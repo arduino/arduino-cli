@@ -191,6 +191,7 @@ func TestUploadPropertiesComposition(t *testing.T) {
 			test.burnBootloader,     // burnBootloader
 			outStream,
 			errStream,
+			false,
 		)
 		verboseVerifyOutput := "verbose verify"
 		if !verboseVerify {

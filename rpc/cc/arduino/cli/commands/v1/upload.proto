@@ -49,6 +49,9 @@ message UploadRequest {
   // triggered instead of a normal upload. The UploadUsingProgrammer call may
   // also be used for explicit error check.
   string programmer = 9;
+  // If set to true, the actual upload will not be performed but a trace output
+  // will be printed stdout. This is for debugging purposes.
+  bool dry_run = 10;
 }
 
 message UploadResponse {
@@ -84,6 +87,9 @@ message UploadUsingProgrammerRequest {
   string import_dir = 8;
   // The programmer to use for upload.
   string programmer = 9;
+  // If set to true, the actual upload will not be performed but a trace output
+  // will be printed stdout. This is for debugging purposes.
+  bool dry_run = 10;
 }
 
 message UploadUsingProgrammerResponse {
@@ -107,6 +113,9 @@ message BurnBootloaderRequest {
   bool verify = 5;
   // The programmer to use for burning bootloader.
   string programmer = 6;
+  // If set to true, the actual upload will not be performed but a trace output
+  // will be printed stdout. This is for debugging purposes.
+  bool dry_run = 7;
 }
 
 message BurnBootloaderResponse {

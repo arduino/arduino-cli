@@ -47,6 +47,7 @@ func BurnBootloader(ctx context.Context, req *rpc.BurnBootloaderRequest, outStre
 		true, // burnBootloader
 		outStream,
 		errStream,
+		req.GetDryRun(),
 	)
 	if err != nil {
 		return nil, err

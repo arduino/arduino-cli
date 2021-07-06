@@ -65,6 +65,7 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		false, // burnBootloader
 		outStream,
 		errStream,
+		req.GetDryRun(),
 	)
 	if err != nil {
 		return nil, err
@@ -98,7 +99,8 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	importFile, importDir, fqbnIn, port string,
 	programmerID string,
 	verbose, verify, burnBootloader bool,
-	outStream, errStream io.Writer) error {
+	outStream, errStream io.Writer,
+	dryRun bool) error {
 
 	if burnBootloader && programmerID == "" {
 		return fmt.Errorf("no programmer specified for burning bootloader")
@@ -308,35 +310,42 @@ func runProgramAction(pm *packagemanager.PackageManager,
 			outStream.Write([]byte(fmt.Sprintln("Skipping 1200-bps touch reset: no serial port selected!")))
 		}
 
-		var cb *serialutils.ResetProgressCallbacks
-		if verbose {
-			cb = &serialutils.ResetProgressCallbacks{
-				TouchingPort: func(port string) {
-					logrus.WithField("phase", "board reset").Infof("Performing 1200-bps touch reset on serial port %s", port)
+		cb := &serialutils.ResetProgressCallbacks{
+			TouchingPort: func(port string) {
+				logrus.WithField("phase", "board reset").Infof("Performing 1200-bps touch reset on serial port %s", port)
+				if verbose {
 					outStream.Write([]byte(fmt.Sprintf("Performing 1200-bps touch reset on serial port %s", port)))
 					outStream.Write([]byte(fmt.Sprintln()))
-				},
-				WaitingForNewSerial: func() {
-					logrus.WithField("phase", "board reset").Info("Waiting for upload port...")
+				}
+			},
+			WaitingForNewSerial: func() {
+				logrus.WithField("phase", "board reset").Info("Waiting for upload port...")
+				if verbose {
 					outStream.Write([]byte(fmt.Sprintln("Waiting for upload port...")))
-				},
-				BootloaderPortFound: func(port string) {
+				}
+			},
+			BootloaderPortFound: func(port string) {
+				if port != "" {
+					logrus.WithField("phase", "board reset").Infof("Upload port found on %s", port)
+				} else {
+					logrus.WithField("phase", "board reset").Infof("No upload port found, using %s as fallback", actualPort)
+				}
+				if verbose {
 					if port != "" {
-						logrus.WithField("phase", "board reset").Infof("Upload port found on %s", port)
 						outStream.Write([]byte(fmt.Sprintf("Upload port found on %s", port)))
 						outStream.Write([]byte(fmt.Sprintln()))
 					} else {
-						logrus.WithField("phase", "board reset").Infof("No upload port found, using %s as fallback", actualPort)
 						outStream.Write([]byte(fmt.Sprintf("No upload port found, using %s as fallback", actualPort)))
 						outStream.Write([]byte(fmt.Sprintln()))
 					}
-				},
-				Debug: func(msg string) {
-					logrus.WithField("phase", "board reset").Debug(msg)
-				},
-			}
+				}
+			},
+			Debug: func(msg string) {
+				logrus.WithField("phase", "board reset").Debug(msg)
+			},
 		}
-		if newPort, err := serialutils.Reset(portToTouch, wait, cb); err != nil {
+
+		if newPort, err := serialutils.Reset(portToTouch, wait, cb, dryRun); err != nil {
 			outStream.Write([]byte(fmt.Sprintf("Cannot perform port reset: %s", err)))
 			outStream.Write([]byte(fmt.Sprintln()))
 		} else {
@@ -358,18 +367,18 @@ func runProgramAction(pm *packagemanager.PackageManager,
 
 	// Run recipes for upload
 	if burnBootloader {
-		if err := runTool("erase.pattern", uploadProperties, outStream, errStream, verbose); err != nil {
+		if err := runTool("erase.pattern", uploadProperties, outStream, errStream, verbose, dryRun); err != nil {
 			return fmt.Errorf("chip erase error: %s", err)
 		}
-		if err := runTool("bootloader.pattern", uploadProperties, outStream, errStream, verbose); err != nil {
+		if err := runTool("bootloader.pattern", uploadProperties, outStream, errStream, verbose, dryRun); err != nil {
 			return fmt.Errorf("burn bootloader error: %s", err)
 		}
 	} else if programmer != nil {
-		if err := runTool("program.pattern", uploadProperties, outStream, errStream, verbose); err != nil {
+		if err := runTool("program.pattern", uploadProperties, outStream, errStream, verbose, dryRun); err != nil {
 			return fmt.Errorf("programming error: %s", err)
 		}
 	} else {
-		if err := runTool("upload.pattern", uploadProperties, outStream, errStream, verbose); err != nil {
+		if err := runTool("upload.pattern", uploadProperties, outStream, errStream, verbose, dryRun); err != nil {
 			return fmt.Errorf("uploading error: %s", err)
 		}
 	}
@@ -378,7 +387,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	return nil
 }
 
-func runTool(recipeID string, props *properties.Map, outStream, errStream io.Writer, verbose bool) error {
+func runTool(recipeID string, props *properties.Map, outStream, errStream io.Writer, verbose bool, dryRun bool) error {
 	recipe, ok := props.GetOk(recipeID)
 	if !ok {
 		return fmt.Errorf("recipe not found '%s'", recipeID)
@@ -396,8 +405,12 @@ func runTool(recipeID string, props *properties.Map, outStream, errStream io.Wri
 	}
 
 	// Run Tool
+	logrus.WithField("phase", "upload").Tracef("Executing upload tool: %s", cmdLine)
 	if verbose {
 		outStream.Write([]byte(fmt.Sprintln(cmdLine)))
+	}
+	if dryRun {
+		return nil
 	}
 	cmd, err := executils.NewProcess(cmdArgs...)
 	if err != nil {
