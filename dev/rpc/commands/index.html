@@ -6607,6 +6607,12 @@
 <td></td>
 <td>The programmer to use for burning bootloader.</td>
 </tr>
+<tr>
+<td>dry_run</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>If set to true, the actual upload will not be performed but a trace output will be printed stdout. This is for debugging purposes.</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.BurnBootloaderResponse"></a></p>
@@ -6747,6 +6753,12 @@
 <td></td>
 <td>The programmer to use for upload. If set an UploadUsingProgrammer is triggered instead of a normal upload. The UploadUsingProgrammer call may also be used for explicit error check.</td>
 </tr>
+<tr>
+<td>dry_run</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>If set to true, the actual upload will not be performed but a trace output will be printed stdout. This is for debugging purposes.</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.UploadResponse"></a></p>
@@ -6840,6 +6852,12 @@
 <td><a href="#string">string</a></td>
 <td></td>
 <td>The programmer to use for upload.</td>
+</tr>
+<tr>
+<td>dry_run</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>If set to true, the actual upload will not be performed but a trace output will be printed stdout. This is for debugging purposes.</td>
 </tr>
 </tbody>
 </table>
