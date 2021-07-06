@@ -31,8 +31,15 @@ type DiscoveryManager struct {
 func New() *DiscoveryManager {
 	return &DiscoveryManager{
 		discoveries:   map[string]*discovery.PluggableDiscovery{},
-		globalEventCh: make(chan *discovery.Event, 5),
+		globalEventCh: nil,
 	}
+}
+
+// Clear resets the DiscoveryManager to its initial state
+func (dm *DiscoveryManager) Clear() {
+	dm.QuitAll()
+	dm.discoveries = map[string]*discovery.PluggableDiscovery{}
+	dm.globalEventCh = nil
 }
 
 // IDs returns the list of discoveries' ids in this DiscoveryManager

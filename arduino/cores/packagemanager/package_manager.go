@@ -67,8 +67,7 @@ func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path) 
 func (pm *PackageManager) Clear() {
 	pm.Packages = cores.NewPackages()
 	pm.CustomGlobalProperties = properties.NewMap()
-	pm.discoveryManager.StopAll()
-	pm.discoveryManager = discoverymanager.New()
+	pm.discoveryManager.Clear()
 }
 
 // DiscoveryManager returns the DiscoveryManager in use by this PackageManager
