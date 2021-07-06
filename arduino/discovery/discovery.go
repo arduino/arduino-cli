@@ -23,6 +23,7 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/executils"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
@@ -60,6 +61,17 @@ type Port struct {
 	Protocol      string          `json:"protocol"`
 	ProtocolLabel string          `json:"protocolLabel"`
 	Properties    *properties.Map `json:"properties"`
+}
+
+// ToRPC converts Port into rpc.Port
+func (p *Port) ToRPC() *rpc.Port {
+	return &rpc.Port{
+		Address:       p.Address,
+		Label:         p.AddressLabel,
+		Protocol:      p.Protocol,
+		ProtocolLabel: p.ProtocolLabel,
+		Properties:    p.Properties.AsMap(),
+	}
 }
 
 func (p *Port) String() string {
