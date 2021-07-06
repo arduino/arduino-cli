@@ -154,12 +154,15 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 	var files []string
 	rootVisited := false
 	err = simpleLocalWalk(sketchFolder, maxFileSystemDepth, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
+		// Ignore ErrNotExist (broken symlinks), which will be
+		// reported by os.Open below if the file would not be
+		// skipped based on the name
+		if err != nil && !errors.Is(err, os.ErrNotExist) {
 			feedback.Errorf("Error during sketch processing: %v", err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 
-		if info.IsDir() {
+		if info != nil && info.IsDir() {
 			// Filters in this if-block are NOT applied to the sketch folder itself.
 			// Since the sketch folder is the first one processed by simpleLocalWalk,
 			// we can set the `rootVisited` guard to exclude it.
@@ -182,7 +185,7 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 		}
 
 		// ignore hidden files
-		if strings.HasPrefix(info.Name(), ".") {
+		if strings.HasPrefix(filepath.Base(path), ".") {
 			return nil
 		}
 
@@ -197,7 +200,8 @@ func SketchLoad(sketchPath, buildPath string) (*sketch.Sketch, error) {
 		// check if file is readable
 		f, err := os.Open(path)
 		if err != nil {
-			return nil
+			feedback.Errorf("Failed to open sketch file: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
 		}
 		f.Close()
 
