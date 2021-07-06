@@ -19,9 +19,9 @@ import (
 	"context"
 	"os"
 
+	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
@@ -49,7 +49,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Executing `arduino core download`")
 
-	platformsRefs, err := globals.ParseReferenceArgs(args, true)
+	platformsRefs, err := arguments.ParseReferences(args, true)
 	if err != nil {
 		feedback.Errorf("Invalid argument passed: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)
