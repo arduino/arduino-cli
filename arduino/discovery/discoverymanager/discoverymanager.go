@@ -139,6 +139,7 @@ func (dm *DiscoveryManager) QuitAll() error {
 	return nil
 }
 
+// List returns a list of available ports detected from all discoveries
 func (dm *DiscoveryManager) List() []*discovery.Port {
 	res := []*discovery.Port{}
 	for _, disc := range dm.discoveries {
@@ -151,7 +152,7 @@ func (dm *DiscoveryManager) List() []*discovery.Port {
 	return res
 }
 
-// ListPorts return the current list of ports detected from all discoveries
+// ListSync return the current list of ports detected from all discoveries
 func (dm *DiscoveryManager) ListSync() []*discovery.Port {
 	res := []*discovery.Port{}
 	for _, disc := range dm.discoveries {
