@@ -440,6 +440,8 @@ func (pm *PackageManager) InstalledBoards() []*cores.Board {
 	return boards
 }
 
+// FindToolsRequiredFromPlatformRelease returns a list of ToolReleases needed by the specified PlatformRelease.
+// If a ToolRelease is not found return an error
 func (pm *PackageManager) FindToolsRequiredFromPlatformRelease(platform *cores.PlatformRelease) ([]*cores.ToolRelease, error) {
 	pm.Log.Infof("Searching tools required for platform %s", platform)
 
