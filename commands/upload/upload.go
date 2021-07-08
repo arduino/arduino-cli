@@ -23,12 +23,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/serialutils"
-	"github.com/arduino/arduino-cli/arduino/sketches"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/executils"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -45,7 +44,7 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 	// TODO: make a generic function to extract sketch from request
 	// and remove duplication in commands/compile.go
 	sketchPath := paths.New(req.GetSketchPath())
-	sketch, err := sketches.NewSketchFromPath(sketchPath)
+	sk, err := sketch.New(sketchPath)
 	if err != nil && req.GetImportDir() == "" && req.GetImportFile() == "" {
 		return nil, fmt.Errorf("opening sketch: %s", err)
 	}
@@ -54,7 +53,7 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 
 	err = runProgramAction(
 		pm,
-		sketch,
+		sk,
 		req.GetImportFile(),
 		req.GetImportDir(),
 		req.GetFqbn(),
@@ -95,7 +94,7 @@ func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest,
 }
 
 func runProgramAction(pm *packagemanager.PackageManager,
-	sketch *sketches.Sketch,
+	sk *sketch.Sketch,
 	importFile, importDir, fqbnIn, port string,
 	programmerID string,
 	verbose, verify, burnBootloader bool,
@@ -107,8 +106,8 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	}
 
 	// FIXME: make a specification on how a port is specified via command line
-	if port == "" && sketch != nil && sketch.Metadata != nil {
-		deviceURI, err := url.Parse(sketch.Metadata.CPU.Port)
+	if port == "" && sk != nil && sk.Metadata != nil {
+		deviceURI, err := url.Parse(sk.Metadata.CPU.Port)
 		if err != nil {
 			return fmt.Errorf("invalid Device URL format: %s", err)
 		}
@@ -118,8 +117,8 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	}
 	logrus.WithField("port", port).Tracef("Upload port")
 
-	if fqbnIn == "" && sketch != nil && sketch.Metadata != nil {
-		fqbnIn = sketch.Metadata.CPU.Fqbn
+	if fqbnIn == "" && sk != nil && sk.Metadata != nil {
+		fqbnIn = sk.Metadata.CPU.Fqbn
 	}
 	if fqbnIn == "" {
 		return fmt.Errorf("no Fully Qualified Board Name provided")
@@ -276,7 +275,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	}
 
 	if !burnBootloader {
-		importPath, sketchName, err := determineBuildPathAndSketchName(importFile, importDir, sketch, fqbn)
+		importPath, sketchName, err := determineBuildPathAndSketchName(importFile, importDir, sk, fqbn)
 		if err != nil {
 			return errors.Errorf("retrieving build artifacts: %s", err)
 		}
@@ -431,7 +430,7 @@ func runTool(recipeID string, props *properties.Map, outStream, errStream io.Wri
 	return nil
 }
 
-func determineBuildPathAndSketchName(importFile, importDir string, sketch *sketches.Sketch, fqbn *cores.FQBN) (*paths.Path, string, error) {
+func determineBuildPathAndSketchName(importFile, importDir string, sk *sketch.Sketch, fqbn *cores.FQBN) (*paths.Path, string, error) {
 	// In general, compiling a sketch will produce a set of files that are
 	// named as the sketch but have different extensions, for example Sketch.ino
 	// may produce: Sketch.ino.bin; Sketch.ino.hex; Sketch.ino.zip; etc...
@@ -478,13 +477,13 @@ func determineBuildPathAndSketchName(importFile, importDir string, sketch *sketc
 	}
 
 	// Case 3: nothing given...
-	if sketch == nil {
+	if sk == nil {
 		return nil, "", fmt.Errorf("no sketch or build directory/file specified")
 	}
 
 	// Case 4: only sketch specified. In this case we use the generated build path
 	// and the given sketch name.
-	return bldr.GenBuildPath(sketch.FullPath), sketch.Name + sketch.MainFileExtension, nil
+	return sk.BuildPath, sk.Name + sk.MainFile.Ext(), nil
 }
 
 func detectSketchNameFromBuildPath(buildPath *paths.Path) (string, error) {

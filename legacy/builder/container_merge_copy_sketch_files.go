@@ -24,22 +24,18 @@ import (
 type ContainerMergeCopySketchFiles struct{}
 
 func (s *ContainerMergeCopySketchFiles) Run(ctx *types.Context) error {
-	sk := types.SketchFromLegacy(ctx.Sketch)
-	if sk == nil {
-		return errors.New("unable to convert legacy sketch to the new type")
-	}
-	offset, source, err := bldr.SketchMergeSources(sk, ctx.SourceOverride)
+	offset, source, err := bldr.SketchMergeSources(ctx.Sketch, ctx.SourceOverride)
 	if err != nil {
 		return err
 	}
 	ctx.LineOffset = offset
 	ctx.Source = source
 
-	if err := bldr.SketchSaveItemCpp(ctx.Sketch.MainFile.Name.String(), []byte(ctx.Source), ctx.SketchBuildPath.String()); err != nil {
+	if err := bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, []byte(ctx.Source), ctx.SketchBuildPath); err != nil {
 		return errors.WithStack(err)
 	}
 
-	if err := bldr.SketchCopyAdditionalFiles(sk, ctx.SketchBuildPath.String(), ctx.SourceOverride); err != nil {
+	if err := bldr.SketchCopyAdditionalFiles(ctx.Sketch, ctx.SketchBuildPath, ctx.SourceOverride); err != nil {
 		return errors.WithStack(err)
 	}
 

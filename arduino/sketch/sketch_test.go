@@ -17,8 +17,7 @@ package sketch
 
 import (
 	"fmt"
-	"path/filepath"
-	"sort"
+	"os"
 	"testing"
 
 	"github.com/arduino/go-paths-helper"
@@ -26,149 +25,278 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewItem(t *testing.T) {
-	sketchItem := filepath.Join("testdata", t.Name()+".ino")
-	item := NewItem(sketchItem)
-	assert.Equal(t, sketchItem, item.Path)
-	sourceBytes, err := item.GetSourceBytes()
-	assert.Nil(t, err)
-	assert.Equal(t, []byte(`#include <testlib.h>`), sourceBytes)
-	sourceStr, err := item.GetSourceStr()
-	assert.Nil(t, err)
-	assert.Equal(t, "#include <testlib.h>", sourceStr)
-
-	item = NewItem("doesnt/exist")
-	sourceBytes, err = item.GetSourceBytes()
-	assert.Nil(t, sourceBytes)
-	assert.NotNil(t, err)
-}
-
-func TestSort(t *testing.T) {
-	items := []*Item{
-		{"foo"},
-		{"baz"},
-		{"bar"},
-	}
-
-	sort.Sort(ItemByPath(items))
-
-	assert.Equal(t, "bar", items[0].Path)
-	assert.Equal(t, "baz", items[1].Path)
-	assert.Equal(t, "foo", items[2].Path)
-}
-
 func TestNew(t *testing.T) {
-	sketchFolderPath := filepath.Join("testdata", t.Name())
-	mainFilePath := filepath.Join(sketchFolderPath, t.Name()+".ino")
-	otherFile := filepath.Join(sketchFolderPath, "other.cpp")
-	allFilesPaths := []string{
-		mainFilePath,
-		otherFile,
-	}
+	sketchFolderPath := paths.New("testdata", "SketchSimple")
+	mainFilePath := sketchFolderPath.Join(fmt.Sprintf("%s.ino", "SketchSimple"))
+	otherFile := sketchFolderPath.Join("other.cpp")
 
-	sketch, err := New(sketchFolderPath, mainFilePath, "", allFilesPaths)
+	// Loading using Sketch folder path
+	sketch, err := New(sketchFolderPath)
 	assert.Nil(t, err)
-	assert.Equal(t, mainFilePath, sketch.MainFile.Path)
-	assert.Equal(t, sketchFolderPath, sketch.LocationPath)
-	assert.Len(t, sketch.OtherSketchFiles, 0)
-	assert.Len(t, sketch.AdditionalFiles, 1)
-	assert.Equal(t, sketch.AdditionalFiles[0].Path, paths.New(sketchFolderPath).Join("other.cpp").String())
-	assert.Len(t, sketch.RootFolderFiles, 1)
-	assert.Equal(t, sketch.RootFolderFiles[0].Path, paths.New(sketchFolderPath).Join("other.cpp").String())
+	assert.True(t, mainFilePath.EquivalentTo(sketch.MainFile))
+	assert.True(t, sketchFolderPath.EquivalentTo(sketch.FullPath))
+	assert.Equal(t, sketch.OtherSketchFiles.Len(), 0)
+	assert.Equal(t, sketch.AdditionalFiles.Len(), 1)
+	assert.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(otherFile))
+	assert.Equal(t, sketch.RootFolderFiles.Len(), 1)
+	assert.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(otherFile))
+
+	// Loading using Sketch main file path
+	sketch, err = New(mainFilePath)
+	assert.Nil(t, err)
+	assert.True(t, mainFilePath.EquivalentTo(sketch.MainFile))
+	assert.True(t, sketchFolderPath.EquivalentTo(sketch.FullPath))
+	assert.Equal(t, sketch.OtherSketchFiles.Len(), 0)
+	assert.Equal(t, sketch.AdditionalFiles.Len(), 1)
+	assert.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(otherFile))
+	assert.Equal(t, sketch.RootFolderFiles.Len(), 1)
+	assert.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(otherFile))
+}
+
+func TestNewSketchPde(t *testing.T) {
+	sketchFolderPath := paths.New("testdata", "SketchPde")
+	mainFilePath := sketchFolderPath.Join(fmt.Sprintf("%s.pde", "SketchPde"))
+
+	// Loading using Sketch folder path
+	sketch, err := New(sketchFolderPath)
+	assert.Nil(t, err)
+	assert.True(t, mainFilePath.EquivalentTo(sketch.MainFile))
+	assert.True(t, sketchFolderPath.EquivalentTo(sketch.FullPath))
+	assert.Equal(t, sketch.OtherSketchFiles.Len(), 0)
+	assert.Equal(t, sketch.AdditionalFiles.Len(), 0)
+	assert.Equal(t, sketch.RootFolderFiles.Len(), 0)
+
+	// Loading using Sketch main file path
+	sketch, err = New(mainFilePath)
+	assert.Nil(t, err)
+	assert.True(t, mainFilePath.EquivalentTo(sketch.MainFile))
+	assert.True(t, sketchFolderPath.EquivalentTo(sketch.FullPath))
+	assert.Equal(t, sketch.OtherSketchFiles.Len(), 0)
+	assert.Equal(t, sketch.AdditionalFiles.Len(), 0)
+	assert.Equal(t, sketch.RootFolderFiles.Len(), 0)
+}
+
+func TestNewSketchBothInoAndPde(t *testing.T) {
+	sketchName := "SketchBothInoAndPde"
+	sketchFolderPath := paths.New("testdata", sketchName)
+	sketch, err := New(sketchFolderPath)
+	require.Nil(t, sketch)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "multiple main sketch files found")
+	require.Contains(t, err.Error(), fmt.Sprintf("%s.ino", sketchName))
+	require.Contains(t, err.Error(), fmt.Sprintf("%s.pde", sketchName))
+}
+
+func TestNewSketchWrongMain(t *testing.T) {
+	sketchName := "SketchWithWrongMain"
+	sketchFolderPath := paths.New("testdata", sketchName)
+	sketch, err := New(sketchFolderPath)
+	require.Nil(t, sketch)
+	require.Error(t, err)
+	sketchFolderPath, _ = sketchFolderPath.Abs()
+	expectedMainFile := sketchFolderPath.Join(sketchName)
+	expectedError := fmt.Sprintf("no valid sketch found in %s: missing %s", sketchFolderPath, expectedMainFile)
+	require.Contains(t, err.Error(), expectedError)
+
+	sketchFolderPath = paths.New("testdata", sketchName)
+	mainFilePath := sketchFolderPath.Join(fmt.Sprintf("%s.ino", sketchName))
+	sketch, err = New(mainFilePath)
+	require.Nil(t, sketch)
+	require.Error(t, err)
+	sketchFolderPath, _ = sketchFolderPath.Abs()
+	expectedError = fmt.Sprintf("no valid sketch found in %s: missing %s", sketchFolderPath, expectedMainFile)
+	require.Contains(t, err.Error(), expectedError)
 }
 
 func TestNewSketchCasingWrong(t *testing.T) {
-	sketchPath := paths.New("testdata", "SketchCasingWrong")
-	mainFilePath := sketchPath.Join("sketchcasingwrong.ino").String()
-	sketch, err := New(sketchPath.String(), mainFilePath, "", []string{mainFilePath})
+	sketchPath := paths.New("testdata", "SketchWithWrongMain")
+	sketch, err := New(sketchPath)
 	assert.Nil(t, sketch)
 	assert.Error(t, err)
-	assert.IsType(t, &InvalidSketchFoldernameError{}, err)
-	e := err.(*InvalidSketchFoldernameError)
+	assert.IsType(t, &InvalidSketchFolderNameError{}, err)
+	e := err.(*InvalidSketchFolderNameError)
 	assert.NotNil(t, e.Sketch)
+	sketchPath, _ = sketchPath.Abs()
 	expectedError := fmt.Sprintf("no valid sketch found in %s: missing %s", sketchPath.String(), sketchPath.Join(sketchPath.Base()+".ino"))
 	assert.EqualError(t, err, expectedError)
 }
 
 func TestNewSketchCasingCorrect(t *testing.T) {
 	sketchPath := paths.New("testdata", "SketchCasingCorrect")
-	mainFilePath := sketchPath.Join("SketchCasingCorrect.ino").String()
-	sketch, err := New(sketchPath.String(), mainFilePath, "", []string{mainFilePath})
+	mainFilePath := sketchPath.Join("SketchCasingCorrect.ino")
+	sketch, err := New(sketchPath)
 	assert.NotNil(t, sketch)
 	assert.NoError(t, err)
-	assert.Equal(t, sketchPath.String(), sketch.LocationPath)
-	assert.Equal(t, mainFilePath, sketch.MainFile.Path)
-	assert.Len(t, sketch.OtherSketchFiles, 0)
-	assert.Len(t, sketch.AdditionalFiles, 0)
-	assert.Len(t, sketch.RootFolderFiles, 0)
-}
-
-func TestCheckSketchCasingWrong(t *testing.T) {
-	sketchFolder := paths.New("testdata", "SketchCasingWrong")
-	err := CheckSketchCasing(sketchFolder.String())
-	expectedError := fmt.Sprintf("no valid sketch found in %s: missing %s", sketchFolder, sketchFolder.Join(sketchFolder.Base()+".ino"))
-	assert.EqualError(t, err, expectedError)
-}
-
-func TestCheckSketchCasingCorrect(t *testing.T) {
-	sketchFolder := paths.New("testdata", "SketchCasingCorrect").String()
-	err := CheckSketchCasing(sketchFolder)
-	require.NoError(t, err)
+	assert.True(t, sketchPath.EquivalentTo(sketch.FullPath))
+	assert.True(t, mainFilePath.EquivalentTo(sketch.MainFile))
+	assert.Equal(t, sketch.OtherSketchFiles.Len(), 0)
+	assert.Equal(t, sketch.AdditionalFiles.Len(), 0)
+	assert.Equal(t, sketch.RootFolderFiles.Len(), 0)
 }
 
 func TestSketchWithMarkdownAsciidocJson(t *testing.T) {
 	sketchPath := paths.New("testdata", "SketchWithMarkdownAsciidocJson")
-	mainFilePath := sketchPath.Join("SketchWithMarkdownAsciidocJson.ino").String()
-	adocFilePath := sketchPath.Join("foo.adoc").String()
-	jsonFilePath := sketchPath.Join("foo.json").String()
-	mdFilePath := sketchPath.Join("foo.md").String()
+	mainFilePath := sketchPath.Join("SketchWithMarkdownAsciidocJson.ino")
+	adocFilePath := sketchPath.Join("foo.adoc")
+	jsonFilePath := sketchPath.Join("foo.json")
+	mdFilePath := sketchPath.Join("foo.md")
 
-	sketch, err := New(sketchPath.String(), mainFilePath, "", []string{mainFilePath, adocFilePath, jsonFilePath, mdFilePath})
+	sketch, err := New(sketchPath)
 	assert.NotNil(t, sketch)
 	assert.NoError(t, err)
-	assert.Equal(t, sketchPath.String(), sketch.LocationPath)
-	assert.Equal(t, mainFilePath, sketch.MainFile.Path)
-	assert.Len(t, sketch.OtherSketchFiles, 0)
-	require.Len(t, sketch.AdditionalFiles, 3)
-	require.Equal(t, "foo.adoc", filepath.Base(sketch.AdditionalFiles[0].Path))
-	require.Equal(t, "foo.json", filepath.Base(sketch.AdditionalFiles[1].Path))
-	require.Equal(t, "foo.md", filepath.Base(sketch.AdditionalFiles[2].Path))
-	assert.Len(t, sketch.RootFolderFiles, 3)
-	require.Equal(t, "foo.adoc", filepath.Base(sketch.RootFolderFiles[0].Path))
-	require.Equal(t, "foo.json", filepath.Base(sketch.RootFolderFiles[1].Path))
-	require.Equal(t, "foo.md", filepath.Base(sketch.RootFolderFiles[2].Path))
+	assert.True(t, sketchPath.EquivalentTo(sketch.FullPath))
+	assert.True(t, mainFilePath.EquivalentTo(sketch.MainFile))
+	assert.Equal(t, sketch.OtherSketchFiles.Len(), 0)
+	require.Equal(t, sketch.AdditionalFiles.Len(), 3)
+	require.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(adocFilePath))
+	require.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(jsonFilePath))
+	require.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(mdFilePath))
+	assert.Equal(t, sketch.RootFolderFiles.Len(), 3)
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(adocFilePath))
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(jsonFilePath))
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(mdFilePath))
 }
 
 func TestSketchWithTppFile(t *testing.T) {
 	sketchPath := paths.New("testdata", "SketchWithTppFile")
-	mainFilePath := sketchPath.Join("SketchWithTppFile.ino").String()
-	templateFile := sketchPath.Join("template.tpp").String()
+	mainFilePath := sketchPath.Join("SketchWithTppFile.ino")
+	templateFile := sketchPath.Join("template.tpp")
 
-	sketch, err := New(sketchPath.String(), mainFilePath, "", []string{mainFilePath, templateFile})
+	sketch, err := New(sketchPath)
 	require.NotNil(t, sketch)
 	require.NoError(t, err)
-	require.Equal(t, sketchPath.String(), sketch.LocationPath)
-	require.Equal(t, mainFilePath, sketch.MainFile.Path)
-	require.Len(t, sketch.OtherSketchFiles, 0)
-	require.Len(t, sketch.AdditionalFiles, 1)
-	require.Equal(t, "template.tpp", filepath.Base(sketch.AdditionalFiles[0].Path))
-	require.Len(t, sketch.RootFolderFiles, 1)
-	require.Equal(t, "template.tpp", filepath.Base(sketch.RootFolderFiles[0].Path))
+	require.True(t, sketchPath.EquivalentTo(sketch.FullPath))
+	require.True(t, mainFilePath.EquivalentTo(sketch.MainFile))
+	require.Equal(t, sketch.OtherSketchFiles.Len(), 0)
+	require.Equal(t, sketch.AdditionalFiles.Len(), 1)
+	require.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(templateFile))
+	require.Equal(t, sketch.RootFolderFiles.Len(), 1)
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(templateFile))
 }
 
 func TestSketchWithIppFile(t *testing.T) {
 	sketchPath := paths.New("testdata", "SketchWithIppFile")
-	mainFilePath := sketchPath.Join("SketchWithIppFile.ino").String()
-	templateFile := sketchPath.Join("template.ipp").String()
+	mainFilePath := sketchPath.Join("SketchWithIppFile.ino")
+	templateFile := sketchPath.Join("template.ipp")
 
-	sketch, err := New(sketchPath.String(), mainFilePath, "", []string{mainFilePath, templateFile})
+	sketch, err := New(sketchPath)
 	require.NotNil(t, sketch)
 	require.NoError(t, err)
-	require.Equal(t, sketchPath.String(), sketch.LocationPath)
-	require.Equal(t, mainFilePath, sketch.MainFile.Path)
-	require.Len(t, sketch.OtherSketchFiles, 0)
-	require.Len(t, sketch.AdditionalFiles, 1)
-	require.Equal(t, "template.ipp", filepath.Base(sketch.AdditionalFiles[0].Path))
-	require.Len(t, sketch.RootFolderFiles, 1)
-	require.Equal(t, "template.ipp", filepath.Base(sketch.RootFolderFiles[0].Path))
+	require.True(t, sketchPath.EquivalentTo(sketch.FullPath))
+	require.True(t, mainFilePath.EquivalentTo(sketch.MainFile))
+	require.Equal(t, sketch.OtherSketchFiles.Len(), 0)
+	require.Equal(t, sketch.AdditionalFiles.Len(), 1)
+	require.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(templateFile))
+	require.Equal(t, sketch.RootFolderFiles.Len(), 1)
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(templateFile))
+}
+
+func TestNewSketchFolderSymlink(t *testing.T) {
+	// pass the path to the sketch folder
+	sketchName := "SketchSymlink"
+	sketchPath, _ := paths.New("testdata", fmt.Sprintf("%sSrc", sketchName)).Abs()
+	sketchPathSymlink, _ := paths.New("testdata", sketchName).Abs()
+	os.Symlink(sketchPath.String(), sketchPathSymlink.String())
+	defer sketchPathSymlink.Remove()
+
+	mainFilePath := sketchPathSymlink.Join(fmt.Sprintf("%sSrc.ino", sketchName))
+	sketch, err := New(sketchPathSymlink)
+	require.Nil(t, err)
+	require.NotNil(t, sketch)
+	require.True(t, sketch.MainFile.EquivalentTo(mainFilePath))
+	require.True(t, sketch.FullPath.EquivalentTo(sketchPath))
+	require.True(t, sketch.FullPath.EquivalentTo(sketchPathSymlink))
+	require.Equal(t, sketch.OtherSketchFiles.Len(), 2)
+	require.True(t, sketch.OtherSketchFiles.ContainsEquivalentTo(sketchPath.Join("old.pde")))
+	require.True(t, sketch.OtherSketchFiles.ContainsEquivalentTo(sketchPath.Join("other.ino")))
+	require.True(t, sketch.OtherSketchFiles.ContainsEquivalentTo(sketchPathSymlink.Join("old.pde")))
+	require.True(t, sketch.OtherSketchFiles.ContainsEquivalentTo(sketchPathSymlink.Join("other.ino")))
+	require.Equal(t, sketch.AdditionalFiles.Len(), 3)
+	require.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(sketchPath.Join("header.h")))
+	require.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(sketchPath.Join("s_file.S")))
+	require.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(sketchPath.Join("src", "helper.h")))
+	require.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(sketchPathSymlink.Join("header.h")))
+	require.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(sketchPathSymlink.Join("s_file.S")))
+	require.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(sketchPathSymlink.Join("src", "helper.h")))
+	require.Equal(t, sketch.RootFolderFiles.Len(), 4)
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(sketchPath.Join("header.h")))
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(sketchPath.Join("old.pde")))
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(sketchPath.Join("other.ino")))
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(sketchPath.Join("s_file.S")))
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(sketchPathSymlink.Join("header.h")))
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(sketchPathSymlink.Join("old.pde")))
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(sketchPathSymlink.Join("other.ino")))
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(sketchPathSymlink.Join("s_file.S")))
+
+	// pass the path to the main file
+	sketch, err = New(mainFilePath)
+	require.Nil(t, err)
+	require.NotNil(t, sketch)
+	require.True(t, sketch.MainFile.EquivalentTo(mainFilePath))
+	require.True(t, sketch.FullPath.EquivalentTo(sketchPath))
+	require.True(t, sketch.FullPath.EquivalentTo(sketchPathSymlink))
+	require.Equal(t, sketch.OtherSketchFiles.Len(), 2)
+	require.True(t, sketch.OtherSketchFiles.ContainsEquivalentTo(sketchPath.Join("old.pde")))
+	require.True(t, sketch.OtherSketchFiles.ContainsEquivalentTo(sketchPath.Join("other.ino")))
+	require.True(t, sketch.OtherSketchFiles.ContainsEquivalentTo(sketchPathSymlink.Join("old.pde")))
+	require.True(t, sketch.OtherSketchFiles.ContainsEquivalentTo(sketchPathSymlink.Join("other.ino")))
+	require.Equal(t, sketch.AdditionalFiles.Len(), 3)
+	require.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(sketchPath.Join("header.h")))
+	require.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(sketchPath.Join("s_file.S")))
+	require.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(sketchPath.Join("src", "helper.h")))
+	require.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(sketchPathSymlink.Join("header.h")))
+	require.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(sketchPathSymlink.Join("s_file.S")))
+	require.True(t, sketch.AdditionalFiles.ContainsEquivalentTo(sketchPathSymlink.Join("src", "helper.h")))
+	require.Equal(t, sketch.RootFolderFiles.Len(), 4)
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(sketchPath.Join("header.h")))
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(sketchPath.Join("old.pde")))
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(sketchPath.Join("other.ino")))
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(sketchPath.Join("s_file.S")))
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(sketchPathSymlink.Join("header.h")))
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(sketchPathSymlink.Join("old.pde")))
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(sketchPathSymlink.Join("other.ino")))
+	require.True(t, sketch.RootFolderFiles.ContainsEquivalentTo(sketchPathSymlink.Join("s_file.S")))
+}
+
+func TestGenBuildPath(t *testing.T) {
+	want := paths.TempDir().Join("arduino-sketch-ACBD18DB4CC2F85CEDEF654FCCC4A4D8")
+	assert.True(t, GenBuildPath(paths.New("foo")).EquivalentTo(want))
+
+	want = paths.TempDir().Join("arduino-sketch-D41D8CD98F00B204E9800998ECF8427E")
+	assert.True(t, GenBuildPath(nil).EquivalentTo(want))
+}
+
+func TestCheckForPdeFiles(t *testing.T) {
+	sketchPath := paths.New("testdata", "SketchSimple")
+	files := CheckForPdeFiles(sketchPath)
+	require.Empty(t, files)
+
+	sketchPath = paths.New("testdata", "SketchPde")
+	files = CheckForPdeFiles(sketchPath)
+	require.Len(t, files, 1)
+	require.Equal(t, sketchPath.Join("SketchPde.pde"), files[0])
+
+	sketchPath = paths.New("testdata", "SketchMultipleMainFiles")
+	files = CheckForPdeFiles(sketchPath)
+	require.Len(t, files, 1)
+	require.Equal(t, sketchPath.Join("SketchMultipleMainFiles.pde"), files[0])
+
+	sketchPath = paths.New("testdata", "SketchSimple", "SketchSimple.ino")
+	files = CheckForPdeFiles(sketchPath)
+	require.Empty(t, files)
+
+	sketchPath = paths.New("testdata", "SketchPde", "SketchPde.pde")
+	files = CheckForPdeFiles(sketchPath)
+	require.Len(t, files, 1)
+	require.Equal(t, sketchPath.Parent().Join("SketchPde.pde"), files[0])
+
+	sketchPath = paths.New("testdata", "SketchMultipleMainFiles", "SketchMultipleMainFiles.ino")
+	files = CheckForPdeFiles(sketchPath)
+	require.Len(t, files, 1)
+	require.Equal(t, sketchPath.Parent().Join("SketchMultipleMainFiles.pde"), files[0])
+
+	sketchPath = paths.New("testdata", "SketchMultipleMainFiles", "SketchMultipleMainFiles.pde")
+	files = CheckForPdeFiles(sketchPath)
+	require.Len(t, files, 1)
+	require.Equal(t, sketchPath.Parent().Join("SketchMultipleMainFiles.pde"), files[0])
 }

@@ -23,7 +23,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/sketches"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 )
@@ -38,13 +38,13 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.Arc
 		sketchPath = paths.New(".")
 	}
 
-	sketch, err := sketches.NewSketchFromPath(sketchPath)
+	s, err := sketch.New(sketchPath)
 	if err != nil {
 		return nil, err
 	}
 
-	sketchPath = sketch.FullPath
-	sketchName = sketch.Name
+	sketchPath = s.FullPath
+	sketchName = s.Name
 
 	archivePath := paths.New(req.ArchivePath)
 	if archivePath == nil {

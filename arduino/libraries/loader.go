@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/sketches"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -173,7 +173,7 @@ func addExamplesToPathList(examplesPath *paths.Path, list *paths.PathList) error
 		return err
 	}
 	for _, file := range files {
-		_, err := sketches.NewSketchFromPath(file)
+		_, err := sketch.New(file)
 		if err == nil {
 			list.Add(file)
 		} else if file.IsDir() {

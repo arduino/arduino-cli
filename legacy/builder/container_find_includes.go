@@ -120,7 +120,7 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 	}
 
 	sketch := ctx.Sketch
-	mergedfile, err := types.MakeSourceFile(ctx, sketch, paths.New(sketch.MainFile.Name.Base()+".cpp"))
+	mergedfile, err := types.MakeSourceFile(ctx, sketch, paths.New(sketch.MainFile.Base()+".cpp"))
 	if err != nil {
 		return errors.WithStack(err)
 	}

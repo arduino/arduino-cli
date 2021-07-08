@@ -43,7 +43,7 @@ var ArduinoPreprocessorProperties = properties.NewFromHashmap(map[string]string{
 type PreprocessSketchArduino struct{}
 
 func (s *PreprocessSketchArduino) Run(ctx *types.Context) error {
-	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Name.Base() + ".cpp")
+	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp")
 	commands := []types.Command{
 		&ArduinoPreprocessorRunner{},
 	}
@@ -66,7 +66,7 @@ func (s *PreprocessSketchArduino) Run(ctx *types.Context) error {
 	if ctx.CodeCompleteAt != "" {
 		err = new(OutputCodeCompletions).Run(ctx)
 	} else {
-		err = bldr.SketchSaveItemCpp(ctx.Sketch.MainFile.Name.String(), []byte(ctx.Source), ctx.SketchBuildPath.String())
+		err = bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, []byte(ctx.Source), ctx.SketchBuildPath)
 	}
 
 	return err

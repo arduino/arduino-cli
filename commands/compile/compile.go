@@ -27,7 +27,7 @@ import (
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/sketches"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/legacy/builder"
@@ -95,14 +95,14 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		return nil, fmt.Errorf("missing sketchPath")
 	}
 	sketchPath := paths.New(req.GetSketchPath())
-	sketch, err := sketches.NewSketchFromPath(sketchPath)
+	sk, err := sketch.New(sketchPath)
 	if err != nil {
 		return nil, fmt.Errorf("opening sketch: %s", err)
 	}
 
 	fqbnIn := req.GetFqbn()
-	if fqbnIn == "" && sketch != nil && sketch.Metadata != nil {
-		fqbnIn = sketch.Metadata.CPU.Fqbn
+	if fqbnIn == "" && sk != nil && sk.Metadata != nil {
+		fqbnIn = sk.Metadata.CPU.Fqbn
 	}
 	if fqbnIn == "" {
 		return nil, fmt.Errorf("no FQBN provided")
@@ -128,7 +128,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx := &types.Context{}
 	builderCtx.PackageManager = pm
 	builderCtx.FQBN = fqbn
-	builderCtx.SketchLocation = sketch.FullPath
+	builderCtx.SketchLocation = sk.FullPath
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.HardwareDirs = configuration.HardwareDirectories(configuration.Settings)
@@ -140,7 +140,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.LibraryDirs = paths.NewPathList(req.Library...)
 
 	if req.GetBuildPath() == "" {
-		builderCtx.BuildPath = bldr.GenBuildPath(sketch.FullPath)
+		builderCtx.BuildPath = sk.BuildPath
 	} else {
 		builderCtx.BuildPath = paths.New(req.GetBuildPath())
 	}
@@ -243,7 +243,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		} else {
 			// Add FQBN (without configs part) to export path
 			fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
-			exportPath = sketch.FullPath.Join("build", fqbnSuffix)
+			exportPath = sk.FullPath.Join("build", fqbnSuffix)
 		}
 		logrus.WithField("path", exportPath).Trace("Saving sketch to export path.")
 		if err := exportPath.MkdirAll(); err != nil {
@@ -281,7 +281,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		importedLibs = append(importedLibs, rpcLib)
 	}
 
-	logrus.Tracef("Compile %s for %s successful", sketch.Name, fqbnIn)
+	logrus.Tracef("Compile %s for %s successful", sk.Name, fqbnIn)
 
 	return &rpc.CompileResponse{
 		UsedLibraries:          importedLibs,

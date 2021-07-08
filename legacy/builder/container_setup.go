@@ -18,11 +18,9 @@ package builder
 import (
 	"fmt"
 
-	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	sk "github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 )
 
@@ -63,9 +61,11 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 		}
 
 		// load sketch
-		sketch, err := bldr.SketchLoad(sketchLocation.String(), ctx.BuildPath.String())
-		if e, ok := err.(*sk.InvalidSketchFoldernameError); ctx.IgnoreSketchFolderNameErrors && ok {
+		sketch, err := sk.New(sketchLocation)
+		if e, ok := err.(*sk.InvalidSketchFolderNameError); ctx.IgnoreSketchFolderNameErrors && ok {
 			// ignore error
+			// This is only done by the arduino-builder since the Arduino Java IDE
+			// supports sketches with invalid names
 			sketch = e.Sketch
 		} else if err != nil {
 			return errors.WithStack(err)
@@ -73,8 +73,9 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 		if sketch.MainFile == nil {
 			return fmt.Errorf("main file missing from sketch")
 		}
-		ctx.SketchLocation = paths.New(sketch.MainFile.Path)
-		ctx.Sketch = types.SketchToLegacy(sketch)
+		sketch.BuildPath = ctx.BuildPath
+		ctx.SketchLocation = sketch.MainFile
+		ctx.Sketch = sketch
 	}
 	ctx.Progress.CompleteStep()
 	builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)

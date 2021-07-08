@@ -1,17 +1,17 @@
 #include <Arduino.h>
-#line 1 {{QuoteCppString .sketch.MainFile.Name}}
+#line 1 {{QuoteCppString .sketch.MainFile}}
 #if __SAM3X8E__
-#line 2 {{QuoteCppString .sketch.MainFile.Name}}
+#line 2 {{QuoteCppString .sketch.MainFile}}
 void ifBranch();
-#line 9 {{QuoteCppString .sketch.MainFile.Name}}
+#line 9 {{QuoteCppString .sketch.MainFile}}
 void f1();
-#line 10 {{QuoteCppString .sketch.MainFile.Name}}
+#line 10 {{QuoteCppString .sketch.MainFile}}
 void f2();
-#line 12 {{QuoteCppString .sketch.MainFile.Name}}
+#line 12 {{QuoteCppString .sketch.MainFile}}
 void setup();
-#line 14 {{QuoteCppString .sketch.MainFile.Name}}
+#line 14 {{QuoteCppString .sketch.MainFile}}
 void loop();
-#line 2 {{QuoteCppString .sketch.MainFile.Name}}
+#line 2 {{QuoteCppString .sketch.MainFile}}
 void ifBranch() {
 }
 #else
