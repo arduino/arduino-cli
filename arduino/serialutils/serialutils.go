@@ -17,6 +17,7 @@ package serialutils
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -86,9 +87,28 @@ type ResetProgressCallbacks struct {
 // If wait is true, this function will wait for a new port to appear and returns that
 // one, otherwise the empty string is returned if the new port can not be detected or
 // if the wait parameter is false.
+// If dryRun is set to true this function will only emulate the port reset without actually
+// performing it, this is useful to mockup for unit-testing and CI.
+// In dryRun mode if the `portToTouch` ends with `"999"` and wait is true, Reset will
+// return a new "bootloader" port as `portToTouch+"0"`.
 // The error is set if the port listing fails.
-func Reset(portToTouch string, wait bool, cb *ResetProgressCallbacks) (string, error) {
-	last, err := getPortMap()
+func Reset(portToTouch string, wait bool, cb *ResetProgressCallbacks, dryRun bool) (string, error) {
+	getPorts := getPortMap // non dry-run default
+	if dryRun {
+		emulatedPort := portToTouch
+		getPorts = func() (map[string]bool, error) {
+			res := map[string]bool{}
+			if emulatedPort != "" {
+				res[emulatedPort] = true
+			}
+			if strings.HasSuffix(emulatedPort, "999") {
+				emulatedPort += "0"
+			}
+			return res, nil
+		}
+	}
+
+	last, err := getPorts()
 	if cb != nil && cb.Debug != nil {
 		cb.Debug(fmt.Sprintf("LAST: %v", last))
 	}
@@ -103,8 +123,12 @@ func Reset(portToTouch string, wait bool, cb *ResetProgressCallbacks) (string, e
 		if cb != nil && cb.TouchingPort != nil {
 			cb.TouchingPort(portToTouch)
 		}
-		if err := TouchSerialPortAt1200bps(portToTouch); err != nil {
-			fmt.Println("TOUCH: error during reset:", err)
+		if dryRun {
+			// do nothing!
+		} else {
+			if err := TouchSerialPortAt1200bps(portToTouch); err != nil {
+				fmt.Println("TOUCH: error during reset:", err)
+			}
 		}
 	}
 
@@ -116,8 +140,12 @@ func Reset(portToTouch string, wait bool, cb *ResetProgressCallbacks) (string, e
 	}
 
 	deadline := time.Now().Add(10 * time.Second)
+	if dryRun {
+		// use a much lower timeout in dryRun
+		deadline = time.Now().Add(100 * time.Millisecond)
+	}
 	for time.Now().Before(deadline) {
-		now, err := getPortMap()
+		now, err := getPorts()
 		if err != nil {
 			return "", err
 		}
@@ -146,7 +174,7 @@ func Reset(portToTouch string, wait bool, cb *ResetProgressCallbacks) (string, e
 			// the USB serial port appearing and disappearing rapidly before
 			// settling.
 			// This check ensure that the port is stable after one second.
-			check, err := getPortMap()
+			check, err := getPorts()
 			if err != nil {
 				return "", err
 			}

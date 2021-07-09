@@ -33,6 +33,7 @@ var (
 	verbose    bool
 	verify     bool
 	programmer string
+	dryRun     bool
 )
 
 // NewCommand created a new `burn-bootloader` command
@@ -51,6 +52,8 @@ func NewCommand() *cobra.Command {
 	burnBootloaderCommand.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
 	burnBootloaderCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, "Turns on verbose mode.")
 	burnBootloaderCommand.Flags().StringVarP(&programmer, "programmer", "P", "", "Use the specified programmer to upload.")
+	burnBootloaderCommand.Flags().BoolVar(&dryRun, "dry-run", false, "Do not perform the actual upload, just log out actions")
+	burnBootloaderCommand.Flags().MarkHidden("dry-run")
 
 	return burnBootloaderCommand
 }
@@ -65,6 +68,7 @@ func run(command *cobra.Command, args []string) {
 		Verbose:    verbose,
 		Verify:     verify,
 		Programmer: programmer,
+		DryRun:     dryRun,
 	}, os.Stdout, os.Stderr); err != nil {
 		feedback.Errorf("Error during Upload: %v", err)
 		os.Exit(errorcodes.ErrGeneric)

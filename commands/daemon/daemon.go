@@ -17,6 +17,7 @@ package daemon
 
 import (
 	"context"
+	"fmt"
 	"io"
 
 	"github.com/arduino/arduino-cli/arduino/utils"
@@ -28,6 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upload"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/sirupsen/logrus"
 )
 
 // ArduinoCoreServerImpl FIXMEDOC
@@ -73,14 +75,37 @@ func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCoreService_Boa
 		return err
 	}
 
-	interrupt := make(chan bool)
+	if msg.Instance == nil {
+		err = fmt.Errorf("no instance specified")
+		stream.Send(&rpc.BoardListWatchResponse{
+			EventType: "error",
+			Error:     err.Error(),
+		})
+		return err
+	}
+
+	interrupt := make(chan bool, 1)
 	go func() {
-		msg, err := stream.Recv()
-		if err != nil {
-			interrupt <- true
-		}
-		if msg != nil {
-			interrupt <- msg.Interrupt
+		defer close(interrupt)
+		for {
+			msg, err := stream.Recv()
+			// Handle client closing the stream and eventual errors
+			if err == io.EOF {
+				logrus.Info("boards watcher stream closed")
+				interrupt <- true
+				return
+			} else if err != nil {
+				logrus.Infof("interrupting boards watcher: %v", err)
+				interrupt <- true
+				return
+			}
+
+			// Message received, does the client want to interrupt?
+			if msg != nil && msg.Interrupt {
+				logrus.Info("boards watcher interrupted by client")
+				interrupt <- msg.Interrupt
+				return
+			}
 		}
 	}()
 
@@ -90,7 +115,10 @@ func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCoreService_Boa
 	}
 
 	for event := range eventsChan {
-		stream.Send(event)
+		err = stream.Send(event)
+		if err != nil {
+			logrus.Infof("sending board watch message: %v", err)
+		}
 	}
 
 	return nil

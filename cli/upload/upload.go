@@ -38,6 +38,7 @@ var (
 	importDir  string
 	importFile string
 	programmer string
+	dryRun     bool
 )
 
 // NewCommand created a new `upload` command
@@ -59,7 +60,8 @@ func NewCommand() *cobra.Command {
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
 	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
 	uploadCommand.Flags().StringVarP(&programmer, "programmer", "P", "", "Optional, use the specified programmer to upload.")
-
+	uploadCommand.Flags().BoolVar(&dryRun, "dry-run", false, "Do not perform the actual upload, just log out actions")
+	uploadCommand.Flags().MarkHidden("dry-run")
 	return uploadCommand
 }
 
@@ -97,6 +99,7 @@ func run(command *cobra.Command, args []string) {
 		ImportFile: importFile,
 		ImportDir:  importDir,
 		Programmer: programmer,
+		DryRun:     dryRun,
 	}, os.Stdout, os.Stderr); err != nil {
 		feedback.Errorf("Error during Upload: %v", err)
 		os.Exit(errorcodes.ErrGeneric)
