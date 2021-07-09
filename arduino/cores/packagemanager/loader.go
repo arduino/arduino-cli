@@ -384,18 +384,15 @@ func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
 	} else {
 		platform.Menus = properties.NewMap()
 	}
+	// This is not a board id so we remove it to correctly
+	// set all other boards properties
+	delete(propertiesByBoard, "menu")
 
 	if !platform.PluggableDiscoveryAware {
 		for _, boardProperties := range propertiesByBoard {
 			convertVidPidIdentificationPropertiesToPluggableDiscovery(boardProperties)
 		}
 	}
-
-	platform.Menus = propertiesByBoard["menu"]
-
-	// This is not a board id so we remove it to correctly
-	// set all other boards properties
-	delete(propertiesByBoard, "menu")
 
 	skippedBoards := []string{}
 	for boardID, boardProperties := range propertiesByBoard {
