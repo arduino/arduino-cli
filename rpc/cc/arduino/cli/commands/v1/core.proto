@@ -71,6 +71,10 @@ message PlatformUninstallResponse {
   TaskProgress task_progress = 1;
 }
 
+// AlreadyAtLatestVersionError is returned when an upgrade is not possible
+// because already at latest version.
+message AlreadyAtLatestVersionError {}
+
 message PlatformUpgradeRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
