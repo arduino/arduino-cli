@@ -226,7 +226,11 @@ func (s *Sketch) checkSketchCasing() error {
 	}
 	files.FilterOutDirs()
 
-	files.FilterPrefix(s.Name)
+	candidateFileNames := []string{}
+	for ext := range globals.MainFileValidExtensions {
+		candidateFileNames = append(candidateFileNames, fmt.Sprintf("%s%s", s.Name, ext))
+	}
+	files.FilterPrefix(candidateFileNames...)
 
 	if files.Len() == 0 {
 		sketchFile := s.FullPath.Join(s.Name + globals.MainFileValidExtension)
