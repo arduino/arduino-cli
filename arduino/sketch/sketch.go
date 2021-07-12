@@ -114,7 +114,7 @@ func New(path *paths.Path) (*Sketch, error) {
 		ext := p.Ext()
 		if _, found := globals.MainFileValidExtensions[ext]; found {
 			if p.EqualsTo(mainFile) {
-				// The main file must be included in the lists of other files
+				// The main file must not be included in the lists of other files
 				continue
 			}
 			// file is a valid sketch file, see if it's stored at the
