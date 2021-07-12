@@ -21,19 +21,23 @@ msgstr ""
 msgid "Available Commands:"
 msgstr ""
 
-#: cli/board/details.go:98
+#: cli/board/details.go:120
 msgid "Board name:"
 msgstr ""
 
-#: cli/board/details.go:100
+#: cli/board/details.go:122
 msgid "Board version:"
 msgstr ""
 
-#: cli/board/details.go:141
+#: cli/board/details.go:168
 msgid "Checksum:"
 msgstr ""
 
-#: cli/board/details.go:55 cli/board/details.go:65
+#: cli/board/details.go:124
+msgid "Debugging supported:"
+msgstr ""
+
+#: cli/board/details.go:71
 msgid "Error getting board details: %v"
 msgstr ""
 
@@ -41,7 +45,7 @@ msgstr ""
 msgid "Examples:"
 msgstr ""
 
-#: cli/board/details.go:139
+#: cli/board/details.go:166
 msgid "File:"
 msgstr ""
 
@@ -53,89 +57,109 @@ msgstr ""
 msgid "Global Flags:"
 msgstr ""
 
-#: cli/board/details.go:111
+#: cli/board/details.go:93 cli/board/details.go:194
+msgid "Id"
+msgstr ""
+
+#: cli/board/details.go:136
 msgid "Identification properties:"
 msgstr ""
 
-#: cli/board/details.go:138
+#: cli/board/details.go:194
+msgid "Name"
+msgstr ""
+
+#: cli/board/details.go:165
 msgid "OS:"
 msgstr ""
 
-#: cli/board/details.go:104
+#: cli/board/details.go:129
 msgid "Official Arduino board:"
 msgstr ""
 
-#: cli/board/details.go:150
+#: cli/board/details.go:177
 msgid "Option:"
 msgstr ""
 
-#: cli/board/details.go:120
+#: cli/board/details.go:145
 msgid "Package URL:"
 msgstr ""
 
-#: cli/board/details.go:119
+#: cli/board/details.go:144
 msgid "Package maintainer:"
 msgstr ""
 
-#: cli/board/details.go:118
+#: cli/board/details.go:143
 msgid "Package name:"
 msgstr ""
 
-#: cli/board/details.go:122
+#: cli/board/details.go:147
 msgid "Package online help:"
 msgstr ""
 
-#: cli/board/details.go:121
+#: cli/board/details.go:146
 msgid "Package website:"
 msgstr ""
 
-#: cli/board/details.go:128
+#: cli/board/details.go:153
 msgid "Platform URL:"
 msgstr ""
 
-#: cli/board/details.go:127
+#: cli/board/details.go:152
 msgid "Platform architecture:"
 msgstr ""
 
-#: cli/board/details.go:126
+#: cli/board/details.go:151
 msgid "Platform category:"
 msgstr ""
 
-#: cli/board/details.go:131
+#: cli/board/details.go:158
 msgid "Platform checksum:"
 msgstr ""
 
-#: cli/board/details.go:129
+#: cli/board/details.go:154
 msgid "Platform file name:"
 msgstr ""
 
-#: cli/board/details.go:125
+#: cli/board/details.go:150
 msgid "Platform name:"
 msgstr ""
 
-#: cli/board/details.go:130
+#: cli/board/details.go:156
 msgid "Platform size (bytes):"
 msgstr ""
 
-#: cli/board/details.go:40
+#: cli/board/details.go:42
 msgid "Print details about a board."
 msgstr ""
 
-#: cli/board/details.go:135
+#: cli/board/details.go:93
+msgid "Programmer name"
+msgstr ""
+
+#: cli/board/details.go:194
+msgid "Programmers:"
+msgstr ""
+
+#: cli/board/details.go:162
 msgid "Required tool:"
 msgstr ""
 
-#: cli/board/details.go:47
+#: cli/board/details.go:49
 msgid "Show full board details"
 msgstr ""
 
-#: cli/board/details.go:41
+#: cli/board/details.go:43
 msgid ""
 "Show information about a board, in particular if the board has options to be"
 " specified in the FQBN."
 msgstr ""
 
-#: cli/board/details.go:140
+#: cli/board/details.go:51
+msgid "Show list of available programmers"
+msgstr ""
+
+#: cli/board/details.go:167
 msgid "Size (bytes):"
 msgstr ""
 
