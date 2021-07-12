@@ -130,7 +130,10 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
 
     # Build sketch for arduino:avr:uno
     result = run_command("compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path))
-    assert result.ok
+    # The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
+    # returning a different error detailed message
+    assert "Error during build: opening sketch" in result.stderr
+    assert not result.ok
 
     sketch_name = "CompileIntegrationTestSymlinkDirLoop"
     sketch_path = os.path.join(data_dir, sketch_name)
@@ -149,7 +152,10 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
 
     # Build sketch for arduino:avr:uno
     result = run_command("compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path))
-    assert result.ok
+    # The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
+    # returning a different error detailed message
+    assert "Error during build: opening sketch" in result.stderr
+    assert not result.ok
 
 
 def test_compile_blacklisted_sketchname(run_command, data_dir):

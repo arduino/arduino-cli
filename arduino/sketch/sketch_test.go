@@ -300,3 +300,39 @@ func TestCheckForPdeFiles(t *testing.T) {
 	require.Len(t, files, 1)
 	require.Equal(t, sketchPath.Parent().Join("SketchMultipleMainFiles.pde"), files[0])
 }
+
+func TestNewSketchWithSymlink(t *testing.T) {
+	sketchPath, _ := paths.New("testdata", "SketchWithSymlink").Abs()
+	mainFilePath := sketchPath.Join("SketchWithSymlink.ino")
+	helperFilePath := sketchPath.Join("some_folder", "helper.h")
+	helperFileSymlinkPath := sketchPath.Join("src", "helper.h")
+	srcPath := sketchPath.Join("src")
+
+	// Create a symlink in the Sketch folder
+	os.Symlink(sketchPath.Join("some_folder").String(), srcPath.String())
+	defer srcPath.Remove()
+
+	sketch, err := New(sketchPath)
+	require.NoError(t, err)
+	require.NotNil(t, sketch)
+	require.True(t, sketch.MainFile.EquivalentTo(mainFilePath))
+	require.True(t, sketch.FullPath.EquivalentTo(sketchPath))
+	require.Equal(t, sketch.OtherSketchFiles.Len(), 0)
+	require.Equal(t, sketch.AdditionalFiles.Len(), 2)
+	require.True(t, sketch.AdditionalFiles.Contains(helperFilePath))
+	require.True(t, sketch.AdditionalFiles.Contains(helperFileSymlinkPath))
+	require.Equal(t, sketch.RootFolderFiles.Len(), 0)
+}
+
+func TestNewSketchWithSymlinkLoop(t *testing.T) {
+	sketchPath, _ := paths.New("testdata", "SketchWithSymlinkLoop").Abs()
+	someSymlinkPath := sketchPath.Join("some_folder", "some_symlink")
+
+	// Create a recursive Sketch symlink
+	os.Symlink(sketchPath.String(), someSymlinkPath.String())
+	defer someSymlinkPath.Remove()
+
+	sketch, err := New(sketchPath)
+	require.Error(t, err)
+	require.Nil(t, sketch)
+}
