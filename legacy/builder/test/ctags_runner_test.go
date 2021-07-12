@@ -216,3 +216,50 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 
 	require.Equal(t, expectedOutput, strings.Replace(ctx.CTagsOutput, "\r\n", "\n", -1))
 }
+
+func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	sketchLocation := Abs(t, paths.New("sketch_with_templates_and_shift", "sketch_with_templates_and_shift.ino"))
+
+	ctx := &types.Context{
+		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
+		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
+		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		OtherLibrariesDirs:   paths.NewPathList("libraries"),
+		SketchLocation:       sketchLocation,
+		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
+		ArduinoAPIVersion:    "10600",
+		Verbose:              true,
+	}
+
+	buildPath := SetupBuildPath(t, ctx)
+	defer buildPath.RemoveAll()
+
+	commands := []types.Command{
+
+		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
+
+		&builder.ContainerMergeCopySketchFiles{},
+
+		&builder.ContainerFindIncludes{},
+
+		&builder.PrintUsedLibrariesIfVerbose{},
+		&builder.WarnAboutArchIncompatibleLibraries{},
+		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"},
+		&builder.CTagsRunner{},
+	}
+
+	for _, command := range commands {
+		err := command.Run(ctx)
+		NoError(t, err)
+	}
+
+	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
+	expectedOutput := "printGyro\t" + quotedSketchLocation + "\t/^void printGyro()$/;\"\tkind:function\tline:10\tsignature:()\treturntype:void\n" +
+		"bVar\t" + quotedSketchLocation + "\t/^c< 8 > bVar;$/;\"\tkind:variable\tline:15\n" +
+		"aVar\t" + quotedSketchLocation + "\t/^c< 1<<8 > aVar;$/;\"\tkind:variable\tline:16\n" +
+		"func\t" + quotedSketchLocation + "\t/^template<int X> func( c< 1<<X> & aParam) {$/;\"\tkind:function\tline:18\tsignature:( c< 1<<X> & aParam)\treturntype:template\n"
+
+	require.Equal(t, expectedOutput, strings.Replace(ctx.CTagsOutput, "\r\n", "\n", -1))
+}
