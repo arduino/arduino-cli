@@ -44,6 +44,10 @@ func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 		return errors.WithStack(err)
 	}
 
+	if len(ctx.Arduifines) > 0 {
+		ctx.GetLogger().Println(constants.LOG_LEVEL_DEBUG, constants.MSG_ADDITIONAL_OPTIONS, ctx.Arduifines)
+	}
+
 	objectFiles, err := compileLibraries(ctx, libs, librariesBuildPath, buildProperties, includes)
 	if err != nil {
 		return errors.WithStack(err)

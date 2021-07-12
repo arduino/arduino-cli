@@ -56,7 +56,7 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 
 	parser := &ctags.CTagsParser{}
 
-	ctx.CTagsOfPreprocessedSource = parser.Parse(ctx.CTagsOutput, ctx.Sketch.MainFile.Name)
+	ctx.CTagsOfPreprocessedSource, ctx.Arduifines = parser.Parse(ctx.CTagsOutput, ctx.Sketch.MainFile.Name)
 	parser.FixCLinkageTagsDeclarations(ctx.CTagsOfPreprocessedSource)
 
 	protos, line := parser.GeneratePrototypes()

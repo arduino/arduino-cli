@@ -43,6 +43,25 @@ func prepareBuilderTestContext(t *testing.T, sketchPath *paths.Path, fqbn string
 	}
 }
 
+func TestBuilderArduifine(t *testing.T) {
+	DownloadCoresAndToolsAndLibraries(t)
+
+	ctx := prepareBuilderTestContext(t, paths.New("sketch_arduifine", "sketch_arduifine.ino"), "arduino:avr:uno")
+	ctx.DebugLevel = 10
+
+	buildPath := SetupBuildPath(t, ctx)
+	defer buildPath.RemoveAll()
+
+	// Run builder
+	command := builder.Builder{}
+	err := command.Run(ctx)
+	NoError(t, err)
+
+	exist, err := buildPath.Join("sketch_arduifine.ino.hex").ExistCheck()
+	NoError(t, err)
+	require.True(t, exist)
+}
+
 func TestBuilderEmptySketch(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 

@@ -66,7 +66,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	require.True(t, Abs(t, paths.New("libraries")).EquivalentTo(librariesFolders[2].Path))
 
 	libs := extractLibraries(ctx)
-	require.Equal(t, 24, len(libs))
+	require.Equal(t, 25, len(libs))
 
 	sort.Sort(ByLibraryName(libs))
 
@@ -176,7 +176,7 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	require.True(t, Abs(t, paths.New("libraries")).EquivalentTo(librariesFolders[2].Path))
 
 	libraries := extractLibraries(ctx)
-	require.Equal(t, 22, len(libraries))
+	require.Equal(t, 23, len(libraries))
 
 	sort.Sort(ByLibraryName(libraries))
 

@@ -32,6 +32,8 @@ const KIND_FUNCTION = "function"
 const TEMPLATE = "template"
 const STATIC = "static"
 const EXTERN = "extern \"C\""
+const ARDUIFINE = "ARDUIFINE"
+const ARDUINOGLOBAL = "ARDUINOGLOBAL"
 
 var KNOWN_TAG_KINDS = map[string]bool{
 	"prototype": true,
@@ -43,14 +45,21 @@ type CTagsParser struct {
 	mainFile *paths.Path
 }
 
-func (p *CTagsParser) Parse(ctagsOutput string, mainFile *paths.Path) []*types.CTag {
+func (p *CTagsParser) Parse(ctagsOutput string, mainFile *paths.Path) ([]*types.CTag, string) {
+	Arduifines := ""
 	rows := strings.Split(ctagsOutput, "\n")
 	rows = removeEmpty(rows)
 
 	p.mainFile = mainFile
 
 	for _, row := range rows {
-		p.tags = append(p.tags, parseTag(row))
+		if strings.Index(row, " "+ARDUINOGLOBAL) != -1 {
+			Arduifines += encloseForCmdLine(extractCtagsDoubleQuotedString(row, ARDUINOGLOBAL))
+		} else if strings.Index(row, " "+ARDUIFINE) != -1 {
+			Arduifines += encloseForCmdLine(toCompilerCmdLine(extractCtagsDoubleQuotedString(row, ARDUIFINE)))
+		} else {
+			p.tags = append(p.tags, parseTag(row))
+		}
 	}
 
 	p.skipTagsWhere(tagIsUnknown)
@@ -60,7 +69,7 @@ func (p *CTagsParser) Parse(ctagsOutput string, mainFile *paths.Path) []*types.C
 	p.skipDuplicates()
 	p.skipTagsWhere(p.prototypeAndCodeDontMatch)
 
-	return p.tags
+	return p.tags, Arduifines
 }
 
 func (p *CTagsParser) addPrototypes() {
@@ -237,4 +246,37 @@ func removeEmpty(rows []string) []string {
 	}
 
 	return newRows
+}
+
+func extractCtagsDoubleQuotedString (row string, directive string) string {
+	first := strings.Index(row, "\"");
+	last := strings.LastIndex(row, "\";$/;\""); // <- $/;" is a ctag addition
+	if (first <= 0) || (last <= 0) || (first + 1 >= last) {
+		//print("\nERROR: malformed \"" + directive + "\" global directive\n\n")
+		return ""
+	}
+	return strings.Replace(strings.Replace(row[first+1 : last], "\\\\", "\\", -1), "\\\"", "\"", -1)
+}
+
+func toCompilerCmdLine (define string) string {
+	// transforms ` A = "B C" ` to `-DA="B C"`
+	// transforms ` A `         to `-DA`
+	elts := strings.SplitAfterN(define, "=", 2)
+	ret := ""
+	eltsLength := len(elts)
+	if eltsLength > 0 {
+		equalsLength := eltsLength - 1
+		ret += "-D"+strings.TrimSpace(elts[0][:len(elts[0])-equalsLength])
+		if equalsLength > 0 {
+			ret += "="+strings.TrimSpace(elts[1])
+		}
+	}
+	return ret
+}
+
+func encloseForCmdLine (str string) string {
+	if len(str) > 0 {
+		return " \""+str+"\" "
+	}
+	return ""
 }

@@ -27,6 +27,9 @@ compiler:
   rare cases, prototype generation may fail for some functions. To work around this, you can provide your own prototypes
   for these functions.
 - `#line` directives are added to make warning or error messages reflect the original sketch layout.
+- Special and optional sketch variables named ARDUIFINE and ARDUINOGLOBAL are parsed, and their content is used to
+  provide more arguments to the compiler commands. Those arguments are used for every compiled source file, including
+  the core, internal and external libraries. Their content is displayed in the message area.
 
 No pre-processing is done to files in a sketch with any extension other than .ino or .pde. Additionally, .h files in the
 sketch are not automatically #included from the main sketch file. Further, if you want to call functions defined in a .c
