@@ -34,9 +34,9 @@ type Sketch struct {
 	MainFile         *paths.Path
 	FullPath         *paths.Path // FullPath is the path to the Sketch folder
 	BuildPath        *paths.Path
-	OtherSketchFiles *paths.PathList // Sketch files that end in .ino other than main file
-	AdditionalFiles  *paths.PathList
-	RootFolderFiles  *paths.PathList // All files that are in the Sketch root
+	OtherSketchFiles paths.PathList // Sketch files that end in .ino other than main file
+	AdditionalFiles  paths.PathList
+	RootFolderFiles  paths.PathList // All files that are in the Sketch root
 	Metadata         *Metadata
 }
 
@@ -80,9 +80,9 @@ func New(path *paths.Path) (*Sketch, error) {
 		MainFile:         mainFile,
 		FullPath:         path,
 		BuildPath:        GenBuildPath(path),
-		OtherSketchFiles: new(paths.PathList),
-		AdditionalFiles:  new(paths.PathList),
-		RootFolderFiles:  new(paths.PathList),
+		OtherSketchFiles: paths.PathList{},
+		AdditionalFiles:  paths.PathList{},
+		RootFolderFiles:  paths.PathList{},
 	}
 
 	err := sketch.checkSketchCasing()
@@ -139,9 +139,9 @@ func New(path *paths.Path) (*Sketch, error) {
 		}
 	}
 
-	sort.Sort(sketch.AdditionalFiles)
-	sort.Sort(sketch.OtherSketchFiles)
-	sort.Sort(sketch.RootFolderFiles)
+	sort.Sort(&sketch.AdditionalFiles)
+	sort.Sort(&sketch.OtherSketchFiles)
+	sort.Sort(&sketch.RootFolderFiles)
 
 	if err := sketch.importMetadata(); err != nil {
 		return nil, fmt.Errorf("importing sketch metadata: %s", err)

@@ -88,7 +88,7 @@ func SketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, st
 	mergedSource += mainSrc + "\n"
 	lineOffset++
 
-	for _, file := range *sk.OtherSketchFiles {
+	for _, file := range sk.OtherSketchFiles {
 		src, err := getSource(file)
 		if err != nil {
 			return 0, "", err
@@ -107,7 +107,7 @@ func SketchCopyAdditionalFiles(sketch *sketch.Sketch, destPath *paths.Path, over
 		return errors.Wrap(err, "unable to create a folder to save the sketch files")
 	}
 
-	for _, file := range *sketch.AdditionalFiles {
+	for _, file := range sketch.AdditionalFiles {
 		relpath, err := sketch.FullPath.RelTo(file)
 		if err != nil {
 			return errors.Wrap(err, "unable to compute relative path to the sketch for the item")

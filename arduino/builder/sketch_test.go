@@ -122,7 +122,7 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	require.Equal(t, s2.AdditionalFiles.Len(), 1)
 
 	// save file info
-	info1, err := paths.New(s2.AdditionalFiles.AsStrings()[0]).Stat()
+	info1, err := s2.AdditionalFiles[0].Stat()
 	require.Nil(t, err)
 
 	// copy again
@@ -130,6 +130,6 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	require.Nil(t, err)
 
 	// verify file hasn't changed
-	info2, err := paths.New(s2.AdditionalFiles.AsStrings()[0]).Stat()
+	info2, err := s2.AdditionalFiles[0].Stat()
 	require.Equal(t, info1.ModTime(), info2.ModTime())
 }

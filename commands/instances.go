@@ -849,17 +849,17 @@ func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketc
 	}
 
 	otherSketchFiles := make([]string, sketch.OtherSketchFiles.Len())
-	for i, file := range *sketch.OtherSketchFiles {
+	for i, file := range sketch.OtherSketchFiles {
 		otherSketchFiles[i] = file.String()
 	}
 
 	additionalFiles := make([]string, sketch.AdditionalFiles.Len())
-	for i, file := range *sketch.AdditionalFiles {
+	for i, file := range sketch.AdditionalFiles {
 		additionalFiles[i] = file.String()
 	}
 
 	rootFolderFiles := make([]string, sketch.RootFolderFiles.Len())
-	for i, file := range *sketch.RootFolderFiles {
+	for i, file := range sketch.RootFolderFiles {
 		rootFolderFiles[i] = file.String()
 	}
 

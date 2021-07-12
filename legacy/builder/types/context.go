@@ -211,7 +211,7 @@ func (ctx *Context) ExtractBuildOptions() *properties.Map {
 	opts.SetPath("sketchLocation", ctx.SketchLocation)
 	var additionalFilesRelative []string
 	if ctx.Sketch != nil {
-		for _, f := range *ctx.Sketch.AdditionalFiles {
+		for _, f := range ctx.Sketch.AdditionalFiles {
 			absPath := ctx.SketchLocation.Parent()
 			relPath, err := f.RelTo(absPath)
 			if err != nil {
