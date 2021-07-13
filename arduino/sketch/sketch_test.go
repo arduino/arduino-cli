@@ -330,13 +330,13 @@ func TestNewSketchWithSymlinkLoop(t *testing.T) {
 	someSymlinkPath := sketchPath.Join("some_folder", "some_symlink")
 
 	// Create a recursive Sketch symlink
-	os.Symlink(sketchPath.String(), someSymlinkPath.String())
+	err := os.Symlink(sketchPath.String(), someSymlinkPath.String())
+	require.NoErrorf(t, err, "This test must be run as administrator on Windows to have symlink creation privilege.")
 	defer someSymlinkPath.Remove()
 
 	// The failure condition is New() never returning, testing for which requires setting up a timeout.
 	done := make(chan bool)
 	var sketch *Sketch
-	var err error
 	go func() {
 		sketch, err = New(sketchPath)
 		done <- true
@@ -361,12 +361,21 @@ func TestNewSketchWithSymlinkLoop(t *testing.T) {
 }
 
 func TestSketchWithMultipleSymlinkLoops(t *testing.T) {
-	sketchPath, _ := paths.New("testdata", "SketchWithMultipleSymlinkLoops").Abs()
+	sketchPath := paths.New("testdata", "SketchWithMultipleSymlinkLoops")
+	srcPath := sketchPath.Join("src")
+	srcPath.Mkdir()
+	defer srcPath.RemoveAll()
+
+	firstSymlinkPath := srcPath.Join("UpGoer1")
+	secondSymlinkPath := srcPath.Join("UpGoer2")
+	err := os.Symlink("..", firstSymlinkPath.String())
+	require.NoErrorf(t, err, "This test must be run as administrator on Windows to have symlink creation privilege.")
+	err = os.Symlink("..", secondSymlinkPath.String())
+	require.NoErrorf(t, err, "This test must be run as administrator on Windows to have symlink creation privilege.")
 
 	// The failure condition is New() never returning, testing for which requires setting up a timeout.
 	done := make(chan bool)
 	var sketch *Sketch
-	var err error
 	go func() {
 		sketch, err = New(sketchPath)
 		done <- true
