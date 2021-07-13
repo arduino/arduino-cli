@@ -53,7 +53,7 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 
-	return &rpc.UploadResponse{}, runProgramAction(
+	if err := runProgramAction(
 		pm,
 		sk,
 		req.GetImportFile(),
@@ -67,7 +67,11 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		outStream,
 		errStream,
 		req.GetDryRun(),
-	)
+	); err != nil {
+		return nil, err
+	}
+
+	return &rpc.UploadResponse{}, nil
 }
 
 // UsingProgrammer FIXMEDOC
