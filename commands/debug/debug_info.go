@@ -22,7 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/sketches"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
 	"github.com/arduino/go-paths-helper"
@@ -47,15 +47,15 @@ func getDebugProperties(req *debug.DebugConfigRequest, pm *packagemanager.Packag
 		return nil, fmt.Errorf("missing sketchPath")
 	}
 	sketchPath := paths.New(req.GetSketchPath())
-	sketch, err := sketches.NewSketchFromPath(sketchPath)
+	sk, err := sketch.New(sketchPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "opening sketch")
 	}
 
 	// XXX Remove this code duplication!!
 	fqbnIn := req.GetFqbn()
-	if fqbnIn == "" && sketch != nil && sketch.Metadata != nil {
-		fqbnIn = sketch.Metadata.CPU.Fqbn
+	if fqbnIn == "" && sk != nil && sk.Metadata != nil {
+		fqbnIn = sk.Metadata.CPU.Fqbn
 	}
 	if fqbnIn == "" {
 		return nil, fmt.Errorf("no Fully Qualified Board Name provided")
@@ -115,15 +115,9 @@ func getDebugProperties(req *debug.DebugConfigRequest, pm *packagemanager.Packag
 		}
 	}
 
-	var importPath *paths.Path
+	importPath := sk.BuildPath
 	if importDir := req.GetImportDir(); importDir != "" {
 		importPath = paths.New(importDir)
-	} else {
-		// TODO: Create a function to obtain importPath from sketch
-		importPath, err = sketch.BuildPath()
-		if err != nil {
-			return nil, fmt.Errorf("can't find build path for sketch: %v", err)
-		}
 	}
 	if !importPath.Exist() {
 		return nil, fmt.Errorf("compiled sketch not found in %s", importPath)
@@ -132,7 +126,7 @@ func getDebugProperties(req *debug.DebugConfigRequest, pm *packagemanager.Packag
 		return nil, fmt.Errorf("expected compiled sketch in directory %s, but is a file instead", importPath)
 	}
 	toolProperties.SetPath("build.path", importPath)
-	toolProperties.Set("build.project_name", sketch.Name+".ino")
+	toolProperties.Set("build.project_name", sk.Name+".ino")
 
 	// Set debug port property
 	port := req.GetPort()

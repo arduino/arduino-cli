@@ -25,7 +25,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/sketches"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	discovery "github.com/arduino/board-discovery"
@@ -42,7 +42,7 @@ func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB commands.Ta
 	if req.GetSketchPath() != "" {
 		sketchPath = paths.New(req.GetSketchPath())
 	}
-	sketch, err := sketches.NewSketchFromPath(sketchPath)
+	sk, err := sketch.New(sketchPath)
 	if err != nil {
 		return nil, fmt.Errorf("opening sketch: %s", err)
 	}
@@ -54,7 +54,7 @@ func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB commands.Ta
 	}
 
 	if fqbn != nil {
-		sketch.Metadata.CPU = sketches.BoardMetadata{
+		sk.Metadata.CPU = sketch.BoardMetadata{
 			Fqbn: fqbn.String(),
 		}
 	} else {
@@ -92,18 +92,18 @@ func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB commands.Ta
 
 		// TODO: should be stoped the monitor: when running as a pure CLI  is released
 		// by the OS, when run as daemon the resource's state is unknown and could be leaked.
-		sketch.Metadata.CPU = sketches.BoardMetadata{
+		sk.Metadata.CPU = sketch.BoardMetadata{
 			Fqbn: board.FQBN(),
 			Name: board.Name(),
 			Port: deviceURI.String(),
 		}
 	}
 
-	err = sketch.ExportMetadata()
+	err = sk.ExportMetadata()
 	if err != nil {
 		return nil, fmt.Errorf("cannot export sketch metadata: %s", err)
 	}
-	taskCB(&rpc.TaskProgress{Name: "Selected fqbn: " + sketch.Metadata.CPU.Fqbn, Completed: true})
+	taskCB(&rpc.TaskProgress{Name: "Selected fqbn: " + sk.Metadata.CPU.Fqbn, Completed: true})
 	return &rpc.BoardAttachResponse{}, nil
 }
 

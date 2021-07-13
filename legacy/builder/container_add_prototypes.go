@@ -32,7 +32,7 @@ func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 	targetFilePath := ctx.PreprocPath.Join(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E)
 
 	// Run preprocessor
-	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Name.Base() + ".cpp")
+	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp")
 	if err := GCCPreprocRunner(ctx, sourceFile, targetFilePath, ctx.IncludeFolders); err != nil {
 		return errors.WithStack(err)
 	}
@@ -53,7 +53,7 @@ func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 		}
 	}
 
-	if err := bldr.SketchSaveItemCpp(ctx.Sketch.MainFile.Name.String(), []byte(ctx.Source), ctx.SketchBuildPath.String()); err != nil {
+	if err := bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, []byte(ctx.Source), ctx.SketchBuildPath); err != nil {
 		return errors.WithStack(err)
 	}
 

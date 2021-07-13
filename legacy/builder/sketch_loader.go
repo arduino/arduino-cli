@@ -16,14 +16,8 @@
 package builder
 
 import (
-	"sort"
-	"strings"
-
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
+	sk "github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/legacy/builder/utils"
-	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 )
 
@@ -50,70 +44,12 @@ func (s *SketchLoader) Run(ctx *types.Context) error {
 
 	ctx.SketchLocation = sketchLocation
 
-	allSketchFilePaths, err := collectAllSketchFiles(sketchLocation.Parent())
+	sketch, err := sk.New(sketchLocation)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-
-	logger := ctx.GetLogger()
-
-	if !allSketchFilePaths.Contains(sketchLocation) {
-		return i18n.ErrorfWithLogger(logger, constants.MSG_CANT_FIND_SKETCH_IN_PATH, sketchLocation, sketchLocation.Parent())
-	}
-
-	sketch, err := makeSketch(sketchLocation, allSketchFilePaths, ctx.BuildPath, logger)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
 	ctx.SketchLocation = sketchLocation
 	ctx.Sketch = sketch
 
 	return nil
-}
-
-func collectAllSketchFiles(from *paths.Path) (paths.PathList, error) {
-	filePaths := []string{}
-	// Source files in the root are compiled, non-recursively. This
-	// is the only place where .ino files can be present.
-	rootExtensions := func(ext string) bool { return MAIN_FILE_VALID_EXTENSIONS[ext] || ADDITIONAL_FILE_VALID_EXTENSIONS[ext] }
-	err := utils.FindFilesInFolder(&filePaths, from.String(), rootExtensions, true /* recurse */)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return paths.NewPathList(filePaths...), errors.WithStack(err)
-}
-
-func makeSketch(sketchLocation *paths.Path, allSketchFilePaths paths.PathList, buildLocation *paths.Path, logger i18n.Logger) (*types.Sketch, error) {
-	sketchFilesMap := make(map[string]types.SketchFile)
-	for _, sketchFilePath := range allSketchFilePaths {
-		sketchFilesMap[sketchFilePath.String()] = types.SketchFile{Name: sketchFilePath}
-	}
-
-	mainFile := sketchFilesMap[sketchLocation.String()]
-	delete(sketchFilesMap, sketchLocation.String())
-
-	additionalFiles := []types.SketchFile{}
-	otherSketchFiles := []types.SketchFile{}
-	mainFileDir := mainFile.Name.Parent()
-	for _, sketchFile := range sketchFilesMap {
-		ext := strings.ToLower(sketchFile.Name.Ext())
-		if MAIN_FILE_VALID_EXTENSIONS[ext] {
-			if sketchFile.Name.Parent().EqualsTo(mainFileDir) {
-				otherSketchFiles = append(otherSketchFiles, sketchFile)
-			}
-		} else if ADDITIONAL_FILE_VALID_EXTENSIONS[ext] {
-			if buildLocation == nil || !strings.Contains(sketchFile.Name.Parent().String(), buildLocation.String()) {
-				additionalFiles = append(additionalFiles, sketchFile)
-			}
-		} else {
-			return nil, i18n.ErrorfWithLogger(logger, constants.MSG_UNKNOWN_SKETCH_EXT, sketchFile.Name)
-		}
-	}
-
-	sort.Sort(types.SketchFileSortByName(additionalFiles))
-	sort.Sort(types.SketchFileSortByName(otherSketchFiles))
-
-	return &types.Sketch{MainFile: mainFile, OtherSketchFiles: otherSketchFiles, AdditionalFiles: additionalFiles}, nil
 }

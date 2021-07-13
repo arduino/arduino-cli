@@ -23,7 +23,6 @@ import (
 	"os"
 	"path"
 
-	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -31,6 +30,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/security"
+	sk "github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/configuration"
@@ -842,29 +842,30 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 
 // LoadSketch collects and returns all files composing a sketch
 func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketchResponse, error) {
-	sketch, err := builder.SketchLoad(req.SketchPath, "")
+	// TODO: This should be a ToRpc function for the Sketch struct
+	sketch, err := sk.New(paths.New(req.SketchPath))
 	if err != nil {
-		return nil, fmt.Errorf("Error loading sketch %v: %v", req.SketchPath, err)
+		return nil, fmt.Errorf("error loading sketch %v: %v", req.SketchPath, err)
 	}
 
-	otherSketchFiles := make([]string, len(sketch.OtherSketchFiles))
+	otherSketchFiles := make([]string, sketch.OtherSketchFiles.Len())
 	for i, file := range sketch.OtherSketchFiles {
-		otherSketchFiles[i] = file.Path
+		otherSketchFiles[i] = file.String()
 	}
 
-	additionalFiles := make([]string, len(sketch.AdditionalFiles))
+	additionalFiles := make([]string, sketch.AdditionalFiles.Len())
 	for i, file := range sketch.AdditionalFiles {
-		additionalFiles[i] = file.Path
+		additionalFiles[i] = file.String()
 	}
 
-	rootFolderFiles := make([]string, len(sketch.RootFolderFiles))
+	rootFolderFiles := make([]string, sketch.RootFolderFiles.Len())
 	for i, file := range sketch.RootFolderFiles {
-		rootFolderFiles[i] = file.Path
+		rootFolderFiles[i] = file.String()
 	}
 
 	return &rpc.LoadSketchResponse{
-		MainFile:         sketch.MainFile.Path,
-		LocationPath:     sketch.LocationPath,
+		MainFile:         sketch.MainFile.String(),
+		LocationPath:     sketch.FullPath.String(),
 		OtherSketchFiles: otherSketchFiles,
 		AdditionalFiles:  additionalFiles,
 		RootFolderFiles:  rootFolderFiles,

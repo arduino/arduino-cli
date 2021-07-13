@@ -4,6 +4,95 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## Unreleased
 
+### Change public library interface
+
+#### `github.com/arduino/arduino-cli/arduino/builder` package
+
+`GenBuildPath()` function has been moved to `github.com/arduino/arduino-cli/arduino/sketch` package. The signature is
+unchanged.
+
+`EnsureBuildPathExists` function from has been completely removed, in its place use
+`github.com/arduino/go-paths-helper.MkDirAll()`.
+
+`SketchSaveItemCpp` function signature is changed from `path string, contents []byte, destPath string` to
+`path *paths.Path, contents []byte, destPath *paths.Path`. `paths` is `github.com/arduino/go-paths-helper`.
+
+`SketchLoad` function has been removed, in its place use `New` from `github.com/arduino/arduino-cli/arduino/sketch`
+package.
+
+```diff
+-      SketchLoad("/some/path", "")
++      sketch.New(paths.New("some/path))
+}
+```
+
+If you need to set a custom build path you must instead set it after creating the Sketch.
+
+```diff
+-      SketchLoad("/some/path", "/my/build/path")
++      s, err := sketch.New(paths.New("some/path))
++      s.BuildPath = paths.new("/my/build/path")
+}
+```
+
+`SketchCopyAdditionalFiles` function signature is changed from
+`sketch *sketch.Sketch, destPath string, overrides map[string]string` to
+`sketch *sketch.Sketch, destPath *paths.Path, overrides map[string]string`.
+
+#### `github.com/arduino/arduino-cli/arduino/sketch` package
+
+`Item` struct has been removed, use `go-paths-helper.Path` in its place.
+
+`NewItem` has been removed too, use `go-paths-helper.New` in its place.
+
+`GetSourceBytes` has been removed, in its place use `go-paths-helper.Path.ReadFile`. `GetSourceStr` too has been
+removed, in its place:
+
+```diff
+-      s, err := item.GetSourceStr()
++      data, err := file.ReadFile()
++      s := string(data)
+}
+```
+
+`ItemByPath` type and its member functions have been removed, use `go-paths-helper.PathList` in its place.
+
+`Sketch.LocationPath` has been renamed to `FullPath` and its type changed from `string` to `go-paths-helper.Path`.
+
+`Sketch.MainFile` type has changed from `*Item` to `go-paths-helper.Path`. `Sketch.OtherSketchFiles`,
+`Sketch.AdditionalFiles` and `Sketch.RootFolderFiles` type has changed from `[]*Item` to `go-paths-helper.PathList`.
+
+`New` signature has been changed from `sketchFolderPath, mainFilePath, buildPath string, allFilesPaths []string` to
+`path *go-paths-helper.Path`.
+
+`CheckSketchCasing` function is now private, the check is done internally by `New`.
+
+`InvalidSketchFoldernameError` has been renamed `InvalidSketchFolderNameError`.
+
+#### `github.com/arduino/arduino-cli/arduino/sketches` package
+
+`Sketch` struct has been merged with `sketch.Sketch` struct.
+
+`Metadata` and `BoardMetadata` structs have been moved to `github.com/arduino/arduino-cli/arduino/sketch` package.
+
+`NewSketchFromPath` has been deleted, use `sketch.New` in its place.
+
+`ImportMetadata` is now private called internally by `sketch.New`.
+
+`ExportMetadata` has been moved to `github.com/arduino/arduino-cli/arduino/sketch` package.
+
+`BuildPath` has been removed, use `sketch.Sketch.BuildPath` in its place.
+
+`CheckForPdeFiles` has been moved to `github.com/arduino/arduino-cli/arduino/sketch` package.
+
+#### `github.com/arduino/arduino-cli/legacy/builder/types` package
+
+`Sketch` has been removed, use `sketch.Sketch` in its place.
+
+`SketchToLegacy` and `SketchFromLegacy` have been removed, nothing replaces them.
+
+`Context.Sketch` types has been changed from `Sketch` to `sketch.Sketch`.
+
 ### Change of behaviour of gRPC `Init` function
 
 Previously the `Init` function was used to both create a new `CoreInstance` and initialize it, so that the internal

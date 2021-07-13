@@ -21,7 +21,7 @@ import (
 	"strconv"
 	"time"
 
-	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/phases"
@@ -41,7 +41,7 @@ const DEFAULT_SOFTWARE = "ARDUINO"
 type Builder struct{}
 
 func (s *Builder) Run(ctx *types.Context) error {
-	if err := bldr.EnsureBuildPathExists(ctx.BuildPath.String()); err != nil {
+	if err := ctx.BuildPath.MkdirAll(); err != nil {
 		return err
 	}
 
@@ -134,10 +134,10 @@ type Preprocess struct{}
 
 func (s *Preprocess) Run(ctx *types.Context) error {
 	if ctx.BuildPath == nil {
-		ctx.BuildPath = bldr.GenBuildPath(ctx.SketchLocation)
+		ctx.BuildPath = sketch.GenBuildPath(ctx.SketchLocation)
 	}
 
-	if err := bldr.EnsureBuildPathExists(ctx.BuildPath.String()); err != nil {
+	if err := ctx.BuildPath.MkdirAll(); err != nil {
 		return err
 	}
 
@@ -170,7 +170,7 @@ type ParseHardwareAndDumpBuildProperties struct{}
 
 func (s *ParseHardwareAndDumpBuildProperties) Run(ctx *types.Context) error {
 	if ctx.BuildPath == nil {
-		ctx.BuildPath = bldr.GenBuildPath(ctx.SketchLocation)
+		ctx.BuildPath = sketch.GenBuildPath(ctx.SketchLocation)
 	}
 
 	commands := []types.Command{

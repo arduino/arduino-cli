@@ -176,7 +176,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 
 	// Generate the CMakeLists global file
 
-	projectName := strings.TrimSuffix(ctx.Sketch.MainFile.Name.Base(), ctx.Sketch.MainFile.Name.Ext())
+	projectName := ctx.Sketch.Name
 
 	cmakelist := "cmake_minimum_required(VERSION 3.5.0)\n"
 	cmakelist += "INCLUDE(FindPkgConfig)\n"

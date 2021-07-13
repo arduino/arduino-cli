@@ -21,10 +21,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/sketches"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
@@ -56,13 +55,13 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 	type test struct {
 		importFile    string
 		importDir     string
-		sketch        *sketches.Sketch
+		sketch        *sketch.Sketch
 		fqbn          *cores.FQBN
 		resBuildPath  string
 		resSketchName string
 	}
 
-	blonk, err := sketches.NewSketchFromPath(paths.New("testdata/Blonk"))
+	blonk, err := sketch.New(paths.New("testdata/Blonk"))
 	require.NoError(t, err)
 
 	fqbn, err := cores.ParseFQBN("arduino:samd:mkr1000")
@@ -78,7 +77,7 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 		// 03: error: used both importPath and importFile
 		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", nil, nil, "<nil>", ""},
 		// 04: only sketch without FQBN
-		{"", "", blonk, nil, builder.GenBuildPath(blonk.FullPath).String(), "Blonk.ino"},
+		{"", "", blonk, nil, sketch.GenBuildPath(blonk.FullPath).String(), "Blonk.ino"},
 		// 05: use importFile to detect build.path and project_name, sketch is ignored.
 		{"testdata/build_path_2/Blink.ino.hex", "", blonk, nil, "testdata/build_path_2", "Blink.ino"},
 		// 06: use importPath as build.path and Blink as project name, ignore the sketch Blonk
@@ -94,7 +93,7 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 		// 11: error: used both importPath and importFile
 		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", nil, fqbn, "<nil>", ""},
 		// 12: use sketch to determine project name and sketch+fqbn to determine build path
-		{"", "", blonk, fqbn, builder.GenBuildPath(blonk.FullPath).String(), "Blonk.ino"},
+		{"", "", blonk, fqbn, sketch.GenBuildPath(blonk.FullPath).String(), "Blonk.ino"},
 		// 13: use importFile to detect build.path and project_name, sketch+fqbn is ignored.
 		{"testdata/build_path_2/Blink.ino.hex", "", blonk, fqbn, "testdata/build_path_2", "Blink.ino"},
 		// 14: use importPath as build.path and Blink as project name, ignore the sketch Blonk, ignore fqbn

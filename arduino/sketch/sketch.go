@@ -16,9 +16,10 @@
 package sketch
 
 import (
+	"crypto/md5"
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"path/filepath"
 	"sort"
 	"strings"
 
@@ -27,123 +28,189 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Item holds the source and the path for a single sketch file
-type Item struct {
-	Path string
-}
-
-// NewItem reads the source code for a sketch item and returns an
-// Item instance
-func NewItem(itemPath string) *Item {
-	return &Item{itemPath}
-}
-
-// GetSourceBytes reads the item file contents and returns it as bytes
-func (i *Item) GetSourceBytes() ([]byte, error) {
-	// read the file
-	source, err := ioutil.ReadFile(i.Path)
-	if err != nil {
-		return nil, errors.Wrap(err, "error reading source file")
-	}
-	return source, nil
-}
-
-// GetSourceStr reads the item file contents and returns it as a string
-func (i *Item) GetSourceStr() (string, error) {
-	source, err := i.GetSourceBytes()
-	if err != nil {
-		return "", err
-	}
-	return string(source), nil
-}
-
-// ItemByPath implements sort.Interface for []Item based on
-// lexicographic order of the path string.
-type ItemByPath []*Item
-
-func (ibn ItemByPath) Len() int           { return len(ibn) }
-func (ibn ItemByPath) Swap(i, j int)      { ibn[i], ibn[j] = ibn[j], ibn[i] }
-func (ibn ItemByPath) Less(i, j int) bool { return ibn[i].Path < ibn[j].Path }
-
 // Sketch holds all the files composing a sketch
 type Sketch struct {
-	MainFile         *Item
-	LocationPath     string
-	OtherSketchFiles []*Item
-	AdditionalFiles  []*Item
-	RootFolderFiles  []*Item
+	Name             string
+	MainFile         *paths.Path
+	FullPath         *paths.Path // FullPath is the path to the Sketch folder
+	BuildPath        *paths.Path
+	OtherSketchFiles paths.PathList // Sketch files that end in .ino other than main file
+	AdditionalFiles  paths.PathList
+	RootFolderFiles  paths.PathList // All files that are in the Sketch root
+	Metadata         *Metadata
+}
+
+// Metadata is the kind of data associated to a project such as the connected board
+type Metadata struct {
+	CPU BoardMetadata `json:"cpu,omitempty"`
+}
+
+// BoardMetadata represents the board metadata for the sketch
+type BoardMetadata struct {
+	Fqbn string `json:"fqbn,required"`
+	Name string `json:"name,omitempty"`
+	Port string `json:"port,omitepty"`
 }
 
 // New creates an Sketch instance by reading all the files composing a sketch and grouping them
 // by file type.
-func New(sketchFolderPath, mainFilePath, buildPath string, allFilesPaths []string) (*Sketch, error) {
-	var mainFile *Item
+func New(path *paths.Path) (*Sketch, error) {
+	path = path.Canonical()
+	if !path.IsDir() {
+		path = path.Parent()
+	}
 
-	// read all the sketch contents and create sketch Items
-	pathToItem := make(map[string]*Item)
-	for _, p := range allFilesPaths {
-		// create an Item
-		item := NewItem(p)
-
-		if p == mainFilePath {
-			// store the main sketch file
-			mainFile = item
-		} else {
-			// map the file path to sketch.Item
-			pathToItem[p] = item
+	var mainFile *paths.Path
+	for ext := range globals.MainFileValidExtensions {
+		candidateSketchMainFile := path.Join(path.Base() + ext)
+		if candidateSketchMainFile.Exist() {
+			if mainFile == nil {
+				mainFile = candidateSketchMainFile
+			} else {
+				return nil, errors.Errorf("multiple main sketch files found (%v, %v)",
+					mainFile,
+					candidateSketchMainFile,
+				)
+			}
 		}
 	}
 
-	// organize the Items
-	additionalFiles := []*Item{}
-	otherSketchFiles := []*Item{}
-	rootFolderFiles := []*Item{}
-	for p, item := range pathToItem {
-		ext := filepath.Ext(p)
+	sketch := &Sketch{
+		Name:             path.Base(),
+		MainFile:         mainFile,
+		FullPath:         path,
+		BuildPath:        GenBuildPath(path),
+		OtherSketchFiles: paths.PathList{},
+		AdditionalFiles:  paths.PathList{},
+		RootFolderFiles:  paths.PathList{},
+	}
+
+	err := sketch.checkSketchCasing()
+	if e, ok := err.(*InvalidSketchFolderNameError); ok {
+		return nil, e
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	if mainFile == nil {
+		return nil, fmt.Errorf("can't find main Sketch file in %s", path)
+	}
+
+	sketchFolderFiles, err := sketch.supportedFiles()
+	if err != nil {
+		return nil, err
+	}
+
+	// Collect files
+	for _, p := range *sketchFolderFiles {
+		// Skip files that can't be opened
+		f, err := p.Open()
+		if err != nil {
+			continue
+		}
+		f.Close()
+
+		ext := p.Ext()
 		if _, found := globals.MainFileValidExtensions[ext]; found {
-			// item is a valid main file, see if it's stored at the
+			if p.EqualsTo(mainFile) {
+				// The main file must not be included in the lists of other files
+				continue
+			}
+			// file is a valid sketch file, see if it's stored at the
 			// sketch root and ignore if it's not.
-			if filepath.Dir(p) == sketchFolderPath {
-				otherSketchFiles = append(otherSketchFiles, item)
-				rootFolderFiles = append(rootFolderFiles, item)
+			if p.Parent().EqualsTo(path) {
+				sketch.OtherSketchFiles.Add(p)
+				sketch.RootFolderFiles.Add(p)
 			}
 		} else if _, found := globals.AdditionalFileValidExtensions[ext]; found {
-			// item is a valid sketch file, grab it only if the buildPath is empty
-			// or the file is within the buildPath
-			if buildPath == "" || !strings.Contains(filepath.Dir(p), buildPath) {
-				additionalFiles = append(additionalFiles, item)
-				if filepath.Dir(p) == sketchFolderPath {
-					rootFolderFiles = append(rootFolderFiles, item)
-				}
+			// If the user exported the compiles binaries to the Sketch "build" folder
+			// they would be picked up but we don't want them, so we skip them like so
+			if isInBuildFolder, err := p.IsInsideDir(sketch.FullPath.Join("build")); isInBuildFolder || err != nil {
+				continue
+			}
+
+			sketch.AdditionalFiles.Add(p)
+			if p.Parent().EqualsTo(path) {
+				sketch.RootFolderFiles.Add(p)
 			}
 		} else {
 			return nil, errors.Errorf("unknown sketch file extension '%s'", ext)
 		}
 	}
 
-	sort.Sort(ItemByPath(additionalFiles))
-	sort.Sort(ItemByPath(otherSketchFiles))
-	sort.Sort(ItemByPath(rootFolderFiles))
+	sort.Sort(&sketch.AdditionalFiles)
+	sort.Sort(&sketch.OtherSketchFiles)
+	sort.Sort(&sketch.RootFolderFiles)
 
-	sk := &Sketch{
-		MainFile:         mainFile,
-		LocationPath:     sketchFolderPath,
-		OtherSketchFiles: otherSketchFiles,
-		AdditionalFiles:  additionalFiles,
-		RootFolderFiles:  rootFolderFiles,
+	if err := sketch.importMetadata(); err != nil {
+		return nil, fmt.Errorf("importing sketch metadata: %s", err)
 	}
-	err := CheckSketchCasing(sketchFolderPath)
-	if e, ok := err.(*InvalidSketchFoldernameError); ok {
-		e.Sketch = sk
-		return nil, e
-	}
+	return sketch, nil
+}
+
+// supportedFiles reads all files recursively contained in Sketch and
+// filter out unneded or unsupported ones and returns them
+func (s *Sketch) supportedFiles() (*paths.PathList, error) {
+	files, err := s.FullPath.ReadDirRecursive()
 	if err != nil {
 		return nil, err
 	}
-	return sk, nil
+	files.FilterOutDirs()
+	files.FilterOutHiddenFiles()
+	validExtensions := []string{}
+	for ext := range globals.MainFileValidExtensions {
+		validExtensions = append(validExtensions, ext)
+	}
+	for ext := range globals.AdditionalFileValidExtensions {
+		validExtensions = append(validExtensions, ext)
+	}
+	files.FilterSuffix(validExtensions...)
+	return &files, nil
+
 }
 
-// CheckSketchCasing returns an error if the casing of the sketch folder and the main file are different.
+// ImportMetadata imports metadata into the sketch from a sketch.json file in the root
+// path of the sketch.
+func (s *Sketch) importMetadata() error {
+	sketchJSON := s.FullPath.Join("sketch.json")
+	if sketchJSON.NotExist() {
+		// File doesn't exist, nothing to import
+		return nil
+	}
+
+	content, err := sketchJSON.ReadFile()
+	if err != nil {
+		return fmt.Errorf("reading sketch metadata %s: %s", sketchJSON, err)
+	}
+	var meta Metadata
+	err = json.Unmarshal(content, &meta)
+	if err != nil {
+		if s.Metadata == nil {
+			s.Metadata = new(Metadata)
+		}
+		return fmt.Errorf("encoding sketch metadata: %s", err)
+	}
+	s.Metadata = &meta
+	return nil
+}
+
+// ExportMetadata writes sketch metadata into a sketch.json file in the root path of
+// the sketch
+func (s *Sketch) ExportMetadata() error {
+	d, err := json.MarshalIndent(&s.Metadata, "", "  ")
+	if err != nil {
+		return fmt.Errorf("decoding sketch metadata: %s", err)
+	}
+
+	sketchJSON := s.FullPath.Join("sketch.json")
+	if err := sketchJSON.WriteFile(d); err != nil {
+		return fmt.Errorf("writing sketch metadata %s: %s", sketchJSON, err)
+	}
+	return nil
+}
+
+// checkSketchCasing returns an error if the casing of the sketch folder and the main file are different.
 // Correct:
 //    MySketch/MySketch.ino
 // Wrong:
@@ -152,33 +219,67 @@ func New(sketchFolderPath, mainFilePath, buildPath string, allFilesPaths []strin
 //
 // This is mostly necessary to avoid errors on Mac OS X.
 // For more info see: https://github.com/arduino/arduino-cli/issues/1174
-func CheckSketchCasing(sketchFolder string) error {
-	sketchPath := paths.New(sketchFolder)
-	files, err := sketchPath.ReadDir()
+func (s *Sketch) checkSketchCasing() error {
+	files, err := s.FullPath.ReadDir()
 	if err != nil {
 		return errors.Errorf("reading files: %v", err)
 	}
 	files.FilterOutDirs()
 
-	sketchName := sketchPath.Base()
-	files.FilterPrefix(sketchName)
+	candidateFileNames := []string{}
+	for ext := range globals.MainFileValidExtensions {
+		candidateFileNames = append(candidateFileNames, fmt.Sprintf("%s%s", s.Name, ext))
+	}
+	files.FilterPrefix(candidateFileNames...)
 
 	if files.Len() == 0 {
-		sketchFolderPath := paths.New(sketchFolder)
-		sketchFile := sketchFolderPath.Join(sketchFolderPath.Base() + globals.MainFileValidExtension)
-		return &InvalidSketchFoldernameError{SketchFolder: sketchFolderPath, SketchFile: sketchFile}
+		sketchFile := s.FullPath.Join(s.Name + globals.MainFileValidExtension)
+		return &InvalidSketchFolderNameError{
+			SketchFolder: s.FullPath,
+			SketchFile:   sketchFile,
+			Sketch:       s,
+		}
 	}
 
 	return nil
 }
 
-// InvalidSketchFoldernameError is returned when the sketch directory doesn't match the sketch name
-type InvalidSketchFoldernameError struct {
+// InvalidSketchFolderNameError is returned when the sketch directory doesn't match the sketch name
+type InvalidSketchFolderNameError struct {
 	SketchFolder *paths.Path
 	SketchFile   *paths.Path
 	Sketch       *Sketch
 }
 
-func (e *InvalidSketchFoldernameError) Error() string {
+func (e *InvalidSketchFolderNameError) Error() string {
 	return fmt.Sprintf("no valid sketch found in %s: missing %s", e.SketchFolder, e.SketchFile)
+}
+
+// CheckForPdeFiles returns all files ending with .pde extension
+// in sketch, this is mainly used to warn the user that these files
+// must be changed to .ino extension.
+// When .pde files won't be supported anymore this function must be removed.
+func CheckForPdeFiles(sketch *paths.Path) []*paths.Path {
+	if sketch.IsNotDir() {
+		sketch = sketch.Parent()
+	}
+
+	files, err := sketch.ReadDirRecursive()
+	if err != nil {
+		return []*paths.Path{}
+	}
+	files.FilterSuffix(".pde")
+	return files
+}
+
+// GenBuildPath generates a suitable name for the build folder.
+// The sketchPath, if not nil, is also used to furhter differentiate build paths.
+func GenBuildPath(sketchPath *paths.Path) *paths.Path {
+	path := ""
+	if sketchPath != nil {
+		path = sketchPath.String()
+	}
+	md5SumBytes := md5.Sum([]byte(path))
+	md5Sum := strings.ToUpper(hex.EncodeToString(md5SumBytes[:]))
+	return paths.TempDir().Join("arduino-sketch-" + md5Sum)
 }

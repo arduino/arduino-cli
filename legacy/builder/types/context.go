@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
@@ -68,7 +69,7 @@ type Context struct {
 	BuiltInLibrariesDirs paths.PathList
 	OtherLibrariesDirs   paths.PathList
 	LibraryDirs          paths.PathList // List of paths pointing to individual library root folders
-	SketchLocation       *paths.Path
+	SketchLocation       *paths.Path    // SketchLocation points to the main Sketch file
 	WatchedLocations     paths.PathList
 	ArduinoAPIVersion    string
 	FQBN                 *cores.FQBN
@@ -109,7 +110,7 @@ type Context struct {
 
 	CollectedSourceFiles *UniqueSourceFileQueue
 
-	Sketch          *Sketch
+	Sketch          *sketch.Sketch
 	Source          string
 	SourceGccMinusE string
 	CodeCompletions string
@@ -210,9 +211,9 @@ func (ctx *Context) ExtractBuildOptions() *properties.Map {
 	opts.SetPath("sketchLocation", ctx.SketchLocation)
 	var additionalFilesRelative []string
 	if ctx.Sketch != nil {
-		for _, sketch := range ctx.Sketch.AdditionalFiles {
+		for _, f := range ctx.Sketch.AdditionalFiles {
 			absPath := ctx.SketchLocation.Parent()
-			relPath, err := sketch.Name.RelTo(absPath)
+			relPath, err := f.RelTo(absPath)
 			if err != nil {
 				continue // ignore
 			}

@@ -50,7 +50,7 @@ func MakeSourceFile(ctx *Context, origin interface{}, path *paths.Path) (SourceF
 // appended here.
 func buildRoot(ctx *Context, origin interface{}) *paths.Path {
 	switch o := origin.(type) {
-	case *Sketch:
+	case *sketch.Sketch:
 		return ctx.SketchBuildPath
 	case *libraries.Library:
 		return ctx.LibrariesBuildPath.Join(o.Name)
@@ -64,7 +64,7 @@ func buildRoot(ctx *Context, origin interface{}) *paths.Path {
 // the full path to that source file.
 func sourceRoot(ctx *Context, origin interface{}) *paths.Path {
 	switch o := origin.(type) {
-	case *Sketch:
+	case *sketch.Sketch:
 		return ctx.SketchBuildPath
 	case *libraries.Library:
 		return o.SourceDir
@@ -101,56 +101,6 @@ func (s SketchFileSortByName) Swap(i, j int) {
 
 func (s SketchFileSortByName) Less(i, j int) bool {
 	return s[i].Name.String() < s[j].Name.String()
-}
-
-type Sketch struct {
-	MainFile         SketchFile
-	OtherSketchFiles []SketchFile
-	AdditionalFiles  []SketchFile
-}
-
-func SketchToLegacy(sketch *sketch.Sketch) *Sketch {
-	s := &Sketch{}
-	s.MainFile = SketchFile{
-		paths.New(sketch.MainFile.Path),
-	}
-
-	for _, item := range sketch.OtherSketchFiles {
-		s.OtherSketchFiles = append(s.OtherSketchFiles, SketchFile{
-			paths.New(item.Path),
-		})
-	}
-
-	for _, item := range sketch.AdditionalFiles {
-		s.AdditionalFiles = append(s.AdditionalFiles, SketchFile{
-			paths.New(item.Path),
-		})
-	}
-
-	return s
-}
-
-func SketchFromLegacy(s *Sketch) *sketch.Sketch {
-	others := []*sketch.Item{}
-	for _, f := range s.OtherSketchFiles {
-		i := sketch.NewItem(f.Name.String())
-		others = append(others, i)
-	}
-
-	additional := []*sketch.Item{}
-	for _, f := range s.AdditionalFiles {
-		i := sketch.NewItem(f.Name.String())
-		additional = append(additional, i)
-	}
-
-	return &sketch.Sketch{
-		MainFile: &sketch.Item{
-			Path: s.MainFile.Name.String(),
-		},
-		LocationPath:     s.MainFile.Name.Parent().String(),
-		OtherSketchFiles: others,
-		AdditionalFiles:  additional,
-	}
 }
 
 type PlatforKeysRewrite struct {
