@@ -287,6 +287,47 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#change-public-library-interface" class="md-nav__link">
+    Change public library interface
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-cliarduinobuilder-package" class="md-nav__link">
+    github.com/arduino/arduino-cli/arduino/builder package
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-cliarduinosketch-package" class="md-nav__link">
+    github.com/arduino/arduino-cli/arduino/sketch package
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-cliarduinosketches-package" class="md-nav__link">
+    github.com/arduino/arduino-cli/arduino/sketches package
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-clilegacybuildertypes-package" class="md-nav__link">
+    github.com/arduino/arduino-cli/legacy/builder/types package
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#change-of-behaviour-of-grpc-init-function" class="md-nav__link">
     Change of behaviour of gRPC Init function
   </a>
@@ -1261,6 +1302,47 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#change-public-library-interface" class="md-nav__link">
+    Change public library interface
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-cliarduinobuilder-package" class="md-nav__link">
+    github.com/arduino/arduino-cli/arduino/builder package
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-cliarduinosketch-package" class="md-nav__link">
+    github.com/arduino/arduino-cli/arduino/sketch package
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-cliarduinosketches-package" class="md-nav__link">
+    github.com/arduino/arduino-cli/arduino/sketches package
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-clilegacybuildertypes-package" class="md-nav__link">
+    github.com/arduino/arduino-cli/legacy/builder/types package
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#change-of-behaviour-of-grpc-init-function" class="md-nav__link">
     Change of behaviour of gRPC Init function
   </a>
@@ -1435,6 +1517,59 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="change-public-library-interface">Change public library interface<a class="headerlink" href="#change-public-library-interface" title="Permanent link">&para;</a></h3>
+<h4 id="githubcomarduinoarduino-cliarduinobuilder-package"><code>github.com/arduino/arduino-cli/arduino/builder</code> package<a class="headerlink" href="#githubcomarduinoarduino-cliarduinobuilder-package" title="Permanent link">&para;</a></h4>
+<p><code>GenBuildPath()</code> function has been moved to <code>github.com/arduino/arduino-cli/arduino/sketch</code> package. The signature is
+unchanged.</p>
+<p><code>EnsureBuildPathExists</code> function from has been completely removed, in its place use
+<code>github.com/arduino/go-paths-helper.MkDirAll()</code>.</p>
+<p><code>SketchSaveItemCpp</code> function signature is changed from <code>path string, contents []byte, destPath string</code> to
+<code>path *paths.Path, contents []byte, destPath *paths.Path</code>. <code>paths</code> is <code>github.com/arduino/go-paths-helper</code>.</p>
+<p><code>SketchLoad</code> function has been removed, in its place use <code>New</code> from <code>github.com/arduino/arduino-cli/arduino/sketch</code>
+package.</p>
+<div class="highlight"><pre><span></span><code><span class="gd">-      SketchLoad(&quot;/some/path&quot;, &quot;&quot;)</span>
+<span class="gi">+      sketch.New(paths.New(&quot;some/path))</span>
+}
+</code></pre></div>
+<p>If you need to set a custom build path you must instead set it after creating the Sketch.</p>
+<div class="highlight"><pre><span></span><code><span class="gd">-      SketchLoad(&quot;/some/path&quot;, &quot;/my/build/path&quot;)</span>
+<span class="gi">+      s, err := sketch.New(paths.New(&quot;some/path))</span>
+<span class="gi">+      s.BuildPath = paths.new(&quot;/my/build/path&quot;)</span>
+}
+</code></pre></div>
+<p><code>SketchCopyAdditionalFiles</code> function signature is changed from
+<code>sketch *sketch.Sketch, destPath string, overrides map[string]string</code> to
+<code>sketch *sketch.Sketch, destPath *paths.Path, overrides map[string]string</code>.</p>
+<h4 id="githubcomarduinoarduino-cliarduinosketch-package"><code>github.com/arduino/arduino-cli/arduino/sketch</code> package<a class="headerlink" href="#githubcomarduinoarduino-cliarduinosketch-package" title="Permanent link">&para;</a></h4>
+<p><code>Item</code> struct has been removed, use <code>go-paths-helper.Path</code> in its place.</p>
+<p><code>NewItem</code> has been removed too, use <code>go-paths-helper.New</code> in its place.</p>
+<p><code>GetSourceBytes</code> has been removed, in its place use <code>go-paths-helper.Path.ReadFile</code>. <code>GetSourceStr</code> too has been
+removed, in its place:</p>
+<div class="highlight"><pre><span></span><code><span class="gd">-      s, err := item.GetSourceStr()</span>
+<span class="gi">+      data, err := file.ReadFile()</span>
+<span class="gi">+      s := string(data)</span>
+}
+</code></pre></div>
+<p><code>ItemByPath</code> type and its member functions have been removed, use <code>go-paths-helper.PathList</code> in its place.</p>
+<p><code>Sketch.LocationPath</code> has been renamed to <code>FullPath</code> and its type changed from <code>string</code> to <code>go-paths-helper.Path</code>.</p>
+<p><code>Sketch.MainFile</code> type has changed from <code>*Item</code> to <code>go-paths-helper.Path</code>. <code>Sketch.OtherSketchFiles</code>,
+<code>Sketch.AdditionalFiles</code> and <code>Sketch.RootFolderFiles</code> type has changed from <code>[]*Item</code> to <code>go-paths-helper.PathList</code>.</p>
+<p><code>New</code> signature has been changed from <code>sketchFolderPath, mainFilePath, buildPath string, allFilesPaths []string</code> to
+<code>path *go-paths-helper.Path</code>.</p>
+<p><code>CheckSketchCasing</code> function is now private, the check is done internally by <code>New</code>.</p>
+<p><code>InvalidSketchFoldernameError</code> has been renamed <code>InvalidSketchFolderNameError</code>.</p>
+<h4 id="githubcomarduinoarduino-cliarduinosketches-package"><code>github.com/arduino/arduino-cli/arduino/sketches</code> package<a class="headerlink" href="#githubcomarduinoarduino-cliarduinosketches-package" title="Permanent link">&para;</a></h4>
+<p><code>Sketch</code> struct has been merged with <code>sketch.Sketch</code> struct.</p>
+<p><code>Metadata</code> and <code>BoardMetadata</code> structs have been moved to <code>github.com/arduino/arduino-cli/arduino/sketch</code> package.</p>
+<p><code>NewSketchFromPath</code> has been deleted, use <code>sketch.New</code> in its place.</p>
+<p><code>ImportMetadata</code> is now private called internally by <code>sketch.New</code>.</p>
+<p><code>ExportMetadata</code> has been moved to <code>github.com/arduino/arduino-cli/arduino/sketch</code> package.</p>
+<p><code>BuildPath</code> has been removed, use <code>sketch.Sketch.BuildPath</code> in its place.</p>
+<p><code>CheckForPdeFiles</code> has been moved to <code>github.com/arduino/arduino-cli/arduino/sketch</code> package.</p>
+<h4 id="githubcomarduinoarduino-clilegacybuildertypes-package"><code>github.com/arduino/arduino-cli/legacy/builder/types</code> package<a class="headerlink" href="#githubcomarduinoarduino-clilegacybuildertypes-package" title="Permanent link">&para;</a></h4>
+<p><code>Sketch</code> has been removed, use <code>sketch.Sketch</code> in its place.</p>
+<p><code>SketchToLegacy</code> and <code>SketchFromLegacy</code> have been removed, nothing replaces them.</p>
+<p><code>Context.Sketch</code> types has been changed from <code>Sketch</code> to <code>sketch.Sketch</code>.</p>
 <h3 id="change-of-behaviour-of-grpc-init-function">Change of behaviour of gRPC <code>Init</code> function<a class="headerlink" href="#change-of-behaviour-of-grpc-init-function" title="Permanent link">&para;</a></h3>
 <p>Previously the <code>Init</code> function was used to both create a new <code>CoreInstance</code> and initialize it, so that the internal
 package and library managers were already populated with all the information available from <code>*_index.json</code> files,
