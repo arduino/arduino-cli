@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/assert"
@@ -332,7 +333,59 @@ func TestNewSketchWithSymlinkLoop(t *testing.T) {
 	os.Symlink(sketchPath.String(), someSymlinkPath.String())
 	defer someSymlinkPath.Remove()
 
-	sketch, err := New(sketchPath)
+	// The failure condition is New() never returning, testing for which requires setting up a timeout.
+	done := make(chan bool)
+	var sketch *Sketch
+	var err error
+	go func() {
+		sketch, err = New(sketchPath)
+		done <- true
+	}()
+
+	assert.Eventually(
+		t,
+		func() bool {
+			select {
+			case <-done:
+				return true
+			default:
+				return false
+			}
+		},
+		20*time.Second,
+		10*time.Millisecond,
+		"Infinite symlink loop while loading sketch",
+	)
+	require.Error(t, err)
+	require.Nil(t, sketch)
+}
+
+func TestSketchWithMultipleSymlinkLoops(t *testing.T) {
+	sketchPath, _ := paths.New("testdata", "SketchWithMultipleSymlinkLoops").Abs()
+
+	// The failure condition is New() never returning, testing for which requires setting up a timeout.
+	done := make(chan bool)
+	var sketch *Sketch
+	var err error
+	go func() {
+		sketch, err = New(sketchPath)
+		done <- true
+	}()
+
+	assert.Eventually(
+		t,
+		func() bool {
+			select {
+			case <-done:
+				return true
+			default:
+				return false
+			}
+		},
+		20*time.Second,
+		10*time.Millisecond,
+		"Infinite symlink loop while loading sketch",
+	)
 	require.Error(t, err)
 	require.Nil(t, sketch)
 }
