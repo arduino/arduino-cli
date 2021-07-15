@@ -106,8 +106,14 @@ def working_dir(tmpdir_factory):
     shutil.rmtree(work_dir, ignore_errors=True)
 
 
+@pytest.fixture(scope="session")
+def cli_path(pytestconfig):
+    cli_path = Path(pytestconfig.rootdir).parent / "arduino-cli"
+    return "{}".format(cli_path)
+
+
 @pytest.fixture(scope="function")
-def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
+def run_command(cli_path, data_dir, downloads_dir, working_dir):
     """
     Provide a wrapper around invoke's `run` API so that every test
     will work in the same temporary folder.
@@ -116,7 +122,6 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
         http://docs.pyinvoke.org/en/1.4/api/runners.html#invoke.runners.Result
     """
 
-    cli_path = Path(pytestconfig.rootdir).parent / "arduino-cli"
     env = {
         "ARDUINO_DATA_DIR": data_dir,
         "ARDUINO_DOWNLOADS_DIR": downloads_dir,
@@ -130,7 +135,7 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
             custom_working_dir = working_dir
         if not custom_env:
             custom_env = env
-        cli_full_line = '"{}" {}'.format(cli_path, cmd_string)
+        cli_full_line = f'"{cli_path}" {cmd_string}'
         run_context = Context()
         # It might happen that we need to change directories between drives on Windows,
         # in that case the "/d" flag must be used otherwise directory wouldn't change
