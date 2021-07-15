@@ -58,6 +58,11 @@ def create_data_dir(tmpdir_factory):
         shutil.rmtree(data, ignore_errors=True)
 
 
+@pytest.fixture(scope="module")
+def module_data_dir(tmpdir_factory):
+    yield from create_data_dir(tmpdir_factory)
+
+
 @pytest.fixture(scope="session")
 def session_data_dir(tmpdir_factory):
     yield from create_data_dir(tmpdir_factory)
