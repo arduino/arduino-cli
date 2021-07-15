@@ -158,6 +158,30 @@ def make_cli_runner(cli_path, working_dir, env):
     return _run
 
 
+class CliTestEnvironment:
+    def __init__(self, cli_path, data_dir, downloads_dir, working_dir):
+        self.env = {
+            "ARDUINO_DATA_DIR": data_dir,
+            "ARDUINO_DOWNLOADS_DIR": downloads_dir,
+            "ARDUINO_SKETCHBOOK_DIR": data_dir,
+        }
+        self.cli_runner = make_cli_runner(cli_path, working_dir, self.env)
+        self.data_dir = data_dir
+        self.downloads_dir = downloads_dir
+        self.sketchbook_dir = data_dir
+        self.working_dir = working_dir
+
+
+@pytest.fixture(scope="function")
+def module_shared_env(cli_path, module_data_dir, downloads_dir, working_dir):
+    return CliTestEnvironment(cli_path, module_data_dir, downloads_dir, working_dir)
+
+
+@pytest.fixture(scope="function")
+def clean_env(cli_path, data_dir, downloads_dir, working_dir):
+    return CliTestEnvironment(cli_path, data_dir, downloads_dir, working_dir)
+
+
 @pytest.fixture(scope="function")
 def daemon_runner(pytestconfig, data_dir, downloads_dir, working_dir):
     """
