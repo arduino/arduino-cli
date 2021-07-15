@@ -193,3 +193,56 @@ func TestLoadDiscoveries(t *testing.T) {
 	require.Contains(t, discoveries, "arduino:serial-discovery")
 	require.Contains(t, discoveries, "teensy")
 }
+
+func TestConvertUploadToolsToPluggableDiscovery(t *testing.T) {
+	props, err := properties.LoadFromBytes([]byte(`
+upload.tool=avrdude
+upload.protocol=arduino
+upload.maximum_size=32256
+upload.maximum_data_size=2048
+upload.speed=115200
+bootloader.tool=avrdude
+bootloader.low_fuses=0xFF
+bootloader.high_fuses=0xDE
+bootloader.extended_fuses=0xFD
+bootloader.unlock_bits=0x3F
+bootloader.lock_bits=0x0F
+bootloader.file=optiboot/optiboot_atmega328.hex
+name=AVR ISP
+communication=serial
+protocol=stk500v1
+program.protocol=stk500v1
+program.tool=avrdude
+program.extra_params=-P{serial.port}
+`))
+	require.NoError(t, err)
+
+	convertUploadToolsToPluggableDiscovery(props)
+
+	expectedProps, err := properties.LoadFromBytes([]byte(`
+upload.tool=avrdude
+upload.tool.default=avrdude
+upload.protocol=arduino
+upload.maximum_size=32256
+upload.maximum_data_size=2048
+upload.speed=115200
+bootloader.tool=avrdude
+bootloader.tool.default=avrdude
+bootloader.low_fuses=0xFF
+bootloader.high_fuses=0xDE
+bootloader.extended_fuses=0xFD
+bootloader.unlock_bits=0x3F
+bootloader.lock_bits=0x0F
+bootloader.file=optiboot/optiboot_atmega328.hex
+name=AVR ISP
+communication=serial
+protocol=stk500v1
+program.protocol=stk500v1
+program.tool=avrdude
+program.tool.default=avrdude
+program.extra_params=-P{serial.port}
+`))
+	require.NoError(t, err)
+
+	require.Equal(t, expectedProps.AsMap(), props.AsMap())
+}

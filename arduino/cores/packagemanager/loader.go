@@ -341,6 +341,9 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 	// Create programmers properties
 	if programmersProperties, err := properties.SafeLoad(programmersTxtPath.String()); err == nil {
 		for programmerID, programmerProperties := range programmersProperties.FirstLevelOf() {
+			if !platform.PluggableDiscoveryAware {
+				convertUploadToolsToPluggableDiscovery(programmersProperties)
+			}
 			platform.Programmers[programmerID] = pm.loadProgrammer(programmerProperties)
 			platform.Programmers[programmerID].PlatformRelease = platform
 		}
@@ -391,12 +394,6 @@ func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
 	// set all other boards properties
 	delete(propertiesByBoard, "menu")
 
-	if !platform.PluggableDiscoveryAware {
-		for _, boardProperties := range propertiesByBoard {
-			convertVidPidIdentificationPropertiesToPluggableDiscovery(boardProperties)
-		}
-	}
-
 	skippedBoards := []string{}
 	for boardID, boardProperties := range propertiesByBoard {
 		var board *cores.Board
@@ -415,6 +412,12 @@ func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
 				goto next_board
 			}
 		}
+
+		if !platform.PluggableDiscoveryAware {
+			convertVidPidIdentificationPropertiesToPluggableDiscovery(boardProperties)
+			convertUploadToolsToPluggableDiscovery(boardProperties)
+		}
+
 		// The board's ID must be available in a board's properties since it can
 		// be used in all configuration files for several reasons, like setting compilation
 		// flags depending on the board id.
@@ -467,6 +470,22 @@ func convertVidPidIdentificationPropertiesToPluggableDiscovery(boardProperties *
 			if vidOk && pidOk {
 				outputVidPid(vid, pid)
 			}
+		}
+	}
+}
+
+func convertUploadToolsToPluggableDiscovery(props *properties.Map) {
+	actions := []string{"upload", "bootloader", "program"}
+	for _, action := range actions {
+		if !props.ContainsKey(fmt.Sprintf("%s.tool.default", action)) {
+			tool, found := props.GetOk(fmt.Sprintf("%s.tool", action))
+			if !found {
+				// Just skip it, ideally this must never happen but if a platform
+				// doesn't define an expected upload.tool, bootloader.tool or program.tool
+				// there will be other issues further down the road after this conversion
+				continue
+			}
+			props.Set(fmt.Sprintf("%s.tool.default", action), tool)
 		}
 	}
 }
