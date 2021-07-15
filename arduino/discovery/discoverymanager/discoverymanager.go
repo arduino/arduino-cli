@@ -39,7 +39,10 @@ func New() *DiscoveryManager {
 func (dm *DiscoveryManager) Clear() {
 	dm.QuitAll()
 	dm.discoveries = map[string]*discovery.PluggableDiscovery{}
-	dm.globalEventCh = nil
+	if dm.globalEventCh != nil {
+		close(dm.globalEventCh)
+		dm.globalEventCh = nil
+	}
 }
 
 // IDs returns the list of discoveries' ids in this DiscoveryManager
@@ -92,6 +95,9 @@ func (dm *DiscoveryManager) StartAll() error {
 // returns the first error it meets or nil
 func (dm *DiscoveryManager) StartSyncAll() (<-chan *discovery.Event, []error) {
 	errs := []error{}
+	if dm.globalEventCh == nil {
+		dm.globalEventCh = make(chan *discovery.Event, 5)
+	}
 	for _, d := range dm.discoveries {
 		if d.IsEventMode() {
 			// Already started, nothing to do
