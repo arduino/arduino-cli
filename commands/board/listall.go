@@ -17,12 +17,13 @@ package board
 
 import (
 	"context"
-	"errors"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // maximumSearchDistance is the maximum Levenshtein distance accepted when using fuzzy search.
@@ -30,10 +31,10 @@ import (
 const maximumSearchDistance = 20
 
 // ListAll FIXMEDOC
-func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListAllResponse, error) {
+func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListAllResponse, *status.Status) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New("invalid instance")
+		return nil, status.New(codes.InvalidArgument, "invalid instance")
 	}
 
 	searchArgs := []string{}
@@ -101,7 +102,7 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListA
 				toTest := append(toTest, board.Name())
 				toTest = append(toTest, board.FQBN())
 				if ok, err := match(toTest); err != nil {
-					return nil, err
+					return nil, status.New(codes.InvalidArgument, err.Error())
 				} else if !ok {
 					continue
 				}

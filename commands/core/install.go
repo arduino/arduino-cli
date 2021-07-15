@@ -23,21 +23,22 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/pkg/errors"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // PlatformInstall FIXMEDOC
 func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformInstallResponse, error) {
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformInstallResponse, *status.Status) {
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New("invalid instance")
+		return nil, status.New(codes.InvalidArgument, "invalid instance")
 	}
 
 	version, err := commands.ParseVersion(req)
 	if err != nil {
-		return nil, fmt.Errorf("invalid version: %s", err)
+		return nil, status.Newf(codes.InvalidArgument, "invalid version: %s", err)
 	}
 
 	platform, tools, err := pm.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{
@@ -46,17 +47,17 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
 		PlatformVersion:      version,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("finding platform dependencies: %s", err)
+		return nil, status.Newf(codes.InvalidArgument, "finding platform dependencies: %s", err)
 	}
 
 	err = installPlatform(pm, platform, tools, downloadCB, taskCB, req.GetSkipPostInstall())
 	if err != nil {
-		return nil, err
+		return nil, status.Convert(err)
 	}
 
 	status := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil)
 	if status != nil {
-		return nil, status.Err()
+		return nil, status
 	}
 
 	return &rpc.PlatformInstallResponse{}, nil

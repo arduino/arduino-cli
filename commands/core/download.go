@@ -17,25 +17,26 @@ package core
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // PlatformDownload FIXMEDOC
-func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, downloadCB commands.DownloadProgressCB) (*rpc.PlatformDownloadResponse, error) {
+func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, downloadCB commands.DownloadProgressCB) (*rpc.PlatformDownloadResponse, *status.Status) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New("invalid instance")
+		return nil, status.New(codes.InvalidArgument, "invalid instance")
 	}
 
 	version, err := commands.ParseVersion(req)
 	if err != nil {
-		return nil, fmt.Errorf("invalid version: %s", err)
+		return nil, status.Newf(codes.InvalidArgument, "invalid version: %s", err)
 	}
 
 	platform, tools, err := pm.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{
@@ -44,18 +45,18 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, dow
 		PlatformVersion:      version,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("find platform dependencies: %s", err)
+		return nil, status.Newf(codes.InvalidArgument, "find platform dependencies: %s", err)
 	}
 
 	err = downloadPlatform(pm, platform, downloadCB)
 	if err != nil {
-		return nil, err
+		return nil, status.New(codes.Unavailable, err.Error())
 	}
 
 	for _, tool := range tools {
 		err := downloadTool(pm, tool, downloadCB)
 		if err != nil {
-			return nil, fmt.Errorf("downloading tool %s: %s", tool, err)
+			return nil, status.Newf(codes.Unavailable, "downloading tool %s: %s", tool, err)
 		}
 	}
 

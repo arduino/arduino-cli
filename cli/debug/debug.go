@@ -33,7 +33,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"google.golang.org/grpc/status"
 )
 
 var (
@@ -90,12 +89,8 @@ func run(command *cobra.Command, args []string) {
 	if printInfo {
 
 		if res, err := debug.GetDebugConfig(context.Background(), debugConfigRequested); err != nil {
-			if status, ok := status.FromError(err); ok {
-				feedback.Errorf("Error getting Debug info: %v", status.Message())
-				errorcodes.ExitWithGrpcStatus(status)
-			}
-			feedback.Errorf("Error getting Debug info: %v", err)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Errorf("Error getting Debug info: %v", err.Message())
+			errorcodes.ExitWithGrpcStatus(err)
 		} else {
 			feedback.PrintResult(&debugInfoResult{res})
 		}

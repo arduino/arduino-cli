@@ -319,10 +319,10 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) *sta
 }
 
 // Destroy FIXMEDOC
-func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse, error) {
+func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse, *status.Status) {
 	id := req.GetInstance().GetId()
 	if _, ok := instances[id]; !ok {
-		return nil, fmt.Errorf("invalid handle")
+		return nil, status.New(codes.InvalidArgument, "invalid handle")
 	}
 
 	delete(instances, id)
@@ -330,25 +330,25 @@ func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse
 }
 
 // UpdateLibrariesIndex updates the library_index.json
-func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequest, downloadCB func(*rpc.DownloadProgress)) error {
+func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequest, downloadCB func(*rpc.DownloadProgress)) *status.Status {
 	logrus.Info("Updating libraries index")
 	lm := GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
-		return fmt.Errorf("invalid handle")
+		return status.New(codes.InvalidArgument, "invalid handle")
 	}
 	config, err := GetDownloaderConfig()
 	if err != nil {
-		return err
+		return status.New(codes.FailedPrecondition, err.Error())
 	}
 
 	if err := lm.IndexFile.Parent().MkdirAll(); err != nil {
-		return err
+		return status.New(codes.PermissionDenied, err.Error())
 	}
 
 	// Create a temp dir to stage all downloads
 	tmp, err := paths.MkTempDir("", "library_index_download")
 	if err != nil {
-		return err
+		return status.New(codes.PermissionDenied, err.Error())
 	}
 	defer tmp.RemoveAll()
 
@@ -356,54 +356,54 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 	tmpIndexGz := tmp.Join("library_index.json.gz")
 	if d, err := downloader.DownloadWithConfig(tmpIndexGz.String(), librariesmanager.LibraryIndexGZURL.String(), *config, downloader.NoResume); err == nil {
 		if err := Download(d, "Updating index: library_index.json.gz", downloadCB); err != nil {
-			return errors.Wrap(err, "downloading library_index.json.gz")
+			return status.New(codes.Unavailable, errors.Wrap(err, "downloading library_index.json.gz").Error())
 		}
 	} else {
-		return err
+		return status.New(codes.Unavailable, err.Error())
 	}
 
 	// Download signature
 	tmpSignature := tmp.Join("library_index.json.sig")
 	if d, err := downloader.DownloadWithConfig(tmpSignature.String(), librariesmanager.LibraryIndexSignature.String(), *config, downloader.NoResume); err == nil {
 		if err := Download(d, "Updating index: library_index.json.sig", downloadCB); err != nil {
-			return errors.Wrap(err, "downloading library_index.json.sig")
+			return status.New(codes.Unavailable, errors.Wrap(err, "downloading library_index.json.sig").Error())
 		}
 	} else {
-		return err
+		return status.New(codes.Unavailable, err.Error())
 	}
 
 	// Extract the real library_index
 	tmpIndex := tmp.Join("library_index.json")
 	if err := paths.GUnzip(tmpIndexGz, tmpIndex); err != nil {
-		return errors.Wrap(err, "unzipping library_index.json.gz")
+		return status.New(codes.Unknown, errors.Wrap(err, "unzipping library_index.json.gz").Error())
 	}
 
 	// Check signature
 	if ok, _, err := security.VerifyArduinoDetachedSignature(tmpIndex, tmpSignature); err != nil {
-		return errors.Wrap(err, "verifying signature")
+		return status.New(codes.Unknown, errors.Wrap(err, "verifying signature").Error())
 	} else if !ok {
-		return errors.New("library_index.json has an invalid signature")
+		return status.New(codes.Unavailable, errors.New("library_index.json has an invalid signature").Error())
 	}
 
 	// Copy extracted library_index and signature to final destination
 	lm.IndexFile.Remove()
 	lm.IndexFileSignature.Remove()
 	if err := tmpIndex.CopyTo(lm.IndexFile); err != nil {
-		return errors.Wrap(err, "writing library_index.json")
+		return status.New(codes.PermissionDenied, errors.Wrap(err, "writing library_index.json").Error())
 	}
 	if err := tmpSignature.CopyTo(lm.IndexFileSignature); err != nil {
-		return errors.Wrap(err, "writing library_index.json.sig")
+		return status.New(codes.PermissionDenied, errors.Wrap(err, "writing library_index.json.sig").Error())
 	}
 
 	return nil
 }
 
 // UpdateIndex FIXMEDOC
-func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB DownloadProgressCB) (*rpc.UpdateIndexResponse, error) {
+func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB DownloadProgressCB) (*rpc.UpdateIndexResponse, *status.Status) {
 	id := req.GetInstance().GetId()
 	_, ok := instances[id]
 	if !ok {
-		return nil, fmt.Errorf("invalid handle")
+		return nil, status.New(codes.InvalidArgument, "invalid handle")
 	}
 
 	indexpath := paths.New(configuration.Settings.GetString("directories.Data"))
@@ -423,7 +423,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 		if URL.Scheme == "file" {
 			path := paths.New(URL.Path)
 			if _, err := packageindex.LoadIndexNoSign(path); err != nil {
-				return nil, fmt.Errorf("invalid package index in %s: %s", path, err)
+				return nil, status.Newf(codes.FailedPrecondition, "invalid package index in %s: %s", path, err)
 			}
 
 			fi, _ := os.Stat(path.String())
@@ -437,9 +437,9 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 
 		var tmp *paths.Path
 		if tmpFile, err := ioutil.TempFile("", ""); err != nil {
-			return nil, fmt.Errorf("creating temp file for index download: %s", err)
+			return nil, status.Newf(codes.PermissionDenied, "creating temp file for index download: %s", err)
 		} else if err := tmpFile.Close(); err != nil {
-			return nil, fmt.Errorf("creating temp file for index download: %s", err)
+			return nil, status.Newf(codes.PermissionDenied, "creating temp file for index download: %s", err)
 		} else {
 			tmp = paths.New(tmpFile.Name())
 		}
@@ -447,16 +447,16 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 
 		config, err := GetDownloaderConfig()
 		if err != nil {
-			return nil, fmt.Errorf("downloading index %s: %s", URL, err)
+			return nil, status.Newf(codes.FailedPrecondition, "downloading index %s: %s", URL, err)
 		}
 		d, err := downloader.DownloadWithConfig(tmp.String(), URL.String(), *config)
 		if err != nil {
-			return nil, fmt.Errorf("downloading index %s: %s", URL, err)
+			return nil, status.Newf(codes.Unavailable, "downloading index %s: %s", URL, err)
 		}
 		coreIndexPath := indexpath.Join(path.Base(URL.Path))
 		err = Download(d, "Updating index: "+coreIndexPath.Base(), downloadCB)
 		if err != nil {
-			return nil, fmt.Errorf("downloading index %s: %s", URL, err)
+			return nil, status.Newf(codes.Unavailable, "downloading index %s: %s", URL, err)
 		}
 
 		// Check for signature
@@ -465,14 +465,14 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 		if URL.Hostname() == "downloads.arduino.cc" {
 			URLSig, err := url.Parse(URL.String())
 			if err != nil {
-				return nil, fmt.Errorf("parsing url for index signature check: %s", err)
+				return nil, status.Newf(codes.FailedPrecondition, "parsing url for index signature check: %s", err)
 			}
 			URLSig.Path += ".sig"
 
 			if t, err := ioutil.TempFile("", ""); err != nil {
-				return nil, fmt.Errorf("creating temp file for index signature download: %s", err)
+				return nil, status.Newf(codes.PermissionDenied, "creating temp file for index signature download: %s", err)
 			} else if err := t.Close(); err != nil {
-				return nil, fmt.Errorf("creating temp file for index signature download: %s", err)
+				return nil, status.Newf(codes.PermissionDenied, "creating temp file for index signature download: %s", err)
 			} else {
 				tmpSig = paths.New(t.Name())
 			}
@@ -480,38 +480,38 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 
 			d, err := downloader.DownloadWithConfig(tmpSig.String(), URLSig.String(), *config)
 			if err != nil {
-				return nil, fmt.Errorf("downloading index signature %s: %s", URLSig, err)
+				return nil, status.Newf(codes.Unavailable, "downloading index signature %s: %s", URLSig, err)
 			}
 
 			coreIndexSigPath = indexpath.Join(path.Base(URLSig.Path))
 			Download(d, "Updating index: "+coreIndexSigPath.Base(), downloadCB)
 			if d.Error() != nil {
-				return nil, fmt.Errorf("downloading index signature %s: %s", URL, d.Error())
+				return nil, status.Newf(codes.Unavailable, "downloading index signature %s: %s", URL, d.Error())
 			}
 
 			valid, _, err := security.VerifyArduinoDetachedSignature(tmp, tmpSig)
 			if err != nil {
-				return nil, fmt.Errorf("signature verification error: %s", err)
+				return nil, status.Newf(codes.Unknown, "signature verification error: %s", err)
 			}
 			if !valid {
-				return nil, fmt.Errorf("index has an invalid signature")
+				return nil, status.Newf(codes.FailedPrecondition, "index has an invalid signature")
 			}
 		}
 
 		if _, err := packageindex.LoadIndex(tmp); err != nil {
-			return nil, fmt.Errorf("invalid package index in %s: %s", URL, err)
+			return nil, status.Newf(codes.FailedPrecondition, "invalid package index in %s: %s", URL, err)
 		}
 
 		if err := indexpath.MkdirAll(); err != nil {
-			return nil, fmt.Errorf("can't create data directory %s: %s", indexpath, err)
+			return nil, status.Newf(codes.PermissionDenied, "can't create data directory %s: %s", indexpath, err)
 		}
 
 		if err := tmp.CopyTo(coreIndexPath); err != nil {
-			return nil, fmt.Errorf("saving downloaded index %s: %s", URL, err)
+			return nil, status.Newf(codes.PermissionDenied, "saving downloaded index %s: %s", URL, err)
 		}
 		if tmpSig != nil {
 			if err := tmpSig.CopyTo(coreIndexSigPath); err != nil {
-				return nil, fmt.Errorf("saving downloaded index signature: %s", err)
+				return nil, status.Newf(codes.PermissionDenied, "saving downloaded index signature: %s", err)
 			}
 		}
 	}
@@ -520,7 +520,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 }
 
 // UpdateCoreLibrariesIndex updates both Cores and Libraries indexes
-func UpdateCoreLibrariesIndex(ctx context.Context, req *rpc.UpdateCoreLibrariesIndexRequest, downloadCB DownloadProgressCB) error {
+func UpdateCoreLibrariesIndex(ctx context.Context, req *rpc.UpdateCoreLibrariesIndexRequest, downloadCB DownloadProgressCB) *status.Status {
 	_, err := UpdateIndex(ctx, &rpc.UpdateIndexRequest{
 		Instance: req.Instance,
 	}, downloadCB)
@@ -539,12 +539,12 @@ func UpdateCoreLibrariesIndex(ctx context.Context, req *rpc.UpdateCoreLibrariesI
 }
 
 // Outdated returns a list struct containing both Core and Libraries that can be updated
-func Outdated(ctx context.Context, req *rpc.OutdatedRequest) (*rpc.OutdatedResponse, error) {
+func Outdated(ctx context.Context, req *rpc.OutdatedRequest) (*rpc.OutdatedResponse, *status.Status) {
 	id := req.GetInstance().GetId()
 
 	libraryManager := GetLibraryManager(id)
 	if libraryManager == nil {
-		return nil, errors.New("invalid instance")
+		return nil, status.New(codes.InvalidArgument, "invalid instance")
 	}
 
 	outdatedLibraries := []*rpc.InstalledLibrary{}
@@ -567,7 +567,7 @@ func Outdated(ctx context.Context, req *rpc.OutdatedRequest) (*rpc.OutdatedRespo
 
 	packageManager := GetPackageManager(id)
 	if packageManager == nil {
-		return nil, errors.New("invalid instance")
+		return nil, status.New(codes.InvalidArgument, "invalid instance")
 	}
 
 	outdatedPlatforms := []*rpc.Platform{}
@@ -657,15 +657,15 @@ func getOutputRelease(lib *librariesindex.Release) *rpc.LibraryRelease {
 }
 
 // Upgrade downloads and installs outdated Cores and Libraries
-func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadProgressCB, taskCB TaskProgressCB) error {
+func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadProgressCB, taskCB TaskProgressCB) *status.Status {
 	downloaderConfig, err := GetDownloaderConfig()
 	if err != nil {
-		return err
+		return status.Newf(codes.FailedPrecondition, err.Error())
 	}
 
 	lm := GetLibraryManager(req.Instance.Id)
 	if lm == nil {
-		return fmt.Errorf("invalid handle")
+		return status.New(codes.InvalidArgument, "invalid handle")
 	}
 
 	for _, libAlternatives := range lm.Libraries {
@@ -681,9 +681,9 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 			// Downloads latest library release
 			taskCB(&rpc.TaskProgress{Name: "Downloading " + available.String()})
 			if d, err := available.Resource.Download(lm.DownloadsDir, downloaderConfig); err != nil {
-				return err
+				return status.Convert(err)
 			} else if err := Download(d, available.String(), downloadCB); err != nil {
-				return err
+				return status.New(codes.Unavailable, err.Error())
 			}
 
 			// Installs downloaded library
@@ -693,7 +693,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 				taskCB(&rpc.TaskProgress{Message: "Already installed " + available.String(), Completed: true})
 				continue
 			} else if err != nil {
-				return fmt.Errorf("checking lib install prerequisites: %s", err)
+				return status.Newf(codes.Unknown, "checking lib install prerequisites: %s", err)
 			}
 
 			if libReplaced != nil {
@@ -701,7 +701,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 			}
 
 			if err := lm.Install(available, libPath); err != nil {
-				return err
+				return status.Convert(err)
 			}
 
 			taskCB(&rpc.TaskProgress{Message: "Installed " + available.String(), Completed: true})
@@ -710,7 +710,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 
 	pm := GetPackageManager(req.Instance.Id)
 	if pm == nil {
-		return fmt.Errorf("invalid handle")
+		return status.New(codes.InvalidArgument, "invalid handle")
 	}
 
 	for _, targetPackage := range pm.Packages {
@@ -729,7 +729,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 				// Get list of installed tools needed by the currently installed version
 				_, installedTools, err := pm.FindPlatformReleaseDependencies(ref)
 				if err != nil {
-					return err
+					return status.Convert(err)
 				}
 
 				ref = &packagemanager.PlatformReference{
@@ -741,7 +741,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 				taskCB(&rpc.TaskProgress{Name: "Downloading " + latest.String()})
 				_, tools, err := pm.FindPlatformReleaseDependencies(ref)
 				if err != nil {
-					return fmt.Errorf("platform %s is not installed", ref)
+					return status.Newf(codes.Unknown, "platform %s is not installed", ref)
 				}
 
 				toolsToInstall := []*cores.ToolRelease{}
@@ -758,15 +758,15 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 				for _, tool := range toolsToInstall {
 					if err := DownloadToolRelease(pm, tool, downloadCB); err != nil {
 						taskCB(&rpc.TaskProgress{Message: "Error downloading tool " + tool.String()})
-						return err
+						return status.Convert(err)
 					}
 				}
 
 				// Downloads platform
 				if d, err := pm.DownloadPlatformRelease(latest, downloaderConfig); err != nil {
-					return err
+					return status.Convert(err)
 				} else if err := Download(d, latest.String(), downloadCB); err != nil {
-					return err
+					return status.New(codes.Unavailable, err.Error())
 				}
 
 				logrus.Info("Updating platform " + installed.String())
@@ -776,7 +776,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 				for _, tool := range toolsToInstall {
 					if err := InstallToolRelease(pm, tool, taskCB); err != nil {
 						taskCB(&rpc.TaskProgress{Message: "Error installing tool " + tool.String()})
-						return err
+						return status.Convert(err)
 					}
 				}
 
@@ -785,7 +785,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 				if err != nil {
 					logrus.WithError(err).Error("Cannot install platform")
 					taskCB(&rpc.TaskProgress{Message: "Error installing " + latest.String()})
-					return err
+					return status.Convert(err)
 				}
 
 				// Uninstall previously installed release
@@ -800,7 +800,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 					if err := pm.UninstallPlatform(latest); err != nil {
 						logrus.WithError(err).Error("Error rolling-back changes.")
 						taskCB(&rpc.TaskProgress{Message: "Error rolling-back changes: " + err.Error()})
-						return err
+						return status.Convert(err)
 					}
 				}
 
@@ -814,7 +814,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 
 						if err := pm.UninstallTool(toolRelease); err != nil {
 							log.WithError(err).Error("Error uninstalling")
-							return err
+							return status.Convert(err)
 						}
 
 						log.Info("Tool uninstalled")
@@ -841,11 +841,11 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 }
 
 // LoadSketch collects and returns all files composing a sketch
-func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketchResponse, error) {
+func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketchResponse, *status.Status) {
 	// TODO: This should be a ToRpc function for the Sketch struct
 	sketch, err := sk.New(paths.New(req.SketchPath))
 	if err != nil {
-		return nil, fmt.Errorf("error loading sketch %v: %v", req.SketchPath, err)
+		return nil, status.Newf(codes.Unknown, "Error loading sketch %v: %v", req.SketchPath, err)
 	}
 
 	otherSketchFiles := make([]string, sketch.OtherSketchFiles.Len())

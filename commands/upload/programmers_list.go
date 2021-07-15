@@ -17,30 +17,31 @@ package upload
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // ListProgrammersAvailableForUpload FIXMEDOC
-func ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgrammersAvailableForUploadRequest) (*rpc.ListProgrammersAvailableForUploadResponse, error) {
+func ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgrammersAvailableForUploadRequest) (*rpc.ListProgrammersAvailableForUploadResponse, *status.Status) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 
 	fqbnIn := req.GetFqbn()
 	if fqbnIn == "" {
-		return nil, fmt.Errorf("no Fully Qualified Board Name provided")
+		return nil, status.New(codes.InvalidArgument, "no Fully Qualified Board Name provided")
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, fmt.Errorf("incorrect FQBN: %s", err)
+		return nil, status.Newf(codes.InvalidArgument, "incorrect FQBN: %s", err)
 	}
 
 	// Find target platforms
 	_, platform, _, _, refPlatform, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
-		return nil, fmt.Errorf("incorrect FQBN: %s", err)
+		return nil, status.Newf(codes.Unknown, "incorrect FQBN: %s", err)
 	}
 
 	result := []*rpc.Programmer{}
