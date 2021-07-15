@@ -388,9 +388,10 @@ gold_board = """
 """  # noqa: E501
 
 
-def test_board_list(run_command):
-    run_command("core update-index")
-    result = run_command("board list --format json")
+def test_board_list(module_shared_env):
+    cli = module_shared_env.cli_runner
+    cli("core update-index")
+    result = cli("board list --format json")
     assert result.ok
     # check is a valid json and contains a list of ports
     ports = json.loads(result.stdout)
@@ -400,10 +401,11 @@ def test_board_list(run_command):
         assert "protocol_label" in port
 
 
-def test_board_listall(run_command):
-    assert run_command("update")
-    assert run_command("core install arduino:avr@1.8.3")
-    res = run_command("board listall --format json")
+def test_board_listall(module_shared_env):
+    cli = module_shared_env.cli_runner
+    assert cli("update")
+    assert cli("core install arduino:avr@1.8.3")
+    res = cli("board listall --format json")
     assert res.ok
     data = json.loads(res.stdout)
     boards = {b["fqbn"]: b for b in data["boards"]}
@@ -425,15 +427,18 @@ def test_board_listall(run_command):
     assert "Arduino AVR Boards" == platform["name"]
 
 
-def test_board_listall_with_manually_installed_platform(run_command, data_dir):
-    assert run_command("update")
+def test_board_listall_with_manually_installed_platform(clean_env):
+    cli = clean_env.cli_runner
+    data_dir = clean_env.data_dir
+
+    assert cli("update")
 
     # Manually installs a core in sketchbooks hardware folder
     git_url = "https://github.com/arduino/ArduinoCore-samd.git"
     repo_dir = Path(data_dir, "hardware", "arduino-beta-development", "samd")
     assert Repo.clone_from(git_url, repo_dir, multi_options=["-b 1.8.11"])
 
-    res = run_command("board listall --format json")
+    res = cli("board listall --format json")
     assert res.ok
     data = json.loads(res.stdout)
     boards = {b["fqbn"]: b for b in data["boards"]}
@@ -455,22 +460,23 @@ def test_board_listall_with_manually_installed_platform(run_command, data_dir):
     assert "Arduino SAMD (32-bits ARM Cortex-M0+) Boards" == platform["name"]
 
 
-def test_board_details(run_command):
-    run_command("core update-index")
+def test_board_details(module_shared_env):
+    cli = module_shared_env.cli_runner
+    cli("core update-index")
     # Download samd core pinned to 1.8.6
-    run_command("core install arduino:samd@1.8.6")
+    cli("core install arduino:samd@1.8.6")
 
     # Test board listall with and without showing hidden elements
-    result = run_command("board listall MIPS --format json")
+    result = cli("board listall MIPS --format json")
     assert result.ok
     assert result.stdout == "{}\n"
 
-    result = run_command("board listall MIPS -a --format json")
+    result = cli("board listall MIPS -a --format json")
     assert result.ok
     result = json.loads(result.stdout)
     assert result["boards"][0]["name"] == "Arduino Tian (MIPS Console port)"
 
-    result = run_command("board details -b arduino:samd:nano_33_iot --format json")
+    result = cli("board details -b arduino:samd:nano_33_iot --format json")
     assert result.ok
     # Sort everything before compare
     result = json.loads(result.stdout)
@@ -489,20 +495,21 @@ def test_board_details(run_command):
         assert programmer in result["programmers"]
 
     # Download samd core pinned to 1.8.8
-    run_command("core install arduino:samd@1.8.8")
+    cli("core install arduino:samd@1.8.8")
 
-    result = run_command("board details -b arduino:samd:nano_33_iot --format json")
+    result = cli("board details -b arduino:samd:nano_33_iot --format json")
     assert result.ok
     result = json.loads(result.stdout)
     assert result["debugging_supported"] is True
 
 
 # old `arduino-cli board details` did not need -b <fqbn> flag to work
-def test_board_details_old(run_command):
-    run_command("core update-index")
+def test_board_details_old(module_shared_env):
+    cli = module_shared_env.cli_runner
+    cli("core update-index")
     # Download samd core pinned to 1.8.6
-    run_command("core install arduino:samd@1.8.6")
-    result = run_command("board details arduino:samd:nano_33_iot --format json")
+    cli("core install arduino:samd@1.8.6")
+    result = cli("board details arduino:samd:nano_33_iot --format json")
     assert result.ok
     # Sort everything before compare
     result = json.loads(result.stdout)
@@ -521,21 +528,23 @@ def test_board_details_old(run_command):
         assert programmer in result["programmers"]
 
 
-def test_board_details_no_flags(run_command):
-    run_command("core update-index")
+def test_board_details_no_flags(module_shared_env):
+    cli = module_shared_env.cli_runner
+    cli("core update-index")
     # Download samd core pinned to 1.8.6
-    run_command("core install arduino:samd@1.8.6")
-    result = run_command("board details")
+    cli("core install arduino:samd@1.8.6")
+    result = cli("board details")
     assert not result.ok
     assert "Error getting board details: parsing fqbn: invalid fqbn:" in result.stderr
     assert result.stdout == ""
 
 
-def test_board_details_list_programmers_without_flag(run_command):
-    run_command("core update-index")
+def test_board_details_list_programmers_without_flag(module_shared_env):
+    cli = module_shared_env.cli_runner
+    cli("core update-index")
     # Download samd core pinned to 1.8.6
-    run_command("core install arduino:samd@1.8.6")
-    result = run_command("board details -b arduino:samd:nano_33_iot")
+    cli("core install arduino:samd@1.8.6")
+    result = cli("board details -b arduino:samd:nano_33_iot")
     assert result.ok
     lines = [l.strip() for l in result.stdout.splitlines()]
     assert (
@@ -547,11 +556,12 @@ def test_board_details_list_programmers_without_flag(run_command):
     assert "sam_ice                                                                Atmel SAM-ICE" in lines
 
 
-def test_board_details_list_programmers_flag(run_command):
-    run_command("core update-index")
+def test_board_details_list_programmers_flag(module_shared_env):
+    cli = module_shared_env.cli_runner
+    cli("core update-index")
     # Download samd core pinned to 1.8.6
-    run_command("core install arduino:samd@1.8.6")
-    result = run_command("board details -b arduino:samd:nano_33_iot --list-programmers")
+    cli("core install arduino:samd@1.8.6")
+    result = cli("board details -b arduino:samd:nano_33_iot --list-programmers")
     assert result.ok
 
     lines = [l.strip() for l in result.stdout.splitlines()]
@@ -561,10 +571,13 @@ def test_board_details_list_programmers_flag(run_command):
     assert "sam_ice   Atmel SAM-ICE" in lines
 
 
-def test_board_search(run_command, data_dir):
-    assert run_command("update")
+def test_board_search(clean_env):
+    cli = clean_env.cli_runner
+    data_dir = clean_env.data_dir
 
-    res = run_command("board search --format json")
+    assert cli("update")
+
+    res = cli("board search --format json")
     assert res.ok
     data = json.loads(res.stdout)
     # Verifies boards are returned
@@ -579,7 +592,7 @@ def test_board_search(run_command, data_dir):
     assert "Arduino Portenta H7" in names
 
     # Search in non installed boards
-    res = run_command("board search --format json nano 33")
+    res = cli("board search --format json nano 33")
     assert res.ok
     data = json.loads(res.stdout)
     # Verifies boards are returned
@@ -591,9 +604,9 @@ def test_board_search(run_command, data_dir):
     assert "Arduino Nano 33 IoT" in names
 
     # Install a platform from index
-    assert run_command("core install arduino:avr@1.8.3")
+    assert cli("core install arduino:avr@1.8.3")
 
-    res = run_command("board search --format json")
+    res = cli("board search --format json")
     assert res.ok
     data = json.loads(res.stdout)
     assert len(data) > 0
@@ -605,7 +618,7 @@ def test_board_search(run_command, data_dir):
     assert "arduino:avr:yun" in installed_boards
     assert "Arduino Yún" == installed_boards["arduino:avr:yun"]["name"]
 
-    res = run_command("board search --format json arduino yun")
+    res = cli("board search --format json arduino yun")
     assert res.ok
     data = json.loads(res.stdout)
     assert len(data) > 0
@@ -618,7 +631,7 @@ def test_board_search(run_command, data_dir):
     repo_dir = Path(data_dir, "hardware", "arduino-beta-development", "samd")
     assert Repo.clone_from(git_url, repo_dir, multi_options=["-b 1.8.11"])
 
-    res = run_command("board search --format json")
+    res = cli("board search --format json")
     assert res.ok
     data = json.loads(res.stdout)
     assert len(data) > 0
@@ -639,7 +652,7 @@ def test_board_search(run_command, data_dir):
     assert "Arduino NANO 33 IoT" == installed_boards["arduino-beta-development:samd:nano_33_iot"]["name"]
     assert "arduino-beta-development:samd:arduino_zero_native" in installed_boards
 
-    res = run_command("board search --format json mkr1000")
+    res = cli("board search --format json mkr1000")
     assert res.ok
     data = json.loads(res.stdout)
     assert len(data) > 0

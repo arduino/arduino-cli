@@ -58,6 +58,11 @@ def create_data_dir(tmpdir_factory):
         shutil.rmtree(data, ignore_errors=True)
 
 
+@pytest.fixture(scope="module")
+def module_data_dir(tmpdir_factory):
+    yield from create_data_dir(tmpdir_factory)
+
+
 @pytest.fixture(scope="session")
 def session_data_dir(tmpdir_factory):
     yield from create_data_dir(tmpdir_factory)
@@ -106,8 +111,14 @@ def working_dir(tmpdir_factory):
     shutil.rmtree(work_dir, ignore_errors=True)
 
 
+@pytest.fixture(scope="session")
+def cli_path(pytestconfig):
+    cli_path = Path(pytestconfig.rootdir).parent / "arduino-cli"
+    return "{}".format(cli_path)
+
+
 @pytest.fixture(scope="function")
-def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
+def run_command(cli_path, data_dir, downloads_dir, working_dir):
     """
     Provide a wrapper around invoke's `run` API so that every test
     will work in the same temporary folder.
@@ -116,21 +127,22 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
         http://docs.pyinvoke.org/en/1.4/api/runners.html#invoke.runners.Result
     """
 
-    cli_path = Path(pytestconfig.rootdir).parent / "arduino-cli"
     env = {
         "ARDUINO_DATA_DIR": data_dir,
         "ARDUINO_DOWNLOADS_DIR": downloads_dir,
         "ARDUINO_SKETCHBOOK_DIR": data_dir,
     }
     (Path(data_dir) / "packages").mkdir(exist_ok=True)
+    return make_cli_runner(cli_path, working_dir, env)
 
+
+def make_cli_runner(cli_path, working_dir, env):
     def _run(cmd_string, custom_working_dir=None, custom_env=None):
-
         if not custom_working_dir:
             custom_working_dir = working_dir
         if not custom_env:
             custom_env = env
-        cli_full_line = '"{}" {}'.format(cli_path, cmd_string)
+        cli_full_line = f'"{cli_path}" {cmd_string}'
         run_context = Context()
         # It might happen that we need to change directories between drives on Windows,
         # in that case the "/d" flag must be used otherwise directory wouldn't change
@@ -144,6 +156,30 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
             return run_context.run(cli_full_line, echo=False, hide=True, warn=True, env=custom_env, encoding="utf-8")
 
     return _run
+
+
+class CliTestEnvironment:
+    def __init__(self, cli_path, data_dir, downloads_dir, working_dir):
+        self.env = {
+            "ARDUINO_DATA_DIR": data_dir,
+            "ARDUINO_DOWNLOADS_DIR": downloads_dir,
+            "ARDUINO_SKETCHBOOK_DIR": data_dir,
+        }
+        self.cli_runner = make_cli_runner(cli_path, working_dir, self.env)
+        self.data_dir = data_dir
+        self.downloads_dir = downloads_dir
+        self.sketchbook_dir = data_dir
+        self.working_dir = working_dir
+
+
+@pytest.fixture(scope="function")
+def module_shared_env(cli_path, module_data_dir, downloads_dir, working_dir):
+    return CliTestEnvironment(cli_path, module_data_dir, downloads_dir, working_dir)
+
+
+@pytest.fixture(scope="function")
+def clean_env(cli_path, data_dir, downloads_dir, working_dir):
+    return CliTestEnvironment(cli_path, data_dir, downloads_dir, working_dir)
 
 
 @pytest.fixture(scope="function")
