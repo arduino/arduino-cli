@@ -128,9 +128,11 @@ def run_command(cli_path, data_dir, downloads_dir, working_dir):
         "ARDUINO_SKETCHBOOK_DIR": data_dir,
     }
     (Path(data_dir) / "packages").mkdir(exist_ok=True)
+    return make_cli_runner(cli_path, working_dir, env)
 
+
+def make_cli_runner(cli_path, working_dir, env):
     def _run(cmd_string, custom_working_dir=None, custom_env=None):
-
         if not custom_working_dir:
             custom_working_dir = working_dir
         if not custom_env:
