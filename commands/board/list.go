@@ -193,10 +193,13 @@ func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 		return nil, errors.New("invalid instance")
 	}
 
-	ports, err := commands.ListBoards(pm)
-	if err != nil {
-		return nil, errors.Wrap(err, "error getting port list from serial-discovery")
+	if err := pm.DiscoveryManager().RunAll(); err != nil {
+		return nil, err
 	}
+	if err := pm.DiscoveryManager().StartAll(); err != nil {
+		return nil, err
+	}
+	ports := pm.DiscoveryManager().List()
 
 	retVal := []*rpc.DetectedPort{}
 	for _, port := range ports {
@@ -224,42 +227,62 @@ func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 // The discovery process can be interrupted by sending a message to the interrupt channel.
 func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchResponse, error) {
 	pm := commands.GetPackageManager(instanceID)
-	eventsChan, err := commands.WatchListBoards(pm)
-	if err != nil {
+
+	if err := pm.DiscoveryManager().RunAll(); err != nil {
 		return nil, err
 	}
 
+	eventsChan, errs := pm.DiscoveryManager().StartSyncAll()
+
 	outChan := make(chan *rpc.BoardListWatchResponse)
+
 	go func() {
+		defer close(outChan)
+		for _, err := range errs {
+			outChan <- &rpc.BoardListWatchResponse{
+				EventType: "error",
+				Error:     err.Error(),
+			}
+		}
 		for {
 			select {
 			case event := <-eventsChan:
-				boards := []*rpc.BoardListItem{}
-				boardsError := ""
-				if event.Type == "add" {
-					boards, err = identify(pm, event.Port)
-					if err != nil {
-						boardsError = err.Error()
-					}
-				}
-
 				serialNumber := ""
 				if props := event.Port.Properties; props != nil {
 					serialNumber = props.Get("serialNumber")
 				}
 
+				port := &rpc.DetectedPort{
+					Address:       event.Port.Address,
+					Protocol:      event.Port.Protocol,
+					ProtocolLabel: event.Port.ProtocolLabel,
+					SerialNumber:  serialNumber,
+				}
+
+				boardsError := ""
+				if event.Type == "add" {
+					boards, err := identify(pm, event.Port)
+					if err != nil {
+						boardsError = err.Error()
+					}
+					port.Boards = boards
+				}
 				outChan <- &rpc.BoardListWatchResponse{
 					EventType: event.Type,
-					Port: &rpc.DetectedPort{
-						Address:       event.Port.Address,
-						Protocol:      event.Port.Protocol,
-						ProtocolLabel: event.Port.ProtocolLabel,
-						Boards:        boards,
-						SerialNumber:  serialNumber,
-					},
-					Error: boardsError,
+					Port:      port,
+					Error:     boardsError,
 				}
 			case <-interrupt:
+				err := pm.DiscoveryManager().StopAll()
+				if err != nil {
+					outChan <- &rpc.BoardListWatchResponse{
+						EventType: "error",
+						Error:     fmt.Sprintf("stopping discoveries: %s", err),
+					}
+					// Don't close the channel if quitting all discoveries
+					// failed, otherwise some processes might be left running.
+					continue
+				}
 				return
 			}
 		}

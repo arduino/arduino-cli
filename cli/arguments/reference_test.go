@@ -13,27 +13,27 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package globals_test
+package arguments_test
 
 import (
 	"testing"
 
-	"github.com/arduino/arduino-cli/cli/globals"
+	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 var goodCores = []struct {
 	in       string
-	expected *globals.ReferenceArg
+	expected *arguments.Reference
 }{
-	{"arduino:avr", &globals.ReferenceArg{"arduino", "avr", ""}},
-	{"arduino:avr@1.6.20", &globals.ReferenceArg{"arduino", "avr", "1.6.20"}},
+	{"arduino:avr", &arguments.Reference{"arduino", "avr", ""}},
+	{"arduino:avr@1.6.20", &arguments.Reference{"arduino", "avr", "1.6.20"}},
 }
 
 var badCores = []struct {
 	in       string
-	expected *globals.ReferenceArg
+	expected *arguments.Reference
 }{
 	{"arduino:avr:avr", nil},
 	{"arduino@1.6.20:avr", nil},
@@ -51,15 +51,15 @@ func TestArgsStringify(t *testing.T) {
 	}
 }
 
-func TestParseReferenceArgCores(t *testing.T) {
+func TestParseReferenceCores(t *testing.T) {
 	for _, tt := range goodCores {
-		actual, err := globals.ParseReferenceArg(tt.in, true)
+		actual, err := arguments.ParseReference(tt.in, true)
 		assert.Nil(t, err)
 		assert.Equal(t, tt.expected, actual)
 	}
 
 	for _, tt := range badCores {
-		actual, err := globals.ParseReferenceArg(tt.in, true)
+		actual, err := arguments.ParseReference(tt.in, true)
 		require.NotNil(t, err, "Testing bad core '%s'", tt.in)
 		require.Equal(t, tt.expected, actual, "Testing bad core '%s'", tt.in)
 	}
@@ -71,7 +71,7 @@ func TestParseArgs(t *testing.T) {
 		input = append(input, tt.in)
 	}
 
-	refs, err := globals.ParseReferenceArgs(input, true)
+	refs, err := arguments.ParseReferences(input, true)
 	assert.Nil(t, err)
 	assert.Equal(t, len(goodCores), len(refs))
 
