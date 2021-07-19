@@ -214,7 +214,7 @@ tasks:
     desc: Generate embedded i18n catalog files
     cmds:
       - git add -N ./i18n/data
-      - git diff --exit-code ./i18n/data &> /dev/null || (cd ./i18n && rice embed-go)
+      - git diff --exit-code ./i18n/data &> /dev/null || { cd ./i18n && rice embed-go; }
 
 vars:
   PROJECT_NAME: "arduino-cli"
