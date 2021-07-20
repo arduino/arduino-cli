@@ -340,11 +340,11 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 
 	// Create programmers properties
 	if programmersProperties, err := properties.SafeLoad(programmersTxtPath.String()); err == nil {
-		for programmerID, programmerProperties := range programmersProperties.FirstLevelOf() {
+		for programmerID, programmerProps := range programmersProperties.FirstLevelOf() {
 			if !platform.PluggableDiscoveryAware {
-				convertUploadToolsToPluggableDiscovery(programmersProperties)
+				convertUploadToolsToPluggableDiscovery(programmerProps)
 			}
-			platform.Programmers[programmerID] = pm.loadProgrammer(programmerProperties)
+			platform.Programmers[programmerID] = pm.loadProgrammer(programmerProps)
 			platform.Programmers[programmerID].PlatformRelease = platform
 		}
 	} else {
