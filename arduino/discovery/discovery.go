@@ -68,12 +68,16 @@ var tr = i18n.Tr
 
 // ToRPC converts Port into rpc.Port
 func (p *Port) ToRPC() *rpc.Port {
+	props := p.Properties
+	if props == nil {
+		props = properties.NewMap()
+	}
 	return &rpc.Port{
 		Address:       p.Address,
 		Label:         p.AddressLabel,
 		Protocol:      p.Protocol,
 		ProtocolLabel: p.ProtocolLabel,
-		Properties:    p.Properties.AsMap(),
+		Properties:    props.AsMap(),
 	}
 }
 
