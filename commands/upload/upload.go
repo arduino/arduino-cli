@@ -62,12 +62,12 @@ func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsReques
 		return nil, fmt.Errorf("loading board data: %s", err)
 	}
 
-	toolId, err := getToolId(board.Properties, "upload", req.Protocol)
+	toolID, err := getToolID(board.Properties, "upload", req.Protocol)
 	if err != nil {
 		return nil, err
 	}
 
-	userFields, err := getUserFields(toolId, platformRelease)
+	userFields, err := getUserFields(toolID, platformRelease)
 	if err != nil {
 		return nil, err
 	}
@@ -77,9 +77,9 @@ func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsReques
 	}, nil
 }
 
-// getToolId returns the ID of the tool that supports the action and protocol combination by searching in props.
+// getToolID returns the ID of the tool that supports the action and protocol combination by searching in props.
 // Returns error if tool cannot be found.
-func getToolId(props *properties.Map, action, protocol string) (string, error) {
+func getToolID(props *properties.Map, action, protocol string) (string, error) {
 	toolProperty := fmt.Sprintf("%s.tool.%s", action, protocol)
 	defaultToolProperty := fmt.Sprintf("%s.tool.default", action)
 
@@ -95,9 +95,9 @@ func getToolId(props *properties.Map, action, protocol string) (string, error) {
 
 // getUserFields return all user fields supported by the tools specified.
 // Returns error only in case the secret property is not a valid boolean.
-func getUserFields(toolId string, platformRelease *cores.PlatformRelease) ([]*rpc.UserField, error) {
+func getUserFields(toolID string, platformRelease *cores.PlatformRelease) ([]*rpc.UserField, error) {
 	userFields := []*rpc.UserField{}
-	fields := platformRelease.Properties.SubTree(fmt.Sprintf("tools.%s.upload.field", toolId))
+	fields := platformRelease.Properties.SubTree(fmt.Sprintf("tools.%s.upload.field", toolID))
 	keys := fields.FirstLevelKeys()
 
 	for _, key := range keys {
@@ -109,10 +109,10 @@ func getUserFields(toolId string, platformRelease *cores.PlatformRelease) ([]*rp
 		}
 		isSecret, err := strconv.ParseBool(secret)
 		if err != nil {
-			return nil, fmt.Errorf(`parsing "tools.%s.upload.field.%s.secret", property is not a boolean`, toolId, key)
+			return nil, fmt.Errorf(`parsing "tools.%s.upload.field.%s.secret", property is not a boolean`, toolID, key)
 		}
 		userFields = append(userFields, &rpc.UserField{
-			ToolId: toolId,
+			ToolId: toolID,
 			Name:   key,
 			Label:  value,
 			Secret: isSecret,
@@ -245,7 +245,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	} else if programmer != nil {
 		action = "program"
 	}
-	uploadToolID, err := getToolId(props, action, port.Protocol)
+	uploadToolID, err := getToolID(props, action, port.Protocol)
 	if err != nil {
 		return err
 	}

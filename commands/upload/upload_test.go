@@ -230,42 +230,42 @@ upload.tool.serial=bossac
 upload.tool.network=arduino_ota`))
 	require.NoError(t, err)
 
-	toolId, err := getToolId(props, "upload", "serial")
+	toolID, err := getToolID(props, "upload", "serial")
 	require.NoError(t, err)
-	require.Equal(t, "bossac", toolId)
+	require.Equal(t, "bossac", toolID)
 
-	toolId, err = getToolId(props, "upload", "network")
+	toolID, err = getToolID(props, "upload", "network")
 	require.NoError(t, err)
-	require.Equal(t, "arduino_ota", toolId)
+	require.Equal(t, "arduino_ota", toolID)
 
-	toolId, err = getToolId(props, "bootloader", "serial")
+	toolID, err = getToolID(props, "bootloader", "serial")
 	require.NoError(t, err)
-	require.Equal(t, "avrdude", toolId)
+	require.Equal(t, "avrdude", toolID)
 
-	toolId, err = getToolId(props, "bootloader", "network")
+	toolID, err = getToolID(props, "bootloader", "network")
 	require.EqualError(t, err, "cannot find tool: undefined 'bootloader.tool.network' property")
-	require.Equal(t, "", toolId)
+	require.Equal(t, "", toolID)
 
 	props, err = properties.LoadFromBytes([]byte(`
 	bootloader.tool.default=avrdude
 	upload.tool.default=bossac`))
 	require.NoError(t, err)
 
-	toolId, err = getToolId(props, "upload", "serial")
+	toolID, err = getToolID(props, "upload", "serial")
 	require.NoError(t, err)
-	require.Equal(t, "bossac", toolId)
+	require.Equal(t, "bossac", toolID)
 
-	toolId, err = getToolId(props, "upload", "network")
+	toolID, err = getToolID(props, "upload", "network")
 	require.NoError(t, err)
-	require.Equal(t, "bossac", toolId)
+	require.Equal(t, "bossac", toolID)
 
-	toolId, err = getToolId(props, "bootloader", "serial")
+	toolID, err = getToolID(props, "bootloader", "serial")
 	require.NoError(t, err)
-	require.Equal(t, "avrdude", toolId)
+	require.Equal(t, "avrdude", toolID)
 
-	toolId, err = getToolId(props, "bootloader", "network")
+	toolID, err = getToolID(props, "bootloader", "network")
 	require.NoError(t, err)
-	require.Equal(t, "avrdude", toolId)
+	require.Equal(t, "avrdude", toolID)
 }
 
 func TestGetUserFields(t *testing.T) {
