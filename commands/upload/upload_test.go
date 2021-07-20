@@ -194,6 +194,7 @@ func TestUploadPropertiesComposition(t *testing.T) {
 			outStream,
 			errStream,
 			false,
+			map[string]string{},
 		)
 		verboseVerifyOutput := "verbose verify"
 		if !verboseVerify {
