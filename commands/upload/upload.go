@@ -445,6 +445,10 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	}
 
 	// Get Port properties gathered using Pluggable Discovery
+	uploadProperties.Set("upload.port.address", port.Address)
+	uploadProperties.Set("upload.port.label", port.Label)
+	uploadProperties.Set("upload.port.protocol", port.Protocol)
+	uploadProperties.Set("upload.port.protocolLabel", port.ProtocolLabel)
 	for prop, value := range actualPort.Properties {
 		uploadProperties.Set(fmt.Sprintf("upload.port.properties.%s", prop), value)
 	}
