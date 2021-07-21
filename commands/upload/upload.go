@@ -372,7 +372,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	// If not using programmer perform some action required
 	// to set the board in bootloader mode
 	actualPort := port
-	if programmer == nil && !burnBootloader {
+	if programmer == nil && !burnBootloader && port.Protocol == "serial" {
 
 		// Perform reset via 1200bps touch if requested and wait for upload port also if requested.
 		touch := uploadProperties.GetBoolean("upload.use_1200bps_touch")
