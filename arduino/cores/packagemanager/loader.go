@@ -649,6 +649,10 @@ func (pm *PackageManager) loadDiscoveries(release *cores.PlatformRelease) []*sta
 			continue
 		}
 		toolRelease := tool.GetLatestInstalled()
+		if toolRelease == nil {
+			statuses = append(statuses, status.Newf(codes.FailedPrecondition, "discovery not installed: %s", id))
+			continue
+		}
 		discoveryPath := toolRelease.InstallDir.Join(tool.Name).String()
 		d, err := discovery.New(id, discoveryPath)
 		if err != nil {
