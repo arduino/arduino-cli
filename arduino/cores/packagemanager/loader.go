@@ -325,6 +325,7 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 		platform.PluggableDiscoveryAware = true
 	} else {
 		platform.Properties.Set("discovery.required.0", "builtin:serial-discovery")
+		platform.Properties.Set("discovery.required.1", "builtin:mdns-discovery")
 	}
 
 	if platform.Platform.Name == "" {

@@ -183,6 +183,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) *sta
 	instance.PackageManager.Clear()
 	ctagsTool := getBuiltinCtagsTool(instance.PackageManager)
 	serialDiscoveryTool := getBuiltinSerialDiscoveryTool(instance.PackageManager)
+	mdnsDiscoveryTool := getBuiltinMDNSDiscoveryTool(instance.PackageManager)
 
 	// Load Platforms
 	urls := []string{globals.DefaultIndexURL}
@@ -276,7 +277,17 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) *sta
 		})
 	}
 
-	if ctagsHasBeenInstalled || serialHasBeenInstalled {
+	mdnsHasBeenInstalled, err := instance.installToolIfMissing(mdnsDiscoveryTool, downloadCallback, taskCallback)
+	if err != nil {
+		s := status.Newf(codes.Internal, err.Error())
+		responseCallback(&rpc.InitResponse{
+			Message: &rpc.InitResponse_Error{
+				Error: s.Proto(),
+			},
+		})
+	}
+
+	if ctagsHasBeenInstalled || serialHasBeenInstalled || mdnsHasBeenInstalled {
 		// We installed at least one new tool after loading hardware
 		// so we must reload again otherwise we would never found them.
 		for _, err := range instance.PackageManager.LoadHardware() {
