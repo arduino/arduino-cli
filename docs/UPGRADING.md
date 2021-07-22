@@ -6,6 +6,21 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ### Change public library interface
 
+#### `github.com/arduino/arduino-cli/i18n` package
+
+The behavior of the `Init` function has changed. The user specified locale code is no longer read from the
+`github.com/arduino/arduino-cli/configuration` package and now must be passed directly to `Init` as a string:
+
+```go
+i18n.Init("it")
+```
+
+Omit the argument for automated locale detection:
+
+```go
+i18n.Init()
+```
+
 #### `github.com/arduino/arduino-cli/arduino/builder` package
 
 `GenBuildPath()` function has been moved to `github.com/arduino/arduino-cli/arduino/sketch` package. The signature is

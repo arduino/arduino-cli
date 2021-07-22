@@ -15,18 +15,20 @@
 
 package i18n
 
-import "github.com/arduino/arduino-cli/configuration"
-
 // Init initializes the i18n module, setting the locale according to this order of preference:
-// 1. Configuration set in arduino-cli.yaml
+// 1. Locale specified via the function call
 // 2. OS Locale
 // 3. en (default)
-func Init() {
+func Init(configLocale ...string) {
 	initRiceBox()
 	locales := supportedLocales()
 
-	if configLocale := configuration.Settings.GetString("locale"); configLocale != "" {
-		if locale := findMatchingLocale(configLocale, locales); locale != "" {
+	if len(configLocale) > 1 {
+		panic("Multiple arguments not supported")
+	}
+
+	if len(configLocale) > 0 && configLocale[0] != "" {
+		if locale := findMatchingLocale(configLocale[0], locales); locale != "" {
 			setLocale(locale)
 			return
 		}
