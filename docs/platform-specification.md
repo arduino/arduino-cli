@@ -615,7 +615,7 @@ A tool may have some actions not defined (it's not mandatory to define all four 
     tools.avrdude.cmd.path={path}/bin/avrdude
     tools.avrdude.config.path={path}/etc/avrdude.conf
 
-    tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+    tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" -p{build.mcu} -c{upload.port.protocol} -P{upload.port.address} -b{upload.speed} -D "-Uflash:w:{build.path}/{build.project_name}.hex:i"
 
 A **{runtime.tools.TOOL_NAME.path}** and **{runtime.tools.TOOL_NAME-TOOL_VERSION.path}** property is generated for the
 tools of Arduino AVR Boards and any other platform installed via Boards Manager. **{runtime.tools.TOOL_NAME.path}**
@@ -624,6 +624,64 @@ points to the latest version of the tool available.
 The tool configuration properties are available globally without the prefix. For example, the **tools.avrdude.cmd.path**
 property can be used as **{cmd.path}** inside the recipe, and the same happens for all the other avrdude configuration
 variables.
+
+#### Pluggable Discovery
+
+Discovery tools are a special kind of tools that are used to find supported boards, a platform must declare one or more
+Pluggable Discoveries in its `platform.txt`. It's ok to use another platform discovery or the builtin ones if necessary.
+
+There are two different syntaxes to declare discoveries, if the platform uses just one discovery:
+
+```
+discovery.required=PLATFORM:DISCOVERY_NAME
+```
+
+instead if it needs multiple discoveries:
+
+```
+discovery.required.0=PLATFORM:DISCOVERY_ID_1
+discovery.required.1=PLATFORM:DISCOVERY_ID_2
+```
+
+A platform that supports only boards connected to the serial can easily use the builtin `serial-discovery` without
+creating a custom Pluggable Discovery:
+
+```
+discovery.required=builtin:serial-discovery
+```
+
+if it supports also boards connected to the network it can use the builtin `mdns-discovery`:
+
+```
+discovery.required.0=builtin:serial-discovery
+discovery.required.1=builtin:mdns-discovery
+```
+
+Since the above syntax requires adding a discovery in the `discoveryDependencies` field in the platform
+`package_index.json` it might be cumbersome to do it before releasing it so we also provide another syntax to ease
+development:
+
+```
+discovery.DISCOVERY_ID.pattern=DISCOVERY_RECIPE
+```
+
+`DISCOVERY_ID` must be replaced by a unique identifier for the particular discovery and `DISCOVERY_RECIPE` must be
+replaced by the command line to launch the discovery. An example could be:
+
+```
+## Teensy Ports Discovery
+discovery.teensy.pattern="{runtime.tools.teensy_ports.path}/hardware/tools/teensy_ports" -J2
+```
+
+We strongly recommend not using this syntax on released platforms but only for development purposes.
+
+For backward compatibility, if a platform does not declare any discovery (using the `discovery.*` properties in
+`platform.txt`) it will automatically inherits `builtin:serial-discovery` and `builtin:mdns-discovery` (but not other
+builtin discoveries that may be possibly added in the future). This will allow all legacy non-pluggable platforms to
+migrate to pluggable discovery without disruption.
+
+For detailed information see the [Pluggable Discovery specification](pluggable-discovery-specification.md)
+documentation.
 
 #### Verbose parameter
 
@@ -651,26 +709,48 @@ The Upload action is triggered when the user clicks on the "Upload" button on th
 [`arduino-cli upload`](commands/arduino-cli_upload.md). Arduino uses the term "upload" for the process of transferring a
 program to the Arduino board.
 
-The **upload.tool** property determines the tool to be used for upload. A specific **upload.tool** property should be
-defined for every board in boards.txt:
+The **upload.tool.<protocol_name\>** property determines the tool to be used for upload. A specific
+**upload.tool.<protocol_name\>** property should be defined for every board in boards.txt:
 
     [......]
+    uno.upload.tool.serial=avrdude
+    [......]
+    leonardo.upload.tool.serial=avrdude
+    leonardo.upload.tool.network=arduino_ota
+    [......]
+
+When the user tries to upload using a certain protocol but the board doesn't support it it will fallback to `default` if
+specified. A board can always specify a `default` protocol even if others are defined:
+
+    [......]
+    uno.upload.tool.default=avrdude
+    [......]
+    leonardo.upload.tool.default=avrdude
+    leonardo.upload.tool.network=arduino_ota
+    [......]
+
+`default` is also used when no upload address is provided by the user, this can be done only for boards that use upload
+tools with builtin port detection like `openocd`.
+
+For backward compatibility with IDE 1.8.15 and older the previous syntax is still supported:
+
     uno.upload.tool=avrdude
-    [......]
-    leonardo.upload.tool=avrdude
-    [......]
+
+The previous syntax is equivalent to:
+
+    uno.upload.tool.default=avrdude
 
 Other upload parameters can also be defined for the board. For example, in the Arduino AVR Boards boards.txt we have:
 
     [.....]
     uno.name=Arduino Uno
-    uno.upload.tool=avrdude
+    uno.upload.tool.serial=avrdude
     uno.upload.protocol=arduino
     uno.upload.maximum_size=32256
     uno.upload.speed=115200
     [.....]
     leonardo.name=Arduino Leonardo
-    leonardo.upload.tool=avrdude
+    leonardo.upload.tool.serial=avrdude
     leonardo.upload.protocol=avr109
     leonardo.upload.maximum_size=28672
     leonardo.upload.speed=57600
@@ -681,8 +761,111 @@ Other upload parameters can also be defined for the board. For example, in the A
 Most **{upload.XXXX}** variables are used later in the avrdude upload recipe in platform.txt:
 
     [.....]
-    tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+    tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} -p{build.mcu} -c{upload.port.protocol} -P{upload.port.address} -b{upload.speed} -D "-Uflash:w:{build.path}/{build.project_name}.hex:i"
     [.....]
+
+If necessary the same property can be defined multiple times for different protocols:
+
+    leonardo.upload.serial.maximum_size=28672
+    leonardo.upload.network.maximum_size=256
+
+The two above properties will be available as **{upload.serial.maximum_size}** and **{upload.network.maximum_size}**.
+
+#### Properties from Pluggable Discovery
+
+If a platform supports Pluggable Discovery it can also use the port's properties returned by a discovery. For example,
+the following port metadata coming from a pluggable discovery:
+
+    {
+        "eventType": "add",
+        "port": {
+            "address": "/dev/ttyACM0",
+            "label": "ttyACM0",
+            "protocol": "serial",
+            "protocolLabel": "Serial Port (USB)",
+            "properties": {
+                "pid": "0x804e",
+                "vid": "0x2341",
+                "serialNumber": "EBEABFD6514D32364E202020FF10181E",
+                "name": "ttyACM0"
+            }
+        }
+    }
+
+will be available on the recipe as the variables:
+
+    {upload.port.address} = /dev/ttyACM0
+    {upload.port.label} = ttyACM0
+    {upload.port.protocol} = serial
+    {upload.port.protocolLabel} = Serial Port (USB)
+    {upload.port.properties.pid} = 0x8043
+    {upload.port.properties.vid} = 0x2341
+    {upload.port.properties.serialNumber} = EBEABFD6514D32364E202020FF10181E
+    {upload.port.properties.name} = ttyACM0
+    {serial.port} = /dev/ttyACM0                # for backward compatibility
+    {serial.port.file} = ttyACM0                # only because protocol=serial
+
+Here another example:
+
+    {
+    "eventType": "add",
+    "port": {
+        "address": "192.168.1.232",
+        "label": "SSH on my-board (192.168.1.232)",
+        "protocol": "ssh",
+        "protocolLabel": "SSH Network port",
+        "properties": {
+        "macprefix": "AA:BB:CC",
+        "macaddress": "AA:BB:CC:DD:EE:FF"
+        }
+    }
+    }
+
+that is translated to:
+
+    {upload.port.address} = 192.168.1.232
+    {upload.port.label} = SSH on my-board (192.168.1.232)
+    {upload.port.protocol} = ssh
+    {upload.port.protocolLabel} = SSH Network port
+    {upload.port.properties.macprefix} = AA:BB:CC
+    {upload.port.properties.macaddress} = AA:BB:CC:DD:EE:FF
+    {serial.port} = 192.168.1.232                  # for backward compatibility
+
+This configuration, together with protocol selection, allows to remove the hardcoded `network_pattern`, now we can
+replace the legacy recipe (split into multiple lines for clarity):
+
+    tools.bossac.upload.network_pattern="{runtime.tools.arduinoOTA.path}/bin/arduinoOTA"
+                                        -address {serial.port} -port 65280
+                                        -sketch "{build.path}/{build.project_name}.bin"
+
+with:
+
+    tools.arduino_ota.upload.pattern="{runtime.tools.arduinoOTA.path}/bin/arduinoOTA"
+                                    -address {upload.port.address} -port 65280
+                                    -sketch "{build.path}/{build.project_name}.bin"
+
+#### User provided fields
+
+Some upload recipes might require custom fields that must be provided by the user, like username and password to upload
+over the network. In this case the recipe must use the special placeholder {upload.field.FIELD_NAME} where FIELD_NAME
+must be declared separately in the recipe using the following format:
+
+    tools.UPLOAD_RECIPE_ID.upload.field.FIELD_NAME=FIELD_LABEL
+    tools.UPLOAD_RECIPE_ID.upload.field.FIELD_NAME.secret=true
+
+FIELD_LABEL is the label shown in the graphical prompt to ask the user to enter the value of the field. The secret
+property is optional and it should be set to true if the field is a secret (like passwords or token).
+
+Let’s see how a complete example will look like:
+
+    tools.arduino_ota.upload.field.username=Username
+    tools.arduino_ota.upload.field.password=Password
+    tools.arduino_ota.upload.field.password.secret=true
+    tools.arduino_ota.upload.pattern="{runtime.tools.arduinoOTA.path}/bin/arduinoOTA"
+                                    -address {upload.port.address} -port 65280
+                                    -username "{upload.field.username}
+                                    -password "{upload.field.password}"
+                                    -sketch "{build.path}/{build.project_name}.bin"
 
 #### Upload verification
 
@@ -744,10 +927,14 @@ support uploading via programmer.
 
 The full path (e.g., `/dev/ttyACM0`) of the port selected via the IDE or
 [`arduino-cli upload`](commands/arduino-cli_upload.md)'s `--port` option is available as a configuration property
-**{serial.port}**.
+**{upload.port.address}**.
 
 The file component of the port's path (e.g., `ttyACM0`) is available as the configuration property
-**{serial.port.file}**.
+**{upload.port.label}**.
+
+For backward compatibility with IDE 1.8.15 and older the old property **serial.port** is still available and is
+identical to **{upload.port.address}**. Instead **serial.port.file** is identical to **{upload.port.label}** and
+available only if protocol in use is **serial**.
 
 ### Upload using an external programmer
 
@@ -756,7 +943,17 @@ The `program` action is triggered via the **Sketch > Upload Using Programmer** f
 compiled sketch to a board using an external programmer.
 
 The **program.tool** property determines the tool to be used for this action. This property is typically defined for
-each programmer in [programmers.txt](#programmerstxt):
+each programmer in [programmers.txt](#programmerstxt) and uses the same syntax as `upload` action:
+
+    [......]
+    usbasp.program.tool.serial=avrdude
+    [......]
+    arduinoasisp.program.tool.serial=avrdude
+    [......]
+    arduinoisp.program.tool.default=avrdude
+    [......]
+
+For backward compatibility with IDE 1.8.15 and older the previous syntax is still supported:
 
     [......]
     usbasp.program.tool=avrdude
@@ -786,7 +983,18 @@ the board.
 1. `bootloader` is used to flash the bootloader to the board
 
 The **bootloader.tool** property determines the tool to be used for the `erase` and `bootloader` actions both. This
-property is typically defined for each board in boards.txt:
+property is typically defined for each board in boards.txt and uses the same syntax as `upload` action:
+
+    [......]
+    uno.bootloader.tool.serial=avrdude
+    [......]
+    leonardo.upload.tool.serial=avrdude
+    leonardo.upload.tool.network=arduino_ota
+    [......]
+    duemilanove.upload.tool.default=avrdude
+    [......]
+
+For backward compatibility with IDE 1.8.15 and older the previous syntax is still supported:
 
     [......]
     uno.bootloader.tool=avrdude
@@ -1009,3 +1217,7 @@ software is in use:
   This behavior
   [can be configured](https://arduino.github.io/arduino-cli/latest/commands/arduino-cli_core_install/#options)
 - **Arduino Pro IDE**: (since 0.1.0) runs the script for any installed platform.
+
+```
+
+```

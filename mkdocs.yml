@@ -70,6 +70,7 @@ nav:
       - board details: commands/arduino-cli_board_details.md
       - board list: commands/arduino-cli_board_list.md
       - board listall: commands/arduino-cli_board_listall.md
+      - board search: commands/arduino-cli_board_search.md
       - burn-bootloader: commands/arduino-cli_burn-bootloader.md
       - cache: commands/arduino-cli_cache.md
       - cache clean: commands/arduino-cli_cache_clean.md
@@ -121,6 +122,7 @@ nav:
   - sketch-specification.md
   - library-specification.md
   - platform-specification.md
+  - Pluggable Discovery specification: pluggable-discovery-specification.md
   - Package index specification: package_index_json-specification.md
 
 extra_css:
