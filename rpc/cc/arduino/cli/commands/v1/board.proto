@@ -53,24 +53,17 @@ message BoardDetailsResponse {
   repeated ToolsDependencies tools_dependencies = 10;
   // The board's custom configuration options.
   repeated ConfigOption config_options = 11;
-  // Identifying information for the board (e.g., USB VID/PID).
-  repeated IdentificationPref identification_prefs = 12;
   // List of programmers supported by the board
   repeated Programmer programmers = 13;
   // Set to true if the board supports debugging
   bool debugging_supported = 14;
+  // Identifying information for the board (e.g., USB VID/PID).
+  repeated BoardIdentificationProperties identification_properties = 15;
 }
 
-message IdentificationPref {
-  // Identifying information for USB-connected boards.
-  USBID usb_id = 1;
-}
-
-message USBID {
-  // USB vendor ID.
-  string vid = 1;
-  // USB product ID.
-  string pid = 2;
+message BoardIdentificationProperties {
+  // A set of properties that must all be matched to identify the board
+  map<string, string> properties = 1;
 }
 
 message Package {
