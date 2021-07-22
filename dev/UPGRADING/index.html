@@ -328,6 +328,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#change-in-board-details-response-grpc-and-json-output" class="md-nav__link">
+    Change in board details response (gRPC and JSON output)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#change-of-behaviour-of-grpc-init-function" class="md-nav__link">
     Change of behaviour of gRPC Init function
   </a>
@@ -1343,6 +1350,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#change-in-board-details-response-grpc-and-json-output" class="md-nav__link">
+    Change in board details response (gRPC and JSON output)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#change-of-behaviour-of-grpc-init-function" class="md-nav__link">
     Change of behaviour of gRPC Init function
   </a>
@@ -1570,6 +1584,105 @@ removed, in its place:</p>
 <p><code>Sketch</code> has been removed, use <code>sketch.Sketch</code> in its place.</p>
 <p><code>SketchToLegacy</code> and <code>SketchFromLegacy</code> have been removed, nothing replaces them.</p>
 <p><code>Context.Sketch</code> types has been changed from <code>Sketch</code> to <code>sketch.Sketch</code>.</p>
+<h3 id="change-in-board-details-response-grpc-and-json-output">Change in <code>board details</code> response (gRPC and JSON output)<a class="headerlink" href="#change-in-board-details-response-grpc-and-json-output" title="Permanent link">&para;</a></h3>
+<p>The <code>board details</code> output WRT board identification properties has changed, before it was:</p>
+<div class="highlight"><pre><span></span><code>$ arduino-cli board details arduino:samd:mkr1000
+Board name:                Arduino MKR1000
+FQBN:                      arduino:samd:mkr1000
+Board version:             1.8.11
+Debugging supported:       ✔
+
+Official Arduino board:    ✔
+
+Identification properties: VID:0x2341 PID:0x824e
+                           VID:0x2341 PID:0x024e
+                           VID:0x2341 PID:0x804e
+                           VID:0x2341 PID:0x004e
+[...]
+
+$ arduino-cli board details arduino:samd:mkr1000 --format json
+[...]
+  &quot;identification_prefs&quot;: [
+    {
+      &quot;usb_id&quot;: {
+        &quot;vid&quot;: &quot;0x2341&quot;,
+        &quot;pid&quot;: &quot;0x804e&quot;
+      }
+    },
+    {
+      &quot;usb_id&quot;: {
+        &quot;vid&quot;: &quot;0x2341&quot;,
+        &quot;pid&quot;: &quot;0x004e&quot;
+      }
+    },
+    {
+      &quot;usb_id&quot;: {
+        &quot;vid&quot;: &quot;0x2341&quot;,
+        &quot;pid&quot;: &quot;0x824e&quot;
+      }
+    },
+    {
+      &quot;usb_id&quot;: {
+        &quot;vid&quot;: &quot;0x2341&quot;,
+        &quot;pid&quot;: &quot;0x024e&quot;
+      }
+    }
+  ],
+[...]
+</code></pre></div>
+<p>now the properties have been renamed from <code>identification_prefs</code> to <code>identification_properties</code> and they are no longer
+specific to USB but they can theoretically be any set of key/values:</p>
+<div class="highlight"><pre><span></span><code>$ arduino-cli board details arduino:samd:mkr1000
+Board name:                Arduino MKR1000
+FQBN:                      arduino:samd:mkr1000
+Board version:             1.8.11
+Debugging supported:       ✔
+
+Official Arduino board:    ✔
+
+Identification properties: vid=0x2341
+                           pid=0x804e
+
+Identification properties: vid=0x2341
+                           pid=0x004e
+
+Identification properties: vid=0x2341
+                           pid=0x824e
+
+Identification properties: vid=0x2341
+                           pid=0x024e
+[...]
+
+$ arduino-cli board details arduino:samd:mkr1000 --format json
+[...]
+  &quot;identification_properties&quot;: [
+    {
+      &quot;properties&quot;: {
+        &quot;pid&quot;: &quot;0x804e&quot;,
+        &quot;vid&quot;: &quot;0x2341&quot;
+      }
+    },
+    {
+      &quot;properties&quot;: {
+        &quot;pid&quot;: &quot;0x004e&quot;,
+        &quot;vid&quot;: &quot;0x2341&quot;
+      }
+    },
+    {
+      &quot;properties&quot;: {
+        &quot;pid&quot;: &quot;0x824e&quot;,
+        &quot;vid&quot;: &quot;0x2341&quot;
+      }
+    },
+    {
+      &quot;properties&quot;: {
+        &quot;pid&quot;: &quot;0x024e&quot;,
+        &quot;vid&quot;: &quot;0x2341&quot;
+      }
+    }
+  ]
+}
+</code></pre></div>
 <h3 id="change-of-behaviour-of-grpc-init-function">Change of behaviour of gRPC <code>Init</code> function<a class="headerlink" href="#change-of-behaviour-of-grpc-init-function" title="Permanent link">&para;</a></h3>
 <p>Previously the <code>Init</code> function was used to both create a new <code>CoreInstance</code> and initialize it, so that the internal
 package and library managers were already populated with all the information available from <code>*_index.json</code> files,

@@ -979,6 +979,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#boardidentificationproperties" class="md-nav__link">
+    BoardIdentificationProperties
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#boardidentificationpropertiespropertiesentry" class="md-nav__link">
+    BoardIdentificationProperties.PropertiesEntry
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#boardlistallrequest" class="md-nav__link">
     BoardListAllRequest
   </a>
@@ -1077,13 +1091,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#identificationpref" class="md-nav__link">
-    IdentificationPref
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#package" class="md-nav__link">
     Package
   </a>
@@ -1100,13 +1107,6 @@
           <li class="md-nav__item">
   <a href="#toolsdependencies" class="md-nav__link">
     ToolsDependencies
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#usbid" class="md-nav__link">
-    USBID
   </a>
   
 </li>
@@ -2030,6 +2030,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#boardidentificationproperties" class="md-nav__link">
+    BoardIdentificationProperties
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#boardidentificationpropertiespropertiesentry" class="md-nav__link">
+    BoardIdentificationProperties.PropertiesEntry
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#boardlistallrequest" class="md-nav__link">
     BoardListAllRequest
   </a>
@@ -2128,13 +2142,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#identificationpref" class="md-nav__link">
-    IdentificationPref
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#package" class="md-nav__link">
     Package
   </a>
@@ -2151,13 +2158,6 @@
           <li class="md-nav__item">
   <a href="#toolsdependencies" class="md-nav__link">
     ToolsDependencies
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#usbid" class="md-nav__link">
-    USBID
   </a>
   
 </li>
@@ -2909,6 +2909,8 @@
 <li><a href="#cc.arduino.cli.commands.v1.BoardAttachResponse">BoardAttachResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.BoardDetailsRequest">BoardDetailsRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.BoardDetailsResponse">BoardDetailsResponse</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.BoardIdentificationProperties">BoardIdentificationProperties</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.BoardIdentificationProperties.PropertiesEntry">BoardIdentificationProperties.PropertiesEntry</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.BoardListAllRequest">BoardListAllRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.BoardListAllResponse">BoardListAllResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.BoardListItem">BoardListItem</a></li>
@@ -2923,11 +2925,9 @@
 <li><a href="#cc.arduino.cli.commands.v1.ConfigValue">ConfigValue</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.DetectedPort">DetectedPort</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.Help">Help</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.IdentificationPref">IdentificationPref</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.Package">Package</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.Systems">Systems</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.ToolsDependencies">ToolsDependencies</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.USBID">USBID</a></li>
 </ul>
 </li>
 </ul>
@@ -3241,12 +3241,6 @@
 <td>The board&#39;s custom configuration options.</td>
 </tr>
 <tr>
-<td>identification_prefs</td>
-<td><a href="#cc.arduino.cli.commands.v1.IdentificationPref">IdentificationPref</a></td>
-<td>repeated</td>
-<td>Identifying information for the board (e.g., USB VID/PID).</td>
-</tr>
-<tr>
 <td>programmers</td>
 <td><a href="#cc.arduino.cli.commands.v1.Programmer">Programmer</a></td>
 <td>repeated</td>
@@ -3257,6 +3251,58 @@
 <td><a href="#bool">bool</a></td>
 <td></td>
 <td>Set to true if the board supports debugging</td>
+</tr>
+<tr>
+<td>identification_properties</td>
+<td><a href="#cc.arduino.cli.commands.v1.BoardIdentificationProperties">BoardIdentificationProperties</a></td>
+<td>repeated</td>
+<td>Identifying information for the board (e.g., USB VID/PID).</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.BoardIdentificationProperties"></a></p>
+<h3 id="boardidentificationproperties">BoardIdentificationProperties<a class="headerlink" href="#boardidentificationproperties" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>properties</td>
+<td><a href="#cc.arduino.cli.commands.v1.BoardIdentificationProperties.PropertiesEntry">BoardIdentificationProperties.PropertiesEntry</a></td>
+<td>repeated</td>
+<td>A set of properties that must all be matched to identify the board</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.BoardIdentificationProperties.PropertiesEntry"></a></p>
+<h3 id="boardidentificationpropertiespropertiesentry">BoardIdentificationProperties.PropertiesEntry<a class="headerlink" href="#boardidentificationpropertiespropertiesentry" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>key</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>value</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -3696,26 +3742,6 @@
 </tr>
 </tbody>
 </table>
-<p><a name="cc.arduino.cli.commands.v1.IdentificationPref"></a></p>
-<h3 id="identificationpref">IdentificationPref<a class="headerlink" href="#identificationpref" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>usb_id</td>
-<td><a href="#cc.arduino.cli.commands.v1.USBID">USBID</a></td>
-<td></td>
-<td>Identifying information for USB-connected boards.</td>
-</tr>
-</tbody>
-</table>
 <p><a name="cc.arduino.cli.commands.v1.Package"></a></p>
 <h3 id="package">Package<a class="headerlink" href="#package" title="Permanent link">&para;</a></h3>
 <table>
@@ -3845,32 +3871,6 @@
 <td><a href="#cc.arduino.cli.commands.v1.Systems">Systems</a></td>
 <td>repeated</td>
 <td>Data for the operating system-specific builds of the tool.</td>
-</tr>
-</tbody>
-</table>
-<p><a name="cc.arduino.cli.commands.v1.USBID"></a></p>
-<h3 id="usbid">USBID<a class="headerlink" href="#usbid" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>vid</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>USB vendor ID.</td>
-</tr>
-<tr>
-<td>pid</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>USB product ID.</td>
 </tr>
 </tbody>
 </table>
