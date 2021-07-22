@@ -25,15 +25,15 @@ import (
 )
 
 var (
-	mdnsDiscoveryVersion = semver.ParseRelaxed("0.9.1")
+	mdnsDiscoveryVersion = semver.ParseRelaxed("0.9.2")
 	mdnsDiscoveryFlavors = []*cores.Flavor{
 		{
 			OS: "i686-pc-linux-gnu",
 			Resource: &resources.DownloadResource{
 				ArchiveFileName: fmt.Sprintf("mdns-discovery_%s_Linux_32bit.tar.bz2", mdnsDiscoveryVersion),
 				URL:             fmt.Sprintf("https://downloads.arduino.cc/discovery/mdns-discovery/mdns-discovery_%s_Linux_32bit.tar.gz", mdnsDiscoveryVersion),
-				Size:            2414966,
-				Checksum:        "SHA-256:47e9e35544c3d0f105926ec31ed3ded1f45cf0d50f4679bd23586bab710102fa",
+				Size:            2417970,
+				Checksum:        "SHA-256:34afe67745c7d7e8d435fb668aa3e85a93d313b7a8a4bc13f7e3c5fe48db0fa8",
 				CachePath:       "tools",
 			},
 		},
@@ -42,8 +42,8 @@ var (
 			Resource: &resources.DownloadResource{
 				ArchiveFileName: fmt.Sprintf("mdns-discovery_%s_Linux_64bit.tar.bz2", mdnsDiscoveryVersion),
 				URL:             fmt.Sprintf("https://downloads.arduino.cc/discovery/mdns-discovery/mdns-discovery_%s_Linux_64bit.tar.gz", mdnsDiscoveryVersion),
-				Size:            2498393,
-				Checksum:        "SHA-256:014d3acd8803660ae26545e3539006d92023a16065a0c585a8ca80aabed94734",
+				Size:            2499458,
+				Checksum:        "SHA-256:e97d9553590559e4b15239c4f8c86c9bd310aca3f0cdfd26098c5878b463f2ec",
 				CachePath:       "tools",
 			},
 		},
@@ -52,8 +52,8 @@ var (
 			Resource: &resources.DownloadResource{
 				ArchiveFileName: fmt.Sprintf("mdns-discovery_%s_Windows_32bit.zip", mdnsDiscoveryVersion),
 				URL:             fmt.Sprintf("https://downloads.arduino.cc/discovery/mdns-discovery/mdns-discovery_%s_Windows_32bit.zip", mdnsDiscoveryVersion),
-				Size:            2546719,
-				Checksum:        "SHA-256:fa55b412ae9d4aeaafaf3903a804b332cf8f9056c038e78369eaacdb238c9d89",
+				Size:            2548123,
+				Checksum:        "SHA-256:2493290856294f8bed3eed50c9ed4cda6a4a98b4c01cae6db7c1621f4db33afd",
 				CachePath:       "tools",
 			},
 		},
@@ -62,8 +62,8 @@ var (
 			Resource: &resources.DownloadResource{
 				ArchiveFileName: fmt.Sprintf("mdns-discovery_%s_Windows_64bit.zip", mdnsDiscoveryVersion),
 				URL:             fmt.Sprintf("https://downloads.arduino.cc/discovery/mdns-discovery/mdns-discovery_%s_Windows_64bit.zip", mdnsDiscoveryVersion),
-				Size:            2601308,
-				Checksum:        "SHA-256:c89220e8e28ad9622a9c896f706207588aa6d3875b07a7b0bd6322e1dde0c642",
+				Size:            2603561,
+				Checksum:        "SHA-256:26ef37b3f331cd6cfbfd234431fe95a0c4aec8d8889286084e0c9012cb72ff1e",
 				CachePath:       "tools",
 			},
 		},
@@ -72,8 +72,8 @@ var (
 			Resource: &resources.DownloadResource{
 				ArchiveFileName: fmt.Sprintf("mdns-discovery_%s_macOS_64bit.tar.bz2", mdnsDiscoveryVersion),
 				URL:             fmt.Sprintf("https://downloads.arduino.cc/discovery/mdns-discovery/mdns-discovery_%s_macOS_64bit.tar.gz", mdnsDiscoveryVersion),
-				Size:            2458193,
-				Checksum:        "SHA-256:e376408e32f79394d1124875c1e2378fe717808aef7da9a6a25086f39bc49be1",
+				Size:            2458693,
+				Checksum:        "SHA-256:51c7c1c7a7a81e1224cfd55f84497cfae278c28124d10619a0f7adae29c0f45b",
 				CachePath:       "tools",
 			},
 		},
@@ -82,8 +82,8 @@ var (
 			Resource: &resources.DownloadResource{
 				ArchiveFileName: fmt.Sprintf("mdns-discovery_%s_Linux_ARMv6.tar.bz2", mdnsDiscoveryVersion),
 				URL:             fmt.Sprintf("https://downloads.arduino.cc/discovery/mdns-discovery/mdns-discovery_%s_Linux_ARMv6.tar.gz", mdnsDiscoveryVersion),
-				Size:            2320366,
-				Checksum:        "SHA-256:531478083a6f77bff419e98fb29aaf1f72c85d14f2265799ea96e33d153c88bb",
+				Size:            2321304,
+				Checksum:        "SHA-256cc1096936abddb21af23fa10c435e8e9e37ec9df2c3d2c41d265d466b03de0af",
 				CachePath:       "tools",
 			},
 		},
@@ -92,8 +92,8 @@ var (
 			Resource: &resources.DownloadResource{
 				ArchiveFileName: fmt.Sprintf("mdns-discovery_%s_Linux_ARM64.tar.bz2", mdnsDiscoveryVersion),
 				URL:             fmt.Sprintf("https://downloads.arduino.cc/discovery/mdns-discovery/mdns-discovery_%s_Linux_ARM64.tar.gz", mdnsDiscoveryVersion),
-				Size:            2326606,
-				Checksum:        "SHA-256:7b30a8c6b770e53d2579bca1443da1fbf6d182224b77b32e06cee6d08cac4595",
+				Size:            2328169,
+				Checksum:        "SHA-256:820266009f7decf421c005d702e1b4da43ba2af03d2ddd73f5a3a91737774571",
 				CachePath:       "tools",
 			},
 		},
