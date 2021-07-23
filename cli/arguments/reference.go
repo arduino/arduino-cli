@@ -36,7 +36,7 @@ func (r *Reference) String() string {
 }
 
 // ParseReferences is a convenient wrapper that operates on a slice of strings and
-// calls ParseReferenceArg for each of them. It returns at the first invalid argument.
+// calls ParseReference for each of them. It returns at the first invalid argument.
 func ParseReferences(args []string, parseArch bool) ([]*Reference, error) {
 	ret := []*Reference{}
 	for _, arg := range args {
@@ -49,7 +49,7 @@ func ParseReferences(args []string, parseArch bool) ([]*Reference, error) {
 	return ret, nil
 }
 
-// ParseReference parses a string and return a ReferenceArg object. If `parseArch` is passed,
+// ParseReference parses a string and returns a Reference object. If `parseArch` is passed,
 // the method also tries to parse the architecture bit, i.e. string must be in the form
 // "packager:arch@version", useful to represent a platform (or core) name.
 func ParseReference(arg string, parseArch bool) (*Reference, error) {

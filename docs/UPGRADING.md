@@ -4,9 +4,9 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## Unreleased
 
-### gRPC interface `UploadRequest`, `UploadUsingProgrammerRequest`, `BurnBootloaderRequest`, `DetectedPort` arguments changes
+### gRPC interface `UploadRequest`, `UploadUsingProgrammerRequest`, `BurnBootloaderRequest`, `DetectedPort` field changes
 
-`UploadRequest`, `UploadUsingProgrammerRequest` and `BurnBootloaderRequest` had their `port` argument change from type
+`UploadRequest`, `UploadUsingProgrammerRequest` and `BurnBootloaderRequest` had their `port` field change from type
 `string` to `Port`.
 
 `Port` contains the following information:
@@ -57,12 +57,12 @@ message DetectedPort {
 
 The properties previously contained directly in the message are now stored in the `port` property.
 
-This changes are necessary for the Pluggable Discovery.
+These changes are necessary for the Pluggable Discovery.
 
 ### gRPC interface `BoardListItem` change
 
-The `vid` and `pid` properties of the `BoardListItem` have been removed. They used to only be available when requesting
-connected board lists, now that information is stored in the `port` property of `DetectedPort`.
+The `vid` and `pid` fields of the `BoardListItem` message have been removed. They used to only be available when
+requesting connected board lists, now that information is stored in the `port` field of `DetectedPort`.
 
 ### Change public library interface
 
