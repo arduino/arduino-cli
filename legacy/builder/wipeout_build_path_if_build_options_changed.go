@@ -41,12 +41,12 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 
 	var opts *properties.Map
 	if err := json.Unmarshal([]byte(buildOptionsJson), &opts); err != nil || opts == nil {
-	    panic(constants.BUILD_OPTIONS_FILE + " is invalid")
+		panic(constants.BUILD_OPTIONS_FILE + " is invalid")
 	}
 
 	var prevOpts *properties.Map
 	if err := json.Unmarshal([]byte(previousBuildOptionsJson), &prevOpts); err != nil || prevOpts == nil {
-		ctx.GetLogger().Println(constants.LOG_LEVEL_DEBUG, constants.MSG_BUILD_OPTIONS_INVALID + constants.MSG_REBUILD_ALL, constants.BUILD_OPTIONS_FILE)
+		ctx.GetLogger().Println(constants.LOG_LEVEL_DEBUG, constants.MSG_BUILD_OPTIONS_INVALID+constants.MSG_REBUILD_ALL, constants.BUILD_OPTIONS_FILE)
 		return doCleanup(ctx.BuildPath)
 	}
 
