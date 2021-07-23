@@ -17,6 +17,7 @@ package lib
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -31,9 +32,9 @@ import (
 
 func initUninstallCommand() *cobra.Command {
 	uninstallCommand := &cobra.Command{
-		Use:     "uninstall LIBRARY_NAME(S)",
-		Short:   "Uninstalls one or more libraries.",
-		Long:    "Uninstalls one or more libraries.",
+		Use:     fmt.Sprintf("uninstall %s...", tr("LIBRARY_NAME")),
+		Short:   tr("Uninstalls one or more libraries."),
+		Long:    tr("Uninstalls one or more libraries."),
 		Example: "  " + os.Args[0] + " lib uninstall AudioZero",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     runUninstallCommand,
@@ -47,7 +48,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
 	refs, err := ParseLibraryReferenceArgsAndAdjustCase(instance, args)
 	if err != nil {
-		feedback.Errorf("Invalid argument passed: %v", err)
+		feedback.Errorf(tr("Invalid argument passed: %v"), err)
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
@@ -58,7 +59,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 			Version:  library.Version,
 		}, output.TaskProgress())
 		if err != nil {
-			feedback.Errorf("Error uninstalling %s: %v", library, err)
+			feedback.Errorf(tr("Error uninstalling %[1]s: %[2]v"), library, err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}

@@ -32,14 +32,14 @@ import (
 func initListCommand() *cobra.Command {
 	listCommand := &cobra.Command{
 		Use:     "list",
-		Short:   "Shows the list of installed platforms.",
-		Long:    "Shows the list of installed platforms.",
+		Short:   tr("Shows the list of installed platforms."),
+		Long:    tr("Shows the list of installed platforms."),
 		Example: "  " + os.Args[0] + " core list",
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}
-	listCommand.Flags().BoolVar(&listFlags.updatableOnly, "updatable", false, "List updatable platforms.")
-	listCommand.Flags().BoolVar(&listFlags.all, "all", false, "If set return all installable and installed cores, including manually installed.")
+	listCommand.Flags().BoolVar(&listFlags.updatableOnly, "updatable", false, tr("List updatable platforms."))
+	listCommand.Flags().BoolVar(&listFlags.all, "all", false, tr("If set return all installable and installed cores, including manually installed."))
 	return listCommand
 }
 
@@ -58,7 +58,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		All:           listFlags.all,
 	})
 	if err != nil {
-		feedback.Errorf("Error listing platforms: %v", err)
+		feedback.Errorf(tr("Error listing platforms: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -81,11 +81,11 @@ func (ir installedResult) String() string {
 	}
 
 	t := table.New()
-	t.SetHeader("ID", "Installed", "Latest", "Name")
+	t.SetHeader(tr("ID"), tr("Installed"), tr("Latest"), tr("Name"))
 	for _, p := range ir.platforms {
 		name := p.Name
 		if p.Deprecated {
-			name = fmt.Sprintf("[DEPRECATED] %s", name)
+			name = fmt.Sprintf(tr("[DEPRECATED] %s"), name)
 		}
 		t.AddRow(p.Id, p.Installed, p.Latest, name)
 	}

@@ -17,6 +17,8 @@ package version
 
 import (
 	"fmt"
+
+	"github.com/arduino/arduino-cli/i18n"
 )
 
 var (
@@ -25,6 +27,7 @@ var (
 	commit               = ""
 	status               = "alpha"
 	date                 = ""
+	tr                   = i18n.Tr
 )
 
 // Info FIXMEDOC
@@ -48,7 +51,7 @@ func NewInfo(application string) *Info {
 }
 
 func (i *Info) String() string {
-	return fmt.Sprintf("%s %s Version: %s Commit: %s Date: %s", i.Application, i.Status, i.VersionString, i.Commit, i.Date)
+	return fmt.Sprintf(tr("%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"), i.Application, i.Status, i.VersionString, i.Commit, i.Date)
 }
 
 //nolint:gochecknoinits

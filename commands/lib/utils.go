@@ -31,7 +31,7 @@ type libraryReferencer interface {
 func createLibIndexReference(lm *librariesmanager.LibrariesManager, req libraryReferencer) (*librariesindex.Reference, error) {
 	version, err := commands.ParseVersion(req)
 	if err != nil {
-		return nil, fmt.Errorf("invalid version: %s", err)
+		return nil, fmt.Errorf(tr("invalid version: %s"), err)
 	}
 
 	return &librariesindex.Reference{Name: req.GetName(), Version: version}, nil
@@ -44,7 +44,7 @@ func findLibraryIndexRelease(lm *librariesmanager.LibrariesManager, req libraryR
 	}
 	lib := lm.Index.FindRelease(ref)
 	if lib == nil {
-		return nil, fmt.Errorf("library %s not found", ref)
+		return nil, fmt.Errorf(tr("library %s not found"), ref)
 	}
 	return lib, nil
 }

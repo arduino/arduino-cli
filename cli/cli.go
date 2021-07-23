@@ -64,9 +64,9 @@ func NewCommand() *cobra.Command {
 	// ArduinoCli is the root command
 	arduinoCli := &cobra.Command{
 		Use:              "arduino-cli",
-		Short:            "Arduino CLI.",
-		Long:             "Arduino Command Line Interface (arduino-cli).",
-		Example:          "  " + os.Args[0] + " <command> [flags...]",
+		Short:            tr("Arduino CLI."),
+		Long:             tr("Arduino Command Line Interface (arduino-cli)."),
+		Example:          fmt.Sprintf("  %s <%s> [%s...]", os.Args[0], tr("command"), tr("flags")),
 		PersistentPreRun: preRun,
 	}
 
@@ -97,13 +97,13 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(burnbootloader.NewCommand())
 	cmd.AddCommand(version.NewCommand())
 
-	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Print the logs on the standard output.")
-	cmd.PersistentFlags().String("log-level", "", "Messages with this level and above will be logged. Valid levels are: trace, debug, info, warn, error, fatal, panic")
-	cmd.PersistentFlags().String("log-file", "", "Path to the file where logs will be written.")
-	cmd.PersistentFlags().String("log-format", "", "The output format for the logs, can be {text|json}.")
-	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", "The output format, can be {text|json}.")
-	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", "The custom config file (if not specified the default will be used).")
-	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, "Comma-separated list of additional URLs for the Boards Manager.")
+	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, tr("Print the logs on the standard output."))
+	cmd.PersistentFlags().String("log-level", "", fmt.Sprintf(tr("Messages with this level and above will be logged. Valid levels are: %s, %s, %s, %s, %s, %s, %s"), "trace", "debug", "info", "warn", "error", "fatal", "panic"))
+	cmd.PersistentFlags().String("log-file", "", tr("Path to the file where logs will be written."))
+	cmd.PersistentFlags().String("log-format", "", fmt.Sprintf(tr("The output format for the logs, can be {%s|%s}."), "text", "json"))
+	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", fmt.Sprintf(tr("The output format, can be {%s|%s}."), "text", "json"))
+	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", tr("The custom config file (if not specified the default will be used)."))
+	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, tr("Comma-separated list of additional URLs for the Boards Manager."))
 	configuration.BindFlags(cmd, configuration.Settings)
 }
 
@@ -168,7 +168,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	if logFile != "" {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
-			fmt.Printf("Unable to open file for logging: %s", logFile)
+			fmt.Printf(tr("Unable to open file for logging: %s"), logFile)
 			os.Exit(errorcodes.ErrBadCall)
 		}
 
@@ -182,7 +182,7 @@ func preRun(cmd *cobra.Command, args []string) {
 
 	// configure logging filter
 	if lvl, found := toLogLevel(configuration.Settings.GetString("logging.level")); !found {
-		feedback.Errorf("Invalid option for --log-level: %s", configuration.Settings.GetString("logging.level"))
+		feedback.Errorf(tr("Invalid option for --log-level: %s"), configuration.Settings.GetString("logging.level"))
 		os.Exit(errorcodes.ErrBadArgument)
 	} else {
 		logrus.SetLevel(lvl)
@@ -199,7 +199,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	// check the right output format was passed
 	format, found := parseFormatString(outputFormat)
 	if !found {
-		feedback.Error("Invalid output format: " + outputFormat)
+		feedback.Errorf(tr("Invalid output format: %s"), outputFormat)
 		os.Exit(errorcodes.ErrBadCall)
 	}
 
@@ -221,7 +221,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	if outputFormat != "text" {
 		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
 			logrus.Warn("Calling help on JSON format")
-			feedback.Error("Invalid Call : should show Help, but it is available only in TEXT mode.")
+			feedback.Error(tr("Invalid Call : should show Help, but it is available only in TEXT mode."))
 			os.Exit(errorcodes.ErrBadCall)
 		})
 	}

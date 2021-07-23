@@ -30,7 +30,7 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 
 	targetPackage, targetPlatform, targetBoard, buildProperties, actualPlatform, err := ctx.PackageManager.ResolveFQBN(ctx.FQBN)
 	if err != nil {
-		return i18n.ErrorfWithLogger(logger, "Error resolving FQBN: {0}", err)
+		return i18n.ErrorfWithLogger(logger, tr("Error resolving FQBN: {0}"), err)
 	}
 
 	targetBoard.Properties = buildProperties // FIXME....

@@ -79,21 +79,21 @@ func (packages Packages) Names() []string {
 // GetPlatformReleaseToolDependencies returns the tool releases needed by the specified PlatformRelease
 func (packages Packages) GetPlatformReleaseToolDependencies(release *PlatformRelease) ([]*ToolRelease, error) {
 	if release == nil {
-		return nil, errors.New("release cannot be nil")
+		return nil, errors.New(tr("release cannot be nil"))
 	}
 	ret := []*ToolRelease{}
 	for _, dep := range release.ToolDependencies {
 		pkg, exists := packages[dep.ToolPackager]
 		if !exists {
-			return nil, fmt.Errorf("package %s not found", dep.ToolPackager)
+			return nil, fmt.Errorf(tr("package %s not found"), dep.ToolPackager)
 		}
 		tool, exists := pkg.Tools[dep.ToolName]
 		if !exists {
-			return nil, fmt.Errorf("tool %s not found", dep.ToolName)
+			return nil, fmt.Errorf(tr("tool %s not found"), dep.ToolName)
 		}
 		toolRelease, exists := tool.Releases[dep.ToolVersion.String()]
 		if !exists {
-			return nil, fmt.Errorf("tool version %s not found", dep.ToolVersion)
+			return nil, fmt.Errorf(tr("tool version %s not found"), dep.ToolVersion)
 		}
 		ret = append(ret, toolRelease)
 	}
@@ -103,24 +103,24 @@ func (packages Packages) GetPlatformReleaseToolDependencies(release *PlatformRel
 // GetPlatformReleaseDiscoveryDependencies returns the discovery releases needed by the specified PlatformRelease
 func (packages Packages) GetPlatformReleaseDiscoveryDependencies(release *PlatformRelease) ([]*ToolRelease, error) {
 	if release == nil {
-		return nil, fmt.Errorf("release cannot be nil")
+		return nil, fmt.Errorf(tr("release cannot be nil"))
 	}
 
 	res := []*ToolRelease{}
 	for _, discovery := range release.DiscoveryDependencies {
 		pkg, exists := packages[discovery.Packager]
 		if !exists {
-			return nil, fmt.Errorf("package %s not found", discovery.Packager)
+			return nil, fmt.Errorf(tr("package %s not found"), discovery.Packager)
 		}
 		tool, exists := pkg.Tools[discovery.Name]
 		if !exists {
-			return nil, fmt.Errorf("tool %s not found", discovery.Name)
+			return nil, fmt.Errorf(tr("tool %s not found"), discovery.Name)
 		}
 
 		// We always want to use the latest available release for discoveries
 		latestRelease := tool.LatestRelease()
 		if latestRelease == nil {
-			return nil, fmt.Errorf("can't find latest release of %s", discovery.Name)
+			return nil, fmt.Errorf(tr("can't find latest release of %s"), discovery.Name)
 		}
 		res = append(res, latestRelease)
 	}
@@ -164,11 +164,11 @@ func (targetPackage *Package) String() string {
 func (tdep ToolDependency) extractTool(sc Packages) (*Tool, error) {
 	pkg, exists := sc[tdep.ToolPackager]
 	if !exists {
-		return nil, errors.New("package not found")
+		return nil, errors.New(tr("package not found"))
 	}
 	tool, exists := pkg.Tools[tdep.ToolName]
 	if !exists {
-		return nil, errors.New("tool not found")
+		return nil, errors.New(tr("tool not found"))
 	}
 	return tool, nil
 }
@@ -180,7 +180,7 @@ func (tdep ToolDependency) extractRelease(sc Packages) (*ToolRelease, error) {
 	}
 	release, exists := tool.Releases[tdep.ToolVersion.String()]
 	if !exists {
-		return nil, errors.New("release not found")
+		return nil, errors.New(tr("release not found"))
 	}
 	return release, nil
 }

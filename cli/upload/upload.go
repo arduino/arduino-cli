@@ -17,6 +17,7 @@ package upload
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -24,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/upload"
+	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -39,35 +41,36 @@ var (
 	importFile string
 	programmer string
 	dryRun     bool
+	tr         = i18n.Tr
 )
 
 // NewCommand created a new `upload` command
 func NewCommand() *cobra.Command {
 	uploadCommand := &cobra.Command{
 		Use:     "upload",
-		Short:   "Upload Arduino sketches.",
-		Long:    "Upload Arduino sketches. This does NOT compile the sketch prior to upload.",
+		Short:   tr("Upload Arduino sketches."),
+		Long:    tr("Upload Arduino sketches. This does NOT compile the sketch prior to upload."),
 		Example: "  " + os.Args[0] + " upload /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		PreRun:  checkFlagsConflicts,
 		Run:     run,
 	}
 
-	uploadCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
-	uploadCommand.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
-	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", "Directory containing binaries to upload.")
-	uploadCommand.Flags().StringVarP(&importFile, "input-file", "i", "", "Binary file to upload.")
-	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
-	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
-	uploadCommand.Flags().StringVarP(&programmer, "programmer", "P", "", "Optional, use the specified programmer to upload.")
-	uploadCommand.Flags().BoolVar(&dryRun, "dry-run", false, "Do not perform the actual upload, just log out actions")
+	uploadCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
+	uploadCommand.Flags().StringVarP(&port, "port", "p", "", tr("Upload port, e.g.: COM10 or /dev/ttyACM0"))
+	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries to upload."))
+	uploadCommand.Flags().StringVarP(&importFile, "input-file", "i", "", tr("Binary file to upload."))
+	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
+	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Optional, turns on verbose mode."))
+	uploadCommand.Flags().StringVarP(&programmer, "programmer", "P", "", tr("Optional, use the specified programmer to upload."))
+	uploadCommand.Flags().BoolVar(&dryRun, "dry-run", false, tr("Do not perform the actual upload, just log out actions"))
 	uploadCommand.Flags().MarkHidden("dry-run")
 	return uploadCommand
 }
 
 func checkFlagsConflicts(command *cobra.Command, args []string) {
 	if importFile != "" && importDir != "" {
-		feedback.Errorf("error: --input-file and --input-dir flags cannot be used together")
+		feedback.Errorf(fmt.Sprintf(tr("error: %s and %s flags cannot be used together"), "--input-file", "--input-dir"))
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 }
@@ -83,7 +86,7 @@ func run(command *cobra.Command, args []string) {
 
 	// .pde files are still supported but deprecated, this warning urges the user to rename them
 	if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 {
-		feedback.Error("Sketches with .pde extension are deprecated, please rename the following files to .ino:")
+		feedback.Error(tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:"))
 		for _, f := range files {
 			feedback.Error(f)
 		}
@@ -101,7 +104,7 @@ func run(command *cobra.Command, args []string) {
 		Programmer: programmer,
 		DryRun:     dryRun,
 	}, os.Stdout, os.Stderr); err != nil {
-		feedback.Errorf("Error during Upload: %v", err)
+		feedback.Errorf(tr("Error during Upload: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }
@@ -114,7 +117,7 @@ func initSketchPath(sketchPath *paths.Path) *paths.Path {
 
 	wd, err := paths.Getwd()
 	if err != nil {
-		feedback.Errorf("Couldn't get current working directory: %v", err)
+		feedback.Errorf(tr("Couldn't get current working directory: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	logrus.Infof("Reading sketch from dir: %s", wd)

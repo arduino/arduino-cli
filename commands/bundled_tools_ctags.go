@@ -19,8 +19,11 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/resources"
+	"github.com/arduino/arduino-cli/i18n"
 	semver "go.bug.st/relaxed-semver"
 )
+
+var tr = i18n.Tr
 
 func getBuiltinCtagsTool(pm *packagemanager.PackageManager) *cores.ToolRelease {
 	builtinPackage := pm.Packages.GetOrCreatePackage("builtin")

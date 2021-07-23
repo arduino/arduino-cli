@@ -82,11 +82,11 @@ func doCleanup(buildPath *paths.Path) error {
 	// logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED + constants.MSG_REBUILD_ALL)
 
 	if files, err := buildPath.ReadDir(); err != nil {
-		return errors.WithMessage(err, "cleaning build path")
+		return errors.WithMessage(err, tr("cleaning build path"))
 	} else {
 		for _, file := range files {
 			if err := file.RemoveAll(); err != nil {
-				return errors.WithMessage(err, "cleaning build path")
+				return errors.WithMessage(err, tr("cleaning build path"))
 			}
 		}
 	}

@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/upload"
+	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
 )
@@ -34,25 +35,26 @@ var (
 	verify     bool
 	programmer string
 	dryRun     bool
+	tr         = i18n.Tr
 )
 
 // NewCommand created a new `burn-bootloader` command
 func NewCommand() *cobra.Command {
 	burnBootloaderCommand := &cobra.Command{
 		Use:     "burn-bootloader",
-		Short:   "Upload the bootloader.",
-		Long:    "Upload the bootloader on the board using an external programmer.",
+		Short:   tr("Upload the bootloader."),
+		Long:    tr("Upload the bootloader on the board using an external programmer."),
 		Example: "  " + os.Args[0] + " burn-bootloader -b arduino:avr:uno -P atmel_ice",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
 	}
 
-	burnBootloaderCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
-	burnBootloaderCommand.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
-	burnBootloaderCommand.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
-	burnBootloaderCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, "Turns on verbose mode.")
-	burnBootloaderCommand.Flags().StringVarP(&programmer, "programmer", "P", "", "Use the specified programmer to upload.")
-	burnBootloaderCommand.Flags().BoolVar(&dryRun, "dry-run", false, "Do not perform the actual upload, just log out actions")
+	burnBootloaderCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
+	burnBootloaderCommand.Flags().StringVarP(&port, "port", "p", "", tr("Upload port, e.g.: COM10 or /dev/ttyACM0"))
+	burnBootloaderCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
+	burnBootloaderCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Turns on verbose mode."))
+	burnBootloaderCommand.Flags().StringVarP(&programmer, "programmer", "P", "", tr("Use the specified programmer to upload."))
+	burnBootloaderCommand.Flags().BoolVar(&dryRun, "dry-run", false, tr("Do not perform the actual upload, just log out actions"))
 	burnBootloaderCommand.Flags().MarkHidden("dry-run")
 
 	return burnBootloaderCommand
@@ -70,7 +72,7 @@ func run(command *cobra.Command, args []string) {
 		Programmer: programmer,
 		DryRun:     dryRun,
 	}, os.Stdout, os.Stderr); err != nil {
-		feedback.Errorf("Error during Upload: %v", err)
+		feedback.Errorf(tr("Error during Upload: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	os.Exit(0)

@@ -22,12 +22,16 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/go-paths-helper"
 
 	"github.com/pkg/errors"
 )
 
-var includesArduinoH = regexp.MustCompile(`(?m)^\s*#\s*include\s*[<\"]Arduino\.h[>\"]`)
+var (
+	includesArduinoH = regexp.MustCompile(`(?m)^\s*#\s*include\s*[<\"]Arduino\.h[>\"]`)
+	tr               = i18n.Tr
+)
 
 // QuoteCppString returns the given string as a quoted string for use with the C
 // preprocessor. This adds double quotes around it and escapes any
@@ -42,13 +46,13 @@ func QuoteCppString(str string) string {
 func SketchSaveItemCpp(path *paths.Path, contents []byte, destPath *paths.Path) error {
 	sketchName := path.Base()
 	if err := destPath.MkdirAll(); err != nil {
-		return errors.Wrap(err, "unable to create a folder to save the sketch")
+		return errors.Wrap(err, tr("unable to create a folder to save the sketch"))
 	}
 
 	destFile := destPath.Join(fmt.Sprintf("%s.cpp", sketchName))
 
 	if err := destFile.WriteFile(contents); err != nil {
-		return errors.Wrap(err, "unable to save the sketch on disk")
+		return errors.Wrap(err, tr("unable to save the sketch on disk"))
 	}
 
 	return nil
@@ -62,14 +66,14 @@ func SketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, st
 	getSource := func(f *paths.Path) (string, error) {
 		path, err := sk.FullPath.RelTo(f)
 		if err != nil {
-			return "", errors.Wrap(err, "unable to compute relative path to the sketch for the item")
+			return "", errors.Wrap(err, tr("unable to compute relative path to the sketch for the item"))
 		}
 		if override, ok := overrides[path.String()]; ok {
 			return override, nil
 		}
 		data, err := f.ReadFile()
 		if err != nil {
-			return "", fmt.Errorf("reading file %s: %s", f, err)
+			return "", fmt.Errorf(tr("reading file %[1]s: %[2]s"), f, err)
 		}
 		return string(data), nil
 	}
@@ -104,19 +108,19 @@ func SketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, st
 // specified destination directory.
 func SketchCopyAdditionalFiles(sketch *sketch.Sketch, destPath *paths.Path, overrides map[string]string) error {
 	if err := destPath.MkdirAll(); err != nil {
-		return errors.Wrap(err, "unable to create a folder to save the sketch files")
+		return errors.Wrap(err, tr("unable to create a folder to save the sketch files"))
 	}
 
 	for _, file := range sketch.AdditionalFiles {
 		relpath, err := sketch.FullPath.RelTo(file)
 		if err != nil {
-			return errors.Wrap(err, "unable to compute relative path to the sketch for the item")
+			return errors.Wrap(err, tr("unable to compute relative path to the sketch for the item"))
 		}
 
 		targetPath := destPath.JoinPath(relpath)
 		// create the directory containing the target
 		if err = targetPath.Parent().MkdirAll(); err != nil {
-			return errors.Wrap(err, "unable to create the folder containing the item")
+			return errors.Wrap(err, tr("unable to create the folder containing the item"))
 		}
 
 		var sourceBytes []byte
@@ -127,7 +131,7 @@ func SketchCopyAdditionalFiles(sketch *sketch.Sketch, destPath *paths.Path, over
 			// read the source file
 			s, err := file.ReadFile()
 			if err != nil {
-				return errors.Wrap(err, "unable to read contents of the source item")
+				return errors.Wrap(err, tr("unable to read contents of the source item"))
 			}
 			sourceBytes = s
 		}
@@ -137,7 +141,7 @@ func SketchCopyAdditionalFiles(sketch *sketch.Sketch, destPath *paths.Path, over
 
 		err = writeIfDifferent(sourceBytes, targetPath)
 		if err != nil {
-			return errors.Wrap(err, "unable to write to destination file")
+			return errors.Wrap(err, tr("unable to write to destination file"))
 		}
 	}
 
@@ -154,7 +158,7 @@ func writeIfDifferent(source []byte, destPath *paths.Path) error {
 	// Read the destination file if it exists
 	existingBytes, err := destPath.ReadFile()
 	if err != nil {
-		return errors.Wrap(err, "unable to read contents of the destination item")
+		return errors.Wrap(err, tr("unable to read contents of the destination item"))
 	}
 
 	// Overwrite if contents are different

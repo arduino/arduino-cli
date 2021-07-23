@@ -27,11 +27,14 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/executils"
+	"github.com/arduino/arduino-cli/i18n"
 	dbg "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
+
+var tr = i18n.Tr
 
 // Debug command launches a debug tool for a sketch.
 // It also implements streams routing:
@@ -45,7 +48,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigRequest, inStream io.Reader,
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	commandLine, err := getCommandLine(req, pm)
 	if err != nil {
-		return nil, errors.Wrap(err, "Cannot get command line for tool")
+		return nil, errors.Wrap(err, tr("Cannot get command line for tool"))
 	}
 
 	for i, arg := range commandLine {
@@ -61,7 +64,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigRequest, inStream io.Reader,
 
 	cmd, err := executils.NewProcess(commandLine...)
 	if err != nil {
-		return nil, errors.Wrap(err, "Cannot execute debug tool")
+		return nil, errors.Wrap(err, tr("Cannot execute debug tool"))
 	}
 
 	// Get stdIn pipe from tool
@@ -128,7 +131,7 @@ func getCommandLine(req *dbg.DebugConfigRequest, pm *packagemanager.PackageManag
 		}
 		gdbPath = paths.New(debugInfo.ToolchainPath).Join(gdbexecutable)
 	default:
-		return nil, errors.Errorf("unsupported toolchain '%s'", debugInfo.GetToolchain())
+		return nil, errors.Errorf(tr("unsupported toolchain '%s'"), debugInfo.GetToolchain())
 	}
 	add(gdbPath.String())
 
@@ -167,7 +170,7 @@ func getCommandLine(req *dbg.DebugConfigRequest, pm *packagemanager.PackageManag
 		add(serverCmd)
 
 	default:
-		return nil, errors.Errorf("unsupported gdb server '%s'", debugInfo.GetServer())
+		return nil, errors.Errorf(tr("unsupported gdb server '%s'"), debugInfo.GetServer())
 	}
 
 	// Add executable

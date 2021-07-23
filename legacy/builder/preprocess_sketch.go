@@ -100,7 +100,7 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 
 	pattern := preprocProperties.Get(constants.BUILD_PROPERTIES_PATTERN)
 	if pattern == constants.EMPTY_STRING {
-		return errors.New("arduino-preprocessor pattern is missing")
+		return errors.New(tr("arduino-preprocessor pattern is missing"))
 	}
 
 	commandLine := preprocProperties.ExpandPropsInString(pattern)

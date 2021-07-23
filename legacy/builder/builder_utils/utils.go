@@ -24,6 +24,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
@@ -31,6 +32,8 @@ import (
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
+
+var tr = i18n.Tr
 
 func PrintProgressIfProgressEnabledAndMachineLogger(ctx *types.Context) {
 
@@ -263,7 +266,7 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 		if objIsUpToDate {
 			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, objectFile)
 		} else {
-			logger.Println("info", "Skipping compile of: {0}", objectFile)
+			logger.Println("info", tr("Skipping compile of: {0}"), objectFile)
 		}
 	}
 
@@ -274,11 +277,11 @@ func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFil
 	logger := ctx.GetLogger()
 	debugLevel := ctx.DebugLevel
 	if debugLevel >= 20 {
-		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Checking previous results for {0} (result = {1}, dep = {2})", sourceFile, objectFile, dependencyFile)
+		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("Checking previous results for {0} (result = {1}, dep = {2})"), sourceFile, objectFile, dependencyFile)
 	}
 	if objectFile == nil || dependencyFile == nil {
 		if debugLevel >= 20 {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Not found: nil")
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("Not found: nil"))
 		}
 		return false, nil
 	}
@@ -294,7 +297,7 @@ func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFil
 	if err != nil {
 		if os.IsNotExist(err) {
 			if debugLevel >= 20 {
-				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Not found: {0}", objectFile)
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("Not found: {0}"), objectFile)
 			}
 			return false, nil
 		} else {
@@ -307,7 +310,7 @@ func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFil
 	if err != nil {
 		if os.IsNotExist(err) {
 			if debugLevel >= 20 {
-				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Not found: {0}", dependencyFile)
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("Not found: {0}"), dependencyFile)
 			}
 			return false, nil
 		} else {
@@ -317,13 +320,13 @@ func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFil
 
 	if sourceFileStat.ModTime().After(objectFileStat.ModTime()) {
 		if debugLevel >= 20 {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "{0} newer than {1}", sourceFile, objectFile)
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("{0} newer than {1}"), sourceFile, objectFile)
 		}
 		return false, nil
 	}
 	if sourceFileStat.ModTime().After(dependencyFileStat.ModTime()) {
 		if debugLevel >= 20 {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "{0} newer than {1}", sourceFile, dependencyFile)
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("{0} newer than {1}"), sourceFile, dependencyFile)
 		}
 		return false, nil
 	}
@@ -345,14 +348,14 @@ func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFil
 	firstRow := rows[0]
 	if !strings.HasSuffix(firstRow, ":") {
 		if debugLevel >= 20 {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "No colon in first line of depfile")
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("No colon in first line of depfile"))
 		}
 		return false, nil
 	}
 	objFileInDepFile := firstRow[:len(firstRow)-1]
 	if objFileInDepFile != objectFile.String() {
 		if debugLevel >= 20 {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Depfile is about different file: {0}", objFileInDepFile)
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("Depfile is about different file: {0}"), objFileInDepFile)
 		}
 		return false, nil
 	}
@@ -374,20 +377,20 @@ func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFil
 			// There is probably a parsing error of the dep file
 			// Ignore the error and trigger a full rebuild anyway
 			if debugLevel >= 20 {
-				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Failed to read: {0}", row)
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("Failed to read: {0}"), row)
 				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, err.Error())
 			}
 			return false, nil
 		}
 		if os.IsNotExist(err) {
 			if debugLevel >= 20 {
-				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Not found: {0}", row)
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("Not found: {0}"), row)
 			}
 			return false, nil
 		}
 		if depStat.ModTime().After(objectFileStat.ModTime()) {
 			if debugLevel >= 20 {
-				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "{0} newer than {1}", row, objectFile)
+				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("{0} newer than {1}"), row, objectFile)
 			}
 			return false, nil
 		}
@@ -470,7 +473,7 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 
 	if ctx.OnlyUpdateCompilationDatabase {
 		if ctx.Verbose {
-			logger.Println("info", "Skipping archive creation of: {0}", archiveFilePath)
+			logger.Println("info", tr("Skipping archive creation of: {0}"), archiveFilePath)
 		}
 		return archiveFilePath, nil
 	}
@@ -524,7 +527,7 @@ const COMMANDLINE_LIMIT = 30000
 func PrepareCommandForRecipe(buildProperties *properties.Map, recipe string, removeUnsetProperties bool) (*exec.Cmd, error) {
 	pattern := buildProperties.Get(recipe)
 	if pattern == "" {
-		return nil, errors.Errorf("%s pattern is missing", recipe)
+		return nil, errors.Errorf(tr("%s pattern is missing"), recipe)
 	}
 
 	commandLine := buildProperties.ExpandPropsInString(pattern)

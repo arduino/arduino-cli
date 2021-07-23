@@ -34,7 +34,7 @@ type Process struct {
 // arguments to the command.
 func NewProcess(args ...string) (*Process, error) {
 	if args == nil || len(args) == 0 {
-		return nil, errors.New("no executable specified")
+		return nil, errors.New(tr("no executable specified"))
 	}
 	p := &Process{
 		cmd: exec.Command(args[0], args[1:]...),

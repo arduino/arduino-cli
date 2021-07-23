@@ -37,7 +37,7 @@ import (
 
 var (
 	// ErrNotFound is returned when the API returns 404
-	ErrNotFound = errors.New("board not found")
+	ErrNotFound = errors.New(tr("board not found"))
 	m           sync.Mutex
 	vidPidURL   = "https://builder.arduino.cc/v3/boards/byVidPid"
 	validVidPid = regexp.MustCompile(`0[xX][a-fA-F\d]{4}`)
@@ -46,10 +46,10 @@ var (
 func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	// ensure vid and pid are valid before hitting the API
 	if !validVidPid.MatchString(vid) {
-		return nil, errors.Errorf("Invalid vid value: '%s'", vid)
+		return nil, errors.Errorf(tr("Invalid vid value: '%s'"), vid)
 	}
 	if !validVidPid.MatchString(pid) {
-		return nil, errors.Errorf("Invalid pid value: '%s'", pid)
+		return nil, errors.Errorf(tr("Invalid pid value: '%s'"), pid)
 	}
 
 	url := fmt.Sprintf("%s/%s/%s", vidPidURL, vid, pid)
@@ -62,7 +62,7 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	httpClient, err := httpclient.New()
 
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to initialize http client")
+		return nil, errors.Wrap(err, tr("failed to initialize http client"))
 	}
 
 	if res, err := httpClient.Do(req); err == nil {
@@ -70,7 +70,7 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 			if res.StatusCode == 404 {
 				return nil, ErrNotFound
 			}
-			return nil, errors.Errorf("the server responded with status %s", res.Status)
+			return nil, errors.Errorf(tr("the server responded with status %s"), res.Status)
 		}
 
 		body, _ := ioutil.ReadAll(res.Body)
@@ -79,14 +79,14 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 		var dat map[string]interface{}
 		err = json.Unmarshal(body, &dat)
 		if err != nil {
-			return nil, errors.Wrap(err, "error processing response from server")
+			return nil, errors.Wrap(err, tr("error processing response from server"))
 		}
 
 		name, nameFound := dat["name"].(string)
 		fqbn, fbqnFound := dat["fqbn"].(string)
 
 		if !nameFound || !fbqnFound {
-			return nil, errors.New("wrong format in server response")
+			return nil, errors.New(tr("wrong format in server response"))
 		}
 
 		retVal = append(retVal, &rpc.BoardListItem{
@@ -96,7 +96,7 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 			Pid:  pid,
 		})
 	} else {
-		return nil, errors.Wrap(err, "error querying Arduino Cloud Api")
+		return nil, errors.Wrap(err, tr("error querying Arduino Cloud Api"))
 	}
 
 	return retVal, nil
@@ -142,7 +142,7 @@ func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.B
 			logrus.Debug("Board not recognized")
 		} else if err != nil {
 			// this is bad, bail out
-			return nil, errors.Wrap(err, "error getting board info from Arduino Cloud")
+			return nil, errors.Wrap(err, tr("error getting board info from Arduino Cloud"))
 		}
 
 		// add a DetectedPort entry in any case: the `Boards` field will
@@ -190,12 +190,12 @@ func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 
 	pm := commands.GetPackageManager(instanceID)
 	if pm == nil {
-		return nil, errors.New("invalid instance")
+		return nil, errors.New(tr("invalid instance"))
 	}
 
 	ports, err := commands.ListBoards(pm)
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting port list from serial-discovery")
+		return nil, errors.Wrap(err, fmt.Sprintf(tr("error getting port list from %s"), "serial-discovery"))
 	}
 
 	retVal := []*rpc.DetectedPort{}

@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/utils"
+	"github.com/arduino/arduino-cli/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/pmylund/sortutil"
 	"github.com/sirupsen/logrus"
@@ -56,10 +57,12 @@ type LibraryAlternatives struct {
 	Alternatives libraries.List
 }
 
+var tr = i18n.Tr
+
 // Add adds a library to the alternatives
 func (alts *LibraryAlternatives) Add(library *libraries.Library) {
 	if len(alts.Alternatives) > 0 && alts.Alternatives[0].Name != library.Name {
-		panic(fmt.Sprintf("the library name is different from the set (%s != %s)", alts.Alternatives[0].Name, library.Name))
+		panic(fmt.Sprintf(tr("the library name is different from the set (%[1]s != %[2]s)"), alts.Alternatives[0].Name, library.Name))
 	}
 	alts.Alternatives = append(alts.Alternatives, library)
 }
@@ -190,7 +193,7 @@ func (lm *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) []*
 		return statuses
 	}
 	if err != nil {
-		s := status.Newf(codes.FailedPrecondition, "reading dir %s: %s", librariesDir.Path, err)
+		s := status.Newf(codes.FailedPrecondition, tr("reading dir %[1]s: %[2]s"), librariesDir.Path, err)
 		return append(statuses, s)
 	}
 	subDirs.FilterDirs()
@@ -199,7 +202,7 @@ func (lm *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) []*
 	for _, subDir := range subDirs {
 		library, err := libraries.Load(subDir, librariesDir.Location)
 		if err != nil {
-			s := status.Newf(codes.Internal, "loading library from %s: %s", subDir, err)
+			s := status.Newf(codes.Internal, tr("loading library from %[1]s: %[2]s"), subDir, err)
 			statuses = append(statuses, s)
 			continue
 		}
@@ -220,12 +223,12 @@ func (lm *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) []*
 // An error is returned if the path doesn't exist or loading of the library fails.
 func (lm *LibrariesManager) LoadLibraryFromDir(libRootDir *paths.Path, location libraries.LibraryLocation) error {
 	if libRootDir.NotExist() {
-		return fmt.Errorf("library path does not exist: %s", libRootDir)
+		return fmt.Errorf(tr("library path does not exist: %s"), libRootDir)
 	}
 
 	library, err := libraries.Load(libRootDir, location)
 	if err != nil {
-		return fmt.Errorf("loading library from %s: %s", libRootDir, err)
+		return fmt.Errorf(tr("loading library from %[1]s: %[2]s"), libRootDir, err)
 	}
 
 	alternatives, ok := lm.Libraries[library.Name]

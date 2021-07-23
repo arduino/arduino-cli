@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upload"
+	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 )
@@ -37,6 +38,8 @@ type ArduinoCoreServerImpl struct {
 	rpc.UnimplementedArduinoCoreServiceServer
 	VersionString string
 }
+
+var tr = i18n.Tr
 
 // BoardDetails FIXMEDOC
 func (s *ArduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetailsResponse, error) {
@@ -76,7 +79,7 @@ func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCoreService_Boa
 	}
 
 	if msg.Instance == nil {
-		err = fmt.Errorf("no instance specified")
+		err = fmt.Errorf(tr("no instance specified"))
 		stream.Send(&rpc.BoardListWatchResponse{
 			EventType: "error",
 			Error:     err.Error(),

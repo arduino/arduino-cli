@@ -28,7 +28,7 @@ import (
 var (
 	// ErrAlreadyLatest is returned when an upgrade is not possible because
 	// already at latest version.
-	ErrAlreadyLatest = errors.New("platform already at latest version")
+	ErrAlreadyLatest = errors.New(tr("platform already at latest version"))
 )
 
 // PlatformUpgrade FIXMEDOC
@@ -37,7 +37,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest,
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New("invalid instance")
+		return nil, errors.New(tr("invalid instance"))
 	}
 
 	// Extract all PlatformReference to platforms that have updates
@@ -61,17 +61,17 @@ func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemana
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB,
 	skipPostInstall bool) error {
 	if platformRef.PlatformVersion != nil {
-		return fmt.Errorf("upgrade doesn't accept parameters with version")
+		return fmt.Errorf(tr("upgrade doesn't accept parameters with version"))
 	}
 
 	// Search the latest version for all specified platforms
 	platform := pm.FindPlatform(platformRef)
 	if platform == nil {
-		return fmt.Errorf("platform %s not found", platformRef)
+		return fmt.Errorf(tr("platform %s not found"), platformRef)
 	}
 	installed := pm.GetInstalledPlatformRelease(platform)
 	if installed == nil {
-		return fmt.Errorf("platform %s is not installed", platformRef)
+		return fmt.Errorf(tr("platform %s is not installed"), platformRef)
 	}
 	latest := platform.GetLatestRelease()
 	if !latest.Version.GreaterThan(installed.Version) {
@@ -81,7 +81,7 @@ func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemana
 
 	platformRelease, tools, err := pm.FindPlatformReleaseDependencies(platformRef)
 	if err != nil {
-		return fmt.Errorf("platform %s is not installed", platformRef)
+		return fmt.Errorf(tr("platform %s is not installed"), platformRef)
 	}
 	err = installPlatform(pm, platformRelease, tools, downloadCB, taskCB, skipPostInstall)
 	if err != nil {

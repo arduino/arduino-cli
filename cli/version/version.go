@@ -20,15 +20,18 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/spf13/cobra"
 )
+
+var tr = i18n.Tr
 
 // NewCommand created a new `version` command
 func NewCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:     "version",
-		Short:   "Shows version number of Arduino CLI.",
-		Long:    "Shows the version number of Arduino CLI which is installed on your system.",
+		Short:   tr("Shows version number of Arduino CLI."),
+		Long:    tr("Shows the version number of Arduino CLI which is installed on your system."),
 		Example: "  " + os.Args[0] + " version",
 		Args:    cobra.NoArgs,
 		Run:     run,

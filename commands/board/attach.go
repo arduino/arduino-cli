@@ -27,16 +27,19 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	discovery "github.com/arduino/board-discovery"
 	"github.com/arduino/go-paths-helper"
 )
 
+var tr = i18n.Tr
+
 // Attach FIXMEDOC
 func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB commands.TaskProgressCB) (*rpc.BoardAttachResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New("invalid instance")
+		return nil, errors.New(tr("invalid instance"))
 	}
 	var sketchPath *paths.Path
 	if req.GetSketchPath() != "" {
@@ -44,7 +47,7 @@ func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB commands.Ta
 	}
 	sk, err := sketch.New(sketchPath)
 	if err != nil {
-		return nil, fmt.Errorf("opening sketch: %s", err)
+		return nil, fmt.Errorf(tr("opening sketch: %s"), err)
 	}
 
 	boardURI := req.GetBoardUri()
@@ -60,7 +63,7 @@ func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB commands.Ta
 	} else {
 		deviceURI, err := url.Parse(boardURI)
 		if err != nil {
-			return nil, fmt.Errorf("invalid Device URL format: %s", err)
+			return nil, fmt.Errorf(tr("invalid Device URL format: %s"), err)
 		}
 
 		var findBoardFunc func(*packagemanager.PackageManager, *discovery.Monitor, *url.URL) *cores.Board
@@ -70,7 +73,7 @@ func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB commands.Ta
 		case "http", "https", "tcp", "udp":
 			findBoardFunc = findNetworkConnectedBoard
 		default:
-			return nil, fmt.Errorf("invalid device port type provided")
+			return nil, fmt.Errorf(tr("invalid device port type provided"))
 		}
 
 		duration, err := time.ParseDuration(req.GetSearchTimeout())
@@ -86,9 +89,9 @@ func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB commands.Ta
 		// TODO: Handle the case when no board is found.
 		board := findBoardFunc(pm, monitor, deviceURI)
 		if board == nil {
-			return nil, fmt.Errorf("no supported board found at %s", deviceURI.String())
+			return nil, fmt.Errorf(tr("no supported board found at %s"), deviceURI.String())
 		}
-		taskCB(&rpc.TaskProgress{Name: "Board found: " + board.Name()})
+		taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Board found: %s"), board.Name())})
 
 		// TODO: should be stoped the monitor: when running as a pure CLI  is released
 		// by the OS, when run as daemon the resource's state is unknown and could be leaked.
@@ -101,9 +104,9 @@ func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB commands.Ta
 
 	err = sk.ExportMetadata()
 	if err != nil {
-		return nil, fmt.Errorf("cannot export sketch metadata: %s", err)
+		return nil, fmt.Errorf(tr("cannot export sketch metadata: %s"), err)
 	}
-	taskCB(&rpc.TaskProgress{Name: "Selected fqbn: " + sk.Metadata.CPU.Fqbn, Completed: true})
+	taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Selected fqbn: %s"), sk.Metadata.CPU.Fqbn), Completed: true})
 	return &rpc.BoardAttachResponse{}, nil
 }
 

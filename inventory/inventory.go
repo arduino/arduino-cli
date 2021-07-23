@@ -20,6 +20,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/gofrs/uuid"
 	"github.com/spf13/viper"
 )
@@ -32,6 +33,7 @@ var (
 	Type = "yaml"
 	// Name is the inventory file Name with Type as extension
 	Name = "inventory" + "." + Type
+	tr   = i18n.Tr
 )
 
 // Init configures the Read Only config storage
@@ -52,7 +54,7 @@ func Init(configPath string) error {
 				return err
 			}
 		} else {
-			return fmt.Errorf("reading inventory file: %w", err)
+			return fmt.Errorf(tr("reading inventory file: %w"), err)
 		}
 	}
 
@@ -62,13 +64,13 @@ func Init(configPath string) error {
 func generateInstallationData() error {
 	installationID, err := uuid.NewV4()
 	if err != nil {
-		return fmt.Errorf("generating installation.id: %w", err)
+		return fmt.Errorf(tr("generating installation.id: %w"), err)
 	}
 	Store.Set("installation.id", installationID.String())
 
 	installationSecret, err := uuid.NewV4()
 	if err != nil {
-		return fmt.Errorf("generating installation.secret: %w", err)
+		return fmt.Errorf(tr("generating installation.secret: %w"), err)
 	}
 	Store.Set("installation.secret", installationSecret.String())
 	return nil
@@ -80,13 +82,13 @@ func writeStore(configFilePath string) error {
 	// Create config dir if not present,
 	// MkdirAll will retrun no error if the path already exists
 	if err := os.MkdirAll(configPath, os.FileMode(0755)); err != nil {
-		return fmt.Errorf("invalid path creating config dir: %s error: %w", configPath, err)
+		return fmt.Errorf(tr("invalid path creating config dir: %[1]s error: %[2]w"), configPath, err)
 	}
 
 	// Create file if not present
 	err := Store.WriteConfigAs(configFilePath)
 	if err != nil {
-		return fmt.Errorf("invalid path writing inventory file: %s error: %w", configFilePath, err)
+		return fmt.Errorf(tr("invalid path writing inventory file: %[1]s error: %[2]w"), configFilePath, err)
 	}
 
 	return nil

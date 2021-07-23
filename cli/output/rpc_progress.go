@@ -19,12 +19,16 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/cmaglie/pb"
 )
 
-// OutputFormat can be "text" or "json"
-var OutputFormat string
+var (
+	// OutputFormat can be "text" or "json"
+	OutputFormat string
+	tr           = i18n.Tr
+)
 
 // ProgressBar returns a DownloadProgressCB that prints a progress bar.
 // If JSON output format has been selected, the callback outputs nothing.
@@ -57,7 +61,7 @@ func NewDownloadProgressBarCB() func(*rpc.DownloadProgress) {
 		// fmt.Printf(">>> %v\n", curr)
 		if filename := curr.GetFile(); filename != "" {
 			if curr.GetCompleted() {
-				fmt.Println(filename + " already downloaded")
+				fmt.Printf(tr("%s already downloaded")+"\n", filename)
 				return
 			}
 			prefix = filename
@@ -69,7 +73,7 @@ func NewDownloadProgressBarCB() func(*rpc.DownloadProgress) {
 			bar.Set(int(curr.GetDownloaded()))
 		}
 		if curr.GetCompleted() {
-			bar.FinishPrintOver(prefix + " downloaded")
+			bar.FinishPrintOver(fmt.Sprintf(tr("%s downloaded"), prefix))
 		}
 	}
 }

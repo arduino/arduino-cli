@@ -37,7 +37,7 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 	allVersions := req.AllVersions
 	pm := commands.GetPackageManager(req.Instance.Id)
 	if pm == nil {
-		return nil, errors.New("invalid instance")
+		return nil, errors.New(tr("invalid instance"))
 	}
 
 	res := []*cores.PlatformRelease{}

@@ -23,19 +23,22 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
+
+var tr = i18n.Tr
 
 // PlatformDownload FIXMEDOC
 func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, downloadCB commands.DownloadProgressCB) (*rpc.PlatformDownloadResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New("invalid instance")
+		return nil, errors.New(tr("invalid instance"))
 	}
 
 	version, err := commands.ParseVersion(req)
 	if err != nil {
-		return nil, fmt.Errorf("invalid version: %s", err)
+		return nil, fmt.Errorf(tr("invalid version: %s"), err)
 	}
 
 	platform, tools, err := pm.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{
@@ -44,7 +47,7 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, dow
 		PlatformVersion:      version,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("find platform dependencies: %s", err)
+		return nil, fmt.Errorf(tr("find platform dependencies: %s"), err)
 	}
 
 	err = downloadPlatform(pm, platform, downloadCB)
@@ -55,7 +58,7 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, dow
 	for _, tool := range tools {
 		err := downloadTool(pm, tool, downloadCB)
 		if err != nil {
-			return nil, fmt.Errorf("downloading tool %s: %s", tool, err)
+			return nil, fmt.Errorf(tr("downloading tool %[1]s: %[2]s"), tool, err)
 		}
 	}
 
@@ -78,7 +81,7 @@ func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.
 func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB commands.DownloadProgressCB) error {
 	// Check if tool has a flavor available for the current OS
 	if tool.GetCompatibleFlavour() == nil {
-		return fmt.Errorf("tool %s not available for the current OS", tool)
+		return fmt.Errorf(tr("tool %s not available for the current OS"), tool)
 	}
 
 	return commands.DownloadToolRelease(pm, tool, downloadCB)

@@ -28,8 +28,8 @@ import (
 func initRemoveCommand() *cobra.Command {
 	addCommand := &cobra.Command{
 		Use:   "remove",
-		Short: "Removes one or more values from a setting.",
-		Long:  "Removes one or more values from a setting.",
+		Short: tr("Removes one or more values from a setting."),
+		Long:  tr("Removes one or more values from a setting."),
 		Example: "" +
 			"  " + os.Args[0] + " config remove board_manager.additional_urls https://example.com/package_example_index.json\n" +
 			"  " + os.Args[0] + " config remove board_manager.additional_urls https://example.com/package_example_index.json https://another-url.com/package_another_index.json\n",
@@ -48,7 +48,7 @@ func runRemoveCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if kind != reflect.Slice {
-		feedback.Errorf("The key '%v' is not a list of items, can't remove from it.\nMaybe use 'config delete'?", key)
+		feedback.Errorf(tr("The key '%[1]v' is not a list of items, can't remove from it.\nMaybe use '%[2]s'?"), key, "config delete")
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -66,7 +66,7 @@ func runRemoveCommand(cmd *cobra.Command, args []string) {
 	configuration.Settings.Set(key, values)
 
 	if err := configuration.Settings.WriteConfig(); err != nil {
-		feedback.Errorf("Can't write config file: %v", err)
+		feedback.Errorf(tr("Can't write config file: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }

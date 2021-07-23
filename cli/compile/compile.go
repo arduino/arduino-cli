@@ -19,12 +19,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/i18n"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -61,14 +63,15 @@ var (
 	// libraries expects a path to a directory containing multiple libraries, similarly to the <directories.user>/libraries path.
 	library   []string // List of paths to libraries root folders. Can be used multiple times for different libraries
 	libraries []string // List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries paths.
+	tr        = i18n.Tr
 )
 
 // NewCommand created a new `compile` command
 func NewCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:   "compile",
-		Short: "Compiles Arduino sketches.",
-		Long:  "Compiles Arduino sketches.",
+		Short: tr("Compiles Arduino sketches."),
+		Long:  tr("Compiles Arduino sketches."),
 		Example: "" +
 			"  " + os.Args[0] + " compile -b arduino:avr:uno /home/user/Arduino/MySketch\n" +
 			"  " + os.Args[0] + ` compile -b arduino:avr:uno --build-property "build.extra_flags=\"-DMY_DEFINE=\"hello world\"\"" /home/user/Arduino/MySketch` + "\n" +
@@ -78,43 +81,43 @@ func NewCommand() *cobra.Command {
 		Run:  run,
 	}
 
-	command.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
-	command.Flags().BoolVar(&showProperties, "show-properties", false, "Show all build properties used instead of compiling.")
-	command.Flags().BoolVar(&preprocess, "preprocess", false, "Print preprocessed code to stdout instead of compiling.")
-	command.Flags().StringVar(&buildCachePath, "build-cache-path", "", "Builds of 'core.a' are saved into this path to be cached and reused.")
-	command.Flags().StringVarP(&exportDir, "output-dir", "", "", "Save build artifacts in this directory.")
+	command.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
+	command.Flags().BoolVar(&showProperties, "show-properties", false, tr("Show all build properties used instead of compiling."))
+	command.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
+	command.Flags().StringVar(&buildCachePath, "build-cache-path", "", tr("Builds of 'core.a' are saved into this path to be cached and reused."))
+	command.Flags().StringVarP(&exportDir, "output-dir", "", "", tr("Save build artifacts in this directory."))
 	command.Flags().StringVar(&buildPath, "build-path", "",
-		"Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS.")
+		tr("Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS."))
 	command.Flags().StringSliceVar(&buildProperties, "build-properties", []string{},
-		"List of custom build properties separated by commas. Or can be used multiple times for multiple properties.")
+		tr("List of custom build properties separated by commas. Or can be used multiple times for multiple properties."))
 	command.Flags().StringArrayVar(&buildProperties, "build-property", []string{},
-		"Override a build property with a custom value. Can be used multiple times for multiple properties.")
+		tr("Override a build property with a custom value. Can be used multiple times for multiple properties."))
 	command.Flags().StringVar(&warnings, "warnings", "none",
-		`Optional, can be "none", "default", "more" and "all". Defaults to "none". Used to tell gcc which warning level to use (-W flag).`)
-	command.Flags().BoolVarP(&verbose, "verbose", "v", false, "Optional, turns on verbose mode.")
-	command.Flags().BoolVar(&quiet, "quiet", false, "Optional, suppresses almost every output.")
-	command.Flags().BoolVarP(&uploadAfterCompile, "upload", "u", false, "Upload the binary after the compilation.")
-	command.Flags().StringVarP(&port, "port", "p", "", "Upload port, e.g.: COM10 or /dev/ttyACM0")
-	command.Flags().BoolVarP(&verify, "verify", "t", false, "Verify uploaded binary after the upload.")
-	command.Flags().StringVar(&vidPid, "vid-pid", "", "When specified, VID/PID specific build properties are used, if board supports them.")
+		fmt.Sprintf(tr(`Optional, can be "%[1]s", "%[2]s", "%[3]s" and "%[4]s". Defaults to "%[1]s". Used to tell gcc which warning level to use (-W flag).`), "none", "default", "more", "all"))
+	command.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Optional, turns on verbose mode."))
+	command.Flags().BoolVar(&quiet, "quiet", false, tr("Optional, suppresses almost every output."))
+	command.Flags().BoolVarP(&uploadAfterCompile, "upload", "u", false, tr("Upload the binary after the compilation."))
+	command.Flags().StringVarP(&port, "port", "p", "", tr("Upload port, e.g.: COM10 or /dev/ttyACM0"))
+	command.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
+	command.Flags().StringVar(&vidPid, "vid-pid", "", tr("When specified, VID/PID specific build properties are used, if board supports them."))
 	command.Flags().StringSliceVar(&library, "library", []string{},
-		"List of paths to libraries root folders. Libraries set this way have top priority in case of conflicts. Can be used multiple times for different libraries.")
+		tr("List of paths to libraries root folders. Libraries set this way have top priority in case of conflicts. Can be used multiple times for different libraries."))
 	command.Flags().StringSliceVar(&libraries, "libraries", []string{},
-		"List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries dir paths.")
-	command.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, "Optional, optimize compile output for debugging, rather than for release.")
-	command.Flags().StringVarP(&programmer, "programmer", "P", "", "Optional, use the specified programmer to upload.")
-	command.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, "Just produce the compilation database, without actually compiling.")
-	command.Flags().BoolVar(&clean, "clean", false, "Optional, cleanup the build folder and do not use any cached build.")
+		tr("List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries dir paths."))
+	command.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, tr("Optional, optimize compile output for debugging, rather than for release."))
+	command.Flags().StringVarP(&programmer, "programmer", "P", "", tr("Optional, use the specified programmer to upload."))
+	command.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, tr("Just produce the compilation database, without actually compiling."))
+	command.Flags().BoolVar(&clean, "clean", false, tr("Optional, cleanup the build folder and do not use any cached build."))
 	// We must use the following syntax for this flag since it's also bound to settings.
 	// This must be done because the value is set when the binding is accessed from viper. Accessing from cobra would only
 	// read the value if the flag is set explicitly by the user.
-	command.Flags().BoolP("export-binaries", "e", false, "If set built binaries will be exported to the sketch folder.")
-	command.Flags().StringVar(&sourceOverrides, "source-override", "", "Optional. Path to a .json file that contains a set of replacements of the sketch source code.")
+	command.Flags().BoolP("export-binaries", "e", false, tr("If set built binaries will be exported to the sketch folder."))
+	command.Flags().StringVar(&sourceOverrides, "source-override", "", tr("Optional. Path to a .json file that contains a set of replacements of the sketch source code."))
 	command.Flag("source-override").Hidden = true
 
 	configuration.Settings.BindPFlag("sketch.always_export_binaries", command.Flags().Lookup("export-binaries"))
 
-	command.Flags().MarkDeprecated("build-properties", "please use --build-property instead.")
+	command.Flags().MarkDeprecated("build-properties", tr("please use --build-property instead."))
 
 	return command
 }
@@ -131,7 +134,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	// .pde files are still supported but deprecated, this warning urges the user to rename them
 	if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 {
-		feedback.Error("Sketches with .pde extension are deprecated, please rename the following files to .ino:")
+		feedback.Error(tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:"))
 		for _, f := range files {
 			feedback.Error(f)
 		}
@@ -141,14 +144,14 @@ func run(cmd *cobra.Command, args []string) {
 	if sourceOverrides != "" {
 		data, err := paths.New(sourceOverrides).ReadFile()
 		if err != nil {
-			feedback.Errorf("Error opening source code overrides data file: %v", err)
+			feedback.Errorf(tr("Error opening source code overrides data file: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 		var o struct {
 			Overrides map[string]string `json:"overrides"`
 		}
 		if err := json.Unmarshal(data, &o); err != nil {
-			feedback.Errorf("Error: invalid source code overrides data file: %v", err)
+			feedback.Errorf(tr("Error: invalid source code overrides data file: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 		overrides = o.Overrides
@@ -207,7 +210,7 @@ func run(cmd *cobra.Command, args []string) {
 			_, err = upload.Upload(context.Background(), uploadRequest, os.Stdout, os.Stderr)
 		}
 		if err != nil {
-			feedback.Errorf("Error during Upload: %v", err)
+			feedback.Errorf(tr("Error during Upload: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}
@@ -219,7 +222,7 @@ func run(cmd *cobra.Command, args []string) {
 		Success:       err == nil,
 	})
 	if err != nil && output.OutputFormat != "json" {
-		feedback.Errorf("Error during build: %v", err)
+		feedback.Errorf(tr("Error during build: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }
@@ -232,7 +235,7 @@ func initSketchPath(sketchPath *paths.Path) *paths.Path {
 
 	wd, err := paths.Getwd()
 	if err != nil {
-		feedback.Errorf("Couldn't get current working directory: %v", err)
+		feedback.Errorf(tr("Couldn't get current working directory: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	logrus.Infof("Reading sketch from dir: %s", wd)

@@ -17,6 +17,7 @@ package board
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"sort"
 	"strings"
@@ -32,18 +33,17 @@ import (
 
 func initSearchCommand() *cobra.Command {
 	var searchCommand = &cobra.Command{
-		Use:   "search [boardname]",
-		Short: "List all known boards and their corresponding FQBN.",
-		Long: "" +
-			"List all boards that have the support platform installed. You can search\n" +
-			"for a specific board if you specify the board name",
+		Use:   fmt.Sprintf("search [%s]", tr("boardname")),
+		Short: tr("List all known boards and their corresponding FQBN."),
+		Long: tr(`List all boards that have the support platform installed. You can search
+for a specific board if you specify the board name`),
 		Example: "" +
 			"  " + os.Args[0] + " board search\n" +
 			"  " + os.Args[0] + " board search zero",
 		Args: cobra.ArbitraryArgs,
 		Run:  runSearchCommand,
 	}
-	searchCommand.Flags().BoolVarP(&searchFlags.showHiddenBoard, "show-hidden", "a", false, "Show also boards marked as 'hidden' in the platform")
+	searchCommand.Flags().BoolVarP(&searchFlags.showHiddenBoard, "show-hidden", "a", false, tr("Show also boards marked as 'hidden' in the platform"))
 	return searchCommand
 }
 
@@ -60,7 +60,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		IncludeHiddenBoards: searchFlags.showHiddenBoard,
 	})
 	if err != nil {
-		feedback.Errorf("Error searching boards: %v", err)
+		feedback.Errorf(tr("Error searching boards: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -83,11 +83,11 @@ func (r searchResults) String() string {
 	})
 
 	t := table.New()
-	t.SetHeader("Board Name", "FQBN", "Platform ID", "")
+	t.SetHeader(tr("Board Name"), tr("FQBN"), tr("Platform ID"), "")
 	for _, item := range r.boards {
 		hidden := ""
 		if item.IsHidden {
-			hidden = "(hidden)"
+			hidden = tr("(hidden)")
 		}
 		t.AddRow(item.GetName(), item.GetFqbn(), item.Platform.Id, hidden)
 	}

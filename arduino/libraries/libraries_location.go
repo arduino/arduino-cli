@@ -70,7 +70,7 @@ func (d *LibraryLocation) MarshalJSON() ([]byte, error) {
 	case Unmanaged:
 		return json.Marshal("unmanaged")
 	}
-	return nil, fmt.Errorf("invalid library location value: %d", *d)
+	return nil, fmt.Errorf(tr("invalid library location value: %d"), *d)
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface
@@ -91,7 +91,7 @@ func (d *LibraryLocation) UnmarshalJSON(b []byte) error {
 	case "unmanaged":
 		*d = Unmanaged
 	}
-	return fmt.Errorf("invalid library location: %s", s)
+	return fmt.Errorf(tr("invalid library location: %s"), s)
 }
 
 // ToRPCLibraryLocation converts this LibraryLocation to rpc.LibraryLocation

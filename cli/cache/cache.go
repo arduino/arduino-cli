@@ -18,16 +18,19 @@ package cache
 import (
 	"os"
 
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/spf13/cobra"
 )
+
+var tr = i18n.Tr
 
 // NewCommand created a new `cache` command
 func NewCommand() *cobra.Command {
 	cacheCommand := &cobra.Command{
 		Use:   "cache",
-		Short: "Arduino cache commands.",
-		Long:  "Arduino cache commands.",
-		Example: "# Clean caches.\n" +
+		Short: tr("Arduino cache commands."),
+		Long:  tr("Arduino cache commands."),
+		Example: "# " + tr("Clean caches.") + "\n" +
 			" " + os.Args[0] + " cache clean\n\n",
 	}
 

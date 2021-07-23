@@ -35,7 +35,7 @@ import (
 var (
 	// ErrAlreadyInstalled is returned when a library is already installed and task
 	// cannot proceed.
-	ErrAlreadyInstalled = errors.New("library already installed")
+	ErrAlreadyInstalled = errors.New(tr("library already installed"))
 )
 
 // InstallPrerequisiteCheck performs prequisite checks to install a library. It returns the
@@ -59,14 +59,14 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 
 	libsDir := lm.getUserLibrariesDir()
 	if libsDir == nil {
-		return nil, nil, fmt.Errorf("User directory not set")
+		return nil, nil, fmt.Errorf(tr("User directory not set"))
 	}
 
 	libPath := libsDir.Join(saneName)
 	if replaced != nil && replaced.InstallDir.EquivalentTo(libPath) {
 
 	} else if libPath.IsDir() {
-		return nil, nil, fmt.Errorf("destination dir %s already exists, cannot install", libPath)
+		return nil, nil, fmt.Errorf(tr("destination dir %s already exists, cannot install"), libPath)
 	}
 	return libPath, replaced, nil
 }
@@ -75,7 +75,7 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, libPath *paths.Path) error {
 	libsDir := lm.getUserLibrariesDir()
 	if libsDir == nil {
-		return fmt.Errorf("User directory not set")
+		return fmt.Errorf(tr("User directory not set"))
 	}
 	return indexLibrary.Resource.Install(lm.DownloadsDir, libsDir, libPath)
 }
@@ -83,10 +83,10 @@ func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, libPat
 // Uninstall removes a Library
 func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
 	if lib == nil || lib.InstallDir == nil {
-		return fmt.Errorf("install directory not set")
+		return fmt.Errorf(tr("install directory not set"))
 	}
 	if err := lib.InstallDir.RemoveAll(); err != nil {
-		return fmt.Errorf("removing lib directory: %s", err)
+		return fmt.Errorf(tr("removing lib directory: %s"), err)
 	}
 
 	lm.Libraries[lib.Name].Remove(lib)
@@ -97,7 +97,7 @@ func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
 func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath string, overwrite bool) error {
 	libsDir := lm.getUserLibrariesDir()
 	if libsDir == nil {
-		return fmt.Errorf("User directory not set")
+		return fmt.Errorf(tr("User directory not set"))
 	}
 
 	tmpDir, err := paths.MkTempDir(paths.TempDir().String(), "arduino-cli-lib-")
@@ -116,7 +116,7 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 	// Extract to a temporary directory so we can check if the zip is structured correctly.
 	// We also use the top level folder from the archive to infer the library name.
 	if err := extract.Archive(ctx, file, tmpDir.String(), nil); err != nil {
-		return fmt.Errorf("extracting archive: %w", err)
+		return fmt.Errorf(tr("extracting archive: %w"), err)
 	}
 
 	paths, err := tmpDir.ReadDir()
@@ -128,7 +128,7 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 	paths.FilterOutPrefix("__MACOSX")
 
 	if len(paths) > 1 {
-		return fmt.Errorf("archive is not valid: multiple files found in zip file top level")
+		return fmt.Errorf(tr("archive is not valid: multiple files found in zip file top level"))
 	}
 
 	extractionPath := paths[0]
@@ -154,7 +154,7 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 	// Delete library folder if already installed
 	if installPath.IsDir() {
 		if !overwrite {
-			return fmt.Errorf("library %s already installed", libraryName)
+			return fmt.Errorf(tr("library %s already installed"), libraryName)
 		}
 		logrus.
 			WithField("library name", libraryName).
@@ -171,7 +171,7 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 
 	// Copy extracted library in the destination directory
 	if err := extractionPath.CopyDirTo(installPath); err != nil {
-		return fmt.Errorf("moving extracted archive to destination dir: %s", err)
+		return fmt.Errorf(tr("moving extracted archive to destination dir: %s"), err)
 	}
 
 	return nil
@@ -181,7 +181,7 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 	libsDir := lm.getUserLibrariesDir()
 	if libsDir == nil {
-		return fmt.Errorf("User directory not set")
+		return fmt.Errorf(tr("User directory not set"))
 	}
 
 	libraryName, err := parseGitURL(gitURL)
@@ -197,7 +197,7 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 	// Deletes libraries folder if already installed
 	if _, ok := lm.Libraries[libraryName]; ok {
 		if !overwrite {
-			return fmt.Errorf("library %s already installed", libraryName)
+			return fmt.Errorf(tr("library %s already installed"), libraryName)
 		}
 		logrus.
 			WithField("library name", libraryName).
@@ -247,7 +247,7 @@ func parseGitURL(gitURL string) (string, error) {
 		i := strings.LastIndex(parsed.Path, "/")
 		res = strings.TrimRight(parsed.Path[i+1:], ".git")
 	} else {
-		return "", fmt.Errorf("invalid git url")
+		return "", fmt.Errorf(tr("invalid git url"))
 	}
 	return res, nil
 }
@@ -261,12 +261,12 @@ func validateLibrary(name string, dir *paths.Path) error {
 	// https://arduino.github.io/arduino-cli/latest/library-specification/#source-code
 	libraryHeader := name + ".h"
 	if !dir.Join("src", libraryHeader).Exist() && !dir.Join(libraryHeader).Exist() {
-		return fmt.Errorf(`library is not valid: missing header file "%s"`, libraryHeader)
+		return fmt.Errorf(tr(`library is not valid: missing header file "%s"`), libraryHeader)
 	}
 
 	// Verifies library contains library.properties
 	if !dir.Join("library.properties").Exist() {
-		return fmt.Errorf(`library is not valid: missing file "library.properties"`)
+		return fmt.Errorf(tr(`library is not valid: missing file "library.properties"`))
 	}
 
 	return nil

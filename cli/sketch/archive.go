@@ -17,6 +17,7 @@ package sketch
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -34,9 +35,9 @@ var includeBuildDir bool
 // initArchiveCommand creates a new `archive` command
 func initArchiveCommand() *cobra.Command {
 	command := &cobra.Command{
-		Use:   "archive <sketchPath> <archivePath>",
-		Short: "Creates a zip file containing all sketch files.",
-		Long:  "Creates a zip file containing all sketch files.",
+		Use:   fmt.Sprintf("archive <%s> <%s>", tr("sketchPath"), tr("archivePath")),
+		Short: tr("Creates a zip file containing all sketch files."),
+		Long:  tr("Creates a zip file containing all sketch files."),
 		Example: "" +
 			"  " + os.Args[0] + " archive\n" +
 			"  " + os.Args[0] + " archive .\n" +
@@ -47,7 +48,7 @@ func initArchiveCommand() *cobra.Command {
 		Run:  runArchiveCommand,
 	}
 
-	command.Flags().BoolVar(&includeBuildDir, "include-build-dir", false, "Includes build directory in the archive.")
+	command.Flags().BoolVar(&includeBuildDir, "include-build-dir", false, fmt.Sprintf(tr("Includes %s directory in the archive."), "build"))
 
 	return command
 }
@@ -62,7 +63,7 @@ func runArchiveCommand(cmd *cobra.Command, args []string) {
 
 	// .pde files are still supported but deprecated, this warning urges the user to rename them
 	if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 {
-		feedback.Error("Sketches with .pde extension are deprecated, please rename the following files to .ino:")
+		feedback.Error(tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:"))
 		for _, f := range files {
 			feedback.Error(f)
 		}
@@ -81,7 +82,7 @@ func runArchiveCommand(cmd *cobra.Command, args []string) {
 		})
 
 	if err != nil {
-		feedback.Errorf("Error archiving: %v", err)
+		feedback.Errorf(tr("Error archiving: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }

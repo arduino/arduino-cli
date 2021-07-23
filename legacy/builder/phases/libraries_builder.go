@@ -88,25 +88,25 @@ func findExpectedPrecompiledLibFolder(ctx *types.Context, library *libraries.Lib
 	}
 
 	logger := ctx.GetLogger()
-	logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "Library {0} has been declared precompiled:", library.Name)
+	logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, tr("Library {0} has been declared precompiled:"), library.Name)
 
 	// Try directory with full fpuSpecs first, if available
 	if len(fpuSpecs) > 0 {
 		fpuSpecs = strings.TrimRight(fpuSpecs, "-")
 		fullPrecompDir := library.SourceDir.Join(mcu).Join(fpuSpecs)
 		if fullPrecompDir.Exist() && directoryContainsFile(fullPrecompDir) {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "Using precompiled library in {0}", fullPrecompDir)
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, tr("Using precompiled library in {0}"), fullPrecompDir)
 			return fullPrecompDir
 		}
-		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "Precompiled library in \"{0}\" not found", fullPrecompDir)
+		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, tr("Precompiled library in \"{0}\" not found"), fullPrecompDir)
 	}
 
 	precompDir := library.SourceDir.Join(mcu)
 	if precompDir.Exist() && directoryContainsFile(precompDir) {
-		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "Using precompiled library in {0}", precompDir)
+		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, tr("Using precompiled library in {0}"), precompDir)
 		return precompDir
 	}
-	logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "Precompiled library in \"{0}\" not found", precompDir)
+	logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, tr("Precompiled library in \"{0}\" not found"), precompDir)
 	return nil
 }
 
@@ -132,7 +132,7 @@ func compileLibraries(ctx *types.Context, libraries libraries.List, buildPath *p
 func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
 	logger := ctx.GetLogger()
 	if ctx.Verbose {
-		logger.Println(constants.LOG_LEVEL_INFO, "Compiling library \"{0}\"", library.Name)
+		logger.Println(constants.LOG_LEVEL_INFO, tr("Compiling library \"{0}\""), library.Name)
 	}
 	libraryBuildPath := buildPath.Join(library.Name)
 
@@ -148,7 +148,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 
 		if !coreSupportPrecompiled {
 			logger := ctx.GetLogger()
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, "The platform does not support 'compiler.libraries.ldflags' for precompiled libraries.")
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, tr("The platform does not support '{0}' for precompiled libraries."), "compiler.libraries.ldflags")
 
 		} else if precompiledPath != nil {
 			// Find all libraries in precompiledPath

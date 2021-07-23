@@ -18,15 +18,18 @@ package sketch
 import (
 	"os"
 
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/spf13/cobra"
 )
+
+var tr = i18n.Tr
 
 // NewCommand created a new `sketch` command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "sketch",
-		Short:   "Arduino CLI sketch commands.",
-		Long:    "Arduino CLI sketch commands.",
+		Short:   tr("Arduino CLI sketch commands."),
+		Long:    tr("Arduino CLI sketch commands."),
 		Example: "  " + os.Args[0] + " sketch new MySketch",
 	}
 

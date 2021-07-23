@@ -19,7 +19,11 @@ import (
 	"bytes"
 	"io"
 	"os/exec"
+
+	"github.com/arduino/arduino-cli/i18n"
 )
+
+var tr = i18n.Tr
 
 // PipeCommands executes the commands received as input by feeding the output of
 // one to the input of the other, exactly like Unix Pipe (|).

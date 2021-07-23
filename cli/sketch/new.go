@@ -29,8 +29,8 @@ import (
 func initNewCommand() *cobra.Command {
 	newCommand := &cobra.Command{
 		Use:     "new",
-		Short:   "Create a new Sketch",
-		Long:    "Create a new Sketch",
+		Short:   tr("Create a new Sketch"),
+		Long:    tr("Create a new Sketch"),
 		Example: "  " + os.Args[0] + " sketch new MultiBlinker",
 		Args:    cobra.ExactArgs(1),
 		Run:     runNewCommand,
@@ -51,19 +51,19 @@ func runNewCommand(cmd *cobra.Command, args []string) {
 	trimmedSketchName := strings.TrimSuffix(args[0], ".ino")
 	sketchDir, err := filepath.Abs(trimmedSketchName)
 	if err != nil {
-		feedback.Errorf("Error creating sketch: %v", err)
+		feedback.Errorf(tr("Error creating sketch: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	if err := os.MkdirAll(sketchDir, os.FileMode(0755)); err != nil {
-		feedback.Errorf("Could not create sketch directory: %v", err)
+		feedback.Errorf(tr("Could not create sketch directory: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	sketchName := filepath.Base(sketchDir)
 	sketchFile := filepath.Join(sketchDir, sketchName+".ino")
 	if err := ioutil.WriteFile(sketchFile, emptySketch, os.FileMode(0644)); err != nil {
-		feedback.Errorf("Error creating sketch: %v", err)
+		feedback.Errorf(tr("Error creating sketch: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	feedback.Print("Sketch created in: " + sketchDir)
+	feedback.Printf(tr("Sketch created in: %s"), sketchDir)
 }

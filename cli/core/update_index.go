@@ -32,8 +32,8 @@ import (
 func initUpdateIndexCommand() *cobra.Command {
 	updateIndexCommand := &cobra.Command{
 		Use:     "update-index",
-		Short:   "Updates the index of cores.",
-		Long:    "Updates the index of cores to the latest version.",
+		Short:   tr("Updates the index of cores."),
+		Long:    tr("Updates the index of cores to the latest version."),
 		Example: "  " + os.Args[0] + " core update-index",
 		Args:    cobra.NoArgs,
 		Run:     runUpdateIndexCommand,
@@ -49,7 +49,7 @@ func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 	// as argument but none would be obviously found.
 	inst, status := instance.Create()
 	if status != nil {
-		feedback.Errorf("Error creating instance: %v", status)
+		feedback.Errorf(tr("Error creating instance: %v"), status)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -58,7 +58,7 @@ func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 	// we must use instance.Create instead of instance.CreateAndInit for the
 	// reason stated above.
 	if err := instance.FirstUpdate(inst); err != nil {
-		feedback.Errorf("Error updating indexes: %v", status)
+		feedback.Errorf(tr("Error updating indexes: %v"), status)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -66,7 +66,7 @@ func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 		Instance: inst,
 	}, output.ProgressBar())
 	if err != nil {
-		feedback.Errorf("Error updating index: %v", err)
+		feedback.Errorf(tr("Error updating index: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }
