@@ -61,7 +61,14 @@ func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Po
 		}
 	}
 	if address == "" {
-		return nil, nil
+		// If no address is provided we assume the user is trying to upload
+		// to a board that supports a tool that automatically detects
+		// the attached board without specifying explictly a port.
+		// Tools that work this way must be specified using the property
+		// "BOARD_ID.upload.tool.default" in the platform's boards.txt.
+		return &discovery.Port{
+			Protocol: "default",
+		}, nil
 	}
 	logrus.WithField("port", address).Tracef("Upload port")
 
