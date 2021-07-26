@@ -167,7 +167,7 @@ message UserField {
   string tool_id = 1;
   // Name used internally to store and retrieve this field
   string name = 2;
-  // Label is the text shown to the user when needs to input this field
+  // Label is the text shown to the user when they need to input this field
   string label = 3;
   // True if the value of the field must not be shown when typing, for example
   // when the user inputs a network password
