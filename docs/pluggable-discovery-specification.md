@@ -1,7 +1,7 @@
 These tools must be in the form of executables that can be launched as a subprocess using a `platform.txt` command line
-recipe. They will communicate to the parent process via stdin/stdout, in particular a discovery will accept commands as
-plain text strings from stdin and will send answers back in JSON format on stdout. Each tool will implement the commands
-to list and enumerate ports for a specific protocol as specified in this document.
+recipe. They communicate to the parent process via stdin/stdout, accepting commands as plain text strings from stdin and
+sending answers back in JSON format on stdout. Each tool will implement the commands to list and enumerate ports for a
+specific protocol as specified in this document.
 
 ### Pluggable discovery API via stdin/stdout
 
@@ -10,7 +10,7 @@ All the commands listed in this specification must be implemented in the discove
 After startup, the tool will just stay idle waiting for commands. The available commands are: `HELLO`, `START`, `STOP`,
 `QUIT`, `LIST` and `START_SYNC`.
 
-After each command the client always expect a response from the discovery. The discovery must not introduce any delay
+After each command the client always expects a response from the discovery. The discovery must not introduce any delay
 and must respond to all commands as fast as possible.
 
 #### HELLO command
@@ -21,8 +21,7 @@ pluggable discovery protocol that the client/IDE supports. The syntax of the com
 `HELLO <PROTOCOL_VERSION> "<USER_AGENT>"`
 
 - `<PROTOCOL_VERSION>` is the maximum protocol version supported by the client/IDE (currently `1`)
-
-- `<USER_AGENT>` is the name and version of the client (double-quotes `"` are not allowed)
+- `<USER_AGENT>` is the name and version of the client. It must not contain double-quotes (`"`).
 
 some examples:
 
@@ -48,13 +47,13 @@ are three possible cases:
 - if the discovery supports a more recent version of the protocol than the client/IDE: the discovery should downgrade
   itself into compatibility mode and report a `protocolVersion` that is less than or equal to the one supported by the
   client/IDE.
-- if the discovery cannot go into compatibility mode, it will report the protocol version supported (even if greater
+- if the discovery cannot go into compatibility mode, it must report the protocol version supported (even if greater
   than the version supported by the client/IDE) and the client/IDE may decide to terminate the discovery or produce an
   error/warning.
 
 #### START command
 
-The `START` command initializes and start the discovery internal subroutines. This command must be called before `LIST`
+The `START` command initializes and starts the discovery internal subroutines. This command must be called before `LIST`
 or `START_SYNC`. The response to the start command is:
 
 ```JSON
@@ -78,7 +77,7 @@ The `error` field must be set to `true` and the `message` field should contain a
 
 #### STOP command
 
-The `STOP` command stops the discovery internal subroutines and possibly free the internally used resources. This
+The `STOP` command stops the discovery internal subroutines and possibly frees the internally used resources. This
 command should be called if the client wants to pause the discovery for a while. The response to the command is:
 
 ```JSON
@@ -130,7 +129,8 @@ call. The format of the response is the following:
       "properties": {
                        <-- A LIST OF PROPERTIES OF THE PORT
       }
-    }, {
+    },
+    {
       ...              <-- OTHER PORTS...
     }
   ]
@@ -142,17 +142,13 @@ The `ports` field contains a list of the available ports.
 Each port has:
 
 - an `address` (for example `/dev/ttyACM0` for serial ports or `192.168.10.100` for network ports)
-
 - a `label` that is the human readable form of the `address` (it may be for example `ttyACM0` or
   `SSH on 192.168.10.100`)
-
 - `protocol` is the protocol identifier (such as `serial` or `dfu` or `ssh`)
-
 - `protocolLabel` is the `protocol` in human readable form (for example `Serial port` or `DFU USB` or `Network (ssh)`)
-
 - `properties` is a list of key/value pairs that represent information relative to the specific port
 
-To make the above more clear let’s show an example with the `serial_discovery`:
+To make the above more clear let's show an example with the `serial_discovery`:
 
 ```JSON
 {
@@ -174,7 +170,7 @@ To make the above more clear let’s show an example with the `serial_discovery`
 }
 ```
 
-In this case the serial port metadata comes from an USB serial converter. Inside the `properties` we have all the
+In this case the serial port metadata comes from a USB serial converter. Inside the `properties` we have all the
 properties of the port, and some of them may be useful for product identification (in this case only USB VID/PID is
 useful to identify the board model).
 
@@ -182,10 +178,10 @@ The `LIST` command performs a one-shot polling of the ports. The discovery shoul
 without any additional delay.
 
 Some discoveries may require some time to discover a new port (for example network protocols like MDNS, Bluetooth, etc.
-requires some seconds to receive the broadcasts from all available clients) in that case is fine to answer with an empty
-or incomplete list.
+require some seconds to receive the broadcasts from all available clients) in that case it is fine to answer with an
+empty or incomplete list.
 
-If an error occurs and the discovery can't complete the enumeration is must report the error with:
+If an error occurs and the discovery can't complete the enumeration, it must report the error with:
 
 ```JSON
 {
@@ -210,7 +206,7 @@ command is:
 }
 ```
 
-After this message the discoery will send `add` and `remove` event asyncronoushly (more on that later). If an error
+After this message the discovery will send `add` and `remove` events asynchronously (more on that later). If an error
 occurs and the discovery can't go in "events" mode the error must be reported as:
 
 ```JSON
@@ -283,17 +279,18 @@ If the client sends an invalid or malformed command, the discovery should answer
 
 The `properties` associated to a port can be used to identify the board attached to that port. The algorithm is simple:
 
-- each board listed in the platform file `boards.txt` may declare a set of `upload_port.*` properties
+- each board listed in the platform file [`boards.txt`](platform-specification.md#boardstxt) may declare a set of
+  `upload_port.*` properties
 - if each `upload_port.*` property has a match in the `properties` set coming from the discovery then the board is a
-  “candidate” board attached to that port.
+  "candidate" board attached to that port.
 
 Some port `properties` may not be precise enough to uniquely identify a board, in that case more boards may match the
-same set of `properties`, that’s why we called it “candidate”.
+same set of `properties`, that's why we called it "candidate".
 
-Let’s see an example to clarify things a bit, let's suppose that we have the following `properties` coming from the
+Let's see an example to clarify things a bit, let's suppose that we have the following `properties` coming from the
 serial discovery:
 
-```JSON
+```
   "port": {
     "address": "/dev/ttyACM0",
     "properties": {
@@ -301,11 +298,12 @@ serial discovery:
       "vid": "0x2341",
       "serialNumber": "EBEABFD6514D32364E202020FF10181E",
       "name": "ttyACM0"
-    }
+    },
+    ...
 ```
 
 in this case we can use `vid` and `pid` to identify the board. The `serialNumber`, instead, is unique for that specific
-instance of the board so it can't be used to identify the board model. Let’s suppose we have the following `boards.txt`:
+instance of the board so it can't be used to identify the board model. Let's suppose we have the following `boards.txt`:
 
 ```
 # Arduino Zero (Programming Port)
@@ -365,4 +363,4 @@ myboard.upload_port.1.apples=40
 ```
 
 will match on both `pears=20, apples=30` and `pears=30, apples=40` but not `pears=20, apples=40`, in that sense each
-"set" of identification properties is indepentent from each other and cannot be mixed for port matching.
+"set" of identification properties is independent from each other and cannot be mixed for port matching.
