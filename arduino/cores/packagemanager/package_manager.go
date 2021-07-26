@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"github.com/schollz/closestmatch"
 	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -129,6 +130,22 @@ func (pm *PackageManager) FindBoardWithFQBN(fqbnIn string) (*cores.Board, error)
 	return board, err
 }
 
+func (pm *PackageManager) findClosestMatchFqbn(fqbn *cores.FQBN) string {
+	// Create closestmatch DB
+	wordsToTest := []string{}
+	name := fqbn.StringWithoutConfig()
+	for _, board := range pm.InstalledBoards() {
+		wordsToTest = append(wordsToTest, board.FQBN())
+	}
+	// Choose a set of bag sizes, more is more accurate but slower
+	bagSizes := []int{2}
+
+	// Create a closestmatch object and find the best matching name
+	cm := closestmatch.New(wordsToTest, bagSizes)
+	closestName := cm.Closest(name)
+	return closestName
+}
+
 // ResolveFQBN returns, in order:
 //
 // - the Package pointed by the fqbn
@@ -174,8 +191,10 @@ func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 	// Find board
 	board := platformRelease.Boards[fqbn.BoardID]
 	if board == nil {
+		// Try looking for the closest match; if found, suggest it
+		suggestion := pm.findClosestMatchFqbn(fqbn)
 		return targetPackage, platformRelease, nil, nil, nil,
-			fmt.Errorf("board %s:%s not found", platformRelease, fqbn.BoardID)
+			fmt.Errorf("board %s not found, did you mean %s ?", fqbn.StringWithoutConfig(), suggestion)
 	}
 
 	buildProperties, err := board.GetBuildProperties(fqbn.Configs)
