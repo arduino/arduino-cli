@@ -430,6 +430,25 @@ following properties are automatically generated:
 - `{build.variant.path}`: The path to the selected board variant folder (inside the
   [variant platform](#platform-terminology), for example hardware/arduino/avr/variants/micro)
 
+If the platform supports pluggable discovery it may also declare a set of `upload_port.*` properties, these properties
+will be used to identify a board by the discovery process when plugged in.
+
+For example we could declare a series of `upload_port.vid` and `upload_port.pid` for the Uno like so:
+
+    uno.upload_port.vid.0=0x2341
+    uno.upload_port.pid.0=0x0043
+    uno.upload_port.vid.1=0x2341
+    uno.upload_port.pid.1=0x0001
+    uno.upload_port.vid.2=0x2A03
+    uno.upload_port.pid.2=0x0043
+    uno.upload_port.vid.3=0x2341
+    uno.upload_port.pid.3=0x0243
+
+In this case we're using the board's `vid` and `pid` to identify it but `upload_port.*` properties can be anything that
+can help identify a certain board. For more detailed information see the
+[board identification](pluggable-discovery-specification.md#board-identification) section of the pluggable discovery
+documentation.
+
 ### Cores
 
 Cores are placed inside the **cores** subfolder. Many different cores can be provided within a single platform. For
