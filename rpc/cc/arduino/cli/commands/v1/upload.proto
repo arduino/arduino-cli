@@ -57,7 +57,7 @@ message UploadRequest {
   // or in any case fields that can be customized by the user at upload time
   // and cannot be known previously.
   // For more info:
-  // https://github.com/arduino/tooling-rfcs/blob/main/RFCs/0002-pluggable-discovery.md#user-provided-fields
+  // https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
   map<string, string> user_fields = 11;
 }
 
@@ -101,7 +101,7 @@ message UploadUsingProgrammerRequest {
   // or in any case fields that can be customized by the user at upload time
   // and cannot be known previously.
   // For more info:
-  // https://github.com/arduino/tooling-rfcs/blob/main/RFCs/0002-pluggable-discovery.md#user-provided-fields
+  // https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
   map<string, string> user_fields = 11;
 }
 
@@ -133,7 +133,7 @@ message BurnBootloaderRequest {
   // or in any case fields that can be customized by the user at upload time
   // and cannot be known previously.
   // For more info:
-  // https://github.com/arduino/tooling-rfcs/blob/main/RFCs/0002-pluggable-discovery.md#user-provided-fields
+  // https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
   map<string, string> user_fields = 11;
 }
 

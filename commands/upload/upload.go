@@ -87,7 +87,7 @@ func getToolID(props *properties.Map, action, protocol string) (string, error) {
 		return t, nil
 	} else if t, ok := props.GetOk(defaultToolProperty); ok {
 		// Fallback for platform that don't support the specified protocol for specified action:
-		// https://github.com/arduino/tooling-rfcs/blob/main/RFCs/0002-pluggable-discovery.md#support-for-default-fallback-allows-upload-without-a-port
+		// https://arduino.github.io/arduino-cli/latest/platform-specification/#sketch-upload-configuration
 		return t, nil
 	}
 	return "", fmt.Errorf("cannot find tool: undefined '%s' property", toolProperty)
@@ -303,7 +303,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	// Certain tools require the user to provide custom fields at run time,
 	// if they've been provided set them
 	// For more info:
-	// https://github.com/arduino/tooling-rfcs/blob/main/RFCs/0002-pluggable-discovery.md#user-provided-fields
+	// https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
 	for name, value := range userFields {
 		uploadProperties.Set(fmt.Sprintf("%s.field.%s", action, name), value)
 	}

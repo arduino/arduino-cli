@@ -74,7 +74,7 @@ type UploadRequest struct {
 	// or in any case fields that can be customized by the user at upload time
 	// and cannot be known previously.
 	// For more info:
-	// https://github.com/arduino/tooling-rfcs/blob/main/RFCs/0002-pluggable-discovery.md#user-provided-fields
+	// https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
 	UserFields map[string]string `protobuf:"bytes,11,rep,name=user_fields,json=userFields,proto3" json:"user_fields,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
@@ -281,7 +281,7 @@ type UploadUsingProgrammerRequest struct {
 	// or in any case fields that can be customized by the user at upload time
 	// and cannot be known previously.
 	// For more info:
-	// https://github.com/arduino/tooling-rfcs/blob/main/RFCs/0002-pluggable-discovery.md#user-provided-fields
+	// https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
 	UserFields map[string]string `protobuf:"bytes,11,rep,name=user_fields,json=userFields,proto3" json:"user_fields,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
@@ -476,7 +476,7 @@ type BurnBootloaderRequest struct {
 	// or in any case fields that can be customized by the user at upload time
 	// and cannot be known previously.
 	// For more info:
-	// https://github.com/arduino/tooling-rfcs/blob/main/RFCs/0002-pluggable-discovery.md#user-provided-fields
+	// https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
 	UserFields map[string]string `protobuf:"bytes,11,rep,name=user_fields,json=userFields,proto3" json:"user_fields,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
@@ -802,7 +802,7 @@ type UserField struct {
 	ToolId string `protobuf:"bytes,1,opt,name=tool_id,json=toolId,proto3" json:"tool_id,omitempty"`
 	// Name used internally to store and retrieve this field
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	// Label is the text shown to the user when needs to input this field
+	// Label is the text shown to the user when they need to input this field
 	Label string `protobuf:"bytes,3,opt,name=label,proto3" json:"label,omitempty"`
 	// True if the value of the field must not be shown when typing, for example
 	// when the user inputs a network password
