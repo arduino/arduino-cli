@@ -1,8 +1,8 @@
 Discovery tools are a special kind of tool used to find supported boards, a platform developer can create its own
 following the specification below. These tools must be in the form of executables that can be launched as a subprocess
-using a `platform.txt` command line recipe. They will communicate to the parent process via stdin/stdout, in particular
-a discovery will accept commands as plain text strings from stdin and will send answers back in JSON format on stdout.
-Each tool will implement the commands to list and enumerate ports for a specific protocol as specified in this document.
+using a `platform.txt` command line recipe. They communicate to the parent process via stdin/stdout, accepting commands
+as plain text strings from stdin and sending answers back in JSON format on stdout. Each tool will implement the
+commands to list and enumerate ports for a specific protocol as specified in this document.
 
 ### Pluggable discovery API via stdin/stdout
 
@@ -149,7 +149,7 @@ Each port has:
 - `protocolLabel` is the `protocol` in human readable form (for example `Serial port` or `DFU USB` or `Network (ssh)`)
 - `properties` is a list of key/value pairs that represent information relative to the specific port
 
-To make the above more clear let’s show an example output from the `serial-discovery` builtin in the Arduino CLI:
+To make the above more clear let's show an example output from the `serial-discovery` builtin in the Arduino CLI:
 
 ```JSON
 {
