@@ -14,9 +14,11 @@
 # a commercial license, send an email to license@arduino.cc.
 
 import tempfile
+import sys
 import hashlib
 import pytest
 from pathlib import Path
+from typing import Union
 
 
 def generate_build_dir(sketch_path):
@@ -26,13 +28,26 @@ def generate_build_dir(sketch_path):
     return build_dir.resolve()
 
 
+def generate_expected_output(
+    output: str, upload_tools: Union[dict, str], data_dir: str, upload_port: str, build_dir: str, sketch_name: str
+) -> str:
+    if isinstance(upload_tools, str):
+        tool = upload_tools
+    else:
+        tool = upload_tools[sys.platform]
+    return output.format(
+        tool_executable=tool, data_dir=data_dir, upload_port=upload_port, build_dir=build_dir, sketch_name=sketch_name,
+    ).replace("\\", "/")
+
+
 testdata = [
     (
         "",
         "arduino:avr:uno",
         "arduino:avr@1.8.3",
         "/dev/ttyACM0",
-        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude"',
+        "{tool_executable} "
         + '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
         + '-v -V -patmega328p -carduino "-P{upload_port}" -b115200 -D "-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"',
     ),
@@ -41,7 +56,8 @@ testdata = [
         "arduino:avr:leonardo",
         "arduino:avr@1.8.3",
         "/dev/ttyACM999",
-        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude"',
+        "{tool_executable} "
         + '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
         + '-v -V -patmega32u4 -cavr109 "-P{upload_port}0" -b57600 -D "-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"',
     ),
@@ -50,7 +66,8 @@ testdata = [
         "adafruit:avr:flora8",
         "adafruit:avr@1.4.13",
         "/dev/ttyACM0",
-        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude"',
+        "{tool_executable} "
         + '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
         + '-v -patmega32u4 -cavr109 -P{upload_port} -b57600 -D "-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"',
     ),
@@ -59,7 +76,8 @@ testdata = [
         "adafruit:avr:flora8",
         "adafruit:avr@1.4.13",
         "/dev/ttyACM999",
-        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude"',
+        "{tool_executable} "
         + '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
         + '-v -patmega32u4 -cavr109 -P{upload_port}0 -b57600 -D "-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"',
     ),
@@ -68,7 +86,12 @@ testdata = [
         "esp32:esp32:esp32thing",
         "esp32:esp32@1.0.6",
         "/dev/ttyACM0",
-        'python "{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool.py" '
+        {
+            "linux": 'python "{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool.py"',
+            "darwin": '"{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool.py"',
+            "win32": '"{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool.exe"',
+        },
+        "{tool_executable} "
         + '--chip esp32 --port "{upload_port}" --baud 921600  --before default_reset '
         + "--after hard_reset write_flash -z --flash_mode dio --flash_freq 80m --flash_size detect 0xe000 "
         + '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/partitions/boot_app0.bin" 0x1000 '
@@ -80,7 +103,8 @@ testdata = [
         "esp8266:esp8266:generic",
         "esp8266:esp8266@3.0.1",
         "/dev/ttyACM0",
-        '"{data_dir}/packages/esp8266/tools/python3/3.7.2-post1/python3" '
+        '"{data_dir}/packages/esp8266/tools/python3/3.7.2-post1/python3"',
+        "{tool_executable} "
         + '"{data_dir}/packages/esp8266/hardware/esp8266/3.0.1/tools/upload.py" '
         + '--chip esp8266 --port "{upload_port}" --baud "115200" ""  '
         + "--before default_reset --after hard_reset write_flash 0x0 "
@@ -89,17 +113,19 @@ testdata = [
 ]
 
 
-@pytest.mark.parametrize("index, fqbn, core, upload_port, expected_output", testdata)
-def test_upload_sketch(run_command, session_data_dir, downloads_dir, index, fqbn, core, upload_port, expected_output):
+@pytest.mark.parametrize("package_index, fqbn, core, upload_port, upload_tools, output", testdata)
+def test_upload_sketch(
+    run_command, session_data_dir, downloads_dir, package_index, fqbn, core, upload_port, upload_tools, output
+):
     env = {
         "ARDUINO_DATA_DIR": session_data_dir,
         "ARDUINO_DOWNLOADS_DIR": downloads_dir,
         "ARDUINO_SKETCHBOOK_DIR": session_data_dir,
     }
 
-    if index:
+    if package_index:
         assert run_command("config init --overwrite", custom_env=env)
-        assert run_command(f"config add board_manager.additional_urls {index}", custom_env=env)
+        assert run_command(f"config add board_manager.additional_urls {package_index}", custom_env=env)
         assert run_command("update", custom_env=env)
 
     assert run_command(f"core install {core}", custom_env=env)
@@ -115,6 +141,11 @@ def test_upload_sketch(run_command, session_data_dir, downloads_dir, index, fqbn
     res = run_command(f'upload -p {upload_port} -b {fqbn} "{sketch_path}" --dry-run -v', custom_env=env)
     assert res.ok
 
-    assert expected_output.format(
-        data_dir=session_data_dir, upload_port=upload_port, build_dir=build_dir, sketch_name=sketch_name
-    ).replace("\\", "/") in res.stdout.replace("\\", "/")
+    generate_expected_output(
+        output=output,
+        upload_tools=upload_tools,
+        data_dir=session_data_dir,
+        upload_port=upload_port,
+        build_dir=build_dir,
+        sketch_name=sketch_name,
+    ) in res.stdout.replace("\\", "/")
