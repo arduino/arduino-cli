@@ -321,11 +321,11 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 		return fmt.Errorf(tr("loading %[1]s: %[2]s"), platformTxtLocalPath, err)
 	}
 
-	if platform.Properties.SubTree("discovery").Size() > 0 {
+	if platform.Properties.SubTree("pluggable_discovery").Size() > 0 {
 		platform.PluggableDiscoveryAware = true
 	} else {
-		platform.Properties.Set("discovery.required.0", "builtin:serial-discovery")
-		platform.Properties.Set("discovery.required.1", "builtin:mdns-discovery")
+		platform.Properties.Set("pluggable_discovery.required.0", "builtin:serial-discovery")
+		platform.Properties.Set("pluggable_discovery.required.1", "builtin:mdns-discovery")
 	}
 
 	if platform.Platform.Name == "" {
