@@ -626,7 +626,7 @@ func (pm *PackageManager) LoadDiscoveries() []*status.Status {
 
 func (pm *PackageManager) loadDiscoveries(release *cores.PlatformRelease) []*status.Status {
 	statuses := []*status.Status{}
-	discoveryProperties := release.Properties.SubTree("discovery")
+	discoveryProperties := release.Properties.SubTree("pluggable_discovery")
 
 	if discoveryProperties.Size() == 0 {
 		return nil
@@ -635,11 +635,11 @@ func (pm *PackageManager) loadDiscoveries(release *cores.PlatformRelease) []*sta
 	// Handles discovery properties formatted like so:
 	//
 	// Case 1:
-	//    "discovery.required": "PLATFORM:DISCOVERY_NAME",
+	//    "pluggable_discovery.required": "PLATFORM:DISCOVERY_NAME",
 	//
 	// Case 2:
-	//    "discovery.required.0": "PLATFORM:DISCOVERY_ID_1",
-	//    "discovery.required.1": "PLATFORM:DISCOVERY_ID_2",
+	//    "pluggable_discovery.required.0": "PLATFORM:DISCOVERY_ID_1",
+	//    "pluggable_discovery.required.1": "PLATFORM:DISCOVERY_ID_2",
 	//
 	// If both indexed and unindexed properties are found the unindexed are ignored
 	for _, id := range discoveryProperties.ExtractSubIndexLists("required") {

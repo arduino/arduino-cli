@@ -652,39 +652,39 @@ Discoveries in its [`platform.txt`](#platformtxt). Discoveries can be referenced
 
 There are two different syntaxes to declare discoveries. If the platform uses just one discovery:
 
-    discovery.required=VENDOR_ID:DISCOVERY_NAME
+    pluggable_discovery.required=VENDOR_ID:DISCOVERY_NAME
 
 instead if it needs multiple discoveries:
 
-    discovery.required.0=VENDOR_ID:DISCOVERY_0_NAME
-    discovery.required.1=VENDOR_ID:DISCOVERY_1_NAME
+    pluggable_discovery.required.0=VENDOR_ID:DISCOVERY_0_NAME
+    pluggable_discovery.required.1=VENDOR_ID:DISCOVERY_1_NAME
 
 A platform that supports only boards connected via serial ports can easily use the `builtin` package's
 `serial-discovery` without creating a custom Pluggable Discovery:
 
-    discovery.required=builtin:serial-discovery
+    pluggable_discovery.required=builtin:serial-discovery
 
 if it also supports boards connected via the network, it can use the `builtin` package's `mdns-discovery`:
 
-    discovery.required.0=builtin:serial-discovery
-    discovery.required.1=builtin:mdns-discovery
+    pluggable_discovery.required.0=builtin:serial-discovery
+    pluggable_discovery.required.1=builtin:mdns-discovery
 
 Since the above syntax requires specifying a discovery via the `discoveryDependencies` field of the platform's
 [package index](package_index_json-specification.md), it might be cumbersome to use with manual installations. So we
 provide another syntax to ease development and beta testing:
 
-    discovery.DISCOVERY_ID.pattern=DISCOVERY_RECIPE
+    pluggable_discovery.DISCOVERY_ID.pattern=DISCOVERY_RECIPE
 
 `DISCOVERY_ID` must be replaced by a unique identifier for the particular discovery and `DISCOVERY_RECIPE` must be
 replaced by the command line to launch the discovery. An example could be:
 
     ## Teensy Ports Discovery
-    discovery.teensy.pattern="{runtime.tools.teensy_ports.path}/hardware/tools/teensy_ports" -J2
+    pluggable_discovery.teensy.pattern="{runtime.tools.teensy_ports.path}/hardware/tools/teensy_ports" -J2
 
 We strongly recommend using this syntax only for development purposes and not on released platforms.
 
-For backward compatibility, if a platform does not declare any discovery (using the `discovery.*` properties in
-`platform.txt`) it will automatically inherit `builtin:serial-discovery` and `builtin:mdns-discovery` (but not other
+For backward compatibility, if a platform does not declare any discovery (using the `pluggable_discovery.*` properties
+in `platform.txt`) it will automatically inherit `builtin:serial-discovery` and `builtin:mdns-discovery` (but not other
 builtin discoveries that may be possibly added in the future).
 
 For detailed information, see the [Pluggable Discovery specification](pluggable-discovery-specification.md).
