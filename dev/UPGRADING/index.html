@@ -295,6 +295,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-clii18n-package" class="md-nav__link">
+    github.com/arduino/arduino-cli/i18n package
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#githubcomarduinoarduino-cliarduinobuilder-package" class="md-nav__link">
     github.com/arduino/arduino-cli/arduino/builder package
   </a>
@@ -1317,6 +1324,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-clii18n-package" class="md-nav__link">
+    github.com/arduino/arduino-cli/i18n package
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#githubcomarduinoarduino-cliarduinobuilder-package" class="md-nav__link">
     github.com/arduino/arduino-cli/arduino/builder package
   </a>
@@ -1532,6 +1546,14 @@
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
 <h3 id="change-public-library-interface">Change public library interface<a class="headerlink" href="#change-public-library-interface" title="Permanent link">&para;</a></h3>
+<h4 id="githubcomarduinoarduino-clii18n-package"><code>github.com/arduino/arduino-cli/i18n</code> package<a class="headerlink" href="#githubcomarduinoarduino-clii18n-package" title="Permanent link">&para;</a></h4>
+<p>The behavior of the <code>Init</code> function has changed. The user specified locale code is no longer read from the
+<code>github.com/arduino/arduino-cli/configuration</code> package and now must be passed directly to <code>Init</code> as a string:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">i18n</span><span class="p">.</span><span class="nx">Init</span><span class="p">(</span><span class="s">&quot;it&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>Omit the argument for automated locale detection:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">i18n</span><span class="p">.</span><span class="nx">Init</span><span class="p">()</span>
+</code></pre></div>
 <h4 id="githubcomarduinoarduino-cliarduinobuilder-package"><code>github.com/arduino/arduino-cli/arduino/builder</code> package<a class="headerlink" href="#githubcomarduinoarduino-cliarduinobuilder-package" title="Permanent link">&para;</a></h4>
 <p><code>GenBuildPath()</code> function has been moved to <code>github.com/arduino/arduino-cli/arduino/sketch</code> package. The signature is
 unchanged.</p>
