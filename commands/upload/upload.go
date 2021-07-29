@@ -444,7 +444,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		}
 	}
 
-	// Get Port properties gathered using Pluggable Discovery
+	// Get Port properties gathered using pluggable discovery
 	uploadProperties.Set("upload.port.address", port.Address)
 	uploadProperties.Set("upload.port.label", port.Label)
 	uploadProperties.Set("upload.port.protocol", port.Protocol)

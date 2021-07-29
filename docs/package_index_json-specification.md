@@ -80,7 +80,7 @@ Each tool describes a binary distribution of a command line tool. A tool can be:
 - a file preprocessor
 - a debugger
 - a program that performs a firmware upgrade
-- a [Pluggable Discovery](pluggable-discovery-specification.md)
+- a [pluggable discovery](pluggable-discovery-specification.md)
 
 basically anything that can run on the user's host PC and do something useful.
 

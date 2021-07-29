@@ -1,4 +1,4 @@
-Discovery tools are a special kind of tool used to find supported boards, a platform developer can create its own
+Discovery tools are a special kind of tool used to find supported boards, a platform developer can create their own
 following the specification below. These tools must be in the form of executables that can be launched as a subprocess
 using a `platform.txt` command line recipe. They communicate to the parent process via stdin/stdout, accepting commands
 as plain text strings from stdin and sending answers back in JSON format on stdout. Each tool will implement the

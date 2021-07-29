@@ -57,7 +57,7 @@ message DetectedPort {
 
 The properties previously contained directly in the message are now stored in the `port` property.
 
-These changes are necessary for the Pluggable Discovery.
+These changes are necessary for the pluggable discovery.
 
 ### gRPC interface `BoardListItem` change
 
