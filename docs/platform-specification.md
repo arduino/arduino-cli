@@ -698,7 +698,7 @@ The tool configuration properties are available globally without the prefix. For
 property can be used as **{cmd.path}** inside the recipe, and the same happens for all the other avrdude configuration
 variables.
 
-#### Pluggable Discovery
+#### Pluggable discovery
 
 Discovery tools are a special kind of tool used to find supported boards. A platform must declare one or more Pluggable
 Discoveries in its [`platform.txt`](#platformtxt). Discoveries can be referenced from other packages, including the
@@ -718,7 +718,7 @@ pluggable_discovery.required.1=VENDOR_ID:DISCOVERY_1_NAME
 ```
 
 A platform that supports only boards connected via serial ports can easily use the `builtin` package's
-`serial-discovery` without creating a custom Pluggable Discovery:
+`serial-discovery` without creating a custom pluggable discovery:
 
 ```
 pluggable_discovery.required=builtin:serial-discovery
@@ -863,9 +863,9 @@ leonardo.upload.network.maximum_size=256
 
 The two above properties will be available as **{upload.serial.maximum_size}** and **{upload.network.maximum_size}**.
 
-#### Properties from Pluggable Discovery
+#### Properties from pluggable discovery
 
-If a platform supports Pluggable Discovery it can also use the port's properties returned by a discovery. For example,
+If a platform supports pluggable discovery it can also use the port's properties returned by a discovery. For example,
 the following port metadata coming from a pluggable discovery:
 
 ```
