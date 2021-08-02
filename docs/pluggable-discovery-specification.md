@@ -276,6 +276,18 @@ If the client sends an invalid or malformed command, the discovery should answer
 }
 ```
 
+### State machine
+
+A well behaved pluggable discovery tool must reflect the following state machine.
+
+![Pluggable discovery state machine](img/pluggable-discovery-state-machine.png)
+
+The arrows represent the commands outlined in the above sections, calling successfully a command assumes the state
+changes.
+
+A pluggable discovery state is Alive when the process has been started but no command has been executed. Dead means the
+process has been stopped and no further commands can be received.
+
 ### Board identification
 
 The `properties` associated to a port can be used to identify the board attached to that port. The algorithm is simple:
