@@ -28,6 +28,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 // To work correctly a Pluggable Discovery must respect the state machine specifed on the documentation:
@@ -231,14 +232,39 @@ func (disc *PluggableDiscovery) runProcess() error {
 	return nil
 }
 
+func (disc *PluggableDiscovery) killProcess() error {
+	if err := disc.process.Kill(); err != nil {
+		return err
+	}
+	disc.statusMutex.Lock()
+	defer disc.statusMutex.Unlock()
+	disc.state = Dead
+	return nil
+}
+
 // Run starts the discovery executable process and sends the HELLO command to the discovery to agree on the
 // pluggable discovery protocol. This must be the first command to run in the communication with the discovery.
-func (disc *PluggableDiscovery) Run() error {
-	if err := disc.runProcess(); err != nil {
+// If the process is started but the HELLO command fails the process is killed.
+func (disc *PluggableDiscovery) Run() (err error) {
+	if err = disc.runProcess(); err != nil {
 		return err
 	}
 
-	if err := disc.sendCommand("HELLO 1 \"arduino-cli " + globals.VersionInfo.VersionString + "\"\n"); err != nil {
+	defer func() {
+		// If the discovery process is started successfully but the HELLO handshake
+		// fails the discovery is an unusable state, we kill the process to avoid
+		// further issues down the line.
+		if err == nil {
+			return
+		}
+		if err := disc.killProcess(); err != nil {
+			// Log failure to kill the process, ideally that should never happen
+			// but it's best to know it if it does
+			logrus.Errorf("Killing discovery %s after unsuccessful start: %s", disc.id, err)
+		}
+	}()
+
+	if err = disc.sendCommand("HELLO 1 \"arduino-cli " + globals.VersionInfo.VersionString + "\"\n"); err != nil {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
