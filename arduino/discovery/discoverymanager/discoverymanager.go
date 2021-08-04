@@ -16,6 +16,10 @@
 package discoverymanager
 
 import (
+	"context"
+	"fmt"
+	"sync"
+
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/pkg/errors"
 )
@@ -64,117 +68,187 @@ func (dm *DiscoveryManager) Add(disc *discovery.PluggableDiscovery) error {
 	return nil
 }
 
-// RunAll the discoveries for this DiscoveryManager,
-// returns the first error it meets or nil
-func (dm *DiscoveryManager) RunAll() error {
+// parallelize runs function f concurrently for each discovery.
+// Returns a list of errors returned by each call of f.
+func (dm *DiscoveryManager) parallelize(f func(d *discovery.PluggableDiscovery) error) []error {
+	var wg sync.WaitGroup
+	ctx, cancel := context.WithCancel(context.Background())
+	errChan := make(chan error)
 	for _, d := range dm.discoveries {
+		wg.Add(1)
+		go func(d *discovery.PluggableDiscovery) {
+			defer wg.Done()
+			if err := f(d); err != nil {
+				errChan <- err
+			}
+		}(d)
+	}
+
+	// Wait in a goroutine to collect eventual errors running a discovery.
+	// When all goroutines that are calling discoveries are done call cancel
+	// to avoid blocking if there are no errors.
+	go func() {
+		wg.Wait()
+		cancel()
+	}()
+
+	errs := []error{}
+	for {
+		select {
+		case <-ctx.Done():
+			goto done
+		case err := <-errChan:
+			errs = append(errs, err)
+		}
+	}
+done:
+	return errs
+}
+
+// RunAll the discoveries for this DiscoveryManager,
+// returns an error for each discovery failing to run
+func (dm *DiscoveryManager) RunAll() []error {
+	return dm.parallelize(func(d *discovery.PluggableDiscovery) error {
 		if d.State() != discovery.Dead {
 			// This discovery is already alive, nothing to do
-			continue
+			return nil
 		}
 
 		if err := d.Run(); err != nil {
-			return err
+			return fmt.Errorf("discovery %s process not started: %w", d.GetID(), err)
 		}
-	}
-	return nil
+		return nil
+	})
 }
 
 // StartAll the discoveries for this DiscoveryManager,
-// returns the first error it meets or nil
-func (dm *DiscoveryManager) StartAll() error {
-	for _, d := range dm.discoveries {
+// returns an error for each discovery failing to start
+func (dm *DiscoveryManager) StartAll() []error {
+	return dm.parallelize(func(d *discovery.PluggableDiscovery) error {
 		state := d.State()
 		if state != discovery.Idling || state == discovery.Running {
 			// Already started
-			continue
+			return nil
 		}
 		if err := d.Start(); err != nil {
-			return err
+			return fmt.Errorf("starting discovery %s: %w", d.GetID(), err)
 		}
-	}
-	return nil
+		return nil
+	})
 }
 
 // StartSyncAll the discoveries for this DiscoveryManager,
-// returns the first error it meets or nil
+// returns an error for each discovery failing to start syncing
 func (dm *DiscoveryManager) StartSyncAll() (<-chan *discovery.Event, []error) {
-	errs := []error{}
 	if dm.globalEventCh == nil {
 		dm.globalEventCh = make(chan *discovery.Event, 5)
 	}
-	for _, d := range dm.discoveries {
+	errs := dm.parallelize(func(d *discovery.PluggableDiscovery) error {
 		state := d.State()
 		if state != discovery.Idling || state == discovery.Syncing {
 			// Already syncing
-			continue
+			return nil
 		}
 
 		eventCh := d.EventChannel(5)
 		if err := d.StartSync(); err != nil {
-			errs = append(errs, err)
+			return fmt.Errorf("start syncing discovery %s: %w", d.GetID(), err)
 		}
 		go func() {
 			for ev := range eventCh {
 				dm.globalEventCh <- ev
 			}
 		}()
-	}
+		return nil
+	})
 	return dm.globalEventCh, errs
 }
 
 // StopAll the discoveries for this DiscoveryManager,
-// returns the first error it meets or nil
-func (dm *DiscoveryManager) StopAll() error {
-	for _, d := range dm.discoveries {
+// returns an error for each discovery failing to stop
+func (dm *DiscoveryManager) StopAll() []error {
+	return dm.parallelize(func(d *discovery.PluggableDiscovery) error {
 		state := d.State()
 		if state != discovery.Syncing && state != discovery.Running {
 			// Not running nor syncing, nothing to stop
-			continue
+			return nil
 		}
-		err := d.Stop()
-		if err != nil {
-			return err
+
+		if err := d.Stop(); err != nil {
+			return fmt.Errorf("stopping discovery %s: %w", d.GetID(), err)
 		}
-	}
-	return nil
+		return nil
+	})
 }
 
 // QuitAll quits all the discoveries managed by this DiscoveryManager.
-// Returns the first error it meets or nil
-func (dm *DiscoveryManager) QuitAll() error {
-	for _, d := range dm.discoveries {
+// Returns an error for each discovery that fails quitting
+func (dm *DiscoveryManager) QuitAll() []error {
+	errs := dm.parallelize(func(d *discovery.PluggableDiscovery) error {
 		if d.State() == discovery.Dead {
 			// Stop! Stop! It's already dead!
-			continue
+			return nil
 		}
-		err := d.Quit()
-		if err != nil {
-			return err
+
+		if err := d.Quit(); err != nil {
+			return fmt.Errorf("quitting discovery %s: %w", d.GetID(), err)
 		}
-	}
-	if dm.globalEventCh != nil {
+		return nil
+	})
+	// Close the global channel only if there were no errors
+	// quitting all alive discoveries
+	if len(errs) == 0 && dm.globalEventCh != nil {
 		close(dm.globalEventCh)
 		dm.globalEventCh = nil
 	}
-	return nil
+	return errs
 }
 
 // List returns a list of available ports detected from all discoveries
-func (dm *DiscoveryManager) List() []*discovery.Port {
-	res := []*discovery.Port{}
-	for _, d := range dm.discoveries {
-		if d.State() != discovery.Running {
-			// Discovery is not running, it won't return anything
-			continue
-		}
-		l, err := d.List()
-		if err != nil {
-			continue
-		}
-		res = append(res, l...)
+// and a list of errors for those discoveries that returned one.
+func (dm *DiscoveryManager) List() ([]*discovery.Port, []error) {
+	var wg sync.WaitGroup
+	// Use this struct to avoid the need of two separate
+	// channels for ports and errors.
+	type listMsg struct {
+		Err  error
+		Port *discovery.Port
 	}
-	return res
+	msgChan := make(chan listMsg)
+	for _, d := range dm.discoveries {
+		wg.Add(1)
+		go func(d *discovery.PluggableDiscovery) {
+			defer wg.Done()
+			if d.State() != discovery.Running {
+				// Discovery is not running, it won't return anything
+				return
+			}
+			ports, err := d.List()
+			if err != nil {
+				msgChan <- listMsg{Err: fmt.Errorf("listing ports from discovery %s: %w", d.GetID(), err)}
+			}
+			for _, p := range ports {
+				msgChan <- listMsg{Port: p}
+			}
+		}(d)
+	}
+
+	go func() {
+		// Close the channel only after all goroutines are done
+		wg.Wait()
+		close(msgChan)
+	}()
+
+	ports := []*discovery.Port{}
+	errs := []error{}
+	for msg := range msgChan {
+		if msg.Err != nil {
+			errs = append(errs, msg.Err)
+		} else {
+			ports = append(ports, msg.Port)
+		}
+	}
+	return ports, errs
 }
 
 // ListSync return the current list of ports detected from all discoveries
