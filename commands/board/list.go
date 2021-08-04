@@ -188,21 +188,25 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 	}
 
 	dm := pm.DiscoveryManager()
-	if err := dm.RunAll(); err != nil {
-		return nil, err
+	if errs := dm.RunAll(); len(errs) > 0 {
+		return nil, fmt.Errorf("%v", errs)
 	}
-	if err := dm.StartAll(); err != nil {
-		return nil, err
+	if errs := dm.StartAll(); len(errs) > 0 {
+		return nil, fmt.Errorf("%v", errs)
 	}
 	defer func() {
-		if err := dm.StopAll(); err != nil {
-			logrus.Error(err)
+		if errs := dm.StopAll(); len(errs) > 0 {
+			logrus.Error(errs)
 		}
 	}()
 	time.Sleep(time.Duration(req.GetTimeout()) * time.Millisecond)
 
 	retVal := []*rpc.DetectedPort{}
-	for _, port := range pm.DiscoveryManager().List() {
+	ports, errs := pm.DiscoveryManager().List()
+	if len(errs) > 0 {
+		return nil, fmt.Errorf("%v", errs)
+	}
+	for _, port := range ports {
 		boards, err := identify(pm, port)
 		if err != nil {
 			return nil, err
@@ -224,12 +228,18 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 // The discovery process can be interrupted by sending a message to the interrupt channel.
 func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchResponse, error) {
 	pm := commands.GetPackageManager(instanceID)
+	dm := pm.DiscoveryManager()
 
-	if err := pm.DiscoveryManager().RunAll(); err != nil {
-		return nil, err
+	runErrs := dm.RunAll()
+	if len(runErrs) == len(dm.IDs()) {
+		// All discoveries failed to run, we can't do anything
+		return nil, fmt.Errorf("%v", runErrs)
 	}
 
-	eventsChan, errs := pm.DiscoveryManager().StartSyncAll()
+	eventsChan, errs := dm.StartSyncAll()
+	if len(runErrs) > 0 {
+		errs = append(runErrs, errs...)
+	}
 
 	outChan := make(chan *rpc.BoardListWatchResponse)
 

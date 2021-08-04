@@ -22,6 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/pkg/errors"
@@ -76,20 +77,25 @@ func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Po
 	if pm == nil {
 		return nil, errors.New("invalid instance")
 	}
-
-	if err := pm.DiscoveryManager().RunAll(); err != nil {
-		return nil, err
+	dm := pm.DiscoveryManager()
+	if errs := dm.RunAll(); len(errs) == len(dm.IDs()) {
+		// All discoveries failed to run, we can't do anything
+		return nil, fmt.Errorf("%v", errs)
+	} else if len(errs) > 0 {
+		// If only some discoveries failed to run just tell the user and go on
+		for _, err := range errs {
+			feedback.Error(err)
+		}
 	}
-	eventChan, errs := pm.DiscoveryManager().StartSyncAll()
+	eventChan, errs := dm.StartSyncAll()
 	if len(errs) > 0 {
 		return nil, fmt.Errorf("%v", errs)
 	}
 
 	defer func() {
 		// Quit all discoveries at the end.
-		err := pm.DiscoveryManager().QuitAll()
-		if err != nil {
-			logrus.Errorf("quitting discoveries when getting port metadata: %s", err)
+		if errs := dm.QuitAll(); len(errs) > 0 {
+			logrus.Errorf("quitting discoveries when getting port metadata: %v", errs)
 		}
 	}()
 
