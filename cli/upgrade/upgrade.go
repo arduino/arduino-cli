@@ -24,17 +24,20 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
+var tr = i18n.Tr
+
 // NewCommand creates a new `upgrade` command
 func NewCommand() *cobra.Command {
 	upgradeCommand := &cobra.Command{
 		Use:     "upgrade",
-		Short:   "Upgrades installed cores and libraries.",
-		Long:    "Upgrades installed cores and libraries to latest version.",
+		Short:   tr("Upgrades installed cores and libraries."),
+		Long:    tr("Upgrades installed cores and libraries to latest version."),
 		Example: "  " + os.Args[0] + " upgrade",
 		Args:    cobra.NoArgs,
 		Run:     runUpgradeCommand,
@@ -54,7 +57,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	}, output.NewDownloadProgressBarCB(), output.TaskProgress())
 
 	if err != nil {
-		feedback.Errorf("Error upgrading: %v", err)
+		feedback.Errorf(tr("Error upgrading: %v"), err)
 	}
 
 	logrus.Info("Done")

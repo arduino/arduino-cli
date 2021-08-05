@@ -236,7 +236,7 @@ func (ctx *Context) InjectBuildOptions(opts *properties.Map) {
 	ctx.SketchLocation = opts.GetPath("sketchLocation")
 	fqbn, err := cores.ParseFQBN(opts.Get("fqbn"))
 	if err != nil {
-		i18n.ErrorfWithLogger(ctx.GetLogger(), "Error in FQBN: %s", err)
+		i18n.ErrorfWithLogger(ctx.GetLogger(), tr("Error in FQBN: %s"), err)
 	}
 	ctx.FQBN = fqbn
 	ctx.ArduinoAPIVersion = opts.Get("runtime.ide.version")

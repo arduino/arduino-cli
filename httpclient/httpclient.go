@@ -17,7 +17,11 @@ package httpclient
 
 import (
 	"net/http"
+
+	"github.com/arduino/arduino-cli/i18n"
 )
+
+var tr = i18n.Tr
 
 // New returns a default http client for use in the cli API calls
 func New() (*http.Client, error) {

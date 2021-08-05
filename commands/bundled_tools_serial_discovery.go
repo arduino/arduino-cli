@@ -116,7 +116,7 @@ func ListBoards(pm *packagemanager.PackageManager) ([]*discovery.Port, error) {
 
 	// determine if it's installed
 	if !t.IsInstalled() {
-		return nil, fmt.Errorf("missing serial-discovery tool")
+		return nil, fmt.Errorf(tr("missing serial-discovery tool"))
 	}
 
 	disc, err := discovery.New("serial-discovery", t.InstallDir.Join(t.Tool.Name).String())
@@ -126,16 +126,16 @@ func ListBoards(pm *packagemanager.PackageManager) ([]*discovery.Port, error) {
 	defer disc.Quit()
 
 	if err = disc.Run(); err != nil {
-		return nil, fmt.Errorf("starting discovery: %v", err)
+		return nil, fmt.Errorf(tr("starting discovery: %v"), err)
 	}
 
 	if err = disc.Start(); err != nil {
-		return nil, fmt.Errorf("starting discovery: %v", err)
+		return nil, fmt.Errorf(tr("starting discovery: %v"), err)
 	}
 
 	res, err := disc.List()
 	if err != nil {
-		return nil, fmt.Errorf("getting port list from discovery: %v", err)
+		return nil, fmt.Errorf(tr("getting port list from discovery: %v"), err)
 	}
 
 	return res, nil
@@ -145,7 +145,7 @@ func ListBoards(pm *packagemanager.PackageManager) ([]*discovery.Port, error) {
 func WatchListBoards(pm *packagemanager.PackageManager) (<-chan *discovery.Event, error) {
 	t := getBuiltinSerialDiscoveryTool(pm)
 	if !t.IsInstalled() {
-		return nil, fmt.Errorf("missing serial-discovery tool")
+		return nil, fmt.Errorf(tr("missing serial-discovery tool"))
 	}
 
 	disc, err := discovery.New("serial-discovery", t.InstallDir.Join(t.Tool.Name).String())
@@ -154,15 +154,15 @@ func WatchListBoards(pm *packagemanager.PackageManager) (<-chan *discovery.Event
 	}
 
 	if err = disc.Run(); err != nil {
-		return nil, fmt.Errorf("starting discovery: %v", err)
+		return nil, fmt.Errorf(tr("starting discovery: %v"), err)
 	}
 
 	if err = disc.Start(); err != nil {
-		return nil, fmt.Errorf("starting discovery: %v", err)
+		return nil, fmt.Errorf(tr("starting discovery: %v"), err)
 	}
 
 	if err = disc.StartSync(); err != nil {
-		return nil, fmt.Errorf("starting sync: %v", err)
+		return nil, fmt.Errorf(tr("starting sync: %v"), err)
 	}
 
 	return disc.EventChannel(10), nil

@@ -29,6 +29,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/gohasissues"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
@@ -38,6 +39,8 @@ import (
 )
 
 type filterFiles func([]os.FileInfo) []os.FileInfo
+
+var tr = i18n.Tr
 
 func ReadDirFiltered(folder string, fn filterFiles) ([]os.FileInfo, error) {
 	files, err := gohasissues.ReadDir(folder)
@@ -457,7 +460,7 @@ func CopyDir(src string, dst string, extensions CheckExtensionFunc) (err error) 
 		return err
 	}
 	if !si.IsDir() {
-		return fmt.Errorf("source is not a directory")
+		return fmt.Errorf(tr("source is not a directory"))
 	}
 
 	_, err = os.Stat(dst)
@@ -465,7 +468,7 @@ func CopyDir(src string, dst string, extensions CheckExtensionFunc) (err error) 
 		return
 	}
 	if err == nil {
-		return fmt.Errorf("destination already exists")
+		return fmt.Errorf(tr("destination already exists"))
 	}
 
 	err = os.MkdirAll(dst, si.Mode())

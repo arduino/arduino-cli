@@ -29,6 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/commands/daemon"
 	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/metrics"
 	srv_commands "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	srv_debug "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
@@ -40,19 +41,21 @@ import (
 	"google.golang.org/grpc"
 )
 
+var tr = i18n.Tr
+
 // NewCommand created a new `daemon` command
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "daemon",
-		Short:   fmt.Sprintf("Run as a daemon on port %s", configuration.Settings.GetString("daemon.port")),
-		Long:    "Running as a daemon the initialization of cores and libraries is done only once.",
+		Short:   fmt.Sprintf(tr("Run as a daemon on port %s"), configuration.Settings.GetString("daemon.port")),
+		Long:    tr("Running as a daemon the initialization of cores and libraries is done only once."),
 		Example: "  " + os.Args[0] + " daemon",
 		Args:    cobra.NoArgs,
 		Run:     runDaemonCommand,
 	}
-	cmd.PersistentFlags().String("port", "", "The TCP port the daemon will listen to")
+	cmd.PersistentFlags().String("port", "", tr("The TCP port the daemon will listen to"))
 	configuration.Settings.BindPFlag("daemon.port", cmd.PersistentFlags().Lookup("port"))
-	cmd.Flags().BoolVar(&daemonize, "daemonize", false, "Do not terminate daemon process if the parent process dies")
+	cmd.Flags().BoolVar(&daemonize, "daemonize", false, tr("Do not terminate daemon process if the parent process dies"))
 	return cmd
 }
 
@@ -102,22 +105,22 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		// Invalid port, such as "Foo"
 		var dnsError *net.DNSError
 		if errors.As(err, &dnsError) {
-			feedback.Errorf("Failed to listen on TCP port: %s. %s is unknown name.", port, dnsError.Name)
+			feedback.Errorf(tr("Failed to listen on TCP port: %[1]s. %[2]s is unknown name."), port, dnsError.Name)
 			os.Exit(errorcodes.ErrCoreConfig)
 		}
 		// Invalid port number, such as -1
 		var addrError *net.AddrError
 		if errors.As(err, &addrError) {
-			feedback.Errorf("Failed to listen on TCP port: %s. %s is an invalid port.", port, addrError.Addr)
+			feedback.Errorf(tr("Failed to listen on TCP port: %[1]s. %[2]s is an invalid port."), port, addrError.Addr)
 			os.Exit(errorcodes.ErrCoreConfig)
 		}
 		// Port is already in use
 		var syscallErr *os.SyscallError
 		if errors.As(err, &syscallErr) && errors.Is(syscallErr.Err, syscall.EADDRINUSE) {
-			feedback.Errorf("Failed to listen on TCP port: %s. Address already in use.", port)
+			feedback.Errorf(tr("Failed to listen on TCP port: %s. Address already in use."), port)
 			os.Exit(errorcodes.ErrNetwork)
 		}
-		feedback.Errorf("Failed to listen on TCP port: %s. Unexpected error: %v", port, err)
+		feedback.Errorf(tr("Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v"), port, err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	// This message will show up on the stdout of the daemon process so that gRPC clients know it is time to connect.

@@ -25,11 +25,11 @@ import (
 func NewCommand() *cobra.Command {
 	boardCommand := &cobra.Command{
 		Use:   "board",
-		Short: "Arduino board commands.",
-		Long:  "Arduino board commands.",
-		Example: "  # Lists all connected boards.\n" +
+		Short: tr("Arduino board commands."),
+		Long:  tr("Arduino board commands."),
+		Example: "  # " + tr("Lists all connected boards.") + "\n" +
 			"  " + os.Args[0] + " board list\n\n" +
-			"  # Attaches a sketch to a board.\n" +
+			"  # " + tr("Attaches a sketch to a board.") + "\n" +
 			"  " + os.Args[0] + " board attach serial:///dev/ttyACM0 mySketch",
 	}
 

@@ -17,6 +17,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -32,13 +33,13 @@ import (
 
 func initUpgradeCommand() *cobra.Command {
 	upgradeCommand := &cobra.Command{
-		Use:   "upgrade [PACKAGER:ARCH] ...",
-		Short: "Upgrades one or all installed platforms to the latest version.",
-		Long:  "Upgrades one or all installed platforms to the latest version.",
+		Use:   fmt.Sprintf("upgrade [%s:%s] ...", tr("PACKAGER"), tr("ARCH")),
+		Short: tr("Upgrades one or all installed platforms to the latest version."),
+		Long:  tr("Upgrades one or all installed platforms to the latest version."),
 		Example: "" +
-			"  # upgrade everything to the latest version\n" +
+			"  # " + tr("upgrade everything to the latest version") + "\n" +
 			"  " + os.Args[0] + " core upgrade\n\n" +
-			"  # upgrade arduino:samd to the latest version\n" +
+			"  # " + tr("upgrade arduino:samd to the latest version") + "\n" +
 			"  " + os.Args[0] + " core upgrade arduino:samd",
 		Run: runUpgradeCommand,
 	}
@@ -57,12 +58,12 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 			UpdatableOnly: true,
 		})
 		if err != nil {
-			feedback.Errorf("Error retrieving core list: %v", err)
+			feedback.Errorf(tr("Error retrieving core list: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 
 		if len(targets) == 0 {
-			feedback.Print("All the cores are already at the latest version")
+			feedback.Print(tr("All the cores are already at the latest version"))
 			return
 		}
 
@@ -75,13 +76,13 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	exitErr := false
 	platformsRefs, err := globals.ParseReferenceArgs(args, true)
 	if err != nil {
-		feedback.Errorf("Invalid argument passed: %v", err)
+		feedback.Errorf(tr("Invalid argument passed: %v"), err)
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
 	for i, platformRef := range platformsRefs {
 		if platformRef.Version != "" {
-			feedback.Error(("Invalid item " + args[i]))
+			feedback.Errorf(tr("Invalid item %s"), args[i])
 			exitErr = true
 			continue
 		}
@@ -95,9 +96,9 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 
 		_, err := core.PlatformUpgrade(context.Background(), r, output.ProgressBar(), output.TaskProgress())
 		if err == core.ErrAlreadyLatest {
-			feedback.Printf("Platform %s is already at the latest version", platformRef)
+			feedback.Printf(tr("Platform %s is already at the latest version"), platformRef)
 		} else if err != nil {
-			feedback.Errorf("Error during upgrade: %v", err)
+			feedback.Errorf(tr("Error during upgrade: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}

@@ -22,6 +22,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/status"
 )
@@ -50,6 +51,8 @@ type Feedback struct {
 	err    io.Writer
 	format OutputFormat
 }
+
+var tr = i18n.Tr
 
 // New creates a Feedback instance
 func New(out, err io.Writer, format OutputFormat) *Feedback {
@@ -128,7 +131,7 @@ func (fb *Feedback) Error(v ...interface{}) {
 // desired output in a pretty JSON format. It adds a newline to the output.
 func (fb *Feedback) printJSON(v interface{}) {
 	if d, err := json.MarshalIndent(v, "", "  "); err != nil {
-		fb.Errorf("Error during JSON encoding of the output: %v", err)
+		fb.Errorf(tr("Error during JSON encoding of the output: %v"), err)
 	} else {
 		fmt.Fprintf(fb.out, "%v\n", string(d))
 	}

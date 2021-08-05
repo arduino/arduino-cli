@@ -17,6 +17,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -33,12 +34,12 @@ import (
 
 func initInstallCommand() *cobra.Command {
 	installCommand := &cobra.Command{
-		Use:   "install PACKAGER:ARCH[@VERSION] ...",
-		Short: "Installs one or more cores and corresponding tool dependencies.",
-		Long:  "Installs one or more cores and corresponding tool dependencies.",
-		Example: "  # download the latest version of Arduino SAMD core.\n" +
+		Use:   fmt.Sprintf("install %s:%s[@%s]...", tr("PACKAGER"), tr("ARCH"), tr("VERSION")),
+		Short: tr("Installs one or more cores and corresponding tool dependencies."),
+		Long:  tr("Installs one or more cores and corresponding tool dependencies."),
+		Example: "  # " + tr("download the latest version of Arduino SAMD core.") + "\n" +
 			"  " + os.Args[0] + " core install arduino:samd\n\n" +
-			"  # download a specific version (in this case 1.6.9).\n" +
+			"  # " + tr("download a specific version (in this case 1.6.9).") + "\n" +
 			"  " + os.Args[0] + " core install arduino:samd@1.6.9",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
@@ -55,14 +56,14 @@ var postInstallFlags struct {
 // AddPostInstallFlagsToCommand adds flags that can be used to force running or skipping
 // of post installation scripts
 func AddPostInstallFlagsToCommand(cmd *cobra.Command) {
-	cmd.Flags().BoolVar(&postInstallFlags.runPostInstall, "run-post-install", false, "Force run of post-install scripts (if the CLI is not running interactively).")
-	cmd.Flags().BoolVar(&postInstallFlags.skipPostInstall, "skip-post-install", false, "Force skip of post-install scripts (if the CLI is running interactively).")
+	cmd.Flags().BoolVar(&postInstallFlags.runPostInstall, "run-post-install", false, tr("Force run of post-install scripts (if the CLI is not running interactively)."))
+	cmd.Flags().BoolVar(&postInstallFlags.skipPostInstall, "skip-post-install", false, tr("Force skip of post-install scripts (if the CLI is running interactively)."))
 }
 
 // DetectSkipPostInstallValue returns true if a post install script must be run
 func DetectSkipPostInstallValue() bool {
 	if postInstallFlags.runPostInstall && postInstallFlags.skipPostInstall {
-		feedback.Errorf("The flags --run-post-install and --skip-post-install can't be both set at the same time.")
+		feedback.Errorf(tr("The flags --run-post-install and --skip-post-install can't be both set at the same time."))
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 	if postInstallFlags.runPostInstall {
@@ -88,7 +89,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 
 	platformsRefs, err := globals.ParseReferenceArgs(args, true)
 	if err != nil {
-		feedback.Errorf("Invalid argument passed: %v", err)
+		feedback.Errorf(tr("Invalid argument passed: %v"), err)
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
@@ -102,7 +103,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 		}
 		_, err := core.PlatformInstall(context.Background(), platformInstallRequest, output.ProgressBar(), output.TaskProgress())
 		if err != nil {
-			feedback.Errorf("Error during install: %v", err)
+			feedback.Errorf(tr("Error during install: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}

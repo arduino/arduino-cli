@@ -29,8 +29,8 @@ import (
 func initSetCommand() *cobra.Command {
 	addCommand := &cobra.Command{
 		Use:   "set",
-		Short: "Sets a setting value.",
-		Long:  "Sets a setting value.",
+		Short: tr("Sets a setting value."),
+		Long:  tr("Sets a setting value."),
 		Example: "" +
 			"  " + os.Args[0] + " config set logging.level trace\n" +
 			"  " + os.Args[0] + " config set logging.file my-log.txt\n" +
@@ -51,7 +51,7 @@ func runSetCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if kind != reflect.Slice && len(args) > 2 {
-		feedback.Errorf("Can't set multiple values in key %v", key)
+		feedback.Errorf(tr("Can't set multiple values in key %v"), key)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -65,7 +65,7 @@ func runSetCommand(cmd *cobra.Command, args []string) {
 		var err error
 		value, err = strconv.ParseBool(args[1])
 		if err != nil {
-			feedback.Errorf("error parsing value: %v", err)
+			feedback.Errorf(tr("error parsing value: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}
@@ -73,7 +73,7 @@ func runSetCommand(cmd *cobra.Command, args []string) {
 	configuration.Settings.Set(key, value)
 
 	if err := configuration.Settings.WriteConfig(); err != nil {
-		feedback.Errorf("Writing config file: %v", err)
+		feedback.Errorf(tr("Writing config file: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }

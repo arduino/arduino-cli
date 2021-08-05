@@ -21,8 +21,11 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/i18n"
 	paths "github.com/arduino/go-paths-helper"
 )
+
+var tr = i18n.Tr
 
 type SourceFile struct {
 	// Sketch or Library pointer that this source file lives in

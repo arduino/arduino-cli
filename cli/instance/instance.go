@@ -24,11 +24,14 @@ import (
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+var tr = i18n.Tr
 
 // CreateAndInit return a new initialized instance.
 // If Create fails the CLI prints an error and exits since
@@ -37,11 +40,11 @@ import (
 func CreateAndInit() *rpc.Instance {
 	instance, err := Create()
 	if err != nil {
-		feedback.Errorf("Error creating instance: %v", err)
+		feedback.Errorf(tr("Error creating instance: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	for _, err := range Init(instance) {
-		feedback.Errorf("Error initializing instance: %v", err)
+		feedback.Errorf(tr("Error initializing instance: %v"), err)
 	}
 	return instance
 }

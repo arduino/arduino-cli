@@ -31,12 +31,12 @@ import (
 
 func initDepsCommand() *cobra.Command {
 	depsCommand := &cobra.Command{
-		Use:   "deps LIBRARY[@VERSION_NUMBER](S)",
-		Short: "Check dependencies status for the specified library.",
-		Long:  "Check dependencies status for the specified library.",
+		Use:   fmt.Sprintf("deps %s[@%s]...", tr("LIBRARY"), tr("VERSION_NUMBER")),
+		Short: tr("Check dependencies status for the specified library."),
+		Long:  tr("Check dependencies status for the specified library."),
 		Example: "" +
-			"  " + os.Args[0] + " lib deps AudioZero       # for the latest version.\n" +
-			"  " + os.Args[0] + " lib deps AudioZero@1.0.0 # for the specific version.",
+			"  " + os.Args[0] + " lib deps AudioZero       # " + tr("for the latest version.") + "\n" +
+			"  " + os.Args[0] + " lib deps AudioZero@1.0.0 # " + tr("for the specific version."),
 		Args: cobra.ExactArgs(1),
 		Run:  runDepsCommand,
 	}
@@ -47,7 +47,7 @@ func runDepsCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
 	libRef, err := ParseLibraryReferenceArgAndAdjustCase(instance, args[0])
 	if err != nil {
-		feedback.Errorf("Arguments error: %v", err)
+		feedback.Errorf(tr("Arguments error: %v"), err)
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
@@ -57,7 +57,7 @@ func runDepsCommand(cmd *cobra.Command, args []string) {
 		Version:  libRef.Version,
 	})
 	if err != nil {
-		feedback.Errorf("Error resolving dependencies for %s: %s", libRef, err)
+		feedback.Errorf(tr("Error resolving dependencies for %[1]s: %[2]s"), libRef, err)
 	}
 
 	feedback.PrintResult(&checkDepResult{deps: deps})
@@ -87,13 +87,13 @@ func outputDep(dep *rpc.LibraryDependencyStatus) string {
 	red := color.New(color.FgRed)
 	yellow := color.New(color.FgYellow)
 	if dep.GetVersionInstalled() == "" {
-		res += fmt.Sprintf("%s must be installed.\n",
+		res += fmt.Sprintf(tr("%s must be installed.")+"\n",
 			red.Sprintf("✕ %s %s", dep.GetName(), dep.GetVersionRequired()))
 	} else if dep.GetVersionInstalled() == dep.GetVersionRequired() {
-		res += fmt.Sprintf("%s is already installed.\n",
+		res += fmt.Sprintf(tr("%s is already installed.")+"\n",
 			green.Sprintf("✓ %s %s", dep.GetName(), dep.GetVersionRequired()))
 	} else {
-		res += fmt.Sprintf("%s is required but %s is currently installed.\n",
+		res += fmt.Sprintf(tr("%s is required but %s is currently installed.")+"\n",
 			yellow.Sprintf("✕ %s %s", dep.GetName(), dep.GetVersionRequired()),
 			yellow.Sprintf("%s", dep.GetVersionInstalled()))
 	}

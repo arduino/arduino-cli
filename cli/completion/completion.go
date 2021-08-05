@@ -20,11 +20,13 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/spf13/cobra"
 )
 
 var (
 	completionNoDesc bool //Disable completion description for shells that support it
+	tr               = i18n.Tr
 )
 
 // NewCommand created a new `completion` command
@@ -33,20 +35,20 @@ func NewCommand() *cobra.Command {
 		Use:       "completion [bash|zsh|fish] [--no-descriptions]",
 		ValidArgs: []string{"bash", "zsh", "fish"},
 		Args:      cobra.ExactArgs(1),
-		Short:     "Generates completion scripts",
-		Long:      "Generates completion scripts for various shells",
+		Short:     tr("Generates completion scripts"),
+		Long:      tr("Generates completion scripts for various shells"),
 		Example: "  " + os.Args[0] + " completion bash > completion.sh\n" +
 			"  " + "source completion.sh",
 		Run: run,
 	}
-	command.Flags().BoolVar(&completionNoDesc, "no-descriptions", false, "Disable completion description for shells that support it")
+	command.Flags().BoolVar(&completionNoDesc, "no-descriptions", false, tr("Disable completion description for shells that support it"))
 
 	return command
 }
 
 func run(cmd *cobra.Command, args []string) {
 	if completionNoDesc && (args[0] == "bash") {
-		feedback.Errorf("Error: command description is not supported by %v", args[0])
+		feedback.Errorf(tr("Error: command description is not supported by %v"), args[0])
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	switch args[0] {

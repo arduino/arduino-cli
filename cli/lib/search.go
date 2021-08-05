@@ -36,14 +36,14 @@ import (
 
 func initSearchCommand() *cobra.Command {
 	searchCommand := &cobra.Command{
-		Use:     "search [LIBRARY_NAME]",
-		Short:   "Searches for one or more libraries data.",
-		Long:    "Search for one or more libraries data (case insensitive search).",
+		Use:     fmt.Sprintf("search [%s]", tr("LIBRARY_NAME")),
+		Short:   tr("Searches for one or more libraries data."),
+		Long:    tr("Search for one or more libraries data (case insensitive search)."),
 		Example: "  " + os.Args[0] + " lib search audio",
 		Args:    cobra.ArbitraryArgs,
 		Run:     runSearchCommand,
 	}
-	searchCommand.Flags().BoolVar(&searchFlags.namesOnly, "names", false, "Show library names only.")
+	searchCommand.Flags().BoolVar(&searchFlags.namesOnly, "names", false, tr("Show library names only."))
 	return searchCommand
 }
 
@@ -54,7 +54,7 @@ var searchFlags struct {
 func runSearchCommand(cmd *cobra.Command, args []string) {
 	inst, status := instance.Create()
 	if status != nil {
-		feedback.Errorf("Error creating instance: %v", status)
+		feedback.Errorf(tr("Error creating instance: %v"), status)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -62,12 +62,12 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		Instance: inst,
 	}, output.ProgressBar())
 	if err != nil {
-		feedback.Errorf("Error updating library index: %v", err)
+		feedback.Errorf(tr("Error updating library index: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	for _, err := range instance.Init(inst) {
-		feedback.Errorf("Error initializing instance: %v", err)
+		feedback.Errorf(tr("Error initializing instance: %v"), err)
 	}
 
 	logrus.Info("Executing `arduino lib search`")
@@ -76,7 +76,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		Query:    (strings.Join(args, " ")),
 	})
 	if err != nil {
-		feedback.Errorf("Error searching for Library: %v", err)
+		feedback.Errorf(tr("Error searching for Library: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -122,7 +122,7 @@ func (res result) Data() interface{} {
 func (res result) String() string {
 	results := res.results.GetLibraries()
 	if len(results) == 0 {
-		return "No libraries matching your search."
+		return tr("No libraries matching your search.")
 	}
 
 	// get a sorted slice of results
@@ -133,12 +133,12 @@ func (res result) String() string {
 	var out strings.Builder
 
 	if res.results.GetStatus() == rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_FAILED {
-		out.WriteString("No libraries matching your search.\nDid you mean...\n")
+		out.WriteString(tr("No libraries matching your search.\nDid you mean...\n"))
 	}
 
 	for _, lib := range results {
 		if res.results.GetStatus() == rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS {
-			out.WriteString(fmt.Sprintf("Name: \"%s\"\n", lib.Name))
+			out.WriteString(fmt.Sprintf(tr(`Name: "%s"`)+"\n", lib.Name))
 			if res.namesOnly {
 				continue
 			}
@@ -158,23 +158,23 @@ func (res result) String() string {
 			}
 		}
 
-		out.WriteString(fmt.Sprintf("  Author: %s\n", latest.Author))
-		out.WriteString(fmt.Sprintf("  Maintainer: %s\n", latest.Maintainer))
-		out.WriteString(fmt.Sprintf("  Sentence: %s\n", latest.Sentence))
-		out.WriteString(fmt.Sprintf("  Paragraph: %s\n", latest.Paragraph))
-		out.WriteString(fmt.Sprintf("  Website: %s\n", latest.Website))
+		out.WriteString(fmt.Sprintf("  "+tr("Author: %s")+"\n", latest.Author))
+		out.WriteString(fmt.Sprintf("  "+tr("Maintainer: %s")+"\n", latest.Maintainer))
+		out.WriteString(fmt.Sprintf("  "+tr("Sentence: %s")+"\n", latest.Sentence))
+		out.WriteString(fmt.Sprintf("  "+tr("Paragraph: %s")+"\n", latest.Paragraph))
+		out.WriteString(fmt.Sprintf("  "+tr("Website: %s")+"\n", latest.Website))
 		if latest.License != "" {
-			out.WriteString(fmt.Sprintf("  License: %s\n", latest.License))
+			out.WriteString(fmt.Sprintf("  "+tr("License: %s")+"\n", latest.License))
 		}
-		out.WriteString(fmt.Sprintf("  Category: %s\n", latest.Category))
-		out.WriteString(fmt.Sprintf("  Architecture: %s\n", strings.Join(latest.Architectures, ", ")))
-		out.WriteString(fmt.Sprintf("  Types: %s\n", strings.Join(latest.Types, ", ")))
-		out.WriteString(fmt.Sprintf("  Versions: %s\n", strings.Replace(fmt.Sprint(versionsFromSearchedLibrary(lib)), " ", ", ", -1)))
+		out.WriteString(fmt.Sprintf("  "+tr("Category: %s")+"\n", latest.Category))
+		out.WriteString(fmt.Sprintf("  "+tr("Architecture: %s")+"\n", strings.Join(latest.Architectures, ", ")))
+		out.WriteString(fmt.Sprintf("  "+tr("Types: %s")+"\n", strings.Join(latest.Types, ", ")))
+		out.WriteString(fmt.Sprintf("  "+tr("Versions: %s")+"\n", strings.Replace(fmt.Sprint(versionsFromSearchedLibrary(lib)), " ", ", ", -1)))
 		if len(latest.ProvidesIncludes) > 0 {
-			out.WriteString(fmt.Sprintf("  Provides includes: %s\n", strings.Join(latest.ProvidesIncludes, ", ")))
+			out.WriteString(fmt.Sprintf("  "+tr("Provides includes: %s")+"\n", strings.Join(latest.ProvidesIncludes, ", ")))
 		}
 		if len(latest.Dependencies) > 0 {
-			out.WriteString(fmt.Sprintf("  Dependencies: %s\n", strings.Join(deps, ", ")))
+			out.WriteString(fmt.Sprintf("  "+tr("Dependencies: %s")+"\n", strings.Join(deps, ", ")))
 		}
 	}
 

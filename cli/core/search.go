@@ -45,14 +45,14 @@ var (
 
 func initSearchCommand() *cobra.Command {
 	searchCommand := &cobra.Command{
-		Use:     "search <keywords...>",
-		Short:   "Search for a core in Boards Manager.",
-		Long:    "Search for a core in Boards Manager using the specified keywords.",
+		Use:     fmt.Sprintf("search <%s...>", tr("keywords")),
+		Short:   tr("Search for a core in Boards Manager."),
+		Long:    tr("Search for a core in Boards Manager using the specified keywords."),
 		Example: "  " + os.Args[0] + " core search MKRZero -a -v",
 		Args:    cobra.ArbitraryArgs,
 		Run:     runSearchCommand,
 	}
-	searchCommand.Flags().BoolVarP(&allVersions, "all", "a", false, "Show all available core versions.")
+	searchCommand.Flags().BoolVarP(&allVersions, "all", "a", false, tr("Show all available core versions."))
 
 	return searchCommand
 }
@@ -63,7 +63,7 @@ const indexUpdateInterval = "24h"
 func runSearchCommand(cmd *cobra.Command, args []string) {
 	inst, status := instance.Create()
 	if status != nil {
-		feedback.Errorf("Error creating instance: %v", status)
+		feedback.Errorf(tr("Error creating instance: %v"), status)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -72,13 +72,13 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 			Instance: inst,
 		}, output.ProgressBar())
 		if err != nil {
-			feedback.Errorf("Error updating index: %v", err)
+			feedback.Errorf(tr("Error updating index: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}
 
 	for _, err := range instance.Init(inst) {
-		feedback.Errorf("Error initializing instance: %v", err)
+		feedback.Errorf(tr("Error initializing instance: %v"), err)
 	}
 
 	arguments := strings.ToLower(strings.Join(args, " "))
@@ -90,7 +90,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		AllVersions: allVersions,
 	})
 	if err != nil {
-		feedback.Errorf("Error searching for platforms: %v", err)
+		feedback.Errorf(tr("Error searching for platforms: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -111,17 +111,17 @@ func (sr searchResults) Data() interface{} {
 func (sr searchResults) String() string {
 	if len(sr.platforms) > 0 {
 		t := table.New()
-		t.SetHeader("ID", "Version", "Name")
+		t.SetHeader(tr("ID"), tr("Version"), tr("Name"))
 		for _, item := range sr.platforms {
 			name := item.GetName()
 			if item.Deprecated {
-				name = fmt.Sprintf("[DEPRECATED] %s", name)
+				name = fmt.Sprintf(tr("[DEPRECATED] %s"), name)
 			}
 			t.AddRow(item.GetId(), item.GetLatest(), name)
 		}
 		return t.Render()
 	}
-	return "No platforms matching your search."
+	return tr("No platforms matching your search.")
 }
 
 // indexesNeedUpdating returns whether one or more index files need updating.

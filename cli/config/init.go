@@ -16,6 +16,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -38,25 +39,25 @@ const defaultFileName = "arduino-cli.yaml"
 func initInitCommand() *cobra.Command {
 	initCommand := &cobra.Command{
 		Use:   "init",
-		Short: "Writes current configuration to a configuration file.",
-		Long:  "Creates or updates the configuration file in the data directory or custom directory with the current configuration settings.",
+		Short: tr("Writes current configuration to a configuration file."),
+		Long:  tr("Creates or updates the configuration file in the data directory or custom directory with the current configuration settings."),
 		Example: "" +
-			"  # Writes current configuration to the configuration file in the data directory.\n" +
+			"  # " + tr("Writes current configuration to the configuration file in the data directory.") + "\n" +
 			"  " + os.Args[0] + " config init\n" +
 			"  " + os.Args[0] + " config init --dest-dir /home/user/MyDirectory\n" +
 			"  " + os.Args[0] + " config init --dest-file /home/user/MyDirectory/my_settings.yaml",
 		Args: cobra.NoArgs,
 		Run:  runInitCommand,
 	}
-	initCommand.Flags().StringVar(&destDir, "dest-dir", "", "Sets where to save the configuration file.")
-	initCommand.Flags().StringVar(&destFile, "dest-file", "", "Sets where to save the configuration file.")
-	initCommand.Flags().BoolVar(&overwrite, "overwrite", false, "Overwrite existing config file.")
+	initCommand.Flags().StringVar(&destDir, "dest-dir", "", tr("Sets where to save the configuration file."))
+	initCommand.Flags().StringVar(&destFile, "dest-file", "", tr("Sets where to save the configuration file."))
+	initCommand.Flags().BoolVar(&overwrite, "overwrite", false, tr("Overwrite existing config file."))
 	return initCommand
 }
 
 func runInitCommand(cmd *cobra.Command, args []string) {
 	if destFile != "" && destDir != "" {
-		feedback.Errorf("Can't use both --dest-file and --dest-dir flags at the same time.")
+		feedback.Errorf(tr("Can't use both --dest-file and --dest-dir flags at the same time."))
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -68,7 +69,7 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	case destFile != "":
 		configFileAbsPath, err = paths.New(destFile).Abs()
 		if err != nil {
-			feedback.Errorf("Cannot find absolute path: %v", err)
+			feedback.Errorf(tr("Cannot find absolute path: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 
@@ -79,21 +80,21 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	default:
 		absPath, err = paths.New(destDir).Abs()
 		if err != nil {
-			feedback.Errorf("Cannot find absolute path: %v", err)
+			feedback.Errorf(tr("Cannot find absolute path: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 		configFileAbsPath = absPath.Join(defaultFileName)
 	}
 
 	if !overwrite && configFileAbsPath.Exist() {
-		feedback.Error("Config file already exists, use --overwrite to discard the existing one.")
+		feedback.Error(tr("Config file already exists, use --overwrite to discard the existing one."))
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	logrus.Infof("Writing config file to: %s", absPath)
 
 	if err := absPath.MkdirAll(); err != nil {
-		feedback.Errorf("Cannot create config file directory: %v", err)
+		feedback.Errorf(tr("Cannot create config file directory: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -102,11 +103,11 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	configuration.BindFlags(cmd, newSettings)
 
 	if err := newSettings.WriteConfigAs(configFileAbsPath.String()); err != nil {
-		feedback.Errorf("Cannot create config file: %v", err)
+		feedback.Errorf(tr("Cannot create config file: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	msg := "Config file written to: " + configFileAbsPath.String()
+	msg := fmt.Sprintf(tr("Config file written to: %s"), configFileAbsPath.String())
 	logrus.Info(msg)
 	feedback.Print(msg)
 }

@@ -70,37 +70,37 @@ func (pm *PackageManager) FindPlatformRelease(ref *PlatformReference) *cores.Pla
 func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReference) (*cores.PlatformRelease, []*cores.ToolRelease, error) {
 	targetPackage, exists := pm.Packages[item.Package]
 	if !exists {
-		return nil, nil, fmt.Errorf("package %s not found", item.Package)
+		return nil, nil, fmt.Errorf(tr("package %s not found"), item.Package)
 	}
 	platform, exists := targetPackage.Platforms[item.PlatformArchitecture]
 	if !exists {
-		return nil, nil, fmt.Errorf("platform %s not found in package %s", item.PlatformArchitecture, targetPackage.String())
+		return nil, nil, fmt.Errorf(tr("platform %[1]s not found in package %[2]s"), item.PlatformArchitecture, targetPackage.String())
 	}
 
 	var release *cores.PlatformRelease
 	if item.PlatformVersion != nil {
 		release = platform.FindReleaseWithVersion(item.PlatformVersion)
 		if release == nil {
-			return nil, nil, fmt.Errorf("required version %s not found for platform %s", item.PlatformVersion, platform.String())
+			return nil, nil, fmt.Errorf(tr("required version %[1]s not found for platform %[2]s"), item.PlatformVersion, platform.String())
 		}
 	} else {
 		release = platform.GetLatestRelease()
 		if release == nil {
-			return nil, nil, fmt.Errorf("platform %s has no available releases", platform.String())
+			return nil, nil, fmt.Errorf(tr("platform %s has no available releases"), platform.String())
 		}
 	}
 
 	// replaces "latest" with latest version too
 	toolDeps, err := pm.Packages.GetPlatformReleaseToolDependencies(release)
 	if err != nil {
-		return nil, nil, fmt.Errorf("getting tool dependencies for platform %s: %s", release.String(), err)
+		return nil, nil, fmt.Errorf(tr("getting tool dependencies for platform %[1]s: %[2]s"), release.String(), err)
 	}
 
 	// discovery dependencies differ from normal tool since we always want to use the latest \
 	// available version for the platform package
 	discoveryDependencies, err := pm.Packages.GetPlatformReleaseDiscoveryDependencies(release)
 	if err != nil {
-		return nil, nil, fmt.Errorf("getting discovery dependencies for platform %s: %s", release.String(), err)
+		return nil, nil, fmt.Errorf(tr("getting discovery dependencies for platform %[1]s: %[2]s"), release.String(), err)
 	}
 
 	return release, append(toolDeps, discoveryDependencies...), nil
@@ -111,7 +111,7 @@ func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReferenc
 func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *downloader.Config) (*downloader.Downloader, error) {
 	resource := tool.GetCompatibleFlavour()
 	if resource == nil {
-		return nil, fmt.Errorf("tool not available for your OS")
+		return nil, fmt.Errorf(tr("tool not available for your OS"))
 	}
 	return resource.Download(pm.DownloadDir, config)
 }

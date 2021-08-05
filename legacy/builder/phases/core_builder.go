@@ -19,6 +19,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -29,6 +30,8 @@ import (
 )
 
 type CoreBuilder struct{}
+
+var tr = i18n.Tr
 
 func (s *CoreBuilder) Run(ctx *types.Context) error {
 	coreBuildPath := ctx.CoreBuildPath
@@ -42,8 +45,8 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 	if coreBuildCachePath != nil {
 		if _, err := coreBuildCachePath.RelTo(ctx.BuildPath); err != nil {
 			logger := ctx.GetLogger()
-			logger.Println(constants.LOG_LEVEL_INFO, "Couldn't deeply cache core build: {0}", err)
-			logger.Println(constants.LOG_LEVEL_INFO, "Running normal build of the core...")
+			logger.Println(constants.LOG_LEVEL_INFO, tr("Couldn't deeply cache core build: {0}"), err)
+			logger.Println(constants.LOG_LEVEL_INFO, tr("Running normal build of the core..."))
 			coreBuildCachePath = nil
 			ctx.CoreBuildCachePath = nil
 		} else if err := coreBuildCachePath.MkdirAll(); err != nil {
@@ -101,7 +104,7 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 		if canUseArchivedCore {
 			// use archived core
 			if ctx.Verbose {
-				logger.Println(constants.LOG_LEVEL_INFO, "Using precompiled core: {0}", targetArchivedCore)
+				logger.Println(constants.LOG_LEVEL_INFO, tr("Using precompiled core: {0}"), targetArchivedCore)
 			}
 			return targetArchivedCore, variantObjectFiles, nil
 		}

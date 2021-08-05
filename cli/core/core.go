@@ -18,15 +18,18 @@ package core
 import (
 	"os"
 
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/spf13/cobra"
 )
+
+var tr = i18n.Tr
 
 // NewCommand created a new `core` command
 func NewCommand() *cobra.Command {
 	coreCommand := &cobra.Command{
 		Use:     "core",
-		Short:   "Arduino core operations.",
-		Long:    "Arduino core operations.",
+		Short:   tr("Arduino core operations."),
+		Long:    tr("Arduino core operations."),
 		Example: "  " + os.Args[0] + " core update-index",
 	}
 

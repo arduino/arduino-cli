@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/utils"
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/schollz/closestmatch"
 	"github.com/sirupsen/logrus"
 )
@@ -31,6 +32,8 @@ import (
 type Cpp struct {
 	headers map[string]libraries.List
 }
+
+var tr = i18n.Tr
 
 // NewCppResolver creates a new Cpp resolver
 func NewCppResolver() *Cpp {
@@ -54,7 +57,7 @@ func (resolver *Cpp) ScanFromLibrariesManager(lm *librariesmanager.LibrariesMana
 func (resolver *Cpp) ScanLibrary(lib *libraries.Library) error {
 	cppHeaders, err := lib.SourceHeaders()
 	if err != nil {
-		return fmt.Errorf("reading lib headers: %s", err)
+		return fmt.Errorf(tr("reading lib headers: %s"), err)
 	}
 	for _, cppHeader := range cppHeaders {
 		l := resolver.headers[cppHeader]

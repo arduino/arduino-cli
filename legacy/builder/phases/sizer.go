@@ -16,6 +16,7 @@
 package phases
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 
@@ -107,12 +108,12 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 
 	if textSize > maxTextSize {
 		logger.Println(constants.LOG_LEVEL_ERROR, constants.MSG_SIZER_TEXT_TOO_BIG)
-		return errors.New("text section exceeds available space in board")
+		return errors.New(tr("text section exceeds available space in board"))
 	}
 
 	if maxDataSize > 0 && dataSize > maxDataSize {
 		logger.Println(constants.LOG_LEVEL_ERROR, constants.MSG_SIZER_DATA_TOO_BIG)
-		return errors.New("data section exceeds available space in board")
+		return errors.New(tr("data section exceeds available space in board"))
 	}
 
 	if properties.Get(constants.PROPERTY_WARN_DATA_PERCENT) != "" {
@@ -131,13 +132,13 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 func execSizeRecipe(ctx *types.Context, properties *properties.Map) (textSize int, dataSize int, eepromSize int, resErr error) {
 	command, err := builder_utils.PrepareCommandForRecipe(properties, constants.RECIPE_SIZE_PATTERN, false)
 	if err != nil {
-		resErr = errors.New("Error while determining sketch size: " + err.Error())
+		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)
 		return
 	}
 
 	out, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.Show /* stderr */)
 	if err != nil {
-		resErr = errors.New("Error while determining sketch size: " + err.Error())
+		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)
 		return
 	}
 
@@ -146,23 +147,23 @@ func execSizeRecipe(ctx *types.Context, properties *properties.Map) (textSize in
 
 	textSize, err = computeSize(properties.Get(constants.RECIPE_SIZE_REGEXP), out)
 	if err != nil {
-		resErr = errors.New("Invalid size regexp: " + err.Error())
+		resErr = fmt.Errorf(tr("Invalid size regexp: %s"), err)
 		return
 	}
 	if textSize == -1 {
-		resErr = errors.New("Missing size regexp")
+		resErr = errors.New(tr("Missing size regexp"))
 		return
 	}
 
 	dataSize, err = computeSize(properties.Get(constants.RECIPE_SIZE_REGEXP_DATA), out)
 	if err != nil {
-		resErr = errors.New("Invalid data size regexp: " + err.Error())
+		resErr = fmt.Errorf(tr("Invalid data size regexp: %s"), err)
 		return
 	}
 
 	eepromSize, err = computeSize(properties.Get(constants.RECIPE_SIZE_REGEXP_EEPROM), out)
 	if err != nil {
-		resErr = errors.New("Invalid eeprom size regexp: " + err.Error())
+		resErr = fmt.Errorf(tr("Invalid eeprom size regexp: %s"), err)
 		return
 	}
 

@@ -71,7 +71,7 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 			return errors.WithStack(err)
 		}
 		if sketch.MainFile == nil {
-			return fmt.Errorf("main file missing from sketch")
+			return fmt.Errorf(tr("main file missing from sketch"))
 		}
 		sketch.BuildPath = ctx.BuildPath
 		ctx.SketchLocation = sketch.MainFile

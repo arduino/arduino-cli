@@ -34,7 +34,7 @@ func (pm *PackageManager) InstallPlatform(platformRelease *cores.PlatformRelease
 		platformRelease.Platform.Architecture,
 		platformRelease.Version.String())
 	if err := platformRelease.Resource.Install(pm.DownloadDir, pm.TempDir, destDir); err != nil {
-		return errors.Errorf("installing platform %s: %s", platformRelease, err)
+		return errors.Errorf(tr("installing platform %[1]s: %[2]s"), platformRelease, err)
 	}
 	if d, err := destDir.Abs(); err == nil {
 		platformRelease.InstallDir = d
@@ -42,7 +42,7 @@ func (pm *PackageManager) InstallPlatform(platformRelease *cores.PlatformRelease
 		return err
 	}
 	if err := pm.cacheInstalledJSON(platformRelease); err != nil {
-		return errors.Errorf("creating installed.json in %s: %s", platformRelease.InstallDir, err)
+		return errors.Errorf(tr("creating installed.json in %[1]s: %[2]s"), platformRelease.InstallDir, err)
 	}
 	return nil
 }
@@ -62,7 +62,7 @@ func (pm *PackageManager) cacheInstalledJSON(platformRelease *cores.PlatformRele
 // specified platformRelease.
 func (pm *PackageManager) RunPostInstallScript(platformRelease *cores.PlatformRelease) error {
 	if !platformRelease.IsInstalled() {
-		return errors.New("platform not installed")
+		return errors.New(tr("platform not installed"))
 	}
 	postInstallFilename := "post_install.sh"
 	if runtime.GOOS == "windows" {
@@ -105,16 +105,16 @@ func (pm *PackageManager) IsManagedPlatformRelease(platformRelease *cores.Platfo
 // UninstallPlatform remove a PlatformRelease.
 func (pm *PackageManager) UninstallPlatform(platformRelease *cores.PlatformRelease) error {
 	if platformRelease.InstallDir == nil {
-		return fmt.Errorf("platform not installed")
+		return fmt.Errorf(tr("platform not installed"))
 	}
 
 	// Safety measure
 	if !pm.IsManagedPlatformRelease(platformRelease) {
-		return fmt.Errorf("%s is not managed by package manager", platformRelease)
+		return fmt.Errorf(tr("%s is not managed by package manager"), platformRelease)
 	}
 
 	if err := platformRelease.InstallDir.RemoveAll(); err != nil {
-		return fmt.Errorf("removing platform files: %s", err)
+		return fmt.Errorf(tr("removing platform files: %s"), err)
 	}
 	platformRelease.InstallDir = nil
 	return nil
@@ -124,7 +124,7 @@ func (pm *PackageManager) UninstallPlatform(platformRelease *cores.PlatformRelea
 func (pm *PackageManager) InstallTool(toolRelease *cores.ToolRelease) error {
 	toolResource := toolRelease.GetCompatibleFlavour()
 	if toolResource == nil {
-		return fmt.Errorf("no compatible version of %s tools found for the current os", toolRelease.Tool.Name)
+		return fmt.Errorf(tr("no compatible version of %s tools found for the current os"), toolRelease.Tool.Name)
 	}
 	destDir := pm.PackagesDir.Join(
 		toolRelease.Tool.Package.Name,
@@ -157,16 +157,16 @@ func (pm *PackageManager) IsManagedToolRelease(toolRelease *cores.ToolRelease) b
 // UninstallTool remove a ToolRelease.
 func (pm *PackageManager) UninstallTool(toolRelease *cores.ToolRelease) error {
 	if toolRelease.InstallDir == nil {
-		return fmt.Errorf("tool not installed")
+		return fmt.Errorf(tr("tool not installed"))
 	}
 
 	// Safety measure
 	if !pm.IsManagedToolRelease(toolRelease) {
-		return fmt.Errorf("tool %s is not managed by package manager", toolRelease)
+		return fmt.Errorf(tr("tool %s is not managed by package manager"), toolRelease)
 	}
 
 	if err := toolRelease.InstallDir.RemoveAll(); err != nil {
-		return fmt.Errorf("removing tool files: %s", err)
+		return fmt.Errorf(tr("removing tool files: %s"), err)
 	}
 	toolRelease.InstallDir = nil
 	return nil

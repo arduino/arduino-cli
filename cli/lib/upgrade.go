@@ -30,10 +30,8 @@ import (
 func initUpgradeCommand() *cobra.Command {
 	listCommand := &cobra.Command{
 		Use:   "upgrade",
-		Short: "Upgrades installed libraries.",
-		Long: "This command upgrades an installed library to the latest available version. " +
-			"Multiple libraries can be passed separated by a space. If no arguments are provided, " +
-			"the command will upgrade all the installed libraries where an update is available.",
+		Short: tr("Upgrades installed libraries."),
+		Long:  tr("This command upgrades an installed library to the latest available version. Multiple libraries can be passed separated by a space. If no arguments are provided, the command will upgrade all the installed libraries where an update is available."),
 		Example: "  " + os.Args[0] + " lib upgrade \n" +
 			"  " + os.Args[0] + " lib upgrade Audio\n" +
 			"  " + os.Args[0] + " lib upgrade Audio ArduinoJson",
@@ -49,13 +47,13 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
 		err := lib.LibraryUpgradeAll(instance.Id, output.ProgressBar(), output.TaskProgress())
 		if err != nil {
-			feedback.Errorf("Error upgrading libraries: %v", err)
+			feedback.Errorf(tr("Error upgrading libraries: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	} else {
 		err := lib.LibraryUpgrade(instance.Id, args, output.ProgressBar(), output.TaskProgress())
 		if err != nil {
-			feedback.Errorf("Error upgrading libraries: %v", err)
+			feedback.Errorf(tr("Error upgrading libraries: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}

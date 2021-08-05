@@ -44,7 +44,7 @@ func addUtilityDirectory(library *Library) {
 func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library, error) {
 	libProperties, err := properties.Load(libraryDir.Join("library.properties").String())
 	if err != nil {
-		return nil, fmt.Errorf("loading library.properties: %s", err)
+		return nil, fmt.Errorf(tr("loading library.properties: %s"), err)
 	}
 
 	if libProperties.Get("maintainer") == "" && libProperties.Get("email") != "" {
@@ -106,7 +106,7 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 	}
 
 	if err := addExamples(library); err != nil {
-		return nil, errors.Errorf("scanning examples: %s", err)
+		return nil, errors.Errorf(tr("scanning examples: %s"), err)
 	}
 	library.Name = libraryDir.Base()
 	library.RealName = strings.TrimSpace(libProperties.Get("name"))
@@ -137,7 +137,7 @@ func makeLegacyLibrary(path *paths.Path, location LibraryLocation) (*Library, er
 		Version:       semver.MustParse(""),
 	}
 	if err := addExamples(library); err != nil {
-		return nil, errors.Errorf("scanning examples: %s", err)
+		return nil, errors.Errorf(tr("scanning examples: %s"), err)
 	}
 	addUtilityDirectory(library)
 	return library, nil

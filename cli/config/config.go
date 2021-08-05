@@ -18,14 +18,17 @@ package config
 import (
 	"os"
 
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/spf13/cobra"
 )
+
+var tr = i18n.Tr
 
 // NewCommand created a new `config` command
 func NewCommand() *cobra.Command {
 	configCommand := &cobra.Command{
 		Use:     "config",
-		Short:   "Arduino configuration commands.",
+		Short:   tr("Arduino configuration commands."),
 		Example: "  " + os.Args[0] + " config init",
 	}
 

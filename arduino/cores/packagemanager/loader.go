@@ -62,19 +62,19 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) []*status.
 	pm.Log.Infof("Loading hardware from: %s", path)
 	statuses := []*status.Status{}
 	if err := path.ToAbs(); err != nil {
-		s := status.Newf(codes.FailedPrecondition, "find abs path: %s", err)
+		s := status.Newf(codes.FailedPrecondition, tr("find abs path: %s"), err)
 		return append(statuses, s)
 	}
 
 	if path.IsNotDir() {
-		s := status.Newf(codes.FailedPrecondition, "%s is not a directory", path)
+		s := status.Newf(codes.FailedPrecondition, tr("%s is not a directory"), path)
 		return append(statuses, s)
 	}
 
 	// Scan subdirs
 	packagersPaths, err := path.ReadDir()
 	if err != nil {
-		s := status.Newf(codes.FailedPrecondition, "reading %s directory: %s", path, err)
+		s := status.Newf(codes.FailedPrecondition, tr("reading %[1]s directory: %[2]s"), path, err)
 		return append(statuses, s)
 	}
 	packagersPaths.FilterOutHiddenFiles()
@@ -104,7 +104,7 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) []*status.
 		// Follow symlinks
 		err := packagerPath.FollowSymLink() // ex: .arduino15/packages/arduino/
 		if err != nil {
-			s := status.Newf(codes.Internal, "following possible symlink %s: %s", path, err)
+			s := status.Newf(codes.Internal, tr("following possible symlink %[1]s: %[2]s"), path, err)
 			statuses = append(statuses, s)
 			continue
 		}
@@ -158,7 +158,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 
 	platformsDirs, err := packageDir.ReadDir()
 	if err != nil {
-		s := status.Newf(codes.FailedPrecondition, "reading directory %s: %s", packageDir, err)
+		s := status.Newf(codes.FailedPrecondition, tr("reading directory %[1]s: %[2]s"), packageDir, err)
 		return append(statuses, s)
 	}
 
@@ -185,7 +185,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, platformPath *paths.Path) *status.Status {
 	// This is not a platform
 	if platformPath.IsNotDir() {
-		return status.Newf(codes.NotFound, "path is not a platform directory: %s", platformPath)
+		return status.Newf(codes.NotFound, tr("path is not a platform directory: %s"), platformPath)
 	}
 
 	architecture := platformPath.Base()
@@ -196,14 +196,14 @@ func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, platformPat
 	// We identify them by checking where is the bords.txt file
 	possibleBoardTxtPath := platformPath.Join("boards.txt")
 	if exist, err := possibleBoardTxtPath.ExistCheck(); err != nil {
-		return status.Newf(codes.FailedPrecondition, "looking for boards.txt in %s: %s", possibleBoardTxtPath, err)
+		return status.Newf(codes.FailedPrecondition, tr("looking for boards.txt in %[1]s: %[2]s"), possibleBoardTxtPath, err)
 	} else if exist {
 		// case: ARCHITECTURE/boards.txt
 
 		platformTxtPath := platformPath.Join("platform.txt")
 		platformProperties, err := properties.SafeLoad(platformTxtPath.String())
 		if err != nil {
-			return status.Newf(codes.FailedPrecondition, "loading platform.txt: %v", err)
+			return status.Newf(codes.FailedPrecondition, tr("loading platform.txt: %v"), err)
 		}
 
 		version := semver.MustParse(platformProperties.Get("version"))
@@ -223,7 +223,7 @@ func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, platformPat
 			// Parse the bundled index and merge to the general index
 			index, err := pm.LoadPackageIndexFromFile(packageBundledIndexPath)
 			if err != nil {
-				return status.Newf(codes.FailedPrecondition, "parsing IDE bundled index: %s", err)
+				return status.Newf(codes.FailedPrecondition, tr("parsing IDE bundled index: %s"), err)
 			}
 
 			// Now export the bundled index in a temporary core.Packages to retrieve the bundled package version
@@ -252,7 +252,7 @@ func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, platformPat
 			pm.Log.Infof("Package is built-in")
 		}
 		if err := pm.loadPlatformRelease(release, platformPath); err != nil {
-			return status.Newf(codes.FailedPrecondition, "loading platform release %s: %s", release, err)
+			return status.Newf(codes.FailedPrecondition, tr("loading platform release %[1]s: %[2]s"), release, err)
 		}
 		pm.Log.WithField("platform", release).Infof("Loaded platform")
 
@@ -263,24 +263,24 @@ func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, platformPat
 		platform := targetPackage.GetOrCreatePlatform(architecture)
 		versionDirs, err := platformPath.ReadDir()
 		if err != nil {
-			return status.Newf(codes.FailedPrecondition, "reading dir %s: %s", platformPath, err)
+			return status.Newf(codes.FailedPrecondition, tr("reading dir %[1]s: %[2]s"), platformPath, err)
 		}
 		versionDirs.FilterDirs()
 		versionDirs.FilterOutHiddenFiles()
 		for _, versionDir := range versionDirs {
 			if exist, err := versionDir.Join("boards.txt").ExistCheck(); err != nil {
-				return status.Newf(codes.FailedPrecondition, "opening boards.txt: %s", err)
+				return status.Newf(codes.FailedPrecondition, tr("opening boards.txt: %s"), err)
 			} else if !exist {
 				continue
 			}
 
 			version, err := semver.Parse(versionDir.Base())
 			if err != nil {
-				return status.Newf(codes.FailedPrecondition, "invalid version dir %s: %s", versionDir, err)
+				return status.Newf(codes.FailedPrecondition, tr("invalid version dir %[1]s: %[2]s"), versionDir, err)
 			}
 			release := platform.GetOrCreateRelease(version)
 			if err := pm.loadPlatformRelease(release, versionDir); err != nil {
-				return status.Newf(codes.FailedPrecondition, "loading platform release %s: %s", release, err)
+				return status.Newf(codes.FailedPrecondition, tr("loading platform release %[1]s: %[2]s"), release, err)
 			}
 			pm.Log.WithField("platform", release).Infof("Loaded platform")
 		}
@@ -303,7 +303,7 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 	// if we don't load it some information about the platform is lost
 	if installedJSONPath.Exist() {
 		if _, err := pm.LoadPackageIndexFromFile(installedJSONPath); err != nil {
-			return fmt.Errorf("loading %s: %s", installedJSONPath, err)
+			return fmt.Errorf(tr("loading %[1]s: %[2]s"), installedJSONPath, err)
 		}
 	}
 
@@ -312,12 +312,12 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 	if p, err := properties.SafeLoad(platformTxtPath.String()); err == nil {
 		platform.Properties.Merge(p)
 	} else {
-		return fmt.Errorf("loading %s: %s", platformTxtPath, err)
+		return fmt.Errorf(tr("loading %[1]s: %[2]s"), platformTxtPath, err)
 	}
 	if p, err := properties.SafeLoad(platformTxtLocalPath.String()); err == nil {
 		platform.Properties.Merge(p)
 	} else {
-		return fmt.Errorf("loading %s: %s", platformTxtLocalPath, err)
+		return fmt.Errorf(tr("loading %[1]s: %[2]s"), platformTxtLocalPath, err)
 	}
 
 	if platform.Properties.SubTree("discovery").Size() > 0 {
@@ -346,7 +346,7 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 	}
 
 	if err := pm.loadBoards(platform); err != nil {
-		return fmt.Errorf("loading boards: %s", err)
+		return fmt.Errorf(tr("loading boards: %s"), err)
 	}
 
 	return nil
@@ -361,7 +361,7 @@ func (pm *PackageManager) loadProgrammer(programmerProperties *properties.Map) *
 
 func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
 	if platform.InstallDir == nil {
-		return fmt.Errorf("platform not installed")
+		return fmt.Errorf(tr("platform not installed"))
 	}
 
 	boardsTxtPath := platform.InstallDir.Join("boards.txt")
@@ -424,7 +424,7 @@ func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
 	}
 
 	if len(skippedBoards) > 0 {
-		return fmt.Errorf("skipping loading of boards %s: malformed custom board options", strings.Join(skippedBoards, ", "))
+		return fmt.Errorf(tr("skipping loading of boards %s: malformed custom board options"), strings.Join(skippedBoards, ", "))
 	}
 
 	return nil
@@ -474,7 +474,7 @@ func (pm *PackageManager) loadToolsFromPackage(targetPackage *cores.Package, too
 	statuses := []*status.Status{}
 	toolsPaths, err := toolsPath.ReadDir()
 	if err != nil {
-		s := status.Newf(codes.FailedPrecondition, "reading directory %s: %s", toolsPath, err)
+		s := status.Newf(codes.FailedPrecondition, tr("reading directory %[1]s: %[2]s"), toolsPath, err)
 		return append(statuses, s)
 	}
 	toolsPaths.FilterDirs()
@@ -483,7 +483,7 @@ func (pm *PackageManager) loadToolsFromPackage(targetPackage *cores.Package, too
 		name := toolPath.Base()
 		tool := targetPackage.GetOrCreateTool(name)
 		if err = pm.loadToolReleasesFromTool(tool, toolPath); err != nil {
-			s := status.Newf(codes.FailedPrecondition, "loading tool release in %s: %s", toolPath, err)
+			s := status.Newf(codes.FailedPrecondition, tr("loading tool release in %[1]s: %[2]s"), toolPath, err)
 			statuses = append(statuses, s)
 		}
 	}
@@ -516,7 +516,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectories(dirs paths.PathList) []
 	statuses := []*status.Status{}
 	for _, dir := range dirs {
 		if err := pm.LoadToolsFromBundleDirectory(dir); err != nil {
-			statuses = append(statuses, status.Newf(codes.FailedPrecondition, "loading bundled tools from %s: %s", dir, err))
+			statuses = append(statuses, status.Newf(codes.FailedPrecondition, tr("loading bundled tools from %[1]s: %[2]s"), dir, err))
 		}
 	}
 	return statuses
@@ -552,7 +552,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath *paths.Path) er
 		return nil
 	}
 	if err := filepath.Walk(toolsPath.String(), findBuiltInToolsVersionsTxt); err != nil {
-		return fmt.Errorf("searching for builtin_tools_versions.txt in %s: %s", toolsPath, err)
+		return fmt.Errorf(tr("searching for builtin_tools_versions.txt in %[1]s: %[2]s"), toolsPath, err)
 	}
 
 	if builtinToolsVersionsTxtPath != "" {
@@ -561,12 +561,12 @@ func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath *paths.Path) er
 		pm.Log.Infof("Found builtin_tools_versions.txt")
 		toolPath, err := paths.New(builtinToolsVersionsTxtPath).Parent().Abs()
 		if err != nil {
-			return fmt.Errorf("getting parent dir of %s: %s", builtinToolsVersionsTxtPath, err)
+			return fmt.Errorf(tr("getting parent dir of %[1]s: %[2]s"), builtinToolsVersionsTxtPath, err)
 		}
 
 		all, err := properties.Load(builtinToolsVersionsTxtPath)
 		if err != nil {
-			return fmt.Errorf("reading %s: %s", builtinToolsVersionsTxtPath, err)
+			return fmt.Errorf(tr("reading %[1]s: %[2]s"), builtinToolsVersionsTxtPath, err)
 		}
 
 		for packager, toolsData := range all.FirstLevelOf() {

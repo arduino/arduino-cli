@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/globals"
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 )
@@ -52,6 +53,8 @@ type BoardMetadata struct {
 	Port string `json:"port,omitepty"`
 }
 
+var tr = i18n.Tr
+
 // New creates an Sketch instance by reading all the files composing a sketch and grouping them
 // by file type.
 func New(path *paths.Path) (*Sketch, error) {
@@ -67,7 +70,7 @@ func New(path *paths.Path) (*Sketch, error) {
 			if mainFile == nil {
 				mainFile = candidateSketchMainFile
 			} else {
-				return nil, errors.Errorf("multiple main sketch files found (%v, %v)",
+				return nil, errors.Errorf(tr("multiple main sketch files found (%[1]v, %[2]v)"),
 					mainFile,
 					candidateSketchMainFile,
 				)
@@ -94,7 +97,7 @@ func New(path *paths.Path) (*Sketch, error) {
 	}
 
 	if mainFile == nil {
-		return nil, fmt.Errorf("can't find main Sketch file in %s", path)
+		return nil, fmt.Errorf(tr("can't find main Sketch file in %s"), path)
 	}
 
 	sketchFolderFiles, err := sketch.supportedFiles()
@@ -135,7 +138,7 @@ func New(path *paths.Path) (*Sketch, error) {
 				sketch.RootFolderFiles.Add(p)
 			}
 		} else {
-			return nil, errors.Errorf("unknown sketch file extension '%s'", ext)
+			return nil, errors.Errorf(tr("unknown sketch file extension '%s'"), ext)
 		}
 	}
 
@@ -144,7 +147,7 @@ func New(path *paths.Path) (*Sketch, error) {
 	sort.Sort(&sketch.RootFolderFiles)
 
 	if err := sketch.importMetadata(); err != nil {
-		return nil, fmt.Errorf("importing sketch metadata: %s", err)
+		return nil, fmt.Errorf(tr("importing sketch metadata: %s"), err)
 	}
 	return sketch, nil
 }
@@ -181,7 +184,7 @@ func (s *Sketch) importMetadata() error {
 
 	content, err := sketchJSON.ReadFile()
 	if err != nil {
-		return fmt.Errorf("reading sketch metadata %s: %s", sketchJSON, err)
+		return fmt.Errorf(tr("reading sketch metadata %[1]s: %[2]s"), sketchJSON, err)
 	}
 	var meta Metadata
 	err = json.Unmarshal(content, &meta)
@@ -189,7 +192,7 @@ func (s *Sketch) importMetadata() error {
 		if s.Metadata == nil {
 			s.Metadata = new(Metadata)
 		}
-		return fmt.Errorf("encoding sketch metadata: %s", err)
+		return fmt.Errorf(tr("encoding sketch metadata: %s"), err)
 	}
 	s.Metadata = &meta
 	return nil
@@ -200,12 +203,12 @@ func (s *Sketch) importMetadata() error {
 func (s *Sketch) ExportMetadata() error {
 	d, err := json.MarshalIndent(&s.Metadata, "", "  ")
 	if err != nil {
-		return fmt.Errorf("decoding sketch metadata: %s", err)
+		return fmt.Errorf(tr("decoding sketch metadata: %s"), err)
 	}
 
 	sketchJSON := s.FullPath.Join("sketch.json")
 	if err := sketchJSON.WriteFile(d); err != nil {
-		return fmt.Errorf("writing sketch metadata %s: %s", sketchJSON, err)
+		return fmt.Errorf(tr("writing sketch metadata %[1]s: %[2]s"), sketchJSON, err)
 	}
 	return nil
 }
@@ -222,7 +225,7 @@ func (s *Sketch) ExportMetadata() error {
 func (s *Sketch) checkSketchCasing() error {
 	files, err := s.FullPath.ReadDir()
 	if err != nil {
-		return errors.Errorf("reading files: %v", err)
+		return errors.Errorf(tr("reading files: %v"), err)
 	}
 	files.FilterOutDirs()
 
@@ -252,7 +255,7 @@ type InvalidSketchFolderNameError struct {
 }
 
 func (e *InvalidSketchFolderNameError) Error() string {
-	return fmt.Sprintf("no valid sketch found in %s: missing %s", e.SketchFolder, e.SketchFile)
+	return fmt.Sprintf(tr("no valid sketch found in %[1]s: missing %[2]s"), e.SketchFolder, e.SketchFile)
 }
 
 // CheckForPdeFiles returns all files ending with .pde extension

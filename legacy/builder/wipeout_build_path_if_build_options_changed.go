@@ -41,12 +41,12 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 
 	var opts *properties.Map
 	if err := json.Unmarshal([]byte(buildOptionsJson), &opts); err != nil || opts == nil {
-	    panic(constants.BUILD_OPTIONS_FILE + " is invalid")
+		panic(constants.BUILD_OPTIONS_FILE + " is invalid")
 	}
 
 	var prevOpts *properties.Map
 	if err := json.Unmarshal([]byte(previousBuildOptionsJson), &prevOpts); err != nil || prevOpts == nil {
-		ctx.GetLogger().Println(constants.LOG_LEVEL_DEBUG, constants.MSG_BUILD_OPTIONS_INVALID + constants.MSG_REBUILD_ALL, constants.BUILD_OPTIONS_FILE)
+		ctx.GetLogger().Println(constants.LOG_LEVEL_DEBUG, constants.MSG_BUILD_OPTIONS_INVALID+constants.MSG_REBUILD_ALL, constants.BUILD_OPTIONS_FILE)
 		return doCleanup(ctx.BuildPath)
 	}
 
@@ -82,11 +82,11 @@ func doCleanup(buildPath *paths.Path) error {
 	// logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED + constants.MSG_REBUILD_ALL)
 
 	if files, err := buildPath.ReadDir(); err != nil {
-		return errors.WithMessage(err, "cleaning build path")
+		return errors.WithMessage(err, tr("cleaning build path"))
 	} else {
 		for _, file := range files {
 			if err := file.RemoveAll(); err != nil {
-				return errors.WithMessage(err, "cleaning build path")
+				return errors.WithMessage(err, tr("cleaning build path"))
 			}
 		}
 	}

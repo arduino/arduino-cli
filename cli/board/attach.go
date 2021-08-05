@@ -17,6 +17,7 @@ package board
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -32,9 +33,9 @@ import (
 
 func initAttachCommand() *cobra.Command {
 	attachCommand := &cobra.Command{
-		Use:   "attach <port>|<FQBN> [sketchPath]",
-		Short: "Attaches a sketch to a board.",
-		Long:  "Attaches a sketch to a board.",
+		Use:   fmt.Sprintf("attach <%s>|<%s> [%s]", tr("port"), tr("FQBN"), tr("sketchPath")),
+		Short: tr("Attaches a sketch to a board."),
+		Long:  tr("Attaches a sketch to a board."),
 		Example: "  " + os.Args[0] + " board attach serial:///dev/ttyACM0\n" +
 			"  " + os.Args[0] + " board attach serial:///dev/ttyACM0 HelloWorld\n" +
 			"  " + os.Args[0] + " board attach arduino:samd:mkr1000",
@@ -42,7 +43,7 @@ func initAttachCommand() *cobra.Command {
 		Run:  runAttachCommand,
 	}
 	attachCommand.Flags().StringVar(&attachFlags.searchTimeout, "timeout", "5s",
-		"The connected devices search timeout, raise it if your board doesn't show up (e.g. to 10s).")
+		fmt.Sprintf(tr("The connected devices search timeout, raise it if your board doesn't show up (e.g. to %s)."), "10s"))
 	return attachCommand
 }
 
@@ -66,7 +67,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		SketchPath:    path.String(),
 		SearchTimeout: attachFlags.searchTimeout,
 	}, output.TaskProgress()); err != nil {
-		feedback.Errorf("Attach board error: %v", err)
+		feedback.Errorf(tr("Attach board error: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }
@@ -79,7 +80,7 @@ func initSketchPath(sketchPath *paths.Path) *paths.Path {
 
 	wd, err := paths.Getwd()
 	if err != nil {
-		feedback.Errorf("Couldn't get current working directory: %v", err)
+		feedback.Errorf(tr("Couldn't get current working directory: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	logrus.Infof("Reading sketch from dir: %s", wd)

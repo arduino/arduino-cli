@@ -16,6 +16,7 @@
 package monitors
 
 import (
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/pkg/errors"
 	"go.bug.st/serial"
 )
@@ -23,6 +24,8 @@ import (
 const (
 	defaultBaudRate = 9600
 )
+
+var tr = i18n.Tr
 
 // SerialMonitor is a monitor for serial ports
 type SerialMonitor struct {
@@ -38,7 +41,7 @@ func OpenSerialMonitor(portName string, baudRate int) (*SerialMonitor, error) {
 
 	port, err := serial.Open(portName, &serial.Mode{BaudRate: baudRate})
 	if err != nil {
-		return nil, errors.Wrap(err, "error opening serial monitor")
+		return nil, errors.Wrap(err, tr("error opening serial monitor"))
 	}
 
 	return &SerialMonitor{

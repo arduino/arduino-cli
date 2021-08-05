@@ -29,8 +29,8 @@ import (
 func initDeleteCommand() *cobra.Command {
 	addCommand := &cobra.Command{
 		Use:   "delete",
-		Short: "Deletes a settings key and all its sub keys.",
-		Long:  "Deletes a settings key and all its sub keys.",
+		Short: tr("Deletes a settings key and all its sub keys."),
+		Long:  tr("Deletes a settings key and all its sub keys."),
 		Example: "" +
 			"  " + os.Args[0] + " config delete board_manager\n" +
 			"  " + os.Args[0] + " config delete board_manager.additional_urls",
@@ -54,7 +54,7 @@ func runDeleteCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if !exists {
-		feedback.Errorf("Settings key doesn't exist")
+		feedback.Errorf(tr("Settings key doesn't exist"))
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -64,7 +64,7 @@ func runDeleteCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if err := updatedSettings.WriteConfigAs(configuration.Settings.ConfigFileUsed()); err != nil {
-		feedback.Errorf("Can't write config file: %v", err)
+		feedback.Errorf(tr("Can't write config file: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }

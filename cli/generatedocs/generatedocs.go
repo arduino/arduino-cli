@@ -20,25 +20,29 @@ import (
 	"path/filepath"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
 )
 
-var outputDir = ""
+var (
+	outputDir = ""
+	tr        = i18n.Tr
+)
 
 // NewCommand created a new `generatedocs` command
 func NewCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:     "generate-docs",
-		Short:   "Generates bash completion and command manpages.",
-		Long:    "Generates bash completion and command manpages.",
+		Short:   tr("Generates bash completion and command manpages."),
+		Long:    tr("Generates bash completion and command manpages."),
 		Example: "  " + os.Args[0] + " generate-docs bash-completions",
 		Hidden:  true,
 	}
 
 	command.PersistentFlags().StringVarP(&outputDir, "output-dir", "o", "",
-		"Directory where to save generated files. Default is './docs', the directory must exist.")
+		tr("Directory where to save generated files. Default is './docs', the directory must exist."))
 	command.AddCommand(&cobra.Command{
 		Use:  "manpage",
 		Args: cobra.NoArgs,
@@ -72,7 +76,7 @@ func generateManPages(cmd *cobra.Command, args []string) {
 	}
 	logrus.WithField("outputDir", outputDir).Info("Generating manpages")
 	header := &doc.GenManHeader{
-		Title:   "ARDUINO COMMAND LINE MANUAL",
+		Title:   tr("ARDUINO COMMAND LINE MANUAL"),
 		Section: "1",
 	}
 	err := doc.GenManTree(cmd.Root(), header, outputDir)

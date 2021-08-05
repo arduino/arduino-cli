@@ -30,18 +30,18 @@ import (
 func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetailsResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New("invalid instance")
+		return nil, errors.New(tr("invalid instance"))
 	}
 
 	fqbn, err := cores.ParseFQBN(req.GetFqbn())
 	if err != nil {
-		return nil, fmt.Errorf("parsing fqbn: %s", err)
+		return nil, fmt.Errorf(tr("parsing fqbn: %s"), err)
 	}
 
 	boardPackage, boardPlatform, board, boardProperties, boardRefPlatform, err := pm.ResolveFQBN(fqbn)
 
 	if err != nil {
-		return nil, fmt.Errorf("loading board data: %s", err)
+		return nil, fmt.Errorf(tr("loading board data: %s"), err)
 	}
 
 	details := &rpc.BoardDetailsResponse{}
