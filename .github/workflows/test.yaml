@@ -91,7 +91,7 @@ jobs:
         if: >
           matrix.operating-system == 'ubuntu-20.04' &&
           github.event_name == 'push'
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2.0.2
         with:
           file: ./coverage_unit.txt
           flags: unit
@@ -100,7 +100,7 @@ jobs:
         if: >
           matrix.operating-system == 'ubuntu-20.04' &&
           github.event_name == 'push'
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2.0.2
         with:
           file: ./coverage_legacy.txt
           flags: unit
@@ -109,7 +109,7 @@ jobs:
         if: >
           matrix.operating-system == 'ubuntu-20.04' &&
           github.event_name == 'push'
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2.0.2
         with:
           file: ./coverage_integ.txt
           flags: integ
