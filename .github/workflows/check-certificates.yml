@@ -56,7 +56,7 @@ jobs:
       # See: https://github.com/rtCamp/action-slack-notify
       - name: Slack notification of certificate verification failure
         if: failure()
-        uses: rtCamp/action-slack-notify@v2.1.0
+        uses: rtCamp/action-slack-notify@v2.2.0
         env:
           SLACK_WEBHOOK: ${{ secrets.TEAM_TOOLING_CHANNEL_SLACK_WEBHOOK }}
           SLACK_MESSAGE: |
@@ -110,7 +110,7 @@ jobs:
       - name: Slack notification of pending certificate expiration
         # Don't send spurious expiration notification if verification fails
         if: failure() && steps.check-expiration.outcome == 'failure'
-        uses: rtCamp/action-slack-notify@v2.1.0
+        uses: rtCamp/action-slack-notify@v2.2.0
         env:
           SLACK_WEBHOOK: ${{ secrets.TEAM_TOOLING_CHANNEL_SLACK_WEBHOOK }}
           SLACK_MESSAGE: |
