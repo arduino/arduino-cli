@@ -167,6 +167,8 @@ message BoardAttachResponse {
 message BoardListRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
+  // Search for boards for the given time (in milliseconds)
+  int64 timeout = 2;
 }
 
 message BoardListResponse {

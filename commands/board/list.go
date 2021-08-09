@@ -24,6 +24,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/discovery"
@@ -173,10 +174,7 @@ func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.B
 }
 
 // List FIXMEDOC
-func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
-	m.Lock()
-	defer m.Unlock()
-
+func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 	tags := map[string]string{}
 	// Use defer func() to evaluate tags map when function returns
 	// and set success flag inspecting the error named return parameter
@@ -188,21 +186,27 @@ func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 		stats.Incr("compile", stats.M(tags)...)
 	}()
 
-	pm := commands.GetPackageManager(instanceID)
+	pm := commands.GetPackageManager(req.GetInstance().Id)
 	if pm == nil {
 		return nil, errors.New(tr("invalid instance"))
 	}
 
-	if err := pm.DiscoveryManager().RunAll(); err != nil {
+	dm := pm.DiscoveryManager()
+	if err := dm.RunAll(); err != nil {
 		return nil, err
 	}
-	if err := pm.DiscoveryManager().StartAll(); err != nil {
+	if err := dm.StartAll(); err != nil {
 		return nil, err
 	}
-	ports := pm.DiscoveryManager().List()
+	defer func() {
+		if err := dm.StopAll(); err != nil {
+			logrus.Error(err)
+		}
+	}()
+	time.Sleep(time.Duration(req.GetTimeout()) * time.Millisecond)
 
 	retVal := []*rpc.DetectedPort{}
-	for _, port := range ports {
+	for _, port := range pm.DiscoveryManager().List() {
 		boards, err := identify(pm, port)
 		if err != nil {
 			return nil, err

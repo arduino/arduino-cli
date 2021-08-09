@@ -41,8 +41,8 @@ func initListCommand() *cobra.Command {
 		Run:     runListCommand,
 	}
 
-	listCommand.Flags().StringVar(&listFlags.timeout, "timeout", "0s",
-		fmt.Sprintf(tr("The connected devices search timeout, raise it if your board doesn't show up (e.g. to %s)."), "10s"))
+	listCommand.Flags().DurationVar(&listFlags.timeout, "timeout", 0,
+		tr("The connected devices search timeout, raise it if your board doesn't show up e.g.: 10s"))
 	listCommand.Flags().BoolVarP(&listFlags.watch, "watch", "w", false,
 		tr("Command keeps running and prints list of connected boards whenever there is a change."))
 
@@ -50,7 +50,7 @@ func initListCommand() *cobra.Command {
 }
 
 var listFlags struct {
-	timeout string // Expressed in a parsable duration, is the timeout for the list and attach commands.
+	timeout time.Duration
 	watch   bool
 }
 
@@ -62,20 +62,15 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		os.Exit(0)
 	}
 
-	if timeout, err := time.ParseDuration(listFlags.timeout); err != nil {
-		feedback.Errorf(tr("Invalid timeout: %v"), err)
-		os.Exit(errorcodes.ErrBadArgument)
-	} else {
-		time.Sleep(timeout)
-	}
-
 	inst := instance.CreateAndInit()
-	ports, err := board.List(inst.GetId())
+	ports, err := board.List(&rpc.BoardListRequest{
+		Instance: inst,
+		Timeout:  listFlags.timeout.Milliseconds(),
+	})
 	if err != nil {
 		feedback.Errorf(tr("Error detecting boards: %v"), err)
 		os.Exit(errorcodes.ErrNetwork)
 	}
-
 	feedback.PrintResult(result{ports})
 }
 
