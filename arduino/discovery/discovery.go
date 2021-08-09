@@ -17,6 +17,7 @@ package discovery
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"sync"
 	"time"
@@ -27,6 +28,17 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
+)
+
+// To work correctly a Pluggable Discovery must respect the state machine specifed on the documentation:
+// https://arduino.github.io/arduino-cli/latest/pluggable-discovery-specification/#state-machine
+// States a PluggableDiscovery can be in
+const (
+	Alive int = iota
+	Idling
+	Running
+	Syncing
+	Dead
 )
 
 // PluggableDiscovery is a tool that detects communication ports to interact
@@ -40,8 +52,7 @@ type PluggableDiscovery struct {
 	// All the following fields are guarded by statusMutex
 	statusMutex           sync.Mutex
 	incomingMessagesError error
-	alive                 bool
-	eventsMode            bool
+	state                 int
 	eventChan             chan<- *Event
 	cachedPorts           map[string]*Port
 }
@@ -114,6 +125,7 @@ func New(id string, args ...string) (*PluggableDiscovery, error) {
 		process:              proc,
 		incomingMessagesChan: messageChan,
 		outgoingCommandsPipe: stdin,
+		state:                Dead,
 	}
 	go disc.jsonDecodeLoop(stdout, messageChan)
 	return disc, nil
@@ -132,7 +144,7 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 	decoder := json.NewDecoder(in)
 	closeAndReportError := func(err error) {
 		disc.statusMutex.Lock()
-		disc.alive = false
+		disc.state = Dead
 		disc.incomingMessagesError = err
 		disc.statusMutex.Unlock()
 		close(outChan)
@@ -173,19 +185,11 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 	}
 }
 
-// IsAlive return true if the discovery process is running and so is able to receive commands
-// and produce events.
-func (disc *PluggableDiscovery) IsAlive() bool {
+// State returns the current state of this PluggableDiscovery
+func (disc *PluggableDiscovery) State() int {
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
-	return disc.alive
-}
-
-// IsEventMode return true if the discovery is in "events" mode
-func (disc *PluggableDiscovery) IsEventMode() bool {
-	disc.statusMutex.Lock()
-	defer disc.statusMutex.Unlock()
-	return disc.eventsMode
+	return disc.state
 }
 
 func (disc *PluggableDiscovery) waitMessage(timeout time.Duration) (*discoveryMessage, error) {
@@ -199,7 +203,7 @@ func (disc *PluggableDiscovery) waitMessage(timeout time.Duration) (*discoveryMe
 		}
 		return msg, nil
 	case <-time.After(timeout):
-		return nil, errors.New("timeout")
+		return nil, fmt.Errorf("timeout waiting for message from %s", disc.id)
 	}
 }
 
@@ -223,7 +227,7 @@ func (disc *PluggableDiscovery) runProcess() error {
 	}
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
-	disc.alive = true
+	disc.state = Alive
 	return nil
 }
 
@@ -238,7 +242,7 @@ func (disc *PluggableDiscovery) Run() error {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return err
+		return fmt.Errorf("calling HELLO: %w", err)
 	} else if msg.EventType != "hello" {
 		return errors.Errorf(tr("communication out of sync, expected 'hello', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
@@ -246,6 +250,9 @@ func (disc *PluggableDiscovery) Run() error {
 	} else if msg.ProtocolVersion > 1 {
 		return errors.Errorf(tr("protocol version not supported: requested 1, got %d"), msg.ProtocolVersion)
 	}
+	disc.statusMutex.Lock()
+	defer disc.statusMutex.Unlock()
+	disc.state = Idling
 	return nil
 }
 
@@ -256,12 +263,15 @@ func (disc *PluggableDiscovery) Start() error {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return err
+		return fmt.Errorf("calling START: %w", err)
 	} else if msg.EventType != "start" {
 		return errors.Errorf(tr("communication out of sync, expected 'start', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
 		return errors.Errorf(tr("command failed: %s"), msg.Message)
 	}
+	disc.statusMutex.Lock()
+	defer disc.statusMutex.Unlock()
+	disc.state = Running
 	return nil
 }
 
@@ -273,7 +283,7 @@ func (disc *PluggableDiscovery) Stop() error {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return err
+		return fmt.Errorf("calling STOP: %w", err)
 	} else if msg.EventType != "stop" {
 		return errors.Errorf(tr("communication out of sync, expected 'stop', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
@@ -281,11 +291,12 @@ func (disc *PluggableDiscovery) Stop() error {
 	}
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
+	// TODO: Should we clear cached ports here?
 	if disc.eventChan != nil {
 		close(disc.eventChan)
 		disc.eventChan = nil
 	}
-	disc.eventsMode = false
+	disc.state = Idling
 	return nil
 }
 
@@ -295,7 +306,7 @@ func (disc *PluggableDiscovery) Quit() error {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return err
+		return fmt.Errorf("calling QUIT: %w", err)
 	} else if msg.EventType != "quit" {
 		return errors.Errorf(tr("communication out of sync, expected 'quit', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
@@ -307,7 +318,7 @@ func (disc *PluggableDiscovery) Quit() error {
 		close(disc.eventChan)
 		disc.eventChan = nil
 	}
-	disc.alive = false
+	disc.state = Dead
 	return nil
 }
 
@@ -318,7 +329,7 @@ func (disc *PluggableDiscovery) List() ([]*Port, error) {
 		return nil, err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("calling LIST: %w", err)
 	} else if msg.EventType != "list" {
 		return nil, errors.Errorf(tr("communication out of sync, expected 'list', received '%s'"), msg.EventType)
 	} else if msg.Error {
@@ -349,25 +360,21 @@ func (disc *PluggableDiscovery) EventChannel(size int) <-chan *Event {
 // After calling StartSync an initial burst of "add" events may be generated to
 // report all the ports available at the moment of the start.
 func (disc *PluggableDiscovery) StartSync() error {
-	disc.statusMutex.Lock()
-	defer disc.statusMutex.Unlock()
-
-	if disc.eventsMode {
-		return errors.New(tr("already in events mode"))
-	}
 	if err := disc.sendCommand("START_SYNC\n"); err != nil {
 		return err
 	}
 
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return err
+		return fmt.Errorf("calling START_SYNC: %w", err)
 	} else if msg.EventType != "start_sync" {
 		return errors.Errorf(tr("communication out of sync, expected 'start_sync', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
 		return errors.Errorf(tr("command failed: %s"), msg.Message)
 	}
 
-	disc.eventsMode = true
+	disc.statusMutex.Lock()
+	defer disc.statusMutex.Unlock()
+	disc.state = Syncing
 	disc.cachedPorts = map[string]*Port{}
 	return nil
 }
