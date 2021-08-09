@@ -1,37 +1,46 @@
-name: Check for issues with signing certificates
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-certificates.md
+name: Check Certificates
 
+# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
 on:
+  push:
+    paths:
+      - ".github/workflows/check-certificates.ya?ml"
+  pull_request:
+    paths:
+      - ".github/workflows/check-certificates.ya?ml"
   schedule:
-    # run every 10 hours
+    # Run every 10 hours.
     - cron: "0 */10 * * *"
-  # workflow_dispatch event allows the workflow to be triggered manually.
-  # This could be used to run an immediate check after updating certificate secrets.
-  # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_dispatch
   workflow_dispatch:
+  repository_dispatch:
 
 env:
-  # Begin notifications when there are less than this many days remaining before expiration
+  # Begin notifications when there are less than this many days remaining before expiration.
   EXPIRATION_WARNING_PERIOD: 30
 
 jobs:
   check-certificates:
-    # This workflow would fail in forks that don't have the certificate secrets defined
-    if: github.repository == 'arduino/arduino-cli'
+    name: ${{ matrix.certificate.identifier }}
+    # Only run when the workflow will have access to the certificate secrets.
+    if: >
+      (github.event_name != 'pull_request' && github.repository == 'arduino/arduino-cli') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'arduino/arduino-cli')
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
 
       matrix:
         certificate:
-          - identifier: macOS signing certificate # Text used to identify the certificate in notifications
-            certificate-secret: INSTALLER_CERT_MAC_P12 # The name of the secret that contains the certificate
-            password-secret: INSTALLER_CERT_MAC_PASSWORD # The name of the secret that contains the certificate password
+          # Additional certificate definitions can be added to this list.
+          - identifier: macOS signing certificate # Text used to identify certificate in notifications.
+            certificate-secret: INSTALLER_CERT_MAC_P12 # Name of the secret that contains the certificate.
+            password-secret: INSTALLER_CERT_MAC_PASSWORD # Name of the secret that contains the certificate password.
 
     steps:
       - name: Set certificate path environment variable
         run: |
-          # See: https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-environment-variable
+          # See: https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-environment-variable
           echo "CERTIFICATE_PATH=${{ runner.temp }}/certificate.p12" >> "$GITHUB_ENV"
 
       - name: Decode certificate
@@ -53,18 +62,17 @@ jobs:
             exit 1
           )
 
-      # See: https://github.com/rtCamp/action-slack-notify
       - name: Slack notification of certificate verification failure
         if: failure()
-        uses: rtCamp/action-slack-notify@v2.2.0
         env:
-          SLACK_WEBHOOK: ${{ secrets.TEAM_TOOLING_CHANNEL_SLACK_WEBHOOK }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_MESSAGE: |
             :warning::warning::warning::warning:
             WARNING: ${{ github.repository }} ${{ matrix.certificate.identifier }} verification failed!!!
             :warning::warning::warning::warning:
           SLACK_COLOR: danger
           MSG_MINIMAL: true
+        uses: rtCamp/action-slack-notify@v2
 
       - name: Get days remaining before certificate expiration date
         env:
@@ -93,7 +101,7 @@ jobs:
 
           DAYS_BEFORE_EXPIRATION="$((($(date --utc --date="$EXPIRATION_DATE" +%s) - $(date --utc +%s)) / 60 / 60 / 24))"
 
-          # Display the expiration information in the log
+          # Display the expiration information in the log.
           echo "Certificate expiration date: $EXPIRATION_DATE"
           echo "Days remaining before expiration: $DAYS_BEFORE_EXPIRATION"
 
@@ -108,14 +116,14 @@ jobs:
           fi
 
       - name: Slack notification of pending certificate expiration
-        # Don't send spurious expiration notification if verification fails
+        # Don't send spurious expiration notification if verification fails.
         if: failure() && steps.check-expiration.outcome == 'failure'
-        uses: rtCamp/action-slack-notify@v2.2.0
         env:
-          SLACK_WEBHOOK: ${{ secrets.TEAM_TOOLING_CHANNEL_SLACK_WEBHOOK }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_MESSAGE: |
             :warning::warning::warning::warning:
             WARNING: ${{ github.repository }} ${{ matrix.certificate.identifier }} will expire in ${{ steps.get-days-before-expiration.outputs.days }} days!!!
             :warning::warning::warning::warning:
           SLACK_COLOR: danger
           MSG_MINIMAL: true
+        uses: rtCamp/action-slack-notify@v2
