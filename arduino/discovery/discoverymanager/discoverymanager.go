@@ -16,7 +16,6 @@
 package discoverymanager
 
 import (
-	"context"
 	"fmt"
 	"sync"
 
@@ -72,7 +71,6 @@ func (dm *DiscoveryManager) Add(disc *discovery.PluggableDiscovery) error {
 // Returns a list of errors returned by each call of f.
 func (dm *DiscoveryManager) parallelize(f func(d *discovery.PluggableDiscovery) error) []error {
 	var wg sync.WaitGroup
-	ctx, cancel := context.WithCancel(context.Background())
 	errChan := make(chan error)
 	for _, d := range dm.discoveries {
 		wg.Add(1)
@@ -85,23 +83,16 @@ func (dm *DiscoveryManager) parallelize(f func(d *discovery.PluggableDiscovery) 
 	}
 
 	// Wait in a goroutine to collect eventual errors running a discovery.
-	// When all goroutines that are calling discoveries are done call cancel
-	// to avoid blocking if there are no errors.
+	// When all goroutines that are calling discoveries are done close the errors chan.
 	go func() {
 		wg.Wait()
-		cancel()
+		close(errChan)
 	}()
 
 	errs := []error{}
-	for {
-		select {
-		case <-ctx.Done():
-			goto done
-		case err := <-errChan:
-			errs = append(errs, err)
-		}
+	for err := range errChan {
+		errs = append(errs, err)
 	}
-done:
 	return errs
 }
 
