@@ -23,6 +23,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
+	"github.com/arduino/arduino-cli/arduino/discovery/discoverymanager"
 	"github.com/arduino/arduino-cli/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -43,6 +44,7 @@ type PackageManager struct {
 	DownloadDir            *paths.Path
 	TempDir                *paths.Path
 	CustomGlobalProperties *properties.Map
+	discoveryManager       *discoverymanager.DiscoveryManager
 }
 
 var tr = i18n.Tr
@@ -57,6 +59,7 @@ func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path) 
 		DownloadDir:            downloadDir,
 		TempDir:                tempDir,
 		CustomGlobalProperties: properties.NewMap(),
+		discoveryManager:       discoverymanager.New(),
 	}
 }
 
@@ -64,6 +67,13 @@ func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path) 
 func (pm *PackageManager) Clear() {
 	pm.Packages = cores.NewPackages()
 	pm.CustomGlobalProperties = properties.NewMap()
+	pm.discoveryManager.StopAll()
+	pm.discoveryManager = discoverymanager.New()
+}
+
+// DiscoveryManager returns the DiscoveryManager in use by this PackageManager
+func (pm *PackageManager) DiscoveryManager() *discoverymanager.DiscoveryManager {
+	return pm.discoveryManager
 }
 
 // FindPlatformReleaseProvidingBoardsWithVidPid FIXMEDOC
