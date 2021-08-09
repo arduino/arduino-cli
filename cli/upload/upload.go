@@ -33,7 +33,7 @@ import (
 
 var (
 	fqbn       string
-	port       string
+	port       arguments.Port
 	verbose    bool
 	verify     bool
 	importDir  string
@@ -56,7 +56,7 @@ func NewCommand() *cobra.Command {
 	}
 
 	uploadCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
-	uploadCommand.Flags().StringVarP(&port, "port", "p", "", tr("Upload port, e.g.: COM10 or /dev/ttyACM0"))
+	port.AddToCommand(uploadCommand)
 	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries to upload."))
 	uploadCommand.Flags().StringVarP(&importFile, "input-file", "i", "", tr("Binary file to upload."))
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
@@ -91,11 +91,22 @@ func run(command *cobra.Command, args []string) {
 		}
 	}
 
+	sk, err := sketch.New(sketchPath)
+	if err != nil {
+		feedback.Errorf("Error during Upload: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+	discoveryPort, err := port.GetPort(instance, sk)
+	if err != nil {
+		feedback.Errorf("Error during Upload: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+
 	if _, err := upload.Upload(context.Background(), &rpc.UploadRequest{
 		Instance:   instance,
 		Fqbn:       fqbn,
 		SketchPath: sketchPath.String(),
-		Port:       port,
+		Port:       discoveryPort.ToRPC(),
 		Verbose:    verbose,
 		Verify:     verify,
 		ImportFile: importFile,

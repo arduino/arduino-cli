@@ -38,8 +38,8 @@ type Port struct {
 
 // AddToCommand adds the flags used to set port and protocol to the specified Command
 func (p *Port) AddToCommand(cmd *cobra.Command) {
-	cmd.Flags().StringVarP(&p.address, "port", "p", "", "Upload port address, e.g.: COM3 or /dev/ttyACM2")
-	cmd.Flags().StringVarP(&p.protocol, "protocol", "l", "", "Upload port protocol, e.g: serial")
+	cmd.Flags().StringVarP(&p.address, "port", "p", "", tr("Upload port address, e.g.: COM3 or /dev/ttyACM2"))
+	cmd.Flags().StringVarP(&p.protocol, "protocol", "l", "", tr("Upload port protocol, e.g: serial"))
 }
 
 // GetPort returns the Port obtained by parsing command line arguments.

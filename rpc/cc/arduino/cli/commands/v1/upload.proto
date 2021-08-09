@@ -20,6 +20,7 @@ package cc.arduino.cli.commands.v1;
 option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
 
 import "cc/arduino/cli/commands/v1/common.proto";
+import "cc/arduino/cli/commands/v1/port.proto";
 
 message UploadRequest {
   // Arduino Core Service instance from the `Init` response.
@@ -33,7 +34,7 @@ message UploadRequest {
   // filename under this path where it is saved by the `Compile` method.
   string sketch_path = 3;
   // The port of the board.
-  string port = 4;
+  Port port = 4;
   // Whether to turn on verbose output during the upload.
   bool verbose = 5;
   // After upload, verify that the contents of the memory on the board match the
@@ -73,7 +74,7 @@ message UploadUsingProgrammerRequest {
   // filename under this path where it is saved by the `Compile` method.
   string sketch_path = 3;
   // The port of the board.
-  string port = 4;
+  Port port = 4;
   // Whether to turn on verbose output during the upload.
   bool verbose = 5;
   // After upload, verify that the contents of the memory on the board match the
@@ -105,7 +106,7 @@ message BurnBootloaderRequest {
   // Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
   string fqbn = 2;
   // The port of the programmer used to program the bootloader.
-  string port = 3;
+  Port port = 3;
   // Whether to turn on verbose output during the programming.
   bool verbose = 4;
   // After programming, verify the contents of the memory on the board match the
