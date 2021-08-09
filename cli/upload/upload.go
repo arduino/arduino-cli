@@ -21,14 +21,13 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/arduino/go-paths-helper"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -78,11 +77,11 @@ func checkFlagsConflicts(command *cobra.Command, args []string) {
 func run(command *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
 
-	var path *paths.Path
+	path := ""
 	if len(args) > 0 {
-		path = paths.New(args[0])
+		path = args[0]
 	}
-	sketchPath := initSketchPath(path)
+	sketchPath := arguments.InitSketchPath(path)
 
 	// .pde files are still supported but deprecated, this warning urges the user to rename them
 	if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 {
@@ -107,19 +106,4 @@ func run(command *cobra.Command, args []string) {
 		feedback.Errorf(tr("Error during Upload: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-}
-
-// initSketchPath returns the current working directory
-func initSketchPath(sketchPath *paths.Path) *paths.Path {
-	if sketchPath != nil {
-		return sketchPath
-	}
-
-	wd, err := paths.Getwd()
-	if err != nil {
-		feedback.Errorf(tr("Couldn't get current working directory: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-	logrus.Infof("Reading sketch from dir: %s", wd)
-	return wd
 }
