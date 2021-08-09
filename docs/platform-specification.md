@@ -870,6 +870,15 @@ Let's see a complete example:
     tools.arduino_ota.upload.field.password.secret=true
     tools.arduino_ota.upload.pattern="{runtime.tools.arduinoOTA.path}/bin/arduinoOTA" -address {upload.port.address} -port 65280 -username "{upload.field.username} -password "{upload.field.password}" -sketch "{build.path}/{build.project_name}.bin"
 
+If a **FIELD_LABEL** is longer than 50 characters it will be truncated to 49 characters and an ellipsis (`…`) appended
+to it. For example this field:
+
+    tools.arduino_ota.upload.field.some_field=This is a really long label that ideally must never be set by any platform
+
+will be shown to the user as:
+
+    This is a really long label that ideally must nev…
+
 #### Upload verification
 
 Upload verification can be enabled via the Arduino IDE's **File > Preferences > Verify code after upload** or

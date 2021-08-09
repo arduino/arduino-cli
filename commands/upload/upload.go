@@ -102,6 +102,9 @@ func getUserFields(toolID string, platformRelease *cores.PlatformRelease) ([]*rp
 
 	for _, key := range keys {
 		value := fields.Get(key)
+		if len(value) > 50 {
+			value = fmt.Sprintf("%s…", value[:49])
+		}
 		secretProp := fmt.Sprintf("%s.secret", key)
 		secret, ok := fields.GetOk(secretProp)
 		if !ok {
