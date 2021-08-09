@@ -68,8 +68,8 @@ func (dm *DiscoveryManager) Add(disc *discovery.PluggableDiscovery) error {
 // returns the first error it meets or nil
 func (dm *DiscoveryManager) RunAll() error {
 	for _, d := range dm.discoveries {
-		if d.IsAlive() {
-			// This discovery is already running, nothing to do
+		if d.State() != discovery.Dead {
+			// This discovery is already alive, nothing to do
 			continue
 		}
 
@@ -84,6 +84,11 @@ func (dm *DiscoveryManager) RunAll() error {
 // returns the first error it meets or nil
 func (dm *DiscoveryManager) StartAll() error {
 	for _, d := range dm.discoveries {
+		state := d.State()
+		if state != discovery.Idling || state == discovery.Running {
+			// Already started
+			continue
+		}
 		if err := d.Start(); err != nil {
 			return err
 		}
@@ -99,8 +104,9 @@ func (dm *DiscoveryManager) StartSyncAll() (<-chan *discovery.Event, []error) {
 		dm.globalEventCh = make(chan *discovery.Event, 5)
 	}
 	for _, d := range dm.discoveries {
-		if d.IsEventMode() {
-			// Already started, nothing to do
+		state := d.State()
+		if state != discovery.Idling || state == discovery.Syncing {
+			// Already syncing
 			continue
 		}
 
@@ -121,6 +127,11 @@ func (dm *DiscoveryManager) StartSyncAll() (<-chan *discovery.Event, []error) {
 // returns the first error it meets or nil
 func (dm *DiscoveryManager) StopAll() error {
 	for _, d := range dm.discoveries {
+		state := d.State()
+		if state != discovery.Syncing && state != discovery.Running {
+			// Not running nor syncing, nothing to stop
+			continue
+		}
 		err := d.Stop()
 		if err != nil {
 			return err
@@ -133,6 +144,10 @@ func (dm *DiscoveryManager) StopAll() error {
 // Returns the first error it meets or nil
 func (dm *DiscoveryManager) QuitAll() error {
 	for _, d := range dm.discoveries {
+		if d.State() == discovery.Dead {
+			// Stop! Stop! It's already dead!
+			continue
+		}
 		err := d.Quit()
 		if err != nil {
 			return err
@@ -148,8 +163,12 @@ func (dm *DiscoveryManager) QuitAll() error {
 // List returns a list of available ports detected from all discoveries
 func (dm *DiscoveryManager) List() []*discovery.Port {
 	res := []*discovery.Port{}
-	for _, disc := range dm.discoveries {
-		l, err := disc.List()
+	for _, d := range dm.discoveries {
+		if d.State() != discovery.Running {
+			// Discovery is not running, it won't return anything
+			continue
+		}
+		l, err := d.List()
 		if err != nil {
 			continue
 		}
@@ -161,8 +180,12 @@ func (dm *DiscoveryManager) List() []*discovery.Port {
 // ListSync return the current list of ports detected from all discoveries
 func (dm *DiscoveryManager) ListSync() []*discovery.Port {
 	res := []*discovery.Port{}
-	for _, disc := range dm.discoveries {
-		res = append(res, disc.ListSync()...)
+	for _, d := range dm.discoveries {
+		if d.State() != discovery.Syncing {
+			// Discovery is not syncing
+			continue
+		}
+		res = append(res, d.ListSync()...)
 	}
 	return res
 }
