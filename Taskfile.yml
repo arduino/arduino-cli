@@ -54,13 +54,6 @@ tasks:
     cmds:
       - mkdocs serve
 
-  docs:check:
-    desc: Run documentation linting
-    cmds:
-      - npx {{ .PRETTIER }} --check "**/*.md"
-      - |
-        echo "WARNING: this task is deprecated. Use general:format-prettier instead"
-
   docs:check-links:
     desc: Verifies there are no dead links in documentation
     cmds:
@@ -72,14 +65,6 @@ tasks:
           STATUS=$(( $STATUS + $? ))
         done
         exit $STATUS'
-
-  docs:format:
-    desc: Automatically formats documentation
-    deps:
-      - task: general:format-prettier
-    cmds:
-      - |
-        echo "WARNING: this task is deprecated. Use general:format-prettier instead"
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-prettier-formatting-task/Taskfile.yml
   general:format-prettier:
@@ -160,24 +145,7 @@ tasks:
       - "'{{.GOLINTBIN}}' {{.GOLINTFLAGS}} {{ default .DEFAULT_TARGETS .TARGETS }}"
       - task: i18n:check
       - task: python:check
-      - task: docs:check
-      - task: config:check
       - task: protoc:check
-
-  config:check:
-    desc: Check linting of configuration and supporting files
-    cmds:
-      - npx {{ .PRETTIER }} --check "**/*.{yml,yaml}"
-      - |
-        echo "WARNING: this task is deprecated. Use general:format-prettier instead"
-
-  config:format:
-    desc: Automatically formats configuration and supporting files
-    deps:
-      - task: general:format-prettier
-    cmds:
-      - |
-        echo "WARNING: this task is deprecated. Use general:format-prettier instead"
 
   python:check:
     desc: Linting for Python files
