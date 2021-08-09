@@ -20,7 +20,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/resources"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -100,33 +99,6 @@ var (
 		},
 	}
 )
-
-// WatchListBoards returns a channel that receives events from the bundled discovery tool
-func WatchListBoards(pm *packagemanager.PackageManager) (<-chan *discovery.Event, error) {
-	t := getBuiltinSerialDiscoveryTool(pm)
-	if !t.IsInstalled() {
-		return nil, fmt.Errorf(tr("missing serial-discovery tool"))
-	}
-
-	disc, err := discovery.New("serial-discovery", t.InstallDir.Join(t.Tool.Name).String())
-	if err != nil {
-		return nil, err
-	}
-
-	if err = disc.Run(); err != nil {
-		return nil, fmt.Errorf(tr("starting discovery: %v"), err)
-	}
-
-	if err = disc.Start(); err != nil {
-		return nil, fmt.Errorf(tr("starting discovery: %v"), err)
-	}
-
-	if err = disc.StartSync(); err != nil {
-		return nil, fmt.Errorf(tr("starting sync: %v"), err)
-	}
-
-	return disc.EventChannel(10), nil
-}
 
 func getBuiltinSerialDiscoveryTool(pm *packagemanager.PackageManager) *cores.ToolRelease {
 	builtinPackage := pm.Packages.GetOrCreatePackage("builtin")

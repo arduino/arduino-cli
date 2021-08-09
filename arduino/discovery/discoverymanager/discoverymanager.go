@@ -23,13 +23,15 @@ import (
 // DiscoveryManager is required to handle multiple pluggable-discovery that
 // may be shared across platforms
 type DiscoveryManager struct {
-	discoveries map[string]*discovery.PluggableDiscovery
+	discoveries   map[string]*discovery.PluggableDiscovery
+	globalEventCh chan *discovery.Event
 }
 
 // New creates a new DiscoveriesManager
 func New() *DiscoveryManager {
 	return &DiscoveryManager{
-		discoveries: map[string]*discovery.PluggableDiscovery{},
+		discoveries:   map[string]*discovery.PluggableDiscovery{},
+		globalEventCh: make(chan *discovery.Event, 5),
 	}
 }
 
@@ -63,6 +65,24 @@ func (dm *DiscoveryManager) StartAll() error {
 		}
 	}
 	return nil
+}
+
+// StartSyncAll the discoveries for this DiscoveryManager,
+// returns the first error it meets or nil
+func (dm *DiscoveryManager) StartSyncAll() (<-chan *discovery.Event, []error) {
+	errs := []error{}
+	for _, d := range dm.discoveries {
+		eventCh := d.EventChannel(5)
+		if err := d.StartSync(); err != nil {
+			errs = append(errs, err)
+		}
+		go func() {
+			for ev := range eventCh {
+				dm.globalEventCh <- ev
+			}
+		}()
+	}
+	return dm.globalEventCh, errs
 }
 
 // StopAll the discoveries for this DiscoveryManager,
