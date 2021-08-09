@@ -424,10 +424,10 @@ func (disc *PluggableDiscovery) StartSync(size int) (<-chan *Event, error) {
 	return c, nil
 }
 
-// ListSync returns a list of the available ports. The list is a cache of all the
+// ListCachedPorts returns a list of the available ports. The list is a cache of all the
 // add/remove events happened from the StartSync call and it will not consume any
 // resource from the underliying discovery.
-func (disc *PluggableDiscovery) ListSync() []*Port {
+func (disc *PluggableDiscovery) ListCachedPorts() []*Port {
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
 	res := []*Port{}
