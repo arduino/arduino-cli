@@ -1,0 +1,219 @@
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-prettier-formatting-task.md
+name: Check Prettier Formatting
+
+# See: https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows
+on:
+  push:
+    paths:
+      - ".github/workflows/check-prettier-formatting-task.ya?ml"
+      - "Taskfile.ya?ml"
+      - "**/.prettierignore"
+      - "**/.prettierrc*"
+      # CSS
+      - "**.css"
+      - "**.wxss"
+      # PostCSS
+      - "**.pcss"
+      - "**.postcss"
+      # Less
+      - "**.less"
+      # SCSS
+      - "**.scss"
+      # GraphQL
+      - "**.graphqls?"
+      - "**.gql"
+      # handlebars
+      - "**.handlebars"
+      - "**.hbs"
+      # HTML
+      - "**.mjml"
+      - "**.html?"
+      - "**.html.hl"
+      - "**.st"
+      - "**.xht"
+      - "**.xhtml"
+      # Vue
+      - "**.vue"
+      # JavaScript
+      - "**.flow"
+      - "**._?jsb?"
+      - "**.bones"
+      - "**.cjs"
+      - "**.es6?"
+      - "**.frag"
+      - "**.gs"
+      - "**.jake"
+      - "**.jscad"
+      - "**.jsfl"
+      - "**.js[ms]"
+      - "**.[mn]js"
+      - "**.pac"
+      - "**.wxs"
+      - "**.[xs]s?js"
+      - "**.xsjslib"
+      # JSX
+      - "**.jsx"
+      # TypeScript
+      - "**.ts"
+      # TSX
+      - "**.tsx"
+      # JSON
+      - "**/.eslintrc"
+      - "**.json"
+      - "**.avsc"
+      - "**.geojson"
+      - "**.gltf"
+      - "**.har"
+      - "**.ice"
+      - "**.JSON-tmLanguage"
+      - "**.mcmeta"
+      - "**.tfstate"
+      - "**.topojson"
+      - "**.webapp"
+      - "**.webmanifest"
+      - "**.yyp?"
+      # JSONC
+      - "**/.babelrc"
+      - "**/.jscsrc"
+      - "**/.js[hl]intrc"
+      - "**.jsonc"
+      - "**.sublime-*"
+      # JSON5
+      - "**.json5"
+      # Markdown
+      - "**.mdx?"
+      - "**.markdown"
+      - "**.mk?down"
+      - "**.mdwn"
+      - "**.mkdn?"
+      - "**.ronn"
+      - "**.workbook"
+      # YAML
+      - "**/.clang-format"
+      - "**/.clang-tidy"
+      - "**/.gemrc"
+      - "**/glide.lock"
+      - "**.ya?ml*"
+      - "**.mir"
+      - "**.reek"
+      - "**.rviz"
+      - "**.sublime-syntax"
+      - "**.syntax"
+  pull_request:
+    paths:
+      - ".github/workflows/check-prettier-formatting-task.ya?ml"
+      - "Taskfile.ya?ml"
+      - "**/.prettierignore"
+      - "**/.prettierrc*"
+      # CSS
+      - "**.css"
+      - "**.wxss"
+      # PostCSS
+      - "**.pcss"
+      - "**.postcss"
+      # Less
+      - "**.less"
+      # SCSS
+      - "**.scss"
+      # GraphQL
+      - "**.graphqls?"
+      - "**.gql"
+      # handlebars
+      - "**.handlebars"
+      - "**.hbs"
+      # HTML
+      - "**.mjml"
+      - "**.html?"
+      - "**.html.hl"
+      - "**.st"
+      - "**.xht"
+      - "**.xhtml"
+      # Vue
+      - "**.vue"
+      # JavaScript
+      - "**.flow"
+      - "**._?jsb?"
+      - "**.bones"
+      - "**.cjs"
+      - "**.es6?"
+      - "**.frag"
+      - "**.gs"
+      - "**.jake"
+      - "**.jscad"
+      - "**.jsfl"
+      - "**.js[ms]"
+      - "**.[mn]js"
+      - "**.pac"
+      - "**.wxs"
+      - "**.[xs]s?js"
+      - "**.xsjslib"
+      # JSX
+      - "**.jsx"
+      # TypeScript
+      - "**.ts"
+      # TSX
+      - "**.tsx"
+      # JSON
+      - "**/.eslintrc"
+      - "**.json"
+      - "**.avsc"
+      - "**.geojson"
+      - "**.gltf"
+      - "**.har"
+      - "**.ice"
+      - "**.JSON-tmLanguage"
+      - "**.mcmeta"
+      - "**.tfstate"
+      - "**.topojson"
+      - "**.webapp"
+      - "**.webmanifest"
+      - "**.yyp?"
+      # JSONC
+      - "**/.babelrc"
+      - "**/.jscsrc"
+      - "**/.js[hl]intrc"
+      - "**.jsonc"
+      - "**.sublime-*"
+      # JSON5
+      - "**.json5"
+      # Markdown
+      - "**.mdx?"
+      - "**.markdown"
+      - "**.mk?down"
+      - "**.mdwn"
+      - "**.mkdn?"
+      - "**.ronn"
+      - "**.workbook"
+      # YAML
+      - "**/.clang-format"
+      - "**/.clang-tidy"
+      - "**/.gemrc"
+      - "**/glide.lock"
+      - "**.ya?ml*"
+      - "**.mir"
+      - "**.reek"
+      - "**.rviz"
+      - "**.sublime-syntax"
+      - "**.syntax"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Format with Prettier
+        run: task general:format-prettier
+
+      - name: Check formatting
+        run: git diff --color --exit-code

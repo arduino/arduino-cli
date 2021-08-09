@@ -230,16 +230,10 @@ extension][prettier-vscode-extension] to automatically format as you write.
 Otherwise you can use the following tasks. To do so you'll need to install `npm` if not already installed. Check the
 [official documentation][npm-install-docs] to learn how to install `npm` for your platform.
 
-To check if the files are correctly formatted run:
+Ensure the formatting is compliant by running the command:
 
 ```shell
-task config:check
-```
-
-If the output tells you that some files are not formatted correctly run:
-
-```shell
-task config:format
+task general:format-prettier
 ```
 
 When opening a new Pull Request, checks are automatically run to verify that configuration files are correctly
@@ -328,16 +322,10 @@ extension][prettier-vscode-extension] to automatically format as you write.
 Otherwise you can use the following tasks. To do so you'll need to install `npm` if not already installed. Check the
 [official documentation][npm-install-docs] to learn how to install `npm` for your platform.
 
-To check if the files are correctly formatted run:
+Ensure the formatting is compliant by running the command:
 
 ```shell
-task docs:check
-```
-
-If the output tells you that some files are not formatted correctly run:
-
-```shell
-task docs:format
+task general:format-prettier
 ```
 
 When opening a new Pull Request, checks are automatically run to verify that documentation is correctly formatted. In

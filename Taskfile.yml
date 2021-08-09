@@ -14,7 +14,7 @@ tasks:
       # we invoke `arduino-cli` like this instead of `./arduino-cli` to remove
       # the `./` chars from the examples
       - PATH=. arduino-cli ../docs/commands
-      - task: docs:format
+      - task: general:format-prettier
 
   docs:gen:protobuf:
     desc: Generate markdown contents for protobuffers
@@ -23,7 +23,7 @@ tasks:
       - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,monitor.md --proto_path=rpc ./rpc/cc/arduino/cli/monitor/v1/*.proto'
       - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,settings.md --proto_path=rpc ./rpc/cc/arduino/cli/settings/v1/*.proto'
       - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,debug.md --proto_path=rpc ./rpc/cc/arduino/cli/debug/v1/*.proto'
-      - task: docs:format
+      - task: general:format-prettier
 
   docs:gen:
     desc: Generate documentation files
@@ -58,6 +58,8 @@ tasks:
     desc: Run documentation linting
     cmds:
       - npx {{ .PRETTIER }} --check "**/*.md"
+      - |
+        echo "WARNING: this task is deprecated. Use general:format-prettier instead"
 
   docs:check-links:
     desc: Verifies there are no dead links in documentation
@@ -73,8 +75,17 @@ tasks:
 
   docs:format:
     desc: Automatically formats documentation
+    deps:
+      - task: general:format-prettier
     cmds:
-      - npx {{ .PRETTIER }} --write "**/*.md"
+      - |
+        echo "WARNING: this task is deprecated. Use general:format-prettier instead"
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-prettier-formatting-task/Taskfile.yml
+  general:format-prettier:
+    desc: Format all supported files with Prettier
+    cmds:
+      - npx prettier --write .
 
   protoc:
     desc: Lint, format and compile protobuf definitions
@@ -157,11 +168,16 @@ tasks:
     desc: Check linting of configuration and supporting files
     cmds:
       - npx {{ .PRETTIER }} --check "**/*.{yml,yaml}"
+      - |
+        echo "WARNING: this task is deprecated. Use general:format-prettier instead"
 
   config:format:
     desc: Automatically formats configuration and supporting files
+    deps:
+      - task: general:format-prettier
     cmds:
-      - npx {{ .PRETTIER }} --write "**/*.{yml,yaml}"
+      - |
+        echo "WARNING: this task is deprecated. Use general:format-prettier instead"
 
   python:check:
     desc: Linting for Python files
