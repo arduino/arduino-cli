@@ -190,16 +190,33 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	if err == nil && uploadAfterCompile {
-
 		var sk *sketch.Sketch
 		sk, err = sketch.New(sketchPath)
 		if err != nil {
-
+			feedback.Errorf("Error during Upload: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
 		}
 		var discoveryPort *discovery.Port
 		discoveryPort, err = port.GetPort(inst, sk)
 		if err != nil {
+			feedback.Errorf("Error during Upload: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
 
+		userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
+			Instance: inst,
+			Fqbn:     fqbn,
+			Protocol: discoveryPort.Protocol,
+		})
+		if err != nil {
+			feedback.Errorf("Error during Upload: %v", err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+
+		fields := map[string]string{}
+		if len(userFieldRes.UserFields) > 0 {
+			feedback.Printf("Uploading to specified board using %s protocol requires the following info:", discoveryPort.Protocol)
+			fields = arguments.AskForUserFields(userFieldRes.UserFields)
 		}
 
 		uploadRequest := &rpc.UploadRequest{
@@ -211,8 +228,8 @@ func run(cmd *cobra.Command, args []string) {
 			Verify:     verify,
 			ImportDir:  buildPath,
 			Programmer: programmer,
+			UserFields: fields,
 		}
-		var err error
 		if output.OutputFormat == "json" {
 			// TODO: do not print upload output in json mode
 			uploadOut := new(bytes.Buffer)

@@ -53,6 +53,12 @@ message UploadRequest {
   // If set to true, the actual upload will not be performed but a trace output
   // will be printed stdout. This is for debugging purposes.
   bool dry_run = 10;
+  // User provided fields usually used by upload tools that need authentication
+  // or in any case fields that can be customized by the user at upload time
+  // and cannot be known previously.
+  // For more info:
+  // https://github.com/arduino/tooling-rfcs/blob/main/RFCs/0002-pluggable-discovery.md#user-provided-fields
+  map<string, string> user_fields = 11;
 }
 
 message UploadResponse {
@@ -91,6 +97,12 @@ message UploadUsingProgrammerRequest {
   // If set to true, the actual upload will not be performed but a trace output
   // will be printed stdout. This is for debugging purposes.
   bool dry_run = 10;
+  // User provided fields usually used by upload tools that need authentication
+  // or in any case fields that can be customized by the user at upload time
+  // and cannot be known previously.
+  // For more info:
+  // https://github.com/arduino/tooling-rfcs/blob/main/RFCs/0002-pluggable-discovery.md#user-provided-fields
+  map<string, string> user_fields = 11;
 }
 
 message UploadUsingProgrammerResponse {
@@ -117,6 +129,12 @@ message BurnBootloaderRequest {
   // If set to true, the actual upload will not be performed but a trace output
   // will be printed stdout. This is for debugging purposes.
   bool dry_run = 7;
+  // User provided fields usually used by upload tools that need authentication
+  // or in any case fields that can be customized by the user at upload time
+  // and cannot be known previously.
+  // For more info:
+  // https://github.com/arduino/tooling-rfcs/blob/main/RFCs/0002-pluggable-discovery.md#user-provided-fields
+  map<string, string> user_fields = 11;
 }
 
 message BurnBootloaderResponse {
@@ -133,4 +151,31 @@ message ListProgrammersAvailableForUploadRequest {
 
 message ListProgrammersAvailableForUploadResponse {
   repeated Programmer programmers = 1;
+}
+
+message SupportedUserFieldsRequest {
+  Instance instance = 1;
+  string fqbn = 2;
+  // Protocol that will be used to upload, this information is
+  // necessary to pick the right upload tool for the board specified
+  // with the FQBN.
+  string protocol = 3;
+}
+
+message UserField {
+  // Id of the tool that supports this field
+  string tool_id = 1;
+  // Name used internally to store and retrieve this field
+  string name = 2;
+  // Label is the text shown to the user when needs to input this field
+  string label = 3;
+  // True if the value of the field must not be shown when typing, for example
+  // when the user inputs a network password
+  bool secret = 4;
+}
+
+message SupportedUserFieldsResponse {
+  // User fields supported by board specified in SupportedUserFieldsRequest.
+  // If board doesn't support any field it will be empty.
+  repeated UserField user_fields = 1;
 }
