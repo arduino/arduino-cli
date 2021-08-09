@@ -390,12 +390,30 @@ func (disc *PluggableDiscovery) List() ([]*Port, error) {
 	}
 }
 
-// EventChannel creates a channel used to receive events from the pluggable discovery.
+// StartSync puts the discovery in "events" mode: the discovery will send "add"
+// and "remove" events each time a new port is detected or removed respectively.
+// After calling StartSync an initial burst of "add" events may be generated to
+// report all the ports available at the moment of the start.
+// It also creates a channel used to receive events from the pluggable discovery.
 // The event channel must be consumed as quickly as possible since it may block the
 // discovery if it becomes full. The channel size is configurable.
-func (disc *PluggableDiscovery) EventChannel(size int) <-chan *Event {
+func (disc *PluggableDiscovery) StartSync(size int) (<-chan *Event, error) {
+	if err := disc.sendCommand("START_SYNC\n"); err != nil {
+		return nil, err
+	}
+
+	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
+		return nil, fmt.Errorf("calling START_SYNC: %w", err)
+	} else if msg.EventType != "start_sync" {
+		return nil, errors.Errorf(tr("communication out of sync, expected 'start_sync', received '%s'"), msg.EventType)
+	} else if msg.Message != "OK" || msg.Error {
+		return nil, errors.Errorf(tr("command failed: %s"), msg.Message)
+	}
+
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
+	disc.state = Syncing
+	disc.cachedPorts = map[string]*Port{}
 	if disc.eventChan != nil {
 		// In case there is already an existing event channel in use we close it
 		// before creating a new one.
@@ -403,31 +421,7 @@ func (disc *PluggableDiscovery) EventChannel(size int) <-chan *Event {
 	}
 	c := make(chan *Event, size)
 	disc.eventChan = c
-	return c
-}
-
-// StartSync puts the discovery in "events" mode: the discovery will send "add"
-// and "remove" events each time a new port is detected or removed respectively.
-// After calling StartSync an initial burst of "add" events may be generated to
-// report all the ports available at the moment of the start.
-func (disc *PluggableDiscovery) StartSync() error {
-	if err := disc.sendCommand("START_SYNC\n"); err != nil {
-		return err
-	}
-
-	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf("calling START_SYNC: %w", err)
-	} else if msg.EventType != "start_sync" {
-		return errors.Errorf(tr("communication out of sync, expected 'start_sync', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
-		return errors.Errorf(tr("command failed: %s"), msg.Message)
-	}
-
-	disc.statusMutex.Lock()
-	defer disc.statusMutex.Unlock()
-	disc.state = Syncing
-	disc.cachedPorts = map[string]*Port{}
-	return nil
+	return c, nil
 }
 
 // ListSync returns a list of the available ports. The list is a cache of all the

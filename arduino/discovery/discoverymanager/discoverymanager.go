@@ -141,8 +141,8 @@ func (dm *DiscoveryManager) StartSyncAll() (<-chan *discovery.Event, []error) {
 			return nil
 		}
 
-		eventCh := d.EventChannel(5)
-		if err := d.StartSync(); err != nil {
+		eventCh, err := d.StartSync(5)
+		if err != nil {
 			return fmt.Errorf("start syncing discovery %s: %w", d.GetID(), err)
 		}
 		go func() {
