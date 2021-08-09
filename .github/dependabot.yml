@@ -9,5 +9,7 @@ updates:
     directory: / # Check the repository's workflows under /.github/workflows/
     schedule:
       interval: daily
+    commit-message:
+      prefix: "[skip changelog] "
     labels:
       - "topic: dependencies"
