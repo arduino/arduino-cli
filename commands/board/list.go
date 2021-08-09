@@ -93,8 +93,6 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 		retVal = append(retVal, &rpc.BoardListItem{
 			Name: name,
 			Fqbn: fqbn,
-			Vid:  vid,
-			Pid:  pid,
 		})
 	} else {
 		return nil, errors.Wrap(err, tr("error querying Arduino Cloud Api"))
@@ -129,8 +127,6 @@ func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.B
 			Name:     board.Name(),
 			Fqbn:     board.FQBN(),
 			Platform: platform,
-			Vid:      port.Properties.Get("vid"),
-			Pid:      port.Properties.Get("pid"),
 		})
 	}
 
@@ -214,14 +210,11 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 
 		// boards slice can be empty at this point if neither the cores nor the
 		// API managed to recognize the connected board
-		p := &rpc.DetectedPort{
-			Address:       port.Address,
-			Protocol:      port.Protocol,
-			ProtocolLabel: port.ProtocolLabel,
-			Boards:        boards,
-			SerialNumber:  port.Properties.Get("serialNumber"),
+		b := &rpc.DetectedPort{
+			Port:           port.ToRPC(),
+			MatchingBoards: boards,
 		}
-		retVal = append(retVal, p)
+		retVal = append(retVal, b)
 	}
 
 	return retVal, nil
@@ -251,16 +244,8 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 		for {
 			select {
 			case event := <-eventsChan:
-				serialNumber := ""
-				if props := event.Port.Properties; props != nil {
-					serialNumber = props.Get("serialNumber")
-				}
-
 				port := &rpc.DetectedPort{
-					Address:       event.Port.Address,
-					Protocol:      event.Port.Protocol,
-					ProtocolLabel: event.Port.ProtocolLabel,
-					SerialNumber:  serialNumber,
+					Port: event.Port.ToRPC(),
 				}
 
 				boardsError := ""
@@ -269,7 +254,7 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 					if err != nil {
 						boardsError = err.Error()
 					}
-					port.Boards = boards
+					port.MatchingBoards = boards
 				}
 				outChan <- &rpc.BoardListWatchResponse{
 					EventType: event.Type,
