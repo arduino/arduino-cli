@@ -18,6 +18,7 @@ package arguments
 import (
 	"fmt"
 	"net/url"
+	"time"
 
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -34,12 +35,14 @@ import (
 type Port struct {
 	address  string
 	protocol string
+	timeout  time.Duration
 }
 
 // AddToCommand adds the flags used to set port and protocol to the specified Command
 func (p *Port) AddToCommand(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&p.address, "port", "p", "", tr("Upload port address, e.g.: COM3 or /dev/ttyACM2"))
 	cmd.Flags().StringVarP(&p.protocol, "protocol", "l", "", tr("Upload port protocol, e.g: serial"))
+	cmd.Flags().DurationVar(&p.timeout, "discovery-timeout", 5*time.Second, tr("Max time to wait for port discovery, e.g.: 30s, 1m"))
 }
 
 // GetPort returns the Port obtained by parsing command line arguments.
@@ -47,12 +50,6 @@ func (p *Port) AddToCommand(cmd *cobra.Command) {
 func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Port, error) {
 	address := p.address
 	protocol := p.protocol
-	if address != "" && protocol != "" {
-		return &discovery.Port{
-			Address:  address,
-			Protocol: protocol,
-		}, nil
-	}
 
 	if address == "" && sk != nil && sk.Metadata != nil {
 		deviceURI, err := url.Parse(sk.Metadata.CPU.Port)
@@ -76,8 +73,9 @@ func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Po
 	if err := pm.DiscoveryManager().RunAll(); err != nil {
 		return nil, err
 	}
-	if err := pm.DiscoveryManager().StartAll(); err != nil {
-		return nil, err
+	eventChan, errs := pm.DiscoveryManager().StartSyncAll()
+	if len(errs) > 0 {
+		return nil, fmt.Errorf("%v", errs)
 	}
 
 	defer func() {
@@ -88,28 +86,27 @@ func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Po
 		}
 	}()
 
-	ports := pm.DiscoveryManager().List()
-
-	matchingPorts := []*discovery.Port{}
-	for _, port := range ports {
-		if address == port.Address {
-			matchingPorts = append(matchingPorts, port)
-			if len(matchingPorts) > 1 {
-				// Too many matching ports found, can't handle this case.
-				// This must never happen.
-				return nil, fmt.Errorf("multiple ports found matching address %s", address)
+	deadline := time.After(p.timeout)
+	for {
+		select {
+		case portEvent := <-eventChan:
+			if portEvent.Type != "add" {
+				continue
 			}
+			port := portEvent.Port
+			if (protocol == "" || protocol == port.Protocol) && address == port.Address {
+				return port, nil
+			}
+
+		case <-deadline:
+			// No matching port found
+			if protocol == "" {
+				return &discovery.Port{
+					Address:  address,
+					Protocol: "serial",
+				}, nil
+			}
+			return nil, fmt.Errorf("port not found: %s %s", address, protocol)
 		}
 	}
-
-	if len(matchingPorts) == 1 {
-		// Only one matching port found, use it
-		return matchingPorts[0], nil
-	}
-
-	// In case no matching port is found assume the address refers to a serial port
-	return &discovery.Port{
-		Address:  address,
-		Protocol: "serial",
-	}, nil
 }
