@@ -342,7 +342,7 @@ func (disc *PluggableDiscovery) Stop() error {
 	}
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
-	// TODO: Should we clear cached ports here?
+	disc.cachedPorts = map[string]*Port{}
 	if disc.eventChan != nil {
 		close(disc.eventChan)
 		disc.eventChan = nil
