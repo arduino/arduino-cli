@@ -11,7 +11,6 @@ import (
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-// Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
 // SettingsServiceClient is the client API for SettingsService service.
@@ -128,8 +127,8 @@ type UnsafeSettingsServiceServer interface {
 	mustEmbedUnimplementedSettingsServiceServer()
 }
 
-func RegisterSettingsServiceServer(s grpc.ServiceRegistrar, srv SettingsServiceServer) {
-	s.RegisterService(&SettingsService_ServiceDesc, srv)
+func RegisterSettingsServiceServer(s *grpc.Server, srv SettingsServiceServer) {
+	s.RegisterService(&_SettingsService_serviceDesc, srv)
 }
 
 func _SettingsService_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -222,10 +221,7 @@ func _SettingsService_Write_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-// SettingsService_ServiceDesc is the grpc.ServiceDesc for SettingsService service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var SettingsService_ServiceDesc = grpc.ServiceDesc{
+var _SettingsService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "cc.arduino.cli.settings.v1.SettingsService",
 	HandlerType: (*SettingsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{

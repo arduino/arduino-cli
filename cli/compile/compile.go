@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -39,25 +40,25 @@ import (
 )
 
 var (
-	fqbn                    string   // Fully Qualified Board Name, e.g.: arduino:avr:uno.
-	showProperties          bool     // Show all build preferences used instead of compiling.
-	preprocess              bool     // Print preprocessed code to stdout.
-	buildCachePath          string   // Builds of 'core.a' are saved into this path to be cached and reused.
-	buildPath               string   // Path where to save compiled files.
-	buildProperties         []string // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
-	warnings                string   // Used to tell gcc which warning level to use.
-	verbose                 bool     // Turns on verbose mode.
-	quiet                   bool     // Suppresses almost every output.
-	vidPid                  string   // VID/PID specific build properties.
-	uploadAfterCompile      bool     // Upload the binary after the compilation.
-	port                    string   // Upload port, e.g.: COM10 or /dev/ttyACM0.
-	verify                  bool     // Upload, verify uploaded binary after the upload.
-	exportDir               string   // The compiled binary is written to this file
-	optimizeForDebug        bool     // Optimize compile output for debug, not for release
-	programmer              string   // Use the specified programmer to upload
-	clean                   bool     // Cleanup the build folder and do not use any cached build
-	compilationDatabaseOnly bool     // Only create compilation database without actually compiling
-	sourceOverrides         string   // Path to a .json file that contains a set of replacements of the sketch source code.
+	fqbn                    string         // Fully Qualified Board Name, e.g.: arduino:avr:uno.
+	showProperties          bool           // Show all build preferences used instead of compiling.
+	preprocess              bool           // Print preprocessed code to stdout.
+	buildCachePath          string         // Builds of 'core.a' are saved into this path to be cached and reused.
+	buildPath               string         // Path where to save compiled files.
+	buildProperties         []string       // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
+	warnings                string         // Used to tell gcc which warning level to use.
+	verbose                 bool           // Turns on verbose mode.
+	quiet                   bool           // Suppresses almost every output.
+	vidPid                  string         // VID/PID specific build properties.
+	uploadAfterCompile      bool           // Upload the binary after the compilation.
+	port                    arguments.Port // Upload port, e.g.: COM10 or /dev/ttyACM0.
+	verify                  bool           // Upload, verify uploaded binary after the upload.
+	exportDir               string         // The compiled binary is written to this file
+	optimizeForDebug        bool           // Optimize compile output for debug, not for release
+	programmer              string         // Use the specified programmer to upload
+	clean                   bool           // Cleanup the build folder and do not use any cached build
+	compilationDatabaseOnly bool           // Only create compilation database without actually compiling
+	sourceOverrides         string         // Path to a .json file that contains a set of replacements of the sketch source code.
 	// library and libraries sound similar but they're actually different.
 	// library expects a path to the root folder of one single library.
 	// libraries expects a path to a directory containing multiple libraries, similarly to the <directories.user>/libraries path.
@@ -97,7 +98,7 @@ func NewCommand() *cobra.Command {
 	command.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Optional, turns on verbose mode."))
 	command.Flags().BoolVar(&quiet, "quiet", false, tr("Optional, suppresses almost every output."))
 	command.Flags().BoolVarP(&uploadAfterCompile, "upload", "u", false, tr("Upload the binary after the compilation."))
-	command.Flags().StringVarP(&port, "port", "p", "", tr("Upload port, e.g.: COM10 or /dev/ttyACM0"))
+	port.AddToCommand(command)
 	command.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
 	command.Flags().StringVar(&vidPid, "vid-pid", "", tr("When specified, VID/PID specific build properties are used, if board supports them."))
 	command.Flags().StringSliceVar(&library, "library", []string{},
@@ -189,11 +190,23 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	if err == nil && uploadAfterCompile {
+
+		var sk *sketch.Sketch
+		sk, err = sketch.New(sketchPath)
+		if err != nil {
+
+		}
+		var discoveryPort *discovery.Port
+		discoveryPort, err = port.GetPort(inst, sk)
+		if err != nil {
+
+		}
+
 		uploadRequest := &rpc.UploadRequest{
 			Instance:   inst,
 			Fqbn:       fqbn,
 			SketchPath: sketchPath.String(),
-			Port:       port,
+			Port:       discoveryPort.ToRPC(),
 			Verbose:    verbose,
 			Verify:     verify,
 			ImportDir:  buildPath,

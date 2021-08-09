@@ -24,7 +24,9 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
+	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
@@ -134,6 +136,7 @@ func TestUploadPropertiesComposition(t *testing.T) {
 		importDir       *paths.Path
 		fqbn            string
 		port            string
+		protocol        string
 		programmer      string
 		burnBootloader  bool
 		expectedOutput  string
@@ -146,30 +149,30 @@ func TestUploadPropertiesComposition(t *testing.T) {
 
 	tests := []test{
 		// 0: classic upload, requires port
-		{buildPath1, "alice:avr:board1", "port", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol port -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
-		{buildPath1, "alice:avr:board1", "", "", false, "FAIL", ""},
+		{buildPath1, "alice:avr:board1", "port", "serial", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol port -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
+		{buildPath1, "alice:avr:board1", "", "", "", false, "FAIL", ""},
 		// 2: classic upload, no port
-		{buildPath1, "alice:avr:board2", "port", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
-		{buildPath1, "alice:avr:board2", "", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
+		{buildPath1, "alice:avr:board2", "port", "serial", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
+		{buildPath1, "alice:avr:board2", "", "", "", false, "conf-board1 conf-general conf-upload $$VERBOSE-VERIFY$$ protocol -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
 
 		// 4: upload with programmer, requires port
-		{buildPath1, "alice:avr:board1", "port", "progr1", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ progprotocol port -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
-		{buildPath1, "alice:avr:board1", "", "progr1", false, "FAIL", ""},
+		{buildPath1, "alice:avr:board1", "port", "serial", "progr1", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ progprotocol port -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
+		{buildPath1, "alice:avr:board1", "", "", "progr1", false, "FAIL", ""},
 		// 6: upload with programmer, no port
-		{buildPath1, "alice:avr:board1", "port", "progr2", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog2protocol -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
-		{buildPath1, "alice:avr:board1", "", "progr2", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog2protocol -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
+		{buildPath1, "alice:avr:board1", "port", "serial", "progr2", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog2protocol -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
+		{buildPath1, "alice:avr:board1", "", "", "progr2", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog2protocol -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
 		// 8: upload with programmer, require port through extra params
-		{buildPath1, "alice:avr:board1", "port", "progr3", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog3protocol port -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
-		{buildPath1, "alice:avr:board1", "", "progr3", false, "FAIL", ""},
+		{buildPath1, "alice:avr:board1", "port", "serial", "progr3", false, "conf-board1 conf-general conf-program $$VERBOSE-VERIFY$$ prog3protocol port -bspeed testdata/build_path_1/sketch.ino.hex\n", ""},
+		{buildPath1, "alice:avr:board1", "", "", "progr3", false, "FAIL", ""},
 
 		// 10: burn bootloader, require port
-		{buildPath1, "alice:avr:board1", "port", "", true, "FAIL", ""}, // requires programmer
-		{buildPath1, "alice:avr:board1", "port", "progr1", true,
+		{buildPath1, "alice:avr:board1", "port", "serial", "", true, "FAIL", ""}, // requires programmer
+		{buildPath1, "alice:avr:board1", "port", "serial", "progr1", true,
 			"ERASE conf-board1 conf-general conf-erase $$VERBOSE-VERIFY$$ genprog1protocol port -bspeed\n",
 			"BURN conf-board1 conf-general conf-bootloader $$VERBOSE-VERIFY$$ genprog1protocol port -bspeed -F0xFF " + cwd + "/testdata/hardware/alice/avr/bootloaders/niceboot/niceboot.hex\n"},
 
 		// 12: burn bootloader, preferences override from programmers.txt
-		{buildPath1, "alice:avr:board1", "port", "progr4", true,
+		{buildPath1, "alice:avr:board1", "port", "serial", "progr4", true,
 			"ERASE conf-board1 conf-two-general conf-two-erase $$VERBOSE-VERIFY$$ prog4protocol-bootloader port -bspeed\n",
 			"BURN conf-board1 conf-two-general conf-two-bootloader $$VERBOSE-VERIFY$$ prog4protocol-bootloader port -bspeed -F0xFF " + cwd + "/testdata/hardware/alice/avr/bootloaders/niceboot/niceboot.hex\n"},
 	}
@@ -183,11 +186,11 @@ func TestUploadPropertiesComposition(t *testing.T) {
 			"",                      // importFile
 			test.importDir.String(), // importDir
 			test.fqbn,               // FQBN
-			test.port,               // port
-			test.programmer,         // programmer
-			verboseVerify,           // verbose
-			verboseVerify,           // verify
-			test.burnBootloader,     // burnBootloader
+			&rpc.Port{Address: test.port, Protocol: test.protocol},
+			test.programmer,     // programmer
+			verboseVerify,       // verbose
+			verboseVerify,       // verify
+			test.burnBootloader, // burnBootloader
 			outStream,
 			errStream,
 			false,
@@ -215,4 +218,51 @@ func TestUploadPropertiesComposition(t *testing.T) {
 			testRunner(t, test, true)
 		})
 	}
+}
+
+func TestGetToolId(t *testing.T) {
+	props, err := properties.LoadFromBytes([]byte(`
+bootloader.tool=avrdude
+bootloader.tool.serial=avrdude
+upload.tool=bossac
+upload.tool.serial=bossac
+upload.tool.network=arduino_ota`))
+	require.NoError(t, err)
+
+	toolId, err := getToolId(props, "upload", "serial")
+	require.NoError(t, err)
+	require.Equal(t, "bossac", toolId)
+
+	toolId, err = getToolId(props, "upload", "network")
+	require.NoError(t, err)
+	require.Equal(t, "arduino_ota", toolId)
+
+	toolId, err = getToolId(props, "bootloader", "serial")
+	require.NoError(t, err)
+	require.Equal(t, "avrdude", toolId)
+
+	toolId, err = getToolId(props, "bootloader", "network")
+	require.EqualError(t, err, "cannot find tool: undefined 'bootloader.tool.network' property")
+	require.Equal(t, "", toolId)
+
+	props, err = properties.LoadFromBytes([]byte(`
+	bootloader.tool.default=avrdude
+	upload.tool.default=bossac`))
+	require.NoError(t, err)
+
+	toolId, err = getToolId(props, "upload", "serial")
+	require.NoError(t, err)
+	require.Equal(t, "bossac", toolId)
+
+	toolId, err = getToolId(props, "upload", "network")
+	require.NoError(t, err)
+	require.Equal(t, "bossac", toolId)
+
+	toolId, err = getToolId(props, "bootloader", "serial")
+	require.NoError(t, err)
+	require.Equal(t, "avrdude", toolId)
+
+	toolId, err = getToolId(props, "bootloader", "network")
+	require.NoError(t, err)
+	require.Equal(t, "avrdude", toolId)
 }

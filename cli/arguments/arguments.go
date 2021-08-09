@@ -15,27 +15,6 @@
 
 package arguments
 
-import (
-	"os"
+import "github.com/arduino/arduino-cli/i18n"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
-	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/go-paths-helper"
-	"github.com/sirupsen/logrus"
-)
-
-// InitSketchPath returns an instance of paths.Path pointing to sketchPath.
-// If sketchPath is an empty string returns the current working directory.
-func InitSketchPath(sketchPath string) *paths.Path {
-	if sketchPath != "" {
-		return paths.New(sketchPath)
-	}
-
-	wd, err := paths.Getwd()
-	if err != nil {
-		feedback.Errorf(tr("Couldn't get current working directory: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-	logrus.Infof("Reading sketch from dir: %s", wd)
-	return wd
-}
+var tr = i18n.Tr

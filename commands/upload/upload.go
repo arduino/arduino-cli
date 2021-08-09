@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"net/url"
 	"path/filepath"
 	"strings"
 
@@ -39,6 +38,22 @@ import (
 )
 
 var tr = i18n.Tr
+
+// getToolId returns the ID of the tool that supports the action and protocol combination by searching in props.
+// Returns error if tool cannot be found.
+func getToolId(props *properties.Map, action, protocol string) (string, error) {
+	toolProperty := fmt.Sprintf("%s.tool.%s", action, protocol)
+	defaultToolProperty := fmt.Sprintf("%s.tool.default", action)
+
+	if t, ok := props.GetOk(toolProperty); ok {
+		return t, nil
+	} else if t, ok := props.GetOk(defaultToolProperty); ok {
+		// Fallback for platform that don't support the specified protocol for specified action:
+		// https://github.com/arduino/tooling-rfcs/blob/main/RFCs/0002-pluggable-discovery.md#support-for-default-fallback-allows-upload-without-a-port
+		return t, nil
+	}
+	return "", fmt.Errorf("cannot find tool: undefined '%s' property", toolProperty)
+}
 
 // Upload FIXMEDOC
 func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, errStream io.Writer) (*rpc.UploadResponse, error) {
@@ -98,7 +113,7 @@ func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest,
 
 func runProgramAction(pm *packagemanager.PackageManager,
 	sk *sketch.Sketch,
-	importFile, importDir, fqbnIn, port string,
+	importFile, importDir, fqbnIn string, port *rpc.Port,
 	programmerID string,
 	verbose, verify, burnBootloader bool,
 	outStream, errStream io.Writer,
@@ -108,16 +123,6 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		return fmt.Errorf(tr("no programmer specified for burning bootloader"))
 	}
 
-	// FIXME: make a specification on how a port is specified via command line
-	if port == "" && sk != nil && sk.Metadata != nil {
-		deviceURI, err := url.Parse(sk.Metadata.CPU.Port)
-		if err != nil {
-			return fmt.Errorf(tr("invalid Device URL format: %s"), err)
-		}
-		if deviceURI.Scheme == "serial" {
-			port = deviceURI.Host + deviceURI.Path
-		}
-	}
 	logrus.WithField("port", port).Tracef("Upload port")
 
 	if fqbnIn == "" && sk != nil && sk.Metadata != nil {
@@ -157,28 +162,23 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	}
 
 	// Determine upload tool
-	var uploadToolID string
-	{
-		toolProperty := "upload.tool"
-		if burnBootloader {
-			toolProperty = "bootloader.tool"
-		} else if programmer != nil {
-			toolProperty = "program.tool"
-		}
-
-		// create a temporary configuration only for the selection of upload tool
-		props := properties.NewMap()
-		props.Merge(boardPlatform.Properties)
-		props.Merge(boardPlatform.RuntimeProperties())
-		props.Merge(boardProperties)
-		if programmer != nil {
-			props.Merge(programmer.Properties)
-		}
-		if t, ok := props.GetOk(toolProperty); ok {
-			uploadToolID = t
-		} else {
-			return fmt.Errorf(tr("cannot get programmer tool: undefined '%s' property"), toolProperty)
-		}
+	// create a temporary configuration only for the selection of upload tool
+	props := properties.NewMap()
+	props.Merge(boardPlatform.Properties)
+	props.Merge(boardPlatform.RuntimeProperties())
+	props.Merge(boardProperties)
+	if programmer != nil {
+		props.Merge(programmer.Properties)
+	}
+	action := "upload"
+	if burnBootloader {
+		action = "bootloader"
+	} else if programmer != nil {
+		action = "program"
+	}
+	uploadToolID, err := getToolId(props, action, port.Protocol)
+	if err != nil {
+		return err
 	}
 
 	var uploadToolPlatform *cores.PlatformRelease
@@ -302,7 +302,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		wait := false
 		portToTouch := ""
 		if touch {
-			portToTouch = port
+			portToTouch = port.Address
 			// Waits for upload port only if a 1200bps touch is done
 			wait = uploadProperties.GetBoolean("upload.wait_for_upload_port")
 		}
@@ -352,18 +352,18 @@ func runProgramAction(pm *packagemanager.PackageManager,
 			outStream.Write([]byte(fmt.Sprintln()))
 		} else {
 			if newPort != "" {
-				actualPort = newPort
+				actualPort.Address = newPort
 			}
 		}
 	}
 
-	if actualPort != "" {
+	if actualPort.Address != "" {
 		// Set serial port property
-		uploadProperties.Set("serial.port", actualPort)
-		if strings.HasPrefix(actualPort, "/dev/") {
-			uploadProperties.Set("serial.port.file", actualPort[5:])
-		} else {
-			uploadProperties.Set("serial.port.file", actualPort)
+		uploadProperties.Set("serial.port", actualPort.Address)
+		if actualPort.Protocol == "serial" {
+			// This must be done only for serial ports
+			portFile := strings.TrimPrefix(actualPort.Address, "/dev/")
+			uploadProperties.Set("serial.port.file", portFile)
 		}
 	}
 
