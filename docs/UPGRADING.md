@@ -4,7 +4,7 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## Unreleased
 
-### gRPC interface `UploadRequest`, `UploadUsingProgrammerRequest` and `BurnBootloaderRequest` arguments type change
+### gRPC interface `UploadRequest`, `UploadUsingProgrammerRequest`, `BurnBootloaderRequest`, `DetectedPort` arguments changes
 
 `UploadRequest`, `UploadUsingProgrammerRequest` and `BurnBootloaderRequest` had their `port` argument change from type
 `string` to `Port`.
@@ -27,7 +27,42 @@ message Port {
 }
 ```
 
-This change is necessary for the Pluggable Discovery.
+The gRPC interface message `DetectedPort` has been changed from:
+
+```
+message DetectedPort {
+  // Address of the port (e.g., `serial:///dev/ttyACM0`).
+  string address = 1;
+  // Protocol of the port (e.g., `serial`).
+  string protocol = 2;
+  // A human friendly description of the protocol (e.g., "Serial Port (USB)").
+  string protocol_label = 3;
+  // The boards attached to the port.
+  repeated BoardListItem boards = 4;
+  // Serial number of connected board
+  string serial_number = 5;
+}
+```
+
+to:
+
+```
+message DetectedPort {
+  // The possible boards attached to the port.
+  repeated BoardListItem matching_boards = 1;
+  // The port details
+  Port port = 2;
+}
+```
+
+The properties previously contained directly in the message are now stored in the `port` property.
+
+This changes are necessary for the Pluggable Discovery.
+
+### gRPC interface `BoardListItem` change
+
+The `vid` and `pid` properties of the `BoardListItem` have been removed. They used to only be available when requesting
+connected board lists, now that information is stored in the `port` property of `DetectedPort`.
 
 ### Change public library interface
 

@@ -91,11 +91,10 @@ func watchList(cmd *cobra.Command, inst *rpc.Instance) {
 	for event := range eventsChan {
 		feedback.PrintResult(watchEvent{
 			Type:          event.EventType,
-			Address:       event.Port.Address,
-			Protocol:      event.Port.Protocol,
-			ProtocolLabel: event.Port.ProtocolLabel,
-			Boards:        event.Port.Boards,
-			SerialNumber:  event.Port.SerialNumber,
+			Address:       event.Port.Port.Address,
+			Protocol:      event.Port.Port.Protocol,
+			ProtocolLabel: event.Port.Port.ProtocolLabel,
+			Boards:        event.Port.MatchingBoards,
 			Error:         event.Error,
 		})
 	}
@@ -117,20 +116,21 @@ func (dr result) String() string {
 	}
 
 	sort.Slice(dr.ports, func(i, j int) bool {
-		x, y := dr.ports[i], dr.ports[j]
+		x, y := dr.ports[i].Port, dr.ports[j].Port
 		return x.GetProtocol() < y.GetProtocol() ||
 			(x.GetProtocol() == y.GetProtocol() && x.GetAddress() < y.GetAddress())
 	})
 
 	t := table.New()
 	t.SetHeader(tr("Port"), tr("Type"), tr("Board Name"), tr("FQBN"), tr("Core"))
-	for _, port := range dr.ports {
+	for _, detectedPort := range dr.ports {
+		port := detectedPort.Port
 		address := port.GetProtocol() + "://" + port.GetAddress()
 		if port.GetProtocol() == "serial" {
 			address = port.GetAddress()
 		}
 		protocol := port.GetProtocolLabel()
-		if boards := port.GetBoards(); len(boards) > 0 {
+		if boards := detectedPort.GetMatchingBoards(); len(boards) > 0 {
 			sort.Slice(boards, func(i, j int) bool {
 				x, y := boards[i], boards[j]
 				return x.GetName() < y.GetName() || (x.GetName() == y.GetName() && x.GetFqbn() < y.GetFqbn())
@@ -168,7 +168,6 @@ type watchEvent struct {
 	Protocol      string               `json:"protocol,omitempty"`
 	ProtocolLabel string               `json:"protocol_label,omitempty"`
 	Boards        []*rpc.BoardListItem `json:"boards,omitempty"`
-	SerialNumber  string               `json:"serial_number,omitempty"`
 	Error         string               `json:"error,omitempty"`
 }
 
