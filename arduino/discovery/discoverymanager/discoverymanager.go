@@ -242,15 +242,15 @@ func (dm *DiscoveryManager) List() ([]*discovery.Port, []error) {
 	return ports, errs
 }
 
-// ListSync return the current list of ports detected from all discoveries
-func (dm *DiscoveryManager) ListSync() []*discovery.Port {
+// ListCachedPorts return the current list of ports detected from all discoveries
+func (dm *DiscoveryManager) ListCachedPorts() []*discovery.Port {
 	res := []*discovery.Port{}
 	for _, d := range dm.discoveries {
 		if d.State() != discovery.Syncing {
 			// Discovery is not syncing
 			continue
 		}
-		res = append(res, d.ListSync()...)
+		res = append(res, d.ListCachedPorts()...)
 	}
 	return res
 }
