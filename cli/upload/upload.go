@@ -102,6 +102,22 @@ func run(command *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
+	userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
+		Instance: instance,
+		Fqbn:     fqbn,
+		Protocol: discoveryPort.Protocol,
+	})
+	if err != nil {
+		feedback.Errorf("Error during Upload: %v", err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+
+	fields := map[string]string{}
+	if len(userFieldRes.UserFields) > 0 {
+		feedback.Printf("Uploading to specified board using %s protocol requires the following info:", discoveryPort.Protocol)
+		fields = arguments.AskForUserFields(userFieldRes.UserFields)
+	}
+
 	if _, err := upload.Upload(context.Background(), &rpc.UploadRequest{
 		Instance:   instance,
 		Fqbn:       fqbn,
@@ -113,6 +129,7 @@ func run(command *cobra.Command, args []string) {
 		ImportDir:  importDir,
 		Programmer: programmer,
 		DryRun:     dryRun,
+		UserFields: fields,
 	}, os.Stdout, os.Stderr); err != nil {
 		feedback.Errorf(tr("Error during Upload: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)

@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -39,6 +40,43 @@ import (
 
 var tr = i18n.Tr
 
+// SupportedUserFields returns a SupportedUserFieldsResponse containing all the UserFields supported
+// by the upload tools needed by the board using the protocol specified in SupportedUserFieldsRequest.
+func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsRequest) (*rpc.SupportedUserFieldsResponse, error) {
+	if req.Protocol == "" {
+		return nil, fmt.Errorf("missing protocol")
+	}
+
+	pm := commands.GetPackageManager(req.GetInstance().GetId())
+	if pm == nil {
+		return nil, fmt.Errorf("invalid instance")
+	}
+
+	fqbn, err := cores.ParseFQBN(req.GetFqbn())
+	if err != nil {
+		return nil, fmt.Errorf("parsing fqbn: %s", err)
+	}
+
+	_, platformRelease, board, _, _, err := pm.ResolveFQBN(fqbn)
+	if err != nil {
+		return nil, fmt.Errorf("loading board data: %s", err)
+	}
+
+	toolId, err := getToolId(board.Properties, "upload", req.Protocol)
+	if err != nil {
+		return nil, err
+	}
+
+	userFields, err := getUserFields(toolId, platformRelease)
+	if err != nil {
+		return nil, err
+	}
+
+	return &rpc.SupportedUserFieldsResponse{
+		UserFields: userFields,
+	}, nil
+}
+
 // getToolId returns the ID of the tool that supports the action and protocol combination by searching in props.
 // Returns error if tool cannot be found.
 func getToolId(props *properties.Map, action, protocol string) (string, error) {
@@ -53,6 +91,35 @@ func getToolId(props *properties.Map, action, protocol string) (string, error) {
 		return t, nil
 	}
 	return "", fmt.Errorf("cannot find tool: undefined '%s' property", toolProperty)
+}
+
+// getUserFields return all user fields supported by the tools specified.
+// Returns error only in case the secret property is not a valid boolean.
+func getUserFields(toolId string, platformRelease *cores.PlatformRelease) ([]*rpc.UserField, error) {
+	userFields := []*rpc.UserField{}
+	fields := platformRelease.Properties.SubTree(fmt.Sprintf("tools.%s.upload.field", toolId))
+	keys := fields.FirstLevelKeys()
+
+	for _, key := range keys {
+		value := fields.Get(key)
+		secretProp := fmt.Sprintf("%s.secret", key)
+		secret, ok := fields.GetOk(secretProp)
+		if !ok {
+			secret = "false"
+		}
+		isSecret, err := strconv.ParseBool(secret)
+		if err != nil {
+			return nil, fmt.Errorf(`parsing "tools.%s.upload.field.%s.secret", property is not a boolean`, toolId, key)
+		}
+		userFields = append(userFields, &rpc.UserField{
+			ToolId: toolId,
+			Name:   key,
+			Label:  value,
+			Secret: isSecret,
+		})
+	}
+
+	return userFields, nil
 }
 
 // Upload FIXMEDOC
@@ -83,6 +150,7 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		outStream,
 		errStream,
 		req.GetDryRun(),
+		req.GetUserFields(),
 	)
 	if err != nil {
 		return nil, err
@@ -107,6 +175,7 @@ func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest,
 		Programmer: req.GetProgrammer(),
 		Verbose:    req.GetVerbose(),
 		Verify:     req.GetVerify(),
+		UserFields: req.GetUserFields(),
 	}, outStream, errStream)
 	return &rpc.UploadUsingProgrammerResponse{}, err
 }
@@ -117,7 +186,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	programmerID string,
 	verbose, verify, burnBootloader bool,
 	outStream, errStream io.Writer,
-	dryRun bool) error {
+	dryRun bool, userFields map[string]string) error {
 
 	if burnBootloader && programmerID == "" {
 		return fmt.Errorf(tr("no programmer specified for burning bootloader"))
@@ -229,6 +298,14 @@ func runProgramAction(pm *packagemanager.PackageManager,
 				errStream.Write([]byte(fmt.Sprintf(tr("Warning: tool '%s' is not installed. It might not be available for your OS."), requiredTool)))
 			}
 		}
+	}
+
+	// Certain tools require the user to provide custom fields at run time,
+	// if they've been provided set them
+	// For more info:
+	// https://github.com/arduino/tooling-rfcs/blob/main/RFCs/0002-pluggable-discovery.md#user-provided-fields
+	for name, value := range userFields {
+		uploadProperties.Set(fmt.Sprintf("%s.field.%s", action, name), value)
 	}
 
 	if !uploadProperties.ContainsKey("upload.protocol") && programmer == nil {
@@ -365,6 +442,11 @@ func runProgramAction(pm *packagemanager.PackageManager,
 			portFile := strings.TrimPrefix(actualPort.Address, "/dev/")
 			uploadProperties.Set("serial.port.file", portFile)
 		}
+	}
+
+	// Get Port properties gathered using Pluggable Discovery
+	for prop, value := range actualPort.Properties {
+		uploadProperties.Set(fmt.Sprintf("upload.port.properties.%s", prop), value)
 	}
 
 	// Run recipes for upload

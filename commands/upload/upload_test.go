@@ -266,3 +266,40 @@ upload.tool.network=arduino_ota`))
 	require.NoError(t, err)
 	require.Equal(t, "avrdude", toolId)
 }
+
+func TestGetUserFields(t *testing.T) {
+	platformRelease := &cores.PlatformRelease{}
+
+	props, err := properties.LoadFromBytes([]byte(`
+tools.avrdude.upload.field.username=Username
+tools.avrdude.upload.field.password=Password
+tools.avrdude.upload.field.password.secret=true
+tools.arduino_ota.upload.field.username=Username
+tools.arduino_ota.upload.field.password=Password
+tools.arduino_ota.upload.field.password.secret=true`))
+	require.NoError(t, err)
+
+	platformRelease.Properties = props
+
+	userFields, err := getUserFields("avrdude", platformRelease)
+	require.NoError(t, err)
+	require.Len(t, userFields, 2)
+	require.Equal(t, userFields[0].ToolId, "avrdude")
+	require.Equal(t, userFields[0].Name, "username")
+	require.Equal(t, userFields[0].Label, "Username")
+	require.False(t, userFields[0].Secret)
+	require.Equal(t, userFields[1].ToolId, "avrdude")
+	require.Equal(t, userFields[1].Name, "password")
+	require.Equal(t, userFields[1].Label, "Password")
+	require.True(t, userFields[1].Secret)
+
+	props, err = properties.LoadFromBytes([]byte(`
+tools.arduino_ota.upload.field.password=Password
+tools.arduino_ota.upload.field.password.secret=THIS_IS_NOT_A_BOOLEAN`))
+	require.NoError(t, err)
+	platformRelease.Properties = props
+
+	userFields, err = getUserFields("arduino_ota", platformRelease)
+	require.Nil(t, userFields)
+	require.EqualError(t, err, `parsing "tools.arduino_ota.upload.field.password.secret", property is not a boolean`)
+}
