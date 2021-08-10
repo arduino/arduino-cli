@@ -18,10 +18,7 @@
           "archiveFileName": "mkr1000-1.6.4-02.tar.bz2",
           "checksum": "SHA-256:df41445fc1ff72c4f143c316c91346de95d2cd9cec5ad093ffca96bebbeaa0b6",
           "size": "979038",
-          "boards": [
-            { "name": "Arduino/Genuino Zero" },
-            { "name": "Arduino/Genuino MKR1000" }
-          ],
+          "boards": [{ "name": "Arduino/Genuino Zero" }, { "name": "Arduino/Genuino MKR1000" }],
           "toolsDependencies": [
             {
               "packager": "arduino",
@@ -54,10 +51,7 @@
           "archiveFileName": "mkr1000-1.6.4-01.tar.bz2",
           "checksum": "SHA-256:92326914c28a2d56ea1509a8b3864a0186a5b8a4634c42d35048d9ccea6334b6",
           "size": "978601",
-          "boards": [
-            { "name": "Arduino/Genuino Zero" },
-            { "name": "Arduino/Genuino MKR1000" }
-          ],
+          "boards": [{ "name": "Arduino/Genuino Zero" }, { "name": "Arduino/Genuino MKR1000" }],
           "toolsDependencies": [
             {
               "packager": "arduino",
@@ -82,8 +76,7 @@
           ]
         }
       ],
-      "tools": [
-      ]
+      "tools": []
     }
   ]
 }

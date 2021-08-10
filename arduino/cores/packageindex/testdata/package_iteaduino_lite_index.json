@@ -14,9 +14,7 @@
           "archiveFileName": "iteaduino_lite_board.zip",
           "checksum": "SHA-256:fc1c0847ff54df757b5b1d2405ea44e51b3f4458e3889b280676adce00e13053",
           "size": "126811",
-          "boards": [
-            {"name": "Iteaduino Lite"}
-          ],
+          "boards": [{ "name": "Iteaduino Lite" }],
           "toolsDependencies": [
             {
               "packager": "arduino",
@@ -31,7 +29,7 @@
           ]
         }
       ],
-      "tools":[]
+      "tools": []
     }
   ]
 }

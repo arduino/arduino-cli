@@ -21,9 +21,7 @@
           "archiveFileName": "Dwenguino.zip",
           "checksum": "SHA-256:18FDB829D8591C0B656DFBAA03F775266ECFAD5CBB99203B942CA82A1D526B19",
           "size": "254686",
-          "boards": [
-            {"name": "Dwenguino"}
-          ],
+          "boards": [{ "name": "Dwenguino" }],
           "toolsDependencies": [
             {
               "packager": "arduino",
@@ -49,13 +47,11 @@
           "archiveFileName": "Dwenguino-2.2.1.zip",
           "checksum": "SHA-256:60e42e6416e7c5b9e20d1edbbf8f93e86fa0d521249f649b3434bcc8185421da",
           "size": "333520",
-          "boards": [
-            {"name": "Dwenguino"}
-          ],
+          "boards": [{ "name": "Dwenguino" }],
           "toolsDependencies": []
         }
       ],
-      "tools":[]
+      "tools": []
     }
   ]
 }

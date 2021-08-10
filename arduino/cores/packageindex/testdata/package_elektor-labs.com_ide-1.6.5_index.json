@@ -22,12 +22,9 @@
           "checksum": "SHA-256:7bbb3ed7e0f3d1613cabee14c2fe47e4dff3081bd51999d99662418bfa9b150f",
           "size": "191053",
           "help": {
-                    "online": "http://www.elektor-labs.com"
+            "online": "http://www.elektor-labs.com"
           },
-          "boards": [
-            {"name": "eRIC Nitro"},
-            {"name": "Platino"}
-          ],
+          "boards": [{ "name": "eRIC Nitro" }, { "name": "Platino" }],
           "toolsDependencies": [
             {
               "packager": "arduino",
@@ -42,7 +39,7 @@
           ]
         }
       ],
-      "tools":[]
+      "tools": []
     }
   ]
 }

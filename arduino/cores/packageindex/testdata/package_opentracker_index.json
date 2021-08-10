@@ -18,9 +18,7 @@
           "archiveFileName": "sam-1.6.11-opentracker-1.0.5.tar.bz2",
           "checksum": "SHA-256:50c01d87122a7f6416c3494b1ca96e05d5b4483ea21bb6dfb57184c0ce7c68e8",
           "size": "2982552",
-          "boards": [
-            {"name": "GeoLink OpenTracker"}
-          ],
+          "boards": [{ "name": "GeoLink OpenTracker" }],
           "toolsDependencies": [
             {
               "packager": "opentracker",
@@ -43,9 +41,7 @@
           "archiveFileName": "sam-1.6.6-opentracker-1.0.4.tar.bz2",
           "checksum": "SHA-256:675f4a0ef567f186bc8fee2b2e76e3670fe68ca176edbd7d2d66c927e4c0572f",
           "size": "2863733",
-          "boards": [
-            {"name": "GeoLink OpenTracker"}
-          ],
+          "boards": [{ "name": "GeoLink OpenTracker" }],
           "toolsDependencies": [
             {
               "packager": "opentracker",
@@ -68,9 +64,7 @@
           "archiveFileName": "sam-1.6.6-opentracker-1.0.3.tar.bz2",
           "checksum": "SHA-256:9622aaf1d86c57014a34d68977a43c3d2c27ed2014bf5a5df65b134f8ba423f1",
           "size": "2863303",
-          "boards": [
-            {"name": "GeoLink OpenTracker"}
-          ],
+          "boards": [{ "name": "GeoLink OpenTracker" }],
           "toolsDependencies": [
             {
               "packager": "opentracker",
@@ -93,9 +87,7 @@
           "archiveFileName": "sam-1.6.6-opentracker-1.0.2.tar.bz2",
           "checksum": "SHA-256:3fd207012b704800a97289ea87c0dee1ecb096d722a4ec36ef999ab9761d24aa",
           "size": "2864704",
-          "boards": [
-            {"name": "GeoLink OpenTracker"}
-          ],
+          "boards": [{ "name": "GeoLink OpenTracker" }],
           "toolsDependencies": [
             {
               "packager": "opentracker",
@@ -118,9 +110,7 @@
           "archiveFileName": "sam-1.6.4-opentracker-1.0.0.tar.bz2",
           "checksum": "SHA-256:cc9d5c605c569128af4c5839966a7ef1fbcfa33f138889d34cabbf05f4e0b4ec",
           "size": "2845509",
-          "boards": [
-            {"name": "GeoLink OpenTracker"}
-          ],
+          "boards": [{ "name": "GeoLink OpenTracker" }],
           "toolsDependencies": [
             {
               "packager": "opentracker",
@@ -143,9 +133,7 @@
           "archiveFileName": "sam-1.6.4-opentracker-1.0.0.tar.bz2",
           "checksum": "SHA-256:cc9d5c605c569128af4c5839966a7ef1fbcfa33f138889d34cabbf05f4e0b4ec",
           "size": "2845509",
-          "boards": [
-            {"name": "GeoLink OpenTracker"}
-          ],
+          "boards": [{ "name": "GeoLink OpenTracker" }],
           "toolsDependencies": [
             {
               "packager": "opentracker",

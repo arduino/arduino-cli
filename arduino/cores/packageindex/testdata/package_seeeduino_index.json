@@ -22,11 +22,11 @@
           "checksum": "SHA-256:db124e76b9cb9e788fa21c78d66e868472a2ec84a45ec25c92237a22b07a2b48",
           "size": "1899",
           "boards": [
-            {"name": "Seeeduino V3.0(Atmega328P)"},
-            {"name": "Seeeduino Mega 2560"},
-			{"name": "Seeeduino V4(Atmega328P)"},
-			{"name": "Seeeduino Lotus"},
-			{"name": "Seeeduino Lite"}
+            { "name": "Seeeduino V3.0(Atmega328P)" },
+            { "name": "Seeeduino Mega 2560" },
+            { "name": "Seeeduino V4(Atmega328P)" },
+            { "name": "Seeeduino Lotus" },
+            { "name": "Seeeduino Lite" }
           ],
           "toolsDependencies": [
             {

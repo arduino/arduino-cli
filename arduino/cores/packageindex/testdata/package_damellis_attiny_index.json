@@ -21,12 +21,7 @@
           "archiveFileName": "702aa287455f7e052cf94fd4949398fec0ef21b8.zip",
           "checksum": "SHA-256:bfffa4a700e42ae993895f5eea22bc369ba5ac3ea36eca18ac5f72a05bb60ab5",
           "size": "5005",
-          "boards": [
-            {"name": "ATtiny45"},
-            {"name": "ATtiny85"},
-            {"name": "ATtiny44"},
-            {"name": "ATtiny84"}
-          ],
+          "boards": [{ "name": "ATtiny45" }, { "name": "ATtiny85" }, { "name": "ATtiny44" }, { "name": "ATtiny84" }],
           "toolsDependencies": [
             {
               "packager": "arduino",
@@ -52,12 +47,7 @@
           "archiveFileName": "76ca88ce3c195fcba8e8a645084e352965dc80e0.zip",
           "checksum": "SHA-256:49a4dfc3796caf2533050b0b962ae0affb2471b8ded1283936d7b712cc1fdff1",
           "size": "5719",
-          "boards": [
-            {"name": "ATtiny45"},
-            {"name": "ATtiny85"},
-            {"name": "ATtiny44"},
-            {"name": "ATtiny84"}
-          ],
+          "boards": [{ "name": "ATtiny45" }, { "name": "ATtiny85" }, { "name": "ATtiny44" }, { "name": "ATtiny84" }],
           "toolsDependencies": [
             {
               "packager": "arduino",
@@ -84,12 +74,12 @@
           "checksum": "SHA-256:1654a8968fea7d599255bd18430786f9c84340606e7a678b9cf9a3cd49d94ad7",
           "size": "5913",
           "boards": [
-            {"name": "ATtiny25"},
-            {"name": "ATtiny45"},
-            {"name": "ATtiny85"},
-            {"name": "ATtiny24"},
-            {"name": "ATtiny44"},
-            {"name": "ATtiny84"}
+            { "name": "ATtiny25" },
+            { "name": "ATtiny45" },
+            { "name": "ATtiny85" },
+            { "name": "ATtiny24" },
+            { "name": "ATtiny44" },
+            { "name": "ATtiny84" }
           ]
         }
       ],

@@ -21,9 +21,7 @@
           "archiveFileName": "laika_boards.zip",
           "checksum": "SHA-256:2acf8089a8840cd8c5cb521c4f3f7e552bdeaa355d65be9f8fc0b46198da1a9b",
           "size": "4450",
-          "boards": [
-            {"name": "Explorer"}
-          ],
+          "boards": [{ "name": "Explorer" }],
           "toolsDependencies": [
             {
               "packager": "arduino",
@@ -38,8 +36,7 @@
           ]
         }
       ],
-      "tools":[]
+      "tools": []
     }
   ]
 }
-

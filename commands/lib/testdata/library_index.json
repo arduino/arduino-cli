@@ -1,13 +1,13 @@
 {
-	"libraries": [
-		{
-			"name": "ArduinoTestPackage"
-		},
-		{
-			"name": "Arduino"
-		},
-		{
-			"name": "Test"
-		}
-	]
+  "libraries": [
+    {
+      "name": "ArduinoTestPackage"
+    },
+    {
+      "name": "Arduino"
+    },
+    {
+      "name": "Test"
+    }
+  ]
 }
