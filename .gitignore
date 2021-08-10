@@ -25,5 +25,6 @@ venv
 /site/
 /public/
 /docsgen/arduino-cli
+/docsgen/arduino-cli.exe
 /docs/rpc/*.md
 /docs/commands/*.md

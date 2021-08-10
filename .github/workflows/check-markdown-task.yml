@@ -1,0 +1,87 @@
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-markdown-task.md
+name: Check Markdown
+
+env:
+  # See: https://github.com/actions/setup-go/tree/v2#readme
+  GO_VERSION: "1.16"
+
+# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+on:
+  push:
+    paths:
+      - ".github/workflows/check-markdown-task.ya?ml"
+      - ".markdown-link-check.json"
+      - "Taskfile.ya?ml"
+      - "**/.markdownlint*"
+      - "**.go"
+      - "**.mdx?"
+      - "**.mkdn"
+      - "**.mdown"
+      - "**.markdown"
+      - "rpc/**"
+  pull_request:
+    paths:
+      - ".github/workflows/check-markdown-task.ya?ml"
+      - ".markdown-link-check.json"
+      - "Taskfile.ya?ml"
+      - "**/.markdownlint*"
+      - "**.go"
+      - "**.mdx?"
+      - "**.mkdn"
+      - "**.mdown"
+      - "**.markdown"
+      - "rpc/**"
+  schedule:
+    # Run every Tuesday at 8 AM UTC to catch breakage caused by external changes.
+    - cron: "0 8 * * TUE"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Initialize markdownlint-cli problem matcher
+        uses: xt0rted/markdownlint-problem-matcher@v1
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Lint
+        run: task markdown:lint
+
+  links:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install Go dependencies
+        run: go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@v1.4.1
+
+      - name: Install protoc compiler
+        uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Check links
+        run: task --silent markdown:check-links

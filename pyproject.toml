@@ -22,6 +22,13 @@ pytest-xdist = "^2.1.0"
 pytest_httpserver = "^0.3.5"
 GitPython = "^3.1.12"
 
+[tool.poetry.dev-dependencies]
+mkdocs = "^1.2.1"
+mkdocs-material = "^7.1.8"
+mdx-truly-sane-lists = "^1.2"
+GitPython = "^3.1.20"
+mike = "^1.0.1"
+
 [tool.black]
 line-length = 120
 target-version = ["py38"]

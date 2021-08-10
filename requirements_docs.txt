@@ -1,6 +1,0 @@
-mkdocs<1.2
-mkdocs-material<5
-mike==0.5.1
-gitpython
-click<7.2
-mdx_truly_sane_lists==1.2
