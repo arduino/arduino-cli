@@ -282,7 +282,7 @@ A well behaved pluggable discovery tool must reflect the following state machine
 
 ![Pluggable discovery state machine](img/pluggable-discovery-state-machine.png)
 
-The arrows represent the commands outlined in the above sections, calling successfully a command assumes the state
+The arrows represent the commands outlined in the above sections, calling a command successfully assumes the state
 changes.
 
 A pluggable discovery state is Alive when the process has been started but no command has been executed. Dead means the
