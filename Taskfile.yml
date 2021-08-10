@@ -4,14 +4,6 @@ includes:
   dist: ./DistTasks.yml
 
 tasks:
-  docs:gen:commands:
-    desc: Generate command reference files
-    deps:
-      - task: go:cli-docs
-    cmds:
-      - |
-        echo "WARNING: this task is deprecated. Use go:cli-docs instead"
-
   docs:gen:protobuf:
     desc: Generate markdown contents for protobuffers
     cmds:
@@ -20,14 +12,6 @@ tasks:
       - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,settings.md --proto_path=rpc ./rpc/cc/arduino/cli/settings/v1/*.proto'
       - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,debug.md --proto_path=rpc ./rpc/cc/arduino/cli/debug/v1/*.proto'
 
-  docs:gen:
-    desc: Generate documentation files
-    deps:
-      - task: docs:generate
-    cmds:
-      - |
-        echo "WARNING: this task is deprecated. Use docs:generate instead"
-
   docs:generate:
     desc: Create all generated documentation content
     deps:
@@ -35,30 +19,6 @@ tasks:
       - task: protoc:docs
     cmds:
       - task: general:format-prettier
-
-  docs:build:
-    desc: Build documentation website contents
-    deps:
-      - task: website:check
-    cmds:
-      - |
-        echo "WARNING: this task is deprecated. Use website:check instead"
-
-  docs:serve:
-    desc: Run documentation website locally
-    deps:
-      - task: website:serve
-    cmds:
-      - |
-        echo "WARNING: this task is deprecated. Use website:serve instead"
-
-  docs:check-links:
-    desc: Verifies there are no dead links in documentation
-    deps:
-      - task: markdown:check-links
-    cmds:
-      - |
-        echo "WARNING: this task is deprecated. Use markdown:check-links instead"
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-prettier-formatting-task/Taskfile.yml
   general:format-prettier:
