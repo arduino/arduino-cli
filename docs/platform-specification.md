@@ -15,10 +15,12 @@ The new hardware folders have a hierarchical structure organized in two levels:
 A vendor/maintainer can have multiple supported architectures. For example, below we have three hardware vendors called
 "arduino", "yyyyy" and "xxxxx":
 
-    hardware/arduino/avr/...     - Arduino - AVR Boards
-    hardware/arduino/sam/...     - Arduino - SAM (32bit ARM) Boards
-    hardware/yyyyy/avr/...       - Yyy - AVR
-    hardware/xxxxx/avr/...       - Xxx - AVR
+```
+hardware/arduino/avr/...     - Arduino - AVR Boards
+hardware/arduino/sam/...     - Arduino - SAM (32bit ARM) Boards
+hardware/yyyyy/avr/...       - Yyy - AVR
+hardware/xxxxx/avr/...       - Xxx - AVR
+```
 
 The vendor "arduino" has two supported architectures (AVR and SAM), while "xxxxx" and "yyyyy" have only AVR.
 
@@ -44,10 +46,12 @@ Each architecture must be configured through a set of configuration files:
 A configuration file is a list of "key=value" properties. The **value** of a property can be expressed using the value
 of another property by putting its name inside brackets "{" "}". For example:
 
-    compiler.path=/tools/g++_arm_none_eabi/bin/
-    compiler.c.cmd=arm-none-eabi-gcc
-    [....]
-    recipe.c.o.pattern={compiler.path}{compiler.c.cmd}
+```
+compiler.path=/tools/g++_arm_none_eabi/bin/
+compiler.c.cmd=arm-none-eabi-gcc
+[....]
+recipe.c.o.pattern={compiler.path}{compiler.c.cmd}
+```
 
 In this example the property **recipe.c.o.pattern** will be set to **/tools/g++\_arm_none_eabi/bin/arm-none-eabi-gcc**,
 which is the composition of the properties **compiler.path** and **compiler.c.cmd**.
@@ -56,16 +60,20 @@ which is the composition of the properties **compiler.path** and **compiler.c.cm
 
 Lines starting with **#** are treated as comments and will be ignored.
 
-    # Like in this example
-    # --------------------
-    # I'm a comment!
+```
+# Like in this example
+# --------------------
+# I'm a comment!
+```
 
 #### Automatic property override for specific OS
 
 We can specify an OS-specific value for a property. For example the following file:
 
-    tools.bossac.cmd=bossac
-    tools.bossac.cmd.windows=bossac.exe
+```
+tools.bossac.cmd=bossac
+tools.bossac.cmd.windows=bossac.exe
+```
 
 will set the property **tools.bossac.cmd** to the value **bossac** on Linux and macOS and **bossac.exe** on Windows.
 [Supported](https://github.com/arduino/Arduino/blob/1.8.12/arduino-core/src/processing/app/helpers/PreferencesMap.java#L110-L112)
@@ -115,8 +123,10 @@ system libraries, etc.).
 
 The following meta-data must be defined:
 
-    name=Arduino AVR Boards
-    version=1.5.3
+```
+name=Arduino AVR Boards
+version=1.5.3
+```
 
 The **name** will be shown as the Arduino IDE's Board menu section title or the Name field of
 [`arduino-cli core list`](commands/arduino-cli_core_list.md)'s output for the platform.<br> The **version** is currently
@@ -163,15 +173,17 @@ The recipes can be built concatenating the following automatically generated pro
 
 For example the following is used for AVR:
 
-    ## Compiler global definitions
-    compiler.path={runtime.ide.path}/tools/avr/bin/
-    compiler.c.cmd=avr-gcc
-    compiler.c.flags=-c -g -Os -w -ffunction-sections -fdata-sections -MMD
+```
+## Compiler global definitions
+compiler.path={runtime.ide.path}/tools/avr/bin/
+compiler.c.cmd=avr-gcc
+compiler.c.flags=-c -g -Os -w -ffunction-sections -fdata-sections -MMD
 
-    [......]
+[......]
 
-    ## Compile c files
-    recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
+## Compile c files
+recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
+```
 
 Note that some properties, like **{build.mcu}** for example, are taken from the **boards.txt** file which is documented
 later in this specification.
@@ -190,13 +202,15 @@ The recipe can be built concatenating the following automatically generated prop
 
 For example, Arduino provides the following for AVR:
 
-    compiler.ar.cmd=avr-ar
-    compiler.ar.flags=rcs
+```
+compiler.ar.cmd=avr-ar
+compiler.ar.flags=rcs
 
-    [......]
+[......]
 
-    ## Create archives
-    recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} "{archive_file_path}" "{object_file}"
+## Create archives
+recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} "{archive_file_path}" "{object_file}"
+```
 
 #### Recipes for linking
 
@@ -217,40 +231,48 @@ The recipe can be built concatenating the following automatically generated prop
 
 For example the following is used for AVR:
 
-    compiler.c.elf.flags=-Os -Wl,--gc-sections
-    compiler.c.elf.cmd=avr-gcc
+```
+compiler.c.elf.flags=-Os -Wl,--gc-sections
+compiler.c.elf.cmd=avr-gcc
 
-    compiler.libraries.ldflags=
+compiler.libraries.ldflags=
 
-    [......]
+[......]
 
-    ## Combine gc-sections, archives, and objects
-    recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} -mmcu={build.mcu} -o "{build.path}/{build.project_name}.elf" {object_files} {compiler.libraries.ldflags} "{archive_file_path}" "-L{build.path}" -lm
+## Combine gc-sections, archives, and objects
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} -mmcu={build.mcu} -o "{build.path}/{build.project_name}.elf" {object_files} {compiler.libraries.ldflags} "{archive_file_path}" "-L{build.path}" -lm
+```
 
 #### Recipes for extraction of executable files and other binary data
 
 An arbitrary number of extra steps can be performed at the end of objects linking. These steps can be used to extract
 binary data used for upload and they are defined by a set of recipes with the following format:
 
-    recipe.objcopy.FILE_EXTENSION_1.pattern=[.....]
-    recipe.objcopy.FILE_EXTENSION_2.pattern=[.....]
-    [.....]
+```
+recipe.objcopy.FILE_EXTENSION_1.pattern=[.....]
+recipe.objcopy.FILE_EXTENSION_2.pattern=[.....]
+[.....]
+```
 
 `FILE_EXTENSION_x` must be replaced with the extension of the extracted file, for example the AVR platform needs two
 files a `.hex` and a `.eep`, so we made two recipes like:
 
-    recipe.objcopy.eep.pattern=[.....]
-    recipe.objcopy.hex.pattern=[.....]
+```
+recipe.objcopy.eep.pattern=[.....]
+recipe.objcopy.hex.pattern=[.....]
+```
 
 There are no specific properties set by the Arduino development software here.
 
 A full example for the AVR platform can be:
 
-    ## Create eeprom
-    recipe.objcopy.eep.pattern="{compiler.path}{compiler.objcopy.cmd}" {compiler.objcopy.eep.flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.eep"
+```
+## Create eeprom
+recipe.objcopy.eep.pattern="{compiler.path}{compiler.objcopy.cmd}" {compiler.objcopy.eep.flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.eep"
 
-    ## Create hex
-    recipe.objcopy.hex.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf2hex.flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.hex"
+## Create hex
+recipe.objcopy.hex.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf2hex.flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.hex"
+```
 
 #### Recipes to compute binary sketch size
 
@@ -263,12 +285,14 @@ through the regular expressions set in the properties:
 
 For AVR we have:
 
-    compiler.size.cmd=avr-size
-    [....]
-    ## Compute size
-    recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.hex"
-    recipe.size.regex=^(?:\.text|\.data|\.bootloader)\s+([0-9]+).*
-    recipe.size.regex.data=^(?:\.data|\.bss|\.noinit)\s+([0-9]+).*
+```
+compiler.size.cmd=avr-size
+[....]
+## Compute size
+recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.hex"
+recipe.size.regex=^(?:\.text|\.data|\.bootloader)\s+([0-9]+).*
+recipe.size.regex.data=^(?:\.data|\.bss|\.noinit)\s+([0-9]+).*
+```
 
 Two properties can be used to define the total available memory:
 
@@ -280,8 +304,10 @@ If the binary sketch size exceeds the value of these properties, the compilation
 This information is displayed in the console output after compiling a sketch, along with the relative memory usage
 value:
 
-    Sketch uses 924 bytes (2%) of program storage space. Maximum is 32256 bytes.
-    Global variables use 9 bytes (0%) of dynamic memory, leaving 2039 bytes for local variables. Maximum is 2048 bytes.
+```
+Sketch uses 924 bytes (2%) of program storage space. Maximum is 32256 bytes.
+Global variables use 9 bytes (0%) of dynamic memory, leaving 2039 bytes for local variables. Maximum is 2048 bytes.
+```
 
 #### Recipes to export compiled binary
 
@@ -300,7 +326,7 @@ The **recipe.hooks.savehex.presavehex.NUMBER.pattern** and **recipe.hooks.savehe
 (but not **recipe.output.tmp_file** and **recipe.output.save_file**) can be built concatenating the following
 automatically generated properties:
 
-    {sketch_path}              - the absolute path of the sketch folder
+- `{sketch_path}`: the absolute path of the sketch folder
 
 #### Recipe to run the preprocessor
 
@@ -318,8 +344,10 @@ The recipes can be built concatenating other automatically generated properties 
 
 For example the following is used for AVR:
 
-    preproc.macros.flags=-w -x c++ -E -CC
-    recipe.preproc.macros="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} {preproc.macros.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{preprocessed_file_path}"
+```
+preproc.macros.flags=-w -x c++ -E -CC
+recipe.preproc.macros="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} {preproc.macros.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{preprocessed_file_path}"
+```
 
 Note that the `{preprocessed_file_path}` might point to (your operating system's equivalent) of `/dev/null`. In this
 case, also passing `-MMD` to gcc is problematic, as it will try to generate a dependency file called `/dev/null.d`,
@@ -392,14 +420,16 @@ as prefix.
 For example, the board ID chosen for the Arduino Uno board is "uno". An extract of the Uno board configuration in
 boards.txt looks like:
 
-    [......]
-    uno.name=Arduino Uno
-    uno.build.mcu=atmega328p
-    uno.build.f_cpu=16000000L
-    uno.build.board=AVR_UNO
-    uno.build.core=arduino
-    uno.build.variant=standard
-    [......]
+```
+[......]
+uno.name=Arduino Uno
+uno.build.mcu=atmega328p
+uno.build.f_cpu=16000000L
+uno.build.board=AVR_UNO
+uno.build.core=arduino
+uno.build.variant=standard
+[......]
+```
 
 Note that all the relevant keys start with the board ID **uno.xxxxx**.
 
@@ -413,11 +443,13 @@ development software outputs a warning. In this case the macro defined at compil
 The other properties will override the corresponding global properties when the user selects the board. These properties
 will be globally available, in other configuration files too, without the board ID prefix:
 
-    uno.build.mcu           =>   build.mcu
-    uno.build.f_cpu         =>   build.f_cpu
-    uno.build.board         =>   build.board
-    uno.build.core          =>   build.core
-    uno.build.variant       =>   build.variant
+```
+uno.build.mcu           =>   build.mcu
+uno.build.f_cpu         =>   build.f_cpu
+uno.build.board         =>   build.board
+uno.build.core          =>   build.core
+uno.build.variant       =>   build.variant
+```
 
 This explains the presence of **{build.mcu}** or **{build.board}** in the platform.txt recipes: their value is
 overwritten respectively by **{uno.build.mcu}** and **{uno.build.board}** when the Uno board is selected! Moreover the
@@ -442,11 +474,15 @@ example the following could be a valid platform layout:
 The board's property **build.core** is used to find the core that must be compiled and linked when the board is
 selected. For example if a board needs the Arduino core the **build.core** variable should be set to:
 
-    uno.build.core=arduino
+```
+uno.build.core=arduino
+```
 
 or if the RTOS core is needed, to:
 
-    uno.build.core=rtos
+```
+uno.build.core=rtos
+```
 
 In any case the contents of the selected core folder are compiled and the core folder path is added to the include files
 search path.
@@ -480,17 +516,21 @@ uses:
 In this example, the Arduino Uno board needs the _standard_ variant so the **build.variant** property is set to
 _standard_:
 
-    [.....]
-    uno.build.core=arduino
-    uno.build.variant=standard
-    [.....]
+```
+[.....]
+uno.build.core=arduino
+uno.build.variant=standard
+[.....]
+```
 
 instead, the Arduino Leonardo board needs the _leonardo_ variant:
 
-    [.....]
-    leonardo.build.core=arduino
-    leonardo.build.variant=leonardo
-    [.....]
+```
+[.....]
+leonardo.build.core=arduino
+leonardo.build.variant=leonardo
+[.....]
+```
 
 In the example above, both Uno and Leonardo share the same core but use different variants.<br> In any case, the
 contents of the selected variant folder path is added to the include search path and its contents are compiled and
@@ -503,10 +543,12 @@ The parameter **build.variant.path** is automatically generated.
 USB vendor IDs (VID) and product IDs (PID) identify USB devices to the computer. If the board uses a unique VID/PID
 pair, it may be defined in boards.txt:
 
-    uno.vid.0=0x2341
-    uno.pid.0=0x0043
-    uno.vid.1=0x2341
-    uno.pid.1=0x0001
+```
+uno.vid.0=0x2341
+uno.pid.0=0x0043
+uno.vid.1=0x2341
+uno.pid.1=0x0001
+```
 
 The **vid** and **pid** properties end with an arbitrary number, which allows multiple VID/PID pairs to be defined for a
 board. The snippet above is defining the 2341:0043 and 2341:0001 pairs used by Uno boards.
@@ -529,16 +571,20 @@ not desirable, the control signal assertion behavior of Serial Monitor is config
 **serial.disableRTS** properties. Setting these properties to `true` will prevent Serial Monitor from asserting the
 control signals when that board is selected:
 
-    [.....]
-    uno.serial.disableDTR=true
-    uno.serial.disableRTS=true
-    [.....]
+```
+[.....]
+uno.serial.disableDTR=true
+uno.serial.disableRTS=true
+[.....]
+```
 
 ### Hiding boards
 
 Adding a **hide** property to a board definition causes it to not be shown in the Arduino IDE's **Tools > Board** menu.
 
-    uno.hide=
+```
+uno.hide=
+```
 
 The value of the property is ignored; it's the presence or absence of the property that controls the board's visibility.
 
@@ -559,13 +605,15 @@ For example, the programmer ID chosen for the
 ["Arduino as ISP" programmer](https://www.arduino.cc/en/Tutorial/ArduinoISP) is "arduinoasisp". The definition of this
 programmer in programmers.txt looks like:
 
-    [......]
-    arduinoasisp.name=Arduino as ISP
-    arduinoasisp.protocol=stk500v1
-    arduinoasisp.program.speed=19200
-    arduinoasisp.program.tool=avrdude
-    arduinoasisp.program.extra_params=-P{serial.port} -b{program.speed}
-    [......]
+```
+[......]
+arduinoasisp.name=Arduino as ISP
+arduinoasisp.protocol=stk500v1
+arduinoasisp.program.speed=19200
+arduinoasisp.program.tool=avrdude
+arduinoasisp.program.extra_params=-P{serial.port} -b{program.speed}
+[......]
+```
 
 These properties can only be used in the recipes of the actions that use the programmer (`erase`, `bootloader`, and
 `program`).
@@ -598,24 +646,28 @@ used for different purposes:
 Each action has its own recipe and its configuration is done through a set of properties having key starting with
 **tools** prefix followed by the tool ID and the action:
 
-    [....]
-    tools.avrdude.upload.pattern=[......]
-    [....]
-    tools.avrdude.program.pattern=[......]
-    [....]
-    tools.avrdude.erase.pattern=[......]
-    [....]
-    tools.avrdude.bootloader.pattern=[......]
-    [.....]
+```
+[....]
+tools.avrdude.upload.pattern=[......]
+[....]
+tools.avrdude.program.pattern=[......]
+[....]
+tools.avrdude.erase.pattern=[......]
+[....]
+tools.avrdude.bootloader.pattern=[......]
+[.....]
+```
 
 A tool may have some actions not defined (it's not mandatory to define all four actions).<br> Let's look at how the
 **upload** action is defined for avrdude:
 
-    tools.avrdude.path={runtime.tools.avrdude.path}
-    tools.avrdude.cmd.path={path}/bin/avrdude
-    tools.avrdude.config.path={path}/etc/avrdude.conf
+```
+tools.avrdude.path={runtime.tools.avrdude.path}
+tools.avrdude.cmd.path={path}/bin/avrdude
+tools.avrdude.config.path={path}/etc/avrdude.conf
 
-    tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+```
 
 A **{runtime.tools.TOOL_NAME.path}** and **{runtime.tools.TOOL_NAME-TOOL_VERSION.path}** property is generated for the
 tools of Arduino AVR Boards and any other platform installed via Boards Manager. **{runtime.tools.TOOL_NAME.path}**
@@ -633,17 +685,23 @@ action we are considering).<br> When the verbose mode is enabled, the **tools.TO
 is copied into **ACTION.verbose**. When the verbose mode is disabled, the **tools.TOOL_ID.ACTION.params.quiet** property
 is copied into **ACTION.verbose**. Confused? Maybe an example will make things clear:
 
-    tools.avrdude.upload.params.verbose=-v -v -v -v
-    tools.avrdude.upload.params.quiet=-q -q
-    tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+```
+tools.avrdude.upload.params.verbose=-v -v -v -v
+tools.avrdude.upload.params.quiet=-q -q
+tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+```
 
 In this example if the user enables verbose mode, then **{upload.params.verbose}** is used in **{upload.verbose}**:
 
-    tools.avrdude.upload.params.verbose    =>    upload.verbose
+```
+tools.avrdude.upload.params.verbose    =>    upload.verbose
+```
 
 If the user didn't enable verbose mode, then **{upload.params.quiet}** is used in **{upload.verbose}**:
 
-    tools.avrdude.upload.params.quiet      =>    upload.verbose
+```
+tools.avrdude.upload.params.quiet      =>    upload.verbose
+```
 
 ### Sketch upload configuration
 
@@ -654,35 +712,41 @@ program to the Arduino board.
 The **upload.tool** property determines the tool to be used for upload. A specific **upload.tool** property should be
 defined for every board in boards.txt:
 
-    [......]
-    uno.upload.tool=avrdude
-    [......]
-    leonardo.upload.tool=avrdude
-    [......]
+```
+[......]
+uno.upload.tool=avrdude
+[......]
+leonardo.upload.tool=avrdude
+[......]
+```
 
 Other upload parameters can also be defined for the board. For example, in the Arduino AVR Boards boards.txt we have:
 
-    [.....]
-    uno.name=Arduino Uno
-    uno.upload.tool=avrdude
-    uno.upload.protocol=arduino
-    uno.upload.maximum_size=32256
-    uno.upload.speed=115200
-    [.....]
-    leonardo.name=Arduino Leonardo
-    leonardo.upload.tool=avrdude
-    leonardo.upload.protocol=avr109
-    leonardo.upload.maximum_size=28672
-    leonardo.upload.speed=57600
-    leonardo.upload.use_1200bps_touch=true
-    leonardo.upload.wait_for_upload_port=true
-    [.....]
+```
+[.....]
+uno.name=Arduino Uno
+uno.upload.tool=avrdude
+uno.upload.protocol=arduino
+uno.upload.maximum_size=32256
+uno.upload.speed=115200
+[.....]
+leonardo.name=Arduino Leonardo
+leonardo.upload.tool=avrdude
+leonardo.upload.protocol=avr109
+leonardo.upload.maximum_size=28672
+leonardo.upload.speed=57600
+leonardo.upload.use_1200bps_touch=true
+leonardo.upload.wait_for_upload_port=true
+[.....]
+```
 
 Most **{upload.XXXX}** variables are used later in the avrdude upload recipe in platform.txt:
 
-    [.....]
-    tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D "-Uflash:w:{build.path}/{build.project_name}.hex:i"
-    [.....]
+```
+[.....]
+tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+[.....]
+```
 
 #### Upload verification
 
@@ -699,11 +763,13 @@ set to `true`/`false` according to the verification preference setting, while `{
 this reason, backwards compatibility with older IDE versions requires the addition of definitions for the
 **upload.verify** and **program.verify** properties to platform.txt:
 
-    [.....]
-    tools.avrdude.upload.verify=
-    [.....]
-    tools.avrdude.program.verify=
-    [.....]
+```
+[.....]
+tools.avrdude.upload.verify=
+[.....]
+tools.avrdude.program.verify=
+[.....]
+```
 
 These definitions are overridden with the value defined by **tools.TOOL_ID.ACTION.params.verify/noverify** when a modern
 version of Arduino development software is in use.
@@ -758,11 +824,13 @@ compiled sketch to a board using an external programmer.
 The **program.tool** property determines the tool to be used for this action. This property is typically defined for
 each programmer in [programmers.txt](#programmerstxt):
 
-    [......]
-    usbasp.program.tool=avrdude
-    [......]
-    arduinoasisp.program.tool=avrdude
-    [......]
+```
+[......]
+usbasp.program.tool=avrdude
+[......]
+arduinoasisp.program.tool=avrdude
+[......]
+```
 
 This action can use the same [upload verification preference system](#upload-verification) as the `upload` action, via
 the **program.verify** property.
@@ -788,11 +856,13 @@ the board.
 The **bootloader.tool** property determines the tool to be used for the `erase` and `bootloader` actions both. This
 property is typically defined for each board in boards.txt:
 
-    [......]
-    uno.bootloader.tool=avrdude
-    [......]
-    leonardo.bootloader.tool=avrdude
-    [......]
+```
+[......]
+uno.bootloader.tool=avrdude
+[......]
+leonardo.bootloader.tool=avrdude
+[......]
+```
 
 When using the Arduino IDE, if the board uses a
 [core reference](https://arduino.github.io/arduino-cli/dev/platform-specification/#core-reference), the platform.txt of
@@ -836,56 +906,66 @@ microcontrollers.
 We must first define a set of **menu.MENU_ID=Text** properties. **Text** is what is displayed on the GUI for every
 custom menu we are going to create and must be declared at the beginning of the boards.txt file:
 
-    menu.cpu=Processor
-    [.....]
+```
+menu.cpu=Processor
+[.....]
+```
 
 in this case, the menu name is "Processor".<br> Now let's add, always in the boards.txt file, the default configuration
 (common to all processors) for the duemilanove board:
 
-    menu.cpu=Processor
-    [.....]
-    duemilanove.name=Arduino Duemilanove
-    duemilanove.upload.tool=avrdude
-    duemilanove.upload.protocol=arduino
-    duemilanove.build.f_cpu=16000000L
-    duemilanove.build.board=AVR_DUEMILANOVE
-    duemilanove.build.core=arduino
-    duemilanove.build.variant=standard
-    [.....]
+```
+menu.cpu=Processor
+[.....]
+duemilanove.name=Arduino Duemilanove
+duemilanove.upload.tool=avrdude
+duemilanove.upload.protocol=arduino
+duemilanove.build.f_cpu=16000000L
+duemilanove.build.board=AVR_DUEMILANOVE
+duemilanove.build.core=arduino
+duemilanove.build.variant=standard
+[.....]
+```
 
 Now let's define the possible values of the "cpu" option:
 
-    [.....]
-    duemilanove.menu.cpu.atmega328=ATmega328P
-    [.....]
-    duemilanove.menu.cpu.atmega168=ATmega168
-    [.....]
+```
+[.....]
+duemilanove.menu.cpu.atmega328=ATmega328P
+[.....]
+duemilanove.menu.cpu.atmega168=ATmega168
+[.....]
+```
 
 We have defined two values: "atmega328" and "atmega168".<br> Note that the property keys must follow the format
 **BOARD_ID.menu.MENU_ID.OPTION_ID=Text**, where **Text** is what is displayed under the "Processor" menu in the IDE's
 GUI.<br> Finally, the specific configuration for each option value:
 
-    [.....]
-    ## Arduino Duemilanove w/ ATmega328P
-    duemilanove.menu.cpu.atmega328=ATmega328P
-    duemilanove.menu.cpu.atmega328.upload.maximum_size=30720
-    duemilanove.menu.cpu.atmega328.upload.speed=57600
-    duemilanove.menu.cpu.atmega328.build.mcu=atmega328p
+```
+[.....]
+## Arduino Duemilanove w/ ATmega328P
+duemilanove.menu.cpu.atmega328=ATmega328P
+duemilanove.menu.cpu.atmega328.upload.maximum_size=30720
+duemilanove.menu.cpu.atmega328.upload.speed=57600
+duemilanove.menu.cpu.atmega328.build.mcu=atmega328p
 
-    ## Arduino Duemilanove w/ ATmega168
-    duemilanove.menu.cpu.atmega168=ATmega168
-    duemilanove.menu.cpu.atmega168.upload.maximum_size=14336
-    duemilanove.menu.cpu.atmega168.upload.speed=19200
-    duemilanove.menu.cpu.atmega168.build.mcu=atmega168
-    [.....]
+## Arduino Duemilanove w/ ATmega168
+duemilanove.menu.cpu.atmega168=ATmega168
+duemilanove.menu.cpu.atmega168.upload.maximum_size=14336
+duemilanove.menu.cpu.atmega168.upload.speed=19200
+duemilanove.menu.cpu.atmega168.build.mcu=atmega168
+[.....]
+```
 
 Note that when the user selects an option value, all the "sub properties" of that value are copied in the global
 configuration. For example, when the user selects "ATmega168" from the "Processor" menu, or uses the FQBN
 `arduino:avr:duemilanove:cpu=atmega168` with Arduino CLI, the configuration under atmega168 is made available globally:
 
-    duemilanove.menu.cpu.atmega168.upload.maximum_size     =>   upload.maximum_size
-    duemilanove.menu.cpu.atmega168.upload.speed            =>   upload.speed
-    duemilanove.menu.cpu.atmega168.build.mcu               =>   build.mcu
+```
+duemilanove.menu.cpu.atmega168.upload.maximum_size     =>   upload.maximum_size
+duemilanove.menu.cpu.atmega168.upload.speed            =>   upload.speed
+duemilanove.menu.cpu.atmega168.build.mcu               =>   build.mcu
+```
 
 There is no limit to the number of custom menus that can be defined.
 
@@ -901,10 +981,12 @@ Inside the boards.txt we can define a board that uses a core provided by another
 **VENDOR_ID:CORE_ID**. For example, if we want to define a board that uses the "arduino" core from the "arduino" vendor
 we should write:
 
-    [....]
-    myboard.name=My Wonderful Arduino Compatible board
-    myboard.build.core=arduino:arduino
-    [....]
+```
+[....]
+myboard.name=My Wonderful Arduino Compatible board
+myboard.build.core=arduino:arduino
+[....]
+```
 
 Note that we don't need to specify any architecture since the same architecture of "myboard" is used, so we just say
 "arduino:arduino" instead of "arduino:avr:arduino".
@@ -925,9 +1007,11 @@ and older, all programmers of all installed platforms were made available.
 
 In the same way we can use a variant defined on another platform using the syntax **VENDOR_ID:VARIANT_ID**:
 
-    [....]
-    myboard.build.variant=arduino:standard
-    [....]
+```
+[....]
+myboard.build.variant=arduino:standard
+[....]
+```
 
 Note that, unlike core references, other resources (platform.txt, bundled libraries, programmers) are _not_ inherited
 from the referenced platform.
@@ -937,10 +1021,12 @@ from the referenced platform.
 Tool recipes defined in the platform.txt of other platforms can also be referenced using the syntax
 **VENDOR_ID:TOOL_ID**:
 
-    [....]
-    myboard.upload.tool=arduino:avrdude
-    myboard.bootloader.tool=arduino:avrdude
-    [....]
+```
+[....]
+myboard.upload.tool=arduino:avrdude
+myboard.bootloader.tool=arduino:avrdude
+[....]
+```
 
 When using Arduino CLI or Arduino Pro IDE (but not Arduino IDE), properties used in the referenced tool recipe may be
 overridden in the referencing platform's platform.txt.
