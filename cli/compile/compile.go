@@ -193,13 +193,13 @@ func run(cmd *cobra.Command, args []string) {
 		var sk *sketch.Sketch
 		sk, err = sketch.New(sketchPath)
 		if err != nil {
-			feedback.Errorf("Error during Upload: %v", err)
+			feedback.Errorf(tr("Error during Upload: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 		var discoveryPort *discovery.Port
 		discoveryPort, err = port.GetPort(inst, sk)
 		if err != nil {
-			feedback.Errorf("Error during Upload: %v", err)
+			feedback.Errorf(tr("Error during Upload: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 
@@ -209,13 +209,13 @@ func run(cmd *cobra.Command, args []string) {
 			Protocol: discoveryPort.Protocol,
 		})
 		if err != nil {
-			feedback.Errorf("Error during Upload: %v", err)
+			feedback.Errorf(tr("Error during Upload: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 
 		fields := map[string]string{}
 		if len(userFieldRes.UserFields) > 0 {
-			feedback.Printf("Uploading to specified board using %s protocol requires the following info:", discoveryPort.Protocol)
+			feedback.Printf(tr("Uploading to specified board using %s protocol requires the following info:"), discoveryPort.Protocol)
 			fields = arguments.AskForUserFields(userFieldRes.UserFields)
 		}
 

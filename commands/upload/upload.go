@@ -44,22 +44,22 @@ var tr = i18n.Tr
 // by the upload tools needed by the board using the protocol specified in SupportedUserFieldsRequest.
 func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsRequest) (*rpc.SupportedUserFieldsResponse, error) {
 	if req.Protocol == "" {
-		return nil, fmt.Errorf("missing protocol")
+		return nil, fmt.Errorf(tr("missing protocol"))
 	}
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, fmt.Errorf("invalid instance")
+		return nil, fmt.Errorf(tr("invalid instance"))
 	}
 
 	fqbn, err := cores.ParseFQBN(req.GetFqbn())
 	if err != nil {
-		return nil, fmt.Errorf("parsing fqbn: %s", err)
+		return nil, fmt.Errorf(tr("parsing fqbn: %s"), err)
 	}
 
 	_, platformRelease, board, _, _, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
-		return nil, fmt.Errorf("loading board data: %s", err)
+		return nil, fmt.Errorf(tr("loading board data: %s"), err)
 	}
 
 	toolID, err := getToolID(board.Properties, "upload", req.Protocol)
@@ -90,7 +90,7 @@ func getToolID(props *properties.Map, action, protocol string) (string, error) {
 		// https://arduino.github.io/arduino-cli/latest/platform-specification/#sketch-upload-configuration
 		return t, nil
 	}
-	return "", fmt.Errorf("cannot find tool: undefined '%s' property", toolProperty)
+	return "", fmt.Errorf(tr("cannot find tool: undefined '%s' property"), toolProperty)
 }
 
 // getUserFields return all user fields supported by the tools specified.
@@ -112,7 +112,7 @@ func getUserFields(toolID string, platformRelease *cores.PlatformRelease) ([]*rp
 		}
 		isSecret, err := strconv.ParseBool(secret)
 		if err != nil {
-			return nil, fmt.Errorf(`parsing "tools.%s.upload.field.%s.secret", property is not a boolean`, toolID, key)
+			return nil, fmt.Errorf(tr("parsing %s, property is not a boolean"), fmt.Sprintf(`"tools.%s.upload.field.%s.secret"`, toolID, key))
 		}
 		userFields = append(userFields, &rpc.UserField{
 			ToolId: toolID,

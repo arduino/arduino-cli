@@ -67,7 +67,7 @@ func run(command *cobra.Command, args []string) {
 	// We don't need a Sketch to upload a board's bootloader
 	discoveryPort, err := port.GetPort(instance, nil)
 	if err != nil {
-		feedback.Errorf("Error during Upload: %v", err)
+		feedback.Errorf(tr("Error during Upload: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 

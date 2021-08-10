@@ -20,6 +20,7 @@ import (
 	"sync"
 
 	"github.com/arduino/arduino-cli/arduino/discovery"
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/pkg/errors"
 )
 
@@ -29,6 +30,8 @@ type DiscoveryManager struct {
 	discoveries   map[string]*discovery.PluggableDiscovery
 	globalEventCh chan *discovery.Event
 }
+
+var tr = i18n.Tr
 
 // New creates a new DiscoveryManager
 func New() *DiscoveryManager {
@@ -61,7 +64,7 @@ func (dm *DiscoveryManager) IDs() []string {
 func (dm *DiscoveryManager) Add(disc *discovery.PluggableDiscovery) error {
 	id := disc.GetID()
 	if _, has := dm.discoveries[id]; has {
-		return errors.Errorf("pluggable discovery already added: %s", id)
+		return errors.Errorf(tr("pluggable discovery already added: %s"), id)
 	}
 	dm.discoveries[id] = disc
 	return nil
@@ -106,7 +109,7 @@ func (dm *DiscoveryManager) RunAll() []error {
 		}
 
 		if err := d.Run(); err != nil {
-			return fmt.Errorf("discovery %s process not started: %w", d.GetID(), err)
+			return fmt.Errorf(tr("discovery %[1]s process not started: %[2]w"), d.GetID(), err)
 		}
 		return nil
 	})
@@ -122,7 +125,7 @@ func (dm *DiscoveryManager) StartAll() []error {
 			return nil
 		}
 		if err := d.Start(); err != nil {
-			return fmt.Errorf("starting discovery %s: %w", d.GetID(), err)
+			return fmt.Errorf(tr("starting discovery %[1]s: %[2]w"), d.GetID(), err)
 		}
 		return nil
 	})
@@ -143,7 +146,7 @@ func (dm *DiscoveryManager) StartSyncAll() (<-chan *discovery.Event, []error) {
 
 		eventCh, err := d.StartSync(5)
 		if err != nil {
-			return fmt.Errorf("start syncing discovery %s: %w", d.GetID(), err)
+			return fmt.Errorf(tr("start syncing discovery %[1]s: %[2]w"), d.GetID(), err)
 		}
 		go func() {
 			for ev := range eventCh {
@@ -166,7 +169,7 @@ func (dm *DiscoveryManager) StopAll() []error {
 		}
 
 		if err := d.Stop(); err != nil {
-			return fmt.Errorf("stopping discovery %s: %w", d.GetID(), err)
+			return fmt.Errorf(tr("stopping discovery %[1]s: %[2]w"), d.GetID(), err)
 		}
 		return nil
 	})
@@ -182,7 +185,7 @@ func (dm *DiscoveryManager) QuitAll() []error {
 		}
 
 		if err := d.Quit(); err != nil {
-			return fmt.Errorf("quitting discovery %s: %w", d.GetID(), err)
+			return fmt.Errorf(tr("quitting discovery %[1]s: %[2]w"), d.GetID(), err)
 		}
 		return nil
 	})
@@ -216,7 +219,7 @@ func (dm *DiscoveryManager) List() ([]*discovery.Port, []error) {
 			}
 			ports, err := d.List()
 			if err != nil {
-				msgChan <- listMsg{Err: fmt.Errorf("listing ports from discovery %s: %w", d.GetID(), err)}
+				msgChan <- listMsg{Err: fmt.Errorf(tr("listing ports from discovery %[1]s: %[2]w"), d.GetID(), err)}
 			}
 			for _, p := range ports {
 				msgChan <- listMsg{Port: p}

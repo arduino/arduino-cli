@@ -119,7 +119,7 @@ func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Po
 					Protocol: "serial",
 				}, nil
 			}
-			return nil, fmt.Errorf("port not found: %s %s", address, protocol)
+			return nil, fmt.Errorf(tr("port not found: %[1]s %[2]s"), address, protocol)
 		}
 	}
 }

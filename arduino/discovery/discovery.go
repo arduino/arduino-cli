@@ -71,16 +71,16 @@ type discoveryMessage struct {
 func (msg discoveryMessage) String() string {
 	s := fmt.Sprintf("type: %s", msg.EventType)
 	if msg.Message != "" {
-		s = fmt.Sprintf("%s, message: %s", s, msg.Message)
+		s = fmt.Sprintf(tr("%[1]s, message: %[2]s"), s, msg.Message)
 	}
 	if msg.ProtocolVersion != 0 {
-		s = fmt.Sprintf("%s, protocol version: %d", s, msg.ProtocolVersion)
+		s = fmt.Sprintf(tr("%[1]s, protocol version: %[2]d"), s, msg.ProtocolVersion)
 	}
 	if len(msg.Ports) > 0 {
-		s = fmt.Sprintf("%s, ports: %s", s, msg.Ports)
+		s = fmt.Sprintf(tr("%[1]s, ports: %[2]s"), s, msg.Ports)
 	}
 	if msg.Port != nil {
-		s = fmt.Sprintf("%s, port: %s", s, msg.Port)
+		s = fmt.Sprintf(tr("%[1]s, port: %[2]s"), s, msg.Port)
 	}
 	return s
 }
@@ -225,7 +225,7 @@ func (disc *PluggableDiscovery) waitMessage(timeout time.Duration) (*discoveryMe
 		}
 		return msg, nil
 	case <-time.After(timeout):
-		return nil, fmt.Errorf("timeout waiting for message from %s", disc.id)
+		return nil, fmt.Errorf(tr("timeout waiting for message from %s"), disc.id)
 	}
 }
 
@@ -294,7 +294,7 @@ func (disc *PluggableDiscovery) Run() (err error) {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf("calling HELLO: %w", err)
+		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "HELLO", err)
 	} else if msg.EventType != "hello" {
 		return errors.Errorf(tr("communication out of sync, expected 'hello', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
@@ -315,7 +315,7 @@ func (disc *PluggableDiscovery) Start() error {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf("calling START: %w", err)
+		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "START", err)
 	} else if msg.EventType != "start" {
 		return errors.Errorf(tr("communication out of sync, expected 'start', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
@@ -335,7 +335,7 @@ func (disc *PluggableDiscovery) Stop() error {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf("calling STOP: %w", err)
+		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "STOP", err)
 	} else if msg.EventType != "stop" {
 		return errors.Errorf(tr("communication out of sync, expected 'stop', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
@@ -358,7 +358,7 @@ func (disc *PluggableDiscovery) Quit() error {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf("calling QUIT: %w", err)
+		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "QUIT", err)
 	} else if msg.EventType != "quit" {
 		return errors.Errorf(tr("communication out of sync, expected 'quit', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
@@ -381,7 +381,7 @@ func (disc *PluggableDiscovery) List() ([]*Port, error) {
 		return nil, err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return nil, fmt.Errorf("calling LIST: %w", err)
+		return nil, fmt.Errorf(tr("calling %[1]s: %[2]w"), "LIST", err)
 	} else if msg.EventType != "list" {
 		return nil, errors.Errorf(tr("communication out of sync, expected 'list', received '%s'"), msg.EventType)
 	} else if msg.Error {
@@ -404,7 +404,7 @@ func (disc *PluggableDiscovery) StartSync(size int) (<-chan *Event, error) {
 	}
 
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return nil, fmt.Errorf("calling START_SYNC: %w", err)
+		return nil, fmt.Errorf(tr("calling %[1]s: %[2]w"), "START_SYNC", err)
 	} else if msg.EventType != "start_sync" {
 		return nil, errors.Errorf(tr("communication out of sync, expected 'start_sync', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
