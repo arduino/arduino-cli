@@ -645,18 +645,18 @@ func (pm *PackageManager) loadDiscoveries(release *cores.PlatformRelease) []*sta
 	for _, id := range discoveryProperties.ExtractSubIndexLists("required") {
 		tool := pm.GetTool(id)
 		if tool == nil {
-			statuses = append(statuses, status.Newf(codes.FailedPrecondition, "discovery not found: %s", id))
+			statuses = append(statuses, status.Newf(codes.FailedPrecondition, tr("discovery not found: %s"), id))
 			continue
 		}
 		toolRelease := tool.GetLatestInstalled()
 		if toolRelease == nil {
-			statuses = append(statuses, status.Newf(codes.FailedPrecondition, "discovery not installed: %s", id))
+			statuses = append(statuses, status.Newf(codes.FailedPrecondition, tr("discovery not installed: %s"), id))
 			continue
 		}
 		discoveryPath := toolRelease.InstallDir.Join(tool.Name).String()
 		d, err := discovery.New(id, discoveryPath)
 		if err != nil {
-			statuses = append(statuses, status.Newf(codes.FailedPrecondition, "creating discovery: %s", err))
+			statuses = append(statuses, status.Newf(codes.FailedPrecondition, tr("creating discovery: %s"), err))
 			continue
 		}
 		pm.discoveryManager.Add(d)
@@ -684,7 +684,7 @@ func (pm *PackageManager) loadDiscoveries(release *cores.PlatformRelease) []*sta
 	for discoveryID, props := range discoveryIDs {
 		pattern, ok := props.GetOk("pattern")
 		if !ok {
-			statuses = append(statuses, status.Newf(codes.FailedPrecondition, "can't find pattern for discovery with id %s", discoveryID))
+			statuses = append(statuses, status.Newf(codes.FailedPrecondition, tr("can't find pattern for discovery with id %s"), discoveryID))
 			continue
 		}
 		configuration := release.Properties.Clone()

@@ -21,6 +21,22 @@ msgstr "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
 msgid "%[1]s folder is no longer supported! See %[2]s for more information"
 msgstr "%[1]s folder is no longer supported! See %[2]s for more information"
 
+#: arduino/discovery/discovery.go:74
+msgid "%[1]s, message: %[2]s"
+msgstr "%[1]s, message: %[2]s"
+
+#: arduino/discovery/discovery.go:83
+msgid "%[1]s, port: %[2]s"
+msgstr "%[1]s, port: %[2]s"
+
+#: arduino/discovery/discovery.go:80
+msgid "%[1]s, ports: %[2]s"
+msgstr "%[1]s, ports: %[2]s"
+
+#: arduino/discovery/discovery.go:77
+msgid "%[1]s, protocol version: %[2]d"
+msgstr "%[1]s, protocol version: %[2]d"
+
 #: cli/output/rpc_progress.go:64
 msgid "%s already downloaded"
 msgstr "%s already downloaded"
@@ -576,8 +592,15 @@ msgstr "Error during Debug: %v"
 msgid "Error during JSON encoding of the output: %v"
 msgstr "Error during JSON encoding of the output: %v"
 
+#: cli/burnbootloader/burnbootloader.go:70
 #: cli/burnbootloader/burnbootloader.go:83
+#: cli/compile/compile.go:196
+#: cli/compile/compile.go:202
+#: cli/compile/compile.go:212
 #: cli/compile/compile.go:242
+#: cli/upload/upload.go:96
+#: cli/upload/upload.go:101
+#: cli/upload/upload.go:111
 #: cli/upload/upload.go:134
 msgid "Error during Upload: %v"
 msgstr "Error during Upload: %v"
@@ -1892,6 +1915,11 @@ msgstr "Upload the bootloader on the board using an external programmer."
 msgid "Upload the bootloader."
 msgstr "Upload the bootloader."
 
+#: cli/compile/compile.go:218
+#: cli/upload/upload.go:117
+msgid "Uploading to specified board using %s protocol requires the following info:"
+msgstr "Uploading to specified board using %s protocol requires the following info:"
+
 #: cli/usage.go:25
 msgid "Usage:"
 msgstr "Usage:"
@@ -2075,6 +2103,15 @@ msgstr "boardname"
 msgid "burn bootloader error: %s"
 msgstr "burn bootloader error: %s"
 
+#: arduino/discovery/discovery.go:297
+#: arduino/discovery/discovery.go:318
+#: arduino/discovery/discovery.go:338
+#: arduino/discovery/discovery.go:361
+#: arduino/discovery/discovery.go:384
+#: arduino/discovery/discovery.go:407
+msgid "calling %[1]s: %[2]w"
+msgstr "calling %[1]s: %[2]w"
+
 #: commands/instances.go:525
 msgid "can't create data directory %[1]s: %[2]s"
 msgstr "can't create data directory %[1]s: %[2]s"
@@ -2090,6 +2127,10 @@ msgstr "can't find latest release of %s"
 #: arduino/sketch/sketch.go:100
 msgid "can't find main Sketch file in %s"
 msgstr "can't find main Sketch file in %s"
+
+#: arduino/cores/packagemanager/loader.go:687
+msgid "can't find pattern for discovery with id %s"
+msgstr "can't find pattern for discovery with id %s"
 
 #: executils/output.go:52
 msgid "can't retrieve standard error stream: %s"
@@ -2115,6 +2156,10 @@ msgstr "cannot execute upload tool: %s"
 #: commands/board/attach.go:107
 msgid "cannot export sketch metadata: %s"
 msgstr "cannot export sketch metadata: %s"
+
+#: commands/upload/upload.go:93
+msgid "cannot find tool: undefined '%s' property"
+msgstr "cannot find tool: undefined '%s' property"
 
 #: commands/instances.go:715
 #: commands/lib/install.go:97
@@ -2193,6 +2238,10 @@ msgstr "copying output file %s"
 msgid "could not find a valid build artifact"
 msgstr "could not find a valid build artifact"
 
+#: arduino/cores/packagemanager/loader.go:659
+msgid "creating discovery: %s"
+msgstr "creating discovery: %s"
+
 #: arduino/cores/packagemanager/install_uninstall.go:45
 msgid "creating installed.json in %[1]s: %[2]s"
 msgstr "creating installed.json in %[1]s: %[2]s"
@@ -2239,6 +2288,22 @@ msgstr "destination already exists"
 #: arduino/libraries/librariesmanager/install.go:69
 msgid "destination dir %s already exists, cannot install"
 msgstr "destination dir %s already exists, cannot install"
+
+#: arduino/discovery/discoverymanager/discoverymanager.go:112
+msgid "discovery %[1]s process not started: %[2]w"
+msgstr "discovery %[1]s process not started: %[2]w"
+
+#: arduino/cores/packagemanager/loader.go:648
+msgid "discovery not found: %s"
+msgstr "discovery not found: %s"
+
+#: arduino/cores/packagemanager/loader.go:653
+msgid "discovery not installed: %s"
+msgstr "discovery not installed: %s"
+
+#: arduino/cores/packagemanager/package_manager.go:478
+msgid "discovery release not found: %s"
+msgstr "discovery release not found: %s"
 
 #: cli/core/download.go:36
 msgid "download [%s:%s[@%s]]..."
@@ -2569,6 +2634,7 @@ msgstr "invalid hash '%[1]s': %[2]s"
 #: commands/lib/list.go:41
 #: commands/lib/list.go:46
 #: commands/lib/search.go:35
+#: commands/upload/upload.go:52
 msgid "invalid instance"
 msgstr "invalid instance"
 
@@ -2668,6 +2734,10 @@ msgstr "library path does not exist: %s"
 msgid "library_index.json has an invalid signature"
 msgstr "library_index.json has an invalid signature"
 
+#: arduino/discovery/discoverymanager/discoverymanager.go:222
+msgid "listing ports from discovery %[1]s: %[2]w"
+msgstr "listing ports from discovery %[1]s: %[2]w"
+
 #: arduino/serialutils/serialutils.go:61
 msgid "listing serial ports"
 msgstr "listing serial ports"
@@ -2680,6 +2750,7 @@ msgstr "loading %[1]s: %[2]s"
 
 #: commands/board/details.go:44
 #: commands/lib/list.go:60
+#: commands/upload/upload.go:62
 msgid "loading board data: %s"
 msgstr "loading board data: %s"
 
@@ -2751,6 +2822,10 @@ msgstr "missing platform %[1]s:%[2]s referenced by board %[3]s"
 #: arduino/cores/packagemanager/package_manager.go:217
 msgid "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 msgstr "missing platform release %[1]s:%[2]s referenced by board %[3]s"
+
+#: commands/upload/upload.go:47
+msgid "missing protocol"
+msgstr "missing protocol"
 
 #: commands/compile/compile.go:98
 #: commands/debug/debug_info.go:47
@@ -2865,6 +2940,10 @@ msgstr "package '%s' not found"
 msgid "package not found"
 msgstr "package not found"
 
+#: commands/upload/upload.go:115
+msgid "parsing %s, property is not a boolean"
+msgstr "parsing %s, property is not a boolean"
+
 #: arduino/cores/packagemanager/loader.go:227
 msgid "parsing IDE bundled index: %s"
 msgstr "parsing IDE bundled index: %s"
@@ -2873,6 +2952,7 @@ msgstr "parsing IDE bundled index: %s"
 #: arduino/cores/packagemanager/package_manager.go:136
 #: commands/board/details.go:38
 #: commands/lib/list.go:56
+#: commands/upload/upload.go:57
 msgid "parsing fqbn: %s"
 msgstr "parsing fqbn: %s"
 
@@ -2930,9 +3010,17 @@ msgstr "platform not installed: %s"
 msgid "please use --build-property instead."
 msgstr "please use --build-property instead."
 
+#: arduino/discovery/discoverymanager/discoverymanager.go:67
+msgid "pluggable discovery already added: %s"
+msgstr "pluggable discovery already added: %s"
+
 #: cli/board/attach.go:35
 msgid "port"
 msgstr "port"
+
+#: cli/arguments/port.go:122
+msgid "port not found: %[1]s %[2]s"
+msgstr "port not found: %[1]s %[2]s"
 
 #: commands/upload/upload.go:232
 msgid "programmer '%s' not available"
@@ -2953,6 +3041,10 @@ msgstr "programming error: %s"
 #: arduino/discovery/discovery.go:303
 msgid "protocol version not supported: requested 1, got %d"
 msgstr "protocol version not supported: requested 1, got %d"
+
+#: arduino/discovery/discoverymanager/discoverymanager.go:188
+msgid "quitting discovery %[1]s: %[2]w"
+msgstr "quitting discovery %[1]s: %[2]w"
 
 #: arduino/cores/packagemanager/loader.go:78
 msgid "reading %[1]s directory: %[2]s"
@@ -3100,6 +3192,22 @@ msgstr "skipping loading of boards %s: malformed custom board options"
 msgid "source is not a directory"
 msgstr "source is not a directory"
 
+#: arduino/discovery/discoverymanager/discoverymanager.go:149
+msgid "start syncing discovery %[1]s: %[2]w"
+msgstr "start syncing discovery %[1]s: %[2]w"
+
+#: arduino/discovery/discoverymanager/discoverymanager.go:128
+msgid "starting discovery %[1]s: %[2]w"
+msgstr "starting discovery %[1]s: %[2]w"
+
+#: commands/board/list.go:279
+msgid "stopping discoveries: %s"
+msgstr "stopping discoveries: %s"
+
+#: arduino/discovery/discoverymanager/discoverymanager.go:172
+msgid "stopping discovery %[1]s: %[2]w"
+msgstr "stopping discovery %[1]s: %[2]w"
+
 #: arduino/resources/checksums.go:119
 msgid "testing archive checksum: %s"
 msgstr "testing archive checksum: %s"
@@ -3127,6 +3235,10 @@ msgstr "the library name is different from the set (%[1]s != %[2]s)"
 #: commands/board/list.go:74
 msgid "the server responded with status %s"
 msgstr "the server responded with status %s"
+
+#: arduino/discovery/discovery.go:228
+msgid "timeout waiting for message from %s"
+msgstr "timeout waiting for message from %s"
 
 #: cli/core/download.go:40
 msgid "to download the latest version of Arduino SAMD core.\n"
@@ -3163,6 +3275,7 @@ msgstr "tool not found"
 msgid "tool not installed"
 msgstr "tool not installed"
 
+#: arduino/cores/packagemanager/package_manager.go:467
 #: arduino/cores/packagemanager/package_manager.go:533
 msgid "tool release not found: %s"
 msgstr "tool release not found: %s"
