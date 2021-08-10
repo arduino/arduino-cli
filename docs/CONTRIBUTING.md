@@ -287,35 +287,6 @@ website; every time a change is pushed to this special branch, GitHub automatica
 change and publish a new version of the website. Do not open Pull Requests to push changes to the `gh-pages` branch,
 that will be done exclusively from the CI.
 
-#### Docs versioning
-
-In order to provide support for multiple Arduino CLI releases, Documentation is versioned so that visitors can select
-which version of the documentation website should be displayed. Unfortunately this feature isn't provided by GitHub
-pages or MkDocs, so we had to implement it on top of the generation process.
-
-Before delving into the details of the generation process, here follow some requirements that were established to
-provide versioned documentation:
-
-- A special version of the documentation called `dev` is provided to reflect the status of the Arduino CLI on the
-  `master` branch - this includes unreleased features and bugfixes.
-- Docs are versioned after the minor version of an Arduino CLI release. For example, Arduino CLI `0.99.1` and `0.99.2`
-  will be both covered by documentation version `0.99`.
-- The landing page of the documentation website will automatically redirect visitors to the most recently released
-  version of the Arduino CLI.
-
-To implement the requirements above, the execution of MkDocs is wrapped using a CLI tool called [Mike][10] that does a
-few things for us:
-
-- It runs MkDocs targeting subfolders named after the Arduino CLI version, e.g. documentation for version `0.10.1` can
-  be found under the folder `0.10`.
-- It injects an HTML control into the documentation website that lets visitors choose which version of the docs to
-  browse from a dropdown list.
-- It provides a redirect to a version we decide when visitors hit the landing page of the documentation website.
-- It pushes generated contents to the `gh-pages` branch.
-
-> **Note:** unless you're working on the generation process itself, you should never run Mike from a local environment,
-> either directly or through the Task `docs:publish`. This might result in unwanted changes to the public website.
-
 #### Docs formatting
 
 To keep the documentation tidy and in order we use [Prettier][prettier-website] to automatically format all Markdown
@@ -343,11 +314,7 @@ In order to avoid unwanted changes to the public website hosting the Arduino CLI
 push changes to the `gh-pages` branch, and this only happens from within the CI, in a workflow named [Deploy
 Website][11].
 
-The CI is responsible for guessing which version of the Arduino CLI we're building docs for, so that generated content
-will be stored in the appropriate section of the documentation website. Because this guessing might be fairly complex,
-the logic is implemented in a Python script called [`build.py`][12]. The script will determine the version of the
-Arduino CLI that was modified in the current commit (either `dev` or an official, numbered release) and whether the
-redirect to the latest version that happens on the landing page should be updated or not.
+Details on the documentation publishing system are available [here][12].
 
 ### Internationalization (i18n)
 
@@ -406,7 +373,8 @@ If your PR doesn't need to be included in the changelog, please start the commit
 [9]: https://www.mkdocs.org/
 [10]: https://github.com/jimporter/mike
 [11]: https://github.com/arduino/arduino-cli/blob/master/.github/workflows/deploy-cobra-mkdocs-versioned-poetry.yml
-[12]: https://github.com/arduino/arduino-cli/blob/master/docs/build.py
+[12]:
+  https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/deploy-cobra-mkdocs-versioned-poetry.md
 [forum]: https://forum.arduino.cc/index.php?board=145.0
 [issues]: #issue-reports
 [nightly]: https://arduino.github.io/arduino-cli/latest/installation/#nightly-builds
