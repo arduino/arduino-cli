@@ -340,7 +340,8 @@ case of failures we might ask you to update the PR with correct formatting.
 #### Docs automation
 
 In order to avoid unwanted changes to the public website hosting the Arduino CLI documentation, only Mike is allowed to
-push changes to the `gh-pages` branch, and this only happens from within the CI, in a workflow named [publish-docs][11].
+push changes to the `gh-pages` branch, and this only happens from within the CI, in a workflow named [Deploy
+Website][11].
 
 The CI is responsible for guessing which version of the Arduino CLI we're building docs for, so that generated content
 will be stored in the appropriate section of the documentation website. Because this guessing might be fairly complex,
@@ -404,7 +405,7 @@ If your PR doesn't need to be included in the changelog, please start the commit
 [7]: https://pages.github.com/
 [9]: https://www.mkdocs.org/
 [10]: https://github.com/jimporter/mike
-[11]: https://github.com/arduino/arduino-cli/blob/master/.github/workflows/publish-docs.yaml
+[11]: https://github.com/arduino/arduino-cli/blob/master/.github/workflows/deploy-cobra-mkdocs-versioned-poetry.yml
 [12]: https://github.com/arduino/arduino-cli/blob/master/docs/build.py
 [forum]: https://forum.arduino.cc/index.php?board=145.0
 [issues]: #issue-reports
