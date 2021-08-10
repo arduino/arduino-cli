@@ -145,6 +145,7 @@ func New(id string, args ...string) (*PluggableDiscovery, error) {
 		incomingMessagesChan: messageChan,
 		outgoingCommandsPipe: stdin,
 		state:                Dead,
+		cachedPorts:          map[string]*Port{},
 	}
 	go disc.jsonDecodeLoop(stdout, messageChan)
 	return disc, nil
