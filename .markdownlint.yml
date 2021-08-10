@@ -1,0 +1,62 @@
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-markdown/.markdownlint.yml
+# See: https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+# The code style defined in this file is the official standardized style to be used in all Arduino projects and should
+# not be modified.
+# Note: Rules disabled solely because they are redundant to Prettier are marked with a "Prettier" comment.
+
+default: false
+MD001: false
+MD002: false
+MD003: false # Prettier
+MD004: false # Prettier
+MD005: false # Prettier
+MD006: false # Prettier
+MD007: false # Prettier
+MD008: false # Prettier
+MD009:
+  br_spaces: 0
+  strict: true
+  list_item_empty_lines: false # Prettier
+MD010: false # Prettier
+MD011: true
+MD012: false # Prettier
+MD013: false
+MD014: false
+MD018: true
+MD019: false # Prettier
+MD020: true
+MD021: false # Prettier
+MD022: false # Prettier
+MD023: false # Prettier
+MD024: false
+MD025:
+  level: 1
+  front_matter_title: '^\s*"?title"?\s*[:=]'
+MD026: false
+MD027: false # Prettier
+MD028: false
+MD029:
+  style: one
+MD030:
+  ul_single: 1
+  ol_single: 1
+  ul_multi: 1
+  ol_multi: 1
+MD031: false # Prettier
+MD032: false # Prettier
+MD033: false
+MD034: false
+MD035: false # Prettier
+MD036: false
+MD037: true
+MD038: true
+MD039: true
+MD040: false
+MD041: false
+MD042: true
+MD043: false
+MD044: false
+MD045: true
+MD046:
+  style: fenced
+MD047: false # Prettier

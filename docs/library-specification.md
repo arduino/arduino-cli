@@ -103,17 +103,19 @@ otherwise below, **all fields are required**. The available fields are:
 
 Example:
 
-    name=WebServer
-    version=1.0.0
-    author=Cristian Maglie <c.maglie@example.com>, Pippo Pluto <pippo@example.com>
-    maintainer=Cristian Maglie <c.maglie@example.com>
-    sentence=A library that makes coding a Webserver a breeze.
-    paragraph=Supports HTTP1.1 and you can do GET and POST.
-    category=Communication
-    url=http://example.com/
-    architectures=avr
-    includes=WebServer.h
-    depends=ArduinoHttpClient
+```
+name=WebServer
+version=1.0.0
+author=Cristian Maglie <c.maglie@example.com>, Pippo Pluto <pippo@example.com>
+maintainer=Cristian Maglie <c.maglie@example.com>
+sentence=A library that makes coding a Webserver a breeze.
+paragraph=Supports HTTP1.1 and you can do GET and POST.
+category=Communication
+url=http://example.com/
+architectures=avr
+includes=WebServer.h
+depends=ArduinoHttpClient
+```
 
 ### Layout of folders and files
 
@@ -130,8 +132,10 @@ numbers, underscores (\_), dots (.) and dashes (-). The maximum length is 63 cha
 For libraries intended to be used with Arduino IDE 1.5.x+ only, the source code resides in the **src** folder. For
 example:
 
-    Servo/src/Servo.h
-    Servo/src/Servo.cpp
+```
+Servo/src/Servo.h
+Servo/src/Servo.cpp
+```
 
 The source code found in **src** folder and _all its subfolders_ is compiled and linked in the user’s sketch. Only the
 _src_ folder is added to the include search path (both when compiling the sketch and the library). When the user imports
@@ -147,10 +151,12 @@ For backward compatibility with Arduino IDE 1.0.x, the library author may opt to
 instead of the folder called **src**. In this case the 1.0 library format is applied and the source code is searched
 from the **library root folder** and the **utility** folder, for example:
 
-    Servo/Servo.h
-    Servo/Servo.cpp
-    Servo/utility/ServoTimers.h
-    Servo/utility/ServoTimers.cpp
+```
+Servo/Servo.h
+Servo/Servo.cpp
+Servo/utility/ServoTimers.h
+Servo/utility/ServoTimers.cpp
+```
 
 This will allow existing 1.0 format libraries to compile under Arduino IDE 1.5.x+ as well, and vice-versa. If a library
 only needs to run on Arduino IDE 1.5.x+, we recommend placing all source code in the src/ folder. If a library requires
@@ -199,7 +205,9 @@ Servo/src/cortex-m4/fpv4-sp-d16-softfp/libServo.a
 Library examples must be placed in the **examples** folder. Note that the **examples** folder name must be written
 exactly like that (with lower case letters).
 
-    Servo/examples/...
+```
+Servo/examples/...
+```
 
 Sketches contained inside the examples folder will be shown in the Examples menu of the Arduino IDE and Arduino Web
 Editor.
@@ -223,7 +231,9 @@ inside.
 A list of keywords for the library may be specified in a file named keywords.txt located in the root of the library
 folder. When a keyword of any installed library is used in a sketch the Arduino IDE colors it.
 
-    Servo/keywords.txt
+```
+Servo/keywords.txt
+```
 
 An example keywords.txt file:
 
@@ -296,18 +306,20 @@ pick up releases that contain a .development file so be sure not to push this fi
 
 A hypothetical library named "Servo" that adheres to the specification follows:
 
-    Servo/
-    Servo/library.properties
-    Servo/keywords.txt
-    Servo/src/
-    Servo/src/Servo.h
-    Servo/src/Servo.cpp
-    Servo/src/ServoTimers.h
-    Servo/examples/
-    Servo/examples/Sweep/Sweep.ino
-    Servo/examples/Pot/Pot.ino
-    Servo/extras/
-    Servo/extras/Servo_Connectors.pdf
+```
+Servo/
+Servo/library.properties
+Servo/keywords.txt
+Servo/src/
+Servo/src/Servo.h
+Servo/src/Servo.cpp
+Servo/src/ServoTimers.h
+Servo/examples/
+Servo/examples/Sweep/Sweep.ino
+Servo/examples/Pot/Pot.ino
+Servo/extras/
+Servo/extras/Servo_Connectors.pdf
+```
 
 ## Working with multiple architectures
 
@@ -320,24 +332,28 @@ the architecture (as determined by the name of the
 
 An example:
 
-    #if defined(ARDUINO_ARCH_AVR)
-      // AVR-specific code
-    #elif defined(ARDUINO_ARCH_SAM)
-      // SAM-specific code
-    #else
-      // generic, non-platform specific code
-    #endif
+```cpp
+#if defined(ARDUINO_ARCH_AVR)
+  // AVR-specific code
+#elif defined(ARDUINO_ARCH_SAM)
+  // SAM-specific code
+#else
+  // generic, non-platform specific code
+#endif
+```
 
 Alternatively, if a library only works on certain architectures, you can provide an explicit error message (instead of
 allowing the compilation to fail in a difficult to understand way):
 
-    #if defined(ARDUINO_ARCH_AVR)
-      // AVR-specific code
-    #elif defined(ARDUINO_ARCH_SAM)
-      // SAM-specific code
-    #else
-      #error “This library only supports boards with an AVR or SAM processor.”
-    #endif
+```cpp
+#if defined(ARDUINO_ARCH_AVR)
+  // AVR-specific code
+#elif defined(ARDUINO_ARCH_SAM)
+  // SAM-specific code
+#else
+  #error “This library only supports boards with an AVR or SAM processor.”
+#endif
+```
 
 ## Old library format (pre-1.5)
 

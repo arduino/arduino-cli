@@ -7,7 +7,7 @@ and many other tools needed to use any Arduino compatible board and platform.
 
 [![tests-badge]](https://github.com/Arduino/arduino-cli/actions?workflow=test)
 [![nightly-badge]](https://github.com/Arduino/arduino-cli/actions?workflow=nightly)
-[![docs-badge]](https://github.com/Arduino/arduino-cli/actions?workflow=publish-docs)
+[![Deploy Website status](https://github.com/arduino/arduino-cli/actions/workflows/deploy-cobra-mkdocs-versioned-poetry.yml/badge.svg)](https://github.com/arduino/arduino-cli/actions/workflows/deploy-cobra-mkdocs-versioned-poetry.yml)
 [![codecov-badge]](https://codecov.io/gh/arduino/arduino-cli)
 
 > **Note:** this software is currently under active development: anything can change at any time, API and UI must be
@@ -20,9 +20,9 @@ For guidance on installation and development, see the [User documentation].
 ## Quickstart
 
 1. [Install] the Arduino CLI
-2. Follow the [Getting Started] guide to check out what the CLI can do
-3. Browse the [Commands reference] to see all the available commands
-4. Should you have an issue, read the [FAQ] page
+1. Follow the [Getting Started] guide to check out what the CLI can do
+1. Browse the [Commands reference] to see all the available commands
+1. Should you have an issue, read the [FAQ] page
 
 ## How to contribute
 

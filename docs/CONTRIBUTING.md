@@ -123,15 +123,21 @@ task test-integration
 By default, all tests from all go packages are run. To run only unit tests from one or more specific packages, you can
 set the TARGETS environment variable, e.g.:
 
-    TARGETS=./arduino/cores/packagemanager task test-unit
+```
+TARGETS=./arduino/cores/packagemanager task test-unit
+```
 
 Alternatively, to run only some specific test(s), you can specify a regex to match against the test function name:
 
-    TEST_REGEX='^TestTryBuild.*' task test-unit
+```
+TEST_REGEX='^TestTryBuild.*' task test-unit
+```
 
 Both can be combined as well, typically to run only a specific test:
 
-    TEST_REGEX='^TestFindBoardWithFQBN$' TARGETS=./arduino/cores/packagemanager task test-unit
+```
+TEST_REGEX='^TestFindBoardWithFQBN$' TARGETS=./arduino/cores/packagemanager task test-unit
+```
 
 ### Integration tests
 
@@ -262,14 +268,14 @@ Before running the toolchain, perform the following operations from the root of 
 virtual environment, activate it before proceeding):
 
 - go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc
-- pip install -r requirements_docs.txt
+- poetry install
 
 When working on docs, you can launch a command that will take care of generating the docs, build the static website and
 start a local server you can later access with a web browser to see a preview of your changes. From the root of the git
 repository run:
 
 ```shell
-task docs:serve
+task website:serve
 ```
 
 If you don't see any error, hit http://127.0.0.1:8000 with your browser to navigate the generated docs.
