@@ -20,9 +20,9 @@ For guidance on installation and development, see the [User documentation].
 ## Quickstart
 
 1. [Install] the Arduino CLI
-2. Follow the [Getting Started] guide to check out what the CLI can do
-3. Browse the [Commands reference] to see all the available commands
-4. Should you have an issue, read the [FAQ] page
+1. Follow the [Getting Started] guide to check out what the CLI can do
+1. Browse the [Commands reference] to see all the available commands
+1. Should you have an issue, read the [FAQ] page
 
 ## How to contribute
 
