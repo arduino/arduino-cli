@@ -137,7 +137,7 @@ func TestLoadDiscoveries(t *testing.T) {
 	packageManager := createTestPackageManager()
 	release := packageManager.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
 	release.Properties = properties.NewFromHashmap(map[string]string{
-		"discovery.required": "arduino:ble-discovery",
+		"pluggable_discovery.required": "arduino:ble-discovery",
 	})
 
 	errs := packageManager.LoadDiscoveries()
@@ -149,8 +149,8 @@ func TestLoadDiscoveries(t *testing.T) {
 	packageManager = createTestPackageManager()
 	release = packageManager.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
 	release.Properties = properties.NewFromHashmap(map[string]string{
-		"discovery.required.0": "arduino:ble-discovery",
-		"discovery.required.1": "arduino:serial-discovery",
+		"pluggable_discovery.required.0": "arduino:ble-discovery",
+		"pluggable_discovery.required.1": "arduino:serial-discovery",
 	})
 
 	errs = packageManager.LoadDiscoveries()
@@ -163,9 +163,9 @@ func TestLoadDiscoveries(t *testing.T) {
 	packageManager = createTestPackageManager()
 	release = packageManager.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
 	release.Properties = properties.NewFromHashmap(map[string]string{
-		"discovery.required.0":     "arduino:ble-discovery",
-		"discovery.required.1":     "arduino:serial-discovery",
-		"discovery.teensy.pattern": "\"{runtime.tools.teensy_ports.path}/hardware/tools/teensy_ports\" -J2",
+		"pluggable_discovery.required.0":     "arduino:ble-discovery",
+		"pluggable_discovery.required.1":     "arduino:serial-discovery",
+		"pluggable_discovery.teensy.pattern": "\"{runtime.tools.teensy_ports.path}/hardware/tools/teensy_ports\" -J2",
 	})
 
 	errs = packageManager.LoadDiscoveries()
@@ -179,10 +179,10 @@ func TestLoadDiscoveries(t *testing.T) {
 	packageManager = createTestPackageManager()
 	release = packageManager.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
 	release.Properties = properties.NewFromHashmap(map[string]string{
-		"discovery.required":       "arduino:some-discovery",
-		"discovery.required.0":     "arduino:ble-discovery",
-		"discovery.required.1":     "arduino:serial-discovery",
-		"discovery.teensy.pattern": "\"{runtime.tools.teensy_ports.path}/hardware/tools/teensy_ports\" -J2",
+		"pluggable_discovery.required":       "arduino:some-discovery",
+		"pluggable_discovery.required.0":     "arduino:ble-discovery",
+		"pluggable_discovery.required.1":     "arduino:serial-discovery",
+		"pluggable_discovery.teensy.pattern": "\"{runtime.tools.teensy_ports.path}/hardware/tools/teensy_ports\" -J2",
 	})
 
 	errs = packageManager.LoadDiscoveries()
