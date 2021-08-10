@@ -119,7 +119,7 @@ testdata = [
 ]
 
 
-@pytest.mark.parametrize("package_index, fqbn, core, deps, upload_port, upload_tools, output", testdata)
+@pytest.mark.parametrize("package_index, fqbn, core, core_dependencies, upload_port, upload_tools, output", testdata)
 def test_upload_sketch(
     run_command,
     session_data_dir,
