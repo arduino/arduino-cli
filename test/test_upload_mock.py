@@ -45,6 +45,7 @@ testdata = [
         "",
         "arduino:avr:uno",
         "arduino:avr@1.8.3",
+        [],
         "/dev/ttyACM0",
         '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude"',
         "{tool_executable} "
@@ -55,6 +56,7 @@ testdata = [
         "",
         "arduino:avr:leonardo",
         "arduino:avr@1.8.3",
+        [],
         "/dev/ttyACM999",
         '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude"',
         "{tool_executable} "
@@ -65,6 +67,7 @@ testdata = [
         "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json",
         "adafruit:avr:flora8",
         "adafruit:avr@1.4.13",
+        ["arduino:avr@1.8.3"],
         "/dev/ttyACM0",
         '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude"',
         "{tool_executable} "
@@ -75,6 +78,7 @@ testdata = [
         "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json",
         "adafruit:avr:flora8",
         "adafruit:avr@1.4.13",
+        ["arduino:avr@1.8.3"],
         "/dev/ttyACM999",
         '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude"',
         "{tool_executable} "
@@ -85,6 +89,7 @@ testdata = [
         "https://dl.espressif.com/dl/package_esp32_index.json",
         "esp32:esp32:esp32thing",
         "esp32:esp32@1.0.6",
+        [],
         "/dev/ttyACM0",
         {
             "linux": 'python "{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool.py"',
@@ -102,6 +107,7 @@ testdata = [
         "http://arduino.esp8266.com/stable/package_esp8266com_index.json",
         "esp8266:esp8266:generic",
         "esp8266:esp8266@3.0.1",
+        [],
         "/dev/ttyACM0",
         '"{data_dir}/packages/esp8266/tools/python3/3.7.2-post1/python3"',
         "{tool_executable} "
@@ -113,9 +119,18 @@ testdata = [
 ]
 
 
-@pytest.mark.parametrize("package_index, fqbn, core, upload_port, upload_tools, output", testdata)
+@pytest.mark.parametrize("package_index, fqbn, core, deps, upload_port, upload_tools, output", testdata)
 def test_upload_sketch(
-    run_command, session_data_dir, downloads_dir, package_index, fqbn, core, upload_port, upload_tools, output
+    run_command,
+    session_data_dir,
+    downloads_dir,
+    package_index,
+    fqbn,
+    core,
+    core_dependencies,
+    upload_port,
+    upload_tools,
+    output,
 ):
     env = {
         "ARDUINO_DATA_DIR": session_data_dir,
@@ -129,6 +144,9 @@ def test_upload_sketch(
         assert run_command("update", custom_env=env)
 
     assert run_command(f"core install {core}", custom_env=env)
+
+    for d in core_dependencies:
+        assert run_command(f"core install {d}", custom_env=env)
 
     # Create a sketch
     sketch_name = "TestSketchForUpload"
