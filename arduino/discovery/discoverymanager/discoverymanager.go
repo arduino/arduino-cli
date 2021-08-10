@@ -27,7 +27,7 @@ type DiscoveryManager struct {
 	globalEventCh chan *discovery.Event
 }
 
-// New creates a new DiscoveriesManager
+// New creates a new DiscoveryManager
 func New() *DiscoveryManager {
 	return &DiscoveryManager{
 		discoveries:   map[string]*discovery.PluggableDiscovery{},

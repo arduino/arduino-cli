@@ -664,7 +664,7 @@ func (pm *PackageManager) loadDiscoveries(release *cores.PlatformRelease) []*sta
 
 	discoveryIDs := discoveryProperties.FirstLevelOf()
 	delete(discoveryIDs, "required")
-	// Get the list of tools only we if have there are discoveries that use Direct discovery integration.
+	// Get the list of tools only if there are discoveries that use Direct discovery integration.
 	// See:
 	// https://github.com/arduino/tooling-rfcs/blob/main/RFCs/0002-pluggable-discovery.md#direct-discovery-integration-not-recommended
 	// We need the tools only in that case since we might need some tool's

@@ -217,10 +217,10 @@ Finally, let's see how `PLATFORMS` are made.
             { "packager": "arduino", "name": "avr-gcc", "version": "4.8.1-arduino5" },
             { "packager": "arduino", "name": "avrdude", "version": "6.0.1-arduino5" }
           ],
-         "discoveryDependencies": [
-           { "packager": "arduino", "name": "serial-discovery" },
-           { "packager": "arduino", "name": "mdns-discovery" }
-         ]
+          "discoveryDependencies": [
+            { "packager": "arduino", "name": "serial-discovery" },
+            { "packager": "arduino", "name": "mdns-discovery" }
+          ]
         },
 ```
 
