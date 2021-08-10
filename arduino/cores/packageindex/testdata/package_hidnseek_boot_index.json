@@ -17,13 +17,11 @@
           "help": {
             "online": ""
           },
-	  "url": "https://www.hidnseek.fr/downloads/HidnSeek_1.0.1.tar.gz",
+          "url": "https://www.hidnseek.fr/downloads/HidnSeek_1.0.1.tar.gz",
           "archiveFileName": "HidnSeek_1.0.1.tar.gz",
           "checksum": "SHA-256:88a34903d1e7667ca29f474bae58609b0214609f18e689f73b36d68f39bd2cfc",
           "size": "7006",
-          "boards": [
-            {"name": "HidnSeek SIGFOX/LoRa GPS Trackers"}
-          ],
+          "boards": [{ "name": "HidnSeek SIGFOX/LoRa GPS Trackers" }],
           "toolsDependencies": [
             {
               "packager": "arduino",

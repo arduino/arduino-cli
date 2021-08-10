@@ -21,11 +21,7 @@
           "archiveFileName": "avr_boot_1.1.0.tar.gz",
           "checksum": "SHA-256:5f0f67942d1da5284192c8dbceae855d0bb8b26ae10281013f7862aaac6771f0",
           "size": "16682",
-          "boards": [
-            {"name": "ATmega328P"},
-            {"name": "ATmega32U4"},
-            {"name": "ATmega1284P"}
-          ],
+          "boards": [{ "name": "ATmega328P" }, { "name": "ATmega32U4" }, { "name": "ATmega1284P" }],
           "toolsDependencies": []
         },
         {
@@ -41,10 +37,10 @@
           "checksum": "SHA-256:b0aa6016ec84724fd250b2d5bc2739fec04f9cc6ad482123340e756546662ae9",
           "size": "226752",
           "boards": [
-            {"name": "ATmega328/P"},
-            {"name": "ATmega32U4"},
-            {"name": "ATmega1284/P"},
-            {"name": "ATmega644/P/A/PA"}
+            { "name": "ATmega328/P" },
+            { "name": "ATmega32U4" },
+            { "name": "ATmega1284/P" },
+            { "name": "ATmega644/P/A/PA" }
           ],
           "toolsDependencies": []
         },
@@ -61,17 +57,17 @@
           "checksum": "SHA-256:77214fdf5784155778ffa214acafe821f2fddc099a40b0d2e0dcfa0a13df4f37",
           "size": "602937",
           "boards": [
-            {"name": "ATmega328/P"},
-            {"name": "ATmega32U4"},
-            {"name": "ATmega1284/P"},
-            {"name": "ATmega644/P/A/PA"},
-            {"name": "ATmega324P/A/PA"},
-            {"name": "ATmega32/A"},
-            {"name": "ATmega1281"},
-            {"name": "ATmega64/A"},
-            {"name": "ATmega128/A"},
-            {"name": "ATmega1280"},
-            {"name": "ATmega640"}
+            { "name": "ATmega328/P" },
+            { "name": "ATmega32U4" },
+            { "name": "ATmega1284/P" },
+            { "name": "ATmega644/P/A/PA" },
+            { "name": "ATmega324P/A/PA" },
+            { "name": "ATmega32/A" },
+            { "name": "ATmega1281" },
+            { "name": "ATmega64/A" },
+            { "name": "ATmega128/A" },
+            { "name": "ATmega1280" },
+            { "name": "ATmega640" }
           ],
           "toolsDependencies": []
         }

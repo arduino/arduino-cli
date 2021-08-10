@@ -3,3 +3,7 @@
 .vscode/
 .vs/
 .ionide/
+
+/arduino/libraries/librariesindex/testdata/invalid.json
+/arduino/security/testdata/
+/site/

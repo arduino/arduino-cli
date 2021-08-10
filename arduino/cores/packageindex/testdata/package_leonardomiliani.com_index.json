@@ -7,7 +7,7 @@
       "email": "leonardo@leonardomiliani.com",
       "help": {
         "online": "https://github.com/leomil72/megax8"
-       },
+      },
       "platforms": [
         {
           "name": "ATmega168P/328P Boards",
@@ -18,10 +18,7 @@
           "archiveFileName": "megax8-1.0.0.zip",
           "checksum": "SHA-256:2fa3de54fd562694df05dd2f5f700f21517a7d2cc1b0a6285a70ae995508798c",
           "size": "146617",
-          "boards": [
-            { "name": "ATmega168P" },
-            { "name": "ATmega328P" }
-          ],
+          "boards": [{ "name": "ATmega168P" }, { "name": "ATmega328P" }],
           "toolsDependencies": [
             {
               "packager": "arduino",
@@ -56,10 +53,7 @@
           "archiveFileName": "megax4-1.0.1.zip",
           "checksum": "SHA-256:c8394ef065b3917c08df9d7818324fd3742c5723ac825f58a02eacbc4d19f669",
           "size": "170122",
-          "boards": [
-            { "name": "ATmega644P" },
-            { "name": "ATmega1284P" }
-          ],
+          "boards": [{ "name": "ATmega644P" }, { "name": "ATmega1284P" }],
           "toolsDependencies": [
             {
               "packager": "arduino",
@@ -94,10 +88,7 @@
           "archiveFileName": "megax4-1.0.2.zip",
           "checksum": "SHA-256:5696cdfcc63d70d0c67c8475c2847fcdf915d86c7d6a24249c32f76fc2fd3351",
           "size": "166254",
-          "boards": [
-            { "name": "ATmega644P" },
-            { "name": "ATmega1284P" }
-          ],
+          "boards": [{ "name": "ATmega644P" }, { "name": "ATmega1284P" }],
           "toolsDependencies": [
             {
               "packager": "arduino",

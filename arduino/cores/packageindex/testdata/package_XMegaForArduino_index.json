@@ -1,21 +1,17 @@
 {
-  "packages":
-  [
+  "packages": [
     {
       "maintainer": "XMegaForArduino",
-      "help":
-      {
+      "help": {
         "online": "https://github.com/XMegaForArduino"
       },
       "websiteURL": "https://github.com/XMegaForArduino",
       "email": "XMegaForArduino@github.com",
       "name": "XMegaForArduino",
-      "platforms":
-      [
+      "platforms": [
         {
           "category": "XMegaForArduino",
-          "help":
-          {
+          "help": {
             "online": "https://github.com/XMegaForArduino"
           },
           "url": "https://raw.githubusercontent.com/XMegaForArduino/IDE/master/XMegaForArduino-0.9.1.tar.bz2",
@@ -26,8 +22,7 @@
           "archiveFileName": "XMegaForArduino-0.9.1.tar.bz2",
           "size": "220194",
           "toolsDependencies": [],
-          "boards":
-          [
+          "boards": [
             {
               "name": "ATXMega64D4"
             },
@@ -50,8 +45,7 @@
         },
         {
           "category": "XMegaForArduino",
-          "help":
-          {
+          "help": {
             "online": "https://github.com/XMegaForArduino"
           },
           "url": "https://raw.githubusercontent.com/XMegaForArduino/IDE/master/XMegaForArduino-0.9.2.tar.bz2",
@@ -62,8 +56,7 @@
           "archiveFileName": "XMegaForArduino-0.9.2.tar.bz2",
           "size": "230744",
           "toolsDependencies": [],
-          "boards":
-          [
+          "boards": [
             {
               "name": "ATXMega64D4"
             },
@@ -89,4 +82,3 @@
     }
   ]
 }
-
