@@ -16,6 +16,7 @@
 package lib
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"sort"
@@ -30,7 +31,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"golang.org/x/net/context"
 )
 
 func initExamplesCommand() *cobra.Command {
