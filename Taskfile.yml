@@ -21,6 +21,7 @@ tasks:
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/go-task/Taskfile.yml
   go:build:
     desc: Build the Go code
+    dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
       - go build -v {{.LDFLAGS}}
 
@@ -37,18 +38,21 @@ tasks:
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
   go:fix:
     desc: Modernize usages of outdated APIs
+    dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
       - go fix {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}}
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
   go:format:
     desc: Format Go code
+    dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
       - go fmt {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}}
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
   go:lint:
     desc: Lint Go code
+    dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
       - |
         if ! which golint &>/dev/null; then
@@ -63,6 +67,7 @@ tasks:
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/test-go-task/Taskfile.yml
   go:test:
     desc: Run unit tests
+    dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
       - |
         go test \
@@ -86,6 +91,7 @@ tasks:
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
   go:vet:
     desc: Check for errors in Go code
+    dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
       - go vet {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}}
 
@@ -289,7 +295,8 @@ vars:
   DIST_DIR: "dist"
   # all modules of this project except for "legacy/..." module
   DEFAULT_GO_PACKAGES:
-    sh: echo $(go list ./... | grep -v legacy | tr '\n' ' ')
+    sh: |
+      echo $(cd {{default "./" .GO_MODULE_PATH}} && go list ./... | grep -v legacy | tr '\n' ' ' || echo '"ERROR: Unable to discover Go packages"')
   # build vars
   COMMIT:
     sh: echo "$(git log --no-show-signature -n 1 --format=%h)"
