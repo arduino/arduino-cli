@@ -202,22 +202,6 @@ tasks:
       - task: go:test
       - task: go:test-integration
 
-  test-unit:
-    desc: Run unit tests only
-    deps:
-      - task: go:test
-    cmds:
-      - |
-        echo "WARNING: this task is deprecated. Use go:test instead"
-
-  test-integration:
-    desc: Run integration tests only
-    deps:
-      - task: go:test-integration
-    cmds:
-      - |
-        echo "WARNING: this task is deprecated. Use go:test-integration instead"
-
   test-legacy:
     desc: Run tests for the `legacy` package
     cmds:
