@@ -43,7 +43,7 @@ require (
 	go.bug.st/serial v1.1.2
 	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
-	golang.org/x/net v0.0.0-20210505024714-0287a6fb4125
+	golang.org/x/net v0.0.0-20210505024714-0287a6fb4125 // indirect
 	golang.org/x/sys v0.0.0-20210503173754-0981d6026fa6 // indirect
 	golang.org/x/text v0.3.6
 	google.golang.org/genproto v0.0.0-20210504143626-3b2ad6ccc450
