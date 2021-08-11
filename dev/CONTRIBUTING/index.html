@@ -1638,21 +1638,21 @@ of the tests locally.</p>
 <div class="highlight"><pre><span></span><code>task check
 </code></pre></div>
 <p>To run unit tests:</p>
-<div class="highlight"><pre><span></span><code>task test-unit
+<div class="highlight"><pre><span></span><code>task go:test
 </code></pre></div>
 <p>To run integration tests (these will take some time and require special setup, see following paragraph):</p>
-<div class="highlight"><pre><span></span><code>task test-integration
+<div class="highlight"><pre><span></span><code>task go:test-integration
 </code></pre></div>
 <h4 id="running-only-some-tests">Running only some tests<a class="headerlink" href="#running-only-some-tests" title="Permanent link">&para;</a></h4>
 <p>By default, all tests from all go packages are run. To run only unit tests from one or more specific packages, you can
 set the TARGETS environment variable, e.g.:</p>
-<div class="highlight"><pre><span></span><code>TARGETS=./arduino/cores/packagemanager task test-unit
+<div class="highlight"><pre><span></span><code>TARGETS=./arduino/cores/packagemanager task go:test
 </code></pre></div>
 <p>Alternatively, to run only some specific test(s), you can specify a regex to match against the test function name:</p>
-<div class="highlight"><pre><span></span><code>TEST_REGEX=&#39;^TestTryBuild.*&#39; task test-unit
+<div class="highlight"><pre><span></span><code>TEST_REGEX=&#39;^TestTryBuild.*&#39; task go:test
 </code></pre></div>
 <p>Both can be combined as well, typically to run only a specific test:</p>
-<div class="highlight"><pre><span></span><code>TEST_REGEX=&#39;^TestFindBoardWithFQBN$&#39; TARGETS=./arduino/cores/packagemanager task test-unit
+<div class="highlight"><pre><span></span><code>TEST_REGEX=&#39;^TestFindBoardWithFQBN$&#39; TARGETS=./arduino/cores/packagemanager task go:test
 </code></pre></div>
 <h3 id="integration-tests">Integration tests<a class="headerlink" href="#integration-tests" title="Permanent link">&para;</a></h3>
 <p>Being a command line interface, Arduino CLI is heavily interactive and it has to stay consistent in accepting the user
@@ -1682,7 +1682,7 @@ to install it (you might need to <code>sudo</code> the following command):</p>
 <p>For more installation options read the <a href="https://python-poetry.org/docs/">official documentation</a>.</p>
 <h4 id="running-tests">Running tests<a class="headerlink" href="#running-tests" title="Permanent link">&para;</a></h4>
 <p>After the software requirements have been installed you should be able to run the tests with:</p>
-<div class="highlight"><pre><span></span><code>task test-integration
+<div class="highlight"><pre><span></span><code>task go:test-integration
 </code></pre></div>
 <p>This will automatically install the necessary dependencies, if not already installed, and run the integration tests
 automatically.</p>
