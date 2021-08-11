@@ -43,11 +43,12 @@ func main() {
 		if err := disc.Start(); err != nil {
 			log.Fatal("Error starting discovery:", err)
 		}
-		if err := disc.StartSync(); err != nil {
+		eventChan, err := disc.StartSync(10)
+		if err != nil {
 			log.Fatal("Error starting discovery:", err)
 		}
 		go func() {
-			for msg := range disc.EventChannel(10) {
+			for msg := range eventChan {
 				discEvent <- msg
 			}
 		}()
@@ -70,7 +71,7 @@ func main() {
 		rows := []string{}
 		rows = append(rows, "Available ports list:")
 		for _, disc := range discoveries {
-			for i, port := range disc.ListSync() {
+			for i, port := range disc.ListCachedPorts() {
 				rows = append(rows, fmt.Sprintf(" [%04d] Address: %s", i, port.AddressLabel))
 				rows = append(rows, fmt.Sprintf("        Protocol: %s", port.ProtocolLabel))
 				keys := port.Properties.Keys()
@@ -138,7 +139,7 @@ out:
 			log.Fatal("Error stopping discovery:", err)
 		}
 		fmt.Println("Discovery QUITed")
-		for disc.IsAlive() {
+		for disc.State() == discovery.Alive {
 			time.Sleep(time.Millisecond)
 		}
 		fmt.Println("Discovery correctly terminated")
