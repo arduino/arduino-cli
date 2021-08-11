@@ -468,13 +468,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#docs-versioning" class="md-nav__link">
-    Docs versioning
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#docs-formatting" class="md-nav__link">
     Docs formatting
   </a>
@@ -1479,13 +1472,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#docs-versioning" class="md-nav__link">
-    Docs versioning
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#docs-formatting" class="md-nav__link">
     Docs formatting
   </a>
@@ -1765,34 +1751,6 @@ repository run:</p>
 website; every time a change is pushed to this special branch, GitHub automatically triggers a deployment to pull the
 change and publish a new version of the website. Do not open Pull Requests to push changes to the <code>gh-pages</code> branch,
 that will be done exclusively from the CI.</p>
-<h4 id="docs-versioning">Docs versioning<a class="headerlink" href="#docs-versioning" title="Permanent link">&para;</a></h4>
-<p>In order to provide support for multiple Arduino CLI releases, Documentation is versioned so that visitors can select
-which version of the documentation website should be displayed. Unfortunately this feature isn't provided by GitHub
-pages or MkDocs, so we had to implement it on top of the generation process.</p>
-<p>Before delving into the details of the generation process, here follow some requirements that were established to
-provide versioned documentation:</p>
-<ul>
-<li>A special version of the documentation called <code>dev</code> is provided to reflect the status of the Arduino CLI on the
-  <code>master</code> branch - this includes unreleased features and bugfixes.</li>
-<li>Docs are versioned after the minor version of an Arduino CLI release. For example, Arduino CLI <code>0.99.1</code> and <code>0.99.2</code>
-  will be both covered by documentation version <code>0.99</code>.</li>
-<li>The landing page of the documentation website will automatically redirect visitors to the most recently released
-  version of the Arduino CLI.</li>
-</ul>
-<p>To implement the requirements above, the execution of MkDocs is wrapped using a CLI tool called <a href="https://github.com/jimporter/mike">Mike</a> that does a
-few things for us:</p>
-<ul>
-<li>It runs MkDocs targeting subfolders named after the Arduino CLI version, e.g. documentation for version <code>0.10.1</code> can
-  be found under the folder <code>0.10</code>.</li>
-<li>It injects an HTML control into the documentation website that lets visitors choose which version of the docs to
-  browse from a dropdown list.</li>
-<li>It provides a redirect to a version we decide when visitors hit the landing page of the documentation website.</li>
-<li>It pushes generated contents to the <code>gh-pages</code> branch.</li>
-</ul>
-<blockquote>
-<p><strong>Note:</strong> unless you're working on the generation process itself, you should never run Mike from a local environment,
-either directly or through the Task <code>docs:publish</code>. This might result in unwanted changes to the public website.</p>
-</blockquote>
 <h4 id="docs-formatting">Docs formatting<a class="headerlink" href="#docs-formatting" title="Permanent link">&para;</a></h4>
 <p>To keep the documentation tidy and in order we use <a href="https://prettier.io/">Prettier</a> to automatically format all Markdown
 files in the project. Keeping and enforcing a formatting standard helps everyone make small PRs and avoids the
@@ -1808,12 +1766,9 @@ extension</a> to automatically format as you write.</p>
 case of failures we might ask you to update the PR with correct formatting.</p>
 <h4 id="docs-automation">Docs automation<a class="headerlink" href="#docs-automation" title="Permanent link">&para;</a></h4>
 <p>In order to avoid unwanted changes to the public website hosting the Arduino CLI documentation, only Mike is allowed to
-push changes to the <code>gh-pages</code> branch, and this only happens from within the CI, in a workflow named <a href="https://github.com/arduino/arduino-cli/blob/master/.github/workflows/publish-docs.yaml">publish-docs</a>.</p>
-<p>The CI is responsible for guessing which version of the Arduino CLI we're building docs for, so that generated content
-will be stored in the appropriate section of the documentation website. Because this guessing might be fairly complex,
-the logic is implemented in a Python script called <a href="https://github.com/arduino/arduino-cli/blob/master/docs/build.py"><code>build.py</code></a>. The script will determine the version of the
-Arduino CLI that was modified in the current commit (either <code>dev</code> or an official, numbered release) and whether the
-redirect to the latest version that happens on the landing page should be updated or not.</p>
+push changes to the <code>gh-pages</code> branch, and this only happens from within the CI, in a workflow named <a href="https://github.com/arduino/arduino-cli/blob/master/.github/workflows/deploy-cobra-mkdocs-versioned-poetry.yml">Deploy
+Website</a>.</p>
+<p>Details on the documentation publishing system are available <a href="https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/deploy-cobra-mkdocs-versioned-poetry.md">here</a>.</p>
 <h3 id="internationalization-i18n">Internationalization (i18n)<a class="headerlink" href="#internationalization-i18n" title="Permanent link">&para;</a></h3>
 <p>In order to support i18n in the CLI, any messages that are intended to be translated should be wrapped in a call to
 <code>i18n.Tr</code>. This call allows us to build a catalog of translatable strings, replacing the reference string at runtime
