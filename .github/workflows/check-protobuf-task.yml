@@ -1,0 +1,81 @@
+name: Check Protocol Buffers
+
+env:
+  # See: https://github.com/actions/setup-go/tree/v2#readme
+  GO_VERSION: "1.16"
+
+# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+on:
+  push:
+    paths:
+      - ".github/workflows/check-protobuf-task.ya?ml"
+      - "Taskfile.ya?ml"
+      - "rpc/**"
+  pull_request:
+    paths:
+      - ".github/workflows/check-protobuf-task.ya?ml"
+      - "Taskfile.ya?ml"
+      - "rpc/**"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install protoc compiler
+        uses: arduino/setup-protoc@v1
+        with:
+          version: v3.16.0
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Go deps
+        run: |
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.26.0
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1.0
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Check protocol buffers compile correctly
+        if: runner.os == 'Linux'
+        run: task protoc:compile
+
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install buf (protoc linter)
+        run: |
+          go install github.com/bufbuild/buf/cmd/buf@latest
+          go install github.com/bufbuild/buf/cmd/protoc-gen-buf-breaking@latest
+          go install github.com/bufbuild/buf/cmd/protoc-gen-buf-lint@latest
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Lint protocol buffers
+        run: task protoc:check

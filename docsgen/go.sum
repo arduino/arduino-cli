@@ -70,7 +70,6 @@ github.com/fluxio/iohelpers v0.0.0-20160419043813-3a4dd67a94d2 h1:C6sOwknxwWfLBE
 github.com/fluxio/iohelpers v0.0.0-20160419043813-3a4dd67a94d2/go.mod h1:c7sGIpDbBo0JZZ1tKyC1p5smWf8QcUjK4bFtZjHAecg=
 github.com/fluxio/multierror v0.0.0-20160419044231-9c68d39025e5 h1:R8jFW6G/bjoXjWPFrEfw9G5YQDlYhwV4AC+Eonu6wmk=
 github.com/fluxio/multierror v0.0.0-20160419044231-9c68d39025e5/go.mod h1:BEUDl7FG1cc76sM0J0x8dqr6RhiL4uqvk6oFkwuNyuM=
-github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568 h1:BHsljHzVlRcyQhjrss6TZTdY2VfCqZPbv5k3iBFa2ZQ=
 github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568/go.mod h1:xEzjJPgXI435gkrCt3MPfRiAkVrwSbHsst4LCFVfpJc=
 github.com/fsnotify/fsnotify v1.4.7 h1:IXs+QLmnXW2CcXuY+8Mzv/fWEsPGWxqefPtCP5CnV9I=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=

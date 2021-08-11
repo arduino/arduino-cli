@@ -1,3 +1,4 @@
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/release-go-task/DistTasks.yml
 version: "3"
 
 # This taskfile is ideally meant to be project agnostic and could be dropped in

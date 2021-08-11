@@ -109,13 +109,13 @@ task check
 To run unit tests:
 
 ```shell
-task test-unit
+task go:test
 ```
 
 To run integration tests (these will take some time and require special setup, see following paragraph):
 
 ```shell
-task test-integration
+task go:test-integration
 ```
 
 #### Running only some tests
@@ -124,19 +124,19 @@ By default, all tests from all go packages are run. To run only unit tests from 
 set the TARGETS environment variable, e.g.:
 
 ```
-TARGETS=./arduino/cores/packagemanager task test-unit
+TARGETS=./arduino/cores/packagemanager task go:test
 ```
 
 Alternatively, to run only some specific test(s), you can specify a regex to match against the test function name:
 
 ```
-TEST_REGEX='^TestTryBuild.*' task test-unit
+TEST_REGEX='^TestTryBuild.*' task go:test
 ```
 
 Both can be combined as well, typically to run only a specific test:
 
 ```
-TEST_REGEX='^TestFindBoardWithFQBN$' TARGETS=./arduino/cores/packagemanager task test-unit
+TEST_REGEX='^TestFindBoardWithFQBN$' TARGETS=./arduino/cores/packagemanager task go:test
 ```
 
 ### Integration tests
@@ -181,7 +181,7 @@ For more installation options read the [official documentation][poetry-docs].
 After the software requirements have been installed you should be able to run the tests with:
 
 ```shell
-task test-integration
+task go:test-integration
 ```
 
 This will automatically install the necessary dependencies, if not already installed, and run the integration tests

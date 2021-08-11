@@ -1,0 +1,51 @@
+name: Check Internationalization
+
+env:
+  # See: https://github.com/actions/setup-go/tree/v2#readme
+  GO_VERSION: "1.16"
+
+# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+on:
+  push:
+    paths:
+      - ".github/workflows/check-i18n-task.ya?ml"
+      - "Taskfile.ya?ml"
+      - "go.mod"
+      - "go.sum"
+      - "**.go"
+      - "i18n/**"
+  pull_request:
+    paths:
+      - ".github/workflows/check-i18n-task.ya?ml"
+      - "Taskfile.ya?ml"
+      - "go.mod"
+      - "go.sum"
+      - "**.go"
+      - "i18n/**"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install go.rice
+        run: go get github.com/cmaglie/go.rice/rice
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Check for errors
+        run: task i18n:check

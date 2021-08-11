@@ -16,6 +16,7 @@
 package lib
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"sort"
@@ -29,7 +30,6 @@ import (
 	"github.com/arduino/arduino-cli/table"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"golang.org/x/net/context"
 )
 
 func initListCommand() *cobra.Command {
