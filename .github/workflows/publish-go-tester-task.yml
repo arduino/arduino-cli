@@ -1,0 +1,111 @@
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/publish-go-tester-task.md
+name: Publish Tester Build
+
+# See: https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows
+on:
+  push:
+    paths:
+      - ".github/workflows/publish-go-tester-task.ya?ml"
+      - "go.mod"
+      - "go.sum"
+      - "Taskfile.ya?ml"
+      - "DistTasks.ya?ml"
+      - "**.go"
+  pull_request:
+    paths:
+      - ".github/workflows/publish-go-tester-task.ya?ml"
+      - "go.mod"
+      - "go.sum"
+      - "Taskfile.ya?ml"
+      - "DistTasks.ya?ml"
+      - "**.go"
+  workflow_dispatch:
+  repository_dispatch:
+
+env:
+  # As defined by the Taskfile's DIST_DIR variable
+  DIST_DIR: dist
+  BUILDS_ARTIFACT: build-artifacts
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Build
+        run: |
+          PACKAGE_NAME_PREFIX="test"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.event.number }}"
+          fi
+          PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.sha }}-"
+          export PACKAGE_NAME_PREFIX
+          task dist:all
+
+      # Transfer builds to artifacts job
+      - name: Upload combined builds artifact
+        uses: actions/upload-artifact@v2
+        with:
+          path: ${{ env.DIST_DIR }}
+          name: ${{ env.BUILDS_ARTIFACT }}
+
+  artifacts:
+    name: ${{ matrix.artifact.name }} artifact
+    needs: build
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        artifact:
+          - path: "*checksums.txt"
+            name: checksums
+          - path: "*Linux_32bit.tar.gz"
+            name: Linux_X86-32
+          - path: "*Linux_64bit.tar.gz"
+            name: Linux_X86-64
+          - path: "*Linux_ARM64.tar.gz"
+            name: Linux_ARM64
+          - path: "*Linux_ARMv6.tar.gz"
+            name: Linux_ARMv6
+          - path: "*Linux_ARMv7.tar.gz"
+            name: Linux_ARMv7
+          - path: "*macOS_64bit.tar.gz"
+            name: macOS_64
+          - path: "*Windows_32bit.zip"
+            name: Windows_X86-32
+          - path: "*Windows_64bit.zip"
+            name: Windows_X86-64
+
+    steps:
+      - name: Download combined builds artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.BUILDS_ARTIFACT }}
+          path: ${{ env.BUILDS_ARTIFACT }}
+
+      - name: Upload individual build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          path: ${{ env.BUILDS_ARTIFACT }}/${{ matrix.artifact.path }}
+          name: ${{ matrix.artifact.name }}
+
+  clean:
+    needs: artifacts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Remove unneeded combined builds artifact
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: ${{ env.BUILDS_ARTIFACT }}

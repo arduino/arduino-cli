@@ -5,10 +5,11 @@
 Arduino CLI is an all-in-one solution that provides Boards/Library Managers, sketch builder, board detection, uploader,
 and many other tools needed to use any Arduino compatible board and platform.
 
-[![tests-badge]](https://github.com/Arduino/arduino-cli/actions?workflow=test)
+[![Test Go status](https://github.com/arduino/arduino-cli/actions/workflows/test-go-task.yml/badge.svg)](https://github.com/arduino/arduino-cli/actions/workflows/test-go-task.yml)
+[![Test Integration status](https://github.com/arduino/arduino-cli/actions/workflows/test-go-integration-task.yml/badge.svg)](https://github.com/arduino/arduino-cli/actions/workflows/test-go-integration-task.yml)
 [![nightly-badge]](https://github.com/Arduino/arduino-cli/actions?workflow=nightly)
 [![Deploy Website status](https://github.com/arduino/arduino-cli/actions/workflows/deploy-cobra-mkdocs-versioned-poetry.yml/badge.svg)](https://github.com/arduino/arduino-cli/actions/workflows/deploy-cobra-mkdocs-versioned-poetry.yml)
-[![codecov-badge]](https://codecov.io/gh/arduino/arduino-cli)
+[![Codecov](https://codecov.io/gh/arduino/arduino-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/arduino/arduino-cli)
 
 > **Note:** this software is currently under active development: anything can change at any time, API and UI must be
 > considered unstable until we release version 1.0.0.

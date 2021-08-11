@@ -26,6 +26,12 @@ tasks:
     cmds:
       - npx prettier --write .
 
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/go-task/Taskfile.yml
+  go:build:
+    desc: Build the Go code
+    cmds:
+      - go build -v {{.LDFLAGS}}
+
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/deploy-cobra-mkdocs-versioned-poetry/Taskfile.yml
   go:cli-docs:
     desc: Generate command line interface reference documentation
@@ -35,6 +41,61 @@ tasks:
       - go build -o {{.PROJECT_NAME}}{{exeExt}}
       # The binary is invoked like this instead of `./{{.PROJECT_NAME}}` to remove the `./` chars from the examples
       - PATH=. {{.PROJECT_NAME}} ../docs/commands
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
+  go:fix:
+    desc: Modernize usages of outdated APIs
+    cmds:
+      - go fix {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}}
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
+  go:format:
+    desc: Format Go code
+    cmds:
+      - go fmt {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}}
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
+  go:lint:
+    desc: Lint Go code
+    cmds:
+      - |
+        if ! which golint &>/dev/null; then
+          echo "golint not installed or not in PATH. Please install: https://github.com/golang/lint#installation"
+          exit 1
+        fi
+      - |
+        golint \
+          {{default "-min_confidence 0.8 -set_exit_status" .GO_LINT_FLAGS}} \
+          {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}}
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/test-go-task/Taskfile.yml
+  go:test:
+    desc: Run unit tests
+    cmds:
+      - |
+        go test \
+          -v \
+          -short \
+          -run '{{default ".*" .GO_TEST_REGEX}}' \
+          {{default "-timeout 10m -coverpkg=./... -covermode=atomic" .GO_TEST_FLAGS}} \
+          -coverprofile=coverage_unit.txt \
+          {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}} \
+          {{.TEST_LDFLAGS}}
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/test-go-integration-task/Taskfile.yml
+  go:test-integration:
+    desc: Run integration tests
+    deps:
+      - task: go:build
+      - task: poetry:install-deps
+    cmds:
+      - poetry run pytest test
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
+  go:vet:
+    desc: Check for errors in Go code
+    cmds:
+      - go vet {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}}
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-markdown-task/Taskfile.yml
   markdown:check-links:
@@ -132,25 +193,30 @@ tasks:
 
   build:
     desc: Build the project
-    cmds:
-      - go build -v {{.LDFLAGS}}
+    deps:
+      - task: go:build
 
   test:
     desc: Run the full testsuite, `legacy` will be skipped
     cmds:
-      - task: test-unit
-      - task: test-integration
+      - task: go:test
+      - task: go:test-integration
 
   test-unit:
     desc: Run unit tests only
+    deps:
+      - task: go:test
     cmds:
-      - go test -short -run '{{ default ".*" .TEST_REGEX }}' {{ default "-v" .GOFLAGS }} -coverprofile=coverage_unit.txt {{ default .DEFAULT_TARGETS .TARGETS }} {{.TEST_LDFLAGS}}
+      - |
+        echo "WARNING: this task is deprecated. Use go:test instead"
 
   test-integration:
     desc: Run integration tests only
+    deps:
+      - task: go:test-integration
     cmds:
-      - poetry install --no-root
-      - poetry run pytest test
+      - |
+        echo "WARNING: this task is deprecated. Use go:test-integration instead"
 
   test-legacy:
     desc: Run tests for the `legacy` package
@@ -160,14 +226,13 @@ tasks:
   test-unit-race:
     desc: Run unit tests only with race condition detection
     cmds:
-      - go test -short -race {{ default "-v" .GOFLAGS }} -coverprofile=coverage_race_unit.txt {{ default .DEFAULT_TARGETS .TARGETS }}
+      - go test -short -race {{ default "-v" .GOFLAGS }} -coverprofile=coverage_race_unit.txt {{ default .DEFAULT_GO_PACKAGES .TARGETS }}
 
   check:
     desc: Check fmt and lint, `legacy` will be skipped
     cmds:
-      - test -z $(go fmt {{ default .DEFAULT_TARGETS .TARGETS }})
-      - go vet {{ default .DEFAULT_TARGETS .TARGETS }}
-      - "'{{.GOLINTBIN}}' {{.GOLINTFLAGS}} {{ default .DEFAULT_TARGETS .TARGETS }}"
+      - task: go:vet
+      - task: go:lint
       - task: i18n:check
       - task: python:check
       - task: protoc:check
@@ -247,8 +312,8 @@ vars:
   PROJECT_NAME: "arduino-cli"
   DIST_DIR: "dist"
   # all modules of this project except for "legacy/..." module
-  DEFAULT_TARGETS:
-    sh: echo `go list ./... | grep -v legacy | tr '\n' ' '`
+  DEFAULT_GO_PACKAGES:
+    sh: echo $(go list ./... | grep -v legacy | tr '\n' ' ')
   # build vars
   COMMIT:
     sh: echo "$(git log --no-show-signature -n 1 --format=%h)"
@@ -257,27 +322,24 @@ vars:
   TIMESTAMP_SHORT:
     sh: echo "{{now | date "20060102"}}"
   TAG:
-    sh: echo "`git tag --points-at=HEAD 2> /dev/null | head -n1`"
-  VERSION: "{{ if .NIGHTLY }}nightly-{{ .TIMESTAMP_SHORT }}{{ else if .TAG }}{{ .TAG }}{{ else }}{{ .PACKAGE_NAME_PREFIX }}git-snapshot{{ end }}"
-  LDFLAGS: >
+    sh: echo "$(git tag --points-at=HEAD 2> /dev/null | head -n1)"
+  VERSION: "{{if .NIGHTLY}}nightly-{{.TIMESTAMP_SHORT}}{{else if .TAG}}{{.TAG}}{{else}}{{.PACKAGE_NAME_PREFIX}}git-snapshot{{end}}"
+  CONFIGURATION_PACKAGE: "github.com/arduino/arduino-cli/version"
+  LDFLAGS: >-
     -ldflags
     '
-    -X github.com/arduino/arduino-cli/version.versionString={{.VERSION}}
-    -X github.com/arduino/arduino-cli/version.commit={{ .COMMIT }}
-    -X github.com/arduino/arduino-cli/version.date={{.TIMESTAMP}}
+    -X {{.CONFIGURATION_PACKAGE}}.versionString={{.VERSION}}
+    -X {{.CONFIGURATION_PACKAGE}}.commit={{.COMMIT}}
+    -X {{.CONFIGURATION_PACKAGE}}.date={{.TIMESTAMP}}
     '
   # test vars
   GOFLAGS: "-timeout 10m -v -coverpkg=./... -covermode=atomic"
   TEST_VERSION: "0.0.0-test.preview"
   TEST_COMMIT: "deadbeef"
-  TEST_LDFLAGS: >
+  TEST_LDFLAGS: >-
     -ldflags
     '
-    -X github.com/arduino/arduino-cli/version.versionString={{.TEST_VERSION}}
-    -X github.com/arduino/arduino-cli/version.commit={{.TEST_COMMIT}}
-    -X github.com/arduino/arduino-cli/version.date={{.TIMESTAMP}}
+    -X {{.CONFIGURATION_PACKAGE}}.versionString={{.TEST_VERSION}}
+    -X {{.CONFIGURATION_PACKAGE}}.commit={{.TEST_COMMIT}}
+    -X {{.CONFIGURATION_PACKAGE}}.date={{.TIMESTAMP}}
     '
-  # check-lint vars
-  GOLINTBIN:
-    sh: go list -f {{"{{"}}".Target{{"}}"}}" golang.org/x/lint/golint
-  GOLINTFLAGS: "-min_confidence 0.8 -set_exit_status"
