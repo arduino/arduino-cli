@@ -1,23 +1,14 @@
 #!/bin/sh
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/other/installation-script/install.sh
 
-# The original version of this script is licensed under the MIT license.
-# See https://github.com/Masterminds/glide/blob/master/LICENSE for more details
-# and copyright notice.
+# The original version of this script (https://github.com/Masterminds/glide.sh/blob/master/get) is licensed under the
+# MIT license. See https://github.com/Masterminds/glide/blob/master/LICENSE for more details and copyright notice.
 
-#
-# Usage:
-#
-# To install the latest version of the CLI:
-#    ./install.sh
-#
-# To pin a specific release of the CLI:
-#    ./install.sh 0.9.0
-#
-
+PROJECT_OWNER="arduino"
 PROJECT_NAME="arduino-cli"
 
 # BINDIR represents the local bin location, defaults to ./bin.
-LBINDIR=""
+EFFECTIVE_BINDIR=""
 DEFAULT_BINDIR="$PWD/bin"
 
 fail() {
@@ -28,16 +19,18 @@ fail() {
 initDestination() {
   if [ -n "$BINDIR" ]; then
     if [ ! -d "$BINDIR" ]; then
+      # The second instance of $BINDIR is intentionally a literal in this message.
+      # shellcheck disable=SC2016
       fail "$BINDIR "'($BINDIR)'" folder not found. Please create it before continuing."
     fi
-    LBINDIR="$BINDIR"
+    EFFECTIVE_BINDIR="$BINDIR"
   else
     if [ ! -d "$DEFAULT_BINDIR" ]; then
       mkdir "$DEFAULT_BINDIR"
     fi
-    LBINDIR="$DEFAULT_BINDIR"
+    EFFECTIVE_BINDIR="$DEFAULT_BINDIR"
   fi
-  echo "Installing in $LBINDIR"
+  echo "Installing in $EFFECTIVE_BINDIR"
 }
 
 initArch() {
@@ -67,9 +60,9 @@ initOS() {
 }
 
 initDownloadTool() {
-  if type "curl" >/dev/null; then
+  if command -v "curl" >/dev/null 2>&1; then
     DOWNLOAD_TOOL="curl"
-  elif type "wget" >/dev/null; then
+  elif command -v "wget" >/dev/null 2>&1; then
     DOWNLOAD_TOOL="wget"
   else
     fail "You need curl or wget as download tool. Please install it first before continuing"
@@ -80,130 +73,137 @@ initDownloadTool() {
 checkLatestVersion() {
   # Use the GitHub releases webpage to find the latest version for this project
   # so we don't get rate-limited.
-  local tag
-  local regex="[0-9][A-Za-z0-9\.-]*"
-  local latest_url="https://github.com/arduino/arduino-cli/releases/latest"
+  CHECKLATESTVERSION_REGEX="[0-9][A-Za-z0-9\.-]*"
+  CHECKLATESTVERSION_LATEST_URL="https://github.com/${PROJECT_OWNER}/${PROJECT_NAME}/releases/latest"
   if [ "$DOWNLOAD_TOOL" = "curl" ]; then
-    tag=$(curl -SsL $latest_url | grep -o "<title>Release $regex · arduino/arduino-cli" | grep -o "$regex")
+    CHECKLATESTVERSION_TAG=$(curl -SsL $CHECKLATESTVERSION_LATEST_URL | grep -o "<title>Release $CHECKLATESTVERSION_REGEX · ${PROJECT_OWNER}/${PROJECT_NAME}" | grep -o "$CHECKLATESTVERSION_REGEX")
   elif [ "$DOWNLOAD_TOOL" = "wget" ]; then
-    tag=$(wget -q -O - $latest_url | grep -o "<title>Release $regex · arduino/arduino-cli" | grep -o "$regex")
+    CHECKLATESTVERSION_TAG=$(wget -q -O - $CHECKLATESTVERSION_LATEST_URL | grep -o "<title>Release $CHECKLATESTVERSION_REGEX · ${PROJECT_OWNER}/${PROJECT_NAME}" | grep -o "$CHECKLATESTVERSION_REGEX")
   fi
-  if [ "x$tag" = "x" ]; then
+  if [ "$CHECKLATESTVERSION_TAG" = "" ]; then
     echo "Cannot determine latest tag."
     exit 1
   fi
-  eval "$1='$tag'"
+  eval "$1='$CHECKLATESTVERSION_TAG'"
 }
 
 get() {
-  local url="$2"
-  local body
-  local httpStatusCode
-  echo "Getting $url"
+  GET_URL="$2"
+  echo "Getting $GET_URL"
   if [ "$DOWNLOAD_TOOL" = "curl" ]; then
-    httpResponse=$(curl -sL --write-out HTTPSTATUS:%{http_code} "$url")
-    httpStatusCode=$(echo $httpResponse | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-    body=$(echo "$httpResponse" | sed -e 's/HTTPSTATUS\:.*//g')
+    GET_HTTP_RESPONSE=$(curl -sL --write-out 'HTTPSTATUS:%{http_code}' "$GET_URL")
+    GET_HTTP_STATUS_CODE=$(echo "$GET_HTTP_RESPONSE" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+    GET_BODY=$(echo "$GET_HTTP_RESPONSE" | sed -e 's/HTTPSTATUS\:.*//g')
   elif [ "$DOWNLOAD_TOOL" = "wget" ]; then
-    tmpFile=$(mktemp)
-    body=$(wget --server-response --content-on-error -q -O - "$url" 2>$tmpFile || true)
-    httpStatusCode=$(cat $tmpFile | awk '/^  HTTP/{print $2}')
+    TMP_FILE=$(mktemp)
+    GET_BODY=$(wget --server-response --content-on-error -q -O - "$GET_URL" 2>"$TMP_FILE" || true)
+    GET_HTTP_STATUS_CODE=$(awk '/^  HTTP/{print $2}' "$TMP_FILE")
   fi
-  if [ "$httpStatusCode" != 200 ]; then
-    echo "Request failed with HTTP status code $httpStatusCode"
-    fail "Body: $body"
+  if [ "$GET_HTTP_STATUS_CODE" != 200 ]; then
+    echo "Request failed with HTTP status code $GET_HTTP_STATUS_CODE"
+    fail "Body: $GET_BODY"
   fi
-  eval "$1='$body'"
+  eval "$1='$GET_BODY'"
 }
 
 getFile() {
-  local url="$1"
-  local filePath="$2"
+  GETFILE_URL="$1"
+  GETFILE_FILE_PATH="$2"
   if [ "$DOWNLOAD_TOOL" = "curl" ]; then
-    httpStatusCode=$(curl -s -w '%{http_code}' -L "$url" -o "$filePath")
+    GETFILE_HTTP_STATUS_CODE=$(curl -s -w '%{http_code}' -L "$GETFILE_URL" -o "$GETFILE_FILE_PATH")
   elif [ "$DOWNLOAD_TOOL" = "wget" ]; then
-    tmpFile=$(mktemp)
-    body=$(wget --server-response --content-on-error -q -O "$filePath" "$url" 2>$tmpFile || true)
-    httpStatusCode=$(cat $tmpFile | awk '/^  HTTP/{print $2}')
+    wget --server-response --content-on-error -q -O "$GETFILE_FILE_PATH" "$GETFILE_URL"
+    GETFILE_HTTP_STATUS_CODE=$(awk '/^  HTTP/{print $2}' "$TMP_FILE")
   fi
-  echo "$httpStatusCode"
+  echo "$GETFILE_HTTP_STATUS_CODE"
 }
 
 downloadFile() {
-  if [ -z $1 ]; then
+  if [ -z "$1" ]; then
     checkLatestVersion TAG
   else
     TAG=$1
   fi
-  echo "TAG=$TAG"
-  #  arduino-cli_0.4.0-rc1_Linux_64bit.[tar.gz, zip]
+  #  arduino-lint_0.4.0-rc1_Linux_64bit.[tar.gz, zip]
   if [ "$OS" = "Windows" ]; then
-    CLI_DIST="arduino-cli_${TAG}_${OS}_${ARCH}.zip"
+    APPLICATION_DIST="${PROJECT_NAME}_${TAG}_${OS}_${ARCH}.zip"
   else
-    CLI_DIST="arduino-cli_${TAG}_${OS}_${ARCH}.tar.gz"
+    APPLICATION_DIST="${PROJECT_NAME}_${TAG}_${OS}_${ARCH}.tar.gz"
   fi
-  echo "CLI_DIST=$CLI_DIST"
-  DOWNLOAD_URL="https://downloads.arduino.cc/arduino-cli/$CLI_DIST"
-  CLI_TMP_FILE="/tmp/$CLI_DIST"
+
+  # Support specifying nightly build versions (e.g., "nightly-latest") via the script argument.
+  case "$TAG" in
+  nightly*)
+    DOWNLOAD_URL="https://downloads.arduino.cc/${PROJECT_NAME}/nightly/${APPLICATION_DIST}"
+    ;;
+  *)
+    DOWNLOAD_URL="https://downloads.arduino.cc/${PROJECT_NAME}/${APPLICATION_DIST}"
+    ;;
+  esac
+
+  INSTALLATION_TMP_FILE="/tmp/$APPLICATION_DIST"
   echo "Downloading $DOWNLOAD_URL"
-  httpStatusCode=$(getFile "$DOWNLOAD_URL" "$CLI_TMP_FILE")
+  httpStatusCode=$(getFile "$DOWNLOAD_URL" "$INSTALLATION_TMP_FILE")
   if [ "$httpStatusCode" -ne 200 ]; then
     echo "Did not find a release for your system: $OS $ARCH"
     echo "Trying to find a release using the GitHub API."
-    LATEST_RELEASE_URL="https://api.github.com/repos/arduino/$PROJECT_NAME/releases/tags/$TAG"
+    LATEST_RELEASE_URL="https://api.github.com/repos/${PROJECT_OWNER}/$PROJECT_NAME/releases/tags/$TAG"
     echo "LATEST_RELEASE_URL=$LATEST_RELEASE_URL"
-    get LATEST_RELEASE_JSON $LATEST_RELEASE_URL
+    get LATEST_RELEASE_JSON "$LATEST_RELEASE_URL"
     # || true forces this command to not catch error if grep does not find anything
-    DOWNLOAD_URL=$(echo "$LATEST_RELEASE_JSON" | grep 'browser_' | cut -d\" -f4 | grep "$CLI_DIST") || true
+    DOWNLOAD_URL=$(echo "$LATEST_RELEASE_JSON" | grep 'browser_' | cut -d\" -f4 | grep "$APPLICATION_DIST") || true
     if [ -z "$DOWNLOAD_URL" ]; then
       echo "Sorry, we dont have a dist for your system: $OS $ARCH"
-      fail "You can request one here: https://github.com/Arduino/$PROJECT_NAME/issues"
+      fail "You can request one here: https://github.com/${PROJECT_OWNER}/$PROJECT_NAME/issues"
     else
       echo "Downloading $DOWNLOAD_URL"
-      getFile "$DOWNLOAD_URL" "$CLI_TMP_FILE"
+      getFile "$DOWNLOAD_URL" "$INSTALLATION_TMP_FILE"
     fi
   fi
 }
 
 installFile() {
-  CLI_TMP="/tmp/$PROJECT_NAME"
-  mkdir -p "$CLI_TMP"
+  INSTALLATION_TMP_DIR="/tmp/$PROJECT_NAME"
+  mkdir -p "$INSTALLATION_TMP_DIR"
   if [ "$OS" = "Windows" ]; then
-    unzip -d "$CLI_TMP" "$CLI_TMP_FILE"
+    unzip -d "$INSTALLATION_TMP_DIR" "$INSTALLATION_TMP_FILE"
   else
-    tar xf "$CLI_TMP_FILE" -C "$CLI_TMP"
+    tar xf "$INSTALLATION_TMP_FILE" -C "$INSTALLATION_TMP_DIR"
   fi
-  CLI_TMP_BIN="$CLI_TMP/$PROJECT_NAME"
-  cp "$CLI_TMP_BIN" "$LBINDIR"
-  rm -rf $CLI_TMP
-  rm -f $CLI_TMP_FILE
+  INSTALLATION_TMP_BIN="$INSTALLATION_TMP_DIR/$PROJECT_NAME"
+  cp "$INSTALLATION_TMP_BIN" "$EFFECTIVE_BINDIR"
+  rm -rf "$INSTALLATION_TMP_DIR"
+  rm -f "$INSTALLATION_TMP_FILE"
 }
 
 bye() {
-  result=$?
-  if [ "$result" != "0" ]; then
+  BYE_RESULT=$?
+  if [ "$BYE_RESULT" != "0" ]; then
     echo "Failed to install $PROJECT_NAME"
   fi
-  exit $result
+  exit $BYE_RESULT
 }
 
 testVersion() {
   set +e
-  CLI="$(which $PROJECT_NAME)"
+  EXECUTABLE_PATH="$(command -v $PROJECT_NAME)"
   if [ "$?" = "1" ]; then
-    echo "$PROJECT_NAME not found. You might want to add "$LBINDIR" to your "'$PATH'
+    # $PATH is intentionally a literal in this message.
+    # shellcheck disable=SC2016
+    echo "$PROJECT_NAME not found. You might want to add \"$EFFECTIVE_BINDIR\" to your "'$PATH'
   else
     # Convert to resolved, absolute paths before comparison
-    CLI_REALPATH="$(cd -- "$(dirname -- "$CLI")" && pwd -P)"
-    LBINDIR_REALPATH="$(cd -- "$LBINDIR" && pwd -P)"
-    if [ "$CLI_REALPATH" != "$LBINDIR_REALPATH" ]; then
-      echo "An existing $PROJECT_NAME was found at $CLI. Please prepend "$LBINDIR" to your "'$PATH'" or remove the existing one."
+    EXECUTABLE_REALPATH="$(cd -- "$(dirname -- "$EXECUTABLE_PATH")" && pwd -P)"
+    EFFECTIVE_BINDIR_REALPATH="$(cd -- "$EFFECTIVE_BINDIR" && pwd -P)"
+    if [ "$EXECUTABLE_REALPATH" != "$EFFECTIVE_BINDIR_REALPATH" ]; then
+      # shellcheck disable=SC2016
+      echo "An existing $PROJECT_NAME was found at $EXECUTABLE_PATH. Please prepend \"$EFFECTIVE_BINDIR\" to your "'$PATH'" or remove the existing one."
     fi
   fi
 
   set -e
-  CLI_VERSION=$($LBINDIR/$PROJECT_NAME version)
-  echo "$CLI_VERSION installed successfully in $LBINDIR"
+  APPLICATION_VERSION="$("$EFFECTIVE_BINDIR/$PROJECT_NAME" version)"
+  echo "$APPLICATION_VERSION installed successfully in $EFFECTIVE_BINDIR"
 }
 
 # Execution
@@ -215,6 +215,6 @@ set -e
 initArch
 initOS
 initDownloadTool
-downloadFile $1
+downloadFile "$1"
 installFile
 testVersion
