@@ -212,7 +212,7 @@ pytest test_lib.py::test_list
 When editing any Python file in the project remember to run linting checks with:
 
 ```shell
-task python:check
+task python:lint
 ```
 
 This will run `flake8` automatically and return any error in the code formatting, if not already installed it will also

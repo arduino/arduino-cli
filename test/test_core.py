@@ -201,7 +201,8 @@ def test_core_install_without_updateindex(run_command):
 
 
 @pytest.mark.skipif(
-    platform.system() == "Windows", reason="core fails with fatal error: bits/c++config.h: No such file or directory",
+    platform.system() == "Windows",
+    reason="core fails with fatal error: bits/c++config.h: No such file or directory",
 )
 def test_core_install_esp32(run_command, data_dir):
     # update index
@@ -685,7 +686,9 @@ def test_core_with_wrong_custom_board_options_is_loaded(run_command, data_dir):
 
     # Install platform in Sketchbook hardware dir
     shutil.copytree(
-        Path(__file__).parent / "testdata" / test_platform_name, platform_install_dir, dirs_exist_ok=True,
+        Path(__file__).parent / "testdata" / test_platform_name,
+        platform_install_dir,
+        dirs_exist_ok=True,
     )
 
     assert run_command("update")
@@ -721,7 +724,9 @@ def test_core_with_missing_custom_board_options_is_loaded(run_command, data_dir)
 
     # Install platform in Sketchbook hardware dir
     shutil.copytree(
-        Path(__file__).parent / "testdata" / test_platform_name, platform_install_dir, dirs_exist_ok=True,
+        Path(__file__).parent / "testdata" / test_platform_name,
+        platform_install_dir,
+        dirs_exist_ok=True,
     )
 
     assert run_command("update")
