@@ -7,7 +7,7 @@ and many other tools needed to use any Arduino compatible board and platform.
 
 [![Test Go status](https://github.com/arduino/arduino-cli/actions/workflows/test-go-task.yml/badge.svg)](https://github.com/arduino/arduino-cli/actions/workflows/test-go-task.yml)
 [![Test Integration status](https://github.com/arduino/arduino-cli/actions/workflows/test-go-integration-task.yml/badge.svg)](https://github.com/arduino/arduino-cli/actions/workflows/test-go-integration-task.yml)
-[![nightly-badge]](https://github.com/Arduino/arduino-cli/actions?workflow=nightly)
+[![Publish Nightly Build status](https://github.com/arduino/arduino-cli/actions/workflows/publish-go-nightly-task.yml/badge.svg)](https://github.com/arduino/arduino-cli/actions/workflows/publish-go-nightly-task.yml)
 [![Deploy Website status](https://github.com/arduino/arduino-cli/actions/workflows/deploy-cobra-mkdocs-versioned-poetry.yml/badge.svg)](https://github.com/arduino/arduino-cli/actions/workflows/deploy-cobra-mkdocs-versioned-poetry.yml)
 [![Codecov](https://codecov.io/gh/arduino/arduino-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/arduino/arduino-cli)
 
@@ -45,10 +45,6 @@ policy] and report the bug to our Security Team 🛡️ Thank you!
 
 e-mail contact: security@arduino.cc
 
-[tests-badge]: https://github.com/Arduino/arduino-cli/workflows/test/badge.svg
-[nightly-badge]: https://github.com/Arduino/arduino-cli/workflows/nightly/badge.svg
-[docs-badge]: https://github.com/Arduino/arduino-cli/workflows/publish-docs/badge.svg
-[codecov-badge]: https://codecov.io/gh/arduino/arduino-cli/branch/master/graph/badge.svg
 [install]: https://arduino.github.io/arduino-cli/latest/installation
 [user documentation]: https://arduino.github.io/arduino-cli/latest/
 [getting started]: https://arduino.github.io/arduino-cli/latest/getting-started/
