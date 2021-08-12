@@ -45,10 +45,7 @@ policy] and report the bug to our Security Team 🛡️ Thank you!
 
 e-mail contact: security@arduino.cc
 
-[tests-badge]: https://github.com/Arduino/arduino-cli/workflows/test/badge.svg
 [nightly-badge]: https://github.com/Arduino/arduino-cli/workflows/nightly/badge.svg
-[docs-badge]: https://github.com/Arduino/arduino-cli/workflows/publish-docs/badge.svg
-[codecov-badge]: https://codecov.io/gh/arduino/arduino-cli/branch/master/graph/badge.svg
 [install]: https://arduino.github.io/arduino-cli/latest/installation
 [user documentation]: https://arduino.github.io/arduino-cli/latest/
 [getting started]: https://arduino.github.io/arduino-cli/latest/getting-started/
