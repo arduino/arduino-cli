@@ -235,14 +235,6 @@ tasks:
       - task: python:check
       - task: protoc:check
 
-  python:check:
-    desc: Linting for Python files
-    deps:
-      - task: python:lint
-    cmds:
-      - |
-        echo "WARNING: this task is deprecated. Use python:lint instead"
-
   check-legacy:
     desc: Check fmt and lint for the `legacy` package
     cmds:
