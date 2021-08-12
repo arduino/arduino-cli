@@ -17,6 +17,7 @@ import tempfile
 import sys
 import hashlib
 import pytest
+import os
 from pathlib import Path
 from typing import Union
 
@@ -29,107 +30,130 @@ def generate_build_dir(sketch_path):
 
 
 def generate_expected_output(
-    output: str, upload_tools: Union[dict, str], data_dir: str, upload_port: str, build_dir: str, sketch_name: str
+    output: Union[dict, str], data_dir: str, upload_port: str, build_dir: str, sketch_name: str
 ) -> str:
-    if isinstance(upload_tools, str):
-        tool = upload_tools
+    if isinstance(output, str):
+        out = output
     else:
-        tool = upload_tools[sys.platform]
-    return output.format(
-        tool_executable=tool, data_dir=data_dir, upload_port=upload_port, build_dir=build_dir, sketch_name=sketch_name,
+        out = output[sys.platform]
+    return out.format(
+        data_dir=data_dir,
+        upload_port=upload_port,
+        build_dir=build_dir,
+        sketch_name=sketch_name,
     ).replace("\\", "/")
 
 
+indexes = [
+    "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json",
+    "https://dl.espressif.com/dl/package_esp32_index.json",
+    "http://arduino.esp8266.com/stable/package_esp8266com_index.json",
+]
+
+cores_to_install = [
+    "arduino:avr@1.8.3",
+    "adafruit:avr@1.4.13",
+    "esp32:esp32@1.0.6",
+    "esp8266:esp8266@3.0.1",
+]
+
 testdata = [
     (
-        "",
         "arduino:avr:uno",
-        "arduino:avr@1.8.3",
-        [],
         "/dev/ttyACM0",
-        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude"',
-        "{tool_executable} "
-        + '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
-        + '-v -V -patmega328p -carduino "-P{upload_port}" -b115200 -D "-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"',
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        '-v -V -patmega328p -carduino "-P/dev/ttyACM0" -b115200 -D '
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
     ),
     (
-        "",
         "arduino:avr:leonardo",
-        "arduino:avr@1.8.3",
-        [],
         "/dev/ttyACM999",
-        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude"',
-        "{tool_executable} "
-        + '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
-        + '-v -V -patmega32u4 -cavr109 "-P{upload_port}0" -b57600 -D "-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"',
+        "Performing 1200-bps touch reset on serial port /dev/ttyACM999\n"
+        "Waiting for upload port...\n"
+        "Upload port found on /dev/ttyACM9990\n"
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        '-v -V -patmega32u4 -cavr109 "-P/dev/ttyACM9990" -b57600 -D '
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
     ),
     (
-        "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json",
         "adafruit:avr:flora8",
-        "adafruit:avr@1.4.13",
-        ["arduino:avr@1.8.3"],
         "/dev/ttyACM0",
-        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude"',
-        "{tool_executable} "
-        + '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
-        + '-v -patmega32u4 -cavr109 -P{upload_port} -b57600 -D "-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"',
+        "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+        "Waiting for upload port...\n"
+        "No upload port found, using /dev/ttyACM0 as fallback\n"
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -patmega32u4 -cavr109 -P/dev/ttyACM0 -b57600 -D "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
     ),
     (
-        "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json",
         "adafruit:avr:flora8",
-        "adafruit:avr@1.4.13",
-        ["arduino:avr@1.8.3"],
         "/dev/ttyACM999",
-        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude"',
-        "{tool_executable} "
-        + '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
-        + '-v -patmega32u4 -cavr109 -P{upload_port}0 -b57600 -D "-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"',
+        "Performing 1200-bps touch reset on serial port /dev/ttyACM999\n"
+        "Waiting for upload port...\n"
+        "Upload port found on /dev/ttyACM9990\n"
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -patmega32u4 -cavr109 -P/dev/ttyACM9990 -b57600 -D "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
     ),
     (
-        "https://dl.espressif.com/dl/package_esp32_index.json",
         "esp32:esp32:esp32thing",
-        "esp32:esp32@1.0.6",
-        [],
         "/dev/ttyACM0",
         {
-            "linux": 'python "{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool.py"',
-            "darwin": '"{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool.py"',
-            "win32": '"{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool.exe"',
+            "linux": "python "
+            '"{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool.py" '
+            '--chip esp32 --port "/dev/ttyACM0" --baud 921600  --before '
+            "default_reset --after hard_reset write_flash -z --flash_mode "
+            "dio --flash_freq 80m --flash_size detect 0xe000 "
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/partitions/boot_app0.bin" '
+            "0x1000 "
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/sdk/bin/bootloader_dio_80m.bin" '
+            '0x10000 "{build_dir}/{sketch_name}.ino.bin" 0x8000 '
+            '"{build_dir}/{sketch_name}.ino.partitions.bin"\n',
+            "darwin": '"{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool" '
+            '--chip esp32 --port "/dev/ttyACM0" --baud 921600  --before '
+            "default_reset --after hard_reset write_flash -z "
+            "--flash_mode dio --flash_freq 80m --flash_size detect "
+            "0xe000 "
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/partitions/boot_app0.bin" '
+            "0x1000 "
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/sdk/bin/bootloader_dio_80m.bin" '
+            '0x10000 "{build_dir}/{sketch_name}.ino.bin" 0x8000 '
+            '"{build_dir}/{sketch_name}.ino.partitions.bin"\n',
+            "win32": '"{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool.exe" '
+            '--chip esp32 --port "/dev/ttyACM0" --baud 921600  --before '
+            "default_reset --after hard_reset write_flash -z "
+            "--flash_mode dio --flash_freq 80m --flash_size detect "
+            "0xe000 "
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/partitions/boot_app0.bin" '
+            "0x1000 "
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/sdk/bin/bootloader_dio_80m.bin" '
+            '0x10000 "{build_dir}/{sketch_name}.ino.bin" 0x8000 '
+            '"{build_dir}/{sketch_name}.ino.partitions.bin"\n',
         },
-        "{tool_executable} "
-        + '--chip esp32 --port "{upload_port}" --baud 921600  --before default_reset '
-        + "--after hard_reset write_flash -z --flash_mode dio --flash_freq 80m --flash_size detect 0xe000 "
-        + '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/partitions/boot_app0.bin" 0x1000 '
-        + '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/sdk/bin/bootloader_dio_80m.bin" 0x10000 '
-        + '"{build_dir}/{sketch_name}.ino.bin" 0x8000 "{build_dir}/{sketch_name}.ino.partitions.bin"',
     ),
     (
-        "http://arduino.esp8266.com/stable/package_esp8266com_index.json",
         "esp8266:esp8266:generic",
-        "esp8266:esp8266@3.0.1",
-        [],
         "/dev/ttyACM0",
-        '"{data_dir}/packages/esp8266/tools/python3/3.7.2-post1/python3"',
-        "{tool_executable} "
-        + '"{data_dir}/packages/esp8266/hardware/esp8266/3.0.1/tools/upload.py" '
-        + '--chip esp8266 --port "{upload_port}" --baud "115200" ""  '
-        + "--before default_reset --after hard_reset write_flash 0x0 "
-        + '"{build_dir}/{sketch_name}.ino.bin"',
+        '"{data_dir}/packages/esp8266/tools/python3/3.7.2-post1/python3" '
+        '"{data_dir}/packages/esp8266/hardware/esp8266/3.0.1/tools/upload.py" '
+        '--chip esp8266 --port "/dev/ttyACM0" --baud "115200" ""  --before '
+        "default_reset --after hard_reset write_flash 0x0 "
+        '"{build_dir}/{sketch_name}.ino.bin"\n',
     ),
 ]
 
 
-@pytest.mark.parametrize("package_index, fqbn, core, core_dependencies, upload_port, upload_tools, output", testdata)
+@pytest.mark.parametrize("fqbn, upload_port, output", testdata)
 def test_upload_sketch(
     run_command,
     session_data_dir,
     downloads_dir,
-    package_index,
     fqbn,
-    core,
-    core_dependencies,
     upload_port,
-    upload_tools,
     output,
 ):
     env = {
@@ -138,15 +162,15 @@ def test_upload_sketch(
         "ARDUINO_SKETCHBOOK_DIR": session_data_dir,
     }
 
-    if package_index:
+    # Install everything just once
+    if not os.path.isdir(session_data_dir + "/packages"):
         assert run_command("config init --overwrite", custom_env=env)
-        assert run_command(f"config add board_manager.additional_urls {package_index}", custom_env=env)
+        for package_index in indexes:
+            assert run_command(f"config add board_manager.additional_urls {package_index}", custom_env=env)
         assert run_command("update", custom_env=env)
 
-    assert run_command(f"core install {core}", custom_env=env)
-
-    for d in core_dependencies:
-        assert run_command(f"core install {d}", custom_env=env)
+        for d in cores_to_install:
+            assert run_command(f"core install {d}", custom_env=env)
 
     # Create a sketch
     sketch_name = "TestSketchForUpload"
@@ -161,9 +185,8 @@ def test_upload_sketch(
 
     generate_expected_output(
         output=output,
-        upload_tools=upload_tools,
         data_dir=session_data_dir,
         upload_port=upload_port,
         build_dir=build_dir,
         sketch_name=sketch_name,
-    ) in res.stdout.replace("\\", "/")
+    ) in res.stdout.replace("\\", "/").replace("\r", "")
