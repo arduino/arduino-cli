@@ -275,9 +275,10 @@
     Use the install script
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Use the install script">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#download" class="md-nav__link">
     Download
   </a>
@@ -286,8 +287,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#latest-packages" class="md-nav__link">
-    Latest packages
+  <a href="#latest-release" class="md-nav__link">
+    Latest release
   </a>
   
 </li>
@@ -310,11 +311,16 @@
     </nav>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#build-from-source" class="md-nav__link">
     Build from source
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1214,9 +1220,10 @@
     Use the install script
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Use the install script">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#download" class="md-nav__link">
     Download
   </a>
@@ -1225,8 +1232,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#latest-packages" class="md-nav__link">
-    Latest packages
+  <a href="#latest-release" class="md-nav__link">
+    Latest release
   </a>
   
 </li>
@@ -1249,11 +1256,16 @@
     </nav>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#build-from-source" class="md-nav__link">
     Build from source
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1276,33 +1288,35 @@
                 
                   <h1>Installation</h1>
                 
-                <h3 id="install-via-homebrew-macoslinux">Install via Homebrew (macOS/Linux)<a class="headerlink" href="#install-via-homebrew-macoslinux" title="Permanent link">&para;</a></h3>
+                <!-- Source: https://github.com/arduino/tooling-project-assets/blob/main/other/installation-script/installation.md -->
+
+<h2 id="install-via-homebrew-macoslinux">Install via Homebrew (macOS/Linux)<a class="headerlink" href="#install-via-homebrew-macoslinux" title="Permanent link">&para;</a></h2>
 <p>The Arduino CLI is available as a Homebrew formula since version <code>0.5.0</code>:</p>
 <div class="highlight"><pre><span></span><code>brew update
 brew install arduino-cli
 </code></pre></div>
-<h4 id="command-line-completion">Command line completion<a class="headerlink" href="#command-line-completion" title="Permanent link">&para;</a></h4>
+<h3 id="command-line-completion">Command line completion<a class="headerlink" href="#command-line-completion" title="Permanent link">&para;</a></h3>
 <p><a href="../command-line-completion/#brew">Command line completion</a> files are already bundled in the homebrew installation.</p>
-<h3 id="use-the-install-script">Use the install script<a class="headerlink" href="#use-the-install-script" title="Permanent link">&para;</a></h3>
-<p>The script requires <code>sh</code>. This is always available on Linux and macOS. <code>sh</code> is not available by default on Windows. The
-script may be run on Windows by installing <a href="https://gitforwindows.org/">Git for Windows</a>, then running it from Git Bash.</p>
+<h2 id="use-the-install-script">Use the install script<a class="headerlink" href="#use-the-install-script" title="Permanent link">&para;</a></h2>
+<p>The script requires <code>sh</code>, which is always available on Linux and macOS. <code>sh</code> is not available by default on Windows. The
+script can be run on Windows by installing <a href="https://gitforwindows.org/">Git for Windows</a>, then running it from Git Bash.</p>
 <p>This script will install the latest version of Arduino CLI to <code>$PWD/bin</code>:</p>
-<div class="highlight"><pre><span></span><code>curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh <span class="p">|</span> sh
+<div class="highlight"><pre><span></span><code>curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
 </code></pre></div>
 <p>If you want to target a different directory, for example <code>~/local/bin</code>, set the <code>BINDIR</code> environment variable like this:</p>
-<div class="highlight"><pre><span></span><code>curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh <span class="p">|</span> <span class="nv">BINDIR</span><span class="o">=</span>~/local/bin sh
+<div class="highlight"><pre><span></span><code>curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/local/bin sh
 </code></pre></div>
 <p>If you would like to use the <code>arduino-cli</code> command from any location, install Arduino CLI to a directory already in your
 <code>PATH</code> or add the Arduino CLI installation path to your <code>PATH</code> environment variable.</p>
-<p>If you want to download a specific arduino-cli version, for example <code>0.9.0</code>, pass the version number as a parameter like
-this:</p>
-<div class="highlight"><pre><span></span><code>curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh <span class="p">|</span> sh -s <span class="m">0</span>.9.0
+<p>If you want to download a specific Arduino CLI version, for example <code>0.9.0</code> or <code>nightly-latest</code>, pass the version number
+as a parameter like this:</p>
+<div class="highlight"><pre><span></span><code>curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh -s 0.9.0
 </code></pre></div>
 <h3 id="download">Download<a class="headerlink" href="#download" title="Permanent link">&para;</a></h3>
 <p>Pre-built binaries for all the supported platforms are available for download from the links below.</p>
 <p>If you would like to use the <code>arduino-cli</code> command from any location, extract the downloaded file to a directory already
 in your <code>PATH</code> or add the Arduino CLI installation path to your <code>PATH</code> environment variable.</p>
-<h4 id="latest-packages">Latest packages<a class="headerlink" href="#latest-packages" title="Permanent link">&para;</a></h4>
+<h4 id="latest-release">Latest release<a class="headerlink" href="#latest-release" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
 <tr>
@@ -1314,23 +1328,23 @@ in your <code>PATH</code> or add the Arduino CLI installation path to your <code
 <tbody>
 <tr>
 <td>Linux</td>
-<td><a href="https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_32bit.tar.gz">Linux 32 bit</a></td>
-<td><a href="https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz">Linux 64 bit</a></td>
+<td><a href="https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_32bit.tar.gz">32 bit</a></td>
+<td><a href="https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz">64 bit</a></td>
 </tr>
 <tr>
 <td>Linux ARM</td>
-<td><a href="https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARMv7.tar.gz">Linux ARM 32 bit</a></td>
-<td><a href="https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARM64.tar.gz">Linux ARM 64 bit</a></td>
+<td><a href="https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARMv7.tar.gz">32 bit</a></td>
+<td><a href="https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARM64.tar.gz">64 bit</a></td>
 </tr>
 <tr>
 <td>Windows</td>
-<td><a href="https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_32bit.zip">Windows 32 bit</a></td>
-<td><a href="https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_64bit.zip">Windows 64 bit</a></td>
+<td><a href="https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_32bit.zip">32 bit</a></td>
+<td><a href="https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_64bit.zip">64 bit</a></td>
 </tr>
 <tr>
-<td>Mac OSX</td>
+<td>macOS</td>
 <td></td>
-<td><a href="https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_macOS_64bit.tar.gz">Mac OSX</a></td>
+<td><a href="https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_macOS_64bit.tar.gz">64 bit</a></td>
 </tr>
 </tbody>
 </table>
@@ -1340,7 +1354,7 @@ in your <code>PATH</code> or add the Arduino CLI installation path to your <code
 will provide the version <code>0.3.7-alpha.preview</code>, regardless of further releases.</p>
 </blockquote>
 <h4 id="previous-versions">Previous versions<a class="headerlink" href="#previous-versions" title="Permanent link">&para;</a></h4>
-<p>These are available from the <a href="https://github.com/arduino/arduino-cli/releases">releases page</a></p>
+<p>These are available from the "Assets" sections on the <a href="https://github.com/arduino/arduino-cli/releases">releases page</a>.</p>
 <h4 id="nightly-builds">Nightly builds<a class="headerlink" href="#nightly-builds" title="Permanent link">&para;</a></h4>
 <p>These builds are generated every day at 01:00 GMT from the <code>master</code> branch and should be considered unstable. In order
 to get the latest nightly build available for the supported platform, use the following links:</p>
@@ -1355,42 +1369,35 @@ to get the latest nightly build available for the supported platform, use the fo
 <tbody>
 <tr>
 <td>Linux</td>
-<td><a href="https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_32bit.tar.gz">Nightly Linux 32 bit</a></td>
-<td><a href="https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_64bit.tar.gz">Nightly Linux 64 bit</a></td>
+<td><a href="https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_32bit.tar.gz">32 bit</a></td>
+<td><a href="https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_64bit.tar.gz">64 bit</a></td>
 </tr>
 <tr>
 <td>Linux ARM</td>
-<td><a href="https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARMv7.tar.gz">Nightly Linux ARM 32 bit</a></td>
-<td><a href="https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARM64.tar.gz">Nightly Linux ARM 64 bit</a></td>
+<td><a href="https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARMv7.tar.gz">32 bit</a></td>
+<td><a href="https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARM64.tar.gz">64 bit</a></td>
 </tr>
 <tr>
 <td>Windows</td>
-<td><a href="https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_32bit.zip">Nightly Windows 32 bit</a></td>
-<td><a href="https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_64bit.zip">Nightly Windows 64 bit</a></td>
+<td><a href="https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_32bit.zip">32 bit</a></td>
+<td><a href="https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_64bit.zip">64 bit</a></td>
 </tr>
 <tr>
-<td>Mac OSX</td>
+<td>macOS</td>
 <td></td>
-<td><a href="https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_macOS_64bit.tar.gz">Nightly Mac OSX</a></td>
+<td><a href="https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_macOS_64bit.tar.gz">64 bit</a></td>
 </tr>
 </tbody>
 </table>
-<!-- prettier-ignore -->
-<!-- prettier-ignore -->
 <blockquote>
 <p>These links return a <code>302: Found</code> response, redirecting to latest generated builds by replacing <code>latest</code> with the
-latest available build date, using the format YYYYMMDD (i.e for 2019/Aug/06 <code>latest</code> is replaced with <code>20190806</code> )</p>
+latest available build date, using the format YYYYMMDD (i.e for 2019-08-06 <code>latest</code> is replaced with <code>20190806</code> )</p>
 </blockquote>
 <p>Checksums for the nightly builds are available at
 <code>https://downloads.arduino.cc/arduino-cli/nightly/nightly-&lt;DATE&gt;-checksums.txt</code></p>
 <h3 id="build-from-source">Build from source<a class="headerlink" href="#build-from-source" title="Permanent link">&para;</a></h3>
-<p>If you’re familiar with Golang or if you want to contribute to the project, you will probably build the <code>arduino-cli</code>
-locally with your Go toolchain. Please refer to the <a href="../CONTRIBUTING/">CONTRIBUTING</a> document for setup instructions.</p>
-<p>If you don’t have a working Golang environment or if you want to build <code>arduino-cli</code> targeting different platforms, you
-can use <a href="https://taskfile.dev/#/installation">Task</a> to get a binary directly from sources. From the project folder run:</p>
-<div class="highlight"><pre><span></span><code>task dist:all
-</code></pre></div>
-<p>Once the build is over, you will find a <code>./dist/</code> folder containing the packages built out of the current source tree.</p>
+<p>If you're familiar with Golang or if you want to contribute to the project, you will probably build Arduino CLI locally
+with your Go toolchain. See the <a href="../CONTRIBUTING/#building-the-source-code">"How to contribute"</a> page for instructions.</p>
                 
               
               
