@@ -74,7 +74,7 @@ jobs:
         with:
           file: ./coverage_unit.txt
           flags: unit
-          fail_ci_if_error: true
+          fail_ci_if_error: ${{ github.repository == 'arduino/arduino-cli' }}
 
       - name: Send legacy tests coverage to Codecov
         if: >
@@ -84,3 +84,4 @@ jobs:
         with:
           file: ./coverage_legacy.txt
           flags: unit
+          fail_ci_if_error: ${{ github.repository == 'arduino/arduino-cli' }}
