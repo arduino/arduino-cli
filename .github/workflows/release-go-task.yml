@@ -1,4 +1,14 @@
-name: release
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/release-go-task.md
+name: Release
+
+env:
+  # As defined by the Taskfile's PROJECT_NAME variable
+  PROJECT_NAME: arduino-cli
+  # As defined by the Taskfile's DIST_DIR variable
+  DIST_DIR: dist
+  # The project's folder on Arduino's download server for uploading builds
+  AWS_PLUGIN_TARGET: /arduino-cli/
+  ARTIFACT_NAME: dist
 
 on:
   push:
@@ -10,8 +20,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
+      - name: Checkout repository
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
@@ -21,9 +31,9 @@ jobs:
           tag-regex: '^[0-9]+\.[0-9]+\.[0-9]+.*$'
           filter-regex: '^\[(skip|changelog)[ ,-](skip|changelog)\].*'
           case-insensitive-regex: true
-          changelog-file-path: "dist/CHANGELOG.md"
+          changelog-file-path: "${{ env.DIST_DIR }}/CHANGELOG.md"
 
-      - name: Install Taskfile
+      - name: Install Task
         uses: arduino/setup-task@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -35,35 +45,46 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: dist
-          path: dist
+          if-no-files-found: error
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.DIST_DIR }}
 
   notarize-macos:
     runs-on: macos-latest
     needs: create-release-artifacts
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
-          name: dist
-          # to ensure compatibility with v1
-          path: dist
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.DIST_DIR }}
 
       - name: Import Code-Signing Certificates
         env:
           KEYCHAIN: "sign.keychain"
           INSTALLER_CERT_MAC_PATH: "/tmp/ArduinoCerts2020.p12"
+          KEYCHAIN_PASSWORD: keychainpassword # Arbitrary password for a keychain that exists only for the duration of the job, so not secret
         run: |
           echo "${{ secrets.INSTALLER_CERT_MAC_P12 }}" | base64 --decode > "${{ env.INSTALLER_CERT_MAC_PATH }}"
-          security create-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" "${{ env.KEYCHAIN }}"
+          security create-keychain -p "${{ env.KEYCHAIN_PASSWORD }}" "${{ env.KEYCHAIN }}"
           security default-keychain -s "${{ env.KEYCHAIN }}"
-          security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" "${{ env.KEYCHAIN }}"
-          security import "${{ env.INSTALLER_CERT_MAC_PATH }}" -k "${{ env.KEYCHAIN }}" -f pkcs12 -A -T /usr/bin/codesign -P "${{ secrets.INSTALLER_CERT_MAC_PASSWORD }}"
-          security set-key-partition-list -S apple-tool:,apple: -s -k "${{ secrets.KEYCHAIN_PASSWORD }}" "${{ env.KEYCHAIN }}"
+          security unlock-keychain -p "${{ env.KEYCHAIN_PASSWORD }}" "${{ env.KEYCHAIN }}"
+          security import \
+            "${{ env.INSTALLER_CERT_MAC_PATH }}" \
+            -k "${{ env.KEYCHAIN }}" \
+            -f pkcs12 \
+            -A \
+            -T "/usr/bin/codesign" \
+            -P "${{ secrets.INSTALLER_CERT_MAC_PASSWORD }}"
+          security set-key-partition-list \
+            -S apple-tool:,apple: \
+            -s \
+            -k "${{ env.KEYCHAIN_PASSWORD }}" \
+            "${{ env.KEYCHAIN }}"
 
       - name: Install gon for code signing and app notarization
         run: |
@@ -82,46 +103,33 @@ jobs:
         # 1. Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
         # 2. Recalculate package checksum and replace it in the nnnnnn-checksums.txt file
         run: |
-          # GitHub's upload/download-artifact@v1 actions don't preserve file permissions,
-          # so we need to add execution permission back until @v2 actions are released.
-          chmod +x dist/arduino-cli_osx_darwin_amd64/arduino-cli
+          # GitHub's upload/download-artifact@v2 actions don't preserve file permissions,
+          # so we need to add execution permission back until the action is made to do this.
+          chmod +x ${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_osx_darwin_amd64/${{ env.PROJECT_NAME }}
           TAG="${GITHUB_REF/refs\/tags\//}"
-          tar -czvf "dist/arduino-cli_${TAG}_macOS_64bit.tar.gz" \
-          -C dist/arduino-cli_osx_darwin_amd64/  arduino-cli   \
+          tar -czvf "${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_${TAG}_macOS_64bit.tar.gz" \
+          -C ${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_osx_darwin_amd64/  ${{ env.PROJECT_NAME }}   \
           -C ../../ LICENSE.txt
-          CLI_CHECKSUM="$(shasum -a 256 "dist/arduino-cli_${TAG}_macOS_64bit.tar.gz" | cut -d " " -f 1)"
-          perl -pi -w -e "s/.*arduino-cli_${TAG}_macOS_64bit.tar.gz/${CLI_CHECKSUM}  arduino-cli_${TAG}_macOS_64bit.tar.gz/g;" dist/*-checksums.txt
+          CHECKSUM="$(shasum -a 256 ${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_${TAG}_macOS_64bit.tar.gz | cut -d " " -f 1)"
+          perl -pi -w -e "s/.*${{ env.PROJECT_NAME }}_${TAG}_macOS_64bit.tar.gz/${CHECKSUM}  ${{ env.PROJECT_NAME }}_${TAG}_macOS_64bit.tar.gz/g;" ${{ env.DIST_DIR }}/*-checksums.txt
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: dist
-          path: dist
+          if-no-files-found: error
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.DIST_DIR }}
 
   create-release:
     runs-on: ubuntu-latest
     needs: notarize-macos
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
-          name: dist
-          # to ensure compatibility with v1
-          path: dist
-
-      - name: Read CHANGELOG
-        id: changelog
-        run: |
-          body="$(cat dist/CHANGELOG.md)"
-          body="${body//'%'/'%25'}"
-          body="${body//$'\n'/'%0A'}"
-          body="${body//$'\r'/'%0D'}"
-          echo "$body"
-          echo "::set-output name=BODY::$body"
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.DIST_DIR }}
 
       - name: Identify Prerelease
         # This is a workaround while waiting for create-release action
@@ -132,32 +140,23 @@ jobs:
           unzip -p /tmp/3.0.0.zip semver-tool-3.0.0/src/semver >/tmp/semver && chmod +x /tmp/semver
           if [[ "$(/tmp/semver get prerel "${GITHUB_REF/refs\/tags\//}")" ]]; then echo "::set-output name=IS_PRE::true"; fi
 
-      - name: Create Github Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Github Release and upload artifacts
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          body: ${{ steps.changelog.outputs.BODY }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          bodyFile: ${{ env.DIST_DIR }}/CHANGELOG.md
           draft: false
           prerelease: ${{ steps.prerelease.outputs.IS_PRE }}
-
-      - name: Upload release files on Github
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: dist/*
-          tag: ${{ github.ref }}
-          file_glob: true
+          # NOTE: "Artifact is a directory" warnings are expected and don't indicate a problem
+          # (all the files we need are in the DIST_DIR root)
+          artifacts: ${{ env.DIST_DIR }}/*
 
       - name: Upload release files on Arduino downloads servers
         uses: docker://plugins/s3
         env:
-          PLUGIN_SOURCE: "dist/*"
-          PLUGIN_TARGET: "/arduino-cli/"
-          PLUGIN_STRIP_PREFIX: "dist/"
+          PLUGIN_SOURCE: "${{ env.DIST_DIR }}/*"
+          PLUGIN_TARGET: ${{ env.AWS_PLUGIN_TARGET }}
+          PLUGIN_STRIP_PREFIX: "${{ env.DIST_DIR }}/"
           PLUGIN_BUCKET: ${{ secrets.DOWNLOADS_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
