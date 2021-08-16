@@ -5,6 +5,8 @@
 
 [flake8]
 doctests = True
+per-file-ignores =
+    test/test_upload_mock.py:E501
 ignore =
     E741,
     # W503 and W504 are mutually exclusive. PEP 8 recommends line break before.

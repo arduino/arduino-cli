@@ -53,22 +53,163 @@ indexes = [
 cores_to_install = [
     "arduino:avr@1.8.3",
     "adafruit:avr@1.4.13",
+    "arduino:samd@1.8.11",
     "esp32:esp32@1.0.6",
-    "esp8266:esp8266@3.0.1",
+    "esp8266:esp8266@3.0.2",
 ]
 
 testdata = [
     (
         "arduino:avr:uno",
         "/dev/ttyACM0",
+        "",
         '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
         '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
         '-v -V -patmega328p -carduino "-P/dev/ttyACM0" -b115200 -D '
         '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
     ),
     (
+        "arduino:avr:uno",
+        "",
+        "usbasp",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -V -patmega328p -cusbasp -Pusb "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:uno",
+        "/dev/ttyACM0",
+        "avrisp",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -V -patmega328p -cstk500v1 -P/dev/ttyACM0 "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:uno",
+        "/dev/ttyACM0",
+        "arduinoasisp",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -V -patmega328p -cstk500v1 -P/dev/ttyACM0 -b19200 "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:nano",
+        "/dev/ttyACM0",
+        "",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        '-v -V -patmega328p -carduino "-P/dev/ttyACM0" -b115200 -D '
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:nano",
+        "",
+        "usbasp",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -V -patmega328p -cusbasp -Pusb "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:nano",
+        "/dev/ttyACM0",
+        "avrisp",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -V -patmega328p -cstk500v1 -P/dev/ttyACM0 "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:nano",
+        "/dev/ttyACM0",
+        "arduinoasisp",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -V -patmega328p -cstk500v1 -P/dev/ttyACM0 -b19200 "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:nano:cpu=atmega328old",
+        "/dev/ttyACM0",
+        "",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        '-v -V -patmega328p -carduino "-P/dev/ttyACM0" -b57600 -D '
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:nano:cpu=atmega328old",
+        "",
+        "usbasp",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -V -patmega328p -cusbasp -Pusb "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:nano:cpu=atmega328old",
+        "/dev/ttyACM0",
+        "avrisp",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -V -patmega328p -cstk500v1 -P/dev/ttyACM0 "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:nano:cpu=atmega328old",
+        "/dev/ttyACM0",
+        "arduinoasisp",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -V -patmega328p -cstk500v1 -P/dev/ttyACM0 -b19200 "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:mega",
+        "/dev/ttyACM0",
+        "",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        '-v -V -patmega2560 -cwiring "-P/dev/ttyACM0" -b115200 -D '
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:mega:cpu=atmega1280",
+        "/dev/ttyACM0",
+        "",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        '-v -V -patmega1280 -carduino "-P/dev/ttyACM0" -b57600 -D '
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:diecimila",
+        "/dev/ttyACM0",
+        "",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        '-v -V -patmega328p -carduino "-P/dev/ttyACM0" -b57600 -D '
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:leonardo",
+        "/dev/ttyACM0",
+        "",
+        "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+        "Waiting for upload port...\n"
+        "No upload port found, using /dev/ttyACM0 as fallback\n"
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        '-v -V -patmega32u4 -cavr109 "-P/dev/ttyACM0" -b57600 -D '
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
         "arduino:avr:leonardo",
         "/dev/ttyACM999",
+        "",
         "Performing 1200-bps touch reset on serial port /dev/ttyACM999\n"
         "Waiting for upload port...\n"
         "Upload port found on /dev/ttyACM9990\n"
@@ -78,8 +219,132 @@ testdata = [
         '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
     ),
     (
+        "arduino:avr:micro",
+        "/dev/ttyACM0",
+        "",
+        "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+        "Waiting for upload port...\n"
+        "No upload port found, using /dev/ttyACM0 as fallback\n"
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        '-v -V -patmega32u4 -cavr109 "-P/dev/ttyACM0" -b57600 -D '
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:micro",
+        "/dev/ttyACM999",
+        "",
+        "Performing 1200-bps touch reset on serial port /dev/ttyACM999\n"
+        "Waiting for upload port...\n"
+        "Upload port found on /dev/ttyACM9990\n"
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        '-v -V -patmega32u4 -cavr109 "-P/dev/ttyACM9990" -b57600 -D '
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:circuitplay32u4cat",
+        "/dev/ttyACM0",
+        "",
+        "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+        "Waiting for upload port...\n"
+        "No upload port found, using /dev/ttyACM0 as fallback\n"
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        '-v -V -patmega32u4 -cavr109 "-P/dev/ttyACM0" -b57600 -D '
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:circuitplay32u4cat",
+        "/dev/ttyACM999",
+        "",
+        "Performing 1200-bps touch reset on serial port /dev/ttyACM999\n"
+        "Waiting for upload port...\n"
+        "Upload port found on /dev/ttyACM9990\n"
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        '-v -V -patmega32u4 -cavr109 "-P/dev/ttyACM9990" -b57600 -D '
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:gemma",
+        "/dev/ttyACM0",
+        "usbGemma",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/hardware/avr/1.8.3/bootloaders/gemma/avrdude.conf" '
+        "-v -V -pattiny85 -carduinogemma  "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:gemma",
+        "",
+        "usbGemma",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/hardware/avr/1.8.3/bootloaders/gemma/avrdude.conf" '
+        "-v -V -pattiny85 -carduinogemma  "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:unowifi",
+        "/dev/ttyACM0",
+        "",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        '-v -V -patmega328p -carduino "-P/dev/ttyACM0" -b115200 -D '
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:yun",
+        "/dev/ttyACM0",
+        "",
+        "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+        "Waiting for upload port...\n"
+        "No upload port found, using /dev/ttyACM0 as fallback\n"
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        '-v -V -patmega32u4 -cavr109 "-P/dev/ttyACM0" -b57600 -D '
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:avr:yun",
+        "/dev/ttyACM999",
+        "",
+        "Performing 1200-bps touch reset on serial port /dev/ttyACM999\n"
+        "Waiting for upload port...\n"
+        "Upload port found on /dev/ttyACM9990\n"
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        '-v -V -patmega32u4 -cavr109 "-P/dev/ttyACM9990" -b57600 -D '
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "adafruit:avr:circuitplay32u4cat",
+        "/dev/ttyACM0",
+        "",
+        "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+        "Waiting for upload port...\n"
+        "No upload port found, using /dev/ttyACM0 as fallback\n"
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -patmega32u4 -cavr109 -P/dev/ttyACM0 -b57600 -D "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "adafruit:avr:circuitplay32u4cat",
+        "/dev/ttyACM999",
+        "",
+        "Performing 1200-bps touch reset on serial port /dev/ttyACM999\n"
+        "Waiting for upload port...\n"
+        "Upload port found on /dev/ttyACM9990\n"
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -patmega32u4 -cavr109 -P/dev/ttyACM9990 -b57600 -D "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
         "adafruit:avr:flora8",
         "/dev/ttyACM0",
+        "",
         "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
         "Waiting for upload port...\n"
         "No upload port found, using /dev/ttyACM0 as fallback\n"
@@ -91,6 +356,7 @@ testdata = [
     (
         "adafruit:avr:flora8",
         "/dev/ttyACM999",
+        "",
         "Performing 1200-bps touch reset on serial port /dev/ttyACM999\n"
         "Waiting for upload port...\n"
         "Upload port found on /dev/ttyACM9990\n"
@@ -100,9 +366,693 @@ testdata = [
         '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
     ),
     (
-        "esp32:esp32:esp32thing",
+        "adafruit:avr:gemma",
         "/dev/ttyACM0",
+        "usbGemma",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/adafruit/hardware/avr/1.4.13/bootloaders/gemma/avrdude.conf" '
+        "-v -pattiny85 -carduinogemma  "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "adafruit:avr:gemma",
+        "",
+        "usbGemma",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/adafruit/hardware/avr/1.4.13/bootloaders/gemma/avrdude.conf" '
+        "-v -pattiny85 -carduinogemma  "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "adafruit:avr:itsybitsy32u4_3V",
+        "/dev/ttyACM0",
+        "",
+        "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+        "Waiting for upload port...\n"
+        "No upload port found, using /dev/ttyACM0 as fallback\n"
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -patmega32u4 -cavr109 -P/dev/ttyACM0 -b57600 -D "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "adafruit:avr:itsybitsy32u4_3V",
+        "/dev/ttyACM999",
+        "",
+        "Performing 1200-bps touch reset on serial port /dev/ttyACM999\n"
+        "Waiting for upload port...\n"
+        "Upload port found on /dev/ttyACM9990\n"
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -patmega32u4 -cavr109 -P/dev/ttyACM9990 -b57600 -D "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "adafruit:avr:itsybitsy32u4_5V",
+        "/dev/ttyACM0",
+        "",
+        "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+        "Waiting for upload port...\n"
+        "No upload port found, using /dev/ttyACM0 as fallback\n"
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -patmega32u4 -cavr109 -P/dev/ttyACM0 -b57600 -D "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "adafruit:avr:itsybitsy32u4_5V",
+        "/dev/ttyACM999",
+        "",
+        "Performing 1200-bps touch reset on serial port /dev/ttyACM999\n"
+        "Waiting for upload port...\n"
+        "Upload port found on /dev/ttyACM9990\n"
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -patmega32u4 -cavr109 -P/dev/ttyACM9990 -b57600 -D "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "adafruit:avr:metro",
+        "/dev/ttyACM0",
+        "",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -patmega328p -carduino -P/dev/ttyACM0 -b115200 -D "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "adafruit:avr:trinket3",
+        "",
+        "usbasp",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -pattiny85 -cusbasp -Pusb "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "adafruit:avr:trinket3",
+        "/dev/ttyACM0",
+        "avrisp",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -pattiny85 -cstk500v1 -P/dev/ttyACM0 "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "adafruit:avr:trinket3",
+        "/dev/ttyACM0",
+        "arduinoasisp",
+        '"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude" '
+        '"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf" '
+        "-v -pattiny85 -cstk500v1 -P/dev/ttyACM0 -b19200 "
+        '"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i"\n',
+    ),
+    (
+        "arduino:samd:arduino_zero_edbg",
+        "",
+        "",
         {
+            "darwin": '"{data_dir}/packages/arduino/tools/openocd/0.10.0-arduino7/bin/openocd" '
+            "-d2 -s "
+            '"{data_dir}/packages/arduino/tools/openocd/0.10.0-arduino7/share/openocd/scripts/" '
+            "-f "
+            '"{data_dir}/packages/arduino/hardware/samd/1.8.11/variants/arduino_zero/openocd_scripts/arduino_zero.cfg" '
+            '-c "telnet_port disabled; program '
+            "{{build_dir}/{sketch_name}.ino.bin} verify reset 0x2000; "
+            'shutdown"\n',
+            "linux": '"{data_dir}/packages/arduino/tools/openocd/0.10.0-arduino7/bin/openocd" '
+            "-d2 -s "
+            '"{data_dir}/packages/arduino/tools/openocd/0.10.0-arduino7/share/openocd/scripts/" '
+            "-f "
+            '"{data_dir}/packages/arduino/hardware/samd/1.8.11/variants/arduino_zero/openocd_scripts/arduino_zero.cfg" '
+            '-c "telnet_port disabled; program '
+            "{{build_dir}/{sketch_name}.ino.bin} verify reset 0x2000; "
+            'shutdown"\n',
+            "win32": '"{data_dir}/packages/arduino/tools/openocd/0.10.0-arduino7/bin/openocd.exe" '
+            "-d2 -s "
+            '"{data_dir}/packages/arduino/tools/openocd/0.10.0-arduino7/share/openocd/scripts/" '
+            "-f "
+            '"{data_dir}/packages/arduino/hardware/samd/1.8.11/variants/arduino_zero/openocd_scripts/arduino_zero.cfg" '
+            '-c "telnet_port disabled; program '
+            "{{build_dir}/{sketch_name}.ino.bin} verify reset 0x2000; "
+            'shutdown"\n',
+        },
+    ),
+    (
+        "arduino:samd:adafruit_circuitplayground_m0",
+        "/dev/ttyACM0",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:adafruit_circuitplayground_m0",
+        "/dev/ttyACM999",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:mkrfox1200",
+        "/dev/ttyACM0",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:mkrfox1200",
+        "/dev/ttyACM999",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:mkrgsm1400",
+        "/dev/ttyACM0",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:mkrgsm1400",
+        "/dev/ttyACM999",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:mkrvidor4000",
+        "/dev/ttyACM0",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -I -U true -i -e -w "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -I -U true -i -e -w "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM0 -I -U true -i -e -w "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:mkrvidor4000",
+        "/dev/ttyACM999",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -I -U true -i -e -w "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -I -U true -i -e -w "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM9990 -I -U true -i -e -w "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:mkrwan1310",
+        "/dev/ttyACM0",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:mkrwan1310",
+        "/dev/ttyACM999",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:mkrwifi1010",
+        "/dev/ttyACM0",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:mkrwifi1010",
+        "/dev/ttyACM999",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:mkr1000",
+        "/dev/ttyACM0",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:mkr1000",
+        "/dev/ttyACM999",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:mkrzero",
+        "/dev/ttyACM0",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:mkrzero",
+        "/dev/ttyACM999",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:nano_33_iot",
+        "/dev/ttyACM0",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:nano_33_iot",
+        "/dev/ttyACM999",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:arduino_zero_native",
+        "/dev/ttyACM0",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\n"
+            "Waiting for upload port...\n"
+            "No upload port found, using /dev/ttyACM0 as fallback\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM0 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "arduino:samd:arduino_zero_native",
+        "/dev/ttyACM999",
+        "",
+        {
+            "darwin": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "linux": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+            "win32": "Performing 1200-bps touch reset on serial port "
+            "/dev/ttyACM999\n"
+            "Waiting for upload port...\n"
+            "Upload port found on /dev/ttyACM9990\n"
+            '"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe" '
+            "-i -d --port=ttyACM9990 -U true -i -e -w -v "
+            '"{build_dir}/{sketch_name}.ino.bin" -R\n',
+        },
+    ),
+    (
+        "esp32:esp32:esp32",
+        "/dev/ttyACM0",
+        "",
+        {
+            "darwin": '"{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool" '
+            '--chip esp32 --port "/dev/ttyACM0" --baud 921600  --before '
+            "default_reset --after hard_reset write_flash -z "
+            "--flash_mode dio --flash_freq 80m --flash_size detect "
+            "0xe000 "
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/partitions/boot_app0.bin" '
+            "0x1000 "
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/sdk/bin/bootloader_qio_80m.bin" '
+            '0x10000 "{build_dir}/{sketch_name}.ino.bin" 0x8000 '
+            '"{build_dir}/{sketch_name}.ino.partitions.bin"\n',
             "linux": "python "
             '"{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool.py" '
             '--chip esp32 --port "/dev/ttyACM0" --baud 921600  --before '
@@ -110,9 +1060,61 @@ testdata = [
             "dio --flash_freq 80m --flash_size detect 0xe000 "
             '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/partitions/boot_app0.bin" '
             "0x1000 "
-            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/sdk/bin/bootloader_dio_80m.bin" '
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/sdk/bin/bootloader_qio_80m.bin" '
             '0x10000 "{build_dir}/{sketch_name}.ino.bin" 0x8000 '
             '"{build_dir}/{sketch_name}.ino.partitions.bin"\n',
+            "win32": '"{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool.exe" '
+            '--chip esp32 --port "/dev/ttyACM0" --baud 921600  --before '
+            "default_reset --after hard_reset write_flash -z --flash_mode "
+            "dio --flash_freq 80m --flash_size detect 0xe000 "
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/partitions/boot_app0.bin" '
+            "0x1000 "
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/sdk/bin/bootloader_qio_80m.bin" '
+            '0x10000 "{build_dir}/{sketch_name}.ino.bin" 0x8000 '
+            '"{build_dir}/{sketch_name}.ino.partitions.bin"\n',
+        },
+    ),
+    (
+        "esp32:esp32:esp32:PSRAM=enabled,PartitionScheme=no_ota,CPUFreq=80,FlashMode=dio,FlashFreq=40,FlashSize=8M,UploadSpeed=230400,DebugLevel=info",
+        "/dev/ttyACM0",
+        "",
+        {
+            "darwin": '"{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool" '
+            '--chip esp32 --port "/dev/ttyACM0" --baud 230400  --before '
+            "default_reset --after hard_reset write_flash -z "
+            "--flash_mode dio --flash_freq 40m --flash_size detect "
+            "0xe000 "
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/partitions/boot_app0.bin" '
+            "0x1000 "
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/sdk/bin/bootloader_dio_40m.bin" '
+            '0x10000 "{build_dir}/{sketch_name}.ino.bin" 0x8000 '
+            '"{build_dir}/{sketch_name}.ino.partitions.bin"\n',
+            "linux": "python "
+            '"{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool.py" '
+            '--chip esp32 --port "/dev/ttyACM0" --baud 230400  --before '
+            "default_reset --after hard_reset write_flash -z --flash_mode "
+            "dio --flash_freq 40m --flash_size detect 0xe000 "
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/partitions/boot_app0.bin" '
+            "0x1000 "
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/sdk/bin/bootloader_dio_40m.bin" '
+            '0x10000 "{build_dir}/{sketch_name}.ino.bin" 0x8000 '
+            '"{build_dir}/{sketch_name}.ino.partitions.bin"\n',
+            "win32": '"{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool.exe" '
+            '--chip esp32 --port "/dev/ttyACM0" --baud 230400  --before '
+            "default_reset --after hard_reset write_flash -z --flash_mode "
+            "dio --flash_freq 40m --flash_size detect 0xe000 "
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/partitions/boot_app0.bin" '
+            "0x1000 "
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/sdk/bin/bootloader_dio_40m.bin" '
+            '0x10000 "{build_dir}/{sketch_name}.ino.bin" 0x8000 '
+            '"{build_dir}/{sketch_name}.ino.partitions.bin"\n',
+        },
+    ),
+    (
+        "esp32:esp32:esp32thing",
+        "/dev/ttyACM0",
+        "",
+        {
             "darwin": '"{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool" '
             '--chip esp32 --port "/dev/ttyACM0" --baud 921600  --before '
             "default_reset --after hard_reset write_flash -z "
@@ -123,11 +1125,20 @@ testdata = [
             '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/sdk/bin/bootloader_dio_80m.bin" '
             '0x10000 "{build_dir}/{sketch_name}.ino.bin" 0x8000 '
             '"{build_dir}/{sketch_name}.ino.partitions.bin"\n',
+            "linux": "python "
+            '"{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool.py" '
+            '--chip esp32 --port "/dev/ttyACM0" --baud 921600  --before '
+            "default_reset --after hard_reset write_flash -z --flash_mode "
+            "dio --flash_freq 80m --flash_size detect 0xe000 "
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/partitions/boot_app0.bin" '
+            "0x1000 "
+            '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/sdk/bin/bootloader_dio_80m.bin" '
+            '0x10000 "{build_dir}/{sketch_name}.ino.bin" 0x8000 '
+            '"{build_dir}/{sketch_name}.ino.partitions.bin"\n',
             "win32": '"{data_dir}/packages/esp32/tools/esptool_py/3.0.0/esptool.exe" '
             '--chip esp32 --port "/dev/ttyACM0" --baud 921600  --before '
-            "default_reset --after hard_reset write_flash -z "
-            "--flash_mode dio --flash_freq 80m --flash_size detect "
-            "0xe000 "
+            "default_reset --after hard_reset write_flash -z --flash_mode "
+            "dio --flash_freq 80m --flash_size detect 0xe000 "
             '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/partitions/boot_app0.bin" '
             "0x1000 "
             '"{data_dir}/packages/esp32/hardware/esp32/1.0.6/tools/sdk/bin/bootloader_dio_80m.bin" '
@@ -138,22 +1149,34 @@ testdata = [
     (
         "esp8266:esp8266:generic",
         "/dev/ttyACM0",
-        '"{data_dir}/packages/esp8266/tools/python3/3.7.2-post1/python3" '
-        '"{data_dir}/packages/esp8266/hardware/esp8266/3.0.1/tools/upload.py" '
+        "",
+        '"{data_dir}/packages/esp8266/tools/python3/3.7.2-post1/python3" -I '
+        '"{data_dir}/packages/esp8266/hardware/esp8266/3.0.2/tools/upload.py" '
         '--chip esp8266 --port "/dev/ttyACM0" --baud "115200" ""  --before '
         "default_reset --after hard_reset write_flash 0x0 "
+        '"{build_dir}/{sketch_name}.ino.bin"\n',
+    ),
+    (
+        "esp8266:esp8266:generic:xtal=160,vt=heap,mmu=3216,ResetMethod=nodtr_nosync,CrystalFreq=40,FlashFreq=20,eesz=2M,baud=57600",
+        "/dev/ttyACM0",
+        "",
+        '"{data_dir}/packages/esp8266/tools/python3/3.7.2-post1/python3" -I '
+        '"{data_dir}/packages/esp8266/hardware/esp8266/3.0.2/tools/upload.py" '
+        '--chip esp8266 --port "/dev/ttyACM0" --baud "57600" ""  --before '
+        "no_reset_no_sync --after soft_reset write_flash 0x0 "
         '"{build_dir}/{sketch_name}.ino.bin"\n',
     ),
 ]
 
 
-@pytest.mark.parametrize("fqbn, upload_port, output", testdata)
+@pytest.mark.parametrize("fqbn, upload_port, programmer, output", testdata)
 def test_upload_sketch(
     run_command,
     session_data_dir,
     downloads_dir,
     fqbn,
     upload_port,
+    programmer,
     output,
 ):
     env = {
@@ -179,8 +1202,16 @@ def test_upload_sketch(
 
     # Fake compilation, we just need the folder to exist
     build_dir = generate_build_dir(sketch_path)
+    if programmer != "":
+        programmer_arg = "-P " + programmer
+    else:
+        programmer_arg = ""
+    if upload_port != "":
+        port_arg = "-p " + upload_port
+    else:
+        port_arg = ""
 
-    res = run_command(f'upload -p {upload_port} -b {fqbn} "{sketch_path}" --dry-run -v', custom_env=env)
+    res = run_command(f'upload {port_arg} {programmer_arg} -b {fqbn} "{sketch_path}" --dry-run -v', custom_env=env)
     assert res.ok
 
     generate_expected_output(
