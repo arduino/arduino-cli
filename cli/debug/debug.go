@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/debug"
+	"github.com/arduino/arduino-cli/i18n"
 	dbg "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/arduino/go-paths-helper"
@@ -45,25 +46,26 @@ var (
 	importDir   string
 	printInfo   bool
 	programmer  string
+	tr          = i18n.Tr
 )
 
 // NewCommand created a new `upload` command
 func NewCommand() *cobra.Command {
 	debugCommand := &cobra.Command{
 		Use:     "debug",
-		Short:   "Debug Arduino sketches.",
-		Long:    "Debug Arduino sketches. (this command opens an interactive gdb session)",
+		Short:   tr("Debug Arduino sketches."),
+		Long:    tr("Debug Arduino sketches. (this command opens an interactive gdb session)"),
 		Example: "  " + os.Args[0] + " debug -b arduino:samd:mkr1000 -P atmel_ice /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     run,
 	}
 
-	debugCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
-	debugCommand.Flags().StringVarP(&port, "port", "p", "", "Debug port, e.g.: COM10 or /dev/ttyACM0")
-	debugCommand.Flags().StringVarP(&programmer, "programmer", "P", "", "Programmer to use for debugging")
-	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", "Debug interpreter e.g.: console, mi, mi1, mi2, mi3")
-	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", "Directory containing binaries for debug.")
-	debugCommand.Flags().BoolVarP(&printInfo, "info", "I", false, "Show metadata about the debug session instead of starting the debugger.")
+	debugCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
+	debugCommand.Flags().StringVarP(&port, "port", "p", "", tr("Debug port, e.g.: COM10 or /dev/ttyACM0"))
+	debugCommand.Flags().StringVarP(&programmer, "programmer", "P", "", tr("Programmer to use for debugging"))
+	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", fmt.Sprintf(tr("Debug interpreter e.g.: %s, %s, %s, %s, %s"), "console", "mi", "mi1", "mi2", "mi3"))
+	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries for debug."))
+	debugCommand.Flags().BoolVarP(&printInfo, "info", "I", false, tr("Show metadata about the debug session instead of starting the debugger."))
 
 	return debugCommand
 }
@@ -91,10 +93,10 @@ func run(command *cobra.Command, args []string) {
 
 		if res, err := debug.GetDebugConfig(context.Background(), debugConfigRequested); err != nil {
 			if status, ok := status.FromError(err); ok {
-				feedback.Errorf("Error getting Debug info: %v", status.Message())
+				feedback.Errorf(tr("Error getting Debug info: %v"), status.Message())
 				errorcodes.ExitWithGrpcStatus(status)
 			}
-			feedback.Errorf("Error getting Debug info: %v", err)
+			feedback.Errorf(tr("Error getting Debug info: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		} else {
 			feedback.PrintResult(&debugInfoResult{res})
@@ -107,7 +109,7 @@ func run(command *cobra.Command, args []string) {
 		signal.Notify(ctrlc, os.Interrupt)
 
 		if _, err := debug.Debug(context.Background(), debugConfigRequested, os.Stdin, os.Stdout, ctrlc); err != nil {
-			feedback.Errorf("Error during Debug: %v", err)
+			feedback.Errorf(tr("Error during Debug: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 
@@ -122,7 +124,7 @@ func initSketchPath(sketchPath *paths.Path) *paths.Path {
 
 	wd, err := paths.Getwd()
 	if err != nil {
-		feedback.Errorf("Couldn't get current working directory: %v", err)
+		feedback.Errorf(tr("Couldn't get current working directory: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	logrus.Infof("Reading sketch from dir: %s", wd)
@@ -141,26 +143,26 @@ func (r *debugInfoResult) String() string {
 	t := table.New()
 	green := color.New(color.FgHiGreen)
 	dimGreen := color.New(color.FgGreen)
-	t.AddRow("Executable to debug", table.NewCell(r.info.GetExecutable(), green))
-	t.AddRow("Toolchain type", table.NewCell(r.info.GetToolchain(), green))
-	t.AddRow("Toolchain path", table.NewCell(r.info.GetToolchainPath(), dimGreen))
-	t.AddRow("Toolchain prefix", table.NewCell(r.info.GetToolchainPrefix(), dimGreen))
+	t.AddRow(tr("Executable to debug"), table.NewCell(r.info.GetExecutable(), green))
+	t.AddRow(tr("Toolchain type"), table.NewCell(r.info.GetToolchain(), green))
+	t.AddRow(tr("Toolchain path"), table.NewCell(r.info.GetToolchainPath(), dimGreen))
+	t.AddRow(tr("Toolchain prefix"), table.NewCell(r.info.GetToolchainPrefix(), dimGreen))
 	if len(r.info.GetToolchainConfiguration()) > 0 {
 		conf := properties.NewFromHashmap(r.info.GetToolchainConfiguration())
 		keys := conf.Keys()
 		sort.Strings(keys)
-		t.AddRow("Toolchain custom configurations")
+		t.AddRow(tr("Toolchain custom configurations"))
 		for _, k := range keys {
 			t.AddRow(table.NewCell(" - "+k, dimGreen), table.NewCell(conf.Get(k), dimGreen))
 		}
 	}
-	t.AddRow("GDB Server type", table.NewCell(r.info.GetServer(), green))
-	t.AddRow("GDB Server path", table.NewCell(r.info.GetServerPath(), dimGreen))
+	t.AddRow(tr("GDB Server type"), table.NewCell(r.info.GetServer(), green))
+	t.AddRow(tr("GDB Server path"), table.NewCell(r.info.GetServerPath(), dimGreen))
 	if len(r.info.GetServerConfiguration()) > 0 {
 		conf := properties.NewFromHashmap(r.info.GetServerConfiguration())
 		keys := conf.Keys()
 		sort.Strings(keys)
-		t.AddRow(fmt.Sprintf("%s custom configurations", r.info.GetServer()))
+		t.AddRow(fmt.Sprintf(tr("%s custom configurations"), r.info.GetServer()))
 		for _, k := range keys {
 			t.AddRow(table.NewCell(" - "+k, dimGreen), table.NewCell(conf.Get(k), dimGreen))
 		}

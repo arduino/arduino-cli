@@ -1,17 +1,16 @@
-# Project information
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/mkdocs/mkdocs.yml
+# See: https://www.mkdocs.org/user-guide/configuration/
+
 site_name: Arduino CLI
 site_description: Arduino Command Line Interface
 site_url: https://arduino.github.io/arduino-cli/
 
-# Repository
 repo_name: arduino/arduino-cli
 repo_url: https://github.com/arduino/arduino-cli
-edit_uri: ""
+edit_uri: blob/master/docs/
 
-# Copyright
 copyright: Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
 
-# Theme
 theme:
   name: material
   logo: img/icon_mac_light.png
@@ -19,44 +18,31 @@ theme:
     primary: teal
     accent: orange
 
-# Extensions
 markdown_extensions:
-  - markdown.extensions.admonition
   - markdown.extensions.codehilite:
       guess_lang: false
-  - markdown.extensions.def_list
-  - markdown.extensions.footnotes
-  - markdown.extensions.meta
   - markdown.extensions.toc:
       permalink: true
-  - pymdownx.arithmatex
+  - mdx_truly_sane_lists:
+      nested_indent: 2
+      truly_sane: true
   - pymdownx.betterem:
       smart_enable: all
-  - pymdownx.caret
-  - pymdownx.critic
   - pymdownx.details
   - pymdownx.emoji:
-      emoji_index: !!python/name:pymdownx.emoji.twemoji
       emoji_generator: !!python/name:pymdownx.emoji.to_svg
-  - pymdownx.inlinehilite
-  - pymdownx.keys
+      emoji_index: !!python/name:pymdownx.emoji.twemoji
   - pymdownx.magiclink:
+      repo: arduino-cli
       repo_url_shorthand: true
       user: arduino
-      repo: arduino-cli
-  - pymdownx.mark
-  - pymdownx.smartsymbols
   - pymdownx.superfences
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.tilde
-  - mdx_truly_sane_lists:
-      nested_indent: 2
-      truly_sane: true
 
-# Navigation
 nav:
-  - Documentation Home: index.md
+  - Home: index.md
   - installation.md
   - UPGRADING.md
   - getting-started.md
@@ -123,8 +109,6 @@ nav:
   - platform-specification.md
   - Package index specification: package_index_json-specification.md
 
-extra_css:
-  - css/version-select.css
-
-extra_javascript:
-  - js/version-select.js
+extra:
+  version:
+    provider: mike

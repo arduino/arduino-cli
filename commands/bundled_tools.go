@@ -42,19 +42,19 @@ func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.To
 
 	if toolRelease.IsInstalled() {
 		log.Warn("Tool already installed")
-		taskCB(&rpc.TaskProgress{Name: "Tool " + toolRelease.String() + " already installed", Completed: true})
+		taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Tool %s already installed"), toolRelease), Completed: true})
 		return nil
 	}
 
 	log.Info("Installing tool")
-	taskCB(&rpc.TaskProgress{Name: "Installing " + toolRelease.String()})
+	taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Installing %s"), toolRelease)})
 	err := pm.InstallTool(toolRelease)
 	if err != nil {
 		log.WithError(err).Warn("Cannot install tool")
-		return fmt.Errorf("installing tool %s: %s", toolRelease, err)
+		return fmt.Errorf(tr("installing tool %[1]s: %[2]s"), toolRelease, err)
 	}
 	log.Info("Tool installed")
-	taskCB(&rpc.TaskProgress{Message: toolRelease.String() + " installed", Completed: true})
+	taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("%s installed"), toolRelease), Completed: true})
 
 	return nil
 }

@@ -34,17 +34,17 @@ import (
 func initListCommand() *cobra.Command {
 	listCommand := &cobra.Command{
 		Use:     "list",
-		Short:   "List connected boards.",
-		Long:    "Detects and displays a list of boards connected to the current computer.",
+		Short:   tr("List connected boards."),
+		Long:    tr("Detects and displays a list of boards connected to the current computer."),
 		Example: "  " + os.Args[0] + " board list --timeout 10s",
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}
 
 	listCommand.Flags().StringVar(&listFlags.timeout, "timeout", "0s",
-		"The connected devices search timeout, raise it if your board doesn't show up (e.g. to 10s).")
+		fmt.Sprintf(tr("The connected devices search timeout, raise it if your board doesn't show up (e.g. to %s)."), "10s"))
 	listCommand.Flags().BoolVarP(&listFlags.watch, "watch", "w", false,
-		"Command keeps running and prints list of connected boards whenever there is a change.")
+		tr("Command keeps running and prints list of connected boards whenever there is a change."))
 
 	return listCommand
 }
@@ -63,7 +63,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if timeout, err := time.ParseDuration(listFlags.timeout); err != nil {
-		feedback.Errorf("Invalid timeout: %v", err)
+		feedback.Errorf(tr("Invalid timeout: %v"), err)
 		os.Exit(errorcodes.ErrBadArgument)
 	} else {
 		time.Sleep(timeout)
@@ -72,7 +72,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
 	ports, err := board.List(inst.GetId())
 	if err != nil {
-		feedback.Errorf("Error detecting boards: %v", err)
+		feedback.Errorf(tr("Error detecting boards: %v"), err)
 		os.Exit(errorcodes.ErrNetwork)
 	}
 
@@ -82,14 +82,14 @@ func runListCommand(cmd *cobra.Command, args []string) {
 func watchList(cmd *cobra.Command, inst *rpc.Instance) {
 	eventsChan, err := board.Watch(inst.Id, nil)
 	if err != nil {
-		feedback.Errorf("Error detecting boards: %v", err)
+		feedback.Errorf(tr("Error detecting boards: %v"), err)
 		os.Exit(errorcodes.ErrNetwork)
 	}
 
 	// This is done to avoid printing the header each time a new event is received
 	if feedback.GetFormat() == feedback.Text {
 		t := table.New()
-		t.SetHeader("Port", "Type", "Event", "Board Name", "FQBN", "Core")
+		t.SetHeader(tr("Port"), tr("Type"), tr("Event"), tr("Board Name"), tr("FQBN"), tr("Core"))
 		feedback.Print(t.Render())
 	}
 
@@ -118,7 +118,7 @@ func (dr result) Data() interface{} {
 
 func (dr result) String() string {
 	if len(dr.ports) == 0 {
-		return "No boards found."
+		return tr("No boards found.")
 	}
 
 	sort.Slice(dr.ports, func(i, j int) bool {
@@ -128,7 +128,7 @@ func (dr result) String() string {
 	})
 
 	t := table.New()
-	t.SetHeader("Port", "Type", "Board Name", "FQBN", "Core")
+	t.SetHeader(tr("Port"), tr("Type"), tr("Board Name"), tr("FQBN"), tr("Core"))
 	for _, port := range dr.ports {
 		address := port.GetProtocol() + "://" + port.GetAddress()
 		if port.GetProtocol() == "serial" {
@@ -158,7 +158,7 @@ func (dr result) String() string {
 				protocol = ""
 			}
 		} else {
-			board := "Unknown"
+			board := tr("Unknown")
 			fqbn := ""
 			coreName := ""
 			t.AddRow(address, protocol, board, fqbn, coreName)
@@ -185,8 +185,8 @@ func (dr watchEvent) String() string {
 	t := table.New()
 
 	event := map[string]string{
-		"add":    "Connected",
-		"remove": "Disconnected",
+		"add":    tr("Connected"),
+		"remove": tr("Disconnected"),
 	}[dr.Type]
 
 	address := fmt.Sprintf("%s://%s", dr.Protocol, dr.Address)

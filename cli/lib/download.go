@@ -17,6 +17,7 @@ package lib
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -30,12 +31,12 @@ import (
 
 func initDownloadCommand() *cobra.Command {
 	downloadCommand := &cobra.Command{
-		Use:   "download [LIBRARY_NAME(S)]",
-		Short: "Downloads one or more libraries without installing them.",
-		Long:  "Downloads one or more libraries without installing them.",
+		Use:   fmt.Sprintf("download [%s]...", tr("LIBRARY_NAME")),
+		Short: tr("Downloads one or more libraries without installing them."),
+		Long:  tr("Downloads one or more libraries without installing them."),
 		Example: "" +
-			"  " + os.Args[0] + " lib download AudioZero       # for the latest version.\n" +
-			"  " + os.Args[0] + " lib download AudioZero@1.0.0 # for a specific version.",
+			"  " + os.Args[0] + " lib download AudioZero       # " + tr("for the latest version.") + "\n" +
+			"  " + os.Args[0] + " lib download AudioZero@1.0.0 # " + tr("for a specific version."),
 		Args: cobra.MinimumNArgs(1),
 		Run:  runDownloadCommand,
 	}
@@ -46,7 +47,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
 	refs, err := ParseLibraryReferenceArgsAndAdjustCase(instance, args)
 	if err != nil {
-		feedback.Errorf("Invalid argument passed: %v", err)
+		feedback.Errorf(tr("Invalid argument passed: %v"), err)
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
@@ -58,7 +59,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 		}
 		_, err := lib.LibraryDownload(context.Background(), libraryDownloadRequest, output.ProgressBar())
 		if err != nil {
-			feedback.Errorf("Error downloading %s: %v", library, err)
+			feedback.Errorf(tr("Error downloading %[1]s: %[2]v"), library, err)
 			os.Exit(errorcodes.ErrNetwork)
 		}
 	}

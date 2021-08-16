@@ -28,8 +28,8 @@ import (
 func initAddCommand() *cobra.Command {
 	addCommand := &cobra.Command{
 		Use:   "add",
-		Short: "Adds one or more values to a setting.",
-		Long:  "Adds one or more values to a setting.",
+		Short: tr("Adds one or more values to a setting."),
+		Long:  tr("Adds one or more values to a setting."),
 		Example: "" +
 			"  " + os.Args[0] + " config add board_manager.additional_urls https://example.com/package_example_index.json\n" +
 			"  " + os.Args[0] + " config add board_manager.additional_urls https://example.com/package_example_index.json https://another-url.com/package_another_index.json\n",
@@ -48,7 +48,7 @@ func runAddCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if kind != reflect.Slice {
-		feedback.Errorf("The key '%v' is not a list of items, can't add to it.\nMaybe use 'config set'?", key)
+		feedback.Errorf(tr("The key '%[1]v' is not a list of items, can't add to it.\nMaybe use '%[2]s'?"), key, "config set")
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -57,7 +57,7 @@ func runAddCommand(cmd *cobra.Command, args []string) {
 	configuration.Settings.Set(key, v)
 
 	if err := configuration.Settings.WriteConfig(); err != nil {
-		feedback.Errorf("Can't write config file: %v", err)
+		feedback.Errorf(tr("Can't write config file: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }

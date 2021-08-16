@@ -42,7 +42,7 @@ func (s *MonitorService) StreamingOpen(stream rpc.MonitorService_StreamingOpenSe
 	// ensure it's a config message and not data
 	config := msg.GetConfig()
 	if config == nil {
-		return errors.New("first message must contain monitor configuration, not data")
+		return errors.New(tr("first message must contain monitor configuration, not data"))
 	}
 
 	// select which type of monitor we need
@@ -69,7 +69,7 @@ func (s *MonitorService) StreamingOpen(stream rpc.MonitorService_StreamingOpenSe
 		if addCfg, ok := config.GetAdditionalConfig().AsMap()["OutputRate"]; !ok {
 			mon = monitors.OpenNullMonitor(100.0) // 100 bytes per second as default
 		} else if outputRate, ok := addCfg.(float64); !ok {
-			return errors.New("OutputRate in Null monitor must be a float64")
+			return errors.New(tr("OutputRate in Null monitor must be a float64"))
 		} else {
 			// get the Monitor instance
 			mon = monitors.OpenNullMonitor(outputRate)

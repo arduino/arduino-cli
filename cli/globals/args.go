@@ -55,16 +55,16 @@ func ParseReferenceArgs(args []string, parseArch bool) ([]*ReferenceArg, error) 
 func ParseReferenceArg(arg string, parseArch bool) (*ReferenceArg, error) {
 	ret := &ReferenceArg{}
 	if arg == "" {
-		return nil, fmt.Errorf("invalid empty core argument")
+		return nil, fmt.Errorf(tr("invalid empty core argument"))
 	}
 	toks := strings.SplitN(arg, "@", 2)
 	if toks[0] == "" {
-		return nil, fmt.Errorf("invalid empty core reference '%s'", arg)
+		return nil, fmt.Errorf(tr("invalid empty core reference '%s'"), arg)
 	}
 	ret.PackageName = toks[0]
 	if len(toks) > 1 {
 		if toks[1] == "" {
-			return nil, fmt.Errorf("invalid empty core version: '%s'", arg)
+			return nil, fmt.Errorf(tr("invalid empty core version: '%s'"), arg)
 		}
 		ret.Version = toks[1]
 	}
@@ -72,14 +72,14 @@ func ParseReferenceArg(arg string, parseArch bool) (*ReferenceArg, error) {
 	if parseArch {
 		toks = strings.Split(ret.PackageName, ":")
 		if len(toks) != 2 {
-			return nil, fmt.Errorf("invalid item %s", arg)
+			return nil, fmt.Errorf(tr("invalid item %s"), arg)
 		}
 		if toks[0] == "" {
-			return nil, fmt.Errorf("invalid empty core name '%s'", arg)
+			return nil, fmt.Errorf(tr("invalid empty core name '%s'"), arg)
 		}
 		ret.PackageName = toks[0]
 		if toks[1] == "" {
-			return nil, fmt.Errorf("invalid empty core architecture '%s'", arg)
+			return nil, fmt.Errorf(tr("invalid empty core architecture '%s'"), arg)
 		}
 		ret.Architecture = toks[1]
 	}

@@ -17,6 +17,7 @@ package board
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"sort"
 
@@ -31,18 +32,17 @@ import (
 
 func initListAllCommand() *cobra.Command {
 	var listAllCommand = &cobra.Command{
-		Use:   "listall [boardname]",
-		Short: "List all known boards and their corresponding FQBN.",
-		Long: "" +
-			"List all boards that have the support platform installed. You can search\n" +
-			"for a specific board if you specify the board name",
+		Use:   fmt.Sprintf("listall [%s]", tr("boardname")),
+		Short: tr("List all known boards and their corresponding FQBN."),
+		Long: tr(`List all boards that have the support platform installed. You can search
+for a specific board if you specify the board name`),
 		Example: "" +
 			"  " + os.Args[0] + " board listall\n" +
 			"  " + os.Args[0] + " board listall zero",
 		Args: cobra.ArbitraryArgs,
 		Run:  runListAllCommand,
 	}
-	listAllCommand.Flags().BoolVarP(&showHiddenBoard, "show-hidden", "a", false, "Show also boards marked as 'hidden' in the platform")
+	listAllCommand.Flags().BoolVarP(&showHiddenBoard, "show-hidden", "a", false, tr("Show also boards marked as 'hidden' in the platform"))
 	return listAllCommand
 }
 
@@ -58,7 +58,7 @@ func runListAllCommand(cmd *cobra.Command, args []string) {
 		IncludeHiddenBoards: showHiddenBoard,
 	})
 	if err != nil {
-		feedback.Errorf("Error listing boards: %v", err)
+		feedback.Errorf(tr("Error listing boards: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -81,11 +81,11 @@ func (dr resultAll) String() string {
 	})
 
 	t := table.New()
-	t.SetHeader("Board Name", "FQBN", "")
+	t.SetHeader(tr("Board Name"), tr("FQBN"), "")
 	for _, item := range dr.list.GetBoards() {
 		hidden := ""
 		if item.IsHidden {
-			hidden = "(hidden)"
+			hidden = tr("(hidden)")
 		}
 		t.AddRow(item.GetName(), item.GetFqbn(), hidden)
 	}

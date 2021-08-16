@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#line 1 {{QuoteCppString .sketch.MainFile.Name}}
+#line 1 {{QuoteCppString .sketch.MainFile}}
 #define DEBUG 1
 #define DISABLED 0
 

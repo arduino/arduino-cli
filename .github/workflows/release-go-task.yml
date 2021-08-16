@@ -1,0 +1,169 @@
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/release-go-task.md
+name: Release
+
+env:
+  # As defined by the Taskfile's PROJECT_NAME variable
+  PROJECT_NAME: arduino-cli
+  # As defined by the Taskfile's DIST_DIR variable
+  DIST_DIR: dist
+  # The project's folder on Arduino's download server for uploading builds
+  AWS_PLUGIN_TARGET: /arduino-cli/
+  ARTIFACT_NAME: dist
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+*"
+
+jobs:
+  create-release-artifacts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Create changelog
+        uses: arduino/create-changelog@v1
+        with:
+          tag-regex: '^[0-9]+\.[0-9]+\.[0-9]+.*$'
+          filter-regex: '^\[(skip|changelog)[ ,-](skip|changelog)\].*'
+          case-insensitive-regex: true
+          changelog-file-path: "${{ env.DIST_DIR }}/CHANGELOG.md"
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Build
+        run: task dist:all
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          if-no-files-found: error
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.DIST_DIR }}
+
+  notarize-macos:
+    runs-on: macos-latest
+    needs: create-release-artifacts
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.DIST_DIR }}
+
+      - name: Import Code-Signing Certificates
+        env:
+          KEYCHAIN: "sign.keychain"
+          INSTALLER_CERT_MAC_PATH: "/tmp/ArduinoCerts2020.p12"
+          KEYCHAIN_PASSWORD: keychainpassword # Arbitrary password for a keychain that exists only for the duration of the job, so not secret
+        run: |
+          echo "${{ secrets.INSTALLER_CERT_MAC_P12 }}" | base64 --decode > "${{ env.INSTALLER_CERT_MAC_PATH }}"
+          security create-keychain -p "${{ env.KEYCHAIN_PASSWORD }}" "${{ env.KEYCHAIN }}"
+          security default-keychain -s "${{ env.KEYCHAIN }}"
+          security unlock-keychain -p "${{ env.KEYCHAIN_PASSWORD }}" "${{ env.KEYCHAIN }}"
+          security import \
+            "${{ env.INSTALLER_CERT_MAC_PATH }}" \
+            -k "${{ env.KEYCHAIN }}" \
+            -f pkcs12 \
+            -A \
+            -T "/usr/bin/codesign" \
+            -P "${{ secrets.INSTALLER_CERT_MAC_PASSWORD }}"
+          security set-key-partition-list \
+            -S apple-tool:,apple: \
+            -s \
+            -k "${{ env.KEYCHAIN_PASSWORD }}" \
+            "${{ env.KEYCHAIN }}"
+
+      - name: Install gon for code signing and app notarization
+        run: |
+          wget -q https://github.com/mitchellh/gon/releases/download/v0.2.3/gon_macos.zip
+          unzip gon_macos.zip -d /usr/local/bin
+
+      - name: Sign and notarize binary
+        env:
+          AC_USERNAME: ${{ secrets.AC_USERNAME }}
+          AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
+        run: |
+          gon gon.config.hcl
+
+      - name: Re-package binary and update checksum
+        # This step performs the following:
+        # 1. Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
+        # 2. Recalculate package checksum and replace it in the nnnnnn-checksums.txt file
+        run: |
+          # GitHub's upload/download-artifact@v2 actions don't preserve file permissions,
+          # so we need to add execution permission back until the action is made to do this.
+          chmod +x ${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_osx_darwin_amd64/${{ env.PROJECT_NAME }}
+          TAG="${GITHUB_REF/refs\/tags\//}"
+          tar -czvf "${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_${TAG}_macOS_64bit.tar.gz" \
+          -C ${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_osx_darwin_amd64/  ${{ env.PROJECT_NAME }}   \
+          -C ../../ LICENSE.txt
+          CHECKSUM="$(shasum -a 256 ${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_${TAG}_macOS_64bit.tar.gz | cut -d " " -f 1)"
+          perl -pi -w -e "s/.*${{ env.PROJECT_NAME }}_${TAG}_macOS_64bit.tar.gz/${CHECKSUM}  ${{ env.PROJECT_NAME }}_${TAG}_macOS_64bit.tar.gz/g;" ${{ env.DIST_DIR }}/*-checksums.txt
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          if-no-files-found: error
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.DIST_DIR }}
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: notarize-macos
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.DIST_DIR }}
+
+      - name: Identify Prerelease
+        # This is a workaround while waiting for create-release action
+        # to implement auto pre-release based on tag
+        id: prerelease
+        run: |
+          wget -q -P /tmp https://github.com/fsaintjacques/semver-tool/archive/3.0.0.zip
+          unzip -p /tmp/3.0.0.zip semver-tool-3.0.0/src/semver >/tmp/semver && chmod +x /tmp/semver
+          if [[ "$(/tmp/semver get prerel "${GITHUB_REF/refs\/tags\//}")" ]]; then echo "::set-output name=IS_PRE::true"; fi
+
+      - name: Create Github Release and upload artifacts
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          bodyFile: ${{ env.DIST_DIR }}/CHANGELOG.md
+          draft: false
+          prerelease: ${{ steps.prerelease.outputs.IS_PRE }}
+          # NOTE: "Artifact is a directory" warnings are expected and don't indicate a problem
+          # (all the files we need are in the DIST_DIR root)
+          artifacts: ${{ env.DIST_DIR }}/*
+
+      - name: Upload release files on Arduino downloads servers
+        uses: docker://plugins/s3
+        env:
+          PLUGIN_SOURCE: "${{ env.DIST_DIR }}/*"
+          PLUGIN_TARGET: ${{ env.AWS_PLUGIN_TARGET }}
+          PLUGIN_STRIP_PREFIX: "${{ env.DIST_DIR }}/"
+          PLUGIN_BUCKET: ${{ secrets.DOWNLOADS_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Update Homebrew formula
+        if: steps.prerelease.outputs.IS_PRE != 'true'
+        uses: dawidd6/action-homebrew-bump-formula@v3
+        with:
+          token: ${{ secrets.ARDUINOBOT_GITHUB_TOKEN }}
+          formula: arduino-cli

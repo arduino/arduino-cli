@@ -28,8 +28,8 @@ import (
 func initCleanCommand() *cobra.Command {
 	cleanCommand := &cobra.Command{
 		Use:     "clean",
-		Short:   "Delete Boards/Library Manager download cache.",
-		Long:    "Delete contents of the `directories.downloads` folder, where archive files are staged during installation of libraries and boards platforms.",
+		Short:   tr("Delete Boards/Library Manager download cache."),
+		Long:    tr("Delete contents of the `directories.downloads` folder, where archive files are staged during installation of libraries and boards platforms."),
 		Example: "  " + os.Args[0] + " cache clean",
 		Args:    cobra.NoArgs,
 		Run:     runCleanCommand,
@@ -43,7 +43,7 @@ func runCleanCommand(cmd *cobra.Command, args []string) {
 	cachePath := configuration.Settings.GetString("directories.Downloads")
 	err := os.RemoveAll(cachePath)
 	if err != nil {
-		feedback.Errorf("Error cleaning caches: %v", err)
+		feedback.Errorf(tr("Error cleaning caches: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }

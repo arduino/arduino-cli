@@ -36,9 +36,9 @@
               "version": "4.8.1-arduino5"
             },
             {
-              "packager":"arduino",
-              "name":"avrdude",
-              "version":"6.0.1-arduino5"
+              "packager": "arduino",
+              "name": "avrdude",
+              "version": "6.0.1-arduino5"
             },
             {
               "packager": "cytron",

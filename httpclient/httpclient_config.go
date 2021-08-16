@@ -16,7 +16,6 @@
 package httpclient
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
 	"runtime"
@@ -42,7 +41,7 @@ func DefaultConfig() (*Config, error) {
 			// this workaround must be here until viper can UnSet properties:
 			// https://github.com/spf13/viper/pull/519
 		} else if proxy, err = url.Parse(proxyConfig); err != nil {
-			return nil, errors.New("Invalid network.proxy '" + proxyConfig + "': " + err.Error())
+			return nil, fmt.Errorf(tr("Invalid network.proxy '%[1]s': %[2]s"), proxyConfig, err)
 		}
 	}
 

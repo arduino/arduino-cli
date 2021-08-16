@@ -16,6 +16,7 @@
 package lib
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"sort"
@@ -30,19 +31,18 @@ import (
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"golang.org/x/net/context"
 )
 
 func initExamplesCommand() *cobra.Command {
 	examplesCommand := &cobra.Command{
-		Use:     "examples [LIBRARY_NAME]",
-		Short:   "Shows the list of the examples for libraries.",
-		Long:    "Shows the list of the examples for libraries. A name may be given as argument to search a specific library.",
+		Use:     fmt.Sprintf("examples [%s]", tr("LIBRARY_NAME")),
+		Short:   tr("Shows the list of the examples for libraries."),
+		Long:    tr("Shows the list of the examples for libraries. A name may be given as argument to search a specific library."),
 		Example: "  " + os.Args[0] + " lib examples Wire",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     runExamplesCommand,
 	}
-	examplesCommand.Flags().StringVarP(&examplesFlags.fqbn, "fqbn", "b", "", "Show libraries for the specified board FQBN.")
+	examplesCommand.Flags().StringVarP(&examplesFlags.fqbn, "fqbn", "b", "", tr("Show libraries for the specified board FQBN."))
 	return examplesCommand
 }
 
@@ -66,7 +66,7 @@ func runExamplesCommand(cmd *cobra.Command, args []string) {
 		Fqbn:     examplesFlags.fqbn,
 	})
 	if err != nil {
-		feedback.Errorf("Error getting libraries info: %v", err)
+		feedback.Errorf(tr("Error getting libraries info: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -100,7 +100,7 @@ func (ir libraryExamplesResult) Data() interface{} {
 
 func (ir libraryExamplesResult) String() string {
 	if ir.Examples == nil || len(ir.Examples) == 0 {
-		return "No libraries found."
+		return tr("No libraries found.")
 	}
 
 	sort.Slice(ir.Examples, func(i, j int) bool {
@@ -115,7 +115,7 @@ func (ir libraryExamplesResult) String() string {
 		} else if lib.Library.Location != rpc.LibraryLocation_LIBRARY_LOCATION_USER {
 			name += " (" + lib.Library.GetLocation().String() + ")"
 		}
-		r := fmt.Sprintf("Examples for library %s\n", color.GreenString("%s", name))
+		r := fmt.Sprintf(tr("Examples for library %s")+"\n", color.GreenString("%s", name))
 		sort.Slice(lib.Examples, func(i, j int) bool {
 			return strings.ToLower(lib.Examples[i]) < strings.ToLower(lib.Examples[j])
 		})

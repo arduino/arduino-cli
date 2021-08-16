@@ -201,7 +201,8 @@ def test_core_install_without_updateindex(run_command):
 
 
 @pytest.mark.skipif(
-    platform.system() == "Windows", reason="core fails with fatal error: bits/c++config.h: No such file or directory",
+    platform.system() == "Windows",
+    reason="core fails with fatal error: bits/c++config.h: No such file or directory",
 )
 def test_core_install_esp32(run_command, data_dir):
     # update index
@@ -685,7 +686,9 @@ def test_core_with_wrong_custom_board_options_is_loaded(run_command, data_dir):
 
     # Install platform in Sketchbook hardware dir
     shutil.copytree(
-        Path(__file__).parent / "testdata" / test_platform_name, platform_install_dir, dirs_exist_ok=True,
+        Path(__file__).parent / "testdata" / test_platform_name,
+        platform_install_dir,
+        dirs_exist_ok=True,
     )
 
     assert run_command("update")
@@ -710,5 +713,43 @@ def test_core_with_wrong_custom_board_options_is_loaded(run_command, data_dir):
         + "loading platform release arduino-beta-dev:platform_with_wrong_custom_board_options@4.2.0: "
         + "loading boards: "
         + "skipping loading of boards arduino-beta-dev:platform_with_wrong_custom_board_options:nessuno: "
+        + "malformed custom board options"
+    ) in res.stderr
+
+
+def test_core_with_missing_custom_board_options_is_loaded(run_command, data_dir):
+    test_platform_name = "platform_with_missing_custom_board_options"
+    platform_install_dir = Path(data_dir, "hardware", "arduino-beta-dev", test_platform_name)
+    platform_install_dir.mkdir(parents=True)
+
+    # Install platform in Sketchbook hardware dir
+    shutil.copytree(
+        Path(__file__).parent / "testdata" / test_platform_name,
+        platform_install_dir,
+        dirs_exist_ok=True,
+    )
+
+    assert run_command("update")
+
+    res = run_command("core list --format json")
+    assert res.ok
+
+    cores = json.loads(res.stdout)
+    mapped = {core["id"]: core for core in cores}
+    assert len(mapped) == 1
+    # Verifies platform is loaded except excluding board with missing options
+    assert "arduino-beta-dev:platform_with_missing_custom_board_options" in mapped
+    boards = {b["fqbn"]: b for b in mapped["arduino-beta-dev:platform_with_missing_custom_board_options"]["boards"]}
+    assert len(boards) == 1
+    # Verify board with malformed options is not loaded
+    assert "arduino-beta-dev:platform_with_missing_custom_board_options:nessuno" not in boards
+    # Verify other board is loaded
+    assert "arduino-beta-dev:platform_with_missing_custom_board_options:altra" in boards
+    # Verify warning is shown to user
+    assert (
+        "Error initializing instance: "
+        + "loading platform release arduino-beta-dev:platform_with_missing_custom_board_options@4.2.0: "
+        + "loading boards: "
+        + "skipping loading of boards arduino-beta-dev:platform_with_missing_custom_board_options:nessuno: "
         + "malformed custom board options"
     ) in res.stderr

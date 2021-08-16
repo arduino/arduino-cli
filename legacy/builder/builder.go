@@ -21,7 +21,8 @@ import (
 	"strconv"
 	"time"
 
-	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/phases"
@@ -29,6 +30,8 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/pkg/errors"
 )
+
+var tr = i18n.Tr
 
 var MAIN_FILE_VALID_EXTENSIONS = map[string]bool{".ino": true, ".pde": true}
 var ADDITIONAL_FILE_VALID_EXTENSIONS = map[string]bool{".h": true, ".c": true, ".hpp": true, ".hh": true, ".cpp": true, ".S": true}
@@ -41,7 +44,7 @@ const DEFAULT_SOFTWARE = "ARDUINO"
 type Builder struct{}
 
 func (s *Builder) Run(ctx *types.Context) error {
-	if err := bldr.EnsureBuildPathExists(ctx.BuildPath.String()); err != nil {
+	if err := ctx.BuildPath.MkdirAll(); err != nil {
 		return err
 	}
 
@@ -56,31 +59,31 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		&ContainerMergeCopySketchFiles{},
 
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, "Detecting libraries used..."),
+		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, tr("Detecting libraries used...")),
 		&ContainerFindIncludes{},
 
 		&WarnAboutArchIncompatibleLibraries{},
 
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, "Generating function prototypes..."),
+		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, tr("Generating function prototypes...")),
 		&PreprocessSketch{},
 
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, "Compiling sketch..."),
+		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, tr("Compiling sketch...")),
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_SKETCH_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 		&phases.SketchBuilder{},
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_SKETCH_POSTBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, "Compiling libraries..."),
+		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, tr("Compiling libraries...")),
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LIBRARIES_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 		&UnusedCompiledLibrariesRemover{},
 		&phases.LibrariesBuilder{},
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LIBRARIES_POSTBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, "Compiling core..."),
+		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, tr("Compiling core...")),
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_CORE_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 		&phases.CoreBuilder{},
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_CORE_POSTBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, "Linking everything together..."),
+		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, tr("Linking everything together...")),
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LINKING_PRELINK, Suffix: constants.HOOKS_PATTERN_SUFFIX},
 		&phases.Linker{},
 		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LINKING_POSTLINK, Suffix: constants.HOOKS_PATTERN_SUFFIX},
@@ -134,10 +137,10 @@ type Preprocess struct{}
 
 func (s *Preprocess) Run(ctx *types.Context) error {
 	if ctx.BuildPath == nil {
-		ctx.BuildPath = bldr.GenBuildPath(ctx.SketchLocation)
+		ctx.BuildPath = sketch.GenBuildPath(ctx.SketchLocation)
 	}
 
-	if err := bldr.EnsureBuildPathExists(ctx.BuildPath.String()); err != nil {
+	if err := ctx.BuildPath.MkdirAll(); err != nil {
 		return err
 	}
 
@@ -170,7 +173,7 @@ type ParseHardwareAndDumpBuildProperties struct{}
 
 func (s *ParseHardwareAndDumpBuildProperties) Run(ctx *types.Context) error {
 	if ctx.BuildPath == nil {
-		ctx.BuildPath = bldr.GenBuildPath(ctx.SketchLocation)
+		ctx.BuildPath = sketch.GenBuildPath(ctx.SketchLocation)
 	}
 
 	commands := []types.Command{

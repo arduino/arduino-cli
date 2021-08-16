@@ -14,7 +14,7 @@
 
 set -euo pipefail
 
-! read -r -d '' query << EOM
+! read -r -d '' query <<EOM
 select
 replace(url_extract_path("d.url"), '/arduino-cli/arduino-cli_', '') as flavor,
 count("id") as gauge
@@ -27,40 +27,42 @@ group by 1
 EOM
 
 queryExecutionId=$(
-aws athena start-query-execution \
---query-string "${query}" \
---query-execution-context "Database=demo_books" \
---result-configuration "OutputLocation=${AWS_ATHENA_OUTPUT_LOCATION}" \
---region us-east-1 | jq -r ".QueryExecutionId"
+  aws athena start-query-execution \
+    --query-string "${query}" \
+    --query-execution-context "Database=demo_books" \
+    --result-configuration "OutputLocation=${AWS_ATHENA_OUTPUT_LOCATION}" \
+    --region us-east-1 | jq -r ".QueryExecutionId"
 )
 
 echo "QueryExecutionId is ${queryExecutionId}"
 for i in $(seq 1 120); do
-  queryState=$( aws athena get-query-execution \
-  --query-execution-id "${queryExecutionId}"  \
-  --region us-east-1 | jq -r ".QueryExecution.Status.State"
-  );
+  queryState=$(
+    aws athena get-query-execution \
+      --query-execution-id "${queryExecutionId}" \
+      --region us-east-1 | jq -r ".QueryExecution.Status.State"
+  )
 
   if [[ "${queryState}" == "SUCCEEDED" ]]; then
-      break;
-  fi;
+    break
+  fi
 
   echo "QueryExecutionId ${queryExecutionId} - state is ${queryState}"
 
   if [[ "${queryState}" == "FAILED" ]]; then
-      exit 1;
-  fi;
+    exit 1
+  fi
 
   sleep 2
 done
 
 echo "Query succeeded. Processing data"
-queryResult=$( aws athena get-query-results \
---query-execution-id "${queryExecutionId}" \
---region us-east-1 | jq --compact-output
-);
+queryResult=$(
+  aws athena get-query-results \
+    --query-execution-id "${queryExecutionId}" \
+    --region us-east-1 | jq --compact-output
+)
 
-! read -r -d '' jsonTemplate << EOM
+! read -r -d '' jsonTemplate <<EOM
 {
 "type": "gauge",
 "name": "arduino.downloads.total",
@@ -78,8 +80,8 @@ EOM
 
 datapoints="["
 for row in $(echo "${queryResult}" | jq 'del(.ResultSet.Rows[0])' | jq -r '.ResultSet.Rows[] | .Data' --compact-output); do
-  value=$(jq -r ".[1].VarCharValue" <<< "${row}")
-  tag=$(jq -r ".[0].VarCharValue" <<< "${row}")
+  value=$(jq -r ".[1].VarCharValue" <<<"${row}")
+  tag=$(jq -r ".[0].VarCharValue" <<<"${row}")
   # Some splitting to obtain 0.6.0, Windows, 32bit elements from string 0.6.0_Windows_32bit.zip
   split=($(echo "$tag" | tr '_' '\n'))
   if [[ ${#split[@]} -ne 3 ]]; then
@@ -90,4 +92,4 @@ for row in $(echo "${queryResult}" | jq 'del(.ResultSet.Rows[0])' | jq -r '.Resu
 done
 datapoints="${datapoints::-1}]"
 
-echo "::set-output name=result::$(jq --compact-output <<< "${datapoints}")"
+echo "::set-output name=result::$(jq --compact-output <<<"${datapoints}")"

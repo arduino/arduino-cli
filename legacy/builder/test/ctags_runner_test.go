@@ -220,7 +220,7 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	sketchLocation := Abs(t, paths.New("sketch_with_templates_and_shift", "sketch_with_templates_and_shift.cpp"))
+	sketchLocation := Abs(t, paths.New("sketch_with_templates_and_shift", "sketch_with_templates_and_shift.ino"))
 
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),

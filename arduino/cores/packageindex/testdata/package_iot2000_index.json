@@ -17,10 +17,7 @@
           "archiveFileName": "iot2000_1.0.1.zip",
           "checksum": "SHA-256:0fa5c0cb72dff7a472198f489babbd8c6959d445d0007181f97f26bfd0f3ca20",
           "size": "423626",
-          "boards": [
-            { "name": "Simatic IOT2000" },
-            { "name": "Simatic IOT2000 Net" }
-          ],
+          "boards": [{ "name": "Simatic IOT2000" }, { "name": "Simatic IOT2000 Net" }],
           "toolsDependencies": [
             {
               "packager": "Simatic",

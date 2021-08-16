@@ -30,12 +30,12 @@ func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, error) {
 	instanceID := req.Instance.Id
 	i := commands.GetInstance(instanceID)
 	if i == nil {
-		return nil, errors.Errorf("unable to find an instance with ID: %d", instanceID)
+		return nil, errors.Errorf(tr("unable to find an instance with ID: %d"), instanceID)
 	}
 
 	packageManager := i.PackageManager
 	if packageManager == nil {
-		return nil, errors.New("invalid instance")
+		return nil, errors.New(tr("invalid instance"))
 	}
 
 	res := []*rpc.Platform{}

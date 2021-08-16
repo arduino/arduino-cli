@@ -27,11 +27,12 @@ import (
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/sketches"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
+	legacyi18n "github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/metrics"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -41,6 +42,8 @@ import (
 	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
 )
+
+var tr = i18n.Tr
 
 // Compile FIXMEDOC
 func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream io.Writer, debug bool) (r *rpc.CompileResponse, e error) {
@@ -87,29 +90,29 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New("invalid instance")
+		return nil, errors.New(tr("invalid instance"))
 	}
 
 	logrus.Tracef("Compile %s for %s started", req.GetSketchPath(), req.GetFqbn())
 	if req.GetSketchPath() == "" {
-		return nil, fmt.Errorf("missing sketchPath")
+		return nil, fmt.Errorf(tr("missing sketchPath"))
 	}
 	sketchPath := paths.New(req.GetSketchPath())
-	sketch, err := sketches.NewSketchFromPath(sketchPath)
+	sk, err := sketch.New(sketchPath)
 	if err != nil {
-		return nil, fmt.Errorf("opening sketch: %s", err)
+		return nil, fmt.Errorf(tr("opening sketch: %s"), err)
 	}
 
 	fqbnIn := req.GetFqbn()
-	if fqbnIn == "" && sketch != nil && sketch.Metadata != nil {
-		fqbnIn = sketch.Metadata.CPU.Fqbn
+	if fqbnIn == "" && sk != nil && sk.Metadata != nil {
+		fqbnIn = sk.Metadata.CPU.Fqbn
 	}
 	if fqbnIn == "" {
-		return nil, fmt.Errorf("no FQBN provided")
+		return nil, fmt.Errorf(tr("no FQBN provided"))
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, fmt.Errorf("incorrect FQBN: %s", err)
+		return nil, fmt.Errorf(tr("incorrect FQBN: %s"), err)
 	}
 
 	targetPlatform := pm.FindPlatform(&packagemanager.PlatformReference{
@@ -122,13 +125,13 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		// 	"\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+
 		// 		version.GetAppName()+" core install %[1]s:%[2]s\".", fqbn.Package, fqbn.PlatformArch)
 		// feedback.Error(errorMessage)
-		return nil, fmt.Errorf("platform not installed")
+		return nil, fmt.Errorf(tr("platform not installed"))
 	}
 
 	builderCtx := &types.Context{}
 	builderCtx.PackageManager = pm
 	builderCtx.FQBN = fqbn
-	builderCtx.SketchLocation = sketch.FullPath
+	builderCtx.SketchLocation = sk.FullPath
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.HardwareDirs = configuration.HardwareDirectories(configuration.Settings)
@@ -140,12 +143,12 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.LibraryDirs = paths.NewPathList(req.Library...)
 
 	if req.GetBuildPath() == "" {
-		builderCtx.BuildPath = bldr.GenBuildPath(sketch.FullPath)
+		builderCtx.BuildPath = sk.BuildPath
 	} else {
 		builderCtx.BuildPath = paths.New(req.GetBuildPath())
 	}
 	if err = builderCtx.BuildPath.MkdirAll(); err != nil {
-		return nil, fmt.Errorf("cannot create build directory: %s", err)
+		return nil, fmt.Errorf(tr("cannot create build directory: %s"), err)
 	}
 	builderCtx.CompilationDatabase = bldr.NewCompilationDatabase(
 		builderCtx.BuildPath.Join("compile_commands.json"),
@@ -175,7 +178,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		builderCtx.BuildCachePath = paths.New(req.GetBuildCachePath())
 		err = builderCtx.BuildCachePath.MkdirAll()
 		if err != nil {
-			return nil, fmt.Errorf("cannot create build cache directory: %s", err)
+			return nil, fmt.Errorf(tr("cannot create build cache directory: %s"), err)
 		}
 	}
 
@@ -203,7 +206,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	builderCtx.ExecStdout = outStream
 	builderCtx.ExecStderr = errStream
-	builderCtx.SetLogger(i18n.LoggerToCustomStreams{Stdout: outStream, Stderr: errStream})
+	builderCtx.SetLogger(legacyi18n.LoggerToCustomStreams{Stdout: outStream, Stderr: errStream})
 	builderCtx.Clean = req.GetClean()
 	builderCtx.OnlyUpdateCompilationDatabase = req.GetCreateCompilationDatabaseOnly()
 
@@ -243,21 +246,21 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		} else {
 			// Add FQBN (without configs part) to export path
 			fqbnSuffix := strings.Replace(fqbn.StringWithoutConfig(), ":", ".", -1)
-			exportPath = sketch.FullPath.Join("build", fqbnSuffix)
+			exportPath = sk.FullPath.Join("build", fqbnSuffix)
 		}
 		logrus.WithField("path", exportPath).Trace("Saving sketch to export path.")
 		if err := exportPath.MkdirAll(); err != nil {
-			return r, errors.Wrap(err, "creating output dir")
+			return r, errors.Wrap(err, tr("creating output dir"))
 		}
 
 		// Copy all "sketch.ino.*" artifacts to the export directory
 		baseName, ok := builderCtx.BuildProperties.GetOk("build.project_name") // == "sketch.ino"
 		if !ok {
-			return r, errors.New("missing 'build.project_name' build property")
+			return r, errors.New(tr("missing 'build.project_name' build property"))
 		}
 		buildFiles, err := builderCtx.BuildPath.ReadDir()
 		if err != nil {
-			return r, errors.Errorf("reading build directory: %s", err)
+			return r, errors.Errorf(tr("reading build directory: %s"), err)
 		}
 		buildFiles.FilterPrefix(baseName)
 		for _, buildFile := range buildFiles {
@@ -267,7 +270,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 				WithField("dest", exportedFile).
 				Trace("Copying artifact.")
 			if err = buildFile.CopyTo(exportedFile); err != nil {
-				return r, errors.Wrapf(err, "copying output file %s", buildFile)
+				return r, errors.Wrapf(err, tr("copying output file %s"), buildFile)
 			}
 		}
 	}
@@ -276,12 +279,12 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	for _, lib := range builderCtx.ImportedLibraries {
 		rpcLib, err := lib.ToRPCLibrary()
 		if err != nil {
-			return r, fmt.Errorf("converting library %s to rpc struct: %w", lib.Name, err)
+			return r, fmt.Errorf(tr("converting library %[1]s to rpc struct: %[2]w"), lib.Name, err)
 		}
 		importedLibs = append(importedLibs, rpcLib)
 	}
 
-	logrus.Tracef("Compile %s for %s successful", sketch.Name, fqbnIn)
+	logrus.Tracef("Compile %s for %s successful", sk.Name, fqbnIn)
 
 	return &rpc.CompileResponse{
 		UsedLibraries:          importedLibs,

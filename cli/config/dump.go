@@ -28,8 +28,8 @@ import (
 func initDumpCmd() *cobra.Command {
 	var dumpCmd = &cobra.Command{
 		Use:     "dump",
-		Short:   "Prints the current configuration",
-		Long:    "Prints the current configuration.",
+		Short:   tr("Prints the current configuration"),
+		Long:    tr("Prints the current configuration."),
 		Example: "  " + os.Args[0] + " config dump",
 		Args:    cobra.NoArgs,
 		Run:     runDumpCommand,
@@ -50,7 +50,7 @@ func (dr dumpResult) Data() interface{} {
 func (dr dumpResult) String() string {
 	bs, err := yaml.Marshal(dr.data)
 	if err != nil {
-		feedback.Errorf("unable to marshal config to YAML: %v", err)
+		feedback.Errorf(tr("unable to marshal config to YAML: %v"), err)
 		return ""
 	}
 

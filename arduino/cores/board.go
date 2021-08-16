@@ -24,9 +24,10 @@ import (
 
 // Board represents a board loaded from an installed platform
 type Board struct {
-	BoardID         string
-	Properties      *properties.Map  `json:"-"`
-	PlatformRelease *PlatformRelease `json:"-"`
+	BoardID                  string
+	Properties               *properties.Map  `json:"-"`
+	PlatformRelease          *PlatformRelease `json:"-"`
+	identificationProperties []*properties.Map
 }
 
 // HasUsbID returns true if the board match the usb vid and pid parameters
@@ -105,7 +106,7 @@ func (b *Board) GetBuildProperties(userConfigs *properties.Map) (*properties.Map
 		if haveUserValue {
 			userConfigs.Remove(option)
 			if !optionMenu.ContainsKey(userValue) {
-				return nil, fmt.Errorf("invalid value '%s' for option '%s'", userValue, option)
+				return nil, fmt.Errorf(tr("invalid value '%[1]s' for option '%[2]s'"), userValue, option)
 			}
 		} else {
 			// apply default
@@ -119,9 +120,9 @@ func (b *Board) GetBuildProperties(userConfigs *properties.Map) (*properties.Map
 	// Check for residual invalid options...
 	for _, invalidOption := range userConfigs.Keys() {
 		if invalidOption == "" {
-			return nil, fmt.Errorf("invalid empty option found")
+			return nil, fmt.Errorf(tr("invalid empty option found"))
 		}
-		return nil, fmt.Errorf("invalid option '%s'", invalidOption)
+		return nil, fmt.Errorf(tr("invalid option '%s'"), invalidOption)
 	}
 
 	return buildProperties, nil
@@ -135,19 +136,24 @@ func (b *Board) GetBuildProperties(userConfigs *properties.Map) (*properties.Map
 func (b *Board) GeneratePropertiesForConfiguration(config string) (*properties.Map, error) {
 	fqbn, err := ParseFQBN(b.String() + ":" + config)
 	if err != nil {
-		return nil, fmt.Errorf("parsing fqbn: %s", err)
+		return nil, fmt.Errorf(tr("parsing fqbn: %s"), err)
 	}
 	return b.GetBuildProperties(fqbn.Configs)
+}
+
+// GetIdentificationProperties calculates and returns a list of properties sets
+// containing the properties required to identify the board. The returned sets
+// must not be changed by the caller.
+func (b *Board) GetIdentificationProperties() []*properties.Map {
+	if b.identificationProperties == nil {
+		b.identificationProperties = b.Properties.ExtractSubIndexSets("upload_port")
+	}
+	return b.identificationProperties
 }
 
 // IsBoardMatchingIDProperties returns true if the board match the given
 // identification properties
 func (b *Board) IsBoardMatchingIDProperties(query *properties.Map) bool {
-	portIDPropsSet := b.Properties.SubTree("upload_port")
-	if portIDPropsSet.Size() == 0 {
-		return false
-	}
-
 	// check checks if the given set of properties p match the "query"
 	check := func(p *properties.Map) bool {
 		for k, v := range p.AsMap() {
@@ -159,26 +165,10 @@ func (b *Board) IsBoardMatchingIDProperties(query *properties.Map) bool {
 	}
 
 	// First check the identification properties with sub index "upload_port.N.xxx"
-	idx := 0
-	haveIndexedProperties := false
-	for {
-		idProps := portIDPropsSet.SubTree(fmt.Sprintf("%d", idx))
-		idx++
-		if idProps.Size() > 0 {
-			haveIndexedProperties = true
-			if check(idProps) {
-				return true
-			}
-		} else if idx > 1 {
-			// Always check sub-id 0 and 1 (https://github.com/arduino/arduino-cli/issues/456)
-			break
+	for _, idProps := range b.GetIdentificationProperties() {
+		if check(idProps) {
+			return true
 		}
 	}
-
-	// if there are no subindexed then check the whole "upload_port.xxx"
-	if !haveIndexedProperties {
-		return check(portIDPropsSet)
-	}
-
 	return false
 }

@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-win32-utils"
 	"github.com/sirupsen/logrus"
@@ -32,6 +33,8 @@ import (
 
 // Settings is a global instance of viper holding configurations for the CLI and the gRPC consumers
 var Settings *viper.Viper
+
+var tr = i18n.Tr
 
 // Init initialize defaults and read the configuration file.
 // Please note the logging system hasn't been configured yet,
@@ -63,7 +66,7 @@ func Init(configFile string) *viper.Viper {
 		// ConfigFileNotFoundError is acceptable, anything else
 		// should be reported to the user
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			feedback.Errorf("Error reading config file: %v", err)
+			feedback.Errorf(tr("Error reading config file: %v"), err)
 		}
 	}
 
@@ -82,7 +85,7 @@ func BindFlags(cmd *cobra.Command, settings *viper.Viper) {
 func getDefaultArduinoDataDir() string {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
-		feedback.Errorf("Unable to get user home dir: %v", err)
+		feedback.Errorf(tr("Unable to get user home dir: %v"), err)
 		return "."
 	}
 
@@ -94,7 +97,7 @@ func getDefaultArduinoDataDir() string {
 	case "windows":
 		localAppDataPath, err := win32.GetLocalAppDataFolder()
 		if err != nil {
-			feedback.Errorf("Unable to get Local App Data Folder: %v", err)
+			feedback.Errorf(tr("Unable to get Local App Data Folder: %v"), err)
 			return "."
 		}
 		return filepath.Join(localAppDataPath, "Arduino15")
@@ -107,7 +110,7 @@ func getDefaultArduinoDataDir() string {
 func getDefaultUserDir() string {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
-		feedback.Errorf("Unable to get user home dir: %v", err)
+		feedback.Errorf(tr("Unable to get user home dir: %v"), err)
 		return "."
 	}
 
@@ -119,7 +122,7 @@ func getDefaultUserDir() string {
 	case "windows":
 		documentsPath, err := win32.GetDocumentsFolder()
 		if err != nil {
-			feedback.Errorf("Unable to get Documents Folder: %v", err)
+			feedback.Errorf(tr("Unable to get Documents Folder: %v"), err)
 			return "."
 		}
 		return filepath.Join(documentsPath, "Arduino")
@@ -141,13 +144,13 @@ func IsBundledInDesktopIDE(settings *viper.Viper) bool {
 	logrus.Info("Checking if CLI is Bundled into the IDE")
 	executable, err := os.Executable()
 	if err != nil {
-		feedback.Errorf("Cannot get executable path: %v", err)
+		feedback.Errorf(tr("Cannot get executable path: %v"), err)
 		return false
 	}
 
 	executablePath, err := filepath.EvalSymlinks(executable)
 	if err != nil {
-		feedback.Errorf("Cannot get executable path: %v", err)
+		feedback.Errorf(tr("Cannot get executable path: %v"), err)
 		return false
 	}
 

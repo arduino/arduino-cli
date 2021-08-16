@@ -30,18 +30,18 @@ import (
 func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetailsResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New("invalid instance")
+		return nil, errors.New(tr("invalid instance"))
 	}
 
 	fqbn, err := cores.ParseFQBN(req.GetFqbn())
 	if err != nil {
-		return nil, fmt.Errorf("parsing fqbn: %s", err)
+		return nil, fmt.Errorf(tr("parsing fqbn: %s"), err)
 	}
 
 	boardPackage, boardPlatform, board, boardProperties, boardRefPlatform, err := pm.ResolveFQBN(fqbn)
 
 	if err != nil {
-		return nil, fmt.Errorf("loading board data: %s", err)
+		return nil, fmt.Errorf(tr("loading board data: %s"), err)
 	}
 
 	details := &rpc.BoardDetailsResponse{}
@@ -50,6 +50,12 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 	details.PropertiesId = board.BoardID
 	details.Official = fqbn.Package == "arduino"
 	details.Version = board.PlatformRelease.Version.String()
+	details.IdentificationProperties = []*rpc.BoardIdentificationProperties{}
+	for _, p := range board.GetIdentificationProperties() {
+		details.IdentificationProperties = append(details.IdentificationProperties, &rpc.BoardIdentificationProperties{
+			Properties: p.AsMap(),
+		})
+	}
 
 	details.DebuggingSupported = boardProperties.ContainsKey("debug.executable") ||
 		boardPlatform.Properties.ContainsKey("debug.executable") ||
@@ -78,16 +84,6 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 		details.Platform.ArchiveFilename = boardPlatform.Resource.ArchiveFileName
 		details.Platform.Checksum = boardPlatform.Resource.Checksum
 		details.Platform.Size = boardPlatform.Resource.Size
-	}
-
-	details.IdentificationPrefs = []*rpc.IdentificationPref{}
-	vids := board.Properties.SubTree("vid")
-	pids := board.Properties.SubTree("pid")
-	for id, vid := range vids.AsMap() {
-		if pid, ok := pids.GetOk(id); ok {
-			idPref := rpc.IdentificationPref{UsbId: &rpc.USBID{Vid: vid, Pid: pid}}
-			details.IdentificationPrefs = append(details.IdentificationPrefs, &idPref)
-		}
 	}
 
 	details.ConfigOptions = []*rpc.ConfigOption{}

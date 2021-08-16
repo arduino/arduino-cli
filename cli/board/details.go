@@ -38,7 +38,7 @@ var listProgrammers bool
 
 func initDetailsCommand() *cobra.Command {
 	var detailsCommand = &cobra.Command{
-		Use:     "details -b <FQBN>",
+		Use:     fmt.Sprintf("details -b <%s>", tr("FQBN")),
 		Short:   tr("Print details about a board."),
 		Long:    tr("Show information about a board, in particular if the board has options to be specified in the FQBN."),
 		Example: "  " + os.Args[0] + " board details -b arduino:avr:nano",
@@ -47,7 +47,7 @@ func initDetailsCommand() *cobra.Command {
 	}
 
 	detailsCommand.Flags().BoolVarP(&showFullDetails, "full", "f", false, tr("Show full board details"))
-	detailsCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", "Fully Qualified Board Name, e.g.: arduino:avr:uno")
+	detailsCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
 	detailsCommand.Flags().BoolVarP(&listProgrammers, "list-programmers", "", false, tr("Show list of available programmers"))
 	// detailsCommand.MarkFlagRequired("fqbn") // enable once `board details <fqbn>` is removed
 
@@ -118,7 +118,7 @@ func (dr detailsResult) String() string {
 
 	t.SetColumnWidthMode(1, table.Average)
 	t.AddRow(tr("Board name:"), details.Name)
-	t.AddRow("FQBN:", details.Fqbn)
+	t.AddRow(tr("FQBN:"), details.Fqbn)
 	addIfNotEmpty(tr("Board version:"), details.Version)
 	if details.GetDebuggingSupported() {
 		t.AddRow(tr("Debugging supported:"), table.NewCell("✔", color.New(color.FgGreen)))
@@ -130,13 +130,13 @@ func (dr detailsResult) String() string {
 			table.NewCell("✔", color.New(color.FgGreen)))
 	}
 
-	for i, idp := range details.IdentificationPrefs {
-		if i == 0 {
-			t.AddRow() // get some space from above
-			t.AddRow(tr("Identification properties:"), "VID:"+idp.UsbId.Vid+" PID:"+idp.UsbId.Pid)
-			continue
+	for _, idp := range details.GetIdentificationProperties() {
+		t.AddRow() // get some space from above
+		header := tr("Identification properties:")
+		for k, v := range idp.GetProperties() {
+			t.AddRow(header, k+"="+v)
+			header = ""
 		}
-		t.AddRow("", "VID:"+idp.UsbId.Vid+" PID:"+idp.UsbId.Pid)
 	}
 
 	t.AddRow() // get some space from above
@@ -159,14 +159,14 @@ func (dr detailsResult) String() string {
 
 	t.AddRow() // get some space from above
 	for _, tool := range details.ToolsDependencies {
-		t.AddRow(tr("Required tool:"), tool.Packager+":"+tool.Name, "", tool.Version)
+		t.AddRow(tr("Required tool:"), tool.Packager+":"+tool.Name, tool.Version)
 		if showFullDetails {
 			for _, sys := range tool.Systems {
-				t.AddRow("", tr("OS:"), "", sys.Host)
-				t.AddRow("", tr("File:"), "", sys.ArchiveFilename)
-				t.AddRow("", tr("Size (bytes):"), "", fmt.Sprint(sys.Size))
-				t.AddRow("", tr("Checksum:"), "", sys.Checksum)
-				t.AddRow("", "URL:", "", sys.Url)
+				t.AddRow("", tr("OS:"), sys.Host)
+				t.AddRow("", tr("File:"), sys.ArchiveFilename)
+				t.AddRow("", tr("Size (bytes):"), fmt.Sprint(sys.Size))
+				t.AddRow("", tr("Checksum:"), sys.Checksum)
+				t.AddRow("", tr("URL:"), sys.Url)
 				t.AddRow() // get some space from above
 			}
 		}

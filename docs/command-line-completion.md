@@ -29,8 +29,8 @@ a directory listed in your `fpath` if you have already created a directory to st
 Or if you want you can create a directory, add it to your `fpath` and copy the file in it:
 
 1. `mkdir ~/completion_zsh`
-2. add `fpath=($HOME/completion_zsh $fpath)` at the beginning of your `~/.zshrc` file
-3. `mv _arduino-cli ~/completion_zsh/`
+1. add `fpath=($HOME/completion_zsh $fpath)` at the beginning of your `~/.zshrc` file
+1. `mv _arduino-cli ~/completion_zsh/`
 
 Remember to open a new shell to test the functionality.
 

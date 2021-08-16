@@ -46,7 +46,7 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 		buildProperties.SetPath("build.path", ctx.BuildPath)
 	}
 	if ctx.Sketch != nil {
-		buildProperties.Set("build.project_name", ctx.Sketch.MainFile.Name.Base())
+		buildProperties.Set("build.project_name", ctx.Sketch.MainFile.Base())
 	}
 	buildProperties.Set("build.arch", strings.ToUpper(targetPlatform.Platform.Architecture))
 

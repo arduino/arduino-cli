@@ -42,7 +42,7 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 
 	buildPath := ctx.BuildPath
 	sketch := ctx.Sketch
-	sketchFileName := sketch.MainFile.Name.Base()
+	sketchFileName := sketch.MainFile.Base()
 
 	sketchInBuildPath := buildPath.Join(sketchFileName + ".hex")
 	sketchInSubfolder := buildPath.Join(constants.FOLDER_SKETCH, sketchFileName+".hex")

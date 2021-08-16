@@ -22,7 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/sketches"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
 	"github.com/arduino/go-paths-helper"
@@ -44,31 +44,31 @@ func getDebugProperties(req *debug.DebugConfigRequest, pm *packagemanager.Packag
 	// TODO: make a generic function to extract sketch from request
 	// and remove duplication in commands/compile.go
 	if req.GetSketchPath() == "" {
-		return nil, fmt.Errorf("missing sketchPath")
+		return nil, fmt.Errorf(tr("missing sketchPath"))
 	}
 	sketchPath := paths.New(req.GetSketchPath())
-	sketch, err := sketches.NewSketchFromPath(sketchPath)
+	sk, err := sketch.New(sketchPath)
 	if err != nil {
-		return nil, errors.Wrap(err, "opening sketch")
+		return nil, errors.Wrap(err, tr("opening sketch"))
 	}
 
 	// XXX Remove this code duplication!!
 	fqbnIn := req.GetFqbn()
-	if fqbnIn == "" && sketch != nil && sketch.Metadata != nil {
-		fqbnIn = sketch.Metadata.CPU.Fqbn
+	if fqbnIn == "" && sk != nil && sk.Metadata != nil {
+		fqbnIn = sk.Metadata.CPU.Fqbn
 	}
 	if fqbnIn == "" {
-		return nil, fmt.Errorf("no Fully Qualified Board Name provided")
+		return nil, fmt.Errorf(tr("no Fully Qualified Board Name provided"))
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, errors.Wrap(err, "error parsing FQBN")
+		return nil, errors.Wrap(err, tr("error parsing FQBN"))
 	}
 
 	// Find target board and board properties
 	_, platformRelease, board, boardProperties, referencedPlatformRelease, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
-		return nil, errors.Wrap(err, "error resolving FQBN")
+		return nil, errors.Wrap(err, tr("error resolving FQBN"))
 	}
 
 	// Build configuration for debug
@@ -111,28 +111,22 @@ func getDebugProperties(req *debug.DebugConfigRequest, pm *packagemanager.Packag
 		} else if refP, ok := referencedPlatformRelease.Programmers[req.GetProgrammer()]; ok {
 			toolProperties.Merge(refP.Properties)
 		} else {
-			return nil, fmt.Errorf("programmer '%s' not found", req.GetProgrammer())
+			return nil, fmt.Errorf(tr("programmer '%s' not found"), req.GetProgrammer())
 		}
 	}
 
-	var importPath *paths.Path
+	importPath := sk.BuildPath
 	if importDir := req.GetImportDir(); importDir != "" {
 		importPath = paths.New(importDir)
-	} else {
-		// TODO: Create a function to obtain importPath from sketch
-		importPath, err = sketch.BuildPath()
-		if err != nil {
-			return nil, fmt.Errorf("can't find build path for sketch: %v", err)
-		}
 	}
 	if !importPath.Exist() {
-		return nil, fmt.Errorf("compiled sketch not found in %s", importPath)
+		return nil, fmt.Errorf(tr("compiled sketch not found in %s"), importPath)
 	}
 	if !importPath.IsDir() {
-		return nil, fmt.Errorf("expected compiled sketch in directory %s, but is a file instead", importPath)
+		return nil, fmt.Errorf(tr("expected compiled sketch in directory %s, but is a file instead"), importPath)
 	}
 	toolProperties.SetPath("build.path", importPath)
-	toolProperties.Set("build.project_name", sketch.Name+".ino")
+	toolProperties.Set("build.project_name", sk.Name+".ino")
 
 	// Set debug port property
 	port := req.GetPort()
@@ -152,7 +146,7 @@ func getDebugProperties(req *debug.DebugConfigRequest, pm *packagemanager.Packag
 	}
 
 	if !debugProperties.ContainsKey("executable") {
-		return nil, status.Error(codes.Unimplemented, fmt.Sprintf("debugging not supported for board %s", req.GetFqbn()))
+		return nil, status.Error(codes.Unimplemented, fmt.Sprintf(tr("debugging not supported for board %s"), req.GetFqbn()))
 	}
 
 	server := debugProperties.Get("server")

@@ -109,13 +109,13 @@ task check
 To run unit tests:
 
 ```shell
-task test-unit
+task go:test
 ```
 
 To run integration tests (these will take some time and require special setup, see following paragraph):
 
 ```shell
-task test-integration
+task go:test-integration
 ```
 
 #### Running only some tests
@@ -123,15 +123,21 @@ task test-integration
 By default, all tests from all go packages are run. To run only unit tests from one or more specific packages, you can
 set the TARGETS environment variable, e.g.:
 
-    TARGETS=./arduino/cores/packagemanager task test-unit
+```
+TARGETS=./arduino/cores/packagemanager task go:test
+```
 
 Alternatively, to run only some specific test(s), you can specify a regex to match against the test function name:
 
-    TEST_REGEX='^TestTryBuild.*' task test-unit
+```
+TEST_REGEX='^TestTryBuild.*' task go:test
+```
 
 Both can be combined as well, typically to run only a specific test:
 
-    TEST_REGEX='^TestFindBoardWithFQBN$' TARGETS=./arduino/cores/packagemanager task test-unit
+```
+TEST_REGEX='^TestFindBoardWithFQBN$' TARGETS=./arduino/cores/packagemanager task go:test
+```
 
 ### Integration tests
 
@@ -175,7 +181,7 @@ For more installation options read the [official documentation][poetry-docs].
 After the software requirements have been installed you should be able to run the tests with:
 
 ```shell
-task test-integration
+task go:test-integration
 ```
 
 This will automatically install the necessary dependencies, if not already installed, and run the integration tests
@@ -206,7 +212,7 @@ pytest test_lib.py::test_list
 When editing any Python file in the project remember to run linting checks with:
 
 ```shell
-task python:check
+task python:lint
 ```
 
 This will run `flake8` automatically and return any error in the code formatting, if not already installed it will also
@@ -230,16 +236,10 @@ extension][prettier-vscode-extension] to automatically format as you write.
 Otherwise you can use the following tasks. To do so you'll need to install `npm` if not already installed. Check the
 [official documentation][npm-install-docs] to learn how to install `npm` for your platform.
 
-To check if the files are correctly formatted run:
+Ensure the formatting is compliant by running the command:
 
 ```shell
-task config:check
-```
-
-If the output tells you that some files are not formatted correctly run:
-
-```shell
-task config:format
+task general:format-prettier
 ```
 
 When opening a new Pull Request, checks are automatically run to verify that configuration files are correctly
@@ -268,14 +268,14 @@ Before running the toolchain, perform the following operations from the root of 
 virtual environment, activate it before proceeding):
 
 - go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc
-- pip install -r requirements_docs.txt
+- poetry install
 
 When working on docs, you can launch a command that will take care of generating the docs, build the static website and
 start a local server you can later access with a web browser to see a preview of your changes. From the root of the git
 repository run:
 
 ```shell
-task docs:serve
+task website:serve
 ```
 
 If you don't see any error, hit http://127.0.0.1:8000 with your browser to navigate the generated docs.
@@ -286,35 +286,6 @@ The present git repository has a special branch called `gh-pages` that contains 
 website; every time a change is pushed to this special branch, GitHub automatically triggers a deployment to pull the
 change and publish a new version of the website. Do not open Pull Requests to push changes to the `gh-pages` branch,
 that will be done exclusively from the CI.
-
-#### Docs versioning
-
-In order to provide support for multiple Arduino CLI releases, Documentation is versioned so that visitors can select
-which version of the documentation website should be displayed. Unfortunately this feature isn't provided by GitHub
-pages or MkDocs, so we had to implement it on top of the generation process.
-
-Before delving into the details of the generation process, here follow some requirements that were established to
-provide versioned documentation:
-
-- A special version of the documentation called `dev` is provided to reflect the status of the Arduino CLI on the
-  `master` branch - this includes unreleased features and bugfixes.
-- Docs are versioned after the minor version of an Arduino CLI release. For example, Arduino CLI `0.99.1` and `0.99.2`
-  will be both covered by documentation version `0.99`.
-- The landing page of the documentation website will automatically redirect visitors to the most recently released
-  version of the Arduino CLI.
-
-To implement the requirements above, the execution of MkDocs is wrapped using a CLI tool called [Mike][10] that does a
-few things for us:
-
-- It runs MkDocs targeting subfolders named after the Arduino CLI version, e.g. documentation for version `0.10.1` can
-  be found under the folder `0.10`.
-- It injects an HTML control into the documentation website that lets visitors choose which version of the docs to
-  browse from a dropdown list.
-- It provides a redirect to a version we decide when visitors hit the landing page of the documentation website.
-- It pushes generated contents to the `gh-pages` branch.
-
-> **Note:** unless you're working on the generation process itself, you should never run Mike from a local environment,
-> either directly or through the Task `docs:publish`. This might result in unwanted changes to the public website.
 
 #### Docs formatting
 
@@ -328,16 +299,10 @@ extension][prettier-vscode-extension] to automatically format as you write.
 Otherwise you can use the following tasks. To do so you'll need to install `npm` if not already installed. Check the
 [official documentation][npm-install-docs] to learn how to install `npm` for your platform.
 
-To check if the files are correctly formatted run:
+Ensure the formatting is compliant by running the command:
 
 ```shell
-task docs:check
-```
-
-If the output tells you that some files are not formatted correctly run:
-
-```shell
-task docs:format
+task general:format-prettier
 ```
 
 When opening a new Pull Request, checks are automatically run to verify that documentation is correctly formatted. In
@@ -346,13 +311,10 @@ case of failures we might ask you to update the PR with correct formatting.
 #### Docs automation
 
 In order to avoid unwanted changes to the public website hosting the Arduino CLI documentation, only Mike is allowed to
-push changes to the `gh-pages` branch, and this only happens from within the CI, in a workflow named [publish-docs][11].
+push changes to the `gh-pages` branch, and this only happens from within the CI, in a workflow named [Deploy
+Website][11].
 
-The CI is responsible for guessing which version of the Arduino CLI we're building docs for, so that generated content
-will be stored in the appropriate section of the documentation website. Because this guessing might be fairly complex,
-the logic is implemented in a Python script called [`build.py`][12]. The script will determine the version of the
-Arduino CLI that was modified in the current commit (either `dev` or an official, numbered release) and whether the
-redirect to the latest version that happens on the landing page should be updated or not.
+Details on the documentation publishing system are available [here][12].
 
 ### Internationalization (i18n)
 
@@ -410,8 +372,9 @@ If your PR doesn't need to be included in the changelog, please start the commit
 [7]: https://pages.github.com/
 [9]: https://www.mkdocs.org/
 [10]: https://github.com/jimporter/mike
-[11]: https://github.com/arduino/arduino-cli/blob/master/.github/workflows/publish-docs.yaml
-[12]: https://github.com/arduino/arduino-cli/blob/master/docs/build.py
+[11]: https://github.com/arduino/arduino-cli/blob/master/.github/workflows/deploy-cobra-mkdocs-versioned-poetry.yml
+[12]:
+  https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/deploy-cobra-mkdocs-versioned-poetry.md
 [forum]: https://forum.arduino.cc/index.php?board=145.0
 [issues]: #issue-reports
 [nightly]: https://arduino.github.io/arduino-cli/latest/installation/#nightly-builds

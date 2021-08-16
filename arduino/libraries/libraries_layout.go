@@ -50,7 +50,7 @@ func (d *LibraryLayout) MarshalJSON() ([]byte, error) {
 	case RecursiveLayout:
 		return json.Marshal("recursive")
 	}
-	return nil, fmt.Errorf("invalid library layout value: %d", *d)
+	return nil, fmt.Errorf(tr("invalid library layout value: %d"), *d)
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface
@@ -65,7 +65,7 @@ func (d *LibraryLayout) UnmarshalJSON(b []byte) error {
 	case "recursive":
 		*d = RecursiveLayout
 	}
-	return fmt.Errorf("invalid library layout: %s", s)
+	return fmt.Errorf(tr("invalid library layout: %s"), s)
 }
 
 // ToRPCLibraryLayout converts this LibraryLayout to rpc.LibraryLayout

@@ -4,77 +4,157 @@ includes:
   dist: ./DistTasks.yml
 
 tasks:
-  docs:gen:commands:
-    desc: Generate command reference files
+  docs:generate:
+    desc: Create all generated documentation content
+    deps:
+      - task: go:cli-docs
+      - task: protoc:docs
+    cmds:
+      - task: general:format-prettier
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-prettier-formatting-task/Taskfile.yml
+  general:format-prettier:
+    desc: Format all supported files with Prettier
+    cmds:
+      - npx prettier --write .
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/go-task/Taskfile.yml
+  go:build:
+    desc: Build the Go code
+    dir: '{{default "./" .GO_MODULE_PATH}}'
+    cmds:
+      - go build -v {{.LDFLAGS}}
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/deploy-cobra-mkdocs-versioned-poetry/Taskfile.yml
+  go:cli-docs:
+    desc: Generate command line interface reference documentation
     dir: ./docsgen
     cmds:
-      # docs will generate examples using os.Args[0] so we need to call
-      # the generator `arduino-cli`
-      - go build -o arduino-cli
-      # we invoke `arduino-cli` like this instead of `./arduino-cli` to remove
-      # the `./` chars from the examples
-      - PATH=. arduino-cli ../docs/commands
-      - task: docs:format
+      # Command examples use os.Args[0] so the docs generation binary must have the same filename as the project
+      - go build -o {{.PROJECT_NAME}}{{exeExt}}
+      # The binary is invoked like this instead of `./{{.PROJECT_NAME}}` to remove the `./` chars from the examples
+      - PATH=. {{.PROJECT_NAME}} ../docs/commands
 
-  docs:gen:protobuf:
-    desc: Generate markdown contents for protobuffers
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
+  go:fix:
+    desc: Modernize usages of outdated APIs
+    dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
-      - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,commands.md --proto_path=rpc ./rpc/cc/arduino/cli/commands/v1/*.proto'
-      - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,monitor.md --proto_path=rpc ./rpc/cc/arduino/cli/monitor/v1/*.proto'
-      - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,settings.md --proto_path=rpc ./rpc/cc/arduino/cli/settings/v1/*.proto'
-      - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,debug.md --proto_path=rpc ./rpc/cc/arduino/cli/debug/v1/*.proto'
-      - task: docs:format
+      - go fix {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}}
 
-  docs:gen:
-    desc: Generate documentation files
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
+  go:format:
+    desc: Format Go code
+    dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
-      - task: docs:gen:commands
-      - task: docs:gen:protobuf
+      - go fmt {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}}
 
-  docs:build:
-    desc: Build documentation website contents
-    deps:
-      - docs:gen:commands
-      - docs:gen:protobuf
-    cmds:
-      - mkdocs build -s
-
-  docs:publish:
-    desc: Use Mike to build and push versioned docs
-    deps:
-      - docs:gen:commands
-      - docs:gen:protobuf
-    cmds:
-      - mike deploy -u -p -r {{.DOCS_REMOTE}} {{.DOCS_VERSION}} {{.DOCS_ALIAS}}
-
-  docs:serve:
-    desc: Run documentation website locally
-    deps:
-      - docs:build
-    cmds:
-      - mkdocs serve
-
-  docs:check:
-    desc: Run documentation linting
-    cmds:
-      - npx {{ .PRETTIER }} --check "**/*.md"
-
-  docs:check-links:
-    desc: Verifies there are no dead links in documentation
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
+  go:lint:
+    desc: Lint Go code
+    dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
       - |
-        npx -p markdown-link-check -c '
-        STATUS=0
-        for file in $(find docs -name "*.md") README.md test/README.md client_example/README.md; do
-          markdown-link-check -c markdown-link-check-config.json -q "$file"
-          STATUS=$(( $STATUS + $? ))
-        done
-        exit $STATUS'
+        if ! which golint &>/dev/null; then
+          echo "golint not installed or not in PATH. Please install: https://github.com/golang/lint#installation"
+          exit 1
+        fi
+      - |
+        golint \
+          {{default "-min_confidence 0.8 -set_exit_status" .GO_LINT_FLAGS}} \
+          {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}}
 
-  docs:format:
-    desc: Automatically formats documentation
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/test-go-task/Taskfile.yml
+  go:test:
+    desc: Run unit tests
+    dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
-      - npx {{ .PRETTIER }} --write "**/*.md"
+      - |
+        go test \
+          -v \
+          -short \
+          -run '{{default ".*" .GO_TEST_REGEX}}' \
+          {{default "-timeout 10m -coverpkg=./... -covermode=atomic" .GO_TEST_FLAGS}} \
+          -coverprofile=coverage_unit.txt \
+          {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}} \
+          {{.TEST_LDFLAGS}}
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/test-go-integration-task/Taskfile.yml
+  go:test-integration:
+    desc: Run integration tests
+    deps:
+      - task: go:build
+      - task: poetry:install-deps
+    cmds:
+      - poetry run pytest test
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
+  go:vet:
+    desc: Check for errors in Go code
+    dir: '{{default "./" .GO_MODULE_PATH}}'
+    cmds:
+      - go vet {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}}
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-markdown-task/Taskfile.yml
+  markdown:check-links:
+    desc: Check for broken links
+    deps:
+      - task: docs:generate
+    cmds:
+      - |
+        if [[ "{{.OS}}" == "Windows_NT" ]]; then
+          # npx --call uses the native shell, which makes it too difficult to use npx for this application on Windows,
+          # so the Windows user is required to have markdown-link-check installed and in PATH.
+          if ! which markdown-link-check &>/dev/null; then
+            echo "markdown-link-check not found or not in PATH. Please install: https://github.com/tcort/markdown-link-check#readme"
+            exit 1
+          fi
+          # Default behavior of the task on Windows is to exit the task when the first broken link causes a non-zero
+          # exit status, but it's better to check all links before exiting.
+          set +o errexit
+          STATUS=0
+          # Using -regex instead of -name to avoid Task's behavior of globbing even when quoted on Windows
+          # The odd method for escaping . in the regex is required for windows compatibility because mvdan.cc/sh gives
+          # \ characters special treatment on Windows in an attempt to support them as path separators.
+          for file in $(find . -regex ".*[.]md"); do
+            markdown-link-check \
+              --quiet \
+              --config "./.markdown-link-check.json" \
+              "$file"
+            STATUS=$(( $STATUS + $? ))
+          done
+          exit $STATUS
+        else
+          npx --package=markdown-link-check --call='
+            STATUS=0
+            for file in $(find . -regex ".*[.]md"); do
+              markdown-link-check \
+                --quiet \
+                --config "./.markdown-link-check.json" \
+                "$file"
+              STATUS=$(( $STATUS + $? ))
+            done
+            exit $STATUS
+          '
+        fi
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-markdown-task/Taskfile.yml
+  markdown:fix:
+    desc: Automatically correct linting violations in Markdown files where possible
+    cmds:
+      - npx markdownlint-cli --fix "**/*.md"
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-markdown-task/Taskfile.yml
+  markdown:lint:
+    desc: Check for problems in Markdown files
+    cmds:
+      - npx markdownlint-cli "**/*.md"
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/poetry-task/Taskfile.yml
+  poetry:install-deps:
+    desc: Install dependencies managed by Poetry
+    cmds:
+      - poetry install --no-root
 
   protoc:
     desc: Lint, format and compile protobuf definitions
@@ -109,27 +189,32 @@ tasks:
     cmds:
       - clang-format -i rpc/cc/arduino/cli/*/*/*.proto
 
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-python-task/Taskfile.yml
+  python:format:
+    desc: Format Python files
+    deps:
+      - task: poetry:install-deps
+    cmds:
+      - poetry run black .
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-python-task/Taskfile.yml
+  python:lint:
+    desc: Lint Python code
+    deps:
+      - task: poetry:install-deps
+    cmds:
+      - poetry run flake8 --show-source
+
   build:
     desc: Build the project
-    cmds:
-      - go build -v {{.LDFLAGS}}
+    deps:
+      - task: go:build
 
   test:
     desc: Run the full testsuite, `legacy` will be skipped
     cmds:
-      - task: test-unit
-      - task: test-integration
-
-  test-unit:
-    desc: Run unit tests only
-    cmds:
-      - go test -short -run '{{ default ".*" .TEST_REGEX }}' {{ default "-v" .GOFLAGS }} -coverprofile=coverage_unit.txt {{ default .DEFAULT_TARGETS .TARGETS }} {{.TEST_LDFLAGS}}
-
-  test-integration:
-    desc: Run integration tests only
-    cmds:
-      - poetry install --no-root
-      - poetry run pytest test
+      - task: go:test
+      - task: go:test-integration
 
   test-legacy:
     desc: Run tests for the `legacy` package
@@ -139,41 +224,16 @@ tasks:
   test-unit-race:
     desc: Run unit tests only with race condition detection
     cmds:
-      - go test -short -race {{ default "-v" .GOFLAGS }} -coverprofile=coverage_race_unit.txt {{ default .DEFAULT_TARGETS .TARGETS }}
+      - go test -short -race {{ default "-v" .GOFLAGS }} -coverprofile=coverage_race_unit.txt {{ default .DEFAULT_GO_PACKAGES .TARGETS }}
 
   check:
     desc: Check fmt and lint, `legacy` will be skipped
     cmds:
-      - test -z $(go fmt {{ default .DEFAULT_TARGETS .TARGETS }})
-      - go vet {{ default .DEFAULT_TARGETS .TARGETS }}
-      - "'{{.GOLINTBIN}}' {{.GOLINTFLAGS}} {{ default .DEFAULT_TARGETS .TARGETS }}"
+      - task: go:vet
+      - task: go:lint
       - task: i18n:check
       - task: python:check
-      - task: docs:check
-      - task: config:check
       - task: protoc:check
-
-  config:check:
-    desc: Check linting of configuration and supporting files
-    cmds:
-      - npx {{ .PRETTIER }} --check "**/*.{yml,yaml}"
-
-  config:format:
-    desc: Automatically formats configuration and supporting files
-    cmds:
-      - npx {{ .PRETTIER }} --write "**/*.{yml,yaml}"
-
-  python:check:
-    desc: Linting for Python files
-    cmds:
-      - poetry install --no-root
-      - poetry run flake8
-
-  python:format:
-    desc: Automatically formats Python files
-    cmds:
-      - poetry install --no-root
-      - poetry run black .
 
   check-legacy:
     desc: Check fmt and lint for the `legacy` package
@@ -214,14 +274,33 @@ tasks:
     desc: Generate embedded i18n catalog files
     cmds:
       - git add -N ./i18n/data
-      - git diff --exit-code ./i18n/data &> /dev/null || (cd ./i18n && rice embed-go)
+      - git diff --exit-code ./i18n/data &> /dev/null || { cd ./i18n && rice embed-go; }
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-mkdocs-task/Taskfile.yml
+  website:check:
+    desc: Check whether the MkDocs-based website will build
+    deps:
+      - task: docs:generate
+      - task: poetry:install-deps
+    cmds:
+      - poetry run mkdocs build --strict
+
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-mkdocs-task/Taskfile.yml
+  website:serve:
+    desc: Run website locally
+    deps:
+      - task: docs:generate
+      - task: poetry:install-deps
+    cmds:
+      - poetry run mkdocs serve
 
 vars:
   PROJECT_NAME: "arduino-cli"
   DIST_DIR: "dist"
   # all modules of this project except for "legacy/..." module
-  DEFAULT_TARGETS:
-    sh: echo `go list ./... | grep -v legacy | tr '\n' ' '`
+  DEFAULT_GO_PACKAGES:
+    sh: |
+      echo $(cd {{default "./" .GO_MODULE_PATH}} && go list ./... | grep -v legacy | tr '\n' ' ' || echo '"ERROR: Unable to discover Go packages"')
   # build vars
   COMMIT:
     sh: echo "$(git log --no-show-signature -n 1 --format=%h)"
@@ -230,32 +309,24 @@ vars:
   TIMESTAMP_SHORT:
     sh: echo "{{now | date "20060102"}}"
   TAG:
-    sh: echo "`git tag --points-at=HEAD 2> /dev/null | head -n1`"
-  VERSION: "{{ if .NIGHTLY }}nightly-{{ .TIMESTAMP_SHORT }}{{ else if .TAG }}{{ .TAG }}{{ else }}{{ .PACKAGE_NAME_PREFIX }}git-snapshot{{ end }}"
-  LDFLAGS: >
+    sh: echo "$(git tag --points-at=HEAD 2> /dev/null | head -n1)"
+  VERSION: "{{if .NIGHTLY}}nightly-{{.TIMESTAMP_SHORT}}{{else if .TAG}}{{.TAG}}{{else}}{{.PACKAGE_NAME_PREFIX}}git-snapshot{{end}}"
+  CONFIGURATION_PACKAGE: "github.com/arduino/arduino-cli/version"
+  LDFLAGS: >-
     -ldflags
     '
-    -X github.com/arduino/arduino-cli/version.versionString={{.VERSION}}
-    -X github.com/arduino/arduino-cli/version.commit={{ .COMMIT }}
-    -X github.com/arduino/arduino-cli/version.date={{.TIMESTAMP}}
+    -X {{.CONFIGURATION_PACKAGE}}.versionString={{.VERSION}}
+    -X {{.CONFIGURATION_PACKAGE}}.commit={{.COMMIT}}
+    -X {{.CONFIGURATION_PACKAGE}}.date={{.TIMESTAMP}}
     '
   # test vars
   GOFLAGS: "-timeout 10m -v -coverpkg=./... -covermode=atomic"
   TEST_VERSION: "0.0.0-test.preview"
   TEST_COMMIT: "deadbeef"
-  TEST_LDFLAGS: >
+  TEST_LDFLAGS: >-
     -ldflags
     '
-    -X github.com/arduino/arduino-cli/version.versionString={{.TEST_VERSION}}
-    -X github.com/arduino/arduino-cli/version.commit={{.TEST_COMMIT}}
-    -X github.com/arduino/arduino-cli/version.date={{.TIMESTAMP}}
+    -X {{.CONFIGURATION_PACKAGE}}.versionString={{.TEST_VERSION}}
+    -X {{.CONFIGURATION_PACKAGE}}.commit={{.TEST_COMMIT}}
+    -X {{.CONFIGURATION_PACKAGE}}.date={{.TIMESTAMP}}
     '
-  # check-lint vars
-  GOLINTBIN:
-    sh: go list -f {{"{{"}}".Target{{"}}"}}" golang.org/x/lint/golint
-  GOLINTFLAGS: "-min_confidence 0.8 -set_exit_status"
-  # docs versioning
-  DOCS_VERSION: dev
-  DOCS_ALIAS: ""
-  DOCS_REMOTE: "origin"
-  PRETTIER: prettier@2.0.5

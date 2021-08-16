@@ -17,6 +17,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -32,12 +33,12 @@ import (
 
 func initDownloadCommand() *cobra.Command {
 	downloadCommand := &cobra.Command{
-		Use:   "download [PACKAGER:ARCH[@VERSION]](S)",
-		Short: "Downloads one or more cores and corresponding tool dependencies.",
-		Long:  "Downloads one or more cores and corresponding tool dependencies.",
+		Use:   fmt.Sprintf(tr("download [%s:%s[@%s]]..."), tr("PACKAGER"), tr("ARCH"), tr("VERSION")),
+		Short: tr("Downloads one or more cores and corresponding tool dependencies."),
+		Long:  tr("Downloads one or more cores and corresponding tool dependencies."),
 		Example: "" +
-			"  " + os.Args[0] + " core download arduino:samd       # to download the latest version of Arduino SAMD core.\n" +
-			"  " + os.Args[0] + " core download arduino:samd@1.6.9 # for a specific version (in this case 1.6.9).",
+			"  " + os.Args[0] + " core download arduino:samd       # " + tr("to download the latest version of Arduino SAMD core.\n") +
+			"  " + os.Args[0] + " core download arduino:samd@1.6.9 # " + tr("for a specific version (in this case 1.6.9)."),
 		Args: cobra.MinimumNArgs(1),
 		Run:  runDownloadCommand,
 	}
@@ -51,7 +52,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 
 	platformsRefs, err := globals.ParseReferenceArgs(args, true)
 	if err != nil {
-		feedback.Errorf("Invalid argument passed: %v", err)
+		feedback.Errorf(tr("Invalid argument passed: %v"), err)
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
@@ -64,7 +65,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 		}
 		_, err := core.PlatformDownload(context.Background(), platformDownloadreq, output.ProgressBar())
 		if err != nil {
-			feedback.Errorf("Error downloading %s: %v", args[i], err)
+			feedback.Errorf(tr("Error downloading %[1]s: %[2]v"), args[i], err)
 			os.Exit(errorcodes.ErrNetwork)
 		}
 	}

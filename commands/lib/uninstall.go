@@ -34,9 +34,9 @@ func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, tas
 	lib := lm.FindByReference(ref)
 
 	if lib == nil {
-		taskCB(&rpc.TaskProgress{Message: fmt.Sprintf("Library %s is not installed", req.Name), Completed: true})
+		taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("Library %s is not installed"), req.Name), Completed: true})
 	} else {
-		taskCB(&rpc.TaskProgress{Name: "Uninstalling " + lib.String()})
+		taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Uninstalling %s"), lib)})
 		lm.Uninstall(lib)
 		taskCB(&rpc.TaskProgress{Completed: true})
 	}

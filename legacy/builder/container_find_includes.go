@@ -120,7 +120,7 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 	}
 
 	sketch := ctx.Sketch
-	mergedfile, err := types.MakeSourceFile(ctx, sketch, paths.New(sketch.MainFile.Name.Base()+".cpp"))
+	mergedfile, err := types.MakeSourceFile(ctx, sketch, paths.New(sketch.MainFile.Base()+".cpp"))
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -375,7 +375,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 					// gcc does not reproduce that, there is something wrong.
 					// Returning an error here will cause the cache to be
 					// deleted, so hopefully the next compilation will succeed.
-					return errors.New("Internal error in cache")
+					return errors.New(tr("Internal error in cache"))
 				}
 			}
 			os.Stderr.Write(preproc_stderr)

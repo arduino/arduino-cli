@@ -19,11 +19,11 @@
           "checksum": "SHA-256:9c0585d97ff9ab4ee38a2d648d613559d241a14f9fbba5306c8c6a5857fa79b7",
           "size": "6522",
           "boards": [
-            {"name": "Akafugu Breadboard Adapter (Internal 8MHz Clock)"},
-            {"name": "Akafugu Breadboard Adapter (External 16MHz Clock)"},
-            {"name": "Akafuino L"},
-            {"name": "Akafugu SimpleClock"},
-            {"name": "Akafugu Nixie Clock"}
+            { "name": "Akafugu Breadboard Adapter (Internal 8MHz Clock)" },
+            { "name": "Akafugu Breadboard Adapter (External 16MHz Clock)" },
+            { "name": "Akafuino L" },
+            { "name": "Akafugu SimpleClock" },
+            { "name": "Akafugu Nixie Clock" }
           ]
         }
       ],

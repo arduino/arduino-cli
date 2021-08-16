@@ -18,12 +18,10 @@
             "online": "http://docs.intorobot.com"
           },
           "url": "https://github.com/IntoRobot/IntoRobotPackages-ArduinoIDE/releases/download/1.0.0/intorobot-stm32-boards-1.0.0.tar.gz",
-	      "archiveFileName": "intorobot-stm32-boards-1.0.0.tar.gz",
-	      "checksum": "SHA-256:9f27e17014f4cf8703860ee8dc4bfcdd47fa97f2e6c3ae374956dd09e2a61e1e",
-	      "size": "26992783",
-          "boards": [
-              {"name" : "IntoRobot Neutron"}
-          ],
+          "archiveFileName": "intorobot-stm32-boards-1.0.0.tar.gz",
+          "checksum": "SHA-256:9f27e17014f4cf8703860ee8dc4bfcdd47fa97f2e6c3ae374956dd09e2a61e1e",
+          "size": "26992783",
+          "boards": [{ "name": "IntoRobot Neutron" }],
           "toolsDependencies": [
             {
               "packager": "intorobot",
@@ -46,12 +44,10 @@
             "online": "http://docs.intorobot.com"
           },
           "url": "https://github.com/IntoRobot/IntoRobotPackages-ArduinoIDE/releases/download/1.0.0/intorobot-esp-boards-1.0.0.tar.gz",
-	      "archiveFileName": "intorobot-esp-boards-1.0.0.tar.gz",
-	      "checksum": "SHA-256:7abc4c65e214763ec3eefc811ac7a979f50d5a3121f52033fd60b3936e225c8a",
-	      "size": "5530013",
-          "boards": [
-	          {"name" : "IntoRobot Nut"}
-          ],
+          "archiveFileName": "intorobot-esp-boards-1.0.0.tar.gz",
+          "checksum": "SHA-256:7abc4c65e214763ec3eefc811ac7a979f50d5a3121f52033fd60b3936e225c8a",
+          "size": "5530013",
+          "boards": [{ "name": "IntoRobot Nut" }],
           "toolsDependencies": [
             {
               "packager": "intorobot",
@@ -65,7 +61,7 @@
             }
           ]
         }
-       ],
+      ],
       "tools": [
         {
           "name": "arm-none-eabi-gcc",
@@ -136,87 +132,87 @@
           ]
         },
         {
-          "version": "1.20.0-26-gb404fb9-2", 
-          "name": "xtensa-lx106-elf-gcc", 
+          "version": "1.20.0-26-gb404fb9-2",
+          "name": "xtensa-lx106-elf-gcc",
           "systems": [
             {
               "url": "http://arduino.esp8266.com/win32-xtensa-lx106-elf-gb404fb9-2.tar.gz",
-              "checksum": "SHA-256:10476b9c11a7a90f40883413ddfb409f505b20692e316c4e597c4c175b4be09c", 
-              "host": "i686-mingw32", 
-              "archiveFileName": "win32-xtensa-lx106-elf-gb404fb9-2.tar.gz", 
+              "checksum": "SHA-256:10476b9c11a7a90f40883413ddfb409f505b20692e316c4e597c4c175b4be09c",
+              "host": "i686-mingw32",
+              "archiveFileName": "win32-xtensa-lx106-elf-gb404fb9-2.tar.gz",
               "size": "153527527"
-            }, 
+            },
             {
-              "url": "http://arduino.esp8266.com/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz", 
-              "checksum": "SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6", 
-              "host": "x86_64-apple-darwin", 
-              "archiveFileName": "osx-xtensa-lx106-elf-gb404fb9-2.tar.gz", 
+              "url": "http://arduino.esp8266.com/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+              "checksum": "SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6",
+              "host": "x86_64-apple-darwin",
+              "archiveFileName": "osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
               "size": "35385382"
-            }, 
+            },
             {
-              "url": "http://arduino.esp8266.com/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz", 
-              "checksum": "SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6", 
-              "host": "i386-apple-darwin", 
-              "archiveFileName": "osx-xtensa-lx106-elf-gb404fb9-2.tar.gz", 
+              "url": "http://arduino.esp8266.com/osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
+              "checksum": "SHA-256:0cf150193997bd1355e0f49d3d49711730035257bc1aee1eaaad619e56b9e4e6",
+              "host": "i386-apple-darwin",
+              "archiveFileName": "osx-xtensa-lx106-elf-gb404fb9-2.tar.gz",
               "size": "35385382"
-            }, 
+            },
             {
-              "url": "http://arduino.esp8266.com/linux64-xtensa-lx106-elf-gb404fb9.tar.gz", 
-              "checksum": "SHA-256:46f057fbd8b320889a26167daf325038912096d09940b2a95489db92431473b7", 
-              "host": "x86_64-pc-linux-gnu", 
-              "archiveFileName": "linux64-xtensa-lx106-elf-gb404fb9.tar.gz", 
+              "url": "http://arduino.esp8266.com/linux64-xtensa-lx106-elf-gb404fb9.tar.gz",
+              "checksum": "SHA-256:46f057fbd8b320889a26167daf325038912096d09940b2a95489db92431473b7",
+              "host": "x86_64-pc-linux-gnu",
+              "archiveFileName": "linux64-xtensa-lx106-elf-gb404fb9.tar.gz",
               "size": "30262903"
-            }, 
+            },
             {
-              "url": "http://arduino.esp8266.com/linux32-xtensa-lx106-elf.tar.gz", 
-              "checksum": "SHA-256:b24817819f0078fb05895a640e806e0aca9aa96b47b80d2390ac8e2d9ddc955a", 
-              "host": "i686-pc-linux-gnu", 
-              "archiveFileName": "linux32-xtensa-lx106-elf.tar.gz", 
+              "url": "http://arduino.esp8266.com/linux32-xtensa-lx106-elf.tar.gz",
+              "checksum": "SHA-256:b24817819f0078fb05895a640e806e0aca9aa96b47b80d2390ac8e2d9ddc955a",
+              "host": "i686-pc-linux-gnu",
+              "archiveFileName": "linux32-xtensa-lx106-elf.tar.gz",
               "size": "32734156"
-            }, 
+            },
             {
-              "url": "http://arduino.esp8266.com/linuxarm-xtensa-lx106-elf-g46f160f-2.tar.gz", 
-              "checksum": "SHA-256:f693946288f2ffa17288ef75ae16fa08573993f2b0a2a5e6bc35a68dc6087443", 
-              "host": "arm-linux-gnueabihf", 
-              "archiveFileName": "linuxarm-xtensa-lx106-elf-g46f160f-2.tar.gz", 
+              "url": "http://arduino.esp8266.com/linuxarm-xtensa-lx106-elf-g46f160f-2.tar.gz",
+              "checksum": "SHA-256:f693946288f2ffa17288ef75ae16fa08573993f2b0a2a5e6bc35a68dc6087443",
+              "host": "arm-linux-gnueabihf",
+              "archiveFileName": "linuxarm-xtensa-lx106-elf-g46f160f-2.tar.gz",
               "size": "34938475"
             }
           ]
-        }, 
+        },
         {
-          "version": "0.4.11", 
-          "name": "esptool", 
+          "version": "0.4.11",
+          "name": "esptool",
           "systems": [
             {
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.11/esptool-0.4.11-win32.zip", 
-              "checksum": "SHA-256:1a9025595b650562dd7325b96edfd92209f79c43ad29aefd00cf4cbe25f87729", 
-              "host": "i686-mingw32", 
-              "archiveFileName": "esptool-0.4.11-win32.zip", 
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.11/esptool-0.4.11-win32.zip",
+              "checksum": "SHA-256:1a9025595b650562dd7325b96edfd92209f79c43ad29aefd00cf4cbe25f87729",
+              "host": "i686-mingw32",
+              "archiveFileName": "esptool-0.4.11-win32.zip",
               "size": "32953"
-            }, 
+            },
             {
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.11/esptool-0.4.11-osx.tar.gz", 
-              "checksum": "SHA-256:3d24e1f34f9d2812e8d96f31e2166108a31a20b57b33059d43e20d7a8ebbf445", 
-              "host": "x86_64-apple-darwin", 
-              "archiveFileName": "esptool-0.4.11-osx.tar.gz", 
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.11/esptool-0.4.11-osx.tar.gz",
+              "checksum": "SHA-256:3d24e1f34f9d2812e8d96f31e2166108a31a20b57b33059d43e20d7a8ebbf445",
+              "host": "x86_64-apple-darwin",
+              "archiveFileName": "esptool-0.4.11-osx.tar.gz",
               "size": "29310"
-            }, 
+            },
             {
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.11/esptool-0.4.11-osx.tar.gz", 
-              "checksum": "SHA-256:3d24e1f34f9d2812e8d96f31e2166108a31a20b57b33059d43e20d7a8ebbf445", 
-              "host": "i386-apple-darwin", 
-              "archiveFileName": "esptool-0.4.11-osx.tar.gz", 
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.11/esptool-0.4.11-osx.tar.gz",
+              "checksum": "SHA-256:3d24e1f34f9d2812e8d96f31e2166108a31a20b57b33059d43e20d7a8ebbf445",
+              "host": "i386-apple-darwin",
+              "archiveFileName": "esptool-0.4.11-osx.tar.gz",
               "size": "29310"
-            }, 
+            },
             {
-              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.11/esptool-0.4.11-linux64.tar.gz", 
-              "checksum": "SHA-256:49ea4cd3a1407b0b856a05016524a2d7ea4aa8188171561a9a309e32bd847ff7", 
-              "host": "x86_64-pc-linux-gnu", 
-              "archiveFileName": "esptool-0.4.11-linux64.tar.gz", 
+              "url": "https://github.com/igrr/esptool-ck/releases/download/0.4.11/esptool-0.4.11-linux64.tar.gz",
+              "checksum": "SHA-256:49ea4cd3a1407b0b856a05016524a2d7ea4aa8188171561a9a309e32bd847ff7",
+              "host": "x86_64-pc-linux-gnu",
+              "archiveFileName": "esptool-0.4.11-linux64.tar.gz",
               "size": "16040"
             }
           ]
-        }, 
+        },
         {
           "name": "stm32-upload",
           "version": "1.0.0",
@@ -252,7 +248,6 @@
           ]
         }
       ]
-
     }
   ]
 }

@@ -69,9 +69,7 @@
               "name": "SmartTutto"
             }
           ],
-          "toolsDependencies": [
-            
-          ]
+          "toolsDependencies": []
         },
         {
           "name": "Arrow Boards",
@@ -93,9 +91,7 @@
               "name": "SmartTutto"
             }
           ],
-          "toolsDependencies": [
-            
-          ]
+          "toolsDependencies": []
         },
         {
           "name": "Arrow Boards",
@@ -120,9 +116,7 @@
               "name": "SmartTutto"
             }
           ],
-          "toolsDependencies": [
-            
-          ]
+          "toolsDependencies": []
         },
         {
           "name": "Arrow Boards",
@@ -150,14 +144,10 @@
               "name": "SmartTutto"
             }
           ],
-          "toolsDependencies": [
-            
-          ]
+          "toolsDependencies": []
         }
       ],
-      "tools": [
-        
-      ]
+      "tools": []
     }
   ]
 }

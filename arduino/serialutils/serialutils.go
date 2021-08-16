@@ -20,9 +20,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/pkg/errors"
 	"go.bug.st/serial"
 )
+
+var tr = i18n.Tr
 
 // TouchSerialPortAt1200bps open and close the serial port at 1200 bps. This
 // is used on many Arduino boards as a signal to put the board in "bootloader"
@@ -31,13 +34,13 @@ func TouchSerialPortAt1200bps(port string) error {
 	// Open port
 	p, err := serial.Open(port, &serial.Mode{BaudRate: 1200})
 	if err != nil {
-		return errors.WithMessage(err, "opening port at 1200bps")
+		return errors.WithMessage(err, tr("opening port at 1200bps"))
 	}
 
 	// Set DTR to false
 	if err = p.SetDTR(false); err != nil {
 		p.Close()
-		return errors.WithMessage(err, "setting DTR to OFF")
+		return errors.WithMessage(err, tr("setting DTR to OFF"))
 	}
 
 	// Close serial port
@@ -55,7 +58,7 @@ func TouchSerialPortAt1200bps(port string) error {
 func getPortMap() (map[string]bool, error) {
 	ports, err := serial.GetPortsList()
 	if err != nil {
-		return nil, errors.WithMessage(err, "listing serial ports")
+		return nil, errors.WithMessage(err, tr("listing serial ports"))
 	}
 	res := map[string]bool{}
 	for _, port := range ports {
@@ -127,7 +130,8 @@ func Reset(portToTouch string, wait bool, cb *ResetProgressCallbacks, dryRun boo
 			// do nothing!
 		} else {
 			if err := TouchSerialPortAt1200bps(portToTouch); err != nil {
-				fmt.Println("TOUCH: error during reset:", err)
+				fmt.Printf(tr("TOUCH: error during reset: %s"), err)
+				fmt.Println()
 			}
 		}
 	}

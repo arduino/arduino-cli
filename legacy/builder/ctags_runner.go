@@ -38,7 +38,7 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 
 	pattern := ctagsProperties.Get(constants.BUILD_PROPERTIES_PATTERN)
 	if pattern == constants.EMPTY_STRING {
-		return errors.Errorf("%s pattern is missing", constants.CTAGS)
+		return errors.Errorf(tr("%s pattern is missing"), constants.CTAGS)
 	}
 
 	commandLine := ctagsProperties.ExpandPropsInString(pattern)
@@ -56,7 +56,7 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 
 	parser := &ctags.CTagsParser{}
 
-	ctx.CTagsOfPreprocessedSource = parser.Parse(ctx.CTagsOutput, ctx.Sketch.MainFile.Name)
+	ctx.CTagsOfPreprocessedSource = parser.Parse(ctx.CTagsOutput, ctx.Sketch.MainFile)
 	parser.FixCLinkageTagsDeclarations(ctx.CTagsOfPreprocessedSource)
 
 	protos, line := parser.GeneratePrototypes()

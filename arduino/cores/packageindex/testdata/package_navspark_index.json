@@ -65,8 +65,8 @@
             {
               "name": "NavSpark-mini"
             }
-           ],
-            "toolsDependencies": [
+          ],
+          "toolsDependencies": [
             {
               "packager": "navspark",
               "name": "navsparktool",
@@ -99,8 +99,8 @@
             {
               "name": "NavSpark-mini"
             }
-           ],
-            "toolsDependencies": [
+          ],
+          "toolsDependencies": [
             {
               "packager": "navspark",
               "name": "navsparktool",

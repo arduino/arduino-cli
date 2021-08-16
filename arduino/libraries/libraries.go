@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -44,6 +45,8 @@ var ValidCategories = map[string]bool{
 	"Other":               true,
 	"Uncategorized":       true,
 }
+
+var tr = i18n.Tr
 
 // Library represents a library in the system
 type Library struct {
@@ -108,7 +111,7 @@ func (library *Library) ToRPCLibrary() (*rpc.Library, error) {
 		var err error
 		headers, err = library.SourceHeaders()
 		if err != nil {
-			return nil, fmt.Errorf("gathering library headers: %w", err)
+			return nil, fmt.Errorf(tr("gathering library headers: %w"), err)
 		}
 	}
 
@@ -228,7 +231,7 @@ func (library *Library) SourceHeaders() ([]string, error) {
 	if library.sourceHeaders == nil {
 		cppHeaders, err := library.SourceDir.ReadDir()
 		if err != nil {
-			return nil, fmt.Errorf("reading lib src dir: %s", err)
+			return nil, fmt.Errorf(tr("reading lib src dir: %s"), err)
 		}
 		cppHeaders.FilterSuffix(".h", ".hpp", ".hh")
 		res := []string{}

@@ -16,7 +16,6 @@
 package packagemanager
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
 	"path"
@@ -24,6 +23,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
+	"github.com/arduino/arduino-cli/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
@@ -44,6 +44,8 @@ type PackageManager struct {
 	TempDir                *paths.Path
 	CustomGlobalProperties *properties.Map
 }
+
+var tr = i18n.Tr
 
 // NewPackageManager returns a new instance of the PackageManager
 func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path) *PackageManager {
@@ -122,7 +124,7 @@ func (pm *PackageManager) FindBoardsWithID(id string) []*cores.Board {
 func (pm *PackageManager) FindBoardWithFQBN(fqbnIn string) (*cores.Board, error) {
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, fmt.Errorf("parsing fqbn: %s", err)
+		return nil, fmt.Errorf(tr("parsing fqbn: %s"), err)
 	}
 
 	_, _, board, _, _, err := pm.ResolveFQBN(fqbn)
@@ -156,32 +158,32 @@ func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 	targetPackage := pm.Packages[fqbn.Package]
 	if targetPackage == nil {
 		return nil, nil, nil, nil, nil,
-			errors.New("unknown package " + fqbn.Package)
+			fmt.Errorf(tr("unknown package %s"), fqbn.Package)
 	}
 
 	// Find platform
 	platform := targetPackage.Platforms[fqbn.PlatformArch]
 	if platform == nil {
 		return targetPackage, nil, nil, nil, nil,
-			fmt.Errorf("unknown platform %s:%s", targetPackage, fqbn.PlatformArch)
+			fmt.Errorf(tr("unknown platform %s:%s"), targetPackage, fqbn.PlatformArch)
 	}
 	platformRelease := pm.GetInstalledPlatformRelease(platform)
 	if platformRelease == nil {
 		return targetPackage, nil, nil, nil, nil,
-			fmt.Errorf("platform %s is not installed", platform)
+			fmt.Errorf(tr("platform %s is not installed"), platform)
 	}
 
 	// Find board
 	board := platformRelease.Boards[fqbn.BoardID]
 	if board == nil {
 		return targetPackage, platformRelease, nil, nil, nil,
-			fmt.Errorf("board %s:%s not found", platformRelease, fqbn.BoardID)
+			fmt.Errorf(tr("board %s:%s not found"), platformRelease, fqbn.BoardID)
 	}
 
 	buildProperties, err := board.GetBuildProperties(fqbn.Configs)
 	if err != nil {
 		return targetPackage, platformRelease, board, nil, nil,
-			fmt.Errorf("getting build properties for board %s: %s", board, err)
+			fmt.Errorf(tr("getting build properties for board %[1]s: %[2]s"), board, err)
 	}
 
 	// Determine the platform used for the build (in case the board refers
@@ -193,17 +195,17 @@ func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 		buildPackage := pm.Packages[referredPackage]
 		if buildPackage == nil {
 			return targetPackage, platformRelease, board, buildProperties, nil,
-				fmt.Errorf("missing package %s referenced by board %s", referredPackage, fqbn)
+				fmt.Errorf(tr("missing package %[1]s referenced by board %[2]s"), referredPackage, fqbn)
 		}
 		buildPlatform := buildPackage.Platforms[fqbn.PlatformArch]
 		if buildPlatform == nil {
 			return targetPackage, platformRelease, board, buildProperties, nil,
-				fmt.Errorf("missing platform %s:%s referenced by board %s", referredPackage, fqbn.PlatformArch, fqbn)
+				fmt.Errorf(tr("missing platform %[1]s:%[2]s referenced by board %[3]s"), referredPackage, fqbn.PlatformArch, fqbn)
 		}
 		buildPlatformRelease = pm.GetInstalledPlatformRelease(buildPlatform)
 		if buildPlatformRelease == nil {
 			return targetPackage, platformRelease, board, buildProperties, nil,
-				fmt.Errorf("missing platform release %s:%s referenced by board %s", referredPackage, fqbn.PlatformArch, fqbn)
+				fmt.Errorf(tr("missing platform release %[1]s:%[2]s referenced by board %[3]s"), referredPackage, fqbn.PlatformArch, fqbn)
 		}
 	}
 
@@ -216,7 +218,7 @@ func (pm *PackageManager) LoadPackageIndex(URL *url.URL) error {
 	indexPath := pm.IndexDir.Join(path.Base(URL.Path))
 	index, err := packageindex.LoadIndex(indexPath)
 	if err != nil {
-		return fmt.Errorf("loading json index file %s: %s", indexPath, err)
+		return fmt.Errorf(tr("loading json index file %[1]s: %[2]s"), indexPath, err)
 	}
 
 	for _, p := range index.Packages {
@@ -231,7 +233,7 @@ func (pm *PackageManager) LoadPackageIndex(URL *url.URL) error {
 func (pm *PackageManager) LoadPackageIndexFromFile(indexPath *paths.Path) (*packageindex.Index, error) {
 	index, err := packageindex.LoadIndex(indexPath)
 	if err != nil {
-		return nil, fmt.Errorf("loading json index file %s: %s", indexPath, err)
+		return nil, fmt.Errorf(tr("loading json index file %[1]s: %[2]s"), indexPath, err)
 	}
 
 	index.MergeIntoPackages(pm.Packages)
@@ -245,7 +247,7 @@ func (pm *PackageManager) Package(name string) *PackageActions {
 	var err error
 	thePackage := pm.Packages[name]
 	if thePackage == nil {
-		err = fmt.Errorf("package '%s' not found", name)
+		err = fmt.Errorf(tr("package '%s' not found"), name)
 	}
 	return &PackageActions{
 		aPackage:     thePackage,
@@ -271,7 +273,7 @@ func (pa *PackageActions) Tool(name string) *ToolActions {
 		tool = pa.aPackage.Tools[name]
 
 		if tool == nil {
-			err = fmt.Errorf("tool '%s' not found in package '%s'", name, pa.aPackage.Name)
+			err = fmt.Errorf(tr("tool '%[1]s' not found in package '%[2]s'"), name, pa.aPackage.Name)
 		}
 	}
 	return &ToolActions{
@@ -321,7 +323,7 @@ func (ta *ToolActions) Release(version *semver.RelaxedVersion) *ToolReleaseActio
 	}
 	release := ta.tool.FindReleaseWithRelaxedVersion(version)
 	if release == nil {
-		return &ToolReleaseActions{forwardError: fmt.Errorf("release %s not found for tool %s", version, ta.tool.String())}
+		return &ToolReleaseActions{forwardError: fmt.Errorf(tr("release %[1]s not found for tool %[2]s"), version, ta.tool.String())}
 	}
 	return &ToolReleaseActions{release: release}
 }
@@ -472,7 +474,7 @@ func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*core
 		pm.Log.WithField("tool", toolDep).Infof("Required tool")
 		tool := pm.FindToolDependency(toolDep)
 		if tool == nil {
-			return nil, fmt.Errorf("tool release not found: %s", toolDep)
+			return nil, fmt.Errorf(tr("tool release not found: %s"), toolDep)
 		}
 		requiredTools = append(requiredTools, tool)
 		delete(foundTools, tool.Tool.Name)

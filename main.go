@@ -26,7 +26,7 @@ import (
 
 func main() {
 	configuration.Settings = configuration.Init(configuration.FindConfigFileInArgsOrWorkingDirectory(os.Args))
-	i18n.Init()
+	i18n.Init(configuration.Settings.GetString("locale"))
 	arduinoCmd := cli.NewCommand()
 	if err := arduinoCmd.Execute(); err != nil {
 		os.Exit(errorcodes.ErrGeneric)

@@ -17,6 +17,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -32,9 +33,9 @@ import (
 
 func initUninstallCommand() *cobra.Command {
 	return &cobra.Command{
-		Use:     "uninstall PACKAGER:ARCH ...",
-		Short:   "Uninstalls one or more cores and corresponding tool dependencies if no longer used.",
-		Long:    "Uninstalls one or more cores and corresponding tool dependencies if no longer used.",
+		Use:     fmt.Sprintf("uninstall %s:%s ...", tr("PACKAGER"), tr("ARCH")),
+		Short:   tr("Uninstalls one or more cores and corresponding tool dependencies if no longer used."),
+		Long:    tr("Uninstalls one or more cores and corresponding tool dependencies if no longer used."),
 		Example: "  " + os.Args[0] + " core uninstall arduino:samd\n",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     runUninstallCommand,
@@ -47,13 +48,13 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 
 	platformsRefs, err := globals.ParseReferenceArgs(args, true)
 	if err != nil {
-		feedback.Errorf("Invalid argument passed: %v", err)
+		feedback.Errorf(tr("Invalid argument passed: %v"), err)
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
 	for _, platformRef := range platformsRefs {
 		if platformRef.Version != "" {
-			feedback.Error("Invalid parameter " + platformRef.String() + ": version not allowed")
+			feedback.Errorf(tr("Invalid parameter %s: version not allowed"), platformRef)
 			os.Exit(errorcodes.ErrBadArgument)
 		}
 	}
@@ -64,7 +65,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 			Architecture:    platformRef.Architecture,
 		}, output.NewTaskProgressCB())
 		if err != nil {
-			feedback.Errorf("Error during uninstall: %v", err)
+			feedback.Errorf(tr("Error during uninstall: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}

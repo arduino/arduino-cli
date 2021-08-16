@@ -30,17 +30,17 @@ func ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgram
 
 	fqbnIn := req.GetFqbn()
 	if fqbnIn == "" {
-		return nil, fmt.Errorf("no Fully Qualified Board Name provided")
+		return nil, fmt.Errorf(tr("no Fully Qualified Board Name provided"))
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, fmt.Errorf("incorrect FQBN: %s", err)
+		return nil, fmt.Errorf(tr("incorrect FQBN: %s"), err)
 	}
 
 	// Find target platforms
 	_, platform, _, _, refPlatform, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
-		return nil, fmt.Errorf("incorrect FQBN: %s", err)
+		return nil, fmt.Errorf(tr("incorrect FQBN: %s"), err)
 	}
 
 	result := []*rpc.Programmer{}

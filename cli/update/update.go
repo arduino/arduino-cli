@@ -24,23 +24,26 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
+var tr = i18n.Tr
+
 // NewCommand creates a new `update` command
 func NewCommand() *cobra.Command {
 	updateCommand := &cobra.Command{
 		Use:     "update",
-		Short:   "Updates the index of cores and libraries",
-		Long:    "Updates the index of cores and libraries to the latest versions.",
+		Short:   tr("Updates the index of cores and libraries"),
+		Long:    tr("Updates the index of cores and libraries to the latest versions."),
 		Example: "  " + os.Args[0] + " update",
 		Args:    cobra.NoArgs,
 		Run:     runUpdateCommand,
 	}
-	updateCommand.Flags().BoolVar(&updateFlags.showOutdated, "show-outdated", false, "Show outdated cores and libraries after index update")
+	updateCommand.Flags().BoolVar(&updateFlags.showOutdated, "show-outdated", false, tr("Show outdated cores and libraries after index update"))
 	return updateCommand
 }
 
@@ -56,7 +59,7 @@ func runUpdateCommand(cmd *cobra.Command, args []string) {
 	// as argument but none would be obviously found.
 	inst, status := instance.Create()
 	if status != nil {
-		feedback.Errorf("Error creating instance: %v", status)
+		feedback.Errorf(tr("Error creating instance: %v"), status)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -65,7 +68,7 @@ func runUpdateCommand(cmd *cobra.Command, args []string) {
 	// we must use instance.Create instead of instance.CreateAndInit for the
 	// reason stated above.
 	if err := instance.FirstUpdate(inst); err != nil {
-		feedback.Errorf("Error updating indexes: %v", status)
+		feedback.Errorf(tr("Error updating indexes: %v"), status)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -73,7 +76,7 @@ func runUpdateCommand(cmd *cobra.Command, args []string) {
 		Instance: inst,
 	}, output.ProgressBar())
 	if err != nil {
-		feedback.Errorf("Error updating core and libraries index: %v", err)
+		feedback.Errorf(tr("Error updating core and libraries index: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -81,19 +84,19 @@ func runUpdateCommand(cmd *cobra.Command, args []string) {
 		// To show outdated platforms and libraries we need to initialize our instance
 		// otherwise nothing would be shown
 		for _, err := range instance.Init(inst) {
-			feedback.Errorf("Error initializing instance: %v", err)
+			feedback.Errorf(tr("Error initializing instance: %v"), err)
 		}
 
 		outdatedResp, err := commands.Outdated(context.Background(), &rpc.OutdatedRequest{
 			Instance: inst,
 		})
 		if err != nil {
-			feedback.Errorf("Error retrieving outdated cores and libraries: %v", err)
+			feedback.Errorf(tr("Error retrieving outdated cores and libraries: %v"), err)
 		}
 
 		// Prints outdated cores
 		tab := table.New()
-		tab.SetHeader("Core name", "Installed version", "New version")
+		tab.SetHeader(tr("Core name"), tr("Installed version"), tr("New version"))
 		if len(outdatedResp.OutdatedPlatforms) > 0 {
 			for _, p := range outdatedResp.OutdatedPlatforms {
 				tab.AddRow(p.Name, p.Installed, p.Latest)
@@ -103,7 +106,7 @@ func runUpdateCommand(cmd *cobra.Command, args []string) {
 
 		// Prints outdated libraries
 		tab = table.New()
-		tab.SetHeader("Library name", "Installed version", "New version")
+		tab.SetHeader(tr("Library name"), tr("Installed version"), tr("New version"))
 		if len(outdatedResp.OutdatedLibraries) > 0 {
 			for _, l := range outdatedResp.OutdatedLibraries {
 				tab.AddRow(l.Library.Name, l.Library.Version, l.Release.Version)

@@ -22,6 +22,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/resources"
 	"github.com/arduino/arduino-cli/arduino/security"
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
@@ -106,6 +107,8 @@ type indexBoardID struct {
 type indexHelp struct {
 	Online string `json:"online,omitempty"`
 }
+
+var tr = i18n.Tr
 
 // MergeIntoPackages converts the Index data into a cores.Packages and merge them
 // with the existing contents of the cores.Packages passed as parameter.
@@ -233,7 +236,7 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 
 	size, err := inPlatformRelease.Size.Int64()
 	if err != nil {
-		return fmt.Errorf("invalid platform archive size: %s", err)
+		return fmt.Errorf(tr("invalid platform archive size: %s"), err)
 	}
 	outPlatformRelease := outPlatform.GetOrCreateRelease(inPlatformRelease.Version)
 	outPlatformRelease.IsTrusted = trusted

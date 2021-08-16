@@ -1,0 +1,233 @@
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-go-task.md
+name: Check Go
+
+env:
+  # See: https://github.com/actions/setup-go/tree/v2#readme
+  GO_VERSION: "1.16"
+
+# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+on:
+  push:
+    paths:
+      - ".github/workflows/check-go-task.ya?ml"
+      - "Taskfile.ya?ml"
+      - "**/go.mod"
+      - "**/go.sum"
+      - "**.go"
+  pull_request:
+    paths:
+      - ".github/workflows/check-go-task.ya?ml"
+      - "Taskfile.ya?ml"
+      - "**/go.mod"
+      - "**/go.sum"
+      - "**.go"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  check-errors:
+    name: check-errors (${{ matrix.module.path }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        module:
+          - path: ./
+          - path: arduino/discovery/discovery_client
+          - path: client_example
+          - path: commands/daemon/term_example
+          - path: docsgen
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Check for errors
+        env:
+          GO_MODULE_PATH: ${{ matrix.module.path }}
+        run: task go:vet
+
+  check-outdated:
+    name: check-outdated (${{ matrix.module.path }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        module:
+          - path: ./
+          - path: arduino/discovery/discovery_client
+          - path: client_example
+          - path: commands/daemon/term_example
+          - path: docsgen
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Modernize usages of outdated APIs
+        env:
+          GO_MODULE_PATH: ${{ matrix.module.path }}
+        run: task go:fix
+
+      - name: Check if any fixes were needed
+        run: git diff --color --exit-code
+
+  check-style:
+    name: check-style (${{ matrix.module.path }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        module:
+          - path: ./
+          - path: arduino/discovery/discovery_client
+          - path: client_example
+          - path: commands/daemon/term_example
+          - path: docsgen
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Install golint
+        run: go install golang.org/x/lint/golint@latest
+
+      - name: Check style
+        env:
+          GO_MODULE_PATH: ${{ matrix.module.path }}
+        run: task --silent go:lint
+
+  check-formatting:
+    name: check-formatting (${{ matrix.module.path }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        module:
+          - path: ./
+          - path: arduino/discovery/discovery_client
+          - path: client_example
+          - path: commands/daemon/term_example
+          - path: docsgen
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Format code
+        env:
+          GO_MODULE_PATH: ${{ matrix.module.path }}
+        run: task go:format
+
+      - name: Check formatting
+        run: git diff --color --exit-code
+
+  check-config:
+    name: check-config (${{ matrix.module.path }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        module:
+          - path: ./
+          - path: arduino/discovery/discovery_client
+          - path: client_example
+          - path: commands/daemon/term_example
+          - path: docsgen
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Run go mod tidy
+        working-directory: ${{ matrix.module.path }}
+        run: go mod tidy
+
+      - name: Check whether any tidying was needed
+        run: git diff --color --exit-code
+
+  # Do a simple "smoke test" build for the modules with no other form of validation
+  build:
+    name: build (${{ matrix.module.path }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        module:
+          - path: arduino/discovery/discovery_client
+          - path: client_example
+          - path: commands/daemon/term_example
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Build
+        working-directory: ${{ matrix.module.path }}
+        run: go build

@@ -16,6 +16,8 @@
 package lib
 
 import (
+	"context"
+	"fmt"
 	"os"
 	"sort"
 	"strings"
@@ -28,24 +30,24 @@ import (
 	"github.com/arduino/arduino-cli/table"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"golang.org/x/net/context"
 )
 
 func initListCommand() *cobra.Command {
 	listCommand := &cobra.Command{
-		Use:   "list [LIBNAME]",
-		Short: "Shows a list of installed libraries.",
-		Long: "Shows a list of installed libraries.\n\n" +
-			"If the LIBNAME parameter is specified the listing is limited to that specific\n" +
-			"library. By default the libraries provided as built-in by platforms/core are\n" +
-			"not listed, they can be listed by adding the --all flag.",
+		Use:   fmt.Sprintf("list [%s]", tr("LIBNAME")),
+		Short: tr("Shows a list of installed libraries."),
+		Long: tr(`Shows a list of installed libraries.
+
+If the LIBNAME parameter is specified the listing is limited to that specific
+library. By default the libraries provided as built-in by platforms/core are
+not listed, they can be listed by adding the --all flag.`),
 		Example: "  " + os.Args[0] + " lib list",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     runListCommand,
 	}
-	listCommand.Flags().BoolVar(&listFlags.all, "all", false, "Include built-in libraries (from platforms and IDE) in listing.")
-	listCommand.Flags().StringVarP(&listFlags.fqbn, "fqbn", "b", "", "Show libraries for the specified board FQBN.")
-	listCommand.Flags().BoolVar(&listFlags.updatable, "updatable", false, "List updatable libraries.")
+	listCommand.Flags().BoolVar(&listFlags.all, "all", false, tr("Include built-in libraries (from platforms and IDE) in listing."))
+	listCommand.Flags().StringVarP(&listFlags.fqbn, "fqbn", "b", "", tr("Show libraries for the specified board FQBN."))
+	listCommand.Flags().BoolVar(&listFlags.updatable, "updatable", false, tr("List updatable libraries."))
 	return listCommand
 }
 
@@ -72,7 +74,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		Fqbn:      listFlags.fqbn,
 	})
 	if err != nil {
-		feedback.Errorf("Error listing Libraries: %v", err)
+		feedback.Errorf(tr("Error listing Libraries: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
@@ -110,9 +112,9 @@ func (ir installedResult) Data() interface{} {
 func (ir installedResult) String() string {
 	if ir.installedLibs == nil || len(ir.installedLibs) == 0 {
 		if listFlags.updatable {
-			return "No updates available."
+			return tr("No updates available.")
 		}
-		return "No libraries installed."
+		return tr("No libraries installed.")
 	}
 	sort.Slice(ir.installedLibs, func(i, j int) bool {
 		return strings.ToLower(ir.installedLibs[i].Library.Name) < strings.ToLower(ir.installedLibs[j].Library.Name) ||
@@ -120,7 +122,7 @@ func (ir installedResult) String() string {
 	})
 
 	t := table.New()
-	t.SetHeader("Name", "Installed", "Available", "Location", "Description")
+	t.SetHeader(tr("Name"), tr("Installed"), tr("Available"), tr("Location"), tr("Description"))
 	t.SetColumnWidthMode(1, table.Average)
 	t.SetColumnWidthMode(2, table.Average)
 	t.SetColumnWidthMode(4, table.Average)

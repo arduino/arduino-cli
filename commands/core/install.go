@@ -32,12 +32,12 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New("invalid instance")
+		return nil, errors.New(tr("invalid instance"))
 	}
 
 	version, err := commands.ParseVersion(req)
 	if err != nil {
-		return nil, fmt.Errorf("invalid version: %s", err)
+		return nil, fmt.Errorf(tr("invalid version: %s"), err)
 	}
 
 	platform, tools, err := pm.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{
@@ -46,7 +46,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
 		PlatformVersion:      version,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("finding platform dependencies: %s", err)
+		return nil, fmt.Errorf(tr("finding platform dependencies: %s"), err)
 	}
 
 	err = installPlatform(pm, platform, tools, downloadCB, taskCB, req.GetSkipPostInstall())
@@ -71,21 +71,21 @@ func installPlatform(pm *packagemanager.PackageManager,
 	// Prerequisite checks before install
 	if platformRelease.IsInstalled() {
 		log.Warn("Platform already installed")
-		taskCB(&rpc.TaskProgress{Name: "Platform " + platformRelease.String() + " already installed", Completed: true})
+		taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Platform %s already installed"), platformRelease), Completed: true})
 		return nil
 	}
 	toolsToInstall := []*cores.ToolRelease{}
 	for _, tool := range requiredTools {
 		if tool.IsInstalled() {
 			log.WithField("tool", tool).Warn("Tool already installed")
-			taskCB(&rpc.TaskProgress{Name: "Tool " + tool.String() + " already installed", Completed: true})
+			taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Tool %s already installed"), tool), Completed: true})
 		} else {
 			toolsToInstall = append(toolsToInstall, tool)
 		}
 	}
 
 	// Package download
-	taskCB(&rpc.TaskProgress{Name: "Downloading packages"})
+	taskCB(&rpc.TaskProgress{Name: tr("Downloading packages")})
 	for _, tool := range toolsToInstall {
 		if err := downloadTool(pm, tool, downloadCB); err != nil {
 			return err
@@ -110,11 +110,11 @@ func installPlatform(pm *packagemanager.PackageManager,
 	if installed == nil {
 		// No version of this platform is installed
 		log.Info("Installing platform")
-		taskCB(&rpc.TaskProgress{Name: "Installing " + platformRelease.String()})
+		taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Installing %s"), platformRelease)})
 	} else {
 		// A platform with a different version is already installed
 		log.Info("Upgrading platform " + installed.String())
-		taskCB(&rpc.TaskProgress{Name: "Upgrading " + installed.String() + " with " + platformRelease.String()})
+		taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Upgrading %[1]s with %[2]s"), installed, platformRelease)})
 		platformRef := &packagemanager.PlatformReference{
 			Package:              platformRelease.Platform.Package.Name,
 			PlatformArchitecture: platformRelease.Platform.Architecture,
@@ -127,7 +127,7 @@ func installPlatform(pm *packagemanager.PackageManager,
 		var err error
 		_, installedTools, err = pm.FindPlatformReleaseDependencies(platformRef)
 		if err != nil {
-			return fmt.Errorf("can't find dependencies for platform %s: %w", platformRef, err)
+			return fmt.Errorf(tr("can't find dependencies for platform %[1]s: %[2]w"), platformRef, err)
 		}
 	}
 
@@ -145,15 +145,15 @@ func installPlatform(pm *packagemanager.PackageManager,
 		// In case of error try to rollback
 		if errUn != nil {
 			log.WithError(errUn).Error("Error upgrading platform.")
-			taskCB(&rpc.TaskProgress{Message: "Error upgrading platform: " + err.Error()})
+			taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("Error upgrading platform: %s"), errUn)})
 
 			// Rollback
 			if err := pm.UninstallPlatform(platformRelease); err != nil {
 				log.WithError(err).Error("Error rolling-back changes.")
-				taskCB(&rpc.TaskProgress{Message: "Error rolling-back changes: " + err.Error()})
+				taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("Error rolling-back changes: %s"), err)})
 			}
 
-			return fmt.Errorf("upgrading platform: %s", errUn)
+			return fmt.Errorf(tr("upgrading platform: %s"), errUn)
 		}
 
 		// Uninstall unused tools
@@ -168,16 +168,16 @@ func installPlatform(pm *packagemanager.PackageManager,
 	// Perform post install
 	if !skipPostInstall {
 		log.Info("Running post_install script")
-		taskCB(&rpc.TaskProgress{Message: "Configuring platform"})
+		taskCB(&rpc.TaskProgress{Message: tr("Configuring platform")})
 		if err := pm.RunPostInstallScript(platformRelease); err != nil {
-			taskCB(&rpc.TaskProgress{Message: fmt.Sprintf("WARNING: cannot run post install: %s", err)})
+			taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("WARNING: cannot run post install: %s"), err)})
 		}
 	} else {
 		log.Info("Skipping platform configuration (post_install run).")
-		taskCB(&rpc.TaskProgress{Message: "Skipping platform configuration"})
+		taskCB(&rpc.TaskProgress{Message: tr("Skipping platform configuration")})
 	}
 
 	log.Info("Platform installed")
-	taskCB(&rpc.TaskProgress{Message: platformRelease.String() + " installed", Completed: true})
+	taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("%s installed"), platformRelease), Completed: true})
 	return nil
 }

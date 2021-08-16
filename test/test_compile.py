@@ -132,7 +132,7 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
     result = run_command("compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path))
     # The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
     # returning a different error detailed message
-    assert "Error during sketch processing" in result.stderr
+    assert "Error during build: opening sketch" in result.stderr
     assert not result.ok
 
     sketch_name = "CompileIntegrationTestSymlinkDirLoop"
@@ -152,9 +152,9 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
 
     # Build sketch for arduino:avr:uno
     result = run_command("compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path))
-    # The assertion is a bit relaxed also in this case because macOS behaves differently from win and linux:
-    # the cli does not follow recursively the symlink til breaking
-    assert "Error during sketch processing" in result.stderr
+    # The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
+    # returning a different error detailed message
+    assert "Error during build: opening sketch" in result.stderr
     assert not result.ok
 
 

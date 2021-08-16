@@ -1,0 +1,87 @@
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/test-go-task.md
+name: Test Go
+
+env:
+  # See: https://github.com/actions/setup-go/tree/v2#readme
+  GO_VERSION: "1.16"
+
+# See: https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows
+on:
+  push:
+    paths:
+      - ".github/workflows/test-go-task.ya?ml"
+      - "codecov.ya?ml"
+      - "go.mod"
+      - "go.sum"
+      - "Taskfile.ya?ml"
+      - "**.go"
+      - "**/testdata/**"
+  pull_request:
+    paths:
+      - ".github/workflows/test-go-task.ya?ml"
+      - "codecov.ya?ml"
+      - "go.mod"
+      - "go.sum"
+      - "Taskfile.ya?ml"
+      - "**.go"
+      - "**/testdata/**"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        operating-system:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+
+    runs-on: ${{ matrix.operating-system }}
+
+    steps:
+      # By default, actions/checkout converts the repo's LF line endings to CRLF on the Windows runner.
+      - name: Disable EOL conversions
+        run: git config --global core.autocrlf false
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Run tests
+        run: task go:test
+
+      - name: Run unit tests on the legacy package
+        # Run legacy tests on one platform only
+        if: runner.os == 'Linux'
+        run: task test-legacy
+
+      - name: Send unit tests coverage to Codecov
+        if: >
+          runner.os == 'Linux' &&
+          github.event_name == 'push'
+        uses: codecov/codecov-action@v2
+        with:
+          file: ./coverage_unit.txt
+          flags: unit
+          fail_ci_if_error: ${{ github.repository == 'arduino/arduino-cli' }}
+
+      - name: Send legacy tests coverage to Codecov
+        if: >
+          runner.os == 'Linux' &&
+          github.event_name == 'push'
+        uses: codecov/codecov-action@v2
+        with:
+          file: ./coverage_legacy.txt
+          flags: unit
+          fail_ci_if_error: ${{ github.repository == 'arduino/arduino-cli' }}

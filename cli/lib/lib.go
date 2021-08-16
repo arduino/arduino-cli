@@ -18,15 +18,18 @@ package lib
 import (
 	"os"
 
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/spf13/cobra"
 )
+
+var tr = i18n.Tr
 
 // NewCommand created a new `lib` command
 func NewCommand() *cobra.Command {
 	libCommand := &cobra.Command{
 		Use:   "lib",
-		Short: "Arduino commands about libraries.",
-		Long:  "Arduino commands about libraries.",
+		Short: tr("Arduino commands about libraries."),
+		Long:  tr("Arduino commands about libraries."),
 		Example: "" +
 			"  " + os.Args[0] + " lib install AudioZero\n" +
 			"  " + os.Args[0] + " lib update-index",

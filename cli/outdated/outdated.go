@@ -22,19 +22,22 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
+var tr = i18n.Tr
+
 // NewCommand creates a new `outdated` command
 func NewCommand() *cobra.Command {
 	outdatedCommand := &cobra.Command{
 		Use:   "outdated",
-		Short: "Lists cores and libraries that can be upgraded",
-		Long: "This commands shows a list of installed cores and/or libraries\n" +
-			"that can be upgraded. If nothing needs to be updated the output is empty.",
+		Short: tr("Lists cores and libraries that can be upgraded"),
+		Long: tr(`This commands shows a list of installed cores and/or libraries
+that can be upgraded. If nothing needs to be updated the output is empty.`),
 		Example: "  " + os.Args[0] + " outdated\n",
 		Args:    cobra.NoArgs,
 		Run:     runOutdatedCommand,
@@ -51,12 +54,12 @@ func runOutdatedCommand(cmd *cobra.Command, args []string) {
 		Instance: inst,
 	})
 	if err != nil {
-		feedback.Errorf("Error retrieving outdated cores and libraries: %v", err)
+		feedback.Errorf(tr("Error retrieving outdated cores and libraries: %v"), err)
 	}
 
 	// Prints outdated cores
 	tab := table.New()
-	tab.SetHeader("Core name", "Installed version", "New version")
+	tab.SetHeader(tr("Core name"), tr("Installed version"), tr("New version"))
 	if len(outdatedResp.OutdatedPlatforms) > 0 {
 		for _, p := range outdatedResp.OutdatedPlatforms {
 			tab.AddRow(p.Name, p.Installed, p.Latest)
@@ -66,7 +69,7 @@ func runOutdatedCommand(cmd *cobra.Command, args []string) {
 
 	// Prints outdated libraries
 	tab = table.New()
-	tab.SetHeader("Library name", "Installed version", "New version")
+	tab.SetHeader(tr("Library name"), tr("Installed version"), tr("New version"))
 	if len(outdatedResp.OutdatedLibraries) > 0 {
 		for _, l := range outdatedResp.OutdatedLibraries {
 			tab.AddRow(l.Library.Name, l.Library.Version, l.Release.Version)

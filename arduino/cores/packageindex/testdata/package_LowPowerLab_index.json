@@ -21,10 +21,7 @@
           "archiveFileName": "Moteino1.0.zip",
           "checksum": "SHA-256:0b75d68c1b8b92dd249aeea58908cf1e25ba7c7076d40faa985225f2f98f7208",
           "size": "41617",
-          "boards": [
-            {"name": "Moteino"},
-            {"name": "MoteinoMEGA"}
-          ],
+          "boards": [{ "name": "Moteino" }, { "name": "MoteinoMEGA" }],
           "toolsDependencies": [
             {
               "packager": "arduino",
@@ -50,11 +47,7 @@
           "archiveFileName": "Moteino1.1.zip",
           "checksum": "SHA-256:565d56ac6977057f436a0064e7cad12cec9a3895fcd04b01e0a1e676b3d429ad",
           "size": "41716",
-          "boards": [
-            {"name": "Moteino"},
-            {"name": "MoteinoMEGA"},
-            {"name": "MightyHat"}
-          ],
+          "boards": [{ "name": "Moteino" }, { "name": "MoteinoMEGA" }, { "name": "MightyHat" }],
           "toolsDependencies": [
             {
               "packager": "arduino",
@@ -80,11 +73,7 @@
           "archiveFileName": "Moteino1.2.zip",
           "checksum": "SHA-256:d61ef83f123464feab648c3208d48338afe8f9858011fe1ff4fa6f2254bcab6d",
           "size": "41720",
-          "boards": [
-            {"name": "Moteino"},
-            {"name": "MoteinoMEGA"},
-            {"name": "MightyHat"}
-          ],
+          "boards": [{ "name": "Moteino" }, { "name": "MoteinoMEGA" }, { "name": "MightyHat" }],
           "toolsDependencies": [
             {
               "packager": "arduino",
@@ -111,10 +100,10 @@
           "checksum": "SHA-256:0297d7670a80b195bedfa246d05ad5e72d03e0cdf89f68ad305fcff9fa4d4755",
           "size": "43492",
           "boards": [
-            {"name": "Moteino"},
-            {"name": "Moteino (8 Mhz)"},
-            {"name": "MoteinoMEGA"},
-            {"name": "MightyHat"}
+            { "name": "Moteino" },
+            { "name": "Moteino (8 Mhz)" },
+            { "name": "MoteinoMEGA" },
+            { "name": "MightyHat" }
           ],
           "toolsDependencies": [
             {
@@ -140,10 +129,10 @@
           "checksum": "SHA-256:230ae19e0794cb6e9340760961cbee3817428b05adc43f1da170ae2b3e3d7915",
           "size": "49283",
           "boards": [
-            {"name": "Moteino / Moteino-USB"},
-            {"name": "MoteinoMEGA / MoteinoMEGA-USB"},
-            {"name": "MightyHat"},
-            {"name": "Moteino (8 Mhz)"}
+            { "name": "Moteino / Moteino-USB" },
+            { "name": "MoteinoMEGA / MoteinoMEGA-USB" },
+            { "name": "MightyHat" },
+            { "name": "Moteino (8 Mhz)" }
           ],
           "toolsDependencies": [
             {
@@ -168,9 +157,7 @@
           "checksum": "SHA-256:29a49516e2fb86be71a856509c4dac187ff9097c2a4921efd439c34ba2d17a75",
           "size": "1152143",
           "help": { "online": "https://lowpowerlab.com/forum" },
-          "boards": [
-            {"name": "Moteino M0"}
-          ],
+          "boards": [{ "name": "Moteino M0" }],
           "toolsDependencies": [
             {
               "packager": "arduino",
@@ -189,9 +176,7 @@
           "checksum": "SHA-256:86eb8028d894fe2398571c0031172bedcf7bf53327b56d6c40b820e3267eb72c",
           "size": "1152143",
           "help": { "online": "https://lowpowerlab.com/forum" },
-          "boards": [
-            {"name": "Moteino M0"}
-          ],
+          "boards": [{ "name": "Moteino M0" }],
           "toolsDependencies": [
             {
               "packager": "arduino",

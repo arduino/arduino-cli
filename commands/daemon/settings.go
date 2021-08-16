@@ -105,7 +105,7 @@ func (s *SettingsService) GetValue(ctx context.Context, req *rpc.GetValueRequest
 		}
 	}
 	if !keyExists {
-		return nil, errors.New("key not found in settings")
+		return nil, errors.New(tr("key not found in settings"))
 	}
 
 	b, err := json.Marshal(configuration.Settings.Get(key))
