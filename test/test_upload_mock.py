@@ -19,7 +19,6 @@ import hashlib
 import pytest
 import os
 from pathlib import Path
-from typing import Union
 
 
 def generate_build_dir(sketch_path):
@@ -27,21 +26,6 @@ def generate_build_dir(sketch_path):
     build_dir = Path(tempfile.gettempdir(), f"arduino-sketch-{sketch_path_md5}")
     build_dir.mkdir(parents=True, exist_ok=True)
     return build_dir.resolve()
-
-
-def generate_expected_output(
-    output: Union[dict, str], data_dir: str, upload_port: str, build_dir: str, sketch_name: str
-) -> str:
-    if isinstance(output, str):
-        out = output
-    else:
-        out = output[sys.platform]
-    return out.format(
-        data_dir=data_dir,
-        upload_port=upload_port,
-        build_dir=build_dir,
-        sketch_name=sketch_name,
-    ).replace("\\", "/")
 
 
 indexes = [
@@ -478,24 +462,24 @@ testdata = [
             "-f "
             '"{data_dir}/packages/arduino/hardware/samd/1.8.11/variants/arduino_zero/openocd_scripts/arduino_zero.cfg" '
             '-c "telnet_port disabled; program '
-            "{{build_dir}/{sketch_name}.ino.bin} verify reset 0x2000; "
-            'shutdown"\n',
+            "{bo}{build_dir}/{sketch_name}.ino.bin{bc} verify reset "
+            '0x2000; shutdown"\n',
             "linux": '"{data_dir}/packages/arduino/tools/openocd/0.10.0-arduino7/bin/openocd" '
             "-d2 -s "
             '"{data_dir}/packages/arduino/tools/openocd/0.10.0-arduino7/share/openocd/scripts/" '
             "-f "
             '"{data_dir}/packages/arduino/hardware/samd/1.8.11/variants/arduino_zero/openocd_scripts/arduino_zero.cfg" '
             '-c "telnet_port disabled; program '
-            "{{build_dir}/{sketch_name}.ino.bin} verify reset 0x2000; "
-            'shutdown"\n',
+            "{bo}{build_dir}/{sketch_name}.ino.bin{bc} verify reset "
+            '0x2000; shutdown"\n',
             "win32": '"{data_dir}/packages/arduino/tools/openocd/0.10.0-arduino7/bin/openocd.exe" '
             "-d2 -s "
             '"{data_dir}/packages/arduino/tools/openocd/0.10.0-arduino7/share/openocd/scripts/" '
             "-f "
             '"{data_dir}/packages/arduino/hardware/samd/1.8.11/variants/arduino_zero/openocd_scripts/arduino_zero.cfg" '
             '-c "telnet_port disabled; program '
-            "{{build_dir}/{sketch_name}.ino.bin} verify reset 0x2000; "
-            'shutdown"\n',
+            "{bo}{build_dir}/{sketch_name}.ino.bin{bc} verify reset "
+            '0x2000; shutdown"\n',
         },
     ),
     (
@@ -1214,10 +1198,17 @@ def test_upload_sketch(
     res = run_command(f'upload {port_arg} {programmer_arg} -b {fqbn} "{sketch_path}" --dry-run -v', custom_env=env)
     assert res.ok
 
-    generate_expected_output(
-        output=output,
+    if isinstance(output, str):
+        out = output
+    else:
+        out = output[sys.platform]
+    expected_output = out.format(
         data_dir=session_data_dir,
         upload_port=upload_port,
         build_dir=build_dir,
         sketch_name=sketch_name,
-    ) in res.stdout.replace("\\", "/").replace("\r", "")
+        bo="{",
+        bc="}",
+    ).replace("\\", "/")
+
+    expected_output in res.stdout.replace("\\", "/").replace("\r", "")
