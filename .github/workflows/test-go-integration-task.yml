@@ -46,10 +46,7 @@ jobs:
           # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
           if [[ \
             "${{ github.event_name }}" != "create" || \
-            ( \
-              "${{ github.event_name }}" == "create" && \
-              "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX \
-            ) \
+            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX \
           ]]; then
             # Run the other jobs.
             RESULT="true"
