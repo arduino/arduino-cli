@@ -7,6 +7,7 @@ env:
 
 # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
 on:
+  create:
   push:
     paths:
       - ".github/workflows/check-go-task.ya?ml"
@@ -25,8 +26,36 @@ on:
   repository_dispatch:
 
 jobs:
+  run-determination:
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.determination.outputs.result }}
+    steps:
+      - name: Determine if the rest of the workflow should run
+        id: determination
+        run: |
+          RELEASE_BRANCH_REGEX="refs/heads/[0-9]+.[0-9]+.x"
+          # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
+          if [[ \
+            "${{ github.event_name }}" != "create" || \
+            ( \
+              "${{ github.event_name }}" == "create" && \
+              "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX \
+            ) \
+          ]]; then
+            # Run the other jobs.
+            RESULT="true"
+          else
+            # There is no need to run the other jobs.
+            RESULT="false"
+          fi
+
+          echo "::set-output name=result::$RESULT"
+
   check-errors:
     name: check-errors (${{ matrix.module.path }})
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
 
     strategy:
@@ -62,6 +91,8 @@ jobs:
 
   check-outdated:
     name: check-outdated (${{ matrix.module.path }})
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
 
     strategy:
@@ -100,6 +131,8 @@ jobs:
 
   check-style:
     name: check-style (${{ matrix.module.path }})
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
 
     strategy:
@@ -138,6 +171,8 @@ jobs:
 
   check-formatting:
     name: check-formatting (${{ matrix.module.path }})
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
 
     strategy:
@@ -176,6 +211,8 @@ jobs:
 
   check-config:
     name: check-config (${{ matrix.module.path }})
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
 
     strategy:
@@ -208,6 +245,8 @@ jobs:
   # Do a simple "smoke test" build for the modules with no other form of validation
   build:
     name: build (${{ matrix.module.path }})
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
 
     strategy:
