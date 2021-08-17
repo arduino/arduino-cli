@@ -356,7 +356,60 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 		return fmt.Errorf(tr("loading boards: %s"), err)
 	}
 
+	if !platform.PluggableDiscoveryAware {
+		convertLegacyPlatformToPluggableDiscovery(platform)
+	}
 	return nil
+}
+
+func convertLegacyPlatformToPluggableDiscovery(platform *cores.PlatformRelease) {
+	toolsProps := platform.Properties.SubTree("tools").FirstLevelOf()
+	for toolName, toolProps := range toolsProps {
+		if !toolProps.ContainsKey("upload.network_pattern") {
+			continue
+		}
+
+		// Convert network_pattern configuration to pluggable discovery
+		convertedToolName := toolName + "__pluggable_network"
+		convertedProps := convertLegacyNetworkPatternToPluggableDiscovery(toolProps, convertedToolName)
+
+		// Merge the converted properties in the root configuration
+		platform.Properties.Merge(convertedProps)
+
+		// Add the network upload to the boards using the old method
+		for _, board := range platform.Boards {
+			oldUploadTool := board.Properties.Get("upload.tool")
+			if oldUploadTool == toolName && !board.Properties.ContainsKey("upload.tool.network") {
+				board.Properties.Set("upload.tool.network", convertedToolName)
+				// fmt.Printf("ADDED: %s.upload.tool.network=%s\n", board, convertedToolName)
+			}
+		}
+	}
+}
+
+func convertLegacyNetworkPatternToPluggableDiscovery(props *properties.Map, newToolName string) *properties.Map {
+	pattern, ok := props.GetOk("upload.network_pattern")
+	if !ok {
+		return nil
+	}
+	props.Remove("upload.network_pattern")
+	pattern = strings.ReplaceAll(pattern, "{serial.port}", "{upload.port.address}")
+	pattern = strings.ReplaceAll(pattern, "{network.port}", "{upload.port.properties.port}")
+	if strings.Contains(pattern, "{network.password}") {
+		props.Set("upload.field.password", "Password")
+		props.Set("upload.field.password.secret", "true")
+		pattern = strings.ReplaceAll(pattern, "{network.password}", "{upload.field.password}")
+	}
+	props.Set("upload.pattern", pattern)
+
+	prefix := "tools." + newToolName + "."
+	res := properties.NewMap()
+	for _, k := range props.Keys() {
+		v := props.Get(k)
+		res.Set(prefix+k, v)
+		// fmt.Println("ADDED:", prefix+k+"="+v)
+	}
+	return res
 }
 
 func (pm *PackageManager) loadProgrammer(programmerProperties *properties.Map) *cores.Programmer {
