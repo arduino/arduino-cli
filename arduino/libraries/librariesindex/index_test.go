@@ -16,11 +16,13 @@
 package librariesindex
 
 import (
+	json "encoding/json"
 	"fmt"
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/go-paths-helper"
+	easyjson "github.com/mailru/easyjson"
 	"github.com/stretchr/testify/require"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -112,4 +114,28 @@ func TestIndexer(t *testing.T) {
 	require.Contains(t, resolve2, eccx135)
 	require.Contains(t, resolve2, bear172)
 	require.Contains(t, resolve2, http040)
+}
+
+func BenchmarkIndexParsingStdJSON(b *testing.B) {
+	indexFile := paths.New("testdata/library_index.json")
+	buff, err := indexFile.ReadFile()
+	require.NoError(b, err)
+	b.SetBytes(int64(len(buff)))
+	for i := 0; i < b.N; i++ {
+		var i indexJSON
+		err = json.Unmarshal(buff, &i)
+		require.NoError(b, err)
+	}
+}
+
+func BenchmarkIndexParsingEasyJSON(b *testing.B) {
+	indexFile := paths.New("testdata/library_index.json")
+	buff, err := indexFile.ReadFile()
+	require.NoError(b, err)
+	b.SetBytes(int64(len(buff)))
+	for i := 0; i < b.N; i++ {
+		var i indexJSON
+		err = easyjson.Unmarshal(buff, &i)
+		require.NoError(b, err)
+	}
 }
