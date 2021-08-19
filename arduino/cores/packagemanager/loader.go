@@ -382,6 +382,17 @@ func convertLegacyPlatformToPluggableDiscovery(platform *cores.PlatformRelease) 
 			if oldUploadTool == toolName && !board.Properties.ContainsKey("upload.tool.network") {
 				board.Properties.Set("upload.tool.network", convertedToolName)
 				// fmt.Printf("ADDED: %s.upload.tool.network=%s\n", board, convertedToolName)
+
+				// Add identification properties for network protocol
+				i := 0
+				for {
+					if !board.Properties.ContainsKey(fmt.Sprintf("upload_port.%d.vid", i)) {
+						break
+					}
+					i++
+				}
+				board.Properties.Set(fmt.Sprintf("upload_port.%d.board", i), board.BoardID)
+				// fmt.Printf("ADDED: upload_port.%d.board=%s\n", i, board.BoardID)
 			}
 		}
 	}

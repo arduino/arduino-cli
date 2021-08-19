@@ -2128,7 +2128,7 @@ msgstr "can't find latest release of %s"
 msgid "can't find main Sketch file in %s"
 msgstr "can't find main Sketch file in %s"
 
-#: arduino/cores/packagemanager/loader.go:687
+#: arduino/cores/packagemanager/loader.go:751
 msgid "can't find pattern for discovery with id %s"
 msgstr "can't find pattern for discovery with id %s"
 
@@ -2238,7 +2238,7 @@ msgstr "copying output file %s"
 msgid "could not find a valid build artifact"
 msgstr "could not find a valid build artifact"
 
-#: arduino/cores/packagemanager/loader.go:659
+#: arduino/cores/packagemanager/loader.go:723
 msgid "creating discovery: %s"
 msgstr "creating discovery: %s"
 
@@ -2293,11 +2293,11 @@ msgstr "destination dir %s already exists, cannot install"
 msgid "discovery %[1]s process not started: %[2]w"
 msgstr "discovery %[1]s process not started: %[2]w"
 
-#: arduino/cores/packagemanager/loader.go:648
+#: arduino/cores/packagemanager/loader.go:712
 msgid "discovery not found: %s"
 msgstr "discovery not found: %s"
 
-#: arduino/cores/packagemanager/loader.go:653
+#: arduino/cores/packagemanager/loader.go:717
 msgid "discovery not installed: %s"
 msgstr "discovery not installed: %s"
 
@@ -2496,7 +2496,7 @@ msgstr "getting build properties for board %[1]s: %[2]s"
 msgid "getting discovery dependencies for platform %[1]s: %[2]s"
 msgstr "getting discovery dependencies for platform %[1]s: %[2]s"
 
-#: arduino/cores/packagemanager/loader.go:587
+#: arduino/cores/packagemanager/loader.go:651
 msgid "getting parent dir of %[1]s: %[2]s"
 msgstr "getting parent dir of %[1]s: %[2]s"
 
@@ -2758,7 +2758,7 @@ msgstr "loading board data: %s"
 msgid "loading boards: %s"
 msgstr "loading boards: %s"
 
-#: arduino/cores/packagemanager/loader.go:542
+#: arduino/cores/packagemanager/loader.go:606
 msgid "loading bundled tools from %[1]s: %[2]s"
 msgstr "loading bundled tools from %[1]s: %[2]s"
 
@@ -2785,7 +2785,7 @@ msgstr "loading platform release %[1]s: %[2]s"
 msgid "loading platform.txt: %v"
 msgstr "loading platform.txt: %v"
 
-#: arduino/cores/packagemanager/loader.go:509
+#: arduino/cores/packagemanager/loader.go:573
 msgid "loading tool release in %[1]s: %[2]s"
 msgstr "loading tool release in %[1]s: %[2]s"
 
@@ -2997,7 +2997,7 @@ msgstr "platform not found: %s"
 
 #: arduino/cores/packagemanager/install_uninstall.go:65
 #: arduino/cores/packagemanager/install_uninstall.go:108
-#: arduino/cores/packagemanager/loader.go:371
+#: arduino/cores/packagemanager/loader.go:435
 #: commands/compile/compile.go:128
 msgid "platform not installed"
 msgstr "platform not installed"
@@ -3050,7 +3050,7 @@ msgstr "quitting discovery %[1]s: %[2]w"
 msgid "reading %[1]s directory: %[2]s"
 msgstr "reading %[1]s directory: %[2]s"
 
-#: arduino/cores/packagemanager/loader.go:592
+#: arduino/cores/packagemanager/loader.go:656
 msgid "reading %[1]s: %[2]s"
 msgstr "reading %[1]s: %[2]s"
 
@@ -3064,7 +3064,7 @@ msgid "reading dir %[1]s: %[2]s"
 msgstr "reading dir %[1]s: %[2]s"
 
 #: arduino/cores/packagemanager/loader.go:162
-#: arduino/cores/packagemanager/loader.go:500
+#: arduino/cores/packagemanager/loader.go:564
 msgid "reading directory %[1]s: %[2]s"
 msgstr "reading directory %[1]s: %[2]s"
 
@@ -3163,7 +3163,7 @@ msgstr "saving downloaded index signature: %s"
 msgid "scanning examples: %s"
 msgstr "scanning examples: %s"
 
-#: arduino/cores/packagemanager/loader.go:578
+#: arduino/cores/packagemanager/loader.go:642
 msgid "searching for builtin_tools_versions.txt in %[1]s: %[2]s"
 msgstr "searching for builtin_tools_versions.txt in %[1]s: %[2]s"
 
@@ -3184,7 +3184,7 @@ msgstr "signature verification error: %s"
 msgid "sketchPath"
 msgstr "sketchPath"
 
-#: arduino/cores/packagemanager/loader.go:434
+#: arduino/cores/packagemanager/loader.go:498
 msgid "skipping loading of boards %s: malformed custom board options"
 msgstr "skipping loading of boards %s: malformed custom board options"
 
