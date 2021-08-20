@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Fetch downloads count
         id: fetch
-        uses: actions/github-script@v4.0.2
+        uses: actions/github-script@v4.1
         with:
           github-token: ${{github.token}}
           script: |
