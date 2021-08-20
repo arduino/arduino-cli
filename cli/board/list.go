@@ -122,14 +122,15 @@ func (dr result) String() string {
 	})
 
 	t := table.New()
-	t.SetHeader(tr("Port"), tr("Type"), tr("Board Name"), tr("FQBN"), tr("Core"))
+	t.SetHeader(tr("Port"), tr("Protocol"), tr("Type"), tr("Board Name"), tr("FQBN"), tr("Core"))
 	for _, detectedPort := range dr.ports {
 		port := detectedPort.Port
-		address := port.GetProtocol() + "://" + port.GetAddress()
+		protocol := port.GetProtocol()
+		address := port.GetAddress()
 		if port.GetProtocol() == "serial" {
 			address = port.GetAddress()
 		}
-		protocol := port.GetProtocolLabel()
+		protocolLabel := port.GetProtocolLabel()
 		if boards := detectedPort.GetMatchingBoards(); len(boards) > 0 {
 			sort.Slice(boards, func(i, j int) bool {
 				x, y := boards[i], boards[j]
@@ -146,7 +147,7 @@ func (dr result) String() string {
 					coreName = fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch)
 				}
 
-				t.AddRow(address, protocol, board, fqbn, coreName)
+				t.AddRow(address, protocol, protocolLabel, board, fqbn, coreName)
 
 				// reset address and protocol, we only show them on the first row
 				address = ""
