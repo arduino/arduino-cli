@@ -41,7 +41,7 @@ func initListCommand() *cobra.Command {
 		Run:     runListCommand,
 	}
 
-	listCommand.Flags().DurationVar(&listFlags.timeout, "timeout", 0,
+	listCommand.Flags().DurationVar(&listFlags.timeout, "timeout", time.Second,
 		tr("The connected devices search timeout, raise it if your board doesn't show up e.g.: 10s"))
 	listCommand.Flags().BoolVarP(&listFlags.watch, "watch", "w", false,
 		tr("Command keeps running and prints list of connected boards whenever there is a change."))
