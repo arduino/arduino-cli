@@ -17,7 +17,6 @@ import tempfile
 import sys
 import hashlib
 import pytest
-import os
 from pathlib import Path
 
 
@@ -462,24 +461,24 @@ testdata = [
             "-f "
             '"{data_dir}/packages/arduino/hardware/samd/1.8.11/variants/arduino_zero/openocd_scripts/arduino_zero.cfg" '
             '-c "telnet_port disabled; program '
-            "{bo}{build_dir}/{sketch_name}.ino.bin{bc} verify reset "
-            '0x2000; shutdown"\n',
+            "{{{build_dir}/{sketch_name}.ino.bin}} verify reset 0x2000; "
+            'shutdown"\n',
             "linux": '"{data_dir}/packages/arduino/tools/openocd/0.10.0-arduino7/bin/openocd" '
             "-d2 -s "
             '"{data_dir}/packages/arduino/tools/openocd/0.10.0-arduino7/share/openocd/scripts/" '
             "-f "
             '"{data_dir}/packages/arduino/hardware/samd/1.8.11/variants/arduino_zero/openocd_scripts/arduino_zero.cfg" '
             '-c "telnet_port disabled; program '
-            "{bo}{build_dir}/{sketch_name}.ino.bin{bc} verify reset "
-            '0x2000; shutdown"\n',
+            "{{{build_dir}/{sketch_name}.ino.bin}} verify reset 0x2000; "
+            'shutdown"\n',
             "win32": '"{data_dir}/packages/arduino/tools/openocd/0.10.0-arduino7/bin/openocd.exe" '
             "-d2 -s "
             '"{data_dir}/packages/arduino/tools/openocd/0.10.0-arduino7/share/openocd/scripts/" '
             "-f "
             '"{data_dir}/packages/arduino/hardware/samd/1.8.11/variants/arduino_zero/openocd_scripts/arduino_zero.cfg" '
             '-c "telnet_port disabled; program '
-            "{bo}{build_dir}/{sketch_name}.ino.bin{bc} verify reset "
-            '0x2000; shutdown"\n',
+            "{{{build_dir}/{sketch_name}.ino.bin}} verify reset 0x2000; "
+            'shutdown"\n',
         },
     ),
     (
@@ -1170,7 +1169,7 @@ def test_upload_sketch(
     }
 
     # Install everything just once
-    if not os.path.isdir(session_data_dir + "/packages"):
+    if not Path(session_data_dir, "packages").is_dir():
         assert run_command("config init --overwrite", custom_env=env)
         for package_index in indexes:
             assert run_command(f"config add board_manager.additional_urls {package_index}", custom_env=env)
@@ -1186,15 +1185,8 @@ def test_upload_sketch(
 
     # Fake compilation, we just need the folder to exist
     build_dir = generate_build_dir(sketch_path)
-    if programmer != "":
-        programmer_arg = "-P " + programmer
-    else:
-        programmer_arg = ""
-    if upload_port != "":
-        port_arg = "-p " + upload_port
-    else:
-        port_arg = ""
-
+    programmer_arg = f"-P {programmer}" if programmer else ""
+    port_arg = f"-p {upload_port}" if upload_port else ""
     res = run_command(f'upload {port_arg} {programmer_arg} -b {fqbn} "{sketch_path}" --dry-run -v', custom_env=env)
     assert res.ok
 
@@ -1207,8 +1199,6 @@ def test_upload_sketch(
         upload_port=upload_port,
         build_dir=build_dir,
         sketch_name=sketch_name,
-        bo="{",
-        bc="}",
     ).replace("\\", "/")
 
     expected_output in res.stdout.replace("\\", "/").replace("\r", "")
