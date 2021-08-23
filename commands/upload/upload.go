@@ -19,8 +19,8 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"net/url"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -39,6 +39,91 @@ import (
 )
 
 var tr = i18n.Tr
+
+// SupportedUserFields returns a SupportedUserFieldsResponse containing all the UserFields supported
+// by the upload tools needed by the board using the protocol specified in SupportedUserFieldsRequest.
+func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsRequest) (*rpc.SupportedUserFieldsResponse, error) {
+	if req.Protocol == "" {
+		return nil, fmt.Errorf(tr("missing protocol"))
+	}
+
+	pm := commands.GetPackageManager(req.GetInstance().GetId())
+	if pm == nil {
+		return nil, fmt.Errorf(tr("invalid instance"))
+	}
+
+	fqbn, err := cores.ParseFQBN(req.GetFqbn())
+	if err != nil {
+		return nil, fmt.Errorf(tr("parsing fqbn: %s"), err)
+	}
+
+	_, platformRelease, board, _, _, err := pm.ResolveFQBN(fqbn)
+	if err != nil {
+		return nil, fmt.Errorf(tr("loading board data: %s"), err)
+	}
+
+	toolID, err := getToolID(board.Properties, "upload", req.Protocol)
+	if err != nil {
+		return nil, err
+	}
+
+	userFields, err := getUserFields(toolID, platformRelease)
+	if err != nil {
+		return nil, err
+	}
+
+	return &rpc.SupportedUserFieldsResponse{
+		UserFields: userFields,
+	}, nil
+}
+
+// getToolID returns the ID of the tool that supports the action and protocol combination by searching in props.
+// Returns error if tool cannot be found.
+func getToolID(props *properties.Map, action, protocol string) (string, error) {
+	toolProperty := fmt.Sprintf("%s.tool.%s", action, protocol)
+	defaultToolProperty := fmt.Sprintf("%s.tool.default", action)
+
+	if t, ok := props.GetOk(toolProperty); ok {
+		return t, nil
+	} else if t, ok := props.GetOk(defaultToolProperty); ok {
+		// Fallback for platform that don't support the specified protocol for specified action:
+		// https://arduino.github.io/arduino-cli/latest/platform-specification/#sketch-upload-configuration
+		return t, nil
+	}
+	return "", fmt.Errorf(tr("cannot find tool: undefined '%s' property"), toolProperty)
+}
+
+// getUserFields return all user fields supported by the tools specified.
+// Returns error only in case the secret property is not a valid boolean.
+func getUserFields(toolID string, platformRelease *cores.PlatformRelease) ([]*rpc.UserField, error) {
+	userFields := []*rpc.UserField{}
+	fields := platformRelease.Properties.SubTree(fmt.Sprintf("tools.%s.upload.field", toolID))
+	keys := fields.FirstLevelKeys()
+
+	for _, key := range keys {
+		value := fields.Get(key)
+		if len(value) > 50 {
+			value = fmt.Sprintf("%s…", value[:49])
+		}
+		secretProp := fmt.Sprintf("%s.secret", key)
+		secret, ok := fields.GetOk(secretProp)
+		if !ok {
+			secret = "false"
+		}
+		isSecret, err := strconv.ParseBool(secret)
+		if err != nil {
+			return nil, fmt.Errorf(tr("parsing %s, property is not a boolean"), fmt.Sprintf(`"tools.%s.upload.field.%s.secret"`, toolID, key))
+		}
+		userFields = append(userFields, &rpc.UserField{
+			ToolId: toolID,
+			Name:   key,
+			Label:  value,
+			Secret: isSecret,
+		})
+	}
+
+	return userFields, nil
+}
 
 // Upload FIXMEDOC
 func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, errStream io.Writer) (*rpc.UploadResponse, error) {
@@ -68,6 +153,7 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		outStream,
 		errStream,
 		req.GetDryRun(),
+		req.GetUserFields(),
 	)
 	if err != nil {
 		return nil, err
@@ -92,32 +178,23 @@ func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest,
 		Programmer: req.GetProgrammer(),
 		Verbose:    req.GetVerbose(),
 		Verify:     req.GetVerify(),
+		UserFields: req.GetUserFields(),
 	}, outStream, errStream)
 	return &rpc.UploadUsingProgrammerResponse{}, err
 }
 
 func runProgramAction(pm *packagemanager.PackageManager,
 	sk *sketch.Sketch,
-	importFile, importDir, fqbnIn, port string,
+	importFile, importDir, fqbnIn string, port *rpc.Port,
 	programmerID string,
 	verbose, verify, burnBootloader bool,
 	outStream, errStream io.Writer,
-	dryRun bool) error {
+	dryRun bool, userFields map[string]string) error {
 
 	if burnBootloader && programmerID == "" {
 		return fmt.Errorf(tr("no programmer specified for burning bootloader"))
 	}
 
-	// FIXME: make a specification on how a port is specified via command line
-	if port == "" && sk != nil && sk.Metadata != nil {
-		deviceURI, err := url.Parse(sk.Metadata.CPU.Port)
-		if err != nil {
-			return fmt.Errorf(tr("invalid Device URL format: %s"), err)
-		}
-		if deviceURI.Scheme == "serial" {
-			port = deviceURI.Host + deviceURI.Path
-		}
-	}
 	logrus.WithField("port", port).Tracef("Upload port")
 
 	if fqbnIn == "" && sk != nil && sk.Metadata != nil {
@@ -157,28 +234,23 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	}
 
 	// Determine upload tool
-	var uploadToolID string
-	{
-		toolProperty := "upload.tool"
-		if burnBootloader {
-			toolProperty = "bootloader.tool"
-		} else if programmer != nil {
-			toolProperty = "program.tool"
-		}
-
-		// create a temporary configuration only for the selection of upload tool
-		props := properties.NewMap()
-		props.Merge(boardPlatform.Properties)
-		props.Merge(boardPlatform.RuntimeProperties())
-		props.Merge(boardProperties)
-		if programmer != nil {
-			props.Merge(programmer.Properties)
-		}
-		if t, ok := props.GetOk(toolProperty); ok {
-			uploadToolID = t
-		} else {
-			return fmt.Errorf(tr("cannot get programmer tool: undefined '%s' property"), toolProperty)
-		}
+	// create a temporary configuration only for the selection of upload tool
+	props := properties.NewMap()
+	props.Merge(boardPlatform.Properties)
+	props.Merge(boardPlatform.RuntimeProperties())
+	props.Merge(boardProperties)
+	if programmer != nil {
+		props.Merge(programmer.Properties)
+	}
+	action := "upload"
+	if burnBootloader {
+		action = "bootloader"
+	} else if programmer != nil {
+		action = "program"
+	}
+	uploadToolID, err := getToolID(props, action, port.Protocol)
+	if err != nil {
+		return err
 	}
 
 	var uploadToolPlatform *cores.PlatformRelease
@@ -229,6 +301,14 @@ func runProgramAction(pm *packagemanager.PackageManager,
 				errStream.Write([]byte(fmt.Sprintf(tr("Warning: tool '%s' is not installed. It might not be available for your OS."), requiredTool)))
 			}
 		}
+	}
+
+	// Certain tools require the user to provide custom fields at run time,
+	// if they've been provided set them
+	// For more info:
+	// https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
+	for name, value := range userFields {
+		uploadProperties.Set(fmt.Sprintf("%s.field.%s", action, name), value)
 	}
 
 	if !uploadProperties.ContainsKey("upload.protocol") && programmer == nil {
@@ -295,14 +375,14 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	// If not using programmer perform some action required
 	// to set the board in bootloader mode
 	actualPort := port
-	if programmer == nil && !burnBootloader {
+	if programmer == nil && !burnBootloader && port.Protocol == "serial" {
 
 		// Perform reset via 1200bps touch if requested and wait for upload port also if requested.
 		touch := uploadProperties.GetBoolean("upload.use_1200bps_touch")
 		wait := false
 		portToTouch := ""
 		if touch {
-			portToTouch = port
+			portToTouch = port.Address
 			// Waits for upload port only if a 1200bps touch is done
 			wait = uploadProperties.GetBoolean("upload.wait_for_upload_port")
 		}
@@ -352,19 +432,28 @@ func runProgramAction(pm *packagemanager.PackageManager,
 			outStream.Write([]byte(fmt.Sprintln()))
 		} else {
 			if newPort != "" {
-				actualPort = newPort
+				actualPort.Address = newPort
 			}
 		}
 	}
 
-	if actualPort != "" {
+	if actualPort.Address != "" {
 		// Set serial port property
-		uploadProperties.Set("serial.port", actualPort)
-		if strings.HasPrefix(actualPort, "/dev/") {
-			uploadProperties.Set("serial.port.file", actualPort[5:])
-		} else {
-			uploadProperties.Set("serial.port.file", actualPort)
+		uploadProperties.Set("serial.port", actualPort.Address)
+		if actualPort.Protocol == "serial" {
+			// This must be done only for serial ports
+			portFile := strings.TrimPrefix(actualPort.Address, "/dev/")
+			uploadProperties.Set("serial.port.file", portFile)
 		}
+	}
+
+	// Get Port properties gathered using pluggable discovery
+	uploadProperties.Set("upload.port.address", port.Address)
+	uploadProperties.Set("upload.port.label", port.Label)
+	uploadProperties.Set("upload.port.protocol", port.Protocol)
+	uploadProperties.Set("upload.port.protocolLabel", port.ProtocolLabel)
+	for prop, value := range actualPort.Properties {
+		uploadProperties.Set(fmt.Sprintf("upload.port.properties.%s", prop), value)
 	}
 
 	// Run recipes for upload

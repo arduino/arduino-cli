@@ -4,6 +4,66 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## Unreleased
 
+### gRPC interface `UploadRequest`, `UploadUsingProgrammerRequest`, `BurnBootloaderRequest`, `DetectedPort` field changes
+
+`UploadRequest`, `UploadUsingProgrammerRequest` and `BurnBootloaderRequest` had their `port` field change from type
+`string` to `Port`.
+
+`Port` contains the following information:
+
+```
+// Port represents a board port that may be used to upload or to monitor a board
+message Port {
+  // Address of the port (e.g., `/dev/ttyACM0`).
+  string address = 1;
+  // The port label to show on the GUI (e.g. "ttyACM0")
+  string label = 2;
+  // Protocol of the port (e.g., `serial`, `network`, ...).
+  string protocol = 3;
+  // A human friendly description of the protocol (e.g., "Serial Port (USB)"
+  string protocol_label = 4;
+  // A set of properties of the port
+  map<string, string> properties = 5;
+}
+```
+
+The gRPC interface message `DetectedPort` has been changed from:
+
+```
+message DetectedPort {
+  // Address of the port (e.g., `serial:///dev/ttyACM0`).
+  string address = 1;
+  // Protocol of the port (e.g., `serial`).
+  string protocol = 2;
+  // A human friendly description of the protocol (e.g., "Serial Port (USB)").
+  string protocol_label = 3;
+  // The boards attached to the port.
+  repeated BoardListItem boards = 4;
+  // Serial number of connected board
+  string serial_number = 5;
+}
+```
+
+to:
+
+```
+message DetectedPort {
+  // The possible boards attached to the port.
+  repeated BoardListItem matching_boards = 1;
+  // The port details
+  Port port = 2;
+}
+```
+
+The properties previously contained directly in the message are now stored in the `port` property.
+
+These changes are necessary for the pluggable discovery.
+
+### gRPC interface `BoardListItem` change
+
+The `vid` and `pid` fields of the `BoardListItem` message have been removed. They used to only be available when
+requesting connected board lists, now that information is stored in the `port` field of `DetectedPort`.
+
 ### Change public library interface
 
 #### `github.com/arduino/arduino-cli/i18n` package

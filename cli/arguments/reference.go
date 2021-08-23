@@ -13,34 +13,34 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package globals
+package arguments
 
 import (
 	"fmt"
 	"strings"
 )
 
-// ReferenceArg represents a reference item (core or library) passed to the CLI
+// Reference represents a reference item (core or library) passed to the CLI
 // interface
-type ReferenceArg struct {
+type Reference struct {
 	PackageName  string
 	Architecture string
 	Version      string
 }
 
-func (r *ReferenceArg) String() string {
+func (r *Reference) String() string {
 	if r.Version != "" {
 		return r.PackageName + ":" + r.Architecture + "@" + r.Version
 	}
 	return r.PackageName + ":" + r.Architecture
 }
 
-// ParseReferenceArgs is a convenient wrapper that operates on a slice of strings and
-// calls ParseReferenceArg for each of them. It returns at the first invalid argument.
-func ParseReferenceArgs(args []string, parseArch bool) ([]*ReferenceArg, error) {
-	ret := []*ReferenceArg{}
+// ParseReferences is a convenient wrapper that operates on a slice of strings and
+// calls ParseReference for each of them. It returns at the first invalid argument.
+func ParseReferences(args []string, parseArch bool) ([]*Reference, error) {
+	ret := []*Reference{}
 	for _, arg := range args {
-		reference, err := ParseReferenceArg(arg, parseArch)
+		reference, err := ParseReference(arg, parseArch)
 		if err != nil {
 			return nil, err
 		}
@@ -49,11 +49,11 @@ func ParseReferenceArgs(args []string, parseArch bool) ([]*ReferenceArg, error) 
 	return ret, nil
 }
 
-// ParseReferenceArg parses a string and return a ReferenceArg object. If `parseArch` is passed,
+// ParseReference parses a string and returns a Reference object. If `parseArch` is passed,
 // the method also tries to parse the architecture bit, i.e. string must be in the form
 // "packager:arch@version", useful to represent a platform (or core) name.
-func ParseReferenceArg(arg string, parseArch bool) (*ReferenceArg, error) {
-	ret := &ReferenceArg{}
+func ParseReference(arg string, parseArch bool) (*Reference, error) {
+	ret := &Reference{}
 	if arg == "" {
 		return nil, fmt.Errorf(tr("invalid empty core argument"))
 	}
