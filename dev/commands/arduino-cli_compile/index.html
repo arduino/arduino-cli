@@ -407,6 +407,18 @@
   
   
     <li class="md-nav__item">
+      <a href="../arduino-cli_board_search/" class="md-nav__link">
+        board search
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../arduino-cli_burn-bootloader/" class="md-nav__link">
         burn-bootloader
       </a>
@@ -1141,6 +1153,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../../pluggable-discovery-specification/" class="md-nav__link">
+        Pluggable discovery specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../package_index_json-specification/" class="md-nav__link">
         Package index specification
       </a>
@@ -1255,6 +1282,7 @@
       --build-path string            Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS.
       --build-property stringArray   Override a build property with a custom value. Can be used multiple times for multiple properties.
       --clean                        Optional, cleanup the build folder and do not use any cached build.
+      --discovery-timeout duration   Max time to wait for port discovery, e.g.: 30s, 1m (default 5s)
   -e, --export-binaries              If set built binaries will be exported to the sketch folder.
   -b, --fqbn string                  Fully Qualified Board Name, e.g.: arduino:avr:uno
   -h, --help                         help for compile
@@ -1263,9 +1291,10 @@
       --only-compilation-database    Just produce the compilation database, without actually compiling.
       --optimize-for-debug           Optional, optimize compile output for debugging, rather than for release.
       --output-dir string            Save build artifacts in this directory.
-  -p, --port string                  Upload port, e.g.: COM10 or /dev/ttyACM0
+  -p, --port string                  Upload port address, e.g.: COM3 or /dev/ttyACM2
       --preprocess                   Print preprocessed code to stdout instead of compiling.
   -P, --programmer string            Optional, use the specified programmer to upload.
+  -l, --protocol string              Upload port protocol, e.g: serial
       --quiet                        Optional, suppresses almost every output.
       --show-properties              Show all build properties used instead of compiling.
   -u, --upload                       Upload the binary after the compilation.

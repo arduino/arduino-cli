@@ -405,6 +405,18 @@
   
   
     <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board_search/" class="md-nav__link">
+        board search
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../commands/arduino-cli_burn-bootloader/" class="md-nav__link">
         burn-bootloader
       </a>
@@ -1302,6 +1314,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#pluggable-discovery" class="md-nav__link">
+    Pluggable discovery
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#verbose-parameter" class="md-nav__link">
     Verbose parameter
   </a>
@@ -1315,6 +1334,20 @@
   
     <nav class="md-nav" aria-label="Sketch upload configuration">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#properties-from-pluggable-discovery" class="md-nav__link">
+    Properties from pluggable discovery
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#user-provided-fields" class="md-nav__link">
+    User provided fields
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#upload-verification" class="md-nav__link">
@@ -1455,6 +1488,21 @@
   
 </nav>
       
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pluggable-discovery-specification/" class="md-nav__link">
+        Pluggable discovery specification
+      </a>
     </li>
   
 
@@ -1724,6 +1772,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#pluggable-discovery" class="md-nav__link">
+    Pluggable discovery
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#verbose-parameter" class="md-nav__link">
     Verbose parameter
   </a>
@@ -1737,6 +1792,20 @@
   
     <nav class="md-nav" aria-label="Sketch upload configuration">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#properties-from-pluggable-discovery" class="md-nav__link">
+    Properties from pluggable discovery
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#user-provided-fields" class="md-nav__link">
+    User provided fields
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#upload-verification" class="md-nav__link">
@@ -2254,6 +2323,22 @@ following properties are automatically generated:</p>
 <li><code>{build.variant.path}</code>: The path to the selected board variant folder (inside the
   <a href="#platform-terminology">variant platform</a>, for example hardware/arduino/avr/variants/micro)</li>
 </ul>
+<p>If the platform supports pluggable discovery it may also declare a set of <code>upload_port.*</code> properties, these properties
+will be used to identify a board by the discovery process when plugged in.</p>
+<p>For example we could declare a series of <code>upload_port.vid</code> and <code>upload_port.pid</code> properties for the Uno like so:</p>
+<div class="highlight"><pre><span></span><code>uno.upload_port.vid.0=0x2341
+uno.upload_port.pid.0=0x0043
+uno.upload_port.vid.1=0x2341
+uno.upload_port.pid.1=0x0001
+uno.upload_port.vid.2=0x2A03
+uno.upload_port.pid.2=0x0043
+uno.upload_port.vid.3=0x2341
+uno.upload_port.pid.3=0x0243
+</code></pre></div>
+<p>In this case we're using the board's USB VID/PID pair to identify it but <code>upload_port.*</code> properties can be anything that
+can help identify a certain board. For more detailed information see the
+<a href="../pluggable-discovery-specification/#board-identification">board identification</a> section of the pluggable discovery
+documentation.</p>
 <h3 id="cores">Cores<a class="headerlink" href="#cores" title="Permanent link">&para;</a></h3>
 <p>Cores are placed inside the <strong>cores</strong> subfolder. Many different cores can be provided within a single platform. For
 example the following could be a valid platform layout:</p>
@@ -2406,7 +2491,7 @@ tools.avrdude.bootloader.pattern=[......]
 tools.avrdude.cmd.path={path}/bin/avrdude
 tools.avrdude.config.path={path}/etc/avrdude.conf
 
-tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D &quot;-Uflash:w:{build.path}/{build.project_name}.hex:i&quot;
+tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; -p{build.mcu} -c{upload.port.protocol} -P{upload.port.address} -b{upload.speed} -D &quot;-Uflash:w:{build.path}/{build.project_name}.hex:i&quot;
 </code></pre></div>
 <p>A <strong>{runtime.tools.TOOL_NAME.path}</strong> and <strong>{runtime.tools.TOOL_NAME-TOOL_VERSION.path}</strong> property is generated for the
 tools of Arduino AVR Boards and any other platform installed via Boards Manager. <strong>{runtime.tools.TOOL_NAME.path}</strong>
@@ -2414,6 +2499,40 @@ points to the latest version of the tool available.</p>
 <p>The tool configuration properties are available globally without the prefix. For example, the <strong>tools.avrdude.cmd.path</strong>
 property can be used as <strong>{cmd.path}</strong> inside the recipe, and the same happens for all the other avrdude configuration
 variables.</p>
+<h4 id="pluggable-discovery">Pluggable discovery<a class="headerlink" href="#pluggable-discovery" title="Permanent link">&para;</a></h4>
+<p>Discovery tools are a special kind of tool used to find supported boards. A platform must declare one or more Pluggable
+Discoveries in its <a href="#platformtxt"><code>platform.txt</code></a>. Discoveries can be referenced from other packages, including the
+<code>builtin</code> dummy package which contains the traditional discoveries.</p>
+<p>There are two different syntaxes to declare discoveries. If the platform uses just one discovery:</p>
+<div class="highlight"><pre><span></span><code>pluggable_discovery.required=VENDOR_ID:DISCOVERY_NAME
+</code></pre></div>
+<p>instead if it needs multiple discoveries:</p>
+<div class="highlight"><pre><span></span><code>pluggable_discovery.required.0=VENDOR_ID:DISCOVERY_0_NAME
+pluggable_discovery.required.1=VENDOR_ID:DISCOVERY_1_NAME
+</code></pre></div>
+<p>A platform that supports only boards connected via serial ports can easily use the <code>builtin</code> package's
+<code>serial-discovery</code> without creating a custom pluggable discovery:</p>
+<div class="highlight"><pre><span></span><code>pluggable_discovery.required=builtin:serial-discovery
+</code></pre></div>
+<p>if it also supports boards connected via the network, it can use the <code>builtin</code> package's <code>mdns-discovery</code>:</p>
+<div class="highlight"><pre><span></span><code>pluggable_discovery.required.0=builtin:serial-discovery
+pluggable_discovery.required.1=builtin:mdns-discovery
+</code></pre></div>
+<p>Since the above syntax requires specifying a discovery via the <code>discoveryDependencies</code> field of the platform's
+<a href="../package_index_json-specification/">package index</a>, it might be cumbersome to use with manual installations. So we
+provide another syntax to ease development and beta testing:</p>
+<div class="highlight"><pre><span></span><code>pluggable_discovery.DISCOVERY_ID.pattern=DISCOVERY_RECIPE
+</code></pre></div>
+<p><code>DISCOVERY_ID</code> must be replaced by a unique identifier for the particular discovery and <code>DISCOVERY_RECIPE</code> must be
+replaced by the command line to launch the discovery. An example could be:</p>
+<div class="highlight"><pre><span></span><code>## Teensy Ports Discovery
+pluggable_discovery.teensy.pattern=&quot;{runtime.tools.teensy_ports.path}/hardware/tools/teensy_ports&quot; -J2
+</code></pre></div>
+<p>We strongly recommend using this syntax only for development purposes and not on released platforms.</p>
+<p>For backward compatibility, if a platform does not declare any discovery (using the <code>pluggable_discovery.*</code> properties
+in <code>platform.txt</code>) it will automatically inherit <code>builtin:serial-discovery</code> and <code>builtin:mdns-discovery</code> (but not other
+builtin discoveries that may be possibly added in the future).</p>
+<p>For detailed information, see the <a href="../pluggable-discovery-specification/">Pluggable Discovery specification</a>.</p>
 <h4 id="verbose-parameter">Verbose parameter<a class="headerlink" href="#verbose-parameter" title="Permanent link">&para;</a></h4>
 <p>It is possible for the user to enable verbosity from the Preferences panel of the IDEs or Arduino CLI's <code>--verbose</code>
 flag. This preference is transferred to the command line using the <strong>ACTION.verbose</strong> property (where ACTION is the
@@ -2434,24 +2553,42 @@ tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; 
 <p>The Upload action is triggered when the user clicks on the "Upload" button on the IDE toolbar or uses
 <a href="../commands/arduino-cli_upload/"><code>arduino-cli upload</code></a>. Arduino uses the term "upload" for the process of transferring a
 program to the Arduino board.</p>
-<p>The <strong>upload.tool</strong> property determines the tool to be used for upload. A specific <strong>upload.tool</strong> property should be
-defined for every board in boards.txt:</p>
+<p>The <strong>upload.tool.&lt;protocol_name></strong> property determines the tool to be used for upload. A specific
+<strong>upload.tool.&lt;protocol_name></strong> property should be defined for every board in boards.txt:</p>
 <div class="highlight"><pre><span></span><code>[......]
-uno.upload.tool=avrdude
+uno.upload.tool.serial=avrdude
 [......]
-leonardo.upload.tool=avrdude
+leonardo.upload.tool.serial=avrdude
+leonardo.upload.tool.network=arduino_ota
 [......]
+</code></pre></div>
+<p>Multiple protocols can be defined for each board. When the user tries to upload using a protocol not supported by the
+board, it will fallback to <code>default</code> if one was defined:</p>
+<div class="highlight"><pre><span></span><code>[......]
+uno.upload.tool.default=avrdude
+[......]
+leonardo.upload.tool.default=avrdude
+leonardo.upload.tool.network=arduino_ota
+[......]
+</code></pre></div>
+<p><code>default</code> is also used when no upload address is provided by the user. This can be used with tools that have built-in
+port detection (e.g., <code>openocd</code>).</p>
+<p>For backward compatibility with IDE 1.8.15 and older the previous syntax is still supported:</p>
+<div class="highlight"><pre><span></span><code>uno.upload.tool=avrdude
+</code></pre></div>
+<p>The previous syntax is equivalent to:</p>
+<div class="highlight"><pre><span></span><code>uno.upload.tool.default=avrdude
 </code></pre></div>
 <p>Other upload parameters can also be defined for the board. For example, in the Arduino AVR Boards boards.txt we have:</p>
 <div class="highlight"><pre><span></span><code>[.....]
 uno.name=Arduino Uno
-uno.upload.tool=avrdude
+uno.upload.tool.serial=avrdude
 uno.upload.protocol=arduino
 uno.upload.maximum_size=32256
 uno.upload.speed=115200
 [.....]
 leonardo.name=Arduino Leonardo
-leonardo.upload.tool=avrdude
+leonardo.upload.tool.serial=avrdude
 leonardo.upload.protocol=avr109
 leonardo.upload.maximum_size=28672
 leonardo.upload.speed=57600
@@ -2461,8 +2598,101 @@ leonardo.upload.wait_for_upload_port=true
 </code></pre></div>
 <p>Most <strong>{upload.XXXX}</strong> variables are used later in the avrdude upload recipe in platform.txt:</p>
 <div class="highlight"><pre><span></span><code>[.....]
-tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; {upload.verbose} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D &quot;-Uflash:w:{build.path}/{build.project_name}.hex:i&quot;
+tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; {upload.verbose} -p{build.mcu} -c{upload.port.protocol} -P{upload.port.address} -b{upload.speed} -D &quot;-Uflash:w:{build.path}/{build.project_name}.hex:i&quot;
 [.....]
+</code></pre></div>
+<p>If necessary the same property can be defined multiple times for different protocols:</p>
+<div class="highlight"><pre><span></span><code>leonardo.upload.serial.maximum_size=28672
+leonardo.upload.network.maximum_size=256
+</code></pre></div>
+<p>The two above properties will be available as <strong>{upload.serial.maximum_size}</strong> and <strong>{upload.network.maximum_size}</strong>.</p>
+<h4 id="properties-from-pluggable-discovery">Properties from pluggable discovery<a class="headerlink" href="#properties-from-pluggable-discovery" title="Permanent link">&para;</a></h4>
+<p>If a platform supports pluggable discovery it can also use the port's properties returned by a discovery. For example,
+the following port metadata coming from a pluggable discovery:</p>
+<div class="highlight"><pre><span></span><code>   {
+      &quot;eventType&quot;: &quot;add&quot;,
+      &quot;port&quot;: {
+        &quot;address&quot;: &quot;/dev/ttyACM0&quot;,
+        &quot;label&quot;: &quot;ttyACM0&quot;,
+        &quot;protocol&quot;: &quot;serial&quot;,
+        &quot;protocolLabel&quot;: &quot;Serial Port (USB)&quot;,
+        &quot;properties&quot;: {
+          &quot;pid&quot;: &quot;0x804e&quot;,
+          &quot;vid&quot;: &quot;0x2341&quot;,
+          &quot;serialNumber&quot;: &quot;EBEABFD6514D32364E202020FF10181E&quot;,
+          &quot;name&quot;: &quot;ttyACM0&quot;
+        }
+      }
+    }
+</code></pre></div>
+<p>will be available on the recipe as the variables:</p>
+<div class="highlight"><pre><span></span><code>{upload.port.address} = /dev/ttyACM0
+{upload.port.label} = ttyACM0
+{upload.port.protocol} = serial
+{upload.port.protocolLabel} = Serial Port (USB)
+{upload.port.properties.pid} = 0x8043
+{upload.port.properties.vid} = 0x2341
+{upload.port.properties.serialNumber} = EBEABFD6514D32364E202020FF10181E
+{upload.port.properties.name} = ttyACM0
+{serial.port} = /dev/ttyACM0                # for backward compatibility
+{serial.port.file} = ttyACM0                # only because protocol=serial
+</code></pre></div>
+<p>Here another example:</p>
+<div class="highlight"><pre><span></span><code>    {
+      &quot;eventType&quot;: &quot;add&quot;,
+      &quot;port&quot;: {
+        &quot;address&quot;: &quot;192.168.1.232&quot;,
+        &quot;label&quot;: &quot;SSH on my-board (192.168.1.232)&quot;,
+        &quot;protocol&quot;: &quot;ssh&quot;,
+        &quot;protocolLabel&quot;: &quot;SSH Network port&quot;,
+        &quot;properties&quot;: {
+          &quot;macprefix&quot;: &quot;AA:BB:CC&quot;,
+          &quot;macaddress&quot;: &quot;AA:BB:CC:DD:EE:FF&quot;
+        }
+      }
+    }
+</code></pre></div>
+<p>that is translated to:</p>
+<div class="highlight"><pre><span></span><code>{upload.port.address} = 192.168.1.232
+{upload.port.label} = SSH on my-board (192.168.1.232)
+{upload.port.protocol} = ssh
+{upload.port.protocolLabel} = SSH Network port
+{upload.port.properties.macprefix} = AA:BB:CC
+{upload.port.properties.macaddress} = AA:BB:CC:DD:EE:FF
+{serial.port} = 192.168.1.232                  # for backward compatibility
+</code></pre></div>
+<p>This configuration, together with protocol selection, allows to remove the hardcoded <code>network_pattern</code>. Now we can
+replace the legacy recipe (split into multiple lines for clarity):</p>
+<div class="highlight"><pre><span></span><code>tools.bossac.upload.network_pattern=&quot;{runtime.tools.arduinoOTA.path}/bin/arduinoOTA&quot;
+                                -address {serial.port} -port 65280
+                                -sketch &quot;{build.path}/{build.project_name}.bin&quot;
+</code></pre></div>
+<p>with:</p>
+<div class="highlight"><pre><span></span><code>tools.arduino_ota.upload.pattern=&quot;{runtime.tools.arduinoOTA.path}/bin/arduinoOTA&quot;
+                            -address {upload.port.address} -port 65280
+                            -sketch &quot;{build.path}/{build.project_name}.bin&quot;
+</code></pre></div>
+<h4 id="user-provided-fields">User provided fields<a class="headerlink" href="#user-provided-fields" title="Permanent link">&para;</a></h4>
+<p>Some upload recipes might require custom fields that must be provided by the user, like username and password to upload
+over the network. In this case the recipe must use the special placeholder <strong>{upload.field.FIELD_NAME}</strong>, where
+<strong>FIELD_NAME</strong> must be declared separately in the recipe using the following format:</p>
+<div class="highlight"><pre><span></span><code>tools.UPLOAD_RECIPE_ID.upload.field.FIELD_NAME=FIELD_LABEL
+tools.UPLOAD_RECIPE_ID.upload.field.FIELD_NAME.secret=true
+</code></pre></div>
+<p><strong>FIELD_LABEL</strong> is the label shown in the graphical prompt where the user is asked to enter the value for the field.</p>
+<p>The optional <strong>secret</strong> property should be set to <code>true</code> if the field is a secret (like a password or token).</p>
+<p>Let's see a complete example:</p>
+<div class="highlight"><pre><span></span><code>tools.arduino_ota.upload.field.username=Username
+tools.arduino_ota.upload.field.password=Password
+tools.arduino_ota.upload.field.password.secret=true
+tools.arduino_ota.upload.pattern=&quot;{runtime.tools.arduinoOTA.path}/bin/arduinoOTA&quot; -address {upload.port.address} -port 65280 -username &quot;{upload.field.username} -password &quot;{upload.field.password}&quot; -sketch &quot;{build.path}/{build.project_name}.bin&quot;
+</code></pre></div>
+<p>If a <strong>FIELD_LABEL</strong> is longer than 50 characters it will be truncated to 49 characters and an ellipsis (<code>…</code>) appended
+to it. For example this field:</p>
+<div class="highlight"><pre><span></span><code>tools.arduino_ota.upload.field.some_field=This is a really long label that ideally must never be set by any platform
+</code></pre></div>
+<p>will be shown to the user as:</p>
+<div class="highlight"><pre><span></span><code>This is a really long label that ideally must nev…
 </code></pre></div>
 <h4 id="upload-verification">Upload verification<a class="headerlink" href="#upload-verification" title="Permanent link">&para;</a></h4>
 <p>Upload verification can be enabled via the Arduino IDE's <strong>File &gt; Preferences &gt; Verify code after upload</strong> or
@@ -2512,15 +2742,28 @@ support uploading via programmer.</p>
 <h3 id="serial-port">Serial port<a class="headerlink" href="#serial-port" title="Permanent link">&para;</a></h3>
 <p>The full path (e.g., <code>/dev/ttyACM0</code>) of the port selected via the IDE or
 <a href="../commands/arduino-cli_upload/"><code>arduino-cli upload</code></a>'s <code>--port</code> option is available as a configuration property
-<strong>{serial.port}</strong>.</p>
+<strong>{upload.port.address}</strong>.</p>
 <p>The file component of the port's path (e.g., <code>ttyACM0</code>) is available as the configuration property
-<strong>{serial.port.file}</strong>.</p>
+<strong>{upload.port.label}</strong>.</p>
+<p>For backward compatibility with IDE 1.8.15 and older the old property <strong>serial.port</strong> is still available and is
+identical to <strong>{upload.port.address}</strong>. Instead <strong>serial.port.file</strong> is identical to <strong>{upload.port.label}</strong> and
+available only if protocol in use is <strong>serial</strong>.</p>
 <h3 id="upload-using-an-external-programmer">Upload using an external programmer<a class="headerlink" href="#upload-using-an-external-programmer" title="Permanent link">&para;</a></h3>
 <p>The <code>program</code> action is triggered via the <strong>Sketch &gt; Upload Using Programmer</strong> feature of the IDEs or
 <a href="../commands/arduino-cli_upload/"><code>arduino-cli upload --programmer &lt;programmer ID&gt;</code></a>. This action is used to transfer a
 compiled sketch to a board using an external programmer.</p>
 <p>The <strong>program.tool</strong> property determines the tool to be used for this action. This property is typically defined for
-each programmer in <a href="#programmerstxt">programmers.txt</a>:</p>
+each programmer in <a href="#programmerstxt">programmers.txt</a> and uses the same syntax as
+<a href="#sketch-upload-configuration">the <code>upload</code> action</a>:</p>
+<div class="highlight"><pre><span></span><code>[......]
+usbasp.program.tool.serial=avrdude
+[......]
+arduinoasisp.program.tool.serial=avrdude
+[......]
+arduinoisp.program.tool.default=avrdude
+[......]
+</code></pre></div>
+<p>For backward compatibility with IDE 1.8.15 and older the previous syntax is still supported:</p>
 <div class="highlight"><pre><span></span><code>[......]
 usbasp.program.tool=avrdude
 [......]
@@ -2545,7 +2788,18 @@ the board.</p>
 <li><code>bootloader</code> is used to flash the bootloader to the board</li>
 </ol>
 <p>The <strong>bootloader.tool</strong> property determines the tool to be used for the <code>erase</code> and <code>bootloader</code> actions both. This
-property is typically defined for each board in boards.txt:</p>
+property is typically defined for each board in boards.txt and uses the same syntax as
+<a href="#sketch-upload-configuration">the <code>upload</code> action</a>:</p>
+<div class="highlight"><pre><span></span><code>[......]
+uno.bootloader.tool.serial=avrdude
+[......]
+leonardo.bootloader.tool.serial=avrdude
+leonardo.bootloader.tool.network=arduino_ota
+[......]
+duemilanove.bootloader.tool.default=avrdude
+[......]
+</code></pre></div>
+<p>For backward compatibility with IDE 1.8.15 and older the previous syntax is still supported:</p>
 <div class="highlight"><pre><span></span><code>[......]
 uno.bootloader.tool=avrdude
 [......]
@@ -2756,13 +3010,13 @@ software is in use:</p>
       
       
         
-        <a href="../package_index_json-specification/" class="md-footer__link md-footer__link--next" aria-label="Next: Package index specification" rel="next">
+        <a href="../pluggable-discovery-specification/" class="md-footer__link md-footer__link--next" aria-label="Next: Pluggable discovery specification" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Package index specification
+              Pluggable discovery specification
             </div>
           </div>
           <div class="md-footer__button md-icon">

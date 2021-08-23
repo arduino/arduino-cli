@@ -278,6 +278,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#grpc-interface-uploadrequest-uploadusingprogrammerrequest-burnbootloaderrequest-detectedport-field-changes" class="md-nav__link">
+    gRPC interface UploadRequest, UploadUsingProgrammerRequest, BurnBootloaderRequest, DetectedPort field changes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grpc-interface-boardlistitem-change" class="md-nav__link">
+    gRPC interface BoardListItem change
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#change-public-library-interface" class="md-nav__link">
     Change public library interface
   </a>
@@ -646,6 +660,18 @@
     <li class="md-nav__item">
       <a href="../commands/arduino-cli_board_listall/" class="md-nav__link">
         board listall
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board_search/" class="md-nav__link">
+        board search
       </a>
     </li>
   
@@ -1313,6 +1339,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../pluggable-discovery-specification/" class="md-nav__link">
+        Pluggable discovery specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../package_index_json-specification/" class="md-nav__link">
         Package index specification
       </a>
@@ -1352,6 +1393,20 @@
   
     <nav class="md-nav" aria-label="Unreleased">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#grpc-interface-uploadrequest-uploadusingprogrammerrequest-burnbootloaderrequest-detectedport-field-changes" class="md-nav__link">
+    gRPC interface UploadRequest, UploadUsingProgrammerRequest, BurnBootloaderRequest, DetectedPort field changes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grpc-interface-boardlistitem-change" class="md-nav__link">
+    gRPC interface BoardListItem change
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#change-public-library-interface" class="md-nav__link">
@@ -1583,6 +1638,51 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="grpc-interface-uploadrequest-uploadusingprogrammerrequest-burnbootloaderrequest-detectedport-field-changes">gRPC interface <code>UploadRequest</code>, <code>UploadUsingProgrammerRequest</code>, <code>BurnBootloaderRequest</code>, <code>DetectedPort</code> field changes<a class="headerlink" href="#grpc-interface-uploadrequest-uploadusingprogrammerrequest-burnbootloaderrequest-detectedport-field-changes" title="Permanent link">&para;</a></h3>
+<p><code>UploadRequest</code>, <code>UploadUsingProgrammerRequest</code> and <code>BurnBootloaderRequest</code> had their <code>port</code> field change from type
+<code>string</code> to <code>Port</code>.</p>
+<p><code>Port</code> contains the following information:</p>
+<div class="highlight"><pre><span></span><code>// Port represents a board port that may be used to upload or to monitor a board
+message Port {
+  // Address of the port (e.g., `/dev/ttyACM0`).
+  string address = 1;
+  // The port label to show on the GUI (e.g. &quot;ttyACM0&quot;)
+  string label = 2;
+  // Protocol of the port (e.g., `serial`, `network`, ...).
+  string protocol = 3;
+  // A human friendly description of the protocol (e.g., &quot;Serial Port (USB)&quot;
+  string protocol_label = 4;
+  // A set of properties of the port
+  map&lt;string, string&gt; properties = 5;
+}
+</code></pre></div>
+<p>The gRPC interface message <code>DetectedPort</code> has been changed from:</p>
+<div class="highlight"><pre><span></span><code>message DetectedPort {
+  // Address of the port (e.g., `serial:///dev/ttyACM0`).
+  string address = 1;
+  // Protocol of the port (e.g., `serial`).
+  string protocol = 2;
+  // A human friendly description of the protocol (e.g., &quot;Serial Port (USB)&quot;).
+  string protocol_label = 3;
+  // The boards attached to the port.
+  repeated BoardListItem boards = 4;
+  // Serial number of connected board
+  string serial_number = 5;
+}
+</code></pre></div>
+<p>to:</p>
+<div class="highlight"><pre><span></span><code>message DetectedPort {
+  // The possible boards attached to the port.
+  repeated BoardListItem matching_boards = 1;
+  // The port details
+  Port port = 2;
+}
+</code></pre></div>
+<p>The properties previously contained directly in the message are now stored in the <code>port</code> property.</p>
+<p>These changes are necessary for the pluggable discovery.</p>
+<h3 id="grpc-interface-boardlistitem-change">gRPC interface <code>BoardListItem</code> change<a class="headerlink" href="#grpc-interface-boardlistitem-change" title="Permanent link">&para;</a></h3>
+<p>The <code>vid</code> and <code>pid</code> fields of the <code>BoardListItem</code> message have been removed. They used to only be available when
+requesting connected board lists, now that information is stored in the <code>port</code> field of <code>DetectedPort</code>.</p>
 <h3 id="change-public-library-interface">Change public library interface<a class="headerlink" href="#change-public-library-interface" title="Permanent link">&para;</a></h3>
 <h4 id="githubcomarduinoarduino-clii18n-package"><code>github.com/arduino/arduino-cli/i18n</code> package<a class="headerlink" href="#githubcomarduinoarduino-clii18n-package" title="Permanent link">&para;</a></h4>
 <p>The behavior of the <code>Init</code> function has changed. The user specified locale code is no longer read from the

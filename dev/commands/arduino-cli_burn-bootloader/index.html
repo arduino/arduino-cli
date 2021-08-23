@@ -405,6 +405,18 @@
             
   
   
+  
+    <li class="md-nav__item">
+      <a href="../arduino-cli_board_search/" class="md-nav__link">
+        board search
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
     
   
   
@@ -1141,6 +1153,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../../pluggable-discovery-specification/" class="md-nav__link">
+        Pluggable discovery specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../package_index_json-specification/" class="md-nav__link">
         Package index specification
       </a>
@@ -1248,11 +1275,13 @@
 <div class="highlight"><pre><span></span><code>  arduino-cli burn-bootloader -b arduino:avr:uno -P atmel_ice
 </code></pre></div>
 <h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>  -b, --fqbn string         Fully Qualified Board Name, e.g.: arduino:avr:uno
-  -h, --help                help for burn-bootloader
-  -p, --port string         Upload port, e.g.: COM10 or /dev/ttyACM0
-  -P, --programmer string   Use the specified programmer to upload.
-  -t, --verify              Verify uploaded binary after the upload.
+<div class="highlight"><pre><span></span><code>      --discovery-timeout duration   Max time to wait for port discovery, e.g.: 30s, 1m (default 5s)
+  -b, --fqbn string                  Fully Qualified Board Name, e.g.: arduino:avr:uno
+  -h, --help                         help for burn-bootloader
+  -p, --port string                  Upload port address, e.g.: COM3 or /dev/ttyACM2
+  -P, --programmer string            Use the specified programmer to upload.
+  -l, --protocol string              Upload port protocol, e.g: serial
+  -t, --verify                       Verify uploaded binary after the upload.
 </code></pre></div>
 <h3 id="options-inherited-from-parent-commands">Options inherited from parent commands<a class="headerlink" href="#options-inherited-from-parent-commands" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>      --additional-urls strings   Comma-separated list of additional URLs for the Boards Manager.
@@ -1286,7 +1315,7 @@
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="../arduino-cli_board_listall/" class="md-footer__link md-footer__link--prev" aria-label="Previous: board listall" rel="prev">
+        <a href="../arduino-cli_board_search/" class="md-footer__link md-footer__link--prev" aria-label="Previous: board search" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -1295,7 +1324,7 @@
               <span class="md-footer__direction">
                 Previous
               </span>
-              board listall
+              board search
             </div>
           </div>
         </a>

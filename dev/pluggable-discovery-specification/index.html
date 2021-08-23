@@ -11,14 +11,14 @@
       
       
       
-        <link rel="canonical" href="https://arduino.github.io/arduino-cli/dev/sketch-specification/">
+        <link rel="canonical" href="https://arduino.github.io/arduino-cli/dev/pluggable-discovery-specification/">
       
       <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.2">
     
     
       
-        <title>Sketch specification - Arduino CLI</title>
+        <title>Pluggable discovery specification - Arduino CLI</title>
       
     
     
@@ -69,7 +69,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#sketch-folders-and-files" class="md-skip">
+        <a href="#pluggable-discovery-api-via-stdinstdout" class="md-skip">
           Skip to content
         </a>
       
@@ -98,7 +98,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Sketch specification
+              Pluggable discovery specification
             
           </span>
         </div>
@@ -1027,150 +1027,11 @@
 
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Sketch specification
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../sketch-specification/" class="md-nav__link">
         Sketch specification
       </a>
-      
-        
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#sketch-folders-and-files" class="md-nav__link">
-    Sketch folders and files
-  </a>
-  
-    <nav class="md-nav" aria-label="Sketch folders and files">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#sketch-root-folder" class="md-nav__link">
-    Sketch root folder
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#primary-sketch-file" class="md-nav__link">
-    Primary sketch file
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#additional-code-files" class="md-nav__link">
-    Additional code files
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#src-subfolder" class="md-nav__link">
-    src subfolder
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#data-subfolder" class="md-nav__link">
-    data subfolder
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#metadata" class="md-nav__link">
-    Metadata
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#secrets" class="md-nav__link">
-    Secrets
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#documentation" class="md-nav__link">
-    Documentation
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#sketch-file-structure-example" class="md-nav__link">
-    Sketch file structure example
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sketchbook" class="md-nav__link">
-    Sketchbook
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#libraryboards-manager-links" class="md-nav__link">
-    Library/Boards Manager links
-  </a>
-  
-    <nav class="md-nav" aria-label="Library/Boards Manager links">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    Example
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    See also
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1211,11 +1072,116 @@
 
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../pluggable-discovery-specification/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Pluggable discovery specification
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Pluggable discovery specification
       </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pluggable-discovery-api-via-stdinstdout" class="md-nav__link">
+    Pluggable discovery API via stdin/stdout
+  </a>
+  
+    <nav class="md-nav" aria-label="Pluggable discovery API via stdin/stdout">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hello-command" class="md-nav__link">
+    HELLO command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#start-command" class="md-nav__link">
+    START command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stop-command" class="md-nav__link">
+    STOP command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quit-command" class="md-nav__link">
+    QUIT command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list-command" class="md-nav__link">
+    LIST command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#start_sync-command" class="md-nav__link">
+    START_SYNC command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-commands" class="md-nav__link">
+    Invalid commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#state-machine" class="md-nav__link">
+    State machine
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#board-identification" class="md-nav__link">
+    Board identification
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1259,72 +1225,58 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#sketch-folders-and-files" class="md-nav__link">
-    Sketch folders and files
+  <a href="#pluggable-discovery-api-via-stdinstdout" class="md-nav__link">
+    Pluggable discovery API via stdin/stdout
   </a>
   
-    <nav class="md-nav" aria-label="Sketch folders and files">
+    <nav class="md-nav" aria-label="Pluggable discovery API via stdin/stdout">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#sketch-root-folder" class="md-nav__link">
-    Sketch root folder
+  <a href="#hello-command" class="md-nav__link">
+    HELLO command
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#primary-sketch-file" class="md-nav__link">
-    Primary sketch file
+  <a href="#start-command" class="md-nav__link">
+    START command
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#additional-code-files" class="md-nav__link">
-    Additional code files
+  <a href="#stop-command" class="md-nav__link">
+    STOP command
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#src-subfolder" class="md-nav__link">
-    src subfolder
+  <a href="#quit-command" class="md-nav__link">
+    QUIT command
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#data-subfolder" class="md-nav__link">
-    data subfolder
+  <a href="#list-command" class="md-nav__link">
+    LIST command
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#metadata" class="md-nav__link">
-    Metadata
+  <a href="#start_sync-command" class="md-nav__link">
+    START_SYNC command
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#secrets" class="md-nav__link">
-    Secrets
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#documentation" class="md-nav__link">
-    Documentation
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#sketch-file-structure-example" class="md-nav__link">
-    Sketch file structure example
+  <a href="#invalid-commands" class="md-nav__link">
+    Invalid commands
   </a>
   
 </li>
@@ -1335,35 +1287,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sketchbook" class="md-nav__link">
-    Sketchbook
+  <a href="#state-machine" class="md-nav__link">
+    State machine
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#libraryboards-manager-links" class="md-nav__link">
-    Library/Boards Manager links
-  </a>
-  
-    <nav class="md-nav" aria-label="Library/Boards Manager links">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    Example
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    See also
+  <a href="#board-identification" class="md-nav__link">
+    Board identification
   </a>
   
 </li>
@@ -1380,130 +1312,304 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/arduino/arduino-cli/blob/master/docs/sketch-specification.md" title="Edit this page" class="md-content__button md-icon">
+                  <a href="https://github.com/arduino/arduino-cli/blob/master/docs/pluggable-discovery-specification.md" title="Edit this page" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
                 
-                  <h1>Sketch specification</h1>
+                  <h1>Pluggable discovery specification</h1>
                 
-                <p>This is the specification for Arduino sketches.</p>
-<p>The programs that run on Arduino boards are called "sketches". This term was inherited from
-<a href="https://processing.org/">Processing</a>, upon which the Arduino IDE and the core API were based.</p>
-<h2 id="sketch-folders-and-files">Sketch folders and files<a class="headerlink" href="#sketch-folders-and-files" title="Permanent link">&para;</a></h2>
-<p>The sketch root folder name and code file names must start with a basic letter (<code>A</code>-<code>Z</code> or <code>a</code>-<code>z</code>) or number (<code>0</code>-<code>9</code>),
-followed by basic letters, numbers, underscores (<code>_</code>), dots (<code>.</code>) and dashes (<code>-</code>). The maximum length is 63 characters.</p>
-<p>Support for names starting with a number was added in Arduino IDE 1.8.4.</p>
-<h3 id="sketch-root-folder">Sketch root folder<a class="headerlink" href="#sketch-root-folder" title="Permanent link">&para;</a></h3>
-<p>Because many Arduino sketches only contain a single .ino file, it's easy to think of that file as the sketch. However,
-it is the folder that is the sketch. The reason is that sketches may consist of multiple code files and the folder is
-what groups those files into a single program.</p>
-<h3 id="primary-sketch-file">Primary sketch file<a class="headerlink" href="#primary-sketch-file" title="Permanent link">&para;</a></h3>
-<p>Every sketch must contain a <code>.ino</code> file with a file name matching the sketch root folder name.</p>
-<p><code>.pde</code> is also supported but <strong>deprecated</strong> and will be removed in the future, using the <code>.ino</code> extension is strongly
-recommended.</p>
-<h3 id="additional-code-files">Additional code files<a class="headerlink" href="#additional-code-files" title="Permanent link">&para;</a></h3>
-<p>Sketches may consist of multiple code files.</p>
-<p>The following extensions are supported:</p>
+                <p>Discovery tools are a special kind of tool used to find supported boards, a platform developer can create their own
+following the specification below. These tools must be in the form of executables that can be launched as a subprocess
+using a <code>platform.txt</code> command line recipe. They communicate to the parent process via stdin/stdout, accepting commands
+as plain text strings from stdin and sending answers back in JSON format on stdout. Each tool will implement the
+commands to list and enumerate ports for a specific protocol as specified in this document.</p>
+<h3 id="pluggable-discovery-api-via-stdinstdout">Pluggable discovery API via stdin/stdout<a class="headerlink" href="#pluggable-discovery-api-via-stdinstdout" title="Permanent link">&para;</a></h3>
+<p>All the commands listed in this specification must be implemented in the discovery.</p>
+<p>After startup, the tool will just stay idle waiting for commands. The available commands are: <code>HELLO</code>, <code>START</code>, <code>STOP</code>,
+<code>QUIT</code>, <code>LIST</code> and <code>START_SYNC</code>.</p>
+<p>After each command the client always expects a response from the discovery. The discovery must not introduce any delay
+and must respond to all commands as fast as possible.</p>
+<h4 id="hello-command">HELLO command<a class="headerlink" href="#hello-command" title="Permanent link">&para;</a></h4>
+<p><code>HELLO</code> <strong>must be the first command sent</strong> to the discovery to tell the name of the client/IDE and the version of the
+pluggable discovery protocol that the client/IDE supports. The syntax of the command is:</p>
+<p><code>HELLO &lt;PROTOCOL_VERSION&gt; "&lt;USER_AGENT&gt;"</code></p>
 <ul>
-<li>.ino - <a href="https://www.arduino.cc/reference/en/">Arduino language</a> files.</li>
-<li>.pde - Alternate extension for Arduino language files. This file extension is also used by Processing sketches. .ino
-  is recommended to avoid confusion. <strong><code>.pde</code> extension is deprecated and will be removed in the future.</strong></li>
-<li>.cpp - C++ files.</li>
-<li>.c - C Files.</li>
-<li>.S - Assembly language files.</li>
-<li>.h - Header files.</li>
-<li>.tpp, .ipp - Header files (available from Arduino CLI 0.19.0).</li>
+<li><code>&lt;PROTOCOL_VERSION&gt;</code> is the maximum protocol version supported by the client/IDE (currently <code>1</code>)</li>
+<li><code>&lt;USER_AGENT&gt;</code> is the name and version of the client. It must not contain double-quotes (<code>"</code>).</li>
 </ul>
-<p>For information about how each of these files and other parts of the sketch are used during compilation, see the
-<a href="../sketch-build-process/">Sketch build process documentation</a>.</p>
-<h3 id="src-subfolder"><code>src</code> subfolder<a class="headerlink" href="#src-subfolder" title="Permanent link">&para;</a></h3>
-<p>The contents of the <code>src</code> subfolder are compiled recursively. Unlike the code files in the sketch root folder, these
-files are not shown as tabs in the IDEs.</p>
-<p>This is useful for files you don't want to expose to the sketch user via the IDE's interface. It can be used to bundle
-libraries with the sketch in order to make it a self-contained project.</p>
-<p>Arduino language files under the <code>src</code> folder are not supported.</p>
+<p>some examples:</p>
 <ul>
-<li>In Arduino IDE 1.6.5-r5 and older, no recursive compilation was done.</li>
-<li>In Arduino IDE 1.6.6 - 1.6.9, recursive compilation was done of all subfolders of the sketch folder.</li>
-<li>In Arduino IDE 1.6.10 and newer, recursive compilation is limited to the <code>src</code> subfolder of the sketch folder.</li>
+<li><code>HELLO 1 "Arduino IDE 1.8.13"</code></li>
 </ul>
-<h3 id="data-subfolder"><code>data</code> subfolder<a class="headerlink" href="#data-subfolder" title="Permanent link">&para;</a></h3>
-<p>The <code>data</code> folder is used to add additional files to the sketch, which will not be compiled.</p>
-<p>Files added to the sketch via the Arduino IDE's <strong>Sketch &gt; Add File...</strong> are placed in the <code>data</code> folder.</p>
-<p>The Arduino IDE's <strong>File &gt; Save As...</strong> only copies the code files in the sketch root folder and the full contents of
-the <code>data</code> folder, so any non-code files outside the <code>data</code> folder are stripped.</p>
-<h3 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h3>
-<p>Arduino CLI and Arduino Web Editor use a file named sketch.json, located in the sketch root folder, to store sketch
-metadata.</p>
-<p>The <code>cpu</code> key contains the board configuration information. This can be set via
-<a href="../commands/arduino-cli_board_attach/"><code>arduino-cli board attach</code></a> or by selecting a board in the Arduino Web Editor
-while the sketch is open. With this configuration set, it is not necessary to specify the <code>--fqbn</code> or <code>--port</code> flags to
-the <a href="../commands/arduino-cli_compile/"><code>arduino-cli compile</code></a> or <a href="../commands/arduino-cli_upload/"><code>arduino-cli upload</code></a>
-commands when compiling or uploading the sketch.</p>
-<p>The <code>included_libs</code> key defines the library versions the Arduino Web Editor uses when the sketch is compiled. This is
-Arduino Web Editor specific because all versions of all the Library Manager libraries are pre-installed in Arduino Web
-Editor, while only one version of each library may be installed when using the other Arduino development software.</p>
-<h3 id="secrets">Secrets<a class="headerlink" href="#secrets" title="Permanent link">&para;</a></h3>
-<p>Arduino Web Editor has a
-<a href="https://create.arduino.cc/projecthub/Arduino_Genuino/store-your-sensitive-data-safely-when-sharing-a-sketch-e7d0f0">"Secret tab" feature</a>
-that makes it easy to share sketches without accidentally exposing sensitive data (e.g., passwords or tokens). The
-Arduino Web Editor automatically generates macros for any identifier in the sketch which starts with <code>SECRET_</code> and
-contains all uppercase characters.</p>
-<p>When you download a sketch from Arduino Web Editor that contains a Secret tab, the empty <code>#define</code> directives for the
-secrets are in a file named arduino_secrets.h, with an <code>#include</code> directive to that file at the top of the primary
-sketch file. This is hidden when viewing the sketch in Arduino Web Editor.</p>
-<h3 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h3>
-<p>Image and text files in common formats which are present in the sketch root folder are displayed in tabs in the Arduino
-Web Editor.</p>
-<h3 id="sketch-file-structure-example">Sketch file structure example<a class="headerlink" href="#sketch-file-structure-example" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>Foo
-|_ arduino_secrets.h
-|_ Abc.ino
-|_ Def.cpp
-|_ Def.h
-|_ Foo.ino
-|_ Ghi.c
-|_ Ghi.h
-|_ Jkl.h
-|_ Jkl.S
-|_ sketch.json
-|_ data
-|  |_ Schematic.pdf
-|_ src
-   |_ SomeLib
-      |_ library.properties
-      |_ src
-         |_ SomeLib.h
-         |_ SomeLib.cpp
+<ul>
+<li><code>HELLO 1 "arduino-cli 1.2.3"</code></li>
+</ul>
+<p>the response to the command is:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;eventType&quot;</span><span class="p">:</span> <span class="s2">&quot;hello&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;protocolVersion&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;OK&quot;</span>
+<span class="p">}</span>
 </code></pre></div>
-<h2 id="sketchbook">Sketchbook<a class="headerlink" href="#sketchbook" title="Permanent link">&para;</a></h2>
-<p>The Arduino IDE provides a "sketchbook" folder (analogous to Arduino CLI's "user directory"). In addition to being the
-place where user libraries and manually installed platforms are installed, the sketchbook is a convenient place to store
-sketches. Sketches in the sketchbook folder appear under the Arduino IDE's <strong>File &gt; Sketchbook</strong> menu. However, there is
-no requirement to store sketches in the sketchbook folder.</p>
-<h2 id="libraryboards-manager-links">Library/Boards Manager links<a class="headerlink" href="#libraryboards-manager-links" title="Permanent link">&para;</a></h2>
-<p>A URI in a comment in the form <code>http://librarymanager#SEARCH_TERM</code> will open a search for SEARCH_TERM in
-<a href="https://www.arduino.cc/en/guide/libraries#toc3">Library Manager</a> when clicked in the Arduino IDE.</p>
-<p>A URI in a comment in the form <code>http://boardsmanager#SEARCH_TERM</code> will open a search for SEARCH_TERM in
-<a href="https://www.arduino.cc/en/Guide/Cores">Boards Manager</a> when clicked in the Arduino IDE.</p>
-<p>This can be used to offer the user an easy way to install dependencies of the sketch.</p>
-<p>This feature is only available when using the Arduino IDE, so be sure to provide supplementary documentation to help the
-users of other development software install the sketch dependencies.</p>
-<p>This feature was added in Arduino IDE 1.6.9.</p>
-<h3 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1">// install the Arduino SAMD Boards platform to add support for your MKR WiFi 1010 board</span>
-<span class="c1">// if using the Arduino IDE, click here: http://boardsmanager#SAMD</span>
-
-<span class="c1">// install the WiFiNINA library via Library Manager</span>
-<span class="c1">// if using the Arduino IDE, click here: http://librarymanager#WiFiNINA</span>
-<span class="cp">#include</span> <span class="cpf">&lt;WiFiNINA.h&gt;</span><span class="cp"></span>
-</code></pre></div>
-<h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<p>The <code>protocolVersion</code> field represents the protocol version that will be used in the rest of the communication. There
+are three possible cases:</p>
 <ul>
-<li><a href="../sketch-build-process/">Sketch build process documentation</a></li>
-<li><a href="https://www.arduino.cc/en/Reference/StyleGuide">Style guide for example sketches</a></li>
+<li>if the client/IDE supports the same or a more recent version of the protocol than the discovery, then the IDE should
+  go into a compatibility mode and use the protocol level supported by the discovery.</li>
+<li>if the discovery supports a more recent version of the protocol than the client/IDE: the discovery should downgrade
+  itself into compatibility mode and report a <code>protocolVersion</code> that is less than or equal to the one supported by the
+  client/IDE.</li>
+<li>if the discovery cannot go into compatibility mode, it must report the protocol version supported (even if greater
+  than the version supported by the client/IDE) and the client/IDE may decide to terminate the discovery or produce an
+  error/warning.</li>
 </ul>
+<h4 id="start-command">START command<a class="headerlink" href="#start-command" title="Permanent link">&para;</a></h4>
+<p>The <code>START</code> command initializes and starts the discovery internal subroutines. This command must be called before <code>LIST</code>
+or <code>START_SYNC</code>. The response to the start command is:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;eventType&quot;</span><span class="p">:</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;OK&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>If the discovery could not start, for any reason, it must report the error with:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;eventType&quot;</span><span class="p">:</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;error&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Permission error&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The <code>error</code> field must be set to <code>true</code> and the <code>message</code> field should contain a description of the error.</p>
+<h4 id="stop-command">STOP command<a class="headerlink" href="#stop-command" title="Permanent link">&para;</a></h4>
+<p>The <code>STOP</code> command stops the discovery internal subroutines and possibly frees the internally used resources. This
+command should be called if the client wants to pause the discovery for a while. The response to the command is:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;eventType&quot;</span><span class="p">:</span> <span class="s2">&quot;stop&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;OK&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>If an error occurs:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;eventType&quot;</span><span class="p">:</span> <span class="s2">&quot;stop&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;error&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Resource busy&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The <code>error</code> field must be set to <code>true</code> and the <code>message</code> field should contain a description of the error.</p>
+<h4 id="quit-command">QUIT command<a class="headerlink" href="#quit-command" title="Permanent link">&para;</a></h4>
+<p>The <code>QUIT</code> command terminates the discovery. The response to <code>QUIT</code> is:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;eventType&quot;</span><span class="p">:</span> <span class="s2">&quot;quit&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;OK&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>after this output the discovery exits. This command is supposed to always succeed.</p>
+<h4 id="list-command">LIST command<a class="headerlink" href="#list-command" title="Permanent link">&para;</a></h4>
+<p>The <code>LIST</code> command executes an enumeration of the ports and returns a list of the available ports at the moment of the
+call. The format of the response is the following:</p>
+<div class="highlight"><pre><span></span><code>{
+  &quot;eventType&quot;: &quot;list&quot;,
+  &quot;ports&quot;: [
+    {
+      &quot;address&quot;:       &lt;-- THE ADDRESS OF THE PORT
+      &quot;label&quot;:         &lt;-- HOW THE PORT IS DISPLAYED ON THE GUI
+      &quot;protocol&quot;:      &lt;-- THE PROTOCOL USED BY THE BOARD
+      &quot;protocolLabel&quot;: &lt;-- HOW THE PROTOCOL IS DISPLAYED ON THE GUI
+      &quot;properties&quot;: {
+                       &lt;-- A LIST OF PROPERTIES OF THE PORT
+      }
+    },
+    {
+      ...              &lt;-- OTHER PORTS...
+    }
+  ]
+}
+</code></pre></div>
+<p>The <code>ports</code> field contains a list of the available ports.</p>
+<p>Each port has:</p>
+<ul>
+<li>an <code>address</code> (for example <code>/dev/ttyACM0</code> for serial ports or <code>192.168.10.100</code> for network ports)</li>
+<li>a <code>label</code> that is the human readable form of the <code>address</code> (it may be for example <code>ttyACM0</code> or
+  <code>SSH on 192.168.10.100</code>)</li>
+<li><code>protocol</code> is the protocol identifier (such as <code>serial</code> or <code>dfu</code> or <code>ssh</code>)</li>
+<li><code>protocolLabel</code> is the <code>protocol</code> in human readable form (for example <code>Serial port</code> or <code>DFU USB</code> or <code>Network (ssh)</code>)</li>
+<li><code>properties</code> is a list of key/value pairs that represent information relative to the specific port</li>
+</ul>
+<p>To make the above more clear let's show an example output from the <code>serial-discovery</code> builtin in the Arduino CLI:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;eventType&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;ports&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;/dev/ttyACM0&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;ttyACM0&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;serial&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;protocolLabel&quot;</span><span class="p">:</span> <span class="s2">&quot;Serial Port (USB)&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;pid&quot;</span><span class="p">:</span> <span class="s2">&quot;0x804e&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;vid&quot;</span><span class="p">:</span> <span class="s2">&quot;0x2341&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;serialNumber&quot;</span><span class="p">:</span> <span class="s2">&quot;EBEABFD6514D32364E202020FF10181E&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ttyACM0&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>In this case the serial port metadata comes from a USB serial converter. Inside the <code>properties</code> we have all the
+properties of the port, and some of them may be useful for product identification (in this case only USB VID/PID is
+useful to identify the board model).</p>
+<p>The <code>LIST</code> command performs a one-shot polling of the ports. The discovery should answer as soon as reasonably possible,
+without any additional delay.</p>
+<p>Some discoveries may require some time to discover a new port (for example network protocols like MDNS, Bluetooth, etc.
+require some seconds to receive the broadcasts from all available clients) in that case it is fine to answer with an
+empty or incomplete list.</p>
+<p>If an error occurs and the discovery can't complete the enumeration, it must report the error with:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;eventType&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;error&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Resource busy&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The <code>error</code> field must be set to <code>true</code> and the <code>message</code> field should contain a description of the error.</p>
+<h4 id="start_sync-command">START_SYNC command<a class="headerlink" href="#start_sync-command" title="Permanent link">&para;</a></h4>
+<p>The <code>START_SYNC</code> command puts the tool in "events" mode: the discovery will send <code>add</code> and <code>remove</code> events each time a
+new port is detected or removed respectively. If the discovery goes into "events" mode successfully the response to this
+command is:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;eventType&quot;</span><span class="p">:</span> <span class="s2">&quot;start_sync&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;OK&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>After this message the discovery will send <code>add</code> and <code>remove</code> events asynchronously (more on that later). If an error
+occurs and the discovery can't go in "events" mode the error must be reported as:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;eventType&quot;</span><span class="p">:</span> <span class="s2">&quot;start_sync&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;error&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Resource busy&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The <code>error</code> field must be set to <code>true</code> and the <code>message</code> field should contain a description of the error.</p>
+<p>Once in "event" mode, the discovery is allowed to send <code>add</code> and <code>remove</code> messages asynchronously in realtime, this
+means that the client must be able to handle these incoming messages at any moment.</p>
+<p>The <code>add</code> event looks like the following:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;eventType&quot;</span><span class="p">:</span> <span class="s2">&quot;add&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;/dev/ttyACM0&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;ttyACM0&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;pid&quot;</span><span class="p">:</span> <span class="s2">&quot;0x804e&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;vid&quot;</span><span class="p">:</span> <span class="s2">&quot;0x2341&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;serialNumber&quot;</span><span class="p">:</span> <span class="s2">&quot;EBEABFD6514D32364E202020FF10181E&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ttyACM0&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;serial&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;protocolLabel&quot;</span><span class="p">:</span> <span class="s2">&quot;Serial Port (USB)&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>It basically provides the same information as the <code>list</code> event but for a single port. After calling <code>START_SYNC</code> an
+initial burst of add events must be generated in sequence to report all the ports available at the moment of the start.</p>
+<p>The <code>remove</code> event looks like the following:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;eventType&quot;</span><span class="p">:</span> <span class="s2">&quot;remove&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;port&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;/dev/ttyACM0&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;serial&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The content is straightforward, in this case only the <code>address</code> and <code>protocol</code> fields are reported.</p>
+<p>If the information about a port needs to be updated the discovery may send a new <code>add</code> message for the same port address
+and protocol without sending a <code>remove</code> first: this means that all the previous information about the port must be
+discarded and replaced with the new one.</p>
+<h4 id="invalid-commands">Invalid commands<a class="headerlink" href="#invalid-commands" title="Permanent link">&para;</a></h4>
+<p>If the client sends an invalid or malformed command, the discovery should answer with:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;eventType&quot;</span><span class="p">:</span> <span class="s2">&quot;command_error&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;error&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Unknown command XXXX&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="state-machine">State machine<a class="headerlink" href="#state-machine" title="Permanent link">&para;</a></h3>
+<p>A well behaved pluggable discovery tool must reflect the following state machine.</p>
+<p><img alt="Pluggable discovery state machine" src="../img/pluggable-discovery-state-machine.png" /></p>
+<p>The arrows represent the commands outlined in the above sections, calling a command successfully assumes the state
+changes.</p>
+<p>A pluggable discovery state is Alive when the process has been started but no command has been executed. Dead means the
+process has been stopped and no further commands can be received.</p>
+<h3 id="board-identification">Board identification<a class="headerlink" href="#board-identification" title="Permanent link">&para;</a></h3>
+<p>The <code>properties</code> associated to a port can be used to identify the board attached to that port. The algorithm is simple:</p>
+<ul>
+<li>each board listed in the platform file <a href="../platform-specification/#boardstxt"><code>boards.txt</code></a> may declare a set of
+  <code>upload_port.*</code> properties</li>
+<li>if each <code>upload_port.*</code> property has a match in the <code>properties</code> set coming from the discovery then the board is a
+  "candidate" board attached to that port.</li>
+</ul>
+<p>Some port <code>properties</code> may not be precise enough to uniquely identify a board, in that case more boards may match the
+same set of <code>properties</code>, that's why we called it "candidate".</p>
+<p>Let's see an example to clarify things a bit, let's suppose that we have the following <code>properties</code> coming from the
+serial discovery:</p>
+<div class="highlight"><pre><span></span><code>  &quot;port&quot;: {
+    &quot;address&quot;: &quot;/dev/ttyACM0&quot;,
+    &quot;properties&quot;: {
+      &quot;pid&quot;: &quot;0x804e&quot;,
+      &quot;vid&quot;: &quot;0x2341&quot;,
+      &quot;serialNumber&quot;: &quot;EBEABFD6514D32364E202020FF10181E&quot;,
+      &quot;name&quot;: &quot;ttyACM0&quot;
+    },
+    ...
+</code></pre></div>
+<p>in this case we can use <code>vid</code> and <code>pid</code> to identify the board. The <code>serialNumber</code>, instead, is unique for that specific
+instance of the board so it can't be used to identify the board model. Let's suppose we have the following <code>boards.txt</code>:</p>
+<div class="highlight"><pre><span></span><code># Arduino Zero (Programming Port)
+# ---------------------------------------
+arduino_zero_edbg.name=Arduino Zero (Programming Port)
+arduino_zero_edbg.upload_port.vid=0x03eb
+arduino_zero_edbg.upload_port.pid=0x2157
+[...CUT...]
+# Arduino Zero (Native USB Port)
+# --------------------------------------
+arduino_zero_native.name=Arduino Zero (Native USB Port)
+arduino_zero_native.upload_port.0.vid=0x2341
+arduino_zero_native.upload_port.0.pid=0x804d
+arduino_zero_native.upload_port.1.vid=0x2341
+arduino_zero_native.upload_port.1.pid=0x004d
+arduino_zero_native.upload_port.2.vid=0x2341
+arduino_zero_native.upload_port.2.pid=0x824d
+arduino_zero_native.upload_port.3.vid=0x2341
+arduino_zero_native.upload_port.3.pid=0x024d
+[...CUT...]
+# Arduino MKR1000
+# -----------------------
+mkr1000.name=Arduino MKR1000
+mkr1000.upload_port.0.vid=0x2341       &lt;------- MATCHING IDs
+mkr1000.upload_port.0.pid=0x804e       &lt;------- MATCHING IDs
+mkr1000.upload_port.1.vid=0x2341
+mkr1000.upload_port.1.pid=0x004e
+mkr1000.upload_port.2.vid=0x2341
+mkr1000.upload_port.2.pid=0x824e
+mkr1000.upload_port.3.vid=0x2341
+mkr1000.upload_port.3.pid=0x024e
+[...CUT...]
+</code></pre></div>
+<p>As we can see the only board that has the two properties matching is the <code>mkr1000</code>, in this case the CLI knows that the
+board is surely an MKR1000.</p>
+<p>Note that <code>vid</code> and <code>pid</code> properties are just free text key/value pairs: the discovery may return basically anything,
+the board just needs to have the same properties defined in <code>boards.txt</code> as <code>upload_port.*</code> to be identified.</p>
+<p>We can also specify multiple identification properties for the same board using the <code>.N</code> suffix, for example:</p>
+<div class="highlight"><pre><span></span><code>myboard.name=My Wonderful Arduino Compatible Board
+myboard.upload_port.pears=20
+myboard.upload_port.apples=30
+</code></pre></div>
+<p>will match on <code>pears=20, apples=30</code> but:</p>
+<div class="highlight"><pre><span></span><code>myboard.name=My Wonderful Arduino Compatible Board
+myboard.upload_port.0.pears=20
+myboard.upload_port.0.apples=30
+myboard.upload_port.1.pears=30
+myboard.upload_port.1.apples=40
+</code></pre></div>
+<p>will match on both <code>pears=20, apples=30</code> and <code>pears=30, apples=40</code> but not <code>pears=20, apples=40</code>, in that sense each
+"set" of identification properties is independent from each other and cannot be mixed for port matching.</p>
                 
               
               
@@ -1523,7 +1629,7 @@ users of other development software install the sketch dependencies.</p>
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="../sketch-build-process/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Sketch build process" rel="prev">
+        <a href="../platform-specification/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Platform specification" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -1532,20 +1638,20 @@ users of other development software install the sketch dependencies.</p>
               <span class="md-footer__direction">
                 Previous
               </span>
-              Sketch build process
+              Platform specification
             </div>
           </div>
         </a>
       
       
         
-        <a href="../library-specification/" class="md-footer__link md-footer__link--next" aria-label="Next: Library specification" rel="next">
+        <a href="../package_index_json-specification/" class="md-footer__link md-footer__link--next" aria-label="Next: Package index specification" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Library specification
+              Package index specification
             </div>
           </div>
           <div class="md-footer__button md-icon">

@@ -405,6 +405,18 @@
   
   
     <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board_search/" class="md-nav__link">
+        board search
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../commands/arduino-cli_burn-bootloader/" class="md-nav__link">
         burn-bootloader
       </a>
@@ -1060,6 +1072,21 @@
 
   
   
+  
+    <li class="md-nav__item">
+      <a href="../pluggable-discovery-specification/" class="md-nav__link">
+        Pluggable discovery specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
     
   
   
@@ -1324,6 +1351,7 @@ active users).</p>
 <li>a file preprocessor</li>
 <li>a debugger</li>
 <li>a program that performs a firmware upgrade</li>
+<li>a <a href="../pluggable-discovery-specification/">pluggable discovery</a></li>
 </ul>
 <p>basically anything that can run on the user's host PC and do something useful.</p>
 <p>For example, Arduino uses two command line tools for the AVR boards: avr-gcc (the compiler) and avrdude (the uploader).</p>
@@ -1448,6 +1476,10 @@ that can be referenced from <code>platform.txt</code> using one of the following
           <span class="nt">&quot;toolsDependencies&quot;</span><span class="p">:</span> <span class="p">[</span>
             <span class="p">{</span> <span class="nt">&quot;packager&quot;</span><span class="p">:</span> <span class="s2">&quot;arduino&quot;</span><span class="p">,</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;avr-gcc&quot;</span><span class="p">,</span> <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;4.8.1-arduino5&quot;</span> <span class="p">},</span>
             <span class="p">{</span> <span class="nt">&quot;packager&quot;</span><span class="p">:</span> <span class="s2">&quot;arduino&quot;</span><span class="p">,</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;avrdude&quot;</span><span class="p">,</span> <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;6.0.1-arduino5&quot;</span> <span class="p">}</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;discoveryDependencies&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span> <span class="nt">&quot;packager&quot;</span><span class="p">:</span> <span class="s2">&quot;arduino&quot;</span><span class="p">,</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;serial-discovery&quot;</span> <span class="p">},</span>
+            <span class="p">{</span> <span class="nt">&quot;packager&quot;</span><span class="p">:</span> <span class="s2">&quot;arduino&quot;</span><span class="p">,</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;mdns-discovery&quot;</span> <span class="p">}</span>
           <span class="p">]</span>
         <span class="p">},</span>
 </code></pre></div>
@@ -1466,6 +1498,10 @@ that can be referenced from <code>platform.txt</code> using one of the following
 <li><code>toolsDependencies</code>: the tools needed by this core. They will be installed by Boards Manager along with the platform.
   Each tool is referenced by the triple (<code>packager</code>, <code>name</code>, <code>version</code>) as previously said. Note that you can reference
   tools available in other packages as well, even if no platform of that package is installed.</li>
+<li><code>discoveryDependencies</code>: the Pluggable Discoveries needed by this core. Each discovery is referenced by <code>packager</code> and
+  <code>name</code>, the <code>version</code> is not specified because the latest installed discovery tool will always be used. Like
+  <code>toolsDependencies</code> they will be installed by Boards Manager along with the platform and can reference tools available
+  in other packages as well, even if no platform of that package is installed.</li>
 </ul>
 <p>The <code>version</code> field is validated by both Arduino IDE and <a href="https://github.com/zafarkhaja/jsemver">JSemVer</a>. Here are the
 rules Arduino IDE follows for parsing versions
@@ -1580,7 +1616,7 @@ files and folders within the architecture folder up a level.</p>
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="../platform-specification/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Platform specification" rel="prev">
+        <a href="../pluggable-discovery-specification/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Pluggable discovery specification" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -1589,7 +1625,7 @@ files and folders within the architecture folder up a level.</p>
               <span class="md-footer__direction">
                 Previous
               </span>
-              Platform specification
+              Pluggable discovery specification
             </div>
           </div>
         </a>
