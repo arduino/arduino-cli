@@ -402,3 +402,53 @@ func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, tools, 4)
 }
+
+func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
+	// Pass nil, since these paths are only used for installing
+	pm := packagemanager.NewPackageManager(nil, nil, nil, nil)
+	// Hardware from main packages directory
+	pm.LoadHardwareFromDirectory(dataDir1.Join("packages"))
+	{
+		fqbn, err := cores.ParseFQBN("esp32:esp32:esp32")
+		require.NoError(t, err)
+		require.NotNil(t, fqbn)
+		_, platformRelease, board, _, _, err := pm.ResolveFQBN(fqbn)
+		require.NoError(t, err)
+
+		require.Equal(t, "esptool__pluggable_network", board.Properties.Get("upload.tool.network"))
+		require.Equal(t, "esp32", board.Properties.Get("upload_port.0.board"))
+		platformProps := platformRelease.Properties
+		require.Equal(t, "builtin:serial-discovery", platformProps.Get("pluggable_discovery.required.0"))
+		require.Equal(t, "builtin:mdns-discovery", platformProps.Get("pluggable_discovery.required.1"))
+		require.Equal(t, "{runtime.tools.esptool.path}", platformProps.Get("tools.esptool__pluggable_network.path"))
+		require.Contains(t, platformProps.Get("tools.esptool__pluggable_network.cmd"), "esptool")
+		require.Contains(t, platformProps.Get("tools.esptool__pluggable_network.network_cmd"), "{runtime.platform.path}/tools/espota")
+		require.Equal(t, "esp32", platformProps.Get("tools.esptool__pluggable_network.upload.protocol"))
+		require.Equal(t, "", platformProps.Get("tools.esptool__pluggable_network.upload.params.verbose"))
+		require.Equal(t, "", platformProps.Get("tools.esptool__pluggable_network.upload.params.quiet"))
+		require.Equal(t, "Password", platformProps.Get("tools.esptool__pluggable_network.upload.field.password"))
+		require.Equal(t, "true", platformProps.Get("tools.esptool__pluggable_network.upload.field.password.secret"))
+		require.Equal(t, "{network_cmd} -i \"{upload.port.address}\" -p \"{upload.port.properties.port}\" \"--auth={upload.field.password}\" -f \"{build.path}/{build.project_name}.bin\"", platformProps.Get("tools.esptool__pluggable_network.upload.pattern"))
+	}
+	{
+		fqbn, err := cores.ParseFQBN("esp8266:esp8266:generic")
+		require.NoError(t, err)
+		require.NotNil(t, fqbn)
+		_, platformRelease, board, _, _, err := pm.ResolveFQBN(fqbn)
+		require.NoError(t, err)
+		require.Equal(t, "esptool__pluggable_network", board.Properties.Get("upload.tool.network"))
+		require.Equal(t, "generic", board.Properties.Get("upload_port.0.board"))
+		platformProps := platformRelease.Properties
+		require.Equal(t, "builtin:serial-discovery", platformProps.Get("pluggable_discovery.required.0"))
+		require.Equal(t, "builtin:mdns-discovery", platformProps.Get("pluggable_discovery.required.1"))
+		require.Equal(t, "", platformProps.Get("tools.esptool__pluggable_network.path"))
+		require.Equal(t, "{runtime.tools.python3.path}/python3", platformProps.Get("tools.esptool__pluggable_network.cmd"))
+		require.Equal(t, "{runtime.tools.python3.path}/python3", platformProps.Get("tools.esptool__pluggable_network.network_cmd"))
+		require.Equal(t, "esp", platformProps.Get("tools.esptool__pluggable_network.upload.protocol"))
+		require.Equal(t, "", platformProps.Get("tools.esptool__pluggable_network.upload.params.verbose"))
+		require.Equal(t, "", platformProps.Get("tools.esptool__pluggable_network.upload.params.quiet"))
+		require.Equal(t, "Password", platformProps.Get("tools.esptool__pluggable_network.upload.field.password"))
+		require.Equal(t, "true", platformProps.Get("tools.esptool__pluggable_network.upload.field.password.secret"))
+		require.Equal(t, "\"{network_cmd}\" -I \"{runtime.platform.path}/tools/espota.py\" -i \"{upload.port.address}\" -p \"{upload.port.properties.port}\" \"--auth={upload.field.password}\" -f \"{build.path}/{build.project_name}.bin\"", platformProps.Get("tools.esptool__pluggable_network.upload.pattern"))
+	}
+}
