@@ -59,10 +59,10 @@ func runOutdatedCommand(cmd *cobra.Command, args []string) {
 
 	// Prints outdated cores
 	tab := table.New()
-	tab.SetHeader(tr("Core name"), tr("Installed version"), tr("New version"))
+	tab.SetHeader(tr("ID"), tr("Installed version"), tr("New version"), tr("Name"))
 	if len(outdatedResp.OutdatedPlatforms) > 0 {
 		for _, p := range outdatedResp.OutdatedPlatforms {
-			tab.AddRow(p.Name, p.Installed, p.Latest)
+			tab.AddRow(p.Id, p.Installed, p.Latest, p.Name)
 		}
 		feedback.Print(tab.Render())
 	}

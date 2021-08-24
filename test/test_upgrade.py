@@ -33,8 +33,8 @@ def test_upgrade(run_command):
     result = run_command("outdated")
     assert result.ok
     lines = result.stdout.splitlines()
-    assert lines[1].startswith("Arduino AVR Boards")
-    assert lines[4].startswith("USBHost")
+    assert "Arduino AVR Boards" in lines[1]
+    assert "USBHost" in lines[4]
 
     result = run_command("upgrade")
     assert result.ok
