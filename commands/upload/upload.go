@@ -281,6 +281,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	if uploadToolPlatform != nil {
 		uploadProperties.Merge(uploadToolPlatform.Properties)
 	}
+	uploadProperties.Set("runtime.os", properties.GetOSSuffix())
 	uploadProperties.Merge(boardPlatform.Properties)
 	uploadProperties.Merge(boardPlatform.RuntimeProperties())
 	uploadProperties.Merge(boardProperties)
