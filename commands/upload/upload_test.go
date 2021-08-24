@@ -282,8 +282,7 @@ tools.arduino_ota.upload.field.password.secret=true`))
 
 	platformRelease.Properties = props
 
-	userFields, err := getUserFields("avrdude", platformRelease)
-	require.NoError(t, err)
+	userFields := getUserFields("avrdude", platformRelease)
 	require.Len(t, userFields, 2)
 	require.Equal(t, userFields[0].ToolId, "avrdude")
 	require.Equal(t, userFields[0].Name, "username")
@@ -300,17 +299,12 @@ tools.arduino_ota.upload.field.password.secret=THIS_IS_NOT_A_BOOLEAN`))
 	require.NoError(t, err)
 	platformRelease.Properties = props
 
-	userFields, err = getUserFields("arduino_ota", platformRelease)
-	require.Nil(t, userFields)
-	require.EqualError(t, err, `parsing "tools.arduino_ota.upload.field.password.secret", property is not a boolean`)
-
 	props, err = properties.LoadFromBytes([]byte(`
 tools.arduino_ota.upload.field.some_field=This is a really long label that ideally must never be set by any platform
 `))
 	require.NoError(t, err)
 	platformRelease.Properties = props
-	userFields, err = getUserFields("arduino_ota", platformRelease)
-	require.NoError(t, err)
+	userFields = getUserFields("arduino_ota", platformRelease)
 	require.Len(t, userFields, 1)
 	require.Equal(t, userFields[0].ToolId, "arduino_ota")
 	require.Equal(t, userFields[0].Name, "some_field")

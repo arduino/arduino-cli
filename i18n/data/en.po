@@ -41,7 +41,7 @@ msgstr "%[1]s, protocol version: %[2]d"
 msgid "%s already downloaded"
 msgstr "%s already downloaded"
 
-#: commands/upload/upload.go:541
+#: commands/upload/upload.go:528
 msgid "%s and %s cannot be used together"
 msgstr "%s and %s cannot be used together"
 
@@ -298,7 +298,7 @@ msgstr "Cannot get command line for tool"
 msgid "Cannot get executable path: %v"
 msgstr "Cannot get executable path: %v"
 
-#: commands/upload/upload.go:431
+#: commands/upload/upload.go:418
 msgid "Cannot perform port reset: %s"
 msgstr "Cannot perform port reset: %s"
 
@@ -1243,7 +1243,7 @@ msgstr "No platforms matching your search."
 msgid "No updates available."
 msgstr "No updates available."
 
-#: commands/upload/upload.go:420
+#: commands/upload/upload.go:407
 msgid "No upload port found, using %s as fallback"
 msgstr "No upload port found, using %s as fallback"
 
@@ -1354,7 +1354,7 @@ msgstr "Path to the file where logs will be written."
 msgid "Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS."
 msgstr "Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS."
 
-#: commands/upload/upload.go:399
+#: commands/upload/upload.go:386
 msgid "Performing 1200-bps touch reset on serial port %s"
 msgstr "Performing 1200-bps touch reset on serial port %s"
 
@@ -1646,7 +1646,7 @@ msgstr "Sketches with .pde extension are deprecated, please rename the following
 msgid "Skip linking of final executable."
 msgstr "Skip linking of final executable."
 
-#: commands/upload/upload.go:392
+#: commands/upload/upload.go:379
 msgid "Skipping 1200-bps touch reset: no serial port selected!"
 msgstr "Skipping 1200-bps touch reset: no serial port selected!"
 
@@ -1900,7 +1900,7 @@ msgstr "Upload Arduino sketches. This does NOT compile the sketch prior to uploa
 msgid "Upload port address, e.g.: COM3 or /dev/ttyACM2"
 msgstr "Upload port address, e.g.: COM3 or /dev/ttyACM2"
 
-#: commands/upload/upload.go:417
+#: commands/upload/upload.go:404
 msgid "Upload port found on %s"
 msgstr "Upload port found on %s"
 
@@ -2018,7 +2018,7 @@ msgstr "WARNING: cannot run post install: %s"
 msgid "WARNING: library {0} claims to run on {1} architecture(s) and may be incompatible with your current board which runs on {2} architecture(s)."
 msgstr "WARNING: library {0} claims to run on {1} architecture(s) and may be incompatible with your current board which runs on {2} architecture(s)."
 
-#: commands/upload/upload.go:406
+#: commands/upload/upload.go:393
 msgid "Waiting for upload port..."
 msgstr "Waiting for upload port..."
 
@@ -2030,7 +2030,7 @@ msgstr "Warning: Board {0}:{1}:{2} doesn''t define a %s preference. Auto-set to:
 msgid "Warning: platform.txt from core '{0}' contains deprecated {1}, automatically converted to {2}. Consider upgrading this core."
 msgstr "Warning: platform.txt from core '{0}' contains deprecated {1}, automatically converted to {2}. Consider upgrading this core."
 
-#: commands/upload/upload.go:301
+#: commands/upload/upload.go:288
 msgid "Warning: tool '%s' is not installed. It might not be available for your OS."
 msgstr "Warning: tool '%s' is not installed. It might not be available for your OS."
 
@@ -2059,7 +2059,7 @@ msgstr "Writing config file: %v"
 msgid "[DEPRECATED] %s"
 msgstr "[DEPRECATED] %s"
 
-#: commands/upload/upload.go:315
+#: commands/upload/upload.go:302
 msgid "a programmer is required to upload for this board"
 msgstr "a programmer is required to upload for this board"
 
@@ -2083,11 +2083,11 @@ msgstr "archivePath"
 msgid "arduino-preprocessor pattern is missing"
 msgstr "arduino-preprocessor pattern is missing"
 
-#: commands/upload/upload.go:566
+#: commands/upload/upload.go:553
 msgid "autodetect build artifact: %s"
 msgstr "autodetect build artifact: %s"
 
-#: commands/upload/upload.go:551
+#: commands/upload/upload.go:538
 msgid "binary file not found in %s"
 msgstr "binary file not found in %s"
 
@@ -2104,7 +2104,7 @@ msgstr "board not found"
 msgid "boardname"
 msgstr "boardname"
 
-#: commands/upload/upload.go:465
+#: commands/upload/upload.go:452
 msgid "burn bootloader error: %s"
 msgstr "burn bootloader error: %s"
 
@@ -2153,8 +2153,8 @@ msgstr "cannot create build cache directory: %s"
 msgid "cannot create build directory: %s"
 msgstr "cannot create build directory: %s"
 
-#: commands/upload/upload.go:508
-#: commands/upload/upload.go:515
+#: commands/upload/upload.go:495
+#: commands/upload/upload.go:502
 msgid "cannot execute upload tool: %s"
 msgstr "cannot execute upload tool: %s"
 
@@ -2162,7 +2162,7 @@ msgstr "cannot execute upload tool: %s"
 msgid "cannot export sketch metadata: %s"
 msgstr "cannot export sketch metadata: %s"
 
-#: commands/upload/upload.go:93
+#: commands/upload/upload.go:87
 msgid "cannot find tool: undefined '%s' property"
 msgstr "cannot find tool: undefined '%s' property"
 
@@ -2175,7 +2175,7 @@ msgstr "checking lib install prerequisites: %s"
 msgid "checking local archive integrity"
 msgstr "checking local archive integrity"
 
-#: commands/upload/upload.go:462
+#: commands/upload/upload.go:449
 msgid "chip erase error: %s"
 msgstr "chip erase error: %s"
 
@@ -2222,7 +2222,7 @@ msgid "communication out of sync, expected 'stop', received '%s'"
 msgstr "communication out of sync, expected 'stop', received '%s'"
 
 #: commands/debug/debug_info.go:123
-#: commands/upload/upload.go:366
+#: commands/upload/upload.go:353
 msgid "compiled sketch not found in %s"
 msgstr "compiled sketch not found in %s"
 
@@ -2239,7 +2239,7 @@ msgstr "converting library %[1]s to rpc struct: %[2]w"
 msgid "copying output file %s"
 msgstr "copying output file %s"
 
-#: commands/upload/upload.go:623
+#: commands/upload/upload.go:610
 msgid "could not find a valid build artifact"
 msgstr "could not find a valid build artifact"
 
@@ -2393,7 +2393,7 @@ msgid "error: %s and %s flags cannot be used together"
 msgstr "error: %s and %s flags cannot be used together"
 
 #: commands/debug/debug_info.go:126
-#: commands/upload/upload.go:369
+#: commands/upload/upload.go:356
 msgid "expected compiled sketch in directory %s, but is a file instead"
 msgstr "expected compiled sketch in directory %s, but is a file instead"
 
@@ -2516,8 +2516,8 @@ msgstr "importing sketch metadata: %s"
 #: commands/compile/compile.go:115
 #: commands/upload/programmers_list.go:37
 #: commands/upload/programmers_list.go:43
-#: commands/upload/upload.go:208
-#: commands/upload/upload.go:215
+#: commands/upload/upload.go:194
+#: commands/upload/upload.go:201
 msgid "incorrect FQBN: %s"
 msgstr "incorrect FQBN: %s"
 
@@ -2549,7 +2549,7 @@ msgstr "invalid 'add' message: missing port"
 msgid "invalid 'remove' message: missing port"
 msgstr "invalid 'remove' message: missing port"
 
-#: commands/upload/upload.go:268
+#: commands/upload/upload.go:254
 msgid "invalid 'upload.tool' property: %s"
 msgstr "invalid 'upload.tool' property: %s"
 
@@ -2639,7 +2639,7 @@ msgstr "invalid hash '%[1]s': %[2]s"
 #: commands/lib/list.go:41
 #: commands/lib/list.go:46
 #: commands/lib/search.go:35
-#: commands/upload/upload.go:52
+#: commands/upload/upload.go:51
 msgid "invalid instance"
 msgstr "invalid instance"
 
@@ -2684,7 +2684,7 @@ msgstr "invalid path writing inventory file: %[1]s error: %[2]w"
 msgid "invalid platform archive size: %s"
 msgstr "invalid platform archive size: %s"
 
-#: commands/upload/upload.go:495
+#: commands/upload/upload.go:482
 msgid "invalid recipe '%[1]s': %[2]s"
 msgstr "invalid recipe '%[1]s': %[2]s"
 
@@ -2755,7 +2755,7 @@ msgstr "loading %[1]s: %[2]s"
 
 #: commands/board/details.go:44
 #: commands/lib/list.go:60
-#: commands/upload/upload.go:62
+#: commands/upload/upload.go:61
 msgid "loading board data: %s"
 msgstr "loading board data: %s"
 
@@ -2828,7 +2828,7 @@ msgstr "missing platform %[1]s:%[2]s referenced by board %[3]s"
 msgid "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 msgstr "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 
-#: commands/upload/upload.go:47
+#: commands/upload/upload.go:46
 msgid "missing protocol"
 msgstr "missing protocol"
 
@@ -2842,7 +2842,7 @@ msgstr "missing sketchPath"
 msgid "moving extracted archive to destination dir: %s"
 msgstr "moving extracted archive to destination dir: %s"
 
-#: commands/upload/upload.go:618
+#: commands/upload/upload.go:605
 msgid "multiple build artifacts found: '%[1]s' and '%[2]s'"
 msgstr "multiple build artifacts found: '%[1]s' and '%[2]s'"
 
@@ -2856,7 +2856,7 @@ msgstr "no FQBN provided"
 
 #: commands/debug/debug_info.go:61
 #: commands/upload/programmers_list.go:33
-#: commands/upload/upload.go:204
+#: commands/upload/upload.go:190
 msgid "no Fully Qualified Board Name provided"
 msgstr "no Fully Qualified Board Name provided"
 
@@ -2872,11 +2872,11 @@ msgstr "no executable specified"
 msgid "no instance specified"
 msgstr "no instance specified"
 
-#: commands/upload/upload.go:195
+#: commands/upload/upload.go:181
 msgid "no programmer specified for burning bootloader"
 msgstr "no programmer specified for burning bootloader"
 
-#: commands/upload/upload.go:573
+#: commands/upload/upload.go:560
 msgid "no sketch or build directory/file specified"
 msgstr "no sketch or build directory/file specified"
 
@@ -2888,7 +2888,7 @@ msgstr "no supported board found at %s"
 msgid "no unique root dir in archive, found '%[1]s' and '%[2]s'"
 msgstr "no unique root dir in archive, found '%[1]s' and '%[2]s'"
 
-#: commands/upload/upload.go:490
+#: commands/upload/upload.go:477
 msgid "no upload port provided"
 msgstr "no upload port provided"
 
@@ -2923,7 +2923,7 @@ msgstr "opening sketch"
 
 #: commands/board/attach.go:50
 #: commands/compile/compile.go:103
-#: commands/upload/upload.go:137
+#: commands/upload/upload.go:123
 msgid "opening sketch: %s"
 msgstr "opening sketch: %s"
 
@@ -2945,10 +2945,6 @@ msgstr "package '%s' not found"
 msgid "package not found"
 msgstr "package not found"
 
-#: commands/upload/upload.go:115
-msgid "parsing %s, property is not a boolean"
-msgstr "parsing %s, property is not a boolean"
-
 #: arduino/cores/packagemanager/loader.go:227
 msgid "parsing IDE bundled index: %s"
 msgstr "parsing IDE bundled index: %s"
@@ -2957,7 +2953,7 @@ msgstr "parsing IDE bundled index: %s"
 #: arduino/cores/packagemanager/package_manager.go:136
 #: commands/board/details.go:38
 #: commands/lib/list.go:56
-#: commands/upload/upload.go:57
+#: commands/upload/upload.go:56
 msgid "parsing fqbn: %s"
 msgstr "parsing fqbn: %s"
 
@@ -3027,7 +3023,7 @@ msgstr "port"
 msgid "port not found: %[1]s %[2]s"
 msgstr "port not found: %[1]s %[2]s"
 
-#: commands/upload/upload.go:232
+#: commands/upload/upload.go:218
 msgid "programmer '%s' not available"
 msgstr "programmer '%s' not available"
 
@@ -3035,11 +3031,11 @@ msgstr "programmer '%s' not available"
 msgid "programmer '%s' not found"
 msgstr "programmer '%s' not found"
 
-#: commands/upload/upload.go:169
+#: commands/upload/upload.go:155
 msgid "programmer not specified"
 msgstr "programmer not specified"
 
-#: commands/upload/upload.go:469
+#: commands/upload/upload.go:456
 msgid "programming error: %s"
 msgstr "programming error: %s"
 
@@ -3105,7 +3101,7 @@ msgstr "reading package root dir: %s"
 msgid "reading sketch metadata %[1]s: %[2]s"
 msgstr "reading sketch metadata %[1]s: %[2]s"
 
-#: commands/upload/upload.go:484
+#: commands/upload/upload.go:471
 msgid "recipe not found '%s'"
 msgstr "recipe not found '%s'"
 
@@ -3151,7 +3147,7 @@ msgstr "rescanning libraries: %s"
 msgid "retrieving Arduino public keys: %s"
 msgstr "retrieving Arduino public keys: %s"
 
-#: commands/upload/upload.go:363
+#: commands/upload/upload.go:350
 msgid "retrieving build artifacts: %s"
 msgstr "retrieving build artifacts: %s"
 
@@ -3378,8 +3374,8 @@ msgstr "upgrade everything to the latest version"
 msgid "upgrading platform: %s"
 msgstr "upgrading platform: %s"
 
-#: commands/upload/upload.go:473
-#: commands/upload/upload.go:519
+#: commands/upload/upload.go:460
+#: commands/upload/upload.go:506
 msgid "uploading error: %s"
 msgstr "uploading error: %s"
 

@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -67,13 +66,8 @@ func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsReques
 		return nil, err
 	}
 
-	userFields, err := getUserFields(toolID, platformRelease)
-	if err != nil {
-		return nil, err
-	}
-
 	return &rpc.SupportedUserFieldsResponse{
-		UserFields: userFields,
+		UserFields: getUserFields(toolID, platformRelease),
 	}, nil
 }
 
@@ -95,7 +89,7 @@ func getToolID(props *properties.Map, action, protocol string) (string, error) {
 
 // getUserFields return all user fields supported by the tools specified.
 // Returns error only in case the secret property is not a valid boolean.
-func getUserFields(toolID string, platformRelease *cores.PlatformRelease) ([]*rpc.UserField, error) {
+func getUserFields(toolID string, platformRelease *cores.PlatformRelease) []*rpc.UserField {
 	userFields := []*rpc.UserField{}
 	fields := platformRelease.Properties.SubTree(fmt.Sprintf("tools.%s.upload.field", toolID))
 	keys := fields.FirstLevelKeys()
@@ -105,15 +99,7 @@ func getUserFields(toolID string, platformRelease *cores.PlatformRelease) ([]*rp
 		if len(value) > 50 {
 			value = fmt.Sprintf("%s…", value[:49])
 		}
-		secretProp := fmt.Sprintf("%s.secret", key)
-		secret, ok := fields.GetOk(secretProp)
-		if !ok {
-			secret = "false"
-		}
-		isSecret, err := strconv.ParseBool(secret)
-		if err != nil {
-			return nil, fmt.Errorf(tr("parsing %s, property is not a boolean"), fmt.Sprintf(`"tools.%s.upload.field.%s.secret"`, toolID, key))
-		}
+		isSecret := fields.GetBoolean(fmt.Sprintf("%s.secret", key))
 		userFields = append(userFields, &rpc.UserField{
 			ToolId: toolID,
 			Name:   key,
@@ -122,7 +108,7 @@ func getUserFields(toolID string, platformRelease *cores.PlatformRelease) ([]*rp
 		})
 	}
 
-	return userFields, nil
+	return userFields
 }
 
 // Upload FIXMEDOC
