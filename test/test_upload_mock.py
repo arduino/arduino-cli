@@ -31,6 +31,7 @@ indexes = [
     "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json",
     "https://dl.espressif.com/dl/package_esp32_index.json",
     "http://arduino.esp8266.com/stable/package_esp8266com_index.json",
+    "https://github.com/sonydevworld/spresense-arduino-compatible/releases/download/generic/package_spresense_index.json",
 ]
 
 cores_to_install = [
@@ -39,6 +40,7 @@ cores_to_install = [
     "arduino:samd@1.8.11",
     "esp32:esp32@1.0.6",
     "esp8266:esp8266@3.0.2",
+    "SPRESENSE:spresense@2.0.2",
 ]
 
 testdata = [
@@ -1148,6 +1150,19 @@ testdata = [
         '--chip esp8266 --port "/dev/ttyACM0" --baud "57600" ""  --before '
         "no_reset_no_sync --after soft_reset write_flash 0x0 "
         '"{build_dir}/{sketch_name}.ino.bin"\n',
+    ),
+    (
+        "SPRESENSE:spresense:spresense",
+        "/dev/ttyACM0",
+        "",
+        {
+            "darwin": '"{data_dir}/packages/SPRESENSE/tools/spresense-tools/2.0.2/flash_writer/macosx/flash_writer" '
+            '-s -c "/dev/ttyACM0"  -d -n "{build_dir}/{sketch_name}.ino.spk"',
+            "linux": '"{data_dir}/packages/SPRESENSE/tools/spresense-tools/2.0.2/flash_writer/linux/flash_writer" '
+            '-s -c "/dev/ttyACM0"  -d -n "{build_dir}/{sketch_name}.ino.spk"',
+            "win32": '"{data_dir}/packages/SPRESENSE/tools/spresense-tools/2.0.2/flash_writer/windows/flash_writer.exe" '
+            '-s -c "/dev/ttyACM0"  -d -n "{build_dir}/{sketch_name}.ino.spk"',
+        },
     ),
 ]
 
