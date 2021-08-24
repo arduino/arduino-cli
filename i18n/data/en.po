@@ -378,7 +378,6 @@ msgstr "Connected"
 msgid "Core"
 msgstr "Core"
 
-#: cli/outdated/outdated.go:62
 #: cli/update/update.go:99
 msgid "Core name"
 msgstr "Core name"
@@ -914,6 +913,7 @@ msgstr "Global variables use {0} bytes of dynamic memory."
 
 #: cli/core/list.go:84
 #: cli/core/search.go:114
+#: cli/outdated/outdated.go:62
 msgid "ID"
 msgstr "ID"
 
@@ -1192,6 +1192,7 @@ msgstr "Multiple libraries were found for \"{0}\""
 #: cli/core/list.go:84
 #: cli/core/search.go:114
 #: cli/lib/list.go:125
+#: cli/outdated/outdated.go:62
 msgid "Name"
 msgstr "Name"
 

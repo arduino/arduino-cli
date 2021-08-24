@@ -33,8 +33,8 @@ def test_outdated(run_command):
     result = run_command("outdated")
     assert result.ok
     lines = [l.strip() for l in result.stdout.splitlines()]
-    assert lines[1].startswith("Arduino AVR Boards")
-    assert lines[4].startswith("USBHost")
+    assert "Arduino AVR Boards" in lines[1]
+    assert "USBHost" in lines[4]
 
 
 def test_outdated_using_library_with_invalid_version(run_command, data_dir):
