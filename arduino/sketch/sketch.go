@@ -86,6 +86,7 @@ func New(path *paths.Path) (*Sketch, error) {
 		OtherSketchFiles: paths.PathList{},
 		AdditionalFiles:  paths.PathList{},
 		RootFolderFiles:  paths.PathList{},
+		Metadata:         new(Metadata),
 	}
 
 	err := sketch.checkSketchCasing()

@@ -644,3 +644,16 @@ def test_board_search(run_command, data_dir):
     installed_boards = {board["fqbn"]: board for board in data if "fqbn" in board}
     assert "arduino-beta-development:samd:mkr1000" in installed_boards
     assert "Arduino MKR1000" == installed_boards["arduino-beta-development:samd:mkr1000"]["name"]
+
+
+def test_board_attach_without_sketch_json(run_command, data_dir):
+    run_command("update")
+
+    sketch_name = "BoardAttachWithoutSketchJson"
+    sketch_path = Path(data_dir, sketch_name)
+    fqbn = "arduino:avr:uno"
+
+    # Create a test sketch
+    assert run_command(f"sketch new {sketch_path}")
+
+    assert run_command(f"board attach {fqbn} {sketch_path}")

@@ -2128,7 +2128,7 @@ msgstr "can't find dependencies for platform %[1]s: %[2]w"
 msgid "can't find latest release of %s"
 msgstr "can't find latest release of %s"
 
-#: arduino/sketch/sketch.go:100
+#: arduino/sketch/sketch.go:101
 msgid "can't find main Sketch file in %s"
 msgstr "can't find main Sketch file in %s"
 
@@ -2277,7 +2277,7 @@ msgstr "data section exceeds available space in board"
 msgid "debugging not supported for board %s"
 msgstr "debugging not supported for board %s"
 
-#: arduino/sketch/sketch.go:206
+#: arduino/sketch/sketch.go:207
 msgid "decoding sketch metadata: %s"
 msgstr "decoding sketch metadata: %s"
 
@@ -2351,7 +2351,7 @@ msgstr "downloading library_index.json.sig"
 msgid "downloading tool %[1]s: %[2]s"
 msgstr "downloading tool %[1]s: %[2]s"
 
-#: arduino/sketch/sketch.go:195
+#: arduino/sketch/sketch.go:196
 msgid "encoding sketch metadata: %s"
 msgstr "encoding sketch metadata: %s"
 
@@ -2508,7 +2508,7 @@ msgstr "getting parent dir of %[1]s: %[2]s"
 msgid "getting tool dependencies for platform %[1]s: %[2]s"
 msgstr "getting tool dependencies for platform %[1]s: %[2]s"
 
-#: arduino/sketch/sketch.go:150
+#: arduino/sketch/sketch.go:151
 msgid "importing sketch metadata: %s"
 msgstr "importing sketch metadata: %s"
 
@@ -2891,7 +2891,7 @@ msgstr "no unique root dir in archive, found '%[1]s' and '%[2]s'"
 msgid "no upload port provided"
 msgstr "no upload port provided"
 
-#: arduino/sketch/sketch.go:258
+#: arduino/sketch/sketch.go:259
 msgid "no valid sketch found in %[1]s: missing %[2]s"
 msgstr "no valid sketch found in %[1]s: missing %[2]s"
 
@@ -3076,7 +3076,7 @@ msgstr "reading directory %[1]s: %[2]s"
 msgid "reading file %[1]s: %[2]s"
 msgstr "reading file %[1]s: %[2]s"
 
-#: arduino/sketch/sketch.go:228
+#: arduino/sketch/sketch.go:229
 msgid "reading files: %v"
 msgstr "reading files: %v"
 
@@ -3100,7 +3100,7 @@ msgstr "reading library_index.json: %s"
 msgid "reading package root dir: %s"
 msgstr "reading package root dir: %s"
 
-#: arduino/sketch/sketch.go:187
+#: arduino/sketch/sketch.go:188
 msgid "reading sketch metadata %[1]s: %[2]s"
 msgstr "reading sketch metadata %[1]s: %[2]s"
 
@@ -3341,7 +3341,7 @@ msgstr "unknown package %s"
 msgid "unknown platform %s:%s"
 msgstr "unknown platform %s:%s"
 
-#: arduino/sketch/sketch.go:141
+#: arduino/sketch/sketch.go:142
 msgid "unknown sketch file extension '%s'"
 msgstr "unknown sketch file extension '%s'"
 
@@ -3394,7 +3394,7 @@ msgstr "writing library_index.json"
 msgid "writing library_index.json.sig"
 msgstr "writing library_index.json.sig"
 
-#: arduino/sketch/sketch.go:211
+#: arduino/sketch/sketch.go:212
 msgid "writing sketch metadata %[1]s: %[2]s"
 msgstr "writing sketch metadata %[1]s: %[2]s"
 
