@@ -59,18 +59,14 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 	for _, targetPackage := range pm.Packages {
 		for _, platform := range targetPackage.Platforms {
 			latestPlatformRelease := platform.GetLatestRelease()
-			if latestPlatformRelease == nil {
+			installedPlatformRelease := pm.GetInstalledPlatformRelease(platform)
+
+			if latestPlatformRelease == nil && installedPlatformRelease == nil {
 				continue
-			}
-			installedVersion := ""
-			if installedPlatformRelease := pm.GetInstalledPlatformRelease(platform); installedPlatformRelease != nil {
-				installedVersion = installedPlatformRelease.Version.String()
 			}
 
 			rpcPlatform := &rpc.Platform{
 				Id:                platform.String(),
-				Installed:         installedVersion,
-				Latest:            latestPlatformRelease.Version.String(),
 				Name:              platform.Name,
 				Maintainer:        platform.Package.Maintainer,
 				Website:           platform.Package.WebsiteURL,
@@ -78,13 +74,20 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 				ManuallyInstalled: platform.ManuallyInstalled,
 			}
 
+			if latestPlatformRelease != nil {
+				rpcPlatform.Latest = latestPlatformRelease.Version.String()
+			}
+			if installedPlatformRelease != nil {
+				rpcPlatform.Installed = installedPlatformRelease.Version.String()
+			}
+
 			// Platforms that are not installed don't have a list of boards
 			// generated from their boards.txt file so we need two different
 			// ways of reading board data.
 			// The only boards information for platforms that are not installed
 			// is that found in the index, usually that's only a board name.
-			if len(latestPlatformRelease.Boards) != 0 {
-				for _, board := range latestPlatformRelease.Boards {
+			if installedPlatformRelease != nil {
+				for _, board := range installedPlatformRelease.Boards {
 					if !req.GetIncludeHiddenBoards() && board.IsHidden() {
 						continue
 					}
@@ -103,7 +106,7 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 						Platform: rpcPlatform,
 					})
 				}
-			} else {
+			} else if latestPlatformRelease != nil {
 				for _, board := range latestPlatformRelease.BoardsManifest {
 					toTest := append(strings.Split(board.Name, " "), board.Name)
 					if ok, err := match(toTest); err != nil {
