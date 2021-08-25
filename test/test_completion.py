@@ -44,6 +44,7 @@ def test_completion_fish(run_command):
     assert "# fish completion for arduino-cli" in result.stdout
     assert "function __arduino_cli_perform_completion" in result.stdout
 
+
 def test_completion_powershell(run_command):
     result = run_command("completion powershell")
     assert result.ok
@@ -75,6 +76,7 @@ def test_completion_fish_no_desc(run_command):
     assert "# fish completion for arduino-cli" in result.stdout
     assert "function __arduino_cli_perform_completion" in result.stdout
     assert "__completeNoDesc" in result.stdout
+
 
 def test_completion_powershell_no_desc(run_command):
     result = run_command("completion powershell --no-descriptions")
