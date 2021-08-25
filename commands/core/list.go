@@ -16,6 +16,7 @@
 package core
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 
@@ -58,14 +59,20 @@ func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, error) {
 			}
 
 			if platformRelease != nil {
+				latest := platform.GetLatestRelease()
+				if latest == nil {
+					return nil, fmt.Errorf(tr("can't find latest release of core %s", platform))
+				}
+
 				if req.UpdatableOnly {
-					if latest := platform.GetLatestRelease(); latest == nil || latest == platformRelease {
+					if latest == platformRelease {
 						continue
 					}
 				}
 
 				rpcPlatform := commands.PlatformReleaseToRPC(platformRelease)
 				rpcPlatform.Installed = platformRelease.Version.String()
+				rpcPlatform.Latest = latest.Version.String()
 				res = append(res, rpcPlatform)
 			}
 		}

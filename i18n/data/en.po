@@ -2129,6 +2129,10 @@ msgstr "can't find dependencies for platform %[1]s: %[2]w"
 msgid "can't find latest release of %s"
 msgstr "can't find latest release of %s"
 
+#: commands/core/list.go:64
+msgid "can't find latest release of core %s"
+msgstr "can't find latest release of core %s"
+
 #: arduino/sketch/sketch.go:101
 msgid "can't find main Sketch file in %s"
 msgstr "can't find main Sketch file in %s"
@@ -2630,7 +2634,7 @@ msgstr "invalid hash '%[1]s': %[2]s"
 #: commands/compile/compile.go:93
 #: commands/core/download.go:36
 #: commands/core/install.go:35
-#: commands/core/list.go:38
+#: commands/core/list.go:39
 #: commands/core/search.go:40
 #: commands/core/uninstall.go:33
 #: commands/core/upgrade.go:40
@@ -3306,7 +3310,7 @@ msgstr "unable to create a folder to save the sketch files"
 msgid "unable to create the folder containing the item"
 msgstr "unable to create the folder containing the item"
 
-#: commands/core/list.go:33
+#: commands/core/list.go:34
 msgid "unable to find an instance with ID: %d"
 msgstr "unable to find an instance with ID: %d"
 
