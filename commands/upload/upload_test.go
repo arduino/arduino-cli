@@ -243,7 +243,7 @@ upload.tool.network=arduino_ota`))
 	require.Equal(t, "avrdude", toolID)
 
 	toolID, err = getToolID(props, "bootloader", "network")
-	require.EqualError(t, err, "cannot find tool: undefined 'bootloader.tool.network' property")
+	require.EqualError(t, err, "Property 'bootloader.tool.network' is undefined")
 	require.Equal(t, "", toolID)
 
 	props, err = properties.LoadFromBytes([]byte(`

@@ -41,6 +41,13 @@ type ArduinoCoreServerImpl struct {
 
 var tr = i18n.Tr
 
+func convertErrorToRPCStatus(err error) error {
+	if cmdErr, ok := err.(commands.CommandError); ok {
+		return cmdErr.ToRPCStatus().Err()
+	}
+	return err
+}
+
 // BoardDetails FIXMEDOC
 func (s *ArduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetailsResponse, error) {
 	resp, err := board.Details(ctx, req)
@@ -336,7 +343,7 @@ func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.Arduin
 		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.UploadResponse{ErrStream: data}) }),
 	)
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(resp)
 }
@@ -349,7 +356,7 @@ func (s *ArduinoCoreServerImpl) UploadUsingProgrammer(req *rpc.UploadUsingProgra
 		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.UploadUsingProgrammerResponse{ErrStream: data}) }),
 	)
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(resp)
 }
@@ -362,7 +369,7 @@ func (s *ArduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderRequest, s
 		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.BurnBootloaderResponse{ErrStream: data}) }),
 	)
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(resp)
 }
@@ -370,7 +377,7 @@ func (s *ArduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderRequest, s
 // ListProgrammersAvailableForUpload FIXMEDOC
 func (s *ArduinoCoreServerImpl) ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgrammersAvailableForUploadRequest) (*rpc.ListProgrammersAvailableForUploadResponse, error) {
 	resp, err := upload.ListProgrammersAvailableForUpload(ctx, req)
-	return resp, err.Err()
+	return resp, convertErrorToRPCStatus(err)
 }
 
 // LibraryDownload FIXMEDOC

@@ -231,17 +231,18 @@ func run(cmd *cobra.Command, args []string) {
 			Programmer: programmer,
 			UserFields: fields,
 		}
-		var st *status.Status
+
+		var uploadError error
 		if output.OutputFormat == "json" {
 			// TODO: do not print upload output in json mode
-			uploadOut := new(bytes.Buffer)
-			uploadErr := new(bytes.Buffer)
-			_, st = upload.Upload(context.Background(), uploadRequest, uploadOut, uploadErr)
+			uploadStdOut := new(bytes.Buffer)
+			uploadStdErr := new(bytes.Buffer)
+			_, uploadError = upload.Upload(context.Background(), uploadRequest, uploadStdOut, uploadStdErr)
 		} else {
-			_, st = upload.Upload(context.Background(), uploadRequest, os.Stdout, os.Stderr)
+			_, uploadError = upload.Upload(context.Background(), uploadRequest, os.Stdout, os.Stderr)
 		}
-		if st != nil {
-			feedback.Errorf(tr("Error during Upload: %v"), st.Message())
+		if uploadError != nil {
+			feedback.Errorf(tr("Error during Upload: %v"), uploadError)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}
