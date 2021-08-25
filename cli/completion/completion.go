@@ -47,7 +47,7 @@ func NewCommand() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	if completionNoDesc && (args[0] == "bash") {
+	if completionNoDesc && (args[0] == "bash" || args[0] == "powershell") {
 		feedback.Errorf(tr("Error: command description is not supported by %v"), args[0])
 		os.Exit(errorcodes.ErrGeneric)
 	}
