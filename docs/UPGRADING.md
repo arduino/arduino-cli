@@ -4,10 +4,10 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## Unreleased
 
-### gRPC interface `UploadRequest`, `UploadUsingProgrammerRequest`, `BurnBootloaderRequest`, `DetectedPort` field changes
+### gRPC interface `DebugConfigRequest`, `UploadRequest`, `UploadUsingProgrammerRequest`, `BurnBootloaderRequest`, `DetectedPort` field changes
 
-`UploadRequest`, `UploadUsingProgrammerRequest` and `BurnBootloaderRequest` had their `port` field change from type
-`string` to `Port`.
+`DebugConfigRequest`, `UploadRequest`, `UploadUsingProgrammerRequest` and `BurnBootloaderRequest` had their `port` field
+change from type `string` to `Port`.
 
 `Port` contains the following information:
 

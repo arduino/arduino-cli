@@ -130,13 +130,10 @@ func getDebugProperties(req *debug.DebugConfigRequest, pm *packagemanager.Packag
 
 	// Set debug port property
 	port := req.GetPort()
-	if port != "" {
-		toolProperties.Set("debug.port", port)
-		if strings.HasPrefix(port, "/dev/") {
-			toolProperties.Set("debug.port.file", port[5:])
-		} else {
-			toolProperties.Set("debug.port.file", port)
-		}
+	if port.GetAddress() != "" {
+		toolProperties.Set("debug.port", port.Address)
+		portFile := strings.TrimPrefix(port.Address, "/dev/")
+		toolProperties.Set("debug.port.file", portFile)
 	}
 
 	// Extract and expand all debugging properties
