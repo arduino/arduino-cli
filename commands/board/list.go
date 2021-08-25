@@ -33,8 +33,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 var (
@@ -139,7 +137,7 @@ func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.B
 			logrus.Debug("Board not recognized")
 		} else if err != nil {
 			// this is bad, bail out
-			return nil, errors.Wrap(err, tr("error getting board info from Arduino Cloud"))
+			return nil, &commands.UnavailableError{Message: tr("Error getting board info from Arduino Cloud")}
 		}
 
 		// add a DetectedPort entry in any case: the `Boards` field will
@@ -170,7 +168,7 @@ func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.B
 }
 
 // List FIXMEDOC
-func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e *status.Status) {
+func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 	tags := map[string]string{}
 	// Use defer func() to evaluate tags map when function returns
 	// and set success flag inspecting the error named return parameter
@@ -184,15 +182,15 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e *status.Status) {
 
 	pm := commands.GetPackageManager(req.GetInstance().Id)
 	if pm == nil {
-		return nil, status.New(codes.InvalidArgument, tr("Invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
 
 	dm := pm.DiscoveryManager()
 	if errs := dm.RunAll(); len(errs) > 0 {
-		return nil, status.New(codes.FailedPrecondition, tr("Error getting port list: %v", errs))
+		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: errs[0]}
 	}
 	if errs := dm.StartAll(); len(errs) > 0 {
-		return nil, status.New(codes.FailedPrecondition, tr("Error getting port list: %v", errs))
+		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: errs[0]}
 	}
 	defer func() {
 		if errs := dm.StopAll(); len(errs) > 0 {
@@ -204,12 +202,12 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e *status.Status) {
 	retVal := []*rpc.DetectedPort{}
 	ports, errs := pm.DiscoveryManager().List()
 	if len(errs) > 0 {
-		return nil, status.New(codes.FailedPrecondition, tr("Error getting port list: %v", errs))
+		return nil, &commands.UnavailableError{Message: tr("Error getting board list"), Cause: errs[0]}
 	}
 	for _, port := range ports {
 		boards, err := identify(pm, port)
 		if err != nil {
-			return nil, status.New(codes.Internal, err.Error())
+			return nil, err
 		}
 
 		// boards slice can be empty at this point if neither the cores nor the
@@ -226,14 +224,14 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e *status.Status) {
 
 // Watch returns a channel that receives boards connection and disconnection events.
 // The discovery process can be interrupted by sending a message to the interrupt channel.
-func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchResponse, *status.Status) {
+func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchResponse, error) {
 	pm := commands.GetPackageManager(instanceID)
 	dm := pm.DiscoveryManager()
 
 	runErrs := dm.RunAll()
 	if len(runErrs) == len(dm.IDs()) {
 		// All discoveries failed to run, we can't do anything
-		return nil, status.New(codes.FailedPrecondition, fmt.Sprintf("%v", runErrs))
+		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: runErrs[0]}
 	}
 
 	eventsChan, errs := dm.StartSyncAll()

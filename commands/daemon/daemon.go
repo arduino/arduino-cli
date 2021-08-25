@@ -51,20 +51,15 @@ func convertErrorToRPCStatus(err error) error {
 // BoardDetails FIXMEDOC
 func (s *ArduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetailsResponse, error) {
 	resp, err := board.Details(ctx, req)
-	if err != nil {
-		return nil, err.Err()
-	}
-
-	return resp, err.Err()
+	return resp, convertErrorToRPCStatus(err)
 }
 
 // BoardList FIXMEDOC
 func (s *ArduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardListRequest) (*rpc.BoardListResponse, error) {
 	ports, err := board.List(req)
 	if err != nil {
-		return nil, err.Err()
+		return nil, convertErrorToRPCStatus(err)
 	}
-
 	return &rpc.BoardListResponse{
 		Ports: ports,
 	}, nil
@@ -73,21 +68,13 @@ func (s *ArduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardLis
 // BoardListAll FIXMEDOC
 func (s *ArduinoCoreServerImpl) BoardListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListAllResponse, error) {
 	resp, err := board.ListAll(ctx, req)
-	if err != nil {
-		return nil, err.Err()
-	}
-
-	return resp, nil
+	return resp, convertErrorToRPCStatus(err)
 }
 
 // BoardSearch exposes to the gRPC interface the board search command
 func (s *ArduinoCoreServerImpl) BoardSearch(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchResponse, error) {
 	resp, err := board.Search(ctx, req)
-	if err != nil {
-		return nil, err.Err()
-	}
-
-	return resp, nil
+	return resp, convertErrorToRPCStatus(err)
 }
 
 // BoardListWatch FIXMEDOC
@@ -134,9 +121,9 @@ func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCoreService_Boa
 		}
 	}()
 
-	eventsChan, stat := board.Watch(msg.Instance.Id, interrupt)
-	if stat != nil {
-		return stat.Err()
+	eventsChan, err := board.Watch(msg.Instance.Id, interrupt)
+	if err != nil {
+		return convertErrorToRPCStatus(err)
 	}
 
 	for event := range eventsChan {
@@ -151,12 +138,11 @@ func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCoreService_Boa
 
 // BoardAttach FIXMEDOC
 func (s *ArduinoCoreServerImpl) BoardAttach(req *rpc.BoardAttachRequest, stream rpc.ArduinoCoreService_BoardAttachServer) error {
-
 	resp, err := board.Attach(stream.Context(), req,
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.BoardAttachResponse{TaskProgress: p}) },
 	)
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(resp)
 }

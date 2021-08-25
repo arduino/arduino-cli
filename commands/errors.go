@@ -205,3 +205,75 @@ func (e *FailedUploadError) Unwrap() error {
 func (e *FailedUploadError) ToRPCStatus() *status.Status {
 	return status.New(codes.Internal, e.Error())
 }
+
+// InvalidArgumentError is returned when an invalid argument is passed to the command
+type InvalidArgumentError struct {
+	Message string
+	Cause   error
+}
+
+func (e *InvalidArgumentError) Error() string {
+	return composeErrorMsg(e.Message, e.Cause)
+}
+
+func (e *InvalidArgumentError) Unwrap() error {
+	return e.Cause
+}
+
+func (e *InvalidArgumentError) ToRPCStatus() *status.Status {
+	return status.New(codes.InvalidArgument, e.Error())
+}
+
+// NotFoundError is returned when a resource is not found
+type NotFoundError struct {
+	Message string
+	Cause   error
+}
+
+func (e *NotFoundError) Error() string {
+	return composeErrorMsg(e.Message, e.Cause)
+}
+
+func (e *NotFoundError) Unwrap() error {
+	return e.Cause
+}
+
+func (e *NotFoundError) ToRPCStatus() *status.Status {
+	return status.New(codes.NotFound, e.Error())
+}
+
+// PermissionDeniedError is returned when a resource cannot be accessed or modified
+type PermissionDeniedError struct {
+	Message string
+	Cause   error
+}
+
+func (e *PermissionDeniedError) Error() string {
+	return composeErrorMsg(e.Message, e.Cause)
+}
+
+func (e *PermissionDeniedError) Unwrap() error {
+	return e.Cause
+}
+
+func (e *PermissionDeniedError) ToRPCStatus() *status.Status {
+	return status.New(codes.PermissionDenied, e.Error())
+}
+
+// UnavailableError is returned when a resource is temporarily not available
+type UnavailableError struct {
+	Message string
+	Cause   error
+}
+
+func (e *UnavailableError) Error() string {
+	return composeErrorMsg(e.Message, e.Cause)
+}
+
+func (e *UnavailableError) Unwrap() error {
+	return e.Cause
+}
+
+func (e *UnavailableError) ToRPCStatus() *status.Status {
+	return status.New(codes.Unavailable, e.Error())
+}

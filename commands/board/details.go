@@ -21,27 +21,24 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // Details returns all details for a board including tools and HW identifiers.
 // This command basically gather al the information and translates it into the required grpc struct properties
-func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetailsResponse, *status.Status) {
+func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetailsResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, status.New(codes.InvalidArgument, tr("Invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
 
 	fqbn, err := cores.ParseFQBN(req.GetFqbn())
 	if err != nil {
-		return nil, status.Newf(codes.InvalidArgument, tr("Error parsing fqbn: %s"), err)
+		return nil, &commands.InvalidFQBNError{Cause: err}
 	}
 
 	boardPackage, boardPlatform, board, boardProperties, boardRefPlatform, err := pm.ResolveFQBN(fqbn)
-
 	if err != nil {
-		return nil, status.Newf(codes.FailedPrecondition, tr("Error loading board data: %s"), err)
+		return nil, &commands.UnknownFQBNError{Cause: err}
 	}
 
 	details := &rpc.BoardDetailsResponse{}

@@ -23,18 +23,16 @@ import (
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // Search returns all boards that match the search arg.
 // Boards are searched in all platforms, including those in the index that are not yet
 // installed. Note that platforms that are not installed don't include boards' FQBNs.
 // If no search argument is used all boards are returned.
-func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchResponse, *status.Status) {
+func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, status.New(codes.InvalidArgument, tr("Invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
 
 	res := &rpc.BoardSearchResponse{Boards: []*rpc.BoardListItem{}}
