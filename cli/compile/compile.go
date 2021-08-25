@@ -29,7 +29,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
-	"google.golang.org/grpc/status"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -179,18 +178,18 @@ func run(cmd *cobra.Command, args []string) {
 		SourceOverride:                overrides,
 		Library:                       library,
 	}
-	compileOut := new(bytes.Buffer)
-	compileErr := new(bytes.Buffer)
+	compileStdOut := new(bytes.Buffer)
+	compileStdErr := new(bytes.Buffer)
 	verboseCompile := configuration.Settings.GetString("logging.level") == "debug"
 	var compileRes *rpc.CompileResponse
-	var st *status.Status
+	var compileError error
 	if output.OutputFormat == "json" {
-		compileRes, st = compile.Compile(context.Background(), compileRequest, compileOut, compileErr, verboseCompile)
+		compileRes, compileError = compile.Compile(context.Background(), compileRequest, compileStdOut, compileStdErr, verboseCompile)
 	} else {
-		compileRes, st = compile.Compile(context.Background(), compileRequest, os.Stdout, os.Stderr, verboseCompile)
+		compileRes, compileError = compile.Compile(context.Background(), compileRequest, os.Stdout, os.Stderr, verboseCompile)
 	}
 
-	if st == nil && uploadAfterCompile {
+	if compileError == nil && uploadAfterCompile {
 		var sk *sketch.Sketch
 		sk, err := sketch.New(sketchPath)
 		if err != nil {
@@ -248,13 +247,13 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	feedback.PrintResult(&compileResult{
-		CompileOut:    compileOut.String(),
-		CompileErr:    compileErr.String(),
+		CompileOut:    compileStdOut.String(),
+		CompileErr:    compileStdErr.String(),
 		BuilderResult: compileRes,
-		Success:       st == nil,
+		Success:       compileError == nil,
 	})
-	if st != nil && output.OutputFormat != "json" {
-		feedback.Errorf(tr("Error during build: %v"), st.Message())
+	if compileError != nil && output.OutputFormat != "json" {
+		feedback.Errorf(tr("Error during build: %v"), compileError)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }

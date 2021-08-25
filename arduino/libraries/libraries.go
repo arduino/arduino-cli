@@ -111,7 +111,7 @@ func (library *Library) ToRPCLibrary() (*rpc.Library, error) {
 		var err error
 		headers, err = library.SourceHeaders()
 		if err != nil {
-			return nil, fmt.Errorf(tr("gathering library headers: %w"), err)
+			return nil, fmt.Errorf(tr("reading library headers: %w"), err)
 		}
 	}
 

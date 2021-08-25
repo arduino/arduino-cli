@@ -171,6 +171,30 @@ func (e *MissingPlatformPropertyError) ToRPCStatus() *status.Status {
 	return status.New(codes.FailedPrecondition, e.Error())
 }
 
+// PlatformNotFound is returned when a platform is not found
+type PlatformNotFound struct {
+	Platform string
+}
+
+func (e *PlatformNotFound) Error() string {
+	return tr("Platform '%s' is not installed", e.Platform)
+}
+
+func (e *PlatformNotFound) ToRPCStatus() *status.Status {
+	return status.New(codes.FailedPrecondition, e.Error())
+}
+
+// MissingSketchPathError is returned when the sketch path is mandatory and not specified
+type MissingSketchPathError struct{}
+
+func (e *MissingSketchPathError) Error() string {
+	return tr("Missing sketch path")
+}
+
+func (e *MissingSketchPathError) ToRPCStatus() *status.Status {
+	return status.New(codes.InvalidArgument, e.Error())
+}
+
 // SketchNotFoundError is returned when the sketch is not found
 type SketchNotFoundError struct {
 	Cause error
@@ -203,6 +227,24 @@ func (e *FailedUploadError) Unwrap() error {
 }
 
 func (e *FailedUploadError) ToRPCStatus() *status.Status {
+	return status.New(codes.Internal, e.Error())
+}
+
+// CompileFailedError is returned when the compile fails
+type CompileFailedError struct {
+	Message string
+	Cause   error
+}
+
+func (e *CompileFailedError) Error() string {
+	return composeErrorMsg(e.Message, e.Cause)
+}
+
+func (e *CompileFailedError) Unwrap() error {
+	return e.Cause
+}
+
+func (e *CompileFailedError) ToRPCStatus() *status.Status {
 	return status.New(codes.Internal, e.Error())
 }
 
