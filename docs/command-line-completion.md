@@ -50,7 +50,7 @@ Use `arduino-cli completion powershell > arduino-cli.ps1` to generate a temporar
 need to add the content of the generated file to your PowerShell profile file.
 
 1. `Get-Content -Path arduino-cli.ps1 | Add-Content -Path $profile` or add it by hand with your favourite text editor.
-1. Move to first two "`using ...`" lines of `arduino-cli.ps1` on the top of the `$profile` file.
+1. The previous command added two `using namespace` lines, move them on top of the `$profile` file.
 1. If not already done, add the line `Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete` to your `$profile` file:
    it is needed to enable the TAB completion in PowerShell.
 1. `del arduino-cli.ps1` to remove the temporary file.
