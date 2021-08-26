@@ -63,6 +63,23 @@ func (e *InvalidFQBNError) Unwrap() error {
 	return e.Cause
 }
 
+// InvalidLibraryError is returned when the library has syntax errors
+type InvalidLibraryError struct {
+	Cause error
+}
+
+func (e *InvalidLibraryError) Error() string {
+	return composeErrorMsg(tr("Invalid library"), e.Cause)
+}
+
+func (e *InvalidLibraryError) ToRPCStatus() *status.Status {
+	return status.New(codes.InvalidArgument, e.Error())
+}
+
+func (e *InvalidLibraryError) Unwrap() error {
+	return e.Cause
+}
+
 // InvalidVersionError is returned when the version has syntax errors
 type InvalidVersionError struct {
 	Cause error
@@ -207,6 +224,42 @@ func (e *PlatformNotFound) Unwrap() error {
 	return e.Cause
 }
 
+// LibraryNotFound is returned when a platform is not found
+type LibraryNotFound struct {
+	Library string
+	Cause   error
+}
+
+func (e *LibraryNotFound) Error() string {
+	return composeErrorMsg(tr("Library '%s' not found", e.Library), e.Cause)
+}
+
+func (e *LibraryNotFound) ToRPCStatus() *status.Status {
+	return status.New(codes.FailedPrecondition, e.Error())
+}
+
+func (e *LibraryNotFound) Unwrap() error {
+	return e.Cause
+}
+
+// LibraryDependenciesResolutionFailedError is returned when an inconsistency is found in library dependencies
+// or a solution cannot be found.
+type LibraryDependenciesResolutionFailedError struct {
+	Cause error
+}
+
+func (e *LibraryDependenciesResolutionFailedError) Error() string {
+	return composeErrorMsg(tr("No valid dependencies solution found"), e.Cause)
+}
+
+func (e *LibraryDependenciesResolutionFailedError) ToRPCStatus() *status.Status {
+	return status.New(codes.FailedPrecondition, e.Error())
+}
+
+func (e *LibraryDependenciesResolutionFailedError) Unwrap() error {
+	return e.Cause
+}
+
 // PlatformAlreadyAtTheLatestVersionError is returned when a platform is up to date
 type PlatformAlreadyAtTheLatestVersionError struct {
 	Platform string
@@ -266,6 +319,23 @@ func (e *FailedInstallError) Unwrap() error {
 }
 
 func (e *FailedInstallError) ToRPCStatus() *status.Status {
+	return status.New(codes.Internal, e.Error())
+}
+
+// FailedLibraryInstallError is returned if a library install operation fails
+type FailedLibraryInstallError struct {
+	Cause error
+}
+
+func (e *FailedLibraryInstallError) Error() string {
+	return composeErrorMsg(tr("Library install failed"), e.Cause)
+}
+
+func (e *FailedLibraryInstallError) Unwrap() error {
+	return e.Cause
+}
+
+func (e *FailedLibraryInstallError) ToRPCStatus() *status.Status {
 	return status.New(codes.Internal, e.Error())
 }
 

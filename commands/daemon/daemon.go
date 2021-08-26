@@ -42,6 +42,9 @@ type ArduinoCoreServerImpl struct {
 var tr = i18n.Tr
 
 func convertErrorToRPCStatus(err error) error {
+	if err == nil {
+		return nil
+	}
 	if cmdErr, ok := err.(commands.CommandError); ok {
 		return cmdErr.ToRPCStatus().Err()
 	}
@@ -373,7 +376,7 @@ func (s *ArduinoCoreServerImpl) LibraryDownload(req *rpc.LibraryDownloadRequest,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.LibraryDownloadResponse{Progress: p}) },
 	)
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(resp)
 }
@@ -386,7 +389,7 @@ func (s *ArduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.LibraryInstallResponse{TaskProgress: p}) },
 	)
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(&rpc.LibraryInstallResponse{})
 }
@@ -397,7 +400,7 @@ func (s *ArduinoCoreServerImpl) LibraryUninstall(req *rpc.LibraryUninstallReques
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.LibraryUninstallResponse{TaskProgress: p}) },
 	)
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(&rpc.LibraryUninstallResponse{})
 }
@@ -409,7 +412,7 @@ func (s *ArduinoCoreServerImpl) LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequ
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.LibraryUpgradeAllResponse{TaskProgress: p}) },
 	)
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(&rpc.LibraryUpgradeAllResponse{})
 }
@@ -417,19 +420,19 @@ func (s *ArduinoCoreServerImpl) LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequ
 // LibraryResolveDependencies FIXMEDOC
 func (s *ArduinoCoreServerImpl) LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesRequest) (*rpc.LibraryResolveDependenciesResponse, error) {
 	resp, err := lib.LibraryResolveDependencies(ctx, req)
-	return resp, err.Err()
+	return resp, convertErrorToRPCStatus(err)
 }
 
 // LibrarySearch FIXMEDOC
 func (s *ArduinoCoreServerImpl) LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.LibrarySearchResponse, error) {
 	resp, err := lib.LibrarySearch(ctx, req)
-	return resp, err.Err()
+	return resp, convertErrorToRPCStatus(err)
 }
 
 // LibraryList FIXMEDOC
 func (s *ArduinoCoreServerImpl) LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.LibraryListResponse, error) {
 	resp, err := lib.LibraryList(ctx, req)
-	return resp, err.Err()
+	return resp, convertErrorToRPCStatus(err)
 }
 
 // ArchiveSketch FIXMEDOC
@@ -445,7 +448,7 @@ func (s *ArduinoCoreServerImpl) ZipLibraryInstall(req *rpc.ZipLibraryInstallRequ
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.ZipLibraryInstallResponse{TaskProgress: p}) },
 	)
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(&rpc.ZipLibraryInstallResponse{})
 }
@@ -457,7 +460,7 @@ func (s *ArduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallRequ
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.GitLibraryInstallResponse{TaskProgress: p}) },
 	)
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(&rpc.GitLibraryInstallResponse{})
 }

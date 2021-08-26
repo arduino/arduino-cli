@@ -81,7 +81,7 @@ func ParseLibraryReferenceArgAndAdjustCase(instance *rpc.Instance, arg string) (
 		Query:    libRef.Name,
 	})
 	if err != nil {
-		return nil, err.Err()
+		return nil, err
 	}
 
 	candidates := []*rpc.SearchedLibrary{}

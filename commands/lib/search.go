@@ -24,22 +24,18 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	semver "go.bug.st/relaxed-semver"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // LibrarySearch FIXMEDOC
-func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.LibrarySearchResponse, *status.Status) {
+func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.LibrarySearchResponse, error) {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
-		return nil, status.New(codes.InvalidArgument, tr("Invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
-
-	resp, err := searchLibrary(req, lm)
-	return resp, status.Convert(err)
+	return searchLibrary(req, lm), nil
 }
 
-func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.LibrariesManager) (*rpc.LibrarySearchResponse, error) {
+func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.LibrariesManager) *rpc.LibrarySearchResponse {
 	res := []*rpc.SearchedLibrary{}
 	status := rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS
 
@@ -51,7 +47,7 @@ func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.Libraries
 		res = append(res, indexLibraryToRPCSearchLibrary(lib))
 	}
 
-	return &rpc.LibrarySearchResponse{Libraries: res, Status: status}, nil
+	return &rpc.LibrarySearchResponse{Libraries: res, Status: status}
 }
 
 // indexLibraryToRPCSearchLibrary converts a librariindex.Library to rpc.SearchLibrary

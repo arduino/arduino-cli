@@ -21,16 +21,14 @@ import (
 
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // LibraryUninstall FIXMEDOC
-func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, taskCB commands.TaskProgressCB) *status.Status {
+func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, taskCB commands.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	ref, err := createLibIndexReference(lm, req)
 	if err != nil {
-		return status.New(codes.InvalidArgument, err.Error())
+		return &commands.InvalidLibraryError{Cause: err}
 	}
 
 	lib := lm.FindByReference(ref)

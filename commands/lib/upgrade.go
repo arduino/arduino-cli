@@ -19,45 +19,42 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"google.golang.org/grpc/status"
 )
 
 // LibraryUpgradeAll upgrades all the available libraries
-func LibraryUpgradeAll(instanceID int32, downloadCB commands.DownloadProgressCB,
-	taskCB commands.TaskProgressCB) *status.Status {
-	// get the library manager
+func LibraryUpgradeAll(instanceID int32, downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(instanceID)
-
-	if err := upgrade(lm, listLibraries(lm, true, true), downloadCB, taskCB); err != nil {
-		return status.Convert(err)
+	if lm == nil {
+		return &commands.InvalidInstanceError{}
 	}
 
-	stat := commands.Init(&rpc.InitRequest{Instance: &rpc.Instance{Id: instanceID}}, nil)
-	if stat != nil {
-		return status.Newf(stat.Code(), tr("Error rescanning libraries: %s", stat.Err()))
+	if err := upgrade(lm, listLibraries(lm, true, true), downloadCB, taskCB); err != nil {
+		return err
+	}
+
+	if err := commands.Init(&rpc.InitRequest{Instance: &rpc.Instance{Id: instanceID}}, nil); err != nil {
+		return err
 	}
 
 	return nil
 }
 
 // LibraryUpgrade upgrades only the given libraries
-func LibraryUpgrade(instanceID int32, libraryNames []string, downloadCB commands.DownloadProgressCB,
-	taskCB commands.TaskProgressCB) *status.Status {
-	// get the library manager
+func LibraryUpgrade(instanceID int32, libraryNames []string, downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(instanceID)
+	if lm == nil {
+		return &commands.InvalidInstanceError{}
+	}
 
 	// get the libs to upgrade
 	libs := filterByName(listLibraries(lm, true, true), libraryNames)
 
 	// do it
-	return status.Convert(upgrade(lm, libs, downloadCB, taskCB))
+	return upgrade(lm, libs, downloadCB, taskCB)
 }
 
-func upgrade(lm *librariesmanager.LibrariesManager, libs []*installedLib, downloadCB commands.DownloadProgressCB,
-	taskCB commands.TaskProgressCB) error {
-
+func upgrade(lm *librariesmanager.LibrariesManager, libs []*installedLib, downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 	// Go through the list and download them
-
 	for _, lib := range libs {
 		if err := downloadLibrary(lm, lib.Available, downloadCB, taskCB); err != nil {
 			return err

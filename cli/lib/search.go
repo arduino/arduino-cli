@@ -58,10 +58,11 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexRequest{
-		Instance: inst,
-	}, output.ProgressBar())
-	if err != nil {
+	if err := commands.UpdateLibrariesIndex(
+		context.Background(),
+		&rpc.UpdateLibrariesIndexRequest{Instance: inst},
+		output.ProgressBar(),
+	); err != nil {
 		feedback.Errorf(tr("Error updating library index: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}

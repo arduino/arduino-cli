@@ -25,27 +25,28 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 var tr = i18n.Tr
 
 // LibraryDownload FIXMEDOC
-func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downloadCB commands.DownloadProgressCB) (*rpc.LibraryDownloadResponse, *status.Status) {
+func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downloadCB commands.DownloadProgressCB) (*rpc.LibraryDownloadResponse, error) {
 	logrus.Info("Executing `arduino lib download`")
 
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
+	if lm == nil {
+		return nil, &commands.InvalidInstanceError{}
+	}
 
 	logrus.Info("Preparing download")
 
 	lib, err := findLibraryIndexRelease(lm, req)
 	if err != nil {
-		return nil, status.Newf(codes.InvalidArgument, tr("Error looking for library: %s"), err)
+		return nil, err
 	}
 
 	if err := downloadLibrary(lm, lib, downloadCB, func(*rpc.TaskProgress) {}); err != nil {
-		return nil, status.Convert(err)
+		return nil, err
 	}
 
 	return &rpc.LibraryDownloadResponse{}, nil
@@ -57,12 +58,12 @@ func downloadLibrary(lm *librariesmanager.LibrariesManager, libRelease *librarie
 	taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Downloading %s"), libRelease)})
 	config, err := commands.GetDownloaderConfig()
 	if err != nil {
-		return err
+		return &commands.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	}
 	if d, err := libRelease.Resource.Download(lm.DownloadsDir, config); err != nil {
-		return err
+		return &commands.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	} else if err := commands.Download(d, libRelease.String(), downloadCB); err != nil {
-		return err
+		return &commands.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 

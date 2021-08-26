@@ -17,22 +17,24 @@ package lib
 
 import (
 	"context"
+	"errors"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // LibraryResolveDependencies FIXMEDOC
-func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesRequest) (*rpc.LibraryResolveDependenciesResponse, *status.Status) {
+func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesRequest) (*rpc.LibraryResolveDependenciesResponse, error) {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
+	if lm == nil {
+		return nil, &commands.InvalidInstanceError{}
+	}
 
 	// Search the requested lib
 	reqLibRelease, err := findLibraryIndexRelease(lm, req)
 	if err != nil {
-		return nil, status.Newf(codes.InvalidArgument, tr("Error looking for library: %s", err))
+		return nil, err
 	}
 
 	// Extract all installed libraries
@@ -49,12 +51,13 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 		// Check if there is a problem with the first level deps
 		for _, directDep := range reqLibRelease.GetDependencies() {
 			if _, ok := lm.Index.Libraries[directDep.GetName()]; !ok {
-				return nil, status.Newf(codes.FailedPrecondition, tr("Dependency '%s' is not available", directDep.GetName()))
+				err := errors.New(tr("dependency '%s' is not available", directDep.GetName()))
+				return nil, &commands.LibraryDependenciesResolutionFailedError{Cause: err}
 			}
 		}
 
 		// Otherwise there is no possible solution, the depends field has an invalid formula
-		return nil, status.New(codes.FailedPrecondition, tr("No valid dependencies solution found"))
+		return nil, &commands.LibraryDependenciesResolutionFailedError{}
 	}
 
 	res := []*rpc.LibraryDependencyStatus{}
