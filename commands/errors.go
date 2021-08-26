@@ -144,20 +144,21 @@ func (e *ProgreammerRequiredForUploadError) ToRPCStatus() *status.Status {
 	return st
 }
 
-// UnknownProgrammerError is returned when the programmer is not found
-type UnknownProgrammerError struct {
-	Cause error
+// ProgrammerNotFoundError is returned when the programmer is not found
+type ProgrammerNotFoundError struct {
+	Programmer string
+	Cause      error
 }
 
-func (e *UnknownProgrammerError) Error() string {
-	return composeErrorMsg(tr("Unknown programmer"), e.Cause)
+func (e *ProgrammerNotFoundError) Error() string {
+	return composeErrorMsg(tr("Programmer '%s' not found", e.Programmer), e.Cause)
 }
 
-func (e *UnknownProgrammerError) Unwrap() error {
+func (e *ProgrammerNotFoundError) Unwrap() error {
 	return e.Cause
 }
 
-func (e *UnknownProgrammerError) ToRPCStatus() *status.Status {
+func (e *ProgrammerNotFoundError) ToRPCStatus() *status.Status {
 	return status.New(codes.NotFound, e.Error())
 }
 
@@ -212,7 +213,7 @@ type PlatformAlreadyAtTheLatestVersionError struct {
 }
 
 func (e *PlatformAlreadyAtTheLatestVersionError) Error() string {
-	return tr("Platform is already at the latest version")
+	return tr("Platform '%s' is already at the latest version", e.Platform)
 }
 
 func (e *PlatformAlreadyAtTheLatestVersionError) ToRPCStatus() *status.Status {
@@ -319,6 +320,24 @@ func (e *FailedUploadError) Unwrap() error {
 }
 
 func (e *FailedUploadError) ToRPCStatus() *status.Status {
+	return status.New(codes.Internal, e.Error())
+}
+
+// FailedDebugError is returned when the debug fails
+type FailedDebugError struct {
+	Message string
+	Cause   error
+}
+
+func (e *FailedDebugError) Error() string {
+	return composeErrorMsg(e.Message, e.Cause)
+}
+
+func (e *FailedDebugError) Unwrap() error {
+	return e.Cause
+}
+
+func (e *FailedDebugError) ToRPCStatus() *status.Status {
 	return status.New(codes.Internal, e.Error())
 }
 

@@ -100,8 +100,8 @@ func run(command *cobra.Command, args []string) {
 	if printInfo {
 
 		if res, err := debug.GetDebugConfig(context.Background(), debugConfigRequested); err != nil {
-			feedback.Errorf(tr("Error getting Debug info: %v"), err.Message())
-			errorcodes.ExitWithGrpcStatus(err)
+			feedback.Errorf(tr("Error getting Debug info: %v"), err)
+			os.Exit(errorcodes.ErrBadArgument)
 		} else {
 			feedback.PrintResult(&debugInfoResult{res})
 		}

@@ -218,7 +218,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 			programmer = buildPlatform.Programmers[programmerID]
 		}
 		if programmer == nil {
-			return &commands.UnknownProgrammerError{Cause: fmt.Errorf(tr("programmer '%s' not available"), programmerID)}
+			return &commands.ProgrammerNotFoundError{Programmer: programmerID}
 		}
 	}
 
@@ -352,13 +352,13 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	if !burnBootloader {
 		importPath, sketchName, err := determineBuildPathAndSketchName(importFile, importDir, sk, fqbn)
 		if err != nil {
-			return &commands.FailedUploadError{Message: tr("Error finding build artifacts"), Cause: err}
+			return &commands.NotFoundError{Message: tr("Error finding build artifacts"), Cause: err}
 		}
 		if !importPath.Exist() {
-			return &commands.FailedUploadError{Message: tr("Compiled sketch not found in %s", importPath)}
+			return &commands.NotFoundError{Message: tr("Compiled sketch not found in %s", importPath)}
 		}
 		if !importPath.IsDir() {
-			return &commands.FailedUploadError{Message: tr("Expected compiled sketch in directory %s, but is a file instead", importPath)}
+			return &commands.NotFoundError{Message: tr("Expected compiled sketch in directory %s, but is a file instead", importPath)}
 		}
 		uploadProperties.SetPath("build.path", importPath)
 		uploadProperties.Set("build.project_name", sketchName)
