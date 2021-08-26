@@ -33,7 +33,7 @@ import (
 var tr = i18n.Tr
 
 // CheckForUpdate returns the latest available version if greater than
-// the one running and it makes sense to check for an udpate, nil in all other cases
+// the one running and it makes sense to check for an update, nil in all other cases
 func CheckForUpdate(currentVersion *semver.Version) *semver.Version {
 	if !shouldCheckForUpdate(currentVersion) {
 		return nil
@@ -71,7 +71,7 @@ func checkForUpdate(currentVersion *semver.Version) *semver.Version {
 // NotifyNewVersionIsAvailable prints information about the new latestVersion
 func NotifyNewVersionIsAvailable(latestVersion string) {
 	feedback.Errorf("\n\n%s %s → %s\n%s",
-		ansi.Color(tr("A new release of arduino-cli is available:"), "yellow"),
+		ansi.Color(tr("A new release of Arduino CLI is available:"), "yellow"),
 		ansi.Color(globals.VersionInfo.VersionString, "cyan"),
 		ansi.Color(latestVersion, "cyan"),
 		ansi.Color("https://arduino.github.io/arduino-cli/latest/installation/#latest-packages", "yellow"))
@@ -85,8 +85,8 @@ func shouldCheckForUpdate(currentVersion *semver.Version) bool {
 		return false
 	}
 
-	if configuration.Settings.GetBool("updater.disable_notification") {
-		// Don't check if the user disable the notification
+	if !configuration.Settings.GetBool("updater.enable_notification") {
+		// Don't check if the user disabled the notification
 		return false
 	}
 

@@ -41,7 +41,8 @@ curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.
 ```
 
 The Arduino CLI verifies every 24 hours if there are new releases, if you don't like this behaviour you can disable it
-by setting the `updater.disable_notification` config or the env var `ARDUINO_UPDATER_DISABLE_NOTIFICATION` to `true`.
+by setting the [`updater.enable_notification` config](configuration.md#configuration-keys) or the
+[env var `ARDUINO_UPDATER_ENABLE_NOTIFICATION`](configuration.md#environment-variables) to `false`.
 
 ### Download
 

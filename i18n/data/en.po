@@ -112,8 +112,8 @@ msgid "--git-url and --zip-path flags allow installing untrusted files, use it a
 msgstr "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk."
 
 #: cli/updater/updater.go:74
-msgid "A new release of arduino-cli is available:"
-msgstr "A new release of arduino-cli is available:"
+msgid "A new release of Arduino CLI is available:"
+msgstr "A new release of Arduino CLI is available:"
 
 #: commands/errors.go:181
 msgid "A programmer is required to upload"

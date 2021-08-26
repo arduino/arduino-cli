@@ -25,7 +25,7 @@
   - `always_export_binaries` - set to `true` to make [`arduino-cli compile`][arduino-cli compile] always save binaries
     to the sketch folder. This is the equivalent of using the [`--export-binaries`][arduino-cli compile options] flag.
 - `updater` - configuration options related to Arduino CLI updates
-  - `disable_notification` - set to `true` to disable notifications of new Arduino CLI releases, defaults to `false`
+  - `enable_notification` - set to `false` to disable notifications of new Arduino CLI releases, defaults to `true`
 
 ## Configuration methods
 
