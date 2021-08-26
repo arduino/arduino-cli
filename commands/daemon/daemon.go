@@ -438,7 +438,7 @@ func (s *ArduinoCoreServerImpl) LibraryList(ctx context.Context, req *rpc.Librar
 // ArchiveSketch FIXMEDOC
 func (s *ArduinoCoreServerImpl) ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.ArchiveSketchResponse, error) {
 	resp, err := sketch.ArchiveSketch(ctx, req)
-	return resp, err.Err()
+	return resp, convertErrorToRPCStatus(err)
 }
 
 //ZipLibraryInstall FIXMEDOC
