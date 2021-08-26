@@ -25,10 +25,6 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
-// maximumSearchDistance is the maximum Levenshtein distance accepted when using fuzzy search.
-// This value is completely arbitrary and picked randomly.
-const maximumSearchDistance = 20
-
 // ListAll FIXMEDOC
 func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListAllResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
