@@ -23,7 +23,6 @@ import (
 	"regexp"
 	"sort"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -39,7 +38,6 @@ import (
 var (
 	// ErrNotFound is returned when the API returns 404
 	ErrNotFound = errors.New(tr("board not found"))
-	m           sync.Mutex
 	vidPidURL   = "https://builder.arduino.cc/v3/boards/byVidPid"
 	validVidPid = regexp.MustCompile(`0[xX][a-fA-F\d]{4}`)
 )
