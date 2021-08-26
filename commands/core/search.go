@@ -54,12 +54,8 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 			}
 
 			for _, t := range toTest {
-				matches, err := utils.Match(t, searchArgs)
-				if err != nil {
-					return false, err
-				}
-				if matches {
-					return matches, nil
+				if utils.Match(t, searchArgs) {
+					return true, nil
 				}
 			}
 			return false, nil

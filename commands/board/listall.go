@@ -47,12 +47,8 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListA
 		}
 
 		for _, t := range toTest {
-			matches, err := utils.Match(t, searchArgs)
-			if err != nil {
-				return false, err
-			}
-			if matches {
-				return matches, nil
+			if utils.Match(t, searchArgs) {
+				return true, nil
 			}
 		}
 		return false, nil
