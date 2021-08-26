@@ -45,6 +45,14 @@ def test_completion_fish(run_command):
     assert "function __arduino_cli_perform_completion" in result.stdout
 
 
+def test_completion_powershell(run_command):
+    result = run_command("completion powershell")
+    assert result.ok
+    assert result.stderr == ""
+    assert "Register-ArgumentCompleter -Native -CommandName 'arduino-cli' -ScriptBlock {" in result.stdout
+    assert "'arduino-cli;completion' {" in result.stdout
+
+
 def test_completion_bash_no_desc(run_command):
     result = run_command("completion bash --no-descriptions")
     assert not result.ok
@@ -68,3 +76,10 @@ def test_completion_fish_no_desc(run_command):
     assert "# fish completion for arduino-cli" in result.stdout
     assert "function __arduino_cli_perform_completion" in result.stdout
     assert "__completeNoDesc" in result.stdout
+
+
+def test_completion_powershell_no_desc(run_command):
+    result = run_command("completion powershell --no-descriptions")
+    assert not result.ok
+    assert result.stdout == ""
+    assert "Error: command description is not supported by powershell" in result.stderr

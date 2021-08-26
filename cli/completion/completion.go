@@ -32,8 +32,8 @@ var (
 // NewCommand created a new `completion` command
 func NewCommand() *cobra.Command {
 	command := &cobra.Command{
-		Use:       "completion [bash|zsh|fish] [--no-descriptions]",
-		ValidArgs: []string{"bash", "zsh", "fish"},
+		Use:       "completion [bash|zsh|fish|powershell] [--no-descriptions]",
+		ValidArgs: []string{"bash", "zsh", "fish", "powershell"},
 		Args:      cobra.ExactArgs(1),
 		Short:     tr("Generates completion scripts"),
 		Long:      tr("Generates completion scripts for various shells"),
@@ -47,7 +47,7 @@ func NewCommand() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	if completionNoDesc && (args[0] == "bash") {
+	if completionNoDesc && (args[0] == "bash" || args[0] == "powershell") {
 		feedback.Errorf(tr("Error: command description is not supported by %v"), args[0])
 		os.Exit(errorcodes.ErrGeneric)
 	}
@@ -64,6 +64,9 @@ func run(cmd *cobra.Command, args []string) {
 		break
 	case "fish":
 		cmd.Root().GenFishCompletion(os.Stdout, !completionNoDesc)
+		break
+	case "powershell":
+		cmd.Root().GenPowerShellCompletion(os.Stdout)
 		break
 	}
 }
