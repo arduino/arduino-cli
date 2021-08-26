@@ -1035,7 +1035,7 @@ msgstr "Invalid output format: %s"
 msgid "Invalid parameter %s: version not allowed"
 msgstr "Invalid parameter %s: version not allowed"
 
-#: commands/board/list.go:53
+#: commands/board/list.go:51
 msgid "Invalid pid value: '%s'"
 msgstr "Invalid pid value: '%s'"
 
@@ -1043,7 +1043,7 @@ msgstr "Invalid pid value: '%s'"
 msgid "Invalid size regexp: %s"
 msgstr "Invalid size regexp: %s"
 
-#: commands/board/list.go:50
+#: commands/board/list.go:48
 msgid "Invalid vid value: '%s'"
 msgstr "Invalid vid value: '%s'"
 
@@ -2093,7 +2093,7 @@ msgstr "binary file not found in %s"
 msgid "board %s:%s not found"
 msgstr "board %s:%s not found"
 
-#: commands/board/list.go:41
+#: commands/board/list.go:40
 msgid "board not found"
 msgstr "board not found"
 
@@ -2358,7 +2358,7 @@ msgstr "downloading tool %[1]s: %[2]s"
 msgid "encoding sketch metadata: %s"
 msgstr "encoding sketch metadata: %s"
 
-#: commands/board/list.go:142
+#: commands/board/list.go:140
 msgid "error getting board info from Arduino Cloud"
 msgstr "error getting board info from Arduino Cloud"
 
@@ -2378,11 +2378,11 @@ msgstr "error parsing FQBN"
 msgid "error parsing value: %v"
 msgstr "error parsing value: %v"
 
-#: commands/board/list.go:83
+#: commands/board/list.go:81
 msgid "error processing response from server"
 msgstr "error processing response from server"
 
-#: commands/board/list.go:98
+#: commands/board/list.go:96
 msgid "error querying Arduino Cloud Api"
 msgstr "error querying Arduino Cloud Api"
 
@@ -2411,7 +2411,7 @@ msgstr "extracting archive: %w"
 msgid "failed to compute hash of file \"%s\""
 msgstr "failed to compute hash of file \"%s\""
 
-#: commands/board/list.go:66
+#: commands/board/list.go:64
 msgid "failed to initialize http client"
 msgstr "failed to initialize http client"
 
@@ -2626,8 +2626,8 @@ msgstr "invalid hash '%[1]s': %[2]s"
 
 #: commands/board/attach.go:42
 #: commands/board/details.go:33
-#: commands/board/list.go:187
-#: commands/board/listall.go:36
+#: commands/board/list.go:185
+#: commands/board/listall.go:32
 #: commands/board/search.go:36
 #: commands/compile/compile.go:93
 #: commands/core/download.go:36
@@ -2640,7 +2640,7 @@ msgstr "invalid hash '%[1]s': %[2]s"
 #: commands/instances.go:589
 #: commands/lib/list.go:41
 #: commands/lib/list.go:46
-#: commands/lib/search.go:35
+#: commands/lib/search.go:34
 #: commands/upload/upload.go:51
 msgid "invalid instance"
 msgstr "invalid instance"
@@ -3203,7 +3203,7 @@ msgstr "start syncing discovery %[1]s: %[2]w"
 msgid "starting discovery %[1]s: %[2]w"
 msgstr "starting discovery %[1]s: %[2]w"
 
-#: commands/board/list.go:279
+#: commands/board/list.go:277
 msgid "stopping discoveries: %s"
 msgstr "stopping discoveries: %s"
 
@@ -3235,7 +3235,7 @@ msgstr "text section exceeds available space in board"
 msgid "the library name is different from the set (%[1]s != %[2]s)"
 msgstr "the library name is different from the set (%[1]s != %[2]s)"
 
-#: commands/board/list.go:74
+#: commands/board/list.go:72
 msgid "the server responded with status %s"
 msgstr "the server responded with status %s"
 
@@ -3397,7 +3397,7 @@ msgstr "writing library_index.json.sig"
 msgid "writing sketch metadata %[1]s: %[2]s"
 msgstr "writing sketch metadata %[1]s: %[2]s"
 
-#: commands/board/list.go:90
+#: commands/board/list.go:88
 msgid "wrong format in server response"
 msgstr "wrong format in server response"
 
