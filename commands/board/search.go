@@ -36,25 +36,6 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 		return nil, errors.New(tr("invalid instance"))
 	}
 
-	searchArgs := strings.Split(strings.Trim(req.SearchArgs, " "), " ")
-
-	match := func(toTest []string) (bool, error) {
-		if len(searchArgs) == 0 {
-			return true, nil
-		}
-
-		for _, t := range toTest {
-			matches, err := utils.Match(t, searchArgs)
-			if err != nil {
-				return false, err
-			}
-			if matches {
-				return matches, nil
-			}
-		}
-		return false, nil
-	}
-
 	res := &rpc.BoardSearchResponse{Boards: []*rpc.BoardListItem{}}
 	for _, targetPackage := range pm.Packages {
 		for _, platform := range targetPackage.Platforms {
@@ -93,9 +74,7 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 					}
 
 					toTest := append(strings.Split(board.Name(), " "), board.Name(), board.FQBN())
-					if ok, err := match(toTest); err != nil {
-						return nil, err
-					} else if !ok {
+					if !utils.MatchAny(req.GetSearchArgs(), toTest) {
 						continue
 					}
 
@@ -109,9 +88,7 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 			} else if latestPlatformRelease != nil {
 				for _, board := range latestPlatformRelease.BoardsManifest {
 					toTest := append(strings.Split(board.Name, " "), board.Name)
-					if ok, err := match(toTest); err != nil {
-						return nil, err
-					} else if !ok {
+					if !utils.MatchAny(req.GetSearchArgs(), toTest) {
 						continue
 					}
 

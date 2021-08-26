@@ -47,20 +47,35 @@ func removeDiatrics(s string) (string, error) {
 // Both str and substrings are transforms to lower case and have their
 // accents and other unicode diatrics removed.
 // If strings transformation fails an error is returned.
-func Match(str string, substrings []string) (bool, error) {
-	str, err := removeDiatrics(strings.ToLower(str))
-	if err != nil {
-		return false, err
+func Match(str string, substrings []string) bool {
+	clean := func(s string) string {
+		s = strings.ToLower(s)
+		if s2, err := removeDiatrics(s); err == nil {
+			return s2
+		}
+		return s
 	}
 
+	str = clean(str)
 	for _, sub := range substrings {
-		cleanSub, err := removeDiatrics(strings.ToLower(sub))
-		if err != nil {
-			return false, err
-		}
-		if !strings.Contains(str, cleanSub) {
-			return false, nil
+		if !strings.Contains(str, clean(sub)) {
+			return false
 		}
 	}
-	return true, nil
+	return true
+}
+
+// MatchAny checks if query matches at least one of the
+// string in arrayToMatch using the utils.Match function.
+func MatchAny(query string, arrayToMatch []string) bool {
+	queryArgs := strings.Split(strings.TrimSpace(query), " ")
+	if len(queryArgs) == 0 {
+		return true
+	}
+	for _, t := range arrayToMatch {
+		if Match(t, queryArgs) {
+			return true
+		}
+	}
+	return false
 }
