@@ -40,6 +40,9 @@ as a parameter like this:
 curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh -s 0.9.0
 ```
 
+The Arduino CLI verifies every 24 hours if there are new releases, if you don't like this behaviour you can disable it
+by setting the `updater.disable_notification` config or the env var `ARDUINO_UPDATER_DISABLE_NOTIFICATION` to `true`.
+
 ### Download
 
 Pre-built binaries for all the supported platforms are available for download from the links below.

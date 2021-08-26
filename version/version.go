@@ -34,6 +34,7 @@ var (
 type Info struct {
 	Application   string `json:"Application"`
 	VersionString string `json:"VersionString"`
+	LatestVersion string `json:"LatestVersion,omitempty"`
 	Commit        string `json:"Commit"`
 	Status        string `json:"Status"`
 	Date          string `json:"Date"`

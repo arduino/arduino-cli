@@ -32,13 +32,14 @@ var (
 	// Type is the inventory file type
 	Type = "yaml"
 	// Name is the inventory file Name with Type as extension
-	Name = "inventory" + "." + Type
-	tr   = i18n.Tr
+	Name           = "inventory" + "." + Type
+	tr             = i18n.Tr
+	configFilePath string
 )
 
 // Init configures the Read Only config storage
 func Init(configPath string) error {
-	configFilePath := filepath.Join(configPath, Name)
+	configFilePath = filepath.Join(configPath, Name)
 	Store.SetConfigName(Name)
 	Store.SetConfigType(Type)
 	Store.AddConfigPath(configPath)
@@ -50,7 +51,7 @@ func Init(configPath string) error {
 			if err := generateInstallationData(); err != nil {
 				return err
 			}
-			if err := writeStore(configFilePath); err != nil {
+			if err := WriteStore(); err != nil {
 				return err
 			}
 		} else {
@@ -76,7 +77,9 @@ func generateInstallationData() error {
 	return nil
 }
 
-func writeStore(configFilePath string) error {
+// WriteStore writes the current information from Store to configFilePath.
+// Returns err if it fails.
+func WriteStore() error {
 	configPath := filepath.Dir(configFilePath)
 
 	// Create config dir if not present,

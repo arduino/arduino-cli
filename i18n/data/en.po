@@ -13,7 +13,7 @@ msgstr " Not used: {0}"
 msgid " Used: {0}"
 msgstr " Used: {0}"
 
-#: version/version.go:54
+#: version/version.go:55
 msgid "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
 msgstr "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
 
@@ -111,6 +111,10 @@ msgstr "--git-url and --zip-path are disabled by default, for more information s
 msgid "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk."
 msgstr "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk."
 
+#: cli/updater/updater.go:74
+msgid "A new release of arduino-cli is available:"
+msgstr "A new release of arduino-cli is available:"
+
 #: commands/errors.go:181
 msgid "A programmer is required to upload"
 msgstr "A programmer is required to upload"
@@ -169,11 +173,11 @@ msgstr "Archiving built core (caching) in: {0}"
 msgid "Arduino CLI sketch commands."
 msgstr "Arduino CLI sketch commands."
 
-#: cli/cli.go:68
+#: cli/cli.go:71
 msgid "Arduino CLI."
 msgstr "Arduino CLI."
 
-#: cli/cli.go:69
+#: cli/cli.go:72
 msgid "Arduino Command Line Interface (arduino-cli)."
 msgstr "Arduino Command Line Interface (arduino-cli)."
 
@@ -389,7 +393,7 @@ msgstr "Checksum:"
 msgid "Clean caches."
 msgstr "Clean caches."
 
-#: cli/cli.go:107
+#: cli/cli.go:111
 msgid "Comma-separated list of additional URLs for the Boards Manager."
 msgstr "Comma-separated list of additional URLs for the Boards Manager."
 
@@ -1203,7 +1207,7 @@ msgstr "Internal error in cache"
 msgid "Invalid '%[1]s' property: %[2]s"
 msgstr "Invalid '%[1]s' property: %[2]s"
 
-#: cli/cli.go:234
+#: cli/cli.go:252
 msgid "Invalid Call : should show Help, but it is available only in TEXT mode."
 msgstr "Invalid Call : should show Help, but it is available only in TEXT mode."
 
@@ -1260,11 +1264,11 @@ msgstr "Invalid library"
 msgid "Invalid network.proxy '%[1]s': %[2]s"
 msgstr "Invalid network.proxy '%[1]s': %[2]s"
 
-#: cli/cli.go:195
+#: cli/cli.go:213
 msgid "Invalid option for --log-level: %s"
 msgstr "Invalid option for --log-level: %s"
 
-#: cli/cli.go:212
+#: cli/cli.go:230
 msgid "Invalid output format: %s"
 msgstr "Invalid output format: %s"
 
@@ -1429,7 +1433,7 @@ msgstr "Maintainer: %s"
 msgid "Max time to wait for port discovery, e.g.: 30s, 1m"
 msgstr "Max time to wait for port discovery, e.g.: 30s, 1m"
 
-#: cli/cli.go:102
+#: cli/cli.go:106
 msgid "Messages with this level and above will be logged. Valid levels are: %s, %s, %s, %s, %s, %s, %s"
 msgstr "Messages with this level and above will be logged. Valid levels are: %s, %s, %s, %s, %s, %s, %s"
 
@@ -1627,7 +1631,7 @@ msgstr "Package website:"
 msgid "Paragraph: %s"
 msgstr "Paragraph: %s"
 
-#: cli/cli.go:103
+#: cli/cli.go:107
 msgid "Path to the file where logs will be written."
 msgstr "Path to the file where logs will be written."
 
@@ -1713,7 +1717,7 @@ msgstr "Print details about a board."
 msgid "Print preprocessed code to stdout instead of compiling."
 msgstr "Print preprocessed code to stdout instead of compiling."
 
-#: cli/cli.go:101
+#: cli/cli.go:105
 msgid "Print the logs on the standard output."
 msgstr "Print the logs on the standard output."
 
@@ -1838,7 +1842,7 @@ msgid "Setting build path to {0}"
 msgstr "Setting build path to {0}"
 
 #: cli/config/delete.go:57
-#: cli/config/validate.go:44
+#: cli/config/validate.go:45
 msgid "Settings key doesn't exist"
 msgstr "Settings key doesn't exist"
 
@@ -1913,11 +1917,11 @@ msgstr "Shows the list of the examples for libraries."
 msgid "Shows the list of the examples for libraries. A name may be given as argument to search a specific library."
 msgstr "Shows the list of the examples for libraries. A name may be given as argument to search a specific library."
 
-#: cli/version/version.go:34
+#: cli/version/version.go:38
 msgid "Shows the version number of Arduino CLI which is installed on your system."
 msgstr "Shows the version number of Arduino CLI which is installed on your system."
 
-#: cli/version/version.go:33
+#: cli/version/version.go:37
 msgid "Shows version number of Arduino CLI."
 msgstr "Shows version number of Arduino CLI."
 
@@ -1995,7 +1999,7 @@ msgstr "The connected devices search timeout, raise it if your board doesn't sho
 msgid "The connected devices search timeout, raise it if your board doesn't show up e.g.: 10s"
 msgstr "The connected devices search timeout, raise it if your board doesn't show up e.g.: 10s"
 
-#: cli/cli.go:106
+#: cli/cli.go:110
 msgid "The custom config file (if not specified the default will be used)."
 msgstr "The custom config file (if not specified the default will be used)."
 
@@ -2015,11 +2019,11 @@ msgid "The key '%[1]v' is not a list of items, can't remove from it.\n"
 msgstr "The key '%[1]v' is not a list of items, can't remove from it.\n"
 "Maybe use '%[2]s'?"
 
-#: cli/cli.go:104
+#: cli/cli.go:108
 msgid "The output format for the logs, can be {%s|%s}."
 msgstr "The output format for the logs, can be {%s|%s}."
 
-#: cli/cli.go:105
+#: cli/cli.go:109
 msgid "The output format, can be {%s|%s}."
 msgstr "The output format, can be {%s|%s}."
 
@@ -2109,7 +2113,7 @@ msgstr "Unable to get Local App Data Folder: %v"
 msgid "Unable to get user home dir: %v"
 msgstr "Unable to get user home dir: %v"
 
-#: cli/cli.go:181
+#: cli/cli.go:199
 msgid "Unable to open file for logging: %s"
 msgstr "Unable to open file for logging: %s"
 
@@ -2469,7 +2473,7 @@ msgstr "checking local archive integrity"
 msgid "cleaning build path"
 msgstr "cleaning build path"
 
-#: cli/cli.go:70
+#: cli/cli.go:73
 msgid "command"
 msgstr "command"
 
@@ -2639,7 +2643,7 @@ msgstr "find abs path: %s"
 msgid "first message must contain monitor configuration, not data"
 msgstr "first message must contain monitor configuration, not data"
 
-#: cli/cli.go:70
+#: cli/cli.go:73
 msgid "flags"
 msgstr "flags"
 
@@ -2666,11 +2670,11 @@ msgstr "for the latest version."
 msgid "for the specific version."
 msgstr "for the specific version."
 
-#: inventory/inventory.go:67
+#: inventory/inventory.go:68
 msgid "generating installation.id: %w"
 msgstr "generating installation.id: %w"
 
-#: inventory/inventory.go:73
+#: inventory/inventory.go:74
 msgid "generating installation.secret: %w"
 msgstr "generating installation.secret: %w"
 
@@ -2803,11 +2807,11 @@ msgstr "invalid library location: %s"
 msgid "invalid option '%s'"
 msgstr "invalid option '%s'"
 
-#: inventory/inventory.go:85
+#: inventory/inventory.go:88
 msgid "invalid path creating config dir: %[1]s error: %[2]w"
 msgstr "invalid path creating config dir: %[1]s error: %[2]w"
 
-#: inventory/inventory.go:91
+#: inventory/inventory.go:94
 msgid "invalid path writing inventory file: %[1]s error: %[2]w"
 msgstr "invalid path writing inventory file: %[1]s error: %[2]w"
 
@@ -3095,7 +3099,7 @@ msgstr "reading file %[1]s: %[2]s"
 msgid "reading files: %v"
 msgstr "reading files: %v"
 
-#: inventory/inventory.go:57
+#: inventory/inventory.go:58
 msgid "reading inventory file: %w"
 msgstr "reading inventory file: %w"
 
