@@ -41,17 +41,17 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListA
 		searchArgs = append(searchArgs, strings.Trim(s, " "))
 	}
 
-	match := func(toTest []string) (bool, error) {
+	match := func(toTest []string) bool {
 		if len(searchArgs) == 0 {
-			return true, nil
+			return true
 		}
 
 		for _, t := range toTest {
 			if utils.Match(t, searchArgs) {
-				return true, nil
+				return true
 			}
 		}
-		return false, nil
+		return false
 	}
 
 	list := &rpc.BoardListAllResponse{Boards: []*rpc.BoardListItem{}}
@@ -96,9 +96,7 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListA
 
 				toTest := append(toTest, board.Name())
 				toTest = append(toTest, board.FQBN())
-				if ok, err := match(toTest); err != nil {
-					return nil, err
-				} else if !ok {
+				if !match(toTest) {
 					continue
 				}
 

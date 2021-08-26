@@ -38,17 +38,17 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 
 	searchArgs := strings.Split(strings.Trim(req.SearchArgs, " "), " ")
 
-	match := func(toTest []string) (bool, error) {
+	match := func(toTest []string) bool {
 		if len(searchArgs) == 0 {
-			return true, nil
+			return true
 		}
 
 		for _, t := range toTest {
 			if utils.Match(t, searchArgs) {
-				return true, nil
+				return true
 			}
 		}
-		return false, nil
+		return false
 	}
 
 	res := &rpc.BoardSearchResponse{Boards: []*rpc.BoardListItem{}}
@@ -89,9 +89,7 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 					}
 
 					toTest := append(strings.Split(board.Name(), " "), board.Name(), board.FQBN())
-					if ok, err := match(toTest); err != nil {
-						return nil, err
-					} else if !ok {
+					if !match(toTest) {
 						continue
 					}
 
@@ -105,9 +103,7 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 			} else if latestPlatformRelease != nil {
 				for _, board := range latestPlatformRelease.BoardsManifest {
 					toTest := append(strings.Split(board.Name, " "), board.Name)
-					if ok, err := match(toTest); err != nil {
-						return nil, err
-					} else if !ok {
+					if !match(toTest) {
 						continue
 					}
 

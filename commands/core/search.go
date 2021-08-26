@@ -48,17 +48,17 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 
 		searchArgs := strings.Split(searchArgs, " ")
 
-		match := func(toTest []string) (bool, error) {
+		match := func(toTest []string) bool {
 			if len(searchArgs) == 0 {
-				return true, nil
+				return true
 			}
 
 			for _, t := range toTest {
 				if utils.Match(t, searchArgs) {
-					return true, nil
+					return true
 				}
 			}
-			return false, nil
+			return false
 		}
 
 		for _, targetPackage := range pm.Packages {
@@ -91,9 +91,7 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 				}
 
 				// Search
-				if ok, err := match(toTest); err != nil {
-					return nil, err
-				} else if !ok {
+				if !match(toTest) {
 					continue
 				}
 

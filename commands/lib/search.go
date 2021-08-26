@@ -45,24 +45,22 @@ func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.Libraries
 
 	searchArgs := strings.Split(strings.Trim(query, " "), " ")
 
-	match := func(toTest []string) (bool, error) {
+	match := func(toTest []string) bool {
 		if len(searchArgs) == 0 {
-			return true, nil
+			return true
 		}
 
 		for _, t := range toTest {
 			if utils.Match(t, searchArgs) {
-				return true, nil
+				return true
 			}
 		}
-		return false, nil
+		return false
 	}
 
 	for _, lib := range lm.Index.Libraries {
 		toTest := []string{lib.Name, lib.Latest.Paragraph, lib.Latest.Sentence}
-		if ok, err := match(toTest); err != nil {
-			return nil, err
-		} else if !ok {
+		if !match(toTest) {
 			continue
 		}
 		res = append(res, indexLibraryToRPCSearchLibrary(lib))
