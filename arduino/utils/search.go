@@ -64,3 +64,18 @@ func Match(str string, substrings []string) bool {
 	}
 	return true
 }
+
+// MatchAny checks if query matches at least one of the
+// string in arrayToMatch using the utils.Match function.
+func MatchAny(query string, arrayToMatch []string) bool {
+	queryArgs := strings.Split(strings.TrimSpace(query), " ")
+	if len(queryArgs) == 0 {
+		return true
+	}
+	for _, t := range arrayToMatch {
+		if Match(t, queryArgs) {
+			return true
+		}
+	}
+	return false
+}

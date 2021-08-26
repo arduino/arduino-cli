@@ -32,23 +32,7 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListA
 		return nil, errors.New(tr("invalid instance"))
 	}
 
-	searchArgs := []string{}
-	for _, s := range req.SearchArgs {
-		searchArgs = append(searchArgs, strings.Trim(s, " "))
-	}
-
-	match := func(toTest []string) bool {
-		if len(searchArgs) == 0 {
-			return true
-		}
-
-		for _, t := range toTest {
-			if utils.Match(t, searchArgs) {
-				return true
-			}
-		}
-		return false
-	}
+	searchArgs := strings.Join(req.GetSearchArgs(), " ")
 
 	list := &rpc.BoardListAllResponse{Boards: []*rpc.BoardListItem{}}
 	for _, targetPackage := range pm.Packages {
@@ -92,7 +76,7 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListA
 
 				toTest := append(toTest, board.Name())
 				toTest = append(toTest, board.FQBN())
-				if !match(toTest) {
+				if !utils.MatchAny(searchArgs, toTest) {
 					continue
 				}
 

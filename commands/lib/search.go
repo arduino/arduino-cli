@@ -18,7 +18,6 @@ package lib
 import (
 	"context"
 	"errors"
-	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
@@ -39,28 +38,12 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.Lib
 }
 
 func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.LibrariesManager) (*rpc.LibrarySearchResponse, error) {
-	query := req.GetQuery()
 	res := []*rpc.SearchedLibrary{}
 	status := rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS
 
-	searchArgs := strings.Split(strings.Trim(query, " "), " ")
-
-	match := func(toTest []string) bool {
-		if len(searchArgs) == 0 {
-			return true
-		}
-
-		for _, t := range toTest {
-			if utils.Match(t, searchArgs) {
-				return true
-			}
-		}
-		return false
-	}
-
 	for _, lib := range lm.Index.Libraries {
 		toTest := []string{lib.Name, lib.Latest.Paragraph, lib.Latest.Sentence}
-		if !match(toTest) {
+		if !utils.MatchAny(req.GetQuery(), toTest) {
 			continue
 		}
 		res = append(res, indexLibraryToRPCSearchLibrary(lib))

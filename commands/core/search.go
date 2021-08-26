@@ -33,7 +33,7 @@ const maximumSearchDistance = 20
 
 // PlatformSearch FIXMEDOC
 func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse, error) {
-	searchArgs := strings.Trim(req.SearchArgs, " ")
+	searchArgs := strings.TrimSpace(req.SearchArgs)
 	allVersions := req.AllVersions
 	pm := commands.GetPackageManager(req.Instance.Id)
 	if pm == nil {
@@ -45,21 +45,6 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 		vid, pid := searchArgs[:4], searchArgs[5:]
 		res = pm.FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid)
 	} else {
-
-		searchArgs := strings.Split(searchArgs, " ")
-
-		match := func(toTest []string) bool {
-			if len(searchArgs) == 0 {
-				return true
-			}
-
-			for _, t := range toTest {
-				if utils.Match(t, searchArgs) {
-					return true
-				}
-			}
-			return false
-		}
 
 		for _, targetPackage := range pm.Packages {
 			for _, platform := range targetPackage.Platforms {
@@ -91,7 +76,7 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 				}
 
 				// Search
-				if !match(toTest) {
+				if !utils.MatchAny(searchArgs, toTest) {
 					continue
 				}
 
