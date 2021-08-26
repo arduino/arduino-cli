@@ -45,7 +45,7 @@ msgstr "%s already downloaded"
 msgid "%s and %s cannot be used together"
 msgstr "%s and %s cannot be used together"
 
-#: cli/debug/debug.go:149
+#: cli/debug/debug.go:159
 msgid "%s custom configurations"
 msgstr "%s custom configurations"
 
@@ -413,21 +413,17 @@ msgstr "Creates a zip file containing all sketch files."
 msgid "Creates or updates the configuration file in the data directory or custom directory with the current configuration settings."
 msgstr "Creates or updates the configuration file in the data directory or custom directory with the current configuration settings."
 
-#: cli/debug/debug.go:55
+#: cli/debug/debug.go:56
 msgid "Debug Arduino sketches."
 msgstr "Debug Arduino sketches."
 
-#: cli/debug/debug.go:56
+#: cli/debug/debug.go:57
 msgid "Debug Arduino sketches. (this command opens an interactive gdb session)"
 msgstr "Debug Arduino sketches. (this command opens an interactive gdb session)"
 
-#: cli/debug/debug.go:65
+#: cli/debug/debug.go:66
 msgid "Debug interpreter e.g.: %s, %s, %s, %s, %s"
 msgstr "Debug interpreter e.g.: %s, %s, %s, %s, %s"
-
-#: cli/debug/debug.go:63
-msgid "Debug port, e.g.: COM10 or /dev/ttyACM0"
-msgstr "Debug port, e.g.: COM10 or /dev/ttyACM0"
 
 #: cli/board/details.go:124
 msgid "Debugging supported:"
@@ -466,7 +462,7 @@ msgstr "Detecting libraries used..."
 msgid "Detects and displays a list of boards connected to the current computer."
 msgstr "Detects and displays a list of boards connected to the current computer."
 
-#: cli/debug/debug.go:66
+#: cli/debug/debug.go:67
 msgid "Directory containing binaries for debug."
 msgstr "Directory containing binaries for debug."
 
@@ -583,7 +579,9 @@ msgstr "Error downloading %[1]s: %[2]v"
 msgid "Error downloading tool %s"
 msgstr "Error downloading tool %s"
 
-#: cli/debug/debug.go:111
+#: cli/debug/debug.go:83
+#: cli/debug/debug.go:88
+#: cli/debug/debug.go:121
 msgid "Error during Debug: %v"
 msgstr "Error during Debug: %v"
 
@@ -620,8 +618,8 @@ msgstr "Error during uninstall: %v"
 msgid "Error during upgrade: %v"
 msgstr "Error during upgrade: %v"
 
-#: cli/debug/debug.go:95
-#: cli/debug/debug.go:98
+#: cli/debug/debug.go:105
+#: cli/debug/debug.go:108
 msgid "Error getting Debug info: %v"
 msgstr "Error getting Debug info: %v"
 
@@ -809,7 +807,7 @@ msgstr "Examples for library %s"
 msgid "Examples:"
 msgstr "Examples:"
 
-#: cli/debug/debug.go:130
+#: cli/debug/debug.go:140
 msgid "Executable to debug"
 msgstr "Executable to debug"
 
@@ -869,16 +867,16 @@ msgstr "Force skip of post-install scripts (if the CLI is running interactively)
 #: cli/board/details.go:50
 #: cli/burnbootloader/burnbootloader.go:53
 #: cli/compile/compile.go:85
-#: cli/debug/debug.go:62
+#: cli/debug/debug.go:63
 #: cli/upload/upload.go:58
 msgid "Fully Qualified Board Name, e.g.: arduino:avr:uno"
 msgstr "Fully Qualified Board Name, e.g.: arduino:avr:uno"
 
-#: cli/debug/debug.go:144
+#: cli/debug/debug.go:154
 msgid "GDB Server path"
 msgstr "GDB Server path"
 
-#: cli/debug/debug.go:143
+#: cli/debug/debug.go:153
 msgid "GDB Server type"
 msgstr "GDB Server type"
 
@@ -1436,7 +1434,7 @@ msgstr "Prints the current configuration."
 msgid "Programmer name"
 msgstr "Programmer name"
 
-#: cli/debug/debug.go:64
+#: cli/debug/debug.go:65
 msgid "Programmer to use for debugging"
 msgstr "Programmer to use for debugging"
 
@@ -1571,7 +1569,7 @@ msgstr "Show library names only."
 msgid "Show list of available programmers"
 msgstr "Show list of available programmers"
 
-#: cli/debug/debug.go:67
+#: cli/debug/debug.go:68
 msgid "Show metadata about the debug session instead of starting the debugger."
 msgstr "Show metadata about the debug session instead of starting the debugger."
 
@@ -1735,19 +1733,19 @@ msgstr "This commands shows a list of installed cores and/or libraries\n"
 msgid "Tool %s already installed"
 msgstr "Tool %s already installed"
 
-#: cli/debug/debug.go:138
+#: cli/debug/debug.go:148
 msgid "Toolchain custom configurations"
 msgstr "Toolchain custom configurations"
 
-#: cli/debug/debug.go:132
+#: cli/debug/debug.go:142
 msgid "Toolchain path"
 msgstr "Toolchain path"
 
-#: cli/debug/debug.go:133
+#: cli/debug/debug.go:143
 msgid "Toolchain prefix"
 msgstr "Toolchain prefix"
 
-#: cli/debug/debug.go:131
+#: cli/debug/debug.go:141
 msgid "Toolchain type"
 msgstr "Toolchain type"
 
@@ -2278,7 +2276,7 @@ msgstr "creating temp file for index signature download: %s"
 msgid "data section exceeds available space in board"
 msgstr "data section exceeds available space in board"
 
-#: commands/debug/debug_info.go:149
+#: commands/debug/debug_info.go:146
 msgid "debugging not supported for board %s"
 msgstr "debugging not supported for board %s"
 

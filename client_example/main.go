@@ -1009,7 +1009,9 @@ func callDebugger(debugStreamingOpenClient dbg.DebugService_DebugClient, instanc
 			Instance:   &rpc.Instance{Id: instance.GetId()},
 			Fqbn:       "arduino:samd:mkr1000",
 			SketchPath: filepath.Join(currDir, "hello"),
-			Port:       "none",
+			Port: &rpc.Port{
+				Address: "none",
+			},
 		}})
 	if err != nil {
 		log.Fatalf("Send error: %s\n", err)

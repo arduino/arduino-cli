@@ -22,6 +22,7 @@ import (
 	"os/signal"
 	"sort"
 
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -38,7 +39,7 @@ import (
 
 var (
 	fqbn        string
-	port        string
+	port        arguments.Port
 	verbose     bool
 	verify      bool
 	interpreter string
@@ -60,7 +61,7 @@ func NewCommand() *cobra.Command {
 	}
 
 	debugCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
-	debugCommand.Flags().StringVarP(&port, "port", "p", "", tr("Debug port, e.g.: COM10 or /dev/ttyACM0"))
+	port.AddToCommand(debugCommand)
 	debugCommand.Flags().StringVarP(&programmer, "programmer", "P", "", tr("Programmer to use for debugging"))
 	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", fmt.Sprintf(tr("Debug interpreter e.g.: %s, %s, %s, %s, %s"), "console", "mi", "mi1", "mi2", "mi3"))
 	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries for debug."))
@@ -77,12 +78,21 @@ func run(command *cobra.Command, args []string) {
 		path = args[0]
 	}
 	sketchPath := arguments.InitSketchPath(path)
-
+	sk, err := sketch.New(sketchPath)
+	if err != nil {
+		feedback.Errorf(tr("Error during Debug: %v"), err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+	discoveryPort, err := port.GetPort(instance, sk)
+	if err != nil {
+		feedback.Errorf(tr("Error during Debug: %v"), err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
 	debugConfigRequested := &dbg.DebugConfigRequest{
 		Instance:    instance,
 		Fqbn:        fqbn,
 		SketchPath:  sketchPath.String(),
-		Port:        port,
+		Port:        discoveryPort.ToRPC(),
 		Interpreter: interpreter,
 		ImportDir:   importDir,
 		Programmer:  programmer,
