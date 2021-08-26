@@ -251,7 +251,7 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.CompileResponse{ErrStream: data}) }),
 		false) // Set debug to false
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(resp)
 }
@@ -264,7 +264,7 @@ func (s *ArduinoCoreServerImpl) PlatformInstall(req *rpc.PlatformInstallRequest,
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.PlatformInstallResponse{TaskProgress: p}) },
 	)
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(resp)
 }
@@ -276,7 +276,7 @@ func (s *ArduinoCoreServerImpl) PlatformDownload(req *rpc.PlatformDownloadReques
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.PlatformDownloadResponse{Progress: p}) },
 	)
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(resp)
 }
@@ -288,7 +288,7 @@ func (s *ArduinoCoreServerImpl) PlatformUninstall(req *rpc.PlatformUninstallRequ
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.PlatformUninstallResponse{TaskProgress: p}) },
 	)
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(resp)
 }
@@ -301,7 +301,7 @@ func (s *ArduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeRequest,
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.PlatformUpgradeResponse{TaskProgress: p}) },
 	)
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(resp)
 }
@@ -309,14 +309,14 @@ func (s *ArduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeRequest,
 // PlatformSearch FIXMEDOC
 func (s *ArduinoCoreServerImpl) PlatformSearch(ctx context.Context, req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse, error) {
 	resp, err := core.PlatformSearch(req)
-	return resp, err.Err()
+	return resp, convertErrorToRPCStatus(err)
 }
 
 // PlatformList FIXMEDOC
 func (s *ArduinoCoreServerImpl) PlatformList(ctx context.Context, req *rpc.PlatformListRequest) (*rpc.PlatformListResponse, error) {
 	platforms, err := core.GetPlatforms(req)
 	if err != nil {
-		return nil, err.Err()
+		return nil, convertErrorToRPCStatus(err)
 	}
 	return &rpc.PlatformListResponse{InstalledPlatforms: platforms}, nil
 }

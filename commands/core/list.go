@@ -16,28 +16,20 @@
 package core
 
 import (
-	"fmt"
+	"errors"
 	"sort"
 	"strings"
 
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // GetPlatforms returns a list of installed platforms, optionally filtered by
 // those requiring an update.
-func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, *status.Status) {
-	instanceID := req.Instance.Id
-	i := commands.GetInstance(instanceID)
-	if i == nil {
-		return nil, status.Newf(codes.InvalidArgument, tr("Invalid instance"))
-	}
-
-	packageManager := i.PackageManager
+func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, error) {
+	packageManager := commands.GetPackageManager(req.GetInstance().Id)
 	if packageManager == nil {
-		return nil, status.New(codes.InvalidArgument, tr("Invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
 
 	res := []*rpc.Platform{}
@@ -62,7 +54,7 @@ func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, *status.Status
 			if platformRelease != nil {
 				latest := platform.GetLatestRelease()
 				if latest == nil {
-					return nil, fmt.Errorf(tr("can't find latest release of core %s", platform))
+					return nil, &commands.PlatformNotFound{Platform: platform.String(), Cause: errors.New(tr("the platform has no releases"))}
 				}
 
 				if req.UpdatableOnly {

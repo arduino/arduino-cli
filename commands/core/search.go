@@ -24,21 +24,15 @@ import (
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
-// maximumSearchDistance is the maximum Levenshtein distance accepted when using fuzzy search.
-// This value is completely arbitrary and picked randomly.
-const maximumSearchDistance = 20
-
 // PlatformSearch FIXMEDOC
-func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse, *status.Status) {
+func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse, error) {
 	searchArgs := strings.TrimSpace(req.SearchArgs)
 	allVersions := req.AllVersions
 	pm := commands.GetPackageManager(req.Instance.Id)
 	if pm == nil {
-		return nil, status.New(codes.InvalidArgument, tr("Invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
 
 	res := []*cores.PlatformRelease{}

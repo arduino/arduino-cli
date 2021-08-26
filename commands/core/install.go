@@ -23,41 +23,40 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // PlatformInstall FIXMEDOC
 func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformInstallResponse, *status.Status) {
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformInstallResponse, error) {
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, status.New(codes.InvalidArgument, tr("Invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
 
 	version, err := commands.ParseVersion(req)
 	if err != nil {
-		return nil, status.Newf(codes.InvalidArgument, tr("Invalid version: %s"), err)
+		return nil, &commands.InvalidVersionError{Cause: err}
 	}
 
-	platform, tools, err := pm.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{
+	ref := &packagemanager.PlatformReference{
 		Package:              req.PlatformPackage,
 		PlatformArchitecture: req.Architecture,
 		PlatformVersion:      version,
-	})
+	}
+	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
-		return nil, status.Newf(codes.InvalidArgument, tr("Error finding platform dependencies: %s"), err)
+		return nil, &commands.PlatformNotFound{Platform: ref.String(), Cause: err}
 	}
 
 	err = installPlatform(pm, platform, tools, downloadCB, taskCB, req.GetSkipPostInstall())
 	if err != nil {
-		return nil, status.Convert(err)
+		return nil, err
 	}
 
 	status := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil)
 	if status != nil {
-		return nil, status
+		return nil, status.Err()
 	}
 
 	return &rpc.PlatformInstallResponse{}, nil
@@ -92,16 +91,14 @@ func installPlatform(pm *packagemanager.PackageManager,
 			return err
 		}
 	}
-	err := downloadPlatform(pm, platformRelease, downloadCB)
-	if err != nil {
+	if err := downloadPlatform(pm, platformRelease, downloadCB); err != nil {
 		return err
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 
 	// Install tools first
 	for _, tool := range toolsToInstall {
-		err := commands.InstallToolRelease(pm, tool, taskCB)
-		if err != nil {
+		if err := commands.InstallToolRelease(pm, tool, taskCB); err != nil {
 			return err
 		}
 	}
@@ -111,11 +108,11 @@ func installPlatform(pm *packagemanager.PackageManager,
 	if installed == nil {
 		// No version of this platform is installed
 		log.Info("Installing platform")
-		taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Installing %s"), platformRelease)})
+		taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Installing platform %s"), platformRelease)})
 	} else {
 		// A platform with a different version is already installed
 		log.Info("Upgrading platform " + installed.String())
-		taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Upgrading %[1]s with %[2]s"), installed, platformRelease)})
+		taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Upgrading platform %[1]s with %[2]s"), installed, platformRelease)})
 		platformRef := &packagemanager.PlatformReference{
 			Package:              platformRelease.Platform.Package.Name,
 			PlatformArchitecture: platformRelease.Platform.Architecture,
@@ -128,25 +125,24 @@ func installPlatform(pm *packagemanager.PackageManager,
 		var err error
 		_, installedTools, err = pm.FindPlatformReleaseDependencies(platformRef)
 		if err != nil {
-			return fmt.Errorf(tr("can't find dependencies for platform %[1]s: %[2]w"), platformRef, err)
+			return &commands.NotFoundError{Message: tr("Can't find dependencies for platform %s", platformRef), Cause: err}
 		}
 	}
 
 	// Install
-	err = pm.InstallPlatform(platformRelease)
-	if err != nil {
+	if err := pm.InstallPlatform(platformRelease); err != nil {
 		log.WithError(err).Error("Cannot install platform")
-		return err
+		return &commands.FailedInstallError{Message: tr("Cannot install platform"), Cause: err}
 	}
 
 	// If upgrading remove previous release
 	if installed != nil {
-		errUn := pm.UninstallPlatform(installed)
+		uninstallErr := pm.UninstallPlatform(installed)
 
 		// In case of error try to rollback
-		if errUn != nil {
-			log.WithError(errUn).Error("Error upgrading platform.")
-			taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("Error upgrading platform: %s"), errUn)})
+		if uninstallErr != nil {
+			log.WithError(uninstallErr).Error("Error upgrading platform.")
+			taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("Error upgrading platform: %s"), uninstallErr)})
 
 			// Rollback
 			if err := pm.UninstallPlatform(platformRelease); err != nil {
@@ -154,7 +150,7 @@ func installPlatform(pm *packagemanager.PackageManager,
 				taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("Error rolling-back changes: %s"), err)})
 			}
 
-			return fmt.Errorf(tr("upgrading platform: %s"), errUn)
+			return &commands.FailedInstallError{Message: tr("Cannot upgrade platform"), Cause: uninstallErr}
 		}
 
 		// Uninstall unused tools
@@ -169,16 +165,16 @@ func installPlatform(pm *packagemanager.PackageManager,
 	// Perform post install
 	if !skipPostInstall {
 		log.Info("Running post_install script")
-		taskCB(&rpc.TaskProgress{Message: tr("Configuring platform")})
+		taskCB(&rpc.TaskProgress{Message: tr("Configuring platform.")})
 		if err := pm.RunPostInstallScript(platformRelease); err != nil {
-			taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("WARNING: cannot run post install: %s"), err)})
+			taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("WARNING cannot configure platform: %s"), err)})
 		}
 	} else {
-		log.Info("Skipping platform configuration (post_install run).")
-		taskCB(&rpc.TaskProgress{Message: tr("Skipping platform configuration")})
+		log.Info("Skipping platform configuration.")
+		taskCB(&rpc.TaskProgress{Message: tr("Skipping platform configuration.")})
 	}
 
 	log.Info("Platform installed")
-	taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("%s installed"), platformRelease), Completed: true})
+	taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("Platform %s installed"), platformRelease), Completed: true})
 	return nil
 }

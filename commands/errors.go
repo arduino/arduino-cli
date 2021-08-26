@@ -63,6 +63,23 @@ func (e *InvalidFQBNError) Unwrap() error {
 	return e.Cause
 }
 
+// InvalidVersionError is returned when the version has syntax errors
+type InvalidVersionError struct {
+	Cause error
+}
+
+func (e *InvalidVersionError) Error() string {
+	return composeErrorMsg(tr("Invalid version"), e.Cause)
+}
+
+func (e *InvalidVersionError) ToRPCStatus() *status.Status {
+	return status.New(codes.InvalidArgument, e.Error())
+}
+
+func (e *InvalidVersionError) Unwrap() error {
+	return e.Cause
+}
+
 // MissingFQBNError is returned when the FQBN is mandatory and not specified
 type MissingFQBNError struct{}
 
@@ -174,14 +191,35 @@ func (e *MissingPlatformPropertyError) ToRPCStatus() *status.Status {
 // PlatformNotFound is returned when a platform is not found
 type PlatformNotFound struct {
 	Platform string
+	Cause    error
 }
 
 func (e *PlatformNotFound) Error() string {
-	return tr("Platform '%s' is not installed", e.Platform)
+	return composeErrorMsg(tr("Platform '%s' not found", e.Platform), e.Cause)
 }
 
 func (e *PlatformNotFound) ToRPCStatus() *status.Status {
 	return status.New(codes.FailedPrecondition, e.Error())
+}
+
+func (e *PlatformNotFound) Unwrap() error {
+	return e.Cause
+}
+
+// PlatformAlreadyAtTheLatestVersionError is returned when a platform is up to date
+type PlatformAlreadyAtTheLatestVersionError struct {
+	Platform string
+}
+
+func (e *PlatformAlreadyAtTheLatestVersionError) Error() string {
+	return tr("Platform is already at the latest version")
+}
+
+func (e *PlatformAlreadyAtTheLatestVersionError) ToRPCStatus() *status.Status {
+	st, _ := status.
+		New(codes.AlreadyExists, e.Error()).
+		WithDetails(&rpc.AlreadyAtLatestVersionError{})
+	return st
 }
 
 // MissingSketchPathError is returned when the sketch path is mandatory and not specified
@@ -210,6 +248,60 @@ func (e *SketchNotFoundError) Unwrap() error {
 
 func (e *SketchNotFoundError) ToRPCStatus() *status.Status {
 	return status.New(codes.NotFound, e.Error())
+}
+
+// FailedInstallError is returned if an install operation fails
+type FailedInstallError struct {
+	Message string
+	Cause   error
+}
+
+func (e *FailedInstallError) Error() string {
+	return composeErrorMsg(e.Message, e.Cause)
+}
+
+func (e *FailedInstallError) Unwrap() error {
+	return e.Cause
+}
+
+func (e *FailedInstallError) ToRPCStatus() *status.Status {
+	return status.New(codes.Internal, e.Error())
+}
+
+// FailedUninstallError is returned if an uninstall operation fails
+type FailedUninstallError struct {
+	Message string
+	Cause   error
+}
+
+func (e *FailedUninstallError) Error() string {
+	return composeErrorMsg(e.Message, e.Cause)
+}
+
+func (e *FailedUninstallError) Unwrap() error {
+	return e.Cause
+}
+
+func (e *FailedUninstallError) ToRPCStatus() *status.Status {
+	return status.New(codes.Internal, e.Error())
+}
+
+// FailedDownloadError is returned when a network download fails
+type FailedDownloadError struct {
+	Message string
+	Cause   error
+}
+
+func (e *FailedDownloadError) Error() string {
+	return composeErrorMsg(e.Message, e.Cause)
+}
+
+func (e *FailedDownloadError) Unwrap() error {
+	return e.Cause
+}
+
+func (e *FailedDownloadError) ToRPCStatus() *status.Status {
+	return status.New(codes.Internal, e.Error())
 }
 
 // FailedUploadError is returned when the upload fails
