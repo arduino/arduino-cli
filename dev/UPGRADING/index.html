@@ -278,8 +278,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#grpc-interface-uploadrequest-uploadusingprogrammerrequest-burnbootloaderrequest-detectedport-field-changes" class="md-nav__link">
-    gRPC interface UploadRequest, UploadUsingProgrammerRequest, BurnBootloaderRequest, DetectedPort field changes
+  <a href="#grpc-interface-debugconfigrequest-uploadrequest-uploadusingprogrammerrequest-burnbootloaderrequest-detectedport-field-changes" class="md-nav__link">
+    gRPC interface DebugConfigRequest, UploadRequest, UploadUsingProgrammerRequest, BurnBootloaderRequest, DetectedPort field changes
   </a>
   
 </li>
@@ -1395,8 +1395,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#grpc-interface-uploadrequest-uploadusingprogrammerrequest-burnbootloaderrequest-detectedport-field-changes" class="md-nav__link">
-    gRPC interface UploadRequest, UploadUsingProgrammerRequest, BurnBootloaderRequest, DetectedPort field changes
+  <a href="#grpc-interface-debugconfigrequest-uploadrequest-uploadusingprogrammerrequest-burnbootloaderrequest-detectedport-field-changes" class="md-nav__link">
+    gRPC interface DebugConfigRequest, UploadRequest, UploadUsingProgrammerRequest, BurnBootloaderRequest, DetectedPort field changes
   </a>
   
 </li>
@@ -1638,9 +1638,9 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
-<h3 id="grpc-interface-uploadrequest-uploadusingprogrammerrequest-burnbootloaderrequest-detectedport-field-changes">gRPC interface <code>UploadRequest</code>, <code>UploadUsingProgrammerRequest</code>, <code>BurnBootloaderRequest</code>, <code>DetectedPort</code> field changes<a class="headerlink" href="#grpc-interface-uploadrequest-uploadusingprogrammerrequest-burnbootloaderrequest-detectedport-field-changes" title="Permanent link">&para;</a></h3>
-<p><code>UploadRequest</code>, <code>UploadUsingProgrammerRequest</code> and <code>BurnBootloaderRequest</code> had their <code>port</code> field change from type
-<code>string</code> to <code>Port</code>.</p>
+<h3 id="grpc-interface-debugconfigrequest-uploadrequest-uploadusingprogrammerrequest-burnbootloaderrequest-detectedport-field-changes">gRPC interface <code>DebugConfigRequest</code>, <code>UploadRequest</code>, <code>UploadUsingProgrammerRequest</code>, <code>BurnBootloaderRequest</code>, <code>DetectedPort</code> field changes<a class="headerlink" href="#grpc-interface-debugconfigrequest-uploadrequest-uploadusingprogrammerrequest-burnbootloaderrequest-detectedport-field-changes" title="Permanent link">&para;</a></h3>
+<p><code>DebugConfigRequest</code>, <code>UploadRequest</code>, <code>UploadUsingProgrammerRequest</code> and <code>BurnBootloaderRequest</code> had their <code>port</code> field
+change from type <code>string</code> to <code>Port</code>.</p>
 <p><code>Port</code> contains the following information:</p>
 <div class="highlight"><pre><span></span><code>// Port represents a board port that may be used to upload or to monitor a board
 message Port {
