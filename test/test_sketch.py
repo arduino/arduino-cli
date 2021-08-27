@@ -845,7 +845,7 @@ def test_sketch_archive_with_multiple_main_files(run_command, copy_sketch, worki
     assert res.failed
     assert "Sketches with .pde extension are deprecated, please rename the following files to .ino" in res.stderr
     assert str(sketch_file.relative_to(sketch_dir)) in res.stderr
-    assert "Error archiving: multiple main sketch files found" in res.stderr
+    assert "Error archiving: Can't open sketch: multiple main sketch files found" in res.stderr
 
 
 def test_sketch_archive_case_mismatch_fails(run_command, data_dir):
@@ -859,4 +859,4 @@ def test_sketch_archive_case_mismatch_fails(run_command, data_dir):
 
     res = run_command(f'sketch archive "{sketch_path}"')
     assert res.failed
-    assert "Error archiving: no valid sketch found" in res.stderr
+    assert "Error archiving: Can't open sketch: no valid sketch found" in res.stderr

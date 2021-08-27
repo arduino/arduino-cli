@@ -99,7 +99,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	sketchPath := paths.New(req.GetSketchPath())
 	sk, err := sketch.New(sketchPath)
 	if err != nil {
-		return nil, &commands.SketchNotFoundError{Cause: err}
+		return nil, &commands.CantOpenSketchError{Cause: err}
 	}
 
 	fqbnIn := req.GetFqbn()

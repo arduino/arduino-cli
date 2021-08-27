@@ -123,7 +123,7 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 	sketchPath := paths.New(req.GetSketchPath())
 	sk, err := sketch.New(sketchPath)
 	if err != nil && req.GetImportDir() == "" && req.GetImportFile() == "" {
-		return nil, &commands.SketchNotFoundError{Cause: err}
+		return nil, &commands.CantOpenSketchError{Cause: err}
 	}
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())

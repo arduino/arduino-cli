@@ -528,7 +528,7 @@ def test_board_details_no_flags(run_command):
     run_command("core install arduino:samd@1.8.6")
     result = run_command("board details")
     assert not result.ok
-    assert "Error getting board details: parsing fqbn: invalid fqbn:" in result.stderr
+    assert "Error getting board details: Invalid FQBN:" in result.stderr
     assert result.stdout == ""
 
 

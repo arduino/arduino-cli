@@ -304,20 +304,20 @@ func (e *MissingSketchPathError) ToRPCStatus() *status.Status {
 	return status.New(codes.InvalidArgument, e.Error())
 }
 
-// SketchNotFoundError is returned when the sketch is not found
-type SketchNotFoundError struct {
+// CantOpenSketchError is returned when the sketch is not found or cannot be opened
+type CantOpenSketchError struct {
 	Cause error
 }
 
-func (e *SketchNotFoundError) Error() string {
-	return composeErrorMsg(tr("Sketch not found"), e.Cause)
+func (e *CantOpenSketchError) Error() string {
+	return composeErrorMsg(tr("Can't open sketch"), e.Cause)
 }
 
-func (e *SketchNotFoundError) Unwrap() error {
+func (e *CantOpenSketchError) Unwrap() error {
 	return e.Cause
 }
 
-func (e *SketchNotFoundError) ToRPCStatus() *status.Status {
+func (e *CantOpenSketchError) ToRPCStatus() *status.Status {
 	return status.New(codes.NotFound, e.Error())
 }
 

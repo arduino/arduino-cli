@@ -46,7 +46,7 @@ func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB commands.Ta
 	}
 	sk, err := sketch.New(sketchPath)
 	if err != nil {
-		return nil, &commands.SketchNotFoundError{Cause: err}
+		return nil, &commands.CantOpenSketchError{Cause: err}
 	}
 
 	boardURI := req.GetBoardUri()

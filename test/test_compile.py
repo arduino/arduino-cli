@@ -132,7 +132,7 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
     result = run_command("compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path))
     # The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
     # returning a different error detailed message
-    assert "Error during build: opening sketch" in result.stderr
+    assert "Error during build: Can't open sketch:" in result.stderr
     assert not result.ok
 
     sketch_name = "CompileIntegrationTestSymlinkDirLoop"
@@ -154,7 +154,7 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
     result = run_command("compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path))
     # The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
     # returning a different error detailed message
-    assert "Error during build: opening sketch" in result.stderr
+    assert "Error during build: Can't open sketch:" in result.stderr
     assert not result.ok
 
 
@@ -685,17 +685,17 @@ def test_compile_sketch_with_multiple_main_files(run_command, data_dir):
     # Build sketch from folder
     res = run_command(f"compile --clean -b {fqbn} {sketch_path}")
     assert res.failed
-    assert "Error during build: opening sketch: multiple main sketch files found" in res.stderr
+    assert "Error during build: Can't open sketch: multiple main sketch files found" in res.stderr
 
     # Build sketch from .ino file
     res = run_command(f"compile --clean -b {fqbn} {sketch_ino_file}")
     assert res.failed
-    assert "Error during build: opening sketch: multiple main sketch files found" in res.stderr
+    assert "Error during build: Can't open sketch: multiple main sketch files found" in res.stderr
 
     # Build sketch from .pde file
     res = run_command(f"compile --clean -b {fqbn} {sketch_pde_file}")
     assert res.failed
-    assert "Error during build: opening sketch: multiple main sketch files found" in res.stderr
+    assert "Error during build: Can't open sketch: multiple main sketch files found" in res.stderr
 
 
 def test_compile_sketch_case_mismatch_fails(run_command, data_dir):
@@ -718,15 +718,15 @@ def test_compile_sketch_case_mismatch_fails(run_command, data_dir):
     # * Compiling with sketch path
     res = run_command(f"compile --clean -b {fqbn} {sketch_path}")
     assert res.failed
-    assert "Error during build: opening sketch: no valid sketch found" in res.stderr
+    assert "Error during build: Can't open sketch: no valid sketch found" in res.stderr
     # * Compiling with sketch main file
     res = run_command(f"compile --clean -b {fqbn} {sketch_main_file}")
     assert res.failed
-    assert "Error during build: opening sketch: no valid sketch found" in res.stderr
+    assert "Error during build: Can't open sketch: no valid sketch found" in res.stderr
     # * Compiling in sketch path
     res = run_command(f"compile --clean -b {fqbn}", custom_working_dir=sketch_path)
     assert res.failed
-    assert "Error during build: opening sketch: no valid sketch found" in res.stderr
+    assert "Error during build: Can't open sketch: no valid sketch found" in res.stderr
 
 
 def test_compile_with_only_compilation_database_flag(run_command, data_dir):

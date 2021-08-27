@@ -44,7 +44,7 @@ func getDebugProperties(req *debug.DebugConfigRequest, pm *packagemanager.Packag
 	sketchPath := paths.New(req.GetSketchPath())
 	sk, err := sketch.New(sketchPath)
 	if err != nil {
-		return nil, &commands.SketchNotFoundError{Cause: err}
+		return nil, &commands.CantOpenSketchError{Cause: err}
 	}
 
 	// XXX Remove this code duplication!!

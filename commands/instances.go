@@ -862,7 +862,7 @@ func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketc
 	// TODO: This should be a ToRpc function for the Sketch struct
 	sketch, err := sk.New(paths.New(req.SketchPath))
 	if err != nil {
-		return nil, &SketchNotFoundError{Cause: err}
+		return nil, &CantOpenSketchError{Cause: err}
 	}
 
 	otherSketchFiles := make([]string, sketch.OtherSketchFiles.Len())

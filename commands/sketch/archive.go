@@ -43,7 +43,7 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.Arc
 
 	s, err := sketch.New(sketchPath)
 	if err != nil {
-		return nil, &commands.SketchNotFoundError{Cause: err}
+		return nil, &commands.CantOpenSketchError{Cause: err}
 	}
 
 	sketchPath = s.FullPath
