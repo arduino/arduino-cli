@@ -63,6 +63,23 @@ func (e *InvalidFQBNError) Unwrap() error {
 	return e.Cause
 }
 
+// InvalidURLError is returned when the URL has syntax errors
+type InvalidURLError struct {
+	Cause error
+}
+
+func (e *InvalidURLError) Error() string {
+	return composeErrorMsg(tr("Invalid URL"), e.Cause)
+}
+
+func (e *InvalidURLError) ToRPCStatus() *status.Status {
+	return status.New(codes.InvalidArgument, e.Error())
+}
+
+func (e *InvalidURLError) Unwrap() error {
+	return e.Cause
+}
+
 // InvalidLibraryError is returned when the library has syntax errors
 type InvalidLibraryError struct {
 	Cause error
@@ -498,5 +515,57 @@ func (e *UnavailableError) Unwrap() error {
 }
 
 func (e *UnavailableError) ToRPCStatus() *status.Status {
+	return status.New(codes.Unavailable, e.Error())
+}
+
+// TempDirCreationFailedError is returned if a temp dir could not be created
+type TempDirCreationFailedError struct {
+	Cause error
+}
+
+func (e *TempDirCreationFailedError) Error() string {
+	return composeErrorMsg(tr("Cannot create temp dir"), e.Cause)
+}
+
+func (e *TempDirCreationFailedError) Unwrap() error {
+	return e.Cause
+}
+
+func (e *TempDirCreationFailedError) ToRPCStatus() *status.Status {
+	return status.New(codes.Unavailable, e.Error())
+}
+
+// TempFileCreationFailedError is returned if a temp file could not be created
+type TempFileCreationFailedError struct {
+	Cause error
+}
+
+func (e *TempFileCreationFailedError) Error() string {
+	return composeErrorMsg(tr("Cannot create temp file"), e.Cause)
+}
+
+func (e *TempFileCreationFailedError) Unwrap() error {
+	return e.Cause
+}
+
+func (e *TempFileCreationFailedError) ToRPCStatus() *status.Status {
+	return status.New(codes.Unavailable, e.Error())
+}
+
+// SignatureVerificationFailedError is returned if a signature verification fails
+type SignatureVerificationFailedError struct {
+	File  string
+	Cause error
+}
+
+func (e *SignatureVerificationFailedError) Error() string {
+	return composeErrorMsg(tr("'%s' has an invalid signature", e.File), e.Cause)
+}
+
+func (e *SignatureVerificationFailedError) Unwrap() error {
+	return e.Cause
+}
+
+func (e *SignatureVerificationFailedError) ToRPCStatus() *status.Status {
 	return status.New(codes.Unavailable, e.Error())
 }

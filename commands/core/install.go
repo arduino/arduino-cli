@@ -54,9 +54,8 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
 		return nil, err
 	}
 
-	status := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil)
-	if status != nil {
-		return nil, status.Err()
+	if err := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil); err != nil {
+		return nil, err
 	}
 
 	return &rpc.PlatformInstallResponse{}, nil

@@ -153,7 +153,7 @@ func (s *ArduinoCoreServerImpl) BoardAttach(req *rpc.BoardAttachRequest, stream 
 // Destroy FIXMEDOC
 func (s *ArduinoCoreServerImpl) Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse, error) {
 	resp, err := commands.Destroy(ctx, req)
-	return resp, err.Err()
+	return resp, convertErrorToRPCStatus(err)
 }
 
 // UpdateIndex FIXMEDOC
@@ -162,7 +162,7 @@ func (s *ArduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream 
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.UpdateIndexResponse{DownloadProgress: p}) },
 	)
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(resp)
 }
@@ -173,7 +173,7 @@ func (s *ArduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesInd
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.UpdateLibrariesIndexResponse{DownloadProgress: p}) },
 	)
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(&rpc.UpdateLibrariesIndexResponse{})
 }
@@ -184,7 +184,7 @@ func (s *ArduinoCoreServerImpl) UpdateCoreLibrariesIndex(req *rpc.UpdateCoreLibr
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.UpdateCoreLibrariesIndexResponse{DownloadProgress: p}) },
 	)
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(&rpc.UpdateCoreLibrariesIndexResponse{})
 }
@@ -192,7 +192,7 @@ func (s *ArduinoCoreServerImpl) UpdateCoreLibrariesIndex(req *rpc.UpdateCoreLibr
 // Outdated FIXMEDOC
 func (s *ArduinoCoreServerImpl) Outdated(ctx context.Context, req *rpc.OutdatedRequest) (*rpc.OutdatedResponse, error) {
 	resp, err := commands.Outdated(ctx, req)
-	return resp, err.Err()
+	return resp, convertErrorToRPCStatus(err)
 }
 
 // Upgrade FIXMEDOC
@@ -210,18 +210,15 @@ func (s *ArduinoCoreServerImpl) Upgrade(req *rpc.UpgradeRequest, stream rpc.Ardu
 		},
 	)
 	if err != nil {
-		return err.Err()
+		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(&rpc.UpgradeResponse{})
 }
 
 // Create FIXMEDOC
 func (s *ArduinoCoreServerImpl) Create(_ context.Context, req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
-	res, status := commands.Create(req)
-	if status != nil {
-		return nil, status.Err()
-	}
-	return res, nil
+	res, err := commands.Create(req)
+	return res, convertErrorToRPCStatus(err)
 }
 
 // Init FIXMEDOC
@@ -229,10 +226,7 @@ func (s *ArduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 	err := commands.Init(req, func(message *rpc.InitResponse) {
 		stream.Send(message)
 	})
-	if err != nil {
-		return err.Err()
-	}
-	return nil
+	return convertErrorToRPCStatus(err)
 }
 
 // Version FIXMEDOC
@@ -243,7 +237,7 @@ func (s *ArduinoCoreServerImpl) Version(ctx context.Context, req *rpc.VersionReq
 // LoadSketch FIXMEDOC
 func (s *ArduinoCoreServerImpl) LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketchResponse, error) {
 	resp, err := commands.LoadSketch(ctx, req)
-	return resp, err.Err()
+	return resp, convertErrorToRPCStatus(err)
 }
 
 // Compile FIXMEDOC
