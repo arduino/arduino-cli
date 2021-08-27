@@ -1,6 +1,6 @@
 module github.com/arduino/arduino-cli
 
-go 1.14
+go 1.16
 
 require (
 	github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c
