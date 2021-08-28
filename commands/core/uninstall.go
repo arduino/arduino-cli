@@ -82,7 +82,7 @@ func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease
 	}
 
 	log.Info("Platform uninstalled")
-	taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("Platofrm %s uninstalled"), platformRelease), Completed: true})
+	taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("Platform %s uninstalled"), platformRelease), Completed: true})
 	return nil
 }
 

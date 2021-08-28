@@ -304,7 +304,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	}
 
 	if !uploadProperties.ContainsKey("upload.protocol") && programmer == nil {
-		return &commands.ProgreammerRequiredForUploadError{}
+		return &commands.ProgrammerRequiredForUploadError{}
 	}
 
 	// Set properties for verbose upload

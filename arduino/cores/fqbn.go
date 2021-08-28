@@ -51,7 +51,7 @@ func ParseFQBN(fqbnIn string) (*FQBN, error) {
 		for _, pair := range strings.Split(fqbnParts[3], ",") {
 			parts := strings.SplitN(pair, "=", 2)
 			if len(parts) != 2 {
-				return nil, fmt.Errorf(tr("invalid config oprion: %s"), pair)
+				return nil, fmt.Errorf(tr("invalid config option: %s"), pair)
 			}
 			k := strings.TrimSpace(parts[0])
 			v := strings.TrimSpace(parts[1])
