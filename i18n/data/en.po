@@ -111,7 +111,7 @@ msgstr "--git-url and --zip-path are disabled by default, for more information s
 msgid "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk."
 msgstr "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk."
 
-#: cli/updater/updater.go:74
+#: cli/updater/updater.go:70
 msgid "A new release of Arduino CLI is available:"
 msgstr "A new release of Arduino CLI is available:"
 

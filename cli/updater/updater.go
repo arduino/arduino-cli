@@ -39,16 +39,12 @@ func CheckForUpdate(currentVersion *semver.Version) *semver.Version {
 		return nil
 	}
 
-	return checkForUpdate(currentVersion)
+	return ForceCheckForUpdate(currentVersion)
 }
 
 // ForceCheckForUpdate always returns the latest available version if greater than
 // the one running, nil in all other cases
 func ForceCheckForUpdate(currentVersion *semver.Version) *semver.Version {
-	return checkForUpdate(currentVersion)
-}
-
-func checkForUpdate(currentVersion *semver.Version) *semver.Version {
 	defer func() {
 		// Always save the last time we checked for updates at the end
 		inventory.Store.Set("updater.last_check_time", time.Now())
