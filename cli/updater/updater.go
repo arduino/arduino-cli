@@ -26,7 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/httpclient"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/inventory"
-	"github.com/mgutz/ansi"
+	"github.com/fatih/color"
 	semver "go.bug.st/relaxed-semver"
 )
 
@@ -71,10 +71,10 @@ func checkForUpdate(currentVersion *semver.Version) *semver.Version {
 // NotifyNewVersionIsAvailable prints information about the new latestVersion
 func NotifyNewVersionIsAvailable(latestVersion string) {
 	feedback.Errorf("\n\n%s %s → %s\n%s",
-		ansi.Color(tr("A new release of Arduino CLI is available:"), "yellow"),
-		ansi.Color(globals.VersionInfo.VersionString, "cyan"),
-		ansi.Color(latestVersion, "cyan"),
-		ansi.Color("https://arduino.github.io/arduino-cli/latest/installation/#latest-packages", "yellow"))
+		color.YellowString(tr("A new release of Arduino CLI is available:")),
+		color.CyanString(globals.VersionInfo.VersionString),
+		color.CyanString(latestVersion),
+		color.YellowString("https://arduino.github.io/arduino-cli/latest/installation/#latest-packages"))
 }
 
 // shouldCheckForUpdate return true if it actually makes sense to check for new updates,
