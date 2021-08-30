@@ -260,7 +260,7 @@ type InvalidSketchFolderNameError struct {
 }
 
 func (e *InvalidSketchFolderNameError) Error() string {
-	return fmt.Sprintf(tr("no valid sketch found in %[1]s: missing %[2]s"), e.SketchFolder, e.SketchFile)
+	return tr("no valid sketch found in %[1]s: missing %[2]s", e.SketchFolder, e.SketchFile)
 }
 
 // CheckForPdeFiles returns all files ending with .pde extension

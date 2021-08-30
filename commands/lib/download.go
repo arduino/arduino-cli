@@ -17,7 +17,6 @@ package lib
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
@@ -55,7 +54,7 @@ func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downl
 func downloadLibrary(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release,
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 
-	taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Downloading %s"), libRelease)})
+	taskCB(&rpc.TaskProgress{Name: tr("Downloading %s", libRelease)})
 	config, err := commands.GetDownloaderConfig()
 	if err != nil {
 		return &commands.FailedDownloadError{Message: tr("Can't download library"), Cause: err}

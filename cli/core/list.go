@@ -85,7 +85,7 @@ func (ir installedResult) String() string {
 	for _, p := range ir.platforms {
 		name := p.Name
 		if p.Deprecated {
-			name = fmt.Sprintf(tr("[DEPRECATED] %s"), name)
+			name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), name)
 		}
 		t.AddRow(p.Id, p.Installed, p.Latest, name)
 	}

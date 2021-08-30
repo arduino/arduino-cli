@@ -47,7 +47,7 @@ var tr = i18n.Tr
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "daemon",
-		Short:   fmt.Sprintf(tr("Run as a daemon on port %s"), configuration.Settings.GetString("daemon.port")),
+		Short:   tr("Run as a daemon on port: %s", configuration.Settings.GetString("daemon.port")),
 		Long:    tr("Running as a daemon the initialization of cores and libraries is done only once."),
 		Example: "  " + os.Args[0] + " daemon",
 		Args:    cobra.NoArgs,

@@ -274,7 +274,7 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 				if err != nil {
 					outChan <- &rpc.BoardListWatchResponse{
 						EventType: "error",
-						Error:     fmt.Sprintf(tr("stopping discoveries: %s"), err),
+						Error:     tr("stopping discoveries: %s", err),
 					}
 					// Don't close the channel if quitting all discoveries
 					// failed, otherwise some processes might be left running.

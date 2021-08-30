@@ -89,7 +89,7 @@ func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, down
 	if tool.IsInstalled() {
 		return false, nil
 	}
-	taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Downloading missing tool %s"), tool)})
+	taskCB(&rpc.TaskProgress{Name: tr("Downloading missing tool %s", tool)})
 	if err := DownloadToolRelease(instance.PackageManager, tool, downloadCB); err != nil {
 		return false, fmt.Errorf(tr("downloading %[1]s tool: %[2]s"), tool, err)
 	}
@@ -444,7 +444,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 
 			fi, _ := os.Stat(path.String())
 			downloadCB(&rpc.DownloadProgress{
-				File:      fmt.Sprintf(tr("Updating index: %s"), path.Base()),
+				File:      tr("Updating index: %s", path.Base()),
 				TotalSize: fi.Size(),
 			})
 			downloadCB(&rpc.DownloadProgress{Completed: true})
@@ -470,7 +470,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 			return nil, &FailedDownloadError{Message: tr("Error downloading index '%s'", URL), Cause: err}
 		}
 		coreIndexPath := indexpath.Join(path.Base(URL.Path))
-		err = Download(d, fmt.Sprintf(tr("Updating index: %s"), coreIndexPath.Base()), downloadCB)
+		err = Download(d, tr("Updating index: %s", coreIndexPath.Base()), downloadCB)
 		if err != nil {
 			return nil, &FailedDownloadError{Message: tr("Error downloading index '%s'", URL), Cause: err}
 		}
@@ -500,7 +500,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 			}
 
 			coreIndexSigPath = indexpath.Join(path.Base(URLSig.Path))
-			Download(d, fmt.Sprintf(tr("Updating index: %s"), coreIndexSigPath.Base()), downloadCB)
+			Download(d, tr("Updating index: %s", coreIndexSigPath.Base()), downloadCB)
 			if d.Error() != nil {
 				return nil, &FailedDownloadError{Message: tr("Error downloading index signature '%s'", URLSig), Cause: err}
 			}
@@ -693,7 +693,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 			}
 
 			// Downloads latest library release
-			taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Downloading %s"), available)})
+			taskCB(&rpc.TaskProgress{Name: tr("Downloading %s", available)})
 			if d, err := available.Resource.Download(lm.DownloadsDir, downloaderConfig); err != nil {
 				return &FailedDownloadError{Message: tr("Error downloading library"), Cause: err}
 			} else if err := Download(d, available.String(), downloadCB); err != nil {

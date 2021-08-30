@@ -90,7 +90,7 @@ func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB commands.Ta
 		if board == nil {
 			return nil, &commands.InvalidArgumentError{Message: tr("No supported board found at %s", deviceURI)}
 		}
-		taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Board found: %s"), board.Name())})
+		taskCB(&rpc.TaskProgress{Name: tr("Board found: %s", board.Name())})
 
 		// TODO: should be stoped the monitor: when running as a pure CLI  is released
 		// by the OS, when run as daemon the resource's state is unknown and could be leaked.
@@ -105,7 +105,7 @@ func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB commands.Ta
 	if err != nil {
 		return nil, &commands.PermissionDeniedError{Message: tr("Cannot export sketch metadata"), Cause: err}
 	}
-	taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Selected fqbn: %s"), sk.Metadata.CPU.Fqbn), Completed: true})
+	taskCB(&rpc.TaskProgress{Name: tr("Selected fqbn: %s", sk.Metadata.CPU.Fqbn), Completed: true})
 	return &rpc.BoardAttachResponse{}, nil
 }
 

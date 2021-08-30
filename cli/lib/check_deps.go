@@ -87,15 +87,16 @@ func outputDep(dep *rpc.LibraryDependencyStatus) string {
 	red := color.New(color.FgRed)
 	yellow := color.New(color.FgYellow)
 	if dep.GetVersionInstalled() == "" {
-		res += fmt.Sprintf(tr("%s must be installed.")+"\n",
+		res += tr("%s must be installed.",
 			red.Sprintf("✕ %s %s", dep.GetName(), dep.GetVersionRequired()))
 	} else if dep.GetVersionInstalled() == dep.GetVersionRequired() {
-		res += fmt.Sprintf(tr("%s is already installed.")+"\n",
+		res += tr("%s is already installed.",
 			green.Sprintf("✓ %s %s", dep.GetName(), dep.GetVersionRequired()))
 	} else {
-		res += fmt.Sprintf(tr("%s is required but %s is currently installed.")+"\n",
+		res += tr("%[1]s is required but %[2]s is currently installed.",
 			yellow.Sprintf("✕ %s %s", dep.GetName(), dep.GetVersionRequired()),
 			yellow.Sprintf("%s", dep.GetVersionInstalled()))
 	}
+	res += "\n"
 	return res
 }

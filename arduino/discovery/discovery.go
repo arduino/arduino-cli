@@ -71,16 +71,16 @@ type discoveryMessage struct {
 func (msg discoveryMessage) String() string {
 	s := fmt.Sprintf("type: %s", msg.EventType)
 	if msg.Message != "" {
-		s = fmt.Sprintf(tr("%[1]s, message: %[2]s"), s, msg.Message)
+		s = tr("%[1]s, message: %[2]s", s, msg.Message)
 	}
 	if msg.ProtocolVersion != 0 {
-		s = fmt.Sprintf(tr("%[1]s, protocol version: %[2]d"), s, msg.ProtocolVersion)
+		s = tr("%[1]s, protocol version: %[2]d", s, msg.ProtocolVersion)
 	}
 	if len(msg.Ports) > 0 {
-		s = fmt.Sprintf(tr("%[1]s, ports: %[2]s"), s, msg.Ports)
+		s = tr("%[1]s, ports: %[2]s", s, msg.Ports)
 	}
 	if msg.Port != nil {
-		s = fmt.Sprintf(tr("%[1]s, port: %[2]s"), s, msg.Port)
+		s = tr("%[1]s, port: %[2]s", s, msg.Port)
 	}
 	return s
 }

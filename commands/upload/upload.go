@@ -290,7 +290,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 			if requiredTool.IsInstalled() {
 				uploadProperties.Merge(requiredTool.RuntimeProperties())
 			} else {
-				errStream.Write([]byte(fmt.Sprintf(tr("Warning: tool '%s' is not installed. It might not be available for your OS."), requiredTool)))
+				errStream.Write([]byte(tr("Warning: tool '%s' is not installed. It might not be available for your OS.", requiredTool)))
 			}
 		}
 	}
@@ -388,8 +388,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 			TouchingPort: func(port string) {
 				logrus.WithField("phase", "board reset").Infof("Performing 1200-bps touch reset on serial port %s", port)
 				if verbose {
-					outStream.Write([]byte(fmt.Sprintf(tr("Performing 1200-bps touch reset on serial port %s"), port)))
-					outStream.Write([]byte(fmt.Sprintln()))
+					outStream.Write([]byte(fmt.Sprintln(tr("Performing 1200-bps touch reset on serial port %s", port))))
 				}
 			},
 			WaitingForNewSerial: func() {
@@ -406,11 +405,9 @@ func runProgramAction(pm *packagemanager.PackageManager,
 				}
 				if verbose {
 					if port != "" {
-						outStream.Write([]byte(fmt.Sprintf(tr("Upload port found on %s"), port)))
-						outStream.Write([]byte(fmt.Sprintln()))
+						outStream.Write([]byte(fmt.Sprintln(tr("Upload port found on %s", port))))
 					} else {
-						outStream.Write([]byte(fmt.Sprintf(tr("No upload port found, using %s as fallback"), actualPort)))
-						outStream.Write([]byte(fmt.Sprintln()))
+						outStream.Write([]byte(fmt.Sprintln(tr("No upload port found, using %s as fallback", actualPort))))
 					}
 				}
 			},
@@ -420,8 +417,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		}
 
 		if newPort, err := serialutils.Reset(portToTouch, wait, cb, dryRun); err != nil {
-			outStream.Write([]byte(fmt.Sprintf(tr("Cannot perform port reset: %s"), err)))
-			outStream.Write([]byte(fmt.Sprintln()))
+			outStream.Write([]byte(fmt.Sprintln(tr("Cannot perform port reset: %s", err))))
 		} else {
 			if newPort != "" {
 				actualPort.Address = newPort
@@ -530,7 +526,7 @@ func determineBuildPathAndSketchName(importFile, importDir string, sk *sketch.Sk
 	// Case 1: importFile flag has been specified
 	if importFile != "" {
 		if importDir != "" {
-			return nil, "", fmt.Errorf(fmt.Sprintf(tr("%s and %s cannot be used together"), "importFile", "importDir"))
+			return nil, "", fmt.Errorf(tr("%[1]s and %[2]s cannot be used together", "importFile", "importDir"))
 		}
 
 		// We have a path like "path/to/my/build/SketchName.ino.bin". We are going to

@@ -19,7 +19,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/arduino/discovery"
@@ -94,7 +93,7 @@ func NewCommand() *cobra.Command {
 	command.Flags().StringArrayVar(&buildProperties, "build-property", []string{},
 		tr("Override a build property with a custom value. Can be used multiple times for multiple properties."))
 	command.Flags().StringVar(&warnings, "warnings", "none",
-		fmt.Sprintf(tr(`Optional, can be "%[1]s", "%[2]s", "%[3]s" and "%[4]s". Defaults to "%[1]s". Used to tell gcc which warning level to use (-W flag).`), "none", "default", "more", "all"))
+		tr(`Optional, can be: %s. Used to tell gcc which warning level to use (-W flag).`, "none, default, more, all"))
 	command.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Optional, turns on verbose mode."))
 	command.Flags().BoolVar(&quiet, "quiet", false, tr("Optional, suppresses almost every output."))
 	command.Flags().BoolVarP(&uploadAfterCompile, "upload", "u", false, tr("Upload the binary after the compilation."))
@@ -215,7 +214,7 @@ func run(cmd *cobra.Command, args []string) {
 
 		fields := map[string]string{}
 		if len(userFieldRes.UserFields) > 0 {
-			feedback.Printf(tr("Uploading to specified board using %s protocol requires the following info:"), discoveryPort.Protocol)
+			feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", discoveryPort.Protocol))
 			fields = arguments.AskForUserFields(userFieldRes.UserFields)
 		}
 

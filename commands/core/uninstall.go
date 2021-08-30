@@ -17,7 +17,6 @@ package core
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -74,7 +73,7 @@ func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease
 	log := pm.Log.WithField("platform", platformRelease)
 
 	log.Info("Uninstalling platform")
-	taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Uninstalling %s"), platformRelease)})
+	taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s", platformRelease)})
 
 	if err := pm.UninstallPlatform(platformRelease); err != nil {
 		log.WithError(err).Error("Error uninstalling")
@@ -82,7 +81,7 @@ func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease
 	}
 
 	log.Info("Platform uninstalled")
-	taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("Platform %s uninstalled"), platformRelease), Completed: true})
+	taskCB(&rpc.TaskProgress{Message: tr("Platform %s uninstalled", platformRelease), Completed: true})
 	return nil
 }
 
@@ -90,7 +89,7 @@ func uninstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.
 	log := pm.Log.WithField("Tool", toolRelease)
 
 	log.Info("Uninstalling tool")
-	taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Uninstalling %s, tool is no more required"), toolRelease)})
+	taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s, tool is no more required", toolRelease)})
 
 	if err := pm.UninstallTool(toolRelease); err != nil {
 		log.WithError(err).Error("Error uninstalling")
@@ -98,6 +97,6 @@ func uninstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.
 	}
 
 	log.Info("Tool uninstalled")
-	taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("Tool %s uninstalled"), toolRelease), Completed: true})
+	taskCB(&rpc.TaskProgress{Message: tr("Tool %s uninstalled", toolRelease), Completed: true})
 	return nil
 }
