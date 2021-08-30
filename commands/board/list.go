@@ -27,6 +27,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/discovery"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/httpclient"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -186,23 +187,27 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 	}
 
 	dm := pm.DiscoveryManager()
-	if errs := dm.RunAll(); len(errs) > 0 {
-		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: fmt.Errorf("%v", errs)}
+	if errs := dm.RunAll(); errs != nil {
+		for _, err := range errs.Errors {
+			feedback.Error(err)
+		}
 	}
-	if errs := dm.StartAll(); len(errs) > 0 {
-		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: fmt.Errorf("%v", errs)}
+	if errs := dm.StartAll(); errs != nil {
+		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: errs}
 	}
 	defer func() {
-		if errs := dm.StopAll(); len(errs) > 0 {
-			logrus.Error(errs)
+		if errs := dm.StopAll(); errs != nil {
+			for _, err := range errs.Errors {
+				logrus.Error(err)
+			}
 		}
 	}()
 	time.Sleep(time.Duration(req.GetTimeout()) * time.Millisecond)
 
 	retVal := []*rpc.DetectedPort{}
 	ports, errs := pm.DiscoveryManager().List()
-	if len(errs) > 0 {
-		return nil, &commands.UnavailableError{Message: tr("Error getting board list"), Cause: fmt.Errorf("%v", errs)}
+	if errs != nil {
+		return nil, &commands.UnavailableError{Message: tr("Error getting board list"), Cause: errs}
 	}
 	for _, port := range ports {
 		boards, err := identify(pm, port)
@@ -229,24 +234,22 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 	dm := pm.DiscoveryManager()
 
 	runErrs := dm.RunAll()
-	if len(runErrs) == len(dm.IDs()) {
-		// All discoveries failed to run, we can't do anything
-		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: fmt.Errorf("%v", runErrs)}
+	if runErrs != nil {
+		feedback.Error(&commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: runErrs})
 	}
 
 	eventsChan, errs := dm.StartSyncAll()
-	if len(runErrs) > 0 {
-		errs = append(runErrs, errs...)
-	}
 
 	outChan := make(chan *rpc.BoardListWatchResponse)
 
 	go func() {
 		defer close(outChan)
-		for _, err := range errs {
-			outChan <- &rpc.BoardListWatchResponse{
-				EventType: "error",
-				Error:     err.Error(),
+		if errs != nil {
+			for _, err := range errs.Errors {
+				outChan <- &rpc.BoardListWatchResponse{
+					EventType: "error",
+					Error:     err.Error(),
+				}
 			}
 		}
 		for {

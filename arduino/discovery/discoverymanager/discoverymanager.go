@@ -21,6 +21,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 )
 
@@ -71,8 +72,8 @@ func (dm *DiscoveryManager) Add(disc *discovery.PluggableDiscovery) error {
 }
 
 // parallelize runs function f concurrently for each discovery.
-// Returns a list of errors returned by each call of f.
-func (dm *DiscoveryManager) parallelize(f func(d *discovery.PluggableDiscovery) error) []error {
+// Returns a multierror.Error containing the result of each call of f.
+func (dm *DiscoveryManager) parallelize(f func(d *discovery.PluggableDiscovery) error) *multierror.Error {
 	var wg sync.WaitGroup
 	errChan := make(chan error)
 	for _, d := range dm.discoveries {
@@ -92,16 +93,16 @@ func (dm *DiscoveryManager) parallelize(f func(d *discovery.PluggableDiscovery) 
 		close(errChan)
 	}()
 
-	errs := []error{}
+	var errs *multierror.Error
 	for err := range errChan {
-		errs = append(errs, err)
+		errs = multierror.Append(errs, err)
 	}
 	return errs
 }
 
-// RunAll the discoveries for this DiscoveryManager,
-// returns an error for each discovery failing to run
-func (dm *DiscoveryManager) RunAll() []error {
+// RunAll the discoveries for this DiscoveryManager.
+// Returns a multierror.Error containing an error for each discovery failing to run
+func (dm *DiscoveryManager) RunAll() *multierror.Error {
 	return dm.parallelize(func(d *discovery.PluggableDiscovery) error {
 		if d.State() != discovery.Dead {
 			// This discovery is already alive, nothing to do
@@ -116,8 +117,8 @@ func (dm *DiscoveryManager) RunAll() []error {
 }
 
 // StartAll the discoveries for this DiscoveryManager,
-// returns an error for each discovery failing to start
-func (dm *DiscoveryManager) StartAll() []error {
+// Returns a multierror.Error containing an error for each discovery failing to start
+func (dm *DiscoveryManager) StartAll() *multierror.Error {
 	return dm.parallelize(func(d *discovery.PluggableDiscovery) error {
 		state := d.State()
 		if state != discovery.Idling || state == discovery.Running {
@@ -131,9 +132,9 @@ func (dm *DiscoveryManager) StartAll() []error {
 	})
 }
 
-// StartSyncAll the discoveries for this DiscoveryManager,
-// returns an error for each discovery failing to start syncing
-func (dm *DiscoveryManager) StartSyncAll() (<-chan *discovery.Event, []error) {
+// StartSyncAll the discoveries for this DiscoveryManager.
+// Returns a multierror.Error containing an error for each discovery failing to start syncing
+func (dm *DiscoveryManager) StartSyncAll() (<-chan *discovery.Event, *multierror.Error) {
 	if dm.globalEventCh == nil {
 		dm.globalEventCh = make(chan *discovery.Event, 5)
 	}
@@ -158,9 +159,9 @@ func (dm *DiscoveryManager) StartSyncAll() (<-chan *discovery.Event, []error) {
 	return dm.globalEventCh, errs
 }
 
-// StopAll the discoveries for this DiscoveryManager,
-// returns an error for each discovery failing to stop
-func (dm *DiscoveryManager) StopAll() []error {
+// StopAll the discoveries for this DiscoveryManager.
+// Returns a multierror.Error containing an error for each discovery failing to stop
+func (dm *DiscoveryManager) StopAll() *multierror.Error {
 	return dm.parallelize(func(d *discovery.PluggableDiscovery) error {
 		state := d.State()
 		if state != discovery.Syncing && state != discovery.Running {
@@ -176,8 +177,8 @@ func (dm *DiscoveryManager) StopAll() []error {
 }
 
 // QuitAll quits all the discoveries managed by this DiscoveryManager.
-// Returns an error for each discovery that fails quitting
-func (dm *DiscoveryManager) QuitAll() []error {
+// Returns a multierror.Error containing an error for each discovery failing to quit
+func (dm *DiscoveryManager) QuitAll() *multierror.Error {
 	errs := dm.parallelize(func(d *discovery.PluggableDiscovery) error {
 		if d.State() == discovery.Dead {
 			// Stop! Stop! It's already dead!
@@ -191,7 +192,7 @@ func (dm *DiscoveryManager) QuitAll() []error {
 	})
 	// Close the global channel only if there were no errors
 	// quitting all alive discoveries
-	if len(errs) == 0 && dm.globalEventCh != nil {
+	if errs != nil && dm.globalEventCh != nil {
 		close(dm.globalEventCh)
 		dm.globalEventCh = nil
 	}
@@ -199,8 +200,8 @@ func (dm *DiscoveryManager) QuitAll() []error {
 }
 
 // List returns a list of available ports detected from all discoveries
-// and a list of errors for those discoveries that returned one.
-func (dm *DiscoveryManager) List() ([]*discovery.Port, []error) {
+// and a multierror.Error containing the list of errors for those discoveries that returned one.
+func (dm *DiscoveryManager) List() ([]*discovery.Port, *multierror.Error) {
 	var wg sync.WaitGroup
 	// Use this struct to avoid the need of two separate
 	// channels for ports and errors.
@@ -234,10 +235,10 @@ func (dm *DiscoveryManager) List() ([]*discovery.Port, []error) {
 	}()
 
 	ports := []*discovery.Port{}
-	errs := []error{}
+	var errs *multierror.Error
 	for msg := range msgChan {
 		if msg.Err != nil {
-			errs = append(errs, msg.Err)
+			errs = multierror.Append(errs, msg.Err)
 		} else {
 			ports = append(ports, msg.Port)
 		}

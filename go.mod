@@ -17,6 +17,7 @@ require (
 	github.com/fluxio/multierror v0.0.0-20160419044231-9c68d39025e5 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/h2non/filetype v1.0.8 // indirect
+	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leonelquinteros/gotext v1.4.0

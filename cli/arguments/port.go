@@ -78,23 +78,19 @@ func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Po
 		return nil, errors.New("invalid instance")
 	}
 	dm := pm.DiscoveryManager()
-	if errs := dm.RunAll(); len(errs) == len(dm.IDs()) {
-		// All discoveries failed to run, we can't do anything
-		return nil, fmt.Errorf("%v", errs)
-	} else if len(errs) > 0 {
-		// If only some discoveries failed to run just tell the user and go on
-		for _, err := range errs {
+	if errs := dm.RunAll(); errs != nil {
+		for _, err := range errs.Errors {
 			feedback.Error(err)
 		}
 	}
 	eventChan, errs := dm.StartSyncAll()
-	if len(errs) > 0 {
-		return nil, fmt.Errorf("%v", errs)
+	if errs != nil {
+		return nil, errs
 	}
 
 	defer func() {
 		// Quit all discoveries at the end.
-		if errs := dm.QuitAll(); len(errs) > 0 {
+		if errs := dm.QuitAll(); errs != nil {
 			logrus.Errorf("quitting discoveries when getting port metadata: %v", errs)
 		}
 	}()
