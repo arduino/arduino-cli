@@ -49,6 +49,9 @@ func SetDefaults(settings *viper.Viper) {
 	settings.SetDefault("metrics.enabled", true)
 	settings.SetDefault("metrics.addr", ":9090")
 
+	// output settings
+	settings.SetDefault("output.no_color", false)
+
 	// Bind env vars
 	settings.SetEnvPrefix("ARDUINO")
 	settings.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))

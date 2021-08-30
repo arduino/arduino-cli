@@ -68,6 +68,16 @@ func DefaultFeedback() *Feedback {
 	return New(os.Stdout, os.Stderr, Text)
 }
 
+// SetOut can be used to change the out writer at runtime
+func (fb *Feedback) SetOut(out io.Writer) {
+	fb.out = out
+}
+
+// SetErr can be used to change the err writer at runtime
+func (fb *Feedback) SetErr(err io.Writer) {
+	fb.err = err
+}
+
 // SetFormat can be used to change the output format at runtime
 func (fb *Feedback) SetFormat(f OutputFormat) {
 	fb.format = f
