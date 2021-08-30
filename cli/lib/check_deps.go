@@ -51,12 +51,12 @@ func runDepsCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
-	deps, stat := lib.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesRequest{
+	deps, err := lib.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesRequest{
 		Instance: instance,
 		Name:     libRef.Name,
 		Version:  libRef.Version,
 	})
-	if stat != nil {
+	if err != nil {
 		feedback.Errorf(tr("Error resolving dependencies for %[1]s: %[2]s", libRef, err))
 	}
 

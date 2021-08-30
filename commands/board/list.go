@@ -187,10 +187,10 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 
 	dm := pm.DiscoveryManager()
 	if errs := dm.RunAll(); len(errs) > 0 {
-		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: errs[0]}
+		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: fmt.Errorf("%v", errs)}
 	}
 	if errs := dm.StartAll(); len(errs) > 0 {
-		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: errs[0]}
+		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: fmt.Errorf("%v", errs)}
 	}
 	defer func() {
 		if errs := dm.StopAll(); len(errs) > 0 {
@@ -202,7 +202,7 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 	retVal := []*rpc.DetectedPort{}
 	ports, errs := pm.DiscoveryManager().List()
 	if len(errs) > 0 {
-		return nil, &commands.UnavailableError{Message: tr("Error getting board list"), Cause: errs[0]}
+		return nil, &commands.UnavailableError{Message: tr("Error getting board list"), Cause: fmt.Errorf("%v", errs)}
 	}
 	for _, port := range ports {
 		boards, err := identify(pm, port)
@@ -231,7 +231,7 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 	runErrs := dm.RunAll()
 	if len(runErrs) == len(dm.IDs()) {
 		// All discoveries failed to run, we can't do anything
-		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: runErrs[0]}
+		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: fmt.Errorf("%v", runErrs)}
 	}
 
 	eventsChan, errs := dm.StartSyncAll()

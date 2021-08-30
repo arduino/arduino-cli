@@ -237,9 +237,9 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	} else if programmer != nil {
 		action = "program"
 	}
-	uploadToolID, st := getToolID(props, action, port.Protocol)
-	if st != nil {
-		return st
+	uploadToolID, err := getToolID(props, action, port.Protocol)
+	if err != nil {
+		return err
 	}
 
 	var uploadToolPlatform *cores.PlatformRelease
