@@ -768,11 +768,11 @@ msgstr "Error getting absolute path of sketch archive"
 msgid "Error getting board details: %v"
 msgstr "Error getting board details: %v"
 
-#: commands/board/list.go:140
+#: commands/board/list.go:141
 msgid "Error getting board info from Arduino Cloud"
 msgstr "Error getting board info from Arduino Cloud"
 
-#: commands/board/list.go:205
+#: commands/board/list.go:210
 msgid "Error getting board list"
 msgstr "Error getting board list"
 
@@ -897,9 +897,8 @@ msgstr "Error searching for platforms: %v"
 msgid "Error serializing compilation database: %s"
 msgstr "Error serializing compilation database: %s"
 
-#: commands/board/list.go:190
-#: commands/board/list.go:193
-#: commands/board/list.go:234
+#: commands/board/list.go:196
+#: commands/board/list.go:238
 msgid "Error starting board discoveries"
 msgstr "Error starting board discoveries"
 
@@ -1281,7 +1280,7 @@ msgstr "Invalid package index in %s"
 msgid "Invalid parameter %s: version not allowed"
 msgstr "Invalid parameter %s: version not allowed"
 
-#: commands/board/list.go:51
+#: commands/board/list.go:52
 msgid "Invalid pid value: '%s'"
 msgstr "Invalid pid value: '%s'"
 
@@ -1293,7 +1292,7 @@ msgstr "Invalid size regexp: %s"
 msgid "Invalid version"
 msgstr "Invalid version"
 
-#: commands/board/list.go:48
+#: commands/board/list.go:49
 msgid "Invalid vid value: '%s'"
 msgstr "Invalid vid value: '%s'"
 
@@ -2421,7 +2420,7 @@ msgstr "binary file not found in %s"
 msgid "board %s:%s not found"
 msgstr "board %s:%s not found"
 
-#: commands/board/list.go:40
+#: commands/board/list.go:41
 msgid "board not found"
 msgstr "board not found"
 
@@ -2551,7 +2550,7 @@ msgstr "destination already exists"
 msgid "destination dir %s already exists, cannot install"
 msgstr "destination dir %s already exists, cannot install"
 
-#: arduino/discovery/discoverymanager/discoverymanager.go:112
+#: arduino/discovery/discoverymanager/discoverymanager.go:113
 msgid "discovery %[1]s process not started: %[2]w"
 msgstr "discovery %[1]s process not started: %[2]w"
 
@@ -2599,11 +2598,11 @@ msgstr "error opening serial monitor"
 msgid "error parsing value: %v"
 msgstr "error parsing value: %v"
 
-#: commands/board/list.go:81
+#: commands/board/list.go:82
 msgid "error processing response from server"
 msgstr "error processing response from server"
 
-#: commands/board/list.go:96
+#: commands/board/list.go:97
 msgid "error querying Arduino Cloud Api"
 msgstr "error querying Arduino Cloud Api"
 
@@ -2623,7 +2622,7 @@ msgstr "extracting archive: %w"
 msgid "failed to compute hash of file \"%s\""
 msgstr "failed to compute hash of file \"%s\""
 
-#: commands/board/list.go:64
+#: commands/board/list.go:65
 msgid "failed to initialize http client"
 msgstr "failed to initialize http client"
 
@@ -2860,7 +2859,7 @@ msgstr "library is not valid: missing header file \"%s\""
 msgid "library path does not exist: %s"
 msgstr "library path does not exist: %s"
 
-#: arduino/discovery/discoverymanager/discoverymanager.go:222
+#: arduino/discovery/discoverymanager/discoverymanager.go:223
 msgid "listing ports from discovery %[1]s: %[2]w"
 msgstr "listing ports from discovery %[1]s: %[2]w"
 
@@ -3053,7 +3052,7 @@ msgstr "platform not installed"
 msgid "please use --build-property instead."
 msgstr "please use --build-property instead."
 
-#: arduino/discovery/discoverymanager/discoverymanager.go:67
+#: arduino/discovery/discoverymanager/discoverymanager.go:68
 msgid "pluggable discovery already added: %s"
 msgstr "pluggable discovery already added: %s"
 
@@ -3061,7 +3060,7 @@ msgstr "pluggable discovery already added: %s"
 msgid "port"
 msgstr "port"
 
-#: cli/arguments/port.go:122
+#: cli/arguments/port.go:118
 msgid "port not found: %[1]s %[2]s"
 msgstr "port not found: %[1]s %[2]s"
 
@@ -3069,7 +3068,7 @@ msgstr "port not found: %[1]s %[2]s"
 msgid "protocol version not supported: requested 1, got %d"
 msgstr "protocol version not supported: requested 1, got %d"
 
-#: arduino/discovery/discoverymanager/discoverymanager.go:188
+#: arduino/discovery/discoverymanager/discoverymanager.go:189
 msgid "quitting discovery %[1]s: %[2]w"
 msgstr "quitting discovery %[1]s: %[2]w"
 
@@ -3198,19 +3197,19 @@ msgstr "skipping loading of boards %s: malformed custom board options"
 msgid "source is not a directory"
 msgstr "source is not a directory"
 
-#: arduino/discovery/discoverymanager/discoverymanager.go:149
+#: arduino/discovery/discoverymanager/discoverymanager.go:150
 msgid "start syncing discovery %[1]s: %[2]w"
 msgstr "start syncing discovery %[1]s: %[2]w"
 
-#: arduino/discovery/discoverymanager/discoverymanager.go:128
+#: arduino/discovery/discoverymanager/discoverymanager.go:129
 msgid "starting discovery %[1]s: %[2]w"
 msgstr "starting discovery %[1]s: %[2]w"
 
-#: commands/board/list.go:277
+#: commands/board/list.go:280
 msgid "stopping discoveries: %s"
 msgstr "stopping discoveries: %s"
 
-#: arduino/discovery/discoverymanager/discoverymanager.go:172
+#: arduino/discovery/discoverymanager/discoverymanager.go:173
 msgid "stopping discovery %[1]s: %[2]w"
 msgstr "stopping discovery %[1]s: %[2]w"
 
@@ -3242,7 +3241,7 @@ msgstr "the library name is different from the set (%[1]s != %[2]s)"
 msgid "the platform has no releases"
 msgstr "the platform has no releases"
 
-#: commands/board/list.go:72
+#: commands/board/list.go:73
 msgid "the server responded with status %s"
 msgstr "the server responded with status %s"
 
@@ -3363,7 +3362,7 @@ msgstr "uploading error: %s"
 msgid "writing sketch metadata %[1]s: %[2]s"
 msgstr "writing sketch metadata %[1]s: %[2]s"
 
-#: commands/board/list.go:88
+#: commands/board/list.go:89
 msgid "wrong format in server response"
 msgstr "wrong format in server response"
 
