@@ -43,7 +43,7 @@ func NewCommand() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	if strings.Contains(globals.VersionInfo.VersionString, "git-snapshot") {
+	if strings.Contains(globals.VersionInfo.VersionString, "git-snapshot") || strings.Contains(globals.VersionInfo.VersionString, "nightly") {
 		// We're using a development version, no need to check if there's a
 		// new release available
 		feedback.Print(globals.VersionInfo)

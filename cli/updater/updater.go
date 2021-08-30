@@ -80,7 +80,7 @@ func NotifyNewVersionIsAvailable(latestVersion string) {
 // shouldCheckForUpdate return true if it actually makes sense to check for new updates,
 // false in all other cases.
 func shouldCheckForUpdate(currentVersion *semver.Version) bool {
-	if strings.Contains(currentVersion.String(), "git") {
+	if strings.Contains(currentVersion.String(), "git-snapshot") || strings.Contains(currentVersion.String(), "nightly") {
 		// This is a dev build, no need to check for updates
 		return false
 	}
