@@ -45,6 +45,7 @@ import (
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/inventory"
+	"github.com/fatih/color"
 	"github.com/mattn/go-colorable"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
@@ -104,6 +105,7 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", fmt.Sprintf(tr("The output format, can be {%s|%s}."), "text", "json"))
 	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", tr("The custom config file (if not specified the default will be used)."))
 	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, tr("Comma-separated list of additional URLs for the Boards Manager."))
+	cmd.PersistentFlags().Bool("no-color", false, "Disable colored output.")
 	configuration.BindFlags(cmd, configuration.Settings)
 }
 
@@ -142,6 +144,13 @@ func preRun(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
+	// https://no-color.org/
+	color.NoColor = configuration.Settings.GetBool("output.no_color") || os.Getenv("NO_COLOR") != ""
+
+	// Set default feedback output to colorable
+	feedback.SetOut(colorable.NewColorableStdout())
+	feedback.SetErr(colorable.NewColorableStderr())
+
 	//
 	// Prepare logging
 	//
@@ -151,7 +160,8 @@ func preRun(cmd *cobra.Command, args []string) {
 		// if we print on stdout, do it in full colors
 		logrus.SetOutput(colorable.NewColorableStdout())
 		logrus.SetFormatter(&logrus.TextFormatter{
-			ForceColors: true,
+			ForceColors:   true,
+			DisableColors: color.NoColor,
 		})
 	} else {
 		logrus.SetOutput(ioutil.Discard)
