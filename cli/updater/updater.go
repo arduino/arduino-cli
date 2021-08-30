@@ -117,7 +117,7 @@ func getLatestRelease() string {
 	// We just use this URL to check if there's a new release available and
 	// never show it to the user, so it's fine to use the Linux one for all OSs.
 	URL := "https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz"
-	res, err := client.Get(URL)
+	res, err := client.Head(URL)
 	if err != nil {
 		// Yes, we ignore it
 		return ""
