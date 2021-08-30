@@ -16,36 +16,35 @@
 package lib
 
 import (
-	"fmt"
-
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // LibraryUpgradeAll upgrades all the available libraries
-func LibraryUpgradeAll(instanceID int32, downloadCB commands.DownloadProgressCB,
-	taskCB commands.TaskProgressCB) error {
-	// get the library manager
+func LibraryUpgradeAll(instanceID int32, downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(instanceID)
+	if lm == nil {
+		return &commands.InvalidInstanceError{}
+	}
 
 	if err := upgrade(lm, listLibraries(lm, true, true), downloadCB, taskCB); err != nil {
 		return err
 	}
 
-	status := commands.Init(&rpc.InitRequest{Instance: &rpc.Instance{Id: instanceID}}, nil)
-	if status != nil {
-		return fmt.Errorf(tr("rescanning libraries: %s"), status.Err())
+	if err := commands.Init(&rpc.InitRequest{Instance: &rpc.Instance{Id: instanceID}}, nil); err != nil {
+		return err
 	}
 
 	return nil
 }
 
 // LibraryUpgrade upgrades only the given libraries
-func LibraryUpgrade(instanceID int32, libraryNames []string, downloadCB commands.DownloadProgressCB,
-	taskCB commands.TaskProgressCB) error {
-	// get the library manager
+func LibraryUpgrade(instanceID int32, libraryNames []string, downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(instanceID)
+	if lm == nil {
+		return &commands.InvalidInstanceError{}
+	}
 
 	// get the libs to upgrade
 	libs := filterByName(listLibraries(lm, true, true), libraryNames)
@@ -54,11 +53,8 @@ func LibraryUpgrade(instanceID int32, libraryNames []string, downloadCB commands
 	return upgrade(lm, libs, downloadCB, taskCB)
 }
 
-func upgrade(lm *librariesmanager.LibrariesManager, libs []*installedLib, downloadCB commands.DownloadProgressCB,
-	taskCB commands.TaskProgressCB) error {
-
+func upgrade(lm *librariesmanager.LibrariesManager, libs []*installedLib, downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 	// Go through the list and download them
-
 	for _, lib := range libs {
 		if err := downloadLibrary(lm, lib.Available, downloadCB, taskCB); err != nil {
 			return err

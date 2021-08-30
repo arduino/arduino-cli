@@ -17,18 +17,10 @@ package core
 
 import (
 	"context"
-	"errors"
-	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-)
-
-var (
-	// ErrAlreadyLatest is returned when an upgrade is not possible because
-	// already at latest version.
-	ErrAlreadyLatest = errors.New(tr("platform already at latest version"))
 )
 
 // PlatformUpgrade FIXMEDOC
@@ -37,7 +29,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest,
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New(tr("invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
 
 	// Extract all PlatformReference to platforms that have updates
@@ -49,42 +41,39 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest,
 		return nil, err
 	}
 
-	status := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil)
-	if status != nil {
-		return nil, status.Err()
+	if err := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil); err != nil {
+		return nil, err
 	}
 
 	return &rpc.PlatformUpgradeResponse{}, nil
 }
 
 func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB,
-	skipPostInstall bool) error {
+	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB, skipPostInstall bool) error {
 	if platformRef.PlatformVersion != nil {
-		return fmt.Errorf(tr("upgrade doesn't accept parameters with version"))
+		return &commands.InvalidArgumentError{Message: tr("Upgrade doesn't accept parameters with version")}
 	}
 
 	// Search the latest version for all specified platforms
 	platform := pm.FindPlatform(platformRef)
 	if platform == nil {
-		return fmt.Errorf(tr("platform %s not found"), platformRef)
+		return &commands.PlatformNotFound{Platform: platformRef.String()}
 	}
 	installed := pm.GetInstalledPlatformRelease(platform)
 	if installed == nil {
-		return fmt.Errorf(tr("platform %s is not installed"), platformRef)
+		return &commands.PlatformNotFound{Platform: platformRef.String()}
 	}
 	latest := platform.GetLatestRelease()
 	if !latest.Version.GreaterThan(installed.Version) {
-		return ErrAlreadyLatest
+		return &commands.PlatformAlreadyAtTheLatestVersionError{}
 	}
 	platformRef.PlatformVersion = latest.Version
 
 	platformRelease, tools, err := pm.FindPlatformReleaseDependencies(platformRef)
 	if err != nil {
-		return fmt.Errorf(tr("platform %s is not installed"), platformRef)
+		return &commands.PlatformNotFound{Platform: platformRef.String()}
 	}
-	err = installPlatform(pm, platformRelease, tools, downloadCB, taskCB, skipPostInstall)
-	if err != nil {
+	if err := installPlatform(pm, platformRelease, tools, downloadCB, taskCB, skipPostInstall); err != nil {
 		return err
 	}
 

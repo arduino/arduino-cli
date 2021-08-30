@@ -75,7 +75,7 @@ func ParseLibraryReferenceArgs(args []string) ([]*LibraryReferenceArg, error) {
 // ParseLibraryReferenceArgAndAdjustCase parse a command line argument that reference a
 // library and possibly adjust the case of the name to match a library in the index
 func ParseLibraryReferenceArgAndAdjustCase(instance *rpc.Instance, arg string) (*LibraryReferenceArg, error) {
-	libRef, err := ParseLibraryReferenceArg(arg)
+	libRef, _ := ParseLibraryReferenceArg(arg)
 	res, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
 		Instance: instance,
 		Query:    libRef.Name,

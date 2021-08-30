@@ -28,7 +28,7 @@ func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, tas
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	ref, err := createLibIndexReference(lm, req)
 	if err != nil {
-		return err
+		return &commands.InvalidLibraryError{Cause: err}
 	}
 
 	lib := lm.FindByReference(ref)

@@ -17,7 +17,6 @@ package upload
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/commands"
@@ -30,17 +29,17 @@ func ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgram
 
 	fqbnIn := req.GetFqbn()
 	if fqbnIn == "" {
-		return nil, fmt.Errorf(tr("no Fully Qualified Board Name provided"))
+		return nil, &commands.MissingFQBNError{}
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, fmt.Errorf(tr("incorrect FQBN: %s"), err)
+		return nil, &commands.InvalidFQBNError{Cause: err}
 	}
 
 	// Find target platforms
 	_, platform, _, _, refPlatform, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
-		return nil, fmt.Errorf(tr("incorrect FQBN: %s"), err)
+		return nil, &commands.UnknownFQBNError{Cause: err}
 	}
 
 	result := []*rpc.Programmer{}

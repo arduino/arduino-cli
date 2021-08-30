@@ -201,9 +201,9 @@ func TestUploadPropertiesComposition(t *testing.T) {
 			verboseVerifyOutput = "quiet noverify"
 		}
 		if test.expectedOutput == "FAIL" {
-			require.Error(t, err)
+			require.NotNil(t, err)
 		} else {
-			require.NoError(t, err)
+			require.Nil(t, err)
 			outFiltered := strings.ReplaceAll(outStream.String(), "\r", "")
 			outFiltered = strings.ReplaceAll(outFiltered, "\\", "/")
 			require.Contains(t, outFiltered, strings.ReplaceAll(test.expectedOutput, "$$VERBOSE-VERIFY$$", verboseVerifyOutput))
@@ -243,7 +243,7 @@ upload.tool.network=arduino_ota`))
 	require.Equal(t, "avrdude", toolID)
 
 	toolID, err = getToolID(props, "bootloader", "network")
-	require.EqualError(t, err, "cannot find tool: undefined 'bootloader.tool.network' property")
+	require.EqualError(t, err, "Property 'bootloader.tool.network' is undefined")
 	require.Equal(t, "", toolID)
 
 	props, err = properties.LoadFromBytes([]byte(`

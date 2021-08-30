@@ -17,6 +17,7 @@ package core
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
@@ -25,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/core"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -94,11 +96,13 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 			SkipPostInstall: DetectSkipPostInstallValue(),
 		}
 
-		_, err := core.PlatformUpgrade(context.Background(), r, output.ProgressBar(), output.TaskProgress())
-		if err == core.ErrAlreadyLatest {
-			feedback.Printf(tr("Platform %s is already at the latest version"), platformRef)
-		} else if err != nil {
-			feedback.Errorf(tr("Error during upgrade: %v"), err)
+		if _, err := core.PlatformUpgrade(context.Background(), r, output.ProgressBar(), output.TaskProgress()); err != nil {
+			if errors.Is(err, &commands.PlatformAlreadyAtTheLatestVersionError{}) {
+				feedback.Print(err.Error())
+				continue
+			}
+
+			feedback.Errorf(tr("Error during upgrade: %v", err))
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}

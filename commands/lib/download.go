@@ -34,12 +34,15 @@ func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downl
 	logrus.Info("Executing `arduino lib download`")
 
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
+	if lm == nil {
+		return nil, &commands.InvalidInstanceError{}
+	}
 
 	logrus.Info("Preparing download")
 
 	lib, err := findLibraryIndexRelease(lm, req)
 	if err != nil {
-		return nil, fmt.Errorf(tr("looking for library: %s"), err)
+		return nil, err
 	}
 
 	if err := downloadLibrary(lm, lib, downloadCB, func(*rpc.TaskProgress) {}); err != nil {
@@ -55,12 +58,12 @@ func downloadLibrary(lm *librariesmanager.LibrariesManager, libRelease *librarie
 	taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Downloading %s"), libRelease)})
 	config, err := commands.GetDownloaderConfig()
 	if err != nil {
-		return err
+		return &commands.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	}
 	if d, err := libRelease.Resource.Download(lm.DownloadsDir, config); err != nil {
-		return err
+		return &commands.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	} else if err := commands.Download(d, libRelease.String(), downloadCB); err != nil {
-		return err
+		return &commands.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 

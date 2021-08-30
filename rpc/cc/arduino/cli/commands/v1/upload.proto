@@ -68,6 +68,8 @@ message UploadResponse {
   bytes err_stream = 2;
 }
 
+message ProgrammerIsRequiredForUploadError {}
+
 message UploadUsingProgrammerRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;

@@ -137,7 +137,7 @@ func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.B
 			logrus.Debug("Board not recognized")
 		} else if err != nil {
 			// this is bad, bail out
-			return nil, errors.Wrap(err, tr("error getting board info from Arduino Cloud"))
+			return nil, &commands.UnavailableError{Message: tr("Error getting board info from Arduino Cloud")}
 		}
 
 		// add a DetectedPort entry in any case: the `Boards` field will
@@ -182,15 +182,15 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 
 	pm := commands.GetPackageManager(req.GetInstance().Id)
 	if pm == nil {
-		return nil, errors.New(tr("invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
 
 	dm := pm.DiscoveryManager()
 	if errs := dm.RunAll(); len(errs) > 0 {
-		return nil, fmt.Errorf("%v", errs)
+		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: fmt.Errorf("%v", errs)}
 	}
 	if errs := dm.StartAll(); len(errs) > 0 {
-		return nil, fmt.Errorf("%v", errs)
+		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: fmt.Errorf("%v", errs)}
 	}
 	defer func() {
 		if errs := dm.StopAll(); len(errs) > 0 {
@@ -202,7 +202,7 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 	retVal := []*rpc.DetectedPort{}
 	ports, errs := pm.DiscoveryManager().List()
 	if len(errs) > 0 {
-		return nil, fmt.Errorf("%v", errs)
+		return nil, &commands.UnavailableError{Message: tr("Error getting board list"), Cause: fmt.Errorf("%v", errs)}
 	}
 	for _, port := range ports {
 		boards, err := identify(pm, port)
@@ -231,7 +231,7 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 	runErrs := dm.RunAll()
 	if len(runErrs) == len(dm.IDs()) {
 		// All discoveries failed to run, we can't do anything
-		return nil, fmt.Errorf("%v", runErrs)
+		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: fmt.Errorf("%v", runErrs)}
 	}
 
 	eventsChan, errs := dm.StartSyncAll()

@@ -17,7 +17,6 @@ package lib
 
 import (
 	"context"
-	"errors"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
@@ -31,13 +30,12 @@ import (
 func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.LibrarySearchResponse, error) {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
-		return nil, errors.New(tr("invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
-
-	return searchLibrary(req, lm)
+	return searchLibrary(req, lm), nil
 }
 
-func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.LibrariesManager) (*rpc.LibrarySearchResponse, error) {
+func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.LibrariesManager) *rpc.LibrarySearchResponse {
 	res := []*rpc.SearchedLibrary{}
 	status := rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS
 
@@ -49,7 +47,7 @@ func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.Libraries
 		res = append(res, indexLibraryToRPCSearchLibrary(lib))
 	}
 
-	return &rpc.LibrarySearchResponse{Libraries: res, Status: status}, nil
+	return &rpc.LibrarySearchResponse{Libraries: res, Status: status}
 }
 
 // indexLibraryToRPCSearchLibrary converts a librariindex.Library to rpc.SearchLibrary

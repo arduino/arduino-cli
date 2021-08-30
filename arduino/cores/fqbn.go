@@ -35,7 +35,7 @@ func ParseFQBN(fqbnIn string) (*FQBN, error) {
 	// Split fqbn
 	fqbnParts := strings.Split(fqbnIn, ":")
 	if len(fqbnParts) < 3 || len(fqbnParts) > 4 {
-		return nil, fmt.Errorf("invalid fqbn: %s", fqbnIn)
+		return nil, fmt.Errorf("not an FQBN: %s", fqbnIn)
 	}
 
 	fqbn := &FQBN{
@@ -45,18 +45,18 @@ func ParseFQBN(fqbnIn string) (*FQBN, error) {
 		Configs:      properties.NewMap(),
 	}
 	if fqbn.BoardID == "" {
-		return nil, fmt.Errorf(tr("invalid fqbn: empty board identifier"))
+		return nil, fmt.Errorf(tr("empty board identifier"))
 	}
 	if len(fqbnParts) > 3 {
 		for _, pair := range strings.Split(fqbnParts[3], ",") {
 			parts := strings.SplitN(pair, "=", 2)
 			if len(parts) != 2 {
-				return nil, fmt.Errorf(tr("invalid fqbn config: %s"), pair)
+				return nil, fmt.Errorf(tr("invalid config option: %s"), pair)
 			}
 			k := strings.TrimSpace(parts[0])
 			v := strings.TrimSpace(parts[1])
 			if k == "" {
-				return nil, fmt.Errorf(tr("invalid fqbn config: %s"), pair)
+				return nil, fmt.Errorf(tr("invalid config option: %s"), pair)
 			}
 			fqbn.Configs.Set(k, v)
 		}

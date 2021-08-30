@@ -18,12 +18,12 @@ package sketch
 import (
 	"archive/zip"
 	"context"
-	"fmt"
 	"io"
 	"path/filepath"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
@@ -43,7 +43,7 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.Arc
 
 	s, err := sketch.New(sketchPath)
 	if err != nil {
-		return nil, err
+		return nil, &commands.CantOpenSketchError{Cause: err}
 	}
 
 	sketchPath = s.FullPath
@@ -56,7 +56,7 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.Arc
 
 	archivePath, err = archivePath.Clean().Abs()
 	if err != nil {
-		return nil, fmt.Errorf(tr("Error getting absolute archive path %v"), err)
+		return nil, &commands.PermissionDeniedError{Message: tr("Error getting absolute path of sketch archive"), Cause: err}
 	}
 
 	// Makes archivePath point to a zip file
@@ -67,18 +67,18 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.Arc
 	}
 
 	if archivePath.Exist() {
-		return nil, fmt.Errorf(tr("archive already exists"))
+		return nil, &commands.InvalidArgumentError{Message: tr("Archive already exists")}
 	}
 
 	filesToZip, err := sketchPath.ReadDirRecursive()
 	if err != nil {
-		return nil, fmt.Errorf(tr("Error retrieving sketch files: %v"), err)
+		return nil, &commands.PermissionDeniedError{Message: tr("Error reading sketch files"), Cause: err}
 	}
 	filesToZip.FilterOutDirs()
 
 	archive, err := archivePath.Create()
 	if err != nil {
-		return nil, fmt.Errorf(tr("Error creating archive: %v"), err)
+		return nil, &commands.PermissionDeniedError{Message: tr("Error creating sketch archive"), Cause: err}
 	}
 	defer archive.Close()
 
@@ -90,7 +90,7 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.Arc
 		if !req.IncludeBuildDir {
 			filePath, err := sketchPath.Parent().RelTo(f)
 			if err != nil {
-				return nil, fmt.Errorf(tr("Error calculating relative file path: %v"), err)
+				return nil, &commands.PermissionDeniedError{Message: tr("Error calculating relative file path"), Cause: err}
 			}
 
 			// Skips build folder
@@ -101,9 +101,8 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.Arc
 
 		// We get the parent path since we want the archive to unpack as a folder.
 		// If we don't do this the archive would contain all the sketch files as top level.
-		err = addFileToSketchArchive(zipWriter, f, sketchPath.Parent())
-		if err != nil {
-			return nil, fmt.Errorf(tr("Error adding file to archive: %v"), err)
+		if err := addFileToSketchArchive(zipWriter, f, sketchPath.Parent()); err != nil {
+			return nil, &commands.PermissionDeniedError{Message: tr("Error adding file to sketch archive"), Cause: err}
 		}
 	}
 

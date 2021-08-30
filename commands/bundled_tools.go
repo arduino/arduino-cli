@@ -51,7 +51,7 @@ func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.To
 	err := pm.InstallTool(toolRelease)
 	if err != nil {
 		log.WithError(err).Warn("Cannot install tool")
-		return fmt.Errorf(tr("installing tool %[1]s: %[2]s"), toolRelease, err)
+		return &FailedInstallError{Message: tr("Cannot install tool %s", toolRelease), Cause: err}
 	}
 	log.Info("Tool installed")
 	taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("%s installed"), toolRelease), Completed: true})

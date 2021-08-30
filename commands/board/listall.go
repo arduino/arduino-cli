@@ -17,7 +17,6 @@ package board
 
 import (
 	"context"
-	"errors"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/utils"
@@ -29,7 +28,7 @@ import (
 func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListAllResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New(tr("invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
 
 	searchArgs := strings.Join(req.GetSearchArgs(), " ")

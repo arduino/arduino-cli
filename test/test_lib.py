@@ -117,18 +117,14 @@ def test_list_exit_code(run_command):
     # Verify lib list command fails because specified platform is not installed
     result = run_command("lib list -b arduino:samd:mkr1000")
     assert result.failed
-    assert (
-        result.stderr.strip() == "Error listing Libraries: loading board data: platform arduino:samd is not installed"
-    )
+    assert result.stderr.strip() == "Error listing Libraries: Unknown FQBN: platform arduino:samd is not installed"
 
     assert run_command('lib install "AllThingsTalk LoRaWAN SDK"')
 
     # Verifies lib list command keeps failing
     result = run_command("lib list -b arduino:samd:mkr1000")
     assert result.failed
-    assert (
-        result.stderr.strip() == "Error listing Libraries: loading board data: platform arduino:samd is not installed"
-    )
+    assert result.stderr.strip() == "Error listing Libraries: Unknown FQBN: platform arduino:samd is not installed"
 
     assert run_command("core install arduino:samd")
 
@@ -224,7 +220,7 @@ def test_install(run_command):
     # (https://github.com/arduino/arduino-cli/issues/534)
     res = run_command("lib install MD_Parola@3.2.0")
     assert res.failed
-    assert "Error resolving dependencies for MD_Parola@3.2.0: dependency 'MD_MAX72xx' is not available" in res.stderr
+    assert "No valid dependencies solution found: dependency 'MD_MAX72xx' is not available" in res.stderr
 
 
 def test_install_library_with_dependencies(run_command):

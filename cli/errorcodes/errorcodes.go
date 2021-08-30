@@ -15,13 +15,6 @@
 
 package errorcodes
 
-import (
-	"os"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-)
-
 // Error codes to be used for os.Exit().
 const (
 	_          = iota // 0 is not a valid exit error code
@@ -36,14 +29,3 @@ const (
 	ErrCoreConfig
 	ErrBadArgument
 )
-
-// ExitWithGrpcStatus will terminate the current process by returing the correct
-// error code closest matching the gRPC status.
-func ExitWithGrpcStatus(s *status.Status) {
-	switch s.Code() {
-	case codes.Unimplemented:
-		os.Exit(ErrBadArgument)
-	default:
-		os.Exit(ErrGeneric)
-	}
-}

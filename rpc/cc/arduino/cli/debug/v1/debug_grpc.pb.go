@@ -11,6 +11,7 @@ import (
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
+// Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
 // DebugServiceClient is the client API for DebugService service.
@@ -31,7 +32,7 @@ func NewDebugServiceClient(cc grpc.ClientConnInterface) DebugServiceClient {
 }
 
 func (c *debugServiceClient) Debug(ctx context.Context, opts ...grpc.CallOption) (DebugService_DebugClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_DebugService_serviceDesc.Streams[0], "/cc.arduino.cli.debug.v1.DebugService/Debug", opts...)
+	stream, err := c.cc.NewStream(ctx, &DebugService_ServiceDesc.Streams[0], "/cc.arduino.cli.debug.v1.DebugService/Debug", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -99,8 +100,8 @@ type UnsafeDebugServiceServer interface {
 	mustEmbedUnimplementedDebugServiceServer()
 }
 
-func RegisterDebugServiceServer(s *grpc.Server, srv DebugServiceServer) {
-	s.RegisterService(&_DebugService_serviceDesc, srv)
+func RegisterDebugServiceServer(s grpc.ServiceRegistrar, srv DebugServiceServer) {
+	s.RegisterService(&DebugService_ServiceDesc, srv)
 }
 
 func _DebugService_Debug_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -147,7 +148,10 @@ func _DebugService_GetDebugConfig_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-var _DebugService_serviceDesc = grpc.ServiceDesc{
+// DebugService_ServiceDesc is the grpc.ServiceDesc for DebugService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var DebugService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "cc.arduino.cli.debug.v1.DebugService",
 	HandlerType: (*DebugServiceServer)(nil),
 	Methods: []grpc.MethodDesc{

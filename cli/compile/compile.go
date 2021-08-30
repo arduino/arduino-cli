@@ -178,20 +178,20 @@ func run(cmd *cobra.Command, args []string) {
 		SourceOverride:                overrides,
 		Library:                       library,
 	}
-	compileOut := new(bytes.Buffer)
-	compileErr := new(bytes.Buffer)
+	compileStdOut := new(bytes.Buffer)
+	compileStdErr := new(bytes.Buffer)
 	verboseCompile := configuration.Settings.GetString("logging.level") == "debug"
 	var compileRes *rpc.CompileResponse
-	var err error
+	var compileError error
 	if output.OutputFormat == "json" {
-		compileRes, err = compile.Compile(context.Background(), compileRequest, compileOut, compileErr, verboseCompile)
+		compileRes, compileError = compile.Compile(context.Background(), compileRequest, compileStdOut, compileStdErr, verboseCompile)
 	} else {
-		compileRes, err = compile.Compile(context.Background(), compileRequest, os.Stdout, os.Stderr, verboseCompile)
+		compileRes, compileError = compile.Compile(context.Background(), compileRequest, os.Stdout, os.Stderr, verboseCompile)
 	}
 
-	if err == nil && uploadAfterCompile {
+	if compileError == nil && uploadAfterCompile {
 		var sk *sketch.Sketch
-		sk, err = sketch.New(sketchPath)
+		sk, err := sketch.New(sketchPath)
 		if err != nil {
 			feedback.Errorf(tr("Error during Upload: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
@@ -230,28 +230,30 @@ func run(cmd *cobra.Command, args []string) {
 			Programmer: programmer,
 			UserFields: fields,
 		}
+
+		var uploadError error
 		if output.OutputFormat == "json" {
 			// TODO: do not print upload output in json mode
-			uploadOut := new(bytes.Buffer)
-			uploadErr := new(bytes.Buffer)
-			_, err = upload.Upload(context.Background(), uploadRequest, uploadOut, uploadErr)
+			uploadStdOut := new(bytes.Buffer)
+			uploadStdErr := new(bytes.Buffer)
+			_, uploadError = upload.Upload(context.Background(), uploadRequest, uploadStdOut, uploadStdErr)
 		} else {
-			_, err = upload.Upload(context.Background(), uploadRequest, os.Stdout, os.Stderr)
+			_, uploadError = upload.Upload(context.Background(), uploadRequest, os.Stdout, os.Stderr)
 		}
-		if err != nil {
-			feedback.Errorf(tr("Error during Upload: %v"), err)
+		if uploadError != nil {
+			feedback.Errorf(tr("Error during Upload: %v"), uploadError)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}
 
 	feedback.PrintResult(&compileResult{
-		CompileOut:    compileOut.String(),
-		CompileErr:    compileErr.String(),
+		CompileOut:    compileStdOut.String(),
+		CompileErr:    compileStdErr.String(),
 		BuilderResult: compileRes,
-		Success:       err == nil,
+		Success:       compileError == nil,
 	})
-	if err != nil && output.OutputFormat != "json" {
-		feedback.Errorf(tr("Error during build: %v"), err)
+	if compileError != nil && output.OutputFormat != "json" {
+		feedback.Errorf(tr("Error during build: %v"), compileError)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }

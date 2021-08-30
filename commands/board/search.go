@@ -17,7 +17,6 @@ package board
 
 import (
 	"context"
-	"errors"
 	"sort"
 	"strings"
 
@@ -33,7 +32,7 @@ import (
 func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New(tr("invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
 
 	res := &rpc.BoardSearchResponse{Boards: []*rpc.BoardListItem{}}
