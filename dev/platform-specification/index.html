@@ -2602,10 +2602,10 @@ tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; 
 [.....]
 </code></pre></div>
 <p>If necessary the same property can be defined multiple times for different protocols:</p>
-<div class="highlight"><pre><span></span><code>leonardo.upload.serial.maximum_size=28672
-leonardo.upload.network.maximum_size=256
+<div class="highlight"><pre><span></span><code>leonardo.upload.serial.speed=57600
+leonardo.upload.network.speed=19200
 </code></pre></div>
-<p>The two above properties will be available as <strong>{upload.serial.maximum_size}</strong> and <strong>{upload.network.maximum_size}</strong>.</p>
+<p>The two above properties will be available as <strong>{upload.speed}</strong>, the value will depend on the protocol used to upload.</p>
 <h4 id="properties-from-pluggable-discovery">Properties from pluggable discovery<a class="headerlink" href="#properties-from-pluggable-discovery" title="Permanent link">&para;</a></h4>
 <p>If a platform supports pluggable discovery it can also use the port's properties returned by a discovery. For example,
 the following port metadata coming from a pluggable discovery:</p>
