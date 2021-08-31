@@ -144,7 +144,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	if req.GetBuildPath() == "" {
 		builderCtx.BuildPath = sk.BuildPath
 	} else {
-		builderCtx.BuildPath = paths.New(req.GetBuildPath())
+		builderCtx.BuildPath = paths.New(req.GetBuildPath()).Canonical()
 	}
 	if err = builderCtx.BuildPath.MkdirAll(); err != nil {
 		return nil, &commands.PermissionDeniedError{Message: tr("Cannot create build directory"), Cause: err}
