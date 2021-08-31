@@ -275,7 +275,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	uploadProperties.Set("runtime.os", properties.GetOSSuffix())
 	uploadProperties.Merge(boardPlatform.Properties)
 	uploadProperties.Merge(boardPlatform.RuntimeProperties())
-	uploadProperties.Merge(boardProperties)
+	uploadProperties.Merge(overrideProtocolProperties(action, port.Protocol, boardProperties))
 	uploadProperties.Merge(uploadProperties.SubTree("tools." + uploadToolID))
 	if programmer != nil {
 		uploadProperties.Merge(programmer.Properties)
@@ -615,4 +615,25 @@ func detectSketchNameFromBuildPath(buildPath *paths.Path) (string, error) {
 		return "", errors.New(tr("could not find a valid build artifact"))
 	}
 	return candidateName, nil
+}
+
+// overrideProtocolProperties returns a copy of props overriding action properties with
+// specified protocol properties.
+//
+// For example passing the below properties and "upload" as action and "serial" as protocol:
+//	upload.speed=256
+//	upload.serial.speed=57600
+//	upload.network.speed=19200
+//
+// will return:
+//	upload.speed=57600
+//	upload.serial.speed=57600
+//	upload.network.speed=19200
+func overrideProtocolProperties(action, protocol string, props *properties.Map) *properties.Map {
+	res := props.Clone()
+	subtree := props.SubTree(fmt.Sprintf("%s.%s", action, protocol))
+	for k, v := range subtree.AsMap() {
+		res.Set(fmt.Sprintf("%s.%s", action, k), v)
+	}
+	return res
 }

@@ -311,3 +311,37 @@ tools.arduino_ota.upload.field.some_field=This is a really long label that ideal
 	require.Equal(t, userFields[0].Label, "This is a really long label that ideally must nev…")
 	require.False(t, userFields[0].Secret)
 }
+
+func TestOverrideProtocolProperties(t *testing.T) {
+	props, err := properties.LoadFromBytes([]byte(`
+	upload.speed=256
+	upload.serial.speed=57600
+	upload.network.speed=19200
+	upload.unrelated_property=ok`))
+	require.NoError(t, err)
+
+	res := overrideProtocolProperties("upload", "serial", props)
+	require.Equal(t, res.Get("upload.speed"), "57600")
+	require.Equal(t, res.Get("upload.serial.speed"), "57600")
+	require.Equal(t, res.Get("upload.network.speed"), "19200")
+	require.Equal(t, res.Get("upload.unrelated_property"), "ok")
+
+	res = overrideProtocolProperties("upload", "network", props)
+	require.Equal(t, res.Get("upload.speed"), "19200")
+	require.Equal(t, res.Get("upload.serial.speed"), "57600")
+	require.Equal(t, res.Get("upload.network.speed"), "19200")
+	require.Equal(t, res.Get("upload.unrelated_property"), "ok")
+
+	res = overrideProtocolProperties("upload", "some_other_protocol", props)
+	require.Equal(t, res.Get("upload.speed"), "256")
+	require.Equal(t, res.Get("upload.serial.speed"), "57600")
+	require.Equal(t, res.Get("upload.network.speed"), "19200")
+	require.Equal(t, res.Get("upload.unrelated_property"), "ok")
+
+	res = overrideProtocolProperties("bootloader", "serial", props)
+	require.Equal(t, res.Get("upload.speed"), "256")
+	require.Equal(t, res.Get("upload.serial.speed"), "57600")
+	require.Equal(t, res.Get("upload.network.speed"), "19200")
+	require.Equal(t, res.Get("upload.unrelated_property"), "ok")
+
+}
