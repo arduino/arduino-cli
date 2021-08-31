@@ -1339,6 +1339,9 @@ script can be run on Windows by installing <a href="https://gitforwindows.org/">
 as a parameter like this:</p>
 <div class="highlight"><pre><span></span><code>curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh -s 0.9.0
 </code></pre></div>
+<p>Arduino CLI checks for new releases every 24 hours. If you don't like this behaviour you can disable it by setting the
+<a href="../configuration/#configuration-keys"><code>updater.enable_notification</code> config</a> or the
+<a href="../configuration/#environment-variables">env var <code>ARDUINO_UPDATER_ENABLE_NOTIFICATION</code></a> to <code>false</code>.</p>
 <h3 id="download">Download<a class="headerlink" href="#download" title="Permanent link">&para;</a></h3>
 <p>Pre-built binaries for all the supported platforms are available for download from the links below.</p>
 <p>If you would like to use the <code>arduino-cli</code> command from any location, extract the downloaded file to a directory already
