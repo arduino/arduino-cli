@@ -857,11 +857,11 @@ tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} -p{
 If necessary the same property can be defined multiple times for different protocols:
 
 ```
-leonardo.upload.serial.maximum_size=28672
-leonardo.upload.network.maximum_size=256
+leonardo.upload.serial.speed=57600
+leonardo.upload.network.speed=19200
 ```
 
-The two above properties will be available as **{upload.serial.maximum_size}** and **{upload.network.maximum_size}**.
+The two above properties will be available as **{upload.speed}**, the value will depend on the protocol used to upload.
 
 #### Properties from pluggable discovery
 
