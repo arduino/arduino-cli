@@ -39,6 +39,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/cli/sketch"
 	"github.com/arduino/arduino-cli/cli/update"
+	"github.com/arduino/arduino-cli/cli/updater"
 	"github.com/arduino/arduino-cli/cli/upgrade"
 	"github.com/arduino/arduino-cli/cli/upload"
 	"github.com/arduino/arduino-cli/cli/version"
@@ -50,12 +51,14 @@ import (
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	semver "go.bug.st/relaxed-semver"
 )
 
 var (
-	verbose      bool
-	outputFormat string
-	configFile   string
+	verbose            bool
+	outputFormat       string
+	configFile         string
+	updaterMessageChan chan *semver.Version = make(chan *semver.Version)
 )
 
 // NewCommand creates a new ArduinoCli command root
@@ -64,11 +67,12 @@ func NewCommand() *cobra.Command {
 
 	// ArduinoCli is the root command
 	arduinoCli := &cobra.Command{
-		Use:              "arduino-cli",
-		Short:            tr("Arduino CLI."),
-		Long:             tr("Arduino Command Line Interface (arduino-cli)."),
-		Example:          fmt.Sprintf("  %s <%s> [%s...]", os.Args[0], tr("command"), tr("flags")),
-		PersistentPreRun: preRun,
+		Use:               "arduino-cli",
+		Short:             tr("Arduino CLI."),
+		Long:              tr("Arduino Command Line Interface (arduino-cli)."),
+		Example:           fmt.Sprintf("  %s <%s> [%s...]", os.Args[0], tr("command"), tr("flags")),
+		PersistentPreRun:  preRun,
+		PersistentPostRun: postRun,
 	}
 
 	arduinoCli.SetUsageTemplate(usageTemplate)
@@ -150,6 +154,20 @@ func preRun(cmd *cobra.Command, args []string) {
 	// Set default feedback output to colorable
 	feedback.SetOut(colorable.NewColorableStdout())
 	feedback.SetErr(colorable.NewColorableStderr())
+
+	updaterMessageChan = make(chan *semver.Version)
+	go func() {
+		if cmd.Name() == "version" {
+			// The version command checks by itself if there's a new available version
+			updaterMessageChan <- nil
+		}
+		// Starts checking for updates
+		currentVersion, err := semver.Parse(globals.VersionInfo.VersionString)
+		if err != nil {
+			updaterMessageChan <- nil
+		}
+		updaterMessageChan <- updater.CheckForUpdate(currentVersion)
+	}()
 
 	//
 	// Prepare logging
@@ -234,5 +252,13 @@ func preRun(cmd *cobra.Command, args []string) {
 			feedback.Error(tr("Invalid Call : should show Help, but it is available only in TEXT mode."))
 			os.Exit(errorcodes.ErrBadCall)
 		})
+	}
+}
+
+func postRun(cmd *cobra.Command, args []string) {
+	latestVersion := <-updaterMessageChan
+	if latestVersion != nil {
+		// Notify the user a new version is available
+		updater.NotifyNewVersionIsAvailable(latestVersion.String())
 	}
 }

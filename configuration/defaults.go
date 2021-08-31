@@ -52,6 +52,9 @@ func SetDefaults(settings *viper.Viper) {
 	// output settings
 	settings.SetDefault("output.no_color", false)
 
+	// updater settings
+	settings.SetDefault("updater.enable_notification", true)
+
 	// Bind env vars
 	settings.SetEnvPrefix("ARDUINO")
 	settings.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
