@@ -232,7 +232,7 @@ msgstr "Available"
 msgid "Available Commands:"
 msgstr "Available Commands:"
 
-#: cli/upload/upload.go:61
+#: cli/upload/upload.go:62
 msgid "Binary file to upload."
 msgstr "Binary file to upload."
 
@@ -552,7 +552,7 @@ msgstr "Detects and displays a list of boards connected to the current computer.
 msgid "Directory containing binaries for debug."
 msgstr "Directory containing binaries for debug."
 
-#: cli/upload/upload.go:60
+#: cli/upload/upload.go:61
 msgid "Directory containing binaries to upload."
 msgstr "Directory containing binaries to upload."
 
@@ -573,7 +573,7 @@ msgid "Do not install dependencies."
 msgstr "Do not install dependencies."
 
 #: cli/burnbootloader/burnbootloader.go:58
-#: cli/upload/upload.go:65
+#: cli/upload/upload.go:66
 msgid "Do not perform the actual upload, just log out actions"
 msgstr "Do not perform the actual upload, just log out actions"
 
@@ -725,10 +725,10 @@ msgstr "Error during JSON encoding of the output: %v"
 #: cli/compile/compile.go:202
 #: cli/compile/compile.go:212
 #: cli/compile/compile.go:244
-#: cli/upload/upload.go:96
-#: cli/upload/upload.go:101
-#: cli/upload/upload.go:111
-#: cli/upload/upload.go:134
+#: cli/upload/upload.go:103
+#: cli/upload/upload.go:109
+#: cli/upload/upload.go:125
+#: cli/upload/upload.go:152
 msgid "Error during Upload: %v"
 msgstr "Error during Upload: %v"
 
@@ -1086,7 +1086,7 @@ msgstr "Force skip of post-install scripts (if the CLI is running interactively)
 #: cli/burnbootloader/burnbootloader.go:53
 #: cli/compile/compile.go:85
 #: cli/debug/debug.go:62
-#: cli/upload/upload.go:58
+#: cli/upload/upload.go:59
 msgid "Fully Qualified Board Name, e.g.: arduino:avr:uno"
 msgstr "Fully Qualified Board Name, e.g.: arduino:avr:uno"
 
@@ -1575,12 +1575,12 @@ msgid "Optional, suppresses almost every output."
 msgstr "Optional, suppresses almost every output."
 
 #: cli/compile/compile.go:98
-#: cli/upload/upload.go:63
+#: cli/upload/upload.go:64
 msgid "Optional, turns on verbose mode."
 msgstr "Optional, turns on verbose mode."
 
 #: cli/compile/compile.go:109
-#: cli/upload/upload.go:64
+#: cli/upload/upload.go:65
 msgid "Optional, use the specified programmer to upload."
 msgstr "Optional, use the specified programmer to upload."
 
@@ -1947,7 +1947,7 @@ msgstr "Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} b
 
 #: cli/compile/compile.go:137
 #: cli/sketch/archive.go:66
-#: cli/upload/upload.go:88
+#: cli/upload/upload.go:94
 msgid "Sketches with .pde extension are deprecated, please rename the following files to .ino:"
 msgstr "Sketches with .pde extension are deprecated, please rename the following files to .ino:"
 
@@ -2219,11 +2219,11 @@ msgstr "Upgrades one or all installed platforms to the latest version."
 msgid "Upgrading platform %[1]s with %[2]s"
 msgstr "Upgrading platform %[1]s with %[2]s"
 
-#: cli/upload/upload.go:50
+#: cli/upload/upload.go:51
 msgid "Upload Arduino sketches."
 msgstr "Upload Arduino sketches."
 
-#: cli/upload/upload.go:51
+#: cli/upload/upload.go:52
 msgid "Upload Arduino sketches. This does NOT compile the sketch prior to upload."
 msgstr "Upload Arduino sketches. This does NOT compile the sketch prior to upload."
 
@@ -2252,7 +2252,7 @@ msgid "Upload the bootloader."
 msgstr "Upload the bootloader."
 
 #: cli/compile/compile.go:218
-#: cli/upload/upload.go:117
+#: cli/upload/upload.go:131
 msgid "Uploading to specified board using %s protocol requires the following info:"
 msgstr "Uploading to specified board using %s protocol requires the following info:"
 
@@ -2320,7 +2320,7 @@ msgstr "VERSION_NUMBER"
 
 #: cli/burnbootloader/burnbootloader.go:55
 #: cli/compile/compile.go:102
-#: cli/upload/upload.go:62
+#: cli/upload/upload.go:63
 msgid "Verify uploaded binary after the upload."
 msgstr "Verify uploaded binary after the upload."
 
@@ -2443,7 +2443,7 @@ msgstr "calling %[1]s: %[2]w"
 msgid "can't find latest release of %s"
 msgstr "can't find latest release of %s"
 
-#: arduino/sketch/sketch.go:101
+#: arduino/sketch/sketch.go:105
 msgid "can't find main Sketch file in %s"
 msgstr "can't find main Sketch file in %s"
 
@@ -2535,7 +2535,7 @@ msgstr "creating temp dir for extraction: %s"
 msgid "data section exceeds available space in board"
 msgstr "data section exceeds available space in board"
 
-#: arduino/sketch/sketch.go:207
+#: arduino/sketch/sketch.go:211
 msgid "decoding sketch metadata: %s"
 msgstr "decoding sketch metadata: %s"
 
@@ -2587,7 +2587,7 @@ msgstr "downloading %[1]s tool: %[2]s"
 msgid "empty board identifier"
 msgstr "empty board identifier"
 
-#: arduino/sketch/sketch.go:196
+#: arduino/sketch/sketch.go:200
 msgid "encoding sketch metadata: %s"
 msgstr "encoding sketch metadata: %s"
 
@@ -2607,7 +2607,7 @@ msgstr "error processing response from server"
 msgid "error querying Arduino Cloud Api"
 msgstr "error querying Arduino Cloud Api"
 
-#: cli/upload/upload.go:72
+#: cli/upload/upload.go:73
 msgid "error: %s and %s flags cannot be used together"
 msgstr "error: %s and %s flags cannot be used together"
 
@@ -2710,7 +2710,7 @@ msgstr "getting parent dir of %[1]s: %[2]s"
 msgid "getting tool dependencies for platform %[1]s: %[2]s"
 msgstr "getting tool dependencies for platform %[1]s: %[2]s"
 
-#: arduino/sketch/sketch.go:151
+#: arduino/sketch/sketch.go:155
 msgid "importing sketch metadata: %s"
 msgstr "importing sketch metadata: %s"
 
@@ -2942,7 +2942,7 @@ msgstr "moving extracted archive to destination dir: %s"
 msgid "multiple build artifacts found: '%[1]s' and '%[2]s'"
 msgstr "multiple build artifacts found: '%[1]s' and '%[2]s'"
 
-#: arduino/sketch/sketch.go:73
+#: arduino/sketch/sketch.go:77
 msgid "multiple main sketch files found (%[1]v, %[2]v)"
 msgstr "multiple main sketch files found (%[1]v, %[2]v)"
 
@@ -2970,7 +2970,7 @@ msgstr "no unique root dir in archive, found '%[1]s' and '%[2]s'"
 msgid "no upload port provided"
 msgstr "no upload port provided"
 
-#: arduino/sketch/sketch.go:259
+#: arduino/sketch/sketch.go:263
 msgid "no valid sketch found in %[1]s: missing %[2]s"
 msgstr "no valid sketch found in %[1]s: missing %[2]s"
 
@@ -3095,7 +3095,7 @@ msgstr "reading directory %[1]s: %[2]s"
 msgid "reading file %[1]s: %[2]s"
 msgstr "reading file %[1]s: %[2]s"
 
-#: arduino/sketch/sketch.go:229
+#: arduino/sketch/sketch.go:233
 msgid "reading files: %v"
 msgstr "reading files: %v"
 
@@ -3123,7 +3123,7 @@ msgstr "reading library_index.json: %s"
 msgid "reading package root dir: %s"
 msgstr "reading package root dir: %s"
 
-#: arduino/sketch/sketch.go:188
+#: arduino/sketch/sketch.go:192
 msgid "reading sketch metadata %[1]s: %[2]s"
 msgstr "reading sketch metadata %[1]s: %[2]s"
 
@@ -3184,6 +3184,10 @@ msgstr "searching package root dir: %s"
 #: arduino/serialutils/serialutils.go:43
 msgid "setting DTR to OFF"
 msgstr "setting DTR to OFF"
+
+#: arduino/sketch/sketch.go:62
+msgid "sketch path is not valid"
+msgstr "sketch path is not valid"
 
 #: cli/board/attach.go:35
 #: cli/sketch/archive.go:38
@@ -3339,7 +3343,7 @@ msgstr "unknown package %s"
 msgid "unknown platform %s:%s"
 msgstr "unknown platform %s:%s"
 
-#: arduino/sketch/sketch.go:142
+#: arduino/sketch/sketch.go:146
 msgid "unknown sketch file extension '%s'"
 msgstr "unknown sketch file extension '%s'"
 
@@ -3359,7 +3363,7 @@ msgstr "upgrade everything to the latest version"
 msgid "uploading error: %s"
 msgstr "uploading error: %s"
 
-#: arduino/sketch/sketch.go:212
+#: arduino/sketch/sketch.go:216
 msgid "writing sketch metadata %[1]s: %[2]s"
 msgstr "writing sketch metadata %[1]s: %[2]s"
 

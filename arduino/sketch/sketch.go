@@ -58,6 +58,10 @@ var tr = i18n.Tr
 // New creates an Sketch instance by reading all the files composing a sketch and grouping them
 // by file type.
 func New(path *paths.Path) (*Sketch, error) {
+	if path == nil {
+		return nil, fmt.Errorf(tr("sketch path is not valid"))
+	}
+
 	path = path.Canonical()
 	if !path.IsDir() {
 		path = path.Parent()

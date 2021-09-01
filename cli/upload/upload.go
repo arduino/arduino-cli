@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-paths-helper"
 	"github.com/spf13/cobra"
 )
 
@@ -81,25 +82,38 @@ func run(command *cobra.Command, args []string) {
 	if len(args) > 0 {
 		path = args[0]
 	}
-	sketchPath := arguments.InitSketchPath(path)
+	var sketchPath *paths.Path
+	var sk *sketch.Sketch = nil
+	// If the user explicitly specified a directory that contains binaries to upload
+	// use those, we don't really need a valid Sketch to upload in this case
+	if importDir == "" && importFile == "" {
+		sketchPath = arguments.InitSketchPath(path)
 
-	// .pde files are still supported but deprecated, this warning urges the user to rename them
-	if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 {
-		feedback.Error(tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:"))
-		for _, f := range files {
-			feedback.Error(f)
+		// .pde files are still supported but deprecated, this warning urges the user to rename them
+		if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 {
+			feedback.Error(tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:"))
+			for _, f := range files {
+				feedback.Error(f)
+			}
 		}
-	}
 
-	sk, err := sketch.New(sketchPath)
-	if err != nil {
-		feedback.Errorf(tr("Error during Upload: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		var err error
+		sk, err = sketch.New(sketchPath)
+		if err != nil {
+			feedback.Errorf(tr("Error during Upload: %v"), err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
 	}
 	discoveryPort, err := port.GetPort(instance, sk)
 	if err != nil {
 		feedback.Errorf(tr("Error during Upload: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
+	}
+
+	if fqbn == "" && sk != nil && sk.Metadata != nil {
+		// If the user didn't specify an FQBN and a sketch.json file is present
+		// read it from there.
+		fqbn = sk.Metadata.CPU.Fqbn
 	}
 
 	userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
@@ -118,10 +132,14 @@ func run(command *cobra.Command, args []string) {
 		fields = arguments.AskForUserFields(userFieldRes.UserFields)
 	}
 
+	if sketchPath != nil {
+		path = sketchPath.String()
+	}
+
 	if _, err := upload.Upload(context.Background(), &rpc.UploadRequest{
 		Instance:   instance,
 		Fqbn:       fqbn,
-		SketchPath: sketchPath.String(),
+		SketchPath: path,
 		Port:       discoveryPort.ToRPC(),
 		Verbose:    verbose,
 		Verify:     verify,
