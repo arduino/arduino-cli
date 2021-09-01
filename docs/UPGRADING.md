@@ -4,6 +4,62 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.19.0
 
+### `board list` command JSON output change
+
+The `board list` command JSON output has been changed quite a bit, from:
+
+```
+$ arduino-cli board list --format json
+[
+  {
+    "address": "/dev/ttyACM1",
+    "protocol": "serial",
+    "protocol_label": "Serial Port (USB)",
+    "boards": [
+      {
+        "name": "Arduino Uno",
+        "fqbn": "arduino:avr:uno",
+        "vid": "0x2341",
+        "pid": "0x0043"
+      }
+    ],
+    "serial_number": "954323132383515092E1"
+  }
+]
+```
+
+to:
+
+```
+$ arduino-cli board list --format json
+[
+  {
+    "matching_boards": [
+      {
+        "name": "Arduino Uno",
+        "fqbn": "arduino:avr:uno"
+      }
+    ],
+    "port": {
+      "address": "/dev/ttyACM1",
+      "label": "/dev/ttyACM1",
+      "protocol": "serial",
+      "protocol_label": "Serial Port (USB)",
+      "properties": {
+        "pid": "0x0043",
+        "serialNumber": "954323132383515092E1",
+        "vid": "0x2341"
+      }
+    }
+  }
+]
+```
+
+The `boards` array has been renamed `matching_boards`, each contained object will now contain only `name` and `fqbn`.
+Properties that can be used to identify a board are now moved to the new `properties` object, it can contain any key
+name. `pid` and `vid` have been moved to `properties`, `serial_number` has been renamed `serialNumber` and moved to
+`properties`. The new `label` field is the name of the `port` if it should be displayed in a GUI.
+
 ### gRPC interface `DebugConfigRequest`, `UploadRequest`, `UploadUsingProgrammerRequest`, `BurnBootloaderRequest`, `DetectedPort` field changes
 
 `DebugConfigRequest`, `UploadRequest`, `UploadUsingProgrammerRequest` and `BurnBootloaderRequest` had their `port` field

@@ -683,6 +683,39 @@ func (pm *PackageManager) LoadDiscoveries() []*status.Status {
 	for _, platform := range pm.InstalledPlatformReleases() {
 		statuses = append(statuses, pm.loadDiscoveries(platform)...)
 	}
+	if st := pm.loadBuiltinDiscoveries(); len(st) > 0 {
+		statuses = append(statuses, st...)
+	}
+	return statuses
+}
+
+// loadDiscovery loads the discovery tool with id, if it cannot be found a non-nil status is returned
+func (pm *PackageManager) loadDiscovery(id string) *status.Status {
+	tool := pm.GetTool(id)
+	if tool == nil {
+		return status.Newf(codes.FailedPrecondition, tr("discovery not found: %s"), id)
+	}
+	toolRelease := tool.GetLatestInstalled()
+	if toolRelease == nil {
+		return status.Newf(codes.FailedPrecondition, tr("discovery not installed: %s"), id)
+	}
+	discoveryPath := toolRelease.InstallDir.Join(tool.Name).String()
+	d, err := discovery.New(id, discoveryPath)
+	if err != nil {
+		return status.Newf(codes.FailedPrecondition, tr("creating discovery: %s"), err)
+	}
+	pm.discoveryManager.Add(d)
+	return nil
+}
+
+// loadBuiltinDiscoveries loads the discovery tools that are part of the builtin package
+func (pm *PackageManager) loadBuiltinDiscoveries() []*status.Status {
+	statuses := []*status.Status{}
+	for _, id := range []string{"builtin:serial-discovery", "builtin:mdns-discovery"} {
+		if st := pm.loadDiscovery(id); st != nil {
+			statuses = append(statuses, st)
+		}
+	}
 	return statuses
 }
 
@@ -705,23 +738,9 @@ func (pm *PackageManager) loadDiscoveries(release *cores.PlatformRelease) []*sta
 	//
 	// If both indexed and unindexed properties are found the unindexed are ignored
 	for _, id := range discoveryProperties.ExtractSubIndexLists("required") {
-		tool := pm.GetTool(id)
-		if tool == nil {
-			statuses = append(statuses, status.Newf(codes.FailedPrecondition, tr("discovery not found: %s"), id))
-			continue
+		if st := pm.loadDiscovery(id); st != nil {
+			statuses = append(statuses, st)
 		}
-		toolRelease := tool.GetLatestInstalled()
-		if toolRelease == nil {
-			statuses = append(statuses, status.Newf(codes.FailedPrecondition, tr("discovery not installed: %s"), id))
-			continue
-		}
-		discoveryPath := toolRelease.InstallDir.Join(tool.Name).String()
-		d, err := discovery.New(id, discoveryPath)
-		if err != nil {
-			statuses = append(statuses, status.Newf(codes.FailedPrecondition, tr("creating discovery: %s"), err))
-			continue
-		}
-		pm.discoveryManager.Add(d)
 	}
 
 	discoveryIDs := discoveryProperties.FirstLevelOf()

@@ -141,7 +141,9 @@ func TestLoadDiscoveries(t *testing.T) {
 	})
 
 	errs := packageManager.LoadDiscoveries()
-	require.Len(t, errs, 0)
+	require.Len(t, errs, 2)
+	require.Equal(t, errs[0].Message(), "discovery not found: builtin:serial-discovery")
+	require.Equal(t, errs[1].Message(), "discovery not found: builtin:mdns-discovery")
 	discoveries := packageManager.DiscoveryManager().IDs()
 	require.Len(t, discoveries, 1)
 	require.Contains(t, discoveries, "arduino:ble-discovery")
@@ -154,7 +156,9 @@ func TestLoadDiscoveries(t *testing.T) {
 	})
 
 	errs = packageManager.LoadDiscoveries()
-	require.Len(t, errs, 0)
+	require.Len(t, errs, 2)
+	require.Equal(t, errs[0].Message(), "discovery not found: builtin:serial-discovery")
+	require.Equal(t, errs[1].Message(), "discovery not found: builtin:mdns-discovery")
 	discoveries = packageManager.DiscoveryManager().IDs()
 	require.Len(t, discoveries, 2)
 	require.Contains(t, discoveries, "arduino:ble-discovery")
@@ -169,7 +173,9 @@ func TestLoadDiscoveries(t *testing.T) {
 	})
 
 	errs = packageManager.LoadDiscoveries()
-	require.Len(t, errs, 0)
+	require.Len(t, errs, 2)
+	require.Equal(t, errs[0].Message(), "discovery not found: builtin:serial-discovery")
+	require.Equal(t, errs[1].Message(), "discovery not found: builtin:mdns-discovery")
 	discoveries = packageManager.DiscoveryManager().IDs()
 	require.Len(t, discoveries, 3)
 	require.Contains(t, discoveries, "arduino:ble-discovery")
@@ -186,7 +192,9 @@ func TestLoadDiscoveries(t *testing.T) {
 	})
 
 	errs = packageManager.LoadDiscoveries()
-	require.Len(t, errs, 0)
+	require.Len(t, errs, 2)
+	require.Equal(t, errs[0].Message(), "discovery not found: builtin:serial-discovery")
+	require.Equal(t, errs[1].Message(), "discovery not found: builtin:mdns-discovery")
 	discoveries = packageManager.DiscoveryManager().IDs()
 	require.Len(t, discoveries, 3)
 	require.Contains(t, discoveries, "arduino:ble-discovery")
