@@ -210,10 +210,10 @@ def test_core_install_without_updateindex(run_command):
 )
 def test_core_install_esp32(run_command, data_dir):
     # update index
-    url = "https://dl.espressif.com/dl/package_esp32_index.json"
+    url = "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
     assert run_command(f"core update-index --additional-urls={url}")
     # install 3rd-party core
-    assert run_command(f"core install esp32:esp32@1.0.4 --additional-urls={url}")
+    assert run_command(f"core install esp32:esp32@2.0.0 --additional-urls={url}")
     # create a sketch and compile to double check the core was successfully installed
     sketch_name = "test_core_install_esp32"
     sketch_path = os.path.join(data_dir, sketch_name)

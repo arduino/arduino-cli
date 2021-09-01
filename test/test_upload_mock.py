@@ -29,7 +29,7 @@ def generate_build_dir(sketch_path):
 
 indexes = [
     "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json",
-    "https://dl.espressif.com/dl/package_esp32_index.json",
+    "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json",
     "http://arduino.esp8266.com/stable/package_esp8266com_index.json",
     "https://github.com/sonydevworld/spresense-arduino-compatible/releases/download/generic/package_spresense_index.json",
 ]
