@@ -2447,7 +2447,7 @@ msgstr "can't find latest release of %s"
 msgid "can't find main Sketch file in %s"
 msgstr "can't find main Sketch file in %s"
 
-#: arduino/cores/packagemanager/loader.go:749
+#: arduino/cores/packagemanager/loader.go:768
 msgid "can't find pattern for discovery with id %s"
 msgstr "can't find pattern for discovery with id %s"
 
@@ -2518,7 +2518,7 @@ msgstr "computing hash: %s"
 msgid "could not find a valid build artifact"
 msgstr "could not find a valid build artifact"
 
-#: arduino/cores/packagemanager/loader.go:721
+#: arduino/cores/packagemanager/loader.go:705
 msgid "creating discovery: %s"
 msgstr "creating discovery: %s"
 
@@ -2555,11 +2555,11 @@ msgstr "destination dir %s already exists, cannot install"
 msgid "discovery %[1]s process not started: %[2]w"
 msgstr "discovery %[1]s process not started: %[2]w"
 
-#: arduino/cores/packagemanager/loader.go:710
+#: arduino/cores/packagemanager/loader.go:696
 msgid "discovery not found: %s"
 msgstr "discovery not found: %s"
 
-#: arduino/cores/packagemanager/loader.go:715
+#: arduino/cores/packagemanager/loader.go:700
 msgid "discovery not installed: %s"
 msgstr "discovery not installed: %s"
 
