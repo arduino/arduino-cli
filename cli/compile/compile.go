@@ -82,6 +82,7 @@ func NewCommand() *cobra.Command {
 	}
 
 	command.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
+	command.MarkFlagRequired("fqbn")
 	command.Flags().BoolVar(&showProperties, "show-properties", false, tr("Show all build properties used instead of compiling."))
 	command.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
 	command.Flags().StringVar(&buildCachePath, "build-cache-path", "", tr("Builds of 'core.a' are saved into this path to be cached and reused."))
