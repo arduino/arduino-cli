@@ -278,6 +278,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#board-list-command-json-output-change" class="md-nav__link">
+    board list command JSON output change
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#grpc-interface-debugconfigrequest-uploadrequest-uploadusingprogrammerrequest-burnbootloaderrequest-detectedport-field-changes" class="md-nav__link">
     gRPC interface DebugConfigRequest, UploadRequest, UploadUsingProgrammerRequest, BurnBootloaderRequest, DetectedPort field changes
   </a>
@@ -1395,6 +1402,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#board-list-command-json-output-change" class="md-nav__link">
+    board list command JSON output change
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#grpc-interface-debugconfigrequest-uploadrequest-uploadusingprogrammerrequest-burnbootloaderrequest-detectedport-field-changes" class="md-nav__link">
     gRPC interface DebugConfigRequest, UploadRequest, UploadUsingProgrammerRequest, BurnBootloaderRequest, DetectedPort field changes
   </a>
@@ -1638,6 +1652,54 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0190">0.19.0<a class="headerlink" href="#0190" title="Permanent link">&para;</a></h2>
+<h3 id="board-list-command-json-output-change"><code>board list</code> command JSON output change<a class="headerlink" href="#board-list-command-json-output-change" title="Permanent link">&para;</a></h3>
+<p>The <code>board list</code> command JSON output has been changed quite a bit, from:</p>
+<div class="highlight"><pre><span></span><code>$ arduino-cli board list --format json
+[
+  {
+    &quot;address&quot;: &quot;/dev/ttyACM1&quot;,
+    &quot;protocol&quot;: &quot;serial&quot;,
+    &quot;protocol_label&quot;: &quot;Serial Port (USB)&quot;,
+    &quot;boards&quot;: [
+      {
+        &quot;name&quot;: &quot;Arduino Uno&quot;,
+        &quot;fqbn&quot;: &quot;arduino:avr:uno&quot;,
+        &quot;vid&quot;: &quot;0x2341&quot;,
+        &quot;pid&quot;: &quot;0x0043&quot;
+      }
+    ],
+    &quot;serial_number&quot;: &quot;954323132383515092E1&quot;
+  }
+]
+</code></pre></div>
+<p>to:</p>
+<div class="highlight"><pre><span></span><code>$ arduino-cli board list --format json
+[
+  {
+    &quot;matching_boards&quot;: [
+      {
+        &quot;name&quot;: &quot;Arduino Uno&quot;,
+        &quot;fqbn&quot;: &quot;arduino:avr:uno&quot;
+      }
+    ],
+    &quot;port&quot;: {
+      &quot;address&quot;: &quot;/dev/ttyACM1&quot;,
+      &quot;label&quot;: &quot;/dev/ttyACM1&quot;,
+      &quot;protocol&quot;: &quot;serial&quot;,
+      &quot;protocol_label&quot;: &quot;Serial Port (USB)&quot;,
+      &quot;properties&quot;: {
+        &quot;pid&quot;: &quot;0x0043&quot;,
+        &quot;serialNumber&quot;: &quot;954323132383515092E1&quot;,
+        &quot;vid&quot;: &quot;0x2341&quot;
+      }
+    }
+  }
+]
+</code></pre></div>
+<p>The <code>boards</code> array has been renamed <code>matching_boards</code>, each contained object will now contain only <code>name</code> and <code>fqbn</code>.
+Properties that can be used to identify a board are now moved to the new <code>properties</code> object, it can contain any key
+name. <code>pid</code> and <code>vid</code> have been moved to <code>properties</code>, <code>serial_number</code> has been renamed <code>serialNumber</code> and moved to
+<code>properties</code>. The new <code>label</code> field is the name of the <code>port</code> if it should be displayed in a GUI.</p>
 <h3 id="grpc-interface-debugconfigrequest-uploadrequest-uploadusingprogrammerrequest-burnbootloaderrequest-detectedport-field-changes">gRPC interface <code>DebugConfigRequest</code>, <code>UploadRequest</code>, <code>UploadUsingProgrammerRequest</code>, <code>BurnBootloaderRequest</code>, <code>DetectedPort</code> field changes<a class="headerlink" href="#grpc-interface-debugconfigrequest-uploadrequest-uploadusingprogrammerrequest-burnbootloaderrequest-detectedport-field-changes" title="Permanent link">&para;</a></h3>
 <p><code>DebugConfigRequest</code>, <code>UploadRequest</code>, <code>UploadUsingProgrammerRequest</code> and <code>BurnBootloaderRequest</code> had their <code>port</code> field
 change from type <code>string</code> to <code>Port</code>.</p>
