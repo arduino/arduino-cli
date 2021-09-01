@@ -1066,7 +1066,7 @@ def test_compile_with_esp32_bundled_libraries(run_command, data_dir, copy_sketch
     assert run_command("update")
 
     # Update index with esp32 core and install it
-    url = "https://dl.espressif.com/dl/package_esp32_index.json"
+    url = "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
     core_version = "1.0.6"
     assert run_command(f"core update-index --additional-urls={url}")
     assert run_command(f"core install esp32:esp32@{core_version} --additional-urls={url}")
