@@ -726,9 +726,9 @@ msgstr "Error during JSON encoding of the output: %v"
 #: cli/compile/compile.go:212
 #: cli/compile/compile.go:244
 #: cli/upload/upload.go:96
-#: cli/upload/upload.go:101
-#: cli/upload/upload.go:111
-#: cli/upload/upload.go:134
+#: cli/upload/upload.go:102
+#: cli/upload/upload.go:118
+#: cli/upload/upload.go:145
 msgid "Error during Upload: %v"
 msgstr "Error during Upload: %v"
 
@@ -2252,7 +2252,7 @@ msgid "Upload the bootloader."
 msgstr "Upload the bootloader."
 
 #: cli/compile/compile.go:218
-#: cli/upload/upload.go:117
+#: cli/upload/upload.go:124
 msgid "Uploading to specified board using %s protocol requires the following info:"
 msgstr "Uploading to specified board using %s protocol requires the following info:"
 
@@ -2443,7 +2443,7 @@ msgstr "calling %[1]s: %[2]w"
 msgid "can't find latest release of %s"
 msgstr "can't find latest release of %s"
 
-#: arduino/sketch/sketch.go:101
+#: arduino/sketch/sketch.go:105
 msgid "can't find main Sketch file in %s"
 msgstr "can't find main Sketch file in %s"
 
@@ -2535,7 +2535,7 @@ msgstr "creating temp dir for extraction: %s"
 msgid "data section exceeds available space in board"
 msgstr "data section exceeds available space in board"
 
-#: arduino/sketch/sketch.go:207
+#: arduino/sketch/sketch.go:211
 msgid "decoding sketch metadata: %s"
 msgstr "decoding sketch metadata: %s"
 
@@ -2587,7 +2587,7 @@ msgstr "downloading %[1]s tool: %[2]s"
 msgid "empty board identifier"
 msgstr "empty board identifier"
 
-#: arduino/sketch/sketch.go:196
+#: arduino/sketch/sketch.go:200
 msgid "encoding sketch metadata: %s"
 msgstr "encoding sketch metadata: %s"
 
@@ -2710,7 +2710,7 @@ msgstr "getting parent dir of %[1]s: %[2]s"
 msgid "getting tool dependencies for platform %[1]s: %[2]s"
 msgstr "getting tool dependencies for platform %[1]s: %[2]s"
 
-#: arduino/sketch/sketch.go:151
+#: arduino/sketch/sketch.go:155
 msgid "importing sketch metadata: %s"
 msgstr "importing sketch metadata: %s"
 
@@ -2942,7 +2942,7 @@ msgstr "moving extracted archive to destination dir: %s"
 msgid "multiple build artifacts found: '%[1]s' and '%[2]s'"
 msgstr "multiple build artifacts found: '%[1]s' and '%[2]s'"
 
-#: arduino/sketch/sketch.go:73
+#: arduino/sketch/sketch.go:77
 msgid "multiple main sketch files found (%[1]v, %[2]v)"
 msgstr "multiple main sketch files found (%[1]v, %[2]v)"
 
@@ -2970,7 +2970,7 @@ msgstr "no unique root dir in archive, found '%[1]s' and '%[2]s'"
 msgid "no upload port provided"
 msgstr "no upload port provided"
 
-#: arduino/sketch/sketch.go:259
+#: arduino/sketch/sketch.go:263
 msgid "no valid sketch found in %[1]s: missing %[2]s"
 msgstr "no valid sketch found in %[1]s: missing %[2]s"
 
@@ -3095,7 +3095,7 @@ msgstr "reading directory %[1]s: %[2]s"
 msgid "reading file %[1]s: %[2]s"
 msgstr "reading file %[1]s: %[2]s"
 
-#: arduino/sketch/sketch.go:229
+#: arduino/sketch/sketch.go:233
 msgid "reading files: %v"
 msgstr "reading files: %v"
 
@@ -3123,7 +3123,7 @@ msgstr "reading library_index.json: %s"
 msgid "reading package root dir: %s"
 msgstr "reading package root dir: %s"
 
-#: arduino/sketch/sketch.go:188
+#: arduino/sketch/sketch.go:192
 msgid "reading sketch metadata %[1]s: %[2]s"
 msgstr "reading sketch metadata %[1]s: %[2]s"
 
@@ -3184,6 +3184,10 @@ msgstr "searching package root dir: %s"
 #: arduino/serialutils/serialutils.go:43
 msgid "setting DTR to OFF"
 msgstr "setting DTR to OFF"
+
+#: arduino/sketch/sketch.go:62
+msgid "sketch path is not valid"
+msgstr "sketch path is not valid"
 
 #: cli/board/attach.go:35
 #: cli/sketch/archive.go:38
@@ -3339,7 +3343,7 @@ msgstr "unknown package %s"
 msgid "unknown platform %s:%s"
 msgstr "unknown platform %s:%s"
 
-#: arduino/sketch/sketch.go:142
+#: arduino/sketch/sketch.go:146
 msgid "unknown sketch file extension '%s'"
 msgstr "unknown sketch file extension '%s'"
 
@@ -3359,7 +3363,7 @@ msgstr "upgrade everything to the latest version"
 msgid "uploading error: %s"
 msgstr "uploading error: %s"
 
-#: arduino/sketch/sketch.go:212
+#: arduino/sketch/sketch.go:216
 msgid "writing sketch metadata %[1]s: %[2]s"
 msgstr "writing sketch metadata %[1]s: %[2]s"
 
