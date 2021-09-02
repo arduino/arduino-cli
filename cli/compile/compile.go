@@ -31,6 +31,7 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/upload"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -83,6 +84,9 @@ func NewCommand() *cobra.Command {
 
 	command.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
 	command.MarkFlagRequired("fqbn")
+	command.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return getBoards(toComplete), cobra.ShellCompDirectiveDefault
+	})
 	command.Flags().BoolVar(&showProperties, "show-properties", false, tr("Show all build properties used instead of compiling."))
 	command.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
 	command.Flags().StringVar(&buildCachePath, "build-cache-path", "", tr("Builds of 'core.a' are saved into this path to be cached and reused."))
@@ -272,4 +276,20 @@ func (r *compileResult) Data() interface{} {
 func (r *compileResult) String() string {
 	// The output is already printed via os.Stdout/os.Stdin
 	return ""
+}
+
+func getBoards(toComplete string) []string {
+	// from listall.go TODO optimize
+	inst := instance.CreateAndInit()
+
+	list, _ := board.ListAll(context.Background(), &rpc.BoardListAllRequest{
+		Instance:            inst,
+		SearchArgs:          nil,
+		IncludeHiddenBoards: false,
+	})
+	var res []string
+	for _, i := range list.GetBoards() {
+		res = append(res, i.Fqbn)
+	}
+	return res
 }
