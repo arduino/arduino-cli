@@ -71,7 +71,7 @@ def test_upload_with_input_dir_flag(run_command, data_dir, detected_boards):
         assert run_command(f"compile -b {fqbn} {sketch_path} --output-dir {output_dir}")
 
         # Upload with --input-dir flag
-        assert run_command(f"upload -b {fqbn} -p {address} --input-dir {output_dir} {sketch_path}")
+        assert run_command(f"upload -b {fqbn} -p {address} --input-dir {output_dir}")
 
 
 def test_upload_with_input_file_flag(run_command, data_dir, detected_boards):
@@ -320,7 +320,7 @@ def test_upload_with_input_dir_containing_multiple_binaries(run_command, data_di
         assert res.failed
         assert (
             "Error during Upload: "
-            + "retrieving build artifacts: "
+            + "Error finding build artifacts: "
             + "autodetect build artifact: "
             + "multiple build artifacts found:"
             in res.stderr
@@ -358,7 +358,7 @@ def test_compile_and_upload_combo_sketch_with_mismatched_casing(run_command, dat
         # Try to compile
         res = run_command(f"compile --clean -b {board.fqbn} -u -p {board.address} {sketch_path}")
         assert res.failed
-        assert "Error during build: opening sketch: no valid sketch found" in res.stderr
+        assert "Error during build: Can't open sketch: no valid sketch found in" in res.stderr
 
 
 def test_upload_sketch_with_mismatched_casing(run_command, data_dir, detected_boards, wait_for_board):
@@ -381,4 +381,4 @@ def test_upload_sketch_with_mismatched_casing(run_command, data_dir, detected_bo
         # searching for binaries since the sketch is not valid
         res = run_command(f"upload -b {board.fqbn} -p {board.address} {sketch_path}")
         assert res.failed
-        assert "Error during Upload: opening sketch: no valid sketch found" in res.stderr
+        assert "Error during Upload: no valid sketch found in" in res.stderr

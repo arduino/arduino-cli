@@ -84,7 +84,7 @@ func run(command *cobra.Command, args []string) {
 	sketchPath := arguments.InitSketchPath(path)
 
 	// .pde files are still supported but deprecated, this warning urges the user to rename them
-	if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 {
+	if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 && importDir == "" && importFile == "" {
 		feedback.Error(tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:"))
 		for _, f := range files {
 			feedback.Error(f)
@@ -92,14 +92,21 @@ func run(command *cobra.Command, args []string) {
 	}
 
 	sk, err := sketch.New(sketchPath)
-	if err != nil {
+	if err != nil && importDir == "" && importFile == "" {
 		feedback.Errorf(tr("Error during Upload: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
+
 	discoveryPort, err := port.GetPort(instance, sk)
 	if err != nil {
 		feedback.Errorf(tr("Error during Upload: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
+	}
+
+	if fqbn == "" && sk != nil && sk.Metadata != nil {
+		// If the user didn't specify an FQBN and a sketch.json file is present
+		// read it from there.
+		fqbn = sk.Metadata.CPU.Fqbn
 	}
 
 	userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
@@ -118,10 +125,14 @@ func run(command *cobra.Command, args []string) {
 		fields = arguments.AskForUserFields(userFieldRes.UserFields)
 	}
 
+	if sketchPath != nil {
+		path = sketchPath.String()
+	}
+
 	if _, err := upload.Upload(context.Background(), &rpc.UploadRequest{
 		Instance:   instance,
 		Fqbn:       fqbn,
-		SketchPath: sketchPath.String(),
+		SketchPath: path,
 		Port:       discoveryPort.ToRPC(),
 		Verbose:    verbose,
 		Verify:     verify,
