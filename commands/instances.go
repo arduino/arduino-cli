@@ -17,6 +17,7 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/url"
@@ -703,7 +704,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 			// Installs downloaded library
 			taskCB(&rpc.TaskProgress{Name: tr("Installing %s", available)})
 			libPath, libReplaced, err := lm.InstallPrerequisiteCheck(available)
-			if err == librariesmanager.ErrAlreadyInstalled {
+			if errors.Is(err, librariesmanager.ErrAlreadyInstalled) {
 				taskCB(&rpc.TaskProgress{Message: tr("Already installed %s", available), Completed: true})
 				continue
 			} else if err != nil {

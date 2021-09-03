@@ -31,16 +31,16 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 )
 
-type AlreadyInstalledError struct{}
+type alreadyInstalledError struct{}
 
-func (e *AlreadyInstalledError) Error() string {
+func (e *alreadyInstalledError) Error() string {
 	return tr("library already installed")
 }
 
 var (
 	// ErrAlreadyInstalled is returned when a library is already installed and task
 	// cannot proceed.
-	ErrAlreadyInstalled = &AlreadyInstalledError{}
+	ErrAlreadyInstalled = &alreadyInstalledError{}
 )
 
 // InstallPrerequisiteCheck performs prequisite checks to install a library. It returns the
