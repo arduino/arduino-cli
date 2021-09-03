@@ -83,7 +83,6 @@ func NewCommand() *cobra.Command {
 	}
 
 	command.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
-	command.MarkFlagRequired("fqbn")
 	command.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return getBoards(toComplete), cobra.ShellCompDirectiveDefault
 	})
