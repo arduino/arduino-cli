@@ -15,14 +15,17 @@
 
 package i18n
 
+var initialized = false
+
 // Init initializes the i18n module, setting the locale according to this order of preference:
 // 1. Locale specified via the function call
 // 2. OS Locale
 // 3. en (default)
 func Init(configLocale ...string) {
+	defer func() { initialized = true }()
+
 	initRiceBox()
 	locales := supportedLocales()
-
 	if len(configLocale) > 1 {
 		panic("Multiple arguments not supported")
 	}
@@ -47,5 +50,8 @@ func Init(configLocale ...string) {
 // Tr returns msg translated to the selected locale
 // the msg argument must be a literal string
 func Tr(msg string, args ...interface{}) string {
+	if !initialized {
+		panic("i18n.Tr called before i18n.Init()")
+	}
 	return po.Get(msg, args...)
 }

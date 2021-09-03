@@ -17,7 +17,6 @@ package librariesmanager
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -32,10 +31,16 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 )
 
+type AlreadyInstalledError struct{}
+
+func (e *AlreadyInstalledError) Error() string {
+	return tr("library already installed")
+}
+
 var (
 	// ErrAlreadyInstalled is returned when a library is already installed and task
 	// cannot proceed.
-	ErrAlreadyInstalled = errors.New(tr("library already installed"))
+	ErrAlreadyInstalled = &AlreadyInstalledError{}
 )
 
 // InstallPrerequisiteCheck performs prequisite checks to install a library. It returns the

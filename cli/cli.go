@@ -75,7 +75,7 @@ func NewCommand() *cobra.Command {
 		PersistentPostRun: postRun,
 	}
 
-	arduinoCli.SetUsageTemplate(usageTemplate)
+	arduinoCli.SetUsageTemplate(getUsageTemplate())
 
 	createCliCommandTree(arduinoCli)
 

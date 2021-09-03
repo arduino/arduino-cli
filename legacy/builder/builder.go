@@ -203,7 +203,7 @@ func runCommands(ctx *types.Context, commands []types.Command) error {
 
 func PrintRingNameIfDebug(ctx *types.Context, command types.Command) {
 	if ctx.DebugLevel >= 10 {
-		ctx.GetLogger().Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_RUNNING_COMMAND, strconv.FormatInt(time.Now().Unix(), 10), reflect.Indirect(reflect.ValueOf(command)).Type().Name())
+		ctx.GetLogger().Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Ts: {0} - Running: {1}", strconv.FormatInt(time.Now().Unix(), 10), reflect.Indirect(reflect.ValueOf(command)).Type().Name())
 	}
 }
 

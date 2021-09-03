@@ -1,14 +1,6 @@
 msgid ""
 msgstr ""
 
-#: legacy/builder/constants/constants.go:105
-msgid " Not used: {0}"
-msgstr " Not used: {0}"
-
-#: legacy/builder/constants/constants.go:106
-msgid " Used: {0}"
-msgstr " Used: {0}"
-
 #: version/version.go:53
 msgid "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
 msgstr "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
@@ -17,7 +9,7 @@ msgstr "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
 msgid "%[1]s and %[2]s cannot be used together"
 msgstr "%[1]s and %[2]s cannot be used together"
 
-#: legacy/builder/constants/constants.go:90
+#: legacy/builder/fail_if_imported_library_is_wrong.go:37
 msgid "%[1]s folder is no longer supported! See %[2]s for more information"
 msgstr "%[1]s folder is no longer supported! See %[2]s for more information"
 
@@ -87,13 +79,9 @@ msgstr "'%s' has an invalid signature"
 msgid "(hidden)"
 msgstr "(hidden)"
 
-#: legacy/builder/constants/constants.go:103
+#: legacy/builder/print_used_libraries_if_verbose.go:38
 msgid "(legacy)"
 msgstr "(legacy)"
-
-#: legacy/builder/constants/constants.go:96
-msgid ", rebuilding all"
-msgstr ", rebuilding all"
 
 #: cli/lib/install.go:71
 msgid "--git-url and --zip-path are disabled by default, for more information see: %v"
@@ -122,7 +110,7 @@ msgstr "ARCH"
 msgid "ARDUINO COMMAND LINE MANUAL"
 msgstr "ARDUINO COMMAND LINE MANUAL"
 
-#: cli/usage.go:31
+#: cli/usage.go:32
 msgid "Additional help topics:"
 msgstr "Additional help topics:"
 
@@ -131,7 +119,7 @@ msgstr "Additional help topics:"
 msgid "Adds one or more values to a setting."
 msgstr "Adds one or more values to a setting."
 
-#: cli/usage.go:26
+#: cli/usage.go:27
 msgid "Aliases:"
 msgstr "Aliases:"
 
@@ -156,7 +144,7 @@ msgstr "Architecture: %s"
 msgid "Archive already exists"
 msgstr "Archive already exists"
 
-#: legacy/builder/constants/constants.go:91
+#: legacy/builder/phases/core_builder.go:128
 msgid "Archiving built core (caching) in: {0}"
 msgstr "Archiving built core (caching) in: {0}"
 
@@ -220,7 +208,7 @@ msgstr "Author: %s"
 msgid "Available"
 msgstr "Available"
 
-#: cli/usage.go:28
+#: cli/usage.go:29
 msgid "Available Commands:"
 msgstr "Available Commands:"
 
@@ -247,17 +235,9 @@ msgstr "Board name:"
 msgid "Board version:"
 msgstr "Board version:"
 
-#: legacy/builder/constants/constants.go:94
-msgid "Board {0} (platform {1}, package {2}) is unknown"
-msgstr "Board {0} (platform {1}, package {2}) is unknown"
-
-#: legacy/builder/constants/constants.go:95
+#: legacy/builder/merge_sketch_with_bootloader.go:69
 msgid "Bootloader file specified but missing: {0}"
 msgstr "Bootloader file specified but missing: {0}"
-
-#: legacy/builder/constants/constants.go:97
-msgid "Build options changed"
-msgstr "Build options changed"
 
 #: cli/compile/compile.go:87
 msgid "Builds of 'core.a' are saved into this path to be cached and reused."
@@ -468,7 +448,7 @@ msgstr "Could not create sketch directory: %v"
 msgid "Couldn't deeply cache core build: {0}"
 msgstr "Couldn't deeply cache core build: {0}"
 
-#: legacy/builder/constants/constants.go:125
+#: legacy/builder/phases/sizer.go:81
 msgid "Couldn't determine program size"
 msgstr "Couldn't determine program size"
 
@@ -618,7 +598,7 @@ msgstr "Enter git url for libraries hosted on repositories"
 msgid "Error adding file to sketch archive"
 msgstr "Error adding file to sketch archive"
 
-#: legacy/builder/constants/constants.go:92
+#: legacy/builder/phases/core_builder.go:136
 msgid "Error archiving built core (caching) in {0}: {1}"
 msgstr "Error archiving built core (caching) in {0}: {1}"
 
@@ -769,11 +749,11 @@ msgstr "Error getting absolute path of sketch archive"
 msgid "Error getting board details: %v"
 msgstr "Error getting board details: %v"
 
-#: commands/board/list.go:140
+#: commands/board/list.go:146
 msgid "Error getting board info from Arduino Cloud"
 msgstr "Error getting board info from Arduino Cloud"
 
-#: commands/board/list.go:205
+#: commands/board/list.go:211
 msgid "Error getting board list"
 msgstr "Error getting board list"
 
@@ -898,9 +878,9 @@ msgstr "Error searching for platforms: %v"
 msgid "Error serializing compilation database: %s"
 msgstr "Error serializing compilation database: %s"
 
-#: commands/board/list.go:190
-#: commands/board/list.go:193
-#: commands/board/list.go:234
+#: commands/board/list.go:196
+#: commands/board/list.go:199
+#: commands/board/list.go:240
 msgid "Error starting board discoveries"
 msgstr "Error starting board discoveries"
 
@@ -956,12 +936,12 @@ msgstr "Error upgrading: %v"
 msgid "Error verifying signature"
 msgstr "Error verifying signature"
 
-#: legacy/builder/constants/constants.go:102
+#: legacy/builder/container_find_includes.go:354
 msgid "Error while detecting libraries included by {0}"
 msgstr "Error while detecting libraries included by {0}"
 
-#: legacy/builder/phases/sizer.go:135
-#: legacy/builder/phases/sizer.go:141
+#: legacy/builder/phases/sizer.go:147
+#: legacy/builder/phases/sizer.go:153
 msgid "Error while determining sketch size: %s"
 msgstr "Error while determining sketch size: %s"
 
@@ -993,7 +973,7 @@ msgstr "Event"
 msgid "Examples for library %s"
 msgstr "Examples for library %s"
 
-#: cli/usage.go:27
+#: cli/usage.go:28
 msgid "Examples:"
 msgstr "Examples:"
 
@@ -1071,7 +1051,7 @@ msgstr "File:"
 msgid "First message must contain debug request, not data"
 msgstr "First message must contain debug request, not data"
 
-#: cli/usage.go:29
+#: cli/usage.go:30
 msgid "Flags:"
 msgstr "Flags:"
 
@@ -1120,15 +1100,15 @@ msgstr "Generates completion scripts for various shells"
 msgid "Generating function prototypes..."
 msgstr "Generating function prototypes..."
 
-#: cli/usage.go:30
+#: cli/usage.go:31
 msgid "Global Flags:"
 msgstr "Global Flags:"
 
-#: legacy/builder/constants/constants.go:120
+#: legacy/builder/phases/sizer.go:93
 msgid "Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes for local variables. Maximum is {1} bytes."
 msgstr "Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes for local variables. Maximum is {1} bytes."
 
-#: legacy/builder/constants/constants.go:121
+#: legacy/builder/phases/sizer.go:100
 msgid "Global variables use {0} bytes of dynamic memory."
 msgstr "Global variables use {0} bytes of dynamic memory."
 
@@ -1237,7 +1217,7 @@ msgstr "Invalid additional URL: %v"
 msgid "Invalid argument passed: %v"
 msgstr "Invalid argument passed: %v"
 
-#: legacy/builder/phases/sizer.go:160
+#: legacy/builder/phases/sizer.go:172
 msgid "Invalid data size regexp: %s"
 msgstr "Invalid data size regexp: %s"
 
@@ -1245,7 +1225,7 @@ msgstr "Invalid data size regexp: %s"
 msgid "Invalid device port type provided"
 msgstr "Invalid device port type provided"
 
-#: legacy/builder/phases/sizer.go:166
+#: legacy/builder/phases/sizer.go:178
 msgid "Invalid eeprom size regexp: %s"
 msgstr "Invalid eeprom size regexp: %s"
 
@@ -1282,11 +1262,11 @@ msgstr "Invalid package index in %s"
 msgid "Invalid parameter %s: version not allowed"
 msgstr "Invalid parameter %s: version not allowed"
 
-#: commands/board/list.go:51
+#: commands/board/list.go:57
 msgid "Invalid pid value: '%s'"
 msgstr "Invalid pid value: '%s'"
 
-#: legacy/builder/phases/sizer.go:150
+#: legacy/builder/phases/sizer.go:162
 msgid "Invalid size regexp: %s"
 msgstr "Invalid size regexp: %s"
 
@@ -1294,7 +1274,7 @@ msgstr "Invalid size regexp: %s"
 msgid "Invalid version"
 msgstr "Invalid version"
 
-#: commands/board/list.go:48
+#: commands/board/list.go:54
 msgid "Invalid vid value: '%s'"
 msgstr "Invalid vid value: '%s'"
 
@@ -1330,7 +1310,7 @@ msgstr "Library %s is not installed"
 msgid "Library '%s' not found"
 msgstr "Library '%s' not found"
 
-#: legacy/builder/constants/constants.go:107
+#: legacy/builder/fail_if_imported_library_is_wrong.go:46
 msgid "Library can't use both '%[1]s' and '%[2]s' folders. Double check {0}"
 msgstr "Library can't use both '%[1]s' and '%[2]s' folders. Double check {0}"
 
@@ -1418,11 +1398,11 @@ msgstr "Loading libraries: %v"
 msgid "Location"
 msgstr "Location"
 
-#: legacy/builder/constants/constants.go:109
+#: legacy/builder/recipe_runner.go:39
 msgid "Looking for recipes like {0}*{1}"
 msgstr "Looking for recipes like {0}*{1}"
 
-#: legacy/builder/constants/constants.go:124
+#: legacy/builder/phases/sizer.go:137
 msgid "Low memory available, stability problems may occur."
 msgstr "Low memory available, stability problems may occur."
 
@@ -1438,7 +1418,7 @@ msgstr "Max time to wait for port discovery, e.g.: 30s, 1m"
 msgid "Messages with this level and above will be logged. Valid levels are: %s"
 msgstr "Messages with this level and above will be logged. Valid levels are: %s"
 
-#: legacy/builder/constants/constants.go:115
+#: legacy/builder/fail_if_imported_library_is_wrong.go:41
 msgid "Missing '{0}' from library in {1}"
 msgstr "Missing '{0}' from library in {1}"
 
@@ -1454,7 +1434,7 @@ msgstr "Missing port protocol"
 msgid "Missing programmer"
 msgstr "Missing programmer"
 
-#: legacy/builder/phases/sizer.go:154
+#: legacy/builder/phases/sizer.go:166
 msgid "Missing size regexp"
 msgstr "Missing size regexp"
 
@@ -1462,7 +1442,7 @@ msgstr "Missing size regexp"
 msgid "Missing sketch path"
 msgstr "Missing sketch path"
 
-#: legacy/builder/constants/constants.go:104
+#: legacy/builder/print_used_and_not_used_libraries.go:50
 msgid "Multiple libraries were found for \"{0}\""
 msgstr "Multiple libraries were found for \"{0}\""
 
@@ -1533,7 +1513,7 @@ msgstr "No upload port found, using %s as fallback"
 msgid "No valid dependencies solution found"
 msgstr "No valid dependencies solution found"
 
-#: legacy/builder/constants/constants.go:123
+#: legacy/builder/phases/sizer.go:127
 msgid "Not enough memory; see %s for tips on reducing your footprint."
 msgstr "Not enough memory; see %s for tips on reducing your footprint."
 
@@ -1546,6 +1526,10 @@ msgstr "Not found: nil"
 #: legacy/builder/builder_utils/utils.go:387
 msgid "Not found: {0}"
 msgstr "Not found: {0}"
+
+#: legacy/builder/print_used_and_not_used_libraries.go:53
+msgid "Not used: {0}"
+msgstr "Not used: {0}"
 
 #: cli/board/details.go:165
 msgid "OS:"
@@ -1696,10 +1680,6 @@ msgstr "Platform name:"
 msgid "Platform size (bytes):"
 msgstr "Platform size (bytes):"
 
-#: legacy/builder/constants/constants.go:113
-msgid "Platform {0} (package {1}) is unknown"
-msgstr "Platform {0} (package {1}) is unknown"
-
 #: cli/board/list.go:87
 #: cli/board/list.go:125
 msgid "Port"
@@ -1746,7 +1726,7 @@ msgstr "Programmer to use for debugging"
 msgid "Programmers:"
 msgstr "Programmers:"
 
-#: legacy/builder/constants/constants.go:114
+#: legacy/builder/builder_utils/utils.go:46
 msgid "Progress {0}"
 msgstr "Progress {0}"
 
@@ -1788,7 +1768,7 @@ msgstr "Running as a daemon the initialization of cores and libraries is done on
 msgid "Running normal build of the core..."
 msgstr "Running normal build of the core..."
 
-#: legacy/builder/constants/constants.go:117
+#: legacy/builder/recipe_runner.go:48
 msgid "Running recipe: {0}"
 msgstr "Running recipe: {0}"
 
@@ -1812,10 +1792,6 @@ msgstr "Search for one or more libraries data (case insensitive search)."
 msgid "Searches for one or more libraries data."
 msgstr "Searches for one or more libraries data."
 
-#: legacy/builder/constants/constants.go:111
-msgid "Selected board depends on '{0}' core (not installed)."
-msgstr "Selected board depends on '{0}' core (not installed)."
-
 #: commands/board/attach.go:108
 msgid "Selected fqbn: %s"
 msgstr "Selected fqbn: %s"
@@ -1837,10 +1813,6 @@ msgstr "Sets a setting value."
 #: cli/config/init.go:52
 msgid "Sets where to save the configuration file."
 msgstr "Sets where to save the configuration file."
-
-#: legacy/builder/constants/constants.go:118
-msgid "Setting build path to {0}"
-msgstr "Setting build path to {0}"
 
 #: cli/config/delete.go:57
 #: cli/config/validate.go:45
@@ -1930,7 +1902,7 @@ msgstr "Shows version number of Arduino CLI."
 msgid "Size (bytes):"
 msgstr "Size (bytes):"
 
-#: legacy/builder/constants/constants.go:126
+#: legacy/builder/fail_if_buildpath_equals_sketchpath.go:44
 msgid "Sketch cannot be located in build path. Please specify a different build path"
 msgstr "Sketch cannot be located in build path. Please specify a different build path"
 
@@ -1938,11 +1910,11 @@ msgstr "Sketch cannot be located in build path. Please specify a different build
 msgid "Sketch created in: %s"
 msgstr "Sketch created in: %s"
 
-#: legacy/builder/constants/constants.go:122
+#: legacy/builder/phases/sizer.go:121
 msgid "Sketch too big; see %s for tips on reducing it."
 msgstr "Sketch too big; see %s for tips on reducing it."
 
-#: legacy/builder/constants/constants.go:119
+#: legacy/builder/phases/sizer.go:86
 msgid "Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."
 msgstr "Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."
 
@@ -1968,7 +1940,7 @@ msgstr "Skipping archive creation of: {0}"
 msgid "Skipping compile of: {0}"
 msgstr "Skipping compile of: {0}"
 
-#: legacy/builder/constants/constants.go:101
+#: legacy/builder/container_find_includes.go:325
 msgid "Skipping dependencies detection for precompiled library {0}"
 msgstr "Skipping dependencies detection for precompiled library {0}"
 
@@ -2069,10 +2041,6 @@ msgstr "Toolchain prefix"
 msgid "Toolchain type"
 msgstr "Toolchain type"
 
-#: legacy/builder/constants/constants.go:116
-msgid "Ts: {0} - Running: {1}"
-msgstr "Ts: {0} - Running: {1}"
-
 #: cli/burnbootloader/burnbootloader.go:56
 msgid "Turns on verbose mode."
 msgstr "Turns on verbose mode."
@@ -2090,13 +2058,9 @@ msgstr "Types: %s"
 msgid "URL:"
 msgstr "URL:"
 
-#: legacy/builder/constants/constants.go:93
+#: legacy/builder/phases/core_builder.go:132
 msgid "Unable to cache built core, please tell {0} maintainers to follow %s"
 msgstr "Unable to cache built core, please tell {0} maintainers to follow %s"
-
-#: legacy/builder/constants/constants.go:99
-msgid "Unable to find {0} in {1}"
-msgstr "Unable to find {0} in {1}"
 
 #: configuration/configuration.go:126
 msgid "Unable to get Documents Folder: %v"
@@ -2145,10 +2109,6 @@ msgstr "Unknown"
 #: commands/errors.go:141
 msgid "Unknown FQBN"
 msgstr "Unknown FQBN"
-
-#: legacy/builder/constants/constants.go:127
-msgid "Unknown sketch file extension: {0}"
-msgstr "Unknown sketch file extension: {0}"
 
 #: cli/update/update.go:40
 msgid "Updates the index of cores and libraries"
@@ -2254,11 +2214,11 @@ msgstr "Upload the bootloader."
 msgid "Uploading to specified board using %s protocol requires the following info:"
 msgstr "Uploading to specified board using %s protocol requires the following info:"
 
-#: cli/usage.go:25
+#: cli/usage.go:26
 msgid "Usage:"
 msgstr "Usage:"
 
-#: cli/usage.go:32
+#: cli/usage.go:33
 msgid "Use %s for more information about a command."
 msgstr "Use %s for more information about a command."
 
@@ -2266,30 +2226,34 @@ msgstr "Use %s for more information about a command."
 msgid "Use the specified programmer to upload."
 msgstr "Use the specified programmer to upload."
 
-#: arduino/libraries/librariesmanager/install.go:62
-#: arduino/libraries/librariesmanager/install.go:78
-#: arduino/libraries/librariesmanager/install.go:100
-#: arduino/libraries/librariesmanager/install.go:184
+#: legacy/builder/print_used_and_not_used_libraries.go:51
+msgid "Used: {0}"
+msgstr "Used: {0}"
+
+#: arduino/libraries/librariesmanager/install.go:67
+#: arduino/libraries/librariesmanager/install.go:83
+#: arduino/libraries/librariesmanager/install.go:105
+#: arduino/libraries/librariesmanager/install.go:189
 msgid "User directory not set"
 msgstr "User directory not set"
 
-#: legacy/builder/constants/constants.go:130
+#: legacy/builder/target_board_resolver.go:47
 msgid "Using board '{0}' from platform in folder: {1}"
 msgstr "Using board '{0}' from platform in folder: {1}"
 
-#: legacy/builder/constants/constants.go:133
+#: legacy/builder/container_find_includes.go:337
 msgid "Using cached library dependencies for file: {0}"
 msgstr "Using cached library dependencies for file: {0}"
 
-#: legacy/builder/constants/constants.go:131
+#: legacy/builder/target_board_resolver.go:51
 msgid "Using core '{0}' from platform in folder: {1}"
 msgstr "Using core '{0}' from platform in folder: {1}"
 
-#: legacy/builder/constants/constants.go:128
+#: legacy/builder/print_used_libraries_if_verbose.go:48
 msgid "Using library {0} at version {1} in folder: {2} {3}"
 msgstr "Using library {0} at version {1} in folder: {2} {3}"
 
-#: legacy/builder/constants/constants.go:129
+#: legacy/builder/print_used_libraries_if_verbose.go:42
 msgid "Using library {0} in folder: {1} {2}"
 msgstr "Using library {0} in folder: {1} {2}"
 
@@ -2302,7 +2266,8 @@ msgstr "Using precompiled core: {0}"
 msgid "Using precompiled library in {0}"
 msgstr "Using precompiled library in {0}"
 
-#: legacy/builder/constants/constants.go:132
+#: legacy/builder/builder_utils/utils.go:267
+#: legacy/builder/builder_utils/utils.go:499
 msgid "Using previously compiled file: {0}"
 msgstr "Using previously compiled file: {0}"
 
@@ -2334,19 +2299,11 @@ msgstr "Versions: %s"
 msgid "WARNING cannot configure platform: %s"
 msgstr "WARNING cannot configure platform: %s"
 
-#: legacy/builder/constants/constants.go:134
-msgid "WARNING: Category '{0}' in library {1} is not valid. Setting to '{2}'"
-msgstr "WARNING: Category '{0}' in library {1} is not valid. Setting to '{2}'"
-
-#: legacy/builder/constants/constants.go:136
-msgid "WARNING: Spurious {0} folder in '{1}' library"
-msgstr "WARNING: Spurious {0} folder in '{1}' library"
-
 #: commands/instances.go:847
 msgid "WARNING: cannot run post install: %s"
 msgstr "WARNING: cannot run post install: %s"
 
-#: legacy/builder/constants/constants.go:108
+#: legacy/builder/warn_about_arch_incompatible_libraries.go:46
 msgid "WARNING: library {0} claims to run on {1} architecture(s) and may be incompatible with your current board which runs on {2} architecture(s)."
 msgstr "WARNING: library {0} claims to run on {1} architecture(s) and may be incompatible with your current board which runs on {2} architecture(s)."
 
@@ -2354,11 +2311,11 @@ msgstr "WARNING: library {0} claims to run on {1} architecture(s) and may be inc
 msgid "Waiting for upload port..."
 msgstr "Waiting for upload port..."
 
-#: legacy/builder/constants/constants.go:110
+#: legacy/builder/add_build_board_property_if_missing.go:41
 msgid "Warning: Board {0}:{1}:{2} doesn''t define a %s preference. Auto-set to: {3}"
 msgstr "Warning: Board {0}:{1}:{2} doesn''t define a %s preference. Auto-set to: {3}"
 
-#: legacy/builder/constants/constants.go:135
+#: legacy/builder/warn_about_platform_rewrites.go:47
 msgid "Warning: platform.txt from core '{0}' contains deprecated {1}, automatically converted to {2}. Consider upgrading this core."
 msgstr "Warning: platform.txt from core '{0}' contains deprecated {1}, automatically converted to {2}. Consider upgrading this core."
 
@@ -2390,7 +2347,7 @@ msgstr "Writing config file: %v"
 msgid "archive hash differs from hash in index"
 msgstr "archive hash differs from hash in index"
 
-#: arduino/libraries/librariesmanager/install.go:131
+#: arduino/libraries/librariesmanager/install.go:136
 msgid "archive is not valid: multiple files found in zip file top level"
 msgstr "archive is not valid: multiple files found in zip file top level"
 
@@ -2414,7 +2371,7 @@ msgstr "binary file not found in %s"
 msgid "board %s:%s not found"
 msgstr "board %s:%s not found"
 
-#: commands/board/list.go:40
+#: commands/board/list.go:41
 msgid "board not found"
 msgstr "board not found"
 
@@ -2528,7 +2485,7 @@ msgstr "creating installed.json in %[1]s: %[2]s"
 msgid "creating temp dir for extraction: %s"
 msgstr "creating temp dir for extraction: %s"
 
-#: legacy/builder/phases/sizer.go:116
+#: legacy/builder/phases/sizer.go:128
 msgid "data section exceeds available space in board"
 msgstr "data section exceeds available space in board"
 
@@ -2544,7 +2501,7 @@ msgstr "dependency '%s' is not available"
 msgid "destination already exists"
 msgstr "destination already exists"
 
-#: arduino/libraries/librariesmanager/install.go:69
+#: arduino/libraries/librariesmanager/install.go:74
 msgid "destination dir %s already exists, cannot install"
 msgstr "destination dir %s already exists, cannot install"
 
@@ -2594,11 +2551,11 @@ msgstr "error opening serial monitor"
 msgid "error parsing value: %v"
 msgstr "error parsing value: %v"
 
-#: commands/board/list.go:81
+#: commands/board/list.go:87
 msgid "error processing response from server"
 msgstr "error processing response from server"
 
-#: commands/board/list.go:96
+#: commands/board/list.go:102
 msgid "error querying Arduino Cloud Api"
 msgstr "error querying Arduino Cloud Api"
 
@@ -2610,7 +2567,7 @@ msgstr "error: %[1]s and %[2]s flags cannot be used together"
 msgid "extracting archive: %s"
 msgstr "extracting archive: %s"
 
-#: arduino/libraries/librariesmanager/install.go:119
+#: arduino/libraries/librariesmanager/install.go:124
 msgid "extracting archive: %w"
 msgstr "extracting archive: %w"
 
@@ -2618,7 +2575,7 @@ msgstr "extracting archive: %w"
 msgid "failed to compute hash of file \"%s\""
 msgstr "failed to compute hash of file \"%s\""
 
-#: commands/board/list.go:64
+#: commands/board/list.go:70
 msgid "failed to initialize http client"
 msgstr "failed to initialize http client"
 
@@ -2705,7 +2662,7 @@ msgstr "getting tool dependencies for platform %[1]s: %[2]s"
 msgid "importing sketch metadata: %s"
 msgstr "importing sketch metadata: %s"
 
-#: arduino/libraries/librariesmanager/install.go:86
+#: arduino/libraries/librariesmanager/install.go:91
 msgid "install directory not set"
 msgstr "install directory not set"
 
@@ -2766,7 +2723,7 @@ msgstr "invalid empty library version: %s"
 msgid "invalid empty option found"
 msgstr "invalid empty option found"
 
-#: arduino/libraries/librariesmanager/install.go:250
+#: arduino/libraries/librariesmanager/install.go:255
 msgid "invalid git url"
 msgstr "invalid git url"
 
@@ -2830,20 +2787,20 @@ msgstr "key not found in settings"
 msgid "keywords"
 msgstr "keywords"
 
-#: arduino/libraries/librariesmanager/install.go:157
-#: arduino/libraries/librariesmanager/install.go:200
+#: arduino/libraries/librariesmanager/install.go:162
+#: arduino/libraries/librariesmanager/install.go:205
 msgid "library %s already installed"
 msgstr "library %s already installed"
 
-#: arduino/libraries/librariesmanager/install.go:38
+#: arduino/libraries/librariesmanager/install.go:37
 msgid "library already installed"
 msgstr "library already installed"
 
-#: arduino/libraries/librariesmanager/install.go:269
+#: arduino/libraries/librariesmanager/install.go:274
 msgid "library is not valid: missing file \"library.properties\""
 msgstr "library is not valid: missing file \"library.properties\""
 
-#: arduino/libraries/librariesmanager/install.go:264
+#: arduino/libraries/librariesmanager/install.go:269
 msgid "library is not valid: missing header file \"%s\""
 msgstr "library is not valid: missing header file \"%s\""
 
@@ -2924,7 +2881,7 @@ msgstr "missing platform %[1]s:%[2]s referenced by board %[3]s"
 msgid "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 msgstr "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 
-#: arduino/libraries/librariesmanager/install.go:174
+#: arduino/libraries/librariesmanager/install.go:179
 #: arduino/resources/install.go:94
 msgid "moving extracted archive to destination dir: %s"
 msgstr "moving extracted archive to destination dir: %s"
@@ -3118,6 +3075,10 @@ msgstr "reading package root dir: %s"
 msgid "reading sketch metadata %[1]s: %[2]s"
 msgstr "reading sketch metadata %[1]s: %[2]s"
 
+#: legacy/builder/wipeout_build_path_if_build_options_changed.go:49
+msgid "rebuilding all"
+msgstr "rebuilding all"
+
 #: commands/upload/upload.go:472
 msgid "recipe not found '%s'"
 msgstr "recipe not found '%s'"
@@ -3139,7 +3100,7 @@ msgstr "release not found"
 msgid "removing corrupted archive file: %s"
 msgstr "removing corrupted archive file: %s"
 
-#: arduino/libraries/librariesmanager/install.go:89
+#: arduino/libraries/librariesmanager/install.go:94
 msgid "removing lib directory: %s"
 msgstr "removing lib directory: %s"
 
@@ -3201,7 +3162,7 @@ msgstr "start syncing discovery %[1]s: %[2]w"
 msgid "starting discovery %[1]s: %[2]w"
 msgstr "starting discovery %[1]s: %[2]w"
 
-#: commands/board/list.go:277
+#: commands/board/list.go:283
 msgid "stopping discoveries: %s"
 msgstr "stopping discoveries: %s"
 
@@ -3225,7 +3186,7 @@ msgstr "testing if archive is cached: %s"
 msgid "testing local archive integrity: %s"
 msgstr "testing local archive integrity: %s"
 
-#: legacy/builder/phases/sizer.go:111
+#: legacy/builder/phases/sizer.go:122
 msgid "text section exceeds available space in board"
 msgstr "text section exceeds available space in board"
 
@@ -3233,7 +3194,7 @@ msgstr "text section exceeds available space in board"
 msgid "the platform has no releases"
 msgstr "the platform has no releases"
 
-#: commands/board/list.go:72
+#: commands/board/list.go:78
 msgid "the server responded with status %s"
 msgstr "the server responded with status %s"
 
@@ -3348,25 +3309,13 @@ msgstr "uploading error: %s"
 msgid "writing sketch metadata %[1]s: %[2]s"
 msgstr "writing sketch metadata %[1]s: %[2]s"
 
-#: commands/board/list.go:88
+#: commands/board/list.go:94
 msgid "wrong format in server response"
 msgstr "wrong format in server response"
-
-#: legacy/builder/constants/constants.go:98
-msgid "{0} invalid"
-msgstr "{0} invalid"
-
-#: legacy/builder/constants/constants.go:100
-msgid "{0} is not a valid fully qualified board name. Required format is targetPackageName:targetPlatformName:targetBoardName."
-msgstr "{0} is not a valid fully qualified board name. Required format is targetPackageName:targetPlatformName:targetBoardName."
 
 #: legacy/builder/builder_utils/utils.go:323
 #: legacy/builder/builder_utils/utils.go:329
 #: legacy/builder/builder_utils/utils.go:393
 msgid "{0} newer than {1}"
 msgstr "{0} newer than {1}"
-
-#: legacy/builder/constants/constants.go:112
-msgid "{0}: Unknown package"
-msgstr "{0}: Unknown package"
 

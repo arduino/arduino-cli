@@ -78,16 +78,26 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 
 	textSize, dataSize, _, err := execSizeRecipe(ctx, properties)
 	if err != nil {
-		logger.Println(constants.LOG_LEVEL_WARN, constants.MSG_SIZER_ERROR_NO_RULE)
+		logger.Println(constants.LOG_LEVEL_WARN, tr("Couldn't determine program size"))
 		return nil
 	}
 
-	logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_SIZER_TEXT_FULL, strconv.Itoa(textSize), strconv.Itoa(maxTextSize), strconv.Itoa(textSize*100/maxTextSize))
+	logger.Println(constants.LOG_LEVEL_INFO,
+		tr("Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."),
+		strconv.Itoa(textSize),
+		strconv.Itoa(maxTextSize),
+		strconv.Itoa(textSize*100/maxTextSize))
 	if dataSize >= 0 {
 		if maxDataSize > 0 {
-			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_SIZER_DATA_FULL, strconv.Itoa(dataSize), strconv.Itoa(maxDataSize), strconv.Itoa(dataSize*100/maxDataSize), strconv.Itoa(maxDataSize-dataSize))
+			logger.Println(constants.LOG_LEVEL_INFO,
+				tr("Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes for local variables. Maximum is {1} bytes."),
+				strconv.Itoa(dataSize),
+				strconv.Itoa(maxDataSize),
+				strconv.Itoa(dataSize*100/maxDataSize),
+				strconv.Itoa(maxDataSize-dataSize))
 		} else {
-			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_SIZER_DATA, strconv.Itoa(dataSize))
+			logger.Println(constants.LOG_LEVEL_INFO,
+				tr("Global variables use {0} bytes of dynamic memory."), strconv.Itoa(dataSize))
 		}
 	}
 
@@ -107,12 +117,14 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 	}
 
 	if textSize > maxTextSize {
-		logger.Println(constants.LOG_LEVEL_ERROR, constants.MSG_SIZER_TEXT_TOO_BIG)
+		logger.Println(constants.LOG_LEVEL_ERROR,
+			tr("Sketch too big; see %s for tips on reducing it.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
 		return errors.New(tr("text section exceeds available space in board"))
 	}
 
 	if maxDataSize > 0 && dataSize > maxDataSize {
-		logger.Println(constants.LOG_LEVEL_ERROR, constants.MSG_SIZER_DATA_TOO_BIG)
+		logger.Println(constants.LOG_LEVEL_ERROR,
+			tr("Not enough memory; see %s for tips on reducing your footprint.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
 		return errors.New(tr("data section exceeds available space in board"))
 	}
 
@@ -122,7 +134,7 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 			return err
 		}
 		if maxDataSize > 0 && dataSize > maxDataSize*warnDataPercentage/100 {
-			logger.Println(constants.LOG_LEVEL_WARN, constants.MSG_SIZER_LOW_MEMORY)
+			logger.Println(constants.LOG_LEVEL_WARN, tr("Low memory available, stability problems may occur."))
 		}
 	}
 

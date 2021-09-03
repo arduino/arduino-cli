@@ -47,10 +47,10 @@ func (s *PrintUsedAndNotUsedLibraries) Run(ctx *types.Context) error {
 		if len(libResResult.NotUsedLibraries) == 0 {
 			continue
 		}
-		logger.Fprintln(os.Stdout, logLevel, constants.MSG_LIBRARIES_MULTIPLE_LIBS_FOUND_FOR, header)
-		logger.Fprintln(os.Stdout, logLevel, constants.MSG_LIBRARIES_USED, libResResult.Library.InstallDir)
+		logger.Fprintln(os.Stdout, logLevel, tr("Multiple libraries were found for \"{0}\""), header)
+		logger.Fprintln(os.Stdout, logLevel, " "+tr("Used: {0}"), libResResult.Library.InstallDir)
 		for _, notUsedLibrary := range libResResult.NotUsedLibraries {
-			logger.Fprintln(os.Stdout, logLevel, constants.MSG_LIBRARIES_NOT_USED, notUsedLibrary.InstallDir)
+			logger.Fprintln(os.Stdout, logLevel, " "+tr("Not used: {0}"), notUsedLibrary.InstallDir)
 		}
 	}
 

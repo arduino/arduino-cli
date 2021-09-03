@@ -35,9 +35,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type BoardNotFoundError struct{}
+
+func (e *BoardNotFoundError) Error() string {
+	return tr("board not found")
+}
+
 var (
 	// ErrNotFound is returned when the API returns 404
-	ErrNotFound = errors.New(tr("board not found"))
+	ErrNotFound = &BoardNotFoundError{}
 	vidPidURL   = "https://builder.arduino.cc/v3/boards/byVidPid"
 	validVidPid = regexp.MustCompile(`0[xX][a-fA-F\d]{4}`)
 )
