@@ -17,7 +17,7 @@ from pathlib import Path
 
 
 def test_update(run_command):
-    res = run_command("update")
+    res = run_command(["update"])
     assert res.ok
     lines = [l.strip() for l in res.stdout.splitlines()]
 
@@ -29,19 +29,19 @@ def test_update(run_command):
 
 def test_update_showing_outdated(run_command):
     # Updates index for cores and libraries
-    run_command("core update-index")
-    run_command("lib update-index")
+    run_command(["core", "update-index"])
+    run_command(["lib", "update-index"])
 
     # Installs an outdated core and library
-    run_command("core install arduino:avr@1.6.3")
-    assert run_command("lib install USBHost@1.0.0")
+    run_command(["core", "install", "arduino:avr@1.6.3"])
+    assert run_command(["lib", "install", "USBHost@1.0.0"])
 
     # Installs latest version of a core and a library
-    run_command("core install arduino:samd")
-    assert run_command("lib install ArduinoJson")
+    run_command(["core", "install", "arduino:samd"])
+    assert run_command(["lib", "install", "ArduinoJson"])
 
     # Verifies outdated cores and libraries are printed after updating indexes
-    result = run_command("update --show-outdated")
+    result = run_command(["update", "--show-outdated"])
     assert result.ok
     lines = [l.strip() for l in result.stdout.splitlines()]
 
@@ -54,13 +54,13 @@ def test_update_showing_outdated(run_command):
 
 
 def test_update_with_url_not_found(run_command, httpserver):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Brings up a local server to fake a failure
     httpserver.expect_request("/test_index.json").respond_with_data(status=404)
     url = httpserver.url_for("/test_index.json")
 
-    res = run_command(f"update --additional-urls={url}")
+    res = run_command(["update", f"--additional-urls={url}"])
     assert res.failed
     lines = [l.strip() for l in res.stderr.splitlines()]
     assert (
@@ -70,13 +70,13 @@ def test_update_with_url_not_found(run_command, httpserver):
 
 
 def test_update_with_url_internal_server_error(run_command, httpserver):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Brings up a local server to fake a failure
     httpserver.expect_request("/test_index.json").respond_with_data(status=500)
     url = httpserver.url_for("/test_index.json")
 
-    res = run_command(f"update --additional-urls={url}")
+    res = run_command(["update", f"--additional-urls={url}"])
     assert res.failed
     lines = [l.strip() for l in res.stderr.splitlines()]
     assert (
@@ -86,13 +86,13 @@ def test_update_with_url_internal_server_error(run_command, httpserver):
 
 
 def test_update_showing_outdated_using_library_with_invalid_version(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Install latest version of a library
-    assert run_command("lib install WiFi101")
+    assert run_command(["lib", "install", "WiFi101"])
 
     # Verifies library doesn't get updated
-    res = run_command("update --show-outdated")
+    res = run_command(["update", "--show-outdated"])
     assert res.ok
     assert "WiFi101" not in res.stdout
 
@@ -102,6 +102,6 @@ def test_update_showing_outdated_using_library_with_invalid_version(run_command,
     Path(lib_path, "library.properties").write_text("version=1.0001")
 
     # Verifies library gets updated
-    res = run_command("update --show-outdated")
+    res = run_command(["update", "--show-outdated"])
     assert res.ok
     assert "WiFi101" in res.stdout

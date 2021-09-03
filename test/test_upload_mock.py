@@ -1185,24 +1185,26 @@ def test_upload_sketch(
 
     # Install everything just once
     if not Path(session_data_dir, "packages").is_dir():
-        assert run_command("config init --overwrite", custom_env=env)
+        assert run_command(["config", "init", "--overwrite"], custom_env=env)
         for package_index in indexes:
-            assert run_command(f"config add board_manager.additional_urls {package_index}", custom_env=env)
-        assert run_command("update", custom_env=env)
+            assert run_command(["config", "add", "board_manager.additional_urls", package_index], custom_env=env)
+        assert run_command(["update"], custom_env=env)
 
         for d in cores_to_install:
-            assert run_command(f"core install {d}", custom_env=env)
+            assert run_command(["core", "install", d], custom_env=env)
 
     # Create a sketch
     sketch_name = "TestSketchForUpload"
     sketch_path = Path(session_data_dir, sketch_name)
-    assert run_command(f'sketch new "{sketch_path}"', custom_env=env)
+    assert run_command(["sketch", "new", sketch_path], custom_env=env)
 
     # Fake compilation, we just need the folder to exist
     build_dir = generate_build_dir(sketch_path)
-    programmer_arg = f"-P {programmer}" if programmer else ""
-    port_arg = f"-p {upload_port}" if upload_port else ""
-    res = run_command(f'upload {port_arg} {programmer_arg} -b {fqbn} "{sketch_path}" --dry-run -v', custom_env=env)
+    programmer_arg = ["-P", programmer] if programmer else []
+    port_arg = ["-p", upload_port] if upload_port else []
+    res = run_command(
+        ["upload"] + port_arg + programmer_arg + ["-b", fqbn, sketch_path, "--dry-run", "-v"], custom_env=env
+    )
     assert res.ok
 
     if isinstance(output, str):

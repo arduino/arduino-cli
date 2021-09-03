@@ -28,38 +28,38 @@ from .common import running_on_ci
 
 def test_compile_without_fqbn(run_command):
     # Init the environment explicitly
-    run_command("core update-index")
+    run_command(["core", "update-index"])
 
     # Install Arduino AVR Boards
-    run_command("core install arduino:avr@1.8.3")
+    run_command(["core", "install", "arduino:avr@1.8.3"])
 
     # Build sketch without FQBN
-    result = run_command("compile")
+    result = run_command(["compile"])
     assert result.failed
 
 
 def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
     # Init the environment explicitly
-    run_command("core update-index")
+    run_command(["core", "update-index"])
 
     # Download latest AVR
-    run_command("core install arduino:avr")
+    run_command(["core", "install", "arduino:avr"])
 
     sketch_name = "CompileIntegrationTest"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
 
     # Create a test sketch
-    result = run_command(f"sketch new {sketch_path}")
+    result = run_command(["sketch", "new", sketch_path])
     assert result.ok
     assert f"Sketch created in: {sketch_path}" in result.stdout
 
     # Build sketch for arduino:avr:uno
-    result = run_command(f"compile -b {fqbn} {sketch_path}")
+    result = run_command(["compile", "-b", fqbn, sketch_path])
     assert result.ok
 
     # Build sketch for arduino:avr:uno with json output
-    result = run_command(f"compile -b {fqbn} {sketch_path} --format json")
+    result = run_command(["compile", "-b", fqbn, sketch_path, "--format", "json"])
     assert result.ok
     # check is a valid json and contains requested data
     compile_output = json.loads(result.stdout)
@@ -90,19 +90,19 @@ def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
 )
 def test_output_flag_default_path(run_command, data_dir, working_dir):
     # Init the environment explicitly
-    run_command("core update-index")
+    run_command(["core", "update-index"])
 
     # Install Arduino AVR Boards
-    run_command("core install arduino:avr@1.8.3")
+    run_command(["core", "install", "arduino:avr@1.8.3"])
 
     # Create a test sketch
     sketch_path = os.path.join(data_dir, "test_output_flag_default_path")
     fqbn = "arduino:avr:uno"
-    result = run_command("sketch new {}".format(sketch_path))
+    result = run_command(["sketch", "new", sketch_path])
     assert result.ok
 
     # Test the --output-dir flag defaulting to current working dir
-    result = run_command("compile -b {fqbn} {sketch_path} --output-dir test".format(fqbn=fqbn, sketch_path=sketch_path))
+    result = run_command(["compile", "-b", fqbn, sketch_path, "--output-dir", "test"])
     assert result.ok
     target = os.path.join(working_dir, "test")
     assert os.path.exists(target) and os.path.isdir(target)
@@ -110,17 +110,17 @@ def test_output_flag_default_path(run_command, data_dir, working_dir):
 
 def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
     # Init the environment explicitly
-    run_command("core update-index")
+    run_command(["core", "update-index"])
 
     # Install Arduino AVR Boards
-    run_command("core install arduino:avr@1.8.3")
+    run_command(["core", "install", "arduino:avr@1.8.3"])
 
     sketch_name = "CompileIntegrationTestSymlinkSelfLoop"
     sketch_path = os.path.join(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
 
     # Create a test sketch
-    result = run_command("sketch new {}".format(sketch_path))
+    result = run_command(["sketch", "new", sketch_path])
     assert result.ok
     assert "Sketch created in: {}".format(sketch_path) in result.stdout
 
@@ -129,7 +129,7 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
     os.symlink(loop_file_path, loop_file_path)
 
     # Build sketch for arduino:avr:uno
-    result = run_command("compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path))
+    result = run_command(["compile", "-b", fqbn, sketch_path])
     # The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
     # returning a different error detailed message
     assert "Error during build: Can't open sketch:" in result.stderr
@@ -140,7 +140,7 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
     fqbn = "arduino:avr:uno"
 
     # Create a test sketch
-    result = run_command("sketch new {}".format(sketch_path))
+    result = run_command(["sketch", "new", sketch_path])
     assert result.ok
     assert "Sketch created in: {}".format(sketch_path) in result.stdout
 
@@ -151,7 +151,7 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
     os.symlink(loop_dir_path, loop_dir_symlink_path)
 
     # Build sketch for arduino:avr:uno
-    result = run_command("compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path))
+    result = run_command(["compile", "-b", fqbn, sketch_path])
     # The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
     # returning a different error detailed message
     assert "Error during build: Can't open sketch:" in result.stderr
@@ -164,84 +164,96 @@ def test_compile_blacklisted_sketchname(run_command, data_dir):
     it should be ok for a sketch to be named like RCS.ino
     """
     # Init the environment explicitly
-    run_command("core update-index")
+    run_command(["core", "update-index"])
 
     # Install Arduino AVR Boards
-    run_command("core install arduino:avr@1.8.3")
+    run_command(["core", "install", "arduino:avr@1.8.3"])
 
     sketch_name = "RCS"
     sketch_path = os.path.join(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
 
     # Create a test sketch
-    result = run_command("sketch new {}".format(sketch_path))
+    result = run_command(["sketch", "new", sketch_path])
     assert result.ok
     assert "Sketch created in: {}".format(sketch_path) in result.stdout
 
     # Build sketch for arduino:avr:uno
-    result = run_command("compile -b {fqbn} {sketch_path}".format(fqbn=fqbn, sketch_path=sketch_path))
+    result = run_command(["compile", "-b", fqbn, sketch_path])
     assert result.ok
 
 
 def test_compile_without_precompiled_libraries(run_command, data_dir):
     # Init the environment explicitly
     url = "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json"
-    assert run_command(f"core update-index --additional-urls={url}")
-    assert run_command(f"core install arduino:mbed@1.3.1 --additional-urls={url}")
+    assert run_command(["core", "update-index", f"--additional-urls={url}"])
+    assert run_command(["core", "install", "arduino:mbed@1.3.1", f"--additional-urls={url}"])
 
     # Precompiled version of Arduino_TensorflowLite
-    assert run_command("lib install Arduino_LSM9DS1")
-    assert run_command("lib install Arduino_TensorflowLite@2.1.1-ALPHA-precompiled")
+    assert run_command(["lib", "install", "Arduino_LSM9DS1"])
+    assert run_command(["lib", "install", "Arduino_TensorflowLite@2.1.1-ALPHA-precompiled"])
 
     sketch_path = Path(data_dir, "libraries", "Arduino_TensorFlowLite", "examples", "hello_world")
-    assert run_command(f"compile -b arduino:mbed:nano33ble {sketch_path}")
+    assert run_command(["compile", "-b", "arduino:mbed:nano33ble", sketch_path])
 
-    assert run_command(f"core install arduino:samd@1.8.7 --additional-urls={url}")
-    assert run_command(f"core install adafruit:samd@1.6.4 --additional-urls={url}")
+    assert run_command(["core", "install", "arduino:samd@1.8.7", f"--additional-urls={url}"])
+    assert run_command(["core", "install", "adafruit:samd@1.6.4", f"--additional-urls={url}"])
     # should work on adafruit too after https://github.com/arduino/arduino-cli/pull/1134
-    assert run_command(f"compile -b adafruit:samd:adafruit_feather_m4 {sketch_path}")
+    assert run_command(["compile", "-b", "adafruit:samd:adafruit_feather_m4", sketch_path])
 
     # Non-precompiled version of Arduino_TensorflowLite
-    assert run_command("lib install Arduino_TensorflowLite@2.1.0-ALPHA")
-    assert run_command(f"compile -b arduino:mbed:nano33ble {sketch_path}")
-    assert run_command(f"compile -b adafruit:samd:adafruit_feather_m4 {sketch_path}")
+    assert run_command(["lib", "install", "Arduino_TensorflowLite@2.1.0-ALPHA"])
+    assert run_command(["compile", "-b", "arduino:mbed:nano33ble", sketch_path])
+    assert run_command(["compile", "-b", "adafruit:samd:adafruit_feather_m4", sketch_path])
 
     # Bosch sensor library
-    assert run_command('lib install "BSEC Software Library@1.5.1474"')
+    assert run_command(["lib", "install", "BSEC Software Library@1.5.1474"])
     sketch_path = Path(data_dir, "libraries", "BSEC_Software_Library", "examples", "basic")
-    assert run_command(f"compile -b arduino:samd:mkr1000 {sketch_path}")
-    assert run_command(f"compile -b arduino:mbed:nano33ble {sketch_path}")
+    assert run_command(["compile", "-b", "arduino:samd:mkr1000", sketch_path])
+    assert run_command(["compile", "-b", "arduino:mbed:nano33ble", sketch_path])
 
     # USBBlaster library
-    assert run_command('lib install "USBBlaster@1.0.0"')
+    assert run_command(["lib", "install", "USBBlaster@1.0.0"])
     sketch_path = Path(data_dir, "libraries", "USBBlaster", "examples", "USB_Blaster")
-    assert run_command(f"compile -b arduino:samd:mkrvidor4000 {sketch_path}")
+    assert run_command(["compile", "-b", "arduino:samd:mkrvidor4000", sketch_path])
 
 
 def test_compile_with_build_properties_flag(run_command, data_dir, copy_sketch):
     # Init the environment explicitly
-    assert run_command("core update-index")
+    assert run_command(["core", "update-index"])
 
     # Install Arduino AVR Boards
-    assert run_command("core install arduino:avr@1.8.3")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
 
     sketch_path = copy_sketch("sketch_with_single_string_define")
     fqbn = "arduino:avr:uno"
 
     # Compile using a build property with quotes
     res = run_command(
-        f"compile -b {fqbn} "
-        + '--build-properties="build.extra_flags=\\"-DMY_DEFINE=\\"hello world\\"\\"" '
-        + f"{sketch_path} --verbose --clean"
+        [
+            "compile",
+            "-b",
+            fqbn,
+            '--build-properties="build.extra_flags=\\"-DMY_DEFINE=\\"hello world\\"\\""',
+            sketch_path,
+            "--verbose",
+            "--clean",
+        ]
     )
     assert res.failed
     assert "Flag --build-properties has been deprecated, please use --build-property instead." not in res.stderr
 
     # Try again with quotes
     res = run_command(
-        f"compile -b {fqbn} "
-        + '--build-properties="build.extra_flags=-DMY_DEFINE=\\"hello\\"" '
-        + f"{sketch_path} --verbose --clean"
+        [
+            "compile",
+            "-b",
+            fqbn,
+            '--build-properties="build.extra_flags=-DMY_DEFINE=\\"hello\\""',
+            sketch_path,
+            "--verbose",
+            "--clean",
+        ]
     )
     assert res.failed
     assert "Flag --build-properties has been deprecated, please use --build-property instead." not in res.stderr
@@ -249,9 +261,15 @@ def test_compile_with_build_properties_flag(run_command, data_dir, copy_sketch):
     # Try without quotes
     sketch_path = copy_sketch("sketch_with_single_int_define")
     res = run_command(
-        f"compile -b {fqbn} "
-        + '--build-properties="build.extra_flags=-DMY_DEFINE=1" '
-        + f"{sketch_path} --verbose --clean"
+        [
+            "compile",
+            "-b",
+            fqbn,
+            '--build-properties="build.extra_flags=-DMY_DEFINE=1"',
+            sketch_path,
+            "--verbose",
+            "--clean",
+        ]
     )
     assert res.ok
     assert "Flag --build-properties has been deprecated, please use --build-property instead." in res.stderr
@@ -259,9 +277,15 @@ def test_compile_with_build_properties_flag(run_command, data_dir, copy_sketch):
 
     sketch_path = copy_sketch("sketch_with_multiple_int_defines")
     res = run_command(
-        f"compile -b {fqbn} "
-        + '--build-properties="build.extra_flags=-DFIRST_PIN=1,compiler.cpp.extra_flags=-DSECOND_PIN=2" '
-        + f"{sketch_path} --verbose --clean"
+        [
+            "compile",
+            "-b",
+            fqbn,
+            '--build-properties="build.extra_flags=-DFIRST_PIN=1,compiler.cpp.extra_flags=-DSECOND_PIN=2"',
+            sketch_path,
+            "--verbose",
+            "--clean",
+        ]
     )
     assert res.ok
     assert "Flag --build-properties has been deprecated, please use --build-property instead." in res.stderr
@@ -271,19 +295,24 @@ def test_compile_with_build_properties_flag(run_command, data_dir, copy_sketch):
 
 def test_compile_with_build_property_containing_quotes(run_command, data_dir, copy_sketch):
     # Init the environment explicitly
-    assert run_command("core update-index")
+    assert run_command(["core", "update-index"])
 
     # Install Arduino AVR Boards
-    assert run_command("core install arduino:avr@1.8.3")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
 
     sketch_path = copy_sketch("sketch_with_single_string_define")
     fqbn = "arduino:avr:uno"
 
     # Compile using a build property with quotes
     res = run_command(
-        f"compile -b {fqbn} "
-        + '--build-property="build.extra_flags=\\"-DMY_DEFINE=\\"hello world\\"\\"" '
-        + f"{sketch_path} --verbose"
+        [
+            "compile",
+            "-b",
+            fqbn,
+            '--build-property=build.extra_flags=\\"-DMY_DEFINE=\\"hello world\\"\\"',
+            sketch_path,
+            "--verbose",
+        ]
     )
     assert res.ok
     assert '-DMY_DEFINE=\\"hello world\\"' in res.stdout
@@ -291,54 +320,84 @@ def test_compile_with_build_property_containing_quotes(run_command, data_dir, co
 
 def test_compile_with_multiple_build_property_flags(run_command, data_dir, copy_sketch, working_dir):
     # Init the environment explicitly
-    assert run_command("core update-index")
+    assert run_command(["core", "update-index"])
 
     # Install Arduino AVR Boards
-    assert run_command("core install arduino:avr@1.8.3")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
 
     sketch_path = copy_sketch("sketch_with_multiple_defines")
     fqbn = "arduino:avr:uno"
 
     # Compile using multiple build properties separated by a space
     res = run_command(
-        f"compile -b {fqbn} "
-        + '--build-property="compiler.cpp.extra_flags=\\"-DPIN=2 -DSSID=\\"This is a String\\"\\"" '
-        + f"{sketch_path} --verbose --clean"
+        [
+            "compile",
+            "-b",
+            fqbn,
+            '--build-property=compiler.cpp.extra_flags=\\"-DPIN=2 -DSSID=\\"This is a String\\"\\"',
+            sketch_path,
+            "--verbose",
+            "--clean",
+        ]
     )
     assert res.failed
 
     # Compile using multiple build properties separated by a space and properly quoted
     res = run_command(
-        f"compile -b {fqbn} "
-        + '--build-property="compiler.cpp.extra_flags=-DPIN=2 \\"-DSSID=\\"This is a String\\"\\"" '
-        + f"{sketch_path} --verbose --clean"
+        [
+            "compile",
+            "-b",
+            fqbn,
+            '--build-property=compiler.cpp.extra_flags=-DPIN=2 \\"-DSSID=\\"This is a String\\"\\"',
+            sketch_path,
+            "--verbose",
+            "--clean",
+        ]
     )
     assert res.ok
     assert '-DPIN=2 "-DSSID=\\"This is a String\\""' in res.stdout
 
     # Tries compilation using multiple build properties separated by a comma
     res = run_command(
-        f"compile -b {fqbn} "
-        + '--build-property="compiler.cpp.extra_flags=\\"-DPIN=2,-DSSID=\\"This is a String\\"\\"\\" '
-        + f"{sketch_path} --verbose --clean"
+        [
+            "compile",
+            "-b",
+            fqbn,
+            '--build-property=compiler.cpp.extra_flags=\\"-DPIN=2,-DSSID=\\"This is a String\\"\\"',
+            sketch_path,
+            "--verbose",
+            "--clean",
+        ]
     )
     assert res.failed
 
     res = run_command(
-        f"compile -b {fqbn} "
-        + '--build-property="compiler.cpp.extra_flags=\\"-DPIN=2\\"" '
-        + '--build-property="compiler.cpp.extra_flags=\\"-DSSID=\\"This is a String\\"\\"" '
-        + f"{sketch_path} --verbose --clean"
+        [
+            "compile",
+            "-b",
+            fqbn,
+            '--build-property=compiler.cpp.extra_flags=\\"-DPIN=2\\"',
+            '--build-property=compiler.cpp.extra_flags=\\"-DSSID=\\"This is a String\\"\\"',
+            sketch_path,
+            "--verbose",
+            "--clean",
+        ]
     )
     assert res.failed
     assert "-DPIN=2" not in res.stdout
     assert '-DSSID=\\"This is a String\\"' in res.stdout
 
     res = run_command(
-        f"compile -b {fqbn} "
-        + '--build-property="compiler.cpp.extra_flags=\\"-DPIN=2\\"" '
-        + '--build-property="build.extra_flags=\\"-DSSID=\\"hello world\\"\\"" '
-        + f"{sketch_path} --verbose --clean"
+        [
+            "compile",
+            "-b",
+            fqbn,
+            '--build-property=compiler.cpp.extra_flags=\\"-DPIN=2\\"',
+            '--build-property=build.extra_flags=\\"-DSSID=\\"hello world\\"\\"',
+            sketch_path,
+            "--verbose",
+            "--clean",
+        ]
     )
     assert res.ok
     assert "-DPIN=2" in res.stdout
@@ -347,23 +406,23 @@ def test_compile_with_multiple_build_property_flags(run_command, data_dir, copy_
 
 def test_compile_with_output_dir_flag(run_command, data_dir):
     # Init the environment explicitly
-    run_command("core update-index")
+    run_command(["core", "update-index"])
 
     # Download latest AVR
-    run_command("core install arduino:avr")
+    run_command(["core", "install", "arduino:avr"])
 
     sketch_name = "CompileWithOutputDir"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
 
     # Create a test sketch
-    result = run_command(f"sketch new {sketch_path}")
+    result = run_command(["sketch", "new", sketch_path])
     assert result.ok
     assert f"Sketch created in: {sketch_path}" in result.stdout
 
     # Test the --output-dir flag with absolute path
     output_dir = Path(data_dir, "test_dir", "output_dir")
-    result = run_command(f"compile -b {fqbn} {sketch_path} --output-dir {output_dir}")
+    result = run_command(["compile", "-b", fqbn, sketch_path, "--output-dir", output_dir])
     assert result.ok
 
     # Verifies expected binaries have been built
@@ -387,20 +446,20 @@ def test_compile_with_output_dir_flag(run_command, data_dir):
 
 def test_compile_with_export_binaries_flag(run_command, data_dir):
     # Init the environment explicitly
-    run_command("core update-index")
+    run_command(["core", "update-index"])
 
     # Download latest AVR
-    run_command("core install arduino:avr")
+    run_command(["core", "install", "arduino:avr"])
 
     sketch_name = "CompileWithExportBinariesFlag"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
 
     # Create a test sketch
-    assert run_command("sketch new {}".format(sketch_path))
+    assert run_command(["sketch", "new", sketch_path])
 
     # Test the --output-dir flag with absolute path
-    result = run_command(f"compile -b {fqbn} {sketch_path} --export-binaries")
+    result = run_command(["compile", "-b", fqbn, sketch_path, "--export-binaries"])
     assert result.ok
     assert Path(sketch_path, "build").exists()
     assert Path(sketch_path, "build").is_dir()
@@ -415,23 +474,23 @@ def test_compile_with_export_binaries_flag(run_command, data_dir):
 
 def test_compile_with_custom_build_path(run_command, data_dir):
     # Init the environment explicitly
-    run_command("core update-index")
+    run_command(["core", "update-index"])
 
     # Download latest AVR
-    run_command("core install arduino:avr")
+    run_command(["core", "install", "arduino:avr"])
 
     sketch_name = "CompileWithBuildPath"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
 
     # Create a test sketch
-    result = run_command(f"sketch new {sketch_path}")
+    result = run_command(["sketch", "new", sketch_path])
     assert result.ok
     assert f"Sketch created in: {sketch_path}" in result.stdout
 
     # Test the --build-path flag with absolute path
     build_path = Path(data_dir, "test_dir", "build_dir")
-    result = run_command(f"compile -b {fqbn} {sketch_path} --build-path {build_path}")
+    result = run_command(["compile", "-b", fqbn, sketch_path, "--build-path", build_path])
     print(result.stderr)
     assert result.ok
 
@@ -456,17 +515,17 @@ def test_compile_with_custom_build_path(run_command, data_dir):
 
 def test_compile_with_export_binaries_env_var(run_command, data_dir, downloads_dir):
     # Init the environment explicitly
-    run_command("core update-index")
+    run_command(["core", "update-index"])
 
     # Download latest AVR
-    run_command("core install arduino:avr")
+    run_command(["core", "install", "arduino:avr"])
 
     sketch_name = "CompileWithExportBinariesEnvVar"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
 
     # Create a test sketch
-    assert run_command("sketch new {}".format(sketch_path))
+    assert run_command(["sketch", "new", sketch_path])
 
     env = {
         "ARDUINO_DATA_DIR": data_dir,
@@ -475,7 +534,7 @@ def test_compile_with_export_binaries_env_var(run_command, data_dir, downloads_d
         "ARDUINO_SKETCH_ALWAYS_EXPORT_BINARIES": "true",
     }
     # Test compilation with export binaries env var set
-    result = run_command(f"compile -b {fqbn} {sketch_path}", custom_env=env)
+    result = run_command(["compile", "-b", fqbn, sketch_path], custom_env=env)
     assert result.ok
     assert Path(sketch_path, "build").exists()
     assert Path(sketch_path, "build").is_dir()
@@ -490,17 +549,17 @@ def test_compile_with_export_binaries_env_var(run_command, data_dir, downloads_d
 
 def test_compile_with_export_binaries_config(run_command, data_dir, downloads_dir):
     # Init the environment explicitly
-    run_command("core update-index")
+    run_command(["core", "update-index"])
 
     # Download latest AVR
-    run_command("core install arduino:avr")
+    run_command(["core", "install", "arduino:avr"])
 
     sketch_name = "CompileWithExportBinariesConfig"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
 
     # Create a test sketch
-    assert run_command("sketch new {}".format(sketch_path))
+    assert run_command(["sketch", "new", sketch_path])
 
     # Create settings with export binaries set to true
     env = {
@@ -509,10 +568,10 @@ def test_compile_with_export_binaries_config(run_command, data_dir, downloads_di
         "ARDUINO_SKETCHBOOK_DIR": data_dir,
         "ARDUINO_SKETCH_ALWAYS_EXPORT_BINARIES": "true",
     }
-    assert run_command("config init --dest-dir .", custom_env=env)
+    assert run_command(["config", "init", "--dest-dir", "."], custom_env=env)
 
     # Test compilation with export binaries env var set
-    result = run_command(f"compile -b {fqbn} {sketch_path}")
+    result = run_command(["compile", "-b", fqbn, sketch_path])
     assert result.ok
     assert Path(sketch_path, "build").exists()
     assert Path(sketch_path, "build").is_dir()
@@ -527,23 +586,25 @@ def test_compile_with_export_binaries_config(run_command, data_dir, downloads_di
 
 def test_compile_with_invalid_url(run_command, data_dir):
     # Init the environment explicitly
-    run_command("core update-index")
+    run_command(["core", "update-index"])
 
     # Download latest AVR
-    run_command("core install arduino:avr")
+    run_command(["core", "install", "arduino:avr"])
 
     sketch_name = "CompileWithInvalidURL"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
 
     # Create a test sketch
-    assert run_command(f'sketch new "{sketch_path}"')
+    assert run_command(["sketch", "new", sketch_path])
 
     # Create settings with custom invalid URL
-    assert run_command("config init --dest-dir . --additional-urls https://example.com/package_example_index.json")
+    assert run_command(
+        ["config", "init", "--dest-dir", ".", "--additional-urls", "https://example.com/package_example_index.json"]
+    )
 
     # Verifies compilation fails cause of missing local index file
-    res = run_command(f'compile -b {fqbn} "{sketch_path}"')
+    res = run_command(["compile", "-b", fqbn, sketch_path])
     assert res.ok
     lines = [l.strip() for l in res.stderr.splitlines()]
     assert "Error initializing instance: Loading index file: loading json index file" in lines[0]
@@ -554,13 +615,13 @@ def test_compile_with_invalid_url(run_command, data_dir):
 def test_compile_with_custom_libraries(run_command, copy_sketch):
     # Creates config with additional URL to install necessary core
     url = "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
-    assert run_command(f"config init --dest-dir . --additional-urls {url}")
+    assert run_command(["config", "init", "--dest-dir", ".", "--additional-urls", url])
 
     # Init the environment explicitly
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Install core to compile
-    assert run_command("core install esp8266:esp8266")
+    assert run_command(["core", "install", "esp8266:esp8266"])
 
     sketch_path = copy_sketch("sketch_with_multiple_custom_libraries")
     fqbn = "esp8266:esp8266:nodemcu:xtal=80,vt=heap,eesz=4M1M,wipe=none,baud=115200"
@@ -569,95 +630,95 @@ def test_compile_with_custom_libraries(run_command, copy_sketch):
     second_lib = Path(sketch_path, "libraries2")
     # This compile command has been taken from this issue:
     # https://github.com/arduino/arduino-cli/issues/973
-    assert run_command(f"compile --libraries {first_lib},{second_lib} -b {fqbn} {sketch_path}")
+    assert run_command(["compile", "--libraries", first_lib, "--libraries", second_lib, "-b", fqbn, sketch_path])
 
 
 def test_compile_with_archives_and_long_paths(run_command):
     # Creates config with additional URL to install necessary core
     url = "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
-    assert run_command(f"config init --dest-dir . --additional-urls {url}")
+    assert run_command(["config", "init", "--dest-dir", ".", "--additional-urls", url])
 
     # Init the environment explicitly
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Install core to compile
-    assert run_command("core install esp8266:esp8266@2.7.4")
+    assert run_command(["core", "install", "esp8266:esp8266@2.7.4"])
 
     # Install test library
-    assert run_command("lib install ArduinoIoTCloud")
+    assert run_command(["lib", "install", "ArduinoIoTCloud"])
 
-    result = run_command("lib examples ArduinoIoTCloud --format json")
+    result = run_command(["lib", "examples", "ArduinoIoTCloud", "--format", "json"])
     assert result.ok
     lib_output = json.loads(result.stdout)
     sketch_path = Path(lib_output[0]["library"]["install_dir"], "examples", "ArduinoIoTCloud-Advanced")
 
-    assert run_command(f"compile -b esp8266:esp8266:huzzah {sketch_path}")
+    assert run_command(["compile", "-b", "esp8266:esp8266:huzzah", sketch_path])
 
 
 def test_compile_with_precompiled_library(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
-    assert run_command("core install arduino:samd@1.8.11")
+    assert run_command(["core", "install", "arduino:samd@1.8.11"])
     fqbn = "arduino:samd:mkrzero"
 
     # Install precompiled library
     # For more information see:
     # https://arduino.github.io/arduino-cli/latest/library-specification/#precompiled-binaries
-    assert run_command('lib install "BSEC Software Library@1.5.1474"')
+    assert run_command(["lib", "install", "BSEC Software Library@1.5.1474"])
     sketch_folder = Path(data_dir, "libraries", "BSEC_Software_Library", "examples", "basic")
 
     # Compile and verify dependencies detection for fully precompiled library is not skipped
-    result = run_command(f"compile -b {fqbn} {sketch_folder} -v")
+    result = run_command(["compile", "-b", fqbn, sketch_folder, "-v"])
     assert result.ok
     assert "Skipping dependencies detection for precompiled library BSEC Software Library" not in result.stdout
 
 
 def test_compile_with_fully_precompiled_library(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
-    assert run_command("core install arduino:mbed@1.3.1")
+    assert run_command(["core", "install", "arduino:mbed@1.3.1"])
     fqbn = "arduino:mbed:nano33ble"
 
     # Install fully precompiled library
     # For more information see:
     # https://arduino.github.io/arduino-cli/latest/library-specification/#precompiled-binaries
-    assert run_command("lib install Arduino_TensorFlowLite@2.1.1-ALPHA-precompiled")
+    assert run_command(["lib", "install", "Arduino_TensorFlowLite@2.1.1-ALPHA-precompiled"])
     sketch_folder = Path(data_dir, "libraries", "Arduino_TensorFlowLite", "examples", "hello_world")
 
     # Install example dependency
     # assert run_command("lib install Arduino_LSM9DS1")
 
     # Compile and verify dependencies detection for fully precompiled library is skipped
-    result = run_command(f"compile -b {fqbn} {sketch_folder} -v")
+    result = run_command(["compile", "-b", fqbn, sketch_folder, "-v"])
     assert result.ok
     assert "Skipping dependencies detection for precompiled library Arduino_TensorFlowLite" in result.stdout
 
 
 def test_compile_sketch_with_pde_extension(run_command, data_dir):
     # Init the environment explicitly
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Install core to compile
-    assert run_command("core install arduino:avr@1.8.3")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
 
     sketch_name = "CompilePdeSketch"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
 
     # Create a test sketch
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
 
     # Renames sketch file to pde
     sketch_file = Path(sketch_path, f"{sketch_name}.ino").rename(sketch_path / f"{sketch_name}.pde")
 
     # Build sketch from folder
-    res = run_command(f"compile --clean -b {fqbn} {sketch_path}")
+    res = run_command(["compile", "--clean", "-b", fqbn, sketch_path])
     assert res.ok
     assert "Sketches with .pde extension are deprecated, please rename the following files to .ino:" in res.stderr
     assert str(sketch_file) in res.stderr
 
     # Build sketch from file
-    res = run_command(f"compile --clean -b {fqbn} {sketch_file}")
+    res = run_command(["compile", "--clean", "-b", fqbn, sketch_file])
     assert res.ok
     assert "Sketches with .pde extension are deprecated, please rename the following files to .ino" in res.stderr
     assert str(sketch_file) in res.stderr
@@ -665,17 +726,17 @@ def test_compile_sketch_with_pde_extension(run_command, data_dir):
 
 def test_compile_sketch_with_multiple_main_files(run_command, data_dir):
     # Init the environment explicitly
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Install core to compile
-    assert run_command("core install arduino:avr@1.8.3")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
 
     sketch_name = "CompileSketchMultipleMainFiles"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
 
     # Create a test sketch
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
 
     # Copy .ino sketch file to .pde
     sketch_ino_file = Path(sketch_path, f"{sketch_name}.ino")
@@ -683,69 +744,71 @@ def test_compile_sketch_with_multiple_main_files(run_command, data_dir):
     shutil.copyfile(sketch_ino_file, sketch_pde_file)
 
     # Build sketch from folder
-    res = run_command(f"compile --clean -b {fqbn} {sketch_path}")
+    res = run_command(["compile", "--clean", "-b", fqbn, sketch_path])
     assert res.failed
     assert "Error during build: Can't open sketch: multiple main sketch files found" in res.stderr
 
     # Build sketch from .ino file
-    res = run_command(f"compile --clean -b {fqbn} {sketch_ino_file}")
+    res = run_command(["compile", "--clean", "-b", fqbn, sketch_ino_file])
     assert res.failed
     assert "Error during build: Can't open sketch: multiple main sketch files found" in res.stderr
 
     # Build sketch from .pde file
-    res = run_command(f"compile --clean -b {fqbn} {sketch_pde_file}")
+    res = run_command(["compile", "--clean", "-b", fqbn, sketch_pde_file])
     assert res.failed
     assert "Error during build: Can't open sketch: multiple main sketch files found" in res.stderr
 
 
 def test_compile_sketch_case_mismatch_fails(run_command, data_dir):
     # Init the environment explicitly
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Install core to compile
-    assert run_command("core install arduino:avr@1.8.3")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
 
     sketch_name = "CompileSketchCaseMismatch"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
 
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
 
     # Rename main .ino file so casing is different from sketch name
     sketch_main_file = Path(sketch_path, f"{sketch_name}.ino").rename(sketch_path / f"{sketch_name.lower()}.ino")
 
     # Verifies compilation fails when:
     # * Compiling with sketch path
-    res = run_command(f"compile --clean -b {fqbn} {sketch_path}")
+    res = run_command(["compile", "--clean", "-b", fqbn, sketch_path])
     assert res.failed
     assert "Error during build: Can't open sketch: no valid sketch found" in res.stderr
     # * Compiling with sketch main file
-    res = run_command(f"compile --clean -b {fqbn} {sketch_main_file}")
+    res = run_command(["compile", "--clean", "-b", fqbn, sketch_main_file])
     assert res.failed
     assert "Error during build: Can't open sketch: no valid sketch found" in res.stderr
     # * Compiling in sketch path
-    res = run_command(f"compile --clean -b {fqbn}", custom_working_dir=sketch_path)
+    res = run_command(["compile", "--clean", "-b", fqbn], custom_working_dir=sketch_path)
     assert res.failed
     assert "Error during build: Can't open sketch: no valid sketch found" in res.stderr
 
 
 def test_compile_with_only_compilation_database_flag(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
-    assert run_command("core install arduino:avr@1.8.3")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
 
     sketch_name = "CompileSketchOnlyCompilationDatabaseFlag"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
 
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
 
     # Verifies no binaries exist
     build_path = Path(sketch_path, "build")
     assert not build_path.exists()
 
     # Compile with both --export-binaries and --only-compilation-database flags
-    assert run_command(f"compile --export-binaries --only-compilation-database --clean -b {fqbn} {sketch_path}")
+    assert run_command(
+        ["compile", "--export-binaries", "--only-compilation-database", "--clean", "-b", fqbn, sketch_path]
+    )
 
     # Verifies no binaries are exported
     assert not build_path.exists()
@@ -755,50 +818,52 @@ def test_compile_with_only_compilation_database_flag(run_command, data_dir):
     assert not build_path.exists()
 
     # Compile by setting the --output-dir flag and --only-compilation-database flags
-    assert run_command(f"compile --output-dir {build_path} --only-compilation-database --clean -b {fqbn} {sketch_path}")
+    assert run_command(
+        ["compile", "--output-dir", build_path, "--only-compilation-database", "--clean", "-b", fqbn, sketch_path]
+    )
 
     # Verifies no binaries are exported
     assert not build_path.exists()
 
 
 def test_compile_using_platform_local_txt(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
-    assert run_command("core install arduino:avr@1.8.3")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
 
     sketch_name = "CompileSketchUsingPlatformLocalTxt"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
 
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
 
     # Verifies compilation works without issues
-    assert run_command(f"compile --clean -b {fqbn} {sketch_path}")
+    assert run_command(["compile", "--clean", "-b", fqbn, sketch_path])
 
     # Overrides default platform compiler with an unexisting one
     platform_local_txt = Path(data_dir, "packages", "arduino", "hardware", "avr", "1.8.3", "platform.local.txt")
     platform_local_txt.write_text("compiler.c.cmd=my-compiler-that-does-not-exist")
 
     # Verifies compilation now fails because compiler is not found
-    res = run_command(f"compile --clean -b {fqbn} {sketch_path}")
+    res = run_command(["compile", "--clean", "-b", fqbn, sketch_path])
     assert res.failed
     assert "my-compiler-that-does-not-exist" in res.stderr
 
 
 def test_compile_using_boards_local_txt(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
-    assert run_command("core install arduino:avr@1.8.3")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
 
     sketch_name = "CompileSketchUsingBoardsLocalTxt"
     sketch_path = Path(data_dir, sketch_name)
     # Use a made up board
     fqbn = "arduino:avr:nessuno"
 
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
 
     # Verifies compilation fails because board doesn't exist
-    res = run_command(f"compile --clean -b {fqbn} {sketch_path}")
+    res = run_command(["compile", "--clean", "-b", fqbn, sketch_path])
     assert res.failed
     assert "Error during build: Error resolving FQBN: board arduino:avr@1.8.3:nessuno not found" in res.stderr
 
@@ -806,16 +871,16 @@ def test_compile_using_boards_local_txt(run_command, data_dir):
     boards_local_txt = Path(data_dir, "packages", "arduino", "hardware", "avr", "1.8.3", "boards.local.txt")
     shutil.copyfile(Path(__file__).parent / "testdata" / "boards.local.txt", boards_local_txt)
 
-    assert run_command(f"compile --clean -b {fqbn} {sketch_path}")
+    assert run_command(["compile", "--clean", "-b", fqbn, sketch_path])
 
 
 def test_compile_manually_installed_platform(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     sketch_name = "CompileSketchManuallyInstalledPlatformUsingPlatformLocalTxt"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino-beta-development:avr:uno"
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
 
     # Manually installs a core in sketchbooks hardware folder
     git_url = "https://github.com/arduino/ArduinoCore-avr.git"
@@ -823,19 +888,19 @@ def test_compile_manually_installed_platform(run_command, data_dir):
     assert Repo.clone_from(git_url, repo_dir, multi_options=["-b 1.8.3"])
 
     # Installs also the same core via CLI so all the necessary tools are installed
-    assert run_command("core install arduino:avr@1.8.3")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
 
     # Verifies compilation works without issues
-    assert run_command(f"compile --clean -b {fqbn} {sketch_path}")
+    assert run_command(["compile", "--clean", "-b", fqbn, sketch_path])
 
 
 def test_compile_manually_installed_platform_using_platform_local_txt(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     sketch_name = "CompileSketchManuallyInstalledPlatformUsingPlatformLocalTxt"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino-beta-development:avr:uno"
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
 
     # Manually installs a core in sketchbooks hardware folder
     git_url = "https://github.com/arduino/ArduinoCore-avr.git"
@@ -843,28 +908,28 @@ def test_compile_manually_installed_platform_using_platform_local_txt(run_comman
     assert Repo.clone_from(git_url, repo_dir, multi_options=["-b 1.8.3"])
 
     # Installs also the same core via CLI so all the necessary tools are installed
-    assert run_command("core install arduino:avr@1.8.3")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
 
     # Verifies compilation works without issues
-    assert run_command(f"compile --clean -b {fqbn} {sketch_path}")
+    assert run_command(["compile", "--clean", "-b", fqbn, sketch_path])
 
     # Overrides default platform compiler with an unexisting one
     platform_local_txt = Path(repo_dir, "platform.local.txt")
     platform_local_txt.write_text("compiler.c.cmd=my-compiler-that-does-not-exist")
 
     # Verifies compilation now fails because compiler is not found
-    res = run_command(f"compile --clean -b {fqbn} {sketch_path}")
+    res = run_command(["compile", "--clean", "-b", fqbn, sketch_path])
     assert res.failed
     assert "my-compiler-that-does-not-exist" in res.stderr
 
 
 def test_compile_manually_installed_platform_using_boards_local_txt(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     sketch_name = "CompileSketchManuallyInstalledPlatformUsingBoardsLocalTxt"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino-beta-development:avr:nessuno"
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
 
     # Manually installs a core in sketchbooks hardware folder
     git_url = "https://github.com/arduino/ArduinoCore-avr.git"
@@ -872,10 +937,10 @@ def test_compile_manually_installed_platform_using_boards_local_txt(run_command,
     assert Repo.clone_from(git_url, repo_dir, multi_options=["-b 1.8.3"])
 
     # Installs also the same core via CLI so all the necessary tools are installed
-    assert run_command("core install arduino:avr@1.8.3")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
 
     # Verifies compilation fails because board doesn't exist
-    res = run_command(f"compile --clean -b {fqbn} {sketch_path}")
+    res = run_command(["compile", "--clean", "-b", fqbn, sketch_path])
     assert res.failed
     assert (
         "Error during build: Error resolving FQBN: board arduino-beta-development:avr@1.8.3:nessuno not found"
@@ -886,19 +951,19 @@ def test_compile_manually_installed_platform_using_boards_local_txt(run_command,
     boards_local_txt = Path(repo_dir, "boards.local.txt")
     shutil.copyfile(Path(__file__).parent / "testdata" / "boards.local.txt", boards_local_txt)
 
-    assert run_command(f"compile --clean -b {fqbn} {sketch_path}")
+    assert run_command(["compile", "--clean", "-b", fqbn, sketch_path])
 
 
 def test_compile_with_library(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
-    assert run_command("core install arduino:avr@1.8.3")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
 
     sketch_name = "CompileSketchWithWiFi101Dependency"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
     # Create new sketch and add library include
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
     sketch_file = sketch_path / f"{sketch_name}.ino"
     lines = []
     with open(sketch_file, "r") as f:
@@ -912,15 +977,15 @@ def test_compile_with_library(run_command, data_dir):
     lib_path = Path(data_dir, "my-libraries", "WiFi101")
     assert Repo.clone_from(git_url, lib_path, multi_options=["-b 0.16.1"])
 
-    res = run_command(f"compile -b {fqbn} {sketch_path} --library {lib_path} -v")
+    res = run_command(["compile", "-b", fqbn, sketch_path, "--library", lib_path, "-v"])
     assert res.ok
     assert "WiFi101" in res.stdout
 
 
 def test_compile_with_library_priority(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
-    assert run_command("core install arduino:avr@1.8.3")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
 
     sketch_name = "CompileSketchWithLibraryPriority"
     sketch_path = Path(data_dir, sketch_name)
@@ -932,10 +997,10 @@ def test_compile_with_library_priority(run_command, data_dir):
     assert Repo.clone_from(git_url, manually_install_lib_path, multi_options=["-b 0.16.1"])
 
     # Install the same library we installed manually
-    assert run_command("lib install WiFi101")
+    assert run_command(["lib", "install", "WiFi101"])
 
     # Create new sketch and add library include
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
     sketch_file = sketch_path / f"{sketch_name}.ino"
     lines = []
     with open(sketch_file, "r") as f:
@@ -944,7 +1009,7 @@ def test_compile_with_library_priority(run_command, data_dir):
     with open(sketch_file, "w") as f:
         f.writelines(lines)
 
-    res = run_command(f"compile -b {fqbn} {sketch_path} --library {manually_install_lib_path} -v")
+    res = run_command(["compile", "-b", fqbn, sketch_path, "--library", manually_install_lib_path, "-v"])
     assert res.ok
     cli_installed_lib_path = Path(data_dir, "libraries", "WiFi101")
     expected_output = [
@@ -956,16 +1021,16 @@ def test_compile_with_library_priority(run_command, data_dir):
 
 
 def test_recompile_with_different_library(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
-    assert run_command("core install arduino:avr@1.8.3")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
 
     sketch_name = "RecompileCompileSketchWithDifferentLibrary"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
 
     # Install library
-    assert run_command("lib install WiFi101")
+    assert run_command(["lib", "install", "WiFi101"])
 
     # Manually installs the same library already installed
     git_url = "https://github.com/arduino-libraries/WiFi101.git"
@@ -973,7 +1038,7 @@ def test_recompile_with_different_library(run_command, data_dir):
     assert Repo.clone_from(git_url, manually_install_lib_path, multi_options=["-b 0.16.1"])
 
     # Create new sketch and add library include
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
     sketch_file = sketch_path / f"{sketch_name}.ino"
     lines = []
     with open(sketch_file, "r") as f:
@@ -986,22 +1051,22 @@ def test_recompile_with_different_library(run_command, data_dir):
     build_dir = Path(tempfile.gettempdir(), f"arduino-sketch-{sketch_path_md5}")
 
     # Compile sketch using library not managed by CLI
-    res = run_command(f"compile -b {fqbn} --library {manually_install_lib_path} {sketch_path} -v")
+    res = run_command(["compile", "-b", fqbn, "--library", manually_install_lib_path, sketch_path, "-v"])
     assert res.ok
     obj_path = build_dir / "libraries" / "WiFi101" / "WiFi.cpp.o"
     assert f"Using previously compiled file: {obj_path}" not in res.stdout
 
     # Compile again using library installed from CLI
-    res = run_command(f"compile -b {fqbn} {sketch_path} -v")
+    res = run_command(["compile", "-b", fqbn, sketch_path, "-v"])
     assert res.ok
     obj_path = build_dir / "libraries" / "WiFi101" / "WiFi.cpp.o"
     assert f"Using previously compiled file: {obj_path}" not in res.stdout
 
 
 def test_compile_with_conflicting_libraries_include(run_command, data_dir, copy_sketch):
-    assert run_command("update")
+    assert run_command(["update"])
 
-    assert run_command("core install arduino:avr@1.8.3")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
 
     # Install conflicting libraries
     git_url = "https://github.com/pstolarz/OneWireNg.git"
@@ -1015,7 +1080,7 @@ def test_compile_with_conflicting_libraries_include(run_command, data_dir, copy_
     sketch_path = copy_sketch("sketch_with_conflicting_libraries_include")
     fqbn = "arduino:avr:uno"
 
-    res = run_command(f"compile -b {fqbn} {sketch_path} --verbose")
+    res = run_command(["compile", "-b", fqbn, sketch_path, "--verbose"])
     assert res.ok
     expected_output = [
         'Multiple libraries were found for "OneWire.h"',
@@ -1026,29 +1091,29 @@ def test_compile_with_conflicting_libraries_include(run_command, data_dir, copy_
 
 
 def test_compile_with_invalid_build_options_json(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
-    assert run_command("core install arduino:avr@1.8.3")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
 
     sketch_name = "CompileInvalidBuildOptionsJson"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:avr:uno"
 
     # Create a test sketch
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
 
     # Get the build directory
     sketch_path_md5 = hashlib.md5(bytes(sketch_path)).hexdigest().upper()
     build_dir = Path(tempfile.gettempdir(), f"arduino-sketch-{sketch_path_md5}")
 
-    assert run_command(f"compile -b {fqbn} {sketch_path} --verbose")
+    assert run_command(["compile", "-b", fqbn, sketch_path, "--verbose"])
 
     # Breaks the build.options.json file
     build_options_json = build_dir / "build.options.json"
     with open(build_options_json, "w") as f:
         f.write("invalid json")
 
-    assert run_command(f"compile -b {fqbn} {sketch_path} --verbose")
+    assert run_command(["compile", "-b", fqbn, sketch_path, "--verbose"])
 
 
 def test_compile_with_esp32_bundled_libraries(run_command, data_dir, copy_sketch):
@@ -1063,21 +1128,21 @@ def test_compile_with_esp32_bundled_libraries(run_command, data_dir, copy_sketch
     # The reason those libraries have these suffixes is to avoid an annoying bug in the Java IDE
     # that would have caused the libraries that are both bundled with the core and the Java IDE to be
     # always marked as updatable. For more info see: https://github.com/arduino/Arduino/issues/4189
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Update index with esp32 core and install it
     url = "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
     core_version = "1.0.6"
-    assert run_command(f"core update-index --additional-urls={url}")
-    assert run_command(f"core install esp32:esp32@{core_version} --additional-urls={url}")
+    assert run_command(["core", "update-index", f"--additional-urls={url}"])
+    assert run_command(["core", "install", f"esp32:esp32@{core_version}", f"--additional-urls={url}"])
 
     # Install a library with the same name as one bundled with the core
-    assert run_command("lib install SD")
+    assert run_command(["lib", "install", "SD"])
 
     sketch_path = copy_sketch("sketch_with_sd_library")
     fqbn = "esp32:esp32:esp32"
 
-    res = run_command(f"compile -b {fqbn} {sketch_path} --verbose")
+    res = run_command(["compile", "-b", fqbn, sketch_path, "--verbose"])
     assert res.failed
 
     core_bundled_lib_path = Path(data_dir, "packages", "esp32", "hardware", "esp32", core_version, "libraries", "SD")
@@ -1102,21 +1167,21 @@ def test_compile_with_esp8266_bundled_libraries(run_command, data_dir, copy_sket
     # The reason those libraries have these suffixes is to avoid an annoying bug in the Java IDE
     # that would have caused the libraries that are both bundled with the core and the Java IDE to be
     # always marked as updatable. For more info see: https://github.com/arduino/Arduino/issues/4189
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Update index with esp8266 core and install it
     url = "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
     core_version = "2.7.4"
-    assert run_command(f"core update-index --additional-urls={url}")
-    assert run_command(f"core install esp8266:esp8266@{core_version} --additional-urls={url}")
+    assert run_command(["core", "update-index", f"--additional-urls={url}"])
+    assert run_command(["core", "install", f"esp8266:esp8266@{core_version}", f"--additional-urls={url}"])
 
     # Install a library with the same name as one bundled with the core
-    assert run_command("lib install SD")
+    assert run_command(["lib", "install", "SD"])
 
     sketch_path = copy_sketch("sketch_with_sd_library")
     fqbn = "esp8266:esp8266:generic"
 
-    res = run_command(f"compile -b {fqbn} {sketch_path} --verbose")
+    res = run_command(["compile", "-b", fqbn, sketch_path, "--verbose"])
     assert res.failed
 
     core_bundled_lib_path = Path(
@@ -1132,35 +1197,35 @@ def test_compile_with_esp8266_bundled_libraries(run_command, data_dir, copy_sket
 
 
 def test_compile_sketch_with_tpp_file_include(run_command, copy_sketch):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Download latest AVR
-    run_command("core install arduino:avr")
+    run_command(["core", "install", "arduino:avr"])
 
     sketch_name = "sketch_with_tpp_file_include"
     sketch_path = copy_sketch(sketch_name)
     fqbn = "arduino:avr:uno"
 
-    assert run_command(f"compile -b {fqbn} {sketch_path} --verbose")
+    assert run_command(["compile", "-b", fqbn, sketch_path, "--verbose"])
 
 
 def test_compile_sketch_with_ipp_file_include(run_command, copy_sketch):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Download latest AVR
-    run_command("core install arduino:avr")
+    run_command(["core", "install", "arduino:avr"])
 
     sketch_name = "sketch_with_ipp_file_include"
     sketch_path = copy_sketch(sketch_name)
     fqbn = "arduino:avr:uno"
 
-    assert run_command(f"compile -b {fqbn} {sketch_path} --verbose")
+    assert run_command(["compile", "-b", fqbn, sketch_path, "--verbose"])
 
 
 def test_compile_with_relative_build_path(run_command, data_dir, copy_sketch):
-    assert run_command("update")
+    assert run_command(["update"])
 
-    run_command("core install arduino:avr@1.8.3")
+    run_command(["core", "install", "arduino:avr@1.8.3"])
 
     sketch_name = "sketch_simple"
     sketch_path = copy_sketch(sketch_name)
@@ -1169,7 +1234,10 @@ def test_compile_with_relative_build_path(run_command, data_dir, copy_sketch):
     build_path = Path("..", "build_path")
     working_dir = Path(data_dir, "working_dir")
     working_dir.mkdir()
-    assert run_command(f"compile -b {fqbn} --build-path {build_path} {sketch_path} -v", custom_working_dir=working_dir)
+    assert run_command(
+        ["compile", "-b", fqbn, "--build-path", build_path, sketch_path, "-v"],
+        custom_working_dir=working_dir,
+    )
 
     absolute_build_path = Path(data_dir, "build_path")
     built_files = [f.name for f in absolute_build_path.glob("*")]

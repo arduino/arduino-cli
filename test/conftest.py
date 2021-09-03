@@ -124,13 +124,16 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
     }
     (Path(data_dir) / "packages").mkdir(exist_ok=True)
 
-    def _run(cmd_string, custom_working_dir=None, custom_env=None):
+    def _run(cmd: list, custom_working_dir=None, custom_env=None):
+        if cmd is None:
+            cmd = []
+        quoted_cmd = [f'"{t}"' for t in cmd]
 
         if not custom_working_dir:
             custom_working_dir = working_dir
         if not custom_env:
             custom_env = env
-        cli_full_line = '"{}" {}'.format(cli_path, cmd_string)
+        cli_full_line = '"{}" {}'.format(cli_path, " ".join(quoted_cmd))
         run_context = Context()
         # It might happen that we need to change directories between drives on Windows,
         # in that case the "/d" flag must be used otherwise directory wouldn't change
@@ -157,7 +160,8 @@ def daemon_runner(pytestconfig, data_dir, downloads_dir, working_dir):
         http://docs.pyinvoke.org/en/1.4/api/runners.html#invoke.runners.Local
         http://docs.pyinvoke.org/en/1.4/api/runners.html
     """
-    cli_full_line = str(Path(pytestconfig.rootdir).parent / "arduino-cli daemon")
+    cli_path = Path(pytestconfig.rootdir).parent / "arduino-cli"
+    cli_full_line = f'"{cli_path}" daemon'
     env = {
         "ARDUINO_DATA_DIR": data_dir,
         "ARDUINO_DOWNLOADS_DIR": downloads_dir,
@@ -197,8 +201,8 @@ def detected_boards(run_command):
 
     :returns a list `Board` objects.
     """
-    assert run_command("core update-index")
-    result = run_command("board list --format json")
+    assert run_command(["core", "update-index"])
+    result = run_command(["board", "list", "--format", "json"])
     assert result.ok
 
     detected_boards = []
@@ -240,7 +244,7 @@ def wait_for_board(run_command):
         # available after a test upload and subsequent tests might consequently fail.
         time_end = time.time() + seconds
         while time.time() < time_end:
-            result = run_command("board list --format json")
+            result = run_command(["board", "list", "--format", "json"])
             ports = json.loads(result.stdout)
             if len([p.get("boards", []) for p in ports]) > 0:
                 break

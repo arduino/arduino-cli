@@ -19,45 +19,45 @@ from pathlib import Path
 
 def test_debugger_starts(run_command, data_dir):
     # Init the environment explicitly
-    assert run_command("core update-index")
+    assert run_command(["core", "update-index"])
 
     # Install cores
-    assert run_command("core install arduino:samd")
+    assert run_command(["core", "install", "arduino:samd"])
 
     # Create sketch for testing
     sketch_name = "DebuggerStartTest"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:samd:mkr1000"
 
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
 
     # Build sketch
-    assert run_command(f"compile -b {fqbn} {sketch_path}")
+    assert run_command(["compile", "-b", fqbn, sketch_path])
 
     programmer = "atmel_ice"
     # Starts debugger
-    assert run_command(f"debug -b {fqbn} -P {programmer} {sketch_path} --info")
+    assert run_command(["debug", "-b", fqbn, "-P", programmer, sketch_path, "--info"])
 
 
 def test_debugger_with_pde_sketch_starts(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Install core
-    assert run_command("core install arduino:samd")
+    assert run_command(["core", "install", "arduino:samd"])
 
     # Create sketch for testing
     sketch_name = "DebuggerPdeSketchStartTest"
     sketch_path = Path(data_dir, sketch_name)
     fqbn = "arduino:samd:mkr1000"
 
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
 
     # Renames sketch file to pde
     Path(sketch_path, f"{sketch_name}.ino").rename(sketch_path / f"{sketch_name}.pde")
 
     # Build sketch
-    assert run_command(f"compile -b {fqbn} {sketch_path}")
+    assert run_command(["compile", "-b", fqbn, sketch_path])
 
     programmer = "atmel_ice"
     # Starts debugger
-    assert run_command(f"debug -b {fqbn} -P {programmer} {sketch_path} --info")
+    assert run_command(["debug", "-b", fqbn, "-P", programmer, sketch_path, "--info"])
