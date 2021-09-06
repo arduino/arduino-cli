@@ -5,10 +5,6 @@ msgstr ""
 msgid "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
 msgstr "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
 
-#: commands/upload/upload.go:529
-msgid "%[1]s and %[2]s cannot be used together"
-msgstr "%[1]s and %[2]s cannot be used together"
-
 #: legacy/builder/fail_if_imported_library_is_wrong.go:37
 msgid "%[1]s folder is no longer supported! See %[2]s for more information"
 msgstr "%[1]s folder is no longer supported! See %[2]s for more information"
@@ -36,6 +32,10 @@ msgstr "%[1]s, protocol version: %[2]d"
 #: cli/output/rpc_progress.go:64
 msgid "%s already downloaded"
 msgstr "%s already downloaded"
+
+#: commands/upload/upload.go:529
+msgid "%s and %s cannot be used together"
+msgstr "%s and %s cannot be used together"
 
 #: cli/output/rpc_progress.go:76
 msgid "%s downloaded"
@@ -133,8 +133,8 @@ msgid "Already installed %s"
 msgstr "Already installed %s"
 
 #: legacy/builder/resolve_library.go:34
-msgid "Alternatives for %s:"
-msgstr "Alternatives for %s:"
+msgid "Alternatives for %[1]s: %[2]s"
+msgstr "Alternatives for %[1]s: %[2]s"
 
 #: cli/lib/search.go:171
 msgid "Architecture: %s"
@@ -2560,8 +2560,8 @@ msgid "error querying Arduino Cloud Api"
 msgstr "error querying Arduino Cloud Api"
 
 #: cli/upload/upload.go:71
-msgid "error: %[1]s and %[2]s flags cannot be used together"
-msgstr "error: %[1]s and %[2]s flags cannot be used together"
+msgid "error: %s and %s flags cannot be used together"
+msgstr "error: %s and %s flags cannot be used together"
 
 #: arduino/resources/install.go:67
 msgid "extracting archive: %s"
@@ -3075,10 +3075,6 @@ msgstr "reading package root dir: %s"
 msgid "reading sketch metadata %[1]s: %[2]s"
 msgstr "reading sketch metadata %[1]s: %[2]s"
 
-#: legacy/builder/wipeout_build_path_if_build_options_changed.go:49
-msgid "rebuilding all"
-msgstr "rebuilding all"
-
 #: commands/upload/upload.go:472
 msgid "recipe not found '%s'"
 msgstr "recipe not found '%s'"
@@ -3312,6 +3308,10 @@ msgstr "writing sketch metadata %[1]s: %[2]s"
 #: commands/board/list.go:94
 msgid "wrong format in server response"
 msgstr "wrong format in server response"
+
+#: legacy/builder/wipeout_build_path_if_build_options_changed.go:49
+msgid "{0} invalid, rebuilding all"
+msgstr "{0} invalid, rebuilding all"
 
 #: legacy/builder/builder_utils/utils.go:323
 #: legacy/builder/builder_utils/utils.go:329

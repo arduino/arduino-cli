@@ -31,7 +31,7 @@ func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {
 
 	logger := ctx.GetLogger()
 	if ctx.Verbose {
-		logger.Println(constants.LOG_LEVEL_INFO, tr("Alternatives for %s:", header), candidates)
+		logger.Println(constants.LOG_LEVEL_INFO, tr("Alternatives for %[1]s: %[2]s", header, candidates))
 		logger.Println(constants.LOG_LEVEL_INFO, fmt.Sprintf("ResolveLibrary(%s)", header))
 		logger.Println(constants.LOG_LEVEL_INFO, fmt.Sprintf("  -> %s: %s", tr("candidates"), candidates))
 	}

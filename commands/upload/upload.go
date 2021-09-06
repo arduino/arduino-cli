@@ -526,7 +526,7 @@ func determineBuildPathAndSketchName(importFile, importDir string, sk *sketch.Sk
 	// Case 1: importFile flag has been specified
 	if importFile != "" {
 		if importDir != "" {
-			return nil, "", fmt.Errorf(tr("%[1]s and %[2]s cannot be used together", "importFile", "importDir"))
+			return nil, "", fmt.Errorf(tr("%s and %s cannot be used together", "importFile", "importDir"))
 		}
 
 		// We have a path like "path/to/my/build/SketchName.ino.bin". We are going to

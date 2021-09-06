@@ -68,7 +68,7 @@ func NewCommand() *cobra.Command {
 
 func checkFlagsConflicts(command *cobra.Command, args []string) {
 	if importFile != "" && importDir != "" {
-		feedback.Errorf(tr("error: %[1]s and %[2]s flags cannot be used together", "--input-file", "--input-dir"))
+		feedback.Errorf(tr("error: %s and %s flags cannot be used together", "--input-file", "--input-dir"))
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 }
