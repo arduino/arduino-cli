@@ -25,6 +25,7 @@ import "cc/arduino/cli/commands/v1/common.proto";
 import "cc/arduino/cli/commands/v1/board.proto";
 import "cc/arduino/cli/commands/v1/compile.proto";
 import "cc/arduino/cli/commands/v1/core.proto";
+import "cc/arduino/cli/commands/v1/monitor.proto";
 import "cc/arduino/cli/commands/v1/upload.proto";
 import "cc/arduino/cli/commands/v1/lib.proto";
 
@@ -170,6 +171,9 @@ service ArduinoCoreService {
 
   // List the installed libraries.
   rpc LibraryList(LibraryListRequest) returns (LibraryListResponse);
+
+  // Open a monitor connection to a board port
+  rpc Monitor(stream MonitorRequest) returns (stream MonitorResponse);
 }
 
 message CreateRequest {}
