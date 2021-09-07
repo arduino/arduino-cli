@@ -35,9 +35,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type boardNotFoundError struct{}
+
+func (e *boardNotFoundError) Error() string {
+	return tr("board not found")
+}
+
 var (
 	// ErrNotFound is returned when the API returns 404
-	ErrNotFound = errors.New(tr("board not found"))
+	ErrNotFound = &boardNotFoundError{}
 	vidPidURL   = "https://builder.arduino.cc/v3/boards/byVidPid"
 	validVidPid = regexp.MustCompile(`0[xX][a-fA-F\d]{4}`)
 )
@@ -132,7 +138,7 @@ func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.B
 	// the builder API if the board is a USB device port
 	if len(boards) == 0 {
 		items, err := identifyViaCloudAPI(port)
-		if err == ErrNotFound {
+		if errors.Is(err, ErrNotFound) {
 			// the board couldn't be detected, print a warning
 			logrus.Debug("Board not recognized")
 		} else if err != nil {
@@ -274,7 +280,7 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 				if err != nil {
 					outChan <- &rpc.BoardListWatchResponse{
 						EventType: "error",
-						Error:     fmt.Sprintf(tr("stopping discoveries: %s"), err),
+						Error:     tr("stopping discoveries: %s", err),
 					}
 					// Don't close the channel if quitting all discoveries
 					// failed, otherwise some processes might be left running.

@@ -17,7 +17,6 @@ package core
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -70,14 +69,14 @@ func installPlatform(pm *packagemanager.PackageManager,
 	// Prerequisite checks before install
 	if platformRelease.IsInstalled() {
 		log.Warn("Platform already installed")
-		taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Platform %s already installed"), platformRelease), Completed: true})
+		taskCB(&rpc.TaskProgress{Name: tr("Platform %s already installed", platformRelease), Completed: true})
 		return nil
 	}
 	toolsToInstall := []*cores.ToolRelease{}
 	for _, tool := range requiredTools {
 		if tool.IsInstalled() {
 			log.WithField("tool", tool).Warn("Tool already installed")
-			taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Tool %s already installed"), tool), Completed: true})
+			taskCB(&rpc.TaskProgress{Name: tr("Tool %s already installed", tool), Completed: true})
 		} else {
 			toolsToInstall = append(toolsToInstall, tool)
 		}
@@ -107,11 +106,11 @@ func installPlatform(pm *packagemanager.PackageManager,
 	if installed == nil {
 		// No version of this platform is installed
 		log.Info("Installing platform")
-		taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Installing platform %s"), platformRelease)})
+		taskCB(&rpc.TaskProgress{Name: tr("Installing platform %s", platformRelease)})
 	} else {
 		// A platform with a different version is already installed
 		log.Info("Upgrading platform " + installed.String())
-		taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Upgrading platform %[1]s with %[2]s"), installed, platformRelease)})
+		taskCB(&rpc.TaskProgress{Name: tr("Upgrading platform %[1]s with %[2]s", installed, platformRelease)})
 		platformRef := &packagemanager.PlatformReference{
 			Package:              platformRelease.Platform.Package.Name,
 			PlatformArchitecture: platformRelease.Platform.Architecture,
@@ -141,12 +140,12 @@ func installPlatform(pm *packagemanager.PackageManager,
 		// In case of error try to rollback
 		if uninstallErr != nil {
 			log.WithError(uninstallErr).Error("Error upgrading platform.")
-			taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("Error upgrading platform: %s"), uninstallErr)})
+			taskCB(&rpc.TaskProgress{Message: tr("Error upgrading platform: %s", uninstallErr)})
 
 			// Rollback
 			if err := pm.UninstallPlatform(platformRelease); err != nil {
 				log.WithError(err).Error("Error rolling-back changes.")
-				taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("Error rolling-back changes: %s"), err)})
+				taskCB(&rpc.TaskProgress{Message: tr("Error rolling-back changes: %s", err)})
 			}
 
 			return &commands.FailedInstallError{Message: tr("Cannot upgrade platform"), Cause: uninstallErr}
@@ -166,7 +165,7 @@ func installPlatform(pm *packagemanager.PackageManager,
 		log.Info("Running post_install script")
 		taskCB(&rpc.TaskProgress{Message: tr("Configuring platform.")})
 		if err := pm.RunPostInstallScript(platformRelease); err != nil {
-			taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("WARNING cannot configure platform: %s"), err)})
+			taskCB(&rpc.TaskProgress{Message: tr("WARNING cannot configure platform: %s", err)})
 		}
 	} else {
 		log.Info("Skipping platform configuration.")
@@ -174,6 +173,6 @@ func installPlatform(pm *packagemanager.PackageManager,
 	}
 
 	log.Info("Platform installed")
-	taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("Platform %s installed"), platformRelease), Completed: true})
+	taskCB(&rpc.TaskProgress{Message: tr("Platform %s installed", platformRelease), Completed: true})
 	return nil
 }

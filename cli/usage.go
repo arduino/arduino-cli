@@ -19,20 +19,20 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 )
 
-// Declare ids used in usage
-var (
-	tr = i18n.Tr
-	_  = tr("Usage:")
-	_  = tr("Aliases:")
-	_  = tr("Examples:")
-	_  = tr("Available Commands:")
-	_  = tr("Flags:")
-	_  = tr("Global Flags:")
-	_  = tr("Additional help topics:")
-	_  = tr("Use %s for more information about a command.")
-)
+var tr = i18n.Tr
 
-const usageTemplate = `{{tr "Usage:"}}{{if .Runnable}}
+func getUsageTemplate() string {
+	// Force i18n to generate translation strings
+	_ = tr("Usage:")
+	_ = tr("Aliases:")
+	_ = tr("Examples:")
+	_ = tr("Available Commands:")
+	_ = tr("Flags:")
+	_ = tr("Global Flags:")
+	_ = tr("Additional help topics:")
+	_ = tr("Use %s for more information about a command.")
+
+	return `{{tr "Usage:"}}{{if .Runnable}}
   {{.UseLine}}{{end}}{{if .HasAvailableSubCommands}}
   {{.CommandPath}} [command]{{end}}{{if gt (len .Aliases) 0}}
 
@@ -56,3 +56,4 @@ const usageTemplate = `{{tr "Usage:"}}{{if .Runnable}}
 
 {{tr "Use %s for more information about a command." (printf "%s %s" .CommandPath "[command] --help" | printf "%q")}}{{end}}
 `
+}

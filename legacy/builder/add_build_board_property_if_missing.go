@@ -38,7 +38,7 @@ func (*AddBuildBoardPropertyIfMissing) Run(ctx *types.Context) error {
 						logger.Fprintln(
 							os.Stdout,
 							constants.LOG_LEVEL_WARN,
-							constants.MSG_MISSING_BUILD_BOARD,
+							tr("Warning: Board {0}:{1}:{2} doesn''t define a %s preference. Auto-set to: {3}", "''build.board''"),
 							aPackage.Name,
 							platform.Architecture,
 							board.BoardID,

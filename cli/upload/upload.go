@@ -17,7 +17,6 @@ package upload
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -69,7 +68,7 @@ func NewCommand() *cobra.Command {
 
 func checkFlagsConflicts(command *cobra.Command, args []string) {
 	if importFile != "" && importDir != "" {
-		feedback.Errorf(fmt.Sprintf(tr("error: %s and %s flags cannot be used together"), "--input-file", "--input-dir"))
+		feedback.Errorf(tr("error: %s and %s flags cannot be used together", "--input-file", "--input-dir"))
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 }
@@ -121,7 +120,7 @@ func run(command *cobra.Command, args []string) {
 
 	fields := map[string]string{}
 	if len(userFieldRes.UserFields) > 0 {
-		feedback.Printf(tr("Uploading to specified board using %s protocol requires the following info:"), discoveryPort.Protocol)
+		feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", discoveryPort.Protocol))
 		fields = arguments.AskForUserFields(userFieldRes.UserFields)
 	}
 

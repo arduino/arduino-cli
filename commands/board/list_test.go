@@ -108,7 +108,7 @@ func TestBoardDetectionViaAPIWithNonUSBPort(t *testing.T) {
 		Properties: properties.NewMap(),
 	}
 	items, err := identifyViaCloudAPI(port)
-	require.Equal(t, err, ErrNotFound)
+	require.ErrorIs(t, err, ErrNotFound)
 	require.Empty(t, items)
 }
 

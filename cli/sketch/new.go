@@ -65,5 +65,5 @@ func runNewCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	feedback.Printf(tr("Sketch created in: %s"), sketchDir)
+	feedback.Print(tr("Sketch created in: %s", sketchDir))
 }

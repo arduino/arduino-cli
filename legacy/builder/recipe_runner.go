@@ -36,7 +36,7 @@ type RecipeByPrefixSuffixRunner struct {
 func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 	logger := ctx.GetLogger()
 	if ctx.DebugLevel >= 10 {
-		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_LOOKING_FOR_RECIPES, s.Prefix, s.Suffix)
+		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("Looking for recipes like {0}*{1}"), s.Prefix, s.Suffix)
 	}
 
 	buildProperties := ctx.BuildProperties.Clone()
@@ -45,7 +45,7 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 	properties := buildProperties.Clone()
 	for _, recipe := range recipes {
 		if ctx.DebugLevel >= 10 {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_RUNNING_RECIPE, recipe)
+			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("Running recipe: {0}"), recipe)
 		}
 
 		command, err := builder_utils.PrepareCommandForRecipe(properties, recipe, false)

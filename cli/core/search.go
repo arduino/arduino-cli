@@ -115,7 +115,7 @@ func (sr searchResults) String() string {
 		for _, item := range sr.platforms {
 			name := item.GetName()
 			if item.Deprecated {
-				name = fmt.Sprintf(tr("[DEPRECATED] %s"), name)
+				name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), name)
 			}
 			t.AddRow(item.GetId(), item.GetLatest(), name)
 		}

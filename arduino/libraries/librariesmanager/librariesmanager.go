@@ -62,7 +62,7 @@ var tr = i18n.Tr
 // Add adds a library to the alternatives
 func (alts *LibraryAlternatives) Add(library *libraries.Library) {
 	if len(alts.Alternatives) > 0 && alts.Alternatives[0].Name != library.Name {
-		panic(fmt.Sprintf(tr("the library name is different from the set (%[1]s != %[2]s)"), alts.Alternatives[0].Name, library.Name))
+		panic(fmt.Sprintf("the library name is different from the set (%[1]s != %[2]s)", alts.Alternatives[0].Name, library.Name))
 	}
 	alts.Alternatives = append(alts.Alternatives, library)
 }

@@ -17,7 +17,6 @@ package lib
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -34,9 +33,9 @@ func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, tas
 	lib := lm.FindByReference(ref)
 
 	if lib == nil {
-		taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("Library %s is not installed"), req.Name), Completed: true})
+		taskCB(&rpc.TaskProgress{Message: tr("Library %s is not installed", req.Name), Completed: true})
 	} else {
-		taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Uninstalling %s"), lib)})
+		taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s", lib)})
 		lm.Uninstall(lib)
 		taskCB(&rpc.TaskProgress{Completed: true})
 	}

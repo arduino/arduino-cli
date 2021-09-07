@@ -41,7 +41,9 @@ func (s *WarnAboutArchIncompatibleLibraries) Run(ctx *types.Context) error {
 
 	for _, importedLibrary := range ctx.ImportedLibraries {
 		if !importedLibrary.SupportsAnyArchitectureIn(archs...) {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN, constants.MSG_LIBRARY_INCOMPATIBLE_ARCH,
+			logger.Fprintln(os.Stdout,
+				constants.LOG_LEVEL_WARN,
+				tr("WARNING: library {0} claims to run on {1} architecture(s) and may be incompatible with your current board which runs on {2} architecture(s)."),
 				importedLibrary.Name,
 				strings.Join(importedLibrary.Architectures, ", "),
 				strings.Join(archs, ", "))

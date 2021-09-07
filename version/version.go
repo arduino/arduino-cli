@@ -16,8 +16,6 @@
 package version
 
 import (
-	"fmt"
-
 	"github.com/arduino/arduino-cli/i18n"
 )
 
@@ -52,7 +50,7 @@ func NewInfo(application string) *Info {
 }
 
 func (i *Info) String() string {
-	return fmt.Sprintf(tr("%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"), i.Application, i.Status, i.VersionString, i.Commit, i.Date)
+	return tr("%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s", i.Application, i.Status, i.VersionString, i.Commit, i.Date)
 }
 
 //nolint:gochecknoinits

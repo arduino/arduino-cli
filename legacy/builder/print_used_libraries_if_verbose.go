@@ -35,12 +35,21 @@ func (s *PrintUsedLibrariesIfVerbose) Run(ctx *types.Context) error {
 	for _, library := range ctx.ImportedLibraries {
 		legacy := ""
 		if library.IsLegacy {
-			legacy = constants.MSG_LIB_LEGACY
+			legacy = tr("(legacy)")
 		}
 		if library.Version.String() == "" {
-			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_LIBRARY, library.Name, library.InstallDir, legacy)
+			logger.Println(constants.LOG_LEVEL_INFO,
+				tr("Using library {0} in folder: {1} {2}"),
+				library.Name,
+				library.InstallDir,
+				legacy)
 		} else {
-			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_LIBRARY_AT_VERSION, library.Name, library.Version, library.InstallDir, legacy)
+			logger.Println(constants.LOG_LEVEL_INFO,
+				tr("Using library {0} at version {1} in folder: {2} {3}"),
+				library.Name,
+				library.Version,
+				library.InstallDir,
+				legacy)
 		}
 	}
 

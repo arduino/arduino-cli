@@ -17,7 +17,6 @@ package debug
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"sort"
@@ -62,7 +61,7 @@ func NewCommand() *cobra.Command {
 	debugCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
 	port.AddToCommand(debugCommand)
 	debugCommand.Flags().StringVarP(&programmer, "programmer", "P", "", tr("Programmer to use for debugging"))
-	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", fmt.Sprintf(tr("Debug interpreter e.g.: %s, %s, %s, %s, %s"), "console", "mi", "mi1", "mi2", "mi3"))
+	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
 	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries for debug."))
 	debugCommand.Flags().BoolVarP(&printInfo, "info", "I", false, tr("Show metadata about the debug session instead of starting the debugger."))
 
@@ -151,7 +150,7 @@ func (r *debugInfoResult) String() string {
 		conf := properties.NewFromHashmap(r.info.GetServerConfiguration())
 		keys := conf.Keys()
 		sort.Strings(keys)
-		t.AddRow(fmt.Sprintf(tr("%s custom configurations"), r.info.GetServer()))
+		t.AddRow(tr("Configuration options for %s", r.info.GetServer()))
 		for _, k := range keys {
 			t.AddRow(table.NewCell(" - "+k, dimGreen), table.NewCell(conf.Get(k), dimGreen))
 		}

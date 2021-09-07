@@ -22,7 +22,6 @@ package i18n
 func Init(configLocale ...string) {
 	initRiceBox()
 	locales := supportedLocales()
-
 	if len(configLocale) > 1 {
 		panic("Multiple arguments not supported")
 	}

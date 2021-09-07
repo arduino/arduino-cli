@@ -42,7 +42,7 @@ func initAttachCommand() *cobra.Command {
 		Run:  runAttachCommand,
 	}
 	attachCommand.Flags().StringVar(&attachFlags.searchTimeout, "timeout", "5s",
-		fmt.Sprintf(tr("The connected devices search timeout, raise it if your board doesn't show up (e.g. to %s)."), "10s"))
+		tr("The connected devices search timeout, raise it if your board doesn't show up (e.g. to %s).", "10s"))
 	return attachCommand
 }
 

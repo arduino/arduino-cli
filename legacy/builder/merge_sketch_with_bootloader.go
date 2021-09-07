@@ -66,7 +66,7 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 
 	bootloaderPath := buildProperties.GetPath(constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH).Join(constants.FOLDER_BOOTLOADERS, bootloader)
 	if bootloaderPath.NotExist() {
-		utils.LogIfVerbose(constants.LOG_LEVEL_WARN, constants.MSG_BOOTLOADER_FILE_MISSING, bootloaderPath)
+		utils.LogIfVerbose(constants.LOG_LEVEL_WARN, tr("Bootloader file specified but missing: {0}"), bootloaderPath)
 		return nil
 	}
 

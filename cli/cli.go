@@ -75,7 +75,7 @@ func NewCommand() *cobra.Command {
 		PersistentPostRun: postRun,
 	}
 
-	arduinoCli.SetUsageTemplate(usageTemplate)
+	arduinoCli.SetUsageTemplate(getUsageTemplate())
 
 	createCliCommandTree(arduinoCli)
 
@@ -103,10 +103,10 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(version.NewCommand())
 
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, tr("Print the logs on the standard output."))
-	cmd.PersistentFlags().String("log-level", "", fmt.Sprintf(tr("Messages with this level and above will be logged. Valid levels are: %s, %s, %s, %s, %s, %s, %s"), "trace", "debug", "info", "warn", "error", "fatal", "panic"))
+	cmd.PersistentFlags().String("log-level", "", tr("Messages with this level and above will be logged. Valid levels are: %s", "trace, debug, info, warn, error, fatal, panic"))
 	cmd.PersistentFlags().String("log-file", "", tr("Path to the file where logs will be written."))
-	cmd.PersistentFlags().String("log-format", "", fmt.Sprintf(tr("The output format for the logs, can be {%s|%s}."), "text", "json"))
-	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", fmt.Sprintf(tr("The output format, can be {%s|%s}."), "text", "json"))
+	cmd.PersistentFlags().String("log-format", "", tr("The output format for the logs, can be: %s", "text, json"))
+	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", tr("The output format for the logs, can be: %s", "text, json"))
 	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", tr("The custom config file (if not specified the default will be used)."))
 	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, tr("Comma-separated list of additional URLs for the Boards Manager."))
 	cmd.PersistentFlags().Bool("no-color", false, "Disable colored output.")
@@ -196,7 +196,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	if logFile != "" {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
-			fmt.Printf(tr("Unable to open file for logging: %s"), logFile)
+			fmt.Println(tr("Unable to open file for logging: %s", logFile))
 			os.Exit(errorcodes.ErrBadCall)
 		}
 

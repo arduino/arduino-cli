@@ -139,7 +139,7 @@ func (res result) String() string {
 
 	for _, lib := range results {
 		if res.results.GetStatus() == rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS {
-			out.WriteString(fmt.Sprintf(tr(`Name: "%s"`)+"\n", lib.Name))
+			out.WriteString(tr(`Name: "%s"`, lib.Name) + "\n")
 			if res.namesOnly {
 				continue
 			}
