@@ -18,14 +18,14 @@ import yaml
 
 
 def test_init(run_command, data_dir, working_dir):
-    result = run_command("config init")
+    result = run_command(["config", "init"])
     assert "" == result.stderr
     assert result.ok
     assert data_dir in result.stdout
 
 
 def test_init_with_existing_custom_config(run_command, data_dir, working_dir, downloads_dir):
-    result = run_command("config init --additional-urls https://example.com")
+    result = run_command(["config", "init", "--additional-urls", "https://example.com"])
     assert result.ok
     assert data_dir in result.stdout
 
@@ -45,7 +45,7 @@ def test_init_with_existing_custom_config(run_command, data_dir, working_dir, do
 
     config_file_path = Path(working_dir) / "config" / "test" / "config.yaml"
     assert not config_file_path.exists()
-    result = run_command(f'config init --dest-file "{config_file_path}"')
+    result = run_command(["config", "init", "--dest-file", config_file_path])
     assert result.ok
     assert str(config_file_path) in result.stdout
 
@@ -65,7 +65,7 @@ def test_init_with_existing_custom_config(run_command, data_dir, working_dir, do
 
 
 def test_init_overwrite_existing_custom_file(run_command, data_dir, working_dir, downloads_dir):
-    result = run_command("config init --additional-urls https://example.com")
+    result = run_command(["config", "init", "--additional-urls", "https://example.com"])
     assert result.ok
     assert data_dir in result.stdout
 
@@ -83,7 +83,7 @@ def test_init_overwrite_existing_custom_file(run_command, data_dir, working_dir,
     assert ":9090" == configs["metrics"]["addr"]
     assert configs["metrics"]["enabled"]
 
-    result = run_command("config init --overwrite")
+    result = run_command(["config", "init", "--overwrite"])
     assert result.ok
     assert data_dir in result.stdout
 
@@ -106,7 +106,7 @@ def test_init_dest_absolute_path(run_command, working_dir):
     dest = Path(working_dir) / "config" / "test"
     expected_config_file = dest / "arduino-cli.yaml"
     assert not expected_config_file.exists()
-    result = run_command(f'config init --dest-dir "{dest}"')
+    result = run_command(["config", "init", "--dest-dir", dest])
     assert result.ok
     assert str(expected_config_file) in result.stdout
     assert expected_config_file.exists()
@@ -116,7 +116,7 @@ def test_init_dest_relative_path(run_command, working_dir):
     dest = Path(working_dir) / "config" / "test"
     expected_config_file = dest / "arduino-cli.yaml"
     assert not expected_config_file.exists()
-    result = run_command('config init --dest-dir "config/test"')
+    result = run_command(["config", "init", "--dest-dir", "config/test"])
     assert result.ok
     assert str(expected_config_file) in result.stdout
     assert expected_config_file.exists()
@@ -128,21 +128,21 @@ def test_init_dest_flag_with_overwrite_flag(run_command, working_dir):
     expected_config_file = dest / "arduino-cli.yaml"
     assert not expected_config_file.exists()
 
-    result = run_command(f'config init --dest-dir "{dest}"')
+    result = run_command(["config", "init", "--dest-dir", dest])
     assert result.ok
     assert expected_config_file.exists()
 
-    result = run_command(f'config init --dest-dir "{dest}"')
+    result = run_command(["config", "init", "--dest-dir", dest])
     assert result.failed
     assert "Config file already exists, use --overwrite to discard the existing one." in result.stderr
 
-    result = run_command(f'config init --dest-dir "{dest}" --overwrite')
+    result = run_command(["config", "init", "--dest-dir", dest, "--overwrite"])
     assert result.ok
     assert str(expected_config_file) in result.stdout
 
 
 def test_init_dest_and_config_file_flags(run_command, working_dir):
-    result = run_command('config init --dest-file "some_other_path" --dest-dir "some_path"')
+    result = run_command(["config", "init", "--dest-file", "some_other_path", "--dest-dir", "some_path"])
     assert result.failed
     assert "Can't use both --dest-file and --dest-dir flags at the same time." in result.stderr
 
@@ -150,7 +150,7 @@ def test_init_dest_and_config_file_flags(run_command, working_dir):
 def test_init_config_file_flag_absolute_path(run_command, working_dir):
     config_file = Path(working_dir) / "config" / "test" / "config.yaml"
     assert not config_file.exists()
-    result = run_command(f'config init --dest-file "{config_file}"')
+    result = run_command(["config", "init", "--dest-file", config_file])
     assert result.ok
     assert str(config_file) in result.stdout
     assert config_file.exists()
@@ -159,7 +159,7 @@ def test_init_config_file_flag_absolute_path(run_command, working_dir):
 def test_init_config_file_flag_relative_path(run_command, working_dir):
     config_file = Path(working_dir) / "config.yaml"
     assert not config_file.exists()
-    result = run_command('config init --dest-file "config.yaml"')
+    result = run_command(["config", "init", "--dest-file", "config.yaml"])
     assert result.ok
     assert str(config_file) in result.stdout
     assert config_file.exists()
@@ -169,15 +169,15 @@ def test_init_config_file_flag_with_overwrite_flag(run_command, working_dir):
     config_file = Path(working_dir) / "config" / "test" / "config.yaml"
     assert not config_file.exists()
 
-    result = run_command(f'config init --dest-file "{config_file}"')
+    result = run_command(["config", "init", "--dest-file", config_file])
     assert result.ok
     assert config_file.exists()
 
-    result = run_command(f'config init --dest-file "{config_file}"')
+    result = run_command(["config", "init", "--dest-file", config_file])
     assert result.failed
     assert "Config file already exists, use --overwrite to discard the existing one." in result.stderr
 
-    result = run_command(f'config init --dest-file "{config_file}" --overwrite')
+    result = run_command(["config", "init", "--dest-file", config_file, "--overwrite"])
     assert result.ok
     assert str(config_file) in result.stdout
 
@@ -186,22 +186,22 @@ def test_dump(run_command, data_dir, working_dir):
     # Create a config file first
     config_file = Path(working_dir) / "config" / "test" / "config.yaml"
     assert not config_file.exists()
-    result = run_command(f'config init --dest-file "{config_file}"')
+    result = run_command(["config", "init", "--dest-file", config_file])
     assert result.ok
     assert config_file.exists()
 
-    result = run_command(f'config dump --config-file "{config_file}" --format json')
+    result = run_command(["config", "dump", "--config-file", config_file, "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert [] == settings_json["board_manager"]["additional_urls"]
 
-    result = run_command('config init --additional-urls "https://example.com"')
+    result = run_command(["config", "init", "--additional-urls", "https://example.com"])
     assert result.ok
     config_file = Path(data_dir) / "arduino-cli.yaml"
     assert str(config_file) in result.stdout
     assert config_file.exists()
 
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert ["https://example.com"] == settings_json["board_manager"]["additional_urls"]
@@ -211,17 +211,25 @@ def test_dump_with_config_file_flag(run_command, working_dir):
     # Create a config file first
     config_file = Path(working_dir) / "config" / "test" / "config.yaml"
     assert not config_file.exists()
-    result = run_command(f'config init --dest-file "{config_file}" --additional-urls=https://example.com')
+    result = run_command(["config", "init", "--dest-file", config_file, "--additional-urls=https://example.com"])
     assert result.ok
     assert config_file.exists()
 
-    result = run_command(f'config dump --config-file "{config_file}" --format json')
+    result = run_command(["config", "dump", "--config-file", config_file, "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert ["https://example.com"] == settings_json["board_manager"]["additional_urls"]
 
     result = run_command(
-        f'config dump --config-file "{config_file}" --additional-urls=https://another-url.com --format json'
+        [
+            "config",
+            "dump",
+            "--config-file",
+            config_file,
+            "--additional-urls=https://another-url.com",
+            "--format",
+            "json",
+        ]
     )
     assert result.ok
     settings_json = json.loads(result.stdout)
@@ -230,41 +238,41 @@ def test_dump_with_config_file_flag(run_command, working_dir):
 
 def test_add_remove_set_delete_on_unexisting_key(run_command):
     # Create a config file
-    assert run_command("config init --dest-dir .")
+    assert run_command(["config", "init", "--dest-dir", "."])
 
-    res = run_command("config add some.key some_value")
+    res = run_command(["config", "add", "some.key", "some_value"])
     assert res.failed
     assert "Settings key doesn't exist" in res.stderr
 
-    res = run_command("config remove some.key some_value")
+    res = run_command(["config", "remove", "some.key", "some_value"])
     assert res.failed
     assert "Settings key doesn't exist" in res.stderr
 
-    res = run_command("config set some.key some_value")
+    res = run_command(["config", "set", "some.key", "some_value"])
     assert res.failed
     assert "Settings key doesn't exist" in res.stderr
 
-    res = run_command("config delete some.key")
+    res = run_command(["config", "delete", "some.key"])
     assert res.failed
     assert "Settings key doesn't exist" in res.stderr
 
 
 def test_add_single_argument(run_command):
     # Create a config file
-    assert run_command("config init --dest-dir .")
+    assert run_command(["config", "init", "--dest-dir", "."])
 
     # Verifies no additional urls are present
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert [] == settings_json["board_manager"]["additional_urls"]
 
     # Adds one URL
     url = "https://example.com"
-    assert run_command(f"config add board_manager.additional_urls {url}")
+    assert run_command(["config", "add", "board_manager.additional_urls", url])
 
     # Verifies URL has been saved
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert ["https://example.com"] == settings_json["board_manager"]["additional_urls"]
@@ -272,10 +280,10 @@ def test_add_single_argument(run_command):
 
 def test_add_multiple_arguments(run_command):
     # Create a config file
-    assert run_command("config init --dest-dir .")
+    assert run_command(["config", "init", "--dest-dir", "."])
 
     # Verifies no additional urls are present
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert [] == settings_json["board_manager"]["additional_urls"]
@@ -285,10 +293,10 @@ def test_add_multiple_arguments(run_command):
         "https://example.com/package_example_index.json",
         "https://example.com/yet_another_package_example_index.json",
     ]
-    assert run_command(f"config add board_manager.additional_urls {' '.join(urls)}")
+    assert run_command(["config", "add", "board_manager.additional_urls"] + urls)
 
     # Verifies URL has been saved
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert 2 == len(settings_json["board_manager"]["additional_urls"])
@@ -298,21 +306,21 @@ def test_add_multiple_arguments(run_command):
 
 def test_add_on_unsupported_key(run_command):
     # Create a config file
-    assert run_command("config init --dest-dir .")
+    assert run_command(["config", "init", "--dest-dir", "."])
 
     # Verifies default value
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert "50051" == settings_json["daemon"]["port"]
 
     # Tries and fails to add a new item
-    result = run_command("config add daemon.port 50000")
+    result = run_command(["config", "add", "daemon.port", "50000"])
     assert result.failed
     assert "The key 'daemon.port' is not a list of items, can't add to it.\nMaybe use 'config set'?" in result.stderr
 
     # Verifies value is not changed
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert "50051" == settings_json["daemon"]["port"]
@@ -320,17 +328,17 @@ def test_add_on_unsupported_key(run_command):
 
 def test_remove_single_argument(run_command):
     # Create a config file
-    assert run_command("config init --dest-dir .")
+    assert run_command(["config", "init", "--dest-dir", "."])
 
     # Adds URLs
     urls = [
         "https://example.com/package_example_index.json",
         "https://example.com/yet_another_package_example_index.json",
     ]
-    assert run_command(f"config add board_manager.additional_urls {' '.join(urls)}")
+    assert run_command(["config", "add", "board_manager.additional_urls"] + urls)
 
     # Verifies default state
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert 2 == len(settings_json["board_manager"]["additional_urls"])
@@ -338,10 +346,10 @@ def test_remove_single_argument(run_command):
     assert urls[1] in settings_json["board_manager"]["additional_urls"]
 
     # Remove first URL
-    assert run_command(f"config remove board_manager.additional_urls {urls[0]}")
+    assert run_command(["config", "remove", "board_manager.additional_urls", urls[0]])
 
     # Verifies URLs has been removed
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert ["https://example.com/yet_another_package_example_index.json"] == settings_json["board_manager"][
@@ -351,17 +359,17 @@ def test_remove_single_argument(run_command):
 
 def test_remove_multiple_arguments(run_command):
     # Create a config file
-    assert run_command("config init --dest-dir .")
+    assert run_command(["config", "init", "--dest-dir", "."])
 
     # Adds URLs
     urls = [
         "https://example.com/package_example_index.json",
         "https://example.com/yet_another_package_example_index.json",
     ]
-    assert run_command(f"config add board_manager.additional_urls {' '.join(urls)}")
+    assert run_command(["config", "add", "board_manager.additional_urls"] + urls)
 
     # Verifies default state
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert 2 == len(settings_json["board_manager"]["additional_urls"])
@@ -369,10 +377,10 @@ def test_remove_multiple_arguments(run_command):
     assert urls[1] in settings_json["board_manager"]["additional_urls"]
 
     # Remove all URLs
-    assert run_command(f"config remove board_manager.additional_urls {' '.join(urls)}")
+    assert run_command(["config", "remove", "board_manager.additional_urls"] + urls)
 
     # Verifies all URLs have been removed
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert [] == settings_json["board_manager"]["additional_urls"]
@@ -380,16 +388,16 @@ def test_remove_multiple_arguments(run_command):
 
 def test_remove_on_unsupported_key(run_command):
     # Create a config file
-    assert run_command("config init --dest-dir .")
+    assert run_command(["config", "init", "--dest-dir", "."])
 
     # Verifies default value
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert "50051" == settings_json["daemon"]["port"]
 
     # Tries and fails to add a new item
-    result = run_command("config remove daemon.port 50051")
+    result = run_command(["config", "remove", "daemon.port", "50051"])
     assert result.failed
     assert (
         "The key 'daemon.port' is not a list of items, can't remove from it.\nMaybe use 'config delete'?"
@@ -397,7 +405,7 @@ def test_remove_on_unsupported_key(run_command):
     )
 
     # Verifies value is not changed
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert "50051" == settings_json["daemon"]["port"]
@@ -405,30 +413,30 @@ def test_remove_on_unsupported_key(run_command):
 
 def test_set_slice_with_single_argument(run_command):
     # Create a config file
-    assert run_command("config init --dest-dir .")
+    assert run_command(["config", "init", "--dest-dir", "."])
 
     # Verifies default state
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert [] == settings_json["board_manager"]["additional_urls"]
 
     # Set an URL in the list
     url = "https://example.com/package_example_index.json"
-    assert run_command(f"config set board_manager.additional_urls {url}")
+    assert run_command(["config", "set", "board_manager.additional_urls", url])
 
     # Verifies value is changed
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert [url] == settings_json["board_manager"]["additional_urls"]
 
     # Sets another URL
     url = "https://example.com/yet_another_package_example_index.json"
-    assert run_command(f"config set board_manager.additional_urls {url}")
+    assert run_command(["config", "set", "board_manager.additional_urls", url])
 
     # Verifies previous value is overwritten
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert [url] == settings_json["board_manager"]["additional_urls"]
@@ -436,10 +444,10 @@ def test_set_slice_with_single_argument(run_command):
 
 def test_set_slice_with_multiple_arguments(run_command):
     # Create a config file
-    assert run_command("config init --dest-dir .")
+    assert run_command(["config", "init", "--dest-dir", "."])
 
     # Verifies default state
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert [] == settings_json["board_manager"]["additional_urls"]
@@ -449,10 +457,10 @@ def test_set_slice_with_multiple_arguments(run_command):
         "https://example.com/first_package_index.json",
         "https://example.com/second_package_index.json",
     ]
-    assert run_command(f"config set board_manager.additional_urls {' '.join(urls)}")
+    assert run_command(["config", "set", "board_manager.additional_urls"] + urls)
 
     # Verifies value is changed
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert 2 == len(settings_json["board_manager"]["additional_urls"])
@@ -464,10 +472,10 @@ def test_set_slice_with_multiple_arguments(run_command):
         "https://example.com/third_package_index.json",
         "https://example.com/fourth_package_index.json",
     ]
-    assert run_command(f"config set board_manager.additional_urls {' '.join(urls)}")
+    assert run_command(["config", "set", "board_manager.additional_urls"] + urls)
 
     # Verifies previous value is overwritten
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert 2 == len(settings_json["board_manager"]["additional_urls"])
@@ -477,19 +485,19 @@ def test_set_slice_with_multiple_arguments(run_command):
 
 def test_set_string_with_single_argument(run_command):
     # Create a config file
-    assert run_command("config init --dest-dir .")
+    assert run_command(["config", "init", "--dest-dir", "."])
 
     # Verifies default state
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert "info" == settings_json["logging"]["level"]
 
     # Changes value
-    assert run_command("" "config set logging.level trace")
+    assert run_command(["config", "set", "logging.level", "trace"])
 
     # Verifies value is changed
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert "trace" == settings_json["logging"]["level"]
@@ -497,35 +505,35 @@ def test_set_string_with_single_argument(run_command):
 
 def test_set_string_with_multiple_arguments(run_command):
     # Create a config file
-    assert run_command("config init --dest-dir .")
+    assert run_command(["config", "init", "--dest-dir", "."])
 
     # Verifies default state
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert "info" == settings_json["logging"]["level"]
 
     # Tries to change value
-    res = run_command("config set logging.level trace debug")
+    res = run_command(["config", "set", "logging.level", "trace", "debug"])
     assert res.failed
     assert "Can't set multiple values in key logging.level" in res.stderr
 
 
 def test_set_bool_with_single_argument(run_command):
     # Create a config file
-    assert run_command("config init --dest-dir .")
+    assert run_command(["config", "init", "--dest-dir", "."])
 
     # Verifies default state
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert not settings_json["library"]["enable_unsafe_install"]
 
     # Changes value
-    assert run_command("config set library.enable_unsafe_install true")
+    assert run_command(["config", "set", "library.enable_unsafe_install", "true"])
 
     # Verifies value is changed
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert settings_json["library"]["enable_unsafe_install"]
@@ -533,32 +541,32 @@ def test_set_bool_with_single_argument(run_command):
 
 def test_set_bool_with_multiple_arguments(run_command):
     # Create a config file
-    assert run_command("config init --dest-dir .")
+    assert run_command(["config", "init", "--dest-dir", "."])
 
     # Verifies default state
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert not settings_json["library"]["enable_unsafe_install"]
 
     # Changes value'
-    res = run_command("config set library.enable_unsafe_install true foo")
+    res = run_command(["config", "set", "library.enable_unsafe_install", "true", "foo"])
     assert res.failed
     assert "Can't set multiple values in key library.enable_unsafe_install" in res.stderr
 
 
 def test_delete(run_command, working_dir):
     # Create a config file
-    assert run_command("config init --dest-dir .")
+    assert run_command(["config", "init", "--dest-dir", "."])
 
     # Verifies default state
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert not settings_json["library"]["enable_unsafe_install"]
 
     # Delete config key
-    assert run_command("config delete library.enable_unsafe_install")
+    assert run_command(["config", "delete", "library.enable_unsafe_install"])
 
     # Verifies value is not found, we read directly from file instead of using
     # the dump command since that would still print the deleted value if it has
@@ -568,13 +576,13 @@ def test_delete(run_command, working_dir):
     assert "enable_unsafe_install" not in config_lines
 
     # Verifies default state
-    result = run_command("config dump --format json")
+    result = run_command(["config", "dump", "--format", "json"])
     assert result.ok
     settings_json = json.loads(result.stdout)
     assert [] == settings_json["board_manager"]["additional_urls"]
 
     # Delete config key and sub keys
-    assert run_command("config delete board_manager")
+    assert run_command(["config", "delete", "board_manager"])
 
     # Verifies value is not found, we read directly from file instead of using
     # the dump command since that would still print the deleted value if it has

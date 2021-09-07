@@ -50,24 +50,24 @@ def download_lib(url, download_dir):
 
 def test_list(run_command):
     # Init the environment explicitly
-    run_command("core update-index")
+    run_command(["core", "update-index"])
 
     # When output is empty, nothing is printed out, no matter the output format
-    result = run_command("lib list")
+    result = run_command(["lib", "list"])
     assert result.ok
     assert "" == result.stderr
     assert "No libraries installed." in result.stdout.strip()
-    result = run_command("lib list --format json")
+    result = run_command(["lib", "list", "--format", "json"])
     assert result.ok
     assert "" == result.stderr
     assert 0 == len(json.loads(result.stdout))
 
     # Install something we can list at a version older than latest
-    result = run_command("lib install ArduinoJson@6.11.0")
+    result = run_command(["lib", "install", "ArduinoJson@6.11.0"])
     assert result.ok
 
     # Look at the plain text output
-    result = run_command("lib list")
+    result = run_command(["lib", "list"])
     assert result.ok
     assert "" == result.stderr
     lines = result.stdout.strip().splitlines()
@@ -82,7 +82,7 @@ def test_list(run_command):
     assert "An efficient and elegant JSON library..." == toks[4]
 
     # Look at the JSON output
-    result = run_command("lib list --format json")
+    result = run_command(["lib", "list", "--format", "json"])
     assert result.ok
     assert "" == result.stderr
     data = json.loads(result.stdout)
@@ -91,10 +91,10 @@ def test_list(run_command):
     assert "" != data[0]["release"]["version"]
 
     # Install something we can list without provides_includes field given in library.properties
-    result = run_command("lib install Arduino_APDS9960@1.0.3")
+    result = run_command(["lib", "install", "Arduino_APDS9960@1.0.3"])
     assert result.ok
     # Look at the JSON output
-    result = run_command("lib list Arduino_APDS9960 --format json")
+    result = run_command(["lib", "list", "Arduino_APDS9960", "--format", "json"])
     assert result.ok
     assert "" == result.stderr
     data = json.loads(result.stdout)
@@ -105,48 +105,48 @@ def test_list(run_command):
 
 def test_list_exit_code(run_command):
     # Init the environment explicitly
-    assert run_command("core update-index")
+    assert run_command(["core", "update-index"])
 
-    assert run_command("core list")
+    assert run_command(["core", "list"])
 
     # Verifies lib list doesn't fail when platform is not specified
-    result = run_command("lib list")
+    result = run_command(["lib", "list"])
     assert result.ok
     assert result.stderr.strip() == ""
 
     # Verify lib list command fails because specified platform is not installed
-    result = run_command("lib list -b arduino:samd:mkr1000")
+    result = run_command(["lib", "list", "-b", "arduino:samd:mkr1000"])
     assert result.failed
     assert result.stderr.strip() == "Error listing Libraries: Unknown FQBN: platform arduino:samd is not installed"
 
-    assert run_command('lib install "AllThingsTalk LoRaWAN SDK"')
+    assert run_command(["lib", "install", "AllThingsTalk LoRaWAN SDK"])
 
     # Verifies lib list command keeps failing
-    result = run_command("lib list -b arduino:samd:mkr1000")
+    result = run_command(["lib", "list", "-b", "arduino:samd:mkr1000"])
     assert result.failed
     assert result.stderr.strip() == "Error listing Libraries: Unknown FQBN: platform arduino:samd is not installed"
 
-    assert run_command("core install arduino:samd")
+    assert run_command(["core", "install", "arduino:samd"])
 
     # Verifies lib list command now works since platform has been installed
-    result = run_command("lib list -b arduino:samd:mkr1000")
+    result = run_command(["lib", "list", "-b", "arduino:samd:mkr1000"])
     assert result.ok
     assert result.stderr.strip() == ""
 
 
 def test_list_with_fqbn(run_command):
     # Init the environment explicitly
-    assert run_command("core update-index")
+    assert run_command(["core", "update-index"])
 
     # Install core
-    assert run_command("core install arduino:avr")
+    assert run_command(["core", "install", "arduino:avr"])
 
     # Install some library
-    assert run_command("lib install ArduinoJson")
-    assert run_command("lib install wm8978-esp32")
+    assert run_command(["lib", "install", "ArduinoJson"])
+    assert run_command(["lib", "install", "wm8978-esp32"])
 
     # Look at the plain text output
-    result = run_command("lib list -b arduino:avr:uno")
+    result = run_command(["lib", "list", "-b", "arduino:avr:uno"])
     assert result.ok
     assert "" == result.stderr
     lines = result.stdout.strip().splitlines()
@@ -158,7 +158,7 @@ def test_list_with_fqbn(run_command):
     assert "ArduinoJson" == toks[0]
 
     # Look at the JSON output
-    result = run_command("lib list -b arduino:avr:uno --format json")
+    result = run_command(["lib", "list", "-b", "arduino:avr:uno", "--format", "json"])
     assert result.ok
     assert "" == result.stderr
     data = json.loads(result.stdout)
@@ -172,14 +172,14 @@ def test_list_with_fqbn(run_command):
 def test_list_provides_includes_fallback(run_command):
     # Verifies "provides_includes" field is returned even if libraries don't declare
     # the "includes" property in their "library.properties" file
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Install core
-    assert run_command("core install arduino:avr@1.8.3")
-    assert run_command("lib install ArduinoJson@6.17.2")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
+    assert run_command(["lib", "install", "ArduinoJson@6.17.2"])
 
     # List all libraries, even the ones installed with the above core
-    result = run_command("lib list --all --fqbn arduino:avr:uno --format json")
+    result = run_command(["lib", "list", "--all", "--fqbn", "arduino:avr:uno", "--format", "json"])
     assert result.ok
     assert "" == result.stderr
 
@@ -198,36 +198,36 @@ def test_list_provides_includes_fallback(run_command):
 def test_lib_download(run_command, downloads_dir):
 
     # Download a specific lib version
-    assert run_command("lib download AudioZero@1.0.0")
+    assert run_command(["lib", "download", "AudioZero@1.0.0"])
     assert Path(downloads_dir, "libraries", "AudioZero-1.0.0.zip").exists()
 
     # Wrong lib version
-    result = run_command("lib download AudioZero@69.42.0")
+    result = run_command(["lib", "download", "AudioZero@69.42.0"])
     assert result.failed
 
     # Wrong lib
-    result = run_command("lib download AudioZ")
+    result = run_command(["lib", "download", "AudioZ"])
     assert result.failed
 
 
 def test_install(run_command):
-    libs = ['"AzureIoTProtocol_MQTT"', '"CMMC MQTT Connector"', '"WiFiNINA"']
+    libs = ["AzureIoTProtocol_MQTT", "CMMC MQTT Connector", "WiFiNINA"]
     # Should be safe to run install multiple times
-    assert run_command("lib install {}".format(" ".join(libs)))
-    assert run_command("lib install {}".format(" ".join(libs)))
+    assert run_command(["lib", "install"] + libs)
+    assert run_command(["lib", "install"] + libs)
 
     # Test failing-install of library with wrong dependency
     # (https://github.com/arduino/arduino-cli/issues/534)
-    res = run_command("lib install MD_Parola@3.2.0")
+    res = run_command(["lib", "install", "MD_Parola@3.2.0"])
     assert res.failed
     assert "No valid dependencies solution found: dependency 'MD_MAX72xx' is not available" in res.stderr
 
 
 def test_install_library_with_dependencies(run_command):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Verifies libraries are not installed
-    res = run_command("lib list --format json")
+    res = run_command(["lib", "list", "--format", "json"])
     assert res.ok
     data = json.loads(res.stdout)
     installed_libraries = [l["library"]["name"] for l in data]
@@ -235,10 +235,10 @@ def test_install_library_with_dependencies(run_command):
     assert "MD_MAX72XX" not in installed_libraries
 
     # Install library
-    assert run_command("lib install MD_Parola@3.5.5")
+    assert run_command(["lib", "install", "MD_Parola@3.5.5"])
 
     # Verifies library's dependencies are correctly installed
-    res = run_command("lib list --format json")
+    res = run_command(["lib", "list", "--format", "json"])
     assert res.ok
     data = json.loads(res.stdout)
     installed_libraries = [l["library"]["name"] for l in data]
@@ -247,10 +247,10 @@ def test_install_library_with_dependencies(run_command):
 
 
 def test_install_no_deps(run_command):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Verifies libraries are not installed
-    res = run_command("lib list --format json")
+    res = run_command(["lib", "list", "--format", "json"])
     assert res.ok
     data = json.loads(res.stdout)
     installed_libraries = [l["library"]["name"] for l in data]
@@ -258,10 +258,10 @@ def test_install_no_deps(run_command):
     assert "MD_MAX72XX" not in installed_libraries
 
     # Install library skipping dependencies installation
-    assert run_command("lib install MD_Parola@3.5.5 --no-deps")
+    assert run_command(["lib", "install", "MD_Parola@3.5.5", "--no-deps"])
 
     # Verifies library's dependencies are not installed
-    res = run_command("lib list --format json")
+    res = run_command(["lib", "list", "--format", "json"])
     assert res.ok
     data = json.loads(res.stdout)
     installed_libraries = [l["library"]["name"] for l in data]
@@ -272,7 +272,7 @@ def test_install_no_deps(run_command):
 def test_install_git_url_and_zip_path_flags_visibility(run_command, data_dir, downloads_dir):
     # Verifies installation fail because flags are not found
     git_url = "https://github.com/arduino-libraries/WiFi101.git"
-    res = run_command(f"lib install --git-url {git_url}")
+    res = run_command(["lib", "install", "--git-url", git_url])
     assert res.failed
     assert "--git-url and --zip-path are disabled by default, for more information see:" in res.stderr
 
@@ -282,7 +282,7 @@ def test_install_git_url_and_zip_path_flags_visibility(run_command, data_dir, do
     zip_path.parent.mkdir(parents=True, exist_ok=True)
     download_lib(url, zip_path)
 
-    res = run_command(f"lib install --zip-path {zip_path}")
+    res = run_command(["lib", "install", "--zip-path", zip_path])
     assert res.failed
     assert "--git-url and --zip-path are disabled by default, for more information see:" in res.stderr
 
@@ -293,25 +293,25 @@ def test_install_git_url_and_zip_path_flags_visibility(run_command, data_dir, do
         "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
     }
     # Verifies installation is successful when flags are enabled with env var
-    res = run_command(f"lib install --git-url {git_url}", custom_env=env)
+    res = run_command(["lib", "install", "--git-url", git_url], custom_env=env)
     assert res.ok
     assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
 
-    res = run_command(f"lib install --zip-path {zip_path}", custom_env=env)
+    res = run_command(["lib", "install", "--zip-path", zip_path], custom_env=env)
     assert res.ok
     assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
 
     # Uninstall libraries to install them again
-    assert run_command("lib uninstall WiFi101 AudioZero")
+    assert run_command(["lib", "uninstall", "WiFi101", "AudioZero"])
 
     # Verifies installation is successful when flags are enabled with settings file
-    assert run_command("config init --dest-dir .", custom_env=env)
+    assert run_command(["config", "init", "--dest-dir", "."], custom_env=env)
 
-    res = run_command(f"lib install --git-url {git_url}")
+    res = run_command(["lib", "install", "--git-url", git_url])
     assert res.ok
     assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
 
-    res = run_command(f"lib install --zip-path {zip_path}")
+    res = run_command(["lib", "install", "--zip-path", zip_path])
     assert res.ok
     assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
 
@@ -324,7 +324,7 @@ def test_install_with_git_url(run_command, data_dir, downloads_dir):
         "ARDUINO_SKETCHBOOK_DIR": data_dir,
         "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
     }
-    assert run_command("config init --dest-dir .", custom_env=env)
+    assert run_command(["config", "init", "--dest-dir", "."], custom_env=env)
 
     lib_install_dir = Path(data_dir, "libraries", "WiFi101")
     # Verifies library is not already installed
@@ -333,7 +333,7 @@ def test_install_with_git_url(run_command, data_dir, downloads_dir):
     git_url = "https://github.com/arduino-libraries/WiFi101.git"
 
     # Test git-url library install
-    res = run_command(f"lib install --git-url {git_url}")
+    res = run_command(["lib", "install", "--git-url", git_url])
     assert res.ok
     assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
 
@@ -341,7 +341,7 @@ def test_install_with_git_url(run_command, data_dir, downloads_dir):
     assert lib_install_dir.exists()
 
     # Reinstall library
-    assert run_command(f"lib install --git-url {git_url}")
+    assert run_command(["lib", "install", "--git-url", git_url])
 
     # Verifies library remains installed
     assert lib_install_dir.exists()
@@ -355,7 +355,7 @@ def test_install_with_zip_path(run_command, data_dir, downloads_dir):
         "ARDUINO_SKETCHBOOK_DIR": data_dir,
         "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
     }
-    assert run_command("config init --dest-dir .", custom_env=env)
+    assert run_command(["config", "init", "--dest-dir", "."], custom_env=env)
 
     # Download a specific lib version
     # Download library
@@ -369,7 +369,7 @@ def test_install_with_zip_path(run_command, data_dir, downloads_dir):
     assert not lib_install_dir.exists()
 
     # Test zip-path install
-    res = run_command(f"lib install --zip-path {zip_path}")
+    res = run_command(["lib", "install", "--zip-path", zip_path])
     assert res.ok
     assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
 
@@ -384,7 +384,7 @@ def test_install_with_zip_path(run_command, data_dir, downloads_dir):
     assert lib_install_dir / "README.adoc" in files
 
     # Reinstall library
-    assert run_command(f"lib install --zip-path {zip_path}")
+    assert run_command(["lib", "install", "--zip-path", zip_path])
 
     # Verifies library remains installed
     assert lib_install_dir.exists()
@@ -398,7 +398,7 @@ def test_install_with_zip_path(run_command, data_dir, downloads_dir):
 
 
 def test_update_index(run_command):
-    result = run_command("lib update-index")
+    result = run_command(["lib", "update-index"])
     assert result.ok
     lines = [l.strip() for l in result.stdout.splitlines()]
     assert "Updating index: library_index.json.gz downloaded" in lines
@@ -406,18 +406,18 @@ def test_update_index(run_command):
 
 
 def test_uninstall(run_command):
-    libs = ['"AzureIoTProtocol_MQTT"', '"WiFiNINA"']
-    assert run_command("lib install {}".format(" ".join(libs)))
+    libs = ["AzureIoTProtocol_MQTT", "WiFiNINA"]
+    assert run_command(["lib", "install"] + libs)
 
-    result = run_command("lib uninstall {}".format(" ".join(libs)))
+    result = run_command(["lib", "uninstall"] + libs)
     assert result.ok
 
 
 def test_uninstall_spaces(run_command):
-    key = '"LiquidCrystal I2C"'
-    assert run_command("lib install {}".format(key))
-    assert run_command("lib uninstall {}".format(key))
-    result = run_command("lib list --format json")
+    key = "LiquidCrystal I2C"
+    assert run_command(["lib", "install", key])
+    assert run_command(["lib", "uninstall", key])
+    result = run_command(["lib", "list", "--format", "json"])
     assert result.ok
     assert len(json.loads(result.stdout)) == 0
 
@@ -439,17 +439,17 @@ def test_lib_ops_caseinsensitive(run_command):
       Versions: [1.0.0]
     """
     key = "pcm"
-    assert run_command("lib install {}".format(key))
-    assert run_command("lib uninstall {}".format(key))
-    result = run_command("lib list --format json")
+    assert run_command(["lib", "install", key])
+    assert run_command(["lib", "uninstall", key])
+    result = run_command(["lib", "list", "--format", "json"])
     assert result.ok
     assert len(json.loads(result.stdout)) == 0
 
 
 def test_search(run_command):
-    assert run_command("update")
+    assert run_command(["update"])
 
-    result = run_command("lib search --names")
+    result = run_command(["lib", "search", "--names"])
     assert result.ok
     lines = [l.strip() for l in result.stdout.strip().splitlines()]
     assert "Updating index: library_index.json.gz downloaded" in lines
@@ -459,16 +459,16 @@ def test_search(run_command):
     expected = {"WiFi101", "WiFi101OTA", "Firebase Arduino based on WiFi101"}
     assert expected == {lib for lib in libs if "WiFi101" in lib}
 
-    result = run_command("lib search --names --format json")
+    result = run_command(["lib", "search", "--names", "--format", "json"])
     assert result.ok
     libs_json = json.loads(result.stdout)
     assert len(libs) == len(libs_json.get("libraries"))
 
-    result = run_command("lib search --names")
+    result = run_command(["lib", "search", "--names"])
     assert result.ok
 
     def run_search(search_args, expected_libraries):
-        res = run_command(f"lib search --names --format json {search_args}")
+        res = run_command(["lib", "search", "--names", "--format", "json"] + search_args.split(" "))
         assert res.ok
         data = json.loads(res.stdout)
         libraries = [l["name"] for l in data["libraries"]]
@@ -500,8 +500,8 @@ def test_search_paragraph(run_command):
     Search for a string that's only present in the `paragraph` field
     within the index file.
     """
-    assert run_command("lib update-index")
-    result = run_command('lib search "A simple and efficient JSON library" --names --format json')
+    assert run_command(["lib", "update-index"])
+    result = run_command(["lib", "search", "A simple and efficient JSON library", "--names", "--format", "json"])
     assert result.ok
     data = json.loads(result.stdout)
     libraries = [l["name"] for l in data["libraries"]]
@@ -510,25 +510,25 @@ def test_search_paragraph(run_command):
 
 def test_lib_list_with_updatable_flag(run_command):
     # Init the environment explicitly
-    run_command("lib update-index")
+    run_command(["lib", "update-index"])
 
     # No libraries to update
-    result = run_command("lib list --updatable")
+    result = run_command(["lib", "list", "--updatable"])
     assert result.ok
     assert "" == result.stderr
     assert "No updates available." in result.stdout.strip()
     # No library to update in json
-    result = run_command("lib list --updatable --format json")
+    result = run_command(["lib", "list", "--updatable", "--format", "json"])
     assert result.ok
     assert "" == result.stderr
     assert 0 == len(json.loads(result.stdout))
 
     # Install outdated library
-    assert run_command("lib install ArduinoJson@6.11.0")
+    assert run_command(["lib", "install", "ArduinoJson@6.11.0"])
     # Install latest version of library
-    assert run_command("lib install WiFi101")
+    assert run_command(["lib", "install", "WiFi101"])
 
-    res = run_command("lib list --updatable")
+    res = run_command(["lib", "list", "--updatable"])
     assert res.ok
     assert "" == res.stderr
     # lines = res.stdout.strip().splitlines()
@@ -544,7 +544,7 @@ def test_lib_list_with_updatable_flag(run_command):
     assert "An efficient and elegant JSON library..." == line[4]
 
     # Look at the JSON output
-    res = run_command("lib list --updatable --format json")
+    res = run_command(["lib", "list", "--updatable", "--format", "json"])
     assert res.ok
     assert "" == res.stderr
     data = json.loads(res.stdout)
@@ -556,7 +556,7 @@ def test_lib_list_with_updatable_flag(run_command):
 
 
 def test_install_with_git_url_from_current_directory(run_command, downloads_dir, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     env = {
         "ARDUINO_DATA_DIR": data_dir,
@@ -574,7 +574,7 @@ def test_install_with_git_url_from_current_directory(run_command, downloads_dir,
     repo_dir = Path(data_dir, "WiFi101")
     assert Repo.clone_from(git_url, repo_dir)
 
-    assert run_command("lib install --git-url .", custom_working_dir=repo_dir, custom_env=env)
+    assert run_command(["lib", "install", "--git-url", "."], custom_working_dir=repo_dir, custom_env=env)
 
     # Verifies library is installed to correct folder
     assert lib_install_dir.exists()
@@ -586,7 +586,7 @@ def test_install_with_git_url_from_current_directory(run_command, downloads_dir,
     + "this must be removed when this issue is fixed: https://github.com/go-git/go-git/issues/247",
 )
 def test_install_with_git_url_local_file_uri(run_command, downloads_dir, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     env = {
         "ARDUINO_DATA_DIR": data_dir,
@@ -604,14 +604,14 @@ def test_install_with_git_url_local_file_uri(run_command, downloads_dir, data_di
     repo_dir = Path(data_dir, "WiFi101")
     assert Repo.clone_from(git_url, repo_dir)
 
-    assert run_command(f"lib install --git-url {repo_dir.as_uri()}", custom_env=env)
+    assert run_command(["lib", "install", "--git-url", repo_dir.as_uri()], custom_env=env)
 
     # Verifies library is installed
     assert lib_install_dir.exists()
 
 
 def test_install_with_git_local_url(run_command, downloads_dir, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     env = {
         "ARDUINO_DATA_DIR": data_dir,
@@ -629,14 +629,14 @@ def test_install_with_git_local_url(run_command, downloads_dir, data_dir):
     repo_dir = Path(data_dir, "WiFi101")
     assert Repo.clone_from(git_url, repo_dir)
 
-    assert run_command(f"lib install --git-url {repo_dir}", custom_env=env)
+    assert run_command(["lib", "install", "--git-url", repo_dir], custom_env=env)
 
     # Verifies library is installed
     assert lib_install_dir.exists()
 
 
 def test_install_with_git_url_relative_path(run_command, downloads_dir, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     env = {
         "ARDUINO_DATA_DIR": data_dir,
@@ -654,14 +654,14 @@ def test_install_with_git_url_relative_path(run_command, downloads_dir, data_dir
     repo_dir = Path(data_dir, "WiFi101")
     assert Repo.clone_from(git_url, repo_dir)
 
-    assert run_command("lib install --git-url ./WiFi101", custom_working_dir=data_dir, custom_env=env)
+    assert run_command(["lib", "install", "--git-url", "./WiFi101"], custom_working_dir=data_dir, custom_env=env)
 
     # Verifies library is installed
     assert lib_install_dir.exists()
 
 
 def test_install_with_git_url_does_not_create_git_repo(run_command, downloads_dir, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     env = {
         "ARDUINO_DATA_DIR": data_dir,
@@ -679,14 +679,14 @@ def test_install_with_git_url_does_not_create_git_repo(run_command, downloads_di
     repo_dir = Path(data_dir, "WiFi101")
     assert Repo.clone_from(git_url, repo_dir)
 
-    assert run_command(f"lib install --git-url {repo_dir}", custom_env=env)
+    assert run_command(["lib", "install", "--git-url", repo_dir], custom_env=env)
 
     # Verifies installed library is not a git repository
     assert not Path(lib_install_dir, ".git").exists()
 
 
 def test_install_with_git_url_multiple_libraries(run_command, downloads_dir, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     env = {
         "ARDUINO_DATA_DIR": data_dir,
@@ -704,7 +704,7 @@ def test_install_with_git_url_multiple_libraries(run_command, downloads_dir, dat
     wifi_url = "https://github.com/arduino-libraries/WiFi101.git"
     ble_url = "https://github.com/arduino-libraries/ArduinoBLE.git"
 
-    assert run_command(f"lib install --git-url {wifi_url} {ble_url}", custom_env=env)
+    assert run_command(["lib", "install", "--git-url", wifi_url, ble_url], custom_env=env)
 
     # Verifies library are installed
     assert wifi_install_dir.exists()
@@ -712,7 +712,7 @@ def test_install_with_git_url_multiple_libraries(run_command, downloads_dir, dat
 
 
 def test_install_with_zip_path_multiple_libraries(run_command, downloads_dir, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     env = {
         "ARDUINO_DATA_DIR": data_dir,
@@ -734,7 +734,7 @@ def test_install_with_zip_path_multiple_libraries(run_command, downloads_dir, da
     assert not wifi_install_dir.exists()
     assert not ble_install_dir.exists()
 
-    assert run_command(f"lib install --zip-path {wifi_zip_path} {ble_zip_path}", custom_env=env)
+    assert run_command(["lib", "install", "--zip-path", wifi_zip_path, ble_zip_path], custom_env=env)
 
     # Verifies library are installed
     assert wifi_install_dir.exists()
@@ -742,11 +742,11 @@ def test_install_with_zip_path_multiple_libraries(run_command, downloads_dir, da
 
 
 def test_lib_examples(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
-    assert run_command("lib install Arduino_JSON@0.1.0")
+    assert run_command(["lib", "install", "Arduino_JSON@0.1.0"])
 
-    res = run_command("lib examples Arduino_JSON --format json")
+    res = run_command(["lib", "examples", "Arduino_JSON", "--format", "json"])
     assert res.ok
     data = json.loads(res.stdout)
     assert len(data) == 1
@@ -758,11 +758,11 @@ def test_lib_examples(run_command, data_dir):
 
 
 def test_lib_examples_with_pde_file(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
-    assert run_command("lib install Encoder@1.4.1")
+    assert run_command(["lib", "install", "Encoder@1.4.1"])
 
-    res = run_command("lib examples Encoder --format json")
+    res = run_command(["lib", "examples", "Encoder", "--format", "json"])
     assert res.ok
     data = json.loads(res.stdout)
     assert len(data) == 1
@@ -775,11 +775,11 @@ def test_lib_examples_with_pde_file(run_command, data_dir):
 
 
 def test_lib_examples_with_case_mismatch(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
-    assert run_command("lib install WiFiManager@2.0.3-alpha")
+    assert run_command(["lib", "install", "WiFiManager@2.0.3-alpha"])
 
-    res = run_command("lib examples WiFiManager --format json")
+    res = run_command(["lib", "examples", "WiFiManager", "--format", "json"])
     assert res.ok
     data = json.loads(res.stdout)
     assert len(data) == 1
@@ -810,13 +810,13 @@ def test_lib_examples_with_case_mismatch(run_command, data_dir):
 
 
 def test_lib_list_using_library_with_invalid_version(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Install a library
-    assert run_command("lib install WiFi101@0.16.1")
+    assert run_command(["lib", "install", "WiFi101@0.16.1"])
 
     # Verifies library is correctly returned
-    res = run_command("lib list --format json")
+    res = run_command(["lib", "list", "--format", "json"])
     assert res.ok
     data = json.loads(res.stdout)
     assert len(data) == 1
@@ -828,7 +828,7 @@ def test_lib_list_using_library_with_invalid_version(run_command, data_dir):
     Path(lib_path, "library.properties").write_text("version=1.0001")
 
     # Verifies version is now empty
-    res = run_command("lib list --format json")
+    res = run_command(["lib", "list", "--format", "json"])
     assert res.ok
     data = json.loads(res.stdout)
     assert len(data) == 1
@@ -836,13 +836,13 @@ def test_lib_list_using_library_with_invalid_version(run_command, data_dir):
 
 
 def test_lib_upgrade_using_library_with_invalid_version(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Install a library
-    assert run_command("lib install WiFi101@0.16.1")
+    assert run_command(["lib", "install", "WiFi101@0.16.1"])
 
     # Verifies library is correctly returned
-    res = run_command("lib list --format json")
+    res = run_command(["lib", "list", "--format", "json"])
     assert res.ok
     data = json.loads(res.stdout)
     assert len(data) == 1
@@ -854,17 +854,17 @@ def test_lib_upgrade_using_library_with_invalid_version(run_command, data_dir):
     Path(lib_path, "library.properties").write_text("version=1.0001")
 
     # Verifies version is now empty
-    res = run_command("lib list --format json")
+    res = run_command(["lib", "list", "--format", "json"])
     assert res.ok
     data = json.loads(res.stdout)
     assert len(data) == 1
     assert "version" not in data[0]["library"]
 
     # Upgrade library
-    assert run_command("lib upgrade WiFi101")
+    assert run_command(["lib", "upgrade", "WiFi101"])
 
     # Verifies library has been updated
-    res = run_command("lib list --format json")
+    res = run_command(["lib", "list", "--format", "json"])
     assert res.ok
     data = json.loads(res.stdout)
     assert len(data) == 1
@@ -879,7 +879,7 @@ def test_install_zip_lib_with_macos_metadata(run_command, data_dir, downloads_di
         "ARDUINO_SKETCHBOOK_DIR": data_dir,
         "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
     }
-    assert run_command("config init --dest-dir .", custom_env=env)
+    assert run_command(["config", "init", "--dest-dir", "."], custom_env=env)
 
     lib_install_dir = Path(data_dir, "libraries", "fake-lib")
     # Verifies library is not already installed
@@ -887,7 +887,7 @@ def test_install_zip_lib_with_macos_metadata(run_command, data_dir, downloads_di
 
     zip_path = Path(__file__).parent / "testdata" / "fake-lib.zip"
     # Test zip-path install
-    res = run_command(f"lib install --zip-path {zip_path}")
+    res = run_command(["lib", "install", "--zip-path", zip_path])
     assert res.ok
     assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
 
@@ -898,7 +898,7 @@ def test_install_zip_lib_with_macos_metadata(run_command, data_dir, downloads_di
     assert lib_install_dir / "src" / "fake-lib.h" in files
 
     # Reinstall library
-    assert run_command(f"lib install --zip-path {zip_path}")
+    assert run_command(["lib", "install", "--zip-path", zip_path])
 
     # Verifies library remains installed
     assert lib_install_dir.exists()
@@ -915,7 +915,7 @@ def test_install_zip_invalid_library(run_command, data_dir, downloads_dir):
         "ARDUINO_SKETCHBOOK_DIR": data_dir,
         "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
     }
-    assert run_command("config init --dest-dir .", custom_env=env)
+    assert run_command(["config", "init", "--dest-dir", "."], custom_env=env)
 
     lib_install_dir = Path(data_dir, "libraries", "lib-without-header")
     # Verifies library is not already installed
@@ -923,7 +923,7 @@ def test_install_zip_invalid_library(run_command, data_dir, downloads_dir):
 
     zip_path = Path(__file__).parent / "testdata" / "lib-without-header.zip"
     # Test zip-path install
-    res = run_command(f"lib install --zip-path {zip_path}")
+    res = run_command(["lib", "install", "--zip-path", zip_path])
     assert res.failed
     assert 'library is not valid: missing header file "lib-without-header.h"' in res.stderr
 
@@ -933,7 +933,7 @@ def test_install_zip_invalid_library(run_command, data_dir, downloads_dir):
 
     zip_path = Path(__file__).parent / "testdata" / "lib-without-properties.zip"
     # Test zip-path install
-    res = run_command(f"lib install --zip-path {zip_path}")
+    res = run_command(["lib", "install", "--zip-path", zip_path])
     assert res.failed
     assert 'library is not valid: missing file "library.properties"' in res.stderr
 
@@ -946,7 +946,7 @@ def test_install_git_invalid_library(run_command, data_dir, downloads_dir):
         "ARDUINO_SKETCHBOOK_DIR": data_dir,
         "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
     }
-    assert run_command("config init --dest-dir .", custom_env=env)
+    assert run_command(["config", "init", "--dest-dir", "."], custom_env=env)
 
     # Create fake library repository
     repo_dir = Path(data_dir, "lib-without-header")
@@ -960,7 +960,7 @@ def test_install_git_invalid_library(run_command, data_dir, downloads_dir):
     # Verifies library is not already installed
     assert not lib_install_dir.exists()
 
-    res = run_command(f"lib install --git-url {repo_dir}", custom_env=env)
+    res = run_command(["lib", "install", "--git-url", repo_dir], custom_env=env)
     assert res.failed
     assert 'library is not valid: missing header file "lib-without-header.h"' in res.stderr
     assert not lib_install_dir.exists()
@@ -978,7 +978,7 @@ def test_install_git_invalid_library(run_command, data_dir, downloads_dir):
     # Verifies library is not already installed
     assert not lib_install_dir.exists()
 
-    res = run_command(f"lib install --git-url {repo_dir}", custom_env=env)
+    res = run_command(["lib", "install", "--git-url", repo_dir], custom_env=env)
     assert res.failed
     assert 'library is not valid: missing file "library.properties"' in res.stderr
     assert not lib_install_dir.exists()

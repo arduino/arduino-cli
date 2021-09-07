@@ -20,14 +20,14 @@ def test_cache_clean(run_command, data_dir):
     Clean the cache under arduino caching file directory which is
     "<Arduino configure file path>/staging"
     """
-    result = run_command("cache clean")
+    result = run_command(["cache", "clean"])
     assert result.ok
 
     # Generate /staging directory
-    result = run_command("lib list")
+    result = run_command(["lib", "list"])
     assert result.ok
 
-    result = run_command("cache clean")
+    result = run_command(["cache", "clean"])
     assert result.ok
 
     assert not os.path.isdir(os.path.join(data_dir, "staging"))

@@ -27,112 +27,110 @@ pytestmark = pytest.mark.skipif(running_on_ci(), reason="VMs have no serial port
 
 def test_upload(run_command, data_dir, detected_boards):
     # Init the environment explicitly
-    run_command("core update-index")
+    run_command(["core", "update-index"])
 
     for board in detected_boards:
         # Download platform
-        run_command(f"core install {board.core}")
+        run_command(["core", "install", board.core])
         # Create a sketch
         sketch_name = f"TestUploadSketch{board.id}"
         sketch_path = Path(data_dir, sketch_name)
         fqbn = board.fqbn
         address = board.address
-        assert run_command(f"sketch new {sketch_path}")
+        assert run_command(["sketch", "new", sketch_path])
         # Build sketch
-        assert run_command(f"compile -b {fqbn} {sketch_path}")
+        assert run_command(["compile", "-b", fqbn, sketch_path])
 
         # Verifies binaries are not exported
         assert not (sketch_path / "build").exists()
 
         # Upload without port must fail
-        assert not run_command(f"upload -b {fqbn} {sketch_path}")
+        assert not run_command(["upload", "-b", fqbn, sketch_path])
 
         # Upload
-        assert run_command(f"upload -b {fqbn} -p {address} {sketch_path}")
+        assert run_command(["upload", "-b", fqbn, "-p", address, sketch_path])
 
 
 def test_upload_with_input_dir_flag(run_command, data_dir, detected_boards):
     # Init the environment explicitly
-    run_command("core update-index")
+    run_command(["core", "update-index"])
 
     for board in detected_boards:
         # Download board platform
-        run_command(f"core install {board.core}")
+        run_command(["core", "install", board.core])
 
         # Create sketch
         sketch_name = f"TestUploadInputDirSketch{board.id}"
         sketch_path = Path(data_dir, sketch_name)
         fqbn = board.fqbn
         address = board.address
-        assert run_command(f"sketch new {sketch_path}")
+        assert run_command(["sketch", "new", sketch_path])
 
         # Build sketch and export binaries to custom directory
         output_dir = Path(data_dir, "test_dir", sketch_name, "build")
-        assert run_command(f"compile -b {fqbn} {sketch_path} --output-dir {output_dir}")
+        assert run_command(["compile", "-b", fqbn, sketch_path, "--output-dir", output_dir])
 
         # Upload with --input-dir flag
-        assert run_command(f"upload -b {fqbn} -p {address} --input-dir {output_dir}")
+        assert run_command(["upload", "-b", fqbn, "-p", address, "--input-dir", output_dir])
 
 
 def test_upload_with_input_file_flag(run_command, data_dir, detected_boards):
     # Init the environment explicitly
-    run_command("core update-index")
+    run_command(["core", "update-index"])
 
     for board in detected_boards:
         # Download board platform
-        run_command(f"core install {board.core}")
+        run_command(["core", "install", board.core])
 
         # Create sketch
         sketch_name = f"TestUploadInputFileSketch{board.id}"
         sketch_path = Path(data_dir, sketch_name)
         fqbn = board.fqbn
         address = board.address
-        assert run_command(f"sketch new {sketch_path}")
+        assert run_command(["sketch", "new", sketch_path])
 
         # Build sketch and export binaries to custom directory
         output_dir = Path(data_dir, "test_dir", sketch_name, "build")
-        assert run_command(f"compile -b {fqbn} {sketch_path} --output-dir {output_dir}")
+        assert run_command(["compile", "-b", fqbn, sketch_path, "--output-dir", output_dir])
 
         # We don't need a specific file when using the --input-file flag to upload since
         # it's just used to calculate the directory, so it's enough to get a random file
         # that's inside that directory
         input_file = next(output_dir.glob(f"{sketch_name}.ino.*"))
         # Upload using --input-file
-        assert run_command(f"upload -b {fqbn} -p {address} --input-file {input_file}")
+        assert run_command(["upload", "-b", fqbn, "-p", address, "--input-file", input_file])
 
 
 def test_upload_after_attach(run_command, data_dir, detected_boards):
     # Init the environment explicitly
-    run_command("core update-index")
+    run_command(["core", "update-index"])
 
     for board in detected_boards:
         # Download core
-        run_command(f"core install {board.core}")
+        run_command(["core", "install", board.core])
         # Create a sketch
         sketch_path = os.path.join(data_dir, "foo")
-        assert run_command("sketch new {}".format(sketch_path))
-        assert run_command(
-            "board attach serial://{port} {sketch_path}".format(port=board.address, sketch_path=sketch_path)
-        )
+        assert run_command(["sketch", "new", sketch_path])
+        assert run_command(["board", "attach", f"serial://{board.address}", sketch_path])
         # Build sketch
-        assert run_command("compile {sketch_path}".format(sketch_path=sketch_path))
+        assert run_command(["compile", sketch_path])
         # Upload
-        assert run_command("upload  {sketch_path}".format(sketch_path=sketch_path))
+        assert run_command(["upload", sketch_path])
 
 
 def test_compile_and_upload_combo(run_command, data_dir, detected_boards, wait_for_board):
     # Init the environment explicitly
-    run_command("core update-index")
+    run_command(["core", "update-index"])
 
     # Install required core(s)
-    run_command("core install arduino:avr@1.8.3")
-    run_command("core install arduino:samd@1.8.6")
+    run_command(["core", "install", "arduino:avr@1.8.3"])
+    run_command(["core", "install", "arduino:samd@1.8.6"])
 
     # Create a test sketch
     sketch_name = "CompileAndUploadIntegrationTest"
     sketch_path = os.path.join(data_dir, sketch_name)
     sketch_main_file = os.path.join(sketch_path, sketch_name + ".ino")
-    result = run_command("sketch new {}".format(sketch_path))
+    result = run_command(["sketch", "new", sketch_path])
     assert result.ok
     assert "Sketch created in: {}".format(sketch_path) in result.stdout
 
@@ -140,11 +138,11 @@ def test_compile_and_upload_combo(run_command, data_dir, detected_boards, wait_f
     for board in detected_boards:
         log_file_name = "{fqbn}-compile.log".format(fqbn=board.fqbn.replace(":", "-"))
         log_file_path = os.path.join(data_dir, log_file_name)
-        command_log_flags = "--log-format json --log-file {} --log-level trace".format(log_file_path)
+        command_log_flags = ["--log-format", "json", "--log-file", log_file_path, "--log-level", "trace"]
 
         def run_test(s):
             wait_for_board()
-            result = run_command(f"compile -b {board.fqbn} --upload -p {board.address} {s} {command_log_flags}")
+            result = run_command(["compile", "-b", board.fqbn, "--upload", "-p", board.address, s] + command_log_flags)
             print(result.stderr)
             assert result.ok
 
@@ -162,30 +160,38 @@ def test_compile_and_upload_combo(run_command, data_dir, detected_boards, wait_f
 
 def test_compile_and_upload_combo_with_custom_build_path(run_command, data_dir, detected_boards, wait_for_board):
     # Init the environment explicitly
-    run_command("core update-index")
+    run_command(["core", "update-index"])
 
     # Install required core(s)
-    run_command("core install arduino:avr@1.8.3")
-    run_command("core install arduino:samd@1.8.6")
+    run_command(["core", "install", "arduino:avr@1.8.3"])
+    run_command(["core", "install", "arduino:samd@1.8.6"])
 
     sketch_name = "CompileAndUploadCustomBuildPathIntegrationTest"
     sketch_path = Path(data_dir, sketch_name)
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
 
     for board in detected_boards:
         fqbn_normalized = board.fqbn.replace(":", "-")
         log_file_name = f"{fqbn_normalized}-compile.log"
         log_file = Path(data_dir, log_file_name)
-        command_log_flags = f"--log-format json --log-file {log_file} --log-level trace"
+        command_log_flags = ["--log-format", "json", "--log-file", log_file, "--log-level", "trace"]
 
         wait_for_board()
 
         build_path = Path(data_dir, "test_dir", fqbn_normalized, "build_dir")
         result = run_command(
-            f"compile -b {board.fqbn} "
-            + f"--upload -p {board.address} "
-            + f"--build-path {build_path} "
-            + f"{sketch_path} {command_log_flags}"
+            [
+                "compile",
+                "-b",
+                board.fqbn,
+                "--upload",
+                "-p",
+                board.address,
+                "--build-path",
+                build_path,
+                sketch_path,
+            ]
+            + command_log_flags
         )
         print(result.stderr)
         assert result.ok
@@ -200,13 +206,13 @@ def test_compile_and_upload_combo_with_custom_build_path(run_command, data_dir, 
 
 
 def test_compile_and_upload_combo_sketch_with_pde_extension(run_command, data_dir, detected_boards, wait_for_board):
-    assert run_command("update")
+    assert run_command(["update"])
 
     sketch_name = "CompileAndUploadPdeSketch"
     sketch_path = Path(data_dir, sketch_name)
 
     # Create a test sketch
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
 
     # Renames sketch file to pde
     sketch_file = Path(sketch_path, f"{sketch_name}.ino").rename(sketch_path / f"{sketch_name}.pde")
@@ -214,31 +220,31 @@ def test_compile_and_upload_combo_sketch_with_pde_extension(run_command, data_di
     for board in detected_boards:
         # Install core
         core = ":".join(board.fqbn.split(":")[:2])
-        assert run_command(f"core install {core}")
+        assert run_command(["core", "install", core])
 
         # Build sketch and upload from folder
         wait_for_board()
-        res = run_command(f"compile --clean -b {board.fqbn} -u -p {board.address} {sketch_path}")
+        res = run_command(["compile", "--clean", "-b", board.fqbn, "-u", "-p", board.address, sketch_path])
         assert res.ok
         assert "Sketches with .pde extension are deprecated, please rename the following files to .ino" in res.stderr
         assert str(sketch_file) in res.stderr
 
         # Build sketch and upload from file
         wait_for_board()
-        res = run_command(f"compile --clean -b {board.fqbn} -u -p {board.address} {sketch_file}")
+        res = run_command(["compile", "--clean", "-b", board.fqbn, "-u", "-p", board.address, sketch_file])
         assert res.ok
         assert "Sketches with .pde extension are deprecated, please rename the following files to .ino" in res.stderr
         assert str(sketch_file) in res.stderr
 
 
 def test_upload_sketch_with_pde_extension(run_command, data_dir, detected_boards, wait_for_board):
-    assert run_command("update")
+    assert run_command(["update"])
 
     sketch_name = "UploadPdeSketch"
     sketch_path = Path(data_dir, sketch_name)
 
     # Create a test sketch
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
 
     # Renames sketch file to pde
     sketch_file = Path(sketch_path, f"{sketch_name}.ino").rename(sketch_path / f"{sketch_name}.pde")
@@ -246,24 +252,24 @@ def test_upload_sketch_with_pde_extension(run_command, data_dir, detected_boards
     for board in detected_boards:
         # Install core
         core = ":".join(board.fqbn.split(":")[:2])
-        assert run_command(f"core install {core}")
+        assert run_command(["core", "install", core])
 
         # Compile sketch first
-        res = run_command(f"compile --clean -b {board.fqbn} {sketch_path} --format json")
+        res = run_command(["compile", "--clean", "-b", board.fqbn, sketch_path, "--format", "json"])
         assert res.ok
         data = json.loads(res.stdout)
         build_dir = Path(data["builder_result"]["build_path"])
 
         # Upload from sketch folder
         wait_for_board()
-        assert run_command(f"upload -b {board.fqbn} -p {board.address} {sketch_path}")
+        assert run_command(["upload", "-b", board.fqbn, "-p", board.address, sketch_path])
 
         # Upload from sketch file
         wait_for_board()
-        assert run_command(f"upload -b {board.fqbn} -p {board.address} {sketch_file}")
+        assert run_command(["upload", "-b", board.fqbn, "-p", board.address, sketch_file])
 
         wait_for_board()
-        res = run_command(f"upload -b {board.fqbn} -p {board.address} --input-dir {build_dir}")
+        res = run_command(["upload", "-b", board.fqbn, "-p", board.address, "--input-dir", build_dir])
         assert (
             "Sketches with .pde extension are deprecated, please rename the following files to .ino:" not in res.stderr
         )
@@ -274,7 +280,7 @@ def test_upload_sketch_with_pde_extension(run_command, data_dir, detected_boards
         # it's just used to calculate the directory, so it's enough to get a random file
         # that's inside that directory
         binary_file = next(build_dir.glob(f"{sketch_name}.pde.*"))
-        res = run_command(f"upload -b {board.fqbn} -p {board.address} --input-file {binary_file}")
+        res = run_command(["upload", "-b", board.fqbn, "-p", board.address, "--input-file", binary_file])
         assert (
             "Sketches with .pde extension are deprecated, please rename the following files to .ino:" not in res.stderr
         )
@@ -283,28 +289,28 @@ def test_upload_sketch_with_pde_extension(run_command, data_dir, detected_boards
 def test_upload_with_input_dir_containing_multiple_binaries(run_command, data_dir, detected_boards, wait_for_board):
     # This tests verifies the behaviour outlined in this issue:
     # https://github.com/arduino/arduino-cli/issues/765#issuecomment-699678646
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Create a two different sketches
     sketch_one_name = "UploadMultipleBinariesSketchOne"
     sketch_one_path = Path(data_dir, sketch_one_name)
-    assert run_command(f"sketch new {sketch_one_path}")
+    assert run_command(["sketch", "new", sketch_one_path])
 
     sketch_two_name = "UploadMultipleBinariesSketchTwo"
     sketch_two_path = Path(data_dir, sketch_two_name)
-    assert run_command(f"sketch new {sketch_two_path}")
+    assert run_command(["sketch", "new", sketch_two_path])
 
     for board in detected_boards:
         # Install core
         core = ":".join(board.fqbn.split(":")[:2])
-        assert run_command(f"core install {core}")
+        assert run_command(["core", "install", core])
 
         # Compile both sketches and copy binaries in the same directory same build directory
-        res = run_command(f"compile --clean -b {board.fqbn} {sketch_one_path} --format json")
+        res = run_command(["compile", "--clean", "-b", board.fqbn, sketch_one_path, "--format", "json"])
         assert res.ok
         data = json.loads(res.stdout)
         build_dir_one = Path(data["builder_result"]["build_path"])
-        res = run_command(f"compile --clean -b {board.fqbn} {sketch_two_path} --format json")
+        res = run_command(["compile", "--clean", "-b", board.fqbn, sketch_two_path, "--format", "json"])
         assert res.ok
         data = json.loads(res.stdout)
         build_dir_two = Path(data["builder_result"]["build_path"])
@@ -316,7 +322,7 @@ def test_upload_with_input_dir_containing_multiple_binaries(run_command, data_di
 
         wait_for_board()
         # Verifies upload fails because multiple binaries are found
-        res = run_command(f"upload -b {board.fqbn} -p {board.address} --input-dir {binaries_dir}")
+        res = run_command(["upload", "-b", board.fqbn, "-p", board.address, "--input-dir", binaries_dir])
         assert res.failed
         assert (
             "Error during Upload: "
@@ -333,19 +339,19 @@ def test_upload_with_input_dir_containing_multiple_binaries(run_command, data_di
 
         wait_for_board()
         # Verifies upload is successful using the binaries with the same name of the containing folder
-        res = run_command(f"upload -b {board.fqbn} -p {board.address} --input-dir {binaries_dir}")
+        res = run_command(["upload", "-b", board.fqbn, "-p", board.address, "--input-dir", binaries_dir])
         assert (
             "Sketches with .pde extension are deprecated, please rename the following files to .ino:" not in res.stderr
         )
 
 
 def test_compile_and_upload_combo_sketch_with_mismatched_casing(run_command, data_dir, detected_boards, wait_for_board):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Create a sketch
     sketch_name = "CompileUploadComboMismatchCasing"
     sketch_path = Path(data_dir, sketch_name)
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
 
     # Rename main .ino file so casing is different from sketch name
     Path(sketch_path, f"{sketch_name}.ino").rename(sketch_path / f"{sketch_name.lower()}.ino")
@@ -353,21 +359,21 @@ def test_compile_and_upload_combo_sketch_with_mismatched_casing(run_command, dat
     for board in detected_boards:
         # Install core
         core = ":".join(board.fqbn.split(":")[:2])
-        assert run_command(f"core install {core}")
+        assert run_command(["core", "install", core])
 
         # Try to compile
-        res = run_command(f"compile --clean -b {board.fqbn} -u -p {board.address} {sketch_path}")
+        res = run_command(["compile", "--clean", "-b", board.fqbn, "-u", "-p", board.address, sketch_path])
         assert res.failed
         assert "Error during build: Can't open sketch: no valid sketch found in" in res.stderr
 
 
 def test_upload_sketch_with_mismatched_casing(run_command, data_dir, detected_boards, wait_for_board):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Create a sketch
     sketch_name = "UploadMismatchCasing"
     sketch_path = Path(data_dir, sketch_name)
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
 
     # Rename main .ino file so casing is different from sketch name
     Path(sketch_path, f"{sketch_name}.ino").rename(sketch_path / f"{sketch_name.lower()}.ino")
@@ -375,10 +381,10 @@ def test_upload_sketch_with_mismatched_casing(run_command, data_dir, detected_bo
     for board in detected_boards:
         # Install core
         core = ":".join(board.fqbn.split(":")[:2])
-        assert run_command(f"core install {core}")
+        assert run_command(["core", "install", core])
 
         # Tries to upload given sketch, it has not been compiled but it fails even before
         # searching for binaries since the sketch is not valid
-        res = run_command(f"upload -b {board.fqbn} -p {board.address} {sketch_path}")
+        res = run_command(["upload", "-b", board.fqbn, "-p", board.address, sketch_path])
         assert res.failed
         assert "Error during Upload: no valid sketch found in" in res.stderr
