@@ -1300,14 +1300,14 @@
   -u, --upload                       Upload the binary after the compilation.
   -t, --verify                       Verify uploaded binary after the upload.
       --vid-pid string               When specified, VID/PID specific build properties are used, if board supports them.
-      --warnings string              Optional, can be &quot;none&quot;, &quot;default&quot;, &quot;more&quot; and &quot;all&quot;. Defaults to &quot;none&quot;. Used to tell gcc which warning level to use (-W flag). (default &quot;none&quot;)
+      --warnings string              Optional, can be: none, default, more, all. Used to tell gcc which warning level to use (-W flag). (default &quot;none&quot;)
 </code></pre></div>
 <h3 id="options-inherited-from-parent-commands">Options inherited from parent commands<a class="headerlink" href="#options-inherited-from-parent-commands" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>      --additional-urls strings   Comma-separated list of additional URLs for the Boards Manager.
       --config-file string        The custom config file (if not specified the default will be used).
-      --format string             The output format, can be {text|json}. (default &quot;text&quot;)
+      --format string             The output format for the logs, can be: text, json (default &quot;text&quot;)
       --log-file string           Path to the file where logs will be written.
-      --log-format string         The output format for the logs, can be {text|json}.
+      --log-format string         The output format for the logs, can be: text, json
       --log-level string          Messages with this level and above will be logged. Valid levels are: trace, debug, info, warn, error, fatal, panic
       --no-color                  Disable colored output.
   -v, --verbose                   Print the logs on the standard output.
