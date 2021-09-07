@@ -241,7 +241,7 @@ def test_sketch_archive_relative_sketch_path_with_absolute_zip_path(run_command,
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command(["sketch", "archive", "./sketch_simple", f"{archives_folder}"])
+    result = run_command(["sketch", "archive", "./sketch_simple", archives_folder])
     assert result.ok
 
     archive = zipfile.ZipFile(f"{archives_folder}/sketch_simple.zip")
