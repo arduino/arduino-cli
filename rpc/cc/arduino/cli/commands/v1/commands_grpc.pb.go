@@ -98,6 +98,10 @@ type ArduinoCoreServiceClient interface {
 	LibrarySearch(ctx context.Context, in *LibrarySearchRequest, opts ...grpc.CallOption) (*LibrarySearchResponse, error)
 	// List the installed libraries.
 	LibraryList(ctx context.Context, in *LibraryListRequest, opts ...grpc.CallOption) (*LibraryListResponse, error)
+	// Open a monitor connection to a board port
+	Monitor(ctx context.Context, opts ...grpc.CallOption) (ArduinoCoreService_MonitorClient, error)
+	// Returns the parameters that can be set in the MonitorRequest calls
+	EnumerateMonitorPortSettings(ctx context.Context, in *EnumerateMonitorPortSettingsRequest, opts ...grpc.CallOption) (*EnumerateMonitorPortSettingsResponse, error)
 }
 
 type arduinoCoreServiceClient struct {
@@ -923,6 +927,46 @@ func (c *arduinoCoreServiceClient) LibraryList(ctx context.Context, in *LibraryL
 	return out, nil
 }
 
+func (c *arduinoCoreServiceClient) Monitor(ctx context.Context, opts ...grpc.CallOption) (ArduinoCoreService_MonitorClient, error) {
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[21], "/cc.arduino.cli.commands.v1.ArduinoCoreService/Monitor", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &arduinoCoreServiceMonitorClient{stream}
+	return x, nil
+}
+
+type ArduinoCoreService_MonitorClient interface {
+	Send(*MonitorRequest) error
+	Recv() (*MonitorResponse, error)
+	grpc.ClientStream
+}
+
+type arduinoCoreServiceMonitorClient struct {
+	grpc.ClientStream
+}
+
+func (x *arduinoCoreServiceMonitorClient) Send(m *MonitorRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *arduinoCoreServiceMonitorClient) Recv() (*MonitorResponse, error) {
+	m := new(MonitorResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *arduinoCoreServiceClient) EnumerateMonitorPortSettings(ctx context.Context, in *EnumerateMonitorPortSettingsRequest, opts ...grpc.CallOption) (*EnumerateMonitorPortSettingsResponse, error) {
+	out := new(EnumerateMonitorPortSettingsResponse)
+	err := c.cc.Invoke(ctx, "/cc.arduino.cli.commands.v1.ArduinoCoreService/EnumerateMonitorPortSettings", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArduinoCoreServiceServer is the server API for ArduinoCoreService service.
 // All implementations must embed UnimplementedArduinoCoreServiceServer
 // for forward compatibility
@@ -1007,6 +1051,10 @@ type ArduinoCoreServiceServer interface {
 	LibrarySearch(context.Context, *LibrarySearchRequest) (*LibrarySearchResponse, error)
 	// List the installed libraries.
 	LibraryList(context.Context, *LibraryListRequest) (*LibraryListResponse, error)
+	// Open a monitor connection to a board port
+	Monitor(ArduinoCoreService_MonitorServer) error
+	// Returns the parameters that can be set in the MonitorRequest calls
+	EnumerateMonitorPortSettings(context.Context, *EnumerateMonitorPortSettingsRequest) (*EnumerateMonitorPortSettingsResponse, error)
 	mustEmbedUnimplementedArduinoCoreServiceServer()
 }
 
@@ -1124,6 +1172,12 @@ func (UnimplementedArduinoCoreServiceServer) LibrarySearch(context.Context, *Lib
 }
 func (UnimplementedArduinoCoreServiceServer) LibraryList(context.Context, *LibraryListRequest) (*LibraryListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LibraryList not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) Monitor(ArduinoCoreService_MonitorServer) error {
+	return status.Errorf(codes.Unimplemented, "method Monitor not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) EnumerateMonitorPortSettings(context.Context, *EnumerateMonitorPortSettingsRequest) (*EnumerateMonitorPortSettingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EnumerateMonitorPortSettings not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) mustEmbedUnimplementedArduinoCoreServiceServer() {}
 
@@ -1872,6 +1926,50 @@ func _ArduinoCoreService_LibraryList_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArduinoCoreService_Monitor_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ArduinoCoreServiceServer).Monitor(&arduinoCoreServiceMonitorServer{stream})
+}
+
+type ArduinoCoreService_MonitorServer interface {
+	Send(*MonitorResponse) error
+	Recv() (*MonitorRequest, error)
+	grpc.ServerStream
+}
+
+type arduinoCoreServiceMonitorServer struct {
+	grpc.ServerStream
+}
+
+func (x *arduinoCoreServiceMonitorServer) Send(m *MonitorResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *arduinoCoreServiceMonitorServer) Recv() (*MonitorRequest, error) {
+	m := new(MonitorRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func _ArduinoCoreService_EnumerateMonitorPortSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EnumerateMonitorPortSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).EnumerateMonitorPortSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cc.arduino.cli.commands.v1.ArduinoCoreService/EnumerateMonitorPortSettings",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).EnumerateMonitorPortSettings(ctx, req.(*EnumerateMonitorPortSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArduinoCoreService_ServiceDesc is the grpc.ServiceDesc for ArduinoCoreService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1942,6 +2040,10 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LibraryList",
 			Handler:    _ArduinoCoreService_LibraryList_Handler,
+		},
+		{
+			MethodName: "EnumerateMonitorPortSettings",
+			Handler:    _ArduinoCoreService_EnumerateMonitorPortSettings_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
@@ -2050,6 +2152,12 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "LibraryUpgradeAll",
 			Handler:       _ArduinoCoreService_LibraryUpgradeAll_Handler,
 			ServerStreams: true,
+		},
+		{
+			StreamName:    "Monitor",
+			Handler:       _ArduinoCoreService_Monitor_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "cc/arduino/cli/commands/v1/commands.proto",
