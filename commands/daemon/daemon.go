@@ -465,3 +465,13 @@ func (s *ArduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallRequ
 	}
 	return stream.Send(&rpc.GitLibraryInstallResponse{})
 }
+
+// EnumerateMonitorPortSettings FIXMEDOC
+func (s *ArduinoCoreServerImpl) EnumerateMonitorPortSettings(context.Context, *rpc.EnumerateMonitorPortSettingsRequest) (*rpc.EnumerateMonitorPortSettingsResponse, error) {
+	return nil, status.New(codes.Unimplemented, "Not implemented").Err()
+}
+
+// Monitor FIXMEDOC
+func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorServer) error {
+	return status.New(codes.Unimplemented, "Not implemented").Err()
+}
