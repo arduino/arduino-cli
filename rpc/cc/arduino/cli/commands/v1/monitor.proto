@@ -47,4 +47,43 @@ message MonitorResponse {
   string error = 1;
   // Data received from the port
   bytes rx_data = 2;
+  // Settings applied to the port, may be returned after a port is opened (to
+  // report the default settings) or after a new port_configuration is sent
+  // (to report the new settings applied)
+  repeated MonitorPortSetting applied_settings = 3;
+}
+
+message MonitorPortSetting {
+  string setting_id = 1;
+  string value = 2;
+}
+
+message EnumerateMonitorPortSettingsRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // The Port to enumerate settings.
+  Port port = 2;
+  // The board FQBN we are trying to connect to. This is optional, and it's
+  // needed to disambiguate if more than one platform provides the pluggable
+  // monitor for a given port protocol.
+  string fqbn = 3;
+}
+
+message EnumerateMonitorPortSettingsResponse {
+  // A list of descriptors of the settings that may be changed for the monitor
+  // port.
+  repeated MonitorPortSettingDescriptor settings = 1;
+}
+
+message MonitorPortSettingDescriptor {
+  // The setting identifier
+  string setting_id = 1;
+  // A human-readable label of the setting (to be displayed on the GUI)
+  string label = 2;
+  // The setting type (at the moment only "enum" is avaiable)
+  string type = 3;
+  // The values allowed on "enum" types
+  repeated string enum_values = 4;
+  // The selected or default value
+  string value = 5;
 }
