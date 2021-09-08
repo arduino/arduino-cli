@@ -223,11 +223,11 @@ def test_compile_with_symlink(run_command, data_dir):
         else:
             assert result.ok
 
-    test_broken_symlink("CompileIntegrationTestSymlinkBrokenIno", "link.ino", "doesnotexist.ino", expect_error=True)
-    test_broken_symlink("CompileIntegrationTestSymlinkBrokenCpp", "link.cpp", "doesnotexist.cpp", expect_error=True)
-    test_broken_symlink("CompileIntegrationTestSymlinkBrokenH", "link.h", "doesnotexist.h", expect_error=True)
-    test_broken_symlink("CompileIntegrationTestSymlinkBrokenJson", "link.json", "doesnotexist.json", expect_error=True)
-    test_broken_symlink("CompileIntegrationTestSymlinkBrokenXXX", "link.xxx", "doesnotexist.xxx", expect_error=True)
+    test_broken_symlink("CompileIntegrationTestSymlinkBrokenIno", "link.ino", "doesnotexist.ino", expect_error=False)
+    test_broken_symlink("CompileIntegrationTestSymlinkBrokenCpp", "link.cpp", "doesnotexist.cpp", expect_error=False)
+    test_broken_symlink("CompileIntegrationTestSymlinkBrokenH", "link.h", "doesnotexist.h", expect_error=False)
+    test_broken_symlink("CompileIntegrationTestSymlinkBrokenJson", "link.json", "doesnotexist.json", expect_error=False)
+    test_broken_symlink("CompileIntegrationTestSymlinkBrokenXXX", "link.xxx", "doesnotexist.xxx", expect_error=False)
 
 
 def test_compile_blacklisted_sketchname(run_command, data_dir):

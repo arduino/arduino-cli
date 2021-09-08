@@ -52,3 +52,5 @@ require (
 	gopkg.in/src-d/go-git.v4 v4.13.1
 	gopkg.in/yaml.v2 v2.4.0
 )
+
+replace github.com/arduino/go-paths-helper v1.6.1 => github.com/matthijskooijman/go-paths-helper v1.6.2-0.20210908151509-429170ecd10a

@@ -255,6 +255,8 @@ github.com/magiconair/properties v1.8.5 h1:b6kJs+EmPFMYGkow9GiUyCyOvIwYetYJ3fSaW
 github.com/magiconair/properties v1.8.5/go.mod h1:y3VJvCyxH9uVvJTWEGAELF3aiYNyPKd5NZ3oSwXrF60=
 github.com/marcinbor85/gohex v0.0.0-20210308104911-55fb1c624d84 h1:hyAgCuG5nqTMDeUD8KZs7HSPs6KprPgPP8QmGV8nyvk=
 github.com/marcinbor85/gohex v0.0.0-20210308104911-55fb1c624d84/go.mod h1:Pb6XcsXyropB9LNHhnqaknG/vEwYztLkQzVCHv8sQ3M=
+github.com/matthijskooijman/go-paths-helper v1.6.2-0.20210908151509-429170ecd10a h1:Mp/RCywh1EVgopMuG3CMjZ9S8xwLhvCZ+oDb4hLNSYY=
+github.com/matthijskooijman/go-paths-helper v1.6.2-0.20210908151509-429170ecd10a/go.mod h1:V82BWgAAp4IbmlybxQdk9Bpkz8M4Qyx+RAFKaG9NuvU=
 github.com/mattn/go-colorable v0.0.9/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
 github.com/mattn/go-colorable v0.1.8 h1:c1ghPdyEDarC70ftn0y+A/Ee++9zz8ljHG1b13eJ0s8=
 github.com/mattn/go-colorable v0.1.8/go.mod h1:u6P/XSegPjTcexA+o6vUJrdnUu04hMope9wVRipJSqc=
