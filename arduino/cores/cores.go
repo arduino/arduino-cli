@@ -293,6 +293,14 @@ func (release *PlatformRelease) RequiresToolRelease(toolRelease *ToolRelease) bo
 			return true
 		}
 	}
+	for _, monitor := range release.MonitorDependencies {
+		if monitor.Name == toolRelease.Tool.Name &&
+			monitor.Packager == toolRelease.Tool.Package.Name &&
+			// We always want the latest monitor version available
+			toolRelease.Version.Equal(toolRelease.Tool.LatestRelease().Version) {
+			return true
+		}
+	}
 	return false
 }
 

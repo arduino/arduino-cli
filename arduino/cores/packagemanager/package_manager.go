@@ -481,6 +481,17 @@ func (pm *PackageManager) FindToolsRequiredFromPlatformRelease(platform *cores.P
 		delete(foundTools, tool.Tool.Name)
 	}
 
+	platform.MonitorDependencies.Sort()
+	for _, monitorDep := range platform.MonitorDependencies {
+		pm.Log.WithField("monitor", monitorDep).Infof("Required monitor")
+		tool := pm.FindMonitorDependency(monitorDep)
+		if tool == nil {
+			return nil, fmt.Errorf(tr("monitor release not found: %s"), monitorDep)
+		}
+		requiredTools = append(requiredTools, tool)
+		delete(foundTools, tool.Tool.Name)
+	}
+
 	for _, toolRel := range foundTools {
 		requiredTools = append(requiredTools, toolRel)
 	}
@@ -555,6 +566,18 @@ func (pm *PackageManager) FindToolDependency(dep *cores.ToolDependency) *cores.T
 // FindDiscoveryDependency returns the ToolRelease referenced by the DiscoveryDepenency or nil if
 // the referenced discovery doesn't exists.
 func (pm *PackageManager) FindDiscoveryDependency(discovery *cores.DiscoveryDependency) *cores.ToolRelease {
+	if pack := pm.Packages[discovery.Packager]; pack == nil {
+		return nil
+	} else if toolRelease := pack.Tools[discovery.Name]; toolRelease == nil {
+		return nil
+	} else {
+		return toolRelease.GetLatestInstalled()
+	}
+}
+
+// FindMonitorDependency returns the ToolRelease referenced by the MonitorDepenency or nil if
+// the referenced monitor doesn't exists.
+func (pm *PackageManager) FindMonitorDependency(discovery *cores.MonitorDependency) *cores.ToolRelease {
 	if pack := pm.Packages[discovery.Packager]; pack == nil {
 		return nil
 	} else if toolRelease := pack.Tools[discovery.Name]; toolRelease == nil {

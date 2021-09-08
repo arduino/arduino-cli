@@ -127,6 +127,33 @@ func (packages Packages) GetPlatformReleaseDiscoveryDependencies(release *Platfo
 	return res, nil
 }
 
+// GetPlatformReleaseMonitorDependencies returns the monitor releases needed by the specified PlatformRelease
+func (packages Packages) GetPlatformReleaseMonitorDependencies(release *PlatformRelease) ([]*ToolRelease, error) {
+	if release == nil {
+		return nil, fmt.Errorf(tr("release cannot be nil"))
+	}
+
+	res := []*ToolRelease{}
+	for _, monitor := range release.MonitorDependencies {
+		pkg, exists := packages[monitor.Packager]
+		if !exists {
+			return nil, fmt.Errorf(tr("package %s not found"), monitor.Packager)
+		}
+		tool, exists := pkg.Tools[monitor.Name]
+		if !exists {
+			return nil, fmt.Errorf(tr("tool %s not found"), monitor.Name)
+		}
+
+		// We always want to use the latest available release for monitors
+		latestRelease := tool.LatestRelease()
+		if latestRelease == nil {
+			return nil, fmt.Errorf(tr("can't find latest release of %s"), monitor.Name)
+		}
+		res = append(res, latestRelease)
+	}
+	return res, nil
+}
+
 // GetOrCreatePlatform returns the Platform object with the specified architecture
 // or creates a new one if not found
 func (targetPackage *Package) GetOrCreatePlatform(architecture string) *Platform {
