@@ -228,6 +228,15 @@ def test_compile_with_symlink(run_command, data_dir):
     test_broken_symlink("CompileIntegrationTestSymlinkBrokenH", "link.h", "doesnotexist.h", expect_error=True)
     test_broken_symlink("CompileIntegrationTestSymlinkBrokenJson", "link.json", "doesnotexist.json", expect_error=True)
     test_broken_symlink("CompileIntegrationTestSymlinkBrokenXXX", "link.xxx", "doesnotexist.xxx", expect_error=False)
+    # Support a usecase where a user makes a symlink to
+    # compile_commands.json in the sketch root, even when it does not
+    # exist yet/anymore
+    test_broken_symlink(
+        "CompileIntegrationTestSymlinkBrokenCompileCommands",
+        "compile_commands.json",
+        "doesnotexist.json",
+        expect_error=False,
+    )
 
 
 def test_compile_blacklisted_sketchname(run_command, data_dir):
