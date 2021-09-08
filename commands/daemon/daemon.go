@@ -37,7 +37,9 @@ import (
 
 // ArduinoCoreServerImpl FIXMEDOC
 type ArduinoCoreServerImpl struct {
-	rpc.UnimplementedArduinoCoreServiceServer
+	// Force compile error for unimplemented methods
+	rpc.UnsafeArduinoCoreServiceServer
+
 	VersionString string
 }
 
