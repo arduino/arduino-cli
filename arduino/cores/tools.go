@@ -68,9 +68,8 @@ func (tool *Tool) FindReleaseWithRelaxedVersion(version *semver.RelaxedVersion) 
 
 // GetAllReleasesVersions returns all the version numbers in this Core Package.
 func (tool *Tool) GetAllReleasesVersions() []*semver.RelaxedVersion {
-	releases := tool.Releases
 	versions := []*semver.RelaxedVersion{}
-	for _, release := range releases {
+	for _, release := range tool.Releases {
 		versions = append(versions, release.Version)
 	}
 
@@ -79,27 +78,13 @@ func (tool *Tool) GetAllReleasesVersions() []*semver.RelaxedVersion {
 
 // LatestRelease obtains latest version of a core package.
 func (tool *Tool) LatestRelease() *ToolRelease {
-	latest := tool.latestReleaseVersion()
-	if latest == nil {
-		return nil
-	}
-
-	return tool.FindReleaseWithRelaxedVersion(latest)
-}
-
-// latestReleaseVersion obtains latest version number.
-func (tool *Tool) latestReleaseVersion() *semver.RelaxedVersion {
-	versions := tool.GetAllReleasesVersions()
-	if len(versions) == 0 {
-		return nil
-	}
-	max := versions[0]
-	for i := 1; i < len(versions); i++ {
-		if versions[i].GreaterThan(max) {
-			max = versions[i]
+	var latest *ToolRelease
+	for _, release := range tool.Releases {
+		if latest == nil || release.Version.GreaterThan(latest.Version) {
+			latest = release
 		}
 	}
-	return max
+	return latest
 }
 
 // GetLatestInstalled returns the latest installed ToolRelease for the Tool, or nil if no releases are installed.
@@ -107,9 +92,7 @@ func (tool *Tool) GetLatestInstalled() *ToolRelease {
 	var latest *ToolRelease
 	for _, release := range tool.Releases {
 		if release.IsInstalled() {
-			if latest == nil {
-				latest = release
-			} else if latest.Version.LessThan(release.Version) {
+			if latest == nil || latest.Version.LessThan(release.Version) {
 				latest = release
 			}
 		}
