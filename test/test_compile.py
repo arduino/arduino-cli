@@ -158,6 +158,78 @@ def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
     assert not result.ok
 
 
+def test_compile_with_symlink(run_command, data_dir):
+    # Init the environment explicitly
+    run_command(["core", "update-index"])
+
+    # Install Arduino AVR Boards
+    run_command(["core", "install", "arduino:avr@1.8.3"])
+
+    sketch_name = "CompileIntegrationTestSymlinkOk"
+    sketch_path = os.path.join(data_dir, sketch_name)
+    main_file = os.path.join(sketch_path, "{}.ino".format(sketch_name))
+    symlink_file = os.path.join(sketch_path, "link.ino")
+    fqbn = "arduino:avr:uno"
+
+    # Create a test sketch
+    result = run_command(["sketch", "new", sketch_path])
+    assert result.ok
+    assert "Sketch created in: {}".format(sketch_path) in result.stdout
+
+    # create a symlink to some external file and move the main .ino
+    # contents into that to check that the symlink is actually compiled
+    with tempfile.NamedTemporaryFile(delete=False) as external:
+        try:
+            os.symlink(external.name, symlink_file)
+
+            with open(main_file, mode="rb+") as main:
+                external.write(main.read())
+                external.flush()
+                main.truncate(0)
+                main.flush()
+
+            # Close to allow re-opening the file on Windows
+            # See https://bugs.python.org/issue14243
+            external.close()
+
+            # Build sketch for arduino:avr:uno
+            result = run_command(["compile", "-b", fqbn, sketch_path])
+            assert result.stderr == ""
+            assert result.ok
+        finally:
+            # Explicit cleanup needed because the file is closed above
+            os.unlink(external.name)
+
+    def test_broken_symlink(sketch_name, link_name, target_name, expect_error):
+        sketch_path = os.path.join(data_dir, sketch_name)
+        symlink_file = os.path.join(sketch_path, link_name)
+        target_file = os.path.join(sketch_path, target_name)
+        fqbn = "arduino:avr:uno"
+
+        # Create a test sketch
+        result = run_command(["sketch", "new", sketch_path])
+        assert result.ok
+        assert "Sketch created in: {}".format(sketch_path) in result.stdout
+
+        os.symlink(target_file, symlink_file)
+
+        # Build sketch for arduino:avr:uno
+        result = run_command(["compile", "-b", fqbn, sketch_path])
+
+        if expect_error:
+            expected_error = "Error during build: Can't open sketch: stat {}: ".format(symlink_file)
+            assert expected_error in result.stderr
+            assert not result.ok
+        else:
+            assert result.ok
+
+    test_broken_symlink("CompileIntegrationTestSymlinkBrokenIno", "link.ino", "doesnotexist.ino", expect_error=True)
+    test_broken_symlink("CompileIntegrationTestSymlinkBrokenCpp", "link.cpp", "doesnotexist.cpp", expect_error=True)
+    test_broken_symlink("CompileIntegrationTestSymlinkBrokenH", "link.h", "doesnotexist.h", expect_error=True)
+    test_broken_symlink("CompileIntegrationTestSymlinkBrokenJson", "link.json", "doesnotexist.json", expect_error=True)
+    test_broken_symlink("CompileIntegrationTestSymlinkBrokenXXX", "link.xxx", "doesnotexist.xxx", expect_error=True)
+
+
 def test_compile_blacklisted_sketchname(run_command, data_dir):
     """
     Compile should ignore folders named `RCS`, `.git` and the likes, but
