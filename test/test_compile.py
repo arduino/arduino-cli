@@ -217,16 +217,16 @@ def test_compile_with_symlink(run_command, data_dir):
         result = run_command(["compile", "-b", fqbn, sketch_path])
 
         if expect_error:
-            expected_error = "Error during build: Can't open sketch: stat {}: ".format(symlink_file)
+            expected_error = "Error during build: Can't open sketch: open {}: ".format(symlink_file)
             assert expected_error in result.stderr
             assert not result.ok
         else:
             assert result.ok
 
-    test_broken_symlink("CompileIntegrationTestSymlinkBrokenIno", "link.ino", "doesnotexist.ino", expect_error=False)
-    test_broken_symlink("CompileIntegrationTestSymlinkBrokenCpp", "link.cpp", "doesnotexist.cpp", expect_error=False)
-    test_broken_symlink("CompileIntegrationTestSymlinkBrokenH", "link.h", "doesnotexist.h", expect_error=False)
-    test_broken_symlink("CompileIntegrationTestSymlinkBrokenJson", "link.json", "doesnotexist.json", expect_error=False)
+    test_broken_symlink("CompileIntegrationTestSymlinkBrokenIno", "link.ino", "doesnotexist.ino", expect_error=True)
+    test_broken_symlink("CompileIntegrationTestSymlinkBrokenCpp", "link.cpp", "doesnotexist.cpp", expect_error=True)
+    test_broken_symlink("CompileIntegrationTestSymlinkBrokenH", "link.h", "doesnotexist.h", expect_error=True)
+    test_broken_symlink("CompileIntegrationTestSymlinkBrokenJson", "link.json", "doesnotexist.json", expect_error=True)
     test_broken_symlink("CompileIntegrationTestSymlinkBrokenXXX", "link.xxx", "doesnotexist.xxx", expect_error=False)
 
 

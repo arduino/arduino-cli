@@ -115,7 +115,7 @@ func New(path *paths.Path) (*Sketch, error) {
 		// Skip files that can't be opened
 		f, err := p.Open()
 		if err != nil {
-			continue
+			return nil, err
 		}
 		f.Close()
 
