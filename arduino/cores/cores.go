@@ -51,6 +51,7 @@ type PlatformRelease struct {
 	BoardsManifest          []*BoardManifest
 	ToolDependencies        ToolDependencies
 	DiscoveryDependencies   DiscoveryDependencies
+	MonitorDependencies     MonitorDependencies
 	Help                    PlatformReleaseHelp    `json:"-"`
 	Platform                *Platform              `json:"-"`
 	Properties              *properties.Map        `json:"-"`
@@ -139,6 +140,30 @@ type DiscoveryDependency struct {
 }
 
 func (d *DiscoveryDependency) String() string {
+	return fmt.Sprintf("%s:%s", d.Packager, d.Name)
+}
+
+// MonitorDependencies is a list of MonitorDependency
+type MonitorDependencies []*MonitorDependency
+
+// Sort the DiscoveryDependencies by name.
+func (d MonitorDependencies) Sort() {
+	sort.Slice(d, func(i, j int) bool {
+		if d[i].Packager != d[j].Packager {
+			return d[i].Packager < d[j].Packager
+		}
+		return d[i].Name < d[j].Name
+	})
+}
+
+// MonitorDependency identifies a specific monitor, version is omitted
+// since the latest version will always be used
+type MonitorDependency struct {
+	Name     string
+	Packager string
+}
+
+func (d *MonitorDependency) String() string {
 	return fmt.Sprintf("%s:%s", d.Packager, d.Name)
 }
 

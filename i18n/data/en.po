@@ -2771,7 +2771,7 @@ msgstr "invalid path creating config dir: %[1]s error: %[2]w"
 msgid "invalid path writing inventory file: %[1]s error: %[2]w"
 msgstr "invalid path writing inventory file: %[1]s error: %[2]w"
 
-#: arduino/cores/packageindex/index.go:239
+#: arduino/cores/packageindex/index.go:255
 msgid "invalid platform archive size: %s"
 msgstr "invalid platform archive size: %s"
 

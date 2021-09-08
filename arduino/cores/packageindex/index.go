@@ -61,6 +61,7 @@ type indexPlatformRelease struct {
 	Help                  indexHelp                  `json:"help,omitempty"`
 	ToolDependencies      []indexToolDependency      `json:"toolsDependencies"`
 	DiscoveryDependencies []indexDiscoveryDependency `json:"discoveryDependencies"`
+	MonitorDependencies   []indexMonitorDependency   `json:"monitorDependencies"`
 }
 
 // indexToolDependency represents a single dependency of a core from a tool.
@@ -72,6 +73,12 @@ type indexToolDependency struct {
 
 // indexDiscoveryDependency represents a single dependency of a core from a pluggable discovery tool.
 type indexDiscoveryDependency struct {
+	Packager string `json:"packager"`
+	Name     string `json:"name"`
+}
+
+// indexMonitorDependency represents a single dependency of a core from a pluggable monitor tool.
+type indexMonitorDependency struct {
 	Packager string `json:"packager"`
 	Name     string `json:"name"`
 }
@@ -152,6 +159,14 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 		})
 	}
 
+	monitors := []indexMonitorDependency{}
+	for _, m := range pr.MonitorDependencies {
+		monitors = append(monitors, indexMonitorDependency{
+			Packager: m.Packager,
+			Name:     m.Name,
+		})
+	}
+
 	packageTools := []*indexToolRelease{}
 	for name, tool := range pr.Platform.Package.Tools {
 		for _, toolRelease := range tool.Releases {
@@ -196,6 +211,7 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 					Help:                  indexHelp{Online: pr.Help.Online},
 					ToolDependencies:      tools,
 					DiscoveryDependencies: discoveries,
+					MonitorDependencies:   monitors,
 				}},
 				Tools: packageTools,
 				Help:  indexHelp{Online: pr.Platform.Package.Help.Online},
@@ -251,6 +267,7 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 	outPlatformRelease.BoardsManifest = inPlatformRelease.extractBoardsManifest()
 	outPlatformRelease.ToolDependencies = inPlatformRelease.extractToolDependencies()
 	outPlatformRelease.DiscoveryDependencies = inPlatformRelease.extractDiscoveryDependencies()
+	outPlatformRelease.MonitorDependencies = inPlatformRelease.extractMonitorDependencies()
 	return nil
 }
 
@@ -270,6 +287,17 @@ func (inPlatformRelease indexPlatformRelease) extractDiscoveryDependencies() cor
 	res := make(cores.DiscoveryDependencies, len(inPlatformRelease.DiscoveryDependencies))
 	for i, discovery := range inPlatformRelease.DiscoveryDependencies {
 		res[i] = &cores.DiscoveryDependency{
+			Name:     discovery.Name,
+			Packager: discovery.Packager,
+		}
+	}
+	return res
+}
+
+func (inPlatformRelease indexPlatformRelease) extractMonitorDependencies() cores.MonitorDependencies {
+	res := make(cores.MonitorDependencies, len(inPlatformRelease.MonitorDependencies))
+	for i, discovery := range inPlatformRelease.MonitorDependencies {
+		res[i] = &cores.MonitorDependency{
 			Name:     discovery.Name,
 			Packager: discovery.Packager,
 		}
