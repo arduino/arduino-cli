@@ -19,6 +19,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"google.golang.org/grpc"
 )
@@ -35,7 +36,22 @@ func logError(err error) {
 	}
 }
 
+func logSelector(method string) bool {
+	if len(debugFilters) == 0 {
+		return true
+	}
+	for _, filter := range debugFilters {
+		if strings.Contains(method, filter) {
+			return true
+		}
+	}
+	return false
+}
+
 func unaryLoggerInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	if !logSelector(info.FullMethod) {
+		return handler(ctx, req)
+	}
 	fmt.Println("CALLED:", info.FullMethod)
 	log(true, req)
 	resp, err := handler(ctx, req)
@@ -46,6 +62,9 @@ func unaryLoggerInterceptor(ctx context.Context, req interface{}, info *grpc.Una
 }
 
 func streamLoggerInterceptor(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	if !logSelector(info.FullMethod) {
+		return handler(srv, stream)
+	}
 	streamReq := ""
 	if info.IsClientStream {
 		streamReq = "STREAM_REQ "
