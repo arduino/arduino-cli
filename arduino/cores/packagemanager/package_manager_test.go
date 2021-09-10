@@ -346,34 +346,48 @@ func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 
 	pm := packagemanager.NewPackageManager(fakePath, fakePath, fakePath, fakePath)
 	pack := pm.Packages.GetOrCreatePackage("arduino")
-	// some tool
-	tool := pack.GetOrCreateTool("some-tool")
-	toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("4.2.0"))
-	// We set this to fake the tool is installed
-	toolRelease.InstallDir = fakePath
-	// some tool
-	tool = pack.GetOrCreateTool("some-tool")
-	toolRelease = tool.GetOrCreateRelease(semver.ParseRelaxed("5.6.7"))
-	// We set this to fake the tool is installed
-	toolRelease.InstallDir = fakePath
-	// some other tool
-	tool = pack.GetOrCreateTool("some-other-tool")
-	toolRelease = tool.GetOrCreateRelease(semver.ParseRelaxed("6.6.6"))
-	// We set this to fake the tool is installed
-	toolRelease.InstallDir = fakePath
-	// ble-discovery tool
-	tool = pack.GetOrCreateTool("ble-discovery")
-	toolRelease = tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
-	// We set this to fake the tool is installed
-	toolRelease.InstallDir = fakePath
-	tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
 
-	// serial-discovery tool
-	tool = pack.GetOrCreateTool("serial-discovery")
-	tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
-	toolRelease = tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
-	// We set this to fake the tool is installed
-	toolRelease.InstallDir = fakePath
+	{
+		// some tool
+		tool := pack.GetOrCreateTool("some-tool")
+		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("4.2.0"))
+		// We set this to fake the tool is installed
+		toolRelease.InstallDir = fakePath
+	}
+
+	{
+		// some tool
+		tool := pack.GetOrCreateTool("some-tool")
+		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("5.6.7"))
+		// We set this to fake the tool is installed
+		toolRelease.InstallDir = fakePath
+	}
+
+	{
+		// some other tool
+		tool := pack.GetOrCreateTool("some-other-tool")
+		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("6.6.6"))
+		// We set this to fake the tool is installed
+		toolRelease.InstallDir = fakePath
+	}
+
+	{
+		// ble-discovery tool
+		tool := pack.GetOrCreateTool("ble-discovery")
+		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
+		// We set this to fake the tool is installed
+		toolRelease.InstallDir = fakePath
+		tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
+	}
+
+	{
+		// serial-discovery tool
+		tool := pack.GetOrCreateTool("serial-discovery")
+		tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
+		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
+		// We set this to fake the tool is installed
+		toolRelease.InstallDir = fakePath
+	}
 
 	platform := pack.GetOrCreatePlatform("avr")
 	release := platform.GetOrCreateRelease(semver.MustParse("1.0.0"))
