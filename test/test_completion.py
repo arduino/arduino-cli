@@ -25,7 +25,7 @@ def test_completion_bash(run_command):
     result = run_command("completion bash")
     assert result.ok
     assert result.stderr == ""
-    assert "_arduino-cli_root_command()" in result.stdout
+    assert "# bash completion V2 for arduino-cli" in result.stdout
     assert "__start_arduino-cli()" in result.stdout
 
 
@@ -54,10 +54,12 @@ def test_completion_powershell(run_command):
 
 
 def test_completion_bash_no_desc(run_command):
-    result = run_command("completion bash --no-descriptions")
-    assert not result.ok
-    assert result.stdout == ""
-    assert "Error: command description is not supported by bash" in result.stderr
+    result = run_command(["completion", "bash", "--no-descriptions"])
+    assert result.ok
+    assert result.stderr == ""
+    assert "# bash completion V2 for arduino-cli" in result.stdout
+    assert "__start_arduino-cli()" in result.stdout
+    assert "__completeNoDesc" in result.stdout
 
 
 def test_completion_zsh_no_desc(run_command):

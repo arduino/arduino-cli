@@ -47,13 +47,13 @@ func NewCommand() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	if completionNoDesc && (args[0] == "bash" || args[0] == "powershell") {
+	if completionNoDesc && (args[0] == "powershell") {
 		feedback.Errorf(tr("Error: command description is not supported by %v"), args[0])
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	switch args[0] {
 	case "bash":
-		cmd.Root().GenBashCompletion(os.Stdout)
+		cmd.Root().GenBashCompletionV2(os.Stdout, !completionNoDesc)
 		break
 	case "zsh":
 		if completionNoDesc {

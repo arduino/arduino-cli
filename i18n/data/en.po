@@ -267,7 +267,7 @@ msgstr "Bootloader file specified but missing: {0}"
 msgid "Build options changed"
 msgstr "Build options changed"
 
-#: cli/compile/compile.go:88
+#: cli/compile/compile.go:92
 msgid "Builds of 'core.a' are saved into this path to be cached and reused."
 msgstr "Builds of 'core.a' are saved into this path to be cached and reused."
 
@@ -406,8 +406,8 @@ msgstr "Command keeps running and prints list of connected boards whenever there
 msgid "Compiled sketch not found in %s"
 msgstr "Compiled sketch not found in %s"
 
-#: cli/compile/compile.go:74
 #: cli/compile/compile.go:75
+#: cli/compile/compile.go:76
 msgid "Compiles Arduino sketches."
 msgstr "Compiles Arduino sketches."
 
@@ -721,10 +721,10 @@ msgstr "Error during JSON encoding of the output: %v"
 
 #: cli/burnbootloader/burnbootloader.go:70
 #: cli/burnbootloader/burnbootloader.go:83
-#: cli/compile/compile.go:196
-#: cli/compile/compile.go:202
-#: cli/compile/compile.go:212
-#: cli/compile/compile.go:244
+#: cli/compile/compile.go:200
+#: cli/compile/compile.go:206
+#: cli/compile/compile.go:216
+#: cli/compile/compile.go:248
 #: cli/upload/upload.go:96
 #: cli/upload/upload.go:102
 #: cli/upload/upload.go:118
@@ -732,7 +732,7 @@ msgstr "Error during JSON encoding of the output: %v"
 msgid "Error during Upload: %v"
 msgstr "Error during Upload: %v"
 
-#: cli/compile/compile.go:256
+#: cli/compile/compile.go:260
 msgid "Error during build: %v"
 msgstr "Error during build: %v"
 
@@ -832,7 +832,7 @@ msgstr "Error listing boards: %v"
 msgid "Error listing platforms: %v"
 msgstr "Error listing platforms: %v"
 
-#: cli/compile/compile.go:147
+#: cli/compile/compile.go:151
 msgid "Error opening source code overrides data file: %v"
 msgstr "Error opening source code overrides data file: %v"
 
@@ -980,7 +980,7 @@ msgstr "Error writing library_index.json.sig"
 msgid "Error: command description is not supported by %v"
 msgstr "Error: command description is not supported by %v"
 
-#: cli/compile/compile.go:154
+#: cli/compile/compile.go:158
 msgid "Error: invalid source code overrides data file: %v"
 msgstr "Error: invalid source code overrides data file: %v"
 
@@ -1084,7 +1084,7 @@ msgstr "Force skip of post-install scripts (if the CLI is running interactively)
 
 #: cli/board/details.go:50
 #: cli/burnbootloader/burnbootloader.go:53
-#: cli/compile/compile.go:85
+#: cli/compile/compile.go:86
 #: cli/debug/debug.go:62
 #: cli/upload/upload.go:58
 msgid "Fully Qualified Board Name, e.g.: arduino:avr:uno"
@@ -1146,7 +1146,7 @@ msgstr "Id"
 msgid "Identification properties:"
 msgstr "Identification properties:"
 
-#: cli/compile/compile.go:115
+#: cli/compile/compile.go:119
 msgid "If set built binaries will be exported to the sketch folder."
 msgstr "If set built binaries will be exported to the sketch folder."
 
@@ -1297,7 +1297,7 @@ msgstr "Invalid version"
 msgid "Invalid vid value: '%s'"
 msgstr "Invalid vid value: '%s'"
 
-#: cli/compile/compile.go:110
+#: cli/compile/compile.go:114
 msgid "Just produce the compilation database, without actually compiling."
 msgstr "Just produce the compilation database, without actually compiling."
 
@@ -1375,15 +1375,15 @@ msgstr "List all known boards and their corresponding FQBN."
 msgid "List connected boards."
 msgstr "List connected boards."
 
-#: cli/compile/compile.go:93
+#: cli/compile/compile.go:97
 msgid "List of custom build properties separated by commas. Or can be used multiple times for multiple properties."
 msgstr "List of custom build properties separated by commas. Or can be used multiple times for multiple properties."
 
-#: cli/compile/compile.go:107
+#: cli/compile/compile.go:111
 msgid "List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries dir paths."
 msgstr "List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries dir paths."
 
-#: cli/compile/compile.go:105
+#: cli/compile/compile.go:109
 msgid "List of paths to libraries root folders. Libraries set this way have top priority in case of conflicts. Can be used multiple times for different libraries."
 msgstr "List of paths to libraries root folders. Libraries set this way have top priority in case of conflicts. Can be used multiple times for different libraries."
 
@@ -1558,33 +1558,33 @@ msgstr "Official Arduino board:"
 msgid "Option:"
 msgstr "Option:"
 
-#: cli/compile/compile.go:97
+#: cli/compile/compile.go:101
 msgid "Optional, can be \"%[1]s\", \"%[2]s\", \"%[3]s\" and \"%[4]s\". Defaults to \"%[1]s\". Used to tell gcc which warning level to use (-W flag)."
 msgstr "Optional, can be \"%[1]s\", \"%[2]s\", \"%[3]s\" and \"%[4]s\". Defaults to \"%[1]s\". Used to tell gcc which warning level to use (-W flag)."
 
-#: cli/compile/compile.go:111
+#: cli/compile/compile.go:115
 msgid "Optional, cleanup the build folder and do not use any cached build."
 msgstr "Optional, cleanup the build folder and do not use any cached build."
 
-#: cli/compile/compile.go:108
+#: cli/compile/compile.go:112
 msgid "Optional, optimize compile output for debugging, rather than for release."
 msgstr "Optional, optimize compile output for debugging, rather than for release."
 
-#: cli/compile/compile.go:99
+#: cli/compile/compile.go:103
 msgid "Optional, suppresses almost every output."
 msgstr "Optional, suppresses almost every output."
 
-#: cli/compile/compile.go:98
+#: cli/compile/compile.go:102
 #: cli/upload/upload.go:63
 msgid "Optional, turns on verbose mode."
 msgstr "Optional, turns on verbose mode."
 
-#: cli/compile/compile.go:109
+#: cli/compile/compile.go:113
 #: cli/upload/upload.go:64
 msgid "Optional, use the specified programmer to upload."
 msgstr "Optional, use the specified programmer to upload."
 
-#: cli/compile/compile.go:116
+#: cli/compile/compile.go:120
 msgid "Optional. Path to a .json file that contains a set of replacements of the sketch source code."
 msgstr "Optional. Path to a .json file that contains a set of replacements of the sketch source code."
 
@@ -1592,7 +1592,7 @@ msgstr "Optional. Path to a .json file that contains a set of replacements of th
 msgid "OutputRate in Null monitor must be a float64"
 msgstr "OutputRate in Null monitor must be a float64"
 
-#: cli/compile/compile.go:95
+#: cli/compile/compile.go:99
 msgid "Override a build property with a custom value. Can be used multiple times for multiple properties."
 msgstr "Override a build property with a custom value. Can be used multiple times for multiple properties."
 
@@ -1635,7 +1635,7 @@ msgstr "Paragraph: %s"
 msgid "Path to the file where logs will be written."
 msgstr "Path to the file where logs will be written."
 
-#: cli/compile/compile.go:91
+#: cli/compile/compile.go:95
 msgid "Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS."
 msgstr "Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS."
 
@@ -1713,7 +1713,7 @@ msgstr "Precompiled library in \"{0}\" not found"
 msgid "Print details about a board."
 msgstr "Print details about a board."
 
-#: cli/compile/compile.go:87
+#: cli/compile/compile.go:91
 msgid "Print preprocessed code to stdout instead of compiling."
 msgstr "Print preprocessed code to stdout instead of compiling."
 
@@ -1791,7 +1791,7 @@ msgstr "Running normal build of the core..."
 msgid "Running recipe: {0}"
 msgstr "Running recipe: {0}"
 
-#: cli/compile/compile.go:89
+#: cli/compile/compile.go:93
 msgid "Save build artifacts in this directory."
 msgstr "Save build artifacts in this directory."
 
@@ -1850,7 +1850,7 @@ msgstr "Settings key doesn't exist"
 msgid "Show all available core versions."
 msgstr "Show all available core versions."
 
-#: cli/compile/compile.go:86
+#: cli/compile/compile.go:90
 msgid "Show all build properties used instead of compiling."
 msgstr "Show all build properties used instead of compiling."
 
@@ -1945,7 +1945,7 @@ msgstr "Sketch too big; see %s for tips on reducing it."
 msgid "Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."
 msgstr "Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."
 
-#: cli/compile/compile.go:137
+#: cli/compile/compile.go:141
 #: cli/sketch/archive.go:66
 #: cli/upload/upload.go:88
 msgid "Sketches with .pde extension are deprecated, please rename the following files to .ino:"
@@ -2239,7 +2239,7 @@ msgstr "Upload port found on %s"
 msgid "Upload port protocol, e.g: serial"
 msgstr "Upload port protocol, e.g: serial"
 
-#: cli/compile/compile.go:100
+#: cli/compile/compile.go:104
 msgid "Upload the binary after the compilation."
 msgstr "Upload the binary after the compilation."
 
@@ -2251,7 +2251,7 @@ msgstr "Upload the bootloader on the board using an external programmer."
 msgid "Upload the bootloader."
 msgstr "Upload the bootloader."
 
-#: cli/compile/compile.go:218
+#: cli/compile/compile.go:222
 #: cli/upload/upload.go:124
 msgid "Uploading to specified board using %s protocol requires the following info:"
 msgstr "Uploading to specified board using %s protocol requires the following info:"
@@ -2319,7 +2319,7 @@ msgid "VERSION_NUMBER"
 msgstr "VERSION_NUMBER"
 
 #: cli/burnbootloader/burnbootloader.go:55
-#: cli/compile/compile.go:102
+#: cli/compile/compile.go:106
 #: cli/upload/upload.go:62
 msgid "Verify uploaded binary after the upload."
 msgstr "Verify uploaded binary after the upload."
@@ -2372,7 +2372,7 @@ msgstr "Warning: tool '%s' is not installed. It might not be available for your 
 msgid "Website: %s"
 msgstr "Website: %s"
 
-#: cli/compile/compile.go:103
+#: cli/compile/compile.go:107
 msgid "When specified, VID/PID specific build properties are used, if board supports them."
 msgstr "When specified, VID/PID specific build properties are used, if board supports them."
 
@@ -3049,7 +3049,7 @@ msgstr "platform %s is not installed"
 msgid "platform not installed"
 msgstr "platform not installed"
 
-#: cli/compile/compile.go:121
+#: cli/compile/compile.go:125
 msgid "please use --build-property instead."
 msgstr "please use --build-property instead."
 
