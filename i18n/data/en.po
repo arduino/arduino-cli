@@ -1027,19 +1027,19 @@ msgstr "Failed to create data directory"
 msgid "Failed to create downloads directory"
 msgstr "Failed to create downloads directory"
 
-#: cli/daemon/daemon.go:125
+#: cli/daemon/daemon.go:124
 msgid "Failed to listen on TCP port: %[1]s. %[2]s is an invalid port."
 msgstr "Failed to listen on TCP port: %[1]s. %[2]s is an invalid port."
 
-#: cli/daemon/daemon.go:119
+#: cli/daemon/daemon.go:118
 msgid "Failed to listen on TCP port: %[1]s. %[2]s is unknown name."
 msgstr "Failed to listen on TCP port: %[1]s. %[2]s is unknown name."
 
-#: cli/daemon/daemon.go:134
+#: cli/daemon/daemon.go:133
 msgid "Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v"
 msgstr "Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v"
 
-#: cli/daemon/daemon.go:131
+#: cli/daemon/daemon.go:130
 msgid "Failed to listen on TCP port: %s. Address already in use."
 msgstr "Failed to listen on TCP port: %s. Address already in use."
 

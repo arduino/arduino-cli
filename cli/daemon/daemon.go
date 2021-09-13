@@ -73,15 +73,14 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		defer stats.Flush()
 	}
 	port := configuration.Settings.GetString("daemon.port")
-	var s *grpc.Server
+	gRPCOptions := []grpc.ServerOption{}
 	if debug {
-		s = grpc.NewServer(
+		gRPCOptions = append(gRPCOptions,
 			grpc.UnaryInterceptor(unaryLoggerInterceptor),
 			grpc.StreamInterceptor(streamLoggerInterceptor),
 		)
-	} else {
-		s = grpc.NewServer()
 	}
+	s := grpc.NewServer(gRPCOptions...)
 	// Set specific user-agent for the daemon
 	configuration.Settings.Set("network.user_agent_ext", "daemon")
 
