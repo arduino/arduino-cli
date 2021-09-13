@@ -83,7 +83,7 @@ var (
 				ArchiveFileName: fmt.Sprintf("mdns-discovery_%s_Linux_ARMv6.tar.bz2", mdnsDiscoveryVersion),
 				URL:             fmt.Sprintf("https://downloads.arduino.cc/discovery/mdns-discovery/mdns-discovery_%s_Linux_ARMv6.tar.gz", mdnsDiscoveryVersion),
 				Size:            2321304,
-				Checksum:        "SHA-256cc1096936abddb21af23fa10c435e8e9e37ec9df2c3d2c41d265d466b03de0af",
+				Checksum:        "SHA-256:cc1096936abddb21af23fa10c435e8e9e37ec9df2c3d2c41d265d466b03de0af",
 				CachePath:       "tools",
 			},
 		},
