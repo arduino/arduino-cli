@@ -56,10 +56,14 @@ func NewCommand() *cobra.Command {
 	cmd.PersistentFlags().String("port", "", tr("The TCP port the daemon will listen to"))
 	configuration.Settings.BindPFlag("daemon.port", cmd.PersistentFlags().Lookup("port"))
 	cmd.Flags().BoolVar(&daemonize, "daemonize", false, tr("Do not terminate daemon process if the parent process dies"))
+	cmd.Flags().BoolVar(&debug, "debug", false, tr("Enable debug logging of gRPC calls"))
+	cmd.Flags().StringSliceVar(&debugFilters, "debug-filter", []string{}, tr("Display only the provided gRPC calls"))
 	return cmd
 }
 
 var daemonize bool
+var debug bool
+var debugFilters []string
 
 func runDaemonCommand(cmd *cobra.Command, args []string) {
 
@@ -69,8 +73,14 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		defer stats.Flush()
 	}
 	port := configuration.Settings.GetString("daemon.port")
-	s := grpc.NewServer()
-
+	gRPCOptions := []grpc.ServerOption{}
+	if debug {
+		gRPCOptions = append(gRPCOptions,
+			grpc.UnaryInterceptor(unaryLoggerInterceptor),
+			grpc.StreamInterceptor(streamLoggerInterceptor),
+		)
+	}
+	s := grpc.NewServer(gRPCOptions...)
 	// Set specific user-agent for the daemon
 	configuration.Settings.Set("network.user_agent_ext", "daemon")
 

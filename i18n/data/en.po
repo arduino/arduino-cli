@@ -549,6 +549,10 @@ msgstr "Disable completion description for shells that support it"
 msgid "Disconnected"
 msgstr "Disconnected"
 
+#: cli/daemon/daemon.go:60
+msgid "Display only the provided gRPC calls"
+msgstr "Display only the provided gRPC calls"
+
 #: cli/lib/install.go:49
 msgid "Do not install dependencies."
 msgstr "Do not install dependencies."
@@ -585,6 +589,10 @@ msgstr "Downloads one or more cores and corresponding tool dependencies."
 #: cli/lib/download.go:36
 msgid "Downloads one or more libraries without installing them."
 msgstr "Downloads one or more libraries without installing them."
+
+#: cli/daemon/daemon.go:59
+msgid "Enable debug logging of gRPC calls"
+msgstr "Enable debug logging of gRPC calls"
 
 #: cli/lib/install.go:51
 msgid "Enter a path to zip file"
@@ -1019,19 +1027,19 @@ msgstr "Failed to create data directory"
 msgid "Failed to create downloads directory"
 msgstr "Failed to create downloads directory"
 
-#: cli/daemon/daemon.go:114
+#: cli/daemon/daemon.go:124
 msgid "Failed to listen on TCP port: %[1]s. %[2]s is an invalid port."
 msgstr "Failed to listen on TCP port: %[1]s. %[2]s is an invalid port."
 
-#: cli/daemon/daemon.go:108
+#: cli/daemon/daemon.go:118
 msgid "Failed to listen on TCP port: %[1]s. %[2]s is unknown name."
 msgstr "Failed to listen on TCP port: %[1]s. %[2]s is unknown name."
 
-#: cli/daemon/daemon.go:123
+#: cli/daemon/daemon.go:133
 msgid "Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v"
 msgstr "Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v"
 
-#: cli/daemon/daemon.go:120
+#: cli/daemon/daemon.go:130
 msgid "Failed to listen on TCP port: %s. Address already in use."
 msgstr "Failed to listen on TCP port: %s. Address already in use."
 
