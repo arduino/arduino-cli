@@ -224,6 +224,18 @@ In case of linting errors you should be able to solve most of them by automatica
 task python:format
 ```
 
+### Dependency license metadata
+
+Metadata about the license types of all dependencies is cached in the repository. To update this cache, run the
+following command from the repository root folder:
+
+```
+task general:cache-dep-licenses
+```
+
+The necessary **Licensed** tool can be installed by following
+[these instructions](https://github.com/github/licensed#as-an-executable).
+
 #### Configuration files formatting
 
 To keep the configurations tidy and in order we use [Prettier][prettier-website] to automatically format all YAML files
