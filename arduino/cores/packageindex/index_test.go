@@ -81,6 +81,16 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 				Name:     "serial-discovery",
 			},
 		},
+		MonitorDependencies: cores.MonitorDependencies{
+			{
+				Packager: "arduino",
+				Name:     "ble-monitor",
+			},
+			{
+				Packager: "arduino",
+				Name:     "serial-monitor",
+			},
+		},
 		Platform: &cores.Platform{
 			Name:         "Arduino AVR Boards",
 			Architecture: "avr",
@@ -355,6 +365,16 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 						Name:     "serial-discovery",
 					},
 				},
+				MonitorDependencies: []indexMonitorDependency{
+					{
+						Packager: "arduino",
+						Name:     "ble-monitor",
+					},
+					{
+						Packager: "arduino",
+						Name:     "serial-monitor",
+					},
+				},
 			}},
 			Tools: []*indexToolRelease{
 				{
@@ -552,6 +572,7 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 			require.ElementsMatch(t, expectedPlatform.Boards, indexPlatform.Boards)
 			require.ElementsMatch(t, expectedPlatform.ToolDependencies, indexPlatform.ToolDependencies)
 			require.ElementsMatch(t, expectedPlatform.DiscoveryDependencies, indexPlatform.DiscoveryDependencies)
+			require.ElementsMatch(t, expectedPlatform.MonitorDependencies, indexPlatform.MonitorDependencies)
 		}
 	}
 }

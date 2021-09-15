@@ -389,6 +389,24 @@ func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 		toolRelease.InstallDir = fakePath
 	}
 
+	{
+		// ble-monitor tool
+		tool := pack.GetOrCreateTool("ble-monitor")
+		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
+		// We set this to fake the tool is installed
+		toolRelease.InstallDir = fakePath
+		tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
+	}
+
+	{
+		// serial-monitor tool
+		tool := pack.GetOrCreateTool("serial-monitor")
+		tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
+		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
+		// We set this to fake the tool is installed
+		toolRelease.InstallDir = fakePath
+	}
+
 	platform := pack.GetOrCreatePlatform("avr")
 	release := platform.GetOrCreateRelease(semver.MustParse("1.0.0"))
 	release.ToolDependencies = append(release.ToolDependencies, &cores.ToolDependency{
@@ -409,12 +427,20 @@ func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 		Name:     "serial-discovery",
 		Packager: "arduino",
 	})
+	release.MonitorDependencies = append(release.MonitorDependencies, &cores.MonitorDependency{
+		Name:     "ble-monitor",
+		Packager: "arduino",
+	})
+	release.MonitorDependencies = append(release.MonitorDependencies, &cores.MonitorDependency{
+		Name:     "serial-monitor",
+		Packager: "arduino",
+	})
 	// We set this to fake the platform is installed
 	release.InstallDir = fakePath
 
 	tools, err := pm.FindToolsRequiredFromPlatformRelease(release)
 	require.NoError(t, err)
-	require.Len(t, tools, 4)
+	require.Len(t, tools, 6)
 }
 
 func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {

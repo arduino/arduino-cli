@@ -2398,6 +2398,7 @@ msgid "calling %[1]s: %[2]w"
 msgstr "calling %[1]s: %[2]w"
 
 #: arduino/cores/status.go:123
+#: arduino/cores/status.go:150
 msgid "can't find latest release of %s"
 msgstr "can't find latest release of %s"
 
@@ -2771,7 +2772,7 @@ msgstr "invalid path creating config dir: %[1]s error: %[2]w"
 msgid "invalid path writing inventory file: %[1]s error: %[2]w"
 msgstr "invalid path writing inventory file: %[1]s error: %[2]w"
 
-#: arduino/cores/packageindex/index.go:239
+#: arduino/cores/packageindex/index.go:255
 msgid "invalid platform archive size: %s"
 msgstr "invalid platform archive size: %s"
 
@@ -2889,6 +2890,10 @@ msgstr "missing platform %[1]s:%[2]s referenced by board %[3]s"
 msgid "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 msgstr "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 
+#: arduino/cores/packagemanager/package_manager.go:489
+msgid "monitor release not found: %s"
+msgstr "monitor release not found: %s"
+
 #: arduino/libraries/librariesmanager/install.go:179
 #: arduino/resources/install.go:94
 msgid "moving extracted archive to destination dir: %s"
@@ -2958,6 +2963,7 @@ msgstr "opening target file: %s"
 #: arduino/cores/packagemanager/download.go:73
 #: arduino/cores/status.go:88
 #: arduino/cores/status.go:113
+#: arduino/cores/status.go:140
 msgid "package %s not found"
 msgstr "package %s not found"
 
@@ -2965,7 +2971,7 @@ msgstr "package %s not found"
 msgid "package '%s' not found"
 msgstr "package '%s' not found"
 
-#: arduino/cores/status.go:167
+#: arduino/cores/status.go:194
 msgid "package not found"
 msgstr "package not found"
 
@@ -3093,10 +3099,11 @@ msgstr "release %[1]s not found for tool %[2]s"
 
 #: arduino/cores/status.go:82
 #: arduino/cores/status.go:106
+#: arduino/cores/status.go:133
 msgid "release cannot be nil"
 msgstr "release cannot be nil"
 
-#: arduino/cores/status.go:183
+#: arduino/cores/status.go:210
 msgid "release not found"
 msgstr "release not found"
 
@@ -3212,6 +3219,7 @@ msgstr "tool %s is not managed by package manager"
 
 #: arduino/cores/status.go:92
 #: arduino/cores/status.go:117
+#: arduino/cores/status.go:144
 msgid "tool %s not found"
 msgstr "tool %s not found"
 
@@ -3223,7 +3231,7 @@ msgstr "tool '%[1]s' not found in package '%[2]s'"
 msgid "tool not available for your OS"
 msgstr "tool not available for your OS"
 
-#: arduino/cores/status.go:171
+#: arduino/cores/status.go:198
 msgid "tool not found"
 msgstr "tool not found"
 
@@ -3232,7 +3240,7 @@ msgid "tool not installed"
 msgstr "tool not installed"
 
 #: arduino/cores/packagemanager/package_manager.go:467
-#: arduino/cores/packagemanager/package_manager.go:533
+#: arduino/cores/packagemanager/package_manager.go:544
 msgid "tool release not found: %s"
 msgstr "tool release not found: %s"
 
