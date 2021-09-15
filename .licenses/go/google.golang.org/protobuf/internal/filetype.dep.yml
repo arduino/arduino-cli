@@ -5,7 +5,7 @@ type: go
 summary: Package filetype provides functionality for wrapping descriptors with Go
   type information.
 homepage: https://pkg.go.dev/google.golang.org/protobuf/internal/filetype
-license: other
+license: bsd-3-clause
 licenses:
 - sources: protobuf@v1.26.0/LICENSE
   text: |

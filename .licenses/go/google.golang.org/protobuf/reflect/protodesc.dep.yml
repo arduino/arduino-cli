@@ -5,7 +5,7 @@ type: go
 summary: Package protodesc provides functionality for converting FileDescriptorProto
   messages to/from protoreflect.FileDescriptor values.
 homepage: https://pkg.go.dev/google.golang.org/protobuf/reflect/protodesc
-license: other
+license: bsd-3-clause
 licenses:
 - sources: protobuf@v1.26.0/LICENSE
   text: |

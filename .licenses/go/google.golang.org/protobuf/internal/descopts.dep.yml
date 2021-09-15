@@ -4,7 +4,7 @@ version: v1.26.0
 type: go
 summary: Package descopts contains the nil pointers to concrete descriptor options.
 homepage: https://pkg.go.dev/google.golang.org/protobuf/internal/descopts
-license: other
+license: bsd-3-clause
 licenses:
 - sources: protobuf@v1.26.0/LICENSE
   text: |

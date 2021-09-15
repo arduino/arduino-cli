@@ -5,7 +5,7 @@ type: go
 summary: Package context defines the Context type, which carries deadlines, cancelation
   signals, and other request-scoped values across API boundaries and between processes.
 homepage: https://pkg.go.dev/golang.org/x/net/context
-license: other
+license: bsd-3-clause
 licenses:
 - sources: net@v0.0.0-20210505024714-0287a6fb4125/LICENSE
   text: |

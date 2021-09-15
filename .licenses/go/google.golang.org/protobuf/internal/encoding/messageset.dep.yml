@@ -4,7 +4,7 @@ version: v1.26.0
 type: go
 summary: Package messageset encodes and decodes the obsolete MessageSet wire format.
 homepage: https://pkg.go.dev/google.golang.org/protobuf/internal/encoding/messageset
-license: other
+license: bsd-3-clause
 licenses:
 - sources: protobuf@v1.26.0/LICENSE
   text: |

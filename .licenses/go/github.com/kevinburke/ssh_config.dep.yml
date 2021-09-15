@@ -4,7 +4,7 @@ version: v0.0.0-20190725054713-01f96b0aa0cd
 type: go
 summary: Package ssh_config provides tools for manipulating SSH config files.
 homepage: https://pkg.go.dev/github.com/kevinburke/ssh_config
-license: other
+license: mit
 licenses:
 - sources: LICENSE
   text: |

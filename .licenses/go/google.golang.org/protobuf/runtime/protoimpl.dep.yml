@@ -5,7 +5,7 @@ type: go
 summary: Package protoimpl contains the default implementation for messages generated
   by protoc-gen-go.
 homepage: https://pkg.go.dev/google.golang.org/protobuf/runtime/protoimpl
-license: other
+license: bsd-3-clause
 licenses:
 - sources: protobuf@v1.26.0/LICENSE
   text: |

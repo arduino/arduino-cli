@@ -12,7 +12,7 @@ summary: 'Package discovery keeps an updated list of the devices connected to th
   for ev := range monitor.Events { fmt.Println(ev) } Output: {add 0x2341/0x8036 <nil>}
   {add <nil> YunShield}'
 homepage: https://pkg.go.dev/github.com/arduino/board-discovery
-license: gpl-2.0
+license: gpl-2.0-or-later
 licenses:
 - sources: LICENSE
   text: |2

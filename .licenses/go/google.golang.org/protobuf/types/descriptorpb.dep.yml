@@ -2,9 +2,9 @@
 name: google.golang.org/protobuf/types/descriptorpb
 version: v1.26.0
 type: go
-summary: 
+summary:
 homepage: https://pkg.go.dev/google.golang.org/protobuf/types/descriptorpb
-license: other
+license: bsd-3-clause
 licenses:
 - sources: protobuf@v1.26.0/LICENSE
   text: |

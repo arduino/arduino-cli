@@ -4,7 +4,8 @@ version: v1.12.0
 type: go
 summary: Package trees provides an abstract Tree interface.
 homepage: https://pkg.go.dev/github.com/emirpasic/gods/trees
-license: other
+# The code is licensed as BSD-2-Clause except for trees/avltree/avrtree.go and trees/avltree/iterator.go
+license: bsd-2-clause
 licenses:
 - sources: gods@v1.12.0/LICENSE
   text: |

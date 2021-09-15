@@ -5,7 +5,7 @@ type: go
 summary: Package agent implements the ssh-agent protocol, and provides both a client
   and a server.
 homepage: https://pkg.go.dev/golang.org/x/crypto/ssh/agent
-license: other
+license: bsd-3-clause
 licenses:
 - sources: crypto@v0.0.0-20200622213623-75b288015ac9/LICENSE
   text: |

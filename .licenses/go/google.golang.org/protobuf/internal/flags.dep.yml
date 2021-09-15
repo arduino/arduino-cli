@@ -4,7 +4,7 @@ version: v1.26.0
 type: go
 summary: Package flags provides a set of flags controlled by build tags.
 homepage: https://pkg.go.dev/google.golang.org/protobuf/internal/flags
-license: other
+license: bsd-3-clause
 licenses:
 - sources: protobuf@v1.26.0/LICENSE
   text: |

@@ -5,7 +5,7 @@ type: go
 summary: Package protoregistry provides data structures to register and lookup protobuf
   descriptor types.
 homepage: https://pkg.go.dev/google.golang.org/protobuf/reflect/protoregistry
-license: other
+license: bsd-3-clause
 licenses:
 - sources: protobuf@v1.26.0/LICENSE
   text: |

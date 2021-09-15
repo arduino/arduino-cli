@@ -5,7 +5,7 @@ type: go
 summary: Package pragma provides types that can be embedded into a struct to statically
   enforce or prevent certain language properties.
 homepage: https://pkg.go.dev/google.golang.org/protobuf/internal/pragma
-license: other
+license: bsd-3-clause
 licenses:
 - sources: protobuf@v1.26.0/LICENSE
   text: |

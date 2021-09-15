@@ -2,9 +2,9 @@
 name: github.com/arduino/go-timeutils
 version: v0.0.0-20171220113728-d1dd9e313b1b
 type: go
-summary: 
+summary:
 homepage: https://pkg.go.dev/github.com/arduino/go-timeutils
-license: gpl-2.0
+license: gpl-2.0-or-later
 licenses:
 - sources: LICENSE.txt
   text: |2

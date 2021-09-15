@@ -4,7 +4,7 @@ version: v1.26.0
 type: go
 summary: Package timestamppb contains generated types for google/protobuf/timestamp.proto.
 homepage: https://pkg.go.dev/google.golang.org/protobuf/types/known/timestamppb
-license: other
+license: bsd-3-clause
 licenses:
 - sources: protobuf@v1.26.0/LICENSE
   text: |

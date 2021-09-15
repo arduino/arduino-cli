@@ -4,7 +4,7 @@ version: v0.0.0-20210505024714-0287a6fb4125
 type: go
 summary: Package socket provides a portable interface for socket system calls.
 homepage: https://pkg.go.dev/golang.org/x/net/internal/socket
-license: other
+license: bsd-3-clause
 licenses:
 - sources: net@v0.0.0-20210505024714-0287a6fb4125/LICENSE
   text: |

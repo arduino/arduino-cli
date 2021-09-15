@@ -5,7 +5,7 @@ type: go
 summary: Package unsafeheader contains header declarations for the Go runtime's slice
   and string implementations.
 homepage: https://pkg.go.dev/golang.org/x/sys/internal/unsafeheader
-license: other
+license: bsd-3-clause
 licenses:
 - sources: sys@v0.0.0-20210823070655-63515b42dcdf/LICENSE
   text: |

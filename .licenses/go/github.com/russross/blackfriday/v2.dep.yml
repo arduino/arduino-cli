@@ -4,7 +4,7 @@ version: v2.0.1
 type: go
 summary: Package blackfriday is a markdown processor.
 homepage: https://pkg.go.dev/github.com/russross/blackfriday/v2
-license: other
+license: bsd-2-clause
 licenses:
 - sources: LICENSE.txt
   text: |

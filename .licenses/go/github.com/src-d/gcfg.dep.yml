@@ -5,7 +5,7 @@ type: go
 summary: Package gcfg reads "INI-style" text-based configuration files with "name=value"
   pairs grouped into sections (gcfg files).
 homepage: https://pkg.go.dev/github.com/src-d/gcfg
-license: other
+license: bsd-3-clause
 licenses:
 - sources: LICENSE
   text: |

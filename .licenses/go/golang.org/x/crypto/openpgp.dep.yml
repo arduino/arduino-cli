@@ -4,7 +4,7 @@ version: v0.0.0-20200622213623-75b288015ac9
 type: go
 summary: Package openpgp implements high level operations on OpenPGP messages.
 homepage: https://pkg.go.dev/golang.org/x/crypto/openpgp
-license: other
+license: bsd-3-clause
 licenses:
 - sources: crypto@v0.0.0-20200622213623-75b288015ac9/LICENSE
   text: |

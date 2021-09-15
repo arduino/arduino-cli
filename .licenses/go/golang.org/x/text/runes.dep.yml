@@ -4,7 +4,7 @@ version: v0.3.6
 type: go
 summary: Package runes provide transforms for UTF-8 encoded text.
 homepage: https://pkg.go.dev/golang.org/x/text/runes
-license: other
+license: bsd-3-clause
 licenses:
 - sources: text@v0.3.6/LICENSE
   text: |

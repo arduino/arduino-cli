@@ -4,7 +4,7 @@ version: v1.26.0
 type: go
 summary: Package protoiface contains types referenced or implemented by messages.
 homepage: https://pkg.go.dev/google.golang.org/protobuf/runtime/protoiface
-license: other
+license: bsd-3-clause
 licenses:
 - sources: protobuf@v1.26.0/LICENSE
   text: |

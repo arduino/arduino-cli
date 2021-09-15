@@ -4,7 +4,7 @@ version: v1.62.0
 type: go
 summary: Package ini provides INI file read and write functionality in Go.
 homepage: https://pkg.go.dev/gopkg.in/ini.v1
-license: other
+license: apache-2.0
 licenses:
 - sources: LICENSE
   text: |

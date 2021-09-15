@@ -5,7 +5,7 @@ type: go
 summary: "[godoc-link-here] The juju/errors provides an easy way to annotate errors
   without losing the orginal error context."
 homepage: https://pkg.go.dev/github.com/juju/errors
-license: other
+license: lgpl-3.0-only
 licenses:
 - sources: LICENSE
   text: |

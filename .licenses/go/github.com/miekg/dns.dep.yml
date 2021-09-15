@@ -4,7 +4,7 @@ version: v1.1.43
 type: go
 summary: Package dns implements a full featured interface to the Domain Name System.
 homepage: https://pkg.go.dev/github.com/miekg/dns
-license: other
+license: bsd-3-clause
 licenses:
 - sources: LICENSE
   text: |

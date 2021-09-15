@@ -5,7 +5,7 @@ type: go
 summary: Package s2k implements the various OpenPGP string-to-key transforms as specified
   in RFC 4800 section 3.7.1.
 homepage: https://pkg.go.dev/golang.org/x/crypto/openpgp/s2k
-license: other
+license: bsd-3-clause
 licenses:
 - sources: crypto@v0.0.0-20200622213623-75b288015ac9/LICENSE
   text: |

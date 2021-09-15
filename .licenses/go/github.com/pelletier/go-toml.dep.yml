@@ -4,7 +4,7 @@ version: v1.9.3
 type: go
 summary: Package toml is a TOML parser and manipulation library.
 homepage: https://pkg.go.dev/github.com/pelletier/go-toml
-license: other
+license: mit
 licenses:
 - sources: LICENSE
   text: |
