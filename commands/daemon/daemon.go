@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/commands/monitor"
 	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/i18n"
@@ -467,8 +468,9 @@ func (s *ArduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallRequ
 }
 
 // EnumerateMonitorPortSettings FIXMEDOC
-func (s *ArduinoCoreServerImpl) EnumerateMonitorPortSettings(context.Context, *rpc.EnumerateMonitorPortSettingsRequest) (*rpc.EnumerateMonitorPortSettingsResponse, error) {
-	return nil, status.New(codes.Unimplemented, "Not implemented").Err()
+func (s *ArduinoCoreServerImpl) EnumerateMonitorPortSettings(ctx context.Context, req *rpc.EnumerateMonitorPortSettingsRequest) (*rpc.EnumerateMonitorPortSettingsResponse, error) {
+	resp, err := monitor.EnumerateMonitorPortSettings(ctx, req)
+	return resp, convertErrorToRPCStatus(err)
 }
 
 // Monitor FIXMEDOC
