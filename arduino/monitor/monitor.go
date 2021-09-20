@@ -354,3 +354,21 @@ func (mon *PluggableMonitor) Close() error {
 		return nil
 	}
 }
+
+// Quit terminates the monitor. No more commands can be accepted by the monitor.
+func (mon *PluggableMonitor) Quit() error {
+	if err := mon.sendCommand("QUIT\n"); err != nil {
+		return err
+	}
+	if msg, err := mon.waitMessage(time.Second * 10); err != nil {
+		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "QUIT", err)
+	} else if msg.EventType != "quit" {
+		return errors.Errorf(tr("communication out of sync, expected 'quit', received '%s'"), msg.EventType)
+	} else if msg.Message != "OK" || msg.Error {
+		return errors.Errorf(tr("command failed: %s"), msg.Message)
+	}
+	mon.statusMutex.Lock()
+	defer mon.statusMutex.Unlock()
+	mon.state = Dead
+	return nil
+}
