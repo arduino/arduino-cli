@@ -62,6 +62,7 @@ type PlatformRelease struct {
 	IsIDEBundled            bool                   `json:"-"`
 	IsTrusted               bool                   `json:"-"`
 	PluggableDiscoveryAware bool                   `json:"-"` // true if the Platform supports pluggable discovery (no compatibility layer required)
+	Monitors                map[string]*MonitorDependency
 }
 
 // BoardManifest contains information about a board. These metadata are usually
