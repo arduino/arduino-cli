@@ -35,6 +35,15 @@ message MonitorRequest {
   bytes tx_data = 4;
   // Port configuration, optional, contains settings of the port to be applied
   MonitorPortConfiguration port_configuration = 5;
+  // If rx_msg_max_data_size>0 the data flow limiter will be enabled and the
+  // server will send rx messages with an rx_data size limited to the amount
+  // specified here. If rx_msg_max_data_size==0 the data flow limiter will be
+  // disabled and the rx_data size will not be limited.
+  int32 rx_msg_max_data_size = 6;
+  // If the message speed limiter is enabled (rx_msg_max_data_size > 0) this
+  // parameter will allow the server to send at most rx_msg_bucket_add messages
+  // in addition to the number of messages previously allowed.
+  int32 rx_msg_bucket_add = 7;
 }
 
 message MonitorPortConfiguration {
@@ -51,6 +60,12 @@ message MonitorResponse {
   // report the default settings) or after a new port_configuration is sent
   // (to report the new settings applied)
   repeated MonitorPortSetting applied_settings = 3;
+  // The number of bytes dropped. This happens when:
+  // * the rate limiter is enabled
+  // * the client is not able to recharge the msg_bucket quickly enough
+  // * the underlying monitor port does not have flow control to avoid data
+  // loss.
+  int32 dropped_bytes = 4;
 }
 
 message MonitorPortSetting {
