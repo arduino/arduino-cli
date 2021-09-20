@@ -24,10 +24,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -291,7 +291,7 @@ func (mon *PluggableMonitor) Configure(param, value string) error {
 }
 
 // Open connects to the given Port. A communication channel is opened
-func (mon *PluggableMonitor) Open(port *discovery.Port) (io.ReadWriter, error) {
+func (mon *PluggableMonitor) Open(port *rpc.Port) (io.ReadWriter, error) {
 	mon.statusMutex.Lock()
 	defer mon.statusMutex.Unlock()
 

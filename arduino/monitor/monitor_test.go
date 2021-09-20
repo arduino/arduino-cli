@@ -60,11 +60,12 @@ func TestDummyMonitor(t *testing.T) {
 	err = mon.Configure("speed", "38400")
 	require.NoError(t, err)
 
-	rw, err := mon.Open(&discovery.Port{Address: "/dev/ttyACM0", Protocol: "test"})
+	port := &discovery.Port{Address: "/dev/ttyACM0", Protocol: "test"}
+	rw, err := mon.Open(port.ToRPC())
 	require.NoError(t, err)
 
 	// Double open -> error: port already opened
-	_, err = mon.Open(&discovery.Port{Address: "/dev/ttyACM0", Protocol: "test"})
+	_, err = mon.Open(port.ToRPC())
 	require.Error(t, err)
 
 	// Write "TEST"
@@ -93,7 +94,7 @@ func TestDummyMonitor(t *testing.T) {
 	time.Sleep(100 * time.Millisecond)
 	require.Equal(t, int32(1), atomic.LoadInt32(&completed))
 
-	rw, err = mon.Open(&discovery.Port{Address: "/dev/ttyACM0", Protocol: "test"})
+	rw, err = mon.Open(port.ToRPC())
 	require.NoError(t, err)
 	n, err = rw.Write([]byte("TEST"))
 	require.NoError(t, err)
