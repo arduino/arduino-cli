@@ -25,11 +25,9 @@ import (
 
 var tr = i18n.Tr
 
-func getBuiltinCtagsTool(pm *packagemanager.PackageManager) *cores.ToolRelease {
-	builtinPackage := pm.Packages.GetOrCreatePackage("builtin")
-	ctagsTool := builtinPackage.GetOrCreateTool("ctags")
-	ctagsRel := ctagsTool.GetOrCreateRelease(semver.ParseRelaxed("5.8-arduino11"))
-	ctagsRel.Flavors = []*cores.Flavor{
+var (
+	ctagsVersion = semver.ParseRelaxed("5.8-arduino11")
+	ctagsFlavors = []*cores.Flavor{
 		{
 			OS: "i686-pc-linux-gnu",
 			Resource: &resources.DownloadResource{
@@ -91,5 +89,12 @@ func getBuiltinCtagsTool(pm *packagemanager.PackageManager) *cores.ToolRelease {
 			},
 		},
 	}
+)
+
+func getBuiltinCtagsTool(pm *packagemanager.PackageManager) *cores.ToolRelease {
+	builtinPackage := pm.Packages.GetOrCreatePackage("builtin")
+	ctagsTool := builtinPackage.GetOrCreateTool("ctags")
+	ctagsRel := ctagsTool.GetOrCreateRelease(ctagsVersion)
+	ctagsRel.Flavors = ctagsFlavors
 	return ctagsRel
 }
