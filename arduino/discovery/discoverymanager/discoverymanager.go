@@ -192,6 +192,9 @@ func (dm *DiscoveryManager) QuitAll() []error {
 	// Close the global channel only if there were no errors
 	// quitting all alive discoveries
 	if len(errs) == 0 && dm.globalEventCh != nil {
+		// Let events consumers that discoveries are quitting no more events
+		// will be sent on this channel
+		dm.globalEventCh <- &discovery.Event{Type: "quit"}
 		close(dm.globalEventCh)
 		dm.globalEventCh = nil
 	}

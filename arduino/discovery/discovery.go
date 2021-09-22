@@ -168,13 +168,19 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 		disc.incomingMessagesError = err
 		disc.statusMutex.Unlock()
 		close(outChan)
-		logrus.Errorf("stopped discovery %s decode loop", disc.id)
-		// TODO: Try restarting process some times before closing it completely
+		logrus.Errorf("stopped discovery %s decode loop: %v", disc.id, err)
 	}
 
 	for {
 		var msg discoveryMessage
-		if err := decoder.Decode(&msg); err != nil {
+		if err := decoder.Decode(&msg); err == io.EOF {
+			// This is fine, we exit gracefully
+			disc.statusMutex.Lock()
+			disc.state = Dead
+			disc.statusMutex.Unlock()
+			close(outChan)
+			return
+		} else if err != nil {
 			closeAndReportError(err)
 			return
 		}
@@ -218,9 +224,6 @@ func (disc *PluggableDiscovery) waitMessage(timeout time.Duration) (*discoveryMe
 	select {
 	case msg := <-disc.incomingMessagesChan:
 		if msg == nil {
-			// channel has been closed
-			disc.statusMutex.Lock()
-			defer disc.statusMutex.Unlock()
 			return nil, disc.incomingMessagesError
 		}
 		return msg, nil
