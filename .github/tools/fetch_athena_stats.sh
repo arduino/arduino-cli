@@ -15,15 +15,14 @@
 set -euo pipefail
 
 ! read -r -d '' query <<EOM
-select
-replace(url_extract_path("d.url"), '/arduino-cli/arduino-cli_', '') as flavor,
-count("id") as gauge
-from ${AWS_ATHENA_SOURCE_TABLE}
-where "d.url" like 'https://downloads.arduino.cc/arduino-cli/arduino-cli_%'
-and "d.url" not like '%latest%' -- exclude latest redirect
-and "d.url" not like '%alpha%' -- exclude early alpha releases
-and "d.url" not like '%.tar.bz2%' -- exclude very old releases archive formats
-group by 1
+SELECT replace(json_extract_scalar(url_decode(url_decode(querystring)),
+        '$.data.url'), 'https://downloads.arduino.cc/arduino-cli/arduino-cli_', '') AS flavor, count(json_extract(url_decode(url_decode(querystring)),'$')) AS gauge
+FROM ${AWS_ATHENA_SOURCE_TABLE}
+WHERE json_extract_scalar(url_decode(url_decode(querystring)),'$.data.url') LIKE 'https://downloads.arduino.cc/arduino-cli/arduino-cli_%'
+        AND json_extract_scalar(url_decode(url_decode(querystring)),'$.data.url') NOT LIKE '%latest%' -- exclude latest redirect
+        AND json_extract_scalar(url_decode(url_decode(querystring)),'$.data.url') NOT LIKE '%alpha%' -- exclude early alpha releases
+        AND json_extract_scalar(url_decode(url_decode(querystring)),'$.data.url') NOT LIKE '%.tar.bz2%' -- exclude very old releases archive formats
+group by 1 ;
 EOM
 
 queryExecutionId=$(
