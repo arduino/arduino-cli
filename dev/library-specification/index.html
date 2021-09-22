@@ -1127,6 +1127,19 @@
     Source code
   </a>
   
+    <nav class="md-nav" aria-label="Source code">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#library-layout" class="md-nav__link">
+    Library layout
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1365,6 +1378,19 @@
   <a href="#source-code" class="md-nav__link">
     Source code
   </a>
+  
+    <nav class="md-nav" aria-label="Source code">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#library-layout" class="md-nav__link">
+    Library layout
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1638,6 +1664,32 @@ Servo/utility/ServoTimers.cpp
 only needs to run on Arduino IDE 1.5.x+, we recommend placing all source code in the src/ folder. If a library requires
 recursive compilation of nested source folders, its code must be in the src/ folder (since Arduino IDE 1.0.x doesn’t
 support recursive compilation, backwards compatibility wouldn’t be possible anyway).</p>
+<h5 id="library-layout">Library layout<a class="headerlink" href="#library-layout" title="Permanent link">&para;</a></h5>
+<p><img alt="Library layout" src="../img/library-layout.svg" /></p>
+<table>
+<thead>
+<tr>
+<th>Layout</th>
+<th>root compiled</th>
+<th><code>src</code> compiled</th>
+<th><code>utility</code> compiled</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>recursive</strong></td>
+<td>no</td>
+<td>recursively</td>
+<td>no</td>
+</tr>
+<tr>
+<td><strong>flat</strong></td>
+<td>yes</td>
+<td>no</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
 <h4 id="precompiled-binaries">Precompiled binaries<a class="headerlink" href="#precompiled-binaries" title="Permanent link">&para;</a></h4>
 <p>The <code>precompiled</code> field of <a href="#libraryproperties-file-format">library.properties</a> enables support for the use of
 precompiled libraries. This requires providing .a (archive) or .so (shared object) files which are compiled for a
