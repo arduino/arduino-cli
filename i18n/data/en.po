@@ -768,11 +768,11 @@ msgstr "Error getting absolute path of sketch archive"
 msgid "Error getting board details: %v"
 msgstr "Error getting board details: %v"
 
-#: commands/board/list.go:140
+#: commands/board/list.go:146
 msgid "Error getting board info from Arduino Cloud"
 msgstr "Error getting board info from Arduino Cloud"
 
-#: commands/board/list.go:205
+#: commands/board/list.go:211
 msgid "Error getting board list"
 msgstr "Error getting board list"
 
@@ -897,9 +897,9 @@ msgstr "Error searching for platforms: %v"
 msgid "Error serializing compilation database: %s"
 msgstr "Error serializing compilation database: %s"
 
-#: commands/board/list.go:190
-#: commands/board/list.go:193
-#: commands/board/list.go:234
+#: commands/board/list.go:196
+#: commands/board/list.go:199
+#: commands/board/list.go:240
 msgid "Error starting board discoveries"
 msgstr "Error starting board discoveries"
 
@@ -1281,7 +1281,7 @@ msgstr "Invalid package index in %s"
 msgid "Invalid parameter %s: version not allowed"
 msgstr "Invalid parameter %s: version not allowed"
 
-#: commands/board/list.go:51
+#: commands/board/list.go:57
 msgid "Invalid pid value: '%s'"
 msgstr "Invalid pid value: '%s'"
 
@@ -1293,7 +1293,7 @@ msgstr "Invalid size regexp: %s"
 msgid "Invalid version"
 msgstr "Invalid version"
 
-#: commands/board/list.go:48
+#: commands/board/list.go:54
 msgid "Invalid vid value: '%s'"
 msgstr "Invalid vid value: '%s'"
 
@@ -2421,7 +2421,7 @@ msgstr "binary file not found in %s"
 msgid "board %s:%s not found"
 msgstr "board %s:%s not found"
 
-#: commands/board/list.go:40
+#: commands/board/list.go:41
 msgid "board not found"
 msgstr "board not found"
 
@@ -2430,12 +2430,12 @@ msgstr "board not found"
 msgid "boardname"
 msgstr "boardname"
 
-#: arduino/discovery/discovery.go:297
-#: arduino/discovery/discovery.go:318
-#: arduino/discovery/discovery.go:338
-#: arduino/discovery/discovery.go:361
-#: arduino/discovery/discovery.go:384
-#: arduino/discovery/discovery.go:407
+#: arduino/discovery/discovery.go:300
+#: arduino/discovery/discovery.go:321
+#: arduino/discovery/discovery.go:341
+#: arduino/discovery/discovery.go:364
+#: arduino/discovery/discovery.go:387
+#: arduino/discovery/discovery.go:410
 msgid "calling %[1]s: %[2]w"
 msgstr "calling %[1]s: %[2]w"
 
@@ -2477,36 +2477,36 @@ msgstr "cleaning build path"
 msgid "command"
 msgstr "command"
 
-#: arduino/discovery/discovery.go:301
-#: arduino/discovery/discovery.go:322
-#: arduino/discovery/discovery.go:342
-#: arduino/discovery/discovery.go:365
-#: arduino/discovery/discovery.go:388
-#: arduino/discovery/discovery.go:411
+#: arduino/discovery/discovery.go:304
+#: arduino/discovery/discovery.go:325
+#: arduino/discovery/discovery.go:345
+#: arduino/discovery/discovery.go:368
+#: arduino/discovery/discovery.go:391
+#: arduino/discovery/discovery.go:414
 msgid "command failed: %s"
 msgstr "command failed: %s"
 
-#: arduino/discovery/discovery.go:299
+#: arduino/discovery/discovery.go:302
 msgid "communication out of sync, expected 'hello', received '%s'"
 msgstr "communication out of sync, expected 'hello', received '%s'"
 
-#: arduino/discovery/discovery.go:386
+#: arduino/discovery/discovery.go:389
 msgid "communication out of sync, expected 'list', received '%s'"
 msgstr "communication out of sync, expected 'list', received '%s'"
 
-#: arduino/discovery/discovery.go:363
+#: arduino/discovery/discovery.go:366
 msgid "communication out of sync, expected 'quit', received '%s'"
 msgstr "communication out of sync, expected 'quit', received '%s'"
 
-#: arduino/discovery/discovery.go:320
+#: arduino/discovery/discovery.go:323
 msgid "communication out of sync, expected 'start', received '%s'"
 msgstr "communication out of sync, expected 'start', received '%s'"
 
-#: arduino/discovery/discovery.go:409
+#: arduino/discovery/discovery.go:412
 msgid "communication out of sync, expected 'start_sync', received '%s'"
 msgstr "communication out of sync, expected 'start_sync', received '%s'"
 
-#: arduino/discovery/discovery.go:340
+#: arduino/discovery/discovery.go:343
 msgid "communication out of sync, expected 'stop', received '%s'"
 msgstr "communication out of sync, expected 'stop', received '%s'"
 
@@ -2599,11 +2599,11 @@ msgstr "error opening serial monitor"
 msgid "error parsing value: %v"
 msgstr "error parsing value: %v"
 
-#: commands/board/list.go:81
+#: commands/board/list.go:87
 msgid "error processing response from server"
 msgstr "error processing response from server"
 
-#: commands/board/list.go:96
+#: commands/board/list.go:102
 msgid "error querying Arduino Cloud Api"
 msgstr "error querying Arduino Cloud Api"
 
@@ -2623,7 +2623,7 @@ msgstr "extracting archive: %w"
 msgid "failed to compute hash of file \"%s\""
 msgstr "failed to compute hash of file \"%s\""
 
-#: commands/board/list.go:64
+#: commands/board/list.go:70
 msgid "failed to initialize http client"
 msgstr "failed to initialize http client"
 
@@ -2726,11 +2726,11 @@ msgstr "installing %[1]s tool: %[2]s"
 msgid "installing platform %[1]s: %[2]s"
 msgstr "installing platform %[1]s: %[2]s"
 
-#: arduino/discovery/discovery.go:184
+#: arduino/discovery/discovery.go:190
 msgid "invalid 'add' message: missing port"
 msgstr "invalid 'add' message: missing port"
 
-#: arduino/discovery/discovery.go:195
+#: arduino/discovery/discovery.go:201
 msgid "invalid 'remove' message: missing port"
 msgstr "invalid 'remove' message: missing port"
 
@@ -2860,7 +2860,7 @@ msgstr "library is not valid: missing header file \"%s\""
 msgid "library path does not exist: %s"
 msgstr "library path does not exist: %s"
 
-#: arduino/discovery/discoverymanager/discoverymanager.go:222
+#: arduino/discovery/discoverymanager/discoverymanager.go:225
 msgid "listing ports from discovery %[1]s: %[2]w"
 msgstr "listing ports from discovery %[1]s: %[2]w"
 
@@ -2954,7 +2954,7 @@ msgstr "no compatible version of %s tools found for the current os"
 msgid "no executable specified"
 msgstr "no executable specified"
 
-#: commands/daemon/daemon.go:94
+#: commands/daemon/daemon.go:96
 msgid "no instance specified"
 msgstr "no instance specified"
 
@@ -3065,7 +3065,7 @@ msgstr "port"
 msgid "port not found: %[1]s %[2]s"
 msgstr "port not found: %[1]s %[2]s"
 
-#: arduino/discovery/discovery.go:303
+#: arduino/discovery/discovery.go:306
 msgid "protocol version not supported: requested 1, got %d"
 msgstr "protocol version not supported: requested 1, got %d"
 
@@ -3210,7 +3210,7 @@ msgstr "start syncing discovery %[1]s: %[2]w"
 msgid "starting discovery %[1]s: %[2]w"
 msgstr "starting discovery %[1]s: %[2]w"
 
-#: commands/board/list.go:277
+#: commands/board/list.go:302
 msgid "stopping discoveries: %s"
 msgstr "stopping discoveries: %s"
 
@@ -3246,11 +3246,11 @@ msgstr "the library name is different from the set (%[1]s != %[2]s)"
 msgid "the platform has no releases"
 msgstr "the platform has no releases"
 
-#: commands/board/list.go:72
+#: commands/board/list.go:78
 msgid "the server responded with status %s"
 msgstr "the server responded with status %s"
 
-#: arduino/discovery/discovery.go:228
+#: arduino/discovery/discovery.go:231
 msgid "timeout waiting for message from %s"
 msgstr "timeout waiting for message from %s"
 
@@ -3367,7 +3367,7 @@ msgstr "uploading error: %s"
 msgid "writing sketch metadata %[1]s: %[2]s"
 msgstr "writing sketch metadata %[1]s: %[2]s"
 
-#: commands/board/list.go:88
+#: commands/board/list.go:94
 msgid "wrong format in server response"
 msgstr "wrong format in server response"
 

@@ -35,9 +35,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type boardNotFoundError struct{}
+
+func (e *boardNotFoundError) Error() string {
+	return tr("board not found")
+}
+
 var (
 	// ErrNotFound is returned when the API returns 404
-	ErrNotFound = errors.New(tr("board not found"))
+	ErrNotFound = &boardNotFoundError{}
 	vidPidURL   = "https://builder.arduino.cc/v3/boards/byVidPid"
 	validVidPid = regexp.MustCompile(`0[xX][a-fA-F\d]{4}`)
 )
@@ -132,7 +138,7 @@ func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.B
 	// the builder API if the board is a USB device port
 	if len(boards) == 0 {
 		items, err := identifyViaCloudAPI(port)
-		if err == ErrNotFound {
+		if errors.Is(err, ErrNotFound) {
 			// the board couldn't be detected, print a warning
 			logrus.Debug("Board not recognized")
 		} else if err != nil {
@@ -252,6 +258,25 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 		for {
 			select {
 			case event := <-eventsChan:
+				if event.Type == "quit" {
+					// The discovery manager has closed its event channel because it's
+					// quitting all the discovery processes that are running, this
+					// means that the events channel we're listening from won't receive any
+					// more events.
+					// Handling this case is necessary when the board watcher is running and
+					// the instance being used is reinitialized since that quits all the
+					// discovery processes and reset the discovery manager. That would leave
+					// this goroutine listening forever on a "dead" channel and might even
+					// cause panics.
+					// This message avoid all this issues.
+					// It will be the client's task restarting the board watcher if necessary,
+					// this host won't attempt restarting it.
+					outChan <- &rpc.BoardListWatchResponse{
+						EventType: event.Type,
+					}
+					return
+				}
+
 				port := &rpc.DetectedPort{
 					Port: event.Port.ToRPC(),
 				}
@@ -270,11 +295,11 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 					Error:     boardsError,
 				}
 			case <-interrupt:
-				err := pm.DiscoveryManager().StopAll()
-				if err != nil {
+				errs := dm.StopAll()
+				if len(errs) > 0 {
 					outChan <- &rpc.BoardListWatchResponse{
 						EventType: "error",
-						Error:     fmt.Sprintf(tr("stopping discoveries: %s"), err),
+						Error:     tr("stopping discoveries: %s", errs),
 					}
 					// Don't close the channel if quitting all discoveries
 					// failed, otherwise some processes might be left running.
