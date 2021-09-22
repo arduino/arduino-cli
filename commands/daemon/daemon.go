@@ -31,6 +31,8 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // ArduinoCoreServerImpl FIXMEDOC
@@ -108,6 +110,9 @@ func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCoreService_Boa
 			if err == io.EOF {
 				logrus.Info("boards watcher stream closed")
 				interrupt <- true
+				return
+			} else if st, ok := status.FromError(err); ok && st.Code() == codes.Canceled {
+				logrus.Info("boards watcher interrupted by host")
 				return
 			} else if err != nil {
 				logrus.Infof("interrupting boards watcher: %v", err)

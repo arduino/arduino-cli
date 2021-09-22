@@ -258,6 +258,25 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 		for {
 			select {
 			case event := <-eventsChan:
+				if event.Type == "quit" {
+					// The discovery manager has closed its event channel because it's
+					// quitting all the discovery processes that are running, this
+					// means that the events channel we're listening from won't receive any
+					// more events.
+					// Handling this case is necessary when the board watcher is running and
+					// the instance being used is reinitialized since that quits all the
+					// discovery processes and reset the discovery manager. That would leave
+					// this goroutine listening forever on a "dead" channel and might even
+					// cause panics.
+					// This message avoid all this issues.
+					// It will be the client's task restarting the board watcher if necessary,
+					// this host won't attempt restarting it.
+					outChan <- &rpc.BoardListWatchResponse{
+						EventType: event.Type,
+					}
+					return
+				}
+
 				port := &rpc.DetectedPort{
 					Port: event.Port.ToRPC(),
 				}
@@ -276,11 +295,11 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 					Error:     boardsError,
 				}
 			case <-interrupt:
-				err := pm.DiscoveryManager().StopAll()
-				if err != nil {
+				errs := dm.StopAll()
+				if len(errs) > 0 {
 					outChan <- &rpc.BoardListWatchResponse{
 						EventType: "error",
-						Error:     tr("stopping discoveries: %s", err),
+						Error:     tr("stopping discoveries: %s", errs),
 					}
 					// Don't close the channel if quitting all discoveries
 					// failed, otherwise some processes might be left running.
