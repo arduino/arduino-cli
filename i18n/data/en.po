@@ -13,19 +13,19 @@ msgstr "%[1]s folder is no longer supported! See %[2]s for more information"
 msgid "%[1]s is required but %[2]s is currently installed."
 msgstr "%[1]s is required but %[2]s is currently installed."
 
-#: arduino/discovery/discovery.go:74
+#: arduino/discovery/discovery.go:75
 msgid "%[1]s, message: %[2]s"
 msgstr "%[1]s, message: %[2]s"
 
-#: arduino/discovery/discovery.go:83
+#: arduino/discovery/discovery.go:84
 msgid "%[1]s, port: %[2]s"
 msgstr "%[1]s, port: %[2]s"
 
-#: arduino/discovery/discovery.go:80
+#: arduino/discovery/discovery.go:81
 msgid "%[1]s, ports: %[2]s"
 msgstr "%[1]s, ports: %[2]s"
 
-#: arduino/discovery/discovery.go:77
+#: arduino/discovery/discovery.go:78
 msgid "%[1]s, protocol version: %[2]d"
 msgstr "%[1]s, protocol version: %[2]d"
 
@@ -2388,12 +2388,12 @@ msgstr "board not found"
 msgid "boardname"
 msgstr "boardname"
 
-#: arduino/discovery/discovery.go:300
-#: arduino/discovery/discovery.go:321
-#: arduino/discovery/discovery.go:341
-#: arduino/discovery/discovery.go:364
-#: arduino/discovery/discovery.go:387
-#: arduino/discovery/discovery.go:410
+#: arduino/discovery/discovery.go:311
+#: arduino/discovery/discovery.go:332
+#: arduino/discovery/discovery.go:352
+#: arduino/discovery/discovery.go:375
+#: arduino/discovery/discovery.go:392
+#: arduino/discovery/discovery.go:415
 #: arduino/monitor/monitor.go:246
 msgid "calling %[1]s: %[2]w"
 msgstr "calling %[1]s: %[2]w"
@@ -2441,12 +2441,12 @@ msgstr "cleaning build path"
 msgid "command"
 msgstr "command"
 
-#: arduino/discovery/discovery.go:304
-#: arduino/discovery/discovery.go:325
-#: arduino/discovery/discovery.go:345
-#: arduino/discovery/discovery.go:368
-#: arduino/discovery/discovery.go:391
-#: arduino/discovery/discovery.go:414
+#: arduino/discovery/discovery.go:315
+#: arduino/discovery/discovery.go:336
+#: arduino/discovery/discovery.go:356
+#: arduino/discovery/discovery.go:379
+#: arduino/discovery/discovery.go:396
+#: arduino/discovery/discovery.go:419
 #: arduino/monitor/monitor.go:250
 #: arduino/monitor/monitor.go:270
 #: arduino/monitor/monitor.go:287
@@ -2467,12 +2467,12 @@ msgstr "communication out of sync, expected 'configure', received '%s'"
 msgid "communication out of sync, expected 'describe', received '%s'"
 msgstr "communication out of sync, expected 'describe', received '%s'"
 
-#: arduino/discovery/discovery.go:302
+#: arduino/discovery/discovery.go:313
 #: arduino/monitor/monitor.go:248
 msgid "communication out of sync, expected 'hello', received '%s'"
 msgstr "communication out of sync, expected 'hello', received '%s'"
 
-#: arduino/discovery/discovery.go:389
+#: arduino/discovery/discovery.go:394
 msgid "communication out of sync, expected 'list', received '%s'"
 msgstr "communication out of sync, expected 'list', received '%s'"
 
@@ -2480,19 +2480,19 @@ msgstr "communication out of sync, expected 'list', received '%s'"
 msgid "communication out of sync, expected 'open', received '%s'"
 msgstr "communication out of sync, expected 'open', received '%s'"
 
-#: arduino/discovery/discovery.go:366
+#: arduino/discovery/discovery.go:377
 msgid "communication out of sync, expected 'quit', received '%s'"
 msgstr "communication out of sync, expected 'quit', received '%s'"
 
-#: arduino/discovery/discovery.go:323
+#: arduino/discovery/discovery.go:334
 msgid "communication out of sync, expected 'start', received '%s'"
 msgstr "communication out of sync, expected 'start', received '%s'"
 
-#: arduino/discovery/discovery.go:412
+#: arduino/discovery/discovery.go:417
 msgid "communication out of sync, expected 'start_sync', received '%s'"
 msgstr "communication out of sync, expected 'start_sync', received '%s'"
 
-#: arduino/discovery/discovery.go:343
+#: arduino/discovery/discovery.go:354
 msgid "communication out of sync, expected 'stop', received '%s'"
 msgstr "communication out of sync, expected 'stop', received '%s'"
 
@@ -2706,11 +2706,11 @@ msgstr "installing %[1]s tool: %[2]s"
 msgid "installing platform %[1]s: %[2]s"
 msgstr "installing platform %[1]s: %[2]s"
 
-#: arduino/discovery/discovery.go:190
+#: arduino/discovery/discovery.go:175
 msgid "invalid 'add' message: missing port"
 msgstr "invalid 'add' message: missing port"
 
-#: arduino/discovery/discovery.go:201
+#: arduino/discovery/discovery.go:186
 msgid "invalid 'remove' message: missing port"
 msgstr "invalid 'remove' message: missing port"
 
@@ -3050,7 +3050,7 @@ msgstr "port"
 msgid "port not found: %[1]s %[2]s"
 msgstr "port not found: %[1]s %[2]s"
 
-#: arduino/discovery/discovery.go:306
+#: arduino/discovery/discovery.go:317
 #: arduino/monitor/monitor.go:252
 msgid "protocol version not supported: requested 1, got %d"
 msgstr "protocol version not supported: requested 1, got %d"
@@ -3233,7 +3233,7 @@ msgstr "the platform has no releases"
 msgid "the server responded with status %s"
 msgstr "the server responded with status %s"
 
-#: arduino/discovery/discovery.go:231
+#: arduino/discovery/discovery.go:216
 msgid "timeout waiting for message from %s"
 msgstr "timeout waiting for message from %s"
 
