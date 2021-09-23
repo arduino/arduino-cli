@@ -17,6 +17,7 @@ package daemon
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 
@@ -475,5 +476,66 @@ func (s *ArduinoCoreServerImpl) EnumerateMonitorPortSettings(ctx context.Context
 
 // Monitor FIXMEDOC
 func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorServer) error {
-	return status.New(codes.Unimplemented, "Not implemented").Err()
+	// The configuration must be sent on the first message
+	req, err := stream.Recv()
+	if err != nil {
+		return err
+	}
+
+	portProxy, _ /* portDescriptor */, err := monitor.Monitor(stream.Context(), req)
+	if err != nil {
+		return err
+	}
+	ctx, cancel := context.WithCancel(stream.Context())
+	go func() {
+		defer cancel()
+		for {
+			msg, err := stream.Recv()
+			if errors.Is(err, io.EOF) {
+				return
+			}
+			if err != nil {
+				stream.Send(&rpc.MonitorResponse{Error: err.Error()})
+				return
+			}
+			if conf := msg.GetPortConfiguration(); conf != nil {
+				for _, c := range conf.GetSettings() {
+					if err := portProxy.Config(c.SettingId, c.Value); err != nil {
+						stream.Send(&rpc.MonitorResponse{Error: err.Error()})
+					}
+				}
+			}
+			tx := msg.GetTxData()
+			for len(tx) > 0 {
+				n, err := portProxy.Write(tx)
+				if errors.Is(err, io.EOF) {
+					return
+				}
+				if err != nil {
+					stream.Send(&rpc.MonitorResponse{Error: err.Error()})
+					return
+				}
+				tx = tx[n:]
+			}
+		}
+	}()
+	go func() {
+		defer cancel()
+		buff := make([]byte, 4096)
+		for {
+			n, err := portProxy.Read(buff)
+			if errors.Is(err, io.EOF) {
+				return
+			}
+			if err != nil {
+				stream.Send(&rpc.MonitorResponse{Error: err.Error()})
+				return
+			}
+			if err := stream.Send(&rpc.MonitorResponse{RxData: buff[:n]}); err != nil {
+				return
+			}
+		}
+	}()
+	<-ctx.Done()
+	return nil
 }
