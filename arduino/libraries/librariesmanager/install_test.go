@@ -18,6 +18,7 @@ package librariesmanager
 import (
 	"testing"
 
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -60,5 +61,45 @@ func TestParseGitURL(t *testing.T) {
 	gitURL = "file:///path/to/arduino-lib"
 	libraryName, err = parseGitURL(gitURL)
 	require.Equal(t, "arduino-lib", libraryName)
+	require.NoError(t, err)
+}
+
+func TestValidateLibrary(t *testing.T) {
+	tmpDir := paths.New(t.TempDir())
+
+	nonExistingDirLib := tmpDir.Join("nonExistingDirLib")
+	err := validateLibrary(nonExistingDirLib)
+	require.Errorf(t, err, "directory doesn't exist: %s", nonExistingDirLib)
+
+	emptyLib := tmpDir.Join("emptyLib")
+	emptyLib.Mkdir()
+	err = validateLibrary(emptyLib)
+	require.Errorf(t, err, "library not valid")
+
+	onlyPropertiesLib := tmpDir.Join("onlyPropertiesLib")
+	onlyPropertiesLib.Mkdir()
+	onlyPropertiesLib.Join("library.properties").WriteFile([]byte{})
+	err = validateLibrary(onlyPropertiesLib)
+	require.Errorf(t, err, "library not valid")
+
+	onlyHeaderLib := tmpDir.Join("onlyHeaderLib")
+	onlyHeaderLibSourceDir := onlyHeaderLib.Join("src")
+	onlyHeaderLibSourceDir.MkdirAll()
+	onlyHeaderLibSourceDir.Join("some_file.hpp").WriteFile([]byte{})
+	err = validateLibrary(onlyHeaderLib)
+	require.Errorf(t, err, "library not valid")
+
+	validLib := tmpDir.Join("valiLib")
+	validLibSourceDir := validLib.Join("src")
+	validLibSourceDir.MkdirAll()
+	validLibSourceDir.Join("some_file.hpp").WriteFile([]byte{})
+	validLib.Join("library.properties").WriteFile([]byte{})
+	err = validateLibrary(validLib)
+	require.NoError(t, err)
+
+	validLegacyLib := tmpDir.Join("validLegacyLib")
+	validLegacyLib.Mkdir()
+	validLegacyLib.Join("some_file.hpp").WriteFile([]byte{})
+	err = validateLibrary(validLib)
 	require.NoError(t, err)
 }
