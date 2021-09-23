@@ -75,6 +75,7 @@ func streamLoggerInterceptor(srv interface{}, stream grpc.ServerStream, info *gr
 	fmt.Println("CALLED:", info.FullMethod, streamReq)
 	err := handler(srv, &loggingServerStream{ServerStream: stream})
 	logError(err)
+	fmt.Println("STREAM CLOSED")
 	fmt.Println()
 	return err
 }
