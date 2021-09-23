@@ -240,12 +240,12 @@ func parseGitURL(gitURL string) (string, error) {
 	if strings.HasPrefix(gitURL, "git@") {
 		// We can't parse these as URLs
 		i := strings.LastIndex(gitURL, "/")
-		res = strings.TrimRight(gitURL[i+1:], ".git")
+		res = strings.TrimSuffix(gitURL[i+1:], ".git")
 	} else if path := paths.New(gitURL); path.Exist() {
 		res = path.Base()
 	} else if parsed, err := url.Parse(gitURL); err == nil {
 		i := strings.LastIndex(parsed.Path, "/")
-		res = strings.TrimRight(parsed.Path[i+1:], ".git")
+		res = strings.TrimSuffix(parsed.Path[i+1:], ".git")
 	} else {
 		return "", fmt.Errorf(tr("invalid git url"))
 	}
