@@ -16,11 +16,86 @@
 package monitor
 
 import (
+	"context"
+	"io"
+
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	pluggableMonitor "github.com/arduino/arduino-cli/arduino/monitor"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
+
+// PortProxy is an io.ReadWriteCloser that maps into the monitor port of the board
+type PortProxy struct {
+	rw               io.ReadWriter
+	changeSettingsCB func(setting, value string) error
+	closeCB          func() error
+}
+
+func (p *PortProxy) Read(buff []byte) (int, error) {
+	return p.rw.Read(buff)
+}
+
+func (p *PortProxy) Write(buff []byte) (int, error) {
+	return p.rw.Write(buff)
+}
+
+// Config sets the port configuration setting to the specified value
+func (p *PortProxy) Config(setting, value string) error {
+	return p.changeSettingsCB(setting, value)
+}
+
+// Close the port
+func (p *PortProxy) Close() error {
+	return p.closeCB()
+}
+
+// Monitor opens a communication port. It returns a PortProxy to communicate with the port and a PortDescriptor
+// that describes the available configuration settings.
+func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggableMonitor.PortDescriptor, error) {
+	pm := commands.GetPackageManager(req.GetInstance().GetId())
+	if pm == nil {
+		return nil, nil, &commands.InvalidInstanceError{}
+	}
+
+	monitorRef, err := findMonitorForProtocolAndBoard(pm, req.GetPort(), req.GetFqbn())
+	if err != nil {
+		return nil, nil, err
+	}
+
+	tool := pm.FindMonitorDependency(monitorRef)
+	if tool == nil {
+		return nil, nil, &commands.MonitorNotFoundError{Monitor: monitorRef.String()}
+	}
+
+	m := pluggableMonitor.New(monitorRef.Name, tool.InstallDir.Join(monitorRef.Name).String())
+
+	if err := m.Run(); err != nil {
+		return nil, nil, &commands.FailedMonitorError{Cause: err}
+	}
+
+	descriptor, err := m.Describe()
+	if err != nil {
+		return nil, nil, &commands.FailedMonitorError{Cause: err}
+	}
+
+	monIO, err := m.Open(req.GetPort())
+	if err != nil {
+		return nil, nil, &commands.FailedMonitorError{Cause: err}
+	}
+
+	return &PortProxy{
+		rw: monIO,
+		changeSettingsCB: func(setting, value string) error {
+			return m.Configure(setting, value)
+		},
+		closeCB: func() error {
+			m.Close()
+			return m.Quit()
+		},
+	}, descriptor, nil
+}
 
 func findMonitorForProtocolAndBoard(pm *packagemanager.PackageManager, port *rpc.Port, fqbn string) (*cores.MonitorDependency, error) {
 	if port == nil {
