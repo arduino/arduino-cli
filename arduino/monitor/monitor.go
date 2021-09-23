@@ -284,7 +284,7 @@ func (mon *PluggableMonitor) Configure(param, value string) error {
 	} else if msg.EventType != "configure" {
 		return errors.Errorf(tr("communication out of sync, expected 'configure', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
-		return errors.Errorf(tr("command failed: %s"), msg.Message)
+		return errors.Errorf(tr("configure failed: %s"), msg.Message)
 	} else {
 		return nil
 	}
@@ -320,7 +320,7 @@ func (mon *PluggableMonitor) Open(port *rpc.Port) (io.ReadWriter, error) {
 	} else if msg.EventType != "open" {
 		return nil, errors.Errorf(tr("communication out of sync, expected 'open', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
-		return nil, errors.Errorf(tr("command failed: %s"), msg.Message)
+		return nil, errors.Errorf(tr("open failed: %s"), msg.Message)
 	}
 
 	conn, err := tcpListener.Accept()
