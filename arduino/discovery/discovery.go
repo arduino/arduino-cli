@@ -268,8 +268,15 @@ func (disc *PluggableDiscovery) killProcess() error {
 	if err := disc.process.Kill(); err != nil {
 		return err
 	}
+	if err := disc.process.Wait(); err != nil {
+		return err
+	}
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
+	if disc.eventChan != nil {
+		close(disc.eventChan)
+		disc.eventChan = nil
+	}
 	disc.state = Dead
 	logrus.Infof("killed discovery %s process", disc.id)
 	return nil
@@ -371,13 +378,7 @@ func (disc *PluggableDiscovery) Quit() error {
 	} else if msg.Message != "OK" || msg.Error {
 		return errors.Errorf(tr("command failed: %s"), msg.Message)
 	}
-	disc.statusMutex.Lock()
-	defer disc.statusMutex.Unlock()
-	if disc.eventChan != nil {
-		close(disc.eventChan)
-		disc.eventChan = nil
-	}
-	disc.state = Dead
+	disc.killProcess()
 	return nil
 }
 

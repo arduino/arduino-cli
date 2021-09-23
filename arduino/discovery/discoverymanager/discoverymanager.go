@@ -120,7 +120,7 @@ func (dm *DiscoveryManager) RunAll() []error {
 func (dm *DiscoveryManager) StartAll() []error {
 	return dm.parallelize(func(d *discovery.PluggableDiscovery) error {
 		state := d.State()
-		if state != discovery.Idling || state == discovery.Running {
+		if state != discovery.Idling {
 			// Already started
 			return nil
 		}
