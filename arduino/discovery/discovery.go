@@ -47,6 +47,7 @@ const (
 // with the boards.
 type PluggableDiscovery struct {
 	id                   string
+	processArgs          []string
 	process              *executils.Process
 	outgoingCommandsPipe io.Writer
 	incomingMessagesChan <-chan *discoveryMessage
@@ -126,28 +127,12 @@ type Event struct {
 
 // New create and connect to the given pluggable discovery
 func New(id string, args ...string) (*PluggableDiscovery, error) {
-	proc, err := executils.NewProcess(args...)
-	if err != nil {
-		return nil, err
-	}
-	stdout, err := proc.StdoutPipe()
-	if err != nil {
-		return nil, err
-	}
-	stdin, err := proc.StdinPipe()
-	if err != nil {
-		return nil, err
-	}
-	messageChan := make(chan *discoveryMessage)
 	disc := &PluggableDiscovery{
-		id:                   id,
-		process:              proc,
-		incomingMessagesChan: messageChan,
-		outgoingCommandsPipe: stdin,
-		state:                Dead,
-		cachedPorts:          map[string]*Port{},
+		id:          id,
+		processArgs: args,
+		state:       Dead,
+		cachedPorts: map[string]*Port{},
 	}
-	go disc.jsonDecodeLoop(stdout, messageChan)
 	return disc, nil
 }
 
@@ -249,6 +234,25 @@ func (disc *PluggableDiscovery) sendCommand(command string) error {
 
 func (disc *PluggableDiscovery) runProcess() error {
 	logrus.Infof("starting discovery %s process", disc.id)
+	proc, err := executils.NewProcess(disc.processArgs...)
+	if err != nil {
+		return err
+	}
+	stdout, err := proc.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	stdin, err := proc.StdinPipe()
+	if err != nil {
+		return err
+	}
+	disc.outgoingCommandsPipe = stdin
+	disc.process = proc
+
+	messageChan := make(chan *discoveryMessage)
+	disc.incomingMessagesChan = messageChan
+	go disc.jsonDecodeLoop(stdout, messageChan)
+
 	if err := disc.process.Start(); err != nil {
 		return err
 	}
