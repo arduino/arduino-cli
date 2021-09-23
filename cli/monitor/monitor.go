@@ -17,8 +17,13 @@ package monitor
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"io"
 	"os"
+	"sort"
 
+	pluggableMonitor "github.com/arduino/arduino-cli/arduino/monitor"
 	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -64,16 +69,120 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	res, err := monitor.EnumerateMonitorPortSettings(context.Background(), &rpc.EnumerateMonitorPortSettingsRequest{
+	if describe {
+		res, err := monitor.EnumerateMonitorPortSettings(context.Background(), &rpc.EnumerateMonitorPortSettingsRequest{
+			Instance: instance,
+			Port:     port.ToRPC(),
+			Fqbn:     "",
+		})
+		if err != nil {
+			feedback.Error(tr("Error getting port settings details: %s"), err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+		feedback.PrintResult(&detailsResult{Settings: res.Settings})
+		return
+	}
+
+	tty, err := newNullTerminal()
+	if err != nil {
+		feedback.Error(err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+	defer tty.Close()
+
+	portProxy, descriptor, err := monitor.Monitor(context.Background(), &rpc.MonitorRequest{
 		Instance: instance,
 		Port:     port.ToRPC(),
 		Fqbn:     "",
 	})
 	if err != nil {
-		feedback.Error(tr("Error getting port settings details: %s"), err)
+		feedback.Error(err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	feedback.PrintResult(&detailsResult{Settings: res.Settings})
+	defer portProxy.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		_, err := io.Copy(tty, portProxy)
+		if err != nil && !errors.Is(err, io.EOF) {
+			feedback.Error(tr("Port closed:"), err)
+		}
+		cancel()
+	}()
+	go func() {
+		_, err := io.Copy(portProxy, tty)
+		if err != nil && !errors.Is(err, io.EOF) {
+			feedback.Error(tr("Port closed:"), err)
+		}
+		cancel()
+	}()
+
+	params := descriptor.ConfigurationParameters
+	paramsKeys := sort.StringSlice{}
+	for k := range params {
+		paramsKeys = append(paramsKeys, k)
+	}
+	sort.Sort(paramsKeys)
+	state := 0
+	var setting *pluggableMonitor.PortParameterDescriptor
+	settingKey := ""
+	feedback.Print(tr("Connected to %s! Press CTRL-C to exit.", port.String()))
+
+	// TODO: This is a work in progress...
+	tty.AddEscapeCallback(func(r rune) bool {
+		switch state {
+		case 0:
+			fmt.Println()
+			fmt.Println("Commands available:")
+			fmt.Println("  CTRL+C - Quit monitor")
+			for i, key := range paramsKeys {
+				fmt.Printf("  %c - Change %s\n", 'a'+i, params[key].Label)
+			}
+			fmt.Println("ESC - back to terminal...")
+			fmt.Print("> ")
+			state = 1
+
+		case 1:
+			if r >= 'a' && r <= rune('a'+len(paramsKeys)) {
+				settingKey = paramsKeys[int(r-'a')]
+				setting = params[settingKey]
+				fmt.Printf("Chaging option %s, please select:\n", setting.Label)
+				for i, v := range setting.Values {
+					fmt.Printf("  %c - Select %s\n", 'a'+i, v)
+				}
+				fmt.Print("> ")
+				state = 2
+				return true
+			}
+			switch r {
+			case 27:
+				fmt.Println("ESC")
+				state = 0
+				return false
+			default:
+				fmt.Println("Invalid command... back to terminal")
+				state = 0
+				return false
+			}
+
+		case 2:
+			if r >= 'a' && r <= rune('a'+len(setting.Values)) {
+				settingValue := setting.Values[int(r-'a')]
+				fmt.Printf("Selected %s <= %s\n", setting.Label, settingValue)
+				if err := portProxy.Config(settingKey, settingValue); err != nil {
+					fmt.Println("Error setting configuration:", err)
+				}
+			} else {
+				fmt.Println("Invalid command... back to terminal")
+			}
+			state = 0
+			return false
+		}
+		return true
+	})
+
+	// Wait for port closed
+	<-ctx.Done()
 }
 
 type detailsResult struct {
