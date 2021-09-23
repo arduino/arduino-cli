@@ -4,6 +4,8 @@ on:
   schedule:
     # run every 30 minutes
     - cron: "*/30 * * * *"
+  workflow_dispatch:
+  repository_dispatch:
 
 jobs:
   push-stats:
