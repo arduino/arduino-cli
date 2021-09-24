@@ -49,4 +49,11 @@ var (
 		".cpp": empty,
 		".S":   empty,
 	}
+
+	// HeaderFilesValidExtensions lists valid extensions for header files
+	HeaderFilesValidExtensions = map[string]struct{}{
+		".h":   empty,
+		".hpp": empty,
+		".hh":  empty,
+	}
 )

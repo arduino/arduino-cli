@@ -2238,10 +2238,10 @@ msgstr "Use the specified programmer to upload."
 msgid "Used: {0}"
 msgstr "Used: {0}"
 
-#: arduino/libraries/librariesmanager/install.go:67
-#: arduino/libraries/librariesmanager/install.go:83
-#: arduino/libraries/librariesmanager/install.go:105
-#: arduino/libraries/librariesmanager/install.go:189
+#: arduino/libraries/librariesmanager/install.go:68
+#: arduino/libraries/librariesmanager/install.go:84
+#: arduino/libraries/librariesmanager/install.go:106
+#: arduino/libraries/librariesmanager/install.go:190
 msgid "User directory not set"
 msgstr "User directory not set"
 
@@ -2355,7 +2355,7 @@ msgstr "Writing config file: %v"
 msgid "archive hash differs from hash in index"
 msgstr "archive hash differs from hash in index"
 
-#: arduino/libraries/librariesmanager/install.go:136
+#: arduino/libraries/librariesmanager/install.go:137
 msgid "archive is not valid: multiple files found in zip file top level"
 msgstr "archive is not valid: multiple files found in zip file top level"
 
@@ -2533,9 +2533,13 @@ msgstr "dependency '%s' is not available"
 msgid "destination already exists"
 msgstr "destination already exists"
 
-#: arduino/libraries/librariesmanager/install.go:74
+#: arduino/libraries/librariesmanager/install.go:75
 msgid "destination dir %s already exists, cannot install"
 msgstr "destination dir %s already exists, cannot install"
+
+#: arduino/libraries/librariesmanager/install.go:268
+msgid "directory doesn't exist: %s"
+msgstr "directory doesn't exist: %s"
 
 #: arduino/discovery/discoverymanager/discoverymanager.go:112
 msgid "discovery %[1]s process not started: %[2]w"
@@ -2599,7 +2603,7 @@ msgstr "error: %s and %s flags cannot be used together"
 msgid "extracting archive: %s"
 msgstr "extracting archive: %s"
 
-#: arduino/libraries/librariesmanager/install.go:124
+#: arduino/libraries/librariesmanager/install.go:125
 msgid "extracting archive: %w"
 msgstr "extracting archive: %w"
 
@@ -2694,7 +2698,7 @@ msgstr "getting tool dependencies for platform %[1]s: %[2]s"
 msgid "importing sketch metadata: %s"
 msgstr "importing sketch metadata: %s"
 
-#: arduino/libraries/librariesmanager/install.go:91
+#: arduino/libraries/librariesmanager/install.go:92
 msgid "install directory not set"
 msgstr "install directory not set"
 
@@ -2755,7 +2759,7 @@ msgstr "invalid empty library version: %s"
 msgid "invalid empty option found"
 msgstr "invalid empty option found"
 
-#: arduino/libraries/librariesmanager/install.go:257
+#: arduino/libraries/librariesmanager/install.go:258
 msgid "invalid git url"
 msgstr "invalid git url"
 
@@ -2819,22 +2823,18 @@ msgstr "key not found in settings"
 msgid "keywords"
 msgstr "keywords"
 
-#: arduino/libraries/librariesmanager/install.go:162
-#: arduino/libraries/librariesmanager/install.go:205
+#: arduino/libraries/librariesmanager/install.go:163
+#: arduino/libraries/librariesmanager/install.go:206
 msgid "library %s already installed"
 msgstr "library %s already installed"
 
-#: arduino/libraries/librariesmanager/install.go:37
+#: arduino/libraries/librariesmanager/install.go:38
 msgid "library already installed"
 msgstr "library already installed"
 
-#: arduino/libraries/librariesmanager/install.go:276
-msgid "library is not valid: missing file \"library.properties\""
-msgstr "library is not valid: missing file \"library.properties\""
-
-#: arduino/libraries/librariesmanager/install.go:271
-msgid "library is not valid: missing header file \"%s\""
-msgstr "library is not valid: missing header file \"%s\""
+#: arduino/libraries/librariesmanager/install.go:305
+msgid "library not valid"
+msgstr "library not valid"
 
 #: arduino/libraries/librariesmanager/librariesmanager.go:226
 msgid "library path does not exist: %s"
@@ -2917,7 +2917,7 @@ msgstr "missing platform release %[1]s:%[2]s referenced by board %[3]s"
 msgid "monitor release not found: %s"
 msgstr "monitor release not found: %s"
 
-#: arduino/libraries/librariesmanager/install.go:179
+#: arduino/libraries/librariesmanager/install.go:180
 #: arduino/resources/install.go:94
 msgid "moving extracted archive to destination dir: %s"
 msgstr "moving extracted archive to destination dir: %s"
@@ -3077,6 +3077,10 @@ msgstr "reading dir %[1]s: %[2]s"
 msgid "reading directory %[1]s: %[2]s"
 msgstr "reading directory %[1]s: %[2]s"
 
+#: arduino/libraries/librariesmanager/install.go:278
+msgid "reading directory %s content: %w"
+msgstr "reading directory %s content: %w"
+
 #: arduino/builder/sketch.go:76
 msgid "reading file %[1]s: %[2]s"
 msgstr "reading file %[1]s: %[2]s"
@@ -3093,11 +3097,11 @@ msgstr "reading inventory file: %w"
 msgid "reading lib headers: %s"
 msgstr "reading lib headers: %s"
 
-#: arduino/libraries/libraries.go:234
+#: arduino/libraries/libraries.go:235
 msgid "reading lib src dir: %s"
 msgstr "reading lib src dir: %s"
 
-#: arduino/libraries/libraries.go:114
+#: arduino/libraries/libraries.go:115
 msgid "reading library headers: %w"
 msgstr "reading library headers: %w"
 
@@ -3135,7 +3139,7 @@ msgstr "release not found"
 msgid "removing corrupted archive file: %s"
 msgstr "removing corrupted archive file: %s"
 
-#: arduino/libraries/librariesmanager/install.go:94
+#: arduino/libraries/librariesmanager/install.go:95
 msgid "removing lib directory: %s"
 msgstr "removing lib directory: %s"
 
