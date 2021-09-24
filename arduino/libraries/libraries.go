@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
@@ -233,7 +234,11 @@ func (library *Library) SourceHeaders() ([]string, error) {
 		if err != nil {
 			return nil, fmt.Errorf(tr("reading lib src dir: %s"), err)
 		}
-		cppHeaders.FilterSuffix(".h", ".hpp", ".hh")
+		headerExtensions := []string{}
+		for k := range globals.HeaderFilesValidExtensions {
+			headerExtensions = append(headerExtensions, k)
+		}
+		cppHeaders.FilterSuffix(headerExtensions...)
 		res := []string{}
 		for _, cppHeader := range cppHeaders {
 			res = append(res, cppHeader.Base())

@@ -925,7 +925,7 @@ def test_install_zip_invalid_library(run_command, data_dir, downloads_dir):
     # Test zip-path install
     res = run_command(f"lib install --zip-path {zip_path}")
     assert res.failed
-    assert 'library is not valid: missing header file "lib-without-header.h"' in res.stderr
+    assert "library not valid" in res.stderr
 
     lib_install_dir = Path(data_dir, "libraries", "lib-without-properties")
     # Verifies library is not already installed
@@ -935,7 +935,7 @@ def test_install_zip_invalid_library(run_command, data_dir, downloads_dir):
     # Test zip-path install
     res = run_command(f"lib install --zip-path {zip_path}")
     assert res.failed
-    assert 'library is not valid: missing file "library.properties"' in res.stderr
+    assert "library not valid" in res.stderr
 
 
 def test_install_git_invalid_library(run_command, data_dir, downloads_dir):
@@ -962,7 +962,7 @@ def test_install_git_invalid_library(run_command, data_dir, downloads_dir):
 
     res = run_command(f"lib install --git-url {repo_dir}", custom_env=env)
     assert res.failed
-    assert 'library is not valid: missing header file "lib-without-header.h"' in res.stderr
+    assert "library not valid" in res.stderr
     assert not lib_install_dir.exists()
 
     # Create another fake library repository
@@ -980,5 +980,5 @@ def test_install_git_invalid_library(run_command, data_dir, downloads_dir):
 
     res = run_command(f"lib install --git-url {repo_dir}", custom_env=env)
     assert res.failed
-    assert 'library is not valid: missing file "library.properties"' in res.stderr
+    assert "library not valid" in res.stderr
     assert not lib_install_dir.exists()
