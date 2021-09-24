@@ -27,8 +27,7 @@ import (
 // DiscoveryManager is required to handle multiple pluggable-discovery that
 // may be shared across platforms
 type DiscoveryManager struct {
-	discoveries   map[string]*discovery.PluggableDiscovery
-	globalEventCh chan *discovery.Event
+	discoveries map[string]*discovery.PluggableDiscovery
 }
 
 var tr = i18n.Tr
@@ -36,8 +35,7 @@ var tr = i18n.Tr
 // New creates a new DiscoveryManager
 func New() *DiscoveryManager {
 	return &DiscoveryManager{
-		discoveries:   map[string]*discovery.PluggableDiscovery{},
-		globalEventCh: nil,
+		discoveries: map[string]*discovery.PluggableDiscovery{},
 	}
 }
 
@@ -45,10 +43,6 @@ func New() *DiscoveryManager {
 func (dm *DiscoveryManager) Clear() {
 	dm.QuitAll()
 	dm.discoveries = map[string]*discovery.PluggableDiscovery{}
-	if dm.globalEventCh != nil {
-		close(dm.globalEventCh)
-		dm.globalEventCh = nil
-	}
 }
 
 // IDs returns the list of discoveries' ids in this DiscoveryManager
@@ -134,9 +128,8 @@ func (dm *DiscoveryManager) StartAll() []error {
 // StartSyncAll the discoveries for this DiscoveryManager,
 // returns an error for each discovery failing to start syncing
 func (dm *DiscoveryManager) StartSyncAll() (<-chan *discovery.Event, []error) {
-	if dm.globalEventCh == nil {
-		dm.globalEventCh = make(chan *discovery.Event, 5)
-	}
+	eventSink := make(chan *discovery.Event, 5)
+	var wg sync.WaitGroup
 	errs := dm.parallelize(func(d *discovery.PluggableDiscovery) error {
 		state := d.State()
 		if state != discovery.Idling || state == discovery.Syncing {
@@ -148,14 +141,22 @@ func (dm *DiscoveryManager) StartSyncAll() (<-chan *discovery.Event, []error) {
 		if err != nil {
 			return fmt.Errorf(tr("start syncing discovery %[1]s: %[2]w"), d.GetID(), err)
 		}
+
+		wg.Add(1)
 		go func() {
 			for ev := range eventCh {
-				dm.globalEventCh <- ev
+				eventSink <- ev
 			}
+			wg.Done()
 		}()
 		return nil
 	})
-	return dm.globalEventCh, errs
+	go func() {
+		wg.Wait()
+		eventSink <- &discovery.Event{Type: "quit"}
+		close(eventSink)
+	}()
+	return eventSink, errs
 }
 
 // StopAll the discoveries for this DiscoveryManager,
@@ -189,15 +190,6 @@ func (dm *DiscoveryManager) QuitAll() []error {
 		}
 		return nil
 	})
-	// Close the global channel only if there were no errors
-	// quitting all alive discoveries
-	if len(errs) == 0 && dm.globalEventCh != nil {
-		// Let events consumers that discoveries are quitting no more events
-		// will be sent on this channel
-		dm.globalEventCh <- &discovery.Event{Type: "quit"}
-		close(dm.globalEventCh)
-		dm.globalEventCh = nil
-	}
 	return errs
 }
 

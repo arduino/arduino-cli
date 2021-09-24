@@ -2541,7 +2541,7 @@ msgstr "destination dir %s already exists, cannot install"
 msgid "directory doesn't exist: %s"
 msgstr "directory doesn't exist: %s"
 
-#: arduino/discovery/discoverymanager/discoverymanager.go:112
+#: arduino/discovery/discoverymanager/discoverymanager.go:106
 msgid "discovery %[1]s process not started: %[2]w"
 msgstr "discovery %[1]s process not started: %[2]w"
 
@@ -2840,7 +2840,7 @@ msgstr "library not valid"
 msgid "library path does not exist: %s"
 msgstr "library path does not exist: %s"
 
-#: arduino/discovery/discoverymanager/discoverymanager.go:225
+#: arduino/discovery/discoverymanager/discoverymanager.go:217
 msgid "listing ports from discovery %[1]s: %[2]w"
 msgstr "listing ports from discovery %[1]s: %[2]w"
 
@@ -3038,7 +3038,7 @@ msgstr "platform not installed"
 msgid "please use --build-property instead."
 msgstr "please use --build-property instead."
 
-#: arduino/discovery/discoverymanager/discoverymanager.go:67
+#: arduino/discovery/discoverymanager/discoverymanager.go:61
 msgid "pluggable discovery already added: %s"
 msgstr "pluggable discovery already added: %s"
 
@@ -3055,7 +3055,7 @@ msgstr "port not found: %[1]s %[2]s"
 msgid "protocol version not supported: requested 1, got %d"
 msgstr "protocol version not supported: requested 1, got %d"
 
-#: arduino/discovery/discoverymanager/discoverymanager.go:188
+#: arduino/discovery/discoverymanager/discoverymanager.go:189
 msgid "quitting discovery %[1]s: %[2]w"
 msgstr "quitting discovery %[1]s: %[2]w"
 
@@ -3193,11 +3193,11 @@ msgstr "skipping loading of boards %s: malformed custom board options"
 msgid "source is not a directory"
 msgstr "source is not a directory"
 
-#: arduino/discovery/discoverymanager/discoverymanager.go:149
+#: arduino/discovery/discoverymanager/discoverymanager.go:142
 msgid "start syncing discovery %[1]s: %[2]w"
 msgstr "start syncing discovery %[1]s: %[2]w"
 
-#: arduino/discovery/discoverymanager/discoverymanager.go:128
+#: arduino/discovery/discoverymanager/discoverymanager.go:122
 msgid "starting discovery %[1]s: %[2]w"
 msgstr "starting discovery %[1]s: %[2]w"
 
@@ -3205,7 +3205,7 @@ msgstr "starting discovery %[1]s: %[2]w"
 msgid "stopping discoveries: %s"
 msgstr "stopping discoveries: %s"
 
-#: arduino/discovery/discoverymanager/discoverymanager.go:172
+#: arduino/discovery/discoverymanager/discoverymanager.go:173
 msgid "stopping discovery %[1]s: %[2]w"
 msgstr "stopping discovery %[1]s: %[2]w"
 
