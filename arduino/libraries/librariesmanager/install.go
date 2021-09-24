@@ -235,15 +235,17 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 	return nil
 }
 
+// parseGitURL tries to recover a library name from a git URL.
+// Returns an error in case the URL is not a valid git URL.
 func parseGitURL(gitURL string) (string, error) {
 	var res string
 	if strings.HasPrefix(gitURL, "git@") {
 		// We can't parse these as URLs
 		i := strings.LastIndex(gitURL, "/")
 		res = strings.TrimSuffix(gitURL[i+1:], ".git")
-	} else if path := paths.New(gitURL); path.Exist() {
+	} else if path := paths.New(gitURL); path != nil && path.Exist() {
 		res = path.Base()
-	} else if parsed, err := url.Parse(gitURL); err == nil {
+	} else if parsed, err := url.Parse(gitURL); parsed.String() != "" && err == nil {
 		i := strings.LastIndex(parsed.Path, "/")
 		res = strings.TrimSuffix(parsed.Path[i+1:], ".git")
 	} else {

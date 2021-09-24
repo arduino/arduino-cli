@@ -2775,7 +2775,7 @@ msgstr "invalid empty library version: %s"
 msgid "invalid empty option found"
 msgstr "invalid empty option found"
 
-#: arduino/libraries/librariesmanager/install.go:250
+#: arduino/libraries/librariesmanager/install.go:252
 msgid "invalid git url"
 msgstr "invalid git url"
 
@@ -2848,11 +2848,11 @@ msgstr "library %s already installed"
 msgid "library already installed"
 msgstr "library already installed"
 
-#: arduino/libraries/librariesmanager/install.go:269
+#: arduino/libraries/librariesmanager/install.go:271
 msgid "library is not valid: missing file \"library.properties\""
 msgstr "library is not valid: missing file \"library.properties\""
 
-#: arduino/libraries/librariesmanager/install.go:264
+#: arduino/libraries/librariesmanager/install.go:266
 msgid "library is not valid: missing header file \"%s\""
 msgstr "library is not valid: missing header file \"%s\""
 
