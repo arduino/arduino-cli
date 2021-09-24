@@ -14,6 +14,34 @@
 
 set -euo pipefail
 
+loadExecutionId=$(
+  aws athena start-query-execution \
+    --query-string "MSCK REPAIR TABLE ${AWS_ATHENA_SOURCE_TABLE};" \
+    --result-configuration "OutputLocation=${AWS_ATHENA_OUTPUT_LOCATION}" \
+    --region us-east-1 | jq -r ".QueryExecutionId"
+)
+
+echo "QueryExecutionId is ${loadExecutionId}"
+for i in $(seq 1 120); do
+  loadState=$(
+    aws athena get-query-execution \
+      --query-execution-id "${loadExecutionId}" \
+      --region us-east-1 | jq -r ".QueryExecution.Status.State"
+  )
+
+  if [[ "${loadState}" == "SUCCEEDED" ]]; then
+    break
+  fi
+
+  echo "QueryExecutionId ${loadExecutionId} - state is ${loadState}"
+
+  if [[ "${loadState}" == "FAILED" ]]; then
+    exit 1
+  fi
+
+  sleep 2
+done
+
 ! read -r -d '' query <<EOM
 SELECT replace(json_extract_scalar(url_decode(url_decode(querystring)),
         '$.data.url'), 'https://downloads.arduino.cc/arduino-cli/arduino-cli_', '') AS flavor, count(json_extract(url_decode(url_decode(querystring)),'$')) AS gauge
@@ -28,7 +56,6 @@ EOM
 queryExecutionId=$(
   aws athena start-query-execution \
     --query-string "${query}" \
-    --query-execution-context "Database=demo_books" \
     --result-configuration "OutputLocation=${AWS_ATHENA_OUTPUT_LOCATION}" \
     --region us-east-1 | jq -r ".QueryExecutionId"
 )
