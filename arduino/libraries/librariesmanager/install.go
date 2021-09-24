@@ -286,16 +286,16 @@ func validateLibrary(dir *paths.Path) error {
 		return len(dirContent) > 0, nil
 	}
 
-	// Library format rev2
-	// https://arduino.github.io/arduino-cli/latest/library-specification/#15-library-format-rev-22
+	// Recursive library layout
+	// https://arduino.github.io/arduino-cli/latest/library-specification/#source-code
 	if headerFound, err := searchHeaderFile(dir.Join("src")); err != nil {
 		return err
 	} else if dir.Join("library.properties").Exist() && headerFound {
 		return nil
 	}
 
-	// Legacy library format
-	// https://arduino.github.io/arduino-cli/latest/library-specification/#old-library-format-pre-15
+	// Flat library layout
+	// https://arduino.github.io/arduino-cli/latest/library-specification/#source-code
 	if headerFound, err := searchHeaderFile(dir); err != nil {
 		return err
 	} else if headerFound {

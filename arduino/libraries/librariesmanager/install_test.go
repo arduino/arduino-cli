@@ -82,11 +82,11 @@ func TestValidateLibrary(t *testing.T) {
 	err = validateLibrary(onlyPropertiesLib)
 	require.Errorf(t, err, "library not valid")
 
-	onlyHeaderLib := tmpDir.Join("onlyHeaderLib")
-	onlyHeaderLibSourceDir := onlyHeaderLib.Join("src")
-	onlyHeaderLibSourceDir.MkdirAll()
-	onlyHeaderLibSourceDir.Join("some_file.hpp").WriteFile([]byte{})
-	err = validateLibrary(onlyHeaderLib)
+	missingPropertiesLib := tmpDir.Join("missingPropertiesLib")
+	missingPropertiesLibSourceDir := missingPropertiesLib.Join("src")
+	missingPropertiesLibSourceDir.MkdirAll()
+	missingPropertiesLibSourceDir.Join("some_file.hpp").WriteFile([]byte{})
+	err = validateLibrary(missingPropertiesLib)
 	require.Errorf(t, err, "library not valid")
 
 	validLib := tmpDir.Join("valiLib")
