@@ -44,8 +44,7 @@ func TestDummyMonitor(t *testing.T) {
 	require.NoError(t, builder.Run())
 
 	// Run dummy-monitor and test if everything is working as expected
-	mon, err := New("dummy", "testdata/dummy-monitor")
-	require.NoError(t, err)
+	mon := New("dummy", "testdata/dummy-monitor")
 	err = mon.Run()
 	require.NoError(t, err)
 
