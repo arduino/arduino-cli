@@ -45,6 +45,7 @@ const (
 // PluggableMonitor is a tool that communicates with a board through a communication port.
 type PluggableMonitor struct {
 	id                   string
+	processArgs          []string
 	process              *executils.Process
 	outgoingCommandsPipe io.Writer
 	incomingMessagesChan <-chan *monitorMessage
@@ -96,29 +97,12 @@ func (msg monitorMessage) String() string {
 var tr = i18n.Tr
 
 // New create and connect to the given pluggable monitor
-func New(id string, args ...string) (*PluggableMonitor, error) {
-	proc, err := executils.NewProcess(args...)
-	if err != nil {
-		return nil, err
+func New(id string, args ...string) *PluggableMonitor {
+	return &PluggableMonitor{
+		id:          id,
+		processArgs: args,
+		state:       Dead,
 	}
-	stdout, err := proc.StdoutPipe()
-	if err != nil {
-		return nil, err
-	}
-	stdin, err := proc.StdinPipe()
-	if err != nil {
-		return nil, err
-	}
-	messageChan := make(chan *monitorMessage)
-	disc := &PluggableMonitor{
-		id:                   id,
-		process:              proc,
-		incomingMessagesChan: messageChan,
-		outgoingCommandsPipe: stdin,
-		state:                Dead,
-	}
-	go disc.jsonDecodeLoop(stdout, messageChan)
-	return disc, nil
 }
 
 // GetID returns the identifier for this monitor
@@ -195,6 +179,25 @@ func (mon *PluggableMonitor) sendCommand(command string) error {
 
 func (mon *PluggableMonitor) runProcess() error {
 	logrus.Infof("starting monitor %s process", mon.id)
+	proc, err := executils.NewProcess(mon.processArgs...)
+	if err != nil {
+		return err
+	}
+	stdout, err := proc.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	stdin, err := proc.StdinPipe()
+	if err != nil {
+		return err
+	}
+	mon.outgoingCommandsPipe = stdin
+	mon.process = proc
+
+	messageChan := make(chan *monitorMessage)
+	mon.incomingMessagesChan = messageChan
+	go mon.jsonDecodeLoop(stdout, messageChan)
+
 	if err := mon.process.Start(); err != nil {
 		return err
 	}
@@ -208,6 +211,9 @@ func (mon *PluggableMonitor) runProcess() error {
 func (mon *PluggableMonitor) killProcess() error {
 	logrus.Infof("killing monitor %s process", mon.id)
 	if err := mon.process.Kill(); err != nil {
+		return err
+	}
+	if err := mon.process.Wait(); err != nil {
 		return err
 	}
 	mon.statusMutex.Lock()
@@ -367,8 +373,6 @@ func (mon *PluggableMonitor) Quit() error {
 	} else if msg.Message != "OK" || msg.Error {
 		return errors.Errorf(tr("command failed: %s"), msg.Message)
 	}
-	mon.statusMutex.Lock()
-	defer mon.statusMutex.Unlock()
-	mon.state = Dead
+	mon.killProcess()
 	return nil
 }
