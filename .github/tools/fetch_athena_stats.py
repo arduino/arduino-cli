@@ -18,7 +18,6 @@ def execute(client, statement, dest_s3_output_location):
     result = client.start_query_execution(
         QueryString=statement,
         ClientRequestToken=str(uuid.uuid4()),
-        QueryExecutionContext={"Database": "etl_kpi_prod_hwfw"},
         ResultConfiguration={
             "OutputLocation": dest_s3_output_location,
         },
@@ -112,6 +111,9 @@ if __name__ == "__main__":
 
     session = boto3.session.Session(region_name="us-east-1")
     athena_client = session.client("athena")
+
+    # Load all partitions before querying downloads
+    execute(athena_client, f"MSCK REPAIR TABLE {AWS_ATHENA_SOURCE_TABLE};", DEST_S3_OUTPUT)
 
     query = f"""SELECT replace(json_extract_scalar(url_decode(url_decode(querystring)),
 '$.data.url'), 'https://downloads.arduino.cc/arduino-cli/arduino-cli_', '')
