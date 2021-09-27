@@ -18,6 +18,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+
       - name: Fetch downloads count form Arduino CDN using AWS Athena
         id: fetch
         env:
@@ -27,11 +31,8 @@ jobs:
           AWS_ATHENA_OUTPUT_LOCATION: ${{ secrets.STATS_AWS_ATHENA_OUTPUT_LOCATION }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
-          # Fetch jq 1.6 as VM has only 1.5 ATM
-          wget -q https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O jq
-          chmod +x jq
-          PATH="${{ github.workspace }}:$PATH"
-          .github/tools/fetch_athena_stats.sh
+          pip install boto3 semver
+          python .github/tools/fetch_athena_stats.py
 
       - name: Send metrics
         uses: masci/datadog@v1
