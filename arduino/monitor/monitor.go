@@ -24,10 +24,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -45,6 +45,7 @@ const (
 // PluggableMonitor is a tool that communicates with a board through a communication port.
 type PluggableMonitor struct {
 	id                   string
+	processArgs          []string
 	process              *executils.Process
 	outgoingCommandsPipe io.Writer
 	incomingMessagesChan <-chan *monitorMessage
@@ -96,29 +97,12 @@ func (msg monitorMessage) String() string {
 var tr = i18n.Tr
 
 // New create and connect to the given pluggable monitor
-func New(id string, args ...string) (*PluggableMonitor, error) {
-	proc, err := executils.NewProcess(args...)
-	if err != nil {
-		return nil, err
+func New(id string, args ...string) *PluggableMonitor {
+	return &PluggableMonitor{
+		id:          id,
+		processArgs: args,
+		state:       Dead,
 	}
-	stdout, err := proc.StdoutPipe()
-	if err != nil {
-		return nil, err
-	}
-	stdin, err := proc.StdinPipe()
-	if err != nil {
-		return nil, err
-	}
-	messageChan := make(chan *monitorMessage)
-	disc := &PluggableMonitor{
-		id:                   id,
-		process:              proc,
-		incomingMessagesChan: messageChan,
-		outgoingCommandsPipe: stdin,
-		state:                Dead,
-	}
-	go disc.jsonDecodeLoop(stdout, messageChan)
-	return disc, nil
 }
 
 // GetID returns the identifier for this monitor
@@ -195,6 +179,25 @@ func (mon *PluggableMonitor) sendCommand(command string) error {
 
 func (mon *PluggableMonitor) runProcess() error {
 	logrus.Infof("starting monitor %s process", mon.id)
+	proc, err := executils.NewProcess(mon.processArgs...)
+	if err != nil {
+		return err
+	}
+	stdout, err := proc.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	stdin, err := proc.StdinPipe()
+	if err != nil {
+		return err
+	}
+	mon.outgoingCommandsPipe = stdin
+	mon.process = proc
+
+	messageChan := make(chan *monitorMessage)
+	mon.incomingMessagesChan = messageChan
+	go mon.jsonDecodeLoop(stdout, messageChan)
+
 	if err := mon.process.Start(); err != nil {
 		return err
 	}
@@ -208,6 +211,9 @@ func (mon *PluggableMonitor) runProcess() error {
 func (mon *PluggableMonitor) killProcess() error {
 	logrus.Infof("killing monitor %s process", mon.id)
 	if err := mon.process.Kill(); err != nil {
+		return err
+	}
+	if err := mon.process.Wait(); err != nil {
 		return err
 	}
 	mon.statusMutex.Lock()
@@ -284,14 +290,14 @@ func (mon *PluggableMonitor) Configure(param, value string) error {
 	} else if msg.EventType != "configure" {
 		return errors.Errorf(tr("communication out of sync, expected 'configure', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
-		return errors.Errorf(tr("command failed: %s"), msg.Message)
+		return errors.Errorf(tr("configure failed: %s"), msg.Message)
 	} else {
 		return nil
 	}
 }
 
 // Open connects to the given Port. A communication channel is opened
-func (mon *PluggableMonitor) Open(port *discovery.Port) (io.ReadWriter, error) {
+func (mon *PluggableMonitor) Open(port *rpc.Port) (io.ReadWriter, error) {
 	mon.statusMutex.Lock()
 	defer mon.statusMutex.Unlock()
 
@@ -320,7 +326,7 @@ func (mon *PluggableMonitor) Open(port *discovery.Port) (io.ReadWriter, error) {
 	} else if msg.EventType != "open" {
 		return nil, errors.Errorf(tr("communication out of sync, expected 'open', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
-		return nil, errors.Errorf(tr("command failed: %s"), msg.Message)
+		return nil, errors.Errorf(tr("open failed: %s"), msg.Message)
 	}
 
 	conn, err := tcpListener.Accept()
@@ -353,4 +359,20 @@ func (mon *PluggableMonitor) Close() error {
 		mon.state = Idle
 		return nil
 	}
+}
+
+// Quit terminates the monitor. No more commands can be accepted by the monitor.
+func (mon *PluggableMonitor) Quit() error {
+	if err := mon.sendCommand("QUIT\n"); err != nil {
+		return err
+	}
+	if msg, err := mon.waitMessage(time.Second * 10); err != nil {
+		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "QUIT", err)
+	} else if msg.EventType != "quit" {
+		return errors.Errorf(tr("communication out of sync, expected 'quit', received '%s'"), msg.EventType)
+	} else if msg.Message != "OK" || msg.Error {
+		return errors.Errorf(tr("command failed: %s"), msg.Message)
+	}
+	mon.killProcess()
+	return nil
 }
