@@ -83,11 +83,11 @@ msgstr "(hidden)"
 msgid "(legacy)"
 msgstr "(legacy)"
 
-#: cli/lib/install.go:71
+#: cli/lib/install.go:73
 msgid "--git-url and --zip-path are disabled by default, for more information see: %v"
 msgstr "--git-url and --zip-path are disabled by default, for more information see: %v"
 
-#: cli/lib/install.go:74
+#: cli/lib/install.go:76
 msgid "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk."
 msgstr "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk."
 
@@ -186,7 +186,7 @@ msgid "Arduino core operations."
 msgstr "Arduino core operations."
 
 #: cli/lib/check_deps.go:50
-#: cli/lib/install.go:117
+#: cli/lib/install.go:119
 msgid "Arguments error: %v"
 msgstr "Arguments error: %v"
 
@@ -453,7 +453,7 @@ msgid "Couldn't determine program size"
 msgstr "Couldn't determine program size"
 
 #: cli/arguments/sketch.go:36
-#: cli/lib/install.go:97
+#: cli/lib/install.go:99
 msgid "Couldn't get current working directory: %v"
 msgstr "Couldn't get current working directory: %v"
 
@@ -553,7 +553,7 @@ msgstr "Disconnected"
 msgid "Display only the provided gRPC calls"
 msgstr "Display only the provided gRPC calls"
 
-#: cli/lib/install.go:49
+#: cli/lib/install.go:50
 msgid "Do not install dependencies."
 msgstr "Do not install dependencies."
 
@@ -594,11 +594,11 @@ msgstr "Downloads one or more libraries without installing them."
 msgid "Enable debug logging of gRPC calls"
 msgstr "Enable debug logging of gRPC calls"
 
-#: cli/lib/install.go:51
+#: cli/lib/install.go:52
 msgid "Enter a path to zip file"
 msgstr "Enter a path to zip file"
 
-#: cli/lib/install.go:50
+#: cli/lib/install.go:51
 msgid "Enter git url for libraries hosted on repositories"
 msgstr "Enter git url for libraries hosted on repositories"
 
@@ -789,15 +789,15 @@ msgstr "Error in FQBN: %s"
 msgid "Error initializing instance: %v"
 msgstr "Error initializing instance: %v"
 
-#: cli/lib/install.go:130
+#: cli/lib/install.go:132
 msgid "Error installing %s: %v"
 msgstr "Error installing %s: %v"
 
-#: cli/lib/install.go:108
+#: cli/lib/install.go:110
 msgid "Error installing Git Library: %v"
 msgstr "Error installing Git Library: %v"
 
-#: cli/lib/install.go:85
+#: cli/lib/install.go:87
 msgid "Error installing Zip Library: %v"
 msgstr "Error installing Zip Library: %v"
 
@@ -1183,8 +1183,8 @@ msgstr "Installing platform %s"
 msgid "Installs one or more cores and corresponding tool dependencies."
 msgstr "Installs one or more cores and corresponding tool dependencies."
 
-#: cli/lib/install.go:39
 #: cli/lib/install.go:40
+#: cli/lib/install.go:41
 msgid "Installs one or more specified libraries into the system."
 msgstr "Installs one or more specified libraries into the system."
 
@@ -1295,7 +1295,7 @@ msgid "LIBNAME"
 msgstr "LIBNAME"
 
 #: cli/lib/check_deps.go:34
-#: cli/lib/install.go:38
+#: cli/lib/install.go:39
 msgid "LIBRARY"
 msgstr "LIBRARY"
 
@@ -2285,7 +2285,7 @@ msgid "VERSION"
 msgstr "VERSION"
 
 #: cli/lib/check_deps.go:34
-#: cli/lib/install.go:38
+#: cli/lib/install.go:39
 msgid "VERSION_NUMBER"
 msgstr "VERSION_NUMBER"
 
@@ -2650,12 +2650,12 @@ msgstr "for a specific version."
 
 #: cli/lib/check_deps.go:38
 #: cli/lib/download.go:38
-#: cli/lib/install.go:42
+#: cli/lib/install.go:43
 msgid "for the latest version."
 msgstr "for the latest version."
 
 #: cli/lib/check_deps.go:39
-#: cli/lib/install.go:43
+#: cli/lib/install.go:44
 msgid "for the specific version."
 msgstr "for the specific version."
 

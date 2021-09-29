@@ -31,6 +31,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/spf13/cobra"
+	semver "go.bug.st/relaxed-semver"
 )
 
 func initInstallCommand() *cobra.Command {
@@ -64,7 +65,8 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	if installFlags.zipPath || installFlags.gitURL {
 		if !configuration.Settings.GetBool("library.enable_unsafe_install") {
 			documentationURL := "https://arduino.github.io/arduino-cli/latest/configuration/#configuration-keys"
-			if !strings.Contains(globals.VersionInfo.VersionString, "git") {
+			_, err := semver.Parse(globals.VersionInfo.VersionString)
+			if err == nil {
 				split := strings.Split(globals.VersionInfo.VersionString, ".")
 				documentationURL = fmt.Sprintf("https://arduino.github.io/arduino-cli/%s.%s/configuration/#configuration-keys", split[0], split[1])
 			}
