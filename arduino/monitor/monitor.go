@@ -27,7 +27,6 @@ import (
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -136,17 +135,28 @@ func (mon *PluggableMonitor) jsonDecodeLoop(in io.Reader, outChan chan<- *monito
 	}
 }
 
-func (mon *PluggableMonitor) waitMessage(timeout time.Duration) (*monitorMessage, error) {
+func (mon *PluggableMonitor) waitMessage(timeout time.Duration, expectedEvt string) (*monitorMessage, error) {
+	var msg *monitorMessage
 	select {
-	case msg := <-mon.incomingMessagesChan:
+	case msg = <-mon.incomingMessagesChan:
 		if msg == nil {
 			// channel has been closed
 			return nil, mon.incomingMessagesError
 		}
-		return msg, nil
 	case <-time.After(timeout):
-		return nil, fmt.Errorf(tr("timeout waiting for message from monitor %s"), mon.id)
+		return nil, fmt.Errorf(tr("timeout waiting for message"))
 	}
+	if expectedEvt == "" {
+		// No message processing required for this call
+		return msg, nil
+	}
+	if msg.EventType != expectedEvt {
+		return msg, fmt.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), expectedEvt, msg.EventType)
+	}
+	if msg.Message != "OK" || msg.Error {
+		return msg, fmt.Errorf(tr("command '%[1]s' failed: %[1]s"), expectedEvt, msg.Message)
+	}
+	return msg, nil
 }
 
 func (mon *PluggableMonitor) sendCommand(command string) error {
@@ -230,14 +240,10 @@ func (mon *PluggableMonitor) Run() (err error) {
 	if err = mon.sendCommand("HELLO 1 \"arduino-cli " + globals.VersionInfo.VersionString + "\"\n"); err != nil {
 		return err
 	}
-	if msg, err := mon.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "HELLO", err)
-	} else if msg.EventType != "hello" {
-		return errors.Errorf(tr("communication out of sync, expected 'hello', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
-		return errors.Errorf(tr("command failed: %s"), msg.Message)
+	if msg, err := mon.waitMessage(time.Second*10, "hello"); err != nil {
+		return err
 	} else if msg.ProtocolVersion > 1 {
-		return errors.Errorf(tr("protocol version not supported: requested 1, got %d"), msg.ProtocolVersion)
+		return fmt.Errorf(tr("protocol version not supported: requested %[1]d, got %[2]d"), 1, msg.ProtocolVersion)
 	}
 	return nil
 }
@@ -247,12 +253,8 @@ func (mon *PluggableMonitor) Describe() (*PortDescriptor, error) {
 	if err := mon.sendCommand("DESCRIBE\n"); err != nil {
 		return nil, err
 	}
-	if msg, err := mon.waitMessage(time.Second * 10); err != nil {
-		return nil, fmt.Errorf("calling %s: %w", "", err)
-	} else if msg.EventType != "describe" {
-		return nil, errors.Errorf(tr("communication out of sync, expected 'describe', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
-		return nil, errors.Errorf(tr("command failed: %s"), msg.Message)
+	if msg, err := mon.waitMessage(time.Second*10, "describe"); err != nil {
+		return nil, err
 	} else {
 		mon.supportedProtocol = msg.PortDescription.Protocol
 		return msg.PortDescription, nil
@@ -264,15 +266,8 @@ func (mon *PluggableMonitor) Configure(param, value string) error {
 	if err := mon.sendCommand(fmt.Sprintf("CONFIGURE %s %s\n", param, value)); err != nil {
 		return err
 	}
-	if msg, err := mon.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf("calling %s: %w", "", err)
-	} else if msg.EventType != "configure" {
-		return errors.Errorf(tr("communication out of sync, expected 'configure', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
-		return errors.Errorf(tr("configure failed: %s"), msg.Message)
-	} else {
-		return nil
-	}
+	_, err := mon.waitMessage(time.Second*10, "configure")
+	return err
 }
 
 // Open connects to the given Port. A communication channel is opened
@@ -291,12 +286,8 @@ func (mon *PluggableMonitor) Open(port *rpc.Port) (io.ReadWriter, error) {
 	if err := mon.sendCommand(fmt.Sprintf("OPEN 127.0.0.1:%d %s\n", tcpListenerPort, port.Address)); err != nil {
 		return nil, err
 	}
-	if msg, err := mon.waitMessage(time.Second * 10); err != nil {
-		return nil, fmt.Errorf("calling %s: %w", "", err)
-	} else if msg.EventType != "open" {
-		return nil, errors.Errorf(tr("communication out of sync, expected 'open', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
-		return nil, errors.Errorf(tr("open failed: %s"), msg.Message)
+	if _, err := mon.waitMessage(time.Second*10, "open"); err != nil {
+		return nil, err
 	}
 
 	conn, err := tcpListener.Accept()
@@ -311,14 +302,8 @@ func (mon *PluggableMonitor) Close() error {
 	if err := mon.sendCommand("CLOSE\n"); err != nil {
 		return err
 	}
-	if msg, err := mon.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf("calling %s: %w", "", err)
-	} else if msg.EventType != "close" {
-		return errors.Errorf(tr("communication out of sync, expected 'close', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
-		return fmt.Errorf(tr("command failed: %s"), msg.Message)
-	}
-	return nil
+	_, err := mon.waitMessage(time.Second*10, "close")
+	return err
 }
 
 // Quit terminates the monitor. No more commands can be accepted by the monitor.
@@ -326,13 +311,9 @@ func (mon *PluggableMonitor) Quit() error {
 	if err := mon.sendCommand("QUIT\n"); err != nil {
 		return err
 	}
-	if msg, err := mon.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "QUIT", err)
-	} else if msg.EventType != "quit" {
-		return errors.Errorf(tr("communication out of sync, expected 'quit', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
-		return errors.Errorf(tr("command failed: %s"), msg.Message)
+	if _, err := mon.waitMessage(time.Second*10, "quit"); err != nil {
+		return err
 	}
-	mon.killProcess()
+	_ = mon.killProcess()
 	return nil
 }
