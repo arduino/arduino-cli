@@ -49,6 +49,7 @@ type PluggableMonitor struct {
 	outgoingCommandsPipe io.Writer
 	incomingMessagesChan <-chan *monitorMessage
 	supportedProtocol    string
+	log                  *logrus.Entry
 
 	// All the following fields are guarded by statusMutex
 	incomingMessagesError error
@@ -98,6 +99,7 @@ func New(id string, args ...string) *PluggableMonitor {
 	return &PluggableMonitor{
 		id:          id,
 		processArgs: args,
+		log:         logrus.WithField("monitor", id),
 	}
 }
 
@@ -118,12 +120,16 @@ func (mon *PluggableMonitor) jsonDecodeLoop(in io.Reader, outChan chan<- *monito
 		if err := decoder.Decode(&msg); err != nil {
 			mon.incomingMessagesError = err
 			close(outChan)
-			logrus.Errorf("stopped monitor %s decode loop", mon.id)
+			mon.log.Errorf("stopped decode loop")
 			return
 		}
-		logrus.Infof("from monitor %s received message %s", mon.id, msg)
+		mon.log.
+			WithField("event_type", msg.EventType).
+			WithField("message", msg.Message).
+			WithField("error", msg.Error).
+			Infof("received message")
 		if msg.EventType == "port_closed" {
-			// port has been closed externally...
+			mon.log.Infof("monitor port has been closed externally")
 		} else {
 			outChan <- &msg
 		}
@@ -144,7 +150,7 @@ func (mon *PluggableMonitor) waitMessage(timeout time.Duration) (*monitorMessage
 }
 
 func (mon *PluggableMonitor) sendCommand(command string) error {
-	logrus.Infof("sending command %s to monitor %s", strings.TrimSpace(command), mon)
+	mon.log.WithField("command", strings.TrimSpace(command)).Infof("sending command")
 	data := []byte(command)
 	for {
 		n, err := mon.outgoingCommandsPipe.Write(data)
@@ -159,7 +165,7 @@ func (mon *PluggableMonitor) sendCommand(command string) error {
 }
 
 func (mon *PluggableMonitor) runProcess() error {
-	logrus.Infof("starting monitor %s process", mon.id)
+	mon.log.Infof("Starting monitor process")
 	proc, err := executils.NewProcess(mon.processArgs...)
 	if err != nil {
 		return err
@@ -183,19 +189,19 @@ func (mon *PluggableMonitor) runProcess() error {
 	mon.incomingMessagesChan = messageChan
 	go mon.jsonDecodeLoop(stdout, messageChan)
 
-	logrus.Infof("started monitor %s process", mon.id)
+	mon.log.Infof("Monitor process started successfully!")
 	return nil
 }
 
 func (mon *PluggableMonitor) killProcess() error {
-	logrus.Infof("killing monitor %s process", mon.id)
+	mon.log.Infof("Killing monitor process")
 	if err := mon.process.Kill(); err != nil {
 		return err
 	}
 	if err := mon.process.Wait(); err != nil {
 		return err
 	}
-	logrus.Infof("killed monitor %s process", mon.id)
+	mon.log.Infof("Monitor process killed successfully!")
 	return nil
 }
 
@@ -217,7 +223,7 @@ func (mon *PluggableMonitor) Run() (err error) {
 		if killErr := mon.killProcess(); killErr != nil {
 			// Log failure to kill the process, ideally that should never happen
 			// but it's best to know it if it does
-			logrus.Errorf("Killing monitor %s after unsuccessful start: %s", mon.id, killErr)
+			mon.log.Errorf("Killing monitor after unsuccessful start: %s", killErr)
 		}
 	}()
 
