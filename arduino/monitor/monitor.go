@@ -21,7 +21,6 @@ import (
 	"io"
 	"net"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/arduino/arduino-cli/cli/globals"
@@ -52,9 +51,7 @@ type PluggableMonitor struct {
 	supportedProtocol    string
 
 	// All the following fields are guarded by statusMutex
-	statusMutex           sync.Mutex
 	incomingMessagesError error
-	state                 int
 }
 
 type monitorMessage struct {
@@ -101,7 +98,6 @@ func New(id string, args ...string) *PluggableMonitor {
 	return &PluggableMonitor{
 		id:          id,
 		processArgs: args,
-		state:       Dead,
 	}
 }
 
@@ -116,37 +112,22 @@ func (mon *PluggableMonitor) String() string {
 
 func (mon *PluggableMonitor) jsonDecodeLoop(in io.Reader, outChan chan<- *monitorMessage) {
 	decoder := json.NewDecoder(in)
-	closeAndReportError := func(err error) {
-		mon.statusMutex.Lock()
-		mon.state = Dead
-		mon.incomingMessagesError = err
-		close(outChan)
-		mon.statusMutex.Unlock()
-		logrus.Errorf("stopped monitor %s decode loop", mon.id)
-	}
 
 	for {
 		var msg monitorMessage
 		if err := decoder.Decode(&msg); err != nil {
-			closeAndReportError(err)
+			mon.incomingMessagesError = err
+			close(outChan)
+			logrus.Errorf("stopped monitor %s decode loop", mon.id)
 			return
 		}
 		logrus.Infof("from monitor %s received message %s", mon.id, msg)
 		if msg.EventType == "port_closed" {
-			mon.statusMutex.Lock()
-			mon.state = Idle
-			mon.statusMutex.Unlock()
+			// port has been closed externally...
 		} else {
 			outChan <- &msg
 		}
 	}
-}
-
-// State returns the current state of this PluggableMonitor
-func (mon *PluggableMonitor) State() int {
-	mon.statusMutex.Lock()
-	defer mon.statusMutex.Unlock()
-	return mon.state
 }
 
 func (mon *PluggableMonitor) waitMessage(timeout time.Duration) (*monitorMessage, error) {
@@ -194,16 +175,14 @@ func (mon *PluggableMonitor) runProcess() error {
 	mon.outgoingCommandsPipe = stdin
 	mon.process = proc
 
+	if err := mon.process.Start(); err != nil {
+		return err
+	}
+
 	messageChan := make(chan *monitorMessage)
 	mon.incomingMessagesChan = messageChan
 	go mon.jsonDecodeLoop(stdout, messageChan)
 
-	if err := mon.process.Start(); err != nil {
-		return err
-	}
-	mon.statusMutex.Lock()
-	defer mon.statusMutex.Unlock()
-	mon.state = Alive
 	logrus.Infof("started monitor %s process", mon.id)
 	return nil
 }
@@ -216,9 +195,6 @@ func (mon *PluggableMonitor) killProcess() error {
 	if err := mon.process.Wait(); err != nil {
 		return err
 	}
-	mon.statusMutex.Lock()
-	defer mon.statusMutex.Unlock()
-	mon.state = Dead
 	logrus.Infof("killed monitor %s process", mon.id)
 	return nil
 }
@@ -257,9 +233,6 @@ func (mon *PluggableMonitor) Run() (err error) {
 	} else if msg.ProtocolVersion > 1 {
 		return errors.Errorf(tr("protocol version not supported: requested 1, got %d"), msg.ProtocolVersion)
 	}
-	mon.statusMutex.Lock()
-	defer mon.statusMutex.Unlock()
-	mon.state = Idle
 	return nil
 }
 
@@ -298,15 +271,6 @@ func (mon *PluggableMonitor) Configure(param, value string) error {
 
 // Open connects to the given Port. A communication channel is opened
 func (mon *PluggableMonitor) Open(port *rpc.Port) (io.ReadWriter, error) {
-	mon.statusMutex.Lock()
-	defer mon.statusMutex.Unlock()
-
-	if mon.state == Opened {
-		return nil, fmt.Errorf("a port is already opened")
-	}
-	if mon.state != Idle {
-		return nil, fmt.Errorf("the monitor is not started")
-	}
 	if port.Protocol != mon.supportedProtocol {
 		return nil, fmt.Errorf("invalid monitor protocol '%s': only '%s' is accepted", port.Protocol, mon.supportedProtocol)
 	}
@@ -333,19 +297,11 @@ func (mon *PluggableMonitor) Open(port *rpc.Port) (io.ReadWriter, error) {
 	if err != nil {
 		return nil, err // TODO
 	}
-
-	mon.state = Opened
 	return conn, nil
 }
 
 // Close the communication port with the board.
 func (mon *PluggableMonitor) Close() error {
-	mon.statusMutex.Lock()
-	defer mon.statusMutex.Unlock()
-
-	if mon.state != Opened {
-		return fmt.Errorf("monitor port already closed")
-	}
 	if err := mon.sendCommand("CLOSE\n"); err != nil {
 		return err
 	}
@@ -354,11 +310,9 @@ func (mon *PluggableMonitor) Close() error {
 	} else if msg.EventType != "close" {
 		return errors.Errorf(tr("communication out of sync, expected 'close', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
-		return errors.Errorf(tr("command failed: %s"), msg.Message)
-	} else {
-		mon.state = Idle
-		return nil
+		return fmt.Errorf(tr("command failed: %s"), msg.Message)
 	}
+	return nil
 }
 
 // Quit terminates the monitor. No more commands can be accepted by the monitor.
