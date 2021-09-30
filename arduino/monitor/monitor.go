@@ -253,12 +253,12 @@ func (mon *PluggableMonitor) Describe() (*PortDescriptor, error) {
 	if err := mon.sendCommand("DESCRIBE\n"); err != nil {
 		return nil, err
 	}
-	if msg, err := mon.waitMessage(time.Second*10, "describe"); err != nil {
+	msg, err := mon.waitMessage(time.Second*10, "describe")
+	if err != nil {
 		return nil, err
-	} else {
-		mon.supportedProtocol = msg.PortDescription.Protocol
-		return msg.PortDescription, nil
 	}
+	mon.supportedProtocol = msg.PortDescription.Protocol
+	return msg.PortDescription, nil
 }
 
 // Configure sets a port configuration parameter.
