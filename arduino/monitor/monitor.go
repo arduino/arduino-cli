@@ -21,14 +21,12 @@ import (
 	"io"
 	"net"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -50,11 +48,10 @@ type PluggableMonitor struct {
 	outgoingCommandsPipe io.Writer
 	incomingMessagesChan <-chan *monitorMessage
 	supportedProtocol    string
+	log                  *logrus.Entry
 
 	// All the following fields are guarded by statusMutex
-	statusMutex           sync.Mutex
 	incomingMessagesError error
-	state                 int
 }
 
 type monitorMessage struct {
@@ -101,7 +98,7 @@ func New(id string, args ...string) *PluggableMonitor {
 	return &PluggableMonitor{
 		id:          id,
 		processArgs: args,
-		state:       Dead,
+		log:         logrus.WithField("monitor", id),
 	}
 }
 
@@ -116,54 +113,54 @@ func (mon *PluggableMonitor) String() string {
 
 func (mon *PluggableMonitor) jsonDecodeLoop(in io.Reader, outChan chan<- *monitorMessage) {
 	decoder := json.NewDecoder(in)
-	closeAndReportError := func(err error) {
-		mon.statusMutex.Lock()
-		mon.state = Dead
-		mon.incomingMessagesError = err
-		close(outChan)
-		mon.statusMutex.Unlock()
-		logrus.Errorf("stopped monitor %s decode loop", mon.id)
-	}
 
 	for {
 		var msg monitorMessage
 		if err := decoder.Decode(&msg); err != nil {
-			closeAndReportError(err)
+			mon.incomingMessagesError = err
+			close(outChan)
+			mon.log.Errorf("stopped decode loop")
 			return
 		}
-		logrus.Infof("from monitor %s received message %s", mon.id, msg)
+		mon.log.
+			WithField("event_type", msg.EventType).
+			WithField("message", msg.Message).
+			WithField("error", msg.Error).
+			Infof("received message")
 		if msg.EventType == "port_closed" {
-			mon.statusMutex.Lock()
-			mon.state = Idle
-			mon.statusMutex.Unlock()
+			mon.log.Infof("monitor port has been closed externally")
 		} else {
 			outChan <- &msg
 		}
 	}
 }
 
-// State returns the current state of this PluggableMonitor
-func (mon *PluggableMonitor) State() int {
-	mon.statusMutex.Lock()
-	defer mon.statusMutex.Unlock()
-	return mon.state
-}
-
-func (mon *PluggableMonitor) waitMessage(timeout time.Duration) (*monitorMessage, error) {
+func (mon *PluggableMonitor) waitMessage(timeout time.Duration, expectedEvt string) (*monitorMessage, error) {
+	var msg *monitorMessage
 	select {
-	case msg := <-mon.incomingMessagesChan:
+	case msg = <-mon.incomingMessagesChan:
 		if msg == nil {
 			// channel has been closed
 			return nil, mon.incomingMessagesError
 		}
-		return msg, nil
 	case <-time.After(timeout):
-		return nil, fmt.Errorf(tr("timeout waiting for message from monitor %s"), mon.id)
+		return nil, fmt.Errorf(tr("timeout waiting for message"))
 	}
+	if expectedEvt == "" {
+		// No message processing required for this call
+		return msg, nil
+	}
+	if msg.EventType != expectedEvt {
+		return msg, fmt.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), expectedEvt, msg.EventType)
+	}
+	if msg.Message != "OK" || msg.Error {
+		return msg, fmt.Errorf(tr("command '%[1]s' failed: %[2]s"), expectedEvt, msg.Message)
+	}
+	return msg, nil
 }
 
 func (mon *PluggableMonitor) sendCommand(command string) error {
-	logrus.Infof("sending command %s to monitor %s", strings.TrimSpace(command), mon)
+	mon.log.WithField("command", strings.TrimSpace(command)).Infof("sending command")
 	data := []byte(command)
 	for {
 		n, err := mon.outgoingCommandsPipe.Write(data)
@@ -178,7 +175,7 @@ func (mon *PluggableMonitor) sendCommand(command string) error {
 }
 
 func (mon *PluggableMonitor) runProcess() error {
-	logrus.Infof("starting monitor %s process", mon.id)
+	mon.log.Infof("Starting monitor process")
 	proc, err := executils.NewProcess(mon.processArgs...)
 	if err != nil {
 		return err
@@ -194,32 +191,27 @@ func (mon *PluggableMonitor) runProcess() error {
 	mon.outgoingCommandsPipe = stdin
 	mon.process = proc
 
+	if err := mon.process.Start(); err != nil {
+		return err
+	}
+
 	messageChan := make(chan *monitorMessage)
 	mon.incomingMessagesChan = messageChan
 	go mon.jsonDecodeLoop(stdout, messageChan)
 
-	if err := mon.process.Start(); err != nil {
-		return err
-	}
-	mon.statusMutex.Lock()
-	defer mon.statusMutex.Unlock()
-	mon.state = Alive
-	logrus.Infof("started monitor %s process", mon.id)
+	mon.log.Infof("Monitor process started successfully!")
 	return nil
 }
 
 func (mon *PluggableMonitor) killProcess() error {
-	logrus.Infof("killing monitor %s process", mon.id)
+	mon.log.Infof("Killing monitor process")
 	if err := mon.process.Kill(); err != nil {
 		return err
 	}
 	if err := mon.process.Wait(); err != nil {
 		return err
 	}
-	mon.statusMutex.Lock()
-	defer mon.statusMutex.Unlock()
-	mon.state = Dead
-	logrus.Infof("killed monitor %s process", mon.id)
+	mon.log.Infof("Monitor process killed successfully!")
 	return nil
 }
 
@@ -241,25 +233,18 @@ func (mon *PluggableMonitor) Run() (err error) {
 		if killErr := mon.killProcess(); killErr != nil {
 			// Log failure to kill the process, ideally that should never happen
 			// but it's best to know it if it does
-			logrus.Errorf("Killing monitor %s after unsuccessful start: %s", mon.id, killErr)
+			mon.log.Errorf("Killing monitor after unsuccessful start: %s", killErr)
 		}
 	}()
 
 	if err = mon.sendCommand("HELLO 1 \"arduino-cli " + globals.VersionInfo.VersionString + "\"\n"); err != nil {
 		return err
 	}
-	if msg, err := mon.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "HELLO", err)
-	} else if msg.EventType != "hello" {
-		return errors.Errorf(tr("communication out of sync, expected 'hello', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
-		return errors.Errorf(tr("command failed: %s"), msg.Message)
+	if msg, err := mon.waitMessage(time.Second*10, "hello"); err != nil {
+		return err
 	} else if msg.ProtocolVersion > 1 {
-		return errors.Errorf(tr("protocol version not supported: requested 1, got %d"), msg.ProtocolVersion)
+		return fmt.Errorf(tr("protocol version not supported: requested %[1]d, got %[2]d"), 1, msg.ProtocolVersion)
 	}
-	mon.statusMutex.Lock()
-	defer mon.statusMutex.Unlock()
-	mon.state = Idle
 	return nil
 }
 
@@ -268,16 +253,12 @@ func (mon *PluggableMonitor) Describe() (*PortDescriptor, error) {
 	if err := mon.sendCommand("DESCRIBE\n"); err != nil {
 		return nil, err
 	}
-	if msg, err := mon.waitMessage(time.Second * 10); err != nil {
-		return nil, fmt.Errorf("calling %s: %w", "", err)
-	} else if msg.EventType != "describe" {
-		return nil, errors.Errorf(tr("communication out of sync, expected 'describe', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
-		return nil, errors.Errorf(tr("command failed: %s"), msg.Message)
-	} else {
-		mon.supportedProtocol = msg.PortDescription.Protocol
-		return msg.PortDescription, nil
+	msg, err := mon.waitMessage(time.Second*10, "describe")
+	if err != nil {
+		return nil, err
 	}
+	mon.supportedProtocol = msg.PortDescription.Protocol
+	return msg.PortDescription, nil
 }
 
 // Configure sets a port configuration parameter.
@@ -285,28 +266,12 @@ func (mon *PluggableMonitor) Configure(param, value string) error {
 	if err := mon.sendCommand(fmt.Sprintf("CONFIGURE %s %s\n", param, value)); err != nil {
 		return err
 	}
-	if msg, err := mon.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf("calling %s: %w", "", err)
-	} else if msg.EventType != "configure" {
-		return errors.Errorf(tr("communication out of sync, expected 'configure', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
-		return errors.Errorf(tr("configure failed: %s"), msg.Message)
-	} else {
-		return nil
-	}
+	_, err := mon.waitMessage(time.Second*10, "configure")
+	return err
 }
 
 // Open connects to the given Port. A communication channel is opened
 func (mon *PluggableMonitor) Open(port *rpc.Port) (io.ReadWriter, error) {
-	mon.statusMutex.Lock()
-	defer mon.statusMutex.Unlock()
-
-	if mon.state == Opened {
-		return nil, fmt.Errorf("a port is already opened")
-	}
-	if mon.state != Idle {
-		return nil, fmt.Errorf("the monitor is not started")
-	}
 	if port.Protocol != mon.supportedProtocol {
 		return nil, fmt.Errorf("invalid monitor protocol '%s': only '%s' is accepted", port.Protocol, mon.supportedProtocol)
 	}
@@ -321,44 +286,24 @@ func (mon *PluggableMonitor) Open(port *rpc.Port) (io.ReadWriter, error) {
 	if err := mon.sendCommand(fmt.Sprintf("OPEN 127.0.0.1:%d %s\n", tcpListenerPort, port.Address)); err != nil {
 		return nil, err
 	}
-	if msg, err := mon.waitMessage(time.Second * 10); err != nil {
-		return nil, fmt.Errorf("calling %s: %w", "", err)
-	} else if msg.EventType != "open" {
-		return nil, errors.Errorf(tr("communication out of sync, expected 'open', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
-		return nil, errors.Errorf(tr("open failed: %s"), msg.Message)
+	if _, err := mon.waitMessage(time.Second*10, "open"); err != nil {
+		return nil, err
 	}
 
 	conn, err := tcpListener.Accept()
 	if err != nil {
 		return nil, err // TODO
 	}
-
-	mon.state = Opened
 	return conn, nil
 }
 
 // Close the communication port with the board.
 func (mon *PluggableMonitor) Close() error {
-	mon.statusMutex.Lock()
-	defer mon.statusMutex.Unlock()
-
-	if mon.state != Opened {
-		return fmt.Errorf("monitor port already closed")
-	}
 	if err := mon.sendCommand("CLOSE\n"); err != nil {
 		return err
 	}
-	if msg, err := mon.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf("calling %s: %w", "", err)
-	} else if msg.EventType != "close" {
-		return errors.Errorf(tr("communication out of sync, expected 'close', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
-		return errors.Errorf(tr("command failed: %s"), msg.Message)
-	} else {
-		mon.state = Idle
-		return nil
-	}
+	_, err := mon.waitMessage(time.Second*10, "close")
+	return err
 }
 
 // Quit terminates the monitor. No more commands can be accepted by the monitor.
@@ -366,13 +311,11 @@ func (mon *PluggableMonitor) Quit() error {
 	if err := mon.sendCommand("QUIT\n"); err != nil {
 		return err
 	}
-	if msg, err := mon.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "QUIT", err)
-	} else if msg.EventType != "quit" {
-		return errors.Errorf(tr("communication out of sync, expected 'quit', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
-		return errors.Errorf(tr("command failed: %s"), msg.Message)
+	if _, err := mon.waitMessage(time.Second*10, "quit"); err != nil {
+		return err
 	}
-	mon.killProcess()
+	if err := mon.killProcess(); err != nil {
+		mon.log.WithError(err).Info("error killing monitor process")
+	}
 	return nil
 }

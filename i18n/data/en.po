@@ -2394,8 +2394,6 @@ msgstr "boardname"
 #: arduino/discovery/discovery.go:375
 #: arduino/discovery/discovery.go:392
 #: arduino/discovery/discovery.go:415
-#: arduino/monitor/monitor.go:252
-#: arduino/monitor/monitor.go:370
 msgid "calling %[1]s: %[2]w"
 msgstr "calling %[1]s: %[2]w"
 
@@ -2442,33 +2440,24 @@ msgstr "cleaning build path"
 msgid "command"
 msgstr "command"
 
+#: arduino/monitor/monitor.go:157
+msgid "command '%[1]s' failed: %[2]s"
+msgstr "command '%[1]s' failed: %[2]s"
+
 #: arduino/discovery/discovery.go:315
 #: arduino/discovery/discovery.go:336
 #: arduino/discovery/discovery.go:356
 #: arduino/discovery/discovery.go:379
 #: arduino/discovery/discovery.go:396
 #: arduino/discovery/discovery.go:419
-#: arduino/monitor/monitor.go:256
-#: arduino/monitor/monitor.go:276
-#: arduino/monitor/monitor.go:357
-#: arduino/monitor/monitor.go:374
 msgid "command failed: %s"
 msgstr "command failed: %s"
 
-#: arduino/monitor/monitor.go:355
-msgid "communication out of sync, expected 'close', received '%s'"
-msgstr "communication out of sync, expected 'close', received '%s'"
-
-#: arduino/monitor/monitor.go:291
-msgid "communication out of sync, expected 'configure', received '%s'"
-msgstr "communication out of sync, expected 'configure', received '%s'"
-
-#: arduino/monitor/monitor.go:274
-msgid "communication out of sync, expected 'describe', received '%s'"
-msgstr "communication out of sync, expected 'describe', received '%s'"
+#: arduino/monitor/monitor.go:154
+msgid "communication out of sync, expected '%[1]s', received '%[2]s'"
+msgstr "communication out of sync, expected '%[1]s', received '%[2]s'"
 
 #: arduino/discovery/discovery.go:313
-#: arduino/monitor/monitor.go:254
 msgid "communication out of sync, expected 'hello', received '%s'"
 msgstr "communication out of sync, expected 'hello', received '%s'"
 
@@ -2476,12 +2465,7 @@ msgstr "communication out of sync, expected 'hello', received '%s'"
 msgid "communication out of sync, expected 'list', received '%s'"
 msgstr "communication out of sync, expected 'list', received '%s'"
 
-#: arduino/monitor/monitor.go:327
-msgid "communication out of sync, expected 'open', received '%s'"
-msgstr "communication out of sync, expected 'open', received '%s'"
-
 #: arduino/discovery/discovery.go:377
-#: arduino/monitor/monitor.go:372
 msgid "communication out of sync, expected 'quit', received '%s'"
 msgstr "communication out of sync, expected 'quit', received '%s'"
 
@@ -2500,10 +2484,6 @@ msgstr "communication out of sync, expected 'stop', received '%s'"
 #: arduino/resources/checksums.go:76
 msgid "computing hash: %s"
 msgstr "computing hash: %s"
-
-#: arduino/monitor/monitor.go:293
-msgid "configure failed: %s"
-msgstr "configure failed: %s"
 
 #: commands/upload/upload.go:611
 msgid "could not find a valid build artifact"
@@ -2967,10 +2947,6 @@ msgstr "no valid sketch found in %[1]s: missing %[2]s"
 msgid "no versions available for the current OS"
 msgstr "no versions available for the current OS"
 
-#: arduino/monitor/monitor.go:329
-msgid "open failed: %s"
-msgstr "open failed: %s"
-
 #: arduino/resources/checksums.go:72
 #: arduino/resources/install.go:59
 msgid "opening archive file: %s"
@@ -3059,8 +3035,11 @@ msgstr "port"
 msgid "port not found: %[1]s %[2]s"
 msgstr "port not found: %[1]s %[2]s"
 
+#: arduino/monitor/monitor.go:246
+msgid "protocol version not supported: requested %[1]d, got %[2]d"
+msgstr "protocol version not supported: requested %[1]d, got %[2]d"
+
 #: arduino/discovery/discovery.go:317
-#: arduino/monitor/monitor.go:258
 msgid "protocol version not supported: requested 1, got %d"
 msgstr "protocol version not supported: requested 1, got %d"
 
@@ -3246,13 +3225,13 @@ msgstr "the platform has no releases"
 msgid "the server responded with status %s"
 msgstr "the server responded with status %s"
 
+#: arduino/monitor/monitor.go:147
+msgid "timeout waiting for message"
+msgstr "timeout waiting for message"
+
 #: arduino/discovery/discovery.go:216
 msgid "timeout waiting for message from %s"
 msgstr "timeout waiting for message from %s"
-
-#: arduino/monitor/monitor.go:161
-msgid "timeout waiting for message from monitor %s"
-msgstr "timeout waiting for message from monitor %s"
 
 #: arduino/cores/packagemanager/install_uninstall.go:165
 msgid "tool %s is not managed by package manager"
