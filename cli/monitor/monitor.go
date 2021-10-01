@@ -29,6 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/monitor"
+	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
@@ -40,6 +41,7 @@ var tr = i18n.Tr
 
 var portArgs arguments.Port
 var describe bool
+var silent bool
 
 // NewCommand created a new `monitor` command
 func NewCommand() *cobra.Command {
@@ -54,12 +56,17 @@ func NewCommand() *cobra.Command {
 	}
 	portArgs.AddToCommand(cmd)
 	cmd.Flags().BoolVar(&describe, "describe", false, tr("Show all the settings of the communication port."))
+	cmd.Flags().BoolVarP(&silent, "silent", "s", false, tr("Run in silent mode, show only monitor input and output."))
 	cmd.MarkFlagRequired("port")
 	return cmd
 }
 
 func runMonitorCmd(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
+
+	if !configuration.HasConsole {
+		silent = true
+	}
 
 	port, err := portArgs.GetPort(instance, nil)
 	if err != nil {
@@ -126,7 +133,9 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 	state := 0
 	var setting *pluggableMonitor.PortParameterDescriptor
 	settingKey := ""
-	feedback.Print(tr("Connected to %s! Press CTRL-C to exit.", port.String()))
+	if !silent {
+		feedback.Print(tr("Connected to %s! Press CTRL-C to exit.", port.String()))
+	}
 
 	// TODO: This is a work in progress...
 	tty.AddEscapeCallback(func(r rune) bool {
