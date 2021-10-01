@@ -2441,8 +2441,8 @@ msgid "command"
 msgstr "command"
 
 #: arduino/monitor/monitor.go:157
-msgid "command '%[1]s' failed: %[1]s"
-msgstr "command '%[1]s' failed: %[1]s"
+msgid "command '%[1]s' failed: %[2]s"
+msgstr "command '%[1]s' failed: %[2]s"
 
 #: arduino/discovery/discovery.go:315
 #: arduino/discovery/discovery.go:336

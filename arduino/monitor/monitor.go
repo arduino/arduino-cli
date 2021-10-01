@@ -154,7 +154,7 @@ func (mon *PluggableMonitor) waitMessage(timeout time.Duration, expectedEvt stri
 		return msg, fmt.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), expectedEvt, msg.EventType)
 	}
 	if msg.Message != "OK" || msg.Error {
-		return msg, fmt.Errorf(tr("command '%[1]s' failed: %[1]s"), expectedEvt, msg.Message)
+		return msg, fmt.Errorf(tr("command '%[1]s' failed: %[2]s"), expectedEvt, msg.Message)
 	}
 	return msg, nil
 }
@@ -314,6 +314,8 @@ func (mon *PluggableMonitor) Quit() error {
 	if _, err := mon.waitMessage(time.Second*10, "quit"); err != nil {
 		return err
 	}
-	_ = mon.killProcess()
+	if err := mon.killProcess(); err != nil {
+		mon.log.WithError(err).Info("error killing monitor process")
+	}
 	return nil
 }
