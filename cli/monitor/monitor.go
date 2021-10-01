@@ -39,6 +39,7 @@ var tr = i18n.Tr
 
 var portArgs arguments.Port
 var describe bool
+var silent bool
 
 // NewCommand created a new `monitor` command
 func NewCommand() *cobra.Command {
@@ -53,12 +54,17 @@ func NewCommand() *cobra.Command {
 	}
 	portArgs.AddToCommand(cmd)
 	cmd.Flags().BoolVar(&describe, "describe", false, tr("Show all the settings of the communication port."))
+	cmd.Flags().BoolVarP(&silent, "silent", "s", false, tr("Run in silent mode, show only monitor input and output."))
 	cmd.MarkFlagRequired("port")
 	return cmd
 }
 
 func runMonitorCmd(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
+
+	if !configuration.HasConsole {
+		silent = true
+	}
 
 	port, err := portArgs.GetPort(instance, nil)
 	if err != nil {
@@ -114,7 +120,9 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 		cancel()
 	}()
 
-	feedback.Print(tr("Connected to %s! Press CTRL-C to exit.", port.String()))
+	if !silent {
+		feedback.Print(tr("Connected to %s! Press CTRL-C to exit.", port.String()))
+	}
 
 	// Wait for port closed
 	<-ctx.Done()
