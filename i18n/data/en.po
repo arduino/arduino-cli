@@ -2923,7 +2923,7 @@ msgstr "no compatible version of %s tools found for the current os"
 msgid "no executable specified"
 msgstr "no executable specified"
 
-#: commands/daemon/daemon.go:96
+#: commands/daemon/daemon.go:98
 msgid "no instance specified"
 msgstr "no instance specified"
 
