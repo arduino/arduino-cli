@@ -182,6 +182,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	ctagsTool := getBuiltinCtagsTool(instance.PackageManager)
 	serialDiscoveryTool := getBuiltinSerialDiscoveryTool(instance.PackageManager)
 	mdnsDiscoveryTool := getBuiltinMDNSDiscoveryTool(instance.PackageManager)
+	serialMonitorRool := getBuiltinSerialMonitorTool(instance.PackageManager)
 
 	// Load Platforms
 	urls := []string{globals.DefaultIndexURL}
@@ -265,7 +266,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		})
 	}
 
-	serialHasBeenInstalled, err := instance.installToolIfMissing(serialDiscoveryTool, downloadCallback, taskCallback)
+	serialDiscoveryHasBeenInstalled, err := instance.installToolIfMissing(serialDiscoveryTool, downloadCallback, taskCallback)
 	if err != nil {
 		s := status.Newf(codes.Internal, err.Error())
 		responseCallback(&rpc.InitResponse{
@@ -275,7 +276,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		})
 	}
 
-	mdnsHasBeenInstalled, err := instance.installToolIfMissing(mdnsDiscoveryTool, downloadCallback, taskCallback)
+	mdnsDiscoveryHasBeenInstalled, err := instance.installToolIfMissing(mdnsDiscoveryTool, downloadCallback, taskCallback)
 	if err != nil {
 		s := status.Newf(codes.Internal, err.Error())
 		responseCallback(&rpc.InitResponse{
@@ -285,7 +286,17 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		})
 	}
 
-	if ctagsHasBeenInstalled || serialHasBeenInstalled || mdnsHasBeenInstalled {
+	serialMonitorHasBeenInstalled, err := instance.installToolIfMissing(serialMonitorRool, downloadCallback, taskCallback)
+	if err != nil {
+		s := status.Newf(codes.Internal, err.Error())
+		responseCallback(&rpc.InitResponse{
+			Message: &rpc.InitResponse_Error{
+				Error: s.Proto(),
+			},
+		})
+	}
+
+	if ctagsHasBeenInstalled || serialDiscoveryHasBeenInstalled || mdnsDiscoveryHasBeenInstalled || serialMonitorHasBeenInstalled {
 		// We installed at least one new tool after loading hardware
 		// so we must reload again otherwise we would never found them.
 		for _, err := range instance.PackageManager.LoadHardware() {

@@ -44,6 +44,7 @@ func TestBundledToolsDownloadAvailability(t *testing.T) {
 	}
 
 	toTest := [][]*cores.Flavor{
+		serialMonitorFlavors,
 		ctagsFlavors,
 		serialDiscoveryFlavors,
 		mdnsDiscoveryFlavors,
