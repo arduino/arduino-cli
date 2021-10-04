@@ -1,0 +1,89 @@
+// This file is part of arduino-cli.
+//
+// Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+//
+// This software is released under the GNU General Public License version 3,
+// which covers the main part of arduino-cli.
+// The terms of this license can be found at:
+// https://www.gnu.org/licenses/gpl-3.0.en.html
+//
+// You can be released from the requirements of the above licenses by purchasing
+// a commercial license. Buying such a license is mandatory if you want to
+// modify or otherwise use the software for commercial activities involving the
+// Arduino software without disclosing the source code of your own applications.
+// To purchase a commercial license, send an email to license@arduino.cc.
+
+syntax = "proto3";
+
+package cc.arduino.cli.commands.v1;
+
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
+
+import "cc/arduino/cli/commands/v1/common.proto";
+import "cc/arduino/cli/commands/v1/port.proto";
+
+message MonitorRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Port to open, must be filled only on the first request
+  Port port = 2;
+  // The board FQBN we are trying to connect to. This is optional, and  it's
+  // needed to disambiguate if more than one platform provides the pluggable
+  // monitor for a given port protocol.
+  string fqbn = 3;
+  // Data to send to the port
+  bytes tx_data = 4;
+  // Port configuration, optional, contains settings of the port to be applied
+  MonitorPortConfiguration port_configuration = 5;
+}
+
+message MonitorPortConfiguration {
+  // The port configuration parameters to configure
+  repeated MonitorPortSetting settings = 1;
+}
+
+message MonitorResponse {
+  // Eventual errors dealing with monitor port
+  string error = 1;
+  // Data received from the port
+  bytes rx_data = 2;
+  // Settings applied to the port, may be returned after a port is opened (to
+  // report the default settings) or after a new port_configuration is sent
+  // (to report the new settings applied)
+  repeated MonitorPortSetting applied_settings = 3;
+}
+
+message MonitorPortSetting {
+  string setting_id = 1;
+  string value = 2;
+}
+
+message EnumerateMonitorPortSettingsRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // The Port to enumerate settings.
+  Port port = 2;
+  // The board FQBN we are trying to connect to. This is optional, and it's
+  // needed to disambiguate if more than one platform provides the pluggable
+  // monitor for a given port protocol.
+  string fqbn = 3;
+}
+
+message EnumerateMonitorPortSettingsResponse {
+  // A list of descriptors of the settings that may be changed for the monitor
+  // port.
+  repeated MonitorPortSettingDescriptor settings = 1;
+}
+
+message MonitorPortSettingDescriptor {
+  // The setting identifier
+  string setting_id = 1;
+  // A human-readable label of the setting (to be displayed on the GUI)
+  string label = 2;
+  // The setting type (at the moment only "enum" is avaiable)
+  string type = 3;
+  // The values allowed on "enum" types
+  repeated string enum_values = 4;
+  // The selected or default value
+  string value = 5;
+}
