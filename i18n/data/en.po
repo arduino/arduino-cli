@@ -423,6 +423,10 @@ msgstr "Configuring platform."
 msgid "Connected"
 msgstr "Connected"
 
+#: cli/monitor/monitor.go:117
+msgid "Connected to %s! Press CTRL-C to exit."
+msgstr "Connected to %s! Press CTRL-C to exit."
+
 #: cli/board/list.go:87
 #: cli/board/list.go:125
 msgid "Core"
@@ -496,7 +500,7 @@ msgstr "Debugging not supported for board %s"
 msgid "Debugging supported:"
 msgstr "Debugging supported:"
 
-#: cli/monitor/monitor.go:96
+#: cli/monitor/monitor.go:134
 msgid "Default"
 msgstr "Default"
 
@@ -782,7 +786,7 @@ msgstr "Error getting information for library %s"
 msgid "Error getting libraries info: %v"
 msgstr "Error getting libraries info: %v"
 
-#: cli/monitor/monitor.go:74
+#: cli/monitor/monitor.go:76
 msgid "Error getting port settings details: %s"
 msgstr "Error getting port settings details: %s"
 
@@ -1130,7 +1134,7 @@ msgstr "Global variables use {0} bytes of dynamic memory."
 
 #: cli/core/list.go:84
 #: cli/core/search.go:114
-#: cli/monitor/monitor.go:96
+#: cli/monitor/monitor.go:134
 #: cli/outdated/outdated.go:62
 msgid "ID"
 msgstr "ID"
@@ -1568,8 +1572,8 @@ msgstr "OS:"
 msgid "Official Arduino board:"
 msgstr "Official Arduino board:"
 
-#: cli/monitor/monitor.go:45
-#: cli/monitor/monitor.go:46
+#: cli/monitor/monitor.go:47
+#: cli/monitor/monitor.go:48
 msgid "Open a communication port with a board."
 msgstr "Open a communication port with a board."
 
@@ -1719,6 +1723,11 @@ msgstr "Platform size (bytes):"
 msgid "Port"
 msgstr "Port"
 
+#: cli/monitor/monitor.go:105
+#: cli/monitor/monitor.go:112
+msgid "Port closed:"
+msgstr "Port closed:"
+
 #: commands/errors.go:508
 msgid "Port monitor error"
 msgstr "Port monitor error"
@@ -1852,7 +1861,7 @@ msgstr "Sets a setting value."
 msgid "Sets where to save the configuration file."
 msgstr "Sets where to save the configuration file."
 
-#: cli/monitor/monitor.go:96
+#: cli/monitor/monitor.go:134
 msgid "Setting"
 msgstr "Setting"
 
@@ -1869,7 +1878,7 @@ msgstr "Show all available core versions."
 msgid "Show all build properties used instead of compiling."
 msgstr "Show all build properties used instead of compiling."
 
-#: cli/monitor/monitor.go:53
+#: cli/monitor/monitor.go:55
 msgid "Show all the settings of the communication port."
 msgstr "Show all the settings of the communication port."
 
@@ -2327,7 +2336,7 @@ msgstr "VERSION"
 msgid "VERSION_NUMBER"
 msgstr "VERSION_NUMBER"
 
-#: cli/monitor/monitor.go:96
+#: cli/monitor/monitor.go:134
 msgid "Values"
 msgstr "Values"
 
