@@ -407,6 +407,10 @@ msgstr "Config file already exists, use --overwrite to discard the existing one.
 msgid "Config file written to: %s"
 msgstr "Config file written to: %s"
 
+#: cli/monitor/monitor.go:60
+msgid "Configuration of the port."
+msgstr "Configuration of the port."
+
 #: cli/debug/debug.go:153
 msgid "Configuration options for %s"
 msgstr "Configuration options for %s"
@@ -423,7 +427,7 @@ msgstr "Configuring platform."
 msgid "Connected"
 msgstr "Connected"
 
-#: cli/monitor/monitor.go:117
+#: cli/monitor/monitor.go:181
 msgid "Connected to %s! Press CTRL-C to exit."
 msgstr "Connected to %s! Press CTRL-C to exit."
 
@@ -500,7 +504,7 @@ msgstr "Debugging not supported for board %s"
 msgid "Debugging supported:"
 msgstr "Debugging supported:"
 
-#: cli/monitor/monitor.go:134
+#: cli/monitor/monitor.go:199
 msgid "Default"
 msgstr "Default"
 
@@ -786,7 +790,7 @@ msgstr "Error getting information for library %s"
 msgid "Error getting libraries info: %v"
 msgstr "Error getting libraries info: %v"
 
-#: cli/monitor/monitor.go:76
+#: cli/monitor/monitor.go:86
 msgid "Error getting port settings details: %s"
 msgstr "Error getting port settings details: %s"
 
@@ -1134,7 +1138,7 @@ msgstr "Global variables use {0} bytes of dynamic memory."
 
 #: cli/core/list.go:84
 #: cli/core/search.go:114
-#: cli/monitor/monitor.go:134
+#: cli/monitor/monitor.go:199
 #: cli/outdated/outdated.go:62
 msgid "ID"
 msgstr "ID"
@@ -1572,8 +1576,8 @@ msgstr "OS:"
 msgid "Official Arduino board:"
 msgstr "Official Arduino board:"
 
-#: cli/monitor/monitor.go:47
-#: cli/monitor/monitor.go:48
+#: cli/monitor/monitor.go:51
+#: cli/monitor/monitor.go:52
 msgid "Open a communication port with a board."
 msgstr "Open a communication port with a board."
 
@@ -1723,8 +1727,8 @@ msgstr "Platform size (bytes):"
 msgid "Port"
 msgstr "Port"
 
-#: cli/monitor/monitor.go:105
-#: cli/monitor/monitor.go:112
+#: cli/monitor/monitor.go:168
+#: cli/monitor/monitor.go:175
 msgid "Port closed:"
 msgstr "Port closed:"
 
@@ -1807,6 +1811,10 @@ msgstr "Required tool:"
 msgid "Run as a daemon on port: %s"
 msgstr "Run as a daemon on port: %s"
 
+#: cli/monitor/monitor.go:61
+msgid "Run in silent mode, show only monitor input and output."
+msgstr "Run in silent mode, show only monitor input and output."
+
 #: cli/daemon/daemon.go:51
 msgid "Running as a daemon the initialization of cores and libraries is done only once."
 msgstr "Running as a daemon the initialization of cores and libraries is done only once."
@@ -1861,7 +1869,7 @@ msgstr "Sets a setting value."
 msgid "Sets where to save the configuration file."
 msgstr "Sets where to save the configuration file."
 
-#: cli/monitor/monitor.go:134
+#: cli/monitor/monitor.go:199
 msgid "Setting"
 msgstr "Setting"
 
@@ -1878,7 +1886,7 @@ msgstr "Show all available core versions."
 msgid "Show all build properties used instead of compiling."
 msgstr "Show all build properties used instead of compiling."
 
-#: cli/monitor/monitor.go:55
+#: cli/monitor/monitor.go:59
 msgid "Show all the settings of the communication port."
 msgstr "Show all the settings of the communication port."
 
@@ -2336,7 +2344,7 @@ msgstr "VERSION"
 msgid "VERSION_NUMBER"
 msgstr "VERSION_NUMBER"
 
-#: cli/monitor/monitor.go:134
+#: cli/monitor/monitor.go:199
 msgid "Values"
 msgstr "Values"
 
@@ -2842,6 +2850,14 @@ msgstr "invalid platform archive size: %s"
 #: arduino/cores/packagemanager/loader.go:369
 msgid "invalid pluggable monitor reference: %s"
 msgstr "invalid pluggable monitor reference: %s"
+
+#: cli/monitor/monitor.go:131
+msgid "invalid port configuration value for %s: %s"
+msgstr "invalid port configuration value for %s: %s"
+
+#: cli/monitor/monitor.go:140
+msgid "invalid port configuration: %s"
+msgstr "invalid port configuration: %s"
 
 #: commands/upload/upload.go:483
 msgid "invalid recipe '%[1]s': %[2]s"
