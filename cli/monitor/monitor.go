@@ -17,6 +17,8 @@ package monitor
 
 import (
 	"context"
+	"errors"
+	"io"
 	"os"
 	"sort"
 	"strings"
@@ -78,8 +80,44 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	feedback.Error("Monitor functionality not yet implemented")
-	os.Exit(errorcodes.ErrGeneric)
+	tty, err := newStdInOutTerminal()
+	if err != nil {
+		feedback.Error(err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+	defer tty.Close()
+
+	portProxy, _, err := monitor.Monitor(context.Background(), &rpc.MonitorRequest{
+		Instance: instance,
+		Port:     port.ToRPC(),
+		Fqbn:     "",
+	})
+	if err != nil {
+		feedback.Error(err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+	defer portProxy.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		_, err := io.Copy(tty, portProxy)
+		if err != nil && !errors.Is(err, io.EOF) {
+			feedback.Error(tr("Port closed:"), err)
+		}
+		cancel()
+	}()
+	go func() {
+		_, err := io.Copy(portProxy, tty)
+		if err != nil && !errors.Is(err, io.EOF) {
+			feedback.Error(tr("Port closed:"), err)
+		}
+		cancel()
+	}()
+
+	feedback.Print(tr("Connected to %s! Press CTRL-C to exit.", port.String()))
+
+	// Wait for port closed
+	<-ctx.Done()
 }
 
 type detailsResult struct {
