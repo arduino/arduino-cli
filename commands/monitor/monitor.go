@@ -87,9 +87,7 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 
 	return &PortProxy{
 		rw: monIO,
-		changeSettingsCB: func(setting, value string) error {
-			return m.Configure(setting, value)
-		},
+		changeSettingsCB: m.Configure(setting, value),
 		closeCB: func() error {
 			m.Close()
 			return m.Quit()
