@@ -729,7 +729,7 @@ msgstr "Error during build: %v"
 msgid "Error during install: %v"
 msgstr "Error during install: %v"
 
-#: cli/core/uninstall.go:68
+#: cli/core/uninstall.go:71
 msgid "Error during uninstall: %v"
 msgstr "Error during uninstall: %v"
 
@@ -1218,7 +1218,7 @@ msgstr "Invalid additional URL: %v"
 
 #: cli/core/download.go:55
 #: cli/core/install.go:92
-#: cli/core/uninstall.go:51
+#: cli/core/uninstall.go:54
 #: cli/core/upgrade.go:81
 #: cli/lib/download.go:50
 #: cli/lib/uninstall.go:51
@@ -1266,7 +1266,7 @@ msgstr "Invalid output format: %s"
 msgid "Invalid package index in %s"
 msgstr "Invalid package index in %s"
 
-#: cli/core/uninstall.go:57
+#: cli/core/uninstall.go:60
 msgid "Invalid parameter %s: version not allowed"
 msgstr "Invalid parameter %s: version not allowed"
 

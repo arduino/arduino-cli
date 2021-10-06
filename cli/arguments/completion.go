@@ -7,6 +7,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
+	"github.com/arduino/arduino-cli/commands/core"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -85,6 +86,24 @@ func GetInstalledProgrammers(toComplete string) []string {
 	for k := range installedProgrammers {
 		res[i] = k
 		i++
+	}
+	return res
+}
+
+// GetUninstallableCores is an helper function useful to autocomplete.
+// It returns a list of cores which can be uninstalled
+func GetUninstallableCores(toComplete string) []string {
+	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
+
+	platforms, _ := core.GetPlatforms(&rpc.PlatformListRequest{
+		Instance:      inst,
+		UpdatableOnly: false,
+		All:           false,
+	})
+	var res []string
+	// transform the data structure for the completion
+	for _, i := range platforms {
+		res = append(res, i.GetId())
 	}
 	return res
 }
