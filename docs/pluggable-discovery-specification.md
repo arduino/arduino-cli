@@ -43,8 +43,8 @@ the response to the command is:
 The `protocolVersion` field represents the protocol version that will be used in the rest of the communication. There
 are three possible cases:
 
-- if the client/IDE supports the same or a more recent version of the protocol than the discovery, then the IDE should
-  go into a compatibility mode and use the protocol level supported by the discovery.
+- if the client/IDE supports the same or a more recent version of the protocol than the discovery, then the clietn/IDE
+  should go into a compatibility mode and use the protocol level supported by the discovery.
 - if the discovery supports a more recent version of the protocol than the client/IDE: the discovery should downgrade
   itself into compatibility mode and report a `protocolVersion` that is less than or equal to the one supported by the
   client/IDE.
