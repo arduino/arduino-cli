@@ -8,6 +8,7 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/commands/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -125,3 +126,23 @@ func GetInstallableCores(toComplete string) []string {
 	}
 	return res
 }
+
+// GetUninstallableLibs is an helper function useful to autocomplete.
+// It returns a list of libs which can be uninstalled
+func GetUninstallableLibs(toComplete string) []string {
+	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
+	libs, _ := lib.LibraryList(context.Background(), &rpc.LibraryListRequest{
+		Instance:  inst,
+		All:       false,
+		Updatable: false,
+		Name:      "",
+		Fqbn:      "",
+	})
+	var res []string
+	// transform the data structure for the completion
+	for _, i := range libs.InstalledLibraries {
+		res = append(res, i.GetLibrary().Name)
+	}
+	return res
+}
+

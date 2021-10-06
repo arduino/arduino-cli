@@ -892,7 +892,7 @@ msgstr "Error serializing compilation database: %s"
 msgid "Error starting board discoveries"
 msgstr "Error starting board discoveries"
 
-#: cli/lib/uninstall.go:62
+#: cli/lib/uninstall.go:66
 msgid "Error uninstalling %[1]s: %[2]v"
 msgstr "Error uninstalling %[1]s: %[2]v"
 
@@ -1221,7 +1221,7 @@ msgstr "Invalid additional URL: %v"
 #: cli/core/uninstall.go:54
 #: cli/core/upgrade.go:81
 #: cli/lib/download.go:50
-#: cli/lib/uninstall.go:51
+#: cli/lib/uninstall.go:55
 msgid "Invalid argument passed: %v"
 msgstr "Invalid argument passed: %v"
 
@@ -1302,7 +1302,7 @@ msgstr "LIBRARY"
 #: cli/lib/download.go:34
 #: cli/lib/examples.go:39
 #: cli/lib/search.go:39
-#: cli/lib/uninstall.go:35
+#: cli/lib/uninstall.go:36
 msgid "LIBRARY_NAME"
 msgstr "LIBRARY_NAME"
 
@@ -2105,8 +2105,8 @@ msgstr "Uninstalling %s: tool is no more required"
 msgid "Uninstalls one or more cores and corresponding tool dependencies if no longer used."
 msgstr "Uninstalls one or more cores and corresponding tool dependencies if no longer used."
 
-#: cli/lib/uninstall.go:36
 #: cli/lib/uninstall.go:37
+#: cli/lib/uninstall.go:38
 msgid "Uninstalls one or more libraries."
 msgstr "Uninstalls one or more libraries."
 
