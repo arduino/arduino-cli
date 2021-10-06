@@ -1475,6 +1475,10 @@ msgstr "Missing sketch path"
 msgid "Monitor '%s' not found"
 msgstr "Monitor '%s' not found"
 
+#: cli/monitor/monitor.go:147
+msgid "Monitor port settings:"
+msgstr "Monitor port settings:"
+
 #: legacy/builder/print_used_and_not_used_libraries.go:50
 msgid "Multiple libraries were found for \"{0}\""
 msgstr "Multiple libraries were found for \"{0}\""
@@ -2851,11 +2855,11 @@ msgstr "invalid platform archive size: %s"
 msgid "invalid pluggable monitor reference: %s"
 msgstr "invalid pluggable monitor reference: %s"
 
-#: cli/monitor/monitor.go:131
+#: cli/monitor/monitor.go:130
 msgid "invalid port configuration value for %s: %s"
 msgstr "invalid port configuration value for %s: %s"
 
-#: cli/monitor/monitor.go:140
+#: cli/monitor/monitor.go:139
 msgid "invalid port configuration: %s"
 msgstr "invalid port configuration: %s"
 

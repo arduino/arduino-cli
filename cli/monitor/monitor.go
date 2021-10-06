@@ -42,7 +42,7 @@ var tr = i18n.Tr
 var portArgs arguments.Port
 var describe bool
 var configs []string
-var silent bool
+var quiet bool
 
 // NewCommand created a new `monitor` command
 func NewCommand() *cobra.Command {
@@ -58,7 +58,7 @@ func NewCommand() *cobra.Command {
 	portArgs.AddToCommand(cmd)
 	cmd.Flags().BoolVar(&describe, "describe", false, tr("Show all the settings of the communication port."))
 	cmd.Flags().StringSliceVarP(&configs, "config", "c", []string{}, tr("Configuration of the port."))
-	cmd.Flags().BoolVarP(&silent, "silent", "s", false, tr("Run in silent mode, show only monitor input and output."))
+	cmd.Flags().BoolVarP(&quiet, "quiet", "q", false, tr("Run in silent mode, show only monitor input and output."))
 	cmd.MarkFlagRequired("port")
 	return cmd
 }
@@ -67,7 +67,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
 
 	if !configuration.HasConsole {
-		silent = true
+		quiet = true
 	}
 
 	port, err := portArgs.GetPort(instance, nil)
@@ -108,7 +108,6 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 			feedback.Error(err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
-		settings := resp.GetSettings()
 		for _, config := range configs {
 			split := strings.SplitN(config, "=", 2)
 			k := ""
@@ -119,7 +118,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 			}
 
 			var setting *rpc.MonitorPortSettingDescriptor
-			for _, s := range settings {
+			for _, s := range resp.GetSettings() {
 				if k == "" {
 					if contains(s.EnumValues, v) {
 						setting = s
@@ -144,8 +143,9 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 				SettingId: setting.SettingId,
 				Value:     v,
 			})
-			if !silent {
-				feedback.Print(fmt.Sprintf("Set %s to %s", setting.SettingId, v))
+			if !quiet {
+				feedback.Print(tr("Monitor port settings:"))
+				feedback.Print(fmt.Sprintf("%s=%s", setting.SettingId, v))
 			}
 		}
 	}
@@ -177,7 +177,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 		cancel()
 	}()
 
-	if !silent {
+	if !quiet {
 		feedback.Print(tr("Connected to %s! Press CTRL-C to exit.", port.String()))
 	}
 
