@@ -365,7 +365,7 @@ msgstr "Checksum:"
 msgid "Clean caches."
 msgstr "Clean caches."
 
-#: cli/cli.go:111
+#: cli/cli.go:120
 msgid "Comma-separated list of additional URLs for the Boards Manager."
 msgstr "Comma-separated list of additional URLs for the Boards Manager."
 
@@ -407,7 +407,7 @@ msgstr "Config file already exists, use --overwrite to discard the existing one.
 msgid "Config file written to: %s"
 msgstr "Config file written to: %s"
 
-#: cli/debug/debug.go:156
+#: cli/debug/debug.go:159
 msgid "Configuration options for %s"
 msgstr "Configuration options for %s"
 
@@ -484,7 +484,7 @@ msgstr "Debug Arduino sketches."
 msgid "Debug Arduino sketches. (this command opens an interactive gdb session)"
 msgstr "Debug Arduino sketches. (this command opens an interactive gdb session)"
 
-#: cli/debug/debug.go:67
+#: cli/debug/debug.go:70
 msgid "Debug interpreter e.g.: %s"
 msgstr "Debug interpreter e.g.: %s"
 
@@ -529,7 +529,7 @@ msgstr "Detecting libraries used..."
 msgid "Detects and displays a list of boards connected to the current computer."
 msgstr "Detects and displays a list of boards connected to the current computer."
 
-#: cli/debug/debug.go:68
+#: cli/debug/debug.go:71
 msgid "Directory containing binaries for debug."
 msgstr "Directory containing binaries for debug."
 
@@ -557,8 +557,8 @@ msgstr "Display only the provided gRPC calls"
 msgid "Do not install dependencies."
 msgstr "Do not install dependencies."
 
-#: cli/burnbootloader/burnbootloader.go:61
-#: cli/upload/upload.go:67
+#: cli/burnbootloader/burnbootloader.go:64
+#: cli/upload/upload.go:70
 msgid "Do not perform the actual upload, just log out actions"
 msgstr "Do not perform the actual upload, just log out actions"
 
@@ -698,9 +698,9 @@ msgstr "Error downloading platform %s"
 msgid "Error downloading tool %s"
 msgstr "Error downloading tool %s"
 
-#: cli/debug/debug.go:84
-#: cli/debug/debug.go:89
-#: cli/debug/debug.go:118
+#: cli/debug/debug.go:87
+#: cli/debug/debug.go:92
+#: cli/debug/debug.go:121
 msgid "Error during Debug: %v"
 msgstr "Error during Debug: %v"
 
@@ -708,20 +708,20 @@ msgstr "Error during Debug: %v"
 msgid "Error during JSON encoding of the output: %v"
 msgstr "Error during JSON encoding of the output: %v"
 
-#: cli/burnbootloader/burnbootloader.go:73
-#: cli/burnbootloader/burnbootloader.go:86
-#: cli/compile/compile.go:198
-#: cli/compile/compile.go:204
-#: cli/compile/compile.go:214
-#: cli/compile/compile.go:246
-#: cli/upload/upload.go:98
-#: cli/upload/upload.go:104
-#: cli/upload/upload.go:120
-#: cli/upload/upload.go:147
+#: cli/burnbootloader/burnbootloader.go:76
+#: cli/burnbootloader/burnbootloader.go:89
+#: cli/compile/compile.go:201
+#: cli/compile/compile.go:207
+#: cli/compile/compile.go:217
+#: cli/compile/compile.go:249
+#: cli/upload/upload.go:101
+#: cli/upload/upload.go:107
+#: cli/upload/upload.go:123
+#: cli/upload/upload.go:150
 msgid "Error during Upload: %v"
 msgstr "Error during Upload: %v"
 
-#: cli/compile/compile.go:258
+#: cli/compile/compile.go:261
 msgid "Error during build: %v"
 msgstr "Error during build: %v"
 
@@ -745,7 +745,7 @@ msgstr "Error extracting library_index.json.gz"
 msgid "Error finding build artifacts"
 msgstr "Error finding build artifacts"
 
-#: cli/debug/debug.go:105
+#: cli/debug/debug.go:108
 msgid "Error getting Debug info: %v"
 msgstr "Error getting Debug info: %v"
 
@@ -821,7 +821,7 @@ msgstr "Error listing boards: %v"
 msgid "Error listing platforms: %v"
 msgstr "Error listing platforms: %v"
 
-#: cli/compile/compile.go:149
+#: cli/compile/compile.go:152
 msgid "Error opening source code overrides data file: %v"
 msgstr "Error opening source code overrides data file: %v"
 
@@ -969,7 +969,7 @@ msgstr "Error writing library_index.json.sig"
 msgid "Error: command description is not supported by %v"
 msgstr "Error: command description is not supported by %v"
 
-#: cli/compile/compile.go:156
+#: cli/compile/compile.go:159
 msgid "Error: invalid source code overrides data file: %v"
 msgstr "Error: invalid source code overrides data file: %v"
 
@@ -985,7 +985,7 @@ msgstr "Examples for library %s"
 msgid "Examples:"
 msgstr "Examples:"
 
-#: cli/debug/debug.go:137
+#: cli/debug/debug.go:140
 msgid "Executable to debug"
 msgstr "Executable to debug"
 
@@ -1079,11 +1079,11 @@ msgstr "Force skip of post-install scripts (if the CLI is running interactively)
 msgid "Fully Qualified Board Name, e.g.: arduino:avr:uno"
 msgstr "Fully Qualified Board Name, e.g.: arduino:avr:uno"
 
-#: cli/debug/debug.go:151
+#: cli/debug/debug.go:154
 msgid "GDB Server path"
 msgstr "GDB Server path"
 
-#: cli/debug/debug.go:150
+#: cli/debug/debug.go:153
 msgid "GDB Server type"
 msgstr "GDB Server type"
 
@@ -1135,7 +1135,7 @@ msgstr "Id"
 msgid "Identification properties:"
 msgstr "Identification properties:"
 
-#: cli/compile/compile.go:117
+#: cli/compile/compile.go:120
 msgid "If set built binaries will be exported to the sketch folder."
 msgstr "If set built binaries will be exported to the sketch folder."
 
@@ -1196,7 +1196,7 @@ msgstr "Internal error in cache"
 msgid "Invalid '%[1]s' property: %[2]s"
 msgstr "Invalid '%[1]s' property: %[2]s"
 
-#: cli/cli.go:252
+#: cli/cli.go:261
 msgid "Invalid Call : should show Help, but it is available only in TEXT mode."
 msgstr "Invalid Call : should show Help, but it is available only in TEXT mode."
 
@@ -1253,11 +1253,11 @@ msgstr "Invalid library"
 msgid "Invalid network.proxy '%[1]s': %[2]s"
 msgstr "Invalid network.proxy '%[1]s': %[2]s"
 
-#: cli/cli.go:213
+#: cli/cli.go:222
 msgid "Invalid option for --log-level: %s"
 msgstr "Invalid option for --log-level: %s"
 
-#: cli/cli.go:230
+#: cli/cli.go:239
 msgid "Invalid output format: %s"
 msgstr "Invalid output format: %s"
 
@@ -1286,7 +1286,7 @@ msgstr "Invalid version"
 msgid "Invalid vid value: '%s'"
 msgstr "Invalid vid value: '%s'"
 
-#: cli/compile/compile.go:112
+#: cli/compile/compile.go:115
 msgid "Just produce the compilation database, without actually compiling."
 msgstr "Just produce the compilation database, without actually compiling."
 
@@ -1555,7 +1555,7 @@ msgstr "Option:"
 msgid "Optional, can be: %s. Used to tell gcc which warning level to use (-W flag)."
 msgstr "Optional, can be: %s. Used to tell gcc which warning level to use (-W flag)."
 
-#: cli/compile/compile.go:113
+#: cli/compile/compile.go:116
 msgid "Optional, cleanup the build folder and do not use any cached build."
 msgstr "Optional, cleanup the build folder and do not use any cached build."
 
@@ -1577,7 +1577,7 @@ msgstr "Optional, turns on verbose mode."
 msgid "Optional, use the specified programmer to upload."
 msgstr "Optional, use the specified programmer to upload."
 
-#: cli/compile/compile.go:118
+#: cli/compile/compile.go:121
 msgid "Optional. Path to a .json file that contains a set of replacements of the sketch source code."
 msgstr "Optional. Path to a .json file that contains a set of replacements of the sketch source code."
 
@@ -1624,7 +1624,7 @@ msgstr "Package website:"
 msgid "Paragraph: %s"
 msgstr "Paragraph: %s"
 
-#: cli/cli.go:107
+#: cli/cli.go:110
 msgid "Path to the file where logs will be written."
 msgstr "Path to the file where logs will be written."
 
@@ -1861,7 +1861,7 @@ msgstr "Show library names only."
 msgid "Show list of available programmers"
 msgstr "Show list of available programmers"
 
-#: cli/debug/debug.go:69
+#: cli/debug/debug.go:72
 msgid "Show metadata about the debug session instead of starting the debugger."
 msgstr "Show metadata about the debug session instead of starting the debugger."
 
@@ -1926,9 +1926,9 @@ msgstr "Sketch too big; see %s for tips on reducing it."
 msgid "Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."
 msgstr "Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."
 
-#: cli/compile/compile.go:139
+#: cli/compile/compile.go:142
 #: cli/sketch/archive.go:66
-#: cli/upload/upload.go:90
+#: cli/upload/upload.go:93
 msgid "Sketches with .pde extension are deprecated, please rename the following files to .ino:"
 msgstr "Sketches with .pde extension are deprecated, please rename the following files to .ino:"
 
@@ -1980,7 +1980,7 @@ msgstr "The connected devices search timeout, raise it if your board doesn't sho
 msgid "The connected devices search timeout, raise it if your board doesn't show up e.g.: 10s"
 msgstr "The connected devices search timeout, raise it if your board doesn't show up e.g.: 10s"
 
-#: cli/cli.go:110
+#: cli/cli.go:119
 msgid "The custom config file (if not specified the default will be used)."
 msgstr "The custom config file (if not specified the default will be used)."
 
@@ -2000,8 +2000,8 @@ msgid "The key '%[1]v' is not a list of items, can't remove from it.\n"
 msgstr "The key '%[1]v' is not a list of items, can't remove from it.\n"
 "Maybe use '%[2]s'?"
 
-#: cli/cli.go:108
-#: cli/cli.go:109
+#: cli/cli.go:111
+#: cli/cli.go:115
 msgid "The output format for the logs, can be: %s"
 msgstr "The output format for the logs, can be: %s"
 
@@ -2033,19 +2033,19 @@ msgstr "Tool %s uninstalled"
 msgid "Toolchain '%s' is not supported"
 msgstr "Toolchain '%s' is not supported"
 
-#: cli/debug/debug.go:145
+#: cli/debug/debug.go:148
 msgid "Toolchain custom configurations"
 msgstr "Toolchain custom configurations"
 
-#: cli/debug/debug.go:139
+#: cli/debug/debug.go:142
 msgid "Toolchain path"
 msgstr "Toolchain path"
 
-#: cli/debug/debug.go:140
+#: cli/debug/debug.go:143
 msgid "Toolchain prefix"
 msgstr "Toolchain prefix"
 
-#: cli/debug/debug.go:138
+#: cli/debug/debug.go:141
 msgid "Toolchain type"
 msgstr "Toolchain type"
 
@@ -2083,7 +2083,7 @@ msgstr "Unable to get Local App Data Folder: %v"
 msgid "Unable to get user home dir: %v"
 msgstr "Unable to get user home dir: %v"
 
-#: cli/cli.go:199
+#: cli/cli.go:208
 msgid "Unable to open file for logging: %s"
 msgstr "Unable to open file for logging: %s"
 
@@ -2217,8 +2217,8 @@ msgstr "Upload the bootloader on the board using an external programmer."
 msgid "Upload the bootloader."
 msgstr "Upload the bootloader."
 
-#: cli/compile/compile.go:220
-#: cli/upload/upload.go:126
+#: cli/compile/compile.go:223
+#: cli/upload/upload.go:129
 msgid "Uploading to specified board using %s protocol requires the following info:"
 msgstr "Uploading to specified board using %s protocol requires the following info:"
 
@@ -2580,7 +2580,7 @@ msgstr "error processing response from server"
 msgid "error querying Arduino Cloud Api"
 msgstr "error querying Arduino Cloud Api"
 
-#: cli/upload/upload.go:74
+#: cli/upload/upload.go:77
 msgid "error: %s and %s flags cannot be used together"
 msgstr "error: %s and %s flags cannot be used together"
 
@@ -3019,7 +3019,7 @@ msgstr "platform %s is not installed"
 msgid "platform not installed"
 msgstr "platform not installed"
 
-#: cli/compile/compile.go:123
+#: cli/compile/compile.go:126
 msgid "please use --build-property instead."
 msgstr "please use --build-property instead."
 

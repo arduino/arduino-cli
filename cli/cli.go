@@ -106,9 +106,18 @@ func createCliCommandTree(cmd *cobra.Command) {
 
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, tr("Print the logs on the standard output."))
 	cmd.PersistentFlags().String("log-level", "", tr("Messages with this level and above will be logged. Valid levels are: %s", "trace, debug, info, warn, error, fatal, panic"))
+	cmd.RegisterFlagCompletionFunc("log-level", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"trace", "debug", "info", "warn", "error", "fatal", "panic"}, cobra.ShellCompDirectiveDefault
+	})
 	cmd.PersistentFlags().String("log-file", "", tr("Path to the file where logs will be written."))
 	cmd.PersistentFlags().String("log-format", "", tr("The output format for the logs, can be: %s", "text, json"))
+	cmd.RegisterFlagCompletionFunc("log-format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"text", "json"}, cobra.ShellCompDirectiveDefault
+	})
 	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", tr("The output format for the logs, can be: %s", "text, json"))
+	cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"text", "json"}, cobra.ShellCompDirectiveDefault
+	})
 	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", tr("The custom config file (if not specified the default will be used)."))
 	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, tr("Comma-separated list of additional URLs for the Boards Manager."))
 	cmd.PersistentFlags().Bool("no-color", false, "Disable colored output.")
