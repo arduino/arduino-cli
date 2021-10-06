@@ -43,6 +43,9 @@ func initInstallCommand() *cobra.Command {
 			"  " + os.Args[0] + " core install arduino:samd@1.6.9",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
+		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return arguments.GetInstallableCores(toComplete), cobra.ShellCompDirectiveDefault
+		},
 	}
 	AddPostInstallFlagsToCommand(installCommand)
 	return installCommand

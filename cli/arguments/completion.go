@@ -107,3 +107,21 @@ func GetUninstallableCores(toComplete string) []string {
 	}
 	return res
 }
+
+// GetInstallableCores is an helper function useful to autocomplete.
+// It returns a list of cores which can be installed/downloaded
+func GetInstallableCores(toComplete string) []string {
+	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
+
+	platforms, _ := core.PlatformSearch(&rpc.PlatformSearchRequest{
+		Instance:    inst,
+		SearchArgs:  "",
+		AllVersions: false,
+	})
+	var res []string
+	// transform the data structure for the completion
+	for _, i := range platforms.SearchOutput {
+		res = append(res, i.GetId())
+	}
+	return res
+}

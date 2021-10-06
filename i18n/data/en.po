@@ -653,7 +653,7 @@ msgstr "Error creating sketch: %v"
 msgid "Error detecting boards: %v"
 msgstr "Error detecting boards: %v"
 
-#: cli/core/download.go:68
+#: cli/core/download.go:71
 #: cli/lib/download.go:62
 msgid "Error downloading %[1]s: %[2]v"
 msgstr "Error downloading %[1]s: %[2]v"
@@ -725,7 +725,7 @@ msgstr "Error during Upload: %v"
 msgid "Error during build: %v"
 msgstr "Error during build: %v"
 
-#: cli/core/install.go:106
+#: cli/core/install.go:109
 msgid "Error during install: %v"
 msgstr "Error during install: %v"
 
@@ -1063,11 +1063,11 @@ msgstr "First message must contain debug request, not data"
 msgid "Flags:"
 msgstr "Flags:"
 
-#: cli/core/install.go:59
+#: cli/core/install.go:62
 msgid "Force run of post-install scripts (if the CLI is not running interactively)."
 msgstr "Force run of post-install scripts (if the CLI is not running interactively)."
 
-#: cli/core/install.go:60
+#: cli/core/install.go:63
 msgid "Force skip of post-install scripts (if the CLI is running interactively)."
 msgstr "Force skip of post-install scripts (if the CLI is running interactively)."
 
@@ -1216,8 +1216,8 @@ msgstr "Invalid URL"
 msgid "Invalid additional URL: %v"
 msgstr "Invalid additional URL: %v"
 
-#: cli/core/download.go:55
-#: cli/core/install.go:92
+#: cli/core/download.go:58
+#: cli/core/install.go:95
 #: cli/core/uninstall.go:54
 #: cli/core/upgrade.go:81
 #: cli/lib/download.go:50
@@ -1984,7 +1984,7 @@ msgstr "The connected devices search timeout, raise it if your board doesn't sho
 msgid "The custom config file (if not specified the default will be used)."
 msgstr "The custom config file (if not specified the default will be used)."
 
-#: cli/core/install.go:66
+#: cli/core/install.go:69
 msgid "The flags --run-post-install and --skip-post-install can't be both set at the same time."
 msgstr "The flags --run-post-install and --skip-post-install can't be both set at the same time."
 
