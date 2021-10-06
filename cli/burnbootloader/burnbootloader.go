@@ -58,6 +58,9 @@ func NewCommand() *cobra.Command {
 	burnBootloaderCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
 	burnBootloaderCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Turns on verbose mode."))
 	burnBootloaderCommand.Flags().StringVarP(&programmer, "programmer", "P", "", tr("Use the specified programmer to upload."))
+	burnBootloaderCommand.RegisterFlagCompletionFunc("programmer", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return arguments.GetInstalledProgrammers(toComplete), cobra.ShellCompDirectiveDefault
+	})
 	burnBootloaderCommand.Flags().BoolVar(&dryRun, "dry-run", false, tr("Do not perform the actual upload, just log out actions"))
 	burnBootloaderCommand.Flags().MarkHidden("dry-run")
 

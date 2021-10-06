@@ -64,6 +64,9 @@ func NewCommand() *cobra.Command {
 	})
 	port.AddToCommand(debugCommand)
 	debugCommand.Flags().StringVarP(&programmer, "programmer", "P", "", tr("Programmer to use for debugging"))
+	debugCommand.RegisterFlagCompletionFunc("programmer", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return arguments.GetInstalledProgrammers(toComplete), cobra.ShellCompDirectiveDefault
+	})
 	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
 	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries for debug."))
 	debugCommand.Flags().BoolVarP(&printInfo, "info", "I", false, tr("Show metadata about the debug session instead of starting the debugger."))

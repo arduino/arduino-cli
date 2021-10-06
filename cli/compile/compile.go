@@ -109,6 +109,9 @@ func NewCommand() *cobra.Command {
 		tr("List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries dir paths."))
 	command.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, tr("Optional, optimize compile output for debugging, rather than for release."))
 	command.Flags().StringVarP(&programmer, "programmer", "P", "", tr("Optional, use the specified programmer to upload."))
+	command.RegisterFlagCompletionFunc("programmer", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return arguments.GetInstalledProgrammers(toComplete), cobra.ShellCompDirectiveDefault
+	})
 	command.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, tr("Just produce the compilation database, without actually compiling."))
 	command.Flags().BoolVar(&clean, "clean", false, tr("Optional, cleanup the build folder and do not use any cached build."))
 	// We must use the following syntax for this flag since it's also bound to settings.
