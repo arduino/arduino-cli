@@ -698,7 +698,7 @@ The tool configuration properties are available globally without the prefix. For
 property can be used as **{cmd.path}** inside the recipe, and the same happens for all the other avrdude configuration
 variables.
 
-#### Pluggable discovery
+### Pluggable discovery
 
 Discovery tools are a special kind of tool used to find supported boards. A platform must declare one or more Pluggable
 Discoveries in its [`platform.txt`](#platformtxt). Discoveries can be referenced from other packages, including the
@@ -755,7 +755,71 @@ builtin discoveries that may be possibly added in the future).
 
 For detailed information, see the [Pluggable Discovery specification](pluggable-discovery-specification.md).
 
-#### Verbose parameter
+### Pluggable monitor
+
+Monitor tools are a special kind of tool used to let the user communicate with the supported boards.
+
+A platform must declare one or more Pluggable Monitor in its [`platform.txt`](#platformtxt) and bind them to a specific
+port protocol. Monitors can be referenced from other packages.
+
+The following directive is used to bind a specific monitor tool to a specific port protocol:
+
+```
+pluggable_monitor.required.PROTOCOL=VENDOR_ID:MONITOR_NAME
+```
+
+where `PROTOCOL` must be replaced with the port protocol identifier and `VENDOR_ID:MONITOR_NAME` must be replaced with
+the monitor tool identifier.
+
+The platform can support as many protocols as needed:
+
+```
+pluggable_monitor.required.PROTOCOL1=VENDOR_ID:MONITOR_NAME1
+pluggable_monitor.required.PROTOCOL2=VENDOR_ID:MONITOR_NAME2
+...
+```
+
+The above syntax requires specifying a monitor tool via the `monitorDependencies` field of the platform's
+[package index](package_index_json-specification.md). Since it might be cumbersome to use with manual installations, we
+provide another syntax to ease development and beta testing:
+
+```
+pluggable_monitor.pattern.PROTOCOL=MONITOR_RECIPE
+```
+
+where `MONITOR_RECIPE` must be replaced by the command line to launch the monitor tool for the specific `PROTOCOL`. An
+example could be:
+
+```
+pluggable_monitor.pattern.custom-ble="{runtime.tools.my-ble-monitor.path}/my-ble-monitor" -H
+```
+
+in this case the platform provides a new hypothetical `custom-ble` protocol monitor tool and the command line tool named
+`my-ble-monitor` is launched with the `-H` parameter to start the monitor tool. In this case the command line pattern
+may contain any extra parameter in the formula: this is different from the monitor tools installed through the
+`monitorDependencies` field that must run without any command line parameter.
+
+We strongly recommend using this syntax only for development purposes and not on released platforms.
+
+#### Built-in monitors
+
+If a platform supports only boards connected via serial ports it can easily use the `builtin:serial-monitor` tool
+without creating a custom pluggable monitor:
+
+```
+pluggable_monitor.required.serial=builtin:serial-monitor
+```
+
+#### Backward compatibility
+
+For backward compatibility, if a platform does not declare any discovery or monitor tool (using the
+`pluggable_discovery.*` or `pluggable_monitor.*` properties in `platform.txt` respectively) it will automatically
+inherit `builtin:serial-monitor` (but not other `builtin` monitor tools that may be possibly added in the future). This
+will allow all legacy non-pluggable platforms to migrate to pluggable monitor without disruption.
+
+For detailed information, see the [Pluggable Monitor specification](pluggable-monitor-specification.md).
+
+### Verbose parameter
 
 It is possible for the user to enable verbosity from the Preferences panel of the IDEs or Arduino CLI's `--verbose`
 flag. This preference is transferred to the command line using the **ACTION.verbose** property (where ACTION is the

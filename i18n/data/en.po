@@ -2503,7 +2503,7 @@ msgstr "cleaning build path"
 msgid "command"
 msgstr "command"
 
-#: arduino/monitor/monitor.go:157
+#: arduino/monitor/monitor.go:150
 msgid "command '%[1]s' failed: %[2]s"
 msgstr "command '%[1]s' failed: %[2]s"
 
@@ -2516,7 +2516,7 @@ msgstr "command '%[1]s' failed: %[2]s"
 msgid "command failed: %s"
 msgstr "command failed: %s"
 
-#: arduino/monitor/monitor.go:154
+#: arduino/monitor/monitor.go:147
 msgid "communication out of sync, expected '%[1]s', received '%[2]s'"
 msgstr "communication out of sync, expected '%[1]s', received '%[2]s'"
 
@@ -3110,7 +3110,7 @@ msgstr "port"
 msgid "port not found: %[1]s %[2]s"
 msgstr "port not found: %[1]s %[2]s"
 
-#: arduino/monitor/monitor.go:246
+#: arduino/monitor/monitor.go:239
 msgid "protocol version not supported: requested %[1]d, got %[2]d"
 msgstr "protocol version not supported: requested %[1]d, got %[2]d"
 
@@ -3300,7 +3300,7 @@ msgstr "the platform has no releases"
 msgid "the server responded with status %s"
 msgstr "the server responded with status %s"
 
-#: arduino/monitor/monitor.go:147
+#: arduino/monitor/monitor.go:140
 msgid "timeout waiting for message"
 msgstr "timeout waiting for message"
 

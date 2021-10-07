@@ -109,6 +109,7 @@ nav:
   - library-specification.md
   - platform-specification.md
   - Pluggable discovery specification: pluggable-discovery-specification.md
+  - Pluggable monitor specification: pluggable-monitor-specification.md
   - Package index specification: package_index_json-specification.md
 
 extra:
