@@ -13,7 +13,8 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-// Documentation about pluggable monitor is available here:
+// Package monitor provides a client for Pluggable Monitors.
+// Documentation is available here:
 // https://arduino.github.io/arduino-cli/latest/pluggable-monitor-specification/
 package monitor
 
