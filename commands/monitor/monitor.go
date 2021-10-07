@@ -59,17 +59,10 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 		return nil, nil, &commands.InvalidInstanceError{}
 	}
 
-	monitorRef, err := findMonitorForProtocolAndBoard(pm, req.GetPort(), req.GetFqbn())
+	m, err := findMonitorForProtocolAndBoard(pm, req.GetPort(), req.GetFqbn())
 	if err != nil {
 		return nil, nil, err
 	}
-
-	tool := pm.FindMonitorDependency(monitorRef)
-	if tool == nil {
-		return nil, nil, &commands.MonitorNotFoundError{Monitor: monitorRef.String()}
-	}
-
-	m := pluggableMonitor.New(monitorRef.Name, tool.InstallDir.Join(monitorRef.Name).String())
 
 	if err := m.Run(); err != nil {
 		return nil, nil, &commands.FailedMonitorError{Cause: err}
@@ -95,7 +88,7 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 	}, descriptor, nil
 }
 
-func findMonitorForProtocolAndBoard(pm *packagemanager.PackageManager, port *rpc.Port, fqbn string) (*cores.MonitorDependency, error) {
+func findMonitorForProtocolAndBoard(pm *packagemanager.PackageManager, port *rpc.Port, fqbn string) (*pluggableMonitor.PluggableMonitor, error) {
 	if port == nil {
 		return nil, &commands.MissingPortError{}
 	}
@@ -103,6 +96,8 @@ func findMonitorForProtocolAndBoard(pm *packagemanager.PackageManager, port *rpc
 	if protocol == "" {
 		return nil, &commands.MissingPortProtocolError{}
 	}
+
+	var monitorDepOrRecipe *cores.MonitorDependency
 
 	// If a board is specified search the monitor in the board package first
 	if fqbn != "" {
@@ -115,16 +110,33 @@ func findMonitorForProtocolAndBoard(pm *packagemanager.PackageManager, port *rpc
 		if err != nil {
 			return nil, &commands.UnknownFQBNError{Cause: err}
 		}
+
 		if mon, ok := boardPlatform.Monitors[protocol]; ok {
-			return mon, nil
+			monitorDepOrRecipe = mon
 		}
 	}
 
-	// Otherwise look in all package for a suitable monitor
-	for _, platformRel := range pm.InstalledPlatformReleases() {
-		if mon, ok := platformRel.Monitors[protocol]; ok {
-			return mon, nil
+	if monitorDepOrRecipe == nil {
+		// Otherwise look in all package for a suitable monitor
+		for _, platformRel := range pm.InstalledPlatformReleases() {
+			if mon, ok := platformRel.Monitors[protocol]; ok {
+				monitorDepOrRecipe = mon
+				break
+			}
 		}
 	}
-	return nil, &commands.NoMonitorAvailableForProtocolError{Protocol: protocol}
+
+	if monitorDepOrRecipe == nil {
+		return nil, &commands.NoMonitorAvailableForProtocolError{Protocol: protocol}
+	}
+
+	tool := pm.FindMonitorDependency(monitorDepOrRecipe)
+	if tool == nil {
+		return nil, &commands.MonitorNotFoundError{Monitor: monitorDepOrRecipe.String()}
+	}
+
+	return pluggableMonitor.New(
+		monitorDepOrRecipe.Name,
+		tool.InstallDir.Join(monitorDepOrRecipe.Name).String(),
+	), nil
 }
