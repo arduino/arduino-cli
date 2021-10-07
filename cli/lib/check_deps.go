@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -39,6 +40,9 @@ func initDepsCommand() *cobra.Command {
 			"  " + os.Args[0] + " lib deps AudioZero@1.0.0 # " + tr("for the specific version."),
 		Args: cobra.ExactArgs(1),
 		Run:  runDepsCommand,
+		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return arguments.GetUninstallableLibs(toComplete), cobra.ShellCompDirectiveDefault
+		},
 	}
 	return depsCommand
 }

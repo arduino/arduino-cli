@@ -9,7 +9,7 @@ msgstr "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
 msgid "%[1]s folder is no longer supported! See %[2]s for more information"
 msgstr "%[1]s folder is no longer supported! See %[2]s for more information"
 
-#: cli/lib/check_deps.go:96
+#: cli/lib/check_deps.go:100
 msgid "%[1]s is required but %[2]s is currently installed."
 msgstr "%[1]s is required but %[2]s is currently installed."
 
@@ -45,7 +45,7 @@ msgstr "%s downloaded"
 msgid "%s installed"
 msgstr "%s installed"
 
-#: cli/lib/check_deps.go:93
+#: cli/lib/check_deps.go:97
 msgid "%s is already installed."
 msgstr "%s is already installed."
 
@@ -57,7 +57,7 @@ msgstr "%s is not a directory"
 msgid "%s is not managed by package manager"
 msgstr "%s is not managed by package manager"
 
-#: cli/lib/check_deps.go:90
+#: cli/lib/check_deps.go:94
 msgid "%s must be installed."
 msgstr "%s must be installed."
 
@@ -185,7 +185,7 @@ msgstr "Arduino configuration commands."
 msgid "Arduino core operations."
 msgstr "Arduino core operations."
 
-#: cli/lib/check_deps.go:50
+#: cli/lib/check_deps.go:54
 #: cli/lib/install.go:123
 msgid "Arguments error: %v"
 msgstr "Arguments error: %v"
@@ -340,8 +340,8 @@ msgstr "Cannot upgrade platform"
 msgid "Category: %s"
 msgstr "Category: %s"
 
-#: cli/lib/check_deps.go:35
 #: cli/lib/check_deps.go:36
+#: cli/lib/check_deps.go:37
 msgid "Check dependencies status for the specified library."
 msgstr "Check dependencies status for the specified library."
 
@@ -841,7 +841,7 @@ msgstr "Error reading sketch files"
 msgid "Error resolving FQBN: {0}"
 msgstr "Error resolving FQBN: {0}"
 
-#: cli/lib/check_deps.go:60
+#: cli/lib/check_deps.go:64
 msgid "Error resolving dependencies for %[1]s: %[2]s"
 msgstr "Error resolving dependencies for %[1]s: %[2]s"
 
@@ -1294,7 +1294,7 @@ msgstr "Just produce the compilation database, without actually compiling."
 msgid "LIBNAME"
 msgstr "LIBNAME"
 
-#: cli/lib/check_deps.go:34
+#: cli/lib/check_deps.go:35
 #: cli/lib/install.go:40
 msgid "LIBRARY"
 msgstr "LIBRARY"
@@ -2284,7 +2284,7 @@ msgstr "Using previously compiled file: {0}"
 msgid "VERSION"
 msgstr "VERSION"
 
-#: cli/lib/check_deps.go:34
+#: cli/lib/check_deps.go:35
 #: cli/lib/install.go:40
 msgid "VERSION_NUMBER"
 msgstr "VERSION_NUMBER"
@@ -2628,13 +2628,13 @@ msgstr "following possible symlink %[1]s: %[2]s"
 msgid "for a specific version."
 msgstr "for a specific version."
 
-#: cli/lib/check_deps.go:38
+#: cli/lib/check_deps.go:39
 #: cli/lib/download.go:39
 #: cli/lib/install.go:44
 msgid "for the latest version."
 msgstr "for the latest version."
 
-#: cli/lib/check_deps.go:39
+#: cli/lib/check_deps.go:40
 #: cli/lib/install.go:45
 msgid "for the specific version."
 msgstr "for the specific version."
