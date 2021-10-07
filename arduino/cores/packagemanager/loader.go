@@ -373,6 +373,13 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 			Name:     split[1],
 		}
 	}
+
+	// Support for pluggable monitors in debugging/development environments
+	platform.MonitorsDevRecipes = map[string]string{}
+	for protocol, recipe := range platform.Properties.SubTree("pluggable_monitor.pattern").AsMap() {
+		platform.MonitorsDevRecipes[protocol] = recipe
+	}
+
 	return nil
 }
 
