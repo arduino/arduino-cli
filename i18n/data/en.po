@@ -774,7 +774,7 @@ msgstr "Error getting current directory for compilation database: %s"
 msgid "Error getting information for library %s"
 msgstr "Error getting information for library %s"
 
-#: cli/lib/examples.go:73
+#: cli/lib/examples.go:76
 msgid "Error getting libraries info: %v"
 msgstr "Error getting libraries info: %v"
 
@@ -977,7 +977,7 @@ msgstr "Error: invalid source code overrides data file: %v"
 msgid "Event"
 msgstr "Event"
 
-#: cli/lib/examples.go:122
+#: cli/lib/examples.go:125
 msgid "Examples for library %s"
 msgstr "Examples for library %s"
 
@@ -1481,7 +1481,7 @@ msgstr "No boards found."
 msgid "No colon in first line of depfile"
 msgstr "No colon in first line of depfile"
 
-#: cli/lib/examples.go:107
+#: cli/lib/examples.go:110
 msgid "No libraries found."
 msgstr "No libraries found."
 
@@ -1848,7 +1848,7 @@ msgstr "Show full board details"
 msgid "Show information about a board, in particular if the board has options to be specified in the FQBN."
 msgstr "Show information about a board, in particular if the board has options to be specified in the FQBN."
 
-#: cli/lib/examples.go:46
+#: cli/lib/examples.go:49
 #: cli/lib/list.go:49
 msgid "Show libraries for the specified board FQBN."
 msgstr "Show libraries for the specified board FQBN."

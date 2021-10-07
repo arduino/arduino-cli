@@ -42,6 +42,9 @@ func initExamplesCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " lib examples Wire",
 		Args:    cobra.MaximumNArgs(1),
 		Run:     runExamplesCommand,
+		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return arguments.GetUninstallableLibs(toComplete), cobra.ShellCompDirectiveDefault
+		},
 	}
 	examplesCommand.Flags().StringVarP(&examplesFlags.fqbn, "fqbn", "b", "", tr("Show libraries for the specified board FQBN."))
 	examplesCommand.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
