@@ -13,6 +13,8 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
+// Documentation about pluggable monitor is available here:
+// https://arduino.github.io/arduino-cli/latest/pluggable-monitor-specification/
 package monitor
 
 import (
@@ -28,16 +30,6 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
-)
-
-// To work correctly a Pluggable Monitor must respect the state machine specifed on the documentation:
-// https://arduino.github.io/arduino-cli/latest/pluggable-monitor-specification/#state-machine
-// States a PluggableMonitor can be in
-const (
-	Alive int = iota
-	Idle
-	Opened
-	Dead
 )
 
 // PluggableMonitor is a tool that communicates with a board through a communication port.
