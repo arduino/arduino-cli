@@ -762,20 +762,20 @@ Monitor tools are a special kind of tool used to let the user communicate with t
 A platform must declare one or more Pluggable Monitor in its [`platform.txt`](#platformtxt) and bind them to a specific
 port protocol. Monitors can be referenced from other packages.
 
-The following direcive is used to bind a specific monitor tool to a specific port protocol:
+The following directive is used to bind a specific monitor tool to a specific port protocol:
 
 ```
-pluggable_monitor.required.PROTOCOL=PLATFORM:MONITOR_NAME
+pluggable_monitor.required.PROTOCOL=VENDOR_ID:MONITOR_NAME
 ```
 
-where `PROTOCOL` must be replaced with the port protocol identifier and `PLATFORM:MONITOR_NAME` must be replaced with
+where `PROTOCOL` must be replaced with the port protocol identifier and `VENDOR_ID:MONITOR_NAME` must be replaced with
 the monitor tool identifier.
 
 The platform can support as many protocols as needed:
 
 ```
-pluggable_monitor.required.PROTOCOL1=PLATFORM:MONITOR_NAME1
-pluggable_monitor.required.PROTOCOL2=PLATFORM:MONITOR_NAME2
+pluggable_monitor.required.PROTOCOL1=VENDOR_ID:MONITOR_NAME1
+pluggable_monitor.required.PROTOCOL2=VENDOR_ID:MONITOR_NAME2
 ...
 ```
 
@@ -794,10 +794,10 @@ example could be:
 pluggable_monitor.pattern.custom-ble="{runtime.tools.my-ble-monitor.path}/my-ble-monitor" -H
 ```
 
-in this case the platform provides a new hypotetical `custom-ble` protocol monitor tool and the command line tool named
+in this case the platform provides a new hypothetical `custom-ble` protocol monitor tool and the command line tool named
 `my-ble-monitor` is launched with the `-H` parameter to start the monitor tool. In this case the command line pattern
 may contain any extra parameter in the formula: this is different from the monitor tools installed through the
-`discoveryDependencies` field that must run without any command line parameter.
+`monitorDependencies` field that must run without any command line parameter.
 
 We strongly recommend using this syntax only for development purposes and not on released platforms.
 

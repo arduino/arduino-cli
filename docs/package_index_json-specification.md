@@ -81,7 +81,7 @@ Each tool describes a binary distribution of a command line tool. A tool can be:
 - a debugger
 - a program that performs a firmware upgrade
 - a [pluggable discovery](pluggable-discovery-specification.md)
-- a [pluggable monitor][pluggable-monitor-specification.md]
+- a [pluggable monitor](pluggable-monitor-specification.md)
 
 basically anything that can run on the user's host PC and do something useful.
 
