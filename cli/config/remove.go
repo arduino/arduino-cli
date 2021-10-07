@@ -35,6 +35,9 @@ func initRemoveCommand() *cobra.Command {
 			"  " + os.Args[0] + " config remove board_manager.additional_urls https://example.com/package_example_index.json https://another-url.com/package_another_index.json\n",
 		Args: cobra.MinimumNArgs(2),
 		Run:  runRemoveCommand,
+		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return configuration.Settings.AllKeys(), cobra.ShellCompDirectiveDefault
+		},
 	}
 	return addCommand
 }

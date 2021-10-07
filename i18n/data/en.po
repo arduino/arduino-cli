@@ -264,7 +264,7 @@ msgstr "Can't find dependencies for platform %s"
 msgid "Can't open sketch"
 msgstr "Can't open sketch"
 
-#: cli/config/set.go:54
+#: cli/config/set.go:57
 msgid "Can't set multiple values in key %v"
 msgstr "Can't set multiple values in key %v"
 
@@ -272,9 +272,9 @@ msgstr "Can't set multiple values in key %v"
 msgid "Can't use both --dest-file and --dest-dir flags at the same time."
 msgstr "Can't use both --dest-file and --dest-dir flags at the same time."
 
-#: cli/config/add.go:60
-#: cli/config/delete.go:67
-#: cli/config/remove.go:69
+#: cli/config/add.go:63
+#: cli/config/delete.go:70
+#: cli/config/remove.go:72
 msgid "Can't write config file: %v"
 msgstr "Can't write config file: %v"
 
@@ -1822,7 +1822,7 @@ msgstr "Sets a setting value."
 msgid "Sets where to save the configuration file."
 msgstr "Sets where to save the configuration file."
 
-#: cli/config/delete.go:57
+#: cli/config/delete.go:60
 #: cli/config/validate.go:45
 msgid "Settings key doesn't exist"
 msgstr "Settings key doesn't exist"
@@ -1988,13 +1988,13 @@ msgstr "The custom config file (if not specified the default will be used)."
 msgid "The flags --run-post-install and --skip-post-install can't be both set at the same time."
 msgstr "The flags --run-post-install and --skip-post-install can't be both set at the same time."
 
-#: cli/config/add.go:51
+#: cli/config/add.go:54
 msgid "The key '%[1]v' is not a list of items, can't add to it.\n"
 "Maybe use '%[2]s'?"
 msgstr "The key '%[1]v' is not a list of items, can't add to it.\n"
 "Maybe use '%[2]s'?"
 
-#: cli/config/remove.go:51
+#: cli/config/remove.go:54
 msgid "The key '%[1]v' is not a list of items, can't remove from it.\n"
 "Maybe use '%[2]s'?"
 msgstr "The key '%[1]v' is not a list of items, can't remove from it.\n"
@@ -2347,7 +2347,7 @@ msgstr "Writes current configuration to a configuration file."
 msgid "Writes current configuration to the configuration file in the data directory."
 msgstr "Writes current configuration to the configuration file in the data directory."
 
-#: cli/config/set.go:76
+#: cli/config/set.go:79
 msgid "Writing config file: %v"
 msgstr "Writing config file: %v"
 
@@ -2568,7 +2568,7 @@ msgstr "encoding sketch metadata: %s"
 msgid "error opening serial monitor"
 msgstr "error opening serial monitor"
 
-#: cli/config/set.go:68
+#: cli/config/set.go:71
 msgid "error parsing value: %v"
 msgstr "error parsing value: %v"
 
