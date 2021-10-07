@@ -146,3 +146,19 @@ func GetUninstallableLibs(toComplete string) []string {
 	return res
 }
 
+// GetInstallableLibs is an helper function useful to autocomplete.
+// It returns a list of libs which can be installed/downloaded
+func GetInstallableLibs(toComplete string) []string {
+	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
+
+	libs, _ := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
+		Instance: inst,
+		Query:    "", // if no query is specified all the libs are returned
+	})
+	var res []string
+	// transform the data structure for the completion
+	for _, i := range libs.Libraries {
+		res = append(res, i.Name)
+	}
+	return res
+}
