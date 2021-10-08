@@ -61,8 +61,8 @@ message MonitorPortSetting {
 message EnumerateMonitorPortSettingsRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
-  // The Port to enumerate settings.
-  Port port = 2;
+  // The port protoco to enumerate settings.
+  string port_protocol = 2;
   // The board FQBN we are trying to connect to. This is optional, and it's
   // needed to disambiguate if more than one platform provides the pluggable
   // monitor for a given port protocol.

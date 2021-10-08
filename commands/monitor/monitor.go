@@ -59,7 +59,7 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 		return nil, nil, &commands.InvalidInstanceError{}
 	}
 
-	m, err := findMonitorForProtocolAndBoard(pm, req.GetPort(), req.GetFqbn())
+	m, err := findMonitorForProtocolAndBoard(pm, req.GetPort().GetProtocol(), req.GetFqbn())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -88,11 +88,7 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 	}, descriptor, nil
 }
 
-func findMonitorForProtocolAndBoard(pm *packagemanager.PackageManager, port *rpc.Port, fqbn string) (*pluggableMonitor.PluggableMonitor, error) {
-	if port == nil {
-		return nil, &commands.MissingPortError{}
-	}
-	protocol := port.GetProtocol()
+func findMonitorForProtocolAndBoard(pm *packagemanager.PackageManager, protocol string, fqbn string) (*pluggableMonitor.PluggableMonitor, error) {
 	if protocol == "" {
 		return nil, &commands.MissingPortProtocolError{}
 	}

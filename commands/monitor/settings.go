@@ -30,7 +30,7 @@ func EnumerateMonitorPortSettings(ctx context.Context, req *rpc.EnumerateMonitor
 		return nil, &commands.InvalidInstanceError{}
 	}
 
-	m, err := findMonitorForProtocolAndBoard(pm, req.GetPort(), req.GetFqbn())
+	m, err := findMonitorForProtocolAndBoard(pm, req.GetPortProtocol(), req.GetFqbn())
 	if err != nil {
 		return nil, err
 	}

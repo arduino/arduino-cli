@@ -77,9 +77,9 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 	}
 
 	enumerateResp, err := monitor.EnumerateMonitorPortSettings(context.Background(), &rpc.EnumerateMonitorPortSettingsRequest{
-		Instance: instance,
-		Port:     port.ToRPC(),
-		Fqbn:     "",
+		Instance:     instance,
+		PortProtocol: port.Protocol,
+		Fqbn:         "",
 	})
 	if err != nil {
 		feedback.Error(tr("Error getting port settings details: %s"), err)
