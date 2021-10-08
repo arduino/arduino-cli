@@ -46,6 +46,21 @@ func (p *Port) AddToCommand(cmd *cobra.Command) {
 	cmd.Flags().DurationVar(&p.timeout, "discovery-timeout", 5*time.Second, tr("Max time to wait for port discovery, e.g.: 30s, 1m"))
 }
 
+// GetPortAddressAndProtocol returns only the port address and the port protocol
+// without any other port metadata obtained from the discoveries. This method allows
+// to bypass the discoveries unless the protocol is not specified: in this
+// case the discoveries are needed to autodetect the protocol.
+func (p *Port) GetPortAddressAndProtocol(instance *rpc.Instance, sk *sketch.Sketch) (string, string, error) {
+	if p.protocol != "" {
+		return p.address, p.protocol, nil
+	}
+	port, err := p.GetPort(instance, sk)
+	if err != nil {
+		return "", "", err
+	}
+	return port.Address, port.Protocol, nil
+}
+
 // GetPort returns the Port obtained by parsing command line arguments.
 // The extra metadata for the ports is obtained using the pluggable discoveries.
 func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Port, error) {

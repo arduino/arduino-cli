@@ -70,7 +70,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 		quiet = true
 	}
 
-	port, err := portArgs.GetPort(instance, nil)
+	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(instance, nil)
 	if err != nil {
 		feedback.Error(err)
 		os.Exit(errorcodes.ErrGeneric)
@@ -78,11 +78,11 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 
 	enumerateResp, err := monitor.EnumerateMonitorPortSettings(context.Background(), &rpc.EnumerateMonitorPortSettingsRequest{
 		Instance:     instance,
-		PortProtocol: port.Protocol,
+		PortProtocol: portProtocol,
 		Fqbn:         "",
 	})
 	if err != nil {
-		feedback.Error(tr("Error getting port settings details: %s"), err)
+		feedback.Error(tr("Error getting port settings details: %s", err))
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	if describe {
@@ -142,7 +142,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 	}
 	portProxy, _, err := monitor.Monitor(context.Background(), &rpc.MonitorRequest{
 		Instance:          instance,
-		Port:              port.ToRPC(),
+		Port:              &rpc.Port{Address: portAddress, Protocol: portProtocol},
 		Fqbn:              "",
 		PortConfiguration: configuration,
 	})
@@ -169,7 +169,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 	}()
 
 	if !quiet {
-		feedback.Print(tr("Connected to %s! Press CTRL-C to exit.", port.String()))
+		feedback.Print(tr("Connected to %s! Press CTRL-C to exit.", portAddress))
 	}
 
 	// Wait for port closed
