@@ -29,7 +29,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
-	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 )
 
@@ -264,9 +263,9 @@ func (mon *PluggableMonitor) Configure(param, value string) error {
 }
 
 // Open connects to the given Port. A communication channel is opened
-func (mon *PluggableMonitor) Open(port *rpc.Port) (io.ReadWriter, error) {
-	if port.Protocol != mon.supportedProtocol {
-		return nil, fmt.Errorf("invalid monitor protocol '%s': only '%s' is accepted", port.Protocol, mon.supportedProtocol)
+func (mon *PluggableMonitor) Open(portAddress, portProtocol string) (io.ReadWriter, error) {
+	if portProtocol != mon.supportedProtocol {
+		return nil, fmt.Errorf("invalid monitor protocol '%s': only '%s' is accepted", portProtocol, mon.supportedProtocol)
 	}
 
 	tcpListener, err := net.Listen("tcp", "127.0.0.1:")
@@ -276,7 +275,7 @@ func (mon *PluggableMonitor) Open(port *rpc.Port) (io.ReadWriter, error) {
 	defer tcpListener.Close()
 	tcpListenerPort := tcpListener.Addr().(*net.TCPAddr).Port
 
-	if err := mon.sendCommand(fmt.Sprintf("OPEN 127.0.0.1:%d %s\n", tcpListenerPort, port.Address)); err != nil {
+	if err := mon.sendCommand(fmt.Sprintf("OPEN 127.0.0.1:%d %s\n", tcpListenerPort, portAddress)); err != nil {
 		return nil, err
 	}
 	if _, err := mon.waitMessage(time.Second*10, "open"); err != nil {

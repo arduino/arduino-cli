@@ -30,17 +30,10 @@ func EnumerateMonitorPortSettings(ctx context.Context, req *rpc.EnumerateMonitor
 		return nil, &commands.InvalidInstanceError{}
 	}
 
-	monitorRef, err := findMonitorForProtocolAndBoard(pm, req.GetPort(), req.GetFqbn())
+	m, err := findMonitorForProtocolAndBoard(pm, req.GetPortProtocol(), req.GetFqbn())
 	if err != nil {
 		return nil, err
 	}
-
-	tool := pm.FindMonitorDependency(monitorRef)
-	if tool == nil {
-		return nil, &commands.MonitorNotFoundError{Monitor: monitorRef.String()}
-	}
-
-	m := pluggableMonitor.New(monitorRef.Name, tool.InstallDir.Join(monitorRef.Name).String())
 
 	if err := m.Run(); err != nil {
 		return nil, &commands.FailedMonitorError{Cause: err}
