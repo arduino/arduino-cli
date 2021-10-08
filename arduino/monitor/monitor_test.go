@@ -24,7 +24,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -59,12 +58,11 @@ func TestDummyMonitor(t *testing.T) {
 	err = mon.Configure("speed", "38400")
 	require.NoError(t, err)
 
-	port := &discovery.Port{Address: "/dev/ttyACM0", Protocol: "test"}
-	rw, err := mon.Open(port.ToRPC())
+	rw, err := mon.Open("/dev/ttyACM0", "test")
 	require.NoError(t, err)
 
 	// Double open -> error: port already opened
-	_, err = mon.Open(port.ToRPC())
+	_, err = mon.Open("/dev/ttyACM0", "test")
 	require.Error(t, err)
 
 	// Write "TEST"
@@ -93,7 +91,7 @@ func TestDummyMonitor(t *testing.T) {
 	time.Sleep(100 * time.Millisecond)
 	require.Equal(t, int32(1), atomic.LoadInt32(&completed))
 
-	rw, err = mon.Open(port.ToRPC())
+	rw, err = mon.Open("/dev/ttyACM0", "test")
 	require.NoError(t, err)
 	n, err = rw.Write([]byte("TEST"))
 	require.NoError(t, err)

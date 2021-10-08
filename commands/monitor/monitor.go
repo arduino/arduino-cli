@@ -73,7 +73,7 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 		return nil, nil, &commands.FailedMonitorError{Cause: err}
 	}
 
-	monIO, err := m.Open(req.GetPort())
+	monIO, err := m.Open(req.GetPort().GetAddress(), req.Port.GetProtocol())
 	if err != nil {
 		return nil, nil, &commands.FailedMonitorError{Cause: err}
 	}
