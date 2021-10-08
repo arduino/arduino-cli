@@ -427,7 +427,7 @@ msgstr "Configuring platform."
 msgid "Connected"
 msgstr "Connected"
 
-#: cli/monitor/monitor.go:181
+#: cli/monitor/monitor.go:172
 msgid "Connected to %s! Press CTRL-C to exit."
 msgstr "Connected to %s! Press CTRL-C to exit."
 
@@ -504,7 +504,7 @@ msgstr "Debugging not supported for board %s"
 msgid "Debugging supported:"
 msgstr "Debugging supported:"
 
-#: cli/monitor/monitor.go:199
+#: cli/monitor/monitor.go:190
 msgid "Default"
 msgstr "Default"
 
@@ -790,7 +790,7 @@ msgstr "Error getting information for library %s"
 msgid "Error getting libraries info: %v"
 msgstr "Error getting libraries info: %v"
 
-#: cli/monitor/monitor.go:86
+#: cli/monitor/monitor.go:85
 msgid "Error getting port settings details: %s"
 msgstr "Error getting port settings details: %s"
 
@@ -1138,7 +1138,7 @@ msgstr "Global variables use {0} bytes of dynamic memory."
 
 #: cli/core/list.go:84
 #: cli/core/search.go:114
-#: cli/monitor/monitor.go:199
+#: cli/monitor/monitor.go:190
 #: cli/outdated/outdated.go:62
 msgid "ID"
 msgstr "ID"
@@ -1475,7 +1475,7 @@ msgstr "Missing sketch path"
 msgid "Monitor '%s' not found"
 msgstr "Monitor '%s' not found"
 
-#: cli/monitor/monitor.go:147
+#: cli/monitor/monitor.go:138
 msgid "Monitor port settings:"
 msgstr "Monitor port settings:"
 
@@ -1731,8 +1731,8 @@ msgstr "Platform size (bytes):"
 msgid "Port"
 msgstr "Port"
 
-#: cli/monitor/monitor.go:168
-#: cli/monitor/monitor.go:175
+#: cli/monitor/monitor.go:159
+#: cli/monitor/monitor.go:166
 msgid "Port closed:"
 msgstr "Port closed:"
 
@@ -1873,7 +1873,7 @@ msgstr "Sets a setting value."
 msgid "Sets where to save the configuration file."
 msgstr "Sets where to save the configuration file."
 
-#: cli/monitor/monitor.go:199
+#: cli/monitor/monitor.go:190
 msgid "Setting"
 msgstr "Setting"
 
@@ -2348,7 +2348,7 @@ msgstr "VERSION"
 msgid "VERSION_NUMBER"
 msgstr "VERSION_NUMBER"
 
-#: cli/monitor/monitor.go:199
+#: cli/monitor/monitor.go:190
 msgid "Values"
 msgstr "Values"
 
@@ -2503,7 +2503,7 @@ msgstr "cleaning build path"
 msgid "command"
 msgstr "command"
 
-#: arduino/monitor/monitor.go:150
+#: arduino/monitor/monitor.go:149
 msgid "command '%[1]s' failed: %[2]s"
 msgstr "command '%[1]s' failed: %[2]s"
 
@@ -2516,7 +2516,7 @@ msgstr "command '%[1]s' failed: %[2]s"
 msgid "command failed: %s"
 msgstr "command failed: %s"
 
-#: arduino/monitor/monitor.go:147
+#: arduino/monitor/monitor.go:146
 msgid "communication out of sync, expected '%[1]s', received '%[2]s'"
 msgstr "communication out of sync, expected '%[1]s', received '%[2]s'"
 
@@ -2855,11 +2855,11 @@ msgstr "invalid platform archive size: %s"
 msgid "invalid pluggable monitor reference: %s"
 msgstr "invalid pluggable monitor reference: %s"
 
-#: cli/monitor/monitor.go:130
+#: cli/monitor/monitor.go:121
 msgid "invalid port configuration value for %s: %s"
 msgstr "invalid port configuration value for %s: %s"
 
-#: cli/monitor/monitor.go:139
+#: cli/monitor/monitor.go:130
 msgid "invalid port configuration: %s"
 msgstr "invalid port configuration: %s"
 
@@ -3106,11 +3106,11 @@ msgstr "pluggable discovery already added: %s"
 msgid "port"
 msgstr "port"
 
-#: cli/arguments/port.go:122
+#: cli/arguments/port.go:137
 msgid "port not found: %[1]s %[2]s"
 msgstr "port not found: %[1]s %[2]s"
 
-#: arduino/monitor/monitor.go:239
+#: arduino/monitor/monitor.go:238
 msgid "protocol version not supported: requested %[1]d, got %[2]d"
 msgstr "protocol version not supported: requested %[1]d, got %[2]d"
 
@@ -3300,7 +3300,7 @@ msgstr "the platform has no releases"
 msgid "the server responded with status %s"
 msgstr "the server responded with status %s"
 
-#: arduino/monitor/monitor.go:140
+#: arduino/monitor/monitor.go:139
 msgid "timeout waiting for message"
 msgstr "timeout waiting for message"
 
