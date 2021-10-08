@@ -407,7 +407,7 @@ msgstr "Config file already exists, use --overwrite to discard the existing one.
 msgid "Config file written to: %s"
 msgstr "Config file written to: %s"
 
-#: cli/monitor/monitor.go:60
+#: cli/monitor/monitor.go:61
 msgid "Configuration of the port."
 msgstr "Configuration of the port."
 
@@ -427,7 +427,7 @@ msgstr "Configuring platform."
 msgid "Connected"
 msgstr "Connected"
 
-#: cli/monitor/monitor.go:172
+#: cli/monitor/monitor.go:174
 msgid "Connected to %s! Press CTRL-C to exit."
 msgstr "Connected to %s! Press CTRL-C to exit."
 
@@ -504,7 +504,7 @@ msgstr "Debugging not supported for board %s"
 msgid "Debugging supported:"
 msgstr "Debugging supported:"
 
-#: cli/monitor/monitor.go:190
+#: cli/monitor/monitor.go:192
 msgid "Default"
 msgstr "Default"
 
@@ -790,7 +790,7 @@ msgstr "Error getting information for library %s"
 msgid "Error getting libraries info: %v"
 msgstr "Error getting libraries info: %v"
 
-#: cli/monitor/monitor.go:85
+#: cli/monitor/monitor.go:87
 msgid "Error getting port settings details: %s"
 msgstr "Error getting port settings details: %s"
 
@@ -1091,6 +1091,7 @@ msgstr "Force skip of post-install scripts (if the CLI is running interactively)
 #: cli/burnbootloader/burnbootloader.go:53
 #: cli/compile/compile.go:85
 #: cli/debug/debug.go:61
+#: cli/monitor/monitor.go:63
 #: cli/upload/upload.go:57
 msgid "Fully Qualified Board Name, e.g.: arduino:avr:uno"
 msgstr "Fully Qualified Board Name, e.g.: arduino:avr:uno"
@@ -1138,7 +1139,7 @@ msgstr "Global variables use {0} bytes of dynamic memory."
 
 #: cli/core/list.go:84
 #: cli/core/search.go:114
-#: cli/monitor/monitor.go:190
+#: cli/monitor/monitor.go:192
 #: cli/outdated/outdated.go:62
 msgid "ID"
 msgstr "ID"
@@ -1290,6 +1291,10 @@ msgstr "Invalid parameter %s: version not allowed"
 #: commands/board/list.go:57
 msgid "Invalid pid value: '%s'"
 msgstr "Invalid pid value: '%s'"
+
+#: commands/monitor/monitor.go:122
+msgid "Invalid recipe in platform.txt"
+msgstr "Invalid recipe in platform.txt"
 
 #: legacy/builder/phases/sizer.go:162
 msgid "Invalid size regexp: %s"
@@ -1475,7 +1480,7 @@ msgstr "Missing sketch path"
 msgid "Monitor '%s' not found"
 msgstr "Monitor '%s' not found"
 
-#: cli/monitor/monitor.go:138
+#: cli/monitor/monitor.go:140
 msgid "Monitor port settings:"
 msgstr "Monitor port settings:"
 
@@ -1580,8 +1585,8 @@ msgstr "OS:"
 msgid "Official Arduino board:"
 msgstr "Official Arduino board:"
 
-#: cli/monitor/monitor.go:51
 #: cli/monitor/monitor.go:52
+#: cli/monitor/monitor.go:53
 msgid "Open a communication port with a board."
 msgstr "Open a communication port with a board."
 
@@ -1731,8 +1736,8 @@ msgstr "Platform size (bytes):"
 msgid "Port"
 msgstr "Port"
 
-#: cli/monitor/monitor.go:159
-#: cli/monitor/monitor.go:166
+#: cli/monitor/monitor.go:161
+#: cli/monitor/monitor.go:168
 msgid "Port closed:"
 msgstr "Port closed:"
 
@@ -1815,7 +1820,7 @@ msgstr "Required tool:"
 msgid "Run as a daemon on port: %s"
 msgstr "Run as a daemon on port: %s"
 
-#: cli/monitor/monitor.go:61
+#: cli/monitor/monitor.go:62
 msgid "Run in silent mode, show only monitor input and output."
 msgstr "Run in silent mode, show only monitor input and output."
 
@@ -1873,7 +1878,7 @@ msgstr "Sets a setting value."
 msgid "Sets where to save the configuration file."
 msgstr "Sets where to save the configuration file."
 
-#: cli/monitor/monitor.go:190
+#: cli/monitor/monitor.go:192
 msgid "Setting"
 msgstr "Setting"
 
@@ -1890,7 +1895,7 @@ msgstr "Show all available core versions."
 msgid "Show all build properties used instead of compiling."
 msgstr "Show all build properties used instead of compiling."
 
-#: cli/monitor/monitor.go:59
+#: cli/monitor/monitor.go:60
 msgid "Show all the settings of the communication port."
 msgstr "Show all the settings of the communication port."
 
@@ -2348,7 +2353,7 @@ msgstr "VERSION"
 msgid "VERSION_NUMBER"
 msgstr "VERSION_NUMBER"
 
-#: cli/monitor/monitor.go:190
+#: cli/monitor/monitor.go:192
 msgid "Values"
 msgstr "Values"
 
@@ -2469,7 +2474,7 @@ msgstr "can't find latest release of %s"
 msgid "can't find main Sketch file in %s"
 msgstr "can't find main Sketch file in %s"
 
-#: arduino/cores/packagemanager/loader.go:782
+#: arduino/cores/packagemanager/loader.go:791
 msgid "can't find pattern for discovery with id %s"
 msgstr "can't find pattern for discovery with id %s"
 
@@ -2552,7 +2557,7 @@ msgstr "computing hash: %s"
 msgid "could not find a valid build artifact"
 msgstr "could not find a valid build artifact"
 
-#: arduino/cores/packagemanager/loader.go:719
+#: arduino/cores/packagemanager/loader.go:728
 msgid "creating discovery: %s"
 msgstr "creating discovery: %s"
 
@@ -2593,11 +2598,11 @@ msgstr "directory doesn't exist: %s"
 msgid "discovery %[1]s process not started: %[2]w"
 msgstr "discovery %[1]s process not started: %[2]w"
 
-#: arduino/cores/packagemanager/loader.go:710
+#: arduino/cores/packagemanager/loader.go:719
 msgid "discovery not found: %s"
 msgstr "discovery not found: %s"
 
-#: arduino/cores/packagemanager/loader.go:714
+#: arduino/cores/packagemanager/loader.go:723
 msgid "discovery not installed: %s"
 msgstr "discovery not installed: %s"
 
@@ -2734,7 +2739,7 @@ msgstr "getting build properties for board %[1]s: %[2]s"
 msgid "getting discovery dependencies for platform %[1]s: %[2]s"
 msgstr "getting discovery dependencies for platform %[1]s: %[2]s"
 
-#: arduino/cores/packagemanager/loader.go:663
+#: arduino/cores/packagemanager/loader.go:672
 msgid "getting parent dir of %[1]s: %[2]s"
 msgstr "getting parent dir of %[1]s: %[2]s"
 
@@ -2855,11 +2860,11 @@ msgstr "invalid platform archive size: %s"
 msgid "invalid pluggable monitor reference: %s"
 msgstr "invalid pluggable monitor reference: %s"
 
-#: cli/monitor/monitor.go:121
+#: cli/monitor/monitor.go:123
 msgid "invalid port configuration value for %s: %s"
 msgstr "invalid port configuration value for %s: %s"
 
-#: cli/monitor/monitor.go:130
+#: cli/monitor/monitor.go:132
 msgid "invalid port configuration: %s"
 msgstr "invalid port configuration: %s"
 
@@ -2918,7 +2923,7 @@ msgstr "loading %[1]s: %[2]s"
 msgid "loading boards: %s"
 msgstr "loading boards: %s"
 
-#: arduino/cores/packagemanager/loader.go:618
+#: arduino/cores/packagemanager/loader.go:627
 msgid "loading bundled tools from %[1]s: %[2]s"
 msgstr "loading bundled tools from %[1]s: %[2]s"
 
@@ -2945,7 +2950,7 @@ msgstr "loading platform release %[1]s: %[2]s"
 msgid "loading platform.txt: %v"
 msgstr "loading platform.txt: %v"
 
-#: arduino/cores/packagemanager/loader.go:585
+#: arduino/cores/packagemanager/loader.go:594
 msgid "loading tool release in %[1]s: %[2]s"
 msgstr "loading tool release in %[1]s: %[2]s"
 
@@ -3089,7 +3094,7 @@ msgstr "platform %s is not installed"
 
 #: arduino/cores/packagemanager/install_uninstall.go:65
 #: arduino/cores/packagemanager/install_uninstall.go:108
-#: arduino/cores/packagemanager/loader.go:447
+#: arduino/cores/packagemanager/loader.go:456
 #: commands/compile/compile.go:127
 msgid "platform not installed"
 msgstr "platform not installed"
@@ -3126,7 +3131,7 @@ msgstr "quitting discovery %[1]s: %[2]w"
 msgid "reading %[1]s directory: %[2]s"
 msgstr "reading %[1]s directory: %[2]s"
 
-#: arduino/cores/packagemanager/loader.go:668
+#: arduino/cores/packagemanager/loader.go:677
 msgid "reading %[1]s: %[2]s"
 msgstr "reading %[1]s: %[2]s"
 
@@ -3136,7 +3141,7 @@ msgid "reading dir %[1]s: %[2]s"
 msgstr "reading dir %[1]s: %[2]s"
 
 #: arduino/cores/packagemanager/loader.go:162
-#: arduino/cores/packagemanager/loader.go:576
+#: arduino/cores/packagemanager/loader.go:585
 msgid "reading directory %[1]s: %[2]s"
 msgstr "reading directory %[1]s: %[2]s"
 
@@ -3227,7 +3232,7 @@ msgstr "retrieving Arduino public keys: %s"
 msgid "scanning examples: %s"
 msgstr "scanning examples: %s"
 
-#: arduino/cores/packagemanager/loader.go:654
+#: arduino/cores/packagemanager/loader.go:663
 msgid "searching for builtin_tools_versions.txt in %[1]s: %[2]s"
 msgstr "searching for builtin_tools_versions.txt in %[1]s: %[2]s"
 
@@ -3248,7 +3253,7 @@ msgstr "sketch path is not valid"
 msgid "sketchPath"
 msgstr "sketchPath"
 
-#: arduino/cores/packagemanager/loader.go:510
+#: arduino/cores/packagemanager/loader.go:519
 msgid "skipping loading of boards %s: malformed custom board options"
 msgstr "skipping loading of boards %s: malformed custom board options"
 
