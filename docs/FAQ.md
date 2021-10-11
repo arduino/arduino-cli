@@ -25,9 +25,6 @@ by this command is very limited and you may want to look for other tools if you 
 There are many excellent serial terminals to chose from. On Linux or macOS, you may already have [screen][screen]
 installed. On Windows, a good choice for command line usage is Plink, included with [PuTTY][putty].
 
-Arduino CLI does provide a gRPC interface which offers the capability for powerful integration with custom monitors. See
-the [Monitor service documentation][monitor service].
-
 ## Additional assistance
 
 If your question wasn't answered, feel free to ask on [Arduino CLI's forum board][1].
