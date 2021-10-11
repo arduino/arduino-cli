@@ -19,9 +19,8 @@ Additional board options have to be separated by commas (instead of colon):
 
 ## Where is the Serial Monitor?
 
-This being a command line tool, we believe it's up to the user to choose their preferred way of interacting with the
-serial connection. If we were to integrate it into the CLI we'd end up putting a tool inside a tool, and this would be
-something that we're trying to avoid.
+The serial monitor is available through the [monitor command][monitor command]. By the way, the functionality provided
+by this command is very limited and you may want to look for other tools if you need more advanced functionality.
 
 There are many excellent serial terminals to chose from. On Linux or macOS, you may already have [screen][screen]
 installed. On Windows, a good choice for command line usage is Plink, included with [PuTTY][putty].
@@ -39,3 +38,4 @@ If your question wasn't answered, feel free to ask on [Arduino CLI's forum board
 [screen]: https://www.gnu.org/software/screen/manual/screen.html
 [putty]: https://www.chiark.greenend.org.uk/~sgtatham/putty/
 [monitor service]: rpc/monitor.md
+[monitor command]: commands/arduino-cli_monitor.md

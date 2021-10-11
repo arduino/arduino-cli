@@ -89,6 +89,7 @@ nav:
       - lib uninstall: commands/arduino-cli_lib_uninstall.md
       - lib update-index: commands/arduino-cli_lib_update-index.md
       - lib upgrade: commands/arduino-cli_lib_upgrade.md
+      - monitor: commands/arduino-cli_monitor.md
       - outdated: commands/arduino-cli_outdated.md
       - sketch: commands/arduino-cli_sketch.md
       - sketch archive: commands/arduino-cli_sketch_archive.md
