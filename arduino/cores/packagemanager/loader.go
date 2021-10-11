@@ -326,6 +326,7 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 	} else {
 		platform.Properties.Set("pluggable_discovery.required.0", "builtin:serial-discovery")
 		platform.Properties.Set("pluggable_discovery.required.1", "builtin:mdns-discovery")
+		platform.Properties.Set("pluggable_monitor.required.serial", "builtin:serial-monitor")
 	}
 
 	if platform.Platform.Name == "" {
@@ -359,6 +360,28 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 	if !platform.PluggableDiscoveryAware {
 		convertLegacyPlatformToPluggableDiscovery(platform)
 	}
+
+	// Build pluggable monitor references
+	platform.Monitors = map[string]*cores.MonitorDependency{}
+	for protocol, ref := range platform.Properties.SubTree("pluggable_monitor.required").AsMap() {
+		split := strings.Split(ref, ":")
+		if len(split) != 2 {
+			return fmt.Errorf(tr("invalid pluggable monitor reference: %s"), ref)
+		}
+		pm.Log.WithField("protocol", protocol).WithField("tool", ref).Info("Adding monitor tool")
+		platform.Monitors[protocol] = &cores.MonitorDependency{
+			Packager: split[0],
+			Name:     split[1],
+		}
+	}
+
+	// Support for pluggable monitors in debugging/development environments
+	platform.MonitorsDevRecipes = map[string]string{}
+	for protocol, recipe := range platform.Properties.SubTree("pluggable_monitor.pattern").AsMap() {
+		pm.Log.WithField("protocol", protocol).WithField("recipe", recipe).Info("Adding monitor recipe")
+		platform.MonitorsDevRecipes[protocol] = recipe
+	}
+
 	return nil
 }
 

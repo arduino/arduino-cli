@@ -13,6 +13,9 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
+// Package monitor provides a client for Pluggable Monitors.
+// Documentation is available here:
+// https://arduino.github.io/arduino-cli/latest/pluggable-monitor-specification/
 package monitor
 
 import (
@@ -26,18 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
-	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
-)
-
-// To work correctly a Pluggable Monitor must respect the state machine specifed on the documentation:
-// https://arduino.github.io/arduino-cli/latest/pluggable-monitor-specification/#state-machine
-// States a PluggableMonitor can be in
-const (
-	Alive int = iota
-	Idle
-	Opened
-	Dead
 )
 
 // PluggableMonitor is a tool that communicates with a board through a communication port.
@@ -271,9 +263,9 @@ func (mon *PluggableMonitor) Configure(param, value string) error {
 }
 
 // Open connects to the given Port. A communication channel is opened
-func (mon *PluggableMonitor) Open(port *rpc.Port) (io.ReadWriter, error) {
-	if port.Protocol != mon.supportedProtocol {
-		return nil, fmt.Errorf("invalid monitor protocol '%s': only '%s' is accepted", port.Protocol, mon.supportedProtocol)
+func (mon *PluggableMonitor) Open(portAddress, portProtocol string) (io.ReadWriter, error) {
+	if portProtocol != mon.supportedProtocol {
+		return nil, fmt.Errorf("invalid monitor protocol '%s': only '%s' is accepted", portProtocol, mon.supportedProtocol)
 	}
 
 	tcpListener, err := net.Listen("tcp", "127.0.0.1:")
@@ -283,7 +275,7 @@ func (mon *PluggableMonitor) Open(port *rpc.Port) (io.ReadWriter, error) {
 	defer tcpListener.Close()
 	tcpListenerPort := tcpListener.Addr().(*net.TCPAddr).Port
 
-	if err := mon.sendCommand(fmt.Sprintf("OPEN 127.0.0.1:%d %s\n", tcpListenerPort, port.Address)); err != nil {
+	if err := mon.sendCommand(fmt.Sprintf("OPEN 127.0.0.1:%d %s\n", tcpListenerPort, portAddress)); err != nil {
 		return nil, err
 	}
 	if _, err := mon.waitMessage(time.Second*10, "open"); err != nil {

@@ -52,16 +52,18 @@ type PlatformRelease struct {
 	ToolDependencies        ToolDependencies
 	DiscoveryDependencies   DiscoveryDependencies
 	MonitorDependencies     MonitorDependencies
-	Help                    PlatformReleaseHelp    `json:"-"`
-	Platform                *Platform              `json:"-"`
-	Properties              *properties.Map        `json:"-"`
-	Boards                  map[string]*Board      `json:"-"`
-	Programmers             map[string]*Programmer `json:"-"`
-	Menus                   *properties.Map        `json:"-"`
-	InstallDir              *paths.Path            `json:"-"`
-	IsIDEBundled            bool                   `json:"-"`
-	IsTrusted               bool                   `json:"-"`
-	PluggableDiscoveryAware bool                   `json:"-"` // true if the Platform supports pluggable discovery (no compatibility layer required)
+	Help                    PlatformReleaseHelp           `json:"-"`
+	Platform                *Platform                     `json:"-"`
+	Properties              *properties.Map               `json:"-"`
+	Boards                  map[string]*Board             `json:"-"`
+	Programmers             map[string]*Programmer        `json:"-"`
+	Menus                   *properties.Map               `json:"-"`
+	InstallDir              *paths.Path                   `json:"-"`
+	IsIDEBundled            bool                          `json:"-"`
+	IsTrusted               bool                          `json:"-"`
+	PluggableDiscoveryAware bool                          `json:"-"` // true if the Platform supports pluggable discovery (no compatibility layer required)
+	Monitors                map[string]*MonitorDependency `json:"-"`
+	MonitorsDevRecipes      map[string]string             `json:"-"`
 }
 
 // BoardManifest contains information about a board. These metadata are usually

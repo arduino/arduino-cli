@@ -17,6 +17,7 @@ package daemon
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 
@@ -26,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/commands/monitor"
 	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/i18n"
@@ -37,7 +39,9 @@ import (
 
 // ArduinoCoreServerImpl FIXMEDOC
 type ArduinoCoreServerImpl struct {
-	rpc.UnimplementedArduinoCoreServiceServer
+	// Force compile error for unimplemented methods
+	rpc.UnsafeArduinoCoreServiceServer
+
 	VersionString string
 }
 
@@ -462,4 +466,76 @@ func (s *ArduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallRequ
 		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(&rpc.GitLibraryInstallResponse{})
+}
+
+// EnumerateMonitorPortSettings FIXMEDOC
+func (s *ArduinoCoreServerImpl) EnumerateMonitorPortSettings(ctx context.Context, req *rpc.EnumerateMonitorPortSettingsRequest) (*rpc.EnumerateMonitorPortSettingsResponse, error) {
+	resp, err := monitor.EnumerateMonitorPortSettings(ctx, req)
+	return resp, convertErrorToRPCStatus(err)
+}
+
+// Monitor FIXMEDOC
+func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorServer) error {
+	// The configuration must be sent on the first message
+	req, err := stream.Recv()
+	if err != nil {
+		return err
+	}
+
+	portProxy, _, err := monitor.Monitor(stream.Context(), req)
+	if err != nil {
+		return err
+	}
+	ctx, cancel := context.WithCancel(stream.Context())
+	go func() {
+		defer cancel()
+		for {
+			msg, err := stream.Recv()
+			if errors.Is(err, io.EOF) {
+				return
+			}
+			if err != nil {
+				stream.Send(&rpc.MonitorResponse{Error: err.Error()})
+				return
+			}
+			if conf := msg.GetPortConfiguration(); conf != nil {
+				for _, c := range conf.GetSettings() {
+					if err := portProxy.Config(c.SettingId, c.Value); err != nil {
+						stream.Send(&rpc.MonitorResponse{Error: err.Error()})
+					}
+				}
+			}
+			tx := msg.GetTxData()
+			for len(tx) > 0 {
+				n, err := portProxy.Write(tx)
+				if errors.Is(err, io.EOF) {
+					return
+				}
+				if err != nil {
+					stream.Send(&rpc.MonitorResponse{Error: err.Error()})
+					return
+				}
+				tx = tx[n:]
+			}
+		}
+	}()
+	go func() {
+		defer cancel()
+		buff := make([]byte, 4096)
+		for {
+			n, err := portProxy.Read(buff)
+			if errors.Is(err, io.EOF) {
+				return
+			}
+			if err != nil {
+				stream.Send(&rpc.MonitorResponse{Error: err.Error()})
+				return
+			}
+			if err := stream.Send(&rpc.MonitorResponse{RxData: buff[:n]}); err != nil {
+				return
+			}
+		}
+	}()
+	<-ctx.Done()
+	return nil
 }

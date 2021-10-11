@@ -162,6 +162,32 @@ func (e *MissingPortProtocolError) ToRPCStatus() *status.Status {
 	return status.New(codes.InvalidArgument, e.Error())
 }
 
+// MissingPortError is returned when the port is mandatory and not specified
+type MissingPortError struct{}
+
+func (e *MissingPortError) Error() string {
+	return tr("Missing port")
+}
+
+// ToRPCStatus converts the error into a *status.Status
+func (e *MissingPortError) ToRPCStatus() *status.Status {
+	return status.New(codes.InvalidArgument, e.Error())
+}
+
+// NoMonitorAvailableForProtocolError is returned when a monitor for the specified port protocol is not available
+type NoMonitorAvailableForProtocolError struct {
+	Protocol string
+}
+
+func (e *NoMonitorAvailableForProtocolError) Error() string {
+	return tr("No monitor available for the port protocol %s", e.Protocol)
+}
+
+// ToRPCStatus converts the error into a *status.Status
+func (e *NoMonitorAvailableForProtocolError) ToRPCStatus() *status.Status {
+	return status.New(codes.InvalidArgument, e.Error())
+}
+
 // MissingProgrammerError is returned when the programmer is mandatory and not specified
 type MissingProgrammerError struct{}
 
@@ -205,6 +231,25 @@ func (e *ProgrammerNotFoundError) Unwrap() error {
 
 // ToRPCStatus converts the error into a *status.Status
 func (e *ProgrammerNotFoundError) ToRPCStatus() *status.Status {
+	return status.New(codes.NotFound, e.Error())
+}
+
+// MonitorNotFoundError is returned when the pluggable monitor is not found
+type MonitorNotFoundError struct {
+	Monitor string
+	Cause   error
+}
+
+func (e *MonitorNotFoundError) Error() string {
+	return composeErrorMsg(tr("Monitor '%s' not found", e.Monitor), e.Cause)
+}
+
+func (e *MonitorNotFoundError) Unwrap() error {
+	return e.Cause
+}
+
+// ToRPCStatus converts the error into a *status.Status
+func (e *MonitorNotFoundError) ToRPCStatus() *status.Status {
 	return status.New(codes.NotFound, e.Error())
 }
 
@@ -451,6 +496,24 @@ func (e *FailedDebugError) Unwrap() error {
 
 // ToRPCStatus converts the error into a *status.Status
 func (e *FailedDebugError) ToRPCStatus() *status.Status {
+	return status.New(codes.Internal, e.Error())
+}
+
+// FailedMonitorError is returned when opening the monitor port of a board fails
+type FailedMonitorError struct {
+	Cause error
+}
+
+func (e *FailedMonitorError) Error() string {
+	return composeErrorMsg(tr("Port monitor error"), e.Cause)
+}
+
+func (e *FailedMonitorError) Unwrap() error {
+	return e.Cause
+}
+
+// ToRPCStatus converts the error into a *status.Status
+func (e *FailedMonitorError) ToRPCStatus() *status.Status {
 	return status.New(codes.Internal, e.Error())
 }
 
