@@ -120,6 +120,11 @@ service ArduinoCoreService {
   rpc UploadUsingProgrammer(UploadUsingProgrammerRequest)
       returns (stream UploadUsingProgrammerResponse);
 
+  // Returns the list of users fields necessary to upload to that board
+  // using the specified protocol.
+  rpc SupportedUserFields(SupportedUserFieldsRequest)
+      returns (SupportedUserFieldsResponse);
+
   // List programmers available for a board.
   rpc ListProgrammersAvailableForUpload(
       ListProgrammersAvailableForUploadRequest)

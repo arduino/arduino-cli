@@ -349,6 +349,12 @@ func (s *ArduinoCoreServerImpl) UploadUsingProgrammer(req *rpc.UploadUsingProgra
 	return stream.Send(resp)
 }
 
+// SupportedUserFields FIXMEDOC
+func (s *ArduinoCoreServerImpl) SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsRequest) (*rpc.SupportedUserFieldsResponse, error) {
+	res, err := upload.SupportedUserFields(ctx, req)
+	return res, convertErrorToRPCStatus(err)
+}
+
 // BurnBootloader FIXMEDOC
 func (s *ArduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderRequest, stream rpc.ArduinoCoreService_BurnBootloaderServer) error {
 	resp, err := upload.BurnBootloader(
