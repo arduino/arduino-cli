@@ -43,6 +43,7 @@ var portArgs arguments.Port
 var describe bool
 var configs []string
 var quiet bool
+var fqbn string
 
 // NewCommand created a new `monitor` command
 func NewCommand() *cobra.Command {
@@ -59,6 +60,7 @@ func NewCommand() *cobra.Command {
 	cmd.Flags().BoolVar(&describe, "describe", false, tr("Show all the settings of the communication port."))
 	cmd.Flags().StringSliceVarP(&configs, "config", "c", []string{}, tr("Configuration of the port."))
 	cmd.Flags().BoolVarP(&quiet, "quiet", "q", false, tr("Run in silent mode, show only monitor input and output."))
+	cmd.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
 	cmd.MarkFlagRequired("port")
 	return cmd
 }
@@ -79,7 +81,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 	enumerateResp, err := monitor.EnumerateMonitorPortSettings(context.Background(), &rpc.EnumerateMonitorPortSettingsRequest{
 		Instance:     instance,
 		PortProtocol: portProtocol,
-		Fqbn:         "",
+		Fqbn:         fqbn,
 	})
 	if err != nil {
 		feedback.Error(tr("Error getting port settings details: %s", err))
@@ -143,7 +145,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 	portProxy, _, err := monitor.Monitor(context.Background(), &rpc.MonitorRequest{
 		Instance:          instance,
 		Port:              &rpc.Port{Address: portAddress, Protocol: portProtocol},
-		Fqbn:              "",
+		Fqbn:              fqbn,
 		PortConfiguration: configuration,
 	})
 	if err != nil {

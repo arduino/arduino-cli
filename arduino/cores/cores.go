@@ -63,6 +63,7 @@ type PlatformRelease struct {
 	IsTrusted               bool                          `json:"-"`
 	PluggableDiscoveryAware bool                          `json:"-"` // true if the Platform supports pluggable discovery (no compatibility layer required)
 	Monitors                map[string]*MonitorDependency `json:"-"`
+	MonitorsDevRecipes      map[string]string             `json:"-"`
 }
 
 // BoardManifest contains information about a board. These metadata are usually

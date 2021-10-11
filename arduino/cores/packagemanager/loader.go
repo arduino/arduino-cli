@@ -368,11 +368,20 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 		if len(split) != 2 {
 			return fmt.Errorf(tr("invalid pluggable monitor reference: %s"), ref)
 		}
+		pm.Log.WithField("protocol", protocol).WithField("tool", ref).Info("Adding monitor tool")
 		platform.Monitors[protocol] = &cores.MonitorDependency{
 			Packager: split[0],
 			Name:     split[1],
 		}
 	}
+
+	// Support for pluggable monitors in debugging/development environments
+	platform.MonitorsDevRecipes = map[string]string{}
+	for protocol, recipe := range platform.Properties.SubTree("pluggable_monitor.pattern").AsMap() {
+		pm.Log.WithField("protocol", protocol).WithField("recipe", recipe).Info("Adding monitor recipe")
+		platform.MonitorsDevRecipes[protocol] = recipe
+	}
+
 	return nil
 }
 

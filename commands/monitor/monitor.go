@@ -17,14 +17,19 @@ package monitor
 
 import (
 	"context"
+	"fmt"
 	"io"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	pluggableMonitor "github.com/arduino/arduino-cli/arduino/monitor"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-properties-orderedmap"
 )
+
+var tr = i18n.Tr
 
 // PortProxy is an io.ReadWriteCloser that maps into the monitor port of the board
 type PortProxy struct {
@@ -102,13 +107,22 @@ func findMonitorForProtocolAndBoard(pm *packagemanager.PackageManager, protocol,
 			return nil, &commands.InvalidFQBNError{Cause: err}
 		}
 
-		_, boardPlatform, _, _, _, err := pm.ResolveFQBN(fqbn)
+		_, boardPlatform, _, boardProperties, _, err := pm.ResolveFQBN(fqbn)
 		if err != nil {
 			return nil, &commands.UnknownFQBNError{Cause: err}
 		}
 
 		if mon, ok := boardPlatform.Monitors[protocol]; ok {
 			monitorDepOrRecipe = mon
+		} else if recipe, ok := boardPlatform.MonitorsDevRecipes[protocol]; ok {
+			// If we have a recipe we must resolve it
+			cmdLine := boardProperties.ExpandPropsInString(recipe)
+			cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
+			if err != nil {
+				return nil, &commands.InvalidArgumentError{Message: tr("Invalid recipe in platform.txt"), Cause: err}
+			}
+			id := fmt.Sprintf("%s-%s", boardPlatform, protocol)
+			return pluggableMonitor.New(id, cmdArgs...), nil
 		}
 	}
 
@@ -126,6 +140,7 @@ func findMonitorForProtocolAndBoard(pm *packagemanager.PackageManager, protocol,
 		return nil, &commands.NoMonitorAvailableForProtocolError{Protocol: protocol}
 	}
 
+	// If it is a monitor dependency, resolve tool and create a monitor client
 	tool := pm.FindMonitorDependency(monitorDepOrRecipe)
 	if tool == nil {
 		return nil, &commands.MonitorNotFoundError{Monitor: monitorDepOrRecipe.String()}
