@@ -1436,6 +1436,33 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#pluggable-monitor" class="md-nav__link">
+    Pluggable monitor
+  </a>
+  
+    <nav class="md-nav" aria-label="Pluggable monitor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#built-in-monitors" class="md-nav__link">
+    Built-in monitors
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backward-compatibility" class="md-nav__link">
+    Backward compatibility
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#verbose-parameter" class="md-nav__link">
     Verbose parameter
   </a>
@@ -1617,6 +1644,21 @@
     <li class="md-nav__item">
       <a href="../pluggable-discovery-specification/" class="md-nav__link">
         Pluggable discovery specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pluggable-monitor-specification/" class="md-nav__link">
+        Pluggable monitor specification
       </a>
     </li>
   
@@ -1890,6 +1932,33 @@
   <a href="#pluggable-discovery" class="md-nav__link">
     Pluggable discovery
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pluggable-monitor" class="md-nav__link">
+    Pluggable monitor
+  </a>
+  
+    <nav class="md-nav" aria-label="Pluggable monitor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#built-in-monitors" class="md-nav__link">
+    Built-in monitors
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backward-compatibility" class="md-nav__link">
+    Backward compatibility
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -2614,7 +2683,7 @@ points to the latest version of the tool available.</p>
 <p>The tool configuration properties are available globally without the prefix. For example, the <strong>tools.avrdude.cmd.path</strong>
 property can be used as <strong>{cmd.path}</strong> inside the recipe, and the same happens for all the other avrdude configuration
 variables.</p>
-<h4 id="pluggable-discovery">Pluggable discovery<a class="headerlink" href="#pluggable-discovery" title="Permanent link">&para;</a></h4>
+<h3 id="pluggable-discovery">Pluggable discovery<a class="headerlink" href="#pluggable-discovery" title="Permanent link">&para;</a></h3>
 <p>Discovery tools are a special kind of tool used to find supported boards. A platform must declare one or more Pluggable
 Discoveries in its <a href="#platformtxt"><code>platform.txt</code></a>. Discoveries can be referenced from other packages, including the
 <code>builtin</code> dummy package which contains the traditional discoveries.</p>
@@ -2648,7 +2717,46 @@ pluggable_discovery.teensy.pattern=&quot;{runtime.tools.teensy_ports.path}/hardw
 in <code>platform.txt</code>) it will automatically inherit <code>builtin:serial-discovery</code> and <code>builtin:mdns-discovery</code> (but not other
 builtin discoveries that may be possibly added in the future).</p>
 <p>For detailed information, see the <a href="../pluggable-discovery-specification/">Pluggable Discovery specification</a>.</p>
-<h4 id="verbose-parameter">Verbose parameter<a class="headerlink" href="#verbose-parameter" title="Permanent link">&para;</a></h4>
+<h3 id="pluggable-monitor">Pluggable monitor<a class="headerlink" href="#pluggable-monitor" title="Permanent link">&para;</a></h3>
+<p>Monitor tools are a special kind of tool used to let the user communicate with the supported boards.</p>
+<p>A platform must declare one or more Pluggable Monitor in its <a href="#platformtxt"><code>platform.txt</code></a> and bind them to a specific
+port protocol. Monitors can be referenced from other packages.</p>
+<p>The following directive is used to bind a specific monitor tool to a specific port protocol:</p>
+<div class="highlight"><pre><span></span><code>pluggable_monitor.required.PROTOCOL=VENDOR_ID:MONITOR_NAME
+</code></pre></div>
+<p>where <code>PROTOCOL</code> must be replaced with the port protocol identifier and <code>VENDOR_ID:MONITOR_NAME</code> must be replaced with
+the monitor tool identifier.</p>
+<p>The platform can support as many protocols as needed:</p>
+<div class="highlight"><pre><span></span><code>pluggable_monitor.required.PROTOCOL1=VENDOR_ID:MONITOR_NAME1
+pluggable_monitor.required.PROTOCOL2=VENDOR_ID:MONITOR_NAME2
+...
+</code></pre></div>
+<p>The above syntax requires specifying a monitor tool via the <code>monitorDependencies</code> field of the platform's
+<a href="../package_index_json-specification/">package index</a>. Since it might be cumbersome to use with manual installations, we
+provide another syntax to ease development and beta testing:</p>
+<div class="highlight"><pre><span></span><code>pluggable_monitor.pattern.PROTOCOL=MONITOR_RECIPE
+</code></pre></div>
+<p>where <code>MONITOR_RECIPE</code> must be replaced by the command line to launch the monitor tool for the specific <code>PROTOCOL</code>. An
+example could be:</p>
+<div class="highlight"><pre><span></span><code>pluggable_monitor.pattern.custom-ble=&quot;{runtime.tools.my-ble-monitor.path}/my-ble-monitor&quot; -H
+</code></pre></div>
+<p>in this case the platform provides a new hypothetical <code>custom-ble</code> protocol monitor tool and the command line tool named
+<code>my-ble-monitor</code> is launched with the <code>-H</code> parameter to start the monitor tool. In this case the command line pattern
+may contain any extra parameter in the formula: this is different from the monitor tools installed through the
+<code>monitorDependencies</code> field that must run without any command line parameter.</p>
+<p>We strongly recommend using this syntax only for development purposes and not on released platforms.</p>
+<h4 id="built-in-monitors">Built-in monitors<a class="headerlink" href="#built-in-monitors" title="Permanent link">&para;</a></h4>
+<p>If a platform supports only boards connected via serial ports it can easily use the <code>builtin:serial-monitor</code> tool
+without creating a custom pluggable monitor:</p>
+<div class="highlight"><pre><span></span><code>pluggable_monitor.required.serial=builtin:serial-monitor
+</code></pre></div>
+<h4 id="backward-compatibility">Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Permanent link">&para;</a></h4>
+<p>For backward compatibility, if a platform does not declare any discovery or monitor tool (using the
+<code>pluggable_discovery.*</code> or <code>pluggable_monitor.*</code> properties in <code>platform.txt</code> respectively) it will automatically
+inherit <code>builtin:serial-monitor</code> (but not other <code>builtin</code> monitor tools that may be possibly added in the future). This
+will allow all legacy non-pluggable platforms to migrate to pluggable monitor without disruption.</p>
+<p>For detailed information, see the <a href="../pluggable-monitor-specification/">Pluggable Monitor specification</a>.</p>
+<h3 id="verbose-parameter">Verbose parameter<a class="headerlink" href="#verbose-parameter" title="Permanent link">&para;</a></h3>
 <p>It is possible for the user to enable verbosity from the Preferences panel of the IDEs or Arduino CLI's <code>--verbose</code>
 flag. This preference is transferred to the command line using the <strong>ACTION.verbose</strong> property (where ACTION is the
 action we are considering).<br> When the verbose mode is enabled, the <strong>tools.TOOL_ID.ACTION.params.verbose</strong> property

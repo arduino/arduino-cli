@@ -11,14 +11,14 @@
       
       
       
-        <link rel="canonical" href="https://arduino.github.io/arduino-cli/dev/integration-options/">
+        <link rel="canonical" href="https://arduino.github.io/arduino-cli/dev/pluggable-monitor-specification/">
       
       <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.3.0">
     
     
       
-        <title>Integration options - Arduino CLI</title>
+        <title>Pluggable monitor specification - Arduino CLI</title>
       
     
     
@@ -69,7 +69,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#the-three-pillars-of-the-arduino-cli" class="md-skip">
+        <a href="#pluggable-monitor-api-via-stdinstdout" class="md-skip">
           Skip to content
         </a>
       
@@ -100,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Integration options
+              Pluggable monitor specification
             
           </span>
         </div>
@@ -1112,92 +1112,11 @@
 
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Integration options
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../integration-options/" class="md-nav__link">
         Integration options
       </a>
-      
-        
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#the-first-pillar-command-line-interface" class="md-nav__link">
-    The first pillar: command line interface
-  </a>
-  
-    <nav class="md-nav" aria-label="The first pillar: command line interface">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#console-applications-for-humans" class="md-nav__link">
-    Console applications for humans
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#console-applications-for-robots" class="md-nav__link">
-    Console applications for robots
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-second-pillar-grpc-interface" class="md-nav__link">
-    The second pillar: gRPC interface
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-third-pillar-embedding" class="md-nav__link">
-    The third pillar: embedding
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#conclusions" class="md-nav__link">
-    Conclusions
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1283,11 +1202,102 @@
 
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../pluggable-monitor-specification/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Pluggable monitor specification
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Pluggable monitor specification
       </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pluggable-monitor-api-via-stdinstdout" class="md-nav__link">
+    Pluggable monitor API via stdin/stdout
+  </a>
+  
+    <nav class="md-nav" aria-label="Pluggable monitor API via stdin/stdout">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hello-command" class="md-nav__link">
+    HELLO command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#describe-command" class="md-nav__link">
+    DESCRIBE command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-command" class="md-nav__link">
+    CONFIGURE command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#open-command" class="md-nav__link">
+    OPEN command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#close-command" class="md-nav__link">
+    CLOSE command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quit-command" class="md-nav__link">
+    QUIT command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-commands" class="md-nav__link">
+    Invalid commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1323,8 +1333,6 @@
   
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -1333,50 +1341,64 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-first-pillar-command-line-interface" class="md-nav__link">
-    The first pillar: command line interface
+  <a href="#pluggable-monitor-api-via-stdinstdout" class="md-nav__link">
+    Pluggable monitor API via stdin/stdout
   </a>
   
-    <nav class="md-nav" aria-label="The first pillar: command line interface">
+    <nav class="md-nav" aria-label="Pluggable monitor API via stdin/stdout">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#console-applications-for-humans" class="md-nav__link">
-    Console applications for humans
+  <a href="#hello-command" class="md-nav__link">
+    HELLO command
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#console-applications-for-robots" class="md-nav__link">
-    Console applications for robots
+  <a href="#describe-command" class="md-nav__link">
+    DESCRIBE command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-command" class="md-nav__link">
+    CONFIGURE command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#open-command" class="md-nav__link">
+    OPEN command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#close-command" class="md-nav__link">
+    CLOSE command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quit-command" class="md-nav__link">
+    QUIT command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-commands" class="md-nav__link">
+    Invalid commands
   </a>
   
 </li>
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-second-pillar-grpc-interface" class="md-nav__link">
-    The second pillar: gRPC interface
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-third-pillar-embedding" class="md-nav__link">
-    The third pillar: embedding
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#conclusions" class="md-nav__link">
-    Conclusions
-  </a>
   
 </li>
       
@@ -1392,75 +1414,204 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/arduino/arduino-cli/blob/master/docs/integration-options.md" title="Edit this page" class="md-content__button md-icon">
+                  <a href="https://github.com/arduino/arduino-cli/blob/master/docs/pluggable-monitor-specification.md" title="Edit this page" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
                 
-                <h1 id="the-three-pillars-of-the-arduino-cli">The three pillars of the Arduino CLI<a class="headerlink" href="#the-three-pillars-of-the-arduino-cli" title="Permanent link">&para;</a></h1>
-<p>The Arduino CLI is an open source Command Line Application written in <a href="https://golang.org/">Golang</a> that can be used from a terminal to
-compile, verify and upload sketches to Arduino boards and that’s capable of managing all the software and tools needed
-in the process. But don’t get fooled by its name: Arduino CLI can do much more than the average console application, as
-shown by the <a href="https://www.arduino.cc/pro/arduino-pro-ide">Arduino Pro IDE</a> and <a href="https://create.arduino.cc">Arduino Cloud</a>, which rely on it for similar purposes but each one in a completely
-different way from the other. In this article we introduce the three pillars of the Arduino CLI, explaining how we
-designed the software so that it can be effectively leveraged under different scenarios.</p>
-<h2 id="the-first-pillar-command-line-interface">The first pillar: command line interface<a class="headerlink" href="#the-first-pillar-command-line-interface" title="Permanent link">&para;</a></h2>
-<h3 id="console-applications-for-humans">Console applications for humans<a class="headerlink" href="#console-applications-for-humans" title="Permanent link">&para;</a></h3>
-<p>As you might expect, the first way to use the Arduino CLI is from a terminal and by a human, and user experience plays a
-key role here. The UX is under a continuous improvement process as we want the tool to be powerful without being too
-complicated. We heavily rely on sub-commands to provide a rich set of different operations logically grouped together,
-so that users can easily explore the interface while getting very specific contextual help.</p>
-<p><img alt="contextual help screenshot" src="../img/CLI_contextual_help_screenshot.png" /></p>
-<h3 id="console-applications-for-robots">Console applications for robots<a class="headerlink" href="#console-applications-for-robots" title="Permanent link">&para;</a></h3>
-<p>Humans are not the only type of customers we want to support and the Arduino CLI was also designed to be used
-programmatically - think about automation pipelines or a <a href="https://en.wikipedia.org/wiki/Continuous_integration">CI</a>/<a href="https://en.wikipedia.org/wiki/Continuous_deployment">CD</a>
-system. There are some niceties to observe when you write software that’s supposed to be easy to run when unattended and
-one in particular is the ability to run without a configuration file. This is possible because every configuration
-option you find in the arduino-cli.yaml configuration file can be provided either through a command line flag or by
-setting an environment variable. To give an example, the following commands are all equivalent and will fetch the
-package index used to work with unstable experimental versions of Arduino's cores:</p>
-<p><img alt="configuration methods screenshot" src="../img/CLI_configuration_methods_screenshot.png" /></p>
-<p>See the <a href="../configuration/">configuration documentation</a> for details about Arduino CLI's configuration system.</p>
-<p>Consistent with the previous paragraph, when it comes to providing output the Arduino CLI aims to be user friendly but
-also slightly verbose, something that doesn’t play well with robots. This is why we added an option to provide output
-that’s easy to parse. For example, the following figure shows what getting the software version in <a href="https://www.json.org">JSON</a> format looks
-like.</p>
-<p><img alt="JSON output screenshot" src="../img/CLI_JSON_output_screenshot.png" /></p>
-<p>Even if not related to software design, one last feature that’s worth mentioning is the availability of a one-line
-<a href="../installation/#use-the-install-script">installation script</a> that can be used to make the latest version of the Arduino CLI available on most systems with an
-HTTP client like curl or wget and a shell like bash.</p>
-<p>For more information on Arduino CLI's command line interface, see the <a href="../commands/arduino-cli/">command reference</a>.</p>
-<h2 id="the-second-pillar-grpc-interface">The second pillar: gRPC interface<a class="headerlink" href="#the-second-pillar-grpc-interface" title="Permanent link">&para;</a></h2>
-<p><a href="https://grpc.io/">gRPC</a> is a high performance <a href="https://en.wikipedia.org/wiki/Remote_procedure_call">RPC</a> framework that can efficiently connect client and server applications. The Arduino
-CLI can act as a gRPC server (we call it <a href="../commands/arduino-cli_daemon/">daemon mode</a>), exposing a set of procedures that implement the very same set
-of features of the command line interface and waiting for clients to connect and use them. To give an idea, the
-following is some <a href="https://golang.org/">Golang</a> code capable of retrieving the version number of a remote running Arduino CLI server
-instance:</p>
-<p><img alt="gRPC interface screenshot" src="../img/CLI_gRPC_interface_screenshot.png" /></p>
-<p>gRPC is language agnostic: even if the example is written in Golang, the programming language used for the client can be
-Python, JavaScript or any of the many <a href="https://grpc.io/docs/languages/">supported ones</a>, leading to a variety of possible
-scenarios. The new <a href="https://www.arduino.cc/pro/arduino-pro-ide">Arduino Pro IDE</a> is a good example of how to leverage the daemon mode of the Arduino CLI with a
-clean separation of concerns: the Pro IDE knows nothing about how to download a core, compile a sketch or talk to an
-Arduino board and it demands all these features of an Arduino CLI instance. Conversely, the Arduino CLI doesn’t even
-know that the client that’s connected is the Pro IDE, and neither does it care.</p>
-<p>For more information on Arduino CLI's gRPC interface, see the <a href="../rpc/commands/">gRPC interface reference</a>.</p>
-<h2 id="the-third-pillar-embedding">The third pillar: embedding<a class="headerlink" href="#the-third-pillar-embedding" title="Permanent link">&para;</a></h2>
-<p>Arduino CLI is written in <a href="https://golang.org/">Golang</a> and the code is organized in a way that makes it easy to use it as a library by
-including the modules you need in another Golang application at compile time. Both the first and second pillars rely on
-a common Golang API, a set of functions that abstract all the functionalities offered by the Arduino CLI, so that when
-we provide a fix or a new feature, they are automatically available to both the command line and gRPC interfaces. The
-source modules implementing this API can be imported in other Golang programs to embed a full-fledged Arduino CLI. For
-example, this is how some backend services powering <a href="https://create.arduino.cc">Arduino Cloud</a> can compile sketches and manage libraries. Just to
-give you a taste of what it means to embed the Arduino CLI, here is how to search for a core using the API:</p>
-<p><img alt="Go library interface screenshot" src="../img/CLI_Go_library_interface_screenshot.png" /></p>
-<p>Embedding the Arduino CLI is limited to Golang applications and requires a deep knowledge of its internals. For the
-average use case, the gRPC interface might be a better alternative. Nevertheless, this remains a valid option that we
-use and provide support for.</p>
-<h2 id="conclusions">Conclusions<a class="headerlink" href="#conclusions" title="Permanent link">&para;</a></h2>
-<p>You can start playing with the Arduino CLI right away. The code is open source and <a href="https://github.com/arduino/arduino-cli">the repo</a>
-contains <a href="https://github.com/arduino/arduino-cli/blob/master/client_example">example code showing how to implement a gRPC client</a>. If you’re curious about how we
-designed the low level API, have a look at the <a href="https://github.com/arduino/arduino-cli/tree/master/commands">commands package</a> and don’t hesitate to leave feedback on the <a href="https://github.com/arduino/arduino-cli/issues">issue
-tracker</a> if you’ve got a use case that doesn’t fit one of the three pillars.</p>
+                  <h1>Pluggable monitor specification</h1>
+                
+                <p>Monitor tools are a special kind of tool used to let the user communicate with the supported boards. A platform
+developer can create their own tools following the specification below. These tools must be in the form of command line
+executables that can be launched as a subprocess.</p>
+<p>They will communicate to the parent process via stdin/stdout, in particular a monitor tool will accept commands as plain
+text strings from stdin and will send answers back in JSON format on stdout. Each tool will implement the commands to
+open and control communication ports for a specific protocol as specified in this document. The actual I/O data stream
+from the communication port will be transferred to the parent process through a separate channel via TCP/IP.</p>
+<h3 id="pluggable-monitor-api-via-stdinstdout">Pluggable monitor API via stdin/stdout<a class="headerlink" href="#pluggable-monitor-api-via-stdinstdout" title="Permanent link">&para;</a></h3>
+<p>All the commands listed in this specification must be implemented in the monitor tool.</p>
+<p>After startup, the tool will just stay idle waiting for commands. The available commands are: <code>HELLO</code>, <code>DESCRIBE</code>,
+<code>CONFIGURE</code>, <code>OPEN</code>, <code>CLOSE</code> and <code>QUIT</code>.</p>
+<p>After each command the client always expects a response from the monitor. The monitor must not introduce any delay and
+must respond to all commands as fast as possible.</p>
+<h4 id="hello-command">HELLO command<a class="headerlink" href="#hello-command" title="Permanent link">&para;</a></h4>
+<p><code>HELLO</code> <strong>must be the first command sent</strong> to the monitor to tell the name of the client/IDE and the version of the
+pluggable monitor protocol that the client/IDE supports. The syntax of the command is:</p>
+<p><code>HELLO &lt;PROTOCOL_VERSION&gt; "&lt;USER_AGENT&gt;"</code></p>
+<ul>
+<li><code>&lt;PROTOCOL_VERSION&gt;</code> is the maximum protocol version supported by the client/IDE (currently <code>1</code>)</li>
+<li><code>&lt;USER_AGENT&gt;</code> is the name and version of the client. It must not contain double-quotes (<code>"</code>).</li>
+</ul>
+<p>some examples:</p>
+<ul>
+<li><code>HELLO 1 "Arduino IDE 1.8.13"</code></li>
+</ul>
+<ul>
+<li><code>HELLO 1 "arduino-cli 1.2.3"</code></li>
+</ul>
+<p>the response to the command is:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;eventType&quot;</span><span class="p">:</span> <span class="s2">&quot;hello&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;protocolVersion&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;OK&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The <code>protocolVersion</code> field represents the protocol version that will be used in the rest of the communication. There
+are three possible cases:</p>
+<ul>
+<li>if the client/IDE supports the same or a more recent version of the protocol than the monitor tool, then the
+  client/IDE should go into a compatibility mode and use the protocol level supported by the monitor tool.</li>
+<li>if the monitor tool supports a more recent version of the protocol than the client/IDE, then the monitor tool should
+  downgrade itself into compatibility mode and report a <code>protocolVersion</code> that is less than or equal to the one
+  supported by the client/IDE.</li>
+<li>if the monitor tool cannot go into compatibility mode, it must report the protocol version supported (even if greater
+  than the version supported by the client/IDE) and the client/IDE may decide to terminate the monitor tool or produce
+  an error/warning.</li>
+</ul>
+<h4 id="describe-command">DESCRIBE command<a class="headerlink" href="#describe-command" title="Permanent link">&para;</a></h4>
+<p>The <code>DESCRIBE</code> command returns a description of the communication port. The description will have metadata about the
+port configuration, and which parameters are available to the user.</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;event&quot;</span><span class="p">:</span> <span class="s2">&quot;describe&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;ok&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;port_description&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;serial&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;configuration_parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;baudrate&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Baudrate&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;enum&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span>
+          <span class="s2">&quot;300&quot;</span><span class="p">,</span> <span class="s2">&quot;600&quot;</span><span class="p">,</span> <span class="s2">&quot;750&quot;</span><span class="p">,</span> <span class="s2">&quot;1200&quot;</span><span class="p">,</span> <span class="s2">&quot;2400&quot;</span><span class="p">,</span> <span class="s2">&quot;4800&quot;</span><span class="p">,</span> <span class="s2">&quot;9600&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;19200&quot;</span><span class="p">,</span> <span class="s2">&quot;38400&quot;</span><span class="p">,</span> <span class="s2">&quot;57600&quot;</span><span class="p">,</span> <span class="s2">&quot;115200&quot;</span><span class="p">,</span> <span class="s2">&quot;230400&quot;</span><span class="p">,</span> <span class="s2">&quot;460800&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;500000&quot;</span><span class="p">,</span> <span class="s2">&quot;921600&quot;</span><span class="p">,</span> <span class="s2">&quot;1000000&quot;</span><span class="p">,</span> <span class="s2">&quot;2000000&quot;</span>
+        <span class="p">],</span>
+        <span class="nt">&quot;selected&quot;</span><span class="p">:</span> <span class="s2">&quot;9600&quot;</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;parity&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Parity&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;enum&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">,</span> <span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span> <span class="p">],</span>
+        <span class="nt">&quot;selected&quot;</span><span class="p">:</span> <span class="s2">&quot;N&quot;</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;bits&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Data bits&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;enum&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span> <span class="s2">&quot;6&quot;</span><span class="p">,</span> <span class="s2">&quot;7&quot;</span><span class="p">,</span> <span class="s2">&quot;8&quot;</span><span class="p">,</span> <span class="s2">&quot;9&quot;</span> <span class="p">],</span>
+        <span class="nt">&quot;selected&quot;</span><span class="p">:</span> <span class="s2">&quot;8&quot;</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;stop_bits&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;Stop bits&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;enum&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;1.5&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span> <span class="p">],</span>
+        <span class="nt">&quot;selected&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The field <code>protocol</code> is the board port protocol identifier, it must match with the corresponding protocol identifier for
+a pluggable discovery tool.</p>
+<p><code>configuration_parameters</code> is a key/value map that enumerates the available port parameters.</p>
+<p>Each parameter has a unique name (<code>baudrate</code>, <code>parity</code>, etc...), a <code>type</code> (in this case only <code>enum</code> is allowed but more
+types may be added in the future if needed), and the <code>selected</code> value for each parameter.</p>
+<p>The parameter name can not contain spaces, the allowed characters are alphanumerics, underscore <code>_</code>, dot <code>.</code>, and dash
+<code>-</code>.</p>
+<p>The <code>enum</code> types must have a list of possible <code>values</code>.</p>
+<p>The client/IDE may expose these configuration values to the user via a config file or a GUI, in this case the <code>label</code>
+field may be used for a user readable description of the parameter.</p>
+<h4 id="configure-command">CONFIGURE command<a class="headerlink" href="#configure-command" title="Permanent link">&para;</a></h4>
+<p>The <code>CONFIGURE</code> command sets configuration parameters for the communication port. The parameters can be changed one at a
+time and the syntax is:</p>
+<p><code>CONFIGURE &lt;PARAMETER_NAME&gt; &lt;VALUE&gt;</code></p>
+<p>The response to the command is:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;event&quot;</span><span class="p">:</span> <span class="s2">&quot;configure&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;ok&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>or if there is an error:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;event&quot;</span><span class="p">:</span> <span class="s2">&quot;configure&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;error&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;invalid value for parameter baudrate: 123456&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The currently selected parameters or their default value may be obtained using the <code>DESCRIBE</code> command.</p>
+<h4 id="open-command">OPEN command<a class="headerlink" href="#open-command" title="Permanent link">&para;</a></h4>
+<p>The <code>OPEN</code> command opens a communication port with the board, the data exchanged with the board will be transferred to
+the Client/IDE via TCP/IP.</p>
+<p>The Client/IDE must first TCP-Listen to a randomly selected TCP port and send the address to connect it to the monitor
+tool as part of the <code>OPEN</code> command. The syntax of the <code>OPEN</code> command is:</p>
+<p><code>OPEN &lt;CLIENT_TCPIP_ADDRESS&gt; &lt;BOARD_PORT&gt;</code></p>
+<p>For example, let's suppose that the Client/IDE wants to communicate with the serial port <code>/dev/ttyACM0</code> using an
+hypothetical <code>serial-monitor</code> tool, then the sequence of actions to perform will be the following:</p>
+<ol>
+<li>the Client/IDE must first listen to a random TCP port (let's suppose it chose <code>32123</code>)</li>
+<li>the Client/IDE runs the <code>serial-monitor</code> tool and initializes it with the <code>HELLO</code> command</li>
+<li>the Client/IDE sends the command <code>OPEN 127.0.0.1:32123 /dev/ttyACM0</code> to the monitor tool</li>
+<li>the monitor tool opens <code>/dev/ttyACM0</code></li>
+<li>the monitor tool connects via TCP/IP to <code>127.0.0.1:32123</code> and starts streaming data back and forth</li>
+</ol>
+<p>The answer to the <code>OPEN</code> command is:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;event&quot;</span><span class="p">:</span> <span class="s2">&quot;open&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;ok&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>If the monitor tool cannot communicate with the board, or if the tool can not connect back to the TCP port, or if any
+other error condition happens:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;event&quot;</span><span class="p">:</span> <span class="s2">&quot;open&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;error&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;unknown port /dev/ttyACM23&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The board port will be opened using the parameters previously set through the <code>CONFIGURE</code> command.</p>
+<p>Once the port is opened, it may be unexpectedly closed at any time due to hardware failure, or because the Client/IDE
+closes the TCP/IP connection, etc. In this case an asynchronous <code>port_closed</code> message must be generated by the monitor
+tool:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;event&quot;</span><span class="p">:</span> <span class="s2">&quot;port_closed&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;serial port disappeared!&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>or</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;event&quot;</span><span class="p">:</span> <span class="s2">&quot;port_closed&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;lost TCP/IP connection with the client!&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h4 id="close-command">CLOSE command<a class="headerlink" href="#close-command" title="Permanent link">&para;</a></h4>
+<p>The <code>CLOSE</code> command will close the currently opened port and close the TCP/IP connection used to communicate with the
+Client/IDE. The answer to the command is:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;event&quot;</span><span class="p">:</span> <span class="s2">&quot;close&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;ok&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>or in case of error</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;event&quot;</span><span class="p">:</span> <span class="s2">&quot;close&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;error&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;port already closed&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h4 id="quit-command">QUIT command<a class="headerlink" href="#quit-command" title="Permanent link">&para;</a></h4>
+<p>The <code>QUIT</code> command terminates the monitor. The response to <code>QUIT</code> is:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;eventType&quot;</span><span class="p">:</span> <span class="s2">&quot;quit&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;OK&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>after this output the monitor exits. This command must always succeed.</p>
+<h4 id="invalid-commands">Invalid commands<a class="headerlink" href="#invalid-commands" title="Permanent link">&para;</a></h4>
+<p>If the client sends an invalid or malformed command, the monitor should answer with:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;eventType&quot;</span><span class="p">:</span> <span class="s2">&quot;command_error&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;error&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Unknown command XXXX&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
                 
               
               
@@ -1480,7 +1631,7 @@ tracker</a> if you’ve got a use case that doesn’t fit one of the three pilla
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="../configuration/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Configuration" rel="prev">
+        <a href="../pluggable-discovery-specification/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Pluggable discovery specification" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -1489,20 +1640,20 @@ tracker</a> if you’ve got a use case that doesn’t fit one of the three pilla
               <span class="md-footer__direction">
                 Previous
               </span>
-              Configuration
+              Pluggable discovery specification
             </div>
           </div>
         </a>
       
       
         
-        <a href="../sketch-build-process/" class="md-footer__link md-footer__link--next" aria-label="Next: Sketch build process" rel="next">
+        <a href="../package_index_json-specification/" class="md-footer__link md-footer__link--next" aria-label="Next: Package index specification" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Sketch build process
+              Package index specification
             </div>
           </div>
           <div class="md-footer__button md-icon">
