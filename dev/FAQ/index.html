@@ -953,6 +953,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../commands/arduino-cli_monitor/" class="md-nav__link">
+        monitor
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../commands/arduino-cli_outdated/" class="md-nav__link">
         outdated
       </a>
@@ -1381,9 +1395,8 @@
 <p>Additional board options have to be separated by commas (instead of colon):</p>
 <p><code>$ arduino-cli compile --fqbn "esp8266:esp8266:generic:xtal=160,baud=57600" TestSketch</code></p>
 <h2 id="where-is-the-serial-monitor">Where is the Serial Monitor?<a class="headerlink" href="#where-is-the-serial-monitor" title="Permanent link">&para;</a></h2>
-<p>This being a command line tool, we believe it's up to the user to choose their preferred way of interacting with the
-serial connection. If we were to integrate it into the CLI we'd end up putting a tool inside a tool, and this would be
-something that we're trying to avoid.</p>
+<p>The serial monitor is available through the <a href="../commands/arduino-cli_monitor/">monitor command</a>. By the way, the functionality provided
+by this command is very limited and you may want to look for other tools if you need more advanced functionality.</p>
 <p>There are many excellent serial terminals to chose from. On Linux or macOS, you may already have <a href="https://www.gnu.org/software/screen/manual/screen.html">screen</a>
 installed. On Windows, a good choice for command line usage is Plink, included with <a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/">PuTTY</a>.</p>
 <p>Arduino CLI does provide a gRPC interface which offers the capability for powerful integration with custom monitors. See
