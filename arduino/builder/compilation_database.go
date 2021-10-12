@@ -60,10 +60,10 @@ func LoadCompilationDatabase(file *paths.Path) (*CompilationDatabase, error) {
 // see https://clang.llvm.org/docs/JSONCompilationDatabase.html
 func (db *CompilationDatabase) SaveToFile() {
 	if jsonContents, err := json.MarshalIndent(db.Contents, "", " "); err != nil {
-		fmt.Printf(tr("Error serializing compilation database: %s"), err)
+		fmt.Println(tr("Error serializing compilation database: %s", err))
 		return
 	} else if err := db.File.WriteFile(jsonContents); err != nil {
-		fmt.Printf(tr("Error writing compilation database: %s"), err)
+		fmt.Println(tr("Error writing compilation database: %s", err))
 	}
 }
 
@@ -75,7 +75,7 @@ func dirForCommand(command *exec.Cmd) string {
 	}
 	dir, err := os.Getwd()
 	if err != nil {
-		fmt.Printf(tr("Error getting current directory for compilation database: %s"), err)
+		fmt.Println(tr("Error getting current directory for compilation database: %s", err))
 		return ""
 	}
 	return dir

@@ -35,6 +35,8 @@ var validMap = map[string]reflect.Kind{
 	"metrics.enabled":               reflect.Bool,
 	"network.proxy":                 reflect.String,
 	"network.user_agent_ext":        reflect.String,
+	"output.no_color":               reflect.Bool,
+	"updater.enable_notification":   reflect.Bool,
 }
 
 func typeOf(key string) (reflect.Kind, error) {

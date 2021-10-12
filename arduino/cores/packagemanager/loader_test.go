@@ -18,8 +18,10 @@ package packagemanager
 import (
 	"testing"
 
+	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
+	semver "go.bug.st/relaxed-semver"
 )
 
 func TestVidPidConvertionToPluggableDiscovery(t *testing.T) {
@@ -102,4 +104,153 @@ arduino_zero_native.pid.3=0x024d
   "upload_port.3.vid": "0x2341",
   "upload_port.3.pid": "0x024d",
 }`, zero4.Dump())
+}
+
+func TestLoadDiscoveries(t *testing.T) {
+	// Create all the necessary data to load discoveries
+	fakePath := paths.New("fake-path")
+
+	createTestPackageManager := func() *PackageManager {
+		packageManager := NewPackageManager(fakePath, fakePath, fakePath, fakePath)
+		pack := packageManager.Packages.GetOrCreatePackage("arduino")
+		// ble-discovery tool
+		tool := pack.GetOrCreateTool("ble-discovery")
+		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
+		// We set this to fake the tool is installed
+		toolRelease.InstallDir = fakePath
+		tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
+
+		// serial-discovery tool
+		tool = pack.GetOrCreateTool("serial-discovery")
+		tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
+		toolRelease = tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
+		// We set this to fake the tool is installed
+		toolRelease.InstallDir = fakePath
+
+		platform := pack.GetOrCreatePlatform("avr")
+		release := platform.GetOrCreateRelease(semver.MustParse("1.0.0"))
+		release.InstallDir = fakePath
+
+		return packageManager
+	}
+
+	packageManager := createTestPackageManager()
+	release := packageManager.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
+	release.Properties = properties.NewFromHashmap(map[string]string{
+		"pluggable_discovery.required": "arduino:ble-discovery",
+	})
+
+	errs := packageManager.LoadDiscoveries()
+	require.Len(t, errs, 2)
+	require.Equal(t, errs[0].Message(), "discovery not found: builtin:serial-discovery")
+	require.Equal(t, errs[1].Message(), "discovery not found: builtin:mdns-discovery")
+	discoveries := packageManager.DiscoveryManager().IDs()
+	require.Len(t, discoveries, 1)
+	require.Contains(t, discoveries, "arduino:ble-discovery")
+
+	packageManager = createTestPackageManager()
+	release = packageManager.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
+	release.Properties = properties.NewFromHashmap(map[string]string{
+		"pluggable_discovery.required.0": "arduino:ble-discovery",
+		"pluggable_discovery.required.1": "arduino:serial-discovery",
+	})
+
+	errs = packageManager.LoadDiscoveries()
+	require.Len(t, errs, 2)
+	require.Equal(t, errs[0].Message(), "discovery not found: builtin:serial-discovery")
+	require.Equal(t, errs[1].Message(), "discovery not found: builtin:mdns-discovery")
+	discoveries = packageManager.DiscoveryManager().IDs()
+	require.Len(t, discoveries, 2)
+	require.Contains(t, discoveries, "arduino:ble-discovery")
+	require.Contains(t, discoveries, "arduino:serial-discovery")
+
+	packageManager = createTestPackageManager()
+	release = packageManager.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
+	release.Properties = properties.NewFromHashmap(map[string]string{
+		"pluggable_discovery.required.0":     "arduino:ble-discovery",
+		"pluggable_discovery.required.1":     "arduino:serial-discovery",
+		"pluggable_discovery.teensy.pattern": "\"{runtime.tools.teensy_ports.path}/hardware/tools/teensy_ports\" -J2",
+	})
+
+	errs = packageManager.LoadDiscoveries()
+	require.Len(t, errs, 2)
+	require.Equal(t, errs[0].Message(), "discovery not found: builtin:serial-discovery")
+	require.Equal(t, errs[1].Message(), "discovery not found: builtin:mdns-discovery")
+	discoveries = packageManager.DiscoveryManager().IDs()
+	require.Len(t, discoveries, 3)
+	require.Contains(t, discoveries, "arduino:ble-discovery")
+	require.Contains(t, discoveries, "arduino:serial-discovery")
+	require.Contains(t, discoveries, "teensy")
+
+	packageManager = createTestPackageManager()
+	release = packageManager.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
+	release.Properties = properties.NewFromHashmap(map[string]string{
+		"pluggable_discovery.required":       "arduino:some-discovery",
+		"pluggable_discovery.required.0":     "arduino:ble-discovery",
+		"pluggable_discovery.required.1":     "arduino:serial-discovery",
+		"pluggable_discovery.teensy.pattern": "\"{runtime.tools.teensy_ports.path}/hardware/tools/teensy_ports\" -J2",
+	})
+
+	errs = packageManager.LoadDiscoveries()
+	require.Len(t, errs, 2)
+	require.Equal(t, errs[0].Message(), "discovery not found: builtin:serial-discovery")
+	require.Equal(t, errs[1].Message(), "discovery not found: builtin:mdns-discovery")
+	discoveries = packageManager.DiscoveryManager().IDs()
+	require.Len(t, discoveries, 3)
+	require.Contains(t, discoveries, "arduino:ble-discovery")
+	require.Contains(t, discoveries, "arduino:serial-discovery")
+	require.Contains(t, discoveries, "teensy")
+}
+
+func TestConvertUploadToolsToPluggableDiscovery(t *testing.T) {
+	props, err := properties.LoadFromBytes([]byte(`
+upload.tool=avrdude
+upload.protocol=arduino
+upload.maximum_size=32256
+upload.maximum_data_size=2048
+upload.speed=115200
+bootloader.tool=avrdude
+bootloader.low_fuses=0xFF
+bootloader.high_fuses=0xDE
+bootloader.extended_fuses=0xFD
+bootloader.unlock_bits=0x3F
+bootloader.lock_bits=0x0F
+bootloader.file=optiboot/optiboot_atmega328.hex
+name=AVR ISP
+communication=serial
+protocol=stk500v1
+program.protocol=stk500v1
+program.tool=avrdude
+program.extra_params=-P{serial.port}
+`))
+	require.NoError(t, err)
+
+	convertUploadToolsToPluggableDiscovery(props)
+
+	expectedProps, err := properties.LoadFromBytes([]byte(`
+upload.tool=avrdude
+upload.tool.default=avrdude
+upload.protocol=arduino
+upload.maximum_size=32256
+upload.maximum_data_size=2048
+upload.speed=115200
+bootloader.tool=avrdude
+bootloader.tool.default=avrdude
+bootloader.low_fuses=0xFF
+bootloader.high_fuses=0xDE
+bootloader.extended_fuses=0xFD
+bootloader.unlock_bits=0x3F
+bootloader.lock_bits=0x0F
+bootloader.file=optiboot/optiboot_atmega328.hex
+name=AVR ISP
+communication=serial
+protocol=stk500v1
+program.protocol=stk500v1
+program.tool=avrdude
+program.tool.default=avrdude
+program.extra_params=-P{serial.port}
+`))
+	require.NoError(t, err)
+
+	require.Equal(t, expectedProps.AsMap(), props.AsMap())
 }

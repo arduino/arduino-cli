@@ -17,6 +17,7 @@ package instance
 
 import (
 	"context"
+	"errors"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -27,8 +28,6 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 var tr = i18n.Tr
@@ -50,7 +49,7 @@ func CreateAndInit() *rpc.Instance {
 }
 
 // Create and return a new Instance.
-func Create() (*rpc.Instance, *status.Status) {
+func Create() (*rpc.Instance, error) {
 	res, err := commands.Create(&rpc.CreateRequest{})
 	if err != nil {
 		return nil, err
@@ -59,12 +58,12 @@ func Create() (*rpc.Instance, *status.Status) {
 }
 
 // Init initializes instance by loading installed libraries and platforms.
-// In case of loading failures return a list gRPC Status errors for each
+// In case of loading failures return a list of errors for each
 // platform or library that we failed to load.
 // Package and library indexes files are automatically updated if the
 // CLI is run for the first time.
-func Init(instance *rpc.Instance) []*status.Status {
-	errs := []*status.Status{}
+func Init(instance *rpc.Instance) []error {
+	errs := []error{}
 
 	// In case the CLI is executed for the first time
 	if err := FirstUpdate(instance); err != nil {
@@ -77,8 +76,8 @@ func Init(instance *rpc.Instance) []*status.Status {
 	err := commands.Init(&rpc.InitRequest{
 		Instance: instance,
 	}, func(res *rpc.InitResponse) {
-		if err := res.GetError(); err != nil {
-			errs = append(errs, status.FromProto(err))
+		if st := res.GetError(); st != nil {
+			errs = append(errs, errors.New(st.Message))
 		}
 
 		if progress := res.GetInitProgress(); progress != nil {
@@ -99,7 +98,7 @@ func Init(instance *rpc.Instance) []*status.Status {
 
 // FirstUpdate downloads libraries and packages indexes if they don't exist.
 // This ideally is only executed the first time the CLI is run.
-func FirstUpdate(instance *rpc.Instance) *status.Status {
+func FirstUpdate(instance *rpc.Instance) error {
 	// Gets the data directory to verify if library_index.json and package_index.json exist
 	dataDir := paths.New(configuration.Settings.GetString("directories.data"))
 
@@ -120,7 +119,7 @@ func FirstUpdate(instance *rpc.Instance) *status.Status {
 			output.ProgressBar(),
 		)
 		if err != nil {
-			return status.Newf(codes.FailedPrecondition, err.Error())
+			return err
 		}
 	}
 
@@ -135,7 +134,7 @@ func FirstUpdate(instance *rpc.Instance) *status.Status {
 			output.ProgressBar(),
 		)
 		if err != nil {
-			return status.Newf(codes.FailedPrecondition, err.Error())
+			return err
 		}
 	}
 

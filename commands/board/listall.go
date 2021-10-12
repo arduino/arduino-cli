@@ -17,7 +17,6 @@ package board
 
 import (
 	"context"
-	"errors"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/utils"
@@ -25,38 +24,14 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
-// maximumSearchDistance is the maximum Levenshtein distance accepted when using fuzzy search.
-// This value is completely arbitrary and picked randomly.
-const maximumSearchDistance = 20
-
 // ListAll FIXMEDOC
 func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListAllResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New(tr("invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
 
-	searchArgs := []string{}
-	for _, s := range req.SearchArgs {
-		searchArgs = append(searchArgs, strings.Trim(s, " "))
-	}
-
-	match := func(toTest []string) (bool, error) {
-		if len(searchArgs) == 0 {
-			return true, nil
-		}
-
-		for _, t := range toTest {
-			matches, err := utils.Match(t, searchArgs)
-			if err != nil {
-				return false, err
-			}
-			if matches {
-				return matches, nil
-			}
-		}
-		return false, nil
-	}
+	searchArgs := strings.Join(req.GetSearchArgs(), " ")
 
 	list := &rpc.BoardListAllResponse{Boards: []*rpc.BoardListItem{}}
 	for _, targetPackage := range pm.Packages {
@@ -100,9 +75,7 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListA
 
 				toTest := append(toTest, board.Name())
 				toTest = append(toTest, board.FQBN())
-				if ok, err := match(toTest); err != nil {
-					return nil, err
-				} else if !ok {
+				if !utils.MatchAny(searchArgs, toTest) {
 					continue
 				}
 

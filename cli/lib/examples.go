@@ -115,7 +115,7 @@ func (ir libraryExamplesResult) String() string {
 		} else if lib.Library.Location != rpc.LibraryLocation_LIBRARY_LOCATION_USER {
 			name += " (" + lib.Library.GetLocation().String() + ")"
 		}
-		r := fmt.Sprintf(tr("Examples for library %s")+"\n", color.GreenString("%s", name))
+		r := tr("Examples for library %s", color.GreenString("%s", name)) + "\n"
 		sort.Slice(lib.Examples, func(i, j int) bool {
 			return strings.ToLower(lib.Examples[i]) < strings.ToLower(lib.Examples[j])
 		})

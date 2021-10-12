@@ -31,8 +31,12 @@ func TestNew(t *testing.T) {
 	mainFilePath := sketchFolderPath.Join(fmt.Sprintf("%s.ino", "SketchSimple"))
 	otherFile := sketchFolderPath.Join("other.cpp")
 
+	sketch, err := New(nil)
+	assert.Nil(t, sketch)
+	assert.Error(t, err)
+
 	// Loading using Sketch folder path
-	sketch, err := New(sketchFolderPath)
+	sketch, err = New(sketchFolderPath)
 	assert.Nil(t, err)
 	assert.True(t, mainFilePath.EquivalentTo(sketch.MainFile))
 	assert.True(t, sketchFolderPath.EquivalentTo(sketch.FullPath))

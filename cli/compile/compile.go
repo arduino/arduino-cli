@@ -19,10 +19,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"os"
 
+	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/configuration"
@@ -30,34 +31,34 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/upload"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 var (
-	fqbn                    string   // Fully Qualified Board Name, e.g.: arduino:avr:uno.
-	showProperties          bool     // Show all build preferences used instead of compiling.
-	preprocess              bool     // Print preprocessed code to stdout.
-	buildCachePath          string   // Builds of 'core.a' are saved into this path to be cached and reused.
-	buildPath               string   // Path where to save compiled files.
-	buildProperties         []string // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
-	warnings                string   // Used to tell gcc which warning level to use.
-	verbose                 bool     // Turns on verbose mode.
-	quiet                   bool     // Suppresses almost every output.
-	vidPid                  string   // VID/PID specific build properties.
-	uploadAfterCompile      bool     // Upload the binary after the compilation.
-	port                    string   // Upload port, e.g.: COM10 or /dev/ttyACM0.
-	verify                  bool     // Upload, verify uploaded binary after the upload.
-	exportDir               string   // The compiled binary is written to this file
-	optimizeForDebug        bool     // Optimize compile output for debug, not for release
-	programmer              string   // Use the specified programmer to upload
-	clean                   bool     // Cleanup the build folder and do not use any cached build
-	compilationDatabaseOnly bool     // Only create compilation database without actually compiling
-	sourceOverrides         string   // Path to a .json file that contains a set of replacements of the sketch source code.
+	fqbn                    string         // Fully Qualified Board Name, e.g.: arduino:avr:uno.
+	showProperties          bool           // Show all build preferences used instead of compiling.
+	preprocess              bool           // Print preprocessed code to stdout.
+	buildCachePath          string         // Builds of 'core.a' are saved into this path to be cached and reused.
+	buildPath               string         // Path where to save compiled files.
+	buildProperties         []string       // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
+	warnings                string         // Used to tell gcc which warning level to use.
+	verbose                 bool           // Turns on verbose mode.
+	quiet                   bool           // Suppresses almost every output.
+	vidPid                  string         // VID/PID specific build properties.
+	uploadAfterCompile      bool           // Upload the binary after the compilation.
+	port                    arguments.Port // Upload port, e.g.: COM10 or /dev/ttyACM0.
+	verify                  bool           // Upload, verify uploaded binary after the upload.
+	exportDir               string         // The compiled binary is written to this file
+	optimizeForDebug        bool           // Optimize compile output for debug, not for release
+	programmer              string         // Use the specified programmer to upload
+	clean                   bool           // Cleanup the build folder and do not use any cached build
+	compilationDatabaseOnly bool           // Only create compilation database without actually compiling
+	sourceOverrides         string         // Path to a .json file that contains a set of replacements of the sketch source code.
 	// library and libraries sound similar but they're actually different.
 	// library expects a path to the root folder of one single library.
 	// libraries expects a path to a directory containing multiple libraries, similarly to the <directories.user>/libraries path.
@@ -82,6 +83,9 @@ func NewCommand() *cobra.Command {
 	}
 
 	command.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
+	command.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return getBoards(toComplete), cobra.ShellCompDirectiveDefault
+	})
 	command.Flags().BoolVar(&showProperties, "show-properties", false, tr("Show all build properties used instead of compiling."))
 	command.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
 	command.Flags().StringVar(&buildCachePath, "build-cache-path", "", tr("Builds of 'core.a' are saved into this path to be cached and reused."))
@@ -93,11 +97,11 @@ func NewCommand() *cobra.Command {
 	command.Flags().StringArrayVar(&buildProperties, "build-property", []string{},
 		tr("Override a build property with a custom value. Can be used multiple times for multiple properties."))
 	command.Flags().StringVar(&warnings, "warnings", "none",
-		fmt.Sprintf(tr(`Optional, can be "%[1]s", "%[2]s", "%[3]s" and "%[4]s". Defaults to "%[1]s". Used to tell gcc which warning level to use (-W flag).`), "none", "default", "more", "all"))
+		tr(`Optional, can be: %s. Used to tell gcc which warning level to use (-W flag).`, "none, default, more, all"))
 	command.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Optional, turns on verbose mode."))
 	command.Flags().BoolVar(&quiet, "quiet", false, tr("Optional, suppresses almost every output."))
 	command.Flags().BoolVarP(&uploadAfterCompile, "upload", "u", false, tr("Upload the binary after the compilation."))
-	command.Flags().StringVarP(&port, "port", "p", "", tr("Upload port, e.g.: COM10 or /dev/ttyACM0"))
+	port.AddToCommand(command)
 	command.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
 	command.Flags().StringVar(&vidPid, "vid-pid", "", tr("When specified, VID/PID specific build properties are used, if board supports them."))
 	command.Flags().StringSliceVar(&library, "library", []string{},
@@ -125,12 +129,11 @@ func NewCommand() *cobra.Command {
 func run(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
 
-	var path *paths.Path
+	path := ""
 	if len(args) > 0 {
-		path = paths.New(args[0])
+		path = args[0]
 	}
-
-	sketchPath := initSketchPath(path)
+	sketchPath := arguments.InitSketchPath(path)
 
 	// .pde files are still supported but deprecated, this warning urges the user to rename them
 	if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 {
@@ -178,68 +181,84 @@ func run(cmd *cobra.Command, args []string) {
 		SourceOverride:                overrides,
 		Library:                       library,
 	}
-	compileOut := new(bytes.Buffer)
-	compileErr := new(bytes.Buffer)
+	compileStdOut := new(bytes.Buffer)
+	compileStdErr := new(bytes.Buffer)
 	verboseCompile := configuration.Settings.GetString("logging.level") == "debug"
 	var compileRes *rpc.CompileResponse
-	var err error
+	var compileError error
 	if output.OutputFormat == "json" {
-		compileRes, err = compile.Compile(context.Background(), compileRequest, compileOut, compileErr, verboseCompile)
+		compileRes, compileError = compile.Compile(context.Background(), compileRequest, compileStdOut, compileStdErr, verboseCompile)
 	} else {
-		compileRes, err = compile.Compile(context.Background(), compileRequest, os.Stdout, os.Stderr, verboseCompile)
+		compileRes, compileError = compile.Compile(context.Background(), compileRequest, os.Stdout, os.Stderr, verboseCompile)
 	}
 
-	if err == nil && uploadAfterCompile {
+	if compileError == nil && uploadAfterCompile {
+		var sk *sketch.Sketch
+		sk, err := sketch.New(sketchPath)
+		if err != nil {
+			feedback.Errorf(tr("Error during Upload: %v"), err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+		var discoveryPort *discovery.Port
+		discoveryPort, err = port.GetPort(inst, sk)
+		if err != nil {
+			feedback.Errorf(tr("Error during Upload: %v"), err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+
+		userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
+			Instance: inst,
+			Fqbn:     fqbn,
+			Protocol: discoveryPort.Protocol,
+		})
+		if err != nil {
+			feedback.Errorf(tr("Error during Upload: %v"), err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+
+		fields := map[string]string{}
+		if len(userFieldRes.UserFields) > 0 {
+			feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", discoveryPort.Protocol))
+			fields = arguments.AskForUserFields(userFieldRes.UserFields)
+		}
+
 		uploadRequest := &rpc.UploadRequest{
 			Instance:   inst,
 			Fqbn:       fqbn,
 			SketchPath: sketchPath.String(),
-			Port:       port,
+			Port:       discoveryPort.ToRPC(),
 			Verbose:    verbose,
 			Verify:     verify,
 			ImportDir:  buildPath,
 			Programmer: programmer,
+			UserFields: fields,
 		}
-		var err error
+
+		var uploadError error
 		if output.OutputFormat == "json" {
 			// TODO: do not print upload output in json mode
-			uploadOut := new(bytes.Buffer)
-			uploadErr := new(bytes.Buffer)
-			_, err = upload.Upload(context.Background(), uploadRequest, uploadOut, uploadErr)
+			uploadStdOut := new(bytes.Buffer)
+			uploadStdErr := new(bytes.Buffer)
+			_, uploadError = upload.Upload(context.Background(), uploadRequest, uploadStdOut, uploadStdErr)
 		} else {
-			_, err = upload.Upload(context.Background(), uploadRequest, os.Stdout, os.Stderr)
+			_, uploadError = upload.Upload(context.Background(), uploadRequest, os.Stdout, os.Stderr)
 		}
-		if err != nil {
-			feedback.Errorf(tr("Error during Upload: %v"), err)
+		if uploadError != nil {
+			feedback.Errorf(tr("Error during Upload: %v"), uploadError)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}
 
 	feedback.PrintResult(&compileResult{
-		CompileOut:    compileOut.String(),
-		CompileErr:    compileErr.String(),
+		CompileOut:    compileStdOut.String(),
+		CompileErr:    compileStdErr.String(),
 		BuilderResult: compileRes,
-		Success:       err == nil,
+		Success:       compileError == nil,
 	})
-	if err != nil && output.OutputFormat != "json" {
-		feedback.Errorf(tr("Error during build: %v"), err)
+	if compileError != nil && output.OutputFormat != "json" {
+		feedback.Errorf(tr("Error during build: %v"), compileError)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-}
-
-// initSketchPath returns the current working directory
-func initSketchPath(sketchPath *paths.Path) *paths.Path {
-	if sketchPath != nil {
-		return sketchPath
-	}
-
-	wd, err := paths.Getwd()
-	if err != nil {
-		feedback.Errorf(tr("Couldn't get current working directory: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-	logrus.Infof("Reading sketch from dir: %s", wd)
-	return wd
 }
 
 type compileResult struct {
@@ -256,4 +275,20 @@ func (r *compileResult) Data() interface{} {
 func (r *compileResult) String() string {
 	// The output is already printed via os.Stdout/os.Stdin
 	return ""
+}
+
+func getBoards(toComplete string) []string {
+	// from listall.go TODO optimize
+	inst := instance.CreateAndInit()
+
+	list, _ := board.ListAll(context.Background(), &rpc.BoardListAllRequest{
+		Instance:            inst,
+		SearchArgs:          nil,
+		IncludeHiddenBoards: false,
+	})
+	var res []string
+	for _, i := range list.GetBoards() {
+		res = append(res, i.Fqbn)
+	}
+	return res
 }

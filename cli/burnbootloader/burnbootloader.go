@@ -19,6 +19,7 @@ import (
 	"context"
 	"os"
 
+	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -30,7 +31,7 @@ import (
 
 var (
 	fqbn       string
-	port       string
+	port       arguments.Port
 	verbose    bool
 	verify     bool
 	programmer string
@@ -50,7 +51,7 @@ func NewCommand() *cobra.Command {
 	}
 
 	burnBootloaderCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
-	burnBootloaderCommand.Flags().StringVarP(&port, "port", "p", "", tr("Upload port, e.g.: COM10 or /dev/ttyACM0"))
+	port.AddToCommand(burnBootloaderCommand)
 	burnBootloaderCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
 	burnBootloaderCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Turns on verbose mode."))
 	burnBootloaderCommand.Flags().StringVarP(&programmer, "programmer", "P", "", tr("Use the specified programmer to upload."))
@@ -63,10 +64,17 @@ func NewCommand() *cobra.Command {
 func run(command *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
 
+	// We don't need a Sketch to upload a board's bootloader
+	discoveryPort, err := port.GetPort(instance, nil)
+	if err != nil {
+		feedback.Errorf(tr("Error during Upload: %v"), err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+
 	if _, err := upload.BurnBootloader(context.Background(), &rpc.BurnBootloaderRequest{
 		Instance:   instance,
 		Fqbn:       fqbn,
-		Port:       port,
+		Port:       discoveryPort.ToRPC(),
 		Verbose:    verbose,
 		Verify:     verify,
 		Programmer: programmer,

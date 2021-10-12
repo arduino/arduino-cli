@@ -19,16 +19,14 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 
 	rice "github.com/cmaglie/go.rice"
 	"github.com/leonelquinteros/gotext"
 )
 
 var (
-	loadOnce sync.Once
-	po       *gotext.Po
-	box      *rice.Box
+	po  *gotext.Po
+	box *rice.Box
 )
 
 func init() {

@@ -16,8 +16,6 @@
 package commands
 
 import (
-	"fmt"
-
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -42,19 +40,19 @@ func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.To
 
 	if toolRelease.IsInstalled() {
 		log.Warn("Tool already installed")
-		taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Tool %s already installed"), toolRelease), Completed: true})
+		taskCB(&rpc.TaskProgress{Name: tr("Tool %s already installed", toolRelease), Completed: true})
 		return nil
 	}
 
 	log.Info("Installing tool")
-	taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Installing %s"), toolRelease)})
+	taskCB(&rpc.TaskProgress{Name: tr("Installing %s", toolRelease)})
 	err := pm.InstallTool(toolRelease)
 	if err != nil {
 		log.WithError(err).Warn("Cannot install tool")
-		return fmt.Errorf(tr("installing tool %[1]s: %[2]s"), toolRelease, err)
+		return &FailedInstallError{Message: tr("Cannot install tool %s", toolRelease), Cause: err}
 	}
 	log.Info("Tool installed")
-	taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("%s installed"), toolRelease), Completed: true})
+	taskCB(&rpc.TaskProgress{Message: tr("%s installed", toolRelease), Completed: true})
 
 	return nil
 }

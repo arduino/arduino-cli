@@ -20,9 +20,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
@@ -33,12 +33,12 @@ import (
 
 func initDownloadCommand() *cobra.Command {
 	downloadCommand := &cobra.Command{
-		Use:   fmt.Sprintf(tr("download [%s:%s[@%s]]..."), tr("PACKAGER"), tr("ARCH"), tr("VERSION")),
+		Use:   fmt.Sprintf("download [%s:%s[@%s]]...", tr("PACKAGER"), tr("ARCH"), tr("VERSION")),
 		Short: tr("Downloads one or more cores and corresponding tool dependencies."),
 		Long:  tr("Downloads one or more cores and corresponding tool dependencies."),
 		Example: "" +
-			"  " + os.Args[0] + " core download arduino:samd       # " + tr("to download the latest version of Arduino SAMD core.\n") +
-			"  " + os.Args[0] + " core download arduino:samd@1.6.9 # " + tr("for a specific version (in this case 1.6.9)."),
+			"  " + os.Args[0] + " core download arduino:samd       # " + tr("download the latest version of Arduino SAMD core.") + "\n" +
+			"  " + os.Args[0] + " core download arduino:samd@1.6.9 # " + tr("download a specific version (in this case 1.6.9)."),
 		Args: cobra.MinimumNArgs(1),
 		Run:  runDownloadCommand,
 	}
@@ -50,7 +50,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Executing `arduino core download`")
 
-	platformsRefs, err := globals.ParseReferenceArgs(args, true)
+	platformsRefs, err := arguments.ParseReferences(args, true)
 	if err != nil {
 		feedback.Errorf(tr("Invalid argument passed: %v"), err)
 		os.Exit(errorcodes.ErrBadArgument)

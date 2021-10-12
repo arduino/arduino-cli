@@ -17,7 +17,6 @@ package debug
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -27,16 +26,12 @@ import (
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // GetDebugConfig returns metadata to start debugging with the specified board
 func GetDebugConfig(ctx context.Context, req *debug.DebugConfigRequest) (*debug.GetDebugConfigResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
-
 	return getDebugProperties(req, pm)
 }
 
@@ -44,12 +39,12 @@ func getDebugProperties(req *debug.DebugConfigRequest, pm *packagemanager.Packag
 	// TODO: make a generic function to extract sketch from request
 	// and remove duplication in commands/compile.go
 	if req.GetSketchPath() == "" {
-		return nil, fmt.Errorf(tr("missing sketchPath"))
+		return nil, &commands.MissingSketchPathError{}
 	}
 	sketchPath := paths.New(req.GetSketchPath())
 	sk, err := sketch.New(sketchPath)
 	if err != nil {
-		return nil, errors.Wrap(err, tr("opening sketch"))
+		return nil, &commands.CantOpenSketchError{Cause: err}
 	}
 
 	// XXX Remove this code duplication!!
@@ -58,17 +53,17 @@ func getDebugProperties(req *debug.DebugConfigRequest, pm *packagemanager.Packag
 		fqbnIn = sk.Metadata.CPU.Fqbn
 	}
 	if fqbnIn == "" {
-		return nil, fmt.Errorf(tr("no Fully Qualified Board Name provided"))
+		return nil, &commands.MissingFQBNError{}
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, errors.Wrap(err, tr("error parsing FQBN"))
+		return nil, &commands.InvalidFQBNError{Cause: err}
 	}
 
 	// Find target board and board properties
 	_, platformRelease, board, boardProperties, referencedPlatformRelease, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
-		return nil, errors.Wrap(err, tr("error resolving FQBN"))
+		return nil, &commands.UnknownFQBNError{Cause: err}
 	}
 
 	// Build configuration for debug
@@ -111,7 +106,7 @@ func getDebugProperties(req *debug.DebugConfigRequest, pm *packagemanager.Packag
 		} else if refP, ok := referencedPlatformRelease.Programmers[req.GetProgrammer()]; ok {
 			toolProperties.Merge(refP.Properties)
 		} else {
-			return nil, fmt.Errorf(tr("programmer '%s' not found"), req.GetProgrammer())
+			return nil, &commands.ProgrammerNotFoundError{Programmer: req.GetProgrammer()}
 		}
 	}
 
@@ -120,23 +115,20 @@ func getDebugProperties(req *debug.DebugConfigRequest, pm *packagemanager.Packag
 		importPath = paths.New(importDir)
 	}
 	if !importPath.Exist() {
-		return nil, fmt.Errorf(tr("compiled sketch not found in %s"), importPath)
+		return nil, &commands.NotFoundError{Message: tr("Compiled sketch not found in %s", importPath)}
 	}
 	if !importPath.IsDir() {
-		return nil, fmt.Errorf(tr("expected compiled sketch in directory %s, but is a file instead"), importPath)
+		return nil, &commands.NotFoundError{Message: tr("Expected compiled sketch in directory %s, but is a file instead", importPath)}
 	}
 	toolProperties.SetPath("build.path", importPath)
 	toolProperties.Set("build.project_name", sk.Name+".ino")
 
 	// Set debug port property
 	port := req.GetPort()
-	if port != "" {
-		toolProperties.Set("debug.port", port)
-		if strings.HasPrefix(port, "/dev/") {
-			toolProperties.Set("debug.port.file", port[5:])
-		} else {
-			toolProperties.Set("debug.port.file", port)
-		}
+	if port.GetAddress() != "" {
+		toolProperties.Set("debug.port", port.Address)
+		portFile := strings.TrimPrefix(port.Address, "/dev/")
+		toolProperties.Set("debug.port.file", portFile)
 	}
 
 	// Extract and expand all debugging properties
@@ -146,7 +138,7 @@ func getDebugProperties(req *debug.DebugConfigRequest, pm *packagemanager.Packag
 	}
 
 	if !debugProperties.ContainsKey("executable") {
-		return nil, status.Error(codes.Unimplemented, fmt.Sprintf(tr("debugging not supported for board %s"), req.GetFqbn()))
+		return nil, &commands.FailedDebugError{Message: tr("Debugging not supported for board %s", req.GetFqbn())}
 	}
 
 	server := debugProperties.Get("server")

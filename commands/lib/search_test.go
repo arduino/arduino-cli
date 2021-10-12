@@ -21,11 +21,7 @@ func TestSearchLibrary(t *testing.T) {
 		Query:    "test",
 	}
 
-	resp, err := searchLibrary(req, lm)
-	if err != nil {
-		t.Fatal(err)
-	}
-
+	resp := searchLibrary(req, lm)
 	assert := assert.New(t)
 	assert.Equal(resp.GetStatus(), rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS)
 	assert.Equal(len(resp.GetLibraries()), 2)
@@ -42,11 +38,7 @@ func TestSearchLibrarySimilar(t *testing.T) {
 		Query:    "arduino",
 	}
 
-	resp, err := searchLibrary(req, lm)
-	if err != nil {
-		t.Fatal(err)
-	}
-
+	resp := searchLibrary(req, lm)
 	assert := assert.New(t)
 	assert.Equal(resp.GetStatus(), rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS)
 	assert.Equal(len(resp.GetLibraries()), 2)

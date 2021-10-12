@@ -80,6 +80,8 @@ Each tool describes a binary distribution of a command line tool. A tool can be:
 - a file preprocessor
 - a debugger
 - a program that performs a firmware upgrade
+- a [pluggable discovery](pluggable-discovery-specification.md)
+- a [pluggable monitor](pluggable-monitor-specification.md)
 
 basically anything that can run on the user's host PC and do something useful.
 
@@ -215,6 +217,13 @@ Finally, let's see how `PLATFORMS` are made.
           "toolsDependencies": [
             { "packager": "arduino", "name": "avr-gcc", "version": "4.8.1-arduino5" },
             { "packager": "arduino", "name": "avrdude", "version": "6.0.1-arduino5" }
+          ],
+          "discoveryDependencies": [
+            { "packager": "arduino", "name": "serial-discovery" },
+            { "packager": "arduino", "name": "mdns-discovery" }
+          ],
+          "monitorDependencies": [
+            { "packager": "arduino", "name": "serial-monitor" }
           ]
         },
 ```
@@ -231,9 +240,17 @@ Each PLATFORM describes a core for a specific architecture. The fields needed ar
   TOOLS
 - `boards`: the list of boards supported (note: just the names to display on the Arduino IDE and Arduino Pro IDE's
   Boards Manager GUI! the real boards definitions are inside `boards.txt` inside the core archive file)
-- `toolsDependencies`: the tools needed by this core. They will be installed by Boards Manager along with the platform.
-  Each tool is referenced by the triple (`packager`, `name`, `version`) as previously said. Note that you can reference
-  tools available in other packages as well, even if no platform of that package is installed.
+- `toolsDependencies`: the tools needed by this platform. They will be installed by Boards Manager along with the
+  platform. Each tool is referenced by the triple (`packager`, `name`, `version`) as previously said. Note that you can
+  reference tools available in other packages as well, even if no platform of that package is installed.
+- `discoveryDependencies`: the Pluggable Discoveries needed by this platform. Each discovery is referenced by the pair
+  (`packager`, `name`), the `version` is not specified because the latest installed discovery tool will always be used.
+  Like `toolsDependencies` they will be installed by Boards Manager along with the platform and can reference tools
+  available in other packages as well, even if no platform of that package is installed.
+- `monitorDependencies`: the Pluggable Monitors needed by this platform. Each monitor is referenced by the pair
+  (`packager`, `name`), the `version` is not specified because the latest installed monitor tool will always be used.
+  Like `toolsDependencies` they will be installed by Boards Manager along with the platform and can reference tools
+  available in other packages as well, even if no platform of that package is installed.
 
 The `version` field is validated by both Arduino IDE and [JSemVer](https://github.com/zafarkhaja/jsemver). Here are the
 rules Arduino IDE follows for parsing versions

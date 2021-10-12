@@ -17,8 +17,6 @@ package lib
 
 import (
 	"context"
-	"errors"
-	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
@@ -32,47 +30,24 @@ import (
 func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.LibrarySearchResponse, error) {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
-		return nil, errors.New(tr("invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
-
-	return searchLibrary(req, lm)
+	return searchLibrary(req, lm), nil
 }
 
-func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.LibrariesManager) (*rpc.LibrarySearchResponse, error) {
-	query := req.GetQuery()
+func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.LibrariesManager) *rpc.LibrarySearchResponse {
 	res := []*rpc.SearchedLibrary{}
 	status := rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS
 
-	searchArgs := strings.Split(strings.Trim(query, " "), " ")
-
-	match := func(toTest []string) (bool, error) {
-		if len(searchArgs) == 0 {
-			return true, nil
-		}
-
-		for _, t := range toTest {
-			matches, err := utils.Match(t, searchArgs)
-			if err != nil {
-				return false, err
-			}
-			if matches {
-				return matches, nil
-			}
-		}
-		return false, nil
-	}
-
 	for _, lib := range lm.Index.Libraries {
 		toTest := []string{lib.Name, lib.Latest.Paragraph, lib.Latest.Sentence}
-		if ok, err := match(toTest); err != nil {
-			return nil, err
-		} else if !ok {
+		if !utils.MatchAny(req.GetQuery(), toTest) {
 			continue
 		}
 		res = append(res, indexLibraryToRPCSearchLibrary(lib))
 	}
 
-	return &rpc.LibrarySearchResponse{Libraries: res, Status: status}, nil
+	return &rpc.LibrarySearchResponse{Libraries: res, Status: status}
 }
 
 // indexLibraryToRPCSearchLibrary converts a librariindex.Library to rpc.SearchLibrary

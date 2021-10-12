@@ -130,8 +130,7 @@ func Reset(portToTouch string, wait bool, cb *ResetProgressCallbacks, dryRun boo
 			// do nothing!
 		} else {
 			if err := TouchSerialPortAt1200bps(portToTouch); err != nil {
-				fmt.Printf(tr("TOUCH: error during reset: %s"), err)
-				fmt.Println()
+				fmt.Println(tr("TOUCH: error during reset: %s", err))
 			}
 		}
 	}

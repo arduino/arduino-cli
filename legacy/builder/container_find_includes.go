@@ -322,7 +322,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 				// Fully precompiled libraries should have no dependencies
 				// to avoid ABI breakage
 				if ctx.Verbose {
-					ctx.GetLogger().Println(constants.LOG_LEVEL_DEBUG, constants.MSG_SKIP_PRECOMPILED_LIBRARY, library.Name)
+					ctx.GetLogger().Println(constants.LOG_LEVEL_DEBUG, tr("Skipping dependencies detection for precompiled library {0}"), library.Name)
 				}
 				return nil
 			}
@@ -334,7 +334,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		if unchanged && cache.valid {
 			include = cache.Next().Include
 			if first && ctx.Verbose {
-				ctx.GetLogger().Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_CACHED_INCLUDES, sourcePath)
+				ctx.GetLogger().Println(constants.LOG_LEVEL_INFO, tr("Using cached library dependencies for file: {0}"), sourcePath)
 			}
 		} else {
 			preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
@@ -351,7 +351,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 			} else {
 				include = IncludesFinderWithRegExp(string(preproc_stderr))
 				if include == "" && ctx.Verbose {
-					ctx.GetLogger().Println(constants.LOG_LEVEL_DEBUG, constants.MSG_FIND_INCLUDES_FAILED, sourcePath)
+					ctx.GetLogger().Println(constants.LOG_LEVEL_DEBUG, tr("Error while detecting libraries included by {0}"), sourcePath)
 				}
 			}
 		}

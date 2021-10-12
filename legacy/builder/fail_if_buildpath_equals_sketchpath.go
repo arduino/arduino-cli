@@ -16,7 +16,6 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/pkg/errors"
@@ -41,7 +40,8 @@ func (s *FailIfBuildPathEqualsSketchPath) Run(ctx *types.Context) error {
 	sketchPath = sketchPath.Parent()
 
 	if buildPath.EqualsTo(sketchPath) {
-		return i18n.ErrorfWithLogger(ctx.GetLogger(), constants.MSG_SKETCH_CANT_BE_IN_BUILDPATH)
+		return i18n.ErrorfWithLogger(ctx.GetLogger(),
+			tr("Sketch cannot be located in build path. Please specify a different build path"))
 	}
 
 	return nil

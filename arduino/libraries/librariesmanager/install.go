@@ -17,12 +17,12 @@ package librariesmanager
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/url"
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/utils"
@@ -32,10 +32,16 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 )
 
+type alreadyInstalledError struct{}
+
+func (e *alreadyInstalledError) Error() string {
+	return tr("library already installed")
+}
+
 var (
 	// ErrAlreadyInstalled is returned when a library is already installed and task
 	// cannot proceed.
-	ErrAlreadyInstalled = errors.New(tr("library already installed"))
+	ErrAlreadyInstalled = &alreadyInstalledError{}
 )
 
 // InstallPrerequisiteCheck performs prequisite checks to install a library. It returns the
@@ -134,7 +140,7 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 	extractionPath := paths[0]
 	libraryName := extractionPath.Base()
 
-	if err := validateLibrary(libraryName, extractionPath); err != nil {
+	if err := validateLibrary(extractionPath); err != nil {
 		return err
 	}
 
@@ -224,7 +230,7 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 		return err
 	}
 
-	if err := validateLibrary(libraryName, installPath); err != nil {
+	if err := validateLibrary(installPath); err != nil {
 		// Clean up installation directory since this is not a valid library
 		installPath.RemoveAll()
 		return err
@@ -235,39 +241,66 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 	return nil
 }
 
+// parseGitURL tries to recover a library name from a git URL.
+// Returns an error in case the URL is not a valid git URL.
 func parseGitURL(gitURL string) (string, error) {
 	var res string
 	if strings.HasPrefix(gitURL, "git@") {
 		// We can't parse these as URLs
 		i := strings.LastIndex(gitURL, "/")
-		res = strings.TrimRight(gitURL[i+1:], ".git")
-	} else if path := paths.New(gitURL); path.Exist() {
+		res = strings.TrimSuffix(gitURL[i+1:], ".git")
+	} else if path := paths.New(gitURL); path != nil && path.Exist() {
 		res = path.Base()
-	} else if parsed, err := url.Parse(gitURL); err == nil {
+	} else if parsed, err := url.Parse(gitURL); parsed.String() != "" && err == nil {
 		i := strings.LastIndex(parsed.Path, "/")
-		res = strings.TrimRight(parsed.Path[i+1:], ".git")
+		res = strings.TrimSuffix(parsed.Path[i+1:], ".git")
 	} else {
 		return "", fmt.Errorf(tr("invalid git url"))
 	}
 	return res, nil
 }
 
-// validateLibrary verifies the dir contains a valid library, meaning it has both
-// an header <name>.h, either in src or root folder, and a library.properties file
-func validateLibrary(name string, dir *paths.Path) error {
-	// Verify library contains library header.
-	// Checks also root folder for legacy reasons.
-	// For more info see:
+// validateLibrary verifies the dir contains a valid library, meaning it has either
+// library.properties file and an header in src/ or an header in its root folder.
+// Returns nil if dir contains a valid library, error on all other cases.
+func validateLibrary(dir *paths.Path) error {
+	if dir.NotExist() {
+		return fmt.Errorf(tr("directory doesn't exist: %s", dir))
+	}
+
+	searchHeaderFile := func(d *paths.Path) (bool, error) {
+		if d.NotExist() {
+			// A directory that doesn't exist can't obviously contain any header file
+			return false, nil
+		}
+		dirContent, err := d.ReadDir()
+		if err != nil {
+			return false, fmt.Errorf(tr("reading directory %s content: %w", dir, err))
+		}
+		dirContent.FilterOutDirs()
+		headerExtensions := []string{}
+		for k := range globals.HeaderFilesValidExtensions {
+			headerExtensions = append(headerExtensions, k)
+		}
+		dirContent.FilterSuffix(headerExtensions...)
+		return len(dirContent) > 0, nil
+	}
+
+	// Recursive library layout
 	// https://arduino.github.io/arduino-cli/latest/library-specification/#source-code
-	libraryHeader := name + ".h"
-	if !dir.Join("src", libraryHeader).Exist() && !dir.Join(libraryHeader).Exist() {
-		return fmt.Errorf(tr(`library is not valid: missing header file "%s"`), libraryHeader)
+	if headerFound, err := searchHeaderFile(dir.Join("src")); err != nil {
+		return err
+	} else if dir.Join("library.properties").Exist() && headerFound {
+		return nil
 	}
 
-	// Verifies library contains library.properties
-	if !dir.Join("library.properties").Exist() {
-		return fmt.Errorf(tr(`library is not valid: missing file "library.properties"`))
+	// Flat library layout
+	// https://arduino.github.io/arduino-cli/latest/library-specification/#source-code
+	if headerFound, err := searchHeaderFile(dir); err != nil {
+		return err
+	} else if headerFound {
+		return nil
 	}
 
-	return nil
+	return fmt.Errorf(tr("library not valid"))
 }

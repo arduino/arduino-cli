@@ -17,7 +17,7 @@ package compile
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"io"
 	"path/filepath"
 	"sort"
@@ -38,7 +38,6 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
-	"github.com/pkg/errors"
 	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
 )
@@ -90,17 +89,17 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New(tr("invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
 
 	logrus.Tracef("Compile %s for %s started", req.GetSketchPath(), req.GetFqbn())
 	if req.GetSketchPath() == "" {
-		return nil, fmt.Errorf(tr("missing sketchPath"))
+		return nil, &commands.MissingSketchPathError{}
 	}
 	sketchPath := paths.New(req.GetSketchPath())
 	sk, err := sketch.New(sketchPath)
 	if err != nil {
-		return nil, fmt.Errorf(tr("opening sketch: %s"), err)
+		return nil, &commands.CantOpenSketchError{Cause: err}
 	}
 
 	fqbnIn := req.GetFqbn()
@@ -108,11 +107,11 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		fqbnIn = sk.Metadata.CPU.Fqbn
 	}
 	if fqbnIn == "" {
-		return nil, fmt.Errorf(tr("no FQBN provided"))
+		return nil, &commands.MissingFQBNError{}
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, fmt.Errorf(tr("incorrect FQBN: %s"), err)
+		return nil, &commands.InvalidFQBNError{Cause: err}
 	}
 
 	targetPlatform := pm.FindPlatform(&packagemanager.PlatformReference{
@@ -125,7 +124,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		// 	"\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+
 		// 		version.GetAppName()+" core install %[1]s:%[2]s\".", fqbn.Package, fqbn.PlatformArch)
 		// feedback.Error(errorMessage)
-		return nil, fmt.Errorf(tr("platform not installed"))
+		return nil, &commands.PlatformNotFound{Platform: targetPlatform.String(), Cause: errors.New(tr("platform not installed"))}
 	}
 
 	builderCtx := &types.Context{}
@@ -145,10 +144,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	if req.GetBuildPath() == "" {
 		builderCtx.BuildPath = sk.BuildPath
 	} else {
-		builderCtx.BuildPath = paths.New(req.GetBuildPath())
+		builderCtx.BuildPath = paths.New(req.GetBuildPath()).Canonical()
 	}
 	if err = builderCtx.BuildPath.MkdirAll(); err != nil {
-		return nil, fmt.Errorf(tr("cannot create build directory: %s"), err)
+		return nil, &commands.PermissionDeniedError{Message: tr("Cannot create build directory"), Cause: err}
 	}
 	builderCtx.CompilationDatabase = bldr.NewCompilationDatabase(
 		builderCtx.BuildPath.Join("compile_commands.json"),
@@ -178,7 +177,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		builderCtx.BuildCachePath = paths.New(req.GetBuildCachePath())
 		err = builderCtx.BuildCachePath.MkdirAll()
 		if err != nil {
-			return nil, fmt.Errorf(tr("cannot create build cache directory: %s"), err)
+			return nil, &commands.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
 		}
 	}
 
@@ -221,14 +220,22 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	// if --preprocess or --show-properties were passed, we can stop here
 	if req.GetShowProperties() {
-		return r, builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
+		compileErr := builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
+		if compileErr != nil {
+			compileErr = &commands.CompileFailedError{Message: err.Error()}
+		}
+		return r, compileErr
 	} else if req.GetPreprocess() {
-		return r, builder.RunPreprocess(builderCtx)
+		compileErr := builder.RunPreprocess(builderCtx)
+		if compileErr != nil {
+			compileErr = &commands.CompileFailedError{Message: err.Error()}
+		}
+		return r, compileErr
 	}
 
 	// if it's a regular build, go on...
 	if err := builder.RunBuilder(builderCtx); err != nil {
-		return r, err
+		return r, &commands.CompileFailedError{Message: err.Error()}
 	}
 
 	// If the export directory is set we assume you want to export the binaries
@@ -250,17 +257,17 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		}
 		logrus.WithField("path", exportPath).Trace("Saving sketch to export path.")
 		if err := exportPath.MkdirAll(); err != nil {
-			return r, errors.Wrap(err, tr("creating output dir"))
+			return r, &commands.PermissionDeniedError{Message: tr("Error creating output dir"), Cause: err}
 		}
 
 		// Copy all "sketch.ino.*" artifacts to the export directory
 		baseName, ok := builderCtx.BuildProperties.GetOk("build.project_name") // == "sketch.ino"
 		if !ok {
-			return r, errors.New(tr("missing 'build.project_name' build property"))
+			return r, &commands.MissingPlatformPropertyError{Property: "build.project_name"}
 		}
 		buildFiles, err := builderCtx.BuildPath.ReadDir()
 		if err != nil {
-			return r, errors.Errorf(tr("reading build directory: %s"), err)
+			return r, &commands.PermissionDeniedError{Message: tr("Error reading build directory"), Cause: err}
 		}
 		buildFiles.FilterPrefix(baseName)
 		for _, buildFile := range buildFiles {
@@ -270,7 +277,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 				WithField("dest", exportedFile).
 				Trace("Copying artifact.")
 			if err = buildFile.CopyTo(exportedFile); err != nil {
-				return r, errors.Wrapf(err, tr("copying output file %s"), buildFile)
+				return r, &commands.PermissionDeniedError{Message: tr("Error copying output file %s", buildFile), Cause: err}
 			}
 		}
 	}
@@ -279,7 +286,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	for _, lib := range builderCtx.ImportedLibraries {
 		rpcLib, err := lib.ToRPCLibrary()
 		if err != nil {
-			return r, fmt.Errorf(tr("converting library %[1]s to rpc struct: %[2]w"), lib.Name, err)
+			return r, &commands.PermissionDeniedError{Message: tr("Error getting information for library %s", lib.Name), Cause: err}
 		}
 		importedLibs = append(importedLibs, rpcLib)
 	}

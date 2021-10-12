@@ -219,12 +219,23 @@ tasks:
   test-legacy:
     desc: Run tests for the `legacy` package
     cmds:
-      - go test {{ default "-v -failfast" .GOFLAGS }} -coverprofile=coverage_legacy.txt ./legacy/...
+      - |
+        go test \
+          {{ default "-v -failfast" .GOFLAGS }} \
+          -coverprofile=coverage_legacy.txt \
+          ./legacy/... \
+          {{.TEST_LDFLAGS}}
 
   test-unit-race:
     desc: Run unit tests only with race condition detection
     cmds:
-      - go test -short -race {{ default "-v" .GOFLAGS }} -coverprofile=coverage_race_unit.txt {{ default .DEFAULT_GO_PACKAGES .TARGETS }}
+      - |
+        go test \
+          -short \
+          -race {{ default "-v" .GOFLAGS }} \
+          -coverprofile=coverage_race_unit.txt \
+          {{ default .DEFAULT_GO_PACKAGES .TARGETS }} \
+          {{.TEST_LDFLAGS}}
 
   check:
     desc: Check fmt and lint, `legacy` will be skipped

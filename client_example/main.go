@@ -636,8 +636,11 @@ func callUpload(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance) {
 			Instance:   instance,
 			Fqbn:       "arduino:samd:mkr1000",
 			SketchPath: filepath.Join(currDir, "hello"),
-			Port:       "/dev/ttyACM0",
-			Verbose:    true,
+			Port: &rpc.Port{
+				Address:  "/dev/ttyACM0",
+				Protocol: "serial",
+			},
+			Verbose: true,
 		})
 
 	if err != nil {
@@ -691,7 +694,7 @@ func callBoardList(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance) 
 	}
 
 	for _, port := range boardListResp.GetPorts() {
-		log.Printf("port: %s, boards: %+v\n", port.GetAddress(), port.GetBoards())
+		log.Printf("port: %s, boards: %+v\n", port.GetPort().GetAddress(), port.GetMatchingBoards())
 	}
 }
 
@@ -720,11 +723,11 @@ func callBoardListWatch(client rpc.ArduinoCoreServiceClient, instance *rpc.Insta
 				continue
 			}
 
-			log.Printf("event: %s, address: %s\n", res.EventType, res.Port.Address)
+			log.Printf("event: %s, address: %s\n", res.EventType, res.Port.Port.Address)
 			if res.EventType == "add" {
-				log.Printf("protocol: %s, ", res.Port.Protocol)
-				log.Printf("protocolLabel: %s, ", res.Port.ProtocolLabel)
-				log.Printf("boards: %s\n\n", res.Port.Boards)
+				log.Printf("protocol: %s, ", res.Port.Port.Protocol)
+				log.Printf("protocolLabel: %s, ", res.Port.Port.ProtocolLabel)
+				log.Printf("boards: %s\n\n", res.Port.MatchingBoards)
 			}
 		}
 	}()
@@ -1006,7 +1009,9 @@ func callDebugger(debugStreamingOpenClient dbg.DebugService_DebugClient, instanc
 			Instance:   &rpc.Instance{Id: instance.GetId()},
 			Fqbn:       "arduino:samd:mkr1000",
 			SketchPath: filepath.Join(currDir, "hello"),
-			Port:       "none",
+			Port: &rpc.Port{
+				Address: "none",
+			},
 		}})
 	if err != nil {
 		log.Fatalf("Send error: %s\n", err)

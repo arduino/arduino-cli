@@ -61,7 +61,7 @@ func NewDownloadProgressBarCB() func(*rpc.DownloadProgress) {
 		// fmt.Printf(">>> %v\n", curr)
 		if filename := curr.GetFile(); filename != "" {
 			if curr.GetCompleted() {
-				fmt.Printf(tr("%s already downloaded")+"\n", filename)
+				fmt.Println(tr("%s already downloaded", filename))
 				return
 			}
 			prefix = filename
@@ -73,7 +73,7 @@ func NewDownloadProgressBarCB() func(*rpc.DownloadProgress) {
 			bar.Set(int(curr.GetDownloaded()))
 		}
 		if curr.GetCompleted() {
-			bar.FinishPrintOver(fmt.Sprintf(tr("%s downloaded"), prefix))
+			bar.FinishPrintOver(tr("%s downloaded", prefix))
 		}
 	}
 }

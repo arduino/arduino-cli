@@ -34,16 +34,16 @@ func (s *FailIfImportedLibraryIsWrong) Run(ctx *types.Context) error {
 	for _, library := range ctx.ImportedLibraries {
 		if !library.IsLegacy {
 			if library.InstallDir.Join(constants.LIBRARY_FOLDER_ARCH).IsDir() {
-				return i18n.ErrorfWithLogger(logger, constants.MSG_ARCH_FOLDER_NOT_SUPPORTED)
+				return i18n.ErrorfWithLogger(logger, tr("%[1]s folder is no longer supported! See %[2]s for more information", "'arch'", "http://goo.gl/gfFJzU"))
 			}
 			for _, propName := range libraries.MandatoryProperties {
 				if !library.Properties.ContainsKey(propName) {
-					return i18n.ErrorfWithLogger(logger, constants.MSG_PROP_IN_LIBRARY, propName, library.InstallDir)
+					return i18n.ErrorfWithLogger(logger, tr("Missing '{0}' from library in {1}"), propName, library.InstallDir)
 				}
 			}
 			if library.Layout == libraries.RecursiveLayout {
 				if library.UtilityDir != nil {
-					return i18n.ErrorfWithLogger(logger, constants.MSG_LIBRARY_CAN_USE_SRC_AND_UTILITY_FOLDERS, library.InstallDir)
+					return i18n.ErrorfWithLogger(logger, tr("Library can't use both '%[1]s' and '%[2]s' folders. Double check {0}", "src", "utility"), library.InstallDir)
 				}
 			}
 		}

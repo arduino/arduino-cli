@@ -17,11 +17,9 @@ package commands
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/resources"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -101,72 +99,6 @@ var (
 		},
 	}
 )
-
-var listBoardMutex sync.Mutex
-
-// ListBoards foo
-func ListBoards(pm *packagemanager.PackageManager) ([]*discovery.Port, error) {
-	// ensure the connection to the discoverer is unique to avoid messing up
-	// the messages exchanged
-	listBoardMutex.Lock()
-	defer listBoardMutex.Unlock()
-
-	// get the bundled tool
-	t := getBuiltinSerialDiscoveryTool(pm)
-
-	// determine if it's installed
-	if !t.IsInstalled() {
-		return nil, fmt.Errorf(tr("missing serial-discovery tool"))
-	}
-
-	disc, err := discovery.New("serial-discovery", t.InstallDir.Join(t.Tool.Name).String())
-	if err != nil {
-		return nil, err
-	}
-	defer disc.Quit()
-
-	if err = disc.Run(); err != nil {
-		return nil, fmt.Errorf(tr("starting discovery: %v"), err)
-	}
-
-	if err = disc.Start(); err != nil {
-		return nil, fmt.Errorf(tr("starting discovery: %v"), err)
-	}
-
-	res, err := disc.List()
-	if err != nil {
-		return nil, fmt.Errorf(tr("getting port list from discovery: %v"), err)
-	}
-
-	return res, nil
-}
-
-// WatchListBoards returns a channel that receives events from the bundled discovery tool
-func WatchListBoards(pm *packagemanager.PackageManager) (<-chan *discovery.Event, error) {
-	t := getBuiltinSerialDiscoveryTool(pm)
-	if !t.IsInstalled() {
-		return nil, fmt.Errorf(tr("missing serial-discovery tool"))
-	}
-
-	disc, err := discovery.New("serial-discovery", t.InstallDir.Join(t.Tool.Name).String())
-	if err != nil {
-		return nil, err
-	}
-
-	if err = disc.Run(); err != nil {
-		return nil, fmt.Errorf(tr("starting discovery: %v"), err)
-	}
-
-	if err = disc.Start(); err != nil {
-		return nil, fmt.Errorf(tr("starting discovery: %v"), err)
-	}
-
-	if err = disc.StartSync(); err != nil {
-		return nil, fmt.Errorf(tr("starting sync: %v"), err)
-	}
-
-	return disc.EventChannel(10), nil
-}
 
 func getBuiltinSerialDiscoveryTool(pm *packagemanager.PackageManager) *cores.ToolRelease {
 	builtinPackage := pm.Packages.GetOrCreatePackage("builtin")

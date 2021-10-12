@@ -57,8 +57,6 @@ func TestGetByVidPid(t *testing.T) {
 	require.Len(t, res, 1)
 	require.Equal(t, "Arduino/Genuino MKR1000", res[0].Name)
 	require.Equal(t, "arduino:samd:mkr1000", res[0].Fqbn)
-	require.Equal(t, "0xf420", res[0].Vid)
-	require.Equal(t, "0XF069", res[0].Pid)
 
 	// wrong vid (too long), wrong pid (not an hex value)
 	_, err = apiByVidPid("0xfffff", "0xDEFG")
@@ -110,7 +108,7 @@ func TestBoardDetectionViaAPIWithNonUSBPort(t *testing.T) {
 		Properties: properties.NewMap(),
 	}
 	items, err := identifyViaCloudAPI(port)
-	require.Equal(t, err, ErrNotFound)
+	require.ErrorIs(t, err, ErrNotFound)
 	require.Empty(t, items)
 }
 

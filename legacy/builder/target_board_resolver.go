@@ -43,8 +43,14 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 	core = core[strings.Index(core, ":")+1:]
 
 	if ctx.Verbose {
-		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_BOARD, targetBoard.BoardID, targetPlatform.InstallDir)
-		logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_CORE, core, actualPlatform.InstallDir)
+		logger.Println(constants.LOG_LEVEL_INFO,
+			tr("Using board '{0}' from platform in folder: {1}"),
+			targetBoard.BoardID,
+			targetPlatform.InstallDir)
+		logger.Println(constants.LOG_LEVEL_INFO,
+			tr("Using core '{0}' from platform in folder: {1}"),
+			core,
+			actualPlatform.InstallDir)
 	}
 
 	ctx.BuildCore = core

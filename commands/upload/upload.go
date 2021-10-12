@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"net/url"
 	"path/filepath"
 	"strings"
 
@@ -40,6 +39,81 @@ import (
 
 var tr = i18n.Tr
 
+// SupportedUserFields returns a SupportedUserFieldsResponse containing all the UserFields supported
+// by the upload tools needed by the board using the protocol specified in SupportedUserFieldsRequest.
+func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsRequest) (*rpc.SupportedUserFieldsResponse, error) {
+	if req.Protocol == "" {
+		return nil, &commands.MissingPortProtocolError{}
+	}
+
+	pm := commands.GetPackageManager(req.GetInstance().GetId())
+	if pm == nil {
+		return nil, &commands.InvalidInstanceError{}
+	}
+
+	fqbn, err := cores.ParseFQBN(req.GetFqbn())
+	if err != nil {
+		return nil, &commands.InvalidFQBNError{Cause: err}
+	}
+
+	_, platformRelease, board, _, _, err := pm.ResolveFQBN(fqbn)
+	if err != nil {
+		return nil, &commands.UnknownFQBNError{Cause: err}
+	}
+
+	toolID, err := getToolID(board.Properties, "upload", req.Protocol)
+	if err != nil {
+		return nil, err
+	}
+
+	return &rpc.SupportedUserFieldsResponse{
+		UserFields: getUserFields(toolID, platformRelease),
+	}, nil
+}
+
+// getToolID returns the ID of the tool that supports the action and protocol combination by searching in props.
+// Returns error if tool cannot be found.
+func getToolID(props *properties.Map, action, protocol string) (string, error) {
+	toolProperty := fmt.Sprintf("%s.tool.%s", action, protocol)
+	defaultToolProperty := fmt.Sprintf("%s.tool.default", action)
+
+	if t, ok := props.GetOk(toolProperty); ok {
+		return t, nil
+	}
+
+	if t, ok := props.GetOk(defaultToolProperty); ok {
+		// Fallback for platform that don't support the specified protocol for specified action:
+		// https://arduino.github.io/arduino-cli/latest/platform-specification/#sketch-upload-configuration
+		return t, nil
+	}
+
+	return "", &commands.MissingPlatformPropertyError{Property: toolProperty}
+}
+
+// getUserFields return all user fields supported by the tools specified.
+// Returns error only in case the secret property is not a valid boolean.
+func getUserFields(toolID string, platformRelease *cores.PlatformRelease) []*rpc.UserField {
+	userFields := []*rpc.UserField{}
+	fields := platformRelease.Properties.SubTree(fmt.Sprintf("tools.%s.upload.field", toolID))
+	keys := fields.FirstLevelKeys()
+
+	for _, key := range keys {
+		value := fields.Get(key)
+		if len(value) > 50 {
+			value = fmt.Sprintf("%s…", value[:49])
+		}
+		isSecret := fields.GetBoolean(fmt.Sprintf("%s.secret", key))
+		userFields = append(userFields, &rpc.UserField{
+			ToolId: toolID,
+			Name:   key,
+			Label:  value,
+			Secret: isSecret,
+		})
+	}
+
+	return userFields
+}
+
 // Upload FIXMEDOC
 func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, errStream io.Writer) (*rpc.UploadResponse, error) {
 	logrus.Tracef("Upload %s on %s started", req.GetSketchPath(), req.GetFqbn())
@@ -49,12 +123,12 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 	sketchPath := paths.New(req.GetSketchPath())
 	sk, err := sketch.New(sketchPath)
 	if err != nil && req.GetImportDir() == "" && req.GetImportFile() == "" {
-		return nil, fmt.Errorf(tr("opening sketch: %s"), err)
+		return nil, &commands.CantOpenSketchError{Cause: err}
 	}
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 
-	err = runProgramAction(
+	if err := runProgramAction(
 		pm,
 		sk,
 		req.GetImportFile(),
@@ -68,10 +142,11 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		outStream,
 		errStream,
 		req.GetDryRun(),
-	)
-	if err != nil {
+		req.GetUserFields(),
+	); err != nil {
 		return nil, err
 	}
+
 	return &rpc.UploadResponse{}, nil
 }
 
@@ -80,7 +155,7 @@ func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest,
 	logrus.Tracef("Upload using programmer %s on %s started", req.GetSketchPath(), req.GetFqbn())
 
 	if req.GetProgrammer() == "" {
-		return nil, errors.New(tr("programmer not specified"))
+		return nil, &commands.MissingProgrammerError{}
 	}
 	_, err := Upload(ctx, &rpc.UploadRequest{
 		Instance:   req.GetInstance(),
@@ -92,50 +167,41 @@ func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest,
 		Programmer: req.GetProgrammer(),
 		Verbose:    req.GetVerbose(),
 		Verify:     req.GetVerify(),
+		UserFields: req.GetUserFields(),
 	}, outStream, errStream)
 	return &rpc.UploadUsingProgrammerResponse{}, err
 }
 
 func runProgramAction(pm *packagemanager.PackageManager,
 	sk *sketch.Sketch,
-	importFile, importDir, fqbnIn, port string,
+	importFile, importDir, fqbnIn string, port *rpc.Port,
 	programmerID string,
 	verbose, verify, burnBootloader bool,
 	outStream, errStream io.Writer,
-	dryRun bool) error {
+	dryRun bool, userFields map[string]string) error {
 
 	if burnBootloader && programmerID == "" {
-		return fmt.Errorf(tr("no programmer specified for burning bootloader"))
+		return &commands.MissingProgrammerError{}
 	}
 
-	// FIXME: make a specification on how a port is specified via command line
-	if port == "" && sk != nil && sk.Metadata != nil {
-		deviceURI, err := url.Parse(sk.Metadata.CPU.Port)
-		if err != nil {
-			return fmt.Errorf(tr("invalid Device URL format: %s"), err)
-		}
-		if deviceURI.Scheme == "serial" {
-			port = deviceURI.Host + deviceURI.Path
-		}
-	}
 	logrus.WithField("port", port).Tracef("Upload port")
 
 	if fqbnIn == "" && sk != nil && sk.Metadata != nil {
 		fqbnIn = sk.Metadata.CPU.Fqbn
 	}
 	if fqbnIn == "" {
-		return fmt.Errorf(tr("no Fully Qualified Board Name provided"))
+		return &commands.MissingFQBNError{}
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return fmt.Errorf(tr("incorrect FQBN: %s"), err)
+		return &commands.InvalidFQBNError{Cause: err}
 	}
 	logrus.WithField("fqbn", fqbn).Tracef("Detected FQBN")
 
 	// Find target board and board properties
 	_, boardPlatform, board, boardProperties, buildPlatform, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
-		return fmt.Errorf(tr("incorrect FQBN: %s"), err)
+		return &commands.UnknownFQBNError{Cause: err}
 	}
 	logrus.
 		WithField("boardPlatform", boardPlatform).
@@ -152,33 +218,28 @@ func runProgramAction(pm *packagemanager.PackageManager,
 			programmer = buildPlatform.Programmers[programmerID]
 		}
 		if programmer == nil {
-			return fmt.Errorf(tr("programmer '%s' not available"), programmerID)
+			return &commands.ProgrammerNotFoundError{Programmer: programmerID}
 		}
 	}
 
 	// Determine upload tool
-	var uploadToolID string
-	{
-		toolProperty := "upload.tool"
-		if burnBootloader {
-			toolProperty = "bootloader.tool"
-		} else if programmer != nil {
-			toolProperty = "program.tool"
-		}
-
-		// create a temporary configuration only for the selection of upload tool
-		props := properties.NewMap()
-		props.Merge(boardPlatform.Properties)
-		props.Merge(boardPlatform.RuntimeProperties())
-		props.Merge(boardProperties)
-		if programmer != nil {
-			props.Merge(programmer.Properties)
-		}
-		if t, ok := props.GetOk(toolProperty); ok {
-			uploadToolID = t
-		} else {
-			return fmt.Errorf(tr("cannot get programmer tool: undefined '%s' property"), toolProperty)
-		}
+	// create a temporary configuration only for the selection of upload tool
+	props := properties.NewMap()
+	props.Merge(boardPlatform.Properties)
+	props.Merge(boardPlatform.RuntimeProperties())
+	props.Merge(boardProperties)
+	if programmer != nil {
+		props.Merge(programmer.Properties)
+	}
+	action := "upload"
+	if burnBootloader {
+		action = "bootloader"
+	} else if programmer != nil {
+		action = "program"
+	}
+	uploadToolID, err := getToolID(props, action, port.Protocol)
+	if err != nil {
+		return err
 	}
 
 	var uploadToolPlatform *cores.PlatformRelease
@@ -193,7 +254,9 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		Trace("Upload tool")
 
 	if split := strings.Split(uploadToolID, ":"); len(split) > 2 {
-		return fmt.Errorf(tr("invalid 'upload.tool' property: %s"), uploadToolID)
+		return &commands.InvalidPlatformPropertyError{
+			Property: fmt.Sprintf("%s.tool.%s", action, port.Protocol), // TODO: Can be done better, maybe inline getToolID(...)
+			Value:    uploadToolID}
 	} else if len(split) == 2 {
 		uploadToolID = split[1]
 		uploadToolPlatform = pm.GetInstalledPlatformRelease(
@@ -209,9 +272,10 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	if uploadToolPlatform != nil {
 		uploadProperties.Merge(uploadToolPlatform.Properties)
 	}
+	uploadProperties.Set("runtime.os", properties.GetOSSuffix())
 	uploadProperties.Merge(boardPlatform.Properties)
 	uploadProperties.Merge(boardPlatform.RuntimeProperties())
-	uploadProperties.Merge(boardProperties)
+	uploadProperties.Merge(overrideProtocolProperties(action, port.Protocol, boardProperties))
 	uploadProperties.Merge(uploadProperties.SubTree("tools." + uploadToolID))
 	if programmer != nil {
 		uploadProperties.Merge(programmer.Properties)
@@ -226,13 +290,21 @@ func runProgramAction(pm *packagemanager.PackageManager,
 			if requiredTool.IsInstalled() {
 				uploadProperties.Merge(requiredTool.RuntimeProperties())
 			} else {
-				errStream.Write([]byte(fmt.Sprintf(tr("Warning: tool '%s' is not installed. It might not be available for your OS."), requiredTool)))
+				errStream.Write([]byte(tr("Warning: tool '%s' is not installed. It might not be available for your OS.", requiredTool)))
 			}
 		}
 	}
 
+	// Certain tools require the user to provide custom fields at run time,
+	// if they've been provided set them
+	// For more info:
+	// https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
+	for name, value := range userFields {
+		uploadProperties.Set(fmt.Sprintf("%s.field.%s", action, name), value)
+	}
+
 	if !uploadProperties.ContainsKey("upload.protocol") && programmer == nil {
-		return fmt.Errorf(tr("a programmer is required to upload for this board"))
+		return &commands.ProgrammerRequiredForUploadError{}
 	}
 
 	// Set properties for verbose upload
@@ -280,13 +352,13 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	if !burnBootloader {
 		importPath, sketchName, err := determineBuildPathAndSketchName(importFile, importDir, sk, fqbn)
 		if err != nil {
-			return errors.Errorf(tr("retrieving build artifacts: %s"), err)
+			return &commands.NotFoundError{Message: tr("Error finding build artifacts"), Cause: err}
 		}
 		if !importPath.Exist() {
-			return fmt.Errorf(tr("compiled sketch not found in %s"), importPath)
+			return &commands.NotFoundError{Message: tr("Compiled sketch not found in %s", importPath)}
 		}
 		if !importPath.IsDir() {
-			return fmt.Errorf(tr("expected compiled sketch in directory %s, but is a file instead"), importPath)
+			return &commands.NotFoundError{Message: tr("Expected compiled sketch in directory %s, but is a file instead", importPath)}
 		}
 		uploadProperties.SetPath("build.path", importPath)
 		uploadProperties.Set("build.project_name", sketchName)
@@ -295,14 +367,14 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	// If not using programmer perform some action required
 	// to set the board in bootloader mode
 	actualPort := port
-	if programmer == nil && !burnBootloader {
+	if programmer == nil && !burnBootloader && port.Protocol == "serial" {
 
 		// Perform reset via 1200bps touch if requested and wait for upload port also if requested.
 		touch := uploadProperties.GetBoolean("upload.use_1200bps_touch")
 		wait := false
 		portToTouch := ""
 		if touch {
-			portToTouch = port
+			portToTouch = port.Address
 			// Waits for upload port only if a 1200bps touch is done
 			wait = uploadProperties.GetBoolean("upload.wait_for_upload_port")
 		}
@@ -316,8 +388,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 			TouchingPort: func(port string) {
 				logrus.WithField("phase", "board reset").Infof("Performing 1200-bps touch reset on serial port %s", port)
 				if verbose {
-					outStream.Write([]byte(fmt.Sprintf(tr("Performing 1200-bps touch reset on serial port %s"), port)))
-					outStream.Write([]byte(fmt.Sprintln()))
+					outStream.Write([]byte(fmt.Sprintln(tr("Performing 1200-bps touch reset on serial port %s", port))))
 				}
 			},
 			WaitingForNewSerial: func() {
@@ -334,11 +405,9 @@ func runProgramAction(pm *packagemanager.PackageManager,
 				}
 				if verbose {
 					if port != "" {
-						outStream.Write([]byte(fmt.Sprintf(tr("Upload port found on %s"), port)))
-						outStream.Write([]byte(fmt.Sprintln()))
+						outStream.Write([]byte(fmt.Sprintln(tr("Upload port found on %s", port))))
 					} else {
-						outStream.Write([]byte(fmt.Sprintf(tr("No upload port found, using %s as fallback"), actualPort)))
-						outStream.Write([]byte(fmt.Sprintln()))
+						outStream.Write([]byte(fmt.Sprintln(tr("No upload port found, using %s as fallback", actualPort))))
 					}
 				}
 			},
@@ -348,40 +417,48 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		}
 
 		if newPort, err := serialutils.Reset(portToTouch, wait, cb, dryRun); err != nil {
-			outStream.Write([]byte(fmt.Sprintf(tr("Cannot perform port reset: %s"), err)))
-			outStream.Write([]byte(fmt.Sprintln()))
+			outStream.Write([]byte(fmt.Sprintln(tr("Cannot perform port reset: %s", err))))
 		} else {
 			if newPort != "" {
-				actualPort = newPort
+				actualPort.Address = newPort
 			}
 		}
 	}
 
-	if actualPort != "" {
+	if actualPort.Address != "" {
 		// Set serial port property
-		uploadProperties.Set("serial.port", actualPort)
-		if strings.HasPrefix(actualPort, "/dev/") {
-			uploadProperties.Set("serial.port.file", actualPort[5:])
-		} else {
-			uploadProperties.Set("serial.port.file", actualPort)
+		uploadProperties.Set("serial.port", actualPort.Address)
+		if actualPort.Protocol == "serial" {
+			// This must be done only for serial ports
+			portFile := strings.TrimPrefix(actualPort.Address, "/dev/")
+			uploadProperties.Set("serial.port.file", portFile)
 		}
+	}
+
+	// Get Port properties gathered using pluggable discovery
+	uploadProperties.Set("upload.port.address", port.Address)
+	uploadProperties.Set("upload.port.label", port.Label)
+	uploadProperties.Set("upload.port.protocol", port.Protocol)
+	uploadProperties.Set("upload.port.protocolLabel", port.ProtocolLabel)
+	for prop, value := range actualPort.Properties {
+		uploadProperties.Set(fmt.Sprintf("upload.port.properties.%s", prop), value)
 	}
 
 	// Run recipes for upload
 	if burnBootloader {
 		if err := runTool("erase.pattern", uploadProperties, outStream, errStream, verbose, dryRun); err != nil {
-			return fmt.Errorf(tr("chip erase error: %s"), err)
+			return &commands.FailedUploadError{Message: tr("Failed chip erase"), Cause: err}
 		}
 		if err := runTool("bootloader.pattern", uploadProperties, outStream, errStream, verbose, dryRun); err != nil {
-			return fmt.Errorf(tr("burn bootloader error: %s"), err)
+			return &commands.FailedUploadError{Message: tr("Failed to burn bootloader"), Cause: err}
 		}
 	} else if programmer != nil {
 		if err := runTool("program.pattern", uploadProperties, outStream, errStream, verbose, dryRun); err != nil {
-			return fmt.Errorf(tr("programming error: %s"), err)
+			return &commands.FailedUploadError{Message: tr("Failed programming"), Cause: err}
 		}
 	} else {
 		if err := runTool("upload.pattern", uploadProperties, outStream, errStream, verbose, dryRun); err != nil {
-			return fmt.Errorf(tr("uploading error: %s"), err)
+			return &commands.FailedUploadError{Message: tr("Failed uploading"), Cause: err}
 		}
 	}
 
@@ -449,7 +526,7 @@ func determineBuildPathAndSketchName(importFile, importDir string, sk *sketch.Sk
 	// Case 1: importFile flag has been specified
 	if importFile != "" {
 		if importDir != "" {
-			return nil, "", fmt.Errorf(fmt.Sprintf(tr("%s and %s cannot be used together"), "importFile", "importDir"))
+			return nil, "", fmt.Errorf(tr("%s and %s cannot be used together", "importFile", "importDir"))
 		}
 
 		// We have a path like "path/to/my/build/SketchName.ino.bin". We are going to
@@ -534,4 +611,25 @@ func detectSketchNameFromBuildPath(buildPath *paths.Path) (string, error) {
 		return "", errors.New(tr("could not find a valid build artifact"))
 	}
 	return candidateName, nil
+}
+
+// overrideProtocolProperties returns a copy of props overriding action properties with
+// specified protocol properties.
+//
+// For example passing the below properties and "upload" as action and "serial" as protocol:
+//	upload.speed=256
+//	upload.serial.speed=57600
+//	upload.network.speed=19200
+//
+// will return:
+//	upload.speed=57600
+//	upload.serial.speed=57600
+//	upload.network.speed=19200
+func overrideProtocolProperties(action, protocol string, props *properties.Map) *properties.Map {
+	res := props.Clone()
+	subtree := props.SubTree(fmt.Sprintf("%s.%s", action, protocol))
+	for k, v := range subtree.AsMap() {
+		res.Set(fmt.Sprintf("%s.%s", action, k), v)
+	}
+	return res
 }

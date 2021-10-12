@@ -20,6 +20,7 @@ package cc.arduino.cli.commands.v1;
 option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
 
 import "cc/arduino/cli/commands/v1/common.proto";
+import "cc/arduino/cli/commands/v1/port.proto";
 
 message BoardDetailsRequest {
   // Arduino Core Service instance from the `Init` response.
@@ -167,6 +168,8 @@ message BoardAttachResponse {
 message BoardListRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
+  // Search for boards for the given time (in milliseconds)
+  int64 timeout = 2;
 }
 
 message BoardListResponse {
@@ -175,16 +178,10 @@ message BoardListResponse {
 }
 
 message DetectedPort {
-  // Address of the port (e.g., `serial:///dev/ttyACM0`).
-  string address = 1;
-  // Protocol of the port (e.g., `serial`).
-  string protocol = 2;
-  // A human friendly description of the protocol (e.g., "Serial Port (USB)").
-  string protocol_label = 3;
-  // The boards attached to the port.
-  repeated BoardListItem boards = 4;
-  // Serial number of connected board
-  string serial_number = 5;
+  // The possible boards attached to the port.
+  repeated BoardListItem matching_boards = 1;
+  // The port details
+  Port port = 2;
 }
 
 message BoardListAllRequest {
@@ -224,10 +221,6 @@ message BoardListItem {
   string fqbn = 2;
   // If the board is marked as "hidden" in the platform
   bool is_hidden = 3;
-  // Vendor ID
-  string vid = 4;
-  // Product ID
-  string pid = 5;
   // Platform this board belongs to
   Platform platform = 6;
 }

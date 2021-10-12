@@ -5,7 +5,7 @@ description = "Project used to run integration tests for the Arduino CLI"
 authors = []
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.8, <3.9.7"
 pytest = "6.0.2"
 simplejson = "3.17.0"
 semver = "2.13.0"

@@ -17,21 +17,37 @@ package discovery
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+)
+
+// To work correctly a Pluggable Discovery must respect the state machine specifed on the documentation:
+// https://arduino.github.io/arduino-cli/latest/pluggable-discovery-specification/#state-machine
+// States a PluggableDiscovery can be in
+const (
+	Alive int = iota
+	Idling
+	Running
+	Syncing
+	Dead
 )
 
 // PluggableDiscovery is a tool that detects communication ports to interact
 // with the boards.
 type PluggableDiscovery struct {
 	id                   string
+	processArgs          []string
 	process              *executils.Process
 	outgoingCommandsPipe io.Writer
 	incomingMessagesChan <-chan *discoveryMessage
@@ -39,8 +55,7 @@ type PluggableDiscovery struct {
 	// All the following fields are guarded by statusMutex
 	statusMutex           sync.Mutex
 	incomingMessagesError error
-	alive                 bool
-	eventsMode            bool
+	state                 int
 	eventChan             chan<- *Event
 	cachedPorts           map[string]*Port
 }
@@ -54,6 +69,23 @@ type discoveryMessage struct {
 	Port            *Port   `json:"port"`            // Used in add and remove events
 }
 
+func (msg discoveryMessage) String() string {
+	s := fmt.Sprintf("type: %s", msg.EventType)
+	if msg.Message != "" {
+		s = tr("%[1]s, message: %[2]s", s, msg.Message)
+	}
+	if msg.ProtocolVersion != 0 {
+		s = tr("%[1]s, protocol version: %[2]d", s, msg.ProtocolVersion)
+	}
+	if len(msg.Ports) > 0 {
+		s = tr("%[1]s, ports: %[2]s", s, msg.Ports)
+	}
+	if msg.Port != nil {
+		s = tr("%[1]s, port: %[2]s", s, msg.Port)
+	}
+	return s
+}
+
 // Port containts metadata about a port to connect to a board.
 type Port struct {
 	Address       string          `json:"address"`
@@ -64,6 +96,21 @@ type Port struct {
 }
 
 var tr = i18n.Tr
+
+// ToRPC converts Port into rpc.Port
+func (p *Port) ToRPC() *rpc.Port {
+	props := p.Properties
+	if props == nil {
+		props = properties.NewMap()
+	}
+	return &rpc.Port{
+		Address:       p.Address,
+		Label:         p.AddressLabel,
+		Protocol:      p.Protocol,
+		ProtocolLabel: p.ProtocolLabel,
+		Properties:    props.AsMap(),
+	}
+}
 
 func (p *Port) String() string {
 	if p == nil {
@@ -80,26 +127,12 @@ type Event struct {
 
 // New create and connect to the given pluggable discovery
 func New(id string, args ...string) (*PluggableDiscovery, error) {
-	proc, err := executils.NewProcess(args...)
-	if err != nil {
-		return nil, err
-	}
-	stdout, err := proc.StdoutPipe()
-	if err != nil {
-		return nil, err
-	}
-	stdin, err := proc.StdinPipe()
-	if err != nil {
-		return nil, err
-	}
-	messageChan := make(chan *discoveryMessage)
 	disc := &PluggableDiscovery{
-		id:                   id,
-		process:              proc,
-		incomingMessagesChan: messageChan,
-		outgoingCommandsPipe: stdin,
+		id:          id,
+		processArgs: args,
+		state:       Dead,
+		cachedPorts: map[string]*Port{},
 	}
-	go disc.jsonDecodeLoop(stdout, messageChan)
 	return disc, nil
 }
 
@@ -116,19 +149,27 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 	decoder := json.NewDecoder(in)
 	closeAndReportError := func(err error) {
 		disc.statusMutex.Lock()
-		disc.alive = false
+		disc.state = Dead
 		disc.incomingMessagesError = err
 		disc.statusMutex.Unlock()
 		close(outChan)
-		// TODO: Try restarting process some times before closing it completely
+		logrus.Errorf("stopped discovery %s decode loop: %v", disc.id, err)
 	}
 
 	for {
 		var msg discoveryMessage
-		if err := decoder.Decode(&msg); err != nil {
+		if err := decoder.Decode(&msg); err == io.EOF {
+			// This is fine, we exit gracefully
+			disc.statusMutex.Lock()
+			disc.state = Dead
+			disc.statusMutex.Unlock()
+			close(outChan)
+			return
+		} else if err != nil {
 			closeAndReportError(err)
 			return
 		}
+		logrus.Infof("from discovery %s received message %s", disc.id, msg)
 		if msg.EventType == "add" {
 			if msg.Port == nil {
 				closeAndReportError(errors.New(tr("invalid 'add' message: missing port")))
@@ -157,37 +198,27 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 	}
 }
 
-// IsAlive return true if the discovery process is running and so is able to receive commands
-// and produce events.
-func (disc *PluggableDiscovery) IsAlive() bool {
+// State returns the current state of this PluggableDiscovery
+func (disc *PluggableDiscovery) State() int {
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
-	return disc.alive
-}
-
-// IsEventMode return true if the discovery is in "events" mode
-func (disc *PluggableDiscovery) IsEventMode() bool {
-	disc.statusMutex.Lock()
-	defer disc.statusMutex.Unlock()
-	return disc.eventsMode
+	return disc.state
 }
 
 func (disc *PluggableDiscovery) waitMessage(timeout time.Duration) (*discoveryMessage, error) {
 	select {
 	case msg := <-disc.incomingMessagesChan:
 		if msg == nil {
-			// channel has been closed
-			disc.statusMutex.Lock()
-			defer disc.statusMutex.Unlock()
 			return nil, disc.incomingMessagesError
 		}
 		return msg, nil
 	case <-time.After(timeout):
-		return nil, errors.New("timeout")
+		return nil, fmt.Errorf(tr("timeout waiting for message from %s"), disc.id)
 	}
 }
 
 func (disc *PluggableDiscovery) sendCommand(command string) error {
+	logrus.Infof("sending command %s to discovery %s", strings.TrimSpace(command), disc)
 	data := []byte(command)
 	for {
 		n, err := disc.outgoingCommandsPipe.Write(data)
@@ -202,27 +233,82 @@ func (disc *PluggableDiscovery) sendCommand(command string) error {
 }
 
 func (disc *PluggableDiscovery) runProcess() error {
+	logrus.Infof("starting discovery %s process", disc.id)
+	proc, err := executils.NewProcess(disc.processArgs...)
+	if err != nil {
+		return err
+	}
+	stdout, err := proc.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	stdin, err := proc.StdinPipe()
+	if err != nil {
+		return err
+	}
+	disc.outgoingCommandsPipe = stdin
+	disc.process = proc
+
+	messageChan := make(chan *discoveryMessage)
+	disc.incomingMessagesChan = messageChan
+	go disc.jsonDecodeLoop(stdout, messageChan)
+
 	if err := disc.process.Start(); err != nil {
 		return err
 	}
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
-	disc.alive = true
+	disc.state = Alive
+	logrus.Infof("started discovery %s process", disc.id)
+	return nil
+}
+
+func (disc *PluggableDiscovery) killProcess() error {
+	logrus.Infof("killing discovery %s process", disc.id)
+	if err := disc.process.Kill(); err != nil {
+		return err
+	}
+	if err := disc.process.Wait(); err != nil {
+		return err
+	}
+	disc.statusMutex.Lock()
+	defer disc.statusMutex.Unlock()
+	if disc.eventChan != nil {
+		close(disc.eventChan)
+		disc.eventChan = nil
+	}
+	disc.state = Dead
+	logrus.Infof("killed discovery %s process", disc.id)
 	return nil
 }
 
 // Run starts the discovery executable process and sends the HELLO command to the discovery to agree on the
 // pluggable discovery protocol. This must be the first command to run in the communication with the discovery.
-func (disc *PluggableDiscovery) Run() error {
-	if err := disc.runProcess(); err != nil {
+// If the process is started but the HELLO command fails the process is killed.
+func (disc *PluggableDiscovery) Run() (err error) {
+	if err = disc.runProcess(); err != nil {
 		return err
 	}
 
-	if err := disc.sendCommand("HELLO 1 \"arduino-cli " + globals.VersionInfo.VersionString + "\"\n"); err != nil {
+	defer func() {
+		// If the discovery process is started successfully but the HELLO handshake
+		// fails the discovery is an unusable state, we kill the process to avoid
+		// further issues down the line.
+		if err == nil {
+			return
+		}
+		if err := disc.killProcess(); err != nil {
+			// Log failure to kill the process, ideally that should never happen
+			// but it's best to know it if it does
+			logrus.Errorf("Killing discovery %s after unsuccessful start: %s", disc.id, err)
+		}
+	}()
+
+	if err = disc.sendCommand("HELLO 1 \"arduino-cli " + globals.VersionInfo.VersionString + "\"\n"); err != nil {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return err
+		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "HELLO", err)
 	} else if msg.EventType != "hello" {
 		return errors.Errorf(tr("communication out of sync, expected 'hello', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
@@ -230,6 +316,9 @@ func (disc *PluggableDiscovery) Run() error {
 	} else if msg.ProtocolVersion > 1 {
 		return errors.Errorf(tr("protocol version not supported: requested 1, got %d"), msg.ProtocolVersion)
 	}
+	disc.statusMutex.Lock()
+	defer disc.statusMutex.Unlock()
+	disc.state = Idling
 	return nil
 }
 
@@ -240,12 +329,15 @@ func (disc *PluggableDiscovery) Start() error {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return err
+		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "START", err)
 	} else if msg.EventType != "start" {
 		return errors.Errorf(tr("communication out of sync, expected 'start', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
 		return errors.Errorf(tr("command failed: %s"), msg.Message)
 	}
+	disc.statusMutex.Lock()
+	defer disc.statusMutex.Unlock()
+	disc.state = Running
 	return nil
 }
 
@@ -257,7 +349,7 @@ func (disc *PluggableDiscovery) Stop() error {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return err
+		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "STOP", err)
 	} else if msg.EventType != "stop" {
 		return errors.Errorf(tr("communication out of sync, expected 'stop', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
@@ -265,11 +357,12 @@ func (disc *PluggableDiscovery) Stop() error {
 	}
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
+	disc.cachedPorts = map[string]*Port{}
 	if disc.eventChan != nil {
 		close(disc.eventChan)
 		disc.eventChan = nil
 	}
-	disc.eventsMode = false
+	disc.state = Idling
 	return nil
 }
 
@@ -279,19 +372,13 @@ func (disc *PluggableDiscovery) Quit() error {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return err
+		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "QUIT", err)
 	} else if msg.EventType != "quit" {
 		return errors.Errorf(tr("communication out of sync, expected 'quit', received '%s'"), msg.EventType)
 	} else if msg.Message != "OK" || msg.Error {
 		return errors.Errorf(tr("command failed: %s"), msg.Message)
 	}
-	disc.statusMutex.Lock()
-	defer disc.statusMutex.Unlock()
-	if disc.eventChan != nil {
-		close(disc.eventChan)
-		disc.eventChan = nil
-	}
-	disc.alive = false
+	disc.killProcess()
 	return nil
 }
 
@@ -302,7 +389,7 @@ func (disc *PluggableDiscovery) List() ([]*Port, error) {
 		return nil, err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return nil, err
+		return nil, fmt.Errorf(tr("calling %[1]s: %[2]w"), "LIST", err)
 	} else if msg.EventType != "list" {
 		return nil, errors.Errorf(tr("communication out of sync, expected 'list', received '%s'"), msg.EventType)
 	} else if msg.Error {
@@ -312,12 +399,30 @@ func (disc *PluggableDiscovery) List() ([]*Port, error) {
 	}
 }
 
-// EventChannel creates a channel used to receive events from the pluggable discovery.
+// StartSync puts the discovery in "events" mode: the discovery will send "add"
+// and "remove" events each time a new port is detected or removed respectively.
+// After calling StartSync an initial burst of "add" events may be generated to
+// report all the ports available at the moment of the start.
+// It also creates a channel used to receive events from the pluggable discovery.
 // The event channel must be consumed as quickly as possible since it may block the
 // discovery if it becomes full. The channel size is configurable.
-func (disc *PluggableDiscovery) EventChannel(size int) <-chan *Event {
+func (disc *PluggableDiscovery) StartSync(size int) (<-chan *Event, error) {
+	if err := disc.sendCommand("START_SYNC\n"); err != nil {
+		return nil, err
+	}
+
+	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
+		return nil, fmt.Errorf(tr("calling %[1]s: %[2]w"), "START_SYNC", err)
+	} else if msg.EventType != "start_sync" {
+		return nil, errors.Errorf(tr("communication out of sync, expected 'start_sync', received '%s'"), msg.EventType)
+	} else if msg.Message != "OK" || msg.Error {
+		return nil, errors.Errorf(tr("command failed: %s"), msg.Message)
+	}
+
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
+	disc.state = Syncing
+	disc.cachedPorts = map[string]*Port{}
 	if disc.eventChan != nil {
 		// In case there is already an existing event channel in use we close it
 		// before creating a new one.
@@ -325,41 +430,13 @@ func (disc *PluggableDiscovery) EventChannel(size int) <-chan *Event {
 	}
 	c := make(chan *Event, size)
 	disc.eventChan = c
-	return c
+	return c, nil
 }
 
-// StartSync puts the discovery in "events" mode: the discovery will send "add"
-// and "remove" events each time a new port is detected or removed respectively.
-// After calling StartSync an initial burst of "add" events may be generated to
-// report all the ports available at the moment of the start.
-func (disc *PluggableDiscovery) StartSync() error {
-	disc.statusMutex.Lock()
-	defer disc.statusMutex.Unlock()
-
-	if disc.eventsMode {
-		return errors.New(tr("already in events mode"))
-	}
-	if err := disc.sendCommand("START_SYNC\n"); err != nil {
-		return err
-	}
-
-	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return err
-	} else if msg.EventType != "start_sync" {
-		return errors.Errorf(tr("communication out of sync, expected 'start_sync', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
-		return errors.Errorf(tr("command failed: %s"), msg.Message)
-	}
-
-	disc.eventsMode = true
-	disc.cachedPorts = map[string]*Port{}
-	return nil
-}
-
-// ListSync returns a list of the available ports. The list is a cache of all the
+// ListCachedPorts returns a list of the available ports. The list is a cache of all the
 // add/remove events happened from the StartSync call and it will not consume any
 // resource from the underliying discovery.
-func (disc *PluggableDiscovery) ListSync() []*Port {
+func (disc *PluggableDiscovery) ListCachedPorts() []*Port {
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
 	res := []*Port{}

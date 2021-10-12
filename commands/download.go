@@ -16,7 +16,6 @@
 package commands
 
 import (
-	"errors"
 	"time"
 
 	"github.com/arduino/arduino-cli/httpclient"
@@ -27,16 +26,13 @@ import (
 // GetDownloaderConfig returns the downloader configuration based on
 // current settings.
 func GetDownloaderConfig() (*downloader.Config, error) {
-
 	httpClient, err := httpclient.New()
 	if err != nil {
-		return nil, err
+		return nil, &InvalidArgumentError{Message: tr("Could not connect via HTTP"), Cause: err}
 	}
-
-	res := &downloader.Config{
+	return &downloader.Config{
 		HttpClient: *httpClient,
-	}
-	return res, nil
+	}, nil
 }
 
 // Download performs a download loop using the provided downloader.Downloader.
@@ -63,7 +59,7 @@ func Download(d *downloader.Downloader, label string, downloadCB DownloadProgres
 	}
 	// The URL is not reachable for some reason
 	if d.Resp.StatusCode >= 400 && d.Resp.StatusCode <= 599 {
-		return errors.New(d.Resp.Status)
+		return &FailedDownloadError{Message: tr("Server responded with: %s", d.Resp.Status)}
 	}
 	downloadCB(&rpc.DownloadProgress{Completed: true})
 	return nil

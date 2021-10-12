@@ -43,7 +43,7 @@ func PrintProgressIfProgressEnabledAndMachineLogger(ctx *types.Context) {
 
 	log := ctx.GetLogger()
 	if log.Name() == "machine" {
-		log.Println(constants.LOG_LEVEL_INFO, constants.MSG_PROGRESS, strconv.FormatFloat(float64(ctx.Progress.Progress), 'f', 2, 32))
+		log.Println(constants.LOG_LEVEL_INFO, tr("Progress {0}"), strconv.FormatFloat(float64(ctx.Progress.Progress), 'f', 2, 32))
 	}
 }
 
@@ -264,7 +264,7 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 		}
 	} else if ctx.Verbose {
 		if objIsUpToDate {
-			logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, objectFile)
+			logger.Println(constants.LOG_LEVEL_INFO, tr("Using previously compiled file: {0}"), objectFile)
 		} else {
 			logger.Println("info", tr("Skipping compile of: {0}"), objectFile)
 		}
@@ -496,7 +496,7 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 			}
 		} else {
 			if ctx.Verbose {
-				logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_USING_PREVIOUS_COMPILED_FILE, archiveFilePath)
+				logger.Println(constants.LOG_LEVEL_INFO, tr("Using previously compiled file: {0}"), archiveFilePath)
 			}
 			return archiveFilePath, nil
 		}

@@ -125,11 +125,15 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 		err := archiveFile.CopyTo(targetArchivedCore)
 		if ctx.Verbose {
 			if err == nil {
-				logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_ARCHIVING_CORE_CACHE, targetArchivedCore)
+				logger.Println(constants.LOG_LEVEL_INFO, tr("Archiving built core (caching) in: {0}"), targetArchivedCore)
 			} else if os.IsNotExist(err) {
-				logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_CORE_CACHE_UNAVAILABLE, ctx.ActualPlatform)
+				logger.Println(
+					constants.LOG_LEVEL_INFO,
+					tr("Unable to cache built core, please tell {0} maintainers to follow %s",
+						"https://arduino.github.io/arduino-cli/latest/platform-specification/#recipes-to-build-the-corea-archive-file"),
+					ctx.ActualPlatform)
 			} else {
-				logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_ERROR_ARCHIVING_CORE_CACHE, targetArchivedCore, err)
+				logger.Println(constants.LOG_LEVEL_INFO, tr("Error archiving built core (caching) in {0}: {1}"), targetArchivedCore, err)
 			}
 		}
 	}

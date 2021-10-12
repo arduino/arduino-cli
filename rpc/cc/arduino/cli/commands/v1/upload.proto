@@ -20,6 +20,7 @@ package cc.arduino.cli.commands.v1;
 option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
 
 import "cc/arduino/cli/commands/v1/common.proto";
+import "cc/arduino/cli/commands/v1/port.proto";
 
 message UploadRequest {
   // Arduino Core Service instance from the `Init` response.
@@ -33,7 +34,7 @@ message UploadRequest {
   // filename under this path where it is saved by the `Compile` method.
   string sketch_path = 3;
   // The port of the board.
-  string port = 4;
+  Port port = 4;
   // Whether to turn on verbose output during the upload.
   bool verbose = 5;
   // After upload, verify that the contents of the memory on the board match the
@@ -52,6 +53,12 @@ message UploadRequest {
   // If set to true, the actual upload will not be performed but a trace output
   // will be printed stdout. This is for debugging purposes.
   bool dry_run = 10;
+  // User provided fields usually used by upload tools that need authentication
+  // or in any case fields that can be customized by the user at upload time
+  // and cannot be known previously.
+  // For more info:
+  // https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
+  map<string, string> user_fields = 11;
 }
 
 message UploadResponse {
@@ -60,6 +67,8 @@ message UploadResponse {
   // The error output of the upload process.
   bytes err_stream = 2;
 }
+
+message ProgrammerIsRequiredForUploadError {}
 
 message UploadUsingProgrammerRequest {
   // Arduino Core Service instance from the `Init` response.
@@ -73,7 +82,7 @@ message UploadUsingProgrammerRequest {
   // filename under this path where it is saved by the `Compile` method.
   string sketch_path = 3;
   // The port of the board.
-  string port = 4;
+  Port port = 4;
   // Whether to turn on verbose output during the upload.
   bool verbose = 5;
   // After upload, verify that the contents of the memory on the board match the
@@ -90,6 +99,12 @@ message UploadUsingProgrammerRequest {
   // If set to true, the actual upload will not be performed but a trace output
   // will be printed stdout. This is for debugging purposes.
   bool dry_run = 10;
+  // User provided fields usually used by upload tools that need authentication
+  // or in any case fields that can be customized by the user at upload time
+  // and cannot be known previously.
+  // For more info:
+  // https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
+  map<string, string> user_fields = 11;
 }
 
 message UploadUsingProgrammerResponse {
@@ -105,7 +120,7 @@ message BurnBootloaderRequest {
   // Fully qualified board name of the target board (e.g., `arduino:avr:uno`).
   string fqbn = 2;
   // The port of the programmer used to program the bootloader.
-  string port = 3;
+  Port port = 3;
   // Whether to turn on verbose output during the programming.
   bool verbose = 4;
   // After programming, verify the contents of the memory on the board match the
@@ -116,6 +131,12 @@ message BurnBootloaderRequest {
   // If set to true, the actual upload will not be performed but a trace output
   // will be printed stdout. This is for debugging purposes.
   bool dry_run = 7;
+  // User provided fields usually used by upload tools that need authentication
+  // or in any case fields that can be customized by the user at upload time
+  // and cannot be known previously.
+  // For more info:
+  // https://arduino.github.io/arduino-cli/latest/platform-specification/#user-provided-fields
+  map<string, string> user_fields = 11;
 }
 
 message BurnBootloaderResponse {
@@ -132,4 +153,31 @@ message ListProgrammersAvailableForUploadRequest {
 
 message ListProgrammersAvailableForUploadResponse {
   repeated Programmer programmers = 1;
+}
+
+message SupportedUserFieldsRequest {
+  Instance instance = 1;
+  string fqbn = 2;
+  // Protocol that will be used to upload, this information is
+  // necessary to pick the right upload tool for the board specified
+  // with the FQBN.
+  string protocol = 3;
+}
+
+message UserField {
+  // Id of the tool that supports this field
+  string tool_id = 1;
+  // Name used internally to store and retrieve this field
+  string name = 2;
+  // Label is the text shown to the user when they need to input this field
+  string label = 3;
+  // True if the value of the field must not be shown when typing, for example
+  // when the user inputs a network password
+  bool secret = 4;
+}
+
+message SupportedUserFieldsResponse {
+  // User fields supported by board specified in SupportedUserFieldsRequest.
+  // If board doesn't support any field it will be empty.
+  repeated UserField user_fields = 1;
 }

@@ -48,6 +48,7 @@ func BurnBootloader(ctx context.Context, req *rpc.BurnBootloaderRequest, outStre
 		outStream,
 		errStream,
 		req.GetDryRun(),
+		map[string]string{}, // User fields
 	)
 	if err != nil {
 		return nil, err

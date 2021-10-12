@@ -18,41 +18,41 @@ from pathlib import Path
 
 def test_upgrade(run_command):
     # Updates index for cores and libraries
-    run_command("core update-index")
-    run_command("lib update-index")
+    run_command(["core", "update-index"])
+    run_command(["lib", "update-index"])
 
     # Installs an outdated core and library
-    run_command("core install arduino:avr@1.6.3")
-    assert run_command("lib install USBHost@1.0.0")
+    run_command(["core", "install", "arduino:avr@1.6.3"])
+    assert run_command(["lib", "install", "USBHost@1.0.0"])
 
     # Installs latest version of a core and a library
-    run_command("core install arduino:samd")
-    assert run_command("lib install ArduinoJson")
+    run_command(["core", "install", "arduino:samd"])
+    assert run_command(["lib", "install", "ArduinoJson"])
 
     # Verifies outdated core and libraries are shown
-    result = run_command("outdated")
+    result = run_command(["outdated"])
     assert result.ok
     lines = result.stdout.splitlines()
-    assert lines[1].startswith("Arduino AVR Boards")
-    assert lines[4].startswith("USBHost")
+    assert "Arduino AVR Boards" in lines[1]
+    assert "USBHost" in lines[4]
 
-    result = run_command("upgrade")
+    result = run_command(["upgrade"])
     assert result.ok
 
     # Verifies cores and libraries have been updated
-    result = run_command("outdated")
+    result = run_command(["outdated"])
     assert result.ok
     assert result.stdout == ""
 
 
 def test_upgrade_using_library_with_invalid_version(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Install latest version of a library
-    assert run_command("lib install WiFi101")
+    assert run_command(["lib", "install", "WiFi101"])
 
     # Verifies library is not shown
-    res = run_command("outdated")
+    res = run_command(["outdated"])
     assert res.ok
     assert "WiFi101" not in res.stdout
 
@@ -62,23 +62,23 @@ def test_upgrade_using_library_with_invalid_version(run_command, data_dir):
     Path(lib_path, "library.properties").write_text("version=1.0001")
 
     # Verifies library gets upgraded
-    res = run_command("upgrade")
+    res = run_command(["upgrade"])
     assert res.ok
     assert "WiFi101" in res.stdout
 
 
 def test_upgrade_unused_core_tools_are_removed(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Installs a core
-    assert run_command("core install arduino:avr@1.8.2")
+    assert run_command(["core", "install", "arduino:avr@1.8.2"])
 
     # Verifies expected tool is installed
     tool_path = Path(data_dir, "packages", "arduino", "tools", "avr-gcc", "7.3.0-atmel3.6.1-arduino5")
     assert tool_path.exists()
 
     # Upgrades everything
-    assert run_command("upgrade")
+    assert run_command(["upgrade"])
 
     # Verifies tool is uninstalled since it's not used by newer core version
     assert not tool_path.exists()

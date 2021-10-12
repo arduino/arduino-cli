@@ -58,10 +58,11 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexRequest{
-		Instance: inst,
-	}, output.ProgressBar())
-	if err != nil {
+	if err := commands.UpdateLibrariesIndex(
+		context.Background(),
+		&rpc.UpdateLibrariesIndexRequest{Instance: inst},
+		output.ProgressBar(),
+	); err != nil {
 		feedback.Errorf(tr("Error updating library index: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
@@ -138,7 +139,7 @@ func (res result) String() string {
 
 	for _, lib := range results {
 		if res.results.GetStatus() == rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS {
-			out.WriteString(fmt.Sprintf(tr(`Name: "%s"`)+"\n", lib.Name))
+			out.WriteString(tr(`Name: "%s"`, lib.Name) + "\n")
 			if res.namesOnly {
 				continue
 			}

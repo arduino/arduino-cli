@@ -136,3 +136,8 @@ func (p *Process) SetDirFromPath(path *paths.Path) {
 func (p *Process) Run() error {
 	return p.cmd.Run()
 }
+
+// SetEnvironment set the enviroment for the running process. Each entry is of the form "key=value".
+func (p *Process) SetEnvironment(values []string) {
+	p.cmd.Env = values
+}

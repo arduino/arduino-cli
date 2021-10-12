@@ -17,8 +17,6 @@ package core
 
 import (
 	"context"
-	"errors"
-	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -30,7 +28,7 @@ import (
 func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, taskCB commands.TaskProgressCB) (*rpc.PlatformUninstallResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New(tr("invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
 
 	ref := &packagemanager.PlatformReference{
@@ -40,24 +38,21 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 	if ref.PlatformVersion == nil {
 		platform := pm.FindPlatform(ref)
 		if platform == nil {
-			return nil, fmt.Errorf(tr("platform not found: %s"), ref)
-
+			return nil, &commands.PlatformNotFound{Platform: ref.String()}
 		}
 		platformRelease := pm.GetInstalledPlatformRelease(platform)
 		if platformRelease == nil {
-			return nil, fmt.Errorf(tr("platform not installed: %s"), ref)
-
+			return nil, &commands.PlatformNotFound{Platform: ref.String()}
 		}
 		ref.PlatformVersion = platformRelease.Version
 	}
 
 	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
-		return nil, fmt.Errorf(tr("finding platform dependencies: %s"), err)
+		return nil, &commands.NotFoundError{Message: tr("Can't find dependencies for platform %s", ref), Cause: err}
 	}
 
-	err = uninstallPlatformRelease(pm, platform, taskCB)
-	if err != nil {
+	if err := uninstallPlatformRelease(pm, platform, taskCB); err != nil {
 		return nil, err
 	}
 
@@ -67,9 +62,8 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 		}
 	}
 
-	status := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil)
-	if status != nil {
-		return nil, status.Err()
+	if err := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil); err != nil {
+		return nil, err
 	}
 
 	return &rpc.PlatformUninstallResponse{}, nil
@@ -79,15 +73,15 @@ func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease
 	log := pm.Log.WithField("platform", platformRelease)
 
 	log.Info("Uninstalling platform")
-	taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Uninstalling %s"), platformRelease)})
+	taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s", platformRelease)})
 
 	if err := pm.UninstallPlatform(platformRelease); err != nil {
 		log.WithError(err).Error("Error uninstalling")
-		return err
+		return &commands.FailedUninstallError{Message: tr("Error uninstalling platform %s", platformRelease), Cause: err}
 	}
 
 	log.Info("Platform uninstalled")
-	taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("%s uninstalled"), platformRelease), Completed: true})
+	taskCB(&rpc.TaskProgress{Message: tr("Platform %s uninstalled", platformRelease), Completed: true})
 	return nil
 }
 
@@ -95,14 +89,14 @@ func uninstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.
 	log := pm.Log.WithField("Tool", toolRelease)
 
 	log.Info("Uninstalling tool")
-	taskCB(&rpc.TaskProgress{Name: fmt.Sprintf(tr("Uninstalling %s, tool is no more required"), toolRelease)})
+	taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s, tool is no more required", toolRelease)})
 
 	if err := pm.UninstallTool(toolRelease); err != nil {
 		log.WithError(err).Error("Error uninstalling")
-		return err
+		return &commands.FailedUninstallError{Message: tr("Error uninstalling tool %s", toolRelease), Cause: err}
 	}
 
 	log.Info("Tool uninstalled")
-	taskCB(&rpc.TaskProgress{Message: fmt.Sprintf(tr("%s uninstalled"), toolRelease), Completed: true})
+	taskCB(&rpc.TaskProgress{Message: tr("Tool %s uninstalled", toolRelease), Completed: true})
 	return nil
 }

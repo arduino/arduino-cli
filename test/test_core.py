@@ -23,6 +23,7 @@ import tempfile
 import hashlib
 from git import Repo
 from pathlib import Path
+import semver
 
 
 def test_core_search(run_command, httpserver):
@@ -31,22 +32,22 @@ def test_core_search(run_command, httpserver):
     httpserver.expect_request("/test_index.json").respond_with_data(test_index.read_text())
 
     url = httpserver.url_for("/test_index.json")
-    assert run_command(f"core update-index --additional-urls={url}")
+    assert run_command(["core", "update-index", f"--additional-urls={url}"])
     # search a specific core
-    result = run_command("core search avr")
+    result = run_command(["core", "search", "avr"])
     assert result.ok
     assert 2 < len(result.stdout.splitlines())
-    result = run_command("core search avr --format json")
+    result = run_command(["core", "search", "avr", "--format", "json"])
     assert result.ok
     data = json.loads(result.stdout)
     assert 0 < len(data)
     # additional URL
-    result = run_command("core search test_core --format json --additional-urls={}".format(url))
+    result = run_command(["core", "search", "test_core", "--format", "json", f"--additional-urls={url}"])
     assert result.ok
     data = json.loads(result.stdout)
     assert 1 == len(data)
     # show all versions
-    result = run_command("core search test_core --all --format json --additional-urls={}".format(url))
+    result = run_command(["core", "search", "test_core", "--all", "--format", "json", f"--additional-urls={url}"])
     assert result.ok
     data = json.loads(result.stdout)
     assert 2 == len(data)
@@ -59,34 +60,34 @@ def test_core_search(run_command, httpserver):
         return platforms
 
     # Search all Retrokit platforms
-    result = run_command(f"core search retrokit --all --additional-urls={url} --format json")
+    result = run_command(["core", "search", "retrokit", "--all", f"--additional-urls={url}", "--format", "json"])
     assert result.ok
     platforms = get_platforms(result.stdout)
     assert "1.0.5" in platforms["Retrokits-RK002:arm"]
     assert "1.0.6" in platforms["Retrokits-RK002:arm"]
 
     # Search using Retrokit Package Maintainer
-    result = run_command(f"core search Retrokits-RK002 --all --additional-urls={url} --format json")
+    result = run_command(["core", "search", "Retrokits-RK002", "--all", f"--additional-urls={url}", "--format", "json"])
     assert result.ok
     platforms = get_platforms(result.stdout)
     assert "1.0.5" in platforms["Retrokits-RK002:arm"]
     assert "1.0.6" in platforms["Retrokits-RK002:arm"]
 
     # Search using the Retrokit Platform name
-    result = run_command(f"core search rk002 --all --additional-urls={url} --format json")
+    result = run_command(["core", "search", "rk002", "--all", f"--additional-urls={url}", "--format", "json"])
     assert result.ok
     platforms = get_platforms(result.stdout)
     assert "1.0.5" in platforms["Retrokits-RK002:arm"]
     assert "1.0.6" in platforms["Retrokits-RK002:arm"]
 
     # Search using board names
-    result = run_command(f"core search myboard --all --additional-urls={url} --format json")
+    result = run_command(["core", "search", "myboard", "--all", f"--additional-urls={url}", "--format", "json"])
     assert result.ok
     platforms = get_platforms(result.stdout)
     assert "1.2.3" in platforms["Package:x86"]
 
     def run_search(search_args, expected_ids):
-        res = run_command(f"core search --format json {search_args}")
+        res = run_command(["core", "search", "--format", "json"] + search_args.split(" "))
         assert res.ok
         data = json.loads(res.stdout)
         platform_ids = [p["id"] for p in data]
@@ -118,11 +119,11 @@ def test_core_search_no_args(run_command, httpserver):
 
     # update custom index and install test core (installed cores affect `core search`)
     url = httpserver.url_for("/test_index.json")
-    assert run_command(f"core update-index --additional-urls={url}")
-    assert run_command(f"core install test:x86 --additional-urls={url}")
+    assert run_command(["core", "update-index", f"--additional-urls={url}"])
+    assert run_command(["core", "install", "test:x86", f"--additional-urls={url}"])
 
     # list all with no additional urls, ensure the test core won't show up
-    result = run_command("core search")
+    result = run_command(["core", "search"])
     assert result.ok
     num_platforms = 0
     lines = [l.strip().split() for l in result.stdout.strip().splitlines()]
@@ -137,14 +138,14 @@ def test_core_search_no_args(run_command, httpserver):
     num_platforms = len(lines[header_index + 1 :])  # noqa: E203
 
     # same thing in JSON format, also check the number of platforms found is the same
-    result = run_command("core search --format json")
+    result = run_command(["core", "search", "--format", "json"])
     assert result.ok
     platforms = json.loads(result.stdout)
     assert 1 == len([e for e in platforms if e.get("name") == "test_core"])
     assert len(platforms) == num_platforms
 
     # list all with additional urls, check the test core is there
-    result = run_command(f"core search --additional-urls={url}")
+    result = run_command(["core", "search", f"--additional-urls={url}"])
     assert result.ok
     num_platforms = 0
     lines = [l.strip().split() for l in result.stdout.strip().splitlines()]
@@ -159,7 +160,7 @@ def test_core_search_no_args(run_command, httpserver):
     num_platforms = len(lines[header_index + 1 :])  # noqa: E203
 
     # same thing in JSON format, also check the number of platforms found is the same
-    result = run_command(f"core search --format json --additional-urls={url}")
+    result = run_command(["core", "search", "--format", "json", f"--additional-urls={url}"])
     assert result.ok
     platforms = json.loads(result.stdout)
     assert 1 == len([e for e in platforms if e.get("name") == "test_core"])
@@ -167,35 +168,38 @@ def test_core_search_no_args(run_command, httpserver):
 
 
 def test_core_updateindex_url_not_found(run_command, httpserver):
-    assert run_command("core update-index")
+    assert run_command(["core", "update-index"])
 
     # Brings up a local server to fake a failure
     httpserver.expect_request("/test_index.json").respond_with_data(status=404)
     url = httpserver.url_for("/test_index.json")
 
-    result = run_command(f"core update-index --additional-urls={url}")
+    result = run_command(["core", "update-index", f"--additional-urls={url}"])
     assert result.failed
     lines = [l.strip() for l in result.stderr.splitlines()]
-    assert f"Error updating index: downloading index {url}: 404 NOT FOUND" in lines
+    assert f"Error updating index: Error downloading index '{url}': Server responded with: 404 NOT FOUND" in lines
 
 
 def test_core_updateindex_internal_server_error(run_command, httpserver):
-    assert run_command("core update-index")
+    assert run_command(["core", "update-index"])
 
     # Brings up a local server to fake a failure
     httpserver.expect_request("/test_index.json").respond_with_data(status=500)
     url = httpserver.url_for("/test_index.json")
 
-    result = run_command(f"core update-index --additional-urls={url}")
+    result = run_command(["core", "update-index", f"--additional-urls={url}"])
     assert result.failed
     lines = [l.strip() for l in result.stderr.splitlines()]
-    assert f"Error updating index: downloading index {url}: 500 INTERNAL SERVER ERROR" in lines
+    assert (
+        f"Error updating index: Error downloading index '{url}': Server responded with: 500 INTERNAL SERVER ERROR"
+        in lines
+    )
 
 
 def test_core_install_without_updateindex(run_command):
     # Missing "core update-index"
     # Download samd core pinned to 1.8.6
-    result = run_command("core install arduino:samd@1.8.6")
+    result = run_command(["core", "install", "arduino:samd@1.8.6"])
     assert result.ok
     assert "Updating index: package_index.json downloaded" in result.stdout
 
@@ -206,15 +210,15 @@ def test_core_install_without_updateindex(run_command):
 )
 def test_core_install_esp32(run_command, data_dir):
     # update index
-    url = "https://dl.espressif.com/dl/package_esp32_index.json"
-    assert run_command(f"core update-index --additional-urls={url}")
+    url = "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
+    assert run_command(["core", "update-index", f"--additional-urls={url}"])
     # install 3rd-party core
-    assert run_command(f"core install esp32:esp32@1.0.4 --additional-urls={url}")
+    assert run_command(["core", "install", "esp32:esp32@2.0.0", f"--additional-urls={url}"])
     # create a sketch and compile to double check the core was successfully installed
     sketch_name = "test_core_install_esp32"
     sketch_path = os.path.join(data_dir, sketch_name)
-    assert run_command(f"sketch new {sketch_path}")
-    assert run_command(f"compile -b esp32:esp32:esp32 {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
+    assert run_command(["compile", "-b", "esp32:esp32:esp32", sketch_path])
     # prevent regressions for https://github.com/arduino/arduino-cli/issues/163
     sketch_path_md5 = hashlib.md5(sketch_path.encode()).hexdigest().upper()
     build_dir = Path(tempfile.gettempdir(), f"arduino-sketch-{sketch_path_md5}")
@@ -222,18 +226,18 @@ def test_core_install_esp32(run_command, data_dir):
 
 
 def test_core_download(run_command, downloads_dir):
-    assert run_command("core update-index")
+    assert run_command(["core", "update-index"])
 
     # Download a specific core version
-    assert run_command("core download arduino:avr@1.6.16")
+    assert run_command(["core", "download", "arduino:avr@1.6.16"])
     assert os.path.exists(os.path.join(downloads_dir, "packages", "avr-1.6.16.tar.bz2"))
 
     # Wrong core version
-    result = run_command("core download arduino:avr@69.42.0")
+    result = run_command(["core", "download", "arduino:avr@69.42.0"])
     assert result.failed
 
     # Wrong core
-    result = run_command("core download bananas:avr")
+    result = run_command(["core", "download", "bananas:avr"])
     assert result.failed
 
 
@@ -249,44 +253,44 @@ def _in(jsondata, name, version=None):
 
 
 def test_core_install(run_command):
-    assert run_command("core update-index")
+    assert run_command(["core", "update-index"])
 
     # Install a specific core version
-    assert run_command("core install arduino:avr@1.6.16")
-    result = run_command("core list --format json")
+    assert run_command(["core", "install", "arduino:avr@1.6.16"])
+    result = run_command(["core", "list", "--format", "json"])
     assert result.ok
     assert _in(result.stdout, "arduino:avr", "1.6.16")
 
     # Replace it with a more recent one
-    assert run_command("core install arduino:avr@1.6.17")
-    result = run_command("core list --format json")
+    assert run_command(["core", "install", "arduino:avr@1.6.17"])
+    result = run_command(["core", "list", "--format", "json"])
     assert result.ok
     assert _in(result.stdout, "arduino:avr", "1.6.17")
 
     # Confirm core is listed as "updatable"
-    result = run_command("core list --updatable --format json")
+    result = run_command(["core", "list", "--updatable", "--format", "json"])
     assert result.ok
     assert _in(result.stdout, "arduino:avr", "1.6.17")
 
     # Upgrade the core to latest version
-    assert run_command("core upgrade arduino:avr")
-    result = run_command("core list --format json")
+    assert run_command(["core", "upgrade", "arduino:avr"])
+    result = run_command(["core", "list", "--format", "json"])
     assert result.ok
     assert not _in(result.stdout, "arduino:avr", "1.6.17")
     # double check the code isn't updatable anymore
-    result = run_command("core list --updatable --format json")
+    result = run_command(["core", "list", "--updatable", "--format", "json"])
     assert result.ok
     assert not _in(result.stdout, "arduino:avr")
 
 
 def test_core_uninstall(run_command):
-    assert run_command("core update-index")
-    assert run_command("core install arduino:avr")
-    result = run_command("core list --format json")
+    assert run_command(["core", "update-index"])
+    assert run_command(["core", "install", "arduino:avr"])
+    result = run_command(["core", "list", "--format", "json"])
     assert result.ok
     assert _in(result.stdout, "arduino:avr")
-    assert run_command("core uninstall arduino:avr")
-    result = run_command("core list --format json")
+    assert run_command(["core", "uninstall", "arduino:avr"])
+    result = run_command(["core", "list", "--format", "json"])
     assert result.ok
     assert not _in(result.stdout, "arduino:avr")
 
@@ -294,10 +298,10 @@ def test_core_uninstall(run_command):
 def test_core_uninstall_tool_dependency_removal(run_command, data_dir):
     # These platforms both have a dependency on the arduino:avr-gcc@7.3.0-atmel3.6.1-arduino5 tool
     # arduino:avr@1.8.2 has a dependency on arduino:avrdude@6.3.0-arduino17
-    assert run_command("core install arduino:avr@1.8.2")
+    assert run_command(["core", "install", "arduino:avr@1.8.2"])
     # arduino:megaavr@1.8.4 has a dependency on arduino:avrdude@6.3.0-arduino16
-    assert run_command("core install arduino:megaavr@1.8.4")
-    assert run_command("core uninstall arduino:avr")
+    assert run_command(["core", "install", "arduino:megaavr@1.8.4"])
+    assert run_command(["core", "uninstall", "arduino:avr"])
 
     arduino_tools_path = Path(data_dir, "packages", "arduino", "tools")
 
@@ -314,22 +318,22 @@ def test_core_uninstall_tool_dependency_removal(run_command, data_dir):
 
 def test_core_zipslip(run_command):
     url = "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
-    assert run_command("core update-index --additional-urls={}".format(url))
+    assert run_command(["core", "update-index", f"--additional-urls={url}"])
 
     # Install a core and check if malicious content has been extracted.
-    run_command("core install zipslip:x86 --additional-urls={}".format(url))
+    run_command(["core", "install", "zipslip:x86", f"--additional-urls={url}"])
     assert os.path.exists("/tmp/evil.txt") is False
 
 
 def test_core_broken_install(run_command):
     url = "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
-    assert run_command("core update-index --additional-urls={}".format(url))
-    assert not run_command("core install brokenchecksum:x86 --additional-urls={}".format(url))
+    assert run_command(["core", "update-index", f"--additional-urls={url}"])
+    assert not run_command(["core", "install", "brokenchecksum:x86", "--additional-urls={url}"])
 
 
 def test_core_install_creates_installed_json(run_command, data_dir):
-    assert run_command("core update-index")
-    assert run_command("core install arduino:avr@1.6.23")
+    assert run_command(["core", "update-index"])
+    assert run_command(["core", "install", "arduino:avr@1.6.23"])
 
     installed_json_file = Path(data_dir, "packages", "arduino", "hardware", "avr", "1.6.23", "installed.json")
     assert installed_json_file.exists()
@@ -353,16 +357,16 @@ def test_core_update_with_local_url(run_command):
     if platform.system() == "Windows":
         test_index = f"/{test_index}".replace("\\", "/")
 
-    res = run_command(f'core update-index --additional-urls="file://{test_index}"')
+    res = run_command(["core", "update-index", f'--additional-urls="file://{test_index}"'])
     assert res.ok
     assert "Updating index: test_index.json downloaded" in res.stdout
 
 
 def test_core_search_manually_installed_cores_not_printed(run_command, data_dir):
-    assert run_command("core update-index")
+    assert run_command(["core", "update-index"])
 
     # Verifies only cores in board manager are shown
-    res = run_command("core search --format json")
+    res = run_command(["core", "search", "--format", "json"])
     assert res.ok
     cores = json.loads(res.stdout)
     num_cores = len(cores)
@@ -374,7 +378,7 @@ def test_core_search_manually_installed_cores_not_printed(run_command, data_dir)
     assert Repo.clone_from(git_url, repo_dir, multi_options=["-b 1.8.3"])
 
     # Verifies manually installed core is not shown
-    res = run_command("core search --format json")
+    res = run_command(["core", "search", "--format", "json"])
     assert res.ok
     cores = json.loads(res.stdout)
     assert num_cores == len(cores)
@@ -384,10 +388,10 @@ def test_core_search_manually_installed_cores_not_printed(run_command, data_dir)
 
 
 def test_core_list_all_manually_installed_core(run_command, data_dir):
-    assert run_command("core update-index")
+    assert run_command(["core", "update-index"])
 
     # Verifies only cores in board manager are shown
-    res = run_command("core list --all --format json")
+    res = run_command(["core", "list", "--all", "--format", "json"])
     assert res.ok
     cores = json.loads(res.stdout)
     num_cores = len(cores)
@@ -399,7 +403,7 @@ def test_core_list_all_manually_installed_core(run_command, data_dir):
     assert Repo.clone_from(git_url, repo_dir, multi_options=["-b 1.8.3"])
 
     # Verifies manually installed core is shown
-    res = run_command("core list --all --format json")
+    res = run_command(["core", "list", "--all", "--format", "json"])
     assert res.ok
     cores = json.loads(res.stdout)
     assert num_cores + 1 == len(cores)
@@ -411,10 +415,10 @@ def test_core_list_all_manually_installed_core(run_command, data_dir):
 
 
 def test_core_list_updatable_all_flags(run_command, data_dir):
-    assert run_command("core update-index")
+    assert run_command(["core", "update-index"])
 
     # Verifies only cores in board manager are shown
-    res = run_command("core list --all --updatable --format json")
+    res = run_command(["core", "list", "--all", "--updatable", "--format", "json"])
     assert res.ok
     cores = json.loads(res.stdout)
     num_cores = len(cores)
@@ -426,7 +430,7 @@ def test_core_list_updatable_all_flags(run_command, data_dir):
     assert Repo.clone_from(git_url, repo_dir, multi_options=["-b 1.8.3"])
 
     # Verifies using both --updatable and --all flags --all takes precedence
-    res = run_command("core list --all --updatable --format json")
+    res = run_command(["core", "list", "--all", "--updatable", "--format", "json"])
     assert res.ok
     cores = json.loads(res.stdout)
     assert num_cores + 1 == len(cores)
@@ -438,49 +442,49 @@ def test_core_list_updatable_all_flags(run_command, data_dir):
 
 
 def test_core_upgrade_removes_unused_tools(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Installs a core
-    assert run_command("core install arduino:avr@1.8.2")
+    assert run_command(["core", "install", "arduino:avr@1.8.2"])
 
     # Verifies expected tool is installed
     tool_path = Path(data_dir, "packages", "arduino", "tools", "avr-gcc", "7.3.0-atmel3.6.1-arduino5")
     assert tool_path.exists()
 
     # Upgrades core
-    assert run_command("core upgrade arduino:avr")
+    assert run_command(["core", "upgrade", "arduino:avr"])
 
     # Verifies tool is uninstalled since it's not used by newer core version
     assert not tool_path.exists()
 
 
 def test_core_install_removes_unused_tools(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Installs a core
-    assert run_command("core install arduino:avr@1.8.2")
+    assert run_command(["core", "install", "arduino:avr@1.8.2"])
 
     # Verifies expected tool is installed
     tool_path = Path(data_dir, "packages", "arduino", "tools", "avr-gcc", "7.3.0-atmel3.6.1-arduino5")
     assert tool_path.exists()
 
     # Installs newer version of already installed core
-    assert run_command("core install arduino:avr@1.8.3")
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
 
     # Verifies tool is uninstalled since it's not used by newer core version
     assert not tool_path.exists()
 
 
 def test_core_list_with_installed_json(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Install core
     url = "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json"
-    assert run_command(f"core update-index --additional-urls={url}")
-    assert run_command(f"core install adafruit:avr@1.4.13 --additional-urls={url}")
+    assert run_command(["core", "update-index", f"--additional-urls={url}"])
+    assert run_command(["core", "install", "adafruit:avr@1.4.13", f"--additional-urls={url}"])
 
     # Verifies installed core is correctly found and name is set
-    res = run_command("core list --format json")
+    res = run_command(["core", "list", "--format", "json"])
     assert res.ok
     cores = json.loads(res.stdout)
     mapped = {core["id"]: core for core in cores}
@@ -497,7 +501,7 @@ def test_core_list_with_installed_json(run_command, data_dir):
     installed_json.unlink()
 
     # Verifies installed core is still found and name is set
-    res = run_command("core list --format json")
+    res = run_command(["core", "list", "--format", "json"])
     assert res.ok
     cores = json.loads(res.stdout)
     mapped = {core["id"]: core for core in cores}
@@ -510,10 +514,10 @@ def test_core_list_with_installed_json(run_command, data_dir):
 
 
 def test_core_search_update_index_delay(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Verifies index update is not run
-    res = run_command("core search")
+    res = run_command(["core", "search"])
     assert res.ok
     assert "Updating index" not in res.stdout
 
@@ -524,12 +528,12 @@ def test_core_search_update_index_delay(run_command, data_dir):
     os.utime(index_file, (mod_time, mod_time))
 
     # Verifies index update is run
-    res = run_command("core search")
+    res = run_command(["core", "search"])
     assert res.ok
     assert "Updating index" in res.stdout
 
     # Verifies index update is not run again
-    res = run_command("core search")
+    res = run_command(["core", "search"])
     assert res.ok
     assert "Updating index" not in res.stdout
 
@@ -541,15 +545,15 @@ def test_core_search_sorted_results(run_command, httpserver):
 
     # update custom index
     url = httpserver.url_for("/test_index.json")
-    assert run_command(f"core update-index --additional-urls={url}")
+    assert run_command(["core", "update-index", f"--additional-urls={url}"])
 
     # This is done only to avoid index update output when calling core search
     # since it automatically updates them if they're outdated and it makes it
     # harder to parse the list of cores
-    assert run_command("core search")
+    assert run_command(["core", "search"])
 
     # list all with additional url specified
-    result = run_command(f"core search --additional-urls={url}")
+    result = run_command(["core", "search", f"--additional-urls={url}"])
     assert result.ok
 
     lines = [l.strip().split(maxsplit=2) for l in result.stdout.strip().splitlines()][1:]
@@ -564,7 +568,7 @@ def test_core_search_sorted_results(run_command, httpserver):
     assert lines == not_deprecated + deprecated
 
     # test same behaviour with json output
-    result = run_command(f"core search --additional-urls={url} --format=json")
+    result = run_command(["core", "search", f"--additional-urls={url}", "--format=json"])
     assert result.ok
 
     platforms = json.loads(result.stdout)
@@ -585,13 +589,15 @@ def test_core_list_sorted_results(run_command, httpserver):
 
     # update custom index
     url = httpserver.url_for("/test_index.json")
-    assert run_command(f"core update-index --additional-urls={url}")
+    assert run_command(["core", "update-index", f"--additional-urls={url}"])
 
     # install some core for testing
-    assert run_command(f"core install test:x86 Retrokits-RK002:arm Package:x86 --additional-urls={url}")
+    assert run_command(
+        ["core", "install", "test:x86", "Retrokits-RK002:arm", "Package:x86", f"--additional-urls={url}"]
+    )
 
     # list all with additional url specified
-    result = run_command(f"core list --additional-urls={url}")
+    result = run_command(["core", "list", f"--additional-urls={url}"])
     assert result.ok
 
     lines = [l.strip().split(maxsplit=3) for l in result.stdout.strip().splitlines()][1:]
@@ -607,7 +613,7 @@ def test_core_list_sorted_results(run_command, httpserver):
     assert lines == not_deprecated + deprecated
 
     # test same behaviour with json output
-    result = run_command(f"core list --additional-urls={url} --format=json")
+    result = run_command(["core", "list", f"--additional-urls={url}", "--format=json"])
     assert result.ok
 
     platforms = json.loads(result.stdout)
@@ -629,10 +635,10 @@ def test_core_list_deprecated_platform_with_installed_json(run_command, httpserv
 
     # update custom index
     url = httpserver.url_for("/test_index.json")
-    assert run_command(f"core update-index --additional-urls={url}")
+    assert run_command(["core", "update-index", f"--additional-urls={url}"])
 
     # install some core for testing
-    assert run_command(f"core install Package:x86 --additional-urls={url}")
+    assert run_command(["core", "install", "Package:x86", f"--additional-urls={url}"])
 
     installed_json_file = Path(data_dir, "packages", "Package", "hardware", "x86", "1.2.3", "installed.json")
     assert installed_json_file.exists()
@@ -644,7 +650,7 @@ def test_core_list_deprecated_platform_with_installed_json(run_command, httpserv
         json.dump(installed_json, f)
 
     # test same behaviour with json output
-    result = run_command(f"core list --additional-urls={url} --format=json")
+    result = run_command(["core", "list", f"--additional-urls={url}", "--format=json"])
     assert result.ok
 
     platforms = json.loads(result.stdout)
@@ -653,10 +659,10 @@ def test_core_list_deprecated_platform_with_installed_json(run_command, httpserv
 
 
 def test_core_list_platform_without_platform_txt(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Verifies no core is installed
-    res = run_command("core list --format json")
+    res = run_command(["core", "list", "--format", "json"])
     assert res.ok
     cores = json.loads(res.stdout)
     assert len(cores) == 0
@@ -670,7 +676,7 @@ def test_core_list_platform_without_platform_txt(run_command, data_dir):
     boards_txt.write_bytes(test_boards_txt.read_bytes())
 
     # Verifies no core is installed
-    res = run_command("core list --format json")
+    res = run_command(["core", "list", "--format", "json"])
     assert res.ok
     cores = json.loads(res.stdout)
     assert len(cores) == 1
@@ -691,9 +697,9 @@ def test_core_with_wrong_custom_board_options_is_loaded(run_command, data_dir):
         dirs_exist_ok=True,
     )
 
-    assert run_command("update")
+    assert run_command(["update"])
 
-    res = run_command("core list --format json")
+    res = run_command(["core", "list", "--format", "json"])
     assert res.ok
 
     cores = json.loads(res.stdout)
@@ -729,9 +735,9 @@ def test_core_with_missing_custom_board_options_is_loaded(run_command, data_dir)
         dirs_exist_ok=True,
     )
 
-    assert run_command("update")
+    assert run_command(["update"])
 
-    res = run_command("core list --format json")
+    res = run_command(["core", "list", "--format", "json"])
     assert res.ok
 
     cores = json.loads(res.stdout)
@@ -753,3 +759,21 @@ def test_core_with_missing_custom_board_options_is_loaded(run_command, data_dir)
         + "skipping loading of boards arduino-beta-dev:platform_with_missing_custom_board_options:nessuno: "
         + "malformed custom board options"
     ) in res.stderr
+
+
+def test_core_list_outdated_core(run_command):
+    assert run_command(["update"])
+
+    # Install an old core version
+    assert run_command(["core", "install", "arduino:samd@1.8.6"])
+
+    res = run_command(["core", "list", "--format", "json"])
+
+    data = json.loads(res.stdout)
+    assert len(data) == 1
+    samd_core = data[0]
+    assert samd_core["installed"] == "1.8.6"
+    installed_version = semver.parse_version_info(samd_core["installed"])
+    latest_version = semver.parse_version_info(samd_core["latest"])
+    # Installed version must be older than latest
+    assert installed_version.compare(latest_version) == -1

@@ -25,6 +25,7 @@ import "cc/arduino/cli/commands/v1/common.proto";
 import "cc/arduino/cli/commands/v1/board.proto";
 import "cc/arduino/cli/commands/v1/compile.proto";
 import "cc/arduino/cli/commands/v1/core.proto";
+import "cc/arduino/cli/commands/v1/monitor.proto";
 import "cc/arduino/cli/commands/v1/upload.proto";
 import "cc/arduino/cli/commands/v1/lib.proto";
 
@@ -120,6 +121,11 @@ service ArduinoCoreService {
   rpc UploadUsingProgrammer(UploadUsingProgrammerRequest)
       returns (stream UploadUsingProgrammerResponse);
 
+  // Returns the list of users fields necessary to upload to that board
+  // using the specified protocol.
+  rpc SupportedUserFields(SupportedUserFieldsRequest)
+      returns (SupportedUserFieldsResponse);
+
   // List programmers available for a board.
   rpc ListProgrammersAvailableForUpload(
       ListProgrammersAvailableForUploadRequest)
@@ -170,6 +176,13 @@ service ArduinoCoreService {
 
   // List the installed libraries.
   rpc LibraryList(LibraryListRequest) returns (LibraryListResponse);
+
+  // Open a monitor connection to a board port
+  rpc Monitor(stream MonitorRequest) returns (stream MonitorResponse);
+
+  // Returns the parameters that can be set in the MonitorRequest calls
+  rpc EnumerateMonitorPortSettings(EnumerateMonitorPortSettingsRequest)
+      returns (EnumerateMonitorPortSettingsResponse);
 }
 
 message CreateRequest {}

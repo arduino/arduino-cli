@@ -41,8 +41,8 @@ func initListCommand() *cobra.Command {
 		Run:     runListCommand,
 	}
 
-	listCommand.Flags().StringVar(&listFlags.timeout, "timeout", "0s",
-		fmt.Sprintf(tr("The connected devices search timeout, raise it if your board doesn't show up (e.g. to %s)."), "10s"))
+	listCommand.Flags().DurationVar(&listFlags.timeout, "timeout", time.Second,
+		tr("The connected devices search timeout, raise it if your board doesn't show up e.g.: 10s"))
 	listCommand.Flags().BoolVarP(&listFlags.watch, "watch", "w", false,
 		tr("Command keeps running and prints list of connected boards whenever there is a change."))
 
@@ -50,7 +50,7 @@ func initListCommand() *cobra.Command {
 }
 
 var listFlags struct {
-	timeout string // Expressed in a parsable duration, is the timeout for the list and attach commands.
+	timeout time.Duration
 	watch   bool
 }
 
@@ -62,20 +62,15 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		os.Exit(0)
 	}
 
-	if timeout, err := time.ParseDuration(listFlags.timeout); err != nil {
-		feedback.Errorf(tr("Invalid timeout: %v"), err)
-		os.Exit(errorcodes.ErrBadArgument)
-	} else {
-		time.Sleep(timeout)
-	}
-
 	inst := instance.CreateAndInit()
-	ports, err := board.List(inst.GetId())
+	ports, err := board.List(&rpc.BoardListRequest{
+		Instance: inst,
+		Timeout:  listFlags.timeout.Milliseconds(),
+	})
 	if err != nil {
 		feedback.Errorf(tr("Error detecting boards: %v"), err)
 		os.Exit(errorcodes.ErrNetwork)
 	}
-
 	feedback.PrintResult(result{ports})
 }
 
@@ -96,11 +91,10 @@ func watchList(cmd *cobra.Command, inst *rpc.Instance) {
 	for event := range eventsChan {
 		feedback.PrintResult(watchEvent{
 			Type:          event.EventType,
-			Address:       event.Port.Address,
-			Protocol:      event.Port.Protocol,
-			ProtocolLabel: event.Port.ProtocolLabel,
-			Boards:        event.Port.Boards,
-			SerialNumber:  event.Port.SerialNumber,
+			Address:       event.Port.Port.Address,
+			Protocol:      event.Port.Port.Protocol,
+			ProtocolLabel: event.Port.Port.ProtocolLabel,
+			Boards:        event.Port.MatchingBoards,
 			Error:         event.Error,
 		})
 	}
@@ -122,20 +116,22 @@ func (dr result) String() string {
 	}
 
 	sort.Slice(dr.ports, func(i, j int) bool {
-		x, y := dr.ports[i], dr.ports[j]
+		x, y := dr.ports[i].Port, dr.ports[j].Port
 		return x.GetProtocol() < y.GetProtocol() ||
 			(x.GetProtocol() == y.GetProtocol() && x.GetAddress() < y.GetAddress())
 	})
 
 	t := table.New()
-	t.SetHeader(tr("Port"), tr("Type"), tr("Board Name"), tr("FQBN"), tr("Core"))
-	for _, port := range dr.ports {
-		address := port.GetProtocol() + "://" + port.GetAddress()
+	t.SetHeader(tr("Port"), tr("Protocol"), tr("Type"), tr("Board Name"), tr("FQBN"), tr("Core"))
+	for _, detectedPort := range dr.ports {
+		port := detectedPort.Port
+		protocol := port.GetProtocol()
+		address := port.GetAddress()
 		if port.GetProtocol() == "serial" {
 			address = port.GetAddress()
 		}
-		protocol := port.GetProtocolLabel()
-		if boards := port.GetBoards(); len(boards) > 0 {
+		protocolLabel := port.GetProtocolLabel()
+		if boards := detectedPort.GetMatchingBoards(); len(boards) > 0 {
 			sort.Slice(boards, func(i, j int) bool {
 				x, y := boards[i], boards[j]
 				return x.GetName() < y.GetName() || (x.GetName() == y.GetName() && x.GetFqbn() < y.GetFqbn())
@@ -151,7 +147,7 @@ func (dr result) String() string {
 					coreName = fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch)
 				}
 
-				t.AddRow(address, protocol, board, fqbn, coreName)
+				t.AddRow(address, protocol, protocolLabel, board, fqbn, coreName)
 
 				// reset address and protocol, we only show them on the first row
 				address = ""
@@ -173,7 +169,6 @@ type watchEvent struct {
 	Protocol      string               `json:"protocol,omitempty"`
 	ProtocolLabel string               `json:"protocol_label,omitempty"`
 	Boards        []*rpc.BoardListItem `json:"boards,omitempty"`
-	SerialNumber  string               `json:"serial_number,omitempty"`
 	Error         string               `json:"error,omitempty"`
 }
 

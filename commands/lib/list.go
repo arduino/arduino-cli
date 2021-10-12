@@ -17,7 +17,6 @@ package lib
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -26,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/pkg/errors"
 )
 
 type installedLib struct {
@@ -38,12 +36,12 @@ type installedLib struct {
 func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.LibraryListResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, errors.New(tr("invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
 
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
-		return nil, errors.New(tr("invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
 
 	nameFilter := strings.ToLower(req.GetName())
@@ -53,11 +51,11 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 	if f := req.GetFqbn(); f != "" {
 		fqbn, err := cores.ParseFQBN(req.GetFqbn())
 		if err != nil {
-			return nil, fmt.Errorf(tr("parsing fqbn: %s"), err)
+			return nil, &commands.InvalidFQBNError{Cause: err}
 		}
 		_, boardPlatform, _, _, refBoardPlatform, err := pm.ResolveFQBN(fqbn)
 		if err != nil {
-			return nil, fmt.Errorf(tr("loading board data: %s"), err)
+			return nil, &commands.UnknownFQBNError{Cause: err}
 		}
 
 		filteredRes := map[string]*installedLib{}
@@ -105,7 +103,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 		}
 		rpcLib, err := lib.Library.ToRPCLibrary()
 		if err != nil {
-			return nil, fmt.Errorf(tr("converting library %[1]s to rpc struct: %[2]w"), lib.Library.Name, err)
+			return nil, &commands.PermissionDeniedError{Message: tr("Error getting information for library %s", lib.Library.Name), Cause: err}
 		}
 		instaledLibs = append(instaledLibs, &rpc.InstalledLibrary{
 			Library: rpcLib,

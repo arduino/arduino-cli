@@ -48,7 +48,7 @@ func initArchiveCommand() *cobra.Command {
 		Run:  runArchiveCommand,
 	}
 
-	command.Flags().BoolVar(&includeBuildDir, "include-build-dir", false, fmt.Sprintf(tr("Includes %s directory in the archive."), "build"))
+	command.Flags().BoolVar(&includeBuildDir, "include-build-dir", false, tr("Includes %s directory in the archive.", "build"))
 
 	return command
 }

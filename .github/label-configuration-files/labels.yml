@@ -1,0 +1,21 @@
+# Used by the "Sync Labels" workflow
+# See: https://github.com/Financial-Times/github-label-sync#label-config-file
+
+- name: "architecture: arm64"
+  color: ff00ff
+  description: Specific to 64 bit ARM host architecture
+- name: "architecture: armv6"
+  color: ff00ff
+  description: Specific to hosts using an ARMv6 core
+- name: "architecture: armv7"
+  color: ff00ff
+  description: Specific to hosts using an ARMv7 core
+- name: "topic: CLI"
+  color: "00ffff"
+  description: Related to the command line interface
+- name: "topic: gRPC"
+  color: "00ffff"
+  description: Related to the gRPC interface
+- name: "topic: packaging"
+  color: "00ffff"
+  description: Related to the release distribution package

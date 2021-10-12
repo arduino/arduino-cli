@@ -16,7 +16,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -107,7 +106,7 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	msg := fmt.Sprintf(tr("Config file written to: %s"), configFileAbsPath.String())
+	msg := tr("Config file written to: %s", configFileAbsPath.String())
 	logrus.Info(msg)
 	feedback.Print(msg)
 }

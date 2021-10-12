@@ -332,10 +332,163 @@ func TestPackageManagerClear(t *testing.T) {
 	emptyPackageManager := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware)
 
 	// Verifies they're not equal
-	require.NotEqual(t, &packageManager, &emptyPackageManager)
+	require.NotEqual(t, packageManager, emptyPackageManager)
 
 	// Clear the first PackageManager that contains loaded hardware
 	packageManager.Clear()
 	// Verifies both PackageManagers are now equal
-	require.Equal(t, &packageManager, &emptyPackageManager)
+	require.Equal(t, packageManager, emptyPackageManager)
+}
+
+func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
+	// Create all the necessary data to load discoveries
+	fakePath := paths.New("fake-path")
+
+	pm := packagemanager.NewPackageManager(fakePath, fakePath, fakePath, fakePath)
+	pack := pm.Packages.GetOrCreatePackage("arduino")
+
+	{
+		// some tool
+		tool := pack.GetOrCreateTool("some-tool")
+		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("4.2.0"))
+		// We set this to fake the tool is installed
+		toolRelease.InstallDir = fakePath
+	}
+
+	{
+		// some tool
+		tool := pack.GetOrCreateTool("some-tool")
+		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("5.6.7"))
+		// We set this to fake the tool is installed
+		toolRelease.InstallDir = fakePath
+	}
+
+	{
+		// some other tool
+		tool := pack.GetOrCreateTool("some-other-tool")
+		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("6.6.6"))
+		// We set this to fake the tool is installed
+		toolRelease.InstallDir = fakePath
+	}
+
+	{
+		// ble-discovery tool
+		tool := pack.GetOrCreateTool("ble-discovery")
+		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
+		// We set this to fake the tool is installed
+		toolRelease.InstallDir = fakePath
+		tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
+	}
+
+	{
+		// serial-discovery tool
+		tool := pack.GetOrCreateTool("serial-discovery")
+		tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
+		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
+		// We set this to fake the tool is installed
+		toolRelease.InstallDir = fakePath
+	}
+
+	{
+		// ble-monitor tool
+		tool := pack.GetOrCreateTool("ble-monitor")
+		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
+		// We set this to fake the tool is installed
+		toolRelease.InstallDir = fakePath
+		tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
+	}
+
+	{
+		// serial-monitor tool
+		tool := pack.GetOrCreateTool("serial-monitor")
+		tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
+		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
+		// We set this to fake the tool is installed
+		toolRelease.InstallDir = fakePath
+	}
+
+	platform := pack.GetOrCreatePlatform("avr")
+	release := platform.GetOrCreateRelease(semver.MustParse("1.0.0"))
+	release.ToolDependencies = append(release.ToolDependencies, &cores.ToolDependency{
+		ToolName:     "some-tool",
+		ToolVersion:  semver.ParseRelaxed("4.2.0"),
+		ToolPackager: "arduino",
+	})
+	release.ToolDependencies = append(release.ToolDependencies, &cores.ToolDependency{
+		ToolName:     "some-other-tool",
+		ToolVersion:  semver.ParseRelaxed("6.6.6"),
+		ToolPackager: "arduino",
+	})
+	release.DiscoveryDependencies = append(release.DiscoveryDependencies, &cores.DiscoveryDependency{
+		Name:     "ble-discovery",
+		Packager: "arduino",
+	})
+	release.DiscoveryDependencies = append(release.DiscoveryDependencies, &cores.DiscoveryDependency{
+		Name:     "serial-discovery",
+		Packager: "arduino",
+	})
+	release.MonitorDependencies = append(release.MonitorDependencies, &cores.MonitorDependency{
+		Name:     "ble-monitor",
+		Packager: "arduino",
+	})
+	release.MonitorDependencies = append(release.MonitorDependencies, &cores.MonitorDependency{
+		Name:     "serial-monitor",
+		Packager: "arduino",
+	})
+	// We set this to fake the platform is installed
+	release.InstallDir = fakePath
+
+	tools, err := pm.FindToolsRequiredFromPlatformRelease(release)
+	require.NoError(t, err)
+	require.Len(t, tools, 6)
+}
+
+func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
+	// Pass nil, since these paths are only used for installing
+	pm := packagemanager.NewPackageManager(nil, nil, nil, nil)
+	// Hardware from main packages directory
+	pm.LoadHardwareFromDirectory(dataDir1.Join("packages"))
+	{
+		fqbn, err := cores.ParseFQBN("esp32:esp32:esp32")
+		require.NoError(t, err)
+		require.NotNil(t, fqbn)
+		_, platformRelease, board, _, _, err := pm.ResolveFQBN(fqbn)
+		require.NoError(t, err)
+
+		require.Equal(t, "esptool__pluggable_network", board.Properties.Get("upload.tool.network"))
+		require.Equal(t, "esp32", board.Properties.Get("upload_port.0.board"))
+		platformProps := platformRelease.Properties
+		require.Equal(t, "builtin:serial-discovery", platformProps.Get("pluggable_discovery.required.0"))
+		require.Equal(t, "builtin:mdns-discovery", platformProps.Get("pluggable_discovery.required.1"))
+		require.Equal(t, "{runtime.tools.esptool.path}", platformProps.Get("tools.esptool__pluggable_network.path"))
+		require.Contains(t, platformProps.Get("tools.esptool__pluggable_network.cmd"), "esptool")
+		require.Contains(t, platformProps.Get("tools.esptool__pluggable_network.network_cmd"), "{runtime.platform.path}/tools/espota")
+		require.Equal(t, "esp32", platformProps.Get("tools.esptool__pluggable_network.upload.protocol"))
+		require.Equal(t, "", platformProps.Get("tools.esptool__pluggable_network.upload.params.verbose"))
+		require.Equal(t, "", platformProps.Get("tools.esptool__pluggable_network.upload.params.quiet"))
+		require.Equal(t, "Password", platformProps.Get("tools.esptool__pluggable_network.upload.field.password"))
+		require.Equal(t, "true", platformProps.Get("tools.esptool__pluggable_network.upload.field.password.secret"))
+		require.Equal(t, "{network_cmd} -i \"{upload.port.address}\" -p \"{upload.port.properties.port}\" \"--auth={upload.field.password}\" -f \"{build.path}/{build.project_name}.bin\"", platformProps.Get("tools.esptool__pluggable_network.upload.pattern"))
+	}
+	{
+		fqbn, err := cores.ParseFQBN("esp8266:esp8266:generic")
+		require.NoError(t, err)
+		require.NotNil(t, fqbn)
+		_, platformRelease, board, _, _, err := pm.ResolveFQBN(fqbn)
+		require.NoError(t, err)
+		require.Equal(t, "esptool__pluggable_network", board.Properties.Get("upload.tool.network"))
+		require.Equal(t, "generic", board.Properties.Get("upload_port.0.board"))
+		platformProps := platformRelease.Properties
+		require.Equal(t, "builtin:serial-discovery", platformProps.Get("pluggable_discovery.required.0"))
+		require.Equal(t, "builtin:mdns-discovery", platformProps.Get("pluggable_discovery.required.1"))
+		require.Equal(t, "", platformProps.Get("tools.esptool__pluggable_network.path"))
+		require.Equal(t, "{runtime.tools.python3.path}/python3", platformProps.Get("tools.esptool__pluggable_network.cmd"))
+		require.Equal(t, "{runtime.tools.python3.path}/python3", platformProps.Get("tools.esptool__pluggable_network.network_cmd"))
+		require.Equal(t, "esp", platformProps.Get("tools.esptool__pluggable_network.upload.protocol"))
+		require.Equal(t, "", platformProps.Get("tools.esptool__pluggable_network.upload.params.verbose"))
+		require.Equal(t, "", platformProps.Get("tools.esptool__pluggable_network.upload.params.quiet"))
+		require.Equal(t, "Password", platformProps.Get("tools.esptool__pluggable_network.upload.field.password"))
+		require.Equal(t, "true", platformProps.Get("tools.esptool__pluggable_network.upload.field.password.secret"))
+		require.Equal(t, "\"{network_cmd}\" -I \"{runtime.platform.path}/tools/espota.py\" -i \"{upload.port.address}\" -p \"{upload.port.properties.port}\" \"--auth={upload.field.password}\" -f \"{build.path}/{build.project_name}.bin\"", platformProps.Get("tools.esptool__pluggable_network.upload.pattern"))
+	}
 }

@@ -18,33 +18,33 @@ from pathlib import Path
 
 def test_outdated(run_command):
     # Updates index for cores and libraries
-    run_command("core update-index")
-    run_command("lib update-index")
+    run_command(["core", "update-index"])
+    run_command(["lib", "update-index"])
 
     # Installs an outdated core and library
-    run_command("core install arduino:avr@1.6.3")
-    assert run_command("lib install USBHost@1.0.0")
+    run_command(["core", "install", "arduino:avr@1.6.3"])
+    assert run_command(["lib", "install", "USBHost@1.0.0"])
 
     # Installs latest version of a core and a library
-    run_command("core install arduino:samd")
-    assert run_command("lib install ArduinoJson")
+    run_command(["core", "install", "arduino:samd"])
+    assert run_command(["lib", "install", "ArduinoJson"])
 
     # Verifies only outdated cores and libraries are returned
-    result = run_command("outdated")
+    result = run_command(["outdated"])
     assert result.ok
     lines = [l.strip() for l in result.stdout.splitlines()]
-    assert lines[1].startswith("Arduino AVR Boards")
-    assert lines[4].startswith("USBHost")
+    assert "Arduino AVR Boards" in lines[1]
+    assert "USBHost" in lines[4]
 
 
 def test_outdated_using_library_with_invalid_version(run_command, data_dir):
-    assert run_command("update")
+    assert run_command(["update"])
 
     # Install latest version of a library library
-    assert run_command("lib install WiFi101")
+    assert run_command(["lib", "install", "WiFi101"])
 
     # Verifies library is correctly returned
-    res = run_command("outdated")
+    res = run_command(["outdated"])
     assert res.ok
     assert "WiFi101" not in res.stdout
 
@@ -54,7 +54,7 @@ def test_outdated_using_library_with_invalid_version(run_command, data_dir):
     Path(lib_path, "library.properties").write_text("version=1.0001")
 
     # Verifies library is correctly returned
-    res = run_command("outdated")
+    res = run_command(["outdated"])
     assert res.ok
     lines = [l.strip().split() for l in res.stdout.splitlines()]
     assert "WiFi101" == lines[1][0]

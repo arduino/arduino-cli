@@ -163,6 +163,15 @@ only needs to run on Arduino IDE 1.5.x+, we recommend placing all source code in
 recursive compilation of nested source folders, its code must be in the src/ folder (since Arduino IDE 1.0.x doesn’t
 support recursive compilation, backwards compatibility wouldn’t be possible anyway).
 
+##### Library layout
+
+![Library layout](img/library-layout.svg)
+
+| Layout        | root compiled | `src` compiled | `utility` compiled |
+| ------------- | ------------- | -------------- | ------------------ |
+| **recursive** | no            | recursively    | no                 |
+| **flat**      | yes           | no             | yes                |
+
 #### Precompiled binaries
 
 The `precompiled` field of [library.properties](#libraryproperties-file-format) enables support for the use of

@@ -35,26 +35,31 @@ import (
 	"github.com/arduino/arduino-cli/cli/generatedocs"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/lib"
+	"github.com/arduino/arduino-cli/cli/monitor"
 	"github.com/arduino/arduino-cli/cli/outdated"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/cli/sketch"
 	"github.com/arduino/arduino-cli/cli/update"
+	"github.com/arduino/arduino-cli/cli/updater"
 	"github.com/arduino/arduino-cli/cli/upgrade"
 	"github.com/arduino/arduino-cli/cli/upload"
 	"github.com/arduino/arduino-cli/cli/version"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/inventory"
+	"github.com/fatih/color"
 	"github.com/mattn/go-colorable"
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	semver "go.bug.st/relaxed-semver"
 )
 
 var (
-	verbose      bool
-	outputFormat string
-	configFile   string
+	verbose            bool
+	outputFormat       string
+	configFile         string
+	updaterMessageChan chan *semver.Version = make(chan *semver.Version)
 )
 
 // NewCommand creates a new ArduinoCli command root
@@ -63,14 +68,15 @@ func NewCommand() *cobra.Command {
 
 	// ArduinoCli is the root command
 	arduinoCli := &cobra.Command{
-		Use:              "arduino-cli",
-		Short:            tr("Arduino CLI."),
-		Long:             tr("Arduino Command Line Interface (arduino-cli)."),
-		Example:          fmt.Sprintf("  %s <%s> [%s...]", os.Args[0], tr("command"), tr("flags")),
-		PersistentPreRun: preRun,
+		Use:               "arduino-cli",
+		Short:             tr("Arduino CLI."),
+		Long:              tr("Arduino Command Line Interface (arduino-cli)."),
+		Example:           fmt.Sprintf("  %s <%s> [%s...]", os.Args[0], tr("command"), tr("flags")),
+		PersistentPreRun:  preRun,
+		PersistentPostRun: postRun,
 	}
 
-	arduinoCli.SetUsageTemplate(usageTemplate)
+	arduinoCli.SetUsageTemplate(getUsageTemplate())
 
 	createCliCommandTree(arduinoCli)
 
@@ -88,6 +94,7 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(daemon.NewCommand())
 	cmd.AddCommand(generatedocs.NewCommand())
 	cmd.AddCommand(lib.NewCommand())
+	cmd.AddCommand(monitor.NewCommand())
 	cmd.AddCommand(outdated.NewCommand())
 	cmd.AddCommand(sketch.NewCommand())
 	cmd.AddCommand(update.NewCommand())
@@ -98,12 +105,13 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(version.NewCommand())
 
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, tr("Print the logs on the standard output."))
-	cmd.PersistentFlags().String("log-level", "", fmt.Sprintf(tr("Messages with this level and above will be logged. Valid levels are: %s, %s, %s, %s, %s, %s, %s"), "trace", "debug", "info", "warn", "error", "fatal", "panic"))
+	cmd.PersistentFlags().String("log-level", "", tr("Messages with this level and above will be logged. Valid levels are: %s", "trace, debug, info, warn, error, fatal, panic"))
 	cmd.PersistentFlags().String("log-file", "", tr("Path to the file where logs will be written."))
-	cmd.PersistentFlags().String("log-format", "", fmt.Sprintf(tr("The output format for the logs, can be {%s|%s}."), "text", "json"))
-	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", fmt.Sprintf(tr("The output format, can be {%s|%s}."), "text", "json"))
+	cmd.PersistentFlags().String("log-format", "", tr("The output format for the logs, can be: %s", "text, json"))
+	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", tr("The output format for the logs, can be: %s", "text, json"))
 	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", tr("The custom config file (if not specified the default will be used)."))
 	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, tr("Comma-separated list of additional URLs for the Boards Manager."))
+	cmd.PersistentFlags().Bool("no-color", false, "Disable colored output.")
 	configuration.BindFlags(cmd, configuration.Settings)
 }
 
@@ -142,6 +150,27 @@ func preRun(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
+	// https://no-color.org/
+	color.NoColor = configuration.Settings.GetBool("output.no_color") || os.Getenv("NO_COLOR") != ""
+
+	// Set default feedback output to colorable
+	feedback.SetOut(colorable.NewColorableStdout())
+	feedback.SetErr(colorable.NewColorableStderr())
+
+	updaterMessageChan = make(chan *semver.Version)
+	go func() {
+		if cmd.Name() == "version" {
+			// The version command checks by itself if there's a new available version
+			updaterMessageChan <- nil
+		}
+		// Starts checking for updates
+		currentVersion, err := semver.Parse(globals.VersionInfo.VersionString)
+		if err != nil {
+			updaterMessageChan <- nil
+		}
+		updaterMessageChan <- updater.CheckForUpdate(currentVersion)
+	}()
+
 	//
 	// Prepare logging
 	//
@@ -151,7 +180,8 @@ func preRun(cmd *cobra.Command, args []string) {
 		// if we print on stdout, do it in full colors
 		logrus.SetOutput(colorable.NewColorableStdout())
 		logrus.SetFormatter(&logrus.TextFormatter{
-			ForceColors: true,
+			ForceColors:   true,
+			DisableColors: color.NoColor,
 		})
 	} else {
 		logrus.SetOutput(ioutil.Discard)
@@ -168,7 +198,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	if logFile != "" {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
-			fmt.Printf(tr("Unable to open file for logging: %s"), logFile)
+			fmt.Println(tr("Unable to open file for logging: %s", logFile))
 			os.Exit(errorcodes.ErrBadCall)
 		}
 
@@ -224,5 +254,13 @@ func preRun(cmd *cobra.Command, args []string) {
 			feedback.Error(tr("Invalid Call : should show Help, but it is available only in TEXT mode."))
 			os.Exit(errorcodes.ErrBadCall)
 		})
+	}
+}
+
+func postRun(cmd *cobra.Command, args []string) {
+	latestVersion := <-updaterMessageChan
+	if latestVersion != nil {
+		// Notify the user a new version is available
+		updater.NotifyNewVersionIsAvailable(latestVersion.String())
 	}
 }

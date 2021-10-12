@@ -23,6 +23,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
+	"github.com/arduino/arduino-cli/arduino/discovery/discoverymanager"
 	"github.com/arduino/arduino-cli/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -43,6 +44,7 @@ type PackageManager struct {
 	DownloadDir            *paths.Path
 	TempDir                *paths.Path
 	CustomGlobalProperties *properties.Map
+	discoveryManager       *discoverymanager.DiscoveryManager
 }
 
 var tr = i18n.Tr
@@ -57,6 +59,7 @@ func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path) 
 		DownloadDir:            downloadDir,
 		TempDir:                tempDir,
 		CustomGlobalProperties: properties.NewMap(),
+		discoveryManager:       discoverymanager.New(),
 	}
 }
 
@@ -64,6 +67,12 @@ func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path) 
 func (pm *PackageManager) Clear() {
 	pm.Packages = cores.NewPackages()
 	pm.CustomGlobalProperties = properties.NewMap()
+	pm.discoveryManager.Clear()
+}
+
+// DiscoveryManager returns the DiscoveryManager in use by this PackageManager
+func (pm *PackageManager) DiscoveryManager() *discoverymanager.DiscoveryManager {
+	return pm.discoveryManager
 }
 
 // FindPlatformReleaseProvidingBoardsWithVidPid FIXMEDOC
@@ -431,6 +440,64 @@ func (pm *PackageManager) InstalledBoards() []*cores.Board {
 	return boards
 }
 
+// FindToolsRequiredFromPlatformRelease returns a list of ToolReleases needed by the specified PlatformRelease.
+// If a ToolRelease is not found return an error
+func (pm *PackageManager) FindToolsRequiredFromPlatformRelease(platform *cores.PlatformRelease) ([]*cores.ToolRelease, error) {
+	pm.Log.Infof("Searching tools required for platform %s", platform)
+
+	// maps "PACKAGER:TOOL" => ToolRelease
+	foundTools := map[string]*cores.ToolRelease{}
+	// A Platform may not specify required tools (because it's a platform that comes from a
+	// user/hardware dir without a package_index.json) then add all available tools
+	for _, targetPackage := range pm.Packages {
+		for _, tool := range targetPackage.Tools {
+			rel := tool.GetLatestInstalled()
+			if rel != nil {
+				foundTools[rel.Tool.Name] = rel
+			}
+		}
+	}
+	// replace the default tools above with the specific required by the current platform
+	requiredTools := []*cores.ToolRelease{}
+	platform.ToolDependencies.Sort()
+	for _, toolDep := range platform.ToolDependencies {
+		pm.Log.WithField("tool", toolDep).Infof("Required tool")
+		tool := pm.FindToolDependency(toolDep)
+		if tool == nil {
+			return nil, fmt.Errorf(tr("tool release not found: %s"), toolDep)
+		}
+		requiredTools = append(requiredTools, tool)
+		delete(foundTools, tool.Tool.Name)
+	}
+
+	platform.DiscoveryDependencies.Sort()
+	for _, discoveryDep := range platform.DiscoveryDependencies {
+		pm.Log.WithField("discovery", discoveryDep).Infof("Required discovery")
+		tool := pm.FindDiscoveryDependency(discoveryDep)
+		if tool == nil {
+			return nil, fmt.Errorf(tr("discovery release not found: %s"), discoveryDep)
+		}
+		requiredTools = append(requiredTools, tool)
+		delete(foundTools, tool.Tool.Name)
+	}
+
+	platform.MonitorDependencies.Sort()
+	for _, monitorDep := range platform.MonitorDependencies {
+		pm.Log.WithField("monitor", monitorDep).Infof("Required monitor")
+		tool := pm.FindMonitorDependency(monitorDep)
+		if tool == nil {
+			return nil, fmt.Errorf(tr("monitor release not found: %s"), monitorDep)
+		}
+		requiredTools = append(requiredTools, tool)
+		delete(foundTools, tool.Tool.Name)
+	}
+
+	for _, toolRel := range foundTools {
+		requiredTools = append(requiredTools, toolRel)
+	}
+	return requiredTools, nil
+}
+
 // GetTool searches for tool in all packages and platforms.
 func (pm *PackageManager) GetTool(toolID string) *cores.Tool {
 	split := strings.Split(toolID, ":")
@@ -499,6 +566,18 @@ func (pm *PackageManager) FindToolDependency(dep *cores.ToolDependency) *cores.T
 // FindDiscoveryDependency returns the ToolRelease referenced by the DiscoveryDepenency or nil if
 // the referenced discovery doesn't exists.
 func (pm *PackageManager) FindDiscoveryDependency(discovery *cores.DiscoveryDependency) *cores.ToolRelease {
+	if pack := pm.Packages[discovery.Packager]; pack == nil {
+		return nil
+	} else if toolRelease := pack.Tools[discovery.Name]; toolRelease == nil {
+		return nil
+	} else {
+		return toolRelease.GetLatestInstalled()
+	}
+}
+
+// FindMonitorDependency returns the ToolRelease referenced by the MonitorDepenency or nil if
+// the referenced monitor doesn't exists.
+func (pm *PackageManager) FindMonitorDependency(discovery *cores.MonitorDependency) *cores.ToolRelease {
 	if pack := pm.Packages[discovery.Packager]; pack == nil {
 		return nil
 	} else if toolRelease := pack.Tools[discovery.Name]; toolRelease == nil {

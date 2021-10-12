@@ -21,7 +21,7 @@ def test_sketch_new(run_command, working_dir):
     current_path = working_dir
     sketch_name = "SketchNewIntegrationTest"
     current_sketch_path = Path(current_path, sketch_name)
-    result = run_command(f"sketch new {sketch_name}")
+    result = run_command(["sketch", "new", sketch_name])
     assert result.ok
     assert f"Sketch created in: {current_sketch_path}" in result.stdout
     assert Path(current_sketch_path, f"{sketch_name}.ino").is_file()
@@ -29,7 +29,7 @@ def test_sketch_new(run_command, working_dir):
     # Create a test sketch in current directory but using an absolute path
     sketch_name = "SketchNewIntegrationTestAbsolute"
     current_sketch_path = Path(current_path, sketch_name)
-    result = run_command(f'sketch new "{current_sketch_path}"')
+    result = run_command(["sketch", "new", current_sketch_path])
     assert result.ok
     assert f"Sketch created in: {current_sketch_path}" in result.stdout
     assert Path(current_sketch_path, f"{sketch_name}.ino").is_file()
@@ -38,7 +38,7 @@ def test_sketch_new(run_command, working_dir):
     sketch_name = "SketchNewIntegrationTestSubpath"
     sketch_subpath = Path("subpath", sketch_name)
     current_sketch_path = Path(current_path, sketch_subpath)
-    result = run_command(f"sketch new {sketch_subpath}")
+    result = run_command(["sketch", "new", sketch_subpath])
     assert result.ok
     assert f"Sketch created in: {current_sketch_path}" in result.stdout
     assert Path(current_sketch_path, f"{sketch_name}.ino").is_file()
@@ -46,7 +46,7 @@ def test_sketch_new(run_command, working_dir):
     # Create a test sketch in current directory using .ino extension
     sketch_name = "SketchNewIntegrationTestDotIno"
     current_sketch_path = Path(current_path, sketch_name)
-    result = run_command(f"sketch new {sketch_name}.ino")
+    result = run_command(["sketch", "new", f"{sketch_name}.ino"])
     assert result.ok
     assert f"Sketch created in: {current_sketch_path}" in result.stdout
     assert Path(current_sketch_path, f"{sketch_name}.ino").is_file()
@@ -85,7 +85,7 @@ def verify_zip_contains_sketch_including_build_dir(files):
 
 
 def test_sketch_archive_no_args(run_command, copy_sketch, working_dir):
-    result = run_command("sketch archive", copy_sketch("sketch_simple"))
+    result = run_command(["sketch", "archive"], copy_sketch("sketch_simple"))
     print(result.stderr)
     assert result.ok
 
@@ -98,7 +98,7 @@ def test_sketch_archive_no_args(run_command, copy_sketch, working_dir):
 
 
 def test_sketch_archive_dot_arg(run_command, copy_sketch, working_dir):
-    result = run_command("sketch archive .", copy_sketch("sketch_simple"))
+    result = run_command(["sketch", "archive", "."], copy_sketch("sketch_simple"))
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/sketch_simple.zip")
@@ -114,7 +114,7 @@ def test_sketch_archive_dot_arg_relative_zip_path(run_command, copy_sketch, work
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command("sketch archive . ../my_archives", copy_sketch("sketch_simple"))
+    result = run_command(["sketch", "archive", ".", "../my_archives"], copy_sketch("sketch_simple"))
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/my_archives/sketch_simple.zip")
@@ -130,7 +130,7 @@ def test_sketch_archive_dot_arg_absolute_zip_path(run_command, copy_sketch, work
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command(f'sketch archive . "{archives_folder}"', copy_sketch("sketch_simple"))
+    result = run_command(["sketch", "archive", ".", archives_folder], copy_sketch("sketch_simple"))
     assert result.ok
 
     archive = zipfile.ZipFile(f"{archives_folder}/sketch_simple.zip")
@@ -146,7 +146,7 @@ def test_sketch_archive_dot_arg_relative_zip_path_and_name_without_extension(run
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command("sketch archive . ../my_archives/my_custom_sketch", copy_sketch("sketch_simple"))
+    result = run_command(["sketch", "archive", ".", "../my_archives/my_custom_sketch"], copy_sketch("sketch_simple"))
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/my_archives/my_custom_sketch.zip")
@@ -162,7 +162,9 @@ def test_sketch_archive_dot_arg_absolute_zip_path_and_name_without_extension(run
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command(f'sketch archive . "{archives_folder}/my_custom_sketch"', copy_sketch("sketch_simple"))
+    result = run_command(
+        ["sketch", "archive", ".", f"{archives_folder}/my_custom_sketch"], copy_sketch("sketch_simple")
+    )
     assert result.ok
 
     archive = zipfile.ZipFile(f"{archives_folder}/my_custom_sketch.zip")
@@ -178,7 +180,9 @@ def test_sketch_archive_dot_arg_custom_zip_path_and_name_with_extension(run_comm
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command(f'sketch archive . "{archives_folder}/my_custom_sketch.zip"', copy_sketch("sketch_simple"))
+    result = run_command(
+        ["sketch", "archive", ".", f"{archives_folder}/my_custom_sketch.zip"], copy_sketch("sketch_simple")
+    )
     assert result.ok
 
     archive = zipfile.ZipFile(f"{archives_folder}/my_custom_sketch.zip")
@@ -191,7 +195,7 @@ def test_sketch_archive_dot_arg_custom_zip_path_and_name_with_extension(run_comm
 
 def test_sketch_archive_relative_sketch_path(run_command, copy_sketch, working_dir):
     copy_sketch("sketch_simple")
-    result = run_command("sketch archive ./sketch_simple")
+    result = run_command(["sketch", "archive", "./sketch_simple"])
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/sketch_simple.zip")
@@ -203,7 +207,7 @@ def test_sketch_archive_relative_sketch_path(run_command, copy_sketch, working_d
 
 
 def test_sketch_archive_absolute_sketch_path(run_command, copy_sketch, working_dir):
-    result = run_command(f'sketch archive "{working_dir}/sketch_simple"', copy_sketch("sketch_simple"))
+    result = run_command(["sketch", "archive", f"{working_dir}/sketch_simple"], copy_sketch("sketch_simple"))
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/sketch_simple.zip")
@@ -220,7 +224,7 @@ def test_sketch_archive_relative_sketch_path_with_relative_zip_path(run_command,
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command("sketch archive ./sketch_simple ./my_archives")
+    result = run_command(["sketch", "archive", "./sketch_simple", "./my_archives"])
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/my_archives/sketch_simple.zip")
@@ -237,7 +241,7 @@ def test_sketch_archive_relative_sketch_path_with_absolute_zip_path(run_command,
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command(f'sketch archive ./sketch_simple "{archives_folder}"')
+    result = run_command(["sketch", "archive", "./sketch_simple", archives_folder])
     assert result.ok
 
     archive = zipfile.ZipFile(f"{archives_folder}/sketch_simple.zip")
@@ -256,7 +260,7 @@ def test_sketch_archive_relative_sketch_path_with_relative_zip_path_and_name_wit
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command("sketch archive ./sketch_simple ./my_archives/my_custom_sketch")
+    result = run_command(["sketch", "archive", "./sketch_simple", "./my_archives/my_custom_sketch"])
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/my_archives/my_custom_sketch.zip")
@@ -275,7 +279,7 @@ def test_sketch_archive_relative_sketch_path_with_relative_zip_path_and_name_wit
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command("sketch archive ./sketch_simple ./my_archives/my_custom_sketch.zip")
+    result = run_command(["sketch", "archive", "./sketch_simple", "./my_archives/my_custom_sketch.zip"])
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/my_archives/my_custom_sketch.zip")
@@ -294,7 +298,7 @@ def test_sketch_archive_relative_sketch_path_with_absolute_zip_path_and_name_wit
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command(f'sketch archive ./sketch_simple "{archives_folder}/my_custom_sketch"')
+    result = run_command(["sketch", "archive", "./sketch_simple", f"{archives_folder}/my_custom_sketch"])
     assert result.ok
 
     archive = zipfile.ZipFile(f"{archives_folder}/my_custom_sketch.zip")
@@ -313,7 +317,7 @@ def test_sketch_archive_relative_sketch_path_with_absolute_zip_path_and_name_wit
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command(f'sketch archive ./sketch_simple "{archives_folder}/my_custom_sketch.zip"')
+    result = run_command(["sketch", "archive", "./sketch_simple", f"{archives_folder}/my_custom_sketch.zip"])
     assert result.ok
 
     archive = zipfile.ZipFile(f"{archives_folder}/my_custom_sketch.zip")
@@ -330,7 +334,7 @@ def test_sketch_archive_absolute_sketch_path_with_relative_zip_path(run_command,
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command(f'sketch archive "{working_dir}/sketch_simple" ./my_archives')
+    result = run_command(["sketch", "archive", f"{working_dir}/sketch_simple", "./my_archives"])
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/my_archives/sketch_simple.zip")
@@ -347,7 +351,7 @@ def test_sketch_archive_absolute_sketch_path_with_absolute_zip_path(run_command,
     Path(archives_folder).mkdir()
 
     result = run_command(
-        f'sketch archive "{working_dir}/sketch_simple" "{archives_folder}"', copy_sketch("sketch_simple")
+        ["sketch", "archive", f"{working_dir}/sketch_simple", archives_folder], copy_sketch("sketch_simple")
     )
     assert result.ok
 
@@ -367,7 +371,7 @@ def test_sketch_archive_absolute_sketch_path_with_relative_zip_path_and_name_wit
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command(f'sketch archive "{working_dir}/sketch_simple" ./my_archives/my_custom_sketch')
+    result = run_command(["sketch", "archive", f"{working_dir}/sketch_simple", "./my_archives/my_custom_sketch"])
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/my_archives/my_custom_sketch.zip")
@@ -386,7 +390,7 @@ def test_sketch_archive_absolute_sketch_path_with_relative_zip_path_and_name_wit
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command(f'sketch archive "{working_dir}/sketch_simple" ./my_archives/my_custom_sketch.zip')
+    result = run_command(["sketch", "archive", f"{working_dir}/sketch_simple", "./my_archives/my_custom_sketch.zip"])
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/my_archives/my_custom_sketch.zip")
@@ -405,7 +409,7 @@ def test_sketch_archive_absolute_sketch_path_with_absolute_zip_path_and_name_wit
     Path(archives_folder).mkdir()
 
     result = run_command(
-        f'sketch archive "{working_dir}/sketch_simple" "{archives_folder}/my_custom_sketch"',
+        ["sketch", "archive", f"{working_dir}/sketch_simple", f"{archives_folder}/my_custom_sketch"],
         copy_sketch("sketch_simple"),
     )
     assert result.ok
@@ -426,7 +430,7 @@ def test_sketch_archive_absolute_sketch_path_with_absolute_zip_path_and_name_wit
     Path(archives_folder).mkdir()
 
     result = run_command(
-        f'sketch archive "{working_dir}/sketch_simple" "{archives_folder}/my_custom_sketch.zip"',
+        ["sketch", "archive", f"{working_dir}/sketch_simple", f"{archives_folder}/my_custom_sketch.zip"],
         copy_sketch("sketch_simple"),
     )
     assert result.ok
@@ -440,7 +444,7 @@ def test_sketch_archive_absolute_sketch_path_with_absolute_zip_path_and_name_wit
 
 
 def test_sketch_archive_no_args_with_include_build_dir_flag(run_command, copy_sketch, working_dir):
-    result = run_command("sketch archive --include-build-dir", copy_sketch("sketch_simple"))
+    result = run_command(["sketch", "archive", "--include-build-dir"], copy_sketch("sketch_simple"))
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/sketch_simple.zip")
@@ -452,7 +456,7 @@ def test_sketch_archive_no_args_with_include_build_dir_flag(run_command, copy_sk
 
 
 def test_sketch_archive_dot_arg_with_include_build_dir_flag(run_command, copy_sketch, working_dir):
-    result = run_command("sketch archive . --include-build-dir", copy_sketch("sketch_simple"))
+    result = run_command(["sketch", "archive", ".", "--include-build-dir"], copy_sketch("sketch_simple"))
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/sketch_simple.zip")
@@ -468,7 +472,9 @@ def test_sketch_archive_dot_arg_relative_zip_path_with_include_build_dir_flag(ru
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command("sketch archive . ../my_archives --include-build-dir", copy_sketch("sketch_simple"))
+    result = run_command(
+        ["sketch", "archive", ".", "../my_archives", "--include-build-dir"], copy_sketch("sketch_simple")
+    )
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/my_archives/sketch_simple.zip")
@@ -484,7 +490,9 @@ def test_sketch_archive_dot_arg_absolute_zip_path_with_include_build_dir_flag(ru
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command(f'sketch archive . "{archives_folder}" --include-build-dir', copy_sketch("sketch_simple"))
+    result = run_command(
+        ["sketch", "archive", ".", archives_folder, "--include-build-dir"], copy_sketch("sketch_simple")
+    )
     assert result.ok
 
     archive = zipfile.ZipFile(f"{archives_folder}/sketch_simple.zip")
@@ -503,7 +511,8 @@ def test_sketch_archive_dot_arg_relative_zip_path_and_name_without_extension_wit
     Path(archives_folder).mkdir()
 
     result = run_command(
-        "sketch archive . ../my_archives/my_custom_sketch --include-build-dir", copy_sketch("sketch_simple")
+        ["sketch", "archive", ".", "../my_archives/my_custom_sketch", "--include-build-dir"],
+        copy_sketch("sketch_simple"),
     )
     assert result.ok
 
@@ -523,7 +532,8 @@ def test_sketch_archive_dot_arg_absolute_zip_path_and_name_without_extension_wit
     Path(archives_folder).mkdir()
 
     result = run_command(
-        f'sketch archive . "{archives_folder}/my_custom_sketch" --include-build-dir', copy_sketch("sketch_simple")
+        ["sketch", "archive", ".", f"{archives_folder}/my_custom_sketch", "--include-build-dir"],
+        copy_sketch("sketch_simple"),
     )
     assert result.ok
 
@@ -543,7 +553,8 @@ def test_sketch_archive_dot_arg_custom_zip_path_and_name_with_extension_with_inc
     Path(archives_folder).mkdir()
 
     result = run_command(
-        f'sketch archive . "{archives_folder}/my_custom_sketch.zip" --include-build-dir', copy_sketch("sketch_simple")
+        ["sketch", "archive", ".", f"{archives_folder}/my_custom_sketch.zip", "--include-build-dir"],
+        copy_sketch("sketch_simple"),
     )
     assert result.ok
 
@@ -557,7 +568,7 @@ def test_sketch_archive_dot_arg_custom_zip_path_and_name_with_extension_with_inc
 
 def test_sketch_archive_relative_sketch_path_with_include_build_dir_flag(run_command, copy_sketch, working_dir):
     copy_sketch("sketch_simple")
-    result = run_command("sketch archive ./sketch_simple --include-build-dir")
+    result = run_command(["sketch", "archive", "./sketch_simple", "--include-build-dir"])
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/sketch_simple.zip")
@@ -570,7 +581,7 @@ def test_sketch_archive_relative_sketch_path_with_include_build_dir_flag(run_com
 
 def test_sketch_archive_absolute_sketch_path_with_include_build_dir_flag(run_command, copy_sketch, working_dir):
     result = run_command(
-        f'sketch archive "{working_dir}/sketch_simple" --include-build-dir', copy_sketch("sketch_simple")
+        ["sketch", "archive", f"{working_dir}/sketch_simple", "--include-build-dir"], copy_sketch("sketch_simple")
     )
     assert result.ok
 
@@ -590,7 +601,7 @@ def test_sketch_archive_relative_sketch_path_with_relative_zip_path_with_include
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command("sketch archive ./sketch_simple ./my_archives --include-build-dir")
+    result = run_command(["sketch", "archive", "./sketch_simple", "./my_archives", "--include-build-dir"])
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/my_archives/sketch_simple.zip")
@@ -609,7 +620,7 @@ def test_sketch_archive_relative_sketch_path_with_absolute_zip_path_with_include
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command(f'sketch archive ./sketch_simple "{archives_folder}" --include-build-dir')
+    result = run_command(["sketch", "archive", "./sketch_simple", archives_folder, "--include-build-dir"])
     assert result.ok
 
     archive = zipfile.ZipFile(f"{archives_folder}/sketch_simple.zip")
@@ -628,7 +639,9 @@ def test_sketch_archive_relative_sketch_path_with_relative_zip_path_and_name_wit
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command("sketch archive ./sketch_simple ./my_archives/my_custom_sketch --include-build-dir")
+    result = run_command(
+        ["sketch", "archive", "./sketch_simple", "./my_archives/my_custom_sketch", "--include-build-dir"]
+    )
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/my_archives/my_custom_sketch.zip")
@@ -647,7 +660,9 @@ def test_sketch_archive_relative_sketch_path_with_relative_zip_path_and_name_wit
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command("sketch archive ./sketch_simple ./my_archives/my_custom_sketch.zip --include-build-dir")
+    result = run_command(
+        ["sketch", "archive", "./sketch_simple", "./my_archives/my_custom_sketch.zip", "--include-build-dir"]
+    )
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/my_archives/my_custom_sketch.zip")
@@ -666,7 +681,9 @@ def test_sketch_archive_relative_sketch_path_with_absolute_zip_path_and_name_wit
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command(f'sketch archive ./sketch_simple "{archives_folder}/my_custom_sketch" --include-build-dir')
+    result = run_command(
+        ["sketch", "archive", "./sketch_simple", f"{archives_folder}/my_custom_sketch", "--include-build-dir"]
+    )
     assert result.ok
 
     archive = zipfile.ZipFile(f"{archives_folder}/my_custom_sketch.zip")
@@ -685,7 +702,9 @@ def test_sketch_archive_relative_sketch_path_with_absolute_zip_path_and_name_wit
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command(f'sketch archive ./sketch_simple "{archives_folder}/my_custom_sketch.zip" --include-build-dir')
+    result = run_command(
+        ["sketch", "archive", "./sketch_simple", f"{archives_folder}/my_custom_sketch.zip", "--include-build-dir"]
+    )
     assert result.ok
 
     archive = zipfile.ZipFile(f"{archives_folder}/my_custom_sketch.zip")
@@ -704,7 +723,7 @@ def test_sketch_archive_absolute_sketch_path_with_relative_zip_path_with_include
     archives_folder = f"{working_dir}/my_archives/"
     Path(archives_folder).mkdir()
 
-    result = run_command(f'sketch archive "{working_dir}/sketch_simple" ./my_archives --include-build-dir')
+    result = run_command(["sketch", "archive", f"{working_dir}/sketch_simple", "./my_archives", "--include-build-dir"])
     assert result.ok
 
     archive = zipfile.ZipFile(f"{working_dir}/my_archives/sketch_simple.zip")
@@ -723,7 +742,7 @@ def test_sketch_archive_absolute_sketch_path_with_absolute_zip_path_with_include
     Path(archives_folder).mkdir()
 
     result = run_command(
-        f'sketch archive "{working_dir}/sketch_simple" "{archives_folder}" --include-build-dir',
+        ["sketch", "archive", f"{working_dir}/sketch_simple", archives_folder, "--include-build-dir"],
         copy_sketch("sketch_simple"),
     )
     assert result.ok
@@ -745,7 +764,7 @@ def test_sketch_archive_absolute_sketch_path_with_relative_zip_path_and_name_wit
     Path(archives_folder).mkdir()
 
     result = run_command(
-        f'sketch archive "{working_dir}/sketch_simple" ./my_archives/my_custom_sketch --include-build-dir'
+        ["sketch", "archive", f"{working_dir}/sketch_simple", "./my_archives/my_custom_sketch", "--include-build-dir"]
     )
     assert result.ok
 
@@ -766,7 +785,13 @@ def test_sketch_archive_absolute_sketch_path_with_relative_zip_path_and_name_wit
     Path(archives_folder).mkdir()
 
     result = run_command(
-        f'sketch archive "{working_dir}/sketch_simple" ./my_archives/my_custom_sketch.zip --include-build-dir'
+        [
+            "sketch",
+            "archive",
+            f"{working_dir}/sketch_simple",
+            "./my_archives/my_custom_sketch.zip",
+            "--include-build-dir",
+        ]
     )
     assert result.ok
 
@@ -786,7 +811,13 @@ def test_sketch_archive_absolute_sketch_path_with_absolute_zip_path_and_name_wit
     Path(archives_folder).mkdir()
 
     result = run_command(
-        f'sketch archive "{working_dir}/sketch_simple" "{archives_folder}/my_custom_sketch" --include-build-dir',
+        [
+            "sketch",
+            "archive",
+            f"{working_dir}/sketch_simple",
+            f"{archives_folder}/my_custom_sketch",
+            "--include-build-dir",
+        ],
         copy_sketch("sketch_simple"),
     )
     assert result.ok
@@ -807,7 +838,13 @@ def test_sketch_archive_absolute_sketch_path_with_absolute_zip_path_and_name_wit
     Path(archives_folder).mkdir()
 
     result = run_command(
-        f'sketch archive "{working_dir}/sketch_simple" "{archives_folder}/my_custom_sketch.zip" --include-build-dir',
+        [
+            "sketch",
+            "archive",
+            f"{working_dir}/sketch_simple",
+            f"{archives_folder}/my_custom_sketch.zip",
+            "--include-build-dir",
+        ],
         copy_sketch("sketch_simple"),
     )
     assert result.ok
@@ -824,7 +861,7 @@ def test_sketch_archive_with_pde_main_file(run_command, copy_sketch, working_dir
     sketch_name = "sketch_pde_main_file"
     sketch_dir = copy_sketch(sketch_name)
     sketch_file = Path(sketch_dir, f"{sketch_name}.pde")
-    res = run_command("sketch archive", sketch_dir)
+    res = run_command(["sketch", "archive"], sketch_dir)
     assert res.ok
     assert "Sketches with .pde extension are deprecated, please rename the following files to .ino" in res.stderr
     assert str(sketch_file.relative_to(sketch_dir)) in res.stderr
@@ -841,22 +878,22 @@ def test_sketch_archive_with_multiple_main_files(run_command, copy_sketch, worki
     sketch_name = "sketch_multiple_main_files"
     sketch_dir = copy_sketch(sketch_name)
     sketch_file = Path(sketch_dir, f"{sketch_name}.pde")
-    res = run_command("sketch archive", sketch_dir)
+    res = run_command(["sketch", "archive"], sketch_dir)
     assert res.failed
     assert "Sketches with .pde extension are deprecated, please rename the following files to .ino" in res.stderr
     assert str(sketch_file.relative_to(sketch_dir)) in res.stderr
-    assert "Error archiving: multiple main sketch files found" in res.stderr
+    assert "Error archiving: Can't open sketch: multiple main sketch files found" in res.stderr
 
 
 def test_sketch_archive_case_mismatch_fails(run_command, data_dir):
     sketch_name = "ArchiveSketchCaseMismatch"
     sketch_path = Path(data_dir, sketch_name)
 
-    assert run_command(f"sketch new {sketch_path}")
+    assert run_command(["sketch", "new", sketch_path])
 
     # Rename main .ino file so casing is different from sketch name
     Path(sketch_path, f"{sketch_name}.ino").rename(sketch_path / f"{sketch_name.lower()}.ino")
 
-    res = run_command(f'sketch archive "{sketch_path}"')
+    res = run_command(["sketch", "archive", sketch_path])
     assert res.failed
-    assert "Error archiving: no valid sketch found" in res.stderr
+    assert "Error archiving: Can't open sketch: no valid sketch found" in res.stderr

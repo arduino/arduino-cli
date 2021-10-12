@@ -2,7 +2,123 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
-## Unreleased
+## 0.19.0
+
+### `board list` command JSON output change
+
+The `board list` command JSON output has been changed quite a bit, from:
+
+```
+$ arduino-cli board list --format json
+[
+  {
+    "address": "/dev/ttyACM1",
+    "protocol": "serial",
+    "protocol_label": "Serial Port (USB)",
+    "boards": [
+      {
+        "name": "Arduino Uno",
+        "fqbn": "arduino:avr:uno",
+        "vid": "0x2341",
+        "pid": "0x0043"
+      }
+    ],
+    "serial_number": "954323132383515092E1"
+  }
+]
+```
+
+to:
+
+```
+$ arduino-cli board list --format json
+[
+  {
+    "matching_boards": [
+      {
+        "name": "Arduino Uno",
+        "fqbn": "arduino:avr:uno"
+      }
+    ],
+    "port": {
+      "address": "/dev/ttyACM1",
+      "label": "/dev/ttyACM1",
+      "protocol": "serial",
+      "protocol_label": "Serial Port (USB)",
+      "properties": {
+        "pid": "0x0043",
+        "serialNumber": "954323132383515092E1",
+        "vid": "0x2341"
+      }
+    }
+  }
+]
+```
+
+The `boards` array has been renamed `matching_boards`, each contained object will now contain only `name` and `fqbn`.
+Properties that can be used to identify a board are now moved to the new `properties` object, it can contain any key
+name. `pid` and `vid` have been moved to `properties`, `serial_number` has been renamed `serialNumber` and moved to
+`properties`. The new `label` field is the name of the `port` if it should be displayed in a GUI.
+
+### gRPC interface `DebugConfigRequest`, `UploadRequest`, `UploadUsingProgrammerRequest`, `BurnBootloaderRequest`, `DetectedPort` field changes
+
+`DebugConfigRequest`, `UploadRequest`, `UploadUsingProgrammerRequest` and `BurnBootloaderRequest` had their `port` field
+change from type `string` to `Port`.
+
+`Port` contains the following information:
+
+```
+// Port represents a board port that may be used to upload or to monitor a board
+message Port {
+  // Address of the port (e.g., `/dev/ttyACM0`).
+  string address = 1;
+  // The port label to show on the GUI (e.g. "ttyACM0")
+  string label = 2;
+  // Protocol of the port (e.g., `serial`, `network`, ...).
+  string protocol = 3;
+  // A human friendly description of the protocol (e.g., "Serial Port (USB)"
+  string protocol_label = 4;
+  // A set of properties of the port
+  map<string, string> properties = 5;
+}
+```
+
+The gRPC interface message `DetectedPort` has been changed from:
+
+```
+message DetectedPort {
+  // Address of the port (e.g., `serial:///dev/ttyACM0`).
+  string address = 1;
+  // Protocol of the port (e.g., `serial`).
+  string protocol = 2;
+  // A human friendly description of the protocol (e.g., "Serial Port (USB)").
+  string protocol_label = 3;
+  // The boards attached to the port.
+  repeated BoardListItem boards = 4;
+  // Serial number of connected board
+  string serial_number = 5;
+}
+```
+
+to:
+
+```
+message DetectedPort {
+  // The possible boards attached to the port.
+  repeated BoardListItem matching_boards = 1;
+  // The port details
+  Port port = 2;
+}
+```
+
+The properties previously contained directly in the message are now stored in the `port` property.
+
+These changes are necessary for the pluggable discovery.
+
+### gRPC interface `BoardListItem` change
+
+The `vid` and `pid` fields of the `BoardListItem` message have been removed. They used to only be available when
+requesting connected board lists, now that information is stored in the `port` field of `DetectedPort`.
 
 ### Change public library interface
 

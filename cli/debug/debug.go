@@ -17,11 +17,12 @@ package debug
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"sort"
 
+	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -29,17 +30,14 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	dbg "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
 	"github.com/arduino/arduino-cli/table"
-	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/fatih/color"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"google.golang.org/grpc/status"
 )
 
 var (
 	fqbn        string
-	port        string
+	port        arguments.Port
 	verbose     bool
 	verify      bool
 	interpreter string
@@ -61,9 +59,9 @@ func NewCommand() *cobra.Command {
 	}
 
 	debugCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
-	debugCommand.Flags().StringVarP(&port, "port", "p", "", tr("Debug port, e.g.: COM10 or /dev/ttyACM0"))
+	port.AddToCommand(debugCommand)
 	debugCommand.Flags().StringVarP(&programmer, "programmer", "P", "", tr("Programmer to use for debugging"))
-	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", fmt.Sprintf(tr("Debug interpreter e.g.: %s, %s, %s, %s, %s"), "console", "mi", "mi1", "mi2", "mi3"))
+	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
 	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries for debug."))
 	debugCommand.Flags().BoolVarP(&printInfo, "info", "I", false, tr("Show metadata about the debug session instead of starting the debugger."))
 
@@ -73,17 +71,26 @@ func NewCommand() *cobra.Command {
 func run(command *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
 
-	var path *paths.Path
+	path := ""
 	if len(args) > 0 {
-		path = paths.New(args[0])
+		path = args[0]
 	}
-	sketchPath := initSketchPath(path)
-
+	sketchPath := arguments.InitSketchPath(path)
+	sk, err := sketch.New(sketchPath)
+	if err != nil {
+		feedback.Errorf(tr("Error during Debug: %v"), err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+	discoveryPort, err := port.GetPort(instance, sk)
+	if err != nil {
+		feedback.Errorf(tr("Error during Debug: %v"), err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
 	debugConfigRequested := &dbg.DebugConfigRequest{
 		Instance:    instance,
 		Fqbn:        fqbn,
 		SketchPath:  sketchPath.String(),
-		Port:        port,
+		Port:        discoveryPort.ToRPC(),
 		Interpreter: interpreter,
 		ImportDir:   importDir,
 		Programmer:  programmer,
@@ -92,12 +99,8 @@ func run(command *cobra.Command, args []string) {
 	if printInfo {
 
 		if res, err := debug.GetDebugConfig(context.Background(), debugConfigRequested); err != nil {
-			if status, ok := status.FromError(err); ok {
-				feedback.Errorf(tr("Error getting Debug info: %v"), status.Message())
-				errorcodes.ExitWithGrpcStatus(status)
-			}
 			feedback.Errorf(tr("Error getting Debug info: %v"), err)
-			os.Exit(errorcodes.ErrGeneric)
+			os.Exit(errorcodes.ErrBadArgument)
 		} else {
 			feedback.PrintResult(&debugInfoResult{res})
 		}
@@ -114,21 +117,6 @@ func run(command *cobra.Command, args []string) {
 		}
 
 	}
-}
-
-// initSketchPath returns the current working directory
-func initSketchPath(sketchPath *paths.Path) *paths.Path {
-	if sketchPath != nil {
-		return sketchPath
-	}
-
-	wd, err := paths.Getwd()
-	if err != nil {
-		feedback.Errorf(tr("Couldn't get current working directory: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-	logrus.Infof("Reading sketch from dir: %s", wd)
-	return wd
 }
 
 type debugInfoResult struct {
@@ -162,7 +150,7 @@ func (r *debugInfoResult) String() string {
 		conf := properties.NewFromHashmap(r.info.GetServerConfiguration())
 		keys := conf.Keys()
 		sort.Strings(keys)
-		t.AddRow(fmt.Sprintf(tr("%s custom configurations"), r.info.GetServer()))
+		t.AddRow(tr("Configuration options for %s", r.info.GetServer()))
 		for _, k := range keys {
 			t.AddRow(table.NewCell(" - "+k, dimGreen), table.NewCell(conf.Get(k), dimGreen))
 		}

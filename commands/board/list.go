@@ -23,7 +23,7 @@ import (
 	"regexp"
 	"sort"
 	"strings"
-	"sync"
+	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/discovery"
@@ -35,10 +35,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type boardNotFoundError struct{}
+
+func (e *boardNotFoundError) Error() string {
+	return tr("board not found")
+}
+
 var (
 	// ErrNotFound is returned when the API returns 404
-	ErrNotFound = errors.New(tr("board not found"))
-	m           sync.Mutex
+	ErrNotFound = &boardNotFoundError{}
 	vidPidURL   = "https://builder.arduino.cc/v3/boards/byVidPid"
 	validVidPid = regexp.MustCompile(`0[xX][a-fA-F\d]{4}`)
 )
@@ -92,8 +97,6 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 		retVal = append(retVal, &rpc.BoardListItem{
 			Name: name,
 			Fqbn: fqbn,
-			Vid:  vid,
-			Pid:  pid,
 		})
 	} else {
 		return nil, errors.Wrap(err, tr("error querying Arduino Cloud Api"))
@@ -128,8 +131,6 @@ func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.B
 			Name:     board.Name(),
 			Fqbn:     board.FQBN(),
 			Platform: platform,
-			Vid:      port.Properties.Get("vid"),
-			Pid:      port.Properties.Get("pid"),
 		})
 	}
 
@@ -137,12 +138,12 @@ func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.B
 	// the builder API if the board is a USB device port
 	if len(boards) == 0 {
 		items, err := identifyViaCloudAPI(port)
-		if err == ErrNotFound {
+		if errors.Is(err, ErrNotFound) {
 			// the board couldn't be detected, print a warning
 			logrus.Debug("Board not recognized")
 		} else if err != nil {
 			// this is bad, bail out
-			return nil, errors.Wrap(err, tr("error getting board info from Arduino Cloud"))
+			return nil, &commands.UnavailableError{Message: tr("Error getting board info from Arduino Cloud")}
 		}
 
 		// add a DetectedPort entry in any case: the `Boards` field will
@@ -173,10 +174,7 @@ func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.B
 }
 
 // List FIXMEDOC
-func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
-	m.Lock()
-	defer m.Unlock()
-
+func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 	tags := map[string]string{}
 	// Use defer func() to evaluate tags map when function returns
 	// and set success flag inspecting the error named return parameter
@@ -188,17 +186,30 @@ func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 		stats.Incr("compile", stats.M(tags)...)
 	}()
 
-	pm := commands.GetPackageManager(instanceID)
+	pm := commands.GetPackageManager(req.GetInstance().Id)
 	if pm == nil {
-		return nil, errors.New(tr("invalid instance"))
+		return nil, &commands.InvalidInstanceError{}
 	}
 
-	ports, err := commands.ListBoards(pm)
-	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf(tr("error getting port list from %s"), "serial-discovery"))
+	dm := pm.DiscoveryManager()
+	if errs := dm.RunAll(); len(errs) > 0 {
+		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: fmt.Errorf("%v", errs)}
 	}
+	if errs := dm.StartAll(); len(errs) > 0 {
+		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: fmt.Errorf("%v", errs)}
+	}
+	defer func() {
+		if errs := dm.StopAll(); len(errs) > 0 {
+			logrus.Error(errs)
+		}
+	}()
+	time.Sleep(time.Duration(req.GetTimeout()) * time.Millisecond)
 
 	retVal := []*rpc.DetectedPort{}
+	ports, errs := pm.DiscoveryManager().List()
+	if len(errs) > 0 {
+		return nil, &commands.UnavailableError{Message: tr("Error getting board list"), Cause: fmt.Errorf("%v", errs)}
+	}
 	for _, port := range ports {
 		boards, err := identify(pm, port)
 		if err != nil {
@@ -207,14 +218,11 @@ func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 
 		// boards slice can be empty at this point if neither the cores nor the
 		// API managed to recognize the connected board
-		p := &rpc.DetectedPort{
-			Address:       port.Address,
-			Protocol:      port.Protocol,
-			ProtocolLabel: port.ProtocolLabel,
-			Boards:        boards,
-			SerialNumber:  port.Properties.Get("serialNumber"),
+		b := &rpc.DetectedPort{
+			Port:           port.ToRPC(),
+			MatchingBoards: boards,
 		}
-		retVal = append(retVal, p)
+		retVal = append(retVal, b)
 	}
 
 	return retVal, nil
@@ -224,42 +232,79 @@ func List(instanceID int32) (r []*rpc.DetectedPort, e error) {
 // The discovery process can be interrupted by sending a message to the interrupt channel.
 func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchResponse, error) {
 	pm := commands.GetPackageManager(instanceID)
-	eventsChan, err := commands.WatchListBoards(pm)
-	if err != nil {
-		return nil, err
+	dm := pm.DiscoveryManager()
+
+	runErrs := dm.RunAll()
+	if len(runErrs) == len(dm.IDs()) {
+		// All discoveries failed to run, we can't do anything
+		return nil, &commands.UnavailableError{Message: tr("Error starting board discoveries"), Cause: fmt.Errorf("%v", runErrs)}
+	}
+
+	eventsChan, errs := dm.StartSyncAll()
+	if len(runErrs) > 0 {
+		errs = append(runErrs, errs...)
 	}
 
 	outChan := make(chan *rpc.BoardListWatchResponse)
+
 	go func() {
+		defer close(outChan)
+		for _, err := range errs {
+			outChan <- &rpc.BoardListWatchResponse{
+				EventType: "error",
+				Error:     err.Error(),
+			}
+		}
 		for {
 			select {
 			case event := <-eventsChan:
-				boards := []*rpc.BoardListItem{}
+				if event.Type == "quit" {
+					// The discovery manager has closed its event channel because it's
+					// quitting all the discovery processes that are running, this
+					// means that the events channel we're listening from won't receive any
+					// more events.
+					// Handling this case is necessary when the board watcher is running and
+					// the instance being used is reinitialized since that quits all the
+					// discovery processes and reset the discovery manager. That would leave
+					// this goroutine listening forever on a "dead" channel and might even
+					// cause panics.
+					// This message avoid all this issues.
+					// It will be the client's task restarting the board watcher if necessary,
+					// this host won't attempt restarting it.
+					outChan <- &rpc.BoardListWatchResponse{
+						EventType: event.Type,
+					}
+					return
+				}
+
+				port := &rpc.DetectedPort{
+					Port: event.Port.ToRPC(),
+				}
+
 				boardsError := ""
 				if event.Type == "add" {
-					boards, err = identify(pm, event.Port)
+					boards, err := identify(pm, event.Port)
 					if err != nil {
 						boardsError = err.Error()
 					}
+					port.MatchingBoards = boards
 				}
-
-				serialNumber := ""
-				if props := event.Port.Properties; props != nil {
-					serialNumber = props.Get("serialNumber")
-				}
-
 				outChan <- &rpc.BoardListWatchResponse{
 					EventType: event.Type,
-					Port: &rpc.DetectedPort{
-						Address:       event.Port.Address,
-						Protocol:      event.Port.Protocol,
-						ProtocolLabel: event.Port.ProtocolLabel,
-						Boards:        boards,
-						SerialNumber:  serialNumber,
-					},
-					Error: boardsError,
+					Port:      port,
+					Error:     boardsError,
 				}
 			case <-interrupt:
+				errs := dm.StopAll()
+				if len(errs) > 0 {
+					outChan <- &rpc.BoardListWatchResponse{
+						EventType: "error",
+						Error:     tr("stopping discoveries: %s", errs),
+					}
+					// Don't close the channel if quitting all discoveries
+					// failed, otherwise some processes might be left running.
+					continue
+				}
 				return
 			}
 		}

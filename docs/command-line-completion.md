@@ -1,5 +1,5 @@
 `arduino-cli` supports command-line completion (also known as _tab completion_) for basic commands. Currently only
-`bash`, `zsh`, `fish` shells are supported
+`bash`, `zsh`, `fish`, and `powershell` shells are supported
 
 ### Before you start
 
@@ -8,9 +8,9 @@ first.
 
 ### Generate the completion file
 
-To generate the completion file you can use `arduino-cli completion [bash|zsh|fish] [--no-descriptions]`. By default
-this command will print on the standard output (the shell window) the content of the completion file. To save to an
-actual file use the `>` redirect symbol.
+To generate the completion file you can use `arduino-cli completion [bash|zsh|fish|powershell] [--no-descriptions]`. By
+default this command will print on the standard output (the shell window) the content of the completion file. To save to
+an actual file use the `>` redirect symbol.
 
 ### Bash
 
@@ -44,13 +44,29 @@ with `mv arduino-cli.fish ~/.config/fish/completions/`
 
 Remember to open a new shell to test the functionality.
 
+### Powershell
+
+Use `arduino-cli completion powershell > arduino-cli.ps1` to generate a temporary completion file. At this point you
+need to add the content of the generated file to your PowerShell profile file.
+
+1. `Get-Content -Path arduino-cli.ps1 | Add-Content -Path $profile` or add it by hand with your favourite text editor.
+1. The previous command added two `using namespace` lines, move them on top of the `$profile` file.
+1. If not already done, add the line `Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete` to your `$profile` file:
+   it is needed to enable the TAB completion in PowerShell.
+1. `del arduino-cli.ps1` to remove the temporary file.
+
+Remember to open a new shell to test the functionality.
+
+For more information on tab-completion on PowerShell, please, refer to
+[Autocomplete in PowerShell](https://techcommunity.microsoft.com/t5/itops-talk-blog/autocomplete-in-powershell/ba-p/2604524).
+
 #### Disabling command and flag descriptions
 
 By default fish and zsh completion have command and flag description enabled by default. If you want to disable this
 behaviour you can simply pass the `--no-descriptions` flag when calling `completion` command and the generated file will
 not have descriptions
 
-_N.B._ This flag is not compatible with bash
+_N.B._ This flag is not compatible with bash nor powershell
 
 ### Brew
 
