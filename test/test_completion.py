@@ -14,6 +14,7 @@
 # a commercial license, send an email to license@arduino.cc.
 
 
+# test if the completion command behaves correctly
 def test_completion_no_args(run_command):
     result = run_command(["completion"])
     assert not result.ok
@@ -85,3 +86,112 @@ def test_completion_powershell_no_desc(run_command):
     assert not result.ok
     assert result.stdout == ""
     assert "Error: command description is not supported by powershell" in result.stderr
+
+
+# test if the completion suggestions returned are meaningful
+# we use the __complete hidden command
+# https://github.com/spf13/cobra/blob/master/shell_completions.md#debugging
+
+# test static completions
+def test_static_completions(run_command):
+    result = run_command(
+        [
+            "__complete",
+            "--format",
+            "",
+        ]
+    )
+    assert "json" in result.stdout
+    result = run_command(
+        [
+            "__complete",
+            "--log-format",
+            "",
+        ]
+    )
+    assert "json" in result.stdout
+    result = run_command(
+        [
+            "__complete",
+            "--log-level",
+            "",
+        ]
+    )
+    assert "trace" in result.stdout
+
+
+# here we test if the completions coming from the core are working
+def test_config_completion(run_command):
+    result = run_command(["__complete", "config", "add", ""])
+    assert "board_manager.additional_urls" in result.stdout
+    result = run_command(["__complete", "config", "remove", ""])
+    assert "board_manager.additional_urls" in result.stdout
+    result = run_command(["__complete", "config", "delete", ""])
+    assert "board_manager.additional_urls" in result.stdout
+    result = run_command(["__complete", "config", "set", ""])
+    assert "board_manager.additional_urls" in result.stdout
+
+
+# here we test if the completions coming from the libs are working
+def test_lib_completion(run_command):
+    assert run_command(["lib", "update-index"])
+    result = run_command(["__complete", "lib", "install", ""])
+    assert "WiFi101" in result.stdout
+    result = run_command(["__complete", "lib", "download", ""])
+    assert "WiFi101" in result.stdout
+    result = run_command(["__complete", "lib", "uninstall", ""])
+    assert "WiFi101" not in result.stdout  # not yet installed
+
+    assert run_command(["lib", "install", "WiFi101"])
+    result = run_command(["__complete", "lib", "uninstall", ""])
+    assert "WiFi101" in result.stdout
+    result = run_command(["__complete", "lib", "examples", ""])
+    assert "WiFi101" in result.stdout
+    result = run_command(["__complete", "lib", "deps", ""])
+    assert "WiFi101" in result.stdout
+
+
+# here we test if the completions coming from the core are working
+def test_core_completion(run_command):
+    assert run_command(["core", "update-index"])
+    result = run_command(["__complete", "core", "install", ""])
+    assert "arduino:avr" in result.stdout
+    result = run_command(["__complete", "core", "download", ""])
+    assert "arduino:avr" in result.stdout
+    result = run_command(["__complete", "core", "uninstall", ""])
+    assert "arduino:avr" not in result.stdout
+
+    # we install a core because the provided completions comes from it
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
+
+    result = run_command(["__complete", "core", "uninstall", ""])
+    assert "arduino:avr" in result.stdout
+
+    result = run_command(["__complete", "board", "details", "-b", ""])
+    assert "arduino:avr:uno" in result.stdout
+    result = run_command(["__complete", "burn-bootloader", "-b", ""])
+    assert "arduino:avr:uno" in result.stdout
+    result = run_command(["__complete", "compile", "-b", ""])
+    assert "arduino:avr:uno" in result.stdout
+    result = run_command(["__complete", "debug", "-b", ""])
+    assert "arduino:avr:uno" in result.stdout
+    result = run_command(["__complete", "lib", "examples", "-b", ""])
+    assert "arduino:avr:uno" in result.stdout
+    result = run_command(["__complete", "upload", "-b", ""])
+    assert "arduino:avr:uno" in result.stdout
+    result = run_command(["__complete", "burn-bootloader", "-l", ""])
+    assert "network" in result.stdout
+    result = run_command(["__complete", "compile", "-l", ""])
+    assert "network" in result.stdout
+    result = run_command(["__complete", "debug", "-l", ""])
+    assert "network" in result.stdout
+    result = run_command(["__complete", "upload", "-l", ""])
+    assert "network" in result.stdout
+    result = run_command(["__complete", "burn-bootloader", "-P", ""])
+    assert "atmel_ice" in result.stdout
+    result = run_command(["__complete", "compile", "-P", ""])
+    assert "atmel_ice" in result.stdout
+    result = run_command(["__complete", "debug", "-P", ""])
+    assert "atmel_ice" in result.stdout
+    result = run_command(["__complete", "upload", "-P", ""])
+    assert "atmel_ice" in result.stdout
