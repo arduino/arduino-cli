@@ -56,7 +56,7 @@ func NewCommand() *cobra.Command {
 
 	uploadCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
 	uploadCommand.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return arguments.GetInstalledBoards(toComplete), cobra.ShellCompDirectiveDefault
+		return arguments.GetInstalledBoards(), cobra.ShellCompDirectiveDefault
 	})
 	port.AddToCommand(uploadCommand)
 	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries to upload."))
@@ -65,7 +65,7 @@ func NewCommand() *cobra.Command {
 	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Optional, turns on verbose mode."))
 	uploadCommand.Flags().StringVarP(&programmer, "programmer", "P", "", tr("Optional, use the specified programmer to upload."))
 	uploadCommand.RegisterFlagCompletionFunc("programmer", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return arguments.GetInstalledProgrammers(toComplete), cobra.ShellCompDirectiveDefault
+		return arguments.GetInstalledProgrammers(), cobra.ShellCompDirectiveDefault
 	})
 	uploadCommand.Flags().BoolVar(&dryRun, "dry-run", false, tr("Do not perform the actual upload, just log out actions"))
 	uploadCommand.Flags().MarkHidden("dry-run")

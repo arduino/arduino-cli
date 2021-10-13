@@ -83,7 +83,7 @@ func NewCommand() *cobra.Command {
 
 	command.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
 	command.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return arguments.GetInstalledBoards(toComplete), cobra.ShellCompDirectiveDefault
+		return arguments.GetInstalledBoards(), cobra.ShellCompDirectiveDefault
 	})
 	command.Flags().BoolVar(&showProperties, "show-properties", false, tr("Show all build properties used instead of compiling."))
 	command.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
@@ -110,7 +110,7 @@ func NewCommand() *cobra.Command {
 	command.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, tr("Optional, optimize compile output for debugging, rather than for release."))
 	command.Flags().StringVarP(&programmer, "programmer", "P", "", tr("Optional, use the specified programmer to upload."))
 	command.RegisterFlagCompletionFunc("programmer", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return arguments.GetInstalledProgrammers(toComplete), cobra.ShellCompDirectiveDefault
+		return arguments.GetInstalledProgrammers(), cobra.ShellCompDirectiveDefault
 	})
 	command.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, tr("Just produce the compilation database, without actually compiling."))
 	command.Flags().BoolVar(&clean, "clean", false, tr("Optional, cleanup the build folder and do not use any cached build."))

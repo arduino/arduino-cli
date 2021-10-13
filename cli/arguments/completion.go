@@ -15,7 +15,7 @@ import (
 // GetInstalledBoards is an helper function useful to autocomplete.
 // It returns a list of fqbn
 // it's taken from cli/board/listall.go
-func GetInstalledBoards(toComplete string) []string {
+func GetInstalledBoards() []string {
 	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
 
 	list, _ := board.ListAll(context.Background(), &rpc.BoardListAllRequest{
@@ -33,7 +33,7 @@ func GetInstalledBoards(toComplete string) []string {
 
 // GetInstalledProtocols is an helper function useful to autocomplete.
 // It returns a list of protocols available based on the installed boards
-func GetInstalledProtocols(toComplete string) []string {
+func GetInstalledProtocols() []string {
 	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
 	pm := commands.GetPackageManager(inst.Id)
 	boards := pm.InstalledBoards()
@@ -60,7 +60,7 @@ func GetInstalledProtocols(toComplete string) []string {
 
 // GetInstalledProgrammers is an helper function useful to autocomplete.
 // It returns a list of programmers available based on the installed boards
-func GetInstalledProgrammers(toComplete string) []string {
+func GetInstalledProgrammers() []string {
 	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
 	pm := commands.GetPackageManager(inst.Id)
 
@@ -91,7 +91,7 @@ func GetInstalledProgrammers(toComplete string) []string {
 
 // GetUninstallableCores is an helper function useful to autocomplete.
 // It returns a list of cores which can be uninstalled
-func GetUninstallableCores(toComplete string) []string {
+func GetUninstallableCores() []string {
 	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
 
 	platforms, _ := core.GetPlatforms(&rpc.PlatformListRequest{
@@ -109,7 +109,7 @@ func GetUninstallableCores(toComplete string) []string {
 
 // GetInstallableCores is an helper function useful to autocomplete.
 // It returns a list of cores which can be installed/downloaded
-func GetInstallableCores(toComplete string) []string {
+func GetInstallableCores() []string {
 	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
 
 	platforms, _ := core.PlatformSearch(&rpc.PlatformSearchRequest{
@@ -127,7 +127,7 @@ func GetInstallableCores(toComplete string) []string {
 
 // GetUninstallableLibs is an helper function useful to autocomplete.
 // It returns a list of libs which can be uninstalled
-func GetUninstallableLibs(toComplete string) []string {
+func GetUninstallableLibs() []string {
 	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
 	libs, _ := lib.LibraryList(context.Background(), &rpc.LibraryListRequest{
 		Instance:  inst,
@@ -146,7 +146,7 @@ func GetUninstallableLibs(toComplete string) []string {
 
 // GetInstallableLibs is an helper function useful to autocomplete.
 // It returns a list of libs which can be installed/downloaded
-func GetInstallableLibs(toComplete string) []string {
+func GetInstallableLibs() []string {
 	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
 
 	libs, _ := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
@@ -164,7 +164,7 @@ func GetInstallableLibs(toComplete string) []string {
 // GetConnectedBoards is an helper function useful to autocomplete.
 // It returns a list of boards which are currently connected
 // Obviously it does not suggests network ports because of the timeout
-func GetConnectedBoards(toComplete string) []string {
+func GetConnectedBoards() []string {
 	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
 
 	list, _ := board.List(&rpc.BoardListRequest{

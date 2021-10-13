@@ -48,7 +48,7 @@ func initInstallCommand() *cobra.Command {
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstallableLibs(toComplete), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstallableLibs(), cobra.ShellCompDirectiveDefault
 		},
 	}
 	installCommand.Flags().BoolVar(&installFlags.noDeps, "no-deps", false, tr("Do not install dependencies."))

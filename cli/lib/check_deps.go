@@ -41,7 +41,7 @@ func initDepsCommand() *cobra.Command {
 		Args: cobra.ExactArgs(1),
 		Run:  runDepsCommand,
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetUninstallableLibs(toComplete), cobra.ShellCompDirectiveDefault
+			return arguments.GetUninstallableLibs(), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return depsCommand

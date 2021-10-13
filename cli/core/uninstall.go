@@ -40,7 +40,7 @@ func initUninstallCommand() *cobra.Command {
 		Args:    cobra.MinimumNArgs(1),
 		Run:     runUninstallCommand,
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetUninstallableCores(toComplete), cobra.ShellCompDirectiveDefault
+			return arguments.GetUninstallableCores(), cobra.ShellCompDirectiveDefault
 		},
 	}
 }

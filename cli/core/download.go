@@ -42,7 +42,7 @@ func initDownloadCommand() *cobra.Command {
 		Args: cobra.MinimumNArgs(1),
 		Run:  runDownloadCommand,
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return arguments.GetInstallableCores(toComplete), cobra.ShellCompDirectiveDefault
+			return arguments.GetInstallableCores(), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return downloadCommand

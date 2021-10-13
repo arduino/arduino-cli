@@ -36,7 +36,7 @@ func initAddCommand() *cobra.Command {
 		Args: cobra.MinimumNArgs(2),
 		Run:  runAddCommand,
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return GetConfigurationKeys(toComplete), cobra.ShellCompDirectiveDefault
+			return GetConfigurationKeys(), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return addCommand

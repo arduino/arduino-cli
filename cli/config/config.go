@@ -46,7 +46,7 @@ func NewCommand() *cobra.Command {
 
 // GetConfigurationKeys is an helper function useful to autocomplete.
 // It returns a list of configuration keys which can be changed
-func GetConfigurationKeys(toComplete string) []string {
+func GetConfigurationKeys() []string {
 	var res []string
 	keys := configuration.Settings.AllKeys()
 	for _, key := range keys {
