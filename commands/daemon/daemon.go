@@ -243,6 +243,12 @@ func (s *ArduinoCoreServerImpl) Version(ctx context.Context, req *rpc.VersionReq
 	return &rpc.VersionResponse{Version: s.VersionString}, nil
 }
 
+// NewSketch FIXMEDOC
+func (s *ArduinoCoreServerImpl) NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchResponse, error) {
+	resp, err := sketch.NewSketch(ctx, req)
+	return resp, convertErrorToRPCStatus(err)
+}
+
 // LoadSketch FIXMEDOC
 func (s *ArduinoCoreServerImpl) LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketchResponse, error) {
 	resp, err := commands.LoadSketch(ctx, req)

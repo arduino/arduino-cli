@@ -368,6 +368,19 @@ func (e *MissingSketchPathError) ToRPCStatus() *status.Status {
 	return status.New(codes.InvalidArgument, e.Error())
 }
 
+// CantCreateSketchError is returned when the sketch cannot be created
+type CantCreateSketchError struct {
+	Cause error
+}
+
+func (e *CantCreateSketchError) Error() string {
+	return composeErrorMsg(tr("Can't create sketch"), e.Cause)
+}
+
+func (e *CantCreateSketchError) Unwrap() error {
+	return e.Cause
+}
+
 // CantOpenSketchError is returned when the sketch is not found or cannot be opened
 type CantOpenSketchError struct {
 	Cause error

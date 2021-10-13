@@ -64,6 +64,9 @@ service ArduinoCoreService {
   // Get the version of Arduino CLI in use.
   rpc Version(VersionRequest) returns (VersionResponse) {}
 
+  // Create a new Sketch
+  rpc NewSketch(NewSketchRequest) returns (NewSketchResponse) {}
+
   // Returns all files composing a Sketch
   rpc LoadSketch(LoadSketchRequest) returns (LoadSketchResponse) {}
 
@@ -278,6 +281,18 @@ message VersionRequest {}
 message VersionResponse {
   // The version of Arduino CLI in use.
   string version = 1;
+}
+
+message NewSketchRequest {
+  // Arduino Core Service instance from the Init response.
+  Instance instance = 1;
+  // New sketch name
+  string sketch_name = 2;
+}
+
+message NewSketchResponse {
+  // Absolute path to a main sketch file
+  string main_file = 1;
 }
 
 message LoadSketchRequest {
