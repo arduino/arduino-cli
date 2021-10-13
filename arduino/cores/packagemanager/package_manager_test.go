@@ -460,6 +460,7 @@ func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 		platformProps := platformRelease.Properties
 		require.Equal(t, "builtin:serial-discovery", platformProps.Get("pluggable_discovery.required.0"))
 		require.Equal(t, "builtin:mdns-discovery", platformProps.Get("pluggable_discovery.required.1"))
+		require.Equal(t, "builtin:serial-monitor", platformProps.Get("pluggable_monitor.required.serial"))
 		require.Equal(t, "{runtime.tools.esptool.path}", platformProps.Get("tools.esptool__pluggable_network.path"))
 		require.Contains(t, platformProps.Get("tools.esptool__pluggable_network.cmd"), "esptool")
 		require.Contains(t, platformProps.Get("tools.esptool__pluggable_network.network_cmd"), "{runtime.platform.path}/tools/espota")
@@ -481,6 +482,7 @@ func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 		platformProps := platformRelease.Properties
 		require.Equal(t, "builtin:serial-discovery", platformProps.Get("pluggable_discovery.required.0"))
 		require.Equal(t, "builtin:mdns-discovery", platformProps.Get("pluggable_discovery.required.1"))
+		require.Equal(t, "builtin:serial-monitor", platformProps.Get("pluggable_monitor.required.serial"))
 		require.Equal(t, "", platformProps.Get("tools.esptool__pluggable_network.path"))
 		require.Equal(t, "{runtime.tools.python3.path}/python3", platformProps.Get("tools.esptool__pluggable_network.cmd"))
 		require.Equal(t, "{runtime.tools.python3.path}/python3", platformProps.Get("tools.esptool__pluggable_network.network_cmd"))
@@ -502,6 +504,7 @@ func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 		platformProps := platformRelease.Properties
 		require.Equal(t, "builtin:serial-discovery", platformProps.Get("pluggable_discovery.required.0"))
 		require.Equal(t, "builtin:mdns-discovery", platformProps.Get("pluggable_discovery.required.1"))
+		require.Equal(t, "builtin:serial-monitor", platformProps.Get("pluggable_monitor.required.serial"))
 		require.Equal(t, `"{network_cmd}" -address {upload.port.address} -port {upload.port.properties.port} -sketch "{build.path}/{build.project_name}.hex" -upload {upload.port.properties.endpoint_upload} -sync {upload.port.properties.endpoint_sync} -reset {upload.port.properties.endpoint_reset} -sync_exp {upload.port.properties.sync_return}`, platformProps.Get("tools.avrdude__pluggable_network.upload.pattern"))
 	}
 }
