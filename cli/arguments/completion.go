@@ -25,8 +25,8 @@ func GetInstalledBoards(toComplete string) []string {
 	})
 	var res []string
 	// transform the data structure for the completion
-	for _, i := range list.GetBoards() {
-		res = append(res, i.Fqbn)
+	for _, i := range list.Boards {
+		res = append(res, i.Fqbn+"\t"+i.Name)
 	}
 	return res
 }
@@ -71,21 +71,19 @@ func GetInstalledProgrammers(toComplete string) []string {
 		IncludeHiddenBoards: false,
 	})
 
-	// use this strange map because it should be more optimized
-	// we use only the key and not the value because we do not need it
-	installedProgrammers := make(map[string]struct{})
-	for _, i := range list.GetBoards() {
+	installedProgrammers := make(map[string]string)
+	for _, i := range list.Boards {
 		fqbn, _ := cores.ParseFQBN(i.Fqbn)
 		_, boardPlatform, _, _, _, _ := pm.ResolveFQBN(fqbn)
-		for programmerID := range boardPlatform.Programmers {
-			installedProgrammers[programmerID] = struct{}{}
+		for programmerID, programmer := range boardPlatform.Programmers {
+			installedProgrammers[programmerID] = programmer.Name
 		}
 	}
 
 	res := make([]string, len(installedProgrammers))
 	i := 0
-	for k := range installedProgrammers {
-		res[i] = k
+	for programmerID := range installedProgrammers {
+		res[i] = programmerID + "\t" + installedProgrammers[programmerID]
 		i++
 	}
 	return res
@@ -104,7 +102,7 @@ func GetUninstallableCores(toComplete string) []string {
 	var res []string
 	// transform the data structure for the completion
 	for _, i := range platforms {
-		res = append(res, i.GetId())
+		res = append(res, i.Id+"\t"+i.Name)
 	}
 	return res
 }
@@ -122,7 +120,7 @@ func GetInstallableCores(toComplete string) []string {
 	var res []string
 	// transform the data structure for the completion
 	for _, i := range platforms.SearchOutput {
-		res = append(res, i.GetId())
+		res = append(res, i.Id+"\t"+i.Name)
 	}
 	return res
 }
@@ -141,7 +139,7 @@ func GetUninstallableLibs(toComplete string) []string {
 	var res []string
 	// transform the data structure for the completion
 	for _, i := range libs.InstalledLibraries {
-		res = append(res, i.GetLibrary().Name)
+		res = append(res, i.Library.Name+"\t"+i.Library.Sentence)
 	}
 	return res
 }
@@ -158,7 +156,7 @@ func GetInstallableLibs(toComplete string) []string {
 	var res []string
 	// transform the data structure for the completion
 	for _, i := range libs.Libraries {
-		res = append(res, i.Name)
+		res = append(res, i.Name+"\t"+i.Latest.Sentence)
 	}
 	return res
 }
