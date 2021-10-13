@@ -491,4 +491,17 @@ func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 		require.Equal(t, "true", platformProps.Get("tools.esptool__pluggable_network.upload.field.password.secret"))
 		require.Equal(t, "\"{network_cmd}\" -I \"{runtime.platform.path}/tools/espota.py\" -i \"{upload.port.address}\" -p \"{upload.port.properties.port}\" \"--auth={upload.field.password}\" -f \"{build.path}/{build.project_name}.bin\"", platformProps.Get("tools.esptool__pluggable_network.upload.pattern"))
 	}
+	{
+		fqbn, err := cores.ParseFQBN("arduino:avr:uno")
+		require.NoError(t, err)
+		require.NotNil(t, fqbn)
+		_, platformRelease, board, _, _, err := pm.ResolveFQBN(fqbn)
+		require.NoError(t, err)
+		require.Equal(t, "avrdude__pluggable_network", board.Properties.Get("upload.tool.network"))
+		require.Equal(t, "uno", board.Properties.Get("upload_port.4.board"))
+		platformProps := platformRelease.Properties
+		require.Equal(t, "builtin:serial-discovery", platformProps.Get("pluggable_discovery.required.0"))
+		require.Equal(t, "builtin:mdns-discovery", platformProps.Get("pluggable_discovery.required.1"))
+		require.Equal(t, `"{network_cmd}" -address {upload.port.address} -port {upload.port.properties.port} -sketch "{build.path}/{build.project_name}.hex" -upload {upload.port.properties.endpoint_upload} -sync {upload.port.properties.endpoint_sync} -reset {upload.port.properties.endpoint_reset} -sync_exp {upload.port.properties.sync_return}`, platformProps.Get("tools.avrdude__pluggable_network.upload.pattern"))
+	}
 }
