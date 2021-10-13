@@ -17,7 +17,9 @@ package config
 
 import (
 	"os"
+	"reflect"
 
+	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/spf13/cobra"
 )
@@ -40,4 +42,18 @@ func NewCommand() *cobra.Command {
 	configCommand.AddCommand(initSetCommand())
 
 	return configCommand
+}
+
+// GetConfigurationKeys is an helper function useful to autocomplete.
+// It returns a list of configuration keys which can be changed
+func GetConfigurationKeys(toComplete string) []string {
+	var res []string
+	keys := configuration.Settings.AllKeys()
+	for _, key := range keys {
+		kind, _ := typeOf(key)
+		if kind == reflect.Slice {
+			res = append(res, key)
+		}
+	}
+	return res
 }

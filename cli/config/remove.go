@@ -36,7 +36,7 @@ func initRemoveCommand() *cobra.Command {
 		Args: cobra.MinimumNArgs(2),
 		Run:  runRemoveCommand,
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return configuration.Settings.AllKeys(), cobra.ShellCompDirectiveDefault
+			return GetConfigurationKeys(toComplete), cobra.ShellCompDirectiveDefault
 		},
 	}
 	return addCommand

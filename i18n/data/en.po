@@ -176,7 +176,7 @@ msgstr "Arduino cache commands."
 msgid "Arduino commands about libraries."
 msgstr "Arduino commands about libraries."
 
-#: cli/config/config.go:31
+#: cli/config/config.go:33
 msgid "Arduino configuration commands."
 msgstr "Arduino configuration commands."
 
