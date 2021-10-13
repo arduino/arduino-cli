@@ -160,3 +160,20 @@ func GetInstallableLibs(toComplete string) []string {
 	}
 	return res
 }
+
+// GetConnectedBoards is an helper function useful to autocomplete.
+// It returns a list of boards which are currently connected
+// Obviously it does not suggests network ports because of the timeout
+func GetConnectedBoards(toComplete string) []string {
+	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
+
+	list, _ := board.List(&rpc.BoardListRequest{
+		Instance: inst,
+	})
+	var res []string
+	// transform the data structure for the completion
+	for _, i := range list {
+		res = append(res, i.Port.Address)
+	}
+	return res
+}

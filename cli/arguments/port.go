@@ -42,6 +42,9 @@ type Port struct {
 // AddToCommand adds the flags used to set port and protocol to the specified Command
 func (p *Port) AddToCommand(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&p.address, "port", "p", "", tr("Upload port address, e.g.: COM3 or /dev/ttyACM2"))
+	cmd.RegisterFlagCompletionFunc("port", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return GetConnectedBoards(toComplete), cobra.ShellCompDirectiveDefault
+	})
 	cmd.Flags().StringVarP(&p.protocol, "protocol", "l", "", tr("Upload port protocol, e.g: serial"))
 	cmd.RegisterFlagCompletionFunc("protocol", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return GetInstalledProtocols(toComplete), cobra.ShellCompDirectiveDefault

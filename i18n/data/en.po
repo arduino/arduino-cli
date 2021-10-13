@@ -1418,7 +1418,7 @@ msgstr "Low memory available, stability problems may occur."
 msgid "Maintainer: %s"
 msgstr "Maintainer: %s"
 
-#: cli/arguments/port.go:49
+#: cli/arguments/port.go:52
 msgid "Max time to wait for port discovery, e.g.: 30s, 1m"
 msgstr "Max time to wait for port discovery, e.g.: 30s, 1m"
 
@@ -2201,7 +2201,7 @@ msgstr "Upload port address, e.g.: COM3 or /dev/ttyACM2"
 msgid "Upload port found on %s"
 msgstr "Upload port found on %s"
 
-#: cli/arguments/port.go:45
+#: cli/arguments/port.go:48
 msgid "Upload port protocol, e.g: serial"
 msgstr "Upload port protocol, e.g: serial"
 
@@ -3031,7 +3031,7 @@ msgstr "pluggable discovery already added: %s"
 msgid "port"
 msgstr "port"
 
-#: cli/arguments/port.go:125
+#: cli/arguments/port.go:128
 msgid "port not found: %[1]s %[2]s"
 msgstr "port not found: %[1]s %[2]s"
 
