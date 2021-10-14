@@ -234,6 +234,9 @@ Each PLATFORM describes a core for a specific architecture. The fields needed ar
 - `architecture`: is the architecture of the platform (avr, sam, etc...). It must match the architecture of the core as
   explained in the [Arduino platform specification](platform-specification.md#hardware-folders-structure)
 - `version`: the version of the platform.
+- `deprecated`: (optional) setting to `true` causes the platform to be moved to the bottom of all Boards Manager and
+  [`arduino-cli core`](https://arduino.github.io/arduino-cli/latest/commands/arduino-cli_core/) listings and marked
+  "DEPRECATED".
 - `category`: this field is reserved, a 3rd party core must set it to `Contributed`
 - `help`/`online`: is a URL that is displayed on the Arduino IDE's Boards Manager as an "Online Help" link
 - `url`, `archiveFileName`, `size` and `checksum`: metadata of the core archive file. The meaning is the same as for the
