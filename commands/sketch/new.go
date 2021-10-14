@@ -17,14 +17,12 @@ package sketch
 
 import (
 	"context"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	paths "github.com/arduino/go-paths-helper"
 )
 
 var emptySketch = []byte(`
@@ -36,19 +34,19 @@ void loop() {
 `)
 
 // CreateSketch creates a new sketch
-func CreateSketch(sketchDir string, sketchName string) (string, error) {
-	if err := os.MkdirAll(sketchDir, os.FileMode(0755)); err != nil {
-		return "", err
+func CreateSketch(sketchDirPath *paths.Path) (*paths.Path, error) {
+	if err := sketchDirPath.MkdirAll(); err != nil {
+		return nil, err
 	}
-	baseSketchName := filepath.Base(sketchDir)
-	sketchFile := filepath.Join(sketchDir, baseSketchName+globals.MainFileValidExtension)
-	if err := ioutil.WriteFile(sketchFile, emptySketch, os.FileMode(0644)); err != nil {
-		return "", err
+	baseSketchName := sketchDirPath.Base()
+	sketchFilePath := sketchDirPath.Join(baseSketchName + globals.MainFileValidExtension)
+	if err := sketchFilePath.WriteFile(emptySketch); err != nil {
+		return nil, err
 	}
-	return sketchFile, nil
+	return sketchFilePath, nil
 }
 
-// NewSketch FIXMEDOC
+// NewSketch creates a new sketch via gRPC
 func NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchResponse, error) {
 	var sketchesDir string
 	if len(req.SketchDir) > 0 {
@@ -56,11 +54,11 @@ func NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchRe
 	} else {
 		sketchesDir = configuration.Settings.GetString("directories.User")
 	}
-	sketchDir := filepath.Join(sketchesDir, req.SketchName)
-	sketchFile, err := CreateSketch(sketchDir, req.SketchName)
+	sketchDirPath := paths.New(sketchesDir).Join(req.SketchName)
+	sketchFilePath, err := CreateSketch(sketchDirPath)
 	if err != nil {
 		return nil, &commands.CantCreateSketchError{Cause: err}
 	}
 
-	return &rpc.NewSketchResponse{MainFile: sketchFile}, nil
+	return &rpc.NewSketchResponse{MainFile: sketchFilePath.String()}, nil
 }
