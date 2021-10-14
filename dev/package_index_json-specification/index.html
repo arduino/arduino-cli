@@ -1637,6 +1637,9 @@ that can be referenced from <code>platform.txt</code> using one of the following
 <li><code>architecture</code>: is the architecture of the platform (avr, sam, etc...). It must match the architecture of the core as
   explained in the <a href="../platform-specification/#hardware-folders-structure">Arduino platform specification</a></li>
 <li><code>version</code>: the version of the platform.</li>
+<li><code>deprecated</code>: (optional) setting to <code>true</code> causes the platform to be moved to the bottom of all Boards Manager and
+  <a href="https://arduino.github.io/arduino-cli/latest/commands/arduino-cli_core/"><code>arduino-cli core</code></a> listings and marked
+  "DEPRECATED".</li>
 <li><code>category</code>: this field is reserved, a 3rd party core must set it to <code>Contributed</code></li>
 <li><code>help</code>/<code>online</code>: is a URL that is displayed on the Arduino IDE's Boards Manager as an "Online Help" link</li>
 <li><code>url</code>, <code>archiveFileName</code>, <code>size</code> and <code>checksum</code>: metadata of the core archive file. The meaning is the same as for the
