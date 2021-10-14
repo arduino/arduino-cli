@@ -179,6 +179,8 @@ def test_core_completion(run_command):
     assert "arduino:avr:uno" in result.stdout
     result = run_command(["__complete", "upload", "-b", ""])
     assert "arduino:avr:uno" in result.stdout
+    result = run_command(["__complete", "monitor", "-b", ""])
+    assert "arduino:avr:uno" in result.stdout
     result = run_command(["__complete", "burn-bootloader", "-l", ""])
     assert "network" in result.stdout
     result = run_command(["__complete", "compile", "-l", ""])
@@ -186,6 +188,8 @@ def test_core_completion(run_command):
     result = run_command(["__complete", "debug", "-l", ""])
     assert "network" in result.stdout
     result = run_command(["__complete", "upload", "-l", ""])
+    assert "network" in result.stdout
+    result = run_command(["__complete", "monitor", "-l", ""])
     assert "network" in result.stdout
     result = run_command(["__complete", "burn-bootloader", "-P", ""])
     assert "atmel_ice" in result.stdout

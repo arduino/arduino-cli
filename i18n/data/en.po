@@ -427,7 +427,7 @@ msgstr "Configuring platform."
 msgid "Connected"
 msgstr "Connected"
 
-#: cli/monitor/monitor.go:174
+#: cli/monitor/monitor.go:177
 msgid "Connected to %s! Press CTRL-C to exit."
 msgstr "Connected to %s! Press CTRL-C to exit."
 
@@ -504,7 +504,7 @@ msgstr "Debugging not supported for board %s"
 msgid "Debugging supported:"
 msgstr "Debugging supported:"
 
-#: cli/monitor/monitor.go:192
+#: cli/monitor/monitor.go:195
 msgid "Default"
 msgstr "Default"
 
@@ -790,7 +790,7 @@ msgstr "Error getting information for library %s"
 msgid "Error getting libraries info: %v"
 msgstr "Error getting libraries info: %v"
 
-#: cli/monitor/monitor.go:87
+#: cli/monitor/monitor.go:90
 msgid "Error getting port settings details: %s"
 msgstr "Error getting port settings details: %s"
 
@@ -1139,7 +1139,7 @@ msgstr "Global variables use {0} bytes of dynamic memory."
 
 #: cli/core/list.go:84
 #: cli/core/search.go:114
-#: cli/monitor/monitor.go:192
+#: cli/monitor/monitor.go:195
 #: cli/outdated/outdated.go:62
 msgid "ID"
 msgstr "ID"
@@ -1480,7 +1480,7 @@ msgstr "Missing sketch path"
 msgid "Monitor '%s' not found"
 msgstr "Monitor '%s' not found"
 
-#: cli/monitor/monitor.go:140
+#: cli/monitor/monitor.go:143
 msgid "Monitor port settings:"
 msgstr "Monitor port settings:"
 
@@ -1736,8 +1736,8 @@ msgstr "Platform size (bytes):"
 msgid "Port"
 msgstr "Port"
 
-#: cli/monitor/monitor.go:161
-#: cli/monitor/monitor.go:168
+#: cli/monitor/monitor.go:164
+#: cli/monitor/monitor.go:171
 msgid "Port closed:"
 msgstr "Port closed:"
 
@@ -1878,7 +1878,7 @@ msgstr "Sets a setting value."
 msgid "Sets where to save the configuration file."
 msgstr "Sets where to save the configuration file."
 
-#: cli/monitor/monitor.go:192
+#: cli/monitor/monitor.go:195
 msgid "Setting"
 msgstr "Setting"
 
@@ -2353,7 +2353,7 @@ msgstr "VERSION"
 msgid "VERSION_NUMBER"
 msgstr "VERSION_NUMBER"
 
-#: cli/monitor/monitor.go:192
+#: cli/monitor/monitor.go:195
 msgid "Values"
 msgstr "Values"
 
@@ -2860,11 +2860,11 @@ msgstr "invalid platform archive size: %s"
 msgid "invalid pluggable monitor reference: %s"
 msgstr "invalid pluggable monitor reference: %s"
 
-#: cli/monitor/monitor.go:123
+#: cli/monitor/monitor.go:126
 msgid "invalid port configuration value for %s: %s"
 msgstr "invalid port configuration value for %s: %s"
 
-#: cli/monitor/monitor.go:132
+#: cli/monitor/monitor.go:135
 msgid "invalid port configuration: %s"
 msgstr "invalid port configuration: %s"
 
