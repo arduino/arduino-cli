@@ -232,6 +232,9 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 	properties := buildProperties.Clone()
 	properties.Set(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel))
 	properties.Set(constants.BUILD_PROPERTIES_INCLUDES, strings.Join(includes, constants.SPACE))
+	if len(ctx.Arduifines) > 0 {
+		properties.Set(constants.BUILD_PROPERTIES_INCLUDES, properties.Get(constants.BUILD_PROPERTIES_INCLUDES) + " " + ctx.Arduifines + " ")
+	}
 	properties.SetPath(constants.BUILD_PROPERTIES_SOURCE_FILE, source)
 	relativeSource, err := sourcePath.RelTo(source)
 	if err != nil {

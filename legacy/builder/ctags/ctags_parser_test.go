@@ -30,7 +30,9 @@ func produceTags(t *testing.T, filename string) []*types.CTag {
 	require.NoError(t, err)
 
 	parser := CTagsParser{}
-	return parser.Parse(string(bytes), nil)
+	tags, Arduifines := parser.Parse(string(bytes), nil)
+	_ = Arduifines
+	return tags
 }
 
 func TestCTagsParserShouldListPrototypes(t *testing.T) {

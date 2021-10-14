@@ -61,7 +61,7 @@ msgstr "%s is not managed by package manager"
 msgid "%s must be installed."
 msgstr "%s must be installed."
 
-#: legacy/builder/builder_utils/utils.go:530
+#: legacy/builder/builder_utils/utils.go:533
 #: legacy/builder/ctags_runner.go:41
 msgid "%s pattern is missing"
 msgstr "%s pattern is missing"
@@ -109,6 +109,10 @@ msgstr "ARCH"
 #: cli/generatedocs/generatedocs.go:79
 msgid "ARDUINO COMMAND LINE MANUAL"
 msgstr "ARDUINO COMMAND LINE MANUAL"
+
+#: legacy/builder/phases/libraries_builder.go:48
+msgid "Additional compiler options provided by user sketch: {0}"
+msgstr "Additional compiler options provided by user sketch: {0}"
 
 #: cli/usage.go:32
 msgid "Additional help topics:"
@@ -349,7 +353,7 @@ msgstr "Check dependencies status for the specified library."
 msgid "Checking lib install prerequisites"
 msgstr "Checking lib install prerequisites"
 
-#: legacy/builder/builder_utils/utils.go:280
+#: legacy/builder/builder_utils/utils.go:283
 msgid "Checking previous results for {0} (result = {1}, dep = {2})"
 msgstr "Checking previous results for {0} (result = {1}, dep = {2})"
 
@@ -391,7 +395,7 @@ msgstr "Compiling core..."
 msgid "Compiling libraries..."
 msgstr "Compiling libraries..."
 
-#: legacy/builder/phases/libraries_builder.go:135
+#: legacy/builder/phases/libraries_builder.go:139
 msgid "Compiling library \"{0}\""
 msgstr "Compiling library \"{0}\""
 
@@ -525,7 +529,7 @@ msgstr "Deletes a settings key and all its sub keys."
 msgid "Dependencies: %s"
 msgstr "Dependencies: %s"
 
-#: legacy/builder/builder_utils/utils.go:358
+#: legacy/builder/builder_utils/utils.go:361
 msgid "Depfile is about different file: {0}"
 msgstr "Depfile is about different file: {0}"
 
@@ -794,7 +798,7 @@ msgstr "Error getting libraries info: %v"
 msgid "Error getting port settings details: %s"
 msgstr "Error getting port settings details: %s"
 
-#: legacy/builder/types/context.go:239
+#: legacy/builder/types/context.go:244
 msgid "Error in FQBN: %s"
 msgstr "Error in FQBN: %s"
 
@@ -1059,7 +1063,7 @@ msgstr "Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v"
 msgid "Failed to listen on TCP port: %s. Address already in use."
 msgstr "Failed to listen on TCP port: %s. Address already in use."
 
-#: legacy/builder/builder_utils/utils.go:380
+#: legacy/builder/builder_utils/utils.go:383
 msgid "Failed to read: {0}"
 msgstr "Failed to read: {0}"
 
@@ -1358,7 +1362,7 @@ msgstr "Library installed"
 msgid "Library name"
 msgstr "Library name"
 
-#: legacy/builder/phases/libraries_builder.go:91
+#: legacy/builder/phases/libraries_builder.go:95
 msgid "Library {0} has been declared precompiled:"
 msgstr "Library {0} has been declared precompiled:"
 
@@ -1511,7 +1515,7 @@ msgstr "New version"
 msgid "No boards found."
 msgstr "No boards found."
 
-#: legacy/builder/builder_utils/utils.go:351
+#: legacy/builder/builder_utils/utils.go:354
 msgid "No colon in first line of depfile"
 msgstr "No colon in first line of depfile"
 
@@ -1563,13 +1567,13 @@ msgstr "No valid dependencies solution found"
 msgid "Not enough memory; see %s for tips on reducing your footprint."
 msgstr "Not enough memory; see %s for tips on reducing your footprint."
 
-#: legacy/builder/builder_utils/utils.go:284
+#: legacy/builder/builder_utils/utils.go:287
 msgid "Not found: nil"
 msgstr "Not found: nil"
 
-#: legacy/builder/builder_utils/utils.go:300
-#: legacy/builder/builder_utils/utils.go:313
-#: legacy/builder/builder_utils/utils.go:387
+#: legacy/builder/builder_utils/utils.go:303
+#: legacy/builder/builder_utils/utils.go:316
+#: legacy/builder/builder_utils/utils.go:390
 msgid "Not found: {0}"
 msgstr "Not found: {0}"
 
@@ -1745,8 +1749,8 @@ msgstr "Port closed:"
 msgid "Port monitor error"
 msgstr "Port monitor error"
 
-#: legacy/builder/phases/libraries_builder.go:101
-#: legacy/builder/phases/libraries_builder.go:109
+#: legacy/builder/phases/libraries_builder.go:105
+#: legacy/builder/phases/libraries_builder.go:113
 msgid "Precompiled library in \"{0}\" not found"
 msgstr "Precompiled library in \"{0}\" not found"
 
@@ -2004,11 +2008,11 @@ msgstr "Skip linking of final executable."
 msgid "Skipping 1200-bps touch reset: no serial port selected!"
 msgstr "Skipping 1200-bps touch reset: no serial port selected!"
 
-#: legacy/builder/builder_utils/utils.go:476
+#: legacy/builder/builder_utils/utils.go:479
 msgid "Skipping archive creation of: {0}"
 msgstr "Skipping archive creation of: {0}"
 
-#: legacy/builder/builder_utils/utils.go:269
+#: legacy/builder/builder_utils/utils.go:272
 msgid "Skipping compile of: {0}"
 msgstr "Skipping compile of: {0}"
 
@@ -2069,7 +2073,7 @@ msgstr "The key '%[1]v' is not a list of items, can't remove from it.\n"
 msgid "The output format for the logs, can be: %s"
 msgstr "The output format for the logs, can be: %s"
 
-#: legacy/builder/phases/libraries_builder.go:151
+#: legacy/builder/phases/libraries_builder.go:155
 msgid "The platform does not support '{0}' for precompiled libraries."
 msgstr "The platform does not support '{0}' for precompiled libraries."
 
@@ -2333,13 +2337,13 @@ msgstr "Using library {0} in folder: {1} {2}"
 msgid "Using precompiled core: {0}"
 msgstr "Using precompiled core: {0}"
 
-#: legacy/builder/phases/libraries_builder.go:98
-#: legacy/builder/phases/libraries_builder.go:106
+#: legacy/builder/phases/libraries_builder.go:102
+#: legacy/builder/phases/libraries_builder.go:110
 msgid "Using precompiled library in {0}"
 msgstr "Using precompiled library in {0}"
 
-#: legacy/builder/builder_utils/utils.go:267
-#: legacy/builder/builder_utils/utils.go:499
+#: legacy/builder/builder_utils/utils.go:270
+#: legacy/builder/builder_utils/utils.go:502
 msgid "Using previously compiled file: {0}"
 msgstr "Using previously compiled file: {0}"
 
@@ -3429,9 +3433,9 @@ msgstr "wrong format in server response"
 msgid "{0} invalid, rebuilding all"
 msgstr "{0} invalid, rebuilding all"
 
-#: legacy/builder/builder_utils/utils.go:323
-#: legacy/builder/builder_utils/utils.go:329
-#: legacy/builder/builder_utils/utils.go:393
+#: legacy/builder/builder_utils/utils.go:326
+#: legacy/builder/builder_utils/utils.go:332
+#: legacy/builder/builder_utils/utils.go:396
 msgid "{0} newer than {1}"
 msgstr "{0} newer than {1}"
 
