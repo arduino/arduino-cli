@@ -21,6 +21,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -40,7 +41,7 @@ func CreateSketch(sketchDir string, sketchName string) (string, error) {
 		return "", err
 	}
 	baseSketchName := filepath.Base(sketchDir)
-	sketchFile := filepath.Join(sketchDir, baseSketchName+".ino")
+	sketchFile := filepath.Join(sketchDir, baseSketchName+globals.MainFileValidExtension)
 	if err := ioutil.WriteFile(sketchFile, emptySketch, os.FileMode(0644)); err != nil {
 		return "", err
 	}

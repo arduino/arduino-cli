@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	sk "github.com/arduino/arduino-cli/commands/sketch"
@@ -41,7 +42,7 @@ func initNewCommand() *cobra.Command {
 func runNewCommand(cmd *cobra.Command, args []string) {
 	// Trim to avoid issues if user creates a sketch adding the .ino extesion to the name
 	sketchName := args[0]
-	trimmedSketchName := strings.TrimSuffix(sketchName, ".ino")
+	trimmedSketchName := strings.TrimSuffix(sketchName, globals.MainFileValidExtension)
 	sketchDir, err := filepath.Abs(trimmedSketchName)
 	if err != nil {
 		feedback.Errorf(tr("Error creating sketch: %v"), err)
