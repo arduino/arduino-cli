@@ -50,7 +50,12 @@ func CreateSketch(sketchDir string, sketchName string) (string, error) {
 
 // NewSketch FIXMEDOC
 func NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchResponse, error) {
-	sketchesDir := configuration.Settings.GetString("directories.User")
+	var sketchesDir string
+	if len(req.SketchDir) > 0 {
+		sketchesDir = req.SketchDir
+	} else {
+		sketchesDir = configuration.Settings.GetString("directories.User")
+	}
 	sketchDir := filepath.Join(sketchesDir, req.SketchName)
 	sketchFile, err := CreateSketch(sketchDir, req.SketchName)
 	if err != nil {
