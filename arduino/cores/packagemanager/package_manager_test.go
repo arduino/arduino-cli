@@ -71,7 +71,7 @@ func TestResolveFQBN(t *testing.T) {
 	require.NotNil(t, platformRelease.Platform)
 	require.Equal(t, platformRelease.Platform.String(), "arduino:avr")
 	require.NotNil(t, board)
-	require.Equal(t, board.Name(), "Arduino/Genuino Uno")
+	require.Equal(t, board.Name(), "Arduino Uno")
 	require.NotNil(t, props)
 	require.Equal(t, platformRelease, buildPlatformRelease)
 
@@ -85,7 +85,7 @@ func TestResolveFQBN(t *testing.T) {
 	require.NotNil(t, platformRelease.Platform)
 	require.Equal(t, platformRelease.Platform.String(), "arduino:avr")
 	require.NotNil(t, board)
-	require.Equal(t, board.Name(), "Arduino/Genuino Mega or Mega 2560")
+	require.Equal(t, board.Name(), "Arduino Mega or Mega 2560")
 	require.NotNil(t, props)
 	require.Equal(t, platformRelease, buildPlatformRelease)
 
