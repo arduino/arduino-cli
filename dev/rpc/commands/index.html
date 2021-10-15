@@ -1350,6 +1350,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#newsketchrequest" class="md-nav__link">
+    NewSketchRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#newsketchresponse" class="md-nav__link">
+    NewSketchResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#outdatedrequest" class="md-nav__link">
     OutdatedRequest
   </a>
@@ -2580,6 +2594,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#newsketchrequest" class="md-nav__link">
+    NewSketchRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#newsketchresponse" class="md-nav__link">
+    NewSketchResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#outdatedrequest" class="md-nav__link">
     OutdatedRequest
   </a>
@@ -3387,6 +3415,8 @@
 <li><a href="#cc.arduino.cli.commands.v1.InitResponse.Progress">InitResponse.Progress</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.LoadSketchRequest">LoadSketchRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.LoadSketchResponse">LoadSketchResponse</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.NewSketchRequest">NewSketchRequest</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.NewSketchResponse">NewSketchResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.OutdatedRequest">OutdatedRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.OutdatedResponse">OutdatedResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndexRequest">UpdateCoreLibrariesIndexRequest</a></li>
@@ -4513,6 +4543,58 @@
 </tr>
 </tbody>
 </table>
+<p><a name="cc.arduino.cli.commands.v1.NewSketchRequest"></a></p>
+<h3 id="newsketchrequest">NewSketchRequest<a class="headerlink" href="#newsketchrequest" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>instance</td>
+<td><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></td>
+<td></td>
+<td>Arduino Core Service instance from the Init response.</td>
+</tr>
+<tr>
+<td>sketch_name</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>New sketch name</td>
+</tr>
+<tr>
+<td>sketch_dir</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Optional: create a Sketch in this directory (used as &#34;Sketchbook&#34; directory). Default Sketchbook directory &#34;directories.User&#34; is used if sketch_dir is empty.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.NewSketchResponse"></a></p>
+<h3 id="newsketchresponse">NewSketchResponse<a class="headerlink" href="#newsketchresponse" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>main_file</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Absolute path to a main sketch file</td>
+</tr>
+</tbody>
+</table>
 <p><a name="cc.arduino.cli.commands.v1.OutdatedRequest"></a></p>
 <h3 id="outdatedrequest">OutdatedRequest<a class="headerlink" href="#outdatedrequest" title="Permanent link">&para;</a></h3>
 <table>
@@ -4820,6 +4902,12 @@
 <td><a href="#cc.arduino.cli.commands.v1.VersionRequest">VersionRequest</a></td>
 <td><a href="#cc.arduino.cli.commands.v1.VersionResponse">VersionResponse</a></td>
 <td>Get the version of Arduino CLI in use.</td>
+</tr>
+<tr>
+<td>NewSketch</td>
+<td><a href="#cc.arduino.cli.commands.v1.NewSketchRequest">NewSketchRequest</a></td>
+<td><a href="#cc.arduino.cli.commands.v1.NewSketchResponse">NewSketchResponse</a></td>
+<td>Create a new Sketch</td>
 </tr>
 <tr>
 <td>LoadSketch</td>
