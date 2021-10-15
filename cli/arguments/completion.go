@@ -16,7 +16,7 @@ import (
 // It returns a list of fqbn
 // it's taken from cli/board/listall.go
 func GetInstalledBoards() []string {
-	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
+	inst := instance.CreateAndInit()
 
 	list, _ := board.ListAll(context.Background(), &rpc.BoardListAllRequest{
 		Instance:            inst,
@@ -34,24 +34,25 @@ func GetInstalledBoards() []string {
 // GetInstalledProtocols is an helper function useful to autocomplete.
 // It returns a list of protocols available based on the installed boards
 func GetInstalledProtocols() []string {
-	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
+	inst := instance.CreateAndInit()
 	pm := commands.GetPackageManager(inst.Id)
 	boards := pm.InstalledBoards()
 
-	// use this strange map because it should be more optimized
-	// we use only the key and not the value because we do not need it
-	intalledProtocolsMap := make(map[string]struct{})
+	installedProtocols := make(map[string]struct{})
 	for _, board := range boards {
-		// we filter and elaborate a bit the informations present in Properties
 		for _, protocol := range board.Properties.SubTree("upload.tool").FirstLevelKeys() {
-			if protocol != "default" { // remove this value since it's the default one
-				intalledProtocolsMap[protocol] = struct{}{}
+			if protocol == "default" {
+				// default is used as fallback when trying to upload to a board
+				// using a protocol not defined for it, it's useless showing it
+				// in autocompletion
+				continue
 			}
+			installedProtocols[protocol] = struct{}{}
 		}
 	}
-	res := make([]string, len(intalledProtocolsMap))
+	res := make([]string, len(installedProtocols))
 	i := 0
-	for k := range intalledProtocolsMap {
+	for k := range installedProtocols {
 		res[i] = k
 		i++
 	}
@@ -61,7 +62,7 @@ func GetInstalledProtocols() []string {
 // GetInstalledProgrammers is an helper function useful to autocomplete.
 // It returns a list of programmers available based on the installed boards
 func GetInstalledProgrammers() []string {
-	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
+	inst := instance.CreateAndInit()
 	pm := commands.GetPackageManager(inst.Id)
 
 	// we need the list of the available fqbn in order to get the list of the programmers
@@ -72,8 +73,8 @@ func GetInstalledProgrammers() []string {
 	})
 
 	installedProgrammers := make(map[string]string)
-	for _, i := range list.Boards {
-		fqbn, _ := cores.ParseFQBN(i.Fqbn)
+	for _, board := range list.Boards {
+		fqbn, _ := cores.ParseFQBN(board.Fqbn)
 		_, boardPlatform, _, _, _, _ := pm.ResolveFQBN(fqbn)
 		for programmerID, programmer := range boardPlatform.Programmers {
 			installedProgrammers[programmerID] = programmer.Name
@@ -92,7 +93,7 @@ func GetInstalledProgrammers() []string {
 // GetUninstallableCores is an helper function useful to autocomplete.
 // It returns a list of cores which can be uninstalled
 func GetUninstallableCores() []string {
-	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
+	inst := instance.CreateAndInit()
 
 	platforms, _ := core.GetPlatforms(&rpc.PlatformListRequest{
 		Instance:      inst,
@@ -110,7 +111,7 @@ func GetUninstallableCores() []string {
 // GetInstallableCores is an helper function useful to autocomplete.
 // It returns a list of cores which can be installed/downloaded
 func GetInstallableCores() []string {
-	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
+	inst := instance.CreateAndInit()
 
 	platforms, _ := core.PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:    inst,
@@ -125,13 +126,23 @@ func GetInstallableCores() []string {
 	return res
 }
 
-// GetUninstallableLibs is an helper function useful to autocomplete.
+// GetInstalledLibraries is an helper function useful to autocomplete.
+// It returns a list of libs which are currently installed, including the builtin ones
+func GetInstalledLibraries() []string {
+	return getLibraries(true)
+}
+
+// GetUninstallableLibraries is an helper function useful to autocomplete.
 // It returns a list of libs which can be uninstalled
-func GetUninstallableLibs() []string {
-	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
+func GetUninstallableLibraries() []string {
+	return getLibraries(false)
+}
+
+func getLibraries(all bool) []string {
+	inst := instance.CreateAndInit()
 	libs, _ := lib.LibraryList(context.Background(), &rpc.LibraryListRequest{
 		Instance:  inst,
-		All:       false,
+		All:       all,
 		Updatable: false,
 		Name:      "",
 		Fqbn:      "",
@@ -147,7 +158,7 @@ func GetUninstallableLibs() []string {
 // GetInstallableLibs is an helper function useful to autocomplete.
 // It returns a list of libs which can be installed/downloaded
 func GetInstallableLibs() []string {
-	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
+	inst := instance.CreateAndInit()
 
 	libs, _ := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
 		Instance: inst,
@@ -165,7 +176,7 @@ func GetInstallableLibs() []string {
 // It returns a list of boards which are currently connected
 // Obviously it does not suggests network ports because of the timeout
 func GetConnectedBoards() []string {
-	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
+	inst := instance.CreateAndInit()
 
 	list, _ := board.List(&rpc.BoardListRequest{
 		Instance: inst,

@@ -365,7 +365,7 @@ msgstr "Checksum:"
 msgid "Clean caches."
 msgstr "Clean caches."
 
-#: cli/cli.go:122
+#: cli/cli.go:124
 msgid "Comma-separated list of additional URLs for the Boards Manager."
 msgstr "Comma-separated list of additional URLs for the Boards Manager."
 
@@ -1214,7 +1214,7 @@ msgstr "Internal error in cache"
 msgid "Invalid '%[1]s' property: %[2]s"
 msgstr "Invalid '%[1]s' property: %[2]s"
 
-#: cli/cli.go:263
+#: cli/cli.go:265
 msgid "Invalid Call : should show Help, but it is available only in TEXT mode."
 msgstr "Invalid Call : should show Help, but it is available only in TEXT mode."
 
@@ -1271,11 +1271,11 @@ msgstr "Invalid library"
 msgid "Invalid network.proxy '%[1]s': %[2]s"
 msgstr "Invalid network.proxy '%[1]s': %[2]s"
 
-#: cli/cli.go:224
+#: cli/cli.go:226
 msgid "Invalid option for --log-level: %s"
 msgstr "Invalid option for --log-level: %s"
 
-#: cli/cli.go:241
+#: cli/cli.go:243
 msgid "Invalid output format: %s"
 msgstr "Invalid output format: %s"
 
@@ -1444,7 +1444,7 @@ msgstr "Maintainer: %s"
 msgid "Max time to wait for port discovery, e.g.: 30s, 1m"
 msgstr "Max time to wait for port discovery, e.g.: 30s, 1m"
 
-#: cli/cli.go:108
+#: cli/cli.go:109
 msgid "Messages with this level and above will be logged. Valid levels are: %s"
 msgstr "Messages with this level and above will be logged. Valid levels are: %s"
 
@@ -1667,7 +1667,7 @@ msgstr "Package website:"
 msgid "Paragraph: %s"
 msgstr "Paragraph: %s"
 
-#: cli/cli.go:112
+#: cli/cli.go:113
 msgid "Path to the file where logs will be written."
 msgstr "Path to the file where logs will be written."
 
@@ -2044,7 +2044,7 @@ msgstr "The connected devices search timeout, raise it if your board doesn't sho
 msgid "The connected devices search timeout, raise it if your board doesn't show up e.g.: 10s"
 msgstr "The connected devices search timeout, raise it if your board doesn't show up e.g.: 10s"
 
-#: cli/cli.go:121
+#: cli/cli.go:123
 msgid "The custom config file (if not specified the default will be used)."
 msgstr "The custom config file (if not specified the default will be used)."
 
@@ -2064,8 +2064,8 @@ msgid "The key '%[1]v' is not a list of items, can't remove from it.\n"
 msgstr "The key '%[1]v' is not a list of items, can't remove from it.\n"
 "Maybe use '%[2]s'?"
 
-#: cli/cli.go:113
-#: cli/cli.go:117
+#: cli/cli.go:115
+#: cli/cli.go:119
 msgid "The output format for the logs, can be: %s"
 msgstr "The output format for the logs, can be: %s"
 
@@ -2147,7 +2147,7 @@ msgstr "Unable to get Local App Data Folder: %v"
 msgid "Unable to get user home dir: %v"
 msgstr "Unable to get user home dir: %v"
 
-#: cli/cli.go:210
+#: cli/cli.go:212
 msgid "Unable to open file for logging: %s"
 msgstr "Unable to open file for logging: %s"
 
