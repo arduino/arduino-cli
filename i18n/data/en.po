@@ -70,7 +70,7 @@ msgstr "%s pattern is missing"
 msgid "%s uninstalled"
 msgstr "%s uninstalled"
 
-#: commands/errors.go:658
+#: commands/errors.go:671
 msgid "'%s' has an invalid signature"
 msgstr "'%s' has an invalid signature"
 
@@ -247,6 +247,10 @@ msgstr "Builds of 'core.a' are saved into this path to be cached and reused."
 msgid "Can't create data directory %s"
 msgstr "Can't create data directory %s"
 
+#: commands/errors.go:377
+msgid "Can't create sketch"
+msgstr "Can't create sketch"
+
 #: commands/lib/download.go:60
 #: commands/lib/download.go:63
 #: commands/lib/download.go:65
@@ -260,7 +264,7 @@ msgstr "Can't download library"
 msgid "Can't find dependencies for platform %s"
 msgstr "Can't find dependencies for platform %s"
 
-#: commands/errors.go:377
+#: commands/errors.go:390
 msgid "Can't open sketch"
 msgstr "Can't open sketch"
 
@@ -294,11 +298,11 @@ msgstr "Cannot create config file directory: %v"
 msgid "Cannot create config file: %v"
 msgstr "Cannot create config file: %v"
 
-#: commands/errors.go:621
+#: commands/errors.go:634
 msgid "Cannot create temp dir"
 msgstr "Cannot create temp dir"
 
-#: commands/errors.go:639
+#: commands/errors.go:652
 msgid "Cannot create temp file"
 msgstr "Cannot create temp file"
 
@@ -448,10 +452,6 @@ msgstr "Could not connect via HTTP"
 msgid "Could not create index directory"
 msgstr "Could not create index directory"
 
-#: cli/sketch/new.go:58
-msgid "Could not create sketch directory: %v"
-msgstr "Could not create sketch directory: %v"
-
 #: legacy/builder/phases/core_builder.go:48
 msgid "Couldn't deeply cache core build: {0}"
 msgstr "Couldn't deeply cache core build: {0}"
@@ -465,8 +465,8 @@ msgstr "Couldn't determine program size"
 msgid "Couldn't get current working directory: %v"
 msgstr "Couldn't get current working directory: %v"
 
-#: cli/sketch/new.go:32
-#: cli/sketch/new.go:33
+#: cli/sketch/new.go:35
+#: cli/sketch/new.go:36
 msgid "Create a new Sketch"
 msgstr "Create a new Sketch"
 
@@ -655,8 +655,8 @@ msgstr "Error creating output dir"
 msgid "Error creating sketch archive"
 msgstr "Error creating sketch archive"
 
-#: cli/sketch/new.go:54
-#: cli/sketch/new.go:64
+#: cli/sketch/new.go:50
+#: cli/sketch/new.go:59
 msgid "Error creating sketch: %v"
 msgstr "Error creating sketch: %v"
 
@@ -1344,7 +1344,7 @@ msgstr "Library '%s' not found"
 msgid "Library can't use both '%[1]s' and '%[2]s' folders. Double check {0}"
 msgstr "Library can't use both '%[1]s' and '%[2]s' folders. Double check {0}"
 
-#: commands/errors.go:414
+#: commands/errors.go:427
 msgid "Library install failed"
 msgstr "Library install failed"
 
@@ -1741,7 +1741,7 @@ msgstr "Port"
 msgid "Port closed:"
 msgstr "Port closed:"
 
-#: commands/errors.go:508
+#: commands/errors.go:521
 msgid "Port monitor error"
 msgstr "Port monitor error"
 
@@ -1978,7 +1978,7 @@ msgstr "Size (bytes):"
 msgid "Sketch cannot be located in build path. Please specify a different build path"
 msgstr "Sketch cannot be located in build path. Please specify a different build path"
 
-#: cli/sketch/new.go:68
+#: cli/sketch/new.go:63
 msgid "Sketch created in: %s"
 msgstr "Sketch created in: %s"
 
