@@ -16,17 +16,20 @@
 package security
 
 import (
+	"embed"
 	"fmt"
 	"io"
 	"os"
 
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/go-paths-helper"
-	rice "github.com/cmaglie/go.rice"
 	"golang.org/x/crypto/openpgp"
 )
 
 var tr = i18n.Tr
+
+//go:embed keys/*
+var keys embed.FS
 
 // VerifyArduinoDetachedSignature checks that the detached GPG signature (in the
 // signaturePath file) matches the given targetPath file and is an authentic
@@ -35,11 +38,7 @@ var tr = i18n.Tr
 // produced the signature is returned too. This function use the default and bundled
 // arduino_public.gpg.key
 func VerifyArduinoDetachedSignature(targetPath *paths.Path, signaturePath *paths.Path) (bool, *openpgp.Entity, error) {
-	keysBox, err := rice.FindBox("keys")
-	if err != nil {
-		panic("could not find bundled signature keys")
-	}
-	arduinoKeyringFile, err := keysBox.Open("arduino_public.gpg.key")
+	arduinoKeyringFile, err := keys.Open("keys/arduino_public.gpg.key")
 	if err != nil {
 		panic("could not find bundled signature keys")
 	}

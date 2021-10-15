@@ -16,35 +16,30 @@
 package i18n
 
 import (
-	"os"
-	"path/filepath"
+	"embed"
 	"strings"
 
-	rice "github.com/cmaglie/go.rice"
 	"github.com/leonelquinteros/gotext"
 )
 
-var (
-	po  *gotext.Po
-	box *rice.Box
-)
+var po *gotext.Po
+
+//go:embed data/*.po
+var contents embed.FS
 
 func init() {
 	po = new(gotext.Po)
 }
 
-func initRiceBox() {
-	box = rice.MustFindBox("./data")
-}
-
 func supportedLocales() []string {
 	var locales []string
-	box.Walk("", func(path string, info os.FileInfo, err error) error {
-		if filepath.Ext(path) == ".po" {
-			locales = append(locales, strings.TrimSuffix(path, ".po"))
-		}
-		return nil
-	})
+	files, err := contents.ReadDir("data")
+	if err != nil {
+		panic("Error reading embedded i18n data: " + err.Error())
+	}
+	for _, file := range files {
+		locales = append(locales, strings.TrimSuffix(file.Name(), ".po"))
+	}
 	return locales
 }
 
@@ -76,7 +71,10 @@ func findMatchingLocale(locale string, supportedLocales []string) string {
 }
 
 func setLocale(locale string) {
-	poFile := box.MustBytes(locale + ".po")
+	poFile, err := contents.ReadFile("data/" + locale + ".po")
+	if err != nil {
+		panic("Error reading embedded i18n data: " + err.Error())
+	}
 	po = new(gotext.Po)
 	po.Parse(poFile)
 }

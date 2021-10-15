@@ -19,7 +19,6 @@ import (
 	"testing"
 
 	"github.com/arduino/go-paths-helper"
-	rice "github.com/cmaglie/go.rice"
 	"github.com/stretchr/testify/require"
 )
 
@@ -59,11 +58,7 @@ func TestVerifyDetachedSignature(t *testing.T) {
 }
 
 func TestVerifySignature(t *testing.T) {
-	keysBox, err := rice.FindBox("keys")
-	if err != nil {
-		panic("could not find bundled signature keys")
-	}
-	arduinoKeyringFile, err := keysBox.Open("arduino_public.gpg.key")
+	arduinoKeyringFile, err := keys.Open("keys/arduino_public.gpg.key")
 	if err != nil {
 		panic("could not find bundled signature keys")
 	}

@@ -3,7 +3,6 @@ comment: off
 ignore:
   - rpc/**
   - i18n/cmd/**
-  - i18n/rice-box.go
 
 coverage:
   status:
