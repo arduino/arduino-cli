@@ -288,9 +288,10 @@ message NewSketchRequest {
   Instance instance = 1;
   // New sketch name
   string sketch_name = 2;
-  // Optional: create a sketch directory in this directory
-  // (used as "sketches" directory), the directory must exist.
-  // "directories.User" directory will be used otherwise.
+  // Optional: create a Sketch in this directory
+  // (used as "Sketchbook" directory).
+  // Default Sketchbook directory "directories.User" is used if sketch_dir is
+  // empty.
   string sketch_dir = 3;
 }
 

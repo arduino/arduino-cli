@@ -465,8 +465,8 @@ msgstr "Couldn't determine program size"
 msgid "Couldn't get current working directory: %v"
 msgstr "Couldn't get current working directory: %v"
 
-#: cli/sketch/new.go:33
-#: cli/sketch/new.go:34
+#: cli/sketch/new.go:35
+#: cli/sketch/new.go:36
 msgid "Create a new Sketch"
 msgstr "Create a new Sketch"
 
@@ -655,8 +655,8 @@ msgstr "Error creating output dir"
 msgid "Error creating sketch archive"
 msgstr "Error creating sketch archive"
 
-#: cli/sketch/new.go:48
-#: cli/sketch/new.go:53
+#: cli/sketch/new.go:50
+#: cli/sketch/new.go:59
 msgid "Error creating sketch: %v"
 msgstr "Error creating sketch: %v"
 
@@ -1978,7 +1978,7 @@ msgstr "Size (bytes):"
 msgid "Sketch cannot be located in build path. Please specify a different build path"
 msgstr "Sketch cannot be located in build path. Please specify a different build path"
 
-#: cli/sketch/new.go:57
+#: cli/sketch/new.go:63
 msgid "Sketch created in: %s"
 msgstr "Sketch created in: %s"
 

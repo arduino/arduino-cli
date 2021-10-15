@@ -16,6 +16,7 @@
 package sketch
 
 import (
+	"context"
 	"os"
 	"strings"
 
@@ -23,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	sk "github.com/arduino/arduino-cli/commands/sketch"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/spf13/cobra"
 )
@@ -48,11 +50,15 @@ func runNewCommand(cmd *cobra.Command, args []string) {
 		feedback.Errorf(tr("Error creating sketch: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	_, err = sk.CreateSketch(sketchDirPath)
+	_, err = sk.NewSketch(context.Background(), &rpc.NewSketchRequest{
+		Instance:   nil,
+		SketchName: sketchDirPath.Base(),
+		SketchDir:  sketchDirPath.Parent().String(),
+	})
 	if err != nil {
 		feedback.Errorf(tr("Error creating sketch: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	feedback.Print(tr("Sketch created in: %s", sketchDirPath.String()))
+	feedback.Print(tr("Sketch created in: %s", sketchDirPath))
 }

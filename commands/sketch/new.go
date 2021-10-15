@@ -33,19 +33,6 @@ void loop() {
 }
 `)
 
-// CreateSketch creates a new sketch
-func CreateSketch(sketchDirPath *paths.Path) (*paths.Path, error) {
-	if err := sketchDirPath.MkdirAll(); err != nil {
-		return nil, err
-	}
-	baseSketchName := sketchDirPath.Base()
-	sketchFilePath := sketchDirPath.Join(baseSketchName + globals.MainFileValidExtension)
-	if err := sketchFilePath.WriteFile(emptySketch); err != nil {
-		return nil, err
-	}
-	return sketchFilePath, nil
-}
-
 // NewSketch creates a new sketch via gRPC
 func NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchResponse, error) {
 	var sketchesDir string
@@ -55,10 +42,14 @@ func NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchRe
 		sketchesDir = configuration.Settings.GetString("directories.User")
 	}
 	sketchDirPath := paths.New(sketchesDir).Join(req.SketchName)
-	sketchFilePath, err := CreateSketch(sketchDirPath)
-	if err != nil {
+	if err := sketchDirPath.MkdirAll(); err != nil {
+		return nil, &commands.CantCreateSketchError{Cause: err}
+	}
+	sketchName := sketchDirPath.Base()
+	sketchMainFilePath := sketchDirPath.Join(sketchName + globals.MainFileValidExtension)
+	if err := sketchMainFilePath.WriteFile(emptySketch); err != nil {
 		return nil, &commands.CantCreateSketchError{Cause: err}
 	}
 
-	return &rpc.NewSketchResponse{MainFile: sketchFilePath.String()}, nil
+	return &rpc.NewSketchResponse{MainFile: sketchMainFilePath.String()}, nil
 }
