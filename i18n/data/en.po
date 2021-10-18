@@ -2444,8 +2444,8 @@ msgid "binary file not found in %s"
 msgstr "binary file not found in %s"
 
 #: arduino/cores/packagemanager/package_manager.go:189
-msgid "board %s:%s not found"
-msgstr "board %s:%s not found"
+msgid "board %s not found"
+msgstr "board %s not found"
 
 #: commands/board/list.go:41
 msgid "board not found"
