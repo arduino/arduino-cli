@@ -22,6 +22,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -43,6 +44,9 @@ func initExamplesCommand() *cobra.Command {
 		Run:     runExamplesCommand,
 	}
 	examplesCommand.Flags().StringVarP(&examplesFlags.fqbn, "fqbn", "b", "", tr("Show libraries for the specified board FQBN."))
+	examplesCommand.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return arguments.GetInstalledBoards(toComplete), cobra.ShellCompDirectiveDefault
+	})
 	return examplesCommand
 }
 

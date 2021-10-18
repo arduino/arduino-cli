@@ -55,6 +55,9 @@ func NewCommand() *cobra.Command {
 	}
 
 	uploadCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
+	uploadCommand.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return arguments.GetInstalledBoards(toComplete), cobra.ShellCompDirectiveDefault
+	})
 	port.AddToCommand(uploadCommand)
 	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries to upload."))
 	uploadCommand.Flags().StringVarP(&importFile, "input-file", "i", "", tr("Binary file to upload."))

@@ -51,6 +51,9 @@ func NewCommand() *cobra.Command {
 	}
 
 	burnBootloaderCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
+	burnBootloaderCommand.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return arguments.GetInstalledBoards(toComplete), cobra.ShellCompDirectiveDefault
+	})
 	port.AddToCommand(burnBootloaderCommand)
 	burnBootloaderCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
 	burnBootloaderCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Turns on verbose mode."))
