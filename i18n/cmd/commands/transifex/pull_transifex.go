@@ -70,9 +70,6 @@ func getLanguages() []string {
 
 	var langs []string
 	for key := range jsonResp {
-		if key == "en" {
-			continue
-		}
 		langs = append(langs, key)
 	}
 

@@ -322,22 +322,6 @@ In order to support i18n in the CLI, any messages that are intended to be transl
 `i18n.Tr`. This call allows us to build a catalog of translatable strings, replacing the reference string at runtime
 with the localized value.
 
-Adding or modifying these messages requires an i18n update, as this process creates the reference catalog that is shared
-with translators. For that reason, the `task check` command will fail if the catalog was not updated to sync with
-changes to the source code.
-
-To update the catalog, execute the following command and commit the changes.
-
-```shell
-task i18n:update
-```
-
-To verify that the catalog is up-to-date, you may execute the command:
-
-```shell
-task i18n:check
-```
-
 Example usage:
 
 ```golang
