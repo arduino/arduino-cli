@@ -3040,11 +3040,11 @@ msgstr "opening boards.txt: %s"
 msgid "opening port at 1200bps"
 msgstr "opening port at 1200bps"
 
-#: arduino/security/signatures.go:81
+#: arduino/security/signatures.go:80
 msgid "opening signature file: %s"
 msgstr "opening signature file: %s"
 
-#: arduino/security/signatures.go:76
+#: arduino/security/signatures.go:75
 msgid "opening target file: %s"
 msgstr "opening target file: %s"
 
@@ -3223,7 +3223,7 @@ msgstr "removing tool files: %s"
 msgid "required version %[1]s not found for platform %[2]s"
 msgstr "required version %[1]s not found for platform %[2]s"
 
-#: arduino/security/signatures.go:72
+#: arduino/security/signatures.go:71
 msgid "retrieving Arduino public keys: %s"
 msgstr "retrieving Arduino public keys: %s"
 

@@ -7,13 +7,6 @@ source using the `go/ast` package to generate the `en` locale using these messag
 
 ## Updating messages to reflect code changes
 
-Install [go-rice](https://github.com/cmaglie/go.rice)
-
-```sh
-go get github.com/cmaglie/go.rice
-go get github.com/cmaglie/go.rice/rice
-```
-
 The following command updates the locales present in the source code to reflect addition/removal of messages.
 
 ```sh

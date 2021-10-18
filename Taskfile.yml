@@ -285,7 +285,7 @@ tasks:
     desc: Generate embedded i18n catalog files
     cmds:
       - git add -N ./i18n/data
-      - git diff --exit-code ./i18n/data &> /dev/null || { cd ./i18n && rice embed-go; }
+      - git diff --exit-code ./i18n/data &> /dev/null
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-mkdocs-task/Taskfile.yml
   website:check:
