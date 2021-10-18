@@ -395,7 +395,7 @@ msgstr "Compiling core..."
 msgid "Compiling libraries..."
 msgstr "Compiling libraries..."
 
-#: legacy/builder/phases/libraries_builder.go:135
+#: legacy/builder/phases/libraries_builder.go:136
 msgid "Compiling library \"{0}\""
 msgstr "Compiling library \"{0}\""
 
@@ -1358,7 +1358,7 @@ msgstr "Library installed"
 msgid "Library name"
 msgstr "Library name"
 
-#: legacy/builder/phases/libraries_builder.go:91
+#: legacy/builder/phases/libraries_builder.go:92
 msgid "Library {0} has been declared precompiled:"
 msgstr "Library {0} has been declared precompiled:"
 
@@ -1745,8 +1745,8 @@ msgstr "Port closed:"
 msgid "Port monitor error"
 msgstr "Port monitor error"
 
-#: legacy/builder/phases/libraries_builder.go:101
-#: legacy/builder/phases/libraries_builder.go:109
+#: legacy/builder/phases/libraries_builder.go:102
+#: legacy/builder/phases/libraries_builder.go:110
 msgid "Precompiled library in \"{0}\" not found"
 msgstr "Precompiled library in \"{0}\" not found"
 
@@ -2069,7 +2069,7 @@ msgstr "The key '%[1]v' is not a list of items, can't remove from it.\n"
 msgid "The output format for the logs, can be: %s"
 msgstr "The output format for the logs, can be: %s"
 
-#: legacy/builder/phases/libraries_builder.go:151
+#: legacy/builder/phases/libraries_builder.go:152
 msgid "The platform does not support '{0}' for precompiled libraries."
 msgstr "The platform does not support '{0}' for precompiled libraries."
 
@@ -2333,8 +2333,8 @@ msgstr "Using library {0} in folder: {1} {2}"
 msgid "Using precompiled core: {0}"
 msgstr "Using precompiled core: {0}"
 
-#: legacy/builder/phases/libraries_builder.go:98
-#: legacy/builder/phases/libraries_builder.go:106
+#: legacy/builder/phases/libraries_builder.go:99
+#: legacy/builder/phases/libraries_builder.go:107
 msgid "Using precompiled library in {0}"
 msgstr "Using precompiled library in {0}"
 

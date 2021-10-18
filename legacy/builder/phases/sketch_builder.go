@@ -27,7 +27,8 @@ type SketchBuilder struct{}
 func (s *SketchBuilder) Run(ctx *types.Context) error {
 	sketchBuildPath := ctx.SketchBuildPath
 	buildProperties := ctx.BuildProperties
-	includes := utils.Map(ctx.IncludeFolders.AsStrings(), utils.WrapWithHyphenI)
+    libFolders := append(ctx.IncludeFolders.AsStrings(), ctx.BuildPath.Join("sketch").Join("libdefs").String()) // user definitions for library include files
+    includes := utils.Map(libFolders, utils.WrapWithHyphenI)
 
 	if err := sketchBuildPath.MkdirAll(); err != nil {
 		return errors.WithStack(err)
