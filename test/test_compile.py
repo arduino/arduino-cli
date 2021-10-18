@@ -865,7 +865,7 @@ def test_compile_using_boards_local_txt(run_command, data_dir):
     # Verifies compilation fails because board doesn't exist
     res = run_command(["compile", "--clean", "-b", fqbn, sketch_path])
     assert res.failed
-    assert "Error during build: Error resolving FQBN: board arduino:avr@1.8.3:nessuno not found" in res.stderr
+    assert "Error during build: Error resolving FQBN: board arduino:avr:nessuno not found" in res.stderr
 
     # Use custom boards.local.txt with made arduino:avr:nessuno board
     boards_local_txt = Path(data_dir, "packages", "arduino", "hardware", "avr", "1.8.3", "boards.local.txt")
@@ -943,8 +943,7 @@ def test_compile_manually_installed_platform_using_boards_local_txt(run_command,
     res = run_command(["compile", "--clean", "-b", fqbn, sketch_path])
     assert res.failed
     assert (
-        "Error during build: Error resolving FQBN: board arduino-beta-development:avr@1.8.3:nessuno not found"
-        in res.stderr
+        "Error during build: Error resolving FQBN: board arduino-beta-development:avr:nessuno not found" in res.stderr
     )
 
     # Use custom boards.local.txt with made arduino:avr:nessuno board
