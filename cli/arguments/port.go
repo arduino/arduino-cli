@@ -43,6 +43,9 @@ type Port struct {
 func (p *Port) AddToCommand(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&p.address, "port", "p", "", tr("Upload port address, e.g.: COM3 or /dev/ttyACM2"))
 	cmd.Flags().StringVarP(&p.protocol, "protocol", "l", "", tr("Upload port protocol, e.g: serial"))
+	cmd.RegisterFlagCompletionFunc("protocol", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return GetInstalledProtocols(toComplete), cobra.ShellCompDirectiveDefault
+	})
 	cmd.Flags().DurationVar(&p.timeout, "discovery-timeout", 5*time.Second, tr("Max time to wait for port discovery, e.g.: 30s, 1m"))
 }
 

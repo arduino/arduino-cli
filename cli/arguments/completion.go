@@ -26,3 +26,18 @@ func GetInstalledBoards(toComplete string) []string {
 	}
 	return res
 }
+
+// GetInstalledProtocols is an helper function usefull to autocomplete.
+// It returns a list of protocols available
+func GetInstalledProtocols(toComplete string) []string {
+	inst := instance.CreateAndInit() // TODO optimize this: it does not make sense to create an instance everytime
+
+	detectedBoards, _ := board.List(&rpc.BoardListRequest{
+		Instance: inst,
+	})
+	var res []string
+	for _, i := range detectedBoards {
+		res = append(res, i.Port.Protocol)
+	}
+	return res
+}

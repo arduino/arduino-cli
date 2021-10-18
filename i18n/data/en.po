@@ -1418,7 +1418,7 @@ msgstr "Low memory available, stability problems may occur."
 msgid "Maintainer: %s"
 msgstr "Maintainer: %s"
 
-#: cli/arguments/port.go:46
+#: cli/arguments/port.go:49
 msgid "Max time to wait for port discovery, e.g.: 30s, 1m"
 msgstr "Max time to wait for port discovery, e.g.: 30s, 1m"
 
@@ -3031,7 +3031,7 @@ msgstr "pluggable discovery already added: %s"
 msgid "port"
 msgstr "port"
 
-#: cli/arguments/port.go:122
+#: cli/arguments/port.go:125
 msgid "port not found: %[1]s %[2]s"
 msgstr "port not found: %[1]s %[2]s"
 
