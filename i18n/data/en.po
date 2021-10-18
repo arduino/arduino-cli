@@ -9,7 +9,7 @@ msgstr "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
 msgid "%[1]s folder is no longer supported! See %[2]s for more information"
 msgstr "%[1]s folder is no longer supported! See %[2]s for more information"
 
-#: cli/lib/check_deps.go:96
+#: cli/lib/check_deps.go:100
 msgid "%[1]s is required but %[2]s is currently installed."
 msgstr "%[1]s is required but %[2]s is currently installed."
 
@@ -45,7 +45,7 @@ msgstr "%s downloaded"
 msgid "%s installed"
 msgstr "%s installed"
 
-#: cli/lib/check_deps.go:93
+#: cli/lib/check_deps.go:97
 msgid "%s is already installed."
 msgstr "%s is already installed."
 
@@ -57,7 +57,7 @@ msgstr "%s is not a directory"
 msgid "%s is not managed by package manager"
 msgstr "%s is not managed by package manager"
 
-#: cli/lib/check_deps.go:90
+#: cli/lib/check_deps.go:94
 msgid "%s must be installed."
 msgstr "%s must be installed."
 
@@ -83,11 +83,11 @@ msgstr "(hidden)"
 msgid "(legacy)"
 msgstr "(legacy)"
 
-#: cli/lib/install.go:73
+#: cli/lib/install.go:77
 msgid "--git-url and --zip-path are disabled by default, for more information see: %v"
 msgstr "--git-url and --zip-path are disabled by default, for more information see: %v"
 
-#: cli/lib/install.go:76
+#: cli/lib/install.go:80
 msgid "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk."
 msgstr "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk."
 
@@ -176,7 +176,7 @@ msgstr "Arduino cache commands."
 msgid "Arduino commands about libraries."
 msgstr "Arduino commands about libraries."
 
-#: cli/config/config.go:31
+#: cli/config/config.go:33
 msgid "Arduino configuration commands."
 msgstr "Arduino configuration commands."
 
@@ -185,8 +185,8 @@ msgstr "Arduino configuration commands."
 msgid "Arduino core operations."
 msgstr "Arduino core operations."
 
-#: cli/lib/check_deps.go:50
-#: cli/lib/install.go:119
+#: cli/lib/check_deps.go:54
+#: cli/lib/install.go:123
 msgid "Arguments error: %v"
 msgstr "Arguments error: %v"
 
@@ -212,7 +212,7 @@ msgstr "Available"
 msgid "Available Commands:"
 msgstr "Available Commands:"
 
-#: cli/upload/upload.go:60
+#: cli/upload/upload.go:63
 msgid "Binary file to upload."
 msgstr "Binary file to upload."
 
@@ -227,11 +227,11 @@ msgstr "Board Name"
 msgid "Board found: %s"
 msgstr "Board found: %s"
 
-#: cli/board/details.go:120
+#: cli/board/details.go:124
 msgid "Board name:"
 msgstr "Board name:"
 
-#: cli/board/details.go:122
+#: cli/board/details.go:126
 msgid "Board version:"
 msgstr "Board version:"
 
@@ -239,7 +239,7 @@ msgstr "Board version:"
 msgid "Bootloader file specified but missing: {0}"
 msgstr "Bootloader file specified but missing: {0}"
 
-#: cli/compile/compile.go:91
+#: cli/compile/compile.go:90
 msgid "Builds of 'core.a' are saved into this path to be cached and reused."
 msgstr "Builds of 'core.a' are saved into this path to be cached and reused."
 
@@ -268,7 +268,7 @@ msgstr "Can't find dependencies for platform %s"
 msgid "Can't open sketch"
 msgstr "Can't open sketch"
 
-#: cli/config/set.go:54
+#: cli/config/set.go:57
 msgid "Can't set multiple values in key %v"
 msgstr "Can't set multiple values in key %v"
 
@@ -276,9 +276,9 @@ msgstr "Can't set multiple values in key %v"
 msgid "Can't use both --dest-file and --dest-dir flags at the same time."
 msgstr "Can't use both --dest-file and --dest-dir flags at the same time."
 
-#: cli/config/add.go:60
-#: cli/config/delete.go:67
-#: cli/config/remove.go:69
+#: cli/config/add.go:63
+#: cli/config/delete.go:70
+#: cli/config/remove.go:72
 msgid "Can't write config file: %v"
 msgstr "Can't write config file: %v"
 
@@ -344,8 +344,8 @@ msgstr "Cannot upgrade platform"
 msgid "Category: %s"
 msgstr "Category: %s"
 
-#: cli/lib/check_deps.go:35
 #: cli/lib/check_deps.go:36
+#: cli/lib/check_deps.go:37
 msgid "Check dependencies status for the specified library."
 msgstr "Check dependencies status for the specified library."
 
@@ -361,7 +361,7 @@ msgstr "Checking previous results for {0} (result = {1}, dep = {2})"
 msgid "Checksum differs from checksum in package.json"
 msgstr "Checksum differs from checksum in package.json"
 
-#: cli/board/details.go:168
+#: cli/board/details.go:172
 msgid "Checksum:"
 msgstr "Checksum:"
 
@@ -369,7 +369,7 @@ msgstr "Checksum:"
 msgid "Clean caches."
 msgstr "Clean caches."
 
-#: cli/cli.go:113
+#: cli/cli.go:124
 msgid "Comma-separated list of additional URLs for the Boards Manager."
 msgstr "Comma-separated list of additional URLs for the Boards Manager."
 
@@ -382,8 +382,8 @@ msgstr "Command keeps running and prints list of connected boards whenever there
 msgid "Compiled sketch not found in %s"
 msgstr "Compiled sketch not found in %s"
 
+#: cli/compile/compile.go:73
 #: cli/compile/compile.go:74
-#: cli/compile/compile.go:75
 msgid "Compiles Arduino sketches."
 msgstr "Compiles Arduino sketches."
 
@@ -415,7 +415,7 @@ msgstr "Config file written to: %s"
 msgid "Configuration of the port."
 msgstr "Configuration of the port."
 
-#: cli/debug/debug.go:153
+#: cli/debug/debug.go:159
 msgid "Configuration options for %s"
 msgstr "Configuration options for %s"
 
@@ -431,7 +431,7 @@ msgstr "Configuring platform."
 msgid "Connected"
 msgstr "Connected"
 
-#: cli/monitor/monitor.go:174
+#: cli/monitor/monitor.go:177
 msgid "Connected to %s! Press CTRL-C to exit."
 msgstr "Connected to %s! Press CTRL-C to exit."
 
@@ -461,7 +461,7 @@ msgid "Couldn't determine program size"
 msgstr "Couldn't determine program size"
 
 #: cli/arguments/sketch.go:36
-#: cli/lib/install.go:99
+#: cli/lib/install.go:103
 msgid "Couldn't get current working directory: %v"
 msgstr "Couldn't get current working directory: %v"
 
@@ -492,7 +492,7 @@ msgstr "Debug Arduino sketches."
 msgid "Debug Arduino sketches. (this command opens an interactive gdb session)"
 msgstr "Debug Arduino sketches. (this command opens an interactive gdb session)"
 
-#: cli/debug/debug.go:64
+#: cli/debug/debug.go:70
 msgid "Debug interpreter e.g.: %s"
 msgstr "Debug interpreter e.g.: %s"
 
@@ -500,11 +500,11 @@ msgstr "Debug interpreter e.g.: %s"
 msgid "Debugging not supported for board %s"
 msgstr "Debugging not supported for board %s"
 
-#: cli/board/details.go:124
+#: cli/board/details.go:128
 msgid "Debugging supported:"
 msgstr "Debugging supported:"
 
-#: cli/monitor/monitor.go:192
+#: cli/monitor/monitor.go:195
 msgid "Default"
 msgstr "Default"
 
@@ -541,11 +541,11 @@ msgstr "Detecting libraries used..."
 msgid "Detects and displays a list of boards connected to the current computer."
 msgstr "Detects and displays a list of boards connected to the current computer."
 
-#: cli/debug/debug.go:65
+#: cli/debug/debug.go:71
 msgid "Directory containing binaries for debug."
 msgstr "Directory containing binaries for debug."
 
-#: cli/upload/upload.go:59
+#: cli/upload/upload.go:62
 msgid "Directory containing binaries to upload."
 msgstr "Directory containing binaries to upload."
 
@@ -565,12 +565,12 @@ msgstr "Disconnected"
 msgid "Display only the provided gRPC calls"
 msgstr "Display only the provided gRPC calls"
 
-#: cli/lib/install.go:50
+#: cli/lib/install.go:54
 msgid "Do not install dependencies."
 msgstr "Do not install dependencies."
 
-#: cli/burnbootloader/burnbootloader.go:58
-#: cli/upload/upload.go:64
+#: cli/burnbootloader/burnbootloader.go:64
+#: cli/upload/upload.go:70
 msgid "Do not perform the actual upload, just log out actions"
 msgstr "Do not perform the actual upload, just log out actions"
 
@@ -597,8 +597,8 @@ msgstr "Downloading packages"
 msgid "Downloads one or more cores and corresponding tool dependencies."
 msgstr "Downloads one or more cores and corresponding tool dependencies."
 
-#: cli/lib/download.go:35
 #: cli/lib/download.go:36
+#: cli/lib/download.go:37
 msgid "Downloads one or more libraries without installing them."
 msgstr "Downloads one or more libraries without installing them."
 
@@ -606,11 +606,11 @@ msgstr "Downloads one or more libraries without installing them."
 msgid "Enable debug logging of gRPC calls"
 msgstr "Enable debug logging of gRPC calls"
 
-#: cli/lib/install.go:52
+#: cli/lib/install.go:56
 msgid "Enter a path to zip file"
 msgstr "Enter a path to zip file"
 
-#: cli/lib/install.go:51
+#: cli/lib/install.go:55
 msgid "Enter git url for libraries hosted on repositories"
 msgstr "Enter git url for libraries hosted on repositories"
 
@@ -665,8 +665,8 @@ msgstr "Error creating sketch: %v"
 msgid "Error detecting boards: %v"
 msgstr "Error detecting boards: %v"
 
-#: cli/core/download.go:68
-#: cli/lib/download.go:62
+#: cli/core/download.go:71
+#: cli/lib/download.go:66
 msgid "Error downloading %[1]s: %[2]v"
 msgstr "Error downloading %[1]s: %[2]v"
 
@@ -710,9 +710,9 @@ msgstr "Error downloading platform %s"
 msgid "Error downloading tool %s"
 msgstr "Error downloading tool %s"
 
-#: cli/debug/debug.go:81
-#: cli/debug/debug.go:86
-#: cli/debug/debug.go:115
+#: cli/debug/debug.go:87
+#: cli/debug/debug.go:92
+#: cli/debug/debug.go:121
 msgid "Error during Debug: %v"
 msgstr "Error during Debug: %v"
 
@@ -720,28 +720,28 @@ msgstr "Error during Debug: %v"
 msgid "Error during JSON encoding of the output: %v"
 msgstr "Error during JSON encoding of the output: %v"
 
-#: cli/burnbootloader/burnbootloader.go:70
-#: cli/burnbootloader/burnbootloader.go:83
-#: cli/compile/compile.go:199
-#: cli/compile/compile.go:205
-#: cli/compile/compile.go:215
-#: cli/compile/compile.go:247
-#: cli/upload/upload.go:95
+#: cli/burnbootloader/burnbootloader.go:76
+#: cli/burnbootloader/burnbootloader.go:89
+#: cli/compile/compile.go:201
+#: cli/compile/compile.go:207
+#: cli/compile/compile.go:217
+#: cli/compile/compile.go:249
 #: cli/upload/upload.go:101
-#: cli/upload/upload.go:117
-#: cli/upload/upload.go:144
+#: cli/upload/upload.go:107
+#: cli/upload/upload.go:123
+#: cli/upload/upload.go:150
 msgid "Error during Upload: %v"
 msgstr "Error during Upload: %v"
 
-#: cli/compile/compile.go:259
+#: cli/compile/compile.go:261
 msgid "Error during build: %v"
 msgstr "Error during build: %v"
 
-#: cli/core/install.go:106
+#: cli/core/install.go:109
 msgid "Error during install: %v"
 msgstr "Error during install: %v"
 
-#: cli/core/uninstall.go:68
+#: cli/core/uninstall.go:71
 msgid "Error during uninstall: %v"
 msgstr "Error during uninstall: %v"
 
@@ -757,7 +757,7 @@ msgstr "Error extracting library_index.json.gz"
 msgid "Error finding build artifacts"
 msgstr "Error finding build artifacts"
 
-#: cli/debug/debug.go:102
+#: cli/debug/debug.go:108
 msgid "Error getting Debug info: %v"
 msgstr "Error getting Debug info: %v"
 
@@ -765,7 +765,7 @@ msgstr "Error getting Debug info: %v"
 msgid "Error getting absolute path of sketch archive"
 msgstr "Error getting absolute path of sketch archive"
 
-#: cli/board/details.go:71
+#: cli/board/details.go:75
 msgid "Error getting board details: %v"
 msgstr "Error getting board details: %v"
 
@@ -786,11 +786,11 @@ msgstr "Error getting current directory for compilation database: %s"
 msgid "Error getting information for library %s"
 msgstr "Error getting information for library %s"
 
-#: cli/lib/examples.go:69
+#: cli/lib/examples.go:76
 msgid "Error getting libraries info: %v"
 msgstr "Error getting libraries info: %v"
 
-#: cli/monitor/monitor.go:87
+#: cli/monitor/monitor.go:90
 msgid "Error getting port settings details: %s"
 msgstr "Error getting port settings details: %s"
 
@@ -805,15 +805,15 @@ msgstr "Error in FQBN: %s"
 msgid "Error initializing instance: %v"
 msgstr "Error initializing instance: %v"
 
-#: cli/lib/install.go:132
+#: cli/lib/install.go:136
 msgid "Error installing %s: %v"
 msgstr "Error installing %s: %v"
 
-#: cli/lib/install.go:110
+#: cli/lib/install.go:114
 msgid "Error installing Git Library: %v"
 msgstr "Error installing Git Library: %v"
 
-#: cli/lib/install.go:87
+#: cli/lib/install.go:91
 msgid "Error installing Zip Library: %v"
 msgstr "Error installing Zip Library: %v"
 
@@ -837,7 +837,7 @@ msgstr "Error listing boards: %v"
 msgid "Error listing platforms: %v"
 msgstr "Error listing platforms: %v"
 
-#: cli/compile/compile.go:150
+#: cli/compile/compile.go:152
 msgid "Error opening source code overrides data file: %v"
 msgstr "Error opening source code overrides data file: %v"
 
@@ -857,7 +857,7 @@ msgstr "Error reading sketch files"
 msgid "Error resolving FQBN: {0}"
 msgstr "Error resolving FQBN: {0}"
 
-#: cli/lib/check_deps.go:60
+#: cli/lib/check_deps.go:64
 msgid "Error resolving dependencies for %[1]s: %[2]s"
 msgstr "Error resolving dependencies for %[1]s: %[2]s"
 
@@ -908,7 +908,7 @@ msgstr "Error serializing compilation database: %s"
 msgid "Error starting board discoveries"
 msgstr "Error starting board discoveries"
 
-#: cli/lib/uninstall.go:62
+#: cli/lib/uninstall.go:66
 msgid "Error uninstalling %[1]s: %[2]v"
 msgstr "Error uninstalling %[1]s: %[2]v"
 
@@ -985,7 +985,7 @@ msgstr "Error writing library_index.json.sig"
 msgid "Error: command description is not supported by %v"
 msgstr "Error: command description is not supported by %v"
 
-#: cli/compile/compile.go:157
+#: cli/compile/compile.go:159
 msgid "Error: invalid source code overrides data file: %v"
 msgstr "Error: invalid source code overrides data file: %v"
 
@@ -993,7 +993,7 @@ msgstr "Error: invalid source code overrides data file: %v"
 msgid "Event"
 msgstr "Event"
 
-#: cli/lib/examples.go:118
+#: cli/lib/examples.go:125
 msgid "Examples for library %s"
 msgstr "Examples for library %s"
 
@@ -1001,7 +1001,7 @@ msgstr "Examples for library %s"
 msgid "Examples:"
 msgstr "Examples:"
 
-#: cli/debug/debug.go:134
+#: cli/debug/debug.go:140
 msgid "Executable to debug"
 msgstr "Executable to debug"
 
@@ -1011,7 +1011,7 @@ msgid "Expected compiled sketch in directory %s, but is a file instead"
 msgstr "Expected compiled sketch in directory %s, but is a file instead"
 
 #: cli/board/attach.go:35
-#: cli/board/details.go:41
+#: cli/board/details.go:42
 #: cli/board/list.go:87
 #: cli/board/list.go:125
 #: cli/board/listall.go:84
@@ -1019,7 +1019,7 @@ msgstr "Expected compiled sketch in directory %s, but is a file instead"
 msgid "FQBN"
 msgstr "FQBN"
 
-#: cli/board/details.go:121
+#: cli/board/details.go:125
 msgid "FQBN:"
 msgstr "FQBN:"
 
@@ -1067,7 +1067,7 @@ msgstr "Failed to read: {0}"
 msgid "Failed uploading"
 msgstr "Failed uploading"
 
-#: cli/board/details.go:166
+#: cli/board/details.go:170
 msgid "File:"
 msgstr "File:"
 
@@ -1079,28 +1079,28 @@ msgstr "First message must contain debug request, not data"
 msgid "Flags:"
 msgstr "Flags:"
 
-#: cli/core/install.go:59
+#: cli/core/install.go:62
 msgid "Force run of post-install scripts (if the CLI is not running interactively)."
 msgstr "Force run of post-install scripts (if the CLI is not running interactively)."
 
-#: cli/core/install.go:60
+#: cli/core/install.go:63
 msgid "Force skip of post-install scripts (if the CLI is running interactively)."
 msgstr "Force skip of post-install scripts (if the CLI is running interactively)."
 
-#: cli/board/details.go:50
+#: cli/board/details.go:51
 #: cli/burnbootloader/burnbootloader.go:53
-#: cli/compile/compile.go:85
+#: cli/compile/compile.go:84
 #: cli/debug/debug.go:61
 #: cli/monitor/monitor.go:63
 #: cli/upload/upload.go:57
 msgid "Fully Qualified Board Name, e.g.: arduino:avr:uno"
 msgstr "Fully Qualified Board Name, e.g.: arduino:avr:uno"
 
-#: cli/debug/debug.go:148
+#: cli/debug/debug.go:154
 msgid "GDB Server path"
 msgstr "GDB Server path"
 
-#: cli/debug/debug.go:147
+#: cli/debug/debug.go:153
 msgid "GDB Server type"
 msgstr "GDB Server type"
 
@@ -1139,21 +1139,21 @@ msgstr "Global variables use {0} bytes of dynamic memory."
 
 #: cli/core/list.go:84
 #: cli/core/search.go:114
-#: cli/monitor/monitor.go:192
+#: cli/monitor/monitor.go:195
 #: cli/outdated/outdated.go:62
 msgid "ID"
 msgstr "ID"
 
-#: cli/board/details.go:93
-#: cli/board/details.go:194
+#: cli/board/details.go:97
+#: cli/board/details.go:198
 msgid "Id"
 msgstr "Id"
 
-#: cli/board/details.go:135
+#: cli/board/details.go:139
 msgid "Identification properties:"
 msgstr "Identification properties:"
 
-#: cli/compile/compile.go:118
+#: cli/compile/compile.go:120
 msgid "If set built binaries will be exported to the sketch folder."
 msgstr "If set built binaries will be exported to the sketch folder."
 
@@ -1201,8 +1201,8 @@ msgstr "Installing platform %s"
 msgid "Installs one or more cores and corresponding tool dependencies."
 msgstr "Installs one or more cores and corresponding tool dependencies."
 
-#: cli/lib/install.go:40
 #: cli/lib/install.go:41
+#: cli/lib/install.go:42
 msgid "Installs one or more specified libraries into the system."
 msgstr "Installs one or more specified libraries into the system."
 
@@ -1214,7 +1214,7 @@ msgstr "Internal error in cache"
 msgid "Invalid '%[1]s' property: %[2]s"
 msgstr "Invalid '%[1]s' property: %[2]s"
 
-#: cli/cli.go:254
+#: cli/cli.go:265
 msgid "Invalid Call : should show Help, but it is available only in TEXT mode."
 msgstr "Invalid Call : should show Help, but it is available only in TEXT mode."
 
@@ -1234,12 +1234,12 @@ msgstr "Invalid URL"
 msgid "Invalid additional URL: %v"
 msgstr "Invalid additional URL: %v"
 
-#: cli/core/download.go:55
-#: cli/core/install.go:92
-#: cli/core/uninstall.go:51
+#: cli/core/download.go:58
+#: cli/core/install.go:95
+#: cli/core/uninstall.go:54
 #: cli/core/upgrade.go:81
-#: cli/lib/download.go:50
-#: cli/lib/uninstall.go:51
+#: cli/lib/download.go:54
+#: cli/lib/uninstall.go:55
 msgid "Invalid argument passed: %v"
 msgstr "Invalid argument passed: %v"
 
@@ -1271,11 +1271,11 @@ msgstr "Invalid library"
 msgid "Invalid network.proxy '%[1]s': %[2]s"
 msgstr "Invalid network.proxy '%[1]s': %[2]s"
 
-#: cli/cli.go:215
+#: cli/cli.go:226
 msgid "Invalid option for --log-level: %s"
 msgstr "Invalid option for --log-level: %s"
 
-#: cli/cli.go:232
+#: cli/cli.go:243
 msgid "Invalid output format: %s"
 msgstr "Invalid output format: %s"
 
@@ -1284,7 +1284,7 @@ msgstr "Invalid output format: %s"
 msgid "Invalid package index in %s"
 msgstr "Invalid package index in %s"
 
-#: cli/core/uninstall.go:57
+#: cli/core/uninstall.go:60
 msgid "Invalid parameter %s: version not allowed"
 msgstr "Invalid parameter %s: version not allowed"
 
@@ -1308,7 +1308,7 @@ msgstr "Invalid version"
 msgid "Invalid vid value: '%s'"
 msgstr "Invalid vid value: '%s'"
 
-#: cli/compile/compile.go:113
+#: cli/compile/compile.go:115
 msgid "Just produce the compilation database, without actually compiling."
 msgstr "Just produce the compilation database, without actually compiling."
 
@@ -1316,15 +1316,15 @@ msgstr "Just produce the compilation database, without actually compiling."
 msgid "LIBNAME"
 msgstr "LIBNAME"
 
-#: cli/lib/check_deps.go:34
-#: cli/lib/install.go:39
+#: cli/lib/check_deps.go:35
+#: cli/lib/install.go:40
 msgid "LIBRARY"
 msgstr "LIBRARY"
 
-#: cli/lib/download.go:34
-#: cli/lib/examples.go:38
+#: cli/lib/download.go:35
+#: cli/lib/examples.go:39
 #: cli/lib/search.go:39
-#: cli/lib/uninstall.go:35
+#: cli/lib/uninstall.go:36
 msgid "LIBRARY_NAME"
 msgstr "LIBRARY_NAME"
 
@@ -1386,15 +1386,15 @@ msgstr "List all known boards and their corresponding FQBN."
 msgid "List connected boards."
 msgstr "List connected boards."
 
-#: cli/compile/compile.go:96
+#: cli/compile/compile.go:95
 msgid "List of custom build properties separated by commas. Or can be used multiple times for multiple properties."
 msgstr "List of custom build properties separated by commas. Or can be used multiple times for multiple properties."
 
-#: cli/compile/compile.go:110
+#: cli/compile/compile.go:109
 msgid "List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries dir paths."
 msgstr "List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries dir paths."
 
-#: cli/compile/compile.go:108
+#: cli/compile/compile.go:107
 msgid "List of paths to libraries root folders. Libraries set this way have top priority in case of conflicts. Can be used multiple times for different libraries."
 msgstr "List of paths to libraries root folders. Libraries set this way have top priority in case of conflicts. Can be used multiple times for different libraries."
 
@@ -1440,11 +1440,11 @@ msgstr "Low memory available, stability problems may occur."
 msgid "Maintainer: %s"
 msgstr "Maintainer: %s"
 
-#: cli/arguments/port.go:46
+#: cli/arguments/port.go:52
 msgid "Max time to wait for port discovery, e.g.: 30s, 1m"
 msgstr "Max time to wait for port discovery, e.g.: 30s, 1m"
 
-#: cli/cli.go:108
+#: cli/cli.go:109
 msgid "Messages with this level and above will be logged. Valid levels are: %s"
 msgstr "Messages with this level and above will be logged. Valid levels are: %s"
 
@@ -1480,7 +1480,7 @@ msgstr "Missing sketch path"
 msgid "Monitor '%s' not found"
 msgstr "Monitor '%s' not found"
 
-#: cli/monitor/monitor.go:140
+#: cli/monitor/monitor.go:143
 msgid "Monitor port settings:"
 msgstr "Monitor port settings:"
 
@@ -1488,7 +1488,7 @@ msgstr "Monitor port settings:"
 msgid "Multiple libraries were found for \"{0}\""
 msgstr "Multiple libraries were found for \"{0}\""
 
-#: cli/board/details.go:194
+#: cli/board/details.go:198
 #: cli/core/list.go:84
 #: cli/core/search.go:114
 #: cli/lib/list.go:125
@@ -1515,7 +1515,7 @@ msgstr "No boards found."
 msgid "No colon in first line of depfile"
 msgstr "No colon in first line of depfile"
 
-#: cli/lib/examples.go:103
+#: cli/lib/examples.go:110
 msgid "No libraries found."
 msgstr "No libraries found."
 
@@ -1577,11 +1577,11 @@ msgstr "Not found: {0}"
 msgid "Not used: {0}"
 msgstr "Not used: {0}"
 
-#: cli/board/details.go:165
+#: cli/board/details.go:169
 msgid "OS:"
 msgstr "OS:"
 
-#: cli/board/details.go:129
+#: cli/board/details.go:133
 msgid "Official Arduino board:"
 msgstr "Official Arduino board:"
 
@@ -1590,37 +1590,37 @@ msgstr "Official Arduino board:"
 msgid "Open a communication port with a board."
 msgstr "Open a communication port with a board."
 
-#: cli/board/details.go:177
+#: cli/board/details.go:181
 msgid "Option:"
 msgstr "Option:"
 
-#: cli/compile/compile.go:100
+#: cli/compile/compile.go:99
 msgid "Optional, can be: %s. Used to tell gcc which warning level to use (-W flag)."
 msgstr "Optional, can be: %s. Used to tell gcc which warning level to use (-W flag)."
 
-#: cli/compile/compile.go:114
+#: cli/compile/compile.go:116
 msgid "Optional, cleanup the build folder and do not use any cached build."
 msgstr "Optional, cleanup the build folder and do not use any cached build."
 
-#: cli/compile/compile.go:111
+#: cli/compile/compile.go:110
 msgid "Optional, optimize compile output for debugging, rather than for release."
 msgstr "Optional, optimize compile output for debugging, rather than for release."
 
-#: cli/compile/compile.go:102
+#: cli/compile/compile.go:101
 msgid "Optional, suppresses almost every output."
 msgstr "Optional, suppresses almost every output."
 
-#: cli/compile/compile.go:101
-#: cli/upload/upload.go:62
+#: cli/compile/compile.go:100
+#: cli/upload/upload.go:65
 msgid "Optional, turns on verbose mode."
 msgstr "Optional, turns on verbose mode."
 
-#: cli/compile/compile.go:112
-#: cli/upload/upload.go:63
+#: cli/compile/compile.go:111
+#: cli/upload/upload.go:66
 msgid "Optional, use the specified programmer to upload."
 msgstr "Optional, use the specified programmer to upload."
 
-#: cli/compile/compile.go:119
+#: cli/compile/compile.go:121
 msgid "Optional. Path to a .json file that contains a set of replacements of the sketch source code."
 msgstr "Optional. Path to a .json file that contains a set of replacements of the sketch source code."
 
@@ -1628,7 +1628,7 @@ msgstr "Optional. Path to a .json file that contains a set of replacements of th
 msgid "OutputRate in Null monitor must be a float64"
 msgstr "OutputRate in Null monitor must be a float64"
 
-#: cli/compile/compile.go:98
+#: cli/compile/compile.go:97
 msgid "Override a build property with a custom value. Can be used multiple times for multiple properties."
 msgstr "Override a build property with a custom value. Can be used multiple times for multiple properties."
 
@@ -1643,23 +1643,23 @@ msgstr "Overwrite existing config file."
 msgid "PACKAGER"
 msgstr "PACKAGER"
 
-#: cli/board/details.go:145
+#: cli/board/details.go:149
 msgid "Package URL:"
 msgstr "Package URL:"
 
-#: cli/board/details.go:144
+#: cli/board/details.go:148
 msgid "Package maintainer:"
 msgstr "Package maintainer:"
 
-#: cli/board/details.go:143
+#: cli/board/details.go:147
 msgid "Package name:"
 msgstr "Package name:"
 
-#: cli/board/details.go:147
+#: cli/board/details.go:151
 msgid "Package online help:"
 msgstr "Package online help:"
 
-#: cli/board/details.go:146
+#: cli/board/details.go:150
 msgid "Package website:"
 msgstr "Package website:"
 
@@ -1667,11 +1667,11 @@ msgstr "Package website:"
 msgid "Paragraph: %s"
 msgstr "Paragraph: %s"
 
-#: cli/cli.go:109
+#: cli/cli.go:113
 msgid "Path to the file where logs will be written."
 msgstr "Path to the file where logs will be written."
 
-#: cli/compile/compile.go:94
+#: cli/compile/compile.go:93
 msgid "Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS."
 msgstr "Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS."
 
@@ -1703,31 +1703,31 @@ msgstr "Platform '%s' not found"
 msgid "Platform ID"
 msgstr "Platform ID"
 
-#: cli/board/details.go:153
+#: cli/board/details.go:157
 msgid "Platform URL:"
 msgstr "Platform URL:"
 
-#: cli/board/details.go:152
+#: cli/board/details.go:156
 msgid "Platform architecture:"
 msgstr "Platform architecture:"
 
-#: cli/board/details.go:151
+#: cli/board/details.go:155
 msgid "Platform category:"
 msgstr "Platform category:"
 
-#: cli/board/details.go:158
+#: cli/board/details.go:162
 msgid "Platform checksum:"
 msgstr "Platform checksum:"
 
-#: cli/board/details.go:154
+#: cli/board/details.go:158
 msgid "Platform file name:"
 msgstr "Platform file name:"
 
-#: cli/board/details.go:150
+#: cli/board/details.go:154
 msgid "Platform name:"
 msgstr "Platform name:"
 
-#: cli/board/details.go:156
+#: cli/board/details.go:160
 msgid "Platform size (bytes):"
 msgstr "Platform size (bytes):"
 
@@ -1736,8 +1736,8 @@ msgstr "Platform size (bytes):"
 msgid "Port"
 msgstr "Port"
 
-#: cli/monitor/monitor.go:161
-#: cli/monitor/monitor.go:168
+#: cli/monitor/monitor.go:164
+#: cli/monitor/monitor.go:171
 msgid "Port closed:"
 msgstr "Port closed:"
 
@@ -1750,11 +1750,11 @@ msgstr "Port monitor error"
 msgid "Precompiled library in \"{0}\" not found"
 msgstr "Precompiled library in \"{0}\" not found"
 
-#: cli/board/details.go:42
+#: cli/board/details.go:43
 msgid "Print details about a board."
 msgstr "Print details about a board."
 
-#: cli/compile/compile.go:90
+#: cli/compile/compile.go:89
 msgid "Print preprocessed code to stdout instead of compiling."
 msgstr "Print preprocessed code to stdout instead of compiling."
 
@@ -1774,15 +1774,15 @@ msgstr "Prints the current configuration."
 msgid "Programmer '%s' not found"
 msgstr "Programmer '%s' not found"
 
-#: cli/board/details.go:93
+#: cli/board/details.go:97
 msgid "Programmer name"
 msgstr "Programmer name"
 
-#: cli/debug/debug.go:63
+#: cli/debug/debug.go:66
 msgid "Programmer to use for debugging"
 msgstr "Programmer to use for debugging"
 
-#: cli/board/details.go:194
+#: cli/board/details.go:198
 msgid "Programmers:"
 msgstr "Programmers:"
 
@@ -1812,7 +1812,7 @@ msgstr "Removes one or more values from a setting."
 msgid "Replacing %[1]s with %[2]s"
 msgstr "Replacing %[1]s with %[2]s"
 
-#: cli/board/details.go:162
+#: cli/board/details.go:166
 msgid "Required tool:"
 msgstr "Required tool:"
 
@@ -1836,7 +1836,7 @@ msgstr "Running normal build of the core..."
 msgid "Running recipe: {0}"
 msgstr "Running recipe: {0}"
 
-#: cli/compile/compile.go:92
+#: cli/compile/compile.go:91
 msgid "Save build artifacts in this directory."
 msgstr "Save build artifacts in this directory."
 
@@ -1878,11 +1878,11 @@ msgstr "Sets a setting value."
 msgid "Sets where to save the configuration file."
 msgstr "Sets where to save the configuration file."
 
-#: cli/monitor/monitor.go:192
+#: cli/monitor/monitor.go:195
 msgid "Setting"
 msgstr "Setting"
 
-#: cli/config/delete.go:57
+#: cli/config/delete.go:60
 #: cli/config/validate.go:45
 msgid "Settings key doesn't exist"
 msgstr "Settings key doesn't exist"
@@ -1891,7 +1891,7 @@ msgstr "Settings key doesn't exist"
 msgid "Show all available core versions."
 msgstr "Show all available core versions."
 
-#: cli/compile/compile.go:89
+#: cli/compile/compile.go:88
 msgid "Show all build properties used instead of compiling."
 msgstr "Show all build properties used instead of compiling."
 
@@ -1904,15 +1904,15 @@ msgstr "Show all the settings of the communication port."
 msgid "Show also boards marked as 'hidden' in the platform"
 msgstr "Show also boards marked as 'hidden' in the platform"
 
-#: cli/board/details.go:49
+#: cli/board/details.go:50
 msgid "Show full board details"
 msgstr "Show full board details"
 
-#: cli/board/details.go:43
+#: cli/board/details.go:44
 msgid "Show information about a board, in particular if the board has options to be specified in the FQBN."
 msgstr "Show information about a board, in particular if the board has options to be specified in the FQBN."
 
-#: cli/lib/examples.go:45
+#: cli/lib/examples.go:49
 #: cli/lib/list.go:49
 msgid "Show libraries for the specified board FQBN."
 msgstr "Show libraries for the specified board FQBN."
@@ -1921,11 +1921,11 @@ msgstr "Show libraries for the specified board FQBN."
 msgid "Show library names only."
 msgstr "Show library names only."
 
-#: cli/board/details.go:51
+#: cli/board/details.go:55
 msgid "Show list of available programmers"
 msgstr "Show list of available programmers"
 
-#: cli/debug/debug.go:66
+#: cli/debug/debug.go:72
 msgid "Show metadata about the debug session instead of starting the debugger."
 msgstr "Show metadata about the debug session instead of starting the debugger."
 
@@ -1954,11 +1954,11 @@ msgstr "Shows a list of installed libraries.\n"
 msgid "Shows the list of installed platforms."
 msgstr "Shows the list of installed platforms."
 
-#: cli/lib/examples.go:39
+#: cli/lib/examples.go:40
 msgid "Shows the list of the examples for libraries."
 msgstr "Shows the list of the examples for libraries."
 
-#: cli/lib/examples.go:40
+#: cli/lib/examples.go:41
 msgid "Shows the list of the examples for libraries. A name may be given as argument to search a specific library."
 msgstr "Shows the list of the examples for libraries. A name may be given as argument to search a specific library."
 
@@ -1970,7 +1970,7 @@ msgstr "Shows the version number of Arduino CLI which is installed on your syste
 msgid "Shows version number of Arduino CLI."
 msgstr "Shows version number of Arduino CLI."
 
-#: cli/board/details.go:167
+#: cli/board/details.go:171
 msgid "Size (bytes):"
 msgstr "Size (bytes):"
 
@@ -1990,9 +1990,9 @@ msgstr "Sketch too big; see %s for tips on reducing it."
 msgid "Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."
 msgstr "Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."
 
-#: cli/compile/compile.go:140
+#: cli/compile/compile.go:142
 #: cli/sketch/archive.go:66
-#: cli/upload/upload.go:87
+#: cli/upload/upload.go:93
 msgid "Sketches with .pde extension are deprecated, please rename the following files to .ino:"
 msgstr "Sketches with .pde extension are deprecated, please rename the following files to .ino:"
 
@@ -2044,28 +2044,28 @@ msgstr "The connected devices search timeout, raise it if your board doesn't sho
 msgid "The connected devices search timeout, raise it if your board doesn't show up e.g.: 10s"
 msgstr "The connected devices search timeout, raise it if your board doesn't show up e.g.: 10s"
 
-#: cli/cli.go:112
+#: cli/cli.go:123
 msgid "The custom config file (if not specified the default will be used)."
 msgstr "The custom config file (if not specified the default will be used)."
 
-#: cli/core/install.go:66
+#: cli/core/install.go:69
 msgid "The flags --run-post-install and --skip-post-install can't be both set at the same time."
 msgstr "The flags --run-post-install and --skip-post-install can't be both set at the same time."
 
-#: cli/config/add.go:51
+#: cli/config/add.go:54
 msgid "The key '%[1]v' is not a list of items, can't add to it.\n"
 "Maybe use '%[2]s'?"
 msgstr "The key '%[1]v' is not a list of items, can't add to it.\n"
 "Maybe use '%[2]s'?"
 
-#: cli/config/remove.go:51
+#: cli/config/remove.go:54
 msgid "The key '%[1]v' is not a list of items, can't remove from it.\n"
 "Maybe use '%[2]s'?"
 msgstr "The key '%[1]v' is not a list of items, can't remove from it.\n"
 "Maybe use '%[2]s'?"
 
-#: cli/cli.go:110
-#: cli/cli.go:111
+#: cli/cli.go:115
+#: cli/cli.go:119
 msgid "The output format for the logs, can be: %s"
 msgstr "The output format for the logs, can be: %s"
 
@@ -2097,23 +2097,23 @@ msgstr "Tool %s uninstalled"
 msgid "Toolchain '%s' is not supported"
 msgstr "Toolchain '%s' is not supported"
 
-#: cli/debug/debug.go:142
+#: cli/debug/debug.go:148
 msgid "Toolchain custom configurations"
 msgstr "Toolchain custom configurations"
 
-#: cli/debug/debug.go:136
+#: cli/debug/debug.go:142
 msgid "Toolchain path"
 msgstr "Toolchain path"
 
-#: cli/debug/debug.go:137
+#: cli/debug/debug.go:143
 msgid "Toolchain prefix"
 msgstr "Toolchain prefix"
 
-#: cli/debug/debug.go:135
+#: cli/debug/debug.go:141
 msgid "Toolchain type"
 msgstr "Toolchain type"
 
-#: cli/burnbootloader/burnbootloader.go:56
+#: cli/burnbootloader/burnbootloader.go:59
 msgid "Turns on verbose mode."
 msgstr "Turns on verbose mode."
 
@@ -2126,7 +2126,7 @@ msgstr "Type"
 msgid "Types: %s"
 msgstr "Types: %s"
 
-#: cli/board/details.go:169
+#: cli/board/details.go:173
 msgid "URL:"
 msgstr "URL:"
 
@@ -2147,7 +2147,7 @@ msgstr "Unable to get Local App Data Folder: %v"
 msgid "Unable to get user home dir: %v"
 msgstr "Unable to get user home dir: %v"
 
-#: cli/cli.go:201
+#: cli/cli.go:212
 msgid "Unable to open file for logging: %s"
 msgstr "Unable to open file for logging: %s"
 
@@ -2169,8 +2169,8 @@ msgstr "Uninstalling %s: tool is no more required"
 msgid "Uninstalls one or more cores and corresponding tool dependencies if no longer used."
 msgstr "Uninstalls one or more cores and corresponding tool dependencies if no longer used."
 
-#: cli/lib/uninstall.go:36
 #: cli/lib/uninstall.go:37
+#: cli/lib/uninstall.go:38
 msgid "Uninstalls one or more libraries."
 msgstr "Uninstalls one or more libraries."
 
@@ -2265,11 +2265,11 @@ msgstr "Upload port address, e.g.: COM3 or /dev/ttyACM2"
 msgid "Upload port found on %s"
 msgstr "Upload port found on %s"
 
-#: cli/arguments/port.go:45
+#: cli/arguments/port.go:48
 msgid "Upload port protocol, e.g: serial"
 msgstr "Upload port protocol, e.g: serial"
 
-#: cli/compile/compile.go:103
+#: cli/compile/compile.go:102
 msgid "Upload the binary after the compilation."
 msgstr "Upload the binary after the compilation."
 
@@ -2281,8 +2281,8 @@ msgstr "Upload the bootloader on the board using an external programmer."
 msgid "Upload the bootloader."
 msgstr "Upload the bootloader."
 
-#: cli/compile/compile.go:221
-#: cli/upload/upload.go:123
+#: cli/compile/compile.go:223
+#: cli/upload/upload.go:129
 msgid "Uploading to specified board using %s protocol requires the following info:"
 msgstr "Uploading to specified board using %s protocol requires the following info:"
 
@@ -2294,7 +2294,7 @@ msgstr "Usage:"
 msgid "Use %s for more information about a command."
 msgstr "Use %s for more information about a command."
 
-#: cli/burnbootloader/burnbootloader.go:57
+#: cli/burnbootloader/burnbootloader.go:60
 msgid "Use the specified programmer to upload."
 msgstr "Use the specified programmer to upload."
 
@@ -2348,18 +2348,18 @@ msgstr "Using previously compiled file: {0}"
 msgid "VERSION"
 msgstr "VERSION"
 
-#: cli/lib/check_deps.go:34
-#: cli/lib/install.go:39
+#: cli/lib/check_deps.go:35
+#: cli/lib/install.go:40
 msgid "VERSION_NUMBER"
 msgstr "VERSION_NUMBER"
 
-#: cli/monitor/monitor.go:192
+#: cli/monitor/monitor.go:195
 msgid "Values"
 msgstr "Values"
 
-#: cli/burnbootloader/burnbootloader.go:55
-#: cli/compile/compile.go:105
-#: cli/upload/upload.go:61
+#: cli/burnbootloader/burnbootloader.go:58
+#: cli/compile/compile.go:104
+#: cli/upload/upload.go:64
 msgid "Verify uploaded binary after the upload."
 msgstr "Verify uploaded binary after the upload."
 
@@ -2403,7 +2403,7 @@ msgstr "Warning: tool '%s' is not installed. It might not be available for your 
 msgid "Website: %s"
 msgstr "Website: %s"
 
-#: cli/compile/compile.go:106
+#: cli/compile/compile.go:105
 msgid "When specified, VID/PID specific build properties are used, if board supports them."
 msgstr "When specified, VID/PID specific build properties are used, if board supports them."
 
@@ -2415,7 +2415,7 @@ msgstr "Writes current configuration to a configuration file."
 msgid "Writes current configuration to the configuration file in the data directory."
 msgstr "Writes current configuration to the configuration file in the data directory."
 
-#: cli/config/set.go:76
+#: cli/config/set.go:79
 msgid "Writing config file: %v"
 msgstr "Writing config file: %v"
 
@@ -2636,7 +2636,7 @@ msgstr "encoding sketch metadata: %s"
 msgid "error opening serial monitor"
 msgstr "error opening serial monitor"
 
-#: cli/config/set.go:68
+#: cli/config/set.go:71
 msgid "error parsing value: %v"
 msgstr "error parsing value: %v"
 
@@ -2648,7 +2648,7 @@ msgstr "error processing response from server"
 msgid "error querying Arduino Cloud Api"
 msgstr "error querying Arduino Cloud Api"
 
-#: cli/upload/upload.go:71
+#: cli/upload/upload.go:77
 msgid "error: %s and %s flags cannot be used together"
 msgstr "error: %s and %s flags cannot be used together"
 
@@ -2692,18 +2692,18 @@ msgstr "flags"
 msgid "following possible symlink %[1]s: %[2]s"
 msgstr "following possible symlink %[1]s: %[2]s"
 
-#: cli/lib/download.go:39
+#: cli/lib/download.go:40
 msgid "for a specific version."
 msgstr "for a specific version."
 
-#: cli/lib/check_deps.go:38
-#: cli/lib/download.go:38
-#: cli/lib/install.go:43
+#: cli/lib/check_deps.go:39
+#: cli/lib/download.go:39
+#: cli/lib/install.go:44
 msgid "for the latest version."
 msgstr "for the latest version."
 
-#: cli/lib/check_deps.go:39
-#: cli/lib/install.go:44
+#: cli/lib/check_deps.go:40
+#: cli/lib/install.go:45
 msgid "for the specific version."
 msgstr "for the specific version."
 
@@ -2860,11 +2860,11 @@ msgstr "invalid platform archive size: %s"
 msgid "invalid pluggable monitor reference: %s"
 msgstr "invalid pluggable monitor reference: %s"
 
-#: cli/monitor/monitor.go:123
+#: cli/monitor/monitor.go:126
 msgid "invalid port configuration value for %s: %s"
 msgstr "invalid port configuration value for %s: %s"
 
-#: cli/monitor/monitor.go:132
+#: cli/monitor/monitor.go:135
 msgid "invalid port configuration: %s"
 msgstr "invalid port configuration: %s"
 
@@ -3099,7 +3099,7 @@ msgstr "platform %s is not installed"
 msgid "platform not installed"
 msgstr "platform not installed"
 
-#: cli/compile/compile.go:124
+#: cli/compile/compile.go:126
 msgid "please use --build-property instead."
 msgstr "please use --build-property instead."
 
@@ -3111,7 +3111,7 @@ msgstr "pluggable discovery already added: %s"
 msgid "port"
 msgstr "port"
 
-#: cli/arguments/port.go:137
+#: cli/arguments/port.go:143
 msgid "port not found: %[1]s %[2]s"
 msgstr "port not found: %[1]s %[2]s"
 

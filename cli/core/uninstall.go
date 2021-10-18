@@ -39,6 +39,9 @@ func initUninstallCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " core uninstall arduino:samd\n",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     runUninstallCommand,
+		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return arguments.GetUninstallableCores(), cobra.ShellCompDirectiveDefault
+		},
 	}
 }
 

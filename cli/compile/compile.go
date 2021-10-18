@@ -31,7 +31,6 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/upload"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -84,7 +83,7 @@ func NewCommand() *cobra.Command {
 
 	command.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
 	command.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return getBoards(toComplete), cobra.ShellCompDirectiveDefault
+		return arguments.GetInstalledBoards(), cobra.ShellCompDirectiveDefault
 	})
 	command.Flags().BoolVar(&showProperties, "show-properties", false, tr("Show all build properties used instead of compiling."))
 	command.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
@@ -110,6 +109,9 @@ func NewCommand() *cobra.Command {
 		tr("List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries dir paths."))
 	command.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, tr("Optional, optimize compile output for debugging, rather than for release."))
 	command.Flags().StringVarP(&programmer, "programmer", "P", "", tr("Optional, use the specified programmer to upload."))
+	command.RegisterFlagCompletionFunc("programmer", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return arguments.GetInstalledProgrammers(), cobra.ShellCompDirectiveDefault
+	})
 	command.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, tr("Just produce the compilation database, without actually compiling."))
 	command.Flags().BoolVar(&clean, "clean", false, tr("Optional, cleanup the build folder and do not use any cached build."))
 	// We must use the following syntax for this flag since it's also bound to settings.
@@ -275,20 +277,4 @@ func (r *compileResult) Data() interface{} {
 func (r *compileResult) String() string {
 	// The output is already printed via os.Stdout/os.Stdin
 	return ""
-}
-
-func getBoards(toComplete string) []string {
-	// from listall.go TODO optimize
-	inst := instance.CreateAndInit()
-
-	list, _ := board.ListAll(context.Background(), &rpc.BoardListAllRequest{
-		Instance:            inst,
-		SearchArgs:          nil,
-		IncludeHiddenBoards: false,
-	})
-	var res []string
-	for _, i := range list.GetBoards() {
-		res = append(res, i.Fqbn)
-	}
-	return res
 }

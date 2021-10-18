@@ -36,6 +36,9 @@ func initDeleteCommand() *cobra.Command {
 			"  " + os.Args[0] + " config delete board_manager.additional_urls",
 		Args: cobra.ExactArgs(1),
 		Run:  runDeleteCommand,
+		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return configuration.Settings.AllKeys(), cobra.ShellCompDirectiveDefault
+		},
 	}
 	return addCommand
 }

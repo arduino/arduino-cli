@@ -21,6 +21,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
@@ -46,6 +47,9 @@ func initInstallCommand() *cobra.Command {
 			"  " + os.Args[0] + " lib install --zip-path /path/to/WiFi101.zip /path/to/ArduinoBLE.zip\n",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,
+		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return arguments.GetInstallableLibs(), cobra.ShellCompDirectiveDefault
+		},
 	}
 	installCommand.Flags().BoolVar(&installFlags.noDeps, "no-deps", false, tr("Do not install dependencies."))
 	installCommand.Flags().BoolVar(&installFlags.gitURL, "git-url", false, tr("Enter git url for libraries hosted on repositories"))
