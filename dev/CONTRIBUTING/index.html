@@ -1944,15 +1944,6 @@ Website</a>.</p>
 <p>In order to support i18n in the CLI, any messages that are intended to be translated should be wrapped in a call to
 <code>i18n.Tr</code>. This call allows us to build a catalog of translatable strings, replacing the reference string at runtime
 with the localized value.</p>
-<p>Adding or modifying these messages requires an i18n update, as this process creates the reference catalog that is shared
-with translators. For that reason, the <code>task check</code> command will fail if the catalog was not updated to sync with
-changes to the source code.</p>
-<p>To update the catalog, execute the following command and commit the changes.</p>
-<div class="highlight"><pre><span></span><code>task i18n:update
-</code></pre></div>
-<p>To verify that the catalog is up-to-date, you may execute the command:</p>
-<div class="highlight"><pre><span></span><code>task i18n:check
-</code></pre></div>
 <p>Example usage:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">package</span> <span class="nx">main</span>
 
