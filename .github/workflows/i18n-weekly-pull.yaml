@@ -4,6 +4,8 @@ on:
   schedule:
     # run every monday at 2AM
     - cron: "0 2 * * 1"
+  workflow_dispatch:
+  repository_dispatch:
 
 jobs:
   pull-from-transifex:

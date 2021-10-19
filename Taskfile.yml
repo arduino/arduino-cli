@@ -261,13 +261,11 @@ tasks:
     desc: Updates i18n files
     cmds:
       - go run ./i18n/cmd/main.go catalog generate . > ./i18n/data/en.po
-      - task: i18n:generate
 
   i18n:pull:
     desc: Pull i18n files from transifex
     cmds:
       - go run ./i18n/cmd/main.go transifex pull ./i18n/data
-      - task: i18n:generate
 
   i18n:push:
     desc: Push i18n files to transifex
@@ -280,12 +278,6 @@ tasks:
       - task: i18n:update
       - git add -N ./i18n/data
       - git diff --exit-code ./i18n/data
-
-  i18n:generate:
-    desc: Generate embedded i18n catalog files
-    cmds:
-      - git add -N ./i18n/data
-      - git diff --exit-code ./i18n/data &> /dev/null
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-mkdocs-task/Taskfile.yml
   website:check:

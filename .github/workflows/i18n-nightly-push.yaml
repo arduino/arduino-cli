@@ -26,6 +26,9 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
 
+      - name: Run task i18n:update
+        run: task i18n:update
+
       - name: Run task i18n:push
         run: task i18n:push
         env:
