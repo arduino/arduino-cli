@@ -243,7 +243,7 @@ tasks:
       - task: go:vet
       - task: go:lint
       - task: i18n:check
-      - task: python:check
+      - task: python:lint
       - task: protoc:check
 
   check-legacy:
