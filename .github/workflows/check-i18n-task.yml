@@ -33,6 +33,4 @@ jobs:
           version: 3.x
 
       - name: Check i18n source file is up to date
-        run:
-          - task i18n:update
-          - task i18n:check
+        run: task i18n:check
