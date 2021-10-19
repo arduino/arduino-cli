@@ -777,3 +777,38 @@ def test_core_list_outdated_core(run_command):
     latest_version = semver.parse_version_info(samd_core["latest"])
     # Installed version must be older than latest
     assert installed_version.compare(latest_version) == -1
+
+
+def test_core_loading_package_manager(run_command):
+    assert run_command(["update"])
+
+    # Install core
+    url = "https://raw.githubusercontent.com/damellis/attiny/ide-1.6.x-boards-manager/package_damellis_attiny_index.json"  # noqa: E501
+    assert run_command(["core", "update-index", f"--additional-urls={url}"])
+    assert run_command(["core", "install", "attiny:avr@1.0.2", f"--additional-urls={url}"])
+
+    # Verifies installed core is correctly found and name is set
+    res = run_command(["core", "list", "--format", "json"])
+    assert res.ok
+    cores = json.loads(res.stdout)
+    mapped = {core["id"]: core for core in cores}
+    assert len(mapped) == 1
+    assert "attiny:avr" in mapped
+    assert mapped["attiny:avr"]["name"] == "attiny"
+
+    # Uninstall the core: this should leave some residue:
+    # tree ~/.arduino15/packages/
+    # /home/umberto/.arduino15/packages/
+    # ├── attiny
+    # │   └── hardware
+    # │       └── avr
+    #
+    # Please note that the folder avr is empty
+
+    assert run_command(["core", "uninstall", "attiny:avr"])
+    result = run_command(["core", "list", "--format", "json"])
+    assert result.ok
+    assert not _in(result.stdout, "attiny:avr")
+
+    result = run_command(["core", "list", "--all", "--format", "json"])
+    assert result.ok  # this should not make the cli crash
