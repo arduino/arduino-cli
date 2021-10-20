@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -419,6 +420,8 @@ func convertLegacyPlatformToPluggableDiscovery(platform *cores.PlatformRelease) 
 	}
 }
 
+var netPropRegexp = regexp.MustCompile(`\{upload\.network\.([^}]+)\}`)
+
 func convertLegacyNetworkPatternToPluggableDiscovery(props *properties.Map, newToolName string) *properties.Map {
 	pattern, ok := props.GetOk("upload.network_pattern")
 	if !ok {
@@ -431,6 +434,11 @@ func convertLegacyNetworkPatternToPluggableDiscovery(props *properties.Map, newT
 		props.Set("upload.field.password", "Password")
 		props.Set("upload.field.password.secret", "true")
 		pattern = strings.ReplaceAll(pattern, "{network.password}", "{upload.field.password}")
+	}
+	// Search for "{upload.network.PROPERTY}"" and convert it to "{upload.port.property.PROPERTY}"
+	for netPropRegexp.MatchString(pattern) {
+		netProp := netPropRegexp.FindStringSubmatch(pattern)[1]
+		pattern = strings.ReplaceAll(pattern, "{upload.network."+netProp+"}", "{upload.port.properties."+netProp+"}")
 	}
 	props.Set("upload.pattern", pattern)
 
