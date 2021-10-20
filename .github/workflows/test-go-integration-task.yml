@@ -67,6 +67,23 @@ jobs:
           - ubuntu-latest
           - windows-latest
           - macos-latest
+        test-file:
+          - test/test_board.py
+          - test/test_cache.py
+          - test/test_compile.py
+          - test/test_completion.py
+          - test/test_config.py
+          - test/test_core.py
+          - test/test_daemon.py
+          - test/test_debug.py
+          - test/test_lib.py
+          - test/test_main.py
+          - test/test_outdated.py
+          - test/test_sketch.py
+          - test/test_update.py
+          - test/test_upgrade.py
+          - test/test_upload_mock.py
+          - test/test_upload.py
 
     runs-on: ${{ matrix.operating-system }}
 
@@ -97,5 +114,11 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
 
+      - name: Build Arduino CLI
+        run: task go:build
+
+      - name: Install poetry deps
+        run: task poetry:install-deps
+
       - name: Run integration tests
-        run: task go:test-integration
+        run: poetry run pytest ${{ matrix.test-file }}
