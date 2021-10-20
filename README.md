@@ -45,6 +45,15 @@ policy] and report the bug to our Security Team 🛡️ Thank you!
 
 e-mail contact: security@arduino.cc
 
+## License
+
+Arduino CLI is licensed under the [GPL 3.0] license.
+
+You can be released from the requirements of the above license by purchasing a commercial license. Buying such a license
+is mandatory if you want to modify or otherwise use the software for commercial activities involving the Arduino
+software without disclosing the source code of your own applications. To purchase a commercial license, send an email to
+license@arduino.cc
+
 [install]: https://arduino.github.io/arduino-cli/latest/installation
 [user documentation]: https://arduino.github.io/arduino-cli/latest/
 [getting started]: https://arduino.github.io/arduino-cli/latest/getting-started/
@@ -54,3 +63,4 @@ e-mail contact: security@arduino.cc
 [contributors]: https://github.com/arduino/arduino-cli/graphs/contributors
 [nightly builds]: https://arduino.github.io/arduino-cli/latest/installation/#nightly-builds
 [security policy]: https://github.com/arduino/arduino-cli/security/policy
+[gpl 3.0]: https://www.gnu.org/licenses/gpl-3.0.en.html

@@ -1,0 +1,67 @@
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-license.md
+name: Check License
+
+env:
+  EXPECTED_LICENSE_FILENAME: LICENSE.txt
+  # SPDX identifier: https://spdx.org/licenses/
+  EXPECTED_LICENSE_TYPE: GPL-3.0
+
+# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+on:
+  push:
+    paths:
+      - ".github/workflows/check-license.ya?ml"
+      # See: https://github.com/licensee/licensee/blob/master/docs/what-we-look-at.md#detecting-the-license-file
+      - "[cC][oO][pP][yY][iI][nN][gG]*"
+      - "[cC][oO][pP][yY][rR][iI][gG][hH][tH]*"
+      - "[lL][iI][cC][eE][nN][cCsS][eE]*"
+      - "[oO][fF][lL]*"
+      - "[pP][aA][tT][eE][nN][tT][sS]*"
+  pull_request:
+    paths:
+      - ".github/workflows/check-license.ya?ml"
+      - "[cC][oO][pP][yY][iI][nN][gG]*"
+      - "[cC][oO][pP][yY][rR][iI][gG][hH][tH]*"
+      - "[lL][iI][cC][eE][nN][cCsS][eE]*"
+      - "[oO][fF][lL]*"
+      - "[pP][aA][tT][eE][nN][tT][sS]*"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  check-license:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ruby # Install latest version
+
+      - name: Install licensee
+        run: gem install licensee
+
+      - name: Check license file
+        run: |
+          EXIT_STATUS=0
+          # See: https://github.com/licensee/licensee
+          LICENSEE_OUTPUT="$(licensee detect --json --confidence=100)"
+
+          DETECTED_LICENSE_FILE="$(echo "$LICENSEE_OUTPUT" | jq .matched_files[0].filename | tr --delete '\r')"
+          echo "Detected license file: $DETECTED_LICENSE_FILE"
+          if [ "$DETECTED_LICENSE_FILE" != "\"${EXPECTED_LICENSE_FILENAME}\"" ]; then
+            echo "::error file=${DETECTED_LICENSE_FILE}::detected license file $DETECTED_LICENSE_FILE doesn't match expected: $EXPECTED_LICENSE_FILENAME"
+            EXIT_STATUS=1
+          fi
+
+          DETECTED_LICENSE_TYPE="$(echo "$LICENSEE_OUTPUT" | jq .matched_files[0].matched_license | tr --delete '\r')"
+          echo "Detected license type: $DETECTED_LICENSE_TYPE"
+          if [ "$DETECTED_LICENSE_TYPE" != "\"${EXPECTED_LICENSE_TYPE}\"" ]; then
+            echo "::error file=${DETECTED_LICENSE_FILE}::detected license type $DETECTED_LICENSE_TYPE doesn't match expected \"${EXPECTED_LICENSE_TYPE}\""
+            EXIT_STATUS=1
+          fi
+
+          exit $EXIT_STATUS
