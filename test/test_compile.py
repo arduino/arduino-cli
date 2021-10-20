@@ -1252,3 +1252,28 @@ def test_compile_with_relative_build_path(run_command, data_dir, copy_sketch):
     assert "libraries" in built_files
     assert "preproc" in built_files
     assert "sketch" in built_files
+
+
+def test_compile_error_returned_if_library_not_installed(run_command, copy_sketch):
+    assert run_command(["update"])
+
+    run_command(["core", "install", "arduino:avr@1.8.3"])
+
+    sketch_name = "sketch_with_sd_library"
+    sketch_path = copy_sketch(sketch_name)
+    fqbn = "arduino:avr:uno"
+
+    res = run_command(["compile", "-b", fqbn, "--format", "json", sketch_path])
+    assert res.ok
+
+    compile_output = json.loads(res.stdout)
+
+    sketch_main_file = f"{Path(sketch_path, sketch_name)}.ino"
+    expected_error = (
+        f"{sketch_main_file}:2:10: fatal error: SD.h: No such file or directory\n #include <SD.h>\n"
+        + "          ^~~~~~\ncompilation terminated.\n"
+    )
+
+    assert not compile_output["success"]
+    assert compile_output["compiler_out"] == ""
+    assert compile_output["compiler_err"].replace("\r\n", "\n") == expected_error
