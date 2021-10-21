@@ -812,3 +812,13 @@ def test_core_loading_package_manager(run_command):
 
     result = run_command(["core", "list", "--all", "--format", "json"])
     assert result.ok  # this should not make the cli crash
+
+
+def test_core_index_without_checksum(run_command):
+    assert run_command(["config", "init", "--dest-dir", "."])
+    url = "https://raw.githubusercontent.com/keyboardio/ArduinoCore-GD32-Keyboardio/main/package_gd32_index.json"  # noqa: E501
+    assert run_command(["config", "add", "board_manager.additional_urls", url])
+
+    assert run_command(["core", "update-index"])
+    result = run_command(["core", "list", "--all"])
+    assert result.ok  # this should not make the cli crash
