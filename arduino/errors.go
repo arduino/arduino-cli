@@ -13,15 +13,18 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package commands
+package arduino
 
 import (
 	"fmt"
 
+	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+var tr = i18n.Tr
 
 func composeErrorMsg(msg string, cause error) string {
 	if cause == nil {
