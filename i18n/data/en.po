@@ -3297,7 +3297,7 @@ msgstr "testing local archive integrity: %s"
 msgid "text section exceeds available space in board"
 msgstr "text section exceeds available space in board"
 
-#: commands/core/list.go:58
+#: commands/core/list.go:60
 msgid "the platform has no releases"
 msgstr "the platform has no releases"
 

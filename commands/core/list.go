@@ -46,10 +46,12 @@ func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, error) {
 				} else {
 					installedVersion = platformRelease.Version.String()
 				}
-				rpcPlatform := commands.PlatformReleaseToRPC(platform.GetLatestRelease())
-				rpcPlatform.Installed = installedVersion
-				res = append(res, rpcPlatform)
-				continue
+				if platformRelease != nil {
+					rpcPlatform := commands.PlatformReleaseToRPC(platformRelease)
+					rpcPlatform.Installed = installedVersion
+					res = append(res, rpcPlatform)
+					continue
+				}
 			}
 
 			if platformRelease != nil {
