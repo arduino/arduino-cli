@@ -39,11 +39,11 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 	if ref.PlatformVersion == nil {
 		platform := pm.FindPlatform(ref)
 		if platform == nil {
-			return nil, &arduino.PlatformNotFound{Platform: ref.String()}
+			return nil, &arduino.PlatformNotFoundError{Platform: ref.String()}
 		}
 		platformRelease := pm.GetInstalledPlatformRelease(platform)
 		if platformRelease == nil {
-			return nil, &arduino.PlatformNotFound{Platform: ref.String()}
+			return nil, &arduino.PlatformNotFoundError{Platform: ref.String()}
 		}
 		ref.PlatformVersion = platformRelease.Version
 	}

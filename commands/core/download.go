@@ -48,7 +48,7 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, dow
 	}
 	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
-		return nil, &arduino.PlatformNotFound{Platform: ref.String(), Cause: err}
+		return nil, &arduino.PlatformNotFoundError{Platform: ref.String(), Cause: err}
 	}
 
 	if err := downloadPlatform(pm, platform, downloadCB); err != nil {

@@ -43,7 +43,7 @@ func findLibraryIndexRelease(lm *librariesmanager.LibrariesManager, req libraryR
 	}
 	lib := lm.Index.FindRelease(ref)
 	if lib == nil {
-		return nil, &arduino.LibraryNotFound{Library: ref.String()}
+		return nil, &arduino.LibraryNotFoundError{Library: ref.String()}
 	}
 	return lib, nil
 }

@@ -58,11 +58,11 @@ func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemana
 	// Search the latest version for all specified platforms
 	platform := pm.FindPlatform(platformRef)
 	if platform == nil {
-		return &arduino.PlatformNotFound{Platform: platformRef.String()}
+		return &arduino.PlatformNotFoundError{Platform: platformRef.String()}
 	}
 	installed := pm.GetInstalledPlatformRelease(platform)
 	if installed == nil {
-		return &arduino.PlatformNotFound{Platform: platformRef.String()}
+		return &arduino.PlatformNotFoundError{Platform: platformRef.String()}
 	}
 	latest := platform.GetLatestRelease()
 	if !latest.Version.GreaterThan(installed.Version) {
@@ -72,7 +72,7 @@ func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemana
 
 	platformRelease, tools, err := pm.FindPlatformReleaseDependencies(platformRef)
 	if err != nil {
-		return &arduino.PlatformNotFound{Platform: platformRef.String()}
+		return &arduino.PlatformNotFoundError{Platform: platformRef.String()}
 	}
 	if err := installPlatform(pm, platformRelease, tools, downloadCB, taskCB, skipPostInstall); err != nil {
 		return err

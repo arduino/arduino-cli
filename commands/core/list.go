@@ -55,7 +55,7 @@ func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, error) {
 			if platformRelease != nil {
 				latest := platform.GetLatestRelease()
 				if latest == nil {
-					return nil, &arduino.PlatformNotFound{Platform: platform.String(), Cause: fmt.Errorf(tr("the platform has no releases"))}
+					return nil, &arduino.PlatformNotFoundError{Platform: platform.String(), Cause: fmt.Errorf(tr("the platform has no releases"))}
 				}
 
 				if req.UpdatableOnly {

@@ -46,7 +46,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
 	}
 	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
-		return nil, &arduino.PlatformNotFound{Platform: ref.String(), Cause: err}
+		return nil, &arduino.PlatformNotFoundError{Platform: ref.String(), Cause: err}
 	}
 
 	err = installPlatform(pm, platform, tools, downloadCB, taskCB, req.GetSkipPostInstall())

@@ -285,41 +285,41 @@ func (e *MissingPlatformPropertyError) ToRPCStatus() *status.Status {
 	return status.New(codes.FailedPrecondition, e.Error())
 }
 
-// PlatformNotFound is returned when a platform is not found
-type PlatformNotFound struct {
+// PlatformNotFoundError is returned when a platform is not found
+type PlatformNotFoundError struct {
 	Platform string
 	Cause    error
 }
 
-func (e *PlatformNotFound) Error() string {
+func (e *PlatformNotFoundError) Error() string {
 	return composeErrorMsg(tr("Platform '%s' not found", e.Platform), e.Cause)
 }
 
 // ToRPCStatus converts the error into a *status.Status
-func (e *PlatformNotFound) ToRPCStatus() *status.Status {
+func (e *PlatformNotFoundError) ToRPCStatus() *status.Status {
 	return status.New(codes.FailedPrecondition, e.Error())
 }
 
-func (e *PlatformNotFound) Unwrap() error {
+func (e *PlatformNotFoundError) Unwrap() error {
 	return e.Cause
 }
 
-// LibraryNotFound is returned when a platform is not found
-type LibraryNotFound struct {
+// LibraryNotFoundError is returned when a platform is not found
+type LibraryNotFoundError struct {
 	Library string
 	Cause   error
 }
 
-func (e *LibraryNotFound) Error() string {
+func (e *LibraryNotFoundError) Error() string {
 	return composeErrorMsg(tr("Library '%s' not found", e.Library), e.Cause)
 }
 
 // ToRPCStatus converts the error into a *status.Status
-func (e *LibraryNotFound) ToRPCStatus() *status.Status {
+func (e *LibraryNotFoundError) ToRPCStatus() *status.Status {
 	return status.New(codes.FailedPrecondition, e.Error())
 }
 
-func (e *LibraryNotFound) Unwrap() error {
+func (e *LibraryNotFoundError) Unwrap() error {
 	return e.Cause
 }
 
