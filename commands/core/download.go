@@ -19,6 +19,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
@@ -32,12 +33,12 @@ var tr = i18n.Tr
 func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, downloadCB commands.DownloadProgressCB) (*rpc.PlatformDownloadResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, &commands.InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 
 	version, err := commands.ParseVersion(req)
 	if err != nil {
-		return nil, &commands.InvalidVersionError{Cause: err}
+		return nil, &arduino.InvalidVersionError{Cause: err}
 	}
 
 	ref := &packagemanager.PlatformReference{
@@ -47,7 +48,7 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, dow
 	}
 	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
-		return nil, &commands.PlatformNotFound{Platform: ref.String(), Cause: err}
+		return nil, &arduino.PlatformNotFound{Platform: ref.String(), Cause: err}
 	}
 
 	if err := downloadPlatform(pm, platform, downloadCB); err != nil {
@@ -67,11 +68,11 @@ func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.
 	// Download platform
 	config, err := commands.GetDownloaderConfig()
 	if err != nil {
-		return &commands.FailedDownloadError{Message: tr("Error downloading platform %s", platformRelease), Cause: err}
+		return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", platformRelease), Cause: err}
 	}
 	resp, err := pm.DownloadPlatformRelease(platformRelease, config)
 	if err != nil {
-		return &commands.FailedDownloadError{Message: tr("Error downloading platform %s", platformRelease), Cause: err}
+		return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", platformRelease), Cause: err}
 	}
 	return commands.Download(resp, platformRelease.String(), downloadCB)
 }
@@ -79,13 +80,13 @@ func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.
 func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB commands.DownloadProgressCB) error {
 	// Check if tool has a flavor available for the current OS
 	if tool.GetCompatibleFlavour() == nil {
-		return &commands.FailedDownloadError{
+		return &arduino.FailedDownloadError{
 			Message: tr("Error downloading tool %s", tool),
 			Cause:   errors.New(tr("no versions available for the current OS", tool))}
 	}
 
 	if err := commands.DownloadToolRelease(pm, tool, downloadCB); err != nil {
-		return &commands.FailedDownloadError{Message: tr("Error downloading tool %s", tool), Cause: err}
+		return &arduino.FailedDownloadError{Message: tr("Error downloading tool %s", tool), Cause: err}
 	}
 
 	return nil

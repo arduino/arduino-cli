@@ -18,6 +18,7 @@ package lib
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
@@ -27,7 +28,7 @@ func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, tas
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	ref, err := createLibIndexReference(lm, req)
 	if err != nil {
-		return &commands.InvalidLibraryError{Cause: err}
+		return &arduino.InvalidLibraryError{Cause: err}
 	}
 
 	lib := lm.FindByReference(ref)

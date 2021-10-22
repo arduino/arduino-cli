@@ -16,6 +16,7 @@
 package lib
 
 import (
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -25,7 +26,7 @@ import (
 func LibraryUpgradeAll(instanceID int32, downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(instanceID)
 	if lm == nil {
-		return &commands.InvalidInstanceError{}
+		return &arduino.InvalidInstanceError{}
 	}
 
 	if err := upgrade(lm, listLibraries(lm, true, true), downloadCB, taskCB); err != nil {
@@ -43,7 +44,7 @@ func LibraryUpgradeAll(instanceID int32, downloadCB commands.DownloadProgressCB,
 func LibraryUpgrade(instanceID int32, libraryNames []string, downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(instanceID)
 	if lm == nil {
-		return &commands.InvalidInstanceError{}
+		return &arduino.InvalidInstanceError{}
 	}
 
 	// get the libs to upgrade

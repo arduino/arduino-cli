@@ -17,13 +17,14 @@ package compile
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"io"
 	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino"
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -89,17 +90,17 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, &commands.InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 
 	logrus.Tracef("Compile %s for %s started", req.GetSketchPath(), req.GetFqbn())
 	if req.GetSketchPath() == "" {
-		return nil, &commands.MissingSketchPathError{}
+		return nil, &arduino.MissingSketchPathError{}
 	}
 	sketchPath := paths.New(req.GetSketchPath())
 	sk, err := sketch.New(sketchPath)
 	if err != nil {
-		return nil, &commands.CantOpenSketchError{Cause: err}
+		return nil, &arduino.CantOpenSketchError{Cause: err}
 	}
 
 	fqbnIn := req.GetFqbn()
@@ -107,11 +108,11 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		fqbnIn = sk.Metadata.CPU.Fqbn
 	}
 	if fqbnIn == "" {
-		return nil, &commands.MissingFQBNError{}
+		return nil, &arduino.MissingFQBNError{}
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, &commands.InvalidFQBNError{Cause: err}
+		return nil, &arduino.InvalidFQBNError{Cause: err}
 	}
 
 	targetPlatform := pm.FindPlatform(&packagemanager.PlatformReference{
@@ -124,7 +125,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		// 	"\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+
 		// 		version.GetAppName()+" core install %[1]s:%[2]s\".", fqbn.Package, fqbn.PlatformArch)
 		// feedback.Error(errorMessage)
-		return nil, &commands.PlatformNotFound{Platform: targetPlatform.String(), Cause: errors.New(tr("platform not installed"))}
+		return nil, &arduino.PlatformNotFound{Platform: targetPlatform.String(), Cause: fmt.Errorf(tr("platform not installed"))}
 	}
 
 	builderCtx := &types.Context{}
@@ -147,7 +148,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		builderCtx.BuildPath = paths.New(req.GetBuildPath()).Canonical()
 	}
 	if err = builderCtx.BuildPath.MkdirAll(); err != nil {
-		return nil, &commands.PermissionDeniedError{Message: tr("Cannot create build directory"), Cause: err}
+		return nil, &arduino.PermissionDeniedError{Message: tr("Cannot create build directory"), Cause: err}
 	}
 	builderCtx.CompilationDatabase = bldr.NewCompilationDatabase(
 		builderCtx.BuildPath.Join("compile_commands.json"),
@@ -177,7 +178,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		builderCtx.BuildCachePath = paths.New(req.GetBuildCachePath())
 		err = builderCtx.BuildCachePath.MkdirAll()
 		if err != nil {
-			return nil, &commands.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
+			return nil, &arduino.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
 		}
 	}
 
@@ -222,20 +223,20 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	if req.GetShowProperties() {
 		compileErr := builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
 		if compileErr != nil {
-			compileErr = &commands.CompileFailedError{Message: err.Error()}
+			compileErr = &arduino.CompileFailedError{Message: err.Error()}
 		}
 		return r, compileErr
 	} else if req.GetPreprocess() {
 		compileErr := builder.RunPreprocess(builderCtx)
 		if compileErr != nil {
-			compileErr = &commands.CompileFailedError{Message: err.Error()}
+			compileErr = &arduino.CompileFailedError{Message: err.Error()}
 		}
 		return r, compileErr
 	}
 
 	// if it's a regular build, go on...
 	if err := builder.RunBuilder(builderCtx); err != nil {
-		return r, &commands.CompileFailedError{Message: err.Error()}
+		return r, &arduino.CompileFailedError{Message: err.Error()}
 	}
 
 	// If the export directory is set we assume you want to export the binaries
@@ -257,17 +258,17 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		}
 		logrus.WithField("path", exportPath).Trace("Saving sketch to export path.")
 		if err := exportPath.MkdirAll(); err != nil {
-			return r, &commands.PermissionDeniedError{Message: tr("Error creating output dir"), Cause: err}
+			return r, &arduino.PermissionDeniedError{Message: tr("Error creating output dir"), Cause: err}
 		}
 
 		// Copy all "sketch.ino.*" artifacts to the export directory
 		baseName, ok := builderCtx.BuildProperties.GetOk("build.project_name") // == "sketch.ino"
 		if !ok {
-			return r, &commands.MissingPlatformPropertyError{Property: "build.project_name"}
+			return r, &arduino.MissingPlatformPropertyError{Property: "build.project_name"}
 		}
 		buildFiles, err := builderCtx.BuildPath.ReadDir()
 		if err != nil {
-			return r, &commands.PermissionDeniedError{Message: tr("Error reading build directory"), Cause: err}
+			return r, &arduino.PermissionDeniedError{Message: tr("Error reading build directory"), Cause: err}
 		}
 		buildFiles.FilterPrefix(baseName)
 		for _, buildFile := range buildFiles {
@@ -277,7 +278,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 				WithField("dest", exportedFile).
 				Trace("Copying artifact.")
 			if err = buildFile.CopyTo(exportedFile); err != nil {
-				return r, &commands.PermissionDeniedError{Message: tr("Error copying output file %s", buildFile), Cause: err}
+				return r, &arduino.PermissionDeniedError{Message: tr("Error copying output file %s", buildFile), Cause: err}
 			}
 		}
 	}
@@ -286,7 +287,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	for _, lib := range builderCtx.ImportedLibraries {
 		rpcLib, err := lib.ToRPCLibrary()
 		if err != nil {
-			return r, &commands.PermissionDeniedError{Message: tr("Error getting information for library %s", lib.Name), Cause: err}
+			return r, &arduino.PermissionDeniedError{Message: tr("Error getting information for library %s", lib.Name), Cause: err}
 		}
 		importedLibs = append(importedLibs, rpcLib)
 	}

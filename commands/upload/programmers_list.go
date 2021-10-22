@@ -18,6 +18,7 @@ package upload
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -29,17 +30,17 @@ func ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgram
 
 	fqbnIn := req.GetFqbn()
 	if fqbnIn == "" {
-		return nil, &commands.MissingFQBNError{}
+		return nil, &arduino.MissingFQBNError{}
 	}
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return nil, &commands.InvalidFQBNError{Cause: err}
+		return nil, &arduino.InvalidFQBNError{Cause: err}
 	}
 
 	// Find target platforms
 	_, platform, _, _, refPlatform, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
-		return nil, &commands.UnknownFQBNError{Cause: err}
+		return nil, &arduino.UnknownFQBNError{Cause: err}
 	}
 
 	result := []*rpc.Programmer{}

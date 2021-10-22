@@ -19,6 +19,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -28,7 +29,7 @@ import (
 func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesRequest) (*rpc.LibraryResolveDependenciesResponse, error) {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
-		return nil, &commands.InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 
 	// Search the requested lib
@@ -52,12 +53,12 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 		for _, directDep := range reqLibRelease.GetDependencies() {
 			if _, ok := lm.Index.Libraries[directDep.GetName()]; !ok {
 				err := errors.New(tr("dependency '%s' is not available", directDep.GetName()))
-				return nil, &commands.LibraryDependenciesResolutionFailedError{Cause: err}
+				return nil, &arduino.LibraryDependenciesResolutionFailedError{Cause: err}
 			}
 		}
 
 		// Otherwise there is no possible solution, the depends field has an invalid formula
-		return nil, &commands.LibraryDependenciesResolutionFailedError{}
+		return nil, &arduino.LibraryDependenciesResolutionFailedError{}
 	}
 
 	res := []*rpc.LibraryDependencyStatus{}
