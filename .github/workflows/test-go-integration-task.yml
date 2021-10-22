@@ -57,33 +57,30 @@ jobs:
 
           echo "::set-output name=result::$RESULT"
 
-  test:
+  tests-collector:
+    runs-on: ubuntu-latest
     needs: run-determination
     if: needs.run-determination.outputs.result == 'true'
+    outputs:
+      tests-data: ${{ steps.collection.outputs.tests-data }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
+      - name: Collect tests
+        id: collection
+        run: |
+          echo "::set-output name=tests-data::$(python .github/tools/get_integration_tests.py ./test/)"
+
+  test:
+    needs: tests-collector
     strategy:
       matrix:
         operating-system:
           - ubuntu-latest
           - windows-latest
           - macos-latest
-        test-file:
-          - test/test_board.py
-          - test/test_cache.py
-          - test/test_compile.py
-          - test/test_completion.py
-          - test/test_config.py
-          - test/test_core.py
-          - test/test_daemon.py
-          - test/test_debug.py
-          - test/test_lib.py
-          - test/test_main.py
-          - test/test_outdated.py
-          - test/test_sketch.py
-          - test/test_update.py
-          - test/test_upgrade.py
-          - test/test_upload_mock.py
-          - test/test_upload.py
+        tests: ${{ fromJSON(needs.tests-collector.outputs.tests-data) }}
 
     runs-on: ${{ matrix.operating-system }}
 
@@ -121,4 +118,4 @@ jobs:
         run: task poetry:install-deps
 
       - name: Run integration tests
-        run: poetry run pytest ${{ matrix.test-file }}
+        run: poetry run pytest ${{ matrix.tests }}
