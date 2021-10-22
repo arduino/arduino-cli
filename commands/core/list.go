@@ -38,14 +38,16 @@ func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, error) {
 		for _, platform := range targetPackage.Platforms {
 			platformRelease := packageManager.GetInstalledPlatformRelease(platform)
 
+			// The All flags adds to the list of installed platforms the installable platforms (from the indexes)
 			// If both All and UpdatableOnly are set All takes precedence
 			if req.All {
 				installedVersion := ""
-				if platformRelease == nil {
+				if platformRelease == nil { // if the platform is not installed
 					platformRelease = platform.GetLatestRelease()
 				} else {
 					installedVersion = platformRelease.Version.String()
 				}
+				// it could happen, especially with indexes not perfectly compliant with specs that a platform do not contain a valid release
 				if platformRelease != nil {
 					rpcPlatform := commands.PlatformReleaseToRPC(platformRelease)
 					rpcPlatform.Installed = installedVersion
@@ -60,10 +62,9 @@ func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, error) {
 					return nil, &arduino.PlatformNotFoundError{Platform: platform.String(), Cause: fmt.Errorf(tr("the platform has no releases"))}
 				}
 
-				if req.UpdatableOnly {
-					if latest == platformRelease {
-						continue
-					}
+				// show only the updatable platforms
+				if req.UpdatableOnly && latest == platformRelease {
+					continue
 				}
 
 				rpcPlatform := commands.PlatformReleaseToRPC(platformRelease)
