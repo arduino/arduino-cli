@@ -18,6 +18,7 @@ package core
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
@@ -30,12 +31,12 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, &commands.InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 
 	version, err := commands.ParseVersion(req)
 	if err != nil {
-		return nil, &commands.InvalidVersionError{Cause: err}
+		return nil, &arduino.InvalidVersionError{Cause: err}
 	}
 
 	ref := &packagemanager.PlatformReference{
@@ -45,7 +46,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
 	}
 	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
-		return nil, &commands.PlatformNotFound{Platform: ref.String(), Cause: err}
+		return nil, &arduino.PlatformNotFoundError{Platform: ref.String(), Cause: err}
 	}
 
 	err = installPlatform(pm, platform, tools, downloadCB, taskCB, req.GetSkipPostInstall())
@@ -123,14 +124,14 @@ func installPlatform(pm *packagemanager.PackageManager,
 		var err error
 		_, installedTools, err = pm.FindPlatformReleaseDependencies(platformRef)
 		if err != nil {
-			return &commands.NotFoundError{Message: tr("Can't find dependencies for platform %s", platformRef), Cause: err}
+			return &arduino.NotFoundError{Message: tr("Can't find dependencies for platform %s", platformRef), Cause: err}
 		}
 	}
 
 	// Install
 	if err := pm.InstallPlatform(platformRelease); err != nil {
 		log.WithError(err).Error("Cannot install platform")
-		return &commands.FailedInstallError{Message: tr("Cannot install platform"), Cause: err}
+		return &arduino.FailedInstallError{Message: tr("Cannot install platform"), Cause: err}
 	}
 
 	// If upgrading remove previous release
@@ -148,7 +149,7 @@ func installPlatform(pm *packagemanager.PackageManager,
 				taskCB(&rpc.TaskProgress{Message: tr("Error rolling-back changes: %s", err)})
 			}
 
-			return &commands.FailedInstallError{Message: tr("Cannot upgrade platform"), Cause: uninstallErr}
+			return &arduino.FailedInstallError{Message: tr("Cannot upgrade platform"), Cause: uninstallErr}
 		}
 
 		// Uninstall unused tools

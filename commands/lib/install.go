@@ -19,6 +19,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
@@ -32,7 +33,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest,
 
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
-		return &commands.InvalidInstanceError{}
+		return &arduino.InvalidInstanceError{}
 	}
 
 	toInstall := map[string]*rpc.LibraryDependencyStatus{}
@@ -57,7 +58,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest,
 					err := errors.New(
 						tr("two different versions of the library %[1]s are required: %[2]s and %[3]s",
 							dep.Name, dep.VersionRequired, existingDep.VersionRequired))
-					return &commands.LibraryDependenciesResolutionFailedError{Cause: err}
+					return &arduino.LibraryDependenciesResolutionFailedError{Cause: err}
 				}
 			}
 			toInstall[dep.Name] = dep
@@ -98,7 +99,7 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 	}
 
 	if err != nil {
-		return &commands.FailedInstallError{Message: tr("Checking lib install prerequisites"), Cause: err}
+		return &arduino.FailedInstallError{Message: tr("Checking lib install prerequisites"), Cause: err}
 	}
 
 	if libReplaced != nil {
@@ -106,7 +107,7 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 	}
 
 	if err := lm.Install(libRelease, libPath); err != nil {
-		return &commands.FailedLibraryInstallError{Cause: err}
+		return &arduino.FailedLibraryInstallError{Cause: err}
 	}
 
 	taskCB(&rpc.TaskProgress{Message: tr("Installed %s", libRelease), Completed: true})
@@ -117,7 +118,7 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallRequest, taskCB commands.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if err := lm.InstallZipLib(ctx, req.Path, req.Overwrite); err != nil {
-		return &commands.FailedLibraryInstallError{Cause: err}
+		return &arduino.FailedLibraryInstallError{Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Message: tr("Library installed"), Completed: true})
 	return nil
@@ -127,7 +128,7 @@ func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallRequest, t
 func GitLibraryInstall(ctx context.Context, req *rpc.GitLibraryInstallRequest, taskCB commands.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if err := lm.InstallGitLib(req.Url, req.Overwrite); err != nil {
-		return &commands.FailedLibraryInstallError{Cause: err}
+		return &arduino.FailedLibraryInstallError{Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Message: tr("Library installed"), Completed: true})
 	return nil

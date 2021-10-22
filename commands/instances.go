@@ -24,6 +24,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -110,7 +111,7 @@ func Create(req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
 	if downloadsDir.NotExist() {
 		err := downloadsDir.MkdirAll()
 		if err != nil {
-			return nil, &PermissionDeniedError{Message: tr("Failed to create downloads directory"), Cause: err}
+			return nil, &arduino.PermissionDeniedError{Message: tr("Failed to create downloads directory"), Cause: err}
 		}
 	}
 
@@ -120,7 +121,7 @@ func Create(req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
 	if packagesDir.NotExist() {
 		err := packagesDir.MkdirAll()
 		if err != nil {
-			return nil, &PermissionDeniedError{Message: tr("Failed to create data directory"), Cause: err}
+			return nil, &arduino.PermissionDeniedError{Message: tr("Failed to create data directory"), Cause: err}
 		}
 	}
 
@@ -170,7 +171,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	}
 	instance := instances[req.Instance.Id]
 	if instance == nil {
-		return &InvalidInstanceError{}
+		return &arduino.InvalidInstanceError{}
 	}
 
 	// We need to clear the PackageManager currently in use by this instance
@@ -350,7 +351,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse, error) {
 	id := req.GetInstance().GetId()
 	if _, ok := instances[id]; !ok {
-		return nil, &InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 
 	delete(instances, id)
@@ -362,7 +363,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 	logrus.Info("Updating libraries index")
 	lm := GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
-		return &InvalidInstanceError{}
+		return &arduino.InvalidInstanceError{}
 	}
 	config, err := GetDownloaderConfig()
 	if err != nil {
@@ -370,13 +371,13 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 	}
 
 	if err := lm.IndexFile.Parent().MkdirAll(); err != nil {
-		return &PermissionDeniedError{Message: tr("Could not create index directory"), Cause: err}
+		return &arduino.PermissionDeniedError{Message: tr("Could not create index directory"), Cause: err}
 	}
 
 	// Create a temp dir to stage all downloads
 	tmp, err := paths.MkTempDir("", "library_index_download")
 	if err != nil {
-		return &TempDirCreationFailedError{Cause: err}
+		return &arduino.TempDirCreationFailedError{Cause: err}
 	}
 	defer tmp.RemoveAll()
 
@@ -384,43 +385,43 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 	tmpIndexGz := tmp.Join("library_index.json.gz")
 	if d, err := downloader.DownloadWithConfig(tmpIndexGz.String(), librariesmanager.LibraryIndexGZURL.String(), *config, downloader.NoResume); err == nil {
 		if err := Download(d, tr("Updating index: library_index.json.gz"), downloadCB); err != nil {
-			return &FailedDownloadError{Message: tr("Error downloading library_index.json.gz"), Cause: err}
+			return &arduino.FailedDownloadError{Message: tr("Error downloading library_index.json.gz"), Cause: err}
 		}
 	} else {
-		return &FailedDownloadError{Message: tr("Error downloading library_index.json.gz"), Cause: err}
+		return &arduino.FailedDownloadError{Message: tr("Error downloading library_index.json.gz"), Cause: err}
 	}
 
 	// Download signature
 	tmpSignature := tmp.Join("library_index.json.sig")
 	if d, err := downloader.DownloadWithConfig(tmpSignature.String(), librariesmanager.LibraryIndexSignature.String(), *config, downloader.NoResume); err == nil {
 		if err := Download(d, tr("Updating index: library_index.json.sig"), downloadCB); err != nil {
-			return &FailedDownloadError{Message: tr("Error downloading library_index.json.sig"), Cause: err}
+			return &arduino.FailedDownloadError{Message: tr("Error downloading library_index.json.sig"), Cause: err}
 		}
 	} else {
-		return &FailedDownloadError{Message: tr("Error downloading library_index.json.sig"), Cause: err}
+		return &arduino.FailedDownloadError{Message: tr("Error downloading library_index.json.sig"), Cause: err}
 	}
 
 	// Extract the real library_index
 	tmpIndex := tmp.Join("library_index.json")
 	if err := paths.GUnzip(tmpIndexGz, tmpIndex); err != nil {
-		return &PermissionDeniedError{Message: tr("Error extracting library_index.json.gz"), Cause: err}
+		return &arduino.PermissionDeniedError{Message: tr("Error extracting library_index.json.gz"), Cause: err}
 	}
 
 	// Check signature
 	if ok, _, err := security.VerifyArduinoDetachedSignature(tmpIndex, tmpSignature); err != nil {
-		return &PermissionDeniedError{Message: tr("Error verifying signature"), Cause: err}
+		return &arduino.PermissionDeniedError{Message: tr("Error verifying signature"), Cause: err}
 	} else if !ok {
-		return &SignatureVerificationFailedError{File: "library_index.json"}
+		return &arduino.SignatureVerificationFailedError{File: "library_index.json"}
 	}
 
 	// Copy extracted library_index and signature to final destination
 	lm.IndexFile.Remove()
 	lm.IndexFileSignature.Remove()
 	if err := tmpIndex.CopyTo(lm.IndexFile); err != nil {
-		return &PermissionDeniedError{Message: tr("Error writing library_index.json"), Cause: err}
+		return &arduino.PermissionDeniedError{Message: tr("Error writing library_index.json"), Cause: err}
 	}
 	if err := tmpSignature.CopyTo(lm.IndexFileSignature); err != nil {
-		return &PermissionDeniedError{Message: tr("Error writing library_index.json.sig"), Cause: err}
+		return &arduino.PermissionDeniedError{Message: tr("Error writing library_index.json.sig"), Cause: err}
 	}
 
 	return nil
@@ -431,7 +432,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 	id := req.GetInstance().GetId()
 	_, ok := instances[id]
 	if !ok {
-		return nil, &InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 
 	indexpath := paths.New(configuration.Settings.GetString("directories.Data"))
@@ -451,7 +452,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 		if URL.Scheme == "file" {
 			path := paths.New(URL.Path)
 			if _, err := packageindex.LoadIndexNoSign(path); err != nil {
-				return nil, &InvalidArgumentError{Message: tr("Invalid package index in %s", path), Cause: err}
+				return nil, &arduino.InvalidArgumentError{Message: tr("Invalid package index in %s", path), Cause: err}
 			}
 
 			fi, _ := os.Stat(path.String())
@@ -465,9 +466,9 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 
 		var tmp *paths.Path
 		if tmpFile, err := ioutil.TempFile("", ""); err != nil {
-			return nil, &TempFileCreationFailedError{Cause: err}
+			return nil, &arduino.TempFileCreationFailedError{Cause: err}
 		} else if err := tmpFile.Close(); err != nil {
-			return nil, &TempFileCreationFailedError{Cause: err}
+			return nil, &arduino.TempFileCreationFailedError{Cause: err}
 		} else {
 			tmp = paths.New(tmpFile.Name())
 		}
@@ -475,16 +476,16 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 
 		config, err := GetDownloaderConfig()
 		if err != nil {
-			return nil, &FailedDownloadError{Message: tr("Error downloading index '%s'", URL), Cause: err}
+			return nil, &arduino.FailedDownloadError{Message: tr("Error downloading index '%s'", URL), Cause: err}
 		}
 		d, err := downloader.DownloadWithConfig(tmp.String(), URL.String(), *config)
 		if err != nil {
-			return nil, &FailedDownloadError{Message: tr("Error downloading index '%s'", URL), Cause: err}
+			return nil, &arduino.FailedDownloadError{Message: tr("Error downloading index '%s'", URL), Cause: err}
 		}
 		coreIndexPath := indexpath.Join(path.Base(URL.Path))
 		err = Download(d, tr("Updating index: %s", coreIndexPath.Base()), downloadCB)
 		if err != nil {
-			return nil, &FailedDownloadError{Message: tr("Error downloading index '%s'", URL), Cause: err}
+			return nil, &arduino.FailedDownloadError{Message: tr("Error downloading index '%s'", URL), Cause: err}
 		}
 
 		// Check for signature
@@ -493,14 +494,14 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 		if URL.Hostname() == "downloads.arduino.cc" {
 			URLSig, err := url.Parse(URL.String())
 			if err != nil {
-				return nil, &InvalidURLError{Cause: err}
+				return nil, &arduino.InvalidURLError{Cause: err}
 			}
 			URLSig.Path += ".sig"
 
 			if t, err := ioutil.TempFile("", ""); err != nil {
-				return nil, &TempFileCreationFailedError{Cause: err}
+				return nil, &arduino.TempFileCreationFailedError{Cause: err}
 			} else if err := t.Close(); err != nil {
-				return nil, &TempFileCreationFailedError{Cause: err}
+				return nil, &arduino.TempFileCreationFailedError{Cause: err}
 			} else {
 				tmpSig = paths.New(t.Name())
 			}
@@ -508,36 +509,36 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 
 			d, err := downloader.DownloadWithConfig(tmpSig.String(), URLSig.String(), *config)
 			if err != nil {
-				return nil, &FailedDownloadError{Message: tr("Error downloading index signature '%s'", URLSig), Cause: err}
+				return nil, &arduino.FailedDownloadError{Message: tr("Error downloading index signature '%s'", URLSig), Cause: err}
 			}
 
 			coreIndexSigPath = indexpath.Join(path.Base(URLSig.Path))
 			Download(d, tr("Updating index: %s", coreIndexSigPath.Base()), downloadCB)
 			if d.Error() != nil {
-				return nil, &FailedDownloadError{Message: tr("Error downloading index signature '%s'", URLSig), Cause: err}
+				return nil, &arduino.FailedDownloadError{Message: tr("Error downloading index signature '%s'", URLSig), Cause: err}
 			}
 
 			if valid, _, err := security.VerifyArduinoDetachedSignature(tmp, tmpSig); err != nil {
-				return nil, &PermissionDeniedError{Message: tr("Error verifying signature"), Cause: err}
+				return nil, &arduino.PermissionDeniedError{Message: tr("Error verifying signature"), Cause: err}
 			} else if !valid {
-				return nil, &SignatureVerificationFailedError{File: URL.String()}
+				return nil, &arduino.SignatureVerificationFailedError{File: URL.String()}
 			}
 		}
 
 		if _, err := packageindex.LoadIndex(tmp); err != nil {
-			return nil, &InvalidArgumentError{Message: tr("Invalid package index in %s", URL), Cause: err}
+			return nil, &arduino.InvalidArgumentError{Message: tr("Invalid package index in %s", URL), Cause: err}
 		}
 
 		if err := indexpath.MkdirAll(); err != nil {
-			return nil, &PermissionDeniedError{Message: tr("Can't create data directory %s", indexpath), Cause: err}
+			return nil, &arduino.PermissionDeniedError{Message: tr("Can't create data directory %s", indexpath), Cause: err}
 		}
 
 		if err := tmp.CopyTo(coreIndexPath); err != nil {
-			return nil, &PermissionDeniedError{Message: tr("Error saving downloaded index %s", URL), Cause: err}
+			return nil, &arduino.PermissionDeniedError{Message: tr("Error saving downloaded index %s", URL), Cause: err}
 		}
 		if tmpSig != nil {
 			if err := tmpSig.CopyTo(coreIndexSigPath); err != nil {
-				return nil, &PermissionDeniedError{Message: tr("Error saving downloaded index signature"), Cause: err}
+				return nil, &arduino.PermissionDeniedError{Message: tr("Error saving downloaded index signature"), Cause: err}
 			}
 		}
 	}
@@ -570,7 +571,7 @@ func Outdated(ctx context.Context, req *rpc.OutdatedRequest) (*rpc.OutdatedRespo
 
 	lm := GetLibraryManager(id)
 	if lm == nil {
-		return nil, &InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 
 	outdatedLibraries := []*rpc.InstalledLibrary{}
@@ -593,7 +594,7 @@ func Outdated(ctx context.Context, req *rpc.OutdatedRequest) (*rpc.OutdatedRespo
 
 	pm := GetPackageManager(id)
 	if pm == nil {
-		return nil, &InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 
 	outdatedPlatforms := []*rpc.Platform{}
@@ -691,7 +692,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 
 	lm := GetLibraryManager(req.Instance.Id)
 	if lm == nil {
-		return &InvalidInstanceError{}
+		return &arduino.InvalidInstanceError{}
 	}
 
 	for _, libAlternatives := range lm.Libraries {
@@ -707,9 +708,9 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 			// Downloads latest library release
 			taskCB(&rpc.TaskProgress{Name: tr("Downloading %s", available)})
 			if d, err := available.Resource.Download(lm.DownloadsDir, downloaderConfig); err != nil {
-				return &FailedDownloadError{Message: tr("Error downloading library"), Cause: err}
+				return &arduino.FailedDownloadError{Message: tr("Error downloading library"), Cause: err}
 			} else if err := Download(d, available.String(), downloadCB); err != nil {
-				return &FailedDownloadError{Message: tr("Error downloading library"), Cause: err}
+				return &arduino.FailedDownloadError{Message: tr("Error downloading library"), Cause: err}
 			}
 
 			// Installs downloaded library
@@ -719,7 +720,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 				taskCB(&rpc.TaskProgress{Message: tr("Already installed %s", available), Completed: true})
 				continue
 			} else if err != nil {
-				return &FailedLibraryInstallError{Cause: err}
+				return &arduino.FailedLibraryInstallError{Cause: err}
 			}
 
 			if libReplaced != nil {
@@ -727,7 +728,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 			}
 
 			if err := lm.Install(available, libPath); err != nil {
-				return &FailedLibraryInstallError{Cause: err}
+				return &arduino.FailedLibraryInstallError{Cause: err}
 			}
 
 			taskCB(&rpc.TaskProgress{Message: tr("Installed %s", available), Completed: true})
@@ -736,7 +737,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 
 	pm := GetPackageManager(req.Instance.Id)
 	if pm == nil {
-		return &InvalidInstanceError{}
+		return &arduino.InvalidInstanceError{}
 	}
 
 	for _, targetPackage := range pm.Packages {
@@ -755,7 +756,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 				// Get list of installed tools needed by the currently installed version
 				_, installedTools, err := pm.FindPlatformReleaseDependencies(ref)
 				if err != nil {
-					return &NotFoundError{Message: tr("Can't find dependencies for platform %s", ref), Cause: err}
+					return &arduino.NotFoundError{Message: tr("Can't find dependencies for platform %s", ref), Cause: err}
 				}
 
 				ref = &packagemanager.PlatformReference{
@@ -767,7 +768,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 				taskCB(&rpc.TaskProgress{Name: tr("Downloading %s", latest)})
 				_, tools, err := pm.FindPlatformReleaseDependencies(ref)
 				if err != nil {
-					return &NotFoundError{Message: tr("Can't find dependencies for platform %s", ref), Cause: err}
+					return &arduino.NotFoundError{Message: tr("Can't find dependencies for platform %s", ref), Cause: err}
 				}
 
 				toolsToInstall := []*cores.ToolRelease{}
@@ -784,15 +785,15 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 				for _, tool := range toolsToInstall {
 					if err := DownloadToolRelease(pm, tool, downloadCB); err != nil {
 						taskCB(&rpc.TaskProgress{Message: tr("Error downloading tool %s", tool)})
-						return &FailedDownloadError{Message: tr("Error downloading tool %s", tool), Cause: err}
+						return &arduino.FailedDownloadError{Message: tr("Error downloading tool %s", tool), Cause: err}
 					}
 				}
 
 				// Downloads platform
 				if d, err := pm.DownloadPlatformRelease(latest, downloaderConfig); err != nil {
-					return &FailedDownloadError{Message: tr("Error downloading platform %s", latest), Cause: err}
+					return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", latest), Cause: err}
 				} else if err := Download(d, latest.String(), downloadCB); err != nil {
-					return &FailedDownloadError{Message: tr("Error downloading platform %s", latest), Cause: err}
+					return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", latest), Cause: err}
 				}
 
 				logrus.Info("Updating platform " + installed.String())
@@ -803,7 +804,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 					if err := InstallToolRelease(pm, tool, taskCB); err != nil {
 						msg := tr("Error installing tool %s", tool)
 						taskCB(&rpc.TaskProgress{Message: msg})
-						return &FailedInstallError{Message: msg, Cause: err}
+						return &arduino.FailedInstallError{Message: msg, Cause: err}
 					}
 				}
 
@@ -813,7 +814,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 					logrus.WithError(err).Error("Cannot install platform")
 					msg := tr("Error installing platform %s", latest)
 					taskCB(&rpc.TaskProgress{Message: msg})
-					return &FailedInstallError{Message: msg, Cause: err}
+					return &arduino.FailedInstallError{Message: msg, Cause: err}
 				}
 
 				// Uninstall previously installed release
@@ -829,7 +830,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 						logrus.WithError(err).Error("Error rolling-back changes.")
 						msg := tr("Error rolling-back changes")
 						taskCB(&rpc.TaskProgress{Message: fmt.Sprintf("%s: %s", msg, err)})
-						return &FailedInstallError{Message: msg, Cause: err}
+						return &arduino.FailedInstallError{Message: msg, Cause: err}
 					}
 				}
 
@@ -843,7 +844,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 
 						if err := pm.UninstallTool(toolRelease); err != nil {
 							log.WithError(err).Error("Error uninstalling")
-							return &FailedInstallError{Message: tr("Error uninstalling tool %s", toolRelease), Cause: err}
+							return &arduino.FailedInstallError{Message: tr("Error uninstalling tool %s", toolRelease), Cause: err}
 						}
 
 						log.Info("Tool uninstalled")
@@ -874,7 +875,7 @@ func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketc
 	// TODO: This should be a ToRpc function for the Sketch struct
 	sketch, err := sk.New(paths.New(req.SketchPath))
 	if err != nil {
-		return nil, &CantOpenSketchError{Cause: err}
+		return nil, &arduino.CantOpenSketchError{Cause: err}
 	}
 
 	otherSketchFiles := make([]string, sketch.OtherSketchFiles.Len())

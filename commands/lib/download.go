@@ -18,6 +18,7 @@ package lib
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
@@ -34,7 +35,7 @@ func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downl
 
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
-		return nil, &commands.InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 
 	logrus.Info("Preparing download")
@@ -57,12 +58,12 @@ func downloadLibrary(lm *librariesmanager.LibrariesManager, libRelease *librarie
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading %s", libRelease)})
 	config, err := commands.GetDownloaderConfig()
 	if err != nil {
-		return &commands.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
+		return &arduino.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	}
 	if d, err := libRelease.Resource.Download(lm.DownloadsDir, config); err != nil {
-		return &commands.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
+		return &arduino.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	} else if err := commands.Download(d, libRelease.String(), downloadCB); err != nil {
-		return &commands.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
+		return &arduino.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 

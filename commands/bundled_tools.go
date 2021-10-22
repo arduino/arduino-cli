@@ -16,6 +16,7 @@
 package commands
 
 import (
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -49,7 +50,7 @@ func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.To
 	err := pm.InstallTool(toolRelease)
 	if err != nil {
 		log.WithError(err).Warn("Cannot install tool")
-		return &FailedInstallError{Message: tr("Cannot install tool %s", toolRelease), Cause: err}
+		return &arduino.FailedInstallError{Message: tr("Cannot install tool %s", toolRelease), Cause: err}
 	}
 	log.Info("Tool installed")
 	taskCB(&rpc.TaskProgress{Message: tr("%s installed", toolRelease), Completed: true})

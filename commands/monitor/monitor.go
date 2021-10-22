@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	pluggableMonitor "github.com/arduino/arduino-cli/arduino/monitor"
@@ -61,7 +62,7 @@ func (p *PortProxy) Close() error {
 func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggableMonitor.PortDescriptor, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, nil, &commands.InvalidInstanceError{}
+		return nil, nil, &arduino.InvalidInstanceError{}
 	}
 
 	m, err := findMonitorForProtocolAndBoard(pm, req.GetPort().GetProtocol(), req.GetFqbn())
@@ -70,17 +71,17 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 	}
 
 	if err := m.Run(); err != nil {
-		return nil, nil, &commands.FailedMonitorError{Cause: err}
+		return nil, nil, &arduino.FailedMonitorError{Cause: err}
 	}
 
 	descriptor, err := m.Describe()
 	if err != nil {
-		return nil, nil, &commands.FailedMonitorError{Cause: err}
+		return nil, nil, &arduino.FailedMonitorError{Cause: err}
 	}
 
 	monIO, err := m.Open(req.GetPort().GetAddress(), req.GetPort().GetProtocol())
 	if err != nil {
-		return nil, nil, &commands.FailedMonitorError{Cause: err}
+		return nil, nil, &arduino.FailedMonitorError{Cause: err}
 	}
 
 	return &PortProxy{
@@ -95,7 +96,7 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 
 func findMonitorForProtocolAndBoard(pm *packagemanager.PackageManager, protocol, fqbn string) (*pluggableMonitor.PluggableMonitor, error) {
 	if protocol == "" {
-		return nil, &commands.MissingPortProtocolError{}
+		return nil, &arduino.MissingPortProtocolError{}
 	}
 
 	var monitorDepOrRecipe *cores.MonitorDependency
@@ -104,12 +105,12 @@ func findMonitorForProtocolAndBoard(pm *packagemanager.PackageManager, protocol,
 	if fqbn != "" {
 		fqbn, err := cores.ParseFQBN(fqbn)
 		if err != nil {
-			return nil, &commands.InvalidFQBNError{Cause: err}
+			return nil, &arduino.InvalidFQBNError{Cause: err}
 		}
 
 		_, boardPlatform, _, boardProperties, _, err := pm.ResolveFQBN(fqbn)
 		if err != nil {
-			return nil, &commands.UnknownFQBNError{Cause: err}
+			return nil, &arduino.UnknownFQBNError{Cause: err}
 		}
 
 		if mon, ok := boardPlatform.Monitors[protocol]; ok {
@@ -119,7 +120,7 @@ func findMonitorForProtocolAndBoard(pm *packagemanager.PackageManager, protocol,
 			cmdLine := boardProperties.ExpandPropsInString(recipe)
 			cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
 			if err != nil {
-				return nil, &commands.InvalidArgumentError{Message: tr("Invalid recipe in platform.txt"), Cause: err}
+				return nil, &arduino.InvalidArgumentError{Message: tr("Invalid recipe in platform.txt"), Cause: err}
 			}
 			id := fmt.Sprintf("%s-%s", boardPlatform, protocol)
 			return pluggableMonitor.New(id, cmdArgs...), nil
@@ -137,13 +138,13 @@ func findMonitorForProtocolAndBoard(pm *packagemanager.PackageManager, protocol,
 	}
 
 	if monitorDepOrRecipe == nil {
-		return nil, &commands.NoMonitorAvailableForProtocolError{Protocol: protocol}
+		return nil, &arduino.NoMonitorAvailableForProtocolError{Protocol: protocol}
 	}
 
 	// If it is a monitor dependency, resolve tool and create a monitor client
 	tool := pm.FindMonitorDependency(monitorDepOrRecipe)
 	if tool == nil {
-		return nil, &commands.MonitorNotFoundError{Monitor: monitorDepOrRecipe.String()}
+		return nil, &arduino.MonitorNotFoundError{Monitor: monitorDepOrRecipe.String()}
 	}
 
 	return pluggableMonitor.New(

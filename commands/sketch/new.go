@@ -18,8 +18,8 @@ package sketch
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/globals"
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
@@ -43,12 +43,12 @@ func NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchRe
 	}
 	sketchDirPath := paths.New(sketchesDir).Join(req.SketchName)
 	if err := sketchDirPath.MkdirAll(); err != nil {
-		return nil, &commands.CantCreateSketchError{Cause: err}
+		return nil, &arduino.CantCreateSketchError{Cause: err}
 	}
 	sketchName := sketchDirPath.Base()
 	sketchMainFilePath := sketchDirPath.Join(sketchName + globals.MainFileValidExtension)
 	if err := sketchMainFilePath.WriteFile(emptySketch); err != nil {
-		return nil, &commands.CantCreateSketchError{Cause: err}
+		return nil, &arduino.CantCreateSketchError{Cause: err}
 	}
 
 	return &rpc.NewSketchResponse{MainFile: sketchMainFilePath.String()}, nil

@@ -16,10 +16,11 @@
 package core
 
 import (
-	"errors"
+	"fmt"
 	"sort"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
@@ -29,7 +30,7 @@ import (
 func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, error) {
 	packageManager := commands.GetPackageManager(req.GetInstance().Id)
 	if packageManager == nil {
-		return nil, &commands.InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 
 	res := []*rpc.Platform{}
@@ -54,7 +55,7 @@ func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, error) {
 			if platformRelease != nil {
 				latest := platform.GetLatestRelease()
 				if latest == nil {
-					return nil, &commands.PlatformNotFound{Platform: platform.String(), Cause: errors.New(tr("the platform has no releases"))}
+					return nil, &arduino.PlatformNotFoundError{Platform: platform.String(), Cause: fmt.Errorf(tr("the platform has no releases"))}
 				}
 
 				if req.UpdatableOnly {

@@ -18,6 +18,7 @@ package monitor
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/arduino"
 	pluggableMonitor "github.com/arduino/arduino-cli/arduino/monitor"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -27,7 +28,7 @@ import (
 func EnumerateMonitorPortSettings(ctx context.Context, req *rpc.EnumerateMonitorPortSettingsRequest) (*rpc.EnumerateMonitorPortSettingsResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, &commands.InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 
 	m, err := findMonitorForProtocolAndBoard(pm, req.GetPortProtocol(), req.GetFqbn())
@@ -36,13 +37,13 @@ func EnumerateMonitorPortSettings(ctx context.Context, req *rpc.EnumerateMonitor
 	}
 
 	if err := m.Run(); err != nil {
-		return nil, &commands.FailedMonitorError{Cause: err}
+		return nil, &arduino.FailedMonitorError{Cause: err}
 	}
 	defer m.Quit()
 
 	desc, err := m.Describe()
 	if err != nil {
-		return nil, &commands.FailedMonitorError{Cause: err}
+		return nil, &arduino.FailedMonitorError{Cause: err}
 	}
 	return &rpc.EnumerateMonitorPortSettingsResponse{Settings: convert(desc)}, nil
 }

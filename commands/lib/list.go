@@ -19,6 +19,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
@@ -36,12 +37,12 @@ type installedLib struct {
 func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.LibraryListResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, &commands.InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
-		return nil, &commands.InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 
 	nameFilter := strings.ToLower(req.GetName())
@@ -51,11 +52,11 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 	if f := req.GetFqbn(); f != "" {
 		fqbn, err := cores.ParseFQBN(req.GetFqbn())
 		if err != nil {
-			return nil, &commands.InvalidFQBNError{Cause: err}
+			return nil, &arduino.InvalidFQBNError{Cause: err}
 		}
 		_, boardPlatform, _, _, refBoardPlatform, err := pm.ResolveFQBN(fqbn)
 		if err != nil {
-			return nil, &commands.UnknownFQBNError{Cause: err}
+			return nil, &arduino.UnknownFQBNError{Cause: err}
 		}
 
 		filteredRes := map[string]*installedLib{}
@@ -103,7 +104,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 		}
 		rpcLib, err := lib.Library.ToRPCLibrary()
 		if err != nil {
-			return nil, &commands.PermissionDeniedError{Message: tr("Error getting information for library %s", lib.Library.Name), Cause: err}
+			return nil, &arduino.PermissionDeniedError{Message: tr("Error getting information for library %s", lib.Library.Name), Cause: err}
 		}
 		instaledLibs = append(instaledLibs, &rpc.InstalledLibrary{
 			Library: rpcLib,

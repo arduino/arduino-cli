@@ -13,15 +13,18 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package commands
+package arduino
 
 import (
 	"fmt"
 
+	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+var tr = i18n.Tr
 
 func composeErrorMsg(msg string, cause error) string {
 	if cause == nil {
@@ -282,41 +285,41 @@ func (e *MissingPlatformPropertyError) ToRPCStatus() *status.Status {
 	return status.New(codes.FailedPrecondition, e.Error())
 }
 
-// PlatformNotFound is returned when a platform is not found
-type PlatformNotFound struct {
+// PlatformNotFoundError is returned when a platform is not found
+type PlatformNotFoundError struct {
 	Platform string
 	Cause    error
 }
 
-func (e *PlatformNotFound) Error() string {
+func (e *PlatformNotFoundError) Error() string {
 	return composeErrorMsg(tr("Platform '%s' not found", e.Platform), e.Cause)
 }
 
 // ToRPCStatus converts the error into a *status.Status
-func (e *PlatformNotFound) ToRPCStatus() *status.Status {
+func (e *PlatformNotFoundError) ToRPCStatus() *status.Status {
 	return status.New(codes.FailedPrecondition, e.Error())
 }
 
-func (e *PlatformNotFound) Unwrap() error {
+func (e *PlatformNotFoundError) Unwrap() error {
 	return e.Cause
 }
 
-// LibraryNotFound is returned when a platform is not found
-type LibraryNotFound struct {
+// LibraryNotFoundError is returned when a platform is not found
+type LibraryNotFoundError struct {
 	Library string
 	Cause   error
 }
 
-func (e *LibraryNotFound) Error() string {
+func (e *LibraryNotFoundError) Error() string {
 	return composeErrorMsg(tr("Library '%s' not found", e.Library), e.Cause)
 }
 
 // ToRPCStatus converts the error into a *status.Status
-func (e *LibraryNotFound) ToRPCStatus() *status.Status {
+func (e *LibraryNotFoundError) ToRPCStatus() *status.Status {
 	return status.New(codes.FailedPrecondition, e.Error())
 }
 
-func (e *LibraryNotFound) Unwrap() error {
+func (e *LibraryNotFoundError) Unwrap() error {
 	return e.Cause
 }
 
