@@ -438,6 +438,19 @@
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dependency-license-metadata" class="md-nav__link">
+    Dependency license metadata
+  </a>
+  
+    <nav class="md-nav" aria-label="Dependency license metadata">
+      <ul class="md-nav__list">
+        
           <li class="md-nav__item">
   <a href="#configuration-files-formatting" class="md-nav__link">
     Configuration files formatting
@@ -1608,6 +1621,19 @@
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dependency-license-metadata" class="md-nav__link">
+    Dependency license metadata
+  </a>
+  
+    <nav class="md-nav" aria-label="Dependency license metadata">
+      <ul class="md-nav__list">
+        
           <li class="md-nav__item">
   <a href="#configuration-files-formatting" class="md-nav__link">
     Configuration files formatting
@@ -1877,6 +1903,13 @@ install integration tests dependencies.</p>
 <p>In case of linting errors you should be able to solve most of them by automatically formatting with:</p>
 <div class="highlight"><pre><span></span><code>task python:format
 </code></pre></div>
+<h3 id="dependency-license-metadata">Dependency license metadata<a class="headerlink" href="#dependency-license-metadata" title="Permanent link">&para;</a></h3>
+<p>Metadata about the license types of all dependencies is cached in the repository. To update this cache, run the
+following command from the repository root folder:</p>
+<div class="highlight"><pre><span></span><code>task general:cache-dep-licenses
+</code></pre></div>
+<p>The necessary <strong>Licensed</strong> tool can be installed by following
+<a href="https://github.com/github/licensed#as-an-executable">these instructions</a>.</p>
 <h4 id="configuration-files-formatting">Configuration files formatting<a class="headerlink" href="#configuration-files-formatting" title="Permanent link">&para;</a></h4>
 <p>To keep the configurations tidy and in order we use <a href="https://prettier.io/">Prettier</a> to automatically format all YAML files
 in the project. Keeping and enforcing a formatting standard helps everyone make small PRs and avoids the introduction of
