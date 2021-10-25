@@ -779,36 +779,9 @@ def test_core_list_outdated_core(run_command):
     assert installed_version.compare(latest_version) == -1
 
 
-def test_core_loading_package_manager(run_command):
-    assert run_command(["update"])
-
-    # Install core
-    url = "https://raw.githubusercontent.com/damellis/attiny/ide-1.6.x-boards-manager/package_damellis_attiny_index.json"  # noqa: E501
-    assert run_command(["core", "update-index", f"--additional-urls={url}"])
-    assert run_command(["core", "install", "attiny:avr@1.0.2", f"--additional-urls={url}"])
-
-    # Verifies installed core is correctly found and name is set
-    res = run_command(["core", "list", "--format", "json"])
-    assert res.ok
-    cores = json.loads(res.stdout)
-    mapped = {core["id"]: core for core in cores}
-    assert len(mapped) == 1
-    assert "attiny:avr" in mapped
-    assert mapped["attiny:avr"]["name"] == "attiny"
-
-    # Uninstall the core: this should leave some residue:
-    # tree ~/.arduino15/packages/
-    # /home/umberto/.arduino15/packages/
-    # ├── attiny
-    # │   └── hardware
-    # │       └── avr
-    #
-    # Please note that the folder avr is empty
-
-    assert run_command(["core", "uninstall", "attiny:avr"])
-    result = run_command(["core", "list", "--format", "json"])
-    assert result.ok
-    assert not _in(result.stdout, "attiny:avr")
+def test_core_loading_package_manager(run_command, data_dir):
+    # Create empty architecture folder (this condition is normally produced by `core uninstall`)
+    (Path(data_dir) / "packages" / "foovendor" / "hardware" / "fooarch").mkdir(parents=True)
 
     result = run_command(["core", "list", "--all", "--format", "json"])
     assert result.ok  # this should not make the cli crash
@@ -816,7 +789,7 @@ def test_core_loading_package_manager(run_command):
 
 def test_core_index_without_checksum(run_command):
     assert run_command(["config", "init", "--dest-dir", "."])
-    url = "https://raw.githubusercontent.com/keyboardio/ArduinoCore-GD32-Keyboardio/main/package_gd32_index.json"  # noqa: E501
+    url = "https://raw.githubusercontent.com/keyboardio/ArduinoCore-GD32-Keyboardio/ae5938af2f485910729e7d27aa233032a1cb4734/package_gd32_index.json"  # noqa: E501
     assert run_command(["config", "add", "board_manager.additional_urls", url])
 
     assert run_command(["core", "update-index"])
