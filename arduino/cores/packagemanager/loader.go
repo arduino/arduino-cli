@@ -145,6 +145,10 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) []*status.
 				statuses = append(statuses, errs...)
 			}
 		}
+		// If the Package does not contain Platforms or Tools we remove it since does not contain anything valuable
+		if len(targetPackage.Platforms) == 0 && len(targetPackage.Tools) == 0 {
+			delete(pm.Packages, packager)
+		}
 	}
 
 	return statuses
@@ -262,7 +266,6 @@ func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, platformPat
 		// case: ARCHITECTURE/VERSION/boards.txt
 		// let's dive into VERSION directories
 
-		platform := targetPackage.GetOrCreatePlatform(architecture)
 		versionDirs, err := platformPath.ReadDir()
 		if err != nil {
 			return status.Newf(codes.FailedPrecondition, tr("reading dir %[1]s: %[2]s"), platformPath, err)
@@ -280,6 +283,7 @@ func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, platformPat
 			if err != nil {
 				return status.Newf(codes.FailedPrecondition, tr("invalid version dir %[1]s: %[2]s"), versionDir, err)
 			}
+			platform := targetPackage.GetOrCreatePlatform(architecture)
 			release := platform.GetOrCreateRelease(version)
 			if err := pm.loadPlatformRelease(release, versionDir); err != nil {
 				return status.Newf(codes.FailedPrecondition, tr("loading platform release %[1]s: %[2]s"), release, err)

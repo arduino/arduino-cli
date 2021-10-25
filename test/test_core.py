@@ -777,3 +777,21 @@ def test_core_list_outdated_core(run_command):
     latest_version = semver.parse_version_info(samd_core["latest"])
     # Installed version must be older than latest
     assert installed_version.compare(latest_version) == -1
+
+
+def test_core_loading_package_manager(run_command, data_dir):
+    # Create empty architecture folder (this condition is normally produced by `core uninstall`)
+    (Path(data_dir) / "packages" / "foovendor" / "hardware" / "fooarch").mkdir(parents=True)
+
+    result = run_command(["core", "list", "--all", "--format", "json"])
+    assert result.ok  # this should not make the cli crash
+
+
+def test_core_index_without_checksum(run_command):
+    assert run_command(["config", "init", "--dest-dir", "."])
+    url = "https://raw.githubusercontent.com/keyboardio/ArduinoCore-GD32-Keyboardio/ae5938af2f485910729e7d27aa233032a1cb4734/package_gd32_index.json"  # noqa: E501
+    assert run_command(["config", "add", "board_manager.additional_urls", url])
+
+    assert run_command(["core", "update-index"])
+    result = run_command(["core", "list", "--all"])
+    assert result.ok  # this should not make the cli crash
