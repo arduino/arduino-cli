@@ -57,16 +57,30 @@ jobs:
 
           echo "::set-output name=result::$RESULT"
 
-  test:
+  tests-collector:
+    runs-on: ubuntu-latest
     needs: run-determination
     if: needs.run-determination.outputs.result == 'true'
+    outputs:
+      tests-data: ${{ steps.collection.outputs.tests-data }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
+      - name: Collect tests
+        id: collection
+        run: |
+          echo "::set-output name=tests-data::$(python .github/tools/get_integration_tests.py ./test/)"
+
+  test:
+    needs: tests-collector
     strategy:
       matrix:
         operating-system:
           - ubuntu-latest
           - windows-latest
           - macos-latest
+        tests: ${{ fromJSON(needs.tests-collector.outputs.tests-data) }}
 
     runs-on: ${{ matrix.operating-system }}
 
@@ -97,5 +111,11 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
 
+      - name: Build Arduino CLI
+        run: task go:build
+
+      - name: Install poetry deps
+        run: task poetry:install-deps
+
       - name: Run integration tests
-        run: task go:test-integration
+        run: poetry run pytest ${{ matrix.tests }}
