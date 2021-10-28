@@ -1,5 +1,5 @@
-`arduino-cli` supports command-line completion (also known as _tab completion_) for basic commands. Currently only
-`bash`, `zsh`, `fish`, and `powershell` shells are supported
+`arduino-cli` supports command-line completion (also known as _tab completion_) for basic commands. Currently `bash`,
+`zsh`, `fish`, and `powershell` shells are supported
 
 ### Before you start
 
@@ -62,11 +62,11 @@ For more information on tab-completion on PowerShell, please, refer to
 
 #### Disabling command and flag descriptions
 
-By default fish and zsh completion have command and flag description enabled by default. If you want to disable this
-behaviour you can simply pass the `--no-descriptions` flag when calling `completion` command and the generated file will
-not have descriptions
+By default fish, zsh and bash completion have command and flag description enabled by default. If you want to disable
+this behaviour you can simply pass the `--no-descriptions` flag when calling `completion` command and the generated file
+will not have descriptions
 
-_N.B._ This flag is not compatible with bash nor powershell
+_N.B._ This flag is not compatible with powershell
 
 ### Brew
 

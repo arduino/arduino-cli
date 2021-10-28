@@ -18,6 +18,7 @@ package core
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -29,7 +30,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest,
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, &commands.InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 
 	// Extract all PlatformReference to platforms that have updates
@@ -51,27 +52,27 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest,
 func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference,
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB, skipPostInstall bool) error {
 	if platformRef.PlatformVersion != nil {
-		return &commands.InvalidArgumentError{Message: tr("Upgrade doesn't accept parameters with version")}
+		return &arduino.InvalidArgumentError{Message: tr("Upgrade doesn't accept parameters with version")}
 	}
 
 	// Search the latest version for all specified platforms
 	platform := pm.FindPlatform(platformRef)
 	if platform == nil {
-		return &commands.PlatformNotFound{Platform: platformRef.String()}
+		return &arduino.PlatformNotFoundError{Platform: platformRef.String()}
 	}
 	installed := pm.GetInstalledPlatformRelease(platform)
 	if installed == nil {
-		return &commands.PlatformNotFound{Platform: platformRef.String()}
+		return &arduino.PlatformNotFoundError{Platform: platformRef.String()}
 	}
 	latest := platform.GetLatestRelease()
 	if !latest.Version.GreaterThan(installed.Version) {
-		return &commands.PlatformAlreadyAtTheLatestVersionError{}
+		return &arduino.PlatformAlreadyAtTheLatestVersionError{}
 	}
 	platformRef.PlatformVersion = latest.Version
 
 	platformRelease, tools, err := pm.FindPlatformReleaseDependencies(platformRef)
 	if err != nil {
-		return &commands.PlatformNotFound{Platform: platformRef.String()}
+		return &arduino.PlatformNotFoundError{Platform: platformRef.String()}
 	}
 	if err := installPlatform(pm, platformRelease, tools, downloadCB, taskCB, skipPostInstall); err != nil {
 		return err

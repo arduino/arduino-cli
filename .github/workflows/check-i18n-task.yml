@@ -6,53 +6,15 @@ env:
 
 # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
 on:
-  create:
   push:
-    paths:
-      - ".github/workflows/check-i18n-task.ya?ml"
-      - "Taskfile.ya?ml"
-      - "go.mod"
-      - "go.sum"
-      - "**.go"
-      - "i18n/**"
-  pull_request:
-    paths:
-      - ".github/workflows/check-i18n-task.ya?ml"
-      - "Taskfile.ya?ml"
-      - "go.mod"
-      - "go.sum"
-      - "**.go"
-      - "i18n/**"
+    branches:
+      # Release branches have names like 0.8.x, 0.9.x, ...
+      - "[0-9]+.[0-9]+.x"
   workflow_dispatch:
   repository_dispatch:
 
 jobs:
-  run-determination:
-    runs-on: ubuntu-latest
-    outputs:
-      result: ${{ steps.determination.outputs.result }}
-    steps:
-      - name: Determine if the rest of the workflow should run
-        id: determination
-        run: |
-          RELEASE_BRANCH_REGEX="refs/heads/[0-9]+.[0-9]+.x"
-          # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
-          if [[ \
-            "${{ github.event_name }}" != "create" || \
-            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX \
-          ]]; then
-            # Run the other jobs.
-            RESULT="true"
-          else
-            # There is no need to run the other jobs.
-            RESULT="false"
-          fi
-
-          echo "::set-output name=result::$RESULT"
-
   check:
-    needs: run-determination
-    if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -64,14 +26,11 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
 
-      - name: Install go.rice
-        run: go get github.com/cmaglie/go.rice/rice
-
       - name: Install Task
         uses: arduino/setup-task@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
 
-      - name: Check for errors
+      - name: Check i18n source file is up to date
         run: task i18n:check

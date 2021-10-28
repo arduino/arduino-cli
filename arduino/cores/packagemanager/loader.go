@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -144,6 +145,10 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) []*status.
 				statuses = append(statuses, errs...)
 			}
 		}
+		// If the Package does not contain Platforms or Tools we remove it since does not contain anything valuable
+		if len(targetPackage.Platforms) == 0 && len(targetPackage.Tools) == 0 {
+			delete(pm.Packages, packager)
+		}
 	}
 
 	return statuses
@@ -261,7 +266,6 @@ func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, platformPat
 		// case: ARCHITECTURE/VERSION/boards.txt
 		// let's dive into VERSION directories
 
-		platform := targetPackage.GetOrCreatePlatform(architecture)
 		versionDirs, err := platformPath.ReadDir()
 		if err != nil {
 			return status.Newf(codes.FailedPrecondition, tr("reading dir %[1]s: %[2]s"), platformPath, err)
@@ -279,6 +283,7 @@ func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, platformPat
 			if err != nil {
 				return status.Newf(codes.FailedPrecondition, tr("invalid version dir %[1]s: %[2]s"), versionDir, err)
 			}
+			platform := targetPackage.GetOrCreatePlatform(architecture)
 			release := platform.GetOrCreateRelease(version)
 			if err := pm.loadPlatformRelease(release, versionDir); err != nil {
 				return status.Newf(codes.FailedPrecondition, tr("loading platform release %[1]s: %[2]s"), release, err)
@@ -419,6 +424,8 @@ func convertLegacyPlatformToPluggableDiscovery(platform *cores.PlatformRelease) 
 	}
 }
 
+var netPropRegexp = regexp.MustCompile(`\{upload\.network\.([^}]+)\}`)
+
 func convertLegacyNetworkPatternToPluggableDiscovery(props *properties.Map, newToolName string) *properties.Map {
 	pattern, ok := props.GetOk("upload.network_pattern")
 	if !ok {
@@ -431,6 +438,11 @@ func convertLegacyNetworkPatternToPluggableDiscovery(props *properties.Map, newT
 		props.Set("upload.field.password", "Password")
 		props.Set("upload.field.password.secret", "true")
 		pattern = strings.ReplaceAll(pattern, "{network.password}", "{upload.field.password}")
+	}
+	// Search for "{upload.network.PROPERTY}"" and convert it to "{upload.port.property.PROPERTY}"
+	for netPropRegexp.MatchString(pattern) {
+		netProp := netPropRegexp.FindStringSubmatch(pattern)[1]
+		pattern = strings.ReplaceAll(pattern, "{upload.network."+netProp+"}", "{upload.port.properties."+netProp+"}")
 	}
 	props.Set("upload.pattern", pattern)
 

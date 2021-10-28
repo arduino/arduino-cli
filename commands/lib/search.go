@@ -18,6 +18,7 @@ package lib
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/utils"
@@ -30,7 +31,7 @@ import (
 func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.LibrarySearchResponse, error) {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
-		return nil, &commands.InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 	return searchLibrary(req, lm), nil
 }

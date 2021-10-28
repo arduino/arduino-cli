@@ -1,0 +1,62 @@
+---
+name: github.com/fsnotify/fsnotify
+version: v1.4.9
+type: go
+summary: Package fsnotify provides a platform-independent interface for file system
+  notifications.
+homepage: https://pkg.go.dev/github.com/fsnotify/fsnotify
+license: bsd-3-clause
+licenses:
+- sources: LICENSE
+  text: |
+    Copyright (c) 2012 The Go Authors. All rights reserved.
+    Copyright (c) 2012-2019 fsnotify Authors. All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+       * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+       * Redistributions in binary form must reproduce the above
+    copyright notice, this list of conditions and the following disclaimer
+    in the documentation and/or other materials provided with the
+    distribution.
+       * Neither the name of Google Inc. nor the names of its
+    contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+    OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+notices:
+- sources: AUTHORS
+  text: "# Names should be added to this file as\n#\tName or Organization <email address>\n#
+    The email address is not required for organizations.\n\n# You can update this
+    list using the following command:\n#\n#   $ git shortlog -se | awk '{print $2
+    \" \" $3 \" \" $4}'\n\n# Please keep the list sorted.\n\nAaron L <aaron@bettercoder.net>\nAdrien
+    Bustany <adrien@bustany.org>\nAmit Krishnan <amit.krishnan@oracle.com>\nAnmol
+    Sethi <me@anmol.io>\nBjørn Erik Pedersen <bjorn.erik.pedersen@gmail.com>\nBruno
+    Bigras <bigras.bruno@gmail.com>\nCaleb Spare <cespare@gmail.com>\nCase Nelson
+    <case@teammating.com>\nChris Howey <chris@howey.me> <howeyc@gmail.com>\nChristoffer
+    Buchholz <christoffer.buchholz@gmail.com>\nDaniel Wagner-Hall <dawagner@gmail.com>\nDave
+    Cheney <dave@cheney.net>\nEvan Phoenix <evan@fallingsnow.net>\nFrancisco Souza
+    <f@souza.cc>\nHari haran <hariharan.uno@gmail.com>\nJohn C Barstow\nKelvin Fo
+    <vmirage@gmail.com>\nKen-ichirou MATSUZAWA <chamas@h4.dion.ne.jp>\nMatt Layher
+    <mdlayher@gmail.com>\nNathan Youngman <git@nathany.com>\nNickolai Zeldovich <nickolai@csail.mit.edu>\nPatrick
+    <patrick@dropbox.com>\nPaul Hammond <paul@paulhammond.org>\nPawel Knap <pawelknap88@gmail.com>\nPieter
+    Droogendijk <pieter@binky.org.uk>\nPursuit92 <JoshChase@techpursuit.net>\nRiku
+    Voipio <riku.voipio@linaro.org>\nRob Figueiredo <robfig@gmail.com>\nRodrigo Chiossi
+    <rodrigochiossi@gmail.com>\nSlawek Ligus <root@ooz.ie>\nSoge Zhang <zhssoge@gmail.com>\nTiffany
+    Jernigan <tiffany.jernigan@intel.com>\nTilak Sharma <tilaks@google.com>\nTom Payne
+    <twpayne@gmail.com>\nTravis Cline <travis.cline@gmail.com>\nTudor Golubenco <tudor.g@gmail.com>\nVahe
+    Khachikyan <vahe@live.ca>\nYukang <moorekang@gmail.com>\nbronze1man <bronze1man@gmail.com>\ndebrando
+    <denis.brandolini@gmail.com>\nhenrikedwards <henrik.edwards@gmail.com>\n铁哥 <guotie.9@gmail.com>"

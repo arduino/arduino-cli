@@ -95,7 +95,6 @@ package builder
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"os/exec"
 	"time"
 
@@ -378,7 +377,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 					return errors.New(tr("Internal error in cache"))
 				}
 			}
-			os.Stderr.Write(preproc_stderr)
+			ctx.ExecStderr.Write(preproc_stderr)
 			return errors.WithStack(preproc_err)
 		}
 

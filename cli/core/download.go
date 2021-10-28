@@ -41,6 +41,9 @@ func initDownloadCommand() *cobra.Command {
 			"  " + os.Args[0] + " core download arduino:samd@1.6.9 # " + tr("download a specific version (in this case 1.6.9)."),
 		Args: cobra.MinimumNArgs(1),
 		Run:  runDownloadCommand,
+		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return arguments.GetInstallableCores(), cobra.ShellCompDirectiveDefault
+		},
 	}
 	return downloadCommand
 }

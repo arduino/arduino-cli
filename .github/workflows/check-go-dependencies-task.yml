@@ -1,0 +1,109 @@
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-go-dependencies-task.md
+name: Check Go Dependencies
+
+env:
+  # See: https://github.com/actions/setup-go/tree/v2#readme
+  GO_VERSION: "1.16"
+
+# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+on:
+  push:
+    paths:
+      - ".github/workflows/check-go-dependencies-task.ya?ml"
+      - ".licenses/**"
+      - ".licensed.json"
+      - ".licensed.ya?ml"
+      - "Taskfile.ya?ml"
+      - "**/.gitmodules"
+      - "**/go.mod"
+      - "**/go.sum"
+  pull_request:
+    paths:
+      - ".github/workflows/check-go-dependencies-task.ya?ml"
+      - ".licenses/**"
+      - ".licensed.json"
+      - ".licensed.ya?ml"
+      - "Taskfile.ya?ml"
+      - "**/.gitmodules"
+      - "**/go.mod"
+      - "**/go.sum"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  check-cache:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install licensed
+        uses: jonabc/setup-licensed@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Update dependencies license metadata cache
+        run: task --silent general:cache-dep-licenses
+
+      - name: Check for outdated cache
+        id: diff
+        run: |
+          git add --intent-to-add .
+          if ! git diff --color --exit-code; then
+            echo
+            echo "::error::Dependency license metadata out of sync. See: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-go-dependencies-task.md#metadata-cache"
+            exit 1
+          fi
+
+      # Some might find it convenient to have CI generate the cache rather than setting up for it locally
+      - name: Upload cache to workflow artifact
+        if: failure() && steps.diff.outcome == 'failure'
+        uses: actions/upload-artifact@v2
+        with:
+          if-no-files-found: error
+          name: dep-licenses-cache
+          path: .licenses/
+
+  check-deps:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install licensed
+        uses: jonabc/setup-licensed@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Check for dependencies with unapproved licenses
+        run: task --silent general:check-dep-licenses

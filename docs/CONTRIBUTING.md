@@ -224,6 +224,18 @@ In case of linting errors you should be able to solve most of them by automatica
 task python:format
 ```
 
+### Dependency license metadata
+
+Metadata about the license types of all dependencies is cached in the repository. To update this cache, run the
+following command from the repository root folder:
+
+```
+task general:cache-dep-licenses
+```
+
+The necessary **Licensed** tool can be installed by following
+[these instructions](https://github.com/github/licensed#as-an-executable).
+
 #### Configuration files formatting
 
 To keep the configurations tidy and in order we use [Prettier][prettier-website] to automatically format all YAML files
@@ -321,22 +333,6 @@ Details on the documentation publishing system are available [here][12].
 In order to support i18n in the CLI, any messages that are intended to be translated should be wrapped in a call to
 `i18n.Tr`. This call allows us to build a catalog of translatable strings, replacing the reference string at runtime
 with the localized value.
-
-Adding or modifying these messages requires an i18n update, as this process creates the reference catalog that is shared
-with translators. For that reason, the `task check` command will fail if the catalog was not updated to sync with
-changes to the source code.
-
-To update the catalog, execute the following command and commit the changes.
-
-```shell
-task i18n:update
-```
-
-To verify that the catalog is up-to-date, you may execute the command:
-
-```shell
-task i18n:check
-```
 
 Example usage:
 

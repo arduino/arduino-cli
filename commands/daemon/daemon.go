@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
@@ -51,7 +52,7 @@ func convertErrorToRPCStatus(err error) error {
 	if err == nil {
 		return nil
 	}
-	if cmdErr, ok := err.(commands.CommandError); ok {
+	if cmdErr, ok := err.(arduino.CommandError); ok {
 		return cmdErr.ToRPCStatus().Err()
 	}
 	return err
@@ -241,6 +242,12 @@ func (s *ArduinoCoreServerImpl) Init(req *rpc.InitRequest, stream rpc.ArduinoCor
 // Version FIXMEDOC
 func (s *ArduinoCoreServerImpl) Version(ctx context.Context, req *rpc.VersionRequest) (*rpc.VersionResponse, error) {
 	return &rpc.VersionResponse{Version: s.VersionString}, nil
+}
+
+// NewSketch FIXMEDOC
+func (s *ArduinoCoreServerImpl) NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchResponse, error) {
+	resp, err := sketch.NewSketch(ctx, req)
+	return resp, convertErrorToRPCStatus(err)
 }
 
 // LoadSketch FIXMEDOC

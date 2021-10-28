@@ -18,6 +18,7 @@ package commands
 import (
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/httpclient"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"go.bug.st/downloader/v2"
@@ -28,7 +29,7 @@ import (
 func GetDownloaderConfig() (*downloader.Config, error) {
 	httpClient, err := httpclient.New()
 	if err != nil {
-		return nil, &InvalidArgumentError{Message: tr("Could not connect via HTTP"), Cause: err}
+		return nil, &arduino.InvalidArgumentError{Message: tr("Could not connect via HTTP"), Cause: err}
 	}
 	return &downloader.Config{
 		HttpClient: *httpClient,
@@ -59,7 +60,7 @@ func Download(d *downloader.Downloader, label string, downloadCB DownloadProgres
 	}
 	// The URL is not reachable for some reason
 	if d.Resp.StatusCode >= 400 && d.Resp.StatusCode <= 599 {
-		return &FailedDownloadError{Message: tr("Server responded with: %s", d.Resp.Status)}
+		return &arduino.FailedDownloadError{Message: tr("Server responded with: %s", d.Resp.Status)}
 	}
 	downloadCB(&rpc.DownloadProgress{Completed: true})
 	return nil

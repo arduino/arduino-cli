@@ -1,0 +1,91 @@
+# See: https://github.com/github/licensed/blob/master/docs/configuration.md
+sources:
+  go: true
+
+shared_cache: true
+cache_path: .licenses/
+
+apps:
+  - source_path: ./
+  - source_path: arduino/discovery/discovery_client/
+  - source_path: client_example/
+  - source_path: commands/daemon/term_example/
+  - source_path: docsgen/
+
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-dependencies/GPL-3.0/.licensed.yml
+allowed:
+  # The following are based on: https://www.gnu.org/licenses/license-list.html#GPLCompatibleLicenses
+  - gpl-1.0-or-later
+  - gpl-1.0+ # Deprecated ID for `gpl-1.0-or-later`
+  - gpl-2.0-or-later
+  - gpl-2.0+ # Deprecated ID for `gpl-2.0-or-later`
+  - gpl-3.0-only
+  - gpl-3.0 # Deprecated ID for `gpl-3.0-only`
+  - gpl-3.0-or-later
+  - gpl-3.0+ # Deprecated ID for `gpl-3.0-or-later`
+  - lgpl-2.0-or-later
+  - lgpl-2.0+ # Deprecated ID for `lgpl-2.0-or-later`
+  - lgpl-2.1-only
+  - lgpl-2.1 # Deprecated ID for `lgpl-2.1-only`
+  - lgpl-2.1-or-later
+  - lgpl-2.1+ # Deprecated ID for `lgpl-2.1-or-later`
+  - lgpl-3.0-only
+  - lgpl-3.0 # Deprecated ID for `lgpl-3.0-only`
+  - lgpl-3.0-or-later
+  - lgpl-3.0+ # Deprecated ID for `lgpl-3.0-or-later`
+  - fsfap
+  - apache-2.0
+  - artistic-2.0
+  - clartistic
+  - sleepycat
+  - bsl-1.0
+  - bsd-3-clause
+  - cecill-2.0
+  - bsd-3-clause-clear
+  # "Cryptix General License" - no SPDX ID (https://github.com/spdx/license-list-XML/issues/456)
+  - ecos-2.0
+  - ecl-2.0
+  - efl-2.0
+  - eudatagrid
+  - mit
+  - bsd-2-clause # Subsumed by `bsd-2-clause-views`
+  - bsd-2-clause-netbsd # Deprecated ID for `bsd-2-clause`
+  - bsd-2-clause-views # This is the version linked from https://www.gnu.org/licenses/license-list.html#FreeBSD
+  - bsd-2-clause-freebsd # Deprecated ID for `bsd-2-clause-views`
+  - ftl
+  - hpnd
+  - imatix
+  - imlib2
+  - ijg
+  # "Informal license" - this is a general class of license
+  - intel
+  - isc
+  - mpl-2.0
+  - ncsa
+  # "License of Netscape JavaScript" - no SPDX ID
+  - oldap-2.7
+  # "License of Perl 5 and below" - possibly `Artistic-1.0-Perl` ?
+  - cc0-1.0
+  - cc-pddc
+  - psf-2.0
+  - ruby
+  - sgi-b-2.0
+  - smlnj
+  - standardml-nj # Deprecated ID for `smlnj`
+  - unicode-dfs-2015
+  - upl-1.0
+  - unlicense
+  - vim
+  - w3c
+  - wtfpl
+  - lgpl-2.0-or-later with wxwindows-exception-3.1
+  - wxwindows # Deprecated ID for `lgpl-2.0-or-later with wxwindows-exception-3.1`
+  - x11
+  - xfree86-1.1
+  - zlib
+  - zpl-2.0
+  - zpl-2.1
+  # The following are based on individual license text
+  - eupl-1.2
+  - liliq-r-1.1
+  - liliq-rplus-1.1

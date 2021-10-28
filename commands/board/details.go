@@ -18,6 +18,7 @@ package board
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -28,17 +29,17 @@ import (
 func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetailsResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, &commands.InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 
 	fqbn, err := cores.ParseFQBN(req.GetFqbn())
 	if err != nil {
-		return nil, &commands.InvalidFQBNError{Cause: err}
+		return nil, &arduino.InvalidFQBNError{Cause: err}
 	}
 
 	boardPackage, boardPlatform, board, boardProperties, boardRefPlatform, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
-		return nil, &commands.UnknownFQBNError{Cause: err}
+		return nil, &arduino.UnknownFQBNError{Cause: err}
 	}
 
 	details := &rpc.BoardDetailsResponse{}

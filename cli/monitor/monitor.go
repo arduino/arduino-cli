@@ -61,6 +61,9 @@ func NewCommand() *cobra.Command {
 	cmd.Flags().StringSliceVarP(&configs, "config", "c", []string{}, tr("Configuration of the port."))
 	cmd.Flags().BoolVarP(&quiet, "quiet", "q", false, tr("Run in silent mode, show only monitor input and output."))
 	cmd.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
+	cmd.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return arguments.GetInstalledBoards(), cobra.ShellCompDirectiveDefault
+	})
 	cmd.MarkFlagRequired("port")
 	return cmd
 }

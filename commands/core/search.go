@@ -20,6 +20,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
@@ -32,7 +33,7 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 	allVersions := req.AllVersions
 	pm := commands.GetPackageManager(req.Instance.Id)
 	if pm == nil {
-		return nil, &commands.InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 
 	res := []*cores.PlatformRelease{}

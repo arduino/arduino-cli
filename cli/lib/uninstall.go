@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -38,6 +39,9 @@ func initUninstallCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " lib uninstall AudioZero",
 		Args:    cobra.MinimumNArgs(1),
 		Run:     runUninstallCommand,
+		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return arguments.GetUninstallableLibraries(), cobra.ShellCompDirectiveDefault
+		},
 	}
 	return uninstallCommand
 }

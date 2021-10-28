@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -39,6 +40,9 @@ func initDownloadCommand() *cobra.Command {
 			"  " + os.Args[0] + " lib download AudioZero@1.0.0 # " + tr("for a specific version."),
 		Args: cobra.MinimumNArgs(1),
 		Run:  runDownloadCommand,
+		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			return arguments.GetInstallableLibs(), cobra.ShellCompDirectiveDefault
+		},
 	}
 	return downloadCommand
 }

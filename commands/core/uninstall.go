@@ -18,6 +18,7 @@ package core
 import (
 	"context"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
@@ -28,7 +29,7 @@ import (
 func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, taskCB commands.TaskProgressCB) (*rpc.PlatformUninstallResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
-		return nil, &commands.InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 
 	ref := &packagemanager.PlatformReference{
@@ -38,18 +39,18 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 	if ref.PlatformVersion == nil {
 		platform := pm.FindPlatform(ref)
 		if platform == nil {
-			return nil, &commands.PlatformNotFound{Platform: ref.String()}
+			return nil, &arduino.PlatformNotFoundError{Platform: ref.String()}
 		}
 		platformRelease := pm.GetInstalledPlatformRelease(platform)
 		if platformRelease == nil {
-			return nil, &commands.PlatformNotFound{Platform: ref.String()}
+			return nil, &arduino.PlatformNotFoundError{Platform: ref.String()}
 		}
 		ref.PlatformVersion = platformRelease.Version
 	}
 
 	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
-		return nil, &commands.NotFoundError{Message: tr("Can't find dependencies for platform %s", ref), Cause: err}
+		return nil, &arduino.NotFoundError{Message: tr("Can't find dependencies for platform %s", ref), Cause: err}
 	}
 
 	if err := uninstallPlatformRelease(pm, platform, taskCB); err != nil {
@@ -77,7 +78,7 @@ func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease
 
 	if err := pm.UninstallPlatform(platformRelease); err != nil {
 		log.WithError(err).Error("Error uninstalling")
-		return &commands.FailedUninstallError{Message: tr("Error uninstalling platform %s", platformRelease), Cause: err}
+		return &arduino.FailedUninstallError{Message: tr("Error uninstalling platform %s", platformRelease), Cause: err}
 	}
 
 	log.Info("Platform uninstalled")
@@ -93,7 +94,7 @@ func uninstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.
 
 	if err := pm.UninstallTool(toolRelease); err != nil {
 		log.WithError(err).Error("Error uninstalling")
-		return &commands.FailedUninstallError{Message: tr("Error uninstalling tool %s", toolRelease), Cause: err}
+		return &arduino.FailedUninstallError{Message: tr("Error uninstalling tool %s", toolRelease), Cause: err}
 	}
 
 	log.Info("Tool uninstalled")

@@ -186,7 +186,7 @@ func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 	board := platformRelease.Boards[fqbn.BoardID]
 	if board == nil {
 		return targetPackage, platformRelease, nil, nil, nil,
-			fmt.Errorf(tr("board %s:%s not found"), platformRelease, fqbn.BoardID)
+			fmt.Errorf(tr("board %s not found"), fqbn.StringWithoutConfig())
 	}
 
 	buildProperties, err := board.GetBuildProperties(fqbn.Configs)
