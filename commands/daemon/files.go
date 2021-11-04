@@ -30,6 +30,7 @@ type FilesService struct {
 // LoadFile returns a requested file content or an error.
 func (s *FilesService) LoadFile(ctx context.Context, req *rpc.LoadFileRequest) (*rpc.LoadFileResponse, error) {
 	content, err := os.ReadFile(req.Path)
+	// TODO: support req.Type other than RAW or remove Type from .proto
 	if err == nil {
 		return &rpc.LoadFileResponse{
 			Content: content,
