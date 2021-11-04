@@ -15,21 +15,21 @@
 
 syntax = "proto3";
 
-package cc.arduino.cli.commands.v1;
+package cc.arduino.cli.files.v1;
 
-option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;files";
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/files/v1;files";
 
 import "google/rpc/status.proto";
 
-// Arduino File System service API
-service ArduinoFileSystemService {
+// Arduino Files service API
+service FilesService {
   // Load file content from the file system
   rpc LoadFile(LoadFileRequest) returns (LoadFileResponse) {}
 }
 
 enum ContentType {
-  RAW = 0;
-  ZIP = 1;
+  CONTENT_TYPE_RAW_UNSPECIFIED = 0;
+  CONTENT_TYPE_ZIP = 1;
 }
 
 message LoadFileRequest {
