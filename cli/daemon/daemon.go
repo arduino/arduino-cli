@@ -33,6 +33,7 @@ import (
 	"github.com/arduino/arduino-cli/metrics"
 	srv_commands "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	srv_debug "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
+	srv_files "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/files/v1"
 	srv_monitor "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/monitor/v1"
 	srv_settings "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1"
 	"github.com/segmentio/stats/v4"
@@ -97,6 +98,9 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 
 	// Register the debug session service
 	srv_debug.RegisterDebugServiceServer(s, &daemon.DebugService{})
+
+	// Register the files service
+	srv_files.RegisterFilesServiceServer(s, &daemon.FilesService{})
 
 	if !daemonize {
 		// When parent process ends terminate also the daemon
