@@ -19,8 +19,6 @@ package cc.arduino.cli.files.v1;
 
 option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/files/v1;files";
 
-import "google/rpc/status.proto";
-
 // Arduino Files service API
 service FilesService {
   // Load file content from the file system
@@ -40,10 +38,8 @@ message LoadFileRequest {
 }
 
 message LoadFileResponse {
-  oneof message {
-    bytes content = 1;
-    google.rpc.Status error = 2;
-  }
+  // File content
+  bytes content = 1;
   // is skipped in case of error
-  ContentType type = 3;
+  ContentType type = 2;
 }
