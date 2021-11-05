@@ -36,6 +36,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -43,6 +44,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+var tr = i18n.Tr
 
 // this map contains all the running Arduino Core Services instances
 // referenced by an int32 handle
@@ -180,10 +183,6 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	// If this is not done the information of the uninstall core is kept in memory,
 	// even if it should not.
 	instance.PackageManager.Clear()
-	ctagsTool := getBuiltinCtagsTool(instance.PackageManager)
-	serialDiscoveryTool := getBuiltinSerialDiscoveryTool(instance.PackageManager)
-	mdnsDiscoveryTool := getBuiltinMDNSDiscoveryTool(instance.PackageManager)
-	serialMonitorRool := getBuiltinSerialMonitorTool(instance.PackageManager)
 
 	// Load Platforms
 	urls := []string{globals.DefaultIndexURL}
@@ -256,48 +255,39 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		})
 	}
 
+	// Get builtin tools
+	builtinToolReleases := []*cores.ToolRelease{}
+	for name, tool := range instance.PackageManager.Packages.GetOrCreatePackage("builtin").Tools {
+		latestRelease := tool.LatestRelease()
+		if latestRelease == nil {
+			s := status.Newf(codes.Internal, tr("can't find latest release of tool %s", name))
+			responseCallback(&rpc.InitResponse{
+				Message: &rpc.InitResponse_Error{
+					Error: s.Proto(),
+				},
+			})
+			continue
+		}
+		builtinToolReleases = append(builtinToolReleases, latestRelease)
+	}
+
+	toolsHaveBeenInstalled := false
 	// Install tools if necessary
-	ctagsHasBeenInstalled, err := instance.installToolIfMissing(ctagsTool, downloadCallback, taskCallback)
-	if err != nil {
-		s := status.Newf(codes.Internal, err.Error())
-		responseCallback(&rpc.InitResponse{
-			Message: &rpc.InitResponse_Error{
-				Error: s.Proto(),
-			},
-		})
+	for _, toolRelease := range builtinToolReleases {
+		installed, err := instance.installToolIfMissing(toolRelease, downloadCallback, taskCallback)
+		if err != nil {
+			s := status.Newf(codes.Internal, err.Error())
+			responseCallback(&rpc.InitResponse{
+				Message: &rpc.InitResponse_Error{
+					Error: s.Proto(),
+				},
+			})
+			continue
+		}
+		toolsHaveBeenInstalled = toolsHaveBeenInstalled || installed
 	}
 
-	serialDiscoveryHasBeenInstalled, err := instance.installToolIfMissing(serialDiscoveryTool, downloadCallback, taskCallback)
-	if err != nil {
-		s := status.Newf(codes.Internal, err.Error())
-		responseCallback(&rpc.InitResponse{
-			Message: &rpc.InitResponse_Error{
-				Error: s.Proto(),
-			},
-		})
-	}
-
-	mdnsDiscoveryHasBeenInstalled, err := instance.installToolIfMissing(mdnsDiscoveryTool, downloadCallback, taskCallback)
-	if err != nil {
-		s := status.Newf(codes.Internal, err.Error())
-		responseCallback(&rpc.InitResponse{
-			Message: &rpc.InitResponse_Error{
-				Error: s.Proto(),
-			},
-		})
-	}
-
-	serialMonitorHasBeenInstalled, err := instance.installToolIfMissing(serialMonitorRool, downloadCallback, taskCallback)
-	if err != nil {
-		s := status.Newf(codes.Internal, err.Error())
-		responseCallback(&rpc.InitResponse{
-			Message: &rpc.InitResponse_Error{
-				Error: s.Proto(),
-			},
-		})
-	}
-
-	if ctagsHasBeenInstalled || serialDiscoveryHasBeenInstalled || mdnsDiscoveryHasBeenInstalled || serialMonitorHasBeenInstalled {
+	if toolsHaveBeenInstalled {
 		// We installed at least one new tool after loading hardware
 		// so we must reload again otherwise we would never found them.
 		for _, err := range instance.PackageManager.LoadHardware() {
