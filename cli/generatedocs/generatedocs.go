@@ -58,6 +58,7 @@ func NewCommand() *cobra.Command {
 }
 
 func generateBashCompletions(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino-cli generate-docs`")
 	if outputDir == "" {
 		outputDir = "docs/bash_completions"
 	}

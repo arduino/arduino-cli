@@ -67,6 +67,7 @@ func NewCommand() *cobra.Command {
 }
 
 func runDaemonCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino-cli daemon`")
 
 	if configuration.Settings.GetBool("metrics.enabled") {
 		metrics.Activate("daemon")

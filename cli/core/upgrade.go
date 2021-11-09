@@ -51,7 +51,7 @@ func initUpgradeCommand() *cobra.Command {
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
-	logrus.Info("Executing `arduino core upgrade`")
+	logrus.Info("Executing `arduino-cli core upgrade`")
 
 	// if no platform was passed, upgrade allthethings
 	if len(args) == 0 {

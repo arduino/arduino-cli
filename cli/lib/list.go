@@ -58,7 +58,7 @@ not listed, they can be listed by adding the --all flag.`),
 
 func runListCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
-	logrus.Info("Listing")
+	logrus.Info("Executing `arduino-cli lib list`")
 
 	name := ""
 	if len(args) > 0 {

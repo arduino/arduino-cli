@@ -52,8 +52,8 @@ var updateFlags struct {
 }
 
 func runUpdateCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino update`")
 	inst := instance.CreateInstanceAndRunFirstUpdate()
+	logrus.Info("Executing `arduino-cli update`")
 
 	err := commands.UpdateCoreLibrariesIndex(context.Background(), &rpc.UpdateCoreLibrariesIndexRequest{
 		Instance: inst,

@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -57,6 +58,9 @@ func initListCommand() *cobra.Command {
 // runListCommand detects and lists the connected arduino boards
 func runListCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
+
+	logrus.Info("Executing `arduino-cli board list`")
+
 	if watch {
 		watchList(cmd, inst)
 		os.Exit(0)

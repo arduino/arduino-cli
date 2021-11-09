@@ -48,7 +48,7 @@ that can be upgraded. If nothing needs to be updated the output is empty.`),
 
 func runOutdatedCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
-	logrus.Info("Executing `arduino outdated`")
+	logrus.Info("Executing `arduino-cli outdated`")
 
 	outdatedResp, err := commands.Outdated(context.Background(), &rpc.OutdatedRequest{
 		Instance: inst,

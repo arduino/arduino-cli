@@ -54,7 +54,7 @@ func initArchiveCommand() *cobra.Command {
 }
 
 func runArchiveCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino sketch archive`")
+	logrus.Info("Executing `arduino-cli sketch archive`")
 
 	sketchPath := paths.New(".")
 	if len(args) >= 1 {

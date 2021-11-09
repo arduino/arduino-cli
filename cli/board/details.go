@@ -28,6 +28,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/fatih/color"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -57,6 +58,8 @@ func initDetailsCommand() *cobra.Command {
 
 func runDetailsCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
+
+	logrus.Info("Executing `arduino-cli board details`")
 
 	// remove once `board details <fqbn>` is removed
 	if fqbn.String() == "" && len(args) > 0 {

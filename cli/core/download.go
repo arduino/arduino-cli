@@ -51,7 +51,7 @@ func initDownloadCommand() *cobra.Command {
 func runDownloadCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
 
-	logrus.Info("Executing `arduino core download`")
+	logrus.Info("Executing `arduino-cli core download`")
 
 	platformsRefs, err := arguments.ParseReferences(args, true)
 	if err != nil {

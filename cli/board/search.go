@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -49,6 +50,8 @@ for a specific board if you specify the board name`),
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
+
+	logrus.Info("Executing `arduino-cli board search`")
 
 	res, err := board.Search(context.Background(), &rpc.BoardSearchRequest{
 		Instance:            inst,

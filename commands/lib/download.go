@@ -31,7 +31,7 @@ var tr = i18n.Tr
 
 // LibraryDownload FIXMEDOC
 func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downloadCB commands.DownloadProgressCB) (*rpc.LibraryDownloadResponse, error) {
-	logrus.Info("Executing `arduino lib download`")
+	logrus.Info("Executing `arduino-cli lib download`")
 
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {

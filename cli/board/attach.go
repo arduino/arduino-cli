@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -50,6 +51,8 @@ func initAttachCommand() *cobra.Command {
 
 func runAttachCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
+
+	logrus.Info("Executing `arduino-cli board attach`")
 
 	path := ""
 	if len(args) > 1 {

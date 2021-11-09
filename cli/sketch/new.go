@@ -26,6 +26,7 @@ import (
 	sk "github.com/arduino/arduino-cli/commands/sketch"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -42,6 +43,7 @@ func initNewCommand() *cobra.Command {
 }
 
 func runNewCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino-cli sketch new`")
 	// Trim to avoid issues if user creates a sketch adding the .ino extesion to the name
 	sketchName := args[0]
 	trimmedSketchName := strings.TrimSuffix(sketchName, globals.MainFileValidExtension)

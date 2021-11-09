@@ -31,6 +31,7 @@ import (
 	"github.com/arduino/arduino-cli/table"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/fatih/color"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -67,6 +68,7 @@ func NewCommand() *cobra.Command {
 
 func runDebugCommand(command *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
+	logrus.Info("Executing `arduino-cli debug`")
 
 	path := ""
 	if len(args) > 0 {

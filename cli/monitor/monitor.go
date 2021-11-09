@@ -34,6 +34,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/fatih/color"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -68,6 +69,7 @@ func NewCommand() *cobra.Command {
 
 func runMonitorCmd(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
+	logrus.Info("Executing `arduino-cli monitor`")
 
 	if !configuration.HasConsole {
 		quiet = true

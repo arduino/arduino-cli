@@ -43,6 +43,7 @@ func initUpgradeCommand() *cobra.Command {
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
+	logrus.Info("Executing `arduino-cli lib upgrade`")
 
 	if len(args) == 0 {
 		err := lib.LibraryUpgradeAll(instance.Id, output.ProgressBar(), output.TaskProgress())

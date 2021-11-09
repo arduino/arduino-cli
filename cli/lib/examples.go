@@ -56,7 +56,7 @@ func initExamplesCommand() *cobra.Command {
 
 func runExamplesCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
-	logrus.Info("Show examples for library")
+	logrus.Info("Executing `arduino-cli lib examples`")
 
 	name := ""
 	if len(args) > 0 {

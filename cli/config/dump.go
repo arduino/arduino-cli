@@ -38,7 +38,7 @@ func initDumpCommand() *cobra.Command {
 }
 
 func runDumpCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino config dump`")
+	logrus.Info("Executing `arduino-cli config dump`")
 	feedback.PrintResult(dumpResult{configuration.Settings.AllSettings()})
 }
 

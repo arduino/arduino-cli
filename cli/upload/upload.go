@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -69,6 +70,7 @@ func NewCommand() *cobra.Command {
 
 func runUploadCommand(command *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
+	logrus.Info("Executing `arduino-cli upload`")
 
 	path := ""
 	if len(args) > 0 {

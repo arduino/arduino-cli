@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/sirupsen/logrus"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -122,6 +123,8 @@ func NewCommand() *cobra.Command {
 
 func runCompileCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
+
+	logrus.Info("Executing `arduino-cli compile`")
 
 	path := ""
 	if len(args) > 0 {

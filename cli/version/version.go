@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/updater"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -44,6 +45,7 @@ func NewCommand() *cobra.Command {
 }
 
 func runVersionCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino-cli version`")
 	if strings.Contains(globals.VersionInfo.VersionString, "git-snapshot") || strings.Contains(globals.VersionInfo.VersionString, "nightly") {
 		// We're using a development version, no need to check if there's a
 		// new release available

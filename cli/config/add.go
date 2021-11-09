@@ -22,6 +22,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/configuration"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -43,6 +44,7 @@ func initAddCommand() *cobra.Command {
 }
 
 func runAddCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino-cli config add`")
 	key := args[0]
 	kind := validateKey(key)
 

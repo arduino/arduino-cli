@@ -52,7 +52,7 @@ func NewCommand() *cobra.Command {
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
-	logrus.Info("Executing `arduino upgrade`")
+	logrus.Info("Executing `arduino-cli upgrade`")
 
 	err := commands.Upgrade(context.Background(), &rpc.UpgradeRequest{
 		Instance:        inst,

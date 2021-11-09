@@ -59,6 +59,7 @@ func initInitCommand() *cobra.Command {
 }
 
 func runInitCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino-cli config init`")
 
 	var configFileAbsPath *paths.Path
 	var absPath *paths.Path

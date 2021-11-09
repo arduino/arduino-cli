@@ -53,6 +53,8 @@ func initSearchCommand() *cobra.Command {
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
 	inst, status := instance.Create()
+	logrus.Info("Executing `arduino-cli lib search`")
+
 	if status != nil {
 		feedback.Errorf(tr("Error creating instance: %v"), status)
 		os.Exit(errorcodes.ErrGeneric)
@@ -71,7 +73,6 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		feedback.Errorf(tr("Error initializing instance: %v"), err)
 	}
 
-	logrus.Info("Executing `arduino lib search`")
 	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
 		Instance: inst,
 		Query:    (strings.Join(args, " ")),
