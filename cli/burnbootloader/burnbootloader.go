@@ -47,7 +47,7 @@ func NewCommand() *cobra.Command {
 		Long:    tr("Upload the bootloader on the board using an external programmer."),
 		Example: "  " + os.Args[0] + " burn-bootloader -b arduino:avr:uno -P atmel_ice",
 		Args:    cobra.MaximumNArgs(1),
-		Run:     run,
+		Run:     runBootloaderCommand,
 	}
 
 	fqbn.AddToCommand(burnBootloaderCommand)
@@ -61,7 +61,7 @@ func NewCommand() *cobra.Command {
 	return burnBootloaderCommand
 }
 
-func run(command *cobra.Command, args []string) {
+func runBootloaderCommand(command *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
 
 	// We don't need a Sketch to upload a board's bootloader

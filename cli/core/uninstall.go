@@ -32,7 +32,7 @@ import (
 )
 
 func initUninstallCommand() *cobra.Command {
-	return &cobra.Command{
+	uninstallCommand := &cobra.Command{
 		Use:     fmt.Sprintf("uninstall %s:%s ...", tr("PACKAGER"), tr("ARCH")),
 		Short:   tr("Uninstalls one or more cores and corresponding tool dependencies if no longer used."),
 		Long:    tr("Uninstalls one or more cores and corresponding tool dependencies if no longer used."),
@@ -43,6 +43,7 @@ func initUninstallCommand() *cobra.Command {
 			return arguments.GetUninstallableCores(), cobra.ShellCompDirectiveDefault
 		},
 	}
+	return uninstallCommand
 }
 
 func runUninstallCommand(cmd *cobra.Command, args []string) {

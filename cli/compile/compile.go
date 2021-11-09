@@ -76,7 +76,7 @@ func NewCommand() *cobra.Command {
 			"  " + os.Args[0] + ` compile -b arduino:avr:uno --build-property "build.extra_flags=-DPIN=2 \"-DMY_DEFINE=\"hello world\"\"" /home/user/Arduino/MySketch` + "\n" +
 			"  " + os.Args[0] + ` compile -b arduino:avr:uno --build-property build.extra_flags=-DPIN=2 --build-property "compiler.cpp.extra_flags=\"-DSSID=\"hello world\"\"" /home/user/Arduino/MySketch` + "\n",
 		Args: cobra.MaximumNArgs(1),
-		Run:  run,
+		Run:  runCompileCommand,
 	}
 
 	fqbn.AddToCommand(compileCommand)
@@ -120,7 +120,7 @@ func NewCommand() *cobra.Command {
 	return compileCommand
 }
 
-func run(cmd *cobra.Command, args []string) {
+func runCompileCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
 
 	path := ""

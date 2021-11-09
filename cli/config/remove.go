@@ -26,7 +26,7 @@ import (
 )
 
 func initRemoveCommand() *cobra.Command {
-	addCommand := &cobra.Command{
+	removeCommand := &cobra.Command{
 		Use:   "remove",
 		Short: tr("Removes one or more values from a setting."),
 		Long:  tr("Removes one or more values from a setting."),
@@ -39,7 +39,7 @@ func initRemoveCommand() *cobra.Command {
 			return GetConfigurationKeys(), cobra.ShellCompDirectiveDefault
 		},
 	}
-	return addCommand
+	return removeCommand
 }
 
 func runRemoveCommand(cmd *cobra.Command, args []string) {

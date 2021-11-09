@@ -32,17 +32,18 @@ var tr = i18n.Tr
 
 // NewCommand created a new `version` command
 func NewCommand() *cobra.Command {
-	return &cobra.Command{
+	versionCommand := &cobra.Command{
 		Use:     "version",
 		Short:   tr("Shows version number of Arduino CLI."),
 		Long:    tr("Shows the version number of Arduino CLI which is installed on your system."),
 		Example: "  " + os.Args[0] + " version",
 		Args:    cobra.NoArgs,
-		Run:     run,
+		Run:     runVersionCommand,
 	}
+	return versionCommand
 }
 
-func run(cmd *cobra.Command, args []string) {
+func runVersionCommand(cmd *cobra.Command, args []string) {
 	if strings.Contains(globals.VersionInfo.VersionString, "git-snapshot") || strings.Contains(globals.VersionInfo.VersionString, "nightly") {
 		// We're using a development version, no need to check if there's a
 		// new release available

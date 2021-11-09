@@ -50,7 +50,7 @@ var (
 
 // NewCommand created a new `daemon` command
 func NewCommand() *cobra.Command {
-	cmd := &cobra.Command{
+	daemonCommand := &cobra.Command{
 		Use:     "daemon",
 		Short:   tr("Run as a daemon on port: %s", configuration.Settings.GetString("daemon.port")),
 		Long:    tr("Running as a daemon the initialization of cores and libraries is done only once."),
@@ -58,12 +58,12 @@ func NewCommand() *cobra.Command {
 		Args:    cobra.NoArgs,
 		Run:     runDaemonCommand,
 	}
-	cmd.PersistentFlags().String("port", "", tr("The TCP port the daemon will listen to"))
-	configuration.Settings.BindPFlag("daemon.port", cmd.PersistentFlags().Lookup("port"))
-	cmd.Flags().BoolVar(&daemonize, "daemonize", false, tr("Do not terminate daemon process if the parent process dies"))
-	cmd.Flags().BoolVar(&debug, "debug", false, tr("Enable debug logging of gRPC calls"))
-	cmd.Flags().StringSliceVar(&debugFilters, "debug-filter", []string{}, tr("Display only the provided gRPC calls"))
-	return cmd
+	daemonCommand.PersistentFlags().String("port", "", tr("The TCP port the daemon will listen to"))
+	configuration.Settings.BindPFlag("daemon.port", daemonCommand.PersistentFlags().Lookup("port"))
+	daemonCommand.Flags().BoolVar(&daemonize, "daemonize", false, tr("Do not terminate daemon process if the parent process dies"))
+	daemonCommand.Flags().BoolVar(&debug, "debug", false, tr("Enable debug logging of gRPC calls"))
+	daemonCommand.Flags().StringSliceVar(&debugFilters, "debug-filter", []string{}, tr("Display only the provided gRPC calls"))
+	return daemonCommand
 }
 
 func runDaemonCommand(cmd *cobra.Command, args []string) {

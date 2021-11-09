@@ -26,15 +26,15 @@ var tr = i18n.Tr
 
 // NewCommand created a new `sketch` command
 func NewCommand() *cobra.Command {
-	cmd := &cobra.Command{
+	sketchCommand := &cobra.Command{
 		Use:     "sketch",
 		Short:   tr("Arduino CLI sketch commands."),
 		Long:    tr("Arduino CLI sketch commands."),
 		Example: "  " + os.Args[0] + " sketch new MySketch",
 	}
 
-	cmd.AddCommand(initNewCommand())
-	cmd.AddCommand(initArchiveCommand())
+	sketchCommand.AddCommand(initNewCommand())
+	sketchCommand.AddCommand(initArchiveCommand())
 
-	return cmd
+	return sketchCommand
 }

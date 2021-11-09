@@ -27,7 +27,7 @@ import (
 )
 
 func initSetCommand() *cobra.Command {
-	addCommand := &cobra.Command{
+	setCommand := &cobra.Command{
 		Use:   "set",
 		Short: tr("Sets a setting value."),
 		Long:  tr("Sets a setting value."),
@@ -42,7 +42,7 @@ func initSetCommand() *cobra.Command {
 			return configuration.Settings.AllKeys(), cobra.ShellCompDirectiveDefault
 		},
 	}
-	return addCommand
+	return setCommand
 }
 
 func runSetCommand(cmd *cobra.Command, args []string) {

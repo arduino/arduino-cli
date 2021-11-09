@@ -36,7 +36,7 @@ func NewCommand() *cobra.Command {
 
 	configCommand.AddCommand(initAddCommand())
 	configCommand.AddCommand(initDeleteCommand())
-	configCommand.AddCommand(initDumpCmd())
+	configCommand.AddCommand(initDumpCommand())
 	configCommand.AddCommand(initInitCommand())
 	configCommand.AddCommand(initRemoveCommand())
 	configCommand.AddCommand(initSetCommand())

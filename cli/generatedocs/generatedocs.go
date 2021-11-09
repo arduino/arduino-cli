@@ -31,9 +31,9 @@ var (
 	tr        = i18n.Tr
 )
 
-// NewCommand created a new `generatedocs` command
+// NewCommand created a new `generate-docs` command
 func NewCommand() *cobra.Command {
-	command := &cobra.Command{
+	generateDocsCommand := &cobra.Command{
 		Use:     "generate-docs",
 		Short:   tr("Generates bash completion and command manpages."),
 		Long:    tr("Generates bash completion and command manpages."),
@@ -41,20 +41,20 @@ func NewCommand() *cobra.Command {
 		Hidden:  true,
 	}
 
-	command.PersistentFlags().StringVarP(&outputDir, "output-dir", "o", "",
+	generateDocsCommand.PersistentFlags().StringVarP(&outputDir, "output-dir", "o", "",
 		tr("Directory where to save generated files. Default is './docs', the directory must exist."))
-	command.AddCommand(&cobra.Command{
+	generateDocsCommand.AddCommand(&cobra.Command{
 		Use:  "manpage",
 		Args: cobra.NoArgs,
 		Run:  generateManPages,
 	})
-	command.AddCommand(&cobra.Command{
+	generateDocsCommand.AddCommand(&cobra.Command{
 		Use:  "bash-completions",
 		Args: cobra.NoArgs,
 		Run:  generateBashCompletions,
 	})
 
-	return command
+	return generateDocsCommand
 }
 
 func generateBashCompletions(cmd *cobra.Command, args []string) {

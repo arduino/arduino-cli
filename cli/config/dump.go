@@ -25,8 +25,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func initDumpCmd() *cobra.Command {
-	var dumpCmd = &cobra.Command{
+func initDumpCommand() *cobra.Command {
+	var dumpCommand = &cobra.Command{
 		Use:     "dump",
 		Short:   tr("Prints the current configuration"),
 		Long:    tr("Prints the current configuration."),
@@ -34,7 +34,12 @@ func initDumpCmd() *cobra.Command {
 		Args:    cobra.NoArgs,
 		Run:     runDumpCommand,
 	}
-	return dumpCmd
+	return dumpCommand
+}
+
+func runDumpCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino config dump`")
+	feedback.PrintResult(dumpResult{configuration.Settings.AllSettings()})
 }
 
 // output from this command requires special formatting, let's create a dedicated
@@ -55,9 +60,4 @@ func (dr dumpResult) String() string {
 	}
 
 	return string(bs)
-}
-
-func runDumpCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino config dump`")
-	feedback.PrintResult(dumpResult{configuration.Settings.AllSettings()})
 }

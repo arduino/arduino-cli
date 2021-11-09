@@ -27,7 +27,7 @@ import (
 )
 
 func initDeleteCommand() *cobra.Command {
-	addCommand := &cobra.Command{
+	deleteCommand := &cobra.Command{
 		Use:   "delete",
 		Short: tr("Deletes a settings key and all its sub keys."),
 		Long:  tr("Deletes a settings key and all its sub keys."),
@@ -40,7 +40,7 @@ func initDeleteCommand() *cobra.Command {
 			return configuration.Settings.AllKeys(), cobra.ShellCompDirectiveDefault
 		},
 	}
-	return addCommand
+	return deleteCommand
 }
 
 func runDeleteCommand(cmd *cobra.Command, args []string) {

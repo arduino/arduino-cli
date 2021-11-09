@@ -34,7 +34,7 @@ var includeBuildDir bool
 
 // initArchiveCommand creates a new `archive` command
 func initArchiveCommand() *cobra.Command {
-	command := &cobra.Command{
+	archiveCommand := &cobra.Command{
 		Use:   fmt.Sprintf("archive <%s> <%s>", tr("sketchPath"), tr("archivePath")),
 		Short: tr("Creates a zip file containing all sketch files."),
 		Long:  tr("Creates a zip file containing all sketch files."),
@@ -48,9 +48,9 @@ func initArchiveCommand() *cobra.Command {
 		Run:  runArchiveCommand,
 	}
 
-	command.Flags().BoolVar(&includeBuildDir, "include-build-dir", false, tr("Includes %s directory in the archive.", "build"))
+	archiveCommand.Flags().BoolVar(&includeBuildDir, "include-build-dir", false, tr("Includes %s directory in the archive.", "build"))
 
-	return command
+	return archiveCommand
 }
 
 func runArchiveCommand(cmd *cobra.Command, args []string) {
