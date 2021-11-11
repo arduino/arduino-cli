@@ -34,7 +34,8 @@ curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.
 ```
 
 If you would like to use the `arduino-cli` command from any location, install Arduino CLI to a directory already in your
-`PATH` or add the Arduino CLI installation path to your `PATH` environment variable.
+[`PATH`](https://en.wikipedia.org/wiki/PATH%5F%28variable%29) or add the Arduino CLI installation path to your `PATH`
+environment variable.
 
 If you want to download a specific Arduino CLI version, for example `0.9.0` or `nightly-latest`, pass the version number
 as a parameter like this:
@@ -52,7 +53,8 @@ Arduino CLI checks for new releases every 24 hours. If you don't like this behav
 Pre-built binaries for all the supported platforms are available for download from the links below.
 
 If you would like to use the `arduino-cli` command from any location, extract the downloaded file to a directory already
-in your `PATH` or add the Arduino CLI installation path to your `PATH` environment variable.
+in your [`PATH`](https://en.wikipedia.org/wiki/PATH%5F%28variable%29) or add the Arduino CLI installation path to your
+`PATH` environment variable.
 
 #### Latest release
 
