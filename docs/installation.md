@@ -48,7 +48,7 @@ Arduino CLI checks for new releases every 24 hours. If you don't like this behav
 [`updater.enable_notification` config](configuration.md#configuration-keys) or the
 [env var `ARDUINO_UPDATER_ENABLE_NOTIFICATION`](configuration.md#environment-variables) to `false`.
 
-### Download
+## Download
 
 Pre-built binaries for all the supported platforms are available for download from the links below.
 
@@ -56,7 +56,7 @@ If you would like to use the `arduino-cli` command from any location, extract th
 in your [`PATH`](https://en.wikipedia.org/wiki/PATH%5F%28variable%29) or add the Arduino CLI installation path to your
 `PATH` environment variable.
 
-#### Latest release
+### Latest release
 
 | Platform  |                      |                      |
 | --------- | -------------------- | -------------------- |
@@ -77,11 +77,11 @@ in your [`PATH`](https://en.wikipedia.org/wiki/PATH%5F%28variable%29) or add the
 > `http://downloads.arduino.cc/arduino-cli/arduino-cli-latest-<platform>.tar.bz2` won’t be further updated. That URL
 > will provide the version `0.3.7-alpha.preview`, regardless of further releases.
 
-#### Previous versions
+### Previous versions
 
 These are available from the "Assets" sections on the [releases page](https://github.com/arduino/arduino-cli/releases).
 
-#### Nightly builds
+### Nightly builds
 
 These builds are generated every day at 01:00 GMT from the `master` branch and should be considered unstable. In order
 to get the latest nightly build available for the supported platform, use the following links:
@@ -107,7 +107,7 @@ to get the latest nightly build available for the supported platform, use the fo
 Checksums for the nightly builds are available at
 `https://downloads.arduino.cc/arduino-cli/nightly/nightly-<DATE>-checksums.txt`
 
-### Build from source
+## Build from source
 
 If you're familiar with Golang or if you want to contribute to the project, you will probably build Arduino CLI locally
 with your Go toolchain. See the ["How to contribute"](CONTRIBUTING.md#building-the-source-code) page for instructions.
