@@ -1,5 +1,7 @@
 <!-- Source: https://github.com/arduino/tooling-project-assets/blob/main/other/installation-script/installation.md -->
 
+Several options are available for installation of Arduino CLI. Instructions for each are provided below:
+
 ## Install via Homebrew (macOS/Linux)
 
 The Arduino CLI is available as a Homebrew formula since version `0.5.0`:
@@ -15,8 +17,9 @@ brew install arduino-cli
 
 ## Use the install script
 
-The script requires `sh`, which is always available on Linux and macOS. `sh` is not available by default on Windows. The
-script can be run on Windows by installing [Git for Windows](https://gitforwindows.org/), then running it from Git Bash.
+The script requires `sh`, which is always available on Linux and macOS. `sh` is not available by default on Windows,
+though it is available as part of [Git for Windows](https://gitforwindows.org/) (Git Bash). If you don't have `sh`
+available, use the ["Download" installation option](#download).
 
 This script will install the latest version of Arduino CLI to `$PWD/bin`:
 
@@ -31,7 +34,8 @@ curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.
 ```
 
 If you would like to use the `arduino-cli` command from any location, install Arduino CLI to a directory already in your
-`PATH` or add the Arduino CLI installation path to your `PATH` environment variable.
+[`PATH`](https://en.wikipedia.org/wiki/PATH%5F%28variable%29) or add the Arduino CLI installation path to your `PATH`
+environment variable.
 
 If you want to download a specific Arduino CLI version, for example `0.9.0` or `nightly-latest`, pass the version number
 as a parameter like this:
@@ -44,14 +48,15 @@ Arduino CLI checks for new releases every 24 hours. If you don't like this behav
 [`updater.enable_notification` config](configuration.md#configuration-keys) or the
 [env var `ARDUINO_UPDATER_ENABLE_NOTIFICATION`](configuration.md#environment-variables) to `false`.
 
-### Download
+## Download
 
 Pre-built binaries for all the supported platforms are available for download from the links below.
 
 If you would like to use the `arduino-cli` command from any location, extract the downloaded file to a directory already
-in your `PATH` or add the Arduino CLI installation path to your `PATH` environment variable.
+in your [`PATH`](https://en.wikipedia.org/wiki/PATH%5F%28variable%29) or add the Arduino CLI installation path to your
+`PATH` environment variable.
 
-#### Latest release
+### Latest release
 
 | Platform  |                      |                      |
 | --------- | -------------------- | -------------------- |
@@ -72,11 +77,11 @@ in your `PATH` or add the Arduino CLI installation path to your `PATH` environme
 > `http://downloads.arduino.cc/arduino-cli/arduino-cli-latest-<platform>.tar.bz2` won’t be further updated. That URL
 > will provide the version `0.3.7-alpha.preview`, regardless of further releases.
 
-#### Previous versions
+### Previous versions
 
 These are available from the "Assets" sections on the [releases page](https://github.com/arduino/arduino-cli/releases).
 
-#### Nightly builds
+### Nightly builds
 
 These builds are generated every day at 01:00 GMT from the `master` branch and should be considered unstable. In order
 to get the latest nightly build available for the supported platform, use the following links:
@@ -102,7 +107,7 @@ to get the latest nightly build available for the supported platform, use the fo
 Checksums for the nightly builds are available at
 `https://downloads.arduino.cc/arduino-cli/nightly/nightly-<DATE>-checksums.txt`
 
-### Build from source
+## Build from source
 
 If you're familiar with Golang or if you want to contribute to the project, you will probably build Arduino CLI locally
 with your Go toolchain. See the ["How to contribute"](CONTRIBUTING.md#building-the-source-code) page for instructions.
