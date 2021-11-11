@@ -17,8 +17,9 @@ brew install arduino-cli
 
 ## Use the install script
 
-The script requires `sh`, which is always available on Linux and macOS. `sh` is not available by default on Windows. The
-script can be run on Windows by installing [Git for Windows](https://gitforwindows.org/), then running it from Git Bash.
+The script requires `sh`, which is always available on Linux and macOS. `sh` is not available by default on Windows,
+though it is available as part of [Git for Windows](https://gitforwindows.org/) (Git Bash). If you don't have `sh`
+available, use the ["Download" installation option](#download).
 
 This script will install the latest version of Arduino CLI to `$PWD/bin`:
 
