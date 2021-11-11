@@ -1,5 +1,7 @@
 <!-- Source: https://github.com/arduino/tooling-project-assets/blob/main/other/installation-script/installation.md -->
 
+Several options are available for installation of Arduino CLI. Instructions for each are provided below:
+
 ## Install via Homebrew (macOS/Linux)
 
 The Arduino CLI is available as a Homebrew formula since version `0.5.0`:
