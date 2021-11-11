@@ -16,6 +16,7 @@
 package executils
 
 import (
+	"context"
 	"io"
 	"os"
 	"os/exec"
@@ -140,4 +141,20 @@ func (p *Process) Run() error {
 // SetEnvironment set the enviroment for the running process. Each entry is of the form "key=value".
 func (p *Process) SetEnvironment(values []string) {
 	p.cmd.Env = values
+}
+
+// RunWithinContext starts the specified command and waits for it to complete. If the given context
+// is canceled before the normal process termination, the process is killed.
+func (p *Process) RunWithinContext(ctx context.Context) error {
+	completed := make(chan struct{})
+	defer close(completed)
+	go func() {
+		select {
+		case <-ctx.Done():
+			p.Kill()
+		case <-completed:
+		}
+	}()
+	res := p.cmd.Run()
+	return res
 }
