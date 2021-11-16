@@ -399,9 +399,9 @@ recipe.hooks.sketch.prebuild.02.pattern=echo 2
 recipe.hooks.sketch.prebuild.11.pattern=echo 11
 ```
 
-Note: all the `pre*` hooks are executed also to produce the "compilation database" (it's a json file with the list of
-commands to run to compile the sketch), instead all the `post*` hooks and all compile commands will be skipped. See the
-[`arduino-cli compile`](commands/arduino-cli_compile.md) command for more info.
+Note: all the `pre*` hooks are executed while producing the "compilation database" (a JSON file with the list of
+commands to run to compile the sketch), but the `post*` hooks and all compile commands are skipped. See the
+[`arduino-cli compile`](commands/arduino-cli_compile.md) command reference for more info.
 
 ## Global platform.txt
 
