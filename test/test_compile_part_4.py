@@ -292,6 +292,22 @@ def test_compile_with_esp8266_bundled_libraries(run_command, data_dir, copy_sket
     assert "\n".join(expected_output) not in res.stdout
 
 
+def test_generate_compile_commands_json_with_esp32(run_command, data_dir, copy_sketch):
+    # https://github.com/arduino/arduino-cli/issues/1547
+    assert run_command(["update"])
+
+    # Update index with esp32 core and install it
+    url = "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
+    assert run_command(["core", "update-index", f"--additional-urls={url}"])
+    assert run_command(["core", "install", "esp32:esp32", f"--additional-urls={url}"])
+
+    # Install a library with the same name as one bundled with the core
+    assert run_command(["lib", "install", "SD"])
+
+    sketch_path = copy_sketch("sketch_simple")
+    assert run_command(["compile", "-b", "esp32:esp32:featheresp32", "--only-compilation-database", sketch_path])
+
+
 def test_compile_sketch_with_tpp_file_include(run_command, copy_sketch):
     assert run_command(["update"])
 
