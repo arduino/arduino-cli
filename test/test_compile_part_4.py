@@ -299,7 +299,7 @@ def test_generate_compile_commands_json_with_esp32(run_command, data_dir, copy_s
     # Update index with esp32 core and install it
     url = "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
     assert run_command(["core", "update-index", f"--additional-urls={url}"])
-    assert run_command(["core", "install", "esp32:esp32", f"--additional-urls={url}"])
+    assert run_command(["core", "install", "esp32:esp32@2.0.1", f"--additional-urls={url}"])
 
     sketch_path = copy_sketch("sketch_simple")
     assert run_command(["compile", "-b", "esp32:esp32:featheresp32", "--only-compilation-database", sketch_path])
