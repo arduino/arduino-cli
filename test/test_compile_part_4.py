@@ -301,9 +301,6 @@ def test_generate_compile_commands_json_with_esp32(run_command, data_dir, copy_s
     assert run_command(["core", "update-index", f"--additional-urls={url}"])
     assert run_command(["core", "install", "esp32:esp32", f"--additional-urls={url}"])
 
-    # Install a library with the same name as one bundled with the core
-    assert run_command(["lib", "install", "SD"])
-
     sketch_path = copy_sketch("sketch_simple")
     assert run_command(["compile", "-b", "esp32:esp32:featheresp32", "--only-compilation-database", sketch_path])
 
