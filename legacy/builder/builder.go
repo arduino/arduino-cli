@@ -24,7 +24,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
@@ -59,31 +58,31 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		&ContainerMergeCopySketchFiles{},
 
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, tr("Detecting libraries used...")),
+		utils.LogIfVerbose("info", tr("Detecting libraries used...")),
 		&ContainerFindIncludes{},
 
 		&WarnAboutArchIncompatibleLibraries{},
 
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, tr("Generating function prototypes...")),
+		utils.LogIfVerbose("info", tr("Generating function prototypes...")),
 		&PreprocessSketch{},
 
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, tr("Compiling sketch...")),
+		utils.LogIfVerbose("info", tr("Compiling sketch...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.sketch.prebuild", Suffix: ".pattern"},
 		&phases.SketchBuilder{},
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.sketch.postbuild", Suffix: ".pattern"},
 
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, tr("Compiling libraries...")),
+		utils.LogIfVerbose("info", tr("Compiling libraries...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.libraries.prebuild", Suffix: ".pattern"},
 		&UnusedCompiledLibrariesRemover{},
 		&phases.LibrariesBuilder{},
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.libraries.postbuild", Suffix: ".pattern"},
 
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, tr("Compiling core...")),
+		utils.LogIfVerbose("info", tr("Compiling core...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.core.prebuild", Suffix: ".pattern"},
 		&phases.CoreBuilder{},
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.core.postbuild", Suffix: ".pattern"},
 
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, tr("Linking everything together...")),
+		utils.LogIfVerbose("info", tr("Linking everything together...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.linking.prelink", Suffix: ".pattern"},
 		&phases.Linker{},
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.linking.postlink", Suffix: ".pattern"},
@@ -203,7 +202,7 @@ func runCommands(ctx *types.Context, commands []types.Command) error {
 
 func PrintRingNameIfDebug(ctx *types.Context, command types.Command) {
 	if ctx.DebugLevel >= 10 {
-		ctx.GetLogger().Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Ts: {0} - Running: {1}", strconv.FormatInt(time.Now().Unix(), 10), reflect.Indirect(reflect.ValueOf(command)).Type().Name())
+		ctx.GetLogger().Fprintln(os.Stdout, "debug", "Ts: {0} - Running: {1}", strconv.FormatInt(time.Now().Unix(), 10), reflect.Indirect(reflect.ValueOf(command)).Type().Name())
 	}
 }
 
