@@ -54,19 +54,15 @@ func runCompletionCommand(cmd *cobra.Command, args []string) {
 	switch args[0] {
 	case "bash":
 		cmd.Root().GenBashCompletionV2(os.Stdout, !completionNoDesc)
-		break
 	case "zsh":
 		if completionNoDesc {
 			cmd.Root().GenZshCompletionNoDesc(os.Stdout)
 		} else {
 			cmd.Root().GenZshCompletion(os.Stdout)
 		}
-		break
 	case "fish":
 		cmd.Root().GenFishCompletion(os.Stdout, !completionNoDesc)
-		break
 	case "powershell":
 		cmd.Root().GenPowerShellCompletion(os.Stdout)
-		break
 	}
 }
