@@ -2473,6 +2473,9 @@ recipe.hooks.sketch.prebuild.02.pattern=echo 2
 ...
 recipe.hooks.sketch.prebuild.11.pattern=echo 11
 </code></pre></div>
+<p>Note: all the <code>pre*</code> hooks are executed while producing the "compilation database" (a JSON file with the list of
+commands to run to compile the sketch), but the <code>post*</code> hooks and all compile commands are skipped. See the
+<a href="../commands/arduino-cli_compile/"><code>arduino-cli compile</code></a> command reference for more info.</p>
 <h2 id="global-platformtxt">Global platform.txt<a class="headerlink" href="#global-platformtxt" title="Permanent link">&para;</a></h2>
 <p>Properties defined in a platform.txt created in the <strong>hardware</strong> subfolder of the Arduino IDE installation folder will
 be used for all platforms and will override local properties. This feature is currently only available when using the
