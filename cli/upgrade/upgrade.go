@@ -19,7 +19,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/cli/core"
+	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
@@ -30,7 +30,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var tr = i18n.Tr
+var (
+	tr               = i18n.Tr
+	postInstallFlags arguments.PostInstallFlags
+)
 
 // NewCommand creates a new `upgrade` command
 func NewCommand() *cobra.Command {
@@ -43,7 +46,7 @@ func NewCommand() *cobra.Command {
 		Run:     runUpgradeCommand,
 	}
 
-	core.AddPostInstallFlagsToCommand(upgradeCommand)
+	postInstallFlags.AddToCommand(upgradeCommand)
 	return upgradeCommand
 }
 
@@ -53,7 +56,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 
 	err := commands.Upgrade(context.Background(), &rpc.UpgradeRequest{
 		Instance:        inst,
-		SkipPostInstall: core.DetectSkipPostInstallValue(),
+		SkipPostInstall: postInstallFlags.DetectSkipPostInstallValue(),
 	}, output.NewDownloadProgressBarCB(), output.TaskProgress())
 
 	if err != nil {

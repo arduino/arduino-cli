@@ -26,10 +26,13 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+)
+
+var (
+	postInstallFlags arguments.PostInstallFlags
 )
 
 func initInstallCommand() *cobra.Command {
@@ -42,48 +45,16 @@ func initInstallCommand() *cobra.Command {
 			"  # " + tr("download a specific version (in this case 1.6.9).") + "\n" +
 			"  " + os.Args[0] + " core install arduino:samd@1.6.9",
 		Args: cobra.MinimumNArgs(1),
-		Run:  runInstallCommand,
+		PreRun: func(cmd *cobra.Command, args []string) {
+			arguments.CheckFlagsConflicts(cmd, "run-post-install", "skip-post-install")
+		},
+		Run: runInstallCommand,
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 			return arguments.GetInstallableCores(), cobra.ShellCompDirectiveDefault
 		},
 	}
-	AddPostInstallFlagsToCommand(installCommand)
+	postInstallFlags.AddToCommand(installCommand)
 	return installCommand
-}
-
-var postInstallFlags struct {
-	runPostInstall  bool
-	skipPostInstall bool
-}
-
-// AddPostInstallFlagsToCommand adds flags that can be used to force running or skipping
-// of post installation scripts
-func AddPostInstallFlagsToCommand(cmd *cobra.Command) {
-	cmd.Flags().BoolVar(&postInstallFlags.runPostInstall, "run-post-install", false, tr("Force run of post-install scripts (if the CLI is not running interactively)."))
-	cmd.Flags().BoolVar(&postInstallFlags.skipPostInstall, "skip-post-install", false, tr("Force skip of post-install scripts (if the CLI is running interactively)."))
-}
-
-// DetectSkipPostInstallValue returns true if a post install script must be run
-func DetectSkipPostInstallValue() bool {
-	if postInstallFlags.runPostInstall && postInstallFlags.skipPostInstall {
-		feedback.Errorf(tr("The flags --run-post-install and --skip-post-install can't be both set at the same time."))
-		os.Exit(errorcodes.ErrBadArgument)
-	}
-	if postInstallFlags.runPostInstall {
-		logrus.Info("Will run post-install by user request")
-		return false
-	}
-	if postInstallFlags.skipPostInstall {
-		logrus.Info("Will skip post-install by user request")
-		return true
-	}
-
-	if !configuration.IsInteractive {
-		logrus.Info("Not running from console, will skip post-install by default")
-		return true
-	}
-	logrus.Info("Running from console, will run post-install by default")
-	return false
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
@@ -102,7 +73,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
-			SkipPostInstall: DetectSkipPostInstallValue(),
+			SkipPostInstall: postInstallFlags.DetectSkipPostInstallValue(),
 		}
 		_, err := core.PlatformInstall(context.Background(), platformInstallRequest, output.ProgressBar(), output.TaskProgress())
 		if err != nil {
