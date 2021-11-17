@@ -24,7 +24,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
@@ -55,46 +54,46 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		&WarnAboutPlatformRewrites{},
 
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
 
 		&ContainerMergeCopySketchFiles{},
 
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, tr("Detecting libraries used...")),
+		utils.LogIfVerbose("info", tr("Detecting libraries used...")),
 		&ContainerFindIncludes{},
 
 		&WarnAboutArchIncompatibleLibraries{},
 
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, tr("Generating function prototypes...")),
+		utils.LogIfVerbose("info", tr("Generating function prototypes...")),
 		&PreprocessSketch{},
 
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, tr("Compiling sketch...")),
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_SKETCH_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		utils.LogIfVerbose("info", tr("Compiling sketch...")),
+		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.sketch.prebuild", Suffix: ".pattern"},
 		&phases.SketchBuilder{},
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_SKETCH_POSTBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.sketch.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, tr("Compiling libraries...")),
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LIBRARIES_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		utils.LogIfVerbose("info", tr("Compiling libraries...")),
+		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.libraries.prebuild", Suffix: ".pattern"},
 		&UnusedCompiledLibrariesRemover{},
 		&phases.LibrariesBuilder{},
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LIBRARIES_POSTBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.libraries.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, tr("Compiling core...")),
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_CORE_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		utils.LogIfVerbose("info", tr("Compiling core...")),
+		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.core.prebuild", Suffix: ".pattern"},
 		&phases.CoreBuilder{},
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_CORE_POSTBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.core.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, tr("Linking everything together...")),
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LINKING_PRELINK, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		utils.LogIfVerbose("info", tr("Linking everything together...")),
+		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.linking.prelink", Suffix: ".pattern"},
 		&phases.Linker{},
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_LINKING_POSTLINK, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.linking.postlink", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_OBJCOPY_PREOBJCOPY, Suffix: constants.HOOKS_PATTERN_SUFFIX},
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.objcopy.", Suffix: constants.HOOKS_PATTERN_SUFFIX},
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_OBJCOPY_POSTOBJCOPY, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.objcopy.preobjcopy", Suffix: ".pattern"},
+		&RecipeByPrefixSuffixRunner{Prefix: "recipe.objcopy.", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
+		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.objcopy.postobjcopy", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
 		&MergeSketchWithBootloader{},
 
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_POSTBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 	}
 
 	mainErr := runCommands(ctx, commands)
@@ -149,7 +148,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 
 		&ContainerBuildOptions{},
 
-		&RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
 
 		&ContainerMergeCopySketchFiles{},
 
@@ -203,7 +202,7 @@ func runCommands(ctx *types.Context, commands []types.Command) error {
 
 func PrintRingNameIfDebug(ctx *types.Context, command types.Command) {
 	if ctx.DebugLevel >= 10 {
-		ctx.GetLogger().Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, "Ts: {0} - Running: {1}", strconv.FormatInt(time.Now().Unix(), 10), reflect.Indirect(reflect.ValueOf(command)).Type().Name())
+		ctx.GetLogger().Fprintln(os.Stdout, "debug", "Ts: {0} - Running: {1}", strconv.FormatInt(time.Now().Unix(), 10), reflect.Indirect(reflect.ValueOf(command)).Type().Name())
 	}
 }
 

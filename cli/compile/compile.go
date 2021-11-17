@@ -112,7 +112,7 @@ func NewCommand() *cobra.Command {
 	command.RegisterFlagCompletionFunc("programmer", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return arguments.GetInstalledProgrammers(), cobra.ShellCompDirectiveDefault
 	})
-	command.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, tr("Just produce the compilation database, without actually compiling."))
+	command.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, tr("Just produce the compilation database, without actually compiling. All build commands are skipped except pre* hooks."))
 	command.Flags().BoolVar(&clean, "clean", false, tr("Optional, cleanup the build folder and do not use any cached build."))
 	// We must use the following syntax for this flag since it's also bound to settings.
 	// This must be done because the value is set when the binding is accessed from viper. Accessing from cobra would only

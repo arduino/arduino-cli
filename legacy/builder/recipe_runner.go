@@ -29,8 +29,9 @@ import (
 )
 
 type RecipeByPrefixSuffixRunner struct {
-	Prefix string
-	Suffix string
+	Prefix                                string
+	Suffix                                string
+	SkipIfOnlyUpdatingCompilationDatabase bool
 }
 
 func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
@@ -53,7 +54,7 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 			return errors.WithStack(err)
 		}
 
-		if ctx.OnlyUpdateCompilationDatabase {
+		if ctx.OnlyUpdateCompilationDatabase && s.SkipIfOnlyUpdatingCompilationDatabase {
 			if ctx.Verbose {
 				ctx.GetLogger().Println("info", tr("Skipping: {0}"), strings.Join(command.Args, " "))
 			}

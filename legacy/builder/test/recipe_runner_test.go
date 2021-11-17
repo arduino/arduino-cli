@@ -19,10 +19,8 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/legacy/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-properties-orderedmap"
-	"github.com/stretchr/testify/require"
 )
 
 // TODO
@@ -38,18 +36,11 @@ func TestRecipeRunner(t *testing.T) {
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
-		&builder.RecipeByPrefixSuffixRunner{Prefix: constants.HOOKS_PREBUILD, Suffix: constants.HOOKS_PATTERN_SUFFIX},
+		&builder.RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-}
-
-func TestRecipesComposition(t *testing.T) {
-	require.Equal(t, "recipe.hooks.core.postbuild", constants.HOOKS_CORE_POSTBUILD)
-	require.Equal(t, "recipe.hooks.postbuild", constants.HOOKS_POSTBUILD)
-	require.Equal(t, "recipe.hooks.linking.prelink", constants.HOOKS_LINKING_PRELINK)
-	require.Equal(t, "recipe.hooks.objcopy.preobjcopy", constants.HOOKS_OBJCOPY_PREOBJCOPY)
 }
