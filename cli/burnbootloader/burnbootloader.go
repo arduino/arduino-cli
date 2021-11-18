@@ -30,7 +30,7 @@ import (
 )
 
 var (
-	fqbn       string
+	fqbn       arguments.Fqbn
 	port       arguments.Port
 	verbose    bool
 	verify     bool
@@ -50,10 +50,7 @@ func NewCommand() *cobra.Command {
 		Run:     run,
 	}
 
-	burnBootloaderCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
-	burnBootloaderCommand.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return arguments.GetInstalledBoards(), cobra.ShellCompDirectiveDefault
-	})
+	fqbn.AddToCommand(burnBootloaderCommand)
 	port.AddToCommand(burnBootloaderCommand)
 	burnBootloaderCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
 	burnBootloaderCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Turns on verbose mode."))
@@ -79,7 +76,7 @@ func run(command *cobra.Command, args []string) {
 
 	if _, err := upload.BurnBootloader(context.Background(), &rpc.BurnBootloaderRequest{
 		Instance:   instance,
-		Fqbn:       fqbn,
+		Fqbn:       fqbn.String(),
 		Port:       discoveryPort.ToRPC(),
 		Verbose:    verbose,
 		Verify:     verify,
