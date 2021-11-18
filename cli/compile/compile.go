@@ -39,25 +39,25 @@ import (
 )
 
 var (
-	fqbn                    string         // Fully Qualified Board Name, e.g.: arduino:avr:uno.
-	showProperties          bool           // Show all build preferences used instead of compiling.
-	preprocess              bool           // Print preprocessed code to stdout.
-	buildCachePath          string         // Builds of 'core.a' are saved into this path to be cached and reused.
-	buildPath               string         // Path where to save compiled files.
-	buildProperties         []string       // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
-	warnings                string         // Used to tell gcc which warning level to use.
-	verbose                 bool           // Turns on verbose mode.
-	quiet                   bool           // Suppresses almost every output.
-	vidPid                  string         // VID/PID specific build properties.
-	uploadAfterCompile      bool           // Upload the binary after the compilation.
-	port                    arguments.Port // Upload port, e.g.: COM10 or /dev/ttyACM0.
-	verify                  bool           // Upload, verify uploaded binary after the upload.
-	exportDir               string         // The compiled binary is written to this file
-	optimizeForDebug        bool           // Optimize compile output for debug, not for release
-	programmer              string         // Use the specified programmer to upload
-	clean                   bool           // Cleanup the build folder and do not use any cached build
-	compilationDatabaseOnly bool           // Only create compilation database without actually compiling
-	sourceOverrides         string         // Path to a .json file that contains a set of replacements of the sketch source code.
+	fqbn                    arguments.Fqbn       // Fully Qualified Board Name, e.g.: arduino:avr:uno.
+	showProperties          bool                 // Show all build preferences used instead of compiling.
+	preprocess              bool                 // Print preprocessed code to stdout.
+	buildCachePath          string               // Builds of 'core.a' are saved into this path to be cached and reused.
+	buildPath               string               // Path where to save compiled files.
+	buildProperties         []string             // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
+	warnings                string               // Used to tell gcc which warning level to use.
+	verbose                 bool                 // Turns on verbose mode.
+	quiet                   bool                 // Suppresses almost every output.
+	vidPid                  string               // VID/PID specific build properties.
+	uploadAfterCompile      bool                 // Upload the binary after the compilation.
+	port                    arguments.Port       // Upload port, e.g.: COM10 or /dev/ttyACM0.
+	verify                  bool                 // Upload, verify uploaded binary after the upload.
+	exportDir               string               // The compiled binary is written to this file
+	optimizeForDebug        bool                 // Optimize compile output for debug, not for release
+	programmer              arguments.Programmer // Use the specified programmer to upload
+	clean                   bool                 // Cleanup the build folder and do not use any cached build
+	compilationDatabaseOnly bool                 // Only create compilation database without actually compiling
+	sourceOverrides         string               // Path to a .json file that contains a set of replacements of the sketch source code.
 	// library and libraries sound similar but they're actually different.
 	// library expects a path to the root folder of one single library.
 	// libraries expects a path to a directory containing multiple libraries, similarly to the <directories.user>/libraries path.
@@ -68,7 +68,7 @@ var (
 
 // NewCommand created a new `compile` command
 func NewCommand() *cobra.Command {
-	command := &cobra.Command{
+	compileCommand := &cobra.Command{
 		Use:   "compile",
 		Short: tr("Compiles Arduino sketches."),
 		Long:  tr("Compiles Arduino sketches."),
@@ -81,51 +81,45 @@ func NewCommand() *cobra.Command {
 		Run:  run,
 	}
 
-	command.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
-	command.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return arguments.GetInstalledBoards(), cobra.ShellCompDirectiveDefault
-	})
-	command.Flags().BoolVar(&showProperties, "show-properties", false, tr("Show all build properties used instead of compiling."))
-	command.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
-	command.Flags().StringVar(&buildCachePath, "build-cache-path", "", tr("Builds of 'core.a' are saved into this path to be cached and reused."))
-	command.Flags().StringVarP(&exportDir, "output-dir", "", "", tr("Save build artifacts in this directory."))
-	command.Flags().StringVar(&buildPath, "build-path", "",
+	fqbn.AddToCommand(compileCommand)
+	compileCommand.Flags().BoolVar(&showProperties, "show-properties", false, tr("Show all build properties used instead of compiling."))
+	compileCommand.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
+	compileCommand.Flags().StringVar(&buildCachePath, "build-cache-path", "", tr("Builds of 'core.a' are saved into this path to be cached and reused."))
+	compileCommand.Flags().StringVarP(&exportDir, "output-dir", "", "", tr("Save build artifacts in this directory."))
+	compileCommand.Flags().StringVar(&buildPath, "build-path", "",
 		tr("Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS."))
-	command.Flags().StringSliceVar(&buildProperties, "build-properties", []string{},
+	compileCommand.Flags().StringSliceVar(&buildProperties, "build-properties", []string{},
 		tr("List of custom build properties separated by commas. Or can be used multiple times for multiple properties."))
-	command.Flags().StringArrayVar(&buildProperties, "build-property", []string{},
+	compileCommand.Flags().StringArrayVar(&buildProperties, "build-property", []string{},
 		tr("Override a build property with a custom value. Can be used multiple times for multiple properties."))
-	command.Flags().StringVar(&warnings, "warnings", "none",
+	compileCommand.Flags().StringVar(&warnings, "warnings", "none",
 		tr(`Optional, can be: %s. Used to tell gcc which warning level to use (-W flag).`, "none, default, more, all"))
-	command.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Optional, turns on verbose mode."))
-	command.Flags().BoolVar(&quiet, "quiet", false, tr("Optional, suppresses almost every output."))
-	command.Flags().BoolVarP(&uploadAfterCompile, "upload", "u", false, tr("Upload the binary after the compilation."))
-	port.AddToCommand(command)
-	command.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
-	command.Flags().StringVar(&vidPid, "vid-pid", "", tr("When specified, VID/PID specific build properties are used, if board supports them."))
-	command.Flags().StringSliceVar(&library, "library", []string{},
+	compileCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Optional, turns on verbose mode."))
+	compileCommand.Flags().BoolVar(&quiet, "quiet", false, tr("Optional, suppresses almost every output."))
+	compileCommand.Flags().BoolVarP(&uploadAfterCompile, "upload", "u", false, tr("Upload the binary after the compilation."))
+	port.AddToCommand(compileCommand)
+	compileCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
+	compileCommand.Flags().StringVar(&vidPid, "vid-pid", "", tr("When specified, VID/PID specific build properties are used, if board supports them."))
+	compileCommand.Flags().StringSliceVar(&library, "library", []string{},
 		tr("List of paths to libraries root folders. Libraries set this way have top priority in case of conflicts. Can be used multiple times for different libraries."))
-	command.Flags().StringSliceVar(&libraries, "libraries", []string{},
+	compileCommand.Flags().StringSliceVar(&libraries, "libraries", []string{},
 		tr("List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries dir paths."))
-	command.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, tr("Optional, optimize compile output for debugging, rather than for release."))
-	command.Flags().StringVarP(&programmer, "programmer", "P", "", tr("Optional, use the specified programmer to upload."))
-	command.RegisterFlagCompletionFunc("programmer", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return arguments.GetInstalledProgrammers(), cobra.ShellCompDirectiveDefault
-	})
-	command.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, tr("Just produce the compilation database, without actually compiling. All build commands are skipped except pre* hooks."))
-	command.Flags().BoolVar(&clean, "clean", false, tr("Optional, cleanup the build folder and do not use any cached build."))
+	compileCommand.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, tr("Optional, optimize compile output for debugging, rather than for release."))
+	programmer.AddToCommand(compileCommand)
+	compileCommand.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, tr("Just produce the compilation database, without actually compiling. All build commands are skipped except pre* hooks."))
+	compileCommand.Flags().BoolVar(&clean, "clean", false, tr("Optional, cleanup the build folder and do not use any cached build."))
 	// We must use the following syntax for this flag since it's also bound to settings.
 	// This must be done because the value is set when the binding is accessed from viper. Accessing from cobra would only
 	// read the value if the flag is set explicitly by the user.
-	command.Flags().BoolP("export-binaries", "e", false, tr("If set built binaries will be exported to the sketch folder."))
-	command.Flags().StringVar(&sourceOverrides, "source-override", "", tr("Optional. Path to a .json file that contains a set of replacements of the sketch source code."))
-	command.Flag("source-override").Hidden = true
+	compileCommand.Flags().BoolP("export-binaries", "e", false, tr("If set built binaries will be exported to the sketch folder."))
+	compileCommand.Flags().StringVar(&sourceOverrides, "source-override", "", tr("Optional. Path to a .json file that contains a set of replacements of the sketch source code."))
+	compileCommand.Flag("source-override").Hidden = true
 
-	configuration.Settings.BindPFlag("sketch.always_export_binaries", command.Flags().Lookup("export-binaries"))
+	configuration.Settings.BindPFlag("sketch.always_export_binaries", compileCommand.Flags().Lookup("export-binaries"))
 
-	command.Flags().MarkDeprecated("build-properties", tr("please use --build-property instead."))
+	compileCommand.Flags().MarkDeprecated("build-properties", tr("please use --build-property instead."))
 
-	return command
+	return compileCommand
 }
 
 func run(cmd *cobra.Command, args []string) {
@@ -164,7 +158,7 @@ func run(cmd *cobra.Command, args []string) {
 
 	compileRequest := &rpc.CompileRequest{
 		Instance:                      inst,
-		Fqbn:                          fqbn,
+		Fqbn:                          fqbn.String(),
 		SketchPath:                    sketchPath.String(),
 		ShowProperties:                showProperties,
 		Preprocess:                    preprocess,
@@ -210,7 +204,7 @@ func run(cmd *cobra.Command, args []string) {
 
 		userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
 			Instance: inst,
-			Fqbn:     fqbn,
+			Fqbn:     fqbn.String(),
 			Protocol: discoveryPort.Protocol,
 		})
 		if err != nil {
@@ -226,13 +220,13 @@ func run(cmd *cobra.Command, args []string) {
 
 		uploadRequest := &rpc.UploadRequest{
 			Instance:   inst,
-			Fqbn:       fqbn,
+			Fqbn:       fqbn.String(),
 			SketchPath: sketchPath.String(),
 			Port:       discoveryPort.ToRPC(),
 			Verbose:    verbose,
 			Verify:     verify,
 			ImportDir:  buildPath,
-			Programmer: programmer,
+			Programmer: programmer.String(),
 			UserFields: fields,
 		}
 
