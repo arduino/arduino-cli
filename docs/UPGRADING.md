@@ -2,6 +2,25 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## Unreleased
+
+### `board details` arguments change
+
+The `board details` command now accepts only the `--fqbn` or `-b` flags to specify the FQBN.
+
+The previously deprecated `board details <FQBN>` syntax is no longer supported.
+
+### `board attach` arguments change
+
+The `board attach` command now uses `--port` and `-p` flags to set board port and `--board` and `-b` flags to select its
+FQBN.
+
+The previous syntax `board attach <port>|<FQBN> [sketchPath]` is no longer supported.
+
+### `--timeout` flag in `board list` command has been replaced by `--discovery-timeout`
+
+The flag `--timeout` in the `board list` command is no longer supported.
+
 ## 0.19.0
 
 ### `board list` command JSON output change
