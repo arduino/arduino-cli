@@ -147,6 +147,11 @@ func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Po
 	}
 }
 
+// GetSearchTimeout returns the timeout
+func (p *Port) GetSearchTimeout() time.Duration {
+	return p.timeout
+}
+
 // GetDiscoveryPort is a helper function useful to get the port and handle possible errors
 func (p *Port) GetDiscoveryPort(instance *rpc.Instance, sk *sketch.Sketch) *discovery.Port {
 	discoveryPort, err := p.GetPort(instance, sk)
