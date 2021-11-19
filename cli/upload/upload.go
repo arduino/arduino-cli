@@ -79,12 +79,8 @@ func runUploadCommand(command *cobra.Command, args []string) {
 	}
 	sketchPath := arguments.InitSketchPath(path)
 
-	// .pde files are still supported but deprecated, this warning urges the user to rename them
-	if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 && importDir == "" && importFile == "" {
-		feedback.Error(tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:"))
-		for _, f := range files {
-			feedback.Error(f)
-		}
+	if importDir == "" && importFile == "" {
+		arguments.WarnDeprecatedFiles(sketchPath)
 	}
 
 	sk, err := sketch.New(sketchPath)
