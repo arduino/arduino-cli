@@ -47,11 +47,7 @@ func initSetCommand() *cobra.Command {
 
 func runSetCommand(cmd *cobra.Command, args []string) {
 	key := args[0]
-	kind, err := typeOf(key)
-	if err != nil {
-		feedback.Error(err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
+	kind := validateKey(key)
 
 	if kind != reflect.Slice && len(args) > 2 {
 		feedback.Errorf(tr("Can't set multiple values in key %v"), key)

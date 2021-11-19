@@ -44,11 +44,7 @@ func initAddCommand() *cobra.Command {
 
 func runAddCommand(cmd *cobra.Command, args []string) {
 	key := args[0]
-	kind, err := typeOf(key)
-	if err != nil {
-		feedback.Error(err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
+	kind := validateKey(key)
 
 	if kind != reflect.Slice {
 		feedback.Errorf(tr("The key '%[1]v' is not a list of items, can't add to it.\nMaybe use '%[2]s'?"), key, "config set")
