@@ -502,37 +502,13 @@ def test_board_details(run_command):
     assert result["debugging_supported"] is True
 
 
-# old `arduino-cli board details` did not need -b <fqbn> flag to work
-def test_board_details_old(run_command):
-    run_command(["core", "update-index"])
-    # Download samd core pinned to 1.8.6
-    run_command(["core", "install", "arduino:samd@1.8.6"])
-    result = run_command(["board", "details", "arduino:samd:nano_33_iot", "--format", "json"])
-    assert result.ok
-    # Sort everything before compare
-    result = json.loads(result.stdout)
-    gold_board_details = json.loads(gold_board)
-
-    assert result["fqbn"] == gold_board_details["fqbn"]
-    assert result["name"] == gold_board_details["name"]
-    assert result["version"] == gold_board_details["version"]
-    assert result["properties_id"] == gold_board_details["properties_id"]
-    assert result["official"] == gold_board_details["official"]
-    assert result["package"] == gold_board_details["package"]
-    assert result["platform"] == gold_board_details["platform"]
-    for usb_id in gold_board_details["identification_properties"]:
-        assert usb_id in result["identification_properties"]
-    for programmer in gold_board_details["programmers"]:
-        assert programmer in result["programmers"]
-
-
 def test_board_details_no_flags(run_command):
     run_command(["core", "update-index"])
     # Download samd core pinned to 1.8.6
     run_command(["core", "install", "arduino:samd@1.8.6"])
     result = run_command(["board", "details"])
     assert not result.ok
-    assert "Error getting board details: Invalid FQBN:" in result.stderr
+    assert 'Error: required flag(s) "fqbn" not set' in result.stderr
     assert result.stdout == ""
 
 

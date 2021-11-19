@@ -44,14 +44,14 @@ func initDetailsCommand() *cobra.Command {
 		Short:   tr("Print details about a board."),
 		Long:    tr("Show information about a board, in particular if the board has options to be specified in the FQBN."),
 		Example: "  " + os.Args[0] + " board details -b arduino:avr:nano",
-		Args:    cobra.MaximumNArgs(1),
+		Args:    cobra.NoArgs,
 		Run:     runDetailsCommand,
 	}
 
 	fqbn.AddToCommand(detailsCommand)
 	detailsCommand.Flags().BoolVarP(&showFullDetails, "full", "f", false, tr("Show full board details"))
 	detailsCommand.Flags().BoolVarP(&listProgrammers, "list-programmers", "", false, tr("Show list of available programmers"))
-	// detailsCommand.MarkFlagRequired("fqbn") // enable once `board details <fqbn>` is removed
+	detailsCommand.MarkFlagRequired("fqbn")
 
 	return detailsCommand
 }
@@ -60,11 +60,6 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
 
 	logrus.Info("Executing `arduino-cli board details`")
-
-	// remove once `board details <fqbn>` is removed
-	if fqbn.String() == "" && len(args) > 0 {
-		fqbn.Set(args[0])
-	}
 
 	res, err := board.Details(context.Background(), &rpc.BoardDetailsRequest{
 		Instance: inst,
