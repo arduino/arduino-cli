@@ -275,6 +275,40 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    Unreleased
+  </a>
+  
+    <nav class="md-nav" aria-label="Unreleased">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#board-details-arguments-change" class="md-nav__link">
+    board details arguments change
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#board-attach-arguments-change" class="md-nav__link">
+    board attach arguments change
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-timeout-flag-in-board-list-command-has-been-replaced-by-discovery-timeout" class="md-nav__link">
+    --timeout flag in board list command has been replaced by --discovery-timeout
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0190" class="md-nav__link">
     0.19.0
   </a>
@@ -1538,6 +1572,40 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    Unreleased
+  </a>
+  
+    <nav class="md-nav" aria-label="Unreleased">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#board-details-arguments-change" class="md-nav__link">
+    board details arguments change
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#board-attach-arguments-change" class="md-nav__link">
+    board attach arguments change
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-timeout-flag-in-board-list-command-has-been-replaced-by-discovery-timeout" class="md-nav__link">
+    --timeout flag in board list command has been replaced by --discovery-timeout
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0190" class="md-nav__link">
     0.19.0
   </a>
@@ -1795,6 +1863,16 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="board-details-arguments-change"><code>board details</code> arguments change<a class="headerlink" href="#board-details-arguments-change" title="Permanent link">&para;</a></h3>
+<p>The <code>board details</code> command now accepts only the <code>--fqbn</code> or <code>-b</code> flags to specify the FQBN.</p>
+<p>The previously deprecated <code>board details &lt;FQBN&gt;</code> syntax is no longer supported.</p>
+<h3 id="board-attach-arguments-change"><code>board attach</code> arguments change<a class="headerlink" href="#board-attach-arguments-change" title="Permanent link">&para;</a></h3>
+<p>The <code>board attach</code> command now uses <code>--port</code> and <code>-p</code> flags to set board port and <code>--board</code> and <code>-b</code> flags to select its
+FQBN.</p>
+<p>The previous syntax <code>board attach &lt;port&gt;|&lt;FQBN&gt; [sketchPath]</code> is no longer supported.</p>
+<h3 id="-timeout-flag-in-board-list-command-has-been-replaced-by-discovery-timeout"><code>--timeout</code> flag in <code>board list</code> command has been replaced by <code>--discovery-timeout</code><a class="headerlink" href="#-timeout-flag-in-board-list-command-has-been-replaced-by-discovery-timeout" title="Permanent link">&para;</a></h3>
+<p>The flag <code>--timeout</code> in the <code>board list</code> command is no longer supported.</p>
 <h2 id="0190">0.19.0<a class="headerlink" href="#0190" title="Permanent link">&para;</a></h2>
 <h3 id="board-list-command-json-output-change"><code>board list</code> command JSON output change<a class="headerlink" href="#board-list-command-json-output-change" title="Permanent link">&para;</a></h3>
 <p>The <code>board list</code> command JSON output has been changed quite a bit, from:</p>

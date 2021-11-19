@@ -1413,16 +1413,19 @@
 <p>Attaches a sketch to a board.</p>
 <h3 id="synopsis">Synopsis<a class="headerlink" href="#synopsis" title="Permanent link">&para;</a></h3>
 <p>Attaches a sketch to a board.</p>
-<div class="highlight"><pre><span></span><code>arduino-cli board attach &lt;port&gt;|&lt;FQBN&gt; [sketchPath] [flags]
+<div class="highlight"><pre><span></span><code>arduino-cli board attach -p &lt;port&gt;|-b &lt;FQBN&gt; [sketchPath] [flags]
 </code></pre></div>
 <h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>  arduino-cli board attach serial:///dev/ttyACM0
-  arduino-cli board attach serial:///dev/ttyACM0 HelloWorld
-  arduino-cli board attach arduino:samd:mkr1000
+<div class="highlight"><pre><span></span><code>  arduino-cli board attach -p /dev/ttyACM0
+  arduino-cli board attach -p /dev/ttyACM0 HelloWorld
+  arduino-cli board attach -b arduino:samd:mkr1000
 </code></pre></div>
 <h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>  -h, --help             help for attach
-      --timeout string   The connected devices search timeout, raise it if your board doesn&#39;t show up (e.g. to 10s). (default &quot;5s&quot;)
+<div class="highlight"><pre><span></span><code>      --discovery-timeout duration   Max time to wait for port discovery, e.g.: 30s, 1m (default 5s)
+  -b, --fqbn string                  Fully Qualified Board Name, e.g.: arduino:avr:uno
+  -h, --help                         help for attach
+  -p, --port string                  Upload port address, e.g.: COM3 or /dev/ttyACM2
+  -l, --protocol string              Upload port protocol, e.g: serial
 </code></pre></div>
 <h3 id="options-inherited-from-parent-commands">Options inherited from parent commands<a class="headerlink" href="#options-inherited-from-parent-commands" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>      --additional-urls strings   Comma-separated list of additional URLs for the Boards Manager.
