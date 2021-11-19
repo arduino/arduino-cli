@@ -23,7 +23,7 @@ var (
 	defaultVersionString = "0.0.0-git"
 	versionString        = ""
 	commit               = ""
-	status               = "alpha"
+	status               = ""
 	date                 = ""
 	tr                   = i18n.Tr
 )
