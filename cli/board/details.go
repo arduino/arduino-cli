@@ -33,8 +33,8 @@ import (
 
 var (
 	showFullDetails bool
-	fqbn            string
 	listProgrammers bool
+	fqbn            arguments.Fqbn
 )
 
 func initDetailsCommand() *cobra.Command {
@@ -47,11 +47,8 @@ func initDetailsCommand() *cobra.Command {
 		Run:     runDetailsCommand,
 	}
 
+	fqbn.AddToCommand(detailsCommand)
 	detailsCommand.Flags().BoolVarP(&showFullDetails, "full", "f", false, tr("Show full board details"))
-	detailsCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
-	detailsCommand.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return arguments.GetInstalledBoards(), cobra.ShellCompDirectiveDefault
-	})
 	detailsCommand.Flags().BoolVarP(&listProgrammers, "list-programmers", "", false, tr("Show list of available programmers"))
 	// detailsCommand.MarkFlagRequired("fqbn") // enable once `board details <fqbn>` is removed
 
@@ -62,13 +59,13 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
 
 	// remove once `board details <fqbn>` is removed
-	if fqbn == "" && len(args) > 0 {
-		fqbn = args[0]
+	if fqbn.String() == "" && len(args) > 0 {
+		fqbn.Set(args[0])
 	}
 
 	res, err := board.Details(context.Background(), &rpc.BoardDetailsRequest{
 		Instance: inst,
-		Fqbn:     fqbn,
+		Fqbn:     fqbn.String(),
 	})
 
 	if err != nil {
