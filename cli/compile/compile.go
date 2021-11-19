@@ -21,8 +21,6 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/arduino/arduino-cli/arduino/discovery"
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/output"
@@ -129,15 +127,8 @@ func run(cmd *cobra.Command, args []string) {
 	if len(args) > 0 {
 		path = args[0]
 	}
-	sketchPath := arguments.InitSketchPath(path)
 
-	// .pde files are still supported but deprecated, this warning urges the user to rename them
-	if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 {
-		feedback.Error(tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:"))
-		for _, f := range files {
-			feedback.Error(f)
-		}
-	}
+	sketchPath := arguments.InitSketchPath(path)
 
 	var overrides map[string]string
 	if sourceOverrides != "" {
@@ -189,18 +180,8 @@ func run(cmd *cobra.Command, args []string) {
 	}
 
 	if compileError == nil && uploadAfterCompile {
-		var sk *sketch.Sketch
-		sk, err := sketch.New(sketchPath)
-		if err != nil {
-			feedback.Errorf(tr("Error during Upload: %v"), err)
-			os.Exit(errorcodes.ErrGeneric)
-		}
-		var discoveryPort *discovery.Port
-		discoveryPort, err = port.GetPort(inst, sk)
-		if err != nil {
-			feedback.Errorf(tr("Error during Upload: %v"), err)
-			os.Exit(errorcodes.ErrGeneric)
-		}
+		sk := arguments.NewSketch(sketchPath)
+		discoveryPort := port.GetDiscoveryPort(inst, sk)
 
 		userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
 			Instance: inst,

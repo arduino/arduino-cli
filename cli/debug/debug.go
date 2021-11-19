@@ -21,7 +21,6 @@ import (
 	"os/signal"
 	"sort"
 
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -81,17 +80,11 @@ func run(command *cobra.Command, args []string) {
 	if len(args) > 0 {
 		path = args[0]
 	}
+
 	sketchPath := arguments.InitSketchPath(path)
-	sk, err := sketch.New(sketchPath)
-	if err != nil {
-		feedback.Errorf(tr("Error during Debug: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-	discoveryPort, err := port.GetPort(instance, sk)
-	if err != nil {
-		feedback.Errorf(tr("Error during Debug: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
+	sk := arguments.NewSketch(sketchPath)
+	discoveryPort := port.GetDiscoveryPort(instance, sk)
+
 	debugConfigRequested := &dbg.DebugConfigRequest{
 		Instance:    instance,
 		Fqbn:        fqbn,

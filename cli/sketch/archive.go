@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	sk "github.com/arduino/arduino-cli/commands/sketch"
@@ -61,13 +61,7 @@ func runArchiveCommand(cmd *cobra.Command, args []string) {
 		sketchPath = paths.New(args[0])
 	}
 
-	// .pde files are still supported but deprecated, this warning urges the user to rename them
-	if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 {
-		feedback.Error(tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:"))
-		for _, f := range files {
-			feedback.Error(f)
-		}
-	}
+	arguments.WarnDeprecatedFiles(sketchPath)
 
 	archivePath := ""
 	if len(args) == 2 {
