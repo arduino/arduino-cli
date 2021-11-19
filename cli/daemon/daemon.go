@@ -41,7 +41,12 @@ import (
 	"google.golang.org/grpc"
 )
 
-var tr = i18n.Tr
+var (
+	tr           = i18n.Tr
+	daemonize    bool
+	debug        bool
+	debugFilters []string
+)
 
 // NewCommand created a new `daemon` command
 func NewCommand() *cobra.Command {
@@ -60,10 +65,6 @@ func NewCommand() *cobra.Command {
 	cmd.Flags().StringSliceVar(&debugFilters, "debug-filter", []string{}, tr("Display only the provided gRPC calls"))
 	return cmd
 }
-
-var daemonize bool
-var debug bool
-var debugFilters []string
 
 func runDaemonCommand(cmd *cobra.Command, args []string) {
 
