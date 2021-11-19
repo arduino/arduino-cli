@@ -30,6 +30,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var showHiddenBoard bool
+
 func initListAllCommand() *cobra.Command {
 	var listAllCommand = &cobra.Command{
 		Use:   fmt.Sprintf("listall [%s]", tr("boardname")),
@@ -45,8 +47,6 @@ for a specific board if you specify the board name`),
 	listAllCommand.Flags().BoolVarP(&showHiddenBoard, "show-hidden", "a", false, tr("Show also boards marked as 'hidden' in the platform"))
 	return listAllCommand
 }
-
-var showHiddenBoard bool
 
 // runListAllCommand list all installed boards
 func runListAllCommand(cmd *cobra.Command, args []string) {

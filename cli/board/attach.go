@@ -30,6 +30,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var searchTimeout string // Expressed in a parsable duration, is the timeout for the list and attach commands.
+
 func initAttachCommand() *cobra.Command {
 	attachCommand := &cobra.Command{
 		Use:   fmt.Sprintf("attach <%s>|<%s> [%s]", tr("port"), tr("FQBN"), tr("sketchPath")),
@@ -41,13 +43,9 @@ func initAttachCommand() *cobra.Command {
 		Args: cobra.RangeArgs(1, 2),
 		Run:  runAttachCommand,
 	}
-	attachCommand.Flags().StringVar(&attachFlags.searchTimeout, "timeout", "5s",
+	attachCommand.Flags().StringVar(&searchTimeout, "timeout", "5s",
 		tr("The connected devices search timeout, raise it if your board doesn't show up (e.g. to %s).", "10s"))
 	return attachCommand
-}
-
-var attachFlags struct {
-	searchTimeout string // Expressed in a parsable duration, is the timeout for the list and attach commands.
 }
 
 func runAttachCommand(cmd *cobra.Command, args []string) {
@@ -63,7 +61,7 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 		Instance:      instance,
 		BoardUri:      args[0],
 		SketchPath:    sketchPath.String(),
-		SearchTimeout: attachFlags.searchTimeout,
+		SearchTimeout: searchTimeout,
 	}, output.TaskProgress()); err != nil {
 		feedback.Errorf(tr("Attach board error: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)

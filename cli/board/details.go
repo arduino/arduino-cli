@@ -25,17 +25,17 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/board"
-	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
-var tr = i18n.Tr
-var showFullDetails bool
-var fqbn string
-var listProgrammers bool
+var (
+	showFullDetails bool
+	fqbn            string
+	listProgrammers bool
+)
 
 func initDetailsCommand() *cobra.Command {
 	var detailsCommand = &cobra.Command{

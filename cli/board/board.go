@@ -18,8 +18,11 @@ package board
 import (
 	"os"
 
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/spf13/cobra"
 )
+
+var tr = i18n.Tr
 
 // NewCommand created a new `board` command
 func NewCommand() *cobra.Command {

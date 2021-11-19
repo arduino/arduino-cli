@@ -43,12 +43,8 @@ for a specific board if you specify the board name`),
 		Args: cobra.ArbitraryArgs,
 		Run:  runSearchCommand,
 	}
-	searchCommand.Flags().BoolVarP(&searchFlags.showHiddenBoard, "show-hidden", "a", false, tr("Show also boards marked as 'hidden' in the platform"))
+	searchCommand.Flags().BoolVarP(&showHiddenBoard, "show-hidden", "a", false, tr("Show also boards marked as 'hidden' in the platform"))
 	return searchCommand
-}
-
-var searchFlags struct {
-	showHiddenBoard bool
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
@@ -57,7 +53,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	res, err := board.Search(context.Background(), &rpc.BoardSearchRequest{
 		Instance:            inst,
 		SearchArgs:          strings.Join(args, " "),
-		IncludeHiddenBoards: searchFlags.showHiddenBoard,
+		IncludeHiddenBoards: showHiddenBoard,
 	})
 	if err != nil {
 		feedback.Errorf(tr("Error searching boards: %v"), err)

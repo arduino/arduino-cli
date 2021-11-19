@@ -31,6 +31,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	timeout time.Duration
+	watch   bool
+)
+
 func initListCommand() *cobra.Command {
 	listCommand := &cobra.Command{
 		Use:     "list",
@@ -41,22 +46,17 @@ func initListCommand() *cobra.Command {
 		Run:     runListCommand,
 	}
 
-	listCommand.Flags().DurationVar(&listFlags.timeout, "timeout", time.Second,
+	listCommand.Flags().DurationVar(&timeout, "timeout", time.Second,
 		tr("The connected devices search timeout, raise it if your board doesn't show up e.g.: 10s"))
-	listCommand.Flags().BoolVarP(&listFlags.watch, "watch", "w", false,
+	listCommand.Flags().BoolVarP(&watch, "watch", "w", false,
 		tr("Command keeps running and prints list of connected boards whenever there is a change."))
 
 	return listCommand
 }
 
-var listFlags struct {
-	timeout time.Duration
-	watch   bool
-}
-
 // runListCommand detects and lists the connected arduino boards
 func runListCommand(cmd *cobra.Command, args []string) {
-	if listFlags.watch {
+	if watch {
 		inst := instance.CreateAndInit()
 		watchList(cmd, inst)
 		os.Exit(0)
@@ -65,7 +65,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
 	ports, err := board.List(&rpc.BoardListRequest{
 		Instance: inst,
-		Timeout:  listFlags.timeout.Milliseconds(),
+		Timeout:  timeout.Milliseconds(),
 	})
 	if err != nil {
 		feedback.Errorf(tr("Error detecting boards: %v"), err)
