@@ -45,13 +45,13 @@ func initUpgradeCommand() *cobra.Command {
 			"  " + os.Args[0] + " core upgrade arduino:samd",
 		Run: runUpgradeCommand,
 	}
-	AddPostInstallFlagsToCommand(upgradeCommand)
+	postInstallFlags.AddToCommand(upgradeCommand)
 	return upgradeCommand
 }
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
-	logrus.Info("Executing `arduino core upgrade`")
+	logrus.Info("Executing `arduino-cli core upgrade`")
 
 	// if no platform was passed, upgrade allthethings
 	if len(args) == 0 {
@@ -93,7 +93,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 			Instance:        inst,
 			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,
-			SkipPostInstall: DetectSkipPostInstallValue(),
+			SkipPostInstall: postInstallFlags.DetectSkipPostInstallValue(),
 		}
 
 		if _, err := core.PlatformUpgrade(context.Background(), r, output.ProgressBar(), output.TaskProgress()); err != nil {

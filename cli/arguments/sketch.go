@@ -18,6 +18,7 @@ package arguments
 import (
 	"os"
 
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/go-paths-helper"
@@ -26,16 +27,40 @@ import (
 
 // InitSketchPath returns an instance of paths.Path pointing to sketchPath.
 // If sketchPath is an empty string returns the current working directory.
-func InitSketchPath(sketchPath string) *paths.Path {
-	if sketchPath != "" {
-		return paths.New(sketchPath)
+// In both cases it warns the user if he's using deprecated files
+func InitSketchPath(path string) (sketchPath *paths.Path) {
+	if path != "" {
+		sketchPath = paths.New(path)
+	} else {
+		wd, err := paths.Getwd()
+		if err != nil {
+			feedback.Errorf(tr("Couldn't get current working directory: %v"), err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+		logrus.Infof("Reading sketch from dir: %s", wd)
+		sketchPath = wd
 	}
+	WarnDeprecatedFiles(sketchPath)
+	return sketchPath
+}
 
-	wd, err := paths.Getwd()
+// NewSketch is a helper function useful to create a sketch instance
+func NewSketch(sketchPath *paths.Path) *sketch.Sketch {
+	sketch, err := sketch.New(sketchPath)
 	if err != nil {
-		feedback.Errorf(tr("Couldn't get current working directory: %v"), err)
+		feedback.Errorf(tr("Error creating sketch: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	logrus.Infof("Reading sketch from dir: %s", wd)
-	return wd
+	return sketch
+}
+
+// WarnDeprecatedFiles warns the user that a type of sketch files are deprecated
+func WarnDeprecatedFiles(sketchPath *paths.Path) {
+	// .pde files are still supported but deprecated, this warning urges the user to rename them
+	if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 {
+		feedback.Error(tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:"))
+		for _, f := range files {
+			feedback.Error(f)
+		}
+	}
 }

@@ -22,12 +22,13 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/configuration"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 func initDeleteCommand() *cobra.Command {
-	addCommand := &cobra.Command{
+	deleteCommand := &cobra.Command{
 		Use:   "delete",
 		Short: tr("Deletes a settings key and all its sub keys."),
 		Long:  tr("Deletes a settings key and all its sub keys."),
@@ -40,10 +41,11 @@ func initDeleteCommand() *cobra.Command {
 			return configuration.Settings.AllKeys(), cobra.ShellCompDirectiveDefault
 		},
 	}
-	return addCommand
+	return deleteCommand
 }
 
 func runDeleteCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino-cli config delete`")
 	toDelete := args[0]
 
 	keys := []string{}

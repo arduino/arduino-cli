@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/fatih/color"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -49,6 +50,7 @@ func initDepsCommand() *cobra.Command {
 
 func runDepsCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
+	logrus.Info("Executing `arduino-cli lib deps`")
 	libRef, err := ParseLibraryReferenceArgAndAdjustCase(instance, args[0])
 	if err != nil {
 		feedback.Errorf(tr("Arguments error: %v"), err)

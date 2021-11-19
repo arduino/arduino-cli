@@ -22,11 +22,12 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/configuration"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 func initRemoveCommand() *cobra.Command {
-	addCommand := &cobra.Command{
+	removeCommand := &cobra.Command{
 		Use:   "remove",
 		Short: tr("Removes one or more values from a setting."),
 		Long:  tr("Removes one or more values from a setting."),
@@ -39,16 +40,13 @@ func initRemoveCommand() *cobra.Command {
 			return GetConfigurationKeys(), cobra.ShellCompDirectiveDefault
 		},
 	}
-	return addCommand
+	return removeCommand
 }
 
 func runRemoveCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino-cli config remove`")
 	key := args[0]
-	kind, err := typeOf(key)
-	if err != nil {
-		feedback.Error(err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
+	kind := validateKey(key)
 
 	if kind != reflect.Slice {
 		feedback.Errorf(tr("The key '%[1]v' is not a list of items, can't remove from it.\nMaybe use '%[2]s'?"), key, "config delete")

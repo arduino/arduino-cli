@@ -38,7 +38,7 @@ func initCleanCommand() *cobra.Command {
 }
 
 func runCleanCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino cache clean`")
+	logrus.Info("Executing `arduino-cli cache clean`")
 
 	cachePath := configuration.Settings.GetString("directories.Downloads")
 	err := os.RemoveAll(cachePath)

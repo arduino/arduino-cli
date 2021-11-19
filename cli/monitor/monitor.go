@@ -34,20 +34,22 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/fatih/color"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-var tr = i18n.Tr
-
-var portArgs arguments.Port
-var describe bool
-var configs []string
-var quiet bool
-var fqbn string
+var (
+	portArgs arguments.Port
+	describe bool
+	configs  []string
+	quiet    bool
+	fqbn     arguments.Fqbn
+	tr       = i18n.Tr
+)
 
 // NewCommand created a new `monitor` command
 func NewCommand() *cobra.Command {
-	cmd := &cobra.Command{
+	monitorCommand := &cobra.Command{
 		Use:   "monitor",
 		Short: tr("Open a communication port with a board."),
 		Long:  tr("Open a communication port with a board."),
@@ -56,20 +58,18 @@ func NewCommand() *cobra.Command {
 			"  " + os.Args[0] + " monitor -p /dev/ttyACM0 --describe",
 		Run: runMonitorCmd,
 	}
-	portArgs.AddToCommand(cmd)
-	cmd.Flags().BoolVar(&describe, "describe", false, tr("Show all the settings of the communication port."))
-	cmd.Flags().StringSliceVarP(&configs, "config", "c", []string{}, tr("Configuration of the port."))
-	cmd.Flags().BoolVarP(&quiet, "quiet", "q", false, tr("Run in silent mode, show only monitor input and output."))
-	cmd.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
-	cmd.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return arguments.GetInstalledBoards(), cobra.ShellCompDirectiveDefault
-	})
-	cmd.MarkFlagRequired("port")
-	return cmd
+	portArgs.AddToCommand(monitorCommand)
+	monitorCommand.Flags().BoolVar(&describe, "describe", false, tr("Show all the settings of the communication port."))
+	monitorCommand.Flags().StringSliceVarP(&configs, "config", "c", []string{}, tr("Configuration of the port."))
+	monitorCommand.Flags().BoolVarP(&quiet, "quiet", "q", false, tr("Run in silent mode, show only monitor input and output."))
+	fqbn.AddToCommand(monitorCommand)
+	monitorCommand.MarkFlagRequired("port")
+	return monitorCommand
 }
 
 func runMonitorCmd(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
+	logrus.Info("Executing `arduino-cli monitor`")
 
 	if !configuration.HasConsole {
 		quiet = true
@@ -84,7 +84,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 	enumerateResp, err := monitor.EnumerateMonitorPortSettings(context.Background(), &rpc.EnumerateMonitorPortSettingsRequest{
 		Instance:     instance,
 		PortProtocol: portProtocol,
-		Fqbn:         fqbn,
+		Fqbn:         fqbn.String(),
 	})
 	if err != nil {
 		feedback.Error(tr("Error getting port settings details: %s", err))
@@ -148,7 +148,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 	portProxy, _, err := monitor.Monitor(context.Background(), &rpc.MonitorRequest{
 		Instance:          instance,
 		Port:              &rpc.Port{Address: portAddress, Protocol: portProtocol},
-		Fqbn:              fqbn,
+		Fqbn:              fqbn.String(),
 		PortConfiguration: configuration,
 	})
 	if err != nil {

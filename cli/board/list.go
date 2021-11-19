@@ -28,7 +28,13 @@ import (
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+)
+
+var (
+	timeout time.Duration
+	watch   bool
 )
 
 func initListCommand() *cobra.Command {
@@ -41,31 +47,26 @@ func initListCommand() *cobra.Command {
 		Run:     runListCommand,
 	}
 
-	listCommand.Flags().DurationVar(&listFlags.timeout, "timeout", time.Second,
-		tr("The connected devices search timeout, raise it if your board doesn't show up e.g.: 10s"))
-	listCommand.Flags().BoolVarP(&listFlags.watch, "watch", "w", false,
-		tr("Command keeps running and prints list of connected boards whenever there is a change."))
+	listCommand.Flags().DurationVar(&timeout, "discovery-timeout", time.Second, tr("Max time to wait for port discovery, e.g.: 30s, 1m"))
+	listCommand.Flags().BoolVarP(&watch, "watch", "w", false, tr("Command keeps running and prints list of connected boards whenever there is a change."))
 
 	return listCommand
 }
 
-var listFlags struct {
-	timeout time.Duration
-	watch   bool
-}
-
 // runListCommand detects and lists the connected arduino boards
 func runListCommand(cmd *cobra.Command, args []string) {
-	if listFlags.watch {
-		inst := instance.CreateAndInit()
+	inst := instance.CreateAndInit()
+
+	logrus.Info("Executing `arduino-cli board list`")
+
+	if watch {
 		watchList(cmd, inst)
 		os.Exit(0)
 	}
 
-	inst := instance.CreateAndInit()
 	ports, err := board.List(&rpc.BoardListRequest{
 		Instance: inst,
-		Timeout:  listFlags.timeout.Milliseconds(),
+		Timeout:  timeout.Milliseconds(),
 	})
 	if err != nil {
 		feedback.Errorf(tr("Error detecting boards: %v"), err)

@@ -34,6 +34,10 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
+var (
+	namesOnly bool // if true outputs lib names only.
+)
+
 func initSearchCommand() *cobra.Command {
 	searchCommand := &cobra.Command{
 		Use:     fmt.Sprintf("search [%s]", tr("LIBRARY_NAME")),
@@ -43,16 +47,14 @@ func initSearchCommand() *cobra.Command {
 		Args:    cobra.ArbitraryArgs,
 		Run:     runSearchCommand,
 	}
-	searchCommand.Flags().BoolVar(&searchFlags.namesOnly, "names", false, tr("Show library names only."))
+	searchCommand.Flags().BoolVar(&namesOnly, "names", false, tr("Show library names only."))
 	return searchCommand
-}
-
-var searchFlags struct {
-	namesOnly bool // if true outputs lib names only.
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
 	inst, status := instance.Create()
+	logrus.Info("Executing `arduino-cli lib search`")
+
 	if status != nil {
 		feedback.Errorf(tr("Error creating instance: %v"), status)
 		os.Exit(errorcodes.ErrGeneric)
@@ -71,7 +73,6 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		feedback.Errorf(tr("Error initializing instance: %v"), err)
 	}
 
-	logrus.Info("Executing `arduino lib search`")
 	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
 		Instance: inst,
 		Query:    (strings.Join(args, " ")),
@@ -83,7 +84,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 
 	feedback.PrintResult(result{
 		results:   searchResp,
-		namesOnly: searchFlags.namesOnly,
+		namesOnly: namesOnly,
 	})
 
 	logrus.Info("Done")

@@ -25,17 +25,18 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/board"
-	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/fatih/color"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-var tr = i18n.Tr
-var showFullDetails bool
-var fqbn string
-var listProgrammers bool
+var (
+	showFullDetails bool
+	listProgrammers bool
+	fqbn            arguments.Fqbn
+)
 
 func initDetailsCommand() *cobra.Command {
 	var detailsCommand = &cobra.Command{
@@ -43,17 +44,14 @@ func initDetailsCommand() *cobra.Command {
 		Short:   tr("Print details about a board."),
 		Long:    tr("Show information about a board, in particular if the board has options to be specified in the FQBN."),
 		Example: "  " + os.Args[0] + " board details -b arduino:avr:nano",
-		Args:    cobra.MaximumNArgs(1),
+		Args:    cobra.NoArgs,
 		Run:     runDetailsCommand,
 	}
 
+	fqbn.AddToCommand(detailsCommand)
 	detailsCommand.Flags().BoolVarP(&showFullDetails, "full", "f", false, tr("Show full board details"))
-	detailsCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
-	detailsCommand.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return arguments.GetInstalledBoards(), cobra.ShellCompDirectiveDefault
-	})
 	detailsCommand.Flags().BoolVarP(&listProgrammers, "list-programmers", "", false, tr("Show list of available programmers"))
-	// detailsCommand.MarkFlagRequired("fqbn") // enable once `board details <fqbn>` is removed
+	detailsCommand.MarkFlagRequired("fqbn")
 
 	return detailsCommand
 }
@@ -61,14 +59,11 @@ func initDetailsCommand() *cobra.Command {
 func runDetailsCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
 
-	// remove once `board details <fqbn>` is removed
-	if fqbn == "" && len(args) > 0 {
-		fqbn = args[0]
-	}
+	logrus.Info("Executing `arduino-cli board details`")
 
 	res, err := board.Details(context.Background(), &rpc.BoardDetailsRequest{
 		Instance: inst,
-		Fqbn:     fqbn,
+		Fqbn:     fqbn.String(),
 	})
 
 	if err != nil {

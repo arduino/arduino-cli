@@ -27,43 +27,56 @@ import (
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+)
+
+var (
+	port arguments.Port
 )
 
 func initAttachCommand() *cobra.Command {
 	attachCommand := &cobra.Command{
-		Use:   fmt.Sprintf("attach <%s>|<%s> [%s]", tr("port"), tr("FQBN"), tr("sketchPath")),
+		Use:   fmt.Sprintf("attach -p <%s>|-b <%s> [%s]", tr("port"), tr("FQBN"), tr("sketchPath")),
 		Short: tr("Attaches a sketch to a board."),
 		Long:  tr("Attaches a sketch to a board."),
-		Example: "  " + os.Args[0] + " board attach serial:///dev/ttyACM0\n" +
-			"  " + os.Args[0] + " board attach serial:///dev/ttyACM0 HelloWorld\n" +
-			"  " + os.Args[0] + " board attach arduino:samd:mkr1000",
-		Args: cobra.RangeArgs(1, 2),
+		Example: "  " + os.Args[0] + " board attach -p /dev/ttyACM0\n" +
+			"  " + os.Args[0] + " board attach -p /dev/ttyACM0 HelloWorld\n" +
+			"  " + os.Args[0] + " board attach -b arduino:samd:mkr1000",
+		Args: cobra.MaximumNArgs(1),
 		Run:  runAttachCommand,
 	}
-	attachCommand.Flags().StringVar(&attachFlags.searchTimeout, "timeout", "5s",
-		tr("The connected devices search timeout, raise it if your board doesn't show up (e.g. to %s).", "10s"))
-	return attachCommand
-}
+	fqbn.AddToCommand(attachCommand)
+	port.AddToCommand(attachCommand)
 
-var attachFlags struct {
-	searchTimeout string // Expressed in a parsable duration, is the timeout for the list and attach commands.
+	return attachCommand
 }
 
 func runAttachCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
 
+	logrus.Info("Executing `arduino-cli board attach`")
+
 	path := ""
-	if len(args) > 1 {
-		path = args[1]
+	if len(args) > 0 {
+		path = args[0]
 	}
 	sketchPath := arguments.InitSketchPath(path)
 
+	// ugly hack to allow user to specify fqbn and port as flags (consistency)
+	// a more meaningful fix would be to fix board.Attach
+	var boardURI string
+	discoveryPort, _ := port.GetPort(instance, nil)
+	if fqbn.String() != "" {
+		boardURI = fqbn.String()
+	} else if discoveryPort != nil {
+		boardURI = discoveryPort.Address
+	}
 	if _, err := board.Attach(context.Background(), &rpc.BoardAttachRequest{
 		Instance:      instance,
-		BoardUri:      args[0],
+		BoardUri:      boardURI,
 		SketchPath:    sketchPath.String(),
-		SearchTimeout: attachFlags.searchTimeout,
+		SearchTimeout: port.GetSearchTimeout().String(),
 	}, output.TaskProgress()); err != nil {
 		feedback.Errorf(tr("Attach board error: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)

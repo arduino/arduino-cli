@@ -18,10 +18,12 @@ package arguments
 import (
 	"fmt"
 	"net/url"
+	"os"
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -143,4 +145,19 @@ func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Po
 			return nil, fmt.Errorf(tr("port not found: %[1]s %[2]s"), address, protocol)
 		}
 	}
+}
+
+// GetSearchTimeout returns the timeout
+func (p *Port) GetSearchTimeout() time.Duration {
+	return p.timeout
+}
+
+// GetDiscoveryPort is a helper function useful to get the port and handle possible errors
+func (p *Port) GetDiscoveryPort(instance *rpc.Instance, sk *sketch.Sketch) *discovery.Port {
+	discoveryPort, err := p.GetPort(instance, sk)
+	if err != nil {
+		feedback.Errorf(tr("Error discovering port: %v"), err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+	return discoveryPort
 }

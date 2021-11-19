@@ -21,7 +21,6 @@ import (
 	"os/signal"
 	"sort"
 
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -32,18 +31,17 @@ import (
 	"github.com/arduino/arduino-cli/table"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/fatih/color"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 var (
-	fqbn        string
+	fqbn        arguments.Fqbn
 	port        arguments.Port
-	verbose     bool
-	verify      bool
 	interpreter string
 	importDir   string
 	printInfo   bool
-	programmer  string
+	programmer  arguments.Programmer
 	tr          = i18n.Tr
 )
 
@@ -55,18 +53,12 @@ func NewCommand() *cobra.Command {
 		Long:    tr("Debug Arduino sketches. (this command opens an interactive gdb session)"),
 		Example: "  " + os.Args[0] + " debug -b arduino:samd:mkr1000 -P atmel_ice /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
-		Run:     run,
+		Run:     runDebugCommand,
 	}
 
-	debugCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
-	debugCommand.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return arguments.GetInstalledBoards(), cobra.ShellCompDirectiveDefault
-	})
+	fqbn.AddToCommand(debugCommand)
 	port.AddToCommand(debugCommand)
-	debugCommand.Flags().StringVarP(&programmer, "programmer", "P", "", tr("Programmer to use for debugging"))
-	debugCommand.RegisterFlagCompletionFunc("programmer", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return arguments.GetInstalledProgrammers(), cobra.ShellCompDirectiveDefault
-	})
+	programmer.AddToCommand(debugCommand)
 	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
 	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries for debug."))
 	debugCommand.Flags().BoolVarP(&printInfo, "info", "I", false, tr("Show metadata about the debug session instead of starting the debugger."))
@@ -74,32 +66,27 @@ func NewCommand() *cobra.Command {
 	return debugCommand
 }
 
-func run(command *cobra.Command, args []string) {
+func runDebugCommand(command *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
+	logrus.Info("Executing `arduino-cli debug`")
 
 	path := ""
 	if len(args) > 0 {
 		path = args[0]
 	}
+
 	sketchPath := arguments.InitSketchPath(path)
-	sk, err := sketch.New(sketchPath)
-	if err != nil {
-		feedback.Errorf(tr("Error during Debug: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-	discoveryPort, err := port.GetPort(instance, sk)
-	if err != nil {
-		feedback.Errorf(tr("Error during Debug: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
+	sk := arguments.NewSketch(sketchPath)
+	discoveryPort := port.GetDiscoveryPort(instance, sk)
+
 	debugConfigRequested := &dbg.DebugConfigRequest{
 		Instance:    instance,
-		Fqbn:        fqbn,
+		Fqbn:        fqbn.String(),
 		SketchPath:  sketchPath.String(),
 		Port:        discoveryPort.ToRPC(),
 		Interpreter: interpreter,
 		ImportDir:   importDir,
-		Programmer:  programmer,
+		Programmer:  programmer.String(),
 	}
 
 	if printInfo {

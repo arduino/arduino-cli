@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	sk "github.com/arduino/arduino-cli/commands/sketch"
@@ -34,7 +34,7 @@ var includeBuildDir bool
 
 // initArchiveCommand creates a new `archive` command
 func initArchiveCommand() *cobra.Command {
-	command := &cobra.Command{
+	archiveCommand := &cobra.Command{
 		Use:   fmt.Sprintf("archive <%s> <%s>", tr("sketchPath"), tr("archivePath")),
 		Short: tr("Creates a zip file containing all sketch files."),
 		Long:  tr("Creates a zip file containing all sketch files."),
@@ -48,26 +48,20 @@ func initArchiveCommand() *cobra.Command {
 		Run:  runArchiveCommand,
 	}
 
-	command.Flags().BoolVar(&includeBuildDir, "include-build-dir", false, tr("Includes %s directory in the archive.", "build"))
+	archiveCommand.Flags().BoolVar(&includeBuildDir, "include-build-dir", false, tr("Includes %s directory in the archive.", "build"))
 
-	return command
+	return archiveCommand
 }
 
 func runArchiveCommand(cmd *cobra.Command, args []string) {
-	logrus.Info("Executing `arduino sketch archive`")
+	logrus.Info("Executing `arduino-cli sketch archive`")
 
 	sketchPath := paths.New(".")
 	if len(args) >= 1 {
 		sketchPath = paths.New(args[0])
 	}
 
-	// .pde files are still supported but deprecated, this warning urges the user to rename them
-	if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 {
-		feedback.Error(tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:"))
-		for _, f := range files {
-			feedback.Error(f)
-		}
-	}
+	arguments.WarnDeprecatedFiles(sketchPath)
 
 	archivePath := ""
 	if len(args) == 2 {

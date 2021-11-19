@@ -82,7 +82,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	}
 
 	arguments := strings.ToLower(strings.Join(args, " "))
-	logrus.Infof("Executing `arduino core search` with args: '%s'", arguments)
+	logrus.Infof("Executing `arduino-cli core search` with args: '%s'", arguments)
 
 	resp, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
 		Instance:    inst,

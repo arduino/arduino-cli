@@ -17,7 +17,11 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"reflect"
+
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 )
 
 var validMap = map[string]reflect.Kind{
@@ -45,4 +49,13 @@ func typeOf(key string) (reflect.Kind, error) {
 		return reflect.Invalid, fmt.Errorf(tr("Settings key doesn't exist"))
 	}
 	return t, nil
+}
+
+func validateKey(key string) reflect.Kind {
+	kind, err := typeOf(key)
+	if err != nil {
+		feedback.Error(err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+	return kind
 }

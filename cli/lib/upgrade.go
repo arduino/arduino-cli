@@ -28,7 +28,7 @@ import (
 )
 
 func initUpgradeCommand() *cobra.Command {
-	listCommand := &cobra.Command{
+	upgradeCommand := &cobra.Command{
 		Use:   "upgrade",
 		Short: tr("Upgrades installed libraries."),
 		Long:  tr("This command upgrades an installed library to the latest available version. Multiple libraries can be passed separated by a space. If no arguments are provided, the command will upgrade all the installed libraries where an update is available."),
@@ -38,11 +38,12 @@ func initUpgradeCommand() *cobra.Command {
 		Args: cobra.ArbitraryArgs,
 		Run:  runUpgradeCommand,
 	}
-	return listCommand
+	return upgradeCommand
 }
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
+	logrus.Info("Executing `arduino-cli lib upgrade`")
 
 	if len(args) == 0 {
 		err := lib.LibraryUpgradeAll(instance.Id, output.ProgressBar(), output.TaskProgress())

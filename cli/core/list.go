@@ -29,6 +29,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	updatableOnly bool
+	all           bool
+)
+
 func initListCommand() *cobra.Command {
 	listCommand := &cobra.Command{
 		Use:     "list",
@@ -38,24 +43,19 @@ func initListCommand() *cobra.Command {
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}
-	listCommand.Flags().BoolVar(&listFlags.updatableOnly, "updatable", false, tr("List updatable platforms."))
-	listCommand.Flags().BoolVar(&listFlags.all, "all", false, tr("If set return all installable and installed cores, including manually installed."))
+	listCommand.Flags().BoolVar(&updatableOnly, "updatable", false, tr("List updatable platforms."))
+	listCommand.Flags().BoolVar(&all, "all", false, tr("If set return all installable and installed cores, including manually installed."))
 	return listCommand
-}
-
-var listFlags struct {
-	updatableOnly bool
-	all           bool
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
-	logrus.Info("Executing `arduino core list`")
+	logrus.Info("Executing `arduino-cli core list`")
 
 	platforms, err := core.GetPlatforms(&rpc.PlatformListRequest{
 		Instance:      inst,
-		UpdatableOnly: listFlags.updatableOnly,
-		All:           listFlags.all,
+		UpdatableOnly: updatableOnly,
+		All:           all,
 	})
 	if err != nil {
 		feedback.Errorf(tr("Error listing platforms: %v"), err)

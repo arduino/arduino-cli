@@ -27,8 +27,11 @@ import (
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
+
+var showHiddenBoard bool
 
 func initListAllCommand() *cobra.Command {
 	var listAllCommand = &cobra.Command{
@@ -46,11 +49,11 @@ for a specific board if you specify the board name`),
 	return listAllCommand
 }
 
-var showHiddenBoard bool
-
 // runListAllCommand list all installed boards
 func runListAllCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
+
+	logrus.Info("Executing `arduino-cli board listall`")
 
 	list, err := board.ListAll(context.Background(), &rpc.BoardListAllRequest{
 		Instance:            inst,

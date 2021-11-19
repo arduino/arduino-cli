@@ -19,7 +19,6 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -27,17 +26,18 @@ import (
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 var (
-	fqbn       string
+	fqbn       arguments.Fqbn
 	port       arguments.Port
 	verbose    bool
 	verify     bool
 	importDir  string
 	importFile string
-	programmer string
+	programmer arguments.Programmer
 	dryRun     bool
 	tr         = i18n.Tr
 )
@@ -50,73 +50,46 @@ func NewCommand() *cobra.Command {
 		Long:    tr("Upload Arduino sketches. This does NOT compile the sketch prior to upload."),
 		Example: "  " + os.Args[0] + " upload /home/user/Arduino/MySketch",
 		Args:    cobra.MaximumNArgs(1),
-		PreRun:  checkFlagsConflicts,
-		Run:     run,
+		PreRun: func(cmd *cobra.Command, args []string) {
+			arguments.CheckFlagsConflicts(cmd, "input-file", "input-dir")
+		},
+		Run: runUploadCommand,
 	}
 
-	uploadCommand.Flags().StringVarP(&fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
-	uploadCommand.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return arguments.GetInstalledBoards(), cobra.ShellCompDirectiveDefault
-	})
+	fqbn.AddToCommand(uploadCommand)
 	port.AddToCommand(uploadCommand)
 	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries to upload."))
 	uploadCommand.Flags().StringVarP(&importFile, "input-file", "i", "", tr("Binary file to upload."))
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
 	uploadCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Optional, turns on verbose mode."))
-	uploadCommand.Flags().StringVarP(&programmer, "programmer", "P", "", tr("Optional, use the specified programmer to upload."))
-	uploadCommand.RegisterFlagCompletionFunc("programmer", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return arguments.GetInstalledProgrammers(), cobra.ShellCompDirectiveDefault
-	})
+	programmer.AddToCommand(uploadCommand)
 	uploadCommand.Flags().BoolVar(&dryRun, "dry-run", false, tr("Do not perform the actual upload, just log out actions"))
 	uploadCommand.Flags().MarkHidden("dry-run")
 	return uploadCommand
 }
 
-func checkFlagsConflicts(command *cobra.Command, args []string) {
-	if importFile != "" && importDir != "" {
-		feedback.Errorf(tr("error: %s and %s flags cannot be used together", "--input-file", "--input-dir"))
-		os.Exit(errorcodes.ErrBadArgument)
-	}
-}
-
-func run(command *cobra.Command, args []string) {
+func runUploadCommand(command *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
+	logrus.Info("Executing `arduino-cli upload`")
 
 	path := ""
 	if len(args) > 0 {
 		path = args[0]
 	}
+
 	sketchPath := arguments.InitSketchPath(path)
+	sk := arguments.NewSketch(sketchPath)
+	discoveryPort := port.GetDiscoveryPort(instance, sk)
 
-	// .pde files are still supported but deprecated, this warning urges the user to rename them
-	if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 && importDir == "" && importFile == "" {
-		feedback.Error(tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:"))
-		for _, f := range files {
-			feedback.Error(f)
-		}
-	}
-
-	sk, err := sketch.New(sketchPath)
-	if err != nil && importDir == "" && importFile == "" {
-		feedback.Errorf(tr("Error during Upload: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
-	discoveryPort, err := port.GetPort(instance, sk)
-	if err != nil {
-		feedback.Errorf(tr("Error during Upload: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
-	if fqbn == "" && sk != nil && sk.Metadata != nil {
+	if fqbn.String() == "" && sk != nil && sk.Metadata != nil {
 		// If the user didn't specify an FQBN and a sketch.json file is present
 		// read it from there.
-		fqbn = sk.Metadata.CPU.Fqbn
+		fqbn.Set(sk.Metadata.CPU.Fqbn)
 	}
 
 	userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
 		Instance: instance,
-		Fqbn:     fqbn,
+		Fqbn:     fqbn.String(),
 		Protocol: discoveryPort.Protocol,
 	})
 	if err != nil {
@@ -136,14 +109,14 @@ func run(command *cobra.Command, args []string) {
 
 	if _, err := upload.Upload(context.Background(), &rpc.UploadRequest{
 		Instance:   instance,
-		Fqbn:       fqbn,
+		Fqbn:       fqbn.String(),
 		SketchPath: path,
 		Port:       discoveryPort.ToRPC(),
 		Verbose:    verbose,
 		Verify:     verify,
 		ImportFile: importFile,
 		ImportDir:  importDir,
-		Programmer: programmer,
+		Programmer: programmer.String(),
 		DryRun:     dryRun,
 		UserFields: fields,
 	}, os.Stdout, os.Stderr); err != nil {

@@ -34,6 +34,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	fqbn arguments.Fqbn
+)
+
 func initExamplesCommand() *cobra.Command {
 	examplesCommand := &cobra.Command{
 		Use:     fmt.Sprintf("examples [%s]", tr("LIBRARY_NAME")),
@@ -46,20 +50,13 @@ func initExamplesCommand() *cobra.Command {
 			return arguments.GetInstalledLibraries(), cobra.ShellCompDirectiveDefault
 		},
 	}
-	examplesCommand.Flags().StringVarP(&examplesFlags.fqbn, "fqbn", "b", "", tr("Show libraries for the specified board FQBN."))
-	examplesCommand.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return arguments.GetInstalledBoards(), cobra.ShellCompDirectiveDefault
-	})
+	fqbn.AddToCommand(examplesCommand)
 	return examplesCommand
-}
-
-var examplesFlags struct {
-	fqbn string
 }
 
 func runExamplesCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
-	logrus.Info("Show examples for library")
+	logrus.Info("Executing `arduino-cli lib examples`")
 
 	name := ""
 	if len(args) > 0 {
@@ -70,7 +67,7 @@ func runExamplesCommand(cmd *cobra.Command, args []string) {
 		Instance: instance,
 		All:      true,
 		Name:     name,
-		Fqbn:     examplesFlags.fqbn,
+		Fqbn:     fqbn.String(),
 	})
 	if err != nil {
 		feedback.Errorf(tr("Error getting libraries info: %v"), err)

@@ -32,6 +32,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	all       bool
+	updatable bool
+)
+
 func initListCommand() *cobra.Command {
 	listCommand := &cobra.Command{
 		Use:   fmt.Sprintf("list [%s]", tr("LIBNAME")),
@@ -45,21 +50,15 @@ not listed, they can be listed by adding the --all flag.`),
 		Args:    cobra.MaximumNArgs(1),
 		Run:     runListCommand,
 	}
-	listCommand.Flags().BoolVar(&listFlags.all, "all", false, tr("Include built-in libraries (from platforms and IDE) in listing."))
-	listCommand.Flags().StringVarP(&listFlags.fqbn, "fqbn", "b", "", tr("Show libraries for the specified board FQBN."))
-	listCommand.Flags().BoolVar(&listFlags.updatable, "updatable", false, tr("List updatable libraries."))
+	listCommand.Flags().BoolVar(&all, "all", false, tr("Include built-in libraries (from platforms and IDE) in listing."))
+	fqbn.AddToCommand(listCommand)
+	listCommand.Flags().BoolVar(&updatable, "updatable", false, tr("List updatable libraries."))
 	return listCommand
-}
-
-var listFlags struct {
-	all       bool
-	updatable bool
-	fqbn      string
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
-	logrus.Info("Listing")
+	logrus.Info("Executing `arduino-cli lib list`")
 
 	name := ""
 	if len(args) > 0 {
@@ -68,10 +67,10 @@ func runListCommand(cmd *cobra.Command, args []string) {
 
 	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListRequest{
 		Instance:  instance,
-		All:       listFlags.all,
-		Updatable: listFlags.updatable,
+		All:       all,
+		Updatable: updatable,
 		Name:      name,
-		Fqbn:      listFlags.fqbn,
+		Fqbn:      fqbn.String(),
 	})
 	if err != nil {
 		feedback.Errorf(tr("Error listing Libraries: %v"), err)
@@ -79,11 +78,11 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	}
 
 	libs := []*rpc.InstalledLibrary{}
-	if listFlags.fqbn == "" {
+	if fqbn.String() == "" {
 		libs = res.GetInstalledLibraries()
 	} else {
 		for _, lib := range res.GetInstalledLibraries() {
-			if lib.Library.CompatibleWith[listFlags.fqbn] {
+			if lib.Library.CompatibleWith[fqbn.String()] {
 				libs = append(libs, lib)
 			}
 		}
@@ -111,7 +110,7 @@ func (ir installedResult) Data() interface{} {
 
 func (ir installedResult) String() string {
 	if ir.installedLibs == nil || len(ir.installedLibs) == 0 {
-		if listFlags.updatable {
+		if updatable {
 			return tr("No updates available.")
 		}
 		return tr("No libraries installed.")

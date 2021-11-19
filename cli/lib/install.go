@@ -31,8 +31,15 @@ import (
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	semver "go.bug.st/relaxed-semver"
+)
+
+var (
+	noDeps  bool
+	gitURL  bool
+	zipPath bool
 )
 
 func initInstallCommand() *cobra.Command {
@@ -51,22 +58,17 @@ func initInstallCommand() *cobra.Command {
 			return arguments.GetInstallableLibs(), cobra.ShellCompDirectiveDefault
 		},
 	}
-	installCommand.Flags().BoolVar(&installFlags.noDeps, "no-deps", false, tr("Do not install dependencies."))
-	installCommand.Flags().BoolVar(&installFlags.gitURL, "git-url", false, tr("Enter git url for libraries hosted on repositories"))
-	installCommand.Flags().BoolVar(&installFlags.zipPath, "zip-path", false, tr("Enter a path to zip file"))
+	installCommand.Flags().BoolVar(&noDeps, "no-deps", false, tr("Do not install dependencies."))
+	installCommand.Flags().BoolVar(&gitURL, "git-url", false, tr("Enter git url for libraries hosted on repositories"))
+	installCommand.Flags().BoolVar(&zipPath, "zip-path", false, tr("Enter a path to zip file"))
 	return installCommand
-}
-
-var installFlags struct {
-	noDeps  bool
-	gitURL  bool
-	zipPath bool
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
+	logrus.Info("Executing `arduino-cli lib install`")
 
-	if installFlags.zipPath || installFlags.gitURL {
+	if zipPath || gitURL {
 		if !configuration.Settings.GetBool("library.enable_unsafe_install") {
 			documentationURL := "https://arduino.github.io/arduino-cli/latest/configuration/#configuration-keys"
 			_, err := semver.Parse(globals.VersionInfo.VersionString)
@@ -80,7 +82,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 		feedback.Print(tr("--git-url and --zip-path flags allow installing untrusted files, use it at your own risk."))
 	}
 
-	if installFlags.zipPath {
+	if zipPath {
 		for _, path := range args {
 			err := lib.ZipLibraryInstall(context.Background(), &rpc.ZipLibraryInstallRequest{
 				Instance:  instance,
@@ -95,7 +97,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	if installFlags.gitURL {
+	if gitURL {
 		for _, url := range args {
 			if url == "." {
 				wd, err := paths.Getwd()
@@ -129,7 +131,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			Instance: instance,
 			Name:     libRef.Name,
 			Version:  libRef.Version,
-			NoDeps:   installFlags.noDeps,
+			NoDeps:   noDeps,
 		}
 		err := lib.LibraryInstall(context.Background(), libraryInstallRequest, output.ProgressBar(), output.TaskProgress())
 		if err != nil {
