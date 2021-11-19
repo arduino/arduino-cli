@@ -15,6 +15,25 @@
 
 package arguments
 
-import "github.com/arduino/arduino-cli/i18n"
+import (
+	"os"
+	"strings"
+
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/i18n"
+	"github.com/spf13/cobra"
+)
 
 var tr = i18n.Tr
+
+// CheckFlagsConflicts is a helper function useful to report errors when more than one conflicting flag is used
+func CheckFlagsConflicts(command *cobra.Command, flagNames ...string) {
+	for _, flagName := range flagNames {
+		if !command.Flag(flagName).Changed {
+			return
+		}
+	}
+	feedback.Errorf(tr("Can't use %s flags at the same time.", "--"+strings.Join(flagNames, " "+tr("and")+" --")))
+	os.Exit(errorcodes.ErrBadArgument)
+}

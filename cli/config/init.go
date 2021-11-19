@@ -18,6 +18,7 @@ package config
 import (
 	"os"
 
+	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/configuration"
@@ -46,7 +47,10 @@ func initInitCommand() *cobra.Command {
 			"  " + os.Args[0] + " config init --dest-dir /home/user/MyDirectory\n" +
 			"  " + os.Args[0] + " config init --dest-file /home/user/MyDirectory/my_settings.yaml",
 		Args: cobra.NoArgs,
-		Run:  runInitCommand,
+		PreRun: func(cmd *cobra.Command, args []string) {
+			arguments.CheckFlagsConflicts(cmd, "dest-file", "dest-dir")
+		},
+		Run: runInitCommand,
 	}
 	initCommand.Flags().StringVar(&destDir, "dest-dir", "", tr("Sets where to save the configuration file."))
 	initCommand.Flags().StringVar(&destFile, "dest-file", "", tr("Sets where to save the configuration file."))
@@ -55,10 +59,6 @@ func initInitCommand() *cobra.Command {
 }
 
 func runInitCommand(cmd *cobra.Command, args []string) {
-	if destFile != "" && destDir != "" {
-		feedback.Errorf(tr("Can't use both --dest-file and --dest-dir flags at the same time."))
-		os.Exit(errorcodes.ErrGeneric)
-	}
 
 	var configFileAbsPath *paths.Path
 	var absPath *paths.Path
