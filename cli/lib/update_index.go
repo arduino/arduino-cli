@@ -25,43 +25,31 @@ import (
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
 func initUpdateIndexCommand() *cobra.Command {
-	return &cobra.Command{
+	updateIndexCommand := &cobra.Command{
 		Use:     "update-index",
 		Short:   tr("Updates the libraries index."),
 		Long:    tr("Updates the libraries index to the latest version."),
 		Example: "  " + os.Args[0] + " lib update-index",
 		Args:    cobra.NoArgs,
-		Run: func(cmd *cobra.Command, args []string) {
-			// We don't initialize any CoreInstance when updating indexes since we don't need to.
-			// Also meaningless errors might be returned when calling this command with --additional-urls
-			// since the CLI would be searching for a corresponding file for the additional urls set
-			// as argument but none would be obviously found.
-			inst, status := instance.Create()
-			if status != nil {
-				feedback.Errorf(tr("Error creating instance: %v"), status)
-				os.Exit(errorcodes.ErrGeneric)
-			}
+		Run:     runUpdateIndexCommand,
+	}
+	return updateIndexCommand
+}
 
-			// In case this is the first time the CLI is run we need to update indexes
-			// to make it work correctly, we must do this explicitly in this command since
-			// we must use instance.Create instead of instance.CreateAndInit for the
-			// reason stated above.
-			if err := instance.FirstUpdate(inst); err != nil {
-				feedback.Errorf(tr("Error updating indexes: %v"), status)
-				os.Exit(errorcodes.ErrGeneric)
-			}
+func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino lib update-index`")
+	inst := instance.CreateInstanceAndRunFirstUpdate()
 
-			err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexRequest{
-				Instance: inst,
-			}, output.ProgressBar())
-			if err != nil {
-				feedback.Errorf(tr("Error updating library index: %v"), err)
-				os.Exit(errorcodes.ErrGeneric)
-			}
-		},
+	err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexRequest{
+		Instance: inst,
+	}, output.ProgressBar())
+	if err != nil {
+		feedback.Errorf(tr("Error updating library index: %v"), err)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 }
