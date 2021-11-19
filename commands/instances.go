@@ -334,6 +334,11 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		})
 	}
 
+	// Refreshes the locale used, this will change the
+	// language of the CLI if the locale is different
+	// after started.
+	i18n.Init(configuration.Settings.GetString("locale"))
+
 	return nil
 }
 
