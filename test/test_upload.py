@@ -111,7 +111,7 @@ def test_upload_after_attach(run_command, data_dir, detected_boards):
         # Create a sketch
         sketch_path = os.path.join(data_dir, "foo")
         assert run_command(["sketch", "new", sketch_path])
-        assert run_command(["board", "attach", f"serial://{board.address}", sketch_path])
+        assert run_command(["board", "attach", "-p", board.address, sketch_path])
         # Build sketch
         assert run_command(["compile", sketch_path])
         # Upload
