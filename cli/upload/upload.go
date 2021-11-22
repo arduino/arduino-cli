@@ -19,6 +19,7 @@ import (
 	"context"
 	"os"
 
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -76,10 +77,23 @@ func runUploadCommand(command *cobra.Command, args []string) {
 	if len(args) > 0 {
 		path = args[0]
 	}
-
 	sketchPath := arguments.InitSketchPath(path)
-	sk := arguments.NewSketch(sketchPath)
-	discoveryPort := port.GetDiscoveryPort(instance, sk)
+
+	if importDir == "" && importFile == "" {
+		arguments.WarnDeprecatedFiles(sketchPath)
+	}
+
+	sk, err := sketch.New(sketchPath)
+	if err != nil && importDir == "" && importFile == "" {
+		feedback.Errorf(tr("Error during Upload: %v"), err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+
+	discoveryPort, err := port.GetPort(instance, sk)
+	if err != nil {
+		feedback.Errorf(tr("Error during Upload: %v"), err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
 
 	if fqbn.String() == "" && sk != nil && sk.Metadata != nil {
 		// If the user didn't specify an FQBN and a sketch.json file is present
