@@ -34,7 +34,15 @@ func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 	// Run preprocessor
 	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp")
 	if err := GCCPreprocRunner(ctx, sourceFile, targetFilePath, ctx.IncludeFolders); err != nil {
-		return errors.WithStack(err)
+		if !ctx.OnlyUpdateCompilationDatabase {
+			return errors.WithStack(err)
+		}
+
+		// Do not bail out if we are generating the compile commands database
+		ctx.GetLogger().Println("info", "%s: %s", tr("An error occurred adding prototypes"), tr("the compilation database may be incomplete or inaccurate"))
+		if err := sourceFile.CopyTo(targetFilePath); err != nil {
+			return errors.WithStack(err)
+		}
 	}
 
 	commands := []types.Command{

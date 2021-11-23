@@ -110,6 +110,15 @@ import (
 type ContainerFindIncludes struct{}
 
 func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
+	err := s.findIncludes(ctx)
+	if err != nil && ctx.OnlyUpdateCompilationDatabase {
+		ctx.GetLogger().Println("info", "%s: %s", tr("An error occurred detecting libraries"), tr("the compilation database may be incomplete or inaccurate"))
+		return nil
+	}
+	return err
+}
+
+func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 	cachePath := ctx.BuildPath.Join("includes.cache")
 	cache := readCache(cachePath)
 
