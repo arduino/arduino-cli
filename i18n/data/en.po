@@ -136,6 +136,14 @@ msgstr "Already installed %s"
 msgid "Alternatives for %[1]s: %[2]s"
 msgstr "Alternatives for %[1]s: %[2]s"
 
+#: legacy/builder/container_add_prototypes.go:42
+msgid "An error occurred adding prototypes"
+msgstr "An error occurred adding prototypes"
+
+#: legacy/builder/container_find_includes.go:115
+msgid "An error occurred detecting libraries"
+msgstr "An error occurred detecting libraries"
+
 #: cli/lib/search.go:172
 msgid "Architecture: %s"
 msgstr "Architecture: %s"
@@ -957,7 +965,7 @@ msgstr "Error upgrading: %v"
 msgid "Error verifying signature"
 msgstr "Error verifying signature"
 
-#: legacy/builder/container_find_includes.go:353
+#: legacy/builder/container_find_includes.go:362
 msgid "Error while detecting libraries included by {0}"
 msgstr "Error while detecting libraries included by {0}"
 
@@ -1198,7 +1206,7 @@ msgstr "Installs one or more cores and corresponding tool dependencies."
 msgid "Installs one or more specified libraries into the system."
 msgstr "Installs one or more specified libraries into the system."
 
-#: legacy/builder/container_find_includes.go:377
+#: legacy/builder/container_find_includes.go:386
 msgid "Internal error in cache"
 msgstr "Internal error in cache"
 
@@ -1993,7 +2001,7 @@ msgstr "Skipping archive creation of: {0}"
 msgid "Skipping compile of: {0}"
 msgstr "Skipping compile of: {0}"
 
-#: legacy/builder/container_find_includes.go:324
+#: legacy/builder/container_find_includes.go:333
 msgid "Skipping dependencies detection for precompiled library {0}"
 msgstr "Skipping dependencies detection for precompiled library {0}"
 
@@ -2278,7 +2286,7 @@ msgstr "User directory not set"
 msgid "Using board '{0}' from platform in folder: {1}"
 msgstr "Using board '{0}' from platform in folder: {1}"
 
-#: legacy/builder/container_find_includes.go:336
+#: legacy/builder/container_find_includes.go:345
 msgid "Using cached library dependencies for file: {0}"
 msgstr "Using cached library dependencies for file: {0}"
 
@@ -3265,6 +3273,11 @@ msgstr "testing local archive integrity: %s"
 #: legacy/builder/phases/sizer.go:122
 msgid "text section exceeds available space in board"
 msgstr "text section exceeds available space in board"
+
+#: legacy/builder/container_add_prototypes.go:42
+#: legacy/builder/container_find_includes.go:115
+msgid "the compilation database may be incomplete or inaccurate"
+msgstr "the compilation database may be incomplete or inaccurate"
 
 #: commands/core/list.go:62
 msgid "the platform has no releases"
