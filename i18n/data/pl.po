@@ -206,7 +206,7 @@ msgstr ""
 msgid "Available Commands:"
 msgstr ""
 
-#: cli/upload/upload.go:62
+#: cli/upload/upload.go:63
 msgid "Binary file to upload."
 msgstr ""
 
@@ -530,7 +530,7 @@ msgstr ""
 msgid "Directory containing binaries for debug."
 msgstr ""
 
-#: cli/upload/upload.go:61
+#: cli/upload/upload.go:62
 msgid "Directory containing binaries to upload."
 msgstr ""
 
@@ -556,7 +556,7 @@ msgstr ""
 msgid "Do not install dependencies."
 msgstr ""
 
-#: cli/burnbootloader/burnbootloader.go:59 cli/upload/upload.go:66
+#: cli/burnbootloader/burnbootloader.go:59 cli/upload/upload.go:67
 msgid "Do not perform the actual upload, just log out actions"
 msgstr ""
 
@@ -691,7 +691,8 @@ msgstr ""
 
 #: cli/burnbootloader/burnbootloader.go:73
 #: cli/burnbootloader/burnbootloader.go:86 cli/compile/compile.go:195
-#: cli/compile/compile.go:227 cli/upload/upload.go:96 cli/upload/upload.go:123
+#: cli/compile/compile.go:227 cli/upload/upload.go:88 cli/upload/upload.go:94
+#: cli/upload/upload.go:110 cli/upload/upload.go:137
 msgid "Error during Upload: %v"
 msgstr ""
 
@@ -1535,7 +1536,7 @@ msgstr ""
 msgid "Optional, suppresses almost every output."
 msgstr ""
 
-#: cli/compile/compile.go:96 cli/upload/upload.go:64
+#: cli/compile/compile.go:96 cli/upload/upload.go:65
 msgid "Optional, turns on verbose mode."
 msgstr ""
 
@@ -2152,11 +2153,11 @@ msgstr ""
 msgid "Upgrading platform %[1]s with %[2]s"
 msgstr ""
 
-#: cli/upload/upload.go:49
+#: cli/upload/upload.go:50
 msgid "Upload Arduino sketches."
 msgstr ""
 
-#: cli/upload/upload.go:50
+#: cli/upload/upload.go:51
 msgid ""
 "Upload Arduino sketches. This does NOT compile the sketch prior to upload."
 msgstr ""
@@ -2185,7 +2186,7 @@ msgstr ""
 msgid "Upload the bootloader."
 msgstr ""
 
-#: cli/compile/compile.go:201 cli/upload/upload.go:102
+#: cli/compile/compile.go:201 cli/upload/upload.go:116
 msgid ""
 "Uploading to specified board using %s protocol requires the following info:"
 msgstr ""
@@ -2256,7 +2257,7 @@ msgid "Values"
 msgstr ""
 
 #: cli/burnbootloader/burnbootloader.go:57 cli/compile/compile.go:100
-#: cli/upload/upload.go:63
+#: cli/upload/upload.go:64
 msgid "Verify uploaded binary after the upload."
 msgstr ""
 
