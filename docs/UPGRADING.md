@@ -2,6 +2,18 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## Unreleased
+
+### `ParseReferences()` function change in`arduino-cli` package
+
+The `parseArch` parameter was removed since it was unused and was always true. This means that the architecture gets
+always parsed by the function.
+
+### `ParseReference()` function change in`arduino-cli` package
+
+The `parseArch` parameter was removed since it was unused and was always true. This means that the architecture gets
+always parsed by the function.
+
 ## 0.20.0
 
 ### `board details` arguments change
