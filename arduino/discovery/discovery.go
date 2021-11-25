@@ -162,6 +162,7 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 			// This is fine, we exit gracefully
 			disc.statusMutex.Lock()
 			disc.state = Dead
+			disc.incomingMessagesError = err
 			disc.statusMutex.Unlock()
 			close(outChan)
 			return
