@@ -142,6 +142,14 @@ msgstr ""
 msgid "Alternatives for %[1]s: %[2]s"
 msgstr ""
 
+#: legacy/builder/container_add_prototypes.go:42
+msgid "An error occurred adding prototypes"
+msgstr ""
+
+#: legacy/builder/container_find_includes.go:115
+msgid "An error occurred detecting libraries"
+msgstr ""
+
 #: cli/lib/search.go:172
 msgid "Architecture: %s"
 msgstr ""
@@ -914,7 +922,7 @@ msgstr ""
 msgid "Error verifying signature"
 msgstr ""
 
-#: legacy/builder/container_find_includes.go:353
+#: legacy/builder/container_find_includes.go:362
 msgid "Error while detecting libraries included by {0}"
 msgstr ""
 
@@ -1144,7 +1152,7 @@ msgstr ""
 msgid "Installs one or more specified libraries into the system."
 msgstr ""
 
-#: legacy/builder/container_find_includes.go:377
+#: legacy/builder/container_find_includes.go:386
 msgid "Internal error in cache"
 msgstr ""
 
@@ -1935,7 +1943,7 @@ msgstr ""
 msgid "Skipping compile of: {0}"
 msgstr ""
 
-#: legacy/builder/container_find_includes.go:324
+#: legacy/builder/container_find_includes.go:333
 msgid "Skipping dependencies detection for precompiled library {0}"
 msgstr ""
 
@@ -2218,7 +2226,7 @@ msgstr ""
 msgid "Using board '{0}' from platform in folder: {1}"
 msgstr ""
 
-#: legacy/builder/container_find_includes.go:336
+#: legacy/builder/container_find_includes.go:345
 msgid "Using cached library dependencies for file: {0}"
 msgstr ""
 
@@ -3186,6 +3194,11 @@ msgstr ""
 
 #: legacy/builder/phases/sizer.go:122
 msgid "text section exceeds available space in board"
+msgstr ""
+
+#: legacy/builder/container_add_prototypes.go:42
+#: legacy/builder/container_find_includes.go:115
+msgid "the compilation database may be incomplete or inaccurate"
 msgstr ""
 
 #: commands/core/list.go:62
