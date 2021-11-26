@@ -2433,12 +2433,12 @@ msgstr "board not found"
 msgid "boardname"
 msgstr "boardname"
 
-#: arduino/discovery/discovery.go:311
-#: arduino/discovery/discovery.go:332
-#: arduino/discovery/discovery.go:352
-#: arduino/discovery/discovery.go:375
-#: arduino/discovery/discovery.go:392
-#: arduino/discovery/discovery.go:415
+#: arduino/discovery/discovery.go:312
+#: arduino/discovery/discovery.go:333
+#: arduino/discovery/discovery.go:353
+#: arduino/discovery/discovery.go:376
+#: arduino/discovery/discovery.go:393
+#: arduino/discovery/discovery.go:416
 msgid "calling %[1]s: %[2]w"
 msgstr "calling %[1]s: %[2]w"
 
@@ -2493,12 +2493,12 @@ msgstr "command"
 msgid "command '%[1]s' failed: %[2]s"
 msgstr "command '%[1]s' failed: %[2]s"
 
-#: arduino/discovery/discovery.go:315
-#: arduino/discovery/discovery.go:336
-#: arduino/discovery/discovery.go:356
-#: arduino/discovery/discovery.go:379
-#: arduino/discovery/discovery.go:396
-#: arduino/discovery/discovery.go:419
+#: arduino/discovery/discovery.go:316
+#: arduino/discovery/discovery.go:337
+#: arduino/discovery/discovery.go:357
+#: arduino/discovery/discovery.go:380
+#: arduino/discovery/discovery.go:397
+#: arduino/discovery/discovery.go:420
 msgid "command failed: %s"
 msgstr "command failed: %s"
 
@@ -2506,27 +2506,27 @@ msgstr "command failed: %s"
 msgid "communication out of sync, expected '%[1]s', received '%[2]s'"
 msgstr "communication out of sync, expected '%[1]s', received '%[2]s'"
 
-#: arduino/discovery/discovery.go:313
+#: arduino/discovery/discovery.go:314
 msgid "communication out of sync, expected 'hello', received '%s'"
 msgstr "communication out of sync, expected 'hello', received '%s'"
 
-#: arduino/discovery/discovery.go:394
+#: arduino/discovery/discovery.go:395
 msgid "communication out of sync, expected 'list', received '%s'"
 msgstr "communication out of sync, expected 'list', received '%s'"
 
-#: arduino/discovery/discovery.go:377
+#: arduino/discovery/discovery.go:378
 msgid "communication out of sync, expected 'quit', received '%s'"
 msgstr "communication out of sync, expected 'quit', received '%s'"
 
-#: arduino/discovery/discovery.go:334
+#: arduino/discovery/discovery.go:335
 msgid "communication out of sync, expected 'start', received '%s'"
 msgstr "communication out of sync, expected 'start', received '%s'"
 
-#: arduino/discovery/discovery.go:417
+#: arduino/discovery/discovery.go:418
 msgid "communication out of sync, expected 'start_sync', received '%s'"
 msgstr "communication out of sync, expected 'start_sync', received '%s'"
 
-#: arduino/discovery/discovery.go:354
+#: arduino/discovery/discovery.go:355
 msgid "communication out of sync, expected 'stop', received '%s'"
 msgstr "communication out of sync, expected 'stop', received '%s'"
 
@@ -2740,11 +2740,11 @@ msgstr "installing %[1]s tool: %[2]s"
 msgid "installing platform %[1]s: %[2]s"
 msgstr "installing platform %[1]s: %[2]s"
 
-#: arduino/discovery/discovery.go:175
+#: arduino/discovery/discovery.go:176
 msgid "invalid 'add' message: missing port"
 msgstr "invalid 'add' message: missing port"
 
-#: arduino/discovery/discovery.go:186
+#: arduino/discovery/discovery.go:187
 msgid "invalid 'remove' message: missing port"
 msgstr "invalid 'remove' message: missing port"
 
@@ -3096,7 +3096,7 @@ msgstr "port not found: %[1]s %[2]s"
 msgid "protocol version not supported: requested %[1]d, got %[2]d"
 msgstr "protocol version not supported: requested %[1]d, got %[2]d"
 
-#: arduino/discovery/discovery.go:317
+#: arduino/discovery/discovery.go:318
 msgid "protocol version not supported: requested 1, got %d"
 msgstr "protocol version not supported: requested 1, got %d"
 
@@ -3291,7 +3291,7 @@ msgstr "the server responded with status %s"
 msgid "timeout waiting for message"
 msgstr "timeout waiting for message"
 
-#: arduino/discovery/discovery.go:216
+#: arduino/discovery/discovery.go:217
 msgid "timeout waiting for message from %s"
 msgstr "timeout waiting for message from %s"
 
