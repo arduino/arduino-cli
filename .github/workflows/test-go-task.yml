@@ -83,7 +83,7 @@ jobs:
         uses: arduino/setup-task@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: 3.x
+          version: 3.9.0
 
       - name: Run tests
         run: task go:test
