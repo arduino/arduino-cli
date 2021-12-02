@@ -365,3 +365,16 @@ def test_compile_with_relative_build_path(run_command, data_dir, copy_sketch):
     assert "libraries" in built_files
     assert "preproc" in built_files
     assert "sketch" in built_files
+
+
+def test_compile_without_upload_and_fqbn(run_command, data_dir):
+    assert run_command(["update"])
+
+    # Create a sketch
+    sketch_name = "SketchSimple"
+    sketch_path = Path(data_dir, sketch_name)
+    assert run_command(["sketch", "new", sketch_path])
+
+    res = run_command(["compile", sketch_path])
+    assert res.failed
+    assert "Error during build: Missing FQBN (Fully Qualified Board Name)" in res.stderr

@@ -104,6 +104,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 	userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
 		Instance: instance,
 		Fqbn:     fqbn.String(),
+		Address:  discoveryPort.Address,
 		Protocol: discoveryPort.Protocol,
 	})
 	if err != nil {

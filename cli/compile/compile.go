@@ -21,9 +21,12 @@ import (
 	"encoding/json"
 	"os"
 
+	"github.com/arduino/arduino-cli/arduino/discovery"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/output"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/sirupsen/logrus"
@@ -150,9 +153,28 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		overrides = o.Overrides
 	}
 
+	detectedFqbn := fqbn.String()
+	var sk *sketch.Sketch
+	var discoveryPort *discovery.Port
+	// If the user didn't provide an FQBN it might either mean
+	// that she forgot or that is trying to compile and upload
+	// using board autodetection.
+	if detectedFqbn == "" && uploadAfterCompile {
+		sk = arguments.NewSketch(sketchPath)
+		discoveryPort = port.GetDiscoveryPort(inst, sk)
+		rpcPort := discoveryPort.ToRPC()
+		var err error
+		pm := commands.GetPackageManager(inst.Id)
+		detectedFqbn, err = upload.DetectConnectedBoard(pm, rpcPort.Address, rpcPort.Protocol)
+		if err != nil {
+			feedback.Errorf(tr("Error during FQBN detection: %v", err))
+			os.Exit(errorcodes.ErrGeneric)
+		}
+	}
+
 	compileRequest := &rpc.CompileRequest{
 		Instance:                      inst,
-		Fqbn:                          fqbn.String(),
+		Fqbn:                          detectedFqbn,
 		SketchPath:                    sketchPath.String(),
 		ShowProperties:                showProperties,
 		Preprocess:                    preprocess,
@@ -183,12 +205,17 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if compileError == nil && uploadAfterCompile {
-		sk := arguments.NewSketch(sketchPath)
-		discoveryPort := port.GetDiscoveryPort(inst, sk)
+		if sk == nil {
+			sk = arguments.NewSketch(sketchPath)
+		}
+		if discoveryPort == nil {
+			discoveryPort = port.GetDiscoveryPort(inst, sk)
+		}
 
 		userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
 			Instance: inst,
 			Fqbn:     fqbn.String(),
+			Address:  discoveryPort.Address,
 			Protocol: discoveryPort.Protocol,
 		})
 		if err != nil {
@@ -204,7 +231,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 
 		uploadRequest := &rpc.UploadRequest{
 			Instance:   inst,
-			Fqbn:       fqbn.String(),
+			Fqbn:       detectedFqbn,
 			SketchPath: sketchPath.String(),
 			Port:       discoveryPort.ToRPC(),
 			Verbose:    verbose,
