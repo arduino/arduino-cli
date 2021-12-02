@@ -5,7 +5,7 @@ env:
   # See: https://github.com/actions/setup-go/tree/v2#readme
   GO_VERSION: "1.16"
   # See: https://github.com/actions/setup-python/tree/v2#available-versions-of-python
-  PYTHON_VERSION: "3.9.6"
+  PYTHON_VERSION: "3.9"
 
 # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
 on:
