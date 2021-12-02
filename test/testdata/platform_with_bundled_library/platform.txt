@@ -1,0 +1,2 @@
+name=Arduino Test Boards
+version=4.2.0
