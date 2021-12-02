@@ -266,7 +266,6 @@ tasks:
     cmds:
       - task: go:vet
       - task: go:lint
-      - task: i18n:check
       - task: python:lint
       - task: protoc:check
 
@@ -299,7 +298,7 @@ tasks:
   i18n:check:
     desc: Check if the i18n message catalog was updated
     cmds:
-      - task: i18n:update
+      - task: i18n:pull
       - git add -N ./i18n/data
       - git diff --exit-code ./i18n/data
 
