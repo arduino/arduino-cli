@@ -29,7 +29,7 @@ func LibraryUpgradeAll(instanceID int32, downloadCB commands.DownloadProgressCB,
 		return &arduino.InvalidInstanceError{}
 	}
 
-	if err := upgrade(lm, listLibraries(lm, true, true), downloadCB, taskCB); err != nil {
+	if err := upgrade(lm, listLibraries(lm, true, false), downloadCB, taskCB); err != nil {
 		return err
 	}
 
