@@ -52,7 +52,16 @@ func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsReques
 		return nil, &arduino.InvalidInstanceError{}
 	}
 
-	fqbn, err := cores.ParseFQBN(req.GetFqbn())
+	reqFQBN := req.GetFqbn()
+	if reqFQBN == "" {
+		var err error
+		reqFQBN, err = DetectConnectedBoard(pm, req.Address, req.Protocol)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	fqbn, err := cores.ParseFQBN(reqFQBN)
 	if err != nil {
 		return nil, &arduino.InvalidFQBNError{Cause: err}
 	}
@@ -70,6 +79,76 @@ func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsReques
 	return &rpc.SupportedUserFieldsResponse{
 		UserFields: getUserFields(toolID, platformRelease),
 	}, nil
+}
+
+// DetectConnectedBoard returns the FQBN of the board connected to specified address and protocol.
+// In all other cases, like when more than a possible board is detected return an error.
+func DetectConnectedBoard(pm *packagemanager.PackageManager, address, protocol string) (string, error) {
+	if address == "" {
+		return "", &arduino.MissingPortAddressError{}
+	}
+	if protocol == "" {
+		return "", &arduino.MissingPortProtocolError{}
+	}
+
+	dm := pm.DiscoveryManager()
+
+	// Run discoveries if they're not already running
+	if errs := dm.RunAll(); len(errs) > 0 {
+		// Some discovery managed to not run, just log the errors,
+		// we'll fail further down the line.
+		for _, err := range errs {
+			logrus.Error(err)
+		}
+	}
+
+	if errs := dm.StartAll(); len(errs) > 0 {
+		// Some discovery managed to not start, just log the errors,
+		// we'll fail further down the line.
+		for _, err := range errs {
+			logrus.Error(err)
+		}
+	}
+
+	ports, errs := dm.List()
+	if len(errs) > 0 {
+		// Errors at this time are not a big issue, we'll
+		// fail further down the line if we can't find a
+		// matching board and tell the user to provide
+		// an FQBN.
+		for _, err := range errs {
+			logrus.Error(err)
+		}
+	}
+
+	for _, p := range ports {
+		if p.Address == address && p.Protocol == protocol {
+			// Found matching port, let's see if we can detect
+			// which board is connected to it
+			boards := pm.IdentifyBoard(p.Properties)
+			if l := len(boards); l == 1 {
+				// We found only one board connected, that must
+				// the one the user want to upload to.
+				board := boards[0]
+				logrus.
+					WithField("board", board.String()).
+					WithField("address", address).
+					WithField("protocol", protocol).
+					Trace("Detected board")
+				return board.FQBN(), nil
+			} else if l >= 2 {
+				// There are multiple boards detected on this port,
+				// we have no way of knowing which one is the one.
+				return "", &arduino.MultipleBoardsDetectedError{Port: p}
+			} else {
+				// We found a matching port but there's either
+				// no board connected or we can't recognize it.
+				// The user must provide an FQBN.
+				break
+			}
+		}
+	}
+	return "", &arduino.MissingFQBNError{}
 }
 
 // getToolID returns the ID of the tool that supports the action and protocol combination by searching in props.
@@ -190,9 +269,15 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	if fqbnIn == "" && sk != nil && sk.Metadata != nil {
 		fqbnIn = sk.Metadata.CPU.Fqbn
 	}
+
 	if fqbnIn == "" {
-		return &arduino.MissingFQBNError{}
+		var err error
+		fqbnIn, err = DetectConnectedBoard(pm, port.Address, port.Protocol)
+		if err != nil {
+			return err
+		}
 	}
+
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
 		return &arduino.InvalidFQBNError{Cause: err}

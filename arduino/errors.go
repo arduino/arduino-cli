@@ -18,6 +18,7 @@ package arduino
 import (
 	"fmt"
 
+	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"google.golang.org/grpc/codes"
@@ -123,6 +124,26 @@ func (e *InvalidVersionError) Unwrap() error {
 	return e.Cause
 }
 
+// MultipleBoardsDetectedError is returned when trying to detect
+// the FQBN of a board connected to a port fails because that
+// are multiple possible boards detected.
+type MultipleBoardsDetectedError struct {
+	Port *discovery.Port
+}
+
+func (e *MultipleBoardsDetectedError) Error() string {
+	return tr(
+		"Please specify an FQBN. Multiple possible ports detected on port %s with protocol %s",
+		e.Port.Address,
+		e.Port.Protocol,
+	)
+}
+
+// ToRPCStatus converts the error into a *status.Status
+func (e *MultipleBoardsDetectedError) ToRPCStatus() *status.Status {
+	return status.New(codes.InvalidArgument, e.Error())
+}
+
 // MissingFQBNError is returned when the FQBN is mandatory and not specified
 type MissingFQBNError struct{}
 
@@ -151,6 +172,18 @@ func (e *UnknownFQBNError) Unwrap() error {
 // ToRPCStatus converts the error into a *status.Status
 func (e *UnknownFQBNError) ToRPCStatus() *status.Status {
 	return status.New(codes.NotFound, e.Error())
+}
+
+// MissingPortAddressError is returned when the port protocol is mandatory and not specified
+type MissingPortAddressError struct{}
+
+func (e *MissingPortAddressError) Error() string {
+	return tr("Missing port protocol")
+}
+
+// ToRPCStatus converts the error into a *status.Status
+func (e *MissingPortAddressError) ToRPCStatus() *status.Status {
+	return status.New(codes.InvalidArgument, e.Error())
 }
 
 // MissingPortProtocolError is returned when the port protocol is mandatory and not specified
