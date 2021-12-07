@@ -388,3 +388,39 @@ def test_upload_sketch_with_mismatched_casing(run_command, data_dir, detected_bo
         res = run_command(["upload", "-b", board.fqbn, "-p", board.address, sketch_path])
         assert res.failed
         assert "Error during Upload: no valid sketch found in" in res.stderr
+
+
+def test_upload_to_port_with_board_autodetect(run_command, data_dir, detected_boards):
+    assert run_command(["update"])
+
+    # Create a sketch
+    sketch_name = "SketchSimple"
+    sketch_path = Path(data_dir, sketch_name)
+    assert run_command(["sketch", "new", sketch_path])
+
+    for board in detected_boards:
+        # Install core
+        core = ":".join(board.fqbn.split(":")[:2])
+        assert run_command(["core", "install", core])
+
+        assert run_command(["compile", "-b", board.fqbn, sketch_path])
+
+        res = run_command(["upload", "-p", board.address, sketch_path])
+        assert res.ok
+
+
+def test_compile_and_upload_to_port_with_board_autodetect(run_command, data_dir, detected_boards):
+    assert run_command(["update"])
+
+    # Create a sketch
+    sketch_name = "SketchSimple"
+    sketch_path = Path(data_dir, sketch_name)
+    assert run_command(["sketch", "new", sketch_path])
+
+    for board in detected_boards:
+        # Install core
+        core = ":".join(board.fqbn.split(":")[:2])
+        assert run_command(["core", "install", core])
+
+        res = run_command(["compile", "-u", "-p", board.address, sketch_path])
+        assert res.ok

@@ -938,9 +938,10 @@ type NewSketchRequest struct {
 	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
 	// New sketch name
 	SketchName string `protobuf:"bytes,2,opt,name=sketch_name,json=sketchName,proto3" json:"sketch_name,omitempty"`
-	// Optional: create a sketch directory in this directory
-	// (used as "sketches" directory), the directory must exist.
-	// "directories.User" directory will be used otherwise.
+	// Optional: create a Sketch in this directory
+	// (used as "Sketchbook" directory).
+	// Default Sketchbook directory "directories.User" is used if sketch_dir is
+	// empty.
 	SketchDir string `protobuf:"bytes,3,opt,name=sketch_dir,json=sketchDir,proto3" json:"sketch_dir,omitempty"`
 }
 
