@@ -35,6 +35,8 @@ const (
 	Text OutputFormat = iota
 	// JSON means JSON format
 	JSON
+	// JSONMini is identical to JSON but without whitespaces
+	JSONMini
 )
 
 // Result is anything more complex than a sentence that needs to be printed
@@ -107,7 +109,7 @@ func (fb *Feedback) Printf(format string, v ...interface{}) {
 
 // Print behaves like fmt.Print but writes on the out writer and adds a newline.
 func (fb *Feedback) Print(v interface{}) {
-	if fb.format == JSON {
+	if fb.format == JSON || fb.format == JSONMini {
 		fb.printJSON(v)
 	} else {
 		fmt.Fprintln(fb.out, v)
@@ -140,7 +142,14 @@ func (fb *Feedback) Error(v ...interface{}) {
 // printJSON is a convenient wrapper to provide feedback by printing the
 // desired output in a pretty JSON format. It adds a newline to the output.
 func (fb *Feedback) printJSON(v interface{}) {
-	if d, err := json.MarshalIndent(v, "", "  "); err != nil {
+	var d []byte
+	var err error
+	if fb.format == JSON {
+		d, err = json.MarshalIndent(v, "", "  ")
+	} else if fb.format == JSONMini {
+		d, err = json.Marshal(v)
+	}
+	if err != nil {
 		fb.Errorf(tr("Error during JSON encoding of the output: %v"), err)
 	} else {
 		fmt.Fprintf(fb.out, "%v\n", string(d))
@@ -151,7 +160,7 @@ func (fb *Feedback) printJSON(v interface{}) {
 // where the contents can't be just serialized to JSON but requires more
 // structure.
 func (fb *Feedback) PrintResult(res Result) {
-	if fb.format == JSON {
+	if fb.format == JSON || fb.format == JSONMini {
 		fb.printJSON(res.Data())
 	} else {
 		fb.Print(fmt.Sprintf("%s", res))
