@@ -111,14 +111,15 @@ func createCliCommandTree(cmd *cobra.Command) {
 		return validLogLevels, cobra.ShellCompDirectiveDefault
 	})
 	cmd.PersistentFlags().String("log-file", "", tr("Path to the file where logs will be written."))
-	validFormats := []string{"text", "json"}
-	cmd.PersistentFlags().String("log-format", "", tr("The output format for the logs, can be: %s", strings.Join(validFormats, ", ")))
+	validLogFormats := []string{"text", "json"}
+	cmd.PersistentFlags().String("log-format", "", tr("The output format for the logs, can be: %s", strings.Join(validLogFormats, ", ")))
 	cmd.RegisterFlagCompletionFunc("log-format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return validFormats, cobra.ShellCompDirectiveDefault
+		return validLogFormats, cobra.ShellCompDirectiveDefault
 	})
-	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", tr("The output format for the logs, can be: %s", strings.Join(validFormats, ", ")))
+	validOutputFormats := []string{"text", "json", "jsonmini"}
+	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", tr("The output format for the logs, can be: %s", strings.Join(validOutputFormats, ", ")))
 	cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return validFormats, cobra.ShellCompDirectiveDefault
+		return validOutputFormats, cobra.ShellCompDirectiveDefault
 	})
 	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", tr("The custom config file (if not specified the default will be used)."))
 	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, tr("Comma-separated list of additional URLs for the Boards Manager."))
@@ -144,9 +145,10 @@ func toLogLevel(s string) (t logrus.Level, found bool) {
 
 func parseFormatString(arg string) (feedback.OutputFormat, bool) {
 	f, found := map[string]feedback.OutputFormat{
-		"json": feedback.JSON,
-		"text": feedback.Text,
-	}[arg]
+		"json":     feedback.JSON,
+		"jsonmini": feedback.JSONMini,
+		"text":     feedback.Text,
+	}[strings.ToLower(arg)]
 
 	return f, found
 }
