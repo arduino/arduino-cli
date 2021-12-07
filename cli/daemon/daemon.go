@@ -22,6 +22,7 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
+	"strings"
 	"syscall"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -111,8 +112,8 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		}()
 	}
 
-	logrus.Infof("Starting daemon on TCP address 127.0.0.1:%s", port)
-	lis, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%s", port))
+	ip := "127.0.0.1"
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", ip, port))
 	if err != nil {
 		// Invalid port, such as "Foo"
 		var dnsError *net.DNSError
@@ -135,9 +136,40 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		feedback.Errorf(tr("Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v"), port, err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	// This message will show up on the stdout of the daemon process so that gRPC clients know it is time to connect.
-	logrus.Infof("Daemon is now listening on 127.0.0.1:%s...", port)
+
+	// We need to parse the port used only if the user let
+	// us choose it randomly, in all other cases we already
+	// know which is used.
+	if port == "0" {
+		address := lis.Addr()
+		split := strings.Split(address.String(), ":")
+
+		if len(split) == 0 {
+			feedback.Error(tr("Failed choosing port, address: %s", address))
+		}
+
+		port = split[len(split)-1]
+	}
+
+	feedback.PrintResult(daemonResult{
+		IP:   ip,
+		Port: port,
+	})
+
 	if err := s.Serve(lis); err != nil {
 		logrus.Fatalf("Failed to serve: %v", err)
 	}
+}
+
+type daemonResult struct {
+	IP   string
+	Port string
+}
+
+func (r daemonResult) Data() interface{} {
+	return r
+}
+
+func (r daemonResult) String() string {
+	return tr("Daemon is now listening on %s:%s", r.IP, r.Port)
 }
