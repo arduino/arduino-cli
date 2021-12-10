@@ -1,0 +1,6 @@
+
+#ifndef LIB2_SOME_CONFIG
+#define LIB2_SOME_CONFIG 0
+#endif
+
+#define LIB2_SOME_SIZE ((LIB2_SOME_CONFIG) * 42)

@@ -61,7 +61,8 @@ func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath *paths
 	properties.SetPath(constants.BUILD_PROPERTIES_SOURCE_FILE, sourceFilePath)
 	properties.SetPath(constants.BUILD_PROPERTIES_PREPROCESSED_FILE_PATH, targetFilePath)
 
-	includesStrings := utils.Map(includes.AsStrings(), utils.WrapWithHyphenI)
+	ctx.SetGlobalIncludeOption()
+	includesStrings := append(utils.Map(includes.AsStrings(), utils.WrapWithHyphenI), ctx.GlobalIncludeOption)
 	properties.Set(constants.BUILD_PROPERTIES_INCLUDES, strings.Join(includesStrings, constants.SPACE))
 
 	if properties.Get(constants.RECIPE_PREPROC_MACROS) == "" {

@@ -27,7 +27,8 @@ type SketchBuilder struct{}
 func (s *SketchBuilder) Run(ctx *types.Context) error {
 	sketchBuildPath := ctx.SketchBuildPath
 	buildProperties := ctx.BuildProperties
-	includes := utils.Map(ctx.IncludeFolders.AsStrings(), utils.WrapWithHyphenI)
+	ctx.SetGlobalIncludeOption()
+	includes := append(utils.Map(ctx.IncludeFolders.AsStrings(), utils.WrapWithHyphenI), ctx.GlobalIncludeOption)
 
 	if err := sketchBuildPath.MkdirAll(); err != nil {
 		return errors.WithStack(err)
