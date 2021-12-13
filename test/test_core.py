@@ -689,6 +689,12 @@ def test_core_list_platform_without_platform_txt(run_command, data_dir):
     assert core["name"] == "some-packager-some-arch"
 
 
+@pytest.mark.skipif(
+    platform.system() in ["Darwin", "Windows"],
+    reason="macOS by default is case insensitive https://github.com/actions/virtual-environments/issues/865 "
+    + "Windows too is case insensitive"
+    + "https://stackoverflow.com/questions/7199039/file-paths-in-windows-environment-not-case-sensitive",
+)
 def test_core_download_multiple_platforms(run_command, data_dir):
     assert run_command(["update"])
 
@@ -705,11 +711,10 @@ def test_core_download_multiple_platforms(run_command, data_dir):
     boards_txt.touch()
     assert boards_txt.write_bytes(test_boards_txt.read_bytes())
 
-    test_boards_txt = Path(__file__).parent / "testdata" / "boards.local.txt"
-    boards_txt = Path(data_dir, "packages", "packager", "hardware", "arch", "1.0.0", "boards.txt")
-    boards_txt.parent.mkdir(parents=True, exist_ok=True)
-    boards_txt.touch()
-    assert boards_txt.write_bytes(test_boards_txt.read_bytes())
+    boards_txt1 = Path(data_dir, "packages", "packager", "hardware", "arch", "1.0.0", "boards.txt")
+    boards_txt1.parent.mkdir(parents=True, exist_ok=True)
+    boards_txt1.touch()
+    assert boards_txt1.write_bytes(test_boards_txt.read_bytes())
 
     # Verifies the two cores are detected
     res = run_command(["core", "list", "--format", "json"])
