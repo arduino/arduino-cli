@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/core"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -94,20 +95,28 @@ func ParseReference(arg string) (*Reference, error) {
 		UpdatableOnly: false,
 		All:           true, // this is true because we want also the installable platforms
 	})
-	var found = 0
+	foundPlatforms := []string{}
 	for _, platform := range platforms {
-		if strings.EqualFold(platform.GetId(), ret.PackageName+":"+ret.Architecture) {
-			logrus.Infof("Found possible match for reference %s -> %s", arg, platform.GetId())
-			toks = strings.Split(platform.GetId(), ":")
-			found++
+		platformID := platform.GetId()
+		platformUser := ret.PackageName + ":" + ret.Architecture
+		// At first we check if the platform the user is searching for matches an available one,
+		// this way we do not need to adapt the casing and we can return it directly
+		if platformUser == platformID {
+			return ret, nil
+		}
+		if strings.EqualFold(platformUser, platformID) {
+			logrus.Infof("Found possible match for reference %s -> %s", platformUser, platformID)
+			toks = strings.Split(platformID, ":")
+			foundPlatforms = append(foundPlatforms, platformID)
 		}
 	}
-	// replace the returned Reference only if only one occurrence is found, otherwise leave it as is
-	if found == 1 {
+	// replace the returned Reference only if only one occurrence is found,
+	// otherwise return an error to the user because we don't know on which platform operate
+	if len(foundPlatforms) == 1 {
 		ret.PackageName = toks[0]
 		ret.Architecture = toks[1]
 	} else {
-		logrus.Warnf("Found %d platform for reference: %s", found, arg)
+		return nil, &arduino.MultiplePlatformsError{Platforms: foundPlatforms, UserPlatform: arg}
 	}
 	return ret, nil
 }
