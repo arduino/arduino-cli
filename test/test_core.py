@@ -689,6 +689,41 @@ def test_core_list_platform_without_platform_txt(run_command, data_dir):
     assert core["name"] == "some-packager-some-arch"
 
 
+def test_core_download_multiple_platforms(run_command, data_dir):
+    assert run_command(["update"])
+
+    # Verifies no core is installed
+    res = run_command(["core", "list", "--format", "json"])
+    assert res.ok
+    cores = json.loads(res.stdout)
+    assert len(cores) == 0
+
+    # Simulates creation of two new cores in the sketchbook hardware folder
+    test_boards_txt = Path(__file__).parent / "testdata" / "boards.local.txt"
+    boards_txt = Path(data_dir, "packages", "PACKAGER", "hardware", "ARCH", "1.0.0", "boards.txt")
+    boards_txt.parent.mkdir(parents=True, exist_ok=True)
+    boards_txt.touch()
+    assert boards_txt.write_bytes(test_boards_txt.read_bytes())
+
+    test_boards_txt = Path(__file__).parent / "testdata" / "boards.local.txt"
+    boards_txt = Path(data_dir, "packages", "packager", "hardware", "arch", "1.0.0", "boards.txt")
+    boards_txt.parent.mkdir(parents=True, exist_ok=True)
+    boards_txt.touch()
+    assert boards_txt.write_bytes(test_boards_txt.read_bytes())
+
+    # Verifies the two cores are detected
+    res = run_command(["core", "list", "--format", "json"])
+    assert res.ok
+    cores = json.loads(res.stdout)
+    assert len(cores) == 2
+
+    # Try to do an operation on the fake cores.
+    # The cli should not allow it since optimizing the casing results in finding two cores
+    res = run_command(["core", "upgrade", "Packager:Arch"])
+    assert res.failed
+    assert "Invalid argument passed: Found 2 platform for reference" in res.stderr
+
+
 def test_core_with_wrong_custom_board_options_is_loaded(run_command, data_dir):
     test_platform_name = "platform_with_wrong_custom_board_options"
     platform_install_dir = Path(data_dir, "hardware", "arduino-beta-dev", test_platform_name)
