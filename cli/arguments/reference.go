@@ -22,6 +22,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/core"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/sirupsen/logrus"
 )
 
 // Reference represents a reference item (core or library) passed to the CLI
@@ -55,6 +56,7 @@ func ParseReferences(args []string) ([]*Reference, error) {
 
 // ParseReference parses a string and returns a Reference object.
 func ParseReference(arg string) (*Reference, error) {
+	logrus.Infof("Parsing reference %s", arg)
 	ret := &Reference{}
 	if arg == "" {
 		return nil, fmt.Errorf(tr("invalid empty core argument"))
@@ -95,6 +97,7 @@ func ParseReference(arg string) (*Reference, error) {
 	var found = 0
 	for _, platform := range platforms {
 		if strings.EqualFold(platform.GetId(), ret.PackageName+":"+ret.Architecture) {
+			logrus.Infof("Found possible match for reference %s -> %s", arg, platform.GetId())
 			toks = strings.Split(platform.GetId(), ":")
 			found++
 		}
@@ -103,6 +106,8 @@ func ParseReference(arg string) (*Reference, error) {
 	if found == 1 {
 		ret.PackageName = toks[0]
 		ret.Architecture = toks[1]
+	} else {
+		logrus.Warnf("Found %d platform for reference: %s", found, arg)
 	}
 	return ret, nil
 }
