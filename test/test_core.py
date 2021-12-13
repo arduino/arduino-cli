@@ -240,6 +240,10 @@ def test_core_download(run_command, downloads_dir):
     result = run_command(["core", "download", "bananas:avr"])
     assert result.failed
 
+    # Wrong casing
+    result = run_command(["core", "download", "Arduino:Samd@1.8.12"])
+    assert os.path.exists(os.path.join(downloads_dir, "packages", "core-ArduinoCore-samd-1.8.12.tar.bz2"))
+
 
 def _in(jsondata, name, version=None):
     installed_cores = json.loads(jsondata)
