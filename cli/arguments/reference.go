@@ -84,20 +84,25 @@ func ParseReference(arg string) (*Reference, error) {
 	}
 	ret.Architecture = toks[1]
 
-	// We try to optimize the search and help the user
+	// Now that we have the required informations in `ret` we can
+	// try to use core.GetPlatforms to optimize what the user typed
+	// (by replacing the PackageName and Architecture in ret with the content of core.GetPlatform())
 	platforms, _ := core.GetPlatforms(&rpc.PlatformListRequest{
 		Instance:      instance.CreateAndInit(),
 		UpdatableOnly: false,
-		All:           true,
+		All:           true, // this is true because we want also the installable platforms
 	})
+	var found = 0
 	for _, platform := range platforms {
 		if strings.EqualFold(platform.GetId(), ret.PackageName+":"+ret.Architecture) {
 			toks = strings.Split(platform.GetId(), ":")
-			ret.PackageName = toks[0]
-			ret.Architecture = toks[1]
-			break // is it ok to stop at the first result?
+			found++
 		}
 	}
-
+	// replace the returned Reference only if only one occurrence is found, otherwise leave it as is
+	if found == 1 {
+		ret.PackageName = toks[0]
+		ret.Architecture = toks[1]
+	}
 	return ret, nil
 }
