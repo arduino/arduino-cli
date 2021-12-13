@@ -18,6 +18,10 @@ package arguments
 import (
 	"fmt"
 	"strings"
+
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/commands/core"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // Reference represents a reference item (core or library) passed to the CLI
@@ -79,6 +83,21 @@ func ParseReference(arg string) (*Reference, error) {
 		return nil, fmt.Errorf(tr("invalid empty core architecture '%s'"), arg)
 	}
 	ret.Architecture = toks[1]
+
+	// We try to optimize the search and help the user
+	platforms, _ := core.GetPlatforms(&rpc.PlatformListRequest{
+		Instance:      instance.CreateAndInit(),
+		UpdatableOnly: false,
+		All:           true,
+	})
+	for _, platform := range platforms {
+		if strings.EqualFold(platform.GetId(), ret.PackageName+":"+ret.Architecture) {
+			toks = strings.Split(platform.GetId(), ":")
+			ret.PackageName = toks[0]
+			ret.Architecture = toks[1]
+			break // is it ok to stop at the first result?
+		}
+	}
 
 	return ret, nil
 }

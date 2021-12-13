@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/cli/arguments"
+	"github.com/arduino/arduino-cli/configuration"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -43,6 +44,10 @@ var badCores = []struct {
 	{"@1.5.0", nil},
 	{"arduino:avr@", nil},
 	{"", nil},
+}
+
+func init() {
+	configuration.Settings = configuration.Init("")
 }
 
 func TestArgsStringify(t *testing.T) {
