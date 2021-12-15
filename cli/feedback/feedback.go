@@ -22,6 +22,8 @@ import (
 	"io"
 	"os"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/status"
@@ -37,6 +39,8 @@ const (
 	JSON
 	// JSONMini is identical to JSON but without whitespaces
 	JSONMini
+	// YAML means YAML format
+	YAML
 )
 
 // Result is anything more complex than a sentence that needs to be printed
@@ -156,13 +160,27 @@ func (fb *Feedback) printJSON(v interface{}) {
 	}
 }
 
+// printYAML is a convenient wrapper to provide feedback by printing the
+// desired output in YAML format. It adds a newline to the output.
+func (fb *Feedback) printYAML(v interface{}) {
+	d, err := yaml.Marshal(v)
+	if err != nil {
+		fb.Errorf(tr("Error during YAML encoding of the output: %v"), err)
+		return
+	}
+	fmt.Fprintf(fb.out, "%v\n", string(d))
+}
+
 // PrintResult is a convenient wrapper to provide feedback for complex data,
 // where the contents can't be just serialized to JSON but requires more
 // structure.
 func (fb *Feedback) PrintResult(res Result) {
-	if fb.format == JSON || fb.format == JSONMini {
+	switch fb.format {
+	case JSON, JSONMini:
 		fb.printJSON(res.Data())
-	} else {
+	case YAML:
+		fb.printYAML(res.Data())
+	default:
 		fb.Print(fmt.Sprintf("%s", res))
 	}
 }
