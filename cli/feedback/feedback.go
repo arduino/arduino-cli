@@ -113,9 +113,12 @@ func (fb *Feedback) Printf(format string, v ...interface{}) {
 
 // Print behaves like fmt.Print but writes on the out writer and adds a newline.
 func (fb *Feedback) Print(v interface{}) {
-	if fb.format == JSON || fb.format == JSONMini {
+	switch fb.format {
+	case JSON, JSONMini:
 		fb.printJSON(v)
-	} else {
+	case YAML:
+		fb.printYAML(v)
+	default:
 		fmt.Fprintln(fb.out, v)
 	}
 }
