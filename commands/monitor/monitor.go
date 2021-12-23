@@ -84,6 +84,10 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 		return nil, nil, &arduino.FailedMonitorError{Cause: err}
 	}
 
+	for _, setting := range req.GetPortConfiguration().Settings {
+		m.Configure(setting.SettingId, setting.Value)
+	}
+
 	return &PortProxy{
 		rw:               monIO,
 		changeSettingsCB: m.Configure,
