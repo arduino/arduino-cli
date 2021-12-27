@@ -277,6 +277,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    Unreleased
+  </a>
+  
+    <nav class="md-nav" aria-label="Unreleased">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-clicliargumentsparsereferences-function-change" class="md-nav__link">
+    github.com/arduino/arduino-cli/cli/arguments.ParseReferences function change
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-clicliargumentsparsereference-function-change" class="md-nav__link">
+    github.com/arduino/arduino-cli/cli/arguments.ParseReference function change
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0200" class="md-nav__link">
     0.20.0
   </a>
@@ -1576,6 +1603,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    Unreleased
+  </a>
+  
+    <nav class="md-nav" aria-label="Unreleased">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-clicliargumentsparsereferences-function-change" class="md-nav__link">
+    github.com/arduino/arduino-cli/cli/arguments.ParseReferences function change
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-clicliargumentsparsereference-function-change" class="md-nav__link">
+    github.com/arduino/arduino-cli/cli/arguments.ParseReference function change
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0200" class="md-nav__link">
     0.20.0
   </a>
@@ -1867,6 +1921,14 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="githubcomarduinoarduino-clicliargumentsparsereferences-function-change"><code>github.com/arduino/arduino-cli/cli/arguments.ParseReferences</code> function change<a class="headerlink" href="#githubcomarduinoarduino-clicliargumentsparsereferences-function-change" title="Permanent link">&para;</a></h3>
+<p>The <code>parseArch</code> parameter was removed since it was unused and was always true. This means that the architecture gets
+always parsed by the function.</p>
+<h3 id="githubcomarduinoarduino-clicliargumentsparsereference-function-change"><code>github.com/arduino/arduino-cli/cli/arguments.ParseReference</code> function change<a class="headerlink" href="#githubcomarduinoarduino-clicliargumentsparsereference-function-change" title="Permanent link">&para;</a></h3>
+<p>The <code>parseArch</code> parameter was removed since it was unused and was always true. This means that the architecture gets
+always parsed by the function. Furthermore the function now should also correctly interpret <code>packager:arch</code> spelled with
+the wrong casing.</p>
 <h2 id="0200">0.20.0<a class="headerlink" href="#0200" title="Permanent link">&para;</a></h2>
 <h3 id="board-details-arguments-change"><code>board details</code> arguments change<a class="headerlink" href="#board-details-arguments-change" title="Permanent link">&para;</a></h3>
 <p>The <code>board details</code> command now accepts only the <code>--fqbn</code> or <code>-b</code> flags to specify the FQBN.</p>
