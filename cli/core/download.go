@@ -53,7 +53,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 
 	logrus.Info("Executing `arduino-cli core download`")
 
-	platformsRefs, err := arguments.ParseReferences(args, true)
+	platformsRefs, err := arguments.ParseReferences(args)
 	if err != nil {
 		feedback.Errorf(tr("Invalid argument passed: %v"), err)
 		os.Exit(errorcodes.ErrBadArgument)

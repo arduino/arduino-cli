@@ -240,6 +240,10 @@ def test_core_download(run_command, downloads_dir):
     result = run_command(["core", "download", "bananas:avr"])
     assert result.failed
 
+    # Wrong casing
+    result = run_command(["core", "download", "Arduino:Samd@1.8.12"])
+    assert os.path.exists(os.path.join(downloads_dir, "packages", "core-ArduinoCore-samd-1.8.12.tar.bz2"))
+
 
 def _in(jsondata, name, version=None):
     installed_cores = json.loads(jsondata)
@@ -683,6 +687,46 @@ def test_core_list_platform_without_platform_txt(run_command, data_dir):
     core = cores[0]
     assert core["id"] == "some-packager:some-arch"
     assert core["name"] == "some-packager-some-arch"
+
+
+@pytest.mark.skipif(
+    platform.system() in ["Darwin", "Windows"],
+    reason="macOS by default is case insensitive https://github.com/actions/virtual-environments/issues/865 "
+    + "Windows too is case insensitive"
+    + "https://stackoverflow.com/questions/7199039/file-paths-in-windows-environment-not-case-sensitive",
+)
+def test_core_download_multiple_platforms(run_command, data_dir):
+    assert run_command(["update"])
+
+    # Verifies no core is installed
+    res = run_command(["core", "list", "--format", "json"])
+    assert res.ok
+    cores = json.loads(res.stdout)
+    assert len(cores) == 0
+
+    # Simulates creation of two new cores in the sketchbook hardware folder
+    test_boards_txt = Path(__file__).parent / "testdata" / "boards.local.txt"
+    boards_txt = Path(data_dir, "packages", "PACKAGER", "hardware", "ARCH", "1.0.0", "boards.txt")
+    boards_txt.parent.mkdir(parents=True, exist_ok=True)
+    boards_txt.touch()
+    assert boards_txt.write_bytes(test_boards_txt.read_bytes())
+
+    boards_txt1 = Path(data_dir, "packages", "packager", "hardware", "arch", "1.0.0", "boards.txt")
+    boards_txt1.parent.mkdir(parents=True, exist_ok=True)
+    boards_txt1.touch()
+    assert boards_txt1.write_bytes(test_boards_txt.read_bytes())
+
+    # Verifies the two cores are detected
+    res = run_command(["core", "list", "--format", "json"])
+    assert res.ok
+    cores = json.loads(res.stdout)
+    assert len(cores) == 2
+
+    # Try to do an operation on the fake cores.
+    # The cli should not allow it since optimizing the casing results in finding two cores
+    res = run_command(["core", "upgrade", "Packager:Arch"])
+    assert res.failed
+    assert "Invalid argument passed: Found 2 platform for reference" in res.stderr
 
 
 def test_core_with_wrong_custom_board_options_is_loaded(run_command, data_dir):
