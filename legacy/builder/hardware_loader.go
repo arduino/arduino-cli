@@ -18,7 +18,6 @@ package builder
 import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/pkg/errors"
 )
 
 type HardwareLoader struct{}
@@ -33,7 +32,13 @@ func (s *HardwareLoader) Run(ctx *types.Context) error {
 			// I have no intention right now to start a refactoring of the legacy package too, so
 			// here's this shitty solution for now.
 			// When we're gonna refactor the legacy package this will be gone.
-			return errors.WithStack(errs[0].Err())
+
+			if ctx.Verbose {
+				log := ctx.GetLogger()
+				for _, err := range errs {
+					log.Println("info", "Error loading hardware platform: {0}", err.Message())
+				}
+			}
 		}
 		ctx.PackageManager = pm
 	}
