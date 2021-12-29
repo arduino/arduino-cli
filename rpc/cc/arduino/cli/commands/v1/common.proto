@@ -80,6 +80,13 @@ message Platform {
   bool deprecated = 10;
 }
 
+message PlatformReference {
+  // Platform ID (e.g., `arduino:avr`).
+  string id = 1;
+  // Version of the platform.
+  string version = 2;
+}
+
 message Board {
   // Name used to identify the board to humans.
   string name = 1;
