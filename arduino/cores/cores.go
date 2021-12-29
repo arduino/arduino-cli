@@ -23,6 +23,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/resources"
 	"github.com/arduino/arduino-cli/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	semver "go.bug.st/relaxed-semver"
@@ -340,6 +341,14 @@ func (release *PlatformRelease) String() string {
 		version = release.Version.String()
 	}
 	return release.Platform.String() + "@" + version
+}
+
+// ToRPCPlatformReference creates a gRPC PlatformReference message out of this PlatformRelease
+func (release *PlatformRelease) ToRPCPlatformReference() *rpc.PlatformReference {
+	return &rpc.PlatformReference{
+		Id:      release.Platform.String(),
+		Version: release.Version.String(),
+	}
 }
 
 // MarshalJSON provides a more user friendly serialization for

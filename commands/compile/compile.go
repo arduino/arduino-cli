@@ -217,6 +217,12 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		if p := builderCtx.BuildPath; p != nil {
 			r.BuildPath = p.String()
 		}
+		if pl := builderCtx.TargetPlatform; pl != nil {
+			r.BoardPlatform = pl.ToRPCPlatformReference()
+		}
+		if pl := builderCtx.ActualPlatform; pl != nil {
+			r.BuildPlatform = pl.ToRPCPlatformReference()
+		}
 	}()
 
 	// if --preprocess or --show-properties were passed, we can stop here
@@ -291,11 +297,11 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		}
 		importedLibs = append(importedLibs, rpcLib)
 	}
+	r.UsedLibraries = importedLibs
+
+	r.ExecutableSectionsSize = builderCtx.ExecutableSectionsSize.ToRPCExecutableSectionSizeArray()
 
 	logrus.Tracef("Compile %s for %s successful", sk.Name, fqbnIn)
 
-	return &rpc.CompileResponse{
-		UsedLibraries:          importedLibs,
-		ExecutableSectionsSize: builderCtx.ExecutableSectionsSize.ToRPCExecutableSectionSizeArray(),
-	}, nil
+	return r, nil
 }
