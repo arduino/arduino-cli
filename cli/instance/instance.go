@@ -31,30 +31,41 @@ import (
 )
 
 var tr = i18n.Tr
+var inst *rpc.Instance = nil
+var instanceInitialized = false
 
 // CreateAndInit return a new initialized instance.
 // If Create fails the CLI prints an error and exits since
 // to execute further operations a valid Instance is mandatory.
 // If Init returns errors they're printed only.
 func CreateAndInit() *rpc.Instance {
-	instance, err := Create()
+	if instanceInitialized {
+		return inst
+	}
+	var err error
+	inst, err = Create()
 	if err != nil {
 		feedback.Errorf(tr("Error creating instance: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	for _, err := range Init(instance) {
+	for _, err := range Init(inst) {
 		feedback.Errorf(tr("Error initializing instance: %v"), err)
 	}
-	return instance
+	return inst
 }
 
 // Create and return a new Instance.
 func Create() (*rpc.Instance, error) {
+	if inst != nil {
+		// Instance already exists, no need to create a new one
+		return inst, nil
+	}
 	res, err := commands.Create(&rpc.CreateRequest{})
 	if err != nil {
 		return nil, err
 	}
-	return res.Instance, nil
+	inst = res.Instance
+	return inst, nil
 }
 
 // Init initializes instance by loading installed libraries and platforms.
@@ -65,8 +76,13 @@ func Create() (*rpc.Instance, error) {
 func Init(instance *rpc.Instance) []error {
 	errs := []error{}
 
+	if instanceInitialized {
+		// Instance has already been initialized, nothing to do
+		return errs
+	}
+
 	// In case the CLI is executed for the first time
-	if err := FirstUpdate(instance); err != nil {
+	if err := firstUpdate(instance); err != nil {
 		return append(errs, err)
 	}
 
@@ -96,9 +112,9 @@ func Init(instance *rpc.Instance) []error {
 	return errs
 }
 
-// FirstUpdate downloads libraries and packages indexes if they don't exist.
+// firstUpdate downloads libraries and packages indexes if they don't exist.
 // This ideally is only executed the first time the CLI is run.
-func FirstUpdate(instance *rpc.Instance) error {
+func firstUpdate(instance *rpc.Instance) error {
 	// Gets the data directory to verify if library_index.json and package_index.json exist
 	dataDir := paths.New(configuration.Settings.GetString("directories.data"))
 
@@ -158,7 +174,7 @@ func CreateInstanceAndRunFirstUpdate() *rpc.Instance {
 	// to make it work correctly, we must do this explicitly in this command since
 	// we must use instance.Create instead of instance.CreateAndInit for the
 	// reason stated above.
-	if err := FirstUpdate(inst); err != nil {
+	if err := firstUpdate(inst); err != nil {
 		feedback.Errorf(tr("Error updating indexes: %v"), status)
 		os.Exit(errorcodes.ErrGeneric)
 	}
