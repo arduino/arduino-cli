@@ -112,7 +112,7 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		}()
 	}
 
-	ip := "127.0.0.1"
+	ip := "0.0.0.0"
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", ip, port))
 	if err != nil {
 		// Invalid port, such as "Foo"
