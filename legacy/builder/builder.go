@@ -23,7 +23,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
@@ -195,7 +194,7 @@ func runCommands(ctx *types.Context, commands []types.Command) error {
 			return errors.WithStack(err)
 		}
 		ctx.Progress.CompleteStep()
-		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
+		ctx.PushProgress()
 	}
 	return nil
 }

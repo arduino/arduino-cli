@@ -132,6 +132,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.PackageManager = pm
 	builderCtx.FQBN = fqbn
 	builderCtx.SketchLocation = sk.FullPath
+	builderCtx.ProgressCB = progressCB
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.HardwareDirs = configuration.HardwareDirectories(configuration.Settings)
