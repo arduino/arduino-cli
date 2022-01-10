@@ -31,7 +31,6 @@ var PLACEHOLDER = regexp.MustCompile(`{(\d)}`)
 type Logger interface {
 	Fprintln(w io.Writer, level string, format string, a ...interface{})
 	Println(level string, format string, a ...interface{})
-	Name() string
 }
 
 type LoggerToCustomStreams struct {
@@ -54,61 +53,41 @@ func (s *LoggerToCustomStreams) Println(level string, format string, a ...interf
 	s.Fprintln(nil, level, format, a...)
 }
 
-func (s *LoggerToCustomStreams) Name() string {
-	return "LoggerToCustomStreams"
-}
-
 type NoopLogger struct{}
 
-func (s NoopLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {}
+func (s *NoopLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {}
 
-func (s NoopLogger) Println(level string, format string, a ...interface{}) {}
-
-func (s NoopLogger) Name() string {
-	return "noop"
-}
+func (s *NoopLogger) Println(level string, format string, a ...interface{}) {}
 
 type HumanTagsLogger struct{}
 
-func (s HumanTagsLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
+func (s *HumanTagsLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
 	format = "[" + level + "] " + format
 	fprintln(w, Format(format, a...))
 }
 
-func (s HumanTagsLogger) Println(level string, format string, a ...interface{}) {
+func (s *HumanTagsLogger) Println(level string, format string, a ...interface{}) {
 	s.Fprintln(os.Stdout, level, format, a...)
-}
-
-func (s HumanTagsLogger) Name() string {
-	return "humantags"
 }
 
 type HumanLogger struct{}
 
-func (s HumanLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
+func (s *HumanLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
 	fprintln(w, Format(format, a...))
 }
 
-func (s HumanLogger) Println(level string, format string, a ...interface{}) {
+func (s *HumanLogger) Println(level string, format string, a ...interface{}) {
 	s.Fprintln(os.Stdout, level, format, a...)
-}
-
-func (s HumanLogger) Name() string {
-	return "human"
 }
 
 type MachineLogger struct{}
 
-func (s MachineLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
+func (s *MachineLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
 	printMachineFormattedLogLine(w, level, format, a)
 }
 
-func (s MachineLogger) Println(level string, format string, a ...interface{}) {
+func (s *MachineLogger) Println(level string, format string, a ...interface{}) {
 	printMachineFormattedLogLine(os.Stdout, level, format, a)
-}
-
-func (s MachineLogger) Name() string {
-	return "machine"
 }
 
 func printMachineFormattedLogLine(w io.Writer, level string, format string, a []interface{}) {

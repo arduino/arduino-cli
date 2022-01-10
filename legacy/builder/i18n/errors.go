@@ -8,7 +8,7 @@ import (
 )
 
 func ErrorfWithLogger(logger Logger, format string, a ...interface{}) error {
-	if logger.Name() == "machine" {
+	if _, isMachineLogger := logger.(*MachineLogger); isMachineLogger {
 		logger.Fprintln(os.Stderr, constants.LOG_LEVEL_ERROR, format, a...)
 		return errors.New("")
 	}

@@ -17,10 +17,11 @@ package test
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestI18NSyntax(t *testing.T) {
@@ -50,9 +51,9 @@ func TestI18NSyntax(t *testing.T) {
 
 func TestI18NInheritance(t *testing.T) {
 	var logger i18n.Logger
-	logger = i18n.HumanLogger{}
+	logger = &i18n.HumanLogger{}
 	logger.Println(constants.LOG_LEVEL_INFO, "good {0} {1}", "morning", "vietnam!")
 
-	logger = i18n.MachineLogger{}
+	logger = &i18n.MachineLogger{}
 	logger.Println(constants.LOG_LEVEL_INFO, "good {0} {1}", "morning", "vietnam!")
 }
