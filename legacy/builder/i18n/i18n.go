@@ -32,7 +32,6 @@ type Logger interface {
 	Fprintln(w io.Writer, level string, format string, a ...interface{})
 	Println(level string, format string, a ...interface{})
 	Name() string
-	Flush() string
 }
 
 type LoggerToCustomStreams struct {
@@ -55,10 +54,6 @@ func (s *LoggerToCustomStreams) Println(level string, format string, a ...interf
 	s.Fprintln(nil, level, format, a...)
 }
 
-func (s *LoggerToCustomStreams) Flush() string {
-	return ""
-}
-
 func (s *LoggerToCustomStreams) Name() string {
 	return "LoggerToCustomStreams"
 }
@@ -68,10 +63,6 @@ type NoopLogger struct{}
 func (s NoopLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {}
 
 func (s NoopLogger) Println(level string, format string, a ...interface{}) {}
-
-func (s NoopLogger) Flush() string {
-	return ""
-}
 
 func (s NoopLogger) Name() string {
 	return "noop"
@@ -88,10 +79,6 @@ func (s HumanTagsLogger) Println(level string, format string, a ...interface{}) 
 	s.Fprintln(os.Stdout, level, format, a...)
 }
 
-func (s HumanTagsLogger) Flush() string {
-	return ""
-}
-
 func (s HumanTagsLogger) Name() string {
 	return "humantags"
 }
@@ -106,10 +93,6 @@ func (s HumanLogger) Println(level string, format string, a ...interface{}) {
 	s.Fprintln(os.Stdout, level, format, a...)
 }
 
-func (s HumanLogger) Flush() string {
-	return ""
-}
-
 func (s HumanLogger) Name() string {
 	return "human"
 }
@@ -122,10 +105,6 @@ func (s MachineLogger) Fprintln(w io.Writer, level string, format string, a ...i
 
 func (s MachineLogger) Println(level string, format string, a ...interface{}) {
 	printMachineFormattedLogLine(os.Stdout, level, format, a)
-}
-
-func (s MachineLogger) Flush() string {
-	return ""
 }
 
 func (s MachineLogger) Name() string {
