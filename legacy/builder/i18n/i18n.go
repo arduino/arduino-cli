@@ -30,7 +30,6 @@ var PLACEHOLDER = regexp.MustCompile(`{(\d)}`)
 
 type Logger interface {
 	Fprintln(w io.Writer, level string, format string, a ...interface{})
-	UnformattedFprintln(w io.Writer, s string)
 	UnformattedWrite(w io.Writer, data []byte)
 	Println(level string, format string, a ...interface{})
 	Name() string
@@ -51,16 +50,6 @@ func (s *LoggerToCustomStreams) Fprintln(w io.Writer, level string, format strin
 		target = s.Stderr
 	}
 	fmt.Fprintln(target, Format(format, a...))
-}
-
-func (s *LoggerToCustomStreams) UnformattedFprintln(w io.Writer, str string) {
-	s.mux.Lock()
-	defer s.mux.Unlock()
-	target := s.Stdout
-	if w == os.Stderr {
-		target = s.Stderr
-	}
-	fmt.Fprintln(target, str)
 }
 
 func (s *LoggerToCustomStreams) UnformattedWrite(w io.Writer, data []byte) {
@@ -89,8 +78,6 @@ type NoopLogger struct{}
 
 func (s NoopLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {}
 
-func (s NoopLogger) UnformattedFprintln(w io.Writer, str string) {}
-
 func (s NoopLogger) UnformattedWrite(w io.Writer, data []byte) {}
 
 func (s NoopLogger) Println(level string, format string, a ...interface{}) {}
@@ -109,10 +96,6 @@ type AccumulatorLogger struct {
 
 func (s AccumulatorLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
 	*s.Buffer = append(*s.Buffer, Format(format, a...))
-}
-
-func (s AccumulatorLogger) UnformattedFprintln(w io.Writer, str string) {
-	*s.Buffer = append(*s.Buffer, str)
 }
 
 func (s AccumulatorLogger) UnformattedWrite(w io.Writer, data []byte) {
@@ -144,10 +127,6 @@ func (s HumanTagsLogger) Println(level string, format string, a ...interface{}) 
 	s.Fprintln(os.Stdout, level, format, a...)
 }
 
-func (s HumanTagsLogger) UnformattedFprintln(w io.Writer, str string) {
-	fprintln(w, str)
-}
-
 func (s HumanTagsLogger) UnformattedWrite(w io.Writer, data []byte) {
 	write(w, data)
 }
@@ -170,10 +149,6 @@ func (s HumanLogger) Println(level string, format string, a ...interface{}) {
 	s.Fprintln(os.Stdout, level, format, a...)
 }
 
-func (s HumanLogger) UnformattedFprintln(w io.Writer, str string) {
-	fprintln(w, str)
-}
-
 func (s HumanLogger) UnformattedWrite(w io.Writer, data []byte) {
 	write(w, data)
 }
@@ -194,10 +169,6 @@ func (s MachineLogger) Fprintln(w io.Writer, level string, format string, a ...i
 
 func (s MachineLogger) Println(level string, format string, a ...interface{}) {
 	printMachineFormattedLogLine(os.Stdout, level, format, a)
-}
-
-func (s MachineLogger) UnformattedFprintln(w io.Writer, str string) {
-	fprintln(w, str)
 }
 
 func (s MachineLogger) Flush() string {
