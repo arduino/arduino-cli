@@ -26,7 +26,7 @@ import (
 	"sync"
 )
 
-var PLACEHOLDER = regexp.MustCompile("{(\\d)}")
+var PLACEHOLDER = regexp.MustCompile(`{(\d)}`)
 
 type Logger interface {
 	Fprintln(w io.Writer, level string, format string, a ...interface{})
@@ -43,7 +43,7 @@ type LoggerToCustomStreams struct {
 	mux    sync.Mutex
 }
 
-func (s LoggerToCustomStreams) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
+func (s *LoggerToCustomStreams) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 	target := s.Stdout
@@ -53,7 +53,7 @@ func (s LoggerToCustomStreams) Fprintln(w io.Writer, level string, format string
 	fmt.Fprintln(target, Format(format, a...))
 }
 
-func (s LoggerToCustomStreams) UnformattedFprintln(w io.Writer, str string) {
+func (s *LoggerToCustomStreams) UnformattedFprintln(w io.Writer, str string) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 	target := s.Stdout
@@ -63,7 +63,7 @@ func (s LoggerToCustomStreams) UnformattedFprintln(w io.Writer, str string) {
 	fmt.Fprintln(target, str)
 }
 
-func (s LoggerToCustomStreams) UnformattedWrite(w io.Writer, data []byte) {
+func (s *LoggerToCustomStreams) UnformattedWrite(w io.Writer, data []byte) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 	target := s.Stdout
@@ -73,15 +73,15 @@ func (s LoggerToCustomStreams) UnformattedWrite(w io.Writer, data []byte) {
 	target.Write(data)
 }
 
-func (s LoggerToCustomStreams) Println(level string, format string, a ...interface{}) {
+func (s *LoggerToCustomStreams) Println(level string, format string, a ...interface{}) {
 	s.Fprintln(nil, level, format, a...)
 }
 
-func (s LoggerToCustomStreams) Flush() string {
+func (s *LoggerToCustomStreams) Flush() string {
 	return ""
 }
 
-func (s LoggerToCustomStreams) Name() string {
+func (s *LoggerToCustomStreams) Name() string {
 	return "LoggerToCustomStreams"
 }
 

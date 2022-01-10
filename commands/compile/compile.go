@@ -206,7 +206,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	builderCtx.ExecStdout = outStream
 	builderCtx.ExecStderr = errStream
-	builderCtx.SetLogger(legacyi18n.LoggerToCustomStreams{Stdout: outStream, Stderr: errStream})
+	builderCtx.SetLogger(&legacyi18n.LoggerToCustomStreams{Stdout: outStream, Stderr: errStream})
 	builderCtx.Clean = req.GetClean()
 	builderCtx.OnlyUpdateCompilationDatabase = req.GetCreateCompilationDatabaseOnly()
 
