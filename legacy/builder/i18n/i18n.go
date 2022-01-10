@@ -77,28 +77,6 @@ func (s NoopLogger) Name() string {
 	return "noop"
 }
 
-type AccumulatorLogger struct {
-	Buffer *[]string
-}
-
-func (s AccumulatorLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
-	*s.Buffer = append(*s.Buffer, Format(format, a...))
-}
-
-func (s AccumulatorLogger) Println(level string, format string, a ...interface{}) {
-	s.Fprintln(nil, level, format, a...)
-}
-
-func (s AccumulatorLogger) Flush() string {
-	str := strings.Join(*s.Buffer, "\n")
-	*s.Buffer = (*s.Buffer)[0:0]
-	return str
-}
-
-func (s AccumulatorLogger) Name() string {
-	return "accumulator"
-}
-
 type HumanTagsLogger struct{}
 
 func (s HumanTagsLogger) Fprintln(w io.Writer, level string, format string, a ...interface{}) {
