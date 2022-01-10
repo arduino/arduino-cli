@@ -262,6 +262,7 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 		stream.Context(), req,
 		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.CompileResponse{OutStream: data}) }),
 		utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.CompileResponse{ErrStream: data}) }),
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.CompileResponse{Progress: p}) },
 		false) // Set debug to false
 	if err != nil {
 		return convertErrorToRPCStatus(err)
