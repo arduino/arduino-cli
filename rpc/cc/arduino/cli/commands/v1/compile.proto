@@ -83,9 +83,9 @@ message CompileRequest {
 }
 
 message CompileResponse {
-  // The output of the compilation process.
+  // The output of the compilation process (stream)
   bytes out_stream = 1;
-  // The error output of the compilation process.
+  // The error output of the compilation process (stream)
   bytes err_stream = 2;
   // The compiler build path
   string build_path = 3;
@@ -97,6 +97,8 @@ message CompileResponse {
   PlatformReference board_platform = 6;
   // The platform used for the build (if referenced from the board platform)
   PlatformReference build_platform = 7;
+  // Completions reports of the compilation process (stream)
+  TaskProgress progress = 8;
 }
 
 message ExecutableSectionSize {

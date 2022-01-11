@@ -20,7 +20,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -34,18 +33,6 @@ import (
 )
 
 var tr = i18n.Tr
-
-func PrintProgressIfProgressEnabledAndMachineLogger(ctx *types.Context) {
-
-	if !ctx.Progress.PrintEnabled {
-		return
-	}
-
-	log := ctx.GetLogger()
-	if log.Name() == "machine" {
-		log.Println(constants.LOG_LEVEL_INFO, tr("Progress {0}"), strconv.FormatFloat(float64(ctx.Progress.Progress), 'f', 2, 32))
-	}
-}
 
 func CompileFilesRecursive(ctx *types.Context, sourcePath *paths.Path, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
 	objectFiles, err := CompileFiles(ctx, sourcePath, false, buildPath, buildProperties, includes)
@@ -215,7 +202,7 @@ func compileFilesWithRecipe(ctx *types.Context, sourcePath *paths.Path, sources 
 		queue <- source
 
 		ctx.Progress.CompleteStep()
-		PrintProgressIfProgressEnabledAndMachineLogger(ctx)
+		ctx.PushProgress()
 	}
 	close(queue)
 	wg.Wait()

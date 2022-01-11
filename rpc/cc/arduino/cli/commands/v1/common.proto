@@ -44,6 +44,8 @@ message TaskProgress {
   string message = 2;
   // Whether the task is complete.
   bool completed = 3;
+  // Amount in percent of the task completion (optional)
+  float percent = 4;
 }
 
 message Programmer {

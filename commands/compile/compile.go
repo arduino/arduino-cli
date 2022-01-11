@@ -46,7 +46,7 @@ import (
 var tr = i18n.Tr
 
 // Compile FIXMEDOC
-func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream io.Writer, debug bool) (r *rpc.CompileResponse, e error) {
+func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream io.Writer, progressCB commands.TaskProgressCB, debug bool) (r *rpc.CompileResponse, e error) {
 
 	// There is a binding between the export binaries setting and the CLI flag to explicitly set it,
 	// since we want this binding to work also for the gRPC interface we must read it here in this
@@ -132,6 +132,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.PackageManager = pm
 	builderCtx.FQBN = fqbn
 	builderCtx.SketchLocation = sk.FullPath
+	builderCtx.ProgressCB = progressCB
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.HardwareDirs = configuration.HardwareDirectories(configuration.Settings)
@@ -206,7 +207,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	builderCtx.ExecStdout = outStream
 	builderCtx.ExecStderr = errStream
-	builderCtx.SetLogger(legacyi18n.LoggerToCustomStreams{Stdout: outStream, Stderr: errStream})
+	builderCtx.SetLogger(&legacyi18n.LoggerToCustomStreams{Stdout: outStream, Stderr: errStream})
 	builderCtx.Clean = req.GetClean()
 	builderCtx.OnlyUpdateCompilationDatabase = req.GetCreateCompilationDatabaseOnly()
 

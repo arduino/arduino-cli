@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
@@ -33,10 +34,9 @@ import (
 )
 
 type ProgressStruct struct {
-	PrintEnabled bool
-	Progress     float32
-	StepAmount   float32
-	Parent       *ProgressStruct
+	Progress   float32
+	StepAmount float32
+	Parent     *ProgressStruct
 }
 
 func (p *ProgressStruct) AddSubSteps(steps int) {
@@ -144,6 +144,8 @@ type Context struct {
 
 	// Dry run, only create progress map
 	Progress ProgressStruct
+	// Send progress events to this callback
+	ProgressCB commands.TaskProgressCB
 
 	// Contents of a custom build properties file (line by line)
 	CustomBuildProperties []string
@@ -253,4 +255,10 @@ func (ctx *Context) GetLogger() i18n.Logger {
 
 func (ctx *Context) SetLogger(l i18n.Logger) {
 	ctx.logger = l
+}
+
+func (ctx *Context) PushProgress() {
+	if ctx.ProgressCB != nil {
+		ctx.ProgressCB(&rpc.TaskProgress{Percent: ctx.Progress.Progress})
+	}
 }
