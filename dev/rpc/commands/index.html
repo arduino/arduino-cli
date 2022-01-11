@@ -5372,6 +5372,12 @@
 <td></td>
 <td>Whether the task is complete.</td>
 </tr>
+<tr>
+<td>percent</td>
+<td><a href="#float">float</a></td>
+<td></td>
+<td>Amount in percent of the task completion (optional)</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc/arduino/cli/commands/v1/compile.proto"></a></p>
@@ -5560,13 +5566,13 @@
 <td>out_stream</td>
 <td><a href="#bytes">bytes</a></td>
 <td></td>
-<td>The output of the compilation process.</td>
+<td>The output of the compilation process (stream)</td>
 </tr>
 <tr>
 <td>err_stream</td>
 <td><a href="#bytes">bytes</a></td>
 <td></td>
-<td>The error output of the compilation process.</td>
+<td>The error output of the compilation process (stream)</td>
 </tr>
 <tr>
 <td>build_path</td>
@@ -5597,6 +5603,12 @@
 <td><a href="#cc.arduino.cli.commands.v1.PlatformReference">PlatformReference</a></td>
 <td></td>
 <td>The platform used for the build (if referenced from the board platform)</td>
+</tr>
+<tr>
+<td>progress</td>
+<td><a href="#cc.arduino.cli.commands.v1.TaskProgress">TaskProgress</a></td>
+<td></td>
+<td>Completions reports of the compilation process (stream)</td>
 </tr>
 </tbody>
 </table>

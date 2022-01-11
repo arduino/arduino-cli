@@ -285,6 +285,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#commandscompile-function-change" class="md-nav__link">
+    commands.Compile function change
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#githubcomarduinoarduino-clicliargumentsparsereferences-function-change" class="md-nav__link">
     github.com/arduino/arduino-cli/cli/arguments.ParseReferences function change
   </a>
@@ -1611,6 +1618,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#commandscompile-function-change" class="md-nav__link">
+    commands.Compile function change
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#githubcomarduinoarduino-clicliargumentsparsereferences-function-change" class="md-nav__link">
     github.com/arduino/arduino-cli/cli/arguments.ParseReferences function change
   </a>
@@ -1922,6 +1936,18 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="commandscompile-function-change"><code>commands.Compile</code> function change<a class="headerlink" href="#commandscompile-function-change" title="Permanent link">&para;</a></h3>
+<p>A new argument <code>progressCB</code> has been added to <code>commands.Compile</code>, the new function signature is:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span> <span class="nx">Compile</span><span class="p">(</span>
+    <span class="nx">ctx</span> <span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span>
+    <span class="nx">req</span> <span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">CompileRequest</span><span class="p">,</span>
+    <span class="nx">outStream</span><span class="p">,</span> <span class="nx">errStream</span> <span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="p">,</span>
+    <span class="nx">progressCB</span> <span class="nx">commands</span><span class="p">.</span><span class="nx">TaskProgressCB</span><span class="p">,</span>
+    <span class="nx">debug</span> <span class="kt">bool</span>
+<span class="p">)</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">CompileResponse</span><span class="p">,</span> <span class="nx">e</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</code></pre></div>
+<p>if a callback function is provided the <code>Compile</code> command will call it periodically with progress reports with the
+percentage of compilation completed, otherwise, if the parameter is <code>nil</code>, no progress reports will be performed.</p>
 <h3 id="githubcomarduinoarduino-clicliargumentsparsereferences-function-change"><code>github.com/arduino/arduino-cli/cli/arguments.ParseReferences</code> function change<a class="headerlink" href="#githubcomarduinoarduino-clicliargumentsparsereferences-function-change" title="Permanent link">&para;</a></h3>
 <p>The <code>parseArch</code> parameter was removed since it was unused and was always true. This means that the architecture gets
 always parsed by the function.</p>
