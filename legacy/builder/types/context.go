@@ -19,6 +19,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -238,7 +239,7 @@ func (ctx *Context) InjectBuildOptions(opts *properties.Map) {
 	ctx.SketchLocation = opts.GetPath("sketchLocation")
 	fqbn, err := cores.ParseFQBN(opts.Get("fqbn"))
 	if err != nil {
-		i18n.ErrorfWithLogger(ctx.GetLogger(), tr("Error in FQBN: %s"), err)
+		ctx.GetLogger().Println("error", "{0}", &arduino.InvalidFQBNError{Cause: err})
 	}
 	ctx.FQBN = fqbn
 	ctx.ArduinoAPIVersion = opts.Get("runtime.ide.version")

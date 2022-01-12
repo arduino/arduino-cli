@@ -16,10 +16,10 @@
 package builder
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 )
 
@@ -30,7 +30,7 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 
 	targetPackage, targetPlatform, targetBoard, buildProperties, actualPlatform, err := ctx.PackageManager.ResolveFQBN(ctx.FQBN)
 	if err != nil {
-		return i18n.ErrorfWithLogger(logger, tr("Error resolving FQBN: {0}"), err)
+		return fmt.Errorf("%s: %w", tr("Error resolving FQBN"), err)
 	}
 
 	targetBoard.Properties = buildProperties // FIXME....
