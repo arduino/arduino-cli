@@ -17,7 +17,6 @@ package cli
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -37,7 +36,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/lib"
 	"github.com/arduino/arduino-cli/cli/monitor"
 	"github.com/arduino/arduino-cli/cli/outdated"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/cli/sketch"
 	"github.com/arduino/arduino-cli/cli/update"
 	"github.com/arduino/arduino-cli/cli/updater"
@@ -47,17 +45,14 @@ import (
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/inventory"
-	"github.com/fatih/color"
-	"github.com/mattn/go-colorable"
-	"github.com/rifflock/lfshook"
+	"github.com/arduino/arduino-cli/logging"
+	"github.com/arduino/arduino-cli/output"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	semver "go.bug.st/relaxed-semver"
 )
 
 var (
-	verbose            bool
-	outputFormat       string
 	configFile         string
 	updaterMessageChan chan *semver.Version = make(chan *semver.Version)
 )
@@ -104,57 +99,34 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(burnbootloader.NewCommand())
 	cmd.AddCommand(version.NewCommand())
 
-	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, tr("Print the logs on the standard output."))
 	validLogLevels := []string{"trace", "debug", "info", "warn", "error", "fatal", "panic"}
-	cmd.PersistentFlags().String("log-level", "", tr("Messages with this level and above will be logged. Valid levels are: %s", strings.Join(validLogLevels, ", ")))
+	validLogFormats := []string{"text", "json"}
+	cmd.PersistentFlags().String("log-level", "info", tr("Messages with this level and above will be logged. Valid levels are: %s", strings.Join(validLogLevels, ", ")))
+	cmd.PersistentFlags().String("log-file", "", tr("Path to the file where logs will be written."))
+	cmd.PersistentFlags().String("log-format", "text", tr("The output format for the logs, can be: %s", strings.Join(validLogFormats, ", ")))
 	cmd.RegisterFlagCompletionFunc("log-level", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return validLogLevels, cobra.ShellCompDirectiveDefault
 	})
-	cmd.PersistentFlags().String("log-file", "", tr("Path to the file where logs will be written."))
-	validLogFormats := []string{"text", "json"}
-	cmd.PersistentFlags().String("log-format", "", tr("The output format for the logs, can be: %s", strings.Join(validLogFormats, ", ")))
 	cmd.RegisterFlagCompletionFunc("log-format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return validLogFormats, cobra.ShellCompDirectiveDefault
 	})
 	validOutputFormats := []string{"text", "json", "jsonmini", "yaml"}
-	cmd.PersistentFlags().StringVar(&outputFormat, "format", "text", tr("The output format for the logs, can be: %s", strings.Join(validOutputFormats, ", ")))
+	cmd.PersistentFlags().BoolP("verbose", "v", false, tr("Print the logs on the standard output."))
+	cmd.PersistentFlags().String("format", "text", tr("The output format for the logs, can be: %s", strings.Join(validOutputFormats, ", ")))
+	cmd.PersistentFlags().Bool("no-color", false, "Disable colored output.")
 	cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return validOutputFormats, cobra.ShellCompDirectiveDefault
 	})
 	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", tr("The custom config file (if not specified the default will be used)."))
 	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, tr("Comma-separated list of additional URLs for the Boards Manager."))
-	cmd.PersistentFlags().Bool("no-color", false, "Disable colored output.")
 	configuration.BindFlags(cmd, configuration.Settings)
 }
 
-// convert the string passed to the `--log-level` option to the corresponding
-// logrus formal level.
-func toLogLevel(s string) (t logrus.Level, found bool) {
-	t, found = map[string]logrus.Level{
-		"trace": logrus.TraceLevel,
-		"debug": logrus.DebugLevel,
-		"info":  logrus.InfoLevel,
-		"warn":  logrus.WarnLevel,
-		"error": logrus.ErrorLevel,
-		"fatal": logrus.FatalLevel,
-		"panic": logrus.PanicLevel,
-	}[s]
-
-	return
-}
-
-func parseFormatString(arg string) (feedback.OutputFormat, bool) {
-	f, found := map[string]feedback.OutputFormat{
-		"json":     feedback.JSON,
-		"jsonmini": feedback.JSONMini,
-		"text":     feedback.Text,
-		"yaml":     feedback.YAML,
-	}[strings.ToLower(arg)]
-
-	return f, found
-}
-
 func preRun(cmd *cobra.Command, args []string) {
+	if cmd.Name() == "daemon" {
+		return
+	}
+
 	configFile := configuration.Settings.ConfigFileUsed()
 
 	// initialize inventory
@@ -164,12 +136,13 @@ func preRun(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
-	// https://no-color.org/
-	color.NoColor = configuration.Settings.GetBool("output.no_color") || os.Getenv("NO_COLOR") != ""
-
-	// Set default feedback output to colorable
-	feedback.SetOut(colorable.NewColorableStdout())
-	feedback.SetErr(colorable.NewColorableStderr())
+	outputFormat, err := cmd.Flags().GetString("format")
+	if err != nil {
+		feedback.Errorf(tr("Error getting flag value: %s", err))
+		os.Exit(errorcodes.ErrBadCall)
+	}
+	noColor := configuration.Settings.GetBool("output.no_color") || os.Getenv("NO_COLOR") != ""
+	output.Setup(outputFormat, noColor)
 
 	updaterMessageChan = make(chan *semver.Version)
 	go func() {
@@ -185,70 +158,19 @@ func preRun(cmd *cobra.Command, args []string) {
 		updaterMessageChan <- updater.CheckForUpdate(currentVersion)
 	}()
 
-	//
-	// Prepare logging
-	//
-
-	// decide whether we should log to stdout
-	if verbose {
-		// if we print on stdout, do it in full colors
-		logrus.SetOutput(colorable.NewColorableStdout())
-		logrus.SetFormatter(&logrus.TextFormatter{
-			ForceColors:   true,
-			DisableColors: color.NoColor,
-		})
-	} else {
-		logrus.SetOutput(ioutil.Discard)
-	}
-
-	// set the Logger format
-	logFormat := strings.ToLower(configuration.Settings.GetString("logging.format"))
-	if logFormat == "json" {
-		logrus.SetFormatter(&logrus.JSONFormatter{})
-	}
-
-	// should we log to file?
-	logFile := configuration.Settings.GetString("logging.file")
-	if logFile != "" {
-		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-		if err != nil {
-			fmt.Println(tr("Unable to open file for logging: %s", logFile))
-			os.Exit(errorcodes.ErrBadCall)
-		}
-
-		// we use a hook so we don't get color codes in the log file
-		if logFormat == "json" {
-			logrus.AddHook(lfshook.NewHook(file, &logrus.JSONFormatter{}))
-		} else {
-			logrus.AddHook(lfshook.NewHook(file, &logrus.TextFormatter{}))
-		}
-	}
-
-	// configure logging filter
-	if lvl, found := toLogLevel(configuration.Settings.GetString("logging.level")); !found {
-		feedback.Errorf(tr("Invalid option for --log-level: %s"), configuration.Settings.GetString("logging.level"))
-		os.Exit(errorcodes.ErrBadArgument)
-	} else {
-		logrus.SetLevel(lvl)
-	}
-
-	//
-	// Prepare the Feedback system
-	//
-
-	// normalize the format strings
-	outputFormat = strings.ToLower(outputFormat)
-	// configure the output package
-	output.OutputFormat = outputFormat
-	// check the right output format was passed
-	format, found := parseFormatString(outputFormat)
-	if !found {
-		feedback.Errorf(tr("Invalid output format: %s"), outputFormat)
+	// Setups logging if necessary
+	verbose, err := cmd.Flags().GetBool("verbose")
+	if err != nil {
+		feedback.Errorf(tr("Error getting flag value: %s", err))
 		os.Exit(errorcodes.ErrBadCall)
 	}
-
-	// use the output format to configure the Feedback
-	feedback.SetFormat(format)
+	logging.Setup(
+		verbose,
+		noColor,
+		configuration.Settings.GetString("logging.level"),
+		configuration.Settings.GetString("logging.file"),
+		configuration.Settings.GetString("logging.format"),
+	)
 
 	//
 	// Print some status info and check command is consistent

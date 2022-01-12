@@ -31,7 +31,8 @@ import (
 	"github.com/arduino/arduino-cli/commands/daemon"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/metrics"
+	"github.com/arduino/arduino-cli/logging"
+	"github.com/arduino/arduino-cli/output"
 	srv_commands "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	srv_debug "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
 	srv_monitor "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/monitor/v1"
@@ -44,64 +45,94 @@ import (
 
 var (
 	tr           = i18n.Tr
-	daemonize    bool
-	debug        bool
 	debugFilters []string
+
+	daemonConfigFile string
 )
 
 // NewCommand created a new `daemon` command
 func NewCommand() *cobra.Command {
 	daemonCommand := &cobra.Command{
 		Use:     "daemon",
-		Short:   tr("Run as a daemon on port: %s", configuration.Settings.GetString("daemon.port")),
+		Short:   tr("Run as a daemon on specified ip and port"),
 		Long:    tr("Running as a daemon the initialization of cores and libraries is done only once."),
 		Example: "  " + os.Args[0] + " daemon",
 		Args:    cobra.NoArgs,
 		Run:     runDaemonCommand,
 	}
-	daemonCommand.PersistentFlags().String("port", "", tr("The TCP port the daemon will listen to"))
-	configuration.Settings.BindPFlag("daemon.port", daemonCommand.PersistentFlags().Lookup("port"))
-	daemonCommand.Flags().BoolVar(&daemonize, "daemonize", false, tr("Do not terminate daemon process if the parent process dies"))
-	daemonCommand.Flags().BoolVar(&debug, "debug", false, tr("Enable debug logging of gRPC calls"))
-	daemonCommand.Flags().StringSliceVar(&debugFilters, "debug-filter", []string{}, tr("Display only the provided gRPC calls"))
+	daemonCommand.Flags().String("ip", "127.0.0.1", tr("The IP the daemon will listen to"))
+	daemonCommand.Flags().String("port", "50051", tr("The TCP port the daemon will listen to"))
+	daemonCommand.Flags().Bool("daemonize", false, tr("Run daemon process in background"))
+	daemonCommand.Flags().Bool("debug", false, tr("Enable debug logging of gRPC calls"))
+	daemonCommand.Flags().StringSlice("debug-filter", []string{}, tr("Display only the provided gRPC calls when debug is enabled"))
+	daemonCommand.Flags().Bool("metrics-enabled", false, tr("Enable local metrics collection"))
+	daemonCommand.Flags().String("metrics-address", ":9090", tr("Metrics local address"))
+	// Metrics for the time being are ignored and unused, might as well hide this setting
+	// from the user since they would do nothing.
+	daemonCommand.Flags().MarkHidden("metrics-enabled")
+	daemonCommand.Flags().MarkHidden("metrics-address")
+
+	daemonCommand.Flags().StringVar(&daemonConfigFile, "config-file", "", tr("The daemon config file (if not specified default values will be used)."))
 	return daemonCommand
 }
 
 func runDaemonCommand(cmd *cobra.Command, args []string) {
+	s, err := load(cmd, daemonConfigFile)
+	if err != nil {
+		feedback.Errorf(tr("Error reading daemon config file: %v"), err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
+
+	// outputFormat, err := cmd.Flags().GetString("format")
+	// if err != nil {
+	// 	feedback.Errorf(globals.Tr("Error getting flag value: %s", err))
+	// 	os.Exit(errorcodes.ErrBadCall)
+	// }
+	noColor := s.NoColor || os.Getenv("NO_COLOR") != ""
+	output.Setup(s.OutputFormat, noColor)
+
+	if daemonConfigFile != "" {
+		// Tell the user which config file we're using only after output setup
+		feedback.Printf(tr("Using daemon config file %s", daemonConfigFile))
+	}
+
+	logging.Setup(
+		s.Verbose,
+		noColor,
+		s.LogLevel,
+		s.LogFile,
+		s.LogFormat,
+	)
+
 	logrus.Info("Executing `arduino-cli daemon`")
 
-	if configuration.Settings.GetBool("metrics.enabled") {
-		metrics.Activate("daemon")
-		stats.Incr("daemon", stats.T("success", "true"))
-		defer stats.Flush()
-	}
-	port := configuration.Settings.GetString("daemon.port")
 	gRPCOptions := []grpc.ServerOption{}
-	if debug {
+	if s.Debug {
+		debugFilters = s.DebugFilter
 		gRPCOptions = append(gRPCOptions,
 			grpc.UnaryInterceptor(unaryLoggerInterceptor),
 			grpc.StreamInterceptor(streamLoggerInterceptor),
 		)
 	}
-	s := grpc.NewServer(gRPCOptions...)
+	server := grpc.NewServer(gRPCOptions...)
 	// Set specific user-agent for the daemon
 	configuration.Settings.Set("network.user_agent_ext", "daemon")
 
 	// register the commands service
-	srv_commands.RegisterArduinoCoreServiceServer(s, &daemon.ArduinoCoreServerImpl{
+	srv_commands.RegisterArduinoCoreServiceServer(server, &daemon.ArduinoCoreServerImpl{
 		VersionString: globals.VersionInfo.VersionString,
 	})
 
 	// Register the monitors service
-	srv_monitor.RegisterMonitorServiceServer(s, &daemon.MonitorService{})
+	srv_monitor.RegisterMonitorServiceServer(server, &daemon.MonitorService{})
 
 	// Register the settings service
-	srv_settings.RegisterSettingsServiceServer(s, &daemon.SettingsService{})
+	srv_settings.RegisterSettingsServiceServer(server, &daemon.SettingsService{})
 
 	// Register the debug session service
-	srv_debug.RegisterDebugServiceServer(s, &daemon.DebugService{})
+	srv_debug.RegisterDebugServiceServer(server, &daemon.DebugService{})
 
-	if !daemonize {
+	if !s.Daemonize {
 		// When parent process ends terminate also the daemon
 		go func() {
 			// Stdin is closed when the controlling parent process ends
@@ -112,35 +143,34 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		}()
 	}
 
-	ip := "127.0.0.1"
-	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", ip, port))
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", s.IP, s.Port))
 	if err != nil {
 		// Invalid port, such as "Foo"
 		var dnsError *net.DNSError
 		if errors.As(err, &dnsError) {
-			feedback.Errorf(tr("Failed to listen on TCP port: %[1]s. %[2]s is unknown name."), port, dnsError.Name)
+			feedback.Errorf(tr("Failed to listen on TCP port: %[1]s. %[2]s is unknown name."), s.Port, dnsError.Name)
 			os.Exit(errorcodes.ErrCoreConfig)
 		}
 		// Invalid port number, such as -1
 		var addrError *net.AddrError
 		if errors.As(err, &addrError) {
-			feedback.Errorf(tr("Failed to listen on TCP port: %[1]s. %[2]s is an invalid port."), port, addrError.Addr)
+			feedback.Errorf(tr("Failed to listen on TCP port: %[1]s. %[2]s is an invalid port."), s.Port, addrError.Addr)
 			os.Exit(errorcodes.ErrCoreConfig)
 		}
 		// Port is already in use
 		var syscallErr *os.SyscallError
 		if errors.As(err, &syscallErr) && errors.Is(syscallErr.Err, syscall.EADDRINUSE) {
-			feedback.Errorf(tr("Failed to listen on TCP port: %s. Address already in use."), port)
+			feedback.Errorf(tr("Failed to listen on TCP port: %s. Address already in use."), s.Port)
 			os.Exit(errorcodes.ErrNetwork)
 		}
-		feedback.Errorf(tr("Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v"), port, err)
+		feedback.Errorf(tr("Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v"), s.Port, err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	// We need to parse the port used only if the user let
 	// us choose it randomly, in all other cases we already
 	// know which is used.
-	if port == "0" {
+	if s.Port == "0" {
 		address := lis.Addr()
 		split := strings.Split(address.String(), ":")
 
@@ -148,15 +178,15 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 			feedback.Error(tr("Failed choosing port, address: %s", address))
 		}
 
-		port = split[len(split)-1]
+		s.Port = split[len(split)-1]
 	}
 
 	feedback.PrintResult(daemonResult{
-		IP:   ip,
-		Port: port,
+		IP:   s.IP,
+		Port: s.Port,
 	})
 
-	if err := s.Serve(lis); err != nil {
+	if err := server.Serve(lis); err != nil {
 		logrus.Fatalf("Failed to serve: %v", err)
 	}
 }

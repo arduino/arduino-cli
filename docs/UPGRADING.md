@@ -4,6 +4,54 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## Unreleased
 
+### Split `daemon` mode configs from core configs
+
+The `daemon.*` settings have been removed from the config read by the `arduino-cli` when running in command line mode.
+
+The `arduino-cli daemon` now doesn't read the same config file as the other commands, the `--config-file` flag is still
+present but reads a file with the following keys:
+
+- `ip`: IP used to listen for gRPC connections
+- `port`: Port used listen for gRPC connections
+- `daemonize`: True to run daemon process in background
+- `debug`: True to enable debug logging of gRPC calls
+- `debug-filter`: List of gRPC calls to log when in debug mode
+- `verbose`: True to print logs in stdout
+- `format`: Stdout output format
+- `no-color`: True to disable color output to stdout and stderr
+- `log-level`: Messages with this level and above will be logged
+- `log-file`: Path to the file where logs will be written
+- `log-format`: Output format for the logs
+
+The format of the file can be `yaml`, `json`, `hcl`, `toml` or `ini`. An example `daemon-config.yaml` file could look
+like this:
+
+```yaml
+ip: "0.0.0.0"
+port: "0"
+verbose: true
+format: "json"
+```
+
+All the settings in the config file can be override with the following flags:
+
+- `--ip`
+- `--port`
+- `--daemonize`
+- `--debug`
+- `--debug-filter`
+- `--verbose`, `-v`
+- `--format`
+- `--no-color`
+- `--log-level`
+- `--log-file`
+- `--log-format`
+
+None of those settings will be read from the default `arduino-cli.yaml` file stored in the `.arduino15` or `Arduino15`
+folder anymore when running the `arduino-cli daemon` command.
+
+Those that start the `daemon` process will be tasked to manage the config file used by it.
+
 ### `commands.Compile` function change
 
 A new argument `progressCB` has been added to `commands.Compile`, the new function signature is:

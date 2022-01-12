@@ -328,27 +328,48 @@ Arduino CLI can be launched as a gRPC server via the `daemon` command.
 The [client_example] folder contains a sample client code that shows how to interact with the gRPC server. Available
 services and messages are detailed in the [gRPC reference] pages.
 
-To provide observability for the gRPC server activities besides logs, the `daemon` mode activates and exposes by default
-a [Prometheus](https://prometheus.io/) endpoint (http://localhost:9090/metrics) that can be fetched for metrics data
-like:
+The `daemon` mode can be configured to read a config file using the `--config-file` flag. The file can have the
+following keys:
 
-```text
-# TYPE daemon_compile counter
-daemon_compile{buildProperties="",exportFile="",fqbn="arduino:samd:mkr1000",installationID="ed6f1f22-1fbe-4b1f-84be-84d035b6369c",jobs="0",libraries="",preprocess="false",quiet="false",showProperties="false",sketchPath="5ff767c6fa5a91230f5cb4e267c889aa61489ab2c4f70f35f921f934c1462cb6",success="true",verbose="true",vidPid="",warnings=""} 1 1580385724726
+- `ip`: IP used to listen for gRPC connections
+- `port`: Port used listen for gRPC connections
+- `daemonize`: True to run daemon process in background
+- `debug`: True to enable debug logging of gRPC calls
+- `debug-filter`: List of gRPC calls to log when in debug mode
+- `verbose`: True to print logs in stdout
+- `format`: Stdout output format
+- `no-color`: True to disable color output to stdout and stderr
+- `log-level`: Messages with this level and above will be logged
+- `log-file`: Path to the file where logs will be written
+- `log-format`: Output format for the logs
 
-# TYPE daemon_board_list counter
-daemon_board_list{installationID="ed6f1f22-1fbe-4b1f-84be-84d035b6369c",success="true"} 1 1580385724833
-```
-
-The metrics settings are exposed via the `metrics` section in the CLI configuration:
+The format of the file can be `yaml`, `json`, `hcl`, `toml` or `ini`. An example `daemon-config.yaml` file could look
+like this:
 
 ```yaml
-metrics:
-  enabled: true
-  addr: :9090
+ip: "0.0.0.0"
+port: "0"
+verbose: true
+format: "json"
 ```
+
+All the settings in the config file can be override with the following flags:
+
+- `--ip`
+- `--port`
+- `--daemonize`
+- `--debug`
+- `--debug-filter`
+- `--verbose`, `-v`
+- `--format`
+- `--no-color`
+- `--log-level`
+- `--log-file`
+- `--log-format`
+
+None of those settings will be read from the default `arduino-cli.yaml` file stored in the `.arduino15` or `Arduino15`
+folder. Those that start the `daemon` process will be tasked to manage the config file used by it.
 
 [configuration documentation]: configuration.md
 [client_example]: https://github.com/arduino/arduino-cli/blob/master/client_example
 [grpc reference]: rpc/commands.md
-[prometheus]: https://prometheus.io/
