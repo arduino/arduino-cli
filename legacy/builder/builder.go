@@ -163,7 +163,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 	}
 
 	// Output arduino-preprocessed source
-	ctx.ExecStdout.Write([]byte(ctx.Source))
+	ctx.Stdout.Write([]byte(ctx.Source))
 	return nil
 }
 

@@ -386,7 +386,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 					return errors.New(tr("Internal error in cache"))
 				}
 			}
-			ctx.ExecStderr.Write(preproc_stderr)
+			ctx.Stderr.Write(preproc_stderr)
 			return errors.WithStack(preproc_err)
 		}
 

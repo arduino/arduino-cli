@@ -164,9 +164,9 @@ type Context struct {
 	// Parallel processes
 	Jobs int
 
-	// Out and Err stream to redirect all Exec commands
-	ExecStdout io.Writer
-	ExecStderr io.Writer
+	// Out and Err stream to redirect all output
+	Stdout io.Writer
+	Stderr io.Writer
 
 	// Sizer results
 	ExecutableSectionsSize ExecutablesFileSections

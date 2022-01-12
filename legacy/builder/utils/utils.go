@@ -175,11 +175,11 @@ const (
 )
 
 func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) ([]byte, []byte, error) {
-	if ctx.ExecStdout == nil {
-		ctx.ExecStdout = os.Stdout
+	if ctx.Stdout == nil {
+		ctx.Stdout = os.Stdout
 	}
-	if ctx.ExecStderr == nil {
-		ctx.ExecStderr = os.Stderr
+	if ctx.Stderr == nil {
+		ctx.Stderr = os.Stderr
 	}
 
 	if ctx.Verbose {
@@ -190,14 +190,14 @@ func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) 
 		buffer := &bytes.Buffer{}
 		command.Stdout = buffer
 	} else if stdout == Show || stdout == ShowIfVerbose && ctx.Verbose {
-		command.Stdout = ctx.ExecStdout
+		command.Stdout = ctx.Stdout
 	}
 
 	if stderr == Capture {
 		buffer := &bytes.Buffer{}
 		command.Stderr = buffer
 	} else if stderr == Show || stderr == ShowIfVerbose && ctx.Verbose {
-		command.Stderr = ctx.ExecStderr
+		command.Stderr = ctx.Stderr
 	}
 
 	err := command.Start()
