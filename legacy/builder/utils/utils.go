@@ -183,7 +183,7 @@ func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) 
 	}
 
 	if ctx.Verbose {
-		ctx.GetLogger().Println("info", "{0}", PrintableCommand(command.Args))
+		ctx.Info(PrintableCommand(command.Args))
 	}
 
 	if stdout == Capture {
@@ -317,20 +317,23 @@ func MD5Sum(data []byte) string {
 
 type loggerAction struct {
 	onlyIfVerbose bool
-	level         string
-	format        string
-	args          []interface{}
+	warn          bool
+	msg           string
 }
 
 func (l *loggerAction) Run(ctx *types.Context) error {
 	if !l.onlyIfVerbose || ctx.Verbose {
-		ctx.GetLogger().Println(l.level, l.format, l.args...)
+		if l.warn {
+			ctx.Warn(l.msg)
+		} else {
+			ctx.Info(l.msg)
+		}
 	}
 	return nil
 }
 
-func LogIfVerbose(level string, format string, args ...interface{}) types.Command {
-	return &loggerAction{true, level, format, args}
+func LogIfVerbose(warn bool, msg string) types.Command {
+	return &loggerAction{onlyIfVerbose: true, warn: warn, msg: msg}
 }
 
 // Returns the given string as a quoted string for use with the C

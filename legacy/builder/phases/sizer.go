@@ -51,8 +51,6 @@ func (s *Sizer) Run(ctx *types.Context) error {
 }
 
 func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
-	logger := ctx.GetLogger()
-
 	properties := buildProperties.Clone()
 	properties.Set(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel))
 
@@ -78,26 +76,23 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 
 	textSize, dataSize, _, err := execSizeRecipe(ctx, properties)
 	if err != nil {
-		logger.Println(constants.LOG_LEVEL_WARN, tr("Couldn't determine program size"))
+		ctx.Warn(tr("Couldn't determine program size"))
 		return nil
 	}
 
-	logger.Println(constants.LOG_LEVEL_INFO,
-		tr("Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes."),
+	ctx.Info(tr("Sketch uses %[1]s bytes (%[3]s%%) of program storage space. Maximum is %[2]s bytes.",
 		strconv.Itoa(textSize),
 		strconv.Itoa(maxTextSize),
-		strconv.Itoa(textSize*100/maxTextSize))
+		strconv.Itoa(textSize*100/maxTextSize)))
 	if dataSize >= 0 {
 		if maxDataSize > 0 {
-			logger.Println(constants.LOG_LEVEL_INFO,
-				tr("Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes for local variables. Maximum is {1} bytes."),
+			ctx.Info(tr("Global variables use %[1]s bytes (%[3]s%%) of dynamic memory, leaving %[4]s bytes for local variables. Maximum is %[2]s bytes.",
 				strconv.Itoa(dataSize),
 				strconv.Itoa(maxDataSize),
 				strconv.Itoa(dataSize*100/maxDataSize),
-				strconv.Itoa(maxDataSize-dataSize))
+				strconv.Itoa(maxDataSize-dataSize)))
 		} else {
-			logger.Println(constants.LOG_LEVEL_INFO,
-				tr("Global variables use {0} bytes of dynamic memory."), strconv.Itoa(dataSize))
+			ctx.Info(tr("Global variables use %[1]s bytes of dynamic memory.", strconv.Itoa(dataSize)))
 		}
 	}
 
@@ -117,14 +112,12 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 	}
 
 	if textSize > maxTextSize {
-		logger.Println(constants.LOG_LEVEL_ERROR,
-			tr("Sketch too big; see %s for tips on reducing it.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
+		ctx.Warn(tr("Sketch too big; see %s for tips on reducing it.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
 		return errors.New(tr("text section exceeds available space in board"))
 	}
 
 	if maxDataSize > 0 && dataSize > maxDataSize {
-		logger.Println(constants.LOG_LEVEL_ERROR,
-			tr("Not enough memory; see %s for tips on reducing your footprint.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
+		ctx.Warn(tr("Not enough memory; see %s for tips on reducing your footprint.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
 		return errors.New(tr("data section exceeds available space in board"))
 	}
 
@@ -134,7 +127,7 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 			return err
 		}
 		if maxDataSize > 0 && dataSize > maxDataSize*warnDataPercentage/100 {
-			logger.Println(constants.LOG_LEVEL_WARN, tr("Low memory available, stability problems may occur."))
+			ctx.Warn(tr("Low memory available, stability problems may occur."))
 		}
 	}
 

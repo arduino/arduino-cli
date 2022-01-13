@@ -16,8 +16,6 @@
 package builder
 
 import (
-	"os"
-
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -26,11 +24,6 @@ import (
 type WarnAboutPlatformRewrites struct{}
 
 func (s *WarnAboutPlatformRewrites) Run(ctx *types.Context) error {
-	if ctx.DebugLevel < 0 {
-		return nil
-	}
-
-	logger := ctx.GetLogger()
 	hardwareRewriteResults := ctx.HardwareRewriteResults
 	targetPlatform := ctx.TargetPlatform
 	actualPlatform := ctx.ActualPlatform
@@ -43,11 +36,11 @@ func (s *WarnAboutPlatformRewrites) Run(ctx *types.Context) error {
 	for _, platform := range platforms {
 		if hardwareRewriteResults[platform] != nil {
 			for _, rewrite := range hardwareRewriteResults[platform] {
-				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_WARN,
-					tr("Warning: platform.txt from core '{0}' contains deprecated {1}, automatically converted to {2}. Consider upgrading this core."),
-					platform.Properties.Get(constants.PLATFORM_NAME),
-					rewrite.Key+"="+rewrite.OldValue,
-					rewrite.Key+"="+rewrite.NewValue)
+				ctx.Info(
+					tr("Warning: platform.txt from core '%[1]s' contains deprecated %[2]s, automatically converted to %[3]s. Consider upgrading this core.",
+						platform.Properties.Get(constants.PLATFORM_NAME),
+						rewrite.Key+"="+rewrite.OldValue,
+						rewrite.Key+"="+rewrite.NewValue))
 			}
 		}
 	}

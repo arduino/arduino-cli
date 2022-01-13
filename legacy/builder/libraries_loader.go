@@ -16,8 +16,6 @@
 package builder
 
 import (
-	"os"
-
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
@@ -38,9 +36,6 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 	for _, folder := range builtInLibrariesFolders {
 		lm.AddLibrariesDir(folder, libraries.IDEBuiltIn)
 	}
-
-	debugLevel := ctx.DebugLevel
-	logger := ctx.GetLogger()
 
 	actualPlatform := ctx.ActualPlatform
 	platform := ctx.TargetPlatform

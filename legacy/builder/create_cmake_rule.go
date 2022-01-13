@@ -27,7 +27,6 @@ import (
 
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 )
@@ -42,9 +41,6 @@ type ExportProjectCMake struct {
 }
 
 func (s *ExportProjectCMake) Run(ctx *types.Context) error {
-	//verbose := ctx.Verbose
-	logger := ctx.GetLogger()
-
 	if s.SketchError || !canExportCmakeProject(ctx) {
 		return nil
 	}
@@ -160,9 +156,9 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	var dynamicLibsFromGccMinusL []string
 	var linkDirectories []string
 
-	extractCompileFlags(ctx, constants.RECIPE_C_COMBINE_PATTERN, &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories, logger)
-	extractCompileFlags(ctx, constants.RECIPE_C_PATTERN, &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories, logger)
-	extractCompileFlags(ctx, constants.RECIPE_CPP_PATTERN, &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories, logger)
+	extractCompileFlags(ctx, constants.RECIPE_C_COMBINE_PATTERN, &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
+	extractCompileFlags(ctx, constants.RECIPE_C_PATTERN, &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
+	extractCompileFlags(ctx, constants.RECIPE_CPP_PATTERN, &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
 
 	// Extract folders with .h in them for adding in include list
 	var headerFiles []string
@@ -240,7 +236,7 @@ func canExportCmakeProject(ctx *types.Context) bool {
 	return ctx.BuildProperties.Get("compiler.export_cmake") != ""
 }
 
-func extractCompileFlags(ctx *types.Context, recipe string, defines, dynamicLibs, linkerflags, linkDirectories *[]string, logger i18n.Logger) {
+func extractCompileFlags(ctx *types.Context, recipe string, defines, dynamicLibs, linkerflags, linkDirectories *[]string) {
 	command, _ := builder_utils.PrepareCommandForRecipe(ctx.BuildProperties, recipe, true)
 
 	for _, arg := range command.Args {

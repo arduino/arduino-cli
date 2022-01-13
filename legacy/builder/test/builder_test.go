@@ -47,7 +47,6 @@ func TestBuilderEmptySketch(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := prepareBuilderTestContext(t, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
-	ctx.DebugLevel = 10
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()

@@ -16,16 +16,16 @@
 package builder
 
 import (
-	"os"
+	"fmt"
 	"sort"
 	"strings"
 
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type RecipeByPrefixSuffixRunner struct {
@@ -35,19 +35,14 @@ type RecipeByPrefixSuffixRunner struct {
 }
 
 func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
-	logger := ctx.GetLogger()
-	if ctx.DebugLevel >= 10 {
-		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("Looking for recipes like {0}*{1}"), s.Prefix, s.Suffix)
-	}
+	logrus.Debugf(fmt.Sprintf("Looking for recipes like %s", s.Prefix+"*"+s.Suffix))
 
 	buildProperties := ctx.BuildProperties.Clone()
 	recipes := findRecipes(buildProperties, s.Prefix, s.Suffix)
 
 	properties := buildProperties.Clone()
 	for _, recipe := range recipes {
-		if ctx.DebugLevel >= 10 {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("Running recipe: {0}"), recipe)
-		}
+		logrus.Debugf(fmt.Sprintf("Running recipe: %s", recipe))
 
 		command, err := builder_utils.PrepareCommandForRecipe(properties, recipe, false)
 		if err != nil {
@@ -56,7 +51,7 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 
 		if ctx.OnlyUpdateCompilationDatabase && s.SkipIfOnlyUpdatingCompilationDatabase {
 			if ctx.Verbose {
-				ctx.GetLogger().Println("info", tr("Skipping: {0}"), strings.Join(command.Args, " "))
+				ctx.Info(tr("Skipping: %s", strings.Join(command.Args, " ")))
 			}
 			return nil
 		}

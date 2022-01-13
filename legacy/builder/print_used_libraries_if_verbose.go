@@ -18,17 +18,13 @@ package builder
 import (
 	"time"
 
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 )
 
 type PrintUsedLibrariesIfVerbose struct{}
 
 func (s *PrintUsedLibrariesIfVerbose) Run(ctx *types.Context) error {
-	verbose := ctx.Verbose
-	logger := ctx.GetLogger()
-
-	if !verbose || len(ctx.ImportedLibraries) == 0 {
+	if !ctx.Verbose || len(ctx.ImportedLibraries) == 0 {
 		return nil
 	}
 
@@ -38,22 +34,21 @@ func (s *PrintUsedLibrariesIfVerbose) Run(ctx *types.Context) error {
 			legacy = tr("(legacy)")
 		}
 		if library.Version.String() == "" {
-			logger.Println(constants.LOG_LEVEL_INFO,
-				tr("Using library {0} in folder: {1} {2}"),
-				library.Name,
-				library.InstallDir,
-				legacy)
+			ctx.Info(
+				tr("Using library %[1]s in folder: %[2]s %[3]s",
+					library.Name,
+					library.InstallDir,
+					legacy))
 		} else {
-			logger.Println(constants.LOG_LEVEL_INFO,
-				tr("Using library {0} at version {1} in folder: {2} {3}"),
-				library.Name,
-				library.Version,
-				library.InstallDir,
-				legacy)
+			ctx.Info(
+				tr("Using library %[1]s at version %[2]s in folder: %[3]s %[4]s",
+					library.Name,
+					library.Version,
+					library.InstallDir,
+					legacy))
 		}
 	}
 
 	time.Sleep(100 * time.Millisecond)
-
 	return nil
 }

@@ -16,9 +16,7 @@
 package builder
 
 import (
-	"os"
 	"reflect"
-	"strconv"
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -27,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 var tr = i18n.Tr
@@ -57,31 +56,31 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		&ContainerMergeCopySketchFiles{},
 
-		utils.LogIfVerbose("info", tr("Detecting libraries used...")),
+		utils.LogIfVerbose(false, tr("Detecting libraries used...")),
 		&ContainerFindIncludes{},
 
 		&WarnAboutArchIncompatibleLibraries{},
 
-		utils.LogIfVerbose("info", tr("Generating function prototypes...")),
+		utils.LogIfVerbose(false, tr("Generating function prototypes...")),
 		&PreprocessSketch{},
 
-		utils.LogIfVerbose("info", tr("Compiling sketch...")),
+		utils.LogIfVerbose(false, tr("Compiling sketch...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.sketch.prebuild", Suffix: ".pattern"},
 		&phases.SketchBuilder{},
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.sketch.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
-		utils.LogIfVerbose("info", tr("Compiling libraries...")),
+		utils.LogIfVerbose(false, tr("Compiling libraries...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.libraries.prebuild", Suffix: ".pattern"},
 		&UnusedCompiledLibrariesRemover{},
 		&phases.LibrariesBuilder{},
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.libraries.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
-		utils.LogIfVerbose("info", tr("Compiling core...")),
+		utils.LogIfVerbose(false, tr("Compiling core...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.core.prebuild", Suffix: ".pattern"},
 		&phases.CoreBuilder{},
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.core.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
-		utils.LogIfVerbose("info", tr("Linking everything together...")),
+		utils.LogIfVerbose(false, tr("Linking everything together...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.linking.prelink", Suffix: ".pattern"},
 		&phases.Linker{},
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.linking.postlink", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
@@ -200,9 +199,7 @@ func runCommands(ctx *types.Context, commands []types.Command) error {
 }
 
 func PrintRingNameIfDebug(ctx *types.Context, command types.Command) {
-	if ctx.DebugLevel >= 10 {
-		ctx.GetLogger().Fprintln(os.Stdout, "debug", "Ts: {0} - Running: {1}", strconv.FormatInt(time.Now().Unix(), 10), reflect.Indirect(reflect.ValueOf(command)).Type().Name())
-	}
+	logrus.Debugf("Ts: %d - Running: %s", time.Now().Unix(), reflect.Indirect(reflect.ValueOf(command)).Type().Name())
 }
 
 func RunBuilder(ctx *types.Context) error {
