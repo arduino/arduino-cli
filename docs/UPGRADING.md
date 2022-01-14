@@ -9,29 +9,7 @@ Here you can find a list of migration guides to handle breaking changes between 
 The `daemon.*` settings have been removed from the config read by the `arduino-cli` when running in command line mode.
 
 The `arduino-cli daemon` now doesn't read the same config file as the other commands, the `--config-file` flag is still
-present but reads a file with the following keys:
-
-- `ip`: IP used to listen for gRPC connections
-- `port`: Port used listen for gRPC connections
-- `daemonize`: True to run daemon process in background
-- `debug`: True to enable debug logging of gRPC calls
-- `debug-filter`: List of gRPC calls to log when in debug mode
-- `verbose`: True to print logs in stdout
-- `format`: Stdout output format
-- `no-color`: True to disable color output to stdout and stderr
-- `log-level`: Messages with this level and above will be logged
-- `log-file`: Path to the file where logs will be written
-- `log-format`: Output format for the logs
-
-The format of the file can be `yaml`, `json`, `hcl`, `toml` or `ini`. An example `daemon-config.yaml` file could look
-like this:
-
-```yaml
-ip: "0.0.0.0"
-port: "0"
-verbose: true
-format: "json"
-```
+present but reads a file with the format described [here](configuration.md#daemon-configuration-keys).
 
 All the settings in the config file can be override with the following flags:
 

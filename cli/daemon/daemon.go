@@ -54,8 +54,8 @@ var (
 func NewCommand() *cobra.Command {
 	daemonCommand := &cobra.Command{
 		Use:     "daemon",
-		Short:   tr("Run as a daemon on specified ip and port"),
-		Long:    tr("Running as a daemon the initialization of cores and libraries is done only once."),
+		Short:   tr("Run as a daemon on specified IP and port"),
+		Long:    tr("Running as a daemon multiple different client can use the same Arduino CLI process with different settings."),
 		Example: "  " + os.Args[0] + " daemon",
 		Args:    cobra.NoArgs,
 		Run:     runDaemonCommand,
@@ -83,11 +83,6 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	// outputFormat, err := cmd.Flags().GetString("format")
-	// if err != nil {
-	// 	feedback.Errorf(globals.Tr("Error getting flag value: %s", err))
-	// 	os.Exit(errorcodes.ErrBadCall)
-	// }
 	noColor := s.NoColor || os.Getenv("NO_COLOR") != ""
 	output.Setup(s.OutputFormat, noColor)
 

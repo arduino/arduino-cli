@@ -328,48 +328,11 @@ Arduino CLI can be launched as a gRPC server via the `daemon` command.
 The [client_example] folder contains a sample client code that shows how to interact with the gRPC server. Available
 services and messages are detailed in the [gRPC reference] pages.
 
-The `daemon` mode can be configured to read a config file using the `--config-file` flag. The file can have the
-following keys:
-
-- `ip`: IP used to listen for gRPC connections
-- `port`: Port used listen for gRPC connections
-- `daemonize`: True to run daemon process in background
-- `debug`: True to enable debug logging of gRPC calls
-- `debug-filter`: List of gRPC calls to log when in debug mode
-- `verbose`: True to print logs in stdout
-- `format`: Stdout output format
-- `no-color`: True to disable color output to stdout and stderr
-- `log-level`: Messages with this level and above will be logged
-- `log-file`: Path to the file where logs will be written
-- `log-format`: Output format for the logs
-
-The format of the file can be `yaml`, `json`, `hcl`, `toml` or `ini`. An example `daemon-config.yaml` file could look
-like this:
-
-```yaml
-ip: "0.0.0.0"
-port: "0"
-verbose: true
-format: "json"
-```
-
-All the settings in the config file can be override with the following flags:
-
-- `--ip`
-- `--port`
-- `--daemonize`
-- `--debug`
-- `--debug-filter`
-- `--verbose`, `-v`
-- `--format`
-- `--no-color`
-- `--log-level`
-- `--log-file`
-- `--log-format`
-
-None of those settings will be read from the default `arduino-cli.yaml` file stored in the `.arduino15` or `Arduino15`
-folder. Those that start the `daemon` process will be tasked to manage the config file used by it.
+The `daemon` mode can be configured via [a configuration file][daemon configuration] or [command line
+flags][arduino-cli daemon options].
 
 [configuration documentation]: configuration.md
 [client_example]: https://github.com/arduino/arduino-cli/blob/master/client_example
 [grpc reference]: rpc/commands.md
+[daemon configuration]: configuration.md#daemon-configuration-keys
+[arduino-cli daemon options]: commands/arduino-cli_daemon.md#options

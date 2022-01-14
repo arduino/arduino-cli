@@ -2,8 +2,6 @@
 
 - `board_manager`
   - `additional_urls` - the URLs to any additional Boards Manager package index files needed for your boards platforms.
-- `daemon` - options related to running Arduino CLI as a [gRPC] server.
-  - `port` - TCP port used for gRPC client connections.
 - `directories` - directories used by Arduino CLI.
   - `data` - directory used to store Boards/Library Manager index files and Boards Manager platform installations.
   - `downloads` - directory used to stage downloaded archives during Boards/Library Manager installations.
@@ -133,6 +131,101 @@ Doing the same using a TOML format file:
 additional_urls = [ "https://downloads.arduino.cc/packages/package_staging_index.json" ]
 ```
 
+## Daemon configuration keys
+
+The `arduino-cli daemon` mode is completely separated from the command line settings and it uses a different
+configuration from the other commands:
+
+- `ip`: IP used to listen for gRPC connections
+- `port`: Port used listen for gRPC connections
+- `daemonize`: True to run daemon process in background
+- `debug`: True to enable debug logging of gRPC calls
+- `debug-filter`: List of gRPC calls to log when in debug mode
+- `verbose`: True to print logs in stdout
+- `format`: Stdout output format
+- `no-color`: True to disable color output to stdout and stderr
+- `log-level`: Messages with this level and above will be logged
+- `log-file`: Path to the file where logs will be written
+- `log-format`: Output format for the logs
+
+### Configuration methods
+
+The `daemon` mode may be configured in two ways:
+
+1. Command line flags
+1. Configuration file
+
+If a configuration option is configured by multiple methods, the value set by the method highest on the above list
+overwrites the ones below it.
+
+If a configuration option is not set, Arduino CLI uses a default value.
+
+### Command line flags
+
+Arduino CLI's `daemon` mode flags are documented in the [Arduino CLI `daemon` command reference][arduino-cli daemon].
+
+#### Example
+
+Starting the `daemon` mode with a different port using the [`--port`][arduino-cli daemon flags] flag
+
+```shell
+$ arduino-cli daemon --port 12345
+```
+
+### Configuration file
+
+The `arduino-cli daemon` mode uses a different configuration file from the other commands and it must be managed by the
+user that starts the `daemon` process. The Arduino CLI doesn't offer any way of managing those configurations and won't
+search for a configuration file if not explictly specified by the user.
+
+It can be easily set like this:
+
+```sh
+arduino-cli daemon --config-file /path/to/settings/daemon-settings.yaml
+```
+
+#### File name
+
+The configuration file name can be anything but the file extension must be appropriate for the file's format.
+
+#### Example
+
+Setting a custom port with debug enabled and custom filters using a YAML format configuration file:
+
+```yaml
+port: "12345"
+debug: true
+debug-filter:
+  - "Create"
+  - "PlatformInstall"
+  - "UpdateIndex"
+```
+
+Doing the same using a TOML format file:
+
+```toml
+port = "12345"
+debug = true
+debug-filter = [
+    "Create",
+    "PlatformInstall",
+    "UpdateIndex"
+]
+```
+
+### Config supported formats
+
+The `daemon` mode `--config-file` flag supports a variety of common formats much like when running the Arduino CLI as a
+command line tool:
+
+- [JSON]
+- [TOML]
+- [YAML]
+- [Java properties file]
+- [HCL]
+- envfile
+- [INI]
+
 [grpc]: https://grpc.io
 [sketchbook directory]: sketch-specification.md#sketchbook
 [arduino cli lib install]: commands/arduino-cli_lib_install.md
@@ -151,3 +244,5 @@ additional_urls = [ "https://downloads.arduino.cc/packages/package_staging_index
 [java properties file]: https://en.wikipedia.org/wiki/.properties
 [hcl]: https://github.com/hashicorp/hcl
 [ini]: https://en.wikipedia.org/wiki/INI_file
+[arduino-cli daemon]: commands/arduino-cli_daemon.md
+[arduino-cli daemon flags]: commands/arduino-cli_daemon.md#options
