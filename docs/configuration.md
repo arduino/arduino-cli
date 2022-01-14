@@ -131,24 +131,7 @@ Doing the same using a TOML format file:
 additional_urls = [ "https://downloads.arduino.cc/packages/package_staging_index.json" ]
 ```
 
-## Daemon configuration keys
-
-The `arduino-cli daemon` mode is completely separated from the command line settings and it uses a different
-configuration from the other commands:
-
-- `ip`: IP used to listen for gRPC connections
-- `port`: Port used listen for gRPC connections
-- `daemonize`: True to run daemon process in background
-- `debug`: True to enable debug logging of gRPC calls
-- `debug-filter`: List of gRPC calls to log when in debug mode
-- `verbose`: True to print logs in stdout
-- `format`: Stdout output format
-- `no-color`: True to disable color output to stdout and stderr
-- `log-level`: Messages with this level and above will be logged
-- `log-file`: Path to the file where logs will be written
-- `log-format`: Output format for the logs
-
-### Configuration methods
+## Daemon
 
 The `daemon` mode may be configured in two ways:
 
@@ -172,11 +155,13 @@ Starting the `daemon` mode with a different port using the [`--port`][arduino-cl
 $ arduino-cli daemon --port 12345
 ```
 
+<a id="daemon-configuration-file"></a>
+
 ### Configuration file
 
 The `arduino-cli daemon` mode uses a different configuration file from the other commands and it must be managed by the
 user that starts the `daemon` process. The Arduino CLI doesn't offer any way of managing those configurations and won't
-search for a configuration file if not explictly specified by the user.
+search for a configuration file if not explicitly specified by the user.
 
 It can be easily set like this:
 
@@ -184,9 +169,39 @@ It can be easily set like this:
 arduino-cli daemon --config-file /path/to/settings/daemon-settings.yaml
 ```
 
+#### Keys
+
+The `arduino-cli daemon` mode is completely separated from the command line settings and it uses a different
+configuration from the other commands:
+
+- `ip`: IP used to listen for gRPC connections
+- `port`: Port used listen for gRPC connections
+- `daemonize`: True to run daemon process in background
+- `debug`: True to enable debug logging of gRPC calls
+- `debug-filter`: List of gRPC calls to log when in debug mode
+- `verbose`: True to print logs in stdout
+- `format`: Stdout output format
+- `no-color`: True to disable color output to stdout and stderr
+- `log-level`: Messages with this level and above will be logged
+- `log-file`: Path to the file where logs will be written
+- `log-format`: Output format for the logs
+
 #### File name
 
 The configuration file name can be anything but the file extension must be appropriate for the file's format.
+
+#### Supported formats
+
+The `daemon` mode `--config-file` flag supports a variety of common formats much like when running the Arduino CLI as a
+command line tool:
+
+- [JSON]
+- [TOML]
+- [YAML]
+- [Java properties file]
+- [HCL]
+- envfile
+- [INI]
 
 #### Example
 
@@ -212,19 +227,6 @@ debug-filter = [
     "UpdateIndex"
 ]
 ```
-
-### Config supported formats
-
-The `daemon` mode `--config-file` flag supports a variety of common formats much like when running the Arduino CLI as a
-command line tool:
-
-- [JSON]
-- [TOML]
-- [YAML]
-- [Java properties file]
-- [HCL]
-- envfile
-- [INI]
 
 [grpc]: https://grpc.io
 [sketchbook directory]: sketch-specification.md#sketchbook

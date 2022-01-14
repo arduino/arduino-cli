@@ -334,5 +334,5 @@ flags][arduino-cli daemon options].
 [configuration documentation]: configuration.md
 [client_example]: https://github.com/arduino/arduino-cli/blob/master/client_example
 [grpc reference]: rpc/commands.md
-[daemon configuration]: configuration.md#daemon-configuration-keys
+[daemon configuration]: configuration.md#daemon-configuration-file
 [arduino-cli daemon options]: commands/arduino-cli_daemon.md#options
