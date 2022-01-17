@@ -44,6 +44,8 @@ message TaskProgress {
   string message = 2;
   // Whether the task is complete.
   bool completed = 3;
+  // Amount in percent of the task completion (optional)
+  float percent = 4;
 }
 
 message Programmer {
@@ -78,6 +80,13 @@ message Platform {
   bool manually_installed = 9;
   // If true this Platform has been deprecated
   bool deprecated = 10;
+}
+
+message PlatformReference {
+  // Platform ID (e.g., `arduino:avr`).
+  string id = 1;
+  // Version of the platform.
+  string version = 2;
 }
 
 message Board {

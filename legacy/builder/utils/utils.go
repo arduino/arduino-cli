@@ -183,7 +183,7 @@ func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) 
 	}
 
 	if ctx.Verbose {
-		ctx.GetLogger().UnformattedFprintln(os.Stdout, PrintableCommand(command.Args))
+		ctx.GetLogger().Println("info", "{0}", PrintableCommand(command.Args))
 	}
 
 	if stdout == Capture {

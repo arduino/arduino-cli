@@ -17,6 +17,7 @@ package arduino
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/i18n"
@@ -714,4 +715,25 @@ func (e *SignatureVerificationFailedError) Unwrap() error {
 // ToRPCStatus converts the error into a *status.Status
 func (e *SignatureVerificationFailedError) ToRPCStatus() *status.Status {
 	return status.New(codes.Unavailable, e.Error())
+}
+
+// MultiplePlatformsError is returned when trying to detect
+// the Platform the user is trying to interact with and
+// and multiple results are found.
+type MultiplePlatformsError struct {
+	Platforms    []string
+	UserPlatform string
+}
+
+func (e *MultiplePlatformsError) Error() string {
+	return tr("Found %d platform for reference \"%s\":\n%s",
+		len(e.Platforms),
+		e.UserPlatform,
+		strings.Join(e.Platforms, "\n"),
+	)
+}
+
+// ToRPCStatus converts the error into a *status.Status
+func (e *MultiplePlatformsError) ToRPCStatus() *status.Status {
+	return status.New(codes.InvalidArgument, e.Error())
 }

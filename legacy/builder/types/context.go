@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -35,10 +36,9 @@ import (
 )
 
 type ProgressStruct struct {
-	PrintEnabled bool
-	Progress     float32
-	StepAmount   float32
-	Parent       *ProgressStruct
+	Progress   float32
+	StepAmount float32
+	Parent     *ProgressStruct
 }
 
 func (p *ProgressStruct) AddSubSteps(steps int) {
@@ -146,6 +146,8 @@ type Context struct {
 
 	// Dry run, only create progress map
 	Progress ProgressStruct
+	// Send progress events to this callback
+	ProgressCB commands.TaskProgressCB
 
 	// Contents of a custom build properties file (line by line)
 	CustomBuildProperties []string
@@ -260,6 +262,12 @@ func (ctx *Context) SetLogger(l i18n.Logger) {
 	ctx.logger = l
 }
 
+func (ctx *Context) PushProgress() {
+	if ctx.ProgressCB != nil {
+		ctx.ProgressCB(&rpc.TaskProgress{Percent: ctx.Progress.Progress})
+	}
+}
+
 func (ctx *Context) SetGlobalIncludeOption () {
 	if len(ctx.GlobalIncludeOption) == 0 {
 
@@ -277,5 +285,4 @@ func (ctx *Context) SetGlobalIncludeOption () {
 		}
 
 		ctx.GlobalIncludeOption += " "
-	}
 }

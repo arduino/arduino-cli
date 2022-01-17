@@ -186,19 +186,19 @@ bye() {
 
 testVersion() {
   set +e
-  EXECUTABLE_PATH="$(command -v $PROJECT_NAME)"
-  if [ "$?" = "1" ]; then
-    # $PATH is intentionally a literal in this message.
-    # shellcheck disable=SC2016
-    echo "$PROJECT_NAME not found. You might want to add \"$EFFECTIVE_BINDIR\" to your "'$PATH'
-  else
+  if EXECUTABLE_PATH="$(command -v $PROJECT_NAME)"; then
     # Convert to resolved, absolute paths before comparison
     EXECUTABLE_REALPATH="$(cd -- "$(dirname -- "$EXECUTABLE_PATH")" && pwd -P)"
     EFFECTIVE_BINDIR_REALPATH="$(cd -- "$EFFECTIVE_BINDIR" && pwd -P)"
     if [ "$EXECUTABLE_REALPATH" != "$EFFECTIVE_BINDIR_REALPATH" ]; then
+      # $PATH is intentionally a literal in this message.
       # shellcheck disable=SC2016
       echo "An existing $PROJECT_NAME was found at $EXECUTABLE_PATH. Please prepend \"$EFFECTIVE_BINDIR\" to your "'$PATH'" or remove the existing one."
     fi
+  else
+    # $PATH is intentionally a literal in this message.
+    # shellcheck disable=SC2016
+    echo "$PROJECT_NAME not found. You might want to add \"$EFFECTIVE_BINDIR\" to your "'$PATH'
   fi
 
   set -e

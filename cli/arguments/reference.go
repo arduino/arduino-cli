@@ -18,6 +18,12 @@ package arguments
 import (
 	"fmt"
 	"strings"
+
+	"github.com/arduino/arduino-cli/arduino"
+	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/commands/core"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/sirupsen/logrus"
 )
 
 // Reference represents a reference item (core or library) passed to the CLI
@@ -37,10 +43,10 @@ func (r *Reference) String() string {
 
 // ParseReferences is a convenient wrapper that operates on a slice of strings and
 // calls ParseReference for each of them. It returns at the first invalid argument.
-func ParseReferences(args []string, parseArch bool) ([]*Reference, error) {
+func ParseReferences(args []string) ([]*Reference, error) {
 	ret := []*Reference{}
 	for _, arg := range args {
-		reference, err := ParseReference(arg, parseArch)
+		reference, err := ParseReference(arg)
 		if err != nil {
 			return nil, err
 		}
@@ -49,10 +55,13 @@ func ParseReferences(args []string, parseArch bool) ([]*Reference, error) {
 	return ret, nil
 }
 
-// ParseReference parses a string and returns a Reference object. If `parseArch` is passed,
-// the method also tries to parse the architecture bit, i.e. string must be in the form
-// "packager:arch@version", useful to represent a platform (or core) name.
-func ParseReference(arg string, parseArch bool) (*Reference, error) {
+// ParseReference parses a string and returns a Reference object.
+// It tries to infer the platform the user is asking for.
+// To achieve that, it tries to use github.com/arduino/arduino-cli/commands/core.GetPlatform
+// Note that the Reference is returned rightaway if the arg inserted by the user matches perfectly one in the response of core.GetPlatform
+// A MultiplePlatformsError is returned if the platform searched by the user matches multiple platforms
+func ParseReference(arg string) (*Reference, error) {
+	logrus.Infof("Parsing reference %s", arg)
 	ret := &Reference{}
 	if arg == "" {
 		return nil, fmt.Errorf(tr("invalid empty core argument"))
@@ -69,20 +78,49 @@ func ParseReference(arg string, parseArch bool) (*Reference, error) {
 		ret.Version = toks[1]
 	}
 
-	if parseArch {
-		toks = strings.Split(ret.PackageName, ":")
-		if len(toks) != 2 {
-			return nil, fmt.Errorf(tr("invalid item %s"), arg)
-		}
-		if toks[0] == "" {
-			return nil, fmt.Errorf(tr("invalid empty core name '%s'"), arg)
-		}
-		ret.PackageName = toks[0]
-		if toks[1] == "" {
-			return nil, fmt.Errorf(tr("invalid empty core architecture '%s'"), arg)
-		}
-		ret.Architecture = toks[1]
+	toks = strings.Split(ret.PackageName, ":")
+	if len(toks) != 2 {
+		return nil, fmt.Errorf(tr("invalid item %s"), arg)
 	}
+	if toks[0] == "" {
+		return nil, fmt.Errorf(tr("invalid empty core name '%s'"), arg)
+	}
+	ret.PackageName = toks[0]
+	if toks[1] == "" {
+		return nil, fmt.Errorf(tr("invalid empty core architecture '%s'"), arg)
+	}
+	ret.Architecture = toks[1]
 
+	// Now that we have the required informations in `ret` we can
+	// try to use core.GetPlatforms to optimize what the user typed
+	// (by replacing the PackageName and Architecture in ret with the content of core.GetPlatform())
+	platforms, _ := core.GetPlatforms(&rpc.PlatformListRequest{
+		Instance:      instance.CreateAndInit(),
+		UpdatableOnly: false,
+		All:           true, // this is true because we want also the installable platforms
+	})
+	foundPlatforms := []string{}
+	for _, platform := range platforms {
+		platformID := platform.GetId()
+		platformUser := ret.PackageName + ":" + ret.Architecture
+		// At first we check if the platform the user is searching for matches an available one,
+		// this way we do not need to adapt the casing and we can return it directly
+		if platformUser == platformID {
+			return ret, nil
+		}
+		if strings.EqualFold(platformUser, platformID) {
+			logrus.Infof("Found possible match for reference %s -> %s", platformUser, platformID)
+			toks = strings.Split(platformID, ":")
+			foundPlatforms = append(foundPlatforms, platformID)
+		}
+	}
+	// replace the returned Reference only if only one occurrence is found,
+	// otherwise return an error to the user because we don't know on which platform operate
+	if len(foundPlatforms) == 1 {
+		ret.PackageName = toks[0]
+		ret.Architecture = toks[1]
+	} else {
+		return nil, &arduino.MultiplePlatformsError{Platforms: foundPlatforms, UserPlatform: arg}
+	}
 	return ret, nil
 }

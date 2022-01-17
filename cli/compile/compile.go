@@ -199,9 +199,9 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	var compileRes *rpc.CompileResponse
 	var compileError error
 	if output.OutputFormat == "json" {
-		compileRes, compileError = compile.Compile(context.Background(), compileRequest, compileStdOut, compileStdErr, verboseCompile)
+		compileRes, compileError = compile.Compile(context.Background(), compileRequest, compileStdOut, compileStdErr, nil, verboseCompile)
 	} else {
-		compileRes, compileError = compile.Compile(context.Background(), compileRequest, os.Stdout, os.Stderr, verboseCompile)
+		compileRes, compileError = compile.Compile(context.Background(), compileRequest, os.Stdout, os.Stderr, nil, verboseCompile)
 	}
 
 	if compileError == nil && uploadAfterCompile {

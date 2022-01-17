@@ -19,7 +19,6 @@ import (
 	"fmt"
 
 	sk "github.com/arduino/arduino-cli/arduino/sketch"
-	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/pkg/errors"
 )
@@ -50,7 +49,7 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 			return errors.WithStack(err)
 		}
 		ctx.Progress.CompleteStep()
-		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
+		ctx.PushProgress()
 	}
 
 	if ctx.SketchLocation != nil {
@@ -78,7 +77,7 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 		ctx.Sketch = sketch
 	}
 	ctx.Progress.CompleteStep()
-	builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
+	ctx.PushProgress()
 
 	commands = []types.Command{
 		&SetupBuildProperties{},
@@ -94,7 +93,7 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 			return errors.WithStack(err)
 		}
 		ctx.Progress.CompleteStep()
-		builder_utils.PrintProgressIfProgressEnabledAndMachineLogger(ctx)
+		ctx.PushProgress()
 	}
 
 	return nil

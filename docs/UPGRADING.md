@@ -2,6 +2,36 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## Unreleased
+
+### `commands.Compile` function change
+
+A new argument `progressCB` has been added to `commands.Compile`, the new function signature is:
+
+```go
+func Compile(
+	ctx context.Context,
+	req *rpc.CompileRequest,
+	outStream, errStream io.Writer,
+	progressCB commands.TaskProgressCB,
+	debug bool
+) (r *rpc.CompileResponse, e error) {
+```
+
+if a callback function is provided the `Compile` command will call it periodically with progress reports with the
+percentage of compilation completed, otherwise, if the parameter is `nil`, no progress reports will be performed.
+
+### `github.com/arduino/arduino-cli/cli/arguments.ParseReferences` function change
+
+The `parseArch` parameter was removed since it was unused and was always true. This means that the architecture gets
+always parsed by the function.
+
+### `github.com/arduino/arduino-cli/cli/arguments.ParseReference` function change
+
+The `parseArch` parameter was removed since it was unused and was always true. This means that the architecture gets
+always parsed by the function. Furthermore the function now should also correctly interpret `packager:arch` spelled with
+the wrong casing.
+
 ## 0.20.0
 
 ### `board details` arguments change
