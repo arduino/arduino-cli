@@ -18,6 +18,7 @@ package types
 import (
 	"fmt"
 	"io"
+	"os"
 	"strings"
 	"sync"
 
@@ -253,12 +254,20 @@ func (ctx *Context) PushProgress() {
 
 func (ctx *Context) Info(msg string) {
 	ctx.stdLock.Lock()
-	fmt.Fprintln(ctx.Stdout, msg)
+	if ctx.Stdout == nil {
+		fmt.Fprintln(os.Stdout, msg)
+	} else {
+		fmt.Fprintln(ctx.Stdout, msg)
+	}
 	ctx.stdLock.Unlock()
 }
 
 func (ctx *Context) Warn(msg string) {
 	ctx.stdLock.Lock()
-	fmt.Fprintln(ctx.Stderr, msg)
+	if ctx.Stderr == nil {
+		fmt.Fprintln(os.Stderr, msg)
+	} else {
+		fmt.Fprintln(ctx.Stderr, msg)
+	}
 	ctx.stdLock.Unlock()
 }
