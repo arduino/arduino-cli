@@ -110,8 +110,8 @@ def test_compile_with_library_priority(run_command, data_dir):
     cli_installed_lib_path = Path(data_dir, "libraries", "WiFi101")
     expected_output = [
         'Multiple libraries were found for "WiFi101.h"',
-        f" Used: {manually_install_lib_path}",
-        f" Not used: {cli_installed_lib_path}",
+        f"  Used: {manually_install_lib_path}",
+        f"  Not used: {cli_installed_lib_path}",
     ]
     assert "\n".join(expected_output) in res.stdout
 
@@ -180,8 +180,8 @@ def test_compile_with_conflicting_libraries_include(run_command, data_dir, copy_
     assert res.ok
     expected_output = [
         'Multiple libraries were found for "OneWire.h"',
-        f" Used: {one_wire_lib_path}",
-        f" Not used: {one_wire_ng_lib_path}",
+        f"  Used: {one_wire_lib_path}",
+        f"  Not used: {one_wire_ng_lib_path}",
     ]
     assert "\n".join(expected_output) in res.stdout
 
@@ -245,8 +245,8 @@ def test_compile_with_esp32_bundled_libraries(run_command, data_dir, copy_sketch
     cli_installed_lib_path = Path(data_dir, "libraries", "SD")
     expected_output = [
         'Multiple libraries were found for "SD.h"',
-        f" Used: {core_bundled_lib_path}",
-        f" Not used: {cli_installed_lib_path}",
+        f"  Used: {core_bundled_lib_path}",
+        f"  Not used: {cli_installed_lib_path}",
     ]
     assert "\n".join(expected_output) not in res.stdout
 
@@ -286,8 +286,8 @@ def test_compile_with_esp8266_bundled_libraries(run_command, data_dir, copy_sket
     cli_installed_lib_path = Path(data_dir, "libraries", "SD")
     expected_output = [
         'Multiple libraries were found for "SD.h"',
-        f" Used: {core_bundled_lib_path}",
-        f" Not used: {cli_installed_lib_path}",
+        f"  Used: {core_bundled_lib_path}",
+        f"  Not used: {cli_installed_lib_path}",
     ]
     assert "\n".join(expected_output) not in res.stdout
 
