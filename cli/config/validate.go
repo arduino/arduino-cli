@@ -26,7 +26,6 @@ import (
 
 var validMap = map[string]reflect.Kind{
 	"board_manager.additional_urls": reflect.Slice,
-	"daemon.port":                   reflect.String,
 	"directories.data":              reflect.String,
 	"directories.downloads":         reflect.String,
 	"directories.user":              reflect.String,

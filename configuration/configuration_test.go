@@ -94,8 +94,6 @@ func TestInit(t *testing.T) {
 	require.NotEmpty(t, settings.GetString("directories.Downloads"))
 	require.NotEmpty(t, settings.GetString("directories.User"))
 
-	require.Equal(t, "50051", settings.GetString("daemon.port"))
-
 	require.Equal(t, true, settings.GetBool("metrics.enabled"))
 	require.Equal(t, ":9090", settings.GetString("metrics.addr"))
 }

@@ -42,9 +42,6 @@ func SetDefaults(settings *viper.Viper) {
 	// Sketch compilation
 	settings.SetDefault("sketch.always_export_binaries", false)
 
-	// daemon settings
-	settings.SetDefault("daemon.port", "50051")
-
 	// metrics settings
 	settings.SetDefault("metrics.enabled", true)
 	settings.SetDefault("metrics.addr", ":9090")

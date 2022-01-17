@@ -328,27 +328,11 @@ Arduino CLI can be launched as a gRPC server via the `daemon` command.
 The [client_example] folder contains a sample client code that shows how to interact with the gRPC server. Available
 services and messages are detailed in the [gRPC reference] pages.
 
-To provide observability for the gRPC server activities besides logs, the `daemon` mode activates and exposes by default
-a [Prometheus](https://prometheus.io/) endpoint (http://localhost:9090/metrics) that can be fetched for metrics data
-like:
-
-```text
-# TYPE daemon_compile counter
-daemon_compile{buildProperties="",exportFile="",fqbn="arduino:samd:mkr1000",installationID="ed6f1f22-1fbe-4b1f-84be-84d035b6369c",jobs="0",libraries="",preprocess="false",quiet="false",showProperties="false",sketchPath="5ff767c6fa5a91230f5cb4e267c889aa61489ab2c4f70f35f921f934c1462cb6",success="true",verbose="true",vidPid="",warnings=""} 1 1580385724726
-
-# TYPE daemon_board_list counter
-daemon_board_list{installationID="ed6f1f22-1fbe-4b1f-84be-84d035b6369c",success="true"} 1 1580385724833
-```
-
-The metrics settings are exposed via the `metrics` section in the CLI configuration:
-
-```yaml
-metrics:
-  enabled: true
-  addr: :9090
-```
+The `daemon` mode can be configured via [a configuration file][daemon configuration] or [command line
+flags][arduino-cli daemon options].
 
 [configuration documentation]: configuration.md
 [client_example]: https://github.com/arduino/arduino-cli/blob/master/client_example
 [grpc reference]: rpc/commands.md
-[prometheus]: https://prometheus.io/
+[daemon configuration]: configuration.md#daemon-configuration-file
+[arduino-cli daemon options]: commands/arduino-cli_daemon.md#options

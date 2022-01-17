@@ -4,6 +4,32 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## Unreleased
 
+### Split `daemon` mode configs from core configs
+
+The `daemon.*` settings have been removed from the config read by the `arduino-cli` when running in command line mode.
+
+The `arduino-cli daemon` now doesn't read the same config file as the other commands, the `--config-file` flag is still
+present but reads a file with the format described [here](configuration.md#daemon-configuration-keys).
+
+All the settings in the config file can be override with the following flags:
+
+- `--ip`
+- `--port`
+- `--daemonize`
+- `--debug`
+- `--debug-filter`
+- `--verbose`, `-v`
+- `--format`
+- `--no-color`
+- `--log-level`
+- `--log-file`
+- `--log-format`
+
+None of those settings will be read from the default `arduino-cli.yaml` file stored in the `.arduino15` or `Arduino15`
+folder anymore when running the `arduino-cli daemon` command.
+
+Those that start the `daemon` process will be tasked to manage the config file used by it.
+
 ### `commands.Compile` function change
 
 A new argument `progressCB` has been added to `commands.Compile`, the new function signature is:

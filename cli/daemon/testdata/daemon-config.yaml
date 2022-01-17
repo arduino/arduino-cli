@@ -1,0 +1,13 @@
+ip: "127.0.0.1"
+port: "0"
+daemonize: false
+debug: false
+debug-filter: []
+verbose: false
+format: "json"
+no-color: false
+metrics-enabled: false
+metrics-address: ":9090"
+log-level: "info"
+log-file: ""
+log-format: "text"
