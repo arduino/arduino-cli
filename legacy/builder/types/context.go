@@ -285,4 +285,5 @@ func (ctx *Context) SetGlobalIncludeOption () {
 		}
 
 		ctx.GlobalIncludeOption += " "
+	}
 }
