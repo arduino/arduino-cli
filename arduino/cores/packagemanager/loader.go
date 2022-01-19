@@ -574,6 +574,7 @@ func convertVidPidIdentificationPropertiesToPluggableDiscovery(boardProperties *
 
 func convertUploadToolsToPluggableDiscovery(props *properties.Map) {
 	actions := []string{"upload", "bootloader", "program"}
+	propsToAdd := properties.NewMap()
 	for _, action := range actions {
 		action += ".tool"
 		defaultAction := action + ".default"
@@ -585,9 +586,10 @@ func convertUploadToolsToPluggableDiscovery(props *properties.Map) {
 				// there will be other issues further down the road after this conversion
 				continue
 			}
-			props.Set(defaultAction, tool)
+			propsToAdd.Set(defaultAction, tool)
 		}
 	}
+	props.Merge(propsToAdd)
 }
 
 func (pm *PackageManager) loadToolsFromPackage(targetPackage *cores.Package, toolsPath *paths.Path) []*status.Status {
