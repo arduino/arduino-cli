@@ -575,15 +575,17 @@ func convertVidPidIdentificationPropertiesToPluggableDiscovery(boardProperties *
 func convertUploadToolsToPluggableDiscovery(props *properties.Map) {
 	actions := []string{"upload", "bootloader", "program"}
 	for _, action := range actions {
-		if !props.ContainsKey(fmt.Sprintf("%s.tool.default", action)) {
-			tool, found := props.GetOk(fmt.Sprintf("%s.tool", action))
+		action += ".tool"
+		defaultAction := action + ".default"
+		if !props.ContainsKey(defaultAction) {
+			tool, found := props.GetOk(action)
 			if !found {
 				// Just skip it, ideally this must never happen but if a platform
 				// doesn't define an expected upload.tool, bootloader.tool or program.tool
 				// there will be other issues further down the road after this conversion
 				continue
 			}
-			props.Set(fmt.Sprintf("%s.tool.default", action), tool)
+			props.Set(defaultAction, tool)
 		}
 	}
 }
