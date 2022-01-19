@@ -579,6 +579,19 @@ func convertUploadToolsToPluggableDiscovery(props *properties.Map) {
 		action += ".tool"
 		defaultAction := action + ".default"
 		if !props.ContainsKey(defaultAction) {
+			// Search for "menu.MENU-ID.MENU-ITEM.ACTION.tool" (some platforms sets ACTION.tool on
+			// submenu config entries). See https://github.com/arduino/arduino-cli/issues/1444
+			for key, value := range props.AsMap() {
+				if !strings.HasPrefix(key, "menu.") {
+					continue
+				}
+				split := strings.Split(key, ".")
+				if len(split) != 5 || split[3]+"."+split[4] != action {
+					continue
+				}
+				prefix := split[0] + "." + split[1] + "." + split[2]
+				propsToAdd.Set(prefix+"."+defaultAction, value)
+			}
 			tool, found := props.GetOk(action)
 			if !found {
 				// Just skip it, ideally this must never happen but if a platform
