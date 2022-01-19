@@ -28,6 +28,7 @@ def generate_build_dir(sketch_path):
 
 
 indexes = [
+    "https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json",
     "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json",
     "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json",
     "http://arduino.esp8266.com/stable/package_esp8266com_index.json",
@@ -35,6 +36,7 @@ indexes = [
 ]
 
 cores_to_install = [
+    "STMicroelectronics:stm32@2.2.0",
     "arduino:avr@1.8.3",
     "adafruit:avr@1.4.13",
     "arduino:samd@1.8.11",
@@ -44,6 +46,23 @@ cores_to_install = [
 ]
 
 testdata = [
+    (
+        "STMicroelectronics:stm32:Nucleo_32:pnum=NUCLEO_F031K6,upload_method=serialMethod",
+        "/dev/ttyACM0",
+        "",
+        {
+            "darwin": '"" sh '
+            '"{data_dir}/packages/STMicroelectronics/tools/STM32Tools/2.1.1/stm32CubeProg.sh" '
+            '1 "{build_dir}/{sketch_name}.ino.bin" ttyACM0 -s\n',
+            "linux": '"" sh '
+            '"{data_dir}/packages/STMicroelectronics/tools/STM32Tools/2.1.1/stm32CubeProg.sh" '
+            '1 "{build_dir}/{sketch_name}.ino.bin" ttyACM0 -s\n',
+            "win32": '"{data_dir}/packages/STMicroelectronics/tools/STM32Tools/2.1.1/win/busybox.exe" '
+            "sh "
+            '"{data_dir}/packages/STMicroelectronics/tools/STM32Tools/2.1.1/stm32CubeProg.sh" '
+            '1 "{build_dir}/{sketch_name}.ino.bin" ttyACM0 -s\n',
+        },
+    ),
     (
         "arduino:avr:uno",
         "/dev/ttyACM0",
