@@ -21,6 +21,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net"
+	"net/url"
 	"os"
 	"strings"
 	"syscall"
@@ -29,7 +30,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/commands/daemon"
-	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/httpclient"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/logging"
 	"github.com/arduino/arduino-cli/output"
@@ -64,6 +65,8 @@ func NewCommand() *cobra.Command {
 	daemonCommand.Flags().Bool("daemonize", false, tr("Run daemon process in background"))
 	daemonCommand.Flags().Bool("debug", false, tr("Enable debug logging of gRPC calls"))
 	daemonCommand.Flags().StringSlice("debug-filter", []string{}, tr("Display only the provided gRPC calls when debug is enabled"))
+	daemonCommand.Flags().String("network-proxy", "", tr(""))
+	daemonCommand.Flags().String("network-user-agent", httpclient.UserAgent("daemon"), tr(""))
 	daemonCommand.Flags().Bool("metrics-enabled", false, tr("Enable local metrics collection"))
 	daemonCommand.Flags().String("metrics-address", ":9090", tr("Metrics local address"))
 	// Metrics for the time being are ignored and unused, might as well hide this setting
@@ -109,8 +112,22 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		)
 	}
 	server := grpc.NewServer(gRPCOptions...)
-	// Set specific user-agent for the daemon
-	configuration.Settings.Set("network.user_agent_ext", "daemon")
+
+	var proxy *url.URL
+	if s.NetworkProxy != "" {
+		var err error
+		proxy, err = url.Parse(s.NetworkProxy)
+		if err != nil {
+			feedback.Errorf(tr("Invalid network.proxy '%[1]s': %[2]s"), s.NetworkProxy, err)
+			os.Exit(errorcodes.ErrCoreConfig)
+		}
+	}
+
+	// Initializes the httpclient that will be used by this daemon process
+	httpclient.Init(&httpclient.Config{
+		Proxy:     proxy,
+		UserAgent: s.NetworkUserAgent,
+	})
 
 	// register the commands service
 	srv_commands.RegisterArduinoCoreServiceServer(server, &daemon.ArduinoCoreServerImpl{

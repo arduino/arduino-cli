@@ -29,19 +29,21 @@ import (
 // of the flag as defined in the cobra.Command used to load
 // the settings.
 type settings struct {
-	IP             string   `mapstructure:"ip"`
-	Port           string   `mapstructure:"port"`
-	Daemonize      bool     `mapstructure:"daemonize"`
-	Debug          bool     `mapstructure:"debug"`
-	DebugFilter    []string `mapstructure:"debug-filter"`
-	Verbose        bool     `mapstructure:"verbose"`
-	OutputFormat   string   `mapstructure:"format"`
-	NoColor        bool     `mapstructure:"no-color"`
-	MetricsEnabled bool     `mapstructure:"metrics-enabled"`
-	MetricsAddress string   `mapstructure:"metrics-address"`
-	LogLevel       string   `mapstructure:"log-level"`
-	LogFile        string   `mapstructure:"log-file"`
-	LogFormat      string   `mapstructure:"log-format"`
+	IP               string   `mapstructure:"ip"`
+	Port             string   `mapstructure:"port"`
+	Daemonize        bool     `mapstructure:"daemonize"`
+	Debug            bool     `mapstructure:"debug"`
+	DebugFilter      []string `mapstructure:"debug-filter"`
+	Verbose          bool     `mapstructure:"verbose"`
+	OutputFormat     string   `mapstructure:"format"`
+	NoColor          bool     `mapstructure:"no-color"`
+	NetworkProxy     string   `mapstructure:"network-proxy"`
+	NetworkUserAgent string   `mapstructure:"network-user-agent"`
+	MetricsEnabled   bool     `mapstructure:"metrics-enabled"`
+	MetricsAddress   string   `mapstructure:"metrics-address"`
+	LogLevel         string   `mapstructure:"log-level"`
+	LogFile          string   `mapstructure:"log-file"`
+	LogFormat        string   `mapstructure:"log-format"`
 }
 
 // load returns a settings struct populated with all the configurations
