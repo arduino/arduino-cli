@@ -56,8 +56,8 @@ var instancesCount int32 = 1
 // instantiate as many as needed by providing a different configuration
 // for each one.
 type CoreInstance struct {
-	PackageManager *packagemanager.PackageManager
-	lm             *librariesmanager.LibrariesManager
+	packageManager   *packagemanager.PackageManager
+	librariesManager *librariesmanager.LibrariesManager
 }
 
 // InstanceContainer FIXMEDOC
@@ -78,7 +78,7 @@ func GetPackageManager(id int32) *packagemanager.PackageManager {
 	if !ok {
 		return nil
 	}
-	return i.PackageManager
+	return i.packageManager
 }
 
 // GetLibraryManager returns the library manager for the given instance ID
@@ -87,7 +87,7 @@ func GetLibraryManager(instanceID int32) *librariesmanager.LibrariesManager {
 	if !ok {
 		return nil
 	}
-	return i.lm
+	return i.librariesManager
 }
 
 func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, downloadCB DownloadProgressCB, taskCB TaskProgressCB) (bool, error) {
@@ -95,11 +95,11 @@ func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, down
 		return false, nil
 	}
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading missing tool %s", tool)})
-	if err := DownloadToolRelease(instance.PackageManager, tool, downloadCB); err != nil {
+	if err := DownloadToolRelease(instance.packageManager, tool, downloadCB); err != nil {
 		return false, fmt.Errorf(tr("downloading %[1]s tool: %[2]s"), tool, err)
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
-	if err := InstallToolRelease(instance.PackageManager, tool, taskCB); err != nil {
+	if err := InstallToolRelease(instance.packageManager, tool, taskCB); err != nil {
 		return false, fmt.Errorf(tr("installing %[1]s tool: %[2]s"), tool, err)
 	}
 	return true, nil
@@ -129,7 +129,7 @@ func Create(req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
 	}
 
 	// Create package manager
-	instance.PackageManager = packagemanager.NewPackageManager(
+	instance.packageManager = packagemanager.NewPackageManager(
 		dataDir,
 		configuration.PackagesDir(configuration.Settings),
 		downloadsDir,
@@ -137,18 +137,18 @@ func Create(req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
 	)
 
 	// Create library manager and add libraries directories
-	instance.lm = librariesmanager.NewLibraryManager(
+	instance.librariesManager = librariesmanager.NewLibraryManager(
 		dataDir,
 		downloadsDir,
 	)
 
 	// Add directories of libraries bundled with IDE
 	if bundledLibsDir := configuration.IDEBundledLibrariesDir(configuration.Settings); bundledLibsDir != nil {
-		instance.lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
+		instance.librariesManager.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
 	}
 
 	// Add libraries directory from config file
-	instance.lm.AddLibrariesDir(
+	instance.librariesManager.AddLibrariesDir(
 		configuration.LibrariesDir(configuration.Settings),
 		libraries.User,
 	)
@@ -182,7 +182,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	// after reinitializing an instance after installing or uninstalling a core.
 	// If this is not done the information of the uninstall core is kept in memory,
 	// even if it should not.
-	instance.PackageManager.Clear()
+	instance.packageManager.Clear()
 
 	// Load Platforms
 	urls := []string{globals.DefaultIndexURL}
@@ -202,7 +202,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		if URL.Scheme == "file" {
 			indexFile := paths.New(URL.Path)
 
-			_, err := instance.PackageManager.LoadPackageIndexFromFile(indexFile)
+			_, err := instance.packageManager.LoadPackageIndexFromFile(indexFile)
 			if err != nil {
 				s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
 				responseCallback(&rpc.InitResponse{
@@ -214,7 +214,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 			continue
 		}
 
-		if err := instance.PackageManager.LoadPackageIndex(URL); err != nil {
+		if err := instance.packageManager.LoadPackageIndex(URL); err != nil {
 			s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
 			responseCallback(&rpc.InitResponse{
 				Message: &rpc.InitResponse_Error{
@@ -227,7 +227,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	// We load hardware before verifying builtin tools are installed
 	// otherwise we wouldn't find them and reinstall them each time
 	// and they would never get reloaded.
-	for _, err := range instance.PackageManager.LoadHardware() {
+	for _, err := range instance.packageManager.LoadHardware() {
 		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_Error{
 				Error: err.Proto(),
@@ -257,7 +257,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 
 	// Get builtin tools
 	builtinToolReleases := []*cores.ToolRelease{}
-	for name, tool := range instance.PackageManager.Packages.GetOrCreatePackage("builtin").Tools {
+	for name, tool := range instance.packageManager.Packages.GetOrCreatePackage("builtin").Tools {
 		latestRelease := tool.LatestRelease()
 		if latestRelease == nil {
 			s := status.Newf(codes.Internal, tr("can't find latest release of tool %s", name))
@@ -290,7 +290,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	if toolsHaveBeenInstalled {
 		// We installed at least one new tool after loading hardware
 		// so we must reload again otherwise we would never found them.
-		for _, err := range instance.PackageManager.LoadHardware() {
+		for _, err := range instance.packageManager.LoadHardware() {
 			responseCallback(&rpc.InitResponse{
 				Message: &rpc.InitResponse_Error{
 					Error: err.Proto(),
@@ -299,7 +299,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		}
 	}
 
-	for _, err := range instance.PackageManager.LoadDiscoveries() {
+	for _, err := range instance.packageManager.LoadDiscoveries() {
 		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_Error{
 				Error: err.Proto(),
@@ -308,15 +308,15 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	}
 
 	// Load libraries
-	for _, pack := range instance.PackageManager.Packages {
+	for _, pack := range instance.packageManager.Packages {
 		for _, platform := range pack.Platforms {
-			if platformRelease := instance.PackageManager.GetInstalledPlatformRelease(platform); platformRelease != nil {
-				instance.lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
+			if platformRelease := instance.packageManager.GetInstalledPlatformRelease(platform); platformRelease != nil {
+				instance.librariesManager.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
 			}
 		}
 	}
 
-	if err := instance.lm.LoadIndex(); err != nil {
+	if err := instance.librariesManager.LoadIndex(); err != nil {
 		s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
 		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_Error{
@@ -325,7 +325,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		})
 	}
 
-	for _, err := range instance.lm.RescanLibraries() {
+	for _, err := range instance.librariesManager.RescanLibraries() {
 		s := status.Newf(codes.FailedPrecondition, tr("Loading libraries: %v"), err)
 		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_Error{
