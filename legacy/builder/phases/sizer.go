@@ -112,12 +112,12 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 	}
 
 	if textSize > maxTextSize {
-		ctx.Warn(tr("Sketch too big; see %s for tips on reducing it.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
+		ctx.Warn(tr("Sketch too big; see %[1]s for tips on reducing it.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
 		return errors.New(tr("text section exceeds available space in board"))
 	}
 
 	if maxDataSize > 0 && dataSize > maxDataSize {
-		ctx.Warn(tr("Not enough memory; see %s for tips on reducing your footprint.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
+		ctx.Warn(tr("Not enough memory; see %[1]s for tips on reducing your footprint.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
 		return errors.New(tr("data section exceeds available space in board"))
 	}
 

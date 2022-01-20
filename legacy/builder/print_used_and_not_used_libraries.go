@@ -41,10 +41,10 @@ func (s *PrintUsedAndNotUsedLibraries) Run(ctx *types.Context) error {
 		if len(libResResult.NotUsedLibraries) == 0 {
 			continue
 		}
-		res += fmt.Sprintln(tr(`Multiple libraries were found for "%s"`, header))
-		res += fmt.Sprintln("  " + tr("Used: %s", libResResult.Library.InstallDir))
+		res += fmt.Sprintln(tr(`Multiple libraries were found for "%[1]s"`, header))
+		res += fmt.Sprintln("  " + tr("Used: %[1]s", libResResult.Library.InstallDir))
 		for _, notUsedLibrary := range libResResult.NotUsedLibraries {
-			res += fmt.Sprintln("  " + tr("Not used: %s", notUsedLibrary.InstallDir))
+			res += fmt.Sprintln("  " + tr("Not used: %[1]s", notUsedLibrary.InstallDir))
 		}
 	}
 

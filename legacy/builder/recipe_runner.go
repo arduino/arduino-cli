@@ -51,7 +51,7 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 
 		if ctx.OnlyUpdateCompilationDatabase && s.SkipIfOnlyUpdatingCompilationDatabase {
 			if ctx.Verbose {
-				ctx.Info(tr("Skipping: %s", strings.Join(command.Args, " ")))
+				ctx.Info(tr("Skipping: %[1]s", strings.Join(command.Args, " ")))
 			}
 			return nil
 		}

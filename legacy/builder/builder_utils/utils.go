@@ -434,7 +434,7 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 
 	if ctx.OnlyUpdateCompilationDatabase {
 		if ctx.Verbose {
-			ctx.Info(tr("Skipping archive creation of: %s", archiveFilePath))
+			ctx.Info(tr("Skipping archive creation of: %[1]s", archiveFilePath))
 		}
 		return archiveFilePath, nil
 	}
@@ -457,7 +457,7 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 			}
 		} else {
 			if ctx.Verbose {
-				ctx.Info(tr("Using previously compiled file: %s", archiveFilePath))
+				ctx.Info(tr("Using previously compiled file: %[1]s", archiveFilePath))
 			}
 			return archiveFilePath, nil
 		}
@@ -488,7 +488,7 @@ const COMMANDLINE_LIMIT = 30000
 func PrepareCommandForRecipe(buildProperties *properties.Map, recipe string, removeUnsetProperties bool) (*exec.Cmd, error) {
 	pattern := buildProperties.Get(recipe)
 	if pattern == "" {
-		return nil, errors.Errorf(tr("%s pattern is missing"), recipe)
+		return nil, errors.Errorf(tr("%[1]s pattern is missing"), recipe)
 	}
 
 	commandLine := buildProperties.ExpandPropsInString(pattern)

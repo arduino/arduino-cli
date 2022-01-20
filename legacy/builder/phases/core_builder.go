@@ -44,7 +44,7 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 
 	if coreBuildCachePath != nil {
 		if _, err := coreBuildCachePath.RelTo(ctx.BuildPath); err != nil {
-			ctx.Info(tr("Couldn't deeply cache core build: %s", err))
+			ctx.Info(tr("Couldn't deeply cache core build: %[1]s", err))
 			ctx.Info(tr("Running normal build of the core..."))
 			coreBuildCachePath = nil
 			ctx.CoreBuildCachePath = nil
@@ -102,7 +102,7 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 		if canUseArchivedCore {
 			// use archived core
 			if ctx.Verbose {
-				ctx.Info(tr("Using precompiled core: %s", targetArchivedCore))
+				ctx.Info(tr("Using precompiled core: %[1]s", targetArchivedCore))
 			}
 			return targetArchivedCore, variantObjectFiles, nil
 		}
