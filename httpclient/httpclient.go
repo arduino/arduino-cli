@@ -23,22 +23,19 @@ import (
 
 var tr = i18n.Tr
 
-// New returns a default http client for use in the cli API calls
-func New() (*http.Client, error) {
-	config, err := DefaultConfig()
+var client *http.Client
 
-	if err != nil {
-		return nil, err
-	}
-
-	return NewWithConfig(config), nil
-}
-
-// NewWithConfig creates a http client for use in the cli API calls with a given configuration
-func NewWithConfig(config *Config) *http.Client {
+// Init the global http client using the specified config.
+// Panics if a client has already been initialized.
+func Init(config *Config) {
 	transport := newHTTPClientTransport(config)
-
-	return &http.Client{
+	client = &http.Client{
 		Transport: transport,
 	}
+}
+
+// Get returns the global http.Client.
+// If Init has not been called the client will be nil.
+func Get() *http.Client {
+	return client
 }

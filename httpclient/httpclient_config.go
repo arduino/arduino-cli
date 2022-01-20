@@ -21,7 +21,7 @@ import (
 	"runtime"
 
 	"github.com/arduino/arduino-cli/cli/globals"
-	"github.com/arduino/arduino-cli/configuration"
+	"github.com/spf13/viper"
 )
 
 // Config is the configuration of the http client
@@ -30,12 +30,12 @@ type Config struct {
 	Proxy     *url.URL
 }
 
-// DefaultConfig returns the default http client config
-func DefaultConfig() (*Config, error) {
+// ConfigFromSettings returns httpConfigs using specified settings
+func ConfigFromSettings(settings *viper.Viper) (*Config, error) {
 	var proxy *url.URL
 	var err error
-	if configuration.Settings.IsSet("network.proxy") {
-		proxyConfig := configuration.Settings.GetString("network.proxy")
+	if settings.IsSet("network.proxy") {
+		proxyConfig := settings.GetString("network.proxy")
 		if proxyConfig == "" {
 			// empty configuration
 			// this workaround must be here until viper can UnSet properties:
@@ -46,14 +46,15 @@ func DefaultConfig() (*Config, error) {
 	}
 
 	return &Config{
-		UserAgent: UserAgent(),
+		UserAgent: UserAgent(settings.GetString("network.user_agent_ext")),
 		Proxy:     proxy,
 	}, nil
 }
 
-// UserAgent returns the user agent for the cli http client
-func UserAgent() string {
-	subComponent := configuration.Settings.GetString("network.user_agent_ext")
+// UserAgent returns the user agent for the cli http client.
+// If a non-empty subComponent is set it will be append to the main component.
+func UserAgent(subComponent string) string {
+	// subComponent := settings.GetString("network.user_agent_ext")
 	if subComponent != "" {
 		subComponent = " " + subComponent
 	}

@@ -27,10 +27,7 @@ import (
 // GetDownloaderConfig returns the downloader configuration based on
 // current settings.
 func GetDownloaderConfig() (*downloader.Config, error) {
-	httpClient, err := httpclient.New()
-	if err != nil {
-		return nil, &arduino.InvalidArgumentError{Message: tr("Could not connect via HTTP"), Cause: err}
-	}
+	httpClient := httpclient.Get()
 	return &downloader.Config{
 		HttpClient: *httpClient,
 	}, nil

@@ -32,9 +32,10 @@ func TestUserAgentHeader(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client := NewWithConfig(&Config{
+	Init(&Config{
 		UserAgent: "test-user-agent",
 	})
+	client := Get()
 
 	request, err := http.NewRequest("GET", ts.URL, nil)
 	require.NoError(t, err)
@@ -57,9 +58,10 @@ func TestProxy(t *testing.T) {
 	proxyURL, err := url.Parse(ts.URL)
 	require.NoError(t, err)
 
-	client := NewWithConfig(&Config{
+	Init(&Config{
 		Proxy: proxyURL,
 	})
+	client := Get()
 
 	request, err := http.NewRequest("GET", "http://arduino.cc", nil)
 	require.NoError(t, err)

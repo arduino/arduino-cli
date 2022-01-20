@@ -63,13 +63,7 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Content-Type", "application/json")
 
-	// TODO: use proxy if set
-
-	httpClient, err := httpclient.New()
-
-	if err != nil {
-		return nil, errors.Wrap(err, tr("failed to initialize http client"))
-	}
+	httpClient := httpclient.Get()
 
 	if res, err := httpClient.Do(req); err == nil {
 		if res.StatusCode >= 400 {
