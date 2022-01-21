@@ -32,6 +32,22 @@ The `parseArch` parameter was removed since it was unused and was always true. T
 always parsed by the function. Furthermore the function now should also correctly interpret `packager:arch` spelled with
 the wrong casing.
 
+### `github.com/arduino/arduino-cli/i18n.Init(...)` now takes only one argument
+
+The signature of the function changed from:
+
+```go
+func Init(configLocale ...string) {
+```
+
+to
+
+```go
+func Init(configLocale string) {
+```
+
+If any extra argument was passed it can be safely removed since it was previously ignored.
+
 ### `github.com/arduino/arduino-cli/legacy/i18n` module has been removed (in particular the `i18n.Logger`)
 
 The `i18n.Logger` is no longer available. It was mainly used in the legacy builder struct field `Context.Logger`.
