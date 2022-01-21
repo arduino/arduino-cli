@@ -327,17 +327,6 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 			includes = append(includes, library.UtilityDir)
 		}
 
-		if library, ok := sourceFile.Origin.(*libraries.Library); ok {
-			if library.Precompiled && library.PrecompiledWithSources {
-				// Fully precompiled libraries should have no dependencies
-				// to avoid ABI breakage
-				if ctx.Verbose {
-					ctx.Info(tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
-				}
-				return nil
-			}
-		}
-
 		var preproc_err error
 		var preproc_stderr []byte
 
@@ -399,7 +388,15 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		appendIncludeFolder(ctx, cache, sourcePath, include, library.SourceDir)
 		sourceDirs := library.SourceDirs()
 		for _, sourceDir := range sourceDirs {
-			queueSourceFilesFromFolder(ctx, ctx.CollectedSourceFiles, library, sourceDir.Dir, sourceDir.Recurse)
+			if library.Precompiled && library.PrecompiledWithSources {
+				// Fully precompiled libraries should have no dependencies
+				// to avoid ABI breakage
+				if ctx.Verbose {
+					ctx.Info(tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
+				}
+			} else {
+				queueSourceFilesFromFolder(ctx, ctx.CollectedSourceFiles, library, sourceDir.Dir, sourceDir.Recurse)
+			}
 		}
 		first = false
 	}
