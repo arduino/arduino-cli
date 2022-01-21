@@ -175,29 +175,29 @@ const (
 )
 
 func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) ([]byte, []byte, error) {
-	if ctx.ExecStdout == nil {
-		ctx.ExecStdout = os.Stdout
+	if ctx.Stdout == nil {
+		ctx.Stdout = os.Stdout
 	}
-	if ctx.ExecStderr == nil {
-		ctx.ExecStderr = os.Stderr
+	if ctx.Stderr == nil {
+		ctx.Stderr = os.Stderr
 	}
 
 	if ctx.Verbose {
-		ctx.GetLogger().Println("info", "{0}", PrintableCommand(command.Args))
+		ctx.Info(PrintableCommand(command.Args))
 	}
 
 	if stdout == Capture {
 		buffer := &bytes.Buffer{}
 		command.Stdout = buffer
 	} else if stdout == Show || stdout == ShowIfVerbose && ctx.Verbose {
-		command.Stdout = ctx.ExecStdout
+		command.Stdout = ctx.Stdout
 	}
 
 	if stderr == Capture {
 		buffer := &bytes.Buffer{}
 		command.Stderr = buffer
 	} else if stderr == Show || stderr == ShowIfVerbose && ctx.Verbose {
-		command.Stderr = ctx.ExecStderr
+		command.Stderr = ctx.Stderr
 	}
 
 	err := command.Start()
@@ -317,20 +317,23 @@ func MD5Sum(data []byte) string {
 
 type loggerAction struct {
 	onlyIfVerbose bool
-	level         string
-	format        string
-	args          []interface{}
+	warn          bool
+	msg           string
 }
 
 func (l *loggerAction) Run(ctx *types.Context) error {
 	if !l.onlyIfVerbose || ctx.Verbose {
-		ctx.GetLogger().Println(l.level, l.format, l.args...)
+		if l.warn {
+			ctx.Warn(l.msg)
+		} else {
+			ctx.Info(l.msg)
+		}
 	}
 	return nil
 }
 
-func LogIfVerbose(level string, format string, args ...interface{}) types.Command {
-	return &loggerAction{true, level, format, args}
+func LogIfVerbose(warn bool, msg string) types.Command {
+	return &loggerAction{onlyIfVerbose: true, warn: warn, msg: msg}
 }
 
 // Returns the given string as a quoted string for use with the C

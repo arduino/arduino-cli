@@ -48,8 +48,6 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
 
-	ctx.DebugLevel = 10
-
 	commands := []types.Command{
 
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},

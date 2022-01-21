@@ -32,6 +32,29 @@ The `parseArch` parameter was removed since it was unused and was always true. T
 always parsed by the function. Furthermore the function now should also correctly interpret `packager:arch` spelled with
 the wrong casing.
 
+### `github.com/arduino/arduino-cli/i18n.Init(...)` now requires an empty string to be passed for autodetection of locale
+
+For automated detection of locale, change the call from:
+
+```go
+i18n.Init()
+```
+
+to
+
+```go
+i18n.Init("")
+```
+
+### `github.com/arduino/arduino-cli/legacy/i18n` module has been removed (in particular the `i18n.Logger`)
+
+The `i18n.Logger` is no longer available. It was mainly used in the legacy builder struct field `Context.Logger`.
+
+The `Context.Logger` field has been replaced with plain `io.Writer` fields `Contex.Stdout` and `Context.Stderr`. All
+existing logger functionality has been dropped, for example the Java-Style formatting with tags like `{0} {1}...` must
+be replaced with one of the equivalent golang printf-based alternatives and logging levels must be replaced with direct
+writes to `Stdout` or `Stderr`.
+
 ## 0.20.0
 
 ### `board details` arguments change

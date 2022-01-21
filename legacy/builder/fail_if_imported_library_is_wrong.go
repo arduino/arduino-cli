@@ -16,9 +16,10 @@
 package builder
 
 import (
+	"errors"
+
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 )
 
@@ -29,21 +30,19 @@ func (s *FailIfImportedLibraryIsWrong) Run(ctx *types.Context) error {
 		return nil
 	}
 
-	logger := ctx.GetLogger()
-
 	for _, library := range ctx.ImportedLibraries {
 		if !library.IsLegacy {
 			if library.InstallDir.Join(constants.LIBRARY_FOLDER_ARCH).IsDir() {
-				return i18n.ErrorfWithLogger(logger, tr("%[1]s folder is no longer supported! See %[2]s for more information", "'arch'", "http://goo.gl/gfFJzU"))
+				return errors.New(tr("%[1]s folder is no longer supported! See %[2]s for more information", "'arch'", "http://goo.gl/gfFJzU"))
 			}
 			for _, propName := range libraries.MandatoryProperties {
 				if !library.Properties.ContainsKey(propName) {
-					return i18n.ErrorfWithLogger(logger, tr("Missing '{0}' from library in {1}"), propName, library.InstallDir)
+					return errors.New(tr("Missing '%[1]s' from library in %[2]s", propName, library.InstallDir))
 				}
 			}
 			if library.Layout == libraries.RecursiveLayout {
 				if library.UtilityDir != nil {
-					return i18n.ErrorfWithLogger(logger, tr("Library can't use both '%[1]s' and '%[2]s' folders. Double check {0}", "src", "utility"), library.InstallDir)
+					return errors.New(tr("Library can't use both '%[1]s' and '%[2]s' folders. Double check in '%[3]s'.", "src", "utility", library.InstallDir))
 				}
 			}
 		}

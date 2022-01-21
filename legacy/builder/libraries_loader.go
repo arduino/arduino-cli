@@ -16,8 +16,6 @@
 package builder
 
 import (
-	"os"
-
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
@@ -38,9 +36,6 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 	for _, folder := range builtInLibrariesFolders {
 		lm.AddLibrariesDir(folder, libraries.IDEBuiltIn)
 	}
-
-	debugLevel := ctx.DebugLevel
-	logger := ctx.GetLogger()
 
 	actualPlatform := ctx.ActualPlatform
 	platform := ctx.TargetPlatform
@@ -71,20 +66,6 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 		// Libraries specified this way have top priority
 		if err := lm.LoadLibraryFromDir(dir, libraries.Unmanaged); err != nil {
 			return err
-		}
-	}
-
-	if debugLevel > 0 {
-		for _, lib := range lm.Libraries {
-			for _, libAlt := range lib.Alternatives {
-				warnings, err := libAlt.Lint()
-				if err != nil {
-					return errors.WithStack(err)
-				}
-				for _, warning := range warnings {
-					logger.Fprintln(os.Stdout, "warn", warning)
-				}
-			}
 		}
 	}
 

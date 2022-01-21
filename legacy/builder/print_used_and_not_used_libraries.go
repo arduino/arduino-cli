@@ -16,10 +16,10 @@
 package builder
 
 import (
-	"os"
+	"fmt"
+	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 )
 
@@ -29,32 +29,31 @@ type PrintUsedAndNotUsedLibraries struct {
 }
 
 func (s *PrintUsedAndNotUsedLibraries) Run(ctx *types.Context) error {
-	var logLevel string
-	// Print this message as warning when the sketch didn't compile,
-	// as info when we're verbose and not all otherwise
-	if s.SketchError {
-		logLevel = constants.LOG_LEVEL_WARN
-	} else if ctx.Verbose {
-		logLevel = constants.LOG_LEVEL_INFO
-	} else {
+	// Print this message:
+	// - as warning, when the sketch didn't compile
+	// - as info, when verbose is on
+	// - otherwise, output nothing
+	if !s.SketchError && !ctx.Verbose {
 		return nil
 	}
 
-	logger := ctx.GetLogger()
-	libraryResolutionResults := ctx.LibrariesResolutionResults
-
-	for header, libResResult := range libraryResolutionResults {
+	res := ""
+	for header, libResResult := range ctx.LibrariesResolutionResults {
 		if len(libResResult.NotUsedLibraries) == 0 {
 			continue
 		}
-		logger.Fprintln(os.Stdout, logLevel, tr("Multiple libraries were found for \"{0}\""), header)
-		logger.Fprintln(os.Stdout, logLevel, " "+tr("Used: {0}"), libResResult.Library.InstallDir)
+		res += fmt.Sprintln(tr(`Multiple libraries were found for "%[1]s"`, header))
+		res += fmt.Sprintln("  " + tr("Used: %[1]s", libResResult.Library.InstallDir))
 		for _, notUsedLibrary := range libResResult.NotUsedLibraries {
-			logger.Fprintln(os.Stdout, logLevel, " "+tr("Not used: {0}"), notUsedLibrary.InstallDir)
+			res += fmt.Sprintln("  " + tr("Not used: %[1]s", notUsedLibrary.InstallDir))
 		}
 	}
-
+	res = strings.TrimSpace(res)
+	if s.SketchError {
+		ctx.Warn(res)
+	} else {
+		ctx.Info(res)
+	}
 	time.Sleep(100 * time.Millisecond)
-
 	return nil
 }

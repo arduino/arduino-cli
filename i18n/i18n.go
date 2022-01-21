@@ -19,14 +19,10 @@ package i18n
 // 1. Locale specified via the function call
 // 2. OS Locale
 // 3. en (default)
-func Init(configLocale ...string) {
+func Init(configLocale string) {
 	locales := supportedLocales()
-	if len(configLocale) > 1 {
-		panic("Multiple arguments not supported")
-	}
-
-	if len(configLocale) > 0 && configLocale[0] != "" {
-		if locale := findMatchingLocale(configLocale[0], locales); locale != "" {
+	if configLocale != "" {
+		if locale := findMatchingLocale(configLocale, locales); locale != "" {
 			setLocale(locale)
 			return
 		}

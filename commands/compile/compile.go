@@ -33,7 +33,6 @@ import (
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder"
-	legacyi18n "github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/metrics"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -167,12 +166,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.USBVidPid = req.GetVidPid()
 	builderCtx.WarningsLevel = req.GetWarnings()
 
-	if debug {
-		builderCtx.DebugLevel = 100
-	} else {
-		builderCtx.DebugLevel = 5
-	}
-
 	builderCtx.CustomBuildProperties = append(req.GetBuildProperties(), "build.warn_data_percentage=75")
 
 	if req.GetBuildCachePath() != "" {
@@ -205,9 +198,8 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		builderCtx.BuiltInLibrariesDirs = paths.NewPathList(ideLibrariesPath)
 	}
 
-	builderCtx.ExecStdout = outStream
-	builderCtx.ExecStderr = errStream
-	builderCtx.SetLogger(&legacyi18n.LoggerToCustomStreams{Stdout: outStream, Stderr: errStream})
+	builderCtx.Stdout = outStream
+	builderCtx.Stderr = errStream
 	builderCtx.Clean = req.GetClean()
 	builderCtx.OnlyUpdateCompilationDatabase = req.GetCreateCompilationDatabaseOnly()
 

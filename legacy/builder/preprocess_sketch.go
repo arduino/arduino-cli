@@ -144,6 +144,6 @@ func (s *OutputCodeCompletions) Run(ctx *types.Context) error {
 		// we assume it is a json, let's make it compliant at least
 		ctx.CodeCompletions = "[]"
 	}
-	ctx.GetLogger().Println(constants.LOG_LEVEL_INFO, ctx.CodeCompletions)
+	fmt.Fprintln(ctx.Stdout, ctx.CodeCompletions)
 	return nil
 }

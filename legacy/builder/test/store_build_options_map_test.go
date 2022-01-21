@@ -36,7 +36,6 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 		ArduinoAPIVersion:     "ideVersion",
 		CustomBuildProperties: []string{"custom=prop"},
 		Verbose:               true,
-		DebugLevel:            5,
 		OptimizationFlags:     "-Os",
 	}
 

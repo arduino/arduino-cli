@@ -30,6 +30,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 var tr = i18n.Tr
@@ -215,7 +216,6 @@ func compileFilesWithRecipe(ctx *types.Context, sourcePath *paths.Path, sources 
 }
 
 func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *paths.Path, buildPath *paths.Path, buildProperties *properties.Map, includes []string, recipe string) (*paths.Path, error) {
-	logger := ctx.GetLogger()
 	properties := buildProperties.Clone()
 	properties.Set(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel))
 	properties.Set(constants.BUILD_PROPERTIES_INCLUDES, strings.Join(includes, constants.SPACE))
@@ -251,9 +251,9 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 		}
 	} else if ctx.Verbose {
 		if objIsUpToDate {
-			logger.Println(constants.LOG_LEVEL_INFO, tr("Using previously compiled file: {0}"), objectFile)
+			ctx.Info(tr("Using previously compiled file: %[1]s", objectFile))
 		} else {
-			logger.Println("info", tr("Skipping compile of: {0}"), objectFile)
+			ctx.Info(tr("Skipping compile of: %[1]s", objectFile))
 		}
 	}
 
@@ -261,15 +261,9 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 }
 
 func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFile *paths.Path) (bool, error) {
-	logger := ctx.GetLogger()
-	debugLevel := ctx.DebugLevel
-	if debugLevel >= 20 {
-		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("Checking previous results for {0} (result = {1}, dep = {2})"), sourceFile, objectFile, dependencyFile)
-	}
+	logrus.Debugf("Checking previous results for %v (result = %v, dep = %v)", sourceFile, objectFile, dependencyFile)
 	if objectFile == nil || dependencyFile == nil {
-		if debugLevel >= 20 {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("Not found: nil"))
-		}
+		logrus.Debugf("Not found: nil")
 		return false, nil
 	}
 
@@ -283,9 +277,7 @@ func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFil
 	objectFileStat, err := objectFile.Stat()
 	if err != nil {
 		if os.IsNotExist(err) {
-			if debugLevel >= 20 {
-				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("Not found: {0}"), objectFile)
-			}
+			logrus.Debugf("Not found: %v", objectFile)
 			return false, nil
 		} else {
 			return false, errors.WithStack(err)
@@ -296,9 +288,7 @@ func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFil
 	dependencyFileStat, err := dependencyFile.Stat()
 	if err != nil {
 		if os.IsNotExist(err) {
-			if debugLevel >= 20 {
-				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("Not found: {0}"), dependencyFile)
-			}
+			logrus.Debugf("Not found: %v", dependencyFile)
 			return false, nil
 		} else {
 			return false, errors.WithStack(err)
@@ -306,15 +296,11 @@ func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFil
 	}
 
 	if sourceFileStat.ModTime().After(objectFileStat.ModTime()) {
-		if debugLevel >= 20 {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("{0} newer than {1}"), sourceFile, objectFile)
-		}
+		logrus.Debugf("%v newer than %v", sourceFile, objectFile)
 		return false, nil
 	}
 	if sourceFileStat.ModTime().After(dependencyFileStat.ModTime()) {
-		if debugLevel >= 20 {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("{0} newer than {1}"), sourceFile, dependencyFile)
-		}
+		logrus.Debugf("%v newer than %v", sourceFile, dependencyFile)
 		return false, nil
 	}
 
@@ -334,16 +320,12 @@ func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFil
 
 	firstRow := rows[0]
 	if !strings.HasSuffix(firstRow, ":") {
-		if debugLevel >= 20 {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("No colon in first line of depfile"))
-		}
+		logrus.Debugf("No colon in first line of depfile")
 		return false, nil
 	}
 	objFileInDepFile := firstRow[:len(firstRow)-1]
 	if objFileInDepFile != objectFile.String() {
-		if debugLevel >= 20 {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("Depfile is about different file: {0}"), objFileInDepFile)
-		}
+		logrus.Debugf("Depfile is about different file: %v", objFileInDepFile)
 		return false, nil
 	}
 
@@ -363,22 +345,15 @@ func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFil
 		if err != nil && !os.IsNotExist(err) {
 			// There is probably a parsing error of the dep file
 			// Ignore the error and trigger a full rebuild anyway
-			if debugLevel >= 20 {
-				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("Failed to read: {0}"), row)
-				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, err.Error())
-			}
+			logrus.WithError(err).Debugf("Failed to read: %v", row)
 			return false, nil
 		}
 		if os.IsNotExist(err) {
-			if debugLevel >= 20 {
-				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("Not found: {0}"), row)
-			}
+			logrus.Debugf("Not found: %v", row)
 			return false, nil
 		}
 		if depStat.ModTime().After(objectFileStat.ModTime()) {
-			if debugLevel >= 20 {
-				logger.Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, tr("{0} newer than {1}"), row, objectFile)
-			}
+			logrus.Debugf("%v newer than %v", row, objectFile)
 			return false, nil
 		}
 	}
@@ -455,12 +430,11 @@ func TXTBuildRulesHaveChanged(corePath, targetCorePath, targetFile *paths.Path) 
 }
 
 func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile *paths.Path, objectFilesToArchive paths.PathList, buildProperties *properties.Map) (*paths.Path, error) {
-	logger := ctx.GetLogger()
 	archiveFilePath := buildPath.JoinPath(archiveFile)
 
 	if ctx.OnlyUpdateCompilationDatabase {
 		if ctx.Verbose {
-			logger.Println("info", tr("Skipping archive creation of: {0}"), archiveFilePath)
+			ctx.Info(tr("Skipping archive creation of: %[1]s", archiveFilePath))
 		}
 		return archiveFilePath, nil
 	}
@@ -483,7 +457,7 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 			}
 		} else {
 			if ctx.Verbose {
-				logger.Println(constants.LOG_LEVEL_INFO, tr("Using previously compiled file: {0}"), archiveFilePath)
+				ctx.Info(tr("Using previously compiled file: %[1]s", archiveFilePath))
 			}
 			return archiveFilePath, nil
 		}
@@ -514,7 +488,7 @@ const COMMANDLINE_LIMIT = 30000
 func PrepareCommandForRecipe(buildProperties *properties.Map, recipe string, removeUnsetProperties bool) (*exec.Cmd, error) {
 	pattern := buildProperties.Get(recipe)
 	if pattern == "" {
-		return nil, errors.Errorf(tr("%s pattern is missing"), recipe)
+		return nil, errors.Errorf(tr("%[1]s pattern is missing"), recipe)
 	}
 
 	commandLine := buildProperties.ExpandPropsInString(pattern)

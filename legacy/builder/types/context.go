@@ -16,9 +16,13 @@
 package types
 
 import (
+	"fmt"
 	"io"
+	"os"
 	"strings"
+	"sync"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -27,7 +31,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -150,10 +153,6 @@ type Context struct {
 	// Contents of a custom build properties file (line by line)
 	CustomBuildProperties []string
 
-	// Logging
-	logger     i18n.Logger
-	DebugLevel int
-
 	// Reuse old tools since the backing storage didn't change
 	CanUseCachedTools bool
 
@@ -163,9 +162,10 @@ type Context struct {
 	// Parallel processes
 	Jobs int
 
-	// Out and Err stream to redirect all Exec commands
-	ExecStdout io.Writer
-	ExecStderr io.Writer
+	// Out and Err stream to redirect all output
+	Stdout  io.Writer
+	Stderr  io.Writer
+	stdLock sync.Mutex
 
 	// Sizer results
 	ExecutableSectionsSize ExecutablesFileSections
@@ -238,7 +238,7 @@ func (ctx *Context) InjectBuildOptions(opts *properties.Map) {
 	ctx.SketchLocation = opts.GetPath("sketchLocation")
 	fqbn, err := cores.ParseFQBN(opts.Get("fqbn"))
 	if err != nil {
-		i18n.ErrorfWithLogger(ctx.GetLogger(), tr("Error in FQBN: %s"), err)
+		fmt.Fprintln(ctx.Stderr, &arduino.InvalidFQBNError{Cause: err})
 	}
 	ctx.FQBN = fqbn
 	ctx.ArduinoAPIVersion = opts.Get("runtime.ide.version")
@@ -246,19 +246,28 @@ func (ctx *Context) InjectBuildOptions(opts *properties.Map) {
 	ctx.OptimizationFlags = opts.Get("compiler.optimization_flags")
 }
 
-func (ctx *Context) GetLogger() i18n.Logger {
-	if ctx.logger == nil {
-		return &i18n.HumanLogger{}
-	}
-	return ctx.logger
-}
-
-func (ctx *Context) SetLogger(l i18n.Logger) {
-	ctx.logger = l
-}
-
 func (ctx *Context) PushProgress() {
 	if ctx.ProgressCB != nil {
 		ctx.ProgressCB(&rpc.TaskProgress{Percent: ctx.Progress.Progress})
 	}
+}
+
+func (ctx *Context) Info(msg string) {
+	ctx.stdLock.Lock()
+	if ctx.Stdout == nil {
+		fmt.Fprintln(os.Stdout, msg)
+	} else {
+		fmt.Fprintln(ctx.Stdout, msg)
+	}
+	ctx.stdLock.Unlock()
+}
+
+func (ctx *Context) Warn(msg string) {
+	ctx.stdLock.Lock()
+	if ctx.Stderr == nil {
+		fmt.Fprintln(os.Stderr, msg)
+	} else {
+		fmt.Fprintln(ctx.Stderr, msg)
+	}
+	ctx.stdLock.Unlock()
 }
