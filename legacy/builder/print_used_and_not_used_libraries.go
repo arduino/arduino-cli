@@ -17,6 +17,7 @@ package builder
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -47,7 +48,7 @@ func (s *PrintUsedAndNotUsedLibraries) Run(ctx *types.Context) error {
 			res += fmt.Sprintln("  " + tr("Not used: %[1]s", notUsedLibrary.InstallDir))
 		}
 	}
-
+	res = strings.TrimSpace(res)
 	if s.SketchError {
 		ctx.Warn(res)
 	} else {
