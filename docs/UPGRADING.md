@@ -32,21 +32,19 @@ The `parseArch` parameter was removed since it was unused and was always true. T
 always parsed by the function. Furthermore the function now should also correctly interpret `packager:arch` spelled with
 the wrong casing.
 
-### `github.com/arduino/arduino-cli/i18n.Init(...)` now takes only one argument
+### `github.com/arduino/arduino-cli/i18n.Init(...)` now requires an empty string to be passed for autodetection of locale
 
-The signature of the function changed from:
+For automated detection of locale, change the call from:
 
 ```go
-func Init(configLocale ...string) {
+i18n.Init()
 ```
 
 to
 
 ```go
-func Init(configLocale string) {
+i18n.Init("")
 ```
-
-If any extra argument was passed it can be safely removed since it was previously ignored.
 
 ### `github.com/arduino/arduino-cli/legacy/i18n` module has been removed (in particular the `i18n.Logger`)
 
