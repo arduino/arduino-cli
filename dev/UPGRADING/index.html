@@ -305,6 +305,20 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-clii18ninit-now-requires-an-empty-string-to-be-passed-for-autodetection-of-locale" class="md-nav__link">
+    github.com/arduino/arduino-cli/i18n.Init(...) now requires an empty string to be passed for autodetection of locale
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-clilegacyi18n-module-has-been-removed-in-particular-the-i18nlogger" class="md-nav__link">
+    github.com/arduino/arduino-cli/legacy/i18n module has been removed (in particular the i18n.Logger)
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1638,6 +1652,20 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-clii18ninit-now-requires-an-empty-string-to-be-passed-for-autodetection-of-locale" class="md-nav__link">
+    github.com/arduino/arduino-cli/i18n.Init(...) now requires an empty string to be passed for autodetection of locale
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-clilegacyi18n-module-has-been-removed-in-particular-the-i18nlogger" class="md-nav__link">
+    github.com/arduino/arduino-cli/legacy/i18n module has been removed (in particular the i18n.Logger)
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1955,6 +1983,19 @@ always parsed by the function.</p>
 <p>The <code>parseArch</code> parameter was removed since it was unused and was always true. This means that the architecture gets
 always parsed by the function. Furthermore the function now should also correctly interpret <code>packager:arch</code> spelled with
 the wrong casing.</p>
+<h3 id="githubcomarduinoarduino-clii18ninit-now-requires-an-empty-string-to-be-passed-for-autodetection-of-locale"><code>github.com/arduino/arduino-cli/i18n.Init(...)</code> now requires an empty string to be passed for autodetection of locale<a class="headerlink" href="#githubcomarduinoarduino-clii18ninit-now-requires-an-empty-string-to-be-passed-for-autodetection-of-locale" title="Permanent link">&para;</a></h3>
+<p>For automated detection of locale, change the call from:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">i18n</span><span class="p">.</span><span class="nx">Init</span><span class="p">()</span>
+</code></pre></div>
+<p>to</p>
+<div class="highlight"><pre><span></span><code><span class="nx">i18n</span><span class="p">.</span><span class="nx">Init</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="githubcomarduinoarduino-clilegacyi18n-module-has-been-removed-in-particular-the-i18nlogger"><code>github.com/arduino/arduino-cli/legacy/i18n</code> module has been removed (in particular the <code>i18n.Logger</code>)<a class="headerlink" href="#githubcomarduinoarduino-clilegacyi18n-module-has-been-removed-in-particular-the-i18nlogger" title="Permanent link">&para;</a></h3>
+<p>The <code>i18n.Logger</code> is no longer available. It was mainly used in the legacy builder struct field <code>Context.Logger</code>.</p>
+<p>The <code>Context.Logger</code> field has been replaced with plain <code>io.Writer</code> fields <code>Contex.Stdout</code> and <code>Context.Stderr</code>. All
+existing logger functionality has been dropped, for example the Java-Style formatting with tags like <code>{0} {1}...</code> must
+be replaced with one of the equivalent golang printf-based alternatives and logging levels must be replaced with direct
+writes to <code>Stdout</code> or <code>Stderr</code>.</p>
 <h2 id="0200">0.20.0<a class="headerlink" href="#0200" title="Permanent link">&para;</a></h2>
 <h3 id="board-details-arguments-change"><code>board details</code> arguments change<a class="headerlink" href="#board-details-arguments-change" title="Permanent link">&para;</a></h3>
 <p>The <code>board details</code> command now accepts only the <code>--fqbn</code> or <code>-b</code> flags to specify the FQBN.</p>
