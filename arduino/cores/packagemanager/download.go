@@ -96,14 +96,23 @@ func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReferenc
 		return nil, nil, fmt.Errorf(tr("getting tool dependencies for platform %[1]s: %[2]s"), release.String(), err)
 	}
 
-	// discovery dependencies differ from normal tool since we always want to use the latest \
+	// discovery dependencies differ from normal tool since we always want to use the latest
 	// available version for the platform package
 	discoveryDependencies, err := pm.Packages.GetPlatformReleaseDiscoveryDependencies(release)
 	if err != nil {
 		return nil, nil, fmt.Errorf(tr("getting discovery dependencies for platform %[1]s: %[2]s"), release.String(), err)
 	}
+	toolDeps = append(toolDeps, discoveryDependencies...)
 
-	return release, append(toolDeps, discoveryDependencies...), nil
+	// monitor dependencies differ from normal tool since we always want to use the latest
+	// available version for the platform package
+	monitorDependencies, err := pm.Packages.GetPlatformReleaseMonitorDependencies(release)
+	if err != nil {
+		return nil, nil, fmt.Errorf(tr("getting monitor dependencies for platform %[1]s: %[2]s"), release.String(), err)
+	}
+	toolDeps = append(toolDeps, monitorDependencies...)
+
+	return release, toolDeps, nil
 }
 
 // DownloadToolRelease downloads a ToolRelease. If the tool is already downloaded a nil Downloader
