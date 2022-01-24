@@ -1653,14 +1653,16 @@ that can be referenced from <code>platform.txt</code> using one of the following
 <li><code>toolsDependencies</code>: the tools needed by this platform. They will be installed by Boards Manager along with the
   platform. Each tool is referenced by the triple (<code>packager</code>, <code>name</code>, <code>version</code>) as previously said. Note that you can
   reference tools available in other packages as well, even if no platform of that package is installed.</li>
-<li><code>discoveryDependencies</code>: the Pluggable Discoveries needed by this platform. Each discovery is referenced by the pair
-  (<code>packager</code>, <code>name</code>), the <code>version</code> is not specified because the latest installed discovery tool will always be used.
-  Like <code>toolsDependencies</code> they will be installed by Boards Manager along with the platform and can reference tools
-  available in other packages as well, even if no platform of that package is installed.</li>
-<li><code>monitorDependencies</code>: the Pluggable Monitors needed by this platform. Each monitor is referenced by the pair
-  (<code>packager</code>, <code>name</code>), the <code>version</code> is not specified because the latest installed monitor tool will always be used.
-  Like <code>toolsDependencies</code> they will be installed by Boards Manager along with the platform and can reference tools
-  available in other packages as well, even if no platform of that package is installed.</li>
+<li><code>discoveryDependencies</code>: the Pluggable Discoveries needed by this platform. These are <a href="#tools-definitions">tools</a>,
+  defined exactly like the ones referenced in <code>toolsDependencies</code>. Unlike <code>toolsDependencies</code>, discoveries are
+  referenced by the pair (<code>packager</code>, <code>name</code>). The <code>version</code> is not specified because the latest installed discovery
+  tool will always be used. Like <code>toolsDependencies</code> they will be installed by Boards Manager along with the platform
+  and can reference tools available in other packages as well, even if no platform of that package is installed.</li>
+<li><code>monitorDependencies</code>: the Pluggable Monitors needed by this platform. These are <a href="#tools-definitions">tools</a>, defined
+  exactly like the ones referenced in <code>toolsDependencies</code>. Unlike <code>toolsDependencies</code>, monitors are referenced by the
+  pair (<code>packager</code>, <code>name</code>). The <code>version</code> is not specified because the latest installed monitor tool will always be
+  used. Like <code>toolsDependencies</code> they will be installed by Boards Manager along with the platform and can reference
+  tools available in other packages as well, even if no platform of that package is installed.</li>
 </ul>
 <p>The <code>version</code> field is validated by both Arduino IDE and <a href="https://github.com/zafarkhaja/jsemver">JSemVer</a>. Here are the
 rules Arduino IDE follows for parsing versions
