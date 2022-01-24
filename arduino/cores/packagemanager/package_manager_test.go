@@ -443,6 +443,16 @@ func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 	require.Len(t, tools, 6)
 }
 
+func TestFindPlatformReleaseDependencies(t *testing.T) {
+	pm := packagemanager.NewPackageManager(nil, nil, nil, nil)
+	pm.LoadPackageIndexFromFile(paths.New("testdata", "package_tooltest_index.json"))
+	pl, tools, err := pm.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{Package: "test", PlatformArchitecture: "avr"})
+	require.NoError(t, err)
+	require.NotNil(t, pl)
+	require.Len(t, tools, 3)
+	require.Equal(t, "[test:some-tool@0.42.0 test:discovery-tool@0.42.0 test:monitor-tool@0.42.0]", fmt.Sprint(tools))
+}
+
 func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 	// Pass nil, since these paths are only used for installing
 	pm := packagemanager.NewPackageManager(nil, nil, nil, nil)
