@@ -1,14 +1,13 @@
 # 
 # Translators:
-# Juan Felipe Giraldo <juanfegiraldo97@gmail.com>, 2021
-# William Cabrera <cabrerawilliam@gmail.com>, 2021
+# Dmitrij, 2022
 # 
 msgid ""
 msgstr ""
-"Last-Translator: William Cabrera <cabrerawilliam@gmail.com>, 2021\n"
-"Language-Team: Spanish (https://www.transifex.com/arduino-1/teams/108174/es/)\n"
-"Language: es\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Last-Translator: Dmitrij, 2022\n"
+"Language-Team: Russian (https://www.transifex.com/arduino-1/teams/108174/ru/)\n"
+"Language: ru\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #: version/version.go:53
 msgid "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
