@@ -49,9 +49,12 @@ func initDownloadCommand() *cobra.Command {
 }
 
 func runDownloadCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli lib download`")
-	refs, err := ParseLibraryReferenceArgsAndAdjustCase(instance, args)
+
+	instance.Init()
+	instance := instance.Get()
+
+	refs, err := ParseLibraryReferenceArgsAndAdjustCase(instance.ToRPC(), args)
 	if err != nil {
 		feedback.Errorf(tr("Invalid argument passed: %v"), err)
 		os.Exit(errorcodes.ErrBadArgument)
@@ -59,7 +62,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 
 	for _, library := range refs {
 		libraryDownloadRequest := &rpc.LibraryDownloadRequest{
-			Instance: instance,
+			Instance: instance.ToRPC(),
 			Name:     library.Name,
 			Version:  library.Version,
 		}

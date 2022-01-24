@@ -58,7 +58,8 @@ func initInstallCommand() *cobra.Command {
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
+	instance.Init()
+	inst := instance.Get()
 	logrus.Info("Executing `arduino-cli core install`")
 
 	platformsRefs, err := arguments.ParseReferences(args)
@@ -69,7 +70,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 
 	for _, platformRef := range platformsRefs {
 		platformInstallRequest := &rpc.PlatformInstallRequest{
-			Instance:        inst,
+			Instance:        inst.ToRPC(),
 			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,

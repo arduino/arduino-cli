@@ -53,7 +53,8 @@ func initAttachCommand() *cobra.Command {
 }
 
 func runAttachCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateAndInit()
+	instance.Init()
+	instance := instance.Get()
 
 	logrus.Info("Executing `arduino-cli board attach`")
 
@@ -66,14 +67,14 @@ func runAttachCommand(cmd *cobra.Command, args []string) {
 	// ugly hack to allow user to specify fqbn and port as flags (consistency)
 	// a more meaningful fix would be to fix board.Attach
 	var boardURI string
-	discoveryPort, _ := port.GetPort(instance, nil)
+	discoveryPort, _ := port.GetPort(instance.ToRPC(), nil)
 	if fqbn.String() != "" {
 		boardURI = fqbn.String()
 	} else if discoveryPort != nil {
 		boardURI = discoveryPort.Address
 	}
 	if _, err := board.Attach(context.Background(), &rpc.BoardAttachRequest{
-		Instance:      instance,
+		Instance:      instance.ToRPC(),
 		BoardUri:      boardURI,
 		SketchPath:    sketchPath.String(),
 		SearchTimeout: port.GetSearchTimeout().String(),

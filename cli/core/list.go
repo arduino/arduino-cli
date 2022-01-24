@@ -49,11 +49,13 @@ func initListCommand() *cobra.Command {
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli core list`")
 
+	instance.Init()
+	inst := instance.Get()
+
 	platforms, err := core.GetPlatforms(&rpc.PlatformListRequest{
-		Instance:      inst,
+		Instance:      inst.ToRPC(),
 		UpdatableOnly: updatableOnly,
 		All:           all,
 	})

@@ -27,7 +27,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/sirupsen/logrus"
 
@@ -117,17 +116,17 @@ func NewCommand() *cobra.Command {
 	compileCommand.Flags().StringVar(&sourceOverrides, "source-override", "", tr("Optional. Path to a .json file that contains a set of replacements of the sketch source code."))
 	compileCommand.Flag("source-override").Hidden = true
 
-	configuration.Settings.BindPFlag("sketch.always_export_binaries", compileCommand.Flags().Lookup("export-binaries"))
-
 	compileCommand.Flags().MarkDeprecated("build-properties", tr("please use --build-property instead."))
 
 	return compileCommand
 }
 
 func runCompileCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
-
 	logrus.Info("Executing `arduino-cli compile`")
+
+	instance.Init()
+	inst := instance.Get()
+	inst.Settings.BindPFlag("sketch.always_export_binaries", cmd.Flags().Lookup("export-binaries"))
 
 	path := ""
 	if len(args) > 0 {
@@ -161,10 +160,10 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	// using board autodetection.
 	if detectedFqbn == "" && uploadAfterCompile {
 		sk = arguments.NewSketch(sketchPath)
-		discoveryPort = port.GetDiscoveryPort(inst, sk)
+		discoveryPort = port.GetDiscoveryPort(inst.ToRPC(), sk)
 		rpcPort := discoveryPort.ToRPC()
 		var err error
-		pm := commands.GetPackageManager(inst.Id)
+		pm := commands.GetPackageManager(inst.ID())
 		detectedFqbn, err = upload.DetectConnectedBoard(pm, rpcPort.Address, rpcPort.Protocol)
 		if err != nil {
 			feedback.Errorf(tr("Error during FQBN detection: %v", err))
@@ -173,7 +172,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	}
 
 	compileRequest := &rpc.CompileRequest{
-		Instance:                      inst,
+		Instance:                      inst.ToRPC(),
 		Fqbn:                          detectedFqbn,
 		SketchPath:                    sketchPath.String(),
 		ShowProperties:                showProperties,
@@ -195,7 +194,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	}
 	compileStdOut := new(bytes.Buffer)
 	compileStdErr := new(bytes.Buffer)
-	verboseCompile := configuration.Settings.GetString("logging.level") == "debug"
+	verboseCompile := inst.Settings.GetString("logging.level") == "debug"
 	var compileRes *rpc.CompileResponse
 	var compileError error
 	if output.OutputFormat == "json" {
@@ -209,11 +208,11 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			sk = arguments.NewSketch(sketchPath)
 		}
 		if discoveryPort == nil {
-			discoveryPort = port.GetDiscoveryPort(inst, sk)
+			discoveryPort = port.GetDiscoveryPort(inst.ToRPC(), sk)
 		}
 
 		userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
-			Instance: inst,
+			Instance: inst.ToRPC(),
 			Fqbn:     fqbn.String(),
 			Address:  discoveryPort.Address,
 			Protocol: discoveryPort.Protocol,
@@ -230,7 +229,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		}
 
 		uploadRequest := &rpc.UploadRequest{
-			Instance:   inst,
+			Instance:   inst.ToRPC(),
 			Fqbn:       detectedFqbn,
 			SketchPath: sketchPath.String(),
 			Port:       discoveryPort.ToRPC(),

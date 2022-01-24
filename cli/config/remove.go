@@ -21,7 +21,7 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -53,8 +53,10 @@ func runRemoveCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
+	instance.Init()
+	inst := instance.Get()
 	mappedValues := map[string]bool{}
-	for _, v := range configuration.Settings.GetStringSlice(key) {
+	for _, v := range inst.Settings.GetStringSlice(key) {
 		mappedValues[v] = true
 	}
 	for _, arg := range args[1:] {
@@ -64,9 +66,9 @@ func runRemoveCommand(cmd *cobra.Command, args []string) {
 	for k := range mappedValues {
 		values = append(values, k)
 	}
-	configuration.Settings.Set(key, values)
+	inst.Settings.Set(key, values)
 
-	if err := configuration.Settings.WriteConfig(); err != nil {
+	if err := inst.Settings.WriteConfig(); err != nil {
 		feedback.Errorf(tr("Can't write config file: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}

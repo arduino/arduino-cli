@@ -51,11 +51,13 @@ func NewCommand() *cobra.Command {
 }
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli upgrade`")
 
+	instance.Init()
+	inst := instance.Get()
+
 	err := commands.Upgrade(context.Background(), &rpc.UpgradeRequest{
-		Instance:        inst,
+		Instance:        inst.ToRPC(),
 		SkipPostInstall: postInstallFlags.DetectSkipPostInstallValue(),
 	}, output.NewDownloadProgressBarCB(), output.TaskProgress())
 

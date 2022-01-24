@@ -16,10 +16,11 @@ import (
 // It returns a list of fqbn
 // it's taken from cli/board/listall.go
 func GetInstalledBoards() []string {
-	inst := instance.CreateAndInit()
+	instance.Init()
+	inst := instance.Get()
 
 	list, _ := board.ListAll(context.Background(), &rpc.BoardListAllRequest{
-		Instance:            inst,
+		Instance:            inst.ToRPC(),
 		SearchArgs:          nil,
 		IncludeHiddenBoards: false,
 	})
@@ -34,8 +35,9 @@ func GetInstalledBoards() []string {
 // GetInstalledProtocols is an helper function useful to autocomplete.
 // It returns a list of protocols available based on the installed boards
 func GetInstalledProtocols() []string {
-	inst := instance.CreateAndInit()
-	pm := commands.GetPackageManager(inst.Id)
+	instance.Init()
+	inst := instance.Get()
+	pm := commands.GetPackageManager(inst.ID())
 	boards := pm.InstalledBoards()
 
 	installedProtocols := make(map[string]struct{})
@@ -62,12 +64,13 @@ func GetInstalledProtocols() []string {
 // GetInstalledProgrammers is an helper function useful to autocomplete.
 // It returns a list of programmers available based on the installed boards
 func GetInstalledProgrammers() []string {
-	inst := instance.CreateAndInit()
-	pm := commands.GetPackageManager(inst.Id)
+	instance.Init()
+	inst := instance.Get()
+	pm := commands.GetPackageManager(inst.ID())
 
 	// we need the list of the available fqbn in order to get the list of the programmers
 	list, _ := board.ListAll(context.Background(), &rpc.BoardListAllRequest{
-		Instance:            inst,
+		Instance:            inst.ToRPC(),
 		SearchArgs:          nil,
 		IncludeHiddenBoards: false,
 	})
@@ -93,10 +96,11 @@ func GetInstalledProgrammers() []string {
 // GetUninstallableCores is an helper function useful to autocomplete.
 // It returns a list of cores which can be uninstalled
 func GetUninstallableCores() []string {
-	inst := instance.CreateAndInit()
+	instance.Init()
+	inst := instance.Get()
 
 	platforms, _ := core.GetPlatforms(&rpc.PlatformListRequest{
-		Instance:      inst,
+		Instance:      inst.ToRPC(),
 		UpdatableOnly: false,
 		All:           false,
 	})
@@ -111,10 +115,11 @@ func GetUninstallableCores() []string {
 // GetInstallableCores is an helper function useful to autocomplete.
 // It returns a list of cores which can be installed/downloaded
 func GetInstallableCores() []string {
-	inst := instance.CreateAndInit()
+	instance.Init()
+	inst := instance.Get()
 
 	platforms, _ := core.PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
+		Instance:    inst.ToRPC(),
 		SearchArgs:  "",
 		AllVersions: false,
 	})
@@ -139,9 +144,11 @@ func GetUninstallableLibraries() []string {
 }
 
 func getLibraries(all bool) []string {
-	inst := instance.CreateAndInit()
+	instance.Init()
+	inst := instance.Get()
+
 	libs, _ := lib.LibraryList(context.Background(), &rpc.LibraryListRequest{
-		Instance:  inst,
+		Instance:  inst.ToRPC(),
 		All:       all,
 		Updatable: false,
 		Name:      "",
@@ -158,10 +165,11 @@ func getLibraries(all bool) []string {
 // GetInstallableLibs is an helper function useful to autocomplete.
 // It returns a list of libs which can be installed/downloaded
 func GetInstallableLibs() []string {
-	inst := instance.CreateAndInit()
+	instance.Init()
+	inst := instance.Get()
 
 	libs, _ := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
-		Instance: inst,
+		Instance: inst.ToRPC(),
 		Query:    "", // if no query is specified all the libs are returned
 	})
 	var res []string
@@ -176,10 +184,11 @@ func GetInstallableLibs() []string {
 // It returns a list of boards which are currently connected
 // Obviously it does not suggests network ports because of the timeout
 func GetConnectedBoards() []string {
-	inst := instance.CreateAndInit()
+	instance.Init()
+	inst := instance.Get()
 
 	list, _ := board.List(&rpc.BoardListRequest{
-		Instance: inst,
+		Instance: inst.ToRPC(),
 	})
 	var res []string
 	// transform the data structure for the completion

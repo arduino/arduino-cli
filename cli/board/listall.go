@@ -51,12 +51,13 @@ for a specific board if you specify the board name`),
 
 // runListAllCommand list all installed boards
 func runListAllCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
+	instance.Init()
+	inst := instance.Get()
 
 	logrus.Info("Executing `arduino-cli board listall`")
 
 	list, err := board.ListAll(context.Background(), &rpc.BoardListAllRequest{
-		Instance:            inst,
+		Instance:            inst.ToRPC(),
 		SearchArgs:          args,
 		IncludeHiddenBoards: showHiddenBoard,
 	})

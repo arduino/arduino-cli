@@ -52,29 +52,24 @@ func initSearchCommand() *cobra.Command {
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
-	inst, status := instance.Create()
 	logrus.Info("Executing `arduino-cli lib search`")
 
-	if status != nil {
-		feedback.Errorf(tr("Error creating instance: %v"), status)
-		os.Exit(errorcodes.ErrGeneric)
-	}
+	instance.Init()
+	inst := instance.Get()
 
 	if err := commands.UpdateLibrariesIndex(
 		context.Background(),
-		&rpc.UpdateLibrariesIndexRequest{Instance: inst},
+		&rpc.UpdateLibrariesIndexRequest{Instance: inst.ToRPC()},
 		output.ProgressBar(),
 	); err != nil {
 		feedback.Errorf(tr("Error updating library index: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	for _, err := range instance.Init(inst) {
-		feedback.Errorf(tr("Error initializing instance: %v"), err)
-	}
+	instance.Init()
 
 	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
-		Instance: inst,
+		Instance: inst.ToRPC(),
 		Query:    (strings.Join(args, " ")),
 	})
 	if err != nil {

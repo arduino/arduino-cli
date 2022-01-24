@@ -19,7 +19,7 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
@@ -39,7 +39,8 @@ func initDumpCommand() *cobra.Command {
 
 func runDumpCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli config dump`")
-	feedback.PrintResult(dumpResult{configuration.Settings.AllSettings()})
+	instance.Init()
+	feedback.PrintResult(dumpResult{instance.Get().Settings.AllSettings()})
 }
 
 // output from this command requires special formatting, let's create a dedicated

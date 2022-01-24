@@ -50,13 +50,15 @@ func initUpgradeCommand() *cobra.Command {
 }
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli core upgrade`")
+
+	instance.Init()
+	inst := instance.Get()
 
 	// if no platform was passed, upgrade allthethings
 	if len(args) == 0 {
 		targets, err := core.GetPlatforms(&rpc.PlatformListRequest{
-			Instance:      inst,
+			Instance:      inst.ToRPC(),
 			UpdatableOnly: true,
 		})
 		if err != nil {
@@ -90,7 +92,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 		}
 
 		r := &rpc.PlatformUpgradeRequest{
-			Instance:        inst,
+			Instance:        inst.ToRPC(),
 			PlatformPackage: platformRef.PackageName,
 			Architecture:    platformRef.Architecture,
 			SkipPostInstall: postInstallFlags.DetectSkipPostInstallValue(),

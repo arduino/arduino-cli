@@ -22,7 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -40,7 +40,11 @@ func initSetCommand() *cobra.Command {
 		Args: cobra.MinimumNArgs(2),
 		Run:  runSetCommand,
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return configuration.Settings.AllKeys(), cobra.ShellCompDirectiveDefault
+			res := []string{}
+			for key := range validMap {
+				res = append(res, key)
+			}
+			return res, cobra.ShellCompDirectiveDefault
 		},
 	}
 	return setCommand
@@ -70,10 +74,12 @@ func runSetCommand(cmd *cobra.Command, args []string) {
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	}
+	instance.Init()
+	inst := instance.Get()
 
-	configuration.Settings.Set(key, value)
+	inst.Settings.Set(key, value)
 
-	if err := configuration.Settings.WriteConfig(); err != nil {
+	if err := inst.Settings.WriteConfig(); err != nil {
 		feedback.Errorf(tr("Writing config file: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}

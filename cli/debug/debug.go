@@ -67,8 +67,10 @@ func NewCommand() *cobra.Command {
 }
 
 func runDebugCommand(command *cobra.Command, args []string) {
-	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli debug`")
+
+	instance.Init()
+	instance := instance.Get()
 
 	path := ""
 	if len(args) > 0 {
@@ -77,10 +79,10 @@ func runDebugCommand(command *cobra.Command, args []string) {
 
 	sketchPath := arguments.InitSketchPath(path)
 	sk := arguments.NewSketch(sketchPath)
-	discoveryPort := port.GetDiscoveryPort(instance, sk)
+	discoveryPort := port.GetDiscoveryPort(instance.ToRPC(), sk)
 
 	debugConfigRequested := &dbg.DebugConfigRequest{
-		Instance:    instance,
+		Instance:    instance.ToRPC(),
 		Fqbn:        fqbn.String(),
 		SketchPath:  sketchPath.String(),
 		Port:        discoveryPort.ToRPC(),

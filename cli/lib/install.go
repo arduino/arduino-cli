@@ -28,7 +28,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
-	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -65,11 +64,13 @@ func initInstallCommand() *cobra.Command {
 }
 
 func runInstallCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli lib install`")
 
+	instance.Init()
+	instance := instance.Get()
+
 	if zipPath || gitURL {
-		if !configuration.Settings.GetBool("library.enable_unsafe_install") {
+		if !instance.Settings.GetBool("library.enable_unsafe_install") {
 			documentationURL := "https://arduino.github.io/arduino-cli/latest/configuration/#configuration-keys"
 			_, err := semver.Parse(globals.VersionInfo.VersionString)
 			if err == nil {
@@ -85,7 +86,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	if zipPath {
 		for _, path := range args {
 			err := lib.ZipLibraryInstall(context.Background(), &rpc.ZipLibraryInstallRequest{
-				Instance:  instance,
+				Instance:  instance.ToRPC(),
 				Path:      path,
 				Overwrite: true,
 			}, output.TaskProgress())
@@ -108,7 +109,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 				url = wd.String()
 			}
 			err := lib.GitLibraryInstall(context.Background(), &rpc.GitLibraryInstallRequest{
-				Instance:  instance,
+				Instance:  instance.ToRPC(),
 				Url:       url,
 				Overwrite: true,
 			}, output.TaskProgress())
@@ -120,7 +121,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	libRefs, err := ParseLibraryReferenceArgsAndAdjustCase(instance, args)
+	libRefs, err := ParseLibraryReferenceArgsAndAdjustCase(instance.ToRPC(), args)
 	if err != nil {
 		feedback.Errorf(tr("Arguments error: %v"), err)
 		os.Exit(errorcodes.ErrBadArgument)
@@ -128,7 +129,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 
 	for _, libRef := range libRefs {
 		libraryInstallRequest := &rpc.LibraryInstallRequest{
-			Instance: instance,
+			Instance: instance.ToRPC(),
 			Name:     libRef.Name,
 			Version:  libRef.Version,
 			NoDeps:   noDeps,

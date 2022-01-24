@@ -31,7 +31,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/arduino/go-paths-helper"
@@ -61,15 +60,11 @@ func initSearchCommand() *cobra.Command {
 const indexUpdateInterval = "24h"
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
-	inst, status := instance.Create()
-	if status != nil {
-		feedback.Errorf(tr("Error creating instance: %v"), status)
-		os.Exit(errorcodes.ErrGeneric)
-	}
+	inst := instance.Get()
 
-	if indexesNeedUpdating(indexUpdateInterval) {
+	if indexesNeedUpdating(inst, indexUpdateInterval) {
 		_, err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{
-			Instance: inst,
+			Instance: inst.ToRPC(),
 		}, output.ProgressBar())
 		if err != nil {
 			feedback.Errorf(tr("Error updating index: %v"), err)
@@ -77,15 +72,12 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	for _, err := range instance.Init(inst) {
-		feedback.Errorf(tr("Error initializing instance: %v"), err)
-	}
-
+	instance.Init()
 	arguments := strings.ToLower(strings.Join(args, " "))
 	logrus.Infof("Executing `arduino-cli core search` with args: '%s'", arguments)
 
 	resp, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
+		Instance:    inst.ToRPC(),
 		SearchArgs:  arguments,
 		AllVersions: allVersions,
 	})
@@ -129,8 +121,8 @@ func (sr searchResults) String() string {
 // used to update the indexes, if the duration is not valid a default
 // of 24 hours is used.
 // Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-func indexesNeedUpdating(duration string) bool {
-	indexpath := paths.New(configuration.Settings.GetString("directories.Data"))
+func indexesNeedUpdating(inst *commands.CoreInstance, duration string) bool {
+	indexpath := paths.New(inst.Settings.GetString("directories.Data"))
 
 	now := time.Now()
 	modTimeThreshold, err := time.ParseDuration(duration)
@@ -141,7 +133,7 @@ func indexesNeedUpdating(duration string) bool {
 	}
 
 	urls := []string{globals.DefaultIndexURL}
-	urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
+	urls = append(urls, inst.Settings.GetStringSlice("board_manager.additional_urls")...)
 	for _, u := range urls {
 		URL, err := utils.URLParse(u)
 		if err != nil {

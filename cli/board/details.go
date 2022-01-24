@@ -57,12 +57,13 @@ func initDetailsCommand() *cobra.Command {
 }
 
 func runDetailsCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
+	instance.Init()
+	inst := instance.Get()
 
 	logrus.Info("Executing `arduino-cli board details`")
 
 	res, err := board.Details(context.Background(), &rpc.BoardDetailsRequest{
-		Instance: inst,
+		Instance: inst.ToRPC(),
 		Fqbn:     fqbn.String(),
 	})
 

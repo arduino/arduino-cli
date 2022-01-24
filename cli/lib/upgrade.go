@@ -42,17 +42,19 @@ func initUpgradeCommand() *cobra.Command {
 }
 
 func runUpgradeCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli lib upgrade`")
 
+	instance.Init()
+	instance := instance.Get()
+
 	if len(args) == 0 {
-		err := lib.LibraryUpgradeAll(instance.Id, output.ProgressBar(), output.TaskProgress())
+		err := lib.LibraryUpgradeAll(instance.ID(), output.ProgressBar(), output.TaskProgress())
 		if err != nil {
 			feedback.Errorf(tr("Error upgrading libraries: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
 	} else {
-		err := lib.LibraryUpgrade(instance.Id, args, output.ProgressBar(), output.TaskProgress())
+		err := lib.LibraryUpgrade(instance.ID(), args, output.ProgressBar(), output.TaskProgress())
 		if err != nil {
 			feedback.Errorf(tr("Error upgrading libraries: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)

@@ -33,6 +33,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/generatedocs"
 	"github.com/arduino/arduino-cli/cli/globals"
+	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/lib"
 	"github.com/arduino/arduino-cli/cli/monitor"
 	"github.com/arduino/arduino-cli/cli/outdated"
@@ -43,6 +44,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/upload"
 	"github.com/arduino/arduino-cli/cli/version"
 	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/httpclient"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/inventory"
 	"github.com/arduino/arduino-cli/logging"
@@ -119,7 +121,6 @@ func createCliCommandTree(cmd *cobra.Command) {
 	})
 	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", tr("The custom config file (if not specified the default will be used)."))
 	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, tr("Comma-separated list of additional URLs for the Boards Manager."))
-	configuration.BindFlags(cmd, configuration.Settings)
 }
 
 func preRun(cmd *cobra.Command, args []string) {
@@ -127,22 +128,52 @@ func preRun(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	configFile := configuration.Settings.ConfigFileUsed()
+	configFile := configuration.FindConfigFileInArgsOrWorkingDirectory(os.Args)
+	instance.Create(configFile)
+	inst := instance.Get()
+	configuration.BindFlags(cmd, inst.Settings)
 
-	// initialize inventory
-	err := inventory.Init(configuration.Settings.GetString("directories.Data"))
-	if err != nil {
-		feedback.Errorf("Error: %v", err)
-		os.Exit(errorcodes.ErrBadArgument)
-	}
+	// From this point on we can use logging
+
+	i18n.Init(inst.Settings.GetString("locale"))
 
 	outputFormat, err := cmd.Flags().GetString("format")
 	if err != nil {
 		feedback.Errorf(tr("Error getting flag value: %s", err))
 		os.Exit(errorcodes.ErrBadCall)
 	}
-	noColor := configuration.Settings.GetBool("output.no_color") || os.Getenv("NO_COLOR") != ""
+
+	noColor := inst.Settings.GetBool("output.no_color") || os.Getenv("NO_COLOR") != ""
 	output.Setup(outputFormat, noColor)
+
+	// Setups logging if necessary
+	verbose, err := cmd.Flags().GetBool("verbose")
+	if err != nil {
+		feedback.Errorf(tr("Error getting flag value: %s", err))
+		os.Exit(errorcodes.ErrBadCall)
+	}
+	logging.Setup(
+		verbose,
+		noColor,
+		inst.Settings.GetString("logging.level"),
+		inst.Settings.GetString("logging.file"),
+		inst.Settings.GetString("logging.format"),
+	)
+
+	httpConfig, err := httpclient.ConfigFromSettings(inst.Settings)
+	if err != nil {
+		feedback.Errorf("Error configuring http client: %v", err)
+		os.Exit(errorcodes.ErrCoreConfig)
+	}
+	// Initializes http client used by this command line process
+	httpclient.Init(httpConfig)
+
+	// initialize inventory
+	err = inventory.Init(inst.Settings.GetString("directories.Data"))
+	if err != nil {
+		feedback.Errorf("Error: %v", err)
+		os.Exit(errorcodes.ErrBadArgument)
+	}
 
 	updaterMessageChan = make(chan *semver.Version)
 	go func() {
@@ -157,20 +188,6 @@ func preRun(cmd *cobra.Command, args []string) {
 		}
 		updaterMessageChan <- updater.CheckForUpdate(currentVersion)
 	}()
-
-	// Setups logging if necessary
-	verbose, err := cmd.Flags().GetBool("verbose")
-	if err != nil {
-		feedback.Errorf(tr("Error getting flag value: %s", err))
-		os.Exit(errorcodes.ErrBadCall)
-	}
-	logging.Setup(
-		verbose,
-		noColor,
-		configuration.Settings.GetString("logging.level"),
-		configuration.Settings.GetString("logging.file"),
-		configuration.Settings.GetString("logging.format"),
-	)
 
 	//
 	// Print some status info and check command is consistent

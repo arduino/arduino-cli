@@ -42,11 +42,15 @@ func initUpdateIndexCommand() *cobra.Command {
 }
 
 func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateInstanceAndRunFirstUpdate()
+	if err := instance.FirstUpdate(); err != nil {
+		feedback.Errorf(tr("Error updating indexes: %v"), err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
 	logrus.Info("Executing `arduino-cli core update-index`")
 
+	instance.Init()
 	_, err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{
-		Instance: inst,
+		Instance: instance.Get().ToRPC(),
 	}, output.ProgressBar())
 	if err != nil {
 		feedback.Errorf(tr("Error updating index: %v"), err)

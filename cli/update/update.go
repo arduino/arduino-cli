@@ -52,11 +52,16 @@ var updateFlags struct {
 }
 
 func runUpdateCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateInstanceAndRunFirstUpdate()
+	if err := instance.FirstUpdate(); err != nil {
+		feedback.Errorf(tr("Error updating indexes: %v"), err)
+		os.Exit(errorcodes.ErrGeneric)
+	}
 	logrus.Info("Executing `arduino-cli update`")
 
+	instance.Init()
+	inst := instance.Get()
 	err := commands.UpdateCoreLibrariesIndex(context.Background(), &rpc.UpdateCoreLibrariesIndexRequest{
-		Instance: inst,
+		Instance: inst.ToRPC(),
 	}, output.ProgressBar())
 	if err != nil {
 		feedback.Errorf(tr("Error updating core and libraries index: %v"), err)
@@ -66,12 +71,10 @@ func runUpdateCommand(cmd *cobra.Command, args []string) {
 	if updateFlags.showOutdated {
 		// To show outdated platforms and libraries we need to initialize our instance
 		// otherwise nothing would be shown
-		for _, err := range instance.Init(inst) {
-			feedback.Errorf(tr("Error initializing instance: %v"), err)
-		}
+		instance.Init()
 
 		outdatedResp, err := commands.Outdated(context.Background(), &rpc.OutdatedRequest{
-			Instance: inst,
+			Instance: inst.ToRPC(),
 		})
 		if err != nil {
 			feedback.Errorf(tr("Error retrieving outdated cores and libraries: %v"), err)

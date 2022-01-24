@@ -70,8 +70,10 @@ func NewCommand() *cobra.Command {
 }
 
 func runUploadCommand(command *cobra.Command, args []string) {
-	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli upload`")
+
+	instance.Init()
+	instance := instance.Get()
 
 	path := ""
 	if len(args) > 0 {
@@ -89,7 +91,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	discoveryPort, err := port.GetPort(instance, sk)
+	discoveryPort, err := port.GetPort(instance.ToRPC(), sk)
 	if err != nil {
 		feedback.Errorf(tr("Error during Upload: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
@@ -102,7 +104,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 	}
 
 	userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
-		Instance: instance,
+		Instance: instance.ToRPC(),
 		Fqbn:     fqbn.String(),
 		Address:  discoveryPort.Address,
 		Protocol: discoveryPort.Protocol,
@@ -123,7 +125,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 	}
 
 	if _, err := upload.Upload(context.Background(), &rpc.UploadRequest{
-		Instance:   instance,
+		Instance:   instance.ToRPC(),
 		Fqbn:       fqbn.String(),
 		SketchPath: path,
 		Port:       discoveryPort.ToRPC(),

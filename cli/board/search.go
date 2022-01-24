@@ -49,12 +49,13 @@ for a specific board if you specify the board name`),
 }
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
+	instance.Init()
+	inst := instance.Get()
 
 	logrus.Info("Executing `arduino-cli board search`")
 
 	res, err := board.Search(context.Background(), &rpc.BoardSearchRequest{
-		Instance:            inst,
+		Instance:            inst.ToRPC(),
 		SearchArgs:          strings.Join(args, " "),
 		IncludeHiddenBoards: showHiddenBoard,
 	})

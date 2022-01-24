@@ -20,7 +20,7 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -40,7 +40,8 @@ func initCleanCommand() *cobra.Command {
 func runCleanCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli cache clean`")
 
-	cachePath := configuration.Settings.GetString("directories.Downloads")
+	instance.Init()
+	cachePath := instance.Get().Settings.GetString("directories.Downloads")
 	err := os.RemoveAll(cachePath)
 	if err != nil {
 		feedback.Errorf(tr("Error cleaning caches: %v"), err)

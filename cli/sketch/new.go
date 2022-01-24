@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/cli/instance"
 	sk "github.com/arduino/arduino-cli/commands/sketch"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
@@ -53,7 +54,7 @@ func runNewCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	_, err = sk.NewSketch(context.Background(), &rpc.NewSketchRequest{
-		Instance:   nil,
+		Instance:   instance.Get().ToRPC(),
 		SketchName: sketchDirPath.Base(),
 		SketchDir:  sketchDirPath.Parent().String(),
 	})

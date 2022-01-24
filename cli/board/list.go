@@ -55,17 +55,17 @@ func initListCommand() *cobra.Command {
 
 // runListCommand detects and lists the connected arduino boards
 func runListCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
-
 	logrus.Info("Executing `arduino-cli board list`")
 
+	instance.Init()
+	inst := instance.Get()
 	if watch {
-		watchList(cmd, inst)
+		watchList(cmd, inst.ToRPC())
 		os.Exit(0)
 	}
 
 	ports, err := board.List(&rpc.BoardListRequest{
-		Instance: inst,
+		Instance: inst.ToRPC(),
 		Timeout:  timeout.Milliseconds(),
 	})
 	if err != nil {

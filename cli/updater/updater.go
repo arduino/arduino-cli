@@ -22,6 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
+	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/httpclient"
 	"github.com/arduino/arduino-cli/i18n"
@@ -81,7 +82,7 @@ func shouldCheckForUpdate(currentVersion *semver.Version) bool {
 		return false
 	}
 
-	if !configuration.Settings.GetBool("updater.enable_notification") {
+	if !instance.Get().Settings.GetBool("updater.enable_notification") {
 		// Don't check if the user disabled the notification
 		return false
 	}
@@ -105,10 +106,7 @@ func isCI() bool {
 // getLatestRelease queries the official Arduino download server for the latest release,
 // if there are no errors or issues a version string is returned, in all other case an empty string.
 func getLatestRelease() string {
-	client, err := httpclient.New()
-	if err != nil {
-		return ""
-	}
+	client := httpclient.Get()
 
 	// We just use this URL to check if there's a new release available and
 	// never show it to the user, so it's fine to use the Linux one for all OSs.

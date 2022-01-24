@@ -68,21 +68,22 @@ func NewCommand() *cobra.Command {
 }
 
 func runMonitorCmd(cmd *cobra.Command, args []string) {
-	instance := instance.CreateAndInit()
+	instance.Init()
 	logrus.Info("Executing `arduino-cli monitor`")
 
 	if !configuration.HasConsole {
 		quiet = true
 	}
 
-	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(instance, nil)
+	inst := instance.Get()
+	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(inst.ToRPC(), nil)
 	if err != nil {
 		feedback.Error(err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	enumerateResp, err := monitor.EnumerateMonitorPortSettings(context.Background(), &rpc.EnumerateMonitorPortSettingsRequest{
-		Instance:     instance,
+		Instance:     inst.ToRPC(),
 		PortProtocol: portProtocol,
 		Fqbn:         fqbn.String(),
 	})
@@ -146,7 +147,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 		}
 	}
 	portProxy, _, err := monitor.Monitor(context.Background(), &rpc.MonitorRequest{
-		Instance:          instance,
+		Instance:          inst.ToRPC(),
 		Port:              &rpc.Port{Address: portAddress, Protocol: portProtocol},
 		Fqbn:              fqbn.String(),
 		PortConfiguration: configuration,

@@ -83,7 +83,7 @@ func Init() {
 
 	instance := Get()
 	err := commands.Init(&rpc.InitRequest{
-		Instance: instance.RPC(),
+		Instance: instance.ToRPC(),
 	}, func(res *rpc.InitResponse) {
 		if st := res.GetError(); st != nil {
 			errs = append(errs, errors.New(st.Message))
@@ -125,7 +125,7 @@ func FirstUpdate() error {
 	if libraryIndex.NotExist() {
 		err := commands.UpdateLibrariesIndex(context.Background(),
 			&rpc.UpdateLibrariesIndexRequest{
-				Instance: instance.RPC(),
+				Instance: instance.ToRPC(),
 			},
 			output.ProgressBar(),
 		)
@@ -140,7 +140,7 @@ func FirstUpdate() error {
 	if packageIndex.NotExist() {
 		_, err := commands.UpdateIndex(context.Background(),
 			&rpc.UpdateIndexRequest{
-				Instance: instance.RPC(),
+				Instance: instance.ToRPC(),
 			},
 			output.ProgressBar(),
 		)

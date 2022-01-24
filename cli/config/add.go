@@ -21,7 +21,7 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -52,12 +52,14 @@ func runAddCommand(cmd *cobra.Command, args []string) {
 		feedback.Errorf(tr("The key '%[1]v' is not a list of items, can't add to it.\nMaybe use '%[2]s'?"), key, "config set")
 		os.Exit(errorcodes.ErrGeneric)
 	}
+	instance.Init()
+	inst := instance.Get()
 
-	v := configuration.Settings.GetStringSlice(key)
+	v := inst.Settings.GetStringSlice(key)
 	v = append(v, args[1:]...)
-	configuration.Settings.Set(key, v)
+	inst.Settings.Set(key, v)
 
-	if err := configuration.Settings.WriteConfig(); err != nil {
+	if err := inst.Settings.WriteConfig(); err != nil {
 		feedback.Errorf(tr("Can't write config file: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}

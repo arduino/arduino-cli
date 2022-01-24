@@ -21,6 +21,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -65,6 +66,8 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	var absPath *paths.Path
 	var err error
 
+	instance.Init()
+	inst := instance.Get()
 	switch {
 	case destFile != "":
 		configFileAbsPath, err = paths.New(destFile).Abs()
@@ -75,7 +78,7 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 
 		absPath = configFileAbsPath.Parent()
 	case destDir == "":
-		destDir = configuration.Settings.GetString("directories.Data")
+		destDir = inst.Settings.GetString("directories.Data")
 		fallthrough
 	default:
 		absPath, err = paths.New(destDir).Abs()

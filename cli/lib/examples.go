@@ -55,8 +55,10 @@ func initExamplesCommand() *cobra.Command {
 }
 
 func runExamplesCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli lib examples`")
+
+	instance.Init()
+	instance := instance.Get()
 
 	name := ""
 	if len(args) > 0 {
@@ -64,7 +66,7 @@ func runExamplesCommand(cmd *cobra.Command, args []string) {
 	}
 
 	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListRequest{
-		Instance: instance,
+		Instance: instance.ToRPC(),
 		All:      true,
 		Name:     name,
 		Fqbn:     fqbn.String(),

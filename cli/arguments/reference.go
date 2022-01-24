@@ -95,7 +95,7 @@ func ParseReference(arg string) (*Reference, error) {
 	// try to use core.GetPlatforms to optimize what the user typed
 	// (by replacing the PackageName and Architecture in ret with the content of core.GetPlatform())
 	platforms, _ := core.GetPlatforms(&rpc.PlatformListRequest{
-		Instance:      instance.CreateAndInit(),
+		Instance:      instance.Get().ToRPC(),
 		UpdatableOnly: false,
 		All:           true, // this is true because we want also the installable platforms
 	})

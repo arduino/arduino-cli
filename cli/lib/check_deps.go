@@ -49,16 +49,19 @@ func initDepsCommand() *cobra.Command {
 }
 
 func runDepsCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli lib deps`")
-	libRef, err := ParseLibraryReferenceArgAndAdjustCase(instance, args[0])
+
+	instance.Init()
+	instance := instance.Get()
+
+	libRef, err := ParseLibraryReferenceArgAndAdjustCase(instance.ToRPC(), args[0])
 	if err != nil {
 		feedback.Errorf(tr("Arguments error: %v"), err)
 		os.Exit(errorcodes.ErrBadArgument)
 	}
 
 	deps, err := lib.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesRequest{
-		Instance: instance,
+		Instance: instance.ToRPC(),
 		Name:     libRef.Name,
 		Version:  libRef.Version,
 	})

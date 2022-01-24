@@ -21,7 +21,7 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -38,7 +38,11 @@ func initDeleteCommand() *cobra.Command {
 		Args: cobra.ExactArgs(1),
 		Run:  runDeleteCommand,
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			return configuration.Settings.AllKeys(), cobra.ShellCompDirectiveDefault
+			res := []string{}
+			for key := range validMap {
+				res = append(res, key)
+			}
+			return res, cobra.ShellCompDirectiveDefault
 		},
 	}
 	return deleteCommand
@@ -48,9 +52,12 @@ func runDeleteCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli config delete`")
 	toDelete := args[0]
 
+	instance.Init()
+	inst := instance.Get()
+
 	keys := []string{}
 	exists := false
-	for _, v := range configuration.Settings.AllKeys() {
+	for _, v := range inst.Settings.AllKeys() {
 		if !strings.HasPrefix(v, toDelete) {
 			keys = append(keys, v)
 			continue
@@ -65,10 +72,10 @@ func runDeleteCommand(cmd *cobra.Command, args []string) {
 
 	updatedSettings := viper.New()
 	for _, k := range keys {
-		updatedSettings.Set(k, configuration.Settings.Get(k))
+		updatedSettings.Set(k, inst.Settings.Get(k))
 	}
 
-	if err := updatedSettings.WriteConfigAs(configuration.Settings.ConfigFileUsed()); err != nil {
+	if err := updatedSettings.WriteConfigAs(inst.Settings.ConfigFileUsed()); err != nil {
 		feedback.Errorf(tr("Can't write config file: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}

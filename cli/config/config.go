@@ -19,7 +19,7 @@ import (
 	"os"
 	"reflect"
 
-	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/spf13/cobra"
 )
@@ -48,7 +48,8 @@ func NewCommand() *cobra.Command {
 // It returns a list of configuration keys which can be changed
 func GetConfigurationKeys() []string {
 	var res []string
-	keys := configuration.Settings.AllKeys()
+	instance.Init()
+	keys := instance.Get().Settings.AllKeys()
 	for _, key := range keys {
 		kind, _ := typeOf(key)
 		if kind == reflect.Slice {

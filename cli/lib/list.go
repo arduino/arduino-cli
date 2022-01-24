@@ -57,8 +57,10 @@ not listed, they can be listed by adding the --all flag.`),
 }
 
 func runListCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli lib list`")
+
+	instance.Init()
+	instance := instance.Get()
 
 	name := ""
 	if len(args) > 0 {
@@ -66,7 +68,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	}
 
 	res, err := lib.LibraryList(context.Background(), &rpc.LibraryListRequest{
-		Instance:  instance,
+		Instance:  instance.ToRPC(),
 		All:       all,
 		Updatable: updatable,
 		Name:      name,
