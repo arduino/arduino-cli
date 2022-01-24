@@ -41,6 +41,19 @@ type CommandError interface {
 	ToRPCStatus() *status.Status
 }
 
+// MissingConfigFileError is returned when trying to create a new instance
+// without providing a config file path
+type MissingConfigFileError struct{}
+
+func (e *MissingConfigFileError) Error() string {
+	return tr("Missing config file path")
+}
+
+// ToRPCStatus converts the error into a *status.Status
+func (e *MissingConfigFileError) ToRPCStatus() *status.Status {
+	return status.New(codes.InvalidArgument, e.Error())
+}
+
 // InvalidInstanceError is returned if the instance used in the command is not valid.
 type InvalidInstanceError struct{}
 

@@ -40,6 +40,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"go.bug.st/downloader/v2"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -56,13 +57,21 @@ var instancesCount int32 = 1
 // instantiate as many as needed by providing a different configuration
 // for each one.
 type CoreInstance struct {
+	id               int32
 	packageManager   *packagemanager.PackageManager
 	librariesManager *librariesmanager.LibrariesManager
+	Settings         *viper.Viper
 }
 
-// InstanceContainer FIXMEDOC
-type InstanceContainer interface {
-	GetInstance() *rpc.Instance
+// ToRPC returns a pointer to an rpc.Instance with
+// the same ID as the calling CoreInstance
+func (c *CoreInstance) ToRPC() *rpc.Instance {
+	return &rpc.Instance{Id: c.id}
+}
+
+// ID returns the id of this CoreInstance
+func (c *CoreInstance) ID() int32 {
+	return c.id
 }
 
 // GetInstance returns a CoreInstance for the given ID, or nil if ID
@@ -107,10 +116,16 @@ func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, down
 
 // Create a new CoreInstance ready to be initialized, supporting directories are also created.
 func Create(req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
-	instance := &CoreInstance{}
+	if req.ConfigFile == "" {
+		return nil, &arduino.MissingConfigFileError{}
+	}
+
+	instance := &CoreInstance{
+		Settings: configuration.Init(req.ConfigFile),
+	}
 
 	// Setup downloads directory
-	downloadsDir := paths.New(configuration.Settings.GetString("directories.Downloads"))
+	downloadsDir := paths.New(instance.Settings.GetString("directories.Downloads"))
 	if downloadsDir.NotExist() {
 		err := downloadsDir.MkdirAll()
 		if err != nil {
@@ -119,8 +134,8 @@ func Create(req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
 	}
 
 	// Setup data directory
-	dataDir := paths.New(configuration.Settings.GetString("directories.Data"))
-	packagesDir := configuration.PackagesDir(configuration.Settings)
+	dataDir := paths.New(instance.Settings.GetString("directories.Data"))
+	packagesDir := configuration.PackagesDir(instance.Settings)
 	if packagesDir.NotExist() {
 		err := packagesDir.MkdirAll()
 		if err != nil {
@@ -131,7 +146,7 @@ func Create(req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
 	// Create package manager
 	instance.packageManager = packagemanager.NewPackageManager(
 		dataDir,
-		configuration.PackagesDir(configuration.Settings),
+		configuration.PackagesDir(instance.Settings),
 		downloadsDir,
 		dataDir.Join("tmp"),
 	)
@@ -143,18 +158,19 @@ func Create(req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
 	)
 
 	// Add directories of libraries bundled with IDE
-	if bundledLibsDir := configuration.IDEBundledLibrariesDir(configuration.Settings); bundledLibsDir != nil {
+	if bundledLibsDir := configuration.IDEBundledLibrariesDir(instance.Settings); bundledLibsDir != nil {
 		instance.librariesManager.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
 	}
 
 	// Add libraries directory from config file
 	instance.librariesManager.AddLibrariesDir(
-		configuration.LibrariesDir(configuration.Settings),
+		configuration.LibrariesDir(instance.Settings),
 		libraries.User,
 	)
 
 	// Save instance
 	instanceID := instancesCount
+	instance.id = instanceID
 	instances[instanceID] = instance
 	instancesCount++
 
@@ -186,7 +202,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 
 	// Load Platforms
 	urls := []string{globals.DefaultIndexURL}
-	urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
+	urls = append(urls, instance.Settings.GetStringSlice("board_manager.additional_urls")...)
 	for _, u := range urls {
 		URL, err := utils.URLParse(u)
 		if err != nil {
@@ -227,7 +243,9 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	// We load hardware before verifying builtin tools are installed
 	// otherwise we wouldn't find them and reinstall them each time
 	// and they would never get reloaded.
-	for _, err := range instance.packageManager.LoadHardware() {
+	hardwareDirs := configuration.HardwareDirectories(instance.Settings)
+	bundleToolsDirs := configuration.BundleToolsDirectories(instance.Settings)
+	for _, err := range instance.packageManager.LoadHardware(hardwareDirs, bundleToolsDirs) {
 		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_Error{
 				Error: err.Proto(),
@@ -290,7 +308,9 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	if toolsHaveBeenInstalled {
 		// We installed at least one new tool after loading hardware
 		// so we must reload again otherwise we would never found them.
-		for _, err := range instance.packageManager.LoadHardware() {
+		hardwareDirs := configuration.HardwareDirectories(instance.Settings)
+		bundleToolsDirs := configuration.BundleToolsDirectories(instance.Settings)
+		for _, err := range instance.packageManager.LoadHardware(hardwareDirs, bundleToolsDirs) {
 			responseCallback(&rpc.InitResponse{
 				Message: &rpc.InitResponse_Error{
 					Error: err.Proto(),
@@ -337,7 +357,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	// Refreshes the locale used, this will change the
 	// language of the CLI if the locale is different
 	// after started.
-	i18n.Init(configuration.Settings.GetString("locale"))
+	i18n.Init(instance.Settings.GetString("locale"))
 
 	return nil
 }
@@ -356,7 +376,8 @@ func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse
 // UpdateLibrariesIndex updates the library_index.json
 func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequest, downloadCB func(*rpc.DownloadProgress)) error {
 	logrus.Info("Updating libraries index")
-	lm := GetLibraryManager(req.GetInstance().GetId())
+	instanceID := req.GetInstance().GetId()
+	lm := GetLibraryManager(instanceID)
 	if lm == nil {
 		return &arduino.InvalidInstanceError{}
 	}
@@ -424,16 +445,16 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 
 // UpdateIndex FIXMEDOC
 func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB DownloadProgressCB) (*rpc.UpdateIndexResponse, error) {
-	id := req.GetInstance().GetId()
-	_, ok := instances[id]
+	instanceID := req.GetInstance().GetId()
+	instance, ok := instances[instanceID]
 	if !ok {
 		return nil, &arduino.InvalidInstanceError{}
 	}
 
-	indexpath := paths.New(configuration.Settings.GetString("directories.Data"))
+	indexpath := paths.New(instance.Settings.GetString("directories.Data"))
 
 	urls := []string{globals.DefaultIndexURL}
-	urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
+	urls = append(urls, instance.Settings.GetStringSlice("board_manager.additional_urls")...)
 	for _, u := range urls {
 		logrus.Info("URL: ", u)
 		URL, err := utils.URLParse(u)
