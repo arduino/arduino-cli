@@ -246,14 +246,16 @@ Each PLATFORM describes a core for a specific architecture. The fields needed ar
 - `toolsDependencies`: the tools needed by this platform. They will be installed by Boards Manager along with the
   platform. Each tool is referenced by the triple (`packager`, `name`, `version`) as previously said. Note that you can
   reference tools available in other packages as well, even if no platform of that package is installed.
-- `discoveryDependencies`: the Pluggable Discoveries needed by this platform. Each discovery is referenced by the pair
-  (`packager`, `name`), the `version` is not specified because the latest installed discovery tool will always be used.
-  Like `toolsDependencies` they will be installed by Boards Manager along with the platform and can reference tools
-  available in other packages as well, even if no platform of that package is installed.
-- `monitorDependencies`: the Pluggable Monitors needed by this platform. Each monitor is referenced by the pair
-  (`packager`, `name`), the `version` is not specified because the latest installed monitor tool will always be used.
-  Like `toolsDependencies` they will be installed by Boards Manager along with the platform and can reference tools
-  available in other packages as well, even if no platform of that package is installed.
+- `discoveryDependencies`: the Pluggable Discoveries needed by this platform. These are [tools](#tools-definitions),
+  defined exactly like the ones referenced in `toolsDependencies`. Unlike `toolsDependencies`, discoveries are
+  referenced by the pair (`packager`, `name`). The `version` is not specified because the latest installed discovery
+  tool will always be used. Like `toolsDependencies` they will be installed by Boards Manager along with the platform
+  and can reference tools available in other packages as well, even if no platform of that package is installed.
+- `monitorDependencies`: the Pluggable Monitors needed by this platform. These are [tools](#tools-definitions), defined
+  exactly like the ones referenced in `toolsDependencies`. Unlike `toolsDependencies`, monitors are referenced by the
+  pair (`packager`, `name`). The `version` is not specified because the latest installed monitor tool will always be
+  used. Like `toolsDependencies` they will be installed by Boards Manager along with the platform and can reference
+  tools available in other packages as well, even if no platform of that package is installed.
 
 The `version` field is validated by both Arduino IDE and [JSemVer](https://github.com/zafarkhaja/jsemver). Here are the
 rules Arduino IDE follows for parsing versions
