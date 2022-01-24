@@ -25,7 +25,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/discovery"
-	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	semver "go.bug.st/relaxed-semver"
@@ -34,15 +33,13 @@ import (
 )
 
 // LoadHardware read all plaforms from the configured paths
-func (pm *PackageManager) LoadHardware() []*status.Status {
+func (pm *PackageManager) LoadHardware(hardwareDirs, bundleToolsDirs paths.PathList) []*status.Status {
 	statuses := []*status.Status{}
-	dirs := configuration.HardwareDirectories(configuration.Settings)
-	if errs := pm.LoadHardwareFromDirectories(dirs); len(errs) > 0 {
+	if errs := pm.LoadHardwareFromDirectories(hardwareDirs); len(errs) > 0 {
 		statuses = append(statuses, errs...)
 	}
 
-	dirs = configuration.BundleToolsDirectories(configuration.Settings)
-	if errs := pm.LoadToolsFromBundleDirectories(dirs); len(errs) > 0 {
+	if errs := pm.LoadToolsFromBundleDirectories(bundleToolsDirs); len(errs) > 0 {
 		statuses = append(statuses, errs...)
 	}
 	return statuses

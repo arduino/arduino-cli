@@ -136,7 +136,6 @@ func (lm *LibrariesManager) AddLibrariesDir(path *paths.Path, location libraries
 			return
 		}
 	}
-	logrus.WithField("dir", path).WithField("location", location.String()).Info("Adding libraries dir")
 	lm.LibrariesDir = append(lm.LibrariesDir, &LibrariesDir{
 		Path:     path,
 		Location: location,

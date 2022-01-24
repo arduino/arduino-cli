@@ -212,11 +212,11 @@ func TestBoardOptionsFunctions(t *testing.T) {
 
 func TestFindToolsRequiredForBoard(t *testing.T) {
 	os.Setenv("ARDUINO_DATA_DIR", dataDir1.String())
-	configuration.Settings = configuration.Init("")
+	settings := configuration.Init(dataDir1.Join("arduino-cli.yaml").String())
 	pm := packagemanager.NewPackageManager(
 		dataDir1,
-		configuration.PackagesDir(configuration.Settings),
-		paths.New(configuration.Settings.GetString("directories.Downloads")),
+		configuration.PackagesDir(settings),
+		paths.New(settings.GetString("directories.Downloads")),
 		dataDir1,
 	)
 
@@ -231,7 +231,9 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	// We ignore the errors returned since they might not be necessarily blocking
 	// but just warnings for the user, like in the case a board is not loaded
 	// because of malformed menus
-	pm.LoadHardware()
+	hardwareDirs := configuration.HardwareDirectories(settings)
+	bundleToolsDirs := configuration.BundleToolsDirectories(settings)
+	pm.LoadHardware(hardwareDirs, bundleToolsDirs)
 	esp32, err := pm.FindBoardWithFQBN("esp32:esp32:esp32")
 	require.NoError(t, err)
 	esptool231 := pm.FindToolDependency(&cores.ToolDependency{
