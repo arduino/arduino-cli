@@ -48,10 +48,15 @@ var tr = i18n.Tr
 // Compile FIXMEDOC
 func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream io.Writer, progressCB commands.TaskProgressCB, debug bool) (r *rpc.CompileResponse, e error) {
 
+	instance := commands.GetInstance(req.GetInstance().GetId())
+	if instance == nil {
+		return nil, &arduino.InvalidInstanceError{}
+	}
+
 	// There is a binding between the export binaries setting and the CLI flag to explicitly set it,
 	// since we want this binding to work also for the gRPC interface we must read it here in this
 	// package instead of the cli/compile one, otherwise we'd lose the binding.
-	exportBinaries := configuration.Settings.GetBool("sketch.always_export_binaries")
+	exportBinaries := instance.Settings.GetBool("sketch.always_export_binaries")
 	// If we'd just read the binding in any case, even if the request sets the export binaries setting,
 	// the settings value would always overwrite the request one and it wouldn't have any effect
 	// setting it for individual requests. To solve this we use a wrapper.BoolValue to handle
@@ -135,11 +140,11 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.ProgressCB = progressCB
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
-	builderCtx.HardwareDirs = configuration.HardwareDirectories(configuration.Settings)
-	builderCtx.BuiltInToolsDirs = configuration.BundleToolsDirectories(configuration.Settings)
+	builderCtx.HardwareDirs = configuration.HardwareDirectories(instance.Settings)
+	builderCtx.BuiltInToolsDirs = configuration.BundleToolsDirectories(instance.Settings)
 
 	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
-	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
+	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(instance.Settings))
 
 	builderCtx.LibraryDirs = paths.NewPathList(req.Library...)
 
@@ -187,7 +192,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.ArduinoAPIVersion = "10607"
 
 	// Check if Arduino IDE is installed and get it's libraries location.
-	dataDir := paths.New(configuration.Settings.GetString("directories.Data"))
+	dataDir := paths.New(instance.Settings.GetString("directories.Data"))
 	preferencesTxt := dataDir.Join("preferences.txt")
 	ideProperties, err := properties.LoadFromPath(preferencesTxt)
 	if err == nil {

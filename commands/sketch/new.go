@@ -20,7 +20,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/globals"
-	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 )
@@ -39,7 +39,8 @@ func NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchRe
 	if len(req.SketchDir) > 0 {
 		sketchesDir = req.SketchDir
 	} else {
-		sketchesDir = configuration.Settings.GetString("directories.User")
+		instance := commands.GetInstance(req.Instance.Id)
+		sketchesDir = instance.Settings.GetString("directories.User")
 	}
 	sketchDirPath := paths.New(sketchesDir).Join(req.SketchName)
 	if err := sketchDirPath.MkdirAll(); err != nil {
