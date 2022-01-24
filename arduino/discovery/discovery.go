@@ -312,7 +312,7 @@ func (disc *PluggableDiscovery) Run() (err error) {
 		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "HELLO", err)
 	} else if msg.EventType != "hello" {
 		return errors.Errorf(tr("communication out of sync, expected 'hello', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
+	} else if strings.ToUpper(msg.Message) != "OK" || msg.Error {
 		return errors.Errorf(tr("command failed: %s"), msg.Message)
 	} else if msg.ProtocolVersion > 1 {
 		return errors.Errorf(tr("protocol version not supported: requested 1, got %d"), msg.ProtocolVersion)
@@ -333,7 +333,7 @@ func (disc *PluggableDiscovery) Start() error {
 		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "START", err)
 	} else if msg.EventType != "start" {
 		return errors.Errorf(tr("communication out of sync, expected 'start', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
+	} else if strings.ToUpper(msg.Message) != "OK" || msg.Error {
 		return errors.Errorf(tr("command failed: %s"), msg.Message)
 	}
 	disc.statusMutex.Lock()
@@ -353,7 +353,7 @@ func (disc *PluggableDiscovery) Stop() error {
 		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "STOP", err)
 	} else if msg.EventType != "stop" {
 		return errors.Errorf(tr("communication out of sync, expected 'stop', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
+	} else if strings.ToUpper(msg.Message) != "OK" || msg.Error {
 		return errors.Errorf(tr("command failed: %s"), msg.Message)
 	}
 	disc.statusMutex.Lock()
@@ -376,7 +376,7 @@ func (disc *PluggableDiscovery) Quit() error {
 		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "QUIT", err)
 	} else if msg.EventType != "quit" {
 		return errors.Errorf(tr("communication out of sync, expected 'quit', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
+	} else if strings.ToUpper(msg.Message) != "OK" || msg.Error {
 		return errors.Errorf(tr("command failed: %s"), msg.Message)
 	}
 	disc.killProcess()
@@ -416,7 +416,7 @@ func (disc *PluggableDiscovery) StartSync(size int) (<-chan *Event, error) {
 		return nil, fmt.Errorf(tr("calling %[1]s: %[2]w"), "START_SYNC", err)
 	} else if msg.EventType != "start_sync" {
 		return nil, errors.Errorf(tr("communication out of sync, expected 'start_sync', received '%s'"), msg.EventType)
-	} else if msg.Message != "OK" || msg.Error {
+	} else if strings.ToUpper(msg.Message) != "OK" || msg.Error {
 		return nil, errors.Errorf(tr("command failed: %s"), msg.Message)
 	}
 
