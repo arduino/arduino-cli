@@ -33,7 +33,7 @@ func HardwareDirectories(settings *viper.Viper) paths.PathList {
 	}
 
 	if settings.IsSet("directories.Data") {
-		packagesDir := PackagesDir(Settings)
+		packagesDir := PackagesDir(settings)
 		if packagesDir.IsDir() {
 			res.Add(packagesDir)
 		}
@@ -70,7 +70,7 @@ func BundleToolsDirectories(settings *viper.Viper) paths.PathList {
 // exists then nil is returned
 func IDEBundledLibrariesDir(settings *viper.Viper) *paths.Path {
 	if IsBundledInDesktopIDE(settings) {
-		ideDir := paths.New(Settings.GetString("IDE.Directory"))
+		ideDir := paths.New(settings.GetString("IDE.Directory"))
 		libDir := ideDir.Join("libraries")
 		if libDir.IsDir() {
 			return libDir

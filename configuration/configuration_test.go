@@ -100,7 +100,7 @@ func TestInit(t *testing.T) {
 
 func TestFindConfigFile(t *testing.T) {
 	configFile := FindConfigFileInArgsOrWorkingDirectory([]string{"--config-file"})
-	require.Equal(t, "", configFile)
+	require.NotEqual(t, "", configFile)
 
 	configFile = FindConfigFileInArgsOrWorkingDirectory([]string{"--config-file", "some/path/to/config"})
 	require.Equal(t, "some/path/to/config", configFile)

@@ -31,9 +31,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Settings is a global instance of viper holding configurations for the CLI and the gRPC consumers
-var Settings *viper.Viper
-
 var tr = i18n.Tr
 
 // Init initialize defaults and read the configuration file.
@@ -50,15 +47,6 @@ func Init(configFile string) *viper.Viper {
 	if configFilePath := paths.New(configFile); configFilePath != nil {
 		settings.SetConfigName(strings.TrimSuffix(configFilePath.Base(), configFilePath.Ext()))
 		settings.AddConfigPath(configFilePath.Parent().String())
-	} else {
-		configDir := settings.GetString("directories.Data")
-		// Get default data path if none was provided
-		if configDir == "" {
-			configDir = getDefaultArduinoDataDir()
-		}
-
-		settings.SetConfigName("arduino-cli")
-		settings.AddConfigPath(configDir)
 	}
 
 	// Attempt to read config file
@@ -84,6 +72,9 @@ func BindFlags(cmd *cobra.Command, settings *viper.Viper) {
 
 // getDefaultArduinoDataDir returns the full path to the default arduino folder
 func getDefaultArduinoDataDir() string {
+	if dataDir := os.Getenv("ARDUINO_DATA_DIR"); dataDir != "" {
+		return dataDir
+	}
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		feedback.Errorf(tr("Unable to get user home dir: %v"), err)
@@ -142,7 +133,6 @@ func IsBundledInDesktopIDE(settings *viper.Viper) bool {
 	settings.Set("IDE.Bundled", false)
 	settings.Set("IDE.Portable", false)
 
-	logrus.Info("Checking if CLI is Bundled into the IDE")
 	executable, err := os.Executable()
 	if err != nil {
 		feedback.Errorf(tr("Cannot get executable path: %v"), err)
@@ -172,8 +162,6 @@ func IsBundledInDesktopIDE(settings *viper.Viper) bool {
 		}
 	}
 
-	logrus.Info("The CLI is bundled in the Arduino IDE")
-
 	// Persist IDE-related config settings
 	settings.Set("IDE.Bundled", true)
 	settings.Set("IDE.Directory", ideDir)
@@ -188,7 +176,8 @@ func IsBundledInDesktopIDE(settings *viper.Viper) bool {
 }
 
 // FindConfigFileInArgsOrWorkingDirectory returns the config file path using the
-// argument '--config-file' (if specified) or looking in the current working dir
+// argument '--config-file' (if specified) or looking in the current working dir.
+// Returns default path for the current OS if no config file can be found.
 func FindConfigFileInArgsOrWorkingDirectory(args []string) string {
 	// Look for '--config-file' argument
 	for i, arg := range args {
@@ -201,11 +190,11 @@ func FindConfigFileInArgsOrWorkingDirectory(args []string) string {
 
 	// Look into current working directory
 	if cwd, err := paths.Getwd(); err != nil {
-		return ""
+		panic(err)
 	} else if configFile := searchConfigTree(cwd); configFile != nil {
 		return configFile.Join("arduino-cli.yaml").String()
 	}
-	return ""
+	return paths.New(getDefaultArduinoDataDir(), "arduino-cli.yaml").String()
 }
 
 func searchConfigTree(cwd *paths.Path) *paths.Path {
