@@ -24,7 +24,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -32,49 +31,59 @@ import (
 
 var tr = i18n.Tr
 
-// CreateAndInit return a new initialized instance.
-// If Create fails the CLI prints an error and exits since
-// to execute further operations a valid Instance is mandatory.
-// If Init returns errors they're printed only.
-func CreateAndInit() *rpc.Instance {
-	instance, err := Create()
+// The Arduino CLI run in command line mode needs only a single instance
+// so we always use the same ID
+const instanceID int32 = 1
+
+// Create a new CoreInstance, returns an error if creation fails.
+// It's meant to be be called only once so it panics if called multiple times.
+// We prefer to panic instead of returning an error since we don't want
+// to risk a developer calling it multiple times different config files.
+func Create(configFile string) {
+	inst := commands.GetInstance(instanceID)
+	if inst != nil {
+		panic("instance Create called multiple times")
+	}
+
+	_, err := commands.Create(&rpc.CreateRequest{
+		ConfigFile: configFile,
+	})
 	if err != nil {
 		feedback.Errorf(tr("Error creating instance: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	for _, err := range Init(instance) {
-		feedback.Errorf(tr("Error initializing instance: %v"), err)
-	}
-	return instance
 }
 
-// Create and return a new Instance.
-func Create() (*rpc.Instance, error) {
-	res, err := commands.Create(&rpc.CreateRequest{})
-	if err != nil {
-		return nil, err
+// Get returns the one and only CoreInstance used by the Arduino CLI
+// when running in the command line mode.
+func Get() *commands.CoreInstance {
+	inst := commands.GetInstance(instanceID)
+	if inst == nil {
+		feedback.Errorf(tr("Arduino CLI instance doesn't exist"))
+		os.Exit(errorcodes.ErrGeneric)
 	}
-	return res.Instance, nil
+	return inst
 }
 
-// Init initializes instance by loading installed libraries and platforms.
-// In case of loading failures return a list of errors for each
+// Init initializes the command line instance by loading installed libraries and platforms.
+// In case of loading failures prints a list of errors for each
 // platform or library that we failed to load.
 // Package and library indexes files are automatically updated if the
 // CLI is run for the first time.
-func Init(instance *rpc.Instance) []error {
+func Init() {
 	errs := []error{}
-
 	// In case the CLI is executed for the first time
-	if err := FirstUpdate(instance); err != nil {
-		return append(errs, err)
+	if err := FirstUpdate(); err != nil {
+		feedback.Errorf(tr("Error initializing instance: %v"), err)
+		return
 	}
 
 	downloadCallback := output.ProgressBar()
 	taskCallback := output.TaskProgress()
 
+	instance := Get()
 	err := commands.Init(&rpc.InitRequest{
-		Instance: instance,
+		Instance: instance.RPC(),
 	}, func(res *rpc.InitResponse) {
 		if st := res.GetError(); st != nil {
 			errs = append(errs, errors.New(st.Message))
@@ -90,17 +99,19 @@ func Init(instance *rpc.Instance) []error {
 		}
 	})
 	if err != nil {
-		return append(errs, err)
+		errs = append(errs, err)
 	}
-
-	return errs
+	for _, err := range errs {
+		feedback.Errorf(tr("Error initializing instance: %v"), err)
+	}
 }
 
 // FirstUpdate downloads libraries and packages indexes if they don't exist.
 // This ideally is only executed the first time the CLI is run.
-func FirstUpdate(instance *rpc.Instance) error {
+func FirstUpdate() error {
+	instance := Get()
 	// Gets the data directory to verify if library_index.json and package_index.json exist
-	dataDir := paths.New(configuration.Settings.GetString("directories.data"))
+	dataDir := paths.New(instance.Settings.GetString("directories.data"))
 
 	libraryIndex := dataDir.Join("library_index.json")
 	packageIndex := dataDir.Join("package_index.json")
@@ -114,7 +125,7 @@ func FirstUpdate(instance *rpc.Instance) error {
 	if libraryIndex.NotExist() {
 		err := commands.UpdateLibrariesIndex(context.Background(),
 			&rpc.UpdateLibrariesIndexRequest{
-				Instance: instance,
+				Instance: instance.RPC(),
 			},
 			output.ProgressBar(),
 		)
@@ -129,7 +140,7 @@ func FirstUpdate(instance *rpc.Instance) error {
 	if packageIndex.NotExist() {
 		_, err := commands.UpdateIndex(context.Background(),
 			&rpc.UpdateIndexRequest{
-				Instance: instance,
+				Instance: instance.RPC(),
 			},
 			output.ProgressBar(),
 		)
@@ -139,28 +150,4 @@ func FirstUpdate(instance *rpc.Instance) error {
 	}
 
 	return nil
-}
-
-// CreateInstanceAndRunFirstUpdate creates an instance and runs `FirstUpdate`.
-// It is mandatory for all `update-index` commands to call this
-func CreateInstanceAndRunFirstUpdate() *rpc.Instance {
-	// We don't initialize any CoreInstance when updating indexes since we don't need to.
-	// Also meaningless errors might be returned when calling this command with --additional-urls
-	// since the CLI would be searching for a corresponding file for the additional urls set
-	// as argument but none would be obviously found.
-	inst, status := Create()
-	if status != nil {
-		feedback.Errorf(tr("Error creating instance: %v"), status)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
-	// In case this is the first time the CLI is run we need to update indexes
-	// to make it work correctly, we must do this explicitly in this command since
-	// we must use instance.Create instead of instance.CreateAndInit for the
-	// reason stated above.
-	if err := FirstUpdate(inst); err != nil {
-		feedback.Errorf(tr("Error updating indexes: %v"), status)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-	return inst
 }
