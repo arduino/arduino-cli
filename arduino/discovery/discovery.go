@@ -312,8 +312,10 @@ func (disc *PluggableDiscovery) Run() (err error) {
 		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "HELLO", err)
 	} else if msg.EventType != "hello" {
 		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "hello", msg.EventType)
-	} else if strings.ToUpper(msg.Message) != "OK" || msg.Error {
+	} else if msg.Error {
 		return errors.Errorf(tr("command failed: %s"), msg.Message)
+	} else if strings.ToUpper(msg.Message) != "OK" {
+		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "OK", msg.Message)
 	} else if msg.ProtocolVersion > 1 {
 		return errors.Errorf(tr("protocol version not supported: requested 1, got %d"), msg.ProtocolVersion)
 	}
@@ -333,8 +335,10 @@ func (disc *PluggableDiscovery) Start() error {
 		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "START", err)
 	} else if msg.EventType != "start" {
 		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "start", msg.EventType)
-	} else if strings.ToUpper(msg.Message) != "OK" || msg.Error {
+	} else if msg.Error {
 		return errors.Errorf(tr("command failed: %s"), msg.Message)
+	} else if strings.ToUpper(msg.Message) != "OK" {
+		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "OK", msg.Message)
 	}
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
@@ -353,8 +357,10 @@ func (disc *PluggableDiscovery) Stop() error {
 		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "STOP", err)
 	} else if msg.EventType != "stop" {
 		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "stop", msg.EventType)
-	} else if strings.ToUpper(msg.Message) != "OK" || msg.Error {
+	} else if msg.Error {
 		return errors.Errorf(tr("command failed: %s"), msg.Message)
+	} else if strings.ToUpper(msg.Message) != "OK" {
+		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "OK", msg.Message)
 	}
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
@@ -376,8 +382,10 @@ func (disc *PluggableDiscovery) Quit() error {
 		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "QUIT", err)
 	} else if msg.EventType != "quit" {
 		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "quit", msg.EventType)
-	} else if strings.ToUpper(msg.Message) != "OK" || msg.Error {
+	} else if msg.Error {
 		return errors.Errorf(tr("command failed: %s"), msg.Message)
+	} else if strings.ToUpper(msg.Message) != "OK" {
+		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "OK", msg.Message)
 	}
 	disc.killProcess()
 	return nil
@@ -416,8 +424,10 @@ func (disc *PluggableDiscovery) StartSync(size int) (<-chan *Event, error) {
 		return nil, fmt.Errorf(tr("calling %[1]s: %[2]w"), "START_SYNC", err)
 	} else if msg.EventType != "start_sync" {
 		return nil, errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "start_sync", msg.EventType)
-	} else if strings.ToUpper(msg.Message) != "OK" || msg.Error {
+	} else if msg.Error {
 		return nil, errors.Errorf(tr("command failed: %s"), msg.Message)
+	} else if strings.ToUpper(msg.Message) != "OK" {
+		return nil, errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "OK", msg.Message)
 	}
 
 	disc.statusMutex.Lock()
