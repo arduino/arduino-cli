@@ -21,7 +21,6 @@ import (
 	"encoding/hex"
 	"net/http"
 
-	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/inventory"
 	"github.com/segmentio/stats/v4"
 	"github.com/segmentio/stats/v4/prometheus"
@@ -32,7 +31,7 @@ import (
 var serverPattern = "/metrics"
 
 // Activate configures and starts the metrics server exposing a Prometheus resource
-func Activate(metricPrefix string) {
+func Activate(metricPrefix, serverAddr string) {
 	// Create a Prometheus default handler
 	ph := prometheus.DefaultHandler
 	// Create a new stats engine with an engine that prepends the "daemon" prefix to all metrics
@@ -42,8 +41,6 @@ func Activate(metricPrefix string) {
 	// Register the handler so it receives metrics from the default engine.
 	stats.Register(ph)
 
-	// Configure using viper settings
-	serverAddr := configuration.Settings.GetString("metrics.addr")
 	logrus.Infof("Setting up Prometheus metrics on %s%s", serverAddr, serverPattern)
 	go func() {
 		http.Handle(serverPattern, ph)
