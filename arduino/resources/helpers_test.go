@@ -54,7 +54,8 @@ func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
 		URL:             srv.URL,
 	}
 
-	httpClient := httpclient.New(&httpclient.Config{UserAgent: goldUserAgentValue})
+	httpclient.Init(&httpclient.Config{UserAgent: goldUserAgentValue})
+	httpClient := httpclient.Get()
 
 	d, err := r.Download(tmp, &downloader.Config{HttpClient: *httpClient})
 	require.NoError(t, err)

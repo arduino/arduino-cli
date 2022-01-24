@@ -109,7 +109,7 @@ func TestFindConfigFile(t *testing.T) {
 	require.Equal(t, "some/path/to/config/arduino-cli.yaml", configFile)
 
 	configFile = FindConfigFileInArgsOrWorkingDirectory([]string{})
-	require.Equal(t, "", configFile)
+	require.NotEqual(t, "", configFile)
 
 	// Create temporary directories
 	tmp := tmpDirOrDie()

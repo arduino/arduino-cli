@@ -24,7 +24,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/discovery"
-	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/httpclient"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
@@ -32,7 +32,10 @@ import (
 )
 
 func init() {
-	configuration.Settings = configuration.Init("")
+	httpclient.Init(&httpclient.Config{
+		UserAgent: "tests",
+		Proxy:     nil,
+	})
 }
 
 func TestGetByVidPid(t *testing.T) {

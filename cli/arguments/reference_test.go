@@ -19,7 +19,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/cli/arguments"
-	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -47,7 +47,8 @@ var badCores = []struct {
 }
 
 func init() {
-	configuration.Settings = configuration.Init("")
+	instance.Create("/fake/config.yaml")
+	instance.Init()
 }
 
 func TestArgsStringify(t *testing.T) {

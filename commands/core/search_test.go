@@ -16,44 +16,53 @@
 package core
 
 import (
+	"context"
 	"os"
 	"testing"
 
-	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/configuration"
-	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/httpclient"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
 func TestPlatformSearch(t *testing.T) {
-
-	dataDir := paths.TempDir().Join("test", "data_dir")
-	downloadDir := paths.TempDir().Join("test", "staging")
+	testDir := paths.TempDir().Join("test", t.Name())
+	dataDir := testDir.Join("data_dir")
+	downloadDir := testDir.Join("staging")
 	os.Setenv("ARDUINO_DATA_DIR", dataDir.String())
 	os.Setenv("ARDUINO_DOWNLOADS_DIR", downloadDir.String())
 	dataDir.MkdirAll()
 	downloadDir.MkdirAll()
-	defer paths.TempDir().Join("test").RemoveAll()
+	defer testDir.RemoveAll()
 	err := paths.New("testdata").Join("package_index.json").CopyTo(dataDir.Join("package_index.json"))
 	require.Nil(t, err)
 
-	configuration.Settings = configuration.Init(paths.TempDir().Join("test", "arduino-cli.yaml").String())
-
-	inst := instance.CreateAndInit()
+	createRes, err := commands.Create(&rpc.CreateRequest{
+		ConfigFile: testDir.Join("arduino-cli.yaml").String(),
+	})
+	require.NoError(t, err)
+	inst := commands.GetInstance(createRes.Instance.Id)
 	require.NotNil(t, inst)
+	config, err := httpclient.ConfigFromSettings(inst.Settings)
+	require.NoError(t, err)
+	httpclient.Init(config)
+	commands.Init(&rpc.InitRequest{
+		Instance: inst.ToRPC(),
+	}, nil)
+	defer commands.Destroy(context.Background(), &rpc.DestroyRequest{Instance: inst.ToRPC()})
 
-	res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
+	res, err := PlatformSearch(&rpc.PlatformSearchRequest{
+		Instance:    inst.ToRPC(),
 		SearchArgs:  "retrokit",
 		AllVersions: true,
 	})
-	require.Nil(t, stat)
+	require.Nil(t, err)
 	require.NotNil(t, res)
 
 	require.Len(t, res.SearchOutput, 2)
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.5",
@@ -61,9 +70,9 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Retrokits (www.retrokits.com)",
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
-		Boards:     []*commands.Board{{Name: "RK002"}},
+		Boards:     []*rpc.Board{{Name: "RK002"}},
 	})
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.6",
@@ -71,18 +80,18 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Retrokits (www.retrokits.com)",
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
-		Boards:     []*commands.Board{{Name: "RK002"}},
+		Boards:     []*rpc.Board{{Name: "RK002"}},
 	})
 
-	res, stat = PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
+	res, err = PlatformSearch(&rpc.PlatformSearchRequest{
+		Instance:    inst.ToRPC(),
 		SearchArgs:  "retrokit",
 		AllVersions: false,
 	})
-	require.Nil(t, stat)
+	require.Nil(t, err)
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 1)
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.6",
@@ -90,19 +99,19 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Retrokits (www.retrokits.com)",
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
-		Boards:     []*commands.Board{{Name: "RK002"}},
+		Boards:     []*rpc.Board{{Name: "RK002"}},
 	})
 
 	// Search the Package Maintainer
-	res, stat = PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
+	res, err = PlatformSearch(&rpc.PlatformSearchRequest{
+		Instance:    inst.ToRPC(),
 		SearchArgs:  "Retrokits (www.retrokits.com)",
 		AllVersions: true,
 	})
-	require.Nil(t, stat)
+	require.Nil(t, err)
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 2)
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.5",
@@ -110,9 +119,9 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Retrokits (www.retrokits.com)",
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
-		Boards:     []*commands.Board{{Name: "RK002"}},
+		Boards:     []*rpc.Board{{Name: "RK002"}},
 	})
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.6",
@@ -120,19 +129,19 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Retrokits (www.retrokits.com)",
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
-		Boards:     []*commands.Board{{Name: "RK002"}},
+		Boards:     []*rpc.Board{{Name: "RK002"}},
 	})
 
 	// Search using the Package name
-	res, stat = PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
+	res, err = PlatformSearch(&rpc.PlatformSearchRequest{
+		Instance:    inst.ToRPC(),
 		SearchArgs:  "Retrokits-RK002",
 		AllVersions: true,
 	})
-	require.Nil(t, stat)
+	require.Nil(t, err)
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 2)
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.5",
@@ -140,9 +149,9 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Retrokits (www.retrokits.com)",
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
-		Boards:     []*commands.Board{{Name: "RK002"}},
+		Boards:     []*rpc.Board{{Name: "RK002"}},
 	})
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.6",
@@ -150,19 +159,19 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Retrokits (www.retrokits.com)",
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
-		Boards:     []*commands.Board{{Name: "RK002"}},
+		Boards:     []*rpc.Board{{Name: "RK002"}},
 	})
 
 	// Search using the Platform name
-	res, stat = PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
+	res, err = PlatformSearch(&rpc.PlatformSearchRequest{
+		Instance:    inst.ToRPC(),
 		SearchArgs:  "rk002",
 		AllVersions: true,
 	})
-	require.Nil(t, stat)
+	require.Nil(t, err)
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 2)
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.5",
@@ -170,9 +179,9 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Retrokits (www.retrokits.com)",
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
-		Boards:     []*commands.Board{{Name: "RK002"}},
+		Boards:     []*rpc.Board{{Name: "RK002"}},
 	})
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.6",
@@ -180,19 +189,19 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Retrokits (www.retrokits.com)",
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
-		Boards:     []*commands.Board{{Name: "RK002"}},
+		Boards:     []*rpc.Board{{Name: "RK002"}},
 	})
 
 	// Search using a board name
-	res, stat = PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
+	res, err = PlatformSearch(&rpc.PlatformSearchRequest{
+		Instance:    inst.ToRPC(),
 		SearchArgs:  "Yún",
 		AllVersions: true,
 	})
-	require.Nil(t, stat)
+	require.Nil(t, err)
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 1)
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "arduino:avr",
 		Installed:  "",
 		Latest:     "1.8.3",
@@ -200,7 +209,7 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Arduino",
 		Website:    "https://www.arduino.cc/",
 		Email:      "packages@arduino.cc",
-		Boards: []*commands.Board{
+		Boards: []*rpc.Board{
 			{Name: "Arduino Yún"},
 			{Name: "Arduino Uno"},
 			{Name: "Arduino Uno WiFi"},
@@ -230,15 +239,15 @@ func TestPlatformSearch(t *testing.T) {
 		},
 	})
 
-	res, stat = PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
+	res, err = PlatformSearch(&rpc.PlatformSearchRequest{
+		Instance:    inst.ToRPC(),
 		SearchArgs:  "yun",
 		AllVersions: true,
 	})
-	require.Nil(t, stat)
+	require.Nil(t, err)
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 1)
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "arduino:avr",
 		Installed:  "",
 		Latest:     "1.8.3",
@@ -246,7 +255,7 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Arduino",
 		Website:    "https://www.arduino.cc/",
 		Email:      "packages@arduino.cc",
-		Boards: []*commands.Board{
+		Boards: []*rpc.Board{
 			{Name: "Arduino Yún"},
 			{Name: "Arduino Uno"},
 			{Name: "Arduino Uno WiFi"},
@@ -278,23 +287,33 @@ func TestPlatformSearch(t *testing.T) {
 }
 
 func TestPlatformSearchSorting(t *testing.T) {
-	dataDir := paths.TempDir().Join("test", "data_dir")
-	downloadDir := paths.TempDir().Join("test", "staging")
+	testDir := paths.TempDir().Join("test", t.Name())
+	dataDir := testDir.Join("data_dir")
+	downloadDir := testDir.Join("staging")
 	os.Setenv("ARDUINO_DATA_DIR", dataDir.String())
 	os.Setenv("ARDUINO_DOWNLOADS_DIR", downloadDir.String())
 	dataDir.MkdirAll()
 	downloadDir.MkdirAll()
-	defer paths.TempDir().Join("test").RemoveAll()
+	defer testDir.RemoveAll()
 	err := paths.New("testdata").Join("package_index.json").CopyTo(dataDir.Join("package_index.json"))
 	require.Nil(t, err)
 
-	configuration.Settings = configuration.Init(paths.TempDir().Join("test", "arduino-cli.yaml").String())
-
-	inst := instance.CreateAndInit()
+	createRes, err := commands.Create(&rpc.CreateRequest{
+		ConfigFile: testDir.Join("arduino-cli.yaml").String(),
+	})
+	require.NoError(t, err)
+	inst := commands.GetInstance(createRes.Instance.Id)
 	require.NotNil(t, inst)
+	config, err := httpclient.ConfigFromSettings(inst.Settings)
+	require.NoError(t, err)
+	httpclient.Init(config)
+	commands.Init(&rpc.InitRequest{
+		Instance: inst.ToRPC(),
+	}, nil)
+	defer commands.Destroy(context.Background(), &rpc.DestroyRequest{Instance: inst.ToRPC()})
 
 	res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
+		Instance:    inst.ToRPC(),
 		SearchArgs:  "",
 		AllVersions: false,
 	})
