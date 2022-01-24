@@ -145,8 +145,11 @@ func (mon *PluggableMonitor) waitMessage(timeout time.Duration, expectedEvt stri
 	if msg.EventType != expectedEvt {
 		return msg, fmt.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), expectedEvt, msg.EventType)
 	}
-	if msg.Message != "OK" || msg.Error {
+	if msg.Error {
 		return msg, fmt.Errorf(tr("command '%[1]s' failed: %[2]s"), expectedEvt, msg.Message)
+	}
+	if strings.ToUpper(msg.Message) != "OK" {
+		return msg, fmt.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "OK", msg.Message)
 	}
 	return msg, nil
 }
