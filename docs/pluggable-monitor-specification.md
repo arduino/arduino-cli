@@ -62,7 +62,7 @@ port configuration, and which parameters are available to the user.
 
 ```JSON
 {
-  "event": "describe",
+  "eventType": "describe",
   "message": "ok",
   "port_description": {
     "protocol": "serial",
@@ -127,7 +127,7 @@ The response to the command is:
 
 ```JSON
 {
-  "event": "configure",
+  "eventType": "configure",
   "message": "ok"
 }
 ```
@@ -136,7 +136,7 @@ or if there is an error:
 
 ```JSON
 {
-  "event": "configure",
+  "eventType": "configure",
   "error": true,
   "message": "invalid value for parameter baudrate: 123456"
 }
@@ -167,7 +167,7 @@ The answer to the `OPEN` command is:
 
 ```JSON
 {
-  "event": "open",
+  "eventType": "open",
   "message": "ok"
 }
 ```
@@ -177,7 +177,7 @@ other error condition happens:
 
 ```JSON
 {
-  "event": "open",
+  "eventType": "open",
   "error": true,
   "message": "unknown port /dev/ttyACM23"
 }
@@ -191,7 +191,7 @@ tool:
 
 ```JSON
 {
-  "event": "port_closed",
+  "eventType": "port_closed",
   "message": "serial port disappeared!"
 }
 ```
@@ -200,7 +200,7 @@ or
 
 ```JSON
 {
-  "event": "port_closed",
+  "eventType": "port_closed",
   "message": "lost TCP/IP connection with the client!"
 }
 ```
@@ -212,7 +212,7 @@ Client/IDE. The answer to the command is:
 
 ```JSON
 {
-  "event": "close",
+  "eventType": "close",
   "message": "ok"
 }
 ```
@@ -221,7 +221,7 @@ or in case of error
 
 ```JSON
 {
-  "event": "close",
+  "eventType": "close",
   "error": true,
   "message": "port already closed"
 }
