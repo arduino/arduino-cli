@@ -16,7 +16,6 @@
 package phases
 
 import (
-	"os"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
@@ -88,26 +87,25 @@ func findExpectedPrecompiledLibFolder(ctx *types.Context, library *libraries.Lib
 		}
 	}
 
-	logger := ctx.GetLogger()
-	logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, tr("Library {0} has been declared precompiled:"), library.Name)
+	ctx.Info(tr("Library %[1]s has been declared precompiled:", library.Name))
 
 	// Try directory with full fpuSpecs first, if available
 	if len(fpuSpecs) > 0 {
 		fpuSpecs = strings.TrimRight(fpuSpecs, "-")
 		fullPrecompDir := library.SourceDir.Join(mcu).Join(fpuSpecs)
 		if fullPrecompDir.Exist() && directoryContainsFile(fullPrecompDir) {
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, tr("Using precompiled library in {0}"), fullPrecompDir)
+			ctx.Info(tr("Using precompiled library in %[1]s", fullPrecompDir))
 			return fullPrecompDir
 		}
-		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, tr("Precompiled library in \"{0}\" not found"), fullPrecompDir)
+		ctx.Info(tr(`Precompiled library in "%[1]s" not found`, fullPrecompDir))
 	}
 
 	precompDir := library.SourceDir.Join(mcu)
 	if precompDir.Exist() && directoryContainsFile(precompDir) {
-		logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, tr("Using precompiled library in {0}"), precompDir)
+		ctx.Info(tr("Using precompiled library in %[1]s", precompDir))
 		return precompDir
 	}
-	logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, tr("Precompiled library in \"{0}\" not found"), precompDir)
+	ctx.Info(tr(`Precompiled library in "%[1]s" not found`, precompDir))
 	return nil
 }
 
@@ -131,9 +129,8 @@ func compileLibraries(ctx *types.Context, libraries libraries.List, buildPath *p
 }
 
 func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
-	logger := ctx.GetLogger()
 	if ctx.Verbose {
-		logger.Println(constants.LOG_LEVEL_INFO, tr("Compiling library \"{0}\""), library.Name)
+		ctx.Info(tr(`Compiling library "%[1]s"`, library.Name))
 	}
 	libraryBuildPath := buildPath.Join(library.Name)
 
@@ -148,9 +145,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 		precompiledPath := findExpectedPrecompiledLibFolder(ctx, library)
 
 		if !coreSupportPrecompiled {
-			logger := ctx.GetLogger()
-			logger.Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, tr("The platform does not support '{0}' for precompiled libraries."), "compiler.libraries.ldflags")
-
+			ctx.Info(tr("The platform does not support '%[1]s' for precompiled libraries.", "compiler.libraries.ldflags"))
 		} else if precompiledPath != nil {
 			// Find all libraries in precompiledPath
 			libs, err := precompiledPath.ReadDir()

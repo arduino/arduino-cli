@@ -32,7 +32,7 @@ type Linker struct{}
 func (s *Linker) Run(ctx *types.Context) error {
 	if ctx.OnlyUpdateCompilationDatabase {
 		if ctx.Verbose {
-			ctx.GetLogger().Println("info", tr("Skip linking of final executable."))
+			ctx.Info(tr("Skip linking of final executable."))
 		}
 		return nil
 	}

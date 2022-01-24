@@ -16,7 +16,6 @@
 package builder
 
 import (
-	"os"
 	"strings"
 
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
@@ -27,7 +26,6 @@ type AddBuildBoardPropertyIfMissing struct{}
 
 func (*AddBuildBoardPropertyIfMissing) Run(ctx *types.Context) error {
 	packages := ctx.Hardware
-	logger := ctx.GetLogger()
 
 	for _, aPackage := range packages {
 		for _, platform := range aPackage.Platforms {
@@ -35,14 +33,10 @@ func (*AddBuildBoardPropertyIfMissing) Run(ctx *types.Context) error {
 				for _, board := range platformRelease.Boards {
 					if board.Properties.Get("build.board") == "" {
 						board.Properties.Set("build.board", strings.ToUpper(platform.Architecture+"_"+board.BoardID))
-						logger.Fprintln(
-							os.Stdout,
-							constants.LOG_LEVEL_WARN,
-							tr("Warning: Board {0}:{1}:{2} doesn''t define a %s preference. Auto-set to: {3}", "''build.board''"),
-							aPackage.Name,
-							platform.Architecture,
-							board.BoardID,
-							board.Properties.Get(constants.BUILD_PROPERTIES_BUILD_BOARD))
+						ctx.Info(tr("Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s",
+							aPackage.Name+":"+platform.Architecture+":"+board.BoardID,
+							"'build.board'",
+							board.Properties.Get(constants.BUILD_PROPERTIES_BUILD_BOARD)))
 					}
 				}
 			}

@@ -100,7 +100,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
@@ -112,7 +111,10 @@ type ContainerFindIncludes struct{}
 func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 	err := s.findIncludes(ctx)
 	if err != nil && ctx.OnlyUpdateCompilationDatabase {
-		ctx.GetLogger().Println("info", "%s: %s", tr("An error occurred detecting libraries"), tr("the compilation database may be incomplete or inaccurate"))
+		ctx.Info(
+			fmt.Sprintf("%s: %s",
+				tr("An error occurred detecting libraries"),
+				tr("the compilation database may be incomplete or inaccurate")))
 		return nil
 	}
 	return err
@@ -330,7 +332,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 				// Fully precompiled libraries should have no dependencies
 				// to avoid ABI breakage
 				if ctx.Verbose {
-					ctx.GetLogger().Println(constants.LOG_LEVEL_DEBUG, tr("Skipping dependencies detection for precompiled library {0}"), library.Name)
+					ctx.Info(tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
 				}
 				return nil
 			}
@@ -342,7 +344,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		if unchanged && cache.valid {
 			include = cache.Next().Include
 			if first && ctx.Verbose {
-				ctx.GetLogger().Println(constants.LOG_LEVEL_INFO, tr("Using cached library dependencies for file: {0}"), sourcePath)
+				ctx.Info(tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
 		} else {
 			preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
@@ -359,7 +361,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 			} else {
 				include = IncludesFinderWithRegExp(string(preproc_stderr))
 				if include == "" && ctx.Verbose {
-					ctx.GetLogger().Println(constants.LOG_LEVEL_DEBUG, tr("Error while detecting libraries included by {0}"), sourcePath)
+					ctx.Info(tr("Error while detecting libraries included by %[1]s", sourcePath))
 				}
 			}
 		}
@@ -386,7 +388,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 					return errors.New(tr("Internal error in cache"))
 				}
 			}
-			ctx.ExecStderr.Write(preproc_stderr)
+			ctx.Stderr.Write(preproc_stderr)
 			return errors.WithStack(preproc_err)
 		}
 

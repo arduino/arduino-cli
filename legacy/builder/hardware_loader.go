@@ -34,9 +34,8 @@ func (s *HardwareLoader) Run(ctx *types.Context) error {
 			// When we're gonna refactor the legacy package this will be gone.
 
 			if ctx.Verbose {
-				log := ctx.GetLogger()
 				for _, err := range errs {
-					log.Println("info", "Error loading hardware platform: {0}", err.Message())
+					ctx.Info(tr("Error loading hardware platform: %[1]s", err.Message()))
 				}
 			}
 		}

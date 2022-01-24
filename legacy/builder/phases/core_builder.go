@@ -44,9 +44,8 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 
 	if coreBuildCachePath != nil {
 		if _, err := coreBuildCachePath.RelTo(ctx.BuildPath); err != nil {
-			logger := ctx.GetLogger()
-			logger.Println(constants.LOG_LEVEL_INFO, tr("Couldn't deeply cache core build: {0}"), err)
-			logger.Println(constants.LOG_LEVEL_INFO, tr("Running normal build of the core..."))
+			ctx.Info(tr("Couldn't deeply cache core build: %[1]s", err))
+			ctx.Info(tr("Running normal build of the core..."))
 			coreBuildCachePath = nil
 			ctx.CoreBuildCachePath = nil
 		} else if err := coreBuildCachePath.MkdirAll(); err != nil {
@@ -66,7 +65,6 @@ func (s *CoreBuilder) Run(ctx *types.Context) error {
 }
 
 func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *paths.Path, buildProperties *properties.Map) (*paths.Path, paths.PathList, error) {
-	logger := ctx.GetLogger()
 	coreFolder := buildProperties.GetPath("build.core.path")
 	variantFolder := buildProperties.GetPath("build.variant.path")
 
@@ -104,7 +102,7 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 		if canUseArchivedCore {
 			// use archived core
 			if ctx.Verbose {
-				logger.Println(constants.LOG_LEVEL_INFO, tr("Using precompiled core: {0}"), targetArchivedCore)
+				ctx.Info(tr("Using precompiled core: %[1]s", targetArchivedCore))
 			}
 			return targetArchivedCore, variantObjectFiles, nil
 		}
@@ -125,15 +123,13 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 		err := archiveFile.CopyTo(targetArchivedCore)
 		if ctx.Verbose {
 			if err == nil {
-				logger.Println(constants.LOG_LEVEL_INFO, tr("Archiving built core (caching) in: {0}"), targetArchivedCore)
+				ctx.Info(tr("Archiving built core (caching) in: %[1]s", targetArchivedCore))
 			} else if os.IsNotExist(err) {
-				logger.Println(
-					constants.LOG_LEVEL_INFO,
-					tr("Unable to cache built core, please tell {0} maintainers to follow %s",
-						"https://arduino.github.io/arduino-cli/latest/platform-specification/#recipes-to-build-the-corea-archive-file"),
-					ctx.ActualPlatform)
+				ctx.Info(tr("Unable to cache built core, please tell %[1]s maintainers to follow %[2]s",
+					ctx.ActualPlatform,
+					"https://arduino.github.io/arduino-cli/latest/platform-specification/#recipes-to-build-the-corea-archive-file"))
 			} else {
-				logger.Println(constants.LOG_LEVEL_INFO, tr("Error archiving built core (caching) in {0}: {1}"), targetArchivedCore, err)
+				ctx.Info(tr("Error archiving built core (caching) in %[1]s: %[2]s", targetArchivedCore, err))
 			}
 		}
 	}

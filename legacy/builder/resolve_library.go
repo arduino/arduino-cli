@@ -19,7 +19,6 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 )
 
@@ -29,11 +28,10 @@ func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {
 
 	candidates := resolver.AlternativesFor(header)
 
-	logger := ctx.GetLogger()
 	if ctx.Verbose {
-		logger.Println(constants.LOG_LEVEL_INFO, tr("Alternatives for %[1]s: %[2]s", header, candidates))
-		logger.Println(constants.LOG_LEVEL_INFO, fmt.Sprintf("ResolveLibrary(%s)", header))
-		logger.Println(constants.LOG_LEVEL_INFO, fmt.Sprintf("  -> %s: %s", tr("candidates"), candidates))
+		ctx.Info(tr("Alternatives for %[1]s: %[2]s", header, candidates))
+		ctx.Info(fmt.Sprintf("ResolveLibrary(%s)", header))
+		ctx.Info(fmt.Sprintf("  -> %s: %s", tr("candidates"), candidates))
 	}
 
 	if candidates == nil || len(candidates) == 0 {

@@ -16,7 +16,6 @@
 package builder
 
 import (
-	"os"
 	"strings"
 
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
@@ -26,13 +25,8 @@ import (
 type WarnAboutArchIncompatibleLibraries struct{}
 
 func (s *WarnAboutArchIncompatibleLibraries) Run(ctx *types.Context) error {
-	if ctx.DebugLevel < 0 {
-		return nil
-	}
-
 	targetPlatform := ctx.TargetPlatform
 	buildProperties := ctx.BuildProperties
-	logger := ctx.GetLogger()
 
 	archs := []string{targetPlatform.Platform.Architecture}
 	if overrides, ok := buildProperties.GetOk(constants.BUILD_PROPERTIES_ARCH_OVERRIDE_CHECK); ok {
@@ -41,12 +35,11 @@ func (s *WarnAboutArchIncompatibleLibraries) Run(ctx *types.Context) error {
 
 	for _, importedLibrary := range ctx.ImportedLibraries {
 		if !importedLibrary.SupportsAnyArchitectureIn(archs...) {
-			logger.Fprintln(os.Stdout,
-				constants.LOG_LEVEL_WARN,
-				tr("WARNING: library {0} claims to run on {1} architecture(s) and may be incompatible with your current board which runs on {2} architecture(s)."),
-				importedLibrary.Name,
-				strings.Join(importedLibrary.Architectures, ", "),
-				strings.Join(archs, ", "))
+			ctx.Info(
+				tr("WARNING: library %[1]s claims to run on %[2]s architecture(s) and may be incompatible with your current board which runs on %[3]s architecture(s).",
+					importedLibrary.Name,
+					strings.Join(importedLibrary.Architectures, ", "),
+					strings.Join(archs, ", ")))
 		}
 	}
 

@@ -254,3 +254,71 @@ program.extra_params=-P{serial.port}
 
 	require.Equal(t, expectedProps.AsMap(), props.AsMap())
 }
+
+func TestConvertUploadToolsToPluggableDiscoveryWithMenus(t *testing.T) {
+	props, err := properties.LoadFromBytes([]byte(`
+name=Nucleo-64
+
+build.core=arduino
+build.board=Nucleo_64
+build.variant_h=variant_{build.board}.h
+build.extra_flags=-D{build.product_line} {build.enable_usb} {build.xSerial}
+
+# Upload menu
+menu.upload_method.MassStorage=Mass Storage
+menu.upload_method.MassStorage.upload.protocol=
+menu.upload_method.MassStorage.upload.tool=massStorageCopy
+
+menu.upload_method.swdMethod=STM32CubeProgrammer (SWD)
+menu.upload_method.swdMethod.upload.protocol=0
+menu.upload_method.swdMethod.upload.options=-g
+menu.upload_method.swdMethod.upload.tool=stm32CubeProg
+
+menu.upload_method.serialMethod=STM32CubeProgrammer (Serial)
+menu.upload_method.serialMethod.upload.protocol=1
+menu.upload_method.serialMethod.upload.options={serial.port.file} -s
+menu.upload_method.serialMethod.upload.tool=stm32CubeProg
+
+menu.upload_method.dfuMethod=STM32CubeProgrammer (DFU)
+menu.upload_method.dfuMethod.upload.protocol=2
+menu.upload_method.dfuMethod.upload.options=-g
+menu.upload_method.dfuMethod.upload.tool=stm32CubeProg
+`))
+	require.NoError(t, err)
+	convertUploadToolsToPluggableDiscovery(props)
+
+	expectedProps, err := properties.LoadFromBytes([]byte(`
+name=Nucleo-64
+
+build.core=arduino
+build.board=Nucleo_64
+build.variant_h=variant_{build.board}.h
+build.extra_flags=-D{build.product_line} {build.enable_usb} {build.xSerial}
+
+# Upload menu
+menu.upload_method.MassStorage=Mass Storage
+menu.upload_method.MassStorage.upload.protocol=
+menu.upload_method.MassStorage.upload.tool=massStorageCopy
+menu.upload_method.MassStorage.upload.tool.default=massStorageCopy
+
+menu.upload_method.swdMethod=STM32CubeProgrammer (SWD)
+menu.upload_method.swdMethod.upload.protocol=0
+menu.upload_method.swdMethod.upload.options=-g
+menu.upload_method.swdMethod.upload.tool=stm32CubeProg
+menu.upload_method.swdMethod.upload.tool.default=stm32CubeProg
+
+menu.upload_method.serialMethod=STM32CubeProgrammer (Serial)
+menu.upload_method.serialMethod.upload.protocol=1
+menu.upload_method.serialMethod.upload.options={serial.port.file} -s
+menu.upload_method.serialMethod.upload.tool=stm32CubeProg
+menu.upload_method.serialMethod.upload.tool.default=stm32CubeProg
+
+menu.upload_method.dfuMethod=STM32CubeProgrammer (DFU)
+menu.upload_method.dfuMethod.upload.protocol=2
+menu.upload_method.dfuMethod.upload.options=-g
+menu.upload_method.dfuMethod.upload.tool=stm32CubeProg
+menu.upload_method.dfuMethod.upload.tool.default=stm32CubeProg
+`))
+	require.NoError(t, err)
+	require.Equal(t, expectedProps.AsMap(), props.AsMap())
+}

@@ -34,7 +34,6 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 		ArduinoAPIVersion:  "ideVersion",
 		Verbose:            true,
 		BuildPath:          paths.New("buildPath"),
-		DebugLevel:         5,
 		OptimizationFlags:  "-Os",
 	}
 

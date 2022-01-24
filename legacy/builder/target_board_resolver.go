@@ -16,21 +16,18 @@
 package builder
 
 import (
+	"fmt"
 	"strings"
 
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 )
 
 type TargetBoardResolver struct{}
 
 func (s *TargetBoardResolver) Run(ctx *types.Context) error {
-	logger := ctx.GetLogger()
-
 	targetPackage, targetPlatform, targetBoard, buildProperties, actualPlatform, err := ctx.PackageManager.ResolveFQBN(ctx.FQBN)
 	if err != nil {
-		return i18n.ErrorfWithLogger(logger, tr("Error resolving FQBN: {0}"), err)
+		return fmt.Errorf("%s: %w", tr("Error resolving FQBN"), err)
 	}
 
 	targetBoard.Properties = buildProperties // FIXME....
@@ -43,14 +40,8 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 	core = core[strings.Index(core, ":")+1:]
 
 	if ctx.Verbose {
-		logger.Println(constants.LOG_LEVEL_INFO,
-			tr("Using board '{0}' from platform in folder: {1}"),
-			targetBoard.BoardID,
-			targetPlatform.InstallDir)
-		logger.Println(constants.LOG_LEVEL_INFO,
-			tr("Using core '{0}' from platform in folder: {1}"),
-			core,
-			actualPlatform.InstallDir)
+		ctx.Info(tr("Using board '%[1]s' from platform in folder: %[2]s", targetBoard.BoardID, targetPlatform.InstallDir))
+		ctx.Info(tr("Using core '%[1]s' from platform in folder: %[2]s", core, actualPlatform.InstallDir))
 	}
 
 	ctx.BuildCore = core

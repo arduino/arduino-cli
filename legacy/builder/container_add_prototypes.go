@@ -16,6 +16,8 @@
 package builder
 
 import (
+	"fmt"
+
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -39,7 +41,10 @@ func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 		}
 
 		// Do not bail out if we are generating the compile commands database
-		ctx.GetLogger().Println("info", "%s: %s", tr("An error occurred adding prototypes"), tr("the compilation database may be incomplete or inaccurate"))
+		ctx.Info(
+			fmt.Sprintf("%s: %s",
+				tr("An error occurred adding prototypes"),
+				tr("the compilation database may be incomplete or inaccurate")))
 		if err := sourceFile.CopyTo(targetFilePath); err != nil {
 			return errors.WithStack(err)
 		}

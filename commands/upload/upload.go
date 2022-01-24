@@ -66,12 +66,12 @@ func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsReques
 		return nil, &arduino.InvalidFQBNError{Cause: err}
 	}
 
-	_, platformRelease, board, _, _, err := pm.ResolveFQBN(fqbn)
+	_, platformRelease, _, boardProperties, _, err := pm.ResolveFQBN(fqbn)
 	if err != nil {
 		return nil, &arduino.UnknownFQBNError{Cause: err}
 	}
 
-	toolID, err := getToolID(board.Properties, "upload", req.Protocol)
+	toolID, err := getToolID(boardProperties, "upload", req.Protocol)
 	if err != nil {
 		return nil, err
 	}
@@ -560,7 +560,7 @@ func runTool(recipeID string, props *properties.Map, outStream, errStream io.Wri
 	if strings.TrimSpace(recipe) == "" {
 		return nil // Nothing to run
 	}
-	if props.IsPropertyMissingInExpandPropsInString("serial.port", recipe) {
+	if props.IsPropertyMissingInExpandPropsInString("serial.port", recipe) || props.IsPropertyMissingInExpandPropsInString("serial.port.file", recipe) {
 		return fmt.Errorf(tr("no upload port provided"))
 	}
 	cmdLine := props.ExpandPropsInString(recipe)

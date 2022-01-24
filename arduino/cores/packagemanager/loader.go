@@ -574,18 +574,35 @@ func convertVidPidIdentificationPropertiesToPluggableDiscovery(boardProperties *
 
 func convertUploadToolsToPluggableDiscovery(props *properties.Map) {
 	actions := []string{"upload", "bootloader", "program"}
+	propsToAdd := properties.NewMap()
 	for _, action := range actions {
-		if !props.ContainsKey(fmt.Sprintf("%s.tool.default", action)) {
-			tool, found := props.GetOk(fmt.Sprintf("%s.tool", action))
+		action += ".tool"
+		defaultAction := action + ".default"
+		if !props.ContainsKey(defaultAction) {
+			// Search for "menu.MENU-ID.MENU-ITEM.ACTION.tool" (some platforms sets ACTION.tool on
+			// submenu config entries). See https://github.com/arduino/arduino-cli/issues/1444
+			for key, value := range props.AsMap() {
+				if !strings.HasPrefix(key, "menu.") {
+					continue
+				}
+				split := strings.Split(key, ".")
+				if len(split) != 5 || split[3]+"."+split[4] != action {
+					continue
+				}
+				prefix := split[0] + "." + split[1] + "." + split[2]
+				propsToAdd.Set(prefix+"."+defaultAction, value)
+			}
+			tool, found := props.GetOk(action)
 			if !found {
 				// Just skip it, ideally this must never happen but if a platform
 				// doesn't define an expected upload.tool, bootloader.tool or program.tool
 				// there will be other issues further down the road after this conversion
 				continue
 			}
-			props.Set(fmt.Sprintf("%s.tool.default", action), tool)
+			propsToAdd.Set(defaultAction, tool)
 		}
 	}
+	props.Merge(propsToAdd)
 }
 
 func (pm *PackageManager) loadToolsFromPackage(targetPackage *cores.Package, toolsPath *paths.Path) []*status.Status {

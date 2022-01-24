@@ -22,7 +22,6 @@ import (
 
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/marcinbor85/gohex"
 	"github.com/pkg/errors"
@@ -66,7 +65,9 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 
 	bootloaderPath := buildProperties.GetPath(constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH).Join(constants.FOLDER_BOOTLOADERS, bootloader)
 	if bootloaderPath.NotExist() {
-		utils.LogIfVerbose(constants.LOG_LEVEL_WARN, tr("Bootloader file specified but missing: {0}"), bootloaderPath)
+		if ctx.Verbose {
+			ctx.Warn(tr("Bootloader file specified but missing: %[1]s", bootloaderPath))
+		}
 		return nil
 	}
 
@@ -79,8 +80,8 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 		maximumBinSize *= 2
 	}
 	err := merge(builtSketchPath, bootloaderPath, mergedSketchPath, maximumBinSize)
-	if err != nil {
-		utils.LogIfVerbose(constants.LOG_LEVEL_INFO, err.Error())
+	if err != nil && ctx.Verbose {
+		ctx.Info(err.Error())
 	}
 
 	return nil
