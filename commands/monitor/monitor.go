@@ -77,11 +77,13 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 
 	descriptor, err := m.Describe()
 	if err != nil {
+		m.Quit()
 		return nil, nil, &arduino.FailedMonitorError{Cause: err}
 	}
 
 	monIO, err := m.Open(req.GetPort().GetAddress(), req.GetPort().GetProtocol())
 	if err != nil {
+		m.Quit()
 		return nil, nil, &arduino.FailedMonitorError{Cause: err}
 	}
 
