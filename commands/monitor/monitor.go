@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
+	"github.com/sirupsen/logrus"
 )
 
 var tr = i18n.Tr
@@ -85,9 +86,12 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 	}
 
 	for _, setting := range req.GetPortConfiguration().Settings {
-		m.Configure(setting.SettingId, setting.Value)
+		if err := m.Configure(setting.SettingId, setting.Value); err != nil {
+			logrus.Errorf("Could not set configuration %s=%s: %s", setting.SettingId, setting.Value, err)
+		}
 	}
 
+	logrus.Infof("Port %s successfully opened", req.GetPort().GetAddress())
 	return &PortProxy{
 		rw:               monIO,
 		changeSettingsCB: m.Configure,
