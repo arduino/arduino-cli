@@ -577,7 +577,7 @@ func runTool(recipeID string, props *properties.Map, outStream, errStream io.Wri
 	if dryRun {
 		return nil
 	}
-	cmd, err := executils.NewProcess(cmdArgs...)
+	cmd, err := executils.NewProcess(nil, cmdArgs...)
 	if err != nil {
 		return fmt.Errorf(tr("cannot execute upload tool: %s"), err)
 	}

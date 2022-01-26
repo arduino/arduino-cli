@@ -30,16 +30,19 @@ type Process struct {
 	cmd *exec.Cmd
 }
 
-// NewProcess creates a command with the provided command line arguments.
-// The first argument is the path to the executable, the remainder are the
-// arguments to the command.
-func NewProcess(args ...string) (*Process, error) {
+// NewProcess creates a command with the provided command line arguments
+// and environment variables (that will be added to the parent os.Environ).
+// The first argument args[0] is the path to the executable, the remainder
+// are the arguments to the command.
+func NewProcess(extraEnv []string, args ...string) (*Process, error) {
 	if len(args) == 0 {
 		return nil, errors.New(tr("no executable specified"))
 	}
 	p := &Process{
 		cmd: exec.Command(args[0], args[1:]...),
 	}
+	p.cmd.Env = append(p.cmd.Env, os.Environ()...)
+	p.cmd.Env = append(p.cmd.Env, extraEnv...)
 	TellCommandNotToSpawnShell(p.cmd)
 
 	// This is required because some tools detects if the program is running
@@ -49,12 +52,12 @@ func NewProcess(args ...string) (*Process, error) {
 	return p, nil
 }
 
-// NewProcessFromPath creates a command from the provided executable path and
-// command line arguments.
-func NewProcessFromPath(executable *paths.Path, args ...string) (*Process, error) {
+// NewProcessFromPath creates a command from the provided executable path,
+// additional environemnt vars and command line arguments.
+func NewProcessFromPath(extraEnv []string, executable *paths.Path, args ...string) (*Process, error) {
 	processArgs := []string{executable.String()}
 	processArgs = append(processArgs, args...)
-	return NewProcess(processArgs...)
+	return NewProcess(extraEnv, processArgs...)
 }
 
 // RedirectStdoutTo will redirect the process' stdout to the specified
@@ -140,7 +143,9 @@ func (p *Process) Run() error {
 
 // SetEnvironment set the enviroment for the running process. Each entry is of the form "key=value".
 func (p *Process) SetEnvironment(values []string) {
-	p.cmd.Env = values
+	p.cmd.Env = nil
+	p.cmd.Env = append(p.cmd.Env, os.Environ()...)
+	p.cmd.Env = append(p.cmd.Env, values...)
 }
 
 // RunWithinContext starts the specified command and waits for it to complete. If the given context

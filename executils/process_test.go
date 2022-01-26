@@ -25,13 +25,13 @@ import (
 
 func TestProcessWithinContext(t *testing.T) {
 	// Build `delay` helper inside testdata/delay
-	builder, err := NewProcess("go", "build")
+	builder, err := NewProcess(nil, "go", "build")
 	require.NoError(t, err)
 	builder.SetDir("testdata/delay")
 	require.NoError(t, builder.Run())
 
 	// Run delay and test if the process is terminated correctly due to context
-	process, err := NewProcess("testdata/delay/delay")
+	process, err := NewProcess(nil, "testdata/delay/delay")
 	require.NoError(t, err)
 	start := time.Now()
 	ctx, cancel := context.WithTimeout(context.Background(), 250*time.Millisecond)
