@@ -1,10 +1,10 @@
 # 
 # Translators:
-# 江 江, 2021
+# cike567, 2022
 # 
 msgid ""
 msgstr ""
-"Last-Translator: 江 江, 2021\n"
+"Last-Translator: cike567, 2022\n"
 "Language-Team: Chinese (https://www.transifex.com/arduino-1/teams/108174/zh/)\n"
 "Language: zh\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -2379,9 +2379,9 @@ msgstr ""
 msgid "boardname"
 msgstr ""
 
-#: arduino/discovery/discovery.go:312 arduino/discovery/discovery.go:333
-#: arduino/discovery/discovery.go:353 arduino/discovery/discovery.go:376
-#: arduino/discovery/discovery.go:393 arduino/discovery/discovery.go:416
+#: arduino/discovery/discovery.go:312 arduino/discovery/discovery.go:335
+#: arduino/discovery/discovery.go:357 arduino/discovery/discovery.go:382
+#: arduino/discovery/discovery.go:401 arduino/discovery/discovery.go:424
 msgid "calling %[1]s: %[2]w"
 msgstr ""
 
@@ -2397,7 +2397,7 @@ msgstr ""
 msgid "can't find main Sketch file in %s"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:803
+#: arduino/cores/packagemanager/loader.go:820
 msgid "can't find pattern for discovery with id %s"
 msgstr ""
 
@@ -2434,38 +2434,20 @@ msgstr ""
 msgid "command '%[1]s' failed: %[2]s"
 msgstr ""
 
-#: arduino/discovery/discovery.go:316 arduino/discovery/discovery.go:337
-#: arduino/discovery/discovery.go:357 arduino/discovery/discovery.go:380
-#: arduino/discovery/discovery.go:397 arduino/discovery/discovery.go:420
+#: arduino/discovery/discovery.go:316 arduino/discovery/discovery.go:339
+#: arduino/discovery/discovery.go:361 arduino/discovery/discovery.go:386
+#: arduino/discovery/discovery.go:405 arduino/discovery/discovery.go:428
 msgid "command failed: %s"
 msgstr ""
 
-#: arduino/monitor/monitor.go:146
+#: arduino/discovery/discovery.go:314 arduino/discovery/discovery.go:318
+#: arduino/discovery/discovery.go:337 arduino/discovery/discovery.go:341
+#: arduino/discovery/discovery.go:359 arduino/discovery/discovery.go:363
+#: arduino/discovery/discovery.go:384 arduino/discovery/discovery.go:388
+#: arduino/discovery/discovery.go:403 arduino/discovery/discovery.go:426
+#: arduino/discovery/discovery.go:430 arduino/monitor/monitor.go:146
+#: arduino/monitor/monitor.go:152
 msgid "communication out of sync, expected '%[1]s', received '%[2]s'"
-msgstr ""
-
-#: arduino/discovery/discovery.go:314
-msgid "communication out of sync, expected 'hello', received '%s'"
-msgstr ""
-
-#: arduino/discovery/discovery.go:395
-msgid "communication out of sync, expected 'list', received '%s'"
-msgstr ""
-
-#: arduino/discovery/discovery.go:378
-msgid "communication out of sync, expected 'quit', received '%s'"
-msgstr ""
-
-#: arduino/discovery/discovery.go:335
-msgid "communication out of sync, expected 'start', received '%s'"
-msgstr ""
-
-#: arduino/discovery/discovery.go:418
-msgid "communication out of sync, expected 'start_sync', received '%s'"
-msgstr ""
-
-#: arduino/discovery/discovery.go:355
-msgid "communication out of sync, expected 'stop', received '%s'"
 msgstr ""
 
 #: arduino/resources/checksums.go:76
@@ -2476,7 +2458,7 @@ msgstr ""
 msgid "could not find a valid build artifact"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:740
+#: arduino/cores/packagemanager/loader.go:757
 msgid "creating discovery: %s"
 msgstr ""
 
@@ -2516,11 +2498,11 @@ msgstr ""
 msgid "discovery %[1]s process not started: %[2]w"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:731
+#: arduino/cores/packagemanager/loader.go:748
 msgid "discovery not found: %s"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:735
+#: arduino/cores/packagemanager/loader.go:752
 msgid "discovery not installed: %s"
 msgstr ""
 
@@ -2646,7 +2628,11 @@ msgstr ""
 msgid "getting discovery dependencies for platform %[1]s: %[2]s"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:684
+#: arduino/cores/packagemanager/download.go:111
+msgid "getting monitor dependencies for platform %[1]s: %[2]s"
+msgstr ""
+
+#: arduino/cores/packagemanager/loader.go:701
 msgid "getting parent dir of %[1]s: %[2]s"
 msgstr ""
 
@@ -2829,7 +2815,7 @@ msgstr ""
 msgid "loading boards: %s"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:639
+#: arduino/cores/packagemanager/loader.go:656
 msgid "loading bundled tools from %[1]s: %[2]s"
 msgstr ""
 
@@ -2856,7 +2842,7 @@ msgstr ""
 msgid "loading platform.txt: %v"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:606
+#: arduino/cores/packagemanager/loader.go:623
 msgid "loading tool release in %[1]s: %[2]s"
 msgstr ""
 
@@ -3017,11 +3003,11 @@ msgstr ""
 msgid "port not found: %[1]s %[2]s"
 msgstr ""
 
-#: arduino/monitor/monitor.go:238
+#: arduino/monitor/monitor.go:241
 msgid "protocol version not supported: requested %[1]d, got %[2]d"
 msgstr ""
 
-#: arduino/discovery/discovery.go:318
+#: arduino/discovery/discovery.go:320
 msgid "protocol version not supported: requested 1, got %d"
 msgstr ""
 
@@ -3033,7 +3019,7 @@ msgstr ""
 msgid "reading %[1]s directory: %[2]s"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:689
+#: arduino/cores/packagemanager/loader.go:706
 msgid "reading %[1]s: %[2]s"
 msgstr ""
 
@@ -3043,7 +3029,7 @@ msgid "reading dir %[1]s: %[2]s"
 msgstr ""
 
 #: arduino/cores/packagemanager/loader.go:167
-#: arduino/cores/packagemanager/loader.go:597
+#: arduino/cores/packagemanager/loader.go:614
 msgid "reading directory %[1]s: %[2]s"
 msgstr ""
 
@@ -3132,7 +3118,7 @@ msgstr ""
 msgid "scanning examples: %s"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:675
+#: arduino/cores/packagemanager/loader.go:692
 msgid "searching for builtin_tools_versions.txt in %[1]s: %[2]s"
 msgstr ""
 
@@ -3230,7 +3216,7 @@ msgstr ""
 msgid "tool '%[1]s' not found in package '%[2]s'"
 msgstr ""
 
-#: arduino/cores/packagemanager/download.go:114
+#: arduino/cores/packagemanager/download.go:123
 msgid "tool not available for your OS"
 msgstr ""
 

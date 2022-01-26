@@ -1,15 +1,9 @@
 # 
-# Translators:
-# Juan Felipe Giraldo <juanfegiraldo97@gmail.com>, 2021
-# William Cabrera <cabrerawilliam@gmail.com>, 2021
-# Carlos José Banti, 2022
-# 
 msgid ""
 msgstr ""
-"Last-Translator: Carlos José Banti, 2022\n"
-"Language-Team: Spanish (https://www.transifex.com/arduino-1/teams/108174/es/)\n"
-"Language: es\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language-Team: Japanese (https://www.transifex.com/arduino-1/teams/108174/ja/)\n"
+"Language: ja\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: version/version.go:53
 msgid "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
