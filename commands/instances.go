@@ -106,7 +106,7 @@ func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, down
 }
 
 // Create a new CoreInstance ready to be initialized, supporting directories are also created.
-func Create(req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
+func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateResponse, error) {
 	instance := &CoreInstance{}
 
 	// Setup downloads directory
@@ -129,11 +129,16 @@ func Create(req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
 	}
 
 	// Create package manager
+	userAgent := "arduino-cli/" + globals.VersionInfo.VersionString
+	for _, ua := range extraUserAgent {
+		userAgent += " " + ua
+	}
 	instance.PackageManager = packagemanager.NewPackageManager(
 		dataDir,
 		configuration.PackagesDir(configuration.Settings),
 		downloadsDir,
 		dataDir.Join("tmp"),
+		userAgent,
 	)
 
 	// Create library manager and add libraries directories

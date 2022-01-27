@@ -45,12 +45,13 @@ type PackageManager struct {
 	TempDir                *paths.Path
 	CustomGlobalProperties *properties.Map
 	discoveryManager       *discoverymanager.DiscoveryManager
+	userAgent              string
 }
 
 var tr = i18n.Tr
 
 // NewPackageManager returns a new instance of the PackageManager
-func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path) *PackageManager {
+func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path, userAgent string) *PackageManager {
 	return &PackageManager{
 		Log:                    logrus.StandardLogger(),
 		Packages:               cores.NewPackages(),
@@ -60,6 +61,7 @@ func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path) 
 		TempDir:                tempDir,
 		CustomGlobalProperties: properties.NewMap(),
 		discoveryManager:       discoverymanager.New(),
+		userAgent:              userAgent,
 	}
 }
 

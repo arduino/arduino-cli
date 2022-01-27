@@ -127,7 +127,7 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 }
 
 func TestUploadPropertiesComposition(t *testing.T) {
-	pm := packagemanager.NewPackageManager(nil, nil, nil, nil)
+	pm := packagemanager.NewPackageManager(nil, nil, nil, nil, "test")
 	errs := pm.LoadHardwareFromDirectory(paths.New("testdata", "hardware"))
 	require.Len(t, errs, 0)
 	buildPath1 := paths.New("testdata", "build_path_1")

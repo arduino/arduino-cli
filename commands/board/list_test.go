@@ -119,7 +119,7 @@ func TestBoardIdentifySorting(t *testing.T) {
 	defer paths.TempDir().Join("test").RemoveAll()
 
 	// We don't really care about the paths in this case
-	pm := packagemanager.NewPackageManager(dataDir, dataDir, dataDir, dataDir)
+	pm := packagemanager.NewPackageManager(dataDir, dataDir, dataDir, dataDir, "test")
 
 	// Create some boards with identical VID:PID combination
 	pack := pm.Packages.GetOrCreatePackage("packager")
