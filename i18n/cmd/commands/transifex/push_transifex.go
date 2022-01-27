@@ -150,6 +150,7 @@ func checkUploadStatus(uploadID string) {
 		status := attributes["status"].(string)
 		switch status {
 		case "succeeded":
+			fmt.Println("Resource file uploaded")
 			return
 		case "pending":
 			fallthrough
