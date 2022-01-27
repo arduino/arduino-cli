@@ -80,8 +80,7 @@ func uploadSourceFile(resourceFile *paths.Path) string {
 		os.Exit(1)
 	}
 
-	req.Header.Set("Content-Type", "application/vnd.api+json")
-	req.Header.Set("Authorization", "Bearer "+apiKey)
+	addHeaders(req)
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -122,8 +121,7 @@ func checkUploadStatus(uploadID string) {
 			os.Exit(1)
 		}
 
-		req.Header.Set("Content-Type", "application/vnd.api+json")
-		req.Header.Set("Authorization", "Bearer "+apiKey)
+		addHeaders(req)
 
 		res, err := http.DefaultClient.Do(req)
 		if err != nil {

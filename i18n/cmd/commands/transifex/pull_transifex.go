@@ -45,8 +45,7 @@ func getLanguages() []string {
 		os.Exit(1)
 	}
 
-	req.Header.Set("Content-Type", "application/vnd.api+json")
-	req.Header.Set("Authorization", "Bearer "+apiKey)
+	addHeaders(req)
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -118,8 +117,7 @@ func startTranslationDownload(languageCode string) string {
 		os.Exit(1)
 	}
 
-	req.Header.Set("Content-Type", "application/vnd.api+json")
-	req.Header.Set("Authorization", "Bearer "+apiKey)
+	addHeaders(req)
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -162,8 +160,7 @@ func getDownloadURL(languageCode, downloadID string) string {
 			os.Exit(1)
 		}
 
-		req.Header.Set("Content-Type", "application/vnd.api+json")
-		req.Header.Set("Authorization", "Bearer "+apiKey)
+		addHeaders(req)
 
 		client := http.Client{
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {

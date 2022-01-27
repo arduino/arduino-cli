@@ -17,6 +17,7 @@ package transifex
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -61,4 +62,9 @@ func preRun(cmd *cobra.Command, args []string) {
 		fmt.Println("missing TRANSIFEX_API_KEY environment variable")
 		os.Exit(1)
 	}
+}
+
+func addHeaders(req *http.Request) {
+	req.Header.Set("Content-Type", "application/vnd.api+json")
+	req.Header.Set("Authorization", "Bearer "+apiKey)
 }
