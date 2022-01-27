@@ -65,6 +65,14 @@ func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path, 
 	}
 }
 
+// GetEnvVarsForSpawnedProcess produces a set of environment variables that
+// must be set to all processes spawned from the arduino-cli.
+func (pm *PackageManager) GetEnvVarsForSpawnedProcess() []string {
+	return []string{
+		"ARDUINO_USER_AGENT=" + pm.userAgent,
+	}
+}
+
 // Clear resets the PackageManager to its initial state
 func (pm *PackageManager) Clear() {
 	pm.Packages = cores.NewPackages()

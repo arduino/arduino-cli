@@ -237,7 +237,7 @@ func canExportCmakeProject(ctx *types.Context) bool {
 }
 
 func extractCompileFlags(ctx *types.Context, recipe string, defines, dynamicLibs, linkerflags, linkDirectories *[]string) {
-	command, _ := builder_utils.PrepareCommandForRecipe(ctx.BuildProperties, recipe, true)
+	command, _ := builder_utils.PrepareCommandForRecipe(ctx.BuildProperties, recipe, true, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
 
 	for _, arg := range command.Args {
 		if strings.HasPrefix(arg, "-D") {

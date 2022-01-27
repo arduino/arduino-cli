@@ -62,7 +62,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigRequest, inStream io.Reader,
 	}
 	entry.Debug("Executing debugger")
 
-	cmd, err := executils.NewProcess(nil, commandLine...)
+	cmd, err := executils.NewProcess(pm.GetEnvVarsForSpawnedProcess(), commandLine...)
 	if err != nil {
 		return nil, &arduino.FailedDebugError{Message: tr("Cannot execute debug tool"), Cause: err}
 	}

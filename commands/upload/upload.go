@@ -531,19 +531,20 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	}
 
 	// Run recipes for upload
+	toolEnv := pm.GetEnvVarsForSpawnedProcess()
 	if burnBootloader {
-		if err := runTool("erase.pattern", uploadProperties, outStream, errStream, verbose, dryRun); err != nil {
+		if err := runTool("erase.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
 			return &arduino.FailedUploadError{Message: tr("Failed chip erase"), Cause: err}
 		}
-		if err := runTool("bootloader.pattern", uploadProperties, outStream, errStream, verbose, dryRun); err != nil {
+		if err := runTool("bootloader.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
 			return &arduino.FailedUploadError{Message: tr("Failed to burn bootloader"), Cause: err}
 		}
 	} else if programmer != nil {
-		if err := runTool("program.pattern", uploadProperties, outStream, errStream, verbose, dryRun); err != nil {
+		if err := runTool("program.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
 			return &arduino.FailedUploadError{Message: tr("Failed programming"), Cause: err}
 		}
 	} else {
-		if err := runTool("upload.pattern", uploadProperties, outStream, errStream, verbose, dryRun); err != nil {
+		if err := runTool("upload.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
 			return &arduino.FailedUploadError{Message: tr("Failed uploading"), Cause: err}
 		}
 	}
@@ -552,7 +553,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	return nil
 }
 
-func runTool(recipeID string, props *properties.Map, outStream, errStream io.Writer, verbose bool, dryRun bool) error {
+func runTool(recipeID string, props *properties.Map, outStream, errStream io.Writer, verbose bool, dryRun bool, toolEnv []string) error {
 	recipe, ok := props.GetOk(recipeID)
 	if !ok {
 		return fmt.Errorf(tr("recipe not found '%s'"), recipeID)
@@ -577,7 +578,7 @@ func runTool(recipeID string, props *properties.Map, outStream, errStream io.Wri
 	if dryRun {
 		return nil
 	}
-	cmd, err := executils.NewProcess(nil, cmdArgs...)
+	cmd, err := executils.NewProcess(toolEnv, cmdArgs...)
 	if err != nil {
 		return fmt.Errorf(tr("cannot execute upload tool: %s"), err)
 	}

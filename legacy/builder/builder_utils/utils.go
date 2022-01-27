@@ -237,7 +237,7 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	command, err := PrepareCommandForRecipe(properties, recipe, false)
+	command, err := PrepareCommandForRecipe(properties, recipe, false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -469,7 +469,7 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 		properties.SetPath(constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH, archiveFilePath)
 		properties.SetPath(constants.BUILD_PROPERTIES_OBJECT_FILE, objectFile)
 
-		command, err := PrepareCommandForRecipe(properties, constants.RECIPE_AR_PATTERN, false)
+		command, err := PrepareCommandForRecipe(properties, constants.RECIPE_AR_PATTERN, false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
@@ -485,7 +485,7 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 
 const COMMANDLINE_LIMIT = 30000
 
-func PrepareCommandForRecipe(buildProperties *properties.Map, recipe string, removeUnsetProperties bool) (*exec.Cmd, error) {
+func PrepareCommandForRecipe(buildProperties *properties.Map, recipe string, removeUnsetProperties bool, toolEnv []string) (*exec.Cmd, error) {
 	pattern := buildProperties.Get(recipe)
 	if pattern == "" {
 		return nil, errors.Errorf(tr("%[1]s pattern is missing"), recipe)
@@ -501,6 +501,8 @@ func PrepareCommandForRecipe(buildProperties *properties.Map, recipe string, rem
 		return nil, errors.WithStack(err)
 	}
 	command := exec.Command(parts[0], parts[1:]...)
+	command.Env = append(command.Env, os.Environ()...)
+	command.Env = append(command.Env, toolEnv...)
 
 	// if the overall commandline is too long for the platform
 	// try reducing the length by making the filenames relative
