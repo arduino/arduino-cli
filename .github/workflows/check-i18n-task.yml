@@ -35,6 +35,7 @@ jobs:
       - name: Check i18n source and translation files are up to date
         run: task i18n:check
         env:
+          TRANSIFEX_ORGANIZATION: ${{ secrets.TRANSIFEX_ORGANIZATION }}
           TRANSIFEX_PROJECT: ${{ secrets.TRANSIFEX_PROJECT }}
           TRANSIFEX_RESOURCE: ${{ secrets.TRANSIFEX_RESOURCE }}
           TRANSIFEX_API_KEY: ${{ secrets.TRANSIFEX_API_KEY }}
