@@ -32,8 +32,8 @@ type Process struct {
 
 // NewProcess creates a command with the provided command line arguments
 // and environment variables (that will be added to the parent os.Environ).
-// The first argument args[0] is the path to the executable, the remainder
-// are the arguments to the command.
+// The argument args[0] is the path to the executable, the remainder are the
+// arguments to the command.
 func NewProcess(extraEnv []string, args ...string) (*Process, error) {
 	if len(args) == 0 {
 		return nil, errors.New(tr("no executable specified"))
@@ -53,7 +53,7 @@ func NewProcess(extraEnv []string, args ...string) (*Process, error) {
 }
 
 // NewProcessFromPath creates a command from the provided executable path,
-// additional environemnt vars and command line arguments.
+// additional environment vars and command line arguments.
 func NewProcessFromPath(extraEnv []string, executable *paths.Path, args ...string) (*Process, error) {
 	processArgs := []string{executable.String()}
 	processArgs = append(processArgs, args...)

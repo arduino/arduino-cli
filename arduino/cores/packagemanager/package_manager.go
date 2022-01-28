@@ -66,7 +66,7 @@ func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path, 
 }
 
 // GetEnvVarsForSpawnedProcess produces a set of environment variables that
-// must be set to all processes spawned from the arduino-cli.
+// must be sent to all processes spawned from the arduino-cli.
 func (pm *PackageManager) GetEnvVarsForSpawnedProcess() []string {
 	if pm == nil {
 		return nil
