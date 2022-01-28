@@ -139,15 +139,12 @@ func checkUploadStatus(uploadID string) {
 			os.Exit(1)
 		}
 
-		var body []byte
-		{
-			defer res.Body.Close()
-			body, err = io.ReadAll(res.Body)
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
+		body, err := io.ReadAll(res.Body)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
 		}
+		res.Body.Close()
 
 		var jsonRes struct {
 			Data struct {

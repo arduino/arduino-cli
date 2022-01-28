@@ -194,15 +194,12 @@ func getDownloadURL(languageCode, downloadID string) string {
 			return res.Header.Get("location")
 		}
 
-		var body []byte
-		{
-			defer res.Body.Close()
-			body, err = io.ReadAll(res.Body)
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
+		body, err := io.ReadAll(res.Body)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
 		}
+		res.Body.Close()
 
 		var jsonRes struct {
 			Data struct {
