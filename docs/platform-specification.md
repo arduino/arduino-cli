@@ -702,6 +702,14 @@ The tool configuration properties are available globally without the prefix. For
 property can be used as **{cmd.path}** inside the recipe, and the same happens for all the other avrdude configuration
 variables.
 
+### Environment variables
+
+All the tools launched to compile or upload a sketch will have the following environment variable set:
+
+`ARDUINO_USER_AGENT`: will contains the name and version of the client used by the user in
+[HTTP user-agent format](https://en.wikipedia.org/wiki/User_agent), for example `"arduino-cli/0.21.0"`. It may also
+contains multiple entries like `"arduino-cli/0.21.0 ArduinoIDE/2.0.0-rc1"` if this information is available.
+
 ### Pluggable discovery
 
 Discovery tools are a special kind of tool used to find supported boards. A platform must declare one or more Pluggable
