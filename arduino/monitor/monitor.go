@@ -111,7 +111,7 @@ func (mon *PluggableMonitor) jsonDecodeLoop(in io.Reader, outChan chan<- *monito
 		if err := decoder.Decode(&msg); err != nil {
 			mon.incomingMessagesError = err
 			close(outChan)
-			mon.log.Errorf("stopped decode loop")
+			mon.log.Errorf("stopped decode loop: %s", err)
 			return
 		}
 		mon.log.
