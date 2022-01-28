@@ -60,17 +60,21 @@ func getLanguages() []string {
 		os.Exit(1)
 	}
 
-	var jsonRes map[string]interface{}
+	var jsonRes struct {
+		Data []struct {
+			Attributes struct {
+				Code string `json:"code"`
+			} `json:"attributes"`
+		} `json:"data"`
+	}
 	if err := json.Unmarshal(b, &jsonRes); err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
 	var languages []string
-	data := jsonRes["data"].([]interface{})
-	for _, object := range data {
-		languageCode := object.(map[string]interface{})["attributes"].(map[string]interface{})["code"].(string)
-		languages = append(languages, languageCode)
+	for _, object := range jsonRes.Data {
+		languages = append(languages, object.Attributes.Code)
 	}
 	return languages
 }
@@ -81,25 +85,32 @@ func getLanguages() []string {
 func startTranslationDownload(languageCode string) string {
 	url := mainEndpoint + "resource_translations_async_downloads"
 
-	jsonData := map[string]interface{}{
-		"data": map[string]interface{}{
-			"relationships": map[string]interface{}{
-				"language": map[string]interface{}{
-					"data": map[string]string{
-						"id":   fmt.Sprintf("l:%s", languageCode),
-						"type": "languages",
-					},
-				},
-				"resource": map[string]interface{}{
-					"data": map[string]string{
-						"id":   fmt.Sprintf("o:%s:p:%s:r:%s", organization, project, resource),
-						"type": "resources",
-					},
-				},
-			},
-			"type": "resource_translations_async_downloads",
-		},
+	type jsonReq struct {
+		Data struct {
+			Relationships struct {
+				Language struct {
+					Data struct {
+						ID   string `json:"id"`
+						Type string `json:"type"`
+					} `json:"data"`
+				} `json:"language"`
+				Resource struct {
+					Data struct {
+						ID   string `json:"id"`
+						Type string `json:"type"`
+					} `json:"data"`
+				} `json:"resource"`
+			} `json:"relationships"`
+			Type string `json:"type"`
+		} `json:"data"`
 	}
+
+	jsonData := jsonReq{}
+	jsonData.Data.Type = "resource_translations_async_downloads"
+	jsonData.Data.Relationships.Language.Data.ID = fmt.Sprintf("l:%s", languageCode)
+	jsonData.Data.Relationships.Language.Data.Type = "languages"
+	jsonData.Data.Relationships.Resource.Data.ID = fmt.Sprintf("o:%s:p:%s:r:%s", organization, project, resource)
+	jsonData.Data.Relationships.Resource.Data.Type = "resources"
 
 	jsonBytes, err := json.Marshal(jsonData)
 	if err != nil {
@@ -132,12 +143,16 @@ func startTranslationDownload(languageCode string) string {
 		os.Exit(1)
 	}
 
-	var jsonRes map[string]interface{}
+	var jsonRes struct {
+		Data struct {
+			ID string `json:"id"`
+		} `json:"data"`
+	}
 	if err = json.Unmarshal(body, &jsonRes); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	return jsonRes["data"].(map[string]interface{})["id"].(string)
+	return jsonRes.Data.ID
 }
 
 // getDownloadURL checks for the download status of the languageCode file specified
@@ -189,15 +204,23 @@ func getDownloadURL(languageCode, downloadID string) string {
 			}
 		}
 
-		var jsonRes map[string]interface{}
+		var jsonRes struct {
+			Data struct {
+				Attributes struct {
+					Status string `json:"status"`
+					Errors []struct {
+						Code   string `json:"code"`
+						Detail string `json:"detail"`
+					} `json:"errors"`
+				} `json:"attributes"`
+			} `json:"data"`
+		}
 		if err = json.Unmarshal(body, &jsonRes); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 
-		data := jsonRes["data"].(map[string]interface{})
-		attributes := data["attributes"].(map[string]interface{})
-		status := attributes["status"].(string)
+		status := jsonRes.Data.Attributes.Status
 		switch status {
 		case "succeeded":
 			return ""
@@ -210,9 +233,8 @@ func getDownloadURL(languageCode, downloadID string) string {
 			// Request the status again
 			continue
 		case "failed":
-			errs := attributes["errors"].([]map[string]string)
-			for _, err := range errs {
-				fmt.Printf("%s: %s\n", err["code"], err["detail"])
+			for _, err := range jsonRes.Data.Attributes.Errors {
+				fmt.Printf("%s: %s\n", err.Code, err.Detail)
 			}
 			os.Exit(1)
 		}
