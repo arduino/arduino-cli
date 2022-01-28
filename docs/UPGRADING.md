@@ -4,6 +4,27 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## Unreleased
 
+### `packagemanager.NewPackageManager` function change
+
+A new argument `userAgent` has been added to `packagemanager.NewPackageManager`, the new function signature is:
+
+```go
+func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path, userAgent string) *PackageManager {
+```
+
+The userAgent string must be in the format `"ProgramName/Version"`, for example `"arduino-cli/0.20.1"`.
+
+### `commands.Create` function change
+
+A new argument `extraUserAgent` has been added to `commands.Create`, the new function signature is:
+
+```go
+func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateResponse, error) {
+```
+
+`extraUserAgent` is an array of strings, so multiple user agent may be provided. Each user agent must be in the format
+`"ProgramName/Version"`, for example `"arduino-cli/0.20.1"`.
+
 ### `commands.Compile` function change
 
 A new argument `progressCB` has been added to `commands.Compile`, the new function signature is:
@@ -31,6 +52,21 @@ always parsed by the function.
 The `parseArch` parameter was removed since it was unused and was always true. This means that the architecture gets
 always parsed by the function. Furthermore the function now should also correctly interpret `packager:arch` spelled with
 the wrong casing.
+
+### `github.com/arduino/arduino-cli/executils.NewProcess` and `executils.NewProcessFromPath` function change
+
+A new argument `extraEnv` has been added to `executils.NewProcess` and `executils.NewProcessFromPath`, the new function
+signature is:
+
+```go
+func NewProcess(extraEnv []string, args ...string) (*Process, error) {
+```
+
+```go
+func NewProcessFromPath(extraEnv []string, executable *paths.Path, args ...string) (*Process, error) {
+```
+
+The `extraEnv` params allow to pass environment variables (in addition to the default ones) to the spawned process.
 
 ### `github.com/arduino/arduino-cli/i18n.Init(...)` now requires an empty string to be passed for autodetection of locale
 
