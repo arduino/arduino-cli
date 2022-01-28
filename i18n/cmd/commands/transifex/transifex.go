@@ -17,6 +17,7 @@ package transifex
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -29,6 +30,9 @@ var Command = &cobra.Command{
 	PersistentPreRun: preRun,
 }
 
+const mainEndpoint = "https://rest.api.transifex.com/"
+
+var organization string
 var project string
 var resource string
 var apiKey string
@@ -39,9 +43,10 @@ func init() {
 }
 
 func preRun(cmd *cobra.Command, args []string) {
-	project = os.Getenv("TRANSIFEX_PROJECT")
-	resource = os.Getenv("TRANSIFEX_RESOURCE")
-	apiKey = os.Getenv("TRANSIFEX_RESOURCE")
+	if organization = os.Getenv("TRANSIFEX_ORGANIZATION"); organization == "" {
+		fmt.Println("missing TRANSIFEX_ORGANIZATION environment variable")
+		os.Exit(1)
+	}
 
 	if project = os.Getenv("TRANSIFEX_PROJECT"); project == "" {
 		fmt.Println("missing TRANSIFEX_PROJECT environment variable")
@@ -57,6 +62,9 @@ func preRun(cmd *cobra.Command, args []string) {
 		fmt.Println("missing TRANSIFEX_API_KEY environment variable")
 		os.Exit(1)
 	}
+}
 
-	return
+func addHeaders(req *http.Request) {
+	req.Header.Set("Content-Type", "application/vnd.api+json")
+	req.Header.Set("Authorization", "Bearer "+apiKey)
 }
