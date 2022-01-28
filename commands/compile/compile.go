@@ -119,12 +119,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		PlatformArchitecture: fqbn.PlatformArch,
 	})
 	if targetPlatform == nil || pm.GetInstalledPlatformRelease(targetPlatform) == nil {
-		// TODO: Move this error message in `cli` module
-		// errorMessage := fmt.Sprintf(
-		// 	"\"%[1]s:%[2]s\" platform is not installed, please install it by running \""+
-		// 		version.GetAppName()+" core install %[1]s:%[2]s\".", fqbn.Package, fqbn.PlatformArch)
-		// feedback.Error(errorMessage)
-		return nil, &arduino.PlatformNotFoundError{Platform: targetPlatform.String(), Cause: fmt.Errorf(tr("platform not installed"))}
+		return nil, &arduino.PlatformNotFoundError{
+			Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
+			Cause:    fmt.Errorf(tr("platform not installed")),
+		}
 	}
 
 	builderCtx := &types.Context{}

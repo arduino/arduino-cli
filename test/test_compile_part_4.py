@@ -378,3 +378,22 @@ def test_compile_without_upload_and_fqbn(run_command, data_dir):
     res = run_command(["compile", sketch_path])
     assert res.failed
     assert "Error during build: Missing FQBN (Fully Qualified Board Name)" in res.stderr
+
+
+def test_compile_non_installed_platform_with_wrong_packager_and_arch(run_command, data_dir):
+    assert run_command(["update"])
+
+    # Create a sketch
+    sketch_name = "SketchSimple"
+    sketch_path = Path(data_dir, sketch_name)
+    assert run_command(["sketch", "new", sketch_path])
+
+    # Compile with wrong packager
+    res = run_command(["compile", "-b", "wrong:avr:uno", sketch_path])
+    assert res.failed
+    assert "Error during build: Platform 'wrong:avr' not found: platform not installed" in res.stderr
+
+    # Compile with wrong arch
+    res = run_command(["compile", "-b", "arduino:wrong:uno", sketch_path])
+    assert res.failed
+    assert "Error during build: Platform 'arduino:wrong' not found: platform not installed" in res.stderr
