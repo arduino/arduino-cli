@@ -32,6 +32,7 @@ jobs:
       - name: Run task i18n:push
         run: task i18n:push
         env:
+          TRANSIFEX_ORGANIZATION: ${{ secrets.TRANSIFEX_ORGANIZATION }}
           TRANSIFEX_PROJECT: ${{ secrets.TRANSIFEX_PROJECT }}
           TRANSIFEX_RESOURCE: ${{ secrets.TRANSIFEX_RESOURCE }}
           TRANSIFEX_API_KEY: ${{ secrets.TRANSIFEX_API_KEY }}
