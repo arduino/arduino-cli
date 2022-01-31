@@ -53,7 +53,8 @@ func NewProcess(extraEnv []string, args ...string) (*Process, error) {
 }
 
 // NewProcessFromPath creates a command from the provided executable path,
-// additional environment vars and command line arguments.
+// additional environment vars (in addition to the system default ones)
+// and command line arguments.
 func NewProcessFromPath(extraEnv []string, executable *paths.Path, args ...string) (*Process, error) {
 	processArgs := []string{executable.String()}
 	processArgs = append(processArgs, args...)
@@ -142,10 +143,9 @@ func (p *Process) Run() error {
 }
 
 // SetEnvironment set the enviroment for the running process. Each entry is of the form "key=value".
+// System default environments will be wiped out.
 func (p *Process) SetEnvironment(values []string) {
-	p.cmd.Env = nil
-	p.cmd.Env = append(p.cmd.Env, os.Environ()...)
-	p.cmd.Env = append(p.cmd.Env, values...)
+	p.cmd.Env = append([]string{}, values...)
 }
 
 // RunWithinContext starts the specified command and waits for it to complete. If the given context
