@@ -19,12 +19,17 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"os"
+	"strings"
 
+	"github.com/arduino/arduino-cli/arduino"
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/configuration"
@@ -264,6 +269,28 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	})
 	if compileError != nil && output.OutputFormat != "json" {
 		feedback.Errorf(tr("Error during build: %v"), compileError)
+
+		// Check the error type to give the user better feedback on how
+		// to resolve it
+		var platformErr *arduino.PlatformNotFoundError
+		if errors.As(compileError, &platformErr) {
+			split := strings.Split(platformErr.Platform, ":")
+			if len(split) < 2 {
+				panic(tr("Platform ID is not correct"))
+			}
+
+			pm := commands.GetPackageManager(inst.GetId())
+			platform := pm.FindPlatform(&packagemanager.PlatformReference{
+				Package:              split[0],
+				PlatformArchitecture: split[1],
+			})
+
+			if platform != nil {
+				feedback.Errorf(tr("Try running `%s core install %s`", globals.VersionInfo.Application, platformErr.Platform))
+			} else {
+				feedback.Errorf(tr("Platform %s is not found in any known index", platformErr.Platform))
+			}
+		}
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }
