@@ -285,6 +285,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#packagemanagernewpackagemanager-function-change" class="md-nav__link">
+    packagemanager.NewPackageManager function change
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commandscreate-function-change" class="md-nav__link">
+    commands.Create function change
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#commandscompile-function-change" class="md-nav__link">
     commands.Compile function change
   </a>
@@ -301,6 +315,13 @@
           <li class="md-nav__item">
   <a href="#githubcomarduinoarduino-clicliargumentsparsereference-function-change" class="md-nav__link">
     github.com/arduino/arduino-cli/cli/arguments.ParseReference function change
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-cliexecutilsnewprocess-and-executilsnewprocessfrompath-function-change" class="md-nav__link">
+    github.com/arduino/arduino-cli/executils.NewProcess and executils.NewProcessFromPath function change
   </a>
   
 </li>
@@ -1632,6 +1653,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#packagemanagernewpackagemanager-function-change" class="md-nav__link">
+    packagemanager.NewPackageManager function change
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commandscreate-function-change" class="md-nav__link">
+    commands.Create function change
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#commandscompile-function-change" class="md-nav__link">
     commands.Compile function change
   </a>
@@ -1648,6 +1683,13 @@
           <li class="md-nav__item">
   <a href="#githubcomarduinoarduino-clicliargumentsparsereference-function-change" class="md-nav__link">
     github.com/arduino/arduino-cli/cli/arguments.ParseReference function change
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-cliexecutilsnewprocess-and-executilsnewprocessfrompath-function-change" class="md-nav__link">
+    github.com/arduino/arduino-cli/executils.NewProcess and executils.NewProcessFromPath function change
   </a>
   
 </li>
@@ -1964,6 +2006,17 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="packagemanagernewpackagemanager-function-change"><code>packagemanager.NewPackageManager</code> function change<a class="headerlink" href="#packagemanagernewpackagemanager-function-change" title="Permanent link">&para;</a></h3>
+<p>A new argument <code>userAgent</code> has been added to <code>packagemanager.NewPackageManager</code>, the new function signature is:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span> <span class="nx">NewPackageManager</span><span class="p">(</span><span class="nx">indexDir</span><span class="p">,</span> <span class="nx">packagesDir</span><span class="p">,</span> <span class="nx">downloadDir</span><span class="p">,</span> <span class="nx">tempDir</span> <span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">,</span> <span class="nx">userAgent</span> <span class="kt">string</span><span class="p">)</span> <span class="o">*</span><span class="nx">PackageManager</span> <span class="p">{</span>
+</code></pre></div>
+<p>The userAgent string must be in the format <code>"ProgramName/Version"</code>, for example <code>"arduino-cli/0.20.1"</code>.</p>
+<h3 id="commandscreate-function-change"><code>commands.Create</code> function change<a class="headerlink" href="#commandscreate-function-change" title="Permanent link">&para;</a></h3>
+<p>A new argument <code>extraUserAgent</code> has been added to <code>commands.Create</code>, the new function signature is:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span> <span class="nx">Create</span><span class="p">(</span><span class="nx">req</span> <span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">CreateRequest</span><span class="p">,</span> <span class="nx">extraUserAgent</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">CreateResponse</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</code></pre></div>
+<p><code>extraUserAgent</code> is an array of strings, so multiple user agent may be provided. Each user agent must be in the format
+<code>"ProgramName/Version"</code>, for example <code>"arduino-cli/0.20.1"</code>.</p>
 <h3 id="commandscompile-function-change"><code>commands.Compile</code> function change<a class="headerlink" href="#commandscompile-function-change" title="Permanent link">&para;</a></h3>
 <p>A new argument <code>progressCB</code> has been added to <code>commands.Compile</code>, the new function signature is:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">func</span> <span class="nx">Compile</span><span class="p">(</span>
@@ -1983,6 +2036,14 @@ always parsed by the function.</p>
 <p>The <code>parseArch</code> parameter was removed since it was unused and was always true. This means that the architecture gets
 always parsed by the function. Furthermore the function now should also correctly interpret <code>packager:arch</code> spelled with
 the wrong casing.</p>
+<h3 id="githubcomarduinoarduino-cliexecutilsnewprocess-and-executilsnewprocessfrompath-function-change"><code>github.com/arduino/arduino-cli/executils.NewProcess</code> and <code>executils.NewProcessFromPath</code> function change<a class="headerlink" href="#githubcomarduinoarduino-cliexecutilsnewprocess-and-executilsnewprocessfrompath-function-change" title="Permanent link">&para;</a></h3>
+<p>A new argument <code>extraEnv</code> has been added to <code>executils.NewProcess</code> and <code>executils.NewProcessFromPath</code>, the new function
+signature is:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span> <span class="nx">NewProcess</span><span class="p">(</span><span class="nx">extraEnv</span> <span class="p">[]</span><span class="kt">string</span><span class="p">,</span> <span class="nx">args</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">Process</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span> <span class="nx">NewProcessFromPath</span><span class="p">(</span><span class="nx">extraEnv</span> <span class="p">[]</span><span class="kt">string</span><span class="p">,</span> <span class="nx">executable</span> <span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">,</span> <span class="nx">args</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">Process</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+</code></pre></div>
+<p>The <code>extraEnv</code> params allow to pass environment variables (in addition to the default ones) to the spawned process.</p>
 <h3 id="githubcomarduinoarduino-clii18ninit-now-requires-an-empty-string-to-be-passed-for-autodetection-of-locale"><code>github.com/arduino/arduino-cli/i18n.Init(...)</code> now requires an empty string to be passed for autodetection of locale<a class="headerlink" href="#githubcomarduinoarduino-clii18ninit-now-requires-an-empty-string-to-be-passed-for-autodetection-of-locale" title="Permanent link">&para;</a></h3>
 <p>For automated detection of locale, change the call from:</p>
 <div class="highlight"><pre><span></span><code><span class="nx">i18n</span><span class="p">.</span><span class="nx">Init</span><span class="p">()</span>

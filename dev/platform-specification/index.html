@@ -1445,6 +1445,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    Environment variables
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pluggable-discovery" class="md-nav__link">
     Pluggable discovery
   </a>
@@ -1945,6 +1952,13 @@
   
     <nav class="md-nav" aria-label="Tools">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    Environment variables
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#pluggable-discovery" class="md-nav__link">
@@ -2704,6 +2718,12 @@ points to the latest version of the tool available.</p>
 <p>The tool configuration properties are available globally without the prefix. For example, the <strong>tools.avrdude.cmd.path</strong>
 property can be used as <strong>{cmd.path}</strong> inside the recipe, and the same happens for all the other avrdude configuration
 variables.</p>
+<h3 id="environment-variables">Environment variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h3>
+<p>All the tools launched to compile or upload a sketch will have the following environment variable set:</p>
+<p><code>ARDUINO_USER_AGENT</code>: contains the name and version of the client used by the user in
+<a href="https://en.wikipedia.org/wiki/User_agent">HTTP user-agent format</a>, for example <code>"arduino-cli/0.21.0"</code>. It may also
+contain multiple space-delimited entries like <code>"arduino-cli/0.21.0 ArduinoIDE/2.0.0-rc1"</code> if this information is
+available.</p>
 <h3 id="pluggable-discovery">Pluggable discovery<a class="headerlink" href="#pluggable-discovery" title="Permanent link">&para;</a></h3>
 <p>Discovery tools are a special kind of tool used to find supported boards. A platform must declare one or more Pluggable
 Discoveries in its <a href="#platformtxt"><code>platform.txt</code></a>. Discoveries can be referenced from other packages, including the
