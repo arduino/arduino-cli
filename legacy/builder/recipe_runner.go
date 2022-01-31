@@ -44,7 +44,7 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 	for _, recipe := range recipes {
 		logrus.Debugf(fmt.Sprintf("Running recipe: %s", recipe))
 
-		command, err := builder_utils.PrepareCommandForRecipe(properties, recipe, false)
+		command, err := builder_utils.PrepareCommandForRecipe(properties, recipe, false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
 		if err != nil {
 			return errors.WithStack(err)
 		}

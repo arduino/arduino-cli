@@ -37,7 +37,7 @@ var dataDir1 = paths.New("testdata", "data_dir_1")
 var extraHardware = paths.New("testdata", "extra_hardware")
 
 func TestFindBoardWithFQBN(t *testing.T) {
-	pm := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware)
+	pm := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware, "test")
 	pm.LoadHardwareFromDirectory(customHardware)
 
 	board, err := pm.FindBoardWithFQBN("arduino:avr:uno")
@@ -53,7 +53,7 @@ func TestFindBoardWithFQBN(t *testing.T) {
 
 func TestResolveFQBN(t *testing.T) {
 	// Pass nil, since these paths are only used for installing
-	pm := packagemanager.NewPackageManager(nil, nil, nil, nil)
+	pm := packagemanager.NewPackageManager(nil, nil, nil, nil, "test")
 	// Hardware from main packages directory
 	pm.LoadHardwareFromDirectory(dataDir1.Join("packages"))
 	// This contains the arduino:avr core
@@ -174,7 +174,7 @@ func TestResolveFQBN(t *testing.T) {
 }
 
 func TestBoardOptionsFunctions(t *testing.T) {
-	pm := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware)
+	pm := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware, "test")
 	pm.LoadHardwareFromDirectory(customHardware)
 
 	nano, err := pm.FindBoardWithFQBN("arduino:avr:nano")
@@ -218,6 +218,7 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 		configuration.PackagesDir(configuration.Settings),
 		paths.New(configuration.Settings.GetString("directories.Downloads")),
 		dataDir1,
+		"test",
 	)
 
 	loadIndex := func(addr string) {
@@ -301,7 +302,7 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 }
 
 func TestIdentifyBoard(t *testing.T) {
-	pm := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware)
+	pm := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware, "test")
 	pm.LoadHardwareFromDirectory(customHardware)
 
 	identify := func(vid, pid string) []*cores.Board {
@@ -325,11 +326,11 @@ func TestIdentifyBoard(t *testing.T) {
 
 func TestPackageManagerClear(t *testing.T) {
 	// Create a PackageManager and load the harware
-	packageManager := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware)
+	packageManager := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware, "test")
 	packageManager.LoadHardwareFromDirectory(customHardware)
 
 	// Creates another PackageManager but don't load the hardware
-	emptyPackageManager := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware)
+	emptyPackageManager := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware, "test")
 
 	// Verifies they're not equal
 	require.NotEqual(t, packageManager, emptyPackageManager)
@@ -344,7 +345,7 @@ func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 	// Create all the necessary data to load discoveries
 	fakePath := paths.New("fake-path")
 
-	pm := packagemanager.NewPackageManager(fakePath, fakePath, fakePath, fakePath)
+	pm := packagemanager.NewPackageManager(fakePath, fakePath, fakePath, fakePath, "test")
 	pack := pm.Packages.GetOrCreatePackage("arduino")
 
 	{
@@ -444,7 +445,7 @@ func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 }
 
 func TestFindPlatformReleaseDependencies(t *testing.T) {
-	pm := packagemanager.NewPackageManager(nil, nil, nil, nil)
+	pm := packagemanager.NewPackageManager(nil, nil, nil, nil, "test")
 	pm.LoadPackageIndexFromFile(paths.New("testdata", "package_tooltest_index.json"))
 	pl, tools, err := pm.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{Package: "test", PlatformArchitecture: "avr"})
 	require.NoError(t, err)
@@ -455,7 +456,7 @@ func TestFindPlatformReleaseDependencies(t *testing.T) {
 
 func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 	// Pass nil, since these paths are only used for installing
-	pm := packagemanager.NewPackageManager(nil, nil, nil, nil)
+	pm := packagemanager.NewPackageManager(nil, nil, nil, nil, "test")
 	// Hardware from main packages directory
 	pm.LoadHardwareFromDirectory(dataDir1.Join("packages"))
 	{

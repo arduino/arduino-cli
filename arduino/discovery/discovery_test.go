@@ -26,7 +26,7 @@ import (
 
 func TestDiscoveryStdioHandling(t *testing.T) {
 	// Build `cat` helper inside testdata/cat
-	builder, err := executils.NewProcess("go", "build")
+	builder, err := executils.NewProcess(nil, "go", "build")
 	require.NoError(t, err)
 	builder.SetDir("testdata/cat")
 	require.NoError(t, builder.Run())

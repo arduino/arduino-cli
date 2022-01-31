@@ -35,6 +35,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -226,8 +227,15 @@ func (s *ArduinoCoreServerImpl) Upgrade(req *rpc.UpgradeRequest, stream rpc.Ardu
 }
 
 // Create FIXMEDOC
-func (s *ArduinoCoreServerImpl) Create(_ context.Context, req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
-	res, err := commands.Create(req)
+func (s *ArduinoCoreServerImpl) Create(ctx context.Context, req *rpc.CreateRequest) (*rpc.CreateResponse, error) {
+	var userAgent []string
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		userAgent = md.Get("user-agent")
+	}
+	if len(userAgent) == 0 {
+		userAgent = []string{"gRPCClientUnknown/0.0.0"}
+	}
+	res, err := commands.Create(req, userAgent...)
 	return res, convertErrorToRPCStatus(err)
 }
 

@@ -36,7 +36,7 @@ func TestGetCommandLine(t *testing.T) {
 	sketchPath := paths.New("testdata", sketch)
 	require.NoError(t, sketchPath.ToAbs())
 
-	pm := packagemanager.NewPackageManager(nil, nil, nil, nil)
+	pm := packagemanager.NewPackageManager(nil, nil, nil, nil, "test")
 	pm.LoadHardwareFromDirectory(customHardware)
 	pm.LoadHardwareFromDirectory(dataDir)
 

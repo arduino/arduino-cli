@@ -45,12 +45,13 @@ type PackageManager struct {
 	TempDir                *paths.Path
 	CustomGlobalProperties *properties.Map
 	discoveryManager       *discoverymanager.DiscoveryManager
+	userAgent              string
 }
 
 var tr = i18n.Tr
 
 // NewPackageManager returns a new instance of the PackageManager
-func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path) *PackageManager {
+func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path, userAgent string) *PackageManager {
 	return &PackageManager{
 		Log:                    logrus.StandardLogger(),
 		Packages:               cores.NewPackages(),
@@ -60,6 +61,18 @@ func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path) 
 		TempDir:                tempDir,
 		CustomGlobalProperties: properties.NewMap(),
 		discoveryManager:       discoverymanager.New(),
+		userAgent:              userAgent,
+	}
+}
+
+// GetEnvVarsForSpawnedProcess produces a set of environment variables that
+// must be sent to all processes spawned from the arduino-cli.
+func (pm *PackageManager) GetEnvVarsForSpawnedProcess() []string {
+	if pm == nil {
+		return nil
+	}
+	return []string{
+		"ARDUINO_USER_AGENT=" + pm.userAgent,
 	}
 }
 

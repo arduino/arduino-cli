@@ -171,7 +171,7 @@ func (mon *PluggableMonitor) sendCommand(command string) error {
 
 func (mon *PluggableMonitor) runProcess() error {
 	mon.log.Infof("Starting monitor process")
-	proc, err := executils.NewProcess(mon.processArgs...)
+	proc, err := executils.NewProcess(nil, mon.processArgs...)
 	if err != nil {
 		return err
 	}

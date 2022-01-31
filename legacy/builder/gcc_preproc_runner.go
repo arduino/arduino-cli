@@ -69,7 +69,7 @@ func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath *paths
 		properties.Set(constants.RECIPE_PREPROC_MACROS, GeneratePreprocPatternFromCompile(properties.Get(constants.RECIPE_CPP_PATTERN)))
 	}
 
-	cmd, err := builder_utils.PrepareCommandForRecipe(properties, constants.RECIPE_PREPROC_MACROS, true)
+	cmd, err := builder_utils.PrepareCommandForRecipe(properties, constants.RECIPE_PREPROC_MACROS, true, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

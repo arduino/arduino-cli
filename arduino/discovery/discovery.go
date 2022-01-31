@@ -235,7 +235,7 @@ func (disc *PluggableDiscovery) sendCommand(command string) error {
 
 func (disc *PluggableDiscovery) runProcess() error {
 	logrus.Infof("starting discovery %s process", disc.id)
-	proc, err := executils.NewProcess(disc.processArgs...)
+	proc, err := executils.NewProcess(nil, disc.processArgs...)
 	if err != nil {
 		return err
 	}

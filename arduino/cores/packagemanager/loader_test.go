@@ -111,7 +111,7 @@ func TestLoadDiscoveries(t *testing.T) {
 	fakePath := paths.New("fake-path")
 
 	createTestPackageManager := func() *PackageManager {
-		packageManager := NewPackageManager(fakePath, fakePath, fakePath, fakePath)
+		packageManager := NewPackageManager(fakePath, fakePath, fakePath, fakePath, "test")
 		pack := packageManager.Packages.GetOrCreatePackage("arduino")
 		// ble-discovery tool
 		tool := pack.GetOrCreateTool("ble-discovery")
