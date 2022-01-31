@@ -41,8 +41,7 @@ func NewProcess(extraEnv []string, args ...string) (*Process, error) {
 	p := &Process{
 		cmd: exec.Command(args[0], args[1:]...),
 	}
-	p.cmd.Env = append(p.cmd.Env, os.Environ()...)
-	p.cmd.Env = append(p.cmd.Env, extraEnv...)
+	p.cmd.Env = append(os.Environ(), extraEnv...)
 	TellCommandNotToSpawnShell(p.cmd)
 
 	// This is required because some tools detects if the program is running

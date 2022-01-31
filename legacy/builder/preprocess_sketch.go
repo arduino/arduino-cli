@@ -110,8 +110,7 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 		return errors.WithStack(err)
 	}
 	command := exec.Command(parts[0], parts[1:]...)
-	command.Env = append(command.Env, os.Environ()...)
-	command.Env = append(command.Env, ctx.PackageManager.GetEnvVarsForSpawnedProcess()...)
+	command.Env = append(os.Environ(), ctx.PackageManager.GetEnvVarsForSpawnedProcess()...)
 
 	if runtime.GOOS == "windows" {
 		// chdir in the uppermost directory to avoid UTF-8 bug in clang (https://github.com/arduino/arduino-preprocessor/issues/2)

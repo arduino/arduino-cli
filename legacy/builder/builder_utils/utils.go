@@ -501,8 +501,7 @@ func PrepareCommandForRecipe(buildProperties *properties.Map, recipe string, rem
 		return nil, errors.WithStack(err)
 	}
 	command := exec.Command(parts[0], parts[1:]...)
-	command.Env = append(command.Env, os.Environ()...)
-	command.Env = append(command.Env, toolEnv...)
+	command.Env = append(os.Environ(), toolEnv...)
 
 	// if the overall commandline is too long for the platform
 	// try reducing the length by making the filenames relative

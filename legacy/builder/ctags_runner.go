@@ -48,8 +48,7 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 		return errors.WithStack(err)
 	}
 	command := exec.Command(parts[0], parts[1:]...)
-	command.Env = append(command.Env, os.Environ()...)
-	command.Env = append(command.Env, ctx.PackageManager.GetEnvVarsForSpawnedProcess()...)
+	command.Env = append(os.Environ(), ctx.PackageManager.GetEnvVarsForSpawnedProcess()...)
 
 	sourceBytes, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.Ignore /* stderr */)
 	if err != nil {
