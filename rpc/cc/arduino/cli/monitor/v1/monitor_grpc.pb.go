@@ -17,6 +17,8 @@ const _ = grpc.SupportPackageIsVersion7
 // MonitorServiceClient is the client API for MonitorService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// Deprecated: Do not use.
 type MonitorServiceClient interface {
 	// Open a bidirectional monitor stream. This can be used to implement
 	// something similar to the Arduino IDE's Serial Monitor.
@@ -27,6 +29,7 @@ type monitorServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
+// Deprecated: Do not use.
 func NewMonitorServiceClient(cc grpc.ClientConnInterface) MonitorServiceClient {
 	return &monitorServiceClient{cc}
 }
@@ -65,6 +68,8 @@ func (x *monitorServiceStreamingOpenClient) Recv() (*StreamingOpenResponse, erro
 // MonitorServiceServer is the server API for MonitorService service.
 // All implementations must embed UnimplementedMonitorServiceServer
 // for forward compatibility
+//
+// Deprecated: Do not use.
 type MonitorServiceServer interface {
 	// Open a bidirectional monitor stream. This can be used to implement
 	// something similar to the Arduino IDE's Serial Monitor.
@@ -88,6 +93,7 @@ type UnsafeMonitorServiceServer interface {
 	mustEmbedUnimplementedMonitorServiceServer()
 }
 
+// Deprecated: Do not use.
 func RegisterMonitorServiceServer(s grpc.ServiceRegistrar, srv MonitorServiceServer) {
 	s.RegisterService(&MonitorService_ServiceDesc, srv)
 }

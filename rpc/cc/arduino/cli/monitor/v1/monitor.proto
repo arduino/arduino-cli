@@ -17,6 +17,7 @@ syntax = "proto3";
 
 package cc.arduino.cli.monitor.v1;
 
+option deprecated = true;
 option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/monitor/v1;monitor";
 
 import "google/protobuf/struct.proto";
@@ -26,6 +27,8 @@ import "google/protobuf/struct.proto";
 // future release. Use ArduinoCoreService.Monitor and
 // ArduinoCoreService.EnumerateMonitorPortSettings instead.
 service MonitorService {
+  option deprecated = true;
+
   // Open a bidirectional monitor stream. This can be used to implement
   // something similar to the Arduino IDE's Serial Monitor.
   rpc StreamingOpen(stream StreamingOpenRequest)
@@ -41,6 +44,8 @@ service MonitorService {
 // in a future release. Use ArduinoCoreService.Monitor and
 // ArduinoCoreService.EnumerateMonitorPortSettings instead.
 message StreamingOpenRequest {
+  option deprecated = true;
+
   // Content must be either a monitor config or data to be sent.
   oneof content {
     // Provides information to the monitor that specifies which is the target.
@@ -63,6 +68,8 @@ message StreamingOpenRequest {
 // in a future release. Use ArduinoCoreService.Monitor and
 // ArduinoCoreService.EnumerateMonitorPortSettings instead.
 message MonitorConfig {
+  option deprecated = true;
+
   enum TargetType {
     TARGET_TYPE_SERIAL = 0;
     TARGET_TYPE_NULL = 99;
@@ -86,6 +93,8 @@ message MonitorConfig {
 // in a future release. Use ArduinoCoreService.Monitor and
 // ArduinoCoreService.EnumerateMonitorPortSettings instead.
 message StreamingOpenResponse {
+  option deprecated = true;
+
   // The data received from the target.
   bytes data = 1;
 
