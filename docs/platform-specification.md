@@ -333,9 +333,9 @@ The expected output from the tool is a JSON object with the following format:
 The meaning of the fields is the following:
 
 - `output`: is a preformatted text that is displayed as-is in console.
-- `severity`: indicates the warning level of the output messages, it can be `info`, `warning` or `error`. Warnings and
+- `severity`: indicates the warning level of the output messages, it must be `info`, `warning` or `error`. Warnings and
   errors are displayed in red (or in a different color than normal output). Errors will make the build/upload fail.
-- `sections`: is an array containing the memory sections and their usage level. Each item representis a memory section.
+- `sections`: is an array containing the memory sections and their usage level. Each item represents a memory section.
   This array is used to report memory usage in a machine-readable format if requested by the user.
 
 When the `severity` is set to `error` the build/upload is interrupted and an exception is returned to the calling
