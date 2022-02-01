@@ -132,7 +132,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 			})
 
 			if platform != nil {
-				feedback.Errorf(tr("Try running `%s core install %s`", globals.VersionInfo.Application, platformErr.Platform))
+				feedback.Errorf(tr("Try running %s", fmt.Sprintf("`%s core install %s`", globals.VersionInfo.Application, platformErr.Platform)))
 			} else {
 				feedback.Errorf(tr("Platform %s is not found in any known index", platformErr.Platform))
 			}
