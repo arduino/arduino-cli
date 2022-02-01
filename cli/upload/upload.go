@@ -18,6 +18,7 @@ package upload
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"strings"
 
@@ -134,7 +135,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 			if platform != nil {
 				feedback.Errorf(tr("Try running %s", fmt.Sprintf("`%s core install %s`", globals.VersionInfo.Application, platformErr.Platform)))
 			} else {
-				feedback.Errorf(tr("Platform %s is not found in any known index", platformErr.Platform))
+				feedback.Errorf(tr("Platform %s is not found in any known index\nMaybe you need to add a 3rd party URL?", platformErr.Platform))
 			}
 		}
 		os.Exit(errorcodes.ErrGeneric)
