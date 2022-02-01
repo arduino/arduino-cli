@@ -183,9 +183,9 @@ type Context struct {
 
 // ExecutableSectionSize represents a section of the executable output file
 type ExecutableSectionSize struct {
-	Name    string
-	Size    int
-	MaxSize int
+	Name    string `json:"name"`
+	Size    int    `json:"size"`
+	MaxSize int    `json:"max_size"`
 }
 
 // ExecutablesFileSections is an array of ExecutablesFileSection

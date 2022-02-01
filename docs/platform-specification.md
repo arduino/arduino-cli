@@ -324,8 +324,8 @@ The expected output from the tool is a JSON object with the following format:
   "output": "Your sketch uses 2200 bytes of program memory out of 8192 (27%)\nThe static RAM used is 200 bytes (of 2048 max)\n",
   "severity": "info",
   "sections": [
-    { "name": "text", "size": 2200, "maxsize": 8192 },
-    { "name": "data", "size": 200, "maxsize": 2048 }
+    { "name": "text", "size": 2200, "max_size": 8192 },
+    { "name": "data", "size": 200, "max_size": 2048 }
   ]
 }
 ```
@@ -340,7 +340,7 @@ The meaning of the fields is the following:
   following fields
   - `name`: an identifier for the section
   - `size`: the sketch size for the section
-  - `maxsize`: the maximum size for the section
+  - `max_size`: the maximum size for the section
 
 When the `severity` is set to `error` the build/upload is interrupted and an exception is returned to the calling
 process. In this case an extra exception message must be provided through the `error` field, for example:
@@ -351,8 +351,8 @@ process. In this case an extra exception message must be provided through the `e
   "severity": "error",
   "error": "Sketch is too big!",
   "sections": [
-    { "name": "text", "size": 12200, "maxsize": 8192 },
-    { "name": "data", "size": 200, "maxsize": 2048 }
+    { "name": "text", "size": 12200, "max_size": 8192 },
+    { "name": "data", "size": 200, "max_size": 2048 }
   ]
 }
 ```
