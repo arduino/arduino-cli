@@ -357,7 +357,7 @@ This means that the `sections` part is **NOT** used to automatically check if th
 memory: this check is now delegated to the tool that must report a `"severity":"error"` with a meaningful error message.
 
 If both **recipe.size.pattern** and **recipe.advanced_size.pattern** are present then **recipe.advanced_size.pattern**
-will be used. Since the **recipe.advanced_size.pattern** feature is avaiable starting from Arduino CLI>=0.21.0, to
+will be used. Since the **recipe.advanced_size.pattern** feature is available starting from Arduino CLI>=0.21.0, to
 maximize backward compatibility, we recommend to provide both **recipe.size.pattern** and
 **recipe.advanced_size.pattern** if possible, so the old versions of the IDE/CLI will continue to work (even with a less
 detailed memory usage reports).
