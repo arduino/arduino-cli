@@ -1474,7 +1474,8 @@
 <p><a name="cc.arduino.cli.monitor.v1.MonitorConfig"></a></p>
 <h3 id="monitorconfig">MonitorConfig<a class="headerlink" href="#monitorconfig" title="Permanent link">&para;</a></h3>
 <p>Tells the monitor which target to open and provides additional parameters that might be needed to configure the target
-or the monitor itself.</p>
+or the monitor itself. DEPRECATION WARNING: MonitorConfig is deprecated and will be removed in a future release. Use
+ArduinoCoreService.Monitor and ArduinoCoreService.EnumerateMonitorPortSettings instead.</p>
 <table>
 <thead>
 <tr>
@@ -1515,7 +1516,9 @@ or the monitor itself.</p>
 <h3 id="streamingopenrequest">StreamingOpenRequest<a class="headerlink" href="#streamingopenrequest" title="Permanent link">&para;</a></h3>
 <p>The top-level message sent by the client for the <code>StreamingOpen</code> method. Multiple <code>StreamingOpenReq</code> messages can be
 sent but the first message must contain a <code>monitor_config</code> message to initialize the monitor target. All subsequent
-messages must contain bytes to be sent to the target and must not contain a <code>monitor_config</code> message.</p>
+messages must contain bytes to be sent to the target and must not contain a <code>monitor_config</code> message. DEPRECATION
+WARNING: StreamingOpenRequest is deprecated and will be removed in a future release. Use ArduinoCoreService.Monitor and
+ArduinoCoreService.EnumerateMonitorPortSettings instead.</p>
 <table>
 <thead>
 <tr>
@@ -1548,6 +1551,8 @@ messages must contain bytes to be sent to the target and must not contain a <cod
 </table>
 <p><a name="cc.arduino.cli.monitor.v1.StreamingOpenResponse"></a></p>
 <h3 id="streamingopenresponse">StreamingOpenResponse<a class="headerlink" href="#streamingopenresponse" title="Permanent link">&para;</a></h3>
+<p>DEPRECATION WARNING: StreamingOpenResponse is deprecated and will be removed in a future release. Use
+ArduinoCoreService.Monitor and ArduinoCoreService.EnumerateMonitorPortSettings instead.</p>
 <table>
 <thead>
 <tr>
@@ -1597,7 +1602,8 @@ messages must contain bytes to be sent to the target and must not contain a <cod
 </table>
 <p><a name="cc.arduino.cli.monitor.v1.MonitorService"></a></p>
 <h3 id="monitorservice">MonitorService<a class="headerlink" href="#monitorservice" title="Permanent link">&para;</a></h3>
-<p>MonitorService provides services for boards monitor</p>
+<p>MonitorService provides services for boards monitor. DEPRECATION WARNING: MonitorService is deprecated and will be
+removed in a future release. Use ArduinoCoreService.Monitor and ArduinoCoreService.EnumerateMonitorPortSettings instead.</p>
 <table>
 <thead>
 <tr>
