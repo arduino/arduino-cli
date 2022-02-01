@@ -321,7 +321,7 @@ The expected output from the tool is a JSON object with the following format:
 
 ```json
 {
-  "output": "Your sketch uses 2200 bytes of program memory out of 8192 (27%)\nThe static RAM used is 200 bytes (of 2048 max)\n",
+  "output": "Your sketch uses 2200 bytes of program memory out of 8192 (27%)\nThe static RAM used is 200 bytes (of 2048 max)",
   "severity": "info",
   "sections": [
     { "name": "text", "size": 2200, "max_size": 8192 },
@@ -347,7 +347,7 @@ process. In this case an extra exception message must be provided through the `e
 
 ```json
 {
-  "output": "Your sketch uses 12200 bytes of program memory out of 8192 (149%))\nThe static RAM used is 200 bytes (of 2048 max)\n",
+  "output": "Your sketch uses 12200 bytes of program memory out of 8192 (149%))\nThe static RAM used is 200 bytes (of 2048 max)",
   "severity": "error",
   "error": "Sketch is too big!",
   "sections": [
