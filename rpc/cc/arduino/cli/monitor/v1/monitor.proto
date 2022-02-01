@@ -17,12 +17,18 @@ syntax = "proto3";
 
 package cc.arduino.cli.monitor.v1;
 
+option deprecated = true;
 option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/monitor/v1;monitor";
 
 import "google/protobuf/struct.proto";
 
-// MonitorService provides services for boards monitor
+// MonitorService provides services for boards monitor.
+// DEPRECATION WARNING: MonitorService is deprecated and will be removed in a
+// future release. Use ArduinoCoreService.Monitor and
+// ArduinoCoreService.EnumerateMonitorPortSettings instead.
 service MonitorService {
+  option deprecated = true;
+
   // Open a bidirectional monitor stream. This can be used to implement
   // something similar to the Arduino IDE's Serial Monitor.
   rpc StreamingOpen(stream StreamingOpenRequest)
@@ -34,7 +40,12 @@ service MonitorService {
 // must contain a `monitor_config` message to initialize the monitor target.
 // All subsequent messages must contain bytes to be sent to the target
 // and must not contain a `monitor_config` message.
+// DEPRECATION WARNING: StreamingOpenRequest is deprecated and will be removed
+// in a future release. Use ArduinoCoreService.Monitor and
+// ArduinoCoreService.EnumerateMonitorPortSettings instead.
 message StreamingOpenRequest {
+  option deprecated = true;
+
   // Content must be either a monitor config or data to be sent.
   oneof content {
     // Provides information to the monitor that specifies which is the target.
@@ -53,7 +64,12 @@ message StreamingOpenRequest {
 
 // Tells the monitor which target to open and provides additional parameters
 // that might be needed to configure the target or the monitor itself.
+// DEPRECATION WARNING: MonitorConfig is deprecated and will be removed
+// in a future release. Use ArduinoCoreService.Monitor and
+// ArduinoCoreService.EnumerateMonitorPortSettings instead.
 message MonitorConfig {
+  option deprecated = true;
+
   enum TargetType {
     TARGET_TYPE_SERIAL = 0;
     TARGET_TYPE_NULL = 99;
@@ -73,7 +89,12 @@ message MonitorConfig {
   int32 recv_rate_limit_buffer = 4;
 }
 
+// DEPRECATION WARNING: StreamingOpenResponse is deprecated and will be removed
+// in a future release. Use ArduinoCoreService.Monitor and
+// ArduinoCoreService.EnumerateMonitorPortSettings instead.
 message StreamingOpenResponse {
+  option deprecated = true;
+
   // The data received from the target.
   bytes data = 1;
 
