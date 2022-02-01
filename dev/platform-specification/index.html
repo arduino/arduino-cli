@@ -1324,6 +1324,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#recipes-to-compute-binary-sketch-size-for-more-complex-systems-since-arduino-cli-0210" class="md-nav__link">
+    Recipes to compute binary sketch size for more complex systems (since Arduino CLI &gt;=0.21.0)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#recipes-to-export-compiled-binary" class="md-nav__link">
     Recipes to export compiled binary
   </a>
@@ -1828,6 +1835,13 @@
           <li class="md-nav__item">
   <a href="#recipes-to-compute-binary-sketch-size" class="md-nav__link">
     Recipes to compute binary sketch size
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recipes-to-compute-binary-sketch-size-for-more-complex-systems-since-arduino-cli-0210" class="md-nav__link">
+    Recipes to compute binary sketch size for more complex systems (since Arduino CLI &gt;=0.21.0)
   </a>
   
 </li>
@@ -2419,6 +2433,54 @@ value:</p>
 <div class="highlight"><pre><span></span><code>Sketch uses 924 bytes (2%) of program storage space. Maximum is 32256 bytes.
 Global variables use 9 bytes (0%) of dynamic memory, leaving 2039 bytes for local variables. Maximum is 2048 bytes.
 </code></pre></div>
+<h4 id="recipes-to-compute-binary-sketch-size-for-more-complex-systems-since-arduino-cli-0210">Recipes to compute binary sketch size for more complex systems (since Arduino CLI &gt;=0.21.0)<a class="headerlink" href="#recipes-to-compute-binary-sketch-size-for-more-complex-systems-since-arduino-cli-0210" title="Permanent link">&para;</a></h4>
+<p>A platform may provide a tool for the specific purpose to analyze the binaries and compute the sketch size and memory
+usage statistics. This is especially useful for boards with non-trivial memory layouts where
+<a href="#recipes-to-compute-binary-sketch-size">the classic reg-exp based approach</a> is not sufficient.</p>
+<p>The command line to run is specified with the recipe <strong>recipe.advanced_size.pattern</strong>.</p>
+<p>The expected output from the tool is a JSON object with the following format:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;Your sketch uses 2200 bytes of program memory out of 8192 (27%)\nThe static RAM used is 200 bytes (of 2048 max)&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;severity&quot;</span><span class="p">:</span> <span class="s2">&quot;info&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;sections&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="nt">&quot;size&quot;</span><span class="p">:</span> <span class="mi">2200</span><span class="p">,</span> <span class="nt">&quot;max_size&quot;</span><span class="p">:</span> <span class="mi">8192</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="nt">&quot;size&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span> <span class="nt">&quot;max_size&quot;</span><span class="p">:</span> <span class="mi">2048</span> <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The meaning of the fields is the following:</p>
+<ul>
+<li><code>output</code>: is a preformatted text that is displayed as-is in console.</li>
+<li><code>severity</code>: indicates the warning level of the output messages, it must be <code>info</code>, <code>warning</code> or <code>error</code>. Warnings and
+  errors are displayed in red (or in a different color than normal output). Errors will make the build/upload fail.</li>
+<li><code>sections</code>: is an array containing the memory sections and their usage level. This array is used to report memory
+  usage in a machine-readable format if requested by the user. Each item represents a memory section and may contain the
+  following fields<ul>
+<li><code>name</code>: an identifier for the section</li>
+<li><code>size</code>: the sketch size for the section</li>
+<li><code>max_size</code>: the maximum size for the section</li>
+</ul>
+</li>
+</ul>
+<p>When the <code>severity</code> is set to <code>error</code> the build/upload is interrupted and an exception is returned to the calling
+process. In this case an extra exception message must be provided through the <code>error</code> field, for example:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;Your sketch uses 12200 bytes of program memory out of 8192 (149%))\nThe static RAM used is 200 bytes (of 2048 max)&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;severity&quot;</span><span class="p">:</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Sketch is too big!&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;sections&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="nt">&quot;size&quot;</span><span class="p">:</span> <span class="mi">12200</span><span class="p">,</span> <span class="nt">&quot;max_size&quot;</span><span class="p">:</span> <span class="mi">8192</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="nt">&quot;size&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span> <span class="nt">&quot;max_size&quot;</span><span class="p">:</span> <span class="mi">2048</span> <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>This means that the <code>sections</code> part is <strong>NOT</strong> used to automatically check if the sketch size exceeds the available
+memory: this check is now delegated to the tool that must report a <code>"severity":"error"</code> with a meaningful error message.</p>
+<p>If both <strong>recipe.size.pattern</strong> and <strong>recipe.advanced_size.pattern</strong> are present then <strong>recipe.advanced_size.pattern</strong>
+will be used. Since the <strong>recipe.advanced_size.pattern</strong> feature is available starting from Arduino CLI&gt;=0.21.0, to
+maximize backward compatibility, we recommend to provide both <strong>recipe.size.pattern</strong> and
+<strong>recipe.advanced_size.pattern</strong> if possible, so the old versions of the IDE/CLI will continue to work (even with a less
+detailed memory usage report).</p>
 <h4 id="recipes-to-export-compiled-binary">Recipes to export compiled binary<a class="headerlink" href="#recipes-to-export-compiled-binary" title="Permanent link">&para;</a></h4>
 <p>When you do a <strong>Sketch &gt; Export compiled Binary</strong> in the Arduino IDE, the compiled binary is copied from the build
 folder to the sketch folder. Two binaries are copied; the standard binary, and a binary that has been merged with the
