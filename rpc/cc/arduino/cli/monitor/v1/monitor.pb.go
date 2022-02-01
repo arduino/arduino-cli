@@ -87,6 +87,9 @@ func (MonitorConfig_TargetType) EnumDescriptor() ([]byte, []int) {
 // must contain a `monitor_config` message to initialize the monitor target.
 // All subsequent messages must contain bytes to be sent to the target
 // and must not contain a `monitor_config` message.
+// DEPRECATION WARNING: StreaminOpenRequest is deprecated and will be removed in
+// a future release. Use CommandService.Monitor and
+// CommandService.EnumerateMonitorPortSettings instead.
 type StreamingOpenRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -191,6 +194,9 @@ func (*StreamingOpenRequest_RecvAcknowledge) isStreamingOpenRequest_Content() {}
 
 // Tells the monitor which target to open and provides additional parameters
 // that might be needed to configure the target or the monitor itself.
+// DEPRECATION WARNING: MonitorConfig is deprecated and will be removed
+// in a future release. Use CommandService.Monitor and
+// CommandService.EnumerateMonitorPortSettings instead.
 type MonitorConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -269,6 +275,9 @@ func (x *MonitorConfig) GetRecvRateLimitBuffer() int32 {
 	return 0
 }
 
+// DEPRECATION WARNING: StreamingOpenResponse is deprecated and will be removed
+// in a future release. Use CommandService.Monitor and
+// CommandService.EnumerateMonitorPortSettings instead.
 type StreamingOpenResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
