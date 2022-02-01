@@ -86,8 +86,10 @@ func checkSizeAdvanced(ctx *types.Context, properties *properties.Map) error {
 		return errors.New(resp.ErrorMessage)
 	case "warning":
 		ctx.Warn(resp.Output)
-	default: // or "info"
+	case "info":
 		ctx.Info(resp.Output)
+	default:
+		return fmt.Errorf("invalid '%s' severity from sketch sizer: it must be 'error', 'warning' or 'info'", resp.Severity)
 	}
 	return nil
 }
