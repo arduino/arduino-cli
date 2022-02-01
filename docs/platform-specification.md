@@ -309,6 +309,63 @@ Sketch uses 924 bytes (2%) of program storage space. Maximum is 32256 bytes.
 Global variables use 9 bytes (0%) of dynamic memory, leaving 2039 bytes for local variables. Maximum is 2048 bytes.
 ```
 
+#### Recipes to compute binary sketch size for more complex systems (since Arduino CLI >=0.21.0)
+
+A platform may provide a tool for the specific purpose to analyze the binaries and compute the sketch size and memory
+usage statistics. This is especially useful for boards with non-trivial memory layouts where
+[the classic reg-exp based approach](#recipes-to-compute-binary-sketch-size) is not sufficient.
+
+The command line to run is specified with the recipe **recipe.advanced_size.pattern**.
+
+The expected output from the tool is a JSON object with the following format:
+
+```json
+{
+  "output": "Your sketch uses 2200 bytes of program memory out of 8192 (27%)\nThe static RAM used is 200 bytes (of 2048 max)",
+  "severity": "info",
+  "sections": [
+    { "name": "text", "size": 2200, "max_size": 8192 },
+    { "name": "data", "size": 200, "max_size": 2048 }
+  ]
+}
+```
+
+The meaning of the fields is the following:
+
+- `output`: is a preformatted text that is displayed as-is in console.
+- `severity`: indicates the warning level of the output messages, it must be `info`, `warning` or `error`. Warnings and
+  errors are displayed in red (or in a different color than normal output). Errors will make the build/upload fail.
+- `sections`: is an array containing the memory sections and their usage level. This array is used to report memory
+  usage in a machine-readable format if requested by the user. Each item represents a memory section and may contain the
+  following fields
+  - `name`: an identifier for the section
+  - `size`: the sketch size for the section
+  - `max_size`: the maximum size for the section
+
+When the `severity` is set to `error` the build/upload is interrupted and an exception is returned to the calling
+process. In this case an extra exception message must be provided through the `error` field, for example:
+
+```json
+{
+  "output": "Your sketch uses 12200 bytes of program memory out of 8192 (149%))\nThe static RAM used is 200 bytes (of 2048 max)",
+  "severity": "error",
+  "error": "Sketch is too big!",
+  "sections": [
+    { "name": "text", "size": 12200, "max_size": 8192 },
+    { "name": "data", "size": 200, "max_size": 2048 }
+  ]
+}
+```
+
+This means that the `sections` part is **NOT** used to automatically check if the sketch size exceeds the available
+memory: this check is now delegated to the tool that must report a `"severity":"error"` with a meaningful error message.
+
+If both **recipe.size.pattern** and **recipe.advanced_size.pattern** are present then **recipe.advanced_size.pattern**
+will be used. Since the **recipe.advanced_size.pattern** feature is available starting from Arduino CLI>=0.21.0, to
+maximize backward compatibility, we recommend to provide both **recipe.size.pattern** and
+**recipe.advanced_size.pattern** if possible, so the old versions of the IDE/CLI will continue to work (even with a less
+detailed memory usage report).
+
 #### Recipes to export compiled binary
 
 When you do a **Sketch > Export compiled Binary** in the Arduino IDE, the compiled binary is copied from the build

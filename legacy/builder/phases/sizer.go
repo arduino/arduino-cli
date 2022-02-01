@@ -16,12 +16,12 @@
 package phases
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strconv"
 
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-properties-orderedmap"
@@ -42,20 +42,64 @@ func (s *Sizer) Run(ctx *types.Context) error {
 
 	buildProperties := ctx.BuildProperties
 
-	err := checkSize(ctx, buildProperties)
-	if err != nil {
-		return errors.WithStack(err)
+	if buildProperties.ContainsKey("recipe.advanced_size.pattern") {
+		return checkSizeAdvanced(ctx, buildProperties)
 	}
 
+	return checkSize(ctx, buildProperties)
+}
+
+func checkSizeAdvanced(ctx *types.Context, properties *properties.Map) error {
+	command, err := builder_utils.PrepareCommandForRecipe(properties, "recipe.advanced_size.pattern", false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+	if err != nil {
+		return errors.New(tr("Error while determining sketch size: %s", err))
+	}
+
+	out, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.Show /* stderr */)
+	if err != nil {
+		return errors.New(tr("Error while determining sketch size: %s", err))
+	}
+
+	type AdvancedSizerResponse struct {
+		// Output are the messages displayed in console to the user
+		Output string `json:"output"`
+		// Severity may be one of "info", "warning" or "error". Warnings and errors will
+		// likely be printed in red. Errors will stop build/upload.
+		Severity string `json:"severity"`
+		// Sections are the sections sizes for machine readable use
+		Sections []types.ExecutableSectionSize `json:"sections"`
+		// ErrorMessage is a one line error message like:
+		// "text section exceeds available space in board"
+		// it must be set when Severity is "error"
+		ErrorMessage string `json:"error"`
+	}
+
+	var resp AdvancedSizerResponse
+	if err := json.Unmarshal(out, &resp); err != nil {
+		return errors.New(tr("Error while determining sketch size: %s", err))
+	}
+
+	ctx.ExecutableSectionsSize = resp.Sections
+	switch resp.Severity {
+	case "error":
+		ctx.Warn(resp.Output)
+		return errors.New(resp.ErrorMessage)
+	case "warning":
+		ctx.Warn(resp.Output)
+	case "info":
+		ctx.Info(resp.Output)
+	default:
+		return fmt.Errorf("invalid '%s' severity from sketch sizer: it must be 'error', 'warning' or 'info'", resp.Severity)
+	}
 	return nil
 }
 
 func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 	properties := buildProperties.Clone()
-	properties.Set(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel))
+	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+ctx.WarningsLevel))
 
-	maxTextSizeString := properties.Get(constants.PROPERTY_UPLOAD_MAX_SIZE)
-	maxDataSizeString := properties.Get(constants.PROPERTY_UPLOAD_MAX_DATA_SIZE)
+	maxTextSizeString := properties.Get("upload.maximum_size")
+	maxDataSizeString := properties.Get("upload.maximum_data_size")
 
 	if maxTextSizeString == "" {
 		return nil
@@ -121,8 +165,8 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 		return errors.New(tr("data section exceeds available space in board"))
 	}
 
-	if properties.Get(constants.PROPERTY_WARN_DATA_PERCENT) != "" {
-		warnDataPercentage, err := strconv.Atoi(properties.Get(constants.PROPERTY_WARN_DATA_PERCENT))
+	if w := properties.Get("build.warn_data_percentage"); w != "" {
+		warnDataPercentage, err := strconv.Atoi(w)
 		if err != nil {
 			return err
 		}
@@ -135,7 +179,7 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 }
 
 func execSizeRecipe(ctx *types.Context, properties *properties.Map) (textSize int, dataSize int, eepromSize int, resErr error) {
-	command, err := builder_utils.PrepareCommandForRecipe(properties, constants.RECIPE_SIZE_PATTERN, false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+	command, err := builder_utils.PrepareCommandForRecipe(properties, "recipe.size.pattern", false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
 	if err != nil {
 		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)
 		return
@@ -150,7 +194,7 @@ func execSizeRecipe(ctx *types.Context, properties *properties.Map) (textSize in
 	// force multiline match prepending "(?m)" to the actual regexp
 	// return an error if RECIPE_SIZE_REGEXP doesn't exist
 
-	textSize, err = computeSize(properties.Get(constants.RECIPE_SIZE_REGEXP), out)
+	textSize, err = computeSize(properties.Get("recipe.size.regex"), out)
 	if err != nil {
 		resErr = fmt.Errorf(tr("Invalid size regexp: %s"), err)
 		return
@@ -160,13 +204,13 @@ func execSizeRecipe(ctx *types.Context, properties *properties.Map) (textSize in
 		return
 	}
 
-	dataSize, err = computeSize(properties.Get(constants.RECIPE_SIZE_REGEXP_DATA), out)
+	dataSize, err = computeSize(properties.Get("recipe.size.regex.data"), out)
 	if err != nil {
 		resErr = fmt.Errorf(tr("Invalid data size regexp: %s"), err)
 		return
 	}
 
-	eepromSize, err = computeSize(properties.Get(constants.RECIPE_SIZE_REGEXP_EEPROM), out)
+	eepromSize, err = computeSize(properties.Get("recipe.size.regex.eeprom"), out)
 	if err != nil {
 		resErr = fmt.Errorf(tr("Invalid eeprom size regexp: %s"), err)
 		return

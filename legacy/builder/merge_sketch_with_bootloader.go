@@ -75,7 +75,7 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 
 	// Ignore merger errors for the first iteration
 	maximumBinSize := 16000000
-	if uploadMaxSize, ok := ctx.BuildProperties.GetOk(constants.PROPERTY_UPLOAD_MAX_SIZE); ok {
+	if uploadMaxSize, ok := ctx.BuildProperties.GetOk("upload.maximum_size"); ok {
 		maximumBinSize, _ = strconv.Atoi(uploadMaxSize)
 		maximumBinSize *= 2
 	}
