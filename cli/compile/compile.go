@@ -268,7 +268,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		BuilderResult: compileRes,
 		Success:       compileError == nil,
 	})
-	if compileError != nil && output.OutputFormat != "json" {
+	if compileError != nil {
 		feedback.Errorf(tr("Error during build: %v"), compileError)
 
 		// Check the error type to give the user better feedback on how
