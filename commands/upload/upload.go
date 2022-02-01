@@ -67,7 +67,12 @@ func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsReques
 	}
 
 	_, platformRelease, _, boardProperties, _, err := pm.ResolveFQBN(fqbn)
-	if err != nil {
+	if platformRelease == nil {
+		return nil, &arduino.PlatformNotFoundError{
+			Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
+			Cause:    err,
+		}
+	} else if err != nil {
 		return nil, &arduino.UnknownFQBNError{Cause: err}
 	}
 
@@ -286,7 +291,12 @@ func runProgramAction(pm *packagemanager.PackageManager,
 
 	// Find target board and board properties
 	_, boardPlatform, board, boardProperties, buildPlatform, err := pm.ResolveFQBN(fqbn)
-	if err != nil {
+	if boardPlatform == nil {
+		return &arduino.PlatformNotFoundError{
+			Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
+			Cause:    err,
+		}
+	} else if err != nil {
 		return &arduino.UnknownFQBNError{Cause: err}
 	}
 	logrus.
