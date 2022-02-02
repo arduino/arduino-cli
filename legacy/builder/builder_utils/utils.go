@@ -210,7 +210,7 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 		return nil, errors.WithStack(err)
 	}
 
-	objIsUpToDate, err := ObjFileIsUpToDate(ctx, source, objectFile, depsFile)
+	objIsUpToDate, err := ObjFileIsUpToDate(source, objectFile, depsFile)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -237,7 +237,7 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 	return objectFile, nil
 }
 
-func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFile *paths.Path) (bool, error) {
+func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool, error) {
 	logrus.Debugf("Checking previous results for %v (result = %v, dep = %v)", sourceFile, objectFile, dependencyFile)
 	if objectFile == nil || dependencyFile == nil {
 		logrus.Debugf("Not found: nil")
