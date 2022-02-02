@@ -79,15 +79,15 @@ func CompileFiles(ctx *types.Context, sourcePath *paths.Path, recurse bool, buil
 	ctx.Progress.AddSubSteps(len(sSources) + len(cSources) + len(cppSources))
 	defer ctx.Progress.RemoveSubSteps()
 
-	sObjectFiles, err := compileFilesWithRecipe(ctx, sourcePath, sSources, buildPath, buildProperties, includes, constants.RECIPE_S_PATTERN)
+	sObjectFiles, err := compileFilesWithRecipe(ctx, sourcePath, sSources, buildPath, buildProperties, includes, "recipe.S.o.pattern")
 	if err != nil {
 		return nil, err
 	}
-	cObjectFiles, err := compileFilesWithRecipe(ctx, sourcePath, cSources, buildPath, buildProperties, includes, constants.RECIPE_C_PATTERN)
+	cObjectFiles, err := compileFilesWithRecipe(ctx, sourcePath, cSources, buildPath, buildProperties, includes, "recipe.c.o.pattern")
 	if err != nil {
 		return nil, err
 	}
-	cppObjectFiles, err := compileFilesWithRecipe(ctx, sourcePath, cppSources, buildPath, buildProperties, includes, constants.RECIPE_CPP_PATTERN)
+	cppObjectFiles, err := compileFilesWithRecipe(ctx, sourcePath, cppSources, buildPath, buildProperties, includes, "recipe.cpp.o.pattern")
 	if err != nil {
 		return nil, err
 	}
