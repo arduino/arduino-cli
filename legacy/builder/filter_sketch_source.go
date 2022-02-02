@@ -34,9 +34,7 @@ type FilterSketchSource struct {
 func (s *FilterSketchSource) Run(ctx *types.Context) error {
 	fileNames := paths.NewPathList()
 	fileNames.Add(ctx.Sketch.MainFile)
-	for _, file := range ctx.Sketch.OtherSketchFiles {
-		fileNames = append(fileNames, file)
-	}
+	fileNames.AddAll(ctx.Sketch.OtherSketchFiles)
 
 	inSketch := false
 	filtered := ""

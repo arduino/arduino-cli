@@ -34,7 +34,7 @@ func findIncludeForOldCompilers(source string) string {
 	lines := strings.Split(source, "\n")
 	for _, line := range lines {
 		splittedLine := strings.Split(line, ":")
-		for i, _ := range splittedLine {
+		for i := range splittedLine {
 			if strings.Contains(splittedLine[i], "fatal error") {
 				return strings.TrimSpace(splittedLine[i+1])
 			}

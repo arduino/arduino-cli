@@ -371,10 +371,7 @@ func unescapeDep(s string) string {
 }
 
 func removeEndingBackSlash(s string) string {
-	if strings.HasSuffix(s, "\\") {
-		s = s[:len(s)-1]
-	}
-	return s
+	return strings.TrimSuffix(s, "\\")
 }
 
 func nonEmptyString(s string) bool {

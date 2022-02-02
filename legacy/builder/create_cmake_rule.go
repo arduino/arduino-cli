@@ -40,6 +40,8 @@ type ExportProjectCMake struct {
 	SketchError bool
 }
 
+var lineMatcher = regexp.MustCompile(`^#line\s\d+\s"`)
+
 func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	if s.SketchError || !canExportCmakeProject(ctx) {
 		return nil
@@ -139,7 +141,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		lines := strings.Split(string(input), "\n")
 
 		for i, line := range lines {
-			if lineToRemove, _ := regexp.MatchString(`^#line\s\d+\s"`, line); lineToRemove == true {
+			if lineMatcher.MatchString(line) {
 				lines[i] = ""
 			}
 		}

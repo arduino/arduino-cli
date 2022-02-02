@@ -90,7 +90,7 @@ func addPrototype(tag *types.CTag) {
 	}
 
 	tag.PrototypeModifiers = ""
-	if strings.Index(tag.Code, STATIC+" ") != -1 {
+	if strings.Contains(tag.Code, STATIC+" ") {
 		tag.PrototypeModifiers = tag.PrototypeModifiers + " " + STATIC
 	}
 
@@ -121,7 +121,7 @@ func (p *CTagsParser) skipDuplicates() {
 	definedPrototypes := make(map[string]bool)
 
 	for _, tag := range p.tags {
-		if !definedPrototypes[tag.Prototype] && tag.SkipMe == false {
+		if !definedPrototypes[tag.Prototype] && !tag.SkipMe {
 			definedPrototypes[tag.Prototype] = true
 		} else {
 			tag.SkipMe = true

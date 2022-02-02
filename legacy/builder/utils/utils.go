@@ -34,6 +34,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
+	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
@@ -92,22 +93,12 @@ func IsSCCSOrHiddenFile(file os.FileInfo) bool {
 
 func IsHiddenFile(file os.FileInfo) bool {
 	name := filepath.Base(file.Name())
-
-	if name[0] == '.' {
-		return true
-	}
-
-	return false
+	return name[0] == '.'
 }
 
 func IsSCCSFile(file os.FileInfo) bool {
 	name := filepath.Base(file.Name())
-
-	if SOURCE_CONTROL_FOLDERS[name] {
-		return true
-	}
-
-	return false
+	return SOURCE_CONTROL_FOLDERS[name]
 }
 
 func SliceContains(slice []string, target string) bool {
@@ -375,34 +366,28 @@ func ParseCppString(line string) (string, string, bool) {
 		c, width := utf8.DecodeRuneInString(line[i:])
 
 		switch c {
-		// Backslash, next character is used unmodified
 		case '\\':
+			// Backslash, next character is used unmodified
 			i += width
 			if i >= len(line) {
 				return "", line, false
 			}
 			res += string(line[i])
-			break
-		// Quote, end of string
 		case '"':
+			// Quote, end of string
 			return res, line[i+width:], true
 		default:
 			res += string(c)
-			break
 		}
 
 		i += width
 	}
 }
 
-func isMn(r rune) bool {
-	return unicode.Is(unicode.Mn, r) // Mn: nonspacing marks
-}
-
 // Normalizes an UTF8 byte slice
 // TODO: use it more often troughout all the project (maybe on logger interface?)
 func NormalizeUTF8(buf []byte) []byte {
-	t := transform.Chain(norm.NFD, transform.RemoveFunc(isMn), norm.NFC)
+	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 	result, _, _ := transform.Bytes(t, buf)
 	return result
 }
