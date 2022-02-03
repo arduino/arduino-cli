@@ -44,6 +44,7 @@ import (
 
 var (
 	tr           = i18n.Tr
+	ip           string
 	daemonize    bool
 	debug        bool
 	debugFilters []string
@@ -59,6 +60,7 @@ func NewCommand() *cobra.Command {
 		Args:    cobra.NoArgs,
 		Run:     runDaemonCommand,
 	}
+	daemonCommand.PersistentFlags().StringVar(&ip, "ip", "127.0.0.1", tr("The IP address the daemon will listen to"))
 	daemonCommand.PersistentFlags().String("port", "", tr("The TCP port the daemon will listen to"))
 	configuration.Settings.BindPFlag("daemon.port", daemonCommand.PersistentFlags().Lookup("port"))
 	daemonCommand.Flags().BoolVar(&daemonize, "daemonize", false, tr("Do not terminate daemon process if the parent process dies"))
@@ -112,7 +114,6 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		}()
 	}
 
-	ip := "127.0.0.1"
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", ip, port))
 	if err != nil {
 		// Invalid port, such as "Foo"
