@@ -16,6 +16,7 @@
 package builder_utils
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -36,45 +37,24 @@ import (
 var tr = i18n.Tr
 
 func CompileFiles(ctx *types.Context, sourcePath *paths.Path, recurse bool, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
-	var allFiles paths.PathList
+	var sources paths.PathList
 	var err error
 	if recurse {
-		allFiles, err = sourcePath.ReadDirRecursive()
+		sources, err = sourcePath.ReadDirRecursive()
 	} else {
-		allFiles, err = sourcePath.ReadDir()
+		sources, err = sourcePath.ReadDir()
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	sSources := allFiles.Clone()
-	sSources.FilterSuffix(".S")
-	cSources := allFiles.Clone()
-	cSources.FilterSuffix(".c")
-	cppSources := allFiles.Clone()
-	cppSources.FilterSuffix(".cpp")
+	validExtensions := []string{".S", ".c", ".cpp"}
 
-	ctx.Progress.AddSubSteps(len(sSources) + len(cSources) + len(cppSources))
+	sources.FilterSuffix(validExtensions...)
+	ctx.Progress.AddSubSteps(len(sources))
 	defer ctx.Progress.RemoveSubSteps()
 
-	sObjectFiles, err := compileFilesWithRecipe(ctx, sourcePath, sSources, buildPath, buildProperties, includes, "recipe.S.o.pattern")
-	if err != nil {
-		return nil, err
-	}
-	cObjectFiles, err := compileFilesWithRecipe(ctx, sourcePath, cSources, buildPath, buildProperties, includes, "recipe.c.o.pattern")
-	if err != nil {
-		return nil, err
-	}
-	cppObjectFiles, err := compileFilesWithRecipe(ctx, sourcePath, cppSources, buildPath, buildProperties, includes, "recipe.cpp.o.pattern")
-	if err != nil {
-		return nil, err
-	}
-
-	objectFiles := paths.NewPathList()
-	objectFiles.AddAll(sObjectFiles)
-	objectFiles.AddAll(cObjectFiles)
-	objectFiles.AddAll(cppObjectFiles)
-	return objectFiles, nil
+	return compileFilesWithRecipe(ctx, sourcePath, sources, buildPath, buildProperties, includes, validExtensions)
 }
 
 func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
@@ -108,7 +88,7 @@ func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
 	return sources, nil
 }
 
-func compileFilesWithRecipe(ctx *types.Context, sourcePath *paths.Path, sources paths.PathList, buildPath *paths.Path, buildProperties *properties.Map, includes []string, recipe string) (paths.PathList, error) {
+func compileFilesWithRecipe(ctx *types.Context, sourcePath *paths.Path, sources paths.PathList, buildPath *paths.Path, buildProperties *properties.Map, includes []string, validExtensions []string) (paths.PathList, error) {
 	objectFiles := paths.NewPathList()
 	if len(sources) == 0 {
 		return objectFiles, nil
@@ -119,6 +99,7 @@ func compileFilesWithRecipe(ctx *types.Context, sourcePath *paths.Path, sources 
 
 	queue := make(chan *paths.Path)
 	job := func(source *paths.Path) {
+		recipe := fmt.Sprintf("recipe%s.o.pattern", source.Ext())
 		objectFile, err := compileFileWithRecipe(ctx, sourcePath, source, buildPath, buildProperties, includes, recipe)
 		if err != nil {
 			errorsMux.Lock()
