@@ -36,27 +36,6 @@ import (
 
 var tr = i18n.Tr
 
-func CompileFiles(ctx *types.Context, sourcePath *paths.Path, recurse bool, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
-	var sources paths.PathList
-	var err error
-	if recurse {
-		sources, err = sourcePath.ReadDirRecursive()
-	} else {
-		sources, err = sourcePath.ReadDir()
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	validExtensions := []string{".S", ".c", ".cpp"}
-
-	sources.FilterSuffix(validExtensions...)
-	ctx.Progress.AddSubSteps(len(sources))
-	defer ctx.Progress.RemoveSubSteps()
-
-	return compileFilesWithRecipe(ctx, sourcePath, sources, buildPath, buildProperties, includes, validExtensions)
-}
-
 func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
 	files, err := utils.ReadDirFiltered(sourcePath, utils.FilterFiles())
 	if err != nil {
@@ -88,12 +67,29 @@ func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
 	return sources, nil
 }
 
-func compileFilesWithRecipe(ctx *types.Context, sourcePath *paths.Path, sources paths.PathList, buildPath *paths.Path, buildProperties *properties.Map, includes []string, validExtensions []string) (paths.PathList, error) {
+func CompileFiles(ctx *types.Context, sourcePath *paths.Path, recurse bool, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
+	var sources paths.PathList
+	var err error
+	if recurse {
+		sources, err = sourcePath.ReadDirRecursive()
+	} else {
+		sources, err = sourcePath.ReadDir()
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	validExtensions := []string{".S", ".c", ".cpp"}
+
+	sources.FilterSuffix(validExtensions...)
+	ctx.Progress.AddSubSteps(len(sources))
+	defer ctx.Progress.RemoveSubSteps()
+
 	objectFiles := paths.NewPathList()
+	var objectFilesMux sync.Mutex
 	if len(sources) == 0 {
 		return objectFiles, nil
 	}
-	var objectFilesMux sync.Mutex
 	var errorsList []error
 	var errorsMux sync.Mutex
 
