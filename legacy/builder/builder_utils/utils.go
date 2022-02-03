@@ -35,28 +35,6 @@ import (
 
 var tr = i18n.Tr
 
-func CompileFilesRecursive(ctx *types.Context, sourcePath *paths.Path, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
-	objectFiles, err := CompileFiles(ctx, sourcePath, false, buildPath, buildProperties, includes)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	folders, err := utils.ReadDirFiltered(sourcePath.String(), utils.FilterDirs)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	for _, folder := range folders {
-		subFolderObjectFiles, err := CompileFilesRecursive(ctx, sourcePath.Join(folder.Name()), buildPath.Join(folder.Name()), buildProperties, includes)
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-		objectFiles.AddAll(subFolderObjectFiles)
-	}
-
-	return objectFiles, nil
-}
-
 func CompileFiles(ctx *types.Context, sourcePath *paths.Path, recurse bool, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
 	var allFiles paths.PathList
 	var err error
