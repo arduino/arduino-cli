@@ -2,7 +2,7 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
-## Unreleased
+## 0.21.0
 
 ### `packagemanager.NewPackageManager` function change
 
