@@ -65,6 +65,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest,
 		}
 	}
 
+	didInstall := false
 	for _, lib := range toInstall {
 		libRelease, err := findLibraryIndexRelease(lm, &rpc.LibraryInstallRequest{
 			Name:    lib.Name,
@@ -79,13 +80,21 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest,
 		}
 
 		if err := installLibrary(lm, libRelease, taskCB); err != nil {
+			if errors.Is(err, librariesmanager.ErrAlreadyInstalled) {
+				continue
+			} else {
+				return err
+			}
+		}
+		didInstall = true
+	}
+
+	if didInstall {
+		if err := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil); err != nil {
 			return err
 		}
 	}
 
-	if err := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil); err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -95,7 +104,7 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 	libPath, libReplaced, err := lm.InstallPrerequisiteCheck(libRelease)
 	if errors.Is(err, librariesmanager.ErrAlreadyInstalled) {
 		taskCB(&rpc.TaskProgress{Message: tr("Already installed %s", libRelease), Completed: true})
-		return nil
+		return err
 	}
 
 	if err != nil {
