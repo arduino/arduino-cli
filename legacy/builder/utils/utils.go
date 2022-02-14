@@ -226,30 +226,6 @@ func AbsolutizePaths(files []string) ([]string, error) {
 
 type CheckExtensionFunc func(ext string) bool
 
-func FindAllSubdirectories(folder string, output *[]string) error {
-	walkFunc := func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		// Skip source control and hidden files and directories
-		if IsSCCSOrHiddenFile(info) {
-			if info.IsDir() {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-
-		// Skip directories unless recurse is on, or this is the
-		// root directory
-		if info.IsDir() {
-			*output = AppendIfNotPresent(*output, path)
-		}
-		return nil
-	}
-	return gohasissues.Walk(folder, walkFunc)
-}
-
 func FindFilesInFolder(files *[]string, folder string, extensions CheckExtensionFunc, recurse bool) error {
 	walkFunc := func(path string, info os.FileInfo, err error) error {
 		if err != nil {
