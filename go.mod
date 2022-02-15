@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c
-	github.com/arduino/go-paths-helper v1.6.1
+	github.com/arduino/go-paths-helper v1.7.0
 	github.com/arduino/go-properties-orderedmap v1.6.0
 	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b
 	github.com/arduino/go-win32-utils v0.0.0-20180330194947-ed041402e83b

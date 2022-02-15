@@ -87,6 +87,25 @@ func FilterFiles() filterFiles {
 
 var SOURCE_CONTROL_FOLDERS = map[string]bool{"CVS": true, "RCS": true, ".git": true, ".github": true, ".svn": true, ".hg": true, ".bzr": true, ".vscode": true, ".settings": true, ".pioenvs": true, ".piolibdeps": true}
 
+// FilterOutHiddenFiles is a ReadDirFilter that exclude files with a "." prefix in their name
+var FilterOutHiddenFiles = paths.FilterOutPrefixes(".")
+
+// FilterOutSCCS is a ReadDirFilter that excludes known VSC or project files
+func FilterOutSCCS(file *paths.Path) bool {
+	return !SOURCE_CONTROL_FOLDERS[file.Base()]
+}
+
+// FilterReadableFiles is a ReadDirFilter that accepts only readable files
+func FilterReadableFiles(file *paths.Path) bool {
+	// See if the file is readable by opening it
+	f, err := file.Open()
+	if err != nil {
+		return false
+	}
+	f.Close()
+	return true
+}
+
 func IsSCCSOrHiddenFile(file os.FileInfo) bool {
 	return IsSCCSFile(file) || IsHiddenFile(file)
 }
@@ -226,46 +245,22 @@ func AbsolutizePaths(files []string) ([]string, error) {
 
 type CheckExtensionFunc func(ext string) bool
 
-func FindFilesInFolder(files *[]string, folder string, extensions CheckExtensionFunc, recurse bool) error {
-	walkFunc := func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		// Skip source control and hidden files and directories
-		if IsSCCSOrHiddenFile(info) {
-			if info.IsDir() {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-
-		// Skip directories unless recurse is on, or this is the
-		// root directory
-		if info.IsDir() {
-			if recurse || path == folder {
-				return nil
-			} else {
-				return filepath.SkipDir
-			}
-		}
-
-		// Check (lowercased) extension against list of extensions
-		if extensions != nil && !extensions(strings.ToLower(filepath.Ext(path))) {
-			return nil
-		}
-
-		// See if the file is readable by opening it
-		currentFile, err := os.Open(path)
-		if err != nil {
-			return nil
-		}
-		currentFile.Close()
-
-		*files = append(*files, path)
-		return nil
+func FindFilesInFolder(dir *paths.Path, recurse bool, extensions []string) (paths.PathList, error) {
+	fileFilter := paths.AndFilter(
+		paths.FilterSuffixes(extensions...),
+		FilterOutHiddenFiles,
+		FilterOutSCCS,
+		paths.FilterOutDirectories(),
+		FilterReadableFiles,
+	)
+	if recurse {
+		dirFilter := paths.AndFilter(
+			FilterOutHiddenFiles,
+			FilterOutSCCS,
+		)
+		return dir.ReadDirRecursiveFiltered(dirFilter, fileFilter)
 	}
-	return gohasissues.Walk(folder, walkFunc)
+	return dir.ReadDir(fileFilter)
 }
 
 func AppendIfNotPresent(target []string, elements ...string) []string {

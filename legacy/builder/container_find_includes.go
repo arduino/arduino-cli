@@ -406,16 +406,13 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 }
 
 func queueSourceFilesFromFolder(ctx *types.Context, queue *types.UniqueSourceFileQueue, origin interface{}, folder *paths.Path, recurse bool) error {
-	extensions := func(ext string) bool { return ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext] }
-
-	filePaths := []string{}
-	err := utils.FindFilesInFolder(&filePaths, folder.String(), extensions, recurse)
+	filePaths, err := utils.FindFilesInFolder(folder, recurse, AdditionalFileValidExtensionsNoHeaders)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
 	for _, filePath := range filePaths {
-		sourceFile, err := types.MakeSourceFile(ctx, origin, paths.New(filePath))
+		sourceFile, err := types.MakeSourceFile(ctx, origin, filePath)
 		if err != nil {
 			return errors.WithStack(err)
 		}

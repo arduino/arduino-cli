@@ -17,8 +17,6 @@ package builder
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -32,8 +30,10 @@ import (
 )
 
 var VALID_EXPORT_EXTENSIONS = map[string]bool{".h": true, ".c": true, ".hpp": true, ".hh": true, ".cpp": true, ".S": true, ".a": true, ".properties": true}
-var DOTHEXTENSION = map[string]bool{".h": true, ".hh": true, ".hpp": true}
-var DOTAEXTENSION = map[string]bool{".a": true}
+
+var ValidExportExtensions = []string{".h", ".c", ".hpp", ".hh", ".cpp", ".S", ".a", ".properties"}
+var DotHExtension = []string{".h", ".hh", ".hpp"}
+var DotAExtension = []string{".a"}
 
 type ExportProjectCMake struct {
 	// Was there an error while compiling the sketch?
@@ -66,7 +66,6 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 
 	dynamicLibsFromPkgConfig := map[string]bool{}
 	extensions := func(ext string) bool { return VALID_EXPORT_EXTENSIONS[ext] }
-	staticLibsExtensions := func(ext string) bool { return DOTAEXTENSION[ext] }
 	for _, library := range ctx.ImportedLibraries {
 		// Copy used libraries in the correct folder
 		libDir := libBaseFolder.Join(library.Name)
@@ -91,12 +90,11 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		}
 
 		// Remove stray folders contining incompatible or not needed libraries archives
-		var files []string
-		utils.FindFilesInFolder(&files, libDir.Join("src").String(), staticLibsExtensions, true)
+		files, _ := utils.FindFilesInFolder(libDir.Join("src"), true, DotAExtension)
 		for _, file := range files {
-			staticLibDir := filepath.Dir(file)
-			if !isStaticLib || !strings.Contains(staticLibDir, mcu) {
-				os.RemoveAll(staticLibDir)
+			staticLibDir := file.Parent()
+			if !isStaticLib || !strings.Contains(staticLibDir.String(), mcu) {
+				staticLibDir.RemoveAll()
 			}
 		}
 	}
@@ -128,11 +126,10 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	}
 
 	// remove "#line 1 ..." from exported c_make folder sketch
-	var sketchFiles []string
-	utils.FindFilesInFolder(&sketchFiles, cmakeFolder.Join("sketch").String(), extensions, false)
+	sketchFiles, _ := utils.FindFilesInFolder(cmakeFolder.Join("sketch"), false, ValidExportExtensions)
 
 	for _, file := range sketchFiles {
-		input, err := ioutil.ReadFile(file)
+		input, err := file.ReadFile()
 		if err != nil {
 			fmt.Println(err)
 			continue
@@ -146,7 +143,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 			}
 		}
 		output := strings.Join(lines, "\n")
-		err = ioutil.WriteFile(file, []byte(output), 0644)
+		err = file.WriteFile([]byte(output))
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -163,14 +160,11 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	extractCompileFlags(ctx, "recipe.cpp.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
 
 	// Extract folders with .h in them for adding in include list
-	var headerFiles []string
-	isHeader := func(ext string) bool { return DOTHEXTENSION[ext] }
-	utils.FindFilesInFolder(&headerFiles, cmakeFolder.String(), isHeader, true)
-	foldersContainingDotH := findUniqueFoldersRelative(headerFiles, cmakeFolder.String())
+	headerFiles, _ := utils.FindFilesInFolder(cmakeFolder, true, DotHExtension)
+	foldersContainingDotH := findUniqueFoldersRelative(headerFiles.AsStrings(), cmakeFolder.String())
 
 	// Extract folders with .a in them for adding in static libs paths list
-	var staticLibs []string
-	utils.FindFilesInFolder(&staticLibs, cmakeFolder.String(), staticLibsExtensions, true)
+	staticLibs, _ := utils.FindFilesInFolder(cmakeFolder, true, DotAExtension)
 
 	// Generate the CMakeLists global file
 
@@ -210,13 +204,13 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	cmakelist += "link_directories (" + strings.Join(relLinkDirectories, " ") + " ${EXTRA_LIBS_DIRS})\n"
 	for _, staticLib := range staticLibs {
 		// Static libraries are fully configured
-		lib := filepath.Base(staticLib)
+		lib := staticLib.Base()
 		lib = strings.TrimPrefix(lib, "lib")
 		lib = strings.TrimSuffix(lib, ".a")
 		if !utils.SliceContains(dynamicLibsFromGccMinusL, lib) {
 			linkGroup += " " + lib
 			cmakelist += "add_library (" + lib + " STATIC IMPORTED)\n"
-			location := strings.TrimPrefix(staticLib, cmakeFolder.String())
+			location := strings.TrimPrefix(staticLib.String(), cmakeFolder.String())
 			cmakelist += "set_property(TARGET " + lib + " PROPERTY IMPORTED_LOCATION " + "${PROJECT_SOURCE_DIR}" + location + " )\n"
 		}
 	}
