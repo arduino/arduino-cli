@@ -184,7 +184,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 	}
 
 	if library.Layout == libraries.RecursiveLayout {
-		libObjectFiles, err := builder_utils.CompileFiles(ctx, library.SourceDir, true, libraryBuildPath, buildProperties, includes)
+		libObjectFiles, err := builder_utils.CompileFilesRecursive(ctx, library.SourceDir, libraryBuildPath, buildProperties, includes)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
@@ -201,7 +201,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 		if library.UtilityDir != nil {
 			includes = append(includes, utils.WrapWithHyphenI(library.UtilityDir.String()))
 		}
-		libObjectFiles, err := builder_utils.CompileFiles(ctx, library.SourceDir, false, libraryBuildPath, buildProperties, includes)
+		libObjectFiles, err := builder_utils.CompileFiles(ctx, library.SourceDir, libraryBuildPath, buildProperties, includes)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
@@ -209,7 +209,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 
 		if library.UtilityDir != nil {
 			utilityBuildPath := libraryBuildPath.Join("utility")
-			utilityObjectFiles, err := builder_utils.CompileFiles(ctx, library.UtilityDir, false, utilityBuildPath, buildProperties, includes)
+			utilityObjectFiles, err := builder_utils.CompileFiles(ctx, library.UtilityDir, utilityBuildPath, buildProperties, includes)
 			if err != nil {
 				return nil, errors.WithStack(err)
 			}

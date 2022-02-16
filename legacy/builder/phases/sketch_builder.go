@@ -33,7 +33,7 @@ func (s *SketchBuilder) Run(ctx *types.Context) error {
 		return errors.WithStack(err)
 	}
 
-	objectFiles, err := builder_utils.CompileFiles(ctx, sketchBuildPath, false, sketchBuildPath, buildProperties, includes)
+	objectFiles, err := builder_utils.CompileFiles(ctx, sketchBuildPath, sketchBuildPath, buildProperties, includes)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -41,7 +41,7 @@ func (s *SketchBuilder) Run(ctx *types.Context) error {
 	// The "src/" subdirectory of a sketch is compiled recursively
 	sketchSrcPath := sketchBuildPath.Join("src")
 	if sketchSrcPath.IsDir() {
-		srcObjectFiles, err := builder_utils.CompileFiles(ctx, sketchSrcPath, true, sketchSrcPath, buildProperties, includes)
+		srcObjectFiles, err := builder_utils.CompileFilesRecursive(ctx, sketchSrcPath, sketchSrcPath, buildProperties, includes)
 		if err != nil {
 			return errors.WithStack(err)
 		}
