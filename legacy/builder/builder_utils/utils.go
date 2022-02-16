@@ -24,6 +24,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -79,7 +80,10 @@ func CompileFiles(ctx *types.Context, sourcePath *paths.Path, recurse bool, buil
 		return nil, err
 	}
 
-	validExtensions := []string{".S", ".c", ".cpp"}
+	validExtensions := []string{}
+	for ext := range globals.SourceFilesValidExtensions {
+		validExtensions = append(validExtensions, ext)
+	}
 
 	sources.FilterSuffix(validExtensions...)
 	ctx.Progress.AddSubSteps(len(sources))
