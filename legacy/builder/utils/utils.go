@@ -243,8 +243,6 @@ func AbsolutizePaths(files []string) ([]string, error) {
 	return files, nil
 }
 
-type CheckExtensionFunc func(ext string) bool
-
 func FindFilesInFolder(dir *paths.Path, recurse bool, extensions []string) (paths.PathList, error) {
 	fileFilter := paths.AndFilter(
 		paths.FilterSuffixes(extensions...),
@@ -410,7 +408,17 @@ func CopyFile(src, dst string) (err error) {
 // CopyDir recursively copies a directory tree, attempting to preserve permissions.
 // Source directory must exist, destination directory must *not* exist.
 // Symlinks are ignored and skipped.
-func CopyDir(src string, dst string, extensions CheckExtensionFunc) (err error) {
+func CopyDir(src string, dst string, extensions []string) (err error) {
+	isAcceptedExtension := func(ext string) bool {
+		ext = strings.ToLower(ext)
+		for _, valid := range extensions {
+			if ext == valid {
+				return true
+			}
+		}
+		return false
+	}
+
 	src = filepath.Clean(src)
 	dst = filepath.Clean(dst)
 
@@ -455,7 +463,7 @@ func CopyDir(src string, dst string, extensions CheckExtensionFunc) (err error) 
 				continue
 			}
 
-			if extensions != nil && !extensions(strings.ToLower(filepath.Ext(srcPath))) {
+			if !isAcceptedExtension(filepath.Ext(srcPath)) {
 				continue
 			}
 

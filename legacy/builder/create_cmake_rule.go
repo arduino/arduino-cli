@@ -30,16 +30,6 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 )
 
-func stringArrayToLookupFunction(in []string) func(string) bool {
-	out := map[string]bool{}
-	for _, i := range in {
-		out[i] = true
-	}
-	return func(s string) bool {
-		return out[s]
-	}
-}
-
 type ExportProjectCMake struct {
 	// Was there an error while compiling the sketch?
 	SketchError bool
@@ -81,12 +71,11 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	cmakeFile := cmakeFolder.Join("CMakeLists.txt")
 
 	dynamicLibsFromPkgConfig := map[string]bool{}
-	extensions := stringArrayToLookupFunction(validExportExtensions)
 	for _, library := range ctx.ImportedLibraries {
 		// Copy used libraries in the correct folder
 		libDir := libBaseFolder.Join(library.Name)
 		mcu := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_BUILD_MCU)
-		utils.CopyDir(library.InstallDir.String(), libDir.String(), extensions)
+		utils.CopyDir(library.InstallDir.String(), libDir.String(), validExportExtensions)
 
 		// Read cmake options if available
 		isStaticLib := true
@@ -116,11 +105,11 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	}
 
 	// Copy core + variant in use + preprocessed sketch in the correct folders
-	err := utils.CopyDir(ctx.BuildProperties.Get("build.core.path"), coreFolder.String(), extensions)
+	err := utils.CopyDir(ctx.BuildProperties.Get("build.core.path"), coreFolder.String(), validExportExtensions)
 	if err != nil {
 		fmt.Println(err)
 	}
-	err = utils.CopyDir(ctx.BuildProperties.Get("build.variant.path"), coreFolder.Join("variant").String(), extensions)
+	err = utils.CopyDir(ctx.BuildProperties.Get("build.variant.path"), coreFolder.Join("variant").String(), validExportExtensions)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -136,7 +125,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		command.Run(ctx)
 	}
 
-	err = utils.CopyDir(ctx.SketchBuildPath.String(), cmakeFolder.Join("sketch").String(), extensions)
+	err = utils.CopyDir(ctx.SketchBuildPath.String(), cmakeFolder.Join("sketch").String(), validExportExtensions)
 	if err != nil {
 		fmt.Println(err)
 	}
