@@ -42,12 +42,12 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	for ext := range globals.SourceFilesValidExtensions {
 		validExportExtensions = append(validExportExtensions, ext)
 	}
-	var dotHExtension = []string{}
+	var validHeaderExtensions = []string{}
 	for ext := range globals.HeaderFilesValidExtensions {
 		validExportExtensions = append(validExportExtensions, ext)
-		dotHExtension = append(dotHExtension, ext)
+		validHeaderExtensions = append(validHeaderExtensions, ext)
 	}
-	var dotAExtension = []string{".a"}
+	var validStaticLibExtensions = []string{".a"}
 
 	if s.SketchError || !canExportCmakeProject(ctx) {
 		return nil
@@ -95,7 +95,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		}
 
 		// Remove stray folders contining incompatible or not needed libraries archives
-		files, _ := utils.FindFilesInFolder(libDir.Join("src"), true, dotAExtension)
+		files, _ := utils.FindFilesInFolder(libDir.Join("src"), true, validStaticLibExtensions)
 		for _, file := range files {
 			staticLibDir := file.Parent()
 			if !isStaticLib || !strings.Contains(staticLibDir.String(), mcu) {
@@ -165,11 +165,11 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	extractCompileFlags(ctx, "recipe.cpp.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
 
 	// Extract folders with .h in them for adding in include list
-	headerFiles, _ := utils.FindFilesInFolder(cmakeFolder, true, dotHExtension)
-	foldersContainingDotH := findUniqueFoldersRelative(headerFiles.AsStrings(), cmakeFolder.String())
+	headerFiles, _ := utils.FindFilesInFolder(cmakeFolder, true, validHeaderExtensions)
+	foldersContainingHeaders := findUniqueFoldersRelative(headerFiles.AsStrings(), cmakeFolder.String())
 
 	// Extract folders with .a in them for adding in static libs paths list
-	staticLibs, _ := utils.FindFilesInFolder(cmakeFolder, true, dotAExtension)
+	staticLibs, _ := utils.FindFilesInFolder(cmakeFolder, true, validStaticLibExtensions)
 
 	// Generate the CMakeLists global file
 
@@ -179,7 +179,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	cmakelist += "INCLUDE(FindPkgConfig)\n"
 	cmakelist += "project (" + projectName + " C CXX)\n"
 	cmakelist += "add_definitions (" + strings.Join(defines, " ") + " " + strings.Join(linkerflags, " ") + ")\n"
-	cmakelist += "include_directories (" + foldersContainingDotH + ")\n"
+	cmakelist += "include_directories (" + foldersContainingHeaders + ")\n"
 
 	// Make link directories relative
 	// We can totally discard them since they mostly are outside the core folder
