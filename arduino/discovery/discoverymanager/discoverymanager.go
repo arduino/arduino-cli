@@ -22,6 +22,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 // DiscoveryManager is required to handle multiple pluggable-discovery that
@@ -64,6 +65,14 @@ func (dm *DiscoveryManager) Add(disc *discovery.PluggableDiscovery) error {
 	return nil
 }
 
+// remove quits and deletes the discovery with specified id
+// from the discoveries managed by this DiscoveryManager
+func (dm *DiscoveryManager) remove(id string) {
+	dm.discoveries[id].Quit()
+	delete(dm.discoveries, id)
+	logrus.Infof("Closed and removed discovery %s", id)
+}
+
 // parallelize runs function f concurrently for each discovery.
 // Returns a list of errors returned by each call of f.
 func (dm *DiscoveryManager) parallelize(f func(d *discovery.PluggableDiscovery) error) []error {
@@ -103,6 +112,7 @@ func (dm *DiscoveryManager) RunAll() []error {
 		}
 
 		if err := d.Run(); err != nil {
+			dm.remove(d.GetID())
 			return fmt.Errorf(tr("discovery %[1]s process not started: %[2]w"), d.GetID(), err)
 		}
 		return nil
@@ -119,6 +129,7 @@ func (dm *DiscoveryManager) StartAll() []error {
 			return nil
 		}
 		if err := d.Start(); err != nil {
+			dm.remove(d.GetID())
 			return fmt.Errorf(tr("starting discovery %[1]s: %[2]w"), d.GetID(), err)
 		}
 		return nil
@@ -139,6 +150,7 @@ func (dm *DiscoveryManager) StartSyncAll() (<-chan *discovery.Event, []error) {
 
 		eventCh, err := d.StartSync(5)
 		if err != nil {
+			dm.remove(d.GetID())
 			return fmt.Errorf(tr("start syncing discovery %[1]s: %[2]w"), d.GetID(), err)
 		}
 
@@ -170,6 +182,7 @@ func (dm *DiscoveryManager) StopAll() []error {
 		}
 
 		if err := d.Stop(); err != nil {
+			dm.remove(d.GetID())
 			return fmt.Errorf(tr("stopping discovery %[1]s: %[2]w"), d.GetID(), err)
 		}
 		return nil
@@ -185,9 +198,7 @@ func (dm *DiscoveryManager) QuitAll() []error {
 			return nil
 		}
 
-		if err := d.Quit(); err != nil {
-			return fmt.Errorf(tr("quitting discovery %[1]s: %[2]w"), d.GetID(), err)
-		}
+		d.Quit()
 		return nil
 	})
 	return errs
