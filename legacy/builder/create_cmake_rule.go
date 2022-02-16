@@ -23,17 +23,22 @@ import (
 
 	properties "github.com/arduino/go-properties-orderedmap"
 
+	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 )
 
-var VALID_EXPORT_EXTENSIONS = map[string]bool{".h": true, ".c": true, ".hpp": true, ".hh": true, ".cpp": true, ".S": true, ".a": true, ".properties": true}
-
-var ValidExportExtensions = []string{".h", ".c", ".hpp", ".hh", ".cpp", ".S", ".a", ".properties"}
-var DotHExtension = []string{".h", ".hh", ".hpp"}
-var DotAExtension = []string{".a"}
+func stringArrayToLookupFunction(in []string) func(string) bool {
+	out := map[string]bool{}
+	for _, i := range in {
+		out[i] = true
+	}
+	return func(s string) bool {
+		return out[s]
+	}
+}
 
 type ExportProjectCMake struct {
 	// Was there an error while compiling the sketch?
@@ -43,6 +48,17 @@ type ExportProjectCMake struct {
 var lineMatcher = regexp.MustCompile(`^#line\s\d+\s"`)
 
 func (s *ExportProjectCMake) Run(ctx *types.Context) error {
+	var validExportExtensions = []string{".a", ".properties"}
+	for ext := range globals.SourceFilesValidExtensions {
+		validExportExtensions = append(validExportExtensions, ext)
+	}
+	var dotHExtension = []string{}
+	for ext := range globals.HeaderFilesValidExtensions {
+		validExportExtensions = append(validExportExtensions, ext)
+		dotHExtension = append(dotHExtension, ext)
+	}
+	var dotAExtension = []string{".a"}
+
 	if s.SketchError || !canExportCmakeProject(ctx) {
 		return nil
 	}
@@ -65,7 +81,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	cmakeFile := cmakeFolder.Join("CMakeLists.txt")
 
 	dynamicLibsFromPkgConfig := map[string]bool{}
-	extensions := func(ext string) bool { return VALID_EXPORT_EXTENSIONS[ext] }
+	extensions := stringArrayToLookupFunction(validExportExtensions)
 	for _, library := range ctx.ImportedLibraries {
 		// Copy used libraries in the correct folder
 		libDir := libBaseFolder.Join(library.Name)
@@ -90,7 +106,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		}
 
 		// Remove stray folders contining incompatible or not needed libraries archives
-		files, _ := utils.FindFilesInFolder(libDir.Join("src"), true, DotAExtension)
+		files, _ := utils.FindFilesInFolder(libDir.Join("src"), true, dotAExtension)
 		for _, file := range files {
 			staticLibDir := file.Parent()
 			if !isStaticLib || !strings.Contains(staticLibDir.String(), mcu) {
@@ -126,7 +142,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	}
 
 	// remove "#line 1 ..." from exported c_make folder sketch
-	sketchFiles, _ := utils.FindFilesInFolder(cmakeFolder.Join("sketch"), false, ValidExportExtensions)
+	sketchFiles, _ := utils.FindFilesInFolder(cmakeFolder.Join("sketch"), false, validExportExtensions)
 
 	for _, file := range sketchFiles {
 		input, err := file.ReadFile()
@@ -160,11 +176,11 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	extractCompileFlags(ctx, "recipe.cpp.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
 
 	// Extract folders with .h in them for adding in include list
-	headerFiles, _ := utils.FindFilesInFolder(cmakeFolder, true, DotHExtension)
+	headerFiles, _ := utils.FindFilesInFolder(cmakeFolder, true, dotHExtension)
 	foldersContainingDotH := findUniqueFoldersRelative(headerFiles.AsStrings(), cmakeFolder.String())
 
 	// Extract folders with .a in them for adding in static libs paths list
-	staticLibs, _ := utils.FindFilesInFolder(cmakeFolder, true, DotAExtension)
+	staticLibs, _ := utils.FindFilesInFolder(cmakeFolder, true, dotAExtension)
 
 	// Generate the CMakeLists global file
 

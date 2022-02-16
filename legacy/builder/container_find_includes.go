@@ -98,6 +98,7 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -406,7 +407,11 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 }
 
 func queueSourceFilesFromFolder(ctx *types.Context, queue *types.UniqueSourceFileQueue, origin interface{}, folder *paths.Path, recurse bool) error {
-	filePaths, err := utils.FindFilesInFolder(folder, recurse, AdditionalFileValidExtensionsNoHeaders)
+	sourceFileExtensions := []string{}
+	for k := range globals.SourceFilesValidExtensions {
+		sourceFileExtensions = append(sourceFileExtensions, k)
+	}
+	filePaths, err := utils.FindFilesInFolder(folder, recurse, sourceFileExtensions)
 	if err != nil {
 		return errors.WithStack(err)
 	}
