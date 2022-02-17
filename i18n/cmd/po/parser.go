@@ -31,6 +31,7 @@ func Parse(filename string) MessageCatalog {
 	}
 
 	file, err := os.Open(filename)
+	defer file.Close()
 
 	if err != nil {
 		fmt.Println(err.Error())
