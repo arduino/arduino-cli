@@ -98,6 +98,7 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -312,7 +313,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 	// TODO: This reads the dependency file, but the actual building
 	// does it again. Should the result be somehow cached? Perhaps
 	// remove the object file if it is found to be stale?
-	unchanged, err := builder_utils.ObjFileIsUpToDate(ctx, sourcePath, objPath, depPath)
+	unchanged, err := builder_utils.ObjFileIsUpToDate(sourcePath, objPath, depPath)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -406,16 +407,17 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 }
 
 func queueSourceFilesFromFolder(ctx *types.Context, queue *types.UniqueSourceFileQueue, origin interface{}, folder *paths.Path, recurse bool) error {
-	extensions := func(ext string) bool { return ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS[ext] }
-
-	filePaths := []string{}
-	err := utils.FindFilesInFolder(&filePaths, folder.String(), extensions, recurse)
+	sourceFileExtensions := []string{}
+	for k := range globals.SourceFilesValidExtensions {
+		sourceFileExtensions = append(sourceFileExtensions, k)
+	}
+	filePaths, err := utils.FindFilesInFolder(folder, recurse, sourceFileExtensions)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
 	for _, filePath := range filePaths {
-		sourceFile, err := types.MakeSourceFile(ctx, origin, paths.New(filePath))
+		sourceFile, err := types.MakeSourceFile(ctx, origin, filePath)
 		if err != nil {
 			return errors.WithStack(err)
 		}

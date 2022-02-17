@@ -55,10 +55,10 @@ func (p *CTagsParser) firstFunctionPointerUsedAsArgument() int {
 
 func functionNameUsedAsFunctionPointerIn(tag *types.CTag, functionTags []*types.CTag) bool {
 	for _, functionTag := range functionTags {
-		if tag.Line != functionTag.Line && strings.Index(tag.Code, "&"+functionTag.FunctionName) != -1 {
+		if tag.Line != functionTag.Line && strings.Contains(tag.Code, "&"+functionTag.FunctionName) {
 			return true
 		}
-		if tag.Line != functionTag.Line && strings.Index(strings.TrimSpace(tag.Code), "("+functionTag.FunctionName+")") != -1 {
+		if tag.Line != functionTag.Line && strings.Contains(tag.Code, "("+functionTag.FunctionName+")") {
 			return true
 		}
 	}

@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
@@ -306,6 +307,7 @@ func TestBuilderSketchWithOldLib(t *testing.T) {
 func TestBuilderSketchWithSubfolders(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
+	logrus.SetLevel(logrus.DebugLevel)
 	ctx := prepareBuilderTestContext(t, paths.New("sketch_with_subfolders", "sketch_with_subfolders.ino"), "arduino:avr:uno")
 
 	buildPath := SetupBuildPath(t, ctx)

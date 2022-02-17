@@ -16,6 +16,7 @@
 package builder_utils
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -23,6 +24,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -34,93 +36,6 @@ import (
 )
 
 var tr = i18n.Tr
-
-func CompileFilesRecursive(ctx *types.Context, sourcePath *paths.Path, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
-	objectFiles, err := CompileFiles(ctx, sourcePath, false, buildPath, buildProperties, includes)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	folders, err := utils.ReadDirFiltered(sourcePath.String(), utils.FilterDirs)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	for _, folder := range folders {
-		subFolderObjectFiles, err := CompileFilesRecursive(ctx, sourcePath.Join(folder.Name()), buildPath.Join(folder.Name()), buildProperties, includes)
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-		objectFiles.AddAll(subFolderObjectFiles)
-	}
-
-	return objectFiles, nil
-}
-
-func CompileFiles(ctx *types.Context, sourcePath *paths.Path, recurse bool, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
-	sSources, err := findFilesInFolder(sourcePath, ".S", recurse)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	cSources, err := findFilesInFolder(sourcePath, ".c", recurse)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	cppSources, err := findFilesInFolder(sourcePath, ".cpp", recurse)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	ctx.Progress.AddSubSteps(len(sSources) + len(cSources) + len(cppSources))
-	defer ctx.Progress.RemoveSubSteps()
-
-	sObjectFiles, err := compileFilesWithRecipe(ctx, sourcePath, sSources, buildPath, buildProperties, includes, constants.RECIPE_S_PATTERN)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	cObjectFiles, err := compileFilesWithRecipe(ctx, sourcePath, cSources, buildPath, buildProperties, includes, constants.RECIPE_C_PATTERN)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	cppObjectFiles, err := compileFilesWithRecipe(ctx, sourcePath, cppSources, buildPath, buildProperties, includes, constants.RECIPE_CPP_PATTERN)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	objectFiles := paths.NewPathList()
-	objectFiles.AddAll(sObjectFiles)
-	objectFiles.AddAll(cObjectFiles)
-	objectFiles.AddAll(cppObjectFiles)
-	return objectFiles, nil
-}
-
-func findFilesInFolder(sourcePath *paths.Path, extension string, recurse bool) (paths.PathList, error) {
-	files, err := utils.ReadDirFiltered(sourcePath.String(), utils.FilterFilesWithExtensions(extension))
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	var sources paths.PathList
-	for _, file := range files {
-		sources = append(sources, sourcePath.Join(file.Name()))
-	}
-
-	if recurse {
-		folders, err := utils.ReadDirFiltered(sourcePath.String(), utils.FilterDirs)
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-
-		for _, folder := range folders {
-			otherSources, err := findFilesInFolder(sourcePath.Join(folder.Name()), extension, recurse)
-			if err != nil {
-				return nil, errors.WithStack(err)
-			}
-			sources = append(sources, otherSources...)
-		}
-	}
-
-	return sources, nil
-}
 
 func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
 	files, err := utils.ReadDirFiltered(sourcePath, utils.FilterFiles())
@@ -153,17 +68,46 @@ func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
 	return sources, nil
 }
 
-func compileFilesWithRecipe(ctx *types.Context, sourcePath *paths.Path, sources paths.PathList, buildPath *paths.Path, buildProperties *properties.Map, includes []string, recipe string) (paths.PathList, error) {
+func CompileFiles(ctx *types.Context, sourcePath *paths.Path, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
+	return compileFiles(ctx, sourcePath, false, buildPath, buildProperties, includes)
+}
+
+func CompileFilesRecursive(ctx *types.Context, sourcePath *paths.Path, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
+	return compileFiles(ctx, sourcePath, true, buildPath, buildProperties, includes)
+}
+
+func compileFiles(ctx *types.Context, sourcePath *paths.Path, recurse bool, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
+	var sources paths.PathList
+	var err error
+	if recurse {
+		sources, err = sourcePath.ReadDirRecursive()
+	} else {
+		sources, err = sourcePath.ReadDir()
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	validExtensions := []string{}
+	for ext := range globals.SourceFilesValidExtensions {
+		validExtensions = append(validExtensions, ext)
+	}
+
+	sources.FilterSuffix(validExtensions...)
+	ctx.Progress.AddSubSteps(len(sources))
+	defer ctx.Progress.RemoveSubSteps()
+
 	objectFiles := paths.NewPathList()
+	var objectFilesMux sync.Mutex
 	if len(sources) == 0 {
 		return objectFiles, nil
 	}
-	var objectFilesMux sync.Mutex
 	var errorsList []error
 	var errorsMux sync.Mutex
 
 	queue := make(chan *paths.Path)
 	job := func(source *paths.Path) {
+		recipe := fmt.Sprintf("recipe%s.o.pattern", source.Ext())
 		objectFile, err := compileFileWithRecipe(ctx, sourcePath, source, buildPath, buildProperties, includes, recipe)
 		if err != nil {
 			errorsMux.Lock()
@@ -233,7 +177,7 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 		return nil, errors.WithStack(err)
 	}
 
-	objIsUpToDate, err := ObjFileIsUpToDate(ctx, source, objectFile, depsFile)
+	objIsUpToDate, err := ObjFileIsUpToDate(source, objectFile, depsFile)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -260,7 +204,7 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 	return objectFile, nil
 }
 
-func ObjFileIsUpToDate(ctx *types.Context, sourceFile, objectFile, dependencyFile *paths.Path) (bool, error) {
+func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool, error) {
 	logrus.Debugf("Checking previous results for %v (result = %v, dep = %v)", sourceFile, objectFile, dependencyFile)
 	if objectFile == nil || dependencyFile == nil {
 		logrus.Debugf("Not found: nil")
@@ -371,10 +315,7 @@ func unescapeDep(s string) string {
 }
 
 func removeEndingBackSlash(s string) string {
-	if strings.HasSuffix(s, "\\") {
-		s = s[:len(s)-1]
-	}
-	return s
+	return strings.TrimSuffix(s, "\\")
 }
 
 func nonEmptyString(s string) bool {

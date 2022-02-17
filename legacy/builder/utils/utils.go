@@ -34,6 +34,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
+	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
@@ -86,28 +87,37 @@ func FilterFiles() filterFiles {
 
 var SOURCE_CONTROL_FOLDERS = map[string]bool{"CVS": true, "RCS": true, ".git": true, ".github": true, ".svn": true, ".hg": true, ".bzr": true, ".vscode": true, ".settings": true, ".pioenvs": true, ".piolibdeps": true}
 
+// FilterOutHiddenFiles is a ReadDirFilter that exclude files with a "." prefix in their name
+var FilterOutHiddenFiles = paths.FilterOutPrefixes(".")
+
+// FilterOutSCCS is a ReadDirFilter that excludes known VSC or project files
+func FilterOutSCCS(file *paths.Path) bool {
+	return !SOURCE_CONTROL_FOLDERS[file.Base()]
+}
+
+// FilterReadableFiles is a ReadDirFilter that accepts only readable files
+func FilterReadableFiles(file *paths.Path) bool {
+	// See if the file is readable by opening it
+	f, err := file.Open()
+	if err != nil {
+		return false
+	}
+	f.Close()
+	return true
+}
+
 func IsSCCSOrHiddenFile(file os.FileInfo) bool {
 	return IsSCCSFile(file) || IsHiddenFile(file)
 }
 
 func IsHiddenFile(file os.FileInfo) bool {
 	name := filepath.Base(file.Name())
-
-	if name[0] == '.' {
-		return true
-	}
-
-	return false
+	return name[0] == '.'
 }
 
 func IsSCCSFile(file os.FileInfo) bool {
 	name := filepath.Base(file.Name())
-
-	if SOURCE_CONTROL_FOLDERS[name] {
-		return true
-	}
-
-	return false
+	return SOURCE_CONTROL_FOLDERS[name]
 }
 
 func SliceContains(slice []string, target string) bool {
@@ -233,72 +243,22 @@ func AbsolutizePaths(files []string) ([]string, error) {
 	return files, nil
 }
 
-type CheckExtensionFunc func(ext string) bool
-
-func FindAllSubdirectories(folder string, output *[]string) error {
-	walkFunc := func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		// Skip source control and hidden files and directories
-		if IsSCCSOrHiddenFile(info) {
-			if info.IsDir() {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-
-		// Skip directories unless recurse is on, or this is the
-		// root directory
-		if info.IsDir() {
-			*output = AppendIfNotPresent(*output, path)
-		}
-		return nil
+func FindFilesInFolder(dir *paths.Path, recurse bool, extensions []string) (paths.PathList, error) {
+	fileFilter := paths.AndFilter(
+		paths.FilterSuffixes(extensions...),
+		FilterOutHiddenFiles,
+		FilterOutSCCS,
+		paths.FilterOutDirectories(),
+		FilterReadableFiles,
+	)
+	if recurse {
+		dirFilter := paths.AndFilter(
+			FilterOutHiddenFiles,
+			FilterOutSCCS,
+		)
+		return dir.ReadDirRecursiveFiltered(dirFilter, fileFilter)
 	}
-	return gohasissues.Walk(folder, walkFunc)
-}
-
-func FindFilesInFolder(files *[]string, folder string, extensions CheckExtensionFunc, recurse bool) error {
-	walkFunc := func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		// Skip source control and hidden files and directories
-		if IsSCCSOrHiddenFile(info) {
-			if info.IsDir() {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-
-		// Skip directories unless recurse is on, or this is the
-		// root directory
-		if info.IsDir() {
-			if recurse || path == folder {
-				return nil
-			} else {
-				return filepath.SkipDir
-			}
-		}
-
-		// Check (lowercased) extension against list of extensions
-		if extensions != nil && !extensions(strings.ToLower(filepath.Ext(path))) {
-			return nil
-		}
-
-		// See if the file is readable by opening it
-		currentFile, err := os.Open(path)
-		if err != nil {
-			return nil
-		}
-		currentFile.Close()
-
-		*files = append(*files, path)
-		return nil
-	}
-	return gohasissues.Walk(folder, walkFunc)
+	return dir.ReadDir(fileFilter)
 }
 
 func AppendIfNotPresent(target []string, elements ...string) []string {
@@ -375,34 +335,28 @@ func ParseCppString(line string) (string, string, bool) {
 		c, width := utf8.DecodeRuneInString(line[i:])
 
 		switch c {
-		// Backslash, next character is used unmodified
 		case '\\':
+			// Backslash, next character is used unmodified
 			i += width
 			if i >= len(line) {
 				return "", line, false
 			}
 			res += string(line[i])
-			break
-		// Quote, end of string
 		case '"':
+			// Quote, end of string
 			return res, line[i+width:], true
 		default:
 			res += string(c)
-			break
 		}
 
 		i += width
 	}
 }
 
-func isMn(r rune) bool {
-	return unicode.Is(unicode.Mn, r) // Mn: nonspacing marks
-}
-
 // Normalizes an UTF8 byte slice
 // TODO: use it more often troughout all the project (maybe on logger interface?)
 func NormalizeUTF8(buf []byte) []byte {
-	t := transform.Chain(norm.NFD, transform.RemoveFunc(isMn), norm.NFC)
+	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 	result, _, _ := transform.Bytes(t, buf)
 	return result
 }
@@ -454,7 +408,17 @@ func CopyFile(src, dst string) (err error) {
 // CopyDir recursively copies a directory tree, attempting to preserve permissions.
 // Source directory must exist, destination directory must *not* exist.
 // Symlinks are ignored and skipped.
-func CopyDir(src string, dst string, extensions CheckExtensionFunc) (err error) {
+func CopyDir(src string, dst string, extensions []string) (err error) {
+	isAcceptedExtension := func(ext string) bool {
+		ext = strings.ToLower(ext)
+		for _, valid := range extensions {
+			if ext == valid {
+				return true
+			}
+		}
+		return false
+	}
+
 	src = filepath.Clean(src)
 	dst = filepath.Clean(dst)
 
@@ -499,7 +463,7 @@ func CopyDir(src string, dst string, extensions CheckExtensionFunc) (err error) 
 				continue
 			}
 
-			if extensions != nil && !extensions(strings.ToLower(filepath.Ext(srcPath))) {
+			if !isAcceptedExtension(filepath.Ext(srcPath)) {
 				continue
 			}
 

@@ -36,7 +36,7 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = temp
-	ctx.ImportedLibraries = []*libraries.Library{&libraries.Library{Name: "Bridge"}}
+	ctx.ImportedLibraries = []*libraries.Library{{Name: "Bridge"}}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
 	err = cmd.Run(ctx)
@@ -56,7 +56,7 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 func TestUnusedCompiledLibrariesRemoverLibDoesNotExist(t *testing.T) {
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = paths.TempDir().Join("test")
-	ctx.ImportedLibraries = []*libraries.Library{&libraries.Library{Name: "Bridge"}}
+	ctx.ImportedLibraries = []*libraries.Library{{Name: "Bridge"}}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
 	err := cmd.Run(ctx)

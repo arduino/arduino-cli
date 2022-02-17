@@ -70,66 +70,66 @@ type Core struct {
 
 func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 	cores := []Core{
-		Core{Maintainer: "arduino", Arch: "avr", Version: "1.6.10"},
-		Core{Maintainer: "arduino", Arch: "sam", Version: "1.6.7"},
+		{Maintainer: "arduino", Arch: "avr", Version: "1.6.10"},
+		{Maintainer: "arduino", Arch: "sam", Version: "1.6.7"},
 	}
 
 	boardsManagerCores := []Core{
-		Core{Maintainer: "arduino", Arch: "samd", Version: "1.6.5"},
+		{Maintainer: "arduino", Arch: "samd", Version: "1.6.5"},
 	}
 
 	boardsManagerRedBearCores := []Core{
-		Core{Maintainer: "RedBearLab", Arch: "avr", Version: "1.0.0", Url: "https://redbearlab.github.io/arduino/Blend/blend_boards.zip"},
+		{Maintainer: "RedBearLab", Arch: "avr", Version: "1.0.0", Url: "https://redbearlab.github.io/arduino/Blend/blend_boards.zip"},
 	}
 
 	toolsMultipleVersions := []Tool{
-		Tool{Name: "bossac", Version: "1.6.1-arduino"},
-		Tool{Name: "bossac", Version: "1.5-arduino"},
+		{Name: "bossac", Version: "1.6.1-arduino"},
+		{Name: "bossac", Version: "1.5-arduino"},
 	}
 
 	tools := []Tool{
-		Tool{Name: "avrdude", Version: "6.0.1-arduino5"},
-		Tool{Name: "avr-gcc", Version: "4.8.1-arduino5"},
-		Tool{Name: "arm-none-eabi-gcc", Version: "4.8.3-2014q1"},
-		Tool{Name: "ctags", Version: "5.8-arduino11",
+		{Name: "avrdude", Version: "6.0.1-arduino5"},
+		{Name: "avr-gcc", Version: "4.8.1-arduino5"},
+		{Name: "arm-none-eabi-gcc", Version: "4.8.3-2014q1"},
+		{Name: "ctags", Version: "5.8-arduino11",
 			OsUrls: []OsUrl{
-				OsUrl{Os: "i686-pc-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-i686-pc-linux-gnu.tar.bz2"},
-				OsUrl{Os: "x86_64-pc-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-x86_64-pc-linux-gnu.tar.bz2"},
-				OsUrl{Os: "i686-mingw32", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-i686-mingw32.zip"},
-				OsUrl{Os: "x86_64-apple-darwin", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-x86_64-apple-darwin.zip"},
-				OsUrl{Os: "arm-linux-gnueabihf", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-armv6-linux-gnueabihf.tar.bz2"},
-				OsUrl{Os: "aarch64-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-aarch64-linux-gnu.tar.bz2"},
+				{Os: "i686-pc-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-i686-pc-linux-gnu.tar.bz2"},
+				{Os: "x86_64-pc-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-x86_64-pc-linux-gnu.tar.bz2"},
+				{Os: "i686-mingw32", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-i686-mingw32.zip"},
+				{Os: "x86_64-apple-darwin", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-x86_64-apple-darwin.zip"},
+				{Os: "arm-linux-gnueabihf", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-armv6-linux-gnueabihf.tar.bz2"},
+				{Os: "aarch64-linux-gnu", Url: "http://downloads.arduino.cc/tools/ctags-5.8-arduino11-aarch64-linux-gnu.tar.bz2"},
 			},
 		},
-		Tool{Name: "arduino-preprocessor", Version: "0.1.5",
+		{Name: "arduino-preprocessor", Version: "0.1.5",
 			OsUrls: []OsUrl{
-				OsUrl{Os: "i686-pc-linux-gnu", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.5/arduino-preprocessor-0.1.5-i686-pc-linux-gnu.tar.bz2"},
-				OsUrl{Os: "x86_64-pc-linux-gnu", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.5/arduino-preprocessor-0.1.5-x86_64-pc-linux-gnu.tar.bz2"},
-				OsUrl{Os: "i686-mingw32", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.5/arduino-preprocessor-0.1.5-i686-w64-mingw32.tar.bz2"},
-				OsUrl{Os: "x86_64-apple-darwin", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.5/arduino-preprocessor-0.1.5-x86_64-apple-darwin11.tar.bz2"},
-				OsUrl{Os: "arm-linux-gnueabihf", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.5/arduino-preprocessor-0.1.5-arm-linux-gnueabihf.tar.bz2"},
-				OsUrl{Os: "aarch64-linux-gnu", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.5/arduino-preprocessor-0.1.5-aarch64-linux-gnu.tar.bz2"},
+				{Os: "i686-pc-linux-gnu", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.5/arduino-preprocessor-0.1.5-i686-pc-linux-gnu.tar.bz2"},
+				{Os: "x86_64-pc-linux-gnu", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.5/arduino-preprocessor-0.1.5-x86_64-pc-linux-gnu.tar.bz2"},
+				{Os: "i686-mingw32", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.5/arduino-preprocessor-0.1.5-i686-w64-mingw32.tar.bz2"},
+				{Os: "x86_64-apple-darwin", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.5/arduino-preprocessor-0.1.5-x86_64-apple-darwin11.tar.bz2"},
+				{Os: "arm-linux-gnueabihf", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.5/arduino-preprocessor-0.1.5-arm-linux-gnueabihf.tar.bz2"},
+				{Os: "aarch64-linux-gnu", Url: "https://github.com/arduino/arduino-preprocessor/releases/download/0.1.5/arduino-preprocessor-0.1.5-aarch64-linux-gnu.tar.bz2"},
 			},
 		},
 	}
 
 	boardsManagerTools := []Tool{
-		Tool{Name: "openocd", Version: "0.9.0-arduino", Package: "arduino"},
-		Tool{Name: "CMSIS", Version: "4.0.0-atmel", Package: "arduino"},
+		{Name: "openocd", Version: "0.9.0-arduino", Package: "arduino"},
+		{Name: "CMSIS", Version: "4.0.0-atmel", Package: "arduino"},
 	}
 
 	boardsManagerRFduinoTools := []Tool{
-		Tool{Name: "arm-none-eabi-gcc", Version: "4.8.3-2014q1", Package: "RFduino"},
+		{Name: "arm-none-eabi-gcc", Version: "4.8.3-2014q1", Package: "RFduino"},
 	}
 
 	libraries := []Library{
-		Library{Name: "Audio", Version: "1.0.4"},
-		Library{Name: "Adafruit PN532", Version: "1.0.0"},
-		Library{Name: "Bridge", Version: "1.6.1"},
-		Library{Name: "CapacitiveSensor", Version: "0.5.0", VersionInLibProperties: "0.5"},
-		Library{Name: "Ethernet", Version: "1.1.1"},
-		Library{Name: "Robot IR Remote", Version: "2.0.0"},
-		Library{Name: "FastLED", Version: "3.1.0"},
+		{Name: "Audio", Version: "1.0.4"},
+		{Name: "Adafruit PN532", Version: "1.0.0"},
+		{Name: "Bridge", Version: "1.6.1"},
+		{Name: "CapacitiveSensor", Version: "0.5.0", VersionInLibProperties: "0.5"},
+		{Name: "Ethernet", Version: "1.1.1"},
+		{Name: "Robot IR Remote", Version: "2.0.0"},
+		{Name: "FastLED", Version: "3.1.0"},
 	}
 
 	download(t, cores, boardsManagerCores, boardsManagerRedBearCores, tools, toolsMultipleVersions, boardsManagerTools, boardsManagerRFduinoTools, libraries)

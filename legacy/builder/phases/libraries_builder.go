@@ -65,7 +65,7 @@ func findExpectedPrecompiledLibFolder(ctx *types.Context, library *libraries.Lib
 	// Add fpu specifications if they exist
 	// To do so, resolve recipe.cpp.o.pattern,
 	// search for -mfpu=xxx -mfloat-abi=yyy and add to a subfolder
-	command, _ := builder_utils.PrepareCommandForRecipe(ctx.BuildProperties, constants.RECIPE_CPP_PATTERN, true, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+	command, _ := builder_utils.PrepareCommandForRecipe(ctx.BuildProperties, "recipe.cpp.o.pattern", true, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
 	fpuSpecs := ""
 	for _, el := range strings.Split(command.String(), " ") {
 		if strings.Contains(el, FPU_CFLAG) {
@@ -201,7 +201,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 		if library.UtilityDir != nil {
 			includes = append(includes, utils.WrapWithHyphenI(library.UtilityDir.String()))
 		}
-		libObjectFiles, err := builder_utils.CompileFiles(ctx, library.SourceDir, false, libraryBuildPath, buildProperties, includes)
+		libObjectFiles, err := builder_utils.CompileFiles(ctx, library.SourceDir, libraryBuildPath, buildProperties, includes)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
@@ -209,7 +209,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 
 		if library.UtilityDir != nil {
 			utilityBuildPath := libraryBuildPath.Join("utility")
-			utilityObjectFiles, err := builder_utils.CompileFiles(ctx, library.UtilityDir, false, utilityBuildPath, buildProperties, includes)
+			utilityObjectFiles, err := builder_utils.CompileFiles(ctx, library.UtilityDir, utilityBuildPath, buildProperties, includes)
 			if err != nil {
 				return nil, errors.WithStack(err)
 			}

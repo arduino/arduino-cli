@@ -66,7 +66,7 @@ func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath *paths
 
 	if properties.Get(constants.RECIPE_PREPROC_MACROS) == "" {
 		//generate PREPROC_MACROS from RECIPE_CPP_PATTERN
-		properties.Set(constants.RECIPE_PREPROC_MACROS, GeneratePreprocPatternFromCompile(properties.Get(constants.RECIPE_CPP_PATTERN)))
+		properties.Set(constants.RECIPE_PREPROC_MACROS, GeneratePreprocPatternFromCompile(properties.Get("recipe.cpp.o.pattern")))
 	}
 
 	cmd, err := builder_utils.PrepareCommandForRecipe(properties, constants.RECIPE_PREPROC_MACROS, true, ctx.PackageManager.GetEnvVarsForSpawnedProcess())

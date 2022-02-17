@@ -81,7 +81,7 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 
 	variantObjectFiles := paths.NewPathList()
 	if variantFolder != nil && variantFolder.IsDir() {
-		variantObjectFiles, err = builder_utils.CompileFiles(ctx, variantFolder, true, buildPath, buildProperties, includes)
+		variantObjectFiles, err = builder_utils.CompileFilesRecursive(ctx, variantFolder, buildPath, buildProperties, includes)
 		if err != nil {
 			return nil, nil, errors.WithStack(err)
 		}
@@ -108,7 +108,7 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 		}
 	}
 
-	coreObjectFiles, err := builder_utils.CompileFiles(ctx, coreFolder, true, buildPath, buildProperties, includes)
+	coreObjectFiles, err := builder_utils.CompileFilesRecursive(ctx, coreFolder, buildPath, buildProperties, includes)
 	if err != nil {
 		return nil, nil, errors.WithStack(err)
 	}
