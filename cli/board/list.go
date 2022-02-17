@@ -70,7 +70,6 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	})
 	if err != nil {
 		feedback.Errorf(tr("Error detecting boards: %v"), err)
-		os.Exit(errorcodes.ErrNetwork)
 	}
 	feedback.PrintResult(result{ports})
 }
