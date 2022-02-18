@@ -135,9 +135,7 @@ out:
 	}
 
 	for _, disc := range discoveries {
-		if err := disc.Quit(); err != nil {
-			log.Fatal("Error stopping discovery:", err)
-		}
+		disc.Quit()
 		fmt.Println("Discovery QUITed")
 		for disc.State() == discovery.Alive {
 			time.Sleep(time.Millisecond)

@@ -297,15 +297,14 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 					Error:     boardsError,
 				}
 			case <-interrupt:
-				errs := dm.StopAll()
-				if len(errs) > 0 {
+				for _, err := range dm.StopAll() {
+					// Discoveries that return errors have their process
+					// closed and are removed from the list of discoveries
+					// in the manager
 					outChan <- &rpc.BoardListWatchResponse{
 						EventType: "error",
-						Error:     tr("stopping discoveries: %s", errs),
+						Error:     tr("stopping discoveries: %s", err),
 					}
-					// Don't close the channel if quitting all discoveries
-					// failed, otherwise some processes might be left running.
-					continue
 				}
 				return
 			}
