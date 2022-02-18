@@ -374,21 +374,12 @@ func (disc *PluggableDiscovery) Stop() error {
 }
 
 // Quit terminates the discovery. No more commands can be accepted by the discovery.
-func (disc *PluggableDiscovery) Quit() error {
-	if err := disc.sendCommand("QUIT\n"); err != nil {
-		return err
-	}
-	if msg, err := disc.waitMessage(time.Second * 10); err != nil {
-		return fmt.Errorf(tr("calling %[1]s: %[2]w"), "QUIT", err)
-	} else if msg.EventType != "quit" {
-		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "quit", msg.EventType)
-	} else if msg.Error {
-		return errors.Errorf(tr("command failed: %s"), msg.Message)
-	} else if strings.ToUpper(msg.Message) != "OK" {
-		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "OK", msg.Message)
+func (disc *PluggableDiscovery) Quit() {
+	_ = disc.sendCommand("QUIT\n")
+	if _, err := disc.waitMessage(time.Second * 5); err != nil {
+		logrus.Errorf("Quitting discovery %s: %s", disc.id, err)
 	}
 	disc.killProcess()
-	return nil
 }
 
 // List executes an enumeration of the ports and returns a list of the available

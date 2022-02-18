@@ -22,12 +22,14 @@ import (
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 // DiscoveryManager is required to handle multiple pluggable-discovery that
 // may be shared across platforms
 type DiscoveryManager struct {
-	discoveries map[string]*discovery.PluggableDiscovery
+	discoveriesMutex sync.Mutex
+	discoveries      map[string]*discovery.PluggableDiscovery
 }
 
 var tr = i18n.Tr
@@ -42,12 +44,16 @@ func New() *DiscoveryManager {
 // Clear resets the DiscoveryManager to its initial state
 func (dm *DiscoveryManager) Clear() {
 	dm.QuitAll()
+	dm.discoveriesMutex.Lock()
+	defer dm.discoveriesMutex.Unlock()
 	dm.discoveries = map[string]*discovery.PluggableDiscovery{}
 }
 
 // IDs returns the list of discoveries' ids in this DiscoveryManager
 func (dm *DiscoveryManager) IDs() []string {
 	ids := []string{}
+	dm.discoveriesMutex.Lock()
+	defer dm.discoveriesMutex.Unlock()
 	for id := range dm.discoveries {
 		ids = append(ids, id)
 	}
@@ -57,6 +63,8 @@ func (dm *DiscoveryManager) IDs() []string {
 // Add adds a discovery to the list of managed discoveries
 func (dm *DiscoveryManager) Add(disc *discovery.PluggableDiscovery) error {
 	id := disc.GetID()
+	dm.discoveriesMutex.Lock()
+	defer dm.discoveriesMutex.Unlock()
 	if _, has := dm.discoveries[id]; has {
 		return errors.Errorf(tr("pluggable discovery already added: %s"), id)
 	}
@@ -64,12 +72,29 @@ func (dm *DiscoveryManager) Add(disc *discovery.PluggableDiscovery) error {
 	return nil
 }
 
+// remove quits and deletes the discovery with specified id
+// from the discoveries managed by this DiscoveryManager
+func (dm *DiscoveryManager) remove(id string) {
+	dm.discoveriesMutex.Lock()
+	d := dm.discoveries[id]
+	delete(dm.discoveries, id)
+	dm.discoveriesMutex.Unlock()
+	d.Quit()
+	logrus.Infof("Closed and removed discovery %s", id)
+}
+
 // parallelize runs function f concurrently for each discovery.
 // Returns a list of errors returned by each call of f.
 func (dm *DiscoveryManager) parallelize(f func(d *discovery.PluggableDiscovery) error) []error {
 	var wg sync.WaitGroup
 	errChan := make(chan error)
+	dm.discoveriesMutex.Lock()
+	discoveries := []*discovery.PluggableDiscovery{}
 	for _, d := range dm.discoveries {
+		discoveries = append(discoveries, d)
+	}
+	dm.discoveriesMutex.Unlock()
+	for _, d := range discoveries {
 		wg.Add(1)
 		go func(d *discovery.PluggableDiscovery) {
 			defer wg.Done()
@@ -103,6 +128,7 @@ func (dm *DiscoveryManager) RunAll() []error {
 		}
 
 		if err := d.Run(); err != nil {
+			dm.remove(d.GetID())
 			return fmt.Errorf(tr("discovery %[1]s process not started: %[2]w"), d.GetID(), err)
 		}
 		return nil
@@ -119,6 +145,7 @@ func (dm *DiscoveryManager) StartAll() []error {
 			return nil
 		}
 		if err := d.Start(); err != nil {
+			dm.remove(d.GetID())
 			return fmt.Errorf(tr("starting discovery %[1]s: %[2]w"), d.GetID(), err)
 		}
 		return nil
@@ -139,6 +166,7 @@ func (dm *DiscoveryManager) StartSyncAll() (<-chan *discovery.Event, []error) {
 
 		eventCh, err := d.StartSync(5)
 		if err != nil {
+			dm.remove(d.GetID())
 			return fmt.Errorf(tr("start syncing discovery %[1]s: %[2]w"), d.GetID(), err)
 		}
 
@@ -170,6 +198,7 @@ func (dm *DiscoveryManager) StopAll() []error {
 		}
 
 		if err := d.Stop(); err != nil {
+			dm.remove(d.GetID())
 			return fmt.Errorf(tr("stopping discovery %[1]s: %[2]w"), d.GetID(), err)
 		}
 		return nil
@@ -185,9 +214,7 @@ func (dm *DiscoveryManager) QuitAll() []error {
 			return nil
 		}
 
-		if err := d.Quit(); err != nil {
-			return fmt.Errorf(tr("quitting discovery %[1]s: %[2]w"), d.GetID(), err)
-		}
+		d.Quit()
 		return nil
 	})
 	return errs
@@ -204,7 +231,13 @@ func (dm *DiscoveryManager) List() ([]*discovery.Port, []error) {
 		Port *discovery.Port
 	}
 	msgChan := make(chan listMsg)
+	dm.discoveriesMutex.Lock()
+	discoveries := []*discovery.PluggableDiscovery{}
 	for _, d := range dm.discoveries {
+		discoveries = append(discoveries, d)
+	}
+	dm.discoveriesMutex.Unlock()
+	for _, d := range discoveries {
 		wg.Add(1)
 		go func(d *discovery.PluggableDiscovery) {
 			defer wg.Done()
@@ -243,7 +276,13 @@ func (dm *DiscoveryManager) List() ([]*discovery.Port, []error) {
 // ListCachedPorts return the current list of ports detected from all discoveries
 func (dm *DiscoveryManager) ListCachedPorts() []*discovery.Port {
 	res := []*discovery.Port{}
+	dm.discoveriesMutex.Lock()
+	discoveries := []*discovery.PluggableDiscovery{}
 	for _, d := range dm.discoveries {
+		discoveries = append(discoveries, d)
+	}
+	dm.discoveriesMutex.Unlock()
+	for _, d := range discoveries {
 		if d.State() != discovery.Syncing {
 			// Discovery is not syncing
 			continue
