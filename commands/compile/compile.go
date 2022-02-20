@@ -148,6 +148,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	if err = builderCtx.BuildPath.MkdirAll(); err != nil {
 		return nil, &arduino.PermissionDeniedError{Message: tr("Cannot create build directory"), Cause: err}
 	}
+	defer builderCtx.BuildPath.RemoveAll()
 	builderCtx.CompilationDatabase = bldr.NewCompilationDatabase(
 		builderCtx.BuildPath.Join("compile_commands.json"),
 	)
