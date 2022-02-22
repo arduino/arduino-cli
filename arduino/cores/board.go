@@ -24,10 +24,12 @@ import (
 
 // Board represents a board loaded from an installed platform
 type Board struct {
-	BoardID                  string
-	Properties               *properties.Map  `json:"-"`
-	PlatformRelease          *PlatformRelease `json:"-"`
-	identificationProperties []*properties.Map
+	BoardID                              string
+	Properties                           *properties.Map  `json:"-"`
+	PlatformRelease                      *PlatformRelease `json:"-"`
+	configOptions                        *properties.Map
+	configOptionValues                   map[string]*properties.Map
+	identificationProperties             []*properties.Map
 }
 
 // HasUsbID returns true if the board match the usb vid and pid parameters
@@ -64,29 +66,41 @@ func (b *Board) String() string {
 	return b.FQBN()
 }
 
+func (b *Board) buildConfigOptionsStructures() {
+	if b.configOptions != nil {
+		return
+	}
+
+	b.configOptions = properties.NewMap()
+	allConfigs := b.Properties.SubTree("menu")
+	for _, option := range allConfigs.FirstLevelKeys() {
+		b.configOptions.Set(option, b.PlatformRelease.Menus.Get(option))
+	}
+
+	b.configOptionValues = map[string]*properties.Map{}
+	for configName, options := range allConfigs.FirstLevelOf() {
+		b.configOptionValues[configName] = properties.NewMap()
+		for _, value := range options.FirstLevelKeys() {
+			if label, ok := options.GetOk(value); ok {
+				b.configOptionValues[configName].Set(value, label)
+			}
+		}
+	}
+}
+
 // GetConfigOptions returns an OrderedMap of configuration options for this board.
 // The returned map will have key and value as option id and option name, respectively.
 func (b *Board) GetConfigOptions() *properties.Map {
-	res := properties.NewMap()
-	menu := b.Properties.SubTree("menu")
-	for _, option := range menu.FirstLevelKeys() {
-		res.Set(option, b.PlatformRelease.Menus.Get(option))
-	}
-	return res
+	b.buildConfigOptionsStructures()
+	return b.configOptions
 }
 
 // GetConfigOptionValues returns an OrderedMap of possible values for a specific configuratio options
 // for this board. The returned map will have key and value as option value and option value name,
 // respectively.
 func (b *Board) GetConfigOptionValues(option string) *properties.Map {
-	res := properties.NewMap()
-	menu := b.Properties.SubTree("menu").SubTree(option)
-	for _, value := range menu.FirstLevelKeys() {
-		if label, ok := menu.GetOk(value); ok {
-			res.Set(value, label)
-		}
-	}
-	return res
+	b.buildConfigOptionsStructures()
+	return b.configOptionValues[option]
 }
 
 // GetBuildProperties returns the build properties and the build
