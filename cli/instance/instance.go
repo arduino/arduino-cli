@@ -159,7 +159,7 @@ func CreateInstanceAndRunFirstUpdate() *rpc.Instance {
 	// we must use instance.Create instead of instance.CreateAndInit for the
 	// reason stated above.
 	if err := FirstUpdate(inst); err != nil {
-		feedback.Errorf(tr("Error updating indexes: %v"), status)
+		feedback.Errorf(tr("Error updating indexes: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	return inst
