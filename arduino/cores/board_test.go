@@ -554,3 +554,81 @@ func TestBoardMatching(t *testing.T) {
 		"lemons": "XXX",
 	})))
 }
+
+func TestBoardConfigMatching(t *testing.T) {
+	brd01 := &Board{
+		Properties: properties.NewFromHashmap(map[string]string{
+			"upload_port.pid":                     "0x0010",
+			"upload_port.vid":                     "0x2341",
+			"menu.cpu.atmega1280":                 "ATmega1280",
+			"menu.cpu.atmega1280.upload_port.cpu": "atmega1280",
+			"menu.cpu.atmega1280.build_cpu":       "atmega1280",
+			"menu.cpu.atmega2560":                 "ATmega2560",
+			"menu.cpu.atmega2560.upload_port.cpu": "atmega2560",
+			"menu.cpu.atmega2560.build_cpu":       "atmega2560",
+			"menu.mem.1k":                         "1KB",
+			"menu.mem.1k.upload_port.mem":         "1",
+			"menu.mem.1k.build_mem":               "1024",
+			"menu.mem.2k":                         "2KB",
+			"menu.mem.2k.upload_port.1.mem":       "2",
+			"menu.mem.2k.upload_port.2.ab":        "ef",
+			"menu.mem.2k.upload_port.2.cd":        "gh",
+			"menu.mem.2k.build_mem":               "2048",
+		}),
+		PlatformRelease: &PlatformRelease{
+			Platform: &Platform{
+				Architecture: "avr",
+				Package: &Package{
+					Name: "arduino",
+				},
+			},
+			Menus: properties.NewFromHashmap(map[string]string{
+				"cpu": "Processor",
+				"mem": "Memory",
+			}),
+		},
+	}
+
+	type m map[string]string
+	type Test struct {
+		testName            string
+		identificationProps map[string]string
+		configOutput        map[string]string
+	}
+
+	tests := []Test{
+		{"Simple",
+			m{"pid": "0x0010", "vid": "0x2341"},
+			m{}},
+		{"WithConfig1",
+			m{"pid": "0x0010", "vid": "0x2341", "cpu": "atmega2560"},
+			m{"cpu": "atmega2560"}},
+		{"WithConfig2",
+			m{"pid": "0x0010", "vid": "0x2341", "cpu": "atmega1280"},
+			m{"cpu": "atmega1280"}},
+		{"WithDoubleConfig1",
+			m{"pid": "0x0010", "vid": "0x2341", "cpu": "atmega1280", "mem": "1"},
+			m{"cpu": "atmega1280", "mem": "1k"}},
+		{"WithDoubleConfig2",
+			m{"pid": "0x0010", "vid": "0x2341", "cpu": "atmega1280", "ab": "ef"},
+			m{"cpu": "atmega1280"}},
+		{"WithDoubleConfig3",
+			m{"pid": "0x0010", "vid": "0x2341", "cpu": "atmega1280", "ab": "ef", "cd": "gh"},
+			m{"cpu": "atmega1280", "mem": "2k"}},
+		{"WithIncompleteIdentificationProps",
+			m{"cpu": "atmega1280"},
+			nil},
+	}
+	for _, test := range tests {
+		t.Run(test.testName, func(t *testing.T) {
+			identificationProps := properties.NewFromHashmap(test.identificationProps)
+			if test.configOutput != nil {
+				require.True(t, brd01.IsBoardMatchingIDProperties(identificationProps))
+				config := brd01.IdentifyBoardConfiguration(identificationProps)
+				require.EqualValues(t, test.configOutput, config.AsMap())
+			} else {
+				require.False(t, brd01.IsBoardMatchingIDProperties(identificationProps))
+			}
+		})
+	}
+}

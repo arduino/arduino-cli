@@ -165,7 +165,7 @@ func (b *Board) GetIdentificationProperties() []*properties.Map {
 }
 
 // IsBoardMatchingIDProperties returns true if the board match the given
-// identification properties
+// upload port identification properties
 func (b *Board) IsBoardMatchingIDProperties(query *properties.Map) bool {
 	// check checks if the given set of properties p match the "query"
 	check := func(p *properties.Map) bool {
@@ -190,4 +190,41 @@ func (b *Board) IsBoardMatchingIDProperties(query *properties.Map) bool {
 // and set of board properties.
 func GetMonitorSettings(protocol string, boardProperties *properties.Map) *properties.Map {
 	return boardProperties.SubTree("monitor_port." + protocol)
+}
+
+// IdentifyBoardConfiguration returns the configuration of the board that can be
+// deduced from the given upload port identification properties
+func (b *Board) IdentifyBoardConfiguration(query *properties.Map) *properties.Map {
+	// check checks if the given set of properties p match the "query"
+	check := func(p *properties.Map) bool {
+		for k, v := range p.AsMap() {
+			if !strings.EqualFold(query.Get(k), v) {
+				return false
+			}
+		}
+		return true
+	}
+	checkAll := func(allP []*properties.Map) bool {
+		for _, p := range allP {
+			if check(p) {
+				return true
+			}
+		}
+		return false
+	}
+
+	res := properties.NewMap()
+	for _, option := range b.GetConfigOptions().Keys() {
+		values := b.GetConfigOptionValues(option).Keys()
+
+		for _, value := range values {
+			config := option + "=" + value
+			configProps := b.configOptionProperties[config]
+
+			if checkAll(configProps.ExtractSubIndexSets("upload_port")) {
+				res.Set(option, value)
+			}
+		}
+	}
+	return res
 }

@@ -35,3 +35,12 @@ func (pme *Explorer) IdentifyBoard(idProps *properties.Map) []*cores.Board {
 
 	return foundBoards
 }
+
+// IdentifyBoardConfiguration returns a set of identification properties for configuration options
+// of a board.
+func (pm *PackageManager) IdentifyBoardConfiguration(idProps *properties.Map, board *cores.Board) *properties.Map {
+	if idProps.Size() == 0 {
+		return properties.NewMap()
+	}
+	return board.IdentifyBoardConfiguration(idProps)
+}
