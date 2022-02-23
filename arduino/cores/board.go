@@ -24,12 +24,14 @@ import (
 
 // Board represents a board loaded from an installed platform
 type Board struct {
-	BoardID                              string
-	Properties                           *properties.Map  `json:"-"`
-	PlatformRelease                      *PlatformRelease `json:"-"`
-	configOptions                        *properties.Map
-	configOptionValues                   map[string]*properties.Map
-	identificationProperties             []*properties.Map
+	BoardID                  string
+	Properties               *properties.Map  `json:"-"`
+	PlatformRelease          *PlatformRelease `json:"-"`
+	configOptions            *properties.Map
+	configOptionValues       map[string]*properties.Map
+	configOptionProperties   map[string]*properties.Map
+	defaultConfig            *properties.Map
+	identificationProperties []*properties.Map
 }
 
 // HasUsbID returns true if the board match the usb vid and pid parameters
@@ -78,11 +80,16 @@ func (b *Board) buildConfigOptionsStructures() {
 	}
 
 	b.configOptionValues = map[string]*properties.Map{}
-	for configName, options := range allConfigs.FirstLevelOf() {
-		b.configOptionValues[configName] = properties.NewMap()
-		for _, value := range options.FirstLevelKeys() {
-			if label, ok := options.GetOk(value); ok {
-				b.configOptionValues[configName].Set(value, label)
+	b.configOptionProperties = map[string]*properties.Map{}
+	b.defaultConfig = properties.NewMap()
+	for option, optionProps := range allConfigs.FirstLevelOf() {
+		b.configOptionValues[option] = properties.NewMap()
+		values := optionProps.FirstLevelKeys()
+		b.defaultConfig.Set(option, values[0])
+		for _, value := range values {
+			if label, ok := optionProps.GetOk(value); ok {
+				b.configOptionValues[option].Set(value, label)
+				b.configOptionProperties[option+"="+value] = optionProps.SubTree(value)
 			}
 		}
 	}
@@ -106,38 +113,29 @@ func (b *Board) GetConfigOptionValues(option string) *properties.Map {
 // GetBuildProperties returns the build properties and the build
 // platform for the Board with the configuration passed as parameter.
 func (b *Board) GetBuildProperties(userConfigs *properties.Map) (*properties.Map, error) {
-	// Clone user configs because they are destroyed during iteration
-	userConfigs = userConfigs.Clone()
+	b.buildConfigOptionsStructures()
+
+	// Override default configs with user configs
+	config := b.defaultConfig.Clone()
+	config.Merge(userConfigs)
 
 	// Start with board's base properties
 	buildProperties := b.Properties.Clone()
 
 	// Add all sub-configurations one by one (a config is: option=value)
-	menu := b.Properties.SubTree("menu")
-	for _, option := range menu.FirstLevelKeys() {
-		optionMenu := menu.SubTree(option)
-		userValue, haveUserValue := userConfigs.GetOk(option)
-		if haveUserValue {
-			userConfigs.Remove(option)
-			if !optionMenu.ContainsKey(userValue) {
-				return nil, fmt.Errorf(tr("invalid value '%[1]s' for option '%[2]s'"), userValue, option)
-			}
-		} else {
-			// apply default
-			userValue = optionMenu.FirstLevelKeys()[0]
-		}
-
-		optionsConf := optionMenu.SubTree(userValue)
-		buildProperties.Merge(optionsConf)
-	}
-
 	// Check for residual invalid options...
-	if invalidKeys := userConfigs.Keys(); len(invalidKeys) > 0 {
-		invalidOption := invalidKeys[0]
-		if invalidOption == "" {
+	for option, value := range config.AsMap() {
+		if option == "" {
 			return nil, fmt.Errorf(tr("invalid empty option found"))
 		}
-		return nil, fmt.Errorf(tr("invalid option '%s'"), invalidOption)
+		if _, ok := b.configOptions.GetOk(option); !ok {
+			return nil, fmt.Errorf(tr("invalid option '%s'"), option)
+		}
+		optionsConf, ok := b.configOptionProperties[option+"="+value]
+		if !ok {
+			return nil, fmt.Errorf(tr("invalid value '%[1]s' for option '%[2]s'"), value, option)
+		}
+		buildProperties.Merge(optionsConf)
 	}
 
 	return buildProperties, nil

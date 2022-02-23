@@ -59,6 +59,7 @@ var boardUno = &Board{
 				Name: "arduino",
 			},
 		},
+		Menus: properties.NewMap(),
 	},
 }
 
@@ -114,6 +115,9 @@ var boardMega = &Board{
 				Name: "arduino",
 			},
 		},
+		Menus: properties.NewFromHashmap(map[string]string{
+			"cpu": "Processor",
+		}),
 	},
 }
 
@@ -154,6 +158,10 @@ var boardWatterottTiny841 = &Board{
 				Name: "watterott",
 			},
 		},
+		Menus: properties.NewFromHashmap(map[string]string{
+			"core": "Core",
+			"info": "Info",
+		}),
 	},
 }
 
