@@ -157,7 +157,7 @@ func (dr result) String() string {
 			board := tr("Unknown")
 			fqbn := ""
 			coreName := ""
-			t.AddRow(address, protocol, board, fqbn, coreName)
+			t.AddRow(address, protocol, protocolLabel, board, fqbn, coreName)
 		}
 	}
 	return t.Render()
