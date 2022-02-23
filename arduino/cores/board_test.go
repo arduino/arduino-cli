@@ -340,6 +340,47 @@ func TestBoardOptions(t *testing.T) {
 	// fmt.Print(string(data))
 }
 
+func TestOSSpecificBoardOptions(t *testing.T) {
+	boardWihOSSpecificOptionProperties := properties.NewMap()
+	boardWihOSSpecificOptionProperties.Set("menu.UploadSpeed.115200", "115200")
+	boardWihOSSpecificOptionProperties.Set("menu.UploadSpeed.115200.upload.speed", "115200")
+	boardWihOSSpecificOptionProperties.Set("menu.UploadSpeed.9600", "9600")
+	boardWihOSSpecificOptionProperties.Set("menu.UploadSpeed.9600.upload.speed", "9600")
+	boardWihOSSpecificOptionProperties.Set("menu.UploadSpeed.57600", "57600")
+	boardWihOSSpecificOptionProperties.Set("menu.UploadSpeed.57600.upload.speed", "57600")
+	boardWihOSSpecificOptionProperties.Set("menu.UploadSpeed.230400", "230400")
+	boardWihOSSpecificOptionProperties.Set("menu.UploadSpeed.230400.macosx", "230400")
+	boardWihOSSpecificOptionProperties.Set("menu.UploadSpeed.230400.upload.speed", "230400")
+	boardWihOSSpecificOptionProperties.Set("menu.UploadSpeed.256000.windows", "256000")
+	boardWihOSSpecificOptionProperties.Set("menu.UploadSpeed.256000.upload.speed", "256000")
+	boardWihOSSpecificOptionProperties.Set("menu.UploadSpeed.460800", "460800")
+	boardWihOSSpecificOptionProperties.Set("menu.UploadSpeed.460800.macosx", "460800")
+	boardWihOSSpecificOptionProperties.Set("menu.UploadSpeed.460800.upload.speed", "460800")
+	boardWihOSSpecificOptionProperties.Set("menu.UploadSpeed.512000.windows", "512000")
+	boardWihOSSpecificOptionProperties.Set("menu.UploadSpeed.512000.upload.speed", "512000")
+	boardWihOSSpecificOptionProperties.Set("menu.UploadSpeed.921600", "921600")
+	boardWihOSSpecificOptionProperties.Set("menu.UploadSpeed.921600.upload.speed", "921600")
+
+	boardWithOSSpecificOptions := &Board{
+		BoardID:    "test",
+		Properties: boardWihOSSpecificOptionProperties,
+		PlatformRelease: &PlatformRelease{
+			Platform: &Platform{
+				Architecture: "test",
+				Package: &Package{
+					Name: "test",
+				},
+			},
+			Menus: properties.NewFromHashmap(map[string]string{
+				"UploadSpeed": "Upload Speed",
+			}),
+		},
+	}
+
+	_, err := boardWithOSSpecificOptions.GeneratePropertiesForConfiguration("UploadSpeed=256000")
+	require.Error(t, err)
+}
+
 func TestBoardMatching(t *testing.T) {
 	brd01 := &Board{
 		Properties: properties.NewFromHashmap(map[string]string{
