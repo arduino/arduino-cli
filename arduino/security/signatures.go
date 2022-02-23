@@ -42,6 +42,7 @@ func VerifyArduinoDetachedSignature(targetPath *paths.Path, signaturePath *paths
 	if err != nil {
 		panic("could not find bundled signature keys")
 	}
+	defer arduinoKeyringFile.Close()
 	return VerifySignature(targetPath, signaturePath, arduinoKeyringFile)
 }
 
