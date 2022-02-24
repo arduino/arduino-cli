@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino"
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/httpclient"
@@ -124,13 +125,19 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardL
 	// first query installed cores through the Package Manager
 	logrus.Debug("Querying installed cores for board identification...")
 	for _, board := range pme.IdentifyBoard(port.Properties) {
+		fqbn, err := cores.ParseFQBN(board.FQBN())
+		if err != nil {
+			return nil, &arduino.InvalidFQBNError{Cause: err}
+		}
+		fqbn.Configs = board.IdentifyBoardConfiguration(port.Properties)
+
 		// We need the Platform maintaner for sorting so we set it here
 		platform := &rpc.Platform{
 			Maintainer: board.PlatformRelease.Platform.Package.Maintainer,
 		}
 		boards = append(boards, &rpc.BoardListItem{
 			Name:     board.Name(),
-			Fqbn:     board.FQBN(),
+			Fqbn:     fqbn.String(),
 			Platform: platform,
 		})
 	}
