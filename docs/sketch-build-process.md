@@ -157,8 +157,8 @@ its cloud-based nature may make the locations of libraries less obvious.
 
 ## Compilation
 
-Sketches are compiled by platform-specific versions of `gcc` and `g++` according to the variables in the boards.txt file of the selected board's
-[platform](platform-specification.md).
+Sketches are compiled by platform-specific versions of `gcc` and `g++` according to the variables in the boards.txt file
+of the selected board's [platform](platform-specification.md).
 
 The sketch is built in a temporary directory in the system-wide temporary directory (e.g. /tmp on Linux).
 
@@ -185,8 +185,9 @@ the build process will be printed in the console.
 
 ## Uploading
 
-Sketches are uploaded by a platform-specific upload tool (e.g., avrdude). The upload process is also controlled by variables in the boards and main preferences
-files. See the [Arduino platform specification](platform-specification.md) page for details.
+Sketches are uploaded by a platform-specific upload tool (e.g., avrdude). The upload process is also controlled by
+variables in the boards and main preferences files. See the [Arduino platform specification](platform-specification.md)
+page for details.
 
-If verbose output during upload is enabled, debugging information will be output to the console, including the upload tool's
-command lines and verbose output.
+If verbose output during upload is enabled, debugging information will be output to the console, including the upload
+tool's command lines and verbose output.
