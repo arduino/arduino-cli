@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Download JSON schema for labels configuration file
         id: download-schema
@@ -106,7 +106,7 @@ jobs:
           echo "::set-output name=flag::--dry-run"
 
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Download configuration files artifact
         uses: actions/download-artifact@v2

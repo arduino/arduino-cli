@@ -65,7 +65,7 @@ jobs:
       tests-data: ${{ steps.collection.outputs.tests-data }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Collect tests
         id: collection
@@ -90,7 +90,7 @@ jobs:
         run: git config --global core.autocrlf false
 
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install Go
         uses: actions/setup-go@v2
