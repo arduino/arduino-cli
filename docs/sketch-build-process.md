@@ -15,8 +15,8 @@ external programming hardware.
 
 ## Pre-Processing
 
-The Arduino development software performs a few transformations to your sketch before passing it to the 
-compiler (e.g., `avr-gcc`): 
+The Arduino development software performs a few transformations to your sketch before passing it to the
+compiler (e.g., `avr-gcc`):
 
 - All .ino and .pde files in the sketch folder (shown in the Arduino IDE as tabs with no extension) are concatenated
   together, starting with the file that matches the folder name followed by the others in alphabetical order. The .cpp
