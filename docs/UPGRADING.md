@@ -2,6 +2,22 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## 0.22.0
+
+### Removed `error` return from `discovery.New(...)` function
+
+The `discovery.New(...)` function never fails, so the error has been removed, the old signature:
+
+```go
+func New(id string, args ...string) (*PluggableDiscovery, error) { ... }
+```
+
+is now:
+
+```go
+func New(id string, args ...string) *PluggableDiscovery { ... }
+```
+
 ## 0.21.0
 
 ### `packagemanager.NewPackageManager` function change

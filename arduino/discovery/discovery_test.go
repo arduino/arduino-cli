@@ -32,8 +32,7 @@ func TestDiscoveryStdioHandling(t *testing.T) {
 	require.NoError(t, builder.Run())
 
 	// Run cat and test if streaming json works as expected
-	disc, err := New("test", "testdata/cat/cat") // copy stdin to stdout
-	require.NoError(t, err)
+	disc := New("test", "testdata/cat/cat") // copy stdin to stdout
 
 	err = disc.runProcess()
 	require.NoError(t, err)

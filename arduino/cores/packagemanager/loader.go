@@ -752,10 +752,7 @@ func (pm *PackageManager) loadDiscovery(id string) *status.Status {
 		return status.Newf(codes.FailedPrecondition, tr("discovery not installed: %s"), id)
 	}
 	discoveryPath := toolRelease.InstallDir.Join(tool.Name).String()
-	d, err := discovery.New(id, discoveryPath)
-	if err != nil {
-		return status.Newf(codes.FailedPrecondition, tr("creating discovery: %s"), err)
-	}
+	d := discovery.New(id, discoveryPath)
 	pm.discoveryManager.Add(d)
 	return nil
 }
@@ -831,9 +828,8 @@ func (pm *PackageManager) loadDiscoveries(release *cores.PlatformRelease) []*sta
 		cmd := configuration.ExpandPropsInString(pattern)
 		if cmdArgs, err := properties.SplitQuotedString(cmd, `"'`, true); err != nil {
 			statuses = append(statuses, status.New(codes.Internal, err.Error()))
-		} else if d, err := discovery.New(discoveryID, cmdArgs...); err != nil {
-			statuses = append(statuses, status.New(codes.Internal, err.Error()))
 		} else {
+			d := discovery.New(discoveryID, cmdArgs...)
 			pm.discoveryManager.Add(d)
 		}
 	}
