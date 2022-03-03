@@ -413,9 +413,9 @@ def test_board_listall(run_command):
     data = json.loads(res.stdout)
     boards = {b["fqbn"]: b for b in data["boards"]}
     assert len(boards) == 26
-    assert "arduino:avr:yun" in boards
-    assert "Arduino Yún" == boards["arduino:avr:yun"]["name"]
-    platform = boards["arduino:avr:yun"]["platform"]
+    assert "arduino:avr:bt" in boards
+    assert "Arduino BT" == boards["arduino:avr:bt"]["name"]
+    platform = boards["arduino:avr:bt"]["platform"]
     assert "arduino:avr" == platform["id"]
     assert "1.8.3" == platform["installed"]
     assert "" != platform["latest"]
@@ -551,7 +551,7 @@ def test_board_search(run_command, data_dir):
     assert len([board["fqbn"] for board in data if "fqbn" in board]) == 0
     names = [board["name"] for board in data if "name" in board]
     assert "Arduino Uno" in names
-    assert "Arduino Yún" in names
+    assert "Arduino BT" in names
     assert "Arduino Zero" in names
     assert "Arduino Nano 33 BLE" in names
     assert "Arduino Portenta H7" in names
@@ -580,16 +580,16 @@ def test_board_search(run_command, data_dir):
     installed_boards = {board["fqbn"]: board for board in data if "fqbn" in board}
     assert "arduino:avr:uno" in installed_boards
     assert "Arduino Uno" == installed_boards["arduino:avr:uno"]["name"]
-    assert "arduino:avr:yun" in installed_boards
-    assert "Arduino Yún" == installed_boards["arduino:avr:yun"]["name"]
+    assert "arduino:avr:bt" in installed_boards
+    assert "Arduino BT" == installed_boards["arduino:avr:bt"]["name"]
 
-    res = run_command(["board", "search", "--format", "json", "arduino", "yun"])
+    res = run_command(["board", "search", "--format", "json", "arduino", "bt"])
     assert res.ok
     data = json.loads(res.stdout)
     assert len(data) > 0
     installed_boards = {board["fqbn"]: board for board in data if "fqbn" in board}
-    assert "arduino:avr:yun" in installed_boards
-    assert "Arduino Yún" == installed_boards["arduino:avr:yun"]["name"]
+    assert "arduino:avr:bt" in installed_boards
+    assert "Arduino BT" == installed_boards["arduino:avr:bt"]["name"]
 
     # Manually installs a core in sketchbooks hardware folder
     git_url = "https://github.com/arduino/ArduinoCore-samd.git"
@@ -605,8 +605,8 @@ def test_board_search(run_command, data_dir):
     installed_boards = {board["fqbn"]: board for board in data if "fqbn" in board}
     assert "arduino:avr:uno" in installed_boards
     assert "Arduino Uno" == installed_boards["arduino:avr:uno"]["name"]
-    assert "arduino:avr:yun" in installed_boards
-    assert "Arduino Yún" == installed_boards["arduino:avr:yun"]["name"]
+    assert "arduino:avr:bt" in installed_boards
+    assert "Arduino BT" == installed_boards["arduino:avr:bt"]["name"]
     assert "arduino-beta-development:samd:mkrwifi1010" in installed_boards
     assert "Arduino MKR WiFi 1010" == installed_boards["arduino-beta-development:samd:mkrwifi1010"]["name"]
     assert "arduino-beta-development:samd:mkr1000" in installed_boards
