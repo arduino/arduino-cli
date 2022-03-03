@@ -34,16 +34,12 @@ import (
 
 // LoadHardware read all plaforms from the configured paths
 func (pm *PackageManager) LoadHardware() []error {
-	var merr []error
-	dirs := configuration.HardwareDirectories(configuration.Settings)
-	if err := pm.LoadHardwareFromDirectories(dirs); err != nil {
-		merr = append(merr, err...)
-	}
+	hardwareDirs := configuration.HardwareDirectories(configuration.Settings)
+	merr := pm.LoadHardwareFromDirectories(hardwareDirs)
 
-	dirs = configuration.BundleToolsDirectories(configuration.Settings)
-	if err := pm.LoadToolsFromBundleDirectories(dirs); err != nil {
-		merr = append(merr, err...)
-	}
+	bundleToolDirs := configuration.BundleToolsDirectories(configuration.Settings)
+	merr = append(merr, pm.LoadToolsFromBundleDirectories(bundleToolDirs)...)
+
 	return merr
 }
 
@@ -51,9 +47,7 @@ func (pm *PackageManager) LoadHardware() []error {
 func (pm *PackageManager) LoadHardwareFromDirectories(hardwarePaths paths.PathList) []error {
 	var merr []error
 	for _, path := range hardwarePaths {
-		if err := pm.LoadHardwareFromDirectory(path); err != nil {
-			merr = append(merr, err...)
-		}
+		merr = append(merr, pm.LoadHardwareFromDirectory(path)...)
 	}
 	return merr
 }
@@ -127,18 +121,14 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) []error {
 		}
 
 		targetPackage := pm.Packages.GetOrCreatePackage(packager)
-		if err := pm.loadPlatforms(targetPackage, architectureParentPath); err != nil {
-			merr = append(merr, err...)
-		}
+		merr = append(merr, pm.loadPlatforms(targetPackage, architectureParentPath)...)
 
 		// Check if we have tools to load, the directory structure is as follows:
 		// - PACKAGER/tools/TOOL-NAME/TOOL-VERSION/... (ex: arduino/tools/bossac/1.7.0/...)
 		toolsSubdirPath := packagerPath.Join("tools")
 		if toolsSubdirPath.IsDir() {
 			pm.Log.Infof("Checking existence of 'tools' path: %s", toolsSubdirPath)
-			if err := pm.loadToolsFromPackage(targetPackage, toolsSubdirPath); err != nil {
-				merr = append(merr, err...)
-			}
+			merr = append(merr, pm.loadToolsFromPackage(targetPackage, toolsSubdirPath)...)
 		}
 		// If the Package does not contain Platforms or Tools we remove it since does not contain anything valuable
 		if len(targetPackage.Platforms) == 0 && len(targetPackage.Tools) == 0 {
@@ -726,13 +716,9 @@ func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath *paths.Path) er
 func (pm *PackageManager) LoadDiscoveries() []error {
 	var merr []error
 	for _, platform := range pm.InstalledPlatformReleases() {
-		if err := pm.loadDiscoveries(platform); err != nil {
-			merr = append(merr, err...)
-		}
+		merr = append(merr, pm.loadDiscoveries(platform)...)
 	}
-	if err := pm.loadBuiltinDiscoveries(); err != nil {
-		merr = append(merr, err...)
-	}
+	merr = append(merr, pm.loadBuiltinDiscoveries()...)
 	return merr
 }
 
