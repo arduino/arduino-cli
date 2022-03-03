@@ -233,9 +233,10 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	// otherwise we wouldn't find them and reinstall them each time
 	// and they would never get reloaded.
 	for _, err := range instance.PackageManager.LoadHardware() {
+		s := &arduino.PlatformLoadingError{Cause: err}
 		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_Error{
-				Error: err.Proto(),
+				Error: s.ToRPCStatus().Proto(),
 			},
 		})
 	}
@@ -296,18 +297,20 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		// We installed at least one new tool after loading hardware
 		// so we must reload again otherwise we would never found them.
 		for _, err := range instance.PackageManager.LoadHardware() {
+			s := &arduino.PlatformLoadingError{Cause: err}
 			responseCallback(&rpc.InitResponse{
 				Message: &rpc.InitResponse_Error{
-					Error: err.Proto(),
+					Error: s.ToRPCStatus().Proto(),
 				},
 			})
 		}
 	}
 
 	for _, err := range instance.PackageManager.LoadDiscoveries() {
+		s := &arduino.PlatformLoadingError{Cause: err}
 		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_Error{
-				Error: err.Proto(),
+				Error: s.ToRPCStatus().Proto(),
 			},
 		})
 	}

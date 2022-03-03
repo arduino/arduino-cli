@@ -759,7 +759,7 @@ def test_core_with_wrong_custom_board_options_is_loaded(run_command, data_dir):
     assert "arduino-beta-dev:platform_with_wrong_custom_board_options:altra" in boards
     # Verify warning is shown to user
     assert (
-        "Error initializing instance: "
+        "Error initializing instance: Error loading hardware platform: "
         + "loading platform release arduino-beta-dev:platform_with_wrong_custom_board_options@4.2.0: "
         + "loading boards: "
         + "skipping loading of boards arduino-beta-dev:platform_with_wrong_custom_board_options:nessuno: "
@@ -797,7 +797,7 @@ def test_core_with_missing_custom_board_options_is_loaded(run_command, data_dir)
     assert "arduino-beta-dev:platform_with_missing_custom_board_options:altra" in boards
     # Verify warning is shown to user
     assert (
-        "Error initializing instance: "
+        "Error initializing instance: Error loading hardware platform: "
         + "loading platform release arduino-beta-dev:platform_with_missing_custom_board_options@4.2.0: "
         + "loading boards: "
         + "skipping loading of boards arduino-beta-dev:platform_with_missing_custom_board_options:nessuno: "

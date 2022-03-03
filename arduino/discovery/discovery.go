@@ -126,14 +126,13 @@ type Event struct {
 }
 
 // New create and connect to the given pluggable discovery
-func New(id string, args ...string) (*PluggableDiscovery, error) {
-	disc := &PluggableDiscovery{
+func New(id string, args ...string) *PluggableDiscovery {
+	return &PluggableDiscovery{
 		id:          id,
 		processArgs: args,
 		state:       Dead,
 		cachedPorts: map[string]*Port{},
 	}
-	return disc, nil
 }
 
 // GetID returns the identifier for this discovery
