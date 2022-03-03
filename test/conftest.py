@@ -144,7 +144,7 @@ def run_command(pytestconfig, data_dir, downloads_dir, working_dir):
         # It escapes spaces in the path using "\ " but it doesn't always work,
         # wrapping the path in quotation marks is the safest approach
         with run_context.prefix(f'{cd_command} "{custom_working_dir}"'):
-            return run_context.run(cli_full_line, echo=False, hide=True, warn=True, env=custom_env, encoding="utf-8")
+            return run_context.run(cli_full_line, echo=True, hide=False, warn=True, env=custom_env, encoding="utf-8")
 
     return _run
 
