@@ -338,6 +338,24 @@ func (e *PlatformNotFoundError) Unwrap() error {
 	return e.Cause
 }
 
+// PlatformLoadingError is returned when a platform has fatal errors that prevents loading
+type PlatformLoadingError struct {
+	Cause error
+}
+
+func (e *PlatformLoadingError) Error() string {
+	return composeErrorMsg(tr("Error loading hardware platform"), e.Cause)
+}
+
+// ToRPCStatus converts the error into a *status.Status
+func (e *PlatformLoadingError) ToRPCStatus() *status.Status {
+	return status.New(codes.FailedPrecondition, e.Error())
+}
+
+func (e *PlatformLoadingError) Unwrap() error {
+	return e.Cause
+}
+
 // LibraryNotFoundError is returned when a platform is not found
 type LibraryNotFoundError struct {
 	Library string

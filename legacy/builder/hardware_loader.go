@@ -27,7 +27,7 @@ func (s *HardwareLoader) Run(ctx *types.Context) error {
 		// This should happen only on legacy arduino-builder.
 		// Hopefully this piece will be removed once the legacy package will be cleanedup.
 		pm := packagemanager.NewPackageManager(nil, nil, nil, nil, "arduino-builder")
-		if errs := pm.LoadHardwareFromDirectories(ctx.HardwareDirs); len(errs) > 0 {
+		if errs := pm.LoadHardwareFromDirectories(ctx.HardwareDirs); errs != nil {
 			// With the refactoring of the initialization step of the CLI we changed how
 			// errors are returned when loading platforms and libraries, that meant returning a list of
 			// errors instead of a single one to enhance the experience for the user.
@@ -37,7 +37,7 @@ func (s *HardwareLoader) Run(ctx *types.Context) error {
 
 			if ctx.Verbose {
 				for _, err := range errs {
-					ctx.Info(tr("Error loading hardware platform: %[1]s", err.Message()))
+					ctx.Info(tr("Error loading hardware platform: %[1]s", err.Error()))
 				}
 			}
 		}

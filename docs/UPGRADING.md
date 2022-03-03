@@ -4,6 +4,30 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.22.0
 
+### `packagemanager.Load*` functions now returns `error` instead of `*status.Status`
+
+The following functions signature:
+
+```go
+func (pm *PackageManager) LoadHardware() []*status.Status { ... }
+func (pm *PackageManager) LoadHardwareFromDirectories(hardwarePaths paths.PathList) []*status.Status { ... }
+func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) []*status.Status { ... }
+func (pm *PackageManager) LoadToolsFromBundleDirectories(dirs paths.PathList) []*status.Status { ... }
+func (pm *PackageManager) LoadDiscoveries() []*status.Status { ... }
+```
+
+have been changed to:
+
+```go
+func (pm *PackageManager) LoadHardware() []error { ... }
+func (pm *PackageManager) LoadHardwareFromDirectories(hardwarePaths paths.PathList) []error { ... }
+func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) []error { ... }
+func (pm *PackageManager) LoadToolsFromBundleDirectories(dirs paths.PathList) []error { ... }
+func (pm *PackageManager) LoadDiscoveries() []error { ... }
+```
+
+These function no longer returns a gRPC status, so the errors can be handled as any other `error`.
+
 ### Removed `error` return from `discovery.New(...)` function
 
 The `discovery.New(...)` function never fails, so the error has been removed, the old signature:
