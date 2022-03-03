@@ -277,6 +277,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0220" class="md-nav__link">
+    0.22.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.22.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#packagemanagerload-functions-now-returns-error-instead-of-statusstatus" class="md-nav__link">
+    packagemanager.Load* functions now returns error instead of *status.Status
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-error-return-from-discoverynew-function" class="md-nav__link">
+    Removed error return from discovery.New(...) function
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0210" class="md-nav__link">
     0.21.0
   </a>
@@ -1645,6 +1672,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0220" class="md-nav__link">
+    0.22.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.22.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#packagemanagerload-functions-now-returns-error-instead-of-statusstatus" class="md-nav__link">
+    packagemanager.Load* functions now returns error instead of *status.Status
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed-error-return-from-discoverynew-function" class="md-nav__link">
+    Removed error return from discovery.New(...) function
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0210" class="md-nav__link">
     0.21.0
   </a>
@@ -2005,6 +2059,30 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<h2 id="0220">0.22.0<a class="headerlink" href="#0220" title="Permanent link">&para;</a></h2>
+<h3 id="packagemanagerload-functions-now-returns-error-instead-of-statusstatus"><code>packagemanager.Load*</code> functions now returns <code>error</code> instead of <code>*status.Status</code><a class="headerlink" href="#packagemanagerload-functions-now-returns-error-instead-of-statusstatus" title="Permanent link">&para;</a></h3>
+<p>The following functions signature:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span> <span class="p">(</span><span class="nx">pm</span> <span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span> <span class="nx">LoadHardware</span><span class="p">()</span> <span class="p">[]</span><span class="o">*</span><span class="nx">status</span><span class="p">.</span><span class="nx">Status</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">pm</span> <span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span> <span class="nx">LoadHardwareFromDirectories</span><span class="p">(</span><span class="nx">hardwarePaths</span> <span class="nx">paths</span><span class="p">.</span><span class="nx">PathList</span><span class="p">)</span> <span class="p">[]</span><span class="o">*</span><span class="nx">status</span><span class="p">.</span><span class="nx">Status</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">pm</span> <span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span> <span class="nx">LoadHardwareFromDirectory</span><span class="p">(</span><span class="nx">path</span> <span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">)</span> <span class="p">[]</span><span class="o">*</span><span class="nx">status</span><span class="p">.</span><span class="nx">Status</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">pm</span> <span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span> <span class="nx">LoadToolsFromBundleDirectories</span><span class="p">(</span><span class="nx">dirs</span> <span class="nx">paths</span><span class="p">.</span><span class="nx">PathList</span><span class="p">)</span> <span class="p">[]</span><span class="o">*</span><span class="nx">status</span><span class="p">.</span><span class="nx">Status</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">pm</span> <span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span> <span class="nx">LoadDiscoveries</span><span class="p">()</span> <span class="p">[]</span><span class="o">*</span><span class="nx">status</span><span class="p">.</span><span class="nx">Status</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+</code></pre></div>
+<p>have been changed to:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span> <span class="p">(</span><span class="nx">pm</span> <span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span> <span class="nx">LoadHardware</span><span class="p">()</span> <span class="p">[]</span><span class="kt">error</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">pm</span> <span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span> <span class="nx">LoadHardwareFromDirectories</span><span class="p">(</span><span class="nx">hardwarePaths</span> <span class="nx">paths</span><span class="p">.</span><span class="nx">PathList</span><span class="p">)</span> <span class="p">[]</span><span class="kt">error</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">pm</span> <span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span> <span class="nx">LoadHardwareFromDirectory</span><span class="p">(</span><span class="nx">path</span> <span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">)</span> <span class="p">[]</span><span class="kt">error</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">pm</span> <span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span> <span class="nx">LoadToolsFromBundleDirectories</span><span class="p">(</span><span class="nx">dirs</span> <span class="nx">paths</span><span class="p">.</span><span class="nx">PathList</span><span class="p">)</span> <span class="p">[]</span><span class="kt">error</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">pm</span> <span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span> <span class="nx">LoadDiscoveries</span><span class="p">()</span> <span class="p">[]</span><span class="kt">error</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+</code></pre></div>
+<p>These function no longer returns a gRPC status, so the errors can be handled as any other <code>error</code>.</p>
+<h3 id="removed-error-return-from-discoverynew-function">Removed <code>error</code> return from <code>discovery.New(...)</code> function<a class="headerlink" href="#removed-error-return-from-discoverynew-function" title="Permanent link">&para;</a></h3>
+<p>The <code>discovery.New(...)</code> function never fails, so the error has been removed, the old signature:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span> <span class="nx">New</span><span class="p">(</span><span class="nx">id</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">args</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">PluggableDiscovery</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+</code></pre></div>
+<p>is now:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span> <span class="nx">New</span><span class="p">(</span><span class="nx">id</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">args</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="o">*</span><span class="nx">PluggableDiscovery</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+</code></pre></div>
 <h2 id="0210">0.21.0<a class="headerlink" href="#0210" title="Permanent link">&para;</a></h2>
 <h3 id="packagemanagernewpackagemanager-function-change"><code>packagemanager.NewPackageManager</code> function change<a class="headerlink" href="#packagemanagernewpackagemanager-function-change" title="Permanent link">&para;</a></h3>
 <p>A new argument <code>userAgent</code> has been added to <code>packagemanager.NewPackageManager</code>, the new function signature is:</p>
