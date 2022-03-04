@@ -157,8 +157,8 @@ its cloud-based nature may make the locations of libraries less obvious.
 
 ## Compilation
 
-Sketches are compiled by platform-specific versions of `gcc` and `g++` according to the variables in the boards.txt file
-of the selected board's [platform](platform-specification.md).
+Sketches are compiled by architecture-specific versions of `gcc` and `g++` according to the variables in the boards.txt
+file of the selected board's [platform](platform-specification.md).
 
 The sketch is built in a temporary directory in the system-wide temporary directory (e.g. /tmp on Linux).
 
