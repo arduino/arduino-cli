@@ -53,6 +53,9 @@ var (
 	buildCachePath          string               // Builds of 'core.a' are saved into this path to be cached and reused.
 	buildPath               string               // Path where to save compiled files.
 	buildProperties         []string             // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
+	keysDir                 string               // The path of the dir where to search for the custom keys to sign and encrypt a binary. Used only by the platforms that supports it
+	signKeyName             string               // The name of the custom signing key to use to sign a binary during the compile process. Used only by the platforms that supports it
+	encryptKeyName          string               // The name of the custom encryption key to use to encrypt a binary during the compile process. Used only by the platforms that supports it
 	warnings                string               // Used to tell gcc which warning level to use.
 	verbose                 bool                 // Turns on verbose mode.
 	quiet                   bool                 // Suppresses almost every output.
@@ -84,7 +87,8 @@ func NewCommand() *cobra.Command {
 			"  " + os.Args[0] + " compile -b arduino:avr:uno /home/user/Arduino/MySketch\n" +
 			"  " + os.Args[0] + ` compile -b arduino:avr:uno --build-property "build.extra_flags=\"-DMY_DEFINE=\"hello world\"\"" /home/user/Arduino/MySketch` + "\n" +
 			"  " + os.Args[0] + ` compile -b arduino:avr:uno --build-property "build.extra_flags=-DPIN=2 \"-DMY_DEFINE=\"hello world\"\"" /home/user/Arduino/MySketch` + "\n" +
-			"  " + os.Args[0] + ` compile -b arduino:avr:uno --build-property build.extra_flags=-DPIN=2 --build-property "compiler.cpp.extra_flags=\"-DSSID=\"hello world\"\"" /home/user/Arduino/MySketch` + "\n",
+			"  " + os.Args[0] + ` compile -b arduino:avr:uno --build-property build.extra_flags=-DPIN=2 --build-property "compiler.cpp.extra_flags=\"-DSSID=\"hello world\"\"" /home/user/Arduino/MySketch` + "\n" +
+			"  " + os.Args[0] + ` compile -b arduino:mbed_portenta:envie_m7:security=sien --keys-input-dir /home/user/Arduino/keys --sign-key-name ecsdsa-p256-signing-key.pem --encrypt-key-name ecsdsa-p256-encrypt-key.pem /home/user/Arduino/MySketch` + "\n",
 		Args: cobra.MaximumNArgs(1),
 		Run:  runCompileCommand,
 	}
@@ -100,6 +104,12 @@ func NewCommand() *cobra.Command {
 		tr("List of custom build properties separated by commas. Or can be used multiple times for multiple properties."))
 	compileCommand.Flags().StringArrayVar(&buildProperties, "build-property", []string{},
 		tr("Override a build property with a custom value. Can be used multiple times for multiple properties."))
+	compileCommand.Flags().StringVar(&keysDir, "keys-input-dir", "",
+		tr("The path of the dir where to search for the custom keys to sign and encrypt a binary. Used only by the platforms that supports it"))
+	compileCommand.Flags().StringVar(&signKeyName, "sign-key-name", "",
+		tr("The name of the custom signing key to use to sign a binary during the compile process. Used only by the platforms that supports it"))
+	compileCommand.Flags().StringVar(&encryptKeyName, "encrypt-key-name", "",
+		tr("The name of the custom encryption key to use to encrypt a binary during the compile process. Used only by the platforms that supports it"))
 	compileCommand.Flags().StringVar(&warnings, "warnings", "none",
 		tr(`Optional, can be: %s. Used to tell gcc which warning level to use (-W flag).`, "none, default, more, all"))
 	compileCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Optional, turns on verbose mode."))
@@ -141,6 +151,10 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	}
 
 	sketchPath := arguments.InitSketchPath(path)
+
+	if keysDir != "" || signKeyName != "" || encryptKeyName != "" {
+		arguments.CheckFlagsMandatory(cmd, "keys-input-dir", "sign-key-name", "encrypt-key-name")
+	}
 
 	var overrides map[string]string
 	if sourceOverrides != "" {
@@ -198,6 +212,9 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		CreateCompilationDatabaseOnly: compilationDatabaseOnly,
 		SourceOverride:                overrides,
 		Library:                       library,
+		Keysdir:                       keysDir,
+		Signkeyname:                   signKeyName,
+		Encryptkeyname:                encryptKeyName,
 	}
 	compileStdOut := new(bytes.Buffer)
 	compileStdErr := new(bytes.Buffer)

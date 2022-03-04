@@ -118,11 +118,32 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		Package:              fqbn.Package,
 		PlatformArchitecture: fqbn.PlatformArch,
 	})
-	if targetPlatform == nil || pm.GetInstalledPlatformRelease(targetPlatform) == nil {
+	InstalledPlatformRelease := pm.GetInstalledPlatformRelease(targetPlatform)
+	if targetPlatform == nil || InstalledPlatformRelease == nil {
 		return nil, &arduino.PlatformNotFoundError{
 			Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
 			Cause:    fmt.Errorf(tr("platform not installed")),
 		}
+	}
+
+	// At the current time we do not have a way of knowing if a board supports the secure boot or not,
+	// so, if the flags to override the default keys are used, we try override the corresponding property in the properties.txt nonetheless.
+	// It's not possible to use the default name for the keys since there could be more tools to sign and encrypt.
+	// So it's mandatory to use all the tree flags to sign and encrypt the binary
+	if req.Keysdir != "" && req.Signkeyname != "" && req.Encryptkeyname != "" {
+		keysDirPath := paths.New(req.Keysdir)
+		if !keysDirPath.IsDir() {
+			return nil, &arduino.NotFoundError{Message: tr("The path specified is not a directory: %s", keysDirPath), Cause: err}
+		}
+		signKeyPath := keysDirPath.Join(req.GetSignkeyname())
+		if !signKeyPath.Exist() {
+			return nil, &arduino.NotFoundError{Message: tr("The path of the specified signing key do not exist: %s", signKeyPath), Cause: err}
+		}
+		encryptKeyPath := keysDirPath.Join(req.GetEncryptkeyname())
+		if !encryptKeyPath.Exist() {
+			return nil, &arduino.NotFoundError{Message: tr("The path of the specified encription key do not exist: %s", encryptKeyPath), Cause: err}
+		}
+		ReplaceSecurityKeys(InstalledPlatformRelease.Properties, req.Keysdir, req.Signkeyname, req.Encryptkeyname)
 	}
 
 	builderCtx := &types.Context{}
@@ -295,4 +316,30 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	logrus.Tracef("Compile %s for %s successful", sk.Name, fqbnIn)
 
 	return r, nil
+}
+
+// ReplaceSecurityKeys function will override the properties representing the security keys specified in the platform.txt file of a platform with the ones provided by the user.
+// The keys are stored in the keyDir
+// signKeyName is the key used to sign a binary
+// encryptKeyName is the key used to encrypt it
+func ReplaceSecurityKeys(properties *properties.Map, keysDir, signKeyName, encryptKeyName string) {
+	toolsProps := properties.SubTree("tools").FirstLevelOf()
+	for toolName, toolProps := range toolsProps {
+		// switch o else o select
+		if toolProps.ContainsKey("keys.path") {
+			key := "tools." + toolName + ".keys.path"
+			properties.Set(key, keysDir)
+			logrus.Tracef("Overriding Property: %s: %s", key, keysDir)
+		}
+		if toolProps.ContainsKey("sign.name") {
+			key := "tools." + toolName + ".sign.name"
+			properties.Set(key, signKeyName)
+			logrus.Tracef("Overriding Property: %s: %s", key, signKeyName)
+		}
+		if toolProps.ContainsKey("encrypt.name") {
+			key := "tools." + toolName + ".encrypt.name"
+			properties.Set(key, encryptKeyName)
+			logrus.Tracef("Overriding Property: %s: %s", key, encryptKeyName)
+		}
+	}
 }

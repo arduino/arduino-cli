@@ -415,3 +415,107 @@ def test_compile_with_known_platform_not_installed(run_command, data_dir):
     assert "Error during build: Platform 'arduino:avr' not found: platform not installed" in res.stderr
     # Verifies command to fix error is shown to user
     assert "Try running `arduino-cli core install arduino:avr`" in res.stderr
+
+
+def test_compile_with_fake_secure_boot_core(run_command, data_dir):
+    assert run_command(["update"])
+
+    assert run_command(["core", "install", "arduino:avr@1.8.3"])
+
+    sketch_name = "SketchSimple"
+    sketch_path = Path(data_dir, sketch_name)
+    fqbn = "arduino:avr:uno"
+
+    assert run_command(["sketch", "new", sketch_path])
+
+    # Verifies compilation works
+    assert run_command(["compile", "--clean", "-b", fqbn, sketch_path])
+
+    # Overrides default platform adding secure_boot support using platform.local.txt
+    avr_platform_path = Path(data_dir, "packages", "arduino", "hardware", "avr", "1.8.3", "platform.local.txt")
+    test_platform_name = "platform_with_secure_boot"
+    shutil.copyfile(
+        Path(__file__).parent / "testdata" / test_platform_name / "platform.local.txt",
+        avr_platform_path,
+    )
+
+    # Overrides default board adding secure boot support using board.local.txt
+    avr_board_path = Path(data_dir, "packages", "arduino", "hardware", "avr", "1.8.3", "boards.local.txt")
+    shutil.copyfile(
+        Path(__file__).parent / "testdata" / test_platform_name / "boards.local.txt",
+        avr_board_path,
+    )
+
+    # Verifies compilation works with secure boot disabled
+    res = run_command(["compile", "--clean", "-b", fqbn + ":security=none", sketch_path, "-v"])
+    assert res.ok
+    assert "echo exit" in res.stdout
+
+    # Verifies compilation works with secure boot enabled
+    res = run_command(["compile", "--clean", "-b", fqbn + ":security=sien", sketch_path, "-v"])
+    assert res.ok
+    assert "Default_Keys/default-signing-key.pem" in res.stdout
+    assert "Default_Keys/default-encrypt-key.pem" in res.stdout
+
+    # Verifies compilation does not work with secure boot enabled and using only one flag
+    res = run_command(
+        [
+            "compile",
+            "--clean",
+            "-b",
+            fqbn + ":security=sien",
+            sketch_path,
+            "--keys-input-dir",
+            data_dir,
+            "-v",
+        ]
+    )
+    assert res.failed
+    assert "Please use also --sign-key-name flag when using --keys-input-dir" in res.stderr
+
+    # Verifies compilation does not work with secure boot enabled and when a key does not exist
+    res = run_command(
+        [
+            "compile",
+            "--clean",
+            "-b",
+            fqbn + ":security=sien",
+            sketch_path,
+            "--keys-input-dir",
+            data_dir,
+            "--sign-key-name",
+            "non_existing_signing_key.pem",
+            "--encrypt-key-name",
+            "non_existing_enctyption_key.pem",
+            "-v",
+        ]
+    )
+    assert res.failed
+    assert "Error during build: The path of the specified signing key do not exist:" in res.stderr
+
+    # Verifies compilation works with secure boot enabled and when overriding the sign key and encryption key used
+    keys_dir = Path(data_dir, "keys_dir")
+    keys_dir.mkdir()
+    sign_key_path = Path(keys_dir, "my-sign-key.pem")
+    sign_key_path.touch()
+    encrypt_key_path = Path(keys_dir, "my-encrypt-key.pem")
+    encrypt_key_path.touch()
+    res = run_command(
+        [
+            "compile",
+            "--clean",
+            "-b",
+            fqbn + ":security=sien",
+            sketch_path,
+            "--keys-input-dir",
+            keys_dir,
+            "--sign-key-name",
+            "my-sign-key.pem",
+            "--encrypt-key-name",
+            "my-encrypt-key.pem",
+            "-v",
+        ]
+    )
+    assert res.ok
+    assert "my-sign-key.pem" in res.stdout
+    assert "my-encrypt-key.pem" in res.stdout

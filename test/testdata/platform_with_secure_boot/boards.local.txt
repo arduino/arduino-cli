@@ -1,0 +1,7 @@
+menu.security=Security setting
+
+uno.menu.security.none=None
+uno.menu.security.sien=Signature + Encryption
+
+uno.menu.security.sien.build.postbuild.cmd="{tools.imgtool.cmd}" {tools.imgtool.build.pattern}
+uno.menu.security.none.build.postbuild.cmd="{tools.imgtool.cmd}" exit

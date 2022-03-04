@@ -80,6 +80,13 @@ message CompileRequest {
   google.protobuf.BoolValue export_binaries = 23;
   // List of paths to library root folders
   repeated string library = 24;
+  // The dir where to search for the custom signing key name and the encrypt key
+  // name
+  string keysdir = 25;
+  // The name of the custom key to use for signing during the compile process
+  string signkeyname = 26;
+  // The name of the custom key to use for encrypting during the compile process
+  string encryptkeyname = 27;
 }
 
 message CompileResponse {
