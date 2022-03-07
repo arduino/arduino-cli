@@ -618,17 +618,26 @@ func (pm *PackageManager) loadToolReleasesFromTool(tool *cores.Tool, toolPath *p
 	toolVersions.FilterDirs()
 	toolVersions.FilterOutHiddenFiles()
 	for _, versionPath := range toolVersions {
-		if toolReleasePath, err := versionPath.Abs(); err == nil {
-			version := semver.ParseRelaxed(versionPath.Base())
-			release := tool.GetOrCreateRelease(version)
-			release.InstallDir = toolReleasePath
-			pm.Log.WithField("tool", release).Infof("Loaded tool")
-		} else {
+		version := semver.ParseRelaxed(versionPath.Base())
+		if err := pm.loadToolReleaseFromDirectory(tool, version, versionPath); err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+func (pm *PackageManager) loadToolReleaseFromDirectory(tool *cores.Tool, version *semver.RelaxedVersion, toolReleasePath *paths.Path) error {
+	if absToolReleasePath, err := toolReleasePath.Abs(); err != nil {
+		return errors.New(tr("error opening %s", absToolReleasePath))
+	} else if !absToolReleasePath.IsDir() {
+		return errors.New(tr("%s is not a directory", absToolReleasePath))
+	} else {
+		toolRelease := tool.GetOrCreateRelease(version)
+		toolRelease.InstallDir = absToolReleasePath
+		pm.Log.WithField("tool", toolRelease).Infof("Loaded tool")
+		return nil
+	}
 }
 
 // LoadToolsFromBundleDirectories FIXMEDOC
