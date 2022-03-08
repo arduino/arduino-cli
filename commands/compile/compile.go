@@ -118,8 +118,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		Package:              fqbn.Package,
 		PlatformArchitecture: fqbn.PlatformArch,
 	})
-	InstalledPlatformRelease := pm.GetInstalledPlatformRelease(targetPlatform)
-	if targetPlatform == nil || InstalledPlatformRelease == nil {
+	if targetPlatform == nil || pm.GetInstalledPlatformRelease(targetPlatform) == nil {
 		return nil, &arduino.PlatformNotFoundError{
 			Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
 			Cause:    fmt.Errorf(tr("platform not installed")),
@@ -143,6 +142,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		if !encryptKeyPath.Exist() {
 			return nil, &arduino.NotFoundError{Message: tr("The path of the specified encription key do not exist: %s", encryptKeyPath), Cause: err}
 		}
+		InstalledPlatformRelease := pm.GetInstalledPlatformRelease(targetPlatform)
 		ReplaceSecurityKeys(InstalledPlatformRelease.Properties, req.Keysdir, req.Signkeyname, req.Encryptkeyname)
 	}
 
