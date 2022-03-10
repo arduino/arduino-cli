@@ -3,7 +3,7 @@ provide Boards Manager installation support for a platform, a JSON formatted ind
 specification for that file.
 
 Boards Manager functionality is provided by [Arduino CLI](getting-started.md#adding-3rd-party-cores),
-[Arduino IDE](https://www.arduino.cc/en/Guide/Cores), and Arduino Pro IDE.
+[Arduino IDE](https://docs.arduino.cc/learn/starting-guide/cores), and Arduino Pro IDE.
 
 ## Naming of the JSON index file
 
