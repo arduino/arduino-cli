@@ -129,21 +129,21 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	// so, if the flags to override the default keys are used, we try override the corresponding platform property nonetheless.
 	// It's not possible to use the default name for the keys since there could be more tools to sign and encrypt.
 	// So it's mandatory to use all the tree flags to sign and encrypt the binary
-	if req.KeysPath != "" && req.SignKeyName != "" && req.EncryptKeyName != "" {
-		keysDirPath := paths.New(req.KeysPath)
+	if req.KeysKeychain != "" && req.SignKey != "" && req.EncryptKey != "" {
+		keysDirPath := paths.New(req.KeysKeychain)
 		if !keysDirPath.IsDir() {
 			return nil, &arduino.NotFoundError{Message: tr("The path specified is not a directory: %s", keysDirPath), Cause: err}
 		}
-		signKeyPath := keysDirPath.Join(req.GetSignKeyName())
+		signKeyPath := keysDirPath.Join(req.GetSignKey())
 		if !signKeyPath.Exist() {
 			return nil, &arduino.NotFoundError{Message: tr("The path of the specified signing key does not exist: %s", signKeyPath), Cause: err}
 		}
-		encryptKeyPath := keysDirPath.Join(req.GetEncryptKeyName())
+		encryptKeyPath := keysDirPath.Join(req.GetEncryptKey())
 		if !encryptKeyPath.Exist() {
 			return nil, &arduino.NotFoundError{Message: tr("The path of the specified encryption key does not exist: %s", encryptKeyPath), Cause: err}
 		}
 		InstalledPlatformRelease := pm.GetInstalledPlatformRelease(targetPlatform)
-		ReplaceSecurityKeys(InstalledPlatformRelease.Properties, req.KeysPath, req.SignKeyName, req.EncryptKeyName)
+		ReplaceSecurityKeys(InstalledPlatformRelease.Properties, req.KeysKeychain, req.SignKey, req.EncryptKey)
 	}
 
 	builderCtx := &types.Context{}
@@ -320,25 +320,25 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 // ReplaceSecurityKeys function will override the properties representing the security keys specified in the platform.txt file of a platform with the ones provided by the user.
 // The keys are stored in the keyPath
-// signKeyName is the key used to sign a binary
-// encryptKeyName is the key used to encrypt it
-func ReplaceSecurityKeys(properties *properties.Map, keysPath, signKeyName, encryptKeyName string) {
+// signKey is the key used to sign a binary
+// encryptKey is the key used to encrypt it
+func ReplaceSecurityKeys(properties *properties.Map, keysKKeysKeychain, signKey, encryptKey string) {
 	toolsProps := properties.SubTree("tools").FirstLevelOf()
 	for toolName, toolProps := range toolsProps {
 		if toolProps.ContainsKey("keys.path") {
 			key := "tools." + toolName + ".keys.path"
-			properties.Set(key, keysPath)
-			logrus.Tracef("Overriding Property: %s: %s", key, keysPath)
+			properties.Set(key, keysKKeysKeychain)
+			logrus.Tracef("Overriding Property: %s: %s", key, keysKKeysKeychain)
 		}
 		if toolProps.ContainsKey("sign.name") {
 			key := "tools." + toolName + ".sign.name"
-			properties.Set(key, signKeyName)
-			logrus.Tracef("Overriding Property: %s: %s", key, signKeyName)
+			properties.Set(key, signKey)
+			logrus.Tracef("Overriding Property: %s: %s", key, signKey)
 		}
 		if toolProps.ContainsKey("encrypt.name") {
 			key := "tools." + toolName + ".encrypt.name"
-			properties.Set(key, encryptKeyName)
-			logrus.Tracef("Overriding Property: %s: %s", key, encryptKeyName)
+			properties.Set(key, encryptKey)
+			logrus.Tracef("Overriding Property: %s: %s", key, encryptKey)
 		}
 	}
 }

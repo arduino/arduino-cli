@@ -82,11 +82,11 @@ message CompileRequest {
   repeated string library = 24;
   // The path where to search for the custom signing key name and the encrypt
   // key name
-  string keys_path = 25;
+  string keys_keychain = 25;
   // The name of the custom key to use for signing during the compile process
-  string sign_key_name = 26;
+  string sign_key = 26;
   // The name of the custom key to use for encrypting during the compile process
-  string encrypt_key_name = 27;
+  string encrypt_key = 27;
 }
 
 message CompileResponse {

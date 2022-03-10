@@ -465,13 +465,13 @@ def test_compile_with_fake_secure_boot_core(run_command, data_dir):
             "-b",
             fqbn + ":security=sien",
             sketch_path,
-            "--keys-input-path",
+            "--keys-keychain",
             data_dir,
             "-v",
         ]
     )
     assert res.failed
-    assert "Please use also --sign-key-name flag when using --keys-input-path" in res.stderr
+    assert "Please use also --sign-key flag when using --keys-keychain" in res.stderr
 
     # Verifies compilation does not work with secure boot enabled and when a key does not exist
     res = run_command(
@@ -481,11 +481,11 @@ def test_compile_with_fake_secure_boot_core(run_command, data_dir):
             "-b",
             fqbn + ":security=sien",
             sketch_path,
-            "--keys-input-path",
+            "--keys-keychain",
             data_dir,
-            "--sign-key-name",
+            "--sign-key",
             "non_existing_signing_key.pem",
-            "--encrypt-key-name",
+            "--encrypt-key",
             "non_existing_enctyption_key.pem",
             "-v",
         ]
@@ -507,11 +507,11 @@ def test_compile_with_fake_secure_boot_core(run_command, data_dir):
             "-b",
             fqbn + ":security=sien",
             sketch_path,
-            "--keys-input-path",
+            "--keys-keychain",
             keys_dir,
-            "--sign-key-name",
+            "--sign-key",
             "my-sign-key.pem",
-            "--encrypt-key-name",
+            "--encrypt-key",
             "my-encrypt-key.pem",
             "-v",
         ]
