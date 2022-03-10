@@ -5,8 +5,4 @@ recipe.hooks.objcopy.postobjcopy.1.pattern={build.postbuild.cmd}
 #
 
 tools.imgtool.cmd=echo
-tools.imgtool.keys.path={runtime.hardware.path}/Default_Keys
-tools.imgtool.sign.name=default-signing-key.pem
-tools.imgtool.encrypt.name=default-encrypt-key.pem
-
-tools.imgtool.build.pattern=sign --key "{tools.imgtool.keys.path}/{tools.imgtool.sign.name}"  --encrypt "{tools.imgtool.keys.path}/{tools.imgtool.encrypt.name}" "{build.path}/{build.project_name}.bin" "{build.path}/{build.project_name}.bin" --align {build.alignment} --max-align {build.alignment} --version {build.version} --header-size {build.header_size} --pad-header --slot-size {build.slot_size}
+tools.imgtool.build.pattern=sign --key "{build.keys.keychain}/{build.keys.sign_key}" --encrypt "{build.keys.keychain}/{build.keys.encrypt_key}" "{build.path}/{build.project_name}.bin" "{build.path}/{build.project_name}.bin" --align {build.alignment} --max-align {build.alignment} --version {build.version} --header-size {build.header_size} --pad-header --slot-size {build.slot_size}

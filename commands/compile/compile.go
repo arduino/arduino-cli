@@ -129,6 +129,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	// so, if the flags to override the default keys are used, we try override the corresponding platform property nonetheless.
 	// It's not possible to use the default name for the keys since there could be more tools to sign and encrypt.
 	// So it's mandatory to use all the tree flags to sign and encrypt the binary
+	securityKeysOverride := []string{}
 	if req.KeysKeychain != "" && req.SignKey != "" && req.EncryptKey != "" {
 		keysDirPath := paths.New(req.KeysKeychain)
 		if !keysDirPath.IsDir() {
@@ -142,8 +143,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		if !encryptKeyPath.Exist() {
 			return nil, &arduino.NotFoundError{Message: tr("The path of the specified encryption key does not exist: %s", encryptKeyPath), Cause: err}
 		}
-		InstalledPlatformRelease := pm.GetInstalledPlatformRelease(targetPlatform)
-		ReplaceSecurityKeys(InstalledPlatformRelease.Properties, req.KeysKeychain, req.SignKey, req.EncryptKey)
+		securityKeysOverride = append(securityKeysOverride, "build.keys.keychain="+req.KeysKeychain, "build.keys.sign_key="+req.GetSignKey(), "build.keys.encrypt_key="+req.EncryptKey)
 	}
 
 	builderCtx := &types.Context{}
@@ -186,6 +186,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.WarningsLevel = req.GetWarnings()
 
 	builderCtx.CustomBuildProperties = append(req.GetBuildProperties(), "build.warn_data_percentage=75")
+	builderCtx.CustomBuildProperties = append(req.GetBuildProperties(), securityKeysOverride...)
 
 	if req.GetBuildCachePath() != "" {
 		builderCtx.BuildCachePath = paths.New(req.GetBuildCachePath())
@@ -316,29 +317,4 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	logrus.Tracef("Compile %s for %s successful", sk.Name, fqbnIn)
 
 	return r, nil
-}
-
-// ReplaceSecurityKeys function will override the properties representing the security keys specified in the platform.txt file of a platform with the ones provided by the user.
-// The keys are stored in the keyPath
-// signKey is the key used to sign a binary
-// encryptKey is the key used to encrypt it
-func ReplaceSecurityKeys(properties *properties.Map, keysKKeysKeychain, signKey, encryptKey string) {
-	toolsProps := properties.SubTree("tools").FirstLevelOf()
-	for toolName, toolProps := range toolsProps {
-		if toolProps.ContainsKey("keys.path") {
-			key := "tools." + toolName + ".keys.path"
-			properties.Set(key, keysKKeysKeychain)
-			logrus.Tracef("Overriding Property: %s: %s", key, keysKKeysKeychain)
-		}
-		if toolProps.ContainsKey("sign.name") {
-			key := "tools." + toolName + ".sign.name"
-			properties.Set(key, signKey)
-			logrus.Tracef("Overriding Property: %s: %s", key, signKey)
-		}
-		if toolProps.ContainsKey("encrypt.name") {
-			key := "tools." + toolName + ".encrypt.name"
-			properties.Set(key, encryptKey)
-			logrus.Tracef("Overriding Property: %s: %s", key, encryptKey)
-		}
-	}
 }

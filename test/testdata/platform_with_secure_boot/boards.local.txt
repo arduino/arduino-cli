@@ -5,3 +5,8 @@ uno.menu.security.sien=Signature + Encryption
 
 uno.menu.security.sien.build.postbuild.cmd="{tools.imgtool.cmd}" {tools.imgtool.build.pattern}
 uno.menu.security.none.build.postbuild.cmd="{tools.imgtool.cmd}" exit
+
+uno.menu.security.sien.build.keys.type=public_keys
+uno.menu.security.sien.build.keys.keychain={runtime.hardware.path}/Default_Keys
+uno.menu.security.sien.build.keys.sign_key=default-signing-key.pem
+uno.menu.security.sien.build.keys.encrypt_key=default-encrypt-key.pem
