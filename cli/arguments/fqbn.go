@@ -15,13 +15,18 @@
 
 package arguments
 
-import "github.com/spf13/cobra"
+import (
+	"strings"
+
+	"github.com/spf13/cobra"
+)
 
 // Fqbn contains the fqbn flag data.
 // This is useful so all flags used by commands that need
 // this information are consistent with each other.
 type Fqbn struct {
-	fqbn string
+	fqbn         string
+	boardOptions []string // List of boards specific options separated by commas. Or can be used multiple times for multiple options.
 }
 
 // AddToCommand adds the flags used to set fqbn to the specified Command
@@ -30,10 +35,18 @@ func (f *Fqbn) AddToCommand(cmd *cobra.Command) {
 	cmd.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return GetInstalledBoards(), cobra.ShellCompDirectiveDefault
 	})
+	cmd.Flags().StringSliceVar(&f.boardOptions, "board-options", []string{},
+		tr("List of board options separated by commas. Or can be used multiple times for multiple options."))
 }
 
-// String returns the fqbn
+// String returns the fqbn with the board options if there are any
 func (f *Fqbn) String() string {
+	// If boardOptions are passed with the "--board-options" flags then add them along with the fqbn
+	// This way it's possible to use either the legacy way (appending board options directly to the fqbn),
+	// or the new and more elegant way (using "--board-options"), even using multiple "--board-options" works.
+	if f.fqbn != "" && len(f.boardOptions) != 0 {
+		return f.fqbn + ":" + strings.Join(f.boardOptions, ",")
+	}
 	return f.fqbn
 }
 
