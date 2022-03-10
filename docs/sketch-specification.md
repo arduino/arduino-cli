@@ -130,10 +130,11 @@ no requirement to store sketches in the sketchbook folder.
 ## Library/Boards Manager links
 
 A URI in a comment in the form `http://librarymanager#SEARCH_TERM` will open a search for SEARCH_TERM in
-[Library Manager](https://www.arduino.cc/en/guide/libraries#toc3) when clicked in the Arduino IDE.
+[Library Manager](https://docs.arduino.cc/software/ide-v1/tutorials/installing-libraries#using-the-library-manager) when
+clicked in the Arduino IDE.
 
 A URI in a comment in the form `http://boardsmanager#SEARCH_TERM` will open a search for SEARCH_TERM in
-[Boards Manager](https://www.arduino.cc/en/Guide/Cores) when clicked in the Arduino IDE.
+[Boards Manager](https://docs.arduino.cc/learn/starting-guide/cores) when clicked in the Arduino IDE.
 
 This can be used to offer the user an easy way to install dependencies of the sketch.
 
