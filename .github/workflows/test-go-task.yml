@@ -3,7 +3,7 @@ name: Test Go
 
 env:
   # See: https://github.com/actions/setup-go/tree/v2#readme
-  GO_VERSION: "1.16"
+  GO_VERSION: "1.17"
 
 # See: https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows
 on:
