@@ -19,7 +19,7 @@ version: "3"
 
 vars:
   CONTAINER: "docker.elastic.co/beats-dev/golang-crossbuild"
-  GO_VERSION: "1.16.4"
+  GO_VERSION: "1.17.8"
   CHECKSUM_FILE: "{{.VERSION}}-checksums.txt"
 
 tasks:
