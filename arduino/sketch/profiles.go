@@ -16,11 +16,14 @@
 package sketch
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"net/url"
 	"regexp"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/go-paths-helper"
 	semver "go.bug.st/relaxed-semver"
 	"gopkg.in/yaml.v2"
@@ -95,6 +98,14 @@ type ProfilePlatformReference struct {
 	Architecture     string
 	Version          *semver.Version
 	PlatformIndexURL *url.URL
+}
+
+// InternalUniqueIdentifier returns the unique identifier for this object
+func (p *ProfilePlatformReference) InternalUniqueIdentifier() string {
+	id := p.String()
+	h := sha256.Sum256([]byte(id))
+	res := fmt.Sprintf("%s:%s@%s_%s", p.Packager, p.Architecture, p.Version, hex.EncodeToString(h[:])[:16])
+	return utils.SanitizeName(res)
 }
 
 func (p *ProfilePlatformReference) String() string {
@@ -176,6 +187,14 @@ func (l *ProfileLibraryReference) UnmarshalYAML(unmarshal func(interface{}) erro
 
 func (l *ProfileLibraryReference) String() string {
 	return fmt.Sprintf("%s@%s", l.Library, l.Version)
+}
+
+// InternalUniqueIdentifier returns the unique identifier for this object
+func (l *ProfileLibraryReference) InternalUniqueIdentifier() string {
+	id := l.String()
+	h := sha256.Sum256([]byte(id))
+	res := fmt.Sprintf("%s_%s", id, hex.EncodeToString(h[:])[:16])
+	return utils.SanitizeName(res)
 }
 
 // LoadProjectFile reads a sketch project file
