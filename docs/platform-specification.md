@@ -768,6 +768,60 @@ All the tools launched to compile or upload a sketch will have the following env
 contain multiple space-delimited entries like `"arduino-cli/0.21.0 ArduinoIDE/2.0.0-rc1"` if this information is
 available.
 
+### Secure Boot
+
+Some boards supports the secure boot. Basically the compiled sketch can be signed and encrypted with a [tool](#tools)
+before being flashed to the target board. The bootloader of the board is then responsible for starting the compiled
+sketch if the matching keys are used.
+
+To be able to correctly carry out all the operations at the end of the build we can leverage the
+[post build hooks](#pre-and-post-build-hooks-since-arduino-ide-165) to sign and encrypt a binary by using
+`recipe.hooks.objcopy.postobjcopy.NUMBER.pattern` key in [`platform.txt`](#platformtxt). The security keys used are
+defined in the boards file, this way there could be different keys for different boards.
+
+```
+[...]
+## Create output secure image (bin file)
+recipe.hooks.objcopy.postobjcopy.1.pattern={build.postbuild.cmd}
+#
+# IMGTOOL
+#
+
+tools.imgtool.cmd=imgtool
+tools.imgtool.build.pattern=sign --key "{build.keys.keychain}/{build.keys.sign_key}" --encrypt "{build.keys.keychain}/{build.keys.encrypt_key}" "{build.path}/{build.project_name}.bin" "{build.path}/{build.project_name}.bin" --align {build.alignment} --max-align {build.alignment} --version {build.version} --header-size {build.header_size} --pad-header --slot-size {build.slot_size}
+[...]
+
+```
+
+By having only `tools.TOOL_NAME.cmd` and `tools.TOOL_NAME.build.pattern`, we can customize the behavior with a
+[custom board option](#custom-board-options). Then in the [`boards.txt`](#boardstxt) we can define the new option to use
+a different `postbuild.cmd`:
+
+```
+[...]
+menu.security=Security setting
+
+envie_m7.menu.security.none=None
+envie_m7.menu.security.sien=Signature + Encryption
+
+envie_m7.menu.security.sien.build.postbuild.cmd="{tools.imgtool.cmd}" {tools.imgtool.build.pattern}
+envie_m7.menu.security.none.build.postbuild.cmd="{tools.imgtool.cmd}" exit
+
+envie_m7.menu.security.sien.build.keys.type=public_keys
+envie_m7.menu.security.sien.build.keys.keychain={runtime.hardware.path}/Default_Keys
+envie_m7.menu.security.sien.build.keys.sign_key=default-signing-key.pem
+envie_m7.menu.security.sien.build.keys.encrypt_key=default-encrypt-key.pem
+[...]
+```
+
+The currently we support the secure boot only with `build.keys.type=public_keys` but in the future other ways can be
+added. The security keys can be added with:
+
+- `keys.keychain` indicates the path of the dir where to search for the custom keys to sign and encrypt a binary.
+- `keys.sign_key` indicates the name of the custom signing key to use to sign a binary during the compile process.
+- `keys.encrypt_key` indicates the name of the custom encryption key to use to encrypt a binary during the compile
+  process.
+
 ### Pluggable discovery
 
 Discovery tools are a special kind of tool used to find supported boards. A platform must declare one or more Pluggable
@@ -1294,7 +1348,7 @@ It can sometimes be useful to provide user selectable configuration options for 
 could be provided in two or more variants with different microcontrollers, or may have different crystal speed based on
 the board model, and so on...
 
-When using Arduino CLI, the option can be selected via the FQBN.
+When using Arduino CLI, the option can be selected via the FQBN, or using the `--board-options` flag
 
 In the Arduino IDE the options add extra menu items under the "Tools" menu.
 
