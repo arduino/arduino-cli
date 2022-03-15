@@ -26,11 +26,12 @@ import (
 	"go.bug.st/downloader/v2"
 )
 
-// Download a DownloadResource.
-func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.Config) (*downloader.Downloader, error) {
+// Download performs a download loop using the provided downloader.Downloader.
+// Messages are passed back to the DownloadProgressCB using label as text for the File field.
+func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.Config, label string, downloadCB DownloadProgressCB) error {
 	path, err := r.ArchivePath(downloadDir)
 	if err != nil {
-		return nil, fmt.Errorf(tr("getting archive path: %s"), err)
+		return fmt.Errorf(tr("getting archive path: %s"), err)
 	}
 
 	if _, err := path.Stat(); os.IsNotExist(err) {
@@ -40,17 +41,46 @@ func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.
 		ok, err := r.TestLocalArchiveIntegrity(downloadDir)
 		if err != nil || !ok {
 			if err := path.Remove(); err != nil {
-				return nil, fmt.Errorf(tr("removing corrupted archive file: %s"), err)
+				return fmt.Errorf(tr("removing corrupted archive file: %s"), err)
 			}
 		} else {
 			// File is cached, nothing to do here
-			return nil, nil
+
+			// This signal means that the file is already downloaded
+			downloadCB(&DownloadProgress{
+				File:      label,
+				Completed: true,
+			})
+			return nil
 		}
 	} else {
-		return nil, fmt.Errorf(tr("getting archive file info: %s"), err)
+		return fmt.Errorf(tr("getting archive file info: %s"), err)
 	}
 
-	return downloader.DownloadWithConfig(path.String(), r.URL, *config)
+	d, err := downloader.DownloadWithConfig(path.String(), r.URL, *config)
+	if err != nil {
+		return err
+	}
+	downloadCB(&DownloadProgress{
+		File:      label,
+		URL:       d.URL,
+		TotalSize: d.Size(),
+	})
+
+	err = d.RunAndPoll(func(downloaded int64) {
+		downloadCB(&DownloadProgress{Downloaded: downloaded})
+	}, 250*time.Millisecond)
+	if err != nil {
+		return err
+	}
+
+	// The URL is not reachable for some reason
+	if d.Resp.StatusCode >= 400 && d.Resp.StatusCode <= 599 {
+		return &arduino.FailedDownloadError{Message: tr("Server responded with: %s", d.Resp.Status)}
+	}
+
+	downloadCB(&DownloadProgress{Completed: true})
+	return nil
 }
 
 // GetDownloaderConfig returns the downloader configuration based on
@@ -82,33 +112,3 @@ type DownloadProgress struct {
 
 // DownloadProgressCB is a callback function to report download progress
 type DownloadProgressCB func(progress *DownloadProgress)
-
-// Download performs a download loop using the provided downloader.Downloader.
-// Messages are passed back to the DownloadProgressCB using label as text for the File field.
-func Download(d *downloader.Downloader, label string, downloadCB DownloadProgressCB) error {
-	if d == nil {
-		// This signal means that the file is already downloaded
-		downloadCB(&DownloadProgress{
-			File:      label,
-			Completed: true,
-		})
-		return nil
-	}
-	downloadCB(&DownloadProgress{
-		File:      label,
-		URL:       d.URL,
-		TotalSize: d.Size(),
-	})
-	d.RunAndPoll(func(downloaded int64) {
-		downloadCB(&DownloadProgress{Downloaded: downloaded})
-	}, 250*time.Millisecond)
-	if d.Error() != nil {
-		return d.Error()
-	}
-	// The URL is not reachable for some reason
-	if d.Resp.StatusCode >= 400 && d.Resp.StatusCode <= 599 {
-		return &arduino.FailedDownloadError{Message: tr("Server responded with: %s", d.Resp.Status)}
-	}
-	downloadCB(&DownloadProgress{Completed: true})
-	return nil
-}

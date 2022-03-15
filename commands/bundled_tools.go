@@ -29,11 +29,7 @@ func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.T
 	if err != nil {
 		return err
 	}
-	resp, err := pm.DownloadToolRelease(toolRelease, config)
-	if err != nil {
-		return err
-	}
-	return resources.Download(resp, toolRelease.String(), downloadCB.FromRPC())
+	return pm.DownloadToolRelease(toolRelease, config, toolRelease.String(), downloadCB.FromRPC())
 }
 
 // InstallToolRelease installs a ToolRelease

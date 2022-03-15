@@ -711,9 +711,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 
 			// Downloads latest library release
 			taskCB(&rpc.TaskProgress{Name: tr("Downloading %s", available)})
-			if d, err := available.Resource.Download(lm.DownloadsDir, downloaderConfig); err != nil {
-				return &arduino.FailedDownloadError{Message: tr("Error downloading library"), Cause: err}
-			} else if err := resources.Download(d, available.String(), downloadCB.FromRPC()); err != nil {
+			if err := available.Resource.Download(lm.DownloadsDir, downloaderConfig, available.String(), downloadCB.FromRPC()); err != nil {
 				return &arduino.FailedDownloadError{Message: tr("Error downloading library"), Cause: err}
 			}
 
@@ -794,9 +792,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 				}
 
 				// Downloads platform
-				if d, err := pm.DownloadPlatformRelease(latest, downloaderConfig); err != nil {
-					return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", latest), Cause: err}
-				} else if err := resources.Download(d, latest.String(), downloadCB.FromRPC()); err != nil {
+				if err := pm.DownloadPlatformRelease(latest, downloaderConfig, latest.String(), downloadCB.FromRPC()); err != nil {
 					return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", latest), Cause: err}
 				}
 

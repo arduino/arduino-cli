@@ -61,9 +61,7 @@ func downloadLibrary(lm *librariesmanager.LibrariesManager, libRelease *librarie
 	if err != nil {
 		return &arduino.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	}
-	if d, err := libRelease.Resource.Download(lm.DownloadsDir, config); err != nil {
-		return &arduino.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
-	} else if err := resources.Download(d, libRelease.String(), downloadCB.FromRPC()); err != nil {
+	if err := libRelease.Resource.Download(lm.DownloadsDir, config, libRelease.String(), downloadCB.FromRPC()); err != nil {
 		return &arduino.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
