@@ -13,14 +13,13 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package commands
+package resources
 
 import (
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/httpclient"
-	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"go.bug.st/downloader/v2"
 )
 
@@ -36,24 +35,42 @@ func GetDownloaderConfig() (*downloader.Config, error) {
 	}, nil
 }
 
+// DownloadProgress is a report of the download progress, not all fields may be
+// filled and multiple reports may be sent during a download.
+type DownloadProgress struct {
+	// URL of the download.
+	URL string
+	// The file being downloaded.
+	File string
+	// TotalSize is the total size of the file being downloaded.
+	TotalSize int64
+	// Downloaded is the size of the downloaded portion of the file.
+	Downloaded int64
+	// Completed reports whether the download is complete.
+	Completed bool
+}
+
+// DownloadProgressCB is a callback function to report download progress
+type DownloadProgressCB func(progress *DownloadProgress)
+
 // Download performs a download loop using the provided downloader.Downloader.
 // Messages are passed back to the DownloadProgressCB using label as text for the File field.
 func Download(d *downloader.Downloader, label string, downloadCB DownloadProgressCB) error {
 	if d == nil {
 		// This signal means that the file is already downloaded
-		downloadCB(&rpc.DownloadProgress{
+		downloadCB(&DownloadProgress{
 			File:      label,
 			Completed: true,
 		})
 		return nil
 	}
-	downloadCB(&rpc.DownloadProgress{
+	downloadCB(&DownloadProgress{
 		File:      label,
-		Url:       d.URL,
+		URL:       d.URL,
 		TotalSize: d.Size(),
 	})
 	d.RunAndPoll(func(downloaded int64) {
-		downloadCB(&rpc.DownloadProgress{Downloaded: downloaded})
+		downloadCB(&DownloadProgress{Downloaded: downloaded})
 	}, 250*time.Millisecond)
 	if d.Error() != nil {
 		return d.Error()
@@ -62,6 +79,6 @@ func Download(d *downloader.Downloader, label string, downloadCB DownloadProgres
 	if d.Resp.StatusCode >= 400 && d.Resp.StatusCode <= 599 {
 		return &arduino.FailedDownloadError{Message: tr("Server responded with: %s", d.Resp.Status)}
 	}
-	downloadCB(&rpc.DownloadProgress{Completed: true})
+	downloadCB(&DownloadProgress{Completed: true})
 	return nil
 }

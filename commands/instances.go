@@ -31,6 +31,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/arduino/resources"
 	"github.com/arduino/arduino-cli/arduino/security"
 	sk "github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/arduino/utils"
@@ -362,13 +363,13 @@ func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse
 }
 
 // UpdateLibrariesIndex updates the library_index.json
-func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequest, downloadCB func(*rpc.DownloadProgress)) error {
+func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequest, downloadCB DownloadProgressCB) error {
 	logrus.Info("Updating libraries index")
 	lm := GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
 		return &arduino.InvalidInstanceError{}
 	}
-	config, err := GetDownloaderConfig()
+	config, err := resources.GetDownloaderConfig()
 	if err != nil {
 		return err
 	}
@@ -387,7 +388,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 	// Download gzipped library_index
 	tmpIndexGz := tmp.Join("library_index.json.gz")
 	if d, err := downloader.DownloadWithConfig(tmpIndexGz.String(), librariesmanager.LibraryIndexGZURL.String(), *config, downloader.NoResume); err == nil {
-		if err := Download(d, tr("Updating index: library_index.json.gz"), downloadCB); err != nil {
+		if err := resources.Download(d, tr("Updating index: library_index.json.gz"), downloadCB.FromRPC()); err != nil {
 			return &arduino.FailedDownloadError{Message: tr("Error downloading library_index.json.gz"), Cause: err}
 		}
 	} else {
@@ -397,7 +398,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 	// Download signature
 	tmpSignature := tmp.Join("library_index.json.sig")
 	if d, err := downloader.DownloadWithConfig(tmpSignature.String(), librariesmanager.LibraryIndexSignature.String(), *config, downloader.NoResume); err == nil {
-		if err := Download(d, tr("Updating index: library_index.json.sig"), downloadCB); err != nil {
+		if err := resources.Download(d, tr("Updating index: library_index.json.sig"), downloadCB.FromRPC()); err != nil {
 			return &arduino.FailedDownloadError{Message: tr("Error downloading library_index.json.sig"), Cause: err}
 		}
 	} else {
@@ -477,7 +478,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 		}
 		defer tmp.Remove()
 
-		config, err := GetDownloaderConfig()
+		config, err := resources.GetDownloaderConfig()
 		if err != nil {
 			return nil, &arduino.FailedDownloadError{Message: tr("Error downloading index '%s'", URL), Cause: err}
 		}
@@ -486,7 +487,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 			return nil, &arduino.FailedDownloadError{Message: tr("Error downloading index '%s'", URL), Cause: err}
 		}
 		coreIndexPath := indexpath.Join(path.Base(URL.Path))
-		err = Download(d, tr("Updating index: %s", coreIndexPath.Base()), downloadCB)
+		err = resources.Download(d, tr("Updating index: %s", coreIndexPath.Base()), downloadCB.FromRPC())
 		if err != nil {
 			return nil, &arduino.FailedDownloadError{Message: tr("Error downloading index '%s'", URL), Cause: err}
 		}
@@ -516,7 +517,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 			}
 
 			coreIndexSigPath = indexpath.Join(path.Base(URLSig.Path))
-			Download(d, tr("Updating index: %s", coreIndexSigPath.Base()), downloadCB)
+			resources.Download(d, tr("Updating index: %s", coreIndexSigPath.Base()), downloadCB.FromRPC())
 			if d.Error() != nil {
 				return nil, &arduino.FailedDownloadError{Message: tr("Error downloading index signature '%s'", URLSig), Cause: err}
 			}
@@ -688,7 +689,7 @@ func getOutputRelease(lib *librariesindex.Release) *rpc.LibraryRelease {
 
 // Upgrade downloads and installs outdated Cores and Libraries
 func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadProgressCB, taskCB TaskProgressCB) error {
-	downloaderConfig, err := GetDownloaderConfig()
+	downloaderConfig, err := resources.GetDownloaderConfig()
 	if err != nil {
 		return err
 	}
@@ -712,7 +713,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 			taskCB(&rpc.TaskProgress{Name: tr("Downloading %s", available)})
 			if d, err := available.Resource.Download(lm.DownloadsDir, downloaderConfig); err != nil {
 				return &arduino.FailedDownloadError{Message: tr("Error downloading library"), Cause: err}
-			} else if err := Download(d, available.String(), downloadCB); err != nil {
+			} else if err := resources.Download(d, available.String(), downloadCB.FromRPC()); err != nil {
 				return &arduino.FailedDownloadError{Message: tr("Error downloading library"), Cause: err}
 			}
 
@@ -795,7 +796,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 				// Downloads platform
 				if d, err := pm.DownloadPlatformRelease(latest, downloaderConfig); err != nil {
 					return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", latest), Cause: err}
-				} else if err := Download(d, latest.String(), downloadCB); err != nil {
+				} else if err := resources.Download(d, latest.String(), downloadCB.FromRPC()); err != nil {
 					return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", latest), Cause: err}
 				}
 

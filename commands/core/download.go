@@ -22,6 +22,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/arduino/resources"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -66,7 +67,7 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, dow
 
 func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, downloadCB commands.DownloadProgressCB) error {
 	// Download platform
-	config, err := commands.GetDownloaderConfig()
+	config, err := resources.GetDownloaderConfig()
 	if err != nil {
 		return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", platformRelease), Cause: err}
 	}
@@ -74,7 +75,7 @@ func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.
 	if err != nil {
 		return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", platformRelease), Cause: err}
 	}
-	return commands.Download(resp, platformRelease.String(), downloadCB)
+	return resources.Download(resp, platformRelease.String(), downloadCB.FromRPC())
 }
 
 func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB commands.DownloadProgressCB) error {

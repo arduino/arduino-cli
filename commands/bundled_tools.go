@@ -19,12 +19,13 @@ import (
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/arduino/resources"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // DownloadToolRelease downloads a ToolRelease
 func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, downloadCB DownloadProgressCB) error {
-	config, err := GetDownloaderConfig()
+	config, err := resources.GetDownloaderConfig()
 	if err != nil {
 		return err
 	}
@@ -32,7 +33,7 @@ func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.T
 	if err != nil {
 		return err
 	}
-	return Download(resp, toolRelease.String(), downloadCB)
+	return resources.Download(resp, toolRelease.String(), downloadCB.FromRPC())
 }
 
 // InstallToolRelease installs a ToolRelease
