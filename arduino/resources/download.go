@@ -16,12 +16,42 @@
 package resources
 
 import (
+	"fmt"
+	"os"
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/httpclient"
+	paths "github.com/arduino/go-paths-helper"
 	"go.bug.st/downloader/v2"
 )
+
+// Download a DownloadResource.
+func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.Config) (*downloader.Downloader, error) {
+	path, err := r.ArchivePath(downloadDir)
+	if err != nil {
+		return nil, fmt.Errorf(tr("getting archive path: %s"), err)
+	}
+
+	if _, err := path.Stat(); os.IsNotExist(err) {
+		// normal download
+	} else if err == nil {
+		// check local file integrity
+		ok, err := r.TestLocalArchiveIntegrity(downloadDir)
+		if err != nil || !ok {
+			if err := path.Remove(); err != nil {
+				return nil, fmt.Errorf(tr("removing corrupted archive file: %s"), err)
+			}
+		} else {
+			// File is cached, nothing to do here
+			return nil, nil
+		}
+	} else {
+		return nil, fmt.Errorf(tr("getting archive file info: %s"), err)
+	}
+
+	return downloader.DownloadWithConfig(path.String(), r.URL, *config)
+}
 
 // GetDownloaderConfig returns the downloader configuration based on
 // current settings.
