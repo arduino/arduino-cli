@@ -128,7 +128,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	// At the current time we do not have a way of knowing if a board supports the secure boot or not,
 	// so, if the flags to override the default keys are used, we try override the corresponding platform property nonetheless.
 	// It's not possible to use the default name for the keys since there could be more tools to sign and encrypt.
-	// So it's mandatory to use all the tree flags to sign and encrypt the binary
+	// So it's mandatory to use all three flags to sign and encrypt the binary
 	securityKeysOverride := []string{}
 	if req.KeysKeychain != "" && req.SignKey != "" && req.EncryptKey != "" {
 		keysDirPath := paths.New(req.KeysKeychain)
