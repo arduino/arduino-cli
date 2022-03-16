@@ -131,18 +131,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	// So it's mandatory to use all three flags to sign and encrypt the binary
 	securityKeysOverride := []string{}
 	if req.KeysKeychain != "" && req.SignKey != "" && req.EncryptKey != "" {
-		keysDirPath := paths.New(req.KeysKeychain)
-		if !keysDirPath.IsDir() {
-			return nil, &arduino.NotFoundError{Message: tr("The path specified is not a directory: %s", keysDirPath), Cause: err}
-		}
-		signKeyPath := keysDirPath.Join(req.GetSignKey())
-		if !signKeyPath.Exist() {
-			return nil, &arduino.NotFoundError{Message: tr("The path of the specified signing key does not exist: %s", signKeyPath), Cause: err}
-		}
-		encryptKeyPath := keysDirPath.Join(req.GetEncryptKey())
-		if !encryptKeyPath.Exist() {
-			return nil, &arduino.NotFoundError{Message: tr("The path of the specified encryption key does not exist: %s", encryptKeyPath), Cause: err}
-		}
 		securityKeysOverride = append(securityKeysOverride, "build.keys.keychain="+req.KeysKeychain, "build.keys.sign_key="+req.GetSignKey(), "build.keys.encrypt_key="+req.EncryptKey)
 	}
 
