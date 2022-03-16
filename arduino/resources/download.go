@@ -56,8 +56,11 @@ func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.
 	} else {
 		return fmt.Errorf(tr("getting archive file info: %s"), err)
 	}
+	return DownloadFile(path, r.URL, label, downloadCB, config)
+}
 
-	d, err := downloader.DownloadWithConfig(path.String(), r.URL, *config)
+func DownloadFile(path *paths.Path, URL string, label string, downloadCB DownloadProgressCB, config *downloader.Config, options ...downloader.DownloadOptions) error {
+	d, err := downloader.DownloadWithConfig(path.String(), URL, *config, options...)
 	if err != nil {
 		return err
 	}

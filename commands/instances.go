@@ -387,21 +387,15 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 
 	// Download gzipped library_index
 	tmpIndexGz := tmp.Join("library_index.json.gz")
-	if d, err := downloader.DownloadWithConfig(tmpIndexGz.String(), librariesmanager.LibraryIndexGZURL.String(), *config, downloader.NoResume); err == nil {
-		if err := resources.Download(d, tr("Updating index: library_index.json.gz"), downloadCB.FromRPC()); err != nil {
-			return &arduino.FailedDownloadError{Message: tr("Error downloading library_index.json.gz"), Cause: err}
-		}
-	} else {
+	tmpIndexURL := librariesmanager.LibraryIndexGZURL.String()
+	if err := resources.DownloadFile(tmpIndexGz, tmpIndexURL, tr("Updating index: library_index.json.gz"), downloadCB.FromRPC(), config, downloader.NoResume); err != nil {
 		return &arduino.FailedDownloadError{Message: tr("Error downloading library_index.json.gz"), Cause: err}
 	}
 
 	// Download signature
 	tmpSignature := tmp.Join("library_index.json.sig")
-	if d, err := downloader.DownloadWithConfig(tmpSignature.String(), librariesmanager.LibraryIndexSignature.String(), *config, downloader.NoResume); err == nil {
-		if err := resources.Download(d, tr("Updating index: library_index.json.sig"), downloadCB.FromRPC()); err != nil {
-			return &arduino.FailedDownloadError{Message: tr("Error downloading library_index.json.sig"), Cause: err}
-		}
-	} else {
+	tmpSignatureURL := librariesmanager.LibraryIndexSignature.String()
+	if err := resources.DownloadFile(tmpSignature, tmpSignatureURL, tr("Updating index: library_index.json.sig"), downloadCB.FromRPC(), config, downloader.NoResume); err != nil {
 		return &arduino.FailedDownloadError{Message: tr("Error downloading library_index.json.sig"), Cause: err}
 	}
 
@@ -482,13 +476,9 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 		if err != nil {
 			return nil, &arduino.FailedDownloadError{Message: tr("Error downloading index '%s'", URL), Cause: err}
 		}
-		d, err := downloader.DownloadWithConfig(tmp.String(), URL.String(), *config)
-		if err != nil {
-			return nil, &arduino.FailedDownloadError{Message: tr("Error downloading index '%s'", URL), Cause: err}
-		}
+
 		coreIndexPath := indexpath.Join(path.Base(URL.Path))
-		err = resources.Download(d, tr("Updating index: %s", coreIndexPath.Base()), downloadCB.FromRPC())
-		if err != nil {
+		if err := resources.DownloadFile(tmp, URL.String(), tr("Updating index: %s", coreIndexPath.Base()), downloadCB.FromRPC(), config, downloader.NoResume); err != nil {
 			return nil, &arduino.FailedDownloadError{Message: tr("Error downloading index '%s'", URL), Cause: err}
 		}
 
@@ -511,14 +501,8 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 			}
 			defer tmpSig.Remove()
 
-			d, err := downloader.DownloadWithConfig(tmpSig.String(), URLSig.String(), *config)
-			if err != nil {
-				return nil, &arduino.FailedDownloadError{Message: tr("Error downloading index signature '%s'", URLSig), Cause: err}
-			}
-
 			coreIndexSigPath = indexpath.Join(path.Base(URLSig.Path))
-			resources.Download(d, tr("Updating index: %s", coreIndexSigPath.Base()), downloadCB.FromRPC())
-			if d.Error() != nil {
+			if err := resources.DownloadFile(tmpSig, URLSig.String(), tr("Updating index: %s", coreIndexSigPath.Base()), downloadCB.FromRPC(), config, downloader.NoResume); err != nil {
 				return nil, &arduino.FailedDownloadError{Message: tr("Error downloading index signature '%s'", URLSig), Cause: err}
 			}
 
