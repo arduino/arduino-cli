@@ -127,15 +127,15 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 
 	buildProperties.Merge(ctx.PackageManager.CustomGlobalProperties)
 
-	// we check if the properties referring to secure boot have been set correctly.
-	if buildProperties.ContainsKey("build.keys.type") {
-		if buildProperties.Get("build.keys.type") == "public_keys" {
-			if !buildProperties.ContainsKey("build.keys.keychain") || !buildProperties.ContainsKey("build.keys.sign_key") || !buildProperties.ContainsKey("build.keys.encrypt_key") {
-				return errors.Errorf("%s core does not specify correctly default sign and encryption keys", ctx.BuildCore)
-			}
-		} else {
-			return errors.New("\"build.keys.type\" key only supports \"public_keys\" value for now")
-		}
+	if !buildProperties.ContainsKey("build.keys.type") {
+		buildProperties.Set("build.keys.type", "public_keys") // The default is "pubblic_keys" for now
+	}
+	keychainProp := buildProperties.ContainsKey("build.keys.keychain")
+	signProp := buildProperties.ContainsKey("build.keys.sign_key")
+	encryptProp := buildProperties.ContainsKey("build.keys.encrypt_key")
+	// we verify that all the properties for the secure boot keys are defined or nono of them is defined.
+	if !(keychainProp || signProp || encryptProp) && (keychainProp && signProp && encryptProp) {
+		return errors.Errorf("%s core does not specify correctly default sign and encryption keys", ctx.BuildCore)
 	}
 
 	ctx.BuildProperties = buildProperties
