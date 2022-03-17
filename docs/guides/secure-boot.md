@@ -54,3 +54,13 @@ The security keys can be added with:
 - `build.keys.sign_key` indicates the name of the custom signing key to use to sign a binary during the compile process.
 - `build.keys.encrypt_key` indicates the name of the custom encryption key to use to encrypt a binary during the compile
   process.
+
+It's suggested to use the property names mentioned before, because they can be overridden respectively with
+`--keys-keychain`, `--sign-key` and ``--encrypt-key` Arduino CLI [compile flags](../commands/arduino-cli_compile.md).
+
+For example, by using the following command, the sketch is compiled and the resulting binary is signed and encrypted
+with the specified keys located in `/home/user/Arduino/keys` directory:
+
+```
+arduino-cli compile -b arduino:mbed_portenta:envie_m7:security=sien --keys-keychain /home/user/Arduino/keys --sign-key ecsdsa-p256-signing-key.pem --encrypt-key ecsdsa-p256-encrypt-key.pem /home/user/Arduino/MySketch
+```
