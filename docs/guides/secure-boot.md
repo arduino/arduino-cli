@@ -1,6 +1,7 @@
 ### Secure Boot
 
-A "secure boot" capability may be offered by Arduino boards platforms.
+A ["secure boot"](https://www.keyfactor.com/blog/what-is-secure-boot-its-where-iot-security-starts/) capability may be
+offered by Arduino boards platforms.
 
 The compiled sketch is signed and encrypted by a [tool](../platform-specification.md#tools) before being flashed to the
 target board. The bootloader of the board is then responsible for starting the compiled sketch only if the matching keys
