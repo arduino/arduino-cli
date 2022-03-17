@@ -155,8 +155,8 @@ the name of the architecture is set as well.
 
 There are some other **{build.xxx}** properties available, that are explained in the boards.txt section of this guide.
 
-Some of them allows to specify trusted security credentials (sign and encryption keys) that can be used for the secure
-boot:
+Some of them allow specifying trusted security credentials (signing and encryption keys) that can be used by a
+["secure boot" system](guides/secure-boot.md):
 
 - `build.keys.keychain`: for the directory containing the keys
 - `build.keys.sign_key`: for the signing key
