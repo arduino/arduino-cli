@@ -3,7 +3,7 @@ menu.security=Security setting
 uno.menu.security.none=None
 uno.menu.security.sien=Signature + Encryption
 
-uno.menu.security.sien.build.postbuild.cmd="{tools.imgtool.cmd}" {tools.imgtool.build.pattern}
+uno.menu.security.sien.build.postbuild.cmd="{tools.imgtool.cmd}" {tools.imgtool.flags}
 uno.menu.security.none.build.postbuild.cmd="{tools.imgtool.cmd}" exit
 
 uno.menu.security.sien.build.keys.keychain={runtime.hardware.path}/Default_Keys

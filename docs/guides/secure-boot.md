@@ -23,12 +23,12 @@ recipe.hooks.objcopy.postobjcopy.1.pattern={build.postbuild.cmd}
 # IMGTOOL
 #
 tools.imgtool.cmd=imgtool
-tools.imgtool.build.pattern=sign --key "{build.keys.keychain}/{build.keys.sign_key}" --encrypt "{build.keys.keychain}/{build.keys.encrypt_key}" "{build.path}/{build.project_name}.bin" "{build.path}/{build.project_name}.bin" --align {build.alignment} --max-align {build.alignment} --version {build.version} --header-size {build.header_size} --pad-header --slot-size {build.slot_size}
+tools.imgtool.flags=sign --key "{build.keys.keychain}/{build.keys.sign_key}" --encrypt "{build.keys.keychain}/{build.keys.encrypt_key}" "{build.path}/{build.project_name}.bin" "{build.path}/{build.project_name}.bin" --align {build.alignment} --max-align {build.alignment} --version {build.version} --header-size {build.header_size} --pad-header --slot-size {build.slot_size}
 [...]
 
 ```
 
-By having only `tools.TOOL_NAME.cmd` and `tools.TOOL_NAME.build.pattern`, we can customize the behavior with a
+By having only `tools.TOOL_NAME.cmd` and `tools.TOOL_NAME.falgs`, we can customize the behavior with a
 [custom board option](../platform-specification.md#custom-board-options). Then in the
 [`boards.txt`](../platform-specification.md#boardstxt) we can define the new option to use a different `postbuild.cmd`:
 
@@ -39,7 +39,7 @@ menu.security=Security setting
 envie_m7.menu.security.none=None
 envie_m7.menu.security.sien=Signature + Encryption
 
-envie_m7.menu.security.sien.build.postbuild.cmd="{tools.imgtool.cmd}" {tools.imgtool.build.pattern}
+envie_m7.menu.security.sien.build.postbuild.cmd="{tools.imgtool.cmd}" {tools.imgtool.flags}
 envie_m7.menu.security.none.build.postbuild.cmd="{tools.imgtool.cmd}" exit
 
 envie_m7.menu.security.sien.build.keys.keychain={runtime.hardware.path}/Default_Keys
