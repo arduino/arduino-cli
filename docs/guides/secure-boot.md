@@ -1,4 +1,4 @@
-### Secure Boot
+# Secure Boot
 
 A ["secure boot"](https://www.keyfactor.com/blog/what-is-secure-boot-its-where-iot-security-starts/) capability may be
 offered by Arduino boards platforms.
@@ -28,9 +28,10 @@ tools.imgtool.flags=sign --key "{build.keys.keychain}/{build.keys.sign_key}" --e
 
 ```
 
-By having only `tools.TOOL_NAME.cmd` and `tools.TOOL_NAME.falgs`, we can customize the behavior with a
+By having only `tools.TOOL_NAME.cmd` and `tools.TOOL_NAME.flags`, we can customize the behavior with a
 [custom board option](../platform-specification.md#custom-board-options). Then in the
-[`boards.txt`](../platform-specification.md#boardstxt) we can define the new option to use a different `postbuild.cmd`:
+[`boards.txt`](../platform-specification.md#boardstxt) we can define the new option to use a different
+`build.postbuild.cmd`:
 
 ```
 [...]
@@ -56,7 +57,7 @@ The security keys can be added with:
   process.
 
 It's suggested to use the property names mentioned before, because they can be overridden respectively with
-`--keys-keychain`, `--sign-key` and ``--encrypt-key` Arduino CLI [compile flags](../commands/arduino-cli_compile.md).
+`--keys-keychain`, `--sign-key` and `--encrypt-key` Arduino CLI [compile flags](../commands/arduino-cli_compile.md).
 
 For example, by using the following command, the sketch is compiled and the resulting binary is signed and encrypted
 with the specified keys located in `/home/user/Arduino/keys` directory:
