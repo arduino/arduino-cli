@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/httpclient"
+	"github.com/arduino/arduino-cli/arduino/httpclient"
 	paths "github.com/arduino/go-paths-helper"
 	"go.bug.st/downloader/v2"
 )

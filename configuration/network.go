@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package httpclient
+package configuration
 
 import (
 	"fmt"
@@ -21,39 +21,12 @@ import (
 	"runtime"
 
 	"github.com/arduino/arduino-cli/cli/globals"
-	"github.com/arduino/arduino-cli/configuration"
+	"github.com/spf13/viper"
 )
 
-// Config is the configuration of the http client
-type Config struct {
-	UserAgent string
-	Proxy     *url.URL
-}
-
-// DefaultConfig returns the default http client config
-func DefaultConfig() (*Config, error) {
-	var proxy *url.URL
-	var err error
-	if configuration.Settings.IsSet("network.proxy") {
-		proxyConfig := configuration.Settings.GetString("network.proxy")
-		if proxyConfig == "" {
-			// empty configuration
-			// this workaround must be here until viper can UnSet properties:
-			// https://github.com/spf13/viper/pull/519
-		} else if proxy, err = url.Parse(proxyConfig); err != nil {
-			return nil, fmt.Errorf(tr("Invalid network.proxy '%[1]s': %[2]s"), proxyConfig, err)
-		}
-	}
-
-	return &Config{
-		UserAgent: UserAgent(),
-		Proxy:     proxy,
-	}, nil
-}
-
-// UserAgent returns the user agent for the cli http client
-func UserAgent() string {
-	subComponent := configuration.Settings.GetString("network.user_agent_ext")
+// UserAgent returns the user agent for the cli (mainly used by http clients)
+func UserAgent(settings *viper.Viper) string {
+	subComponent := settings.GetString("network.user_agent_ext")
 	if subComponent != "" {
 		subComponent = " " + subComponent
 	}
@@ -64,4 +37,21 @@ func UserAgent() string {
 		subComponent,
 		runtime.GOARCH, runtime.GOOS, runtime.Version(),
 		globals.VersionInfo.Commit)
+}
+
+// NetworkProxy returns the proxy configuration (mainly used by http clients)
+func NetworkProxy(settings *viper.Viper) (*url.URL, error) {
+	if !settings.IsSet("network.proxy") {
+		return nil, nil
+	}
+	if proxyConfig := settings.GetString("network.proxy"); proxyConfig == "" {
+		// empty configuration
+		// this workaround must be here until viper can UnSet properties:
+		// https://github.com/spf13/viper/pull/519
+		return nil, nil
+	} else if proxy, err := url.Parse(proxyConfig); err != nil {
+		return nil, fmt.Errorf(tr("Invalid network.proxy '%[1]s': %[2]s"), proxyConfig, err)
+	} else {
+		return proxy, nil
+	}
 }
