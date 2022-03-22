@@ -698,21 +698,22 @@ func (e *TempDirCreationFailedError) ToRPCStatus() *status.Status {
 	return status.New(codes.Unavailable, e.Error())
 }
 
-// TempFileCreationFailedError is returned if a temp file could not be created
-type TempFileCreationFailedError struct {
-	Cause error
+// FileCreationFailedError is returned if a temp file could not be created
+type FileCreationFailedError struct {
+	Message string
+	Cause   error
 }
 
-func (e *TempFileCreationFailedError) Error() string {
-	return composeErrorMsg(tr("Cannot create temp file"), e.Cause)
+func (e *FileCreationFailedError) Error() string {
+	return composeErrorMsg(e.Message, e.Cause)
 }
 
-func (e *TempFileCreationFailedError) Unwrap() error {
+func (e *FileCreationFailedError) Unwrap() error {
 	return e.Cause
 }
 
 // ToRPCStatus converts the error into a *status.Status
-func (e *TempFileCreationFailedError) ToRPCStatus() *status.Status {
+func (e *FileCreationFailedError) ToRPCStatus() *status.Status {
 	return status.New(codes.Unavailable, e.Error())
 }
 

@@ -469,9 +469,9 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 
 		var tmp *paths.Path
 		if tmpFile, err := ioutil.TempFile("", ""); err != nil {
-			return nil, &arduino.TempFileCreationFailedError{Cause: err}
+			return nil, &arduino.FileCreationFailedError{Message: tr("Cannot create temp file"), Cause: err}
 		} else if err := tmpFile.Close(); err != nil {
-			return nil, &arduino.TempFileCreationFailedError{Cause: err}
+			return nil, &arduino.FileCreationFailedError{Message: tr("Cannot create temp file"), Cause: err}
 		} else {
 			tmp = paths.New(tmpFile.Name())
 		}
@@ -502,9 +502,9 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 			URLSig.Path += ".sig"
 
 			if t, err := ioutil.TempFile("", ""); err != nil {
-				return nil, &arduino.TempFileCreationFailedError{Cause: err}
+				return nil, &arduino.FileCreationFailedError{Message: tr("Cannot create temp file"), Cause: err}
 			} else if err := t.Close(); err != nil {
-				return nil, &arduino.TempFileCreationFailedError{Cause: err}
+				return nil, &arduino.FileCreationFailedError{Message: tr("Cannot create temp file"), Cause: err}
 			} else {
 				tmpSig = paths.New(t.Name())
 			}
