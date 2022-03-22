@@ -61,7 +61,7 @@ func runGenerateCommand(command *cobra.Command, args []string) {
 
 	logrus.Info("Executing `arduino-cli keys generate`")
 
-	_, err := keys.Generate(context.Background(), &rpc.KeysGenerateRequest{
+	resp, err := keys.Generate(context.Background(), &rpc.KeysGenerateRequest{
 		AlgorithmType: algorithmType,
 		KeyName:       keyName,
 		KeysKeychain:  keysKeychain,
@@ -70,6 +70,19 @@ func runGenerateCommand(command *cobra.Command, args []string) {
 		feedback.Errorf(tr("Error during Generate: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
+	feedback.PrintResult(result{resp})
+}
 
-	feedback.Print(tr("Keys created in: %s", keysKeychain))
+// output from this command requires special formatting, let's create a dedicated
+// feedback.Result implementation
+type result struct {
+	Keychain *rpc.KeysGenerateResponse `json:"keys_keychain"`
+}
+
+func (dr result) Data() interface{} {
+	return dr.Keychain
+}
+
+func (dr result) String() string {
+	return (tr("Keys created in: %s", dr.Keychain.KeysKeychain))
 }
