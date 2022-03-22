@@ -34,6 +34,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/generatedocs"
 	"github.com/arduino/arduino-cli/cli/globals"
+	"github.com/arduino/arduino-cli/cli/keys"
 	"github.com/arduino/arduino-cli/cli/lib"
 	"github.com/arduino/arduino-cli/cli/monitor"
 	"github.com/arduino/arduino-cli/cli/outdated"
@@ -93,6 +94,7 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(core.NewCommand())
 	cmd.AddCommand(daemon.NewCommand())
 	cmd.AddCommand(generatedocs.NewCommand())
+	cmd.AddCommand(keys.NewCommand())
 	cmd.AddCommand(lib.NewCommand())
 	cmd.AddCommand(monitor.NewCommand())
 	cmd.AddCommand(outdated.NewCommand())
