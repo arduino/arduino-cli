@@ -60,6 +60,14 @@ func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.
 }
 
 func DownloadFile(path *paths.Path, URL string, label string, downloadCB DownloadProgressCB, config *downloader.Config, options ...downloader.DownloadOptions) error {
+	if config == nil {
+		if c, err := GetDownloaderConfig(); err != nil {
+			return err
+		} else {
+			config = c
+		}
+	}
+
 	d, err := downloader.DownloadWithConfig(path.String(), URL, *config, options...)
 	if err != nil {
 		return err
@@ -86,8 +94,7 @@ func DownloadFile(path *paths.Path, URL string, label string, downloadCB Downloa
 	return nil
 }
 
-// GetDownloaderConfig returns the downloader configuration based on
-// current settings.
+// GetDownloaderConfig returns the downloader configuration based on current settings.
 func GetDownloaderConfig() (*downloader.Config, error) {
 	httpClient, err := httpclient.New()
 	if err != nil {
