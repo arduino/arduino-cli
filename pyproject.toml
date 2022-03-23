@@ -19,6 +19,7 @@ filelock = "^3.0.12"
 pytest-xdist = "^2.1.0"
 pytest_httpserver = "^0.3.5"
 GitPython = "^3.1.12"
+ecdsa = "^0.17.0"
 
 [tool.poetry.dev-dependencies]
 mkdocs = "^1.2.1"
