@@ -44,7 +44,7 @@ func CheckFlagsMandatory(command *cobra.Command, flagNames ...string) {
 		if command.Flag(flagName).Changed {
 			continue
 		} else {
-			feedback.Errorf(tr("Please use also %s flag when using %s flags at the same time.", "--"+flagName, "--"+strings.Join(flagNames, " "+tr("and")+" --")))
+			feedback.Errorf(tr("Flag %[1]s is mandatory when used in conjunction with flag %[2]s.", "--"+flagName, "--"+strings.Join(flagNames, " "+tr("and")+" --")))
 			os.Exit(errorcodes.ErrBadArgument)
 		}
 	}

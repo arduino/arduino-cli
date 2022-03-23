@@ -471,7 +471,7 @@ def test_compile_with_fake_secure_boot_core(run_command, data_dir):
         ]
     )
     assert res.failed
-    assert "Please use also --sign-key flag when using --keys-keychain" in res.stderr
+    assert "Flag --sign-key is mandatory when used in conjunction with flag --keys-keychain" in res.stderr
 
     # Verifies compilation works with secure boot enabled and when overriding the sign key and encryption key used
     keys_dir = Path(data_dir, "keys_dir")
