@@ -155,12 +155,16 @@ the name of the architecture is set as well.
 
 There are some other **{build.xxx}** properties available, that are explained in the boards.txt section of this guide.
 
+#### Security credential properties
+
 Some of them allow specifying trusted security credentials (signing and encryption keys) that can be used by a
 ["secure boot" system](guides/secure-boot.md):
 
 - `build.keys.keychain`: for the directory containing the keys
 - `build.keys.sign_key`: for the signing key
 - `build.keys.encrypt_key`: for the encryption key
+
+If any of these properties are defined, the others are required.
 
 These properties can be overwritten respectively with `--keys-keychain`, `--sign-key`, `--encrypt-key`
 [compile](commands/arduino-cli_compile.md) flags in the Arduino CLI.
