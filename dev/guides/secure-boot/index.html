@@ -11,14 +11,14 @@
       
       
       
-        <link rel="canonical" href="https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_compile/">
+        <link rel="canonical" href="https://arduino.github.io/arduino-cli/dev/guides/secure-boot/">
       
       <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.6">
     
     
       
-        <title>compile - Arduino CLI</title>
+        <title>Secure Boot - Arduino CLI</title>
       
     
     
@@ -69,7 +69,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#arduino-cli-compile" class="md-skip">
+        <a href="#secure-boot" class="md-skip">
           Skip to content
         </a>
       
@@ -100,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              compile
+              Secure Boot
             
           </span>
         </div>
@@ -315,14 +315,12 @@
 
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
       
       
       
@@ -345,7 +343,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli/" class="md-nav__link">
+      <a href="../../commands/arduino-cli/" class="md-nav__link">
         arduino-cli
       </a>
     </li>
@@ -359,7 +357,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_board/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_board/" class="md-nav__link">
         board
       </a>
     </li>
@@ -373,7 +371,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_board_attach/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_board_attach/" class="md-nav__link">
         board attach
       </a>
     </li>
@@ -387,7 +385,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_board_details/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_board_details/" class="md-nav__link">
         board details
       </a>
     </li>
@@ -401,7 +399,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_board_list/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_board_list/" class="md-nav__link">
         board list
       </a>
     </li>
@@ -415,7 +413,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_board_listall/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_board_listall/" class="md-nav__link">
         board listall
       </a>
     </li>
@@ -429,7 +427,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_board_search/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_board_search/" class="md-nav__link">
         board search
       </a>
     </li>
@@ -443,7 +441,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_burn-bootloader/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_burn-bootloader/" class="md-nav__link">
         burn-bootloader
       </a>
     </li>
@@ -457,7 +455,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_cache/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_cache/" class="md-nav__link">
         cache
       </a>
     </li>
@@ -471,7 +469,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_cache_clean/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_cache_clean/" class="md-nav__link">
         cache clean
       </a>
     </li>
@@ -483,90 +481,11 @@
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          compile
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../commands/arduino-cli_compile/" class="md-nav__link">
         compile
       </a>
-      
-        
-
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#arduino-cli-compile" class="md-nav__link">
-    arduino-cli compile
-  </a>
-  
-    <nav class="md-nav" aria-label="arduino-cli compile">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#synopsis" class="md-nav__link">
-    Synopsis
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#examples" class="md-nav__link">
-    Examples
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
-    Options
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#options-inherited-from-parent-commands" class="md-nav__link">
-    Options inherited from parent commands
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    SEE ALSO
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -578,7 +497,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_completion/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_completion/" class="md-nav__link">
         completion
       </a>
     </li>
@@ -592,7 +511,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_config/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_config/" class="md-nav__link">
         config
       </a>
     </li>
@@ -606,7 +525,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_config_dump/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_config_dump/" class="md-nav__link">
         config dump
       </a>
     </li>
@@ -620,7 +539,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_config_init/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_config_init/" class="md-nav__link">
         config init
       </a>
     </li>
@@ -634,7 +553,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_config_add/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_config_add/" class="md-nav__link">
         config add
       </a>
     </li>
@@ -648,7 +567,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_config_delete/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_config_delete/" class="md-nav__link">
         config delete
       </a>
     </li>
@@ -662,7 +581,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_config_remove/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_config_remove/" class="md-nav__link">
         config remove
       </a>
     </li>
@@ -676,7 +595,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_config_set/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_config_set/" class="md-nav__link">
         config set
       </a>
     </li>
@@ -690,7 +609,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_core/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_core/" class="md-nav__link">
         core
       </a>
     </li>
@@ -704,7 +623,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_core_download/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_core_download/" class="md-nav__link">
         core download
       </a>
     </li>
@@ -718,7 +637,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_core_install/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_core_install/" class="md-nav__link">
         core install
       </a>
     </li>
@@ -732,7 +651,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_core_list/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_core_list/" class="md-nav__link">
         core list
       </a>
     </li>
@@ -746,7 +665,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_core_search/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_core_search/" class="md-nav__link">
         core search
       </a>
     </li>
@@ -760,7 +679,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_core_uninstall/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_core_uninstall/" class="md-nav__link">
         core uninstall
       </a>
     </li>
@@ -774,7 +693,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_core_update-index/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_core_update-index/" class="md-nav__link">
         core update-index
       </a>
     </li>
@@ -788,7 +707,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_core_upgrade/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_core_upgrade/" class="md-nav__link">
         core upgrade
       </a>
     </li>
@@ -802,7 +721,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_daemon/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_daemon/" class="md-nav__link">
         daemon
       </a>
     </li>
@@ -816,7 +735,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_debug/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_debug/" class="md-nav__link">
         debug
       </a>
     </li>
@@ -830,7 +749,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_lib/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_lib/" class="md-nav__link">
         lib
       </a>
     </li>
@@ -844,7 +763,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_lib_deps/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_lib_deps/" class="md-nav__link">
         lib deps
       </a>
     </li>
@@ -858,7 +777,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_lib_download/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_lib_download/" class="md-nav__link">
         lib download
       </a>
     </li>
@@ -872,7 +791,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_lib_examples/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_lib_examples/" class="md-nav__link">
         lib examples
       </a>
     </li>
@@ -886,7 +805,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_lib_install/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_lib_install/" class="md-nav__link">
         lib install
       </a>
     </li>
@@ -900,7 +819,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_lib_list/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_lib_list/" class="md-nav__link">
         lib list
       </a>
     </li>
@@ -914,7 +833,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_lib_search/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_lib_search/" class="md-nav__link">
         lib search
       </a>
     </li>
@@ -928,7 +847,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_lib_uninstall/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_lib_uninstall/" class="md-nav__link">
         lib uninstall
       </a>
     </li>
@@ -942,7 +861,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_lib_update-index/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_lib_update-index/" class="md-nav__link">
         lib update-index
       </a>
     </li>
@@ -956,7 +875,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_lib_upgrade/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_lib_upgrade/" class="md-nav__link">
         lib upgrade
       </a>
     </li>
@@ -970,7 +889,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_monitor/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_monitor/" class="md-nav__link">
         monitor
       </a>
     </li>
@@ -984,7 +903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_outdated/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_outdated/" class="md-nav__link">
         outdated
       </a>
     </li>
@@ -998,7 +917,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_sketch/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_sketch/" class="md-nav__link">
         sketch
       </a>
     </li>
@@ -1012,7 +931,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_sketch_archive/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_sketch_archive/" class="md-nav__link">
         sketch archive
       </a>
     </li>
@@ -1026,7 +945,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_sketch_new/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_sketch_new/" class="md-nav__link">
         sketch new
       </a>
     </li>
@@ -1040,7 +959,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_update/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_update/" class="md-nav__link">
         update
       </a>
     </li>
@@ -1054,7 +973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_upgrade/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_upgrade/" class="md-nav__link">
         upgrade
       </a>
     </li>
@@ -1068,7 +987,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_upload/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_upload/" class="md-nav__link">
         upload
       </a>
     </li>
@@ -1082,7 +1001,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arduino-cli_version/" class="md-nav__link">
+      <a href="../../commands/arduino-cli_version/" class="md-nav__link">
         version
       </a>
     </li>
@@ -1339,62 +1258,8 @@
   
   
   
+    
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#arduino-cli-compile" class="md-nav__link">
-    arduino-cli compile
-  </a>
-  
-    <nav class="md-nav" aria-label="arduino-cli compile">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#synopsis" class="md-nav__link">
-    Synopsis
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#examples" class="md-nav__link">
-    Examples
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
-    Options
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#options-inherited-from-parent-commands" class="md-nav__link">
-    Options inherited from parent commands
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    SEE ALSO
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
   
 </nav>
                   </div>
@@ -1406,68 +1271,65 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/arduino/arduino-cli/blob/master/docs/commands/arduino-cli_compile.md" title="Edit this page" class="md-content__button md-icon">
+                  <a href="https://github.com/arduino/arduino-cli/blob/master/docs/guides/secure-boot.md" title="Edit this page" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
                 
-                  <h1>compile</h1>
-                
-                <h2 id="arduino-cli-compile">arduino-cli compile<a class="headerlink" href="#arduino-cli-compile" title="Permanent link">&para;</a></h2>
-<p>Compiles Arduino sketches.</p>
-<h3 id="synopsis">Synopsis<a class="headerlink" href="#synopsis" title="Permanent link">&para;</a></h3>
-<p>Compiles Arduino sketches.</p>
-<div class="highlight"><pre><span></span><code>arduino-cli compile [flags]
+                <h1 id="secure-boot">Secure Boot<a class="headerlink" href="#secure-boot" title="Permanent link">&para;</a></h1>
+<p>A <a href="https://www.keyfactor.com/blog/what-is-secure-boot-its-where-iot-security-starts/">"secure boot"</a> capability may be
+offered by Arduino boards platforms.</p>
+<p>The compiled sketch is signed and encrypted by a <a href="../../platform-specification/#tools">tool</a> before being flashed to the
+target board. The bootloader of the board is then responsible for starting the compiled sketch only if the matching keys
+are used.</p>
+<p>To be able to correctly carry out all the operations at the end of the build we can leverage the
+<a href="../../platform-specification/#pre-and-post-build-hooks-since-arduino-ide-165">post build hooks</a> to sign and encrypt a
+binary by using <code>recipe.hooks.objcopy.postobjcopy.NUMBER.pattern</code> key in
+<a href="../../platform-specification/#platformtxt"><code>platform.txt</code></a>. The security keys used are defined in the
+<a href="../../platform-specification/#boardstxt"><code>boards.txt</code></a> file, this way there could be different keys for different
+boards.</p>
+<div class="highlight"><pre><span></span><code>[...]
+## Create secure image (bin file)
+recipe.hooks.objcopy.postobjcopy.1.pattern={build.postbuild.cmd}
+
+#
+# IMGTOOL
+#
+tools.imgtool.cmd=imgtool
+tools.imgtool.flags=sign --key &quot;{build.keys.keychain}/{build.keys.sign_key}&quot; --encrypt &quot;{build.keys.keychain}/{build.keys.encrypt_key}&quot; &quot;{build.path}/{build.project_name}.bin&quot; &quot;{build.path}/{build.project_name}.bin&quot; --align {build.alignment} --max-align {build.alignment} --version {build.version} --header-size {build.header_size} --pad-header --slot-size {build.slot_size}
+[...]
 </code></pre></div>
-<h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>  arduino-cli compile -b arduino:avr:uno /home/user/Arduino/MySketch
-  arduino-cli compile -b arduino:avr:uno --build-property &quot;build.extra_flags=\&quot;-DMY_DEFINE=\&quot;hello world\&quot;\&quot;&quot; /home/user/Arduino/MySketch
-  arduino-cli compile -b arduino:avr:uno --build-property &quot;build.extra_flags=-DPIN=2 \&quot;-DMY_DEFINE=\&quot;hello world\&quot;\&quot;&quot; /home/user/Arduino/MySketch
-  arduino-cli compile -b arduino:avr:uno --build-property build.extra_flags=-DPIN=2 --build-property &quot;compiler.cpp.extra_flags=\&quot;-DSSID=\&quot;hello world\&quot;\&quot;&quot; /home/user/Arduino/MySketch
+<p>By having only <code>tools.TOOL_NAME.cmd</code> and <code>tools.TOOL_NAME.flags</code>, we can customize the behavior with a
+<a href="../../platform-specification/#custom-board-options">custom board option</a>. Then in the
+<a href="../../platform-specification/#boardstxt"><code>boards.txt</code></a> we can define the new option to use a different
+<code>build.postbuild.cmd</code>:</p>
+<div class="highlight"><pre><span></span><code>[...]
+menu.security=Security setting
+
+envie_m7.menu.security.none=None
+envie_m7.menu.security.sien=Signature + Encryption
+
+envie_m7.menu.security.sien.build.postbuild.cmd=&quot;{tools.imgtool.cmd}&quot; {tools.imgtool.flags}
+envie_m7.menu.security.none.build.postbuild.cmd=&quot;{tools.imgtool.cmd}&quot; exit
+
+envie_m7.menu.security.sien.build.keys.keychain={runtime.hardware.path}/Default_Keys
+envie_m7.menu.security.sien.build.keys.sign_key=default-signing-key.pem
+envie_m7.menu.security.sien.build.keys.encrypt_key=default-encrypt-key.pem
+[...]
 </code></pre></div>
-<h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>      --board-options strings        List of board options separated by commas. Or can be used multiple times for multiple options.
-      --build-cache-path string      Builds of &#39;core.a&#39; are saved into this path to be cached and reused.
-      --build-path string            Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS.
-      --build-property stringArray   Override a build property with a custom value. Can be used multiple times for multiple properties.
-      --clean                        Optional, cleanup the build folder and do not use any cached build.
-      --discovery-timeout duration   Max time to wait for port discovery, e.g.: 30s, 1m (default 5s)
-      --encrypt-key string           The name of the custom encryption key to use to encrypt a binary during the compile process. Used only by the platforms that support it.
-  -e, --export-binaries              If set built binaries will be exported to the sketch folder.
-  -b, --fqbn string                  Fully Qualified Board Name, e.g.: arduino:avr:uno
-  -h, --help                         help for compile
-      --keys-keychain string         The path of the dir to search for the custom keys to sign and encrypt a binary. Used only by the platforms that support it.
-      --libraries strings            List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries dir paths.
-      --library strings              List of paths to libraries root folders. Libraries set this way have top priority in case of conflicts. Can be used multiple times for different libraries.
-      --only-compilation-database    Just produce the compilation database, without actually compiling. All build commands are skipped except pre* hooks.
-      --optimize-for-debug           Optional, optimize compile output for debugging, rather than for release.
-      --output-dir string            Save build artifacts in this directory.
-  -p, --port string                  Upload port address, e.g.: COM3 or /dev/ttyACM2
-      --preprocess                   Print preprocessed code to stdout instead of compiling.
-  -P, --programmer string            Programmer to use, e.g: atmel_ice
-  -l, --protocol string              Upload port protocol, e.g: serial
-      --quiet                        Optional, suppresses almost every output.
-      --show-properties              Show all build properties used instead of compiling.
-      --sign-key string              The name of the custom signing key to use to sign a binary during the compile process. Used only by the platforms that support it.
-  -u, --upload                       Upload the binary after the compilation.
-  -t, --verify                       Verify uploaded binary after the upload.
-      --vid-pid string               When specified, VID/PID specific build properties are used, if board supports them.
-      --warnings string              Optional, can be: none, default, more, all. Used to tell gcc which warning level to use (-W flag). (default &quot;none&quot;)
-</code></pre></div>
-<h3 id="options-inherited-from-parent-commands">Options inherited from parent commands<a class="headerlink" href="#options-inherited-from-parent-commands" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>      --additional-urls strings   Comma-separated list of additional URLs for the Boards Manager.
-      --config-file string        The custom config file (if not specified the default will be used).
-      --format string             The output format for the logs, can be: text, json, jsonmini, yaml (default &quot;text&quot;)
-      --log-file string           Path to the file where logs will be written.
-      --log-format string         The output format for the logs, can be: text, json
-      --log-level string          Messages with this level and above will be logged. Valid levels are: trace, debug, info, warn, error, fatal, panic
-      --no-color                  Disable colored output.
-  -v, --verbose                   Print the logs on the standard output.
-</code></pre></div>
-<h3 id="see-also">SEE ALSO<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h3>
+<p>The security keys can be added with:</p>
 <ul>
-<li><a href="../arduino-cli/">arduino-cli</a> - Arduino CLI.</li>
+<li><code>build.keys.keychain</code> indicates the path of the dir where to search for the custom keys to sign and encrypt a binary.</li>
+<li><code>build.keys.sign_key</code> indicates the name of the custom signing key to use to sign a binary during the compile process.</li>
+<li><code>build.keys.encrypt_key</code> indicates the name of the custom encryption key to use to encrypt a binary during the compile
+  process.</li>
 </ul>
+<p>It's suggested to use the property names mentioned before, because they can be overridden respectively with
+<code>--keys-keychain</code>, <code>--sign-key</code> and <code>--encrypt-key</code> Arduino CLI <a href="../../commands/arduino-cli_compile/">compile flags</a>.</p>
+<p>For example, by using the following command, the sketch is compiled and the resulting binary is signed and encrypted
+with the specified keys located in <code>/home/user/Arduino/keys</code> directory:</p>
+<div class="highlight"><pre><span></span><code>arduino-cli compile -b arduino:mbed_portenta:envie_m7:security=sien --keys-keychain /home/user/Arduino/keys --sign-key ecsdsa-p256-signing-key.pem --encrypt-key ecsdsa-p256-encrypt-key.pem /home/user/Arduino/MySketch
+</code></pre></div>
                 
               
               
@@ -1483,41 +1345,6 @@
       
         
 <footer class="md-footer">
-  
-    <nav class="md-footer__inner md-grid" aria-label="Footer">
-      
-        
-        <a href="../arduino-cli_cache_clean/" class="md-footer__link md-footer__link--prev" aria-label="Previous: cache clean" rel="prev">
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-          </div>
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              cache clean
-            </div>
-          </div>
-        </a>
-      
-      
-        
-        <a href="../arduino-cli_completion/" class="md-footer__link md-footer__link--next" aria-label="Next: completion" rel="next">
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              completion
-            </div>
-          </div>
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
-          </div>
-        </a>
-      
-    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">

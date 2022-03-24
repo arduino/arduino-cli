@@ -1289,6 +1289,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#security-credential-properties" class="md-nav__link">
+    Security credential properties
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#recipes-to-compile-source-code" class="md-nav__link">
     Recipes to compile source code
   </a>
@@ -1805,6 +1812,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#security-credential-properties" class="md-nav__link">
+    Security credential properties
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#recipes-to-compile-source-code" class="md-nav__link">
     Recipes to compile source code
   </a>
@@ -2313,6 +2327,17 @@ the name of the architecture is set as well.</p>
 <li><code>{build.arch}</code>: The MCU architecture (avr, sam, etc...)</li>
 </ul>
 <p>There are some other <strong>{build.xxx}</strong> properties available, that are explained in the boards.txt section of this guide.</p>
+<h4 id="security-credential-properties">Security credential properties<a class="headerlink" href="#security-credential-properties" title="Permanent link">&para;</a></h4>
+<p>Some of them allow specifying trusted security credentials (signing and encryption keys) that can be used by a
+<a href="../guides/secure-boot/">"secure boot" system</a>:</p>
+<ul>
+<li><code>build.keys.keychain</code>: for the directory containing the keys</li>
+<li><code>build.keys.sign_key</code>: for the signing key</li>
+<li><code>build.keys.encrypt_key</code>: for the encryption key</li>
+</ul>
+<p>If any of these properties are defined, the others are required.</p>
+<p>These properties can be overwritten respectively with <code>--keys-keychain</code>, <code>--sign-key</code>, <code>--encrypt-key</code>
+<a href="../commands/arduino-cli_compile/">compile</a> flags in the Arduino CLI.</p>
 <h4 id="recipes-to-compile-source-code">Recipes to compile source code<a class="headerlink" href="#recipes-to-compile-source-code" title="Permanent link">&para;</a></h4>
 <p>We said that the Arduino development software determines a list of files to compile. Each file can be source code
 written in C (.c files), C++ (.cpp files) or Assembly (.S files). Every language is compiled using its respective
@@ -3153,7 +3178,7 @@ IDE's <strong>Sketch &gt; Optimize for Debugging</strong> setting or <a href="..
 <p>It can sometimes be useful to provide user selectable configuration options for a specific board. For example, a board
 could be provided in two or more variants with different microcontrollers, or may have different crystal speed based on
 the board model, and so on...</p>
-<p>When using Arduino CLI, the option can be selected via the FQBN.</p>
+<p>When using Arduino CLI, the option can be selected via the FQBN, or using the <code>--board-options</code> flag</p>
 <p>In the Arduino IDE the options add extra menu items under the "Tools" menu.</p>
 <p>In Arduino Web Editor, the options are displayed in the "Flavours" menu.</p>
 <p>Let's see an example of how a custom option is implemented. The board used in the example is the Arduino Duemilanove.
