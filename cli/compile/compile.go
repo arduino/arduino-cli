@@ -53,6 +53,9 @@ var (
 	buildCachePath          string               // Builds of 'core.a' are saved into this path to be cached and reused.
 	buildPath               string               // Path where to save compiled files.
 	buildProperties         []string             // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
+	keysKeychain            string               // The path of the dir where to search for the custom keys to sign and encrypt a binary. Used only by the platforms that supports it
+	signKey                 string               // The name of the custom signing key to use to sign a binary during the compile process. Used only by the platforms that supports it
+	encryptKey              string               // The name of the custom encryption key to use to encrypt a binary during the compile process. Used only by the platforms that supports it
 	warnings                string               // Used to tell gcc which warning level to use.
 	verbose                 bool                 // Turns on verbose mode.
 	quiet                   bool                 // Suppresses almost every output.
@@ -100,6 +103,12 @@ func NewCommand() *cobra.Command {
 		tr("List of custom build properties separated by commas. Or can be used multiple times for multiple properties."))
 	compileCommand.Flags().StringArrayVar(&buildProperties, "build-property", []string{},
 		tr("Override a build property with a custom value. Can be used multiple times for multiple properties."))
+	compileCommand.Flags().StringVar(&keysKeychain, "keys-keychain", "",
+		tr("The path of the dir to search for the custom keys to sign and encrypt a binary. Used only by the platforms that support it."))
+	compileCommand.Flags().StringVar(&signKey, "sign-key", "",
+		tr("The name of the custom signing key to use to sign a binary during the compile process. Used only by the platforms that support it."))
+	compileCommand.Flags().StringVar(&encryptKey, "encrypt-key", "",
+		tr("The name of the custom encryption key to use to encrypt a binary during the compile process. Used only by the platforms that support it."))
 	compileCommand.Flags().StringVar(&warnings, "warnings", "none",
 		tr(`Optional, can be: %s. Used to tell gcc which warning level to use (-W flag).`, "none, default, more, all"))
 	compileCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Optional, turns on verbose mode."))
@@ -141,6 +150,10 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	}
 
 	sketchPath := arguments.InitSketchPath(path)
+
+	if keysKeychain != "" || signKey != "" || encryptKey != "" {
+		arguments.CheckFlagsMandatory(cmd, "keys-keychain", "sign-key", "encrypt-key")
+	}
 
 	var overrides map[string]string
 	if sourceOverrides != "" {
@@ -198,6 +211,9 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		CreateCompilationDatabaseOnly: compilationDatabaseOnly,
 		SourceOverride:                overrides,
 		Library:                       library,
+		KeysKeychain:                  keysKeychain,
+		SignKey:                       signKey,
+		EncryptKey:                    encryptKey,
 	}
 	compileStdOut := new(bytes.Buffer)
 	compileStdErr := new(bytes.Buffer)

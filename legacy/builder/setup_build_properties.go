@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	properties "github.com/arduino/go-properties-orderedmap"
 	timeutils "github.com/arduino/go-timeutils"
+	"github.com/pkg/errors"
 )
 
 type SetupBuildProperties struct{}
@@ -125,6 +126,14 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	buildProperties.Set("extra.time.dst", strconv.Itoa(timeutils.DaylightSavingsOffset(now)))
 
 	buildProperties.Merge(ctx.PackageManager.CustomGlobalProperties)
+
+	keychainProp := buildProperties.ContainsKey("build.keys.keychain")
+	signProp := buildProperties.ContainsKey("build.keys.sign_key")
+	encryptProp := buildProperties.ContainsKey("build.keys.encrypt_key")
+	// we verify that all the properties for the secure boot keys are defined or none of them is defined.
+	if (keychainProp || signProp || encryptProp) && !(keychainProp && signProp && encryptProp) {
+		return errors.Errorf("%s platform does not specify correctly default sign and encryption keys", targetPlatform.Platform)
+	}
 
 	ctx.BuildProperties = buildProperties
 

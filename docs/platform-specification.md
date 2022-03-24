@@ -155,6 +155,20 @@ the name of the architecture is set as well.
 
 There are some other **{build.xxx}** properties available, that are explained in the boards.txt section of this guide.
 
+#### Security credential properties
+
+Some of them allow specifying trusted security credentials (signing and encryption keys) that can be used by a
+["secure boot" system](guides/secure-boot.md):
+
+- `build.keys.keychain`: for the directory containing the keys
+- `build.keys.sign_key`: for the signing key
+- `build.keys.encrypt_key`: for the encryption key
+
+If any of these properties are defined, the others are required.
+
+These properties can be overwritten respectively with `--keys-keychain`, `--sign-key`, `--encrypt-key`
+[compile](commands/arduino-cli_compile.md) flags in the Arduino CLI.
+
 #### Recipes to compile source code
 
 We said that the Arduino development software determines a list of files to compile. Each file can be source code
@@ -1294,7 +1308,7 @@ It can sometimes be useful to provide user selectable configuration options for 
 could be provided in two or more variants with different microcontrollers, or may have different crystal speed based on
 the board model, and so on...
 
-When using Arduino CLI, the option can be selected via the FQBN.
+When using Arduino CLI, the option can be selected via the FQBN, or using the `--board-options` flag
 
 In the Arduino IDE the options add extra menu items under the "Tools" menu.
 

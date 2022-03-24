@@ -125,6 +125,15 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		}
 	}
 
+	// At the current time we do not have a way of knowing if a board supports the secure boot or not,
+	// so, if the flags to override the default keys are used, we try override the corresponding platform property nonetheless.
+	// It's not possible to use the default name for the keys since there could be more tools to sign and encrypt.
+	// So it's mandatory to use all three flags to sign and encrypt the binary
+	securityKeysOverride := []string{}
+	if req.KeysKeychain != "" && req.SignKey != "" && req.EncryptKey != "" {
+		securityKeysOverride = append(securityKeysOverride, "build.keys.keychain="+req.KeysKeychain, "build.keys.sign_key="+req.GetSignKey(), "build.keys.encrypt_key="+req.EncryptKey)
+	}
+
 	builderCtx := &types.Context{}
 	builderCtx.PackageManager = pm
 	builderCtx.FQBN = fqbn
@@ -165,6 +174,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.WarningsLevel = req.GetWarnings()
 
 	builderCtx.CustomBuildProperties = append(req.GetBuildProperties(), "build.warn_data_percentage=75")
+	builderCtx.CustomBuildProperties = append(req.GetBuildProperties(), securityKeysOverride...)
 
 	if req.GetBuildCachePath() != "" {
 		builderCtx.BuildCachePath = paths.New(req.GetBuildCachePath())
