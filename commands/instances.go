@@ -19,10 +19,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/url"
 	"os"
-	"path"
+	"strings"
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -32,7 +31,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/resources"
-	"github.com/arduino/arduino-cli/arduino/security"
 	sk "github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/cli/globals"
@@ -41,7 +39,6 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
-	"go.bug.st/downloader/v2"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -381,41 +378,12 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 	}
 	defer tmp.RemoveAll()
 
-	// Download gzipped library_index
-	tmpIndexGz := tmp.Join("library_index.json.gz")
-	tmpIndexURL := librariesmanager.LibraryIndexGZURL.String()
-	if err := resources.DownloadFile(tmpIndexGz, tmpIndexURL, tr("Updating index: library_index.json.gz"), downloadCB.FromRPC(), nil, downloader.NoResume); err != nil {
-		return &arduino.FailedDownloadError{Message: tr("Error downloading library_index.json.gz"), Cause: err}
+	indexResource := resources.IndexResource{
+		URL:          librariesmanager.LibraryIndexGZURL,
+		SignatureURL: librariesmanager.LibraryIndexSignature,
 	}
-
-	// Download signature
-	tmpSignature := tmp.Join("library_index.json.sig")
-	tmpSignatureURL := librariesmanager.LibraryIndexSignature.String()
-	if err := resources.DownloadFile(tmpSignature, tmpSignatureURL, tr("Updating index: library_index.json.sig"), downloadCB.FromRPC(), nil, downloader.NoResume); err != nil {
-		return &arduino.FailedDownloadError{Message: tr("Error downloading library_index.json.sig"), Cause: err}
-	}
-
-	// Extract the real library_index
-	tmpIndex := tmp.Join("library_index.json")
-	if err := paths.GUnzip(tmpIndexGz, tmpIndex); err != nil {
-		return &arduino.PermissionDeniedError{Message: tr("Error extracting library_index.json.gz"), Cause: err}
-	}
-
-	// Check signature
-	if ok, _, err := security.VerifyArduinoDetachedSignature(tmpIndex, tmpSignature); err != nil {
-		return &arduino.PermissionDeniedError{Message: tr("Error verifying signature"), Cause: err}
-	} else if !ok {
-		return &arduino.SignatureVerificationFailedError{File: "library_index.json"}
-	}
-
-	// Copy extracted library_index and signature to final destination
-	lm.IndexFile.Remove()
-	lm.IndexFileSignature.Remove()
-	if err := tmpIndex.CopyTo(lm.IndexFile); err != nil {
-		return &arduino.PermissionDeniedError{Message: tr("Error writing library_index.json"), Cause: err}
-	}
-	if err := tmpSignature.CopyTo(lm.IndexFileSignature); err != nil {
-		return &arduino.PermissionDeniedError{Message: tr("Error writing library_index.json.sig"), Cause: err}
+	if err := indexResource.Download(lm.IndexFile.Parent(), downloadCB.FromRPC()); err != nil {
+		return err
 	}
 
 	return nil
@@ -458,67 +426,15 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 			continue
 		}
 
-		var tmp *paths.Path
-		if tmpFile, err := ioutil.TempFile("", ""); err != nil {
-			return nil, &arduino.TempFileCreationFailedError{Cause: err}
-		} else if err := tmpFile.Close(); err != nil {
-			return nil, &arduino.TempFileCreationFailedError{Cause: err}
-		} else {
-			tmp = paths.New(tmpFile.Name())
+		indexResource := resources.IndexResource{
+			URL: URL,
 		}
-		defer tmp.Remove()
-
-		coreIndexPath := indexpath.Join(path.Base(URL.Path))
-		if err := resources.DownloadFile(tmp, URL.String(), tr("Updating index: %s", coreIndexPath.Base()), downloadCB.FromRPC(), nil, downloader.NoResume); err != nil {
-			return nil, &arduino.FailedDownloadError{Message: tr("Error downloading index '%s'", URL), Cause: err}
+		if strings.HasSuffix(URL.Host, "arduino.cc") {
+			indexResource.SignatureURL, _ = url.Parse(u) // should not fail because we already parsed it
+			indexResource.SignatureURL.Path += ".sig"
 		}
-
-		// Check for signature
-		var tmpSig *paths.Path
-		var coreIndexSigPath *paths.Path
-		if URL.Hostname() == "downloads.arduino.cc" {
-			URLSig, err := url.Parse(URL.String())
-			if err != nil {
-				return nil, &arduino.InvalidURLError{Cause: err}
-			}
-			URLSig.Path += ".sig"
-
-			if t, err := ioutil.TempFile("", ""); err != nil {
-				return nil, &arduino.TempFileCreationFailedError{Cause: err}
-			} else if err := t.Close(); err != nil {
-				return nil, &arduino.TempFileCreationFailedError{Cause: err}
-			} else {
-				tmpSig = paths.New(t.Name())
-			}
-			defer tmpSig.Remove()
-
-			coreIndexSigPath = indexpath.Join(path.Base(URLSig.Path))
-			if err := resources.DownloadFile(tmpSig, URLSig.String(), tr("Updating index: %s", coreIndexSigPath.Base()), downloadCB.FromRPC(), nil, downloader.NoResume); err != nil {
-				return nil, &arduino.FailedDownloadError{Message: tr("Error downloading index signature '%s'", URLSig), Cause: err}
-			}
-
-			if valid, _, err := security.VerifyArduinoDetachedSignature(tmp, tmpSig); err != nil {
-				return nil, &arduino.PermissionDeniedError{Message: tr("Error verifying signature"), Cause: err}
-			} else if !valid {
-				return nil, &arduino.SignatureVerificationFailedError{File: URL.String()}
-			}
-		}
-
-		if _, err := packageindex.LoadIndex(tmp); err != nil {
-			return nil, &arduino.InvalidArgumentError{Message: tr("Invalid package index in %s", URL), Cause: err}
-		}
-
-		if err := indexpath.MkdirAll(); err != nil {
-			return nil, &arduino.PermissionDeniedError{Message: tr("Can't create data directory %s", indexpath), Cause: err}
-		}
-
-		if err := tmp.CopyTo(coreIndexPath); err != nil {
-			return nil, &arduino.PermissionDeniedError{Message: tr("Error saving downloaded index %s", URL), Cause: err}
-		}
-		if tmpSig != nil {
-			if err := tmpSig.CopyTo(coreIndexSigPath); err != nil {
-				return nil, &arduino.PermissionDeniedError{Message: tr("Error saving downloaded index signature"), Cause: err}
-			}
+		if err := indexResource.Download(indexpath, downloadCB.FromRPC()); err != nil {
+			return nil, err
 		}
 	}
 
