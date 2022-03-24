@@ -32,7 +32,7 @@ def test_keys_generate(run_command, working_dir):
     # Overwrite security keys
     result = run_command(["keys", "generate", "--key-name", sign_key_name])
     assert result.failed
-    assert f"Error during Generate: Cannot create file: File already exists: {working_dir}" in result.stderr
+    assert f"Error during generate: Cannot create file: File already exists: {working_dir}" in result.stderr
 
     # Create security keys in specified directory
     keychain_name = "keychain"
@@ -64,4 +64,4 @@ def test_keys_generate(run_command, working_dir):
         ["keys", "generate", "--key-name", sign_key_name, "--keys-keychain", keychain_path, "-t", "rsa"]
     )
     assert result.failed
-    assert "Error during Generate: Cannot create file: Unsupported algorithm: rsa" in result.stderr
+    assert "Error during generate: Cannot create file: Unsupported algorithm: rsa" in result.stderr

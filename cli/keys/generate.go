@@ -67,7 +67,7 @@ func runGenerateCommand(command *cobra.Command, args []string) {
 		KeysKeychain:  keysKeychain,
 	})
 	if err != nil {
-		feedback.Errorf(tr("Error during Generate: %v"), err)
+		feedback.Errorf(tr("Error during generate: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	feedback.PrintResult(result{resp})

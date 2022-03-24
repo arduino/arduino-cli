@@ -698,7 +698,7 @@ func (e *TempDirCreationFailedError) ToRPCStatus() *status.Status {
 	return status.New(codes.Unavailable, e.Error())
 }
 
-// FileCreationFailedError is returned if a temp file could not be created
+// FileCreationFailedError is returned if a file could not be created
 type FileCreationFailedError struct {
 	Message string
 	Cause   error
