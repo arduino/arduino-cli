@@ -59,13 +59,15 @@ func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.
 	return DownloadFile(path, r.URL, label, downloadCB, config)
 }
 
+// DownloadFile downloads a file from a URL into the specified path. An optional config and options may be passed (or nil to use the defaults).
+// A DownloadProgressCB callback function must be passed to monitor download progress.
 func DownloadFile(path *paths.Path, URL string, label string, downloadCB DownloadProgressCB, config *downloader.Config, options ...downloader.DownloadOptions) error {
 	if config == nil {
-		if c, err := GetDownloaderConfig(); err != nil {
+		c, err := GetDownloaderConfig()
+		if err != nil {
 			return err
-		} else {
-			config = c
 		}
+		config = c
 	}
 
 	d, err := downloader.DownloadWithConfig(path.String(), URL, *config, options...)
