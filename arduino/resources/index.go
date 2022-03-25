@@ -91,18 +91,21 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB DownloadProgr
 	// Make a backup copy of old index and signature so the defer function can rollback in case of errors.
 	indexPath := destDir.Join(indexFileName)
 	oldIndex := tmp.Join("old_index")
-	if err := indexPath.CopyTo(oldIndex); err != nil {
-		return &arduino.PermissionDeniedError{Message: tr("Error saving downloaded index %s", res.URL), Cause: err}
+	if indexPath.Exist() {
+		if err := indexPath.CopyTo(oldIndex); err != nil {
+			return &arduino.PermissionDeniedError{Message: tr("Error saving downloaded index"), Cause: err}
+		}
+		defer oldIndex.CopyTo(indexPath) // will silently fail in case of success
 	}
-	defer oldIndex.CopyTo(indexPath) // will silently fail in case of success
 	oldSignature := tmp.Join("old_signature")
-	if err := signaturePath.CopyTo(oldSignature); err != nil {
-		return &arduino.PermissionDeniedError{Message: tr("Error saving downloaded index %s", res.URL), Cause: err}
+	if oldSignature.Exist() {
+		if err := signaturePath.CopyTo(oldSignature); err != nil {
+			return &arduino.PermissionDeniedError{Message: tr("Error saving downloaded index signature"), Cause: err}
+		}
+		defer oldSignature.CopyTo(signaturePath) // will silently fail in case of success
 	}
-	defer oldSignature.CopyTo(signaturePath) // will silently fail in case of success
-
 	if err := tmpIndexPath.CopyTo(indexPath); err != nil {
-		return &arduino.PermissionDeniedError{Message: tr("Error saving downloaded index %s", res.URL), Cause: err}
+		return &arduino.PermissionDeniedError{Message: tr("Error saving downloaded index"), Cause: err}
 	}
 	if res.SignatureURL != nil {
 		if err := tmpSignaturePath.CopyTo(signaturePath); err != nil {
