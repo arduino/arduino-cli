@@ -419,7 +419,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 
 			fi, _ := os.Stat(path.String())
 			downloadCB(&rpc.DownloadProgress{
-				File:      tr("Updating index: %s", path.Base()),
+				File:      tr("Downloading index: %s", path.Base()),
 				TotalSize: fi.Size(),
 			})
 			downloadCB(&rpc.DownloadProgress{Completed: true})
