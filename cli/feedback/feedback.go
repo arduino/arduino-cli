@@ -184,6 +184,6 @@ func (fb *Feedback) PrintResult(res Result) {
 	case YAML:
 		fb.printYAML(res.Data())
 	default:
-		fb.Print(fmt.Sprintf("%s", res))
+		fb.Print(res.String())
 	}
 }

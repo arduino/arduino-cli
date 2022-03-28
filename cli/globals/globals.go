@@ -19,7 +19,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/version"
 )
 
@@ -28,5 +27,4 @@ var (
 	VersionInfo = version.NewInfo(filepath.Base(os.Args[0]))
 	// DefaultIndexURL is the default index url
 	DefaultIndexURL = "https://downloads.arduino.cc/packages/package_index.json"
-	tr              = i18n.Tr
 )
