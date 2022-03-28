@@ -19,13 +19,13 @@ import (
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/resources"
+	"github.com/arduino/arduino-cli/arduino/httpclient"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // DownloadToolRelease downloads a ToolRelease
 func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, downloadCB DownloadProgressCB) error {
-	config, err := resources.GetDownloaderConfig()
+	config, err := httpclient.GetDownloaderConfig()
 	if err != nil {
 		return err
 	}

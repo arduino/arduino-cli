@@ -19,9 +19,9 @@ import (
 	"context"
 
 	"github.com/arduino/arduino-cli/arduino"
+	"github.com/arduino/arduino-cli/arduino/httpclient"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/arduino/arduino-cli/arduino/resources"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -57,7 +57,7 @@ func downloadLibrary(lm *librariesmanager.LibrariesManager, libRelease *librarie
 	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
 
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading %s", libRelease)})
-	config, err := resources.GetDownloaderConfig()
+	config, err := httpclient.GetDownloaderConfig()
 	if err != nil {
 		return &arduino.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	}

@@ -55,7 +55,7 @@ func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
 
 	httpClient := httpclient.NewWithConfig(&httpclient.Config{UserAgent: goldUserAgentValue})
 
-	err = r.Download(tmp, &downloader.Config{HttpClient: *httpClient}, "", func(progress *DownloadProgress) {})
+	err = r.Download(tmp, &downloader.Config{HttpClient: *httpClient}, "", func(progress *httpclient.DownloadProgress) {})
 	require.NoError(t, err)
 
 	// leverage the download helper to download the echo for the request made by the downloader itself

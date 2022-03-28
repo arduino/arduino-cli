@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/arduino/httpclient"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
@@ -580,7 +581,7 @@ func getOutputRelease(lib *librariesindex.Release) *rpc.LibraryRelease {
 
 // Upgrade downloads and installs outdated Cores and Libraries
 func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadProgressCB, taskCB TaskProgressCB) error {
-	downloaderConfig, err := resources.GetDownloaderConfig()
+	downloaderConfig, err := httpclient.GetDownloaderConfig()
 	if err != nil {
 		return err
 	}

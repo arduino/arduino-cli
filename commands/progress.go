@@ -16,7 +16,7 @@
 package commands
 
 import (
-	"github.com/arduino/arduino-cli/arduino/resources"
+	"github.com/arduino/arduino-cli/arduino/httpclient"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -24,8 +24,8 @@ import (
 type DownloadProgressCB func(curr *rpc.DownloadProgress)
 
 // FromRPC converts the gRPC DownloadProgessCB in a resources.DownloadProgressCB
-func (rpcCB DownloadProgressCB) FromRPC() resources.DownloadProgressCB {
-	return func(cb *resources.DownloadProgress) {
+func (rpcCB DownloadProgressCB) FromRPC() httpclient.DownloadProgressCB {
+	return func(cb *httpclient.DownloadProgress) {
 		rpcCB(&rpc.DownloadProgress{
 			Url:        cb.URL,
 			File:       cb.File,

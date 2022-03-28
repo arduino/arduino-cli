@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino"
+	"github.com/arduino/arduino-cli/arduino/httpclient"
 	"github.com/arduino/arduino-cli/arduino/security"
 	"github.com/arduino/go-paths-helper"
 	"go.bug.st/downloader/v2"
@@ -34,7 +35,7 @@ type IndexResource struct {
 
 // Download will download the index and possibly check the signature using the Arduino's public key.
 // If the file is in .gz format it will be unpacked first.
-func (res *IndexResource) Download(destDir *paths.Path, downloadCB DownloadProgressCB) error {
+func (res *IndexResource) Download(destDir *paths.Path, downloadCB httpclient.DownloadProgressCB) error {
 	// Create destination directory
 	if err := destDir.MkdirAll(); err != nil {
 		return &arduino.PermissionDeniedError{Message: tr("Can't create data directory %s", destDir), Cause: err}
@@ -50,7 +51,7 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB DownloadProgr
 	// Download index file
 	indexFileName := path.Base(res.URL.Path) // == pakcage_index.json[.gz]
 	tmpIndexPath := tmp.Join(indexFileName)
-	if err := DownloadFile(tmpIndexPath, res.URL.String(), tr("Downloading index: %s", indexFileName), downloadCB, nil, downloader.NoResume); err != nil {
+	if err := httpclient.DownloadFile(tmpIndexPath, res.URL.String(), tr("Downloading index: %s", indexFileName), downloadCB, nil, downloader.NoResume); err != nil {
 		return &arduino.FailedDownloadError{Message: tr("Error downloading index '%s'", res.URL), Cause: err}
 	}
 
@@ -73,7 +74,7 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB DownloadProgr
 		// Download signature
 		signaturePath = destDir.Join(signatureFileName)
 		tmpSignaturePath = tmp.Join(signatureFileName)
-		if err := DownloadFile(tmpSignaturePath, res.SignatureURL.String(), tr("Downloading index signature: %s", signatureFileName), downloadCB, nil, downloader.NoResume); err != nil {
+		if err := httpclient.DownloadFile(tmpSignaturePath, res.SignatureURL.String(), tr("Downloading index signature: %s", signatureFileName), downloadCB, nil, downloader.NoResume); err != nil {
 			return &arduino.FailedDownloadError{Message: tr("Error downloading index signature '%s'", res.SignatureURL), Cause: err}
 		}
 
