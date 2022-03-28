@@ -36,27 +36,27 @@ type Index struct {
 
 // indexPackage represents a single entry from package_index.json file.
 type indexPackage struct {
-	Name       string                  `json:"name,required"`
-	Maintainer string                  `json:"maintainer,required"`
+	Name       string                  `json:"name"`
+	Maintainer string                  `json:"maintainer"`
 	WebsiteURL string                  `json:"websiteUrl"`
 	URL        string                  `json:"Url"`
 	Email      string                  `json:"email"`
-	Platforms  []*indexPlatformRelease `json:"platforms,required"`
-	Tools      []*indexToolRelease     `json:"tools,required"`
+	Platforms  []*indexPlatformRelease `json:"platforms"`
+	Tools      []*indexToolRelease     `json:"tools"`
 	Help       indexHelp               `json:"help,omitempty"`
 }
 
 // indexPlatformRelease represents a single Core Platform from package_index.json file.
 type indexPlatformRelease struct {
-	Name                  string                     `json:"name,required"`
+	Name                  string                     `json:"name"`
 	Architecture          string                     `json:"architecture"`
-	Version               *semver.Version            `json:"version,required"`
+	Version               *semver.Version            `json:"version"`
 	Deprecated            bool                       `json:"deprecated"`
 	Category              string                     `json:"category"`
 	URL                   string                     `json:"url"`
-	ArchiveFileName       string                     `json:"archiveFileName,required"`
-	Checksum              string                     `json:"checksum,required"`
-	Size                  json.Number                `json:"size,required"`
+	ArchiveFileName       string                     `json:"archiveFileName"`
+	Checksum              string                     `json:"checksum"`
+	Size                  json.Number                `json:"size"`
 	Boards                []indexBoard               `json:"boards"`
 	Help                  indexHelp                  `json:"help,omitempty"`
 	ToolDependencies      []indexToolDependency      `json:"toolsDependencies"`
@@ -66,9 +66,9 @@ type indexPlatformRelease struct {
 
 // indexToolDependency represents a single dependency of a core from a tool.
 type indexToolDependency struct {
-	Packager string                 `json:"packager,required"`
-	Name     string                 `json:"name,required"`
-	Version  *semver.RelaxedVersion `json:"version,required"`
+	Packager string                 `json:"packager"`
+	Name     string                 `json:"name"`
+	Version  *semver.RelaxedVersion `json:"version"`
 }
 
 // indexDiscoveryDependency represents a single dependency of a core from a pluggable discovery tool.
@@ -85,18 +85,18 @@ type indexMonitorDependency struct {
 
 // indexToolRelease represents a single Tool from package_index.json file.
 type indexToolRelease struct {
-	Name    string                    `json:"name,required"`
-	Version *semver.RelaxedVersion    `json:"version,required"`
-	Systems []indexToolReleaseFlavour `json:"systems,required"`
+	Name    string                    `json:"name"`
+	Version *semver.RelaxedVersion    `json:"version"`
+	Systems []indexToolReleaseFlavour `json:"systems"`
 }
 
 // indexToolReleaseFlavour represents a single tool flavor in the package_index.json file.
 type indexToolReleaseFlavour struct {
-	OS              string      `json:"host,required"`
-	URL             string      `json:"url,required"`
-	ArchiveFileName string      `json:"archiveFileName,required"`
-	Size            json.Number `json:"size,required"`
-	Checksum        string      `json:"checksum,required"`
+	OS              string      `json:"host"`
+	URL             string      `json:"url"`
+	ArchiveFileName string      `json:"archiveFileName"`
+	Size            json.Number `json:"size"`
+	Checksum        string      `json:"checksum"`
 }
 
 // indexBoard represents a single Board as written in package_index.json file.

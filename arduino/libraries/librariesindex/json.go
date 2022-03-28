@@ -30,8 +30,8 @@ type indexJSON struct {
 }
 
 type indexRelease struct {
-	Name             string             `json:"name,required"`
-	Version          *semver.Version    `json:"version,required"`
+	Name             string             `json:"name"`
+	Version          *semver.Version    `json:"version"`
 	Author           string             `json:"author"`
 	Maintainer       string             `json:"maintainer"`
 	Sentence         string             `json:"sentence"`
