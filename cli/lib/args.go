@@ -86,7 +86,7 @@ func ParseLibraryReferenceArgAndAdjustCase(instance *rpc.Instance, arg string) (
 
 	candidates := []*rpc.SearchedLibrary{}
 	for _, foundLib := range res.GetLibraries() {
-		if strings.ToLower(foundLib.GetName()) == strings.ToLower(libRef.Name) {
+		if strings.EqualFold(foundLib.GetName(), libRef.Name) {
 			candidates = append(candidates, foundLib)
 		}
 	}

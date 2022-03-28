@@ -429,9 +429,7 @@ func (pm *PackageManager) InstalledPlatformReleases() []*cores.PlatformRelease {
 	platforms := []*cores.PlatformRelease{}
 	for _, targetPackage := range pm.Packages {
 		for _, platform := range targetPackage.Platforms {
-			for _, release := range platform.GetAllInstalled() {
-				platforms = append(platforms, release)
-			}
+			platforms = append(platforms, platform.GetAllInstalled()...)
 		}
 	}
 	return platforms

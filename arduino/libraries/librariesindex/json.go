@@ -30,8 +30,8 @@ type indexJSON struct {
 }
 
 type indexRelease struct {
-	Name             string             `json:"name,required"`
-	Version          *semver.Version    `json:"version,required"`
+	Name             string             `json:"name"`
+	Version          *semver.Version    `json:"version"`
 	Author           string             `json:"author"`
 	Maintainer       string             `json:"maintainer"`
 	Sentence         string             `json:"sentence"`
@@ -138,9 +138,8 @@ func (indexDep *indexDependency) extractDependency() *Dependency {
 	var constraint semver.Constraint
 	if c, err := semver.ParseConstraint(indexDep.Version); err == nil {
 		constraint = c
-	} else {
-		// FIXME: report invalid constraint
 	}
+	// FIXME: else { report invalid constraint }
 	return &Dependency{
 		Name:              indexDep.Name,
 		VersionConstraint: constraint,

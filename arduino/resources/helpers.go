@@ -62,8 +62,6 @@ func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.
 			// File is cached, nothing to do here
 			return nil, nil
 		}
-	} else if err == nil {
-		// resume download
 	} else {
 		return nil, fmt.Errorf(tr("getting archive file info: %s"), err)
 	}

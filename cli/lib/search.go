@@ -100,11 +100,11 @@ type result struct {
 func (res result) Data() interface{} {
 	if res.namesOnly {
 		type LibName struct {
-			Name string `json:"name,required"`
+			Name string `json:"name"`
 		}
 
 		type NamesOnly struct {
-			Libraries []LibName `json:"libraries,required"`
+			Libraries []LibName `json:"libraries"`
 		}
 
 		names := []LibName{}
@@ -180,7 +180,7 @@ func (res result) String() string {
 		}
 	}
 
-	return fmt.Sprintf("%s", out.String())
+	return out.String()
 }
 
 func versionsFromSearchedLibrary(library *rpc.SearchedLibrary) []*semver.Version {

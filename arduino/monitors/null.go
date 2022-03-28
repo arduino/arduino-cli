@@ -45,7 +45,7 @@ func (mon *NullMonitor) Close() error {
 // Read bytes from the port
 func (mon *NullMonitor) Read(bytes []byte) (int, error) {
 	for {
-		elapsed := time.Now().Sub(mon.started).Seconds()
+		elapsed := time.Since(mon.started).Seconds()
 		n := int(elapsed*mon.bps) - mon.sent
 		if n == 0 {
 			// Delay until the next char...

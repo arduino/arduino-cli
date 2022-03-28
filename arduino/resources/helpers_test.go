@@ -16,7 +16,6 @@
 package resources
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -37,7 +36,7 @@ func (h *EchoHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 }
 
 func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
-	goldUserAgentValue := fmt.Sprintf("arduino-cli/0.0.0-test.preview (amd64; linux; go1.12.4) Commit:deadbeef/Build:2019-06-12 11:11:11.111")
+	goldUserAgentValue := "arduino-cli/0.0.0-test.preview (amd64; linux; go1.12.4) Commit:deadbeef/Build:2019-06-12 11:11:11.111"
 	goldUserAgentString := "User-Agent: " + goldUserAgentValue
 
 	tmp, err := paths.MkTempDir("", "")
