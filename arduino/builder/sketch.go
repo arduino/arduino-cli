@@ -162,7 +162,7 @@ func writeIfDifferent(source []byte, destPath *paths.Path) error {
 	}
 
 	// Overwrite if contents are different
-	if bytes.Compare(existingBytes, source) != 0 {
+	if !bytes.Equal(existingBytes, source) {
 		return destPath.WriteFile(source)
 	}
 

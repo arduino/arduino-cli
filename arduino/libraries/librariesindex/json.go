@@ -138,9 +138,8 @@ func (indexDep *indexDependency) extractDependency() *Dependency {
 	var constraint semver.Constraint
 	if c, err := semver.ParseConstraint(indexDep.Version); err == nil {
 		constraint = c
-	} else {
-		// FIXME: report invalid constraint
 	}
+	// FIXME: else { report invalid constraint }
 	return &Dependency{
 		Name:              indexDep.Name,
 		VersionConstraint: constraint,

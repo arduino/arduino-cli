@@ -118,7 +118,8 @@ func (b *Board) GetBuildProperties(userConfigs *properties.Map) (*properties.Map
 	}
 
 	// Check for residual invalid options...
-	for _, invalidOption := range userConfigs.Keys() {
+	if invalidKeys := userConfigs.Keys(); len(invalidKeys) > 0 {
+		invalidOption := invalidKeys[0]
 		if invalidOption == "" {
 			return nil, fmt.Errorf(tr("invalid empty option found"))
 		}

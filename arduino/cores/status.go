@@ -187,27 +187,3 @@ func (targetPackage *Package) GetOrCreateTool(name string) *Tool {
 func (targetPackage *Package) String() string {
 	return targetPackage.Name
 }
-
-func (tdep ToolDependency) extractTool(sc Packages) (*Tool, error) {
-	pkg, exists := sc[tdep.ToolPackager]
-	if !exists {
-		return nil, errors.New(tr("package not found"))
-	}
-	tool, exists := pkg.Tools[tdep.ToolName]
-	if !exists {
-		return nil, errors.New(tr("tool not found"))
-	}
-	return tool, nil
-}
-
-func (tdep ToolDependency) extractRelease(sc Packages) (*ToolRelease, error) {
-	tool, err := tdep.extractTool(sc)
-	if err != nil {
-		return nil, err
-	}
-	release, exists := tool.Releases[tdep.ToolVersion.String()]
-	if !exists {
-		return nil, errors.New(tr("release not found"))
-	}
-	return release, nil
-}
