@@ -26,7 +26,7 @@ import (
 )
 
 // PlatformUninstall FIXMEDOC
-func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, taskCB commands.TaskProgressCB) (*rpc.PlatformUninstallResponse, error) {
+func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, taskCB rpc.TaskProgressCB) (*rpc.PlatformUninstallResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, &arduino.InvalidInstanceError{}
@@ -70,7 +70,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 	return &rpc.PlatformUninstallResponse{}, nil
 }
 
-func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, taskCB commands.TaskProgressCB) error {
+func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, taskCB rpc.TaskProgressCB) error {
 	log := pm.Log.WithField("platform", platformRelease)
 
 	log.Info("Uninstalling platform")
@@ -86,7 +86,7 @@ func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease
 	return nil
 }
 
-func uninstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, taskCB commands.TaskProgressCB) error {
+func uninstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB) error {
 	log := pm.Log.WithField("Tool", toolRelease)
 
 	log.Info("Uninstalling tool")

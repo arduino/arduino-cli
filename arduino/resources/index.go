@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/httpclient"
 	"github.com/arduino/arduino-cli/arduino/security"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"go.bug.st/downloader/v2"
 )
@@ -35,7 +36,7 @@ type IndexResource struct {
 
 // Download will download the index and possibly check the signature using the Arduino's public key.
 // If the file is in .gz format it will be unpacked first.
-func (res *IndexResource) Download(destDir *paths.Path, downloadCB httpclient.DownloadProgressCB) error {
+func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadProgressCB) error {
 	// Create destination directory
 	if err := destDir.MkdirAll(); err != nil {
 		return &arduino.PermissionDeniedError{Message: tr("Can't create data directory %s", destDir), Cause: err}

@@ -15,26 +15,8 @@
 
 package commands
 
-import (
-	"github.com/arduino/arduino-cli/arduino/httpclient"
-	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-)
-
 // DownloadProgressCB is a callback to get updates on download progress
-type DownloadProgressCB func(curr *rpc.DownloadProgress)
-
-// FromRPC converts the gRPC DownloadProgessCB in a resources.DownloadProgressCB
-func (rpcCB DownloadProgressCB) FromRPC() httpclient.DownloadProgressCB {
-	return func(cb *httpclient.DownloadProgress) {
-		rpcCB(&rpc.DownloadProgress{
-			Url:        cb.URL,
-			File:       cb.File,
-			TotalSize:  cb.TotalSize,
-			Downloaded: cb.Downloaded,
-			Completed:  cb.Completed,
-		})
-	}
-}
+type DownloadProgressCB func(curr *DownloadProgress)
 
 // TaskProgressCB is a callback to receive progress messages
-type TaskProgressCB func(msg *rpc.TaskProgress)
+type TaskProgressCB func(msg *TaskProgress)

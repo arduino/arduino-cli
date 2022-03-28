@@ -31,7 +31,7 @@ import (
 var tr = i18n.Tr
 
 // PlatformDownload FIXMEDOC
-func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, downloadCB commands.DownloadProgressCB) (*rpc.PlatformDownloadResponse, error) {
+func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, downloadCB rpc.DownloadProgressCB) (*rpc.PlatformDownloadResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, &arduino.InvalidInstanceError{}
@@ -65,16 +65,16 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, dow
 	return &rpc.PlatformDownloadResponse{}, nil
 }
 
-func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, downloadCB commands.DownloadProgressCB) error {
+func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, downloadCB rpc.DownloadProgressCB) error {
 	// Download platform
 	config, err := httpclient.GetDownloaderConfig()
 	if err != nil {
 		return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", platformRelease), Cause: err}
 	}
-	return pm.DownloadPlatformRelease(platformRelease, config, platformRelease.String(), downloadCB.FromRPC())
+	return pm.DownloadPlatformRelease(platformRelease, config, platformRelease.String(), downloadCB)
 }
 
-func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB commands.DownloadProgressCB) error {
+func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB) error {
 	// Check if tool has a flavor available for the current OS
 	if tool.GetCompatibleFlavour() == nil {
 		return &arduino.FailedDownloadError{

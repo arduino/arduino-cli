@@ -20,7 +20,7 @@ import (
 	"encoding/hex"
 	"testing"
 
-	"github.com/arduino/arduino-cli/arduino/httpclient"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/downloader/v2"
@@ -45,7 +45,7 @@ func TestDownloadAndChecksums(t *testing.T) {
 	require.NoError(t, err)
 
 	downloadAndTestChecksum := func() {
-		err := r.Download(tmp, &downloader.Config{}, "", func(*httpclient.DownloadProgress) {})
+		err := r.Download(tmp, &downloader.Config{}, "", func(*rpc.DownloadProgress) {})
 		require.NoError(t, err)
 
 		data, err := testFile.ReadFile()
@@ -59,7 +59,7 @@ func TestDownloadAndChecksums(t *testing.T) {
 	downloadAndTestChecksum()
 
 	// Download with cached file
-	err = r.Download(tmp, &downloader.Config{}, "", func(*httpclient.DownloadProgress) {})
+	err = r.Download(tmp, &downloader.Config{}, "", func(*rpc.DownloadProgress) {})
 	require.NoError(t, err)
 
 	// Download if cached file has data in excess (redownload)

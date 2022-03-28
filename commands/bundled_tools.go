@@ -24,16 +24,16 @@ import (
 )
 
 // DownloadToolRelease downloads a ToolRelease
-func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, downloadCB DownloadProgressCB) error {
+func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, downloadCB rpc.DownloadProgressCB) error {
 	config, err := httpclient.GetDownloaderConfig()
 	if err != nil {
 		return err
 	}
-	return pm.DownloadToolRelease(toolRelease, config, toolRelease.String(), downloadCB.FromRPC())
+	return pm.DownloadToolRelease(toolRelease, config, toolRelease.String(), downloadCB)
 }
 
 // InstallToolRelease installs a ToolRelease
-func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, taskCB TaskProgressCB) error {
+func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB) error {
 	log := pm.Log.WithField("Tool", toolRelease)
 
 	if toolRelease.IsInstalled() {

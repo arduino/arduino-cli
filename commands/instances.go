@@ -89,7 +89,7 @@ func GetLibraryManager(instanceID int32) *librariesmanager.LibrariesManager {
 	return i.lm
 }
 
-func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, downloadCB DownloadProgressCB, taskCB TaskProgressCB) (bool, error) {
+func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (bool, error) {
 	if tool.IsInstalled() {
 		return false, nil
 	}
@@ -361,7 +361,7 @@ func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse
 }
 
 // UpdateLibrariesIndex updates the library_index.json
-func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequest, downloadCB DownloadProgressCB) error {
+func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequest, downloadCB rpc.DownloadProgressCB) error {
 	logrus.Info("Updating libraries index")
 	lm := GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
@@ -383,7 +383,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 		URL:          librariesmanager.LibraryIndexGZURL,
 		SignatureURL: librariesmanager.LibraryIndexSignature,
 	}
-	if err := indexResource.Download(lm.IndexFile.Parent(), downloadCB.FromRPC()); err != nil {
+	if err := indexResource.Download(lm.IndexFile.Parent(), downloadCB); err != nil {
 		return err
 	}
 
@@ -391,7 +391,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 }
 
 // UpdateIndex FIXMEDOC
-func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB DownloadProgressCB) (*rpc.UpdateIndexResponse, error) {
+func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rpc.DownloadProgressCB) (*rpc.UpdateIndexResponse, error) {
 	id := req.GetInstance().GetId()
 	_, ok := instances[id]
 	if !ok {
@@ -434,7 +434,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 			indexResource.SignatureURL, _ = url.Parse(u) // should not fail because we already parsed it
 			indexResource.SignatureURL.Path += ".sig"
 		}
-		if err := indexResource.Download(indexpath, downloadCB.FromRPC()); err != nil {
+		if err := indexResource.Download(indexpath, downloadCB); err != nil {
 			return nil, err
 		}
 	}
@@ -443,7 +443,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB Do
 }
 
 // UpdateCoreLibrariesIndex updates both Cores and Libraries indexes
-func UpdateCoreLibrariesIndex(ctx context.Context, req *rpc.UpdateCoreLibrariesIndexRequest, downloadCB DownloadProgressCB) error {
+func UpdateCoreLibrariesIndex(ctx context.Context, req *rpc.UpdateCoreLibrariesIndexRequest, downloadCB rpc.DownloadProgressCB) error {
 	_, err := UpdateIndex(ctx, &rpc.UpdateIndexRequest{
 		Instance: req.Instance,
 	}, downloadCB)
@@ -580,7 +580,7 @@ func getOutputRelease(lib *librariesindex.Release) *rpc.LibraryRelease {
 }
 
 // Upgrade downloads and installs outdated Cores and Libraries
-func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadProgressCB, taskCB TaskProgressCB) error {
+func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	downloaderConfig, err := httpclient.GetDownloaderConfig()
 	if err != nil {
 		return err
@@ -603,7 +603,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 
 			// Downloads latest library release
 			taskCB(&rpc.TaskProgress{Name: tr("Downloading %s", available)})
-			if err := available.Resource.Download(lm.DownloadsDir, downloaderConfig, available.String(), downloadCB.FromRPC()); err != nil {
+			if err := available.Resource.Download(lm.DownloadsDir, downloaderConfig, available.String(), downloadCB); err != nil {
 				return &arduino.FailedDownloadError{Message: tr("Error downloading library"), Cause: err}
 			}
 
@@ -684,7 +684,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB DownloadPr
 				}
 
 				// Downloads platform
-				if err := pm.DownloadPlatformRelease(latest, downloaderConfig, latest.String(), downloadCB.FromRPC()); err != nil {
+				if err := pm.DownloadPlatformRelease(latest, downloaderConfig, latest.String(), downloadCB); err != nil {
 					return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", latest), Cause: err}
 				}
 

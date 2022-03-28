@@ -27,7 +27,7 @@ import (
 
 // PlatformInstall FIXMEDOC
 func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformInstallResponse, error) {
+	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformInstallResponse, error) {
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
@@ -63,7 +63,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
 
 func installPlatform(pm *packagemanager.PackageManager,
 	platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB,
+	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB,
 	skipPostInstall bool) error {
 	log := pm.Log.WithField("platform", platformRelease)
 

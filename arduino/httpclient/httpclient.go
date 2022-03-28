@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"go.bug.st/downloader/v2"
 )
@@ -31,7 +32,7 @@ var tr = i18n.Tr
 
 // DownloadFile downloads a file from a URL into the specified path. An optional config and options may be passed (or nil to use the defaults).
 // A DownloadProgressCB callback function must be passed to monitor download progress.
-func DownloadFile(path *paths.Path, URL string, label string, downloadCB DownloadProgressCB, config *downloader.Config, options ...downloader.DownloadOptions) error {
+func DownloadFile(path *paths.Path, URL string, label string, downloadCB rpc.DownloadProgressCB, config *downloader.Config, options ...downloader.DownloadOptions) error {
 	if config == nil {
 		c, err := GetDownloaderConfig()
 		if err != nil {
@@ -44,14 +45,14 @@ func DownloadFile(path *paths.Path, URL string, label string, downloadCB Downloa
 	if err != nil {
 		return err
 	}
-	downloadCB(&DownloadProgress{
+	downloadCB(&rpc.DownloadProgress{
 		File:      label,
-		URL:       d.URL,
+		Url:       d.URL,
 		TotalSize: d.Size(),
 	})
 
 	err = d.RunAndPoll(func(downloaded int64) {
-		downloadCB(&DownloadProgress{Downloaded: downloaded})
+		downloadCB(&rpc.DownloadProgress{Downloaded: downloaded})
 	}, 250*time.Millisecond)
 	if err != nil {
 		return err
@@ -62,7 +63,7 @@ func DownloadFile(path *paths.Path, URL string, label string, downloadCB Downloa
 		return &arduino.FailedDownloadError{Message: tr("Server responded with: %s", d.Resp.Status)}
 	}
 
-	downloadCB(&DownloadProgress{Completed: true})
+	downloadCB(&rpc.DownloadProgress{Completed: true})
 	return nil
 }
 
@@ -93,24 +94,6 @@ func NewWithConfig(config *Config) *http.Client {
 		},
 	}
 }
-
-// DownloadProgress is a report of the download progress, not all fields may be
-// filled and multiple reports may be sent during a download.
-type DownloadProgress struct {
-	// URL of the download.
-	URL string
-	// The file being downloaded.
-	File string
-	// TotalSize is the total size of the file being downloaded.
-	TotalSize int64
-	// Downloaded is the size of the downloaded portion of the file.
-	Downloaded int64
-	// Completed reports whether the download is complete.
-	Completed bool
-}
-
-// DownloadProgressCB is a callback function to report download progress
-type DownloadProgressCB func(progress *DownloadProgress)
 
 // GetDownloaderConfig returns the downloader configuration based on current settings.
 func GetDownloaderConfig() (*downloader.Config, error) {

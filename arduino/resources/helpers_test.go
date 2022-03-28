@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/httpclient"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/downloader/v2"
@@ -55,7 +56,7 @@ func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
 
 	httpClient := httpclient.NewWithConfig(&httpclient.Config{UserAgent: goldUserAgentValue})
 
-	err = r.Download(tmp, &downloader.Config{HttpClient: *httpClient}, "", func(progress *httpclient.DownloadProgress) {})
+	err = r.Download(tmp, &downloader.Config{HttpClient: *httpClient}, "", func(progress *rpc.DownloadProgress) {})
 	require.NoError(t, err)
 
 	// leverage the download helper to download the echo for the request made by the downloader itself

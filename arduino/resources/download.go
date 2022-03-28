@@ -20,13 +20,14 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/arduino/httpclient"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	"go.bug.st/downloader/v2"
 )
 
 // Download performs a download loop using the provided downloader.Downloader.
 // Messages are passed back to the DownloadProgressCB using label as text for the File field.
-func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.Config, label string, downloadCB httpclient.DownloadProgressCB) error {
+func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.Config, label string, downloadCB rpc.DownloadProgressCB) error {
 	path, err := r.ArchivePath(downloadDir)
 	if err != nil {
 		return fmt.Errorf(tr("getting archive path: %s"), err)
@@ -45,7 +46,7 @@ func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.
 			// File is cached, nothing to do here
 
 			// This signal means that the file is already downloaded
-			downloadCB(&httpclient.DownloadProgress{
+			downloadCB(&rpc.DownloadProgress{
 				File:      label,
 				Completed: true,
 			})

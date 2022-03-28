@@ -31,7 +31,7 @@ import (
 var tr = i18n.Tr
 
 // LibraryDownload FIXMEDOC
-func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downloadCB commands.DownloadProgressCB) (*rpc.LibraryDownloadResponse, error) {
+func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downloadCB rpc.DownloadProgressCB) (*rpc.LibraryDownloadResponse, error) {
 	logrus.Info("Executing `arduino-cli lib download`")
 
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
@@ -54,14 +54,14 @@ func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downl
 }
 
 func downloadLibrary(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
+	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading %s", libRelease)})
 	config, err := httpclient.GetDownloaderConfig()
 	if err != nil {
 		return &arduino.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	}
-	if err := libRelease.Resource.Download(lm.DownloadsDir, config, libRelease.String(), downloadCB.FromRPC()); err != nil {
+	if err := libRelease.Resource.Download(lm.DownloadsDir, config, libRelease.String(), downloadCB); err != nil {
 		return &arduino.FailedDownloadError{Message: tr("Can't download library"), Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
