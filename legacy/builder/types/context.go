@@ -31,6 +31,8 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/legacy/builder/i18n"
+	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -179,6 +181,9 @@ type Context struct {
 	// The provided source data is used instead of reading it from disk.
 	// The keys of the map are paths relative to sketch folder.
 	SourceOverride map[string]string
+
+	// Compiler directive for transparent inclusion of global definition when present
+	GlobalIncludeOption string
 }
 
 // ExecutableSectionSize represents a section of the executable output file
@@ -270,4 +275,24 @@ func (ctx *Context) Warn(msg string) {
 		fmt.Fprintln(ctx.Stderr, msg)
 	}
 	ctx.stdLock.Unlock()
+}
+
+func (ctx *Context) SetGlobalIncludeOption () {
+	if len(ctx.GlobalIncludeOption) == 0 {
+
+		// testing existence of path/to/sketch/sketch_globals.h
+
+		globalsHeaderName := ctx.BuildPath.Join("sketch").Join(ctx.Sketch.Name + "_globals.h").String()
+		_, err := os.Stat(globalsHeaderName);
+
+		if os.IsNotExist(err) {
+			ctx.GetLogger().Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, tr("global definition file is not present") + " '" + globalsHeaderName + "'")
+		} else {
+			ctx.GlobalIncludeOption = "-include "
+			ctx.GlobalIncludeOption += globalsHeaderName
+			ctx.GetLogger().Fprintln(os.Stdout, constants.LOG_LEVEL_INFO, tr("Using global definition file") + " '" + globalsHeaderName + "'")
+		}
+
+		ctx.GlobalIncludeOption += " "
+	}
 }

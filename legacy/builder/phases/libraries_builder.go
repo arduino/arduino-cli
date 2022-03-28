@@ -36,7 +36,8 @@ type LibrariesBuilder struct{}
 func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	librariesBuildPath := ctx.LibrariesBuildPath
 	buildProperties := ctx.BuildProperties
-	includes := utils.Map(ctx.IncludeFolders.AsStrings(), utils.WrapWithHyphenI)
+	ctx.SetGlobalIncludeOption()
+	includes := append(utils.Map(ctx.IncludeFolders.AsStrings(), utils.WrapWithHyphenI), ctx.GlobalIncludeOption)
 	libs := ctx.ImportedLibraries
 
 	if err := librariesBuildPath.MkdirAll(); err != nil {
