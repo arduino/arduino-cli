@@ -18,6 +18,7 @@ package packagemanager
 import (
 	"fmt"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"go.bug.st/downloader/v2"
@@ -129,5 +130,8 @@ func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *d
 // DownloadPlatformRelease downloads a PlatformRelease. If the platform is already downloaded a
 // nil Downloader is returned.
 func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease, config *downloader.Config, progressCB rpc.DownloadProgressCB) error {
+	if platform.Resource == nil {
+		return &arduino.PlatformNotFoundError{Platform: platform.String()}
+	}
 	return platform.Resource.Download(pm.DownloadDir, config, platform.String(), progressCB)
 }
