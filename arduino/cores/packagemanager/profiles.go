@@ -50,6 +50,8 @@ func (pm *PackageManager) LoadHardwareForProfile(p *sketch.Profile, installMissi
 
 	// Load tools dependencies for the platforms
 	for _, platformRelease := range platformReleases {
+		// TODO: pm.FindPlatformReleaseDependencies(platformRelease)
+
 		for _, toolDep := range platformRelease.ToolDependencies {
 			indexURL := indexURLs[toolDep.ToolPackager]
 			if err := pm.loadProfileTool(toolDep, indexURL, installMissing, downloadCB, taskCB); err != nil {
@@ -71,6 +73,12 @@ func (pm *PackageManager) loadProfilePlatform(platformRef *sketch.ProfilePlatfor
 
 	uid := platformRef.InternalUniqueIdentifier()
 	destDir := configuration.ProfilesCacheDir(configuration.Settings).Join(uid)
+	if !destDir.IsDir() && installMissing {
+		// Try installing the missing platform
+		if err := pm.installMissingProfilePlatform(platformRef, destDir, downloadCB, taskCB); err != nil {
+			return nil, err
+		}
+	}
 	return release, pm.loadPlatformRelease(release, destDir)
 }
 
