@@ -128,6 +128,6 @@ func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *d
 
 // DownloadPlatformRelease downloads a PlatformRelease. If the platform is already downloaded a
 // nil Downloader is returned.
-func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease, config *downloader.Config, label string, progressCB rpc.DownloadProgressCB) error {
-	return platform.Resource.Download(pm.DownloadDir, config, label, progressCB)
+func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease, config *downloader.Config, progressCB rpc.DownloadProgressCB) error {
+	return platform.Resource.Download(pm.DownloadDir, config, platform.String(), progressCB)
 }

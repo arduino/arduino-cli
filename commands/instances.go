@@ -688,7 +688,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB rpc.Downlo
 				}
 
 				// Downloads platform
-				if err := pm.DownloadPlatformRelease(latest, downloaderConfig, latest.String(), downloadCB); err != nil {
+				if err := pm.DownloadPlatformRelease(latest, downloaderConfig, downloadCB); err != nil {
 					return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", latest), Cause: err}
 				}
 

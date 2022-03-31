@@ -71,7 +71,7 @@ func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.
 	if err != nil {
 		return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", platformRelease), Cause: err}
 	}
-	return pm.DownloadPlatformRelease(platformRelease, config, platformRelease.String(), downloadCB)
+	return pm.DownloadPlatformRelease(platformRelease, config, downloadCB)
 }
 
 func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB) error {
