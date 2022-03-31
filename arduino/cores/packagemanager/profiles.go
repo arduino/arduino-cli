@@ -31,13 +31,14 @@ import (
 )
 
 // LoadHardwareForProfile load the hardware platforms for the given profile.
-func (pm *PackageManager) LoadHardwareForProfile(p *sketch.Profile) []error {
+// If installMissing is true then possibly missing tools and platforms will be downloaded and installed.
+func (pm *PackageManager) LoadHardwareForProfile(p *sketch.Profile, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) []error {
 	// Load required platforms
 	var merr []error
 	var platformReleases []*cores.PlatformRelease
 	indexURLs := map[string]*url.URL{}
 	for _, platformRef := range p.Platforms {
-		if platformRelease, err := pm.loadProfilePlatform(platformRef); err != nil {
+		if platformRelease, err := pm.loadProfilePlatform(platformRef, installMissing, downloadCB, taskCB); err != nil {
 			merr = append(merr, fmt.Errorf("%s: %w", tr("loading required platform %s", platformRef), err))
 			logrus.WithField("platform", platformRef).WithError(err).Debugf("Error loading platform for profile")
 		} else {
@@ -51,7 +52,7 @@ func (pm *PackageManager) LoadHardwareForProfile(p *sketch.Profile) []error {
 	for _, platformRelease := range platformReleases {
 		for _, toolDep := range platformRelease.ToolDependencies {
 			indexURL := indexURLs[toolDep.ToolPackager]
-			if err := pm.loadProfileTool(toolDep, indexURL); err != nil {
+			if err := pm.loadProfileTool(toolDep, indexURL, installMissing, downloadCB, taskCB); err != nil {
 				merr = append(merr, fmt.Errorf("%s: %w", tr("loading required tool %s", toolDep), err))
 				logrus.WithField("tool", toolDep).WithField("index_url", indexURL).WithError(err).Debugf("Error loading tool for profile")
 			} else {
@@ -63,7 +64,7 @@ func (pm *PackageManager) LoadHardwareForProfile(p *sketch.Profile) []error {
 	return merr
 }
 
-func (pm *PackageManager) loadProfilePlatform(platformRef *sketch.ProfilePlatformReference) (*cores.PlatformRelease, error) {
+func (pm *PackageManager) loadProfilePlatform(platformRef *sketch.ProfilePlatformReference, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*cores.PlatformRelease, error) {
 	targetPackage := pm.Packages.GetOrCreatePackage(platformRef.Packager)
 	platform := targetPackage.GetOrCreatePlatform(platformRef.Architecture)
 	release := platform.GetOrCreateRelease(platformRef.Version)
@@ -127,7 +128,7 @@ func (pm *PackageManager) installMissingProfilePlatform(platformRef *sketch.Prof
 	return nil
 }
 
-func (pm *PackageManager) loadProfileTool(toolRef *cores.ToolDependency, indexURL *url.URL) error {
+func (pm *PackageManager) loadProfileTool(toolRef *cores.ToolDependency, indexURL *url.URL, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	targetPackage := pm.Packages.GetOrCreatePackage(toolRef.ToolPackager)
 	tool := targetPackage.GetOrCreateTool(toolRef.ToolName)
 
