@@ -36,6 +36,7 @@ import (
 	srv_debug "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
 	srv_monitor "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/monitor/v1"
 	srv_settings "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1"
+	"github.com/arduino/go-paths-helper"
 	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -47,6 +48,7 @@ var (
 	ip           string
 	daemonize    bool
 	debug        bool
+	debugFile    string
 	debugFilters []string
 )
 
@@ -65,6 +67,7 @@ func NewCommand() *cobra.Command {
 	configuration.Settings.BindPFlag("daemon.port", daemonCommand.PersistentFlags().Lookup("port"))
 	daemonCommand.Flags().BoolVar(&daemonize, "daemonize", false, tr("Do not terminate daemon process if the parent process dies"))
 	daemonCommand.Flags().BoolVar(&debug, "debug", false, tr("Enable debug logging of gRPC calls"))
+	daemonCommand.Flags().StringVar(&debugFile, "debug-file", "", tr("Append debug logging to the specified file"))
 	daemonCommand.Flags().StringSliceVar(&debugFilters, "debug-filter", []string{}, tr("Display only the provided gRPC calls"))
 	return daemonCommand
 }
@@ -79,7 +82,23 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 	}
 	port := configuration.Settings.GetString("daemon.port")
 	gRPCOptions := []grpc.ServerOption{}
+	if debugFile != "" {
+		if !debug {
+			feedback.Error(tr("The flag --debug-file must be used with --debug."))
+			os.Exit(errorcodes.ErrBadArgument)
+		}
+	}
 	if debug {
+		if debugFile != "" {
+			outFile := paths.New(debugFile)
+			f, err := outFile.Append()
+			if err != nil {
+				feedback.Error(tr("Error opening debug logging file: %s", err))
+				os.Exit(errorcodes.ErrBadCall)
+			}
+			debugStdOut = f
+			defer f.Close()
+		}
 		gRPCOptions = append(gRPCOptions,
 			grpc.UnaryInterceptor(unaryLoggerInterceptor),
 			grpc.StreamInterceptor(streamLoggerInterceptor),
