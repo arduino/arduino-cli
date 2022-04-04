@@ -199,16 +199,15 @@ func (mon *PluggableMonitor) runProcess() error {
 	return nil
 }
 
-func (mon *PluggableMonitor) killProcess() error {
+func (mon *PluggableMonitor) killProcess() {
 	mon.log.Infof("Killing monitor process")
 	if err := mon.process.Kill(); err != nil {
-		return err
+		mon.log.WithError(err).Error("Sent kill signal")
 	}
 	if err := mon.process.Wait(); err != nil {
-		return err
+		mon.log.WithError(err).Error("Waiting for process end")
 	}
-	mon.log.Infof("Monitor process killed successfully!")
-	return nil
+	mon.log.Infof("Monitor process killed")
 }
 
 // Run starts the monitor executable process and sends the HELLO command to the monitor to agree on the
@@ -221,15 +220,10 @@ func (mon *PluggableMonitor) Run() (err error) {
 
 	defer func() {
 		// If the monitor process is started successfully but the HELLO handshake
-		// fails the monitor is an unusable state, we kill the process to avoid
+		// fails the monitor is in an unusable state, we kill the process to avoid
 		// further issues down the line.
-		if err == nil {
-			return
-		}
-		if killErr := mon.killProcess(); killErr != nil {
-			// Log failure to kill the process, ideally that should never happen
-			// but it's best to know it if it does
-			mon.log.Errorf("Killing monitor after unsuccessful start: %s", killErr)
+		if err != nil {
+			mon.killProcess()
 		}
 	}()
 
@@ -304,14 +298,13 @@ func (mon *PluggableMonitor) Close() error {
 
 // Quit terminates the monitor. No more commands can be accepted by the monitor.
 func (mon *PluggableMonitor) Quit() error {
+	defer mon.killProcess() // ensure that killProcess is called in any case...
+
 	if err := mon.sendCommand("QUIT\n"); err != nil {
 		return err
 	}
 	if _, err := mon.waitMessage(time.Second*10, "quit"); err != nil {
 		return err
-	}
-	if err := mon.killProcess(); err != nil {
-		mon.log.WithError(err).Info("error killing monitor process")
 	}
 	return nil
 }
