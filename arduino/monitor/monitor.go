@@ -103,24 +103,23 @@ func (mon *PluggableMonitor) String() string {
 	return mon.id
 }
 
-func (mon *PluggableMonitor) jsonDecodeLoop(in io.Reader, outChan chan<- *monitorMessage) {
+func jsonDecodeLoop(in io.Reader, outChan chan<- *monitorMessage, log *logrus.Entry, lastError *error) {
 	decoder := json.NewDecoder(in)
 
 	for {
 		var msg monitorMessage
 		if err := decoder.Decode(&msg); err != nil {
-			mon.incomingMessagesError = err
+			*lastError = err
 			close(outChan)
-			mon.log.Errorf("stopped decode loop: %s", err)
+			log.Errorf("stopped decode loop: %s", err)
 			return
 		}
-		mon.log.
-			WithField("event_type", msg.EventType).
+		log.WithField("event_type", msg.EventType).
 			WithField("message", msg.Message).
 			WithField("error", msg.Error).
 			Infof("received message")
 		if msg.EventType == "port_closed" {
-			mon.log.Infof("monitor port has been closed externally")
+			log.Infof("monitor port has been closed externally")
 		} else {
 			outChan <- &msg
 		}
@@ -192,7 +191,7 @@ func (mon *PluggableMonitor) runProcess() error {
 
 	messageChan := make(chan *monitorMessage)
 	mon.incomingMessagesChan = messageChan
-	go mon.jsonDecodeLoop(stdout, messageChan)
+	go jsonDecodeLoop(stdout, messageChan, mon.log, &mon.incomingMessagesError)
 
 	mon.log.Infof("Monitor process started successfully!")
 	return nil
