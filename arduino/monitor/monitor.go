@@ -127,13 +127,15 @@ func jsonDecodeLoop(in io.Reader, outChan chan<- *monitorMessage, log *logrus.En
 }
 
 func (mon *PluggableMonitor) waitMessage(timeout time.Duration, expectedEvt string) (*monitorMessage, error) {
+	mon.log.WithField("expected", expectedEvt).Debugf("waiting for event")
 	var msg *monitorMessage
 	select {
-	case msg = <-mon.incomingMessagesChan:
-		if msg == nil {
+	case m, ok := <-mon.incomingMessagesChan:
+		if !ok {
 			// channel has been closed
 			return nil, mon.incomingMessagesError
 		}
+		msg = m
 	case <-time.After(timeout):
 		return nil, fmt.Errorf(tr("timeout waiting for message"))
 	}
