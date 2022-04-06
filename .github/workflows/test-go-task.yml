@@ -97,7 +97,7 @@ jobs:
         if: >
           runner.os == 'Linux' &&
           github.event_name == 'push'
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           file: ./coverage_unit.txt
           flags: unit
@@ -107,7 +107,7 @@ jobs:
         if: >
           runner.os == 'Linux' &&
           github.event_name == 'push'
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           file: ./coverage_legacy.txt
           flags: unit
