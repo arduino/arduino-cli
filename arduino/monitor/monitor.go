@@ -292,7 +292,7 @@ func (mon *PluggableMonitor) Close() error {
 	if err := mon.sendCommand("CLOSE\n"); err != nil {
 		return err
 	}
-	_, err := mon.waitMessage(time.Second*10, "close")
+	_, err := mon.waitMessage(time.Millisecond*250, "close")
 	return err
 }
 
@@ -303,7 +303,7 @@ func (mon *PluggableMonitor) Quit() error {
 	if err := mon.sendCommand("QUIT\n"); err != nil {
 		return err
 	}
-	if _, err := mon.waitMessage(time.Second*10, "quit"); err != nil {
+	if _, err := mon.waitMessage(time.Millisecond*250, "quit"); err != nil {
 		return err
 	}
 	return nil
