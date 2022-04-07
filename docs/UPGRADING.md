@@ -4,6 +4,53 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.22.0
 
+### package `github.com/arduino/arduino-cli/httpclient` has been moved to `github.com/arduino/arduino-cli/arduino/httpclient`
+
+The old import must be updated to the new one.
+
+### `commands.DownloadProgressCB` and `commands.TaskProgressCB` have been moved to package `github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1`
+
+All references to these types must be updated with the new import.
+
+### `commands.GetDownloaderConfig` has been moved to package `github.com/arduino/arduino-cli/arduino/httpclient`
+
+All references to this function must be updated with the new import.
+
+### `commands.Download` has been removed and replaced by `github.com/arduino/arduino-cli/arduino/httpclient.DownloadFile`
+
+The old function must be replaced by the new one that is much more versatile.
+
+### `packagemanager.PackageManager.DownloadToolRelease`, `packagemanager.PackageManager.DownloadPlatformRelease`, and `resources.DownloadResource.Download` functions now require `label` and `progressCB` parameters
+
+The following functions:
+
+```go
+func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *downloader.Config) (*downloader.Downloader, error)
+func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease, config *downloader.Config) (*downloader.Downloader, error)
+func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.Config) (*downloader.Downloader, error)
+```
+
+now requires a progress callback:
+
+```go
+func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *downloader.Config, label string, progressCB rpc.DownloadProgressCB) error
+func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease, config *downloader.Config, label string, progressCB rpc.DownloadProgressCB) error
+func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.Config, label string, downloadCB rpc.DownloadProgressCB) error
+```
+
+The new parameters must be added to legacy code. If progress reports are not needed an empty stub for `label` and
+`progressCB` must be provided, for example:
+
+```go
+err := pm.DownloadPlatformRelease(platformToDownload, config)
+```
+
+becomes:
+
+```go
+err := pm.DownloadPlatformRelease(platformToDownload, config, "", func(progress *rpc.DownloadProgress) {})
+```
+
 ### `packagemanager.Load*` functions now returns `error` instead of `*status.Status`
 
 The following functions signature:
