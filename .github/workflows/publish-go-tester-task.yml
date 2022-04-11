@@ -115,7 +115,7 @@ jobs:
 
     steps:
       - name: Download combined builds artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ env.BUILDS_ARTIFACT }}
           path: ${{ env.BUILDS_ARTIFACT }}
