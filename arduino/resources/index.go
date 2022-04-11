@@ -28,7 +28,7 @@ import (
 	"go.bug.st/downloader/v2"
 )
 
-// IndexResource is a reference to a package_index.json
+// IndexResource is a reference to an index file URL with an optional signature.
 type IndexResource struct {
 	URL          *url.URL
 	SignatureURL *url.URL

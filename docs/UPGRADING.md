@@ -4,9 +4,15 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.22.0
 
-### package `github.com/arduino/arduino-cli/httpclient` has been moved to `github.com/arduino/arduino-cli/arduino/httpclient`
+### The content of package `github.com/arduino/arduino-cli/httpclient` has been moved to a different path
 
-The old import must be updated to the new one.
+In particular:
+
+- `UserAgent` and `NetworkProxy` have been moved to `github.com/arduino/arduino-cli/configuration`
+- the remainder of the package `github.com/arduino/arduino-cli/httpclient` has been moved to
+  `github.com/arduino/arduino-cli/arduino/httpclient`
+
+The old imports must be updated according to the list above.
 
 ### `commands.DownloadProgressCB` and `commands.TaskProgressCB` have been moved to package `github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1`
 
@@ -20,7 +26,7 @@ All references to this function must be updated with the new import.
 
 The old function must be replaced by the new one that is much more versatile.
 
-### `packagemanager.PackageManager.DownloadToolRelease`, `packagemanager.PackageManager.DownloadPlatformRelease`, and `resources.DownloadResource.Download` functions now require `label` and `progressCB` parameters
+### `packagemanager.PackageManager.DownloadToolRelease`, `packagemanager.PackageManager.DownloadPlatformRelease`, and `resources.DownloadResource.Download` functions change signature and behaviour
 
 The following functions:
 
@@ -30,7 +36,8 @@ func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformReleas
 func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.Config) (*downloader.Downloader, error)
 ```
 
-now requires a progress callback:
+now requires a label and a progress callback parameter, do not return the `Downloader` object anymore, and they
+automatically handles the download internally:
 
 ```go
 func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *downloader.Config, label string, progressCB rpc.DownloadProgressCB) error
@@ -38,14 +45,23 @@ func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformReleas
 func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.Config, label string, downloadCB rpc.DownloadProgressCB) error
 ```
 
-The new parameters must be added to legacy code. If progress reports are not needed an empty stub for `label` and
-`progressCB` must be provided, for example:
+The new progress parameters must be added to legacy code, if progress reports are not needed an empty stub for `label`
+and `progressCB` must be provided. There is no more need to execute the `downloader.Run()` or
+`downloader.RunAndPoll(...)` method.
+
+For example, the old legacy code like:
 
 ```go
-err := pm.DownloadPlatformRelease(platformToDownload, config)
+downloader, err := pm.DownloadPlatformRelease(platformToDownload, config)
+if err != nil {
+    ...
+}
+if err := downloader.Run(); err != nil {
+    ...
+}
 ```
 
-becomes:
+may be ported to the new version as:
 
 ```go
 err := pm.DownloadPlatformRelease(platformToDownload, config, "", func(progress *rpc.DownloadProgress) {})

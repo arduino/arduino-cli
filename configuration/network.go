@@ -24,7 +24,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// UserAgent returns the user agent for the cli (mainly used by http clients)
+// UserAgent returns the user agent (mainly used by HTTP clients)
 func UserAgent(settings *viper.Viper) string {
 	subComponent := settings.GetString("network.user_agent_ext")
 	if subComponent != "" {
@@ -39,7 +39,7 @@ func UserAgent(settings *viper.Viper) string {
 		globals.VersionInfo.Commit)
 }
 
-// NetworkProxy returns the proxy configuration (mainly used by http clients)
+// NetworkProxy returns the proxy configuration (mainly used by HTTP clients)
 func NetworkProxy(settings *viper.Viper) (*url.URL, error) {
 	if !settings.IsSet("network.proxy") {
 		return nil, nil

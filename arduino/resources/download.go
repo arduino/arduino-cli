@@ -25,7 +25,7 @@ import (
 	"go.bug.st/downloader/v2"
 )
 
-// Download performs a download loop using the provided downloader.Downloader.
+// Download performs a download loop using the provided downloader.Config.
 // Messages are passed back to the DownloadProgressCB using label as text for the File field.
 func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.Config, label string, downloadCB rpc.DownloadProgressCB) error {
 	path, err := r.ArchivePath(downloadDir)
