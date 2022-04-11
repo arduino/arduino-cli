@@ -74,52 +74,54 @@ func main() {
 	}
 	fmt.Println("Detected port:", port.Label, port.ProtocolLabel)
 
-	// Connect to the port monitor
-	fmt.Println("Connecting to monitor")
-	ctx, cancel := context.WithCancel(context.Background())
-	if respStream, err := cli.Monitor(ctx); err != nil {
-		log.Fatal("Monitor:", err)
-	} else {
-		if err := respStream.Send(&commands.MonitorRequest{
-			Instance: instance,
-			Port:     port,
-		}); err != nil {
-			log.Fatal("Monitor send-config:", err)
-		}
-		time.Sleep(1 * time.Second)
-
-		go func() {
-			for {
-				if resp, err := respStream.Recv(); err != nil {
-					fmt.Println("     RECV:", err)
-					break
-				} else {
-					fmt.Println("     RECV:", resp)
-				}
-			}
-		}()
-
-		hello := &commands.MonitorRequest{
-			TxData: []byte("HELLO!"),
-		}
-		fmt.Println("Send:", hello)
-		if err := respStream.Send(hello); err != nil {
-			log.Fatal("Monitor send HELLO:", err)
-		}
-
-		fmt.Println("Send:", hello)
-		if err := respStream.Send(hello); err != nil {
-			log.Fatal("Monitor send HELLO:", err)
-		}
-
-		time.Sleep(5 * time.Second)
-
-		fmt.Println("Closing Monitor")
-		if err := respStream.CloseSend(); err != nil {
-			log.Fatal("Monitor close send:", err)
-		}
-		time.Sleep(5 * time.Second)
-	}
-	cancel()
+	connectToPort(cli, instance, port)
 	time.Sleep(5 * time.Second)
+	connectToPort(cli, instance, port)
+	time.Sleep(5 * time.Second)
+}
+
+func connectToPort(cli commands.ArduinoCoreServiceClient, instance *commands.Instance, port *commands.Port) {
+	// Connect to the port monitor
+	fmt.Println("Connecting to port", port)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	monitorClient, err := cli.Monitor(ctx)
+	if err != nil {
+		log.Fatal("Error opening Monitor:", err)
+	}
+	if err := monitorClient.Send(&commands.MonitorRequest{
+		Instance: instance,
+		Port:     port,
+	}); err != nil {
+		log.Fatal("Error sending Monitor config:", err)
+	}
+
+	go func() {
+		for {
+			resp, err := monitorClient.Recv()
+			if err != nil {
+				fmt.Println("     RECV-ERR:", err)
+				break
+			}
+			fmt.Println("     RECV:", resp)
+		}
+	}()
+
+	hello := &commands.MonitorRequest{
+		TxData: []byte("HELLO!"),
+	}
+	fmt.Println("Send:", hello)
+	if err := monitorClient.Send(hello); err != nil {
+		log.Fatal("Monitor send HELLO:", err)
+	}
+
+	time.Sleep(15 * time.Second)
+
+	fmt.Println("Closing Monitor")
+	if err := monitorClient.CloseSend(); err != nil {
+		log.Fatal("Monitor close send:", err)
+	}
+	<-monitorClient.Context().Done()
+
+	cancel()
 }

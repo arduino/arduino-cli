@@ -86,10 +86,11 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 		m.Quit()
 		return nil, nil, &arduino.FailedMonitorError{Cause: err}
 	}
-
-	for _, setting := range req.GetPortConfiguration().Settings {
-		if err := m.Configure(setting.SettingId, setting.Value); err != nil {
-			logrus.Errorf("Could not set configuration %s=%s: %s", setting.SettingId, setting.Value, err)
+	if portConfig := req.GetPortConfiguration(); portConfig != nil {
+		for _, setting := range portConfig.Settings {
+			if err := m.Configure(setting.SettingId, setting.Value); err != nil {
+				logrus.Errorf("Could not set configuration %s=%s: %s", setting.SettingId, setting.Value, err)
+			}
 		}
 	}
 

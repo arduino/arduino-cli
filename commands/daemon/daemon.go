@@ -508,9 +508,11 @@ func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 	if err != nil {
 		return err
 	}
-	ctx, cancel := context.WithCancel(stream.Context())
+
 	go func() {
-		defer cancel()
+		// close port on gRPC call EOF or errors
+		defer portProxy.Close()
+
 		for {
 			msg, err := stream.Recv()
 			if errors.Is(err, io.EOF) {
@@ -541,23 +543,20 @@ func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 			}
 		}
 	}()
-	go func() {
-		defer cancel()
-		buff := make([]byte, 4096)
-		for {
-			n, err := portProxy.Read(buff)
-			if errors.Is(err, io.EOF) {
-				return
-			}
-			if err != nil {
-				stream.Send(&rpc.MonitorResponse{Error: err.Error()})
-				return
-			}
-			if err := stream.Send(&rpc.MonitorResponse{RxData: buff[:n]}); err != nil {
-				return
-			}
+
+	buff := make([]byte, 4096)
+	for {
+		n, err := portProxy.Read(buff)
+		if errors.Is(err, io.EOF) {
+			break
 		}
-	}()
-	<-ctx.Done()
+		if err != nil {
+			stream.Send(&rpc.MonitorResponse{Error: err.Error()})
+			break
+		}
+		if err := stream.Send(&rpc.MonitorResponse{RxData: buff[:n]}); err != nil {
+			break
+		}
+	}
 	return nil
 }

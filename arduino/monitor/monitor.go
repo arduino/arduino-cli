@@ -103,24 +103,23 @@ func (mon *PluggableMonitor) String() string {
 	return mon.id
 }
 
-func (mon *PluggableMonitor) jsonDecodeLoop(in io.Reader, outChan chan<- *monitorMessage) {
+func jsonDecodeLoop(in io.Reader, outChan chan<- *monitorMessage, log *logrus.Entry, lastError *error) {
 	decoder := json.NewDecoder(in)
 
 	for {
 		var msg monitorMessage
 		if err := decoder.Decode(&msg); err != nil {
-			mon.incomingMessagesError = err
+			*lastError = err
 			close(outChan)
-			mon.log.Errorf("stopped decode loop: %s", err)
+			log.Errorf("stopped decode loop: %s", err)
 			return
 		}
-		mon.log.
-			WithField("event_type", msg.EventType).
+		log.WithField("event_type", msg.EventType).
 			WithField("message", msg.Message).
 			WithField("error", msg.Error).
 			Infof("received message")
 		if msg.EventType == "port_closed" {
-			mon.log.Infof("monitor port has been closed externally")
+			log.Infof("monitor port has been closed externally")
 		} else {
 			outChan <- &msg
 		}
@@ -128,13 +127,15 @@ func (mon *PluggableMonitor) jsonDecodeLoop(in io.Reader, outChan chan<- *monito
 }
 
 func (mon *PluggableMonitor) waitMessage(timeout time.Duration, expectedEvt string) (*monitorMessage, error) {
+	mon.log.WithField("expected", expectedEvt).Debugf("waiting for event")
 	var msg *monitorMessage
 	select {
-	case msg = <-mon.incomingMessagesChan:
-		if msg == nil {
+	case m, ok := <-mon.incomingMessagesChan:
+		if !ok {
 			// channel has been closed
 			return nil, mon.incomingMessagesError
 		}
+		msg = m
 	case <-time.After(timeout):
 		return nil, fmt.Errorf(tr("timeout waiting for message"))
 	}
@@ -192,22 +193,21 @@ func (mon *PluggableMonitor) runProcess() error {
 
 	messageChan := make(chan *monitorMessage)
 	mon.incomingMessagesChan = messageChan
-	go mon.jsonDecodeLoop(stdout, messageChan)
+	go jsonDecodeLoop(stdout, messageChan, mon.log, &mon.incomingMessagesError)
 
 	mon.log.Infof("Monitor process started successfully!")
 	return nil
 }
 
-func (mon *PluggableMonitor) killProcess() error {
+func (mon *PluggableMonitor) killProcess() {
 	mon.log.Infof("Killing monitor process")
 	if err := mon.process.Kill(); err != nil {
-		return err
+		mon.log.WithError(err).Error("Sent kill signal")
 	}
 	if err := mon.process.Wait(); err != nil {
-		return err
+		mon.log.WithError(err).Error("Waiting for process end")
 	}
-	mon.log.Infof("Monitor process killed successfully!")
-	return nil
+	mon.log.Infof("Monitor process killed")
 }
 
 // Run starts the monitor executable process and sends the HELLO command to the monitor to agree on the
@@ -220,15 +220,10 @@ func (mon *PluggableMonitor) Run() (err error) {
 
 	defer func() {
 		// If the monitor process is started successfully but the HELLO handshake
-		// fails the monitor is an unusable state, we kill the process to avoid
+		// fails the monitor is in an unusable state, we kill the process to avoid
 		// further issues down the line.
-		if err == nil {
-			return
-		}
-		if killErr := mon.killProcess(); killErr != nil {
-			// Log failure to kill the process, ideally that should never happen
-			// but it's best to know it if it does
-			mon.log.Errorf("Killing monitor after unsuccessful start: %s", killErr)
+		if err != nil {
+			mon.killProcess()
 		}
 	}()
 
@@ -297,20 +292,19 @@ func (mon *PluggableMonitor) Close() error {
 	if err := mon.sendCommand("CLOSE\n"); err != nil {
 		return err
 	}
-	_, err := mon.waitMessage(time.Second*10, "close")
+	_, err := mon.waitMessage(time.Millisecond*250, "close")
 	return err
 }
 
 // Quit terminates the monitor. No more commands can be accepted by the monitor.
 func (mon *PluggableMonitor) Quit() error {
+	defer mon.killProcess() // ensure that killProcess is called in any case...
+
 	if err := mon.sendCommand("QUIT\n"); err != nil {
 		return err
 	}
-	if _, err := mon.waitMessage(time.Second*10, "quit"); err != nil {
+	if _, err := mon.waitMessage(time.Millisecond*250, "quit"); err != nil {
 		return err
-	}
-	if err := mon.killProcess(); err != nil {
-		mon.log.WithError(err).Info("error killing monitor process")
 	}
 	return nil
 }
