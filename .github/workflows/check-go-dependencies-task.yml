@@ -73,7 +73,7 @@ jobs:
       # Some might find it convenient to have CI generate the cache rather than setting up for it locally
       - name: Upload cache to workflow artifact
         if: failure() && steps.diff.outcome == 'failure'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
           name: dep-licenses-cache

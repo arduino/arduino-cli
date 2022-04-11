@@ -81,7 +81,7 @@ jobs:
 
       # Transfer builds to artifacts job
       - name: Upload combined builds artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: ${{ env.DIST_DIR }}
           name: ${{ env.BUILDS_ARTIFACT }}
@@ -121,7 +121,7 @@ jobs:
           path: ${{ env.BUILDS_ARTIFACT }}
 
       - name: Upload individual build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: ${{ env.BUILDS_ARTIFACT }}/${{ matrix.artifact.path }}
           name: ${{ matrix.artifact.name }}

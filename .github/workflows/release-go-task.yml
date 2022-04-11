@@ -43,7 +43,7 @@ jobs:
         run: task dist:all
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
           name: ${{ env.ARTIFACT_NAME }}
@@ -114,7 +114,7 @@ jobs:
           perl -pi -w -e "s/.*${{ env.PROJECT_NAME }}_${TAG}_macOS_64bit.tar.gz/${CHECKSUM}  ${{ env.PROJECT_NAME }}_${TAG}_macOS_64bit.tar.gz/g;" ${{ env.DIST_DIR }}/*-checksums.txt
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
           name: ${{ env.ARTIFACT_NAME }}

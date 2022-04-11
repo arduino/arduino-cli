@@ -71,7 +71,7 @@ jobs:
           file-url: https://raw.githubusercontent.com/arduino/tooling-project-assets/main/workflow-templates/assets/sync-labels/${{ matrix.filename }}
 
       - name: Pass configuration files to next job via workflow artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: |
             *.yaml
