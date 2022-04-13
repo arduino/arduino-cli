@@ -30,7 +30,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
 	"github.com/arduino/arduino-cli/arduino/sketch"
-	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -148,7 +147,7 @@ type Context struct {
 	// Dry run, only create progress map
 	Progress ProgressStruct
 	// Send progress events to this callback
-	ProgressCB commands.TaskProgressCB
+	ProgressCB rpc.TaskProgressCB
 
 	// Contents of a custom build properties file (line by line)
 	CustomBuildProperties []string

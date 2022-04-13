@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"go.bug.st/downloader/v2"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -117,16 +118,16 @@ func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReferenc
 
 // DownloadToolRelease downloads a ToolRelease. If the tool is already downloaded a nil Downloader
 // is returned.
-func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *downloader.Config) (*downloader.Downloader, error) {
+func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *downloader.Config, label string, progressCB rpc.DownloadProgressCB) error {
 	resource := tool.GetCompatibleFlavour()
 	if resource == nil {
-		return nil, fmt.Errorf(tr("tool not available for your OS"))
+		return fmt.Errorf(tr("tool not available for your OS"))
 	}
-	return resource.Download(pm.DownloadDir, config)
+	return resource.Download(pm.DownloadDir, config, label, progressCB)
 }
 
 // DownloadPlatformRelease downloads a PlatformRelease. If the platform is already downloaded a
 // nil Downloader is returned.
-func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease, config *downloader.Config) (*downloader.Downloader, error) {
-	return platform.Resource.Download(pm.DownloadDir, config)
+func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease, config *downloader.Config, label string, progressCB rpc.DownloadProgressCB) error {
+	return platform.Resource.Download(pm.DownloadDir, config, label, progressCB)
 }

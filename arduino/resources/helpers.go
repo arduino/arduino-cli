@@ -17,10 +17,8 @@ package resources
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/arduino/go-paths-helper"
-	"go.bug.st/downloader/v2"
 )
 
 // ArchivePath returns the path of the Archive of the specified DownloadResource relative
@@ -40,31 +38,4 @@ func (r *DownloadResource) IsCached(downloadDir *paths.Path) (bool, error) {
 		return false, fmt.Errorf(tr("getting archive path: %s"), err)
 	}
 	return archivePath.Exist(), nil
-}
-
-// Download a DownloadResource.
-func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.Config) (*downloader.Downloader, error) {
-	path, err := r.ArchivePath(downloadDir)
-	if err != nil {
-		return nil, fmt.Errorf(tr("getting archive path: %s"), err)
-	}
-
-	if _, err := path.Stat(); os.IsNotExist(err) {
-		// normal download
-	} else if err == nil {
-		// check local file integrity
-		ok, err := r.TestLocalArchiveIntegrity(downloadDir)
-		if err != nil || !ok {
-			if err := path.Remove(); err != nil {
-				return nil, fmt.Errorf(tr("removing corrupted archive file: %s"), err)
-			}
-		} else {
-			// File is cached, nothing to do here
-			return nil, nil
-		}
-	} else {
-		return nil, fmt.Errorf(tr("getting archive file info: %s"), err)
-	}
-
-	return downloader.DownloadWithConfig(path.String(), r.URL, *config)
 }

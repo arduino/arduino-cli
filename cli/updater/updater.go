@@ -20,10 +20,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino/httpclient"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/configuration"
-	"github.com/arduino/arduino-cli/httpclient"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/inventory"
 	"github.com/fatih/color"

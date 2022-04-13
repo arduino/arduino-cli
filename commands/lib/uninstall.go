@@ -24,7 +24,7 @@ import (
 )
 
 // LibraryUninstall FIXMEDOC
-func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, taskCB commands.TaskProgressCB) error {
+func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, taskCB rpc.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	ref, err := createLibIndexReference(lm, req)
 	if err != nil {

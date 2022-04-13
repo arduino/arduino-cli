@@ -23,7 +23,7 @@ import (
 )
 
 // LibraryUpgradeAll upgrades all the available libraries
-func LibraryUpgradeAll(instanceID int32, downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
+func LibraryUpgradeAll(instanceID int32, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(instanceID)
 	if lm == nil {
 		return &arduino.InvalidInstanceError{}
@@ -41,7 +41,7 @@ func LibraryUpgradeAll(instanceID int32, downloadCB commands.DownloadProgressCB,
 }
 
 // LibraryUpgrade upgrades only the given libraries
-func LibraryUpgrade(instanceID int32, libraryNames []string, downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
+func LibraryUpgrade(instanceID int32, libraryNames []string, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(instanceID)
 	if lm == nil {
 		return &arduino.InvalidInstanceError{}
@@ -54,7 +54,7 @@ func LibraryUpgrade(instanceID int32, libraryNames []string, downloadCB commands
 	return upgrade(lm, libs, downloadCB, taskCB)
 }
 
-func upgrade(lm *librariesmanager.LibrariesManager, libs []*installedLib, downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
+func upgrade(lm *librariesmanager.LibrariesManager, libs []*installedLib, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	// Go through the list and download them
 	for _, lib := range libs {
 		if err := downloadLibrary(lm, lib.Available, downloadCB, taskCB); err != nil {

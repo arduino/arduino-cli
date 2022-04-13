@@ -13,29 +13,10 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package httpclient
+package commands
 
-import "net/http"
+// DownloadProgressCB is a callback to get updates on download progress
+type DownloadProgressCB func(curr *DownloadProgress)
 
-type httpClientRoundTripper struct {
-	transport http.RoundTripper
-	config    *Config
-}
-
-func newHTTPClientTransport(config *Config) http.RoundTripper {
-	proxy := http.ProxyURL(config.Proxy)
-
-	transport := &http.Transport{
-		Proxy: proxy,
-	}
-
-	return &httpClientRoundTripper{
-		transport: transport,
-		config:    config,
-	}
-}
-
-func (h *httpClientRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
-	req.Header.Add("User-Agent", h.config.UserAgent)
-	return h.transport.RoundTrip(req)
-}
+// TaskProgressCB is a callback to receive progress messages
+type TaskProgressCB func(msg *TaskProgress)

@@ -26,7 +26,7 @@ import (
 
 // PlatformUpgrade FIXMEDOC
 func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) (*rpc.PlatformUpgradeResponse, error) {
+	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformUpgradeResponse, error) {
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
@@ -50,7 +50,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest,
 }
 
 func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB, skipPostInstall bool) error {
+	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, skipPostInstall bool) error {
 	if platformRef.PlatformVersion != nil {
 		return &arduino.InvalidArgumentError{Message: tr("Upgrade doesn't accept parameters with version")}
 	}
