@@ -285,6 +285,41 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#the-content-of-package-githubcomarduinoarduino-clihttpclient-has-been-moved-to-a-different-path" class="md-nav__link">
+    The content of package github.com/arduino/arduino-cli/httpclient has been moved to a different path
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commandsdownloadprogresscb-and-commandstaskprogresscb-have-been-moved-to-package-githubcomarduinoarduino-clirpcccarduinoclicommandsv1" class="md-nav__link">
+    commands.DownloadProgressCB and commands.TaskProgressCB have been moved to package github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commandsgetdownloaderconfig-has-been-moved-to-package-githubcomarduinoarduino-cliarduinohttpclient" class="md-nav__link">
+    commands.GetDownloaderConfig has been moved to package github.com/arduino/arduino-cli/arduino/httpclient
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commandsdownload-has-been-removed-and-replaced-by-githubcomarduinoarduino-cliarduinohttpclientdownloadfile" class="md-nav__link">
+    commands.Download has been removed and replaced by github.com/arduino/arduino-cli/arduino/httpclient.DownloadFile
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#packagemanagerpackagemanagerdownloadtoolrelease-packagemanagerpackagemanagerdownloadplatformrelease-and-resourcesdownloadresourcedownload-functions-change-signature-and-behaviour" class="md-nav__link">
+    packagemanager.PackageManager.DownloadToolRelease, packagemanager.PackageManager.DownloadPlatformRelease, and resources.DownloadResource.Download functions change signature and behaviour
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#packagemanagerload-functions-now-returns-error-instead-of-statusstatus" class="md-nav__link">
     packagemanager.Load* functions now returns error instead of *status.Status
   </a>
@@ -1680,6 +1715,41 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#the-content-of-package-githubcomarduinoarduino-clihttpclient-has-been-moved-to-a-different-path" class="md-nav__link">
+    The content of package github.com/arduino/arduino-cli/httpclient has been moved to a different path
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commandsdownloadprogresscb-and-commandstaskprogresscb-have-been-moved-to-package-githubcomarduinoarduino-clirpcccarduinoclicommandsv1" class="md-nav__link">
+    commands.DownloadProgressCB and commands.TaskProgressCB have been moved to package github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commandsgetdownloaderconfig-has-been-moved-to-package-githubcomarduinoarduino-cliarduinohttpclient" class="md-nav__link">
+    commands.GetDownloaderConfig has been moved to package github.com/arduino/arduino-cli/arduino/httpclient
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commandsdownload-has-been-removed-and-replaced-by-githubcomarduinoarduino-cliarduinohttpclientdownloadfile" class="md-nav__link">
+    commands.Download has been removed and replaced by github.com/arduino/arduino-cli/arduino/httpclient.DownloadFile
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#packagemanagerpackagemanagerdownloadtoolrelease-packagemanagerpackagemanagerdownloadplatformrelease-and-resourcesdownloadresourcedownload-functions-change-signature-and-behaviour" class="md-nav__link">
+    packagemanager.PackageManager.DownloadToolRelease, packagemanager.PackageManager.DownloadPlatformRelease, and resources.DownloadResource.Download functions change signature and behaviour
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#packagemanagerload-functions-now-returns-error-instead-of-statusstatus" class="md-nav__link">
     packagemanager.Load* functions now returns error instead of *status.Status
   </a>
@@ -2060,6 +2130,47 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0220">0.22.0<a class="headerlink" href="#0220" title="Permanent link">&para;</a></h2>
+<h3 id="the-content-of-package-githubcomarduinoarduino-clihttpclient-has-been-moved-to-a-different-path">The content of package <code>github.com/arduino/arduino-cli/httpclient</code> has been moved to a different path<a class="headerlink" href="#the-content-of-package-githubcomarduinoarduino-clihttpclient-has-been-moved-to-a-different-path" title="Permanent link">&para;</a></h3>
+<p>In particular:</p>
+<ul>
+<li><code>UserAgent</code> and <code>NetworkProxy</code> have been moved to <code>github.com/arduino/arduino-cli/configuration</code></li>
+<li>the remainder of the package <code>github.com/arduino/arduino-cli/httpclient</code> has been moved to
+  <code>github.com/arduino/arduino-cli/arduino/httpclient</code></li>
+</ul>
+<p>The old imports must be updated according to the list above.</p>
+<h3 id="commandsdownloadprogresscb-and-commandstaskprogresscb-have-been-moved-to-package-githubcomarduinoarduino-clirpcccarduinoclicommandsv1"><code>commands.DownloadProgressCB</code> and <code>commands.TaskProgressCB</code> have been moved to package <code>github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1</code><a class="headerlink" href="#commandsdownloadprogresscb-and-commandstaskprogresscb-have-been-moved-to-package-githubcomarduinoarduino-clirpcccarduinoclicommandsv1" title="Permanent link">&para;</a></h3>
+<p>All references to these types must be updated with the new import.</p>
+<h3 id="commandsgetdownloaderconfig-has-been-moved-to-package-githubcomarduinoarduino-cliarduinohttpclient"><code>commands.GetDownloaderConfig</code> has been moved to package <code>github.com/arduino/arduino-cli/arduino/httpclient</code><a class="headerlink" href="#commandsgetdownloaderconfig-has-been-moved-to-package-githubcomarduinoarduino-cliarduinohttpclient" title="Permanent link">&para;</a></h3>
+<p>All references to this function must be updated with the new import.</p>
+<h3 id="commandsdownload-has-been-removed-and-replaced-by-githubcomarduinoarduino-cliarduinohttpclientdownloadfile"><code>commands.Download</code> has been removed and replaced by <code>github.com/arduino/arduino-cli/arduino/httpclient.DownloadFile</code><a class="headerlink" href="#commandsdownload-has-been-removed-and-replaced-by-githubcomarduinoarduino-cliarduinohttpclientdownloadfile" title="Permanent link">&para;</a></h3>
+<p>The old function must be replaced by the new one that is much more versatile.</p>
+<h3 id="packagemanagerpackagemanagerdownloadtoolrelease-packagemanagerpackagemanagerdownloadplatformrelease-and-resourcesdownloadresourcedownload-functions-change-signature-and-behaviour"><code>packagemanager.PackageManager.DownloadToolRelease</code>, <code>packagemanager.PackageManager.DownloadPlatformRelease</code>, and <code>resources.DownloadResource.Download</code> functions change signature and behaviour<a class="headerlink" href="#packagemanagerpackagemanagerdownloadtoolrelease-packagemanagerpackagemanagerdownloadplatformrelease-and-resourcesdownloadresourcedownload-functions-change-signature-and-behaviour" title="Permanent link">&para;</a></h3>
+<p>The following functions:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span> <span class="p">(</span><span class="nx">pm</span> <span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span> <span class="nx">DownloadToolRelease</span><span class="p">(</span><span class="nx">tool</span> <span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">ToolRelease</span><span class="p">,</span> <span class="nx">config</span> <span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Config</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Downloader</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">pm</span> <span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span> <span class="nx">DownloadPlatformRelease</span><span class="p">(</span><span class="nx">platform</span> <span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">PlatformRelease</span><span class="p">,</span> <span class="nx">config</span> <span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Config</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Downloader</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">DownloadResource</span><span class="p">)</span> <span class="nx">Download</span><span class="p">(</span><span class="nx">downloadDir</span> <span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">,</span> <span class="nx">config</span> <span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Config</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Downloader</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span>
+</code></pre></div>
+<p>now requires a label and a progress callback parameter, do not return the <code>Downloader</code> object anymore, and they
+automatically handles the download internally:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span> <span class="p">(</span><span class="nx">pm</span> <span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span> <span class="nx">DownloadToolRelease</span><span class="p">(</span><span class="nx">tool</span> <span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">ToolRelease</span><span class="p">,</span> <span class="nx">config</span> <span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Config</span><span class="p">,</span> <span class="nx">label</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">progressCB</span> <span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">)</span> <span class="kt">error</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">pm</span> <span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span> <span class="nx">DownloadPlatformRelease</span><span class="p">(</span><span class="nx">platform</span> <span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">PlatformRelease</span><span class="p">,</span> <span class="nx">config</span> <span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Config</span><span class="p">,</span> <span class="nx">label</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">progressCB</span> <span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">)</span> <span class="kt">error</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">DownloadResource</span><span class="p">)</span> <span class="nx">Download</span><span class="p">(</span><span class="nx">downloadDir</span> <span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">,</span> <span class="nx">config</span> <span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Config</span><span class="p">,</span> <span class="nx">label</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">downloadCB</span> <span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">)</span> <span class="kt">error</span>
+</code></pre></div>
+<p>The new progress parameters must be added to legacy code, if progress reports are not needed an empty stub for <code>label</code>
+and <code>progressCB</code> must be provided. There is no more need to execute the <code>downloader.Run()</code> or
+<code>downloader.RunAndPoll(...)</code> method.</p>
+<p>For example, the old legacy code like:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">downloader</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">pm</span><span class="p">.</span><span class="nx">DownloadPlatformRelease</span><span class="p">(</span><span class="nx">platformToDownload</span><span class="p">,</span> <span class="nx">config</span><span class="p">)</span>
+<span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+    <span class="o">...</span>
+<span class="p">}</span>
+<span class="k">if</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">downloader</span><span class="p">.</span><span class="nx">Run</span><span class="p">();</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+    <span class="o">...</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>may be ported to the new version as:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">err</span> <span class="o">:=</span> <span class="nx">pm</span><span class="p">.</span><span class="nx">DownloadPlatformRelease</span><span class="p">(</span><span class="nx">platformToDownload</span><span class="p">,</span> <span class="nx">config</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">progress</span> <span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgress</span><span class="p">)</span> <span class="p">{})</span>
+</code></pre></div>
 <h3 id="packagemanagerload-functions-now-returns-error-instead-of-statusstatus"><code>packagemanager.Load*</code> functions now returns <code>error</code> instead of <code>*status.Status</code><a class="headerlink" href="#packagemanagerload-functions-now-returns-error-instead-of-statusstatus" title="Permanent link">&para;</a></h3>
 <p>The following functions signature:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">func</span> <span class="p">(</span><span class="nx">pm</span> <span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span> <span class="nx">LoadHardware</span><span class="p">()</span> <span class="p">[]</span><span class="o">*</span><span class="nx">status</span><span class="p">.</span><span class="nx">Status</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
