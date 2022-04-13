@@ -112,6 +112,8 @@ nav:
   - Pluggable discovery specification: pluggable-discovery-specification.md
   - Pluggable monitor specification: pluggable-monitor-specification.md
   - Package index specification: package_index_json-specification.md
+  - Guides:
+      - Secure boot: guides/secure-boot.md
 
 extra:
   version:
