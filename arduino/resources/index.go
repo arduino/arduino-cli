@@ -50,7 +50,7 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadP
 	defer tmp.RemoveAll()
 
 	// Download index file
-	indexFileName := path.Base(res.URL.Path) // == pakcage_index.json[.gz]
+	indexFileName := path.Base(res.URL.Path) // == package_index.json[.gz]
 	tmpIndexPath := tmp.Join(indexFileName)
 	if err := httpclient.DownloadFile(tmpIndexPath, res.URL.String(), tr("Downloading index: %s", indexFileName), downloadCB, nil, downloader.NoResume); err != nil {
 		return &arduino.FailedDownloadError{Message: tr("Error downloading index '%s'", res.URL), Cause: err}
@@ -58,7 +58,7 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadP
 
 	// Expand the index if it is compressed
 	if strings.HasSuffix(indexFileName, ".gz") {
-		indexFileName = strings.TrimSuffix(indexFileName, ".gz") // == pakcage_index.json
+		indexFileName = strings.TrimSuffix(indexFileName, ".gz") // == package_index.json
 		tmpUnzippedIndexPath := tmp.Join(indexFileName)
 		if err := paths.GUnzip(tmpIndexPath, tmpUnzippedIndexPath); err != nil {
 			return &arduino.PermissionDeniedError{Message: tr("Error extracting %s", indexFileName), Cause: err}
