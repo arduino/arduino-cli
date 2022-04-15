@@ -66,7 +66,7 @@ require (
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	go.bug.st/cleanup v1.0.0 // indirect
 	go.bug.st/downloader/v2 v2.1.1 // indirect
-	go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18 // indirect
+	go.bug.st/relaxed-semver v0.9.0 // indirect
 	go.bug.st/serial v1.3.2 // indirect
 	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect

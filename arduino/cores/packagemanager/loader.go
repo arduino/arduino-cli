@@ -157,11 +157,13 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 	// Filter out directories like .git and similar things
 	platformsDirs.FilterOutPrefix(".")
 	for _, platformPath := range platformsDirs {
+		targetArchitecture := platformPath.Base()
+
 		// Tools are not a platform
-		if platformPath.Base() == "tools" {
+		if targetArchitecture == "tools" {
 			continue
 		}
-		if err := pm.loadPlatform(targetPackage, platformPath); err != nil {
+		if err := pm.loadPlatform(targetPackage, targetArchitecture, platformPath); err != nil {
 			merr = append(merr, err)
 		}
 	}
@@ -172,13 +174,11 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 // loadPlatform loads a single platform and all its installed releases given a platformPath.
 // platformPath must be a directory.
 // Returns a gRPC Status error in case of failures.
-func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, platformPath *paths.Path) error {
+func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, architecture string, platformPath *paths.Path) error {
 	// This is not a platform
 	if platformPath.IsNotDir() {
 		return errors.New(tr("path is not a platform directory: %s", platformPath))
 	}
-
-	architecture := platformPath.Base()
 
 	// There are two possible platform directory structures:
 	// - ARCHITECTURE/boards.txt
@@ -618,17 +618,26 @@ func (pm *PackageManager) loadToolReleasesFromTool(tool *cores.Tool, toolPath *p
 	toolVersions.FilterDirs()
 	toolVersions.FilterOutHiddenFiles()
 	for _, versionPath := range toolVersions {
-		if toolReleasePath, err := versionPath.Abs(); err == nil {
-			version := semver.ParseRelaxed(versionPath.Base())
-			release := tool.GetOrCreateRelease(version)
-			release.InstallDir = toolReleasePath
-			pm.Log.WithField("tool", release).Infof("Loaded tool")
-		} else {
+		version := semver.ParseRelaxed(versionPath.Base())
+		if err := pm.loadToolReleaseFromDirectory(tool, version, versionPath); err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+func (pm *PackageManager) loadToolReleaseFromDirectory(tool *cores.Tool, version *semver.RelaxedVersion, toolReleasePath *paths.Path) error {
+	if absToolReleasePath, err := toolReleasePath.Abs(); err != nil {
+		return errors.New(tr("error opening %s", absToolReleasePath))
+	} else if !absToolReleasePath.IsDir() {
+		return errors.New(tr("%s is not a directory", absToolReleasePath))
+	} else {
+		toolRelease := tool.GetOrCreateRelease(version)
+		toolRelease.InstallDir = absToolReleasePath
+		pm.Log.WithField("tool", toolRelease).Infof("Loaded tool")
+		return nil
+	}
 }
 
 // LoadToolsFromBundleDirectories FIXMEDOC

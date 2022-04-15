@@ -305,7 +305,7 @@ github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9dec
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
 go.bug.st/cleanup v1.0.0/go.mod h1:EqVmTg2IBk4znLbPD28xne3abjsJftMdqqJEjhn70bk=
 go.bug.st/downloader/v2 v2.1.1/go.mod h1:VZW2V1iGKV8rJL2ZEGIDzzBeKowYv34AedJz13RzVII=
-go.bug.st/relaxed-semver v0.0.0-20190922224835-391e10178d18/go.mod h1:Cx1VqMtEhE9pIkEyUj3LVVVPkv89dgW8aCKrRPDR/uE=
+go.bug.st/relaxed-semver v0.9.0/go.mod h1:ug0/W/RPYUjliE70Ghxg77RDHmPxqpo7SHV16ijss7Q=
 go.bug.st/serial v1.3.2/go.mod h1:jDkjqASf/qSjmaOxHSHljwUQ6eHo/ZX/bxJLQqSlvZg=
 go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45/go.mod h1:dRSl/CVCTf56CkXgJMDOdSwNfo2g1orOGE/gBGdvjZw=
 go.etcd.io/etcd/api/v3 v3.5.0/go.mod h1:cbVKeC6lCfl7j/8jBhAK6aIYO9XOjdptoxU/nLQcPvs=
