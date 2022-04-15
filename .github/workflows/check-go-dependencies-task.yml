@@ -63,8 +63,8 @@ jobs:
       - name: Check for outdated cache
         id: diff
         run: |
-          git add --intent-to-add .
-          if ! git diff --color --exit-code; then
+          git add .
+          if ! git diff --cached --color --exit-code; then
             echo
             echo "::error::Dependency license metadata out of sync. See: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-go-dependencies-task.md#metadata-cache"
             exit 1
