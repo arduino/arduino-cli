@@ -16,8 +16,14 @@
 package arguments
 
 import (
+	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino"
+	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
 )
 
@@ -53,4 +59,45 @@ func (f *Fqbn) String() string {
 // Set sets the fqbn
 func (f *Fqbn) Set(fqbn string) {
 	f.fqbn = fqbn
+}
+
+// CalculateFQBNAndPort calculate the FQBN and Port metadata based on
+// parameters provided by the user.
+// This determine the FQBN based on:
+// - the value of the FQBN flag if explicitly specified, otherwise
+// - the FQBN value in sketch.json if available, otherwise
+// - it tries to autodetect the board connected to the given port flags
+// If all above methods fails, it returns the empty string.
+// The Port metadata are always returned except if:
+// - the port is not found, in this case nil is returned
+// - the FQBN autodetection fail, in this case the function prints an error and
+//   terminates the execution
+func CalculateFQBNAndPort(portArgs *Port, fqbnArg *Fqbn, instance *rpc.Instance, sk *sketch.Sketch) (string, *rpc.Port) {
+	// TODO: REMOVE sketch.Sketch from here
+
+	fqbn := fqbnArg.String()
+	if fqbn == "" && sk != nil && sk.Metadata != nil {
+		// If the user didn't specify an FQBN and a sketch.json file is present
+		// read it from there.
+		fqbn = sk.Metadata.CPU.Fqbn
+	}
+	if fqbn == "" {
+		if portArgs == nil || portArgs.address == "" {
+			feedback.Error(&arduino.MissingFQBNError{})
+			os.Exit(errorcodes.ErrGeneric)
+		}
+		fqbn, port := portArgs.DetectFQBN(instance)
+		if fqbn == "" {
+			feedback.Error(&arduino.MissingFQBNError{})
+			os.Exit(errorcodes.ErrGeneric)
+		}
+		return fqbn, port
+	}
+
+	port, err := portArgs.GetPort(instance, sk)
+	if err != nil {
+		feedback.Errorf(tr("Error getting port metadata: %v", err))
+		os.Exit(errorcodes.ErrGeneric)
+	}
+	return fqbn, port.ToRPC()
 }

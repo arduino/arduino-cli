@@ -95,22 +95,11 @@ func runUploadCommand(command *cobra.Command, args []string) {
 		feedback.Errorf(tr("Error during Upload: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-
-	port, err := portArgs.GetPort(instance, sk)
-	if err != nil {
-		feedback.Errorf(tr("Error during Upload: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
-	}
-
-	if fqbnArg.String() == "" && sk != nil && sk.Metadata != nil {
-		// If the user didn't specify an FQBN and a sketch.json file is present
-		// read it from there.
-		fqbnArg.Set(sk.Metadata.CPU.Fqbn)
-	}
+	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, instance, sk)
 
 	userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
 		Instance: instance,
-		Fqbn:     fqbnArg.String(),
+		Fqbn:     fqbn,
 		Address:  port.Address,
 		Protocol: port.Protocol,
 	})
@@ -153,9 +142,9 @@ func runUploadCommand(command *cobra.Command, args []string) {
 
 	if _, err := upload.Upload(context.Background(), &rpc.UploadRequest{
 		Instance:   instance,
-		Fqbn:       fqbnArg.String(),
+		Fqbn:       fqbn,
 		SketchPath: path,
-		Port:       port.ToRPC(),
+		Port:       port,
 		Verbose:    verbose,
 		Verify:     verify,
 		ImportFile: importFile,

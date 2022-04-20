@@ -21,11 +21,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -152,12 +154,32 @@ func (p *Port) GetSearchTimeout() time.Duration {
 	return p.timeout
 }
 
-// GetDiscoveryPort is a helper function useful to get the port and handle possible errors
-func (p *Port) GetDiscoveryPort(instance *rpc.Instance, sk *sketch.Sketch) *discovery.Port {
-	discoveryPort, err := p.GetPort(instance, sk)
+// DetectFQBN tries to identify the board connected to the port and returns the
+// discovered Port object together with the FQBN. If the port does not match
+// exactly 1 board,
+func (p *Port) DetectFQBN(inst *rpc.Instance) (string, *rpc.Port) {
+	detectedPorts, err := board.List(&rpc.BoardListRequest{Instance: inst})
 	if err != nil {
-		feedback.Errorf(tr("Error discovering port: %v"), err)
+		feedback.Errorf(tr("Error during FQBN detection: %v", err))
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	return discoveryPort
+	for _, detectedPort := range detectedPorts {
+		port := detectedPort.GetPort()
+		if p.address != port.GetAddress() {
+			continue
+		}
+		if p.protocol != "" && p.protocol != port.GetProtocol() {
+			continue
+		}
+		if len(detectedPort.MatchingBoards) > 1 {
+			feedback.Error(&arduino.MultipleBoardsDetectedError{Port: port})
+			os.Exit(errorcodes.ErrBadArgument)
+		}
+		if len(detectedPort.MatchingBoards) == 0 {
+			feedback.Error(&arduino.NoBoardsDetectedError{Port: port})
+			os.Exit(errorcodes.ErrBadArgument)
+		}
+		return detectedPort.MatchingBoards[0].Fqbn, port
+	}
+	return "", nil
 }

@@ -26,8 +26,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/discovery"
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
@@ -150,6 +148,8 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	}
 
 	sketchPath := arguments.InitSketchPath(path)
+	sk := arguments.NewSketch(sketchPath)
+	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, sk)
 
 	if keysKeychain != "" || signKey != "" || encryptKey != "" {
 		arguments.CheckFlagsMandatory(cmd, "keys-keychain", "sign-key", "encrypt-key")
@@ -170,25 +170,6 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			os.Exit(errorcodes.ErrGeneric)
 		}
 		overrides = o.Overrides
-	}
-
-	fqbn := fqbnArg.String()
-	var sk *sketch.Sketch
-	var port *discovery.Port
-	// If the user didn't provide an FQBN it might either mean
-	// that she forgot or that is trying to compile and upload
-	// using board autodetection.
-	if fqbn == "" && uploadAfterCompile {
-		sk = arguments.NewSketch(sketchPath)
-		port = portArgs.GetDiscoveryPort(inst, sk)
-		rpcPort := port.ToRPC()
-		var err error
-		pm := commands.GetPackageManager(inst.Id)
-		fqbn, err = upload.DetectConnectedBoard(pm, rpcPort.Address, rpcPort.Protocol)
-		if err != nil {
-			feedback.Errorf(tr("Error during FQBN detection: %v", err))
-			os.Exit(errorcodes.ErrGeneric)
-		}
 	}
 
 	compileRequest := &rpc.CompileRequest{
@@ -227,16 +208,9 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if compileError == nil && uploadAfterCompile {
-		if sk == nil {
-			sk = arguments.NewSketch(sketchPath)
-		}
-		if port == nil {
-			port = portArgs.GetDiscoveryPort(inst, sk)
-		}
-
 		userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
 			Instance: inst,
-			Fqbn:     fqbnArg.String(),
+			Fqbn:     fqbn,
 			Address:  port.Address,
 			Protocol: port.Protocol,
 		})
@@ -255,7 +229,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			Instance:   inst,
 			Fqbn:       fqbn,
 			SketchPath: sketchPath.String(),
-			Port:       port.ToRPC(),
+			Port:       port,
 			Verbose:    verbose,
 			Verify:     verify,
 			ImportDir:  buildPath,
