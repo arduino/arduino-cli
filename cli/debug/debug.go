@@ -36,8 +36,8 @@ import (
 )
 
 var (
-	fqbn        arguments.Fqbn
-	port        arguments.Port
+	fqbnArg     arguments.Fqbn
+	portArgs    arguments.Port
 	interpreter string
 	importDir   string
 	printInfo   bool
@@ -56,8 +56,8 @@ func NewCommand() *cobra.Command {
 		Run:     runDebugCommand,
 	}
 
-	fqbn.AddToCommand(debugCommand)
-	port.AddToCommand(debugCommand)
+	fqbnArg.AddToCommand(debugCommand)
+	portArgs.AddToCommand(debugCommand)
 	programmer.AddToCommand(debugCommand)
 	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
 	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries for debug."))
@@ -77,13 +77,13 @@ func runDebugCommand(command *cobra.Command, args []string) {
 
 	sketchPath := arguments.InitSketchPath(path)
 	sk := arguments.NewSketch(sketchPath)
-	discoveryPort := port.GetDiscoveryPort(instance, sk)
+	port := portArgs.GetDiscoveryPort(instance, sk)
 
 	debugConfigRequested := &dbg.DebugConfigRequest{
 		Instance:    instance,
-		Fqbn:        fqbn.String(),
+		Fqbn:        fqbnArg.String(),
 		SketchPath:  sketchPath.String(),
-		Port:        discoveryPort.ToRPC(),
+		Port:        port.ToRPC(),
 		Interpreter: interpreter,
 		ImportDir:   importDir,
 		Programmer:  programmer.String(),
