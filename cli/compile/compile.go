@@ -211,7 +211,6 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
 			Instance: inst,
 			Fqbn:     fqbn,
-			Address:  port.Address,
 			Protocol: port.Protocol,
 		})
 		if err != nil {
