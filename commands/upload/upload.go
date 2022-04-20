@@ -144,7 +144,7 @@ func DetectConnectedBoard(pm *packagemanager.PackageManager, address, protocol s
 			} else if l >= 2 {
 				// There are multiple boards detected on this port,
 				// we have no way of knowing which one is the one.
-				return "", &arduino.MultipleBoardsDetectedError{Port: p}
+				return "", &arduino.MultipleBoardsDetectedError{Port: p.ToRPC()}
 			} else {
 				// We found a matching port but there's either
 				// no board connected or we can't recognize it.
