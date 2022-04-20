@@ -74,6 +74,9 @@ func (p *Port) GetPortAddressAndProtocol(instance *rpc.Instance, sk *sketch.Sket
 // GetPort returns the Port obtained by parsing command line arguments.
 // The extra metadata for the ports is obtained using the pluggable discoveries.
 func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Port, error) {
+	// TODO: REMOVE sketch.Sketch from here
+	// TODO: REMOVE discvoery from here (use board.List instead)
+
 	address := p.address
 	protocol := p.protocol
 
