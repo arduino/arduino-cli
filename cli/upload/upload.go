@@ -39,8 +39,8 @@ import (
 )
 
 var (
-	fqbn       arguments.Fqbn
-	port       arguments.Port
+	fqbnArg    arguments.Fqbn
+	portArgs   arguments.Port
 	verbose    bool
 	verify     bool
 	importDir  string
@@ -64,8 +64,8 @@ func NewCommand() *cobra.Command {
 		Run: runUploadCommand,
 	}
 
-	fqbn.AddToCommand(uploadCommand)
-	port.AddToCommand(uploadCommand)
+	fqbnArg.AddToCommand(uploadCommand)
+	portArgs.AddToCommand(uploadCommand)
 	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries to upload."))
 	uploadCommand.Flags().StringVarP(&importFile, "input-file", "i", "", tr("Binary file to upload."))
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
@@ -96,23 +96,23 @@ func runUploadCommand(command *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	discoveryPort, err := port.GetPort(instance, sk)
+	port, err := portArgs.GetPort(instance, sk)
 	if err != nil {
 		feedback.Errorf(tr("Error during Upload: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if fqbn.String() == "" && sk != nil && sk.Metadata != nil {
+	if fqbnArg.String() == "" && sk != nil && sk.Metadata != nil {
 		// If the user didn't specify an FQBN and a sketch.json file is present
 		// read it from there.
-		fqbn.Set(sk.Metadata.CPU.Fqbn)
+		fqbnArg.Set(sk.Metadata.CPU.Fqbn)
 	}
 
 	userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
 		Instance: instance,
-		Fqbn:     fqbn.String(),
-		Address:  discoveryPort.Address,
-		Protocol: discoveryPort.Protocol,
+		Fqbn:     fqbnArg.String(),
+		Address:  port.Address,
+		Protocol: port.Protocol,
 	})
 	if err != nil {
 		feedback.Errorf(tr("Error during Upload: %v"), err)
@@ -143,7 +143,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 
 	fields := map[string]string{}
 	if len(userFieldRes.UserFields) > 0 {
-		feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", discoveryPort.Protocol))
+		feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", port.Protocol))
 		fields = arguments.AskForUserFields(userFieldRes.UserFields)
 	}
 
@@ -153,9 +153,9 @@ func runUploadCommand(command *cobra.Command, args []string) {
 
 	if _, err := upload.Upload(context.Background(), &rpc.UploadRequest{
 		Instance:   instance,
-		Fqbn:       fqbn.String(),
+		Fqbn:       fqbnArg.String(),
 		SketchPath: path,
-		Port:       discoveryPort.ToRPC(),
+		Port:       port.ToRPC(),
 		Verbose:    verbose,
 		Verify:     verify,
 		ImportFile: importFile,
