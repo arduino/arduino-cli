@@ -241,7 +241,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			Protocol: port.Protocol,
 		})
 		if err != nil {
-			feedback.Errorf(tr("Error during Upload: %v"), err)
+			feedback.Errorf(tr("Error during Upload: %v", err))
 			os.Exit(errorcodes.ErrGeneric)
 		}
 
