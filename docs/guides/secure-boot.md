@@ -63,5 +63,5 @@ For example, by using the following command, the sketch is compiled and the resu
 with the specified keys located in `/home/user/Arduino/keys` directory:
 
 ```
-arduino-cli compile -b arduino:mbed_portenta:envie_m7:security=sien --keys-keychain /home/user/Arduino/keys --sign-key ecdsa-p256-signing-key.pem --encrypt-key ecdsa-p256-encrypt-key.pem /home/user/Arduino/MySketch
+arduino-cli compile -b arduino:mbed_portenta:envie_m7:security=sien --keys-keychain /home/user/Arduino/keys --sign-key ecdsa-p256-signing-priv-key.pem --encrypt-key ecdsa-p256-encrypt-pub-key.pem /home/user/Arduino/MySketch
 ```
