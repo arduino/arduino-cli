@@ -40,8 +40,8 @@ menu.security=Security setting
 envie_m7.menu.security.none=None
 envie_m7.menu.security.sien=Signature + Encryption
 
-envie_m7.menu.security.sien.build.postbuild.cmd="{tools.imgtool.cmd}" {tools.imgtool.flags}
-envie_m7.menu.security.none.build.postbuild.cmd="{tools.imgtool.cmd}" exit
+envie_m7.menu.security.sien.build.postbuild.cmd="{tools.imgtool.path}/{tools.imgtool.cmd}" {tools.imgtool.flags}
+envie_m7.menu.security.none.build.postbuild.cmd="{tools.imgtool.path}/{tools.imgtool.cmd}" exit
 
 envie_m7.menu.security.sien.build.keys.keychain={runtime.hardware.path}/Default_Keys
 envie_m7.menu.security.sien.build.keys.sign_key=default-signing-key.pem
