@@ -43,7 +43,7 @@ envie_m7.menu.security.sien=Signature + Encryption
 envie_m7.menu.security.sien.build.postbuild.cmd="{tools.imgtool.path}/{tools.imgtool.cmd}" {tools.imgtool.flags}
 envie_m7.menu.security.none.build.postbuild.cmd="{tools.imgtool.path}/{tools.imgtool.cmd}" exit
 
-envie_m7.menu.security.sien.build.keys.keychain={runtime.hardware.path}/Default_Keys
+envie_m7.menu.security.sien.build.keys.keychain={runtime.platform.path}/libraries/MCUboot/default_keys
 envie_m7.menu.security.sien.build.keys.sign_key=default-signing-key.pem
 envie_m7.menu.security.sien.build.keys.encrypt_key=default-encrypt-key.pem
 [...]
