@@ -364,7 +364,7 @@ def test_compile_and_upload_combo_sketch_with_mismatched_casing(run_command, dat
         # Try to compile
         res = run_command(["compile", "--clean", "-b", board.fqbn, "-u", "-p", board.address, sketch_path])
         assert res.failed
-        assert "Error during build: Can't open sketch: no valid sketch found in" in res.stderr
+        assert "Error opening sketch: no valid sketch found in" in res.stderr
 
 
 def test_upload_sketch_with_mismatched_casing(run_command, data_dir, detected_boards, wait_for_board):
