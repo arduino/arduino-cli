@@ -40,7 +40,7 @@ import (
 type Port struct {
 	address  string
 	protocol string
-	timeout  time.Duration
+	timeout  DiscoveryTimeout
 }
 
 // AddToCommand adds the flags used to set port and protocol to the specified Command
@@ -53,7 +53,7 @@ func (p *Port) AddToCommand(cmd *cobra.Command) {
 	cmd.RegisterFlagCompletionFunc("protocol", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return GetInstalledProtocols(), cobra.ShellCompDirectiveDefault
 	})
-	cmd.Flags().DurationVar(&p.timeout, "discovery-timeout", 5*time.Second, tr("Max time to wait for port discovery, e.g.: 30s, 1m"))
+	p.timeout.AddToCommand(cmd)
 }
 
 // GetPortAddressAndProtocol returns only the port address and the port protocol
@@ -127,7 +127,7 @@ func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Po
 		}
 	}()
 
-	deadline := time.After(p.timeout)
+	deadline := time.After(p.timeout.Get())
 	for {
 		select {
 		case portEvent := <-eventChan:
@@ -154,14 +154,17 @@ func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Po
 
 // GetSearchTimeout returns the timeout
 func (p *Port) GetSearchTimeout() time.Duration {
-	return p.timeout
+	return p.timeout.Get()
 }
 
 // DetectFQBN tries to identify the board connected to the port and returns the
 // discovered Port object together with the FQBN. If the port does not match
 // exactly 1 board,
 func (p *Port) DetectFQBN(inst *rpc.Instance) (string, *rpc.Port) {
-	detectedPorts, err := board.List(&rpc.BoardListRequest{Instance: inst})
+	detectedPorts, err := board.List(&rpc.BoardListRequest{
+		Instance: inst,
+		Timeout:  p.timeout.Get().Milliseconds(),
+	})
 	if err != nil {
 		feedback.Errorf(tr("Error during FQBN detection: %v", err))
 		os.Exit(errorcodes.ErrGeneric)
