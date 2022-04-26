@@ -46,6 +46,7 @@ import (
 
 var (
 	fqbnArg                 arguments.Fqbn       // Fully Qualified Board Name, e.g.: arduino:avr:uno.
+	profile                 arguments.Profile    // Profile to use
 	showProperties          bool                 // Show all build preferences used instead of compiling.
 	preprocess              bool                 // Print preprocessed code to stdout.
 	buildCachePath          string               // Builds of 'core.a' are saved into this path to be cached and reused.
@@ -91,6 +92,7 @@ func NewCommand() *cobra.Command {
 	}
 
 	fqbnArg.AddToCommand(compileCommand)
+	profile.AddToCommand(compileCommand)
 	compileCommand.Flags().BoolVar(&showProperties, "show-properties", false, tr("Show all build properties used instead of compiling."))
 	compileCommand.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
 	compileCommand.Flags().StringVar(&buildCachePath, "build-cache-path", "", tr("Builds of 'core.a' are saved into this path to be cached and reused."))
@@ -138,8 +140,6 @@ func NewCommand() *cobra.Command {
 }
 
 func runCompileCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
-
 	logrus.Info("Executing `arduino-cli compile`")
 
 	path := ""
@@ -149,6 +149,12 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 
 	sketchPath := arguments.InitSketchPath(path)
 	sk := arguments.NewSketch(sketchPath)
+
+	inst, profileFqbn := instance.CreateAndInitWithProfile(profile.Get(), sketchPath)
+	if fqbnArg.String() == "" {
+		fqbnArg.Set(profileFqbn)
+	}
+
 	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, sk)
 
 	if keysKeychain != "" || signKey != "" || encryptKey != "" {
