@@ -32,7 +32,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/resources"
-	sk "github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/configuration"
@@ -769,29 +769,29 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB rpc.Downlo
 // LoadSketch collects and returns all files composing a sketch
 func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketchResponse, error) {
 	// TODO: This should be a ToRpc function for the Sketch struct
-	sketch, err := sk.New(paths.New(req.SketchPath))
+	sk, err := sketch.New(paths.New(req.SketchPath))
 	if err != nil {
 		return nil, &arduino.CantOpenSketchError{Cause: err}
 	}
 
-	otherSketchFiles := make([]string, sketch.OtherSketchFiles.Len())
-	for i, file := range sketch.OtherSketchFiles {
+	otherSketchFiles := make([]string, sk.OtherSketchFiles.Len())
+	for i, file := range sk.OtherSketchFiles {
 		otherSketchFiles[i] = file.String()
 	}
 
-	additionalFiles := make([]string, sketch.AdditionalFiles.Len())
-	for i, file := range sketch.AdditionalFiles {
+	additionalFiles := make([]string, sk.AdditionalFiles.Len())
+	for i, file := range sk.AdditionalFiles {
 		additionalFiles[i] = file.String()
 	}
 
-	rootFolderFiles := make([]string, sketch.RootFolderFiles.Len())
-	for i, file := range sketch.RootFolderFiles {
+	rootFolderFiles := make([]string, sk.RootFolderFiles.Len())
+	for i, file := range sk.RootFolderFiles {
 		rootFolderFiles[i] = file.String()
 	}
 
 	return &rpc.LoadSketchResponse{
-		MainFile:         sketch.MainFile.String(),
-		LocationPath:     sketch.FullPath.String(),
+		MainFile:         sk.MainFile.String(),
+		LocationPath:     sk.FullPath.String(),
 		OtherSketchFiles: otherSketchFiles,
 		AdditionalFiles:  additionalFiles,
 		RootFolderFiles:  rootFolderFiles,
