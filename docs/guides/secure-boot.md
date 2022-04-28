@@ -40,12 +40,12 @@ menu.security=Security setting
 envie_m7.menu.security.none=None
 envie_m7.menu.security.sien=Signature + Encryption
 
-envie_m7.menu.security.sien.build.postbuild.cmd="{tools.imgtool.cmd}" {tools.imgtool.flags}
-envie_m7.menu.security.none.build.postbuild.cmd="{tools.imgtool.cmd}" exit
+envie_m7.menu.security.sien.build.postbuild.cmd="{tools.imgtool.path}/{tools.imgtool.cmd}" {tools.imgtool.flags}
+envie_m7.menu.security.none.build.postbuild.cmd="{tools.imgtool.path}/{tools.imgtool.cmd}" exit
 
-envie_m7.menu.security.sien.build.keys.keychain={runtime.hardware.path}/Default_Keys
-envie_m7.menu.security.sien.build.keys.sign_key=default-signing-key.pem
-envie_m7.menu.security.sien.build.keys.encrypt_key=default-encrypt-key.pem
+envie_m7.menu.security.sien.build.keys.keychain={runtime.platform.path}/libraries/MCUboot/default_keys
+envie_m7.menu.security.sien.build.keys.sign_key=default-signing-priv-key.pem
+envie_m7.menu.security.sien.build.keys.encrypt_key=default-encrypt-pub-key.pem
 [...]
 ```
 
@@ -63,5 +63,5 @@ For example, by using the following command, the sketch is compiled and the resu
 with the specified keys located in `/home/user/Arduino/keys` directory:
 
 ```
-arduino-cli compile -b arduino:mbed_portenta:envie_m7:security=sien --keys-keychain /home/user/Arduino/keys --sign-key ecsdsa-p256-signing-key.pem --encrypt-key ecsdsa-p256-encrypt-key.pem /home/user/Arduino/MySketch
+arduino-cli compile -b arduino:mbed_portenta:envie_m7:security=sien --keys-keychain /home/user/Arduino/keys --sign-key ecdsa-p256-signing-priv-key.pem --encrypt-key ecdsa-p256-encrypt-pub-key.pem /home/user/Arduino/MySketch
 ```
