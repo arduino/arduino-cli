@@ -1369,12 +1369,12 @@ menu.security=Security setting
 envie_m7.menu.security.none=None
 envie_m7.menu.security.sien=Signature + Encryption
 
-envie_m7.menu.security.sien.build.postbuild.cmd=&quot;{tools.imgtool.cmd}&quot; {tools.imgtool.flags}
-envie_m7.menu.security.none.build.postbuild.cmd=&quot;{tools.imgtool.cmd}&quot; exit
+envie_m7.menu.security.sien.build.postbuild.cmd=&quot;{tools.imgtool.path}/{tools.imgtool.cmd}&quot; {tools.imgtool.flags}
+envie_m7.menu.security.none.build.postbuild.cmd=&quot;{tools.imgtool.path}/{tools.imgtool.cmd}&quot; exit
 
-envie_m7.menu.security.sien.build.keys.keychain={runtime.hardware.path}/Default_Keys
-envie_m7.menu.security.sien.build.keys.sign_key=default-signing-key.pem
-envie_m7.menu.security.sien.build.keys.encrypt_key=default-encrypt-key.pem
+envie_m7.menu.security.sien.build.keys.keychain={runtime.platform.path}/libraries/MCUboot/default_keys
+envie_m7.menu.security.sien.build.keys.sign_key=default-signing-priv-key.pem
+envie_m7.menu.security.sien.build.keys.encrypt_key=default-encrypt-pub-key.pem
 [...]
 </code></pre></div>
 <p>The security keys can be added with:</p>
@@ -1388,7 +1388,7 @@ envie_m7.menu.security.sien.build.keys.encrypt_key=default-encrypt-key.pem
 <code>--keys-keychain</code>, <code>--sign-key</code> and <code>--encrypt-key</code> Arduino CLI <a href="../../commands/arduino-cli_compile/">compile flags</a>.</p>
 <p>For example, by using the following command, the sketch is compiled and the resulting binary is signed and encrypted
 with the specified keys located in <code>/home/user/Arduino/keys</code> directory:</p>
-<div class="highlight"><pre><span></span><code>arduino-cli compile -b arduino:mbed_portenta:envie_m7:security=sien --keys-keychain /home/user/Arduino/keys --sign-key ecsdsa-p256-signing-key.pem --encrypt-key ecsdsa-p256-encrypt-key.pem /home/user/Arduino/MySketch
+<div class="highlight"><pre><span></span><code>arduino-cli compile -b arduino:mbed_portenta:envie_m7:security=sien --keys-keychain /home/user/Arduino/keys --sign-key ecdsa-p256-signing-priv-key.pem --encrypt-key ecdsa-p256-encrypt-pub-key.pem /home/user/Arduino/MySketch
 </code></pre></div>
                 
               
