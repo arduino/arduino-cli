@@ -185,6 +185,36 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		return &arduino.InvalidInstanceError{}
 	}
 
+	// Setup callback functions
+	if responseCallback == nil {
+		responseCallback = func(r *rpc.InitResponse) {}
+	}
+	responseError := func(st *status.Status) {
+		responseCallback(&rpc.InitResponse{
+			Message: &rpc.InitResponse_Error{
+				Error: st.Proto(),
+			},
+		})
+	}
+	taskCallback := func(msg *rpc.TaskProgress) {
+		responseCallback(&rpc.InitResponse{
+			Message: &rpc.InitResponse_InitProgress{
+				InitProgress: &rpc.InitResponse_Progress{
+					TaskProgress: msg,
+				},
+			},
+		})
+	}
+	downloadCallback := func(msg *rpc.DownloadProgress) {
+		responseCallback(&rpc.InitResponse{
+			Message: &rpc.InitResponse_InitProgress{
+				InitProgress: &rpc.InitResponse_Progress{
+					DownloadProgress: msg,
+				},
+			},
+		})
+	}
+
 	// We need to clear the PackageManager currently in use by this instance
 	// in case this is not the first Init on this instances, that might happen
 	// after reinitializing an instance after installing or uninstalling a core.
@@ -199,11 +229,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		URL, err := utils.URLParse(u)
 		if err != nil {
 			s := status.Newf(codes.InvalidArgument, tr("Invalid additional URL: %v"), err)
-			responseCallback(&rpc.InitResponse{
-				Message: &rpc.InitResponse_Error{
-					Error: s.Proto(),
-				},
-			})
+			responseError(s)
 			continue
 		}
 
@@ -213,22 +239,14 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 			_, err := instance.PackageManager.LoadPackageIndexFromFile(indexFile)
 			if err != nil {
 				s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
-				responseCallback(&rpc.InitResponse{
-					Message: &rpc.InitResponse_Error{
-						Error: s.Proto(),
-					},
-				})
+				responseError(s)
 			}
 			continue
 		}
 
 		if err := instance.PackageManager.LoadPackageIndex(URL); err != nil {
 			s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
-			responseCallback(&rpc.InitResponse{
-				Message: &rpc.InitResponse_Error{
-					Error: s.Proto(),
-				},
-			})
+			responseError(s)
 		}
 	}
 
@@ -237,31 +255,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	// and they would never get reloaded.
 	for _, err := range instance.PackageManager.LoadHardware() {
 		s := &arduino.PlatformLoadingError{Cause: err}
-		responseCallback(&rpc.InitResponse{
-			Message: &rpc.InitResponse_Error{
-				Error: s.ToRPCStatus().Proto(),
-			},
-		})
-	}
-
-	taskCallback := func(msg *rpc.TaskProgress) {
-		responseCallback(&rpc.InitResponse{
-			Message: &rpc.InitResponse_InitProgress{
-				InitProgress: &rpc.InitResponse_Progress{
-					TaskProgress: msg,
-				},
-			},
-		})
-	}
-
-	downloadCallback := func(msg *rpc.DownloadProgress) {
-		responseCallback(&rpc.InitResponse{
-			Message: &rpc.InitResponse_InitProgress{
-				InitProgress: &rpc.InitResponse_Progress{
-					DownloadProgress: msg,
-				},
-			},
-		})
+		responseError(s.ToRPCStatus())
 	}
 
 	// Get builtin tools
@@ -270,11 +264,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		latestRelease := tool.LatestRelease()
 		if latestRelease == nil {
 			s := status.Newf(codes.Internal, tr("can't find latest release of tool %s", name))
-			responseCallback(&rpc.InitResponse{
-				Message: &rpc.InitResponse_Error{
-					Error: s.Proto(),
-				},
-			})
+			responseError(s)
 			continue
 		}
 		builtinToolReleases = append(builtinToolReleases, latestRelease)
@@ -286,11 +276,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		installed, err := instance.installToolIfMissing(toolRelease, downloadCallback, taskCallback)
 		if err != nil {
 			s := status.Newf(codes.Internal, err.Error())
-			responseCallback(&rpc.InitResponse{
-				Message: &rpc.InitResponse_Error{
-					Error: s.Proto(),
-				},
-			})
+			responseError(s)
 			continue
 		}
 		toolsHaveBeenInstalled = toolsHaveBeenInstalled || installed
@@ -301,21 +287,13 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		// so we must reload again otherwise we would never found them.
 		for _, err := range instance.PackageManager.LoadHardware() {
 			s := &arduino.PlatformLoadingError{Cause: err}
-			responseCallback(&rpc.InitResponse{
-				Message: &rpc.InitResponse_Error{
-					Error: s.ToRPCStatus().Proto(),
-				},
-			})
+			responseError(s.ToRPCStatus())
 		}
 	}
 
 	for _, err := range instance.PackageManager.LoadDiscoveries() {
 		s := &arduino.PlatformLoadingError{Cause: err}
-		responseCallback(&rpc.InitResponse{
-			Message: &rpc.InitResponse_Error{
-				Error: s.ToRPCStatus().Proto(),
-			},
-		})
+		responseError(s.ToRPCStatus())
 	}
 
 	// Load libraries
@@ -329,20 +307,12 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 
 	if err := instance.lm.LoadIndex(); err != nil {
 		s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
-		responseCallback(&rpc.InitResponse{
-			Message: &rpc.InitResponse_Error{
-				Error: s.Proto(),
-			},
-		})
+		responseError(s)
 	}
 
 	for _, err := range instance.lm.RescanLibraries() {
 		s := status.Newf(codes.FailedPrecondition, tr("Loading libraries: %v"), err)
-		responseCallback(&rpc.InitResponse{
-			Message: &rpc.InitResponse_Error{
-				Error: s.Proto(),
-			},
-		})
+		responseError(s)
 	}
 
 	// Refreshes the locale used, this will change the
