@@ -221,7 +221,8 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	// after reinitializing an instance after installing or uninstalling a core.
 	// If this is not done the information of the uninstall core is kept in memory,
 	// even if it should not.
-	instance.PackageManager.Clear()
+	pm := instance.PackageManager
+	pm.Clear()
 
 	// Load Platforms
 	urls := []string{globals.DefaultIndexURL}
@@ -237,7 +238,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		if URL.Scheme == "file" {
 			indexFile := paths.New(URL.Path)
 
-			_, err := instance.PackageManager.LoadPackageIndexFromFile(indexFile)
+			_, err := pm.LoadPackageIndexFromFile(indexFile)
 			if err != nil {
 				s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
 				responseError(s)
@@ -245,7 +246,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 			continue
 		}
 
-		if err := instance.PackageManager.LoadPackageIndex(URL); err != nil {
+		if err := pm.LoadPackageIndex(URL); err != nil {
 			s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
 			responseError(s)
 		}
@@ -254,14 +255,14 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	// We load hardware before verifying builtin tools are installed
 	// otherwise we wouldn't find them and reinstall them each time
 	// and they would never get reloaded.
-	for _, err := range instance.PackageManager.LoadHardware() {
+	for _, err := range pm.LoadHardware() {
 		s := &arduino.PlatformLoadingError{Cause: err}
 		responseError(s.ToRPCStatus())
 	}
 
 	// Get builtin tools
 	builtinToolReleases := []*cores.ToolRelease{}
-	for name, tool := range instance.PackageManager.Packages.GetOrCreatePackage("builtin").Tools {
+	for name, tool := range pm.Packages.GetOrCreatePackage("builtin").Tools {
 		latestRelease := tool.LatestRelease()
 		if latestRelease == nil {
 			s := status.Newf(codes.Internal, tr("can't find latest release of tool %s", name))
@@ -271,8 +272,8 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		builtinToolReleases = append(builtinToolReleases, latestRelease)
 	}
 
-	toolsHaveBeenInstalled := false
 	// Install tools if necessary
+	toolsHaveBeenInstalled := false
 	for _, toolRelease := range builtinToolReleases {
 		installed, err := instance.installToolIfMissing(toolRelease, downloadCallback, taskCallback)
 		if err != nil {
@@ -286,13 +287,13 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	if toolsHaveBeenInstalled {
 		// We installed at least one new tool after loading hardware
 		// so we must reload again otherwise we would never found them.
-		for _, err := range instance.PackageManager.LoadHardware() {
+		for _, err := range pm.LoadHardware() {
 			s := &arduino.PlatformLoadingError{Cause: err}
 			responseError(s.ToRPCStatus())
 		}
 	}
 
-	for _, err := range instance.PackageManager.LoadDiscoveries() {
+	for _, err := range pm.LoadDiscoveries() {
 		s := &arduino.PlatformLoadingError{Cause: err}
 		responseError(s.ToRPCStatus())
 	}
@@ -300,9 +301,9 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	lm := instance.lm
 
 	// Load libraries
-	for _, pack := range instance.PackageManager.Packages {
+	for _, pack := range pm.Packages {
 		for _, platform := range pack.Platforms {
-			if platformRelease := instance.PackageManager.GetInstalledPlatformRelease(platform); platformRelease != nil {
+			if platformRelease := pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
 				lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
 			}
 		}
