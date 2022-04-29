@@ -141,18 +141,19 @@ func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateRespon
 	)
 
 	// Create library manager and add libraries directories
-	instance.lm = librariesmanager.NewLibraryManager(
+	lm := librariesmanager.NewLibraryManager(
 		dataDir,
 		downloadsDir,
 	)
+	instance.lm = lm
 
 	// Add directories of libraries bundled with IDE
 	if bundledLibsDir := configuration.IDEBundledLibrariesDir(configuration.Settings); bundledLibsDir != nil {
-		instance.lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
+		lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
 	}
 
 	// Add libraries directory from config file
-	instance.lm.AddLibrariesDir(
+	lm.AddLibrariesDir(
 		configuration.LibrariesDir(configuration.Settings),
 		libraries.User,
 	)
@@ -296,21 +297,23 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		responseError(s.ToRPCStatus())
 	}
 
+	lm := instance.lm
+
 	// Load libraries
 	for _, pack := range instance.PackageManager.Packages {
 		for _, platform := range pack.Platforms {
 			if platformRelease := instance.PackageManager.GetInstalledPlatformRelease(platform); platformRelease != nil {
-				instance.lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
+				lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
 			}
 		}
 	}
 
-	if err := instance.lm.LoadIndex(); err != nil {
+	if err := lm.LoadIndex(); err != nil {
 		s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
 		responseError(s)
 	}
 
-	for _, err := range instance.lm.RescanLibraries() {
+	for _, err := range lm.RescanLibraries() {
 		s := status.Newf(codes.FailedPrecondition, tr("Loading libraries: %v"), err)
 		responseError(s)
 	}
