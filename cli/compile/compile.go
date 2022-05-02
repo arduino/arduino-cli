@@ -142,6 +142,17 @@ func NewCommand() *cobra.Command {
 func runCompileCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli compile`")
 
+	if profileArg.Get() != "" {
+		if len(libraries) > 0 {
+			feedback.Errorf(tr("You cannot use the %s flag while compiling with a profile.", "--libraries"))
+			os.Exit(errorcodes.ErrBadArgument)
+		}
+		if len(library) > 0 {
+			feedback.Errorf(tr("You cannot use the %s flag while compiling with a profile.", "--library"))
+			os.Exit(errorcodes.ErrBadArgument)
+		}
+	}
+
 	path := ""
 	if len(args) > 0 {
 		path = args[0]

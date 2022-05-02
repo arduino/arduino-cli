@@ -150,11 +150,13 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.HardwareDirs = configuration.HardwareDirectories(configuration.Settings)
 	builderCtx.BuiltInToolsDirs = configuration.BundleToolsDirectories(configuration.Settings)
 
+	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
 	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
-
 	builderCtx.LibraryDirs = paths.NewPathList(req.Library...)
-
+	if len(builderCtx.OtherLibrariesDirs) > 0 || len(builderCtx.LibraryDirs) > 0 {
+		builderCtx.LibrariesManager = nil // let the builder rebuild the library manager
+	}
 	if req.GetBuildPath() == "" {
 		builderCtx.BuildPath = sk.BuildPath
 	} else {
