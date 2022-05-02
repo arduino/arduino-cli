@@ -162,9 +162,6 @@ message SupportedUserFieldsRequest {
   // necessary to pick the right upload tool for the board specified
   // with the FQBN.
   string protocol = 3;
-  // If an FQBN is not provided but both protocol and address are
-  // we can try and detect the FQBN using this information.
-  string address = 4;
 }
 
 message UserField {

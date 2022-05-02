@@ -377,7 +377,7 @@ def test_compile_without_upload_and_fqbn(run_command, data_dir):
 
     res = run_command(["compile", sketch_path])
     assert res.failed
-    assert "Error during build: Missing FQBN (Fully Qualified Board Name)" in res.stderr
+    assert "Missing FQBN (Fully Qualified Board Name)" in res.stderr
 
 
 def test_compile_non_installed_platform_with_wrong_packager_and_arch(run_command, data_dir):

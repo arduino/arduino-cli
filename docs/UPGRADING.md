@@ -4,6 +4,39 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.22.0
 
+### `github.com/arduino/arduino-cli/arduino.MultipleBoardsDetectedError` field changed type
+
+Now the `Port` field of the error is a `github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1.Port`, usually
+imported as `rpc.Port`. The old `discovery.Port` can be converted to the new one using the `.ToRPC()` method.
+
+### Function `github.com/arduino/arduino-cli/commands/upload.DetectConnectedBoard(...)` has been removed
+
+Use `github.com/arduino/arduino-cli/commands/board.List(...)` to detect boards.
+
+### Function `arguments.GetDiscoveryPort(...)` has been removed
+
+NOTE: the functions in the `arguments` package doesn't have much use outside of the `arduino-cli` so we are considering
+to remove them from the public golang API making them `internal`.
+
+The old function:
+
+```go
+func (p *Port) GetDiscoveryPort(instance *rpc.Instance, sk *sketch.Sketch) *discovery.Port { }
+```
+
+is now replaced by the more powerful:
+
+```go
+func (p *Port) DetectFQBN(inst *rpc.Instance) (string, *rpc.Port) { }
+
+func CalculateFQBNAndPort(portArgs *Port, fqbnArg *Fqbn, instance *rpc.Instance, sk *sketch.Sketch) (string, *rpc.Port) { }
+```
+
+### gRPC: `address` parameter has been removed from `commands.SupportedUserFieldsRequest`
+
+The parameter is no more needed. Lagacy code will continue to work without modification (the value of the parameter will
+be just ignored).
+
 ### The content of package `github.com/arduino/arduino-cli/httpclient` has been moved to a different path
 
 In particular:

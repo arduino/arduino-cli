@@ -19,9 +19,9 @@ import (
 	"fmt"
 	"os"
 	"sort"
-	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -33,8 +33,8 @@ import (
 )
 
 var (
-	timeout time.Duration
-	watch   bool
+	timeoutArg arguments.DiscoveryTimeout
+	watch      bool
 )
 
 func initListCommand() *cobra.Command {
@@ -42,12 +42,12 @@ func initListCommand() *cobra.Command {
 		Use:     "list",
 		Short:   tr("List connected boards."),
 		Long:    tr("Detects and displays a list of boards connected to the current computer."),
-		Example: "  " + os.Args[0] + " board list --timeout 10s",
+		Example: "  " + os.Args[0] + " board list --discovery-timeout 10s",
 		Args:    cobra.NoArgs,
 		Run:     runListCommand,
 	}
 
-	listCommand.Flags().DurationVar(&timeout, "discovery-timeout", time.Second, tr("Max time to wait for port discovery, e.g.: 30s, 1m"))
+	timeoutArg.AddToCommand(listCommand)
 	listCommand.Flags().BoolVarP(&watch, "watch", "w", false, tr("Command keeps running and prints list of connected boards whenever there is a change."))
 
 	return listCommand
@@ -66,7 +66,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 
 	ports, err := board.List(&rpc.BoardListRequest{
 		Instance: inst,
-		Timeout:  timeout.Milliseconds(),
+		Timeout:  timeoutArg.Get().Milliseconds(),
 	})
 	if err != nil {
 		feedback.Errorf(tr("Error detecting boards: %v"), err)

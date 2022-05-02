@@ -21,11 +21,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -38,7 +40,7 @@ import (
 type Port struct {
 	address  string
 	protocol string
-	timeout  time.Duration
+	timeout  DiscoveryTimeout
 }
 
 // AddToCommand adds the flags used to set port and protocol to the specified Command
@@ -51,7 +53,7 @@ func (p *Port) AddToCommand(cmd *cobra.Command) {
 	cmd.RegisterFlagCompletionFunc("protocol", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return GetInstalledProtocols(), cobra.ShellCompDirectiveDefault
 	})
-	cmd.Flags().DurationVar(&p.timeout, "discovery-timeout", 5*time.Second, tr("Max time to wait for port discovery, e.g.: 30s, 1m"))
+	p.timeout.AddToCommand(cmd)
 }
 
 // GetPortAddressAndProtocol returns only the port address and the port protocol
@@ -72,6 +74,9 @@ func (p *Port) GetPortAddressAndProtocol(instance *rpc.Instance, sk *sketch.Sket
 // GetPort returns the Port obtained by parsing command line arguments.
 // The extra metadata for the ports is obtained using the pluggable discoveries.
 func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Port, error) {
+	// TODO: REMOVE sketch.Sketch from here
+	// TODO: REMOVE discovery from here (use board.List instead)
+
 	address := p.address
 	protocol := p.protocol
 
@@ -122,7 +127,7 @@ func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Po
 		}
 	}()
 
-	deadline := time.After(p.timeout)
+	deadline := time.After(p.timeout.Get())
 	for {
 		select {
 		case portEvent := <-eventChan:
@@ -149,15 +154,38 @@ func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Po
 
 // GetSearchTimeout returns the timeout
 func (p *Port) GetSearchTimeout() time.Duration {
-	return p.timeout
+	return p.timeout.Get()
 }
 
-// GetDiscoveryPort is a helper function useful to get the port and handle possible errors
-func (p *Port) GetDiscoveryPort(instance *rpc.Instance, sk *sketch.Sketch) *discovery.Port {
-	discoveryPort, err := p.GetPort(instance, sk)
+// DetectFQBN tries to identify the board connected to the port and returns the
+// discovered Port object together with the FQBN. If the port does not match
+// exactly 1 board,
+func (p *Port) DetectFQBN(inst *rpc.Instance) (string, *rpc.Port) {
+	detectedPorts, err := board.List(&rpc.BoardListRequest{
+		Instance: inst,
+		Timeout:  p.timeout.Get().Milliseconds(),
+	})
 	if err != nil {
-		feedback.Errorf(tr("Error discovering port: %v"), err)
+		feedback.Errorf(tr("Error during FQBN detection: %v", err))
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	return discoveryPort
+	for _, detectedPort := range detectedPorts {
+		port := detectedPort.GetPort()
+		if p.address != port.GetAddress() {
+			continue
+		}
+		if p.protocol != "" && p.protocol != port.GetProtocol() {
+			continue
+		}
+		if len(detectedPort.MatchingBoards) > 1 {
+			feedback.Error(&arduino.MultipleBoardsDetectedError{Port: port})
+			os.Exit(errorcodes.ErrBadArgument)
+		}
+		if len(detectedPort.MatchingBoards) == 0 {
+			feedback.Error(&arduino.NoBoardsDetectedError{Port: port})
+			os.Exit(errorcodes.ErrBadArgument)
+		}
+		return detectedPort.MatchingBoards[0].Fqbn, port
+	}
+	return "", nil
 }

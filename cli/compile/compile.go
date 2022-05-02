@@ -26,8 +26,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/discovery"
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
@@ -47,7 +45,7 @@ import (
 )
 
 var (
-	fqbn                    arguments.Fqbn       // Fully Qualified Board Name, e.g.: arduino:avr:uno.
+	fqbnArg                 arguments.Fqbn       // Fully Qualified Board Name, e.g.: arduino:avr:uno.
 	showProperties          bool                 // Show all build preferences used instead of compiling.
 	preprocess              bool                 // Print preprocessed code to stdout.
 	buildCachePath          string               // Builds of 'core.a' are saved into this path to be cached and reused.
@@ -61,7 +59,7 @@ var (
 	quiet                   bool                 // Suppresses almost every output.
 	vidPid                  string               // VID/PID specific build properties.
 	uploadAfterCompile      bool                 // Upload the binary after the compilation.
-	port                    arguments.Port       // Upload port, e.g.: COM10 or /dev/ttyACM0.
+	portArgs                arguments.Port       // Upload port, e.g.: COM10 or /dev/ttyACM0.
 	verify                  bool                 // Upload, verify uploaded binary after the upload.
 	exportDir               string               // The compiled binary is written to this file
 	optimizeForDebug        bool                 // Optimize compile output for debug, not for release
@@ -92,7 +90,7 @@ func NewCommand() *cobra.Command {
 		Run:  runCompileCommand,
 	}
 
-	fqbn.AddToCommand(compileCommand)
+	fqbnArg.AddToCommand(compileCommand)
 	compileCommand.Flags().BoolVar(&showProperties, "show-properties", false, tr("Show all build properties used instead of compiling."))
 	compileCommand.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
 	compileCommand.Flags().StringVar(&buildCachePath, "build-cache-path", "", tr("Builds of 'core.a' are saved into this path to be cached and reused."))
@@ -114,7 +112,7 @@ func NewCommand() *cobra.Command {
 	compileCommand.Flags().BoolVarP(&verbose, "verbose", "v", false, tr("Optional, turns on verbose mode."))
 	compileCommand.Flags().BoolVar(&quiet, "quiet", false, tr("Optional, suppresses almost every output."))
 	compileCommand.Flags().BoolVarP(&uploadAfterCompile, "upload", "u", false, tr("Upload the binary after the compilation."))
-	port.AddToCommand(compileCommand)
+	portArgs.AddToCommand(compileCommand)
 	compileCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
 	compileCommand.Flags().StringVar(&vidPid, "vid-pid", "", tr("When specified, VID/PID specific build properties are used, if board supports them."))
 	compileCommand.Flags().StringSliceVar(&library, "library", []string{},
@@ -150,6 +148,8 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	}
 
 	sketchPath := arguments.InitSketchPath(path)
+	sk := arguments.NewSketch(sketchPath)
+	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, sk)
 
 	if keysKeychain != "" || signKey != "" || encryptKey != "" {
 		arguments.CheckFlagsMandatory(cmd, "keys-keychain", "sign-key", "encrypt-key")
@@ -172,28 +172,9 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		overrides = o.Overrides
 	}
 
-	detectedFqbn := fqbn.String()
-	var sk *sketch.Sketch
-	var discoveryPort *discovery.Port
-	// If the user didn't provide an FQBN it might either mean
-	// that she forgot or that is trying to compile and upload
-	// using board autodetection.
-	if detectedFqbn == "" && uploadAfterCompile {
-		sk = arguments.NewSketch(sketchPath)
-		discoveryPort = port.GetDiscoveryPort(inst, sk)
-		rpcPort := discoveryPort.ToRPC()
-		var err error
-		pm := commands.GetPackageManager(inst.Id)
-		detectedFqbn, err = upload.DetectConnectedBoard(pm, rpcPort.Address, rpcPort.Protocol)
-		if err != nil {
-			feedback.Errorf(tr("Error during FQBN detection: %v", err))
-			os.Exit(errorcodes.ErrGeneric)
-		}
-	}
-
 	compileRequest := &rpc.CompileRequest{
 		Instance:                      inst,
-		Fqbn:                          detectedFqbn,
+		Fqbn:                          fqbn,
 		SketchPath:                    sketchPath.String(),
 		ShowProperties:                showProperties,
 		Preprocess:                    preprocess,
@@ -227,35 +208,27 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if compileError == nil && uploadAfterCompile {
-		if sk == nil {
-			sk = arguments.NewSketch(sketchPath)
-		}
-		if discoveryPort == nil {
-			discoveryPort = port.GetDiscoveryPort(inst, sk)
-		}
-
 		userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
 			Instance: inst,
-			Fqbn:     fqbn.String(),
-			Address:  discoveryPort.Address,
-			Protocol: discoveryPort.Protocol,
+			Fqbn:     fqbn,
+			Protocol: port.Protocol,
 		})
 		if err != nil {
-			feedback.Errorf(tr("Error during Upload: %v"), err)
+			feedback.Errorf(tr("Error during Upload: %v", err))
 			os.Exit(errorcodes.ErrGeneric)
 		}
 
 		fields := map[string]string{}
 		if len(userFieldRes.UserFields) > 0 {
-			feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", discoveryPort.Protocol))
+			feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", port.Protocol))
 			fields = arguments.AskForUserFields(userFieldRes.UserFields)
 		}
 
 		uploadRequest := &rpc.UploadRequest{
 			Instance:   inst,
-			Fqbn:       detectedFqbn,
+			Fqbn:       fqbn,
 			SketchPath: sketchPath.String(),
-			Port:       discoveryPort.ToRPC(),
+			Port:       port,
 			Verbose:    verbose,
 			Verify:     verify,
 			ImportDir:  buildPath,

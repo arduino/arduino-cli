@@ -36,8 +36,8 @@ import (
 )
 
 var (
-	fqbn        arguments.Fqbn
-	port        arguments.Port
+	fqbnArg     arguments.Fqbn
+	portArgs    arguments.Port
 	interpreter string
 	importDir   string
 	printInfo   bool
@@ -56,8 +56,8 @@ func NewCommand() *cobra.Command {
 		Run:     runDebugCommand,
 	}
 
-	fqbn.AddToCommand(debugCommand)
-	port.AddToCommand(debugCommand)
+	fqbnArg.AddToCommand(debugCommand)
+	portArgs.AddToCommand(debugCommand)
 	programmer.AddToCommand(debugCommand)
 	debugCommand.Flags().StringVar(&interpreter, "interpreter", "console", tr("Debug interpreter e.g.: %s", "console, mi, mi1, mi2, mi3"))
 	debugCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries for debug."))
@@ -77,13 +77,12 @@ func runDebugCommand(command *cobra.Command, args []string) {
 
 	sketchPath := arguments.InitSketchPath(path)
 	sk := arguments.NewSketch(sketchPath)
-	discoveryPort := port.GetDiscoveryPort(instance, sk)
-
+	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, instance, sk)
 	debugConfigRequested := &dbg.DebugConfigRequest{
 		Instance:    instance,
-		Fqbn:        fqbn.String(),
+		Fqbn:        fqbn,
 		SketchPath:  sketchPath.String(),
-		Port:        discoveryPort.ToRPC(),
+		Port:        port,
 		Interpreter: interpreter,
 		ImportDir:   importDir,
 		Programmer:  programmer.String(),
@@ -92,7 +91,7 @@ func runDebugCommand(command *cobra.Command, args []string) {
 	if printInfo {
 
 		if res, err := debug.GetDebugConfig(context.Background(), debugConfigRequested); err != nil {
-			feedback.Errorf(tr("Error getting Debug info: %v"), err)
+			feedback.Errorf(tr("Error getting Debug info: %v", err))
 			os.Exit(errorcodes.ErrBadArgument)
 		} else {
 			feedback.PrintResult(&debugInfoResult{res})
@@ -105,7 +104,7 @@ func runDebugCommand(command *cobra.Command, args []string) {
 		signal.Notify(ctrlc, os.Interrupt)
 
 		if _, err := debug.Debug(context.Background(), debugConfigRequested, os.Stdin, os.Stdout, ctrlc); err != nil {
-			feedback.Errorf(tr("Error during Debug: %v"), err)
+			feedback.Errorf(tr("Error during Debug: %v", err))
 			os.Exit(errorcodes.ErrGeneric)
 		}
 

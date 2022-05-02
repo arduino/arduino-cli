@@ -48,7 +48,7 @@ func InitSketchPath(path string) (sketchPath *paths.Path) {
 func NewSketch(sketchPath *paths.Path) *sketch.Sketch {
 	sketch, err := sketch.New(sketchPath)
 	if err != nil {
-		feedback.Errorf(tr("Error creating sketch: %v"), err)
+		feedback.Errorf(tr("Error opening sketch: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 	return sketch
