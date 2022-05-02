@@ -589,6 +589,8 @@ func convertUploadToolsToPluggableDiscovery(props *properties.Map) {
 	props.Merge(propsToAdd)
 }
 
+// LoadToolsFromPackageDir loads a set of tools from the given toolsPath. The tools will be loaded
+// in the given *Package.
 func (pm *PackageManager) LoadToolsFromPackageDir(targetPackage *cores.Package, toolsPath *paths.Path) []error {
 	pm.Log.Infof("Loading tools from dir: %s", toolsPath)
 

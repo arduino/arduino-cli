@@ -134,19 +134,20 @@ func parseNameAndVersion(in string) (string, string, bool) {
 	return split[0][1], split[0][2], true
 }
 
+// UnmarshalYAML decodes a ProfilePlatformReference from YAML source.
 func (p *ProfilePlatformReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var data map[string]string
 	if err := unmarshal(&data); err != nil {
 		return err
 	}
-	if platformId, ok := data["platform"]; !ok {
+	if platformID, ok := data["platform"]; !ok {
 		return fmt.Errorf(tr("missing 'platform' directive"))
-	} else if platformId, platformVersion, ok := parseNameAndVersion(platformId); !ok {
+	} else if platformID, platformVersion, ok := parseNameAndVersion(platformID); !ok {
 		return fmt.Errorf(tr("invalid 'platform' directive"))
 	} else if c, err := semver.Parse(platformVersion); err != nil {
 		return fmt.Errorf("%s: %w", tr("error parsing version constraints"), err)
-	} else if split := strings.SplitN(platformId, ":", 2); len(split) != 2 {
-		return fmt.Errorf("%s: %s", tr("invalid platform identifier"), platformId)
+	} else if split := strings.SplitN(platformID, ":", 2); len(split) != 2 {
+		return fmt.Errorf("%s: %s", tr("invalid platform identifier"), platformID)
 	} else {
 		p.Packager = split[0]
 		p.Architecture = split[1]
@@ -154,11 +155,11 @@ func (p *ProfilePlatformReference) UnmarshalYAML(unmarshal func(interface{}) err
 	}
 
 	if rawIndexURL, ok := data["platform_index_url"]; ok {
-		if indexURL, err := url.Parse(rawIndexURL); err != nil {
+		indexURL, err := url.Parse(rawIndexURL)
+		if err != nil {
 			return fmt.Errorf("%s: %w", tr("invlid platform index URL:"), err)
-		} else {
-			p.PlatformIndexURL = indexURL
 		}
+		p.PlatformIndexURL = indexURL
 	}
 	return nil
 }
@@ -169,6 +170,7 @@ type ProfileLibraryReference struct {
 	Version *semver.Version
 }
 
+// UnmarshalYAML decodes a ProfileLibraryReference from YAML source.
 func (l *ProfileLibraryReference) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var data string
 	if err := unmarshal(&data); err != nil {

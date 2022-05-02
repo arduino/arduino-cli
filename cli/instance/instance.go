@@ -41,6 +41,9 @@ func CreateAndInit() *rpc.Instance {
 	return inst
 }
 
+// CreateAndInitWithProfile return a new initialized instance using the given profile in the give sketch.
+// If Create fails the CLI prints an error and exits since to execute further operations a valid Instance is mandatory.
+// If Init returns errors they're printed only.
 func CreateAndInitWithProfile(profileName string, sketchPath *paths.Path) (*rpc.Instance, *rpc.Profile) {
 	instance, err := Create()
 	if err != nil {
@@ -73,6 +76,9 @@ func Init(instance *rpc.Instance) []error {
 	return errs
 }
 
+// InitWithProfile initializes instance by loading libraries and platforms specified in the given profile of the given sketch.
+// In case of loading failures return a list of errors for each platform or library that we failed to load.
+// Required Package and library indexes files are automatically downloaded.
 func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *paths.Path) (*rpc.Profile, []error) {
 	errs := []error{}
 
