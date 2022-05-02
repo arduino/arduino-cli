@@ -285,6 +285,34 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-cliarduinomultipleboardsdetectederror-field-changed-type" class="md-nav__link">
+    github.com/arduino/arduino-cli/arduino.MultipleBoardsDetectedError field changed type
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#function-githubcomarduinoarduino-clicommandsuploaddetectconnectedboard-has-been-removed" class="md-nav__link">
+    Function github.com/arduino/arduino-cli/commands/upload.DetectConnectedBoard(...) has been removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#function-argumentsgetdiscoveryport-has-been-removed" class="md-nav__link">
+    Function arguments.GetDiscoveryPort(...) has been removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grpc-address-parameter-has-been-removed-from-commandssupporteduserfieldsrequest" class="md-nav__link">
+    gRPC: address parameter has been removed from commands.SupportedUserFieldsRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#the-content-of-package-githubcomarduinoarduino-clihttpclient-has-been-moved-to-a-different-path" class="md-nav__link">
     The content of package github.com/arduino/arduino-cli/httpclient has been moved to a different path
   </a>
@@ -1763,6 +1791,34 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-cliarduinomultipleboardsdetectederror-field-changed-type" class="md-nav__link">
+    github.com/arduino/arduino-cli/arduino.MultipleBoardsDetectedError field changed type
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#function-githubcomarduinoarduino-clicommandsuploaddetectconnectedboard-has-been-removed" class="md-nav__link">
+    Function github.com/arduino/arduino-cli/commands/upload.DetectConnectedBoard(...) has been removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#function-argumentsgetdiscoveryport-has-been-removed" class="md-nav__link">
+    Function arguments.GetDiscoveryPort(...) has been removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grpc-address-parameter-has-been-removed-from-commandssupporteduserfieldsrequest" class="md-nav__link">
+    gRPC: address parameter has been removed from commands.SupportedUserFieldsRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#the-content-of-package-githubcomarduinoarduino-clihttpclient-has-been-moved-to-a-different-path" class="md-nav__link">
     The content of package github.com/arduino/arduino-cli/httpclient has been moved to a different path
   </a>
@@ -2178,6 +2234,25 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0220">0.22.0<a class="headerlink" href="#0220" title="Permanent link">&para;</a></h2>
+<h3 id="githubcomarduinoarduino-cliarduinomultipleboardsdetectederror-field-changed-type"><code>github.com/arduino/arduino-cli/arduino.MultipleBoardsDetectedError</code> field changed type<a class="headerlink" href="#githubcomarduinoarduino-cliarduinomultipleboardsdetectederror-field-changed-type" title="Permanent link">&para;</a></h3>
+<p>Now the <code>Port</code> field of the error is a <code>github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1.Port</code>, usually
+imported as <code>rpc.Port</code>. The old <code>discovery.Port</code> can be converted to the new one using the <code>.ToRPC()</code> method.</p>
+<h3 id="function-githubcomarduinoarduino-clicommandsuploaddetectconnectedboard-has-been-removed">Function <code>github.com/arduino/arduino-cli/commands/upload.DetectConnectedBoard(...)</code> has been removed<a class="headerlink" href="#function-githubcomarduinoarduino-clicommandsuploaddetectconnectedboard-has-been-removed" title="Permanent link">&para;</a></h3>
+<p>Use <code>github.com/arduino/arduino-cli/commands/board.List(...)</code> to detect boards.</p>
+<h3 id="function-argumentsgetdiscoveryport-has-been-removed">Function <code>arguments.GetDiscoveryPort(...)</code> has been removed<a class="headerlink" href="#function-argumentsgetdiscoveryport-has-been-removed" title="Permanent link">&para;</a></h3>
+<p>NOTE: the functions in the <code>arguments</code> package doesn't have much use outside of the <code>arduino-cli</code> so we are considering
+to remove them from the public golang API making them <code>internal</code>.</p>
+<p>The old function:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span> <span class="p">(</span><span class="nx">p</span> <span class="o">*</span><span class="nx">Port</span><span class="p">)</span> <span class="nx">GetDiscoveryPort</span><span class="p">(</span><span class="nx">instance</span> <span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">Instance</span><span class="p">,</span> <span class="nx">sk</span> <span class="o">*</span><span class="nx">sketch</span><span class="p">.</span><span class="nx">Sketch</span><span class="p">)</span> <span class="o">*</span><span class="nx">discovery</span><span class="p">.</span><span class="nx">Port</span> <span class="p">{</span> <span class="p">}</span>
+</code></pre></div>
+<p>is now replaced by the more powerful:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span> <span class="p">(</span><span class="nx">p</span> <span class="o">*</span><span class="nx">Port</span><span class="p">)</span> <span class="nx">DetectFQBN</span><span class="p">(</span><span class="nx">inst</span> <span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">Instance</span><span class="p">)</span> <span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">Port</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">CalculateFQBNAndPort</span><span class="p">(</span><span class="nx">portArgs</span> <span class="o">*</span><span class="nx">Port</span><span class="p">,</span> <span class="nx">fqbnArg</span> <span class="o">*</span><span class="nx">Fqbn</span><span class="p">,</span> <span class="nx">instance</span> <span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">Instance</span><span class="p">,</span> <span class="nx">sk</span> <span class="o">*</span><span class="nx">sketch</span><span class="p">.</span><span class="nx">Sketch</span><span class="p">)</span> <span class="p">(</span><span class="kt">string</span><span class="p">,</span> <span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">Port</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+</code></pre></div>
+<h3 id="grpc-address-parameter-has-been-removed-from-commandssupporteduserfieldsrequest">gRPC: <code>address</code> parameter has been removed from <code>commands.SupportedUserFieldsRequest</code><a class="headerlink" href="#grpc-address-parameter-has-been-removed-from-commandssupporteduserfieldsrequest" title="Permanent link">&para;</a></h3>
+<p>The parameter is no more needed. Lagacy code will continue to work without modification (the value of the parameter will
+be just ignored).</p>
 <h3 id="the-content-of-package-githubcomarduinoarduino-clihttpclient-has-been-moved-to-a-different-path">The content of package <code>github.com/arduino/arduino-cli/httpclient</code> has been moved to a different path<a class="headerlink" href="#the-content-of-package-githubcomarduinoarduino-clihttpclient-has-been-moved-to-a-different-path" title="Permanent link">&para;</a></h3>
 <p>In particular:</p>
 <ul>
