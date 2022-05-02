@@ -215,7 +215,7 @@ message InitResponse {
     Progress init_progress = 1;
     google.rpc.Status error = 2;
     // Fqbn selected in profile (optional)
-    string profile_selected_fqbn = 3;
+    Profile profile = 3;
   }
 }
 

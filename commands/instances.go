@@ -219,8 +219,12 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		}
 		profile = sk.GetProfile(req.GetProfile())
 		responseCallback(&rpc.InitResponse{
-			Message: &rpc.InitResponse_ProfileSelectedFqbn{
-				ProfileSelectedFqbn: profile.FQBN,
+			Message: &rpc.InitResponse_Profile{
+				Profile: &rpc.Profile{
+					Name: req.GetProfile(),
+					Fqbn: profile.FQBN,
+					// TODO: Other profile infos may be provided here...
+				},
 			},
 		})
 	}

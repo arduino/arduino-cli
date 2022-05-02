@@ -41,7 +41,7 @@ import (
 var (
 	fqbnArg    arguments.Fqbn
 	portArgs   arguments.Port
-	profile    arguments.Profile
+	profileArg arguments.Profile
 	verbose    bool
 	verify     bool
 	importDir  string
@@ -67,7 +67,7 @@ func NewCommand() *cobra.Command {
 
 	fqbnArg.AddToCommand(uploadCommand)
 	portArgs.AddToCommand(uploadCommand)
-	profile.AddToCommand(uploadCommand)
+	profileArg.AddToCommand(uploadCommand)
 	uploadCommand.Flags().StringVarP(&importDir, "input-dir", "", "", tr("Directory containing binaries to upload."))
 	uploadCommand.Flags().StringVarP(&importFile, "input-file", "i", "", tr("Binary file to upload."))
 	uploadCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
@@ -97,9 +97,9 @@ func runUploadCommand(command *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	instance, profileFqbn := instance.CreateAndInitWithProfile(profile.Get(), sketchPath)
+	instance, profile := instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
 	if fqbnArg.String() == "" {
-		fqbnArg.Set(profileFqbn)
+		fqbnArg.Set(profile.GetFqbn())
 	}
 
 	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, instance, sk)

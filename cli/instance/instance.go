@@ -41,17 +41,17 @@ func CreateAndInit() *rpc.Instance {
 	return inst
 }
 
-func CreateAndInitWithProfile(profile string, sketchPath *paths.Path) (*rpc.Instance, string) {
+func CreateAndInitWithProfile(profileName string, sketchPath *paths.Path) (*rpc.Instance, *rpc.Profile) {
 	instance, err := Create()
 	if err != nil {
 		feedback.Errorf(tr("Error creating instance: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	fqbn, errs := InitWithProfile(instance, profile, sketchPath)
+	profile, errs := InitWithProfile(instance, profileName, sketchPath)
 	for _, err := range errs {
 		feedback.Errorf(tr("Error initializing instance: %v"), err)
 	}
-	return instance, fqbn
+	return instance, profile
 }
 
 // Create and return a new Instance.
@@ -73,12 +73,12 @@ func Init(instance *rpc.Instance) []error {
 	return errs
 }
 
-func InitWithProfile(instance *rpc.Instance, profile string, sketchPath *paths.Path) (string, []error) {
+func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *paths.Path) (*rpc.Profile, []error) {
 	errs := []error{}
 
 	// In case the CLI is executed for the first time
 	if err := FirstUpdate(instance); err != nil {
-		return "", append(errs, err)
+		return nil, append(errs, err)
 	}
 
 	downloadCallback := output.ProgressBar()
@@ -87,9 +87,9 @@ func InitWithProfile(instance *rpc.Instance, profile string, sketchPath *paths.P
 	initReq := &rpc.InitRequest{Instance: instance}
 	if sketchPath != nil {
 		initReq.SketchPath = sketchPath.String()
-		initReq.Profile = profile
+		initReq.Profile = profileName
 	}
-	profileFqbn := ""
+	var profile *rpc.Profile
 	err := commands.Init(initReq, func(res *rpc.InitResponse) {
 		if st := res.GetError(); st != nil {
 			errs = append(errs, errors.New(st.Message))
@@ -104,15 +104,15 @@ func InitWithProfile(instance *rpc.Instance, profile string, sketchPath *paths.P
 			}
 		}
 
-		if fqbn := res.GetProfileSelectedFqbn(); fqbn != "" {
-			profileFqbn = fqbn
+		if p := res.GetProfile(); p != nil {
+			profile = p
 		}
 	})
 	if err != nil {
 		errs = append(errs, err)
 	}
 
-	return profileFqbn, errs
+	return profile, errs
 }
 
 // FirstUpdate downloads libraries and packages indexes if they don't exist.
