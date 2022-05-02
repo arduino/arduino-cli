@@ -139,23 +139,9 @@ func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateRespon
 		dataDir.Join("tmp"),
 		userAgent,
 	)
-
-	// Create library manager and add libraries directories
-	lm := librariesmanager.NewLibraryManager(
+	instance.lm = librariesmanager.NewLibraryManager(
 		dataDir,
 		downloadsDir,
-	)
-	instance.lm = lm
-
-	// Add directories of libraries bundled with IDE
-	if bundledLibsDir := configuration.IDEBundledLibrariesDir(configuration.Settings); bundledLibsDir != nil {
-		lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
-	}
-
-	// Add libraries directory from config file
-	lm.AddLibrariesDir(
-		configuration.LibrariesDir(configuration.Settings),
-		libraries.User,
 	)
 
 	// Save instance
@@ -224,9 +210,30 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	pm := instance.PackageManager
 	pm.Clear()
 
-	// Load Platforms
+	// Try to extract profile if specified
+	var profile *sketch.Profile
+	if req.GetProfile() != "" {
+		sk, err := sketch.New(paths.New(req.GetSketchPath()))
+		if err != nil {
+			return &arduino.InvalidArgumentError{Cause: err}
+		}
+		profile = sk.GetProfile(req.GetProfile())
+		responseCallback(&rpc.InitResponse{
+			Message: &rpc.InitResponse_ProfileSelectedFqbn{
+				ProfileSelectedFqbn: profile.FQBN,
+			},
+		})
+	}
+
+	loadBuiltinTools := func() []error {
+		builtinPackage := pm.Packages.GetOrCreatePackage("builtin")
+		return pm.LoadToolsFromPackageDir(builtinPackage, pm.PackagesDir.Join("builtin", "tools"))
+	}
+
 	urls := []string{globals.DefaultIndexURL}
-	urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
+	if profile == nil {
+		urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
+	}
 	for _, u := range urls {
 		URL, err := utils.URLParse(u)
 		if err != nil {
@@ -236,9 +243,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		}
 
 		if URL.Scheme == "file" {
-			indexFile := paths.New(URL.Path)
-
-			_, err := pm.LoadPackageIndexFromFile(indexFile)
+			_, err := pm.LoadPackageIndexFromFile(paths.New(URL.Path))
 			if err != nil {
 				s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
 				responseError(s)
@@ -252,15 +257,30 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		}
 	}
 
+	// Load Platforms
+	if profile == nil {
+		for _, err := range pm.LoadHardware() {
+			s := &arduino.PlatformLoadingError{Cause: err}
+			responseError(s.ToRPCStatus())
+		}
+	} else {
+		// Load platforms from profile
+		errs := pm.LoadHardwareForProfile(
+			profile, true, downloadCallback, taskCallback,
+		)
+		for _, err := range errs {
+			s := &arduino.PlatformLoadingError{Cause: err}
+			responseError(s.ToRPCStatus())
+		}
+
+		// Load "builtin" tools
+		_ = loadBuiltinTools()
+	}
+
 	// We load hardware before verifying builtin tools are installed
 	// otherwise we wouldn't find them and reinstall them each time
 	// and they would never get reloaded.
-	for _, err := range pm.LoadHardware() {
-		s := &arduino.PlatformLoadingError{Cause: err}
-		responseError(s.ToRPCStatus())
-	}
 
-	// Get builtin tools
 	builtinToolReleases := []*cores.ToolRelease{}
 	for name, tool := range pm.Packages.GetOrCreatePackage("builtin").Tools {
 		latestRelease := tool.LatestRelease()
@@ -287,7 +307,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	if toolsHaveBeenInstalled {
 		// We installed at least one new tool after loading hardware
 		// so we must reload again otherwise we would never found them.
-		for _, err := range pm.LoadHardware() {
+		for _, err := range loadBuiltinTools() {
 			s := &arduino.PlatformLoadingError{Cause: err}
 			responseError(s.ToRPCStatus())
 		}
@@ -298,7 +318,12 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		responseError(s.ToRPCStatus())
 	}
 
-	lm := instance.lm
+	// Create library manager and add libraries directories
+	lm := librariesmanager.NewLibraryManager(
+		pm.IndexDir,
+		pm.DownloadDir,
+	)
+	instance.lm = lm
 
 	// Load libraries
 	for _, pack := range pm.Packages {
@@ -312,6 +337,57 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	if err := lm.LoadIndex(); err != nil {
 		s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
 		responseError(s)
+	}
+
+	if profile == nil {
+		// Add directories of libraries bundled with IDE
+		if bundledLibsDir := configuration.IDEBundledLibrariesDir(configuration.Settings); bundledLibsDir != nil {
+			lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
+		}
+
+		// Add libraries directory from config file
+		lm.AddLibrariesDir(configuration.LibrariesDir(configuration.Settings), libraries.User)
+	} else {
+		// Load libraries required for profile
+		for _, libraryRef := range profile.Libraries {
+			uid := libraryRef.InternalUniqueIdentifier()
+			libRoot := configuration.ProfilesCacheDir(configuration.Settings).Join(uid)
+			libDir := libRoot.Join(libraryRef.Library)
+
+			if !libDir.IsDir() {
+				// Download library
+				taskCallback(&rpc.TaskProgress{Name: tr("Downloading library %s", libraryRef)})
+				libRelease := lm.Index.FindRelease(&librariesindex.Reference{
+					Name:    libraryRef.Library,
+					Version: libraryRef.Version,
+				})
+				if libRelease == nil {
+					taskCallback(&rpc.TaskProgress{Name: tr("Library %s not found", libraryRef)})
+					err := &arduino.LibraryNotFoundError{Library: libraryRef.Library}
+					responseError(err.ToRPCStatus())
+					continue
+				}
+				if err := libRelease.Resource.Download(lm.DownloadsDir, nil, libRelease.String(), downloadCallback); err != nil {
+					taskCallback(&rpc.TaskProgress{Name: tr("Error downloading library %s", libraryRef)})
+					e := &arduino.FailedLibraryInstallError{Cause: err}
+					responseError(e.ToRPCStatus())
+					continue
+				}
+				taskCallback(&rpc.TaskProgress{Completed: true})
+
+				// Install library
+				taskCallback(&rpc.TaskProgress{Name: tr("Installing library %s", libraryRef)})
+				if err := libRelease.Resource.Install(lm.DownloadsDir, libRoot, libDir); err != nil {
+					taskCallback(&rpc.TaskProgress{Name: tr("Error installing library %s", libraryRef)})
+					e := &arduino.FailedLibraryInstallError{Cause: err}
+					responseError(e.ToRPCStatus())
+					continue
+				}
+				taskCallback(&rpc.TaskProgress{Completed: true})
+			}
+
+			lm.AddLibrariesDir(libRoot, libraries.User)
+		}
 	}
 
 	for _, err := range lm.RescanLibraries() {

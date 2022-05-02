@@ -37,15 +37,21 @@ var tr = i18n.Tr
 // to execute further operations a valid Instance is mandatory.
 // If Init returns errors they're printed only.
 func CreateAndInit() *rpc.Instance {
+	inst, _ := CreateAndInitWithProfile("", nil)
+	return inst
+}
+
+func CreateAndInitWithProfile(profile string, sketchPath *paths.Path) (*rpc.Instance, string) {
 	instance, err := Create()
 	if err != nil {
 		feedback.Errorf(tr("Error creating instance: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	for _, err := range Init(instance) {
+	fqbn, errs := InitWithProfile(instance, profile, sketchPath)
+	for _, err := range errs {
 		feedback.Errorf(tr("Error initializing instance: %v"), err)
 	}
-	return instance
+	return instance, fqbn
 }
 
 // Create and return a new Instance.
@@ -63,19 +69,28 @@ func Create() (*rpc.Instance, error) {
 // Package and library indexes files are automatically updated if the
 // CLI is run for the first time.
 func Init(instance *rpc.Instance) []error {
+	_, errs := InitWithProfile(instance, "", nil)
+	return errs
+}
+
+func InitWithProfile(instance *rpc.Instance, profile string, sketchPath *paths.Path) (string, []error) {
 	errs := []error{}
 
 	// In case the CLI is executed for the first time
 	if err := FirstUpdate(instance); err != nil {
-		return append(errs, err)
+		return "", append(errs, err)
 	}
 
 	downloadCallback := output.ProgressBar()
 	taskCallback := output.TaskProgress()
 
-	err := commands.Init(&rpc.InitRequest{
-		Instance: instance,
-	}, func(res *rpc.InitResponse) {
+	initReq := &rpc.InitRequest{Instance: instance}
+	if sketchPath != nil {
+		initReq.SketchPath = sketchPath.String()
+		initReq.Profile = profile
+	}
+	profileFqbn := ""
+	err := commands.Init(initReq, func(res *rpc.InitResponse) {
 		if st := res.GetError(); st != nil {
 			errs = append(errs, errors.New(st.Message))
 		}
@@ -88,12 +103,16 @@ func Init(instance *rpc.Instance) []error {
 				taskCallback(progress.TaskProgress)
 			}
 		}
+
+		if fqbn := res.GetProfileSelectedFqbn(); fqbn != "" {
+			profileFqbn = fqbn
+		}
 	})
 	if err != nil {
-		return append(errs, err)
+		errs = append(errs, err)
 	}
 
-	return errs
+	return profileFqbn, errs
 }
 
 // FirstUpdate downloads libraries and packages indexes if they don't exist.
