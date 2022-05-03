@@ -2,11 +2,12 @@
 name: Check Go Dependencies
 
 env:
-  # See: https://github.com/actions/setup-go/tree/v2#readme
+  # See: https://github.com/actions/setup-go/tree/v3#readme
   GO_VERSION: "1.17"
 
-# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+# See: https://docs.github.com/actions/using-workflows/events-that-trigger-workflows
 on:
+  create:
   push:
     paths:
       - ".github/workflows/check-go-dependencies-task.ya?ml"
@@ -27,11 +28,39 @@ on:
       - "**/.gitmodules"
       - "**/go.mod"
       - "**/go.sum"
+  schedule:
+    # Run periodically to catch breakage caused by external changes.
+    - cron: "0 8 * * WED"
   workflow_dispatch:
   repository_dispatch:
 
 jobs:
+  run-determination:
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.determination.outputs.result }}
+    steps:
+      - name: Determine if the rest of the workflow should run
+        id: determination
+        run: |
+          RELEASE_BRANCH_REGEX="refs/heads/[0-9]+.[0-9]+.x"
+          # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
+          if [[
+            "${{ github.event_name }}" != "create" ||
+            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX
+          ]]; then
+            # Run the other jobs.
+            RESULT="true"
+          else
+            # There is no need to run the other jobs.
+            RESULT="false"
+          fi
+
+          echo "::set-output name=result::$RESULT"
+
   check-cache:
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -80,6 +109,8 @@ jobs:
           path: .licenses/
 
   check-deps:
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
 
     steps:
