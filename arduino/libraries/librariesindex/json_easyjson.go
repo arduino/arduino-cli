@@ -8,6 +8,7 @@ import (
 	jlexer "github.com/mailru/easyjson/jlexer"
 	jwriter "github.com/mailru/easyjson/jwriter"
 	relaxed_semver "go.bug.st/relaxed-semver"
+	strings "strings"
 )
 
 // suppress unused package warning
@@ -174,7 +175,146 @@ func easyjson42239ddeDecodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesin
 				in.Delim(']')
 			}
 		default:
-			in.SkipRecursive()
+			switch strings.ToLower(key) {
+			case "name":
+				out.Name = string(in.String())
+			case "version":
+				if in.IsNull() {
+					in.Skip()
+					out.Version = nil
+				} else {
+					if out.Version == nil {
+						out.Version = new(relaxed_semver.Version)
+					}
+					if data := in.Raw(); in.Ok() {
+						in.AddError((*out.Version).UnmarshalJSON(data))
+					}
+				}
+			case "author":
+				out.Author = string(in.String())
+			case "maintainer":
+				out.Maintainer = string(in.String())
+			case "sentence":
+				out.Sentence = string(in.String())
+			case "paragraph":
+				out.Paragraph = string(in.String())
+			case "website":
+				out.Website = string(in.String())
+			case "category":
+				out.Category = string(in.String())
+			case "architectures":
+				if in.IsNull() {
+					in.Skip()
+					out.Architectures = nil
+				} else {
+					in.Delim('[')
+					if out.Architectures == nil {
+						if !in.IsDelim(']') {
+							out.Architectures = make([]string, 0, 4)
+						} else {
+							out.Architectures = []string{}
+						}
+					} else {
+						out.Architectures = (out.Architectures)[:0]
+					}
+					for !in.IsDelim(']') {
+						var v5 string
+						v5 = string(in.String())
+						out.Architectures = append(out.Architectures, v5)
+						in.WantComma()
+					}
+					in.Delim(']')
+				}
+			case "types":
+				if in.IsNull() {
+					in.Skip()
+					out.Types = nil
+				} else {
+					in.Delim('[')
+					if out.Types == nil {
+						if !in.IsDelim(']') {
+							out.Types = make([]string, 0, 4)
+						} else {
+							out.Types = []string{}
+						}
+					} else {
+						out.Types = (out.Types)[:0]
+					}
+					for !in.IsDelim(']') {
+						var v6 string
+						v6 = string(in.String())
+						out.Types = append(out.Types, v6)
+						in.WantComma()
+					}
+					in.Delim(']')
+				}
+			case "url":
+				out.URL = string(in.String())
+			case "archivefilename":
+				out.ArchiveFileName = string(in.String())
+			case "size":
+				out.Size = int64(in.Int64())
+			case "checksum":
+				out.Checksum = string(in.String())
+			case "dependencies":
+				if in.IsNull() {
+					in.Skip()
+					out.Dependencies = nil
+				} else {
+					in.Delim('[')
+					if out.Dependencies == nil {
+						if !in.IsDelim(']') {
+							out.Dependencies = make([]*indexDependency, 0, 8)
+						} else {
+							out.Dependencies = []*indexDependency{}
+						}
+					} else {
+						out.Dependencies = (out.Dependencies)[:0]
+					}
+					for !in.IsDelim(']') {
+						var v7 *indexDependency
+						if in.IsNull() {
+							in.Skip()
+							v7 = nil
+						} else {
+							if v7 == nil {
+								v7 = new(indexDependency)
+							}
+							(*v7).UnmarshalEasyJSON(in)
+						}
+						out.Dependencies = append(out.Dependencies, v7)
+						in.WantComma()
+					}
+					in.Delim(']')
+				}
+			case "license":
+				out.License = string(in.String())
+			case "providesincludes":
+				if in.IsNull() {
+					in.Skip()
+					out.ProvidesIncludes = nil
+				} else {
+					in.Delim('[')
+					if out.ProvidesIncludes == nil {
+						if !in.IsDelim(']') {
+							out.ProvidesIncludes = make([]string, 0, 4)
+						} else {
+							out.ProvidesIncludes = []string{}
+						}
+					} else {
+						out.ProvidesIncludes = (out.ProvidesIncludes)[:0]
+					}
+					for !in.IsDelim(']') {
+						var v8 string
+						v8 = string(in.String())
+						out.ProvidesIncludes = append(out.ProvidesIncludes, v8)
+						in.WantComma()
+					}
+					in.Delim(']')
+				}
+			default:
+				in.SkipRecursive()
+			}
 		}
 		in.WantComma()
 	}
@@ -238,11 +378,11 @@ func easyjson42239ddeEncodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesin
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v5, v6 := range in.Architectures {
-				if v5 > 0 {
+			for v9, v10 := range in.Architectures {
+				if v9 > 0 {
 					out.RawByte(',')
 				}
-				out.String(string(v6))
+				out.String(string(v10))
 			}
 			out.RawByte(']')
 		}
@@ -254,11 +394,11 @@ func easyjson42239ddeEncodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesin
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v7, v8 := range in.Types {
-				if v7 > 0 {
+			for v11, v12 := range in.Types {
+				if v11 > 0 {
 					out.RawByte(',')
 				}
-				out.String(string(v8))
+				out.String(string(v12))
 			}
 			out.RawByte(']')
 		}
@@ -288,14 +428,14 @@ func easyjson42239ddeEncodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesin
 		out.RawString(prefix)
 		{
 			out.RawByte('[')
-			for v9, v10 := range in.Dependencies {
-				if v9 > 0 {
+			for v13, v14 := range in.Dependencies {
+				if v13 > 0 {
 					out.RawByte(',')
 				}
-				if v10 == nil {
+				if v14 == nil {
 					out.RawString("null")
 				} else {
-					(*v10).MarshalEasyJSON(out)
+					(*v14).MarshalEasyJSON(out)
 				}
 			}
 			out.RawByte(']')
@@ -313,11 +453,11 @@ func easyjson42239ddeEncodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesin
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v11, v12 := range in.ProvidesIncludes {
-				if v11 > 0 {
+			for v15, v16 := range in.ProvidesIncludes {
+				if v15 > 0 {
 					out.RawByte(',')
 				}
-				out.String(string(v12))
+				out.String(string(v16))
 			}
 			out.RawByte(']')
 		}
@@ -383,15 +523,41 @@ func easyjson42239ddeDecodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesin
 					out.Libraries = (out.Libraries)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v13 indexRelease
-					(v13).UnmarshalEasyJSON(in)
-					out.Libraries = append(out.Libraries, v13)
+					var v17 indexRelease
+					(v17).UnmarshalEasyJSON(in)
+					out.Libraries = append(out.Libraries, v17)
 					in.WantComma()
 				}
 				in.Delim(']')
 			}
 		default:
-			in.SkipRecursive()
+			switch strings.ToLower(key) {
+			case "libraries":
+				if in.IsNull() {
+					in.Skip()
+					out.Libraries = nil
+				} else {
+					in.Delim('[')
+					if out.Libraries == nil {
+						if !in.IsDelim(']') {
+							out.Libraries = make([]indexRelease, 0, 0)
+						} else {
+							out.Libraries = []indexRelease{}
+						}
+					} else {
+						out.Libraries = (out.Libraries)[:0]
+					}
+					for !in.IsDelim(']') {
+						var v18 indexRelease
+						(v18).UnmarshalEasyJSON(in)
+						out.Libraries = append(out.Libraries, v18)
+						in.WantComma()
+					}
+					in.Delim(']')
+				}
+			default:
+				in.SkipRecursive()
+			}
 		}
 		in.WantComma()
 	}
@@ -411,11 +577,11 @@ func easyjson42239ddeEncodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesin
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v14, v15 := range in.Libraries {
-				if v14 > 0 {
+			for v19, v20 := range in.Libraries {
+				if v19 > 0 {
 					out.RawByte(',')
 				}
-				(v15).MarshalEasyJSON(out)
+				(v20).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -470,7 +636,14 @@ func easyjson42239ddeDecodeGithubComArduinoArduinoCliArduinoLibrariesLibrariesin
 		case "version":
 			out.Version = string(in.String())
 		default:
-			in.SkipRecursive()
+			switch strings.ToLower(key) {
+			case "name":
+				out.Name = string(in.String())
+			case "version":
+				out.Version = string(in.String())
+			default:
+				in.SkipRecursive()
+			}
 		}
 		in.WantComma()
 	}

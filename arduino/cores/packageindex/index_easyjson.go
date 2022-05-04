@@ -8,6 +8,7 @@ import (
 	jlexer "github.com/mailru/easyjson/jlexer"
 	jwriter "github.com/mailru/easyjson/jwriter"
 	relaxed_semver "go.bug.st/relaxed-semver"
+	strings "strings"
 )
 
 // suppress unused package warning
@@ -48,7 +49,20 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliArduinoCoresPackageindex(in
 		case "checksum":
 			out.Checksum = string(in.String())
 		default:
-			in.SkipRecursive()
+			switch strings.ToLower(key) {
+			case "host":
+				out.OS = string(in.String())
+			case "url":
+				out.URL = string(in.String())
+			case "archivefilename":
+				out.ArchiveFileName = string(in.String())
+			case "size":
+				out.Size = in.JsonNumber()
+			case "checksum":
+				out.Checksum = string(in.String())
+			default:
+				in.SkipRecursive()
+			}
 		}
 		in.WantComma()
 	}
@@ -169,7 +183,47 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliArduinoCoresPackageindex1(i
 				in.Delim(']')
 			}
 		default:
-			in.SkipRecursive()
+			switch strings.ToLower(key) {
+			case "name":
+				out.Name = string(in.String())
+			case "version":
+				if in.IsNull() {
+					in.Skip()
+					out.Version = nil
+				} else {
+					if out.Version == nil {
+						out.Version = new(relaxed_semver.RelaxedVersion)
+					}
+					if data := in.Raw(); in.Ok() {
+						in.AddError((*out.Version).UnmarshalJSON(data))
+					}
+				}
+			case "systems":
+				if in.IsNull() {
+					in.Skip()
+					out.Systems = nil
+				} else {
+					in.Delim('[')
+					if out.Systems == nil {
+						if !in.IsDelim(']') {
+							out.Systems = make([]indexToolReleaseFlavour, 0, 0)
+						} else {
+							out.Systems = []indexToolReleaseFlavour{}
+						}
+					} else {
+						out.Systems = (out.Systems)[:0]
+					}
+					for !in.IsDelim(']') {
+						var v2 indexToolReleaseFlavour
+						(v2).UnmarshalEasyJSON(in)
+						out.Systems = append(out.Systems, v2)
+						in.WantComma()
+					}
+					in.Delim(']')
+				}
+			default:
+				in.SkipRecursive()
+			}
 		}
 		in.WantComma()
 	}
@@ -203,11 +257,11 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliArduinoCoresPackageindex1(o
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v2, v3 := range in.Systems {
-				if v2 > 0 {
+			for v3, v4 := range in.Systems {
+				if v3 > 0 {
 					out.RawByte(',')
 				}
-				(v3).MarshalEasyJSON(out)
+				(v4).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -274,7 +328,26 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliArduinoCoresPackageindex2(i
 				}
 			}
 		default:
-			in.SkipRecursive()
+			switch strings.ToLower(key) {
+			case "packager":
+				out.Packager = string(in.String())
+			case "name":
+				out.Name = string(in.String())
+			case "version":
+				if in.IsNull() {
+					in.Skip()
+					out.Version = nil
+				} else {
+					if out.Version == nil {
+						out.Version = new(relaxed_semver.RelaxedVersion)
+					}
+					if data := in.Raw(); in.Ok() {
+						in.AddError((*out.Version).UnmarshalJSON(data))
+					}
+				}
+			default:
+				in.SkipRecursive()
+			}
 		}
 		in.WantComma()
 	}
@@ -395,9 +468,9 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliArduinoCoresPackageindex3(i
 					out.Boards = (out.Boards)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v4 indexBoard
-					(v4).UnmarshalEasyJSON(in)
-					out.Boards = append(out.Boards, v4)
+					var v5 indexBoard
+					(v5).UnmarshalEasyJSON(in)
+					out.Boards = append(out.Boards, v5)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -420,9 +493,9 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliArduinoCoresPackageindex3(i
 					out.ToolDependencies = (out.ToolDependencies)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v5 indexToolDependency
-					(v5).UnmarshalEasyJSON(in)
-					out.ToolDependencies = append(out.ToolDependencies, v5)
+					var v6 indexToolDependency
+					(v6).UnmarshalEasyJSON(in)
+					out.ToolDependencies = append(out.ToolDependencies, v6)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -443,9 +516,9 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliArduinoCoresPackageindex3(i
 					out.DiscoveryDependencies = (out.DiscoveryDependencies)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v6 indexDiscoveryDependency
-					(v6).UnmarshalEasyJSON(in)
-					out.DiscoveryDependencies = append(out.DiscoveryDependencies, v6)
+					var v7 indexDiscoveryDependency
+					(v7).UnmarshalEasyJSON(in)
+					out.DiscoveryDependencies = append(out.DiscoveryDependencies, v7)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -466,15 +539,140 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliArduinoCoresPackageindex3(i
 					out.MonitorDependencies = (out.MonitorDependencies)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v7 indexMonitorDependency
-					(v7).UnmarshalEasyJSON(in)
-					out.MonitorDependencies = append(out.MonitorDependencies, v7)
+					var v8 indexMonitorDependency
+					(v8).UnmarshalEasyJSON(in)
+					out.MonitorDependencies = append(out.MonitorDependencies, v8)
 					in.WantComma()
 				}
 				in.Delim(']')
 			}
 		default:
-			in.SkipRecursive()
+			switch strings.ToLower(key) {
+			case "name":
+				out.Name = string(in.String())
+			case "architecture":
+				out.Architecture = string(in.String())
+			case "version":
+				if in.IsNull() {
+					in.Skip()
+					out.Version = nil
+				} else {
+					if out.Version == nil {
+						out.Version = new(relaxed_semver.Version)
+					}
+					if data := in.Raw(); in.Ok() {
+						in.AddError((*out.Version).UnmarshalJSON(data))
+					}
+				}
+			case "deprecated":
+				out.Deprecated = bool(in.Bool())
+			case "category":
+				out.Category = string(in.String())
+			case "url":
+				out.URL = string(in.String())
+			case "archivefilename":
+				out.ArchiveFileName = string(in.String())
+			case "checksum":
+				out.Checksum = string(in.String())
+			case "size":
+				out.Size = in.JsonNumber()
+			case "boards":
+				if in.IsNull() {
+					in.Skip()
+					out.Boards = nil
+				} else {
+					in.Delim('[')
+					if out.Boards == nil {
+						if !in.IsDelim(']') {
+							out.Boards = make([]indexBoard, 0, 1)
+						} else {
+							out.Boards = []indexBoard{}
+						}
+					} else {
+						out.Boards = (out.Boards)[:0]
+					}
+					for !in.IsDelim(']') {
+						var v9 indexBoard
+						(v9).UnmarshalEasyJSON(in)
+						out.Boards = append(out.Boards, v9)
+						in.WantComma()
+					}
+					in.Delim(']')
+				}
+			case "help":
+				(out.Help).UnmarshalEasyJSON(in)
+			case "toolsdependencies":
+				if in.IsNull() {
+					in.Skip()
+					out.ToolDependencies = nil
+				} else {
+					in.Delim('[')
+					if out.ToolDependencies == nil {
+						if !in.IsDelim(']') {
+							out.ToolDependencies = make([]indexToolDependency, 0, 1)
+						} else {
+							out.ToolDependencies = []indexToolDependency{}
+						}
+					} else {
+						out.ToolDependencies = (out.ToolDependencies)[:0]
+					}
+					for !in.IsDelim(']') {
+						var v10 indexToolDependency
+						(v10).UnmarshalEasyJSON(in)
+						out.ToolDependencies = append(out.ToolDependencies, v10)
+						in.WantComma()
+					}
+					in.Delim(']')
+				}
+			case "discoverydependencies":
+				if in.IsNull() {
+					in.Skip()
+					out.DiscoveryDependencies = nil
+				} else {
+					in.Delim('[')
+					if out.DiscoveryDependencies == nil {
+						if !in.IsDelim(']') {
+							out.DiscoveryDependencies = make([]indexDiscoveryDependency, 0, 2)
+						} else {
+							out.DiscoveryDependencies = []indexDiscoveryDependency{}
+						}
+					} else {
+						out.DiscoveryDependencies = (out.DiscoveryDependencies)[:0]
+					}
+					for !in.IsDelim(']') {
+						var v11 indexDiscoveryDependency
+						(v11).UnmarshalEasyJSON(in)
+						out.DiscoveryDependencies = append(out.DiscoveryDependencies, v11)
+						in.WantComma()
+					}
+					in.Delim(']')
+				}
+			case "monitordependencies":
+				if in.IsNull() {
+					in.Skip()
+					out.MonitorDependencies = nil
+				} else {
+					in.Delim('[')
+					if out.MonitorDependencies == nil {
+						if !in.IsDelim(']') {
+							out.MonitorDependencies = make([]indexMonitorDependency, 0, 2)
+						} else {
+							out.MonitorDependencies = []indexMonitorDependency{}
+						}
+					} else {
+						out.MonitorDependencies = (out.MonitorDependencies)[:0]
+					}
+					for !in.IsDelim(']') {
+						var v12 indexMonitorDependency
+						(v12).UnmarshalEasyJSON(in)
+						out.MonitorDependencies = append(out.MonitorDependencies, v12)
+						in.WantComma()
+					}
+					in.Delim(']')
+				}
+			default:
+				in.SkipRecursive()
+			}
 		}
 		in.WantComma()
 	}
@@ -543,11 +741,11 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliArduinoCoresPackageindex3(o
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v8, v9 := range in.Boards {
-				if v8 > 0 {
+			for v13, v14 := range in.Boards {
+				if v13 > 0 {
 					out.RawByte(',')
 				}
-				(v9).MarshalEasyJSON(out)
+				(v14).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -564,11 +762,11 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliArduinoCoresPackageindex3(o
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v10, v11 := range in.ToolDependencies {
-				if v10 > 0 {
+			for v15, v16 := range in.ToolDependencies {
+				if v15 > 0 {
 					out.RawByte(',')
 				}
-				(v11).MarshalEasyJSON(out)
+				(v16).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -580,11 +778,11 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliArduinoCoresPackageindex3(o
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v12, v13 := range in.DiscoveryDependencies {
-				if v12 > 0 {
+			for v17, v18 := range in.DiscoveryDependencies {
+				if v17 > 0 {
 					out.RawByte(',')
 				}
-				(v13).MarshalEasyJSON(out)
+				(v18).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -596,11 +794,11 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliArduinoCoresPackageindex3(o
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v14, v15 := range in.MonitorDependencies {
-				if v14 > 0 {
+			for v19, v20 := range in.MonitorDependencies {
+				if v19 > 0 {
 					out.RawByte(',')
 				}
-				(v15).MarshalEasyJSON(out)
+				(v20).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -676,17 +874,17 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliArduinoCoresPackageindex4(i
 					out.Platforms = (out.Platforms)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v16 *indexPlatformRelease
+					var v21 *indexPlatformRelease
 					if in.IsNull() {
 						in.Skip()
-						v16 = nil
+						v21 = nil
 					} else {
-						if v16 == nil {
-							v16 = new(indexPlatformRelease)
+						if v21 == nil {
+							v21 = new(indexPlatformRelease)
 						}
-						(*v16).UnmarshalEasyJSON(in)
+						(*v21).UnmarshalEasyJSON(in)
 					}
-					out.Platforms = append(out.Platforms, v16)
+					out.Platforms = append(out.Platforms, v21)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -707,17 +905,17 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliArduinoCoresPackageindex4(i
 					out.Tools = (out.Tools)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v17 *indexToolRelease
+					var v22 *indexToolRelease
 					if in.IsNull() {
 						in.Skip()
-						v17 = nil
+						v22 = nil
 					} else {
-						if v17 == nil {
-							v17 = new(indexToolRelease)
+						if v22 == nil {
+							v22 = new(indexToolRelease)
 						}
-						(*v17).UnmarshalEasyJSON(in)
+						(*v22).UnmarshalEasyJSON(in)
 					}
-					out.Tools = append(out.Tools, v17)
+					out.Tools = append(out.Tools, v22)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -725,7 +923,84 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliArduinoCoresPackageindex4(i
 		case "help":
 			(out.Help).UnmarshalEasyJSON(in)
 		default:
-			in.SkipRecursive()
+			switch strings.ToLower(key) {
+			case "name":
+				out.Name = string(in.String())
+			case "maintainer":
+				out.Maintainer = string(in.String())
+			case "websiteurl":
+				out.WebsiteURL = string(in.String())
+			case "url":
+				out.URL = string(in.String())
+			case "email":
+				out.Email = string(in.String())
+			case "platforms":
+				if in.IsNull() {
+					in.Skip()
+					out.Platforms = nil
+				} else {
+					in.Delim('[')
+					if out.Platforms == nil {
+						if !in.IsDelim(']') {
+							out.Platforms = make([]*indexPlatformRelease, 0, 8)
+						} else {
+							out.Platforms = []*indexPlatformRelease{}
+						}
+					} else {
+						out.Platforms = (out.Platforms)[:0]
+					}
+					for !in.IsDelim(']') {
+						var v23 *indexPlatformRelease
+						if in.IsNull() {
+							in.Skip()
+							v23 = nil
+						} else {
+							if v23 == nil {
+								v23 = new(indexPlatformRelease)
+							}
+							(*v23).UnmarshalEasyJSON(in)
+						}
+						out.Platforms = append(out.Platforms, v23)
+						in.WantComma()
+					}
+					in.Delim(']')
+				}
+			case "tools":
+				if in.IsNull() {
+					in.Skip()
+					out.Tools = nil
+				} else {
+					in.Delim('[')
+					if out.Tools == nil {
+						if !in.IsDelim(']') {
+							out.Tools = make([]*indexToolRelease, 0, 8)
+						} else {
+							out.Tools = []*indexToolRelease{}
+						}
+					} else {
+						out.Tools = (out.Tools)[:0]
+					}
+					for !in.IsDelim(']') {
+						var v24 *indexToolRelease
+						if in.IsNull() {
+							in.Skip()
+							v24 = nil
+						} else {
+							if v24 == nil {
+								v24 = new(indexToolRelease)
+							}
+							(*v24).UnmarshalEasyJSON(in)
+						}
+						out.Tools = append(out.Tools, v24)
+						in.WantComma()
+					}
+					in.Delim(']')
+				}
+			case "help":
+				(out.Help).UnmarshalEasyJSON(in)
+			default:
+				in.SkipRecursive()
+			}
 		}
 		in.WantComma()
 	}
@@ -770,14 +1045,14 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliArduinoCoresPackageindex4(o
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v18, v19 := range in.Platforms {
-				if v18 > 0 {
+			for v25, v26 := range in.Platforms {
+				if v25 > 0 {
 					out.RawByte(',')
 				}
-				if v19 == nil {
+				if v26 == nil {
 					out.RawString("null")
 				} else {
-					(*v19).MarshalEasyJSON(out)
+					(*v26).MarshalEasyJSON(out)
 				}
 			}
 			out.RawByte(']')
@@ -790,14 +1065,14 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliArduinoCoresPackageindex4(o
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v20, v21 := range in.Tools {
-				if v20 > 0 {
+			for v27, v28 := range in.Tools {
+				if v27 > 0 {
 					out.RawByte(',')
 				}
-				if v21 == nil {
+				if v28 == nil {
 					out.RawString("null")
 				} else {
-					(*v21).MarshalEasyJSON(out)
+					(*v28).MarshalEasyJSON(out)
 				}
 			}
 			out.RawByte(']')
@@ -858,7 +1133,14 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliArduinoCoresPackageindex5(i
 		case "name":
 			out.Name = string(in.String())
 		default:
-			in.SkipRecursive()
+			switch strings.ToLower(key) {
+			case "packager":
+				out.Packager = string(in.String())
+			case "name":
+				out.Name = string(in.String())
+			default:
+				in.SkipRecursive()
+			}
 		}
 		in.WantComma()
 	}
@@ -929,7 +1211,12 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliArduinoCoresPackageindex6(i
 		case "online":
 			out.Online = string(in.String())
 		default:
-			in.SkipRecursive()
+			switch strings.ToLower(key) {
+			case "online":
+				out.Online = string(in.String())
+			default:
+				in.SkipRecursive()
+			}
 		}
 		in.WantComma()
 	}
@@ -998,7 +1285,14 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliArduinoCoresPackageindex7(i
 		case "name":
 			out.Name = string(in.String())
 		default:
-			in.SkipRecursive()
+			switch strings.ToLower(key) {
+			case "packager":
+				out.Packager = string(in.String())
+			case "name":
+				out.Name = string(in.String())
+			default:
+				in.SkipRecursive()
+			}
 		}
 		in.WantComma()
 	}
@@ -1069,7 +1363,12 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliArduinoCoresPackageindex8(i
 		case "usb":
 			out.USB = string(in.String())
 		default:
-			in.SkipRecursive()
+			switch strings.ToLower(key) {
+			case "usb":
+				out.USB = string(in.String())
+			default:
+				in.SkipRecursive()
+			}
 		}
 		in.WantComma()
 	}
@@ -1150,15 +1449,43 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliArduinoCoresPackageindex9(i
 					out.ID = (out.ID)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v22 indexBoardID
-					(v22).UnmarshalEasyJSON(in)
-					out.ID = append(out.ID, v22)
+					var v29 indexBoardID
+					(v29).UnmarshalEasyJSON(in)
+					out.ID = append(out.ID, v29)
 					in.WantComma()
 				}
 				in.Delim(']')
 			}
 		default:
-			in.SkipRecursive()
+			switch strings.ToLower(key) {
+			case "name":
+				out.Name = string(in.String())
+			case "id":
+				if in.IsNull() {
+					in.Skip()
+					out.ID = nil
+				} else {
+					in.Delim('[')
+					if out.ID == nil {
+						if !in.IsDelim(']') {
+							out.ID = make([]indexBoardID, 0, 4)
+						} else {
+							out.ID = []indexBoardID{}
+						}
+					} else {
+						out.ID = (out.ID)[:0]
+					}
+					for !in.IsDelim(']') {
+						var v30 indexBoardID
+						(v30).UnmarshalEasyJSON(in)
+						out.ID = append(out.ID, v30)
+						in.WantComma()
+					}
+					in.Delim(']')
+				}
+			default:
+				in.SkipRecursive()
+			}
 		}
 		in.WantComma()
 	}
@@ -1181,11 +1508,11 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliArduinoCoresPackageindex9(o
 		out.RawString(prefix)
 		{
 			out.RawByte('[')
-			for v23, v24 := range in.ID {
-				if v23 > 0 {
+			for v31, v32 := range in.ID {
+				if v31 > 0 {
 					out.RawByte(',')
 				}
-				(v24).MarshalEasyJSON(out)
+				(v32).MarshalEasyJSON(out)
 			}
 			out.RawByte(']')
 		}
@@ -1251,17 +1578,17 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliArduinoCoresPackageindex10(
 					out.Packages = (out.Packages)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v25 *indexPackage
+					var v33 *indexPackage
 					if in.IsNull() {
 						in.Skip()
-						v25 = nil
+						v33 = nil
 					} else {
-						if v25 == nil {
-							v25 = new(indexPackage)
+						if v33 == nil {
+							v33 = new(indexPackage)
 						}
-						(*v25).UnmarshalEasyJSON(in)
+						(*v33).UnmarshalEasyJSON(in)
 					}
-					out.Packages = append(out.Packages, v25)
+					out.Packages = append(out.Packages, v33)
 					in.WantComma()
 				}
 				in.Delim(']')
@@ -1269,7 +1596,43 @@ func easyjsonE2a549a6DecodeGithubComArduinoArduinoCliArduinoCoresPackageindex10(
 		case "IsTrusted":
 			out.IsTrusted = bool(in.Bool())
 		default:
-			in.SkipRecursive()
+			switch strings.ToLower(key) {
+			case "packages":
+				if in.IsNull() {
+					in.Skip()
+					out.Packages = nil
+				} else {
+					in.Delim('[')
+					if out.Packages == nil {
+						if !in.IsDelim(']') {
+							out.Packages = make([]*indexPackage, 0, 8)
+						} else {
+							out.Packages = []*indexPackage{}
+						}
+					} else {
+						out.Packages = (out.Packages)[:0]
+					}
+					for !in.IsDelim(']') {
+						var v34 *indexPackage
+						if in.IsNull() {
+							in.Skip()
+							v34 = nil
+						} else {
+							if v34 == nil {
+								v34 = new(indexPackage)
+							}
+							(*v34).UnmarshalEasyJSON(in)
+						}
+						out.Packages = append(out.Packages, v34)
+						in.WantComma()
+					}
+					in.Delim(']')
+				}
+			case "istrusted":
+				out.IsTrusted = bool(in.Bool())
+			default:
+				in.SkipRecursive()
+			}
 		}
 		in.WantComma()
 	}
@@ -1289,14 +1652,14 @@ func easyjsonE2a549a6EncodeGithubComArduinoArduinoCliArduinoCoresPackageindex10(
 			out.RawString("null")
 		} else {
 			out.RawByte('[')
-			for v26, v27 := range in.Packages {
-				if v26 > 0 {
+			for v35, v36 := range in.Packages {
+				if v35 > 0 {
 					out.RawByte(',')
 				}
-				if v27 == nil {
+				if v36 == nil {
 					out.RawString("null")
 				} else {
-					(*v27).MarshalEasyJSON(out)
+					(*v36).MarshalEasyJSON(out)
 				}
 			}
 			out.RawByte(']')
