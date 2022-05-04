@@ -24,17 +24,20 @@ import (
 	"github.com/arduino/arduino-cli/arduino/security"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/go-paths-helper"
+	easyjson "github.com/mailru/easyjson"
 	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
 )
 
 // Index represents Cores and Tools struct as seen from package_index.json file.
+//easyjson:json
 type Index struct {
 	Packages  []*indexPackage `json:"packages"`
 	IsTrusted bool
 }
 
 // indexPackage represents a single entry from package_index.json file.
+//easyjson:json
 type indexPackage struct {
 	Name       string                  `json:"name"`
 	Maintainer string                  `json:"maintainer"`
@@ -47,6 +50,7 @@ type indexPackage struct {
 }
 
 // indexPlatformRelease represents a single Core Platform from package_index.json file.
+//easyjson:json
 type indexPlatformRelease struct {
 	Name                  string                     `json:"name"`
 	Architecture          string                     `json:"architecture"`
@@ -65,6 +69,7 @@ type indexPlatformRelease struct {
 }
 
 // indexToolDependency represents a single dependency of a core from a tool.
+//easyjson:json
 type indexToolDependency struct {
 	Packager string                 `json:"packager"`
 	Name     string                 `json:"name"`
@@ -72,18 +77,21 @@ type indexToolDependency struct {
 }
 
 // indexDiscoveryDependency represents a single dependency of a core from a pluggable discovery tool.
+//easyjson:json
 type indexDiscoveryDependency struct {
 	Packager string `json:"packager"`
 	Name     string `json:"name"`
 }
 
 // indexMonitorDependency represents a single dependency of a core from a pluggable monitor tool.
+//easyjson:json
 type indexMonitorDependency struct {
 	Packager string `json:"packager"`
 	Name     string `json:"name"`
 }
 
 // indexToolRelease represents a single Tool from package_index.json file.
+//easyjson:json
 type indexToolRelease struct {
 	Name    string                    `json:"name"`
 	Version *semver.RelaxedVersion    `json:"version"`
@@ -91,6 +99,7 @@ type indexToolRelease struct {
 }
 
 // indexToolReleaseFlavour represents a single tool flavor in the package_index.json file.
+//easyjson:json
 type indexToolReleaseFlavour struct {
 	OS              string      `json:"host"`
 	URL             string      `json:"url"`
@@ -100,17 +109,20 @@ type indexToolReleaseFlavour struct {
 }
 
 // indexBoard represents a single Board as written in package_index.json file.
+//easyjson:json
 type indexBoard struct {
 	Name string         `json:"name"`
 	ID   []indexBoardID `json:"id,omitempty"`
 }
 
 // indexBoardID represents the ID of a single board. i.e. uno, yun, diecimila, micro and the likes
+//easyjson:json
 type indexBoardID struct {
 	USB string `json:"usb"`
 }
 
 // indexHelp represents the help URL
+//easyjson:json
 type indexHelp struct {
 	Online string `json:"online,omitempty"`
 }
@@ -352,7 +364,7 @@ func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
 		return nil, err
 	}
 	var index Index
-	err = json.Unmarshal(buff, &index)
+	err = easyjson.Unmarshal(buff, &index)
 	if err != nil {
 		return nil, err
 	}
@@ -381,7 +393,7 @@ func LoadIndexNoSign(jsonIndexFile *paths.Path) (*Index, error) {
 		return nil, err
 	}
 	var index Index
-	err = json.Unmarshal(buff, &index)
+	err = easyjson.Unmarshal(buff, &index)
 	if err != nil {
 		return nil, err
 	}
