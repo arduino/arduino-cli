@@ -41,7 +41,7 @@ func CreateAndInit() *rpc.Instance {
 	return inst
 }
 
-// CreateAndInitWithProfile return a new initialized instance using the given profile in the give sketch.
+// CreateAndInitWithProfile returns a new initialized instance using the given profile of the given sketch.
 // If Create fails the CLI prints an error and exits since to execute further operations a valid Instance is mandatory.
 // If Init returns errors they're printed only.
 func CreateAndInitWithProfile(profileName string, sketchPath *paths.Path) (*rpc.Instance, *rpc.Profile) {

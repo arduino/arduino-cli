@@ -30,12 +30,12 @@ func (f *Profile) AddToCommand(cmd *cobra.Command) {
 	// TODO: register autocompletion
 }
 
-// Get returns the profile
+// Get returns the profile name
 func (f *Profile) Get() string {
 	return f.profile
 }
 
-// String returns the profile
+// String returns the profile name
 func (f *Profile) String() string {
 	return f.profile
 }

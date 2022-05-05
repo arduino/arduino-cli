@@ -212,21 +212,21 @@ func (e *UnknownProfileError) ToRPCStatus() *status.Status {
 	return status.New(codes.NotFound, e.Error())
 }
 
-// InvlaidProfileError is returned when the profile has errors
-type InvlaidProfileError struct {
+// InvalidProfileError is returned when the profile has errors
+type InvalidProfileError struct {
 	Cause error
 }
 
-func (e *InvlaidProfileError) Error() string {
+func (e *InvalidProfileError) Error() string {
 	return composeErrorMsg(tr("Invalid profile"), e.Cause)
 }
 
-func (e *InvlaidProfileError) Unwrap() error {
+func (e *InvalidProfileError) Unwrap() error {
 	return e.Cause
 }
 
 // ToRPCStatus converts the error into a *status.Status
-func (e *InvlaidProfileError) ToRPCStatus() *status.Status {
+func (e *InvalidProfileError) ToRPCStatus() *status.Status {
 	return status.New(codes.FailedPrecondition, e.Error())
 }
 

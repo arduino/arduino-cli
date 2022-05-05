@@ -29,7 +29,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// Project represents all the
+// Project represents all the profiles defined for the sketch
 type Project struct {
 	Profiles       map[string]*Profile `yaml:"profiles"`
 	DefaultProfile string              `yaml:"default_profile"`
@@ -141,9 +141,9 @@ func (p *ProfilePlatformReference) UnmarshalYAML(unmarshal func(interface{}) err
 		return err
 	}
 	if platformID, ok := data["platform"]; !ok {
-		return fmt.Errorf(tr("missing 'platform' directive"))
+		return fmt.Errorf(tr("missing '%s' directive", "platform"))
 	} else if platformID, platformVersion, ok := parseNameAndVersion(platformID); !ok {
-		return fmt.Errorf(tr("invalid 'platform' directive"))
+		return fmt.Errorf(tr("invalid '%s' directive", "platform"))
 	} else if c, err := semver.Parse(platformVersion); err != nil {
 		return fmt.Errorf("%s: %w", tr("error parsing version constraints"), err)
 	} else if split := strings.SplitN(platformID, ":", 2); len(split) != 2 {
@@ -157,7 +157,7 @@ func (p *ProfilePlatformReference) UnmarshalYAML(unmarshal func(interface{}) err
 	if rawIndexURL, ok := data["platform_index_url"]; ok {
 		indexURL, err := url.Parse(rawIndexURL)
 		if err != nil {
-			return fmt.Errorf("%s: %w", tr("invlid platform index URL:"), err)
+			return fmt.Errorf("%s: %w", tr("invalid platform index URL:"), err)
 		}
 		p.PlatformIndexURL = indexURL
 	}
