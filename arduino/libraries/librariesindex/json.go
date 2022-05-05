@@ -16,19 +16,21 @@
 package librariesindex
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/resources"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/go-paths-helper"
+	easyjson "github.com/mailru/easyjson"
 	semver "go.bug.st/relaxed-semver"
 )
 
+//easyjson:json
 type indexJSON struct {
 	Libraries []indexRelease `json:"libraries"`
 }
 
+//easyjson:json
 type indexRelease struct {
 	Name             string             `json:"name"`
 	Version          *semver.Version    `json:"version"`
@@ -49,6 +51,7 @@ type indexRelease struct {
 	ProvidesIncludes []string           `json:"providesIncludes"`
 }
 
+//easyjson:json
 type indexDependency struct {
 	Name    string `json:"name"`
 	Version string `json:"version,omitempty"`
@@ -64,7 +67,7 @@ func LoadIndex(indexFile *paths.Path) (*Index, error) {
 	}
 
 	var i indexJSON
-	err = json.Unmarshal(buff, &i)
+	err = easyjson.Unmarshal(buff, &i)
 	if err != nil {
 		return nil, fmt.Errorf(tr("parsing library_index.json: %s"), err)
 	}

@@ -349,6 +349,13 @@ func main() {
 }
 ```
 
+### About `easyjson` golang library
+
+We use the hi-performance `easyjson` library to parse the large JSON index files for libraries and platforms. To obtain
+the best performance we must do some code generation, this is done via `task go:easyjson-generate`. If you ever touch
+source code using the `easyjson` library, make sure to re-run the `go:easyjson-generate` task to see if there are
+changes in the generated code.
+
 ### Additional settings
 
 If you need to push a commit that's only shipping documentation changes or example files, thus a complete no-op for the
