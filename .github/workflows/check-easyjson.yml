@@ -9,7 +9,6 @@ on:
   push:
     paths:
       - ".github/workflows/check-easyjson.ya?ml"
-      - "codecov.ya?ml"
       - "go.mod"
       - "go.sum"
       - "Taskfile.ya?ml"
@@ -17,7 +16,6 @@ on:
   pull_request:
     paths:
       - ".github/workflows/check-easyjson.ya?ml"
-      - "codecov.ya?ml"
       - "go.mod"
       - "go.sum"
       - "Taskfile.ya?ml"
