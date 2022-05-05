@@ -514,6 +514,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#about-easyjson-golang-library" class="md-nav__link">
+    About easyjson golang library
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#additional-settings" class="md-nav__link">
     Additional settings
   </a>
@@ -1747,6 +1754,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#about-easyjson-golang-library" class="md-nav__link">
+    About easyjson golang library
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#additional-settings" class="md-nav__link">
     Additional settings
   </a>
@@ -2041,6 +2055,11 @@ with the localized value.</p>
 <span class="w">  </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">i18n</span><span class="p">.</span><span class="nx">Tr</span><span class="p">(</span><span class="s">&quot;Hello World!&quot;</span><span class="p">))</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span>
 </code></pre></div>
+<h3 id="about-easyjson-golang-library">About <code>easyjson</code> golang library<a class="headerlink" href="#about-easyjson-golang-library" title="Permanent link">&para;</a></h3>
+<p>We use the hi-performance <code>easyjson</code> library to parse the large JSON index files for libraries and platforms. To obtain
+the best performance we must do some code generation, this is done via <code>task go:easyjson-generate</code>. If you ever touch
+source code using the <code>easyjson</code> library, make sure to re-run the <code>go:easyjson-generate</code> task to see if there are
+changes in the generated code.</p>
 <h3 id="additional-settings">Additional settings<a class="headerlink" href="#additional-settings" title="Permanent link">&para;</a></h3>
 <p>If you need to push a commit that's only shipping documentation changes or example files, thus a complete no-op for the
 test suite, please start the commit message with the string <strong>[skip ci]</strong> to skip the build and give that slot to
