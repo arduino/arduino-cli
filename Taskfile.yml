@@ -119,6 +119,13 @@ tasks:
     cmds:
       - go vet {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}}
 
+  go:easyjson-generate:
+    desc: Run easyjson code generation
+    cmds:
+      - go install github.com/mailru/easyjson/...@v0.7.7
+      - easyjson arduino/cores/packageindex/index.go
+      - easyjson arduino/libraries/librariesindex/json.go
+
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-markdown-task/Taskfile.yml
   markdown:check-links:
     desc: Check for broken links
