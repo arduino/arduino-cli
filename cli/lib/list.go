@@ -129,7 +129,10 @@ func (ir installedResult) String() string {
 	lastName := ""
 	for _, libMeta := range ir.installedLibs {
 		lib := libMeta.GetLibrary()
-		name := lib.Name
+		name := lib.RealName
+		if name == "" {
+			name = lib.Name
+		}
 		if name == lastName {
 			name = ` "`
 		} else {

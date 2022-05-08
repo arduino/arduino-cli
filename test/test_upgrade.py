@@ -59,7 +59,7 @@ def test_upgrade_using_library_with_invalid_version(run_command, data_dir):
     # Changes the version of the currently installed library so that it's
     # invalid
     lib_path = Path(data_dir, "libraries", "WiFi101")
-    Path(lib_path, "library.properties").write_text("version=1.0001")
+    Path(lib_path, "library.properties").write_text("name=WiFi101\nversion=1.0001")
 
     # Verifies library gets upgraded
     res = run_command(["upgrade"])

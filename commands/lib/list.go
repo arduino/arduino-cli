@@ -47,7 +47,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 
 	nameFilter := strings.ToLower(req.GetName())
 
-	instaledLibs := []*rpc.InstalledLibrary{}
+	installedLibs := []*rpc.InstalledLibrary{}
 	res := listLibraries(lm, req.GetUpdatable(), req.GetAll())
 	if f := req.GetFqbn(); f != "" {
 		fqbn, err := cores.ParseFQBN(req.GetFqbn())
@@ -106,13 +106,13 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 		if err != nil {
 			return nil, &arduino.PermissionDeniedError{Message: tr("Error getting information for library %s", lib.Library.Name), Cause: err}
 		}
-		instaledLibs = append(instaledLibs, &rpc.InstalledLibrary{
+		installedLibs = append(installedLibs, &rpc.InstalledLibrary{
 			Library: rpcLib,
 			Release: release,
 		})
 	}
 
-	return &rpc.LibraryListResponse{InstalledLibraries: instaledLibs}, nil
+	return &rpc.LibraryListResponse{InstalledLibraries: installedLibs}, nil
 }
 
 // listLibraries returns the list of installed libraries. If updatable is true it
