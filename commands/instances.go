@@ -218,6 +218,9 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 			return &arduino.InvalidArgumentError{Cause: err}
 		}
 		profile = sk.GetProfile(req.GetProfile())
+		if profile == nil {
+			return &arduino.UnknownProfileError{Profile: req.GetProfile()}
+		}
 		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_Profile{
 				Profile: &rpc.Profile{
