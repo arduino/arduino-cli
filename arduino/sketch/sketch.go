@@ -94,7 +94,10 @@ func New(path *paths.Path) (*Sketch, error) {
 		Metadata:         new(Metadata),
 	}
 
-	projectFile := path.Join("sketch.yml")
+	projectFile := path.Join("sketch.yaml")
+	if !projectFile.Exist() {
+		projectFile = path.Join("sketch.yml")
+	}
 	if projectFile.Exist() {
 		prj, err := LoadProjectFile(projectFile)
 		if err != nil {
