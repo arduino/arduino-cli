@@ -2,6 +2,22 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## 0.23.0
+
+### golang API: PackageManager.DownloadPlatformRelease no longer need `label` parameter
+
+```go
+func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease, config *downloader.Config, label string, progressCB rpc.DownloadProgressCB) error {
+```
+
+is now:
+
+```go
+func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease, config *downloader.Config, progressCB rpc.DownloadProgressCB) error {
+```
+
+Just remove the `label` parameter from legacy code.
+
 ## 0.22.0
 
 ### `github.com/arduino/arduino-cli/arduino.MultipleBoardsDetectedError` field changed type
