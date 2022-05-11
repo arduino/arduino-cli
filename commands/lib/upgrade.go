@@ -82,7 +82,7 @@ func filterByName(libs []*installedLib, names []string) []*installedLib {
 	ret := []*installedLib{}
 	for _, lib := range libs {
 		// skip if library name wasn't in the query
-		if _, found := queryMap[lib.Library.Name]; found {
+		if _, found := queryMap[lib.Library.RealName]; found {
 			ret = append(ret, lib)
 		}
 	}
