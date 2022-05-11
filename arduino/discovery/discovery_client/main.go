@@ -32,11 +32,7 @@ func main() {
 	discoveries := []*discovery.PluggableDiscovery{}
 	discEvent := make(chan *discovery.Event)
 	for _, discCmd := range os.Args[1:] {
-		disc, err := discovery.New("", discCmd)
-		if err != nil {
-			log.Fatal("Error initializing discovery:", err)
-		}
-
+		disc := discovery.New("", discCmd)
 		if err := disc.Run(); err != nil {
 			log.Fatal("Error starting discovery:", err)
 		}
@@ -135,9 +131,7 @@ out:
 	}
 
 	for _, disc := range discoveries {
-		if err := disc.Quit(); err != nil {
-			log.Fatal("Error stopping discovery:", err)
-		}
+		disc.Quit()
 		fmt.Println("Discovery QUITed")
 		for disc.State() == discovery.Alive {
 			time.Sleep(time.Millisecond)

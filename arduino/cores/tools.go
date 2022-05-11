@@ -27,22 +27,22 @@ import (
 
 // Tool represents a single Tool, part of a Package.
 type Tool struct {
-	Name     string                  `json:"name,required"` // The Name of the Tool.
-	Releases map[string]*ToolRelease `json:"releases"`      // Maps Version to Release.
+	Name     string                  `json:"name"`     // The Name of the Tool.
+	Releases map[string]*ToolRelease `json:"releases"` // Maps Version to Release.
 	Package  *Package                `json:"-"`
 }
 
 // ToolRelease represents a single release of a tool
 type ToolRelease struct {
-	Version    *semver.RelaxedVersion `json:"version,required"` // The version number of this Release.
-	Flavors    []*Flavor              `json:"systems"`          // Maps OS to Flavor
+	Version    *semver.RelaxedVersion `json:"version"` // The version number of this Release.
+	Flavors    []*Flavor              `json:"systems"` // Maps OS to Flavor
 	Tool       *Tool                  `json:"-"`
 	InstallDir *paths.Path            `json:"-"`
 }
 
 // Flavor represents a flavor of a Tool version.
 type Flavor struct {
-	OS       string `json:"os,required"` // The OS Supported by this flavor.
+	OS       string `json:"os"` // The OS Supported by this flavor.
 	Resource *resources.DownloadResource
 }
 

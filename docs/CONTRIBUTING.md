@@ -70,7 +70,7 @@ submitting a PR:
 
 To build the Arduino CLI from sources you need the following tools to be available in your local environment:
 
-- [Go][1] version 1.14 or later
+- [Go][1] version 1.17 or later
 - [Taskfile][2] to help you run the most common tasks from the command line
 
 If you want to run integration tests you will also need:
@@ -272,7 +272,7 @@ If you want to check out how the documentation would look after some local chang
 happens in the CI, generating the full documentation website from your personal computer. To run the docs toolchain
 locally, you need to have a few dependencies and tools installed:
 
-- [Go][1] version 1.14 or later
+- [Go][1] version 1.17 or later
 - [Taskfile][2] to help you run the most common tasks from the command line
 - A working [Python][3] environment, see [this paragraph](#integration-tests) if you need to setup one
 
@@ -348,6 +348,13 @@ func main() {
   fmt.Println(i18n.Tr("Hello World!"))
 }
 ```
+
+### About `easyjson` golang library
+
+We use the hi-performance `easyjson` library to parse the large JSON index files for libraries and platforms. To obtain
+the best performance we must do some code generation, this is done via `task go:easyjson-generate`. If you ever touch
+source code using the `easyjson` library, make sure to re-run the `go:easyjson-generate` task to see if there are
+changes in the generated code.
 
 ### Additional settings
 

@@ -16,22 +16,24 @@
 package librariesindex
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/resources"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/go-paths-helper"
+	easyjson "github.com/mailru/easyjson"
 	semver "go.bug.st/relaxed-semver"
 )
 
+//easyjson:json
 type indexJSON struct {
 	Libraries []indexRelease `json:"libraries"`
 }
 
+//easyjson:json
 type indexRelease struct {
-	Name             string             `json:"name,required"`
-	Version          *semver.Version    `json:"version,required"`
+	Name             string             `json:"name"`
+	Version          *semver.Version    `json:"version"`
 	Author           string             `json:"author"`
 	Maintainer       string             `json:"maintainer"`
 	Sentence         string             `json:"sentence"`
@@ -49,6 +51,7 @@ type indexRelease struct {
 	ProvidesIncludes []string           `json:"providesIncludes"`
 }
 
+//easyjson:json
 type indexDependency struct {
 	Name    string `json:"name"`
 	Version string `json:"version,omitempty"`
@@ -64,7 +67,7 @@ func LoadIndex(indexFile *paths.Path) (*Index, error) {
 	}
 
 	var i indexJSON
-	err = json.Unmarshal(buff, &i)
+	err = easyjson.Unmarshal(buff, &i)
 	if err != nil {
 		return nil, fmt.Errorf(tr("parsing library_index.json: %s"), err)
 	}
@@ -138,9 +141,8 @@ func (indexDep *indexDependency) extractDependency() *Dependency {
 	var constraint semver.Constraint
 	if c, err := semver.ParseConstraint(indexDep.Version); err == nil {
 		constraint = c
-	} else {
-		// FIXME: report invalid constraint
 	}
+	// FIXME: else { report invalid constraint }
 	return &Dependency{
 		Name:              indexDep.Name,
 		VersionConstraint: constraint,

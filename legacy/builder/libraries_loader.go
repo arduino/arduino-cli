@@ -26,51 +26,53 @@ import (
 type LibrariesLoader struct{}
 
 func (s *LibrariesLoader) Run(ctx *types.Context) error {
-	lm := librariesmanager.NewLibraryManager(nil, nil)
-	ctx.LibrariesManager = lm
+	if ctx.LibrariesManager == nil {
+		lm := librariesmanager.NewLibraryManager(nil, nil)
+		ctx.LibrariesManager = lm
 
-	builtInLibrariesFolders := ctx.BuiltInLibrariesDirs
-	if err := builtInLibrariesFolders.ToAbs(); err != nil {
-		return errors.WithStack(err)
-	}
-	for _, folder := range builtInLibrariesFolders {
-		lm.AddLibrariesDir(folder, libraries.IDEBuiltIn)
-	}
+		builtInLibrariesFolders := ctx.BuiltInLibrariesDirs
+		if err := builtInLibrariesFolders.ToAbs(); err != nil {
+			return errors.WithStack(err)
+		}
+		for _, folder := range builtInLibrariesFolders {
+			lm.AddLibrariesDir(folder, libraries.IDEBuiltIn)
+		}
 
-	actualPlatform := ctx.ActualPlatform
-	platform := ctx.TargetPlatform
-	if actualPlatform != platform {
-		lm.AddPlatformReleaseLibrariesDir(actualPlatform, libraries.ReferencedPlatformBuiltIn)
-	}
-	lm.AddPlatformReleaseLibrariesDir(platform, libraries.PlatformBuiltIn)
+		actualPlatform := ctx.ActualPlatform
+		platform := ctx.TargetPlatform
+		if actualPlatform != platform {
+			lm.AddPlatformReleaseLibrariesDir(actualPlatform, libraries.ReferencedPlatformBuiltIn)
+		}
+		lm.AddPlatformReleaseLibrariesDir(platform, libraries.PlatformBuiltIn)
 
-	librariesFolders := ctx.OtherLibrariesDirs
-	if err := librariesFolders.ToAbs(); err != nil {
-		return errors.WithStack(err)
-	}
-	for _, folder := range librariesFolders {
-		lm.AddLibrariesDir(folder, libraries.User)
-	}
+		librariesFolders := ctx.OtherLibrariesDirs
+		if err := librariesFolders.ToAbs(); err != nil {
+			return errors.WithStack(err)
+		}
+		for _, folder := range librariesFolders {
+			lm.AddLibrariesDir(folder, libraries.User)
+		}
 
-	if errs := lm.RescanLibraries(); len(errs) > 0 {
-		// With the refactoring of the initialization step of the CLI we changed how
-		// errors are returned when loading platforms and libraries, that meant returning a list of
-		// errors instead of a single one to enhance the experience for the user.
-		// I have no intention right now to start a refactoring of the legacy package too, so
-		// here's this shitty solution for now.
-		// When we're gonna refactor the legacy package this will be gone.
-		return errors.WithStack(errs[0].Err())
-	}
+		if errs := lm.RescanLibraries(); len(errs) > 0 {
+			// With the refactoring of the initialization step of the CLI we changed how
+			// errors are returned when loading platforms and libraries, that meant returning a list of
+			// errors instead of a single one to enhance the experience for the user.
+			// I have no intention right now to start a refactoring of the legacy package too, so
+			// here's this shitty solution for now.
+			// When we're gonna refactor the legacy package this will be gone.
+			return errors.WithStack(errs[0].Err())
+		}
 
-	for _, dir := range ctx.LibraryDirs {
-		// Libraries specified this way have top priority
-		if err := lm.LoadLibraryFromDir(dir, libraries.Unmanaged); err != nil {
-			return err
+		for _, dir := range ctx.LibraryDirs {
+			// Libraries specified this way have top priority
+			if err := lm.LoadLibraryFromDir(dir, libraries.Unmanaged); err != nil {
+				return err
+			}
 		}
 	}
 
 	resolver := librariesresolver.NewCppResolver()
-	if err := resolver.ScanFromLibrariesManager(lm); err != nil {
+	if err := resolver.ScanFromLibrariesManager(ctx.LibrariesManager); err != nil {
 		return errors.WithStack(err)
 	}
 	ctx.LibrariesResolver = resolver

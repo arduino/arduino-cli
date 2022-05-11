@@ -1,0 +1,56 @@
+name: Check easyjson generated files
+
+env:
+  # See: https://github.com/actions/setup-go/tree/v2#readme
+  GO_VERSION: "1.17"
+
+# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+on:
+  push:
+    paths:
+      - ".github/workflows/check-easyjson.ya?ml"
+      - "go.mod"
+      - "go.sum"
+      - "Taskfile.ya?ml"
+      - "**.go"
+  pull_request:
+    paths:
+      - ".github/workflows/check-easyjson.ya?ml"
+      - "go.mod"
+      - "go.sum"
+      - "Taskfile.ya?ml"
+      - "**.go"
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  check-easyjson-generated-files:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Regenerate easyjson source code
+        run: task go:easyjson-generate
+
+      - name: Check for outdated cache
+        id: diff
+        run: |
+          git add .
+          if ! git diff --cached --color --exit-code; then
+            echo
+            echo "::error::easyjson generated files out of sync."
+            exit 1
+          fi

@@ -30,10 +30,6 @@ import (
 
 var tr = i18n.Tr
 
-var MAIN_FILE_VALID_EXTENSIONS = map[string]bool{".ino": true, ".pde": true}
-var ADDITIONAL_FILE_VALID_EXTENSIONS = map[string]bool{".h": true, ".c": true, ".hpp": true, ".hh": true, ".cpp": true, ".S": true}
-var ADDITIONAL_FILE_VALID_EXTENSIONS_NO_HEADERS = map[string]bool{".c": true, ".cpp": true, ".S": true}
-
 const DEFAULT_DEBUG_LEVEL = 5
 const DEFAULT_WARNINGS_LEVEL = "none"
 const DEFAULT_SOFTWARE = "ARDUINO"

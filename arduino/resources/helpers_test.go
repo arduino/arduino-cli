@@ -16,14 +16,14 @@
 package resources
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
-	"github.com/arduino/arduino-cli/httpclient"
+	"github.com/arduino/arduino-cli/arduino/httpclient"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/downloader/v2"
@@ -37,7 +37,7 @@ func (h *EchoHandler) ServeHTTP(writer http.ResponseWriter, request *http.Reques
 }
 
 func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
-	goldUserAgentValue := fmt.Sprintf("arduino-cli/0.0.0-test.preview (amd64; linux; go1.12.4) Commit:deadbeef/Build:2019-06-12 11:11:11.111")
+	goldUserAgentValue := "arduino-cli/0.0.0-test.preview (amd64; linux; go1.12.4) Commit:deadbeef/Build:2019-06-12 11:11:11.111"
 	goldUserAgentString := "User-Agent: " + goldUserAgentValue
 
 	tmp, err := paths.MkTempDir("", "")
@@ -56,9 +56,7 @@ func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
 
 	httpClient := httpclient.NewWithConfig(&httpclient.Config{UserAgent: goldUserAgentValue})
 
-	d, err := r.Download(tmp, &downloader.Config{HttpClient: *httpClient})
-	require.NoError(t, err)
-	err = d.Run()
+	err = r.Download(tmp, &downloader.Config{HttpClient: *httpClient}, "", func(progress *rpc.DownloadProgress) {})
 	require.NoError(t, err)
 
 	// leverage the download helper to download the echo for the request made by the downloader itself

@@ -76,7 +76,7 @@ func (r *DownloadResource) TestLocalArchiveChecksum(downloadDir *paths.Path) (bo
 		return false, fmt.Errorf(tr("computing hash: %s"), err)
 	}
 
-	if bytes.Compare(algo.Sum(nil), digest) != 0 {
+	if !bytes.Equal(algo.Sum(nil), digest) {
 		return false, fmt.Errorf(tr("archive hash differs from hash in index"))
 	}
 
@@ -150,20 +150,6 @@ func computeDirChecksum(root string) (string, error) {
 		return "", err
 	}
 	return fmt.Sprintf("%x", hash.Sum(nil)), nil
-}
-
-func createPackageFile(root string) error {
-	checksum, err := computeDirChecksum(root)
-	if err != nil {
-		return err
-	}
-
-	packageJSON, _ := json.Marshal(packageFile{checksum})
-	err = ioutil.WriteFile(filepath.Join(root, packageFileName), packageJSON, filePermissions)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 // CheckDirChecksum reads checksum from the package.json and compares it with a recomputed value.

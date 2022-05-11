@@ -1,6 +1,6 @@
 // This file is part of arduino-cli.
 //
-// Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+// Copyright 2022 ARDUINO SA (http://www.arduino.cc/)
 //
 // This software is released under the GNU General Public License version 3,
 // which covers the main part of arduino-cli.
@@ -13,29 +13,25 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package httpclient
+package arguments
 
-import "net/http"
+import (
+	"time"
 
-type httpClientRoundTripper struct {
-	transport http.RoundTripper
-	config    *Config
+	"github.com/spf13/cobra"
+)
+
+// DiscoveryTimeout is the timeout given to discoveries to detect ports.
+type DiscoveryTimeout struct {
+	timeout time.Duration
 }
 
-func newHTTPClientTransport(config *Config) http.RoundTripper {
-	proxy := http.ProxyURL(config.Proxy)
-
-	transport := &http.Transport{
-		Proxy: proxy,
-	}
-
-	return &httpClientRoundTripper{
-		transport: transport,
-		config:    config,
-	}
+// AddToCommand adds the flags used to set fqbn to the specified Command
+func (d *DiscoveryTimeout) AddToCommand(cmd *cobra.Command) {
+	cmd.Flags().DurationVar(&d.timeout, "discovery-timeout", time.Second, tr("Max time to wait for port discovery, e.g.: 30s, 1m"))
 }
 
-func (h *httpClientRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
-	req.Header.Add("User-Agent", h.config.UserAgent)
-	return h.transport.RoundTrip(req)
+// Get returns the timeout
+func (d *DiscoveryTimeout) Get() time.Duration {
+	return d.timeout
 }

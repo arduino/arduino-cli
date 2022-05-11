@@ -2,11 +2,12 @@
 name: Check Go Dependencies
 
 env:
-  # See: https://github.com/actions/setup-go/tree/v2#readme
-  GO_VERSION: "1.16"
+  # See: https://github.com/actions/setup-go/tree/v3#readme
+  GO_VERSION: "1.17"
 
-# See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+# See: https://docs.github.com/actions/using-workflows/events-that-trigger-workflows
 on:
+  create:
   push:
     paths:
       - ".github/workflows/check-go-dependencies-task.ya?ml"
@@ -27,16 +28,44 @@ on:
       - "**/.gitmodules"
       - "**/go.mod"
       - "**/go.sum"
+  schedule:
+    # Run periodically to catch breakage caused by external changes.
+    - cron: "0 8 * * WED"
   workflow_dispatch:
   repository_dispatch:
 
 jobs:
+  run-determination:
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.determination.outputs.result }}
+    steps:
+      - name: Determine if the rest of the workflow should run
+        id: determination
+        run: |
+          RELEASE_BRANCH_REGEX="refs/heads/[0-9]+.[0-9]+.x"
+          # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
+          if [[
+            "${{ github.event_name }}" != "create" ||
+            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX
+          ]]; then
+            # Run the other jobs.
+            RESULT="true"
+          else
+            # There is no need to run the other jobs.
+            RESULT="false"
+          fi
+
+          echo "::set-output name=result::$RESULT"
+
   check-cache:
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: recursive
 
@@ -47,7 +76,7 @@ jobs:
           version: 3.x
 
       - name: Install Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
 
@@ -63,8 +92,8 @@ jobs:
       - name: Check for outdated cache
         id: diff
         run: |
-          git add --intent-to-add .
-          if ! git diff --color --exit-code; then
+          git add .
+          if ! git diff --cached --color --exit-code; then
             echo
             echo "::error::Dependency license metadata out of sync. See: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/check-go-dependencies-task.md#metadata-cache"
             exit 1
@@ -73,18 +102,20 @@ jobs:
       # Some might find it convenient to have CI generate the cache rather than setting up for it locally
       - name: Upload cache to workflow artifact
         if: failure() && steps.diff.outcome == 'failure'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
           name: dep-licenses-cache
           path: .licenses/
 
   check-deps:
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: recursive
 
@@ -95,7 +126,7 @@ jobs:
           version: 3.x
 
       - name: Install Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
 

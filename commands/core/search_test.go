@@ -21,7 +21,6 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/configuration"
-	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -53,7 +52,7 @@ func TestPlatformSearch(t *testing.T) {
 	require.NotNil(t, res)
 
 	require.Len(t, res.SearchOutput, 2)
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.5",
@@ -61,9 +60,9 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Retrokits (www.retrokits.com)",
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
-		Boards:     []*commands.Board{{Name: "RK002"}},
+		Boards:     []*rpc.Board{{Name: "RK002"}},
 	})
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.6",
@@ -71,7 +70,7 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Retrokits (www.retrokits.com)",
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
-		Boards:     []*commands.Board{{Name: "RK002"}},
+		Boards:     []*rpc.Board{{Name: "RK002"}},
 	})
 
 	res, stat = PlatformSearch(&rpc.PlatformSearchRequest{
@@ -82,7 +81,7 @@ func TestPlatformSearch(t *testing.T) {
 	require.Nil(t, stat)
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 1)
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.6",
@@ -90,7 +89,7 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Retrokits (www.retrokits.com)",
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
-		Boards:     []*commands.Board{{Name: "RK002"}},
+		Boards:     []*rpc.Board{{Name: "RK002"}},
 	})
 
 	// Search the Package Maintainer
@@ -102,7 +101,7 @@ func TestPlatformSearch(t *testing.T) {
 	require.Nil(t, stat)
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 2)
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.5",
@@ -110,9 +109,9 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Retrokits (www.retrokits.com)",
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
-		Boards:     []*commands.Board{{Name: "RK002"}},
+		Boards:     []*rpc.Board{{Name: "RK002"}},
 	})
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.6",
@@ -120,7 +119,7 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Retrokits (www.retrokits.com)",
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
-		Boards:     []*commands.Board{{Name: "RK002"}},
+		Boards:     []*rpc.Board{{Name: "RK002"}},
 	})
 
 	// Search using the Package name
@@ -132,7 +131,7 @@ func TestPlatformSearch(t *testing.T) {
 	require.Nil(t, stat)
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 2)
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.5",
@@ -140,9 +139,9 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Retrokits (www.retrokits.com)",
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
-		Boards:     []*commands.Board{{Name: "RK002"}},
+		Boards:     []*rpc.Board{{Name: "RK002"}},
 	})
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.6",
@@ -150,7 +149,7 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Retrokits (www.retrokits.com)",
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
-		Boards:     []*commands.Board{{Name: "RK002"}},
+		Boards:     []*rpc.Board{{Name: "RK002"}},
 	})
 
 	// Search using the Platform name
@@ -162,7 +161,7 @@ func TestPlatformSearch(t *testing.T) {
 	require.Nil(t, stat)
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 2)
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.5",
@@ -170,9 +169,9 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Retrokits (www.retrokits.com)",
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
-		Boards:     []*commands.Board{{Name: "RK002"}},
+		Boards:     []*rpc.Board{{Name: "RK002"}},
 	})
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
 		Installed:  "",
 		Latest:     "1.0.6",
@@ -180,7 +179,7 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Retrokits (www.retrokits.com)",
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
-		Boards:     []*commands.Board{{Name: "RK002"}},
+		Boards:     []*rpc.Board{{Name: "RK002"}},
 	})
 
 	// Search using a board name
@@ -192,7 +191,7 @@ func TestPlatformSearch(t *testing.T) {
 	require.Nil(t, stat)
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 1)
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "arduino:avr",
 		Installed:  "",
 		Latest:     "1.8.3",
@@ -200,7 +199,7 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Arduino",
 		Website:    "https://www.arduino.cc/",
 		Email:      "packages@arduino.cc",
-		Boards: []*commands.Board{
+		Boards: []*rpc.Board{
 			{Name: "Arduino Yún"},
 			{Name: "Arduino Uno"},
 			{Name: "Arduino Uno WiFi"},
@@ -238,7 +237,7 @@ func TestPlatformSearch(t *testing.T) {
 	require.Nil(t, stat)
 	require.NotNil(t, res)
 	require.Len(t, res.SearchOutput, 1)
-	require.Contains(t, res.SearchOutput, &commands.Platform{
+	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "arduino:avr",
 		Installed:  "",
 		Latest:     "1.8.3",
@@ -246,7 +245,7 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Arduino",
 		Website:    "https://www.arduino.cc/",
 		Email:      "packages@arduino.cc",
-		Boards: []*commands.Board{
+		Boards: []*rpc.Board{
 			{Name: "Arduino Yún"},
 			{Name: "Arduino Uno"},
 			{Name: "Arduino Uno WiFi"},

@@ -28,8 +28,8 @@ import (
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/discovery"
+	"github.com/arduino/arduino-cli/arduino/httpclient"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/httpclient"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/pkg/errors"
 	"github.com/segmentio/stats/v4"
@@ -174,7 +174,9 @@ func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.B
 	return boards, nil
 }
 
-// List FIXMEDOC
+// List returns a list of boards found by the loaded discoveries.
+// In case of errors partial results from discoveries that didn't fail
+// are returned.
 func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 	tags := map[string]string{}
 	// Use defer func() to evaluate tags map when function returns
@@ -208,9 +210,6 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 
 	retVal := []*rpc.DetectedPort{}
 	ports, errs := pm.DiscoveryManager().List()
-	if len(errs) > 0 {
-		return nil, &arduino.UnavailableError{Message: tr("Error getting board list"), Cause: fmt.Errorf("%v", errs)}
-	}
 	for _, port := range ports {
 		boards, err := identify(pm, port)
 		if err != nil {
@@ -225,7 +224,9 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 		}
 		retVal = append(retVal, b)
 	}
-
+	if len(errs) > 0 {
+		return retVal, &arduino.UnavailableError{Message: tr("Error getting board list"), Cause: fmt.Errorf("%v", errs)}
+	}
 	return retVal, nil
 }
 
@@ -296,15 +297,14 @@ func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchR
 					Error:     boardsError,
 				}
 			case <-interrupt:
-				errs := dm.StopAll()
-				if len(errs) > 0 {
+				for _, err := range dm.StopAll() {
+					// Discoveries that return errors have their process
+					// closed and are removed from the list of discoveries
+					// in the manager
 					outChan <- &rpc.BoardListWatchResponse{
 						EventType: "error",
-						Error:     tr("stopping discoveries: %s", errs),
+						Error:     tr("stopping discoveries: %s", err),
 					}
-					// Don't close the channel if quitting all discoveries
-					// failed, otherwise some processes might be left running.
-					continue
 				}
 				return
 			}

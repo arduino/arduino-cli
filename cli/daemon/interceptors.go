@@ -19,20 +19,23 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 
 	"google.golang.org/grpc"
 )
 
+var debugStdOut = os.Stdout
+
 func log(isRequest bool, msg interface{}) {
 	j, _ := json.MarshalIndent(msg, "|  ", "  ")
 	inOut := map[bool]string{true: "REQ:  ", false: "RESP: "}
-	fmt.Println("|  " + inOut[isRequest] + string(j))
+	fmt.Fprintln(debugStdOut, "|  "+inOut[isRequest]+string(j))
 }
 
 func logError(err error) {
 	if err != nil {
-		fmt.Println("|  ERROR: ", err)
+		fmt.Fprintln(debugStdOut, "|  ERROR: ", err)
 	}
 }
 
@@ -52,12 +55,12 @@ func unaryLoggerInterceptor(ctx context.Context, req interface{}, info *grpc.Una
 	if !logSelector(info.FullMethod) {
 		return handler(ctx, req)
 	}
-	fmt.Println("CALLED:", info.FullMethod)
+	fmt.Fprintln(debugStdOut, "CALLED:", info.FullMethod)
 	log(true, req)
 	resp, err := handler(ctx, req)
 	logError(err)
 	log(false, resp)
-	fmt.Println()
+	fmt.Fprintln(debugStdOut)
 	return resp, err
 }
 
@@ -72,11 +75,11 @@ func streamLoggerInterceptor(srv interface{}, stream grpc.ServerStream, info *gr
 	if info.IsServerStream {
 		streamReq += "STREAM_RESP"
 	}
-	fmt.Println("CALLED:", info.FullMethod, streamReq)
+	fmt.Fprintln(debugStdOut, "CALLED:", info.FullMethod, streamReq)
 	err := handler(srv, &loggingServerStream{ServerStream: stream})
 	logError(err)
-	fmt.Println("STREAM CLOSED")
-	fmt.Println()
+	fmt.Fprintln(debugStdOut, "STREAM CLOSED")
+	fmt.Fprintln(debugStdOut)
 	return err
 }
 

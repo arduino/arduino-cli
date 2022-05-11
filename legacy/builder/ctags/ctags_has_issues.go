@@ -26,7 +26,7 @@ import (
 func (p *CTagsParser) FixCLinkageTagsDeclarations(tags []*types.CTag) {
 
 	linesMap := p.FindCLinkageLines(tags)
-	for i, _ := range tags {
+	for i := range tags {
 
 		if sliceContainsInt(linesMap[tags[i].Filename], tags[i].Line) &&
 			!strings.Contains(tags[i].PrototypeModifiers, EXTERN) {
@@ -51,7 +51,7 @@ func (p *CTagsParser) prototypeAndCodeDontMatch(tag *types.CTag) bool {
 
 	code := removeSpacesAndTabs(tag.Code)
 
-	if strings.Index(code, ")") == -1 {
+	if !strings.Contains(code, ")") {
 		// Add to code non-whitespace non-comments tokens until we find a closing round bracket
 		file, err := os.Open(tag.Filename)
 		if err == nil {
@@ -70,7 +70,7 @@ func (p *CTagsParser) prototypeAndCodeDontMatch(tag *types.CTag) bool {
 			temp := ""
 
 			code, multilinecomment = removeComments(scanner.Text(), multilinecomment)
-			for scanner.Scan() && line < (tag.Line+10) && strings.Index(temp, ")") == -1 {
+			for scanner.Scan() && line < (tag.Line+10) && !strings.Contains(temp, ")") {
 				temp, multilinecomment = removeComments(scanner.Text(), multilinecomment)
 				code += temp
 			}
@@ -189,13 +189,13 @@ func getFunctionProtoWithNPreviousCharacters(tag *types.CTag, code string, n int
 
 func removeComments(text string, multilinecomment bool) (string, bool) {
 	// Remove C++ style comments
-	if strings.Index(text, "//") != -1 {
+	if strings.Contains(text, "//") {
 		text = text[0:strings.Index(text, "//")]
 	}
 
 	// Remove C style comments
-	if strings.Index(text, "*/") != -1 {
-		if strings.Index(text, "/*") != -1 {
+	if strings.Contains(text, "*/") {
+		if strings.Contains(text, "/*") {
 			// C style comments on the same line
 			text = text[0:strings.Index(text, "/*")] + text[strings.Index(text, "*/")+1:len(text)-1]
 		} else {
@@ -205,7 +205,7 @@ func removeComments(text string, multilinecomment bool) (string, bool) {
 	}
 
 	if multilinecomment {
-		if strings.Index(text, "/*") != -1 {
+		if strings.Contains(text, "/*") {
 			text = text[0:strings.Index(text, "/*")]
 			multilinecomment = false
 		} else {
@@ -267,7 +267,7 @@ func (p *CTagsParser) FindCLinkageLines(tags []*types.CTag) map[string][]int {
 				}
 
 				// check if we are on the first non empty line after externCDecl in case 3
-				if enteringScope == true {
+				if enteringScope {
 					enteringScope = false
 				}
 
@@ -279,13 +279,13 @@ func (p *CTagsParser) FindCLinkageLines(tags []*types.CTag) map[string][]int {
 						enteringScope = true
 					}
 				}
-				if inScope == true {
+				if inScope {
 					lines[tag.Filename] = append(lines[tag.Filename], line)
 				}
 				indentLevels += strings.Count(str, "{") - strings.Count(str, "}")
 
 				// Bail out if indentLevel is zero and we are not in case 3
-				if indentLevels == 0 && enteringScope == false {
+				if indentLevels == 0 && !enteringScope {
 					inScope = false
 				}
 			}

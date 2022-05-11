@@ -40,12 +40,22 @@ initArch() {
   armv6*) ARCH="ARMv6" ;;
   armv7*) ARCH="ARMv7" ;;
   aarch64) ARCH="ARM64" ;;
+  arm64) ARCH="ARM64" ;;
   x86) ARCH="32bit" ;;
   x86_64) ARCH="64bit" ;;
   i686) ARCH="32bit" ;;
   i386) ARCH="32bit" ;;
   esac
   echo "ARCH=$ARCH"
+}
+
+initFallbackArch() {
+  case "${OS}_${ARCH}" in
+  macOS_ARM64)
+    # Rosetta 2 allows applications built for x86-64 hosts to run on the ARM 64-bit M1 processor
+    FALLBACK_ARCH='64bit'
+    ;;
+  esac
 }
 
 initOS() {
@@ -70,6 +80,7 @@ initDownloadTool() {
   echo "Using $DOWNLOAD_TOOL as download tool"
 }
 
+# checkLatestVersion() sets the CHECKLATESTVERSION_TAG variable to the latest version
 checkLatestVersion() {
   # Use the GitHub releases webpage to find the latest version for this project
   # so we don't get rate-limited.
@@ -84,26 +95,6 @@ checkLatestVersion() {
     echo "Cannot determine latest tag."
     exit 1
   fi
-  eval "$1='$CHECKLATESTVERSION_TAG'"
-}
-
-get() {
-  GET_URL="$2"
-  echo "Getting $GET_URL"
-  if [ "$DOWNLOAD_TOOL" = "curl" ]; then
-    GET_HTTP_RESPONSE=$(curl -sL --write-out 'HTTPSTATUS:%{http_code}' "$GET_URL")
-    GET_HTTP_STATUS_CODE=$(echo "$GET_HTTP_RESPONSE" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-    GET_BODY=$(echo "$GET_HTTP_RESPONSE" | sed -e 's/HTTPSTATUS\:.*//g')
-  elif [ "$DOWNLOAD_TOOL" = "wget" ]; then
-    TMP_FILE=$(mktemp)
-    GET_BODY=$(wget --server-response --content-on-error -q -O - "$GET_URL" 2>"$TMP_FILE" || true)
-    GET_HTTP_STATUS_CODE=$(awk '/^  HTTP/{print $2}' "$TMP_FILE")
-  fi
-  if [ "$GET_HTTP_STATUS_CODE" != 200 ]; then
-    echo "Request failed with HTTP status code $GET_HTTP_STATUS_CODE"
-    fail "Body: $GET_BODY"
-  fi
-  eval "$1='$GET_BODY'"
 }
 
 getFile() {
@@ -120,44 +111,75 @@ getFile() {
 
 downloadFile() {
   if [ -z "$1" ]; then
-    checkLatestVersion TAG
+    checkLatestVersion
+    TAG="$CHECKLATESTVERSION_TAG"
   else
     TAG=$1
   fi
   #  arduino-lint_0.4.0-rc1_Linux_64bit.[tar.gz, zip]
+  APPLICATION_DIST_PREFIX="${PROJECT_NAME}_${TAG}_"
   if [ "$OS" = "Windows" ]; then
-    APPLICATION_DIST="${PROJECT_NAME}_${TAG}_${OS}_${ARCH}.zip"
+    APPLICATION_DIST_EXTENSION=".zip"
   else
-    APPLICATION_DIST="${PROJECT_NAME}_${TAG}_${OS}_${ARCH}.tar.gz"
+    APPLICATION_DIST_EXTENSION=".tar.gz"
   fi
+  APPLICATION_DIST="${APPLICATION_DIST_PREFIX}${OS}_${ARCH}${APPLICATION_DIST_EXTENSION}"
 
   # Support specifying nightly build versions (e.g., "nightly-latest") via the script argument.
   case "$TAG" in
   nightly*)
-    DOWNLOAD_URL="https://downloads.arduino.cc/${PROJECT_NAME}/nightly/${APPLICATION_DIST}"
+    DOWNLOAD_URL_PREFIX="https://downloads.arduino.cc/${PROJECT_NAME}/nightly/"
     ;;
   *)
-    DOWNLOAD_URL="https://downloads.arduino.cc/${PROJECT_NAME}/${APPLICATION_DIST}"
+    DOWNLOAD_URL_PREFIX="https://downloads.arduino.cc/${PROJECT_NAME}/"
     ;;
   esac
+  DOWNLOAD_URL="${DOWNLOAD_URL_PREFIX}${APPLICATION_DIST}"
 
   INSTALLATION_TMP_FILE="/tmp/$APPLICATION_DIST"
   echo "Downloading $DOWNLOAD_URL"
   httpStatusCode=$(getFile "$DOWNLOAD_URL" "$INSTALLATION_TMP_FILE")
   if [ "$httpStatusCode" -ne 200 ]; then
-    echo "Did not find a release for your system: $OS $ARCH"
-    echo "Trying to find a release using the GitHub API."
-    LATEST_RELEASE_URL="https://api.github.com/repos/${PROJECT_OWNER}/$PROJECT_NAME/releases/tags/$TAG"
-    echo "LATEST_RELEASE_URL=$LATEST_RELEASE_URL"
-    get LATEST_RELEASE_JSON "$LATEST_RELEASE_URL"
-    # || true forces this command to not catch error if grep does not find anything
-    DOWNLOAD_URL=$(echo "$LATEST_RELEASE_JSON" | grep 'browser_' | cut -d\" -f4 | grep "$APPLICATION_DIST") || true
-    if [ -z "$DOWNLOAD_URL" ]; then
-      echo "Sorry, we dont have a dist for your system: $OS $ARCH"
-      fail "You can request one here: https://github.com/${PROJECT_OWNER}/$PROJECT_NAME/issues"
-    else
+    if [ -n "$FALLBACK_ARCH" ]; then
+      echo "$OS $ARCH release not currently available. Checking for alternative $OS $FALLBACK_ARCH release for your system."
+      FALLBACK_APPLICATION_DIST="${APPLICATION_DIST_PREFIX}${OS}_${FALLBACK_ARCH}${APPLICATION_DIST_EXTENSION}"
+      DOWNLOAD_URL="${DOWNLOAD_URL_PREFIX}${FALLBACK_APPLICATION_DIST}"
       echo "Downloading $DOWNLOAD_URL"
-      getFile "$DOWNLOAD_URL" "$INSTALLATION_TMP_FILE"
+      httpStatusCode=$(getFile "$DOWNLOAD_URL" "$INSTALLATION_TMP_FILE")
+    fi
+
+    if [ "$httpStatusCode" -ne 200 ]; then
+      echo "Did not find a release for your system: $OS $ARCH"
+      echo "Trying to find a release using the GitHub API."
+
+      LATEST_RELEASE_URL="https://api.github.com/repos/${PROJECT_OWNER}/$PROJECT_NAME/releases/tags/$TAG"
+      if [ "$DOWNLOAD_TOOL" = "curl" ]; then
+        HTTP_RESPONSE=$(curl -sL --write-out 'HTTPSTATUS:%{http_code}' "$LATEST_RELEASE_URL")
+        HTTP_STATUS_CODE=$(echo "$HTTP_RESPONSE" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+        BODY=$(echo "$HTTP_RESPONSE" | sed -e 's/HTTPSTATUS\:.*//g')
+      elif [ "$DOWNLOAD_TOOL" = "wget" ]; then
+        TMP_FILE=$(mktemp)
+        BODY=$(wget --server-response --content-on-error -q -O - "$LATEST_RELEASE_URL" 2>"$TMP_FILE" || true)
+        HTTP_STATUS_CODE=$(awk '/^  HTTP/{print $2}' "$TMP_FILE")
+      fi
+      if [ "$HTTP_STATUS_CODE" != 200 ]; then
+        echo "Request failed with HTTP status code $HTTP_STATUS_CODE"
+        fail "Body: $BODY"
+      fi
+
+      # || true forces this command to not catch error if grep does not find anything
+      DOWNLOAD_URL=$(echo "$BODY" | grep 'browser_' | cut -d\" -f4 | grep "$APPLICATION_DIST") || true
+      if [ -z "$DOWNLOAD_URL" ]; then
+        DOWNLOAD_URL=$(echo "$BODY" | grep 'browser_' | cut -d\" -f4 | grep "$FALLBACK_APPLICATION_DIST") || true
+      fi
+
+      if [ -z "$DOWNLOAD_URL" ]; then
+        echo "Sorry, we dont have a dist for your system: $OS $ARCH"
+        fail "You can request one here: https://github.com/${PROJECT_OWNER}/$PROJECT_NAME/issues"
+      else
+        echo "Downloading $DOWNLOAD_URL"
+        getFile "$DOWNLOAD_URL" "$INSTALLATION_TMP_FILE"
+      fi
     fi
   fi
 }
@@ -214,6 +236,7 @@ initDestination
 set -e
 initArch
 initOS
+initFallbackArch
 initDownloadTool
 downloadFile "$1"
 installFile

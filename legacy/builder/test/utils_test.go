@@ -67,13 +67,13 @@ func TestQuoteCppString(t *testing.T) {
 }
 
 func TestParseCppString(t *testing.T) {
-	str, rest, ok := utils.ParseCppString(`foo`)
+	_, _, ok := utils.ParseCppString(`foo`)
 	require.Equal(t, false, ok)
 
-	str, rest, ok = utils.ParseCppString(`"foo`)
+	_, _, ok = utils.ParseCppString(`"foo`)
 	require.Equal(t, false, ok)
 
-	str, rest, ok = utils.ParseCppString(`"foo"`)
+	str, rest, ok := utils.ParseCppString(`"foo"`)
 	require.Equal(t, true, ok)
 	require.Equal(t, `foo`, str)
 	require.Equal(t, ``, rest)

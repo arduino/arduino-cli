@@ -37,3 +37,15 @@ func CheckFlagsConflicts(command *cobra.Command, flagNames ...string) {
 	feedback.Errorf(tr("Can't use %s flags at the same time.", "--"+strings.Join(flagNames, " "+tr("and")+" --")))
 	os.Exit(errorcodes.ErrBadArgument)
 }
+
+// CheckFlagsMandatory is a helper function useful to report errors when at least one flag is not used in a group of "required" flags
+func CheckFlagsMandatory(command *cobra.Command, flagNames ...string) {
+	for _, flagName := range flagNames {
+		if command.Flag(flagName).Changed {
+			continue
+		} else {
+			feedback.Errorf(tr("Flag %[1]s is mandatory when used in conjunction with flag %[2]s.", "--"+flagName, "--"+strings.Join(flagNames, " "+tr("and")+" --")))
+			os.Exit(errorcodes.ErrBadArgument)
+		}
+	}
+}

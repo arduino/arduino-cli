@@ -31,11 +31,11 @@ func Parse(filename string) MessageCatalog {
 	}
 
 	file, err := os.Open(filename)
-
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
+	defer file.Close()
 
 	return ParseReader(file)
 }
@@ -101,7 +101,7 @@ func parseCatalog(scanner *bufio.Scanner) MessageCatalog {
 
 		if strings.HasPrefix(line, "msgstr") {
 			state = StateMessageValue
-			value += mustUnquote(strings.TrimLeft(line, "msgstr "))
+			value += mustUnquote(strings.TrimPrefix(line, "msgstr "))
 			continue
 		}
 

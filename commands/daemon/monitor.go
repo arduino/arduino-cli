@@ -173,7 +173,7 @@ func (s *MonitorService) StreamingOpen(stream rpc.MonitorService_StreamingOpenSe
 
 				// Rate limit, filling all the available window
 				if rateLimitEnabled {
-					slots = atomic.AddInt32(&writeSlots, -1)
+					atomic.AddInt32(&writeSlots, -1)
 				}
 			}
 		}

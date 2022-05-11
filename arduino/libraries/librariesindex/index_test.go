@@ -16,11 +16,13 @@
 package librariesindex
 
 import (
+	json "encoding/json"
 	"fmt"
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/go-paths-helper"
+	easyjson "github.com/mailru/easyjson"
 	"github.com/stretchr/testify/require"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -36,16 +38,16 @@ func TestIndexer(t *testing.T) {
 
 	index, err := LoadIndex(paths.New("testdata/library_index.json"))
 	require.NoError(t, err)
-	require.Equal(t, 2380, len(index.Libraries), "parsed libraries count")
+	require.Equal(t, 4124, len(index.Libraries), "parsed libraries count")
 
 	alp := index.Libraries["Arduino Low Power"]
 	require.NotNil(t, alp)
-	require.Equal(t, 4, len(alp.Releases))
-	require.Equal(t, "Arduino Low Power@1.2.1", alp.Latest.String())
+	require.Equal(t, 5, len(alp.Releases))
+	require.Equal(t, "Arduino Low Power@1.2.2", alp.Latest.String())
 	require.Len(t, alp.Latest.Dependencies, 1)
 	require.Equal(t, "RTCZero", alp.Latest.Dependencies[0].GetName())
 	require.Equal(t, "", alp.Latest.Dependencies[0].GetConstraint().String())
-	require.Equal(t, "[1.0.0 1.1.0 1.2.0 1.2.1]", fmt.Sprintf("%v", alp.Versions()))
+	require.Equal(t, "[1.0.0 1.1.0 1.2.0 1.2.1 1.2.2]", fmt.Sprintf("%v", alp.Versions()))
 
 	rtc100ref := &Reference{Name: "RTCZero", Version: semver.MustParse("1.0.0")}
 	require.Equal(t, "RTCZero@1.0.0", rtc100ref.String())
@@ -96,12 +98,12 @@ func TestIndexer(t *testing.T) {
 	oauth010 := index.FindRelease(&Reference{Name: "Arduino_OAuth", Version: semver.MustParse("0.1.0")})
 	require.NotNil(t, oauth010)
 	require.Equal(t, "Arduino_OAuth@0.1.0", oauth010.String())
-	eccx133 := index.FindRelease(&Reference{Name: "ArduinoECCX08", Version: semver.MustParse("1.3.3")})
-	require.NotNil(t, eccx133)
-	require.Equal(t, "ArduinoECCX08@1.3.3", eccx133.String())
-	bear130 := index.FindRelease(&Reference{Name: "ArduinoBearSSL", Version: semver.MustParse("1.3.0")})
-	require.NotNil(t, bear130)
-	require.Equal(t, "ArduinoBearSSL@1.3.0", bear130.String())
+	eccx135 := index.FindRelease(&Reference{Name: "ArduinoECCX08", Version: semver.MustParse("1.3.5")})
+	require.NotNil(t, eccx135)
+	require.Equal(t, "ArduinoECCX08@1.3.5", eccx135.String())
+	bear172 := index.FindRelease(&Reference{Name: "ArduinoBearSSL", Version: semver.MustParse("1.7.2")})
+	require.NotNil(t, bear172)
+	require.Equal(t, "ArduinoBearSSL@1.7.2", bear172.String())
 	http040 := index.FindRelease(&Reference{Name: "ArduinoHttpClient", Version: semver.MustParse("0.4.0")})
 	require.NotNil(t, http040)
 	require.Equal(t, "ArduinoHttpClient@0.4.0", http040.String())
@@ -109,7 +111,31 @@ func TestIndexer(t *testing.T) {
 	resolve2 := index.ResolveDependencies(oauth010)
 	require.Len(t, resolve2, 4)
 	require.Contains(t, resolve2, oauth010)
-	require.Contains(t, resolve2, eccx133)
-	require.Contains(t, resolve2, bear130)
+	require.Contains(t, resolve2, eccx135)
+	require.Contains(t, resolve2, bear172)
 	require.Contains(t, resolve2, http040)
+}
+
+func BenchmarkIndexParsingStdJSON(b *testing.B) {
+	indexFile := paths.New("testdata/library_index.json")
+	buff, err := indexFile.ReadFile()
+	require.NoError(b, err)
+	b.SetBytes(int64(len(buff)))
+	for i := 0; i < b.N; i++ {
+		var i indexJSON
+		err = json.Unmarshal(buff, &i)
+		require.NoError(b, err)
+	}
+}
+
+func BenchmarkIndexParsingEasyJSON(b *testing.B) {
+	indexFile := paths.New("testdata/library_index.json")
+	buff, err := indexFile.ReadFile()
+	require.NoError(b, err)
+	b.SetBytes(int64(len(buff)))
+	for i := 0; i < b.N; i++ {
+		var i indexJSON
+		err = easyjson.Unmarshal(buff, &i)
+		require.NoError(b, err)
+	}
 }

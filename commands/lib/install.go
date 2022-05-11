@@ -28,8 +28,7 @@ import (
 )
 
 // LibraryInstall FIXMEDOC
-func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest,
-	downloadCB commands.DownloadProgressCB, taskCB commands.TaskProgressCB) error {
+func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
@@ -98,7 +97,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest,
 	return nil
 }
 
-func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release, taskCB commands.TaskProgressCB) error {
+func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release, taskCB rpc.TaskProgressCB) error {
 	taskCB(&rpc.TaskProgress{Name: tr("Installing %s", libRelease)})
 	logrus.WithField("library", libRelease).Info("Installing library")
 	libPath, libReplaced, err := lm.InstallPrerequisiteCheck(libRelease)
@@ -124,7 +123,7 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 }
 
 //ZipLibraryInstall FIXMEDOC
-func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallRequest, taskCB commands.TaskProgressCB) error {
+func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallRequest, taskCB rpc.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if err := lm.InstallZipLib(ctx, req.Path, req.Overwrite); err != nil {
 		return &arduino.FailedLibraryInstallError{Cause: err}
@@ -134,7 +133,7 @@ func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallRequest, t
 }
 
 //GitLibraryInstall FIXMEDOC
-func GitLibraryInstall(ctx context.Context, req *rpc.GitLibraryInstallRequest, taskCB commands.TaskProgressCB) error {
+func GitLibraryInstall(ctx context.Context, req *rpc.GitLibraryInstallRequest, taskCB rpc.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if err := lm.InstallGitLib(req.Url, req.Overwrite); err != nil {
 		return &arduino.FailedLibraryInstallError{Cause: err}

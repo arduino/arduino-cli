@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/executils"
+	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 )
 
@@ -33,6 +34,11 @@ func (pm *PackageManager) InstallPlatform(platformRelease *cores.PlatformRelease
 		"hardware",
 		platformRelease.Platform.Architecture,
 		platformRelease.Version.String())
+	return pm.InstallPlatformInDirectory(platformRelease, destDir)
+}
+
+// InstallPlatformInDirectory installs a specific release of a platform in a specific directory.
+func (pm *PackageManager) InstallPlatformInDirectory(platformRelease *cores.PlatformRelease, destDir *paths.Path) error {
 	if err := platformRelease.Resource.Install(pm.DownloadDir, pm.TempDir, destDir); err != nil {
 		return errors.Errorf(tr("installing platform %[1]s: %[2]s"), platformRelease, err)
 	}

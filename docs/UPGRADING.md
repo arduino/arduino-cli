@@ -2,6 +2,142 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## 0.22.0
+
+### `github.com/arduino/arduino-cli/arduino.MultipleBoardsDetectedError` field changed type
+
+Now the `Port` field of the error is a `github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1.Port`, usually
+imported as `rpc.Port`. The old `discovery.Port` can be converted to the new one using the `.ToRPC()` method.
+
+### Function `github.com/arduino/arduino-cli/commands/upload.DetectConnectedBoard(...)` has been removed
+
+Use `github.com/arduino/arduino-cli/commands/board.List(...)` to detect boards.
+
+### Function `arguments.GetDiscoveryPort(...)` has been removed
+
+NOTE: the functions in the `arguments` package doesn't have much use outside of the `arduino-cli` so we are considering
+to remove them from the public golang API making them `internal`.
+
+The old function:
+
+```go
+func (p *Port) GetDiscoveryPort(instance *rpc.Instance, sk *sketch.Sketch) *discovery.Port { }
+```
+
+is now replaced by the more powerful:
+
+```go
+func (p *Port) DetectFQBN(inst *rpc.Instance) (string, *rpc.Port) { }
+
+func CalculateFQBNAndPort(portArgs *Port, fqbnArg *Fqbn, instance *rpc.Instance, sk *sketch.Sketch) (string, *rpc.Port) { }
+```
+
+### gRPC: `address` parameter has been removed from `commands.SupportedUserFieldsRequest`
+
+The parameter is no more needed. Lagacy code will continue to work without modification (the value of the parameter will
+be just ignored).
+
+### The content of package `github.com/arduino/arduino-cli/httpclient` has been moved to a different path
+
+In particular:
+
+- `UserAgent` and `NetworkProxy` have been moved to `github.com/arduino/arduino-cli/configuration`
+- the remainder of the package `github.com/arduino/arduino-cli/httpclient` has been moved to
+  `github.com/arduino/arduino-cli/arduino/httpclient`
+
+The old imports must be updated according to the list above.
+
+### `commands.DownloadProgressCB` and `commands.TaskProgressCB` have been moved to package `github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1`
+
+All references to these types must be updated with the new import.
+
+### `commands.GetDownloaderConfig` has been moved to package `github.com/arduino/arduino-cli/arduino/httpclient`
+
+All references to this function must be updated with the new import.
+
+### `commands.Download` has been removed and replaced by `github.com/arduino/arduino-cli/arduino/httpclient.DownloadFile`
+
+The old function must be replaced by the new one that is much more versatile.
+
+### `packagemanager.PackageManager.DownloadToolRelease`, `packagemanager.PackageManager.DownloadPlatformRelease`, and `resources.DownloadResource.Download` functions change signature and behaviour
+
+The following functions:
+
+```go
+func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *downloader.Config) (*downloader.Downloader, error)
+func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease, config *downloader.Config) (*downloader.Downloader, error)
+func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.Config) (*downloader.Downloader, error)
+```
+
+now requires a label and a progress callback parameter, do not return the `Downloader` object anymore, and they
+automatically handles the download internally:
+
+```go
+func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *downloader.Config, label string, progressCB rpc.DownloadProgressCB) error
+func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease, config *downloader.Config, label string, progressCB rpc.DownloadProgressCB) error
+func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.Config, label string, downloadCB rpc.DownloadProgressCB) error
+```
+
+The new progress parameters must be added to legacy code, if progress reports are not needed an empty stub for `label`
+and `progressCB` must be provided. There is no more need to execute the `downloader.Run()` or
+`downloader.RunAndPoll(...)` method.
+
+For example, the old legacy code like:
+
+```go
+downloader, err := pm.DownloadPlatformRelease(platformToDownload, config)
+if err != nil {
+    ...
+}
+if err := downloader.Run(); err != nil {
+    ...
+}
+```
+
+may be ported to the new version as:
+
+```go
+err := pm.DownloadPlatformRelease(platformToDownload, config, "", func(progress *rpc.DownloadProgress) {})
+```
+
+### `packagemanager.Load*` functions now returns `error` instead of `*status.Status`
+
+The following functions signature:
+
+```go
+func (pm *PackageManager) LoadHardware() []*status.Status { ... }
+func (pm *PackageManager) LoadHardwareFromDirectories(hardwarePaths paths.PathList) []*status.Status { ... }
+func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) []*status.Status { ... }
+func (pm *PackageManager) LoadToolsFromBundleDirectories(dirs paths.PathList) []*status.Status { ... }
+func (pm *PackageManager) LoadDiscoveries() []*status.Status { ... }
+```
+
+have been changed to:
+
+```go
+func (pm *PackageManager) LoadHardware() []error { ... }
+func (pm *PackageManager) LoadHardwareFromDirectories(hardwarePaths paths.PathList) []error { ... }
+func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) []error { ... }
+func (pm *PackageManager) LoadToolsFromBundleDirectories(dirs paths.PathList) []error { ... }
+func (pm *PackageManager) LoadDiscoveries() []error { ... }
+```
+
+These function no longer returns a gRPC status, so the errors can be handled as any other `error`.
+
+### Removed `error` return from `discovery.New(...)` function
+
+The `discovery.New(...)` function never fails, so the error has been removed, the old signature:
+
+```go
+func New(id string, args ...string) (*PluggableDiscovery, error) { ... }
+```
+
+is now:
+
+```go
+func New(id string, args ...string) *PluggableDiscovery { ... }
+```
+
 ## 0.21.0
 
 ### `packagemanager.NewPackageManager` function change

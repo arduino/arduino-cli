@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"google.golang.org/grpc/codes"
@@ -125,16 +124,35 @@ func (e *InvalidVersionError) Unwrap() error {
 	return e.Cause
 }
 
+// NoBoardsDetectedError is returned when detecting the FQBN of a board
+// does not produce any result.
+type NoBoardsDetectedError struct {
+	Port *rpc.Port
+}
+
+func (e *NoBoardsDetectedError) Error() string {
+	return tr(
+		"Please specify an FQBN. The board on port %[1]s with protocol %[2]s can't be identified",
+		e.Port.Address,
+		e.Port.Protocol,
+	)
+}
+
+// ToRPCStatus converts the error into a *status.Status
+func (e *NoBoardsDetectedError) ToRPCStatus() *status.Status {
+	return status.New(codes.InvalidArgument, e.Error())
+}
+
 // MultipleBoardsDetectedError is returned when trying to detect
 // the FQBN of a board connected to a port fails because that
 // are multiple possible boards detected.
 type MultipleBoardsDetectedError struct {
-	Port *discovery.Port
+	Port *rpc.Port
 }
 
 func (e *MultipleBoardsDetectedError) Error() string {
 	return tr(
-		"Please specify an FQBN. Multiple possible ports detected on port %s with protocol %s",
+		"Please specify an FQBN. Multiple possible boards detected on port %[1]s with protocol %[2]s",
 		e.Port.Address,
 		e.Port.Protocol,
 	)
@@ -335,6 +353,24 @@ func (e *PlatformNotFoundError) ToRPCStatus() *status.Status {
 }
 
 func (e *PlatformNotFoundError) Unwrap() error {
+	return e.Cause
+}
+
+// PlatformLoadingError is returned when a platform has fatal errors that prevents loading
+type PlatformLoadingError struct {
+	Cause error
+}
+
+func (e *PlatformLoadingError) Error() string {
+	return composeErrorMsg(tr("Error loading hardware platform"), e.Cause)
+}
+
+// ToRPCStatus converts the error into a *status.Status
+func (e *PlatformLoadingError) ToRPCStatus() *status.Status {
+	return status.New(codes.FailedPrecondition, e.Error())
+}
+
+func (e *PlatformLoadingError) Unwrap() error {
 	return e.Cause
 }
 

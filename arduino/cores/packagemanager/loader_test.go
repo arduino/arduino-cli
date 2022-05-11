@@ -140,10 +140,10 @@ func TestLoadDiscoveries(t *testing.T) {
 		"pluggable_discovery.required": "arduino:ble-discovery",
 	})
 
-	errs := packageManager.LoadDiscoveries()
-	require.Len(t, errs, 2)
-	require.Equal(t, errs[0].Message(), "discovery not found: builtin:serial-discovery")
-	require.Equal(t, errs[1].Message(), "discovery not found: builtin:mdns-discovery")
+	err := packageManager.LoadDiscoveries()
+	require.Len(t, err, 2)
+	require.Equal(t, err[0].Error(), "discovery builtin:serial-discovery not found")
+	require.Equal(t, err[1].Error(), "discovery builtin:mdns-discovery not found")
 	discoveries := packageManager.DiscoveryManager().IDs()
 	require.Len(t, discoveries, 1)
 	require.Contains(t, discoveries, "arduino:ble-discovery")
@@ -155,10 +155,10 @@ func TestLoadDiscoveries(t *testing.T) {
 		"pluggable_discovery.required.1": "arduino:serial-discovery",
 	})
 
-	errs = packageManager.LoadDiscoveries()
-	require.Len(t, errs, 2)
-	require.Equal(t, errs[0].Message(), "discovery not found: builtin:serial-discovery")
-	require.Equal(t, errs[1].Message(), "discovery not found: builtin:mdns-discovery")
+	err = packageManager.LoadDiscoveries()
+	require.Len(t, err, 2)
+	require.Equal(t, err[0].Error(), "discovery builtin:serial-discovery not found")
+	require.Equal(t, err[1].Error(), "discovery builtin:mdns-discovery not found")
 	discoveries = packageManager.DiscoveryManager().IDs()
 	require.Len(t, discoveries, 2)
 	require.Contains(t, discoveries, "arduino:ble-discovery")
@@ -172,10 +172,10 @@ func TestLoadDiscoveries(t *testing.T) {
 		"pluggable_discovery.teensy.pattern": "\"{runtime.tools.teensy_ports.path}/hardware/tools/teensy_ports\" -J2",
 	})
 
-	errs = packageManager.LoadDiscoveries()
-	require.Len(t, errs, 2)
-	require.Equal(t, errs[0].Message(), "discovery not found: builtin:serial-discovery")
-	require.Equal(t, errs[1].Message(), "discovery not found: builtin:mdns-discovery")
+	err = packageManager.LoadDiscoveries()
+	require.Len(t, err, 2)
+	require.Equal(t, err[0].Error(), "discovery builtin:serial-discovery not found")
+	require.Equal(t, err[1].Error(), "discovery builtin:mdns-discovery not found")
 	discoveries = packageManager.DiscoveryManager().IDs()
 	require.Len(t, discoveries, 3)
 	require.Contains(t, discoveries, "arduino:ble-discovery")
@@ -191,10 +191,10 @@ func TestLoadDiscoveries(t *testing.T) {
 		"pluggable_discovery.teensy.pattern": "\"{runtime.tools.teensy_ports.path}/hardware/tools/teensy_ports\" -J2",
 	})
 
-	errs = packageManager.LoadDiscoveries()
-	require.Len(t, errs, 2)
-	require.Equal(t, errs[0].Message(), "discovery not found: builtin:serial-discovery")
-	require.Equal(t, errs[1].Message(), "discovery not found: builtin:mdns-discovery")
+	err = packageManager.LoadDiscoveries()
+	require.Len(t, err, 2)
+	require.Equal(t, err[0].Error(), "discovery builtin:serial-discovery not found")
+	require.Equal(t, err[1].Error(), "discovery builtin:mdns-discovery not found")
 	discoveries = packageManager.DiscoveryManager().IDs()
 	require.Len(t, discoveries, 3)
 	require.Contains(t, discoveries, "arduino:ble-discovery")

@@ -19,24 +19,21 @@ import (
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/arduino/httpclient"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // DownloadToolRelease downloads a ToolRelease
-func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, downloadCB DownloadProgressCB) error {
-	config, err := GetDownloaderConfig()
+func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, downloadCB rpc.DownloadProgressCB) error {
+	config, err := httpclient.GetDownloaderConfig()
 	if err != nil {
 		return err
 	}
-	resp, err := pm.DownloadToolRelease(toolRelease, config)
-	if err != nil {
-		return err
-	}
-	return Download(resp, toolRelease.String(), downloadCB)
+	return pm.DownloadToolRelease(toolRelease, config, toolRelease.String(), downloadCB)
 }
 
 // InstallToolRelease installs a ToolRelease
-func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, taskCB TaskProgressCB) error {
+func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB) error {
 	log := pm.Log.WithField("Tool", toolRelease)
 
 	if toolRelease.IsInstalled() {

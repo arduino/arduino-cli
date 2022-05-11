@@ -131,5 +131,6 @@ func TestCopyAdditionalFiles(t *testing.T) {
 
 	// verify file hasn't changed
 	info2, err := s2.AdditionalFiles[0].Stat()
+	require.NoError(t, err)
 	require.Equal(t, info1.ModTime(), info2.ModTime())
 }

@@ -3,7 +3,7 @@ name: Check Markdown
 
 env:
   # See: https://github.com/actions/setup-go/tree/v2#readme
-  GO_VERSION: "1.16"
+  GO_VERSION: "1.17"
 
 # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
 on:
@@ -43,7 +43,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Initialize markdownlint-cli problem matcher
         uses: xt0rted/markdownlint-problem-matcher@v1
@@ -62,10 +62,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
 

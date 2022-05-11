@@ -36,7 +36,7 @@ import (
 var tr = i18n.Tr
 
 // Attach FIXMEDOC
-func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB commands.TaskProgressCB) (*rpc.BoardAttachResponse, error) {
+func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB rpc.TaskProgressCB) (*rpc.BoardAttachResponse, error) {
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {
 		return nil, &arduino.InvalidInstanceError{}

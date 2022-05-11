@@ -201,7 +201,7 @@ def test_core_install_without_updateindex(run_command):
     # Download samd core pinned to 1.8.6
     result = run_command(["core", "install", "arduino:samd@1.8.6"])
     assert result.ok
-    assert "Updating index: package_index.json downloaded" in result.stdout
+    assert "Downloading index: package_index.json downloaded" in result.stdout
 
 
 @pytest.mark.skipif(
@@ -363,7 +363,7 @@ def test_core_update_with_local_url(run_command):
 
     res = run_command(["core", "update-index", f'--additional-urls="file://{test_index}"'])
     assert res.ok
-    assert "Updating index: test_index.json downloaded" in res.stdout
+    assert "Downloading index: test_index.json downloaded" in res.stdout
 
 
 def test_core_search_manually_installed_cores_not_printed(run_command, data_dir):
@@ -523,7 +523,7 @@ def test_core_search_update_index_delay(run_command, data_dir):
     # Verifies index update is not run
     res = run_command(["core", "search"])
     assert res.ok
-    assert "Updating index" not in res.stdout
+    assert "Downloading index" not in res.stdout
 
     # Change edit time of package index file
     index_file = Path(data_dir, "package_index.json")
@@ -534,12 +534,12 @@ def test_core_search_update_index_delay(run_command, data_dir):
     # Verifies index update is run
     res = run_command(["core", "search"])
     assert res.ok
-    assert "Updating index" in res.stdout
+    assert "Downloading index" in res.stdout
 
     # Verifies index update is not run again
     res = run_command(["core", "search"])
     assert res.ok
-    assert "Updating index" not in res.stdout
+    assert "Downloading index" not in res.stdout
 
 
 def test_core_search_sorted_results(run_command, httpserver):
@@ -759,7 +759,7 @@ def test_core_with_wrong_custom_board_options_is_loaded(run_command, data_dir):
     assert "arduino-beta-dev:platform_with_wrong_custom_board_options:altra" in boards
     # Verify warning is shown to user
     assert (
-        "Error initializing instance: "
+        "Error initializing instance: Error loading hardware platform: "
         + "loading platform release arduino-beta-dev:platform_with_wrong_custom_board_options@4.2.0: "
         + "loading boards: "
         + "skipping loading of boards arduino-beta-dev:platform_with_wrong_custom_board_options:nessuno: "
@@ -797,7 +797,7 @@ def test_core_with_missing_custom_board_options_is_loaded(run_command, data_dir)
     assert "arduino-beta-dev:platform_with_missing_custom_board_options:altra" in boards
     # Verify warning is shown to user
     assert (
-        "Error initializing instance: "
+        "Error initializing instance: Error loading hardware platform: "
         + "loading platform release arduino-beta-dev:platform_with_missing_custom_board_options@4.2.0: "
         + "loading boards: "
         + "skipping loading of boards arduino-beta-dev:platform_with_missing_custom_board_options:nessuno: "
