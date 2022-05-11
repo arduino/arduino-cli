@@ -21,21 +21,27 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sync/atomic"
 
 	"google.golang.org/grpc"
 )
 
 var debugStdOut = os.Stdout
+var debugSeq uint32
 
-func log(isRequest bool, msg interface{}) {
-	j, _ := json.MarshalIndent(msg, "|  ", "  ")
-	inOut := map[bool]string{true: "REQ:  ", false: "RESP: "}
-	fmt.Fprintln(debugStdOut, "|  "+inOut[isRequest]+string(j))
+func log(isRequest bool, seq uint32, msg interface{}) {
+	prefix := fmt.Sprint(seq, " |  ")
+	j, _ := json.MarshalIndent(msg, prefix, "  ")
+	inOut := "RESP: "
+	if isRequest {
+		inOut = "REQ:  "
+	}
+	fmt.Fprintln(debugStdOut, prefix+inOut+string(j))
 }
 
-func logError(err error) {
+func logError(seq uint32, err error) {
 	if err != nil {
-		fmt.Fprintln(debugStdOut, "|  ERROR: ", err)
+		fmt.Fprintln(debugStdOut, seq, "|  ERROR: ", err)
 	}
 }
 
@@ -55,11 +61,13 @@ func unaryLoggerInterceptor(ctx context.Context, req interface{}, info *grpc.Una
 	if !logSelector(info.FullMethod) {
 		return handler(ctx, req)
 	}
-	fmt.Fprintln(debugStdOut, "CALLED:", info.FullMethod)
-	log(true, req)
+	seq := atomic.AddUint32(&debugSeq, 1)
+	fmt.Fprintln(debugStdOut, seq, "CALLED:", info.FullMethod)
+	log(true, seq, req)
 	resp, err := handler(ctx, req)
-	logError(err)
-	log(false, resp)
+	logError(seq, err)
+	log(false, seq, resp)
+	fmt.Fprintln(debugStdOut, seq, "CALL END")
 	fmt.Fprintln(debugStdOut)
 	return resp, err
 }
@@ -68,6 +76,7 @@ func streamLoggerInterceptor(srv interface{}, stream grpc.ServerStream, info *gr
 	if !logSelector(info.FullMethod) {
 		return handler(srv, stream)
 	}
+	seq := atomic.AddUint32(&debugSeq, 1)
 	streamReq := ""
 	if info.IsClientStream {
 		streamReq = "STREAM_REQ "
@@ -75,28 +84,29 @@ func streamLoggerInterceptor(srv interface{}, stream grpc.ServerStream, info *gr
 	if info.IsServerStream {
 		streamReq += "STREAM_RESP"
 	}
-	fmt.Fprintln(debugStdOut, "CALLED:", info.FullMethod, streamReq)
-	err := handler(srv, &loggingServerStream{ServerStream: stream})
-	logError(err)
-	fmt.Fprintln(debugStdOut, "STREAM CLOSED")
+	fmt.Fprintln(debugStdOut, seq, "CALLED:", info.FullMethod, streamReq)
+	err := handler(srv, &loggingServerStream{ServerStream: stream, seq: seq})
+	logError(seq, err)
+	fmt.Fprintln(debugStdOut, seq, "STREAM CLOSED")
 	fmt.Fprintln(debugStdOut)
 	return err
 }
 
 type loggingServerStream struct {
 	grpc.ServerStream
+	seq uint32
 }
 
 func (l *loggingServerStream) RecvMsg(m interface{}) error {
 	err := l.ServerStream.RecvMsg(m)
-	logError(err)
-	log(true, m)
+	logError(l.seq, err)
+	log(true, l.seq, m)
 	return err
 }
 
 func (l *loggingServerStream) SendMsg(m interface{}) error {
 	err := l.ServerStream.SendMsg(m)
-	logError(err)
-	log(false, m)
+	logError(l.seq, err)
+	log(false, l.seq, m)
 	return err
 }
