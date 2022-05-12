@@ -176,7 +176,11 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	if responseCallback == nil {
 		responseCallback = func(r *rpc.InitResponse) {}
 	}
-	instance := instances[req.Instance.Id]
+	reqInst := req.GetInstance()
+	if reqInst == nil {
+		return &arduino.InvalidInstanceError{}
+	}
+	instance := instances[reqInst.GetId()]
 	if instance == nil {
 		return &arduino.InvalidInstanceError{}
 	}
