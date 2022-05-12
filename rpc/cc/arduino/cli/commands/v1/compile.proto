@@ -57,7 +57,7 @@ message CompileRequest {
   // If jobs is set to 0, it will use the number of available CPUs as the
   // maximum.
   int32 jobs = 14;
-  // List of custom libraries dir paths.
+  // A list of paths to directories containing a collection of libraries.
   repeated string libraries = 15;
   // Optimize compile output for debug, not for release.
   bool optimize_for_debug = 16;
@@ -78,7 +78,7 @@ message CompileRequest {
   // When set to `true` the compiled binary will be copied to the export
   // directory.
   google.protobuf.BoolValue export_binaries = 23;
-  // List of paths to library root folders
+  // A list of paths to single libraries root directory.
   repeated string library = 24;
   // The path where to search for the custom signing key name and the encrypt
   // key name
