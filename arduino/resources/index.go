@@ -68,7 +68,7 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadP
 		signatureFileName := indexFileName + ".sig"
 		signaturePath = destDir.Join(signatureFileName)
 
-		// .tar.gz may contain both index and signature
+		// .tar archive may contain both index and signature
 
 		// Extract archive in a tmp/archive subdirectory
 		f, err := tmpIndexPath.Open()
