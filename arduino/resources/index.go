@@ -17,7 +17,6 @@ package resources
 
 import (
 	"context"
-	"errors"
 	"net/url"
 	"path"
 	"strings"
@@ -28,6 +27,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/codeclysm/extract/v3"
+	"github.com/sirupsen/logrus"
 	"go.bug.st/downloader/v2"
 )
 
@@ -68,12 +68,12 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadP
 		signatureFileName := indexFileName + ".sig"
 		signaturePath = destDir.Join(signatureFileName)
 
-		// .tar archive may contain both index and signature
+		// .tar.bz2 archive may contain both index and signature
 
 		// Extract archive in a tmp/archive subdirectory
 		f, err := tmpIndexPath.Open()
 		if err != nil {
-			return &arduino.PermissionDeniedError{Message: tr("Error extracting %s", tmpIndexPath), Cause: err}
+			return &arduino.PermissionDeniedError{Message: tr("Error opening %s", tmpIndexPath), Cause: err}
 		}
 		defer f.Close()
 		tmpArchivePath := tmp.Join("archive")
@@ -85,14 +85,15 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadP
 		// Look for index.json
 		tmpIndexPath = tmpArchivePath.Join(indexFileName)
 		if !tmpIndexPath.Exist() {
-			err := errors.New(tr("%s not found", indexFileName))
-			return &arduino.FailedDownloadError{Message: tr("Invalid index archive"), Cause: err}
+			return &arduino.NotFoundError{Message: tr("Invalid archive: file %{1}s not found in archive %{2}s", indexFileName, tmpArchivePath.Base())}
 		}
 
 		// Look for signature
 		if t := tmpArchivePath.Join(signatureFileName); t.Exist() {
 			tmpSignaturePath = t
 			hasSignature = true
+		} else {
+			logrus.Infof("No signature %s found in package index archive %s", signatureFileName, tmpArchivePath.Base())
 		}
 	} else if strings.HasSuffix(indexFileName, ".gz") {
 		indexFileName = strings.TrimSuffix(indexFileName, ".gz") // == package_index.json
