@@ -111,9 +111,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-var cache_valid bool
-var libGuard sync.Mutex
-var fileGuard sync.Mutex
+var libMux sync.Mutex
+var fileMux sync.Mutex
 
 type ContainerFindIncludes struct{}
 
@@ -197,9 +196,9 @@ func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 			break
 		}
 		if(!sourceFilePaths.Empty()){
-			fileGuard.Lock()
+			fileMux.Lock()
 			queue <- sourceFilePaths.Pop()
-			fileGuard.Unlock()
+			fileMux.Unlock()
 			atomic.AddInt32(&unhandled, 1)
 		}
 	}
@@ -231,20 +230,20 @@ func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 // include (e.g. what #include line in what file it was resolved from)
 // and should be the empty string for the default include folders, like
 // the core or variant.
-func appendIncludeFolder(ctx *types.Context, cache *sync.Map, sourceFilePath *paths.Path, include string, folder *paths.Path) {
-	libGuard.Lock()
+func appendIncludeFolder(ctx *types.Context, cache *includeCache, sourceFilePath *paths.Path, include string, folder *paths.Path) {
+	libMux.Lock()
 	ctx.IncludeFolders = append(ctx.IncludeFolders, folder)
-	libGuard.Unlock()
+	libMux.Unlock()
 	entry := &includeCacheEntry{Sourcefile: sourceFilePath, Include: include, Includepath: folder}
-	cache.Store(include, entry)
-	cache_valid = false
+	cache.entries.Store(include, entry)
+	cache.valid = false
 }
 
 // Append the given folder to the include path without touch the cache, because it is already in cache
 func appendIncludeFolderWoCache(ctx *types.Context, include string, folder *paths.Path) {
-	libGuard.Lock()
+	libMux.Lock()
 	ctx.IncludeFolders = append(ctx.IncludeFolders, folder)
-	libGuard.Unlock()
+	libMux.Unlock()
 }
 
 func runCommand(ctx *types.Context, command types.Command) error {
@@ -274,49 +273,46 @@ func (entry *includeCacheEntry) Equals(other *includeCacheEntry) bool {
 type includeCache struct {
 	// Are the cache contents valid so far?
 	valid bool
-	// Index into entries of the next entry to be processed. Unused
-	// when the cache is invalid.
-	next    int
-	entries []*includeCacheEntry
+	entries sync.Map
 }
 
 // Read the cache from the given file
-func readCache(path *paths.Path) *sync.Map {
-	var cache sync.Map
+func readCache(path *paths.Path) *includeCache {
 	bytes, err := path.ReadFile()
 	if err != nil {
 		// Return an empty, invalid cache
-		return &cache
+		return &includeCache{}
 	}
 	result := &includeCache{}
-	err = json.Unmarshal(bytes, &result.entries)
+	var entries []*includeCacheEntry
+	err = json.Unmarshal(bytes, &entries)
 	if err != nil {
 		// Return an empty, invalid cache
-		return &cache
+		return &includeCache{}
 	} else {
-		for _, entry := range result.entries {
+		for _, entry := range entries {
 			if entry.Include != "" || entry.Includepath != nil {
 				// Put the entry into cache
-				cache.Store(entry.Include, entry)
+				result.entries.Store(entry.Include, entry)
 			}
 		}
 	}
-	cache_valid = true
-	return &cache
+	result.valid = true
+	return result
 }
 
 // Write the given cache to the given file if it is invalidated. If the
 // cache is still valid, just update the timestamps of the file.
-func writeCache(cache *sync.Map, path *paths.Path) error {
+func writeCache(cache *includeCache, path *paths.Path) error {
 	// If the cache was still valid all the way, just touch its file
 	// (in case any source file changed without influencing the
 	// includes). If it was invalidated, overwrite the cache with
 	// the new contents.
-	if cache_valid {
+	if cache.valid {
 		path.Chtimes(time.Now(), time.Now())
 	} else {
 		var entries []*includeCacheEntry
-		cache.Range(func(k, v interface{}) bool {
+		cache.entries.Range(func(k, v interface{}) bool {
 			if entry, ok := v.(*includeCacheEntry); ok {
 				entries = append(entries, entry)
 			}
@@ -335,9 +331,9 @@ func writeCache(cache *sync.Map, path *paths.Path) error {
 }
 
 // Preload the cached include files and libraries
-func preloadCachedFolder(ctx *types.Context, cache *sync.Map) {
+func preloadCachedFolder(ctx *types.Context, cache *includeCache) {
 	var entryToRemove []string
-	cache.Range(func(include, entry interface{}) bool {
+	cache.entries.Range(func(include, entry interface{}) bool {
 
 		header, ok := include.(string)
 		if(ok) {
@@ -348,7 +344,7 @@ func preloadCachedFolder(ctx *types.Context, cache *sync.Map) {
 					if !imported {
 						// Cannot find the library and it is not imported, is it gone? Remove it later
 						entryToRemove = append(entryToRemove, header)
-						cache_valid = false
+						cache.valid = false
 					}
 				} else {
 
@@ -369,12 +365,12 @@ func preloadCachedFolder(ctx *types.Context, cache *sync.Map) {
 	})
 	// Remove the invalid entry
 	for entry := range entryToRemove {
-		cache.Delete(entry)
+		cache.entries.Delete(entry)
 	}
 }
 
 // For the uncached/updated source file, find the include files
-func findIncludesUntilDone(ctx *types.Context, cache *sync.Map, sourceFile types.SourceFile) error {
+func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile types.SourceFile) error {
 	sourcePath := sourceFile.SourcePath(ctx)
 	targetFilePath := paths.NullPath()
 	depPath := sourceFile.DepfilePath(ctx)
@@ -450,15 +446,15 @@ func findIncludesUntilDone(ctx *types.Context, cache *sync.Map, sourceFile types
 			return nil
 		}
 
-		libGuard.Lock()
+		libMux.Lock()
 		library, imported := ResolveLibrary(ctx, include)
 		if library == nil {
 			if imported {
 				// Added by others
-				libGuard.Unlock()
+				libMux.Unlock()
 				continue
 			} else {
-				defer libGuard.Unlock()
+				defer libMux.Unlock()
 				// Library could not be resolved, show error
 				// err := runCommand(ctx, &GCCPreprocRunner{SourceFilePath: sourcePath, TargetFileName: paths.New(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E), Includes: includes})
 				// return errors.WithStack(err)
@@ -482,7 +478,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *sync.Map, sourceFile types
 		// include path and queue its source files for further
 		// include scanning
 		ctx.ImportedLibraries = append(ctx.ImportedLibraries, library)
-		libGuard.Unlock()
+		libMux.Unlock()
 		appendIncludeFolder(ctx, cache, sourcePath, include, library.SourceDir)
 		sourceDirs := library.SourceDirs()
 		for _, sourceDir := range sourceDirs {
@@ -508,9 +504,9 @@ func queueSourceFilesFromFolder(ctx *types.Context, queue *types.UniqueSourceFil
 			return errors.WithStack(err)
 		}
 
-		fileGuard.Lock()
+		fileMux.Lock()
 		queue.Push(sourceFile)
-		fileGuard.Unlock()
+		fileMux.Unlock()
 	}
 
 	return nil
