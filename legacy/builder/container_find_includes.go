@@ -96,7 +96,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"os/exec"
+	"runtime"
 	"time"
+	"sync"
+	"strings"
+	"sync/atomic"
 
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/libraries"
@@ -106,6 +110,10 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 )
+
+var cache_valid bool
+var libGuard sync.Mutex
+var fileGuard sync.Mutex
 
 type ContainerFindIncludes struct{}
 
@@ -125,9 +133,11 @@ func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 	cachePath := ctx.BuildPath.Join("includes.cache")
 	cache := readCache(cachePath)
 
-	appendIncludeFolder(ctx, cache, nil, "", ctx.BuildProperties.GetPath("build.core.path"))
+	// The entry with no_resolve prefix will be ignored in the preload phase 
+	// in case they are already added into context at here 
+	appendIncludeFolder(ctx, cache, nil, "no_resolve_1", ctx.BuildProperties.GetPath("build.core.path"))
 	if ctx.BuildProperties.Get("build.variant.path") != "" {
-		appendIncludeFolder(ctx, cache, nil, "", ctx.BuildProperties.GetPath("build.variant.path"))
+		appendIncludeFolder(ctx, cache, nil, "no_resolve_2", ctx.BuildProperties.GetPath("build.variant.path"))
 	}
 
 	sketch := ctx.Sketch
@@ -144,16 +154,65 @@ func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 		queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, srcSubfolderPath, true /* recurse */)
 	}
 
-	for !sourceFilePaths.Empty() {
-		err := findIncludesUntilDone(ctx, cache, sourceFilePaths.Pop())
+	preloadCachedFolder(ctx, cache)
+
+	var errorsList []error
+	var errorsMux sync.Mutex
+
+	queue := make(chan types.SourceFile)
+	job := func(source types.SourceFile) {
+		// Find all includes
+		err := findIncludesUntilDone(ctx, cache, source)
 		if err != nil {
-			cachePath.Remove()
-			return errors.WithStack(err)
+			errorsMux.Lock()
+			errorsList = append(errorsList, err)
+			errorsMux.Unlock()
 		}
 	}
 
+	// Spawn jobs runners to make the scan faster
+	var wg sync.WaitGroup
+	jobs := ctx.Jobs
+	if jobs == 0 {
+		jobs = runtime.NumCPU()
+	}
+	var unhandled int32 = 0
+	for i := 0; i < jobs; i++ {
+		wg.Add(1)
+		go func() {
+			for source := range queue {
+				job(source)
+				atomic.AddInt32(&unhandled, -1)
+			}
+			wg.Done()
+		}()
+	}
+
+	// Loop until all files are handled
+	for (!sourceFilePaths.Empty() || unhandled != 0 ) {
+		errorsMux.Lock()
+		gotError := len(errorsList) > 0
+		errorsMux.Unlock()
+		if gotError {
+			break
+		}
+		if(!sourceFilePaths.Empty()){
+			fileGuard.Lock()
+			queue <- sourceFilePaths.Pop()
+			fileGuard.Unlock()
+			atomic.AddInt32(&unhandled, 1)
+		}
+	}
+	close(queue)
+	wg.Wait()
+
+	if len(errorsList) > 0 {
+		// output the first error
+		cachePath.Remove()
+		return errors.WithStack(errorsList[0])
+	}
+
 	// Finalize the cache
-	cache.ExpectEnd()
 	err = writeCache(cache, cachePath)
 	if err != nil {
 		return errors.WithStack(err)
@@ -172,9 +231,20 @@ func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 // include (e.g. what #include line in what file it was resolved from)
 // and should be the empty string for the default include folders, like
 // the core or variant.
-func appendIncludeFolder(ctx *types.Context, cache *includeCache, sourceFilePath *paths.Path, include string, folder *paths.Path) {
+func appendIncludeFolder(ctx *types.Context, cache *sync.Map, sourceFilePath *paths.Path, include string, folder *paths.Path) {
+	libGuard.Lock()
 	ctx.IncludeFolders = append(ctx.IncludeFolders, folder)
-	cache.ExpectEntry(sourceFilePath, include, folder)
+	libGuard.Unlock()
+	entry := &includeCacheEntry{Sourcefile: sourceFilePath, Include: include, Includepath: folder}
+	cache.Store(include, entry)
+	cache_valid = false
+}
+
+// Append the given folder to the include path without touch the cache, because it is already in cache
+func appendIncludeFolderWoCache(ctx *types.Context, include string, folder *paths.Path) {
+	libGuard.Lock()
+	ctx.IncludeFolders = append(ctx.IncludeFolders, folder)
+	libGuard.Unlock()
 }
 
 func runCommand(ctx *types.Context, command types.Command) error {
@@ -210,80 +280,49 @@ type includeCache struct {
 	entries []*includeCacheEntry
 }
 
-// Return the next cache entry. Should only be called when the cache is
-// valid and a next entry is available (the latter can be checked with
-// ExpectFile). Does not advance the cache.
-func (cache *includeCache) Next() *includeCacheEntry {
-	return cache.entries[cache.next]
-}
-
-// Check that the next cache entry is about the given file. If it is
-// not, or no entry is available, the cache is invalidated. Does not
-// advance the cache.
-func (cache *includeCache) ExpectFile(sourcefile *paths.Path) {
-	if cache.valid && (cache.next >= len(cache.entries) || !cache.Next().Sourcefile.EqualsTo(sourcefile)) {
-		cache.valid = false
-		cache.entries = cache.entries[:cache.next]
-	}
-}
-
-// Check that the next entry matches the given values. If so, advance
-// the cache. If not, the cache is invalidated. If the cache is
-// invalidated, or was already invalid, an entry with the given values
-// is appended.
-func (cache *includeCache) ExpectEntry(sourcefile *paths.Path, include string, librarypath *paths.Path) {
-	entry := &includeCacheEntry{Sourcefile: sourcefile, Include: include, Includepath: librarypath}
-	if cache.valid {
-		if cache.next < len(cache.entries) && cache.Next().Equals(entry) {
-			cache.next++
-		} else {
-			cache.valid = false
-			cache.entries = cache.entries[:cache.next]
-		}
-	}
-
-	if !cache.valid {
-		cache.entries = append(cache.entries, entry)
-	}
-}
-
-// Check that the cache is completely consumed. If not, the cache is
-// invalidated.
-func (cache *includeCache) ExpectEnd() {
-	if cache.valid && cache.next < len(cache.entries) {
-		cache.valid = false
-		cache.entries = cache.entries[:cache.next]
-	}
-}
-
 // Read the cache from the given file
-func readCache(path *paths.Path) *includeCache {
+func readCache(path *paths.Path) *sync.Map {
+	var cache sync.Map
 	bytes, err := path.ReadFile()
 	if err != nil {
 		// Return an empty, invalid cache
-		return &includeCache{}
+		return &cache
 	}
 	result := &includeCache{}
 	err = json.Unmarshal(bytes, &result.entries)
 	if err != nil {
 		// Return an empty, invalid cache
-		return &includeCache{}
+		return &cache
+	} else {
+		for _, entry := range result.entries {
+			if entry.Include != "" || entry.Includepath != nil {
+				// Put the entry into cache
+				cache.Store(entry.Include, entry)
+			}
+		}
 	}
-	result.valid = true
-	return result
+	cache_valid = true
+	return &cache
 }
 
 // Write the given cache to the given file if it is invalidated. If the
 // cache is still valid, just update the timestamps of the file.
-func writeCache(cache *includeCache, path *paths.Path) error {
+func writeCache(cache *sync.Map, path *paths.Path) error {
 	// If the cache was still valid all the way, just touch its file
 	// (in case any source file changed without influencing the
 	// includes). If it was invalidated, overwrite the cache with
 	// the new contents.
-	if cache.valid {
+	if cache_valid {
 		path.Chtimes(time.Now(), time.Now())
 	} else {
-		bytes, err := json.MarshalIndent(cache.entries, "", "  ")
+		var entries []*includeCacheEntry
+		cache.Range(func(k, v interface{}) bool {
+			if entry, ok := v.(*includeCacheEntry); ok {
+				entries = append(entries, entry)
+			}
+			return true
+		})
+		bytes, err := json.MarshalIndent(entries, "", "  ")
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -295,7 +334,47 @@ func writeCache(cache *includeCache, path *paths.Path) error {
 	return nil
 }
 
-func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile types.SourceFile) error {
+// Preload the cached include files and libraries
+func preloadCachedFolder(ctx *types.Context, cache *sync.Map) {
+	var entryToRemove []string
+	cache.Range(func(include, entry interface{}) bool {
+
+		header, ok := include.(string)
+		if(ok) {
+			// Ignore the pre-added folder
+			if(!strings.HasPrefix(header, "no_resolve")) {
+				library, imported := ResolveLibrary(ctx, header)
+				if library == nil {
+					if !imported {
+						// Cannot find the library and it is not imported, is it gone? Remove it later
+						entryToRemove = append(entryToRemove, header)
+						cache_valid = false
+					}
+				} else {
+
+					// Add this library to the list of libraries, the
+					// include path and queue its source files for further
+					// include scanning
+					ctx.ImportedLibraries = append(ctx.ImportedLibraries, library)
+					// Since it is already in cache, append the include folder only
+					appendIncludeFolderWoCache(ctx, header, library.SourceDir)
+					sourceDirs := library.SourceDirs()
+					for _, sourceDir := range sourceDirs {
+						queueSourceFilesFromFolder(ctx, ctx.CollectedSourceFiles, library, sourceDir.Dir, sourceDir.Recurse)
+					}
+				}
+			}
+		}
+		return true
+	})
+	// Remove the invalid entry
+	for entry := range entryToRemove {
+		cache.Delete(entry)
+	}
+}
+
+// For the uncached/updated source file, find the include files
+func findIncludesUntilDone(ctx *types.Context, cache *sync.Map, sourceFile types.SourceFile) error {
 	sourcePath := sourceFile.SourcePath(ctx)
 	targetFilePath := paths.NullPath()
 	depPath := sourceFile.DepfilePath(ctx)
@@ -321,7 +400,6 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 	first := true
 	for {
 		var include string
-		cache.ExpectFile(sourcePath)
 
 		includes := ctx.IncludeFolders
 		if library, ok := sourceFile.Origin.(*libraries.Library); ok && library.UtilityDir != nil {
@@ -342,11 +420,11 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		var preproc_err error
 		var preproc_stderr []byte
 
-		if unchanged && cache.valid {
-			include = cache.Next().Include
+		if unchanged {
 			if first && ctx.Verbose {
 				ctx.Info(tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
+			return nil
 		} else {
 			preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
 			// Unwrap error and see if it is an ExitError.
@@ -369,34 +447,42 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 
 		if include == "" {
 			// No missing includes found, we're done
-			cache.ExpectEntry(sourcePath, "", nil)
 			return nil
 		}
 
-		library := ResolveLibrary(ctx, include)
+		libGuard.Lock()
+		library, imported := ResolveLibrary(ctx, include)
 		if library == nil {
-			// Library could not be resolved, show error
-			// err := runCommand(ctx, &GCCPreprocRunner{SourceFilePath: sourcePath, TargetFileName: paths.New(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E), Includes: includes})
-			// return errors.WithStack(err)
-			if preproc_err == nil || preproc_stderr == nil {
-				// Filename came from cache, so run preprocessor to obtain error to show
-				preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
-				if preproc_err == nil {
-					// If there is a missing #include in the cache, but running
-					// gcc does not reproduce that, there is something wrong.
-					// Returning an error here will cause the cache to be
-					// deleted, so hopefully the next compilation will succeed.
-					return errors.New(tr("Internal error in cache"))
+			if imported {
+				// Added by others
+				libGuard.Unlock()
+				continue
+			} else {
+				defer libGuard.Unlock()
+				// Library could not be resolved, show error
+				// err := runCommand(ctx, &GCCPreprocRunner{SourceFilePath: sourcePath, TargetFileName: paths.New(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E), Includes: includes})
+				// return errors.WithStack(err)
+				if preproc_err == nil || preproc_stderr == nil {
+					// Filename came from cache, so run preprocessor to obtain error to show
+					preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
+					if preproc_err == nil {
+						// If there is a missing #include in the cache, but running
+						// gcc does not reproduce that, there is something wrong.
+						// Returning an error here will cause the cache to be
+						// deleted, so hopefully the next compilation will succeed.
+						return errors.New(tr("Internal error in cache"))
+					}
 				}
+				ctx.Stderr.Write(preproc_stderr)
+				return errors.WithStack(preproc_err)
 			}
-			ctx.Stderr.Write(preproc_stderr)
-			return errors.WithStack(preproc_err)
 		}
 
 		// Add this library to the list of libraries, the
 		// include path and queue its source files for further
 		// include scanning
 		ctx.ImportedLibraries = append(ctx.ImportedLibraries, library)
+		libGuard.Unlock()
 		appendIncludeFolder(ctx, cache, sourcePath, include, library.SourceDir)
 		sourceDirs := library.SourceDirs()
 		for _, sourceDir := range sourceDirs {
@@ -421,7 +507,10 @@ func queueSourceFilesFromFolder(ctx *types.Context, queue *types.UniqueSourceFil
 		if err != nil {
 			return errors.WithStack(err)
 		}
+
+		fileGuard.Lock()
 		queue.Push(sourceFile)
+		fileGuard.Unlock()
 	}
 
 	return nil

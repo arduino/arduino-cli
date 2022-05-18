@@ -22,7 +22,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 )
 
-func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {
+func ResolveLibrary(ctx *types.Context, header string) (*libraries.Library, bool) {
 	resolver := ctx.LibrariesResolver
 	importedLibraries := ctx.ImportedLibraries
 
@@ -35,12 +35,12 @@ func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {
 	}
 
 	if candidates == nil || len(candidates) == 0 {
-		return nil
+		return nil, false
 	}
 
 	for _, candidate := range candidates {
 		if importedLibraries.Contains(candidate) {
-			return nil
+			return nil, true
 		}
 	}
 
@@ -63,7 +63,7 @@ func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {
 		NotUsedLibraries: filterOutLibraryFrom(candidates, selected),
 	}
 
-	return selected
+	return selected, false
 }
 
 func filterOutLibraryFrom(libs libraries.List, libraryToRemove *libraries.Library) libraries.List {
