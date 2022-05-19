@@ -30,23 +30,23 @@ profiles:
       - <LIB_NAME> (<LIB_VERSION>)
       - <LIB_NAME> (<LIB_VERSION>)
 
-...more profiles here...
+  ...more profiles here...
 ```
 
-There is a 'profiles:' section containing all the profiles. Each field is self-explanatory, in particular:
+There is an optional `profiles:` section containing all the profiles. Each field in a profile is mandatory (unless noted otherwise below). The available fields are:
 
 - `<PROFILE_NAME>` is the profile identifier, it’s a user-defined field, and the allowed characters are alphanumerics,
-  underscore `_`, dot `.`, and dash `-`
-- `<PLATFORM>` is the target core platform identifier, for example, `arduino:avr` or `adafruit:samd`
-- `<PLATFORM_VERSION>` is the target core platform version required
+  underscore `_`, dot `.`, and dash `-`.
+- `<PLATFORM>` is the target core platform identifier, for example, `arduino:avr` or `adafruit:samd`.
+- `<PLATFORM_VERSION>` is the target core platform version required.
 - `<3RD_PARTY_PLATFORM_URL>` is the index URL to download the target core platform (also known as “Additional Boards
   Manager URLs” in the Arduino IDE). This field can be omitted for the official `arduino:*` platforms.
 - `<PLATFORM_DEPENDENCY>`, `<PLATFORM_DEPENDENCY_VERSION>`, and `<3RD_PARTY_PLATFORM_DEPENDENCY_URL>` contains the same
-  information as `<PLATFORM>`, `<PLATFORM_VERSION>`, and `<3RD_PARTY_PLATFORM_URL>` but for the core platform dependency
+  information as `<PLATFORM>`, `<PLATFORM_VERSION>`, and `<3RD_PARTY_PLATFORM_URL>` respectively but for the core platform dependency
   of the main core platform. These fields are optional.
-- `<LIB_VERSION>` is the version required for the library, for example, `1.0.0`
-- `<USER_NOTES>` is a free text string available to the developer to add comments
-- `<DEFAULT_PROFILE_NAME>` is the profile used by default (more on that later)
+- `libraries:` is a section where the required libraries to build the project are defined. This section is optional.
+- `<LIB_VERSION>` is the version required for the library, for example, `1.0.0`.
+- `<USER_NOTES>` is a free text string available to the developer to add comments.
 
 A complete example of a `sketch.yaml` may be the following:
 
