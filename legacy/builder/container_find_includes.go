@@ -155,6 +155,10 @@ func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 
 	preloadCachedFolder(ctx, cache)
 
+	// The first source file is the main .ino.cpp
+	// handle it first to setup environment for other files
+	findIncludesUntilDone(ctx, cache, sourceFilePaths.Pop())
+
 	var errorsList []error
 	var errorsMux sync.Mutex
 
