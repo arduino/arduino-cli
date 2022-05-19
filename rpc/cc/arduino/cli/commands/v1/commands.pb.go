@@ -131,7 +131,7 @@ type InitRequest struct {
 	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
 	// Profile to use
 	Profile string `protobuf:"bytes,2,opt,name=profile,proto3" json:"profile,omitempty"`
-	// The path where the sketch is stored (contains also the profile.yml path)
+	// The path where the sketch is stored
 	SketchPath string `protobuf:"bytes,3,opt,name=sketch_path,json=sketchPath,proto3" json:"sketch_path,omitempty"`
 }
 
@@ -273,7 +273,7 @@ type InitResponse_Error struct {
 }
 
 type InitResponse_Profile struct {
-	// Fqbn selected in profile (optional)
+	// Selected profile information
 	Profile *Profile `protobuf:"bytes,3,opt,name=profile,proto3,oneof"`
 }
 
