@@ -86,7 +86,7 @@ func (pm *PackageManager) installMissingProfilePlatform(platformRef *sketch.Prof
 	// TODO: TaskProgressCB
 
 	// Instantiate a temporary package manager only for platform installation
-	tmp, err := paths.MkTempDir("", "")
+	tmp, err := paths.MkTempDir(pm.TempDir.String(), "")
 	if err != nil {
 		return fmt.Errorf("installing missing platform: could not create temp dir %s", err)
 	}
