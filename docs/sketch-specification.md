@@ -89,7 +89,7 @@ needed to build the sketch (platform and libraries each pinned to a specific ver
 When using a profile to compile, Arduino CLI will install all the required resources in a isolated environment, used
 only for the build, leaving the libraries and platforms installed globally in the system untouched.
 
-For more information see the [profiles documentation](sketch-profiles.md).
+For more information see the [sketch project file](sketch-project-file.md) documentation.
 
 ### Secrets
 

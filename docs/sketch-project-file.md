@@ -33,7 +33,8 @@ profiles:
   ...more profiles here...
 ```
 
-There is an optional `profiles:` section containing all the profiles. Each field in a profile is mandatory (unless noted otherwise below). The available fields are:
+There is an optional `profiles:` section containing all the profiles. Each field in a profile is mandatory (unless noted
+otherwise below). The available fields are:
 
 - `<PROFILE_NAME>` is the profile identifier, it’s a user-defined field, and the allowed characters are alphanumerics,
   underscore `_`, dot `.`, and dash `-`.
@@ -42,8 +43,8 @@ There is an optional `profiles:` section containing all the profiles. Each field
 - `<3RD_PARTY_PLATFORM_URL>` is the index URL to download the target core platform (also known as “Additional Boards
   Manager URLs” in the Arduino IDE). This field can be omitted for the official `arduino:*` platforms.
 - `<PLATFORM_DEPENDENCY>`, `<PLATFORM_DEPENDENCY_VERSION>`, and `<3RD_PARTY_PLATFORM_DEPENDENCY_URL>` contains the same
-  information as `<PLATFORM>`, `<PLATFORM_VERSION>`, and `<3RD_PARTY_PLATFORM_URL>` respectively but for the core platform dependency
-  of the main core platform. These fields are optional.
+  information as `<PLATFORM>`, `<PLATFORM_VERSION>`, and `<3RD_PARTY_PLATFORM_URL>` respectively but for the core
+  platform dependency of the main core platform. These fields are optional.
 - `libraries:` is a section where the required libraries to build the project are defined. This section is optional.
 - `<LIB_VERSION>` is the version required for the library, for example, `1.0.0`.
 - `<USER_NOTES>` is a free text string available to the developer to add comments.
