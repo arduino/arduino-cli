@@ -30,7 +30,7 @@ gold_board = """
   "official": true,
   "package": {
     "maintainer": "Arduino",
-    "url": "https://downloads.arduino.cc/packages/package_index.json",
+    "url": "https://downloads.arduino.cc/packages/package_index.tar.bz2",
     "website_url": "http://www.arduino.cc/",
     "email": "packages@arduino.cc",
     "name": "arduino",
