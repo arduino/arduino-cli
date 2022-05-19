@@ -3,8 +3,9 @@ Arduino CLI provides support for reproducible builds through the use of build pr
 ## Sketch project file `sketch.yaml` and build profiles.
 
 A profile is a complete description of all the resources needed to build a sketch. Profiles are defined in a project
-file called `sketch.yaml`. This file will be in YAML format and it will contain one or more profiles, in particular each
-profile will define:
+file called `sketch.yaml`. This file is in YAML format and may contain multiple profiles.
+
+Each profile will define:
 
 - The board FQBN
 - The target core platform name and version (with the 3rd party platform index URL if needed)
