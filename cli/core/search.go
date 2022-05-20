@@ -134,10 +134,9 @@ func indexesNeedUpdating(duration string) bool {
 
 	now := time.Now()
 	modTimeThreshold, err := time.ParseDuration(duration)
-	// Not the most elegant way of handling this error
-	// but it does its job
 	if err != nil {
-		modTimeThreshold, _ = time.ParseDuration("24h")
+		feedback.Error(tr("Invalid timeout: %s", err))
+		os.Exit(errorcodes.ErrBadArgument)
 	}
 
 	urls := []string{globals.DefaultIndexURL}
