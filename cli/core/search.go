@@ -152,7 +152,18 @@ func indexesNeedUpdating(duration string) bool {
 			continue
 		}
 
-		coreIndexPath := indexpath.Join(path.Base(URL.Path))
+		// should handle:
+		// - package_index.json
+		// - package_index.json.sig
+		// - package_index.json.gz
+		// - package_index.tar.bz2
+		indexFileName := path.Base(URL.Path)
+		indexFileName = strings.TrimSuffix(indexFileName, ".tar.bz2")
+		indexFileName = strings.TrimSuffix(indexFileName, ".gz")
+		indexFileName = strings.TrimSuffix(indexFileName, ".sig")
+		indexFileName = strings.TrimSuffix(indexFileName, ".json")
+		// and obtain package_index.json as result
+		coreIndexPath := indexpath.Join(indexFileName + ".json")
 		if coreIndexPath.NotExist() {
 			return true
 		}
