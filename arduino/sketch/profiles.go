@@ -35,7 +35,7 @@ type Project struct {
 	DefaultProfile string   `yaml:"default_profile"`
 }
 
-// AsYaml outputs the project file as Yaml
+// AsYaml outputs the sketch project file as YAML
 func (p *Project) AsYaml() string {
 	res := "profiles:\n"
 	for _, profile := range p.Profiles {

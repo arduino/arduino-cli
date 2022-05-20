@@ -101,7 +101,7 @@ func New(path *paths.Path) (*Sketch, error) {
 	if projectFile.Exist() {
 		prj, err := LoadProjectFile(projectFile)
 		if err != nil {
-			return nil, fmt.Errorf("%s %w", tr("error loading project file:"), err)
+			return nil, fmt.Errorf("%s %w", tr("error loading sketch project file:"), err)
 		}
 		sketch.Project = prj
 	}

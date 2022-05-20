@@ -99,8 +99,8 @@ profiles:
 
 ### Building a sketch
 
-When a `sketch.yaml` file exists in the sketch, it can be leveraged to compile the sketch with the `--profile/-m` flag
-in the `compile` command:
+When a sketch project file is present, it can be leveraged to compile the sketch with the `--profile/-m` flag in the
+`compile` command:
 
 ```
 arduino-cli compile --profile nanorp
