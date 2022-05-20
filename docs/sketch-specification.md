@@ -84,8 +84,8 @@ Editor, while only one version of each library may be installed when using the o
 This is an optional file named `sketch.yaml`, located in the root folder of the sketch.
 
 Inside `sketch.yaml` the user can define one or more "profiles": each profile is a description of all the resources
-needed to build the sketch (platform and libraries each pinned to a specific version).
-For more information see the [sketch project file](sketch-project-file.md) documentation.
+needed to build the sketch (platform and libraries each pinned to a specific version). For more information see the
+[sketch project file](sketch-project-file.md) documentation.
 
 ### Secrets
 
