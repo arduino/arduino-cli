@@ -234,7 +234,12 @@ func (s *Sketch) ExportMetadata() error {
 // GetProfile returns the requested profile or nil if the profile
 // is not found.
 func (s *Sketch) GetProfile(profileName string) *Profile {
-	return s.Project.Profiles[profileName]
+	for _, p := range s.Project.Profiles {
+		if p.Name == profileName {
+			return p
+		}
+	}
+	return nil
 }
 
 // checkSketchCasing returns an error if the casing of the sketch folder and the main file are different.

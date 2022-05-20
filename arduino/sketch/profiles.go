@@ -31,15 +31,15 @@ import (
 
 // Project represents all the profiles defined for the sketch
 type Project struct {
-	Profiles       map[string]*Profile `yaml:"profiles"`
-	DefaultProfile string              `yaml:"default_profile"`
+	Profiles       Profiles `yaml:"profiles"`
+	DefaultProfile string   `yaml:"default_profile"`
 }
 
 // AsYaml outputs the project file as Yaml
 func (p *Project) AsYaml() string {
 	res := "profiles:\n"
-	for name, profile := range p.Profiles {
-		res += fmt.Sprintf("  %s:\n", name)
+	for _, profile := range p.Profiles {
+		res += fmt.Sprintf("  %s:\n", profile.Name)
 		res += profile.AsYaml()
 		res += "\n"
 	}
@@ -49,9 +49,38 @@ func (p *Project) AsYaml() string {
 	return res
 }
 
+// Profiles are a list of Profile
+type Profiles []*Profile
+
+// UnmarshalYAML decodes a Profiles section from YAML source.
+func (p *Profiles) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	unmarshaledProfiles := map[string]*Profile{}
+	if err := unmarshal(&unmarshaledProfiles); err != nil {
+		return err
+	}
+
+	var profilesData yaml.MapSlice
+	if err := unmarshal(&profilesData); err != nil {
+		return err
+	}
+
+	for _, profileData := range profilesData {
+		profileName, ok := profileData.Key.(string)
+		if !ok {
+			return fmt.Errorf("invalid profile name: %v", profileData.Key)
+		}
+		profile := unmarshaledProfiles[profileName]
+		profile.Name = profileName
+		*p = append(*p, profile)
+	}
+
+	return nil
+}
+
 // Profile is a sketch profile, it contains a reference to all the resources
 // needed to build and upload a sketch
 type Profile struct {
+	Name      string
 	Notes     string                   `yaml:"notes"`
 	FQBN      string                   `yaml:"fqbn"`
 	Platforms ProfileRequiredPlatforms `yaml:"platforms"`
