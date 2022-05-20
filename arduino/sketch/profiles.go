@@ -76,7 +76,7 @@ type ProfileRequiredPlatforms []*ProfilePlatformReference
 
 // AsYaml outputs the required platforms as Yaml
 func (p *ProfileRequiredPlatforms) AsYaml() string {
-	res := ""
+	res := "    platforms:\n"
 	for _, platform := range *p {
 		res += platform.AsYaml()
 	}
@@ -89,7 +89,11 @@ type ProfileRequiredLibraries []*ProfileLibraryReference
 
 // AsYaml outputs the required libraries as Yaml
 func (p *ProfileRequiredLibraries) AsYaml() string {
-	return ""
+	res := "    libraries:\n"
+	for _, lib := range *p {
+		res += lib.AsYaml()
+	}
+	return res
 }
 
 // ProfilePlatformReference is a reference to a platform
@@ -185,6 +189,12 @@ func (l *ProfileLibraryReference) UnmarshalYAML(unmarshal func(interface{}) erro
 		l.Version = v
 	}
 	return nil
+}
+
+// AsYaml outputs the required library as Yaml
+func (l *ProfileLibraryReference) AsYaml() string {
+	res := fmt.Sprintf("      - %s (%s)\n", l.Library, l.Version)
+	return res
 }
 
 func (l *ProfileLibraryReference) String() string {

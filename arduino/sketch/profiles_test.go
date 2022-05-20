@@ -24,7 +24,11 @@ import (
 )
 
 func TestProjectFileLoading(t *testing.T) {
-	proj, err := LoadProjectFile(paths.New("testdata", "SketchWithProfiles", "sketch.yml"))
+	sketchProj := paths.New("testdata", "SketchWithProfiles", "sketch.yml")
+	proj, err := LoadProjectFile(sketchProj)
 	require.NoError(t, err)
 	fmt.Println(proj)
+	golden, err := sketchProj.ReadFile()
+	require.NoError(t, err)
+	require.Equal(t, proj.AsYaml(), string(golden))
 }
