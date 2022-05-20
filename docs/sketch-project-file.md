@@ -49,7 +49,7 @@ otherwise below). The available fields are:
   platform dependency of the main core platform. These fields are optional.
 - `libraries:` is a section where the required libraries to build the project are defined. This section is optional.
 - `<LIB_VERSION>` is the version required for the library, for example, `1.0.0`.
-- `<USER_NOTES>` is a free text string available to the developer to add comments.
+- `<USER_NOTES>` is a free text string available to the developer to add comments. This field is optional.
 
 A complete example of a sketch project file may be the following:
 
