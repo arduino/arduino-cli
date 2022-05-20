@@ -1,9 +1,11 @@
+Sketch metadata is defined in a file named `sketch.yaml`. This file is in YAML format.
+
+## Build profiles
+
 Arduino CLI provides support for reproducible builds through the use of build profiles.
 
-## Sketch project file `sketch.yaml` and build profiles.
-
-A profile is a complete description of all the resources needed to build a sketch. Profiles are defined in a project
-file called `sketch.yaml`. This file is in YAML format and may contain multiple profiles.
+A profile is a complete description of all the resources needed to build a sketch. The sketch project file may contain
+multiple profiles.
 
 Each profile will define:
 
@@ -49,7 +51,7 @@ otherwise below). The available fields are:
 - `<LIB_VERSION>` is the version required for the library, for example, `1.0.0`.
 - `<USER_NOTES>` is a free text string available to the developer to add comments.
 
-A complete example of a `sketch.yaml` may be the following:
+A complete example of a sketch project file may be the following:
 
 ```
 profiles:
@@ -105,7 +107,7 @@ arduino-cli compile --profile nanorp
 ```
 
 In this case, the sketch will be compiled using the core platform and libraries specified in the nanorp profile. If a
-core platform or a library is missing it will be automatically downloaded and installed on the fly in a isolated
+core platform or a library is missing it will be automatically downloaded and installed on the fly in an isolated
 directory inside the data folder. The dedicated storage is not accessible to the user and is meant as a "cache" of the
 resources used to build the sketch.
 

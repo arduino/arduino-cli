@@ -79,16 +79,12 @@ The `included_libs` key defines the library versions the Arduino Web Editor uses
 Arduino Web Editor specific because all versions of all the Library Manager libraries are pre-installed in Arduino Web
 Editor, while only one version of each library may be installed when using the other Arduino development software.
 
-### Build profiles and reproducible builds
+### Sketch project file
 
-Arduino CLI provides support for reproducible builds through the use of a project file `sketch.yaml`.
+This is an optional file named `sketch.yaml`, located in the root folder of the sketch.
 
 Inside `sketch.yaml` the user can define one or more "profiles": each profile is a description of all the resources
 needed to build the sketch (platform and libraries each pinned to a specific version).
-
-When using a profile to compile, Arduino CLI will install all the required resources in a isolated environment, used
-only for the build, leaving the libraries and platforms installed globally in the system untouched.
-
 For more information see the [sketch project file](sketch-project-file.md) documentation.
 
 ### Secrets
