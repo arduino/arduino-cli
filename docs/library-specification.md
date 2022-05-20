@@ -23,7 +23,7 @@ code to specific architectures.
 
 ## See also
 
-- [Arduino library style guide](https://www.arduino.cc/en/Reference/APIStyleGuide)
+- [Arduino library style guide](http://docs.arduino.cc/learn/contributions/arduino-library-style-guide)
 - [Library dependency resolution process documentation](sketch-build-process.md#dependency-resolution)
 
 ## 1.5 library format (rev. 2.2)
