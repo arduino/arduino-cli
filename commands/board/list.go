@@ -32,7 +32,6 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/pkg/errors"
-	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
 )
 
@@ -178,17 +177,6 @@ func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.B
 // In case of errors partial results from discoveries that didn't fail
 // are returned.
 func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
-	tags := map[string]string{}
-	// Use defer func() to evaluate tags map when function returns
-	// and set success flag inspecting the error named return parameter
-	defer func() {
-		tags["success"] = "true"
-		if e != nil {
-			tags["success"] = "false"
-		}
-		stats.Incr("compile", stats.M(tags)...)
-	}()
-
 	pm := commands.GetPackageManager(req.GetInstance().Id)
 	if pm == nil {
 		return nil, &arduino.InvalidInstanceError{}
