@@ -21,7 +21,6 @@ import (
 	"io"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino"
@@ -34,11 +33,9 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/metrics"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
-	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
 )
 
@@ -59,33 +56,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	if reqExportBinaries := req.GetExportBinaries(); reqExportBinaries != nil {
 		exportBinaries = reqExportBinaries.Value
 	}
-
-	tags := map[string]string{
-		"fqbn":            req.Fqbn,
-		"sketchPath":      metrics.Sanitize(req.SketchPath),
-		"showProperties":  strconv.FormatBool(req.ShowProperties),
-		"preprocess":      strconv.FormatBool(req.Preprocess),
-		"buildProperties": strings.Join(req.BuildProperties, ","),
-		"warnings":        req.Warnings,
-		"verbose":         strconv.FormatBool(req.Verbose),
-		"quiet":           strconv.FormatBool(req.Quiet),
-		"vidPid":          req.VidPid,
-		"exportDir":       metrics.Sanitize(req.GetExportDir()),
-		"jobs":            strconv.FormatInt(int64(req.Jobs), 10),
-		"libraries":       strings.Join(req.Libraries, ","),
-		"clean":           strconv.FormatBool(req.GetClean()),
-		"exportBinaries":  strconv.FormatBool(exportBinaries),
-	}
-
-	// Use defer func() to evaluate tags map when function returns
-	// and set success flag inspecting the error named return parameter
-	defer func() {
-		tags["success"] = "true"
-		if e != nil {
-			tags["success"] = "false"
-		}
-		stats.Incr("compile", stats.M(tags)...)
-	}()
 
 	pm := commands.GetPackageManager(req.GetInstance().GetId())
 	if pm == nil {

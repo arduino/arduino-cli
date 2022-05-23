@@ -31,13 +31,11 @@ import (
 	"github.com/arduino/arduino-cli/commands/daemon"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/metrics"
 	srv_commands "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	srv_debug "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
 	srv_monitor "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/monitor/v1"
 	srv_settings "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1"
 	"github.com/arduino/go-paths-helper"
-	"github.com/segmentio/stats/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
@@ -75,11 +73,6 @@ func NewCommand() *cobra.Command {
 func runDaemonCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli daemon`")
 
-	if configuration.Settings.GetBool("metrics.enabled") {
-		metrics.Activate("daemon")
-		stats.Incr("daemon", stats.T("success", "true"))
-		defer stats.Flush()
-	}
 	port := configuration.Settings.GetString("daemon.port")
 	gRPCOptions := []grpc.ServerOption{}
 	if debugFile != "" {
@@ -127,8 +120,6 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		go func() {
 			// Stdin is closed when the controlling parent process ends
 			_, _ = io.Copy(ioutil.Discard, os.Stdin)
-			// Flush metrics stats (this is a no-op if metrics is disabled)
-			stats.Flush()
 			os.Exit(0)
 		}()
 	}
