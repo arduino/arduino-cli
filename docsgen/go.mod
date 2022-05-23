@@ -53,8 +53,6 @@ require (
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5 // indirect
 	github.com/russross/blackfriday/v2 v2.0.1 // indirect
 	github.com/schollz/closestmatch v2.1.0+incompatible // indirect
-	github.com/segmentio/fasthash v0.0.0-20180216231524-a72b379d632e // indirect
-	github.com/segmentio/stats/v4 v4.5.3 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.4.2 // indirect
