@@ -1485,8 +1485,8 @@
   -b, --fqbn string                  Fully Qualified Board Name, e.g.: arduino:avr:uno
   -h, --help                         help for compile
       --keys-keychain string         The path of the dir to search for the custom keys to sign and encrypt a binary. Used only by the platforms that support it.
-      --libraries strings            List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries dir paths.
-      --library strings              List of paths to libraries root folders. Libraries set this way have top priority in case of conflicts. Can be used multiple times for different libraries.
+      --libraries strings            Path to a collection of libraries. Can be used multiple times or entries can be comma separated.
+      --library strings              Path to a single library’s root folder. Can be used multiple times or entries can be comma separated.
       --only-compilation-database    Just produce the compilation database, without actually compiling. All build commands are skipped except pre* hooks.
       --optimize-for-debug           Optional, optimize compile output for debugging, rather than for release.
       --output-dir string            Save build artifacts in this directory.
