@@ -116,9 +116,9 @@ func NewCommand() *cobra.Command {
 	compileCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
 	compileCommand.Flags().StringVar(&vidPid, "vid-pid", "", tr("When specified, VID/PID specific build properties are used, if board supports them."))
 	compileCommand.Flags().StringSliceVar(&library, "library", []string{},
-		tr("List of paths to libraries root folders. Libraries set this way have top priority in case of conflicts. Can be used multiple times for different libraries."))
+		tr("Path to a single library’s root folder. Can be used multiple times or entries can be comma separated."))
 	compileCommand.Flags().StringSliceVar(&libraries, "libraries", []string{},
-		tr("List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries dir paths."))
+		tr("Path to a collection of libraries. Can be used multiple times or entries can be comma separated."))
 	compileCommand.Flags().BoolVar(&optimizeForDebug, "optimize-for-debug", false, tr("Optional, optimize compile output for debugging, rather than for release."))
 	programmer.AddToCommand(compileCommand)
 	compileCommand.Flags().BoolVar(&compilationDatabaseOnly, "only-compilation-database", false, tr("Just produce the compilation database, without actually compiling. All build commands are skipped except pre* hooks."))

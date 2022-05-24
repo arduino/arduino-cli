@@ -74,7 +74,7 @@ type CompileRequest struct {
 	// If jobs is set to 0, it will use the number of available CPUs as the
 	// maximum.
 	Jobs int32 `protobuf:"varint,14,opt,name=jobs,proto3" json:"jobs,omitempty"`
-	// List of custom libraries dir paths.
+	// A list of paths to directories containing a collection of libraries.
 	Libraries []string `protobuf:"bytes,15,rep,name=libraries,proto3" json:"libraries,omitempty"`
 	// Optimize compile output for debug, not for release.
 	OptimizeForDebug bool `protobuf:"varint,16,opt,name=optimize_for_debug,json=optimizeForDebug,proto3" json:"optimize_for_debug,omitempty"`
@@ -95,7 +95,7 @@ type CompileRequest struct {
 	// When set to `true` the compiled binary will be copied to the export
 	// directory.
 	ExportBinaries *wrapperspb.BoolValue `protobuf:"bytes,23,opt,name=export_binaries,json=exportBinaries,proto3" json:"export_binaries,omitempty"`
-	// List of paths to library root folders
+	// A list of paths to single libraries root directory.
 	Library []string `protobuf:"bytes,24,rep,name=library,proto3" json:"library,omitempty"`
 	// The path where to search for the custom signing key name and the encrypt
 	// key name
