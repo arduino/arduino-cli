@@ -277,6 +277,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0230" class="md-nav__link">
+    0.23.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.23.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#golang-api-packagemanagerdownloadplatformrelease-no-longer-need-label-parameter" class="md-nav__link">
+    golang API: PackageManager.DownloadPlatformRelease no longer need label parameter
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0220" class="md-nav__link">
     0.22.0
   </a>
@@ -1640,6 +1660,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../sketch-project-file/" class="md-nav__link">
+        Sketch project file
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../library-specification/" class="md-nav__link">
         Library specification
       </a>
@@ -1718,18 +1753,18 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_19" type="checkbox" id="__nav_19" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_20" type="checkbox" id="__nav_20" >
       
       
       
       
-        <label class="md-nav__link" for="__nav_19">
+        <label class="md-nav__link" for="__nav_20">
           Guides
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Guides" data-md-level="1">
-        <label class="md-nav__title" for="__nav_19">
+        <label class="md-nav__title" for="__nav_20">
           <span class="md-nav__icon md-icon"></span>
           Guides
         </label>
@@ -1781,6 +1816,26 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0230" class="md-nav__link">
+    0.23.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.23.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#golang-api-packagemanagerdownloadplatformrelease-no-longer-need-label-parameter" class="md-nav__link">
+    golang API: PackageManager.DownloadPlatformRelease no longer need label parameter
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#0220" class="md-nav__link">
@@ -2233,6 +2288,14 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<h2 id="0230">0.23.0<a class="headerlink" href="#0230" title="Permanent link">&para;</a></h2>
+<h3 id="golang-api-packagemanagerdownloadplatformrelease-no-longer-need-label-parameter">golang API: PackageManager.DownloadPlatformRelease no longer need <code>label</code> parameter<a class="headerlink" href="#golang-api-packagemanagerdownloadplatformrelease-no-longer-need-label-parameter" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">pm</span><span class="w"> </span><span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span><span class="w"> </span><span class="nx">DownloadPlatformRelease</span><span class="p">(</span><span class="nx">platform</span><span class="w"> </span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">PlatformRelease</span><span class="p">,</span><span class="w"> </span><span class="nx">config</span><span class="w"> </span><span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Config</span><span class="p">,</span><span class="w"> </span><span class="nx">label</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">progressCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+</code></pre></div>
+<p>is now:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">pm</span><span class="w"> </span><span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span><span class="w"> </span><span class="nx">DownloadPlatformRelease</span><span class="p">(</span><span class="nx">platform</span><span class="w"> </span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">PlatformRelease</span><span class="p">,</span><span class="w"> </span><span class="nx">config</span><span class="w"> </span><span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Config</span><span class="p">,</span><span class="w"> </span><span class="nx">progressCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+</code></pre></div>
+<p>Just remove the <code>label</code> parameter from legacy code.</p>
 <h2 id="0220">0.22.0<a class="headerlink" href="#0220" title="Permanent link">&para;</a></h2>
 <h3 id="githubcomarduinoarduino-cliarduinomultipleboardsdetectederror-field-changed-type"><code>github.com/arduino/arduino-cli/arduino.MultipleBoardsDetectedError</code> field changed type<a class="headerlink" href="#githubcomarduinoarduino-cliarduinomultipleboardsdetectederror-field-changed-type" title="Permanent link">&para;</a></h3>
 <p>Now the <code>Port</code> field of the error is a <code>github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1.Port</code>, usually

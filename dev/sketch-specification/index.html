@@ -1236,6 +1236,26 @@
     Metadata
   </a>
   
+    <nav class="md-nav" aria-label="Metadata">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sketchjson" class="md-nav__link">
+    sketch.json
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sketch-project-file" class="md-nav__link">
+    Sketch project file
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1302,6 +1322,21 @@
   
 </nav>
       
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sketch-project-file/" class="md-nav__link">
+        Sketch project file
+      </a>
     </li>
   
 
@@ -1392,18 +1427,18 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_19" type="checkbox" id="__nav_19" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_20" type="checkbox" id="__nav_20" >
       
       
       
       
-        <label class="md-nav__link" for="__nav_19">
+        <label class="md-nav__link" for="__nav_20">
           Guides
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Guides" data-md-level="1">
-        <label class="md-nav__title" for="__nav_19">
+        <label class="md-nav__title" for="__nav_20">
           <span class="md-nav__icon md-icon"></span>
           Guides
         </label>
@@ -1501,6 +1536,26 @@
   <a href="#metadata" class="md-nav__link">
     Metadata
   </a>
+  
+    <nav class="md-nav" aria-label="Metadata">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sketchjson" class="md-nav__link">
+    sketch.json
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sketch-project-file" class="md-nav__link">
+    Sketch project file
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1630,6 +1685,7 @@ libraries with the sketch in order to make it a self-contained project.</p>
 <p>The Arduino IDE's <strong>File &gt; Save As...</strong> only copies the code files in the sketch root folder and the full contents of
 the <code>data</code> folder, so any non-code files outside the <code>data</code> folder are stripped.</p>
 <h3 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h3>
+<h4 id="sketchjson"><code>sketch.json</code><a class="headerlink" href="#sketchjson" title="Permanent link">&para;</a></h4>
 <p>Arduino CLI and Arduino Web Editor use a file named sketch.json, located in the sketch root folder, to store sketch
 metadata.</p>
 <p>The <code>cpu</code> key contains the board configuration information. This can be set via
@@ -1640,6 +1696,11 @@ commands when compiling or uploading the sketch.</p>
 <p>The <code>included_libs</code> key defines the library versions the Arduino Web Editor uses when the sketch is compiled. This is
 Arduino Web Editor specific because all versions of all the Library Manager libraries are pre-installed in Arduino Web
 Editor, while only one version of each library may be installed when using the other Arduino development software.</p>
+<h4 id="sketch-project-file">Sketch project file<a class="headerlink" href="#sketch-project-file" title="Permanent link">&para;</a></h4>
+<p>This is an optional file named <code>sketch.yaml</code>, located in the root folder of the sketch.</p>
+<p>Inside the sketch project file the user can define one or more "profiles": each profile is a description of all the
+resources needed to build the sketch (platform and libraries each pinned to a specific version).</p>
+<p>For more information see the <a href="../sketch-project-file/">sketch project file</a> documentation.</p>
 <h3 id="secrets">Secrets<a class="headerlink" href="#secrets" title="Permanent link">&para;</a></h3>
 <p>Arduino Web Editor has a
 <a href="https://create.arduino.cc/projecthub/Arduino_Genuino/store-your-sensitive-data-safely-when-sharing-a-sketch-e7d0f0">"Secret tab" feature</a>
@@ -1736,13 +1797,13 @@ users of other development software install the sketch dependencies.</p>
       
       
         
-        <a href="../library-specification/" class="md-footer__link md-footer__link--next" aria-label="Next: Library specification" rel="next">
+        <a href="../sketch-project-file/" class="md-footer__link md-footer__link--next" aria-label="Next: Sketch project file" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Library specification
+              Sketch project file
             </div>
           </div>
           <div class="md-footer__button md-icon">

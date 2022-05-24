@@ -1512,6 +1512,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#profile" class="md-nav__link">
+    Profile
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#programmer" class="md-nav__link">
     Programmer
   </a>
@@ -2244,6 +2251,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../../sketch-project-file/" class="md-nav__link">
+        Sketch project file
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../library-specification/" class="md-nav__link">
         Library specification
       </a>
@@ -2322,18 +2344,18 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_19" type="checkbox" id="__nav_19" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_20" type="checkbox" id="__nav_20" >
       
       
       
       
-        <label class="md-nav__link" for="__nav_19">
+        <label class="md-nav__link" for="__nav_20">
           Guides
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Guides" data-md-level="1">
-        <label class="md-nav__title" for="__nav_19">
+        <label class="md-nav__title" for="__nav_20">
           <span class="md-nav__icon md-icon"></span>
           Guides
         </label>
@@ -2808,6 +2830,13 @@
           <li class="md-nav__item">
   <a href="#platformreference" class="md-nav__link">
     PlatformReference
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#profile" class="md-nav__link">
+    Profile
   </a>
   
 </li>
@@ -3508,6 +3537,7 @@
 <li><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.Platform">Platform</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.PlatformReference">PlatformReference</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.Profile">Profile</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.Programmer">Programmer</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.TaskProgress">TaskProgress</a></li>
 </ul>
@@ -4486,6 +4516,18 @@
 <td></td>
 <td>An Arduino Core instance.</td>
 </tr>
+<tr>
+<td>profile</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Profile to use</td>
+</tr>
+<tr>
+<td>sketch_path</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The path where the sketch is stored</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.InitResponse"></a></p>
@@ -4511,6 +4553,12 @@
 <td><a href="#google.rpc.Status">google.rpc.Status</a></td>
 <td></td>
 <td></td>
+</tr>
+<tr>
+<td>profile</td>
+<td><a href="#cc.arduino.cli.commands.v1.Profile">Profile</a></td>
+<td></td>
+<td>Selected profile information</td>
 </tr>
 </tbody>
 </table>
@@ -5355,6 +5403,32 @@
 <td><a href="#string">string</a></td>
 <td></td>
 <td>Version of the platform.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.Profile"></a></p>
+<h3 id="profile">Profile<a class="headerlink" href="#profile" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Name used to identify the profile within the sketch.</td>
+</tr>
+<tr>
+<td>fqbn</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>FQBN specified in the profile.</td>
 </tr>
 </tbody>
 </table>
