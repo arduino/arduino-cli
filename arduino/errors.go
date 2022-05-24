@@ -193,6 +193,43 @@ func (e *UnknownFQBNError) ToRPCStatus() *status.Status {
 	return status.New(codes.NotFound, e.Error())
 }
 
+// UnknownProfileError is returned when the profile is not found
+type UnknownProfileError struct {
+	Profile string
+	Cause   error
+}
+
+func (e *UnknownProfileError) Error() string {
+	return composeErrorMsg(tr("Profile '%s' not found", e.Profile), e.Cause)
+}
+
+func (e *UnknownProfileError) Unwrap() error {
+	return e.Cause
+}
+
+// ToRPCStatus converts the error into a *status.Status
+func (e *UnknownProfileError) ToRPCStatus() *status.Status {
+	return status.New(codes.NotFound, e.Error())
+}
+
+// InvalidProfileError is returned when the profile has errors
+type InvalidProfileError struct {
+	Cause error
+}
+
+func (e *InvalidProfileError) Error() string {
+	return composeErrorMsg(tr("Invalid profile"), e.Cause)
+}
+
+func (e *InvalidProfileError) Unwrap() error {
+	return e.Cause
+}
+
+// ToRPCStatus converts the error into a *status.Status
+func (e *InvalidProfileError) ToRPCStatus() *status.Status {
+	return status.New(codes.FailedPrecondition, e.Error())
+}
+
 // MissingPortAddressError is returned when the port protocol is mandatory and not specified
 type MissingPortAddressError struct{}
 

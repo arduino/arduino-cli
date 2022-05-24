@@ -39,6 +39,7 @@ type Sketch struct {
 	AdditionalFiles  paths.PathList
 	RootFolderFiles  paths.PathList // All files that are in the Sketch root
 	Metadata         *Metadata
+	Project          *Project
 }
 
 // Metadata is the kind of data associated to a project such as the connected board
@@ -91,6 +92,18 @@ func New(path *paths.Path) (*Sketch, error) {
 		AdditionalFiles:  paths.PathList{},
 		RootFolderFiles:  paths.PathList{},
 		Metadata:         new(Metadata),
+	}
+
+	projectFile := path.Join("sketch.yaml")
+	if !projectFile.Exist() {
+		projectFile = path.Join("sketch.yml")
+	}
+	if projectFile.Exist() {
+		prj, err := LoadProjectFile(projectFile)
+		if err != nil {
+			return nil, fmt.Errorf("%s %w", tr("error loading sketch project file:"), err)
+		}
+		sketch.Project = prj
 	}
 
 	err := sketch.checkSketchCasing()
@@ -214,6 +227,17 @@ func (s *Sketch) ExportMetadata() error {
 	sketchJSON := s.FullPath.Join("sketch.json")
 	if err := sketchJSON.WriteFile(d); err != nil {
 		return fmt.Errorf(tr("writing sketch metadata %[1]s: %[2]s"), sketchJSON, err)
+	}
+	return nil
+}
+
+// GetProfile returns the requested profile or nil if the profile
+// is not found.
+func (s *Sketch) GetProfile(profileName string) *Profile {
+	for _, p := range s.Project.Profiles {
+		if p.Name == profileName {
+			return p
+		}
 	}
 	return nil
 }

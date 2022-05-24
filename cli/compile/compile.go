@@ -46,6 +46,7 @@ import (
 
 var (
 	fqbnArg                 arguments.Fqbn       // Fully Qualified Board Name, e.g.: arduino:avr:uno.
+	profileArg              arguments.Profile    // Profile to use
 	showProperties          bool                 // Show all build preferences used instead of compiling.
 	preprocess              bool                 // Print preprocessed code to stdout.
 	buildCachePath          string               // Builds of 'core.a' are saved into this path to be cached and reused.
@@ -91,6 +92,7 @@ func NewCommand() *cobra.Command {
 	}
 
 	fqbnArg.AddToCommand(compileCommand)
+	profileArg.AddToCommand(compileCommand)
 	compileCommand.Flags().BoolVar(&showProperties, "show-properties", false, tr("Show all build properties used instead of compiling."))
 	compileCommand.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
 	compileCommand.Flags().StringVar(&buildCachePath, "build-cache-path", "", tr("Builds of 'core.a' are saved into this path to be cached and reused."))
@@ -138,9 +140,18 @@ func NewCommand() *cobra.Command {
 }
 
 func runCompileCommand(cmd *cobra.Command, args []string) {
-	inst := instance.CreateAndInit()
-
 	logrus.Info("Executing `arduino-cli compile`")
+
+	if profileArg.Get() != "" {
+		if len(libraries) > 0 {
+			feedback.Errorf(tr("You cannot use the %s flag while compiling with a profile.", "--libraries"))
+			os.Exit(errorcodes.ErrBadArgument)
+		}
+		if len(library) > 0 {
+			feedback.Errorf(tr("You cannot use the %s flag while compiling with a profile.", "--library"))
+			os.Exit(errorcodes.ErrBadArgument)
+		}
+	}
 
 	path := ""
 	if len(args) > 0 {
@@ -149,6 +160,12 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 
 	sketchPath := arguments.InitSketchPath(path)
 	sk := arguments.NewSketch(sketchPath)
+
+	inst, profile := instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
+	if fqbnArg.String() == "" {
+		fqbnArg.Set(profile.GetFqbn())
+	}
+
 	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, sk)
 
 	if keysKeychain != "" || signKey != "" || encryptKey != "" {
@@ -275,10 +292,12 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 				PlatformArchitecture: split[1],
 			})
 
-			if platform != nil {
-				feedback.Errorf(tr("Try running %s", fmt.Sprintf("`%s core install %s`", globals.VersionInfo.Application, platformErr.Platform)))
-			} else {
-				feedback.Errorf(tr("Platform %s is not found in any known index\nMaybe you need to add a 3rd party URL?", platformErr.Platform))
+			if profileArg.String() == "" {
+				if platform != nil {
+					feedback.Errorf(tr("Try running %s", fmt.Sprintf("`%s core install %s`", globals.VersionInfo.Application, platformErr.Platform)))
+				} else {
+					feedback.Errorf(tr("Platform %s is not found in any known index\nMaybe you need to add a 3rd party URL?", platformErr.Platform))
+				}
 			}
 		}
 		os.Exit(errorcodes.ErrGeneric)

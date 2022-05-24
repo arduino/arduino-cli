@@ -96,3 +96,10 @@ message Board {
   // is only available for installed boards.
   string fqbn = 2;
 }
+
+message Profile {
+  // Name used to identify the profile within the sketch.
+  string name = 1;
+  // FQBN specified in the profile.
+  string fqbn = 2;
+}

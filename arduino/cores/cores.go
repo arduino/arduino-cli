@@ -16,12 +16,16 @@
 package cores
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"sort"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/resources"
+	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
@@ -120,6 +124,17 @@ type ToolDependency struct {
 
 func (dep *ToolDependency) String() string {
 	return dep.ToolPackager + ":" + dep.ToolName + "@" + dep.ToolVersion.String()
+}
+
+// InternalUniqueIdentifier returns the unique identifier for this object
+func (dep *ToolDependency) InternalUniqueIdentifier(platformIndexURL *url.URL) string {
+	h := sha256.New()
+	h.Write([]byte(dep.String()))
+	if platformIndexURL != nil {
+		h.Write([]byte(platformIndexURL.String()))
+	}
+	res := dep.String() + "_" + hex.EncodeToString(h.Sum([]byte{}))[:16]
+	return utils.SanitizeName(res)
 }
 
 // DiscoveryDependencies is a list of DiscoveryDependency

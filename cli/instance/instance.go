@@ -37,15 +37,24 @@ var tr = i18n.Tr
 // to execute further operations a valid Instance is mandatory.
 // If Init returns errors they're printed only.
 func CreateAndInit() *rpc.Instance {
+	inst, _ := CreateAndInitWithProfile("", nil)
+	return inst
+}
+
+// CreateAndInitWithProfile returns a new initialized instance using the given profile of the given sketch.
+// If Create fails the CLI prints an error and exits since to execute further operations a valid Instance is mandatory.
+// If Init returns errors they're printed only.
+func CreateAndInitWithProfile(profileName string, sketchPath *paths.Path) (*rpc.Instance, *rpc.Profile) {
 	instance, err := Create()
 	if err != nil {
 		feedback.Errorf(tr("Error creating instance: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	for _, err := range Init(instance) {
+	profile, errs := InitWithProfile(instance, profileName, sketchPath)
+	for _, err := range errs {
 		feedback.Errorf(tr("Error initializing instance: %v"), err)
 	}
-	return instance
+	return instance, profile
 }
 
 // Create and return a new Instance.
@@ -63,19 +72,31 @@ func Create() (*rpc.Instance, error) {
 // Package and library indexes files are automatically updated if the
 // CLI is run for the first time.
 func Init(instance *rpc.Instance) []error {
+	_, errs := InitWithProfile(instance, "", nil)
+	return errs
+}
+
+// InitWithProfile initializes instance by loading libraries and platforms specified in the given profile of the given sketch.
+// In case of loading failures return a list of errors for each platform or library that we failed to load.
+// Required Package and library indexes files are automatically downloaded.
+func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *paths.Path) (*rpc.Profile, []error) {
 	errs := []error{}
 
 	// In case the CLI is executed for the first time
 	if err := FirstUpdate(instance); err != nil {
-		return append(errs, err)
+		return nil, append(errs, err)
 	}
 
 	downloadCallback := output.ProgressBar()
 	taskCallback := output.TaskProgress()
 
-	err := commands.Init(&rpc.InitRequest{
-		Instance: instance,
-	}, func(res *rpc.InitResponse) {
+	initReq := &rpc.InitRequest{Instance: instance}
+	if sketchPath != nil {
+		initReq.SketchPath = sketchPath.String()
+		initReq.Profile = profileName
+	}
+	var profile *rpc.Profile
+	err := commands.Init(initReq, func(res *rpc.InitResponse) {
 		if st := res.GetError(); st != nil {
 			errs = append(errs, errors.New(st.Message))
 		}
@@ -88,12 +109,16 @@ func Init(instance *rpc.Instance) []error {
 				taskCallback(progress.TaskProgress)
 			}
 		}
+
+		if p := res.GetProfile(); p != nil {
+			profile = p
+		}
 	})
 	if err != nil {
-		return append(errs, err)
+		errs = append(errs, err)
 	}
 
-	return errs
+	return profile, errs
 }
 
 // FirstUpdate downloads libraries and packages indexes if they don't exist.

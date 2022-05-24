@@ -61,6 +61,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	if pm == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
+	lm := commands.GetLibraryManager(req.GetInstance().GetId())
+	if lm == nil {
+		return nil, &arduino.InvalidInstanceError{}
+	}
 
 	logrus.Tracef("Compile %s for %s started", req.GetSketchPath(), req.GetFqbn())
 	if req.GetSketchPath() == "" {
@@ -79,6 +83,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	if fqbnIn == "" {
 		return nil, &arduino.MissingFQBNError{}
 	}
+
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
 		return nil, &arduino.InvalidFQBNError{Cause: err}
@@ -106,6 +111,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	builderCtx := &types.Context{}
 	builderCtx.PackageManager = pm
+	builderCtx.LibrariesManager = lm
 	builderCtx.FQBN = fqbn
 	builderCtx.SketchLocation = sk.FullPath
 	builderCtx.ProgressCB = progressCB
@@ -114,11 +120,13 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.HardwareDirs = configuration.HardwareDirectories(configuration.Settings)
 	builderCtx.BuiltInToolsDirs = configuration.BundleToolsDirectories(configuration.Settings)
 
+	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
 	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
-
 	builderCtx.LibraryDirs = paths.NewPathList(req.Library...)
-
+	if len(builderCtx.OtherLibrariesDirs) > 0 || len(builderCtx.LibraryDirs) > 0 {
+		builderCtx.LibrariesManager = nil // let the builder rebuild the library manager
+	}
 	if req.GetBuildPath() == "" {
 		builderCtx.BuildPath = sk.BuildPath
 	} else {
@@ -158,6 +166,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.ArduinoAPIVersion = "10607"
 
 	// Check if Arduino IDE is installed and get it's libraries location.
+	// TODO: Remove?
 	dataDir := paths.New(configuration.Settings.GetString("directories.Data"))
 	preferencesTxt := dataDir.Join("preferences.txt")
 	ideProperties, err := properties.LoadFromPath(preferencesTxt)
@@ -180,7 +189,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.Stderr = errStream
 	builderCtx.Clean = req.GetClean()
 	builderCtx.OnlyUpdateCompilationDatabase = req.GetCreateCompilationDatabaseOnly()
-
 	builderCtx.SourceOverride = req.GetSourceOverride()
 
 	r = &rpc.CompileResponse{}

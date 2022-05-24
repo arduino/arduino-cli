@@ -107,6 +107,7 @@ nav:
   - Integration options: integration-options.md
   - sketch-build-process.md
   - sketch-specification.md
+  - sketch-project-file.md
   - library-specification.md
   - platform-specification.md
   - Pluggable discovery specification: pluggable-discovery-specification.md

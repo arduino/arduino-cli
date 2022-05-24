@@ -32,7 +32,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/resources"
-	sk "github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/configuration"
@@ -139,22 +139,9 @@ func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateRespon
 		dataDir.Join("tmp"),
 		userAgent,
 	)
-
-	// Create library manager and add libraries directories
 	instance.lm = librariesmanager.NewLibraryManager(
 		dataDir,
 		downloadsDir,
-	)
-
-	// Add directories of libraries bundled with IDE
-	if bundledLibsDir := configuration.IDEBundledLibrariesDir(configuration.Settings); bundledLibsDir != nil {
-		instance.lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
-	}
-
-	// Add libraries directory from config file
-	instance.lm.AddLibrariesDir(
-		configuration.LibrariesDir(configuration.Settings),
-		libraries.User,
 	)
 
 	// Save instance
@@ -185,65 +172,17 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		return &arduino.InvalidInstanceError{}
 	}
 
-	// We need to clear the PackageManager currently in use by this instance
-	// in case this is not the first Init on this instances, that might happen
-	// after reinitializing an instance after installing or uninstalling a core.
-	// If this is not done the information of the uninstall core is kept in memory,
-	// even if it should not.
-	instance.PackageManager.Clear()
-
-	// Load Platforms
-	urls := []string{globals.DefaultIndexURL}
-	urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
-	for _, u := range urls {
-		URL, err := utils.URLParse(u)
-		if err != nil {
-			s := status.Newf(codes.InvalidArgument, tr("Invalid additional URL: %v"), err)
-			responseCallback(&rpc.InitResponse{
-				Message: &rpc.InitResponse_Error{
-					Error: s.Proto(),
-				},
-			})
-			continue
-		}
-
-		if URL.Scheme == "file" {
-			indexFile := paths.New(URL.Path)
-
-			_, err := instance.PackageManager.LoadPackageIndexFromFile(indexFile)
-			if err != nil {
-				s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
-				responseCallback(&rpc.InitResponse{
-					Message: &rpc.InitResponse_Error{
-						Error: s.Proto(),
-					},
-				})
-			}
-			continue
-		}
-
-		if err := instance.PackageManager.LoadPackageIndex(URL); err != nil {
-			s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
-			responseCallback(&rpc.InitResponse{
-				Message: &rpc.InitResponse_Error{
-					Error: s.Proto(),
-				},
-			})
-		}
+	// Setup callback functions
+	if responseCallback == nil {
+		responseCallback = func(r *rpc.InitResponse) {}
 	}
-
-	// We load hardware before verifying builtin tools are installed
-	// otherwise we wouldn't find them and reinstall them each time
-	// and they would never get reloaded.
-	for _, err := range instance.PackageManager.LoadHardware() {
-		s := &arduino.PlatformLoadingError{Cause: err}
+	responseError := func(st *status.Status) {
 		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_Error{
-				Error: s.ToRPCStatus().Proto(),
+				Error: st.Proto(),
 			},
 		})
 	}
-
 	taskCallback := func(msg *rpc.TaskProgress) {
 		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_InitProgress{
@@ -253,7 +192,6 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 			},
 		})
 	}
-
 	downloadCallback := func(msg *rpc.DownloadProgress) {
 		responseCallback(&rpc.InitResponse{
 			Message: &rpc.InitResponse_InitProgress{
@@ -264,33 +202,110 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		})
 	}
 
-	// Get builtin tools
+	// We need to clear the PackageManager currently in use by this instance
+	// in case this is not the first Init on this instances, that might happen
+	// after reinitializing an instance after installing or uninstalling a core.
+	// If this is not done the information of the uninstall core is kept in memory,
+	// even if it should not.
+	pm := instance.PackageManager
+	pm.Clear()
+
+	// Try to extract profile if specified
+	var profile *sketch.Profile
+	if req.GetProfile() != "" {
+		sk, err := sketch.New(paths.New(req.GetSketchPath()))
+		if err != nil {
+			return &arduino.InvalidArgumentError{Cause: err}
+		}
+		profile = sk.GetProfile(req.GetProfile())
+		if profile == nil {
+			return &arduino.UnknownProfileError{Profile: req.GetProfile()}
+		}
+		responseCallback(&rpc.InitResponse{
+			Message: &rpc.InitResponse_Profile{
+				Profile: &rpc.Profile{
+					Name: req.GetProfile(),
+					Fqbn: profile.FQBN,
+					// TODO: Other profile infos may be provided here...
+				},
+			},
+		})
+	}
+
+	loadBuiltinTools := func() []error {
+		builtinPackage := pm.Packages.GetOrCreatePackage("builtin")
+		return pm.LoadToolsFromPackageDir(builtinPackage, pm.PackagesDir.Join("builtin", "tools"))
+	}
+
+	urls := []string{globals.DefaultIndexURL}
+	if profile == nil {
+		urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
+	}
+	for _, u := range urls {
+		URL, err := utils.URLParse(u)
+		if err != nil {
+			s := status.Newf(codes.InvalidArgument, tr("Invalid additional URL: %v"), err)
+			responseError(s)
+			continue
+		}
+
+		if URL.Scheme == "file" {
+			_, err := pm.LoadPackageIndexFromFile(paths.New(URL.Path))
+			if err != nil {
+				s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
+				responseError(s)
+			}
+			continue
+		}
+
+		if err := pm.LoadPackageIndex(URL); err != nil {
+			s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
+			responseError(s)
+		}
+	}
+
+	// Load Platforms
+	if profile == nil {
+		for _, err := range pm.LoadHardware() {
+			s := &arduino.PlatformLoadingError{Cause: err}
+			responseError(s.ToRPCStatus())
+		}
+	} else {
+		// Load platforms from profile
+		errs := pm.LoadHardwareForProfile(
+			profile, true, downloadCallback, taskCallback,
+		)
+		for _, err := range errs {
+			s := &arduino.PlatformLoadingError{Cause: err}
+			responseError(s.ToRPCStatus())
+		}
+
+		// Load "builtin" tools
+		_ = loadBuiltinTools()
+	}
+
+	// We load hardware before verifying builtin tools are installed
+	// otherwise we wouldn't find them and reinstall them each time
+	// and they would never get reloaded.
+
 	builtinToolReleases := []*cores.ToolRelease{}
-	for name, tool := range instance.PackageManager.Packages.GetOrCreatePackage("builtin").Tools {
+	for name, tool := range pm.Packages.GetOrCreatePackage("builtin").Tools {
 		latestRelease := tool.LatestRelease()
 		if latestRelease == nil {
 			s := status.Newf(codes.Internal, tr("can't find latest release of tool %s", name))
-			responseCallback(&rpc.InitResponse{
-				Message: &rpc.InitResponse_Error{
-					Error: s.Proto(),
-				},
-			})
+			responseError(s)
 			continue
 		}
 		builtinToolReleases = append(builtinToolReleases, latestRelease)
 	}
 
-	toolsHaveBeenInstalled := false
 	// Install tools if necessary
+	toolsHaveBeenInstalled := false
 	for _, toolRelease := range builtinToolReleases {
 		installed, err := instance.installToolIfMissing(toolRelease, downloadCallback, taskCallback)
 		if err != nil {
 			s := status.Newf(codes.Internal, err.Error())
-			responseCallback(&rpc.InitResponse{
-				Message: &rpc.InitResponse_Error{
-					Error: s.Proto(),
-				},
-			})
+			responseError(s)
 			continue
 		}
 		toolsHaveBeenInstalled = toolsHaveBeenInstalled || installed
@@ -299,50 +314,92 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	if toolsHaveBeenInstalled {
 		// We installed at least one new tool after loading hardware
 		// so we must reload again otherwise we would never found them.
-		for _, err := range instance.PackageManager.LoadHardware() {
+		for _, err := range loadBuiltinTools() {
 			s := &arduino.PlatformLoadingError{Cause: err}
-			responseCallback(&rpc.InitResponse{
-				Message: &rpc.InitResponse_Error{
-					Error: s.ToRPCStatus().Proto(),
-				},
-			})
+			responseError(s.ToRPCStatus())
 		}
 	}
 
-	for _, err := range instance.PackageManager.LoadDiscoveries() {
+	for _, err := range pm.LoadDiscoveries() {
 		s := &arduino.PlatformLoadingError{Cause: err}
-		responseCallback(&rpc.InitResponse{
-			Message: &rpc.InitResponse_Error{
-				Error: s.ToRPCStatus().Proto(),
-			},
-		})
+		responseError(s.ToRPCStatus())
 	}
 
+	// Create library manager and add libraries directories
+	lm := librariesmanager.NewLibraryManager(
+		pm.IndexDir,
+		pm.DownloadDir,
+	)
+	instance.lm = lm
+
 	// Load libraries
-	for _, pack := range instance.PackageManager.Packages {
+	for _, pack := range pm.Packages {
 		for _, platform := range pack.Platforms {
-			if platformRelease := instance.PackageManager.GetInstalledPlatformRelease(platform); platformRelease != nil {
-				instance.lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
+			if platformRelease := pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
+				lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
 			}
 		}
 	}
 
-	if err := instance.lm.LoadIndex(); err != nil {
+	if err := lm.LoadIndex(); err != nil {
 		s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
-		responseCallback(&rpc.InitResponse{
-			Message: &rpc.InitResponse_Error{
-				Error: s.Proto(),
-			},
-		})
+		responseError(s)
 	}
 
-	for _, err := range instance.lm.RescanLibraries() {
+	if profile == nil {
+		// Add directories of libraries bundled with IDE
+		if bundledLibsDir := configuration.IDEBundledLibrariesDir(configuration.Settings); bundledLibsDir != nil {
+			lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
+		}
+
+		// Add libraries directory from config file
+		lm.AddLibrariesDir(configuration.LibrariesDir(configuration.Settings), libraries.User)
+	} else {
+		// Load libraries required for profile
+		for _, libraryRef := range profile.Libraries {
+			uid := libraryRef.InternalUniqueIdentifier()
+			libRoot := configuration.ProfilesCacheDir(configuration.Settings).Join(uid)
+			libDir := libRoot.Join(libraryRef.Library)
+
+			if !libDir.IsDir() {
+				// Download library
+				taskCallback(&rpc.TaskProgress{Name: tr("Downloading library %s", libraryRef)})
+				libRelease := lm.Index.FindRelease(&librariesindex.Reference{
+					Name:    libraryRef.Library,
+					Version: libraryRef.Version,
+				})
+				if libRelease == nil {
+					taskCallback(&rpc.TaskProgress{Name: tr("Library %s not found", libraryRef)})
+					err := &arduino.LibraryNotFoundError{Library: libraryRef.Library}
+					responseError(err.ToRPCStatus())
+					continue
+				}
+				if err := libRelease.Resource.Download(lm.DownloadsDir, nil, libRelease.String(), downloadCallback); err != nil {
+					taskCallback(&rpc.TaskProgress{Name: tr("Error downloading library %s", libraryRef)})
+					e := &arduino.FailedLibraryInstallError{Cause: err}
+					responseError(e.ToRPCStatus())
+					continue
+				}
+				taskCallback(&rpc.TaskProgress{Completed: true})
+
+				// Install library
+				taskCallback(&rpc.TaskProgress{Name: tr("Installing library %s", libraryRef)})
+				if err := libRelease.Resource.Install(lm.DownloadsDir, libRoot, libDir); err != nil {
+					taskCallback(&rpc.TaskProgress{Name: tr("Error installing library %s", libraryRef)})
+					e := &arduino.FailedLibraryInstallError{Cause: err}
+					responseError(e.ToRPCStatus())
+					continue
+				}
+				taskCallback(&rpc.TaskProgress{Completed: true})
+			}
+
+			lm.AddLibrariesDir(libRoot, libraries.User)
+		}
+	}
+
+	for _, err := range lm.RescanLibraries() {
 		s := status.Newf(codes.FailedPrecondition, tr("Loading libraries: %v"), err)
-		responseCallback(&rpc.InitResponse{
-			Message: &rpc.InitResponse_Error{
-				Error: s.Proto(),
-			},
-		})
+		responseError(s)
 	}
 
 	// Refreshes the locale used, this will change the
@@ -688,7 +745,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB rpc.Downlo
 				}
 
 				// Downloads platform
-				if err := pm.DownloadPlatformRelease(latest, downloaderConfig, latest.String(), downloadCB); err != nil {
+				if err := pm.DownloadPlatformRelease(latest, downloaderConfig, downloadCB); err != nil {
 					return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", latest), Cause: err}
 				}
 
@@ -769,29 +826,29 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB rpc.Downlo
 // LoadSketch collects and returns all files composing a sketch
 func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketchResponse, error) {
 	// TODO: This should be a ToRpc function for the Sketch struct
-	sketch, err := sk.New(paths.New(req.SketchPath))
+	sk, err := sketch.New(paths.New(req.SketchPath))
 	if err != nil {
 		return nil, &arduino.CantOpenSketchError{Cause: err}
 	}
 
-	otherSketchFiles := make([]string, sketch.OtherSketchFiles.Len())
-	for i, file := range sketch.OtherSketchFiles {
+	otherSketchFiles := make([]string, sk.OtherSketchFiles.Len())
+	for i, file := range sk.OtherSketchFiles {
 		otherSketchFiles[i] = file.String()
 	}
 
-	additionalFiles := make([]string, sketch.AdditionalFiles.Len())
-	for i, file := range sketch.AdditionalFiles {
+	additionalFiles := make([]string, sk.AdditionalFiles.Len())
+	for i, file := range sk.AdditionalFiles {
 		additionalFiles[i] = file.String()
 	}
 
-	rootFolderFiles := make([]string, sketch.RootFolderFiles.Len())
-	for i, file := range sketch.RootFolderFiles {
+	rootFolderFiles := make([]string, sk.RootFolderFiles.Len())
+	for i, file := range sk.RootFolderFiles {
 		rootFolderFiles[i] = file.String()
 	}
 
 	return &rpc.LoadSketchResponse{
-		MainFile:         sketch.MainFile.String(),
-		LocationPath:     sketch.FullPath.String(),
+		MainFile:         sk.MainFile.String(),
+		LocationPath:     sk.FullPath.String(),
 		OtherSketchFiles: otherSketchFiles,
 		AdditionalFiles:  additionalFiles,
 		RootFolderFiles:  rootFolderFiles,

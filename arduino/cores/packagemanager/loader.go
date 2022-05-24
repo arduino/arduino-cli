@@ -128,7 +128,7 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) []error {
 		toolsSubdirPath := packagerPath.Join("tools")
 		if toolsSubdirPath.IsDir() {
 			pm.Log.Infof("Checking existence of 'tools' path: %s", toolsSubdirPath)
-			merr = append(merr, pm.loadToolsFromPackage(targetPackage, toolsSubdirPath)...)
+			merr = append(merr, pm.LoadToolsFromPackageDir(targetPackage, toolsSubdirPath)...)
 		}
 		// If the Package does not contain Platforms or Tools we remove it since does not contain anything valuable
 		if len(targetPackage.Platforms) == 0 && len(targetPackage.Tools) == 0 {
@@ -589,7 +589,9 @@ func convertUploadToolsToPluggableDiscovery(props *properties.Map) {
 	props.Merge(propsToAdd)
 }
 
-func (pm *PackageManager) loadToolsFromPackage(targetPackage *cores.Package, toolsPath *paths.Path) []error {
+// LoadToolsFromPackageDir loads a set of tools from the given toolsPath. The tools will be loaded
+// in the given *Package.
+func (pm *PackageManager) LoadToolsFromPackageDir(targetPackage *cores.Package, toolsPath *paths.Path) []error {
 	pm.Log.Infof("Loading tools from dir: %s", toolsPath)
 
 	var merr []error
@@ -712,7 +714,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath *paths.Path) er
 	} else {
 		// otherwise load the tools inside the unnamed package
 		unnamedPackage := pm.Packages.GetOrCreatePackage("")
-		pm.loadToolsFromPackage(unnamedPackage, toolsPath)
+		pm.LoadToolsFromPackageDir(unnamedPackage, toolsPath)
 	}
 	return nil
 }

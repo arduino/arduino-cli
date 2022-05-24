@@ -66,6 +66,8 @@ the `data` folder, so any non-code files outside the `data` folder are stripped.
 
 ### Metadata
 
+#### `sketch.json`
+
 Arduino CLI and Arduino Web Editor use a file named sketch.json, located in the sketch root folder, to store sketch
 metadata.
 
@@ -78,6 +80,15 @@ commands when compiling or uploading the sketch.
 The `included_libs` key defines the library versions the Arduino Web Editor uses when the sketch is compiled. This is
 Arduino Web Editor specific because all versions of all the Library Manager libraries are pre-installed in Arduino Web
 Editor, while only one version of each library may be installed when using the other Arduino development software.
+
+#### Sketch project file
+
+This is an optional file named `sketch.yaml`, located in the root folder of the sketch.
+
+Inside the sketch project file the user can define one or more "profiles": each profile is a description of all the
+resources needed to build the sketch (platform and libraries each pinned to a specific version).
+
+For more information see the [sketch project file](sketch-project-file.md) documentation.
 
 ### Secrets
 

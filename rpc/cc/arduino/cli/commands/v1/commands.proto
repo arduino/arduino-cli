@@ -198,6 +198,10 @@ message CreateResponse {
 message InitRequest {
   // An Arduino Core instance.
   Instance instance = 1;
+  // Profile to use
+  string profile = 2;
+  // The path where the sketch is stored
+  string sketch_path = 3;
 }
 
 message InitResponse {
@@ -210,6 +214,8 @@ message InitResponse {
   oneof message {
     Progress init_progress = 1;
     google.rpc.Status error = 2;
+    // Selected profile information
+    Profile profile = 3;
   }
 }
 
