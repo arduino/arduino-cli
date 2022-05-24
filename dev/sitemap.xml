@@ -2,347 +2,347 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/CONTRIBUTING/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/FAQ/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/UPGRADING/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/command-line-completion/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/configuration/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/getting-started/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/installation/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/integration-options/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/library-specification/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/package_index_json-specification/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/platform-specification/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/pluggable-discovery-specification/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/pluggable-monitor-specification/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/sketch-build-process/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/sketch-specification/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_board/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_board_attach/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_board_details/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_board_list/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_board_listall/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_board_search/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_burn-bootloader/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_cache/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_cache_clean/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_compile/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_completion/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_config/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_config_add/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_config_delete/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_config_dump/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_config_init/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_config_remove/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_config_set/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_core/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_core_download/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_core_install/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_core_list/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_core_search/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_core_uninstall/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_core_update-index/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_core_upgrade/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_daemon/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_debug/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_lib/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_lib_deps/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_lib_download/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_lib_examples/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_lib_install/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_lib_list/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_lib_search/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_lib_uninstall/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_lib_update-index/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_lib_upgrade/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_monitor/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_outdated/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_sketch/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_sketch_archive/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_sketch_new/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_update/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_upgrade/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_upload/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/commands/arduino-cli_version/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/guides/secure-boot/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/rpc/commands/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/rpc/debug/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/rpc/monitor/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://arduino.github.io/arduino-cli/dev/rpc/settings/</loc>
-         <lastmod>2022-05-23</lastmod>
+         <lastmod>2022-05-24</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
