@@ -26,5 +26,5 @@ var (
 	// VersionInfo contains all info injected during build
 	VersionInfo = version.NewInfo(filepath.Base(os.Args[0]))
 	// DefaultIndexURL is the default index url
-	DefaultIndexURL = "https://downloads.arduino.cc/packages/package_index.json"
+	DefaultIndexURL = "https://downloads.arduino.cc/packages/package_index.tar.bz2"
 )

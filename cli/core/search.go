@@ -134,10 +134,9 @@ func indexesNeedUpdating(duration string) bool {
 
 	now := time.Now()
 	modTimeThreshold, err := time.ParseDuration(duration)
-	// Not the most elegant way of handling this error
-	// but it does its job
 	if err != nil {
-		modTimeThreshold, _ = time.ParseDuration("24h")
+		feedback.Error(tr("Invalid timeout: %s", err))
+		os.Exit(errorcodes.ErrBadArgument)
 	}
 
 	urls := []string{globals.DefaultIndexURL}
@@ -153,7 +152,18 @@ func indexesNeedUpdating(duration string) bool {
 			continue
 		}
 
-		coreIndexPath := indexpath.Join(path.Base(URL.Path))
+		// should handle:
+		// - package_index.json
+		// - package_index.json.sig
+		// - package_index.json.gz
+		// - package_index.tar.bz2
+		indexFileName := path.Base(URL.Path)
+		indexFileName = strings.TrimSuffix(indexFileName, ".tar.bz2")
+		indexFileName = strings.TrimSuffix(indexFileName, ".gz")
+		indexFileName = strings.TrimSuffix(indexFileName, ".sig")
+		indexFileName = strings.TrimSuffix(indexFileName, ".json")
+		// and obtain package_index.json as result
+		coreIndexPath := indexpath.Join(indexFileName + ".json")
 		if coreIndexPath.NotExist() {
 			return true
 		}

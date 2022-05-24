@@ -18,6 +18,9 @@ package resources
 import (
 	"crypto"
 	"encoding/hex"
+	"net"
+	"net/http"
+	"net/url"
 	"testing"
 
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -109,4 +112,39 @@ func TestDownloadAndChecksums(t *testing.T) {
 	r.ArchiveFileName = "not-existent.zip"
 	_, err = r.TestLocalArchiveChecksum(tmp)
 	require.Error(t, err)
+}
+
+func TestIndexDownloadAndSignatureWithinArchive(t *testing.T) {
+	// Spawn test webserver
+	mux := http.NewServeMux()
+	fs := http.FileServer(http.Dir("testdata"))
+	mux.Handle("/", fs)
+	server := &http.Server{Handler: mux}
+	ln, err := net.Listen("tcp", "127.0.0.1:")
+	require.NoError(t, err)
+	defer ln.Close()
+	go server.Serve(ln)
+
+	validIdxURL, err := url.Parse("http://" + ln.Addr().String() + "/valid/package_index.tar.bz2")
+	require.NoError(t, err)
+	idxResource := &IndexResource{URL: validIdxURL}
+	destDir, err := paths.MkTempDir("", "")
+	require.NoError(t, err)
+	defer destDir.RemoveAll()
+	err = idxResource.Download(destDir, func(curr *rpc.DownloadProgress) {})
+	require.NoError(t, err)
+	require.True(t, destDir.Join("package_index.json").Exist())
+	require.True(t, destDir.Join("package_index.json.sig").Exist())
+
+	invalidIdxURL, err := url.Parse("http://" + ln.Addr().String() + "/invalid/package_index.tar.bz2")
+	require.NoError(t, err)
+	invIdxResource := &IndexResource{URL: invalidIdxURL}
+	invDestDir, err := paths.MkTempDir("", "")
+	require.NoError(t, err)
+	defer invDestDir.RemoveAll()
+	err = invIdxResource.Download(invDestDir, func(curr *rpc.DownloadProgress) {})
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "invalid signature")
+	require.False(t, invDestDir.Join("package_index.json").Exist())
+	require.False(t, invDestDir.Join("package_index.json.sig").Exist())
 }

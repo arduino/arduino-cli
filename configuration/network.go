@@ -26,7 +26,10 @@ import (
 
 // UserAgent returns the user agent (mainly used by HTTP clients)
 func UserAgent(settings *viper.Viper) string {
-	subComponent := settings.GetString("network.user_agent_ext")
+	subComponent := ""
+	if settings != nil {
+		subComponent = settings.GetString("network.user_agent_ext")
+	}
 	if subComponent != "" {
 		subComponent = " " + subComponent
 	}
@@ -41,7 +44,7 @@ func UserAgent(settings *viper.Viper) string {
 
 // NetworkProxy returns the proxy configuration (mainly used by HTTP clients)
 func NetworkProxy(settings *viper.Viper) (*url.URL, error) {
-	if !settings.IsSet("network.proxy") {
+	if settings == nil || !settings.IsSet("network.proxy") {
 		return nil, nil
 	}
 	if proxyConfig := settings.GetString("network.proxy"); proxyConfig == "" {

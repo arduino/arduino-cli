@@ -16,6 +16,7 @@
 package resources
 
 import (
+	"context"
 	"net/url"
 	"path"
 	"strings"
@@ -25,6 +26,8 @@ import (
 	"github.com/arduino/arduino-cli/arduino/security"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
+	"github.com/codeclysm/extract/v3"
+	"github.com/sirupsen/logrus"
 	"go.bug.st/downloader/v2"
 )
 
@@ -56,8 +59,43 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadP
 		return &arduino.FailedDownloadError{Message: tr("Error downloading index '%s'", res.URL), Cause: err}
 	}
 
+	var signaturePath, tmpSignaturePath *paths.Path
+	hasSignature := false
+
 	// Expand the index if it is compressed
-	if strings.HasSuffix(indexFileName, ".gz") {
+	if strings.HasSuffix(indexFileName, ".tar.bz2") {
+		indexFileName = strings.TrimSuffix(indexFileName, ".tar.bz2") + ".json" // == package_index.json
+		signatureFileName := indexFileName + ".sig"
+		signaturePath = destDir.Join(signatureFileName)
+
+		// .tar.bz2 archive may contain both index and signature
+
+		// Extract archive in a tmp/archive subdirectory
+		f, err := tmpIndexPath.Open()
+		if err != nil {
+			return &arduino.PermissionDeniedError{Message: tr("Error opening %s", tmpIndexPath), Cause: err}
+		}
+		defer f.Close()
+		tmpArchivePath := tmp.Join("archive")
+		_ = tmpArchivePath.MkdirAll()
+		if err := extract.Bz2(context.Background(), f, tmpArchivePath.String(), nil); err != nil {
+			return &arduino.PermissionDeniedError{Message: tr("Error extracting %s", tmpIndexPath), Cause: err}
+		}
+
+		// Look for index.json
+		tmpIndexPath = tmpArchivePath.Join(indexFileName)
+		if !tmpIndexPath.Exist() {
+			return &arduino.NotFoundError{Message: tr("Invalid archive: file %{1}s not found in archive %{2}s", indexFileName, tmpArchivePath.Base())}
+		}
+
+		// Look for signature
+		if t := tmpArchivePath.Join(signatureFileName); t.Exist() {
+			tmpSignaturePath = t
+			hasSignature = true
+		} else {
+			logrus.Infof("No signature %s found in package index archive %s", signatureFileName, tmpArchivePath.Base())
+		}
+	} else if strings.HasSuffix(indexFileName, ".gz") {
 		indexFileName = strings.TrimSuffix(indexFileName, ".gz") // == package_index.json
 		tmpUnzippedIndexPath := tmp.Join(indexFileName)
 		if err := paths.GUnzip(tmpIndexPath, tmpUnzippedIndexPath); err != nil {
@@ -67,7 +105,6 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadP
 	}
 
 	// Check the signature if needed
-	var signaturePath, tmpSignaturePath *paths.Path
 	if res.SignatureURL != nil {
 		// Compose signature URL
 		signatureFileName := path.Base(res.SignatureURL.Path)
@@ -79,6 +116,10 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadP
 			return &arduino.FailedDownloadError{Message: tr("Error downloading index signature '%s'", res.SignatureURL), Cause: err}
 		}
 
+		hasSignature = true
+	}
+
+	if hasSignature {
 		// Check signature...
 		if valid, _, err := security.VerifyArduinoDetachedSignature(tmpIndexPath, tmpSignaturePath); err != nil {
 			return &arduino.PermissionDeniedError{Message: tr("Error verifying signature"), Cause: err}
@@ -109,12 +150,12 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadP
 	if err := tmpIndexPath.CopyTo(indexPath); err != nil {
 		return &arduino.PermissionDeniedError{Message: tr("Error saving downloaded index"), Cause: err}
 	}
-	if res.SignatureURL != nil {
+	if hasSignature {
 		if err := tmpSignaturePath.CopyTo(signaturePath); err != nil {
 			return &arduino.PermissionDeniedError{Message: tr("Error saving downloaded index signature"), Cause: err}
 		}
 	}
-	oldIndex.Remove()
-	oldSignature.Remove()
+	_ = oldIndex.Remove()
+	_ = oldSignature.Remove()
 	return nil
 }
