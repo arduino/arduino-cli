@@ -1,0 +1,12 @@
+profiles:
+  avr1:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.5)
+
+  avr2:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.5)
+    libraries:
+      - Arduino_JSON (0.1.0)

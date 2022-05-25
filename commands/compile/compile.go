@@ -124,7 +124,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
 	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
 	builderCtx.LibraryDirs = paths.NewPathList(req.Library...)
-	if len(builderCtx.OtherLibrariesDirs) > 0 || len(builderCtx.LibraryDirs) > 0 {
+	if len(req.GetLibraries()) > 0 || len(req.GetLibrary()) > 0 {
 		builderCtx.LibrariesManager = nil // let the builder rebuild the library manager
 	}
 	if req.GetBuildPath() == "" {
