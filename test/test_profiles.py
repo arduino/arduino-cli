@@ -21,6 +21,7 @@ def test_compile_with_profiles(run_command, copy_sketch):
     sketch_path = copy_sketch("sketch_with_profile")
 
     # use profile without a required library -> should fail
+    assert run_command(["lib", "install", "Arduino_JSON"])
     result = run_command(["compile", "-m", "avr1", sketch_path])
     assert result.failed
 
