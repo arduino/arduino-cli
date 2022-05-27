@@ -101,9 +101,9 @@ message CompileResponse {
   // The size of the executable split by sections
   repeated ExecutableSectionSize executable_sections_size = 5;
   // The platform where the board is defined
-  PlatformReference board_platform = 6;
+  InstalledPlatformReference board_platform = 6;
   // The platform used for the build (if referenced from the board platform)
-  PlatformReference build_platform = 7;
+  InstalledPlatformReference build_platform = 7;
   // Completions reports of the compilation process (stream)
   TaskProgress progress = 8;
 }

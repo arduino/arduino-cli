@@ -359,10 +359,11 @@ func (release *PlatformRelease) String() string {
 }
 
 // ToRPCPlatformReference creates a gRPC PlatformReference message out of this PlatformRelease
-func (release *PlatformRelease) ToRPCPlatformReference() *rpc.PlatformReference {
-	return &rpc.PlatformReference{
-		Id:      release.Platform.String(),
-		Version: release.Version.String(),
+func (release *PlatformRelease) ToRPCPlatformReference() *rpc.InstalledPlatformReference {
+	return &rpc.InstalledPlatformReference{
+		Id:         release.Platform.String(),
+		Version:    release.Version.String(),
+		InstallDir: release.InstallDir.String(),
 	}
 }
 
