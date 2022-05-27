@@ -33,6 +33,8 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/table"
+	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -316,6 +318,45 @@ func (r *compileResult) Data() interface{} {
 }
 
 func (r *compileResult) String() string {
-	// The output is already printed via os.Stdout/os.Stdin
-	return ""
+	titleColor := color.New(color.FgHiGreen)
+	nameColor := color.New(color.FgHiYellow)
+	pathColor := color.New(color.FgHiBlack)
+	build := r.BuilderResult
+
+	res := "\n"
+	libraries := table.New()
+	if len(build.GetUsedLibraries()) > 0 {
+		libraries.SetHeader(
+			table.NewCell(tr("Used library"), titleColor),
+			table.NewCell(tr("Version"), titleColor),
+			table.NewCell(tr("Path"), pathColor))
+		for _, l := range build.GetUsedLibraries() {
+			libraries.AddRow(
+				table.NewCell(l.GetName(), nameColor),
+				l.GetVersion(),
+				table.NewCell(l.GetInstallDir(), pathColor))
+		}
+	}
+	res += libraries.Render() + "\n"
+
+	platforms := table.New()
+	platforms.SetHeader(
+		table.NewCell(tr("Used platform"), titleColor),
+		table.NewCell(tr("Version"), titleColor),
+		table.NewCell(tr("Path"), pathColor))
+	boardPlatform := build.GetBoardPlatform()
+	platforms.AddRow(
+		table.NewCell(boardPlatform.GetId(), nameColor),
+		boardPlatform.GetVersion(),
+		table.NewCell(boardPlatform.GetInstallDir(), pathColor))
+	if buildPlatform := build.GetBuildPlatform(); buildPlatform != nil &&
+		buildPlatform.Id != boardPlatform.Id &&
+		buildPlatform.Version != boardPlatform.Version {
+		platforms.AddRow(
+			table.NewCell(buildPlatform.GetId(), nameColor),
+			buildPlatform.GetVersion(),
+			table.NewCell(buildPlatform.GetInstallDir(), pathColor))
+	}
+	res += platforms.Render()
+	return res
 }
