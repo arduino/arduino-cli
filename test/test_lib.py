@@ -58,7 +58,7 @@ def test_list(run_command):
     assert result.ok
     assert "" == result.stderr
     assert "No libraries installed." in result.stdout.strip()
-    result = run_command(["lib", "list", "--format", "json"])
+    result = run_command(["lib", "list", "--format", "json"], hide=True)
     assert result.ok
     assert "" == result.stderr
     assert 0 == len(json.loads(result.stdout))
@@ -83,7 +83,7 @@ def test_list(run_command):
     assert "An efficient and elegant JSON library..." == toks[4]
 
     # Look at the JSON output
-    result = run_command(["lib", "list", "--format", "json"])
+    result = run_command(["lib", "list", "--format", "json"], hide=True)
     assert result.ok
     assert "" == result.stderr
     data = json.loads(result.stdout)
@@ -159,7 +159,7 @@ def test_list_with_fqbn(run_command):
     assert "ArduinoJson" == toks[0]
 
     # Look at the JSON output
-    result = run_command(["lib", "list", "-b", "arduino:avr:uno", "--format", "json"])
+    result = run_command(["lib", "list", "-b", "arduino:avr:uno", "--format", "json"], hide=True)
     assert result.ok
     assert "" == result.stderr
     data = json.loads(result.stdout)
@@ -180,7 +180,7 @@ def test_list_provides_includes_fallback(run_command):
     assert run_command(["lib", "install", "ArduinoJson@6.17.2"])
 
     # List all libraries, even the ones installed with the above core
-    result = run_command(["lib", "list", "--all", "--fqbn", "arduino:avr:uno", "--format", "json"])
+    result = run_command(["lib", "list", "--all", "--fqbn", "arduino:avr:uno", "--format", "json"], hide=True)
     assert result.ok
     assert "" == result.stderr
 
@@ -545,7 +545,7 @@ def test_lib_list_with_updatable_flag(run_command):
     assert "An efficient and elegant JSON library..." == line[4]
 
     # Look at the JSON output
-    res = run_command(["lib", "list", "--updatable", "--format", "json"])
+    res = run_command(["lib", "list", "--updatable", "--format", "json"], hide=True)
     assert res.ok
     assert "" == res.stderr
     data = json.loads(res.stdout)
