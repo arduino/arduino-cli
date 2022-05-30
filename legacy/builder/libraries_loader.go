@@ -38,12 +38,10 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 			lm.AddLibrariesDir(folder, libraries.IDEBuiltIn)
 		}
 
-		actualPlatform := ctx.ActualPlatform
-		platform := ctx.TargetPlatform
-		if actualPlatform != platform {
-			lm.AddPlatformReleaseLibrariesDir(actualPlatform, libraries.ReferencedPlatformBuiltIn)
+		if ctx.ActualPlatform != ctx.TargetPlatform {
+			lm.AddPlatformReleaseLibrariesDir(ctx.ActualPlatform, libraries.ReferencedPlatformBuiltIn)
 		}
-		lm.AddPlatformReleaseLibrariesDir(platform, libraries.PlatformBuiltIn)
+		lm.AddPlatformReleaseLibrariesDir(ctx.TargetPlatform, libraries.PlatformBuiltIn)
 
 		librariesFolders := ctx.OtherLibrariesDirs
 		if err := librariesFolders.ToAbs(); err != nil {
