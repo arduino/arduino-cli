@@ -72,8 +72,19 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 	}
 
 	resolver := librariesresolver.NewCppResolver()
-	if err := resolver.ScanFromLibrariesManager(ctx.LibrariesManager); err != nil {
+	if err := resolver.ScanIDEBuiltinLibraries(ctx.LibrariesManager); err != nil {
 		return errors.WithStack(err)
+	}
+	if err := resolver.ScanUserAndUnmanagedLibraries(ctx.LibrariesManager); err != nil {
+		return errors.WithStack(err)
+	}
+	if err := resolver.ScanPlatformLibraries(ctx.LibrariesManager, ctx.TargetPlatform); err != nil {
+		return errors.WithStack(err)
+	}
+	if ctx.ActualPlatform != ctx.TargetPlatform {
+		if err := resolver.ScanPlatformLibraries(ctx.LibrariesManager, ctx.ActualPlatform); err != nil {
+			return errors.WithStack(err)
+		}
 	}
 	ctx.LibrariesResolver = resolver
 
