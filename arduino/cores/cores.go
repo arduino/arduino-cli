@@ -360,10 +360,15 @@ func (release *PlatformRelease) String() string {
 
 // ToRPCPlatformReference creates a gRPC PlatformReference message out of this PlatformRelease
 func (release *PlatformRelease) ToRPCPlatformReference() *rpc.InstalledPlatformReference {
+	url := release.Platform.Package.URL
+	if strings.HasPrefix(url, "https://downloads.arduino.cc/packages/package_index.") {
+		url = ""
+	}
 	return &rpc.InstalledPlatformReference{
 		Id:         release.Platform.String(),
 		Version:    release.Version.String(),
 		InstallDir: release.InstallDir.String(),
+		PackageUrl: url,
 	}
 }
 

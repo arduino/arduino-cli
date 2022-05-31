@@ -89,6 +89,8 @@ message InstalledPlatformReference {
   string version = 2;
   // Installation directory of the platform
   string install_dir = 3;
+  // 3rd party platform URL
+  string package_url = 4;
 }
 
 message Board {
