@@ -516,7 +516,7 @@ def test_board_details_list_programmers_without_flag(run_command):
     run_command(["core", "update-index"])
     # Download samd core pinned to 1.8.6
     run_command(["core", "install", "arduino:samd@1.8.6"])
-    result = run_command(["board", "details", "-b", "arduino:samd:nano_33_iot"])
+    result = run_command(["board", "details", "-b", "arduino:samd:nano_33_iot"], hide=True)
     assert result.ok
     lines = [l.strip().split() for l in result.stdout.splitlines()]
     assert ["Programmers:", "Id", "Name"] in lines
@@ -529,7 +529,7 @@ def test_board_details_list_programmers_flag(run_command):
     run_command(["core", "update-index"])
     # Download samd core pinned to 1.8.6
     run_command(["core", "install", "arduino:samd@1.8.6"])
-    result = run_command(["board", "details", "-b", "arduino:samd:nano_33_iot", "--list-programmers"])
+    result = run_command(["board", "details", "-b", "arduino:samd:nano_33_iot", "--list-programmers"], hide=True)
     assert result.ok
 
     lines = [l.strip() for l in result.stdout.splitlines()]

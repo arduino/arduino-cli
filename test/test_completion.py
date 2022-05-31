@@ -135,11 +135,11 @@ def test_config_completion(run_command):
 # here we test if the completions coming from the libs are working
 def test_lib_completion(run_command):
     assert run_command(["lib", "update-index"])
-    result = run_command(["__complete", "lib", "install", ""])
+    result = run_command(["__complete", "lib", "install", ""], hide=True)
     assert "WiFi101" in result.stdout
-    result = run_command(["__complete", "lib", "download", ""])
+    result = run_command(["__complete", "lib", "download", ""], hide=True)
     assert "WiFi101" in result.stdout
-    result = run_command(["__complete", "lib", "uninstall", ""])
+    result = run_command(["__complete", "lib", "uninstall", ""], hide=True)
     assert "WiFi101" not in result.stdout  # not yet installed
 
     assert run_command(["lib", "install", "WiFi101"])
