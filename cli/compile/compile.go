@@ -291,9 +291,13 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			fmt.Println(tr("Currently, Build Profiles only support libraries available through Arduino Library Manager."))
 		}
 
+		newProfileName := "my_profile_name"
+		if split := strings.Split(compileRequest.GetFqbn(), ":"); len(split) > 2 {
+			newProfileName = split[2]
+		}
 		fmt.Println()
 		fmt.Println("profile:")
-		fmt.Println("  my_profile_name:")
+		fmt.Println("  " + newProfileName + ":")
 		fmt.Println("    fqbn: " + compileRequest.GetFqbn())
 		fmt.Println("    platforms:")
 		boardPlatform := compileRes.GetBoardPlatform()
