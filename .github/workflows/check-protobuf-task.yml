@@ -95,9 +95,9 @@ jobs:
 
       - name: Install buf (protoc linter)
         run: |
-          go install github.com/bufbuild/buf/cmd/buf@latest
-          go install github.com/bufbuild/buf/cmd/protoc-gen-buf-breaking@latest
-          go install github.com/bufbuild/buf/cmd/protoc-gen-buf-lint@latest
+          go install github.com/bufbuild/buf/cmd/buf@v1.4.0
+          go install github.com/bufbuild/buf/cmd/protoc-gen-buf-breaking@v1.4.0
+          go install github.com/bufbuild/buf/cmd/protoc-gen-buf-lint@v1.4.0
 
       - name: Install Task
         uses: arduino/setup-task@v1
