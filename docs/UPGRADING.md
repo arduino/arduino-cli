@@ -13,6 +13,17 @@ but since it has been the default behaviour from a very long time we decided to 
 If a compilation fail for a missing bundled library, you can fix it just by installing the missing library from the
 library manager as usual.
 
+### gRPC: Changes in message `cc.arduino.cli.commands.v1.PlatformReference`
+
+The gRPC message structure `cc.arduino.cli.commands.v1.PlatformReference` has been renamed to
+`cc.arduino.cli.commands.v1.InstalledPlatformReference`, and some new fields have been added:
+
+- `install_dir` is the installation directory of the platform
+- `package_url` is the 3rd party platform URL of the platform
+
+It is currently used only in `cc.arduino.cli.commands.v1.CompileResponse`, so the field type has been changed as well.
+Old gRPC clients must only update gRPC bindings. They can safely ignore the new fields if not needed.
+
 ### golang API: PackageManager.DownloadPlatformRelease no longer need `label` parameter
 
 ```go
