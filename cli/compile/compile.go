@@ -70,6 +70,7 @@ var (
 	clean                   bool                 // Cleanup the build folder and do not use any cached build
 	compilationDatabaseOnly bool                 // Only create compilation database without actually compiling
 	sourceOverrides         string               // Path to a .json file that contains a set of replacements of the sketch source code.
+	dumpProfile             bool                 // Create and print a profile configuration from the build
 	// library and libraries sound similar but they're actually different.
 	// library expects a path to the root folder of one single library.
 	// libraries expects a path to a directory containing multiple libraries, similarly to the <directories.user>/libraries path.
@@ -95,6 +96,7 @@ func NewCommand() *cobra.Command {
 
 	fqbnArg.AddToCommand(compileCommand)
 	profileArg.AddToCommand(compileCommand)
+	compileCommand.Flags().BoolVar(&dumpProfile, "dump-profile", false, tr("Create and print a profile configuration from the build."))
 	compileCommand.Flags().BoolVar(&showProperties, "show-properties", false, tr("Show all build properties used instead of compiling."))
 	compileCommand.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
 	compileCommand.Flags().StringVar(&buildCachePath, "build-cache-path", "", tr("Builds of 'core.a' are saved into this path to be cached and reused."))
@@ -267,6 +269,50 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		if uploadError != nil {
 			feedback.Errorf(tr("Error during Upload: %v"), uploadError)
 			os.Exit(errorcodes.ErrGeneric)
+		}
+	}
+
+	if dumpProfile {
+		libs := ""
+		hasVendoredLibs := false
+		for _, lib := range compileRes.GetUsedLibraries() {
+			if lib.Location != rpc.LibraryLocation_LIBRARY_LOCATION_USER && lib.Location != rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED {
+				continue
+			}
+			if lib.GetVersion() == "" {
+				hasVendoredLibs = true
+				continue
+			}
+			libs += fmt.Sprintln("      - " + lib.GetName() + " (" + lib.GetVersion() + ")")
+		}
+		if hasVendoredLibs {
+			fmt.Println()
+			fmt.Println(tr("WARNING: The sketch is compiled using one or more custom libraries."))
+			fmt.Println(tr("Currently, Build Profiles only support libraries available through Arduino Library Manager."))
+		}
+
+		fmt.Println()
+		fmt.Println("profile:")
+		fmt.Println("  my_profile_name:")
+		fmt.Println("    fqbn: " + compileRequest.GetFqbn())
+		fmt.Println("    platforms:")
+		boardPlatform := compileRes.GetBoardPlatform()
+		fmt.Println("      - platform: " + boardPlatform.GetId() + " (" + boardPlatform.GetVersion() + ")")
+		if url := boardPlatform.GetPackageUrl(); url != "" {
+			fmt.Println("        platform_index_url: " + url)
+		}
+
+		if buildPlatform := compileRes.GetBuildPlatform(); buildPlatform != nil &&
+			buildPlatform.Id != boardPlatform.Id &&
+			buildPlatform.Version != boardPlatform.Version {
+			fmt.Println("      - platform: " + buildPlatform.GetId() + " (" + buildPlatform.GetVersion() + ")")
+			if url := buildPlatform.GetPackageUrl(); url != "" {
+				fmt.Println("        platform_index_url: " + url)
+			}
+		}
+		if len(libs) > 0 {
+			fmt.Println("    libraries:")
+			fmt.Print(libs)
 		}
 	}
 
