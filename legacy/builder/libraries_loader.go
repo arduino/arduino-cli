@@ -38,12 +38,10 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 			lm.AddLibrariesDir(folder, libraries.IDEBuiltIn)
 		}
 
-		actualPlatform := ctx.ActualPlatform
-		platform := ctx.TargetPlatform
-		if actualPlatform != platform {
-			lm.AddPlatformReleaseLibrariesDir(actualPlatform, libraries.ReferencedPlatformBuiltIn)
+		if ctx.ActualPlatform != ctx.TargetPlatform {
+			lm.AddPlatformReleaseLibrariesDir(ctx.ActualPlatform, libraries.ReferencedPlatformBuiltIn)
 		}
-		lm.AddPlatformReleaseLibrariesDir(platform, libraries.PlatformBuiltIn)
+		lm.AddPlatformReleaseLibrariesDir(ctx.TargetPlatform, libraries.PlatformBuiltIn)
 
 		librariesFolders := ctx.OtherLibrariesDirs
 		if err := librariesFolders.ToAbs(); err != nil {
@@ -72,8 +70,19 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 	}
 
 	resolver := librariesresolver.NewCppResolver()
-	if err := resolver.ScanFromLibrariesManager(ctx.LibrariesManager); err != nil {
+	if err := resolver.ScanIDEBuiltinLibraries(ctx.LibrariesManager); err != nil {
 		return errors.WithStack(err)
+	}
+	if err := resolver.ScanUserAndUnmanagedLibraries(ctx.LibrariesManager); err != nil {
+		return errors.WithStack(err)
+	}
+	if err := resolver.ScanPlatformLibraries(ctx.LibrariesManager, ctx.TargetPlatform); err != nil {
+		return errors.WithStack(err)
+	}
+	if ctx.ActualPlatform != ctx.TargetPlatform {
+		if err := resolver.ScanPlatformLibraries(ctx.LibrariesManager, ctx.ActualPlatform); err != nil {
+			return errors.WithStack(err)
+		}
 	}
 	ctx.LibrariesResolver = resolver
 

@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/utils"
@@ -47,6 +48,49 @@ func NewCppResolver() *Cpp {
 func (resolver *Cpp) ScanFromLibrariesManager(lm *librariesmanager.LibrariesManager) error {
 	for _, libAlternatives := range lm.Libraries {
 		for _, lib := range libAlternatives.Alternatives {
+			resolver.ScanLibrary(lib)
+		}
+	}
+	return nil
+}
+
+// ScanIDEBuiltinLibraries reads ide-builtin librariers loaded in the LibrariesManager to find
+// and cache all C++ headers for later retrieval.
+func (resolver *Cpp) ScanIDEBuiltinLibraries(lm *librariesmanager.LibrariesManager) error {
+	for _, libAlternatives := range lm.Libraries {
+		for _, lib := range libAlternatives.Alternatives {
+			if lib.Location == libraries.IDEBuiltIn {
+				resolver.ScanLibrary(lib)
+			}
+		}
+	}
+	return nil
+}
+
+// ScanUserAndUnmanagedLibraries reads user/unmanaged librariers loaded in the LibrariesManager to find
+// and cache all C++ headers for later retrieval.
+func (resolver *Cpp) ScanUserAndUnmanagedLibraries(lm *librariesmanager.LibrariesManager) error {
+	for _, libAlternatives := range lm.Libraries {
+		for _, lib := range libAlternatives.Alternatives {
+			if lib.Location == libraries.User || lib.Location == libraries.Unmanaged {
+				resolver.ScanLibrary(lib)
+			}
+		}
+	}
+	return nil
+}
+
+// ScanPlatformLibraries reads platform-bundled libraries for a specific platform loaded in the LibrariesManager
+// to find and cache all C++ headers for later retrieval.
+func (resolver *Cpp) ScanPlatformLibraries(lm *librariesmanager.LibrariesManager, platform *cores.PlatformRelease) error {
+	for _, libAlternatives := range lm.Libraries {
+		for _, lib := range libAlternatives.Alternatives {
+			if lib.Location != libraries.PlatformBuiltIn && lib.Location != libraries.ReferencedPlatformBuiltIn {
+				continue
+			}
+			if lib.ContainerPlatform != platform {
+				continue
+			}
 			resolver.ScanLibrary(lib)
 		}
 	}
