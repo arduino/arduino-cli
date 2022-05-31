@@ -285,6 +285,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#arduino-ide-builtin-libraries-are-now-excluded-from-the-build-when-running-arduino-cli-standalone" class="md-nav__link">
+    Arduino IDE builtin libraries are now excluded from the build when running arduino-cli standalone
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#golang-api-packagemanagerdownloadplatformrelease-no-longer-need-label-parameter" class="md-nav__link">
     golang API: PackageManager.DownloadPlatformRelease no longer need label parameter
   </a>
@@ -1826,6 +1833,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#arduino-ide-builtin-libraries-are-now-excluded-from-the-build-when-running-arduino-cli-standalone" class="md-nav__link">
+    Arduino IDE builtin libraries are now excluded from the build when running arduino-cli standalone
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#golang-api-packagemanagerdownloadplatformrelease-no-longer-need-label-parameter" class="md-nav__link">
     golang API: PackageManager.DownloadPlatformRelease no longer need label parameter
   </a>
@@ -2289,6 +2303,12 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0230">0.23.0<a class="headerlink" href="#0230" title="Permanent link">&para;</a></h2>
+<h3 id="arduino-ide-builtin-libraries-are-now-excluded-from-the-build-when-running-arduino-cli-standalone">Arduino IDE builtin libraries are now excluded from the build when running <code>arduino-cli</code> standalone<a class="headerlink" href="#arduino-ide-builtin-libraries-are-now-excluded-from-the-build-when-running-arduino-cli-standalone" title="Permanent link">&para;</a></h3>
+<p>Previously the "builtin libraries" in the Arduino IDE 1.8.x were always included in the build process. This wasn't the
+intended behaviour, <code>arduino-cli</code> should include them only if run as a daemon from the Arduino IDE. Now this is fixed,
+but since it has been the default behaviour from a very long time we decided to report it here as a breaking change.</p>
+<p>If a compilation fail for a missing bundled library, you can fix it just by installing the missing library from the
+library manager as usual.</p>
 <h3 id="golang-api-packagemanagerdownloadplatformrelease-no-longer-need-label-parameter">golang API: PackageManager.DownloadPlatformRelease no longer need <code>label</code> parameter<a class="headerlink" href="#golang-api-packagemanagerdownloadplatformrelease-no-longer-need-label-parameter" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">pm</span><span class="w"> </span><span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span><span class="w"> </span><span class="nx">DownloadPlatformRelease</span><span class="p">(</span><span class="nx">platform</span><span class="w"> </span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">PlatformRelease</span><span class="p">,</span><span class="w"> </span><span class="nx">config</span><span class="w"> </span><span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Config</span><span class="p">,</span><span class="w"> </span><span class="nx">label</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">progressCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 </code></pre></div>
