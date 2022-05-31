@@ -4,6 +4,15 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.23.0
 
+### Arduino IDE builtin libraries are now excluded from the build when running `arduino-cli` standalone
+
+Previously the "builtin libraries" in the Arduino IDE 1.8.x were always included in the build process. This wasn't the
+intended behaviour, `arduino-cli` should include them only if run as a daemon from the Arduino IDE. Now this is fixed,
+but since it has been the default behaviour from a very long time we decided to report it here as a breaking change.
+
+If a compilation fail for a missing bundled library, you can fix it just by installing the missing library from the
+library manager as usual.
+
 ### golang API: PackageManager.DownloadPlatformRelease no longer need `label` parameter
 
 ```go
