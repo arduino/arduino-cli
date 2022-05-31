@@ -51,6 +51,9 @@ message MonitorResponse {
   // report the default settings) or after a new port_configuration is sent
   // (to report the new settings applied)
   repeated MonitorPortSetting applied_settings = 3;
+  // A message with this field set to true is sent as soon as the port is
+  // succesfully opened
+  bool success = 4;
 }
 
 message MonitorPortSetting {
