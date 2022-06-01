@@ -509,6 +509,9 @@ func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 		return err
 	}
 
+	// Send a message with Success set to true to notify the caller of the port being now active
+	_ = stream.Send(&rpc.MonitorResponse{Success: true})
+
 	go func() {
 		// close port on gRPC call EOF or errors
 		defer portProxy.Close()
