@@ -56,4 +56,7 @@ var (
 		".hpp": empty,
 		".hh":  empty,
 	}
+
+	// DefaultIndexURL is the default index url
+	DefaultIndexURL = "https://downloads.arduino.cc/packages/package_index.tar.bz2"
 )

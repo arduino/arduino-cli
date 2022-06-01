@@ -24,6 +24,10 @@ The gRPC message structure `cc.arduino.cli.commands.v1.PlatformReference` has be
 It is currently used only in `cc.arduino.cli.commands.v1.CompileResponse`, so the field type has been changed as well.
 Old gRPC clients must only update gRPC bindings. They can safely ignore the new fields if not needed.
 
+### golang API: `github.com/arduino/arduino-cli/cli/globals.DefaultIndexURL` has been moved under `github.com/arduino/arduino-cli/arduino/globals`
+
+Legacy code should just update the import.
+
 ### golang API: PackageManager.DownloadPlatformRelease no longer need `label` parameter
 
 ```go
