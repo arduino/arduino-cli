@@ -292,6 +292,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#grpc-changes-in-message-ccarduinoclicommandsv1platformreference" class="md-nav__link">
+    gRPC: Changes in message cc.arduino.cli.commands.v1.PlatformReference
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#golang-api-githubcomarduinoarduino-clicliglobalsdefaultindexurl-has-been-moved-under-githubcomarduinoarduino-cliarduinoglobals" class="md-nav__link">
+    golang API: github.com/arduino/arduino-cli/cli/globals.DefaultIndexURL has been moved under github.com/arduino/arduino-cli/arduino/globals
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#golang-api-packagemanagerdownloadplatformrelease-no-longer-need-label-parameter" class="md-nav__link">
     golang API: PackageManager.DownloadPlatformRelease no longer need label parameter
   </a>
@@ -1840,6 +1854,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#grpc-changes-in-message-ccarduinoclicommandsv1platformreference" class="md-nav__link">
+    gRPC: Changes in message cc.arduino.cli.commands.v1.PlatformReference
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#golang-api-githubcomarduinoarduino-clicliglobalsdefaultindexurl-has-been-moved-under-githubcomarduinoarduino-cliarduinoglobals" class="md-nav__link">
+    golang API: github.com/arduino/arduino-cli/cli/globals.DefaultIndexURL has been moved under github.com/arduino/arduino-cli/arduino/globals
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#golang-api-packagemanagerdownloadplatformrelease-no-longer-need-label-parameter" class="md-nav__link">
     golang API: PackageManager.DownloadPlatformRelease no longer need label parameter
   </a>
@@ -2309,6 +2337,17 @@ intended behaviour, <code>arduino-cli</code> should include them only if run as 
 but since it has been the default behaviour from a very long time we decided to report it here as a breaking change.</p>
 <p>If a compilation fail for a missing bundled library, you can fix it just by installing the missing library from the
 library manager as usual.</p>
+<h3 id="grpc-changes-in-message-ccarduinoclicommandsv1platformreference">gRPC: Changes in message <code>cc.arduino.cli.commands.v1.PlatformReference</code><a class="headerlink" href="#grpc-changes-in-message-ccarduinoclicommandsv1platformreference" title="Permanent link">&para;</a></h3>
+<p>The gRPC message structure <code>cc.arduino.cli.commands.v1.PlatformReference</code> has been renamed to
+<code>cc.arduino.cli.commands.v1.InstalledPlatformReference</code>, and some new fields have been added:</p>
+<ul>
+<li><code>install_dir</code> is the installation directory of the platform</li>
+<li><code>package_url</code> is the 3rd party platform URL of the platform</li>
+</ul>
+<p>It is currently used only in <code>cc.arduino.cli.commands.v1.CompileResponse</code>, so the field type has been changed as well.
+Old gRPC clients must only update gRPC bindings. They can safely ignore the new fields if not needed.</p>
+<h3 id="golang-api-githubcomarduinoarduino-clicliglobalsdefaultindexurl-has-been-moved-under-githubcomarduinoarduino-cliarduinoglobals">golang API: <code>github.com/arduino/arduino-cli/cli/globals.DefaultIndexURL</code> has been moved under <code>github.com/arduino/arduino-cli/arduino/globals</code><a class="headerlink" href="#golang-api-githubcomarduinoarduino-clicliglobalsdefaultindexurl-has-been-moved-under-githubcomarduinoarduino-cliarduinoglobals" title="Permanent link">&para;</a></h3>
+<p>Legacy code should just update the import.</p>
 <h3 id="golang-api-packagemanagerdownloadplatformrelease-no-longer-need-label-parameter">golang API: PackageManager.DownloadPlatformRelease no longer need <code>label</code> parameter<a class="headerlink" href="#golang-api-packagemanagerdownloadplatformrelease-no-longer-need-label-parameter" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">pm</span><span class="w"> </span><span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span><span class="w"> </span><span class="nx">DownloadPlatformRelease</span><span class="p">(</span><span class="nx">platform</span><span class="w"> </span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">PlatformRelease</span><span class="p">,</span><span class="w"> </span><span class="nx">config</span><span class="w"> </span><span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Config</span><span class="p">,</span><span class="w"> </span><span class="nx">label</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">progressCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 </code></pre></div>

@@ -1491,6 +1491,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#installedplatformreference" class="md-nav__link">
+    InstalledPlatformReference
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#instance" class="md-nav__link">
     Instance
   </a>
@@ -1500,13 +1507,6 @@
           <li class="md-nav__item">
   <a href="#platform" class="md-nav__link">
     Platform
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#platformreference" class="md-nav__link">
-    PlatformReference
   </a>
   
 </li>
@@ -2814,6 +2814,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#installedplatformreference" class="md-nav__link">
+    InstalledPlatformReference
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#instance" class="md-nav__link">
     Instance
   </a>
@@ -2823,13 +2830,6 @@
           <li class="md-nav__item">
   <a href="#platform" class="md-nav__link">
     Platform
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#platformreference" class="md-nav__link">
-    PlatformReference
   </a>
   
 </li>
@@ -3534,9 +3534,9 @@
 <li><a href="#cc/arduino/cli/commands/v1/common.proto">cc/arduino/cli/commands/v1/common.proto</a><ul>
 <li><a href="#cc.arduino.cli.commands.v1.Board">Board</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.DownloadProgress">DownloadProgress</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.InstalledPlatformReference">InstalledPlatformReference</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.Platform">Platform</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.PlatformReference">PlatformReference</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.Profile">Profile</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.Programmer">Programmer</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.TaskProgress">TaskProgress</a></li>
@@ -5286,6 +5286,44 @@
 </tr>
 </tbody>
 </table>
+<p><a name="cc.arduino.cli.commands.v1.InstalledPlatformReference"></a></p>
+<h3 id="installedplatformreference">InstalledPlatformReference<a class="headerlink" href="#installedplatformreference" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Platform ID (e.g., <code>arduino:avr</code>).</td>
+</tr>
+<tr>
+<td>version</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Version of the platform.</td>
+</tr>
+<tr>
+<td>install_dir</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Installation directory of the platform</td>
+</tr>
+<tr>
+<td>package_url</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>3rd party platform URL</td>
+</tr>
+</tbody>
+</table>
 <p><a name="cc.arduino.cli.commands.v1.Instance"></a></p>
 <h3 id="instance">Instance<a class="headerlink" href="#instance" title="Permanent link">&para;</a></h3>
 <table>
@@ -5377,32 +5415,6 @@
 <td><a href="#bool">bool</a></td>
 <td></td>
 <td>If true this Platform has been deprecated</td>
-</tr>
-</tbody>
-</table>
-<p><a name="cc.arduino.cli.commands.v1.PlatformReference"></a></p>
-<h3 id="platformreference">PlatformReference<a class="headerlink" href="#platformreference" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>id</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>Platform ID (e.g., <code>arduino:avr</code>).</td>
-</tr>
-<tr>
-<td>version</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>Version of the platform.</td>
 </tr>
 </tbody>
 </table>
@@ -5734,13 +5746,13 @@
 </tr>
 <tr>
 <td>board_platform</td>
-<td><a href="#cc.arduino.cli.commands.v1.PlatformReference">PlatformReference</a></td>
+<td><a href="#cc.arduino.cli.commands.v1.InstalledPlatformReference">InstalledPlatformReference</a></td>
 <td></td>
 <td>The platform where the board is defined</td>
 </tr>
 <tr>
 <td>build_platform</td>
-<td><a href="#cc.arduino.cli.commands.v1.PlatformReference">PlatformReference</a></td>
+<td><a href="#cc.arduino.cli.commands.v1.InstalledPlatformReference">InstalledPlatformReference</a></td>
 <td></td>
 <td>The platform used for the build (if referenced from the board platform)</td>
 </tr>
