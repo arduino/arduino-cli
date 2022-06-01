@@ -82,11 +82,15 @@ message Platform {
   bool deprecated = 10;
 }
 
-message PlatformReference {
+message InstalledPlatformReference {
   // Platform ID (e.g., `arduino:avr`).
   string id = 1;
   // Version of the platform.
   string version = 2;
+  // Installation directory of the platform
+  string install_dir = 3;
+  // 3rd party platform URL
+  string package_url = 4;
 }
 
 message Board {

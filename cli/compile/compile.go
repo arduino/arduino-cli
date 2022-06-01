@@ -33,6 +33,8 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/table"
+	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -68,6 +70,7 @@ var (
 	clean                   bool                 // Cleanup the build folder and do not use any cached build
 	compilationDatabaseOnly bool                 // Only create compilation database without actually compiling
 	sourceOverrides         string               // Path to a .json file that contains a set of replacements of the sketch source code.
+	dumpProfile             bool                 // Create and print a profile configuration from the build
 	// library and libraries sound similar but they're actually different.
 	// library expects a path to the root folder of one single library.
 	// libraries expects a path to a directory containing multiple libraries, similarly to the <directories.user>/libraries path.
@@ -93,6 +96,7 @@ func NewCommand() *cobra.Command {
 
 	fqbnArg.AddToCommand(compileCommand)
 	profileArg.AddToCommand(compileCommand)
+	compileCommand.Flags().BoolVar(&dumpProfile, "dump-profile", false, tr("Create and print a profile configuration from the build."))
 	compileCommand.Flags().BoolVar(&showProperties, "show-properties", false, tr("Show all build properties used instead of compiling."))
 	compileCommand.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
 	compileCommand.Flags().StringVar(&buildCachePath, "build-cache-path", "", tr("Builds of 'core.a' are saved into this path to be cached and reused."))
@@ -142,6 +146,10 @@ func NewCommand() *cobra.Command {
 func runCompileCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli compile`")
 
+	if dumpProfile && feedback.GetFormat() != feedback.Text {
+		feedback.Errorf(tr("You cannot use the %[1]s flag together with %[2]s.", "--dump-profile", "--format json"))
+		os.Exit(errorcodes.ErrBadArgument)
+	}
 	if profileArg.Get() != "" {
 		if len(libraries) > 0 {
 			feedback.Errorf(tr("You cannot use the %s flag while compiling with a profile.", "--libraries"))
@@ -268,6 +276,54 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 
+	if dumpProfile {
+		libs := ""
+		hasVendoredLibs := false
+		for _, lib := range compileRes.GetUsedLibraries() {
+			if lib.Location != rpc.LibraryLocation_LIBRARY_LOCATION_USER && lib.Location != rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED {
+				continue
+			}
+			if lib.GetVersion() == "" {
+				hasVendoredLibs = true
+				continue
+			}
+			libs += fmt.Sprintln("      - " + lib.GetName() + " (" + lib.GetVersion() + ")")
+		}
+		if hasVendoredLibs {
+			fmt.Println()
+			fmt.Println(tr("WARNING: The sketch is compiled using one or more custom libraries."))
+			fmt.Println(tr("Currently, Build Profiles only support libraries available through Arduino Library Manager."))
+		}
+
+		newProfileName := "my_profile_name"
+		if split := strings.Split(compileRequest.GetFqbn(), ":"); len(split) > 2 {
+			newProfileName = split[2]
+		}
+		fmt.Println()
+		fmt.Println("profile:")
+		fmt.Println("  " + newProfileName + ":")
+		fmt.Println("    fqbn: " + compileRequest.GetFqbn())
+		fmt.Println("    platforms:")
+		boardPlatform := compileRes.GetBoardPlatform()
+		fmt.Println("      - platform: " + boardPlatform.GetId() + " (" + boardPlatform.GetVersion() + ")")
+		if url := boardPlatform.GetPackageUrl(); url != "" {
+			fmt.Println("        platform_index_url: " + url)
+		}
+
+		if buildPlatform := compileRes.GetBuildPlatform(); buildPlatform != nil &&
+			buildPlatform.Id != boardPlatform.Id &&
+			buildPlatform.Version != boardPlatform.Version {
+			fmt.Println("      - platform: " + buildPlatform.GetId() + " (" + buildPlatform.GetVersion() + ")")
+			if url := buildPlatform.GetPackageUrl(); url != "" {
+				fmt.Println("        platform_index_url: " + url)
+			}
+		}
+		if len(libs) > 0 {
+			fmt.Println("    libraries:")
+			fmt.Print(libs)
+		}
+	}
+
 	feedback.PrintResult(&compileResult{
 		CompileOut:    compileStdOut.String(),
 		CompileErr:    compileStdErr.String(),
@@ -316,6 +372,45 @@ func (r *compileResult) Data() interface{} {
 }
 
 func (r *compileResult) String() string {
-	// The output is already printed via os.Stdout/os.Stdin
-	return ""
+	titleColor := color.New(color.FgHiGreen)
+	nameColor := color.New(color.FgHiYellow)
+	pathColor := color.New(color.FgHiBlack)
+	build := r.BuilderResult
+
+	res := "\n"
+	libraries := table.New()
+	if len(build.GetUsedLibraries()) > 0 {
+		libraries.SetHeader(
+			table.NewCell(tr("Used library"), titleColor),
+			table.NewCell(tr("Version"), titleColor),
+			table.NewCell(tr("Path"), pathColor))
+		for _, l := range build.GetUsedLibraries() {
+			libraries.AddRow(
+				table.NewCell(l.GetName(), nameColor),
+				l.GetVersion(),
+				table.NewCell(l.GetInstallDir(), pathColor))
+		}
+	}
+	res += libraries.Render() + "\n"
+
+	platforms := table.New()
+	platforms.SetHeader(
+		table.NewCell(tr("Used platform"), titleColor),
+		table.NewCell(tr("Version"), titleColor),
+		table.NewCell(tr("Path"), pathColor))
+	boardPlatform := build.GetBoardPlatform()
+	platforms.AddRow(
+		table.NewCell(boardPlatform.GetId(), nameColor),
+		boardPlatform.GetVersion(),
+		table.NewCell(boardPlatform.GetInstallDir(), pathColor))
+	if buildPlatform := build.GetBuildPlatform(); buildPlatform != nil &&
+		buildPlatform.Id != boardPlatform.Id &&
+		buildPlatform.Version != boardPlatform.Version {
+		platforms.AddRow(
+			table.NewCell(buildPlatform.GetId(), nameColor),
+			buildPlatform.GetVersion(),
+			table.NewCell(buildPlatform.GetInstallDir(), pathColor))
+	}
+	res += platforms.Render()
+	return res
 }

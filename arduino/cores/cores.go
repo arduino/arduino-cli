@@ -21,9 +21,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"path/filepath"
 	"sort"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/resources"
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/i18n"
@@ -359,10 +361,21 @@ func (release *PlatformRelease) String() string {
 }
 
 // ToRPCPlatformReference creates a gRPC PlatformReference message out of this PlatformRelease
-func (release *PlatformRelease) ToRPCPlatformReference() *rpc.PlatformReference {
-	return &rpc.PlatformReference{
-		Id:      release.Platform.String(),
-		Version: release.Version.String(),
+func (release *PlatformRelease) ToRPCPlatformReference() *rpc.InstalledPlatformReference {
+	defaultURLPrefix := globals.DefaultIndexURL
+	// TODO: create a IndexURL object to factorize this
+	defaultURLPrefix = strings.TrimSuffix(defaultURLPrefix, filepath.Ext(defaultURLPrefix))
+	defaultURLPrefix = strings.TrimSuffix(defaultURLPrefix, filepath.Ext(defaultURLPrefix)) // removes .tar.bz2
+
+	url := release.Platform.Package.URL
+	if strings.HasPrefix(url, defaultURLPrefix) {
+		url = ""
+	}
+	return &rpc.InstalledPlatformReference{
+		Id:         release.Platform.String(),
+		Version:    release.Version.String(),
+		InstallDir: release.InstallDir.String(),
+		PackageUrl: url,
 	}
 }
 

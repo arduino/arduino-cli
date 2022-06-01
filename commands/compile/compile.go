@@ -219,6 +219,19 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		return r, compileErr
 	}
 
+	defer func() {
+		importedLibs := []*rpc.Library{}
+		for _, lib := range builderCtx.ImportedLibraries {
+			rpcLib, err := lib.ToRPCLibrary()
+			if err != nil {
+				msg := tr("Error getting information for library %s", lib.Name) + ": " + err.Error() + "\n"
+				errStream.Write([]byte(msg))
+			}
+			importedLibs = append(importedLibs, rpcLib)
+		}
+		r.UsedLibraries = importedLibs
+	}()
+
 	// if it's a regular build, go on...
 	if err := builder.RunBuilder(builderCtx); err != nil {
 		return r, &arduino.CompileFailedError{Message: err.Error()}
@@ -267,16 +280,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 			}
 		}
 	}
-
-	importedLibs := []*rpc.Library{}
-	for _, lib := range builderCtx.ImportedLibraries {
-		rpcLib, err := lib.ToRPCLibrary()
-		if err != nil {
-			return r, &arduino.PermissionDeniedError{Message: tr("Error getting information for library %s", lib.Name), Cause: err}
-		}
-		importedLibs = append(importedLibs, rpcLib)
-	}
-	r.UsedLibraries = importedLibs
 
 	r.ExecutableSectionsSize = builderCtx.ExecutableSectionsSize.ToRPCExecutableSectionSizeArray()
 
