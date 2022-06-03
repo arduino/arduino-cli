@@ -70,7 +70,7 @@ port configuration, and which parameters are available to the user.
       "baudrate": {
         "label": "Baudrate",
         "type": "enum",
-        "values": [
+        "value": [
           "300", "600", "750", "1200", "2400", "4800", "9600",
           "19200", "38400", "57600", "115200", "230400", "460800",
           "500000", "921600", "1000000", "2000000"
@@ -80,19 +80,19 @@ port configuration, and which parameters are available to the user.
       "parity": {
         "label": "Parity",
         "type": "enum",
-        "values": [ "N", "E", "O", "M", "S" ],
+        "value": [ "N", "E", "O", "M", "S" ],
         "selected": "N"
       },
       "bits": {
         "label": "Data bits",
         "type": "enum",
-        "values": [ "5", "6", "7", "8", "9" ],
+        "value": [ "5", "6", "7", "8", "9" ],
         "selected": "8"
       },
       "stop_bits": {
         "label": "Stop bits",
         "type": "enum",
-        "values": [ "1", "1.5", "2" ],
+        "value": [ "1", "1.5", "2" ],
         "selected": "1"
       }
     }
@@ -111,7 +111,7 @@ types may be added in the future if needed), and the `selected` value for each p
 The parameter name can not contain spaces, the allowed characters are alphanumerics, underscore `_`, dot `.`, and dash
 `-`.
 
-The `enum` types must have a list of possible `values`.
+The `enum` types must have a list of possible values in the `value` list field.
 
 The client/IDE may expose these configuration values to the user via a config file or a GUI, in this case the `label`
 field may be used for a user readable description of the parameter.
