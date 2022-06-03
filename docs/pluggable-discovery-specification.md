@@ -54,8 +54,8 @@ are three possible cases:
 
 #### START command
 
-The `START` command initializes and starts the discovery internal subroutines. This command must be called before `LIST`
-or `START_SYNC`. The response to the start command is:
+The `START` command initializes and starts the discovery internal subroutines. This command must be called before
+`LIST`. The response to the start command is:
 
 ```JSON
 {
