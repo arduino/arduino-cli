@@ -237,7 +237,7 @@ Sketch uses 9600 bytes (3%) of program storage space. Maximum is 262144 bytes.
 To upload the sketch to your board, run the following command, using the serial port your board is connected to:
 
 ```sh
-$ arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:samd:mkr1000 MyFirstSketch
+$ arduino-cli upload -v -p /dev/ttyACM0 --fqbn arduino:samd:mkr1000 MyFirstSketch
 No new serial port detected.
 Atmel SMART device 0x10010005 found
 Device       : ATSAMD21G18A
