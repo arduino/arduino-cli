@@ -42,7 +42,7 @@ def test_upgrade(run_command):
     # Verifies cores and libraries have been updated
     result = run_command(["outdated"])
     assert result.ok
-    assert result.stdout == ""
+    assert result.stdout == "\n"
 
 
 def test_upgrade_using_library_with_invalid_version(run_command, data_dir):
