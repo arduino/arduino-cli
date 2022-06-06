@@ -37,5 +37,4 @@ If your question wasn't answered, feel free to ask on [Arduino CLI's forum board
 [1]: https://forum.arduino.cc/index.php?board=145.0
 [screen]: https://www.gnu.org/software/screen/manual/screen.html
 [putty]: https://www.chiark.greenend.org.uk/~sgtatham/putty/
-[monitor service]: rpc/monitor.md
 [monitor command]: commands/arduino-cli_monitor.md
