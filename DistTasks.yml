@@ -41,7 +41,7 @@ tasks:
     cmds:
       - |
         docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=1 \
+        -e CGO_ENABLED=0 \
         {{.CONTAINER}}:{{.CONTAINER_TAG}} \
         --build-cmd "{{.BUILD_COMMAND}}" \
         -p "{{.BUILD_PLATFORM}}"
@@ -63,7 +63,7 @@ tasks:
     cmds:
       - |
         docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=1 \
+        -e CGO_ENABLED=0 \
         {{.CONTAINER}}:{{.CONTAINER_TAG}} \
         --build-cmd "{{.BUILD_COMMAND}}" \
         -p "{{.BUILD_PLATFORM}}"
@@ -85,7 +85,7 @@ tasks:
     cmds:
       - |
         docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=1 \
+        -e CGO_ENABLED=0 \
         {{.CONTAINER}}:{{.CONTAINER_TAG}} \
         --build-cmd "{{.BUILD_COMMAND}}" \
         -p "{{.BUILD_PLATFORM}}"
@@ -107,7 +107,7 @@ tasks:
     cmds:
       - |
         docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=1 \
+        -e CGO_ENABLED=0 \
         {{.CONTAINER}}:{{.CONTAINER_TAG}} \
         --build-cmd "{{.BUILD_COMMAND}}" \
         -p "{{.BUILD_PLATFORM}}"
@@ -129,7 +129,7 @@ tasks:
     cmds:
       - |
         docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=1 \
+        -e CGO_ENABLED=0 \
         {{.CONTAINER}}:{{.CONTAINER_TAG}} \
         --build-cmd "{{.BUILD_COMMAND}}" \
         -p "{{.BUILD_PLATFORM}}"
@@ -151,7 +151,7 @@ tasks:
     cmds:
       - |
         docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=1 \
+        -e CGO_ENABLED=0 \
         {{.CONTAINER}}:{{.CONTAINER_TAG}} \
         --build-cmd "{{.BUILD_COMMAND}}" \
         -p "{{.BUILD_PLATFORM}}"
@@ -201,7 +201,7 @@ tasks:
     cmds:
       - |
         docker run -v `pwd`/..:/home/build -w /home/build \
-        -e CGO_ENABLED=1 \
+        -e CGO_ENABLED=0 \
         {{.CONTAINER}}:{{.CONTAINER_TAG}} \
         --build-cmd "{{.BUILD_COMMAND}}" \
         -p "{{.BUILD_PLATFORM}}"
