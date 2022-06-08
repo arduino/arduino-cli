@@ -413,8 +413,8 @@ msgid "Config file written to: %s"
 msgstr "Config file written to: %s"
 
 #: cli/monitor/monitor.go:63
-msgid "Configuration of the port."
-msgstr "Configuration of the port."
+msgid "Configuration of the port, e.g.: baudrate=1000000"
+msgstr "Configuration of the port, e.g.: baudrate=1000000"
 
 #: cli/debug/debug.go:146
 msgid "Configuration options for %s"
