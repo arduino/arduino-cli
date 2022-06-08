@@ -41,10 +41,10 @@ func (list *List) Add(libs ...*Library) {
 	}
 }
 
-// Remove removes the library from the list
-func (list *List) Remove(library *Library) {
+// Remove removes the given library from the list
+func (list *List) Remove(libraryToRemove *Library) {
 	for i, lib := range *list {
-		if lib == library {
+		if lib == libraryToRemove {
 			*list = append((*list)[:i], (*list)[i+1:]...)
 			return
 		}

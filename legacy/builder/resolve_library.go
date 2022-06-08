@@ -58,20 +58,11 @@ func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {
 		}
 	}
 
+	candidates.Remove(selected)
 	ctx.LibrariesResolutionResults[header] = types.LibraryResolutionResult{
 		Library:          selected,
-		NotUsedLibraries: filterOutLibraryFrom(candidates, selected),
+		NotUsedLibraries: candidates,
 	}
 
 	return selected
-}
-
-func filterOutLibraryFrom(libs libraries.List, libraryToRemove *libraries.Library) libraries.List {
-	filteredOutLibraries := []*libraries.Library{}
-	for _, lib := range libs {
-		if lib != libraryToRemove {
-			filteredOutLibraries = append(filteredOutLibraries, lib)
-		}
-	}
-	return filteredOutLibraries
 }
