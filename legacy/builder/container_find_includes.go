@@ -175,7 +175,7 @@ func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 		}
 	}
 
-	if err := runCommand(ctx, &FailIfImportedLibraryIsWrong{}); err != nil {
+	if err := failIfImportedLibraryIsWrong(ctx); err != nil {
 		return errors.WithStack(err)
 	}
 
@@ -196,15 +196,6 @@ func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 func appendIncludeFolder(ctx *types.Context, cache *includeCache, sourceFilePath *paths.Path, include string, folder *paths.Path) {
 	ctx.IncludeFolders = append(ctx.IncludeFolders, folder)
 	cache.ExpectEntry(sourceFilePath, include, folder)
-}
-
-func runCommand(ctx *types.Context, command types.Command) error {
-	PrintRingNameIfDebug(ctx, command)
-	err := command.Run(ctx)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
 }
 
 type includeCacheEntry struct {
@@ -499,4 +490,30 @@ func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {
 	}
 
 	return selected
+}
+
+func failIfImportedLibraryIsWrong(ctx *types.Context) error {
+	if len(ctx.ImportedLibraries) == 0 {
+		return nil
+	}
+
+	for _, library := range ctx.ImportedLibraries {
+		if !library.IsLegacy {
+			if library.InstallDir.Join("arch").IsDir() {
+				return errors.New(tr("%[1]s folder is no longer supported! See %[2]s for more information", "'arch'", "http://goo.gl/gfFJzU"))
+			}
+			for _, propName := range libraries.MandatoryProperties {
+				if !library.Properties.ContainsKey(propName) {
+					return errors.New(tr("Missing '%[1]s' from library in %[2]s", propName, library.InstallDir))
+				}
+			}
+			if library.Layout == libraries.RecursiveLayout {
+				if library.UtilityDir != nil {
+					return errors.New(tr("Library can't use both '%[1]s' and '%[2]s' folders. Double check in '%[3]s'.", "src", "utility", library.InstallDir))
+				}
+			}
+		}
+	}
+
+	return nil
 }
