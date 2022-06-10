@@ -309,10 +309,10 @@ func writeCache(cache *includeCache, path *paths.Path) error {
 
 func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQueue *types.UniqueSourceFileQueue) error {
 	sourceFile := sourceFileQueue.Pop()
-	sourcePath := sourceFile.SourcePath(ctx)
+	sourcePath := sourceFile.SourcePath()
 	targetFilePath := paths.NullPath()
-	depPath := sourceFile.DepfilePath(ctx)
-	objPath := sourceFile.ObjectPath(ctx)
+	depPath := sourceFile.DepfilePath()
+	objPath := sourceFile.ObjectPath()
 
 	// TODO: This should perhaps also compare against the
 	// include.cache file timestamp. Now, it only checks if the file
@@ -336,11 +336,11 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 		cache.ExpectFile(sourcePath)
 
 		includeFolders := ctx.IncludeFolders
-		if library, ok := sourceFile.Origin.(*libraries.Library); ok && library.UtilityDir != nil {
+		if library := sourceFile.Library; library != nil && library.UtilityDir != nil {
 			includeFolders = append(includeFolders, library.UtilityDir)
 		}
 
-		if library, ok := sourceFile.Origin.(*libraries.Library); ok {
+		if library := sourceFile.Library; library != nil {
 			if library.Precompiled && library.PrecompiledWithSources {
 				// Fully precompiled libraries should have no dependencies
 				// to avoid ABI breakage
