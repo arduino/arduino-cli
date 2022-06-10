@@ -17,14 +17,14 @@ package types
 
 import "golang.org/x/exp/slices"
 
-type UniqueSourceFileQueue []SourceFile
+type UniqueSourceFileQueue []*SourceFile
 
 func (queue UniqueSourceFileQueue) Len() int           { return len(queue) }
 func (queue UniqueSourceFileQueue) Less(i, j int) bool { return false }
 func (queue UniqueSourceFileQueue) Swap(i, j int)      { panic("Who called me?!?") }
 
-func (queue *UniqueSourceFileQueue) Push(value SourceFile) {
-	equals := func(elem SourceFile) bool {
+func (queue *UniqueSourceFileQueue) Push(value *SourceFile) {
+	equals := func(elem *SourceFile) bool {
 		return elem.Origin == value.Origin && elem.RelativePath.EqualsTo(value.RelativePath)
 	}
 	if !slices.ContainsFunc(*queue, equals) {
@@ -32,7 +32,7 @@ func (queue *UniqueSourceFileQueue) Push(value SourceFile) {
 	}
 }
 
-func (queue *UniqueSourceFileQueue) Pop() SourceFile {
+func (queue *UniqueSourceFileQueue) Pop() *SourceFile {
 	old := *queue
 	x := old[0]
 	*queue = old[1:]

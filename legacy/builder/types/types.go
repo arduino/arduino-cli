@@ -33,15 +33,15 @@ type SourceFile struct {
 // Create a SourceFile containing the given source file path within the
 // given origin. The given path can be absolute, or relative within the
 // origin's root source folder
-func MakeSourceFile(ctx *Context, origin interface{}, path *paths.Path) (SourceFile, error) {
+func MakeSourceFile(ctx *Context, origin interface{}, path *paths.Path) (*SourceFile, error) {
 	if path.IsAbs() {
 		var err error
 		path, err = sourceRoot(ctx, origin).RelTo(path)
 		if err != nil {
-			return SourceFile{}, err
+			return nil, err
 		}
 	}
-	return SourceFile{Origin: origin, RelativePath: path}, nil
+	return &SourceFile{Origin: origin, RelativePath: path}, nil
 }
 
 // Return the build root for the given origin, where build products will
