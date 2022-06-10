@@ -333,7 +333,6 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 
 	first := true
 	for {
-		var missingIncludeH string
 		cache.ExpectFile(sourcePath)
 
 		includeFolders := ctx.IncludeFolders
@@ -355,6 +354,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 		var preprocErr error
 		var preprocStderr []byte
 
+		var missingIncludeH string
 		if unchanged && cache.valid {
 			missingIncludeH = cache.Next().Include
 			if first && ctx.Verbose {
