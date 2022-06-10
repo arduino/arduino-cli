@@ -335,6 +335,10 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 	for {
 		cache.ExpectFile(sourcePath)
 
+		// Libraries may require the "utility" directory to be added to the include
+		// search path, but only for the source code of the library, so we temporary
+		// copy the current search path list and add the library' utility directory
+		// if needed.
 		includeFolders := ctx.IncludeFolders
 		if library := sourceFile.Library; library != nil && library.UtilityDir != nil {
 			includeFolders = append(includeFolders, library.UtilityDir)
