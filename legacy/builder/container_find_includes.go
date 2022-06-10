@@ -372,14 +372,11 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 				ctx.WriteStdout(preprocStderr)
 			}
 			// Unwrap error and see if it is an ExitError.
-			_, isExitErr := errors.Cause(preprocErr).(*exec.ExitError)
 			if preprocErr == nil {
 				// Preprocessor successful, done
 				missingIncludeH = ""
-			} else if !isExitErr || preprocStderr == nil {
-				// Ignore ExitErrors (e.g. gcc returning
-				// non-zero status), but bail out on
-				// other errors
+			} else if _, isExitErr := errors.Cause(preprocErr).(*exec.ExitError); !isExitErr || preprocStderr == nil {
+				// Ignore ExitErrors (e.g. gcc returning non-zero status), but bail out on other errors
 				return errors.WithStack(preprocErr)
 			} else {
 				missingIncludeH = IncludesFinderWithRegExp(string(preprocStderr))
