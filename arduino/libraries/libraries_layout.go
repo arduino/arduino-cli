@@ -38,19 +38,14 @@ func (d *LibraryLayout) String() string {
 		return "flat"
 	case RecursiveLayout:
 		return "recursive"
+	default:
+		panic(fmt.Sprintf("invalid LibraryLayout value %d", *d))
 	}
-	panic(fmt.Sprintf("invalid LibraryLayout value %d", *d))
 }
 
 // MarshalJSON implements the json.Marshaler interface
-func (d *LibraryLayout) MarshalJSON() ([]byte, error) {
-	switch *d {
-	case FlatLayout:
-		return json.Marshal("flat")
-	case RecursiveLayout:
-		return json.Marshal("recursive")
-	}
-	return nil, fmt.Errorf(tr("invalid library layout value: %d"), *d)
+func (d LibraryLayout) MarshalJSON() ([]byte, error) {
+	return json.Marshal(d.String())
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface
@@ -62,10 +57,13 @@ func (d *LibraryLayout) UnmarshalJSON(b []byte) error {
 	switch s {
 	case "flat":
 		*d = FlatLayout
+		return nil
 	case "recursive":
 		*d = RecursiveLayout
+		return nil
+	default:
+		return fmt.Errorf(tr("invalid library layout: %s"), s)
 	}
-	return fmt.Errorf(tr("invalid library layout: %s"), s)
 }
 
 // ToRPCLibraryLayout converts this LibraryLayout to rpc.LibraryLayout
@@ -75,6 +73,7 @@ func (d *LibraryLayout) ToRPCLibraryLayout() rpc.LibraryLayout {
 		return rpc.LibraryLayout_LIBRARY_LAYOUT_FLAT
 	case RecursiveLayout:
 		return rpc.LibraryLayout_LIBRARY_LAYOUT_RECURSIVE
+	default:
+		panic(fmt.Sprintf("invalid LibraryLayout value %d", *d))
 	}
-	panic(fmt.Sprintf("invalid LibraryLayout value %d", *d))
 }
