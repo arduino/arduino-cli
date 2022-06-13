@@ -33,6 +33,8 @@ import (
 // LoadHardwareForProfile load the hardware platforms for the given profile.
 // If installMissing is true then possibly missing tools and platforms will be downloaded and installed.
 func (pm *PackageManager) LoadHardwareForProfile(p *sketch.Profile, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) []error {
+	pm.profile = p
+
 	// Load required platforms
 	var merr []error
 	var platformReleases []*cores.PlatformRelease
