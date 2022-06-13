@@ -52,25 +52,14 @@ func (d *LibraryLocation) String() string {
 		return "user"
 	case Unmanaged:
 		return "unmanaged"
+	default:
+		panic(fmt.Sprintf("invalid LibraryLocation value %d", *d))
 	}
-	panic(fmt.Sprintf("invalid LibraryLocation value %d", *d))
 }
 
 // MarshalJSON implements the json.Marshaler interface
-func (d *LibraryLocation) MarshalJSON() ([]byte, error) {
-	switch *d {
-	case IDEBuiltIn:
-		return json.Marshal("ide")
-	case PlatformBuiltIn:
-		return json.Marshal("platform")
-	case ReferencedPlatformBuiltIn:
-		return json.Marshal("ref-platform")
-	case User:
-		return json.Marshal("user")
-	case Unmanaged:
-		return json.Marshal("unmanaged")
-	}
-	return nil, fmt.Errorf(tr("invalid library location value: %d"), *d)
+func (d LibraryLocation) MarshalJSON() ([]byte, error) {
+	return json.Marshal(d.String())
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface
@@ -82,16 +71,22 @@ func (d *LibraryLocation) UnmarshalJSON(b []byte) error {
 	switch s {
 	case "ide":
 		*d = IDEBuiltIn
+		return nil
 	case "platform":
 		*d = PlatformBuiltIn
+		return nil
 	case "ref-platform":
 		*d = ReferencedPlatformBuiltIn
+		return nil
 	case "user":
 		*d = User
+		return nil
 	case "unmanaged":
 		*d = Unmanaged
+		return nil
+	default:
+		return fmt.Errorf(tr("invalid library location: %s"), s)
 	}
-	return fmt.Errorf(tr("invalid library location: %s"), s)
 }
 
 // ToRPCLibraryLocation converts this LibraryLocation to rpc.LibraryLocation
@@ -107,8 +102,9 @@ func (d *LibraryLocation) ToRPCLibraryLocation() rpc.LibraryLocation {
 		return rpc.LibraryLocation_LIBRARY_LOCATION_USER
 	case Unmanaged:
 		return rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED
+	default:
+		panic(fmt.Sprintf("invalid LibraryLocation value %d", *d))
 	}
-	panic(fmt.Sprintf("invalid LibraryLocation value %d", *d))
 }
 
 // FromRPCLibraryLocation converts a rpc.LibraryLocation to a LibraryLocation
@@ -124,6 +120,7 @@ func FromRPCLibraryLocation(l rpc.LibraryLocation) LibraryLocation {
 		return User
 	case rpc.LibraryLocation_LIBRARY_LOCATION_UNMANAGED:
 		return Unmanaged
+	default:
+		panic(fmt.Sprintf("invalid rpc.LibraryLocation value %d", l))
 	}
-	panic(fmt.Sprintf("invalid rpc.LibraryLocation value %d", l))
 }
