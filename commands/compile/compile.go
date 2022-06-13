@@ -111,7 +111,9 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	builderCtx := &types.Context{}
 	builderCtx.PackageManager = pm
-	builderCtx.LibrariesManager = lm
+	if pm.GetProfile() != nil {
+		builderCtx.LibrariesManager = lm
+	}
 	builderCtx.FQBN = fqbn
 	builderCtx.SketchLocation = sk.FullPath
 	builderCtx.ProgressCB = progressCB
@@ -124,9 +126,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
 	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
 	builderCtx.LibraryDirs = paths.NewPathList(req.Library...)
-	if len(req.GetLibraries()) > 0 || len(req.GetLibrary()) > 0 {
-		builderCtx.LibrariesManager = nil // let the builder rebuild the library manager
-	}
 	if req.GetBuildPath() == "" {
 		builderCtx.BuildPath = sk.BuildPath
 	} else {

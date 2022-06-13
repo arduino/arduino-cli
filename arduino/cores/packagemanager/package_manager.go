@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/discovery/discoverymanager"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -44,6 +45,7 @@ type PackageManager struct {
 	DownloadDir            *paths.Path
 	TempDir                *paths.Path
 	CustomGlobalProperties *properties.Map
+	profile                *sketch.Profile
 	discoveryManager       *discoverymanager.DiscoveryManager
 	userAgent              string
 }
@@ -63,6 +65,11 @@ func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path, 
 		discoveryManager:       discoverymanager.New(),
 		userAgent:              userAgent,
 	}
+}
+
+// GetProfile returns the active profile for this package manager, or nil if no profile is selected.
+func (pm *PackageManager) GetProfile() *sketch.Profile {
+	return pm.profile
 }
 
 // GetEnvVarsForSpawnedProcess produces a set of environment variables that
