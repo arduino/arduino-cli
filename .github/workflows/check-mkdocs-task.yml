@@ -2,9 +2,9 @@
 name: Check Website
 
 env:
-  # See: https://github.com/actions/setup-go/tree/v2#readme
+  # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
   GO_VERSION: "1.17"
-  # See: https://github.com/actions/setup-python/tree/v2#available-versions-of-python
+  # See: https://github.com/actions/setup-python/tree/main#available-versions-of-python
   PYTHON_VERSION: "3.9"
 
 # See: https://docs.github.com/en/actions/reference/events-that-trigger-workflows
