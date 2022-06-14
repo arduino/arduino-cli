@@ -1,6 +1,7 @@
 {
   "retryOn429": true,
-  "retryCount": 3,
+  "retryCount": 5,
+  "timeout": "20s",
   "aliveStatusCodes": [200, 206],
   "ignorePatterns": [
     {
