@@ -342,7 +342,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 
 	first := true
 	for {
-		var include string
+		var missingIncludeH string
 		cache.ExpectFile(sourcePath)
 
 		includeFolders := ctx.IncludeFolders
@@ -365,7 +365,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 		var preprocStderr []byte
 
 		if unchanged && cache.valid {
-			include = cache.Next().Include
+			missingIncludeH = cache.Next().Include
 			if first && ctx.Verbose {
 				ctx.Info(tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
@@ -380,27 +380,27 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 			_, isExitErr := errors.Cause(preprocErr).(*exec.ExitError)
 			if preprocErr == nil {
 				// Preprocessor successful, done
-				include = ""
+				missingIncludeH = ""
 			} else if !isExitErr || preprocStderr == nil {
 				// Ignore ExitErrors (e.g. gcc returning
 				// non-zero status), but bail out on
 				// other errors
 				return errors.WithStack(preprocErr)
 			} else {
-				include = IncludesFinderWithRegExp(string(preprocStderr))
-				if include == "" && ctx.Verbose {
+				missingIncludeH = IncludesFinderWithRegExp(string(preprocStderr))
+				if missingIncludeH == "" && ctx.Verbose {
 					ctx.Info(tr("Error while detecting libraries included by %[1]s", sourcePath))
 				}
 			}
 		}
 
-		if include == "" {
+		if missingIncludeH == "" {
 			// No missing includes found, we're done
 			cache.ExpectEntry(sourcePath, "", nil)
 			return nil
 		}
 
-		library := ResolveLibrary(ctx, include)
+		library := ResolveLibrary(ctx, missingIncludeH)
 		if library == nil {
 			// Library could not be resolved, show error
 			if preprocErr == nil || preprocStderr == nil {
@@ -426,7 +426,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 		// include path and queue its source files for further
 		// include scanning
 		ctx.ImportedLibraries = append(ctx.ImportedLibraries, library)
-		appendIncludeFolder(ctx, cache, sourcePath, include, library.SourceDir)
+		appendIncludeFolder(ctx, cache, sourcePath, missingIncludeH, library.SourceDir)
 		sourceDirs := library.SourceDirs()
 		for _, sourceDir := range sourceDirs {
 			queueSourceFilesFromFolder(ctx, sourceFileQueue, library, sourceDir.Dir, sourceDir.Recurse)
