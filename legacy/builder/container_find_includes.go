@@ -345,9 +345,9 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 		var include string
 		cache.ExpectFile(sourcePath)
 
-		includes := ctx.IncludeFolders
+		includeFolders := ctx.IncludeFolders
 		if library, ok := sourceFile.Origin.(*libraries.Library); ok && library.UtilityDir != nil {
-			includes = append(includes, library.UtilityDir)
+			includeFolders = append(includeFolders, library.UtilityDir)
 		}
 
 		if library, ok := sourceFile.Origin.(*libraries.Library); ok {
@@ -371,7 +371,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 			}
 		} else {
 			var preproc_stdout []byte
-			preproc_stdout, preproc_stderr, preproc_err = preprocessor.GCC(sourcePath, targetFilePath, includes, ctx.BuildProperties)
+			preproc_stdout, preproc_stderr, preproc_err = preprocessor.GCC(sourcePath, targetFilePath, includeFolders, ctx.BuildProperties)
 			if ctx.Verbose {
 				ctx.WriteStdout(preproc_stdout)
 				ctx.WriteStdout(preproc_stderr)
@@ -406,7 +406,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 			if preproc_err == nil || preproc_stderr == nil {
 				// Filename came from cache, so run preprocessor to obtain error to show
 				var preproc_stdout []byte
-				preproc_stdout, preproc_stderr, preproc_err = preprocessor.GCC(sourcePath, targetFilePath, includes, ctx.BuildProperties)
+				preproc_stdout, preproc_stderr, preproc_err = preprocessor.GCC(sourcePath, targetFilePath, includeFolders, ctx.BuildProperties)
 				if ctx.Verbose {
 					ctx.WriteStdout(preproc_stdout)
 				}
