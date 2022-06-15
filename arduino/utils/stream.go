@@ -25,7 +25,7 @@ import (
 func FeedStreamTo(writer func(data []byte)) io.Writer {
 	r, w := io.Pipe()
 	go func() {
-		data := make([]byte, 10240)
+		data := make([]byte, 16384)
 		for {
 			if n, err := r.Read(data); err == nil {
 				writer(data[:n])
