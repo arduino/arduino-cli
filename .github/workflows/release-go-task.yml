@@ -131,6 +131,7 @@ jobs:
 
       - name: Re-package binary and output checksum
         id: re-package
+        working-directory: ${{ env.DIST_DIR }}
         # This step performs the following:
         # 1. Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
         # 2. Recalculate package checksum
@@ -138,13 +139,13 @@ jobs:
         run: |
           # GitHub's upload/download-artifact@v2 actions don't preserve file permissions,
           # so we need to add execution permission back until the action is made to do this.
-          chmod +x "${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_osx_${{ matrix.artifact.name }}/${{ env.PROJECT_NAME }}"
+          chmod +x "${{ env.PROJECT_NAME }}_osx_${{ matrix.artifact.name }}/${{ env.PROJECT_NAME }}"
           TAG="${GITHUB_REF/refs\/tags\//}"
-          PACKAGE_FILENAME="$(basename ${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_${TAG}_${{ matrix.artifact.path }})"
-          tar -czvf "${{ env.DIST_DIR }}/$PACKAGE_FILENAME" \
-          -C "${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_osx_${{ matrix.artifact.name }}/" "${{ env.PROJECT_NAME }}" \
+          PACKAGE_FILENAME="${{ env.PROJECT_NAME }}_${TAG}_${{ matrix.artifact.path }}"
+          tar -czvf "$PACKAGE_FILENAME" \
+          -C "${{ env.PROJECT_NAME }}_osx_${{ matrix.artifact.name }}/" "${{ env.PROJECT_NAME }}" \
           -C ../../ LICENSE.txt
-          CHECKSUM_LINE="$(shasum -a 256 ${{ env.DIST_DIR }}/$PACKAGE_FILENAME)"
+          CHECKSUM_LINE="$(shasum -a 256 $PACKAGE_FILENAME)"
           echo "::set-output name=checksum-${{ matrix.artifact.name }}::$CHECKSUM_LINE"
 
       - name: Upload artifacts
