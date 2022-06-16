@@ -140,6 +140,7 @@ jobs:
           -C "${{ env.PROJECT_NAME }}_osx_${{ matrix.artifact.name }}/" "${{ env.PROJECT_NAME }}" \
           -C ../../ LICENSE.txt
           CHECKSUM_LINE="$(shasum -a 256 $PACKAGE_FILENAME)"
+          echo "PACKAGE_FILENAME=$PACKAGE_FILENAME" >> $GITHUB_ENV
           echo "::set-output name=checksum-${{ matrix.artifact.name }}::$CHECKSUM_LINE"
 
       - name: Upload artifacts
@@ -147,7 +148,7 @@ jobs:
         with:
           if-no-files-found: error
           name: ${{ env.ARTIFACT_NAME }}
-          path: ${{ env.DIST_DIR }}
+          path: ${{ env.DIST_DIR }}/${{ env.PACKAGE_FILENAME }}
 
   publish-nightly:
     runs-on: ubuntu-latest
