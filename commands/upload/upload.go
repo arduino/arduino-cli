@@ -153,7 +153,7 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		return nil, err
 	}
 
-	return &rpc.UploadResponse{}, nil
+	return &rpc.UploadResponse{Success: true}, nil
 }
 
 // UsingProgrammer FIXMEDOC
@@ -163,7 +163,7 @@ func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest,
 	if req.GetProgrammer() == "" {
 		return nil, &arduino.MissingProgrammerError{}
 	}
-	_, err := Upload(ctx, &rpc.UploadRequest{
+	if _, err := Upload(ctx, &rpc.UploadRequest{
 		Instance:   req.GetInstance(),
 		SketchPath: req.GetSketchPath(),
 		ImportFile: req.GetImportFile(),
@@ -174,8 +174,10 @@ func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest,
 		Verbose:    req.GetVerbose(),
 		Verify:     req.GetVerify(),
 		UserFields: req.GetUserFields(),
-	}, outStream, errStream)
-	return &rpc.UploadUsingProgrammerResponse{}, err
+	}, outStream, errStream); err != nil {
+		return nil, err
+	}
+	return &rpc.UploadUsingProgrammerResponse{Success: true}, nil
 }
 
 func runProgramAction(pm *packagemanager.PackageManager,

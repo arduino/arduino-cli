@@ -53,5 +53,5 @@ func BurnBootloader(ctx context.Context, req *rpc.BurnBootloaderRequest, outStre
 	if err != nil {
 		return nil, err
 	}
-	return &rpc.BurnBootloaderResponse{}, nil
+	return &rpc.BurnBootloaderResponse{Success: true}, nil
 }

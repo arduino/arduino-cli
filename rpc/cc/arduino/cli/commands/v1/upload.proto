@@ -66,6 +66,8 @@ message UploadResponse {
   bytes out_stream = 1;
   // The error output of the upload process.
   bytes err_stream = 2;
+  // Set to true when the upload is successfully completed.
+  bool success = 3;
 }
 
 message ProgrammerIsRequiredForUploadError {}
@@ -112,6 +114,8 @@ message UploadUsingProgrammerResponse {
   bytes out_stream = 1;
   // The error output of the upload process.
   bytes err_stream = 2;
+  // Set to true when the upload is successfully completed.
+  bool success = 3;
 }
 
 message BurnBootloaderRequest {
@@ -144,6 +148,8 @@ message BurnBootloaderResponse {
   bytes out_stream = 1;
   // The error output of the burn bootloader process.
   bytes err_stream = 2;
+  // Set to true when the burn bootloader is successfully completed.
+  bool success = 3;
 }
 
 message ListProgrammersAvailableForUploadRequest {
