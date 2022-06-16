@@ -108,6 +108,8 @@ jobs:
             name: Linux_ARMv7
           - path: "*macOS_64bit.tar.gz"
             name: macOS_64
+          - path: "*macOS_ARM64.tar.gz"
+            name: macOS_ARM64
           - path: "*Windows_32bit.zip"
             name: Windows_X86-32
           - path: "*Windows_64bit.zip"
