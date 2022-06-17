@@ -512,10 +512,9 @@ func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 	// Send a message with Success set to true to notify the caller of the port being now active
 	_ = stream.Send(&rpc.MonitorResponse{Success: true})
 
+	cancelCtx, cancel := context.WithCancel(stream.Context())
 	go func() {
-		// close port on gRPC call EOF or errors
-		defer portProxy.Close()
-
+		defer cancel()
 		for {
 			msg, err := stream.Recv()
 			if errors.Is(err, io.EOF) {
@@ -547,19 +546,25 @@ func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 		}
 	}()
 
-	buff := make([]byte, 4096)
-	for {
-		n, err := portProxy.Read(buff)
-		if errors.Is(err, io.EOF) {
-			break
+	go func() {
+		defer cancel()
+		buff := make([]byte, 4096)
+		for {
+			n, err := portProxy.Read(buff)
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			if err != nil {
+				stream.Send(&rpc.MonitorResponse{Error: err.Error()})
+				break
+			}
+			if err := stream.Send(&rpc.MonitorResponse{RxData: buff[:n]}); err != nil {
+				break
+			}
 		}
-		if err != nil {
-			stream.Send(&rpc.MonitorResponse{Error: err.Error()})
-			break
-		}
-		if err := stream.Send(&rpc.MonitorResponse{RxData: buff[:n]}); err != nil {
-			break
-		}
-	}
+	}()
+
+	<-cancelCtx.Done()
+	portProxy.Close()
 	return nil
 }
