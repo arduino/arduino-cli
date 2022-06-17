@@ -15,17 +15,26 @@
 
 package utils
 
-import "io"
+import (
+	"io"
+	"time"
+)
 
 // FeedStreamTo creates a pipe to pass data to the writer function.
 // FeedStreamTo returns the io.Writer side of the pipe, on which the user can write data
 func FeedStreamTo(writer func(data []byte)) io.Writer {
 	r, w := io.Pipe()
 	go func() {
-		data := make([]byte, 1024)
+		data := make([]byte, 16384)
 		for {
 			if n, err := r.Read(data); err == nil {
 				writer(data[:n])
+
+				// Rate limit the number of outgoing gRPC messages
+				// (less messages with biggger data blocks)
+				if n < len(data) {
+					time.Sleep(50 * time.Millisecond)
+				}
 			} else {
 				r.Close()
 				return
