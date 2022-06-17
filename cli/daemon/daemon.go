@@ -65,7 +65,7 @@ func NewCommand() *cobra.Command {
 	configuration.Settings.BindPFlag("daemon.port", daemonCommand.PersistentFlags().Lookup("port"))
 	daemonCommand.Flags().BoolVar(&daemonize, "daemonize", false, tr("Do not terminate daemon process if the parent process dies"))
 	daemonCommand.Flags().BoolVar(&debug, "debug", false, tr("Enable debug logging of gRPC calls"))
-	daemonCommand.Flags().StringVar(&debugFile, "debug-file", "", tr("Append debug logging to the specified file"))
+	daemonCommand.Flags().StringVar(&debugFile, "debug-file", "", tr("Log to the specified file, the file will be overwritten"))
 	daemonCommand.Flags().StringSliceVar(&debugFilters, "debug-filter", []string{}, tr("Display only the provided gRPC calls"))
 	return daemonCommand
 }
@@ -84,7 +84,7 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 	if debug {
 		if debugFile != "" {
 			outFile := paths.New(debugFile)
-			f, err := outFile.Append()
+			f, err := outFile.Create()
 			if err != nil {
 				feedback.Error(tr("Error opening debug logging file: %s", err))
 				os.Exit(errorcodes.ErrBadCall)

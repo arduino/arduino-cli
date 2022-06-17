@@ -2,6 +2,14 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## 0.24.0
+
+### The flag `--debug-file path` in `daemon` command now overwrites the file instead of appending.
+
+Previously running the Arduino CLI in deamon mode with the flag `--debug-file log.txt` will append to `log.txt`, now the
+file is overwritten. Since the amount of log produced is very high this will help to keep the log size on a reasonable
+amount if the flag is left enabled.
+
 ## 0.23.0
 
 ### Arduino IDE builtin libraries are now excluded from the build when running `arduino-cli` standalone
