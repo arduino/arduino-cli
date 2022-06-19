@@ -122,6 +122,19 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 }
 
 func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
+	librariesResolutionCache := ctx.BuildPath.Join("libraries.cache")
+	if ctx.UseCachedLibrariesResolution && librariesResolutionCache.Exist() {
+		if d, err := librariesResolutionCache.ReadFile(); err != nil {
+			return err
+		} else if err := json.Unmarshal(d, &ctx.IncludeFolders); err != nil {
+			return err
+		}
+		if ctx.Verbose {
+			ctx.Info("Using cached library discovery: " + librariesResolutionCache.String())
+		}
+		return nil
+	}
+
 	cachePath := ctx.BuildPath.Join("includes.cache")
 	cache := readCache(cachePath)
 
@@ -130,38 +143,44 @@ func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 		appendIncludeFolder(ctx, cache, nil, "", ctx.BuildProperties.GetPath("build.variant.path"))
 	}
 
-	sketch := ctx.Sketch
-	mergedfile, err := types.MakeSourceFile(ctx, sketch, paths.New(sketch.MainFile.Base()+".cpp"))
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	ctx.CollectedSourceFiles.Push(mergedfile)
-
-	sourceFilePaths := ctx.CollectedSourceFiles
-	queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, ctx.SketchBuildPath, false /* recurse */)
-	srcSubfolderPath := ctx.SketchBuildPath.Join("src")
-	if srcSubfolderPath.IsDir() {
-		queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, srcSubfolderPath, true /* recurse */)
-	}
-
-	for !sourceFilePaths.Empty() {
-		err := findIncludesUntilDone(ctx, cache, sourceFilePaths.Pop())
+	if !ctx.UseCachedLibrariesResolution {
+		sketch := ctx.Sketch
+		mergedfile, err := types.MakeSourceFile(ctx, sketch, paths.New(sketch.MainFile.Base()+".cpp"))
 		if err != nil {
-			cachePath.Remove()
+			return errors.WithStack(err)
+		}
+		ctx.CollectedSourceFiles.Push(mergedfile)
+
+		sourceFilePaths := ctx.CollectedSourceFiles
+		queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, ctx.SketchBuildPath, false /* recurse */)
+		srcSubfolderPath := ctx.SketchBuildPath.Join("src")
+		if srcSubfolderPath.IsDir() {
+			queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, srcSubfolderPath, true /* recurse */)
+		}
+
+		for !sourceFilePaths.Empty() {
+			err := findIncludesUntilDone(ctx, cache, sourceFilePaths.Pop())
+			if err != nil {
+				cachePath.Remove()
+				return errors.WithStack(err)
+			}
+		}
+
+		// Finalize the cache
+		cache.ExpectEnd()
+		if err := writeCache(cache, cachePath); err != nil {
 			return errors.WithStack(err)
 		}
 	}
 
-	// Finalize the cache
-	cache.ExpectEnd()
-	err = writeCache(cache, cachePath)
-	if err != nil {
+	if err := runCommand(ctx, &FailIfImportedLibraryIsWrong{}); err != nil {
 		return errors.WithStack(err)
 	}
 
-	err = runCommand(ctx, &FailIfImportedLibraryIsWrong{})
-	if err != nil {
-		return errors.WithStack(err)
+	if d, err := json.Marshal(ctx.IncludeFolders); err != nil {
+		return err
+	} else if err := librariesResolutionCache.WriteFile(d); err != nil {
+		return err
 	}
 
 	return nil

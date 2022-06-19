@@ -120,12 +120,12 @@ type Context struct {
 	WarningsLevel string
 
 	// Libraries handling
-	LibrariesManager           *librariesmanager.LibrariesManager
-	LibrariesResolver          *librariesresolver.Cpp
-	ImportedLibraries          libraries.List
-	LibrariesResolutionResults map[string]LibraryResolutionResult
-	IncludeFolders             paths.PathList
-	//OutputGccMinusM            string
+	LibrariesManager             *librariesmanager.LibrariesManager
+	LibrariesResolver            *librariesresolver.Cpp
+	ImportedLibraries            libraries.List
+	LibrariesResolutionResults   map[string]LibraryResolutionResult
+	IncludeFolders               paths.PathList
+	UseCachedLibrariesResolution bool
 
 	// C++ Parsing
 	CTagsOutput                 string

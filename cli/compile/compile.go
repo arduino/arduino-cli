@@ -74,9 +74,10 @@ var (
 	// library and libraries sound similar but they're actually different.
 	// library expects a path to the root folder of one single library.
 	// libraries expects a path to a directory containing multiple libraries, similarly to the <directories.user>/libraries path.
-	library   []string // List of paths to libraries root folders. Can be used multiple times for different libraries
-	libraries []string // List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries paths.
-	tr        = i18n.Tr
+	library                []string // List of paths to libraries root folders. Can be used multiple times for different libraries
+	libraries              []string // List of custom libraries dir paths separated by commas. Or can be used multiple times for multiple libraries paths.
+	skipLibrariesDiscovery bool
+	tr                     = i18n.Tr
 )
 
 // NewCommand created a new `compile` command
@@ -135,7 +136,8 @@ func NewCommand() *cobra.Command {
 	compileCommand.Flags().BoolP("export-binaries", "e", false, tr("If set built binaries will be exported to the sketch folder."))
 	compileCommand.Flags().StringVar(&sourceOverrides, "source-override", "", tr("Optional. Path to a .json file that contains a set of replacements of the sketch source code."))
 	compileCommand.Flag("source-override").Hidden = true
-
+	compileCommand.Flags().BoolVar(&skipLibrariesDiscovery, "skip-libraries-discovery", false, "Skip libraries discovery. This flag is provided only for use in language server and other, very specific, use cases. Do not use for normal compiles")
+	compileCommand.Flag("skip-libraries-discovery").Hidden = true
 	configuration.Settings.BindPFlag("sketch.always_export_binaries", compileCommand.Flags().Lookup("export-binaries"))
 
 	compileCommand.Flags().MarkDeprecated("build-properties", tr("please use --build-property instead."))
@@ -220,6 +222,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		KeysKeychain:                  keysKeychain,
 		SignKey:                       signKey,
 		EncryptKey:                    encryptKey,
+		SkipLibrariesDiscovery:        skipLibrariesDiscovery,
 	}
 	compileStdOut := new(bytes.Buffer)
 	compileStdErr := new(bytes.Buffer)

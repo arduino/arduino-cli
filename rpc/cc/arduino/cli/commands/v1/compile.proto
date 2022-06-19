@@ -87,6 +87,12 @@ message CompileRequest {
   string sign_key = 26;
   // The name of the custom key to use for encrypting during the compile process
   string encrypt_key = 27;
+  // If set to true the build will skip the library discovery process and will
+  // use the same libraries of latest build. Enabling this flag may produce a
+  // wrong output and should not be used in regular compiles unless there is a
+  // very specific reason to do so. This flag is mainly provided for usage in
+  // language servers to optimize the build speed in some particular cases.
+  bool skip_libraries_discovery = 28;
 }
 
 message CompileResponse {
