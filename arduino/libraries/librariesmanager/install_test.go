@@ -24,43 +24,57 @@ import (
 
 func TestParseGitURL(t *testing.T) {
 	gitURL := ""
-	libraryName, err := parseGitURL(gitURL)
+	libraryName, ref, err := parseGitURL(gitURL)
 	require.Equal(t, "", libraryName)
+	require.EqualValues(t, "", ref)
 	require.Errorf(t, err, "invalid git url")
 
 	gitURL = "https://github.com/arduino/arduino-lib.git"
-	libraryName, err = parseGitURL(gitURL)
+	libraryName, ref, err = parseGitURL(gitURL)
 	require.Equal(t, "arduino-lib", libraryName)
+	require.EqualValues(t, "", ref)
+	require.NoError(t, err)
+
+	gitURL = "https://github.com/arduino/arduino-lib.git#0.1.2"
+	libraryName, ref, err = parseGitURL(gitURL)
+	require.Equal(t, "arduino-lib", libraryName)
+	require.EqualValues(t, "0.1.2", ref)
 	require.NoError(t, err)
 
 	gitURL = "git@github.com:arduino/arduino-lib.git"
-	libraryName, err = parseGitURL(gitURL)
+	libraryName, ref, err = parseGitURL(gitURL)
 	require.Equal(t, "arduino-lib", libraryName)
+	require.EqualValues(t, "", ref)
 	require.NoError(t, err)
 
 	gitURL = "file:///path/to/arduino-lib"
-	libraryName, err = parseGitURL(gitURL)
+	libraryName, ref, err = parseGitURL(gitURL)
 	require.Equal(t, "arduino-lib", libraryName)
+	require.EqualValues(t, "", ref)
 	require.NoError(t, err)
 
 	gitURL = "file:///path/to/arduino-lib.git"
-	libraryName, err = parseGitURL(gitURL)
+	libraryName, ref, err = parseGitURL(gitURL)
 	require.Equal(t, "arduino-lib", libraryName)
+	require.EqualValues(t, "", ref)
 	require.NoError(t, err)
 
 	gitURL = "/path/to/arduino-lib"
-	libraryName, err = parseGitURL(gitURL)
+	libraryName, ref, err = parseGitURL(gitURL)
 	require.Equal(t, "arduino-lib", libraryName)
+	require.EqualValues(t, "", ref)
 	require.NoError(t, err)
 
 	gitURL = "/path/to/arduino-lib.git"
-	libraryName, err = parseGitURL(gitURL)
+	libraryName, ref, err = parseGitURL(gitURL)
 	require.Equal(t, "arduino-lib", libraryName)
+	require.EqualValues(t, "", ref)
 	require.NoError(t, err)
 
 	gitURL = "file:///path/to/arduino-lib"
-	libraryName, err = parseGitURL(gitURL)
+	libraryName, ref, err = parseGitURL(gitURL)
 	require.Equal(t, "arduino-lib", libraryName)
+	require.EqualValues(t, "", ref)
 	require.NoError(t, err)
 }
 
