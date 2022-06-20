@@ -197,7 +197,9 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 		for _, a := range archives {
 			filesToLink.Add(a.ArchivePath)
 			if a.IsUpToDate() {
-				ctx.Info(fmt.Sprintf("%s %s", tr("Using previously build archive:"), a.ArchivePath))
+				if ctx.Verbose {
+					ctx.Info(fmt.Sprintf("%s %s", tr("Using previously build archive:"), a.ArchivePath))
+				}
 				continue
 			}
 			if err := a.Create(ctx, arPattern); err != nil {
