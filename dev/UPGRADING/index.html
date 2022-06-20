@@ -277,6 +277,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#nightly-builds-not-yet-released" class="md-nav__link">
+    Nightly builds: not yet released
+  </a>
+  
+    <nav class="md-nav" aria-label="Nightly builds: not yet released">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#grpc-monitor-service-and-related-grpc-calls-have-been-removed" class="md-nav__link">
+    gRPC Monitor service and related gRPC calls have been removed
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0230" class="md-nav__link">
     0.23.0
   </a>
@@ -1571,20 +1591,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../rpc/monitor/" class="md-nav__link">
-        monitor
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../rpc/settings/" class="md-nav__link">
         settings
       </a>
@@ -1837,6 +1843,26 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#nightly-builds-not-yet-released" class="md-nav__link">
+    Nightly builds: not yet released
+  </a>
+  
+    <nav class="md-nav" aria-label="Nightly builds: not yet released">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#grpc-monitor-service-and-related-grpc-calls-have-been-removed" class="md-nav__link">
+    gRPC Monitor service and related gRPC calls have been removed
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#0230" class="md-nav__link">
@@ -2330,6 +2356,21 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<h2 id="nightly-builds-not-yet-released">Nightly builds: not yet released<a class="headerlink" href="#nightly-builds-not-yet-released" title="Permanent link">&para;</a></h2>
+<h3 id="grpc-monitor-service-and-related-grpc-calls-have-been-removed">gRPC <code>Monitor</code> service and related gRPC calls have been removed<a class="headerlink" href="#grpc-monitor-service-and-related-grpc-calls-have-been-removed" title="Permanent link">&para;</a></h3>
+<p>The gRPC <code>Monitor</code> service and the gRPC call <code>Monitor.StreamingOpen</code> have been removed in favor of the new Pluggable
+Monitor API in the gRPC <code>Commands</code> service:</p>
+<ul>
+<li><code>Commands.Monitor</code>: open a monitor connection to a communication port.</li>
+<li><code>Commands.EnumerateMonitorPortSettings</code>: enumerate the possible configurations parameters for a communication port.</li>
+</ul>
+<p>Please refer to the official documentation and the reference client implementation for details on how to use the new
+API.</p>
+<p><a href="https://arduino.github.io/arduino-cli/dev/rpc/commands/#monitorrequest">https://arduino.github.io/arduino-cli/dev/rpc/commands/#monitorrequest</a>
+<a href="https://arduino.github.io/arduino-cli/dev/rpc/commands/#monitorresponse">https://arduino.github.io/arduino-cli/dev/rpc/commands/#monitorresponse</a>
+<a href="https://arduino.github.io/arduino-cli/dev/rpc/commands/#enumeratemonitorportsettingsrequest">https://arduino.github.io/arduino-cli/dev/rpc/commands/#enumeratemonitorportsettingsrequest</a>
+<a href="https://arduino.github.io/arduino-cli/dev/rpc/commands/#enumeratemonitorportsettingsresponse">https://arduino.github.io/arduino-cli/dev/rpc/commands/#enumeratemonitorportsettingsresponse</a></p>
+<p><a href="https://github.com/arduino/arduino-cli/blob/master/commands/daemon/term_example/main.go">https://github.com/arduino/arduino-cli/blob/master/commands/daemon/term_example/main.go</a></p>
 <h2 id="0230">0.23.0<a class="headerlink" href="#0230" title="Permanent link">&para;</a></h2>
 <h3 id="arduino-ide-builtin-libraries-are-now-excluded-from-the-build-when-running-arduino-cli-standalone">Arduino IDE builtin libraries are now excluded from the build when running <code>arduino-cli</code> standalone<a class="headerlink" href="#arduino-ide-builtin-libraries-are-now-excluded-from-the-build-when-running-arduino-cli-standalone" title="Permanent link">&para;</a></h3>
 <p>Previously the "builtin libraries" in the Arduino IDE 1.8.x were always included in the build process. This wasn't the
