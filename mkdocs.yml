@@ -100,7 +100,6 @@ nav:
       - version: commands/arduino-cli_version.md
   - gRPC reference:
       - commands: rpc/commands.md
-      - monitor: rpc/monitor.md
       - settings: rpc/settings.md
       - debug: rpc/debug.md
   - configuration.md

@@ -33,7 +33,6 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	srv_commands "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	srv_debug "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
-	srv_monitor "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/monitor/v1"
 	srv_settings "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -105,9 +104,6 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 	srv_commands.RegisterArduinoCoreServiceServer(s, &daemon.ArduinoCoreServerImpl{
 		VersionString: globals.VersionInfo.VersionString,
 	})
-
-	// Register the monitors service
-	srv_monitor.RegisterMonitorServiceServer(s, &daemon.MonitorService{})
 
 	// Register the settings service
 	srv_settings.RegisterSettingsServiceServer(s, &daemon.SettingsService{})

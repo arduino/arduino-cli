@@ -2,6 +2,26 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## Nightly builds: not yet released
+
+### gRPC `Monitor` service and related gRPC calls have been removed
+
+The gRPC `Monitor` service and the gRPC call `Monitor.StreamingOpen` have been removed in favor of the new Pluggable
+Monitor API in the gRPC `Commands` service:
+
+- `Commands.Monitor`: open a monitor connection to a communication port.
+- `Commands.EnumerateMonitorPortSettings`: enumerate the possible configurations parameters for a communication port.
+
+Please refer to the official documentation and the reference client implementation for details on how to use the new
+API.
+
+https://arduino.github.io/arduino-cli/dev/rpc/commands/#monitorrequest
+https://arduino.github.io/arduino-cli/dev/rpc/commands/#monitorresponse
+https://arduino.github.io/arduino-cli/dev/rpc/commands/#enumeratemonitorportsettingsrequest
+https://arduino.github.io/arduino-cli/dev/rpc/commands/#enumeratemonitorportsettingsresponse
+
+https://github.com/arduino/arduino-cli/blob/master/commands/daemon/term_example/main.go
+
 ## 0.23.0
 
 ### Arduino IDE builtin libraries are now excluded from the build when running `arduino-cli` standalone
