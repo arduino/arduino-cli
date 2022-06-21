@@ -2,7 +2,7 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
-## Nightly builds: not yet released
+## 0.24.0
 
 ### gRPC `Monitor` service and related gRPC calls have been removed
 
