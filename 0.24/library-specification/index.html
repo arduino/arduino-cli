@@ -1,0 +1,2179 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Arduino Command Line Interface">
+      
+      
+      
+      
+        <link rel="canonical" href="https://arduino.github.io/arduino-cli/0.24/library-specification/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-7.3.6">
+    
+    
+      
+        <title>Library specification - Arduino CLI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.a57b2b03.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#009485">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="teal" data-md-color-accent="orange">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#see-also" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Arduino CLI" class="md-header__button md-logo" aria-label="Arduino CLI" data-md-component="logo">
+      
+  <img src="../img/icon_mac_light.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Arduino CLI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Library specification
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/arduino/arduino-cli" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    arduino/arduino-cli
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Arduino CLI" class="md-nav__button md-logo" aria-label="Arduino CLI" data-md-component="logo">
+      
+  <img src="../img/icon_mac_light.png" alt="logo">
+
+    </a>
+    Arduino CLI
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/arduino/arduino-cli" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    arduino/arduino-cli
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        Installation
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../UPGRADING/" class="md-nav__link">
+        Upgrading
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        Getting started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../command-line-completion/" class="md-nav__link">
+        Command line completion
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CONTRIBUTING/" class="md-nav__link">
+        How to contribute
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FAQ/" class="md-nav__link">
+        FAQ
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8">
+          Command reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Command reference" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          Command reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli/" class="md-nav__link">
+        arduino-cli
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board/" class="md-nav__link">
+        board
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board_attach/" class="md-nav__link">
+        board attach
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board_details/" class="md-nav__link">
+        board details
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board_list/" class="md-nav__link">
+        board list
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board_listall/" class="md-nav__link">
+        board listall
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board_search/" class="md-nav__link">
+        board search
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_burn-bootloader/" class="md-nav__link">
+        burn-bootloader
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_cache/" class="md-nav__link">
+        cache
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_cache_clean/" class="md-nav__link">
+        cache clean
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_compile/" class="md-nav__link">
+        compile
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_completion/" class="md-nav__link">
+        completion
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config/" class="md-nav__link">
+        config
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_dump/" class="md-nav__link">
+        config dump
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_init/" class="md-nav__link">
+        config init
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_add/" class="md-nav__link">
+        config add
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_delete/" class="md-nav__link">
+        config delete
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_remove/" class="md-nav__link">
+        config remove
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_set/" class="md-nav__link">
+        config set
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core/" class="md-nav__link">
+        core
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_download/" class="md-nav__link">
+        core download
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_install/" class="md-nav__link">
+        core install
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_list/" class="md-nav__link">
+        core list
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_search/" class="md-nav__link">
+        core search
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_uninstall/" class="md-nav__link">
+        core uninstall
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_update-index/" class="md-nav__link">
+        core update-index
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_upgrade/" class="md-nav__link">
+        core upgrade
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_daemon/" class="md-nav__link">
+        daemon
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_debug/" class="md-nav__link">
+        debug
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib/" class="md-nav__link">
+        lib
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_deps/" class="md-nav__link">
+        lib deps
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_download/" class="md-nav__link">
+        lib download
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_examples/" class="md-nav__link">
+        lib examples
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_install/" class="md-nav__link">
+        lib install
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_list/" class="md-nav__link">
+        lib list
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_search/" class="md-nav__link">
+        lib search
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_uninstall/" class="md-nav__link">
+        lib uninstall
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_update-index/" class="md-nav__link">
+        lib update-index
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_upgrade/" class="md-nav__link">
+        lib upgrade
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_monitor/" class="md-nav__link">
+        monitor
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_outdated/" class="md-nav__link">
+        outdated
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_sketch/" class="md-nav__link">
+        sketch
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_sketch_archive/" class="md-nav__link">
+        sketch archive
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_sketch_new/" class="md-nav__link">
+        sketch new
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_update/" class="md-nav__link">
+        update
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_upgrade/" class="md-nav__link">
+        upgrade
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_upload/" class="md-nav__link">
+        upload
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_version/" class="md-nav__link">
+        version
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9">
+          gRPC reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="gRPC reference" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          gRPC reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rpc/commands/" class="md-nav__link">
+        commands
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rpc/settings/" class="md-nav__link">
+        settings
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rpc/debug/" class="md-nav__link">
+        debug
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        Configuration
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../integration-options/" class="md-nav__link">
+        Integration options
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sketch-build-process/" class="md-nav__link">
+        Sketch build process
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sketch-specification/" class="md-nav__link">
+        Sketch specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sketch-project-file/" class="md-nav__link">
+        Sketch project file
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Library specification
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Library specification
+      </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    See also
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-library-format-rev-22" class="md-nav__link">
+    1.5 library format (rev. 2.2)
+  </a>
+  
+    <nav class="md-nav" aria-label="1.5 library format (rev. 2.2)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#library-metadata" class="md-nav__link">
+    Library metadata
+  </a>
+  
+    <nav class="md-nav" aria-label="Library metadata">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#libraryproperties-file-format" class="md-nav__link">
+    library.properties file format
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#layout-of-folders-and-files" class="md-nav__link">
+    Layout of folders and files
+  </a>
+  
+    <nav class="md-nav" aria-label="Layout of folders and files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#library-root-folder" class="md-nav__link">
+    Library Root folder
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-code" class="md-nav__link">
+    Source code
+  </a>
+  
+    <nav class="md-nav" aria-label="Source code">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#library-layout" class="md-nav__link">
+    Library layout
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#precompiled-binaries" class="md-nav__link">
+    Precompiled binaries
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#library-examples" class="md-nav__link">
+    Library Examples
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extra-documentation" class="md-nav__link">
+    Extra documentation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keywords" class="md-nav__link">
+    Keywords
+  </a>
+  
+    <nav class="md-nav" aria-label="Keywords">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#keywordstxt-format" class="md-nav__link">
+    keywords.txt format
+  </a>
+  
+    <nav class="md-nav" aria-label="keywords.txt format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#keyword_tokentype" class="md-nav__link">
+    KEYWORD_TOKENTYPE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_link" class="md-nav__link">
+    REFERENCE_LINK
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rsyntaxtextarea_tokentype" class="md-nav__link">
+    RSYNTAXTEXTAREA_TOKENTYPE
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#development-flag-file" class="md-nav__link">
+    Development flag file
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-complete-example" class="md-nav__link">
+    A complete example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#working-with-multiple-architectures" class="md-nav__link">
+    Working with multiple architectures
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#old-library-format-pre-15" class="md-nav__link">
+    Old library format (pre-1.5)
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../platform-specification/" class="md-nav__link">
+        Platform specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pluggable-discovery-specification/" class="md-nav__link">
+        Pluggable discovery specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pluggable-monitor-specification/" class="md-nav__link">
+        Pluggable monitor specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../package_index_json-specification/" class="md-nav__link">
+        Package index specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_20" type="checkbox" id="__nav_20" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_20">
+          Guides
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Guides" data-md-level="1">
+        <label class="md-nav__title" for="__nav_20">
+          <span class="md-nav__icon md-icon"></span>
+          Guides
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/secure-boot/" class="md-nav__link">
+        Secure boot
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    See also
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-library-format-rev-22" class="md-nav__link">
+    1.5 library format (rev. 2.2)
+  </a>
+  
+    <nav class="md-nav" aria-label="1.5 library format (rev. 2.2)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#library-metadata" class="md-nav__link">
+    Library metadata
+  </a>
+  
+    <nav class="md-nav" aria-label="Library metadata">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#libraryproperties-file-format" class="md-nav__link">
+    library.properties file format
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#layout-of-folders-and-files" class="md-nav__link">
+    Layout of folders and files
+  </a>
+  
+    <nav class="md-nav" aria-label="Layout of folders and files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#library-root-folder" class="md-nav__link">
+    Library Root folder
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-code" class="md-nav__link">
+    Source code
+  </a>
+  
+    <nav class="md-nav" aria-label="Source code">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#library-layout" class="md-nav__link">
+    Library layout
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#precompiled-binaries" class="md-nav__link">
+    Precompiled binaries
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#library-examples" class="md-nav__link">
+    Library Examples
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extra-documentation" class="md-nav__link">
+    Extra documentation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keywords" class="md-nav__link">
+    Keywords
+  </a>
+  
+    <nav class="md-nav" aria-label="Keywords">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#keywordstxt-format" class="md-nav__link">
+    keywords.txt format
+  </a>
+  
+    <nav class="md-nav" aria-label="keywords.txt format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#keyword_tokentype" class="md-nav__link">
+    KEYWORD_TOKENTYPE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_link" class="md-nav__link">
+    REFERENCE_LINK
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rsyntaxtextarea_tokentype" class="md-nav__link">
+    RSYNTAXTEXTAREA_TOKENTYPE
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#development-flag-file" class="md-nav__link">
+    Development flag file
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-complete-example" class="md-nav__link">
+    A complete example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#working-with-multiple-architectures" class="md-nav__link">
+    Working with multiple architectures
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#old-library-format-pre-15" class="md-nav__link">
+    Old library format (pre-1.5)
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/arduino/arduino-cli/blob/master/docs/library-specification.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  <h1>Library specification</h1>
+                
+                <p>This is the specification for the Arduino library format, to be used with Arduino IDE 1.5.x onwards.</p>
+<ul>
+<li>rev.1 has been implemented starting with Arduino IDE version 1.5.3 (now superseded by rev.2)</li>
+<li>rev.2 will be implemented starting from Arduino IDE version 1.5.6</li>
+<li>rev.2.1 will be implemented starting from Arduino IDE version 1.6.10</li>
+<li>rev.2.2 will be implemented starting from Arduino IDE version 1.8.10</li>
+</ul>
+<p>This new library format is intended to be used in tandem with <strong>Library Manager</strong>, available since Arduino IDE 1.6.2.
+The Library Manager allows users to automatically download and install libraries needed in their projects, with an easy
+to use graphical interface in the
+<a href="https://docs.arduino.cc/software/ide-v1/tutorials/installing-libraries#using-the-library-manager">Arduino IDE</a>/<a href="https://docs.arduino.cc/software/ide-v2/tutorials/ide-v2-installing-a-library#installing-a-library">Arduino IDE 2.0</a>
+and
+<a href="https://create.arduino.cc/projecthub/Arduino_Genuino/getting-started-with-arduino-web-editor-on-various-platforms-4b3e4a#toc-libraries-and-the-arduino-web-editor-11">Arduino Web Editor</a>
+as well as <a href="../commands/arduino-cli_lib/"><code>arduino-cli lib</code></a>.</p>
+<p>More information about how Library Manager works is available
+<a href="https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ">here</a>.</p>
+<p>Arduino development software supports multiple microcontroller architectures (e.g. AVR, SAM, etc), meaning that
+libraries may need to work on multiple architectures. The new 1.5 library format doesn’t contain special support for
+cross-architecture libraries, but it does provide a preprocessor based mechanism for libraries to target sections of
+code to specific architectures.</p>
+<h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="http://docs.arduino.cc/learn/contributions/arduino-library-style-guide">Arduino library style guide</a></li>
+<li><a href="../sketch-build-process/#dependency-resolution">Library dependency resolution process documentation</a></li>
+</ul>
+<h2 id="15-library-format-rev-22">1.5 library format (rev. 2.2)<a class="headerlink" href="#15-library-format-rev-22" title="Permanent link">&para;</a></h2>
+<h3 id="library-metadata">Library metadata<a class="headerlink" href="#library-metadata" title="Permanent link">&para;</a></h3>
+<p>The most significant addition to the format is the ability to add information about the library itself through a
+properties file called <strong>library.properties</strong>.</p>
+<p>This file allows the <em>Library Manager</em> to search and install a library and its dependencies in an easy and automated
+way. It must be located in the root of the library folder.</p>
+<h4 id="libraryproperties-file-format">library.properties file format<a class="headerlink" href="#libraryproperties-file-format" title="Permanent link">&para;</a></h4>
+<p>The library.properties file is a key=value properties list. Every field in this file is UTF-8 encoded. Unless noted
+otherwise below, <strong>all fields are required</strong>. The available fields are:</p>
+<ul>
+<li><strong>name</strong> - the name of the library. Library names must contain only basic letters (A-Z or a-z) and numbers (0-9),
+  spaces ( ), underscores (_), dots (.) and dashes (-). They must start with a letter or number. They must contain at
+  least one letter. Note that libraries with a <code>name</code> value starting with <code>Arduino</code> will no longer be allowed
+  <a href="https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ">addition to the Library Manager index</a> as these names
+  are now reserved for official Arduino libraries.</li>
+<li><strong>version</strong> - version of the library. Version should be <a href="http://semver.org/">semver</a> compliant. 1.2.0 is correct; 1.2
+  is accepted; r5, 003, 1.1c are invalid</li>
+<li><strong>author</strong> - name/nickname of the authors and their email addresses (not mandatory) separated by comma (,)</li>
+<li><strong>maintainer</strong> - name and email of the maintainer</li>
+<li><strong>sentence</strong> - a sentence explaining the purpose of the library</li>
+<li><strong>paragraph</strong> - a longer description of the library. The value of <strong>sentence</strong> will be prepended to this, so you
+  should start by writing the second sentence here</li>
+<li><strong>category</strong> - (defaults to <code>Uncategorized</code>) allowed values:<ul>
+<li>Display</li>
+<li>Communication</li>
+<li>Signal Input/Output</li>
+<li>Sensors</li>
+<li>Device Control</li>
+<li>Timing</li>
+<li>Data Storage</li>
+<li>Data Processing</li>
+<li>Other</li>
+</ul>
+</li>
+<li><strong>url</strong> - the URL of the library project, for a person to visit. For example, the library's GitHub page. This is used
+  for the "More info" links in Library Manager</li>
+<li><strong>architectures</strong> - (defaults to <code>*</code>) a comma separated list of architectures supported by the library. If the library
+  doesn’t contain architecture specific code use <code>*</code> to match all architectures. This field is used as one factor in
+  determining priority when multiple libraries match an <code>#include</code> directive and to provide a warning message when the
+  library is compiled for a board of an architecture that doesn't match any on the list.</li>
+<li><strong>depends</strong> - <strong>(available from Arduino IDE 1.8.10/Arduino CLI 0.7.0)</strong> (optional) a comma-separated list of
+  dependencies (libraries that are needed to build the current library). The Arduino IDE's Library Manager will offer to
+  install the dependencies during installation of the library.
+  <a href="../commands/arduino-cli_lib_install/"><code>arduino-cli lib install</code></a> will automatically install the dependencies. Since
+  spaces are allowed in the <code>name</code> of a library, but not commas, you can refer to libraries containing spaces in the
+  name without ambiguity for example:<br> <code>depends=Very long library name, Another library with long-name</code></li>
+<li><strong>dot_a_linkage</strong> - <strong>(available from Arduino IDE 1.6.0 / arduino-builder 1.0.0-beta13)</strong> (optional) when set to
+  <code>true</code>, the library will be compiled using a .a (archive) file. First, all source files are compiled into .o files as
+  normal. Then instead of including all .o
+    <!-- prettier-ignore -->
+  files in the linker command directly, all .o files are saved into a .a file, which is then included in the linker
+  command. <a href="#layout-of-folders-and-files">1.5 format library folder structure</a> is required.</li>
+<li><strong>includes</strong> - <strong>(available from Arduino IDE 1.6.10)</strong> (optional) a comma separated list of files of the library to be
+  added to the sketch as <code>#include &lt;...&gt;</code> lines. This property is used with the "Include library" command in the Arduino
+  IDE. If the <code>includes</code> property is missing, all the header files (.h) on the root source folder are included.</li>
+<li><strong>precompiled</strong> - <strong>(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)</strong> (optional) enables support for .a
+  (archive) and .so (shared object) files. See the <a href="#precompiled-binaries">"Precompiled binaries"</a> section for
+  documentation of the required location in the library for these files. The static library should be linked as an
+  ldflag. The <strong>precompiled</strong> field has two supported values, which control how any source files in the library are
+  handled:<ul>
+<li>true - Source files are always compiled. This is useful for "mixed" libraries, such as those that contain both open
+  source code and the precompiled binary of a closed source component. Support for "mixed" libraries was inadvertently
+  lost in Arduino IDE 1.8.12/arduino-builder 1.5.2/Arduino CLI 0.8.0, and returned in Arduino IDE
+  1.8.13/arduino-builder 1.5.3/Arduino CLI 0.11.0.</li>
+<li>full - <strong>(available from Arduino IDE 1.8.13/arduino-builder 1.5.3/Arduino CLI 0.11.0)</strong> If the library provides a
+  precompiled library for the board being compiled for, the source files will not be compiled. If no precompiled
+  library was provided for the selected board, source files are compiled as a fallback. This is useful for
+  precompiling the library to reduce compilation time for specific target hardware, but also providing support for
+  arbitrary boards by compiling the library on demand.</li>
+</ul>
+</li>
+<li><strong>ldflags</strong> - <strong>(available from Arduino IDE 1.8.6/arduino-builder 1.4.0)</strong> (optional) the linker flags to be added.
+  Ex: <code>ldflags=-lm</code></li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>name=WebServer
+version=1.0.0
+author=Cristian Maglie &lt;c.maglie@example.com&gt;, Pippo Pluto &lt;pippo@example.com&gt;
+maintainer=Cristian Maglie &lt;c.maglie@example.com&gt;
+sentence=A library that makes coding a Webserver a breeze.
+paragraph=Supports HTTP1.1 and you can do GET and POST.
+category=Communication
+url=http://example.com/
+architectures=avr
+includes=WebServer.h
+depends=ArduinoHttpClient
+</code></pre></div>
+<h3 id="layout-of-folders-and-files">Layout of folders and files<a class="headerlink" href="#layout-of-folders-and-files" title="Permanent link">&para;</a></h3>
+<p>Each folder has a specific purpose (sources, examples, documentation, etc). Folders not covered in this specification
+may be added as needed to future revisions.</p>
+<h4 id="library-root-folder">Library Root folder<a class="headerlink" href="#library-root-folder" title="Permanent link">&para;</a></h4>
+<p>The library root folder name must start with a basic letter (A-Z or a-z) or number (0-9), followed by basic letters,
+numbers, underscores (_), dots (.) and dashes (-). The maximum length is 63 characters.</p>
+<h4 id="source-code">Source code<a class="headerlink" href="#source-code" title="Permanent link">&para;</a></h4>
+<p>For libraries intended to be used with Arduino IDE 1.5.x+ only, the source code resides in the <strong>src</strong> folder. For
+example:</p>
+<div class="highlight"><pre><span></span><code>Servo/src/Servo.h
+Servo/src/Servo.cpp
+</code></pre></div>
+<p>The source code found in <strong>src</strong> folder and <em>all its subfolders</em> is compiled and linked in the user’s sketch. Only the
+<em>src</em> folder is added to the include search path (both when compiling the sketch and the library). When the user imports
+a library into their sketch (from the Arduino IDE's "Sketch &gt; Include Library" menu or the Arduino Web Editor's
+"Include" button), the default behavior (configurable via the
+<a href="#libraryproperties-file-format">library.properties <code>includes</code> field</a>) is for an <code>#include</code> statement to be added for
+all header (.h) files in the src/ directory (but not its subfolders). As a result, these header files form something of
+a de facto interface to your library; in general, the only header files in the root src/ folder should be those that you
+want to expose to the user's sketch and plan to maintain compatibility with in future versions of the library. Place
+internal header files in a subfolder of the src/ folder.</p>
+<p>For backward compatibility with Arduino IDE 1.0.x, the library author may opt to place source code into the root folder,
+instead of the folder called <strong>src</strong>. In this case the 1.0 library format is applied and the source code is searched
+from the <strong>library root folder</strong> and the <strong>utility</strong> folder, for example:</p>
+<div class="highlight"><pre><span></span><code>Servo/Servo.h
+Servo/Servo.cpp
+Servo/utility/ServoTimers.h
+Servo/utility/ServoTimers.cpp
+</code></pre></div>
+<p>This will allow existing 1.0 format libraries to compile under Arduino IDE 1.5.x+ as well, and vice-versa. If a library
+only needs to run on Arduino IDE 1.5.x+, we recommend placing all source code in the src/ folder. If a library requires
+recursive compilation of nested source folders, its code must be in the src/ folder (since Arduino IDE 1.0.x doesn’t
+support recursive compilation, backwards compatibility wouldn’t be possible anyway).</p>
+<h5 id="library-layout">Library layout<a class="headerlink" href="#library-layout" title="Permanent link">&para;</a></h5>
+<p><img alt="Library layout" src="../img/library-layout.svg" /></p>
+<table>
+<thead>
+<tr>
+<th>Layout</th>
+<th>root compiled</th>
+<th><code>src</code> compiled</th>
+<th><code>utility</code> compiled</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>recursive</strong></td>
+<td>no</td>
+<td>recursively</td>
+<td>no</td>
+</tr>
+<tr>
+<td><strong>flat</strong></td>
+<td>yes</td>
+<td>no</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<h4 id="precompiled-binaries">Precompiled binaries<a class="headerlink" href="#precompiled-binaries" title="Permanent link">&para;</a></h4>
+<p>The <code>precompiled</code> field of <a href="#libraryproperties-file-format">library.properties</a> enables support for the use of
+precompiled libraries. This requires providing .a (archive) or .so (shared object) files which are compiled for a
+particular processor architecture. The target architecture of the files is indicated by folder names.</p>
+<p>The binaries must be located at <code>src/{build.mcu}</code>, where <code>{build.mcu}</code> is the architecture name of the target the file
+was compiled for. Ex: <code>cortex-m3</code> for the Arduino Due.</p>
+<p>The filenames of the compiled binaries should start with <code>lib</code> (e.g., <code>libFoo.a</code>).</p>
+<p><strong>(available from Arduino IDE 1.8.12/arduino-builder 1.5.2/Arduino CLI 0.8.0)</strong> The floating point ABI configuration of
+ARM core microcontrollers may be adjusted via compiler flags. An extra subfolder level can be used to provide files
+compiled for a specific floating point configuration: <code>src/{build.mcu}/{build.fpu}-{build.float-abi}</code>, where
+<code>{build.fpu}</code> is the value of the <code>-mfpu</code> compiler flag and <code>{build.float-abi}</code> is the value of the <code>-mfloat-abi</code>
+compiler flag. <strong>(available from Arduino IDE 1.8.13/arduino-builder 1.5.3/Arduino CLI 0.11.0)</strong> If floating point
+configuration flags are used but no folder matching that configuration is found, <code>src/{build.mcu}</code> is used as a
+fallback.</p>
+<p>Below is an example library <code>src</code> folder structure that provides:</p>
+<ul>
+<li>Header file containing the declarations for the library API.</li>
+<li>Source file to use as a fallback for other architectures (<code>precompiled=full</code> mode).</li>
+<li>Archive file for the ARM Cortex M0+ architecture of the Arduino SAMD boards.</li>
+<li>Archive file for the ARM Cortex M4 architecture of the Arduino Nano 33 BLE, as a fallback for backwards compatibility
+  with Arduino development software before the floating point configuration support was added.</li>
+<li>Archive file for the ARM Cortex M4 architecture of the Arduino Nano 33 BLE, compiled for the
+  <code>-mfloat-abi=softfp -mfpu=fpv4-sp-d16</code> floating point ABI configuration.</li>
+</ul>
+<div class="highlight"><pre><span></span><code>Servo/src/Servo.h
+Servo/src/Servo.cpp
+Servo/src/cortex-m0plus/libServo.a
+Servo/src/cortex-m4/libServo.a
+Servo/src/cortex-m4/fpv4-sp-d16-softfp/libServo.a
+</code></pre></div>
+<h4 id="library-examples">Library Examples<a class="headerlink" href="#library-examples" title="Permanent link">&para;</a></h4>
+<p>Library examples must be placed in the <strong>examples</strong> folder. Note that the <strong>examples</strong> folder name must be written
+exactly like that (with lower case letters).</p>
+<div class="highlight"><pre><span></span><code>Servo/examples/...
+</code></pre></div>
+<p>Sketches contained inside the examples folder will be shown in the Examples menu of the Arduino IDE and Arduino Web
+Editor.</p>
+<p>More information:</p>
+<ul>
+<li><a href="../sketch-specification/">Arduino sketch specification</a></li>
+<li><a href="https://www.arduino.cc/en/Reference/StyleGuide">Style guide for Arduino examples</a></li>
+</ul>
+<h4 id="extra-documentation">Extra documentation<a class="headerlink" href="#extra-documentation" title="Permanent link">&para;</a></h4>
+<p>An <strong>extras</strong> folder can be used by the developer to put documentation or other items to be bundled with the library.
+Remember that files placed inside this folder will increase the size of the library, so putting a 20MB PDF in a library
+that weights a few kilobytes may not be such a good idea.</p>
+<p>The content of the <em>extras</em> folder is totally ignored by the Arduino development software; you are free to put anything
+inside.</p>
+<h3 id="keywords">Keywords<a class="headerlink" href="#keywords" title="Permanent link">&para;</a></h3>
+<p>A list of keywords for the library may be specified in a file named keywords.txt located in the root of the library
+folder. When a keyword of any installed library is used in a sketch the Arduino IDE colors it.</p>
+<div class="highlight"><pre><span></span><code>Servo/keywords.txt
+</code></pre></div>
+<p>An example keywords.txt file:</p>
+<div class="highlight"><pre><span></span><code># Syntax Coloring Map For ExampleLibrary
+
+# Datatypes (KEYWORD1)
+Test    KEYWORD1
+
+# Methods and Functions (KEYWORD2)
+doSomething KEYWORD2
+
+# Instances (KEYWORD2)
+
+# Constants (LITERAL1)
+</code></pre></div>
+<p>This file would cause the Arduino IDE to highlight <code>Test</code> as a data type, and <code>doSomething</code> as a method / function.</p>
+<h4 id="keywordstxt-format">keywords.txt format<a class="headerlink" href="#keywordstxt-format" title="Permanent link">&para;</a></h4>
+<p>keywords.txt is formatted in four fields which are separated by a single true tab (not spaces):</p>
+<div class="highlight"><pre><span></span><code>KEYWORD KEYWORD_TOKENTYPE   REFERENCE_LINK  RSYNTAXTEXTAREA_TOKENTYPE
+</code></pre></div>
+<p>It is permitted to leave a field empty.</p>
+<h5 id="keyword_tokentype"><code>KEYWORD_TOKENTYPE</code><a class="headerlink" href="#keyword_tokentype" title="Permanent link">&para;</a></h5>
+<table>
+<thead>
+<tr>
+<th>KEYWORD_TOKENTYPE</th>
+<th>Use for</th>
+<th>Theme property</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KEYWORD1</code></td>
+<td>datatypes</td>
+<td><code>editor.data_type.style</code></td>
+</tr>
+<tr>
+<td><code>KEYWORD2</code></td>
+<td>functions</td>
+<td><code>editor.function.style</code></td>
+</tr>
+<tr>
+<td><code>KEYWORD3</code></td>
+<td>structures</td>
+<td><code>editor.function.style</code></td>
+</tr>
+<tr>
+<td><code>LITERAL1</code></td>
+<td>constants</td>
+<td><code>editor.reserved_word_2.style</code></td>
+</tr>
+<tr>
+<td><code>LITERAL2</code></td>
+<td>?</td>
+<td><code>editor.function.style</code></td>
+</tr>
+</tbody>
+</table>
+<h5 id="reference_link"><code>REFERENCE_LINK</code><a class="headerlink" href="#reference_link" title="Permanent link">&para;</a></h5>
+<p>This field specifies the <a href="https://www.arduino.cc/reference/en">Arduino Language Reference</a> page to open via the Arduino
+IDE's <strong>Right Click &gt; Find in Reference</strong> or <strong>Help &gt; Find in Reference</strong> when the cursor is on that keyword. Generally
+it does not make sense to define the <code>REFERENCE_LINK</code> field for 3rd party library keywords since they are not likely to
+be in the Arduino Language Reference.</p>
+<h5 id="rsyntaxtextarea_tokentype"><code>RSYNTAXTEXTAREA_TOKENTYPE</code><a class="headerlink" href="#rsyntaxtextarea_tokentype" title="Permanent link">&para;</a></h5>
+<p>In Arduino IDE 1.6.5 and newer this field overrides <code>KEYWORD_TOKENTYPE</code>. In previous IDE versions the
+<code>RSYNTAXTEXTAREA_TOKENTYPE</code> field is ignored and <code>KEYWORD_TOKENTYPE</code> is used instead.</p>
+<table>
+<thead>
+<tr>
+<th>RSYNTAXTEXTAREA_TOKENTYPE</th>
+<th>Theme property</th>
+<th>KEYWORD_TOKENTYPE equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RESERVED_WORD</code></td>
+<td><code>editor.reserved_word.style</code></td>
+<td><code>KEYWORD3</code></td>
+</tr>
+<tr>
+<td><code>RESERVED_WORD_2</code></td>
+<td><code>editor.reserved_word_2.style</code></td>
+<td><code>LITERAL1</code></td>
+</tr>
+<tr>
+<td><code>DATA_TYPE</code></td>
+<td><code>editor.data_type.style</code></td>
+<td><code>KEYWORD1</code></td>
+</tr>
+<tr>
+<td><code>PREPROCESSOR</code></td>
+<td><code>editor.preprocessor.style</code></td>
+<td><code>KEYWORD3</code></td>
+</tr>
+<tr>
+<td><code>LITERAL_BOOLEAN</code></td>
+<td><code>editor.literal_boolean.style</code></td>
+<td><code>LITERAL1</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="development-flag-file">Development flag file<a class="headerlink" href="#development-flag-file" title="Permanent link">&para;</a></h3>
+<p>Normally the Arduino IDE treats the contents of the library folder as read-only. This is to prevent users from
+accidentally modifying example sketches. During the library development process you may want to edit example sketches in
+place using the Arduino IDE. With Arduino IDE 1.6.6 and newer, the read-only behavior can be disabled by adding a file
+named .development to the root of the library folder. A <a href="#libraryproperties-file-format">library.properties</a> file must
+also be present. The <a href="https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ">Library Manager indexer</a> will not
+pick up releases that contain a .development file so be sure not to push this file to your remote repository.</p>
+<h3 id="a-complete-example">A complete example<a class="headerlink" href="#a-complete-example" title="Permanent link">&para;</a></h3>
+<p>A hypothetical library named "Servo" that adheres to the specification follows:</p>
+<div class="highlight"><pre><span></span><code>Servo/
+Servo/library.properties
+Servo/keywords.txt
+Servo/src/
+Servo/src/Servo.h
+Servo/src/Servo.cpp
+Servo/src/ServoTimers.h
+Servo/examples/
+Servo/examples/Sweep/Sweep.ino
+Servo/examples/Pot/Pot.ino
+Servo/extras/
+Servo/extras/Servo_Connectors.pdf
+</code></pre></div>
+<h2 id="working-with-multiple-architectures">Working with multiple architectures<a class="headerlink" href="#working-with-multiple-architectures" title="Permanent link">&para;</a></h2>
+<p>Libraries placed in the <code>libraries</code> subfolder of the sketchbook folder (AKA "user directory") will be made available for
+all boards, which may include multiple different processor architectures. To provide architecture-specific code or
+optimizations, library authors can use the <code>ARDUINO_ARCH_XXX</code> preprocessor macro (<code>#define</code>), where XXX is the name of
+the architecture (as determined by the name of the
+<a href="../platform-specification/#hardware-folders-structure">architecture folder</a> of the board's platform). For example,
+<code>ARDUINO_ARCH_AVR</code> will be defined when compiling for AVR-based boards.</p>
+<p>An example:</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#if defined(ARDUINO_ARCH_AVR)</span>
+<span class="w">  </span><span class="c1">// AVR-specific code</span>
+<span class="cp">#elif defined(ARDUINO_ARCH_SAM)</span>
+<span class="w">  </span><span class="c1">// SAM-specific code</span>
+<span class="cp">#else</span>
+<span class="w">  </span><span class="c1">// generic, non-platform specific code</span>
+<span class="cp">#endif</span>
+</code></pre></div>
+<p>Alternatively, if a library only works on certain architectures, you can provide an explicit error message (instead of
+allowing the compilation to fail in a difficult to understand way):</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#if defined(ARDUINO_ARCH_AVR)</span>
+<span class="w">  </span><span class="c1">// AVR-specific code</span>
+<span class="cp">#elif defined(ARDUINO_ARCH_SAM)</span>
+<span class="w">  </span><span class="c1">// SAM-specific code</span>
+<span class="cp">#else</span>
+<span class="w">  </span><span class="cp">#error “This library only supports boards with an AVR or SAM processor.”</span>
+<span class="cp">#endif</span>
+</code></pre></div>
+<h2 id="old-library-format-pre-15">Old library format (pre-1.5)<a class="headerlink" href="#old-library-format-pre-15" title="Permanent link">&para;</a></h2>
+<p>In order to support old libraries (from Arduino IDE 1.0.x), the Arduino IDE/Pro IDE and Arduino CLI will also compile
+libraries missing a library.properties metadata file. As a result, these libraries should behave as they did in Arduino
+IDE 1.0.x, although they will be available for all boards, including non-AVR ones (which wouldn’t have been present in
+Arduino IDE 1.0.x).</p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../sketch-project-file/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Sketch project file" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Sketch project file
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../platform-specification/" class="md-footer__link md-footer__link--next" aria-label="Next: Platform specification" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Platform specification
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+          </div>
+        
+        
+          Made with
+          <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+            Material for MkDocs
+          </a>
+        
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.fcfe8b6d.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.b1047164.min.js"></script>
+      
+    
+  </body>
+</html>
