@@ -63,7 +63,7 @@ in your [`PATH`](https://en.wikipedia.org/wiki/PATH%5F%28variable%29) or add the
 | Linux     | [32 bit][linux32]    | [64 bit][linux64]    |
 | Linux ARM | [32 bit][linuxarm32] | [64 bit][linuxarm64] |
 | Windows   | [32 bit][windows32]  | [64 bit][windows64]  |
-| macOS     |                      | [64 bit][macos]      |
+| macOS     | [ARM][macosarm64]    | [64 bit][macos64]    |
 
 [linux64]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz
 [linux32]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_32bit.tar.gz
@@ -71,7 +71,8 @@ in your [`PATH`](https://en.wikipedia.org/wiki/PATH%5F%28variable%29) or add the
 [linuxarm32]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARMv7.tar.gz
 [windows64]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_64bit.zip
 [windows32]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_32bit.zip
-[macos]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_macOS_64bit.tar.gz
+[macos64]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_macOS_64bit.tar.gz
+[macosarm64]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_macOS_ARM64.tar.gz
 
 > **Deprecation notice**: links in the form
 > `http://downloads.arduino.cc/arduino-cli/arduino-cli-latest-<platform>.tar.bz2` won’t be further updated. That URL
@@ -91,7 +92,7 @@ to get the latest nightly build available for the supported platform, use the fo
 | Linux     | [32 bit][linux32-nightly]    | [64 bit][linux64-nightly]    |
 | Linux ARM | [32 bit][linuxarm32-nightly] | [64 bit][linuxarm64-nightly] |
 | Windows   | [32 bit][windows32-nightly]  | [64 bit][windows64-nightly]  |
-| macOS     |                              | [64 bit][macos-nightly]      |
+| macOS     | [ARM][macosarm64-nightly]    | [64 bit][macos64-nightly]    |
 
 [linux64-nightly]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_64bit.tar.gz
 [linux32-nightly]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_32bit.tar.gz
@@ -99,7 +100,8 @@ to get the latest nightly build available for the supported platform, use the fo
 [linuxarm32-nightly]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARMv7.tar.gz
 [windows64-nightly]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_64bit.zip
 [windows32-nightly]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_32bit.zip
-[macos-nightly]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_macOS_64bit.tar.gz
+[macos64-nightly]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_macOS_64bit.tar.gz
+[macosarm64-nightly]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_macOS_ARM64.tar.gz
 
 > These links return a `302: Found` response, redirecting to latest generated builds by replacing `latest` with the
 > latest available build date, using the format YYYYMMDD (i.e for 2019-08-06 `latest` is replaced with `20190806` )
