@@ -45,12 +45,15 @@ jobs:
           path: ${{ env.DIST_DIR }}
 
   notarize-macos:
-    name: notarize-${{ matrix.artifact.name }}
+    name: Notarize ${{ matrix.artifact.name }}
     runs-on: macos-latest
     needs: create-nightly-artifacts
     outputs:
       checksum-darwin_amd64: ${{ steps.re-package.outputs.checksum-darwin_amd64 }}
       checksum-darwin_arm64: ${{ steps.re-package.outputs.checksum-darwin_arm64 }}
+
+    env:
+      GON_CONFIG_PATH: gon.config.hcl
 
     strategy:
       matrix:
@@ -101,7 +104,7 @@ jobs:
       - name: Write gon config to file
         # gon does not allow env variables in config file (https://github.com/mitchellh/gon/issues/20)
         run: |
-          cat > gon.config.hcl <<EOF
+          cat > "${{ env.GON_CONFIG_PATH }}" <<EOF
           # See: https://github.com/mitchellh/gon#configuration-file
           source = ["dist/arduino-cli_osx_${{ matrix.artifact.name }}/arduino-cli"]
           bundle_id = "cc.arduino.arduino-cli"
@@ -122,7 +125,7 @@ jobs:
           AC_USERNAME: ${{ secrets.AC_USERNAME }}
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
         run: |
-          gon gon.config.hcl
+          gon "${{ env.GON_CONFIG_PATH }}"
 
       - name: Re-package binary and output checksum
         id: re-package
@@ -130,7 +133,8 @@ jobs:
         # This step performs the following:
         # 1. Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
         # 2. Recalculate package checksum
-        # 3. Output the new checksum to include in the nnnnnn-checksums.txt file(it cannot be done there because of parallelization)
+        # 3. Output the new checksum to include in the nnnnnn-checksums.txt file
+        #    (it cannot be done there because of workflow job parallelization)
         run: |
           # GitHub's upload/download-artifact@v2 actions don't preserve file permissions,
           # so we need to add execution permission back until the action is made to do this.
