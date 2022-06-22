@@ -63,7 +63,8 @@ in your [`PATH`](https://en.wikipedia.org/wiki/PATH%5F%28variable%29) or add the
 | Linux     | [32 bit][linux32]    | [64 bit][linux64]    |
 | Linux ARM | [32 bit][linuxarm32] | [64 bit][linuxarm64] |
 | Windows   | [32 bit][windows32]  | [64 bit][windows64]  |
-| macOS     | [ARM][macosarm64]    | [64 bit][macos64]    |
+| macOS     |                      | [64 bit][macos64]    |
+| macOS ARM |                      | [64 bit][macosarm64] |
 
 [linux64]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz
 [linux32]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_32bit.tar.gz
@@ -92,7 +93,8 @@ to get the latest nightly build available for the supported platform, use the fo
 | Linux     | [32 bit][linux32-nightly]    | [64 bit][linux64-nightly]    |
 | Linux ARM | [32 bit][linuxarm32-nightly] | [64 bit][linuxarm64-nightly] |
 | Windows   | [32 bit][windows32-nightly]  | [64 bit][windows64-nightly]  |
-| macOS     | [ARM][macosarm64-nightly]    | [64 bit][macos64-nightly]    |
+| macOS     |                              | [64 bit][macos64-nightly]    |
+| macOS ARM |                              | [64 bit][macosarm64-nightly] |
 
 [linux64-nightly]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_64bit.tar.gz
 [linux32-nightly]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_32bit.tar.gz
