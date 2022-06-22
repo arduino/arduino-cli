@@ -34,6 +34,7 @@ tasks:
       - task: Linux_ARMv7
       - task: Linux_ARM64
       - task: macOS_64bit
+      - task: macOS_ARM64
 
   Windows_32bit:
     desc: Builds Windows 32 bit binaries
@@ -250,4 +251,26 @@ tasks:
       # has the SDK 10.14 installed.
       CONTAINER_TAG: "{{.GO_VERSION}}-darwin-debian10"
       PACKAGE_PLATFORM: "macOS_64bit"
+      PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.tar.gz"
+
+  macOS_ARM64:
+    desc: Builds Mac OS X ARM64 binaries
+    dir: "{{.DIST_DIR}}"
+    cmds:
+      - |
+        docker run -v `pwd`/..:/home/build -w /home/build \
+        -e CGO_ENABLED=1 \
+        {{.CONTAINER}}:{{.CONTAINER_TAG}} \
+        --build-cmd "{{.BUILD_COMMAND}}" \
+        -p "{{.BUILD_PLATFORM}}"
+
+        tar cz -C {{.PLATFORM_DIR}} {{.PROJECT_NAME}} -C ../.. LICENSE.txt  -f {{.PACKAGE_NAME}}
+        sha256sum {{.PACKAGE_NAME}} >> {{.CHECKSUM_FILE}}
+
+    vars:
+      PLATFORM_DIR: "{{.PROJECT_NAME}}_osx_darwin_arm64"
+      BUILD_COMMAND: "go build -o {{.DIST_DIR}}/{{.PLATFORM_DIR}}/{{.PROJECT_NAME}} {{.LDFLAGS}}"
+      BUILD_PLATFORM: "darwin/arm64"
+      CONTAINER_TAG: "{{.GO_VERSION}}-darwin-arm64-debian10"
+      PACKAGE_PLATFORM: "macOS_ARM64"
       PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.tar.gz"

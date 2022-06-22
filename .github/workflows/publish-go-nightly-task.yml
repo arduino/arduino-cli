@@ -45,8 +45,23 @@ jobs:
           path: ${{ env.DIST_DIR }}
 
   notarize-macos:
+    name: Notarize ${{ matrix.artifact.name }}
     runs-on: macos-latest
     needs: create-nightly-artifacts
+    outputs:
+      checksum-darwin_amd64: ${{ steps.re-package.outputs.checksum-darwin_amd64 }}
+      checksum-darwin_arm64: ${{ steps.re-package.outputs.checksum-darwin_arm64 }}
+
+    env:
+      GON_CONFIG_PATH: gon.config.hcl
+
+    strategy:
+      matrix:
+        artifact:
+          - name: darwin_amd64
+            path: "macOS_64bit.tar.gz"
+          - name: darwin_arm64
+            path: "macOS_ARM64.tar.gz"
 
     steps:
       - name: Checkout repository
@@ -86,34 +101,58 @@ jobs:
           wget -q https://github.com/mitchellh/gon/releases/download/v0.2.3/gon_macos.zip
           unzip gon_macos.zip -d /usr/local/bin
 
+      - name: Write gon config to file
+        # gon does not allow env variables in config file (https://github.com/mitchellh/gon/issues/20)
+        run: |
+          cat > "${{ env.GON_CONFIG_PATH }}" <<EOF
+          # See: https://github.com/mitchellh/gon#configuration-file
+          source = ["dist/arduino-cli_osx_${{ matrix.artifact.name }}/arduino-cli"]
+          bundle_id = "cc.arduino.arduino-cli"
+
+          sign {
+            application_identity = "Developer ID Application: ARDUINO SA (7KT7ZWMCJT)"
+          }
+
+          # Ask Gon for zip output to force notarization process to take place.
+          # The CI will ignore the zip output, using the signed binary only.
+          zip {
+            output_path = "unused.zip"
+          }
+          EOF
+
       - name: Sign and notarize binary
         env:
           AC_USERNAME: ${{ secrets.AC_USERNAME }}
           AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
         run: |
-          gon gon.config.hcl
+          gon "${{ env.GON_CONFIG_PATH }}"
 
-      - name: Re-package binary and update checksum
+      - name: Re-package binary and output checksum
+        id: re-package
+        working-directory: ${{ env.DIST_DIR }}
         # This step performs the following:
         # 1. Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
-        # 2. Recalculate package checksum and replace it in the nnnnnn-checksums.txt file
+        # 2. Recalculate package checksum
+        # 3. Output the new checksum to include in the nnnnnn-checksums.txt file
+        #    (it cannot be done there because of workflow job parallelization)
         run: |
           # GitHub's upload/download-artifact@v2 actions don't preserve file permissions,
           # so we need to add execution permission back until the action is made to do this.
-          chmod +x "${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_osx_darwin_amd64/${{ env.PROJECT_NAME }}"
-          PACKAGE_FILENAME="$(basename ${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_nightly-*_macOS_64bit.tar.gz)"
-          tar -czvf "${{ env.DIST_DIR }}/$PACKAGE_FILENAME" \
-          -C "${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_osx_darwin_amd64/" "${{ env.PROJECT_NAME }}" \
+          chmod +x "${{ env.PROJECT_NAME }}_osx_${{ matrix.artifact.name }}/${{ env.PROJECT_NAME }}"
+          PACKAGE_FILENAME="${{ env.PROJECT_NAME }}_nightly-*${{ matrix.artifact.path }}"
+          tar -czvf "$PACKAGE_FILENAME" \
+          -C "${{ env.PROJECT_NAME }}_osx_${{ matrix.artifact.name }}/" "${{ env.PROJECT_NAME }}" \
           -C ../../ LICENSE.txt
-          CHECKSUM="$(shasum -a 256 ${{ env.DIST_DIR }}/$PACKAGE_FILENAME | cut -d " " -f 1)"
-          perl -pi -w -e "s/.*${PACKAGE_FILENAME}/${CHECKSUM} ${PACKAGE_FILENAME}/g;" ${{ env.DIST_DIR }}/*-checksums.txt
+          CHECKSUM_LINE="$(shasum -a 256 $PACKAGE_FILENAME)"
+          echo "PACKAGE_FILENAME=$PACKAGE_FILENAME" >> $GITHUB_ENV
+          echo "::set-output name=checksum-${{ matrix.artifact.name }}::$CHECKSUM_LINE"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
           name: ${{ env.ARTIFACT_NAME }}
-          path: ${{ env.DIST_DIR }}
+          path: ${{ env.DIST_DIR }}/${{ env.PACKAGE_FILENAME }}
 
   publish-nightly:
     runs-on: ubuntu-latest
@@ -125,6 +164,16 @@ jobs:
         with:
           name: ${{ env.ARTIFACT_NAME }}
           path: ${{ env.DIST_DIR }}
+
+      - name: Update checksum
+        run: |
+          declare -a checksum_lines=("${{ needs.notarize-macos.outputs.checksum-darwin_amd64 }}" "${{ needs.notarize-macos.outputs.checksum-darwin_arm64 }}")
+          for checksum_line in "${checksum_lines[@]}"
+          do
+            CHECKSUM=$(echo ${checksum_line} | cut -d " " -f 1)
+            PACKAGE_FILENAME=$(echo ${checksum_line} | cut -d " " -f 2)
+            perl -pi -w -e "s/.*${PACKAGE_FILENAME}/${CHECKSUM}  ${PACKAGE_FILENAME}/g;" ${{ env.DIST_DIR }}/*-checksums.txt
+          done
 
       - name: Upload release files on Arduino downloads servers
         uses: docker://plugins/s3
