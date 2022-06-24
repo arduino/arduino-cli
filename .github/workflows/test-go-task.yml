@@ -11,7 +11,9 @@ on:
   push:
     paths:
       - ".github/workflows/test-go-task.ya?ml"
-      - "codecov.ya?ml"
+      - ".github/.?codecov.ya?ml"
+      - "dev/.?codecov.ya?ml"
+      - ".?codecov.ya?ml"
       - "go.mod"
       - "go.sum"
       - "Taskfile.ya?ml"
@@ -20,7 +22,9 @@ on:
   pull_request:
     paths:
       - ".github/workflows/test-go-task.ya?ml"
-      - "codecov.ya?ml"
+      - ".github/.?codecov.ya?ml"
+      - "dev/.?codecov.ya?ml"
+      - ".?codecov.ya?ml"
       - "go.mod"
       - "go.sum"
       - "Taskfile.ya?ml"
