@@ -1,5 +1,3 @@
-comment: off
-
 ignore:
   - rpc/**
   - i18n/cmd/**
