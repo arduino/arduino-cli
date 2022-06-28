@@ -74,7 +74,9 @@ otherwise below, **all fields are required**. The available fields are:
   install the dependencies during installation of the library.
   [`arduino-cli lib install`](commands/arduino-cli_lib_install.md) will automatically install the dependencies. Since
   spaces are allowed in the `name` of a library, but not commas, you can refer to libraries containing spaces in the
-  name without ambiguity for example:<br> `depends=Very long library name, Another library with long-name`
+  name without ambiguity for example:<br> `depends=Very long library name, Another library with long-name`<br>
+  [Version constraints](#version-constraints) for the dependency may be specified in parentheses after the name:<br>
+  `depends=ArduinoHttpClient (>=1.0.0)`
 - **dot_a_linkage** - **(available from Arduino IDE 1.6.0 / arduino-builder 1.0.0-beta13)** (optional) when set to
   `true`, the library will be compiled using a .a (archive) file. First, all source files are compiled into .o files as
   normal. Then instead of including all .o
@@ -116,6 +118,56 @@ architectures=avr
 includes=WebServer.h
 depends=ArduinoHttpClient
 ```
+
+#### Version constraints
+
+**(available from Arduino IDE 2.0.0-beta.3/Arduino CLI 0.7.0)**
+
+By default, the latest version of a dependency specified in the `depends` field of
+[`library.properties`](#libraryproperties-file-format) is installed along with the library. Specifying an exact version
+or range of versions is also supported.
+
+The following operators are available:
+
+<!-- code tags used below to reconcile mismatch between Prettier and Python-Markdown handling of pipe characters -->
+
+|                   |                               |
+| ----------------- | ----------------------------- |
+| `=`               | equal to                      |
+| `>`               | greater than                  |
+| `>=`              | greater than or equal to      |
+| `<`               | less than                     |
+| `<=`              | less than or equal to         |
+| `!`               | NOT [<sup>1</sup>](#not-note) |
+| `&&`              | AND                           |
+| <code>\|\|</code> | OR                            |
+| `(`, `)`          | constraint group              |
+
+<a id="not-note"></a> <sup>1</sup> Available from Arduino IDE 2.0.0-rc7/Arduino CLI 0.22.0
+
+##### Examples
+
+If the library "ArduinoHttpClient" has the following releases:
+
+- `0.1.0`
+- `1.0.0`
+- `2.0.0`
+- `2.1.0`
+
+The version of it installed as a dependency would be as follows:
+
+| `depends` field value                                           | Installs<br> version |
+| --------------------------------------------------------------- | -------------------- |
+| `ArduinoHttpClient`                                             | `2.1.0`              |
+| `ArduinoHttpClient (=1.0.0)`                                    | `1.0.0`              |
+| `ArduinoHttpClient (>1.0.0)`                                    | `2.1.0`              |
+| `ArduinoHttpClient (>=1.0.0)`                                   | `2.1.0`              |
+| `ArduinoHttpClient (<2.0.0)`                                    | `1.0.0`              |
+| `ArduinoHttpClient (<=2.0.0)`                                   | `2.0.0`              |
+| `ArduinoHttpClient (!=1.0.0)`                                   | `2.1.0`              |
+| `ArduinoHttpClient (>1.0.0 && <2.1.0)`                          | `2.0.0`              |
+| <code>ArduinoHttpClient (<1.0.0 \|\| >2.0.0)</code>             | `2.1.0`              |
+| <code>ArduinoHttpClient ((>0.1.0 && <2.0.0) \|\| >2.1.0)</code> | `1.0.0`              |
 
 ### Layout of folders and files
 
