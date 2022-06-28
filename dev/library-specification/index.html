@@ -1234,6 +1234,26 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#version-constraints" class="md-nav__link">
+    Version constraints
+  </a>
+  
+    <nav class="md-nav" aria-label="Version constraints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    Examples
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1551,6 +1571,26 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#version-constraints" class="md-nav__link">
+    Version constraints
+  </a>
+  
+    <nav class="md-nav" aria-label="Version constraints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    Examples
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1786,7 +1826,9 @@ otherwise below, <strong>all fields are required</strong>. The available fields 
   install the dependencies during installation of the library.
   <a href="../commands/arduino-cli_lib_install/"><code>arduino-cli lib install</code></a> will automatically install the dependencies. Since
   spaces are allowed in the <code>name</code> of a library, but not commas, you can refer to libraries containing spaces in the
-  name without ambiguity for example:<br> <code>depends=Very long library name, Another library with long-name</code></li>
+  name without ambiguity for example:<br> <code>depends=Very long library name, Another library with long-name</code><br>
+  <a href="#version-constraints">Version constraints</a> for the dependency may be specified in parentheses after the name:<br>
+  <code>depends=ArduinoHttpClient (&gt;=1.0.0)</code></li>
 <li><strong>dot_a_linkage</strong> - <strong>(available from Arduino IDE 1.6.0 / arduino-builder 1.0.0-beta13)</strong> (optional) when set to
   <code>true</code>, the library will be compiled using a .a (archive) file. First, all source files are compiled into .o files as
   normal. Then instead of including all .o
@@ -1828,6 +1870,120 @@ architectures=avr
 includes=WebServer.h
 depends=ArduinoHttpClient
 </code></pre></div>
+<h4 id="version-constraints">Version constraints<a class="headerlink" href="#version-constraints" title="Permanent link">&para;</a></h4>
+<p><strong>(available from Arduino IDE 2.0.0-beta.3/Arduino CLI 0.7.0)</strong></p>
+<p>By default, the latest version of a dependency specified in the <code>depends</code> field of
+<a href="#libraryproperties-file-format"><code>library.properties</code></a> is installed along with the library. Specifying an exact version
+or range of versions is also supported.</p>
+<p>The following operators are available:</p>
+<!-- code tags used below to reconcile mismatch between Prettier and Python-Markdown handling of pipe characters -->
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>=</code></td>
+<td>equal to</td>
+</tr>
+<tr>
+<td><code>&gt;</code></td>
+<td>greater than</td>
+</tr>
+<tr>
+<td><code>&gt;=</code></td>
+<td>greater than or equal to</td>
+</tr>
+<tr>
+<td><code>&lt;</code></td>
+<td>less than</td>
+</tr>
+<tr>
+<td><code>&lt;=</code></td>
+<td>less than or equal to</td>
+</tr>
+<tr>
+<td><code>!</code></td>
+<td>NOT <a href="#not-note"><sup>1</sup></a></td>
+</tr>
+<tr>
+<td><code>&amp;&amp;</code></td>
+<td>AND</td>
+</tr>
+<tr>
+<td><code>||</code></td>
+<td>OR</td>
+</tr>
+<tr>
+<td><code>(</code>, <code>)</code></td>
+<td>constraint group</td>
+</tr>
+</tbody>
+</table>
+<p><a id="not-note"></a> <sup>1</sup> Available from Arduino IDE 2.0.0-rc7/Arduino CLI 0.22.0</p>
+<h5 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h5>
+<p>If the library "ArduinoHttpClient" has the following releases:</p>
+<ul>
+<li><code>0.1.0</code></li>
+<li><code>1.0.0</code></li>
+<li><code>2.0.0</code></li>
+<li><code>2.1.0</code></li>
+</ul>
+<p>The version of it installed as a dependency would be as follows:</p>
+<table>
+<thead>
+<tr>
+<th><code>depends</code> field value</th>
+<th>Installs<br> version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ArduinoHttpClient</code></td>
+<td><code>2.1.0</code></td>
+</tr>
+<tr>
+<td><code>ArduinoHttpClient (=1.0.0)</code></td>
+<td><code>1.0.0</code></td>
+</tr>
+<tr>
+<td><code>ArduinoHttpClient (&gt;1.0.0)</code></td>
+<td><code>2.1.0</code></td>
+</tr>
+<tr>
+<td><code>ArduinoHttpClient (&gt;=1.0.0)</code></td>
+<td><code>2.1.0</code></td>
+</tr>
+<tr>
+<td><code>ArduinoHttpClient (&lt;2.0.0)</code></td>
+<td><code>1.0.0</code></td>
+</tr>
+<tr>
+<td><code>ArduinoHttpClient (&lt;=2.0.0)</code></td>
+<td><code>2.0.0</code></td>
+</tr>
+<tr>
+<td><code>ArduinoHttpClient (!=1.0.0)</code></td>
+<td><code>2.1.0</code></td>
+</tr>
+<tr>
+<td><code>ArduinoHttpClient (&gt;1.0.0 &amp;&amp; &lt;2.1.0)</code></td>
+<td><code>2.0.0</code></td>
+</tr>
+<tr>
+<td><code>ArduinoHttpClient (&lt;1.0.0 || &gt;2.0.0)</code></td>
+<td><code>2.1.0</code></td>
+</tr>
+<tr>
+<td><code>ArduinoHttpClient ((&gt;0.1.0 &amp;&amp; &lt;2.0.0) || &gt;2.1.0)</code></td>
+<td><code>1.0.0</code></td>
+</tr>
+</tbody>
+</table>
 <h3 id="layout-of-folders-and-files">Layout of folders and files<a class="headerlink" href="#layout-of-folders-and-files" title="Permanent link">&para;</a></h3>
 <p>Each folder has a specific purpose (sources, examples, documentation, etc). Folders not covered in this specification
 may be added as needed to future revisions.</p>
