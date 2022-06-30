@@ -19,6 +19,9 @@ import (
 	"context"
 	"io"
 	"time"
+
+	"github.com/djherbis/buffer"
+	"github.com/djherbis/nio/v3"
 )
 
 // FeedStreamTo creates a pipe to pass data to the writer function.
@@ -28,7 +31,7 @@ import (
 // closing the writer.
 func FeedStreamTo(writer func(data []byte)) (io.WriteCloser, context.Context) {
 	ctx, cancel := context.WithCancel(context.Background())
-	r, w := io.Pipe()
+	r, w := nio.Pipe(buffer.New(32 * 1024))
 	go func() {
 		defer cancel()
 		data := make([]byte, 16384)

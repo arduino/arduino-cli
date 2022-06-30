@@ -14,6 +14,8 @@ require (
 	github.com/cmaglie/pb v1.0.27
 	github.com/codeclysm/cc v1.2.2 // indirect
 	github.com/codeclysm/extract/v3 v3.0.2
+	github.com/djherbis/buffer v1.1.0
+	github.com/djherbis/nio/v3 v3.0.1
 	github.com/fatih/color v1.7.0
 	github.com/fluxio/iohelpers v0.0.0-20160419043813-3a4dd67a94d2 // indirect
 	github.com/fluxio/multierror v0.0.0-20160419044231-9c68d39025e5 // indirect
