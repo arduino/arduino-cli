@@ -16,15 +16,18 @@
 package utils
 
 import (
+	"context"
 	"io"
 	"time"
 )
 
 // FeedStreamTo creates a pipe to pass data to the writer function.
 // FeedStreamTo returns the io.Writer side of the pipe, on which the user can write data
-func FeedStreamTo(writer func(data []byte)) io.Writer {
+func FeedStreamTo(writer func(data []byte)) (io.WriteCloser, context.Context) {
+	ctx, cancel := context.WithCancel(context.Background())
 	r, w := io.Pipe()
 	go func() {
+		defer cancel()
 		data := make([]byte, 16384)
 		for {
 			if n, err := r.Read(data); err == nil {
@@ -41,7 +44,7 @@ func FeedStreamTo(writer func(data []byte)) io.Writer {
 			}
 		}
 	}()
-	return w
+	return w, ctx
 }
 
 // ConsumeStreamFrom creates a pipe to consume data from the reader function.
