@@ -2,6 +2,25 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## 0.25.0
+
+### go-lang function `github.com/arduino/arudino-cli/utils/FeedStreamTo` has been changed
+
+The function `FeedStreamTo` has been changed from:
+
+```go
+func FeedStreamTo(writer func(data []byte)) io.Writer
+```
+
+to
+
+```go
+func FeedStreamTo(writer func(data []byte)) (io.WriteCloser, context.Context)
+```
+
+The user must call the `Close` method on the returned `io.WriteClose` to correctly dispose the streaming channel. The
+context `Done()` method may be used to wait for the internal subroutines to complete.
+
 ## 0.24.0
 
 ### gRPC `Monitor` service and related gRPC calls have been removed
