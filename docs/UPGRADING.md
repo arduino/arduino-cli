@@ -4,7 +4,7 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.25.0
 
-### go-lang function `github.com/arduino/arudino-cli/utils/FeedStreamTo` has been changed
+### go-lang function `github.com/arduino/arduino-cli/arduino/utils.FeedStreamTo` has been changed
 
 The function `FeedStreamTo` has been changed from:
 
