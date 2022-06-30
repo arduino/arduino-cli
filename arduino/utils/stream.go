@@ -22,7 +22,10 @@ import (
 )
 
 // FeedStreamTo creates a pipe to pass data to the writer function.
-// FeedStreamTo returns the io.Writer side of the pipe, on which the user can write data
+// FeedStreamTo returns the io.WriteCloser side of the pipe, on which the user can write data.
+// The user must call Close() on the returned io.WriteCloser to release all the resources.
+// If needed, the context can be used to detect when all the data has been processed after
+// closing the writer.
 func FeedStreamTo(writer func(data []byte)) (io.WriteCloser, context.Context) {
 	ctx, cancel := context.WithCancel(context.Background())
 	r, w := io.Pipe()
