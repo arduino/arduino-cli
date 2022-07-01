@@ -21,6 +21,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -28,7 +29,9 @@ import (
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	semver "go.bug.st/relaxed-semver"
@@ -51,6 +54,9 @@ func initSearchCommand() *cobra.Command {
 	return searchCommand
 }
 
+// indexUpdateInterval specifies the time threshold over which indexes are updated
+const indexUpdateInterval = "60m"
+
 func runSearchCommand(cmd *cobra.Command, args []string) {
 	inst, status := instance.Create()
 	logrus.Info("Executing `arduino-cli lib search`")
@@ -60,13 +66,15 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	if err := commands.UpdateLibrariesIndex(
-		context.Background(),
-		&rpc.UpdateLibrariesIndexRequest{Instance: inst},
-		output.ProgressBar(),
-	); err != nil {
-		feedback.Errorf(tr("Error updating library index: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+	if indexNeedsUpdating(indexUpdateInterval) {
+		if err := commands.UpdateLibrariesIndex(
+			context.Background(),
+			&rpc.UpdateLibrariesIndexRequest{Instance: inst},
+			output.ProgressBar(),
+		); err != nil {
+			feedback.Errorf(tr("Error updating library index: %v"), err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
 	}
 
 	for _, err := range instance.Init(inst) {
@@ -192,4 +200,39 @@ func versionsFromSearchedLibrary(library *rpc.SearchedLibrary) []*semver.Version
 	}
 	sort.Sort(semver.List(res))
 	return res
+}
+
+// indexNeedsUpdating returns whether library_index.json need updating.
+// A positive duration string must be provided to calculate the time threshold 
+// used to update the index (default: +24 hours).
+// Valid duration units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+// Use a duration of 0 to always update the index.
+func indexNeedsUpdating(duration string) bool {
+	// Library index path is constant (relative to the data directory).
+	// It does not depend on board manager URLs or any other configuration.
+	dataDir := configuration.Settings.GetString("directories.Data")
+	indexPath := paths.New(dataDir).Join("library_index.json")
+	// Verify the index file exists and we can read its fstat attrs.
+	if indexPath.NotExist() {
+		return true
+	}
+	info, err := indexPath.Stat()
+	if err != nil {
+		return true
+	}
+	// Sanity check the given threshold duration string.
+	now := time.Now()
+	modTimeThreshold, err := time.ParseDuration(duration)
+	if err != nil {
+		feedback.Error(tr("Invalid timeout: %s", err))
+		os.Exit(errorcodes.ErrBadArgument)
+	}
+	// The behavior of now.After(T) is confusing if T < 0 and MTIME in the future,
+	// and is probably not what the user intended. Disallow negative T and inform
+	// the user that positive thresholds are expected.
+	if modTimeThreshold < 0 {
+		feedback.Error(tr("Timeout must be non-negative: %dns (%s)", modTimeThreshold, duration))
+		os.Exit(errorcodes.ErrBadArgument)
+	}
+	return modTimeThreshold == 0 || now.After(info.ModTime().Add(modTimeThreshold))
 }
