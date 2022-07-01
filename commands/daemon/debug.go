@@ -50,6 +50,7 @@ func (s *DebugService) Debug(stream dbg.DebugService_DebugServer) error {
 	// Launch debug recipe attaching stdin and out to grpc streaming
 	signalChan := make(chan os.Signal)
 	defer close(signalChan)
+	outStream, outCtx := utils.FeedStreamTo(func(data []byte) { stream.Send(&dbg.DebugResponse{Data: data}) })
 	resp, debugErr := cmd.Debug(stream.Context(), req,
 		utils.ConsumeStreamFrom(func() ([]byte, error) {
 			command, err := stream.Recv()
@@ -58,13 +59,13 @@ func (s *DebugService) Debug(stream dbg.DebugService_DebugServer) error {
 			}
 			return command.GetData(), err
 		}),
-		utils.FeedStreamTo(func(data []byte) {
-			stream.Send(&dbg.DebugResponse{Data: data})
-		}),
+		outStream,
 		signalChan)
+	outStream.Close()
 	if debugErr != nil {
 		return debugErr
 	}
+	<-outCtx.Done()
 	return stream.Send(resp)
 }
 

@@ -16,15 +16,24 @@
 package utils
 
 import (
+	"context"
 	"io"
 	"time"
+
+	"github.com/djherbis/buffer"
+	"github.com/djherbis/nio/v3"
 )
 
 // FeedStreamTo creates a pipe to pass data to the writer function.
-// FeedStreamTo returns the io.Writer side of the pipe, on which the user can write data
-func FeedStreamTo(writer func(data []byte)) io.Writer {
-	r, w := io.Pipe()
+// FeedStreamTo returns the io.WriteCloser side of the pipe, on which the user can write data.
+// The user must call Close() on the returned io.WriteCloser to release all the resources.
+// If needed, the context can be used to detect when all the data has been processed after
+// closing the writer.
+func FeedStreamTo(writer func(data []byte)) (io.WriteCloser, context.Context) {
+	ctx, cancel := context.WithCancel(context.Background())
+	r, w := nio.Pipe(buffer.New(32 * 1024))
 	go func() {
+		defer cancel()
 		data := make([]byte, 16384)
 		for {
 			if n, err := r.Read(data); err == nil {
@@ -41,7 +50,7 @@ func FeedStreamTo(writer func(data []byte)) io.Writer {
 			}
 		}
 	}()
-	return w
+	return w, ctx
 }
 
 // ConsumeStreamFrom creates a pipe to consume data from the reader function.
