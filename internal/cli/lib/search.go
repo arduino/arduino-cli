@@ -192,7 +192,7 @@ func versionsFromSearchedLibrary(library *rpc.SearchedLibrary) []*semver.Version
 
 // indexNeedsUpdating returns whether library_index.json need updating.
 // A positive duration string must be provided to calculate the time threshold
-// used to update the index (default: +24 hours).
+// used to update the index.
 // Valid duration units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 // Use a duration of 0 to always update the index.
 func indexNeedsUpdating(duration string) bool {
