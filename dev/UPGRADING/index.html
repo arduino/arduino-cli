@@ -277,6 +277,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0250" class="md-nav__link">
+    0.25.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.25.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#go-lang-function-githubcomarduinoarduino-cliarduinoutilsfeedstreamto-has-been-changed" class="md-nav__link">
+    go-lang function github.com/arduino/arduino-cli/arduino/utils.FeedStreamTo has been changed
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0240" class="md-nav__link">
     0.24.0
   </a>
@@ -1845,6 +1865,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0250" class="md-nav__link">
+    0.25.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.25.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#go-lang-function-githubcomarduinoarduino-cliarduinoutilsfeedstreamto-has-been-changed" class="md-nav__link">
+    go-lang function github.com/arduino/arduino-cli/arduino/utils.FeedStreamTo has been changed
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0240" class="md-nav__link">
     0.24.0
   </a>
@@ -2356,6 +2396,16 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<h2 id="0250">0.25.0<a class="headerlink" href="#0250" title="Permanent link">&para;</a></h2>
+<h3 id="go-lang-function-githubcomarduinoarduino-cliarduinoutilsfeedstreamto-has-been-changed">go-lang function <code>github.com/arduino/arduino-cli/arduino/utils.FeedStreamTo</code> has been changed<a class="headerlink" href="#go-lang-function-githubcomarduinoarduino-cliarduinoutilsfeedstreamto-has-been-changed" title="Permanent link">&para;</a></h3>
+<p>The function <code>FeedStreamTo</code> has been changed from:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">FeedStreamTo</span><span class="p">(</span><span class="nx">writer</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">data</span><span class="w"> </span><span class="p">[]</span><span class="kt">byte</span><span class="p">))</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="w"></span>
+</code></pre></div>
+<p>to</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">FeedStreamTo</span><span class="p">(</span><span class="nx">writer</span><span class="w"> </span><span class="kd">func</span><span class="p">(</span><span class="nx">data</span><span class="w"> </span><span class="p">[]</span><span class="kt">byte</span><span class="p">))</span><span class="w"> </span><span class="p">(</span><span class="nx">io</span><span class="p">.</span><span class="nx">WriteCloser</span><span class="p">,</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<p>The user must call the <code>Close</code> method on the returned <code>io.WriteClose</code> to correctly dispose the streaming channel. The
+context <code>Done()</code> method may be used to wait for the internal subroutines to complete.</p>
 <h2 id="0240">0.24.0<a class="headerlink" href="#0240" title="Permanent link">&para;</a></h2>
 <h3 id="grpc-monitor-service-and-related-grpc-calls-have-been-removed">gRPC <code>Monitor</code> service and related gRPC calls have been removed<a class="headerlink" href="#grpc-monitor-service-and-related-grpc-calls-have-been-removed" title="Permanent link">&para;</a></h3>
 <p>The gRPC <code>Monitor</code> service and the gRPC call <code>Monitor.StreamingOpen</code> have been removed in favor of the new Pluggable
