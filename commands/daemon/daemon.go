@@ -268,18 +268,19 @@ func (s *ArduinoCoreServerImpl) LoadSketch(ctx context.Context, req *rpc.LoadSke
 func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.ArduinoCoreService_CompileServer) error {
 	outStream, outCtx := utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.CompileResponse{OutStream: data}) })
 	errStream, errCtx := utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.CompileResponse{ErrStream: data}) })
-	resp, err := compile.Compile(
+	compileResp, compileErr := compile.Compile(
 		stream.Context(), req, outStream, errStream,
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.CompileResponse{Progress: p}) },
 		false) // Set debug to false
 	outStream.Close()
 	errStream.Close()
-	if err != nil {
-		return convertErrorToRPCStatus(err)
-	}
 	<-outCtx.Done()
 	<-errCtx.Done()
-	return stream.Send(resp)
+	compileRespSendErr := stream.Send(compileResp)
+	if compileErr != nil {
+		return convertErrorToRPCStatus(compileErr)
+	}
+	return compileRespSendErr
 }
 
 // PlatformInstall FIXMEDOC
