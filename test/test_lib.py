@@ -246,6 +246,11 @@ def test_install_library_with_dependencies(run_command):
     assert "MD_Parola" in installed_libraries
     assert "MD_MAX72XX" in installed_libraries
 
+    # Try upgrading with --no-overwrite (should fail) and without --no-overwrite (should succeed)
+    res = run_command(["lib", "install", "MD_Parola@3.6.1", "--no-overwrite"])
+    assert res.failed
+    assert run_command(["lib", "install", "MD_Parola@3.6.1"])
+
 
 def test_install_no_deps(run_command):
     assert run_command(["update"])
