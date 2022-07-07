@@ -18,6 +18,7 @@ package lib
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
@@ -64,7 +65,8 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 		}
 	}
 
-	didInstall := false
+	// Find the libReleasesToInstall to install
+	libReleasesToInstall := []*librariesindex.Release{}
 	for _, lib := range toInstall {
 		libRelease, err := findLibraryIndexRelease(lm, &rpc.LibraryInstallRequest{
 			Name:    lib.Name,
@@ -73,7 +75,24 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 		if err != nil {
 			return err
 		}
+		libReleasesToInstall = append(libReleasesToInstall, libRelease)
+	}
 
+	// Check if any of the libraries to install is already installed
+	if req.GetNoOverwrite() {
+		for _, libRelease := range libReleasesToInstall {
+			_, libReplaced, err := lm.InstallPrerequisiteCheck(libRelease)
+			if err != nil {
+				return err
+			}
+			if libReplaced != nil {
+				return fmt.Errorf(tr("Library %[1]s is already installed, but with a different version: %[2]s", libRelease, libReplaced))
+			}
+		}
+	}
+
+	didInstall := false
+	for _, libRelease := range libReleasesToInstall {
 		if err := downloadLibrary(lm, libRelease, downloadCB, taskCB); err != nil {
 			return err
 		}

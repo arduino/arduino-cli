@@ -37,9 +37,10 @@ import (
 )
 
 var (
-	noDeps  bool
-	gitURL  bool
-	zipPath bool
+	noDeps      bool
+	noOverwrite bool
+	gitURL      bool
+	zipPath     bool
 )
 
 func initInstallCommand() *cobra.Command {
@@ -59,6 +60,7 @@ func initInstallCommand() *cobra.Command {
 		},
 	}
 	installCommand.Flags().BoolVar(&noDeps, "no-deps", false, tr("Do not install dependencies."))
+	installCommand.Flags().BoolVar(&noOverwrite, "no-overwrite", false, tr("Do not overwrite already installed libraries."))
 	installCommand.Flags().BoolVar(&gitURL, "git-url", false, tr("Enter git url for libraries hosted on repositories"))
 	installCommand.Flags().BoolVar(&zipPath, "zip-path", false, tr("Enter a path to zip file"))
 	return installCommand
@@ -87,7 +89,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			err := lib.ZipLibraryInstall(context.Background(), &rpc.ZipLibraryInstallRequest{
 				Instance:  instance,
 				Path:      path,
-				Overwrite: true,
+				Overwrite: !noOverwrite,
 			}, output.TaskProgress())
 			if err != nil {
 				feedback.Errorf(tr("Error installing Zip Library: %v"), err)
@@ -110,7 +112,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			err := lib.GitLibraryInstall(context.Background(), &rpc.GitLibraryInstallRequest{
 				Instance:  instance,
 				Url:       url,
-				Overwrite: true,
+				Overwrite: !noOverwrite,
 			}, output.TaskProgress())
 			if err != nil {
 				feedback.Errorf(tr("Error installing Git Library: %v"), err)
@@ -128,10 +130,11 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 
 	for _, libRef := range libRefs {
 		libraryInstallRequest := &rpc.LibraryInstallRequest{
-			Instance: instance,
-			Name:     libRef.Name,
-			Version:  libRef.Version,
-			NoDeps:   noDeps,
+			Instance:    instance,
+			Name:        libRef.Name,
+			Version:     libRef.Version,
+			NoDeps:      noDeps,
+			NoOverwrite: noOverwrite,
 		}
 		err := lib.LibraryInstall(context.Background(), libraryInstallRequest, output.ProgressBar(), output.TaskProgress())
 		if err != nil {
