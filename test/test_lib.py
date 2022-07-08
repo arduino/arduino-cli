@@ -251,6 +251,13 @@ def test_install_library_with_dependencies(run_command):
     assert res.failed
     assert run_command(["lib", "install", "MD_Parola@3.6.1"])
 
+    # Test --no-overwrite with transitive dependencies
+    assert run_command(["lib", "install", "SD"])
+    assert run_command(["lib", "install", "Arduino_Builtin", "--no-overwrite"])
+    assert run_command(["lib", "install", "SD@1.2.3"])
+    res = run_command(["lib", "install", "Arduino_Builtin", "--no-overwrite"])
+    assert res.failed
+
 
 def test_install_no_deps(run_command):
     assert run_command(["update"])
