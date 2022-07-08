@@ -44,12 +44,12 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
 		PlatformArchitecture: req.Architecture,
 		PlatformVersion:      version,
 	}
-	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
+	platformRelease, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
 		return nil, &arduino.PlatformNotFoundError{Platform: ref.String(), Cause: err}
 	}
 
-	didInstall, err := installPlatform(pm, platform, tools, downloadCB, taskCB, req.GetSkipPostInstall())
+	didInstall, err := installPlatform(pm, platformRelease, tools, downloadCB, taskCB, req.GetSkipPostInstall())
 	if err != nil {
 		return nil, err
 	}
