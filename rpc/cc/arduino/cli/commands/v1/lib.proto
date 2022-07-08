@@ -45,8 +45,8 @@ message LibraryInstallRequest {
   // Set to true to skip installation of specified library's dependencies,
   // defaults to false.
   bool no_deps = 4;
-  // Set to true to skip installation a different version of the library or one
-  // of its dependencies is already installed, defaults to false.
+  // Set to true to skip installation if a different version of the library or
+  // one of its dependencies is already installed, defaults to false.
   bool no_overwrite = 5;
 }
 

@@ -321,7 +321,7 @@ type LibraryInstallRequest struct {
 	// Set to true to skip installation of specified library's dependencies,
 	// defaults to false.
 	NoDeps bool `protobuf:"varint,4,opt,name=no_deps,json=noDeps,proto3" json:"no_deps,omitempty"`
-	// Set to true to skip installation a different version of the library or one
+	// Set to true to skip installation if a different version of the library or one
 	// of its dependencies is already installed, defaults to false.
 	NoOverwrite bool `protobuf:"varint,5,opt,name=no_overwrite,json=noOverwrite,proto3" json:"no_overwrite,omitempty"`
 }
