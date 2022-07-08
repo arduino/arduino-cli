@@ -119,8 +119,8 @@ func installPlatform(pm *packagemanager.PackageManager,
 		taskCB(&rpc.TaskProgress{Name: tr("Installing platform %s", platformRelease)})
 	} else {
 		// A platform with a different version is already installed
-		log.Info("Upgrading platform " + installed.String())
-		taskCB(&rpc.TaskProgress{Name: tr("Upgrading platform %[1]s with %[2]s", installed, platformRelease)})
+		log.Info("Replacing platform " + installed.String())
+		taskCB(&rpc.TaskProgress{Name: tr("Replacing platform %[1]s with %[2]s", installed, platformRelease)})
 		platformRef := &packagemanager.PlatformReference{
 			Package:              platformRelease.Platform.Package.Name,
 			PlatformArchitecture: platformRelease.Platform.Architecture,
