@@ -74,7 +74,7 @@ func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemana
 	if err != nil {
 		return &arduino.PlatformNotFoundError{Platform: platformRef.String()}
 	}
-	if _, err := installPlatform(pm, platformRelease, tools, downloadCB, taskCB, skipPostInstall); err != nil {
+	if err := installPlatform(pm, platformRelease, tools, downloadCB, taskCB, skipPostInstall); err != nil {
 		return err
 	}
 
