@@ -18,6 +18,7 @@ package configuration
 import (
 	"fmt"
 	"net/url"
+	"os"
 	"runtime"
 
 	"github.com/arduino/arduino-cli/cli/globals"
@@ -34,12 +35,18 @@ func UserAgent(settings *viper.Viper) string {
 		subComponent = " " + subComponent
 	}
 
-	return fmt.Sprintf("%s/%s%s (%s; %s; %s) Commit:%s",
+	extendedUA := os.Getenv("ARDUINO_CLI_USER_AGENT_EXTENSION")
+	if extendedUA != "" {
+		extendedUA = " " + extendedUA
+	}
+
+	return fmt.Sprintf("%s/%s%s (%s; %s; %s) Commit:%s%s",
 		globals.VersionInfo.Application,
 		globals.VersionInfo.VersionString,
 		subComponent,
 		runtime.GOARCH, runtime.GOOS, runtime.Version(),
-		globals.VersionInfo.Commit)
+		globals.VersionInfo.Commit,
+		extendedUA)
 }
 
 // NetworkProxy returns the proxy configuration (mainly used by HTTP clients)
