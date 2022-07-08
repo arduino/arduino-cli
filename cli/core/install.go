@@ -33,6 +33,7 @@ import (
 
 var (
 	postInstallFlags arguments.PostInstallFlags
+	noOverwrite      bool
 )
 
 func initInstallCommand() *cobra.Command {
@@ -54,6 +55,7 @@ func initInstallCommand() *cobra.Command {
 		},
 	}
 	postInstallFlags.AddToCommand(installCommand)
+	installCommand.Flags().BoolVar(&noOverwrite, "no-overwrite", false, tr("Do not overwrite existing platforms (during upgrade or downgrade)."))
 	return installCommand
 }
 
@@ -74,6 +76,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
 			SkipPostInstall: postInstallFlags.DetectSkipPostInstallValue(),
+			NoOverwrite:     noOverwrite,
 		}
 		_, err := core.PlatformInstall(context.Background(), platformInstallRequest, output.ProgressBar(), output.TaskProgress())
 		if err != nil {

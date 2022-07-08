@@ -17,6 +17,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -53,6 +54,14 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
 	if platformRelease.IsInstalled() {
 		taskCB(&rpc.TaskProgress{Name: tr("Platform %s already installed", platformRelease), Completed: true})
 		return &rpc.PlatformInstallResponse{}, nil
+	}
+
+	if req.GetNoOverwrite() {
+		if installed := pm.GetInstalledPlatformRelease(platformRelease.Platform); installed != nil {
+			return nil, fmt.Errorf("%s: %s",
+				tr("Platform %s already installed", installed),
+				tr("could not overwrite"))
+		}
 	}
 
 	if err := installPlatform(pm, platformRelease, tools, downloadCB, taskCB, req.GetSkipPostInstall()); err != nil {
