@@ -182,7 +182,8 @@ type MonitorResponse struct {
 	// report the default settings) or after a new port_configuration is sent
 	// (to report the new settings applied)
 	AppliedSettings []*MonitorPortSetting `protobuf:"bytes,3,rep,name=applied_settings,json=appliedSettings,proto3" json:"applied_settings,omitempty"`
-	// A message with this field set to true is sent as soon as the port is succesfully opened
+	// A message with this field set to true is sent as soon as the port is
+	// succesfully opened
 	Success bool `protobuf:"varint,4,opt,name=success,proto3" json:"success,omitempty"`
 }
 
