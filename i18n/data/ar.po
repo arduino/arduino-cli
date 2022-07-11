@@ -2,10 +2,11 @@
 # Translators:
 # CLI team <prj_cli_team@arduino.cc>, 2022
 # Osama Breman, 2022
+# Mark Asaad, 2022
 # 
 msgid ""
 msgstr ""
-"Last-Translator: Osama Breman, 2022\n"
+"Last-Translator: Mark Asaad, 2022\n"
 "Language-Team: Arabic (https://www.transifex.com/arduino-1/teams/108174/ar/)\n"
 "Language: ar\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
@@ -1366,7 +1367,7 @@ msgstr ""
 
 #: arduino/errors.go:221
 msgid "Invalid profile"
-msgstr ""
+msgstr "ملف تعريف غير صالح"
 
 #: commands/monitor/monitor.go:134
 msgid "Invalid recipe in platform.txt"
@@ -1378,11 +1379,11 @@ msgstr ""
 
 #: cli/core/search.go:138
 msgid "Invalid timeout: %s"
-msgstr ""
+msgstr "مهلة غير صالحة"
 
 #: arduino/errors.go:115
 msgid "Invalid version"
-msgstr ""
+msgstr "نسخة غير صالحة"
 
 #: commands/board/list.go:54
 msgid "Invalid vid value: '%s'"
@@ -1409,7 +1410,7 @@ msgstr ""
 
 #: cli/core/list.go:84
 msgid "Latest"
-msgstr ""
+msgstr "الأخير"
 
 #: legacy/builder/phases/libraries_builder.go:89
 msgid "Library %[1]s has been declared precompiled:"
@@ -1448,7 +1449,7 @@ msgstr "اسم المكتبة"
 
 #: cli/lib/search.go:169
 msgid "License: %s"
-msgstr ""
+msgstr "رخصة"
 
 #: legacy/builder/builder.go:79
 msgid "Linking everything together..."
@@ -1549,7 +1550,7 @@ msgstr "يوجد بروتوكول منفذ مفقود"
 
 #: arduino/errors.go:287
 msgid "Missing programmer"
-msgstr ""
+msgstr "المبرمج مفقود"
 
 #: legacy/builder/phases/sizer.go:203
 msgid "Missing size regexp"
@@ -1557,7 +1558,7 @@ msgstr ""
 
 #: arduino/errors.go:473
 msgid "Missing sketch path"
-msgstr ""
+msgstr "مسار السكتش مفقود"
 
 #: arduino/errors.go:336
 msgid "Monitor '%s' not found"
@@ -1643,11 +1644,11 @@ msgstr "غير مستخدم : %[1]s"
 
 #: cli/board/details.go:164
 msgid "OS:"
-msgstr ""
+msgstr "نظام التشغيل:"
 
 #: cli/board/details.go:128
 msgid "Official Arduino board:"
-msgstr ""
+msgstr "لوحة أردوينو الرسمية:"
 
 #: cli/monitor/monitor.go:54 cli/monitor/monitor.go:55
 msgid "Open a communication port with a board."
@@ -1655,12 +1656,14 @@ msgstr ""
 
 #: cli/board/details.go:176
 msgid "Option:"
-msgstr ""
+msgstr "اختيار:"
 
 #: cli/compile/compile.go:117
 msgid ""
 "Optional, can be: %s. Used to tell gcc which warning level to use (-W flag)."
 msgstr ""
+"اختياري، يمكن أن يكون: %s. يُستخدم لإخبار ال gcc أي مستوي تحذير يَستخدِم (-W"
+" flag)"
 
 #: cli/compile/compile.go:131
 msgid "Optional, cleanup the build folder and do not use any cached build."
@@ -1677,7 +1680,7 @@ msgstr ""
 
 #: cli/compile/compile.go:118 cli/upload/upload.go:74
 msgid "Optional, turns on verbose mode."
-msgstr ""
+msgstr "اختياري، يُفعل الوضع المفصل."
 
 #: cli/compile/compile.go:136
 msgid ""
@@ -1726,7 +1729,7 @@ msgstr ""
 
 #: cli/compile/compile.go:386 cli/compile/compile.go:400
 msgid "Path"
-msgstr ""
+msgstr "المسار"
 
 #: cli/compile/compile.go:127
 msgid ""
@@ -1742,7 +1745,7 @@ msgstr ""
 
 #: cli/cli.go:113
 msgid "Path to the file where logs will be written."
-msgstr ""
+msgstr "مسار للملف حيث تُكتب السجلات"
 
 #: cli/compile/compile.go:105
 msgid ""
@@ -1756,11 +1759,11 @@ msgstr ""
 
 #: commands/core/install.go:75
 msgid "Platform %s already installed"
-msgstr ""
+msgstr "المنصة %s مثبتة سابقا"
 
 #: commands/core/install.go:179
 msgid "Platform %s installed"
-msgstr ""
+msgstr "تم تثبيت المنصة: %s"
 
 #: cli/compile/compile.go:355 cli/upload/upload.go:133
 msgid ""
@@ -1770,7 +1773,7 @@ msgstr ""
 
 #: commands/core/uninstall.go:85
 msgid "Platform %s uninstalled"
-msgstr ""
+msgstr "تم إلغاء تثبيت المنصة: %s"
 
 #: arduino/errors.go:458
 msgid "Platform '%s' is already at the latest version"
@@ -1806,11 +1809,11 @@ msgstr ""
 
 #: cli/board/details.go:153
 msgid "Platform file name:"
-msgstr ""
+msgstr "اسم ملف المنصة:"
 
 #: cli/board/details.go:149
 msgid "Platform name:"
-msgstr ""
+msgstr "اسم المنصة:"
 
 #: cli/board/details.go:155
 msgid "Platform size (bytes):"
@@ -1847,7 +1850,7 @@ msgstr ""
 
 #: cli/board/details.go:44
 msgid "Print details about a board."
-msgstr ""
+msgstr "طباعة تفاصيل عن لوحة."
 
 #: cli/compile/compile.go:101
 msgid "Print preprocessed code to stdout instead of compiling."
@@ -1903,7 +1906,7 @@ msgstr ""
 
 #: commands/instances.go:683 commands/lib/install.go:114
 msgid "Replacing %[1]s with %[2]s"
-msgstr ""
+msgstr "تبديل %[1]s ب %[2]s"
 
 #: cli/board/details.go:161
 msgid "Required tool:"
@@ -2227,7 +2230,7 @@ msgstr ""
 
 #: cli/compile/compile.go:353 cli/upload/upload.go:131
 msgid "Try running %s"
-msgstr ""
+msgstr "جرب تشغيل %s"
 
 #: cli/burnbootloader/burnbootloader.go:58
 msgid "Turns on verbose mode."
@@ -2239,7 +2242,7 @@ msgstr "نوع"
 
 #: cli/lib/search.go:173
 msgid "Types: %s"
-msgstr ""
+msgstr "الأنواع: %s"
 
 #: cli/board/details.go:168
 msgid "URL:"
@@ -2268,11 +2271,11 @@ msgstr ""
 
 #: commands/core/uninstall.go:77 commands/lib/uninstall.go:39
 msgid "Uninstalling %s"
-msgstr ""
+msgstr "إلغاء تثبيت %s"
 
 #: commands/core/uninstall.go:93
 msgid "Uninstalling %s, tool is no more required"
-msgstr ""
+msgstr "إلغاء تثبيت %s، الأداة لم تعد مطلوبة"
 
 #: commands/instances.go:797
 msgid "Uninstalling %s: tool is no more required"

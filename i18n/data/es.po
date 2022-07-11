@@ -4,10 +4,11 @@
 # William Cabrera <cabrerawilliam@gmail.com>, 2021
 # Carlos José Banti, 2022
 # CLI team <prj_cli_team@arduino.cc>, 2022
+# Sacha Arancibia Bazan, 2022
 # 
 msgid ""
 msgstr ""
-"Last-Translator: CLI team <prj_cli_team@arduino.cc>, 2022\n"
+"Last-Translator: Sacha Arancibia Bazan, 2022\n"
 "Language-Team: Spanish (https://www.transifex.com/arduino-1/teams/108174/es/)\n"
 "Language: es\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
@@ -18,11 +19,11 @@ msgstr ""
 
 #: legacy/builder/fail_if_imported_library_is_wrong.go:36
 msgid "%[1]s folder is no longer supported! See %[2]s for more information"
-msgstr ""
+msgstr "¡%[1]s ya no es compatible con la carpeta! %[2]s Para más información"
 
 #: legacy/builder/wipeout_build_path_if_build_options_changed.go:49
 msgid "%[1]s invalid, rebuilding all"
-msgstr ""
+msgstr "%[1]s inválido, reconstruyendo todo"
 
 #: cli/lib/check_deps.go:102
 msgid "%[1]s is required but %[2]s is currently installed."
@@ -168,7 +169,7 @@ msgstr "Ocurrió un error detectando librerías"
 
 #: cli/daemon/daemon.go:67
 msgid "Append debug logging to the specified file"
-msgstr ""
+msgstr "Registro de depuración añadido al archivo especificado"
 
 #: cli/lib/search.go:172
 msgid "Architecture: %s"
@@ -184,7 +185,7 @@ msgstr "Archivando el núcleo construido (cacheado) en: %[1]s"
 
 #: cli/sketch/sketch.go:31 cli/sketch/sketch.go:32
 msgid "Arduino CLI sketch commands."
-msgstr ""
+msgstr "Comandos de diseños de Arduino CLI."
 
 #: cli/cli.go:72
 msgid "Arduino CLI."
@@ -200,31 +201,31 @@ msgstr "Comandos de la placa Arduino."
 
 #: cli/cache/cache.go:31 cli/cache/cache.go:32
 msgid "Arduino cache commands."
-msgstr ""
+msgstr "Comandos de cache de Arduino"
 
 #: cli/lib/lib.go:31 cli/lib/lib.go:32
 msgid "Arduino commands about libraries."
-msgstr ""
+msgstr "Comandos sobre librerías de Arduino"
 
 #: cli/config/config.go:33
 msgid "Arduino configuration commands."
-msgstr ""
+msgstr "Commandos de configuración de Arduino"
 
 #: cli/core/core.go:31 cli/core/core.go:32
 msgid "Arduino core operations."
-msgstr ""
+msgstr "Operaciones del núcleo Arduino"
 
 #: cli/lib/check_deps.go:56 cli/lib/install.go:125
 msgid "Arguments error: %v"
-msgstr ""
+msgstr "Errores en los argumentos: %v "
 
 #: cli/board/attach.go:81
 msgid "Attach board error: %v"
-msgstr ""
+msgstr "Error en la tarjeta conectada: %v"
 
 #: cli/board/attach.go:41 cli/board/attach.go:42 cli/board/board.go:35
 msgid "Attaches a sketch to a board."
-msgstr ""
+msgstr "Conecta una tabla al diseño."
 
 #: cli/lib/search.go:163
 msgid "Author: %s"
@@ -240,7 +241,7 @@ msgstr "Comandos disponibles:"
 
 #: cli/upload/upload.go:72
 msgid "Binary file to upload."
-msgstr ""
+msgstr "Archivo binario para cargar."
 
 #: cli/board/list.go:87 cli/board/list.go:125 cli/board/listall.go:87
 #: cli/board/search.go:85
@@ -266,6 +267,8 @@ msgstr "Fichero Bootloader especificado pero ausente: %[1]s"
 #: cli/compile/compile.go:102
 msgid "Builds of 'core.a' are saved into this path to be cached and reused."
 msgstr ""
+"La compilaciones de 'core.a' e guardan en esta ruta para ser cacheadas y "
+"reusadas"
 
 #: arduino/resources/index.go:45
 msgid "Can't create data directory %s"
@@ -273,7 +276,7 @@ msgstr "No se puede crear el directorio de datos %s"
 
 #: arduino/errors.go:487
 msgid "Can't create sketch"
-msgstr ""
+msgstr "No se puede crear el diseño"
 
 #: commands/lib/download.go:62 commands/lib/download.go:65
 msgid "Can't download library"
@@ -290,23 +293,23 @@ msgstr "No es posible abrir el sketch"
 
 #: cli/config/set.go:55
 msgid "Can't set multiple values in key %v"
-msgstr ""
+msgstr "No se puede establecer multiples valores a un mismo índice %v"
 
 #: cli/arguments/arguments.go:37
 msgid "Can't use %s flags at the same time."
-msgstr ""
+msgstr "No puedes usar %s señales al mismo tiempo"
 
 #: cli/config/add.go:61 cli/config/delete.go:72 cli/config/remove.go:70
 msgid "Can't write config file: %v"
-msgstr ""
+msgstr "No se puede escribir el archivo de configuración: %v"
 
 #: commands/compile/compile.go:160
 msgid "Cannot create build cache directory"
-msgstr ""
+msgstr "No se puede crear el directorio de caché de compilación"
 
 #: commands/compile/compile.go:135
 msgid "Cannot create build directory"
-msgstr ""
+msgstr "No se puede crear el directorio de caché de compilación"
 
 #: cli/config/init.go:97
 msgid "Cannot create config file directory: %v"
@@ -330,15 +333,15 @@ msgstr "No se puede ejecutar la herramienta de depuración"
 
 #: commands/board/attach.go:107
 msgid "Cannot export sketch metadata"
-msgstr ""
+msgstr "No se puede exportar los metadatas del diseño"
 
 #: cli/config/init.go:72 cli/config/init.go:83
 msgid "Cannot find absolute path: %v"
-msgstr ""
+msgstr "No se puede encontrar la ruta absoluta: %v"
 
 #: configuration/configuration.go:148 configuration/configuration.go:154
 msgid "Cannot get executable path: %v"
-msgstr ""
+msgstr "No se puede obtener la ruta del ejecutable: %v"
 
 #: commands/core/install.go:136
 msgid "Cannot install platform"
@@ -362,7 +365,7 @@ msgstr "Categoría: %s"
 
 #: cli/lib/check_deps.go:37 cli/lib/check_deps.go:38
 msgid "Check dependencies status for the specified library."
-msgstr ""
+msgstr "Comprueba el estado de las dependencias de la librería especificada."
 
 #: commands/lib/install.go:110
 msgid "Checking lib install prerequisites"
@@ -370,11 +373,11 @@ msgstr "Revisando los pre requisitos de instalación de la librería"
 
 #: arduino/resources/checksums.go:168
 msgid "Checksum differs from checksum in package.json"
-msgstr ""
+msgstr "El checksum difiere del checksum en package.json"
 
 #: cli/board/details.go:167
 msgid "Checksum:"
-msgstr ""
+msgstr "Checksum:"
 
 #: cli/cache/cache.go:33
 msgid "Clean caches."
@@ -398,7 +401,7 @@ msgstr ""
 
 #: cli/compile/compile.go:86 cli/compile/compile.go:87
 msgid "Compiles Arduino sketches."
-msgstr ""
+msgstr "Compila los diseños de Arduino"
 
 #: legacy/builder/builder.go:74
 msgid "Compiling core..."
@@ -465,7 +468,7 @@ msgstr "No se pudo conectar vía HTTP"
 
 #: commands/instances.go:434
 msgid "Could not create index directory"
-msgstr ""
+msgstr "No se ha podido crear el directorio índice."
 
 #: legacy/builder/phases/core_builder.go:47
 msgid "Couldn't deeply cache core build: %[1]s"
@@ -505,7 +508,7 @@ msgstr ""
 
 #: cli/core/list.go:88 cli/core/search.go:118
 msgid "DEPRECATED"
-msgstr ""
+msgstr "OBSOLETO"
 
 #: cli/daemon/daemon.go:181
 msgid "Daemon is now listening on %s:%s"
@@ -513,7 +516,7 @@ msgstr ""
 
 #: cli/debug/debug.go:52
 msgid "Debug Arduino sketches."
-msgstr ""
+msgstr "Depurar diseños Arduino."
 
 #: cli/debug/debug.go:53
 msgid ""

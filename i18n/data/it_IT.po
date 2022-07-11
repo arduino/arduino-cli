@@ -740,7 +740,7 @@ msgstr "Errore durante il download della libreria"
 
 #: commands/instances.go:379
 msgid "Error downloading library %s"
-msgstr ""
+msgstr "Errore durante il download della libreria %s"
 
 #: arduino/cores/packagemanager/profiles.go:125
 #: arduino/cores/packagemanager/profiles.go:126 commands/core/download.go:72
@@ -871,7 +871,7 @@ msgstr ""
 #: arduino/cores/packagemanager/profiles.go:184
 #: arduino/cores/packagemanager/profiles.go:185 commands/instances.go:759
 msgid "Error installing tool %s"
-msgstr ""
+msgstr "Errore durante l'installazione dello strumento %s"
 
 #: cli/lib/list.go:76
 msgid "Error listing Libraries: %v"
