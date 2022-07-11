@@ -265,7 +265,14 @@ def test_core_install(run_command):
     assert result.ok
     assert _in(result.stdout, "arduino:avr", "1.6.16")
 
-    # Replace it with a more recent one
+    # Replace it with the same with --no-overwrite (should NOT fail)
+    assert run_command(["core", "install", "arduino:avr@1.6.16", "--no-overwrite"])
+
+    # Replace it with a more recent one with --no-overwrite (should fail)
+    result = run_command(["core", "install", "arduino:avr@1.6.17", "--no-overwrite"])
+    assert result.failed
+
+    # Replace it with a more recent one without --no-overwrite (should succeed)
     assert run_command(["core", "install", "arduino:avr@1.6.17"])
     result = run_command(["core", "list", "--format", "json"])
     assert result.ok

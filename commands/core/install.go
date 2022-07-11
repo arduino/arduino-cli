@@ -17,6 +17,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -44,20 +45,31 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
 		PlatformArchitecture: req.Architecture,
 		PlatformVersion:      version,
 	}
-	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
+	platformRelease, tools, err := pm.FindPlatformReleaseDependencies(ref)
 	if err != nil {
 		return nil, &arduino.PlatformNotFoundError{Platform: ref.String(), Cause: err}
 	}
 
-	didInstall, err := installPlatform(pm, platform, tools, downloadCB, taskCB, req.GetSkipPostInstall())
-	if err != nil {
+	// Prerequisite checks before install
+	if platformRelease.IsInstalled() {
+		taskCB(&rpc.TaskProgress{Name: tr("Platform %s already installed", platformRelease), Completed: true})
+		return &rpc.PlatformInstallResponse{}, nil
+	}
+
+	if req.GetNoOverwrite() {
+		if installed := pm.GetInstalledPlatformRelease(platformRelease.Platform); installed != nil {
+			return nil, fmt.Errorf("%s: %s",
+				tr("Platform %s already installed", installed),
+				tr("could not overwrite"))
+		}
+	}
+
+	if err := installPlatform(pm, platformRelease, tools, downloadCB, taskCB, req.GetSkipPostInstall()); err != nil {
 		return nil, err
 	}
 
-	if didInstall {
-		if err := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil); err != nil {
-			return nil, err
-		}
+	if err := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil); err != nil {
+		return nil, err
 	}
 
 	return &rpc.PlatformInstallResponse{}, nil
@@ -66,15 +78,10 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
 func installPlatform(pm *packagemanager.PackageManager,
 	platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease,
 	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB,
-	skipPostInstall bool) (bool, error) {
+	skipPostInstall bool) error {
 	log := pm.Log.WithField("platform", platformRelease)
 
 	// Prerequisite checks before install
-	if platformRelease.IsInstalled() {
-		log.Warn("Platform already installed")
-		taskCB(&rpc.TaskProgress{Name: tr("Platform %s already installed", platformRelease), Completed: true})
-		return false, nil
-	}
 	toolsToInstall := []*cores.ToolRelease{}
 	for _, tool := range requiredTools {
 		if tool.IsInstalled() {
@@ -89,18 +96,18 @@ func installPlatform(pm *packagemanager.PackageManager,
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading packages")})
 	for _, tool := range toolsToInstall {
 		if err := downloadTool(pm, tool, downloadCB); err != nil {
-			return false, err
+			return err
 		}
 	}
 	if err := downloadPlatform(pm, platformRelease, downloadCB); err != nil {
-		return false, err
+		return err
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 
 	// Install tools first
 	for _, tool := range toolsToInstall {
 		if err := commands.InstallToolRelease(pm, tool, taskCB); err != nil {
-			return false, err
+			return err
 		}
 	}
 
@@ -112,8 +119,8 @@ func installPlatform(pm *packagemanager.PackageManager,
 		taskCB(&rpc.TaskProgress{Name: tr("Installing platform %s", platformRelease)})
 	} else {
 		// A platform with a different version is already installed
-		log.Info("Upgrading platform " + installed.String())
-		taskCB(&rpc.TaskProgress{Name: tr("Upgrading platform %[1]s with %[2]s", installed, platformRelease)})
+		log.Info("Replacing platform " + installed.String())
+		taskCB(&rpc.TaskProgress{Name: tr("Replacing platform %[1]s with %[2]s", installed, platformRelease)})
 		platformRef := &packagemanager.PlatformReference{
 			Package:              platformRelease.Platform.Package.Name,
 			PlatformArchitecture: platformRelease.Platform.Architecture,
@@ -126,14 +133,14 @@ func installPlatform(pm *packagemanager.PackageManager,
 		var err error
 		_, installedTools, err = pm.FindPlatformReleaseDependencies(platformRef)
 		if err != nil {
-			return false, &arduino.NotFoundError{Message: tr("Can't find dependencies for platform %s", platformRef), Cause: err}
+			return &arduino.NotFoundError{Message: tr("Can't find dependencies for platform %s", platformRef), Cause: err}
 		}
 	}
 
 	// Install
 	if err := pm.InstallPlatform(platformRelease); err != nil {
 		log.WithError(err).Error("Cannot install platform")
-		return false, &arduino.FailedInstallError{Message: tr("Cannot install platform"), Cause: err}
+		return &arduino.FailedInstallError{Message: tr("Cannot install platform"), Cause: err}
 	}
 
 	// If upgrading remove previous release
@@ -151,7 +158,7 @@ func installPlatform(pm *packagemanager.PackageManager,
 				taskCB(&rpc.TaskProgress{Message: tr("Error rolling-back changes: %s", err)})
 			}
 
-			return false, &arduino.FailedInstallError{Message: tr("Cannot upgrade platform"), Cause: uninstallErr}
+			return &arduino.FailedInstallError{Message: tr("Cannot upgrade platform"), Cause: uninstallErr}
 		}
 
 		// Uninstall unused tools
@@ -177,5 +184,5 @@ func installPlatform(pm *packagemanager.PackageManager,
 
 	log.Info("Platform installed")
 	taskCB(&rpc.TaskProgress{Message: tr("Platform %s installed", platformRelease), Completed: true})
-	return true, nil
+	return nil
 }

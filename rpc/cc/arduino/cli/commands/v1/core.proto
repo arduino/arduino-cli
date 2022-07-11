@@ -33,6 +33,9 @@ message PlatformInstallRequest {
   // Set to true to not run (eventual) post install scripts for trusted
   // platforms
   bool skip_post_install = 5;
+  // Set to true to skip installation if a different version of the platform
+  // is already installed.
+  bool no_overwrite = 6;
 }
 
 message PlatformInstallResponse {
