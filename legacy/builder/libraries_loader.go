@@ -26,7 +26,12 @@ import (
 type LibrariesLoader struct{}
 
 func (s *LibrariesLoader) Run(ctx *types.Context) error {
-	if ctx.LibrariesManager == nil {
+	if ctx.UseCachedLibrariesResolution {
+		// Since we are using the cached libraries resolution
+		// the library manager is not needed.
+		lm := librariesmanager.NewLibraryManager(nil, nil)
+		ctx.LibrariesManager = lm
+	} else if ctx.LibrariesManager == nil {
 		lm := librariesmanager.NewLibraryManager(nil, nil)
 		ctx.LibrariesManager = lm
 

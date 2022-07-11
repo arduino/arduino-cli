@@ -114,6 +114,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	if pm.GetProfile() != nil {
 		builderCtx.LibrariesManager = lm
 	}
+	builderCtx.UseCachedLibrariesResolution = req.GetSkipLibrariesDiscovery()
 	builderCtx.FQBN = fqbn
 	builderCtx.SketchLocation = sk.FullPath
 	builderCtx.ProgressCB = progressCB
