@@ -51,8 +51,8 @@ type PlatformInstallRequest struct {
 	// Set to true to not run (eventual) post install scripts for trusted
 	// platforms
 	SkipPostInstall bool `protobuf:"varint,5,opt,name=skip_post_install,json=skipPostInstall,proto3" json:"skip_post_install,omitempty"`
-	// Set to true will not install the platform if another version is already
-	// installed.
+	// Set to true to skip installation if a different version of the platform
+	// is already installed.
 	NoOverwrite bool `protobuf:"varint,6,opt,name=no_overwrite,json=noOverwrite,proto3" json:"no_overwrite,omitempty"`
 }
 
