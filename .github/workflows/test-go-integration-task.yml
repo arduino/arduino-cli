@@ -84,6 +84,9 @@ jobs:
 
     runs-on: ${{ matrix.operating-system }}
 
+    env:
+      ARDUINO_CLI_USER_AGENT_EXTENSION: ${{ secrets.CLOUDFLARE_SPAMCHECK_BYPASS_TOKEN }}
+
     steps:
       # By default, actions/checkout converts the repo's LF line endings to CRLF on the Windows runner.
       - name: Disable EOL conversions
