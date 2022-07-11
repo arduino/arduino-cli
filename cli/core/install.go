@@ -55,7 +55,7 @@ func initInstallCommand() *cobra.Command {
 		},
 	}
 	postInstallFlags.AddToCommand(installCommand)
-	installCommand.Flags().BoolVar(&noOverwrite, "no-overwrite", false, tr("Do not overwrite existing platforms (during upgrade or downgrade)."))
+	installCommand.Flags().BoolVar(&noOverwrite, "no-overwrite", false, tr("Do not overwrite already installed platforms."))
 	return installCommand
 }
 
