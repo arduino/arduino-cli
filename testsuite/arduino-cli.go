@@ -36,6 +36,7 @@ type ArduinoCLI struct {
 	path          *paths.Path
 	t             *require.Assertions
 	proc          *executils.Process
+	cliEnvVars    []string
 	cliConfigPath *paths.Path
 	daemonAddr    string
 	daemonConn    *grpc.ClientConn
@@ -45,17 +46,11 @@ type ArduinoCLI struct {
 // NewArduinoCliWithinEnvironment creates a new Arduino CLI client inside the given environment.
 func NewArduinoCliWithinEnvironment(t *testing.T, cliPath *paths.Path, env *Environment) *ArduinoCLI {
 	cli := NewArduinoCli(t, cliPath)
-	cli.cliConfigPath = env.Root().Join("arduino-cli.yaml")
-	config := fmt.Sprintf(`
-directories:
-  data: %s
-  downloads: %s
-  user: %s
-`,
-		env.Root().Join("arduino15"),
-		env.Root().Join("arduino15/staging"),
-		env.Root().Join("Arduino"))
-	require.NoError(t, cli.cliConfigPath.WriteFile([]byte(config)))
+	cli.cliEnvVars = []string{
+		fmt.Sprintf("ARDUINO_DATA_DIR=%s", env.Root().Join("arduino15")),
+		fmt.Sprintf("ARDUINO_DOWNLOADS_DIR=%s", env.Root().Join("arduino15/staging")),
+		fmt.Sprintf("ARDUINO_SKETCHBOOK_DIR=%s", env.Root().Join("Arduino")),
+	}
 	return cli
 }
 
@@ -77,11 +72,11 @@ func (cli *ArduinoCLI) CleanUp() {
 
 // Run executes the given arduino-cli command and returns the output.
 func (cli *ArduinoCLI) Run(args ...string) ([]byte, []byte, error) {
-	fmt.Println(color.HiBlackString(">>> Running: ") + color.HiYellowString("%s %s", cli.path, strings.Join(args, " ")))
 	if cli.cliConfigPath != nil {
 		args = append([]string{"--config-file", cli.cliConfigPath.String()}, args...)
 	}
-	cliProc, err := executils.NewProcessFromPath(nil, cli.path, args...)
+	fmt.Println(color.HiBlackString(">>> Running: ") + color.HiYellowString("%s %s", cli.path, strings.Join(args, " ")))
+	cliProc, err := executils.NewProcessFromPath(cli.cliEnvVars, cli.path, args...)
 	cli.t.NoError(err)
 	stdout, err := cliProc.StdoutPipe()
 	cli.t.NoError(err)
