@@ -20,11 +20,13 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
+	"github.com/fatih/color"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 )
@@ -75,6 +77,7 @@ func (cli *ArduinoCLI) CleanUp() {
 
 // Run executes the given arduino-cli command and returns the output.
 func (cli *ArduinoCLI) Run(args ...string) ([]byte, []byte, error) {
+	fmt.Println(color.HiBlackString(">>> Running: ") + color.HiYellowString("%s %s", cli.path, strings.Join(args, " ")))
 	if cli.cliConfigPath != nil {
 		args = append([]string{"--config-file", cli.cliConfigPath.String()}, args...)
 	}
@@ -93,15 +96,17 @@ func (cli *ArduinoCLI) Run(args ...string) ([]byte, []byte, error) {
 	stdoutCtx, stdoutCancel := context.WithCancel(context.Background())
 	stderrCtx, stderrCancel := context.WithCancel(context.Background())
 	go func() {
-		io.Copy(&stdoutBuf, stdout)
+		io.Copy(&stdoutBuf, io.TeeReader(stdout, os.Stdout))
 		stdoutCancel()
 	}()
 	go func() {
-		io.Copy(&stderrBuf, stderr)
+		io.Copy(&stderrBuf, io.TeeReader(stderr, os.Stderr))
 		stderrCancel()
 	}()
 	cliErr := cliProc.Wait()
 	<-stdoutCtx.Done()
 	<-stderrCtx.Done()
+	fmt.Println(color.HiBlackString("<<< Run completed (err = %v)", cliErr))
+
 	return stdoutBuf.Bytes(), stderrBuf.Bytes(), cliErr
 }
