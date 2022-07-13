@@ -89,6 +89,9 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
 
+      - name: Build arduino-cli
+        run: task go:build
+
       - name: Run tests
         run: task go:test
 
