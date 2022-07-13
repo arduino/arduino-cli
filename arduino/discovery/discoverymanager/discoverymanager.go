@@ -52,12 +52,15 @@ func New() *DiscoveryManager {
 // Clear resets the DiscoveryManager to its initial state
 func (dm *DiscoveryManager) Clear() {
 	dm.discoveriesMutex.Lock()
-	for _, d := range dm.discoveries {
-		d.Quit()
-		logrus.Infof("Closed and removed discovery %s", d.GetID())
+	defer dm.discoveriesMutex.Unlock()
+
+	if dm.discoveriesRunning {
+		for _, d := range dm.discoveries {
+			d.Quit()
+			logrus.Infof("Closed and removed discovery %s", d.GetID())
+		}
 	}
 	dm.discoveries = map[string]*discovery.PluggableDiscovery{}
-	dm.discoveriesMutex.Unlock()
 }
 
 // IDs returns the list of discoveries' ids in this DiscoveryManager
@@ -209,6 +212,9 @@ func (dm *DiscoveryManager) cacheEvent(ev *discovery.Event) {
 		cache[eventID] = ev
 	case "remove":
 		delete(cache, eventID)
+	case "quit":
+		// Remove all the events for this discovery
+		delete(dm.watchersCache, ev.DiscoveryID)
 	default:
 		logrus.Errorf("Unhandled event from discovery: %s", ev.Type)
 		return

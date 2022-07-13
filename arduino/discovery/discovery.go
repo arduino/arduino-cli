@@ -277,10 +277,7 @@ func (disc *PluggableDiscovery) killProcess() error {
 	}
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
-	if disc.eventChan != nil {
-		close(disc.eventChan)
-		disc.eventChan = nil
-	}
+	disc.stopSync()
 	disc.state = Dead
 	logrus.Infof("killed discovery %s process", disc.id)
 	return nil
@@ -367,13 +364,18 @@ func (disc *PluggableDiscovery) Stop() error {
 	}
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
-	disc.cachedPorts = map[string]*Port{}
-	if disc.eventChan != nil {
-		close(disc.eventChan)
-		disc.eventChan = nil
-	}
+	disc.stopSync()
 	disc.state = Idling
 	return nil
+}
+
+func (disc *PluggableDiscovery) stopSync() {
+	if disc.eventChan != nil {
+		disc.eventChan <- &Event{"stop", nil, disc.GetID()}
+		close(disc.eventChan)
+		disc.eventChan = nil
+		disc.cachedPorts = map[string]*Port{}
+	}
 }
 
 // Quit terminates the discovery. No more commands can be accepted by the discovery.
@@ -427,12 +429,8 @@ func (disc *PluggableDiscovery) StartSync(size int) (<-chan *Event, error) {
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
 	disc.state = Syncing
-	disc.cachedPorts = map[string]*Port{}
-	if disc.eventChan != nil {
-		// In case there is already an existing event channel in use we close it
-		// before creating a new one.
-		close(disc.eventChan)
-	}
+	// In case there is already an existing event channel in use we close it before creating a new one.
+	disc.stopSync()
 	c := make(chan *Event, size)
 	disc.eventChan = c
 	return c, nil
