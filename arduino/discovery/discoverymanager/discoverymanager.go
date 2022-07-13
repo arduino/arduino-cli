@@ -34,6 +34,7 @@ type DiscoveryManager struct {
 	feed               chan *discovery.Event
 	watchersMutex      sync.Mutex
 	watchers           map[*PortWatcher]bool
+	watchersCache      map[string]map[string]*discovery.Event
 }
 
 var tr = i18n.Tr
@@ -41,9 +42,10 @@ var tr = i18n.Tr
 // New creates a new DiscoveryManager
 func New() *DiscoveryManager {
 	return &DiscoveryManager{
-		discoveries: map[string]*discovery.PluggableDiscovery{},
-		watchers:    map[*PortWatcher]bool{},
-		feed:        make(chan *discovery.Event, 50),
+		discoveries:   map[string]*discovery.PluggableDiscovery{},
+		watchers:      map[*PortWatcher]bool{},
+		feed:          make(chan *discovery.Event, 50),
+		watchersCache: map[string]map[string]*discovery.Event{},
 	}
 }
 
@@ -139,9 +141,16 @@ func (dm *DiscoveryManager) Watch() (*PortWatcher, error) {
 		dm.watchersMutex.Unlock()
 		close(watcher.feed)
 	}
-	dm.watchersMutex.Lock()
-	dm.watchers[watcher] = true
-	dm.watchersMutex.Unlock()
+	go func() {
+		dm.watchersMutex.Lock()
+		for _, cache := range dm.watchersCache {
+			for _, ev := range cache {
+				watcher.feed <- ev
+			}
+		}
+		dm.watchers[watcher] = true
+		dm.watchersMutex.Unlock()
+	}()
 	return watcher, nil
 }
 
@@ -188,19 +197,35 @@ func (dm *DiscoveryManager) feeder() {
 }
 
 func (dm *DiscoveryManager) cacheEvent(ev *discovery.Event) {
-	// XXX: TODO
+	cache := dm.watchersCache[ev.DiscoveryID]
+	if cache == nil {
+		cache = map[string]*discovery.Event{}
+		dm.watchersCache[ev.DiscoveryID] = cache
+	}
+
+	eventID := ev.Port.Address + "|" + ev.Port.Protocol
+	switch ev.Type {
+	case "add":
+		cache[eventID] = ev
+	case "remove":
+		delete(cache, eventID)
+	default:
+		logrus.Errorf("Unhandled event from discovery: %s", ev.Type)
+		return
+	}
 }
 
 // List return the current list of ports detected from all discoveries
 func (dm *DiscoveryManager) List() []*discovery.Port {
 	dm.Start()
 
-	// XXX: Cache ports and return them
-	dm.discoveriesMutex.Lock()
-	defer dm.discoveriesMutex.Unlock()
 	res := []*discovery.Port{}
-	for _, d := range dm.discoveries {
-		res = append(res, d.ListCachedPorts()...)
+	dm.watchersMutex.Lock()
+	defer dm.watchersMutex.Unlock()
+	for _, cache := range dm.watchersCache {
+		for _, ev := range cache {
+			res = append(res, ev.Port)
+		}
 	}
 	return res
 }
