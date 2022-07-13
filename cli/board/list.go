@@ -75,11 +75,12 @@ func runListCommand(cmd *cobra.Command, args []string) {
 }
 
 func watchList(cmd *cobra.Command, inst *rpc.Instance) {
-	eventsChan, err := board.Watch(inst.Id, nil)
+	eventsChan, closeCB, err := board.Watch(inst.Id)
 	if err != nil {
 		feedback.Errorf(tr("Error detecting boards: %v"), err)
 		os.Exit(errorcodes.ErrNetwork)
 	}
+	defer closeCB()
 
 	// This is done to avoid printing the header each time a new event is received
 	if feedback.GetFormat() == feedback.Text {

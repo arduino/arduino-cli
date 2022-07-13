@@ -36,9 +36,7 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/status"
 )
 
 // ArduinoCoreServerImpl FIXMEDOC
@@ -109,42 +107,35 @@ func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCoreService_Boa
 		return err
 	}
 
-	interrupt := make(chan bool, 1)
+	eventsChan, closeWatcher, err := board.Watch(msg.Instance.Id)
+	if err != nil {
+		return convertErrorToRPCStatus(err)
+	}
+
 	go func() {
-		defer close(interrupt)
+		defer closeWatcher()
 		for {
 			msg, err := stream.Recv()
 			// Handle client closing the stream and eventual errors
 			if err == io.EOF {
 				logrus.Info("boards watcher stream closed")
-				interrupt <- true
 				return
-			} else if st, ok := status.FromError(err); ok && st.Code() == codes.Canceled {
-				logrus.Info("boards watcher interrupted by host")
-				return
-			} else if err != nil {
+			}
+			if err != nil {
 				logrus.Infof("interrupting boards watcher: %v", err)
-				interrupt <- true
 				return
 			}
 
 			// Message received, does the client want to interrupt?
 			if msg != nil && msg.Interrupt {
 				logrus.Info("boards watcher interrupted by client")
-				interrupt <- msg.Interrupt
 				return
 			}
 		}
 	}()
 
-	eventsChan, err := board.Watch(msg.Instance.Id, interrupt)
-	if err != nil {
-		return convertErrorToRPCStatus(err)
-	}
-
 	for event := range eventsChan {
-		err = stream.Send(event)
-		if err != nil {
+		if err := stream.Send(event); err != nil {
 			logrus.Infof("sending board watch message: %v", err)
 		}
 	}

@@ -28,8 +28,12 @@ import (
 // DiscoveryManager is required to handle multiple pluggable-discovery that
 // may be shared across platforms
 type DiscoveryManager struct {
-	discoveriesMutex sync.Mutex
-	discoveries      map[string]*discovery.PluggableDiscovery
+	discoveriesMutex   sync.Mutex
+	discoveries        map[string]*discovery.PluggableDiscovery
+	discoveriesRunning bool
+	feed               chan *discovery.Event
+	watchersMutex      sync.Mutex
+	watchers           map[*PortWatcher]bool
 }
 
 var tr = i18n.Tr
@@ -38,15 +42,20 @@ var tr = i18n.Tr
 func New() *DiscoveryManager {
 	return &DiscoveryManager{
 		discoveries: map[string]*discovery.PluggableDiscovery{},
+		watchers:    map[*PortWatcher]bool{},
+		feed:        make(chan *discovery.Event, 50),
 	}
 }
 
 // Clear resets the DiscoveryManager to its initial state
 func (dm *DiscoveryManager) Clear() {
-	dm.QuitAll()
 	dm.discoveriesMutex.Lock()
-	defer dm.discoveriesMutex.Unlock()
+	for _, d := range dm.discoveries {
+		d.Quit()
+		logrus.Infof("Closed and removed discovery %s", d.GetID())
+	}
 	dm.discoveries = map[string]*discovery.PluggableDiscovery{}
+	dm.discoveriesMutex.Unlock()
 }
 
 // IDs returns the list of discoveries' ids in this DiscoveryManager
@@ -60,233 +69,137 @@ func (dm *DiscoveryManager) IDs() []string {
 	return ids
 }
 
-// Add adds a discovery to the list of managed discoveries
-func (dm *DiscoveryManager) Add(disc *discovery.PluggableDiscovery) error {
-	id := disc.GetID()
+// Start starts all the discoveries in this DiscoveryManager.
+// If the discoveries are already running, this function does nothing.
+func (dm *DiscoveryManager) Start() {
 	dm.discoveriesMutex.Lock()
 	defer dm.discoveriesMutex.Unlock()
+	if dm.discoveriesRunning {
+		return
+	}
+
+	go dm.feeder()
+
+	var wg sync.WaitGroup
+	for _, d := range dm.discoveries {
+		wg.Add(1)
+		go func(d *discovery.PluggableDiscovery) {
+			dm.startDiscovery(d)
+			wg.Done()
+		}(d)
+	}
+	wg.Wait()
+	dm.discoveriesRunning = true
+}
+
+// Add adds a discovery to the list of managed discoveries
+func (dm *DiscoveryManager) Add(d *discovery.PluggableDiscovery) error {
+	dm.discoveriesMutex.Lock()
+	defer dm.discoveriesMutex.Unlock()
+
+	id := d.GetID()
 	if _, has := dm.discoveries[id]; has {
 		return errors.Errorf(tr("pluggable discovery already added: %s"), id)
 	}
-	dm.discoveries[id] = disc
+	dm.discoveries[id] = d
+
+	if dm.discoveriesRunning {
+		dm.startDiscovery(d)
+	}
 	return nil
 }
 
-// remove quits and deletes the discovery with specified id
-// from the discoveries managed by this DiscoveryManager
-func (dm *DiscoveryManager) remove(id string) {
-	dm.discoveriesMutex.Lock()
-	d := dm.discoveries[id]
-	delete(dm.discoveries, id)
-	dm.discoveriesMutex.Unlock()
-	d.Quit()
-	logrus.Infof("Closed and removed discovery %s", id)
+// PortWatcher is a watcher for all discovery events (port connection/disconnection)
+type PortWatcher struct {
+	closeCB func()
+	feed    chan *discovery.Event
 }
 
-// parallelize runs function f concurrently for each discovery.
-// Returns a list of errors returned by each call of f.
-func (dm *DiscoveryManager) parallelize(f func(d *discovery.PluggableDiscovery) error) []error {
-	var wg sync.WaitGroup
-	errChan := make(chan error)
-	dm.discoveriesMutex.Lock()
-	discoveries := []*discovery.PluggableDiscovery{}
-	for _, d := range dm.discoveries {
-		discoveries = append(discoveries, d)
-	}
-	dm.discoveriesMutex.Unlock()
-	for _, d := range discoveries {
-		wg.Add(1)
-		go func(d *discovery.PluggableDiscovery) {
-			defer wg.Done()
-			if err := f(d); err != nil {
-				errChan <- err
-			}
-		}(d)
-	}
+// Feed returns the feed of events coming from the discoveries
+func (pw *PortWatcher) Feed() <-chan *discovery.Event {
+	return pw.feed
+}
 
-	// Wait in a goroutine to collect eventual errors running a discovery.
-	// When all goroutines that are calling discoveries are done close the errors chan.
-	go func() {
-		wg.Wait()
-		close(errChan)
+// Close closes the PortWatcher
+func (pw *PortWatcher) Close() {
+	pw.closeCB()
+}
+
+// Watch starts a watcher for all discovery events (port connection/disconnection).
+// The watcher must be closed when it is no longer needed with the Close method.
+func (dm *DiscoveryManager) Watch() (*PortWatcher, error) {
+	dm.Start()
+
+	watcher := &PortWatcher{
+		feed: make(chan *discovery.Event),
+	}
+	watcher.closeCB = func() {
+		dm.watchersMutex.Lock()
+		delete(dm.watchers, watcher)
+		dm.watchersMutex.Unlock()
+		close(watcher.feed)
+	}
+	dm.watchersMutex.Lock()
+	dm.watchers[watcher] = true
+	dm.watchersMutex.Unlock()
+	return watcher, nil
+}
+
+func (dm *DiscoveryManager) startDiscovery(d *discovery.PluggableDiscovery) (discErr error) {
+	defer func() {
+		if discErr != nil {
+			logrus.Errorf("Discovery %s failed to run: %s", d.GetID(), discErr)
+		}
 	}()
 
-	errs := []error{}
-	for err := range errChan {
-		errs = append(errs, err)
+	if err := d.Run(); err != nil {
+		return fmt.Errorf(tr("discovery %[1]s process not started: %[2]w"), d.GetID(), err)
 	}
-	return errs
-}
-
-// RunAll the discoveries for this DiscoveryManager,
-// returns an error for each discovery failing to run
-func (dm *DiscoveryManager) RunAll() []error {
-	return dm.parallelize(func(d *discovery.PluggableDiscovery) error {
-		if d.State() != discovery.Dead {
-			// This discovery is already alive, nothing to do
-			return nil
-		}
-
-		if err := d.Run(); err != nil {
-			dm.remove(d.GetID())
-			return fmt.Errorf(tr("discovery %[1]s process not started: %[2]w"), d.GetID(), err)
-		}
-		return nil
-	})
-}
-
-// StartAll the discoveries for this DiscoveryManager,
-// returns an error for each discovery failing to start
-func (dm *DiscoveryManager) StartAll() []error {
-	return dm.parallelize(func(d *discovery.PluggableDiscovery) error {
-		state := d.State()
-		if state != discovery.Idling {
-			// Already started
-			return nil
-		}
-		if err := d.Start(); err != nil {
-			dm.remove(d.GetID())
-			return fmt.Errorf(tr("starting discovery %[1]s: %[2]w"), d.GetID(), err)
-		}
-		return nil
-	})
-}
-
-// StartSyncAll the discoveries for this DiscoveryManager,
-// returns an error for each discovery failing to start syncing
-func (dm *DiscoveryManager) StartSyncAll() (<-chan *discovery.Event, []error) {
-	eventSink := make(chan *discovery.Event, 5)
-	var wg sync.WaitGroup
-	errs := dm.parallelize(func(d *discovery.PluggableDiscovery) error {
-		state := d.State()
-		if state != discovery.Idling || state == discovery.Syncing {
-			// Already syncing
-			return nil
-		}
-
-		eventCh, err := d.StartSync(5)
-		if err != nil {
-			dm.remove(d.GetID())
-			return fmt.Errorf(tr("start syncing discovery %[1]s: %[2]w"), d.GetID(), err)
-		}
-
-		wg.Add(1)
-		go func() {
-			for ev := range eventCh {
-				eventSink <- ev
-			}
-			wg.Done()
-		}()
-		return nil
-	})
-	go func() {
-		wg.Wait()
-		eventSink <- &discovery.Event{Type: "quit"}
-		close(eventSink)
-	}()
-	return eventSink, errs
-}
-
-// StopAll the discoveries for this DiscoveryManager,
-// returns an error for each discovery failing to stop
-func (dm *DiscoveryManager) StopAll() []error {
-	return dm.parallelize(func(d *discovery.PluggableDiscovery) error {
-		state := d.State()
-		if state != discovery.Syncing && state != discovery.Running {
-			// Not running nor syncing, nothing to stop
-			return nil
-		}
-
-		if err := d.Stop(); err != nil {
-			dm.remove(d.GetID())
-			return fmt.Errorf(tr("stopping discovery %[1]s: %[2]w"), d.GetID(), err)
-		}
-		return nil
-	})
-}
-
-// QuitAll quits all the discoveries managed by this DiscoveryManager.
-// Returns an error for each discovery that fails quitting
-func (dm *DiscoveryManager) QuitAll() []error {
-	errs := dm.parallelize(func(d *discovery.PluggableDiscovery) error {
-		if d.State() == discovery.Dead {
-			// Stop! Stop! It's already dead!
-			return nil
-		}
-
-		d.Quit()
-		return nil
-	})
-	return errs
-}
-
-// List returns a list of available ports detected from all discoveries
-// and a list of errors for those discoveries that returned one.
-func (dm *DiscoveryManager) List() ([]*discovery.Port, []error) {
-	var wg sync.WaitGroup
-	// Use this struct to avoid the need of two separate
-	// channels for ports and errors.
-	type listMsg struct {
-		Err  error
-		Port *discovery.Port
-	}
-	msgChan := make(chan listMsg)
-	dm.discoveriesMutex.Lock()
-	discoveries := []*discovery.PluggableDiscovery{}
-	for _, d := range dm.discoveries {
-		discoveries = append(discoveries, d)
-	}
-	dm.discoveriesMutex.Unlock()
-	for _, d := range discoveries {
-		wg.Add(1)
-		go func(d *discovery.PluggableDiscovery) {
-			defer wg.Done()
-			if d.State() != discovery.Running {
-				// Discovery is not running, it won't return anything
-				return
-			}
-			ports, err := d.List()
-			if err != nil {
-				msgChan <- listMsg{Err: fmt.Errorf(tr("listing ports from discovery %[1]s: %[2]w"), d.GetID(), err)}
-			}
-			for _, p := range ports {
-				msgChan <- listMsg{Port: p}
-			}
-		}(d)
+	eventCh, err := d.StartSync(5)
+	if err != nil {
+		return fmt.Errorf("%s: %s", tr("starting discovery %s", d.GetID()), err)
 	}
 
 	go func() {
-		// Close the channel only after all goroutines are done
-		wg.Wait()
-		close(msgChan)
-	}()
-
-	ports := []*discovery.Port{}
-	errs := []error{}
-	for msg := range msgChan {
-		if msg.Err != nil {
-			errs = append(errs, msg.Err)
-		} else {
-			ports = append(ports, msg.Port)
+		for ev := range eventCh {
+			dm.feed <- ev
 		}
-	}
-	return ports, errs
+	}()
+	return nil
 }
 
-// ListCachedPorts return the current list of ports detected from all discoveries
-func (dm *DiscoveryManager) ListCachedPorts() []*discovery.Port {
+func (dm *DiscoveryManager) feeder() {
+	// Feed all watchers with data coming from the discoveries
+	for ev := range dm.feed {
+		dm.watchersMutex.Lock()
+		for watcher := range dm.watchers {
+			select {
+			case watcher.feed <- ev:
+				// OK
+			default:
+				// If the watcher is not able to process event fast enough
+				// remove the watcher from the list of watchers
+				go watcher.Close()
+			}
+		}
+		dm.cacheEvent(ev)
+		dm.watchersMutex.Unlock()
+	}
+}
+
+func (dm *DiscoveryManager) cacheEvent(ev *discovery.Event) {
+	// XXX: TODO
+}
+
+// List return the current list of ports detected from all discoveries
+func (dm *DiscoveryManager) List() []*discovery.Port {
+	dm.Start()
+
+	// XXX: Cache ports and return them
+	dm.discoveriesMutex.Lock()
+	defer dm.discoveriesMutex.Unlock()
 	res := []*discovery.Port{}
-	dm.discoveriesMutex.Lock()
-	discoveries := []*discovery.PluggableDiscovery{}
 	for _, d := range dm.discoveries {
-		discoveries = append(discoveries, d)
-	}
-	dm.discoveriesMutex.Unlock()
-	for _, d := range discoveries {
-		if d.State() != discovery.Syncing {
-			// Discovery is not syncing
-			continue
-		}
 		res = append(res, d.ListCachedPorts()...)
 	}
 	return res
