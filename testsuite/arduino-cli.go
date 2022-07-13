@@ -20,8 +20,11 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"os"
 	"strings"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -104,4 +107,132 @@ func (cli *ArduinoCLI) Run(args ...string) ([]byte, []byte, error) {
 	fmt.Println(color.HiBlackString("<<< Run completed (err = %v)", cliErr))
 
 	return stdoutBuf.Bytes(), stderrBuf.Bytes(), cliErr
+}
+
+// StartDeamon starts the Arduino CLI daemon. It returns the address of the daemon.
+func (cli *ArduinoCLI) StartDeamon(verbose bool) string {
+	args := []string{"daemon", "--format", "json"}
+	if cli.cliConfigPath != nil {
+		args = append([]string{"--config-file", cli.cliConfigPath.String()}, args...)
+	}
+	if verbose {
+		args = append(args, "-v", "--log-level", "debug")
+	}
+	cliProc, err := executils.NewProcessFromPath(cli.cliEnvVars, cli.path, args...)
+	cli.t.NoError(err)
+	stdout, err := cliProc.StdoutPipe()
+	cli.t.NoError(err)
+	stderr, err := cliProc.StderrPipe()
+	cli.t.NoError(err)
+	_, err = cliProc.StdinPipe()
+	cli.t.NoError(err)
+
+	cli.t.NoError(cliProc.Start())
+	cli.proc = cliProc
+
+	// var daemonAddr struct {
+	// 	IP   string
+	// 	Port string
+	// }
+	// dec := json.NewDecoder(stdout)
+	// cli.t.NoError(dec.Decode(&daemonAddr))
+	// cli.daemonAddr = daemonAddr.IP + ":" + daemonAddr.Port
+	cli.daemonAddr = "127.0.0.1:50051"
+
+	copy := func(dst io.Writer, src io.Reader) {
+		buff := make([]byte, 1024)
+		for {
+			n, err := src.Read(buff)
+			if err != nil {
+				return
+			}
+			dst.Write([]byte(color.YellowString(string(buff[:n]))))
+		}
+	}
+	go copy(os.Stdout, stdout)
+	go copy(os.Stderr, stderr)
+	conn, err := grpc.Dial(cli.daemonAddr, grpc.WithInsecure(), grpc.WithBlock())
+	cli.t.NoError(err)
+	cli.daemonConn = conn
+	cli.daemonClient = commands.NewArduinoCoreServiceClient(conn)
+
+	return cli.daemonAddr
+}
+
+// ArduinoCLIInstance is an Arduino CLI gRPC instance.
+type ArduinoCLIInstance struct {
+	cli      *ArduinoCLI
+	instance *commands.Instance
+}
+
+var logCallfMutex sync.Mutex
+
+func logCallf(format string, a ...interface{}) {
+	logCallfMutex.Lock()
+	fmt.Print(color.HiRedString(format, a...))
+	logCallfMutex.Unlock()
+}
+
+// Create calls the "Create" gRPC method.
+func (cli *ArduinoCLI) Create() *ArduinoCLIInstance {
+	logCallf(">>> Create()")
+	resp, err := cli.daemonClient.Create(context.Background(), &commands.CreateRequest{})
+	cli.t.NoError(err)
+	logCallf(" -> %v\n", resp)
+	return &ArduinoCLIInstance{
+		cli:      cli,
+		instance: resp.Instance,
+	}
+}
+
+// Init calls the "Init" gRPC method.
+func (inst *ArduinoCLIInstance) Init(profile string, sketchPath string, respCB func(*commands.InitResponse)) error {
+	initReq := &commands.InitRequest{
+		Instance:   inst.instance,
+		Profile:    profile,
+		SketchPath: sketchPath,
+	}
+	logCallf(">>> Init(%v)\n", initReq)
+	initClient, err := inst.cli.daemonClient.Init(context.Background(), initReq)
+	if err != nil {
+		return err
+	}
+	for {
+		msg, err := initClient.Recv()
+		if err == io.EOF {
+			logCallf("<<< Init EOF\n")
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		if respCB != nil {
+			respCB(msg)
+		}
+	}
+}
+
+// BoardList calls the "BoardList" gRPC method.
+func (inst *ArduinoCLIInstance) BoardList(timeout time.Duration) (*commands.BoardListResponse, error) {
+	boardListReq := &commands.BoardListRequest{
+		Instance: inst.instance,
+		Timeout:  timeout.Milliseconds(),
+	}
+	logCallf(">>> BoardList(%v) -> ", boardListReq)
+	resp, err := inst.cli.daemonClient.BoardList(context.Background(), boardListReq)
+	logCallf("err=%v\n", err)
+	return resp, err
+}
+
+// BoardListWatch calls the "BoardListWatch" gRPC method.
+func (inst *ArduinoCLIInstance) BoardListWatch() (commands.ArduinoCoreService_BoardListWatchClient, error) {
+	boardListWatchReq := &commands.BoardListWatchRequest{
+		Instance: inst.instance,
+	}
+	logCallf(">>> BoardListWatch(%v)\n", boardListWatchReq)
+	watcher, err := inst.cli.daemonClient.BoardListWatch(context.Background())
+	if err != nil {
+		return watcher, err
+	}
+	return watcher, watcher.Send(boardListWatchReq)
 }
