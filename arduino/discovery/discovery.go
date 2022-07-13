@@ -121,8 +121,9 @@ func (p *Port) String() string {
 
 // Event is a pluggable discovery event
 type Event struct {
-	Type string
-	Port *Port
+	Type        string
+	Port        *Port
+	DiscoveryID string
 }
 
 // New create and connect to the given pluggable discovery
@@ -178,7 +179,7 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 			disc.statusMutex.Lock()
 			disc.cachedPorts[msg.Port.Address+"|"+msg.Port.Protocol] = msg.Port
 			if disc.eventChan != nil {
-				disc.eventChan <- &Event{"add", msg.Port}
+				disc.eventChan <- &Event{"add", msg.Port, disc.GetID()}
 			}
 			disc.statusMutex.Unlock()
 		} else if msg.EventType == "remove" {
@@ -189,7 +190,7 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 			disc.statusMutex.Lock()
 			delete(disc.cachedPorts, msg.Port.Address+"|"+msg.Port.Protocol)
 			if disc.eventChan != nil {
-				disc.eventChan <- &Event{"remove", msg.Port}
+				disc.eventChan <- &Event{"remove", msg.Port, disc.GetID()}
 			}
 			disc.statusMutex.Unlock()
 		} else {
