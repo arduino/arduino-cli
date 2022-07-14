@@ -37,6 +37,30 @@ def test_compile_without_fqbn(run_command):
     assert result.failed
 
 
+def test_compile_error_message(run_command, working_dir):
+    # Init the environment explicitly
+    run_command(["core", "update-index"])
+
+    # Download latest AVR
+    run_command(["core", "install", "arduino:avr"])
+
+    # Run a batch of bogus compile in a temp dir to check the error messages
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp = Path(tmp_dir)
+        res = run_command(["compile", "-b", "arduino:avr:uno", tmp / "ABCDEF"])
+        assert res.failed
+        assert "missing" in res.stderr
+        assert "ABCDEF" in res.stderr
+        res = run_command(["compile", "-b", "arduino:avr:uno", tmp / "ABCDEF" / "ABCDEF.ino"])
+        assert res.failed
+        assert "missing" in res.stderr
+        assert "ABCDEF" in res.stderr
+        res = run_command(["compile", "-b", "arduino:avr:uno", tmp / "ABCDEF" / "QWERTY"])
+        assert res.failed
+        assert "missing" in res.stderr
+        assert "QWERTY" in res.stderr
+
+
 def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
     # Init the environment explicitly
     run_command(["core", "update-index"])
