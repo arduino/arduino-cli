@@ -364,7 +364,7 @@ def test_compile_and_upload_combo_sketch_with_mismatched_casing(run_command, dat
         # Try to compile
         res = run_command(["compile", "--clean", "-b", board.fqbn, "-u", "-p", board.address, sketch_path])
         assert res.failed
-        assert "Error opening sketch: no valid sketch found in" in res.stderr
+        assert "Error opening sketch:" in res.stderr
 
 
 def test_upload_sketch_with_mismatched_casing(run_command, data_dir, detected_boards, wait_for_board):
@@ -387,7 +387,7 @@ def test_upload_sketch_with_mismatched_casing(run_command, data_dir, detected_bo
         # searching for binaries since the sketch is not valid
         res = run_command(["upload", "-b", board.fqbn, "-p", board.address, sketch_path])
         assert res.failed
-        assert "Error during Upload: no valid sketch found in" in res.stderr
+        assert "Error during Upload:" in res.stderr
 
 
 def test_upload_to_port_with_board_autodetect(run_command, data_dir, detected_boards):
