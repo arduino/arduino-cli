@@ -114,16 +114,39 @@ func TestNewSketchWrongMain(t *testing.T) {
 }
 
 func TestNewSketchCasingWrong(t *testing.T) {
-	sketchPath := paths.New("testdata", "SketchWithWrongMain")
-	sketch, err := New(sketchPath)
-	assert.Nil(t, sketch)
-	assert.Error(t, err)
-	assert.IsType(t, &InvalidSketchFolderNameError{}, err)
-	e := err.(*InvalidSketchFolderNameError)
-	assert.NotNil(t, e.Sketch)
-	sketchPath, _ = sketchPath.Abs()
-	expectedError := fmt.Sprintf("no valid sketch found in %s: missing %s", sketchPath.String(), sketchPath.Join(sketchPath.Base()+".ino"))
-	assert.EqualError(t, err, expectedError)
+	{
+		sketchPath := paths.New("testdata", "SketchWithWrongMain")
+		sketch, err := New(sketchPath)
+		assert.Nil(t, sketch)
+		assert.Error(t, err)
+		_, ok := err.(*InvalidSketchFolderNameError)
+		assert.False(t, ok)
+		sketchPath, _ = sketchPath.Abs()
+		expectedError := fmt.Sprintf("main file missing from sketch: %s", sketchPath.Join(sketchPath.Base()+".ino"))
+		assert.EqualError(t, err, expectedError)
+	}
+	{
+		sketchPath := paths.New("testdata", "SketchWithWrongMain", "main.ino")
+		sketch, err := New(sketchPath)
+		assert.Nil(t, sketch)
+		assert.Error(t, err)
+		_, ok := err.(*InvalidSketchFolderNameError)
+		assert.False(t, ok)
+		sketchPath, _ = sketchPath.Parent().Abs()
+		expectedError := fmt.Sprintf("main file missing from sketch: %s", sketchPath.Join(sketchPath.Base()+".ino"))
+		assert.EqualError(t, err, expectedError)
+	}
+	{
+		sketchPath := paths.New("testdata", "non-existent")
+		sketch, skerr := New(sketchPath)
+		require.Nil(t, sketch)
+		require.Error(t, skerr)
+		_, ok := skerr.(*InvalidSketchFolderNameError)
+		assert.False(t, ok)
+		sketchPath, _ = sketchPath.Abs()
+		expectedError := fmt.Sprintf("main file missing from sketch: %s", sketchPath.Join(sketchPath.Base()+".ino"))
+		require.EqualError(t, skerr, expectedError)
+	}
 }
 
 func TestNewSketchCasingCorrect(t *testing.T) {
