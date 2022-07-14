@@ -100,7 +100,7 @@ func TestNewSketchWrongMain(t *testing.T) {
 	require.Error(t, err)
 	sketchFolderPath, _ = sketchFolderPath.Abs()
 	expectedMainFile := sketchFolderPath.Join(sketchName)
-	expectedError := fmt.Sprintf("no valid sketch found in %s: missing %s", sketchFolderPath, expectedMainFile)
+	expectedError := fmt.Sprintf("main file missing from sketch: %s", expectedMainFile)
 	require.Contains(t, err.Error(), expectedError)
 
 	sketchFolderPath = paths.New("testdata", sketchName)
@@ -108,8 +108,7 @@ func TestNewSketchWrongMain(t *testing.T) {
 	sketch, err = New(mainFilePath)
 	require.Nil(t, sketch)
 	require.Error(t, err)
-	sketchFolderPath, _ = sketchFolderPath.Abs()
-	expectedError = fmt.Sprintf("no valid sketch found in %s: missing %s", sketchFolderPath, expectedMainFile)
+	expectedError = fmt.Sprintf("main file missing from sketch: %s", expectedMainFile)
 	require.Contains(t, err.Error(), expectedError)
 }
 
