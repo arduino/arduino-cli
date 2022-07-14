@@ -18,6 +18,7 @@ package discoverymanager
 import (
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/i18n"
@@ -83,7 +84,12 @@ func (dm *DiscoveryManager) Start() {
 		return
 	}
 
-	go dm.feeder()
+	go func() {
+		// Feed all watchers with data coming from the discoveries
+		for ev := range dm.feed {
+			dm.feedEvent(ev)
+		}
+	}()
 
 	var wg sync.WaitGroup
 	for _, d := range dm.discoveries {
@@ -136,13 +142,13 @@ func (dm *DiscoveryManager) Watch() (*PortWatcher, error) {
 	dm.Start()
 
 	watcher := &PortWatcher{
-		feed: make(chan *discovery.Event),
+		feed: make(chan *discovery.Event, 10),
 	}
 	watcher.closeCB = func() {
 		dm.watchersMutex.Lock()
 		delete(dm.watchers, watcher)
-		dm.watchersMutex.Unlock()
 		close(watcher.feed)
+		dm.watchersMutex.Unlock()
 	}
 	go func() {
 		dm.watchersMutex.Lock()
@@ -180,44 +186,43 @@ func (dm *DiscoveryManager) startDiscovery(d *discovery.PluggableDiscovery) (dis
 	return nil
 }
 
-func (dm *DiscoveryManager) feeder() {
-	// Feed all watchers with data coming from the discoveries
-	for ev := range dm.feed {
-		dm.watchersMutex.Lock()
-		for watcher := range dm.watchers {
-			select {
-			case watcher.feed <- ev:
-				// OK
-			default:
-				// If the watcher is not able to process event fast enough
-				// remove the watcher from the list of watchers
-				go watcher.Close()
-			}
-		}
-		dm.cacheEvent(ev)
-		dm.watchersMutex.Unlock()
-	}
-}
+func (dm *DiscoveryManager) feedEvent(ev *discovery.Event) {
+	dm.watchersMutex.Lock()
+	defer dm.watchersMutex.Unlock()
 
-func (dm *DiscoveryManager) cacheEvent(ev *discovery.Event) {
+	if ev.Type == "stop" {
+		// Remove all the cached events for the terminating discovery
+		delete(dm.watchersCache, ev.DiscoveryID)
+		return
+	}
+
+	// Send the event to all watchers
+	for watcher := range dm.watchers {
+		select {
+		case watcher.feed <- ev:
+			// OK
+		case <-time.After(time.Millisecond * 500):
+			// If the watcher is not able to process event fast enough
+			// remove the watcher from the list of watchers
+			logrus.Info("Watcher is not able to process events fast enough, removing it from the list of watchers")
+			delete(dm.watchers, watcher)
+		}
+	}
+
+	// Cache the event for the discovery
 	cache := dm.watchersCache[ev.DiscoveryID]
 	if cache == nil {
 		cache = map[string]*discovery.Event{}
 		dm.watchersCache[ev.DiscoveryID] = cache
 	}
-
 	eventID := ev.Port.Address + "|" + ev.Port.Protocol
 	switch ev.Type {
 	case "add":
 		cache[eventID] = ev
 	case "remove":
 		delete(cache, eventID)
-	case "quit":
-		// Remove all the events for this discovery
-		delete(dm.watchersCache, ev.DiscoveryID)
 	default:
 		logrus.Errorf("Unhandled event from discovery: %s", ev.Type)
-		return
 	}
 }
 

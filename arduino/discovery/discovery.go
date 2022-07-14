@@ -371,10 +371,13 @@ func (disc *PluggableDiscovery) Stop() error {
 
 func (disc *PluggableDiscovery) stopSync() {
 	if disc.eventChan != nil {
+		for _, port := range disc.cachedPorts {
+			disc.eventChan <- &Event{"remove", port, disc.GetID()}
+		}
+		disc.cachedPorts = map[string]*Port{}
 		disc.eventChan <- &Event{"stop", nil, disc.GetID()}
 		close(disc.eventChan)
 		disc.eventChan = nil
-		disc.cachedPorts = map[string]*Port{}
 	}
 }
 
