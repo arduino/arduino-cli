@@ -47,18 +47,30 @@ def test_compile_error_message(run_command, working_dir):
     # Run a batch of bogus compile in a temp dir to check the error messages
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp = Path(tmp_dir)
-        res = run_command(["compile", "-b", "arduino:avr:uno", tmp / "ABCDEF"])
+        abcdef = tmp / "ABCDEF"
+        res = run_command(["compile", "-b", "arduino:avr:uno", abcdef])
         assert res.failed
-        assert "missing" in res.stderr
-        assert "ABCDEF" in res.stderr
-        res = run_command(["compile", "-b", "arduino:avr:uno", tmp / "ABCDEF" / "ABCDEF.ino"])
+        assert "no such file or directory:" in res.stderr
+        res = run_command(["compile", "-b", "arduino:avr:uno", abcdef / "ABCDEF.ino"])
         assert res.failed
-        assert "missing" in res.stderr
-        assert "ABCDEF" in res.stderr
-        res = run_command(["compile", "-b", "arduino:avr:uno", tmp / "ABCDEF" / "QWERTY"])
+        assert "no such file or directory:" in res.stderr
+        res = run_command(["compile", "-b", "arduino:avr:uno", abcdef / "QWERTY"])
         assert res.failed
-        assert "missing" in res.stderr
-        assert "QWERTY" in res.stderr
+        assert "no such file or directory:" in res.stderr
+
+        abcdef.mkdir()
+        res = run_command(["compile", "-b", "arduino:avr:uno", abcdef])
+        assert res.failed
+        assert "main file missing from sketch:" in res.stderr
+        res = run_command(["compile", "-b", "arduino:avr:uno", abcdef / "ABCDEF.ino"])
+        assert res.failed
+        assert "no such file or directory:" in res.stderr
+
+        qwerty_ino = abcdef / "QWERTY.ino"
+        qwerty_ino.touch()
+        res = run_command(["compile", "-b", "arduino:avr:uno", qwerty_ino])
+        assert res.failed
+        assert "main file missing from sketch:" in res.stderr
 
 
 def test_compile_with_simple_sketch(run_command, data_dir, working_dir):

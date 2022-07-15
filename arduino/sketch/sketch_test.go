@@ -108,7 +108,7 @@ func TestNewSketchWrongMain(t *testing.T) {
 	sketch, err = New(mainFilePath)
 	require.Nil(t, sketch)
 	require.Error(t, err)
-	expectedError = fmt.Sprintf("main file missing from sketch: %s", expectedMainFile)
+	expectedError = fmt.Sprintf("no such file or directory: %s", expectedMainFile)
 	require.Contains(t, err.Error(), expectedError)
 }
 
@@ -143,7 +143,7 @@ func TestNewSketchCasingWrong(t *testing.T) {
 		_, ok := skerr.(*InvalidSketchFolderNameError)
 		assert.False(t, ok)
 		sketchPath, _ = sketchPath.Abs()
-		expectedError := fmt.Sprintf("main file missing from sketch: %s", sketchPath.Join(sketchPath.Base()+".ino"))
+		expectedError := fmt.Sprintf("no such file or directory: %s", sketchPath)
 		require.EqualError(t, skerr, expectedError)
 	}
 }

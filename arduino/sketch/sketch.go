@@ -64,6 +64,11 @@ func New(path *paths.Path) (*Sketch, error) {
 	}
 
 	path = path.Canonical()
+	if exist, err := path.ExistCheck(); err != nil {
+		return nil, fmt.Errorf("%s: %s", tr("sketch path is not valid"), err)
+	} else if !exist {
+		return nil, fmt.Errorf("%s: %s", tr("no such file or directory"), path)
+	}
 	if _, validIno := globals.MainFileValidExtensions[path.Ext()]; validIno && !path.IsDir() {
 		path = path.Parent()
 	}
