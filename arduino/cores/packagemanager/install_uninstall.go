@@ -75,7 +75,7 @@ func (pm *PackageManager) DownloadAndInstallPlatformAndTools(
 	platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease,
 	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB,
 	skipPostInstall bool) error {
-	log := pm.Log.WithField("platform", platformRelease)
+	log := pm.log.WithField("platform", platformRelease)
 
 	// Prerequisite checks before install
 	toolsToInstall := []*cores.ToolRelease{}
@@ -267,7 +267,7 @@ func (pm *PackageManager) IsManagedPlatformRelease(platformRelease *cores.Platfo
 
 // UninstallPlatform remove a PlatformRelease.
 func (pm *PackageManager) UninstallPlatform(platformRelease *cores.PlatformRelease, taskCB rpc.TaskProgressCB) error {
-	log := pm.Log.WithField("platform", platformRelease)
+	log := pm.log.WithField("platform", platformRelease)
 
 	log.Info("Uninstalling platform")
 	taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s", platformRelease)})
@@ -300,7 +300,7 @@ func (pm *PackageManager) UninstallPlatform(platformRelease *cores.PlatformRelea
 
 // InstallTool installs a specific release of a tool.
 func (pm *PackageManager) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB) error {
-	log := pm.Log.WithField("Tool", toolRelease)
+	log := pm.log.WithField("Tool", toolRelease)
 
 	if toolRelease.IsInstalled() {
 		log.Warn("Tool already installed")
@@ -353,7 +353,7 @@ func (pm *PackageManager) IsManagedToolRelease(toolRelease *cores.ToolRelease) b
 
 // UninstallTool remove a ToolRelease.
 func (pm *PackageManager) UninstallTool(toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB) error {
-	log := pm.Log.WithField("Tool", toolRelease)
+	log := pm.log.WithField("Tool", toolRelease)
 	log.Info("Uninstalling tool")
 
 	if toolRelease.InstallDir == nil {

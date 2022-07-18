@@ -38,7 +38,7 @@ import (
 // The manager also keeps track of the status of the Packages (their Platform Releases, actually)
 // installed in the system.
 type PackageManager struct {
-	Log                    logrus.FieldLogger
+	log                    logrus.FieldLogger
 	Packages               cores.Packages
 	IndexDir               *paths.Path
 	PackagesDir            *paths.Path
@@ -55,7 +55,7 @@ var tr = i18n.Tr
 // NewPackageManager returns a new instance of the PackageManager
 func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path, userAgent string) *PackageManager {
 	return &PackageManager{
-		Log:                    logrus.StandardLogger(),
+		log:                    logrus.StandardLogger(),
 		Packages:               cores.NewPackages(),
 		IndexDir:               indexDir,
 		PackagesDir:            packagesDir,
@@ -386,7 +386,7 @@ func (pm *PackageManager) GetInstalledPlatformRelease(platform *cores.Platform) 
 	}
 
 	debug := func(msg string, pl *cores.PlatformRelease) {
-		pm.Log.WithField("bundle", pl.IsIDEBundled).
+		pm.log.WithField("bundle", pl.IsIDEBundled).
 			WithField("version", pl.Version).
 			WithField("managed", pm.IsManagedPlatformRelease(pl)).
 			Debugf("%s: %s", msg, pl)
@@ -465,7 +465,7 @@ func (pm *PackageManager) InstalledBoards() []*cores.Board {
 // FindToolsRequiredFromPlatformRelease returns a list of ToolReleases needed by the specified PlatformRelease.
 // If a ToolRelease is not found return an error
 func (pm *PackageManager) FindToolsRequiredFromPlatformRelease(platform *cores.PlatformRelease) ([]*cores.ToolRelease, error) {
-	pm.Log.Infof("Searching tools required for platform %s", platform)
+	pm.log.Infof("Searching tools required for platform %s", platform)
 
 	// maps "PACKAGER:TOOL" => ToolRelease
 	foundTools := map[string]*cores.ToolRelease{}
@@ -483,7 +483,7 @@ func (pm *PackageManager) FindToolsRequiredFromPlatformRelease(platform *cores.P
 	requiredTools := []*cores.ToolRelease{}
 	platform.ToolDependencies.Sort()
 	for _, toolDep := range platform.ToolDependencies {
-		pm.Log.WithField("tool", toolDep).Infof("Required tool")
+		pm.log.WithField("tool", toolDep).Infof("Required tool")
 		tool := pm.FindToolDependency(toolDep)
 		if tool == nil {
 			return nil, fmt.Errorf(tr("tool release not found: %s"), toolDep)
@@ -494,7 +494,7 @@ func (pm *PackageManager) FindToolsRequiredFromPlatformRelease(platform *cores.P
 
 	platform.DiscoveryDependencies.Sort()
 	for _, discoveryDep := range platform.DiscoveryDependencies {
-		pm.Log.WithField("discovery", discoveryDep).Infof("Required discovery")
+		pm.log.WithField("discovery", discoveryDep).Infof("Required discovery")
 		tool := pm.FindDiscoveryDependency(discoveryDep)
 		if tool == nil {
 			return nil, fmt.Errorf(tr("discovery release not found: %s"), discoveryDep)
@@ -505,7 +505,7 @@ func (pm *PackageManager) FindToolsRequiredFromPlatformRelease(platform *cores.P
 
 	platform.MonitorDependencies.Sort()
 	for _, monitorDep := range platform.MonitorDependencies {
-		pm.Log.WithField("monitor", monitorDep).Infof("Required monitor")
+		pm.log.WithField("monitor", monitorDep).Infof("Required monitor")
 		tool := pm.FindMonitorDependency(monitorDep)
 		if tool == nil {
 			return nil, fmt.Errorf(tr("monitor release not found: %s"), monitorDep)
@@ -537,7 +537,7 @@ func (pm *PackageManager) GetTool(toolID string) *cores.Tool {
 
 // FindToolsRequiredForBoard FIXMEDOC
 func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*cores.ToolRelease, error) {
-	pm.Log.Infof("Searching tools required for board %s", board)
+	pm.log.Infof("Searching tools required for board %s", board)
 
 	// core := board.Properties["build.core"]
 	platform := board.PlatformRelease
@@ -560,7 +560,7 @@ func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*core
 	requiredTools := []*cores.ToolRelease{}
 	platform.ToolDependencies.Sort()
 	for _, toolDep := range platform.ToolDependencies {
-		pm.Log.WithField("tool", toolDep).Infof("Required tool")
+		pm.log.WithField("tool", toolDep).Infof("Required tool")
 		tool := pm.FindToolDependency(toolDep)
 		if tool == nil {
 			return nil, fmt.Errorf(tr("tool release not found: %s"), toolDep)
