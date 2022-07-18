@@ -39,7 +39,7 @@ func (pm *PackageManager) InstallPlatform(platformRelease *cores.PlatformRelease
 
 // InstallPlatformInDirectory installs a specific release of a platform in a specific directory.
 func (pm *PackageManager) InstallPlatformInDirectory(platformRelease *cores.PlatformRelease, destDir *paths.Path) error {
-	if err := platformRelease.Resource.Install(pm.DownloadDir, pm.TempDir, destDir); err != nil {
+	if err := platformRelease.Resource.Install(pm.DownloadDir, pm.tempDir, destDir); err != nil {
 		return errors.Errorf(tr("installing platform %[1]s: %[2]s"), platformRelease, err)
 	}
 	if d, err := destDir.Abs(); err == nil {
@@ -137,7 +137,7 @@ func (pm *PackageManager) InstallTool(toolRelease *cores.ToolRelease) error {
 		"tools",
 		toolRelease.Tool.Name,
 		toolRelease.Version.String())
-	return toolResource.Install(pm.DownloadDir, pm.TempDir, destDir)
+	return toolResource.Install(pm.DownloadDir, pm.tempDir, destDir)
 }
 
 // IsManagedToolRelease returns true if the ToolRelease is managed by the PackageManager

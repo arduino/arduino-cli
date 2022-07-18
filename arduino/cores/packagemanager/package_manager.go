@@ -43,7 +43,7 @@ type PackageManager struct {
 	IndexDir               *paths.Path
 	PackagesDir            *paths.Path
 	DownloadDir            *paths.Path
-	TempDir                *paths.Path
+	tempDir                *paths.Path
 	CustomGlobalProperties *properties.Map
 	profile                *sketch.Profile
 	discoveryManager       *discoverymanager.DiscoveryManager
@@ -60,7 +60,7 @@ func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path, 
 		IndexDir:               indexDir,
 		PackagesDir:            packagesDir,
 		DownloadDir:            downloadDir,
-		TempDir:                tempDir,
+		tempDir:                tempDir,
 		CustomGlobalProperties: properties.NewMap(),
 		discoveryManager:       discoverymanager.New(),
 		userAgent:              userAgent,
