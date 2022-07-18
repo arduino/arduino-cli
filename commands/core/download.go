@@ -19,9 +19,7 @@ import (
 	"context"
 
 	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/httpclient"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -51,7 +49,7 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, dow
 		return nil, &arduino.PlatformNotFoundError{Platform: ref.String(), Cause: err}
 	}
 
-	if err := downloadPlatform(pm, platform, downloadCB); err != nil {
+	if err := pm.DownloadPlatformRelease(platform, nil, downloadCB); err != nil {
 		return nil, err
 	}
 
@@ -62,13 +60,4 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, dow
 	}
 
 	return &rpc.PlatformDownloadResponse{}, nil
-}
-
-func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, downloadCB rpc.DownloadProgressCB) error {
-	// Download platform
-	config, err := httpclient.GetDownloaderConfig()
-	if err != nil {
-		return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", platformRelease), Cause: err}
-	}
-	return pm.DownloadPlatformRelease(platformRelease, config, downloadCB)
 }

@@ -99,7 +99,7 @@ func installPlatform(pm *packagemanager.PackageManager,
 			return err
 		}
 	}
-	if err := downloadPlatform(pm, platformRelease, downloadCB); err != nil {
+	if err := pm.DownloadPlatformRelease(platformRelease, nil, downloadCB); err != nil {
 		return err
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
