@@ -163,8 +163,9 @@ func installPlatform(pm *packagemanager.PackageManager,
 
 		// Uninstall unused tools
 		for _, tool := range installedTools {
+			taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s, tool is no more required", tool)})
 			if !pm.IsToolRequired(tool) {
-				uninstallToolRelease(pm, tool, taskCB)
+				pm.UninstallTool(tool, taskCB)
 			}
 		}
 

@@ -796,8 +796,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB rpc.Downlo
 
 						log.Info("Uninstalling tool")
 						taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s: tool is no more required", toolRelease)})
-
-						if err := pm.UninstallTool(toolRelease); err != nil {
+						if err := pm.UninstallTool(toolRelease, taskCB); err != nil {
 							log.WithError(err).Error("Error uninstalling")
 							return &arduino.FailedInstallError{Message: tr("Error uninstalling tool %s", toolRelease), Cause: err}
 						}

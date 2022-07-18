@@ -182,20 +182,31 @@ func (pm *PackageManager) IsManagedToolRelease(toolRelease *cores.ToolRelease) b
 }
 
 // UninstallTool remove a ToolRelease.
-func (pm *PackageManager) UninstallTool(toolRelease *cores.ToolRelease) error {
+func (pm *PackageManager) UninstallTool(toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB) error {
+	log := pm.Log.WithField("Tool", toolRelease)
+	log.Info("Uninstalling tool")
+
 	if toolRelease.InstallDir == nil {
 		return fmt.Errorf(tr("tool not installed"))
 	}
 
 	// Safety measure
 	if !pm.IsManagedToolRelease(toolRelease) {
-		return fmt.Errorf(tr("tool %s is not managed by package manager"), toolRelease)
+		err := &arduino.FailedUninstallError{Message: tr("tool %s is not managed by package manager", toolRelease)}
+		log.WithError(err).Error("Error uninstalling")
+		return err
 	}
 
 	if err := toolRelease.InstallDir.RemoveAll(); err != nil {
-		return fmt.Errorf(tr("removing tool files: %s"), err)
+		err = &arduino.FailedUninstallError{Message: err.Error()}
+		log.WithError(err).Error("Error uninstalling")
+		return err
 	}
+
 	toolRelease.InstallDir = nil
+
+	log.Info("Tool uninstalled")
+	taskCB(&rpc.TaskProgress{Message: tr("Tool %s uninstalled", toolRelease), Completed: true})
 	return nil
 }
 
