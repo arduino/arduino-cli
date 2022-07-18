@@ -99,7 +99,7 @@ func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, down
 		return false, fmt.Errorf(tr("downloading %[1]s tool: %[2]s"), tool, err)
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
-	if err := InstallToolRelease(instance.PackageManager, tool, taskCB); err != nil {
+	if err := instance.PackageManager.InstallTool(tool, taskCB); err != nil {
 		return false, fmt.Errorf(tr("installing %[1]s tool: %[2]s"), tool, err)
 	}
 	return true, nil
@@ -756,7 +756,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB rpc.Downlo
 
 				// Installs tools
 				for _, tool := range toolsToInstall {
-					if err := InstallToolRelease(pm, tool, taskCB); err != nil {
+					if err := pm.InstallTool(tool, taskCB); err != nil {
 						msg := tr("Error installing tool %s", tool)
 						taskCB(&rpc.TaskProgress{Message: msg})
 						return &arduino.FailedInstallError{Message: msg, Cause: err}

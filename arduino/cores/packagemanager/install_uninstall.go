@@ -20,9 +20,11 @@ import (
 	"fmt"
 	"runtime"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/executils"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 )
@@ -127,7 +129,18 @@ func (pm *PackageManager) UninstallPlatform(platformRelease *cores.PlatformRelea
 }
 
 // InstallTool installs a specific release of a tool.
-func (pm *PackageManager) InstallTool(toolRelease *cores.ToolRelease) error {
+func (pm *PackageManager) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB) error {
+	log := pm.Log.WithField("Tool", toolRelease)
+
+	if toolRelease.IsInstalled() {
+		log.Warn("Tool already installed")
+		taskCB(&rpc.TaskProgress{Name: tr("Tool %s already installed", toolRelease), Completed: true})
+		return nil
+	}
+
+	log.Info("Installing tool")
+	taskCB(&rpc.TaskProgress{Name: tr("Installing %s", toolRelease)})
+
 	toolResource := toolRelease.GetCompatibleFlavour()
 	if toolResource == nil {
 		return fmt.Errorf(tr("no compatible version of %s tools found for the current os"), toolRelease.Tool.Name)
@@ -137,7 +150,15 @@ func (pm *PackageManager) InstallTool(toolRelease *cores.ToolRelease) error {
 		"tools",
 		toolRelease.Tool.Name,
 		toolRelease.Version.String())
-	return toolResource.Install(pm.DownloadDir, pm.tempDir, destDir)
+	err := toolResource.Install(pm.DownloadDir, pm.tempDir, destDir)
+	if err != nil {
+		log.WithError(err).Warn("Cannot install tool")
+		return &arduino.FailedInstallError{Message: tr("Cannot install tool %s", toolRelease), Cause: err}
+	}
+	log.Info("Tool installed")
+	taskCB(&rpc.TaskProgress{Message: tr("%s installed", toolRelease), Completed: true})
+
+	return nil
 }
 
 // IsManagedToolRelease returns true if the ToolRelease is managed by the PackageManager

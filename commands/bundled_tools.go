@@ -16,7 +16,6 @@
 package commands
 
 import (
-	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/httpclient"
@@ -30,27 +29,4 @@ func DownloadToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.T
 		return err
 	}
 	return pm.DownloadToolRelease(toolRelease, config, toolRelease.String(), downloadCB)
-}
-
-// InstallToolRelease installs a ToolRelease
-func InstallToolRelease(pm *packagemanager.PackageManager, toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB) error {
-	log := pm.Log.WithField("Tool", toolRelease)
-
-	if toolRelease.IsInstalled() {
-		log.Warn("Tool already installed")
-		taskCB(&rpc.TaskProgress{Name: tr("Tool %s already installed", toolRelease), Completed: true})
-		return nil
-	}
-
-	log.Info("Installing tool")
-	taskCB(&rpc.TaskProgress{Name: tr("Installing %s", toolRelease)})
-	err := pm.InstallTool(toolRelease)
-	if err != nil {
-		log.WithError(err).Warn("Cannot install tool")
-		return &arduino.FailedInstallError{Message: tr("Cannot install tool %s", toolRelease), Cause: err}
-	}
-	log.Info("Tool installed")
-	taskCB(&rpc.TaskProgress{Message: tr("%s installed", toolRelease), Completed: true})
-
-	return nil
 }

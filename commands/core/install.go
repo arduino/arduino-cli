@@ -106,7 +106,7 @@ func installPlatform(pm *packagemanager.PackageManager,
 
 	// Install tools first
 	for _, tool := range toolsToInstall {
-		if err := commands.InstallToolRelease(pm, tool, taskCB); err != nil {
+		if err := pm.InstallTool(tool, taskCB); err != nil {
 			return err
 		}
 	}
