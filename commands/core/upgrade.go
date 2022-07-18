@@ -38,7 +38,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest,
 		Package:              req.PlatformPackage,
 		PlatformArchitecture: req.Architecture,
 	}
-	if err := upgradePlatform(pm, ref, downloadCB, taskCB, req.GetSkipPostInstall()); err != nil {
+	if err := pm.DownloadAndInstallPlatformUpgrades(ref, downloadCB, taskCB, req.GetSkipPostInstall()); err != nil {
 		return nil, err
 	}
 
@@ -47,36 +47,4 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest,
 	}
 
 	return &rpc.PlatformUpgradeResponse{}, nil
-}
-
-func upgradePlatform(pm *packagemanager.PackageManager, platformRef *packagemanager.PlatformReference,
-	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, skipPostInstall bool) error {
-	if platformRef.PlatformVersion != nil {
-		return &arduino.InvalidArgumentError{Message: tr("Upgrade doesn't accept parameters with version")}
-	}
-
-	// Search the latest version for all specified platforms
-	platform := pm.FindPlatform(platformRef)
-	if platform == nil {
-		return &arduino.PlatformNotFoundError{Platform: platformRef.String()}
-	}
-	installed := pm.GetInstalledPlatformRelease(platform)
-	if installed == nil {
-		return &arduino.PlatformNotFoundError{Platform: platformRef.String()}
-	}
-	latest := platform.GetLatestRelease()
-	if !latest.Version.GreaterThan(installed.Version) {
-		return &arduino.PlatformAlreadyAtTheLatestVersionError{}
-	}
-	platformRef.PlatformVersion = latest.Version
-
-	platformRelease, tools, err := pm.FindPlatformReleaseDependencies(platformRef)
-	if err != nil {
-		return &arduino.PlatformNotFoundError{Platform: platformRef.String()}
-	}
-	if err := pm.DownloadAndInstallPlatformAndTools(platformRelease, tools, downloadCB, taskCB, skipPostInstall); err != nil {
-		return err
-	}
-
-	return nil
 }

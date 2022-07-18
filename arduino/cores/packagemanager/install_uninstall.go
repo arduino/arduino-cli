@@ -29,6 +29,45 @@ import (
 	"github.com/pkg/errors"
 )
 
+// DownloadAndInstallPlatformUpgrades runs a full installation process to upgrade the given platform.
+// This methods taks care of downloading missing archives, upgrade platforms and tools, and
+// remove the previously installed platform/tools that are no more needed after the upgrade.
+func (pm *PackageManager) DownloadAndInstallPlatformUpgrades(
+	platformRef *PlatformReference,
+	downloadCB rpc.DownloadProgressCB,
+	taskCB rpc.TaskProgressCB,
+	skipPostInstall bool,
+) error {
+	if platformRef.PlatformVersion != nil {
+		return &arduino.InvalidArgumentError{Message: tr("Upgrade doesn't accept parameters with version")}
+	}
+
+	// Search the latest version for all specified platforms
+	platform := pm.FindPlatform(platformRef)
+	if platform == nil {
+		return &arduino.PlatformNotFoundError{Platform: platformRef.String()}
+	}
+	installed := pm.GetInstalledPlatformRelease(platform)
+	if installed == nil {
+		return &arduino.PlatformNotFoundError{Platform: platformRef.String()}
+	}
+	latest := platform.GetLatestRelease()
+	if !latest.Version.GreaterThan(installed.Version) {
+		return &arduino.PlatformAlreadyAtTheLatestVersionError{}
+	}
+	platformRef.PlatformVersion = latest.Version
+
+	platformRelease, tools, err := pm.FindPlatformReleaseDependencies(platformRef)
+	if err != nil {
+		return &arduino.PlatformNotFoundError{Platform: platformRef.String()}
+	}
+	if err := pm.DownloadAndInstallPlatformAndTools(platformRelease, tools, downloadCB, taskCB, skipPostInstall); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // DownloadAndInstallPlatformAndTools runs a full installation process for the given platform and tools.
 // This methods taks care of downloading missing archives, install/upgrade platforms and tools, and
 // remove the previously installed platform/tools that are no more needed after the upgrade.
