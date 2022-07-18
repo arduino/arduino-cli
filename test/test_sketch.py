@@ -896,4 +896,4 @@ def test_sketch_archive_case_mismatch_fails(run_command, data_dir):
 
     res = run_command(["sketch", "archive", sketch_path])
     assert res.failed
-    assert "Error archiving: Can't open sketch: no valid sketch found" in res.stderr
+    assert "Error archiving: Can't open sketch:" in res.stderr

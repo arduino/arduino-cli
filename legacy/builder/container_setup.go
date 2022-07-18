@@ -16,8 +16,6 @@
 package builder
 
 import (
-	"fmt"
-
 	sk "github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/pkg/errors"
@@ -61,16 +59,8 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 
 		// load sketch
 		sketch, err := sk.New(sketchLocation)
-		if e, ok := err.(*sk.InvalidSketchFolderNameError); ctx.IgnoreSketchFolderNameErrors && ok {
-			// ignore error
-			// This is only done by the arduino-builder since the Arduino Java IDE
-			// supports sketches with invalid names
-			sketch = e.Sketch
-		} else if err != nil {
+		if err != nil {
 			return errors.WithStack(err)
-		}
-		if sketch.MainFile == nil {
-			return fmt.Errorf(tr("main file missing from sketch"))
 		}
 		sketch.BuildPath = ctx.BuildPath
 		ctx.SketchLocation = sketch.MainFile

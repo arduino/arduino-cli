@@ -37,6 +37,42 @@ def test_compile_without_fqbn(run_command):
     assert result.failed
 
 
+def test_compile_error_message(run_command, working_dir):
+    # Init the environment explicitly
+    run_command(["core", "update-index"])
+
+    # Download latest AVR
+    run_command(["core", "install", "arduino:avr"])
+
+    # Run a batch of bogus compile in a temp dir to check the error messages
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp = Path(tmp_dir)
+        abcdef = tmp / "ABCDEF"
+        res = run_command(["compile", "-b", "arduino:avr:uno", abcdef])
+        assert res.failed
+        assert "no such file or directory:" in res.stderr
+        res = run_command(["compile", "-b", "arduino:avr:uno", abcdef / "ABCDEF.ino"])
+        assert res.failed
+        assert "no such file or directory:" in res.stderr
+        res = run_command(["compile", "-b", "arduino:avr:uno", abcdef / "QWERTY"])
+        assert res.failed
+        assert "no such file or directory:" in res.stderr
+
+        abcdef.mkdir()
+        res = run_command(["compile", "-b", "arduino:avr:uno", abcdef])
+        assert res.failed
+        assert "main file missing from sketch:" in res.stderr
+        res = run_command(["compile", "-b", "arduino:avr:uno", abcdef / "ABCDEF.ino"])
+        assert res.failed
+        assert "no such file or directory:" in res.stderr
+
+        qwerty_ino = abcdef / "QWERTY.ino"
+        qwerty_ino.touch()
+        res = run_command(["compile", "-b", "arduino:avr:uno", qwerty_ino])
+        assert res.failed
+        assert "main file missing from sketch:" in res.stderr
+
+
 def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
     # Init the environment explicitly
     run_command(["core", "update-index"])

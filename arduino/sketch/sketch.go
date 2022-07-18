@@ -64,7 +64,12 @@ func New(path *paths.Path) (*Sketch, error) {
 	}
 
 	path = path.Canonical()
-	if !path.IsDir() {
+	if exist, err := path.ExistCheck(); err != nil {
+		return nil, fmt.Errorf("%s: %s", tr("sketch path is not valid"), err)
+	} else if !exist {
+		return nil, fmt.Errorf("%s: %s", tr("no such file or directory"), path)
+	}
+	if _, validIno := globals.MainFileValidExtensions[path.Ext()]; validIno && !path.IsDir() {
 		path = path.Parent()
 	}
 
@@ -81,6 +86,9 @@ func New(path *paths.Path) (*Sketch, error) {
 				)
 			}
 		}
+	}
+	if mainFile == nil {
+		return nil, fmt.Errorf(tr("main file missing from sketch: %s", path.Join(path.Base()+globals.MainFileValidExtension)))
 	}
 
 	sketch := &Sketch{
@@ -269,7 +277,6 @@ func (s *Sketch) checkSketchCasing() error {
 		return &InvalidSketchFolderNameError{
 			SketchFolder: s.FullPath,
 			SketchFile:   sketchFile,
-			Sketch:       s,
 		}
 	}
 
@@ -280,7 +287,6 @@ func (s *Sketch) checkSketchCasing() error {
 type InvalidSketchFolderNameError struct {
 	SketchFolder *paths.Path
 	SketchFile   *paths.Path
-	Sketch       *Sketch
 }
 
 func (e *InvalidSketchFolderNameError) Error() string {
