@@ -17,7 +17,6 @@ package core
 
 import (
 	"context"
-	"errors"
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -57,7 +56,7 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, dow
 	}
 
 	for _, tool := range tools {
-		if err := downloadTool(pm, tool, downloadCB); err != nil {
+		if err := pm.DownloadToolRelease(tool, nil, downloadCB); err != nil {
 			return nil, err
 		}
 	}
@@ -72,19 +71,4 @@ func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.
 		return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", platformRelease), Cause: err}
 	}
 	return pm.DownloadPlatformRelease(platformRelease, config, downloadCB)
-}
-
-func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB) error {
-	// Check if tool has a flavor available for the current OS
-	if tool.GetCompatibleFlavour() == nil {
-		return &arduino.FailedDownloadError{
-			Message: tr("Error downloading tool %s", tool),
-			Cause:   errors.New(tr("no versions available for the current OS", tool))}
-	}
-
-	if err := pm.DownloadToolRelease(tool, nil, downloadCB); err != nil {
-		return &arduino.FailedDownloadError{Message: tr("Error downloading tool %s", tool), Cause: err}
-	}
-
-	return nil
 }

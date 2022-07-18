@@ -21,6 +21,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/pkg/errors"
 	"go.bug.st/downloader/v2"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -122,9 +123,16 @@ func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReferenc
 func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *downloader.Config, progressCB rpc.DownloadProgressCB) error {
 	resource := tool.GetCompatibleFlavour()
 	if resource == nil {
-		return fmt.Errorf(tr("tool not available for your OS"))
+		return &arduino.FailedDownloadError{
+			Message: tr("Error downloading tool %s", tool),
+			Cause:   errors.New(tr("no versions available for the current OS", tool))}
 	}
-	return resource.Download(pm.DownloadDir, config, tool.String(), progressCB)
+	if err := resource.Download(pm.DownloadDir, config, tool.String(), progressCB); err != nil {
+		return &arduino.FailedDownloadError{
+			Message: tr("Error downloading tool %s", tool),
+			Cause:   err}
+	}
+	return nil
 }
 
 // DownloadPlatformRelease downloads a PlatformRelease. If the platform is already downloaded a
