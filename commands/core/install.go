@@ -20,7 +20,6 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -64,7 +63,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
 		}
 	}
 
-	if err := installPlatform(pm, platformRelease, tools, downloadCB, taskCB, req.GetSkipPostInstall()); err != nil {
+	if err := pm.DownloadAndInstallPlatformAndTools(platformRelease, tools, downloadCB, taskCB, req.GetSkipPostInstall()); err != nil {
 		return nil, err
 	}
 
@@ -73,117 +72,4 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
 	}
 
 	return &rpc.PlatformInstallResponse{}, nil
-}
-
-func installPlatform(pm *packagemanager.PackageManager,
-	platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease,
-	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB,
-	skipPostInstall bool) error {
-	log := pm.Log.WithField("platform", platformRelease)
-
-	// Prerequisite checks before install
-	toolsToInstall := []*cores.ToolRelease{}
-	for _, tool := range requiredTools {
-		if tool.IsInstalled() {
-			log.WithField("tool", tool).Warn("Tool already installed")
-			taskCB(&rpc.TaskProgress{Name: tr("Tool %s already installed", tool), Completed: true})
-		} else {
-			toolsToInstall = append(toolsToInstall, tool)
-		}
-	}
-
-	// Package download
-	taskCB(&rpc.TaskProgress{Name: tr("Downloading packages")})
-	for _, tool := range toolsToInstall {
-		if err := pm.DownloadToolRelease(tool, nil, downloadCB); err != nil {
-			return err
-		}
-	}
-	if err := pm.DownloadPlatformRelease(platformRelease, nil, downloadCB); err != nil {
-		return err
-	}
-	taskCB(&rpc.TaskProgress{Completed: true})
-
-	// Install tools first
-	for _, tool := range toolsToInstall {
-		if err := pm.InstallTool(tool, taskCB); err != nil {
-			return err
-		}
-	}
-
-	installed := pm.GetInstalledPlatformRelease(platformRelease.Platform)
-	installedTools := []*cores.ToolRelease{}
-	if installed == nil {
-		// No version of this platform is installed
-		log.Info("Installing platform")
-		taskCB(&rpc.TaskProgress{Name: tr("Installing platform %s", platformRelease)})
-	} else {
-		// A platform with a different version is already installed
-		log.Info("Replacing platform " + installed.String())
-		taskCB(&rpc.TaskProgress{Name: tr("Replacing platform %[1]s with %[2]s", installed, platformRelease)})
-		platformRef := &packagemanager.PlatformReference{
-			Package:              platformRelease.Platform.Package.Name,
-			PlatformArchitecture: platformRelease.Platform.Architecture,
-			PlatformVersion:      installed.Version,
-		}
-
-		// Get a list of tools used by the currently installed platform version.
-		// This must be done so tools used by the currently installed version are
-		// removed if not used also by the newly installed version.
-		var err error
-		_, installedTools, err = pm.FindPlatformReleaseDependencies(platformRef)
-		if err != nil {
-			return &arduino.NotFoundError{Message: tr("Can't find dependencies for platform %s", platformRef), Cause: err}
-		}
-	}
-
-	// Install
-	if err := pm.InstallPlatform(platformRelease); err != nil {
-		log.WithError(err).Error("Cannot install platform")
-		return &arduino.FailedInstallError{Message: tr("Cannot install platform"), Cause: err}
-	}
-
-	// If upgrading remove previous release
-	if installed != nil {
-		uninstallErr := pm.UninstallPlatform(installed, taskCB)
-
-		// In case of error try to rollback
-		if uninstallErr != nil {
-			log.WithError(uninstallErr).Error("Error upgrading platform.")
-			taskCB(&rpc.TaskProgress{Message: tr("Error upgrading platform: %s", uninstallErr)})
-
-			// Rollback
-			if err := pm.UninstallPlatform(platformRelease, taskCB); err != nil {
-				log.WithError(err).Error("Error rolling-back changes.")
-				taskCB(&rpc.TaskProgress{Message: tr("Error rolling-back changes: %s", err)})
-			}
-
-			return &arduino.FailedInstallError{Message: tr("Cannot upgrade platform"), Cause: uninstallErr}
-		}
-
-		// Uninstall unused tools
-		for _, tool := range installedTools {
-			taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s, tool is no more required", tool)})
-			if !pm.IsToolRequired(tool) {
-				pm.UninstallTool(tool, taskCB)
-			}
-		}
-
-	}
-
-	// Perform post install
-	if !skipPostInstall {
-		log.Info("Running post_install script")
-		taskCB(&rpc.TaskProgress{Message: tr("Configuring platform.")})
-		if err := pm.RunPostInstallScript(platformRelease); err != nil {
-			taskCB(&rpc.TaskProgress{Message: tr("WARNING cannot configure platform: %s", err)})
-		}
-	} else {
-		log.Info("Skipping platform configuration.")
-		taskCB(&rpc.TaskProgress{Message: tr("Skipping platform configuration.")})
-	}
-
-	log.Info("Platform installed")
-	taskCB(&rpc.TaskProgress{Message: tr("Platform %s installed", platformRelease), Completed: true})
-	return nil
 }
