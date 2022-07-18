@@ -145,7 +145,7 @@ func installPlatform(pm *packagemanager.PackageManager,
 
 	// If upgrading remove previous release
 	if installed != nil {
-		uninstallErr := pm.UninstallPlatform(installed)
+		uninstallErr := pm.UninstallPlatform(installed, taskCB)
 
 		// In case of error try to rollback
 		if uninstallErr != nil {
@@ -153,7 +153,7 @@ func installPlatform(pm *packagemanager.PackageManager,
 			taskCB(&rpc.TaskProgress{Message: tr("Error upgrading platform: %s", uninstallErr)})
 
 			// Rollback
-			if err := pm.UninstallPlatform(platformRelease); err != nil {
+			if err := pm.UninstallPlatform(platformRelease, taskCB); err != nil {
 				log.WithError(err).Error("Error rolling-back changes.")
 				taskCB(&rpc.TaskProgress{Message: tr("Error rolling-back changes: %s", err)})
 			}

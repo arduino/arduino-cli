@@ -773,7 +773,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB rpc.Downlo
 				}
 
 				// Uninstall previously installed release
-				err = pm.UninstallPlatform(installedRelease)
+				err = pm.UninstallPlatform(installedRelease, taskCB)
 
 				// In case uninstall fails tries to rollback
 				if err != nil {
@@ -781,7 +781,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB rpc.Downlo
 					taskCB(&rpc.TaskProgress{Message: tr("Error upgrading platform: %s", err)})
 
 					// Rollback
-					if err := pm.UninstallPlatform(latest); err != nil {
+					if err := pm.UninstallPlatform(latest, taskCB); err != nil {
 						logrus.WithError(err).Error("Error rolling-back changes.")
 						msg := tr("Error rolling-back changes")
 						taskCB(&rpc.TaskProgress{Message: fmt.Sprintf("%s: %s", msg, err)})

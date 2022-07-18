@@ -111,20 +111,35 @@ func (pm *PackageManager) IsManagedPlatformRelease(platformRelease *cores.Platfo
 }
 
 // UninstallPlatform remove a PlatformRelease.
-func (pm *PackageManager) UninstallPlatform(platformRelease *cores.PlatformRelease) error {
+func (pm *PackageManager) UninstallPlatform(platformRelease *cores.PlatformRelease, taskCB rpc.TaskProgressCB) error {
+	log := pm.Log.WithField("platform", platformRelease)
+
+	log.Info("Uninstalling platform")
+	taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s", platformRelease)})
+
 	if platformRelease.InstallDir == nil {
-		return fmt.Errorf(tr("platform not installed"))
+		err := fmt.Errorf(tr("platform not installed"))
+		log.WithError(err).Error("Error uninstalling")
+		return &arduino.FailedUninstallError{Message: err.Error()}
 	}
 
 	// Safety measure
 	if !pm.IsManagedPlatformRelease(platformRelease) {
-		return fmt.Errorf(tr("%s is not managed by package manager"), platformRelease)
+		err := fmt.Errorf(tr("%s is not managed by package manager"), platformRelease)
+		log.WithError(err).Error("Error uninstalling")
+		return &arduino.FailedUninstallError{Message: err.Error()}
 	}
 
 	if err := platformRelease.InstallDir.RemoveAll(); err != nil {
-		return fmt.Errorf(tr("removing platform files: %s"), err)
+		err = fmt.Errorf(tr("removing platform files: %s"), err)
+		log.WithError(err).Error("Error uninstalling")
+		return &arduino.FailedUninstallError{Message: err.Error()}
 	}
+
 	platformRelease.InstallDir = nil
+
+	log.Info("Platform uninstalled")
+	taskCB(&rpc.TaskProgress{Message: tr("Platform %s uninstalled", platformRelease), Completed: true})
 	return nil
 }
 

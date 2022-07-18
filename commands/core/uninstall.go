@@ -19,7 +19,6 @@ import (
 	"context"
 
 	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -53,7 +52,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 		return nil, &arduino.NotFoundError{Message: tr("Can't find dependencies for platform %s", ref), Cause: err}
 	}
 
-	if err := uninstallPlatformRelease(pm, platform, taskCB); err != nil {
+	if err := pm.UninstallPlatform(platform, taskCB); err != nil {
 		return nil, err
 	}
 
@@ -69,20 +68,4 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 	}
 
 	return &rpc.PlatformUninstallResponse{}, nil
-}
-
-func uninstallPlatformRelease(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, taskCB rpc.TaskProgressCB) error {
-	log := pm.Log.WithField("platform", platformRelease)
-
-	log.Info("Uninstalling platform")
-	taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s", platformRelease)})
-
-	if err := pm.UninstallPlatform(platformRelease); err != nil {
-		log.WithError(err).Error("Error uninstalling")
-		return &arduino.FailedUninstallError{Message: tr("Error uninstalling platform %s", platformRelease), Cause: err}
-	}
-
-	log.Info("Platform uninstalled")
-	taskCB(&rpc.TaskProgress{Message: tr("Platform %s uninstalled", platformRelease), Completed: true})
-	return nil
 }
