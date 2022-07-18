@@ -82,7 +82,7 @@ func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, do
 			Cause:   errors.New(tr("no versions available for the current OS", tool))}
 	}
 
-	if err := commands.DownloadToolRelease(pm, tool, downloadCB); err != nil {
+	if err := pm.DownloadToolRelease(tool, nil, downloadCB); err != nil {
 		return &arduino.FailedDownloadError{Message: tr("Error downloading tool %s", tool), Cause: err}
 	}
 

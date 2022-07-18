@@ -118,13 +118,13 @@ func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReferenc
 }
 
 // DownloadToolRelease downloads a ToolRelease. If the tool is already downloaded a nil Downloader
-// is returned.
-func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *downloader.Config, label string, progressCB rpc.DownloadProgressCB) error {
+// is returned. Uses the given downloader configuration for download, or the default config if nil.
+func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *downloader.Config, progressCB rpc.DownloadProgressCB) error {
 	resource := tool.GetCompatibleFlavour()
 	if resource == nil {
 		return fmt.Errorf(tr("tool not available for your OS"))
 	}
-	return resource.Download(pm.DownloadDir, config, label, progressCB)
+	return resource.Download(pm.DownloadDir, config, tool.String(), progressCB)
 }
 
 // DownloadPlatformRelease downloads a PlatformRelease. If the platform is already downloaded a
