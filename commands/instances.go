@@ -17,7 +17,6 @@ package commands
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -28,7 +27,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/globals"
-	"github.com/arduino/arduino-cli/arduino/httpclient"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
@@ -640,188 +638,6 @@ func getOutputRelease(lib *librariesindex.Release) *rpc.LibraryRelease {
 		}
 	}
 	return &rpc.LibraryRelease{}
-}
-
-// Upgrade downloads and installs outdated Cores and Libraries
-func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
-	downloaderConfig, err := httpclient.GetDownloaderConfig()
-	if err != nil {
-		return err
-	}
-
-	lm := GetLibraryManager(req.Instance.Id)
-	if lm == nil {
-		return &arduino.InvalidInstanceError{}
-	}
-
-	for _, libAlternatives := range lm.Libraries {
-		for _, library := range libAlternatives.Alternatives {
-			if library.Location != libraries.User {
-				continue
-			}
-			available := lm.Index.FindLibraryUpdate(library)
-			if available == nil {
-				continue
-			}
-
-			// Downloads latest library release
-			taskCB(&rpc.TaskProgress{Name: tr("Downloading %s", available)})
-			if err := available.Resource.Download(lm.DownloadsDir, downloaderConfig, available.String(), downloadCB); err != nil {
-				return &arduino.FailedDownloadError{Message: tr("Error downloading library"), Cause: err}
-			}
-
-			// Installs downloaded library
-			taskCB(&rpc.TaskProgress{Name: tr("Installing %s", available)})
-			libPath, libReplaced, err := lm.InstallPrerequisiteCheck(available)
-			if errors.Is(err, librariesmanager.ErrAlreadyInstalled) {
-				taskCB(&rpc.TaskProgress{Message: tr("Already installed %s", available), Completed: true})
-				continue
-			} else if err != nil {
-				return &arduino.FailedLibraryInstallError{Cause: err}
-			}
-
-			if libReplaced != nil {
-				taskCB(&rpc.TaskProgress{Message: tr("Replacing %[1]s with %[2]s", libReplaced, available)})
-			}
-
-			if err := lm.Install(available, libPath); err != nil {
-				return &arduino.FailedLibraryInstallError{Cause: err}
-			}
-
-			taskCB(&rpc.TaskProgress{Message: tr("Installed %s", available), Completed: true})
-		}
-	}
-
-	pm := GetPackageManager(req.Instance.Id)
-	if pm == nil {
-		return &arduino.InvalidInstanceError{}
-	}
-
-	for _, targetPackage := range pm.Packages {
-		for _, installed := range targetPackage.Platforms {
-			if installedRelease := pm.GetInstalledPlatformRelease(installed); installedRelease != nil {
-				latest := installed.GetLatestRelease()
-				if latest == nil || latest == installedRelease {
-					continue
-				}
-
-				ref := &packagemanager.PlatformReference{
-					Package:              installedRelease.Platform.Package.Name,
-					PlatformArchitecture: installedRelease.Platform.Architecture,
-					PlatformVersion:      installedRelease.Version,
-				}
-				// Get list of installed tools needed by the currently installed version
-				_, installedTools, err := pm.FindPlatformReleaseDependencies(ref)
-				if err != nil {
-					return &arduino.NotFoundError{Message: tr("Can't find dependencies for platform %s", ref), Cause: err}
-				}
-
-				ref = &packagemanager.PlatformReference{
-					Package:              latest.Platform.Package.Name,
-					PlatformArchitecture: latest.Platform.Architecture,
-					PlatformVersion:      latest.Version,
-				}
-
-				taskCB(&rpc.TaskProgress{Name: tr("Downloading %s", latest)})
-				_, tools, err := pm.FindPlatformReleaseDependencies(ref)
-				if err != nil {
-					return &arduino.NotFoundError{Message: tr("Can't find dependencies for platform %s", ref), Cause: err}
-				}
-
-				toolsToInstall := []*cores.ToolRelease{}
-				for _, tool := range tools {
-					if tool.IsInstalled() {
-						logrus.WithField("tool", tool).Warn("Tool already installed")
-						taskCB(&rpc.TaskProgress{Name: tr("Tool %s already installed", tool), Completed: true})
-					} else {
-						toolsToInstall = append(toolsToInstall, tool)
-					}
-				}
-
-				// Downloads platform tools
-				for _, tool := range toolsToInstall {
-					if err := pm.DownloadToolRelease(tool, nil, downloadCB); err != nil {
-						taskCB(&rpc.TaskProgress{Message: tr("Error downloading tool %s", tool)})
-						return &arduino.FailedDownloadError{Message: tr("Error downloading tool %s", tool), Cause: err}
-					}
-				}
-
-				// Downloads platform
-				if err := pm.DownloadPlatformRelease(latest, downloaderConfig, downloadCB); err != nil {
-					return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", latest), Cause: err}
-				}
-
-				logrus.Info("Updating platform " + installed.String())
-				taskCB(&rpc.TaskProgress{Name: tr("Updating platform %s", latest)})
-
-				// Installs tools
-				for _, tool := range toolsToInstall {
-					if err := pm.InstallTool(tool, taskCB); err != nil {
-						msg := tr("Error installing tool %s", tool)
-						taskCB(&rpc.TaskProgress{Message: msg})
-						return &arduino.FailedInstallError{Message: msg, Cause: err}
-					}
-				}
-
-				// Installs platform
-				err = pm.InstallPlatform(latest)
-				if err != nil {
-					logrus.WithError(err).Error("Cannot install platform")
-					msg := tr("Error installing platform %s", latest)
-					taskCB(&rpc.TaskProgress{Message: msg})
-					return &arduino.FailedInstallError{Message: msg, Cause: err}
-				}
-
-				// Uninstall previously installed release
-				err = pm.UninstallPlatform(installedRelease, taskCB)
-
-				// In case uninstall fails tries to rollback
-				if err != nil {
-					logrus.WithError(err).Error("Error updating platform.")
-					taskCB(&rpc.TaskProgress{Message: tr("Error upgrading platform: %s", err)})
-
-					// Rollback
-					if err := pm.UninstallPlatform(latest, taskCB); err != nil {
-						logrus.WithError(err).Error("Error rolling-back changes.")
-						msg := tr("Error rolling-back changes")
-						taskCB(&rpc.TaskProgress{Message: fmt.Sprintf("%s: %s", msg, err)})
-						return &arduino.FailedInstallError{Message: msg, Cause: err}
-					}
-				}
-
-				// Uninstall unused tools
-				for _, toolRelease := range installedTools {
-					if !pm.IsToolRequired(toolRelease) {
-						log := pm.Log.WithField("Tool", toolRelease)
-
-						log.Info("Uninstalling tool")
-						taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s: tool is no more required", toolRelease)})
-						if err := pm.UninstallTool(toolRelease, taskCB); err != nil {
-							log.WithError(err).Error("Error uninstalling")
-							return &arduino.FailedInstallError{Message: tr("Error uninstalling tool %s", toolRelease), Cause: err}
-						}
-
-						log.Info("Tool uninstalled")
-						taskCB(&rpc.TaskProgress{Message: tr("%s uninstalled", toolRelease), Completed: true})
-					}
-				}
-
-				// Perform post install
-				if !req.SkipPostInstall {
-					logrus.Info("Running post_install script")
-					taskCB(&rpc.TaskProgress{Message: tr("Configuring platform")})
-					if err := pm.RunPostInstallScript(latest); err != nil {
-						taskCB(&rpc.TaskProgress{Message: tr("WARNING: cannot run post install: %s", err)})
-					}
-				} else {
-					logrus.Info("Skipping platform configuration (post_install run).")
-					taskCB(&rpc.TaskProgress{Message: tr("Skipping platform configuration")})
-				}
-			}
-		}
-	}
-
-	return nil
 }
 
 // LoadSketch collects and returns all files composing a sketch

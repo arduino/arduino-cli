@@ -23,7 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/upgrade"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -54,7 +54,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli upgrade`")
 
-	err := commands.Upgrade(context.Background(), &rpc.UpgradeRequest{
+	err := upgrade.Upgrade(context.Background(), &rpc.UpgradeRequest{
 		Instance:        inst,
 		SkipPostInstall: postInstallFlags.DetectSkipPostInstallValue(),
 	}, output.NewDownloadProgressBarCB(), output.TaskProgress())

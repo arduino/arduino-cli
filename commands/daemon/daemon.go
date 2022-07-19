@@ -30,6 +30,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/commands/monitor"
 	"github.com/arduino/arduino-cli/commands/sketch"
+	"github.com/arduino/arduino-cli/commands/upgrade"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -208,7 +209,7 @@ func (s *ArduinoCoreServerImpl) Outdated(ctx context.Context, req *rpc.OutdatedR
 
 // Upgrade FIXMEDOC
 func (s *ArduinoCoreServerImpl) Upgrade(req *rpc.UpgradeRequest, stream rpc.ArduinoCoreService_UpgradeServer) error {
-	err := commands.Upgrade(stream.Context(), req,
+	err := upgrade.Upgrade(stream.Context(), req,
 		func(p *rpc.DownloadProgress) {
 			stream.Send(&rpc.UpgradeResponse{
 				Progress: p,
