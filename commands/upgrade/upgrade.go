@@ -21,28 +21,18 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/commands/outdated"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // Upgrade downloads and installs outdated Cores and Libraries
 func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
-	libraryListResponse, err := lib.LibraryList(ctx, &rpc.LibraryListRequest{
-		Instance:  req.GetInstance(),
-		Updatable: true,
-	})
+	outdatedResp, err := outdated.Outdated(ctx, &rpc.OutdatedRequest{Instance: req.GetInstance()})
 	if err != nil {
 		return err
 	}
 
-	getPlatformsResp, err := core.GetPlatforms(&rpc.PlatformListRequest{
-		Instance:      req.GetInstance(),
-		UpdatableOnly: true,
-	})
-	if err != nil {
-		return err
-	}
-
-	for _, libToUpgrade := range libraryListResponse.GetInstalledLibraries() {
+	for _, libToUpgrade := range outdatedResp.GetOutdatedLibraries() {
 		err := lib.LibraryInstall(ctx, &rpc.LibraryInstallRequest{
 			Instance: req.GetInstance(),
 			Name:     libToUpgrade.GetLibrary().GetName(),
@@ -52,7 +42,7 @@ func Upgrade(ctx context.Context, req *rpc.UpgradeRequest, downloadCB rpc.Downlo
 		}
 	}
 
-	for _, platformToUpgrade := range getPlatformsResp {
+	for _, platformToUpgrade := range outdatedResp.GetOutdatedPlatforms() {
 		split := strings.Split(platformToUpgrade.GetId(), ":")
 		_, err := core.PlatformUpgrade(ctx, &rpc.PlatformUpgradeRequest{
 			Instance:        req.GetInstance(),

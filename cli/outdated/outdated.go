@@ -21,7 +21,7 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/outdated"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
@@ -50,7 +50,7 @@ func runOutdatedCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli outdated`")
 
-	outdatedResp, err := commands.Outdated(context.Background(), &rpc.OutdatedRequest{
+	outdatedResp, err := outdated.Outdated(context.Background(), &rpc.OutdatedRequest{
 		Instance: inst,
 	})
 	if err != nil {

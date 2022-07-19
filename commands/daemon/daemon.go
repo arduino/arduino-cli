@@ -29,6 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/commands/monitor"
+	"github.com/arduino/arduino-cli/commands/outdated"
 	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upgrade"
 	"github.com/arduino/arduino-cli/commands/upload"
@@ -203,7 +204,7 @@ func (s *ArduinoCoreServerImpl) UpdateCoreLibrariesIndex(req *rpc.UpdateCoreLibr
 
 // Outdated FIXMEDOC
 func (s *ArduinoCoreServerImpl) Outdated(ctx context.Context, req *rpc.OutdatedRequest) (*rpc.OutdatedResponse, error) {
-	resp, err := commands.Outdated(ctx, req)
+	resp, err := outdated.Outdated(ctx, req)
 	return resp, convertErrorToRPCStatus(err)
 }
 
