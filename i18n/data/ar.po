@@ -100,7 +100,7 @@ msgstr "(مخفي)"
 msgid "(legacy)"
 msgstr "(الشكل القديم)"
 
-#: cli/lib/install.go:79
+#: cli/lib/install.go:81
 msgid ""
 "--git-url and --zip-path are disabled by default, for more information see: "
 "%v"
@@ -108,7 +108,7 @@ msgstr ""
 "مسارات --git url و zip-path-- غير مفعلة افتراضيا . للمزيد من المعلومات راجع "
 ": %v"
 
-#: cli/lib/install.go:82
+#: cli/lib/install.go:84
 msgid ""
 "--git-url and --zip-path flags allow installing untrusted files, use it at "
 "your own risk."
@@ -124,7 +124,7 @@ msgstr "نسخة جديدة من CLI متوافرة "
 msgid "A programmer is required to upload"
 msgstr "عليك وصل مبرمجة للرفع"
 
-#: cli/core/download.go:36 cli/core/install.go:40 cli/core/uninstall.go:36
+#: cli/core/download.go:36 cli/core/install.go:41 cli/core/uninstall.go:36
 #: cli/core/upgrade.go:38
 msgid "ARCH"
 msgstr "ARCH"
@@ -149,7 +149,8 @@ msgstr ""
 msgid "All the cores are already at the latest version"
 msgstr "كل الانوية محدثة باخر اصدار مسبقا"
 
-#: commands/instances.go:676 commands/lib/install.go:105
+#: commands/instances.go:676 commands/lib/install.go:86
+#: commands/lib/install.go:131
 msgid "Already installed %s"
 msgstr "%s مثبت مسبقا"
 
@@ -215,7 +216,7 @@ msgstr "تهيئة الاردوينو"
 msgid "Arduino core operations."
 msgstr "عمليات نواة الاردوينو (Arduino core operations)"
 
-#: cli/lib/check_deps.go:56 cli/lib/install.go:125
+#: cli/lib/check_deps.go:56 cli/lib/install.go:127
 msgid "Arguments error: %v"
 msgstr ""
 
@@ -264,7 +265,7 @@ msgstr "نسخة اللوحة :"
 msgid "Bootloader file specified but missing: %[1]s"
 msgstr "ملف محمل الإقلاع (Bootloader) تم تحدديده لكنه مفقود:  %[1]s"
 
-#: cli/compile/compile.go:102
+#: cli/compile/compile.go:103
 msgid "Builds of 'core.a' are saved into this path to be cached and reused."
 msgstr ""
 "Builds الخاصة ب 'core.a' تحفظ في هذا المسار و سيتم وضعها في الكاش و سيعاد "
@@ -282,7 +283,7 @@ msgstr "تعذر انشاء المشروع"
 msgid "Can't download library"
 msgstr "تعذر تنزيل المكتبة"
 
-#: commands/core/install.go:129 commands/core/uninstall.go:53
+#: commands/core/install.go:136 commands/core/uninstall.go:53
 #: commands/instances.go:715 commands/instances.go:727
 msgid "Can't find dependencies for platform %s"
 msgstr "تعذر ايجاد التبعيات للمنصة %s"
@@ -303,11 +304,11 @@ msgstr "تعذر استخدام اعلام (flags) %s في نفس الوقت"
 msgid "Can't write config file: %v"
 msgstr "تعذر كتابة ملف التهيئة : %v"
 
-#: commands/compile/compile.go:160
+#: commands/compile/compile.go:161
 msgid "Cannot create build cache directory"
 msgstr "تعذر انشاء مجلد لل \"build cache\""
 
-#: commands/compile/compile.go:135
+#: commands/compile/compile.go:136
 msgid "Cannot create build directory"
 msgstr "تعذر انشاء مسار البناء"
 
@@ -343,7 +344,7 @@ msgstr "تعذر ايجاد المسار المطلق : %v"
 msgid "Cannot get executable path: %v"
 msgstr "تعذر ايجاد مسار البرنامج التنفيذي : %v"
 
-#: commands/core/install.go:136
+#: commands/core/install.go:143
 msgid "Cannot install platform"
 msgstr "تعذر تثبيت المنصة"
 
@@ -355,7 +356,7 @@ msgstr "تعذر تثبيت الاداة %s"
 msgid "Cannot perform port reset: %s"
 msgstr "تعذر اجراء اعادة تشغيل المنفذ : %s"
 
-#: commands/core/install.go:154
+#: commands/core/install.go:161
 msgid "Cannot upgrade platform"
 msgstr "تعذر تحديث المنصة"
 
@@ -367,7 +368,7 @@ msgstr "الفئة : %s"
 msgid "Check dependencies status for the specified library."
 msgstr "التحقق من حالة التبعيات (dependencies) للمكتبة المختارة"
 
-#: commands/lib/install.go:110
+#: commands/lib/install.go:136
 msgid "Checking lib install prerequisites"
 msgstr "جار التحقق من المتطلبات الاساسية لتثبيت المكتبات"
 
@@ -400,7 +401,7 @@ msgstr "الامر يبقى قيد التشغيل و يطبع قائمة للو�
 msgid "Compiled sketch not found in %s"
 msgstr "المشروع المترجم لم يتم ايجاده في %s"
 
-#: cli/compile/compile.go:86 cli/compile/compile.go:87
+#: cli/compile/compile.go:87 cli/compile/compile.go:88
 msgid "Compiles Arduino sketches."
 msgstr "يترجم مشاريع الاردوينو"
 
@@ -442,7 +443,7 @@ msgstr "اعدادات التهيئة ل %s"
 msgid "Configuring platform"
 msgstr "تهيئة المنصة"
 
-#: commands/core/install.go:169
+#: commands/core/install.go:176
 msgid "Configuring platform."
 msgstr "جار تهيئة المنصة"
 
@@ -478,7 +479,7 @@ msgstr "تعذر القيام بـ deeply cache لــ core build : %[1]s"
 msgid "Couldn't determine program size"
 msgstr "تعذر معرفة حجم البرنامج"
 
-#: cli/arguments/sketch.go:37 cli/lib/install.go:105
+#: cli/arguments/sketch.go:37 cli/lib/install.go:107
 msgid "Couldn't get current working directory: %v"
 msgstr "تعذر ايجاد المسار الحالي %v"
 
@@ -486,7 +487,7 @@ msgstr "تعذر ايجاد المسار الحالي %v"
 msgid "Create a new Sketch"
 msgstr "انشاء مشروع جديد"
 
-#: cli/compile/compile.go:99
+#: cli/compile/compile.go:100
 msgid "Create and print a profile configuration from the build."
 msgstr "انشاء و طباعة اعدادات البروفايل من البناء (build)"
 
@@ -502,7 +503,7 @@ msgstr ""
 "انشاء او تحديث ملف التهيئة في مسار البيانات او في مسار مخصص مع اعدادات "
 "التهيئة الحالية"
 
-#: cli/compile/compile.go:295
+#: cli/compile/compile.go:298
 msgid ""
 "Currently, Build Profiles only support libraries available through Arduino "
 "Library Manager."
@@ -600,9 +601,17 @@ msgstr "قطع الاتصال"
 msgid "Display only the provided gRPC calls"
 msgstr ""
 
-#: cli/lib/install.go:61
+#: cli/lib/install.go:62
 msgid "Do not install dependencies."
 msgstr "عدم تثبيت التبعيات (dependencies)"
+
+#: cli/lib/install.go:63
+msgid "Do not overwrite already installed libraries."
+msgstr ""
+
+#: cli/core/install.go:58
+msgid "Do not overwrite already installed platforms."
+msgstr ""
 
 #: cli/burnbootloader/burnbootloader.go:59 cli/upload/upload.go:76
 msgid "Do not perform the actual upload, just log out actions"
@@ -635,7 +644,7 @@ msgstr "جار تحميل المكتبة %s"
 msgid "Downloading missing tool %s"
 msgstr "جار تنزيل الاداة الناقصة"
 
-#: commands/core/install.go:89
+#: commands/core/install.go:96
 msgid "Downloading packages"
 msgstr "جار تنزيل الحزم"
 
@@ -659,11 +668,11 @@ msgstr "يقوم بتنزيل مكتبة او اكثر بدون تثبيتها"
 msgid "Enable debug logging of gRPC calls"
 msgstr ""
 
-#: cli/lib/install.go:63
+#: cli/lib/install.go:65
 msgid "Enter a path to zip file"
 msgstr "ادخل مسار لملف zip"
 
-#: cli/lib/install.go:62
+#: cli/lib/install.go:64
 msgid "Enter git url for libraries hosted on repositories"
 msgstr ""
 "ادخل عنوان git URL الخاص بالمكتبات المستضافة على المستودعات (repositories)"
@@ -690,7 +699,7 @@ msgstr ""
 msgid "Error cleaning caches: %v"
 msgstr "خطأ اثناء تنظيف الكاش : %v"
 
-#: commands/compile/compile.go:278
+#: commands/compile/compile.go:279
 msgid "Error copying output file %s"
 msgstr "خطا اثناء نسخ ملف الخرج %s"
 
@@ -699,7 +708,7 @@ msgstr "خطا اثناء نسخ ملف الخرج %s"
 msgid "Error creating instance: %v"
 msgstr "خطا اثناء انشاء النسخة %v"
 
-#: commands/compile/compile.go:258
+#: commands/compile/compile.go:259
 msgid "Error creating output dir"
 msgstr "خطا اثناء انشاء مسار الخرج"
 
@@ -767,8 +776,8 @@ msgid "Error during JSON encoding of the output: %v"
 msgstr "خطا اثناء ترميز JSON الخاص بالخرج : %v"
 
 #: cli/burnbootloader/burnbootloader.go:73
-#: cli/burnbootloader/burnbootloader.go:86 cli/compile/compile.go:242
-#: cli/compile/compile.go:274 cli/upload/upload.go:96 cli/upload/upload.go:113
+#: cli/burnbootloader/burnbootloader.go:86 cli/compile/compile.go:245
+#: cli/compile/compile.go:277 cli/upload/upload.go:96 cli/upload/upload.go:113
 #: cli/upload/upload.go:162
 msgid "Error during Upload: %v"
 msgstr "خطا اثناء الرفع : %v"
@@ -777,11 +786,11 @@ msgstr "خطا اثناء الرفع : %v"
 msgid "Error during YAML encoding of the output: %v"
 msgstr "خطأ اثناء القيام بYAML econding للخرج : %v"
 
-#: cli/compile/compile.go:334
+#: cli/compile/compile.go:337
 msgid "Error during build: %v"
 msgstr "خطأ اثناء بناء : %v"
 
-#: cli/core/install.go:80
+#: cli/core/install.go:83
 msgid "Error during install: %v"
 msgstr "خطأ اثناء تثبيت : %v"
 
@@ -827,7 +836,7 @@ msgstr "خطأ اثناء الحصول على قائمة اللوحات"
 msgid "Error getting current directory for compilation database: %s"
 msgstr "خطأ اثناء الحصول على المسار الحالي من اجل قاعدة بيانات الترجمة %s"
 
-#: commands/compile/compile.go:226 commands/lib/list.go:107
+#: commands/compile/compile.go:227 commands/lib/list.go:107
 msgid "Error getting information for library %s"
 msgstr "خطأ  اثناء الحصول على المعلومات للمكتبة %s"
 
@@ -849,15 +858,15 @@ msgstr ""
 msgid "Error initializing instance: %v"
 msgstr ""
 
-#: cli/lib/install.go:138
+#: cli/lib/install.go:141
 msgid "Error installing %s: %v"
 msgstr "خطأ اثناء تثبيت %v:%s"
 
-#: cli/lib/install.go:116
+#: cli/lib/install.go:118
 msgid "Error installing Git Library: %v"
 msgstr "خطأ اثناء تثبيت مكتبة GIT : %v"
 
-#: cli/lib/install.go:93
+#: cli/lib/install.go:95
 msgid "Error installing Zip Library: %v"
 msgstr "خطأ اثناء تثبيت مكتبة ZIP : %v"
 
@@ -913,11 +922,11 @@ msgstr "تعذر فتح الملف الذي يحوي سجلات التصحيح (
 msgid "Error opening sketch: %v"
 msgstr "خطأ اثناء فتح المشروع : %v"
 
-#: cli/compile/compile.go:187
+#: cli/compile/compile.go:189
 msgid "Error opening source code overrides data file: %v"
 msgstr "خطا اثناء فتح الكود المصدر الذي يتجاوز ملف البيانات : %v"
 
-#: commands/compile/compile.go:268
+#: commands/compile/compile.go:269
 msgid "Error reading build directory"
 msgstr "خطا اثناء قراءة مسار البناء"
 
@@ -949,7 +958,7 @@ msgstr "خطا اثناء استعادة الانوية و المكتبات ال
 msgid "Error rolling-back changes"
 msgstr "خطا اثناء التراجع عن التغييرات"
 
-#: commands/core/install.go:151
+#: commands/core/install.go:158
 msgid "Error rolling-back changes: %s"
 msgstr "خطا اثناء التراجع عن التغييرات : %s"
 
@@ -1017,7 +1026,7 @@ msgstr "خطا اثناء تحديث فهرس المكتبات : %v"
 msgid "Error upgrading libraries: %v"
 msgstr "خطأ اثناء تطوير المكتبات : %v"
 
-#: commands/core/install.go:146 commands/instances.go:780
+#: commands/core/install.go:153 commands/instances.go:780
 msgid "Error upgrading platform: %s"
 msgstr "خطا اثناء تطوير المنصة : %s"
 
@@ -1029,7 +1038,7 @@ msgstr "خطأ اثناء ترقية : %v"
 msgid "Error verifying signature"
 msgstr "تعذر التحقق من التوقيع"
 
-#: legacy/builder/container_find_includes.go:365
+#: legacy/builder/container_find_includes.go:384
 msgid "Error while detecting libraries included by %[1]s"
 msgstr "تعذر العثور على المكتبات التي ضُمِّنَت (included) من قبل : %[1]s"
 
@@ -1047,7 +1056,7 @@ msgstr "خطأ اثناء كتابة قاعدة بيانات الترجمة (com
 msgid "Error: command description is not supported by %v"
 msgstr "خطأ : وصف الامر غير مدعوم من قبل %v"
 
-#: cli/compile/compile.go:194
+#: cli/compile/compile.go:196
 msgid "Error: invalid source code overrides data file: %v"
 msgstr "خطأ : كود مصدري خاطئ سيقوم بالكتابة فوق ملف البيانات : %v"
 
@@ -1221,7 +1230,7 @@ msgstr ""
 msgid "Identification properties:"
 msgstr ""
 
-#: cli/compile/compile.go:135
+#: cli/compile/compile.go:136
 msgid "If set built binaries will be exported to the sketch folder."
 msgstr ""
 
@@ -1243,7 +1252,7 @@ msgstr ""
 msgid "Installed"
 msgstr "تم التنصيب"
 
-#: commands/instances.go:690 commands/lib/install.go:121
+#: commands/instances.go:690 commands/lib/install.go:147
 msgid "Installed %s"
 msgstr "تم تثبيت %s"
 
@@ -1253,7 +1262,7 @@ msgid "Installed version"
 msgstr "النسخة المثبتة "
 
 #: commands/bundled_tools.go:46 commands/instances.go:673
-#: commands/lib/install.go:101
+#: commands/lib/install.go:127
 msgid "Installing %s"
 msgstr "جار تثبيت %s"
 
@@ -1261,7 +1270,7 @@ msgstr "جار تثبيت %s"
 msgid "Installing library %s"
 msgstr "جار تثبيت المكتبة %s"
 
-#: arduino/cores/packagemanager/profiles.go:131 commands/core/install.go:112
+#: arduino/cores/packagemanager/profiles.go:131 commands/core/install.go:119
 msgid "Installing platform %s"
 msgstr "جار تثبيت المنصة %s"
 
@@ -1269,17 +1278,17 @@ msgstr "جار تثبيت المنصة %s"
 msgid "Installing tool %s"
 msgstr "جار تثبيت الاداة %s"
 
-#: cli/core/install.go:41 cli/core/install.go:42
+#: cli/core/install.go:42 cli/core/install.go:43
 msgid "Installs one or more cores and corresponding tool dependencies."
 msgstr ""
 "يقوم بتثبيت نواة او اكثر و ادواتها التابعة لها (corresponding tool "
 "dependencies)"
 
-#: cli/lib/install.go:48 cli/lib/install.go:49
+#: cli/lib/install.go:49 cli/lib/install.go:50
 msgid "Installs one or more specified libraries into the system."
 msgstr "يقوم بتثبيت مكتبة او اكثر تم تحديدها مسبقا على النظام"
 
-#: legacy/builder/container_find_includes.go:389
+#: legacy/builder/container_find_includes.go:408
 msgid "Internal error in cache"
 msgstr "خطأ داخلي في الكاش (Internal error in cache)"
 
@@ -1312,7 +1321,7 @@ msgstr "URL الاضافي غير صالح : %v"
 msgid "Invalid archive: file %{1}s not found in archive %{2}s"
 msgstr ""
 
-#: cli/core/download.go:58 cli/core/install.go:66 cli/core/uninstall.go:55
+#: cli/core/download.go:58 cli/core/install.go:68 cli/core/uninstall.go:55
 #: cli/core/upgrade.go:81 cli/lib/download.go:56 cli/lib/uninstall.go:55
 msgid "Invalid argument passed: %v"
 msgstr ""
@@ -1341,7 +1350,7 @@ msgstr ""
 msgid "Invalid library"
 msgstr ""
 
-#: configuration/network.go:56
+#: configuration/network.go:63
 msgid "Invalid network.proxy '%[1]s': %[2]s"
 msgstr ""
 
@@ -1389,7 +1398,7 @@ msgstr "نسخة غير صالحة"
 msgid "Invalid vid value: '%s'"
 msgstr ""
 
-#: cli/compile/compile.go:130
+#: cli/compile/compile.go:131
 msgid ""
 "Just produce the compilation database, without actually compiling. All build"
 " commands are skipped except pre* hooks."
@@ -1399,7 +1408,7 @@ msgstr ""
 msgid "LIBNAME"
 msgstr ""
 
-#: cli/lib/check_deps.go:36 cli/lib/install.go:47
+#: cli/lib/check_deps.go:36 cli/lib/install.go:48
 msgid "LIBRARY"
 msgstr ""
 
@@ -1414,6 +1423,11 @@ msgstr "الأخير"
 
 #: legacy/builder/phases/libraries_builder.go:89
 msgid "Library %[1]s has been declared precompiled:"
+msgstr ""
+
+#: commands/lib/install.go:95
+msgid ""
+"Library %[1]s is already installed, but with a different version: %[2]s"
 msgstr ""
 
 #: commands/lib/uninstall.go:37
@@ -1439,7 +1453,7 @@ msgstr ""
 msgid "Library install failed"
 msgstr "فشل تثبيت المكتبة"
 
-#: commands/lib/install.go:131 commands/lib/install.go:141
+#: commands/lib/install.go:157 commands/lib/install.go:167
 msgid "Library installed"
 msgstr "المكتبة مثبتة"
 
@@ -1479,7 +1493,7 @@ msgstr ""
 "اعرض كل خيارات اللوحات مفصولة عن بعضها بفواصل . او يمكن استخدامها عدة مرات "
 "من اجل عدة خيارات"
 
-#: cli/compile/compile.go:107
+#: cli/compile/compile.go:108
 msgid ""
 "List of custom build properties separated by commas. Or can be used multiple"
 " times for multiple properties."
@@ -1658,37 +1672,37 @@ msgstr ""
 msgid "Option:"
 msgstr "اختيار:"
 
-#: cli/compile/compile.go:117
+#: cli/compile/compile.go:118
 msgid ""
 "Optional, can be: %s. Used to tell gcc which warning level to use (-W flag)."
 msgstr ""
 "اختياري، يمكن أن يكون: %s. يُستخدم لإخبار ال gcc أي مستوي تحذير يَستخدِم (-W"
 " flag)"
 
-#: cli/compile/compile.go:131
+#: cli/compile/compile.go:132
 msgid "Optional, cleanup the build folder and do not use any cached build."
 msgstr ""
 
-#: cli/compile/compile.go:128
+#: cli/compile/compile.go:129
 msgid ""
 "Optional, optimize compile output for debugging, rather than for release."
 msgstr ""
 
-#: cli/compile/compile.go:119
+#: cli/compile/compile.go:120
 msgid "Optional, suppresses almost every output."
 msgstr ""
 
-#: cli/compile/compile.go:118 cli/upload/upload.go:74
+#: cli/compile/compile.go:119 cli/upload/upload.go:74
 msgid "Optional, turns on verbose mode."
 msgstr "اختياري، يُفعل الوضع المفصل."
 
-#: cli/compile/compile.go:136
+#: cli/compile/compile.go:137
 msgid ""
 "Optional. Path to a .json file that contains a set of replacements of the "
 "sketch source code."
 msgstr ""
 
-#: cli/compile/compile.go:109
+#: cli/compile/compile.go:110
 msgid ""
 "Override a build property with a custom value. Can be used multiple times "
 "for multiple properties."
@@ -1698,7 +1712,7 @@ msgstr ""
 msgid "Overwrite existing config file."
 msgstr ""
 
-#: cli/core/download.go:36 cli/core/install.go:40 cli/core/uninstall.go:36
+#: cli/core/download.go:36 cli/core/install.go:41 cli/core/uninstall.go:36
 #: cli/core/upgrade.go:38
 msgid "PACKAGER"
 msgstr ""
@@ -1727,17 +1741,17 @@ msgstr ""
 msgid "Paragraph: %s"
 msgstr ""
 
-#: cli/compile/compile.go:386 cli/compile/compile.go:400
+#: cli/compile/compile.go:389 cli/compile/compile.go:403
 msgid "Path"
 msgstr "المسار"
 
-#: cli/compile/compile.go:127
+#: cli/compile/compile.go:128
 msgid ""
 "Path to a collection of libraries. Can be used multiple times or entries can"
 " be comma separated."
 msgstr ""
 
-#: cli/compile/compile.go:125
+#: cli/compile/compile.go:126
 msgid ""
 "Path to a single library’s root folder. Can be used multiple times or "
 "entries can be comma separated."
@@ -1747,7 +1761,7 @@ msgstr ""
 msgid "Path to the file where logs will be written."
 msgstr "مسار للملف حيث تُكتب السجلات"
 
-#: cli/compile/compile.go:105
+#: cli/compile/compile.go:106
 msgid ""
 "Path where to save compiled files. If omitted, a directory will be created "
 "in the default temporary path of your OS."
@@ -1757,15 +1771,15 @@ msgstr ""
 msgid "Performing 1200-bps touch reset on serial port %s"
 msgstr ""
 
-#: commands/core/install.go:75
+#: commands/core/install.go:55 commands/core/install.go:62
 msgid "Platform %s already installed"
 msgstr "المنصة %s مثبتة سابقا"
 
-#: commands/core/install.go:179
+#: commands/core/install.go:186
 msgid "Platform %s installed"
 msgstr "تم تثبيت المنصة: %s"
 
-#: cli/compile/compile.go:355 cli/upload/upload.go:133
+#: cli/compile/compile.go:358 cli/upload/upload.go:133
 msgid ""
 "Platform %s is not found in any known index\n"
 "Maybe you need to add a 3rd party URL?"
@@ -1787,7 +1801,7 @@ msgstr ""
 msgid "Platform ID"
 msgstr ""
 
-#: cli/compile/compile.go:342 cli/upload/upload.go:121
+#: cli/compile/compile.go:345 cli/upload/upload.go:121
 msgid "Platform ID is not correct"
 msgstr ""
 
@@ -1852,7 +1866,7 @@ msgstr ""
 msgid "Print details about a board."
 msgstr "طباعة تفاصيل عن لوحة."
 
-#: cli/compile/compile.go:101
+#: cli/compile/compile.go:102
 msgid "Print preprocessed code to stdout instead of compiling."
 msgstr ""
 
@@ -1904,9 +1918,13 @@ msgstr ""
 msgid "Removes one or more values from a setting."
 msgstr ""
 
-#: commands/instances.go:683 commands/lib/install.go:114
+#: commands/instances.go:683 commands/lib/install.go:140
 msgid "Replacing %[1]s with %[2]s"
 msgstr "تبديل %[1]s ب %[2]s"
+
+#: commands/core/install.go:123
+msgid "Replacing platform %[1]s with %[2]s"
+msgstr ""
 
 #: cli/board/details.go:161
 msgid "Required tool:"
@@ -1930,7 +1948,7 @@ msgstr ""
 msgid "Running normal build of the core..."
 msgstr ""
 
-#: cli/compile/compile.go:103
+#: cli/compile/compile.go:104
 msgid "Save build artifacts in this directory."
 msgstr ""
 
@@ -1982,7 +2000,7 @@ msgstr ""
 msgid "Show all available core versions."
 msgstr ""
 
-#: cli/compile/compile.go:100
+#: cli/compile/compile.go:101
 msgid "Show all build properties used instead of compiling."
 msgstr ""
 
@@ -2111,7 +2129,7 @@ msgstr ""
 msgid "Skipping compile of: %[1]s"
 msgstr ""
 
-#: legacy/builder/container_find_includes.go:336
+#: legacy/builder/container_find_includes.go:355
 msgid "Skipping dependencies detection for precompiled library %[1]s"
 msgstr ""
 
@@ -2119,7 +2137,7 @@ msgstr ""
 msgid "Skipping platform configuration"
 msgstr ""
 
-#: commands/core/install.go:175
+#: commands/core/install.go:182
 msgid "Skipping platform configuration."
 msgstr ""
 
@@ -2159,13 +2177,13 @@ msgid ""
 "Maybe use '%[2]s'?"
 msgstr ""
 
-#: cli/compile/compile.go:115
+#: cli/compile/compile.go:116
 msgid ""
 "The name of the custom encryption key to use to encrypt a binary during the "
 "compile process. Used only by the platforms that support it."
 msgstr ""
 
-#: cli/compile/compile.go:113
+#: cli/compile/compile.go:114
 msgid ""
 "The name of the custom signing key to use to sign a binary during the "
 "compile process. Used only by the platforms that support it."
@@ -2175,7 +2193,7 @@ msgstr ""
 msgid "The output format for the logs, can be: %s"
 msgstr ""
 
-#: cli/compile/compile.go:111
+#: cli/compile/compile.go:112
 msgid ""
 "The path of the dir to search for the custom keys to sign and encrypt a "
 "binary. Used only by the platforms that support it."
@@ -2199,7 +2217,7 @@ msgid ""
 "that can be upgraded. If nothing needs to be updated the output is empty."
 msgstr ""
 
-#: commands/bundled_tools.go:41 commands/core/install.go:82
+#: commands/bundled_tools.go:41 commands/core/install.go:89
 #: commands/instances.go:734
 msgid "Tool %s already installed"
 msgstr ""
@@ -2228,7 +2246,7 @@ msgstr ""
 msgid "Toolchain type"
 msgstr ""
 
-#: cli/compile/compile.go:353 cli/upload/upload.go:131
+#: cli/compile/compile.go:356 cli/upload/upload.go:131
 msgid "Try running %s"
 msgstr "جرب تشغيل %s"
 
@@ -2347,10 +2365,6 @@ msgstr ""
 msgid "Upgrades one or all installed platforms to the latest version."
 msgstr ""
 
-#: commands/core/install.go:116
-msgid "Upgrading platform %[1]s with %[2]s"
-msgstr ""
-
 #: cli/upload/upload.go:58
 msgid "Upload Arduino sketches."
 msgstr ""
@@ -2372,7 +2386,7 @@ msgstr ""
 msgid "Upload port protocol, e.g: serial"
 msgstr ""
 
-#: cli/compile/compile.go:120
+#: cli/compile/compile.go:121
 msgid "Upload the binary after the compilation."
 msgstr ""
 
@@ -2384,7 +2398,7 @@ msgstr ""
 msgid "Upload the bootloader."
 msgstr ""
 
-#: cli/compile/compile.go:248 cli/upload/upload.go:141
+#: cli/compile/compile.go:251 cli/upload/upload.go:141
 msgid ""
 "Uploading to specified board using %s protocol requires the following info:"
 msgstr ""
@@ -2397,11 +2411,11 @@ msgstr ""
 msgid "Use %s for more information about a command."
 msgstr ""
 
-#: cli/compile/compile.go:384
+#: cli/compile/compile.go:387
 msgid "Used library"
 msgstr ""
 
-#: cli/compile/compile.go:398
+#: cli/compile/compile.go:401
 msgid "Used platform"
 msgstr ""
 
@@ -2420,7 +2434,7 @@ msgstr ""
 msgid "Using board '%[1]s' from platform in folder: %[2]s"
 msgstr ""
 
-#: legacy/builder/container_find_includes.go:348
+#: legacy/builder/container_find_includes.go:367
 msgid "Using cached library dependencies for file: %[1]s"
 msgstr ""
 
@@ -2450,11 +2464,11 @@ msgstr ""
 msgid "Using previously compiled file: %[1]s"
 msgstr "استخدام الملف المترجم سابقا: %[1]s"
 
-#: cli/core/download.go:36 cli/core/install.go:40
+#: cli/core/download.go:36 cli/core/install.go:41
 msgid "VERSION"
 msgstr ""
 
-#: cli/lib/check_deps.go:36 cli/lib/install.go:47
+#: cli/lib/check_deps.go:36 cli/lib/install.go:48
 msgid "VERSION_NUMBER"
 msgstr ""
 
@@ -2462,12 +2476,12 @@ msgstr ""
 msgid "Values"
 msgstr ""
 
-#: cli/burnbootloader/burnbootloader.go:57 cli/compile/compile.go:122
+#: cli/burnbootloader/burnbootloader.go:57 cli/compile/compile.go:123
 #: cli/upload/upload.go:73
 msgid "Verify uploaded binary after the upload."
 msgstr ""
 
-#: cli/compile/compile.go:385 cli/compile/compile.go:399
+#: cli/compile/compile.go:388 cli/compile/compile.go:402
 #: cli/core/search.go:114
 msgid "Version"
 msgstr ""
@@ -2476,11 +2490,11 @@ msgstr ""
 msgid "Versions: %s"
 msgstr ""
 
-#: commands/core/install.go:171
+#: commands/core/install.go:178
 msgid "WARNING cannot configure platform: %s"
 msgstr ""
 
-#: cli/compile/compile.go:294
+#: cli/compile/compile.go:297
 msgid "WARNING: The sketch is compiled using one or more custom libraries."
 msgstr "تحذير : المشروع سيترجم باستخدام مكتبة خاصة او اكثر . "
 
@@ -2524,7 +2538,7 @@ msgstr ""
 msgid "Website: %s"
 msgstr "الموقع : %s"
 
-#: cli/compile/compile.go:123
+#: cli/compile/compile.go:124
 msgid ""
 "When specified, VID/PID specific build properties are used, if board "
 "supports them."
@@ -2549,11 +2563,11 @@ msgstr ""
 msgid "Writing config file: %v"
 msgstr "جار كتابة ملف التهيئة : %v"
 
-#: cli/compile/compile.go:150
+#: cli/compile/compile.go:152
 msgid "You cannot use the %[1]s flag together with %[2]s."
 msgstr "لا يمكنك استخدام %[1]sflag مع %[2]s سويا"
 
-#: cli/compile/compile.go:155 cli/compile/compile.go:159
+#: cli/compile/compile.go:157 cli/compile/compile.go:161
 msgid "You cannot use the %s flag while compiling with a profile."
 msgstr ""
 "لا يمكنك استخدام flag %s اثناء الترجمة باستخدام بروفايل (while compiling "
@@ -2615,7 +2629,7 @@ msgstr "تعذر العثور على اخر اصدار من %s"
 msgid "can't find latest release of tool %s"
 msgstr "تعذر العثور على اخر اصدار من الاداة %s"
 
-#: arduino/sketch/sketch.go:118
+#: arduino/sketch/sketch.go:126
 msgid "can't find main Sketch file in %s"
 msgstr "تعذر ايحاد ملف المشروع الرئيسي داخل %s"
 
@@ -2681,6 +2695,10 @@ msgstr "جار معالجة التشفير (computing hash) : %s"
 msgid "could not find a valid build artifact"
 msgstr "تعذر ايجاد ادوات صالحة للبناء (valid build artifact)"
 
+#: commands/core/install.go:63
+msgid "could not overwrite"
+msgstr ""
+
 #: arduino/cores/packagemanager/install_uninstall.go:51
 msgid "creating installed.json in %[1]s: %[2]s"
 msgstr "جار انشاء installed.json داخل %[1]s : %[2]s"
@@ -2695,7 +2713,7 @@ msgstr ""
 "قسم البيانات تخطى الحجم المتوفر في اللوحة (data section exceeds available "
 "space in board)"
 
-#: arduino/sketch/sketch.go:224
+#: arduino/sketch/sketch.go:232
 msgid "decoding sketch metadata: %s"
 msgstr "جار فك تشفير البيانات الوصفية للمشروع (decoding sketch metadata) : %s"
 
@@ -2731,11 +2749,11 @@ msgstr ""
 msgid "discovery release not found: %s"
 msgstr ""
 
-#: cli/core/download.go:41 cli/core/install.go:45
+#: cli/core/download.go:41 cli/core/install.go:46
 msgid "download a specific version (in this case 1.6.9)."
 msgstr "تنزيل نسخة محددة (في هذه الحالة ستكون النسخة 1.6.9)"
 
-#: cli/core/download.go:40 cli/core/install.go:43
+#: cli/core/download.go:40 cli/core/install.go:44
 msgid "download the latest version of Arduino SAMD core."
 msgstr "تنزيل اخر نسخة من  Arduino SAMD core"
 
@@ -2747,11 +2765,11 @@ msgstr "جار تنزيل الاداة %[1]s : %[2]s"
 msgid "empty board identifier"
 msgstr "معرف اللوحة خالي (empty board identifier)"
 
-#: arduino/sketch/sketch.go:213
+#: arduino/sketch/sketch.go:221
 msgid "encoding sketch metadata: %s"
 msgstr "جار تشفير البيانات الوصفية للمشروع (encoding sketch metadata) : %s"
 
-#: arduino/sketch/sketch.go:104
+#: arduino/sketch/sketch.go:112
 msgid "error loading sketch project file:"
 msgstr "خطا اثناء تحميل ملفات المشروع :"
 
@@ -2816,11 +2834,11 @@ msgstr ""
 msgid "for a specific version."
 msgstr "من اجل نسخة محددة"
 
-#: cli/lib/check_deps.go:40 cli/lib/download.go:40 cli/lib/install.go:51
+#: cli/lib/check_deps.go:40 cli/lib/download.go:40 cli/lib/install.go:52
 msgid "for the latest version."
 msgstr ""
 
-#: cli/lib/check_deps.go:41 cli/lib/install.go:52
+#: cli/lib/check_deps.go:41 cli/lib/install.go:53
 msgid "for the specific version."
 msgstr ""
 
@@ -2866,7 +2884,7 @@ msgstr ""
 msgid "getting tool dependencies for platform %[1]s: %[2]s"
 msgstr ""
 
-#: arduino/sketch/sketch.go:168
+#: arduino/sketch/sketch.go:176
 msgid "importing sketch metadata: %s"
 msgstr ""
 
@@ -3096,9 +3114,9 @@ msgstr "جار تحميل اصدار الاداة (tool release) في %s"
 msgid "looking for boards.txt in %s"
 msgstr "جار البحث عن boards.txt داخل %s"
 
-#: legacy/builder/container_setup.go:73
-msgid "main file missing from sketch"
-msgstr "ملف رئيسي للمشروع مفقود"
+#: arduino/sketch/sketch.go:91
+msgid "main file missing from sketch: %s"
+msgstr ""
 
 #: arduino/sketch/profiles.go:177
 msgid "missing '%s' directive"
@@ -3136,7 +3154,7 @@ msgstr "جار نقل الارشيف الذي تم استخراجه الى مج�
 msgid "multiple build artifacts found: '%[1]s' and '%[2]s'"
 msgstr "تم ايجاد اكثر من build artifacts : '%[1]s' و '%[2]s'"
 
-#: arduino/sketch/sketch.go:78
+#: arduino/sketch/sketch.go:83
 msgid "multiple main sketch files found (%[1]v, %[2]v)"
 msgstr "تم العثور على اكثر من ملف مشروع رئيسي main sketch file (%[1]v,%[2]v)"
 
@@ -3156,6 +3174,10 @@ msgstr ""
 msgid "no sketch or build directory/file specified"
 msgstr ""
 
+#: arduino/sketch/sketch.go:70
+msgid "no such file or directory"
+msgstr ""
+
 #: arduino/resources/install.go:128
 msgid "no unique root dir in archive, found '%[1]s' and '%[2]s'"
 msgstr ""
@@ -3164,7 +3186,7 @@ msgstr ""
 msgid "no upload port provided"
 msgstr "لم يتم تحديد اي منفذ للرفع"
 
-#: arduino/sketch/sketch.go:287
+#: arduino/sketch/sketch.go:293
 msgid "no valid sketch found in %[1]s: missing %[2]s"
 msgstr "تعذر ايجاد اي مشروع صالح في %[2]s : %[1]sمفقود"
 
@@ -3236,7 +3258,7 @@ msgstr ""
 msgid "platform not installed"
 msgstr ""
 
-#: cli/compile/compile.go:141
+#: cli/compile/compile.go:143
 msgid "please use --build-property instead."
 msgstr ""
 
@@ -3283,7 +3305,7 @@ msgstr ""
 msgid "reading file %[1]s: %[2]s"
 msgstr ""
 
-#: arduino/sketch/sketch.go:257
+#: arduino/sketch/sketch.go:265
 msgid "reading files: %v"
 msgstr ""
 
@@ -3311,7 +3333,7 @@ msgstr ""
 msgid "reading package root dir: %s"
 msgstr ""
 
-#: arduino/sketch/sketch.go:205
+#: arduino/sketch/sketch.go:213
 msgid "reading sketch metadata %[1]s: %[2]s"
 msgstr ""
 
@@ -3368,7 +3390,7 @@ msgstr ""
 msgid "setting DTR to OFF"
 msgstr ""
 
-#: arduino/sketch/sketch.go:63
+#: arduino/sketch/sketch.go:63 arduino/sketch/sketch.go:68
 msgid "sketch path is not valid"
 msgstr ""
 
@@ -3471,7 +3493,7 @@ msgstr ""
 msgid "tool version %s not found"
 msgstr ""
 
-#: commands/lib/install.go:58
+#: commands/lib/install.go:59
 msgid ""
 "two different versions of the library %[1]s are required: %[2]s and %[3]s"
 msgstr ""
@@ -3520,7 +3542,7 @@ msgstr ""
 msgid "unknown platform %s:%s"
 msgstr ""
 
-#: arduino/sketch/sketch.go:159
+#: arduino/sketch/sketch.go:167
 msgid "unknown sketch file extension '%s'"
 msgstr ""
 
@@ -3548,7 +3570,7 @@ msgstr ""
 msgid "version %s not found"
 msgstr ""
 
-#: arduino/sketch/sketch.go:229
+#: arduino/sketch/sketch.go:237
 msgid "writing sketch metadata %[1]s: %[2]s"
 msgstr ""
 
