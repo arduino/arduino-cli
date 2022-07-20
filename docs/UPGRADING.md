@@ -2,6 +2,56 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## 0.26.0
+
+### `github.com/arduino/arduino-cli/commands.DownloadToolRelease`, and `InstallToolRelease` functions have been removed
+
+This functionality was duplicated and already available via `PackageManager` methods.
+
+### `github.com/arduino/arduino-cli/commands.Outdated` and `Upgrade` functions have been moved
+
+- `github.com/arduino/arduino-cli/commands.Outdated` is now `github.com/arduino/arduino-cli/commands/outdated.Outdated`
+- `github.com/arduino/arduino-cli/commands.Upgrade` is now `github.com/arduino/arduino-cli/commands/upgrade.Upgrade`
+
+Old code must change the imports accordingly.
+
+### `github.com/arduino-cli/arduino/cores/packagemanager.PackageManager` methods and fields change
+
+- The `PackageManager.Log` and `TempDir` fields are now private.
+
+- The `PackageManager.DownloadToolRelease` method has no more the `label` parameter:
+
+  ```go
+  func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *downloader.Config, label string, progressCB rpc.DownloadProgressCB) error {
+  ```
+
+  has been changed to:
+
+  ```go
+  func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *downloader.Config, progressCB rpc.DownloadProgressCB) error {
+  ```
+
+  Old code should remove the `label` parameter.
+
+- The `PackageManager.UninstallPlatform`, `PackageManager.InstallTool`, and `PackageManager.UninstallTool` methods now
+  requires a `github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1.TaskProgressCB`
+
+  ```go
+  func (pm *PackageManager) UninstallPlatform(platformRelease *cores.PlatformRelease) error {
+  func (pm *PackageManager) InstallTool(toolRelease *cores.ToolRelease) error {
+  func (pm *PackageManager) UninstallTool(toolRelease *cores.ToolRelease) error {
+  ```
+
+  have been changed to:
+
+  ```go
+  func (pm *PackageManager) UninstallPlatform(platformRelease *cores.PlatformRelease, taskCB rpc.TaskProgressCB) error {
+  func (pm *PackageManager) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB) error {
+  func (pm *PackageManager) UninstallTool(toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB) error {
+  ```
+
+  If you're not interested in getting the task events you can pass an empty callback function.
+
 ## 0.25.0
 
 ### go-lang function `github.com/arduino/arduino-cli/arduino/utils.FeedStreamTo` has been changed
