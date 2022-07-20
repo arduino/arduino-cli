@@ -150,9 +150,9 @@ func (dm *DiscoveryManager) Watch() (*PortWatcher, error) {
 	}
 	watcher.closeCB = func() {
 		dm.watchersMutex.Lock()
+		defer dm.watchersMutex.Unlock()
 		delete(dm.watchers, watcher)
 		close(watcher.feed)
-		dm.watchersMutex.Unlock()
 	}
 	go func() {
 		dm.watchersMutex.Lock()
