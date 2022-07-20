@@ -371,6 +371,8 @@ func (disc *PluggableDiscovery) Stop() error {
 
 func (disc *PluggableDiscovery) stopSync() {
 	if disc.eventChan != nil {
+		// When stopping sync send a batch of "remove" events for
+		// all the active ports.
 		for _, port := range disc.cachedPorts {
 			disc.eventChan <- &Event{"remove", port, disc.GetID()}
 		}

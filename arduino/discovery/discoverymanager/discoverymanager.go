@@ -26,16 +26,20 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// DiscoveryManager is required to handle multiple pluggable-discovery that
-// may be shared across platforms
+// DiscoveryManager manages the many-to-many communication between all pluggable
+// discoveries and all watchers. Each PluggableDiscovery, once started, will
+// produce a sequence of "events". These events will be broadcasted to all
+// listening Watcher.
+// The DiscoveryManager will not start the discoveries until the Start method
+// is called.
 type DiscoveryManager struct {
 	discoveriesMutex   sync.Mutex
-	discoveries        map[string]*discovery.PluggableDiscovery
-	discoveriesRunning bool
-	feed               chan *discovery.Event
+	discoveries        map[string]*discovery.PluggableDiscovery // all registered PluggableDiscovery
+	discoveriesRunning bool                                     // set to true once discoveries are started
+	feed               chan *discovery.Event                    // all events will pass through this channel
 	watchersMutex      sync.Mutex
-	watchers           map[*PortWatcher]bool
-	watchersCache      map[string]map[string]*discovery.Event
+	watchers           map[*PortWatcher]bool                  // all registered Watcher
+	watchersCache      map[string]map[string]*discovery.Event // this is a cache of all active ports
 }
 
 var tr = i18n.Tr
@@ -85,7 +89,7 @@ func (dm *DiscoveryManager) Start() {
 	}
 
 	go func() {
-		// Feed all watchers with data coming from the discoveries
+		// Send all events coming from the feed channel to all active watchers
 		for ev := range dm.feed {
 			dm.feedEvent(ev)
 		}
@@ -152,11 +156,13 @@ func (dm *DiscoveryManager) Watch() (*PortWatcher, error) {
 	}
 	go func() {
 		dm.watchersMutex.Lock()
+		// When a watcher is started, send all the current active ports first...
 		for _, cache := range dm.watchersCache {
 			for _, ev := range cache {
 				watcher.feed <- ev
 			}
 		}
+		// ...and after that add the watcher to the list of watchers receiving events
 		dm.watchers[watcher] = true
 		dm.watchersMutex.Unlock()
 	}()
@@ -165,6 +171,7 @@ func (dm *DiscoveryManager) Watch() (*PortWatcher, error) {
 
 func (dm *DiscoveryManager) startDiscovery(d *discovery.PluggableDiscovery) (discErr error) {
 	defer func() {
+		// If this function returns an error log it
 		if discErr != nil {
 			logrus.Errorf("Discovery %s failed to run: %s", d.GetID(), discErr)
 		}
@@ -179,6 +186,7 @@ func (dm *DiscoveryManager) startDiscovery(d *discovery.PluggableDiscovery) (dis
 	}
 
 	go func() {
+		// Transfer all incoming events from this discovery to the feed channel
 		for ev := range eventCh {
 			dm.feed <- ev
 		}
