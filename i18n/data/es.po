@@ -4,11 +4,11 @@
 # William Cabrera <cabrerawilliam@gmail.com>, 2021
 # Carlos José Banti, 2022
 # CLI team <prj_cli_team@arduino.cc>, 2022
-# Sacha Arancibia Bazan, 2022
+# Sachonidas, 2022
 # 
 msgid ""
 msgstr ""
-"Last-Translator: Sacha Arancibia Bazan, 2022\n"
+"Last-Translator: Sachonidas, 2022\n"
 "Language-Team: Spanish (https://www.transifex.com/arduino-1/teams/108174/es/)\n"
 "Language: es\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
