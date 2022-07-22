@@ -52,6 +52,7 @@ func initInstallCommand() *cobra.Command {
 			"  " + os.Args[0] + " lib install AudioZero       # " + tr("for the latest version.") + "\n" +
 			"  " + os.Args[0] + " lib install AudioZero@1.0.0 # " + tr("for the specific version.") + "\n" +
 			"  " + os.Args[0] + " lib install --git-url https://github.com/arduino-libraries/WiFi101.git https://github.com/arduino-libraries/ArduinoBLE.git\n" +
+			"  " + os.Args[0] + " lib install --git-url https://github.com/arduino-libraries/WiFi101.git#0.16.0 # " + tr("for the specific version.") + "\n" +
 			"  " + os.Args[0] + " lib install --zip-path /path/to/WiFi101.zip /path/to/ArduinoBLE.zip\n",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runInstallCommand,

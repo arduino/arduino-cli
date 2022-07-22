@@ -30,6 +30,7 @@ import (
 	"github.com/codeclysm/extract/v3"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
 type alreadyInstalledError struct{}
@@ -190,7 +191,7 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 		return fmt.Errorf(tr("User directory not set"))
 	}
 
-	libraryName, err := parseGitURL(gitURL)
+	libraryName, ref, err := parseGitURL(gitURL)
 	if err != nil {
 		logrus.
 			WithError(err).
@@ -218,9 +219,13 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 		WithField("git url", gitURL).
 		Trace("Installing library")
 
-	_, err = git.PlainClone(installPath.String(), false, &git.CloneOptions{
+	depth := 1
+	if ref != "" {
+		depth = 0
+	}
+	repo, err := git.PlainClone(installPath.String(), false, &git.CloneOptions{
 		URL:      gitURL,
-		Depth:    1,
+		Depth:    depth,
 		Progress: os.Stdout,
 	})
 	if err != nil {
@@ -228,6 +233,25 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 			WithError(err).
 			Warn("Cloning git repository")
 		return err
+	}
+
+	if ref != "" {
+		if h, err := repo.ResolveRevision(ref); err != nil {
+			logrus.
+				WithError(err).
+				Warnf("Resolving revision %s", ref)
+			return err
+		} else if w, err := repo.Worktree(); err != nil {
+			logrus.
+				WithError(err).
+				Warn("Finding worktree")
+			return err
+		} else if err := w.Checkout(&git.CheckoutOptions{Hash: plumbing.NewHash(h.String())}); err != nil {
+			logrus.
+				WithError(err).
+				Warnf("Checking out %s", h)
+			return err
+		}
 	}
 
 	if err := validateLibrary(installPath); err != nil {
@@ -243,8 +267,9 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 
 // parseGitURL tries to recover a library name from a git URL.
 // Returns an error in case the URL is not a valid git URL.
-func parseGitURL(gitURL string) (string, error) {
+func parseGitURL(gitURL string) (string, plumbing.Revision, error) {
 	var res string
+	var rev plumbing.Revision
 	if strings.HasPrefix(gitURL, "git@") {
 		// We can't parse these as URLs
 		i := strings.LastIndex(gitURL, "/")
@@ -254,10 +279,11 @@ func parseGitURL(gitURL string) (string, error) {
 	} else if parsed, err := url.Parse(gitURL); parsed.String() != "" && err == nil {
 		i := strings.LastIndex(parsed.Path, "/")
 		res = strings.TrimSuffix(parsed.Path[i+1:], ".git")
+		rev = plumbing.Revision(parsed.Fragment)
 	} else {
-		return "", fmt.Errorf(tr("invalid git url"))
+		return "", "", fmt.Errorf(tr("invalid git url"))
 	}
-	return res, nil
+	return res, rev, nil
 }
 
 // validateLibrary verifies the dir contains a valid library, meaning it has either
