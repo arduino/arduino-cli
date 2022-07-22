@@ -94,7 +94,7 @@ func (r *DownloadResource) TestLocalArchiveSize(downloadDir *paths.Path) (bool, 
 		return false, fmt.Errorf(tr("getting archive info: %s"), err)
 	}
 	if info.Size() != r.Size {
-		return false, fmt.Errorf(tr("fetched archive size differs from size specified in index"))
+		return false, fmt.Errorf("%s: %d != %d", tr("fetched archive size differs from size specified in index"), info.Size(), r.Size)
 	}
 
 	return true, nil

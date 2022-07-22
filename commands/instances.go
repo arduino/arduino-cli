@@ -238,6 +238,27 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		return pm.LoadToolsFromPackageDir(builtinPackage, pm.PackagesDir.Join("builtin", "tools"))
 	}
 
+	// Load Platforms
+	if profile == nil {
+		for _, err := range pm.LoadHardware() {
+			s := &arduino.PlatformLoadingError{Cause: err}
+			responseError(s.ToRPCStatus())
+		}
+	} else {
+		// Load platforms from profile
+		errs := pm.LoadHardwareForProfile(
+			profile, true, downloadCallback, taskCallback,
+		)
+		for _, err := range errs {
+			s := &arduino.PlatformLoadingError{Cause: err}
+			responseError(s.ToRPCStatus())
+		}
+
+		// Load "builtin" tools
+		_ = loadBuiltinTools()
+	}
+
+	// Load packages index
 	urls := []string{globals.DefaultIndexURL}
 	if profile == nil {
 		urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
@@ -263,26 +284,6 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 			s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
 			responseError(s)
 		}
-	}
-
-	// Load Platforms
-	if profile == nil {
-		for _, err := range pm.LoadHardware() {
-			s := &arduino.PlatformLoadingError{Cause: err}
-			responseError(s.ToRPCStatus())
-		}
-	} else {
-		// Load platforms from profile
-		errs := pm.LoadHardwareForProfile(
-			profile, true, downloadCallback, taskCallback,
-		)
-		for _, err := range errs {
-			s := &arduino.PlatformLoadingError{Cause: err}
-			responseError(s.ToRPCStatus())
-		}
-
-		// Load "builtin" tools
-		_ = loadBuiltinTools()
 	}
 
 	// We load hardware before verifying builtin tools are installed
