@@ -30,6 +30,8 @@ var validMap = map[string]reflect.Kind{
 	"directories.data":              reflect.String,
 	"directories.downloads":         reflect.String,
 	"directories.user":              reflect.String,
+	"directories.builtin.tools":     reflect.String,
+	"directories.builtin.libraries": reflect.String,
 	"library.enable_unsafe_install": reflect.Bool,
 	"logging.file":                  reflect.String,
 	"logging.format":                reflect.String,

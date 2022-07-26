@@ -24,12 +24,8 @@ import (
 func HardwareDirectories(settings *viper.Viper) paths.PathList {
 	res := paths.PathList{}
 
-	if IsBundledInDesktopIDE(settings) {
-		ideDir := paths.New(settings.GetString("IDE.Directory"))
-		bundledHardwareDir := ideDir.Join("hardware")
-		if bundledHardwareDir.IsDir() {
-			res.Add(bundledHardwareDir)
-		}
+	for _, bundledHardwareDir := range BuiltinToolsDirectories(Settings) {
+		res.Add(bundledHardwareDir)
 	}
 
 	if settings.IsSet("directories.Data") {
@@ -50,34 +46,15 @@ func HardwareDirectories(settings *viper.Viper) paths.PathList {
 	return res
 }
 
-// BundleToolsDirectories returns all paths that may contains bundled-tools.
-func BundleToolsDirectories(settings *viper.Viper) paths.PathList {
-	res := paths.PathList{}
-
-	if IsBundledInDesktopIDE(settings) {
-		ideDir := paths.New(settings.GetString("IDE.Directory"))
-		bundledToolsDir := ideDir.Join("hardware", "tools")
-		if bundledToolsDir.IsDir() {
-			res = append(res, bundledToolsDir)
-		}
-	}
-
-	return res
+// BuiltinToolsDirectories returns all paths that may contains bundled-tools.
+func BuiltinToolsDirectories(settings *viper.Viper) paths.PathList {
+	return paths.NewPathList(settings.GetStringSlice("directories.builtin.Tools")...)
 }
 
-// IDEBundledLibrariesDir returns the libraries directory bundled in
-// the Arduino IDE. If there is no Arduino IDE or the directory doesn't
-// exists then nil is returned
-func IDEBundledLibrariesDir(settings *viper.Viper) *paths.Path {
-	if IsBundledInDesktopIDE(settings) {
-		ideDir := paths.New(Settings.GetString("IDE.Directory"))
-		libDir := ideDir.Join("libraries")
-		if libDir.IsDir() {
-			return libDir
-		}
-	}
-
-	return nil
+// IDEBuiltinLibrariesDir returns the IDE-bundled libraries paths. Usually
+// one of these directories is present in the Arduino IDE.
+func IDEBuiltinLibrariesDir(settings *viper.Viper) paths.PathList {
+	return paths.NewPathList(Settings.GetStringSlice("directories.builtin.Libraries")...)
 }
 
 // LibrariesDir returns the full path to the user directory containing

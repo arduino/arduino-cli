@@ -19,8 +19,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"path/filepath"
-	"sort"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino"
@@ -35,7 +33,6 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
-	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 )
 
@@ -123,7 +120,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.HardwareDirs = configuration.HardwareDirectories(configuration.Settings)
-	builderCtx.BuiltInToolsDirs = configuration.BundleToolsDirectories(configuration.Settings)
+	builderCtx.BuiltInToolsDirs = configuration.BuiltinToolsDirectories(configuration.Settings)
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
@@ -164,28 +161,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		}
 	}
 
+	builderCtx.BuiltInLibrariesDirs = configuration.IDEBuiltinLibrariesDir(configuration.Settings)
+
 	// Will be deprecated.
 	builderCtx.ArduinoAPIVersion = "10607"
-
-	// Check if Arduino IDE is installed and get it's libraries location.
-	// TODO: Remove?
-	dataDir := paths.New(configuration.Settings.GetString("directories.Data"))
-	preferencesTxt := dataDir.Join("preferences.txt")
-	ideProperties, err := properties.LoadFromPath(preferencesTxt)
-	if err == nil {
-		lastIdeSubProperties := ideProperties.SubTree("last").SubTree("ide")
-		// Preferences can contain records from previous IDE versions. Find the latest one.
-		var pathVariants []string
-		for k := range lastIdeSubProperties.AsMap() {
-			if strings.HasSuffix(k, ".hardwarepath") {
-				pathVariants = append(pathVariants, k)
-			}
-		}
-		sort.Strings(pathVariants)
-		ideHardwarePath := lastIdeSubProperties.Get(pathVariants[len(pathVariants)-1])
-		ideLibrariesPath := filepath.Join(filepath.Dir(ideHardwarePath), "libraries")
-		builderCtx.BuiltInLibrariesDirs = paths.NewPathList(ideLibrariesPath)
-	}
 
 	builderCtx.Stdout = outStream
 	builderCtx.Stderr = errStream

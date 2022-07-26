@@ -38,7 +38,7 @@ func (pm *Builder) LoadHardware() []error {
 	hardwareDirs := configuration.HardwareDirectories(configuration.Settings)
 	merr := pm.LoadHardwareFromDirectories(hardwareDirs)
 
-	bundleToolDirs := configuration.BundleToolsDirectories(configuration.Settings)
+	bundleToolDirs := configuration.BuiltinToolsDirectories(configuration.Settings)
 	merr = append(merr, pm.LoadToolsFromBundleDirectories(bundleToolDirs)...)
 
 	return merr
