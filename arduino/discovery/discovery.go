@@ -247,17 +247,18 @@ func (disc *PluggableDiscovery) runProcess() error {
 		return err
 	}
 	disc.outgoingCommandsPipe = stdin
-	disc.process = proc
 
 	messageChan := make(chan *discoveryMessage)
 	disc.incomingMessagesChan = messageChan
 	go disc.jsonDecodeLoop(stdout, messageChan)
 
-	if err := disc.process.Start(); err != nil {
+	if err := proc.Start(); err != nil {
 		return err
 	}
+
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
+	disc.process = proc
 	disc.state = Alive
 	logrus.Infof("started discovery %s process", disc.id)
 	return nil
@@ -265,11 +266,13 @@ func (disc *PluggableDiscovery) runProcess() error {
 
 func (disc *PluggableDiscovery) killProcess() error {
 	logrus.Infof("killing discovery %s process", disc.id)
-	if err := disc.process.Kill(); err != nil {
-		return err
-	}
-	if err := disc.process.Wait(); err != nil {
-		return err
+	if disc.process != nil {
+		if err := disc.process.Kill(); err != nil {
+			return err
+		}
+		if err := disc.process.Wait(); err != nil {
+			return err
+		}
 	}
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
