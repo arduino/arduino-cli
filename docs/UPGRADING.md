@@ -266,6 +266,34 @@ must be changed to:
 	eventsChan, closeWatcher, err := board.Watch(req)
 ```
 
+### Removed detection of Arduino IDE bundling
+
+Arduino CLI does not check anymore if it's bundled with the Arduino IDE. Previously this check allowed the Arduino CLI
+to automatically use the libraries and tools bundled in the Arduino IDE, now this is not supported anymore unless the
+configuration keys `directories.builtin.libraries` and `directories.builtin.tools` are set.
+
+### gRPC enumeration renamed enum value in `cc.arduino.cli.commands.v1.LibraryLocation`
+
+`LIBRARY_LOCATION_IDE_BUILTIN` has been renamed to `LIBRARY_LOCATION_BUILTIN`
+
+### go-lang API change in `LibraryManager`
+
+```go
+func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesindex.Release) (*paths.Path, *libraries.Library, error) { ... }
+func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, libPath *paths.Path) error { ... ]
+```
+
+```go
+func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesindex.Release, installLocation libraries.LibraryLocation) (*paths.Path, *libraries.Library, error) { ... }
+func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, libPath *paths.Path, installLocation libraries.LibraryLocation) error { ... ]
+```
+
+### go-lang functions changes in `github.com/arduino/arduino-cli/configuration`
+
+- `github.com/arduino/arduino-cli/configuration.IsBundledInDesktopIDE` function has been removed.
+- `github.com/arduino/arduino-cli/configuration.BundleToolsDirectories` has been renamed to `BuiltinToolsDirectories`
+- `github.com/arduino/arduino-cli/configuration.IDEBundledLibrariesDir` has been renamed to `IDEBuiltinLibrariesDir`
+
 ## 0.26.0
 
 ### `github.com/arduino/arduino-cli/commands.DownloadToolRelease`, and `InstallToolRelease` functions have been removed
