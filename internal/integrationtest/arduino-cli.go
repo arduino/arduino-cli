@@ -54,6 +54,7 @@ type ArduinoCLIConfig struct {
 
 // NewArduinoCliWithinEnvironment creates a new Arduino CLI client inside the given environment.
 func NewArduinoCliWithinEnvironment(t *testing.T, config *ArduinoCLIConfig, env *Environment) *ArduinoCLI {
+	color.NoColor = false
 	cli := NewArduinoCli(t, config)
 	staging := env.downloadsDir
 	if !config.UseSharedStagingFolder {
