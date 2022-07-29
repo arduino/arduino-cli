@@ -31,7 +31,10 @@ func TestArduinoCliDaemon(t *testing.T) {
 	env := NewEnvironment(t)
 	defer env.CleanUp()
 
-	cli := NewArduinoCliWithinEnvironment(t, paths.New("..", "..", "arduino-cli"), env)
+	cli := NewArduinoCliWithinEnvironment(t, &ArduinoCLIConfig{
+		ArduinoCLIPath:         paths.New("..", "..", "arduino-cli"),
+		UseSharedStagingFolder: true,
+	}, env)
 	defer cli.CleanUp()
 
 	_, _, err := cli.Run("core", "update-index")

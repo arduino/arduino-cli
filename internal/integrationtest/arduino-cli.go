@@ -46,21 +46,31 @@ type ArduinoCLI struct {
 	daemonClient  commands.ArduinoCoreServiceClient
 }
 
+// ArduinoCLIConfig is the configuration of the ArduinoCLI client
+type ArduinoCLIConfig struct {
+	ArduinoCLIPath         *paths.Path
+	UseSharedStagingFolder bool
+}
+
 // NewArduinoCliWithinEnvironment creates a new Arduino CLI client inside the given environment.
-func NewArduinoCliWithinEnvironment(t *testing.T, cliPath *paths.Path, env *Environment) *ArduinoCLI {
-	cli := NewArduinoCli(t, cliPath)
+func NewArduinoCliWithinEnvironment(t *testing.T, config *ArduinoCLIConfig, env *Environment) *ArduinoCLI {
+	cli := NewArduinoCli(t, config)
+	staging := env.downloadsDir
+	if !config.UseSharedStagingFolder {
+		staging = env.Root().Join("arduino15/staging")
+	}
 	cli.cliEnvVars = []string{
 		fmt.Sprintf("ARDUINO_DATA_DIR=%s", env.Root().Join("arduino15")),
-		fmt.Sprintf("ARDUINO_DOWNLOADS_DIR=%s", env.Root().Join("arduino15/staging")),
+		fmt.Sprintf("ARDUINO_DOWNLOADS_DIR=%s", staging),
 		fmt.Sprintf("ARDUINO_SKETCHBOOK_DIR=%s", env.Root().Join("Arduino")),
 	}
 	return cli
 }
 
 // NewArduinoCli creates a new Arduino CLI client.
-func NewArduinoCli(t *testing.T, cliPath *paths.Path) *ArduinoCLI {
+func NewArduinoCli(t *testing.T, config *ArduinoCLIConfig) *ArduinoCLI {
 	return &ArduinoCLI{
-		path: cliPath,
+		path: config.ArduinoCLIPath,
 		t:    require.New(t),
 	}
 }
