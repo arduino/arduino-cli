@@ -1,0 +1,210 @@
+{
+  "packages": [
+    {
+      "maintainer": "Arduino",
+      "help": {
+        "online": "https://github.com/Arduino/arduino-cli"
+      },
+      "websiteURL": "https://github.com/Arduino/arduino-cli",
+      "platforms": [
+        {
+          "category": "Test Category",
+          "help": {
+            "online": "https://github.com/Arduino/arduino-cli"
+          },
+          "url": "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/core.zip",
+          "checksum": "SHA-256:6a338cf4d6d501176a2d352c87a8d72ac7488b8c5b82cdf2a4e2cef630391092",
+          "name": "test_core",
+          "version": "1.0.0",
+          "architecture": "x86",
+          "archiveFileName": "core.zip",
+          "size": "486",
+          "toolsDependencies": [],
+          "boards": [
+            {
+              "name": "Test Board"
+            }
+          ]
+        },
+        {
+          "category": "Test Category",
+          "help": {
+            "online": "https://github.com/Arduino/arduino-cli"
+          },
+          "url": "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/core.zip",
+          "checksum": "SHA-256:6a338cf4d6d501176a2d352c87a8d72ac7488b8c5b82cdf2a4e2cef630391092",
+          "name": "test_core",
+          "version": "2.0.0",
+          "architecture": "x86",
+          "archiveFileName": "core.zip",
+          "size": "486",
+          "toolsDependencies": [],
+          "boards": [
+            {
+              "name": "Test Board"
+            }
+          ]
+        }
+      ],
+      "tools": [],
+      "email": "test@example.com",
+      "name": "test"
+    },
+    {
+      "name": "zipslip",
+      "tools": [],
+      "email": "test@example.com",
+      "maintainer": "Arduino",
+      "help": {
+        "online": "https://github.com/Arduino/arduino-cli"
+      },
+      "websiteURL": "https://github.com/Arduino/arduino-cli",
+      "platforms": [
+        {
+          "category": "Zipslip Test",
+          "help": {
+            "online": "https://github.com/Arduino/arduino-cli"
+          },
+          "url": "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/evil.zip",
+          "checksum": "SHA-256:9b85dfe23f13318efc0e541327f584a0f3674a773d46a7eb8b25f0f408d07f96",
+          "name": "zipslip",
+          "version": "1.0.0",
+          "architecture": "x86",
+          "archiveFileName": "evil.zip",
+          "size": "2184",
+          "toolsDependencies": [],
+          "boards": [
+            {
+              "name": "Test Board"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "brokenchecksum",
+      "tools": [],
+      "email": "test@example.com",
+      "maintainer": "Arduino",
+      "help": {
+        "online": "https://github.com/Arduino/arduino-cli"
+      },
+      "websiteURL": "https://github.com/Arduino/arduino-cli",
+      "platforms": [
+        {
+          "category": "BrokenChecksum Test",
+          "help": {
+            "online": "https://github.com/Arduino/arduino-cli"
+          },
+          "url": "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/core.zip",
+          "checksum": "SHA-256:1a338cf4d6d501176a2d352c87a8d72ac7488b8c5b82cdf2a4e2cef630391092",
+          "name": "zipslip",
+          "version": "1.0.0",
+          "architecture": "x86",
+          "archiveFileName": "core.zip",
+          "size": "486",
+          "toolsDependencies": [],
+          "boards": [
+            {
+              "name": "Test Board"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Retrokits-RK002",
+      "maintainer": "Retrokits (www.retrokits.com)",
+      "websiteURL": "https://www.retrokits.com",
+      "email": "info@retrokits.com",
+      "help": { "online": "https://www.retrokits.com/rk002/arduino" },
+      "platforms": [
+        {
+          "name": "RK002",
+          "architecture": "arm",
+          "version": "1.0.5",
+          "category": "Contributed",
+          "help": {
+            "online": "https://www.retrokits.com/rk002/arduino"
+          },
+          "url": "https://www.retrokits.com/rk002/arduino/retrokits-rk002-1.0.5.tar.bz2",
+          "archiveFileName": "retrokits-rk002-1.0.5.tar.bz2",
+          "checksum": "SHA-256:9a012867baf4bb26f656f84502e0acce6a653c3452cca4505ebac77256802fb6",
+          "size": "290784",
+          "boards": [{ "name": "RK002" }],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "version": "4.8.3-2014q1",
+              "name": "arm-none-eabi-gcc"
+            }
+          ]
+        }
+      ],
+      "tools": []
+    },
+    {
+      "name": "Retrokits-RK002",
+      "maintainer": "Retrokits (www.retrokits.com)",
+      "websiteURL": "https://www.retrokits.com",
+      "email": "info@retrokits.com",
+      "help": { "online": "https://www.retrokits.com/rk002/arduino" },
+      "platforms": [
+        {
+          "name": "RK002",
+          "architecture": "arm",
+          "version": "1.0.6",
+          "category": "Contributed",
+          "help": {
+            "online": "https://www.retrokits.com/rk002/arduino"
+          },
+          "url": "https://www.retrokits.com/rk002/arduino/retrokits-rk002-1.0.6.tar.bz2",
+          "archiveFileName": "retrokits-rk002-1.0.6.tar.bz2",
+          "checksum": "SHA-256:8a3b63efcf4dfaed047a37844861387e542d8519485b5305d5979630cb3feb20",
+          "size": "291631",
+          "boards": [{ "name": "RK002" }],
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "version": "4.8.3-2014q1",
+              "name": "arm-none-eabi-gcc"
+            }
+          ]
+        }
+      ],
+      "tools": []
+    },
+    {
+      "name": "Package",
+      "tools": [],
+      "email": "test@example.com",
+      "maintainer": "Arduino",
+      "help": {
+        "online": "https://github.com/Arduino/arduino-cli"
+      },
+      "websiteURL": "https://github.com/Arduino/arduino-cli",
+      "platforms": [
+        {
+          "category": "Test",
+          "help": {
+            "online": "https://github.com/Arduino/arduino-cli"
+          },
+          "url": "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/core.zip",
+          "checksum": "SHA-256:6a338cf4d6d501176a2d352c87a8d72ac7488b8c5b82cdf2a4e2cef630391092",
+          "name": "Platform",
+          "version": "1.2.3",
+          "deprecated": true,
+          "architecture": "x86",
+          "archiveFileName": "core.zip",
+          "size": "486",
+          "toolsDependencies": [],
+          "boards": [
+            {
+              "name": "MyBoard"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
