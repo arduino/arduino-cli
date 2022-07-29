@@ -28,6 +28,9 @@ import (
 )
 
 func TestArduinoCliDaemon(t *testing.T) {
+	t.Skip("Deactivated for now")
+	t.SkipNow()
+
 	env := NewEnvironment(t)
 	defer env.CleanUp()
 
