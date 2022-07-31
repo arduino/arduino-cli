@@ -98,9 +98,7 @@ jobs:
         run: task test-legacy
 
       - name: Send unit tests coverage to Codecov
-        if: >
-          runner.os == 'Linux' &&
-          github.event_name == 'push'
+        if: runner.os == 'Linux'
         uses: codecov/codecov-action@v3
         with:
           file: ./coverage_unit.txt
@@ -108,9 +106,7 @@ jobs:
           fail_ci_if_error: ${{ github.repository == 'arduino/arduino-cli' }}
 
       - name: Send legacy tests coverage to Codecov
-        if: >
-          runner.os == 'Linux' &&
-          github.event_name == 'push'
+        if: runner.os == 'Linux'
         uses: codecov/codecov-action@v3
         with:
           file: ./coverage_legacy.txt
