@@ -31,6 +31,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/fatih/color"
 	"github.com/stretchr/testify/require"
+	"go.bug.st/testsuite"
 	"google.golang.org/grpc"
 )
 
@@ -53,18 +54,19 @@ type ArduinoCLIConfig struct {
 }
 
 // NewArduinoCliWithinEnvironment creates a new Arduino CLI client inside the given environment.
-func NewArduinoCliWithinEnvironment(t *testing.T, config *ArduinoCLIConfig, env *Environment) *ArduinoCLI {
+func NewArduinoCliWithinEnvironment(env *testsuite.Environment, config *ArduinoCLIConfig) *ArduinoCLI {
 	color.NoColor = false
-	cli := NewArduinoCli(t, config)
-	staging := env.downloadsDir
+	cli := NewArduinoCli(env.T(), config)
+	staging := env.SharedDownloadsDir()
 	if !config.UseSharedStagingFolder {
-		staging = env.Root().Join("arduino15/staging")
+		staging = env.RootDir().Join("arduino15/staging")
 	}
 	cli.cliEnvVars = []string{
-		fmt.Sprintf("ARDUINO_DATA_DIR=%s", env.Root().Join("arduino15")),
+		fmt.Sprintf("ARDUINO_DATA_DIR=%s", env.RootDir().Join("arduino15")),
 		fmt.Sprintf("ARDUINO_DOWNLOADS_DIR=%s", staging),
-		fmt.Sprintf("ARDUINO_SKETCHBOOK_DIR=%s", env.Root().Join("Arduino")),
+		fmt.Sprintf("ARDUINO_SKETCHBOOK_DIR=%s", env.RootDir().Join("Arduino")),
 	}
+	env.RegisterCleanUpCallback(cli.CleanUp)
 	return cli
 }
 

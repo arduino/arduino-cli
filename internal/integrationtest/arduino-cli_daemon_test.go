@@ -25,20 +25,20 @@ import (
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
+	"go.bug.st/testsuite"
 )
 
 func TestArduinoCliDaemon(t *testing.T) {
 	t.Skip("Deactivated for now")
 	t.SkipNow()
 
-	env := NewEnvironment(t)
+	env := testsuite.NewEnvironment(t)
 	defer env.CleanUp()
 
-	cli := NewArduinoCliWithinEnvironment(t, &ArduinoCLIConfig{
+	cli := NewArduinoCliWithinEnvironment(env, &ArduinoCLIConfig{
 		ArduinoCLIPath:         paths.New("..", "..", "arduino-cli"),
 		UseSharedStagingFolder: true,
-	}, env)
-	defer cli.CleanUp()
+	})
 
 	_, _, err := cli.Run("core", "update-index")
 	require.NoError(t, err)

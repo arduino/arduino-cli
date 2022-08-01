@@ -16,7 +16,6 @@
 package core_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"testing"
@@ -24,23 +23,22 @@ import (
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
-	"github.com/tidwall/gjson"
+	"go.bug.st/testsuite"
+	"go.bug.st/testsuite/requirejson"
 )
 
 func TestCoreSearch(t *testing.T) {
-	env := integrationtest.NewEnvironment(t)
+	env := testsuite.NewEnvironment(t)
 	defer env.CleanUp()
 
-	cli := integrationtest.NewArduinoCliWithinEnvironment(t, &integrationtest.ArduinoCLIConfig{
+	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
 		ArduinoCLIPath:         paths.New("..", "..", "..", "arduino-cli"),
 		UseSharedStagingFolder: true,
-	}, env)
-	defer cli.CleanUp()
+	})
 
 	// Set up an http server to serve our custom index file
 	test_index := paths.New("..", "testdata", "test_index.json")
-	url, httpClose := integrationtest.HTTPServeFile(t, 8000, test_index)
-	defer httpClose()
+	url := env.HTTPServeFile(8000, test_index)
 
 	// Run update-index with our test index
 	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url.String())
@@ -53,47 +51,22 @@ func TestCoreSearch(t *testing.T) {
 
 	out, _, err = cli.Run("core", "search", "avr", "--format", "json")
 	require.NoError(t, err)
-	data := make([]interface{}, 0)
-	require.NoError(t, json.Unmarshal(out, &data))
-	require.NotEmpty(t, data)
-	// same check using gjson lib
-	require.NotEmpty(t, gjson.ParseBytes(out).Array())
+	requirejson.NotEmpty(t, out)
 
 	// additional URL
 	out, _, err = cli.Run("core", "search", "test_core", "--format", "json", "--additional-urls="+url.String())
 	require.NoError(t, err)
-	require.NoError(t, json.Unmarshal(out, &data))
-	require.Len(t, data, 1)
+	requirejson.Len(t, out, 1)
 
 	// show all versions
 	out, _, err = cli.Run("core", "search", "test_core", "--all", "--format", "json", "--additional-urls="+url.String())
 	require.NoError(t, err)
-	require.NoError(t, json.Unmarshal(out, &data))
-	require.Len(t, data, 2)
-	// alternative check using gjson:
-	require.Len(t, gjson.ParseBytes(out).Array(), 2)
-	// alternative using gojq:
-	integrationtest.JQQuery(t, out, "length", 2)
+	requirejson.Len(t, out, 2)
+	// requirejson.Len(t, out, 3) // Test failure
 
 	checkPlatformIsInJSONOutput := func(stdout []byte, id, version string) {
-		// Alternative solution with gojq
-		jqquery := fmt.Sprintf(`contains( [{id:"%s", latest:"%s"}] )`, id, version)
-		integrationtest.JQQuery(t, out, jqquery, true, "platform %s@%s is missing from the output", id, version)
-
-		// Alternative solution with gjson
-		// query := fmt.Sprintf("#(id=%s)#|#(latest=%s)", id, version)
-		// if gjson.ParseBytes(out).Get(query).Exists() {
-		// 	return
-		// }
-		// require.FailNowf(t, "Wrong output", "platform %s@%s is missing from the output", id, version)
-
-		// Alternative solution:
-		// for _, platform := range gjson.ParseBytes(out).Array() {
-		// 	if platform.Get("id").Str == id && platform.Get("latest").Str == version {
-		// 		return
-		// 	}
-		// }
-		// require.FailNowf(t, "Wrong output", "platform %s@%s is missing from the output", id, version)
+		jqquery := fmt.Sprintf(`[{id:"%s", latest:"%s"}]`, id, version)
+		requirejson.Contains(t, out, jqquery, "platform %s@%s is missing from the output", id, version)
 	}
 
 	// Search all Retrokit platforms
@@ -127,20 +100,10 @@ func TestCoreSearch(t *testing.T) {
 		out, _, err := cli.Run(args...)
 		require.NoError(t, err)
 
-		// Alternative solution with gojq
 		for _, id := range expectedIDs {
-			jqquery := fmt.Sprintf(`contains( [{id:"%s"}] )`, id)
-			integrationtest.JQQuery(t, out, jqquery, true, "platform %s is missing from the output", id)
+			jqquery := fmt.Sprintf(`[{id:"%s"}]`, id)
+			requirejson.Contains(t, out, jqquery, "platform %s is missing from the output", id)
 		}
-
-		// Alternative solution with gjson
-		// data := gjson.ParseBytes(out)
-		// for _, expectedID := range expectedIDs {
-		// 	query := fmt.Sprintf("#(id=%s)", expectedID)
-		// 	if !data.Get(query).Exists() {
-		// 		require.FailNowf(t, "Wrong output", "platform %s is missing from the output", expectedID)
-		// 	}
-		// }
 	}
 
 	runSearch("mkr1000", "arduino:samd")
