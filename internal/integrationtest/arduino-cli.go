@@ -23,7 +23,6 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"testing"
 	"time"
 
 	"github.com/arduino/arduino-cli/executils"
@@ -42,6 +41,9 @@ type ArduinoCLI struct {
 	proc          *executils.Process
 	cliEnvVars    []string
 	cliConfigPath *paths.Path
+	stagingDir    *paths.Path
+	dataDir       *paths.Path
+	sketchbookDir *paths.Path
 	daemonAddr    string
 	daemonConn    *grpc.ClientConn
 	daemonClient  commands.ArduinoCoreServiceClient
@@ -56,26 +58,24 @@ type ArduinoCLIConfig struct {
 // NewArduinoCliWithinEnvironment creates a new Arduino CLI client inside the given environment.
 func NewArduinoCliWithinEnvironment(env *testsuite.Environment, config *ArduinoCLIConfig) *ArduinoCLI {
 	color.NoColor = false
-	cli := NewArduinoCli(env.T(), config)
-	staging := env.SharedDownloadsDir()
-	if !config.UseSharedStagingFolder {
-		staging = env.RootDir().Join("arduino15/staging")
+	cli := &ArduinoCLI{
+		path:          config.ArduinoCLIPath,
+		t:             require.New(env.T()),
+		dataDir:       env.RootDir().Join("arduino15"),
+		sketchbookDir: env.RootDir().Join("Arduino"),
+		stagingDir:    env.RootDir().Join("arduino15/staging"),
 	}
+	if config.UseSharedStagingFolder {
+		cli.stagingDir = env.SharedDownloadsDir()
+	}
+
 	cli.cliEnvVars = []string{
-		fmt.Sprintf("ARDUINO_DATA_DIR=%s", env.RootDir().Join("arduino15")),
-		fmt.Sprintf("ARDUINO_DOWNLOADS_DIR=%s", staging),
-		fmt.Sprintf("ARDUINO_SKETCHBOOK_DIR=%s", env.RootDir().Join("Arduino")),
+		fmt.Sprintf("ARDUINO_DATA_DIR=%s", cli.dataDir),
+		fmt.Sprintf("ARDUINO_DOWNLOADS_DIR=%s", cli.stagingDir),
+		fmt.Sprintf("ARDUINO_SKETCHBOOK_DIR=%s", cli.sketchbookDir),
 	}
 	env.RegisterCleanUpCallback(cli.CleanUp)
 	return cli
-}
-
-// NewArduinoCli creates a new Arduino CLI client.
-func NewArduinoCli(t *testing.T, config *ArduinoCLIConfig) *ArduinoCLI {
-	return &ArduinoCLI{
-		path: config.ArduinoCLIPath,
-		t:    require.New(t),
-	}
 }
 
 // CleanUp closes the Arduino CLI client.
@@ -84,6 +84,16 @@ func (cli *ArduinoCLI) CleanUp() {
 		cli.proc.Kill()
 		cli.proc.Wait()
 	}
+}
+
+// DataDir returns the data directory
+func (cli *ArduinoCLI) DataDir() *paths.Path {
+	return cli.dataDir
+}
+
+// SketchbookDir returns the sketchbook directory
+func (cli *ArduinoCLI) SketchbookDir() *paths.Path {
+	return cli.sketchbookDir
 }
 
 // Run executes the given arduino-cli command and returns the output.

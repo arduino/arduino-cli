@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package integrationtest
+package daemon_test
 
 import (
 	"context"
@@ -22,27 +22,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
-	"go.bug.st/testsuite"
 )
 
 func TestArduinoCliDaemon(t *testing.T) {
 	t.Skip("Deactivated for now")
 	t.SkipNow()
 
-	env := testsuite.NewEnvironment(t)
+	env, cli := createEnvForDaemon(t)
 	defer env.CleanUp()
-
-	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
-		ArduinoCLIPath:         paths.New("..", "..", "arduino-cli"),
-		UseSharedStagingFolder: true,
-	})
-
-	_, _, err := cli.Run("core", "update-index")
-	require.NoError(t, err)
 
 	_ = cli.StartDaemon(false)
 
