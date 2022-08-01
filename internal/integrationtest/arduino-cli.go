@@ -259,3 +259,26 @@ func (inst *ArduinoCLIInstance) BoardListWatch() (commands.ArduinoCoreService_Bo
 	}
 	return watcher, watcher.Send(boardListWatchReq)
 }
+
+// PlatformInstall calls the "PlatformInstall" gRPC method.
+func (inst *ArduinoCLIInstance) PlatformInstall(ctx context.Context, packager, arch, version string) (commands.ArduinoCoreService_PlatformInstallClient, error) {
+	installCl, err := inst.cli.daemonClient.PlatformInstall(ctx, &commands.PlatformInstallRequest{
+		Instance:        inst.instance,
+		PlatformPackage: packager,
+		Architecture:    arch,
+		Version:         version,
+	})
+	logCallf(">>> PlatformInstall(%v:%v %v)\n", packager, arch, version)
+	return installCl, err
+}
+
+func (inst *ArduinoCLIInstance) Compile(ctx context.Context, fqbn, sketchPath string) (commands.ArduinoCoreService_CompileClient, error) {
+	compileCl, err := inst.cli.daemonClient.Compile(ctx, &commands.CompileRequest{
+		Instance:   inst.instance,
+		Fqbn:       fqbn,
+		SketchPath: sketchPath,
+		Verbose:    true,
+	})
+	logCallf(">>> Compile(%v %v)\n", fqbn, sketchPath)
+	return compileCl, err
+}
