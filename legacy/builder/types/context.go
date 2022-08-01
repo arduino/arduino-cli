@@ -82,15 +82,16 @@ type Context struct {
 	BuildOptionsJson         string
 	BuildOptionsJsonPrevious string
 
-	PackageManager *packagemanager.PackageManager
-	Hardware       cores.Packages
-	AllTools       []*cores.ToolRelease
-	RequiredTools  []*cores.ToolRelease
-	TargetBoard    *cores.Board
-	TargetPackage  *cores.Package
-	TargetPlatform *cores.PlatformRelease
-	ActualPlatform *cores.PlatformRelease
-	USBVidPid      string
+	PackageManager             *packagemanager.PackageManager
+	Hardware                   cores.Packages
+	AllTools                   []*cores.ToolRelease
+	RequiredTools              []*cores.ToolRelease
+	TargetBoard                *cores.Board
+	TargetBoardBuildProperties *properties.Map
+	TargetPackage              *cores.Package
+	TargetPlatform             *cores.PlatformRelease
+	ActualPlatform             *cores.PlatformRelease
+	USBVidPid                  string
 
 	PlatformKeyRewrites    PlatforKeysRewrite
 	HardwareRewriteResults map[*cores.PlatformRelease][]PlatforKeyRewrite

@@ -30,9 +30,7 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 		return fmt.Errorf("%s: %w", tr("Error resolving FQBN"), err)
 	}
 
-	targetBoard.Properties = buildProperties // FIXME....
-
-	core := targetBoard.Properties.Get("build.core")
+	core := buildProperties.Get("build.core")
 	if core == "" {
 		core = "arduino"
 	}
@@ -46,6 +44,7 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 
 	ctx.BuildCore = core
 	ctx.TargetBoard = targetBoard
+	ctx.TargetBoardBuildProperties = buildProperties
 	ctx.TargetPlatform = targetPlatform
 	ctx.TargetPackage = targetPackage
 	ctx.ActualPlatform = actualPlatform

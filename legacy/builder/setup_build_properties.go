@@ -36,12 +36,11 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 
 	targetPlatform := ctx.TargetPlatform
 	actualPlatform := ctx.ActualPlatform
-	targetBoard := ctx.TargetBoard
 
 	buildProperties := properties.NewMap()
 	buildProperties.Merge(actualPlatform.Properties)
 	buildProperties.Merge(targetPlatform.Properties)
-	buildProperties.Merge(targetBoard.Properties)
+	buildProperties.Merge(ctx.TargetBoardBuildProperties)
 
 	if ctx.BuildPath != nil {
 		buildProperties.SetPath("build.path", ctx.BuildPath)
