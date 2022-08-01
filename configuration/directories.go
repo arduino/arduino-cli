@@ -24,10 +24,6 @@ import (
 func HardwareDirectories(settings *viper.Viper) paths.PathList {
 	res := paths.PathList{}
 
-	for _, bundledHardwareDir := range BuiltinToolsDirectories(Settings) {
-		res.Add(bundledHardwareDir)
-	}
-
 	if settings.IsSet("directories.Data") {
 		packagesDir := PackagesDir(Settings)
 		if packagesDir.IsDir() {
