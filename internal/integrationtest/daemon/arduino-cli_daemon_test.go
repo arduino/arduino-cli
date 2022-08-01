@@ -22,6 +22,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -35,7 +36,7 @@ func TestArduinoCliDaemon(t *testing.T) {
 	env := testsuite.NewEnvironment(t)
 	defer env.CleanUp()
 
-	cli := NewArduinoCliWithinEnvironment(env, &ArduinoCLIConfig{
+	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
 		ArduinoCLIPath:         paths.New("..", "..", "arduino-cli"),
 		UseSharedStagingFolder: true,
 	})
