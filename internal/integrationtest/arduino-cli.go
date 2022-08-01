@@ -122,8 +122,8 @@ func (cli *ArduinoCLI) Run(args ...string) ([]byte, []byte, error) {
 	return stdoutBuf.Bytes(), stderrBuf.Bytes(), cliErr
 }
 
-// StartDeamon starts the Arduino CLI daemon. It returns the address of the daemon.
-func (cli *ArduinoCLI) StartDeamon(verbose bool) string {
+// StartDaemon starts the Arduino CLI daemon. It returns the address of the daemon.
+func (cli *ArduinoCLI) StartDaemon(verbose bool) string {
 	args := []string{"daemon", "--format", "json"}
 	if cli.cliConfigPath != nil {
 		args = append([]string{"--config-file", cli.cliConfigPath.String()}, args...)

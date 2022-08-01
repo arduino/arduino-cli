@@ -44,7 +44,7 @@ func TestArduinoCliDaemon(t *testing.T) {
 	_, _, err := cli.Run("core", "update-index")
 	require.NoError(t, err)
 
-	_ = cli.StartDeamon(false)
+	_ = cli.StartDaemon(false)
 
 	inst := cli.Create()
 	require.NoError(t, inst.Init("", "", func(ir *commands.InitResponse) {
