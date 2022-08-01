@@ -42,6 +42,14 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 		ctx.Info(tr("Using core '%[1]s' from platform in folder: %[2]s", core, actualPlatform.InstallDir))
 	}
 
+	if buildProperties.Get("build.board") == "" {
+		architecture := targetBoard.PlatformRelease.Platform.Architecture
+		defaultBuildBoard := strings.ToUpper(architecture + "_" + targetBoard.BoardID)
+		buildProperties.Set("build.board", defaultBuildBoard)
+		ctx.Info(tr("Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s",
+			targetBoard.String(), "'build.board'", defaultBuildBoard))
+	}
+
 	ctx.BuildCore = core
 	ctx.TargetBoard = targetBoard
 	ctx.TargetBoardBuildProperties = buildProperties
