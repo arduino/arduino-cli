@@ -90,7 +90,9 @@ tasks:
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/test-go-task/Taskfile.yml
   go:test:
-    desc: Run unit tests
+    desc: Run unit tests and part of the integration tests
+    deps:
+      - task: go:build
     dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
       - |
