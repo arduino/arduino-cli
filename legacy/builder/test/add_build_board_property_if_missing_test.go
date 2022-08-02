@@ -61,7 +61,7 @@ func TestAddBuildBoardPropertyIfMissing(t *testing.T) {
 	require.Equal(t, "mymega", targetBoard.BoardID)
 	targetBoardBuildProperties := ctx.TargetBoardBuildProperties
 	require.Equal(t, "atmega2560", targetBoardBuildProperties.Get("build.mcu"))
-	require.Equal(t, "AVR_MYMEGA2560", targetBoardBuildProperties.Get("build.board"))
+	require.Equal(t, "AVR_MYMEGA", targetBoardBuildProperties.Get("build.board"))
 }
 
 func TestAddBuildBoardPropertyIfMissingNotMissing(t *testing.T) {
@@ -91,5 +91,5 @@ func TestAddBuildBoardPropertyIfMissingNotMissing(t *testing.T) {
 	require.Equal(t, "mymega", targetBoard.BoardID)
 	targetBoardBuildProperties := ctx.TargetBoardBuildProperties
 	require.Equal(t, "atmega1280", targetBoardBuildProperties.Get("build.mcu"))
-	require.Equal(t, "AVR_MYMEGA", targetBoardBuildProperties.Get("build.board"))
+	require.Equal(t, "MYMEGA1280", targetBoardBuildProperties.Get("build.board"))
 }

@@ -70,7 +70,8 @@ mymega.menu.cpu.atmega2560.bootloader.extended_fuses=0xFD
 mymega.menu.cpu.atmega2560.bootloader.file={bootloader._folder}/stk500boot_v2_mega2560.hex
 
 mymega.menu.cpu.atmega2560.build.mcu=atmega2560
-mymega.menu.cpu.atmega2560.build.board=AVR_MYMEGA2560
+# Do not define build.board to test autogeneration
+#mymega.menu.cpu.atmega2560.build.board=AVR_MYMEGA2560
 
 mymega.menu.cpu.atmega1280=ATmega1280
 
@@ -84,4 +85,5 @@ mymega.menu.cpu.atmega1280.bootloader.extended_fuses=0xF5
 mymega.menu.cpu.atmega1280.bootloader.file={bootloader._folder}/ATmegaBOOT_168_atmega1280.hex
 
 mymega.menu.cpu.atmega1280.build.mcu=atmega1280
-mymega.menu.cpu.atmega1280.build.board=AVR_MYMEGA
+# define custom build.board for testing
+mymega.menu.cpu.atmega1280.build.board=MYMEGA1280
