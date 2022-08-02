@@ -27,8 +27,9 @@ import (
 )
 
 func TestArduinoCliDaemon(t *testing.T) {
-	t.Skip("Deactivated for now")
-	t.SkipNow()
+	// See: https://github.com/arduino/arduino-cli/pull/1804
+
+	t.SkipNow() // TO BE Removed once the bug is fixed
 
 	env, cli := createEnvForDaemon(t)
 	defer env.CleanUp()

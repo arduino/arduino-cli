@@ -27,6 +27,11 @@ import (
 )
 
 func TestDaemonCompileOptions(t *testing.T) {
+	// See: https://github.com/arduino/arduino-cli/issues/1614
+	// See: https://github.com/arduino/arduino-cli/pull/1820
+
+	t.SkipNow() // TO BE Removed once the bug is fixed
+
 	env, cli := createEnvForDaemon(t)
 	defer env.CleanUp()
 
