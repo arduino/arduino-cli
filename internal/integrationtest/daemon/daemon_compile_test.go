@@ -38,7 +38,7 @@ func TestDaemonCompileOptions(t *testing.T) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
-	plInst, err := inst.PlatformInstall(context.Background(), "arduino", "avr", "1.8.5")
+	plInst, err := inst.PlatformInstall(context.Background(), "arduino", "avr", "1.8.5", true)
 	require.NoError(t, err)
 	for {
 		msg, err := plInst.Recv()
