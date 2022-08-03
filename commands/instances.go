@@ -21,6 +21,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -49,6 +50,7 @@ var tr = i18n.Tr
 // referenced by an int32 handle
 var instances = map[int32]*CoreInstance{}
 var instancesCount int32 = 1
+var instancesMux sync.Mutex
 
 // CoreInstance is an instance of the Arduino Core Services. The user can
 // instantiate as many as needed by providing a different configuration
@@ -66,23 +68,25 @@ type InstanceContainer interface {
 // GetInstance returns a CoreInstance for the given ID, or nil if ID
 // doesn't exist
 func GetInstance(id int32) *CoreInstance {
+	instancesMux.Lock()
+	defer instancesMux.Unlock()
 	return instances[id]
 }
 
 // GetPackageManager returns a PackageManager for the given ID, or nil if
 // ID doesn't exist
 func GetPackageManager(id int32) *packagemanager.PackageManager {
-	i, ok := instances[id]
-	if !ok {
+	i := GetInstance(id)
+	if i == nil {
 		return nil
 	}
 	return i.PackageManager
 }
 
 // GetLibraryManager returns the library manager for the given instance ID
-func GetLibraryManager(instanceID int32) *librariesmanager.LibrariesManager {
-	i, ok := instances[instanceID]
-	if !ok {
+func GetLibraryManager(id int32) *librariesmanager.LibrariesManager {
+	i := GetInstance(id)
+	if i == nil {
 		return nil
 	}
 	return i.lm
@@ -144,9 +148,11 @@ func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateRespon
 	)
 
 	// Save instance
+	instancesMux.Lock()
 	instanceID := instancesCount
 	instances[instanceID] = instance
 	instancesCount++
+	instancesMux.Unlock()
 
 	return &rpc.CreateResponse{
 		Instance: &rpc.Instance{Id: instanceID},
@@ -166,7 +172,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	if reqInst == nil {
 		return &arduino.InvalidInstanceError{}
 	}
-	instance := instances[reqInst.GetId()]
+	instance := GetInstance(reqInst.GetId())
 	if instance == nil {
 		return &arduino.InvalidInstanceError{}
 	}
@@ -413,10 +419,12 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 // Destroy FIXMEDOC
 func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse, error) {
 	id := req.GetInstance().GetId()
+
+	instancesMux.Lock()
+	defer instancesMux.Unlock()
 	if _, ok := instances[id]; !ok {
 		return nil, &arduino.InvalidInstanceError{}
 	}
-
 	delete(instances, id)
 	return &rpc.DestroyResponse{}, nil
 }
@@ -453,9 +461,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 
 // UpdateIndex FIXMEDOC
 func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rpc.DownloadProgressCB) (*rpc.UpdateIndexResponse, error) {
-	id := req.GetInstance().GetId()
-	_, ok := instances[id]
-	if !ok {
+	if GetInstance(req.GetInstance().GetId()) == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
 
