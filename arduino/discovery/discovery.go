@@ -57,7 +57,6 @@ type PluggableDiscovery struct {
 	incomingMessagesError error
 	state                 int
 	eventChan             chan<- *Event
-	cachedPorts           map[string]*Port
 }
 
 type discoveryMessage struct {
@@ -132,7 +131,6 @@ func New(id string, args ...string) *PluggableDiscovery {
 		id:          id,
 		processArgs: args,
 		state:       Dead,
-		cachedPorts: map[string]*Port{},
 	}
 }
 
@@ -177,7 +175,6 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 				return
 			}
 			disc.statusMutex.Lock()
-			disc.cachedPorts[msg.Port.Address+"|"+msg.Port.Protocol] = msg.Port
 			if disc.eventChan != nil {
 				disc.eventChan <- &Event{"add", msg.Port, disc.GetID()}
 			}
@@ -188,7 +185,6 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 				return
 			}
 			disc.statusMutex.Lock()
-			delete(disc.cachedPorts, msg.Port.Address+"|"+msg.Port.Protocol)
 			if disc.eventChan != nil {
 				disc.eventChan <- &Event{"remove", msg.Port, disc.GetID()}
 			}
@@ -371,12 +367,6 @@ func (disc *PluggableDiscovery) Stop() error {
 
 func (disc *PluggableDiscovery) stopSync() {
 	if disc.eventChan != nil {
-		// When stopping sync send a batch of "remove" events for
-		// all the active ports.
-		for _, port := range disc.cachedPorts {
-			disc.eventChan <- &Event{"remove", port, disc.GetID()}
-		}
-		disc.cachedPorts = map[string]*Port{}
 		disc.eventChan <- &Event{"stop", nil, disc.GetID()}
 		close(disc.eventChan)
 		disc.eventChan = nil
@@ -439,17 +429,4 @@ func (disc *PluggableDiscovery) StartSync(size int) (<-chan *Event, error) {
 	c := make(chan *Event, size)
 	disc.eventChan = c
 	return c, nil
-}
-
-// ListCachedPorts returns a list of the available ports. The list is a cache of all the
-// add/remove events happened from the StartSync call and it will not consume any
-// resource from the underliying discovery.
-func (disc *PluggableDiscovery) ListCachedPorts() []*Port {
-	disc.statusMutex.Lock()
-	defer disc.statusMutex.Unlock()
-	res := []*Port{}
-	for _, port := range disc.cachedPorts {
-		res = append(res, port)
-	}
-	return res
 }

@@ -214,7 +214,22 @@ func (dm *DiscoveryManager) feedEvent(ev *discovery.Event) {
 	}
 
 	if ev.Type == "stop" {
-		// Remove all the cached events for the terminating discovery
+		// Send remove events for all the cached ports of the terminating discovery
+		cache := dm.watchersCache[ev.DiscoveryID]
+		for _, addEv := range cache {
+			removeEv := &discovery.Event{
+				Type: "remove",
+				Port: &discovery.Port{
+					Address:       addEv.Port.Address,
+					AddressLabel:  addEv.Port.AddressLabel,
+					Protocol:      addEv.Port.Protocol,
+					ProtocolLabel: addEv.Port.ProtocolLabel},
+				DiscoveryID: addEv.DiscoveryID,
+			}
+			sendToAllWatchers(removeEv)
+		}
+
+		// Remove the cache for the terminating discovery
 		delete(dm.watchersCache, ev.DiscoveryID)
 		return
 	}
