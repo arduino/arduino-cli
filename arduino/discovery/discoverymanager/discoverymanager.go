@@ -198,24 +198,28 @@ func (dm *DiscoveryManager) feedEvent(ev *discovery.Event) {
 	dm.watchersMutex.Lock()
 	defer dm.watchersMutex.Unlock()
 
+	sendToAllWatchers := func(ev *discovery.Event) {
+		// Send the event to all watchers
+		for watcher := range dm.watchers {
+			select {
+			case watcher.feed <- ev:
+				// OK
+			case <-time.After(time.Millisecond * 500):
+				// If the watcher is not able to process event fast enough
+				// remove the watcher from the list of watchers
+				logrus.Info("Watcher is not able to process events fast enough, removing it from the list of watchers")
+				delete(dm.watchers, watcher)
+			}
+		}
+	}
+
 	if ev.Type == "stop" {
 		// Remove all the cached events for the terminating discovery
 		delete(dm.watchersCache, ev.DiscoveryID)
 		return
 	}
 
-	// Send the event to all watchers
-	for watcher := range dm.watchers {
-		select {
-		case watcher.feed <- ev:
-			// OK
-		case <-time.After(time.Millisecond * 500):
-			// If the watcher is not able to process event fast enough
-			// remove the watcher from the list of watchers
-			logrus.Info("Watcher is not able to process events fast enough, removing it from the list of watchers")
-			delete(dm.watchers, watcher)
-		}
-	}
+	sendToAllWatchers(ev)
 
 	// Cache the event for the discovery
 	cache := dm.watchersCache[ev.DiscoveryID]
