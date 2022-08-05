@@ -36,9 +36,9 @@ func TestGetCommandLine(t *testing.T) {
 	sketchPath := paths.New("testdata", sketch)
 	require.NoError(t, sketchPath.ToAbs())
 
-	pm := packagemanager.NewPackageManager(nil, nil, nil, nil, "test")
-	pm.LoadHardwareFromDirectory(customHardware)
-	pm.LoadHardwareFromDirectory(dataDir)
+	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test")
+	pmb.LoadHardwareFromDirectory(customHardware)
+	pmb.LoadHardwareFromDirectory(dataDir)
 
 	// Windows tools have .exe extension
 	var toolExtension = ""
@@ -61,6 +61,7 @@ func TestGetCommandLine(t *testing.T) {
 		fmt.Sprintf(" --file \"%s/arduino-test/samd/variants/arduino_zero/openocd_scripts/arduino_zero.cfg\"", customHardware) +
 		fmt.Sprintf(" -c \"gdb_port pipe\" -c \"telnet_port 0\" %s/build/arduino-test.samd.arduino_zero_edbg/hello.ino.elf", sketchPath)
 
+	pm := pmb.Build()
 	command, err := getCommandLine(req, pm)
 	require.Nil(t, err)
 	commandToTest := strings.Join(command[:], " ")

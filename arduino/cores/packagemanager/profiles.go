@@ -32,15 +32,15 @@ import (
 
 // LoadHardwareForProfile load the hardware platforms for the given profile.
 // If installMissing is true then possibly missing tools and platforms will be downloaded and installed.
-func (pm *PackageManager) LoadHardwareForProfile(p *sketch.Profile, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) []error {
-	pm.profile = p
+func (pmb *Builder) LoadHardwareForProfile(p *sketch.Profile, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) []error {
+	pmb.profile = p
 
 	// Load required platforms
 	var merr []error
 	var platformReleases []*cores.PlatformRelease
 	indexURLs := map[string]*url.URL{}
 	for _, platformRef := range p.Platforms {
-		if platformRelease, err := pm.loadProfilePlatform(platformRef, installMissing, downloadCB, taskCB); err != nil {
+		if platformRelease, err := pmb.loadProfilePlatform(platformRef, installMissing, downloadCB, taskCB); err != nil {
 			merr = append(merr, fmt.Errorf("%s: %w", tr("loading required platform %s", platformRef), err))
 			logrus.WithField("platform", platformRef).WithError(err).Debugf("Error loading platform for profile")
 		} else {
@@ -56,7 +56,7 @@ func (pm *PackageManager) LoadHardwareForProfile(p *sketch.Profile, installMissi
 
 		for _, toolDep := range platformRelease.ToolDependencies {
 			indexURL := indexURLs[toolDep.ToolPackager]
-			if err := pm.loadProfileTool(toolDep, indexURL, installMissing, downloadCB, taskCB); err != nil {
+			if err := pmb.loadProfileTool(toolDep, indexURL, installMissing, downloadCB, taskCB); err != nil {
 				merr = append(merr, fmt.Errorf("%s: %w", tr("loading required tool %s", toolDep), err))
 				logrus.WithField("tool", toolDep).WithField("index_url", indexURL).WithError(err).Debugf("Error loading tool for profile")
 			} else {
@@ -68,8 +68,8 @@ func (pm *PackageManager) LoadHardwareForProfile(p *sketch.Profile, installMissi
 	return merr
 }
 
-func (pm *PackageManager) loadProfilePlatform(platformRef *sketch.ProfilePlatformReference, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*cores.PlatformRelease, error) {
-	targetPackage := pm.Packages.GetOrCreatePackage(platformRef.Packager)
+func (pmb *Builder) loadProfilePlatform(platformRef *sketch.ProfilePlatformReference, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*cores.PlatformRelease, error) {
+	targetPackage := pmb.Packages.GetOrCreatePackage(platformRef.Packager)
 	platform := targetPackage.GetOrCreatePlatform(platformRef.Architecture)
 	release := platform.GetOrCreateRelease(platformRef.Version)
 
@@ -77,21 +77,21 @@ func (pm *PackageManager) loadProfilePlatform(platformRef *sketch.ProfilePlatfor
 	destDir := configuration.ProfilesCacheDir(configuration.Settings).Join(uid)
 	if !destDir.IsDir() && installMissing {
 		// Try installing the missing platform
-		if err := pm.installMissingProfilePlatform(platformRef, destDir, downloadCB, taskCB); err != nil {
+		if err := pmb.installMissingProfilePlatform(platformRef, destDir, downloadCB, taskCB); err != nil {
 			return nil, err
 		}
 	}
-	return release, pm.loadPlatformRelease(release, destDir)
+	return release, pmb.loadPlatformRelease(release, destDir)
 }
 
-func (pm *PackageManager) installMissingProfilePlatform(platformRef *sketch.ProfilePlatformReference, destDir *paths.Path, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+func (pmb *Builder) installMissingProfilePlatform(platformRef *sketch.ProfilePlatformReference, destDir *paths.Path, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	// Instantiate a temporary package manager only for platform installation
-	_ = pm.tempDir.MkdirAll()
-	tmp, err := paths.MkTempDir(pm.tempDir.String(), "")
+	_ = pmb.tempDir.MkdirAll()
+	tmp, err := paths.MkTempDir(pmb.tempDir.String(), "")
 	if err != nil {
 		return fmt.Errorf("installing missing platform: could not create temp dir %s", err)
 	}
-	tmpPm := NewPackageManager(tmp, tmp, pm.DownloadDir, tmp, pm.userAgent)
+	tmpPmb := NewBuilder(tmp, tmp, pmb.DownloadDir, tmp, pmb.userAgent)
 	defer tmp.RemoveAll()
 
 	// Download the main index and parse it
@@ -107,20 +107,22 @@ func (pm *PackageManager) installMissingProfilePlatform(platformRef *sketch.Prof
 			return &arduino.FailedDownloadError{Message: tr("Error downloading %s", indexURL), Cause: err}
 		}
 		indexResource := resources.IndexResource{URL: indexURL}
-		if err := indexResource.Download(tmpPm.IndexDir, downloadCB); err != nil {
+		if err := indexResource.Download(tmpPmb.IndexDir, downloadCB); err != nil {
 			taskCB(&rpc.TaskProgress{Name: tr("Error downloading %s", indexURL)})
 			return &arduino.FailedDownloadError{Message: tr("Error downloading %s", indexURL), Cause: err}
 		}
-		if err := tmpPm.LoadPackageIndex(indexURL); err != nil {
+		if err := tmpPmb.LoadPackageIndex(indexURL); err != nil {
 			taskCB(&rpc.TaskProgress{Name: tr("Error loading index %s", indexURL)})
 			return &arduino.FailedInstallError{Message: tr("Error loading index %s", indexURL), Cause: err}
 		}
 	}
 
 	// Download the platform
-	tmpTargetPackage := tmpPm.Packages.GetOrCreatePackage(platformRef.Packager)
+	tmpTargetPackage := tmpPmb.Packages.GetOrCreatePackage(platformRef.Packager)
 	tmpPlatform := tmpTargetPackage.GetOrCreatePlatform(platformRef.Architecture)
 	tmpPlatformRelease := tmpPlatform.GetOrCreateRelease(platformRef.Version)
+	tmpPm := tmpPmb.Build()
+
 	if err := tmpPm.DownloadPlatformRelease(tmpPlatformRelease, nil, downloadCB); err != nil {
 		taskCB(&rpc.TaskProgress{Name: tr("Error downloading platform %s", tmpPlatformRelease)})
 		return &arduino.FailedInstallError{Message: tr("Error downloading platform %s", tmpPlatformRelease), Cause: err}
@@ -137,8 +139,8 @@ func (pm *PackageManager) installMissingProfilePlatform(platformRef *sketch.Prof
 	return nil
 }
 
-func (pm *PackageManager) loadProfileTool(toolRef *cores.ToolDependency, indexURL *url.URL, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
-	targetPackage := pm.Packages.GetOrCreatePackage(toolRef.ToolPackager)
+func (pmb *Builder) loadProfileTool(toolRef *cores.ToolDependency, indexURL *url.URL, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+	targetPackage := pmb.Packages.GetOrCreatePackage(toolRef.ToolPackager)
 	tool := targetPackage.GetOrCreateTool(toolRef.ToolName)
 
 	uid := toolRef.InternalUniqueIdentifier(indexURL)
@@ -150,15 +152,15 @@ func (pm *PackageManager) loadProfileTool(toolRef *cores.ToolDependency, indexUR
 		if toolRelease == nil {
 			return &arduino.InvalidVersionError{Cause: fmt.Errorf(tr("version %s not found", toolRef.ToolVersion))}
 		}
-		if err := pm.installMissingProfileTool(toolRelease, destDir, downloadCB, taskCB); err != nil {
+		if err := pmb.installMissingProfileTool(toolRelease, destDir, downloadCB, taskCB); err != nil {
 			return err
 		}
 	}
 
-	return pm.loadToolReleaseFromDirectory(tool, toolRef.ToolVersion, destDir)
+	return pmb.loadToolReleaseFromDirectory(tool, toolRef.ToolVersion, destDir)
 }
 
-func (pm *PackageManager) installMissingProfileTool(toolRelease *cores.ToolRelease, destDir *paths.Path, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+func (pmb *Builder) installMissingProfileTool(toolRelease *cores.ToolRelease, destDir *paths.Path, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	// Instantiate a temporary package manager only for platform installation
 	tmp, err := paths.MkTempDir(destDir.Parent().String(), "")
 	if err != nil {
@@ -172,7 +174,7 @@ func (pm *PackageManager) installMissingProfileTool(toolRelease *cores.ToolRelea
 		return &arduino.InvalidVersionError{Cause: fmt.Errorf(tr("version %s not available for this operating system", toolRelease))}
 	}
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading tool %s", toolRelease)})
-	if err := toolResource.Download(pm.DownloadDir, nil, toolRelease.String(), downloadCB); err != nil {
+	if err := toolResource.Download(pmb.DownloadDir, nil, toolRelease.String(), downloadCB); err != nil {
 		taskCB(&rpc.TaskProgress{Name: tr("Error downloading tool %s", toolRelease)})
 		return &arduino.FailedInstallError{Message: tr("Error installing tool %s", toolRelease), Cause: err}
 	}
@@ -180,7 +182,7 @@ func (pm *PackageManager) installMissingProfileTool(toolRelease *cores.ToolRelea
 
 	// Install tool
 	taskCB(&rpc.TaskProgress{Name: tr("Installing tool %s", toolRelease)})
-	if err := toolResource.Install(pm.DownloadDir, tmp, destDir); err != nil {
+	if err := toolResource.Install(pmb.DownloadDir, tmp, destDir); err != nil {
 		taskCB(&rpc.TaskProgress{Name: tr("Error installing tool %s", toolRelease)})
 		return &arduino.FailedInstallError{Message: tr("Error installing tool %s", toolRelease), Cause: err}
 	}

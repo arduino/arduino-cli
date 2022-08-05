@@ -50,20 +50,62 @@ type PackageManager struct {
 	userAgent              string
 }
 
+// Builder is used to create a new PackageManager. The builder
+// has methods to load patforms and tools to actually build the PackageManager.
+// Once the PackageManager is built, it cannot be changed anymore.
+type Builder struct {
+	*PackageManager
+}
+
 var tr = i18n.Tr
 
-// NewPackageManager returns a new instance of the PackageManager
-func NewPackageManager(indexDir, packagesDir, downloadDir, tempDir *paths.Path, userAgent string) *PackageManager {
-	return &PackageManager{
-		log:                    logrus.StandardLogger(),
-		Packages:               cores.NewPackages(),
-		IndexDir:               indexDir,
-		PackagesDir:            packagesDir,
-		DownloadDir:            downloadDir,
-		tempDir:                tempDir,
-		CustomGlobalProperties: properties.NewMap(),
-		discoveryManager:       discoverymanager.New(),
-		userAgent:              userAgent,
+// NewBuilder returns a new Builder
+func NewBuilder(indexDir, packagesDir, downloadDir, tempDir *paths.Path, userAgent string) *Builder {
+	return &Builder{
+		PackageManager: &PackageManager{
+			log:                    logrus.StandardLogger(),
+			Packages:               cores.NewPackages(),
+			IndexDir:               indexDir,
+			PackagesDir:            packagesDir,
+			DownloadDir:            downloadDir,
+			tempDir:                tempDir,
+			CustomGlobalProperties: properties.NewMap(),
+			discoveryManager:       discoverymanager.New(),
+			userAgent:              userAgent,
+		},
+	}
+}
+
+// BuildIntoExistingPackageManager will overwrite the given PackageManager instead
+// of building a new one.
+func (pmb *Builder) BuildIntoExistingPackageManager(old *PackageManager) {
+	old.log = pmb.log
+	old.Packages = pmb.Packages
+	old.IndexDir = pmb.IndexDir
+	old.PackagesDir = pmb.PackagesDir
+	old.DownloadDir = pmb.DownloadDir
+	old.tempDir = pmb.tempDir
+	old.CustomGlobalProperties = pmb.CustomGlobalProperties
+	old.profile = pmb.profile
+	old.discoveryManager = pmb.discoveryManager
+	old.userAgent = pmb.userAgent
+}
+
+// Build builds a new PackageManager.
+func (pmb *Builder) Build() *PackageManager {
+	res := &PackageManager{}
+	pmb.BuildIntoExistingPackageManager(res)
+	return res
+}
+
+// NewBuilder creates a Builder with the same configuration
+// of this PackageManager. A "commit" function callback is returned: calling
+// this function will make the builder write the new configuration into this
+// PackageManager.
+func (pm *PackageManager) NewBuilder() (*Builder, func()) {
+	pmb := NewBuilder(pm.IndexDir, pm.PackagesDir, pm.DownloadDir, pm.tempDir, pm.userAgent)
+	return pmb, func() {
+		pmb.BuildIntoExistingPackageManager(pm)
 	}
 }
 
@@ -81,13 +123,6 @@ func (pm *PackageManager) GetEnvVarsForSpawnedProcess() []string {
 	return []string{
 		"ARDUINO_USER_AGENT=" + pm.userAgent,
 	}
-}
-
-// Clear resets the PackageManager to its initial state
-func (pm *PackageManager) Clear() {
-	pm.Packages = cores.NewPackages()
-	pm.CustomGlobalProperties = properties.NewMap()
-	pm.discoveryManager.Clear()
 }
 
 // DiscoveryManager returns the DiscoveryManager in use by this PackageManager
@@ -243,12 +278,12 @@ func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 }
 
 // LoadPackageIndex loads a package index by looking up the local cached file from the specified URL
-func (pm *PackageManager) LoadPackageIndex(URL *url.URL) error {
+func (pmb *Builder) LoadPackageIndex(URL *url.URL) error {
 	indexFileName := path.Base(URL.Path)
 	if strings.HasSuffix(indexFileName, ".tar.bz2") {
 		indexFileName = strings.TrimSuffix(indexFileName, ".tar.bz2") + ".json"
 	}
-	indexPath := pm.IndexDir.Join(indexFileName)
+	indexPath := pmb.IndexDir.Join(indexFileName)
 	index, err := packageindex.LoadIndex(indexPath)
 	if err != nil {
 		return fmt.Errorf(tr("loading json index file %[1]s: %[2]s"), indexPath, err)
@@ -258,18 +293,18 @@ func (pm *PackageManager) LoadPackageIndex(URL *url.URL) error {
 		p.URL = URL.String()
 	}
 
-	index.MergeIntoPackages(pm.Packages)
+	index.MergeIntoPackages(pmb.Packages)
 	return nil
 }
 
 // LoadPackageIndexFromFile load a package index from the specified file
-func (pm *PackageManager) LoadPackageIndexFromFile(indexPath *paths.Path) (*packageindex.Index, error) {
+func (pmb *Builder) LoadPackageIndexFromFile(indexPath *paths.Path) (*packageindex.Index, error) {
 	index, err := packageindex.LoadIndex(indexPath)
 	if err != nil {
 		return nil, fmt.Errorf(tr("loading json index file %[1]s: %[2]s"), indexPath, err)
 	}
 
-	index.MergeIntoPackages(pm.Packages)
+	index.MergeIntoPackages(pmb.Packages)
 	return index, nil
 }
 

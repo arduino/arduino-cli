@@ -119,10 +119,10 @@ func TestBoardIdentifySorting(t *testing.T) {
 	defer paths.TempDir().Join("test").RemoveAll()
 
 	// We don't really care about the paths in this case
-	pm := packagemanager.NewPackageManager(dataDir, dataDir, dataDir, dataDir, "test")
+	pmb := packagemanager.NewBuilder(dataDir, dataDir, dataDir, dataDir, "test")
 
 	// Create some boards with identical VID:PID combination
-	pack := pm.Packages.GetOrCreatePackage("packager")
+	pack := pmb.Packages.GetOrCreatePackage("packager")
 	pack.Maintainer = "NotArduino"
 	platform := pack.GetOrCreatePlatform("platform")
 	platformRelease := platform.GetOrCreateRelease(semver.MustParse("0.0.0"))
@@ -135,7 +135,7 @@ func TestBoardIdentifySorting(t *testing.T) {
 	board.Properties.Set("upload_port.pid", "0x0000")
 
 	// Create some Arduino boards with same VID:PID combination as boards created previously
-	pack = pm.Packages.GetOrCreatePackage("arduino")
+	pack = pmb.Packages.GetOrCreatePackage("arduino")
 	pack.Maintainer = "Arduino"
 	platform = pack.GetOrCreatePlatform("avr")
 	platformRelease = platform.GetOrCreateRelease(semver.MustParse("0.0.0"))
@@ -150,7 +150,8 @@ func TestBoardIdentifySorting(t *testing.T) {
 	idPrefs := properties.NewMap()
 	idPrefs.Set("vid", "0x0000")
 	idPrefs.Set("pid", "0x0000")
-	res, err := identify(pm, &discovery.Port{Properties: idPrefs})
+
+	res, err := identify(pmb.Build(), &discovery.Port{Properties: idPrefs})
 	require.NoError(t, err)
 	require.NotNil(t, res)
 	require.Len(t, res, 4)

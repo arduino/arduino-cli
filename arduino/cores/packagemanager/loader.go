@@ -34,7 +34,7 @@ import (
 )
 
 // LoadHardware read all plaforms from the configured paths
-func (pm *PackageManager) LoadHardware() []error {
+func (pm *Builder) LoadHardware() []error {
 	hardwareDirs := configuration.HardwareDirectories(configuration.Settings)
 	merr := pm.LoadHardwareFromDirectories(hardwareDirs)
 
@@ -45,7 +45,7 @@ func (pm *PackageManager) LoadHardware() []error {
 }
 
 // LoadHardwareFromDirectories load plaforms from a set of directories
-func (pm *PackageManager) LoadHardwareFromDirectories(hardwarePaths paths.PathList) []error {
+func (pm *Builder) LoadHardwareFromDirectories(hardwarePaths paths.PathList) []error {
 	var merr []error
 	for _, path := range hardwarePaths {
 		merr = append(merr, pm.LoadHardwareFromDirectory(path)...)
@@ -54,7 +54,7 @@ func (pm *PackageManager) LoadHardwareFromDirectories(hardwarePaths paths.PathLi
 }
 
 // LoadHardwareFromDirectory read a plaform from the path passed as parameter
-func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) []error {
+func (pm *Builder) LoadHardwareFromDirectory(path *paths.Path) []error {
 	var merr []error
 	pm.log.Infof("Loading hardware from: %s", path)
 	if err := path.ToAbs(); err != nil {
@@ -143,7 +143,7 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) []error {
 // loadPlatforms load plaftorms from the specified directory assuming that they belongs
 // to the targetPackage object passed as parameter.
 // A list of gRPC Status error is returned for each Platform failed to load.
-func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir *paths.Path) []error {
+func (pm *Builder) loadPlatforms(targetPackage *cores.Package, packageDir *paths.Path) []error {
 	pm.log.Infof("Loading package %s from: %s", targetPackage.Name, packageDir)
 
 	var merr []error
@@ -175,7 +175,7 @@ func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir
 // loadPlatform loads a single platform and all its installed releases given a platformPath.
 // platformPath must be a directory.
 // Returns a gRPC Status error in case of failures.
-func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, architecture string, platformPath *paths.Path) error {
+func (pm *Builder) loadPlatform(targetPackage *cores.Package, architecture string, platformPath *paths.Path) error {
 	// This is not a platform
 	if platformPath.IsNotDir() {
 		return errors.New(tr("path is not a platform directory: %s", platformPath))
@@ -284,7 +284,7 @@ func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, architectur
 	return nil
 }
 
-func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, path *paths.Path) error {
+func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *paths.Path) error {
 	platform.InstallDir = path
 
 	// Some useful paths
@@ -445,14 +445,14 @@ func convertLegacyNetworkPatternToPluggableDiscovery(props *properties.Map, newT
 	return res
 }
 
-func (pm *PackageManager) loadProgrammer(programmerProperties *properties.Map) *cores.Programmer {
+func (pm *Builder) loadProgrammer(programmerProperties *properties.Map) *cores.Programmer {
 	return &cores.Programmer{
 		Name:       programmerProperties.Get("name"),
 		Properties: programmerProperties,
 	}
 }
 
-func (pm *PackageManager) loadBoards(platform *cores.PlatformRelease) error {
+func (pm *Builder) loadBoards(platform *cores.PlatformRelease) error {
 	if platform.InstallDir == nil {
 		return fmt.Errorf(tr("platform not installed"))
 	}
@@ -596,7 +596,7 @@ func convertUploadToolsToPluggableDiscovery(props *properties.Map) {
 
 // LoadToolsFromPackageDir loads a set of tools from the given toolsPath. The tools will be loaded
 // in the given *Package.
-func (pm *PackageManager) LoadToolsFromPackageDir(targetPackage *cores.Package, toolsPath *paths.Path) []error {
+func (pm *Builder) LoadToolsFromPackageDir(targetPackage *cores.Package, toolsPath *paths.Path) []error {
 	pm.log.Infof("Loading tools from dir: %s", toolsPath)
 
 	var merr []error
@@ -617,7 +617,7 @@ func (pm *PackageManager) LoadToolsFromPackageDir(targetPackage *cores.Package, 
 	return merr
 }
 
-func (pm *PackageManager) loadToolReleasesFromTool(tool *cores.Tool, toolPath *paths.Path) error {
+func (pm *Builder) loadToolReleasesFromTool(tool *cores.Tool, toolPath *paths.Path) error {
 	toolVersions, err := toolPath.ReadDir()
 	if err != nil {
 		return err
@@ -634,7 +634,7 @@ func (pm *PackageManager) loadToolReleasesFromTool(tool *cores.Tool, toolPath *p
 	return nil
 }
 
-func (pm *PackageManager) loadToolReleaseFromDirectory(tool *cores.Tool, version *semver.RelaxedVersion, toolReleasePath *paths.Path) error {
+func (pm *Builder) loadToolReleaseFromDirectory(tool *cores.Tool, version *semver.RelaxedVersion, toolReleasePath *paths.Path) error {
 	if absToolReleasePath, err := toolReleasePath.Abs(); err != nil {
 		return errors.New(tr("error opening %s", absToolReleasePath))
 	} else if !absToolReleasePath.IsDir() {
@@ -648,7 +648,7 @@ func (pm *PackageManager) loadToolReleaseFromDirectory(tool *cores.Tool, version
 }
 
 // LoadToolsFromBundleDirectories FIXMEDOC
-func (pm *PackageManager) LoadToolsFromBundleDirectories(dirs paths.PathList) []error {
+func (pm *Builder) LoadToolsFromBundleDirectories(dirs paths.PathList) []error {
 	var merr []error
 	for _, dir := range dirs {
 		if err := pm.LoadToolsFromBundleDirectory(dir); err != nil {
@@ -659,7 +659,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectories(dirs paths.PathList) []
 }
 
 // LoadToolsFromBundleDirectory FIXMEDOC
-func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath *paths.Path) error {
+func (pm *Builder) LoadToolsFromBundleDirectory(toolsPath *paths.Path) error {
 	pm.log.Infof("Loading tools from bundle dir: %s", toolsPath)
 
 	// We scan toolsPath content to find a "builtin_tools_versions.txt", if such file exists

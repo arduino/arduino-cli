@@ -111,8 +111,8 @@ func TestLoadDiscoveries(t *testing.T) {
 	fakePath := paths.New("fake-path")
 
 	createTestPackageManager := func() *PackageManager {
-		packageManager := NewPackageManager(fakePath, fakePath, fakePath, fakePath, "test")
-		pack := packageManager.Packages.GetOrCreatePackage("arduino")
+		pmb := NewBuilder(fakePath, fakePath, fakePath, fakePath, "test")
+		pack := pmb.Packages.GetOrCreatePackage("arduino")
 		// ble-discovery tool
 		tool := pack.GetOrCreateTool("ble-discovery")
 		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
@@ -131,59 +131,59 @@ func TestLoadDiscoveries(t *testing.T) {
 		release := platform.GetOrCreateRelease(semver.MustParse("1.0.0"))
 		release.InstallDir = fakePath
 
-		return packageManager
+		return pmb.Build()
 	}
 
-	packageManager := createTestPackageManager()
-	release := packageManager.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
+	pm := createTestPackageManager()
+	release := pm.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
 	release.Properties = properties.NewFromHashmap(map[string]string{
 		"pluggable_discovery.required": "arduino:ble-discovery",
 	})
 
-	err := packageManager.LoadDiscoveries()
+	err := pm.LoadDiscoveries()
 	require.Len(t, err, 2)
 	require.Equal(t, err[0].Error(), "discovery builtin:serial-discovery not found")
 	require.Equal(t, err[1].Error(), "discovery builtin:mdns-discovery not found")
-	discoveries := packageManager.DiscoveryManager().IDs()
+	discoveries := pm.DiscoveryManager().IDs()
 	require.Len(t, discoveries, 1)
 	require.Contains(t, discoveries, "arduino:ble-discovery")
 
-	packageManager = createTestPackageManager()
-	release = packageManager.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
+	pm = createTestPackageManager()
+	release = pm.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
 	release.Properties = properties.NewFromHashmap(map[string]string{
 		"pluggable_discovery.required.0": "arduino:ble-discovery",
 		"pluggable_discovery.required.1": "arduino:serial-discovery",
 	})
 
-	err = packageManager.LoadDiscoveries()
+	err = pm.LoadDiscoveries()
 	require.Len(t, err, 2)
 	require.Equal(t, err[0].Error(), "discovery builtin:serial-discovery not found")
 	require.Equal(t, err[1].Error(), "discovery builtin:mdns-discovery not found")
-	discoveries = packageManager.DiscoveryManager().IDs()
+	discoveries = pm.DiscoveryManager().IDs()
 	require.Len(t, discoveries, 2)
 	require.Contains(t, discoveries, "arduino:ble-discovery")
 	require.Contains(t, discoveries, "arduino:serial-discovery")
 
-	packageManager = createTestPackageManager()
-	release = packageManager.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
+	pm = createTestPackageManager()
+	release = pm.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
 	release.Properties = properties.NewFromHashmap(map[string]string{
 		"pluggable_discovery.required.0":     "arduino:ble-discovery",
 		"pluggable_discovery.required.1":     "arduino:serial-discovery",
 		"pluggable_discovery.teensy.pattern": "\"{runtime.tools.teensy_ports.path}/hardware/tools/teensy_ports\" -J2",
 	})
 
-	err = packageManager.LoadDiscoveries()
+	err = pm.LoadDiscoveries()
 	require.Len(t, err, 2)
 	require.Equal(t, err[0].Error(), "discovery builtin:serial-discovery not found")
 	require.Equal(t, err[1].Error(), "discovery builtin:mdns-discovery not found")
-	discoveries = packageManager.DiscoveryManager().IDs()
+	discoveries = pm.DiscoveryManager().IDs()
 	require.Len(t, discoveries, 3)
 	require.Contains(t, discoveries, "arduino:ble-discovery")
 	require.Contains(t, discoveries, "arduino:serial-discovery")
 	require.Contains(t, discoveries, "teensy")
 
-	packageManager = createTestPackageManager()
-	release = packageManager.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
+	pm = createTestPackageManager()
+	release = pm.Packages["arduino"].Platforms["avr"].Releases["1.0.0"]
 	release.Properties = properties.NewFromHashmap(map[string]string{
 		"pluggable_discovery.required":       "arduino:some-discovery",
 		"pluggable_discovery.required.0":     "arduino:ble-discovery",
@@ -191,11 +191,11 @@ func TestLoadDiscoveries(t *testing.T) {
 		"pluggable_discovery.teensy.pattern": "\"{runtime.tools.teensy_ports.path}/hardware/tools/teensy_ports\" -J2",
 	})
 
-	err = packageManager.LoadDiscoveries()
+	err = pm.LoadDiscoveries()
 	require.Len(t, err, 2)
 	require.Equal(t, err[0].Error(), "discovery builtin:serial-discovery not found")
 	require.Equal(t, err[1].Error(), "discovery builtin:mdns-discovery not found")
-	discoveries = packageManager.DiscoveryManager().IDs()
+	discoveries = pm.DiscoveryManager().IDs()
 	require.Len(t, discoveries, 3)
 	require.Contains(t, discoveries, "arduino:ble-discovery")
 	require.Contains(t, discoveries, "arduino:serial-discovery")

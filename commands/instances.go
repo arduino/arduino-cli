@@ -135,13 +135,13 @@ func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateRespon
 	for _, ua := range extraUserAgent {
 		userAgent += " " + ua
 	}
-	instance.PackageManager = packagemanager.NewPackageManager(
+	instance.PackageManager = packagemanager.NewBuilder(
 		dataDir,
 		configuration.PackagesDir(configuration.Settings),
 		downloadsDir,
 		dataDir.Join("tmp"),
 		userAgent,
-	)
+	).Build()
 	instance.lm = librariesmanager.NewLibraryManager(
 		dataDir,
 		downloadsDir,
@@ -207,13 +207,13 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		})
 	}
 
-	// We need to clear the PackageManager currently in use by this instance
+	// We need to rebuild the PackageManager currently in use by this instance
 	// in case this is not the first Init on this instances, that might happen
 	// after reinitializing an instance after installing or uninstalling a core.
 	// If this is not done the information of the uninstall core is kept in memory,
 	// even if it should not.
-	pm := instance.PackageManager
-	pm.Clear()
+	pmb, commit := instance.PackageManager.NewBuilder()
+	defer commit()
 
 	// Try to extract profile if specified
 	var profile *sketch.Profile
@@ -238,19 +238,19 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	}
 
 	loadBuiltinTools := func() []error {
-		builtinPackage := pm.Packages.GetOrCreatePackage("builtin")
-		return pm.LoadToolsFromPackageDir(builtinPackage, pm.PackagesDir.Join("builtin", "tools"))
+		builtinPackage := pmb.Packages.GetOrCreatePackage("builtin")
+		return pmb.LoadToolsFromPackageDir(builtinPackage, pmb.PackagesDir.Join("builtin", "tools"))
 	}
 
 	// Load Platforms
 	if profile == nil {
-		for _, err := range pm.LoadHardware() {
+		for _, err := range pmb.LoadHardware() {
 			s := &arduino.PlatformLoadingError{Cause: err}
 			responseError(s.ToRPCStatus())
 		}
 	} else {
 		// Load platforms from profile
-		errs := pm.LoadHardwareForProfile(
+		errs := pmb.LoadHardwareForProfile(
 			profile, true, downloadCallback, taskCallback,
 		)
 		for _, err := range errs {
@@ -276,7 +276,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		}
 
 		if URL.Scheme == "file" {
-			_, err := pm.LoadPackageIndexFromFile(paths.New(URL.Path))
+			_, err := pmb.LoadPackageIndexFromFile(paths.New(URL.Path))
 			if err != nil {
 				s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
 				responseError(s)
@@ -284,7 +284,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 			continue
 		}
 
-		if err := pm.LoadPackageIndex(URL); err != nil {
+		if err := pmb.LoadPackageIndex(URL); err != nil {
 			s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
 			responseError(s)
 		}
@@ -295,7 +295,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	// and they would never get reloaded.
 
 	builtinToolReleases := []*cores.ToolRelease{}
-	for name, tool := range pm.Packages.GetOrCreatePackage("builtin").Tools {
+	for name, tool := range pmb.Packages.GetOrCreatePackage("builtin").Tools {
 		latestRelease := tool.LatestRelease()
 		if latestRelease == nil {
 			s := status.Newf(codes.Internal, tr("can't find latest release of tool %s", name))
@@ -326,22 +326,22 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		}
 	}
 
-	for _, err := range pm.LoadDiscoveries() {
+	for _, err := range pmb.LoadDiscoveries() {
 		s := &arduino.PlatformLoadingError{Cause: err}
 		responseError(s.ToRPCStatus())
 	}
 
 	// Create library manager and add libraries directories
 	lm := librariesmanager.NewLibraryManager(
-		pm.IndexDir,
-		pm.DownloadDir,
+		pmb.IndexDir,
+		pmb.DownloadDir,
 	)
 	instance.lm = lm
 
 	// Load libraries
-	for _, pack := range pm.Packages {
+	for _, pack := range pmb.Packages {
 		for _, platform := range pack.Platforms {
-			if platformRelease := pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
+			if platformRelease := pmb.GetInstalledPlatformRelease(platform); platformRelease != nil {
 				lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
 			}
 		}

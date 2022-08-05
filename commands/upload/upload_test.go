@@ -127,8 +127,8 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 }
 
 func TestUploadPropertiesComposition(t *testing.T) {
-	pm := packagemanager.NewPackageManager(nil, nil, nil, nil, "test")
-	errs := pm.LoadHardwareFromDirectory(paths.New("testdata", "hardware"))
+	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test")
+	errs := pmb.LoadHardwareFromDirectory(paths.New("testdata", "hardware"))
 	require.Len(t, errs, 0)
 	buildPath1 := paths.New("testdata", "build_path_1")
 	logrus.SetLevel(logrus.TraceLevel)
@@ -181,7 +181,7 @@ func TestUploadPropertiesComposition(t *testing.T) {
 		outStream := &bytes.Buffer{}
 		errStream := &bytes.Buffer{}
 		err := runProgramAction(
-			pm,
+			pmb.Build(),
 			nil,                     // sketch
 			"",                      // importFile
 			test.importDir.String(), // importDir
