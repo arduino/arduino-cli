@@ -212,7 +212,7 @@ def test_lib_download(run_command, downloads_dir):
 
 
 def test_install(run_command):
-    libs = ["AzureIoTProtocol_MQTT", "CMMC MQTT Connector", "WiFiNINA"]
+    libs = ["Arduino_BQ24195", "CMMC MQTT Connector", "WiFiNINA"]
     # Should be safe to run install multiple times
     assert run_command(["lib", "install"] + libs)
     assert run_command(["lib", "install"] + libs)
@@ -452,7 +452,7 @@ def test_update_index(run_command):
 
 
 def test_uninstall(run_command):
-    libs = ["AzureIoTProtocol_MQTT", "WiFiNINA"]
+    libs = ["Arduino_BQ24195", "WiFiNINA"]
     assert run_command(["lib", "install"] + libs)
 
     result = run_command(["lib", "uninstall"] + libs)
