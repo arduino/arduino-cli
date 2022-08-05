@@ -34,8 +34,6 @@ func TestArduinoCliDaemon(t *testing.T) {
 	env, cli := createEnvForDaemon(t)
 	defer env.CleanUp()
 
-	_ = cli.StartDaemon(false)
-
 	inst := cli.Create()
 	require.NoError(t, inst.Init("", "", func(ir *commands.InitResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
