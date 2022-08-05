@@ -68,7 +68,6 @@ func TestLoadTools(t *testing.T) {
 	}
 
 	NoError(t, (&builder.HardwareLoader{}).Run(ctx))
-	NoError(t, (&builder.ToolsLoader{}).Run(ctx))
 
 	tools := ctx.AllTools
 	require.Equal(t, 9, len(tools))
@@ -111,7 +110,6 @@ func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
 	}
 
 	NoError(t, (&builder.HardwareLoader{}).Run(ctx))
-	NoError(t, (&builder.ToolsLoader{}).Run(ctx))
 
 	tools := ctx.AllTools
 	require.Equal(t, 3, len(tools))
@@ -138,7 +136,6 @@ func TestLoadLotsOfTools(t *testing.T) {
 	}
 
 	NoError(t, (&builder.HardwareLoader{}).Run(ctx))
-	NoError(t, (&builder.ToolsLoader{}).Run(ctx))
 
 	tools := ctx.AllTools
 	require.Equal(t, 12, len(tools))

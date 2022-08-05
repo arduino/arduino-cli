@@ -39,6 +39,16 @@ func (s *HardwareLoader) Run(ctx *types.Context) error {
 				ctx.Info(tr("Error loading hardware platform: %[1]s", err.Error()))
 			}
 		}
+
+		if !ctx.CanUseCachedTools {
+			if ctx.BuiltInToolsDirs != nil {
+				pm.LoadToolsFromBundleDirectories(ctx.BuiltInToolsDirs)
+			}
+
+			ctx.AllTools = pm.GetAllInstalledToolsReleases()
+			ctx.CanUseCachedTools = true
+		}
+
 		ctx.PackageManager = pm
 	}
 	ctx.Hardware = ctx.PackageManager.Packages

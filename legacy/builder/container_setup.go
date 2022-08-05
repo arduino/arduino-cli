@@ -35,7 +35,6 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 		&PlatformKeysRewriteLoader{},
 		&RewriteHardwareKeys{},
 		&TargetBoardResolver{},
-		&ToolsLoader{},
 		&LibrariesLoader{},
 	}
 
