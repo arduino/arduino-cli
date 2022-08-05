@@ -61,12 +61,13 @@ func (p *PortProxy) Close() error {
 // Monitor opens a communication port. It returns a PortProxy to communicate with the port and a PortDescriptor
 // that describes the available configuration settings.
 func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggableMonitor.PortDescriptor, error) {
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
-	if pm == nil {
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
 		return nil, nil, &arduino.InvalidInstanceError{}
 	}
+	defer release()
 
-	m, err := findMonitorForProtocolAndBoard(pm, req.GetPort().GetProtocol(), req.GetFqbn())
+	m, err := findMonitorForProtocolAndBoard(pme, req.GetPort().GetProtocol(), req.GetFqbn())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -105,7 +106,7 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 	}, descriptor, nil
 }
 
-func findMonitorForProtocolAndBoard(pm *packagemanager.PackageManager, protocol, fqbn string) (*pluggableMonitor.PluggableMonitor, error) {
+func findMonitorForProtocolAndBoard(pme *packagemanager.Explorer, protocol, fqbn string) (*pluggableMonitor.PluggableMonitor, error) {
 	if protocol == "" {
 		return nil, &arduino.MissingPortProtocolError{}
 	}
@@ -119,7 +120,7 @@ func findMonitorForProtocolAndBoard(pm *packagemanager.PackageManager, protocol,
 			return nil, &arduino.InvalidFQBNError{Cause: err}
 		}
 
-		_, boardPlatform, _, boardProperties, _, err := pm.ResolveFQBN(fqbn)
+		_, boardPlatform, _, boardProperties, _, err := pme.ResolveFQBN(fqbn)
 		if err != nil {
 			return nil, &arduino.UnknownFQBNError{Cause: err}
 		}
@@ -140,7 +141,7 @@ func findMonitorForProtocolAndBoard(pm *packagemanager.PackageManager, protocol,
 
 	if monitorDepOrRecipe == nil {
 		// Otherwise look in all package for a suitable monitor
-		for _, platformRel := range pm.InstalledPlatformReleases() {
+		for _, platformRel := range pme.InstalledPlatformReleases() {
 			if mon, ok := platformRel.Monitors[protocol]; ok {
 				monitorDepOrRecipe = mon
 				break
@@ -153,7 +154,7 @@ func findMonitorForProtocolAndBoard(pm *packagemanager.PackageManager, protocol,
 	}
 
 	// If it is a monitor dependency, resolve tool and create a monitor client
-	tool := pm.FindMonitorDependency(monitorDepOrRecipe)
+	tool := pme.FindMonitorDependency(monitorDepOrRecipe)
 	if tool == nil {
 		return nil, &arduino.MonitorNotFoundError{Monitor: monitorDepOrRecipe.String()}
 	}

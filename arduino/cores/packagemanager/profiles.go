@@ -69,7 +69,7 @@ func (pmb *Builder) LoadHardwareForProfile(p *sketch.Profile, installMissing boo
 }
 
 func (pmb *Builder) loadProfilePlatform(platformRef *sketch.ProfilePlatformReference, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*cores.PlatformRelease, error) {
-	targetPackage := pmb.Packages.GetOrCreatePackage(platformRef.Packager)
+	targetPackage := pmb.packages.GetOrCreatePackage(platformRef.Packager)
 	platform := targetPackage.GetOrCreatePlatform(platformRef.Architecture)
 	release := platform.GetOrCreateRelease(platformRef.Version)
 
@@ -118,7 +118,7 @@ func (pmb *Builder) installMissingProfilePlatform(platformRef *sketch.ProfilePla
 	}
 
 	// Download the platform
-	tmpTargetPackage := tmpPmb.Packages.GetOrCreatePackage(platformRef.Packager)
+	tmpTargetPackage := tmpPmb.packages.GetOrCreatePackage(platformRef.Packager)
 	tmpPlatform := tmpTargetPackage.GetOrCreatePlatform(platformRef.Architecture)
 	tmpPlatformRelease := tmpPlatform.GetOrCreateRelease(platformRef.Version)
 	tmpPm := tmpPmb.Build()
@@ -140,7 +140,7 @@ func (pmb *Builder) installMissingProfilePlatform(platformRef *sketch.ProfilePla
 }
 
 func (pmb *Builder) loadProfileTool(toolRef *cores.ToolDependency, indexURL *url.URL, installMissing bool, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
-	targetPackage := pmb.Packages.GetOrCreatePackage(toolRef.ToolPackager)
+	targetPackage := pmb.packages.GetOrCreatePackage(toolRef.ToolPackager)
 	tool := targetPackage.GetOrCreateTool(toolRef.ToolName)
 
 	uid := toolRef.InternalUniqueIdentifier(indexURL)

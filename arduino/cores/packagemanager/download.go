@@ -44,7 +44,7 @@ func (platform *PlatformReference) String() string {
 // FindPlatform returns the Platform matching the PlatformReference or nil if not found.
 // The PlatformVersion field of the reference is ignored.
 func (pm *PackageManager) FindPlatform(ref *PlatformReference) *cores.Platform {
-	targetPackage, ok := pm.Packages[ref.Package]
+	targetPackage, ok := pm.packages[ref.Package]
 	if !ok {
 		return nil
 	}
@@ -71,7 +71,7 @@ func (pm *PackageManager) FindPlatformRelease(ref *PlatformReference) *cores.Pla
 // FindPlatformReleaseDependencies takes a PlatformReference and returns a set of items to download and
 // a set of outputs for non existing platforms.
 func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReference) (*cores.PlatformRelease, []*cores.ToolRelease, error) {
-	targetPackage, exists := pm.Packages[item.Package]
+	targetPackage, exists := pm.packages[item.Package]
 	if !exists {
 		return nil, nil, fmt.Errorf(tr("package %s not found"), item.Package)
 	}
@@ -94,14 +94,14 @@ func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReferenc
 	}
 
 	// replaces "latest" with latest version too
-	toolDeps, err := pm.Packages.GetPlatformReleaseToolDependencies(release)
+	toolDeps, err := pm.packages.GetPlatformReleaseToolDependencies(release)
 	if err != nil {
 		return nil, nil, fmt.Errorf(tr("getting tool dependencies for platform %[1]s: %[2]s"), release.String(), err)
 	}
 
 	// discovery dependencies differ from normal tool since we always want to use the latest
 	// available version for the platform package
-	discoveryDependencies, err := pm.Packages.GetPlatformReleaseDiscoveryDependencies(release)
+	discoveryDependencies, err := pm.packages.GetPlatformReleaseDiscoveryDependencies(release)
 	if err != nil {
 		return nil, nil, fmt.Errorf(tr("getting discovery dependencies for platform %[1]s: %[2]s"), release.String(), err)
 	}
@@ -109,7 +109,7 @@ func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReferenc
 
 	// monitor dependencies differ from normal tool since we always want to use the latest
 	// available version for the platform package
-	monitorDependencies, err := pm.Packages.GetPlatformReleaseMonitorDependencies(release)
+	monitorDependencies, err := pm.packages.GetPlatformReleaseMonitorDependencies(release)
 	if err != nil {
 		return nil, nil, fmt.Errorf(tr("getting monitor dependencies for platform %[1]s: %[2]s"), release.String(), err)
 	}

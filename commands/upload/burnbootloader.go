@@ -19,6 +19,7 @@ import (
 	"context"
 	"io"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -32,10 +33,14 @@ func BurnBootloader(ctx context.Context, req *rpc.BurnBootloaderRequest, outStre
 		WithField("programmer", req.GetProgrammer()).
 		Trace("BurnBootloader started", req.GetFqbn())
 
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
+		return nil, &arduino.InvalidInstanceError{}
+	}
+	defer release()
 
 	err := runProgramAction(
-		pm,
+		pme,
 		nil, // sketch
 		"",  // importFile
 		"",  // importDir

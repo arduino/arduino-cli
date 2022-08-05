@@ -31,18 +31,19 @@ import (
 func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse, error) {
 	searchArgs := strings.TrimSpace(req.SearchArgs)
 	allVersions := req.AllVersions
-	pm := commands.GetPackageManager(req.Instance.Id)
-	if pm == nil {
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
+	defer release()
 
 	res := []*cores.PlatformRelease{}
 	if isUsb, _ := regexp.MatchString("[0-9a-f]{4}:[0-9a-f]{4}", searchArgs); isUsb {
 		vid, pid := searchArgs[:4], searchArgs[5:]
-		res = pm.FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid)
+		res = pme.FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid)
 	} else {
 
-		for _, targetPackage := range pm.Packages {
+		for _, targetPackage := range pme.GetPackages() {
 			for _, platform := range targetPackage.Platforms {
 				// discard invalid platforms
 				// Users can install platforms manually in the Sketchbook hardware folder,

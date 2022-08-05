@@ -40,13 +40,14 @@ func TestFindBoardWithFQBN(t *testing.T) {
 	pmb := packagemanager.NewBuilder(customHardware, customHardware, customHardware, customHardware, "test")
 	pmb.LoadHardwareFromDirectory(customHardware)
 	pm := pmb.Build()
-
-	board, err := pm.FindBoardWithFQBN("arduino:avr:uno")
+	pme, release := pm.NewExplorer()
+	defer release()
+	board, err := pme.FindBoardWithFQBN("arduino:avr:uno")
 	require.Nil(t, err)
 	require.NotNil(t, board)
 	require.Equal(t, board.Name(), "Arduino/Genuino Uno")
 
-	board, err = pm.FindBoardWithFQBN("arduino:avr:mega")
+	board, err = pme.FindBoardWithFQBN("arduino:avr:mega")
 	require.Nil(t, err)
 	require.NotNil(t, board)
 	require.Equal(t, board.Name(), "Arduino/Genuino Mega or Mega 2560")
@@ -62,11 +63,13 @@ func TestResolveFQBN(t *testing.T) {
 	// This contains the referenced:avr core
 	pmb.LoadHardwareFromDirectory(extraHardware)
 	pm := pmb.Build()
+	pme, release := pm.NewExplorer()
+	defer release()
 
 	fqbn, err := cores.ParseFQBN("arduino:avr:uno")
 	require.Nil(t, err)
 	require.NotNil(t, fqbn)
-	pkg, platformRelease, board, props, buildPlatformRelease, err := pm.ResolveFQBN(fqbn)
+	pkg, platformRelease, board, props, buildPlatformRelease, err := pme.ResolveFQBN(fqbn)
 	require.Nil(t, err)
 	require.Equal(t, pkg, platformRelease.Platform.Package)
 	require.NotNil(t, platformRelease)
@@ -80,7 +83,7 @@ func TestResolveFQBN(t *testing.T) {
 	fqbn, err = cores.ParseFQBN("arduino:avr:mega")
 	require.Nil(t, err)
 	require.NotNil(t, fqbn)
-	pkg, platformRelease, board, props, buildPlatformRelease, err = pm.ResolveFQBN(fqbn)
+	pkg, platformRelease, board, props, buildPlatformRelease, err = pme.ResolveFQBN(fqbn)
 	require.Nil(t, err)
 	require.Equal(t, pkg, platformRelease.Platform.Package)
 	require.NotNil(t, platformRelease)
@@ -95,7 +98,7 @@ func TestResolveFQBN(t *testing.T) {
 	fqbn, err = cores.ParseFQBN("referenced:avr:uno")
 	require.Nil(t, err)
 	require.NotNil(t, fqbn)
-	pkg, platformRelease, board, props, buildPlatformRelease, err = pm.ResolveFQBN(fqbn)
+	pkg, platformRelease, board, props, buildPlatformRelease, err = pme.ResolveFQBN(fqbn)
 	require.Nil(t, err)
 	require.Equal(t, pkg, platformRelease.Platform.Package)
 	require.NotNil(t, platformRelease)
@@ -113,7 +116,7 @@ func TestResolveFQBN(t *testing.T) {
 	fqbn, err = cores.ParseFQBN("referenced:samd:feather_m0")
 	require.Nil(t, err)
 	require.NotNil(t, fqbn)
-	pkg, platformRelease, board, props, buildPlatformRelease, err = pm.ResolveFQBN(fqbn)
+	pkg, platformRelease, board, props, buildPlatformRelease, err = pme.ResolveFQBN(fqbn)
 	require.Nil(t, err)
 	require.Equal(t, pkg, platformRelease.Platform.Package)
 	require.NotNil(t, platformRelease)
@@ -130,7 +133,7 @@ func TestResolveFQBN(t *testing.T) {
 	fqbn, err = cores.ParseFQBN("referenced:avr:dummy_invalid_package")
 	require.Nil(t, err)
 	require.NotNil(t, fqbn)
-	pkg, platformRelease, board, props, buildPlatformRelease, err = pm.ResolveFQBN(fqbn)
+	pkg, platformRelease, board, props, buildPlatformRelease, err = pme.ResolveFQBN(fqbn)
 	require.NotNil(t, err)
 	require.Equal(t, pkg, platformRelease.Platform.Package)
 	require.NotNil(t, platformRelease)
@@ -145,7 +148,7 @@ func TestResolveFQBN(t *testing.T) {
 	fqbn, err = cores.ParseFQBN("referenced:avr:dummy_invalid_platform")
 	require.Nil(t, err)
 	require.NotNil(t, fqbn)
-	pkg, platformRelease, board, props, buildPlatformRelease, err = pm.ResolveFQBN(fqbn)
+	pkg, platformRelease, board, props, buildPlatformRelease, err = pme.ResolveFQBN(fqbn)
 	require.NotNil(t, err)
 	require.Equal(t, pkg, platformRelease.Platform.Package)
 	require.NotNil(t, platformRelease)
@@ -161,7 +164,7 @@ func TestResolveFQBN(t *testing.T) {
 	fqbn, err = cores.ParseFQBN("referenced:avr:dummy_invalid_core")
 	require.Nil(t, err)
 	require.NotNil(t, fqbn)
-	pkg, platformRelease, board, props, buildPlatformRelease, err = pm.ResolveFQBN(fqbn)
+	pkg, platformRelease, board, props, buildPlatformRelease, err = pme.ResolveFQBN(fqbn)
 	require.Nil(t, err)
 	require.Equal(t, pkg, platformRelease.Platform.Package)
 	require.NotNil(t, platformRelease)
@@ -179,8 +182,10 @@ func TestBoardOptionsFunctions(t *testing.T) {
 	pmb := packagemanager.NewBuilder(customHardware, customHardware, customHardware, customHardware, "test")
 	pmb.LoadHardwareFromDirectory(customHardware)
 	pm := pmb.Build()
+	pme, release := pm.NewExplorer()
+	defer release()
 
-	nano, err := pm.FindBoardWithFQBN("arduino:avr:nano")
+	nano, err := pme.FindBoardWithFQBN("arduino:avr:nano")
 	require.Nil(t, err)
 	require.NotNil(t, nano)
 	require.Equal(t, nano.Name(), "Arduino Nano")
@@ -196,7 +201,7 @@ func TestBoardOptionsFunctions(t *testing.T) {
 	expectedNanoCPUValues.Set("atmega168", "ATmega168")
 	require.EqualValues(t, expectedNanoCPUValues, nanoCPUValues)
 
-	esp8266, err := pm.FindBoardWithFQBN("esp8266:esp8266:generic")
+	esp8266, err := pme.FindBoardWithFQBN("esp8266:esp8266:generic")
 	require.Nil(t, err)
 	require.NotNil(t, esp8266)
 	require.Equal(t, esp8266.Name(), "Generic ESP8266 Module")
@@ -237,16 +242,18 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	// because of malformed menus
 	pmb.LoadHardware()
 	pm := pmb.Build()
+	pme, release := pm.NewExplorer()
+	defer release()
 
-	esp32, err := pm.FindBoardWithFQBN("esp32:esp32:esp32")
+	esp32, err := pme.FindBoardWithFQBN("esp32:esp32:esp32")
 	require.NoError(t, err)
-	esptool231 := pm.FindToolDependency(&cores.ToolDependency{
+	esptool231 := pme.FindToolDependency(&cores.ToolDependency{
 		ToolPackager: "esp32",
 		ToolName:     "esptool",
 		ToolVersion:  semver.ParseRelaxed("2.3.1"),
 	})
 	require.NotNil(t, esptool231)
-	esptool0413 := pm.FindToolDependency(&cores.ToolDependency{
+	esptool0413 := pme.FindToolDependency(&cores.ToolDependency{
 		ToolPackager: "esp8266",
 		ToolName:     "esptool",
 		ToolVersion:  semver.ParseRelaxed("0.4.13"),
@@ -254,7 +261,7 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	require.NotNil(t, esptool0413)
 
 	testConflictingToolsInDifferentPackages := func() {
-		tools, err := pm.FindToolsRequiredForBoard(esp32)
+		tools, err := pme.FindToolsRequiredForBoard(esp32)
 		require.NoError(t, err)
 		require.Contains(t, tools, esptool231)
 		require.NotContains(t, tools, esptool0413)
@@ -274,22 +281,22 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	testConflictingToolsInDifferentPackages()
 	testConflictingToolsInDifferentPackages()
 
-	feather, err := pm.FindBoardWithFQBN("adafruit:samd:adafruit_feather_m0_express")
+	feather, err := pme.FindBoardWithFQBN("adafruit:samd:adafruit_feather_m0_express")
 	require.NoError(t, err)
 	require.NotNil(t, feather)
-	featherTools, err := pm.FindToolsRequiredForBoard(feather)
+	featherTools, err := pme.FindToolsRequiredForBoard(feather)
 	require.NoError(t, err)
 	require.NotNil(t, featherTools)
 
 	// Test when a package index requires two different version of the same tool
 	// See: https://github.com/arduino/arduino-cli/issues/166#issuecomment-528295989
-	bossac17 := pm.FindToolDependency(&cores.ToolDependency{
+	bossac17 := pme.FindToolDependency(&cores.ToolDependency{
 		ToolPackager: "arduino",
 		ToolName:     "bossac",
 		ToolVersion:  semver.ParseRelaxed("1.7.0"),
 	})
 	require.NotNil(t, bossac17)
-	bossac18 := pm.FindToolDependency(&cores.ToolDependency{
+	bossac18 := pme.FindToolDependency(&cores.ToolDependency{
 		ToolPackager: "arduino",
 		ToolName:     "bossac",
 		ToolVersion:  semver.ParseRelaxed("1.8.0-48-gb176eee"),
@@ -310,9 +317,11 @@ func TestIdentifyBoard(t *testing.T) {
 	pmb := packagemanager.NewBuilder(customHardware, customHardware, customHardware, customHardware, "test")
 	pmb.LoadHardwareFromDirectory(customHardware)
 	pm := pmb.Build()
+	pme, release := pm.NewExplorer()
+	defer release()
 
 	identify := func(vid, pid string) []*cores.Board {
-		return pm.IdentifyBoard(properties.NewFromHashmap(map[string]string{
+		return pme.IdentifyBoard(properties.NewFromHashmap(map[string]string{
 			"vid": vid, "pid": pid,
 		}))
 	}
@@ -355,7 +364,7 @@ func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 	fakePath := paths.New("fake-path")
 
 	pmb := packagemanager.NewBuilder(fakePath, fakePath, fakePath, fakePath, "test")
-	pack := pmb.Packages.GetOrCreatePackage("arduino")
+	pack := pmb.GetOrCreatePackage("arduino")
 
 	{
 		// some tool
@@ -449,7 +458,9 @@ func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 	release.InstallDir = fakePath
 
 	pm := pmb.Build()
-	tools, err := pm.FindToolsRequiredFromPlatformRelease(release)
+	pme, pmeRelease := pm.NewExplorer()
+	defer pmeRelease()
+	tools, err := pme.FindToolsRequiredFromPlatformRelease(release)
 	require.NoError(t, err)
 	require.Len(t, tools, 6)
 }
@@ -472,11 +483,14 @@ func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 	// Hardware from main packages directory
 	pmb.LoadHardwareFromDirectory(dataDir1.Join("packages"))
 	pm := pmb.Build()
+	pme, release := pm.NewExplorer()
+	defer release()
+
 	{
 		fqbn, err := cores.ParseFQBN("esp32:esp32:esp32")
 		require.NoError(t, err)
 		require.NotNil(t, fqbn)
-		_, platformRelease, board, _, _, err := pm.ResolveFQBN(fqbn)
+		_, platformRelease, board, _, _, err := pme.ResolveFQBN(fqbn)
 		require.NoError(t, err)
 
 		require.Equal(t, "esptool__pluggable_network", board.Properties.Get("upload.tool.network"))
@@ -499,7 +513,7 @@ func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 		fqbn, err := cores.ParseFQBN("esp8266:esp8266:generic")
 		require.NoError(t, err)
 		require.NotNil(t, fqbn)
-		_, platformRelease, board, _, _, err := pm.ResolveFQBN(fqbn)
+		_, platformRelease, board, _, _, err := pme.ResolveFQBN(fqbn)
 		require.NoError(t, err)
 		require.Equal(t, "esptool__pluggable_network", board.Properties.Get("upload.tool.network"))
 		require.Equal(t, "generic", board.Properties.Get("upload_port.0.board"))
@@ -521,7 +535,7 @@ func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 		fqbn, err := cores.ParseFQBN("arduino:avr:uno")
 		require.NoError(t, err)
 		require.NotNil(t, fqbn)
-		_, platformRelease, board, _, _, err := pm.ResolveFQBN(fqbn)
+		_, platformRelease, board, _, _, err := pme.ResolveFQBN(fqbn)
 		require.NoError(t, err)
 		require.Equal(t, "avrdude__pluggable_network", board.Properties.Get("upload.tool.network"))
 		require.Equal(t, "uno", board.Properties.Get("upload_port.4.board"))

@@ -45,12 +45,16 @@ func (s *HardwareLoader) Run(ctx *types.Context) error {
 				pmb.LoadToolsFromBundleDirectories(ctx.BuiltInToolsDirs)
 			}
 
-			ctx.AllTools = pmb.GetAllInstalledToolsReleases()
 			ctx.CanUseCachedTools = true
 		}
 
-		ctx.PackageManager = pmb.Build()
+		pm := pmb.Build()
+		pme, _ /* never release... */ := pm.NewExplorer()
+
+		ctx.AllTools = pme.GetAllInstalledToolsReleases()
+		ctx.PackageManager = pme
 	}
-	ctx.Hardware = ctx.PackageManager.Packages
+
+	ctx.Hardware = ctx.PackageManager.GetPackages()
 	return nil
 }

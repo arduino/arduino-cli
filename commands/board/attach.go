@@ -37,10 +37,11 @@ var tr = i18n.Tr
 
 // Attach FIXMEDOC
 func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB rpc.TaskProgressCB) (*rpc.BoardAttachResponse, error) {
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
-	if pm == nil {
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
+	defer release()
 	var sketchPath *paths.Path
 	if req.GetSketchPath() != "" {
 		sketchPath = paths.New(req.GetSketchPath())
@@ -66,7 +67,7 @@ func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB rpc.TaskPro
 			return nil, &arduino.InvalidArgumentError{Message: tr("Invalid Device URL format"), Cause: err}
 		}
 
-		var findBoardFunc func(*packagemanager.PackageManager, *discovery.Monitor, *url.URL) *cores.Board
+		var findBoardFunc func(*packagemanager.Explorer, *discovery.Monitor, *url.URL) *cores.Board
 		switch deviceURI.Scheme {
 		case "serial", "tty":
 			findBoardFunc = findSerialConnectedBoard
@@ -87,7 +88,7 @@ func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB rpc.TaskPro
 		time.Sleep(duration)
 
 		// TODO: Handle the case when no board is found.
-		board := findBoardFunc(pm, monitor, deviceURI)
+		board := findBoardFunc(pme, monitor, deviceURI)
 		if board == nil {
 			return nil, &arduino.InvalidArgumentError{Message: tr("No supported board found at %s", deviceURI)}
 		}
@@ -113,7 +114,7 @@ func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB rpc.TaskPro
 // FIXME: Those should probably go in a "BoardManager" pkg or something
 // findSerialConnectedBoard find the board which is connected to the specified URI via serial port, using a monitor and a set of Boards
 // for the matching.
-func findSerialConnectedBoard(pm *packagemanager.PackageManager, monitor *discovery.Monitor, deviceURI *url.URL) *cores.Board {
+func findSerialConnectedBoard(pme *packagemanager.Explorer, monitor *discovery.Monitor, deviceURI *url.URL) *cores.Board {
 	found := false
 	// to support both cases:
 	// serial:///dev/ttyACM2 parsing gives: deviceURI.Host = ""      and deviceURI.Path = /dev/ttyACM2
@@ -131,7 +132,7 @@ func findSerialConnectedBoard(pm *packagemanager.PackageManager, monitor *discov
 		return nil
 	}
 
-	boards := pm.FindBoardsWithVidPid(serialDevice.VendorID, serialDevice.ProductID)
+	boards := pme.FindBoardsWithVidPid(serialDevice.VendorID, serialDevice.ProductID)
 	if len(boards) == 0 {
 		return nil
 	}
@@ -141,7 +142,7 @@ func findSerialConnectedBoard(pm *packagemanager.PackageManager, monitor *discov
 
 // findNetworkConnectedBoard find the board which is connected to the specified URI on the network, using a monitor and a set of Boards
 // for the matching.
-func findNetworkConnectedBoard(pm *packagemanager.PackageManager, monitor *discovery.Monitor, deviceURI *url.URL) *cores.Board {
+func findNetworkConnectedBoard(pme *packagemanager.Explorer, monitor *discovery.Monitor, deviceURI *url.URL) *cores.Board {
 	found := false
 
 	var networkDevice discovery.NetworkDevice
@@ -158,7 +159,7 @@ func findNetworkConnectedBoard(pm *packagemanager.PackageManager, monitor *disco
 		return nil
 	}
 
-	boards := pm.FindBoardsWithID(networkDevice.Name)
+	boards := pme.FindBoardsWithID(networkDevice.Name)
 	if len(boards) == 0 {
 		return nil
 	}

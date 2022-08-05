@@ -45,8 +45,13 @@ var tr = i18n.Tr
 func Debug(ctx context.Context, req *dbg.DebugConfigRequest, inStream io.Reader, out io.Writer, interrupt <-chan os.Signal) (*dbg.DebugResponse, error) {
 
 	// Get debugging command line to run debugger
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
-	commandLine, err := getCommandLine(req, pm)
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
+		return nil, &arduino.InvalidInstanceError{}
+	}
+	defer release()
+
+	commandLine, err := getCommandLine(req, pme)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +67,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigRequest, inStream io.Reader,
 	}
 	entry.Debug("Executing debugger")
 
-	cmd, err := executils.NewProcess(pm.GetEnvVarsForSpawnedProcess(), commandLine...)
+	cmd, err := executils.NewProcess(pme.GetEnvVarsForSpawnedProcess(), commandLine...)
 	if err != nil {
 		return nil, &arduino.FailedDebugError{Message: tr("Cannot execute debug tool"), Cause: err}
 	}
@@ -112,8 +117,8 @@ func Debug(ctx context.Context, req *dbg.DebugConfigRequest, inStream io.Reader,
 }
 
 // getCommandLine compose a debug command represented by a core recipe
-func getCommandLine(req *dbg.DebugConfigRequest, pm *packagemanager.PackageManager) ([]string, error) {
-	debugInfo, err := getDebugProperties(req, pm)
+func getCommandLine(req *dbg.DebugConfigRequest, pme *packagemanager.Explorer) ([]string, error) {
+	debugInfo, err := getDebugProperties(req, pme)
 	if err != nil {
 		return nil, err
 	}

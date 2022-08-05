@@ -28,15 +28,16 @@ import (
 // GetPlatforms returns a list of installed platforms, optionally filtered by
 // those requiring an update.
 func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, error) {
-	packageManager := commands.GetPackageManager(req.GetInstance().Id)
-	if packageManager == nil {
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
+	defer release()
 
 	res := []*rpc.Platform{}
-	for _, targetPackage := range packageManager.Packages {
+	for _, targetPackage := range pme.GetPackages() {
 		for _, platform := range targetPackage.Platforms {
-			platformRelease := packageManager.GetInstalledPlatformRelease(platform)
+			platformRelease := pme.GetInstalledPlatformRelease(platform)
 
 			// The All flags adds to the list of installed platforms the installable platforms (from the indexes)
 			// If both All and UpdatableOnly are set All takes precedence

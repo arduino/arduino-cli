@@ -177,11 +177,15 @@ func TestUploadPropertiesComposition(t *testing.T) {
 			"BURN conf-board1 conf-two-general conf-two-bootloader $$VERBOSE-VERIFY$$ prog4protocol-bootloader port -bspeed -F0xFF " + cwd + "/testdata/hardware/alice/avr/bootloaders/niceboot/niceboot.hex\n"},
 	}
 
+	pm := pmb.Build()
+	pme, release := pm.NewExplorer()
+	defer release()
+
 	testRunner := func(t *testing.T, test test, verboseVerify bool) {
 		outStream := &bytes.Buffer{}
 		errStream := &bytes.Buffer{}
 		err := runProgramAction(
-			pmb.Build(),
+			pme,
 			nil,                     // sketch
 			"",                      // importFile
 			test.importDir.String(), // importDir

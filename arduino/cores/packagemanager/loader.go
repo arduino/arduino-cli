@@ -81,7 +81,7 @@ func (pm *Builder) LoadHardwareFromDirectory(path *paths.Path) []error {
 		if p, err := properties.LoadFromPath(globalPlatformTxt); err != nil {
 			pm.log.WithError(err).Errorf("Error loading properties.")
 		} else {
-			pm.CustomGlobalProperties.Merge(p)
+			pm.packagesCustomGlobalProperties.Merge(p)
 		}
 	}
 
@@ -121,7 +121,7 @@ func (pm *Builder) LoadHardwareFromDirectory(path *paths.Path) []error {
 			architectureParentPath = packagerPath
 		}
 
-		targetPackage := pm.Packages.GetOrCreatePackage(packager)
+		targetPackage := pm.packages.GetOrCreatePackage(packager)
 		merr = append(merr, pm.loadPlatforms(targetPackage, architectureParentPath)...)
 
 		// Check if we have tools to load, the directory structure is as follows:
@@ -133,7 +133,7 @@ func (pm *Builder) LoadHardwareFromDirectory(path *paths.Path) []error {
 		}
 		// If the Package does not contain Platforms or Tools we remove it since does not contain anything valuable
 		if len(targetPackage.Platforms) == 0 && len(targetPackage.Tools) == 0 {
-			delete(pm.Packages, packager)
+			delete(pm.packages, packager)
 		}
 	}
 
@@ -706,7 +706,7 @@ func (pm *Builder) LoadToolsFromBundleDirectory(toolsPath *paths.Path) error {
 		}
 
 		for packager, toolsData := range all.FirstLevelOf() {
-			targetPackage := pm.Packages.GetOrCreatePackage(packager)
+			targetPackage := pm.packages.GetOrCreatePackage(packager)
 
 			for toolName, toolVersion := range toolsData.AsMap() {
 				tool := targetPackage.GetOrCreateTool(toolName)
@@ -718,7 +718,7 @@ func (pm *Builder) LoadToolsFromBundleDirectory(toolsPath *paths.Path) error {
 		}
 	} else {
 		// otherwise load the tools inside the unnamed package
-		unnamedPackage := pm.Packages.GetOrCreatePackage("")
+		unnamedPackage := pm.packages.GetOrCreatePackage("")
 		pm.LoadToolsFromPackageDir(unnamedPackage, toolsPath)
 	}
 	return nil
@@ -729,18 +729,18 @@ func (pm *Builder) LoadToolsFromBundleDirectory(toolsPath *paths.Path) error {
 // * A PluggableDiscovery instance can't be created
 // * Tools required by the PlatformRelease cannot be found
 // * Command line to start PluggableDiscovery has malformed or mismatched quotes
-func (pm *PackageManager) LoadDiscoveries() []error {
+func (pme *Explorer) LoadDiscoveries() []error {
 	var merr []error
-	for _, platform := range pm.InstalledPlatformReleases() {
-		merr = append(merr, pm.loadDiscoveries(platform)...)
+	for _, platform := range pme.InstalledPlatformReleases() {
+		merr = append(merr, pme.loadDiscoveries(platform)...)
 	}
-	merr = append(merr, pm.loadBuiltinDiscoveries()...)
+	merr = append(merr, pme.loadBuiltinDiscoveries()...)
 	return merr
 }
 
 // loadDiscovery loads the discovery tool with id, if it cannot be found a non-nil status is returned
-func (pm *PackageManager) loadDiscovery(id string) error {
-	tool := pm.GetTool(id)
+func (pme *Explorer) loadDiscovery(id string) error {
+	tool := pme.GetTool(id)
 	if tool == nil {
 		return errors.New(tr("discovery %s not found", id))
 	}
@@ -750,22 +750,22 @@ func (pm *PackageManager) loadDiscovery(id string) error {
 	}
 	discoveryPath := toolRelease.InstallDir.Join(tool.Name).String()
 	d := discovery.New(id, discoveryPath)
-	pm.discoveryManager.Add(d)
+	pme.discoveryManager.Add(d)
 	return nil
 }
 
 // loadBuiltinDiscoveries loads the discovery tools that are part of the builtin package
-func (pm *PackageManager) loadBuiltinDiscoveries() []error {
+func (pme *Explorer) loadBuiltinDiscoveries() []error {
 	var merr []error
 	for _, id := range []string{"builtin:serial-discovery", "builtin:mdns-discovery"} {
-		if err := pm.loadDiscovery(id); err != nil {
+		if err := pme.loadDiscovery(id); err != nil {
 			merr = append(merr, err)
 		}
 	}
 	return merr
 }
 
-func (pm *PackageManager) loadDiscoveries(release *cores.PlatformRelease) []error {
+func (pme *Explorer) loadDiscoveries(release *cores.PlatformRelease) []error {
 	var merr []error
 	discoveryProperties := release.Properties.SubTree("pluggable_discovery")
 
@@ -784,7 +784,7 @@ func (pm *PackageManager) loadDiscoveries(release *cores.PlatformRelease) []erro
 	//
 	// If both indexed and unindexed properties are found the unindexed are ignored
 	for _, id := range discoveryProperties.ExtractSubIndexLists("required") {
-		if err := pm.loadDiscovery(id); err != nil {
+		if err := pme.loadDiscovery(id); err != nil {
 			merr = append(merr, err)
 		}
 	}
@@ -799,7 +799,7 @@ func (pm *PackageManager) loadDiscoveries(release *cores.PlatformRelease) []erro
 	var tools []*cores.ToolRelease
 	if len(discoveryIDs) > 0 {
 		var err error
-		tools, err = pm.FindToolsRequiredFromPlatformRelease(release)
+		tools, err = pme.FindToolsRequiredFromPlatformRelease(release)
 		if err != nil {
 			merr = append(merr, err)
 		}
@@ -827,7 +827,7 @@ func (pm *PackageManager) loadDiscoveries(release *cores.PlatformRelease) []erro
 			merr = append(merr, err)
 		} else {
 			d := discovery.New(discoveryID, cmdArgs...)
-			pm.discoveryManager.Add(d)
+			pme.discoveryManager.Add(d)
 		}
 	}
 

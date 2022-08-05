@@ -57,10 +57,12 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		exportBinaries = reqExportBinaries.Value
 	}
 
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
-	if pm == nil {
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
+	defer release()
+
 	lm := commands.GetLibraryManager(req.GetInstance().GetId())
 	if lm == nil {
 		return nil, &arduino.InvalidInstanceError{}
@@ -89,11 +91,11 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		return nil, &arduino.InvalidFQBNError{Cause: err}
 	}
 
-	targetPlatform := pm.FindPlatform(&packagemanager.PlatformReference{
+	targetPlatform := pme.FindPlatform(&packagemanager.PlatformReference{
 		Package:              fqbn.Package,
 		PlatformArchitecture: fqbn.PlatformArch,
 	})
-	if targetPlatform == nil || pm.GetInstalledPlatformRelease(targetPlatform) == nil {
+	if targetPlatform == nil || pme.GetInstalledPlatformRelease(targetPlatform) == nil {
 		return nil, &arduino.PlatformNotFoundError{
 			Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
 			Cause:    fmt.Errorf(tr("platform not installed")),
@@ -110,8 +112,8 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	}
 
 	builderCtx := &types.Context{}
-	builderCtx.PackageManager = pm
-	if pm.GetProfile() != nil {
+	builderCtx.PackageManager = pme
+	if pme.GetProfile() != nil {
 		builderCtx.LibrariesManager = lm
 	}
 	builderCtx.UseCachedLibrariesResolution = req.GetSkipLibrariesDiscovery()

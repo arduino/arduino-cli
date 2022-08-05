@@ -29,10 +29,11 @@ import (
 func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
 	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformInstallResponse, error) {
 
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
-	if pm == nil {
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
+	defer release()
 
 	version, err := commands.ParseVersion(req)
 	if err != nil {
@@ -44,7 +45,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
 		PlatformArchitecture: req.Architecture,
 		PlatformVersion:      version,
 	}
-	platformRelease, tools, err := pm.FindPlatformReleaseDependencies(ref)
+	platformRelease, tools, err := pme.FindPlatformReleaseDependencies(ref)
 	if err != nil {
 		return nil, &arduino.PlatformNotFoundError{Platform: ref.String(), Cause: err}
 	}
@@ -56,14 +57,14 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
 	}
 
 	if req.GetNoOverwrite() {
-		if installed := pm.GetInstalledPlatformRelease(platformRelease.Platform); installed != nil {
+		if installed := pme.GetInstalledPlatformRelease(platformRelease.Platform); installed != nil {
 			return nil, fmt.Errorf("%s: %s",
 				tr("Platform %s already installed", installed),
 				tr("could not overwrite"))
 		}
 	}
 
-	if err := pm.DownloadAndInstallPlatformAndTools(platformRelease, tools, downloadCB, taskCB, req.GetSkipPostInstall()); err != nil {
+	if err := pme.DownloadAndInstallPlatformAndTools(platformRelease, tools, downloadCB, taskCB, req.GetSkipPostInstall()); err != nil {
 		return nil, err
 	}
 

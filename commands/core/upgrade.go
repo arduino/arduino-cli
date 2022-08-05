@@ -28,17 +28,18 @@ import (
 func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest,
 	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformUpgradeResponse, error) {
 
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
-	if pm == nil {
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
+	defer release()
 
 	// Extract all PlatformReference to platforms that have updates
 	ref := &packagemanager.PlatformReference{
 		Package:              req.PlatformPackage,
 		PlatformArchitecture: req.Architecture,
 	}
-	if err := pm.DownloadAndInstallPlatformUpgrades(ref, downloadCB, taskCB, req.GetSkipPostInstall()); err != nil {
+	if err := pme.DownloadAndInstallPlatformUpgrades(ref, downloadCB, taskCB, req.GetSkipPostInstall()); err != nil {
 		return nil, err
 	}
 

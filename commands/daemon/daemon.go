@@ -107,7 +107,7 @@ func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCoreService_Boa
 		return err
 	}
 
-	eventsChan, closeWatcher, err := board.Watch(msg.Instance.Id)
+	eventsChan, closeWatcher, err := board.Watch(msg)
 	if err != nil {
 		return convertErrorToRPCStatus(err)
 	}
@@ -470,7 +470,7 @@ func (s *ArduinoCoreServerImpl) ArchiveSketch(ctx context.Context, req *rpc.Arch
 	return resp, convertErrorToRPCStatus(err)
 }
 
-//ZipLibraryInstall FIXMEDOC
+// ZipLibraryInstall FIXMEDOC
 func (s *ArduinoCoreServerImpl) ZipLibraryInstall(req *rpc.ZipLibraryInstallRequest, stream rpc.ArduinoCoreService_ZipLibraryInstallServer) error {
 	err := lib.ZipLibraryInstall(
 		stream.Context(), req,
@@ -482,7 +482,7 @@ func (s *ArduinoCoreServerImpl) ZipLibraryInstall(req *rpc.ZipLibraryInstallRequ
 	return stream.Send(&rpc.ZipLibraryInstallResponse{})
 }
 
-//GitLibraryInstall FIXMEDOC
+// GitLibraryInstall FIXMEDOC
 func (s *ArduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallRequest, stream rpc.ArduinoCoreService_GitLibraryInstallServer) error {
 	err := lib.GitLibraryInstall(
 		stream.Context(), req,

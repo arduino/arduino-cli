@@ -26,40 +26,41 @@ import (
 
 // PlatformUninstall FIXMEDOC
 func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, taskCB rpc.TaskProgressCB) (*rpc.PlatformUninstallResponse, error) {
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
-	if pm == nil {
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
+	defer release()
 
 	ref := &packagemanager.PlatformReference{
 		Package:              req.PlatformPackage,
 		PlatformArchitecture: req.Architecture,
 	}
 	if ref.PlatformVersion == nil {
-		platform := pm.FindPlatform(ref)
+		platform := pme.FindPlatform(ref)
 		if platform == nil {
 			return nil, &arduino.PlatformNotFoundError{Platform: ref.String()}
 		}
-		platformRelease := pm.GetInstalledPlatformRelease(platform)
+		platformRelease := pme.GetInstalledPlatformRelease(platform)
 		if platformRelease == nil {
 			return nil, &arduino.PlatformNotFoundError{Platform: ref.String()}
 		}
 		ref.PlatformVersion = platformRelease.Version
 	}
 
-	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
+	platform, tools, err := pme.FindPlatformReleaseDependencies(ref)
 	if err != nil {
 		return nil, &arduino.NotFoundError{Message: tr("Can't find dependencies for platform %s", ref), Cause: err}
 	}
 
-	if err := pm.UninstallPlatform(platform, taskCB); err != nil {
+	if err := pme.UninstallPlatform(platform, taskCB); err != nil {
 		return nil, err
 	}
 
 	for _, tool := range tools {
-		if !pm.IsToolRequired(tool) {
+		if !pme.IsToolRequired(tool) {
 			taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s, tool is no more required", tool)})
-			pm.UninstallTool(tool, taskCB)
+			pme.UninstallTool(tool, taskCB)
 		}
 	}
 

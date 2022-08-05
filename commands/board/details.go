@@ -27,17 +27,18 @@ import (
 // Details returns all details for a board including tools and HW identifiers.
 // This command basically gather al the information and translates it into the required grpc struct properties
 func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetailsResponse, error) {
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
-	if pm == nil {
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
+	defer release()
 
 	fqbn, err := cores.ParseFQBN(req.GetFqbn())
 	if err != nil {
 		return nil, &arduino.InvalidFQBNError{Cause: err}
 	}
 
-	boardPackage, boardPlatform, board, boardProperties, boardRefPlatform, err := pm.ResolveFQBN(fqbn)
+	boardPackage, boardPlatform, board, boardProperties, boardRefPlatform, err := pme.ResolveFQBN(fqbn)
 	if err != nil {
 		return nil, &arduino.UnknownFQBNError{Cause: err}
 	}
@@ -110,7 +111,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 
 	details.ToolsDependencies = []*rpc.ToolsDependencies{}
 	for _, tool := range boardPlatform.ToolDependencies {
-		toolRelease := pm.FindToolDependency(tool)
+		toolRelease := pme.FindToolDependency(tool)
 		var systems []*rpc.Systems
 		if toolRelease != nil {
 			for _, f := range toolRelease.Flavors {

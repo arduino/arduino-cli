@@ -47,8 +47,10 @@ func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsReques
 		return nil, &arduino.MissingPortProtocolError{}
 	}
 
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
-	if pm == nil {
+	pme, release := commands.GetPackageManagerExplorer(req)
+	defer release()
+
+	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
 
@@ -57,7 +59,7 @@ func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsReques
 		return nil, &arduino.InvalidFQBNError{Cause: err}
 	}
 
-	_, platformRelease, _, boardProperties, _, err := pm.ResolveFQBN(fqbn)
+	_, platformRelease, _, boardProperties, _, err := pme.ResolveFQBN(fqbn)
 	if platformRelease == nil {
 		return nil, &arduino.PlatformNotFoundError{
 			Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
@@ -132,10 +134,14 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		return nil, &arduino.CantOpenSketchError{Cause: err}
 	}
 
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
+		return nil, &arduino.InvalidInstanceError{}
+	}
+	defer release()
 
 	if err := runProgramAction(
-		pm,
+		pme,
 		sk,
 		req.GetImportFile(),
 		req.GetImportDir(),
@@ -178,7 +184,7 @@ func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest,
 	return &rpc.UploadUsingProgrammerResponse{}, err
 }
 
-func runProgramAction(pm *packagemanager.PackageManager,
+func runProgramAction(pme *packagemanager.Explorer,
 	sk *sketch.Sketch,
 	importFile, importDir, fqbnIn string, port *rpc.Port,
 	programmerID string,
@@ -199,7 +205,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	logrus.WithField("fqbn", fqbn).Tracef("Detected FQBN")
 
 	// Find target board and board properties
-	_, boardPlatform, board, boardProperties, buildPlatform, err := pm.ResolveFQBN(fqbn)
+	_, boardPlatform, board, boardProperties, buildPlatform, err := pme.ResolveFQBN(fqbn)
 	if boardPlatform == nil {
 		return &arduino.PlatformNotFoundError{
 			Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
@@ -264,8 +270,8 @@ func runProgramAction(pm *packagemanager.PackageManager,
 			Value:    uploadToolID}
 	} else if len(split) == 2 {
 		uploadToolID = split[1]
-		uploadToolPlatform = pm.GetInstalledPlatformRelease(
-			pm.FindPlatform(&packagemanager.PlatformReference{
+		uploadToolPlatform = pme.GetInstalledPlatformRelease(
+			pme.FindPlatform(&packagemanager.PlatformReference{
 				Package:              split[0],
 				PlatformArchitecture: boardPlatform.Platform.Architecture,
 			}),
@@ -286,10 +292,10 @@ func runProgramAction(pm *packagemanager.PackageManager,
 		uploadProperties.Merge(programmer.Properties)
 	}
 
-	for _, tool := range pm.GetAllInstalledToolsReleases() {
+	for _, tool := range pme.GetAllInstalledToolsReleases() {
 		uploadProperties.Merge(tool.RuntimeProperties())
 	}
-	if requiredTools, err := pm.FindToolsRequiredForBoard(board); err == nil {
+	if requiredTools, err := pme.FindToolsRequiredForBoard(board); err == nil {
 		for _, requiredTool := range requiredTools {
 			logrus.WithField("tool", requiredTool).Info("Tool required for upload")
 			if requiredTool.IsInstalled() {
@@ -450,7 +456,7 @@ func runProgramAction(pm *packagemanager.PackageManager,
 	}
 
 	// Run recipes for upload
-	toolEnv := pm.GetEnvVarsForSpawnedProcess()
+	toolEnv := pme.GetEnvVarsForSpawnedProcess()
 	if burnBootloader {
 		if err := runTool("erase.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
 			return &arduino.FailedUploadError{Message: tr("Failed chip erase"), Cause: err}

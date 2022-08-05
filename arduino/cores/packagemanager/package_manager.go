@@ -20,6 +20,7 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"sync"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
@@ -38,16 +39,18 @@ import (
 // The manager also keeps track of the status of the Packages (their Platform Releases, actually)
 // installed in the system.
 type PackageManager struct {
-	log                    logrus.FieldLogger
-	Packages               cores.Packages
-	IndexDir               *paths.Path
-	PackagesDir            *paths.Path
-	DownloadDir            *paths.Path
-	tempDir                *paths.Path
-	CustomGlobalProperties *properties.Map
-	profile                *sketch.Profile
-	discoveryManager       *discoverymanager.DiscoveryManager
-	userAgent              string
+	packagesLock                   sync.RWMutex // Protects packages and packagesCustomGlobalProperties
+	packages                       cores.Packages
+	packagesCustomGlobalProperties *properties.Map
+
+	log              logrus.FieldLogger
+	IndexDir         *paths.Path
+	PackagesDir      *paths.Path
+	DownloadDir      *paths.Path
+	tempDir          *paths.Path
+	profile          *sketch.Profile
+	discoveryManager *discoverymanager.DiscoveryManager
+	userAgent        string
 }
 
 // Builder is used to create a new PackageManager. The builder
@@ -57,21 +60,28 @@ type Builder struct {
 	*PackageManager
 }
 
+// Explorer is used to query the PackageManager. When used it holds
+// a read-only lock on the PackageManager that must be released when the
+// job is completed.
+type Explorer struct {
+	*PackageManager
+}
+
 var tr = i18n.Tr
 
 // NewBuilder returns a new Builder
 func NewBuilder(indexDir, packagesDir, downloadDir, tempDir *paths.Path, userAgent string) *Builder {
 	return &Builder{
 		PackageManager: &PackageManager{
-			log:                    logrus.StandardLogger(),
-			Packages:               cores.NewPackages(),
-			IndexDir:               indexDir,
-			PackagesDir:            packagesDir,
-			DownloadDir:            downloadDir,
-			tempDir:                tempDir,
-			CustomGlobalProperties: properties.NewMap(),
-			discoveryManager:       discoverymanager.New(),
-			userAgent:              userAgent,
+			log:                            logrus.StandardLogger(),
+			packages:                       cores.NewPackages(),
+			IndexDir:                       indexDir,
+			PackagesDir:                    packagesDir,
+			DownloadDir:                    downloadDir,
+			tempDir:                        tempDir,
+			packagesCustomGlobalProperties: properties.NewMap(),
+			discoveryManager:               discoverymanager.New(),
+			userAgent:                      userAgent,
 		},
 	}
 }
@@ -79,13 +89,15 @@ func NewBuilder(indexDir, packagesDir, downloadDir, tempDir *paths.Path, userAge
 // BuildIntoExistingPackageManager will overwrite the given PackageManager instead
 // of building a new one.
 func (pmb *Builder) BuildIntoExistingPackageManager(old *PackageManager) {
+	old.packagesLock.Lock()
+	defer old.packagesLock.Unlock()
 	old.log = pmb.log
-	old.Packages = pmb.Packages
+	old.packages = pmb.packages
 	old.IndexDir = pmb.IndexDir
 	old.PackagesDir = pmb.PackagesDir
 	old.DownloadDir = pmb.DownloadDir
 	old.tempDir = pmb.tempDir
-	old.CustomGlobalProperties = pmb.CustomGlobalProperties
+	old.packagesCustomGlobalProperties = pmb.packagesCustomGlobalProperties
 	old.profile = pmb.profile
 	old.discoveryManager = pmb.discoveryManager
 	old.userAgent = pmb.userAgent
@@ -102,38 +114,66 @@ func (pmb *Builder) Build() *PackageManager {
 // of this PackageManager. A "commit" function callback is returned: calling
 // this function will make the builder write the new configuration into this
 // PackageManager.
-func (pm *PackageManager) NewBuilder() (*Builder, func()) {
+func (pm *PackageManager) NewBuilder() (builder *Builder, commit func()) {
 	pmb := NewBuilder(pm.IndexDir, pm.PackagesDir, pm.DownloadDir, pm.tempDir, pm.userAgent)
 	return pmb, func() {
 		pmb.BuildIntoExistingPackageManager(pm)
 	}
 }
 
+// NewExplorer creates an Explorer for this PackageManager.
+// The Explorer will keep a read-lock on the underlying PackageManager,
+// and a "release" callback function to release the lock is returned.
+// The "release" function must be called when the Explorer is no more
+// to correctly dispose it.
+func (pm *PackageManager) NewExplorer() (explorer *Explorer, release func()) {
+	pm.packagesLock.RLock()
+	return &Explorer{pm}, pm.packagesLock.RUnlock
+}
+
 // GetProfile returns the active profile for this package manager, or nil if no profile is selected.
-func (pm *PackageManager) GetProfile() *sketch.Profile {
-	return pm.profile
+func (pme *Explorer) GetProfile() *sketch.Profile {
+	return pme.profile
 }
 
 // GetEnvVarsForSpawnedProcess produces a set of environment variables that
 // must be sent to all processes spawned from the arduino-cli.
-func (pm *PackageManager) GetEnvVarsForSpawnedProcess() []string {
-	if pm == nil {
+func (pme *Explorer) GetEnvVarsForSpawnedProcess() []string {
+	if pme == nil {
 		return nil
 	}
 	return []string{
-		"ARDUINO_USER_AGENT=" + pm.userAgent,
+		"ARDUINO_USER_AGENT=" + pme.userAgent,
 	}
 }
 
 // DiscoveryManager returns the DiscoveryManager in use by this PackageManager
-func (pm *PackageManager) DiscoveryManager() *discoverymanager.DiscoveryManager {
-	return pm.discoveryManager
+func (pme *Explorer) DiscoveryManager() *discoverymanager.DiscoveryManager {
+	return pme.discoveryManager
+}
+
+// GetOrCreatePackage returns the specified Package or creates an empty one
+// filling all the cross-references
+func (pmb *Builder) GetOrCreatePackage(packager string) *cores.Package {
+	return pmb.packages.GetOrCreatePackage(packager)
+}
+
+// GetPackages returns the internal packages structure for direct usage.
+// Deprecated: do not access packages directly, but use specific Explorer methods when possible.
+func (pme *Explorer) GetPackages() cores.Packages {
+	return pme.packages
+}
+
+// GetCustomGlobalProperties returns the user defined custom global
+// properties for installed platforms.
+func (pme *Explorer) GetCustomGlobalProperties() *properties.Map {
+	return pme.packagesCustomGlobalProperties
 }
 
 // FindPlatformReleaseProvidingBoardsWithVidPid FIXMEDOC
-func (pm *PackageManager) FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid string) []*cores.PlatformRelease {
+func (pme *Explorer) FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid string) []*cores.PlatformRelease {
 	res := []*cores.PlatformRelease{}
-	for _, targetPackage := range pm.Packages {
+	for _, targetPackage := range pme.packages {
 		for _, targetPlatform := range targetPackage.Platforms {
 			platformRelease := targetPlatform.GetLatestRelease()
 			if platformRelease == nil {
@@ -151,11 +191,11 @@ func (pm *PackageManager) FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid 
 }
 
 // FindBoardsWithVidPid FIXMEDOC
-func (pm *PackageManager) FindBoardsWithVidPid(vid, pid string) []*cores.Board {
+func (pme *Explorer) FindBoardsWithVidPid(vid, pid string) []*cores.Board {
 	res := []*cores.Board{}
-	for _, targetPackage := range pm.Packages {
+	for _, targetPackage := range pme.packages {
 		for _, targetPlatform := range targetPackage.Platforms {
-			if platform := pm.GetInstalledPlatformRelease(targetPlatform); platform != nil {
+			if platform := pme.GetInstalledPlatformRelease(targetPlatform); platform != nil {
 				for _, board := range platform.Boards {
 					if board.HasUsbID(vid, pid) {
 						res = append(res, board)
@@ -168,11 +208,11 @@ func (pm *PackageManager) FindBoardsWithVidPid(vid, pid string) []*cores.Board {
 }
 
 // FindBoardsWithID FIXMEDOC
-func (pm *PackageManager) FindBoardsWithID(id string) []*cores.Board {
+func (pme *Explorer) FindBoardsWithID(id string) []*cores.Board {
 	res := []*cores.Board{}
-	for _, targetPackage := range pm.Packages {
+	for _, targetPackage := range pme.packages {
 		for _, targetPlatform := range targetPackage.Platforms {
-			if platform := pm.GetInstalledPlatformRelease(targetPlatform); platform != nil {
+			if platform := pme.GetInstalledPlatformRelease(targetPlatform); platform != nil {
 				for _, board := range platform.Boards {
 					if board.BoardID == id {
 						res = append(res, board)
@@ -185,13 +225,13 @@ func (pm *PackageManager) FindBoardsWithID(id string) []*cores.Board {
 }
 
 // FindBoardWithFQBN returns the board identified by the fqbn, or an error
-func (pm *PackageManager) FindBoardWithFQBN(fqbnIn string) (*cores.Board, error) {
+func (pme *Explorer) FindBoardWithFQBN(fqbnIn string) (*cores.Board, error) {
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
 		return nil, fmt.Errorf(tr("parsing fqbn: %s"), err)
 	}
 
-	_, _, board, _, _, err := pm.ResolveFQBN(fqbn)
+	_, _, board, _, _, err := pme.ResolveFQBN(fqbn)
 	return board, err
 }
 
@@ -214,12 +254,12 @@ func (pm *PackageManager) FindBoardWithFQBN(fqbnIn string) (*cores.Board, error)
 //
 // In case of error the partial results found in the meantime are
 // returned together with the error.
-func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
+func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 	*cores.Package, *cores.PlatformRelease, *cores.Board,
 	*properties.Map, *cores.PlatformRelease, error) {
 
 	// Find package
-	targetPackage := pm.Packages[fqbn.Package]
+	targetPackage := pme.packages[fqbn.Package]
 	if targetPackage == nil {
 		return nil, nil, nil, nil, nil,
 			fmt.Errorf(tr("unknown package %s"), fqbn.Package)
@@ -231,7 +271,7 @@ func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 		return targetPackage, nil, nil, nil, nil,
 			fmt.Errorf(tr("unknown platform %s:%s"), targetPackage, fqbn.PlatformArch)
 	}
-	platformRelease := pm.GetInstalledPlatformRelease(platform)
+	platformRelease := pme.GetInstalledPlatformRelease(platform)
 	if platformRelease == nil {
 		return targetPackage, nil, nil, nil, nil,
 			fmt.Errorf(tr("platform %s is not installed"), platform)
@@ -256,7 +296,7 @@ func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 	coreParts := strings.Split(buildProperties.Get("build.core"), ":")
 	if len(coreParts) > 1 {
 		referredPackage := coreParts[0]
-		buildPackage := pm.Packages[referredPackage]
+		buildPackage := pme.packages[referredPackage]
 		if buildPackage == nil {
 			return targetPackage, platformRelease, board, buildProperties, nil,
 				fmt.Errorf(tr("missing package %[1]s referenced by board %[2]s"), referredPackage, fqbn)
@@ -266,7 +306,7 @@ func (pm *PackageManager) ResolveFQBN(fqbn *cores.FQBN) (
 			return targetPackage, platformRelease, board, buildProperties, nil,
 				fmt.Errorf(tr("missing platform %[1]s:%[2]s referenced by board %[3]s"), referredPackage, fqbn.PlatformArch, fqbn)
 		}
-		buildPlatformRelease = pm.GetInstalledPlatformRelease(buildPlatform)
+		buildPlatformRelease = pme.GetInstalledPlatformRelease(buildPlatform)
 		if buildPlatformRelease == nil {
 			return targetPackage, platformRelease, board, buildProperties, nil,
 				fmt.Errorf(tr("missing platform release %[1]s:%[2]s referenced by board %[3]s"), referredPackage, fqbn.PlatformArch, fqbn)
@@ -293,7 +333,7 @@ func (pmb *Builder) LoadPackageIndex(URL *url.URL) error {
 		p.URL = URL.String()
 	}
 
-	index.MergeIntoPackages(pmb.Packages)
+	index.MergeIntoPackages(pmb.packages)
 	return nil
 }
 
@@ -304,16 +344,16 @@ func (pmb *Builder) LoadPackageIndexFromFile(indexPath *paths.Path) (*packageind
 		return nil, fmt.Errorf(tr("loading json index file %[1]s: %[2]s"), indexPath, err)
 	}
 
-	index.MergeIntoPackages(pmb.Packages)
+	index.MergeIntoPackages(pmb.packages)
 	return index, nil
 }
 
 // Package looks for the Package with the given name, returning a structure
 // able to perform further operations on that given resource
-func (pm *PackageManager) Package(name string) *PackageActions {
+func (pme *Explorer) Package(name string) *PackageActions {
 	//TODO: perhaps these 2 structure should be merged? cores.Packages vs pkgmgr??
 	var err error
-	thePackage := pm.Packages[name]
+	thePackage := pme.packages[name]
 	if thePackage == nil {
 		err = fmt.Errorf(tr("package '%s' not found"), name)
 	}
@@ -414,25 +454,25 @@ func (tr *ToolReleaseActions) Get() (*cores.ToolRelease, error) {
 }
 
 // GetInstalledPlatformRelease returns the PlatformRelease installed (it is chosen)
-func (pm *PackageManager) GetInstalledPlatformRelease(platform *cores.Platform) *cores.PlatformRelease {
+func (pme *Explorer) GetInstalledPlatformRelease(platform *cores.Platform) *cores.PlatformRelease {
 	releases := platform.GetAllInstalled()
 	if len(releases) == 0 {
 		return nil
 	}
 
 	debug := func(msg string, pl *cores.PlatformRelease) {
-		pm.log.WithField("bundle", pl.IsIDEBundled).
+		pme.log.WithField("bundle", pl.IsIDEBundled).
 			WithField("version", pl.Version).
-			WithField("managed", pm.IsManagedPlatformRelease(pl)).
+			WithField("managed", pme.IsManagedPlatformRelease(pl)).
 			Debugf("%s: %s", msg, pl)
 	}
 
 	best := releases[0]
-	bestIsManaged := pm.IsManagedPlatformRelease(best)
+	bestIsManaged := pme.IsManagedPlatformRelease(best)
 	debug("current best", best)
 
 	for _, candidate := range releases[1:] {
-		candidateIsManaged := pm.IsManagedPlatformRelease(candidate)
+		candidateIsManaged := pme.IsManagedPlatformRelease(candidate)
 		debug("candidate", candidate)
 		// TODO: Disentangle this algorithm and make it more straightforward
 		if bestIsManaged == candidateIsManaged {
@@ -455,9 +495,9 @@ func (pm *PackageManager) GetInstalledPlatformRelease(platform *cores.Platform) 
 }
 
 // GetAllInstalledToolsReleases FIXMEDOC
-func (pm *PackageManager) GetAllInstalledToolsReleases() []*cores.ToolRelease {
+func (pme *Explorer) GetAllInstalledToolsReleases() []*cores.ToolRelease {
 	tools := []*cores.ToolRelease{}
-	for _, targetPackage := range pm.Packages {
+	for _, targetPackage := range pme.packages {
 		for _, tool := range targetPackage.Tools {
 			for _, release := range tool.Releases {
 				if release.IsInstalled() {
@@ -471,9 +511,9 @@ func (pm *PackageManager) GetAllInstalledToolsReleases() []*cores.ToolRelease {
 
 // InstalledPlatformReleases returns all installed PlatformReleases. This function is
 // useful to range all PlatformReleases in for loops.
-func (pm *PackageManager) InstalledPlatformReleases() []*cores.PlatformRelease {
+func (pme *Explorer) InstalledPlatformReleases() []*cores.PlatformRelease {
 	platforms := []*cores.PlatformRelease{}
-	for _, targetPackage := range pm.Packages {
+	for _, targetPackage := range pme.packages {
 		for _, platform := range targetPackage.Platforms {
 			platforms = append(platforms, platform.GetAllInstalled()...)
 		}
@@ -483,9 +523,9 @@ func (pm *PackageManager) InstalledPlatformReleases() []*cores.PlatformRelease {
 
 // InstalledBoards returns all installed Boards. This function is useful to range
 // all Boards in for loops.
-func (pm *PackageManager) InstalledBoards() []*cores.Board {
+func (pme *Explorer) InstalledBoards() []*cores.Board {
 	boards := []*cores.Board{}
-	for _, targetPackage := range pm.Packages {
+	for _, targetPackage := range pme.packages {
 		for _, platform := range targetPackage.Platforms {
 			for _, release := range platform.GetAllInstalled() {
 				for _, board := range release.Boards {
@@ -499,14 +539,14 @@ func (pm *PackageManager) InstalledBoards() []*cores.Board {
 
 // FindToolsRequiredFromPlatformRelease returns a list of ToolReleases needed by the specified PlatformRelease.
 // If a ToolRelease is not found return an error
-func (pm *PackageManager) FindToolsRequiredFromPlatformRelease(platform *cores.PlatformRelease) ([]*cores.ToolRelease, error) {
-	pm.log.Infof("Searching tools required for platform %s", platform)
+func (pme *Explorer) FindToolsRequiredFromPlatformRelease(platform *cores.PlatformRelease) ([]*cores.ToolRelease, error) {
+	pme.log.Infof("Searching tools required for platform %s", platform)
 
 	// maps "PACKAGER:TOOL" => ToolRelease
 	foundTools := map[string]*cores.ToolRelease{}
 	// A Platform may not specify required tools (because it's a platform that comes from a
 	// user/hardware dir without a package_index.json) then add all available tools
-	for _, targetPackage := range pm.Packages {
+	for _, targetPackage := range pme.packages {
 		for _, tool := range targetPackage.Tools {
 			rel := tool.GetLatestInstalled()
 			if rel != nil {
@@ -518,8 +558,8 @@ func (pm *PackageManager) FindToolsRequiredFromPlatformRelease(platform *cores.P
 	requiredTools := []*cores.ToolRelease{}
 	platform.ToolDependencies.Sort()
 	for _, toolDep := range platform.ToolDependencies {
-		pm.log.WithField("tool", toolDep).Infof("Required tool")
-		tool := pm.FindToolDependency(toolDep)
+		pme.log.WithField("tool", toolDep).Infof("Required tool")
+		tool := pme.FindToolDependency(toolDep)
 		if tool == nil {
 			return nil, fmt.Errorf(tr("tool release not found: %s"), toolDep)
 		}
@@ -529,8 +569,8 @@ func (pm *PackageManager) FindToolsRequiredFromPlatformRelease(platform *cores.P
 
 	platform.DiscoveryDependencies.Sort()
 	for _, discoveryDep := range platform.DiscoveryDependencies {
-		pm.log.WithField("discovery", discoveryDep).Infof("Required discovery")
-		tool := pm.FindDiscoveryDependency(discoveryDep)
+		pme.log.WithField("discovery", discoveryDep).Infof("Required discovery")
+		tool := pme.FindDiscoveryDependency(discoveryDep)
 		if tool == nil {
 			return nil, fmt.Errorf(tr("discovery release not found: %s"), discoveryDep)
 		}
@@ -540,8 +580,8 @@ func (pm *PackageManager) FindToolsRequiredFromPlatformRelease(platform *cores.P
 
 	platform.MonitorDependencies.Sort()
 	for _, monitorDep := range platform.MonitorDependencies {
-		pm.log.WithField("monitor", monitorDep).Infof("Required monitor")
-		tool := pm.FindMonitorDependency(monitorDep)
+		pme.log.WithField("monitor", monitorDep).Infof("Required monitor")
+		tool := pme.FindMonitorDependency(monitorDep)
 		if tool == nil {
 			return nil, fmt.Errorf(tr("monitor release not found: %s"), monitorDep)
 		}
@@ -556,12 +596,12 @@ func (pm *PackageManager) FindToolsRequiredFromPlatformRelease(platform *cores.P
 }
 
 // GetTool searches for tool in all packages and platforms.
-func (pm *PackageManager) GetTool(toolID string) *cores.Tool {
+func (pme *Explorer) GetTool(toolID string) *cores.Tool {
 	split := strings.Split(toolID, ":")
 	if len(split) != 2 {
 		return nil
 	}
-	if pack, ok := pm.Packages[split[0]]; !ok {
+	if pack, ok := pme.packages[split[0]]; !ok {
 		return nil
 	} else if tool, ok := pack.Tools[split[1]]; !ok {
 		return nil
@@ -571,8 +611,8 @@ func (pm *PackageManager) GetTool(toolID string) *cores.Tool {
 }
 
 // FindToolsRequiredForBoard FIXMEDOC
-func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*cores.ToolRelease, error) {
-	pm.log.Infof("Searching tools required for board %s", board)
+func (pme *Explorer) FindToolsRequiredForBoard(board *cores.Board) ([]*cores.ToolRelease, error) {
+	pme.log.Infof("Searching tools required for board %s", board)
 
 	// core := board.Properties["build.core"]
 	platform := board.PlatformRelease
@@ -582,7 +622,7 @@ func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*core
 
 	// a Platform may not specify required tools (because it's a platform that comes from a
 	// user/hardware dir without a package_index.json) then add all available tools
-	for _, targetPackage := range pm.Packages {
+	for _, targetPackage := range pme.packages {
 		for _, tool := range targetPackage.Tools {
 			rel := tool.GetLatestInstalled()
 			if rel != nil {
@@ -595,8 +635,8 @@ func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*core
 	requiredTools := []*cores.ToolRelease{}
 	platform.ToolDependencies.Sort()
 	for _, toolDep := range platform.ToolDependencies {
-		pm.log.WithField("tool", toolDep).Infof("Required tool")
-		tool := pm.FindToolDependency(toolDep)
+		pme.log.WithField("tool", toolDep).Infof("Required tool")
+		tool := pme.FindToolDependency(toolDep)
 		if tool == nil {
 			return nil, fmt.Errorf(tr("tool release not found: %s"), toolDep)
 		}
@@ -612,8 +652,8 @@ func (pm *PackageManager) FindToolsRequiredForBoard(board *cores.Board) ([]*core
 
 // FindToolDependency returns the ToolRelease referenced by the ToolDependency or nil if
 // the referenced tool doesn't exists.
-func (pm *PackageManager) FindToolDependency(dep *cores.ToolDependency) *cores.ToolRelease {
-	toolRelease, err := pm.Package(dep.ToolPackager).Tool(dep.ToolName).Release(dep.ToolVersion).Get()
+func (pme *Explorer) FindToolDependency(dep *cores.ToolDependency) *cores.ToolRelease {
+	toolRelease, err := pme.Package(dep.ToolPackager).Tool(dep.ToolName).Release(dep.ToolVersion).Get()
 	if err != nil {
 		return nil
 	}
@@ -622,8 +662,8 @@ func (pm *PackageManager) FindToolDependency(dep *cores.ToolDependency) *cores.T
 
 // FindDiscoveryDependency returns the ToolRelease referenced by the DiscoveryDepenency or nil if
 // the referenced discovery doesn't exists.
-func (pm *PackageManager) FindDiscoveryDependency(discovery *cores.DiscoveryDependency) *cores.ToolRelease {
-	if pack := pm.Packages[discovery.Packager]; pack == nil {
+func (pme *Explorer) FindDiscoveryDependency(discovery *cores.DiscoveryDependency) *cores.ToolRelease {
+	if pack := pme.packages[discovery.Packager]; pack == nil {
 		return nil
 	} else if toolRelease := pack.Tools[discovery.Name]; toolRelease == nil {
 		return nil
@@ -634,8 +674,8 @@ func (pm *PackageManager) FindDiscoveryDependency(discovery *cores.DiscoveryDepe
 
 // FindMonitorDependency returns the ToolRelease referenced by the MonitorDepenency or nil if
 // the referenced monitor doesn't exists.
-func (pm *PackageManager) FindMonitorDependency(discovery *cores.MonitorDependency) *cores.ToolRelease {
-	if pack := pm.Packages[discovery.Packager]; pack == nil {
+func (pme *Explorer) FindMonitorDependency(discovery *cores.MonitorDependency) *cores.ToolRelease {
+	if pack := pme.packages[discovery.Packager]; pack == nil {
 		return nil
 	} else if toolRelease := pack.Tools[discovery.Name]; toolRelease == nil {
 		return nil

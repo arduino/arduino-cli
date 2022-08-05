@@ -181,7 +181,10 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	command, err := PrepareCommandForRecipe(properties, recipe, false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+
+	pme, release := ctx.PackageManager.NewExplorer()
+	command, err := PrepareCommandForRecipe(properties, recipe, false, pme.GetEnvVarsForSpawnedProcess())
+	release()
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -410,7 +413,9 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 		properties.SetPath(constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH, archiveFilePath)
 		properties.SetPath(constants.BUILD_PROPERTIES_OBJECT_FILE, objectFile)
 
-		command, err := PrepareCommandForRecipe(properties, constants.RECIPE_AR_PATTERN, false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+		pme, release := ctx.PackageManager.NewExplorer()
+		command, err := PrepareCommandForRecipe(properties, constants.RECIPE_AR_PATTERN, false, pme.GetEnvVarsForSpawnedProcess())
+		release()
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}

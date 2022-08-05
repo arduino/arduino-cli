@@ -26,7 +26,11 @@ import (
 
 // ListProgrammersAvailableForUpload FIXMEDOC
 func ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgrammersAvailableForUploadRequest) (*rpc.ListProgrammersAvailableForUploadResponse, error) {
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
+		return nil, &arduino.InvalidInstanceError{}
+	}
+	defer release()
 
 	fqbnIn := req.GetFqbn()
 	if fqbnIn == "" {
@@ -38,7 +42,7 @@ func ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgram
 	}
 
 	// Find target platforms
-	_, platform, _, _, refPlatform, err := pm.ResolveFQBN(fqbn)
+	_, platform, _, _, refPlatform, err := pme.ResolveFQBN(fqbn)
 	if err != nil {
 		return nil, &arduino.UnknownFQBNError{Cause: err}
 	}

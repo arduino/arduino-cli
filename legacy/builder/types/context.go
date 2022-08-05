@@ -82,7 +82,7 @@ type Context struct {
 	BuildOptionsJson         string
 	BuildOptionsJsonPrevious string
 
-	PackageManager             *packagemanager.PackageManager
+	PackageManager             *packagemanager.Explorer
 	Hardware                   cores.Packages
 	AllTools                   []*cores.ToolRelease
 	RequiredTools              []*cores.ToolRelease
