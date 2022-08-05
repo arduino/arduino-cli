@@ -34,24 +34,24 @@ func TestArduinoCliDaemon(t *testing.T) {
 	env, cli := createEnvForDaemon(t)
 	defer env.CleanUp()
 
-	inst := cli.Create()
-	require.NoError(t, inst.Init("", "", func(ir *commands.InitResponse) {
+	grpcInst := cli.Create()
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
 	// Run a one-shot board list
-	boardListResp, err := inst.BoardList(time.Second)
+	boardListResp, err := grpcInst.BoardList(time.Second)
 	require.NoError(t, err)
 	fmt.Printf("Got boardlist response with %d ports\n", len(boardListResp.GetPorts()))
 
 	// Run a one-shot board list again (should not fail)
-	boardListResp, err = inst.BoardList(time.Second)
+	boardListResp, err = grpcInst.BoardList(time.Second)
 	require.NoError(t, err)
 	fmt.Printf("Got boardlist response with %d ports\n", len(boardListResp.GetPorts()))
 
 	testWatcher := func() {
 		// Run watcher
-		watcher, err := inst.BoardListWatch()
+		watcher, err := grpcInst.BoardListWatch()
 		require.NoError(t, err)
 		ctx, cancel := context.WithCancel(context.Background())
 		go func() {

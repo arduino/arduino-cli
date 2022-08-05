@@ -33,12 +33,12 @@ func TestDaemonCompileOptions(t *testing.T) {
 	env, cli := createEnvForDaemon(t)
 	defer env.CleanUp()
 
-	inst := cli.Create()
-	require.NoError(t, inst.Init("", "", func(ir *commands.InitResponse) {
+	grpcInst := cli.Create()
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
-	plInst, err := inst.PlatformInstall(context.Background(), "arduino", "avr", "1.8.5", true)
+	plInst, err := grpcInst.PlatformInstall(context.Background(), "arduino", "avr", "1.8.5", true)
 	require.NoError(t, err)
 	for {
 		msg, err := plInst.Recv()
@@ -56,13 +56,13 @@ func TestDaemonCompileOptions(t *testing.T) {
 	require.NoError(t, err)
 
 	// Re-init instance to update changes
-	require.NoError(t, inst.Init("", "", func(ir *commands.InitResponse) {
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
 	// Build sketch (with errors)
 	sk := paths.New("testdata", "bare_minimum")
-	compile, err := inst.Compile(context.Background(), "arduino:avr:uno:some_menu=bad", sk.String())
+	compile, err := grpcInst.Compile(context.Background(), "arduino:avr:uno:some_menu=bad", sk.String())
 	require.NoError(t, err)
 	for {
 		msg, err := compile.Recv()
@@ -83,7 +83,7 @@ func TestDaemonCompileOptions(t *testing.T) {
 	}
 
 	// Build sketch (without errors)
-	compile, err = inst.Compile(context.Background(), "arduino:avr:uno:some_menu=good", sk.String())
+	compile, err = grpcInst.Compile(context.Background(), "arduino:avr:uno:some_menu=good", sk.String())
 	require.NoError(t, err)
 	for {
 		msg, err := compile.Recv()
