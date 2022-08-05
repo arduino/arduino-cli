@@ -81,6 +81,7 @@ func NewArduinoCliWithinEnvironment(env *testsuite.Environment, config *ArduinoC
 // CleanUp closes the Arduino CLI client.
 func (cli *ArduinoCLI) CleanUp() {
 	if cli.proc != nil {
+		cli.daemonConn.Close()
 		cli.proc.Kill()
 		cli.proc.Wait()
 	}
