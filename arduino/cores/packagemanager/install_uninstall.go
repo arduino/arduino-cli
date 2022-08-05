@@ -69,8 +69,8 @@ func (pm *PackageManager) DownloadAndInstallPlatformUpgrades(
 }
 
 // DownloadAndInstallPlatformAndTools runs a full installation process for the given platform and tools.
-// This methods taks care of downloading missing archives, install/upgrade platforms and tools, and
-// remove the previously installed platform/tools that are no more needed after the upgrade.
+// This method takes care of downloading missing archives, installing/upgrading platforms and tools, and
+// removing the previously installed platform/tools that are no longer needed after the upgrade.
 func (pm *PackageManager) DownloadAndInstallPlatformAndTools(
 	platformRelease *cores.PlatformRelease, requiredTools []*cores.ToolRelease,
 	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB,
