@@ -24,6 +24,9 @@ import (
 	"go.bug.st/testsuite"
 )
 
+// createEnvForDaemon performs the minimum required operations to start the arduino-cli daemon.
+// It returns a testsuite.Environment and an ArduinoCLI client to perform the integration tests.
+// The Environment must be disposed by calling the CleanUp method via defer.
 func createEnvForDaemon(t *testing.T) (*testsuite.Environment, *integrationtest.ArduinoCLI) {
 	env := testsuite.NewEnvironment(t)
 
