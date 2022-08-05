@@ -30,8 +30,8 @@ import (
 )
 
 // DownloadAndInstallPlatformUpgrades runs a full installation process to upgrade the given platform.
-// This methods taks care of downloading missing archives, upgrade platforms and tools, and
-// remove the previously installed platform/tools that are no more needed after the upgrade.
+// This method takes care of downloading missing archives, upgrading platforms and tools, and
+// removing the previously installed platform/tools that are no longer needed after the upgrade.
 func (pm *PackageManager) DownloadAndInstallPlatformUpgrades(
 	platformRef *PlatformReference,
 	downloadCB rpc.DownloadProgressCB,
