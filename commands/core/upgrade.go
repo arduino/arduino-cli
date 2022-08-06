@@ -25,27 +25,31 @@ import (
 )
 
 // PlatformUpgrade FIXMEDOC
-func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest,
-	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformUpgradeResponse, error) {
+func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformUpgradeResponse, error) {
+	upgrade := func() error {
+		pme, release := commands.GetPackageManagerExplorer(req)
+		if pme == nil {
+			return &arduino.InvalidInstanceError{}
+		}
+		defer release()
 
-	pme, release := commands.GetPackageManagerExplorer(req)
-	if pme == nil {
-		return nil, &arduino.InvalidInstanceError{}
-	}
-	defer release()
+		// Extract all PlatformReference to platforms that have updates
+		ref := &packagemanager.PlatformReference{
+			Package:              req.PlatformPackage,
+			PlatformArchitecture: req.Architecture,
+		}
+		if err := pme.DownloadAndInstallPlatformUpgrades(ref, downloadCB, taskCB, req.GetSkipPostInstall()); err != nil {
+			return err
+		}
 
-	// Extract all PlatformReference to platforms that have updates
-	ref := &packagemanager.PlatformReference{
-		Package:              req.PlatformPackage,
-		PlatformArchitecture: req.Architecture,
+		return nil
 	}
-	if err := pme.DownloadAndInstallPlatformUpgrades(ref, downloadCB, taskCB, req.GetSkipPostInstall()); err != nil {
+
+	if err := upgrade(); err != nil {
 		return nil, err
 	}
-
 	if err := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil); err != nil {
 		return nil, err
 	}
-
 	return &rpc.PlatformUpgradeResponse{}, nil
 }

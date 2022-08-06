@@ -26,9 +26,20 @@ import (
 
 // PlatformUninstall FIXMEDOC
 func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, taskCB rpc.TaskProgressCB) (*rpc.PlatformUninstallResponse, error) {
+	if err := platformUninstall(ctx, req, taskCB); err != nil {
+		return nil, err
+	}
+	if err := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil); err != nil {
+		return nil, err
+	}
+	return &rpc.PlatformUninstallResponse{}, nil
+}
+
+// platformUninstall is the implementation of platform unistaller
+func platformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, taskCB rpc.TaskProgressCB) error {
 	pme, release := commands.GetPackageManagerExplorer(req)
 	if pme == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return &arduino.InvalidInstanceError{}
 	}
 	defer release()
 
@@ -39,22 +50,22 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 	if ref.PlatformVersion == nil {
 		platform := pme.FindPlatform(ref)
 		if platform == nil {
-			return nil, &arduino.PlatformNotFoundError{Platform: ref.String()}
+			return &arduino.PlatformNotFoundError{Platform: ref.String()}
 		}
 		platformRelease := pme.GetInstalledPlatformRelease(platform)
 		if platformRelease == nil {
-			return nil, &arduino.PlatformNotFoundError{Platform: ref.String()}
+			return &arduino.PlatformNotFoundError{Platform: ref.String()}
 		}
 		ref.PlatformVersion = platformRelease.Version
 	}
 
 	platform, tools, err := pme.FindPlatformReleaseDependencies(ref)
 	if err != nil {
-		return nil, &arduino.NotFoundError{Message: tr("Can't find dependencies for platform %s", ref), Cause: err}
+		return &arduino.NotFoundError{Message: tr("Can't find dependencies for platform %s", ref), Cause: err}
 	}
 
 	if err := pme.UninstallPlatform(platform, taskCB); err != nil {
-		return nil, err
+		return err
 	}
 
 	for _, tool := range tools {
@@ -64,9 +75,5 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 		}
 	}
 
-	if err := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil); err != nil {
-		return nil, err
-	}
-
-	return &rpc.PlatformUninstallResponse{}, nil
+	return nil
 }

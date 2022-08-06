@@ -26,51 +26,55 @@ import (
 )
 
 // PlatformInstall FIXMEDOC
-func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest,
-	downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformInstallResponse, error) {
-
-	pme, release := commands.GetPackageManagerExplorer(req)
-	if pme == nil {
-		return nil, &arduino.InvalidInstanceError{}
-	}
-	defer release()
-
-	version, err := commands.ParseVersion(req)
-	if err != nil {
-		return nil, &arduino.InvalidVersionError{Cause: err}
-	}
-
-	ref := &packagemanager.PlatformReference{
-		Package:              req.PlatformPackage,
-		PlatformArchitecture: req.Architecture,
-		PlatformVersion:      version,
-	}
-	platformRelease, tools, err := pme.FindPlatformReleaseDependencies(ref)
-	if err != nil {
-		return nil, &arduino.PlatformNotFoundError{Platform: ref.String(), Cause: err}
-	}
-
-	// Prerequisite checks before install
-	if platformRelease.IsInstalled() {
-		taskCB(&rpc.TaskProgress{Name: tr("Platform %s already installed", platformRelease), Completed: true})
-		return &rpc.PlatformInstallResponse{}, nil
-	}
-
-	if req.GetNoOverwrite() {
-		if installed := pme.GetInstalledPlatformRelease(platformRelease.Platform); installed != nil {
-			return nil, fmt.Errorf("%s: %s",
-				tr("Platform %s already installed", installed),
-				tr("could not overwrite"))
+func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformInstallResponse, error) {
+	install := func() error {
+		pme, release := commands.GetPackageManagerExplorer(req)
+		if pme == nil {
+			return &arduino.InvalidInstanceError{}
 		}
+		defer release()
+
+		version, err := commands.ParseVersion(req)
+		if err != nil {
+			return &arduino.InvalidVersionError{Cause: err}
+		}
+
+		ref := &packagemanager.PlatformReference{
+			Package:              req.PlatformPackage,
+			PlatformArchitecture: req.Architecture,
+			PlatformVersion:      version,
+		}
+		platformRelease, tools, err := pme.FindPlatformReleaseDependencies(ref)
+		if err != nil {
+			return &arduino.PlatformNotFoundError{Platform: ref.String(), Cause: err}
+		}
+
+		// Prerequisite checks before install
+		if platformRelease.IsInstalled() {
+			taskCB(&rpc.TaskProgress{Name: tr("Platform %s already installed", platformRelease), Completed: true})
+			return nil
+		}
+
+		if req.GetNoOverwrite() {
+			if installed := pme.GetInstalledPlatformRelease(platformRelease.Platform); installed != nil {
+				return fmt.Errorf("%s: %s",
+					tr("Platform %s already installed", installed),
+					tr("could not overwrite"))
+			}
+		}
+
+		if err := pme.DownloadAndInstallPlatformAndTools(platformRelease, tools, downloadCB, taskCB, req.GetSkipPostInstall()); err != nil {
+			return err
+		}
+
+		return nil
 	}
 
-	if err := pme.DownloadAndInstallPlatformAndTools(platformRelease, tools, downloadCB, taskCB, req.GetSkipPostInstall()); err != nil {
+	if err := install(); err != nil {
 		return nil, err
 	}
-
 	if err := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil); err != nil {
 		return nil, err
 	}
-
 	return &rpc.PlatformInstallResponse{}, nil
 }
