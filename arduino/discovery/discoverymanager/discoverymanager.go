@@ -207,7 +207,7 @@ func (dm *DiscoveryManager) feedEvent(ev *discovery.Event) {
 			case <-time.After(time.Millisecond * 500):
 				// If the watcher is not able to process event fast enough
 				// remove the watcher from the list of watchers
-				logrus.Info("Watcher is not able to process events fast enough, removing it from the list of watchers")
+				logrus.Error("Watcher is not able to process events fast enough, removing it from the list of watchers")
 				delete(dm.watchers, watcher)
 			}
 		}
