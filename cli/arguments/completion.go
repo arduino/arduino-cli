@@ -178,7 +178,7 @@ func GetInstallableLibs() []string {
 func GetConnectedBoards() []string {
 	inst := instance.CreateAndInit()
 
-	list, _ := board.List(&rpc.BoardListRequest{
+	list, _, _ := board.List(&rpc.BoardListRequest{
 		Instance: inst,
 	})
 	var res []string

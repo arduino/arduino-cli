@@ -146,7 +146,7 @@ func (p *Port) GetSearchTimeout() time.Duration {
 // discovered Port object together with the FQBN. If the port does not match
 // exactly 1 board,
 func (p *Port) DetectFQBN(inst *rpc.Instance) (string, *rpc.Port) {
-	detectedPorts, err := board.List(&rpc.BoardListRequest{
+	detectedPorts, _, err := board.List(&rpc.BoardListRequest{
 		Instance: inst,
 		Timeout:  p.timeout.Get().Milliseconds(),
 	})

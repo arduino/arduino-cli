@@ -64,12 +64,15 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		os.Exit(0)
 	}
 
-	ports, err := board.List(&rpc.BoardListRequest{
+	ports, discvoeryErrors, err := board.List(&rpc.BoardListRequest{
 		Instance: inst,
 		Timeout:  timeoutArg.Get().Milliseconds(),
 	})
 	if err != nil {
 		feedback.Errorf(tr("Error detecting boards: %v"), err)
+	}
+	for _, err := range discvoeryErrors {
+		feedback.Errorf(tr("Error starting discovery: %v"), err)
 	}
 	feedback.PrintResult(result{ports})
 }

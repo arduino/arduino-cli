@@ -67,7 +67,7 @@ func (s *ArduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.Board
 
 // BoardList FIXMEDOC
 func (s *ArduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardListRequest) (*rpc.BoardListResponse, error) {
-	ports, err := board.List(req)
+	ports, _, err := board.List(req)
 	if err != nil {
 		return nil, convertErrorToRPCStatus(err)
 	}

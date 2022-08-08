@@ -177,21 +177,21 @@ func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.B
 // List returns a list of boards found by the loaded discoveries.
 // In case of errors partial results from discoveries that didn't fail
 // are returned.
-func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
+func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStartErrors []error, e error) {
 	pm := commands.GetPackageManager(req.GetInstance().Id)
 	if pm == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return nil, nil, &arduino.InvalidInstanceError{}
 	}
 
 	dm := pm.DiscoveryManager()
-	dm.Start()
+	discoveryStartErrors = dm.Start()
 	time.Sleep(time.Duration(req.GetTimeout()) * time.Millisecond)
 
 	retVal := []*rpc.DetectedPort{}
 	for _, port := range dm.List() {
 		boards, err := identify(pm, port)
 		if err != nil {
-			return nil, err
+			return nil, discoveryStartErrors, err
 		}
 
 		// boards slice can be empty at this point if neither the cores nor the
@@ -202,7 +202,7 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 		}
 		retVal = append(retVal, b)
 	}
-	return retVal, nil
+	return retVal, discoveryStartErrors, nil
 }
 
 // Watch returns a channel that receives boards connection and disconnection events.

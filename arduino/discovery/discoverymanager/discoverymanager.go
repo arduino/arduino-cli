@@ -81,11 +81,11 @@ func (dm *DiscoveryManager) IDs() []string {
 
 // Start starts all the discoveries in this DiscoveryManager.
 // If the discoveries are already running, this function does nothing.
-func (dm *DiscoveryManager) Start() {
+func (dm *DiscoveryManager) Start() []error {
 	dm.discoveriesMutex.Lock()
 	defer dm.discoveriesMutex.Unlock()
 	if dm.discoveriesRunning {
-		return
+		return nil
 	}
 
 	go func() {
@@ -95,16 +95,25 @@ func (dm *DiscoveryManager) Start() {
 		}
 	}()
 
+	errs := []error{}
+	var errsLock sync.Mutex
+
 	var wg sync.WaitGroup
 	for _, d := range dm.discoveries {
 		wg.Add(1)
 		go func(d *discovery.PluggableDiscovery) {
-			dm.startDiscovery(d)
+			if err := dm.startDiscovery(d); err != nil {
+				errsLock.Lock()
+				errs = append(errs, err)
+				errsLock.Unlock()
+			}
 			wg.Done()
 		}(d)
 	}
 	wg.Wait()
 	dm.discoveriesRunning = true
+
+	return errs
 }
 
 // Add adds a discovery to the list of managed discoveries
