@@ -125,7 +125,7 @@ func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *d
 	if resource == nil {
 		return &arduino.FailedDownloadError{
 			Message: tr("Error downloading tool %s", tool),
-			Cause:   errors.New(tr("no versions available for the current OS", tool))}
+			Cause:   errors.New(tr("no versions available for the current OS"))}
 	}
 	if err := resource.Download(pm.DownloadDir, config, tool.String(), progressCB); err != nil {
 		return &arduino.FailedDownloadError{
