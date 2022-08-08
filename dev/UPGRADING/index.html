@@ -277,6 +277,40 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0260" class="md-nav__link">
+    0.26.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.26.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-clicommandsdownloadtoolrelease-and-installtoolrelease-functions-have-been-removed" class="md-nav__link">
+    github.com/arduino/arduino-cli/commands.DownloadToolRelease, and InstallToolRelease functions have been removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-clicommandsoutdated-and-upgrade-functions-have-been-moved" class="md-nav__link">
+    github.com/arduino/arduino-cli/commands.Outdated and Upgrade functions have been moved
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduino-cliarduinocorespackagemanagerpackagemanager-methods-and-fields-change" class="md-nav__link">
+    github.com/arduino-cli/arduino/cores/packagemanager.PackageManager methods and fields change
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0250" class="md-nav__link">
     0.25.0
   </a>
@@ -1865,6 +1899,40 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0260" class="md-nav__link">
+    0.26.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.26.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-clicommandsdownloadtoolrelease-and-installtoolrelease-functions-have-been-removed" class="md-nav__link">
+    github.com/arduino/arduino-cli/commands.DownloadToolRelease, and InstallToolRelease functions have been removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-clicommandsoutdated-and-upgrade-functions-have-been-moved" class="md-nav__link">
+    github.com/arduino/arduino-cli/commands.Outdated and Upgrade functions have been moved
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduino-cliarduinocorespackagemanagerpackagemanager-methods-and-fields-change" class="md-nav__link">
+    github.com/arduino-cli/arduino/cores/packagemanager.PackageManager methods and fields change
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0250" class="md-nav__link">
     0.25.0
   </a>
@@ -2396,6 +2464,46 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<h2 id="0260">0.26.0<a class="headerlink" href="#0260" title="Permanent link">&para;</a></h2>
+<h3 id="githubcomarduinoarduino-clicommandsdownloadtoolrelease-and-installtoolrelease-functions-have-been-removed"><code>github.com/arduino/arduino-cli/commands.DownloadToolRelease</code>, and <code>InstallToolRelease</code> functions have been removed<a class="headerlink" href="#githubcomarduinoarduino-clicommandsdownloadtoolrelease-and-installtoolrelease-functions-have-been-removed" title="Permanent link">&para;</a></h3>
+<p>This functionality was duplicated and already available via <code>PackageManager</code> methods.</p>
+<h3 id="githubcomarduinoarduino-clicommandsoutdated-and-upgrade-functions-have-been-moved"><code>github.com/arduino/arduino-cli/commands.Outdated</code> and <code>Upgrade</code> functions have been moved<a class="headerlink" href="#githubcomarduinoarduino-clicommandsoutdated-and-upgrade-functions-have-been-moved" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>github.com/arduino/arduino-cli/commands.Outdated</code> is now <code>github.com/arduino/arduino-cli/commands/outdated.Outdated</code></li>
+<li><code>github.com/arduino/arduino-cli/commands.Upgrade</code> is now <code>github.com/arduino/arduino-cli/commands/upgrade.Upgrade</code></li>
+</ul>
+<p>Old code must change the imports accordingly.</p>
+<h3 id="githubcomarduino-cliarduinocorespackagemanagerpackagemanager-methods-and-fields-change"><code>github.com/arduino-cli/arduino/cores/packagemanager.PackageManager</code> methods and fields change<a class="headerlink" href="#githubcomarduino-cliarduinocorespackagemanagerpackagemanager-methods-and-fields-change" title="Permanent link">&para;</a></h3>
+<ul>
+<li>The <code>PackageManager.Log</code> and <code>TempDir</code> fields are now private.</li>
+</ul>
+<ul>
+<li>
+<p>The <code>PackageManager.DownloadToolRelease</code> method has no more the <code>label</code> parameter:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">pm</span><span class="w"> </span><span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span><span class="w"> </span><span class="nx">DownloadToolRelease</span><span class="p">(</span><span class="nx">tool</span><span class="w"> </span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">ToolRelease</span><span class="p">,</span><span class="w"> </span><span class="nx">config</span><span class="w"> </span><span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Config</span><span class="p">,</span><span class="w"> </span><span class="nx">label</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">progressCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+</code></pre></div>
+<p>has been changed to:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">pm</span><span class="w"> </span><span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span><span class="w"> </span><span class="nx">DownloadToolRelease</span><span class="p">(</span><span class="nx">tool</span><span class="w"> </span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">ToolRelease</span><span class="p">,</span><span class="w"> </span><span class="nx">config</span><span class="w"> </span><span class="o">*</span><span class="nx">downloader</span><span class="p">.</span><span class="nx">Config</span><span class="p">,</span><span class="w"> </span><span class="nx">progressCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+</code></pre></div>
+<p>Old code should remove the <code>label</code> parameter.</p>
+</li>
+</ul>
+<ul>
+<li>
+<p>The <code>PackageManager.UninstallPlatform</code>, <code>PackageManager.InstallTool</code>, and <code>PackageManager.UninstallTool</code> methods now
+  requires a <code>github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1.TaskProgressCB</code></p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">pm</span><span class="w"> </span><span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span><span class="w"> </span><span class="nx">UninstallPlatform</span><span class="p">(</span><span class="nx">platformRelease</span><span class="w"> </span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">PlatformRelease</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">pm</span><span class="w"> </span><span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span><span class="w"> </span><span class="nx">InstallTool</span><span class="p">(</span><span class="nx">toolRelease</span><span class="w"> </span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">ToolRelease</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">pm</span><span class="w"> </span><span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span><span class="w"> </span><span class="nx">UninstallTool</span><span class="p">(</span><span class="nx">toolRelease</span><span class="w"> </span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">ToolRelease</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+</code></pre></div>
+<p>have been changed to:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">pm</span><span class="w"> </span><span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span><span class="w"> </span><span class="nx">UninstallPlatform</span><span class="p">(</span><span class="nx">platformRelease</span><span class="w"> </span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">PlatformRelease</span><span class="p">,</span><span class="w"> </span><span class="nx">taskCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">TaskProgressCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">pm</span><span class="w"> </span><span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span><span class="w"> </span><span class="nx">InstallTool</span><span class="p">(</span><span class="nx">toolRelease</span><span class="w"> </span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">ToolRelease</span><span class="p">,</span><span class="w"> </span><span class="nx">taskCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">TaskProgressCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">pm</span><span class="w"> </span><span class="o">*</span><span class="nx">PackageManager</span><span class="p">)</span><span class="w"> </span><span class="nx">UninstallTool</span><span class="p">(</span><span class="nx">toolRelease</span><span class="w"> </span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">ToolRelease</span><span class="p">,</span><span class="w"> </span><span class="nx">taskCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">TaskProgressCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+</code></pre></div>
+<p>If you're not interested in getting the task events you can pass an empty callback function.</p>
+</li>
+</ul>
 <h2 id="0250">0.25.0<a class="headerlink" href="#0250" title="Permanent link">&para;</a></h2>
 <h3 id="go-lang-function-githubcomarduinoarduino-cliarduinoutilsfeedstreamto-has-been-changed">go-lang function <code>github.com/arduino/arduino-cli/arduino/utils.FeedStreamTo</code> has been changed<a class="headerlink" href="#go-lang-function-githubcomarduinoarduino-cliarduinoutilsfeedstreamto-has-been-changed" title="Permanent link">&para;</a></h3>
 <p>The function <code>FeedStreamTo</code> has been changed from:</p>
