@@ -17,12 +17,9 @@ package core
 
 import (
 	"context"
-	"errors"
 
 	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/httpclient"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -52,39 +49,15 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, dow
 		return nil, &arduino.PlatformNotFoundError{Platform: ref.String(), Cause: err}
 	}
 
-	if err := downloadPlatform(pm, platform, downloadCB); err != nil {
+	if err := pm.DownloadPlatformRelease(platform, nil, downloadCB); err != nil {
 		return nil, err
 	}
 
 	for _, tool := range tools {
-		if err := downloadTool(pm, tool, downloadCB); err != nil {
+		if err := pm.DownloadToolRelease(tool, nil, downloadCB); err != nil {
 			return nil, err
 		}
 	}
 
 	return &rpc.PlatformDownloadResponse{}, nil
-}
-
-func downloadPlatform(pm *packagemanager.PackageManager, platformRelease *cores.PlatformRelease, downloadCB rpc.DownloadProgressCB) error {
-	// Download platform
-	config, err := httpclient.GetDownloaderConfig()
-	if err != nil {
-		return &arduino.FailedDownloadError{Message: tr("Error downloading platform %s", platformRelease), Cause: err}
-	}
-	return pm.DownloadPlatformRelease(platformRelease, config, downloadCB)
-}
-
-func downloadTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB) error {
-	// Check if tool has a flavor available for the current OS
-	if tool.GetCompatibleFlavour() == nil {
-		return &arduino.FailedDownloadError{
-			Message: tr("Error downloading tool %s", tool),
-			Cause:   errors.New(tr("no versions available for the current OS", tool))}
-	}
-
-	if err := commands.DownloadToolRelease(pm, tool, downloadCB); err != nil {
-		return &arduino.FailedDownloadError{Message: tr("Error downloading tool %s", tool), Cause: err}
-	}
-
-	return nil
 }

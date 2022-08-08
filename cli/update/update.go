@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/outdated"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
@@ -70,7 +71,7 @@ func runUpdateCommand(cmd *cobra.Command, args []string) {
 			feedback.Errorf(tr("Error initializing instance: %v"), err)
 		}
 
-		outdatedResp, err := commands.Outdated(context.Background(), &rpc.OutdatedRequest{
+		outdatedResp, err := outdated.Outdated(context.Background(), &rpc.OutdatedRequest{
 			Instance: inst,
 		})
 		if err != nil {

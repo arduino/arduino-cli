@@ -55,7 +55,7 @@ func (pm *PackageManager) LoadHardwareFromDirectories(hardwarePaths paths.PathLi
 // LoadHardwareFromDirectory read a plaform from the path passed as parameter
 func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) []error {
 	var merr []error
-	pm.Log.Infof("Loading hardware from: %s", path)
+	pm.log.Infof("Loading hardware from: %s", path)
 	if err := path.ToAbs(); err != nil {
 		return append(merr, fmt.Errorf("%s: %w", tr("finding absolute path of %s", path), err))
 	}
@@ -76,9 +76,9 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) []error {
 	// "Global" platform.txt used to overwrite all installed platforms.
 	// For more info: https://arduino.github.io/arduino-cli/latest/platform-specification/#global-platformtxt
 	if globalPlatformTxt := path.Join("platform.txt"); globalPlatformTxt.Exist() {
-		pm.Log.Infof("Loading custom platform properties: %s", globalPlatformTxt)
+		pm.log.Infof("Loading custom platform properties: %s", globalPlatformTxt)
 		if p, err := properties.LoadFromPath(globalPlatformTxt); err != nil {
-			pm.Log.WithError(err).Errorf("Error loading properties.")
+			pm.log.WithError(err).Errorf("Error loading properties.")
 		} else {
 			pm.CustomGlobalProperties.Merge(p)
 		}
@@ -89,7 +89,7 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) []error {
 
 		// Skip tools, they're not packages and don't contain Platforms
 		if packager == "tools" {
-			pm.Log.Infof("Excluding directory: %s", packagerPath)
+			pm.log.Infof("Excluding directory: %s", packagerPath)
 			continue
 		}
 
@@ -127,7 +127,7 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) []error {
 		// - PACKAGER/tools/TOOL-NAME/TOOL-VERSION/... (ex: arduino/tools/bossac/1.7.0/...)
 		toolsSubdirPath := packagerPath.Join("tools")
 		if toolsSubdirPath.IsDir() {
-			pm.Log.Infof("Checking existence of 'tools' path: %s", toolsSubdirPath)
+			pm.log.Infof("Checking existence of 'tools' path: %s", toolsSubdirPath)
 			merr = append(merr, pm.LoadToolsFromPackageDir(targetPackage, toolsSubdirPath)...)
 		}
 		// If the Package does not contain Platforms or Tools we remove it since does not contain anything valuable
@@ -143,7 +143,7 @@ func (pm *PackageManager) LoadHardwareFromDirectory(path *paths.Path) []error {
 // to the targetPackage object passed as parameter.
 // A list of gRPC Status error is returned for each Platform failed to load.
 func (pm *PackageManager) loadPlatforms(targetPackage *cores.Package, packageDir *paths.Path) []error {
-	pm.Log.Infof("Loading package %s from: %s", targetPackage.Name, packageDir)
+	pm.log.Infof("Loading package %s from: %s", targetPackage.Name, packageDir)
 
 	var merr []error
 
@@ -220,11 +220,11 @@ func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, architectur
 			tmp := cores.NewPackages()
 			index.MergeIntoPackages(tmp)
 			if tmpPackage := tmp.GetOrCreatePackage(targetPackage.Name); tmpPackage == nil {
-				pm.Log.Warnf("Can't determine bundle platform version for %s", targetPackage.Name)
+				pm.log.Warnf("Can't determine bundle platform version for %s", targetPackage.Name)
 			} else if tmpPlatform := tmpPackage.GetOrCreatePlatform(architecture); tmpPlatform == nil {
-				pm.Log.Warnf("Can't determine bundle platform version for %s:%s", targetPackage.Name, architecture)
+				pm.log.Warnf("Can't determine bundle platform version for %s:%s", targetPackage.Name, architecture)
 			} else if tmpPlatformRelease := tmpPlatform.GetLatestRelease(); tmpPlatformRelease == nil {
-				pm.Log.Warnf("Can't determine bundle platform version for %s:%s, no valid release found", targetPackage.Name, architecture)
+				pm.log.Warnf("Can't determine bundle platform version for %s:%s, no valid release found", targetPackage.Name, architecture)
 			} else {
 				version = tmpPlatformRelease.Version
 			}
@@ -239,12 +239,12 @@ func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, architectur
 		release := platform.GetOrCreateRelease(version)
 		release.IsIDEBundled = isIDEBundled
 		if isIDEBundled {
-			pm.Log.Infof("Package is built-in")
+			pm.log.Infof("Package is built-in")
 		}
 		if err := pm.loadPlatformRelease(release, platformPath); err != nil {
 			return fmt.Errorf("%s: %w", tr("loading platform release %s", release), err)
 		}
-		pm.Log.WithField("platform", release).Infof("Loaded platform")
+		pm.log.WithField("platform", release).Infof("Loaded platform")
 
 	} else {
 		// case: ARCHITECTURE/VERSION/boards.txt
@@ -272,7 +272,7 @@ func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, architectur
 			if err := pm.loadPlatformRelease(release, versionDir); err != nil {
 				return fmt.Errorf("%s: %w", tr("loading platform release %s", release), err)
 			}
-			pm.Log.WithField("platform", release).Infof("Loaded platform")
+			pm.log.WithField("platform", release).Infof("Loaded platform")
 		}
 	}
 
@@ -357,7 +357,7 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 		if len(split) != 2 {
 			return fmt.Errorf(tr("invalid pluggable monitor reference: %s"), ref)
 		}
-		pm.Log.WithField("protocol", protocol).WithField("tool", ref).Info("Adding monitor tool")
+		pm.log.WithField("protocol", protocol).WithField("tool", ref).Info("Adding monitor tool")
 		platform.Monitors[protocol] = &cores.MonitorDependency{
 			Packager: split[0],
 			Name:     split[1],
@@ -367,7 +367,7 @@ func (pm *PackageManager) loadPlatformRelease(platform *cores.PlatformRelease, p
 	// Support for pluggable monitors in debugging/development environments
 	platform.MonitorsDevRecipes = map[string]string{}
 	for protocol, recipe := range platform.Properties.SubTree("pluggable_monitor.pattern").AsMap() {
-		pm.Log.WithField("protocol", protocol).WithField("recipe", recipe).Info("Adding monitor recipe")
+		pm.log.WithField("protocol", protocol).WithField("recipe", recipe).Info("Adding monitor recipe")
 		platform.MonitorsDevRecipes[protocol] = recipe
 	}
 
@@ -592,7 +592,7 @@ func convertUploadToolsToPluggableDiscovery(props *properties.Map) {
 // LoadToolsFromPackageDir loads a set of tools from the given toolsPath. The tools will be loaded
 // in the given *Package.
 func (pm *PackageManager) LoadToolsFromPackageDir(targetPackage *cores.Package, toolsPath *paths.Path) []error {
-	pm.Log.Infof("Loading tools from dir: %s", toolsPath)
+	pm.log.Infof("Loading tools from dir: %s", toolsPath)
 
 	var merr []error
 
@@ -637,7 +637,7 @@ func (pm *PackageManager) loadToolReleaseFromDirectory(tool *cores.Tool, version
 	} else {
 		toolRelease := tool.GetOrCreateRelease(version)
 		toolRelease.InstallDir = absToolReleasePath
-		pm.Log.WithField("tool", toolRelease).Infof("Loaded tool")
+		pm.log.WithField("tool", toolRelease).Infof("Loaded tool")
 		return nil
 	}
 }
@@ -655,7 +655,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectories(dirs paths.PathList) []
 
 // LoadToolsFromBundleDirectory FIXMEDOC
 func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath *paths.Path) error {
-	pm.Log.Infof("Loading tools from bundle dir: %s", toolsPath)
+	pm.log.Infof("Loading tools from bundle dir: %s", toolsPath)
 
 	// We scan toolsPath content to find a "builtin_tools_versions.txt", if such file exists
 	// then the all the tools are available in the same directory, mixed together, and their
@@ -689,7 +689,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath *paths.Path) er
 	if builtinToolsVersionsTxtPath != "" {
 		// If builtin_tools_versions.txt is found create tools based on the info
 		// contained in that file
-		pm.Log.Infof("Found builtin_tools_versions.txt")
+		pm.log.Infof("Found builtin_tools_versions.txt")
 		toolPath, err := paths.New(builtinToolsVersionsTxtPath).Parent().Abs()
 		if err != nil {
 			return fmt.Errorf(tr("getting parent dir of %[1]s: %[2]s"), builtinToolsVersionsTxtPath, err)
@@ -708,7 +708,7 @@ func (pm *PackageManager) LoadToolsFromBundleDirectory(toolsPath *paths.Path) er
 				version := semver.ParseRelaxed(toolVersion)
 				release := tool.GetOrCreateRelease(version)
 				release.InstallDir = toolPath
-				pm.Log.WithField("tool", release).Infof("Loaded tool")
+				pm.log.WithField("tool", release).Infof("Loaded tool")
 			}
 		}
 	} else {
