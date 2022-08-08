@@ -407,6 +407,9 @@ func (disc *PluggableDiscovery) List() ([]*Port, error) {
 // The event channel must be consumed as quickly as possible since it may block the
 // discovery if it becomes full. The channel size is configurable.
 func (disc *PluggableDiscovery) StartSync(size int) (<-chan *Event, error) {
+	disc.statusMutex.Lock()
+	defer disc.statusMutex.Unlock()
+
 	if err := disc.sendCommand("START_SYNC\n"); err != nil {
 		return nil, err
 	}
@@ -421,8 +424,6 @@ func (disc *PluggableDiscovery) StartSync(size int) (<-chan *Event, error) {
 		return nil, errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "OK", msg.Message)
 	}
 
-	disc.statusMutex.Lock()
-	defer disc.statusMutex.Unlock()
 	disc.state = Syncing
 	// In case there is already an existing event channel in use we close it before creating a new one.
 	disc.stopSync()
