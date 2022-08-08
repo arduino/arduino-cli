@@ -62,7 +62,6 @@ func TestCoreSearch(t *testing.T) {
 	out, _, err = cli.Run("core", "search", "test_core", "--all", "--format", "json", "--additional-urls="+url.String())
 	require.NoError(t, err)
 	requirejson.Len(t, out, 2)
-	// requirejson.Len(t, out, 3) // Test failure
 
 	checkPlatformIsInJSONOutput := func(stdout []byte, id, version string) {
 		jqquery := fmt.Sprintf(`[{id:"%s", latest:"%s"}]`, id, version)
@@ -74,7 +73,6 @@ func TestCoreSearch(t *testing.T) {
 	require.NoError(t, err)
 	checkPlatformIsInJSONOutput(out, "Retrokits-RK002:arm", "1.0.5")
 	checkPlatformIsInJSONOutput(out, "Retrokits-RK002:arm", "1.0.6")
-	//checkPlatformIsInJSONOutput(out, "Retrokits-RK002:arm", "1.0.9") // Test failure
 
 	// Search using Retrokit Package Maintainer
 	out, _, err = cli.Run("core", "search", "Retrokits-RK002", "--all", "--additional-urls="+url.String(), "--format", "json")
@@ -93,7 +91,6 @@ func TestCoreSearch(t *testing.T) {
 	require.NoError(t, err)
 	checkPlatformIsInJSONOutput(out, "Package:x86", "1.2.3")
 
-	// Check search with case, accents and spaces
 	runSearch := func(searchArgs string, expectedIDs ...string) {
 		args := []string{"core", "search", "--format", "json"}
 		args = append(args, strings.Split(searchArgs, " ")...)
@@ -106,6 +103,7 @@ func TestCoreSearch(t *testing.T) {
 		}
 	}
 
+	// Check search with case, accents and spaces
 	runSearch("mkr1000", "arduino:samd")
 	runSearch("mkr 1000", "arduino:samd")
 

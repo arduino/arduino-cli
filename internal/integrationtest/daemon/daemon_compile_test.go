@@ -74,9 +74,6 @@ func TestDaemonCompileOptions(t *testing.T) {
 			fmt.Println("COMPILE ERROR>", err)
 			break
 		}
-		// if msg.OutStream != nil {
-		// 	fmt.Printf("COMPILE> %v\n", string(msg.GetOutStream()))
-		// }
 		if msg.ErrStream != nil {
 			fmt.Printf("COMPILE> %v\n", string(msg.GetErrStream()))
 		}
@@ -91,9 +88,6 @@ func TestDaemonCompileOptions(t *testing.T) {
 			break
 		}
 		require.NoError(t, err)
-		// if msg.OutStream != nil {
-		// 	fmt.Printf("COMPILE> %v\n", string(msg.GetOutStream()))
-		// }
 		if msg.ErrStream != nil {
 			fmt.Printf("COMPILE> %v\n", string(msg.GetErrStream()))
 		}

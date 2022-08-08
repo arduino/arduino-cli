@@ -61,7 +61,7 @@ func NewArduinoCliWithinEnvironment(env *testsuite.Environment, config *ArduinoC
 	cli := &ArduinoCLI{
 		path:          config.ArduinoCLIPath,
 		t:             require.New(env.T()),
-		dataDir:       env.RootDir().Join("arduino15"),
+		dataDir:       env.RootDir().Join("Arduino15"),
 		sketchbookDir: env.RootDir().Join("Arduino"),
 		stagingDir:    env.RootDir().Join("arduino15/staging"),
 	}
@@ -153,14 +153,6 @@ func (cli *ArduinoCLI) StartDaemon(verbose bool) string {
 
 	cli.t.NoError(cliProc.Start())
 	cli.proc = cliProc
-
-	// var daemonAddr struct {
-	// 	IP   string
-	// 	Port string
-	// }
-	// dec := json.NewDecoder(stdout)
-	// cli.t.NoError(dec.Decode(&daemonAddr))
-	// cli.daemonAddr = daemonAddr.IP + ":" + daemonAddr.Port
 	cli.daemonAddr = "127.0.0.1:50051"
 
 	copy := func(dst io.Writer, src io.Reader) {
