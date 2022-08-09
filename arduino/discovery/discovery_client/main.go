@@ -41,7 +41,7 @@ func main() {
 	activePorts := map[string]*discovery.Port{}
 	watcher, err := dm.Watch()
 	if err != nil {
-		log.Fatalf("failed to start discvoeries: %v", err)
+		log.Fatalf("failed to start discoveries: %v", err)
 	}
 	if err := ui.Init(); err != nil {
 		log.Fatalf("failed to initialize termui: %v", err)
