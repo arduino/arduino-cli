@@ -63,7 +63,7 @@ func NewArduinoCliWithinEnvironment(env *testsuite.Environment, config *ArduinoC
 		t:             require.New(env.T()),
 		dataDir:       env.RootDir().Join("Arduino15"),
 		sketchbookDir: env.RootDir().Join("Arduino"),
-		stagingDir:    env.RootDir().Join("arduino15/staging"),
+		stagingDir:    env.RootDir().Join("Arduino15/staging"),
 	}
 	if config.UseSharedStagingFolder {
 		cli.stagingDir = env.SharedDownloadsDir()
