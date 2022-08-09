@@ -21,20 +21,13 @@ import (
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
-	"go.bug.st/testsuite"
 	"go.bug.st/testsuite/requirejson"
 )
 
 func TestCorrectHandlingOfPlatformVersionProperty(t *testing.T) {
 	// See: https://github.com/arduino/arduino-cli/issues/1823
-
-	env := testsuite.NewEnvironment(t)
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
-
-	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
-		ArduinoCLIPath:         paths.New("..", "..", "..", "arduino-cli"),
-		UseSharedStagingFolder: true,
-	})
 
 	// Copy test platform
 	testPlatform := paths.New("testdata", "issue_1823", "DxCore-dev")
