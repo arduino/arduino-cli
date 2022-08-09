@@ -38,10 +38,10 @@ func TestCorrectHandlingOfPlatformVersionProperty(t *testing.T) {
 
 	// Copy test platform
 	testPlatform := paths.New("testdata", "issue_1823", "DxCore-dev")
-	require.NoError(t, testPlatform.CopyDirTo(cli.DataDir().Join("packages", "hardware")))
+	require.NoError(t, testPlatform.CopyDirTo(cli.SketchbookDir().Join("hardware", "DxCore-dev")))
 
 	// Trigger problematic call
 	out, _, err := cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Contains(t, out, `[{"id":"hardware:megaavr","installed":"1.4.10","name":"DxCore"}]`)
+	requirejson.Contains(t, out, `[{"id":"DxCore-dev:megaavr","installed":"1.4.10","name":"DxCore"}]`)
 }
