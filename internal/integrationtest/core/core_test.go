@@ -23,7 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
-	"go.bug.st/testsuite/requirejson"
+	"go.bug.st/testifyjson/requirejson"
 )
 
 func TestCoreSearch(t *testing.T) {
