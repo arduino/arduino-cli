@@ -1,16 +1,17 @@
 ---
-name: github.com/mattn/go-runewidth
-version: v0.0.13
+name: github.com/rivo/uniseg
+version: v0.2.0
 type: go
-summary: 
-homepage: https://pkg.go.dev/github.com/mattn/go-runewidth
+summary: 'Package uniseg implements Unicode Text Segmentation according to Unicode
+  Standard Annex #29 (http://unicode.org/reports/tr29/).'
+homepage: https://pkg.go.dev/github.com/rivo/uniseg
 license: mit
 licenses:
-- sources: LICENSE
+- sources: LICENSE.txt
   text: |
-    The MIT License (MIT)
+    MIT License
 
-    Copyright (c) 2016 Yasuhiro Matsumoto
+    Copyright (c) 2019 Oliver Kuederle
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +30,4 @@ licenses:
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
-- sources: README.md
-  text: 'under the MIT License: http://mattn.mit-license.org/2013'
 notices: []
