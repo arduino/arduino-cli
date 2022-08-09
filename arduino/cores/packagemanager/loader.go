@@ -197,7 +197,8 @@ func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, architectur
 			return fmt.Errorf("%s: %w", tr("loading platform.txt"), err)
 		}
 
-		version, err := semver.Parse(platformProperties.Get("version"))
+		versionString := platformProperties.ExpandPropsInString(platformProperties.Get("version"))
+		version, err := semver.Parse(versionString)
 		if err != nil {
 			return &arduino.InvalidVersionError{Cause: fmt.Errorf("%s: %s", platformTxtPath, err)}
 		}
