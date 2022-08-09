@@ -1,0 +1,78 @@
+serialupdi.name=SerialUPDI - 230400 baud
+serialupdi.protocol=uart
+serialupdi.program.extra_params=-u {serial.port} -b 230400
+serialupdi.program.protocol=uart
+serialupdi.program.tool=serialupdi
+serialupdi.bootloader.tool=serialupdi
+
+serialupdi345k.name=SerialUPDI - Fast: 345600 baud (Not for HT42B345 adapters or CP2102)
+serialupdi345k.protocol=uart
+serialupdi345k.program.extra_params=-u {serial.port} -b 345600
+serialupdi345k.program.protocol=uart
+serialupdi345k.program.tool=serialupdi
+serialupdi345k.bootloader.tool=serialupdi
+
+serialupdiHT42.name=SerialUPDI - HT42: Fastest for HT42. (Known to be flaky - 460800 baud)
+serialupdiHT42.protocol=uart
+serialupdiHT42.program.extra_params=-u {serial.port} -b 460800 -wc 32
+serialupdiHT42.program.protocol=uart
+serialupdiHT42.program.tool=serialupdi
+serialupdiHT42.bootloader.tool=serialupdi
+
+serialupdi57k.name=SerialUPDI - SLOW: 57600 baud
+serialupdi57k.protocol=uart
+serialupdi57k.program.extra_params=-u {serial.port} -b 57600
+serialupdi57k.program.protocol=uart
+serialupdi57k.program.tool=serialupdi
+serialupdi57k.bootloader.tool=serialupdi
+
+jtag2updi.name=jtag2updi
+jtag2updi.communication=serial
+jtag2updi.protocol=jtag2updi
+jtag2updi.program.protocol=jtag2updi
+jtag2updi.program.tool=avrdude
+jtag2updi.program.extra_params=-P{serial.port}
+jtag2updi.program.speed=115200
+
+
+nedbg.name=Curiosity Nano (nEDBG, debug chip: ATSAMD21E18)
+nedbg.communication=usb
+nedbg.protocol=curiosity_updi
+nedbg.program.protocol=curiosity_updi
+nedbg.program.tool=avrdude
+nedbg.program.extra_params=-Pusb
+
+medbg.name=mEDBG, debug chip: ATmega32u4
+medbg.communication=usb
+medbg.protocol=xplainedmini_updi
+medbg.program.protocol=xplainedmini_updi
+medbg.program.tool=avrdude
+medbg.program.extra_params=-Pusb
+
+edbg.name=EDBG, debug chip: AT32UC3A4256
+edbg.communication=usb
+edbg.protocol=xplainedpro_updi
+edbg.program.protocol=xplainedpro_updi
+edbg.program.tool=avrdude
+edbg.program.extra_params=-Pusb
+
+atmelice_updi.name=Atmel-ICE (UPDI mode)
+atmelice_updi.communication=usb
+atmelice_updi.protocol=atmelice_updi
+atmelice_updi.program.protocol=jtagice3_updi
+atmelice_updi.program.tool=avrdude
+atmelice_updi.program.extra_params=-Pusb
+
+pickit4_updi.name=PICkit4 (UPDI mode)
+pickit4_updi.communication=usb
+pickit4_updi.protocol=pickit4_updi
+pickit4_updi.program.protocol=jtagice3_updi
+pickit4_updi.program.tool=avrdude
+pickit4_updi.program.extra_params=-Pusb
+
+snap_updi.name=MPLAB SNAP (UPDI mode)
+snap_updi.communication=usb
+snap_updi.protocol=snap_updi
+snap_updi.program.protocol=jtagice3_updi
+snap_updi.program.tool=avrdude
+snap_updi.program.extra_params=-Pusb

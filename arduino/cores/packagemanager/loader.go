@@ -23,6 +23,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/configuration"
@@ -196,7 +197,11 @@ func (pm *PackageManager) loadPlatform(targetPackage *cores.Package, architectur
 			return fmt.Errorf("%s: %w", tr("loading platform.txt"), err)
 		}
 
-		version := semver.MustParse(platformProperties.Get("version"))
+		versionString := platformProperties.ExpandPropsInString(platformProperties.Get("version"))
+		version, err := semver.Parse(versionString)
+		if err != nil {
+			return &arduino.InvalidVersionError{Cause: fmt.Errorf("%s: %s", platformTxtPath, err)}
+		}
 
 		// Check if package_bundled_index.json exists.
 		// This is used indirectly by the Java IDE since it's necessary for the arduino-builder
