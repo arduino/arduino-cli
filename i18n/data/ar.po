@@ -59,7 +59,7 @@ msgstr "%s و %s لا يمكن استخدامهما معا"
 msgid "%s downloaded"
 msgstr "%s تم تحميله بنجاح"
 
-#: commands/bundled_tools.go:53
+#: arduino/cores/packagemanager/install_uninstall.go:329
 msgid "%s installed"
 msgstr "%s تم تثبيته بنجاح"
 
@@ -67,12 +67,12 @@ msgstr "%s تم تثبيته بنجاح"
 msgid "%s is already installed."
 msgstr "%s مثبت مسبقا"
 
-#: arduino/cores/packagemanager/loader.go:64
-#: arduino/cores/packagemanager/loader.go:636
+#: arduino/cores/packagemanager/loader.go:65
+#: arduino/cores/packagemanager/loader.go:641
 msgid "%s is not a directory"
 msgstr "%s ليس مسارا صحيحا"
 
-#: arduino/cores/packagemanager/install_uninstall.go:119
+#: arduino/cores/packagemanager/install_uninstall.go:283
 msgid "%s is not managed by package manager"
 msgstr "%s غير مدار بواسطة مدير الحزمات"
 
@@ -83,10 +83,6 @@ msgstr "يجب تثبيت %s"
 #: legacy/builder/ctags_runner.go:42
 msgid "%s pattern is missing"
 msgstr "%s النسق مفقود"
-
-#: commands/instances.go:805
-msgid "%s uninstalled"
-msgstr "%s غير مثبت"
 
 #: arduino/errors.go:781
 msgid "'%s' has an invalid signature"
@@ -100,7 +96,7 @@ msgstr "(مخفي)"
 msgid "(legacy)"
 msgstr "(الشكل القديم)"
 
-#: cli/lib/install.go:81
+#: cli/lib/install.go:82
 msgid ""
 "--git-url and --zip-path are disabled by default, for more information see: "
 "%v"
@@ -108,7 +104,7 @@ msgstr ""
 "مسارات --git url و zip-path-- غير مفعلة افتراضيا . للمزيد من المعلومات راجع "
 ": %v"
 
-#: cli/lib/install.go:84
+#: cli/lib/install.go:85
 msgid ""
 "--git-url and --zip-path flags allow installing untrusted files, use it at "
 "your own risk."
@@ -149,8 +145,7 @@ msgstr ""
 msgid "All the cores are already at the latest version"
 msgstr "كل الانوية محدثة باخر اصدار مسبقا"
 
-#: commands/instances.go:676 commands/lib/install.go:86
-#: commands/lib/install.go:131
+#: commands/lib/install.go:86 commands/lib/install.go:131
 msgid "Already installed %s"
 msgstr "%s مثبت مسبقا"
 
@@ -216,7 +211,7 @@ msgstr "تهيئة الاردوينو"
 msgid "Arduino core operations."
 msgstr "عمليات نواة الاردوينو (Arduino core operations)"
 
-#: cli/lib/check_deps.go:56 cli/lib/install.go:127
+#: cli/lib/check_deps.go:56 cli/lib/install.go:128
 msgid "Arguments error: %v"
 msgstr ""
 
@@ -283,8 +278,8 @@ msgstr "تعذر انشاء المشروع"
 msgid "Can't download library"
 msgstr "تعذر تنزيل المكتبة"
 
-#: commands/core/install.go:136 commands/core/uninstall.go:53
-#: commands/instances.go:715 commands/instances.go:727
+#: arduino/cores/packagemanager/install_uninstall.go:132
+#: commands/core/uninstall.go:52
 msgid "Can't find dependencies for platform %s"
 msgstr "تعذر ايجاد التبعيات للمنصة %s"
 
@@ -344,11 +339,11 @@ msgstr "تعذر ايجاد المسار المطلق : %v"
 msgid "Cannot get executable path: %v"
 msgstr "تعذر ايجاد مسار البرنامج التنفيذي : %v"
 
-#: commands/core/install.go:143
+#: arduino/cores/packagemanager/install_uninstall.go:139
 msgid "Cannot install platform"
 msgstr "تعذر تثبيت المنصة"
 
-#: commands/bundled_tools.go:50
+#: arduino/cores/packagemanager/install_uninstall.go:326
 msgid "Cannot install tool %s"
 msgstr "تعذر تثبيت الاداة %s"
 
@@ -356,7 +351,7 @@ msgstr "تعذر تثبيت الاداة %s"
 msgid "Cannot perform port reset: %s"
 msgstr "تعذر اجراء اعادة تشغيل المنفذ : %s"
 
-#: commands/core/install.go:161
+#: arduino/cores/packagemanager/install_uninstall.go:157
 msgid "Cannot upgrade platform"
 msgstr "تعذر تحديث المنصة"
 
@@ -439,11 +434,7 @@ msgstr "تهيئة المنفذ"
 msgid "Configuration options for %s"
 msgstr "اعدادات التهيئة ل %s"
 
-#: commands/instances.go:812
-msgid "Configuring platform"
-msgstr "تهيئة المنصة"
-
-#: commands/core/install.go:176
+#: arduino/cores/packagemanager/install_uninstall.go:173
 msgid "Configuring platform."
 msgstr "جار تهيئة المنصة"
 
@@ -459,7 +450,7 @@ msgstr "متصل الى %s ! اضغط CTRL-C للخروج"
 msgid "Core"
 msgstr "النواة"
 
-#: cli/update/update.go:82
+#: cli/update/update.go:83
 msgid "Core name"
 msgstr "اسم النواة"
 
@@ -467,7 +458,7 @@ msgstr "اسم النواة"
 msgid "Could not connect via HTTP"
 msgstr "تعذر الاتصال بواسطة HTTP"
 
-#: commands/instances.go:434
+#: commands/instances.go:433
 msgid "Could not create index directory"
 msgstr "تعذر انشاء فهرس داخل المسار"
 
@@ -479,7 +470,7 @@ msgstr "تعذر القيام بـ deeply cache لــ core build : %[1]s"
 msgid "Couldn't determine program size"
 msgstr "تعذر معرفة حجم البرنامج"
 
-#: cli/arguments/sketch.go:37 cli/lib/install.go:107
+#: cli/arguments/sketch.go:37 cli/lib/install.go:108
 msgid "Couldn't get current working directory: %v"
 msgstr "تعذر ايجاد المسار الحالي %v"
 
@@ -601,11 +592,11 @@ msgstr "قطع الاتصال"
 msgid "Display only the provided gRPC calls"
 msgstr ""
 
-#: cli/lib/install.go:62
+#: cli/lib/install.go:63
 msgid "Do not install dependencies."
 msgstr "عدم تثبيت التبعيات (dependencies)"
 
-#: cli/lib/install.go:63
+#: cli/lib/install.go:64
 msgid "Do not overwrite already installed libraries."
 msgstr ""
 
@@ -623,7 +614,6 @@ msgstr ""
 "عدم انهاء عمليات daemon في حال تم انهاء العملية الام (Do not terminate "
 "daemon process if the parent process dies)"
 
-#: commands/instances.go:667 commands/instances.go:724
 #: commands/lib/download.go:59
 msgid "Downloading %s"
 msgstr "يتم تنزيل %s"
@@ -632,19 +622,19 @@ msgstr "يتم تنزيل %s"
 msgid "Downloading index signature: %s"
 msgstr "جار تنزيل فهرس التوقيعات %s"
 
-#: arduino/resources/index.go:58 commands/instances.go:485
+#: arduino/resources/index.go:58 commands/instances.go:484
 msgid "Downloading index: %s"
 msgstr "جار تنزيل الفهرس : %s"
 
-#: commands/instances.go:367
+#: commands/instances.go:366
 msgid "Downloading library %s"
 msgstr "جار تحميل المكتبة %s"
 
-#: commands/instances.go:97
+#: commands/instances.go:95
 msgid "Downloading missing tool %s"
 msgstr "جار تنزيل الاداة الناقصة"
 
-#: commands/core/install.go:96
+#: arduino/cores/packagemanager/install_uninstall.go:92
 msgid "Downloading packages"
 msgstr "جار تنزيل الحزم"
 
@@ -668,11 +658,11 @@ msgstr "يقوم بتنزيل مكتبة او اكثر بدون تثبيتها"
 msgid "Enable debug logging of gRPC calls"
 msgstr ""
 
-#: cli/lib/install.go:65
+#: cli/lib/install.go:66
 msgid "Enter a path to zip file"
 msgstr "ادخل مسار لملف zip"
 
-#: cli/lib/install.go:64
+#: cli/lib/install.go:65
 msgid "Enter git url for libraries hosted on repositories"
 msgstr ""
 "ادخل عنوان git URL الخاص بالمكتبات المستضافة على المستودعات (repositories)"
@@ -743,23 +733,18 @@ msgstr "خطأ اثناء تحميل الفهرس '%s'"
 msgid "Error downloading index signature '%s'"
 msgstr "خطأ اثناء تحميل توقيع الفهرس : '%s'"
 
-#: commands/instances.go:669
-msgid "Error downloading library"
-msgstr "خطا اثناء تنزيل المكتبة"
-
-#: commands/instances.go:379
+#: commands/instances.go:378
 msgid "Error downloading library %s"
 msgstr "خطأ اثناء تحميل المكتبة %s"
 
 #: arduino/cores/packagemanager/profiles.go:125
-#: arduino/cores/packagemanager/profiles.go:126 commands/core/download.go:72
-#: commands/instances.go:750
+#: arduino/cores/packagemanager/profiles.go:126
 msgid "Error downloading platform %s"
 msgstr "خطأ اثناء تنزيل المنصة %s"
 
-#: arduino/cores/packagemanager/profiles.go:176 commands/core/download.go:81
-#: commands/core/download.go:86 commands/instances.go:743
-#: commands/instances.go:744
+#: arduino/cores/packagemanager/download.go:127
+#: arduino/cores/packagemanager/download.go:132
+#: arduino/cores/packagemanager/profiles.go:176
 msgid "Error downloading tool %s"
 msgstr "خطا اثناء تنزيل الاداة %s"
 
@@ -854,34 +839,34 @@ msgstr ""
 "خطأ اثناء الحصول على بيانات اعدادات المنفذ (port settings details) : %s"
 
 #: cli/core/search.go:81 cli/instance/instance.go:55 cli/lib/search.go:73
-#: cli/update/update.go:70
+#: cli/update/update.go:71
 msgid "Error initializing instance: %v"
 msgstr ""
 
-#: cli/lib/install.go:141
+#: cli/lib/install.go:142
 msgid "Error installing %s: %v"
 msgstr "خطأ اثناء تثبيت %v:%s"
 
-#: cli/lib/install.go:118
+#: cli/lib/install.go:119
 msgid "Error installing Git Library: %v"
 msgstr "خطأ اثناء تثبيت مكتبة GIT : %v"
 
-#: cli/lib/install.go:95
+#: cli/lib/install.go:96
 msgid "Error installing Zip Library: %v"
 msgstr "خطأ اثناء تثبيت مكتبة ZIP : %v"
 
-#: commands/instances.go:389
+#: commands/instances.go:388
 msgid "Error installing library %s"
 msgstr "خطأ اثناء تثبيت المكتبة %s"
 
 #: arduino/cores/packagemanager/profiles.go:133
-#: arduino/cores/packagemanager/profiles.go:134 commands/instances.go:769
+#: arduino/cores/packagemanager/profiles.go:134
 msgid "Error installing platform %s"
 msgstr "خطأ اثناء تثبيت المنصة %s"
 
 #: arduino/cores/packagemanager/profiles.go:177
 #: arduino/cores/packagemanager/profiles.go:184
-#: arduino/cores/packagemanager/profiles.go:185 commands/instances.go:759
+#: arduino/cores/packagemanager/profiles.go:185
 msgid "Error installing tool %s"
 msgstr "خطأ اثناء تثبيت الاداة %s"
 
@@ -950,15 +935,11 @@ msgstr "خطا اثناء حل التبعيات ل %[1]s:%[2]s"
 msgid "Error retrieving core list: %v"
 msgstr "خطا اثناء استعادة قائمة النواة : %v"
 
-#: cli/outdated/outdated.go:57 cli/update/update.go:77
+#: cli/outdated/outdated.go:57 cli/update/update.go:78
 msgid "Error retrieving outdated cores and libraries: %v"
 msgstr "خطا اثناء استعادة الانوية و المكتبات القديمة : %v"
 
-#: commands/instances.go:785
-msgid "Error rolling-back changes"
-msgstr "خطا اثناء التراجع عن التغييرات"
-
-#: commands/core/install.go:158
+#: arduino/cores/packagemanager/install_uninstall.go:154
 msgid "Error rolling-back changes: %s"
 msgstr "خطا اثناء التراجع عن التغييرات : %s"
 
@@ -998,15 +979,7 @@ msgstr "خطأ اثناء بدء اكتشاف اللوحات (board discoveries)
 msgid "Error uninstalling %[1]s: %[2]v"
 msgstr "خطا اثناء الغاء تثبيت %[1]s: %[2]v"
 
-#: commands/core/uninstall.go:81
-msgid "Error uninstalling platform %s"
-msgstr "خطأ خلال الغاء تثبيت المنصة %s"
-
-#: commands/core/uninstall.go:97 commands/instances.go:801
-msgid "Error uninstalling tool %s"
-msgstr "خطأ اثناء الغاء تثبيت الاداة %s"
-
-#: cli/update/update.go:62
+#: cli/update/update.go:63
 msgid "Error updating core and libraries index: %v"
 msgstr "تعذر تحديث النواة و فهرس المكتبات : %v"
 
@@ -1026,7 +999,7 @@ msgstr "خطا اثناء تحديث فهرس المكتبات : %v"
 msgid "Error upgrading libraries: %v"
 msgstr "خطأ اثناء تطوير المكتبات : %v"
 
-#: commands/core/install.go:153 commands/instances.go:780
+#: arduino/cores/packagemanager/install_uninstall.go:149
 msgid "Error upgrading platform: %s"
 msgstr "خطا اثناء تطوير المنصة : %s"
 
@@ -1105,11 +1078,11 @@ msgstr "فشل المبرمجة"
 msgid "Failed to burn bootloader"
 msgstr "فشل حرق محمل الاقلاع"
 
-#: commands/instances.go:127
+#: commands/instances.go:125
 msgid "Failed to create data directory"
 msgstr "فشل انشاء مسار البيانات"
 
-#: commands/instances.go:117
+#: commands/instances.go:115
 msgid "Failed to create downloads directory"
 msgstr "فشل انشاء مسار التنزيلات"
 
@@ -1252,25 +1225,26 @@ msgstr ""
 msgid "Installed"
 msgstr "تم التنصيب"
 
-#: commands/instances.go:690 commands/lib/install.go:147
+#: commands/lib/install.go:147
 msgid "Installed %s"
 msgstr "تم تثبيت %s"
 
 #: cli/outdated/outdated.go:80 cli/outdated/outdated.go:89
-#: cli/update/update.go:82 cli/update/update.go:92
+#: cli/update/update.go:83 cli/update/update.go:93
 msgid "Installed version"
 msgstr "النسخة المثبتة "
 
-#: commands/bundled_tools.go:46 commands/instances.go:673
+#: arduino/cores/packagemanager/install_uninstall.go:312
 #: commands/lib/install.go:127
 msgid "Installing %s"
 msgstr "جار تثبيت %s"
 
-#: commands/instances.go:387
+#: commands/instances.go:386
 msgid "Installing library %s"
 msgstr "جار تثبيت المكتبة %s"
 
-#: arduino/cores/packagemanager/profiles.go:131 commands/core/install.go:119
+#: arduino/cores/packagemanager/install_uninstall.go:115
+#: arduino/cores/packagemanager/profiles.go:131
 msgid "Installing platform %s"
 msgstr "جار تثبيت المنصة %s"
 
@@ -1313,7 +1287,7 @@ msgstr "FBQN غير صالح"
 msgid "Invalid URL"
 msgstr "URL غير صالح"
 
-#: commands/instances.go:248
+#: commands/instances.go:267
 msgid "Invalid additional URL: %v"
 msgstr "URL الاضافي غير صالح : %v"
 
@@ -1362,7 +1336,7 @@ msgstr ""
 msgid "Invalid output format: %s"
 msgstr ""
 
-#: commands/instances.go:480
+#: commands/instances.go:479
 msgid "Invalid package index in %s"
 msgstr ""
 
@@ -1434,7 +1408,7 @@ msgstr ""
 msgid "Library %s is not installed"
 msgstr "المكتبة %s غير مثبتة"
 
-#: commands/instances.go:373
+#: commands/instances.go:372
 msgid "Library %s not found"
 msgstr "تعذر ايجاد المكتبة %s"
 
@@ -1457,7 +1431,7 @@ msgstr "فشل تثبيت المكتبة"
 msgid "Library installed"
 msgstr "المكتبة مثبتة"
 
-#: cli/outdated/outdated.go:89 cli/update/update.go:92
+#: cli/outdated/outdated.go:89 cli/update/update.go:93
 msgid "Library name"
 msgstr "اسم المكتبة"
 
@@ -1515,12 +1489,12 @@ msgstr "انشاء قائمة بجميع اللوحات المتصلة"
 msgid "Lists cores and libraries that can be upgraded"
 msgstr ""
 
-#: commands/instances.go:256 commands/instances.go:263
-#: commands/instances.go:346
+#: commands/instances.go:275 commands/instances.go:282
+#: commands/instances.go:345
 msgid "Loading index file: %v"
 msgstr ""
 
-#: commands/instances.go:402
+#: commands/instances.go:401
 msgid "Loading libraries: %v"
 msgstr ""
 
@@ -1596,7 +1570,7 @@ msgid "Name: \"%s\""
 msgstr "الاسم\"%s\""
 
 #: cli/outdated/outdated.go:80 cli/outdated/outdated.go:89
-#: cli/update/update.go:82 cli/update/update.go:92
+#: cli/update/update.go:83 cli/update/update.go:93
 msgid "New version"
 msgstr "نسخة جديدة"
 
@@ -1771,11 +1745,11 @@ msgstr ""
 msgid "Performing 1200-bps touch reset on serial port %s"
 msgstr ""
 
-#: commands/core/install.go:55 commands/core/install.go:62
+#: commands/core/install.go:54 commands/core/install.go:61
 msgid "Platform %s already installed"
 msgstr "المنصة %s مثبتة سابقا"
 
-#: commands/core/install.go:186
+#: arduino/cores/packagemanager/install_uninstall.go:183
 msgid "Platform %s installed"
 msgstr "تم تثبيت المنصة: %s"
 
@@ -1785,7 +1759,7 @@ msgid ""
 "Maybe you need to add a 3rd party URL?"
 msgstr ""
 
-#: commands/core/uninstall.go:85
+#: arduino/cores/packagemanager/install_uninstall.go:297
 msgid "Platform %s uninstalled"
 msgstr "تم إلغاء تثبيت المنصة: %s"
 
@@ -1918,11 +1892,11 @@ msgstr ""
 msgid "Removes one or more values from a setting."
 msgstr ""
 
-#: commands/instances.go:683 commands/lib/install.go:140
+#: commands/lib/install.go:140
 msgid "Replacing %[1]s with %[2]s"
 msgstr "تبديل %[1]s ب %[2]s"
 
-#: commands/core/install.go:123
+#: arduino/cores/packagemanager/install_uninstall.go:119
 msgid "Replacing platform %[1]s with %[2]s"
 msgstr ""
 
@@ -2035,7 +2009,7 @@ msgid ""
 "Show metadata about the debug session instead of starting the debugger."
 msgstr ""
 
-#: cli/update/update.go:46
+#: cli/update/update.go:47
 msgid "Show outdated cores and libraries after index update"
 msgstr ""
 
@@ -2133,11 +2107,7 @@ msgstr ""
 msgid "Skipping dependencies detection for precompiled library %[1]s"
 msgstr ""
 
-#: commands/instances.go:818
-msgid "Skipping platform configuration"
-msgstr ""
-
-#: commands/core/install.go:182
+#: arduino/cores/packagemanager/install_uninstall.go:179
 msgid "Skipping platform configuration."
 msgstr ""
 
@@ -2217,12 +2187,12 @@ msgid ""
 "that can be upgraded. If nothing needs to be updated the output is empty."
 msgstr ""
 
-#: commands/bundled_tools.go:41 commands/core/install.go:89
-#: commands/instances.go:734
+#: arduino/cores/packagemanager/install_uninstall.go:85
+#: arduino/cores/packagemanager/install_uninstall.go:307
 msgid "Tool %s already installed"
 msgstr ""
 
-#: commands/core/uninstall.go:101
+#: arduino/cores/packagemanager/install_uninstall.go:379
 msgid "Tool %s uninstalled"
 msgstr ""
 
@@ -2287,17 +2257,15 @@ msgstr ""
 msgid "Unable to open file for logging: %s"
 msgstr ""
 
-#: commands/core/uninstall.go:77 commands/lib/uninstall.go:39
+#: arduino/cores/packagemanager/install_uninstall.go:273
+#: commands/lib/uninstall.go:39
 msgid "Uninstalling %s"
 msgstr "إلغاء تثبيت %s"
 
-#: commands/core/uninstall.go:93
+#: arduino/cores/packagemanager/install_uninstall.go:162
+#: commands/core/uninstall.go:61
 msgid "Uninstalling %s, tool is no more required"
 msgstr "إلغاء تثبيت %s، الأداة لم تعد مطلوبة"
-
-#: commands/instances.go:797
-msgid "Uninstalling %s: tool is no more required"
-msgstr ""
 
 #: cli/core/uninstall.go:37 cli/core/uninstall.go:38
 msgid ""
@@ -2317,11 +2285,11 @@ msgstr ""
 msgid "Unknown FQBN"
 msgstr ""
 
-#: cli/update/update.go:40
+#: cli/update/update.go:41
 msgid "Updates the index of cores and libraries"
 msgstr ""
 
-#: cli/update/update.go:41
+#: cli/update/update.go:42
 msgid "Updates the index of cores and libraries to the latest versions."
 msgstr ""
 
@@ -2341,11 +2309,7 @@ msgstr ""
 msgid "Updates the libraries index."
 msgstr ""
 
-#: commands/instances.go:754
-msgid "Updating platform %s"
-msgstr ""
-
-#: commands/core/upgrade.go:55
+#: arduino/cores/packagemanager/install_uninstall.go:42
 msgid "Upgrade doesn't accept parameters with version"
 msgstr ""
 
@@ -2423,14 +2387,14 @@ msgstr ""
 msgid "Used: %[1]s"
 msgstr "مستخدم : %[1]s"
 
-#: arduino/libraries/librariesmanager/install.go:68
-#: arduino/libraries/librariesmanager/install.go:84
-#: arduino/libraries/librariesmanager/install.go:106
-#: arduino/libraries/librariesmanager/install.go:190
+#: arduino/libraries/librariesmanager/install.go:69
+#: arduino/libraries/librariesmanager/install.go:85
+#: arduino/libraries/librariesmanager/install.go:107
+#: arduino/libraries/librariesmanager/install.go:191
 msgid "User directory not set"
 msgstr ""
 
-#: legacy/builder/target_board_resolver.go:43
+#: legacy/builder/target_board_resolver.go:41
 msgid "Using board '%[1]s' from platform in folder: %[2]s"
 msgstr ""
 
@@ -2438,7 +2402,7 @@ msgstr ""
 msgid "Using cached library dependencies for file: %[1]s"
 msgstr ""
 
-#: legacy/builder/target_board_resolver.go:44
+#: legacy/builder/target_board_resolver.go:42
 msgid "Using core '%[1]s' from platform in folder: %[2]s"
 msgstr ""
 
@@ -2490,17 +2454,13 @@ msgstr ""
 msgid "Versions: %s"
 msgstr ""
 
-#: commands/core/install.go:178
+#: arduino/cores/packagemanager/install_uninstall.go:175
 msgid "WARNING cannot configure platform: %s"
 msgstr ""
 
 #: cli/compile/compile.go:297
 msgid "WARNING: The sketch is compiled using one or more custom libraries."
 msgstr "تحذير : المشروع سيترجم باستخدام مكتبة خاصة او اكثر . "
-
-#: commands/instances.go:814
-msgid "WARNING: cannot run post install: %s"
-msgstr "تحذير : تعذر تشغيل post install : %s"
 
 #: legacy/builder/warn_about_arch_incompatible_libraries.go:39
 msgid ""
@@ -2514,7 +2474,7 @@ msgstr ""
 msgid "Waiting for upload port..."
 msgstr "يتم انتظار منفذ الرفع (upload port) ... "
 
-#: legacy/builder/add_build_board_property_if_missing.go:36
+#: legacy/builder/target_board_resolver.go:49
 msgid ""
 "Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s"
 msgstr ""
@@ -2583,7 +2543,7 @@ msgstr ""
 "تشفير الارشيف يختلف عن تشفير الفهرس (archive hash differs from hash in "
 "index)"
 
-#: arduino/libraries/librariesmanager/install.go:137
+#: arduino/libraries/librariesmanager/install.go:138
 msgid "archive is not valid: multiple files found in zip file top level"
 msgstr ""
 
@@ -2615,9 +2575,9 @@ msgstr "تعذر ايجاد اللوحة"
 msgid "boardname"
 msgstr "اسم اللوحة"
 
-#: arduino/discovery/discovery.go:311 arduino/discovery/discovery.go:334
-#: arduino/discovery/discovery.go:356 arduino/discovery/discovery.go:391
-#: arduino/discovery/discovery.go:414
+#: arduino/discovery/discovery.go:314 arduino/discovery/discovery.go:337
+#: arduino/discovery/discovery.go:359 arduino/discovery/discovery.go:394
+#: arduino/discovery/discovery.go:417
 msgid "calling %[1]s: %[2]w"
 msgstr "جار استدعاء %[1]s :%[2]w"
 
@@ -2625,7 +2585,7 @@ msgstr "جار استدعاء %[1]s :%[2]w"
 msgid "can't find latest release of %s"
 msgstr "تعذر العثور على اخر اصدار من %s"
 
-#: commands/instances.go:296
+#: commands/instances.go:295
 msgid "can't find latest release of tool %s"
 msgstr "تعذر العثور على اخر اصدار من الاداة %s"
 
@@ -2633,7 +2593,7 @@ msgstr "تعذر العثور على اخر اصدار من الاداة %s"
 msgid "can't find main Sketch file in %s"
 msgstr "تعذر ايحاد ملف المشروع الرئيسي داخل %s"
 
-#: arduino/cores/packagemanager/loader.go:809
+#: arduino/cores/packagemanager/loader.go:814
 msgid "can't find pattern for discovery with id %s"
 msgstr ""
 
@@ -2670,17 +2630,17 @@ msgstr "الامر"
 msgid "command '%[1]s' failed: %[2]s"
 msgstr "الامر '%[1]s' اخفق في : %[2]s"
 
-#: arduino/discovery/discovery.go:315 arduino/discovery/discovery.go:338
-#: arduino/discovery/discovery.go:360 arduino/discovery/discovery.go:395
-#: arduino/discovery/discovery.go:418
+#: arduino/discovery/discovery.go:318 arduino/discovery/discovery.go:341
+#: arduino/discovery/discovery.go:363 arduino/discovery/discovery.go:398
+#: arduino/discovery/discovery.go:421
 msgid "command failed: %s"
 msgstr "الامر اخفق : %s"
 
-#: arduino/discovery/discovery.go:313 arduino/discovery/discovery.go:317
-#: arduino/discovery/discovery.go:336 arduino/discovery/discovery.go:340
-#: arduino/discovery/discovery.go:358 arduino/discovery/discovery.go:362
-#: arduino/discovery/discovery.go:393 arduino/discovery/discovery.go:416
-#: arduino/discovery/discovery.go:420 arduino/monitor/monitor.go:147
+#: arduino/discovery/discovery.go:316 arduino/discovery/discovery.go:320
+#: arduino/discovery/discovery.go:339 arduino/discovery/discovery.go:343
+#: arduino/discovery/discovery.go:361 arduino/discovery/discovery.go:365
+#: arduino/discovery/discovery.go:396 arduino/discovery/discovery.go:419
+#: arduino/discovery/discovery.go:423 arduino/monitor/monitor.go:147
 #: arduino/monitor/monitor.go:153
 msgid "communication out of sync, expected '%[1]s', received '%[2]s'"
 msgstr ""
@@ -2695,11 +2655,11 @@ msgstr "جار معالجة التشفير (computing hash) : %s"
 msgid "could not find a valid build artifact"
 msgstr "تعذر ايجاد ادوات صالحة للبناء (valid build artifact)"
 
-#: commands/core/install.go:63
+#: commands/core/install.go:62
 msgid "could not overwrite"
 msgstr ""
 
-#: arduino/cores/packagemanager/install_uninstall.go:51
+#: arduino/cores/packagemanager/install_uninstall.go:208
 msgid "creating installed.json in %[1]s: %[2]s"
 msgstr "جار انشاء installed.json داخل %[1]s : %[2]s"
 
@@ -2725,11 +2685,11 @@ msgstr "التبعية (dependency)   '%s' غير متوفرة"
 msgid "destination already exists"
 msgstr ""
 
-#: arduino/libraries/librariesmanager/install.go:75
+#: arduino/libraries/librariesmanager/install.go:76
 msgid "destination dir %s already exists, cannot install"
 msgstr ""
 
-#: arduino/libraries/librariesmanager/install.go:268
+#: arduino/libraries/librariesmanager/install.go:294
 msgid "directory doesn't exist: %s"
 msgstr "المجلد غير موجود : %s"
 
@@ -2737,11 +2697,11 @@ msgstr "المجلد غير موجود : %s"
 msgid "discovery %[1]s process not started: %[2]w"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:740
+#: arduino/cores/packagemanager/loader.go:745
 msgid "discovery %s not found"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:744
+#: arduino/cores/packagemanager/loader.go:749
 msgid "discovery %s not installed"
 msgstr ""
 
@@ -2757,7 +2717,7 @@ msgstr "تنزيل نسخة محددة (في هذه الحالة ستكون ال
 msgid "download the latest version of Arduino SAMD core."
 msgstr "تنزيل اخر نسخة من  Arduino SAMD core"
 
-#: commands/instances.go:99
+#: commands/instances.go:97
 msgid "downloading %[1]s tool: %[2]s"
 msgstr "جار تنزيل الاداة %[1]s : %[2]s"
 
@@ -2773,7 +2733,7 @@ msgstr "جار تشفير البيانات الوصفية للمشروع (encodi
 msgid "error loading sketch project file:"
 msgstr "خطا اثناء تحميل ملفات المشروع :"
 
-#: arduino/cores/packagemanager/loader.go:634
+#: arduino/cores/packagemanager/loader.go:639
 msgid "error opening %s"
 msgstr "تعذر فتح %s"
 
@@ -2798,7 +2758,7 @@ msgstr ""
 msgid "extracting archive: %s"
 msgstr "جار استخراج الارشيف : %s"
 
-#: arduino/libraries/librariesmanager/install.go:125
+#: arduino/libraries/librariesmanager/install.go:126
 msgid "extracting archive: %w"
 msgstr "جار استخراج الارشيف : %w"
 
@@ -2818,7 +2778,7 @@ msgstr ""
 msgid "files in archive must be placed in a subdirectory"
 msgstr "ملفات الارشيف يجب ان توضع في مسار فرعي"
 
-#: arduino/cores/packagemanager/loader.go:60
+#: arduino/cores/packagemanager/loader.go:61
 msgid "finding absolute path of %s"
 msgstr "جار البحث عن المسار المطلق (absolute path) لـ %s"
 
@@ -2826,7 +2786,7 @@ msgstr "جار البحث عن المسار المطلق (absolute path) لـ %s
 msgid "flags"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:99
+#: arduino/cores/packagemanager/loader.go:100
 msgid "following symlink %s"
 msgstr ""
 
@@ -2838,7 +2798,7 @@ msgstr "من اجل نسخة محددة"
 msgid "for the latest version."
 msgstr ""
 
-#: cli/lib/check_deps.go:41 cli/lib/install.go:53
+#: cli/lib/check_deps.go:41 cli/lib/install.go:53 cli/lib/install.go:55
 msgid "for the specific version."
 msgstr ""
 
@@ -2868,19 +2828,19 @@ msgstr ""
 msgid "getting build properties for board %[1]s: %[2]s"
 msgstr ""
 
-#: arduino/cores/packagemanager/download.go:105
+#: arduino/cores/packagemanager/download.go:106
 msgid "getting discovery dependencies for platform %[1]s: %[2]s"
 msgstr ""
 
-#: arduino/cores/packagemanager/download.go:113
+#: arduino/cores/packagemanager/download.go:114
 msgid "getting monitor dependencies for platform %[1]s: %[2]s"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:695
+#: arduino/cores/packagemanager/loader.go:700
 msgid "getting parent dir of %[1]s: %[2]s"
 msgstr ""
 
-#: arduino/cores/packagemanager/download.go:98
+#: arduino/cores/packagemanager/download.go:99
 msgid "getting tool dependencies for platform %[1]s: %[2]s"
 msgstr ""
 
@@ -2888,15 +2848,15 @@ msgstr ""
 msgid "importing sketch metadata: %s"
 msgstr ""
 
-#: arduino/libraries/librariesmanager/install.go:92
+#: arduino/libraries/librariesmanager/install.go:93
 msgid "install directory not set"
 msgstr ""
 
-#: commands/instances.go:103
+#: commands/instances.go:101
 msgid "installing %[1]s tool: %[2]s"
 msgstr ""
 
-#: arduino/cores/packagemanager/install_uninstall.go:43
+#: arduino/cores/packagemanager/install_uninstall.go:200
 msgid "installing platform %[1]s: %[2]s"
 msgstr ""
 
@@ -2952,7 +2912,7 @@ msgstr ""
 msgid "invalid empty option found"
 msgstr ""
 
-#: arduino/libraries/librariesmanager/install.go:258
+#: arduino/libraries/librariesmanager/install.go:284
 msgid "invalid git url"
 msgstr ""
 
@@ -3000,7 +2960,7 @@ msgstr ""
 msgid "invalid platform index URL:"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:358
+#: arduino/cores/packagemanager/loader.go:363
 msgid "invalid pluggable monitor reference: %s"
 msgstr ""
 
@@ -3020,7 +2980,7 @@ msgstr ""
 msgid "invalid value '%[1]s' for option '%[2]s'"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:268
+#: arduino/cores/packagemanager/loader.go:273
 msgid "invalid version directory %s"
 msgstr ""
 
@@ -3036,16 +2996,16 @@ msgstr ""
 msgid "keywords"
 msgstr ""
 
-#: arduino/libraries/librariesmanager/install.go:163
-#: arduino/libraries/librariesmanager/install.go:206
+#: arduino/libraries/librariesmanager/install.go:164
+#: arduino/libraries/librariesmanager/install.go:207
 msgid "library %s already installed"
 msgstr ""
 
-#: arduino/libraries/librariesmanager/install.go:38
+#: arduino/libraries/librariesmanager/install.go:39
 msgid "library already installed"
 msgstr ""
 
-#: arduino/libraries/librariesmanager/install.go:305
+#: arduino/libraries/librariesmanager/install.go:331
 msgid "library not valid"
 msgstr ""
 
@@ -3061,17 +3021,17 @@ msgstr ""
 msgid "listing serial ports"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:296
-#: arduino/cores/packagemanager/loader.go:305
+#: arduino/cores/packagemanager/loader.go:301
 #: arduino/cores/packagemanager/loader.go:310
+#: arduino/cores/packagemanager/loader.go:315
 msgid "loading %[1]s: %[2]s"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:346
+#: arduino/cores/packagemanager/loader.go:351
 msgid "loading boards: %s"
 msgstr "جار تحميل اللوحات : %s"
 
-#: arduino/cores/packagemanager/loader.go:650
+#: arduino/cores/packagemanager/loader.go:655
 msgid "loading bundled tools from %s"
 msgstr "جار تحميل حزمة الادوات من %s"
 
@@ -3089,12 +3049,12 @@ msgstr "جار تحميل المكتبة من %[1]s : %[2]s"
 msgid "loading library.properties: %s"
 msgstr "جار تحميل خصائص المكتبة (library.properties) : %s"
 
-#: arduino/cores/packagemanager/loader.go:245
-#: arduino/cores/packagemanager/loader.go:273
+#: arduino/cores/packagemanager/loader.go:250
+#: arduino/cores/packagemanager/loader.go:278
 msgid "loading platform release %s"
 msgstr "جار تحميل المنصة اصدار %s"
 
-#: arduino/cores/packagemanager/loader.go:196
+#: arduino/cores/packagemanager/loader.go:197
 msgid "loading platform.txt"
 msgstr "جار تحميل platform.txt"
 
@@ -3106,11 +3066,11 @@ msgstr "جار تحميل المنصات المطلوبة %s"
 msgid "loading required tool %s"
 msgstr "جار تحميل الادوات المطلوبة %s"
 
-#: arduino/cores/packagemanager/loader.go:609
+#: arduino/cores/packagemanager/loader.go:614
 msgid "loading tool release in %s"
 msgstr "جار تحميل اصدار الاداة (tool release) في %s"
 
-#: arduino/cores/packagemanager/loader.go:189
+#: arduino/cores/packagemanager/loader.go:190
 msgid "looking for boards.txt in %s"
 msgstr "جار البحث عن boards.txt داخل %s"
 
@@ -3145,7 +3105,7 @@ msgstr ""
 msgid "monitor release not found: %s"
 msgstr "تعذر ايجاد اصدار المراقب : %s"
 
-#: arduino/libraries/librariesmanager/install.go:180
+#: arduino/libraries/librariesmanager/install.go:181
 #: arduino/resources/install.go:94
 msgid "moving extracted archive to destination dir: %s"
 msgstr "جار نقل الارشيف الذي تم استخراجه الى مجلد الوجهة : %s"
@@ -3158,7 +3118,7 @@ msgstr "تم ايجاد اكثر من build artifacts : '%[1]s' و '%[2]s'"
 msgid "multiple main sketch files found (%[1]v, %[2]v)"
 msgstr "تم العثور على اكثر من ملف مشروع رئيسي main sketch file (%[1]v,%[2]v)"
 
-#: arduino/cores/packagemanager/install_uninstall.go:133
+#: arduino/cores/packagemanager/install_uninstall.go:316
 msgid "no compatible version of %s tools found for the current os"
 msgstr "تعذر ايجاد اي نسخة من ادوات %s متوافقة مع نظام التشغيل الخاص بك"
 
@@ -3166,7 +3126,7 @@ msgstr "تعذر ايجاد اي نسخة من ادوات %s متوافقة مع
 msgid "no executable specified"
 msgstr "لم يتم تحديد اي برنامج قابل للتنفيذ (executable)"
 
-#: commands/daemon/daemon.go:102
+#: commands/daemon/daemon.go:104
 msgid "no instance specified"
 msgstr ""
 
@@ -3190,7 +3150,7 @@ msgstr "لم يتم تحديد اي منفذ للرفع"
 msgid "no valid sketch found in %[1]s: missing %[2]s"
 msgstr "تعذر ايجاد اي مشروع صالح في %[2]s : %[1]sمفقود"
 
-#: commands/core/download.go:82
+#: arduino/cores/packagemanager/download.go:128
 msgid "no versions available for the current OS"
 msgstr "لا يوجد اي نسخ متوافقة مع نظام التشغيل الحالي"
 
@@ -3198,7 +3158,7 @@ msgstr "لا يوجد اي نسخ متوافقة مع نظام التشغيل ا
 msgid "opening archive file: %s"
 msgstr "جار فتح ملف الارشيف : %s"
 
-#: arduino/cores/packagemanager/loader.go:261
+#: arduino/cores/packagemanager/loader.go:266
 msgid "opening boards.txt"
 msgstr "جار فتح  boards.txt"
 
@@ -3214,7 +3174,7 @@ msgstr "جار فتح ملف التوقيع : %s"
 msgid "opening target file: %s"
 msgstr ""
 
-#: arduino/cores/packagemanager/download.go:75 arduino/cores/status.go:88
+#: arduino/cores/packagemanager/download.go:76 arduino/cores/status.go:88
 #: arduino/cores/status.go:113 arduino/cores/status.go:140
 msgid "package %s not found"
 msgstr ""
@@ -3223,7 +3183,7 @@ msgstr ""
 msgid "package '%s' not found"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:216
+#: arduino/cores/packagemanager/loader.go:221
 msgid "parsing IDE bundled index"
 msgstr ""
 
@@ -3236,15 +3196,15 @@ msgstr ""
 msgid "parsing library_index.json: %s"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:180
+#: arduino/cores/packagemanager/loader.go:181
 msgid "path is not a platform directory: %s"
 msgstr ""
 
-#: arduino/cores/packagemanager/download.go:79
+#: arduino/cores/packagemanager/download.go:80
 msgid "platform %[1]s not found in package %[2]s"
 msgstr ""
 
-#: arduino/cores/packagemanager/download.go:91
+#: arduino/cores/packagemanager/download.go:92
 msgid "platform %s has no available releases"
 msgstr ""
 
@@ -3252,9 +3212,9 @@ msgstr ""
 msgid "platform %s is not installed"
 msgstr ""
 
-#: arduino/cores/packagemanager/install_uninstall.go:71
-#: arduino/cores/packagemanager/install_uninstall.go:114
-#: arduino/cores/packagemanager/loader.go:452 commands/compile/compile.go:99
+#: arduino/cores/packagemanager/install_uninstall.go:228
+#: arduino/cores/packagemanager/install_uninstall.go:276
+#: arduino/cores/packagemanager/loader.go:457 commands/compile/compile.go:99
 msgid "platform not installed"
 msgstr ""
 
@@ -3278,11 +3238,11 @@ msgstr ""
 msgid "protocol version not supported: requested %[1]d, got %[2]d"
 msgstr ""
 
-#: arduino/discovery/discovery.go:319
+#: arduino/discovery/discovery.go:322
 msgid "protocol version not supported: requested 1, got %d"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:700
+#: arduino/cores/packagemanager/loader.go:705
 msgid "reading %[1]s: %[2]s"
 msgstr ""
 
@@ -3290,14 +3250,14 @@ msgstr ""
 msgid "reading dir %[1]s: %[2]s"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:70
-#: arduino/cores/packagemanager/loader.go:152
-#: arduino/cores/packagemanager/loader.go:255
-#: arduino/cores/packagemanager/loader.go:601
+#: arduino/cores/packagemanager/loader.go:71
+#: arduino/cores/packagemanager/loader.go:153
+#: arduino/cores/packagemanager/loader.go:260
+#: arduino/cores/packagemanager/loader.go:606
 msgid "reading directory %s"
 msgstr ""
 
-#: arduino/libraries/librariesmanager/install.go:278
+#: arduino/libraries/librariesmanager/install.go:304
 msgid "reading directory %s content: %w"
 msgstr ""
 
@@ -3354,19 +3314,15 @@ msgstr ""
 msgid "removing corrupted archive file: %s"
 msgstr ""
 
-#: arduino/libraries/librariesmanager/install.go:95
+#: arduino/libraries/librariesmanager/install.go:96
 msgid "removing lib directory: %s"
 msgstr ""
 
-#: arduino/cores/packagemanager/install_uninstall.go:123
+#: arduino/cores/packagemanager/install_uninstall.go:289
 msgid "removing platform files: %s"
 msgstr ""
 
-#: arduino/cores/packagemanager/install_uninstall.go:175
-msgid "removing tool files: %s"
-msgstr ""
-
-#: arduino/cores/packagemanager/download.go:86
+#: arduino/cores/packagemanager/download.go:87
 msgid "required version %[1]s not found for platform %[2]s"
 msgstr ""
 
@@ -3378,7 +3334,7 @@ msgstr ""
 msgid "scanning examples: %s"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:686
+#: arduino/cores/packagemanager/loader.go:691
 msgid "searching for builtin_tools_versions.txt in %[1]s: %[2]s"
 msgstr ""
 
@@ -3398,7 +3354,7 @@ msgstr ""
 msgid "sketchPath"
 msgstr ""
 
-#: arduino/cores/packagemanager/loader.go:515
+#: arduino/cores/packagemanager/loader.go:520
 msgid "skipping loading of boards %s: malformed custom board options"
 msgstr ""
 
@@ -3463,7 +3419,7 @@ msgstr ""
 msgid "timeout waiting for message from %s"
 msgstr ""
 
-#: arduino/cores/packagemanager/install_uninstall.go:171
+#: arduino/cores/packagemanager/install_uninstall.go:365
 msgid "tool %s is not managed by package manager"
 msgstr ""
 
@@ -3476,11 +3432,7 @@ msgstr ""
 msgid "tool '%[1]s' not found in package '%[2]s'"
 msgstr ""
 
-#: arduino/cores/packagemanager/download.go:125
-msgid "tool not available for your OS"
-msgstr ""
-
-#: arduino/cores/packagemanager/install_uninstall.go:166
+#: arduino/cores/packagemanager/install_uninstall.go:360
 msgid "tool not installed"
 msgstr ""
 
