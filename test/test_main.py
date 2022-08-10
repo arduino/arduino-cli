@@ -19,13 +19,6 @@ import semver
 import yaml
 
 
-def test_help(run_command):
-    result = run_command(["help"])
-    assert result.ok
-    assert result.stderr == ""
-    assert "Usage" in result.stdout
-
-
 def test_version(run_command):
     result = run_command(["version"])
     assert result.ok
