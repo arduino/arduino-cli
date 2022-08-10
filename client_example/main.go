@@ -656,7 +656,6 @@ func callUpload(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance) {
 
 		if err != nil {
 			log.Fatalf("Upload error: %s", err)
-			break
 		}
 
 		// When an operation is ongoing you can get its output
