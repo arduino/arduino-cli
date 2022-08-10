@@ -16,6 +16,7 @@
 package board
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -176,32 +177,21 @@ func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.B
 // List returns a list of boards found by the loaded discoveries.
 // In case of errors partial results from discoveries that didn't fail
 // are returned.
-func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
+func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStartErrors []error, e error) {
 	pm := commands.GetPackageManager(req.GetInstance().Id)
 	if pm == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return nil, nil, &arduino.InvalidInstanceError{}
 	}
 
 	dm := pm.DiscoveryManager()
-	if errs := dm.RunAll(); len(errs) > 0 {
-		return nil, &arduino.UnavailableError{Message: tr("Error starting board discoveries"), Cause: fmt.Errorf("%v", errs)}
-	}
-	if errs := dm.StartAll(); len(errs) > 0 {
-		return nil, &arduino.UnavailableError{Message: tr("Error starting board discoveries"), Cause: fmt.Errorf("%v", errs)}
-	}
-	defer func() {
-		if errs := dm.StopAll(); len(errs) > 0 {
-			logrus.Error(errs)
-		}
-	}()
+	discoveryStartErrors = dm.Start()
 	time.Sleep(time.Duration(req.GetTimeout()) * time.Millisecond)
 
 	retVal := []*rpc.DetectedPort{}
-	ports, errs := pm.DiscoveryManager().List()
-	for _, port := range ports {
+	for _, port := range dm.List() {
 		boards, err := identify(pm, port)
 		if err != nil {
-			return nil, err
+			return nil, discoveryStartErrors, err
 		}
 
 		// boards slice can be empty at this point if neither the cores nor the
@@ -212,92 +202,49 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, e error) {
 		}
 		retVal = append(retVal, b)
 	}
-	if len(errs) > 0 {
-		return retVal, &arduino.UnavailableError{Message: tr("Error getting board list"), Cause: fmt.Errorf("%v", errs)}
-	}
-	return retVal, nil
+	return retVal, discoveryStartErrors, nil
 }
 
 // Watch returns a channel that receives boards connection and disconnection events.
-// The discovery process can be interrupted by sending a message to the interrupt channel.
-func Watch(instanceID int32, interrupt <-chan bool) (<-chan *rpc.BoardListWatchResponse, error) {
+// It also returns a callback function that must be used to stop and dispose the watch.
+func Watch(instanceID int32) (<-chan *rpc.BoardListWatchResponse, func(), error) {
 	pm := commands.GetPackageManager(instanceID)
 	dm := pm.DiscoveryManager()
 
-	runErrs := dm.RunAll()
-	if len(runErrs) == len(dm.IDs()) {
-		// All discoveries failed to run, we can't do anything
-		return nil, &arduino.UnavailableError{Message: tr("Error starting board discoveries"), Cause: fmt.Errorf("%v", runErrs)}
+	watcher, err := dm.Watch()
+	if err != nil {
+		return nil, nil, err
 	}
 
-	eventsChan, errs := dm.StartSyncAll()
-	if len(runErrs) > 0 {
-		errs = append(runErrs, errs...)
-	}
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		<-ctx.Done()
+		watcher.Close()
+	}()
 
 	outChan := make(chan *rpc.BoardListWatchResponse)
-
 	go func() {
 		defer close(outChan)
-		for _, err := range errs {
-			outChan <- &rpc.BoardListWatchResponse{
-				EventType: "error",
-				Error:     err.Error(),
+		for event := range watcher.Feed() {
+			port := &rpc.DetectedPort{
+				Port: event.Port.ToRPC(),
 			}
-		}
-		for {
-			select {
-			case event := <-eventsChan:
-				if event.Type == "quit" {
-					// The discovery manager has closed its event channel because it's
-					// quitting all the discovery processes that are running, this
-					// means that the events channel we're listening from won't receive any
-					// more events.
-					// Handling this case is necessary when the board watcher is running and
-					// the instance being used is reinitialized since that quits all the
-					// discovery processes and reset the discovery manager. That would leave
-					// this goroutine listening forever on a "dead" channel and might even
-					// cause panics.
-					// This message avoid all this issues.
-					// It will be the client's task restarting the board watcher if necessary,
-					// this host won't attempt restarting it.
-					outChan <- &rpc.BoardListWatchResponse{
-						EventType: event.Type,
-					}
-					return
-				}
 
-				port := &rpc.DetectedPort{
-					Port: event.Port.ToRPC(),
+			boardsError := ""
+			if event.Type == "add" {
+				boards, err := identify(pm, event.Port)
+				if err != nil {
+					boardsError = err.Error()
 				}
-
-				boardsError := ""
-				if event.Type == "add" {
-					boards, err := identify(pm, event.Port)
-					if err != nil {
-						boardsError = err.Error()
-					}
-					port.MatchingBoards = boards
-				}
-				outChan <- &rpc.BoardListWatchResponse{
-					EventType: event.Type,
-					Port:      port,
-					Error:     boardsError,
-				}
-			case <-interrupt:
-				for _, err := range dm.StopAll() {
-					// Discoveries that return errors have their process
-					// closed and are removed from the list of discoveries
-					// in the manager
-					outChan <- &rpc.BoardListWatchResponse{
-						EventType: "error",
-						Error:     tr("stopping discoveries: %s", err),
-					}
-				}
-				return
+				port.MatchingBoards = boards
+			}
+			outChan <- &rpc.BoardListWatchResponse{
+				EventType: event.Type,
+				Port:      port,
+				Error:     boardsError,
 			}
 		}
 	}()
 
-	return outChan, nil
+	return outChan, cancel, nil
 }

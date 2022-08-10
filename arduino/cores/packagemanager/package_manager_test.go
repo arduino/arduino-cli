@@ -329,16 +329,14 @@ func TestPackageManagerClear(t *testing.T) {
 	packageManager := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware, "test")
 	packageManager.LoadHardwareFromDirectory(customHardware)
 
-	// Creates another PackageManager but don't load the hardware
-	emptyPackageManager := packagemanager.NewPackageManager(customHardware, customHardware, customHardware, customHardware, "test")
+	// Check that the hardware is loaded
+	require.NotEmpty(t, packageManager.Packages)
 
-	// Verifies they're not equal
-	require.NotEqual(t, packageManager, emptyPackageManager)
-
-	// Clear the first PackageManager that contains loaded hardware
+	// Clear the package manager
 	packageManager.Clear()
-	// Verifies both PackageManagers are now equal
-	require.Equal(t, packageManager, emptyPackageManager)
+
+	// Check that the hardware is cleared
+	require.Empty(t, packageManager.Packages)
 }
 
 func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
