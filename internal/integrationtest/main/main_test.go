@@ -17,6 +17,7 @@ package main_test
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
@@ -81,4 +82,27 @@ func TestVersion(t *testing.T) {
 
 	// Checks if Commit's value is not empty
 	require.NotEmpty(t, jsonMap["Commit"])
+}
+
+func TestInventoryCreation(t *testing.T) {
+	// Using version as a test command
+
+	env := testsuite.NewEnvironment(t)
+	defer env.CleanUp()
+
+	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
+		ArduinoCLIPath:         paths.New("..", "..", "..", "arduino-cli"),
+		UseSharedStagingFolder: true,
+	})
+
+	// no logs
+	stdout, _, _ := cli.Run("version")
+	line := strings.TrimSpace(string(stdout))
+	outLines := strings.Split(line, "\n")
+	require.Len(t, outLines, 1)
+
+	// parse inventory file
+	inventoryFile := cli.DataDir().Join("inventory.yaml")
+	stream, _ := inventoryFile.ReadFile()
+	require.True(t, strings.Contains(string(stream), "installation"))
 }
