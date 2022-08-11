@@ -31,7 +31,7 @@ If your question wasn't answered, feel free to ask on [Arduino CLI's forum board
 
 [arduino cli board list]: commands/arduino-cli_board_list.md
 [0]: platform-specification.md
-[1]: https://forum.arduino.cc/index.php?board=145.0
+[1]: https://forum.arduino.cc/c/software/arduino-cli/89
 [screen]: https://www.gnu.org/software/screen/manual/screen.html
 [putty]: https://www.chiark.greenend.org.uk/~sgtatham/putty/
 [monitor command]: commands/arduino-cli_monitor.md

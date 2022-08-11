@@ -366,7 +366,7 @@ If your PR doesn't need to be included in the changelog, please start the commit
 **[skip changelog]**
 
 [0]: https://cla-assistant.io/arduino/arduino-cli
-[1]: https://golang.org/doc/install
+[1]: https://go.dev/doc/install
 [2]: https://taskfile.dev/#/installation
 [3]: https://www.python.org/downloads/
 [6]: https://github.com/protocolbuffers/protobuf/releases

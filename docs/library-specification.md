@@ -14,7 +14,7 @@ and
 as well as [`arduino-cli lib`](commands/arduino-cli_lib.md).
 
 More information about how Library Manager works is available
-[here](https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ).
+[here](https://github.com/arduino/library-registry/blob/main/FAQ.md#readme).
 
 Arduino development software supports multiple microcontroller architectures (e.g. AVR, SAM, etc), meaning that
 libraries may need to work on multiple architectures. The new 1.5 library format doesn’t contain special support for
@@ -23,7 +23,7 @@ code to specific architectures.
 
 ## See also
 
-- [Arduino library style guide](http://docs.arduino.cc/learn/contributions/arduino-library-style-guide)
+- [Arduino library style guide](https://docs.arduino.cc/learn/contributions/arduino-library-style-guide)
 - [Library dependency resolution process documentation](sketch-build-process.md#dependency-resolution)
 
 ## 1.5 library format (rev. 2.2)
@@ -44,9 +44,9 @@ otherwise below, **all fields are required**. The available fields are:
 - **name** - the name of the library. Library names must contain only basic letters (A-Z or a-z) and numbers (0-9),
   spaces ( ), underscores (\_), dots (.) and dashes (-). They must start with a letter or number. They must contain at
   least one letter. Note that libraries with a `name` value starting with `Arduino` will no longer be allowed
-  [addition to the Library Manager index](https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ) as these names
-  are now reserved for official Arduino libraries.
-- **version** - version of the library. Version should be [semver](http://semver.org/) compliant. 1.2.0 is correct; 1.2
+  [addition to the Library Manager index](https://github.com/arduino/library-registry/blob/main/README.md#adding-a-library-to-library-manager)
+  as these names are now reserved for official Arduino libraries.
+- **version** - version of the library. Version should be [semver](https://semver.org/) compliant. 1.2.0 is correct; 1.2
   is accepted; r5, 003, 1.1c are invalid
 - **author** - name/nickname of the authors and their email addresses (not mandatory) separated by comma (,)
 - **maintainer** - name and email of the maintainer
@@ -360,8 +360,8 @@ Normally the Arduino IDE treats the contents of the library folder as read-only.
 accidentally modifying example sketches. During the library development process you may want to edit example sketches in
 place using the Arduino IDE. With Arduino IDE 1.6.6 and newer, the read-only behavior can be disabled by adding a file
 named .development to the root of the library folder. A [library.properties](#libraryproperties-file-format) file must
-also be present. The [Library Manager indexer](https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ) will not
-pick up releases that contain a .development file so be sure not to push this file to your remote repository.
+also be present. The [Library Manager indexer](https://github.com/arduino/library-registry/blob/main/FAQ.md#readme) will
+not pick up releases that contain a .development file so be sure not to push this file to your remote repository.
 
 ### A complete example
 
