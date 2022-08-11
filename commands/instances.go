@@ -60,11 +60,6 @@ type CoreInstance struct {
 	lm             *librariesmanager.LibrariesManager
 }
 
-// InstanceContainer FIXMEDOC
-type InstanceContainer interface {
-	GetInstance() *rpc.Instance
-}
-
 // GetInstance returns a CoreInstance for the given ID, or nil if ID
 // doesn't exist
 func GetInstance(id int32) *CoreInstance {
@@ -86,7 +81,7 @@ func GetPackageManager(id int32) *packagemanager.PackageManager {
 // GetPackageManagerExplorer returns a new package manager Explorer. The
 // explorer holds a read lock on the underlying PackageManager and it should
 // be released by calling the returned "release" function.
-func GetPackageManagerExplorer(instance InstanceContainer) (explorer *packagemanager.Explorer, release func()) {
+func GetPackageManagerExplorer(instance rpc.InstanceCommand) (explorer *packagemanager.Explorer, release func()) {
 	i := GetInstance(instance.GetInstance().GetId())
 	if i == nil {
 		return nil, nil
