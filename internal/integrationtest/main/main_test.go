@@ -16,11 +16,13 @@
 package main_test
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
+	semver "go.bug.st/relaxed-semver"
 	"go.bug.st/testsuite"
 )
 
@@ -38,4 +40,45 @@ func TestHelp(t *testing.T) {
 	require.NoError(t, err)
 	require.Empty(t, stderr)
 	require.Contains(t, string(stdout), "Usage")
+}
+
+func TestVersion(t *testing.T) {
+	env := testsuite.NewEnvironment(t)
+	defer env.CleanUp()
+
+	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
+		ArduinoCLIPath:         paths.New("..", "..", "..", "arduino-cli"),
+		UseSharedStagingFolder: true,
+	})
+
+	// Run version and check the output message
+	stdout, stderr, err := cli.Run("version")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Version:")
+	require.Contains(t, string(stdout), "Commit:")
+	require.Empty(t, stderr)
+
+	// Checks if "version --format json" has a json as an output
+	stdout, _, err = cli.Run("version", "--format", "json")
+	require.NoError(t, err)
+	var jsonMap map[string]string
+	err = json.Unmarshal(stdout, &jsonMap)
+	require.NoError(t, err)
+
+	// Checks if Application's value is arduino-cli
+	require.Equal(t, jsonMap["Application"], "arduino-cli")
+
+	// Checks if VersionString's value is git-snapshot, nightly or a valid semantic versioning
+	switch version := jsonMap["VersionString"]; version {
+	case "git-snapshot":
+		require.Contains(t, version, "git-snapshot")
+	case "nigthly":
+		require.Contains(t, version, "nightly")
+	default:
+		_, err = semver.Parse(version)
+		require.NoError(t, err)
+	}
+
+	// Checks if Commit's value is not empty
+	require.NotEmpty(t, jsonMap["Commit"])
 }

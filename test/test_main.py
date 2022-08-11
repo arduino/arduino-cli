@@ -18,23 +18,6 @@ import os
 import semver
 import yaml
 
-
-def test_version(run_command):
-    result = run_command(["version"])
-    assert result.ok
-    assert "Version:" in result.stdout
-    assert "Commit:" in result.stdout
-    assert "" == result.stderr
-
-    result = run_command(["version", "--format", "json"])
-    assert result.ok
-    parsed_out = json.loads(result.stdout)
-    assert parsed_out.get("Application", False) == "arduino-cli"
-    version = parsed_out.get("VersionString", False)
-    assert semver.VersionInfo.isvalid(version=version) or "git-snapshot" in version or "nightly" in version
-    assert isinstance(parsed_out.get("Commit", False), str)
-
-
 def test_log_options(run_command, data_dir):
     """
     using `version` as a test command
