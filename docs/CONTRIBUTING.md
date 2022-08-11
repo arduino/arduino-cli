@@ -369,12 +369,9 @@ If your PR doesn't need to be included in the changelog, please start the commit
 [1]: https://golang.org/doc/install
 [2]: https://taskfile.dev/#/installation
 [3]: https://www.python.org/downloads/
-[4]: https://docs.python.org/3/tutorial/venv.html
-[5]: https://github.com/ofek/hatch
 [6]: https://github.com/protocolbuffers/protobuf/releases
 [7]: https://pages.github.com/
 [9]: https://www.mkdocs.org/
-[10]: https://github.com/jimporter/mike
 [11]: https://github.com/arduino/arduino-cli/blob/master/.github/workflows/deploy-cobra-mkdocs-versioned-poetry.yml
 [12]:
   https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/deploy-cobra-mkdocs-versioned-poetry.md
