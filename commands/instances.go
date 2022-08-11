@@ -50,8 +50,8 @@ var tr = i18n.Tr
 // instantiate as many as needed by providing a different configuration
 // for each one.
 type CoreInstance struct {
-	PackageManager *packagemanager.PackageManager
-	lm             *librariesmanager.LibrariesManager
+	pm *packagemanager.PackageManager
+	lm *librariesmanager.LibrariesManager
 }
 
 // coreInstancesContainer has methods to add an remove instances atomically.
@@ -106,7 +106,7 @@ func GetPackageManager(id int32) *packagemanager.PackageManager {
 	if i == nil {
 		return nil
 	}
-	return i.PackageManager
+	return i.pm
 }
 
 // GetPackageManagerExplorer returns a new package manager Explorer. The
@@ -134,11 +134,11 @@ func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, down
 		return false, nil
 	}
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading missing tool %s", tool)})
-	if err := instance.PackageManager.DownloadToolRelease(tool, nil, downloadCB); err != nil {
+	if err := instance.pm.DownloadToolRelease(tool, nil, downloadCB); err != nil {
 		return false, fmt.Errorf(tr("downloading %[1]s tool: %[2]s"), tool, err)
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
-	if err := instance.PackageManager.InstallTool(tool, taskCB); err != nil {
+	if err := instance.pm.InstallTool(tool, taskCB); err != nil {
 		return false, fmt.Errorf(tr("installing %[1]s tool: %[2]s"), tool, err)
 	}
 	return true, nil
@@ -172,7 +172,7 @@ func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateRespon
 	for _, ua := range extraUserAgent {
 		userAgent += " " + ua
 	}
-	instance.PackageManager = packagemanager.NewBuilder(
+	instance.pm = packagemanager.NewBuilder(
 		dataDir,
 		configuration.PackagesDir(configuration.Settings),
 		downloadsDir,
@@ -268,7 +268,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		// after reinitializing an instance after installing or uninstalling a core.
 		// If this is not done the information of the uninstall core is kept in memory,
 		// even if it should not.
-		pmb, commitPackageManager := instance.PackageManager.NewBuilder()
+		pmb, commitPackageManager := instance.pm.NewBuilder()
 
 		loadBuiltinTools := func() []error {
 			builtinPackage := pmb.GetOrCreatePackage("builtin")
@@ -362,7 +362,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		commitPackageManager()
 	}
 
-	pme, release := instance.PackageManager.NewExplorer()
+	pme, release := instance.pm.NewExplorer()
 	defer release()
 
 	for _, err := range pme.LoadDiscoveries() {
