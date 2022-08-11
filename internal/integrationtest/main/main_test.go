@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 	semver "go.bug.st/relaxed-semver"
 	"go.bug.st/testsuite"
+	"go.bug.st/testsuite/requirejson"
 )
 
 func TestHelp(t *testing.T) {
@@ -84,9 +85,64 @@ func TestVersion(t *testing.T) {
 	require.NotEmpty(t, jsonMap["Commit"])
 }
 
+func TestLogOptions(t *testing.T) {
+	// Using version as a test command
+	env := testsuite.NewEnvironment(t)
+	defer env.CleanUp()
+
+	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
+		ArduinoCLIPath:         paths.New("..", "..", "..", "arduino-cli"),
+		UseSharedStagingFolder: true,
+	})
+
+	// No logs
+	stdout, _, err := cli.Run("version")
+	require.NoError(t, err)
+	trimOut := strings.TrimSpace(string(stdout))
+	outLines := strings.Split(trimOut, "\n")
+	require.Len(t, outLines, 1)
+
+	// Plain text logs on stdout
+	stdout, _, err = cli.Run("version", "-v")
+	require.NoError(t, err)
+	trimOut = strings.TrimSpace(string(stdout))
+	outLines = strings.Split(trimOut, "\n")
+	require.Greater(t, len(outLines), 1)
+	require.True(t, strings.HasPrefix(outLines[0], "\x1b[36mINFO\x1b[0m")) // account for the colors
+
+	// Plain text logs on file
+	logFile := cli.DataDir().Join("log.txt")
+	_, _, err = cli.Run("version", "--log-file", logFile.String())
+	require.NoError(t, err)
+	lines, _ := logFile.ReadFileAsLines()
+	require.True(t, strings.HasPrefix(lines[0], "time=\""))
+
+	// json on stdout
+	stdout, _, err = cli.Run("version", "-v", "--log-format", "JSON")
+	require.NoError(t, err)
+	trimOut = strings.TrimSpace(string(stdout))
+	outLines = strings.Split(trimOut, "\n")
+	requirejson.Contains(t, []byte(outLines[0]), `{ "level" }`)
+
+	// Check if log.json contains readable json in each line
+	var v interface{}
+	logFileJson := cli.DataDir().Join("log.json")
+	_, _, err = cli.Run("version", "--log-format", "JSON", "--log-file", logFileJson.String())
+	require.NoError(t, err)
+	fileContent, err := logFileJson.ReadFileAsLines()
+	require.NoError(t, err)
+	for _, line := range fileContent {
+		// exclude empty lines since they are not valid json
+		if line == "" {
+			continue
+		}
+		err = json.Unmarshal([]byte(line), &v)
+		require.NoError(t, err)
+	}
+}
+
 func TestInventoryCreation(t *testing.T) {
 	// Using version as a test command
-
 	env := testsuite.NewEnvironment(t)
 	defer env.CleanUp()
 
@@ -96,13 +152,15 @@ func TestInventoryCreation(t *testing.T) {
 	})
 
 	// no logs
-	stdout, _, _ := cli.Run("version")
+	stdout, _, err := cli.Run("version")
+	require.NoError(t, err)
 	line := strings.TrimSpace(string(stdout))
 	outLines := strings.Split(line, "\n")
 	require.Len(t, outLines, 1)
 
 	// parse inventory file
 	inventoryFile := cli.DataDir().Join("inventory.yaml")
-	stream, _ := inventoryFile.ReadFile()
+	stream, err := inventoryFile.ReadFile()
+	require.NoError(t, err)
 	require.True(t, strings.Contains(string(stream), "installation"))
 }
