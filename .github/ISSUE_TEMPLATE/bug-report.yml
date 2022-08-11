@@ -1,4 +1,4 @@
-# Source: https://github.com/arduino/tooling-project-assets/blob/main/issue-templates/forms/platform-dependent/bug-report.md
+# Source: https://github.com/arduino/tooling-project-assets/blob/main/issue-templates/forms/platform-dependent/bug-report.yml
 # See: https://docs.github.com/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms
 
 name: Bug report

@@ -276,7 +276,7 @@ Editor.
 More information:
 
 - [Arduino sketch specification](sketch-specification.md)
-- [Style guide for Arduino examples](https://www.arduino.cc/en/Reference/StyleGuide)
+- [Style guide for Arduino examples](https://docs.arduino.cc/learn/contributions/arduino-writing-style-guide)
 
 #### Extra documentation
 

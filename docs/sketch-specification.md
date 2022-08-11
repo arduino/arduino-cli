@@ -168,4 +168,4 @@ This feature was added in Arduino IDE 1.6.9.
 ## See also
 
 - [Sketch build process documentation](sketch-build-process.md)
-- [Style guide for example sketches](https://www.arduino.cc/en/Reference/StyleGuide)
+- [Style guide for example sketches](https://docs.arduino.cc/learn/contributions/arduino-writing-style-guide)
