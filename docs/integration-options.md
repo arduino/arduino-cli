@@ -87,9 +87,9 @@ contains [example code showing how to implement a gRPC client][grpc client examp
 designed the low level API, have a look at the [commands package] and don’t hesitate to leave feedback on the [issue
 tracker] if you’ve got a use case that doesn’t fit one of the three pillars.
 
-[golang]: https://golang.org/
+[golang]: https://go.dev/
 [arduino pro ide]: https://www.arduino.cc/pro/arduino-pro-ide
-[arduino cloud]: https://create.arduino.cc
+[arduino cloud]: https://cloud.arduino.cc/home
 [continuous integration]: https://en.wikipedia.org/wiki/Continuous_integration
 [continuous deployment]: https://en.wikipedia.org/wiki/Continuous_deployment
 [configuration documentation]: configuration.md
