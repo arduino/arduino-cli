@@ -1771,14 +1771,14 @@ and
 <a href="https://create.arduino.cc/projecthub/Arduino_Genuino/getting-started-with-arduino-web-editor-on-various-platforms-4b3e4a#toc-libraries-and-the-arduino-web-editor-11">Arduino Web Editor</a>
 as well as <a href="../commands/arduino-cli_lib/"><code>arduino-cli lib</code></a>.</p>
 <p>More information about how Library Manager works is available
-<a href="https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ">here</a>.</p>
+<a href="https://github.com/arduino/library-registry/blob/main/FAQ.md#readme">here</a>.</p>
 <p>Arduino development software supports multiple microcontroller architectures (e.g. AVR, SAM, etc), meaning that
 libraries may need to work on multiple architectures. The new 1.5 library format doesn’t contain special support for
 cross-architecture libraries, but it does provide a preprocessor based mechanism for libraries to target sections of
 code to specific architectures.</p>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="http://docs.arduino.cc/learn/contributions/arduino-library-style-guide">Arduino library style guide</a></li>
+<li><a href="https://docs.arduino.cc/learn/contributions/arduino-library-style-guide">Arduino library style guide</a></li>
 <li><a href="../sketch-build-process/#dependency-resolution">Library dependency resolution process documentation</a></li>
 </ul>
 <h2 id="15-library-format-rev-22">1.5 library format (rev. 2.2)<a class="headerlink" href="#15-library-format-rev-22" title="Permanent link">&para;</a></h2>
@@ -1794,9 +1794,9 @@ otherwise below, <strong>all fields are required</strong>. The available fields 
 <li><strong>name</strong> - the name of the library. Library names must contain only basic letters (A-Z or a-z) and numbers (0-9),
   spaces ( ), underscores (_), dots (.) and dashes (-). They must start with a letter or number. They must contain at
   least one letter. Note that libraries with a <code>name</code> value starting with <code>Arduino</code> will no longer be allowed
-  <a href="https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ">addition to the Library Manager index</a> as these names
-  are now reserved for official Arduino libraries.</li>
-<li><strong>version</strong> - version of the library. Version should be <a href="http://semver.org/">semver</a> compliant. 1.2.0 is correct; 1.2
+  <a href="https://github.com/arduino/library-registry/blob/main/README.md#adding-a-library-to-library-manager">addition to the Library Manager index</a>
+  as these names are now reserved for official Arduino libraries.</li>
+<li><strong>version</strong> - version of the library. Version should be <a href="https://semver.org/">semver</a> compliant. 1.2.0 is correct; 1.2
   is accepted; r5, 003, 1.1c are invalid</li>
 <li><strong>author</strong> - name/nickname of the authors and their email addresses (not mandatory) separated by comma (,)</li>
 <li><strong>maintainer</strong> - name and email of the maintainer</li>
@@ -2083,7 +2083,7 @@ Editor.</p>
 <p>More information:</p>
 <ul>
 <li><a href="../sketch-specification/">Arduino sketch specification</a></li>
-<li><a href="https://www.arduino.cc/en/Reference/StyleGuide">Style guide for Arduino examples</a></li>
+<li><a href="https://docs.arduino.cc/learn/contributions/arduino-writing-style-guide">Style guide for Arduino examples</a></li>
 </ul>
 <h4 id="extra-documentation">Extra documentation<a class="headerlink" href="#extra-documentation" title="Permanent link">&para;</a></h4>
 <p>An <strong>extras</strong> folder can be used by the developer to put documentation or other items to be bundled with the library.
@@ -2201,8 +2201,8 @@ be in the Arduino Language Reference.</p>
 accidentally modifying example sketches. During the library development process you may want to edit example sketches in
 place using the Arduino IDE. With Arduino IDE 1.6.6 and newer, the read-only behavior can be disabled by adding a file
 named .development to the root of the library folder. A <a href="#libraryproperties-file-format">library.properties</a> file must
-also be present. The <a href="https://github.com/arduino/Arduino/wiki/Library-Manager-FAQ">Library Manager indexer</a> will not
-pick up releases that contain a .development file so be sure not to push this file to your remote repository.</p>
+also be present. The <a href="https://github.com/arduino/library-registry/blob/main/FAQ.md#readme">Library Manager indexer</a> will
+not pick up releases that contain a .development file so be sure not to push this file to your remote repository.</p>
 <h3 id="a-complete-example">A complete example<a class="headerlink" href="#a-complete-example" title="Permanent link">&para;</a></h3>
 <p>A hypothetical library named "Servo" that adheres to the specification follows:</p>
 <div class="highlight"><pre><span></span><code>Servo/
