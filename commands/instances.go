@@ -46,12 +46,6 @@ import (
 
 var tr = i18n.Tr
 
-// this map contains all the running Arduino Core Services instances
-// referenced by an int32 handle
-var instances = map[int32]*CoreInstance{}
-var instancesCount int32 = 1
-var instancesMux sync.Mutex
-
 // CoreInstance is an instance of the Arduino Core Services. The user can
 // instantiate as many as needed by providing a different configuration
 // for each one.
@@ -60,18 +54,55 @@ type CoreInstance struct {
 	lm             *librariesmanager.LibrariesManager
 }
 
+// coreInstancesContainer has methods to add an remove instances atomically.
+type coreInstancesContainer struct {
+	instances      map[int32]*CoreInstance
+	instancesCount int32
+	instancesMux   sync.Mutex
+}
+
+// instances contains all the running Arduino Core Services instances
+var instances = &coreInstancesContainer{
+	instances:      map[int32]*CoreInstance{},
+	instancesCount: 1,
+}
+
 // GetInstance returns a CoreInstance for the given ID, or nil if ID
 // doesn't exist
-func GetInstance(id int32) *CoreInstance {
-	instancesMux.Lock()
-	defer instancesMux.Unlock()
-	return instances[id]
+func (c *coreInstancesContainer) GetInstance(id int32) *CoreInstance {
+	c.instancesMux.Lock()
+	defer c.instancesMux.Unlock()
+	return c.instances[id]
+}
+
+// AddAndAssignID saves the CoreInstance and assign an unique ID to
+// retrieve it later
+func (c *coreInstancesContainer) AddAndAssignID(i *CoreInstance) int32 {
+	c.instancesMux.Lock()
+	defer c.instancesMux.Unlock()
+	id := c.instancesCount
+	c.instances[id] = i
+	c.instancesCount++
+	return id
+}
+
+// RemoveID removed the CoreInstance referenced by id. Returns true
+// if the operation is successful, or false if the CoreInstance does
+// not exists
+func (c *coreInstancesContainer) RemoveID(id int32) bool {
+	c.instancesMux.Lock()
+	defer c.instancesMux.Unlock()
+	if _, ok := c.instances[id]; !ok {
+		return false
+	}
+	delete(c.instances, id)
+	return true
 }
 
 // GetPackageManager returns a PackageManager for the given ID, or nil if
 // ID doesn't exist
 func GetPackageManager(id int32) *packagemanager.PackageManager {
-	i := GetInstance(id)
+	i := instances.GetInstance(id)
 	if i == nil {
 		return nil
 	}
@@ -82,7 +113,7 @@ func GetPackageManager(id int32) *packagemanager.PackageManager {
 // explorer holds a read lock on the underlying PackageManager and it should
 // be released by calling the returned "release" function.
 func GetPackageManagerExplorer(instance rpc.InstanceCommand) (explorer *packagemanager.Explorer, release func()) {
-	i := GetInstance(instance.GetInstance().GetId())
+	i := instances.GetInstance(instance.GetInstance().GetId())
 	if i == nil {
 		return nil, nil
 	}
@@ -91,7 +122,7 @@ func GetPackageManagerExplorer(instance rpc.InstanceCommand) (explorer *packagem
 
 // GetLibraryManager returns the library manager for the given instance ID
 func GetLibraryManager(id int32) *librariesmanager.LibrariesManager {
-	i := GetInstance(id)
+	i := instances.GetInstance(id)
 	if i == nil {
 		return nil
 	}
@@ -154,11 +185,7 @@ func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateRespon
 	)
 
 	// Save instance
-	instancesMux.Lock()
-	instanceID := instancesCount
-	instances[instanceID] = instance
-	instancesCount++
-	instancesMux.Unlock()
+	instanceID := instances.AddAndAssignID(instance)
 
 	return &rpc.CreateResponse{
 		Instance: &rpc.Instance{Id: instanceID},
@@ -178,7 +205,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	if reqInst == nil {
 		return &arduino.InvalidInstanceError{}
 	}
-	instance := GetInstance(reqInst.GetId())
+	instance := instances.GetInstance(reqInst.GetId())
 	if instance == nil {
 		return &arduino.InvalidInstanceError{}
 	}
@@ -430,14 +457,9 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 
 // Destroy FIXMEDOC
 func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse, error) {
-	id := req.GetInstance().GetId()
-
-	instancesMux.Lock()
-	defer instancesMux.Unlock()
-	if _, ok := instances[id]; !ok {
+	if ok := instances.RemoveID(req.GetInstance().GetId()); !ok {
 		return nil, &arduino.InvalidInstanceError{}
 	}
-	delete(instances, id)
 	return &rpc.DestroyResponse{}, nil
 }
 
@@ -473,7 +495,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 
 // UpdateIndex FIXMEDOC
 func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rpc.DownloadProgressCB) (*rpc.UpdateIndexResponse, error) {
-	if GetInstance(req.GetInstance().GetId()) == nil {
+	if instances.GetInstance(req.GetInstance().GetId()) == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
 
