@@ -16,29 +16,6 @@
 
 from pathlib import Path
 
-
-def test_debugger_starts(run_command, data_dir):
-    # Init the environment explicitly
-    assert run_command(["core", "update-index"])
-
-    # Install cores
-    assert run_command(["core", "install", "arduino:samd"])
-
-    # Create sketch for testing
-    sketch_name = "DebuggerStartTest"
-    sketch_path = Path(data_dir, sketch_name)
-    fqbn = "arduino:samd:mkr1000"
-
-    assert run_command(["sketch", "new", sketch_path])
-
-    # Build sketch
-    assert run_command(["compile", "-b", fqbn, sketch_path])
-
-    programmer = "atmel_ice"
-    # Starts debugger
-    assert run_command(["debug", "-b", fqbn, "-P", programmer, sketch_path, "--info"])
-
-
 def test_debugger_with_pde_sketch_starts(run_command, data_dir):
     assert run_command(["update"])
 
