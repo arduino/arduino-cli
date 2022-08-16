@@ -51,3 +51,41 @@ func TestDebuggerStarts(t *testing.T) {
 	_, _, err = cli.Run("debug", "-b", fqbn, "-P", programmer, sketchPath.String(), "--info")
 	require.NoError(t, err)
 }
+
+func TestDebuggerWithPdeSketchStarts(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Install core
+	_, _, err = cli.Run("core", "install", "arduino:samd")
+	require.NoError(t, err)
+
+	sketchName := "DebuggerPdeSketchStartTest"
+	sketchPath := cli.DataDir().Join(sketchName)
+	fqbn := "arduino:samd:mkr1000"
+
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Looks for sketch file .ino
+	pathDir, err := sketchPath.ReadDir()
+	require.NoError(t, err)
+	fileIno := pathDir[0]
+
+	// Renames sketch file to pde
+	filePde := sketchPath.Join(sketchName + ".pde")
+	err = fileIno.Rename(filePde)
+	require.NoError(t, err)
+
+	// Build sketch
+	_, _, err = cli.Run("compile", "-b", fqbn, filePde.String())
+	require.NoError(t, err)
+
+	programmer := "atmel_ice"
+	// Starts debugger
+	_, _, err = cli.Run("debug", "-b", fqbn, "-P", programmer, filePde.String(), "--info")
+	require.NoError(t, err)
+}
