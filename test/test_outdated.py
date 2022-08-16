@@ -15,28 +15,6 @@
 
 from pathlib import Path
 
-
-def test_outdated(run_command):
-    # Updates index for cores and libraries
-    run_command(["core", "update-index"])
-    run_command(["lib", "update-index"])
-
-    # Installs an outdated core and library
-    run_command(["core", "install", "arduino:avr@1.6.3"])
-    assert run_command(["lib", "install", "USBHost@1.0.0"])
-
-    # Installs latest version of a core and a library
-    run_command(["core", "install", "arduino:samd"])
-    assert run_command(["lib", "install", "ArduinoJson"])
-
-    # Verifies only outdated cores and libraries are returned
-    result = run_command(["outdated"])
-    assert result.ok
-    lines = [l.strip() for l in result.stdout.splitlines()]
-    assert "Arduino AVR Boards" in lines[1]
-    assert "USBHost" in lines[4]
-
-
 def test_outdated_using_library_with_invalid_version(run_command, data_dir):
     assert run_command(["update"])
 
