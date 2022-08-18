@@ -32,3 +32,14 @@ func TestCompletionNoArgs(t *testing.T) {
 	require.Contains(t, string(stderr), "Error: accepts 1 arg(s), received 0")
 	require.Empty(t, stdout)
 }
+
+func TestCompletionBash(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	stdout, stderr, err := cli.Run("completion", "bash")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	require.Contains(t, string(stdout), "# bash completion V2 for arduino-cli")
+	require.Contains(t, string(stdout), "__start_arduino-cli()")
+}

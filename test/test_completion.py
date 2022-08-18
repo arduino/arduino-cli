@@ -14,14 +14,6 @@
 # a commercial license, send an email to license@arduino.cc.
 
 
-def test_completion_bash(run_command):
-    result = run_command(["completion", "bash"])
-    assert result.ok
-    assert result.stderr == ""
-    assert "# bash completion V2 for arduino-cli" in result.stdout
-    assert "__start_arduino-cli()" in result.stdout
-
-
 def test_completion_zsh(run_command):
     result = run_command(["completion", "zsh"])
     assert result.ok
