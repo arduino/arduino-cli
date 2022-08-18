@@ -88,3 +88,15 @@ func TestCompletionBashNoDesc(t *testing.T) {
 	require.Contains(t, string(stdout), "__start_arduino-cli()")
 	require.Contains(t, string(stdout), "__completeNoDesc")
 }
+
+func TestCompletionZshNoDesc(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	stdout, stderr, err := cli.Run("completion", "zsh", "--no-descriptions")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	require.Contains(t, string(stdout), "#compdef _arduino-cli arduino-cli")
+	require.Contains(t, string(stdout), "_arduino-cli()")
+	require.Contains(t, string(stdout), "__completeNoDesc")
+}

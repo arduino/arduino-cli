@@ -14,15 +14,6 @@
 # a commercial license, send an email to license@arduino.cc.
 
 
-def test_completion_zsh_no_desc(run_command):
-    result = run_command(["completion", "zsh", "--no-descriptions"])
-    assert result.ok
-    assert result.stderr == ""
-    assert "#compdef _arduino-cli arduino-cli" in result.stdout
-    assert "_arduino-cli()" in result.stdout
-    assert "__completeNoDesc" in result.stdout
-
-
 def test_completion_fish_no_desc(run_command):
     result = run_command(["completion", "fish", "--no-descriptions"])
     assert result.ok
