@@ -185,18 +185,18 @@ func (pme *Explorer) DownloadAndInstallPlatformAndTools(
 }
 
 // InstallPlatform installs a specific release of a platform.
-func (pm *PackageManager) InstallPlatform(platformRelease *cores.PlatformRelease) error {
-	destDir := pm.PackagesDir.Join(
+func (pme *Explorer) InstallPlatform(platformRelease *cores.PlatformRelease) error {
+	destDir := pme.PackagesDir.Join(
 		platformRelease.Platform.Package.Name,
 		"hardware",
 		platformRelease.Platform.Architecture,
 		platformRelease.Version.String())
-	return pm.InstallPlatformInDirectory(platformRelease, destDir)
+	return pme.InstallPlatformInDirectory(platformRelease, destDir)
 }
 
 // InstallPlatformInDirectory installs a specific release of a platform in a specific directory.
-func (pm *PackageManager) InstallPlatformInDirectory(platformRelease *cores.PlatformRelease, destDir *paths.Path) error {
-	if err := platformRelease.Resource.Install(pm.DownloadDir, pm.tempDir, destDir); err != nil {
+func (pme *Explorer) InstallPlatformInDirectory(platformRelease *cores.PlatformRelease, destDir *paths.Path) error {
+	if err := platformRelease.Resource.Install(pme.DownloadDir, pme.tempDir, destDir); err != nil {
 		return errors.Errorf(tr("installing platform %[1]s: %[2]s"), platformRelease, err)
 	}
 	if d, err := destDir.Abs(); err == nil {
@@ -204,13 +204,13 @@ func (pm *PackageManager) InstallPlatformInDirectory(platformRelease *cores.Plat
 	} else {
 		return err
 	}
-	if err := pm.cacheInstalledJSON(platformRelease); err != nil {
+	if err := pme.cacheInstalledJSON(platformRelease); err != nil {
 		return errors.Errorf(tr("creating installed.json in %[1]s: %[2]s"), platformRelease.InstallDir, err)
 	}
 	return nil
 }
 
-func (pm *PackageManager) cacheInstalledJSON(platformRelease *cores.PlatformRelease) error {
+func (pme *Explorer) cacheInstalledJSON(platformRelease *cores.PlatformRelease) error {
 	index := packageindex.IndexFromPlatformRelease(platformRelease)
 	platformJSON, err := json.MarshalIndent(index, "", "  ")
 	if err != nil {
@@ -246,15 +246,15 @@ func (pme *Explorer) RunPostInstallScript(platformRelease *cores.PlatformRelease
 }
 
 // IsManagedPlatformRelease returns true if the PlatforRelease is managed by the PackageManager
-func (pm *PackageManager) IsManagedPlatformRelease(platformRelease *cores.PlatformRelease) bool {
-	if pm.PackagesDir == nil {
+func (pme *Explorer) IsManagedPlatformRelease(platformRelease *cores.PlatformRelease) bool {
+	if pme.PackagesDir == nil {
 		return false
 	}
 	installDir := platformRelease.InstallDir.Clone()
 	if installDir.FollowSymLink() != nil {
 		return false
 	}
-	packagesDir := pm.PackagesDir.Clone()
+	packagesDir := pme.PackagesDir.Clone()
 	if packagesDir.FollowSymLink() != nil {
 		return false
 	}
@@ -266,8 +266,8 @@ func (pm *PackageManager) IsManagedPlatformRelease(platformRelease *cores.Platfo
 }
 
 // UninstallPlatform remove a PlatformRelease.
-func (pm *PackageManager) UninstallPlatform(platformRelease *cores.PlatformRelease, taskCB rpc.TaskProgressCB) error {
-	log := pm.log.WithField("platform", platformRelease)
+func (pme *Explorer) UninstallPlatform(platformRelease *cores.PlatformRelease, taskCB rpc.TaskProgressCB) error {
+	log := pme.log.WithField("platform", platformRelease)
 
 	log.Info("Uninstalling platform")
 	taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s", platformRelease)})
@@ -279,7 +279,7 @@ func (pm *PackageManager) UninstallPlatform(platformRelease *cores.PlatformRelea
 	}
 
 	// Safety measure
-	if !pm.IsManagedPlatformRelease(platformRelease) {
+	if !pme.IsManagedPlatformRelease(platformRelease) {
 		err := fmt.Errorf(tr("%s is not managed by package manager"), platformRelease)
 		log.WithError(err).Error("Error uninstalling")
 		return &arduino.FailedUninstallError{Message: err.Error()}
@@ -299,8 +299,8 @@ func (pm *PackageManager) UninstallPlatform(platformRelease *cores.PlatformRelea
 }
 
 // InstallTool installs a specific release of a tool.
-func (pm *PackageManager) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB) error {
-	log := pm.log.WithField("Tool", toolRelease)
+func (pme *Explorer) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB) error {
+	log := pme.log.WithField("Tool", toolRelease)
 
 	if toolRelease.IsInstalled() {
 		log.Warn("Tool already installed")
@@ -315,12 +315,12 @@ func (pm *PackageManager) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc
 	if toolResource == nil {
 		return fmt.Errorf(tr("no compatible version of %s tools found for the current os"), toolRelease.Tool.Name)
 	}
-	destDir := pm.PackagesDir.Join(
+	destDir := pme.PackagesDir.Join(
 		toolRelease.Tool.Package.Name,
 		"tools",
 		toolRelease.Tool.Name,
 		toolRelease.Version.String())
-	err := toolResource.Install(pm.DownloadDir, pm.tempDir, destDir)
+	err := toolResource.Install(pme.DownloadDir, pme.tempDir, destDir)
 	if err != nil {
 		log.WithError(err).Warn("Cannot install tool")
 		return &arduino.FailedInstallError{Message: tr("Cannot install tool %s", toolRelease), Cause: err}
@@ -332,15 +332,15 @@ func (pm *PackageManager) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc
 }
 
 // IsManagedToolRelease returns true if the ToolRelease is managed by the PackageManager
-func (pm *PackageManager) IsManagedToolRelease(toolRelease *cores.ToolRelease) bool {
-	if pm.PackagesDir == nil {
+func (pme *Explorer) IsManagedToolRelease(toolRelease *cores.ToolRelease) bool {
+	if pme.PackagesDir == nil {
 		return false
 	}
 	installDir := toolRelease.InstallDir.Clone()
 	if installDir.FollowSymLink() != nil {
 		return false
 	}
-	packagesDir := pm.PackagesDir.Clone()
+	packagesDir := pme.PackagesDir.Clone()
 	if packagesDir.FollowSymLink() != nil {
 		return false
 	}
@@ -352,8 +352,8 @@ func (pm *PackageManager) IsManagedToolRelease(toolRelease *cores.ToolRelease) b
 }
 
 // UninstallTool remove a ToolRelease.
-func (pm *PackageManager) UninstallTool(toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB) error {
-	log := pm.log.WithField("Tool", toolRelease)
+func (pme *Explorer) UninstallTool(toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB) error {
+	log := pme.log.WithField("Tool", toolRelease)
 	log.Info("Uninstalling tool")
 
 	if toolRelease.InstallDir == nil {
@@ -361,7 +361,7 @@ func (pm *PackageManager) UninstallTool(toolRelease *cores.ToolRelease, taskCB r
 	}
 
 	// Safety measure
-	if !pm.IsManagedToolRelease(toolRelease) {
+	if !pme.IsManagedToolRelease(toolRelease) {
 		err := &arduino.FailedUninstallError{Message: tr("tool %s is not managed by package manager", toolRelease)}
 		log.WithError(err).Error("Error uninstalling")
 		return err

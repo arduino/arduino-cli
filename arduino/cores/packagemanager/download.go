@@ -43,8 +43,8 @@ func (platform *PlatformReference) String() string {
 
 // FindPlatform returns the Platform matching the PlatformReference or nil if not found.
 // The PlatformVersion field of the reference is ignored.
-func (pm *PackageManager) FindPlatform(ref *PlatformReference) *cores.Platform {
-	targetPackage, ok := pm.packages[ref.Package]
+func (pme *Explorer) FindPlatform(ref *PlatformReference) *cores.Platform {
+	targetPackage, ok := pme.packages[ref.Package]
 	if !ok {
 		return nil
 	}
@@ -56,8 +56,8 @@ func (pm *PackageManager) FindPlatform(ref *PlatformReference) *cores.Platform {
 }
 
 // FindPlatformRelease returns the PlatformRelease matching the PlatformReference or nil if not found
-func (pm *PackageManager) FindPlatformRelease(ref *PlatformReference) *cores.PlatformRelease {
-	platform := pm.FindPlatform(ref)
+func (pme *Explorer) FindPlatformRelease(ref *PlatformReference) *cores.PlatformRelease {
+	platform := pme.FindPlatform(ref)
 	if platform == nil {
 		return nil
 	}
@@ -70,8 +70,8 @@ func (pm *PackageManager) FindPlatformRelease(ref *PlatformReference) *cores.Pla
 
 // FindPlatformReleaseDependencies takes a PlatformReference and returns a set of items to download and
 // a set of outputs for non existing platforms.
-func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReference) (*cores.PlatformRelease, []*cores.ToolRelease, error) {
-	targetPackage, exists := pm.packages[item.Package]
+func (pme *Explorer) FindPlatformReleaseDependencies(item *PlatformReference) (*cores.PlatformRelease, []*cores.ToolRelease, error) {
+	targetPackage, exists := pme.packages[item.Package]
 	if !exists {
 		return nil, nil, fmt.Errorf(tr("package %s not found"), item.Package)
 	}
@@ -94,14 +94,14 @@ func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReferenc
 	}
 
 	// replaces "latest" with latest version too
-	toolDeps, err := pm.packages.GetPlatformReleaseToolDependencies(release)
+	toolDeps, err := pme.packages.GetPlatformReleaseToolDependencies(release)
 	if err != nil {
 		return nil, nil, fmt.Errorf(tr("getting tool dependencies for platform %[1]s: %[2]s"), release.String(), err)
 	}
 
 	// discovery dependencies differ from normal tool since we always want to use the latest
 	// available version for the platform package
-	discoveryDependencies, err := pm.packages.GetPlatformReleaseDiscoveryDependencies(release)
+	discoveryDependencies, err := pme.packages.GetPlatformReleaseDiscoveryDependencies(release)
 	if err != nil {
 		return nil, nil, fmt.Errorf(tr("getting discovery dependencies for platform %[1]s: %[2]s"), release.String(), err)
 	}
@@ -109,7 +109,7 @@ func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReferenc
 
 	// monitor dependencies differ from normal tool since we always want to use the latest
 	// available version for the platform package
-	monitorDependencies, err := pm.packages.GetPlatformReleaseMonitorDependencies(release)
+	monitorDependencies, err := pme.packages.GetPlatformReleaseMonitorDependencies(release)
 	if err != nil {
 		return nil, nil, fmt.Errorf(tr("getting monitor dependencies for platform %[1]s: %[2]s"), release.String(), err)
 	}
@@ -120,14 +120,14 @@ func (pm *PackageManager) FindPlatformReleaseDependencies(item *PlatformReferenc
 
 // DownloadToolRelease downloads a ToolRelease. If the tool is already downloaded a nil Downloader
 // is returned. Uses the given downloader configuration for download, or the default config if nil.
-func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *downloader.Config, progressCB rpc.DownloadProgressCB) error {
+func (pme *Explorer) DownloadToolRelease(tool *cores.ToolRelease, config *downloader.Config, progressCB rpc.DownloadProgressCB) error {
 	resource := tool.GetCompatibleFlavour()
 	if resource == nil {
 		return &arduino.FailedDownloadError{
 			Message: tr("Error downloading tool %s", tool),
 			Cause:   errors.New(tr("no versions available for the current OS"))}
 	}
-	if err := resource.Download(pm.DownloadDir, config, tool.String(), progressCB); err != nil {
+	if err := resource.Download(pme.DownloadDir, config, tool.String(), progressCB); err != nil {
 		return &arduino.FailedDownloadError{
 			Message: tr("Error downloading tool %s", tool),
 			Cause:   err}
@@ -137,9 +137,9 @@ func (pm *PackageManager) DownloadToolRelease(tool *cores.ToolRelease, config *d
 
 // DownloadPlatformRelease downloads a PlatformRelease. If the platform is already downloaded a
 // nil Downloader is returned.
-func (pm *PackageManager) DownloadPlatformRelease(platform *cores.PlatformRelease, config *downloader.Config, progressCB rpc.DownloadProgressCB) error {
+func (pme *Explorer) DownloadPlatformRelease(platform *cores.PlatformRelease, config *downloader.Config, progressCB rpc.DownloadProgressCB) error {
 	if platform.Resource == nil {
 		return &arduino.PlatformNotFoundError{Platform: platform.String()}
 	}
-	return platform.Resource.Download(pm.DownloadDir, config, platform.String(), progressCB)
+	return platform.Resource.Download(pme.DownloadDir, config, platform.String(), progressCB)
 }

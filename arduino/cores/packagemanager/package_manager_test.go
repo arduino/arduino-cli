@@ -469,8 +469,10 @@ func TestFindPlatformReleaseDependencies(t *testing.T) {
 	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test")
 	pmb.LoadPackageIndexFromFile(paths.New("testdata", "package_tooltest_index.json"))
 	pm := pmb.Build()
+	pme, release := pm.NewExplorer()
+	defer release()
 
-	pl, tools, err := pm.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{Package: "test", PlatformArchitecture: "avr"})
+	pl, tools, err := pme.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{Package: "test", PlatformArchitecture: "avr"})
 	require.NoError(t, err)
 	require.NotNil(t, pl)
 	require.Len(t, tools, 3)

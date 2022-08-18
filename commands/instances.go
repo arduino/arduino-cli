@@ -129,16 +129,16 @@ func GetLibraryManager(id int32) *librariesmanager.LibrariesManager {
 	return i.lm
 }
 
-func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (bool, error) {
+func installToolIfMissing(pme *packagemanager.Explorer, tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (bool, error) {
 	if tool.IsInstalled() {
 		return false, nil
 	}
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading missing tool %s", tool)})
-	if err := instance.pm.DownloadToolRelease(tool, nil, downloadCB); err != nil {
+	if err := pme.DownloadToolRelease(tool, nil, downloadCB); err != nil {
 		return false, fmt.Errorf(tr("downloading %[1]s tool: %[2]s"), tool, err)
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
-	if err := instance.pm.InstallTool(tool, taskCB); err != nil {
+	if err := pme.InstallTool(tool, taskCB); err != nil {
 		return false, fmt.Errorf(tr("installing %[1]s tool: %[2]s"), tool, err)
 	}
 	return true, nil

@@ -345,11 +345,13 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 				panic(tr("Platform ID is not correct"))
 			}
 
-			pm := commands.GetPackageManager(inst.GetId())
-			platform := pm.FindPlatform(&packagemanager.PlatformReference{
+			// FIXME: Here we should not access PackageManager...
+			pme, release := commands.GetPackageManagerExplorer(compileRequest)
+			platform := pme.FindPlatform(&packagemanager.PlatformReference{
 				Package:              split[0],
 				PlatformArchitecture: split[1],
 			})
+			release()
 
 			if profileArg.String() == "" {
 				if platform != nil {

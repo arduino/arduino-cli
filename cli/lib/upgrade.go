@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -46,7 +47,7 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli lib upgrade`")
 
 	if len(args) == 0 {
-		err := lib.LibraryUpgradeAll(instance.Id, output.ProgressBar(), output.TaskProgress())
+		err := lib.LibraryUpgradeAll(&rpc.LibraryUpgradeAllRequest{Instance: instance}, output.ProgressBar(), output.TaskProgress())
 		if err != nil {
 			feedback.Errorf(tr("Error upgrading libraries: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)

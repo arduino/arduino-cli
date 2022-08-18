@@ -122,8 +122,10 @@ func (pmb *Builder) installMissingProfilePlatform(platformRef *sketch.ProfilePla
 	tmpPlatform := tmpTargetPackage.GetOrCreatePlatform(platformRef.Architecture)
 	tmpPlatformRelease := tmpPlatform.GetOrCreateRelease(platformRef.Version)
 	tmpPm := tmpPmb.Build()
+	tmpPme, tmpRelease := tmpPm.NewExplorer()
+	defer tmpRelease()
 
-	if err := tmpPm.DownloadPlatformRelease(tmpPlatformRelease, nil, downloadCB); err != nil {
+	if err := tmpPme.DownloadPlatformRelease(tmpPlatformRelease, nil, downloadCB); err != nil {
 		taskCB(&rpc.TaskProgress{Name: tr("Error downloading platform %s", tmpPlatformRelease)})
 		return &arduino.FailedInstallError{Message: tr("Error downloading platform %s", tmpPlatformRelease), Cause: err}
 	}
@@ -131,7 +133,7 @@ func (pmb *Builder) installMissingProfilePlatform(platformRef *sketch.ProfilePla
 
 	// Perform install
 	taskCB(&rpc.TaskProgress{Name: tr("Installing platform %s", tmpPlatformRelease)})
-	if err := tmpPm.InstallPlatformInDirectory(tmpPlatformRelease, destDir); err != nil {
+	if err := tmpPme.InstallPlatformInDirectory(tmpPlatformRelease, destDir); err != nil {
 		taskCB(&rpc.TaskProgress{Name: tr("Error installing platform %s", tmpPlatformRelease)})
 		return &arduino.FailedInstallError{Message: tr("Error installing platform %s", tmpPlatformRelease), Cause: err}
 	}
