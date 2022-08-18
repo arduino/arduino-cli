@@ -14,14 +14,6 @@
 # a commercial license, send an email to license@arduino.cc.
 
 
-def test_completion_fish(run_command):
-    result = run_command(["completion", "fish"])
-    assert result.ok
-    assert result.stderr == ""
-    assert "# fish completion for arduino-cli" in result.stdout
-    assert "function __arduino_cli_perform_completion" in result.stdout
-
-
 def test_completion_powershell(run_command):
     result = run_command(["completion", "powershell"])
     assert result.ok

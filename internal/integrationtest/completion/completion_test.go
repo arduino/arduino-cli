@@ -54,3 +54,14 @@ func TestCompletionZsh(t *testing.T) {
 	require.Contains(t, string(stdout), "#compdef _arduino-cli arduino-cli")
 	require.Contains(t, string(stdout), "_arduino-cli()")
 }
+
+func TestCompletionFish(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	stdout, stderr, err := cli.Run("completion", "fish")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	require.Contains(t, string(stdout), "# fish completion for arduino-cli")
+	require.Contains(t, string(stdout), "function __arduino_cli_perform_completion")
+}
