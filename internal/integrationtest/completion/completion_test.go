@@ -76,3 +76,15 @@ func TestCompletionPowershell(t *testing.T) {
 	require.Contains(t, string(stdout), "# powershell completion for arduino-cli")
 	require.Contains(t, string(stdout), "Register-ArgumentCompleter -CommandName 'arduino-cli' -ScriptBlock")
 }
+
+func TestCompletionBashNoDesc(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	stdout, stderr, err := cli.Run("completion", "bash", "--no-descriptions")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	require.Contains(t, string(stdout), "# bash completion V2 for arduino-cli")
+	require.Contains(t, string(stdout), "__start_arduino-cli()")
+	require.Contains(t, string(stdout), "__completeNoDesc")
+}
