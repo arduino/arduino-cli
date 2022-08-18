@@ -156,3 +156,27 @@ func TestConfigCompletion(t *testing.T) {
 	stdout, _, _ = cli.Run("__complete", "config", "set", "")
 	require.Contains(t, string(stdout), "board_manager.additional_urls")
 }
+
+// here we test if the completions coming from the libs are working
+func TestLibCompletion(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("lib", "update-index")
+	require.NoError(t, err)
+	stdout, _, _ := cli.Run("__complete", "lib", "install", "")
+	require.Contains(t, string(stdout), "WiFi101")
+	stdout, _, _ = cli.Run("__complete", "lib", "download", "")
+	require.Contains(t, string(stdout), "WiFi101")
+	stdout, _, _ = cli.Run("__complete", "lib", "uninstall", "")
+	require.NotContains(t, string(stdout), "WiFi101") // not yet installed
+
+	_, _, err = cli.Run("lib", "install", "Wifi101")
+	require.NoError(t, err)
+	stdout, _, _ = cli.Run("__complete", "lib", "uninstall", "")
+	require.Contains(t, string(stdout), "WiFi101")
+	stdout, _, _ = cli.Run("__complete", "lib", "examples", "")
+	require.Contains(t, string(stdout), "WiFi101")
+	stdout, _, _ = cli.Run("__complete", "lib", "deps", "")
+	require.Contains(t, string(stdout), "WiFi101")
+}

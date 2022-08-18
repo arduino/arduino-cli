@@ -14,25 +14,6 @@
 # a commercial license, send an email to license@arduino.cc.
 
 
-# here we test if the completions coming from the libs are working
-def test_lib_completion(run_command):
-    assert run_command(["lib", "update-index"])
-    result = run_command(["__complete", "lib", "install", ""], hide=True)
-    assert "WiFi101" in result.stdout
-    result = run_command(["__complete", "lib", "download", ""], hide=True)
-    assert "WiFi101" in result.stdout
-    result = run_command(["__complete", "lib", "uninstall", ""], hide=True)
-    assert "WiFi101" not in result.stdout  # not yet installed
-
-    assert run_command(["lib", "install", "WiFi101"])
-    result = run_command(["__complete", "lib", "uninstall", ""])
-    assert "WiFi101" in result.stdout
-    result = run_command(["__complete", "lib", "examples", ""])
-    assert "WiFi101" in result.stdout
-    result = run_command(["__complete", "lib", "deps", ""])
-    assert "WiFi101" in result.stdout
-
-
 # here we test if the completions coming from the core are working
 def test_core_completion(run_command):
     assert run_command(["core", "update-index"])
