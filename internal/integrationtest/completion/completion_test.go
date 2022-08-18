@@ -65,3 +65,14 @@ func TestCompletionFish(t *testing.T) {
 	require.Contains(t, string(stdout), "# fish completion for arduino-cli")
 	require.Contains(t, string(stdout), "function __arduino_cli_perform_completion")
 }
+
+func TestCompletionPowershell(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	stdout, stderr, err := cli.Run("completion", "powershell")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	require.Contains(t, string(stdout), "# powershell completion for arduino-cli")
+	require.Contains(t, string(stdout), "Register-ArgumentCompleter -CommandName 'arduino-cli' -ScriptBlock")
+}

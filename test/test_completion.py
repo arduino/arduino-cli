@@ -14,14 +14,6 @@
 # a commercial license, send an email to license@arduino.cc.
 
 
-def test_completion_powershell(run_command):
-    result = run_command(["completion", "powershell"])
-    assert result.ok
-    assert result.stderr == ""
-    assert "# powershell completion for arduino-cli" in result.stdout
-    assert "Register-ArgumentCompleter -CommandName 'arduino-cli' -ScriptBlock" in result.stdout
-
-
 def test_completion_bash_no_desc(run_command):
     result = run_command(["completion", "bash", "--no-descriptions"])
     assert result.ok
