@@ -14,18 +14,6 @@
 # a commercial license, send an email to license@arduino.cc.
 
 
-# here we test if the completions coming from the core are working
-def test_config_completion(run_command):
-    result = run_command(["__complete", "config", "add", ""])
-    assert "board_manager.additional_urls" in result.stdout
-    result = run_command(["__complete", "config", "remove", ""])
-    assert "board_manager.additional_urls" in result.stdout
-    result = run_command(["__complete", "config", "delete", ""])
-    assert "board_manager.additional_urls" in result.stdout
-    result = run_command(["__complete", "config", "set", ""])
-    assert "board_manager.additional_urls" in result.stdout
-
-
 # here we test if the completions coming from the libs are working
 def test_lib_completion(run_command):
     assert run_command(["lib", "update-index"])

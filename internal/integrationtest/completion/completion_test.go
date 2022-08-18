@@ -141,3 +141,18 @@ func TestStaticCompletions(t *testing.T) {
 	stdout, _, _ = cli.Run("__complete", "--log-level", "")
 	require.Contains(t, string(stdout), "trace")
 }
+
+// here we test if the completions coming from the core are working
+func TestConfigCompletion(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	stdout, _, _ := cli.Run("__complete", "config", "add", "")
+	require.Contains(t, string(stdout), "board_manager.additional_urls")
+	stdout, _, _ = cli.Run("__complete", "config", "remove", "")
+	require.Contains(t, string(stdout), "board_manager.additional_urls")
+	stdout, _, _ = cli.Run("__complete", "config", "delete", "")
+	require.Contains(t, string(stdout), "board_manager.additional_urls")
+	stdout, _, _ = cli.Run("__complete", "config", "set", "")
+	require.Contains(t, string(stdout), "board_manager.additional_urls")
+}
