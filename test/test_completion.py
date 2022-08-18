@@ -14,14 +14,6 @@
 # a commercial license, send an email to license@arduino.cc.
 
 
-# test if the completion command behaves correctly
-def test_completion_no_args(run_command):
-    result = run_command(["completion"])
-    assert not result.ok
-    assert "Error: accepts 1 arg(s), received 0" in result.stderr
-    assert result.stdout == ""
-
-
 def test_completion_bash(run_command):
     result = run_command(["completion", "bash"])
     assert result.ok
