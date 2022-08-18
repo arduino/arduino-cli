@@ -112,3 +112,13 @@ func TestCompletionFishNoDesc(t *testing.T) {
 	require.Contains(t, string(stdout), "function __arduino_cli_perform_completion")
 	require.Contains(t, string(stdout), "__completeNoDesc")
 }
+
+func TestCompletionPowershellNoDesc(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	stdout, stderr, err := cli.Run("completion", "powershell", "--no-descriptions")
+	require.Error(t, err)
+	require.Empty(t, stdout)
+	require.Contains(t, string(stderr), "Error: command description is not supported by powershell")
+}

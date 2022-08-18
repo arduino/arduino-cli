@@ -14,13 +14,6 @@
 # a commercial license, send an email to license@arduino.cc.
 
 
-def test_completion_powershell_no_desc(run_command):
-    result = run_command(["completion", "powershell", "--no-descriptions"])
-    assert not result.ok
-    assert result.stdout == ""
-    assert "Error: command description is not supported by powershell" in result.stderr
-
-
 # test if the completion suggestions returned are meaningful
 # we use the __complete hidden command
 # https://github.com/spf13/cobra/blob/master/shell_completions.md#debugging
