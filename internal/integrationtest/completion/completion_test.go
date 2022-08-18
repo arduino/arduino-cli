@@ -180,3 +180,58 @@ func TestLibCompletion(t *testing.T) {
 	stdout, _, _ = cli.Run("__complete", "lib", "deps", "")
 	require.Contains(t, string(stdout), "WiFi101")
 }
+
+// here we test if the completions coming from the core are working
+func TestCoreCompletion(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+	stdout, _, _ := cli.Run("__complete", "core", "install", "")
+	require.Contains(t, string(stdout), "arduino:avr")
+	stdout, _, _ = cli.Run("__complete", "core", "download", "")
+	require.Contains(t, string(stdout), "arduino:avr")
+	stdout, _, _ = cli.Run("__complete", "core", "uninstall", "")
+	require.NotContains(t, string(stdout), "arduino:avr")
+
+	// we install a core because the provided completions comes from it
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	stdout, _, _ = cli.Run("__complete", "core", "uninstall", "")
+	require.Contains(t, string(stdout), "arduino:avr")
+
+	stdout, _, _ = cli.Run("__complete", "board", "details", "-b", "")
+	require.Contains(t, string(stdout), "arduino:avr:uno")
+	stdout, _, _ = cli.Run("__complete", "burn-bootloader", "-b", "")
+	require.Contains(t, string(stdout), "arduino:avr:uno")
+	stdout, _, _ = cli.Run("__complete", "compile", "-b", "")
+	require.Contains(t, string(stdout), "arduino:avr:uno")
+	stdout, _, _ = cli.Run("__complete", "debug", "-b", "")
+	require.Contains(t, string(stdout), "arduino:avr:uno")
+	stdout, _, _ = cli.Run("__complete", "lib", "examples", "-b", "")
+	require.Contains(t, string(stdout), "arduino:avr:uno")
+	stdout, _, _ = cli.Run("__complete", "upload", "-b", "")
+	require.Contains(t, string(stdout), "arduino:avr:uno")
+	stdout, _, _ = cli.Run("__complete", "monitor", "-b", "")
+	require.Contains(t, string(stdout), "arduino:avr:uno")
+	stdout, _, _ = cli.Run("__complete", "burn-bootloader", "-l", "")
+	require.Contains(t, string(stdout), "network")
+	stdout, _, _ = cli.Run("__complete", "compile", "-l", "")
+	require.Contains(t, string(stdout), "network")
+	stdout, _, _ = cli.Run("__complete", "debug", "-l", "")
+	require.Contains(t, string(stdout), "network")
+	stdout, _, _ = cli.Run("__complete", "upload", "-l", "")
+	require.Contains(t, string(stdout), "network")
+	stdout, _, _ = cli.Run("__complete", "monitor", "-l", "")
+	require.Contains(t, string(stdout), "network")
+	stdout, _, _ = cli.Run("__complete", "burn-bootloader", "-P", "")
+	require.Contains(t, string(stdout), "atmel_ice")
+	stdout, _, _ = cli.Run("__complete", "compile", "-P", "")
+	require.Contains(t, string(stdout), "atmel_ice")
+	stdout, _, _ = cli.Run("__complete", "debug", "-P", "")
+	require.Contains(t, string(stdout), "atmel_ice")
+	stdout, _, _ = cli.Run("__complete", "upload", "-P", "")
+	require.Contains(t, string(stdout), "atmel_ice")
+}
