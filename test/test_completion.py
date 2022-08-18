@@ -14,38 +14,6 @@
 # a commercial license, send an email to license@arduino.cc.
 
 
-# test if the completion suggestions returned are meaningful
-# we use the __complete hidden command
-# https://github.com/spf13/cobra/blob/master/shell_completions.md#debugging
-
-# test static completions
-def test_static_completions(run_command):
-    result = run_command(
-        [
-            "__complete",
-            "--format",
-            "",
-        ]
-    )
-    assert "json" in result.stdout
-    result = run_command(
-        [
-            "__complete",
-            "--log-format",
-            "",
-        ]
-    )
-    assert "json" in result.stdout
-    result = run_command(
-        [
-            "__complete",
-            "--log-level",
-            "",
-        ]
-    )
-    assert "trace" in result.stdout
-
-
 # here we test if the completions coming from the core are working
 def test_config_completion(run_command):
     result = run_command(["__complete", "config", "add", ""])

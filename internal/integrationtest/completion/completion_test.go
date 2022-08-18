@@ -122,3 +122,22 @@ func TestCompletionPowershellNoDesc(t *testing.T) {
 	require.Empty(t, stdout)
 	require.Contains(t, string(stderr), "Error: command description is not supported by powershell")
 }
+
+// test if the completion suggestions returned are meaningful
+// we use the __complete hidden command
+// https://github.com/spf13/cobra/blob/master/shell_completions.md#debugging
+
+// test static completions
+func TestStaticCompletions(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	stdout, _, _ := cli.Run("__complete", "--format", "")
+	require.Contains(t, string(stdout), "json")
+
+	stdout, _, _ = cli.Run("__complete", "--log-format", "")
+	require.Contains(t, string(stdout), "json")
+
+	stdout, _, _ = cli.Run("__complete", "--log-level", "")
+	require.Contains(t, string(stdout), "trace")
+}
