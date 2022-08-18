@@ -14,15 +14,6 @@
 # a commercial license, send an email to license@arduino.cc.
 
 
-def test_completion_fish_no_desc(run_command):
-    result = run_command(["completion", "fish", "--no-descriptions"])
-    assert result.ok
-    assert result.stderr == ""
-    assert "# fish completion for arduino-cli" in result.stdout
-    assert "function __arduino_cli_perform_completion" in result.stdout
-    assert "__completeNoDesc" in result.stdout
-
-
 def test_completion_powershell_no_desc(run_command):
     result = run_command(["completion", "powershell", "--no-descriptions"])
     assert not result.ok
