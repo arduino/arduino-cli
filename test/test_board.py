@@ -394,19 +394,6 @@ gold_board = """
 """  # noqa: E501
 
 
-@pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
-def test_board_list(run_command):
-    run_command(["core", "update-index"])
-    result = run_command(["board", "list", "--format", "json"])
-    assert result.ok
-    # check is a valid json and contains a list of ports
-    ports = json.loads(result.stdout)
-    assert isinstance(ports, list)
-    for port in ports:
-        assert "protocol" in port["port"]
-        assert "protocol_label" in port["port"]
-
-
 def test_board_list_with_invalid_discovery(run_command, data_dir):
     run_command(["core", "update-index"])
     result = run_command(["board", "list"])
