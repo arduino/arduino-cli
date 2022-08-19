@@ -394,23 +394,6 @@ gold_board = """
 """  # noqa: E501
 
 
-def test_board_list_with_invalid_discovery(run_command, data_dir):
-    run_command(["core", "update-index"])
-    result = run_command(["board", "list"])
-    assert result.ok
-
-    # check that the CLI do no crash if an invalid discovery is installed
-    # (for example if the installation fails midway).
-    # https://github.com/arduino/arduino-cli/issues/1669
-    tool_dir = os.path.join(data_dir, "packages", "builtin", "tools", "serial-discovery")
-    for file_to_delete in glob.glob(tool_dir + "/*/*"):
-        os.remove(file_to_delete)
-
-    result = run_command(["board", "list"])
-    assert result.ok
-    assert "builtin:serial-discovery" in result.stderr
-
-
 def test_board_listall(run_command):
     assert run_command(["update"])
     assert run_command(["core", "install", "arduino:avr@1.8.3"])
