@@ -423,6 +423,19 @@ func (s *ArduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 	return stream.Send(&rpc.LibraryInstallResponse{})
 }
 
+// LibraryUpgrade FIXMEDOC
+func (s *ArduinoCoreServerImpl) LibraryUpgrade(req *rpc.LibraryUpgradeRequest, stream rpc.ArduinoCoreService_LibraryUpgradeServer) error {
+	err := lib.LibraryUpgrade(
+		stream.Context(), req,
+		func(p *rpc.DownloadProgress) { stream.Send(&rpc.LibraryUpgradeResponse{Progress: p}) },
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.LibraryUpgradeResponse{TaskProgress: p}) },
+	)
+	if err != nil {
+		return convertErrorToRPCStatus(err)
+	}
+	return stream.Send(&rpc.LibraryUpgradeResponse{})
+}
+
 // LibraryUninstall FIXMEDOC
 func (s *ArduinoCoreServerImpl) LibraryUninstall(req *rpc.LibraryUninstallRequest, stream rpc.ArduinoCoreService_LibraryUninstallServer) error {
 	err := lib.LibraryUninstall(stream.Context(), req,

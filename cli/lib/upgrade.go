@@ -16,6 +16,7 @@
 package lib
 
 import (
+	"context"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -46,18 +47,26 @@ func runUpgradeCommand(cmd *cobra.Command, args []string) {
 	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli lib upgrade`")
 
+	var upgradeErr error
 	if len(args) == 0 {
-		err := lib.LibraryUpgradeAll(&rpc.LibraryUpgradeAllRequest{Instance: instance}, output.ProgressBar(), output.TaskProgress())
-		if err != nil {
-			feedback.Errorf(tr("Error upgrading libraries: %v"), err)
-			os.Exit(errorcodes.ErrGeneric)
-		}
+		req := &rpc.LibraryUpgradeAllRequest{Instance: instance}
+		upgradeErr = lib.LibraryUpgradeAll(req, output.ProgressBar(), output.TaskProgress())
 	} else {
-		err := lib.LibraryUpgrade(instance.Id, args, output.ProgressBar(), output.TaskProgress())
-		if err != nil {
-			feedback.Errorf(tr("Error upgrading libraries: %v"), err)
-			os.Exit(errorcodes.ErrGeneric)
+		for _, libName := range args {
+			req := &rpc.LibraryUpgradeRequest{
+				Instance: instance,
+				Name:     libName,
+			}
+			upgradeErr = lib.LibraryUpgrade(context.Background(), req, output.ProgressBar(), output.TaskProgress())
+			if upgradeErr != nil {
+				break
+			}
 		}
+	}
+
+	if upgradeErr != nil {
+		feedback.Errorf("%s: %v", tr("Error upgrading libraries"), upgradeErr)
+		os.Exit(errorcodes.ErrGeneric)
 	}
 
 	logrus.Info("Done")

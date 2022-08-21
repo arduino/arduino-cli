@@ -92,6 +92,8 @@ type ArduinoCoreServiceClient interface {
 	LibraryDownload(ctx context.Context, in *LibraryDownloadRequest, opts ...grpc.CallOption) (ArduinoCoreService_LibraryDownloadClient, error)
 	// Download and install an Arduino library from the libraries index.
 	LibraryInstall(ctx context.Context, in *LibraryInstallRequest, opts ...grpc.CallOption) (ArduinoCoreService_LibraryInstallClient, error)
+	// Upgrade a library to the newest version available.
+	LibraryUpgrade(ctx context.Context, in *LibraryUpgradeRequest, opts ...grpc.CallOption) (ArduinoCoreService_LibraryUpgradeClient, error)
 	// Install a library from a Zip File
 	ZipLibraryInstall(ctx context.Context, in *ZipLibraryInstallRequest, opts ...grpc.CallOption) (ArduinoCoreService_ZipLibraryInstallClient, error)
 	// Download and install a library from a git url
@@ -799,8 +801,40 @@ func (x *arduinoCoreServiceLibraryInstallClient) Recv() (*LibraryInstallResponse
 	return m, nil
 }
 
+func (c *arduinoCoreServiceClient) LibraryUpgrade(ctx context.Context, in *LibraryUpgradeRequest, opts ...grpc.CallOption) (ArduinoCoreService_LibraryUpgradeClient, error) {
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[17], "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryUpgrade", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &arduinoCoreServiceLibraryUpgradeClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type ArduinoCoreService_LibraryUpgradeClient interface {
+	Recv() (*LibraryUpgradeResponse, error)
+	grpc.ClientStream
+}
+
+type arduinoCoreServiceLibraryUpgradeClient struct {
+	grpc.ClientStream
+}
+
+func (x *arduinoCoreServiceLibraryUpgradeClient) Recv() (*LibraryUpgradeResponse, error) {
+	m := new(LibraryUpgradeResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *arduinoCoreServiceClient) ZipLibraryInstall(ctx context.Context, in *ZipLibraryInstallRequest, opts ...grpc.CallOption) (ArduinoCoreService_ZipLibraryInstallClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[17], "/cc.arduino.cli.commands.v1.ArduinoCoreService/ZipLibraryInstall", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[18], "/cc.arduino.cli.commands.v1.ArduinoCoreService/ZipLibraryInstall", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -832,7 +866,7 @@ func (x *arduinoCoreServiceZipLibraryInstallClient) Recv() (*ZipLibraryInstallRe
 }
 
 func (c *arduinoCoreServiceClient) GitLibraryInstall(ctx context.Context, in *GitLibraryInstallRequest, opts ...grpc.CallOption) (ArduinoCoreService_GitLibraryInstallClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[18], "/cc.arduino.cli.commands.v1.ArduinoCoreService/GitLibraryInstall", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[19], "/cc.arduino.cli.commands.v1.ArduinoCoreService/GitLibraryInstall", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -864,7 +898,7 @@ func (x *arduinoCoreServiceGitLibraryInstallClient) Recv() (*GitLibraryInstallRe
 }
 
 func (c *arduinoCoreServiceClient) LibraryUninstall(ctx context.Context, in *LibraryUninstallRequest, opts ...grpc.CallOption) (ArduinoCoreService_LibraryUninstallClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[19], "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryUninstall", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[20], "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryUninstall", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -896,7 +930,7 @@ func (x *arduinoCoreServiceLibraryUninstallClient) Recv() (*LibraryUninstallResp
 }
 
 func (c *arduinoCoreServiceClient) LibraryUpgradeAll(ctx context.Context, in *LibraryUpgradeAllRequest, opts ...grpc.CallOption) (ArduinoCoreService_LibraryUpgradeAllClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[20], "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryUpgradeAll", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[21], "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryUpgradeAll", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -955,7 +989,7 @@ func (c *arduinoCoreServiceClient) LibraryList(ctx context.Context, in *LibraryL
 }
 
 func (c *arduinoCoreServiceClient) Monitor(ctx context.Context, opts ...grpc.CallOption) (ArduinoCoreService_MonitorClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[21], "/cc.arduino.cli.commands.v1.ArduinoCoreService/Monitor", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[22], "/cc.arduino.cli.commands.v1.ArduinoCoreService/Monitor", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1068,6 +1102,8 @@ type ArduinoCoreServiceServer interface {
 	LibraryDownload(*LibraryDownloadRequest, ArduinoCoreService_LibraryDownloadServer) error
 	// Download and install an Arduino library from the libraries index.
 	LibraryInstall(*LibraryInstallRequest, ArduinoCoreService_LibraryInstallServer) error
+	// Upgrade a library to the newest version available.
+	LibraryUpgrade(*LibraryUpgradeRequest, ArduinoCoreService_LibraryUpgradeServer) error
 	// Install a library from a Zip File
 	ZipLibraryInstall(*ZipLibraryInstallRequest, ArduinoCoreService_ZipLibraryInstallServer) error
 	// Download and install a library from a git url
@@ -1189,6 +1225,9 @@ func (UnimplementedArduinoCoreServiceServer) LibraryDownload(*LibraryDownloadReq
 }
 func (UnimplementedArduinoCoreServiceServer) LibraryInstall(*LibraryInstallRequest, ArduinoCoreService_LibraryInstallServer) error {
 	return status.Errorf(codes.Unimplemented, "method LibraryInstall not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) LibraryUpgrade(*LibraryUpgradeRequest, ArduinoCoreService_LibraryUpgradeServer) error {
+	return status.Errorf(codes.Unimplemented, "method LibraryUpgrade not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) ZipLibraryInstall(*ZipLibraryInstallRequest, ArduinoCoreService_ZipLibraryInstallServer) error {
 	return status.Errorf(codes.Unimplemented, "method ZipLibraryInstall not implemented")
@@ -1862,6 +1901,27 @@ func (x *arduinoCoreServiceLibraryInstallServer) Send(m *LibraryInstallResponse)
 	return x.ServerStream.SendMsg(m)
 }
 
+func _ArduinoCoreService_LibraryUpgrade_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(LibraryUpgradeRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ArduinoCoreServiceServer).LibraryUpgrade(m, &arduinoCoreServiceLibraryUpgradeServer{stream})
+}
+
+type ArduinoCoreService_LibraryUpgradeServer interface {
+	Send(*LibraryUpgradeResponse) error
+	grpc.ServerStream
+}
+
+type arduinoCoreServiceLibraryUpgradeServer struct {
+	grpc.ServerStream
+}
+
+func (x *arduinoCoreServiceLibraryUpgradeServer) Send(m *LibraryUpgradeResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 func _ArduinoCoreService_ZipLibraryInstall_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(ZipLibraryInstallRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -2213,6 +2273,11 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "LibraryInstall",
 			Handler:       _ArduinoCoreService_LibraryInstall_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "LibraryUpgrade",
+			Handler:       _ArduinoCoreService_LibraryUpgrade_Handler,
 			ServerStreams: true,
 		},
 		{

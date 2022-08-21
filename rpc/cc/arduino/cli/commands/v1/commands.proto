@@ -153,6 +153,10 @@ service ArduinoCoreService {
   rpc LibraryInstall(LibraryInstallRequest)
       returns (stream LibraryInstallResponse);
 
+  // Upgrade a library to the newest version available.
+  rpc LibraryUpgrade(LibraryUpgradeRequest)
+      returns (stream LibraryUpgradeResponse);
+
   // Install a library from a Zip File
   rpc ZipLibraryInstall(ZipLibraryInstallRequest)
       returns (stream ZipLibraryInstallResponse);

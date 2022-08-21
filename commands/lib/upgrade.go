@@ -16,6 +16,7 @@
 package lib
 
 import (
+	"context"
 	"errors"
 
 	"github.com/arduino/arduino-cli/arduino"
@@ -42,12 +43,15 @@ func LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.Downloa
 	return nil
 }
 
-func LibraryUpgrade(lm *librariesmanager.LibrariesManager, libraryNames []string, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+// LibraryUpgrade upgrades a library
+func LibraryUpgrade(ctx context.Context, req *rpc.LibraryUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+	lm := commands.GetLibraryManager(req)
+
 	// get the libs to upgrade
-	libs := filterByName(listLibraries(lm, true, true), libraryNames)
+	lib := filterByName(listLibraries(lm, true, true), req.GetName())
 
 	// do it
-	return upgrade(lm, libs, downloadCB, taskCB)
+	return upgrade(lm, []*installedLib{lib}, downloadCB, taskCB)
 }
 
 func upgrade(lm *librariesmanager.LibrariesManager, libs []*installedLib, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
@@ -70,20 +74,11 @@ func upgrade(lm *librariesmanager.LibrariesManager, libs []*installedLib, downlo
 	return nil
 }
 
-func filterByName(libs []*installedLib, names []string) []*installedLib {
-	// put the names in a map to ease lookup
-	queryMap := make(map[string]struct{})
-	for _, name := range names {
-		queryMap[name] = struct{}{}
-	}
-
-	ret := []*installedLib{}
+func filterByName(libs []*installedLib, name string) *installedLib {
 	for _, lib := range libs {
-		// skip if library name wasn't in the query
-		if _, found := queryMap[lib.Library.RealName]; found {
-			ret = append(ret, lib)
+		if lib.Library.RealName == name {
+			return lib
 		}
 	}
-
-	return ret
+	return nil
 }
