@@ -130,19 +130,18 @@ func GetLibraryManager(req rpc.InstanceCommand) *librariesmanager.LibrariesManag
 	return i.lm
 }
 
-func installToolIfMissing(pme *packagemanager.Explorer, tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (bool, error) {
-	if tool.IsInstalled() {
-		return false, nil
-	}
+func installTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+	pme, release := pm.NewExplorer()
+	defer release()
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading missing tool %s", tool)})
 	if err := pme.DownloadToolRelease(tool, nil, downloadCB); err != nil {
-		return false, fmt.Errorf(tr("downloading %[1]s tool: %[2]s"), tool, err)
+		return fmt.Errorf(tr("downloading %[1]s tool: %[2]s"), tool, err)
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
 	if err := pme.InstallTool(tool, taskCB); err != nil {
-		return false, fmt.Errorf(tr("installing %[1]s tool: %[2]s"), tool, err)
+		return fmt.Errorf(tr("installing %[1]s tool: %[2]s"), tool, err)
 	}
-	return true, nil
+	return nil
 }
 
 // Create a new CoreInstance ready to be initialized, supporting directories are also created.
@@ -328,31 +327,27 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		// otherwise we wouldn't find them and reinstall them each time
 		// and they would never get reloaded.
 
-		builtinToolReleases := []*cores.ToolRelease{}
+		builtinToolsToInstall := []*cores.ToolRelease{}
 		for name, tool := range pmb.GetOrCreatePackage("builtin").Tools {
-			latestRelease := tool.LatestRelease()
-			if latestRelease == nil {
+			latest := tool.LatestRelease()
+			if latest == nil {
 				s := status.Newf(codes.Internal, tr("can't find latest release of tool %s", name))
 				responseError(s)
-				continue
+			} else if !latest.IsInstalled() {
+				builtinToolsToInstall = append(builtinToolsToInstall, latest)
 			}
-			builtinToolReleases = append(builtinToolReleases, latestRelease)
 		}
 
-		// Install tools if necessary
-		toolsHaveBeenInstalled := false
-		for _, toolRelease := range builtinToolReleases {
-			installed, err := instance.installToolIfMissing(toolRelease, downloadCallback, taskCallback)
-			if err != nil {
-				s := status.Newf(codes.Internal, err.Error())
-				responseError(s)
-				continue
+		// Install builtin tools if necessary
+		if len(builtinToolsToInstall) > 0 {
+			for _, toolRelease := range builtinToolsToInstall {
+				if err := installTool(pmb.Build(), toolRelease, downloadCallback, taskCallback); err != nil {
+					s := status.Newf(codes.Internal, err.Error())
+					responseError(s)
+				}
 			}
-			toolsHaveBeenInstalled = toolsHaveBeenInstalled || installed
-		}
 
-		if toolsHaveBeenInstalled {
-			// We installed at least one new tool after loading hardware
+			// We installed at least one builtin tool after loading hardware
 			// so we must reload again otherwise we would never found them.
 			for _, err := range loadBuiltinTools() {
 				s := &arduino.PlatformLoadingError{Cause: err}
