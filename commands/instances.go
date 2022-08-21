@@ -99,10 +99,11 @@ func (c *coreInstancesContainer) RemoveID(id int32) bool {
 	return true
 }
 
-// GetPackageManager returns a PackageManager for the given ID, or nil if
-// ID doesn't exist
-func GetPackageManager(id int32) *packagemanager.PackageManager {
-	i := instances.GetInstance(id)
+// GetPackageManager returns a PackageManager. If the package manager is not found
+// (because the instance is invalid or has been destroyed), nil is returned.
+// Deprecated: use GetPackageManagerExplorer instead.
+func GetPackageManager(instance rpc.InstanceCommand) *packagemanager.PackageManager {
+	i := instances.GetInstance(instance.GetInstance().GetId())
 	if i == nil {
 		return nil
 	}
@@ -112,12 +113,12 @@ func GetPackageManager(id int32) *packagemanager.PackageManager {
 // GetPackageManagerExplorer returns a new package manager Explorer. The
 // explorer holds a read lock on the underlying PackageManager and it should
 // be released by calling the returned "release" function.
-func GetPackageManagerExplorer(instance rpc.InstanceCommand) (explorer *packagemanager.Explorer, release func()) {
-	i := instances.GetInstance(instance.GetInstance().GetId())
-	if i == nil {
+func GetPackageManagerExplorer(req rpc.InstanceCommand) (explorer *packagemanager.Explorer, release func()) {
+	pm := GetPackageManager(req)
+	if pm == nil {
 		return nil, nil
 	}
-	return i.PackageManager.NewExplorer()
+	return pm.NewExplorer()
 }
 
 // GetLibraryManager returns the library manager for the given instance ID

@@ -108,10 +108,6 @@ func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Po
 	}
 	defer release()
 
-	pm := commands.GetPackageManager(instance.Id)
-	if pm == nil {
-		return nil, errors.New("invalid instance")
-	}
 	dm := pme.DiscoveryManager()
 	watcher, err := dm.Watch()
 	if err != nil {
