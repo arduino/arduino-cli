@@ -121,9 +121,9 @@ func GetPackageManagerExplorer(req rpc.InstanceCommand) (explorer *packagemanage
 	return pm.NewExplorer()
 }
 
-// GetLibraryManager returns the library manager for the given instance ID
-func GetLibraryManager(id int32) *librariesmanager.LibrariesManager {
-	i := instances.GetInstance(id)
+// GetLibraryManager returns the library manager for the given instance.
+func GetLibraryManager(req rpc.InstanceCommand) *librariesmanager.LibrariesManager {
+	i := instances.GetInstance(req.GetInstance().GetId())
 	if i == nil {
 		return nil
 	}
@@ -467,7 +467,7 @@ func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse
 // UpdateLibrariesIndex updates the library_index.json
 func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequest, downloadCB rpc.DownloadProgressCB) error {
 	logrus.Info("Updating libraries index")
-	lm := GetLibraryManager(req.GetInstance().GetId())
+	lm := GetLibraryManager(req)
 	if lm == nil {
 		return &arduino.InvalidInstanceError{}
 	}
