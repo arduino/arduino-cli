@@ -56,33 +56,27 @@ type PackageManager struct {
 // Builder is used to create a new PackageManager. The builder
 // has methods to load patforms and tools to actually build the PackageManager.
 // Once the PackageManager is built, it cannot be changed anymore.
-type Builder struct {
-	*PackageManager
-}
+type Builder PackageManager
 
 // Explorer is used to query the PackageManager. When used it holds
 // a read-only lock on the PackageManager that must be released when the
 // job is completed.
-type Explorer struct {
-	*PackageManager
-}
+type Explorer PackageManager
 
 var tr = i18n.Tr
 
 // NewBuilder returns a new Builder
 func NewBuilder(indexDir, packagesDir, downloadDir, tempDir *paths.Path, userAgent string) *Builder {
 	return &Builder{
-		PackageManager: &PackageManager{
-			log:                            logrus.StandardLogger(),
-			packages:                       cores.NewPackages(),
-			IndexDir:                       indexDir,
-			PackagesDir:                    packagesDir,
-			DownloadDir:                    downloadDir,
-			tempDir:                        tempDir,
-			packagesCustomGlobalProperties: properties.NewMap(),
-			discoveryManager:               discoverymanager.New(),
-			userAgent:                      userAgent,
-		},
+		log:                            logrus.StandardLogger(),
+		packages:                       cores.NewPackages(),
+		IndexDir:                       indexDir,
+		PackagesDir:                    packagesDir,
+		DownloadDir:                    downloadDir,
+		tempDir:                        tempDir,
+		packagesCustomGlobalProperties: properties.NewMap(),
+		discoveryManager:               discoverymanager.New(),
+		userAgent:                      userAgent,
 	}
 }
 
@@ -128,7 +122,18 @@ func (pm *PackageManager) NewBuilder() (builder *Builder, commit func()) {
 // to correctly dispose it.
 func (pm *PackageManager) NewExplorer() (explorer *Explorer, release func()) {
 	pm.packagesLock.RLock()
-	return &Explorer{pm}, pm.packagesLock.RUnlock
+	return &Explorer{
+		log:                            pm.log,
+		packages:                       pm.packages,
+		IndexDir:                       pm.IndexDir,
+		PackagesDir:                    pm.PackagesDir,
+		DownloadDir:                    pm.DownloadDir,
+		tempDir:                        pm.tempDir,
+		packagesCustomGlobalProperties: pm.packagesCustomGlobalProperties,
+		profile:                        pm.profile,
+		discoveryManager:               pm.discoveryManager,
+		userAgent:                      pm.userAgent,
+	}, pm.packagesLock.RUnlock
 }
 
 // GetProfile returns the active profile for this package manager, or nil if no profile is selected.
