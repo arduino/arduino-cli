@@ -48,7 +48,7 @@ type Package struct {
 	Packages   Packages             `json:"-"`
 }
 
-// GetOrCreatePackage returns the specified Package or create an empty one
+// GetOrCreatePackage returns the specified Package or creates an empty one
 // filling all the cross-references
 func (packages Packages) GetOrCreatePackage(packager string) *Package {
 	if targetPackage, ok := packages[packager]; ok {
