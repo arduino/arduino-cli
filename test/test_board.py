@@ -394,31 +394,6 @@ gold_board = """
 """  # noqa: E501
 
 
-def test_board_listall(run_command):
-    assert run_command(["update"])
-    assert run_command(["core", "install", "arduino:avr@1.8.3"])
-    res = run_command(["board", "listall", "--format", "json"])
-    assert res.ok
-    data = json.loads(res.stdout)
-    boards = {b["fqbn"]: b for b in data["boards"]}
-    assert len(boards) == 26
-    assert "arduino:avr:yun" in boards
-    assert "Arduino Yún" == boards["arduino:avr:yun"]["name"]
-    platform = boards["arduino:avr:yun"]["platform"]
-    assert "arduino:avr" == platform["id"]
-    assert "1.8.3" == platform["installed"]
-    assert "" != platform["latest"]
-    assert "Arduino AVR Boards" == platform["name"]
-
-    assert "arduino:avr:uno" in boards
-    assert "Arduino Uno" == boards["arduino:avr:uno"]["name"]
-    platform = boards["arduino:avr:uno"]["platform"]
-    assert "arduino:avr" == platform["id"]
-    assert "1.8.3" == platform["installed"]
-    assert "" != platform["latest"]
-    assert "Arduino AVR Boards" == platform["name"]
-
-
 def test_board_listall_with_manually_installed_platform(run_command, data_dir):
     assert run_command(["update"])
 

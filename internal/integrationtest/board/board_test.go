@@ -65,3 +65,46 @@ func TestBoardListWithInvalidDiscovery(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, string(stderr), "builtin:serial-discovery")
 }
+
+func TestBoardListall(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("board", "listall", "--format", "json")
+	require.NoError(t, err)
+
+	requirejson.Query(t, stdout, ".boards | length", "26")
+
+	requirejson.Contains(t, stdout, `{
+		"boards":[
+			{
+				"name": "Arduino Yún",
+				"fqbn": "arduino:avr:yun",
+				"platform": {
+					"id": "arduino:avr",
+					"installed": "1.8.3",
+					"name": "Arduino AVR Boards"
+				}
+			},
+			{
+				"name": "Arduino Uno",
+				"fqbn": "arduino:avr:uno",
+				"platform": {
+					"id": "arduino:avr",
+					"installed": "1.8.3",
+					"name": "Arduino AVR Boards"
+				}
+			}
+		]
+	}`)
+
+	// Check if the boards' "latest" value is not empty
+	requirejson.Parse(t, stdout).
+		Query(`[ .boards | .[] | .platform | select(.latest == "") ]`).
+		MustBeEmpty()
+}
