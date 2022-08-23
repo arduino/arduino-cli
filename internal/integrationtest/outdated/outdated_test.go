@@ -55,3 +55,36 @@ func TestOutdated(t *testing.T) {
 	require.Contains(t, lines[1], "Arduino AVR Boards")
 	require.Contains(t, lines[4], "USBHost")
 }
+
+func TestOutdatedUsingLibraryWithInvalidVersion(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Install latest version of a library library
+	_, _, err = cli.Run("lib", "install", "WiFi101")
+	require.NoError(t, err)
+
+	// Verifies library is correctly returned
+	stdout, _, err := cli.Run("outdated")
+	require.NoError(t, err)
+	require.NotContains(t, string(stdout), "WiFi101")
+
+	// Changes the version of the currently installed library so that it's invalid
+	libPropPath := cli.SketchbookDir().Join("libraries", "WiFi101", "library.properties")
+	err = libPropPath.WriteFile([]byte("name=WiFi101\nversion=1.0001"))
+	require.NoError(t, err)
+
+	// Verifies library is correctly returned
+	stdout, _, err = cli.Run("outdated")
+	require.NoError(t, err)
+	lines := strings.Split(string(stdout), "\n")
+	l := make([][]string, len(lines))
+	for i := range lines {
+		lines[i] = strings.TrimSpace(lines[i])
+		l[i] = strings.Split(lines[i], " ")
+	}
+	require.Contains(t, l[1][0], "WiFi101")
+}
