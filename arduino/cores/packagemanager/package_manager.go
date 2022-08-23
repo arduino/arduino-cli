@@ -117,9 +117,8 @@ func (pm *PackageManager) NewBuilder() (builder *Builder, commit func()) {
 
 // NewExplorer creates an Explorer for this PackageManager.
 // The Explorer will keep a read-lock on the underlying PackageManager,
-// and a "release" callback function to release the lock is returned.
-// The "release" function must be called when the Explorer is no more
-// to correctly dispose it.
+// the user must call the "release" callback function to release the lock
+// when the Explorer is no more needed.
 func (pm *PackageManager) NewExplorer() (explorer *Explorer, release func()) {
 	pm.packagesLock.RLock()
 	return &Explorer{

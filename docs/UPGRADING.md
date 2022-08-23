@@ -2,6 +2,270 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## 0.27.0
+
+### Breaking changes in golang API `github.com/arduino/arduino-cli/arduino/cores/packagemanager.PackageManager`
+
+The `PackageManager` API has been heavily refactored to correctly handle multitasking and concurrency. Many fields in
+the PackageManager object are now private. All the `PackageManager` methods have been moved into other objects. In
+particular:
+
+- the methods that query the `PackageManager` without changing its internal state, have been moved into the new
+  `Explorer` object
+- the methods that change the `PackageManager` internal state, have been moved into the new `Builder` object.
+
+The `Builder` object must be used to create a new `PackageManager`. Previously the function `NewPackageManager` was used
+to get a clean `PackageManager` object and then use the `LoadHardware*` methods to build it. Now the function
+`NewBuilder` must be used to create a `Builder`, run the `LoadHardware*` methods to load platforms, and finally call the
+`Builder.Build()` method to obtain the final `PackageManager`.
+
+Previously we did:
+
+```go
+pm := packagemanager.NewPackageManager(...)
+err = pm.LoadHardware()
+err = pm.LoadHardwareFromDirectories(...)
+err = pm.LoadHardwareFromDirectory(...)
+err = pm.LoadToolsFromPackageDir(...)
+err = pm.LoadToolsFromBundleDirectories(...)
+err = pm.LoadToolsFromBundleDirectory(...)
+pack = pm.GetOrCreatePackage("packagername")
+// ...use `pack` to tweak or load more hardware...
+err = pm.LoadPackageIndex(...)
+err = pm.LoadPackageIndexFromFile(...)
+err = pm.LoadHardwareForProfile(...)
+
+// ...use `pm` to implement business logic...
+```
+
+Now we must do:
+
+```go
+var pm *packagemanager.PackageManager
+
+{
+    pmb := packagemanager.Newbuilder(...)
+    err = pmb.LoadHardware()
+    err = pmb.LoadHardwareFromDirectories(...)
+    err = pmb.LoadHardwareFromDirectory(...)
+    err = pmb.LoadToolsFromPackageDir(...)
+    err = pmb.LoadToolsFromBundleDirectories(...)
+    err = pmb.LoadToolsFromBundleDirectory(...)
+    pack = pmb.GetOrCreatePackage("packagername")
+    // ...use `pack` to tweak or load more hardware...
+    err = pmb.LoadPackageIndex(...)
+    err = pmb.LoadPackageIndexFromFile(...)
+    err = pmb.LoadHardwareForProfile(...)
+    pm = pmb.Build()
+}
+
+// ...use `pm` to implement business logic...
+```
+
+It's not mandatory but highly recommended, to drop the `Builder` object once it has built the `PackageManager` (that's
+why in the example the `pmb` builder is created in a limited scope between braces).
+
+To query the `PackagerManager` now it is required to obtain an `Explorer` object through the
+`PackageManager.NewExplorer()` method.
+
+Previously we did:
+
+```go
+func DoStuff(pm *packagemanager.PackageManager, ...) {
+    // ...implement business logic through PackageManager methods...
+    ... := pm.Packages
+    ... := pm.CustomGlobalProperties
+    ... := pm.FindPlatform(...)
+    ... := pm.FindPlatformRelease(...)
+    ... := pm.FindPlatformReleaseDependencies(...)
+    ... := pm.DownloadToolRelease(...)
+    ... := pm.DownloadPlatformRelease(...)
+    ... := pm.IdentifyBoard(...)
+    ... := pm.DownloadAndInstallPlatformUpgrades(...)
+    ... := pm.DownloadAndInstallPlatformAndTools(...)
+    ... := pm.InstallPlatform(...)
+    ... := pm.InstallPlatformInDirectory(...)
+    ... := pm.RunPostInstallScript(...)
+    ... := pm.IsManagedPlatformRelease(...)
+    ... := pm.UninstallPlatform(...)
+    ... := pm.InstallTool(...)
+    ... := pm.IsManagedToolRelease(...)
+    ... := pm.UninstallTool(...)
+    ... := pm.IsToolRequired(...)
+    ... := pm.LoadDiscoveries(...)
+    ... := pm.GetProfile(...)
+    ... := pm.GetEnvVarsForSpawnedProcess(...)
+    ... := pm.DiscoveryManager(...)
+    ... := pm.FindPlatformReleaseProvidingBoardsWithVidPid(...)
+    ... := pm.FindBoardsWithVidPid(...)
+    ... := pm.FindBoardsWithID(...)
+    ... := pm.FindBoardWithFQBN(...)
+    ... := pm.ResolveFQBN(...)
+    ... := pm.Package(...)
+    ... := pm.GetInstalledPlatformRelease(...)
+    ... := pm.GetAllInstalledToolsReleases(...)
+    ... := pm.InstalledPlatformReleases(...)
+    ... := pm.InstalledBoards(...)
+    ... := pm.FindToolsRequiredFromPlatformRelease(...)
+    ... := pm.GetTool(...)
+    ... := pm.FindToolsRequiredForBoard(...)
+    ... := pm.FindToolDependency(...)
+    ... := pm.FindDiscoveryDependency(...)
+    ... := pm.FindMonitorDependency(...)
+}
+```
+
+Now we must obtain the `Explorer` object to access the same methods, moreover, we must call the `release` callback
+function once we complete the task:
+
+```go
+func DoStuff(pm *packagemanager.PackageManager, ...) {
+    pme, release := pm.NewExplorer()
+    defer release()
+
+    ... := pme.GetPackages()
+    ... := pme.GetCustomGlobalProperties()
+    ... := pme.FindPlatform(...)
+    ... := pme.FindPlatformRelease(...)
+    ... := pme.FindPlatformReleaseDependencies(...)
+    ... := pme.DownloadToolRelease(...)
+    ... := pme.DownloadPlatformRelease(...)
+    ... := pme.IdentifyBoard(...)
+    ... := pme.DownloadAndInstallPlatformUpgrades(...)
+    ... := pme.DownloadAndInstallPlatformAndTools(...)
+    ... := pme.InstallPlatform(...)
+    ... := pme.InstallPlatformInDirectory(...)
+    ... := pme.RunPostInstallScript(...)
+    ... := pme.IsManagedPlatformRelease(...)
+    ... := pme.UninstallPlatform(...)
+    ... := pme.InstallTool(...)
+    ... := pme.IsManagedToolRelease(...)
+    ... := pme.UninstallTool(...)
+    ... := pme.IsToolRequired(...)
+    ... := pme.LoadDiscoveries(...)
+    ... := pme.GetProfile(...)
+    ... := pme.GetEnvVarsForSpawnedProcess(...)
+    ... := pme.DiscoveryManager(...)
+    ... := pme.FindPlatformReleaseProvidingBoardsWithVidPid(...)
+    ... := pme.FindBoardsWithVidPid(...)
+    ... := pme.FindBoardsWithID(...)
+    ... := pme.FindBoardWithFQBN(...)
+    ... := pme.ResolveFQBN(...)
+    ... := pme.Package(...)
+    ... := pme.GetInstalledPlatformRelease(...)
+    ... := pme.GetAllInstalledToolsReleases(...)
+    ... := pme.InstalledPlatformReleases(...)
+    ... := pme.InstalledBoards(...)
+    ... := pme.FindToolsRequiredFromPlatformRelease(...)
+    ... := pme.GetTool(...)
+    ... := pme.FindToolsRequiredForBoard(...)
+    ... := pme.FindToolDependency(...)
+    ... := pme.FindDiscoveryDependency(...)
+    ... := pme.FindMonitorDependency(...)
+}
+```
+
+The `Explorer` object keeps a read-lock on the underlying `PackageManager` that must be released once the task is done
+by calling the `release` callback function. This ensures that no other task will change the status of the
+`PackageManager` while the current task is in progress.
+
+The `PackageManager.Clean()` method has been removed and replaced by the methods:
+
+- `PackageManager.NewBuilder() (*Builder, commit func())`
+- `Builder.BuildIntoExistingPackageManager(target *PackageManager)`
+
+Previously, to update a `PackageManager` instance we did:
+
+```go
+func Reload(pm *packagemanager.PackageManager) {
+    pm.Clear()
+    ... = pm.LoadHardware(...)
+    // ...other pm.Load* calls...
+}
+```
+
+now we have two options:
+
+```go
+func Reload(pm *packagemanager.PackageManager) {
+    // Create a new builder and build a package manager
+    pmb := packagemanager.NewBuilder(.../* config params */)
+    ... = pmb.LoadHardware(...)
+    // ...other pmb.Load* calls...
+
+    // apply the changes to the original pm
+    pmb.BuildIntoExistingPackageManager(pm)
+}
+```
+
+in this case, we create a new `Builder` with the given config params and once the package manager is built we apply the
+changes atomically with `BuildIntoExistingPackageManager`. This procedure may be even more simplified with:
+
+```go
+func Reload(pm *packagemanager.PackageManager) {
+    // Create a new builder using the same config params
+    // as the original package manager
+    pmb, commit := pm.NewBuilder()
+
+    // build the new package manager
+    ... = pmb.LoadHardware(...)
+    // ...other pmb.Load* calls...
+
+    // apply the changes to the original pm
+    commit()
+}
+```
+
+In this case, we don't even need to bother to provide the configuration parameters because they are taken from the
+previous `PackageManager` instance.
+
+### Some gRPC-mapped methods now accepts the gRPC request instead of the instance ID as parameter
+
+The following methods in subpackages of `github.com/arduino/arduino-cli/commands/*`:
+
+```go
+func Watch(instanceID int32) (<-chan *rpc.BoardListWatchResponse, func(), error) { ... }
+func LibraryUpgradeAll(instanceID int32, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error { ... }
+func LibraryUpgrade(instanceID int32, libraryNames []string, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error { ... }
+```
+
+have been changed to:
+
+```go
+func Watch(req *rpc.BoardListWatchRequest) (<-chan *rpc.BoardListWatchResponse, func(), error) { ... ]
+func LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error { ... }
+func LibraryUpgrade(ctx context.Context, req *rpc.LibraryUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error { ... }
+```
+
+The following methods in package `github.com/arduino/arduino-cli/commands`
+
+```go
+func GetInstance(id int32) *CoreInstance { ... }
+func GetPackageManager(id int32) *packagemanager.PackageManager { ... }
+func GetLibraryManager(instanceID int32) *librariesmanager.LibrariesManager { ... }
+```
+
+have been changed to:
+
+```go
+func GetPackageManager(instance rpc.InstanceCommand) *packagemanager.PackageManager { ... } // Deprecated
+func GetPackageManagerExplorer(req rpc.InstanceCommand) (explorer *packagemanager.Explorer, release func()) { ... ]
+func GetLibraryManager(req rpc.InstanceCommand) *librariesmanager.LibrariesManager { ... }
+```
+
+Old code using passing the `instanceID` inside the gRPC request must be changed to pass directly the whole gRPC request,
+for example:
+
+```go
+	eventsChan, closeWatcher, err := board.Watch(req.Instance.Id)
+```
+
+must be changed to:
+
+```go
+	eventsChan, closeWatcher, err := board.Watch(req)
+```
+
 ## 0.26.0
 
 ### `github.com/arduino/arduino-cli/commands.DownloadToolRelease`, and `InstallToolRelease` functions have been removed
