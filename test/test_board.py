@@ -394,36 +394,6 @@ gold_board = """
 """  # noqa: E501
 
 
-def test_board_listall_with_manually_installed_platform(run_command, data_dir):
-    assert run_command(["update"])
-
-    # Manually installs a core in sketchbooks hardware folder
-    git_url = "https://github.com/arduino/ArduinoCore-samd.git"
-    repo_dir = Path(data_dir, "hardware", "arduino-beta-development", "samd")
-    assert Repo.clone_from(git_url, repo_dir, multi_options=["-b 1.8.11"])
-
-    res = run_command(["board", "listall", "--format", "json"])
-    assert res.ok
-    data = json.loads(res.stdout)
-    boards = {b["fqbn"]: b for b in data["boards"]}
-    assert len(boards) == 17
-    assert "arduino-beta-development:samd:nano_33_iot" in boards
-    assert "Arduino NANO 33 IoT" == boards["arduino-beta-development:samd:nano_33_iot"]["name"]
-    platform = boards["arduino-beta-development:samd:nano_33_iot"]["platform"]
-    assert "arduino-beta-development:samd" == platform["id"]
-    assert "1.8.11" == platform["installed"]
-    assert "1.8.11" == platform["latest"]
-    assert "Arduino SAMD (32-bits ARM Cortex-M0+) Boards" == platform["name"]
-
-    assert "arduino-beta-development:samd:mkr1000" in boards
-    assert "Arduino MKR1000" == boards["arduino-beta-development:samd:mkr1000"]["name"]
-    platform = boards["arduino-beta-development:samd:mkr1000"]["platform"]
-    assert "arduino-beta-development:samd" == platform["id"]
-    assert "1.8.11" == platform["installed"]
-    assert "1.8.11" == platform["latest"]
-    assert "Arduino SAMD (32-bits ARM Cortex-M0+) Boards" == platform["name"]
-
-
 def test_board_details(run_command):
     run_command(["core", "update-index"])
     # Download samd core pinned to 1.8.6

@@ -22,6 +22,8 @@ import (
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/testifyjson/requirejson"
+	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
 func TestBoardList(t *testing.T) {
@@ -107,4 +109,51 @@ func TestBoardListall(t *testing.T) {
 	requirejson.Parse(t, stdout).
 		Query(`[ .boards | .[] | .platform | select(.latest == "") ]`).
 		MustBeEmpty()
+}
+
+func TestBoardListallWithManuallyInstalledPlatform(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Manually installs a core in sketchbooks hardware folder
+	gitUrl := "https://github.com/arduino/ArduinoCore-samd.git"
+	repoDir := cli.SketchbookDir().Join("hardware", "arduino-beta-development", "samd")
+	_, err = git.PlainClone(repoDir.String(), false, &git.CloneOptions{
+		URL:           gitUrl,
+		ReferenceName: plumbing.NewTagReferenceName("1.8.11"),
+	})
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("board", "listall", "--format", "json")
+	require.NoError(t, err)
+
+	requirejson.Query(t, stdout, ".boards | length", "17")
+
+	requirejson.Contains(t, stdout, `{
+		"boards": [
+			{
+				"name": "Arduino MKR1000",
+				"fqbn": "arduino-beta-development:samd:mkr1000",
+				"platform": {
+				  "id": "arduino-beta-development:samd",
+				  "installed": "1.8.11",
+				  "latest": "1.8.11",
+				  "name": "Arduino SAMD (32-bits ARM Cortex-M0+) Boards",
+				}
+			},
+			{
+				"name": "Arduino NANO 33 IoT",
+      			"fqbn": "arduino-beta-development:samd:nano_33_iot",
+      			"platform": {
+        			"id": "arduino-beta-development:samd",
+        			"installed": "1.8.11",
+        			"latest": "1.8.11",
+        			"name": "Arduino SAMD (32-bits ARM Cortex-M0+) Boards"
+				}
+			}
+		]
+	}`)
 }
