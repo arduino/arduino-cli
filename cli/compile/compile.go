@@ -303,7 +303,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			newProfileName = split[2]
 		}
 		fmt.Println()
-		fmt.Println("profile:")
+		fmt.Println("profiles:")
 		fmt.Println("  " + newProfileName + ":")
 		fmt.Println("    fqbn: " + compileRequest.GetFqbn())
 		fmt.Println("    platforms:")
