@@ -157,3 +157,98 @@ func TestBoardListallWithManuallyInstalledPlatform(t *testing.T) {
 		]
 	}`)
 }
+
+func TestBoardDetails(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+	// Download samd core pinned to 1.8.6
+	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.6")
+	require.NoError(t, err)
+
+	// Test board listall with and without showing hidden elements
+	stdout, _, err := cli.Run("board", "listall", "MIPS", "--format", "json")
+	require.NoError(t, err)
+	require.Equal(t, string(stdout), "{}\n")
+
+	stdout, _, err = cli.Run("board", "listall", "MIPS", "-a", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Contains(t, stdout, `{
+		"boards": [
+			{
+				"name": "Arduino Tian (MIPS Console port)"
+			}
+		]
+	}`)
+
+	stdout, _, err = cli.Run("board", "details", "-b", "arduino:samd:nano_33_iot", "--format", "json")
+	require.NoError(t, err)
+
+	requirejson.Contains(t, stdout, `{
+		"fqbn": "arduino:samd:nano_33_iot",
+		"name": "Arduino NANO 33 IoT",
+		"version": "1.8.6",
+		"properties_id": "nano_33_iot",
+		"official": true,
+		"package": {
+	  		"maintainer": "Arduino",
+	  		"url": "https://downloads.arduino.cc/packages/package_index.tar.bz2",
+	  		"website_url": "http://www.arduino.cc/",
+	 		 "email": "packages@arduino.cc",
+	  		"name": "arduino",
+	  		"help": {
+				"online": "http://www.arduino.cc/en/Reference/HomePage"
+	  		}
+		},
+		"platform": {
+	  		"architecture": "samd",
+	  		"category": "Arduino",
+	  		"url": "http://downloads.arduino.cc/cores/samd-1.8.6.tar.bz2",
+			"archive_filename": "samd-1.8.6.tar.bz2",
+			"checksum": "SHA-256:68a4fffa6fe6aa7886aab2e69dff7d3f94c02935bbbeb42de37f692d7daf823b",
+			"size": 2980953,
+			"name": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)"
+		},
+		"identification_properties": [
+			{
+				"properties": {
+				"vid": "0x2341",
+				"pid": "0x8057"
+				}
+			},
+			{
+				"properties": {
+				"vid": "0x2341",
+				"pid": "0x0057"
+				}
+			}
+		],
+		"programmers": [
+	  		{
+				"platform": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)",
+				"id": "edbg",
+				"name": "Atmel EDBG"
+			},
+			{
+				"platform": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)",
+				"id": "atmel_ice",
+				"name": "Atmel-ICE"
+			},
+			{
+				"platform": "Arduino SAMD Boards (32-bits ARM Cortex-M0+)",
+				"id": "sam_ice",
+				"name": "Atmel SAM-ICE"
+			}
+		]
+	}`)
+
+	// Download samd core pinned to 1.8.8
+	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.8")
+	require.NoError(t, err)
+
+	stdout, _, err = cli.Run("board", "details", "-b", "arduino:samd:nano_33_iot", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Contains(t, stdout, `{"debugging_supported": true}`)
+}
