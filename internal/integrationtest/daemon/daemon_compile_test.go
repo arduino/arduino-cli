@@ -93,3 +93,35 @@ func TestDaemonCompileOptions(t *testing.T) {
 		}
 	}
 }
+
+func TestDaemonCompileAfterFailedLibInstall(t *testing.T) {
+	// See: https://github.com/arduino/arduino-cli/issues/1812
+
+	env, cli := createEnvForDaemon(t)
+	defer env.CleanUp()
+
+	grpcInst := cli.Create()
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+		fmt.Printf("INIT> %v\n", ir.GetMessage())
+	}))
+
+	// Build sketch (with errors)
+	sk := paths.New("testdata", "bare_minimum")
+	compile, err := grpcInst.Compile(context.Background(), "", sk.String())
+	require.NoError(t, err)
+	for {
+		msg, err := compile.Recv()
+		if err == io.EOF {
+			require.FailNow(t, "Expected compilation failure", "compilation succeeded")
+			break
+		}
+		if err != nil {
+			fmt.Println("COMPILE ERROR>", err)
+			require.Contains(t, err.Error(), "Missing FQBN")
+			break
+		}
+		if msg.ErrStream != nil {
+			fmt.Printf("COMPILE> %v\n", string(msg.GetErrStream()))
+		}
+	}
+}
