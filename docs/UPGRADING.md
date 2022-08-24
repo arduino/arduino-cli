@@ -232,7 +232,7 @@ func LibraryUpgrade(instanceID int32, libraryNames []string, downloadCB rpc.Down
 have been changed to:
 
 ```go
-func Watch(req *rpc.BoardListWatchRequest) (<-chan *rpc.BoardListWatchResponse, func(), error) { ... ]
+func Watch(req *rpc.BoardListWatchRequest) (<-chan *rpc.BoardListWatchResponse, func(), error) { ... }
 func LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error { ... }
 func LibraryUpgrade(ctx context.Context, req *rpc.LibraryUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error { ... }
 ```
@@ -249,12 +249,12 @@ have been changed to:
 
 ```go
 func GetPackageManager(instance rpc.InstanceCommand) *packagemanager.PackageManager { ... } // Deprecated
-func GetPackageManagerExplorer(req rpc.InstanceCommand) (explorer *packagemanager.Explorer, release func()) { ... ]
+func GetPackageManagerExplorer(req rpc.InstanceCommand) (explorer *packagemanager.Explorer, release func()) { ... }
 func GetLibraryManager(req rpc.InstanceCommand) *librariesmanager.LibrariesManager { ... }
 ```
 
-Old code using passing the `instanceID` inside the gRPC request must be changed to pass directly the whole gRPC request,
-for example:
+Old code passing the `instanceID` inside the gRPC request must be changed to pass directly the whole gRPC request, for
+example:
 
 ```go
 	eventsChan, closeWatcher, err := board.Watch(req.Instance.Id)

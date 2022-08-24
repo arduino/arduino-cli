@@ -54,7 +54,7 @@ type PackageManager struct {
 }
 
 // Builder is used to create a new PackageManager. The builder
-// has methods to load patforms and tools to actually build the PackageManager.
+// has methods to load platforms and tools to actually build the PackageManager.
 // Once the PackageManager is built, it cannot be changed anymore.
 type Builder PackageManager
 
@@ -82,19 +82,19 @@ func NewBuilder(indexDir, packagesDir, downloadDir, tempDir *paths.Path, userAge
 
 // BuildIntoExistingPackageManager will overwrite the given PackageManager instead
 // of building a new one.
-func (pmb *Builder) BuildIntoExistingPackageManager(old *PackageManager) {
-	old.packagesLock.Lock()
-	defer old.packagesLock.Unlock()
-	old.log = pmb.log
-	old.packages = pmb.packages
-	old.IndexDir = pmb.IndexDir
-	old.PackagesDir = pmb.PackagesDir
-	old.DownloadDir = pmb.DownloadDir
-	old.tempDir = pmb.tempDir
-	old.packagesCustomGlobalProperties = pmb.packagesCustomGlobalProperties
-	old.profile = pmb.profile
-	old.discoveryManager = pmb.discoveryManager
-	old.userAgent = pmb.userAgent
+func (pmb *Builder) BuildIntoExistingPackageManager(target *PackageManager) {
+	target.packagesLock.Lock()
+	defer target.packagesLock.Unlock()
+	target.log = pmb.log
+	target.packages = pmb.packages
+	target.IndexDir = pmb.IndexDir
+	target.PackagesDir = pmb.PackagesDir
+	target.DownloadDir = pmb.DownloadDir
+	target.tempDir = pmb.tempDir
+	target.packagesCustomGlobalProperties = pmb.packagesCustomGlobalProperties
+	target.profile = pmb.profile
+	target.discoveryManager = pmb.discoveryManager
+	target.userAgent = pmb.userAgent
 }
 
 // Build builds a new PackageManager.

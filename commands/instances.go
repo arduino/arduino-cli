@@ -75,7 +75,7 @@ func (c *coreInstancesContainer) GetInstance(id int32) *CoreInstance {
 	return c.instances[id]
 }
 
-// AddAndAssignID saves the CoreInstance and assign an unique ID to
+// AddAndAssignID saves the CoreInstance and assigns a unique ID to
 // retrieve it later
 func (c *coreInstancesContainer) AddAndAssignID(i *CoreInstance) int32 {
 	c.instancesMux.Lock()
@@ -86,9 +86,9 @@ func (c *coreInstancesContainer) AddAndAssignID(i *CoreInstance) int32 {
 	return id
 }
 
-// RemoveID removed the CoreInstance referenced by id. Returns true
+// RemoveID removes the CoreInstance referenced by id. Returns true
 // if the operation is successful, or false if the CoreInstance does
-// not exists
+// not exist
 func (c *coreInstancesContainer) RemoveID(id int32) bool {
 	c.instancesMux.Lock()
 	defer c.instancesMux.Unlock()
