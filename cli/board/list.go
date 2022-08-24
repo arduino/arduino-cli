@@ -91,9 +91,11 @@ func watchList(cmd *cobra.Command, inst *rpc.Instance) {
 	for event := range eventsChan {
 		feedback.PrintResult(watchEvent{
 			Type:          event.EventType,
+			Label:         event.Port.Port.Label,
 			Address:       event.Port.Port.Address,
 			Protocol:      event.Port.Port.Protocol,
 			ProtocolLabel: event.Port.Port.ProtocolLabel,
+			Properties:    event.Port.Port.Properties,
 			Boards:        event.Port.MatchingBoards,
 			Error:         event.Error,
 		})
@@ -166,8 +168,10 @@ func (dr result) String() string {
 type watchEvent struct {
 	Type          string               `json:"type"`
 	Address       string               `json:"address,omitempty"`
+	Label         string               `json:"label,omitempty"`
 	Protocol      string               `json:"protocol,omitempty"`
 	ProtocolLabel string               `json:"protocol_label,omitempty"`
+	Properties    map[string]string    `json:"properties"`
 	Boards        []*rpc.BoardListItem `json:"boards,omitempty"`
 	Error         string               `json:"error,omitempty"`
 }
