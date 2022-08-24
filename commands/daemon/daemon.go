@@ -278,7 +278,10 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	errStream.Close()
 	<-outCtx.Done()
 	<-errCtx.Done()
-	compileRespSendErr := stream.Send(compileResp)
+	var compileRespSendErr error
+	if compileResp != nil {
+		compileRespSendErr = stream.Send(compileResp)
+	}
 	if compileErr != nil {
 		return convertErrorToRPCStatus(compileErr)
 	}
