@@ -125,7 +125,7 @@ func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *pat
 // This ideally is only executed the first time the CLI is run.
 func FirstUpdate(instance *rpc.Instance) error {
 	// Gets the data directory to verify if library_index.json and package_index.json exist
-	dataDir := paths.New(configuration.Settings.GetString("directories.data"))
+	dataDir := configuration.DataDir(configuration.Settings)
 
 	libraryIndex := dataDir.Join("library_index.json")
 	packageIndex := dataDir.Join("package_index.json")

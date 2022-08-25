@@ -34,7 +34,6 @@ import (
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
-	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -130,7 +129,7 @@ func (sr searchResults) String() string {
 // of 24 hours is used.
 // Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 func indexesNeedUpdating(duration string) bool {
-	indexpath := paths.New(configuration.Settings.GetString("directories.Data"))
+	indexpath := configuration.DataDir(configuration.Settings)
 
 	now := time.Now()
 	modTimeThreshold, err := time.ParseDuration(duration)

@@ -224,7 +224,7 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	pmb := packagemanager.NewBuilder(
 		dataDir1,
 		configuration.PackagesDir(configuration.Settings),
-		paths.New(configuration.Settings.GetString("directories.Downloads")),
+		configuration.DownloadsDir(configuration.Settings),
 		dataDir1,
 		"test",
 	)

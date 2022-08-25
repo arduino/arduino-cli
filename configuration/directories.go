@@ -61,12 +61,22 @@ func LibrariesDir(settings *viper.Viper) *paths.Path {
 
 // PackagesDir returns the full path to the packages folder
 func PackagesDir(settings *viper.Viper) *paths.Path {
-	return paths.New(settings.GetString("directories.Data")).Join("packages")
+	return DataDir(settings).Join("packages")
 }
 
 // ProfilesCacheDir returns the full path to the profiles cache directory
 // (it contains all the platforms and libraries used to compile a sketch
 // using profiles)
 func ProfilesCacheDir(settings *viper.Viper) *paths.Path {
-	return paths.New(settings.GetString("directories.Data")).Join("internal")
+	return DataDir(settings).Join("internal")
+}
+
+// DataDir returns the full path to the data directory
+func DataDir(settings *viper.Viper) *paths.Path {
+	return paths.New(settings.GetString("directories.Data"))
+}
+
+// DownloadsDir returns the full path to the download cache directory
+func DownloadsDir(settings *viper.Viper) *paths.Path {
+	return paths.New(settings.GetString("directories.Downloads"))
 }

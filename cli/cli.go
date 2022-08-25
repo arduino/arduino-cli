@@ -158,7 +158,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	configFile := configuration.Settings.ConfigFileUsed()
 
 	// initialize inventory
-	err := inventory.Init(configuration.Settings.GetString("directories.Data"))
+	err := inventory.Init(configuration.DataDir(configuration.Settings).String())
 	if err != nil {
 		feedback.Errorf("Error: %v", err)
 		os.Exit(errorcodes.ErrBadArgument)

@@ -149,7 +149,7 @@ func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateRespon
 	instance := &CoreInstance{}
 
 	// Setup downloads directory
-	downloadsDir := paths.New(configuration.Settings.GetString("directories.Downloads"))
+	downloadsDir := configuration.DownloadsDir(configuration.Settings)
 	if downloadsDir.NotExist() {
 		err := downloadsDir.MkdirAll()
 		if err != nil {
@@ -158,7 +158,7 @@ func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateRespon
 	}
 
 	// Setup data directory
-	dataDir := paths.New(configuration.Settings.GetString("directories.Data"))
+	dataDir := configuration.DataDir(configuration.Settings)
 	packagesDir := configuration.PackagesDir(configuration.Settings)
 	if packagesDir.NotExist() {
 		err := packagesDir.MkdirAll()
@@ -497,7 +497,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 		return nil, &arduino.InvalidInstanceError{}
 	}
 
-	indexpath := paths.New(configuration.Settings.GetString("directories.Data"))
+	indexpath := configuration.DataDir(configuration.Settings)
 
 	urls := []string{globals.DefaultIndexURL}
 	urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
