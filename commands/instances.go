@@ -390,9 +390,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	if profile == nil {
 		// Add directories of libraries bundled with IDE
 		if bundledLibsDir := configuration.IDEBuiltinLibrariesDir(configuration.Settings); bundledLibsDir != nil {
-			for _, d := range bundledLibsDir {
-				lm.AddLibrariesDir(d, libraries.IDEBuiltIn)
-			}
+			lm.AddLibrariesDir(bundledLibsDir, libraries.IDEBuiltIn)
 		}
 
 		// Add libraries directory from config file

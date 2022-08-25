@@ -68,7 +68,7 @@ type Context struct {
 	// Build options
 	HardwareDirs         paths.PathList
 	BuiltInToolsDirs     paths.PathList
-	BuiltInLibrariesDirs paths.PathList
+	BuiltInLibrariesDirs *paths.Path
 	OtherLibrariesDirs   paths.PathList
 	LibraryDirs          paths.PathList // List of paths pointing to individual library root folders
 	SketchLocation       *paths.Path    // SketchLocation points to the main Sketch file
@@ -208,7 +208,7 @@ func (ctx *Context) ExtractBuildOptions() *properties.Map {
 	opts := properties.NewMap()
 	opts.Set("hardwareFolders", strings.Join(ctx.HardwareDirs.AsStrings(), ","))
 	opts.Set("builtInToolsFolders", strings.Join(ctx.BuiltInToolsDirs.AsStrings(), ","))
-	opts.Set("builtInLibrariesFolders", strings.Join(ctx.BuiltInLibrariesDirs.AsStrings(), ","))
+	opts.Set("builtInLibrariesFolders", ctx.BuiltInLibrariesDirs.String())
 	opts.Set("otherLibrariesFolders", strings.Join(ctx.OtherLibrariesDirs.AsStrings(), ","))
 	opts.SetPath("sketchLocation", ctx.SketchLocation)
 	var additionalFilesRelative []string
@@ -233,7 +233,7 @@ func (ctx *Context) ExtractBuildOptions() *properties.Map {
 func (ctx *Context) InjectBuildOptions(opts *properties.Map) {
 	ctx.HardwareDirs = paths.NewPathList(strings.Split(opts.Get("hardwareFolders"), ",")...)
 	ctx.BuiltInToolsDirs = paths.NewPathList(strings.Split(opts.Get("builtInToolsFolders"), ",")...)
-	ctx.BuiltInLibrariesDirs = paths.NewPathList(strings.Split(opts.Get("builtInLibrariesFolders"), ",")...)
+	ctx.BuiltInLibrariesDirs = paths.New(opts.Get("builtInLibrariesFolders"))
 	ctx.OtherLibrariesDirs = paths.NewPathList(strings.Split(opts.Get("otherLibrariesFolders"), ",")...)
 	ctx.SketchLocation = opts.GetPath("sketchLocation")
 	fqbn, err := cores.ParseFQBN(opts.Get("fqbn"))

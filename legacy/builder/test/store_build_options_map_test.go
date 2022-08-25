@@ -29,7 +29,7 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:          paths.NewPathList("hardware"),
 		BuiltInToolsDirs:      paths.NewPathList("tools"),
-		BuiltInLibrariesDirs:  paths.NewPathList("built-in libraries"),
+		BuiltInLibrariesDirs:  paths.New("built-in libraries"),
 		OtherLibrariesDirs:    paths.NewPathList("libraries"),
 		SketchLocation:        paths.New("sketchLocation"),
 		FQBN:                  parseFQBN(t, "my:nice:fqbn"),
