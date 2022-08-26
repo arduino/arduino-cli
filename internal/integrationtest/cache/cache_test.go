@@ -19,21 +19,13 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
-	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
-	"go.bug.st/testsuite"
 )
 
 func TestCacheClean(t *testing.T) {
 	// Clean the cache under arduino caching file directory which is "<Arduino configure file path>/staging"
-
-	env := testsuite.NewEnvironment(t)
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
-
-	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
-		ArduinoCLIPath:         paths.New("..", "..", "..", "arduino-cli"),
-		UseSharedStagingFolder: true,
-	})
 
 	_, _, err := cli.Run("cache", "clean")
 	require.NoError(t, err)
