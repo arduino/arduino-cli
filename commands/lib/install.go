@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino"
+	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
@@ -30,13 +31,13 @@ import (
 
 // LibraryInstall FIXMEDOC
 func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
-
 	lm := commands.GetLibraryManager(req)
 	if lm == nil {
 		return &arduino.InvalidInstanceError{}
 	}
 
 	toInstall := map[string]*rpc.LibraryDependencyStatus{}
+	installLocation := libraries.FromRPCLibraryInstallLocation(req.GetInstallLocation())
 	if req.NoDeps {
 		toInstall[req.Name] = &rpc.LibraryDependencyStatus{
 			Name:            req.Name,
@@ -81,7 +82,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 	// Check if any of the libraries to install is already installed and remove it from the list
 	j := 0
 	for i, libRelease := range libReleasesToInstall {
-		_, libReplaced, err := lm.InstallPrerequisiteCheck(libRelease)
+		_, libReplaced, err := lm.InstallPrerequisiteCheck(libRelease, installLocation)
 		if errors.Is(err, librariesmanager.ErrAlreadyInstalled) {
 			taskCB(&rpc.TaskProgress{Message: tr("Already installed %s", libRelease), Completed: true})
 		} else if err != nil {
@@ -104,7 +105,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 			return err
 		}
 
-		if err := installLibrary(lm, libRelease, taskCB); err != nil {
+		if err := installLibrary(lm, libRelease, installLocation, taskCB); err != nil {
 			if errors.Is(err, librariesmanager.ErrAlreadyInstalled) {
 				continue
 			} else {
@@ -123,10 +124,10 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 	return nil
 }
 
-func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release, taskCB rpc.TaskProgressCB) error {
+func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release, installLocation libraries.LibraryLocation, taskCB rpc.TaskProgressCB) error {
 	taskCB(&rpc.TaskProgress{Name: tr("Installing %s", libRelease)})
 	logrus.WithField("library", libRelease).Info("Installing library")
-	libPath, libReplaced, err := lm.InstallPrerequisiteCheck(libRelease)
+	libPath, libReplaced, err := lm.InstallPrerequisiteCheck(libRelease, installLocation)
 	if errors.Is(err, librariesmanager.ErrAlreadyInstalled) {
 		taskCB(&rpc.TaskProgress{Message: tr("Already installed %s", libRelease), Completed: true})
 		return err
@@ -140,7 +141,7 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 		taskCB(&rpc.TaskProgress{Message: tr("Replacing %[1]s with %[2]s", libReplaced, libRelease)})
 	}
 
-	if err := lm.Install(libRelease, libPath); err != nil {
+	if err := lm.Install(libRelease, libPath, installLocation); err != nil {
 		return &arduino.FailedLibraryInstallError{Cause: err}
 	}
 

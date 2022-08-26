@@ -48,6 +48,16 @@ message LibraryInstallRequest {
   // Set to true to skip installation if a different version of the library or
   // one of its dependencies is already installed, defaults to false.
   bool no_overwrite = 5;
+  // Install the library and dependencies in the specified location
+  LibraryInstallLocation install_location = 6;
+}
+
+enum LibraryInstallLocation {
+  // In the `libraries` subdirectory of the user directory (sketchbook). This is
+  // the default if not specified.
+  LIBRARY_INSTALL_LOCATION_USER = 0;
+  // In the configured 'builtin.libraries' directory.
+  LIBRARY_INSTALL_LOCATION_BUILTIN = 1;
 }
 
 message LibraryInstallResponse {
@@ -307,8 +317,8 @@ enum LibraryLayout {
 }
 
 enum LibraryLocation {
-  // In the `libraries` subdirectory of the Arduino IDE installation.
-  LIBRARY_LOCATION_IDE_BUILTIN = 0;
+  // In the configured 'builtin.libraries' directory.
+  LIBRARY_LOCATION_BUILTIN = 0;
   // In the `libraries` subdirectory of the user directory (sketchbook).
   LIBRARY_LOCATION_USER = 1;
   // In the `libraries` subdirectory of a platform.

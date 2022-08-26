@@ -48,13 +48,13 @@ var (
 // InstallPrerequisiteCheck performs prequisite checks to install a library. It returns the
 // install path, where the library should be installed and the possible library that is already
 // installed on the same folder and it's going to be replaced by the new one.
-func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesindex.Release) (*paths.Path, *libraries.Library, error) {
+func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesindex.Release, installLocation libraries.LibraryLocation) (*paths.Path, *libraries.Library, error) {
 	saneName := utils.SanitizeName(indexLibrary.Library.Name)
 
 	var replaced *libraries.Library
 	if installedLibs, have := lm.Libraries[saneName]; have {
 		for _, installedLib := range installedLibs.Alternatives {
-			if installedLib.Location != libraries.User {
+			if installedLib.Location != installLocation {
 				continue
 			}
 			if installedLib.Version != nil && installedLib.Version.Equal(indexLibrary.Version) {
@@ -64,9 +64,12 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 		}
 	}
 
-	libsDir := lm.getUserLibrariesDir()
+	libsDir := lm.getLibrariesDir(installLocation)
 	if libsDir == nil {
-		return nil, nil, fmt.Errorf(tr("User directory not set"))
+		if installLocation == libraries.User {
+			return nil, nil, fmt.Errorf(tr("User directory not set"))
+		}
+		return nil, nil, fmt.Errorf(tr("Builtin libraries directory not set"))
 	}
 
 	libPath := libsDir.Join(saneName)
@@ -79,8 +82,8 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 }
 
 // Install installs a library on the specified path.
-func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, libPath *paths.Path) error {
-	libsDir := lm.getUserLibrariesDir()
+func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, libPath *paths.Path, installLocation libraries.LibraryLocation) error {
+	libsDir := lm.getLibrariesDir(installLocation)
 	if libsDir == nil {
 		return fmt.Errorf(tr("User directory not set"))
 	}
@@ -100,9 +103,9 @@ func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
 	return nil
 }
 
-//InstallZipLib  installs a Zip library on the specified path.
+// InstallZipLib installs a Zip library on the specified path.
 func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath string, overwrite bool) error {
-	libsDir := lm.getUserLibrariesDir()
+	libsDir := lm.getLibrariesDir(libraries.User)
 	if libsDir == nil {
 		return fmt.Errorf(tr("User directory not set"))
 	}
@@ -184,9 +187,9 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 	return nil
 }
 
-//InstallGitLib  installs a library hosted on a git repository on the specified path.
+// InstallGitLib installs a library hosted on a git repository on the specified path.
 func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
-	libsDir := lm.getUserLibrariesDir()
+	libsDir := lm.getLibrariesDir(libraries.User)
 	if libsDir == nil {
 		return fmt.Errorf(tr("User directory not set"))
 	}

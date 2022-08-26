@@ -175,9 +175,9 @@ func (lm *LibrariesManager) RescanLibraries() []*status.Status {
 	return statuses
 }
 
-func (lm *LibrariesManager) getUserLibrariesDir() *paths.Path {
+func (lm *LibrariesManager) getLibrariesDir(installLocation libraries.LibraryLocation) *paths.Path {
 	for _, dir := range lm.LibrariesDir {
-		if dir.Location == libraries.User {
+		if dir.Location == installLocation {
 			return dir.Path
 		}
 	}
