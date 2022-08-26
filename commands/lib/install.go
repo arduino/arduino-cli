@@ -31,7 +31,7 @@ import (
 // LibraryInstall FIXMEDOC
 func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 
-	lm := commands.GetLibraryManager(req.GetInstance().GetId())
+	lm := commands.GetLibraryManager(req)
 	if lm == nil {
 		return &arduino.InvalidInstanceError{}
 	}
@@ -148,9 +148,9 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 	return nil
 }
 
-//ZipLibraryInstall FIXMEDOC
+// ZipLibraryInstall FIXMEDOC
 func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallRequest, taskCB rpc.TaskProgressCB) error {
-	lm := commands.GetLibraryManager(req.GetInstance().GetId())
+	lm := commands.GetLibraryManager(req)
 	if err := lm.InstallZipLib(ctx, req.Path, req.Overwrite); err != nil {
 		return &arduino.FailedLibraryInstallError{Cause: err}
 	}
@@ -158,9 +158,9 @@ func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallRequest, t
 	return nil
 }
 
-//GitLibraryInstall FIXMEDOC
+// GitLibraryInstall FIXMEDOC
 func GitLibraryInstall(ctx context.Context, req *rpc.GitLibraryInstallRequest, taskCB rpc.TaskProgressCB) error {
-	lm := commands.GetLibraryManager(req.GetInstance().GetId())
+	lm := commands.GetLibraryManager(req)
 	if err := lm.InstallGitLib(req.Url, req.Overwrite); err != nil {
 		return &arduino.FailedLibraryInstallError{Cause: err}
 	}

@@ -20,3 +20,9 @@ type DownloadProgressCB func(curr *DownloadProgress)
 
 // TaskProgressCB is a callback to receive progress messages
 type TaskProgressCB func(msg *TaskProgress)
+
+// InstanceCommand is an interface that represents a gRPC command with
+// a gRPC Instance.
+type InstanceCommand interface {
+	GetInstance() *Instance
+}

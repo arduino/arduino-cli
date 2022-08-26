@@ -181,6 +181,7 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	command, err := PrepareCommandForRecipe(properties, recipe, false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
 	if err != nil {
 		return nil, errors.WithStack(err)

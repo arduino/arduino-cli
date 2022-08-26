@@ -50,11 +50,17 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 			targetBoard.String(), "'build.board'", defaultBuildBoard))
 	}
 
+	requiredTools, err := ctx.PackageManager.FindToolsRequiredForBoard(targetBoard)
+	if err != nil {
+		return err
+	}
+
 	ctx.BuildCore = core
 	ctx.TargetBoard = targetBoard
 	ctx.TargetBoardBuildProperties = buildProperties
 	ctx.TargetPlatform = targetPlatform
 	ctx.TargetPackage = targetPackage
 	ctx.ActualPlatform = actualPlatform
+	ctx.RequiredTools = requiredTools
 	return nil
 }

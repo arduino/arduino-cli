@@ -118,12 +118,12 @@ func identifyViaCloudAPI(port *discovery.Port) ([]*rpc.BoardListItem, error) {
 }
 
 // identify returns a list of boards checking first the installed platforms or the Cloud API
-func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.BoardListItem, error) {
+func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardListItem, error) {
 	boards := []*rpc.BoardListItem{}
 
 	// first query installed cores through the Package Manager
 	logrus.Debug("Querying installed cores for board identification...")
-	for _, board := range pm.IdentifyBoard(port.Properties) {
+	for _, board := range pme.IdentifyBoard(port.Properties) {
 		// We need the Platform maintaner for sorting so we set it here
 		platform := &rpc.Platform{
 			Maintainer: board.PlatformRelease.Platform.Package.Maintainer,
@@ -178,18 +178,19 @@ func identify(pm *packagemanager.PackageManager, port *discovery.Port) ([]*rpc.B
 // In case of errors partial results from discoveries that didn't fail
 // are returned.
 func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStartErrors []error, e error) {
-	pm := commands.GetPackageManager(req.GetInstance().Id)
-	if pm == nil {
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
 		return nil, nil, &arduino.InvalidInstanceError{}
 	}
+	defer release()
 
-	dm := pm.DiscoveryManager()
+	dm := pme.DiscoveryManager()
 	discoveryStartErrors = dm.Start()
 	time.Sleep(time.Duration(req.GetTimeout()) * time.Millisecond)
 
 	retVal := []*rpc.DetectedPort{}
 	for _, port := range dm.List() {
-		boards, err := identify(pm, port)
+		boards, err := identify(pme, port)
 		if err != nil {
 			return nil, discoveryStartErrors, err
 		}
@@ -207,9 +208,13 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStartError
 
 // Watch returns a channel that receives boards connection and disconnection events.
 // It also returns a callback function that must be used to stop and dispose the watch.
-func Watch(instanceID int32) (<-chan *rpc.BoardListWatchResponse, func(), error) {
-	pm := commands.GetPackageManager(instanceID)
-	dm := pm.DiscoveryManager()
+func Watch(req *rpc.BoardListWatchRequest) (<-chan *rpc.BoardListWatchResponse, func(), error) {
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
+		return nil, nil, &arduino.InvalidInstanceError{}
+	}
+	defer release()
+	dm := pme.DiscoveryManager()
 
 	watcher, err := dm.Watch()
 	if err != nil {
@@ -232,7 +237,7 @@ func Watch(instanceID int32) (<-chan *rpc.BoardListWatchResponse, func(), error)
 
 			boardsError := ""
 			if event.Type == "add" {
-				boards, err := identify(pm, event.Port)
+				boards, err := identify(pme, event.Port)
 				if err != nil {
 					boardsError = err.Error()
 				}

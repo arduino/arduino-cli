@@ -31,16 +31,17 @@ import (
 // installed. Note that platforms that are not installed don't include boards' FQBNs.
 // If no search argument is used all boards are returned.
 func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchResponse, error) {
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
-	if pm == nil {
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
+	defer release()
 
 	res := &rpc.BoardSearchResponse{Boards: []*rpc.BoardListItem{}}
-	for _, targetPackage := range pm.Packages {
+	for _, targetPackage := range pme.GetPackages() {
 		for _, platform := range targetPackage.Platforms {
 			latestPlatformRelease := platform.GetLatestRelease()
-			installedPlatformRelease := pm.GetInstalledPlatformRelease(platform)
+			installedPlatformRelease := pme.GetInstalledPlatformRelease(platform)
 
 			if latestPlatformRelease == nil && installedPlatformRelease == nil {
 				continue

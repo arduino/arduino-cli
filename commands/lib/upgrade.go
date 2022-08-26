@@ -16,6 +16,7 @@
 package lib
 
 import (
+	"context"
 	"errors"
 
 	"github.com/arduino/arduino-cli/arduino"
@@ -25,8 +26,8 @@ import (
 )
 
 // LibraryUpgradeAll upgrades all the available libraries
-func LibraryUpgradeAll(instanceID int32, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
-	lm := commands.GetLibraryManager(instanceID)
+func LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+	lm := commands.GetLibraryManager(req)
 	if lm == nil {
 		return &arduino.InvalidInstanceError{}
 	}
@@ -35,25 +36,22 @@ func LibraryUpgradeAll(instanceID int32, downloadCB rpc.DownloadProgressCB, task
 		return err
 	}
 
-	if err := commands.Init(&rpc.InitRequest{Instance: &rpc.Instance{Id: instanceID}}, nil); err != nil {
+	if err := commands.Init(&rpc.InitRequest{Instance: req.GetInstance()}, nil); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// LibraryUpgrade upgrades only the given libraries
-func LibraryUpgrade(instanceID int32, libraryNames []string, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
-	lm := commands.GetLibraryManager(instanceID)
-	if lm == nil {
-		return &arduino.InvalidInstanceError{}
-	}
+// LibraryUpgrade upgrades a library
+func LibraryUpgrade(ctx context.Context, req *rpc.LibraryUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+	lm := commands.GetLibraryManager(req)
 
 	// get the libs to upgrade
-	libs := filterByName(listLibraries(lm, true, true), libraryNames)
+	lib := filterByName(listLibraries(lm, true, true), req.GetName())
 
 	// do it
-	return upgrade(lm, libs, downloadCB, taskCB)
+	return upgrade(lm, []*installedLib{lib}, downloadCB, taskCB)
 }
 
 func upgrade(lm *librariesmanager.LibrariesManager, libs []*installedLib, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
@@ -76,20 +74,11 @@ func upgrade(lm *librariesmanager.LibrariesManager, libs []*installedLib, downlo
 	return nil
 }
 
-func filterByName(libs []*installedLib, names []string) []*installedLib {
-	// put the names in a map to ease lookup
-	queryMap := make(map[string]struct{})
-	for _, name := range names {
-		queryMap[name] = struct{}{}
-	}
-
-	ret := []*installedLib{}
+func filterByName(libs []*installedLib, name string) *installedLib {
 	for _, lib := range libs {
-		// skip if library name wasn't in the query
-		if _, found := queryMap[lib.Library.RealName]; found {
-			ret = append(ret, lib)
+		if lib.Library.RealName == name {
+			return lib
 		}
 	}
-
-	return ret
+	return nil
 }

@@ -26,8 +26,8 @@ func (s *HardwareLoader) Run(ctx *types.Context) error {
 	if ctx.PackageManager == nil {
 		// This should happen only on legacy arduino-builder.
 		// Hopefully this piece will be removed once the legacy package will be cleanedup.
-		pm := packagemanager.NewPackageManager(nil, nil, nil, nil, "arduino-builder")
-		errs := pm.LoadHardwareFromDirectories(ctx.HardwareDirs)
+		pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "arduino-builder")
+		errs := pmb.LoadHardwareFromDirectories(ctx.HardwareDirs)
 		if ctx.Verbose {
 			// With the refactoring of the initialization step of the CLI we changed how
 			// errors are returned when loading platforms and libraries, that meant returning a list of
@@ -39,8 +39,22 @@ func (s *HardwareLoader) Run(ctx *types.Context) error {
 				ctx.Info(tr("Error loading hardware platform: %[1]s", err.Error()))
 			}
 		}
-		ctx.PackageManager = pm
+
+		if !ctx.CanUseCachedTools {
+			if ctx.BuiltInToolsDirs != nil {
+				pmb.LoadToolsFromBundleDirectories(ctx.BuiltInToolsDirs)
+			}
+
+			ctx.CanUseCachedTools = true
+		}
+
+		pm := pmb.Build()
+		pme, _ /* never release... */ := pm.NewExplorer()
+
+		ctx.AllTools = pme.GetAllInstalledToolsReleases()
+		ctx.PackageManager = pme
 	}
-	ctx.Hardware = ctx.PackageManager.Packages
+
+	ctx.Hardware = ctx.PackageManager.GetPackages()
 	return nil
 }

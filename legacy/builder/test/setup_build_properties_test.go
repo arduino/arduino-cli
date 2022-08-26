@@ -43,7 +43,6 @@ func TestSetupBuildProperties(t *testing.T) {
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
-		&builder.ToolsLoader{},
 		&builder.SketchLoader{},
 		&builder.SetupBuildProperties{},
 	}
@@ -111,7 +110,6 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
-		&builder.ToolsLoader{},
 		&builder.SketchLoader{},
 		&builder.SetupBuildProperties{},
 		&builder.SetCustomBuildProperties{},
@@ -150,7 +148,6 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
-		&builder.ToolsLoader{},
 		&builder.SketchLoader{},
 		&builder.SetupBuildProperties{},
 	}

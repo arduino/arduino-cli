@@ -25,7 +25,7 @@ import (
 
 // LibraryUninstall FIXMEDOC
 func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, taskCB rpc.TaskProgressCB) error {
-	lm := commands.GetLibraryManager(req.GetInstance().GetId())
+	lm := commands.GetLibraryManager(req)
 	ref, err := createLibIndexReference(lm, req)
 	if err != nil {
 		return &arduino.InvalidLibraryError{Cause: err}
