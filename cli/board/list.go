@@ -64,22 +64,26 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		os.Exit(0)
 	}
 
-	ports, err := board.List(&rpc.BoardListRequest{
+	ports, discvoeryErrors, err := board.List(&rpc.BoardListRequest{
 		Instance: inst,
 		Timeout:  timeoutArg.Get().Milliseconds(),
 	})
 	if err != nil {
 		feedback.Errorf(tr("Error detecting boards: %v"), err)
 	}
+	for _, err := range discvoeryErrors {
+		feedback.Errorf(tr("Error starting discovery: %v"), err)
+	}
 	feedback.PrintResult(result{ports})
 }
 
 func watchList(cmd *cobra.Command, inst *rpc.Instance) {
-	eventsChan, err := board.Watch(inst.Id, nil)
+	eventsChan, closeCB, err := board.Watch(&rpc.BoardListWatchRequest{Instance: inst})
 	if err != nil {
 		feedback.Errorf(tr("Error detecting boards: %v"), err)
 		os.Exit(errorcodes.ErrNetwork)
 	}
+	defer closeCB()
 
 	// This is done to avoid printing the header each time a new event is received
 	if feedback.GetFormat() == feedback.Text {

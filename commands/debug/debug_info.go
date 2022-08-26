@@ -32,11 +32,15 @@ import (
 
 // GetDebugConfig returns metadata to start debugging with the specified board
 func GetDebugConfig(ctx context.Context, req *debug.DebugConfigRequest) (*debug.GetDebugConfigResponse, error) {
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
-	return getDebugProperties(req, pm)
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
+		return nil, &arduino.InvalidInstanceError{}
+	}
+	defer release()
+	return getDebugProperties(req, pme)
 }
 
-func getDebugProperties(req *debug.DebugConfigRequest, pm *packagemanager.PackageManager) (*debug.GetDebugConfigResponse, error) {
+func getDebugProperties(req *debug.DebugConfigRequest, pme *packagemanager.Explorer) (*debug.GetDebugConfigResponse, error) {
 	// TODO: make a generic function to extract sketch from request
 	// and remove duplication in commands/compile.go
 	if req.GetSketchPath() == "" {
@@ -62,7 +66,7 @@ func getDebugProperties(req *debug.DebugConfigRequest, pm *packagemanager.Packag
 	}
 
 	// Find target board and board properties
-	_, platformRelease, board, boardProperties, referencedPlatformRelease, err := pm.ResolveFQBN(fqbn)
+	_, platformRelease, board, boardProperties, referencedPlatformRelease, err := pme.ResolveFQBN(fqbn)
 	if err != nil {
 		return nil, &arduino.UnknownFQBNError{Cause: err}
 	}
@@ -91,10 +95,10 @@ func getDebugProperties(req *debug.DebugConfigRequest, pm *packagemanager.Packag
 		}
 	}
 
-	for _, tool := range pm.GetAllInstalledToolsReleases() {
+	for _, tool := range pme.GetAllInstalledToolsReleases() {
 		toolProperties.Merge(tool.RuntimeProperties())
 	}
-	if requiredTools, err := pm.FindToolsRequiredForBoard(board); err == nil {
+	if requiredTools, err := pme.FindToolsRequiredForBoard(board); err == nil {
 		for _, requiredTool := range requiredTools {
 			logrus.WithField("tool", requiredTool).Info("Tool required for debug")
 			toolProperties.Merge(requiredTool.RuntimeProperties())

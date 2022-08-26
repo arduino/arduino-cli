@@ -36,9 +36,7 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/status"
 )
 
 // ArduinoCoreServerImpl FIXMEDOC
@@ -69,7 +67,7 @@ func (s *ArduinoCoreServerImpl) BoardDetails(ctx context.Context, req *rpc.Board
 
 // BoardList FIXMEDOC
 func (s *ArduinoCoreServerImpl) BoardList(ctx context.Context, req *rpc.BoardListRequest) (*rpc.BoardListResponse, error) {
-	ports, err := board.List(req)
+	ports, _, err := board.List(req)
 	if err != nil {
 		return nil, convertErrorToRPCStatus(err)
 	}
@@ -109,42 +107,35 @@ func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCoreService_Boa
 		return err
 	}
 
-	interrupt := make(chan bool, 1)
+	eventsChan, closeWatcher, err := board.Watch(msg)
+	if err != nil {
+		return convertErrorToRPCStatus(err)
+	}
+
 	go func() {
-		defer close(interrupt)
+		defer closeWatcher()
 		for {
 			msg, err := stream.Recv()
 			// Handle client closing the stream and eventual errors
 			if err == io.EOF {
 				logrus.Info("boards watcher stream closed")
-				interrupt <- true
 				return
-			} else if st, ok := status.FromError(err); ok && st.Code() == codes.Canceled {
-				logrus.Info("boards watcher interrupted by host")
-				return
-			} else if err != nil {
+			}
+			if err != nil {
 				logrus.Infof("interrupting boards watcher: %v", err)
-				interrupt <- true
 				return
 			}
 
 			// Message received, does the client want to interrupt?
 			if msg != nil && msg.Interrupt {
 				logrus.Info("boards watcher interrupted by client")
-				interrupt <- msg.Interrupt
 				return
 			}
 		}
 	}()
 
-	eventsChan, err := board.Watch(msg.Instance.Id, interrupt)
-	if err != nil {
-		return convertErrorToRPCStatus(err)
-	}
-
 	for event := range eventsChan {
-		err = stream.Send(event)
-		if err != nil {
+		if err := stream.Send(event); err != nil {
 			logrus.Infof("sending board watch message: %v", err)
 		}
 	}
@@ -435,6 +426,19 @@ func (s *ArduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 	return stream.Send(&rpc.LibraryInstallResponse{})
 }
 
+// LibraryUpgrade FIXMEDOC
+func (s *ArduinoCoreServerImpl) LibraryUpgrade(req *rpc.LibraryUpgradeRequest, stream rpc.ArduinoCoreService_LibraryUpgradeServer) error {
+	err := lib.LibraryUpgrade(
+		stream.Context(), req,
+		func(p *rpc.DownloadProgress) { stream.Send(&rpc.LibraryUpgradeResponse{Progress: p}) },
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.LibraryUpgradeResponse{TaskProgress: p}) },
+	)
+	if err != nil {
+		return convertErrorToRPCStatus(err)
+	}
+	return stream.Send(&rpc.LibraryUpgradeResponse{})
+}
+
 // LibraryUninstall FIXMEDOC
 func (s *ArduinoCoreServerImpl) LibraryUninstall(req *rpc.LibraryUninstallRequest, stream rpc.ArduinoCoreService_LibraryUninstallServer) error {
 	err := lib.LibraryUninstall(stream.Context(), req,
@@ -448,7 +452,7 @@ func (s *ArduinoCoreServerImpl) LibraryUninstall(req *rpc.LibraryUninstallReques
 
 // LibraryUpgradeAll FIXMEDOC
 func (s *ArduinoCoreServerImpl) LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, stream rpc.ArduinoCoreService_LibraryUpgradeAllServer) error {
-	err := lib.LibraryUpgradeAll(req.GetInstance().GetId(),
+	err := lib.LibraryUpgradeAll(req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.LibraryUpgradeAllResponse{Progress: p}) },
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.LibraryUpgradeAllResponse{TaskProgress: p}) },
 	)
@@ -482,7 +486,7 @@ func (s *ArduinoCoreServerImpl) ArchiveSketch(ctx context.Context, req *rpc.Arch
 	return resp, convertErrorToRPCStatus(err)
 }
 
-//ZipLibraryInstall FIXMEDOC
+// ZipLibraryInstall FIXMEDOC
 func (s *ArduinoCoreServerImpl) ZipLibraryInstall(req *rpc.ZipLibraryInstallRequest, stream rpc.ArduinoCoreService_ZipLibraryInstallServer) error {
 	err := lib.ZipLibraryInstall(
 		stream.Context(), req,
@@ -494,7 +498,7 @@ func (s *ArduinoCoreServerImpl) ZipLibraryInstall(req *rpc.ZipLibraryInstallRequ
 	return stream.Send(&rpc.ZipLibraryInstallResponse{})
 }
 
-//GitLibraryInstall FIXMEDOC
+// GitLibraryInstall FIXMEDOC
 func (s *ArduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallRequest, stream rpc.ArduinoCoreService_GitLibraryInstallServer) error {
 	err := lib.GitLibraryInstall(
 		stream.Context(), req,

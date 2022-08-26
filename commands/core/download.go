@@ -29,10 +29,11 @@ var tr = i18n.Tr
 
 // PlatformDownload FIXMEDOC
 func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, downloadCB rpc.DownloadProgressCB) (*rpc.PlatformDownloadResponse, error) {
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
-	if pm == nil {
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
+	defer release()
 
 	version, err := commands.ParseVersion(req)
 	if err != nil {
@@ -44,17 +45,17 @@ func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, dow
 		PlatformArchitecture: req.Architecture,
 		PlatformVersion:      version,
 	}
-	platform, tools, err := pm.FindPlatformReleaseDependencies(ref)
+	platform, tools, err := pme.FindPlatformReleaseDependencies(ref)
 	if err != nil {
 		return nil, &arduino.PlatformNotFoundError{Platform: ref.String(), Cause: err}
 	}
 
-	if err := pm.DownloadPlatformRelease(platform, nil, downloadCB); err != nil {
+	if err := pme.DownloadPlatformRelease(platform, nil, downloadCB); err != nil {
 		return nil, err
 	}
 
 	for _, tool := range tools {
-		if err := pm.DownloadToolRelease(tool, nil, downloadCB); err != nil {
+		if err := pme.DownloadToolRelease(tool, nil, downloadCB); err != nil {
 			return nil, err
 		}
 	}

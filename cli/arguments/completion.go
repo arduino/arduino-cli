@@ -35,8 +35,15 @@ func GetInstalledBoards() []string {
 // It returns a list of protocols available based on the installed boards
 func GetInstalledProtocols() []string {
 	inst := instance.CreateAndInit()
-	pm := commands.GetPackageManager(inst.Id)
-	boards := pm.InstalledBoards()
+
+	// FIXME: We must not access PackageManager directly here but use one of the commands.* functions
+	pme, release := commands.GetPackageManagerExplorer(&rpc.BoardListAllRequest{Instance: inst})
+	if pme == nil {
+		return nil // should never happen...
+	}
+	defer release()
+
+	boards := pme.InstalledBoards()
 
 	installedProtocols := make(map[string]struct{})
 	for _, board := range boards {
@@ -63,19 +70,26 @@ func GetInstalledProtocols() []string {
 // It returns a list of programmers available based on the installed boards
 func GetInstalledProgrammers() []string {
 	inst := instance.CreateAndInit()
-	pm := commands.GetPackageManager(inst.Id)
 
 	// we need the list of the available fqbn in order to get the list of the programmers
-	list, _ := board.ListAll(context.Background(), &rpc.BoardListAllRequest{
+	listAllReq := &rpc.BoardListAllRequest{
 		Instance:            inst,
 		SearchArgs:          nil,
 		IncludeHiddenBoards: false,
-	})
+	}
+	list, _ := board.ListAll(context.Background(), listAllReq)
+
+	// FIXME: We must not access PackageManager directly here but use one of the commands.* functions
+	pme, release := commands.GetPackageManagerExplorer(listAllReq)
+	if pme == nil {
+		return nil // should never happen...
+	}
+	defer release()
 
 	installedProgrammers := make(map[string]string)
 	for _, board := range list.Boards {
 		fqbn, _ := cores.ParseFQBN(board.Fqbn)
-		_, boardPlatform, _, _, _, _ := pm.ResolveFQBN(fqbn)
+		_, boardPlatform, _, _, _, _ := pme.ResolveFQBN(fqbn)
 		for programmerID, programmer := range boardPlatform.Programmers {
 			installedProgrammers[programmerID] = programmer.Name
 		}
@@ -178,7 +192,7 @@ func GetInstallableLibs() []string {
 func GetConnectedBoards() []string {
 	inst := instance.CreateAndInit()
 
-	list, _ := board.List(&rpc.BoardListRequest{
+	list, _, _ := board.List(&rpc.BoardListRequest{
 		Instance: inst,
 	})
 	var res []string

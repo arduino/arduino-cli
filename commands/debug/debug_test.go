@@ -36,9 +36,9 @@ func TestGetCommandLine(t *testing.T) {
 	sketchPath := paths.New("testdata", sketch)
 	require.NoError(t, sketchPath.ToAbs())
 
-	pm := packagemanager.NewPackageManager(nil, nil, nil, nil, "test")
-	pm.LoadHardwareFromDirectory(customHardware)
-	pm.LoadHardwareFromDirectory(dataDir)
+	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test")
+	pmb.LoadHardwareFromDirectory(customHardware)
+	pmb.LoadHardwareFromDirectory(dataDir)
 
 	// Windows tools have .exe extension
 	var toolExtension = ""
@@ -61,7 +61,10 @@ func TestGetCommandLine(t *testing.T) {
 		fmt.Sprintf(" --file \"%s/arduino-test/samd/variants/arduino_zero/openocd_scripts/arduino_zero.cfg\"", customHardware) +
 		fmt.Sprintf(" -c \"gdb_port pipe\" -c \"telnet_port 0\" %s/build/arduino-test.samd.arduino_zero_edbg/hello.ino.elf", sketchPath)
 
-	command, err := getCommandLine(req, pm)
+	pm := pmb.Build()
+	pme, release := pm.NewExplorer()
+	defer release()
+	command, err := getCommandLine(req, pme)
 	require.Nil(t, err)
 	commandToTest := strings.Join(command[:], " ")
 	require.Equal(t, filepath.FromSlash(goldCommand), filepath.FromSlash(commandToTest))
@@ -83,7 +86,7 @@ func TestGetCommandLine(t *testing.T) {
 		fmt.Sprintf(" --file \"%s/arduino-test/samd/variants/mkr1000/openocd_scripts/arduino_zero.cfg\"", customHardware) +
 		fmt.Sprintf(" -c \"gdb_port pipe\" -c \"telnet_port 0\" %s/build/arduino-test.samd.mkr1000/hello.ino.elf", sketchPath)
 
-	command2, err := getCommandLine(req2, pm)
+	command2, err := getCommandLine(req2, pme)
 	assert.Nil(t, err)
 	commandToTest2 := strings.Join(command2[:], " ")
 	assert.Equal(t, filepath.FromSlash(goldCommand2), filepath.FromSlash(commandToTest2))

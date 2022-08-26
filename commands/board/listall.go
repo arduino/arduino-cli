@@ -27,17 +27,18 @@ import (
 
 // ListAll FIXMEDOC
 func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListAllResponse, error) {
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
-	if pm == nil {
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
+	defer release()
 
 	searchArgs := strings.Join(req.GetSearchArgs(), " ")
 
 	list := &rpc.BoardListAllResponse{Boards: []*rpc.BoardListItem{}}
-	for _, targetPackage := range pm.Packages {
+	for _, targetPackage := range pme.GetPackages() {
 		for _, platform := range targetPackage.Platforms {
-			installedPlatformRelease := pm.GetInstalledPlatformRelease(platform)
+			installedPlatformRelease := pme.GetInstalledPlatformRelease(platform)
 			// We only want to list boards for installed platforms
 			if installedPlatformRelease == nil {
 				continue

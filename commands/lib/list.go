@@ -35,12 +35,13 @@ type installedLib struct {
 
 // LibraryList FIXMEDOC
 func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.LibraryListResponse, error) {
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
-	if pm == nil {
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
+	defer release()
 
-	lm := commands.GetLibraryManager(req.GetInstance().GetId())
+	lm := commands.GetLibraryManager(req)
 	if lm == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
@@ -54,7 +55,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 		if err != nil {
 			return nil, &arduino.InvalidFQBNError{Cause: err}
 		}
-		_, boardPlatform, _, _, refBoardPlatform, err := pm.ResolveFQBN(fqbn)
+		_, boardPlatform, _, _, refBoardPlatform, err := pme.ResolveFQBN(fqbn)
 		if err != nil {
 			return nil, &arduino.UnknownFQBNError{Cause: err}
 		}

@@ -7,6 +7,7 @@ replace github.com/arduino/arduino-cli => ../../..
 require (
 	github.com/arduino/arduino-cli v0.0.0-00010101000000-000000000000
 	github.com/gizak/termui/v3 v3.1.0
+	github.com/sirupsen/logrus v1.4.2
 )
 
 require (
@@ -20,7 +21,6 @@ require (
 	github.com/nsf/termbox-go v0.0.0-20190121233118-02980233997d // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/sirupsen/logrus v1.4.2 // indirect
 	golang.org/x/net v0.0.0-20210505024714-0287a6fb4125 // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/text v0.3.6 // indirect

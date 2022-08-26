@@ -21,6 +21,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -45,62 +46,102 @@ import (
 
 var tr = i18n.Tr
 
-// this map contains all the running Arduino Core Services instances
-// referenced by an int32 handle
-var instances = map[int32]*CoreInstance{}
-var instancesCount int32 = 1
-
 // CoreInstance is an instance of the Arduino Core Services. The user can
 // instantiate as many as needed by providing a different configuration
 // for each one.
 type CoreInstance struct {
-	PackageManager *packagemanager.PackageManager
-	lm             *librariesmanager.LibrariesManager
+	pm *packagemanager.PackageManager
+	lm *librariesmanager.LibrariesManager
 }
 
-// InstanceContainer FIXMEDOC
-type InstanceContainer interface {
-	GetInstance() *rpc.Instance
+// coreInstancesContainer has methods to add an remove instances atomically.
+type coreInstancesContainer struct {
+	instances      map[int32]*CoreInstance
+	instancesCount int32
+	instancesMux   sync.Mutex
+}
+
+// instances contains all the running Arduino Core Services instances
+var instances = &coreInstancesContainer{
+	instances:      map[int32]*CoreInstance{},
+	instancesCount: 1,
 }
 
 // GetInstance returns a CoreInstance for the given ID, or nil if ID
 // doesn't exist
-func GetInstance(id int32) *CoreInstance {
-	return instances[id]
+func (c *coreInstancesContainer) GetInstance(id int32) *CoreInstance {
+	c.instancesMux.Lock()
+	defer c.instancesMux.Unlock()
+	return c.instances[id]
 }
 
-// GetPackageManager returns a PackageManager for the given ID, or nil if
-// ID doesn't exist
-func GetPackageManager(id int32) *packagemanager.PackageManager {
-	i, ok := instances[id]
-	if !ok {
+// AddAndAssignID saves the CoreInstance and assigns a unique ID to
+// retrieve it later
+func (c *coreInstancesContainer) AddAndAssignID(i *CoreInstance) int32 {
+	c.instancesMux.Lock()
+	defer c.instancesMux.Unlock()
+	id := c.instancesCount
+	c.instances[id] = i
+	c.instancesCount++
+	return id
+}
+
+// RemoveID removes the CoreInstance referenced by id. Returns true
+// if the operation is successful, or false if the CoreInstance does
+// not exist
+func (c *coreInstancesContainer) RemoveID(id int32) bool {
+	c.instancesMux.Lock()
+	defer c.instancesMux.Unlock()
+	if _, ok := c.instances[id]; !ok {
+		return false
+	}
+	delete(c.instances, id)
+	return true
+}
+
+// GetPackageManager returns a PackageManager. If the package manager is not found
+// (because the instance is invalid or has been destroyed), nil is returned.
+// Deprecated: use GetPackageManagerExplorer instead.
+func GetPackageManager(instance rpc.InstanceCommand) *packagemanager.PackageManager {
+	i := instances.GetInstance(instance.GetInstance().GetId())
+	if i == nil {
 		return nil
 	}
-	return i.PackageManager
+	return i.pm
 }
 
-// GetLibraryManager returns the library manager for the given instance ID
-func GetLibraryManager(instanceID int32) *librariesmanager.LibrariesManager {
-	i, ok := instances[instanceID]
-	if !ok {
+// GetPackageManagerExplorer returns a new package manager Explorer. The
+// explorer holds a read lock on the underlying PackageManager and it should
+// be released by calling the returned "release" function.
+func GetPackageManagerExplorer(req rpc.InstanceCommand) (explorer *packagemanager.Explorer, release func()) {
+	pm := GetPackageManager(req)
+	if pm == nil {
+		return nil, nil
+	}
+	return pm.NewExplorer()
+}
+
+// GetLibraryManager returns the library manager for the given instance.
+func GetLibraryManager(req rpc.InstanceCommand) *librariesmanager.LibrariesManager {
+	i := instances.GetInstance(req.GetInstance().GetId())
+	if i == nil {
 		return nil
 	}
 	return i.lm
 }
 
-func (instance *CoreInstance) installToolIfMissing(tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (bool, error) {
-	if tool.IsInstalled() {
-		return false, nil
-	}
+func installTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+	pme, release := pm.NewExplorer()
+	defer release()
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading missing tool %s", tool)})
-	if err := instance.PackageManager.DownloadToolRelease(tool, nil, downloadCB); err != nil {
-		return false, fmt.Errorf(tr("downloading %[1]s tool: %[2]s"), tool, err)
+	if err := pme.DownloadToolRelease(tool, nil, downloadCB); err != nil {
+		return fmt.Errorf(tr("downloading %[1]s tool: %[2]s"), tool, err)
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
-	if err := instance.PackageManager.InstallTool(tool, taskCB); err != nil {
-		return false, fmt.Errorf(tr("installing %[1]s tool: %[2]s"), tool, err)
+	if err := pme.InstallTool(tool, taskCB); err != nil {
+		return fmt.Errorf(tr("installing %[1]s tool: %[2]s"), tool, err)
 	}
-	return true, nil
+	return nil
 }
 
 // Create a new CoreInstance ready to be initialized, supporting directories are also created.
@@ -131,22 +172,20 @@ func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateRespon
 	for _, ua := range extraUserAgent {
 		userAgent += " " + ua
 	}
-	instance.PackageManager = packagemanager.NewPackageManager(
+	instance.pm = packagemanager.NewBuilder(
 		dataDir,
 		configuration.PackagesDir(configuration.Settings),
 		downloadsDir,
 		dataDir.Join("tmp"),
 		userAgent,
-	)
+	).Build()
 	instance.lm = librariesmanager.NewLibraryManager(
 		dataDir,
 		downloadsDir,
 	)
 
 	// Save instance
-	instanceID := instancesCount
-	instances[instanceID] = instance
-	instancesCount++
+	instanceID := instances.AddAndAssignID(instance)
 
 	return &rpc.CreateResponse{
 		Instance: &rpc.Instance{Id: instanceID},
@@ -166,7 +205,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 	if reqInst == nil {
 		return &arduino.InvalidInstanceError{}
 	}
-	instance := instances[reqInst.GetId()]
+	instance := instances.GetInstance(reqInst.GetId())
 	if instance == nil {
 		return &arduino.InvalidInstanceError{}
 	}
@@ -201,14 +240,6 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		})
 	}
 
-	// We need to clear the PackageManager currently in use by this instance
-	// in case this is not the first Init on this instances, that might happen
-	// after reinitializing an instance after installing or uninstalling a core.
-	// If this is not done the information of the uninstall core is kept in memory,
-	// even if it should not.
-	pm := instance.PackageManager
-	pm.Clear()
-
 	// Try to extract profile if specified
 	var profile *sketch.Profile
 	if req.GetProfile() != "" {
@@ -231,111 +262,121 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		})
 	}
 
-	loadBuiltinTools := func() []error {
-		builtinPackage := pm.Packages.GetOrCreatePackage("builtin")
-		return pm.LoadToolsFromPackageDir(builtinPackage, pm.PackagesDir.Join("builtin", "tools"))
-	}
+	{
+		// We need to rebuild the PackageManager currently in use by this instance
+		// in case this is not the first Init on this instances, that might happen
+		// after reinitializing an instance after installing or uninstalling a core.
+		// If this is not done the information of the uninstall core is kept in memory,
+		// even if it should not.
+		pmb, commitPackageManager := instance.pm.NewBuilder()
 
-	// Load Platforms
-	if profile == nil {
-		for _, err := range pm.LoadHardware() {
-			s := &arduino.PlatformLoadingError{Cause: err}
-			responseError(s.ToRPCStatus())
-		}
-	} else {
-		// Load platforms from profile
-		errs := pm.LoadHardwareForProfile(
-			profile, true, downloadCallback, taskCallback,
-		)
-		for _, err := range errs {
-			s := &arduino.PlatformLoadingError{Cause: err}
-			responseError(s.ToRPCStatus())
+		loadBuiltinTools := func() []error {
+			builtinPackage := pmb.GetOrCreatePackage("builtin")
+			return pmb.LoadToolsFromPackageDir(builtinPackage, pmb.PackagesDir.Join("builtin", "tools"))
 		}
 
-		// Load "builtin" tools
-		_ = loadBuiltinTools()
-	}
+		// Load Platforms
+		if profile == nil {
+			for _, err := range pmb.LoadHardware() {
+				s := &arduino.PlatformLoadingError{Cause: err}
+				responseError(s.ToRPCStatus())
+			}
+		} else {
+			// Load platforms from profile
+			errs := pmb.LoadHardwareForProfile(
+				profile, true, downloadCallback, taskCallback,
+			)
+			for _, err := range errs {
+				s := &arduino.PlatformLoadingError{Cause: err}
+				responseError(s.ToRPCStatus())
+			}
 
-	// Load packages index
-	urls := []string{globals.DefaultIndexURL}
-	if profile == nil {
-		urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
-	}
-	for _, u := range urls {
-		URL, err := utils.URLParse(u)
-		if err != nil {
-			s := status.Newf(codes.InvalidArgument, tr("Invalid additional URL: %v"), err)
-			responseError(s)
-			continue
+			// Load "builtin" tools
+			_ = loadBuiltinTools()
 		}
 
-		if URL.Scheme == "file" {
-			_, err := pm.LoadPackageIndexFromFile(paths.New(URL.Path))
+		// Load packages index
+		urls := []string{globals.DefaultIndexURL}
+		if profile == nil {
+			urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
+		}
+		for _, u := range urls {
+			URL, err := utils.URLParse(u)
 			if err != nil {
+				s := status.Newf(codes.InvalidArgument, tr("Invalid additional URL: %v"), err)
+				responseError(s)
+				continue
+			}
+
+			if URL.Scheme == "file" {
+				_, err := pmb.LoadPackageIndexFromFile(paths.New(URL.Path))
+				if err != nil {
+					s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
+					responseError(s)
+				}
+				continue
+			}
+
+			if err := pmb.LoadPackageIndex(URL); err != nil {
 				s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
 				responseError(s)
 			}
-			continue
 		}
 
-		if err := pm.LoadPackageIndex(URL); err != nil {
-			s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
-			responseError(s)
+		// We load hardware before verifying builtin tools are installed
+		// otherwise we wouldn't find them and reinstall them each time
+		// and they would never get reloaded.
+
+		builtinToolsToInstall := []*cores.ToolRelease{}
+		for name, tool := range pmb.GetOrCreatePackage("builtin").Tools {
+			latest := tool.LatestRelease()
+			if latest == nil {
+				s := status.Newf(codes.Internal, tr("can't find latest release of tool %s", name))
+				responseError(s)
+			} else if !latest.IsInstalled() {
+				builtinToolsToInstall = append(builtinToolsToInstall, latest)
+			}
 		}
+
+		// Install builtin tools if necessary
+		if len(builtinToolsToInstall) > 0 {
+			for _, toolRelease := range builtinToolsToInstall {
+				if err := installTool(pmb.Build(), toolRelease, downloadCallback, taskCallback); err != nil {
+					s := status.Newf(codes.Internal, err.Error())
+					responseError(s)
+				}
+			}
+
+			// We installed at least one builtin tool after loading hardware
+			// so we must reload again otherwise we would never found them.
+			for _, err := range loadBuiltinTools() {
+				s := &arduino.PlatformLoadingError{Cause: err}
+				responseError(s.ToRPCStatus())
+			}
+		}
+
+		commitPackageManager()
 	}
 
-	// We load hardware before verifying builtin tools are installed
-	// otherwise we wouldn't find them and reinstall them each time
-	// and they would never get reloaded.
+	pme, release := instance.pm.NewExplorer()
+	defer release()
 
-	builtinToolReleases := []*cores.ToolRelease{}
-	for name, tool := range pm.Packages.GetOrCreatePackage("builtin").Tools {
-		latestRelease := tool.LatestRelease()
-		if latestRelease == nil {
-			s := status.Newf(codes.Internal, tr("can't find latest release of tool %s", name))
-			responseError(s)
-			continue
-		}
-		builtinToolReleases = append(builtinToolReleases, latestRelease)
-	}
-
-	// Install tools if necessary
-	toolsHaveBeenInstalled := false
-	for _, toolRelease := range builtinToolReleases {
-		installed, err := instance.installToolIfMissing(toolRelease, downloadCallback, taskCallback)
-		if err != nil {
-			s := status.Newf(codes.Internal, err.Error())
-			responseError(s)
-			continue
-		}
-		toolsHaveBeenInstalled = toolsHaveBeenInstalled || installed
-	}
-
-	if toolsHaveBeenInstalled {
-		// We installed at least one new tool after loading hardware
-		// so we must reload again otherwise we would never found them.
-		for _, err := range loadBuiltinTools() {
-			s := &arduino.PlatformLoadingError{Cause: err}
-			responseError(s.ToRPCStatus())
-		}
-	}
-
-	for _, err := range pm.LoadDiscoveries() {
+	for _, err := range pme.LoadDiscoveries() {
 		s := &arduino.PlatformLoadingError{Cause: err}
 		responseError(s.ToRPCStatus())
 	}
 
 	// Create library manager and add libraries directories
 	lm := librariesmanager.NewLibraryManager(
-		pm.IndexDir,
-		pm.DownloadDir,
+		pme.IndexDir,
+		pme.DownloadDir,
 	)
 	instance.lm = lm
 
 	// Load libraries
-	for _, pack := range pm.Packages {
+	for _, pack := range pme.GetPackages() {
 		for _, platform := range pack.Platforms {
-			if platformRelease := pm.GetInstalledPlatformRelease(platform); platformRelease != nil {
+			if platformRelease := pme.GetInstalledPlatformRelease(platform); platformRelease != nil {
 				lm.AddPlatformReleaseLibrariesDir(platformRelease, libraries.PlatformBuiltIn)
 			}
 		}
@@ -412,19 +453,16 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 
 // Destroy FIXMEDOC
 func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse, error) {
-	id := req.GetInstance().GetId()
-	if _, ok := instances[id]; !ok {
+	if ok := instances.RemoveID(req.GetInstance().GetId()); !ok {
 		return nil, &arduino.InvalidInstanceError{}
 	}
-
-	delete(instances, id)
 	return &rpc.DestroyResponse{}, nil
 }
 
 // UpdateLibrariesIndex updates the library_index.json
 func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequest, downloadCB rpc.DownloadProgressCB) error {
 	logrus.Info("Updating libraries index")
-	lm := GetLibraryManager(req.GetInstance().GetId())
+	lm := GetLibraryManager(req)
 	if lm == nil {
 		return &arduino.InvalidInstanceError{}
 	}
@@ -453,9 +491,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 
 // UpdateIndex FIXMEDOC
 func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rpc.DownloadProgressCB) (*rpc.UpdateIndexResponse, error) {
-	id := req.GetInstance().GetId()
-	_, ok := instances[id]
-	if !ok {
+	if instances.GetInstance(req.GetInstance().GetId()) == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
 

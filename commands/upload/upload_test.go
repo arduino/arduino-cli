@@ -127,8 +127,8 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 }
 
 func TestUploadPropertiesComposition(t *testing.T) {
-	pm := packagemanager.NewPackageManager(nil, nil, nil, nil, "test")
-	errs := pm.LoadHardwareFromDirectory(paths.New("testdata", "hardware"))
+	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test")
+	errs := pmb.LoadHardwareFromDirectory(paths.New("testdata", "hardware"))
 	require.Len(t, errs, 0)
 	buildPath1 := paths.New("testdata", "build_path_1")
 	logrus.SetLevel(logrus.TraceLevel)
@@ -177,11 +177,15 @@ func TestUploadPropertiesComposition(t *testing.T) {
 			"BURN conf-board1 conf-two-general conf-two-bootloader $$VERBOSE-VERIFY$$ prog4protocol-bootloader port -bspeed -F0xFF " + cwd + "/testdata/hardware/alice/avr/bootloaders/niceboot/niceboot.hex\n"},
 	}
 
+	pm := pmb.Build()
+	pme, release := pm.NewExplorer()
+	defer release()
+
 	testRunner := func(t *testing.T, test test, verboseVerify bool) {
 		outStream := &bytes.Buffer{}
 		errStream := &bytes.Buffer{}
 		err := runProgramAction(
-			pm,
+			pme,
 			nil,                     // sketch
 			"",                      // importFile
 			test.importDir.String(), // importDir

@@ -57,6 +57,23 @@ message LibraryInstallResponse {
   TaskProgress task_progress = 2;
 }
 
+message LibraryUpgradeRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Name of the library.
+  string name = 2;
+  // Set to true to skip installation of specified library's dependencies,
+  // defaults to false.
+  bool no_deps = 3;
+}
+
+message LibraryUpgradeResponse {
+  // Progress of the library download.
+  DownloadProgress progress = 1;
+  // Description of the current stage of the installation.
+  TaskProgress task_progress = 2;
+}
+
 message LibraryUninstallRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;

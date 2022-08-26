@@ -27,7 +27,7 @@ import (
 
 // LibraryResolveDependencies FIXMEDOC
 func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesRequest) (*rpc.LibraryResolveDependenciesResponse, error) {
-	lm := commands.GetLibraryManager(req.GetInstance().GetId())
+	lm := commands.GetLibraryManager(req)
 	if lm == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

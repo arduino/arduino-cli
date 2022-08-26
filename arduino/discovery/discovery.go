@@ -57,7 +57,6 @@ type PluggableDiscovery struct {
 	incomingMessagesError error
 	state                 int
 	eventChan             chan<- *Event
-	cachedPorts           map[string]*Port
 }
 
 type discoveryMessage struct {
@@ -121,8 +120,9 @@ func (p *Port) String() string {
 
 // Event is a pluggable discovery event
 type Event struct {
-	Type string
-	Port *Port
+	Type        string
+	Port        *Port
+	DiscoveryID string
 }
 
 // New create and connect to the given pluggable discovery
@@ -131,7 +131,6 @@ func New(id string, args ...string) *PluggableDiscovery {
 		id:          id,
 		processArgs: args,
 		state:       Dead,
-		cachedPorts: map[string]*Port{},
 	}
 }
 
@@ -176,9 +175,8 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 				return
 			}
 			disc.statusMutex.Lock()
-			disc.cachedPorts[msg.Port.Address+"|"+msg.Port.Protocol] = msg.Port
 			if disc.eventChan != nil {
-				disc.eventChan <- &Event{"add", msg.Port}
+				disc.eventChan <- &Event{"add", msg.Port, disc.GetID()}
 			}
 			disc.statusMutex.Unlock()
 		} else if msg.EventType == "remove" {
@@ -187,9 +185,8 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 				return
 			}
 			disc.statusMutex.Lock()
-			delete(disc.cachedPorts, msg.Port.Address+"|"+msg.Port.Protocol)
 			if disc.eventChan != nil {
-				disc.eventChan <- &Event{"remove", msg.Port}
+				disc.eventChan <- &Event{"remove", msg.Port, disc.GetID()}
 			}
 			disc.statusMutex.Unlock()
 		} else {
@@ -276,10 +273,7 @@ func (disc *PluggableDiscovery) killProcess() error {
 	}
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
-	if disc.eventChan != nil {
-		close(disc.eventChan)
-		disc.eventChan = nil
-	}
+	disc.stopSync()
 	disc.state = Dead
 	logrus.Infof("killed discovery %s process", disc.id)
 	return nil
@@ -366,13 +360,17 @@ func (disc *PluggableDiscovery) Stop() error {
 	}
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
-	disc.cachedPorts = map[string]*Port{}
+	disc.stopSync()
+	disc.state = Idling
+	return nil
+}
+
+func (disc *PluggableDiscovery) stopSync() {
 	if disc.eventChan != nil {
+		disc.eventChan <- &Event{"stop", nil, disc.GetID()}
 		close(disc.eventChan)
 		disc.eventChan = nil
 	}
-	disc.state = Idling
-	return nil
 }
 
 // Quit terminates the discovery. No more commands can be accepted by the discovery.
@@ -409,6 +407,9 @@ func (disc *PluggableDiscovery) List() ([]*Port, error) {
 // The event channel must be consumed as quickly as possible since it may block the
 // discovery if it becomes full. The channel size is configurable.
 func (disc *PluggableDiscovery) StartSync(size int) (<-chan *Event, error) {
+	disc.statusMutex.Lock()
+	defer disc.statusMutex.Unlock()
+
 	if err := disc.sendCommand("START_SYNC\n"); err != nil {
 		return nil, err
 	}
@@ -423,29 +424,10 @@ func (disc *PluggableDiscovery) StartSync(size int) (<-chan *Event, error) {
 		return nil, errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "OK", msg.Message)
 	}
 
-	disc.statusMutex.Lock()
-	defer disc.statusMutex.Unlock()
 	disc.state = Syncing
-	disc.cachedPorts = map[string]*Port{}
-	if disc.eventChan != nil {
-		// In case there is already an existing event channel in use we close it
-		// before creating a new one.
-		close(disc.eventChan)
-	}
+	// In case there is already an existing event channel in use we close it before creating a new one.
+	disc.stopSync()
 	c := make(chan *Event, size)
 	disc.eventChan = c
 	return c, nil
-}
-
-// ListCachedPorts returns a list of the available ports. The list is a cache of all the
-// add/remove events happened from the StartSync call and it will not consume any
-// resource from the underliying discovery.
-func (disc *PluggableDiscovery) ListCachedPorts() []*Port {
-	disc.statusMutex.Lock()
-	defer disc.statusMutex.Unlock()
-	res := []*Port{}
-	for _, port := range disc.cachedPorts {
-		res = append(res, port)
-	}
-	return res
 }

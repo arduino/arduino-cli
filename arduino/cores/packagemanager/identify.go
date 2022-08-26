@@ -22,12 +22,12 @@ import (
 
 // IdentifyBoard returns a list of boards whose identification properties match the
 // provided ones.
-func (pm *PackageManager) IdentifyBoard(idProps *properties.Map) []*cores.Board {
+func (pme *Explorer) IdentifyBoard(idProps *properties.Map) []*cores.Board {
 	if idProps.Size() == 0 {
 		return []*cores.Board{}
 	}
 	foundBoards := []*cores.Board{}
-	for _, board := range pm.InstalledBoards() {
+	for _, board := range pme.InstalledBoards() {
 		if board.IsBoardMatchingIDProperties(idProps) {
 			foundBoards = append(foundBoards, board)
 		}

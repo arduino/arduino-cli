@@ -29,7 +29,7 @@ import (
 
 // LibrarySearch FIXMEDOC
 func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.LibrarySearchResponse, error) {
-	lm := commands.GetLibraryManager(req.GetInstance().GetId())
+	lm := commands.GetLibraryManager(req)
 	if lm == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

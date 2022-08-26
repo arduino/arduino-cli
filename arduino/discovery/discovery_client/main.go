@@ -21,36 +21,28 @@ import (
 	"log"
 	"os"
 	"sort"
-	"time"
 
 	"github.com/arduino/arduino-cli/arduino/discovery"
+	"github.com/arduino/arduino-cli/arduino/discovery/discoverymanager"
 	ui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	discoveries := []*discovery.PluggableDiscovery{}
-	discEvent := make(chan *discovery.Event)
+	logrus.SetLevel(logrus.ErrorLevel)
+	dm := discoverymanager.New()
 	for _, discCmd := range os.Args[1:] {
-		disc := discovery.New("", discCmd)
-		if err := disc.Run(); err != nil {
-			log.Fatal("Error starting discovery:", err)
-		}
-		if err := disc.Start(); err != nil {
-			log.Fatal("Error starting discovery:", err)
-		}
-		eventChan, err := disc.StartSync(10)
-		if err != nil {
-			log.Fatal("Error starting discovery:", err)
-		}
-		go func() {
-			for msg := range eventChan {
-				discEvent <- msg
-			}
-		}()
-		discoveries = append(discoveries, disc)
+		disc := discovery.New(discCmd, discCmd)
+		dm.Add(disc)
 	}
+	dm.Start()
 
+	activePorts := map[string]*discovery.Port{}
+	watcher, err := dm.Watch()
+	if err != nil {
+		log.Fatalf("failed to start discoveries: %v", err)
+	}
 	if err := ui.Init(); err != nil {
 		log.Fatalf("failed to initialize termui: %v", err)
 	}
@@ -66,15 +58,20 @@ func main() {
 	updateList := func() {
 		rows := []string{}
 		rows = append(rows, "Available ports list:")
-		for _, disc := range discoveries {
-			for i, port := range disc.ListCachedPorts() {
-				rows = append(rows, fmt.Sprintf(" [%04d] Address: %s", i, port.AddressLabel))
-				rows = append(rows, fmt.Sprintf("        Protocol: %s", port.ProtocolLabel))
-				keys := port.Properties.Keys()
-				sort.Strings(keys)
-				for _, k := range keys {
-					rows = append(rows, fmt.Sprintf("                  %s=%s", k, port.Properties.Get(k)))
-				}
+
+		ids := sort.StringSlice{}
+		for id := range activePorts {
+			ids = append(ids, id)
+		}
+		ids.Sort()
+		for _, id := range ids {
+			port := activePorts[id]
+			rows = append(rows, fmt.Sprintf("> Address: %s", port.AddressLabel))
+			rows = append(rows, fmt.Sprintf("  Protocol: %s", port.ProtocolLabel))
+			keys := port.Properties.Keys()
+			sort.Strings(keys)
+			for _, k := range keys {
+				rows = append(rows, fmt.Sprintf("                  %s=%s", k, port.Properties.Get(k)))
 			}
 		}
 		l.Rows = rows
@@ -123,20 +120,16 @@ out:
 				previousKey = e.ID
 			}
 
-		case <-discEvent:
+		case ev := <-watcher.Feed():
+			if ev.Type == "add" {
+				activePorts[ev.Port.Address+"|"+ev.Port.Protocol] = ev.Port
+			}
+			if ev.Type == "remove" {
+				delete(activePorts, ev.Port.Address+"|"+ev.Port.Protocol)
+			}
 			updateList()
 		}
 
 		ui.Render(l)
 	}
-
-	for _, disc := range discoveries {
-		disc.Quit()
-		fmt.Println("Discovery QUITed")
-		for disc.State() == discovery.Alive {
-			time.Sleep(time.Millisecond)
-		}
-		fmt.Println("Discovery correctly terminated")
-	}
-
 }

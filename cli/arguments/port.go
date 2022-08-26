@@ -101,36 +101,24 @@ func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Po
 	}
 	logrus.WithField("port", address).Tracef("Upload port")
 
-	pm := commands.GetPackageManager(instance.Id)
-	if pm == nil {
-		return nil, errors.New("invalid instance")
+	// FIXME: We must not access PackageManager directly here but use one of the commands.* functions
+	pme, release := commands.GetPackageManagerExplorer(&rpc.BoardListAllRequest{Instance: instance})
+	if pme == nil {
+		return nil, &arduino.InvalidInstanceError{}
 	}
-	dm := pm.DiscoveryManager()
-	if errs := dm.RunAll(); len(errs) == len(dm.IDs()) {
-		// All discoveries failed to run, we can't do anything
-		return nil, fmt.Errorf("%v", errs)
-	} else if len(errs) > 0 {
-		// If only some discoveries failed to run just tell the user and go on
-		for _, err := range errs {
-			feedback.Error(err)
-		}
-	}
-	eventChan, errs := dm.StartSyncAll()
-	if len(errs) > 0 {
-		return nil, fmt.Errorf("%v", errs)
-	}
+	defer release()
 
-	defer func() {
-		// Quit all discoveries at the end.
-		if errs := dm.QuitAll(); len(errs) > 0 {
-			logrus.Errorf("quitting discoveries when getting port metadata: %v", errs)
-		}
-	}()
+	dm := pme.DiscoveryManager()
+	watcher, err := dm.Watch()
+	if err != nil {
+		return nil, err
+	}
+	defer watcher.Close()
 
 	deadline := time.After(p.timeout.Get())
 	for {
 		select {
-		case portEvent := <-eventChan:
+		case portEvent := <-watcher.Feed():
 			if portEvent.Type != "add" {
 				continue
 			}
@@ -161,7 +149,7 @@ func (p *Port) GetSearchTimeout() time.Duration {
 // discovered Port object together with the FQBN. If the port does not match
 // exactly 1 board,
 func (p *Port) DetectFQBN(inst *rpc.Instance) (string, *rpc.Port) {
-	detectedPorts, err := board.List(&rpc.BoardListRequest{
+	detectedPorts, _, err := board.List(&rpc.BoardListRequest{
 		Instance: inst,
 		Timeout:  p.timeout.Get().Milliseconds(),
 	})

@@ -121,11 +121,13 @@ func runUploadCommand(command *cobra.Command, args []string) {
 				panic(tr("Platform ID is not correct"))
 			}
 
-			pm := commands.GetPackageManager(instance.GetId())
-			platform := pm.FindPlatform(&packagemanager.PlatformReference{
+			// FIXME: Here we must not access package manager...
+			pme, release := commands.GetPackageManagerExplorer(&rpc.UploadRequest{Instance: instance})
+			platform := pme.FindPlatform(&packagemanager.PlatformReference{
 				Package:              split[0],
 				PlatformArchitecture: split[1],
 			})
+			release()
 
 			if platform != nil {
 				feedback.Errorf(tr("Try running %s", fmt.Sprintf("`%s core install %s`", globals.VersionInfo.Application, platformErr.Platform)))

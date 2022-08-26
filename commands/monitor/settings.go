@@ -26,12 +26,13 @@ import (
 
 // EnumerateMonitorPortSettings returns a description of the configuration settings of a monitor port
 func EnumerateMonitorPortSettings(ctx context.Context, req *rpc.EnumerateMonitorPortSettingsRequest) (*rpc.EnumerateMonitorPortSettingsResponse, error) {
-	pm := commands.GetPackageManager(req.GetInstance().GetId())
-	if pm == nil {
+	pme, release := commands.GetPackageManagerExplorer(req)
+	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
+	defer release()
 
-	m, err := findMonitorForProtocolAndBoard(pm, req.GetPortProtocol(), req.GetFqbn())
+	m, err := findMonitorForProtocolAndBoard(pme, req.GetPortProtocol(), req.GetFqbn())
 	if err != nil {
 		return nil, err
 	}
