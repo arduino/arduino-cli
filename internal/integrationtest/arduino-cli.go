@@ -18,6 +18,7 @@ package integrationtest
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -28,6 +29,7 @@ import (
 
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/fatih/color"
 	"github.com/stretchr/testify/require"
@@ -61,17 +63,18 @@ func CreateArduinoCLIWithEnvironment(t *testing.T) (*testsuite.Environment, *Ard
 
 // ArduinoCLI is an Arduino CLI client.
 type ArduinoCLI struct {
-	path          *paths.Path
-	t             *require.Assertions
-	proc          *executils.Process
-	cliEnvVars    []string
-	cliConfigPath *paths.Path
-	stagingDir    *paths.Path
-	dataDir       *paths.Path
-	sketchbookDir *paths.Path
-	daemonAddr    string
-	daemonConn    *grpc.ClientConn
-	daemonClient  commands.ArduinoCoreServiceClient
+	path                 *paths.Path
+	t                    *require.Assertions
+	proc                 *executils.Process
+	cliEnvVars           []string
+	cliConfigPath        *paths.Path
+	stagingDir           *paths.Path
+	dataDir              *paths.Path
+	sketchbookDir        *paths.Path
+	daemonAddr           string
+	daemonConn           *grpc.ClientConn
+	daemonClient         commands.ArduinoCoreServiceClient
+	daemonSettingsClient settings.SettingsServiceClient
 }
 
 // ArduinoCLIConfig is the configuration of the ArduinoCLI client
@@ -196,7 +199,7 @@ func (cli *ArduinoCLI) StartDaemon(verbose bool) string {
 	cli.t.NoError(err)
 	cli.daemonConn = conn
 	cli.daemonClient = commands.NewArduinoCoreServiceClient(conn)
-
+	cli.daemonSettingsClient = settings.NewSettingsServiceClient(conn)
 	return cli.daemonAddr
 }
 
@@ -224,6 +227,17 @@ func (cli *ArduinoCLI) Create() *ArduinoCLIInstance {
 		cli:      cli,
 		instance: resp.Instance,
 	}
+}
+
+// SetValue calls the "SetValue" gRPC method.
+func (cli *ArduinoCLI) SetValue(key, jsonData string) error {
+	req := &settings.SetValueRequest{
+		Key:      key,
+		JsonData: jsonData,
+	}
+	logCallf(">>> SetValue(%+v)\n", req)
+	_, err := cli.daemonSettingsClient.SetValue(context.Background(), req)
+	return err
 }
 
 // Init calls the "Init" gRPC method.
@@ -301,4 +315,40 @@ func (inst *ArduinoCLIInstance) Compile(ctx context.Context, fqbn, sketchPath st
 	})
 	logCallf(">>> Compile(%v %v)\n", fqbn, sketchPath)
 	return compileCl, err
+}
+
+// LibraryList calls the "LibraryList" gRPC method.
+func (inst *ArduinoCLIInstance) LibraryList(ctx context.Context, name, fqbn string, all, updatable bool) (*commands.LibraryListResponse, error) {
+	req := &commands.LibraryListRequest{
+		Instance:  inst.instance,
+		Name:      name,
+		Fqbn:      fqbn,
+		All:       all,
+		Updatable: updatable,
+	}
+	logCallf(">>> LibraryList(%v) -> ", req)
+	resp, err := inst.cli.daemonClient.LibraryList(ctx, req)
+	logCallf("err=%v\n", err)
+	r, _ := json.MarshalIndent(resp, "    ", "  ")
+	logCallf("<<< LibraryList resp: %s\n", string(r))
+	return resp, err
+}
+
+// LibraryInstall calls the "LibraryInstall" gRPC method.
+func (inst *ArduinoCLIInstance) LibraryInstall(ctx context.Context, name, version string, noDeps, noOverwrite, installAsBundled bool) (commands.ArduinoCoreService_LibraryInstallClient, error) {
+	installLocation := commands.LibraryInstallLocation_LIBRARY_INSTALL_LOCATION_USER
+	if installAsBundled {
+		installLocation = commands.LibraryInstallLocation_LIBRARY_INSTALL_LOCATION_BUILTIN
+	}
+	req := &commands.LibraryInstallRequest{
+		Instance:        inst.instance,
+		Name:            name,
+		Version:         version,
+		NoDeps:          noDeps,
+		NoOverwrite:     noOverwrite,
+		InstallLocation: installLocation,
+	}
+	installCl, err := inst.cli.daemonClient.LibraryInstall(ctx, req)
+	logCallf(">>> LibraryInstall(%+v)\n", req)
+	return installCl, err
 }

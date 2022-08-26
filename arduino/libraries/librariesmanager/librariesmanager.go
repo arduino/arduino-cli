@@ -118,6 +118,7 @@ func NewLibraryManager(indexDir *paths.Path, downloadsDir *paths.Path) *Librarie
 // LoadIndex reads a library_index.json from a file and returns
 // the corresponding Index structure.
 func (lm *LibrariesManager) LoadIndex() error {
+	logrus.WithField("index", lm.IndexFile).Info("Loading libraries index file")
 	index, err := librariesindex.LoadIndex(lm.IndexFile)
 	if err != nil {
 		lm.Index = librariesindex.EmptyIndex
