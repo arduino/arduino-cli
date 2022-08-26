@@ -277,6 +277,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0270" class="md-nav__link">
+    0.27.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.27.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes-in-golang-api-githubcomarduinoarduino-cliarduinocorespackagemanagerpackagemanager" class="md-nav__link">
+    Breaking changes in golang API github.com/arduino/arduino-cli/arduino/cores/packagemanager.PackageManager
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#some-grpc-mapped-methods-now-accepts-the-grpc-request-instead-of-the-instance-id-as-parameter" class="md-nav__link">
+    Some gRPC-mapped methods now accepts the gRPC request instead of the instance ID as parameter
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0260" class="md-nav__link">
     0.26.0
   </a>
@@ -1899,6 +1926,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0270" class="md-nav__link">
+    0.27.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.27.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes-in-golang-api-githubcomarduinoarduino-cliarduinocorespackagemanagerpackagemanager" class="md-nav__link">
+    Breaking changes in golang API github.com/arduino/arduino-cli/arduino/cores/packagemanager.PackageManager
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#some-grpc-mapped-methods-now-accepts-the-grpc-request-instead-of-the-instance-id-as-parameter" class="md-nav__link">
+    Some gRPC-mapped methods now accepts the gRPC request instead of the instance ID as parameter
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0260" class="md-nav__link">
     0.26.0
   </a>
@@ -2464,6 +2518,223 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<h2 id="0270">0.27.0<a class="headerlink" href="#0270" title="Permanent link">&para;</a></h2>
+<h3 id="breaking-changes-in-golang-api-githubcomarduinoarduino-cliarduinocorespackagemanagerpackagemanager">Breaking changes in golang API <code>github.com/arduino/arduino-cli/arduino/cores/packagemanager.PackageManager</code><a class="headerlink" href="#breaking-changes-in-golang-api-githubcomarduinoarduino-cliarduinocorespackagemanagerpackagemanager" title="Permanent link">&para;</a></h3>
+<p>The <code>PackageManager</code> API has been heavily refactored to correctly handle multitasking and concurrency. Many fields in
+the PackageManager object are now private. All the <code>PackageManager</code> methods have been moved into other objects. In
+particular:</p>
+<ul>
+<li>the methods that query the <code>PackageManager</code> without changing its internal state, have been moved into the new
+  <code>Explorer</code> object</li>
+<li>the methods that change the <code>PackageManager</code> internal state, have been moved into the new <code>Builder</code> object.</li>
+</ul>
+<p>The <code>Builder</code> object must be used to create a new <code>PackageManager</code>. Previously the function <code>NewPackageManager</code> was used
+to get a clean <code>PackageManager</code> object and then use the <code>LoadHardware*</code> methods to build it. Now the function
+<code>NewBuilder</code> must be used to create a <code>Builder</code>, run the <code>LoadHardware*</code> methods to load platforms, and finally call the
+<code>Builder.Build()</code> method to obtain the final <code>PackageManager</code>.</p>
+<p>Previously we did:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">pm</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">packagemanager</span><span class="p">.</span><span class="nx">NewPackageManager</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">LoadHardware</span><span class="p">()</span><span class="w"></span>
+<span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">LoadHardwareFromDirectories</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">LoadHardwareFromDirectory</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">LoadToolsFromPackageDir</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">LoadToolsFromBundleDirectories</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">LoadToolsFromBundleDirectory</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="nx">pack</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">GetOrCreatePackage</span><span class="p">(</span><span class="s">&quot;packagername&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="c1">// ...use `pack` to tweak or load more hardware...</span><span class="w"></span>
+<span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">LoadPackageIndex</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">LoadPackageIndexFromFile</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">LoadHardwareForProfile</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+
+<span class="c1">// ...use `pm` to implement business logic...</span><span class="w"></span>
+</code></pre></div>
+<p>Now we must do:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">var</span><span class="w"> </span><span class="nx">pm</span><span class="w"> </span><span class="o">*</span><span class="nx">packagemanager</span><span class="p">.</span><span class="nx">PackageManager</span><span class="w"></span>
+
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">pmb</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">packagemanager</span><span class="p">.</span><span class="nx">Newbuilder</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pmb</span><span class="p">.</span><span class="nx">LoadHardware</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pmb</span><span class="p">.</span><span class="nx">LoadHardwareFromDirectories</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pmb</span><span class="p">.</span><span class="nx">LoadHardwareFromDirectory</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pmb</span><span class="p">.</span><span class="nx">LoadToolsFromPackageDir</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pmb</span><span class="p">.</span><span class="nx">LoadToolsFromBundleDirectories</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pmb</span><span class="p">.</span><span class="nx">LoadToolsFromBundleDirectory</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="nx">pack</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pmb</span><span class="p">.</span><span class="nx">GetOrCreatePackage</span><span class="p">(</span><span class="s">&quot;packagername&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...use `pack` to tweak or load more hardware...</span><span class="w"></span>
+<span class="w">    </span><span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pmb</span><span class="p">.</span><span class="nx">LoadPackageIndex</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pmb</span><span class="p">.</span><span class="nx">LoadPackageIndexFromFile</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="nx">err</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pmb</span><span class="p">.</span><span class="nx">LoadHardwareForProfile</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="nx">pm</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pmb</span><span class="p">.</span><span class="nx">Build</span><span class="p">()</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="c1">// ...use `pm` to implement business logic...</span><span class="w"></span>
+</code></pre></div>
+<p>It's not mandatory but highly recommended, to drop the <code>Builder</code> object once it has built the <code>PackageManager</code> (that's
+why in the example the <code>pmb</code> builder is created in a limited scope between braces).</p>
+<p>To query the <code>PackagerManager</code> now it is required to obtain an <code>Explorer</code> object through the
+<code>PackageManager.NewExplorer()</code> method.</p>
+<p>Previously we did:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">DoStuff</span><span class="p">(</span><span class="nx">pm</span><span class="w"> </span><span class="o">*</span><span class="nx">packagemanager</span><span class="p">.</span><span class="nx">PackageManager</span><span class="p">,</span><span class="w"> </span><span class="o">...</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...implement business logic through PackageManager methods...</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">Packages</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">CustomGlobalProperties</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">FindPlatform</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">FindPlatformRelease</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">FindPlatformReleaseDependencies</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">DownloadToolRelease</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">DownloadPlatformRelease</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">IdentifyBoard</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">DownloadAndInstallPlatformUpgrades</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">DownloadAndInstallPlatformAndTools</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">InstallPlatform</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">InstallPlatformInDirectory</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">RunPostInstallScript</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">IsManagedPlatformRelease</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">UninstallPlatform</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">InstallTool</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">IsManagedToolRelease</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">UninstallTool</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">IsToolRequired</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">LoadDiscoveries</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">GetProfile</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">GetEnvVarsForSpawnedProcess</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">DiscoveryManager</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">FindPlatformReleaseProvidingBoardsWithVidPid</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">FindBoardsWithVidPid</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">FindBoardsWithID</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">FindBoardWithFQBN</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">ResolveFQBN</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">Package</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">GetInstalledPlatformRelease</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">GetAllInstalledToolsReleases</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">InstalledPlatformReleases</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">InstalledBoards</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">FindToolsRequiredFromPlatformRelease</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">GetTool</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">FindToolsRequiredForBoard</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">FindToolDependency</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">FindDiscoveryDependency</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">FindMonitorDependency</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>Now we must obtain the <code>Explorer</code> object to access the same methods, moreover, we must call the <code>release</code> callback
+function once we complete the task:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">DoStuff</span><span class="p">(</span><span class="nx">pm</span><span class="w"> </span><span class="o">*</span><span class="nx">packagemanager</span><span class="p">.</span><span class="nx">PackageManager</span><span class="p">,</span><span class="w"> </span><span class="o">...</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">pme</span><span class="p">,</span><span class="w"> </span><span class="nx">release</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">NewExplorer</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="k">defer</span><span class="w"> </span><span class="nx">release</span><span class="p">()</span><span class="w"></span>
+
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">GetPackages</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">GetCustomGlobalProperties</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">FindPlatform</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">FindPlatformRelease</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">FindPlatformReleaseDependencies</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">DownloadToolRelease</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">DownloadPlatformRelease</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">IdentifyBoard</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">DownloadAndInstallPlatformUpgrades</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">DownloadAndInstallPlatformAndTools</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">InstallPlatform</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">InstallPlatformInDirectory</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">RunPostInstallScript</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">IsManagedPlatformRelease</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">UninstallPlatform</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">InstallTool</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">IsManagedToolRelease</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">UninstallTool</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">IsToolRequired</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">LoadDiscoveries</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">GetProfile</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">GetEnvVarsForSpawnedProcess</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">DiscoveryManager</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">FindPlatformReleaseProvidingBoardsWithVidPid</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">FindBoardsWithVidPid</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">FindBoardsWithID</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">FindBoardWithFQBN</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">ResolveFQBN</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">Package</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">GetInstalledPlatformRelease</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">GetAllInstalledToolsReleases</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">InstalledPlatformReleases</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">InstalledBoards</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">FindToolsRequiredFromPlatformRelease</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">GetTool</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">FindToolsRequiredForBoard</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">FindToolDependency</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">FindDiscoveryDependency</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pme</span><span class="p">.</span><span class="nx">FindMonitorDependency</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>The <code>Explorer</code> object keeps a read-lock on the underlying <code>PackageManager</code> that must be released once the task is done
+by calling the <code>release</code> callback function. This ensures that no other task will change the status of the
+<code>PackageManager</code> while the current task is in progress.</p>
+<p>The <code>PackageManager.Clean()</code> method has been removed and replaced by the methods:</p>
+<ul>
+<li><code>PackageManager.NewBuilder() (*Builder, commit func())</code></li>
+<li><code>Builder.BuildIntoExistingPackageManager(target *PackageManager)</code></li>
+</ul>
+<p>Previously, to update a <code>PackageManager</code> instance we did:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">Reload</span><span class="p">(</span><span class="nx">pm</span><span class="w"> </span><span class="o">*</span><span class="nx">packagemanager</span><span class="p">.</span><span class="nx">PackageManager</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">pm</span><span class="p">.</span><span class="nx">Clear</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">LoadHardware</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...other pm.Load* calls...</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>now we have two options:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">Reload</span><span class="p">(</span><span class="nx">pm</span><span class="w"> </span><span class="o">*</span><span class="nx">packagemanager</span><span class="p">.</span><span class="nx">PackageManager</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Create a new builder and build a package manager</span><span class="w"></span>
+<span class="w">    </span><span class="nx">pmb</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">packagemanager</span><span class="p">.</span><span class="nx">NewBuilder</span><span class="p">(</span><span class="o">...</span><span class="cm">/* config params */</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pmb</span><span class="p">.</span><span class="nx">LoadHardware</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...other pmb.Load* calls...</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// apply the changes to the original pm</span><span class="w"></span>
+<span class="w">    </span><span class="nx">pmb</span><span class="p">.</span><span class="nx">BuildIntoExistingPackageManager</span><span class="p">(</span><span class="nx">pm</span><span class="p">)</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>in this case, we create a new <code>Builder</code> with the given config params and once the package manager is built we apply the
+changes atomically with <code>BuildIntoExistingPackageManager</code>. This procedure may be even more simplified with:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">Reload</span><span class="p">(</span><span class="nx">pm</span><span class="w"> </span><span class="o">*</span><span class="nx">packagemanager</span><span class="p">.</span><span class="nx">PackageManager</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Create a new builder using the same config params</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// as the original package manager</span><span class="w"></span>
+<span class="w">    </span><span class="nx">pmb</span><span class="p">,</span><span class="w"> </span><span class="nx">commit</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">pm</span><span class="p">.</span><span class="nx">NewBuilder</span><span class="p">()</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// build the new package manager</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">pmb</span><span class="p">.</span><span class="nx">LoadHardware</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ...other pmb.Load* calls...</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// apply the changes to the original pm</span><span class="w"></span>
+<span class="w">    </span><span class="nx">commit</span><span class="p">()</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>In this case, we don't even need to bother to provide the configuration parameters because they are taken from the
+previous <code>PackageManager</code> instance.</p>
+<h3 id="some-grpc-mapped-methods-now-accepts-the-grpc-request-instead-of-the-instance-id-as-parameter">Some gRPC-mapped methods now accepts the gRPC request instead of the instance ID as parameter<a class="headerlink" href="#some-grpc-mapped-methods-now-accepts-the-grpc-request-instead-of-the-instance-id-as-parameter" title="Permanent link">&para;</a></h3>
+<p>The following methods in subpackages of <code>github.com/arduino/arduino-cli/commands/*</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">Watch</span><span class="p">(</span><span class="nx">instanceID</span><span class="w"> </span><span class="kt">int32</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">&lt;-</span><span class="kd">chan</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">BoardListWatchResponse</span><span class="p">,</span><span class="w"> </span><span class="kd">func</span><span class="p">(),</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="nx">LibraryUpgradeAll</span><span class="p">(</span><span class="nx">instanceID</span><span class="w"> </span><span class="kt">int32</span><span class="p">,</span><span class="w"> </span><span class="nx">downloadCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">,</span><span class="w"> </span><span class="nx">taskCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">TaskProgressCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="nx">LibraryUpgrade</span><span class="p">(</span><span class="nx">instanceID</span><span class="w"> </span><span class="kt">int32</span><span class="p">,</span><span class="w"> </span><span class="nx">libraryNames</span><span class="w"> </span><span class="p">[]</span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">downloadCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">,</span><span class="w"> </span><span class="nx">taskCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">TaskProgressCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>have been changed to:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">Watch</span><span class="p">(</span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">BoardListWatchRequest</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">&lt;-</span><span class="kd">chan</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">BoardListWatchResponse</span><span class="p">,</span><span class="w"> </span><span class="kd">func</span><span class="p">(),</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="nx">LibraryUpgradeAll</span><span class="p">(</span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">LibraryUpgradeAllRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">downloadCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">,</span><span class="w"> </span><span class="nx">taskCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">TaskProgressCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="nx">LibraryUpgrade</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">LibraryUpgradeRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">downloadCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">,</span><span class="w"> </span><span class="nx">taskCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">TaskProgressCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>The following methods in package <code>github.com/arduino/arduino-cli/commands</code></p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">GetInstance</span><span class="p">(</span><span class="nx">id</span><span class="w"> </span><span class="kt">int32</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">CoreInstance</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="nx">GetPackageManager</span><span class="p">(</span><span class="nx">id</span><span class="w"> </span><span class="kt">int32</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">packagemanager</span><span class="p">.</span><span class="nx">PackageManager</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="nx">GetLibraryManager</span><span class="p">(</span><span class="nx">instanceID</span><span class="w"> </span><span class="kt">int32</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">librariesmanager</span><span class="p">.</span><span class="nx">LibrariesManager</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>have been changed to:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">GetPackageManager</span><span class="p">(</span><span class="nx">instance</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">InstanceCommand</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">packagemanager</span><span class="p">.</span><span class="nx">PackageManager</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="c1">// Deprecated</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="nx">GetPackageManagerExplorer</span><span class="p">(</span><span class="nx">req</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">InstanceCommand</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nx">explorer</span><span class="w"> </span><span class="o">*</span><span class="nx">packagemanager</span><span class="p">.</span><span class="nx">Explorer</span><span class="p">,</span><span class="w"> </span><span class="nx">release</span><span class="w"> </span><span class="kd">func</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="nx">GetLibraryManager</span><span class="p">(</span><span class="nx">req</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">InstanceCommand</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">librariesmanager</span><span class="p">.</span><span class="nx">LibrariesManager</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>Old code passing the <code>instanceID</code> inside the gRPC request must be changed to pass directly the whole gRPC request, for
+example:</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="nx">eventsChan</span><span class="p">,</span><span class="w"> </span><span class="nx">closeWatcher</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">board</span><span class="p">.</span><span class="nx">Watch</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">Instance</span><span class="p">.</span><span class="nx">Id</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<p>must be changed to:</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="nx">eventsChan</span><span class="p">,</span><span class="w"> </span><span class="nx">closeWatcher</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">board</span><span class="p">.</span><span class="nx">Watch</span><span class="p">(</span><span class="nx">req</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
 <h2 id="0260">0.26.0<a class="headerlink" href="#0260" title="Permanent link">&para;</a></h2>
 <h3 id="githubcomarduinoarduino-clicommandsdownloadtoolrelease-and-installtoolrelease-functions-have-been-removed"><code>github.com/arduino/arduino-cli/commands.DownloadToolRelease</code>, and <code>InstallToolRelease</code> functions have been removed<a class="headerlink" href="#githubcomarduinoarduino-clicommandsdownloadtoolrelease-and-installtoolrelease-functions-have-been-removed" title="Permanent link">&para;</a></h3>
 <p>This functionality was duplicated and already available via <code>PackageManager</code> methods.</p>

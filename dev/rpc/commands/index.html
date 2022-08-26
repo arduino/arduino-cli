@@ -1859,6 +1859,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#libraryupgraderequest" class="md-nav__link">
+    LibraryUpgradeRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#libraryupgraderesponse" class="md-nav__link">
+    LibraryUpgradeResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#searchedlibrary" class="md-nav__link">
     SearchedLibrary
   </a>
@@ -3168,6 +3182,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#libraryupgraderequest" class="md-nav__link">
+    LibraryUpgradeRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#libraryupgraderesponse" class="md-nav__link">
+    LibraryUpgradeResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#searchedlibrary" class="md-nav__link">
     SearchedLibrary
   </a>
@@ -3578,6 +3606,8 @@
 <li><a href="#cc.arduino.cli.commands.v1.LibraryUninstallResponse">LibraryUninstallResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.LibraryUpgradeAllRequest">LibraryUpgradeAllRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.LibraryUpgradeAllResponse">LibraryUpgradeAllResponse</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.LibraryUpgradeRequest">LibraryUpgradeRequest</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.LibraryUpgradeResponse">LibraryUpgradeResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.SearchedLibrary">SearchedLibrary</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.SearchedLibrary.ReleasesEntry">SearchedLibrary.ReleasesEntry</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.ZipLibraryInstallRequest">ZipLibraryInstallRequest</a></li>
@@ -5141,6 +5171,12 @@
 <td><a href="#cc.arduino.cli.commands.v1.LibraryInstallRequest">LibraryInstallRequest</a></td>
 <td><a href="#cc.arduino.cli.commands.v1.LibraryInstallResponse">LibraryInstallResponse</a> stream</td>
 <td>Download and install an Arduino library from the libraries index.</td>
+</tr>
+<tr>
+<td>LibraryUpgrade</td>
+<td><a href="#cc.arduino.cli.commands.v1.LibraryUpgradeRequest">LibraryUpgradeRequest</a></td>
+<td><a href="#cc.arduino.cli.commands.v1.LibraryUpgradeResponse">LibraryUpgradeResponse</a> stream</td>
+<td>Upgrade a library to the newest version available.</td>
 </tr>
 <tr>
 <td>ZipLibraryInstall</td>
@@ -7032,6 +7068,64 @@
 <td><a href="#cc.arduino.cli.commands.v1.TaskProgress">TaskProgress</a></td>
 <td></td>
 <td>Description of the current stage of the upgrade.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.LibraryUpgradeRequest"></a></p>
+<h3 id="libraryupgraderequest">LibraryUpgradeRequest<a class="headerlink" href="#libraryupgraderequest" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>instance</td>
+<td><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></td>
+<td></td>
+<td>Arduino Core Service instance from the <code>Init</code> response.</td>
+</tr>
+<tr>
+<td>name</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Name of the library.</td>
+</tr>
+<tr>
+<td>no_deps</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>Set to true to skip installation of specified library&#39;s dependencies, defaults to false.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.LibraryUpgradeResponse"></a></p>
+<h3 id="libraryupgraderesponse">LibraryUpgradeResponse<a class="headerlink" href="#libraryupgraderesponse" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>progress</td>
+<td><a href="#cc.arduino.cli.commands.v1.DownloadProgress">DownloadProgress</a></td>
+<td></td>
+<td>Progress of the library download.</td>
+</tr>
+<tr>
+<td>task_progress</td>
+<td><a href="#cc.arduino.cli.commands.v1.TaskProgress">TaskProgress</a></td>
+<td></td>
+<td>Description of the current stage of the installation.</td>
 </tr>
 </tbody>
 </table>
