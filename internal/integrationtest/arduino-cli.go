@@ -23,6 +23,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"testing"
 	"time"
 
 	"github.com/arduino/arduino-cli/executils"
@@ -33,6 +34,30 @@ import (
 	"go.bug.st/testsuite"
 	"google.golang.org/grpc"
 )
+
+// FindRepositoryRootPath returns the repository root path
+func FindRepositoryRootPath(t *testing.T) *paths.Path {
+	repoRootPath := paths.New(".")
+	require.NoError(t, repoRootPath.ToAbs())
+	for !repoRootPath.Join(".git").Exist() {
+		require.Contains(t, repoRootPath.String(), "arduino-cli", "Error searching for repository root path")
+		repoRootPath = repoRootPath.Parent()
+	}
+	return repoRootPath
+}
+
+// CreateArduinoCLIWithEnvironment performs the minimum amount of actions
+// to build the default test environment.
+func CreateArduinoCLIWithEnvironment(t *testing.T) (*testsuite.Environment, *ArduinoCLI) {
+	env := testsuite.NewEnvironment(t)
+
+	cli := NewArduinoCliWithinEnvironment(env, &ArduinoCLIConfig{
+		ArduinoCLIPath:         FindRepositoryRootPath(t).Join("arduino-cli"),
+		UseSharedStagingFolder: true,
+	})
+
+	return env, cli
+}
 
 // ArduinoCLI is an Arduino CLI client.
 type ArduinoCLI struct {

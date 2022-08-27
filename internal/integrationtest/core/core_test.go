@@ -23,18 +23,12 @@ import (
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
-	"go.bug.st/testsuite"
-	"go.bug.st/testsuite/requirejson"
+	"go.bug.st/testifyjson/requirejson"
 )
 
 func TestCoreSearch(t *testing.T) {
-	env := testsuite.NewEnvironment(t)
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
-
-	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
-		ArduinoCLIPath:         paths.New("..", "..", "..", "arduino-cli"),
-		UseSharedStagingFolder: true,
-	})
 
 	// Set up an http server to serve our custom index file
 	test_index := paths.New("..", "testdata", "test_index.json")

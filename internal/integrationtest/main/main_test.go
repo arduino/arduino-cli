@@ -21,21 +21,14 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
-	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	semver "go.bug.st/relaxed-semver"
-	"go.bug.st/testsuite"
-	"go.bug.st/testsuite/requirejson"
+	"go.bug.st/testifyjson/requirejson"
 )
 
 func TestHelp(t *testing.T) {
-	env := testsuite.NewEnvironment(t)
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
-
-	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
-		ArduinoCLIPath:         paths.New("..", "..", "..", "arduino-cli"),
-		UseSharedStagingFolder: true,
-	})
 
 	// Run help and check the output message
 	stdout, stderr, err := cli.Run("help")
@@ -45,13 +38,8 @@ func TestHelp(t *testing.T) {
 }
 
 func TestVersion(t *testing.T) {
-	env := testsuite.NewEnvironment(t)
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
-
-	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
-		ArduinoCLIPath:         paths.New("..", "..", "..", "arduino-cli"),
-		UseSharedStagingFolder: true,
-	})
 
 	// Run version and check the output message
 	stdout, stderr, err := cli.Run("version")
@@ -87,13 +75,8 @@ func TestVersion(t *testing.T) {
 
 func TestLogOptions(t *testing.T) {
 	// Using version as a test command
-	env := testsuite.NewEnvironment(t)
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
-
-	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
-		ArduinoCLIPath:         paths.New("..", "..", "..", "arduino-cli"),
-		UseSharedStagingFolder: true,
-	})
 
 	// No logs
 	stdout, _, err := cli.Run("version")
@@ -143,13 +126,8 @@ func TestLogOptions(t *testing.T) {
 
 func TestInventoryCreation(t *testing.T) {
 	// Using version as a test command
-	env := testsuite.NewEnvironment(t)
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
-
-	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
-		ArduinoCLIPath:         paths.New("..", "..", "..", "arduino-cli"),
-		UseSharedStagingFolder: true,
-	})
 
 	// no logs
 	stdout, _, err := cli.Run("version")
