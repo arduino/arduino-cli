@@ -208,7 +208,9 @@ func (ctx *Context) ExtractBuildOptions() *properties.Map {
 	opts := properties.NewMap()
 	opts.Set("hardwareFolders", strings.Join(ctx.HardwareDirs.AsStrings(), ","))
 	opts.Set("builtInToolsFolders", strings.Join(ctx.BuiltInToolsDirs.AsStrings(), ","))
-	opts.Set("builtInLibrariesFolders", ctx.BuiltInLibrariesDirs.String())
+	if ctx.BuiltInLibrariesDirs != nil {
+		opts.Set("builtInLibrariesFolders", ctx.BuiltInLibrariesDirs.String())
+	}
 	opts.Set("otherLibrariesFolders", strings.Join(ctx.OtherLibrariesDirs.AsStrings(), ","))
 	opts.SetPath("sketchLocation", ctx.SketchLocation)
 	var additionalFilesRelative []string
