@@ -17,6 +17,7 @@ package board_test
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
@@ -266,4 +267,26 @@ func TestBoardDetailsNoFlags(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "Error: required flag(s) \"fqbn\" not set")
 	require.Empty(t, stdout)
+}
+
+func TestBoardDetailsListProgrammersWithoutFlag(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+	// Download samd core pinned to 1.8.6
+	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.6")
+	require.NoError(t, err)
+	stdout, _, err := cli.Run("board", "details", "-b", "arduino:samd:nano_33_iot")
+	require.NoError(t, err)
+	split := strings.Split(string(stdout), "\n")
+	lines := make([][]string, len(split))
+	for i, l := range split {
+		lines[i] = strings.Fields(l)
+	}
+	require.Contains(t, lines, []string{"Programmers:", "Id", "Name"})
+	require.Contains(t, lines, []string{"edbg", "Atmel", "EDBG"})
+	require.Contains(t, lines, []string{"atmel_ice", "Atmel-ICE"})
+	require.Contains(t, lines, []string{"sam_ice", "Atmel", "SAM-ICE"})
 }
