@@ -80,8 +80,8 @@ message Platform {
   bool manually_installed = 9;
   // If true this Platform has been deprecated
   bool deprecated = 10;
-  // Category of the platform.
-  string category = 11;
+  // Type of the platform.
+  repeated string type = 11;
 }
 
 message InstalledPlatformReference {
