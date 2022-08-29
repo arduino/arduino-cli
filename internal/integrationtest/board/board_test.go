@@ -252,3 +252,18 @@ func TestBoardDetails(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Contains(t, stdout, `{"debugging_supported": true}`)
 }
+
+func TestBoardDetailsNoFlags(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+	// Download samd core pinned to 1.8.6
+	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.6")
+	require.NoError(t, err)
+	stdout, stderr, err := cli.Run("board", "details")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error: required flag(s) \"fqbn\" not set")
+	require.Empty(t, stdout)
+}

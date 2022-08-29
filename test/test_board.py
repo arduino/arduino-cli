@@ -23,16 +23,6 @@ import pytest
 from .common import running_on_ci
 
 
-def test_board_details_no_flags(run_command):
-    run_command(["core", "update-index"])
-    # Download samd core pinned to 1.8.6
-    run_command(["core", "install", "arduino:samd@1.8.6"])
-    result = run_command(["board", "details"])
-    assert not result.ok
-    assert 'Error: required flag(s) "fqbn" not set' in result.stderr
-    assert result.stdout == ""
-
-
 def test_board_details_list_programmers_without_flag(run_command):
     run_command(["core", "update-index"])
     # Download samd core pinned to 1.8.6
