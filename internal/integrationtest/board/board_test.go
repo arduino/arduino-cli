@@ -290,3 +290,24 @@ func TestBoardDetailsListProgrammersWithoutFlag(t *testing.T) {
 	require.Contains(t, lines, []string{"atmel_ice", "Atmel-ICE"})
 	require.Contains(t, lines, []string{"sam_ice", "Atmel", "SAM-ICE"})
 }
+
+func TestBoardDetailsListProgrammersFlag(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+	// Download samd core pinned to 1.8.6
+	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.6")
+	require.NoError(t, err)
+	stdout, _, err := cli.Run("board", "details", "-b", "arduino:samd:nano_33_iot", "--list-programmers")
+	require.NoError(t, err)
+	lines := strings.Split(string(stdout), "\n")
+	for i, l := range lines {
+		lines[i] = strings.TrimSpace(l)
+	}
+	require.Contains(t, lines, "Id        Programmer name")
+	require.Contains(t, lines, "edbg      Atmel EDBG")
+	require.Contains(t, lines, "atmel_ice Atmel-ICE")
+	require.Contains(t, lines, "sam_ice   Atmel SAM-ICE")
+}

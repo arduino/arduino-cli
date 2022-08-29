@@ -23,20 +23,6 @@ import pytest
 from .common import running_on_ci
 
 
-def test_board_details_list_programmers_flag(run_command):
-    run_command(["core", "update-index"])
-    # Download samd core pinned to 1.8.6
-    run_command(["core", "install", "arduino:samd@1.8.6"])
-    result = run_command(["board", "details", "-b", "arduino:samd:nano_33_iot", "--list-programmers"], hide=True)
-    assert result.ok
-
-    lines = [l.strip() for l in result.stdout.splitlines()]
-    assert "Id        Programmer name" in lines
-    assert "edbg      Atmel EDBG" in lines
-    assert "atmel_ice Atmel-ICE" in lines
-    assert "sam_ice   Atmel SAM-ICE" in lines
-
-
 def test_board_search(run_command, data_dir):
     assert run_command(["update"])
 
