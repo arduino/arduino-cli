@@ -61,6 +61,7 @@ func TestPlatformSearch(t *testing.T) {
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
 		Boards:     []*rpc.Board{{Name: "RK002"}},
+		Type:       []string{"Contributed"},
 	})
 	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
@@ -71,6 +72,7 @@ func TestPlatformSearch(t *testing.T) {
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
 		Boards:     []*rpc.Board{{Name: "RK002"}},
+		Type:       []string{"Contributed"},
 	})
 
 	res, stat = PlatformSearch(&rpc.PlatformSearchRequest{
@@ -90,6 +92,7 @@ func TestPlatformSearch(t *testing.T) {
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
 		Boards:     []*rpc.Board{{Name: "RK002"}},
+		Type:       []string{"Contributed"},
 	})
 
 	// Search the Package Maintainer
@@ -110,6 +113,7 @@ func TestPlatformSearch(t *testing.T) {
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
 		Boards:     []*rpc.Board{{Name: "RK002"}},
+		Type:       []string{"Contributed"},
 	})
 	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
@@ -120,6 +124,7 @@ func TestPlatformSearch(t *testing.T) {
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
 		Boards:     []*rpc.Board{{Name: "RK002"}},
+		Type:       []string{"Contributed"},
 	})
 
 	// Search using the Package name
@@ -140,6 +145,7 @@ func TestPlatformSearch(t *testing.T) {
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
 		Boards:     []*rpc.Board{{Name: "RK002"}},
+		Type:       []string{"Contributed"},
 	})
 	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
@@ -150,6 +156,7 @@ func TestPlatformSearch(t *testing.T) {
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
 		Boards:     []*rpc.Board{{Name: "RK002"}},
+		Type:       []string{"Contributed"},
 	})
 
 	// Search using the Platform name
@@ -170,6 +177,7 @@ func TestPlatformSearch(t *testing.T) {
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
 		Boards:     []*rpc.Board{{Name: "RK002"}},
+		Type:       []string{"Contributed"},
 	})
 	require.Contains(t, res.SearchOutput, &rpc.Platform{
 		Id:         "Retrokits-RK002:arm",
@@ -180,6 +188,7 @@ func TestPlatformSearch(t *testing.T) {
 		Website:    "https://www.retrokits.com",
 		Email:      "info@retrokits.com",
 		Boards:     []*rpc.Board{{Name: "RK002"}},
+		Type:       []string{"Contributed"},
 	})
 
 	// Search using a board name
@@ -199,6 +208,7 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Arduino",
 		Website:    "https://www.arduino.cc/",
 		Email:      "packages@arduino.cc",
+		Type:       []string{"Arduino"},
 		Boards: []*rpc.Board{
 			{Name: "Arduino Yún"},
 			{Name: "Arduino Uno"},
@@ -245,6 +255,7 @@ func TestPlatformSearch(t *testing.T) {
 		Maintainer: "Arduino",
 		Website:    "https://www.arduino.cc/",
 		Email:      "packages@arduino.cc",
+		Type:       []string{"Arduino"},
 		Boards: []*rpc.Board{
 			{Name: "Arduino Yún"},
 			{Name: "Arduino Uno"},
