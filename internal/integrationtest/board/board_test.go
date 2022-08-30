@@ -311,3 +311,122 @@ func TestBoardDetailsListProgrammersFlag(t *testing.T) {
 	require.Contains(t, lines, "atmel_ice Atmel-ICE")
 	require.Contains(t, lines, "sam_ice   Atmel SAM-ICE")
 }
+
+func TestBoardSearch(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("board", "search", "--format", "json")
+	require.NoError(t, err)
+	// Verifies boards are returned
+	requirejson.NotEmpty(t, stdout)
+	// Verifies no board has FQBN set since no platform is installed
+	requirejson.Query(t, stdout, "[ .[] | select(.fqbn) ] | length", "0")
+	requirejson.Contains(t, stdout, `[
+		{"name": "Arduino Uno"},
+		{"name": "Arduino Yún"},
+		{"name": "Arduino Zero"},
+		{"name": "Arduino Nano 33 BLE"},
+		{"name": "Arduino Portenta H7"}
+	]`)
+
+	// Search in non installed boards
+	stdout, _, err = cli.Run("board", "search", "--format", "json", "nano", "33")
+	require.NoError(t, err)
+	// Verifies boards are returned
+	requirejson.NotEmpty(t, stdout)
+	// Verifies no board has FQBN set since no platform is installed
+	requirejson.Query(t, stdout, "[ .[] | select(.fqbn) ] | length", "0")
+	requirejson.Contains(t, stdout, `[
+		{"name": "Arduino Nano 33 BLE"},
+		{"name": "Arduino Nano 33 IoT"}
+	]`)
+
+	// Install a platform from index
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	stdout, _, err = cli.Run("board", "search", "--format", "json")
+	require.NoError(t, err)
+	requirejson.NotEmpty(t, stdout)
+	// Verifies some FQBNs are now returned after installing a platform
+	requirejson.Query(t, stdout, "[ .[] | select(.fqbn) ] | length", "26")
+	requirejson.Contains(t, stdout, `[
+		{
+			"name": "Arduino Yún",
+    		"fqbn": "arduino:avr:yun"
+		},
+		{
+			"name": "Arduino Uno",
+    		"fqbn": "arduino:avr:uno"
+		}
+	]`)
+
+	stdout, _, err = cli.Run("board", "search", "--format", "json", "arduino", "yun")
+	require.NoError(t, err)
+	requirejson.NotEmpty(t, stdout)
+	requirejson.Contains(t, stdout, `[
+		{
+			"name": "Arduino Yún",
+			"fqbn": "arduino:avr:yun"
+		}
+	]`)
+
+	// Manually installs a core in sketchbooks hardware folder
+	gitUrl := "https://github.com/arduino/ArduinoCore-samd.git"
+	repoDir := cli.SketchbookDir().Join("hardware", "arduino-beta-development", "samd")
+	_, err = git.PlainClone(repoDir.String(), false, &git.CloneOptions{
+		URL:           gitUrl,
+		ReferenceName: plumbing.NewTagReferenceName("1.8.11"),
+	})
+	require.NoError(t, err)
+
+	stdout, _, err = cli.Run("board", "search", "--format", "json")
+	require.NoError(t, err)
+	requirejson.NotEmpty(t, stdout)
+	// Verifies some FQBNs are now returned after installing a platform
+	requirejson.Query(t, stdout, "[ .[] | select(.fqbn) ] | length", "43")
+	requirejson.Contains(t, stdout, `[
+		{
+			"name": "Arduino Uno",
+    		"fqbn": "arduino:avr:uno"
+		},
+		{
+			"name": "Arduino Yún",
+    		"fqbn": "arduino:avr:yun"
+		},
+		{
+			"name": "Arduino MKR WiFi 1010",
+    		"fqbn": "arduino-beta-development:samd:mkrwifi1010"
+		},
+		{
+			"name": "Arduino MKR1000",
+    		"fqbn": "arduino-beta-development:samd:mkr1000"
+		},
+		{
+			"name": "Arduino MKRZERO",
+    		"fqbn": "arduino-beta-development:samd:mkrzero"
+		},
+		{
+			"name": "Arduino NANO 33 IoT",
+    		"fqbn": "arduino-beta-development:samd:nano_33_iot"
+		},
+		{
+			"fqbn": "arduino-beta-development:samd:arduino_zero_native"
+		}
+	]`)
+
+	stdout, _, err = cli.Run("board", "search", "--format", "json", "mkr1000")
+	require.NoError(t, err)
+	requirejson.NotEmpty(t, stdout)
+	// Verifies some FQBNs are now returned after installing a platform
+	requirejson.Contains(t, stdout, `[
+		{
+			"name": "Arduino MKR1000",
+    		"fqbn": "arduino-beta-development:samd:mkr1000"
+		}
+	]`)
+}
