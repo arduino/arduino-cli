@@ -106,6 +106,36 @@ arduino_zero_native.pid.3=0x024d
 }`, zero4.Dump())
 }
 
+func TestDisableDTRRTSConversionToPluggableMonitor(t *testing.T) {
+	m, err := properties.LoadFromBytes([]byte(`
+arduino_zero.serial.disableDTR=true
+arduino_zero.serial.disableRTS=true
+arduino_zero_edbg.serial.disableDTR=false
+arduino_zero_edbg.serial.disableRTS=true
+`))
+	require.NoError(t, err)
+
+	{
+		zero := m.SubTree("arduino_zero")
+		convertLegacySerialPortRTSDTRSettingsToPluggableMonitor(zero)
+		require.Equal(t, `properties.Map{
+  "serial.disableDTR": "true",
+  "serial.disableRTS": "true",
+  "monitor_port.serial.dtr": "off",
+  "monitor_port.serial.rts": "off",
+}`, zero.Dump())
+	}
+	{
+		zeroEdbg := m.SubTree("arduino_zero_edbg")
+		convertLegacySerialPortRTSDTRSettingsToPluggableMonitor(zeroEdbg)
+		require.Equal(t, `properties.Map{
+  "serial.disableDTR": "false",
+  "serial.disableRTS": "true",
+  "monitor_port.serial.rts": "off",
+}`, zeroEdbg.Dump())
+	}
+}
+
 func TestLoadDiscoveries(t *testing.T) {
 	// Create all the necessary data to load discoveries
 	fakePath := paths.New("fake-path")

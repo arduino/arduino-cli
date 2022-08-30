@@ -504,6 +504,7 @@ func (pm *Builder) loadBoards(platform *cores.PlatformRelease) error {
 			convertVidPidIdentificationPropertiesToPluggableDiscovery(boardProperties)
 			convertUploadToolsToPluggableDiscovery(boardProperties)
 		}
+		convertLegacySerialPortRTSDTRSettingsToPluggableMonitor(boardProperties)
 
 		// The board's ID must be available in a board's properties since it can
 		// be used in all configuration files for several reasons, like setting compilation
@@ -525,6 +526,24 @@ func (pm *Builder) loadBoards(platform *cores.PlatformRelease) error {
 
 // Converts the old:
 //
+//   - xxx.serial.disableRTS=true
+//   - xxx.serial.disableDTR=true
+//
+// properties into pluggable monitor compatible:
+//
+//   - xxx.monitor_port.serial.rts=off
+//   - xxx.monitor_port.serial.dtr=off
+func convertLegacySerialPortRTSDTRSettingsToPluggableMonitor(boardProperties *properties.Map) {
+	if boardProperties.GetBoolean("serial.disableDTR") {
+		boardProperties.Set("monitor_port.serial.dtr", "off")
+	}
+	if boardProperties.GetBoolean("serial.disableRTS") {
+		boardProperties.Set("monitor_port.serial.rts", "off")
+	}
+}
+
+// Converts the old:
+//
 //   - xxx.vid.N
 //   - xxx.pid.N
 //
@@ -532,7 +551,6 @@ func (pm *Builder) loadBoards(platform *cores.PlatformRelease) error {
 //
 //   - xxx.upload_port.N.vid
 //   - xxx.upload_port.N.pid
-//
 func convertVidPidIdentificationPropertiesToPluggableDiscovery(boardProperties *properties.Map) {
 	n := 0
 	outputVidPid := func(vid, pid string) {
