@@ -23,19 +23,6 @@ import pytest
 from .common import running_on_ci
 
 
-def test_board_attach_without_sketch_json(run_command, data_dir):
-    run_command(["update"])
-
-    sketch_name = "BoardAttachWithoutSketchJson"
-    sketch_path = Path(data_dir, sketch_name)
-    fqbn = "arduino:avr:uno"
-
-    # Create a test sketch
-    assert run_command(["sketch", "new", sketch_path])
-
-    assert run_command(["board", "attach", "-b", fqbn, sketch_path])
-
-
 def test_board_search_with_outdated_core(run_command):
     assert run_command(["update"])
 

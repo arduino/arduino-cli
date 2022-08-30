@@ -430,3 +430,22 @@ func TestBoardSearch(t *testing.T) {
 		}
 	]`)
 }
+
+func TestBoardAttachWithoutSketchJson(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	sketchName := "BoardAttachWithoutSketchJson"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	// Create a test sketch
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("board", "attach", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+}
