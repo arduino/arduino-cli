@@ -32,7 +32,7 @@ func EnumerateMonitorPortSettings(ctx context.Context, req *rpc.EnumerateMonitor
 	}
 	defer release()
 
-	m, err := findMonitorForProtocolAndBoard(pme, req.GetPortProtocol(), req.GetFqbn())
+	m, boardSettings, err := findMonitorAndSettingsForProtocolAndBoard(pme, req.GetPortProtocol(), req.GetFqbn())
 	if err != nil {
 		return nil, err
 	}
@@ -46,6 +46,19 @@ func EnumerateMonitorPortSettings(ctx context.Context, req *rpc.EnumerateMonitor
 	if err != nil {
 		return nil, &arduino.FailedMonitorError{Cause: err}
 	}
+
+	// Apply default settings for this board and protocol
+	for setting, value := range boardSettings.AsMap() {
+		if param, ok := desc.ConfigurationParameters[setting]; ok {
+			for _, v := range param.Values {
+				if v == value {
+					param.Selected = value
+					break
+				}
+			}
+		}
+	}
+
 	return &rpc.EnumerateMonitorPortSettingsResponse{Settings: convert(desc)}, nil
 }
 
