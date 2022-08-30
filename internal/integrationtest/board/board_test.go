@@ -16,12 +16,14 @@
 package board_test
 
 import (
+	"encoding/json"
 	"os"
 	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/stretchr/testify/require"
+	semver "go.bug.st/relaxed-semver"
 	"go.bug.st/testifyjson/requirejson"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
@@ -448,4 +450,34 @@ func TestBoardAttachWithoutSketchJson(t *testing.T) {
 
 	_, _, err = cli.Run("board", "attach", "-b", fqbn, sketchPath.String())
 	require.NoError(t, err)
+}
+
+func TestBoardSearchWithOutdatedCore(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Install an old core version
+	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.6")
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("board", "search", "arduino:samd:mkrwifi1010", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+	var data []map[string]interface{}
+	err = json.Unmarshal(stdout, &data)
+	require.NoError(t, err)
+	board := data[0]
+	require.Equal(t, board["name"], "Arduino MKR WiFi 1010")
+	require.Equal(t, board["fqbn"], "arduino:samd:mkrwifi1010")
+	samdCore := board["platform"].(map[string]interface{})
+	require.Equal(t, samdCore["id"], "arduino:samd")
+	installedVersion, err := semver.Parse(samdCore["installed"].(string))
+	require.NoError(t, err)
+	latestVersion, err := semver.Parse(samdCore["latest"].(string))
+	require.NoError(t, err)
+	// Installed version must be older than latest
+	require.True(t, installedVersion.LessThan(latestVersion))
 }
