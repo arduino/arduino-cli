@@ -16,24 +16,39 @@
 package utils
 
 import (
-	"context"
 	"io"
+	"sync"
 	"time"
 
 	"github.com/djherbis/buffer"
 	"github.com/djherbis/nio/v3"
 )
 
+// implWriteCloser is an helper struct to implement an anonymous io.WriteCloser
+type implWriteCloser struct {
+	write func(buff []byte) (int, error)
+	close func() error
+}
+
+func (w *implWriteCloser) Write(buff []byte) (int, error) {
+	return w.write(buff)
+}
+
+func (w *implWriteCloser) Close() error {
+	return w.close()
+}
+
 // FeedStreamTo creates a pipe to pass data to the writer function.
 // FeedStreamTo returns the io.WriteCloser side of the pipe, on which the user can write data.
 // The user must call Close() on the returned io.WriteCloser to release all the resources.
 // If needed, the context can be used to detect when all the data has been processed after
 // closing the writer.
-func FeedStreamTo(writer func(data []byte)) (io.WriteCloser, context.Context) {
-	ctx, cancel := context.WithCancel(context.Background())
+func FeedStreamTo(writer func(data []byte)) io.WriteCloser {
 	r, w := nio.Pipe(buffer.New(32 * 1024))
+	var wg sync.WaitGroup
+	wg.Add(1)
 	go func() {
-		defer cancel()
+		defer wg.Done()
 		data := make([]byte, 16384)
 		for {
 			if n, err := r.Read(data); err == nil {
@@ -50,7 +65,16 @@ func FeedStreamTo(writer func(data []byte)) (io.WriteCloser, context.Context) {
 			}
 		}
 	}()
-	return w, ctx
+	return &implWriteCloser{
+		write: w.Write,
+		close: func() error {
+			if err := w.Close(); err != nil {
+				return err
+			}
+			wg.Wait()
+			return nil
+		},
+	}
 }
 
 // ConsumeStreamFrom creates a pipe to consume data from the reader function.
