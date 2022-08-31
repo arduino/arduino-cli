@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package utils
+package daemon
 
 import (
 	"io"
@@ -38,12 +38,12 @@ func (w *implWriteCloser) Close() error {
 	return w.close()
 }
 
-// FeedStreamTo creates a pipe to pass data to the writer function.
-// FeedStreamTo returns the io.WriteCloser side of the pipe, on which the user can write data.
+// feedStreamTo creates a pipe to pass data to the writer function.
+// feedStreamTo returns the io.WriteCloser side of the pipe, on which the user can write data.
 // The user must call Close() on the returned io.WriteCloser to release all the resources.
 // If needed, the context can be used to detect when all the data has been processed after
 // closing the writer.
-func FeedStreamTo(writer func(data []byte)) io.WriteCloser {
+func feedStreamTo(writer func(data []byte)) io.WriteCloser {
 	r, w := nio.Pipe(buffer.New(32 * 1024))
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -77,9 +77,9 @@ func FeedStreamTo(writer func(data []byte)) io.WriteCloser {
 	}
 }
 
-// ConsumeStreamFrom creates a pipe to consume data from the reader function.
-// ConsumeStreamFrom returns the io.Reader side of the pipe, which the user can use to consume the data
-func ConsumeStreamFrom(reader func() ([]byte, error)) io.Reader {
+// consumeStreamFrom creates a pipe to consume data from the reader function.
+// consumeStreamFrom returns the io.Reader side of the pipe, which the user can use to consume the data
+func consumeStreamFrom(reader func() ([]byte, error)) io.Reader {
 	r, w := io.Pipe()
 	go func() {
 		for {

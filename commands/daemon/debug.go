@@ -19,7 +19,6 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/arduino/utils"
 	cmd "github.com/arduino/arduino-cli/commands/debug"
 	dbg "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
 	"github.com/pkg/errors"
@@ -50,9 +49,9 @@ func (s *DebugService) Debug(stream dbg.DebugService_DebugServer) error {
 	// Launch debug recipe attaching stdin and out to grpc streaming
 	signalChan := make(chan os.Signal)
 	defer close(signalChan)
-	outStream := utils.FeedStreamTo(func(data []byte) { stream.Send(&dbg.DebugResponse{Data: data}) })
+	outStream := feedStreamTo(func(data []byte) { stream.Send(&dbg.DebugResponse{Data: data}) })
 	resp, debugErr := cmd.Debug(stream.Context(), req,
-		utils.ConsumeStreamFrom(func() ([]byte, error) {
+		consumeStreamFrom(func() ([]byte, error) {
 			command, err := stream.Recv()
 			if command.GetSendInterrupt() {
 				signalChan <- os.Interrupt
