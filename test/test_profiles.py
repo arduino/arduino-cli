@@ -14,22 +14,6 @@
 # a commercial license, send an email to license@arduino.cc.
 
 
-def test_compile_with_profiles(run_command, copy_sketch):
-    # Init the environment explicitly
-    run_command(["core", "update-index"])
-
-    sketch_path = copy_sketch("sketch_with_profile")
-
-    # use profile without a required library -> should fail
-    assert run_command(["lib", "install", "Arduino_JSON"])
-    result = run_command(["compile", "-m", "avr1", sketch_path])
-    assert result.failed
-
-    # use profile with the required library -> should succeed
-    result = run_command(["compile", "-m", "avr2", sketch_path])
-    assert result.ok
-
-
 def test_builder_did_not_catch_libs_from_unused_platforms(run_command, copy_sketch):
     # Init the environment explicitly
     run_command(["core", "update-index"])
