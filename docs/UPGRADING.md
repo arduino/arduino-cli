@@ -268,9 +268,9 @@ must be changed to:
 
 ### Removed detection of Arduino IDE bundling
 
-Arduino CLI does not check anymore if it's bundled with the Arduino IDE. Previously this check allowed the Arduino CLI
-to automatically use the libraries and tools bundled in the Arduino IDE, now this is not supported anymore unless the
-configuration keys `directories.builtin.libraries` and `directories.builtin.tools` are set.
+Arduino CLI does not check anymore if it's bundled with the Arduino IDE 1.x. Previously this check allowed the Arduino
+CLI to automatically use the libraries and tools bundled in the Arduino IDE, now this is not supported anymore unless
+the configuration keys `directories.builtin.libraries` and `directories.builtin.tools` are set.
 
 ### gRPC enumeration renamed enum value in `cc.arduino.cli.commands.v1.LibraryLocation`
 
