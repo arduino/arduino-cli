@@ -65,7 +65,5 @@ func SetDefaults(settings *viper.Viper) {
 	settings.BindEnv("directories.User", "ARDUINO_SKETCHBOOK_DIR")
 	settings.BindEnv("directories.Downloads", "ARDUINO_DOWNLOADS_DIR")
 	settings.BindEnv("directories.Data", "ARDUINO_DATA_DIR")
-	settings.BindEnv("directories.builtin.tools", "ARDUINO_BUILTIN_TOOLS_DIR")
-	settings.BindEnv("directories.builtin.libraires", "ARDUINO_BUILTIN_LIBRARIES_DIR")
 	settings.BindEnv("sketch.always_export_binaries", "ARDUINO_SKETCH_ALWAYS_EXPORT_BINARIES")
 }
