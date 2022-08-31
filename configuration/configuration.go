@@ -131,6 +131,11 @@ func getDefaultUserDir() string {
 	}
 }
 
+// GetDefaultBuiltinLibrariesDir returns the full path to the default builtin libraries dir
+func GetDefaultBuiltinLibrariesDir() string {
+	return filepath.Join(getDefaultArduinoDataDir(), "libraries")
+}
+
 // FindConfigFileInArgsOrWorkingDirectory returns the config file path using the
 // argument '--config-file' (if specified) or looking in the current working dir
 func FindConfigFileInArgsOrWorkingDirectory(args []string) string {

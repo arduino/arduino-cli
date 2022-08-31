@@ -17,7 +17,6 @@ package daemon_test
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"testing"
@@ -31,35 +30,6 @@ func TestDaemonBundleLibInstall(t *testing.T) {
 	defer env.CleanUp()
 
 	grpcInst := cli.Create()
-	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
-		fmt.Printf("INIT> %v\n", ir.GetMessage())
-	}))
-
-	// Install libraries in bundled dir (should fail)
-	{
-		instCl, err := grpcInst.LibraryInstall(context.Background(), "Arduino_BuiltIn", "", false, false, true)
-		require.NoError(t, err)
-		for {
-			msg, err := instCl.Recv()
-			if err == io.EOF {
-				require.FailNow(t, "LibraryInstall is supposed to fail because builtin libraries directory is not set")
-			}
-			if err != nil {
-				fmt.Println("LIB INSTALL ERROR:", err)
-				break
-			}
-			fmt.Printf("LIB INSTALL> %+v\n", msg)
-		}
-	}
-
-	// Set builtin libraries dir
-	builtinLibsDir := cli.DataDir().Join("libraries")
-	jsonBuiltinLibsDir, err := json.Marshal(builtinLibsDir)
-	require.NoError(t, err)
-	err = cli.SetValue("directories.builtin.libraries", string(jsonBuiltinLibsDir))
-	require.NoError(t, err)
-
-	// Re-init
 	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
@@ -122,5 +92,31 @@ func TestDaemonBundleLibInstall(t *testing.T) {
 		require.Equal(t, libsAndLocation["Ethernet"], commands.LibraryLocation_LIBRARY_LOCATION_USER)
 		require.Equal(t, libsAndLocation["SD"], commands.LibraryLocation_LIBRARY_LOCATION_BUILTIN)
 		require.Equal(t, libsAndLocation["Firmata"], commands.LibraryLocation_LIBRARY_LOCATION_BUILTIN)
+	}
+
+	// Un-Set builtin libraries dir
+	err := cli.SetValue("directories.builtin.libraries", `""`)
+	require.NoError(t, err)
+
+	// Re-init
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+		fmt.Printf("INIT> %v\n", ir.GetMessage())
+	}))
+
+	// Install libraries in bundled dir (should now fail)
+	{
+		instCl, err := grpcInst.LibraryInstall(context.Background(), "Arduino_BuiltIn", "", false, false, true)
+		require.NoError(t, err)
+		for {
+			msg, err := instCl.Recv()
+			if err == io.EOF {
+				require.FailNow(t, "LibraryInstall is supposed to fail because builtin libraries directory is not set")
+			}
+			if err != nil {
+				fmt.Println("LIB INSTALL ERROR:", err)
+				break
+			}
+			fmt.Printf("LIB INSTALL> %+v\n", msg)
+		}
 	}
 }
