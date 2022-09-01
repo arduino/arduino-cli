@@ -18,25 +18,25 @@ from git import Repo
 from pathlib import Path
 
 
-def test_compile_with_fully_precompiled_library(run_command, data_dir):
-    assert run_command(["update"])
-
-    assert run_command(["core", "install", "arduino:mbed@1.3.1"])
-    fqbn = "arduino:mbed:nano33ble"
-
-    # Install fully precompiled library
-    # For more information see:
-    # https://arduino.github.io/arduino-cli/latest/library-specification/#precompiled-binaries
-    assert run_command(["lib", "install", "Arduino_TensorFlowLite@2.1.1-ALPHA-precompiled"])
-    sketch_folder = Path(data_dir, "libraries", "Arduino_TensorFlowLite", "examples", "hello_world")
-
-    # Install example dependency
-    # assert run_command("lib install Arduino_LSM9DS1")
-
-    # Compile and verify dependencies detection for fully precompiled library is skipped
-    result = run_command(["compile", "-b", fqbn, sketch_folder, "-v"])
-    assert result.ok
-    assert "Skipping dependencies detection for precompiled library Arduino_TensorFlowLite" in result.stdout
+# def test_compile_with_fully_precompiled_library(run_command, data_dir):
+#    assert run_command(["update"])
+#
+#    assert run_command(["core", "install", "arduino:mbed@1.3.1"])
+#    fqbn = "arduino:mbed:nano33ble"
+#
+#    # Install fully precompiled library
+#    # For more information see:
+#    # https://arduino.github.io/arduino-cli/latest/library-specification/#precompiled-binaries
+#    assert run_command(["lib", "install", "Arduino_TensorFlowLite@2.1.1-ALPHA-precompiled"])
+#    sketch_folder = Path(data_dir, "libraries", "Arduino_TensorFlowLite", "examples", "hello_world")
+#
+#    # Install example dependency
+#    # assert run_command("lib install Arduino_LSM9DS1")#
+#
+#    # Compile and verify dependencies detection for fully precompiled library is skipped
+#    result = run_command(["compile", "-b", fqbn, sketch_folder, "-v"])
+#    assert result.ok
+#    assert "Skipping dependencies detection for precompiled library Arduino_TensorFlowLite" in result.stdout
 
 
 def test_compile_sketch_with_pde_extension(run_command, data_dir):

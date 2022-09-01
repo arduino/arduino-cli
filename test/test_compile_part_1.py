@@ -224,22 +224,22 @@ def test_compile_without_precompiled_libraries(run_command, data_dir):
     assert run_command(["core", "update-index", f"--additional-urls={url}"])
     assert run_command(["core", "install", "arduino:mbed@1.3.1", f"--additional-urls={url}"])
 
-    # Precompiled version of Arduino_TensorflowLite
-    assert run_command(["lib", "install", "Arduino_LSM9DS1"])
-    assert run_command(["lib", "install", "Arduino_TensorflowLite@2.1.1-ALPHA-precompiled"])
-
-    sketch_path = Path(data_dir, "libraries", "Arduino_TensorFlowLite", "examples", "hello_world")
-    assert run_command(["compile", "-b", "arduino:mbed:nano33ble", sketch_path])
+    #    # Precompiled version of Arduino_TensorflowLite
+    #    assert run_command(["lib", "install", "Arduino_LSM9DS1"])
+    #    assert run_command(["lib", "install", "Arduino_TensorflowLite@2.1.1-ALPHA-precompiled"])
+    #
+    #    sketch_path = Path(data_dir, "libraries", "Arduino_TensorFlowLite", "examples", "hello_world")
+    #    assert run_command(["compile", "-b", "arduino:mbed:nano33ble", sketch_path])
 
     assert run_command(["core", "install", "arduino:samd@1.8.7", f"--additional-urls={url}"])
-    assert run_command(["core", "install", "adafruit:samd@1.6.4", f"--additional-urls={url}"])
-    # should work on adafruit too after https://github.com/arduino/arduino-cli/pull/1134
-    assert run_command(["compile", "-b", "adafruit:samd:adafruit_feather_m4", sketch_path])
-
-    # Non-precompiled version of Arduino_TensorflowLite
-    assert run_command(["lib", "install", "Arduino_TensorflowLite@2.1.0-ALPHA"])
-    assert run_command(["compile", "-b", "arduino:mbed:nano33ble", sketch_path])
-    assert run_command(["compile", "-b", "adafruit:samd:adafruit_feather_m4", sketch_path])
+    #    assert run_command(["core", "install", "adafruit:samd@1.6.4", f"--additional-urls={url}"])
+    #    # should work on adafruit too after https://github.com/arduino/arduino-cli/pull/1134
+    #    assert run_command(["compile", "-b", "adafruit:samd:adafruit_feather_m4", sketch_path])
+    #
+    #    # Non-precompiled version of Arduino_TensorflowLite
+    #    assert run_command(["lib", "install", "Arduino_TensorflowLite@2.1.0-ALPHA"])
+    #    assert run_command(["compile", "-b", "arduino:mbed:nano33ble", sketch_path])
+    #    assert run_command(["compile", "-b", "adafruit:samd:adafruit_feather_m4", sketch_path])
 
     # Bosch sensor library
     assert run_command(["lib", "install", "BSEC Software Library@1.5.1474"])
