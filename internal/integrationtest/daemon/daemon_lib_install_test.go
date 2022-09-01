@@ -79,6 +79,40 @@ func TestDaemonBundleLibInstall(t *testing.T) {
 	}
 
 	// Check if libraries are installed as expected
+	installedEthernetVersion := ""
+	{
+		resp, err := grpcInst.LibraryList(context.Background(), "", "", true, false)
+		require.NoError(t, err)
+		libsAndLocation := map[string]commands.LibraryLocation{}
+		for _, lib := range resp.GetInstalledLibraries() {
+			libsAndLocation[lib.Library.Name] = lib.Library.Location
+			if lib.Library.Name == "Ethernet" {
+				installedEthernetVersion = lib.Library.Version
+			}
+		}
+		require.Contains(t, libsAndLocation, "Ethernet")
+		require.Contains(t, libsAndLocation, "SD")
+		require.Contains(t, libsAndLocation, "Firmata")
+		require.Equal(t, libsAndLocation["Ethernet"], commands.LibraryLocation_LIBRARY_LOCATION_USER)
+		require.Equal(t, libsAndLocation["SD"], commands.LibraryLocation_LIBRARY_LOCATION_BUILTIN)
+		require.Equal(t, libsAndLocation["Firmata"], commands.LibraryLocation_LIBRARY_LOCATION_BUILTIN)
+	}
+
+	// Remove library from sketchbook
+	{
+		uninstCl, err := grpcInst.LibraryUninstall(context.Background(), "Ethernet", installedEthernetVersion)
+		require.NoError(t, err)
+		for {
+			msg, err := uninstCl.Recv()
+			if err == io.EOF {
+				break
+			}
+			require.NoError(t, err)
+			fmt.Printf("LIB INSTALL> %+v\n", msg)
+		}
+	}
+
+	// Check if libraries are installed as expected
 	{
 		resp, err := grpcInst.LibraryList(context.Background(), "", "", true, false)
 		require.NoError(t, err)
@@ -89,7 +123,7 @@ func TestDaemonBundleLibInstall(t *testing.T) {
 		require.Contains(t, libsAndLocation, "Ethernet")
 		require.Contains(t, libsAndLocation, "SD")
 		require.Contains(t, libsAndLocation, "Firmata")
-		require.Equal(t, libsAndLocation["Ethernet"], commands.LibraryLocation_LIBRARY_LOCATION_USER)
+		require.Equal(t, libsAndLocation["Ethernet"], commands.LibraryLocation_LIBRARY_LOCATION_BUILTIN)
 		require.Equal(t, libsAndLocation["SD"], commands.LibraryLocation_LIBRARY_LOCATION_BUILTIN)
 		require.Equal(t, libsAndLocation["Firmata"], commands.LibraryLocation_LIBRARY_LOCATION_BUILTIN)
 	}

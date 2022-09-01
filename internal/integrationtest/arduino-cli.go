@@ -352,3 +352,15 @@ func (inst *ArduinoCLIInstance) LibraryInstall(ctx context.Context, name, versio
 	logCallf(">>> LibraryInstall(%+v)\n", req)
 	return installCl, err
 }
+
+// LibraryUninstall calls the "LibraryUninstall" gRPC method.
+func (inst *ArduinoCLIInstance) LibraryUninstall(ctx context.Context, name, version string) (commands.ArduinoCoreService_LibraryUninstallClient, error) {
+	req := &commands.LibraryUninstallRequest{
+		Instance: inst.instance,
+		Name:     name,
+		Version:  version,
+	}
+	installCl, err := inst.cli.daemonClient.LibraryUninstall(ctx, req)
+	logCallf(">>> LibraryUninstall(%+v)\n", req)
+	return installCl, err
+}
