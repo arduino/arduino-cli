@@ -43,3 +43,29 @@ func TestCompileWithProfiles(t *testing.T) {
 	_, _, err = cli.Run("compile", "-m", "avr2", sketchPath.String())
 	require.NoError(t, err)
 }
+
+func TestBuilderDidNotCatchLibsFromUnusedPlatforms(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// copy sketch into the working directory
+	sketchPath := cli.CopySketch("sketch_with_error_including_wire")
+
+	// install two platforms with the Wire library bundled
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "arduino:samd")
+	require.NoError(t, err)
+
+	// compile for AVR
+	stdout, stderr, err := cli.Run("compile", "-b", "arduino:avr:uno", sketchPath.String())
+	require.Error(t, err)
+
+	// check that the libary resolver did not take the SAMD bundled Wire library into account
+	require.NotContains(t, string(stdout), "samd")
+	require.NotContains(t, string(stderr), "samd")
+}
