@@ -278,15 +278,26 @@ the configuration keys `directories.builtin.libraries` and `directories.builtin.
 
 ### go-lang API change in `LibraryManager`
 
+The following methods:
+
 ```go
 func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesindex.Release) (*paths.Path, *libraries.Library, error) { ... }
 func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, libPath *paths.Path) error { ... ]
+func (alts *LibraryAlternatives) FindVersion(version *semver.Version, installLocation libraries.LibraryLocation) *libraries.Library { ... }
+func (lm *LibrariesManager) FindByReference(libRef *librariesindex.Reference) *libraries.Library { ... }
 ```
+
+now requires a new parameter `LibraryLocation`:
 
 ```go
 func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesindex.Release, installLocation libraries.LibraryLocation) (*paths.Path, *libraries.Library, error) { ... }
 func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, libPath *paths.Path, installLocation libraries.LibraryLocation) error { ... ]
+func (alts *LibraryAlternatives) FindVersion(version *semver.Version, installLocation libraries.LibraryLocation) *libraries.Library { ... }
++func (lm *LibrariesManager) FindByReference(libRef *librariesindex.Reference, installLocation libraries.LibraryLocation) *libraries.Library { ... }
 ```
+
+If you're not interested in specifying the `LibraryLocation` you can use `libraries.User` to refer to the user
+directory.
 
 ### go-lang functions changes in `github.com/arduino/arduino-cli/configuration`
 
