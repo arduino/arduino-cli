@@ -25,18 +25,6 @@ import pytest
 from .common import running_on_ci
 
 
-def test_compile_without_fqbn(run_command):
-    # Init the environment explicitly
-    run_command(["core", "update-index"])
-
-    # Install Arduino AVR Boards
-    run_command(["core", "install", "arduino:avr@1.8.3"])
-
-    # Build sketch without FQBN
-    result = run_command(["compile"])
-    assert result.failed
-
-
 def test_compile_error_message(run_command, working_dir):
     # Init the environment explicitly
     run_command(["core", "update-index"])
