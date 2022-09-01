@@ -885,6 +885,24 @@ may contain any extra parameter in the formula: this is different from the monit
 
 We strongly recommend using this syntax only for development purposes and not on released platforms.
 
+#### Built-in monitors
+
+If a platform supports only boards connected via serial ports it can easily use the `builtin:serial-monitor` tool
+without creating a custom pluggable monitor:
+
+```
+pluggable_monitor.required.serial=builtin:serial-monitor
+```
+
+#### Backward compatibility
+
+For backward compatibility, if a platform does not declare any discovery or monitor tool (using the
+`pluggable_discovery.*` or `pluggable_monitor.*` properties in `platform.txt` respectively) it will automatically
+inherit `builtin:serial-monitor` (but not other `builtin` monitor tools that may be possibly added in the future). This
+will allow all legacy non-pluggable platforms to migrate to pluggable monitor without disruption.
+
+For detailed information, see the [Pluggable Monitor specification](pluggable-monitor-specification.md).
+
 #### Port configuration
 
 Each pluggable monitor has its own default settings that can be overridden using the following board properties:
@@ -908,24 +926,6 @@ myboard.monitor_port.serial.baudrate=9600
 
 The settings available in a specific pluggable monitor can be
 [queried directly from it](pluggable-monitor-specification.md#describe-command).
-
-#### Built-in monitors
-
-If a platform supports only boards connected via serial ports it can easily use the `builtin:serial-monitor` tool
-without creating a custom pluggable monitor:
-
-```
-pluggable_monitor.required.serial=builtin:serial-monitor
-```
-
-#### Backward compatibility
-
-For backward compatibility, if a platform does not declare any discovery or monitor tool (using the
-`pluggable_discovery.*` or `pluggable_monitor.*` properties in `platform.txt` respectively) it will automatically
-inherit `builtin:serial-monitor` (but not other `builtin` monitor tools that may be possibly added in the future). This
-will allow all legacy non-pluggable platforms to migrate to pluggable monitor without disruption.
-
-For detailed information, see the [Pluggable Monitor specification](pluggable-monitor-specification.md).
 
 #### Legacy `serial.disableRTS` and `serial.disableDTR` properties
 
