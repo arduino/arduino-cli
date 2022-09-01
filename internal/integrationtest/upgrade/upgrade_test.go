@@ -87,3 +87,26 @@ func TestUpgradeUsingLibraryWithInvalidVersion(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "WiFi101")
 }
+
+func TestUpgradeUnusedCoreToolsAreRemoved(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Installs a core
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.2")
+	require.NoError(t, err)
+
+	// Verifies expected tool is installed
+	toolPath := cli.DataDir().Join("packages", "arduino", "tools", "avr-gcc", "7.3.0-atmel3.6.1-arduino5")
+	require.DirExists(t, toolPath.String())
+
+	// Upgrades everything
+	_, _, err = cli.Run("upgrade")
+	require.NoError(t, err)
+
+	// Verifies tool is uninstalled since it's not used by newer core version
+	require.NoDirExists(t, toolPath.String())
+}
