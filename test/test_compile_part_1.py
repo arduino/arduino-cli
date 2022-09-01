@@ -25,30 +25,6 @@ import pytest
 from .common import running_on_ci
 
 
-@pytest.mark.skipif(
-    running_on_ci() and platform.system() == "Windows",
-    reason="Test disabled on Github Actions Win VM until tmpdir inconsistent behavior bug is fixed",
-)
-def test_output_flag_default_path(run_command, data_dir, working_dir):
-    # Init the environment explicitly
-    run_command(["core", "update-index"])
-
-    # Install Arduino AVR Boards
-    run_command(["core", "install", "arduino:avr@1.8.3"])
-
-    # Create a test sketch
-    sketch_path = os.path.join(data_dir, "test_output_flag_default_path")
-    fqbn = "arduino:avr:uno"
-    result = run_command(["sketch", "new", sketch_path])
-    assert result.ok
-
-    # Test the --output-dir flag defaulting to current working dir
-    result = run_command(["compile", "-b", fqbn, sketch_path, "--output-dir", "test"])
-    assert result.ok
-    target = os.path.join(working_dir, "test")
-    assert os.path.exists(target) and os.path.isdir(target)
-
-
 def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
     # Init the environment explicitly
     run_command(["core", "update-index"])

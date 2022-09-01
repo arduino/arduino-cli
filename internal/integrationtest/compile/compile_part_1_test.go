@@ -143,3 +143,31 @@ func TestCompileWithSimpleSketch(t *testing.T) {
 	require.NoFileExists(t, sketchBuildDir.Join(sketchName+".ino.with_bootloader.bin").String())
 	require.NoFileExists(t, sketchBuildDir.Join(sketchName+".ino.with_bootloader.hex").String())
 }
+
+func TestOutputFlagDefaultPath(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Install Arduino AVR Boards
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	// Create a test sketch
+	sketchPath := cli.SketchbookDir().Join("test_output_flag_default_path")
+	fqbn := "arduino:avr:uno"
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Test the --output-dir flag defaulting to current working dir
+	workingDir, err := paths.Getwd()
+	require.NoError(t, err)
+	target := workingDir.Join("test")
+	defer target.RemoveAll()
+	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--output-dir", "test")
+	require.NoError(t, err)
+	require.DirExists(t, target.String())
+}
