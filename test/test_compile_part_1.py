@@ -25,52 +25,6 @@ import pytest
 from .common import running_on_ci
 
 
-def test_compile_with_simple_sketch(run_command, data_dir, working_dir):
-    # Init the environment explicitly
-    run_command(["core", "update-index"])
-
-    # Download latest AVR
-    run_command(["core", "install", "arduino:avr"])
-
-    sketch_name = "CompileIntegrationTest"
-    sketch_path = Path(data_dir, sketch_name)
-    fqbn = "arduino:avr:uno"
-
-    # Create a test sketch
-    result = run_command(["sketch", "new", sketch_path])
-    assert result.ok
-    assert f"Sketch created in: {sketch_path}" in result.stdout
-
-    # Build sketch for arduino:avr:uno
-    result = run_command(["compile", "-b", fqbn, sketch_path])
-    assert result.ok
-
-    # Build sketch for arduino:avr:uno with json output
-    result = run_command(["compile", "-b", fqbn, sketch_path, "--format", "json"])
-    assert result.ok
-    # check is a valid json and contains requested data
-    compile_output = json.loads(result.stdout)
-    assert compile_output["compiler_out"] != ""
-    assert compile_output["compiler_err"] == ""
-
-    # Verifies expected binaries have been built
-    sketch_path_md5 = hashlib.md5(bytes(sketch_path)).hexdigest().upper()
-    build_dir = Path(tempfile.gettempdir(), f"arduino-sketch-{sketch_path_md5}")
-    assert (build_dir / f"{sketch_name}.ino.eep").exists()
-    assert (build_dir / f"{sketch_name}.ino.elf").exists()
-    assert (build_dir / f"{sketch_name}.ino.hex").exists()
-    assert (build_dir / f"{sketch_name}.ino.with_bootloader.bin").exists()
-    assert (build_dir / f"{sketch_name}.ino.with_bootloader.hex").exists()
-
-    # Verifies binaries are not exported by default to Sketch folder
-    sketch_build_dir = Path(sketch_path, "build", fqbn.replace(":", "."))
-    assert not (sketch_build_dir / f"{sketch_name}.ino.eep").exists()
-    assert not (sketch_build_dir / f"{sketch_name}.ino.elf").exists()
-    assert not (sketch_build_dir / f"{sketch_name}.ino.hex").exists()
-    assert not (sketch_build_dir / f"{sketch_name}.ino.with_bootloader.bin").exists()
-    assert not (sketch_build_dir / f"{sketch_name}.ino.with_bootloader.hex").exists()
-
-
 @pytest.mark.skipif(
     running_on_ci() and platform.system() == "Windows",
     reason="Test disabled on Github Actions Win VM until tmpdir inconsistent behavior bug is fixed",
