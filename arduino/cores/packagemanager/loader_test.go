@@ -108,8 +108,20 @@ arduino_zero_native.pid.3=0x024d
 
 func TestDisableDTRRTSConversionToPluggableMonitor(t *testing.T) {
 	m, err := properties.LoadFromBytes([]byte(`
+menu.rts=RTS
+menu.dtr=DTR
+foo.menu.rts.on=On
+foo.menu.rts.on.serial.disableRTS=false
+foo.menu.rts.off=Off
+foo.menu.rts.off.serial.disableRTS=true
+foo.menu.dtr.on=On
+foo.menu.dtr.on.serial.disableDTR=false
+foo.menu.dtr.off=Off
+foo.menu.dtr.off.serial.disableDTR=true
+
 arduino_zero.serial.disableDTR=true
 arduino_zero.serial.disableRTS=true
+
 arduino_zero_edbg.serial.disableDTR=false
 arduino_zero_edbg.serial.disableRTS=true
 `))
@@ -131,8 +143,27 @@ arduino_zero_edbg.serial.disableRTS=true
 		require.Equal(t, `properties.Map{
   "serial.disableDTR": "false",
   "serial.disableRTS": "true",
+  "monitor_port.serial.dtr": "on",
   "monitor_port.serial.rts": "off",
 }`, zeroEdbg.Dump())
+	}
+	{
+		foo := m.SubTree("foo")
+		convertLegacySerialPortRTSDTRSettingsToPluggableMonitor(foo)
+		require.Equal(t, `properties.Map{
+  "menu.rts.on": "On",
+  "menu.rts.on.serial.disableRTS": "false",
+  "menu.rts.off": "Off",
+  "menu.rts.off.serial.disableRTS": "true",
+  "menu.dtr.on": "On",
+  "menu.dtr.on.serial.disableDTR": "false",
+  "menu.dtr.off": "Off",
+  "menu.dtr.off.serial.disableDTR": "true",
+  "menu.rts.on.monitor_port.serial.rts": "on",
+  "menu.rts.off.monitor_port.serial.rts": "off",
+  "menu.dtr.on.monitor_port.serial.dtr": "on",
+  "menu.dtr.off.monitor_port.serial.dtr": "off",
+}`, foo.Dump())
 	}
 }
 

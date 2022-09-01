@@ -128,12 +128,12 @@ func findMonitorAndSettingsForProtocolAndBoard(pme *packagemanager.Explorer, pro
 			return nil, nil, &arduino.InvalidFQBNError{Cause: err}
 		}
 
-		_, boardPlatform, board, boardProperties, _, err := pme.ResolveFQBN(fqbn)
+		_, boardPlatform, _, boardProperties, _, err := pme.ResolveFQBN(fqbn)
 		if err != nil {
 			return nil, nil, &arduino.UnknownFQBNError{Cause: err}
 		}
 
-		boardSettings = board.GetMonitorSettings(protocol)
+		boardSettings = cores.GetMonitorSettings(protocol, boardProperties)
 
 		if mon, ok := boardPlatform.Monitors[protocol]; ok {
 			monitorDepOrRecipe = mon

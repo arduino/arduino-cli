@@ -534,11 +534,29 @@ func (pm *Builder) loadBoards(platform *cores.PlatformRelease) error {
 //   - xxx.monitor_port.serial.rts=off
 //   - xxx.monitor_port.serial.dtr=off
 func convertLegacySerialPortRTSDTRSettingsToPluggableMonitor(boardProperties *properties.Map) {
-	if boardProperties.GetBoolean("serial.disableDTR") {
-		boardProperties.Set("monitor_port.serial.dtr", "off")
+	disabledToOnOff := func(k string) string {
+		if boardProperties.GetBoolean(k) {
+			return "off" // Disabled
+		}
+		return "on" // Not disabled
 	}
-	if boardProperties.GetBoolean("serial.disableRTS") {
-		boardProperties.Set("monitor_port.serial.rts", "off")
+	if boardProperties.ContainsKey("serial.disableDTR") {
+		boardProperties.Set("monitor_port.serial.dtr", disabledToOnOff("serial.disableDTR"))
+	}
+	if boardProperties.ContainsKey("serial.disableRTS") {
+		boardProperties.Set("monitor_port.serial.rts", disabledToOnOff("serial.disableRTS"))
+	}
+	for _, k := range boardProperties.Keys() {
+		if strings.HasSuffix(k, ".serial.disableDTR") {
+			boardProperties.Set(
+				strings.TrimSuffix(k, ".serial.disableDTR")+".monitor_port.serial.dtr",
+				disabledToOnOff(k))
+		}
+		if strings.HasSuffix(k, ".serial.disableRTS") {
+			boardProperties.Set(
+				strings.TrimSuffix(k, ".serial.disableRTS")+".monitor_port.serial.rts",
+				disabledToOnOff(k))
+		}
 	}
 }
 
