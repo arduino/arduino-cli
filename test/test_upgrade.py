@@ -16,28 +16,6 @@
 from pathlib import Path
 
 
-def test_upgrade_using_library_with_invalid_version(run_command, data_dir):
-    assert run_command(["update"])
-
-    # Install latest version of a library
-    assert run_command(["lib", "install", "WiFi101"])
-
-    # Verifies library is not shown
-    res = run_command(["outdated"])
-    assert res.ok
-    assert "WiFi101" not in res.stdout
-
-    # Changes the version of the currently installed library so that it's
-    # invalid
-    lib_path = Path(data_dir, "libraries", "WiFi101")
-    Path(lib_path, "library.properties").write_text("name=WiFi101\nversion=1.0001")
-
-    # Verifies library gets upgraded
-    res = run_command(["upgrade"])
-    assert res.ok
-    assert "WiFi101" in res.stdout
-
-
 def test_upgrade_unused_core_tools_are_removed(run_command, data_dir):
     assert run_command(["update"])
 

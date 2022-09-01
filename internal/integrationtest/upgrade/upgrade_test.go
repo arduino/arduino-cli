@@ -60,3 +60,30 @@ func TestUpgrade(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, string(stdout), "\n")
 }
+
+func TestUpgradeUsingLibraryWithInvalidVersion(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Install latest version of a library
+	_, _, err = cli.Run("lib", "install", "WiFi101")
+	require.NoError(t, err)
+
+	// Verifies library is not shown
+	stdout, _, err := cli.Run("outdated")
+	require.NoError(t, err)
+	require.NotContains(t, string(stdout), "WiFi101")
+
+	// Changes the version of the currently installed library so that it's invalid
+	libPropPath := cli.SketchbookDir().Join("libraries", "WiFi101", "library.properties")
+	err = libPropPath.WriteFile([]byte("name=WiFi101\nversion=1.0001"))
+	require.NoError(t, err)
+
+	// Verifies library gets upgraded
+	stdout, _, err = cli.Run("upgrade")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "WiFi101")
+}
