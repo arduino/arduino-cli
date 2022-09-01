@@ -885,6 +885,30 @@ may contain any extra parameter in the formula: this is different from the monit
 
 We strongly recommend using this syntax only for development purposes and not on released platforms.
 
+#### Port configuration
+
+Each pluggable monitor has its own default settings that can be overridden using the following board properties:
+
+```
+BOARD_ID.monitor_port.PROTOCOL.SETTING_NAME=SETTING_VALUE
+```
+
+where:
+
+- `BOARD_ID` is the board identifier
+- `PROTOCOL` is the port protocol
+- `SETTING_NAME` and `SETTING_VALUE` are the port setting and the desired value
+
+For example, let's suppose that a board needs the `baudrate` setting of the `serial` port to be `9600`, then the
+corresponding properties in the `boards.txt` file will be:
+
+```
+myboard.monitor_port.serial.baudrate=9600
+```
+
+The settings available in a specific pluggable monitor can be
+[queried directly from it](pluggable-monitor-specification.md#describe-command).
+
 #### Built-in monitors
 
 If a platform supports only boards connected via serial ports it can easily use the `builtin:serial-monitor` tool
@@ -902,6 +926,23 @@ inherit `builtin:serial-monitor` (but not other `builtin` monitor tools that may
 will allow all legacy non-pluggable platforms to migrate to pluggable monitor without disruption.
 
 For detailed information, see the [Pluggable Monitor specification](pluggable-monitor-specification.md).
+
+#### Legacy `serial.disableRTS` and `serial.disableDTR` properties
+
+In the old Arduino IDE (<=1.8.x) we used the properties:
+
+```
+BOARD_ID.serial.disableRTS=true
+BOARD_ID.serial.disableDTR=true
+```
+
+to disable RTS and DTR when opening the serial monitor. To keep backward compatibilty the properties above are
+automatically converted to the corresponding pluggable monitor properties:
+
+```
+BOARD_ID.monitor_port.serial.rts=off
+BOARD_ID.monitor_port.serial.dtr=off
+```
 
 ### Verbose parameter
 
@@ -1190,47 +1231,6 @@ disappears).
 If the **upload.protocol** property is not defined for a board, the Arduino IDE's "Upload" process will use the same
 behavior as ["Upload Using Programmer"](#upload-using-an-external-programmer). This is convenient for boards which only
 support uploading via programmer.
-
-### Overriding the default monitor port settings
-
-Each pluggable monitor has its own default settings that can be overridden using the following board properties:
-
-```
-BOARD_ID.monitor_port.PROTOCOL.SETTING_NAME=SETTING_VALUE
-```
-
-where:
-
-- `BOARD_ID` is the board identifier
-- `PROTOCOL` is the port protocol
-- `SETTING_NAME` and `SETTING_VALUE` are the port setting and the desired value
-
-For example, let's suppose that a board needs the `baudrate` setting of the `serial` port to be `9600`, then the
-corresponding properties in the `boards.txt` file will be:
-
-```
-myboard.monitor_port.serial.baudrate=9600
-```
-
-The setting name and value can be anything available in the
-[pluggable monitor settings](pluggable-monitor-specification.md#describe-command).
-
-#### Legacy `serial.disableRTS` and `serial.disableDTR` properties
-
-In the old Arduino IDE (<=1.8.x) we used the properties:
-
-```
-BOARD_ID.serial.disableRTS=true
-BOARD_ID.serial.disableDTR=true
-```
-
-to disable RTS and DTR when opening the serial monitor. The keep backward compatibilty the properties above are
-automatically converted to the corresponding pluggable monitor properties:
-
-```
-BOARD_ID.monitor_port.serial.rts=off
-BOARD_ID.monitor_port.serial.dtr=off
-```
 
 ### Serial port
 
