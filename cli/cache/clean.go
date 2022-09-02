@@ -40,8 +40,8 @@ func initCleanCommand() *cobra.Command {
 func runCleanCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli cache clean`")
 
-	cachePath := configuration.Settings.GetString("directories.Downloads")
-	err := os.RemoveAll(cachePath)
+	cachePath := configuration.DownloadsDir(configuration.Settings)
+	err := cachePath.RemoveAll()
 	if err != nil {
 		feedback.Errorf(tr("Error cleaning caches: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)

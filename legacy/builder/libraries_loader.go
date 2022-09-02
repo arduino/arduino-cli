@@ -36,11 +36,11 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 		ctx.LibrariesManager = lm
 
 		builtInLibrariesFolders := ctx.BuiltInLibrariesDirs
-		if err := builtInLibrariesFolders.ToAbs(); err != nil {
-			return errors.WithStack(err)
-		}
-		for _, folder := range builtInLibrariesFolders {
-			lm.AddLibrariesDir(folder, libraries.IDEBuiltIn)
+		if builtInLibrariesFolders != nil {
+			if err := builtInLibrariesFolders.ToAbs(); err != nil {
+				return errors.WithStack(err)
+			}
+			lm.AddLibrariesDir(builtInLibrariesFolders, libraries.IDEBuiltIn)
 		}
 
 		if ctx.ActualPlatform != ctx.TargetPlatform {

@@ -43,7 +43,6 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 
 	require.Equal(t, `{
   "additionalFiles": "",
-  "builtInLibrariesFolders": "",
   "builtInToolsFolders": "tools",
   "compiler.optimization_flags": "-Os",
   "customBuildProperties": "",

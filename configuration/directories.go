@@ -24,14 +24,6 @@ import (
 func HardwareDirectories(settings *viper.Viper) paths.PathList {
 	res := paths.PathList{}
 
-	if IsBundledInDesktopIDE(settings) {
-		ideDir := paths.New(settings.GetString("IDE.Directory"))
-		bundledHardwareDir := ideDir.Join("hardware")
-		if bundledHardwareDir.IsDir() {
-			res.Add(bundledHardwareDir)
-		}
-	}
-
 	if settings.IsSet("directories.Data") {
 		packagesDir := PackagesDir(Settings)
 		if packagesDir.IsDir() {
@@ -50,34 +42,15 @@ func HardwareDirectories(settings *viper.Viper) paths.PathList {
 	return res
 }
 
-// BundleToolsDirectories returns all paths that may contains bundled-tools.
-func BundleToolsDirectories(settings *viper.Viper) paths.PathList {
-	res := paths.PathList{}
-
-	if IsBundledInDesktopIDE(settings) {
-		ideDir := paths.New(settings.GetString("IDE.Directory"))
-		bundledToolsDir := ideDir.Join("hardware", "tools")
-		if bundledToolsDir.IsDir() {
-			res = append(res, bundledToolsDir)
-		}
-	}
-
-	return res
+// BuiltinToolsDirectories returns all paths that may contains bundled-tools.
+func BuiltinToolsDirectories(settings *viper.Viper) paths.PathList {
+	return paths.NewPathList(settings.GetStringSlice("directories.builtin.Tools")...)
 }
 
-// IDEBundledLibrariesDir returns the libraries directory bundled in
-// the Arduino IDE. If there is no Arduino IDE or the directory doesn't
-// exists then nil is returned
-func IDEBundledLibrariesDir(settings *viper.Viper) *paths.Path {
-	if IsBundledInDesktopIDE(settings) {
-		ideDir := paths.New(Settings.GetString("IDE.Directory"))
-		libDir := ideDir.Join("libraries")
-		if libDir.IsDir() {
-			return libDir
-		}
-	}
-
-	return nil
+// IDEBuiltinLibrariesDir returns the IDE-bundled libraries path. Usually
+// this directory is present in the Arduino IDE.
+func IDEBuiltinLibrariesDir(settings *viper.Viper) *paths.Path {
+	return paths.New(Settings.GetString("directories.builtin.Libraries"))
 }
 
 // LibrariesDir returns the full path to the user directory containing
@@ -88,12 +61,22 @@ func LibrariesDir(settings *viper.Viper) *paths.Path {
 
 // PackagesDir returns the full path to the packages folder
 func PackagesDir(settings *viper.Viper) *paths.Path {
-	return paths.New(settings.GetString("directories.Data")).Join("packages")
+	return DataDir(settings).Join("packages")
 }
 
 // ProfilesCacheDir returns the full path to the profiles cache directory
 // (it contains all the platforms and libraries used to compile a sketch
 // using profiles)
 func ProfilesCacheDir(settings *viper.Viper) *paths.Path {
-	return paths.New(settings.GetString("directories.Data")).Join("internal")
+	return DataDir(settings).Join("internal")
+}
+
+// DataDir returns the full path to the data directory
+func DataDir(settings *viper.Viper) *paths.Path {
+	return paths.New(settings.GetString("directories.Data"))
+}
+
+// DownloadsDir returns the full path to the download cache directory
+func DownloadsDir(settings *viper.Viper) *paths.Path {
+	return paths.New(settings.GetString("directories.Downloads"))
 }

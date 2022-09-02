@@ -130,9 +130,8 @@ The "location priority" is determined as follows (in order of highest to lowest 
    ([`{runtime.platform.path}/libraries`](platform-specification.md#global-predefined-properties))
 1. The library is bundled with the [referenced](platform-specification.md#referencing-another-core-variant-or-tool)
    board platform/core
-1. The library is bundled with the Arduino IDE
-   ([`{runtime.ide.path}/libraries`](platform-specification.md#global-predefined-properties))
-   - This location is only used by Arduino CLI when it's located in the Arduino IDE installation folder
+1. The library is bundled with the Arduino IDE (this location is determined by the Arduino CLI configuration setting
+   `directories.builtin.libraries`)
 
 #### Location priorities in Arduino Web Editor
 

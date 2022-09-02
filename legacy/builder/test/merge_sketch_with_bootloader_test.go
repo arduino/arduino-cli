@@ -34,7 +34,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		SketchLocation:       paths.New("sketch1", "sketch1.ino"),
 		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
@@ -104,7 +104,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		SketchLocation:       paths.New("sketch1", "sketch1.ino"),
 		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
@@ -175,7 +175,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		SketchLocation:       paths.New("sketch1", "sketch1.ino"),
 		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
@@ -213,7 +213,7 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		SketchLocation:       paths.New("sketch1", "sketch1.ino"),
 		FQBN:                 parseFQBN(t, "my_avr_platform:avr:mymega:cpu=atmega2560"),

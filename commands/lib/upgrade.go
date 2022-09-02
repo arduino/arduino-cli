@@ -20,6 +20,7 @@ import (
 	"errors"
 
 	"github.com/arduino/arduino-cli/arduino"
+	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -64,7 +65,7 @@ func upgrade(lm *librariesmanager.LibrariesManager, libs []*installedLib, downlo
 
 	// Go through the list and install them
 	for _, lib := range libs {
-		if err := installLibrary(lm, lib.Available, taskCB); err != nil {
+		if err := installLibrary(lm, lib.Available, libraries.User, taskCB); err != nil {
 			if !errors.Is(err, librariesmanager.ErrAlreadyInstalled) {
 				return err
 			}

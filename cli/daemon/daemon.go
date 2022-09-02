@@ -72,6 +72,9 @@ func NewCommand() *cobra.Command {
 func runDaemonCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli daemon`")
 
+	// Bundled libraries support is enabled by default when running as a daemon
+	configuration.Settings.SetDefault("directories.builtin.Libraries", configuration.GetDefaultBuiltinLibrariesDir())
+
 	port := configuration.Settings.GetString("daemon.port")
 	gRPCOptions := []grpc.ServerOption{}
 	if debugFile != "" {

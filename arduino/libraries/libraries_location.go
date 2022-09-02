@@ -93,7 +93,7 @@ func (d *LibraryLocation) UnmarshalJSON(b []byte) error {
 func (d *LibraryLocation) ToRPCLibraryLocation() rpc.LibraryLocation {
 	switch *d {
 	case IDEBuiltIn:
-		return rpc.LibraryLocation_LIBRARY_LOCATION_IDE_BUILTIN
+		return rpc.LibraryLocation_LIBRARY_LOCATION_BUILTIN
 	case PlatformBuiltIn:
 		return rpc.LibraryLocation_LIBRARY_LOCATION_PLATFORM_BUILTIN
 	case ReferencedPlatformBuiltIn:
@@ -110,7 +110,7 @@ func (d *LibraryLocation) ToRPCLibraryLocation() rpc.LibraryLocation {
 // FromRPCLibraryLocation converts a rpc.LibraryLocation to a LibraryLocation
 func FromRPCLibraryLocation(l rpc.LibraryLocation) LibraryLocation {
 	switch l {
-	case rpc.LibraryLocation_LIBRARY_LOCATION_IDE_BUILTIN:
+	case rpc.LibraryLocation_LIBRARY_LOCATION_BUILTIN:
 		return IDEBuiltIn
 	case rpc.LibraryLocation_LIBRARY_LOCATION_PLATFORM_BUILTIN:
 		return PlatformBuiltIn
@@ -122,5 +122,17 @@ func FromRPCLibraryLocation(l rpc.LibraryLocation) LibraryLocation {
 		return Unmanaged
 	default:
 		panic(fmt.Sprintf("invalid rpc.LibraryLocation value %d", l))
+	}
+}
+
+// FromRPCLibraryInstallLocation converts a rpc.LibraryInstallLocation to a LibraryLocation
+func FromRPCLibraryInstallLocation(l rpc.LibraryInstallLocation) LibraryLocation {
+	switch l {
+	case rpc.LibraryInstallLocation_LIBRARY_INSTALL_LOCATION_BUILTIN:
+		return IDEBuiltIn
+	case rpc.LibraryInstallLocation_LIBRARY_INSTALL_LOCATION_USER:
+		return User
+	default:
+		panic(fmt.Sprintf("invalid rpc.LibraryInstallLocation value %d", l))
 	}
 }

@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-win32-utils"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	jww "github.com/spf13/jwalterweatherman"
 	"github.com/spf13/viper"
@@ -132,59 +131,9 @@ func getDefaultUserDir() string {
 	}
 }
 
-// IsBundledInDesktopIDE returns true if the CLI is bundled with the Arduino IDE.
-func IsBundledInDesktopIDE(settings *viper.Viper) bool {
-	// value is cached the first time we run the check
-	if settings.IsSet("IDE.Bundled") {
-		return settings.GetBool("IDE.Bundled")
-	}
-
-	settings.Set("IDE.Bundled", false)
-	settings.Set("IDE.Portable", false)
-
-	logrus.Info("Checking if CLI is Bundled into the IDE")
-	executable, err := os.Executable()
-	if err != nil {
-		feedback.Errorf(tr("Cannot get executable path: %v"), err)
-		return false
-	}
-
-	executablePath, err := filepath.EvalSymlinks(executable)
-	if err != nil {
-		feedback.Errorf(tr("Cannot get executable path: %v"), err)
-		return false
-	}
-
-	ideDir := paths.New(executablePath).Parent()
-	logrus.WithField("dir", ideDir).Trace("Candidate IDE directory")
-
-	// To determine if the CLI is bundled with an IDE, We check an arbitrary
-	// number of folders that are part of the IDE install tree
-	tests := []string{
-		"tools-builder",
-		"examples/01.Basics/Blink",
-	}
-
-	for _, test := range tests {
-		if !ideDir.Join(test).Exist() {
-			// the test folder doesn't exist or is not accessible
-			return false
-		}
-	}
-
-	logrus.Info("The CLI is bundled in the Arduino IDE")
-
-	// Persist IDE-related config settings
-	settings.Set("IDE.Bundled", true)
-	settings.Set("IDE.Directory", ideDir)
-
-	// Check whether this is a portable install
-	if ideDir.Join("portable").Exist() {
-		logrus.Info("The IDE installation is 'portable'")
-		settings.Set("IDE.Portable", true)
-	}
-
-	return true
+// GetDefaultBuiltinLibrariesDir returns the full path to the default builtin libraries dir
+func GetDefaultBuiltinLibrariesDir() string {
+	return filepath.Join(getDefaultArduinoDataDir(), "libraries")
 }
 
 // FindConfigFileInArgsOrWorkingDirectory returns the config file path using the

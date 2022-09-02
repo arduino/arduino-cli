@@ -37,7 +37,7 @@ func prepareBuilderTestContext(t *testing.T, sketchPath *paths.Path, fqbn string
 		FQBN:                 parseFQBN(t, fqbn),
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		ArduinoAPIVersion:    "10600",
 		Verbose:              false,

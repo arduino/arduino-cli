@@ -78,9 +78,9 @@ func (alts *LibraryAlternatives) Remove(library *libraries.Library) {
 }
 
 // FindVersion returns the library mathching the provided version or nil if not found
-func (alts *LibraryAlternatives) FindVersion(version *semver.Version) *libraries.Library {
+func (alts *LibraryAlternatives) FindVersion(version *semver.Version, installLocation libraries.LibraryLocation) *libraries.Library {
 	for _, lib := range alts.Alternatives {
-		if lib.Version.Equal(version) {
+		if lib.Version.Equal(version) && lib.Location == installLocation {
 			return lib
 		}
 	}
@@ -118,6 +118,7 @@ func NewLibraryManager(indexDir *paths.Path, downloadsDir *paths.Path) *Librarie
 // LoadIndex reads a library_index.json from a file and returns
 // the corresponding Index structure.
 func (lm *LibrariesManager) LoadIndex() error {
+	logrus.WithField("index", lm.IndexFile).Info("Loading libraries index file")
 	index, err := librariesindex.LoadIndex(lm.IndexFile)
 	if err != nil {
 		lm.Index = librariesindex.EmptyIndex
@@ -175,9 +176,9 @@ func (lm *LibrariesManager) RescanLibraries() []*status.Status {
 	return statuses
 }
 
-func (lm *LibrariesManager) getUserLibrariesDir() *paths.Path {
+func (lm *LibrariesManager) getLibrariesDir(installLocation libraries.LibraryLocation) *paths.Path {
 	for _, dir := range lm.LibrariesDir {
-		if dir.Location == libraries.User {
+		if dir.Location == installLocation {
 			return dir.Path
 		}
 	}
@@ -244,7 +245,7 @@ func (lm *LibrariesManager) LoadLibraryFromDir(libRootDir *paths.Path, location 
 // FindByReference return the installed library matching the Reference
 // name and version or, if the version is nil, the library installed
 // in the User folder.
-func (lm *LibrariesManager) FindByReference(libRef *librariesindex.Reference) *libraries.Library {
+func (lm *LibrariesManager) FindByReference(libRef *librariesindex.Reference, installLocation libraries.LibraryLocation) *libraries.Library {
 	saneName := utils.SanitizeName(libRef.Name)
 	alternatives, have := lm.Libraries[saneName]
 	if !have {
@@ -253,11 +254,11 @@ func (lm *LibrariesManager) FindByReference(libRef *librariesindex.Reference) *l
 	// TODO: Move "search into user" into another method...
 	if libRef.Version == nil {
 		for _, candidate := range alternatives.Alternatives {
-			if candidate.Location == libraries.User {
+			if candidate.Location == installLocation {
 				return candidate
 			}
 		}
 		return nil
 	}
-	return alternatives.FindVersion(libRef.Version)
+	return alternatives.FindVersion(libRef.Version, installLocation)
 }

@@ -42,7 +42,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
 	}
@@ -152,7 +152,7 @@ func TestLoadLibrariesSAM(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		FQBN:                 parseFQBN(t, "arduino:sam:arduino_due_x_dbg"),
 	}
@@ -235,7 +235,7 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries", filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
 	}
@@ -264,7 +264,7 @@ func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "user_hardware", "downloaded_hardware"),
-		BuiltInLibrariesDirs: paths.NewPathList("downloaded_libraries"),
+		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries", filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")),
 		FQBN:                 parseFQBN(t, "my_avr_platform:avr:custom_yun"),
 	}
