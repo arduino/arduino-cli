@@ -312,3 +312,55 @@ func TestCompileWithoutPrecompiledLibraries(t *testing.T) {
 	_, _, err = cli.Run("compile", "-b", "arduino:samd:mkrvidor4000", sketchPath.String())
 	require.NoError(t, err)
 }
+
+func TestCompileWithBuildPropertiesFlag(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Install Arduino AVR Boards
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	sketchName := "sketch_with_single_string_define"
+	sketchPath := cli.CopySketch(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	// Compile using a build property with quotes
+	_, stderr, err := cli.Run("compile", "-b", fqbn, "--build-properties=\"build.extra_flags=\"-DMY_DEFINE=\"hello world\"\"", sketchPath.String(), "--verbose", "--clean")
+	require.Error(t, err)
+	require.NotContains(t, string(stderr), "Flag --build-properties has been deprecated, please use --build-property instead.")
+
+	// Try again with quotes
+	_, stderr, err = cli.Run("compile", "-b", fqbn, "--build-properties=\"build.extra_flags=-DMY_DEFINE=\"hello\"\"", sketchPath.String(), "--verbose", "--clean")
+	require.Error(t, err)
+	require.NotContains(t, string(stderr), "Flag --build-properties has been deprecated, please use --build-property instead.")
+
+	sketchName = "sketch_with_single_int_define"
+	sketchPath = cli.CopySketch(sketchName)
+
+	// Try without quotes
+	stdout, stderr, err := cli.Run("compile", "-b", fqbn, "--build-properties=\"build.extra_flags=-DMY_DEFINE=1\"", sketchPath.String(), "--verbose", "--clean")
+	require.NoError(t, err)
+	require.Contains(t, string(stderr), "Flag --build-properties has been deprecated, please use --build-property instead.")
+	require.Contains(t, string(stdout), "-DMY_DEFINE=1")
+
+	sketchName = "sketch_with_multiple_int_defines"
+	sketchPath = cli.CopySketch(sketchName)
+
+	stdout, stderr, err = cli.Run("compile",
+		"-b",
+		fqbn,
+		"--build-properties",
+		"build.extra_flags=-DFIRST_PIN=1,compiler.cpp.extra_flags=-DSECOND_PIN=2",
+		sketchPath.String(),
+		"--verbose",
+		"--clean")
+	require.NoError(t, err)
+	require.Contains(t, string(stderr), "Flag --build-properties has been deprecated, please use --build-property instead.")
+	require.Contains(t, string(stdout), "-DFIRST_PIN=1")
+	require.Contains(t, string(stdout), "-DSECOND_PIN=2")
+}
