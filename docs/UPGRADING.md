@@ -305,6 +305,12 @@ directory.
 - `github.com/arduino/arduino-cli/configuration.BundleToolsDirectories` has been renamed to `BuiltinToolsDirectories`
 - `github.com/arduino/arduino-cli/configuration.IDEBundledLibrariesDir` has been renamed to `IDEBuiltinLibrariesDir`
 
+### Removed `utils.FeedStreamTo` and `utils.ConsumeStreamFrom`
+
+`github.com/arduino/arduino-cli/arduino/utils.FeedStreamTo` and
+`github.com/arduino/arduino-cli/arduino/utils.ConsumeStreamFrom` are now private. They are mainly used internally for
+gRPC stream handling and are not suitable to be public API.
+
 ## 0.26.0
 
 ### `github.com/arduino/arduino-cli/commands.DownloadToolRelease`, and `InstallToolRelease` functions have been removed

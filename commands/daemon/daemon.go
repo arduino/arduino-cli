@@ -22,7 +22,6 @@ import (
 	"io"
 
 	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/compile"
@@ -259,16 +258,14 @@ func (s *ArduinoCoreServerImpl) LoadSketch(ctx context.Context, req *rpc.LoadSke
 
 // Compile FIXMEDOC
 func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.ArduinoCoreService_CompileServer) error {
-	outStream, outCtx := utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.CompileResponse{OutStream: data}) })
-	errStream, errCtx := utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.CompileResponse{ErrStream: data}) })
+	outStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.CompileResponse{OutStream: data}) })
+	errStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.CompileResponse{ErrStream: data}) })
 	compileResp, compileErr := compile.Compile(
 		stream.Context(), req, outStream, errStream,
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.CompileResponse{Progress: p}) },
 		false) // Set debug to false
 	outStream.Close()
 	errStream.Close()
-	<-outCtx.Done()
-	<-errCtx.Done()
 	var compileRespSendErr error
 	if compileResp != nil {
 		compileRespSendErr = stream.Send(compileResp)
@@ -346,31 +343,27 @@ func (s *ArduinoCoreServerImpl) PlatformList(ctx context.Context, req *rpc.Platf
 
 // Upload FIXMEDOC
 func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.ArduinoCoreService_UploadServer) error {
-	outStream, outCtx := utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.UploadResponse{OutStream: data}) })
-	errStream, errCtx := utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.UploadResponse{ErrStream: data}) })
+	outStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.UploadResponse{OutStream: data}) })
+	errStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.UploadResponse{ErrStream: data}) })
 	resp, err := upload.Upload(stream.Context(), req, outStream, errStream)
 	outStream.Close()
 	errStream.Close()
 	if err != nil {
 		return convertErrorToRPCStatus(err)
 	}
-	<-outCtx.Done()
-	<-errCtx.Done()
 	return stream.Send(resp)
 }
 
 // UploadUsingProgrammer FIXMEDOC
 func (s *ArduinoCoreServerImpl) UploadUsingProgrammer(req *rpc.UploadUsingProgrammerRequest, stream rpc.ArduinoCoreService_UploadUsingProgrammerServer) error {
-	outStream, outCtx := utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.UploadUsingProgrammerResponse{OutStream: data}) })
-	errStream, errCtx := utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.UploadUsingProgrammerResponse{ErrStream: data}) })
+	outStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.UploadUsingProgrammerResponse{OutStream: data}) })
+	errStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.UploadUsingProgrammerResponse{ErrStream: data}) })
 	resp, err := upload.UsingProgrammer(stream.Context(), req, outStream, errStream)
 	outStream.Close()
 	errStream.Close()
 	if err != nil {
 		return convertErrorToRPCStatus(err)
 	}
-	<-outCtx.Done()
-	<-errCtx.Done()
 	return stream.Send(resp)
 }
 
@@ -382,16 +375,14 @@ func (s *ArduinoCoreServerImpl) SupportedUserFields(ctx context.Context, req *rp
 
 // BurnBootloader FIXMEDOC
 func (s *ArduinoCoreServerImpl) BurnBootloader(req *rpc.BurnBootloaderRequest, stream rpc.ArduinoCoreService_BurnBootloaderServer) error {
-	outStream, outCtx := utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.BurnBootloaderResponse{OutStream: data}) })
-	errStream, errCtx := utils.FeedStreamTo(func(data []byte) { stream.Send(&rpc.BurnBootloaderResponse{ErrStream: data}) })
+	outStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.BurnBootloaderResponse{OutStream: data}) })
+	errStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.BurnBootloaderResponse{ErrStream: data}) })
 	resp, err := upload.BurnBootloader(stream.Context(), req, outStream, errStream)
 	outStream.Close()
 	errStream.Close()
 	if err != nil {
 		return convertErrorToRPCStatus(err)
 	}
-	<-outCtx.Done()
-	<-errCtx.Done()
 	return stream.Send(resp)
 }
 
