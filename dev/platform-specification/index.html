@@ -1495,6 +1495,20 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#port-configuration" class="md-nav__link">
+    Port configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#legacy-serialdisablerts-and-serialdisabledtr-properties" class="md-nav__link">
+    Legacy serial.disableRTS and serial.disableDTR properties
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2062,6 +2076,20 @@
           <li class="md-nav__item">
   <a href="#backward-compatibility" class="md-nav__link">
     Backward compatibility
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#port-configuration" class="md-nav__link">
+    Port configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#legacy-serialdisablerts-and-serialdisabledtr-properties" class="md-nav__link">
+    Legacy serial.disableRTS and serial.disableDTR properties
   </a>
   
 </li>
@@ -2933,6 +2961,32 @@ without creating a custom pluggable monitor:</p>
 inherit <code>builtin:serial-monitor</code> (but not other <code>builtin</code> monitor tools that may be possibly added in the future). This
 will allow all legacy non-pluggable platforms to migrate to pluggable monitor without disruption.</p>
 <p>For detailed information, see the <a href="../pluggable-monitor-specification/">Pluggable Monitor specification</a>.</p>
+<h4 id="port-configuration">Port configuration<a class="headerlink" href="#port-configuration" title="Permanent link">&para;</a></h4>
+<p>Each pluggable monitor has its own default settings that can be overridden using the following board properties:</p>
+<div class="highlight"><pre><span></span><code>BOARD_ID.monitor_port.PROTOCOL.SETTING_NAME=SETTING_VALUE
+</code></pre></div>
+<p>where:</p>
+<ul>
+<li><code>BOARD_ID</code> is the board identifier</li>
+<li><code>PROTOCOL</code> is the port protocol</li>
+<li><code>SETTING_NAME</code> and <code>SETTING_VALUE</code> are the port setting and the desired value</li>
+</ul>
+<p>For example, let's suppose that a board needs the <code>baudrate</code> setting of the <code>serial</code> port to be <code>9600</code>, then the
+corresponding properties in the <code>boards.txt</code> file will be:</p>
+<div class="highlight"><pre><span></span><code>myboard.monitor_port.serial.baudrate=9600
+</code></pre></div>
+<p>The settings available in a specific pluggable monitor can be
+<a href="../pluggable-monitor-specification/#describe-command">queried directly from it</a>.</p>
+<h4 id="legacy-serialdisablerts-and-serialdisabledtr-properties">Legacy <code>serial.disableRTS</code> and <code>serial.disableDTR</code> properties<a class="headerlink" href="#legacy-serialdisablerts-and-serialdisabledtr-properties" title="Permanent link">&para;</a></h4>
+<p>In the old Arduino IDE (&lt;=1.8.x) we used the properties:</p>
+<div class="highlight"><pre><span></span><code>BOARD_ID.serial.disableRTS=true
+BOARD_ID.serial.disableDTR=true
+</code></pre></div>
+<p>to disable RTS and DTR when opening the serial monitor. To keep backward compatibilty the properties above are
+automatically converted to the corresponding pluggable monitor properties:</p>
+<div class="highlight"><pre><span></span><code>BOARD_ID.monitor_port.serial.rts=off
+BOARD_ID.monitor_port.serial.dtr=off
+</code></pre></div>
 <h3 id="verbose-parameter">Verbose parameter<a class="headerlink" href="#verbose-parameter" title="Permanent link">&para;</a></h3>
 <p>It is possible for the user to enable verbosity from the Preferences panel of the IDEs or Arduino CLI's <code>--verbose</code>
 flag. This preference is transferred to the command line using the <strong>ACTION.verbose</strong> property (where ACTION is the
