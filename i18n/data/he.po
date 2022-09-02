@@ -1,25 +1,21 @@
 # 
 # Translators:
-# Alix ANNERAUD, 2021
-# CLI team <prj_cli_team@arduino.cc>, 2022
-# DrBlackjack, 2022
+# rel_m3, 2022
 # 
 msgid ""
 msgstr ""
-"Last-Translator: DrBlackjack, 2022\n"
-"Language-Team: French (https://www.transifex.com/arduino-1/teams/108174/fr/)\n"
-"Language: fr\n"
-"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+"Last-Translator: rel_m3, 2022\n"
+"Language-Team: Hebrew (https://www.transifex.com/arduino-1/teams/108174/he/)\n"
+"Language: he\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
 
 #: version/version.go:53
 msgid "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
-msgstr ""
+msgstr "%[1]s%[2]s גרסה: %[3]s קומיט: %[4]sתאריך: %[5]s"
 
 #: legacy/builder/fail_if_imported_library_is_wrong.go:36
 msgid "%[1]s folder is no longer supported! See %[2]s for more information"
 msgstr ""
-"le dossier %[1]sn'est plus supporté ! Consulter%[2]s pour plus "
-"d'informations"
 
 #: legacy/builder/wipeout_build_path_if_build_options_changed.go:49
 msgid "%[1]s invalid, rebuilding all"
@@ -31,15 +27,15 @@ msgstr ""
 
 #: legacy/builder/builder_utils/utils.go:433
 msgid "%[1]s pattern is missing"
-msgstr "%[1]s est un schéma manquant"
+msgstr "%[1]s תבנית חסרה"
 
 #: arduino/discovery/discovery.go:74
 msgid "%[1]s, message: %[2]s"
-msgstr ""
+msgstr "%[1]s, הערה: %[2]s"
 
 #: arduino/discovery/discovery.go:83
 msgid "%[1]s, port: %[2]s"
-msgstr ""
+msgstr "%[1]s, פורט: %[2]s "
 
 #: arduino/discovery/discovery.go:80
 msgid "%[1]s, ports: %[2]s"
@@ -47,23 +43,23 @@ msgstr ""
 
 #: arduino/discovery/discovery.go:77
 msgid "%[1]s, protocol version: %[2]d"
-msgstr ""
+msgstr "%[1]s, גרסאת פרוטוקול: %[2]d"
 
 #: cli/output/rpc_progress.go:63
 msgid "%s already downloaded"
-msgstr "%s déjà téléchargé"
+msgstr ""
 
 #: commands/upload/upload.go:541
 msgid "%s and %s cannot be used together"
-msgstr "%set%sne peuvent pas être téléchargé."
+msgstr ""
 
 #: cli/output/rpc_progress.go:75
 msgid "%s downloaded"
-msgstr "%s téléchargé"
+msgstr ""
 
 #: arduino/cores/packagemanager/install_uninstall.go:329
 msgid "%s installed"
-msgstr ""
+msgstr "%s מותקן"
 
 #: cli/lib/check_deps.go:99
 msgid "%s is already installed."
@@ -72,11 +68,11 @@ msgstr ""
 #: arduino/cores/packagemanager/loader.go:65
 #: arduino/cores/packagemanager/loader.go:641
 msgid "%s is not a directory"
-msgstr ""
+msgstr "%s אינו תיקייה"
 
 #: arduino/cores/packagemanager/install_uninstall.go:283
 msgid "%s is not managed by package manager"
-msgstr ""
+msgstr "%s אינו מנוהל על ידי מנהל ההתקנות"
 
 #: cli/lib/check_deps.go:96
 msgid "%s must be installed."
@@ -92,11 +88,11 @@ msgstr ""
 
 #: cli/board/listall.go:91 cli/board/search.go:89
 msgid "(hidden)"
-msgstr ""
+msgstr "(מוסתר)"
 
 #: legacy/builder/print_used_libraries_if_verbose.go:34
 msgid "(legacy)"
-msgstr "(héritage)"
+msgstr ""
 
 #: cli/lib/install.go:82
 msgid ""
@@ -125,31 +121,31 @@ msgstr ""
 
 #: cli/generatedocs/generatedocs.go:80
 msgid "ARDUINO COMMAND LINE MANUAL"
-msgstr "Manuel d'Arduino Command Line"
+msgstr ""
 
 #: cli/usage.go:32
 msgid "Additional help topics:"
-msgstr "Aide supplémentaire sur les sujets :"
+msgstr ""
 
 #: cli/config/add.go:32 cli/config/add.go:33
 msgid "Adds one or more values to a setting."
-msgstr "Ajouter une autre valeur à un réglage."
+msgstr ""
 
 #: cli/usage.go:27
 msgid "Aliases:"
-msgstr "Alias :"
+msgstr ""
 
 #: cli/core/upgrade.go:68
 msgid "All the cores are already at the latest version"
-msgstr "Tous les cœurs sont à jours vers la dernière version."
+msgstr ""
 
 #: commands/lib/install.go:86 commands/lib/install.go:131
 msgid "Already installed %s"
-msgstr "Déjà installé %s"
+msgstr ""
 
 #: legacy/builder/resolve_library.go:32
 msgid "Alternatives for %[1]s: %[2]s"
-msgstr "Alternative pour %[1]s: %[2]s"
+msgstr ""
 
 #: legacy/builder/container_add_prototypes.go:46
 msgid "An error occurred adding prototypes"
@@ -165,23 +161,23 @@ msgstr ""
 
 #: cli/lib/search.go:172
 msgid "Architecture: %s"
-msgstr "Architecture : %s"
+msgstr "ארכיטקטורה: %s"
 
 #: commands/sketch/archive.go:70
 msgid "Archive already exists"
-msgstr "L'archive existe déjà"
+msgstr ""
 
 #: legacy/builder/phases/core_builder.go:126
 msgid "Archiving built core (caching) in: %[1]s"
-msgstr "Archivage du noyau construit (mise en cache) dans: %[1]s"
+msgstr ""
 
 #: cli/sketch/sketch.go:31 cli/sketch/sketch.go:32
 msgid "Arduino CLI sketch commands."
-msgstr "Arduino CLI croquis commandes."
+msgstr "פקודות סקיצה בשורת הפקודה של ארדואינו."
 
 #: cli/cli.go:72
 msgid "Arduino CLI."
-msgstr "Arduino CLI."
+msgstr "שורת הפקודה של ארדואינו."
 
 #: cli/cli.go:73
 msgid "Arduino Command Line Interface (arduino-cli)."
@@ -189,7 +185,7 @@ msgstr ""
 
 #: cli/board/board.go:31 cli/board/board.go:32
 msgid "Arduino board commands."
-msgstr ""
+msgstr "פקודות לוח של ארדואינו."
 
 #: cli/cache/cache.go:31 cli/cache/cache.go:32
 msgid "Arduino cache commands."
@@ -254,7 +250,7 @@ msgstr ""
 
 #: legacy/builder/merge_sketch_with_bootloader.go:69
 msgid "Bootloader file specified but missing: %[1]s"
-msgstr "Fichier du bootloader spécifié mais absent: %[1]s"
+msgstr ""
 
 #: cli/compile/compile.go:103
 msgid "Builds of 'core.a' are saved into this path to be cached and reused."
@@ -311,11 +307,11 @@ msgstr ""
 
 #: arduino/errors.go:744
 msgid "Cannot create temp dir"
-msgstr "Impossible de créer le dossier temporaire"
+msgstr ""
 
 #: arduino/errors.go:762
 msgid "Cannot create temp file"
-msgstr "Impossible de créer le fichier temporaire"
+msgstr ""
 
 #: commands/debug/debug.go:72
 msgid "Cannot execute debug tool"
@@ -385,11 +381,11 @@ msgstr ""
 
 #: commands/debug/debug_info.go:123 commands/upload/upload.go:369
 msgid "Compiled sketch not found in %s"
-msgstr "Croquis compilé introuvable %s"
+msgstr ""
 
 #: cli/compile/compile.go:87 cli/compile/compile.go:88
 msgid "Compiles Arduino sketches."
-msgstr "Compilation des croquis Arduino."
+msgstr ""
 
 #: legacy/builder/builder.go:74
 msgid "Compiling core..."
@@ -405,7 +401,7 @@ msgstr ""
 
 #: legacy/builder/builder.go:63
 msgid "Compiling sketch..."
-msgstr "Compilation du croquis..."
+msgstr ""
 
 #: cli/config/init.go:90
 msgid ""
@@ -426,11 +422,11 @@ msgstr ""
 
 #: arduino/cores/packagemanager/install_uninstall.go:173
 msgid "Configuring platform."
-msgstr "Configuration de la plateforme."
+msgstr ""
 
 #: cli/board/list.go:191
 msgid "Connected"
-msgstr "Connecté"
+msgstr ""
 
 #: cli/monitor/monitor.go:177
 msgid "Connected to %s! Press CTRL-C to exit."
@@ -519,7 +515,7 @@ msgstr ""
 
 #: cli/monitor/monitor.go:195
 msgid "Default"
-msgstr "Défaut"
+msgstr ""
 
 #: cli/cache/clean.go:31
 msgid "Delete Boards/Library Manager download cache."
@@ -600,7 +596,7 @@ msgstr ""
 
 #: commands/lib/download.go:59
 msgid "Downloading %s"
-msgstr "Téléchargement %s"
+msgstr ""
 
 #: arduino/resources/index.go:115
 msgid "Downloading index signature: %s"
@@ -620,7 +616,7 @@ msgstr ""
 
 #: arduino/cores/packagemanager/install_uninstall.go:92
 msgid "Downloading packages"
-msgstr "Téléchargement des paquets"
+msgstr ""
 
 #: arduino/cores/packagemanager/profiles.go:98
 msgid "Downloading platform %s"
@@ -827,7 +823,7 @@ msgstr ""
 
 #: cli/lib/install.go:96
 msgid "Error installing Zip Library: %v"
-msgstr "Erreur lors de l'installation de la librairie Zip : %v"
+msgstr ""
 
 #: commands/instances.go:429
 msgid "Error installing library %s"
@@ -836,17 +832,17 @@ msgstr ""
 #: arduino/cores/packagemanager/profiles.go:137
 #: arduino/cores/packagemanager/profiles.go:138
 msgid "Error installing platform %s"
-msgstr "Erreur lors de l'installation de la plateforme %s"
+msgstr ""
 
 #: arduino/cores/packagemanager/profiles.go:181
 #: arduino/cores/packagemanager/profiles.go:188
 #: arduino/cores/packagemanager/profiles.go:189
 msgid "Error installing tool %s"
-msgstr "Erreur lors de l’installation de l'outil %s."
+msgstr ""
 
 #: cli/lib/list.go:76
 msgid "Error listing Libraries: %v"
-msgstr "Erreur lors du listage des librairies : %v"
+msgstr ""
 
 #: cli/board/listall.go:64
 msgid "Error listing boards: %v"
@@ -1149,13 +1145,10 @@ msgid ""
 "Global variables use %[1]s bytes (%[3]s%%) of dynamic memory, leaving %[4]s "
 "bytes for local variables. Maximum is %[2]s bytes."
 msgstr ""
-"Les variables globales utilisent %[1]s octets (%[3]s%%) de mémoire "
-"dynamique, ce qui laisse %[4]s octets pour les variables locales. Le maximum"
-" est de %[2]s octets."
 
 #: legacy/builder/phases/sizer.go:139
 msgid "Global variables use %[1]s bytes of dynamic memory."
-msgstr "Les variables globales utilisent %[1]s octets de mémoire dynamique."
+msgstr ""
 
 #: cli/core/list.go:84 cli/core/search.go:114 cli/monitor/monitor.go:195
 #: cli/outdated/outdated.go:80
@@ -1190,7 +1183,7 @@ msgstr ""
 
 #: cli/core/list.go:84 cli/lib/list.go:124
 msgid "Installed"
-msgstr "Installé"
+msgstr ""
 
 #: commands/lib/install.go:147
 msgid "Installed %s"
@@ -1464,8 +1457,6 @@ msgstr ""
 #: legacy/builder/phases/sizer.go:174
 msgid "Low memory available, stability problems may occur."
 msgstr ""
-"La mémoire disponible faible, des problèmes de stabilité pourraient "
-"survenir."
 
 #: cli/lib/search.go:164
 msgid "Maintainer: %s"
@@ -1482,7 +1473,7 @@ msgstr ""
 
 #: legacy/builder/fail_if_imported_library_is_wrong.go:40
 msgid "Missing '%[1]s' from library in %[2]s"
-msgstr "Fichier manquant '%[1]s' de la bibliothèque dans %[2]s"
+msgstr ""
 
 #: arduino/errors.go:170
 msgid "Missing FQBN (Fully Qualified Board Name)"
@@ -1518,7 +1509,7 @@ msgstr ""
 
 #: legacy/builder/print_used_and_not_used_libraries.go:45
 msgid "Multiple libraries were found for \"%[1]s\""
-msgstr "Plusieurs bibliothèque trouvées pour \"%[1]s\""
+msgstr ""
 
 #: cli/board/details.go:193 cli/core/list.go:84 cli/core/search.go:114
 #: cli/lib/list.go:124 cli/outdated/outdated.go:80
@@ -1583,12 +1574,10 @@ msgstr ""
 #: legacy/builder/phases/sizer.go:164
 msgid "Not enough memory; see %[1]s for tips on reducing your footprint."
 msgstr ""
-"Mémore insuffisante; consulter la page %[1]s pour obtenir des astuces sur "
-"comment le réduire."
 
 #: legacy/builder/print_used_and_not_used_libraries.go:48
 msgid "Not used: %[1]s"
-msgstr "Non utilisé: %[1]s"
+msgstr ""
 
 #: cli/board/details.go:164
 msgid "OS:"
@@ -1779,7 +1768,7 @@ msgstr ""
 
 #: cli/board/list.go:91 cli/board/list.go:131
 msgid "Port"
-msgstr "Port"
+msgstr ""
 
 #: cli/monitor/monitor.go:164 cli/monitor/monitor.go:171
 msgid "Port closed:"
@@ -2027,15 +2016,13 @@ msgstr ""
 
 #: legacy/builder/phases/sizer.go:159
 msgid "Sketch too big; see %[1]s for tips on reducing it."
-msgstr "Croquis trop gros; vois %[1]s pour des conseils de réduction."
+msgstr ""
 
 #: legacy/builder/phases/sizer.go:127
 msgid ""
 "Sketch uses %[1]s bytes (%[3]s%%) of program storage space. Maximum is %[2]s"
 " bytes."
 msgstr ""
-"Le croquis utilise %[1]s octets (%[3]s%%) de l'espace de stockage de "
-"programmes. Le maximum est de %[2]s octets."
 
 #: cli/arguments/sketch.go:61
 msgid ""
@@ -2341,7 +2328,7 @@ msgstr ""
 
 #: legacy/builder/print_used_and_not_used_libraries.go:46
 msgid "Used: %[1]s"
-msgstr "Utilisé: %[1]s"
+msgstr ""
 
 #: arduino/libraries/librariesmanager/install.go:69
 #: arduino/libraries/librariesmanager/install.go:85
@@ -2365,13 +2352,10 @@ msgstr ""
 #: legacy/builder/print_used_libraries_if_verbose.go:44
 msgid "Using library %[1]s at version %[2]s in folder: %[3]s %[4]s"
 msgstr ""
-"Utilisation de la bibliothèque %[1]s version %[2]s dans le dossier: %[3]s "
-"%[4]s"
 
 #: legacy/builder/print_used_libraries_if_verbose.go:38
 msgid "Using library %[1]s in folder: %[2]s %[3]s"
 msgstr ""
-"Utilisation de la bibliothèque %[1]s prise dans le dossier: %[2]s %[3]s"
 
 #: legacy/builder/phases/core_builder.go:105
 msgid "Using precompiled core: %[1]s"
@@ -2385,7 +2369,7 @@ msgstr ""
 #: legacy/builder/builder_utils/utils.go:199
 #: legacy/builder/builder_utils/utils.go:402
 msgid "Using previously compiled file: %[1]s"
-msgstr "Utilisation du fichier déjà compilé: %[1]s"
+msgstr ""
 
 #: cli/core/download.go:36 cli/core/install.go:41
 msgid "VERSION"
@@ -2426,9 +2410,6 @@ msgid ""
 "WARNING: library %[1]s claims to run on %[2]s architecture(s) and may be "
 "incompatible with your current board which runs on %[3]s architecture(s)."
 msgstr ""
-"ATTENTION: la bibliothèque %[1]s prétend être exécutable sur la (ou les) "
-"architecture(s) %[2]s et peut être incompatible avec votre carte actuelle "
-"qui s'exécute sur %[3]s."
 
 #: commands/upload/upload.go:408
 msgid "Waiting for upload port..."
@@ -2444,8 +2425,6 @@ msgid ""
 "Warning: platform.txt from core '%[1]s' contains deprecated %[2]s, "
 "automatically converted to %[3]s. Consider upgrading this core."
 msgstr ""
-"Attention: platform.txt du cœur '%[1]s' contiens %[2]s dépassé, converti "
-"automatiquement en %[3]s. La mise a niveau de ce cœur est conseillée."
 
 #: commands/upload/upload.go:304
 msgid ""
@@ -3409,31 +3388,31 @@ msgstr ""
 
 #: arduino/builder/sketch.go:144
 msgid "unable to write to destination file"
-msgstr "impossible d’écrire dans le fichier de destination."
+msgstr ""
 
 #: arduino/cores/packagemanager/package_manager.go:269
 msgid "unknown package %s"
-msgstr "paquet inconnu %s"
+msgstr ""
 
 #: arduino/cores/packagemanager/package_manager.go:276
 msgid "unknown platform %s:%s"
-msgstr "plateforme inconnue %s:%s"
+msgstr ""
 
 #: arduino/sketch/sketch.go:167
 msgid "unknown sketch file extension '%s'"
-msgstr "extension de croquis inconnue '%s' "
+msgstr ""
 
 #: arduino/resources/checksums.go:62
 msgid "unsupported hash algorithm: %s"
-msgstr "algorithme de hachage non supporté"
+msgstr ""
 
 #: cli/core/upgrade.go:44
 msgid "upgrade arduino:samd to the latest version"
-msgstr "mise à jour de arduino:samd vers la dernière version"
+msgstr ""
 
 #: cli/core/upgrade.go:42
 msgid "upgrade everything to the latest version"
-msgstr "tout mettre à jour tout vers la dernière version"
+msgstr ""
 
 #: commands/upload/upload.go:519
 msgid "uploading error: %s"
