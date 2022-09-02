@@ -298,6 +298,34 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#removed-detection-of-arduino-ide-bundling" class="md-nav__link">
+    Removed detection of Arduino IDE bundling
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grpc-enumeration-renamed-enum-value-in-ccarduinoclicommandsv1librarylocation" class="md-nav__link">
+    gRPC enumeration renamed enum value in cc.arduino.cli.commands.v1.LibraryLocation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#go-lang-api-change-in-librarymanager" class="md-nav__link">
+    go-lang API change in LibraryManager
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#go-lang-functions-changes-in-githubcomarduinoarduino-cliconfiguration" class="md-nav__link">
+    go-lang functions changes in github.com/arduino/arduino-cli/configuration
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1947,6 +1975,34 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#removed-detection-of-arduino-ide-bundling" class="md-nav__link">
+    Removed detection of Arduino IDE bundling
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grpc-enumeration-renamed-enum-value-in-ccarduinoclicommandsv1librarylocation" class="md-nav__link">
+    gRPC enumeration renamed enum value in cc.arduino.cli.commands.v1.LibraryLocation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#go-lang-api-change-in-librarymanager" class="md-nav__link">
+    go-lang API change in LibraryManager
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#go-lang-functions-changes-in-githubcomarduinoarduino-cliconfiguration" class="md-nav__link">
+    go-lang functions changes in github.com/arduino/arduino-cli/configuration
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2735,6 +2791,33 @@ example:</p>
 <p>must be changed to:</p>
 <div class="highlight"><pre><span></span><code><span class="w">    </span><span class="nx">eventsChan</span><span class="p">,</span><span class="w"> </span><span class="nx">closeWatcher</span><span class="p">,</span><span class="w"> </span><span class="nx">err</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">board</span><span class="p">.</span><span class="nx">Watch</span><span class="p">(</span><span class="nx">req</span><span class="p">)</span><span class="w"></span>
 </code></pre></div>
+<h3 id="removed-detection-of-arduino-ide-bundling">Removed detection of Arduino IDE bundling<a class="headerlink" href="#removed-detection-of-arduino-ide-bundling" title="Permanent link">&para;</a></h3>
+<p>Arduino CLI does not check anymore if it's bundled with the Arduino IDE 1.x. Previously this check allowed the Arduino
+CLI to automatically use the libraries and tools bundled in the Arduino IDE, now this is not supported anymore unless
+the configuration keys <code>directories.builtin.libraries</code> and <code>directories.builtin.tools</code> are set.</p>
+<h3 id="grpc-enumeration-renamed-enum-value-in-ccarduinoclicommandsv1librarylocation">gRPC enumeration renamed enum value in <code>cc.arduino.cli.commands.v1.LibraryLocation</code><a class="headerlink" href="#grpc-enumeration-renamed-enum-value-in-ccarduinoclicommandsv1librarylocation" title="Permanent link">&para;</a></h3>
+<p><code>LIBRARY_LOCATION_IDE_BUILTIN</code> has been renamed to <code>LIBRARY_LOCATION_BUILTIN</code></p>
+<h3 id="go-lang-api-change-in-librarymanager">go-lang API change in <code>LibraryManager</code><a class="headerlink" href="#go-lang-api-change-in-librarymanager" title="Permanent link">&para;</a></h3>
+<p>The following methods:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">lm</span><span class="w"> </span><span class="o">*</span><span class="nx">LibrariesManager</span><span class="p">)</span><span class="w"> </span><span class="nx">InstallPrerequisiteCheck</span><span class="p">(</span><span class="nx">indexLibrary</span><span class="w"> </span><span class="o">*</span><span class="nx">librariesindex</span><span class="p">.</span><span class="nx">Release</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="nx">libraries</span><span class="p">.</span><span class="nx">Library</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">lm</span><span class="w"> </span><span class="o">*</span><span class="nx">LibrariesManager</span><span class="p">)</span><span class="w"> </span><span class="nx">Install</span><span class="p">(</span><span class="nx">indexLibrary</span><span class="w"> </span><span class="o">*</span><span class="nx">librariesindex</span><span class="p">.</span><span class="nx">Release</span><span class="p">,</span><span class="w"> </span><span class="nx">libPath</span><span class="w"> </span><span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">]</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">alts</span><span class="w"> </span><span class="o">*</span><span class="nx">LibraryAlternatives</span><span class="p">)</span><span class="w"> </span><span class="nx">FindVersion</span><span class="p">(</span><span class="nx">version</span><span class="w"> </span><span class="o">*</span><span class="nx">semver</span><span class="p">.</span><span class="nx">Version</span><span class="p">,</span><span class="w"> </span><span class="nx">installLocation</span><span class="w"> </span><span class="nx">libraries</span><span class="p">.</span><span class="nx">LibraryLocation</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">libraries</span><span class="p">.</span><span class="nx">Library</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">lm</span><span class="w"> </span><span class="o">*</span><span class="nx">LibrariesManager</span><span class="p">)</span><span class="w"> </span><span class="nx">FindByReference</span><span class="p">(</span><span class="nx">libRef</span><span class="w"> </span><span class="o">*</span><span class="nx">librariesindex</span><span class="p">.</span><span class="nx">Reference</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">libraries</span><span class="p">.</span><span class="nx">Library</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>now requires a new parameter <code>LibraryLocation</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">lm</span><span class="w"> </span><span class="o">*</span><span class="nx">LibrariesManager</span><span class="p">)</span><span class="w"> </span><span class="nx">InstallPrerequisiteCheck</span><span class="p">(</span><span class="nx">indexLibrary</span><span class="w"> </span><span class="o">*</span><span class="nx">librariesindex</span><span class="p">.</span><span class="nx">Release</span><span class="p">,</span><span class="w"> </span><span class="nx">installLocation</span><span class="w"> </span><span class="nx">libraries</span><span class="p">.</span><span class="nx">LibraryLocation</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="nx">libraries</span><span class="p">.</span><span class="nx">Library</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">lm</span><span class="w"> </span><span class="o">*</span><span class="nx">LibrariesManager</span><span class="p">)</span><span class="w"> </span><span class="nx">Install</span><span class="p">(</span><span class="nx">indexLibrary</span><span class="w"> </span><span class="o">*</span><span class="nx">librariesindex</span><span class="p">.</span><span class="nx">Release</span><span class="p">,</span><span class="w"> </span><span class="nx">libPath</span><span class="w"> </span><span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">,</span><span class="w"> </span><span class="nx">installLocation</span><span class="w"> </span><span class="nx">libraries</span><span class="p">.</span><span class="nx">LibraryLocation</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">]</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">alts</span><span class="w"> </span><span class="o">*</span><span class="nx">LibraryAlternatives</span><span class="p">)</span><span class="w"> </span><span class="nx">FindVersion</span><span class="p">(</span><span class="nx">version</span><span class="w"> </span><span class="o">*</span><span class="nx">semver</span><span class="p">.</span><span class="nx">Version</span><span class="p">,</span><span class="w"> </span><span class="nx">installLocation</span><span class="w"> </span><span class="nx">libraries</span><span class="p">.</span><span class="nx">LibraryLocation</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">libraries</span><span class="p">.</span><span class="nx">Library</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="o">+</span><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">lm</span><span class="w"> </span><span class="o">*</span><span class="nx">LibrariesManager</span><span class="p">)</span><span class="w"> </span><span class="nx">FindByReference</span><span class="p">(</span><span class="nx">libRef</span><span class="w"> </span><span class="o">*</span><span class="nx">librariesindex</span><span class="p">.</span><span class="nx">Reference</span><span class="p">,</span><span class="w"> </span><span class="nx">installLocation</span><span class="w"> </span><span class="nx">libraries</span><span class="p">.</span><span class="nx">LibraryLocation</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">libraries</span><span class="p">.</span><span class="nx">Library</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>If you're not interested in specifying the <code>LibraryLocation</code> you can use <code>libraries.User</code> to refer to the user
+directory.</p>
+<h3 id="go-lang-functions-changes-in-githubcomarduinoarduino-cliconfiguration">go-lang functions changes in <code>github.com/arduino/arduino-cli/configuration</code><a class="headerlink" href="#go-lang-functions-changes-in-githubcomarduinoarduino-cliconfiguration" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>github.com/arduino/arduino-cli/configuration.IsBundledInDesktopIDE</code> function has been removed.</li>
+<li><code>github.com/arduino/arduino-cli/configuration.BundleToolsDirectories</code> has been renamed to <code>BuiltinToolsDirectories</code></li>
+<li><code>github.com/arduino/arduino-cli/configuration.IDEBundledLibrariesDir</code> has been renamed to <code>IDEBuiltinLibrariesDir</code></li>
+</ul>
 <h2 id="0260">0.26.0<a class="headerlink" href="#0260" title="Permanent link">&para;</a></h2>
 <h3 id="githubcomarduinoarduino-clicommandsdownloadtoolrelease-and-installtoolrelease-functions-have-been-removed"><code>github.com/arduino/arduino-cli/commands.DownloadToolRelease</code>, and <code>InstallToolRelease</code> functions have been removed<a class="headerlink" href="#githubcomarduinoarduino-clicommandsdownloadtoolrelease-and-installtoolrelease-functions-have-been-removed" title="Permanent link">&para;</a></h3>
 <p>This functionality was duplicated and already available via <code>PackageManager</code> methods.</p>

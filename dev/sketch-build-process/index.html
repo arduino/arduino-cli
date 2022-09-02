@@ -1724,11 +1724,8 @@ field. That value is sanitized by replacing spaces with <code>_</code> before co
    (<a href="../platform-specification/#global-predefined-properties"><code>{runtime.platform.path}/libraries</code></a>)</li>
 <li>The library is bundled with the <a href="../platform-specification/#referencing-another-core-variant-or-tool">referenced</a>
    board platform/core</li>
-<li>The library is bundled with the Arduino IDE
-   (<a href="../platform-specification/#global-predefined-properties"><code>{runtime.ide.path}/libraries</code></a>)<ul>
-<li>This location is only used by Arduino CLI when it's located in the Arduino IDE installation folder</li>
-</ul>
-</li>
+<li>The library is bundled with the Arduino IDE (this location is determined by the Arduino CLI configuration setting
+   <code>directories.builtin.libraries</code>)</li>
 </ol>
 <h4 id="location-priorities-in-arduino-web-editor">Location priorities in Arduino Web Editor<a class="headerlink" href="#location-priorities-in-arduino-web-editor" title="Permanent link">&para;</a></h4>
 <p>The location priorities system works in the same manner in <a href="https://create.arduino.cc/editor">Arduino Web Editor</a>, but

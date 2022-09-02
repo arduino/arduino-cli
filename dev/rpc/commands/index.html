@@ -1901,6 +1901,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#libraryinstalllocation" class="md-nav__link">
+    LibraryInstallLocation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#librarylayout" class="md-nav__link">
     LibraryLayout
   </a>
@@ -3224,6 +3231,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#libraryinstalllocation" class="md-nav__link">
+    LibraryInstallLocation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#librarylayout" class="md-nav__link">
     LibraryLayout
   </a>
@@ -3614,6 +3628,7 @@
 <li><a href="#cc.arduino.cli.commands.v1.ZipLibraryInstallResponse">ZipLibraryInstallResponse</a></li>
 </ul>
 <ul>
+<li><a href="#cc.arduino.cli.commands.v1.LibraryInstallLocation">LibraryInstallLocation</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.LibraryLayout">LibraryLayout</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.LibraryLocation">LibraryLocation</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.LibrarySearchStatus">LibrarySearchStatus</a></li>
@@ -6691,6 +6706,12 @@
 <td></td>
 <td>Set to true to skip installation if a different version of the library or one of its dependencies is already installed, defaults to false.</td>
 </tr>
+<tr>
+<td>install_location</td>
+<td><a href="#cc.arduino.cli.commands.v1.LibraryInstallLocation">LibraryInstallLocation</a></td>
+<td></td>
+<td>Install the library and dependencies in the specified location</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.LibraryInstallResponse"></a></p>
@@ -7245,6 +7266,29 @@
 </tr>
 </tbody>
 </table>
+<p><a name="cc.arduino.cli.commands.v1.LibraryInstallLocation"></a></p>
+<h3 id="libraryinstalllocation">LibraryInstallLocation<a class="headerlink" href="#libraryinstalllocation" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Number</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LIBRARY_INSTALL_LOCATION_USER</td>
+<td>0</td>
+<td>In the <code>libraries</code> subdirectory of the user directory (sketchbook). This is the default if not specified.</td>
+</tr>
+<tr>
+<td>LIBRARY_INSTALL_LOCATION_BUILTIN</td>
+<td>1</td>
+<td>In the configured &#39;builtin.libraries&#39; directory.</td>
+</tr>
+</tbody>
+</table>
 <p><a name="cc.arduino.cli.commands.v1.LibraryLayout"></a></p>
 <h3 id="librarylayout">LibraryLayout<a class="headerlink" href="#librarylayout" title="Permanent link">&para;</a></h3>
 <table>
@@ -7280,9 +7324,9 @@
 </thead>
 <tbody>
 <tr>
-<td>LIBRARY_LOCATION_IDE_BUILTIN</td>
+<td>LIBRARY_LOCATION_BUILTIN</td>
 <td>0</td>
-<td>In the <code>libraries</code> subdirectory of the Arduino IDE installation.</td>
+<td>In the configured &#39;builtin.libraries&#39; directory.</td>
 </tr>
 <tr>
 <td>LIBRARY_LOCATION_USER</td>
