@@ -25,56 +25,6 @@ import pytest
 from .common import running_on_ci
 
 
-def test_compile_with_sketch_with_symlink_selfloop(run_command, data_dir):
-    # Init the environment explicitly
-    run_command(["core", "update-index"])
-
-    # Install Arduino AVR Boards
-    run_command(["core", "install", "arduino:avr@1.8.3"])
-
-    sketch_name = "CompileIntegrationTestSymlinkSelfLoop"
-    sketch_path = os.path.join(data_dir, sketch_name)
-    fqbn = "arduino:avr:uno"
-
-    # Create a test sketch
-    result = run_command(["sketch", "new", sketch_path])
-    assert result.ok
-    assert "Sketch created in: {}".format(sketch_path) in result.stdout
-
-    # create a symlink that loops on himself
-    loop_file_path = os.path.join(sketch_path, "loop")
-    os.symlink(loop_file_path, loop_file_path)
-
-    # Build sketch for arduino:avr:uno
-    result = run_command(["compile", "-b", fqbn, sketch_path])
-    # The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
-    # returning a different error detailed message
-    assert "Error opening sketch:" in result.stderr
-    assert not result.ok
-
-    sketch_name = "CompileIntegrationTestSymlinkDirLoop"
-    sketch_path = os.path.join(data_dir, sketch_name)
-    fqbn = "arduino:avr:uno"
-
-    # Create a test sketch
-    result = run_command(["sketch", "new", sketch_path])
-    assert result.ok
-    assert "Sketch created in: {}".format(sketch_path) in result.stdout
-
-    # create a symlink that loops on the upper level
-    loop_dir_path = os.path.join(sketch_path, "loop_dir")
-    os.mkdir(loop_dir_path)
-    loop_dir_symlink_path = os.path.join(loop_dir_path, "loop_dir_symlink")
-    os.symlink(loop_dir_path, loop_dir_symlink_path)
-
-    # Build sketch for arduino:avr:uno
-    result = run_command(["compile", "-b", fqbn, sketch_path])
-    # The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
-    # returning a different error detailed message
-    assert "Error opening sketch:" in result.stderr
-    assert not result.ok
-
-
 def test_compile_blacklisted_sketchname(run_command, data_dir):
     """
     Compile should ignore folders named `RCS`, `.git` and the likes, but

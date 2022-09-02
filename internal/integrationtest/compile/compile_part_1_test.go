@@ -19,6 +19,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
+	"os"
 	"strings"
 	"testing"
 
@@ -170,4 +171,61 @@ func TestOutputFlagDefaultPath(t *testing.T) {
 	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--output-dir", "test")
 	require.NoError(t, err)
 	require.DirExists(t, target.String())
+}
+
+func TestCompileWithSketchWithSymlinkSelfloop(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Install Arduino AVR Boards
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	sketchName := "CompileIntegrationTestSymlinkSelfLoop"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	// Create a test sketch
+	stdout, _, err := cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Sketch created in: "+sketchPath.String())
+
+	// create a symlink that loops on himself
+	loopFilePath := sketchPath.Join("loop")
+	err = os.Symlink(loopFilePath.String(), loopFilePath.String())
+	require.NoError(t, err)
+
+	// Build sketch for arduino:avr:uno
+	_, stderr, err := cli.Run("compile", "-b", fqbn, sketchPath.String())
+	// The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
+	// returning a different error detailed message
+	require.Contains(t, string(stderr), "Error opening sketch:")
+	require.Error(t, err)
+
+	sketchName = "CompileIntegrationTestSymlinkDirLoop"
+	sketchPath = cli.SketchbookDir().Join(sketchName)
+
+	// Create a test sketch
+	stdout, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Sketch created in: "+sketchPath.String())
+
+	// create a symlink that loops on the upper level
+	loopDirPath := sketchPath.Join("loop_dir")
+	err = loopDirPath.Mkdir()
+	require.NoError(t, err)
+	loopDirSymlinkPath := loopDirPath.Join("loop_dir_symlink")
+	err = os.Symlink(loopDirPath.String(), loopDirSymlinkPath.String())
+	require.NoError(t, err)
+
+	// Build sketch for arduino:avr:uno
+	_, stderr, err = cli.Run("compile", "-b", fqbn, sketchPath.String())
+	// The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
+	// returning a different error detailed message
+	require.Contains(t, string(stderr), "Error opening sketch:")
+	require.Error(t, err)
 }
