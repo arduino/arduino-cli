@@ -229,3 +229,32 @@ func TestCompileWithSketchWithSymlinkSelfloop(t *testing.T) {
 	require.Contains(t, string(stderr), "Error opening sketch:")
 	require.Error(t, err)
 }
+
+func TestCompileBlacklistedSketchname(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Compile should ignore folders named `RCS`, `.git` and the likes, but
+	// it should be ok for a sketch to be named like RCS.ino
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Install Arduino AVR Boards
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	sketchName := "RCS"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	// Create a test sketch
+	stdout, _, err := cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Sketch created in: "+sketchPath.String())
+
+	// Build sketch for arduino:avr:uno
+	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+}

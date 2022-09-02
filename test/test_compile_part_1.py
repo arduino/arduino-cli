@@ -25,31 +25,6 @@ import pytest
 from .common import running_on_ci
 
 
-def test_compile_blacklisted_sketchname(run_command, data_dir):
-    """
-    Compile should ignore folders named `RCS`, `.git` and the likes, but
-    it should be ok for a sketch to be named like RCS.ino
-    """
-    # Init the environment explicitly
-    run_command(["core", "update-index"])
-
-    # Install Arduino AVR Boards
-    run_command(["core", "install", "arduino:avr@1.8.3"])
-
-    sketch_name = "RCS"
-    sketch_path = os.path.join(data_dir, sketch_name)
-    fqbn = "arduino:avr:uno"
-
-    # Create a test sketch
-    result = run_command(["sketch", "new", sketch_path])
-    assert result.ok
-    assert "Sketch created in: {}".format(sketch_path) in result.stdout
-
-    # Build sketch for arduino:avr:uno
-    result = run_command(["compile", "-b", fqbn, sketch_path])
-    assert result.ok
-
-
 def test_compile_without_precompiled_libraries(run_command, data_dir):
     # Init the environment explicitly
     url = "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json"
