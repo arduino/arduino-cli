@@ -258,3 +258,57 @@ func TestCompileBlacklistedSketchname(t *testing.T) {
 	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String())
 	require.NoError(t, err)
 }
+
+func TestCompileWithoutPrecompiledLibraries(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	url := "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json"
+	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url)
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "arduino:mbed@1.3.1", "--additional-urls="+url)
+	require.NoError(t, err)
+
+	// // Precompiled version of Arduino_TensorflowLite
+	//	_, _, err = cli.Run("lib", "install", "Arduino_LSM9DS1")
+	//	require.NoError(t, err)
+	//	_, _, err = cli.Run("lib", "install", "Arduino_TensorflowLite@2.1.1-ALPHA-precompiled")
+	//	require.NoError(t, err)
+
+	//	sketchPath := cli.SketchbookDir().Join("libraries", "Arduino_TensorFlowLite", "examples", "hello_world")
+	//	_, _, err = cli.Run("compile", "-b", "arduino:mbed:nano33ble", sketchPath.String())
+	//	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.7", "--additional-urls="+url)
+	require.NoError(t, err)
+	//	_, _, err = cli.Run("core", "install", "adafruit:samd@1.6.4", "--additional-urls="+url)
+	//	require.NoError(t, err)
+	//	// should work on adafruit too after https://github.com/arduino/arduino-cli/pull/1134
+	//	_, _, err = cli.Run("compile", "-b", "adafruit:samd:adafruit_feather_m4", sketchPath.String())
+	//	require.NoError(t, err)
+
+	//	// Non-precompiled version of Arduino_TensorflowLite
+	//	_, _, err = cli.Run("lib", "install", "Arduino_TensorflowLite@2.1.0-ALPHA")
+	//	require.NoError(t, err)
+	//	_, _, err = cli.Run("compile", "-b", "arduino:mbed:nano33ble", sketchPath.String())
+	//	require.NoError(t, err)
+	//	_, _, err = cli.Run("compile", "-b", "adafruit:samd:adafruit_feather_m4", sketchPath.String())
+	//	require.NoError(t, err)
+
+	// Bosch sensor library
+	_, _, err = cli.Run("lib", "install", "BSEC Software Library@1.5.1474")
+	require.NoError(t, err)
+	sketchPath := cli.SketchbookDir().Join("libraries", "BSEC_Software_Library", "examples", "basic")
+	_, _, err = cli.Run("compile", "-b", "arduino:samd:mkr1000", sketchPath.String())
+	require.NoError(t, err)
+	_, _, err = cli.Run("compile", "-b", "arduino:mbed:nano33ble", sketchPath.String())
+	require.NoError(t, err)
+
+	// USBBlaster library
+	_, _, err = cli.Run("lib", "install", "USBBlaster@1.0.0")
+	require.NoError(t, err)
+	sketchPath = cli.SketchbookDir().Join("libraries", "USBBlaster", "examples", "USB_Blaster")
+	_, _, err = cli.Run("compile", "-b", "arduino:samd:mkrvidor4000", sketchPath.String())
+	require.NoError(t, err)
+}
