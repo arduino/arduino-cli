@@ -173,3 +173,9 @@ func (b *Board) IsBoardMatchingIDProperties(query *properties.Map) bool {
 	}
 	return false
 }
+
+// GetMonitorSettings returns the settings for the pluggable monitor of the given protocol
+// and set of board properties.
+func GetMonitorSettings(protocol string, boardProperties *properties.Map) *properties.Map {
+	return boardProperties.SubTree("monitor_port." + protocol)
+}

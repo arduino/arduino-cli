@@ -67,7 +67,7 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 	}
 	defer release()
 
-	m, err := findMonitorForProtocolAndBoard(pme, req.GetPort().GetProtocol(), req.GetFqbn())
+	m, boardSettings, err := findMonitorAndSettingsForProtocolAndBoard(pme, req.GetPort().GetProtocol(), req.GetFqbn())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -82,17 +82,24 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 		return nil, nil, &arduino.FailedMonitorError{Cause: err}
 	}
 
-	monIO, err := m.Open(req.GetPort().GetAddress(), req.GetPort().GetProtocol())
-	if err != nil {
-		m.Quit()
-		return nil, nil, &arduino.FailedMonitorError{Cause: err}
-	}
+	// Apply user-requested settings
 	if portConfig := req.GetPortConfiguration(); portConfig != nil {
 		for _, setting := range portConfig.Settings {
+			boardSettings.Remove(setting.SettingId) // Remove board settings overridden by the user
 			if err := m.Configure(setting.SettingId, setting.Value); err != nil {
 				logrus.Errorf("Could not set configuration %s=%s: %s", setting.SettingId, setting.Value, err)
 			}
 		}
+	}
+	// Apply specific board settings
+	for setting, value := range boardSettings.AsMap() {
+		m.Configure(setting, value)
+	}
+
+	monIO, err := m.Open(req.GetPort().GetAddress(), req.GetPort().GetProtocol())
+	if err != nil {
+		m.Quit()
+		return nil, nil, &arduino.FailedMonitorError{Cause: err}
 	}
 
 	logrus.Infof("Port %s successfully opened", req.GetPort().GetAddress())
@@ -106,24 +113,27 @@ func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggab
 	}, descriptor, nil
 }
 
-func findMonitorForProtocolAndBoard(pme *packagemanager.Explorer, protocol, fqbn string) (*pluggableMonitor.PluggableMonitor, error) {
+func findMonitorAndSettingsForProtocolAndBoard(pme *packagemanager.Explorer, protocol, fqbn string) (*pluggableMonitor.PluggableMonitor, *properties.Map, error) {
 	if protocol == "" {
-		return nil, &arduino.MissingPortProtocolError{}
+		return nil, nil, &arduino.MissingPortProtocolError{}
 	}
 
 	var monitorDepOrRecipe *cores.MonitorDependency
+	boardSettings := properties.NewMap()
 
 	// If a board is specified search the monitor in the board package first
 	if fqbn != "" {
 		fqbn, err := cores.ParseFQBN(fqbn)
 		if err != nil {
-			return nil, &arduino.InvalidFQBNError{Cause: err}
+			return nil, nil, &arduino.InvalidFQBNError{Cause: err}
 		}
 
 		_, boardPlatform, _, boardProperties, _, err := pme.ResolveFQBN(fqbn)
 		if err != nil {
-			return nil, &arduino.UnknownFQBNError{Cause: err}
+			return nil, nil, &arduino.UnknownFQBNError{Cause: err}
 		}
+
+		boardSettings = cores.GetMonitorSettings(protocol, boardProperties)
 
 		if mon, ok := boardPlatform.Monitors[protocol]; ok {
 			monitorDepOrRecipe = mon
@@ -132,10 +142,10 @@ func findMonitorForProtocolAndBoard(pme *packagemanager.Explorer, protocol, fqbn
 			cmdLine := boardProperties.ExpandPropsInString(recipe)
 			cmdArgs, err := properties.SplitQuotedString(cmdLine, `"'`, false)
 			if err != nil {
-				return nil, &arduino.InvalidArgumentError{Message: tr("Invalid recipe in platform.txt"), Cause: err}
+				return nil, nil, &arduino.InvalidArgumentError{Message: tr("Invalid recipe in platform.txt"), Cause: err}
 			}
 			id := fmt.Sprintf("%s-%s", boardPlatform, protocol)
-			return pluggableMonitor.New(id, cmdArgs...), nil
+			return pluggableMonitor.New(id, cmdArgs...), boardSettings, nil
 		}
 	}
 
@@ -150,17 +160,17 @@ func findMonitorForProtocolAndBoard(pme *packagemanager.Explorer, protocol, fqbn
 	}
 
 	if monitorDepOrRecipe == nil {
-		return nil, &arduino.NoMonitorAvailableForProtocolError{Protocol: protocol}
+		return nil, nil, &arduino.NoMonitorAvailableForProtocolError{Protocol: protocol}
 	}
 
 	// If it is a monitor dependency, resolve tool and create a monitor client
 	tool := pme.FindMonitorDependency(monitorDepOrRecipe)
 	if tool == nil {
-		return nil, &arduino.MonitorNotFoundError{Monitor: monitorDepOrRecipe.String()}
+		return nil, nil, &arduino.MonitorNotFoundError{Monitor: monitorDepOrRecipe.String()}
 	}
 
 	return pluggableMonitor.New(
 		monitorDepOrRecipe.Name,
 		tool.InstallDir.Join(monitorDepOrRecipe.Name).String(),
-	), nil
+	), boardSettings, nil
 }

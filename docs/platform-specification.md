@@ -903,6 +903,47 @@ will allow all legacy non-pluggable platforms to migrate to pluggable monitor wi
 
 For detailed information, see the [Pluggable Monitor specification](pluggable-monitor-specification.md).
 
+#### Port configuration
+
+Each pluggable monitor has its own default settings that can be overridden using the following board properties:
+
+```
+BOARD_ID.monitor_port.PROTOCOL.SETTING_NAME=SETTING_VALUE
+```
+
+where:
+
+- `BOARD_ID` is the board identifier
+- `PROTOCOL` is the port protocol
+- `SETTING_NAME` and `SETTING_VALUE` are the port setting and the desired value
+
+For example, let's suppose that a board needs the `baudrate` setting of the `serial` port to be `9600`, then the
+corresponding properties in the `boards.txt` file will be:
+
+```
+myboard.monitor_port.serial.baudrate=9600
+```
+
+The settings available in a specific pluggable monitor can be
+[queried directly from it](pluggable-monitor-specification.md#describe-command).
+
+#### Legacy `serial.disableRTS` and `serial.disableDTR` properties
+
+In the old Arduino IDE (<=1.8.x) we used the properties:
+
+```
+BOARD_ID.serial.disableRTS=true
+BOARD_ID.serial.disableDTR=true
+```
+
+to disable RTS and DTR when opening the serial monitor. To keep backward compatibilty the properties above are
+automatically converted to the corresponding pluggable monitor properties:
+
+```
+BOARD_ID.monitor_port.serial.rts=off
+BOARD_ID.monitor_port.serial.dtr=off
+```
+
 ### Verbose parameter
 
 It is possible for the user to enable verbosity from the Preferences panel of the IDEs or Arduino CLI's `--verbose`

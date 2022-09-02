@@ -504,6 +504,7 @@ func (pm *Builder) loadBoards(platform *cores.PlatformRelease) error {
 			convertVidPidIdentificationPropertiesToPluggableDiscovery(boardProperties)
 			convertUploadToolsToPluggableDiscovery(boardProperties)
 		}
+		convertLegacySerialPortRTSDTRSettingsToPluggableMonitor(boardProperties)
 
 		// The board's ID must be available in a board's properties since it can
 		// be used in all configuration files for several reasons, like setting compilation
@@ -525,6 +526,42 @@ func (pm *Builder) loadBoards(platform *cores.PlatformRelease) error {
 
 // Converts the old:
 //
+//   - xxx.serial.disableRTS=true
+//   - xxx.serial.disableDTR=true
+//
+// properties into pluggable monitor compatible:
+//
+//   - xxx.monitor_port.serial.rts=off
+//   - xxx.monitor_port.serial.dtr=off
+func convertLegacySerialPortRTSDTRSettingsToPluggableMonitor(boardProperties *properties.Map) {
+	disabledToOnOff := func(k string) string {
+		if boardProperties.GetBoolean(k) {
+			return "off" // Disabled
+		}
+		return "on" // Not disabled
+	}
+	if boardProperties.ContainsKey("serial.disableDTR") {
+		boardProperties.Set("monitor_port.serial.dtr", disabledToOnOff("serial.disableDTR"))
+	}
+	if boardProperties.ContainsKey("serial.disableRTS") {
+		boardProperties.Set("monitor_port.serial.rts", disabledToOnOff("serial.disableRTS"))
+	}
+	for _, k := range boardProperties.Keys() {
+		if strings.HasSuffix(k, ".serial.disableDTR") {
+			boardProperties.Set(
+				strings.TrimSuffix(k, ".serial.disableDTR")+".monitor_port.serial.dtr",
+				disabledToOnOff(k))
+		}
+		if strings.HasSuffix(k, ".serial.disableRTS") {
+			boardProperties.Set(
+				strings.TrimSuffix(k, ".serial.disableRTS")+".monitor_port.serial.rts",
+				disabledToOnOff(k))
+		}
+	}
+}
+
+// Converts the old:
+//
 //   - xxx.vid.N
 //   - xxx.pid.N
 //
@@ -532,7 +569,6 @@ func (pm *Builder) loadBoards(platform *cores.PlatformRelease) error {
 //
 //   - xxx.upload_port.N.vid
 //   - xxx.upload_port.N.pid
-//
 func convertVidPidIdentificationPropertiesToPluggableDiscovery(boardProperties *properties.Map) {
 	n := 0
 	outputVidPid := func(vid, pid string) {
