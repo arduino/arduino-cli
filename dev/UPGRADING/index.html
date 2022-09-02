@@ -326,6 +326,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#removed-utilsfeedstreamto-and-utilsconsumestreamfrom" class="md-nav__link">
+    Removed utils.FeedStreamTo and utils.ConsumeStreamFrom
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2003,6 +2010,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#removed-utilsfeedstreamto-and-utilsconsumestreamfrom" class="md-nav__link">
+    Removed utils.FeedStreamTo and utils.ConsumeStreamFrom
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2818,6 +2832,10 @@ directory.</p>
 <li><code>github.com/arduino/arduino-cli/configuration.BundleToolsDirectories</code> has been renamed to <code>BuiltinToolsDirectories</code></li>
 <li><code>github.com/arduino/arduino-cli/configuration.IDEBundledLibrariesDir</code> has been renamed to <code>IDEBuiltinLibrariesDir</code></li>
 </ul>
+<h3 id="removed-utilsfeedstreamto-and-utilsconsumestreamfrom">Removed <code>utils.FeedStreamTo</code> and <code>utils.ConsumeStreamFrom</code><a class="headerlink" href="#removed-utilsfeedstreamto-and-utilsconsumestreamfrom" title="Permanent link">&para;</a></h3>
+<p><code>github.com/arduino/arduino-cli/arduino/utils.FeedStreamTo</code> and
+<code>github.com/arduino/arduino-cli/arduino/utils.ConsumeStreamFrom</code> are now private. They are mainly used internally for
+gRPC stream handling and are not suitable to be public API.</p>
 <h2 id="0260">0.26.0<a class="headerlink" href="#0260" title="Permanent link">&para;</a></h2>
 <h3 id="githubcomarduinoarduino-clicommandsdownloadtoolrelease-and-installtoolrelease-functions-have-been-removed"><code>github.com/arduino/arduino-cli/commands.DownloadToolRelease</code>, and <code>InstallToolRelease</code> functions have been removed<a class="headerlink" href="#githubcomarduinoarduino-clicommandsdownloadtoolrelease-and-installtoolrelease-functions-have-been-removed" title="Permanent link">&para;</a></h3>
 <p>This functionality was duplicated and already available via <code>PackageManager</code> methods.</p>
