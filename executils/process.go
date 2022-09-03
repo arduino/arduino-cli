@@ -86,12 +86,22 @@ func (p *Process) StdinPipe() (io.WriteCloser, error) {
 
 // StdoutPipe returns a pipe that will be connected to the command's standard
 // output when the command starts.
+//
+// Wait will close the pipe after seeing the command exit, so most callers
+// need not close the pipe themselves. It is thus incorrect to call Wait
+// before all reads from the pipe have completed.
+// For the same reason, it is incorrect to call Run when using StdoutPipe.
 func (p *Process) StdoutPipe() (io.ReadCloser, error) {
 	return p.cmd.StdoutPipe()
 }
 
 // StderrPipe returns a pipe that will be connected to the command's standard
 // error when the command starts.
+//
+// Wait will close the pipe after seeing the command exit, so most callers
+// need not close the pipe themselves. It is thus incorrect to call Wait
+// before all reads from the pipe have completed.
+// For the same reason, it is incorrect to use Run when using StderrPipe.
 func (p *Process) StderrPipe() (io.ReadCloser, error) {
 	return p.cmd.StderrPipe()
 }

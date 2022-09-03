@@ -143,19 +143,22 @@ func (cli *ArduinoCLI) Run(args ...string) ([]byte, []byte, error) {
 	cli.t.NoError(cliProc.Start())
 
 	var stdoutBuf, stderrBuf bytes.Buffer
-	stdoutCtx, stdoutCancel := context.WithCancel(context.Background())
-	stderrCtx, stderrCancel := context.WithCancel(context.Background())
+	var wg sync.WaitGroup
+	wg.Add(2)
 	go func() {
-		io.Copy(&stdoutBuf, io.TeeReader(stdout, os.Stdout))
-		stdoutCancel()
+		defer wg.Done()
+		if _, err := io.Copy(&stdoutBuf, io.TeeReader(stdout, os.Stdout)); err != nil {
+			fmt.Println(color.HiBlackString("<<< stdout copy error:"), err)
+		}
 	}()
 	go func() {
-		io.Copy(&stderrBuf, io.TeeReader(stderr, os.Stderr))
-		stderrCancel()
+		defer wg.Done()
+		if _, err := io.Copy(&stderrBuf, io.TeeReader(stderr, os.Stderr)); err != nil {
+			fmt.Println(color.HiBlackString("<<< stderr copy error:"), err)
+		}
 	}()
+	wg.Wait()
 	cliErr := cliProc.Wait()
-	<-stdoutCtx.Done()
-	<-stderrCtx.Done()
 	fmt.Println(color.HiBlackString("<<< Run completed (err = %v)", cliErr))
 
 	return stdoutBuf.Bytes(), stderrBuf.Bytes(), cliErr
