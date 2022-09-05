@@ -88,7 +88,7 @@ func (p *Process) StdinPipe() (io.WriteCloser, error) {
 // output when the command starts.
 //
 // Wait will close the pipe after seeing the command exit, so most callers
-// need not close the pipe themselves. It is thus incorrect to call Wait
+// don't need to close the pipe themselves. It is thus incorrect to call Wait
 // before all reads from the pipe have completed.
 // For the same reason, it is incorrect to call Run when using StdoutPipe.
 func (p *Process) StdoutPipe() (io.ReadCloser, error) {
@@ -99,7 +99,7 @@ func (p *Process) StdoutPipe() (io.ReadCloser, error) {
 // error when the command starts.
 //
 // Wait will close the pipe after seeing the command exit, so most callers
-// need not close the pipe themselves. It is thus incorrect to call Wait
+// don't need to close the pipe themselves. It is thus incorrect to call Wait
 // before all reads from the pipe have completed.
 // For the same reason, it is incorrect to use Run when using StderrPipe.
 func (p *Process) StderrPipe() (io.ReadCloser, error) {
