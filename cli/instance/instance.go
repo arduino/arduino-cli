@@ -154,7 +154,8 @@ func FirstUpdate(instance *rpc.Instance) error {
 	if packageIndex.NotExist() {
 		_, err := commands.UpdateIndex(context.Background(),
 			&rpc.UpdateIndexRequest{
-				Instance: instance,
+				Instance:                   instance,
+				IgnoreCustomPackageIndexes: true,
 			},
 			output.ProgressBar(),
 		)

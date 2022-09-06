@@ -233,6 +233,8 @@ message DestroyResponse {}
 message UpdateIndexRequest {
   // Arduino Core Service instance from the Init response.
   Instance instance = 1;
+  // If set to true user defined package indexes will not be updated.
+  bool ignore_custom_package_indexes = 2;
 }
 
 message UpdateIndexResponse {

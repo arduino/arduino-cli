@@ -498,7 +498,9 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 	indexpath := configuration.DataDir(configuration.Settings)
 
 	urls := []string{globals.DefaultIndexURL}
-	urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
+	if !req.GetIgnoreCustomPackageIndexes() {
+		urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
+	}
 	for _, u := range urls {
 		logrus.Info("URL: ", u)
 		URL, err := utils.URLParse(u)
