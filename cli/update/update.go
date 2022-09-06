@@ -56,9 +56,9 @@ func runUpdateCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateInstanceAndRunFirstUpdate()
 	logrus.Info("Executing `arduino-cli update`")
 
-	err := commands.UpdateCoreLibrariesIndex(context.Background(), &rpc.UpdateCoreLibrariesIndexRequest{
-		Instance: inst,
-	}, output.ProgressBar())
+	err := commands.UpdateCoreLibrariesIndex(context.Background(), &rpc.UpdateCoreLibrariesIndexRequest{Instance: inst},
+		output.ProgressBar(),
+		output.PrintErrorFromDownloadResult(tr("Error updating index")))
 	if err != nil {
 		feedback.Errorf(tr("Error updating core and libraries index: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
