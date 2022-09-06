@@ -2,6 +2,60 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## 0.28.0
+
+### Breaking changes in UpdateIndex API (both gRPC and go-lang)
+
+The gRPC message `cc.arduino.cli.commands.v1.UpdateIndexResponse` has been changed from:
+
+```
+message UpdateIndexResponse {
+  // Progress of the platforms index download.
+  DownloadProgress download_progress = 1;
+}
+```
+
+to
+
+```
+message UpdateIndexResponse {
+  oneof message {
+    // Progress of the platforms index download.
+    DownloadProgress download_progress = 1;
+    // Report of the index update downloads.
+    DownloadResult download_result = 2;
+  }
+}
+
+message DownloadResult {
+  // Index URL.
+  string url = 1;
+  // Download result: true if successful, false if an error occurred.
+  bool successful = 2;
+  // Download error details.
+  string error = 3;
+}
+```
+
+even if not strictly a breaking change it's worth noting that the detailed error message is now streamed in the
+response. About the go-lang API the following functions in `github.com/arduino/arduino-cli/commands`:
+
+```go
+func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rpc.DownloadProgressCB) (*rpc.UpdateIndexResponse, error) { ... }
+func UpdateCoreLibrariesIndex(ctx context.Context, req *rpc.UpdateCoreLibrariesIndexRequest, downloadCB rpc.DownloadProgressCB) error { ... }
+```
+
+have changed their signature to:
+
+```go
+func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rpc.DownloadProgressCB, downloadResultCB rpc.DownloadResultCB) error { ... }
+func UpdateCoreLibrariesIndex(ctx context.Context, req *rpc.UpdateCoreLibrariesIndexRequest, downloadCB rpc.DownloadProgressCB, downloadResultCB rpc.DownloadResultCB) error { ... }
+```
+
+`UpdateIndex` do not return anymore the latest `UpdateIndexResponse` (it was always empty). Both `UpdateIndex` and
+`UpdateCoreLibrariesIndex` now accepts an `rpc.DownloadResultCB` to get download results, you can pass an empty callback
+if you're not interested in the error details.
+
 ## 0.27.0
 
 ### Breaking changes in golang API `github.com/arduino/arduino-cli/arduino/cores/packagemanager.PackageManager`
