@@ -58,7 +58,7 @@ require (
 )
 
 require (
-	go.bug.st/testifyjson v1.0.0
+	go.bug.st/testifyjson v1.1.0
 	go.bug.st/testsuite v0.1.0
 )
 
