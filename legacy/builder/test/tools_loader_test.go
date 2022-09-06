@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
@@ -178,4 +179,21 @@ func TestLoadLotsOfTools(t *testing.T) {
 	idx++
 	require.Equal(t, "arduino:openocd@0.9.0-arduino", tools[idx].String())
 	requireEquivalentPaths(t, tools[idx].InstallDir.String(), "downloaded_board_manager_stuff/arduino/tools/openocd/0.9.0-arduino")
+}
+
+func TestAllToolsContextIsPopulated(t *testing.T) {
+	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "")
+	pmb.LoadHardwareFromDirectories(paths.NewPathList("downloaded_board_manager_stuff"))
+	pmb.LoadToolsFromBundleDirectory(paths.New("downloaded_tools", "tools_builtin"))
+	pm := pmb.Build()
+	pme, release := pm.NewExplorer()
+	defer release()
+
+	ctx := &types.Context{
+		PackageManager: pme,
+	}
+
+	hl := &builder.HardwareLoader{}
+	require.NoError(t, hl.Run(ctx))
+	require.NotEmpty(t, ctx.AllTools)
 }
