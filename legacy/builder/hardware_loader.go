@@ -50,11 +50,10 @@ func (s *HardwareLoader) Run(ctx *types.Context) error {
 
 		pm := pmb.Build()
 		pme, _ /* never release... */ := pm.NewExplorer()
-
-		ctx.AllTools = pme.GetAllInstalledToolsReleases()
 		ctx.PackageManager = pme
 	}
 
+	ctx.AllTools = ctx.PackageManager.GetAllInstalledToolsReleases()
 	ctx.Hardware = ctx.PackageManager.GetPackages()
 	return nil
 }
