@@ -555,6 +555,7 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 				Error: err.Error(),
 			})
 			failed = true
+			continue
 		}
 
 		downloadResultCB(&rpc.DownloadResult{
