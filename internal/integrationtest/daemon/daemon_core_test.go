@@ -79,21 +79,21 @@ func analyzeUpdateIndexStream(t *testing.T, cl commands.ArduinoCoreService_Updat
 		fmt.Printf("UPDATE> %+v\n", msg)
 		if progress := msg.GetDownloadProgress(); progress != nil {
 			if progress.Url != "" && progress.Url != ongoingDownload {
-				require.Empty(t, ongoingDownload, "DownloadProgress: initiated a new download with closing the previous one")
+				require.Empty(t, ongoingDownload, "DownloadProgress: started a download without 'completing' the previous one")
 				ongoingDownload = progress.Url
 			}
 			if progress.Completed {
-				require.NotEmpty(t, ongoingDownload, "DownloadProgress: sent a 'completed' download message without starting it")
+				require.NotEmpty(t, ongoingDownload, "DownloadProgress: received a 'completed' notification but never initiated a download")
 				ongoingDownload = ""
 			}
 			if progress.Downloaded > 0 {
-				require.NotEmpty(t, ongoingDownload, "DownloadProgress: sent an update but never initiated a download")
+				require.NotEmpty(t, ongoingDownload, "DownloadProgress: received a download update but never initiated a download")
 			}
 		} else if result := msg.GetDownloadResult(); result != nil {
-			require.Empty(t, ongoingDownload, "DownloadResult: got a download result with closing it first")
+			require.Empty(t, ongoingDownload, "DownloadResult: got a download result without completing the current download first")
 			results[result.Url] = result
 		} else {
-			require.FailNow(t, "DownloadProgress: received a message without a Progress or a Result")
+			require.FailNow(t, "DownloadProgress: received an empty message (without a Progress or a Result)")
 		}
 	}
 }
