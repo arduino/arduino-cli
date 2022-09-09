@@ -277,6 +277,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0280" class="md-nav__link">
+    0.28.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.28.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes-in-updateindex-api-both-grpc-and-go-lang" class="md-nav__link">
+    Breaking changes in UpdateIndex API (both gRPC and go-lang)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0270" class="md-nav__link">
     0.27.0
   </a>
@@ -1961,6 +1981,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0280" class="md-nav__link">
+    0.28.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.28.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes-in-updateindex-api-both-grpc-and-go-lang" class="md-nav__link">
+    Breaking changes in UpdateIndex API (both gRPC and go-lang)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0270" class="md-nav__link">
     0.27.0
   </a>
@@ -2588,6 +2628,45 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<h2 id="0280">0.28.0<a class="headerlink" href="#0280" title="Permanent link">&para;</a></h2>
+<h3 id="breaking-changes-in-updateindex-api-both-grpc-and-go-lang">Breaking changes in UpdateIndex API (both gRPC and go-lang)<a class="headerlink" href="#breaking-changes-in-updateindex-api-both-grpc-and-go-lang" title="Permanent link">&para;</a></h3>
+<p>The gRPC message <code>cc.arduino.cli.commands.v1.UpdateIndexResponse</code> has been changed from:</p>
+<div class="highlight"><pre><span></span><code>message UpdateIndexResponse {
+  // Progress of the platforms index download.
+  DownloadProgress download_progress = 1;
+}
+</code></pre></div>
+<p>to</p>
+<div class="highlight"><pre><span></span><code>message UpdateIndexResponse {
+  oneof message {
+    // Progress of the platforms index download.
+    DownloadProgress download_progress = 1;
+    // Report of the index update downloads.
+    DownloadResult download_result = 2;
+  }
+}
+
+message DownloadResult {
+  // Index URL.
+  string url = 1;
+  // Download result: true if successful, false if an error occurred.
+  bool successful = 2;
+  // Download error details.
+  string error = 3;
+}
+</code></pre></div>
+<p>even if not strictly a breaking change it's worth noting that the detailed error message is now streamed in the
+response. About the go-lang API the following functions in <code>github.com/arduino/arduino-cli/commands</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">UpdateIndex</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UpdateIndexRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">downloadCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UpdateIndexResponse</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="nx">UpdateCoreLibrariesIndex</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UpdateCoreLibrariesIndexRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">downloadCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>have changed their signature to:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">UpdateIndex</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UpdateIndexRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">downloadCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">,</span><span class="w"> </span><span class="nx">downloadResultCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadResultCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="nx">UpdateCoreLibrariesIndex</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UpdateCoreLibrariesIndexRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">downloadCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">,</span><span class="w"> </span><span class="nx">downloadResultCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadResultCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p><code>UpdateIndex</code> do not return anymore the latest <code>UpdateIndexResponse</code> (it was always empty). Both <code>UpdateIndex</code> and
+<code>UpdateCoreLibrariesIndex</code> now accepts an <code>rpc.DownloadResultCB</code> to get download results, you can pass an empty callback
+if you're not interested in the error details.</p>
 <h2 id="0270">0.27.0<a class="headerlink" href="#0270" title="Permanent link">&para;</a></h2>
 <h3 id="breaking-changes-in-golang-api-githubcomarduinoarduino-cliarduinocorespackagemanagerpackagemanager">Breaking changes in golang API <code>github.com/arduino/arduino-cli/arduino/cores/packagemanager.PackageManager</code><a class="headerlink" href="#breaking-changes-in-golang-api-githubcomarduinoarduino-cliarduinocorespackagemanagerpackagemanager" title="Permanent link">&para;</a></h3>
 <p>The <code>PackageManager</code> API has been heavily refactored to correctly handle multitasking and concurrency. Many fields in

@@ -1317,6 +1317,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#downloadresult" class="md-nav__link">
+    DownloadResult
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#initrequest" class="md-nav__link">
     InitRequest
   </a>
@@ -2647,6 +2654,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#downloadresult" class="md-nav__link">
+    DownloadResult
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#initrequest" class="md-nav__link">
     InitRequest
   </a>
@@ -3533,6 +3547,7 @@
 <li><a href="#cc.arduino.cli.commands.v1.CreateResponse">CreateResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.DestroyRequest">DestroyRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.DestroyResponse">DestroyResponse</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.DownloadResult">DownloadResult</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.InitRequest">InitRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.InitResponse">InitResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.InitResponse.Progress">InitResponse.Progress</a></li>
@@ -4529,6 +4544,38 @@
 </table>
 <p><a name="cc.arduino.cli.commands.v1.DestroyResponse"></a></p>
 <h3 id="destroyresponse">DestroyResponse<a class="headerlink" href="#destroyresponse" title="Permanent link">&para;</a></h3>
+<p><a name="cc.arduino.cli.commands.v1.DownloadResult"></a></p>
+<h3 id="downloadresult">DownloadResult<a class="headerlink" href="#downloadresult" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>url</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Index URL.</td>
+</tr>
+<tr>
+<td>successful</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>Download result: true if successful, false if an error occurred.</td>
+</tr>
+<tr>
+<td>error</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Download error details.</td>
+</tr>
+</tbody>
+</table>
 <p><a name="cc.arduino.cli.commands.v1.InitRequest"></a></p>
 <h3 id="initrequest">InitRequest<a class="headerlink" href="#initrequest" title="Permanent link">&para;</a></h3>
 <table>
@@ -4845,6 +4892,12 @@
 <td></td>
 <td>Arduino Core Service instance from the Init response.</td>
 </tr>
+<tr>
+<td>ignore_custom_package_indexes</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>If set to true user defined package indexes will not be updated.</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.UpdateIndexResponse"></a></p>
@@ -4864,6 +4917,12 @@
 <td><a href="#cc.arduino.cli.commands.v1.DownloadProgress">DownloadProgress</a></td>
 <td></td>
 <td>Progress of the platforms index download.</td>
+</tr>
+<tr>
+<td>download_result</td>
+<td><a href="#cc.arduino.cli.commands.v1.DownloadResult">DownloadResult</a></td>
+<td></td>
+<td>Report of the index update downloads.</td>
 </tr>
 </tbody>
 </table>
