@@ -161,7 +161,10 @@ func (cli *ArduinoCLI) Run(args ...string) ([]byte, []byte, error) {
 	cliErr := cliProc.Wait()
 	fmt.Println(color.HiBlackString("<<< Run completed (err = %v)", cliErr))
 
-	return stdoutBuf.Bytes(), stderrBuf.Bytes(), cliErr
+	errBuf := stderrBuf.Bytes()
+	cli.t.NotContains(string(errBuf), "panic: runtime error:", "arduino-cli panicked")
+
+	return stdoutBuf.Bytes(), errBuf, cliErr
 }
 
 // StartDaemon starts the Arduino CLI daemon. It returns the address of the daemon.
