@@ -490,20 +490,29 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 }
 
 // UpdateIndex FIXMEDOC
-func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rpc.DownloadProgressCB) (*rpc.UpdateIndexResponse, error) {
+func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rpc.DownloadProgressCB, downloadResultCB rpc.DownloadResultCB) error {
 	if instances.GetInstance(req.GetInstance().GetId()) == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return &arduino.InvalidInstanceError{}
 	}
 
 	indexpath := configuration.DataDir(configuration.Settings)
 
 	urls := []string{globals.DefaultIndexURL}
-	urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
+	if !req.GetIgnoreCustomPackageIndexes() {
+		urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
+	}
+
+	failed := false
 	for _, u := range urls {
 		logrus.Info("URL: ", u)
 		URL, err := utils.URLParse(u)
 		if err != nil {
 			logrus.Warnf("unable to parse additional URL: %s", u)
+			downloadResultCB(&rpc.DownloadResult{
+				Url:   u,
+				Error: fmt.Sprintf("%s: %v", tr("Unable to parse URL"), err),
+			})
+			failed = true
 			continue
 		}
 
@@ -512,7 +521,12 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 		if URL.Scheme == "file" {
 			path := paths.New(URL.Path)
 			if _, err := packageindex.LoadIndexNoSign(path); err != nil {
-				return nil, &arduino.InvalidArgumentError{Message: tr("Invalid package index in %s", path), Cause: err}
+				downloadResultCB(&rpc.DownloadResult{
+					Url:   u,
+					Error: fmt.Sprintf("%s: %v", tr("Invalid package index in %s", path), err),
+				})
+				failed = true
+				continue
 			}
 
 			fi, _ := os.Stat(path.String())
@@ -521,6 +535,10 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 				TotalSize: fi.Size(),
 			})
 			downloadCB(&rpc.DownloadProgress{Completed: true})
+			downloadResultCB(&rpc.DownloadResult{
+				Url:        u,
+				Successful: true,
+			})
 			continue
 		}
 
@@ -532,18 +550,31 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 			indexResource.SignatureURL.Path += ".sig"
 		}
 		if err := indexResource.Download(indexpath, downloadCB); err != nil {
-			return nil, err
+			downloadResultCB(&rpc.DownloadResult{
+				Url:   u,
+				Error: err.Error(),
+			})
+			failed = true
+			continue
 		}
+
+		downloadResultCB(&rpc.DownloadResult{
+			Url:        u,
+			Successful: true,
+		})
 	}
 
-	return &rpc.UpdateIndexResponse{}, nil
+	if failed {
+		return &arduino.FailedDownloadError{Message: tr("Some indexes could not be updated.")}
+	}
+	return nil
 }
 
 // UpdateCoreLibrariesIndex updates both Cores and Libraries indexes
-func UpdateCoreLibrariesIndex(ctx context.Context, req *rpc.UpdateCoreLibrariesIndexRequest, downloadCB rpc.DownloadProgressCB) error {
-	_, err := UpdateIndex(ctx, &rpc.UpdateIndexRequest{
+func UpdateCoreLibrariesIndex(ctx context.Context, req *rpc.UpdateCoreLibrariesIndexRequest, downloadCB rpc.DownloadProgressCB, downloadResultCB rpc.DownloadResultCB) error {
+	err := UpdateIndex(ctx, &rpc.UpdateIndexRequest{
 		Instance: req.Instance,
-	}, downloadCB)
+	}, downloadCB, downloadResultCB)
 	if err != nil {
 		return err
 	}

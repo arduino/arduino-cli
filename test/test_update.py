@@ -61,10 +61,7 @@ def test_update_with_url_not_found(run_command, httpserver):
     res = run_command(["update", f"--additional-urls={url}"])
     assert res.failed
     lines = [l.strip() for l in res.stderr.splitlines()]
-    assert (
-        f"Error updating core and libraries index: Error downloading index '{url}':"
-        " Server responded with: 404 NOT FOUND" in lines
-    )
+    assert f"Error updating index: Error downloading index '{url}': Server responded with: 404 NOT FOUND" in lines
 
 
 def test_update_with_url_internal_server_error(run_command, httpserver):
@@ -78,8 +75,8 @@ def test_update_with_url_internal_server_error(run_command, httpserver):
     assert res.failed
     lines = [l.strip() for l in res.stderr.splitlines()]
     assert (
-        f"Error updating core and libraries index: Error downloading index '{url}':"
-        " Server responded with: 500 INTERNAL SERVER ERROR" in lines
+        f"Error updating index: Error downloading index '{url}': Server responded with: 500 INTERNAL SERVER ERROR"
+        in lines
     )
 
 

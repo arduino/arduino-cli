@@ -50,6 +50,7 @@ func DownloadFile(path *paths.Path, URL string, label string, downloadCB rpc.Dow
 		Url:       d.URL,
 		TotalSize: d.Size(),
 	})
+	defer downloadCB(&rpc.DownloadProgress{Completed: true})
 
 	err = d.RunAndPoll(func(downloaded int64) {
 		downloadCB(&rpc.DownloadProgress{Downloaded: downloaded})
@@ -63,7 +64,6 @@ func DownloadFile(path *paths.Path, URL string, label string, downloadCB rpc.Dow
 		return &arduino.FailedDownloadError{Message: tr("Server responded with: %s", d.Resp.Status)}
 	}
 
-	downloadCB(&rpc.DownloadProgress{Completed: true})
 	return nil
 }
 

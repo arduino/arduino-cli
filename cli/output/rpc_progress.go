@@ -18,6 +18,7 @@ package output
 import (
 	"fmt"
 
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/cmaglie/pb"
@@ -37,6 +38,21 @@ func ProgressBar() rpc.DownloadProgressCB {
 	}
 	return func(curr *rpc.DownloadProgress) {
 		// XXX: Output progress in JSON?
+	}
+}
+
+// PrintErrorFromDownloadResult returns a DownloadResultCB that only prints
+// the errors with the give message prefixed.
+func PrintErrorFromDownloadResult(msg string) rpc.DownloadResultCB {
+	if OutputFormat != "json" {
+		return func(res *rpc.DownloadResult) {
+			if !res.GetSuccessful() {
+				feedback.Errorf("%s: %s", msg, res.GetError())
+			}
+		}
+	}
+	return func(res *rpc.DownloadResult) {
+		// XXX: Output result in JSON?
 	}
 }
 

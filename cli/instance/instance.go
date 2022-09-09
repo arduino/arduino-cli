@@ -152,12 +152,13 @@ func FirstUpdate(instance *rpc.Instance) error {
 	// similarly to the library update we download that file and all the other package indexes
 	// from additional_urls
 	if packageIndex.NotExist() {
-		_, err := commands.UpdateIndex(context.Background(),
+		err := commands.UpdateIndex(context.Background(),
 			&rpc.UpdateIndexRequest{
-				Instance: instance,
+				Instance:                   instance,
+				IgnoreCustomPackageIndexes: true,
 			},
 			output.ProgressBar(),
-		)
+			output.PrintErrorFromDownloadResult(tr("Error updating index")))
 		if err != nil {
 			return err
 		}

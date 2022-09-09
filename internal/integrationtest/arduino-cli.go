@@ -367,3 +367,14 @@ func (inst *ArduinoCLIInstance) LibraryUninstall(ctx context.Context, name, vers
 	logCallf(">>> LibraryUninstall(%+v)\n", req)
 	return installCl, err
 }
+
+// UpdateIndex calls the "UpdateIndex" gRPC method.
+func (inst *ArduinoCLIInstance) UpdateIndex(ctx context.Context, ignoreCustomPackages bool) (commands.ArduinoCoreService_UpdateIndexClient, error) {
+	req := &commands.UpdateIndexRequest{
+		Instance:                   inst.instance,
+		IgnoreCustomPackageIndexes: ignoreCustomPackages,
+	}
+	updCl, err := inst.cli.daemonClient.UpdateIndex(ctx, req)
+	logCallf(">>> UpdateIndex(%+v)\n", req)
+	return updCl, err
+}
