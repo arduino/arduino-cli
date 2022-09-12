@@ -98,6 +98,7 @@ func NewArduinoCliWithinEnvironment(env *testsuite.Environment, config *ArduinoC
 	}
 
 	cli.cliEnvVars = []string{
+		"LANG=en",
 		fmt.Sprintf("ARDUINO_DATA_DIR=%s", cli.dataDir),
 		fmt.Sprintf("ARDUINO_DOWNLOADS_DIR=%s", cli.stagingDir),
 		fmt.Sprintf("ARDUINO_SKETCHBOOK_DIR=%s", cli.sketchbookDir),

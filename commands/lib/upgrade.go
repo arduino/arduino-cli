@@ -48,10 +48,19 @@ func LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.Downloa
 func LibraryUpgrade(ctx context.Context, req *rpc.LibraryUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(req)
 
-	// get the libs to upgrade
-	lib := filterByName(listLibraries(lm, true, true), req.GetName())
+	// Get the library to upgrade
+	name := req.GetName()
+	lib := filterByName(listLibraries(lm, false, false), name)
+	if lib == nil {
+		// library not installed...
+		return &arduino.LibraryNotFoundError{Library: name}
+	}
+	if lib.Available == nil {
+		taskCB(&rpc.TaskProgress{Message: tr("Library %s is already at the latest version", name), Completed: true})
+		return nil
+	}
 
-	// do it
+	// Install update
 	return upgrade(lm, []*installedLib{lib}, downloadCB, taskCB)
 }
 
