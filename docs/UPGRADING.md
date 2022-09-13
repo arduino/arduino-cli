@@ -58,55 +58,96 @@ replacement.
 
 ### Breaking changes in UpdateIndex API (both gRPC and go-lang)
 
-The gRPC message `cc.arduino.cli.commands.v1.UpdateIndexResponse` has been changed from:
+The gRPC message `cc.arduino.cli.commands.v1.DownloadProgress` has been changed from:
 
 ```
-message UpdateIndexResponse {
-  // Progress of the platforms index download.
-  DownloadProgress download_progress = 1;
+message DownloadProgress {
+  // URL of the download.
+  string url = 1;
+  // The file being downloaded.
+  string file = 2;
+  // Total size of the file being downloaded.
+  int64 total_size = 3;
+  // Size of the downloaded portion of the file.
+  int64 downloaded = 4;
+  // Whether the download is complete.
+  bool completed = 5;
 }
 ```
 
 to
 
 ```
-message UpdateIndexResponse {
+message DownloadProgress {
   oneof message {
-    // Progress of the platforms index download.
-    DownloadProgress download_progress = 1;
-    // Report of the index update downloads.
-    DownloadResult download_result = 2;
+    DownloadProgressStart start = 1;
+    DownloadProgressUpdate update = 2;
+    DownloadProgressEnd end = 3;
   }
 }
 
-message DownloadResult {
-  // Index URL.
+message DownloadProgressStart {
+  // URL of the download.
   string url = 1;
-  // Download result: true if successful, false if an error occurred.
-  bool successful = 2;
-  // Download error details.
-  string error = 3;
+  // The label to display on the progress bar.
+  string label = 2;
+}
+
+message DownloadProgressUpdate {
+  // Size of the downloaded portion of the file.
+  int64 downloaded = 1;
+  // Total size of the file being downloaded.
+  int64 total_size = 2;
+}
+
+message DownloadProgressEnd {
+  // True if the download is successful
+  bool success = 1;
+  // Info or error message, depending on the value of 'success'. Some examples:
+  // "File xxx already downloaded" or "Connection timeout"
+  string message = 2;
 }
 ```
 
-even if not strictly a breaking change it's worth noting that the detailed error message is now streamed in the
-response. About the go-lang API the following functions in `github.com/arduino/arduino-cli/commands`:
+The new message format allows a better handling of the progress update reports on downloads. Every download now will
+report a sequence of message as follows:
+
+```
+DownloadProgressStart{url="https://...", label="Downloading package index..."}
+DownloadProgressUpdate{downloaded=0, total_size=103928}
+DownloadProgressUpdate{downloaded=29380, total_size=103928}
+DownloadProgressUpdate{downloaded=69540, total_size=103928}
+DownloadProgressEnd{success=true, message=""}
+```
+
+or if an error occurs:
+
+```
+DownloadProgressStart{url="https://...", label="Downloading package index..."}
+DownloadProgressUpdate{downloaded=0, total_size=103928}
+DownloadProgressEnd{success=false, message="Server closed connection"}
+```
+
+or if the file is already cached:
+
+```
+DownloadProgressStart{url="https://...", label="Downloading package index..."}
+DownloadProgressEnd{success=true, message="Index already downloaded"}
+```
+
+About the go-lang API the following functions in `github.com/arduino/arduino-cli/commands`:
 
 ```go
 func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rpc.DownloadProgressCB) (*rpc.UpdateIndexResponse, error) { ... }
-func UpdateCoreLibrariesIndex(ctx context.Context, req *rpc.UpdateCoreLibrariesIndexRequest, downloadCB rpc.DownloadProgressCB) error { ... }
 ```
 
 have changed their signature to:
 
 ```go
 func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rpc.DownloadProgressCB, downloadResultCB rpc.DownloadResultCB) error { ... }
-func UpdateCoreLibrariesIndex(ctx context.Context, req *rpc.UpdateCoreLibrariesIndexRequest, downloadCB rpc.DownloadProgressCB, downloadResultCB rpc.DownloadResultCB) error { ... }
 ```
 
-`UpdateIndex` do not return anymore the latest `UpdateIndexResponse` (it was always empty). Both `UpdateIndex` and
-`UpdateCoreLibrariesIndex` now accepts an `rpc.DownloadResultCB` to get download results, you can pass an empty callback
-if you're not interested in the error details.
+`UpdateIndex` do not return anymore the latest `UpdateIndexResponse` (beacuse it was always empty).
 
 ## 0.27.0
 
