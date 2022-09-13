@@ -391,3 +391,85 @@ func TestCompileWithBuildPropertyContainingQuotes(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), `-DMY_DEFINE=\"hello world\"`)
 }
+
+func TestCompileWithMultipleBuildPropertyFlags(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Install Arduino AVR Boards
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	sketchName := "sketch_with_multiple_defines"
+	sketchPath := cli.CopySketch(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	// Compile using multiple build properties separated by a space
+	_, _, err = cli.Run(
+		"compile",
+		"-b",
+		fqbn,
+		"--build-property=compiler.cpp.extra_flags=\"-DPIN=2 -DSSID=\"This is a String\"\"",
+		sketchPath.String(),
+		"--verbose",
+		"--clean",
+	)
+	require.Error(t, err)
+
+	// Compile using multiple build properties separated by a space and properly quoted
+	stdout, _, err := cli.Run(
+		"compile",
+		"-b",
+		fqbn,
+		"--build-property=compiler.cpp.extra_flags=-DPIN=2 \"-DSSID=\"This is a String\"\"",
+		sketchPath.String(),
+		"--verbose",
+		"--clean",
+	)
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "-DPIN=2 \"-DSSID=\\\"This is a String\\\"\"")
+
+	// Tries compilation using multiple build properties separated by a comma
+	_, _, err = cli.Run(
+		"compile",
+		"-b",
+		fqbn,
+		"--build-property=compiler.cpp.extra_flags=\"-DPIN=2,-DSSID=\"This is a String\"\"",
+		sketchPath.String(),
+		"--verbose",
+		"--clean",
+	)
+	require.Error(t, err)
+
+	stdout, _, err = cli.Run(
+		"compile",
+		"-b",
+		fqbn,
+		"--build-property=compiler.cpp.extra_flags=\"-DPIN=2\"",
+		"--build-property=compiler.cpp.extra_flags=\"-DSSID=\"This is a String\"\"",
+		sketchPath.String(),
+		"--verbose",
+		"--clean",
+	)
+	require.Error(t, err)
+	require.NotContains(t, string(stdout), "-DPIN=2")
+	require.Contains(t, string(stdout), "-DSSID=\\\"This is a String\\\"")
+
+	stdout, _, err = cli.Run(
+		"compile",
+		"-b",
+		fqbn,
+		"--build-property=compiler.cpp.extra_flags=\"-DPIN=2\"",
+		"--build-property=build.extra_flags=\"-DSSID=\"hello world\"\"",
+		sketchPath.String(),
+		"--verbose",
+		"--clean",
+	)
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "-DPIN=2")
+	require.Contains(t, string(stdout), "-DSSID=\\\"hello world\\\"")
+}
