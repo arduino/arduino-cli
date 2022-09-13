@@ -25,31 +25,6 @@ import pytest
 from .common import running_on_ci
 
 
-def test_compile_with_build_property_containing_quotes(run_command, data_dir, copy_sketch):
-    # Init the environment explicitly
-    assert run_command(["core", "update-index"])
-
-    # Install Arduino AVR Boards
-    assert run_command(["core", "install", "arduino:avr@1.8.3"])
-
-    sketch_path = copy_sketch("sketch_with_single_string_define")
-    fqbn = "arduino:avr:uno"
-
-    # Compile using a build property with quotes
-    res = run_command(
-        [
-            "compile",
-            "-b",
-            fqbn,
-            '--build-property=build.extra_flags=\\"-DMY_DEFINE=\\"hello world\\"\\"',
-            sketch_path,
-            "--verbose",
-        ]
-    )
-    assert res.ok
-    assert '-DMY_DEFINE=\\"hello world\\"' in res.stdout
-
-
 def test_compile_with_multiple_build_property_flags(run_command, data_dir, copy_sketch, working_dir):
     # Init the environment explicitly
     assert run_command(["core", "update-index"])

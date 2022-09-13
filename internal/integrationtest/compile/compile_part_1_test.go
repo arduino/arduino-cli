@@ -364,3 +364,30 @@ func TestCompileWithBuildPropertiesFlag(t *testing.T) {
 	require.Contains(t, string(stdout), "-DFIRST_PIN=1")
 	require.Contains(t, string(stdout), "-DSECOND_PIN=2")
 }
+
+func TestCompileWithBuildPropertyContainingQuotes(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Install Arduino AVR Boards
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	sketchName := "sketch_with_single_string_define"
+	sketchPath := cli.CopySketch(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	// Compile using a build property with quotes
+	stdout, _, err := cli.Run("compile",
+		"-b",
+		fqbn,
+		`--build-property=build.extra_flags="-DMY_DEFINE="hello world""`,
+		sketchPath.String(),
+		"--verbose")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), `-DMY_DEFINE=\"hello world\"`)
+}
