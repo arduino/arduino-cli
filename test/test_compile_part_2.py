@@ -19,47 +19,6 @@ from pathlib import Path
 import simplejson as json
 
 
-def test_compile_with_custom_build_path(run_command, data_dir):
-    # Init the environment explicitly
-    run_command(["core", "update-index"])
-
-    # Download latest AVR
-    run_command(["core", "install", "arduino:avr"])
-
-    sketch_name = "CompileWithBuildPath"
-    sketch_path = Path(data_dir, sketch_name)
-    fqbn = "arduino:avr:uno"
-
-    # Create a test sketch
-    result = run_command(["sketch", "new", sketch_path])
-    assert result.ok
-    assert f"Sketch created in: {sketch_path}" in result.stdout
-
-    # Test the --build-path flag with absolute path
-    build_path = Path(data_dir, "test_dir", "build_dir")
-    result = run_command(["compile", "-b", fqbn, sketch_path, "--build-path", build_path])
-    print(result.stderr)
-    assert result.ok
-
-    # Verifies expected binaries have been built to build_path
-    assert build_path.exists()
-    assert build_path.is_dir()
-    assert (build_path / f"{sketch_name}.ino.eep").exists()
-    assert (build_path / f"{sketch_name}.ino.elf").exists()
-    assert (build_path / f"{sketch_name}.ino.hex").exists()
-    assert (build_path / f"{sketch_name}.ino.with_bootloader.bin").exists()
-    assert (build_path / f"{sketch_name}.ino.with_bootloader.hex").exists()
-
-    # Verifies there are no binaries in temp directory
-    sketch_path_md5 = hashlib.md5(bytes(sketch_path)).hexdigest().upper()
-    build_dir = Path(tempfile.gettempdir(), f"arduino-sketch-{sketch_path_md5}")
-    assert not (build_dir / f"{sketch_name}.ino.eep").exists()
-    assert not (build_dir / f"{sketch_name}.ino.elf").exists()
-    assert not (build_dir / f"{sketch_name}.ino.hex").exists()
-    assert not (build_dir / f"{sketch_name}.ino.with_bootloader.bin").exists()
-    assert not (build_dir / f"{sketch_name}.ino.with_bootloader.hex").exists()
-
-
 def test_compile_with_export_binaries_env_var(run_command, data_dir, downloads_dir):
     # Init the environment explicitly
     run_command(["core", "update-index"])

@@ -105,3 +105,48 @@ func TestCompileWithExportBinariesFlag(t *testing.T) {
 	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.with_bootloader.bin").String())
 	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.with_bootloader.hex").String())
 }
+
+func TestCompileWithCustomBuildPath(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Download latest AVR
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+
+	sketchName := "CompileWithBuildPath"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	// Create a test sketch
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Test the --build-path flag with absolute path
+	buildPath := cli.DataDir().Join("test_dir", "build_dir")
+	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--build-path", buildPath.String())
+	require.NoError(t, err)
+
+	// Verifies expected binaries have been built to build_path
+	require.DirExists(t, buildPath.String())
+	require.FileExists(t, buildPath.Join(sketchName+".ino.eep").String())
+	require.FileExists(t, buildPath.Join(sketchName+".ino.elf").String())
+	require.FileExists(t, buildPath.Join(sketchName+".ino.hex").String())
+	require.FileExists(t, buildPath.Join(sketchName+".ino.with_bootloader.bin").String())
+	require.FileExists(t, buildPath.Join(sketchName+".ino.with_bootloader.hex").String())
+
+	// Verifies there are no binaries in temp directory
+	md5 := md5.Sum(([]byte(sketchPath.String())))
+	sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
+	require.NotEmpty(t, sketchPathMd5)
+	buildDir := paths.TempDir().Join("arduino-sketch-" + sketchPathMd5)
+	require.NoFileExists(t, buildDir.Join(sketchName+".ino.eep").String())
+	require.NoFileExists(t, buildDir.Join(sketchName+".ino.elf").String())
+	require.NoFileExists(t, buildDir.Join(sketchName+".ino.hex").String())
+	require.NoFileExists(t, buildDir.Join(sketchName+".ino.with_bootloader.bin").String())
+	require.NoFileExists(t, buildDir.Join(sketchName+".ino.with_bootloader.hex").String())
+}
