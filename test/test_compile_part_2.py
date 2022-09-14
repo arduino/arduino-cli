@@ -19,34 +19,6 @@ from pathlib import Path
 import simplejson as json
 
 
-def test_compile_with_export_binaries_flag(run_command, data_dir):
-    # Init the environment explicitly
-    run_command(["core", "update-index"])
-
-    # Download latest AVR
-    run_command(["core", "install", "arduino:avr"])
-
-    sketch_name = "CompileWithExportBinariesFlag"
-    sketch_path = Path(data_dir, sketch_name)
-    fqbn = "arduino:avr:uno"
-
-    # Create a test sketch
-    assert run_command(["sketch", "new", sketch_path])
-
-    # Test the --output-dir flag with absolute path
-    result = run_command(["compile", "-b", fqbn, sketch_path, "--export-binaries"])
-    assert result.ok
-    assert Path(sketch_path, "build").exists()
-    assert Path(sketch_path, "build").is_dir()
-
-    # Verifies binaries are exported when --export-binaries flag is set
-    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.eep").exists()
-    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.elf").exists()
-    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.hex").exists()
-    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.with_bootloader.bin").exists()
-    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.with_bootloader.hex").exists()
-
-
 def test_compile_with_custom_build_path(run_command, data_dir):
     # Init the environment explicitly
     run_command(["core", "update-index"])

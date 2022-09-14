@@ -71,3 +71,37 @@ func TestCompileWithOutputDirFlag(t *testing.T) {
 	require.FileExists(t, outputDir.Join(sketchName+".ino.with_bootloader.bin").String())
 	require.FileExists(t, outputDir.Join(sketchName+".ino.with_bootloader.hex").String())
 }
+
+func TestCompileWithExportBinariesFlag(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Download latest AVR
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+
+	sketchName := "CompileWithExportBinariesFlag"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	// Create a test sketch
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Test the --output-dir flag with absolute path
+	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--export-binaries")
+	require.NoError(t, err)
+	require.DirExists(t, sketchPath.Join("build").String())
+
+	// Verifies binaries are exported when --export-binaries flag is set
+	fqbn = strings.ReplaceAll(fqbn, ":", ".")
+	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.eep").String())
+	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.elf").String())
+	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.hex").String())
+	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.with_bootloader.bin").String())
+	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.with_bootloader.hex").String())
+}
