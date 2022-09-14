@@ -262,19 +262,19 @@ jobs:
           # (all the files we need are in the DIST_DIR root)
           artifacts: ${{ env.DIST_DIR }}/*
 
-      - name: Upload release files on Arduino downloads servers
-        uses: docker://plugins/s3
-        env:
-          PLUGIN_SOURCE: "${{ env.DIST_DIR }}/*"
-          PLUGIN_TARGET: ${{ env.AWS_PLUGIN_TARGET }}
-          PLUGIN_STRIP_PREFIX: "${{ env.DIST_DIR }}/"
-          PLUGIN_BUCKET: ${{ secrets.DOWNLOADS_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # - name: Upload release files on Arduino downloads servers
+      #   uses: docker://plugins/s3
+      #   env:
+      #     PLUGIN_SOURCE: "${{ env.DIST_DIR }}/*"
+      #     PLUGIN_TARGET: ${{ env.AWS_PLUGIN_TARGET }}
+      #     PLUGIN_STRIP_PREFIX: "${{ env.DIST_DIR }}/"
+      #     PLUGIN_BUCKET: ${{ secrets.DOWNLOADS_BUCKET }}
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Update Homebrew formula
-        if: steps.prerelease.outputs.IS_PRE != 'true'
-        uses: dawidd6/action-homebrew-bump-formula@v3
-        with:
-          token: ${{ secrets.ARDUINOBOT_GITHUB_TOKEN }}
-          formula: arduino-cli
+      # - name: Update Homebrew formula
+      #   if: steps.prerelease.outputs.IS_PRE != 'true'
+      #   uses: dawidd6/action-homebrew-bump-formula@v3
+      #   with:
+      #     token: ${{ secrets.ARDUINOBOT_GITHUB_TOKEN }}
+      #     formula: arduino-cli

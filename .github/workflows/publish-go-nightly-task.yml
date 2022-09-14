@@ -234,15 +234,15 @@ jobs:
           TAG="nightly-$(date -u +"%Y%m%d")"
           sha256sum ${{ env.PROJECT_NAME }}_${TAG}* > ${TAG}-checksums.txt
 
-      - name: Upload release files on Arduino downloads servers
-        uses: docker://plugins/s3
-        env:
-          PLUGIN_SOURCE: "${{ env.DIST_DIR }}/*"
-          PLUGIN_TARGET: "${{ env.AWS_PLUGIN_TARGET }}nightly"
-          PLUGIN_STRIP_PREFIX: "${{ env.DIST_DIR }}/"
-          PLUGIN_BUCKET: ${{ secrets.DOWNLOADS_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # - name: Upload release files on Arduino downloads servers
+      #   uses: docker://plugins/s3
+      #   env:
+      #     PLUGIN_SOURCE: "${{ env.DIST_DIR }}/*"
+      #     PLUGIN_TARGET: "${{ env.AWS_PLUGIN_TARGET }}nightly"
+      #     PLUGIN_STRIP_PREFIX: "${{ env.DIST_DIR }}/"
+      #     PLUGIN_BUCKET: ${{ secrets.DOWNLOADS_BUCKET }}
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   report:
     runs-on: ubuntu-latest
