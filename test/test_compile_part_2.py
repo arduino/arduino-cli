@@ -19,46 +19,6 @@ from pathlib import Path
 import simplejson as json
 
 
-def test_compile_with_output_dir_flag(run_command, data_dir):
-    # Init the environment explicitly
-    run_command(["core", "update-index"])
-
-    # Download latest AVR
-    run_command(["core", "install", "arduino:avr"])
-
-    sketch_name = "CompileWithOutputDir"
-    sketch_path = Path(data_dir, sketch_name)
-    fqbn = "arduino:avr:uno"
-
-    # Create a test sketch
-    result = run_command(["sketch", "new", sketch_path])
-    assert result.ok
-    assert f"Sketch created in: {sketch_path}" in result.stdout
-
-    # Test the --output-dir flag with absolute path
-    output_dir = Path(data_dir, "test_dir", "output_dir")
-    result = run_command(["compile", "-b", fqbn, sketch_path, "--output-dir", output_dir])
-    assert result.ok
-
-    # Verifies expected binaries have been built
-    sketch_path_md5 = hashlib.md5(bytes(sketch_path)).hexdigest().upper()
-    build_dir = Path(tempfile.gettempdir(), f"arduino-sketch-{sketch_path_md5}")
-    assert (build_dir / f"{sketch_name}.ino.eep").exists()
-    assert (build_dir / f"{sketch_name}.ino.elf").exists()
-    assert (build_dir / f"{sketch_name}.ino.hex").exists()
-    assert (build_dir / f"{sketch_name}.ino.with_bootloader.bin").exists()
-    assert (build_dir / f"{sketch_name}.ino.with_bootloader.hex").exists()
-
-    # Verifies binaries are exported when --output-dir flag is specified
-    assert output_dir.exists()
-    assert output_dir.is_dir()
-    assert (output_dir / f"{sketch_name}.ino.eep").exists()
-    assert (output_dir / f"{sketch_name}.ino.elf").exists()
-    assert (output_dir / f"{sketch_name}.ino.hex").exists()
-    assert (output_dir / f"{sketch_name}.ino.with_bootloader.bin").exists()
-    assert (output_dir / f"{sketch_name}.ino.with_bootloader.hex").exists()
-
-
 def test_compile_with_export_binaries_flag(run_command, data_dir):
     # Init the environment explicitly
     run_command(["core", "update-index"])
