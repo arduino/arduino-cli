@@ -150,3 +150,33 @@ func TestCompileWithCustomBuildPath(t *testing.T) {
 	require.NoFileExists(t, buildDir.Join(sketchName+".ino.with_bootloader.bin").String())
 	require.NoFileExists(t, buildDir.Join(sketchName+".ino.with_bootloader.hex").String())
 }
+
+func TestCompileWithInvalidUrl(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Download latest AVR
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+
+	sketchName := "CompileWithInvalidURL"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	// Create a test sketch
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("config", "init", "--dest-dir", ".", "--additional-urls", "https://example.com/package_example_index.json")
+	require.NoError(t, err)
+
+	_, stderr, err := cli.Run("compile", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stderr), "Error initializing instance: Loading index file: loading json index file")
+	expectedIndexfile := cli.DataDir().Join("package_example_index.json")
+	require.Contains(t, string(stderr), "loading json index file "+expectedIndexfile.String()+": open "+expectedIndexfile.String()+":")
+}
