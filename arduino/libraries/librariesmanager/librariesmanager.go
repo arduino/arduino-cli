@@ -22,7 +22,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
-	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/pmylund/sortutil"
@@ -173,9 +172,9 @@ func (lm *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) []*
 			continue
 		}
 		library.ContainerPlatform = librariesDir.PlatformRelease
-		alternatives := lm.Libraries[library.Name]
+		alternatives := lm.Libraries[library.RealName]
 		alternatives.Add(library)
-		lm.Libraries[library.Name] = alternatives
+		lm.Libraries[library.RealName] = alternatives
 	}
 
 	return statuses
@@ -194,9 +193,9 @@ func (lm *LibrariesManager) LoadLibraryFromDir(libRootDir *paths.Path, location 
 		return fmt.Errorf(tr("loading library from %[1]s: %[2]s"), libRootDir, err)
 	}
 
-	alternatives := lm.Libraries[library.Name]
+	alternatives := lm.Libraries[library.RealName]
 	alternatives.Add(library)
-	lm.Libraries[library.Name] = alternatives
+	lm.Libraries[library.RealName] = alternatives
 	return nil
 }
 
@@ -204,8 +203,7 @@ func (lm *LibrariesManager) LoadLibraryFromDir(libRootDir *paths.Path, location 
 // name and version or, if the version is nil, the library installed
 // in the User folder.
 func (lm *LibrariesManager) FindByReference(libRef *librariesindex.Reference, installLocation libraries.LibraryLocation) *libraries.Library {
-	saneName := utils.SanitizeName(libRef.Name)
-	alternatives, have := lm.Libraries[saneName]
+	alternatives, have := lm.Libraries[libRef.Name]
 	if !have {
 		return nil
 	}

@@ -144,7 +144,11 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 	if err := lm.Install(libRelease, libPath, installLocation); err != nil {
 		return &arduino.FailedLibraryInstallError{Cause: err}
 	}
-
+	if libReplaced != nil && !libReplaced.InstallDir.EquivalentTo(libPath) {
+		if err := lm.Uninstall(libReplaced); err != nil {
+			return fmt.Errorf("%s: %s", tr("could not remove old library"), err)
+		}
+	}
 	taskCB(&rpc.TaskProgress{Message: tr("Installed %s", libRelease), Completed: true})
 	return nil
 }
