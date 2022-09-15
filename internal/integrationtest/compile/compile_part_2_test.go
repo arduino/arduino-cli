@@ -151,6 +151,43 @@ func TestCompileWithCustomBuildPath(t *testing.T) {
 	require.NoFileExists(t, buildDir.Join(sketchName+".ino.with_bootloader.hex").String())
 }
 
+func TestCompileWithExportBinariesEnvVar(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Download latest AVR
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+
+	sketchName := "CompileWithExportBinariesEnvVar"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	// Create a test sketch
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_SKETCH_ALWAYS_EXPORT_BINARIES"] = "true"
+
+	// Test compilation with export binaries env var set
+	_, _, err = cli.RunWithCustomEnv(envVar, "compile", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+	require.DirExists(t, sketchPath.Join("build").String())
+
+	// Verifies binaries are exported when export binaries env var is set
+	fqbn = strings.ReplaceAll(fqbn, ":", ".")
+	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.eep").String())
+	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.elf").String())
+	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.hex").String())
+	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.with_bootloader.bin").String())
+	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.with_bootloader.hex").String())
+}
+
 func TestCompileWithInvalidUrl(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()

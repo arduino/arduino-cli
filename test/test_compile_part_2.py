@@ -19,40 +19,6 @@ from pathlib import Path
 import simplejson as json
 
 
-def test_compile_with_export_binaries_env_var(run_command, data_dir, downloads_dir):
-    # Init the environment explicitly
-    run_command(["core", "update-index"])
-
-    # Download latest AVR
-    run_command(["core", "install", "arduino:avr"])
-
-    sketch_name = "CompileWithExportBinariesEnvVar"
-    sketch_path = Path(data_dir, sketch_name)
-    fqbn = "arduino:avr:uno"
-
-    # Create a test sketch
-    assert run_command(["sketch", "new", sketch_path])
-
-    env = {
-        "ARDUINO_DATA_DIR": data_dir,
-        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
-        "ARDUINO_SKETCHBOOK_DIR": data_dir,
-        "ARDUINO_SKETCH_ALWAYS_EXPORT_BINARIES": "true",
-    }
-    # Test compilation with export binaries env var set
-    result = run_command(["compile", "-b", fqbn, sketch_path], custom_env=env)
-    assert result.ok
-    assert Path(sketch_path, "build").exists()
-    assert Path(sketch_path, "build").is_dir()
-
-    # Verifies binaries are exported when export binaries env var is set
-    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.eep").exists()
-    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.elf").exists()
-    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.hex").exists()
-    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.with_bootloader.bin").exists()
-    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.with_bootloader.hex").exists()
-
-
 def test_compile_with_export_binaries_config(run_command, data_dir, downloads_dir):
     # Init the environment explicitly
     run_command(["core", "update-index"])
