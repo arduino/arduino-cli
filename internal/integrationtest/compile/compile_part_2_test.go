@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
+	"go.bug.st/testifyjson/requirejson"
 )
 
 func TestCompileWithOutputDirFlag(t *testing.T) {
@@ -176,6 +177,56 @@ func TestCompileWithExportBinariesEnvVar(t *testing.T) {
 
 	// Test compilation with export binaries env var set
 	_, _, err = cli.RunWithCustomEnv(envVar, "compile", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+	require.DirExists(t, sketchPath.Join("build").String())
+
+	// Verifies binaries are exported when export binaries env var is set
+	fqbn = strings.ReplaceAll(fqbn, ":", ".")
+	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.eep").String())
+	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.elf").String())
+	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.hex").String())
+	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.with_bootloader.bin").String())
+	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.with_bootloader.hex").String())
+}
+
+func TestCompileWithExportBinariesConfig(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Download latest AVR
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+
+	sketchName := "CompileWithExportBinariesEnvVar"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	// Create a test sketch
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Create settings with export binaries set to true
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_SKETCH_ALWAYS_EXPORT_BINARIES"] = "true"
+	_, _, err = cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	// Test if arduino-cli config file written in the previous run has the `always_export_binaries` flag set.
+	stdout, _, err := cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Contains(t, stdout, `
+		{
+			"sketch": {
+			"always_export_binaries": "true"
+	  		}
+		}`)
+
+	// Test compilation with export binaries env var set
+	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String())
 	require.NoError(t, err)
 	require.DirExists(t, sketchPath.Join("build").String())
 

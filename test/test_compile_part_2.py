@@ -19,43 +19,6 @@ from pathlib import Path
 import simplejson as json
 
 
-def test_compile_with_export_binaries_config(run_command, data_dir, downloads_dir):
-    # Init the environment explicitly
-    run_command(["core", "update-index"])
-
-    # Download latest AVR
-    run_command(["core", "install", "arduino:avr"])
-
-    sketch_name = "CompileWithExportBinariesConfig"
-    sketch_path = Path(data_dir, sketch_name)
-    fqbn = "arduino:avr:uno"
-
-    # Create a test sketch
-    assert run_command(["sketch", "new", sketch_path])
-
-    # Create settings with export binaries set to true
-    env = {
-        "ARDUINO_DATA_DIR": data_dir,
-        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
-        "ARDUINO_SKETCHBOOK_DIR": data_dir,
-        "ARDUINO_SKETCH_ALWAYS_EXPORT_BINARIES": "true",
-    }
-    assert run_command(["config", "init", "--dest-dir", "."], custom_env=env)
-
-    # Test compilation with export binaries env var set
-    result = run_command(["compile", "-b", fqbn, sketch_path])
-    assert result.ok
-    assert Path(sketch_path, "build").exists()
-    assert Path(sketch_path, "build").is_dir()
-
-    # Verifies binaries are exported when export binaries env var is set
-    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.eep").exists()
-    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.elf").exists()
-    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.hex").exists()
-    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.with_bootloader.bin").exists()
-    assert (sketch_path / "build" / fqbn.replace(":", ".") / f"{sketch_name}.ino.with_bootloader.hex").exists()
-
-
 def test_compile_with_custom_libraries(run_command, copy_sketch):
     # Creates config with additional URL to install necessary core
     url = "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
