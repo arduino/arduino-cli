@@ -121,7 +121,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 func listLibraries(lm *librariesmanager.LibrariesManager, updatable bool, all bool) []*installedLib {
 	res := []*installedLib{}
 	for _, libAlternatives := range lm.Libraries {
-		for _, lib := range libAlternatives.Alternatives {
+		for _, lib := range libAlternatives {
 			if !all {
 				if lib.Location != libraries.User {
 					continue

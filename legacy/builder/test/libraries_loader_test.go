@@ -31,7 +31,7 @@ import (
 func extractLibraries(ctx *types.Context) []*libraries.Library {
 	res := []*libraries.Library{}
 	for _, lib := range ctx.LibrariesManager.Libraries {
-		for _, libAlternative := range lib.Alternatives {
+		for _, libAlternative := range lib {
 			res = append(res, libAlternative)
 		}
 	}

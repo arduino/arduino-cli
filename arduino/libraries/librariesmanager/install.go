@@ -53,7 +53,7 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 
 	var replaced *libraries.Library
 	if installedLibs, have := lm.Libraries[saneName]; have {
-		for _, installedLib := range installedLibs.Alternatives {
+		for _, installedLib := range installedLibs {
 			if installedLib.Location != installLocation {
 				continue
 			}
@@ -99,7 +99,9 @@ func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
 		return fmt.Errorf(tr("removing lib directory: %s"), err)
 	}
 
-	lm.Libraries[lib.Name].Remove(lib)
+	alternatives := lm.Libraries[lib.Name]
+	alternatives.Remove(lib)
+	lm.Libraries[lib.Name] = alternatives
 	return nil
 }
 

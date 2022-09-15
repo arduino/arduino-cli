@@ -27,7 +27,6 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/pmylund/sortutil"
 	"github.com/sirupsen/logrus"
-	semver "go.bug.st/relaxed-semver"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -36,7 +35,7 @@ import (
 // (the list of libraries, revisions, installed paths, etc.)
 type LibrariesManager struct {
 	LibrariesDir []*LibrariesDir
-	Libraries    map[string]*LibraryAlternatives `json:"libraries"`
+	Libraries    map[string]libraries.List `json:"libraries"`
 
 	Index              *librariesindex.Index
 	IndexFile          *paths.Path
@@ -51,41 +50,7 @@ type LibrariesDir struct {
 	PlatformRelease *cores.PlatformRelease
 }
 
-// LibraryAlternatives is a list of different versions of the same library
-// installed in the system
-type LibraryAlternatives struct {
-	Alternatives libraries.List
-}
-
 var tr = i18n.Tr
-
-// Add adds a library to the alternatives
-func (alts *LibraryAlternatives) Add(library *libraries.Library) {
-	if len(alts.Alternatives) > 0 && alts.Alternatives[0].Name != library.Name {
-		panic(fmt.Sprintf("the library name is different from the set (%[1]s != %[2]s)", alts.Alternatives[0].Name, library.Name))
-	}
-	alts.Alternatives = append(alts.Alternatives, library)
-}
-
-// Remove removes the library from the alternatives
-func (alts *LibraryAlternatives) Remove(library *libraries.Library) {
-	for i, lib := range alts.Alternatives {
-		if lib == library {
-			alts.Alternatives = append(alts.Alternatives[:i], alts.Alternatives[i+1:]...)
-			return
-		}
-	}
-}
-
-// FindVersion returns the library mathching the provided version or nil if not found
-func (alts *LibraryAlternatives) FindVersion(version *semver.Version, installLocation libraries.LibraryLocation) *libraries.Library {
-	for _, lib := range alts.Alternatives {
-		if lib.Version.Equal(version) && lib.Location == installLocation {
-			return lib
-		}
-	}
-	return nil
-}
 
 // Names returns an array with all the names of the installed libraries.
 func (lm LibrariesManager) Names() []string {
@@ -107,7 +72,7 @@ func NewLibraryManager(indexDir *paths.Path, downloadsDir *paths.Path) *Librarie
 		indexFileSignature = indexDir.Join("library_index.json.sig")
 	}
 	return &LibrariesManager{
-		Libraries:          map[string]*LibraryAlternatives{},
+		Libraries:          map[string]libraries.List{},
 		IndexFile:          indexFile,
 		IndexFileSignature: indexFileSignature,
 		DownloadsDir:       downloadsDir,
@@ -208,12 +173,9 @@ func (lm *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) []*
 			continue
 		}
 		library.ContainerPlatform = librariesDir.PlatformRelease
-		alternatives, ok := lm.Libraries[library.Name]
-		if !ok {
-			alternatives = &LibraryAlternatives{}
-			lm.Libraries[library.Name] = alternatives
-		}
+		alternatives := lm.Libraries[library.Name]
 		alternatives.Add(library)
+		lm.Libraries[library.Name] = alternatives
 	}
 
 	return statuses
@@ -232,13 +194,9 @@ func (lm *LibrariesManager) LoadLibraryFromDir(libRootDir *paths.Path, location 
 		return fmt.Errorf(tr("loading library from %[1]s: %[2]s"), libRootDir, err)
 	}
 
-	alternatives, ok := lm.Libraries[library.Name]
-	if !ok {
-		alternatives = &LibraryAlternatives{}
-		lm.Libraries[library.Name] = alternatives
-	}
+	alternatives := lm.Libraries[library.Name]
 	alternatives.Add(library)
-
+	lm.Libraries[library.Name] = alternatives
 	return nil
 }
 
@@ -253,12 +211,16 @@ func (lm *LibrariesManager) FindByReference(libRef *librariesindex.Reference, in
 	}
 	// TODO: Move "search into user" into another method...
 	if libRef.Version == nil {
-		for _, candidate := range alternatives.Alternatives {
+		for _, candidate := range alternatives {
 			if candidate.Location == installLocation {
 				return candidate
 			}
 		}
 		return nil
 	}
-	return alternatives.FindVersion(libRef.Version, installLocation)
+	res := alternatives.FilterByVersionAndInstallLocation(libRef.Version, installLocation)
+	if len(res) > 0 {
+		return res[0]
+	}
+	return nil
 }
