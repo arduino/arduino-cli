@@ -66,7 +66,7 @@ type ArduinoCLI struct {
 	path                 *paths.Path
 	t                    *require.Assertions
 	proc                 *executils.Process
-	cliEnvVars           []string
+	cliEnvVars           map[string]string
 	cliConfigPath        *paths.Path
 	stagingDir           *paths.Path
 	dataDir              *paths.Path
@@ -97,11 +97,11 @@ func NewArduinoCliWithinEnvironment(env *testsuite.Environment, config *ArduinoC
 		cli.stagingDir = env.SharedDownloadsDir()
 	}
 
-	cli.cliEnvVars = []string{
-		"LANG=en",
-		fmt.Sprintf("ARDUINO_DATA_DIR=%s", cli.dataDir),
-		fmt.Sprintf("ARDUINO_DOWNLOADS_DIR=%s", cli.stagingDir),
-		fmt.Sprintf("ARDUINO_SKETCHBOOK_DIR=%s", cli.sketchbookDir),
+	cli.cliEnvVars = map[string]string{
+		"LANG":                   "en",
+		"ARDUINO_DATA_DIR":       cli.dataDir.String(),
+		"ARDUINO_DOWNLOADS_DIR":  cli.stagingDir.String(),
+		"ARDUINO_SKETCHBOOK_DIR": cli.sketchbookDir.String(),
 	}
 	env.RegisterCleanUpCallback(cli.CleanUp)
 	return cli
@@ -128,11 +128,35 @@ func (cli *ArduinoCLI) SketchbookDir() *paths.Path {
 
 // Run executes the given arduino-cli command and returns the output.
 func (cli *ArduinoCLI) Run(args ...string) ([]byte, []byte, error) {
+	return cli.RunWithCustomEnv(cli.cliEnvVars, args...)
+}
+
+// GetDefaultEnv returns a copy of the default execution env used with the Run method.
+func (cli *ArduinoCLI) GetDefaultEnv() map[string]string {
+	res := map[string]string{}
+	for k, v := range cli.cliEnvVars {
+		res[k] = v
+	}
+	return res
+}
+
+// convertEnvForExecutils returns a string array made of "key=value" strings
+// with (key,value) pairs obtained from the given map.
+func (cli *ArduinoCLI) convertEnvForExecutils(env map[string]string) []string {
+	envVars := []string{}
+	for k, v := range env {
+		envVars = append(envVars, fmt.Sprintf("%s=%s", k, v))
+	}
+	return envVars
+}
+
+// RunWithCustomEnv executes the given arduino-cli command with the given custom env and returns the output.
+func (cli *ArduinoCLI) RunWithCustomEnv(env map[string]string, args ...string) ([]byte, []byte, error) {
 	if cli.cliConfigPath != nil {
 		args = append([]string{"--config-file", cli.cliConfigPath.String()}, args...)
 	}
 	fmt.Println(color.HiBlackString(">>> Running: ") + color.HiYellowString("%s %s", cli.path, strings.Join(args, " ")))
-	cliProc, err := executils.NewProcessFromPath(cli.cliEnvVars, cli.path, args...)
+	cliProc, err := executils.NewProcessFromPath(cli.convertEnvForExecutils(env), cli.path, args...)
 	cli.t.NoError(err)
 	stdout, err := cliProc.StdoutPipe()
 	cli.t.NoError(err)
@@ -177,7 +201,7 @@ func (cli *ArduinoCLI) StartDaemon(verbose bool) string {
 	if verbose {
 		args = append(args, "-v", "--log-level", "debug")
 	}
-	cliProc, err := executils.NewProcessFromPath(cli.cliEnvVars, cli.path, args...)
+	cliProc, err := executils.NewProcessFromPath(cli.convertEnvForExecutils(cli.cliEnvVars), cli.path, args...)
 	cli.t.NoError(err)
 	stdout, err := cliProc.StdoutPipe()
 	cli.t.NoError(err)
