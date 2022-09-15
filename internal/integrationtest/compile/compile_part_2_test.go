@@ -268,3 +268,29 @@ func TestCompileWithInvalidUrl(t *testing.T) {
 	expectedIndexfile := cli.DataDir().Join("package_example_index.json")
 	require.Contains(t, string(stderr), "loading json index file "+expectedIndexfile.String()+": open "+expectedIndexfile.String()+":")
 }
+
+func TestCompileWithCustomLibraries(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Creates config with additional URL to install necessary core
+	url := "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
+	_, _, err := cli.Run("config", "init", "--dest-dir", ".", "--additional-urls", url)
+	require.NoError(t, err)
+
+	// Init the environment explicitly
+	_, _, err = cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "esp8266:esp8266")
+	require.NoError(t, err)
+
+	sketchName := "sketch_with_multiple_custom_libraries"
+	sketchPath := cli.CopySketch(sketchName)
+	fqbn := "esp8266:esp8266:nodemcu:xtal=80,vt=heap,eesz=4M1M,wipe=none,baud=115200"
+
+	firstLib := sketchPath.Join("libraries1")
+	secondLib := sketchPath.Join("libraries2")
+	_, _, err = cli.Run("compile", "--libraries", firstLib.String(), "--libraries", secondLib.String(), "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+}
