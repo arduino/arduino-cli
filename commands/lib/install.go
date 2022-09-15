@@ -141,7 +141,7 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 		taskCB(&rpc.TaskProgress{Message: tr("Replacing %[1]s with %[2]s", libReplaced, libRelease)})
 	}
 
-	if err := lm.Install(libRelease, libPath, installLocation); err != nil {
+	if err := lm.Install(libRelease, libPath); err != nil {
 		return &arduino.FailedLibraryInstallError{Cause: err}
 	}
 	if libReplaced != nil && !libReplaced.InstallDir.EquivalentTo(libPath) {

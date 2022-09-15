@@ -81,12 +81,8 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 }
 
 // Install installs a library on the specified path.
-func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, libPath *paths.Path, installLocation libraries.LibraryLocation) error {
-	libsDir := lm.getLibrariesDir(installLocation)
-	if libsDir == nil {
-		return fmt.Errorf(tr("User directory not set"))
-	}
-	return indexLibrary.Resource.Install(lm.DownloadsDir, libsDir, libPath)
+func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, libPath *paths.Path) error {
+	return indexLibrary.Resource.Install(lm.DownloadsDir, libPath.Parent(), libPath)
 }
 
 // Uninstall removes a Library
