@@ -199,26 +199,13 @@ func (lm *LibrariesManager) LoadLibraryFromDir(libRootDir *paths.Path, location 
 	return nil
 }
 
-// FindByReference return the installed library matching the Reference
-// name and version or, if the version is nil, the library installed
-// in the User folder.
-func (lm *LibrariesManager) FindByReference(libRef *librariesindex.Reference, installLocation libraries.LibraryLocation) *libraries.Library {
-	alternatives, have := lm.Libraries[libRef.Name]
-	if !have {
+// FindByReference return the installed libraries matching the Reference
+// name and version or, if the version is nil, the libraries installed
+// in the installLocation.
+func (lm *LibrariesManager) FindByReference(libRef *librariesindex.Reference, installLocation libraries.LibraryLocation) libraries.List {
+	alternatives := lm.Libraries[libRef.Name]
+	if alternatives == nil {
 		return nil
 	}
-	// TODO: Move "search into user" into another method...
-	if libRef.Version == nil {
-		for _, candidate := range alternatives {
-			if candidate.Location == installLocation {
-				return candidate
-			}
-		}
-		return nil
-	}
-	res := alternatives.FilterByVersionAndInstallLocation(libRef.Version, installLocation)
-	if len(res) > 0 {
-		return res[0]
-	}
-	return nil
+	return alternatives.FilterByVersionAndInstallLocation(libRef.Version, installLocation)
 }

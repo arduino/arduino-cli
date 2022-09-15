@@ -32,13 +32,13 @@ func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, tas
 		return &arduino.InvalidLibraryError{Cause: err}
 	}
 
-	lib := lm.FindByReference(ref, libraries.User)
+	libs := lm.FindByReference(ref, libraries.User)
 
-	if lib == nil {
+	if len(libs) == 0 {
 		taskCB(&rpc.TaskProgress{Message: tr("Library %s is not installed", req.Name), Completed: true})
 	} else {
-		taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s", lib)})
-		lm.Uninstall(lib)
+		taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s", libs[0])})
+		lm.Uninstall(libs[0])
 		taskCB(&rpc.TaskProgress{Completed: true})
 	}
 
