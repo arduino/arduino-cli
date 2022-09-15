@@ -203,8 +203,8 @@ jobs:
           TAG="${GITHUB_REF/refs\/tags\//}"
           WIX_TAG="${TAG%%-*}" # removes "-rc*" since wix is not happy with it, this only affects RCs builds (error CNDL0108)
           PACKAGE_FILENAME="${{ env.PROJECT_NAME }}_${TAG}_Windows_64bit"
-          SOURCE_DIR="${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_windows_amd64/${{ env.PROJECT_NAME }}.exe"
-          "${{ env.MSBUILD_PATH }}\MSBuild.exe" ./installer/cli.wixproj -p:SourceDir="$SOURCE_DIR" -p:OutputPath="${{ env.DIST_DIR }}" -p:OutputName="$PACKAGE_FILENAME" -p:ProductVersion="$WIX_TAG"
+          SOURCE_DIR="${GITHUB_WORKSPACE}/${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_windows_amd64/"
+          "${{ env.MSBUILD_PATH }}\MSBuild.exe" ./installer/cli.wixproj -p:SourceDir="$SOURCE_DIR" -p:OutputPath="${GITHUB_WORKSPACE}/${{ env.DIST_DIR }}" -p:OutputName="$PACKAGE_FILENAME" -p:ProductVersion="$WIX_TAG"
 
       - name: Save Win signing certificate to file
         run: echo "${{ secrets.INSTALLER_CERT_WINDOWS_PFX }}" | base64 --decode > ${{ env.INSTALLER_CERT_WINDOWS_PFX}}
