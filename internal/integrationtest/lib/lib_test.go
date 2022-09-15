@@ -64,3 +64,32 @@ func TestLibUpgradeCommand(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Query(t, stdOut, `.[].library | select(.name=="Servo") | .version`, servoVersion)
 }
+
+func TestLibInstallMultipleSameLibrary(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+	cliEnv := cli.GetDefaultEnv()
+	cliEnv["ARDUINO_LIBRARY_ENABLE_UNSAFE_INSTALL"] = "true"
+
+	// Check that 'lib install' didn't create a double install
+	// https://github.com/arduino/arduino-cli/issues/1870
+	_, _, err := cli.RunWithCustomEnv(cliEnv, "lib", "install", "--git-url", "https://github.com/arduino-libraries/SigFox#1.0.3")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "Arduino SigFox for MKRFox1200")
+	require.NoError(t, err)
+	jsonOut, _, err := cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, jsonOut, 1, "A duplicate library install has been detected")
+
+	// Check that 'lib upgrade' didn't create a double install
+	// https://github.com/arduino/arduino-cli/issues/1870
+	_, _, err = cli.Run("lib", "uninstall", "Arduino SigFox for MKRFox1200")
+	require.NoError(t, err)
+	_, _, err = cli.RunWithCustomEnv(cliEnv, "lib", "install", "--git-url", "https://github.com/arduino-libraries/SigFox#1.0.3")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "upgrade", "Arduino SigFox for MKRFox1200")
+	require.NoError(t, err)
+	jsonOut, _, err = cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, jsonOut, 1, "A duplicate library install has been detected")
+}
