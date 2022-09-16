@@ -65,6 +65,22 @@ func TestLibUpgradeCommand(t *testing.T) {
 	requirejson.Query(t, stdOut, `.[].library | select(.name=="Servo") | .version`, servoVersion)
 }
 
+func TestLibCommandsUsingNameInsteadOfCanonicalName(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("lib", "install", "Robot Motor")
+	require.NoError(t, err)
+
+	jsonOut, _, err := cli.Run("lib", "examples", "Robot Motor", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, jsonOut, 1, "Library 'Robot Motor' not matched in lib examples command.")
+
+	jsonOut, _, err = cli.Run("lib", "list", "Robot Motor", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, jsonOut, 1, "Library 'Robot Motor' not matched in lib list command.")
+}
+
 func TestLibInstallMultipleSameLibrary(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()

@@ -48,8 +48,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 
 	nameFilter := strings.ToLower(req.GetName())
 
-	installedLibs := []*rpc.InstalledLibrary{}
-	res := listLibraries(lm, req.GetUpdatable(), req.GetAll())
+	allLibs := listLibraries(lm, req.GetUpdatable(), req.GetAll())
 	if f := req.GetFqbn(); f != "" {
 		fqbn, err := cores.ParseFQBN(req.GetFqbn())
 		if err != nil {
@@ -61,15 +60,16 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 		}
 
 		filteredRes := map[string]*installedLib{}
-		for _, lib := range res {
+		for _, lib := range allLibs {
 			if cp := lib.Library.ContainerPlatform; cp != nil {
 				if cp != boardPlatform && cp != refBoardPlatform {
 					// Filter all libraries from extraneous platforms
 					continue
 				}
 			}
-			if latest, has := filteredRes[lib.Library.CanonicalName]; has {
+			if latest, has := filteredRes[lib.Library.Name]; has {
 				if latest.Library.LocationPriorityFor(boardPlatform, refBoardPlatform) >= lib.Library.LocationPriorityFor(boardPlatform, refBoardPlatform) {
+					// Pick library with the best priority
 					continue
 				}
 			}
@@ -86,17 +86,18 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 				f: compatible,
 			}
 
-			filteredRes[lib.Library.CanonicalName] = lib
+			filteredRes[lib.Library.Name] = lib
 		}
 
-		res = []*installedLib{}
+		allLibs = []*installedLib{}
 		for _, lib := range filteredRes {
-			res = append(res, lib)
+			allLibs = append(allLibs, lib)
 		}
 	}
 
-	for _, lib := range res {
-		if nameFilter != "" && strings.ToLower(lib.Library.CanonicalName) != nameFilter {
+	installedLibs := []*rpc.InstalledLibrary{}
+	for _, lib := range allLibs {
+		if nameFilter != "" && strings.ToLower(lib.Library.Name) != nameFilter {
 			continue
 		}
 		var release *rpc.LibraryRelease
@@ -105,7 +106,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 		}
 		rpcLib, err := lib.Library.ToRPCLibrary()
 		if err != nil {
-			return nil, &arduino.PermissionDeniedError{Message: tr("Error getting information for library %s", lib.Library.CanonicalName), Cause: err}
+			return nil, &arduino.PermissionDeniedError{Message: tr("Error getting information for library %s", lib.Library.Name), Cause: err}
 		}
 		installedLibs = append(installedLibs, &rpc.InstalledLibrary{
 			Library: rpcLib,
