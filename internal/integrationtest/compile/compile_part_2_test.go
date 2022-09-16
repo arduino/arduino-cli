@@ -18,6 +18,7 @@ package compile_part_1_test
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"encoding/json"
 	"strings"
 	"testing"
 
@@ -292,5 +293,38 @@ func TestCompileWithCustomLibraries(t *testing.T) {
 	firstLib := sketchPath.Join("libraries1")
 	secondLib := sketchPath.Join("libraries2")
 	_, _, err = cli.Run("compile", "--libraries", firstLib.String(), "--libraries", secondLib.String(), "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+}
+
+func TestCompileWithArchivesAndLongPaths(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Creates config with additional URL to install necessary core
+	url := "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
+	_, _, err := cli.Run("config", "init", "--dest-dir", ".", "--additional-urls", url)
+	require.NoError(t, err)
+
+	// Init the environment explicitly
+	_, _, err = cli.Run("update")
+	require.NoError(t, err)
+
+	// Install core to compile
+	_, _, err = cli.Run("core", "install", "esp8266:esp8266@2.7.4")
+	require.NoError(t, err)
+
+	// Install test library
+	_, _, err = cli.Run("lib", "install", "ArduinoIoTCloud")
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("lib", "examples", "ArduinoIoTCloud", "--format", "json")
+	require.NoError(t, err)
+	var libOutput []map[string]interface{}
+	err = json.Unmarshal(stdout, &libOutput)
+	require.NoError(t, err)
+	sketchPath := paths.New(libOutput[0]["library"].(map[string]interface{})["install_dir"].(string))
+	sketchPath = sketchPath.Join("examples", "ArduinoIoTCloud-Advanced")
+
+	_, _, err = cli.Run("compile", "-b", "esp8266:esp8266:huzzah", sketchPath.String())
 	require.NoError(t, err)
 }

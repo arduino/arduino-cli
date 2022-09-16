@@ -40,28 +40,6 @@ def test_compile_with_custom_libraries(run_command, copy_sketch):
     assert run_command(["compile", "--libraries", first_lib, "--libraries", second_lib, "-b", fqbn, sketch_path])
 
 
-def test_compile_with_archives_and_long_paths(run_command):
-    # Creates config with additional URL to install necessary core
-    url = "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
-    assert run_command(["config", "init", "--dest-dir", ".", "--additional-urls", url])
-
-    # Init the environment explicitly
-    assert run_command(["update"])
-
-    # Install core to compile
-    assert run_command(["core", "install", "esp8266:esp8266@2.7.4"])
-
-    # Install test library
-    assert run_command(["lib", "install", "ArduinoIoTCloud"])
-
-    result = run_command(["lib", "examples", "ArduinoIoTCloud", "--format", "json"])
-    assert result.ok
-    lib_output = json.loads(result.stdout)
-    sketch_path = Path(lib_output[0]["library"]["install_dir"], "examples", "ArduinoIoTCloud-Advanced")
-
-    assert run_command(["compile", "-b", "esp8266:esp8266:huzzah", sketch_path])
-
-
 def test_compile_with_precompiled_library(run_command, data_dir):
     assert run_command(["update"])
 
