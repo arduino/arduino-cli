@@ -172,9 +172,9 @@ func (lm *LibrariesManager) LoadLibrariesFromDir(librariesDir *LibrariesDir) []*
 			continue
 		}
 		library.ContainerPlatform = librariesDir.PlatformRelease
-		alternatives := lm.Libraries[library.RealName]
+		alternatives := lm.Libraries[library.Name]
 		alternatives.Add(library)
-		lm.Libraries[library.RealName] = alternatives
+		lm.Libraries[library.Name] = alternatives
 	}
 
 	return statuses
@@ -193,9 +193,9 @@ func (lm *LibrariesManager) LoadLibraryFromDir(libRootDir *paths.Path, location 
 		return fmt.Errorf(tr("loading library from %[1]s: %[2]s"), libRootDir, err)
 	}
 
-	alternatives := lm.Libraries[library.RealName]
+	alternatives := lm.Libraries[library.Name]
 	alternatives.Add(library)
-	lm.Libraries[library.RealName] = alternatives
+	lm.Libraries[library.Name] = alternatives
 	return nil
 }
 

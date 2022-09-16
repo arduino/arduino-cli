@@ -86,7 +86,7 @@ func findExpectedPrecompiledLibFolder(ctx *types.Context, library *libraries.Lib
 		}
 	}
 
-	ctx.Info(tr("Library %[1]s has been declared precompiled:", library.Name))
+	ctx.Info(tr("Library %[1]s has been declared precompiled:", library.CanonicalName))
 
 	// Try directory with full fpuSpecs first, if available
 	if len(fpuSpecs) > 0 {
@@ -129,9 +129,9 @@ func compileLibraries(ctx *types.Context, libraries libraries.List, buildPath *p
 
 func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
 	if ctx.Verbose {
-		ctx.Info(tr(`Compiling library "%[1]s"`, library.Name))
+		ctx.Info(tr(`Compiling library "%[1]s"`, library.CanonicalName))
 	}
-	libraryBuildPath := buildPath.Join(library.Name)
+	libraryBuildPath := buildPath.Join(library.CanonicalName)
 
 	if err := libraryBuildPath.MkdirAll(); err != nil {
 		return nil, errors.WithStack(err)
@@ -189,7 +189,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 			return nil, errors.WithStack(err)
 		}
 		if library.DotALinkage {
-			archiveFile, err := builder_utils.ArchiveCompiledFiles(ctx, libraryBuildPath, paths.New(library.Name+".a"), libObjectFiles, buildProperties)
+			archiveFile, err := builder_utils.ArchiveCompiledFiles(ctx, libraryBuildPath, paths.New(library.CanonicalName+".a"), libObjectFiles, buildProperties)
 			if err != nil {
 				return nil, errors.WithStack(err)
 			}

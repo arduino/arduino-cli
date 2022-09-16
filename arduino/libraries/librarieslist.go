@@ -55,7 +55,7 @@ func (list *List) Remove(library *Library) {
 // the specified name or nil if not found
 func (list *List) FindByName(name string) *Library {
 	for _, lib := range *list {
-		if lib.Name == name {
+		if lib.CanonicalName == name {
 			return lib
 		}
 	}
@@ -82,7 +82,7 @@ func (list *List) FilterByVersionAndInstallLocation(version *semver.Version, ins
 func (list *List) SortByName() {
 	sort.Slice(*list, func(i, j int) bool {
 		a, b := (*list)[i], (*list)[j]
-		return a.Name < b.Name
+		return a.CanonicalName < b.CanonicalName
 	})
 }
 

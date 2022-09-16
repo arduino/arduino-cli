@@ -52,7 +52,7 @@ func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, tas
 		libsDir.Add(lib.InstallDir)
 	}
 	return &arduino.MultipleLibraryInstallDetected{
-		LibName: libs[0].RealName,
+		LibName: libs[0].Name,
 		LibsDir: libsDir,
 		Message: tr("Automatic library uninstall can't be performed in this case, please manually remove them."),
 	}

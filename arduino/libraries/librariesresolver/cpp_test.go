@@ -22,14 +22,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var l1 = &libraries.Library{Name: "Calculus Lib", Location: libraries.User}
-var l2 = &libraries.Library{Name: "Calculus Lib-master", Location: libraries.User}
-var l3 = &libraries.Library{Name: "Calculus Lib Improved", Location: libraries.User}
-var l4 = &libraries.Library{Name: "Another Calculus Lib", Location: libraries.User}
-var l5 = &libraries.Library{Name: "Yet Another Calculus Lib Improved", Location: libraries.User}
-var l6 = &libraries.Library{Name: "Calculus Unified Lib", Location: libraries.User}
-var l7 = &libraries.Library{Name: "AnotherLib", Location: libraries.User}
-var bundleServo = &libraries.Library{Name: "Servo", Location: libraries.IDEBuiltIn, Architectures: []string{"avr", "sam", "samd"}}
+var l1 = &libraries.Library{CanonicalName: "Calculus Lib", Location: libraries.User}
+var l2 = &libraries.Library{CanonicalName: "Calculus Lib-master", Location: libraries.User}
+var l3 = &libraries.Library{CanonicalName: "Calculus Lib Improved", Location: libraries.User}
+var l4 = &libraries.Library{CanonicalName: "Another Calculus Lib", Location: libraries.User}
+var l5 = &libraries.Library{CanonicalName: "Yet Another Calculus Lib Improved", Location: libraries.User}
+var l6 = &libraries.Library{CanonicalName: "Calculus Unified Lib", Location: libraries.User}
+var l7 = &libraries.Library{CanonicalName: "AnotherLib", Location: libraries.User}
+var bundleServo = &libraries.Library{CanonicalName: "Servo", Location: libraries.IDEBuiltIn, Architectures: []string{"avr", "sam", "samd"}}
 
 func runResolver(include string, arch string, libs ...*libraries.Library) *libraries.Library {
 	libraryList := libraries.List{}
@@ -41,19 +41,19 @@ func runResolver(include string, arch string, libs ...*libraries.Library) *libra
 
 func TestArchitecturePriority(t *testing.T) {
 	userServo := &libraries.Library{
-		Name:          "Servo",
+		CanonicalName: "Servo",
 		Location:      libraries.User,
 		Architectures: []string{"avr", "sam", "samd"}}
 	userServoAllArch := &libraries.Library{
-		Name:          "Servo",
+		CanonicalName: "Servo",
 		Location:      libraries.User,
 		Architectures: []string{"*"}}
 	userServoNonavr := &libraries.Library{
-		Name:          "Servo",
+		CanonicalName: "Servo",
 		Location:      libraries.User,
 		Architectures: []string{"sam", "samd"}}
 	userAnotherServo := &libraries.Library{
-		Name:          "AnotherServo",
+		CanonicalName: "AnotherServo",
 		Location:      libraries.User,
 		Architectures: []string{"avr", "sam", "samd", "esp32"}}
 
@@ -78,11 +78,11 @@ func TestArchitecturePriority(t *testing.T) {
 	require.Equal(t, userServoAllArch, res, "selected library")
 
 	userSDAllArch := &libraries.Library{
-		Name:          "SD",
+		CanonicalName: "SD",
 		Location:      libraries.User,
 		Architectures: []string{"*"}}
 	builtinSDesp := &libraries.Library{
-		Name:          "SD",
+		CanonicalName: "SD",
 		Location:      libraries.PlatformBuiltIn,
 		Architectures: []string{"esp8266"}}
 	res = runResolver("SD.h", "esp8266", userSDAllArch, builtinSDesp)
@@ -133,7 +133,7 @@ func TestCppHeaderResolver(t *testing.T) {
 			librarylist.Add(lib)
 		}
 		resolver.headers[header] = librarylist
-		return resolver.ResolveFor(header, "avr").Name
+		return resolver.ResolveFor(header, "avr").CanonicalName
 	}
 	require.Equal(t, "Calculus Lib", resolve("calculus_lib.h", l1, l2, l3, l4, l5, l6, l7))
 	require.Equal(t, "Calculus Lib-master", resolve("calculus_lib.h", l2, l3, l4, l5, l6, l7))
@@ -147,14 +147,14 @@ func TestCppHeaderResolver(t *testing.T) {
 func TestCppHeaderResolverWithLibrariesInStrangeDirectoryNames(t *testing.T) {
 	resolver := NewCppResolver()
 	librarylist := libraries.List{}
-	librarylist.Add(&libraries.Library{Name: "onewire_2_3_4", RealName: "OneWire", Architectures: []string{"*"}})
-	librarylist.Add(&libraries.Library{Name: "onewireng_2_3_4", RealName: "OneWireNg", Architectures: []string{"avr"}})
+	librarylist.Add(&libraries.Library{CanonicalName: "onewire_2_3_4", Name: "OneWire", Architectures: []string{"*"}})
+	librarylist.Add(&libraries.Library{CanonicalName: "onewireng_2_3_4", Name: "OneWireNg", Architectures: []string{"avr"}})
 	resolver.headers["OneWire.h"] = librarylist
-	require.Equal(t, "onewire_2_3_4", resolver.ResolveFor("OneWire.h", "avr").Name)
+	require.Equal(t, "onewire_2_3_4", resolver.ResolveFor("OneWire.h", "avr").CanonicalName)
 
 	librarylist2 := libraries.List{}
-	librarylist2.Add(&libraries.Library{Name: "OneWire", RealName: "OneWire", Architectures: []string{"*"}})
-	librarylist2.Add(&libraries.Library{Name: "onewire_2_3_4", RealName: "OneWire", Architectures: []string{"avr"}})
+	librarylist2.Add(&libraries.Library{CanonicalName: "OneWire", Name: "OneWire", Architectures: []string{"*"}})
+	librarylist2.Add(&libraries.Library{CanonicalName: "onewire_2_3_4", Name: "OneWire", Architectures: []string{"avr"}})
 	resolver.headers["OneWire.h"] = librarylist2
-	require.Equal(t, "OneWire", resolver.ResolveFor("OneWire.h", "avr").Name)
+	require.Equal(t, "OneWire", resolver.ResolveFor("OneWire.h", "avr").CanonicalName)
 }

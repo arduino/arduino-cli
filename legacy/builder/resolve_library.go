@@ -45,7 +45,7 @@ func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {
 	}
 
 	selected := resolver.ResolveFor(header, ctx.TargetPlatform.Platform.Architecture)
-	if alreadyImported := importedLibraries.FindByName(selected.Name); alreadyImported != nil {
+	if alreadyImported := importedLibraries.FindByName(selected.CanonicalName); alreadyImported != nil {
 		// Certain libraries might have the same name but be different.
 		// This usually happens when the user includes two or more custom libraries that have
 		// different header name but are stored in a parent folder with identical name, like

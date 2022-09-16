@@ -72,10 +72,10 @@ func TestLoadLibrariesAVR(t *testing.T) {
 
 	idx := 0
 
-	require.Equal(t, "ANewLibrary-master", libs[idx].Name)
+	require.Equal(t, "ANewLibrary-master", libs[idx].CanonicalName)
 
 	idx++
-	require.Equal(t, "Adafruit_PN532", libs[idx].Name)
+	require.Equal(t, "Adafruit_PN532", libs[idx].CanonicalName)
 	require.True(t, Abs(t, paths.New("downloaded_libraries/Adafruit_PN532")).EquivalentTo(libs[idx].InstallDir))
 	require.True(t, Abs(t, paths.New("downloaded_libraries/Adafruit_PN532")).EquivalentTo(libs[idx].SourceDir))
 	require.Equal(t, 1, len(libs[idx].Architectures))
@@ -83,15 +83,15 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	require.False(t, libs[idx].IsLegacy)
 
 	idx++
-	require.Equal(t, "Audio", libs[idx].Name)
+	require.Equal(t, "Audio", libs[idx].CanonicalName)
 
 	idx++
-	require.Equal(t, "Balanduino", libs[idx].Name)
+	require.Equal(t, "Balanduino", libs[idx].CanonicalName)
 	require.True(t, libs[idx].IsLegacy)
 
 	idx++
 	bridgeLib := libs[idx]
-	require.Equal(t, "Bridge", bridgeLib.Name)
+	require.Equal(t, "Bridge", bridgeLib.CanonicalName)
 	require.True(t, Abs(t, paths.New("downloaded_libraries/Bridge")).EquivalentTo(bridgeLib.InstallDir))
 	require.True(t, Abs(t, paths.New("downloaded_libraries/Bridge/src")).EquivalentTo(bridgeLib.SourceDir))
 	require.Equal(t, 1, len(bridgeLib.Architectures))
@@ -100,51 +100,51 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	require.Equal(t, "Arduino <info@arduino.cc>", bridgeLib.Maintainer)
 
 	idx++
-	require.Equal(t, "CapacitiveSensor", libs[idx].Name)
+	require.Equal(t, "CapacitiveSensor", libs[idx].CanonicalName)
 	idx++
-	require.Equal(t, "EEPROM", libs[idx].Name)
+	require.Equal(t, "EEPROM", libs[idx].CanonicalName)
 	idx++
-	require.Equal(t, "Ethernet", libs[idx].Name)
+	require.Equal(t, "Ethernet", libs[idx].CanonicalName)
 	idx++
-	require.Equal(t, "FakeAudio", libs[idx].Name)
+	require.Equal(t, "FakeAudio", libs[idx].CanonicalName)
 	idx++
-	require.Equal(t, "FastLED", libs[idx].Name)
+	require.Equal(t, "FastLED", libs[idx].CanonicalName)
 	idx++
-	require.Equal(t, "HID", libs[idx].Name)
+	require.Equal(t, "HID", libs[idx].CanonicalName)
 	idx++
-	require.Equal(t, "IRremote", libs[idx].Name)
+	require.Equal(t, "IRremote", libs[idx].CanonicalName)
 	idx++
-	require.Equal(t, "Robot_IR_Remote", libs[idx].Name)
+	require.Equal(t, "Robot_IR_Remote", libs[idx].CanonicalName)
 	idx++
-	require.Equal(t, "SPI", libs[idx].Name)
+	require.Equal(t, "SPI", libs[idx].CanonicalName)
 	idx++
-	require.Equal(t, "SPI", libs[idx].Name)
+	require.Equal(t, "SPI", libs[idx].CanonicalName)
 	idx++
-	require.Equal(t, "ShouldNotRecurseWithOldLibs", libs[idx].Name)
+	require.Equal(t, "ShouldNotRecurseWithOldLibs", libs[idx].CanonicalName)
 	idx++
-	require.Equal(t, "SoftwareSerial", libs[idx].Name)
+	require.Equal(t, "SoftwareSerial", libs[idx].CanonicalName)
 	idx++
-	require.Equal(t, "USBHost", libs[idx].Name)
+	require.Equal(t, "USBHost", libs[idx].CanonicalName)
 	idx++
-	require.Equal(t, "Wire", libs[idx].Name)
+	require.Equal(t, "Wire", libs[idx].CanonicalName)
 
 	libs = ctx.LibrariesResolver.AlternativesFor("Audio.h")
 	require.Len(t, libs, 2)
 	sort.Sort(ByLibraryName(libs))
-	require.Equal(t, "Audio", libs[0].Name)
-	require.Equal(t, "FakeAudio", libs[1].Name)
+	require.Equal(t, "Audio", libs[0].CanonicalName)
+	require.Equal(t, "FakeAudio", libs[1].CanonicalName)
 
 	libs = ctx.LibrariesResolver.AlternativesFor("FakeAudio.h")
 	require.Len(t, libs, 1)
-	require.Equal(t, "FakeAudio", libs[0].Name)
+	require.Equal(t, "FakeAudio", libs[0].CanonicalName)
 
 	libs = ctx.LibrariesResolver.AlternativesFor("Adafruit_PN532.h")
 	require.Len(t, libs, 1)
-	require.Equal(t, "Adafruit_PN532", libs[0].Name)
+	require.Equal(t, "Adafruit_PN532", libs[0].CanonicalName)
 
 	libs = ctx.LibrariesResolver.AlternativesFor("IRremote.h")
 	require.Len(t, libs, 1)
-	require.Equal(t, "IRremote", libs[0].Name)
+	require.Equal(t, "IRremote", libs[0].CanonicalName)
 }
 
 func TestLoadLibrariesSAM(t *testing.T) {
@@ -181,53 +181,53 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	sort.Sort(ByLibraryName(libraries))
 
 	idx := 0
-	require.Equal(t, "ANewLibrary-master", libraries[idx].Name)
+	require.Equal(t, "ANewLibrary-master", libraries[idx].CanonicalName)
 	idx++
-	require.Equal(t, "Adafruit_PN532", libraries[idx].Name)
+	require.Equal(t, "Adafruit_PN532", libraries[idx].CanonicalName)
 	idx++
-	require.Equal(t, "Audio", libraries[idx].Name)
+	require.Equal(t, "Audio", libraries[idx].CanonicalName)
 	idx++
-	require.Equal(t, "Balanduino", libraries[idx].Name)
+	require.Equal(t, "Balanduino", libraries[idx].CanonicalName)
 	idx++
-	require.Equal(t, "Bridge", libraries[idx].Name)
+	require.Equal(t, "Bridge", libraries[idx].CanonicalName)
 	idx++
-	require.Equal(t, "CapacitiveSensor", libraries[idx].Name)
+	require.Equal(t, "CapacitiveSensor", libraries[idx].CanonicalName)
 	idx++
-	require.Equal(t, "Ethernet", libraries[idx].Name)
+	require.Equal(t, "Ethernet", libraries[idx].CanonicalName)
 	idx++
-	require.Equal(t, "FakeAudio", libraries[idx].Name)
+	require.Equal(t, "FakeAudio", libraries[idx].CanonicalName)
 	idx++
-	require.Equal(t, "FastLED", libraries[idx].Name)
+	require.Equal(t, "FastLED", libraries[idx].CanonicalName)
 	idx++
-	require.Equal(t, "HID", libraries[idx].Name)
+	require.Equal(t, "HID", libraries[idx].CanonicalName)
 	idx++
-	require.Equal(t, "IRremote", libraries[idx].Name)
+	require.Equal(t, "IRremote", libraries[idx].CanonicalName)
 	idx++
-	require.Equal(t, "Robot_IR_Remote", libraries[idx].Name)
+	require.Equal(t, "Robot_IR_Remote", libraries[idx].CanonicalName)
 	idx++
-	require.Equal(t, "SPI", libraries[idx].Name)
+	require.Equal(t, "SPI", libraries[idx].CanonicalName)
 	idx++
-	require.Equal(t, "SPI", libraries[idx].Name)
+	require.Equal(t, "SPI", libraries[idx].CanonicalName)
 	idx++
-	require.Equal(t, "ShouldNotRecurseWithOldLibs", libraries[idx].Name)
+	require.Equal(t, "ShouldNotRecurseWithOldLibs", libraries[idx].CanonicalName)
 	idx++
-	require.Equal(t, "USBHost", libraries[idx].Name)
+	require.Equal(t, "USBHost", libraries[idx].CanonicalName)
 	idx++
-	require.Equal(t, "Wire", libraries[idx].Name)
+	require.Equal(t, "Wire", libraries[idx].CanonicalName)
 
 	libs := ctx.LibrariesResolver.AlternativesFor("Audio.h")
 	require.Len(t, libs, 2)
 	sort.Sort(ByLibraryName(libs))
-	require.Equal(t, "Audio", libs[0].Name)
-	require.Equal(t, "FakeAudio", libs[1].Name)
+	require.Equal(t, "Audio", libs[0].CanonicalName)
+	require.Equal(t, "FakeAudio", libs[1].CanonicalName)
 
 	libs = ctx.LibrariesResolver.AlternativesFor("FakeAudio.h")
 	require.Len(t, libs, 1)
-	require.Equal(t, "FakeAudio", libs[0].Name)
+	require.Equal(t, "FakeAudio", libs[0].CanonicalName)
 
 	libs = ctx.LibrariesResolver.AlternativesFor("IRremote.h")
 	require.Len(t, libs, 1)
-	require.Equal(t, "IRremote", libs[0].Name)
+	require.Equal(t, "IRremote", libs[0].CanonicalName)
 }
 
 func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {

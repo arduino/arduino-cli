@@ -86,7 +86,7 @@ func upgrade(lm *librariesmanager.LibrariesManager, libs []*installedLib, downlo
 
 func filterByName(libs []*installedLib, name string) *installedLib {
 	for _, lib := range libs {
-		if lib.Library.RealName == name {
+		if lib.Library.Name == name {
 			return lib
 		}
 	}

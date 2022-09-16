@@ -68,7 +68,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 					continue
 				}
 			}
-			if latest, has := filteredRes[lib.Library.Name]; has {
+			if latest, has := filteredRes[lib.Library.CanonicalName]; has {
 				if latest.Library.LocationPriorityFor(boardPlatform, refBoardPlatform) >= lib.Library.LocationPriorityFor(boardPlatform, refBoardPlatform) {
 					continue
 				}
@@ -86,7 +86,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 				f: compatible,
 			}
 
-			filteredRes[lib.Library.Name] = lib
+			filteredRes[lib.Library.CanonicalName] = lib
 		}
 
 		res = []*installedLib{}
@@ -96,7 +96,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 	}
 
 	for _, lib := range res {
-		if nameFilter != "" && strings.ToLower(lib.Library.Name) != nameFilter {
+		if nameFilter != "" && strings.ToLower(lib.Library.CanonicalName) != nameFilter {
 			continue
 		}
 		var release *rpc.LibraryRelease
@@ -105,7 +105,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 		}
 		rpcLib, err := lib.Library.ToRPCLibrary()
 		if err != nil {
-			return nil, &arduino.PermissionDeniedError{Message: tr("Error getting information for library %s", lib.Library.Name), Cause: err}
+			return nil, &arduino.PermissionDeniedError{Message: tr("Error getting information for library %s", lib.Library.CanonicalName), Cause: err}
 		}
 		installedLibs = append(installedLibs, &rpc.InstalledLibrary{
 			Library: rpcLib,

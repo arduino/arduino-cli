@@ -135,7 +135,7 @@ func (resolver *Cpp) ResolveFor(header, architecture string) *libraries.Library 
 			msg = "  found another lib with same priority"
 		}
 		logrus.
-			WithField("lib", lib.Name).
+			WithField("lib", lib.CanonicalName).
 			WithField("prio", fmt.Sprintf("%03X", libPriority)).
 			Infof(msg)
 	}
@@ -149,12 +149,12 @@ func (resolver *Cpp) ResolveFor(header, architecture string) *libraries.Library 
 	// If more than one library qualifies use the "closestmatch" algorithm to
 	// find the best matching one (instead of choosing it randomly)
 	if best := findLibraryWithNameBestDistance(header, found); best != nil {
-		logrus.WithField("lib", best.Name).Info("  library with the best matching name")
+		logrus.WithField("lib", best.CanonicalName).Info("  library with the best matching name")
 		return best
 	}
 
 	found.SortByName()
-	logrus.WithField("lib", found[0].Name).Info("  first library in alphabetic order")
+	logrus.WithField("lib", found[0].CanonicalName).Info("  first library in alphabetic order")
 	return found[0]
 }
 
@@ -167,8 +167,8 @@ func simplify(name string) string {
 func computePriority(lib *libraries.Library, header, arch string) int {
 	header = strings.TrimSuffix(header, filepath.Ext(header))
 	header = simplify(header)
-	name := simplify(lib.Name)
-	realName := simplify(lib.RealName)
+	name := simplify(lib.CanonicalName)
+	realName := simplify(lib.Name)
 
 	priority := 0
 
@@ -220,7 +220,7 @@ func findLibraryWithNameBestDistance(name string, libs libraries.List) *librarie
 	// Create closestmatch DB
 	wordsToTest := []string{}
 	for _, lib := range libs {
-		wordsToTest = append(wordsToTest, simplify(lib.Name))
+		wordsToTest = append(wordsToTest, simplify(lib.CanonicalName))
 	}
 	// Choose a set of bag sizes, more is more accurate but slower
 	bagSizes := []int{2}
@@ -232,7 +232,7 @@ func findLibraryWithNameBestDistance(name string, libs libraries.List) *librarie
 	// Return the closest-matching lib
 	var winner *libraries.Library
 	for _, lib := range libs {
-		if closestName == simplify(lib.Name) {
+		if closestName == simplify(lib.CanonicalName) {
 			winner = lib
 			break
 		}

@@ -59,7 +59,7 @@ func TestIncludesToIncludeFolders(t *testing.T) {
 
 	importedLibraries := ctx.ImportedLibraries
 	require.Equal(t, 1, len(importedLibraries))
-	require.Equal(t, "Bridge", importedLibraries[0].Name)
+	require.Equal(t, "Bridge", importedLibraries[0].CanonicalName)
 }
 
 func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
@@ -131,8 +131,8 @@ func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 	importedLibraries := ctx.ImportedLibraries
 	sort.Sort(ByLibraryName(importedLibraries))
 	require.Equal(t, 2, len(importedLibraries))
-	require.Equal(t, "Bridge", importedLibraries[0].Name)
-	require.Equal(t, "IRremote", importedLibraries[1].Name)
+	require.Equal(t, "Bridge", importedLibraries[0].CanonicalName)
+	require.Equal(t, "IRremote", importedLibraries[1].CanonicalName)
 }
 
 func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
@@ -166,8 +166,8 @@ func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 	importedLibraries := ctx.ImportedLibraries
 	sort.Sort(ByLibraryName(importedLibraries))
 	require.Equal(t, 2, len(importedLibraries))
-	require.Equal(t, "ANewLibrary-master", importedLibraries[0].Name)
-	require.Equal(t, "IRremote", importedLibraries[1].Name)
+	require.Equal(t, "ANewLibrary-master", importedLibraries[0].CanonicalName)
+	require.Equal(t, "IRremote", importedLibraries[1].CanonicalName)
 }
 
 func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
@@ -203,7 +203,7 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 	importedLibraries := ctx.ImportedLibraries
 	sort.Sort(ByLibraryName(importedLibraries))
 	require.Equal(t, 1, len(importedLibraries))
-	require.Equal(t, "SPI", importedLibraries[0].Name)
+	require.Equal(t, "SPI", importedLibraries[0].CanonicalName)
 	requireEquivalentPaths(t, importedLibraries[0].SourceDir.String(), filepath.Join("user_hardware", "my_avr_platform", "avr", "libraries", "SPI"))
 }
 
@@ -241,7 +241,7 @@ func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatfo
 	importedLibraries := ctx.ImportedLibraries
 	sort.Sort(ByLibraryName(importedLibraries))
 	require.Equal(t, 1, len(importedLibraries))
-	require.Equal(t, "SPI", importedLibraries[0].Name)
+	require.Equal(t, "SPI", importedLibraries[0].CanonicalName)
 	requireEquivalentPaths(t, importedLibraries[0].SourceDir.String(), filepath.Join("libraries", "SPI"))
 }
 
@@ -279,7 +279,7 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 	importedLibraries := ctx.ImportedLibraries
 	sort.Sort(ByLibraryName(importedLibraries))
 	require.Equal(t, 1, len(importedLibraries))
-	require.Equal(t, "USBHost", importedLibraries[0].Name)
+	require.Equal(t, "USBHost", importedLibraries[0].CanonicalName)
 	requireEquivalentPaths(t, importedLibraries[0].SourceDir.String(), filepath.Join("libraries", "USBHost", "src"))
 }
 
@@ -317,7 +317,7 @@ func TestIncludesToIncludeFoldersSubfolders(t *testing.T) {
 	importedLibraries := ctx.ImportedLibraries
 	sort.Sort(ByLibraryName(importedLibraries))
 	require.Equal(t, 3, len(importedLibraries))
-	require.Equal(t, "testlib1", importedLibraries[0].Name)
-	require.Equal(t, "testlib2", importedLibraries[1].Name)
-	require.Equal(t, "testlib3", importedLibraries[2].Name)
+	require.Equal(t, "testlib1", importedLibraries[0].CanonicalName)
+	require.Equal(t, "testlib2", importedLibraries[1].CanonicalName)
+	require.Equal(t, "testlib3", importedLibraries[2].CanonicalName)
 }

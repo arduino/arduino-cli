@@ -53,7 +53,7 @@ func buildRoot(ctx *Context, origin interface{}) *paths.Path {
 	case *sketch.Sketch:
 		return ctx.SketchBuildPath
 	case *libraries.Library:
-		return ctx.LibrariesBuildPath.Join(o.Name)
+		return ctx.LibrariesBuildPath.Join(o.CanonicalName)
 	default:
 		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
 	}
