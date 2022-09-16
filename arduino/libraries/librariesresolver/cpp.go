@@ -135,7 +135,7 @@ func (resolver *Cpp) ResolveFor(header, architecture string) *libraries.Library 
 			msg = "  found another lib with same priority"
 		}
 		logrus.
-			WithField("lib", lib.CanonicalName).
+			WithField("lib", lib.Name).
 			WithField("prio", fmt.Sprintf("%03X", libPriority)).
 			Infof(msg)
 	}
@@ -149,12 +149,12 @@ func (resolver *Cpp) ResolveFor(header, architecture string) *libraries.Library 
 	// If more than one library qualifies use the "closestmatch" algorithm to
 	// find the best matching one (instead of choosing it randomly)
 	if best := findLibraryWithNameBestDistance(header, found); best != nil {
-		logrus.WithField("lib", best.CanonicalName).Info("  library with the best matching name")
+		logrus.WithField("lib", best.Name).Info("  library with the best matching name")
 		return best
 	}
 
 	found.SortByName()
-	logrus.WithField("lib", found[0].CanonicalName).Info("  first library in alphabetic order")
+	logrus.WithField("lib", found[0].Name).Info("  first library in alphabetic order")
 	return found[0]
 }
 
@@ -167,8 +167,8 @@ func simplify(name string) string {
 func computePriority(lib *libraries.Library, header, arch string) int {
 	header = strings.TrimSuffix(header, filepath.Ext(header))
 	header = simplify(header)
-	name := simplify(lib.CanonicalName)
-	realName := simplify(lib.Name)
+	name := simplify(lib.Name)
+	canonicalName := simplify(lib.CanonicalName)
 
 	priority := 0
 
@@ -185,17 +185,17 @@ func computePriority(lib *libraries.Library, header, arch string) int {
 		priority += 0
 	}
 
-	if realName == header && name == header {
+	if name == header && canonicalName == header {
 		priority += 600
-	} else if realName == header || name == header {
+	} else if name == header || canonicalName == header {
 		priority += 500
-	} else if realName == header+"-master" || name == header+"-master" {
+	} else if name == header+"-master" || canonicalName == header+"-master" {
 		priority += 400
-	} else if strings.HasPrefix(realName, header) || strings.HasPrefix(name, header) {
+	} else if strings.HasPrefix(name, header) || strings.HasPrefix(canonicalName, header) {
 		priority += 300
-	} else if strings.HasSuffix(realName, header) || strings.HasSuffix(name, header) {
+	} else if strings.HasSuffix(name, header) || strings.HasSuffix(canonicalName, header) {
 		priority += 200
-	} else if strings.Contains(realName, header) || strings.Contains(name, header) {
+	} else if strings.Contains(name, header) || strings.Contains(canonicalName, header) {
 		priority += 100
 	}
 
@@ -220,7 +220,7 @@ func findLibraryWithNameBestDistance(name string, libs libraries.List) *librarie
 	// Create closestmatch DB
 	wordsToTest := []string{}
 	for _, lib := range libs {
-		wordsToTest = append(wordsToTest, simplify(lib.CanonicalName))
+		wordsToTest = append(wordsToTest, simplify(lib.Name))
 	}
 	// Choose a set of bag sizes, more is more accurate but slower
 	bagSizes := []int{2}
@@ -232,7 +232,7 @@ func findLibraryWithNameBestDistance(name string, libs libraries.List) *librarie
 	// Return the closest-matching lib
 	var winner *libraries.Library
 	for _, lib := range libs {
-		if closestName == simplify(lib.CanonicalName) {
+		if closestName == simplify(lib.Name) {
 			winner = lib
 			break
 		}

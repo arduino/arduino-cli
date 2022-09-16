@@ -85,9 +85,9 @@ type Library struct {
 
 func (library *Library) String() string {
 	if library.Version.String() == "" {
-		return library.CanonicalName
+		return library.Name
 	}
-	return library.CanonicalName + "@" + library.Version.String()
+	return library.Name + "@" + library.Version.String()
 }
 
 // ToRPCLibrary converts this library into an rpc.Library
@@ -117,7 +117,7 @@ func (library *Library) ToRPCLibrary() (*rpc.Library, error) {
 	}
 
 	return &rpc.Library{
-		Name:              library.CanonicalName,
+		Name:              library.Name,
 		Author:            library.Author,
 		Maintainer:        library.Maintainer,
 		Sentence:          library.Sentence,

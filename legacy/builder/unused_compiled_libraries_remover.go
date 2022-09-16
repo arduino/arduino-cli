@@ -53,7 +53,7 @@ func (s *UnusedCompiledLibrariesRemover) Run(ctx *types.Context) error {
 func toLibraryNames(libraries []*libraries.Library) []string {
 	libraryNames := []string{}
 	for _, library := range libraries {
-		libraryNames = append(libraryNames, library.CanonicalName)
+		libraryNames = append(libraryNames, library.Name)
 	}
 	return libraryNames
 }

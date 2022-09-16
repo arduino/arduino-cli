@@ -131,6 +131,7 @@ func makeLegacyLibrary(path *paths.Path, location LibraryLocation) (*Library, er
 		Location:      location,
 		SourceDir:     path,
 		Layout:        FlatLayout,
+		Name:          path.Base(),
 		CanonicalName: path.Base(),
 		Architectures: []string{"*"},
 		IsLegacy:      true,

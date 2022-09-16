@@ -86,7 +86,7 @@ func findExpectedPrecompiledLibFolder(ctx *types.Context, library *libraries.Lib
 		}
 	}
 
-	ctx.Info(tr("Library %[1]s has been declared precompiled:", library.CanonicalName))
+	ctx.Info(tr("Library %[1]s has been declared precompiled:", library.Name))
 
 	// Try directory with full fpuSpecs first, if available
 	if len(fpuSpecs) > 0 {
@@ -129,7 +129,7 @@ func compileLibraries(ctx *types.Context, libraries libraries.List, buildPath *p
 
 func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
 	if ctx.Verbose {
-		ctx.Info(tr(`Compiling library "%[1]s"`, library.CanonicalName))
+		ctx.Info(tr(`Compiling library "%[1]s"`, library.Name))
 	}
 	libraryBuildPath := buildPath.Join(library.CanonicalName)
 

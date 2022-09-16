@@ -205,7 +205,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		for _, lib := range builderCtx.ImportedLibraries {
 			rpcLib, err := lib.ToRPCLibrary()
 			if err != nil {
-				msg := tr("Error getting information for library %s", lib.CanonicalName) + ": " + err.Error() + "\n"
+				msg := tr("Error getting information for library %s", lib.Name) + ": " + err.Error() + "\n"
 				errStream.Write([]byte(msg))
 			}
 			importedLibs = append(importedLibs, rpcLib)

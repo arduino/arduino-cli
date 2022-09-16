@@ -36,13 +36,13 @@ func (s *PrintUsedLibrariesIfVerbose) Run(ctx *types.Context) error {
 		if library.Version.String() == "" {
 			ctx.Info(
 				tr("Using library %[1]s in folder: %[2]s %[3]s",
-					library.CanonicalName,
+					library.Name,
 					library.InstallDir,
 					legacy))
 		} else {
 			ctx.Info(
 				tr("Using library %[1]s at version %[2]s in folder: %[3]s %[4]s",
-					library.CanonicalName,
+					library.Name,
 					library.Version,
 					library.InstallDir,
 					legacy))

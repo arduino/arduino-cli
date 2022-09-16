@@ -84,5 +84,5 @@ func (s ByLibraryName) Swap(i, j int) {
 	s[i], s[j] = s[j], s[i]
 }
 func (s ByLibraryName) Less(i, j int) bool {
-	return s[i].CanonicalName < s[j].CanonicalName
+	return s[i].Name < s[j].Name
 }

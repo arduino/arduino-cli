@@ -280,7 +280,7 @@ message Library {
   // (e.g., `arduino:avr@1.8.2`).
   string container_platform = 14;
   // Value of the `name` field in library.properties.
-  string real_name = 16;
+  string real_name = 16 [ deprecated = true ];
   // Value of the `dot_a_linkage` field in library.properties.
   bool dot_a_linkage = 17;
   // Value of the `precompiled` field in library.properties.

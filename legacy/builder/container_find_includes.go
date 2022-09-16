@@ -352,7 +352,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 				// Fully precompiled libraries should have no dependencies
 				// to avoid ABI breakage
 				if ctx.Verbose {
-					ctx.Info(tr("Skipping dependencies detection for precompiled library %[1]s", library.CanonicalName))
+					ctx.Info(tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
 				}
 				return nil
 			}
