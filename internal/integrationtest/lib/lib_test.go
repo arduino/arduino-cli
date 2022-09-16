@@ -93,3 +93,27 @@ func TestLibInstallMultipleSameLibrary(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Len(t, jsonOut, 1, "A duplicate library install has been detected")
 }
+
+func TestDuplicateLibInstallDetection(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+	cliEnv := cli.GetDefaultEnv()
+	cliEnv["ARDUINO_LIBRARY_ENABLE_UNSAFE_INSTALL"] = "true"
+
+	// Make a double install in the sketchbook/user directory
+	_, _, err := cli.Run("lib", "install", "ArduinoOTA@1.0.0")
+	require.NoError(t, err)
+	otaLibPath := cli.SketchbookDir().Join("libraries", "ArduinoOTA")
+	err = otaLibPath.CopyDirTo(otaLibPath.Parent().Join("CopyOfArduinoOTA"))
+	require.NoError(t, err)
+	jsonOut, _, err := cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, jsonOut, 2, "Duplicate library install is not detected by the CLI")
+
+	_, _, err = cli.Run("lib", "install", "ArduinoOTA")
+	require.Error(t, err)
+	_, _, err = cli.Run("lib", "upgrade", "ArduinoOTA")
+	require.Error(t, err)
+	_, _, err = cli.Run("lib", "uninstall", "ArduinoOTA")
+	require.Error(t, err)
+}
