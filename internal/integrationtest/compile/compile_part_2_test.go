@@ -328,3 +328,27 @@ func TestCompileWithArchivesAndLongPaths(t *testing.T) {
 	_, _, err = cli.Run("compile", "-b", "esp8266:esp8266:huzzah", sketchPath.String())
 	require.NoError(t, err)
 }
+
+func TestCompileWithPrecompileLibrary(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.11")
+	require.NoError(t, err)
+	fqbn := "arduino:samd:mkrzero"
+
+	// Install precompiled library
+	// For more information see:
+	// https://arduino.github.io/arduino-cli/latest/library-specification/#precompiled-binaries
+	_, _, err = cli.Run("lib", "install", "BSEC Software Library@1.5.1474")
+	require.NoError(t, err)
+	sketchFolder := cli.SketchbookDir().Join("libraries", "BSEC_Software_Library", "examples", "basic")
+
+	// Compile and verify dependencies detection for fully precompiled library is not skipped
+	stdout, _, err := cli.Run("compile", "-b", fqbn, sketchFolder.String(), "-v")
+	require.NoError(t, err)
+	require.NotContains(t, string(stdout), "Skipping dependencies detection for precompiled library BSEC Software Library")
+}
