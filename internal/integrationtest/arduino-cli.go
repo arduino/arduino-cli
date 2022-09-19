@@ -126,6 +126,18 @@ func (cli *ArduinoCLI) SketchbookDir() *paths.Path {
 	return cli.sketchbookDir
 }
 
+// CopySketch copies a sketch inside the testing environment and returns its path
+func (cli *ArduinoCLI) CopySketch(sketchName string) *paths.Path {
+	p, err := paths.Getwd()
+	cli.t.NoError(err)
+	cli.t.NotNil(p)
+	testSketch := p.Parent().Join("testdata", sketchName)
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	err = testSketch.CopyDirTo(sketchPath)
+	cli.t.NoError(err)
+	return sketchPath
+}
+
 // Run executes the given arduino-cli command and returns the output.
 func (cli *ArduinoCLI) Run(args ...string) ([]byte, []byte, error) {
 	return cli.RunWithCustomEnv(cli.cliEnvVars, args...)
