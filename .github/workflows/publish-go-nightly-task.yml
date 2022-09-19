@@ -179,31 +179,31 @@ jobs:
           TAG="nightly-$(date -u +"%Y%m%d")"
           sha256sum ${{ env.PROJECT_NAME }}_${TAG}* >> ${TAG}-checksums.txt
 
-      - name: Upload release files on Arduino downloads servers
-        uses: docker://plugins/s3
-        env:
-          PLUGIN_SOURCE: "${{ env.DIST_DIR }}/*"
-          PLUGIN_TARGET: "${{ env.AWS_PLUGIN_TARGET }}nightly"
-          PLUGIN_STRIP_PREFIX: "${{ env.DIST_DIR }}/"
-          PLUGIN_BUCKET: ${{ secrets.DOWNLOADS_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # - name: Upload release files on Arduino downloads servers
+      #   uses: docker://plugins/s3
+      #   env:
+      #     PLUGIN_SOURCE: "${{ env.DIST_DIR }}/*"
+      #     PLUGIN_TARGET: "${{ env.AWS_PLUGIN_TARGET }}nightly"
+      #     PLUGIN_STRIP_PREFIX: "${{ env.DIST_DIR }}/"
+      #     PLUGIN_BUCKET: ${{ secrets.DOWNLOADS_BUCKET }}
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-  report:
-    runs-on: ubuntu-latest
-    needs: publish-nightly
-    if: failure() # Run if publish-nightly or any of its job dependencies failed
+  #  report:
+  #    runs-on: ubuntu-latest
+  #    needs: publish-nightly
+  #    if: failure() # Run if publish-nightly or any of its job dependencies failed
 
-    steps:
-      - name: Report failure
-        uses: masci/datadog@v1
-        with:
-          api-key: ${{ secrets.DD_API_KEY }}
-          events: |
-            - title: "${{ env.PROJECT_NAME }} nightly build failed"
-              text: "Nightly build workflow has failed"
-              alert_type: "error"
-              host: ${{ github.repository }}
-              tags:
-                - "project:${{ env.PROJECT_NAME }}"
-                - "workflow:${{ github.workflow }}"
+  #    steps:
+  #      - name: Report failure
+  #        uses: masci/datadog@v1
+  #        with:
+  #          api-key: ${{ secrets.DD_API_KEY }}
+  #          events: |
+  #            - title: "${{ env.PROJECT_NAME }} nightly build failed"
+  #              text: "Nightly build workflow has failed"
+  #              alert_type: "error"
+  #              host: ${{ github.repository }}
+  #              tags:
+  #                - "project:${{ env.PROJECT_NAME }}"
+  #                - "workflow:${{ github.workflow }}"
