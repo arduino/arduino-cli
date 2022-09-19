@@ -126,10 +126,13 @@ func TestDuplicateLibInstallDetection(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Len(t, jsonOut, 2, "Duplicate library install is not detected by the CLI")
 
-	_, _, err = cli.Run("lib", "install", "ArduinoOTA")
+	_, stdErr, err := cli.Run("lib", "install", "ArduinoOTA")
 	require.Error(t, err)
-	_, _, err = cli.Run("lib", "upgrade", "ArduinoOTA")
+	require.Contains(t, string(stdErr), "The library ArduinoOTA has multiple installations")
+	_, stdErr, err = cli.Run("lib", "upgrade", "ArduinoOTA")
 	require.Error(t, err)
-	_, _, err = cli.Run("lib", "uninstall", "ArduinoOTA")
+	require.Contains(t, string(stdErr), "The library ArduinoOTA has multiple installations")
+	_, stdErr, err = cli.Run("lib", "uninstall", "ArduinoOTA")
 	require.Error(t, err)
+	require.Contains(t, string(stdErr), "The library ArduinoOTA has multiple installations")
 }
