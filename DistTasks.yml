@@ -23,19 +23,6 @@ vars:
   CHECKSUM_FILE: "{{.VERSION}}-checksums.txt"
 
 tasks:
-  all:
-    desc: Build for distribution for all platforms
-    cmds:
-      - task: Windows_32bit
-      - task: Windows_64bit
-      - task: Linux_32bit
-      - task: Linux_64bit
-      - task: Linux_ARMv6
-      - task: Linux_ARMv7
-      - task: Linux_ARM64
-      - task: macOS_64bit
-      - task: macOS_ARM64
-
   Windows_32bit:
     desc: Builds Windows 32 bit binaries
     dir: "{{.DIST_DIR}}"

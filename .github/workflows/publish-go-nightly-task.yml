@@ -22,6 +22,19 @@ jobs:
   create-nightly-artifacts:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        os:
+          - Windows_32bit
+          - Windows_64bit
+          - Linux_32bit
+          - Linux_64bit
+          - Linux_ARMv6
+          - Linux_ARMv7
+          - Linux_ARM64
+          - macOS_64bit
+          - macOS_ARM64
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -35,7 +48,7 @@ jobs:
       - name: Build
         env:
           NIGHTLY: true
-        run: task dist:all
+        run: task dist:${{ matrix.os }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
