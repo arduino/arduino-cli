@@ -62,7 +62,7 @@ func (list *List) FindByName(name string) *Library {
 	return nil
 }
 
-// FilterByVersionAndInstallLocation returns the libraries mathching the provided version and install location. If version
+// FilterByVersionAndInstallLocation returns the libraries matching the provided version and install location. If version
 // is nil all version are matched.
 func (list *List) FilterByVersionAndInstallLocation(version *semver.Version, installLocation LibraryLocation) List {
 	var found List
