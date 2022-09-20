@@ -17,25 +17,6 @@ import json
 import yaml
 
 
-def test_init_dest_flag_with_overwrite_flag(run_command, working_dir):
-    dest = Path(working_dir) / "config" / "test"
-
-    expected_config_file = dest / "arduino-cli.yaml"
-    assert not expected_config_file.exists()
-
-    result = run_command(["config", "init", "--dest-dir", dest])
-    assert result.ok
-    assert expected_config_file.exists()
-
-    result = run_command(["config", "init", "--dest-dir", dest])
-    assert result.failed
-    assert "Config file already exists, use --overwrite to discard the existing one." in result.stderr
-
-    result = run_command(["config", "init", "--dest-dir", dest, "--overwrite"])
-    assert result.ok
-    assert str(expected_config_file) in result.stdout
-
-
 def test_init_dest_and_config_file_flags(run_command, working_dir):
     result = run_command(["config", "init", "--dest-file", "some_other_path", "--dest-dir", "some_path"])
     assert result.failed

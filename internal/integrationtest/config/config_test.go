@@ -148,3 +148,24 @@ func TestInistDestRelativePath(t *testing.T) {
 	require.Contains(t, string(stdout), expectedConfigFile.String())
 	require.FileExists(t, expectedConfigFile.String())
 }
+
+func TestInitDestFlagWithOverwriteFlag(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	dest := cli.WorkingDir().Join("config", "test")
+	expectedConfigFile := dest.Join("arduino-cli.yaml")
+	require.NoFileExists(t, expectedConfigFile.String())
+
+	_, _, err := cli.Run("config", "init", "--dest-dir", dest.String())
+	require.NoError(t, err)
+	require.FileExists(t, expectedConfigFile.String())
+
+	_, stderr, err := cli.Run("config", "init", "--dest-dir", dest.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Config file already exists, use --overwrite to discard the existing one.")
+
+	stdout, _, err := cli.Run("config", "init", "--dest-dir", dest.String(), "--overwrite")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), expectedConfigFile.String())
+}
