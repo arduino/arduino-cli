@@ -17,44 +17,6 @@ import json
 import yaml
 
 
-def test_init_overwrite_existing_custom_file(run_command, data_dir, working_dir, downloads_dir):
-    result = run_command(["config", "init", "--additional-urls", "https://example.com"])
-    assert result.ok
-    assert data_dir in result.stdout
-
-    config_file = open(Path(data_dir) / "arduino-cli.yaml", "r")
-    configs = yaml.load(config_file.read(), Loader=yaml.FullLoader)
-    config_file.close()
-    assert ["https://example.com"] == configs["board_manager"]["additional_urls"]
-    assert "50051" == configs["daemon"]["port"]
-    assert data_dir == configs["directories"]["data"]
-    assert downloads_dir == configs["directories"]["downloads"]
-    assert data_dir == configs["directories"]["user"]
-    assert "" == configs["logging"]["file"]
-    assert "text" == configs["logging"]["format"]
-    assert "info" == configs["logging"]["level"]
-    assert ":9090" == configs["metrics"]["addr"]
-    assert configs["metrics"]["enabled"]
-
-    result = run_command(["config", "init", "--overwrite"])
-    assert result.ok
-    assert data_dir in result.stdout
-
-    config_file = open(Path(data_dir) / "arduino-cli.yaml", "r")
-    configs = yaml.load(config_file.read(), Loader=yaml.FullLoader)
-    config_file.close()
-    assert [] == configs["board_manager"]["additional_urls"]
-    assert "50051" == configs["daemon"]["port"]
-    assert data_dir == configs["directories"]["data"]
-    assert downloads_dir == configs["directories"]["downloads"]
-    assert data_dir == configs["directories"]["user"]
-    assert "" == configs["logging"]["file"]
-    assert "text" == configs["logging"]["format"]
-    assert "info" == configs["logging"]["level"]
-    assert ":9090" == configs["metrics"]["addr"]
-    assert configs["metrics"]["enabled"]
-
-
 def test_init_dest_absolute_path(run_command, working_dir):
     dest = Path(working_dir) / "config" / "test"
     expected_config_file = dest / "arduino-cli.yaml"
