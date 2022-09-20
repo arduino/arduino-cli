@@ -178,3 +178,16 @@ func TestInitDestAndConfigFileFlags(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "Can't use --dest-file and --dest-dir flags at the same time.")
 }
+
+func TestInitConfigFileFlagAbsolutePath(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	configFile := cli.WorkingDir().Join("config", "test", "config.yaml")
+	require.NoFileExists(t, configFile.String())
+
+	stdout, _, err := cli.Run("config", "init", "--dest-file", configFile.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), configFile.String())
+	require.FileExists(t, configFile.String())
+}
