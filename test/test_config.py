@@ -17,12 +17,6 @@ import json
 import yaml
 
 
-def test_init_dest_and_config_file_flags(run_command, working_dir):
-    result = run_command(["config", "init", "--dest-file", "some_other_path", "--dest-dir", "some_path"])
-    assert result.failed
-    assert "Can't use --dest-file and --dest-dir flags at the same time." in result.stderr
-
-
 def test_init_config_file_flag_absolute_path(run_command, working_dir):
     config_file = Path(working_dir) / "config" / "test" / "config.yaml"
     assert not config_file.exists()

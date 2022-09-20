@@ -169,3 +169,12 @@ func TestInitDestFlagWithOverwriteFlag(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), expectedConfigFile.String())
 }
+
+func TestInitDestAndConfigFileFlags(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, stderr, err := cli.Run("config", "init", "--dest-file", "some_other_path", "--dest-dir", "some_path")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Can't use --dest-file and --dest-dir flags at the same time.")
+}
