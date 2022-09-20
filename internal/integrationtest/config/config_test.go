@@ -135,3 +135,16 @@ func TestInitDestAbsolutePath(t *testing.T) {
 	require.Contains(t, string(stdout), expectedConfigFile.String())
 	require.FileExists(t, expectedConfigFile.String())
 }
+
+func TestInistDestRelativePath(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	dest := cli.WorkingDir().Join("config", "test")
+	expectedConfigFile := dest.Join("arduino-cli.yaml")
+	require.NoFileExists(t, expectedConfigFile.String())
+	stdout, _, err := cli.Run("config", "init", "--dest-dir", "config/test")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), expectedConfigFile.String())
+	require.FileExists(t, expectedConfigFile.String())
+}
