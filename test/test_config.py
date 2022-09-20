@@ -17,13 +17,6 @@ import json
 import yaml
 
 
-def test_init(run_command, data_dir, working_dir):
-    result = run_command(["config", "init"])
-    assert "" == result.stderr
-    assert result.ok
-    assert data_dir in result.stdout
-
-
 def test_init_with_existing_custom_config(run_command, data_dir, working_dir, downloads_dir):
     result = run_command(["config", "init", "--additional-urls", "https://example.com"])
     assert result.ok
