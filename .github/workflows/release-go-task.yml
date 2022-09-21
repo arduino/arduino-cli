@@ -39,6 +39,8 @@ jobs:
           fetch-depth: 0
 
       - name: Create changelog
+        # Avoid creating the same changelog for each os
+        if: matrix.os == 'Windows_32bit'
         uses: arduino/create-changelog@v1
         with:
           tag-regex: '^[0-9]+\.[0-9]+\.[0-9]+.*$'
