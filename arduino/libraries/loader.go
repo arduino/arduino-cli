@@ -108,8 +108,8 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 	if err := addExamples(library); err != nil {
 		return nil, errors.Errorf(tr("scanning examples: %s"), err)
 	}
-	library.Name = libraryDir.Base()
-	library.RealName = strings.TrimSpace(libProperties.Get("name"))
+	library.CanonicalName = libraryDir.Base()
+	library.Name = strings.TrimSpace(libProperties.Get("name"))
 	library.Author = strings.TrimSpace(libProperties.Get("author"))
 	library.Maintainer = strings.TrimSpace(libProperties.Get("maintainer"))
 	library.Sentence = strings.TrimSpace(libProperties.Get("sentence"))
@@ -132,6 +132,7 @@ func makeLegacyLibrary(path *paths.Path, location LibraryLocation) (*Library, er
 		SourceDir:     path,
 		Layout:        FlatLayout,
 		Name:          path.Base(),
+		CanonicalName: path.Base(),
 		Architectures: []string{"*"},
 		IsLegacy:      true,
 		Version:       semver.MustParse(""),

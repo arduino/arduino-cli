@@ -22,6 +22,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
@@ -49,32 +50,42 @@ var (
 // install path, where the library should be installed and the possible library that is already
 // installed on the same folder and it's going to be replaced by the new one.
 func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesindex.Release, installLocation libraries.LibraryLocation) (*paths.Path, *libraries.Library, error) {
-	saneName := utils.SanitizeName(indexLibrary.Library.Name)
-
-	var replaced *libraries.Library
-	if installedLibs, have := lm.Libraries[saneName]; have {
-		for _, installedLib := range installedLibs.Alternatives {
-			if installedLib.Location != installLocation {
-				continue
-			}
-			if installedLib.Version != nil && installedLib.Version.Equal(indexLibrary.Version) {
-				return installedLib.InstallDir, nil, ErrAlreadyInstalled
-			}
-			replaced = installedLib
-		}
-	}
-
-	libsDir := lm.getLibrariesDir(installLocation)
-	if libsDir == nil {
+	installDir := lm.getLibrariesDir(installLocation)
+	if installDir == nil {
 		if installLocation == libraries.User {
 			return nil, nil, fmt.Errorf(tr("User directory not set"))
 		}
 		return nil, nil, fmt.Errorf(tr("Builtin libraries directory not set"))
 	}
 
-	libPath := libsDir.Join(saneName)
-	if replaced != nil && replaced.InstallDir.EquivalentTo(libPath) {
+	name := indexLibrary.Library.Name
+	libs := lm.FindByReference(&librariesindex.Reference{Name: name}, installLocation)
+	for _, lib := range libs {
+		if lib.Version != nil && lib.Version.Equal(indexLibrary.Version) {
+			return lib.InstallDir, nil, ErrAlreadyInstalled
+		}
+	}
 
+	if len(libs) > 1 {
+		libsDir := paths.NewPathList()
+		for _, lib := range libs {
+			libsDir.Add(lib.InstallDir)
+		}
+		return nil, nil, &arduino.MultipleLibraryInstallDetected{
+			LibName: name,
+			LibsDir: libsDir,
+			Message: tr("Automatic library install can't be performed in this case, please manually remove all duplicates and retry."),
+		}
+	}
+
+	var replaced *libraries.Library
+	if len(libs) == 1 {
+		replaced = libs[0]
+	}
+
+	libPath := installDir.Join(utils.SanitizeName(indexLibrary.Library.Name))
+	if replaced != nil && replaced.InstallDir.EquivalentTo(libPath) {
+		return libPath, replaced, nil
 	} else if libPath.IsDir() {
 		return nil, nil, fmt.Errorf(tr("destination dir %s already exists, cannot install"), libPath)
 	}
@@ -82,12 +93,8 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 }
 
 // Install installs a library on the specified path.
-func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, libPath *paths.Path, installLocation libraries.LibraryLocation) error {
-	libsDir := lm.getLibrariesDir(installLocation)
-	if libsDir == nil {
-		return fmt.Errorf(tr("User directory not set"))
-	}
-	return indexLibrary.Resource.Install(lm.DownloadsDir, libsDir, libPath)
+func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, libPath *paths.Path) error {
+	return indexLibrary.Resource.Install(lm.DownloadsDir, libPath.Parent(), libPath)
 }
 
 // Uninstall removes a Library
@@ -99,7 +106,9 @@ func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
 		return fmt.Errorf(tr("removing lib directory: %s"), err)
 	}
 
-	lm.Libraries[lib.Name].Remove(lib)
+	alternatives := lm.Libraries[lib.Name]
+	alternatives.Remove(lib)
+	lm.Libraries[lib.Name] = alternatives
 	return nil
 }
 
@@ -189,8 +198,8 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 
 // InstallGitLib installs a library hosted on a git repository on the specified path.
 func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
-	libsDir := lm.getLibrariesDir(libraries.User)
-	if libsDir == nil {
+	installDir := lm.getLibrariesDir(libraries.User)
+	if installDir == nil {
 		return fmt.Errorf(tr("User directory not set"))
 	}
 
@@ -202,10 +211,9 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 		return err
 	}
 
-	installPath := libsDir.Join(libraryName)
-
 	// Deletes libraries folder if already installed
-	if _, ok := lm.Libraries[libraryName]; ok {
+	installPath := installDir.Join(libraryName)
+	if installPath.IsDir() {
 		if !overwrite {
 			return fmt.Errorf(tr("library %s already installed"), libraryName)
 		}
@@ -214,6 +222,9 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 			WithField("install path", installPath).
 			Trace("Deleting library")
 		installPath.RemoveAll()
+	}
+	if installPath.Exist() {
+		return fmt.Errorf(tr("could not create directory %s: a file with the same name exists!", installPath))
 	}
 
 	logrus.

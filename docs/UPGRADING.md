@@ -4,6 +4,58 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.28.0
 
+### Breaking changes in libraries name handling
+
+In the structure `github.com/arduino/arduino-cli/arduino/libraries.Library` the field:
+
+- `RealName` has been renamed to `Name`
+- `Name` has been renamed to `CanonicalName`
+
+Now `Name` is the name of the library as it appears in the `library.properties` file and `CanonicalName` it's the name
+of the directory containing the library. The `CanonicalName` is usually the name of the library with non-alphanumeric
+characters converted to underscore, but it could be actually anything since the directory where the library is installed
+can be freely renamed.
+
+This change improves the overall code base naming coherence since all the structures involving libraries have the `Name`
+field that refers to the library name as it appears in the `library.properties` file.
+
+### `github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager.Install` removed parameter `installLocation`
+
+The method:
+
+```go
+func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, libPath *paths.Path, installLocation libraries.LibraryLocation) error { ... }
+```
+
+no more needs the `installLocation` parameter:
+
+```go
+func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, libPath *paths.Path) error { ... }
+```
+
+The install location is determined from the libPath.
+
+### `github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager.FindByReference` now returns a list of libraries.
+
+The method:
+
+```go
+func (lm *LibrariesManager) FindByReference(libRef *librariesindex.Reference, installLocation libraries.LibraryLocation) *libraries.Library { ... }
+```
+
+has been changed to:
+
+```go
+func (lm *LibrariesManager) FindByReference(libRef *librariesindex.Reference, installLocation libraries.LibraryLocation) libraries.List { ... }
+```
+
+the method now returns all the libraries matching the criteria and not just the first one.
+
+### `github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibraryAlternatives` removed
+
+The structure `librariesmanager.LibraryAlternatives` has been removed. The `libraries.List` object can be used as a
+replacement.
+
 ### Breaking changes in UpdateIndex API (both gRPC and go-lang)
 
 The gRPC message `cc.arduino.cli.commands.v1.UpdateIndexResponse` has been changed from:

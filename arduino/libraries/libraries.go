@@ -63,12 +63,12 @@ type Library struct {
 	Types []string `json:"types,omitempty"`
 
 	InstallDir             *paths.Path
+	CanonicalName          string
 	SourceDir              *paths.Path
 	UtilityDir             *paths.Path
 	Location               LibraryLocation
 	ContainerPlatform      *cores.PlatformRelease `json:""`
 	Layout                 LibraryLayout
-	RealName               string
 	DotALinkage            bool
 	Precompiled            bool
 	PrecompiledWithSources bool
@@ -132,7 +132,7 @@ func (library *Library) ToRPCLibrary() (*rpc.Library, error) {
 		Location:          library.Location.ToRPCLibraryLocation(),
 		ContainerPlatform: platformOrEmpty(library.ContainerPlatform),
 		Layout:            library.Layout.ToRPCLibraryLayout(),
-		RealName:          library.RealName,
+		RealName:          library.Name,
 		DotALinkage:       library.DotALinkage,
 		Precompiled:       library.Precompiled,
 		LdFlags:           library.LDflags,

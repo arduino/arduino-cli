@@ -31,12 +31,13 @@ import (
 func extractLibraries(ctx *types.Context) []*libraries.Library {
 	res := []*libraries.Library{}
 	for _, lib := range ctx.LibrariesManager.Libraries {
-		for _, libAlternative := range lib.Alternatives {
+		for _, libAlternative := range lib {
 			res = append(res, libAlternative)
 		}
 	}
 	return res
 }
+
 func TestLoadLibrariesAVR(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
@@ -75,7 +76,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	require.Equal(t, "ANewLibrary-master", libs[idx].Name)
 
 	idx++
-	require.Equal(t, "Adafruit_PN532", libs[idx].Name)
+	require.Equal(t, "Adafruit PN532", libs[idx].Name)
 	require.True(t, Abs(t, paths.New("downloaded_libraries/Adafruit_PN532")).EquivalentTo(libs[idx].InstallDir))
 	require.True(t, Abs(t, paths.New("downloaded_libraries/Adafruit_PN532")).EquivalentTo(libs[idx].SourceDir))
 	require.Equal(t, 1, len(libs[idx].Architectures))
@@ -114,7 +115,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	idx++
 	require.Equal(t, "IRremote", libs[idx].Name)
 	idx++
-	require.Equal(t, "Robot_IR_Remote", libs[idx].Name)
+	require.Equal(t, "Robot IR Remote", libs[idx].Name)
 	idx++
 	require.Equal(t, "SPI", libs[idx].Name)
 	idx++
@@ -140,7 +141,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 
 	libs = ctx.LibrariesResolver.AlternativesFor("Adafruit_PN532.h")
 	require.Len(t, libs, 1)
-	require.Equal(t, "Adafruit_PN532", libs[0].Name)
+	require.Equal(t, "Adafruit PN532", libs[0].Name)
 
 	libs = ctx.LibrariesResolver.AlternativesFor("IRremote.h")
 	require.Len(t, libs, 1)
@@ -183,7 +184,7 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	idx := 0
 	require.Equal(t, "ANewLibrary-master", libraries[idx].Name)
 	idx++
-	require.Equal(t, "Adafruit_PN532", libraries[idx].Name)
+	require.Equal(t, "Adafruit PN532", libraries[idx].Name)
 	idx++
 	require.Equal(t, "Audio", libraries[idx].Name)
 	idx++
@@ -203,7 +204,7 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	idx++
 	require.Equal(t, "IRremote", libraries[idx].Name)
 	idx++
-	require.Equal(t, "Robot_IR_Remote", libraries[idx].Name)
+	require.Equal(t, "Robot IR Remote", libraries[idx].Name)
 	idx++
 	require.Equal(t, "SPI", libraries[idx].Name)
 	idx++

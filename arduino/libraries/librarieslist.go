@@ -17,6 +17,8 @@ package libraries
 
 import (
 	"sort"
+
+	semver "go.bug.st/relaxed-semver"
 )
 
 // List is a list of Libraries
@@ -39,6 +41,16 @@ func (list *List) Add(libs ...*Library) {
 	}
 }
 
+// Remove removes the library from the list
+func (list *List) Remove(library *Library) {
+	for i, lib := range *list {
+		if lib == library {
+			*list = append((*list)[:i], (*list)[i+1:]...)
+			return
+		}
+	}
+}
+
 // FindByName returns the first library in the list that match
 // the specified name or nil if not found
 func (list *List) FindByName(name string) *Library {
@@ -48,6 +60,22 @@ func (list *List) FindByName(name string) *Library {
 		}
 	}
 	return nil
+}
+
+// FilterByVersionAndInstallLocation returns the libraries matching the provided version and install location. If version
+// is nil all version are matched.
+func (list *List) FilterByVersionAndInstallLocation(version *semver.Version, installLocation LibraryLocation) List {
+	var found List
+	for _, lib := range *list {
+		if lib.Location != installLocation {
+			continue
+		}
+		if version != nil && !lib.Version.Equal(version) {
+			continue
+		}
+		found.Add(lib)
+	}
+	return found
 }
 
 // SortByName sorts the libraries by name

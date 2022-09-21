@@ -21,6 +21,7 @@ import (
 
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-paths-helper"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -808,5 +809,28 @@ func (e *MultiplePlatformsError) Error() string {
 
 // ToRPCStatus converts the error into a *status.Status
 func (e *MultiplePlatformsError) ToRPCStatus() *status.Status {
+	return status.New(codes.InvalidArgument, e.Error())
+}
+
+// MultipleLibraryInstallDetected is returned when the user request an
+// operation on a library but multiple libraries with the same name
+// (in library.properties) are detected.
+type MultipleLibraryInstallDetected struct {
+	LibName string
+	LibsDir paths.PathList
+	Message string
+}
+
+func (e *MultipleLibraryInstallDetected) Error() string {
+	res := tr("The library %s has multiple installations:", e.LibName) + "\n"
+	for _, lib := range e.LibsDir {
+		res += fmt.Sprintf("- %s\n", lib)
+	}
+	res += e.Message
+	return res
+}
+
+// ToRPCStatus converts the error into a *status.Status
+func (e *MultipleLibraryInstallDetected) ToRPCStatus() *status.Status {
 	return status.New(codes.InvalidArgument, e.Error())
 }

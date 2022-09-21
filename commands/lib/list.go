@@ -48,8 +48,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 
 	nameFilter := strings.ToLower(req.GetName())
 
-	installedLibs := []*rpc.InstalledLibrary{}
-	res := listLibraries(lm, req.GetUpdatable(), req.GetAll())
+	allLibs := listLibraries(lm, req.GetUpdatable(), req.GetAll())
 	if f := req.GetFqbn(); f != "" {
 		fqbn, err := cores.ParseFQBN(req.GetFqbn())
 		if err != nil {
@@ -61,7 +60,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 		}
 
 		filteredRes := map[string]*installedLib{}
-		for _, lib := range res {
+		for _, lib := range allLibs {
 			if cp := lib.Library.ContainerPlatform; cp != nil {
 				if cp != boardPlatform && cp != refBoardPlatform {
 					// Filter all libraries from extraneous platforms
@@ -70,6 +69,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 			}
 			if latest, has := filteredRes[lib.Library.Name]; has {
 				if latest.Library.LocationPriorityFor(boardPlatform, refBoardPlatform) >= lib.Library.LocationPriorityFor(boardPlatform, refBoardPlatform) {
+					// Pick library with the best priority
 					continue
 				}
 			}
@@ -89,13 +89,14 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 			filteredRes[lib.Library.Name] = lib
 		}
 
-		res = []*installedLib{}
+		allLibs = []*installedLib{}
 		for _, lib := range filteredRes {
-			res = append(res, lib)
+			allLibs = append(allLibs, lib)
 		}
 	}
 
-	for _, lib := range res {
+	installedLibs := []*rpc.InstalledLibrary{}
+	for _, lib := range allLibs {
 		if nameFilter != "" && strings.ToLower(lib.Library.Name) != nameFilter {
 			continue
 		}
@@ -121,7 +122,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 func listLibraries(lm *librariesmanager.LibrariesManager, updatable bool, all bool) []*installedLib {
 	res := []*installedLib{}
 	for _, libAlternatives := range lm.Libraries {
-		for _, lib := range libAlternatives.Alternatives {
+		for _, lib := range libAlternatives {
 			if !all {
 				if lib.Location != libraries.User {
 					continue

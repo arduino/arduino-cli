@@ -72,22 +72,22 @@ func TestIndexer(t *testing.T) {
 	})
 	require.Nil(t, rtcInexistent)
 
-	rtc := index.FindIndexedLibrary(&libraries.Library{RealName: "RTCZero"})
+	rtc := index.FindIndexedLibrary(&libraries.Library{Name: "RTCZero"})
 	require.NotNil(t, rtc)
 	require.Equal(t, "RTCZero", rtc.Name)
 
-	rtcUpdate := index.FindLibraryUpdate(&libraries.Library{RealName: "RTCZero", Version: semver.MustParse("1.0.0")})
+	rtcUpdate := index.FindLibraryUpdate(&libraries.Library{Name: "RTCZero", Version: semver.MustParse("1.0.0")})
 	require.NotNil(t, rtcUpdate)
 	require.Equal(t, "RTCZero@1.6.0", rtcUpdate.String())
 
-	rtcUpdateNoVersion := index.FindLibraryUpdate(&libraries.Library{RealName: "RTCZero", Version: nil})
+	rtcUpdateNoVersion := index.FindLibraryUpdate(&libraries.Library{Name: "RTCZero", Version: nil})
 	require.NotNil(t, rtcUpdateNoVersion)
 	require.Equal(t, "RTCZero@1.6.0", rtcUpdateNoVersion.String())
 
-	rtcNoUpdate := index.FindLibraryUpdate(&libraries.Library{RealName: "RTCZero", Version: semver.MustParse("3.0.0")})
+	rtcNoUpdate := index.FindLibraryUpdate(&libraries.Library{Name: "RTCZero", Version: semver.MustParse("3.0.0")})
 	require.Nil(t, rtcNoUpdate)
 
-	rtcInexistent2 := index.FindLibraryUpdate(&libraries.Library{RealName: "RTCZero-blah", Version: semver.MustParse("1.0.0")})
+	rtcInexistent2 := index.FindLibraryUpdate(&libraries.Library{Name: "RTCZero-blah", Version: semver.MustParse("1.0.0")})
 	require.Nil(t, rtcInexistent2)
 
 	resolve1 := index.ResolveDependencies(alp.Releases["1.2.1"])

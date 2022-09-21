@@ -125,7 +125,7 @@ func (idx *Index) FindRelease(ref *Reference) *Release {
 // FindIndexedLibrary search an indexed library that matches the provided
 // installed library or nil if not found
 func (idx *Index) FindIndexedLibrary(lib *libraries.Library) *Library {
-	return idx.Libraries[lib.RealName]
+	return idx.Libraries[lib.Name]
 }
 
 // FindLibraryUpdate check if an installed library may be updated using

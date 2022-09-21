@@ -47,7 +47,7 @@ func NewCppResolver() *Cpp {
 // and cache all C++ headers for later retrieval
 func (resolver *Cpp) ScanFromLibrariesManager(lm *librariesmanager.LibrariesManager) error {
 	for _, libAlternatives := range lm.Libraries {
-		for _, lib := range libAlternatives.Alternatives {
+		for _, lib := range libAlternatives {
 			resolver.ScanLibrary(lib)
 		}
 	}
@@ -58,7 +58,7 @@ func (resolver *Cpp) ScanFromLibrariesManager(lm *librariesmanager.LibrariesMana
 // and cache all C++ headers for later retrieval.
 func (resolver *Cpp) ScanIDEBuiltinLibraries(lm *librariesmanager.LibrariesManager) error {
 	for _, libAlternatives := range lm.Libraries {
-		for _, lib := range libAlternatives.Alternatives {
+		for _, lib := range libAlternatives {
 			if lib.Location == libraries.IDEBuiltIn {
 				resolver.ScanLibrary(lib)
 			}
@@ -71,7 +71,7 @@ func (resolver *Cpp) ScanIDEBuiltinLibraries(lm *librariesmanager.LibrariesManag
 // and cache all C++ headers for later retrieval.
 func (resolver *Cpp) ScanUserAndUnmanagedLibraries(lm *librariesmanager.LibrariesManager) error {
 	for _, libAlternatives := range lm.Libraries {
-		for _, lib := range libAlternatives.Alternatives {
+		for _, lib := range libAlternatives {
 			if lib.Location == libraries.User || lib.Location == libraries.Unmanaged {
 				resolver.ScanLibrary(lib)
 			}
@@ -84,7 +84,7 @@ func (resolver *Cpp) ScanUserAndUnmanagedLibraries(lm *librariesmanager.Librarie
 // to find and cache all C++ headers for later retrieval.
 func (resolver *Cpp) ScanPlatformLibraries(lm *librariesmanager.LibrariesManager, platform *cores.PlatformRelease) error {
 	for _, libAlternatives := range lm.Libraries {
-		for _, lib := range libAlternatives.Alternatives {
+		for _, lib := range libAlternatives {
 			if lib.Location != libraries.PlatformBuiltIn && lib.Location != libraries.ReferencedPlatformBuiltIn {
 				continue
 			}
@@ -168,7 +168,7 @@ func computePriority(lib *libraries.Library, header, arch string) int {
 	header = strings.TrimSuffix(header, filepath.Ext(header))
 	header = simplify(header)
 	name := simplify(lib.Name)
-	realName := simplify(lib.RealName)
+	canonicalName := simplify(lib.CanonicalName)
 
 	priority := 0
 
@@ -185,17 +185,17 @@ func computePriority(lib *libraries.Library, header, arch string) int {
 		priority += 0
 	}
 
-	if realName == header && name == header {
+	if name == header && canonicalName == header {
 		priority += 600
-	} else if realName == header || name == header {
+	} else if name == header || canonicalName == header {
 		priority += 500
-	} else if realName == header+"-master" || name == header+"-master" {
+	} else if name == header+"-master" || canonicalName == header+"-master" {
 		priority += 400
-	} else if strings.HasPrefix(realName, header) || strings.HasPrefix(name, header) {
+	} else if strings.HasPrefix(name, header) || strings.HasPrefix(canonicalName, header) {
 		priority += 300
-	} else if strings.HasSuffix(realName, header) || strings.HasSuffix(name, header) {
+	} else if strings.HasSuffix(name, header) || strings.HasSuffix(canonicalName, header) {
 		priority += 200
-	} else if strings.Contains(realName, header) || strings.Contains(name, header) {
+	} else if strings.Contains(name, header) || strings.Contains(canonicalName, header) {
 		priority += 100
 	}
 
