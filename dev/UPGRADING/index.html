@@ -285,6 +285,34 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#breaking-changes-in-libraries-name-handling" class="md-nav__link">
+    Breaking changes in libraries name handling
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanagerinstall-removed-parameter-installlocation" class="md-nav__link">
+    github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager.Install removed parameter installLocation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanagerfindbyreference-now-returns-a-list-of-libraries" class="md-nav__link">
+    github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager.FindByReference now returns a list of libraries.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibraryalternatives-removed" class="md-nav__link">
+    github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibraryAlternatives removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#breaking-changes-in-updateindex-api-both-grpc-and-go-lang" class="md-nav__link">
     Breaking changes in UpdateIndex API (both gRPC and go-lang)
   </a>
@@ -1989,6 +2017,34 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#breaking-changes-in-libraries-name-handling" class="md-nav__link">
+    Breaking changes in libraries name handling
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanagerinstall-removed-parameter-installlocation" class="md-nav__link">
+    github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager.Install removed parameter installLocation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanagerfindbyreference-now-returns-a-list-of-libraries" class="md-nav__link">
+    github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager.FindByReference now returns a list of libraries.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibraryalternatives-removed" class="md-nav__link">
+    github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibraryAlternatives removed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#breaking-changes-in-updateindex-api-both-grpc-and-go-lang" class="md-nav__link">
     Breaking changes in UpdateIndex API (both gRPC and go-lang)
   </a>
@@ -2629,6 +2685,37 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0280">0.28.0<a class="headerlink" href="#0280" title="Permanent link">&para;</a></h2>
+<h3 id="breaking-changes-in-libraries-name-handling">Breaking changes in libraries name handling<a class="headerlink" href="#breaking-changes-in-libraries-name-handling" title="Permanent link">&para;</a></h3>
+<p>In the structure <code>github.com/arduino/arduino-cli/arduino/libraries.Library</code> the field:</p>
+<ul>
+<li><code>RealName</code> has been renamed to <code>Name</code></li>
+<li><code>Name</code> has been renamed to <code>CanonicalName</code></li>
+</ul>
+<p>Now <code>Name</code> is the name of the library as it appears in the <code>library.properties</code> file and <code>CanonicalName</code> it's the name
+of the directory containing the library. The <code>CanonicalName</code> is usually the name of the library with non-alphanumeric
+characters converted to underscore, but it could be actually anything since the directory where the library is installed
+can be freely renamed.</p>
+<p>This change improves the overall code base naming coherence since all the structures involving libraries have the <code>Name</code>
+field that refers to the library name as it appears in the <code>library.properties</code> file.</p>
+<h3 id="githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanagerinstall-removed-parameter-installlocation"><code>github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager.Install</code> removed parameter <code>installLocation</code><a class="headerlink" href="#githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanagerinstall-removed-parameter-installlocation" title="Permanent link">&para;</a></h3>
+<p>The method:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">lm</span><span class="w"> </span><span class="o">*</span><span class="nx">LibrariesManager</span><span class="p">)</span><span class="w"> </span><span class="nx">Install</span><span class="p">(</span><span class="nx">indexLibrary</span><span class="w"> </span><span class="o">*</span><span class="nx">librariesindex</span><span class="p">.</span><span class="nx">Release</span><span class="p">,</span><span class="w"> </span><span class="nx">libPath</span><span class="w"> </span><span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">,</span><span class="w"> </span><span class="nx">installLocation</span><span class="w"> </span><span class="nx">libraries</span><span class="p">.</span><span class="nx">LibraryLocation</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>no more needs the <code>installLocation</code> parameter:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">lm</span><span class="w"> </span><span class="o">*</span><span class="nx">LibrariesManager</span><span class="p">)</span><span class="w"> </span><span class="nx">Install</span><span class="p">(</span><span class="nx">indexLibrary</span><span class="w"> </span><span class="o">*</span><span class="nx">librariesindex</span><span class="p">.</span><span class="nx">Release</span><span class="p">,</span><span class="w"> </span><span class="nx">libPath</span><span class="w"> </span><span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>The install location is determined from the libPath.</p>
+<h3 id="githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanagerfindbyreference-now-returns-a-list-of-libraries"><code>github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager.FindByReference</code> now returns a list of libraries.<a class="headerlink" href="#githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanagerfindbyreference-now-returns-a-list-of-libraries" title="Permanent link">&para;</a></h3>
+<p>The method:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">lm</span><span class="w"> </span><span class="o">*</span><span class="nx">LibrariesManager</span><span class="p">)</span><span class="w"> </span><span class="nx">FindByReference</span><span class="p">(</span><span class="nx">libRef</span><span class="w"> </span><span class="o">*</span><span class="nx">librariesindex</span><span class="p">.</span><span class="nx">Reference</span><span class="p">,</span><span class="w"> </span><span class="nx">installLocation</span><span class="w"> </span><span class="nx">libraries</span><span class="p">.</span><span class="nx">LibraryLocation</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">libraries</span><span class="p">.</span><span class="nx">Library</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>has been changed to:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">lm</span><span class="w"> </span><span class="o">*</span><span class="nx">LibrariesManager</span><span class="p">)</span><span class="w"> </span><span class="nx">FindByReference</span><span class="p">(</span><span class="nx">libRef</span><span class="w"> </span><span class="o">*</span><span class="nx">librariesindex</span><span class="p">.</span><span class="nx">Reference</span><span class="p">,</span><span class="w"> </span><span class="nx">installLocation</span><span class="w"> </span><span class="nx">libraries</span><span class="p">.</span><span class="nx">LibraryLocation</span><span class="p">)</span><span class="w"> </span><span class="nx">libraries</span><span class="p">.</span><span class="nx">List</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>the method now returns all the libraries matching the criteria and not just the first one.</p>
+<h3 id="githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibraryalternatives-removed"><code>github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibraryAlternatives</code> removed<a class="headerlink" href="#githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibraryalternatives-removed" title="Permanent link">&para;</a></h3>
+<p>The structure <code>librariesmanager.LibraryAlternatives</code> has been removed. The <code>libraries.List</code> object can be used as a
+replacement.</p>
 <h3 id="breaking-changes-in-updateindex-api-both-grpc-and-go-lang">Breaking changes in UpdateIndex API (both gRPC and go-lang)<a class="headerlink" href="#breaking-changes-in-updateindex-api-both-grpc-and-go-lang" title="Permanent link">&para;</a></h3>
 <p>The gRPC message <code>cc.arduino.cli.commands.v1.UpdateIndexResponse</code> has been changed from:</p>
 <div class="highlight"><pre><span></span><code>message UpdateIndexResponse {
