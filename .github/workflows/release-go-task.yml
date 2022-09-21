@@ -145,14 +145,10 @@ jobs:
         run: |
           gon "${{ env.GON_CONFIG_PATH }}"
 
-      - name: Re-package binary and output checksum
+      - name: Re-package binary
         id: re-package
         working-directory: ${{ env.DIST_DIR }}
-        # This step performs the following:
-        # 1. Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
-        # 2. Recalculate package checksum
-        # 3. Output the new checksum to include in the nnnnnn-checksums.txt file
-        #    (it cannot be done there because of workflow job parallelization)
+        # Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
         run: |
           # GitHub's upload/download-artifact@v2 actions don't preserve file permissions,
           # so we need to add execution permission back until the action is made to do this.
@@ -162,11 +158,9 @@ jobs:
           tar -czvf "$PACKAGE_FILENAME" \
           -C "${{ env.PROJECT_NAME }}_osx_${{ matrix.artifact.name }}/" "${{ env.PROJECT_NAME }}" \
           -C ../../ LICENSE.txt
-          CHECKSUM_LINE="$(shasum -a 256 $PACKAGE_FILENAME)"
           echo "PACKAGE_FILENAME=$PACKAGE_FILENAME" >> $GITHUB_ENV
-          echo "::set-output name=checksum-${{ matrix.artifact.name }}::$CHECKSUM_LINE"
 
-      - name: Upload artifacts
+      - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
@@ -184,15 +178,11 @@ jobs:
           name: ${{ env.ARTIFACT_NAME }}
           path: ${{ env.DIST_DIR }}
 
-      - name: Update checksum
+      - name: Output checksum
+        working-directory: ${{ env.DIST_DIR}}
         run: |
-          declare -a checksum_lines=("${{ needs.notarize-macos.outputs.checksum-darwin_amd64 }}" "${{ needs.notarize-macos.outputs.checksum-darwin_arm64 }}")
-          for checksum_line in "${checksum_lines[@]}"
-          do
-            CHECKSUM=$(echo ${checksum_line} | cut -d " " -f 1)
-            PACKAGE_FILENAME=$(echo ${checksum_line} | cut -d " " -f 2)
-            perl -pi -w -e "s/.*${PACKAGE_FILENAME}/${CHECKSUM}  ${PACKAGE_FILENAME}/g;" ${{ env.DIST_DIR }}/*-checksums.txt
-          done
+          TAG="${GITHUB_REF/refs\/tags\//}"
+          sha256sum ${{ env.PROJECT_NAME }}_${TAG}* >> ${TAG}-checksums.txt
 
       - name: Identify Prerelease
         # This is a workaround while waiting for create-release action
