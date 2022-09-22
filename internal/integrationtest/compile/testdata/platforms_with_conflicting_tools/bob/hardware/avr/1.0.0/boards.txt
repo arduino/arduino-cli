@@ -1,1 +1,2 @@
-bob.name=Alice's Board
+bob.name=Bob's Board
+bob.build.board=BOB

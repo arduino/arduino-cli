@@ -20,6 +20,7 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
 )
 
@@ -46,20 +47,26 @@ func TestRuntimeToolPropertiesGeneration(t *testing.T) {
 	for i := 0; i < 3; i++ {
 		stdout, _, err := cli.Run("compile", "-b", "alice:avr:alice", "--show-properties", sketch.String())
 		require.NoError(t, err)
+		res, err := properties.LoadFromBytes(stdout)
+		require.NoError(t, err)
 		// the tools coming from the same packager are selected
-		require.Contains(t, string(stdout), "runtime.tools.avr-gcc.path="+hardwareDir.String()+"/alice/tools/avr-gcc/50.0.0")
-		require.Contains(t, string(stdout), "runtime.tools.avrdude.path="+hardwareDir.String()+"/alice/tools/avrdude/1.0.0")
+		require.True(t, res.GetPath("runtime.tools.avr-gcc.path").EquivalentTo(hardwareDir.Join("alice", "tools", "avr-gcc", "50.0.0")))
+		require.True(t, res.GetPath("runtime.tools.avrdude.path").EquivalentTo(hardwareDir.Join("alice", "tools", "avrdude", "1.0.0")))
 
 		stdout, _, err = cli.Run("compile", "-b", "bob:avr:bob", "--show-properties", sketch.String())
 		require.NoError(t, err)
+		res, err = properties.LoadFromBytes(stdout)
+		require.NoError(t, err)
 		// the latest version available are selected
-		require.Contains(t, string(stdout), "runtime.tools.avr-gcc.path="+hardwareDir.String()+"/alice/tools/avr-gcc/50.0.0")
-		require.Contains(t, string(stdout), "runtime.tools.avrdude.path="+hardwareDir.String()+"/arduino/tools/avrdude/6.3.0-arduino17")
+		require.True(t, res.GetPath("runtime.tools.avr-gcc.path").EquivalentTo(hardwareDir.Join("alice", "tools", "avr-gcc", "50.0.0")))
+		require.True(t, res.GetPath("runtime.tools.avrdude.path").EquivalentTo(hardwareDir.Join("arduino", "tools", "avrdude", "6.3.0-arduino17")))
 
 		stdout, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--show-properties", sketch.String())
 		require.NoError(t, err)
+		res, err = properties.LoadFromBytes(stdout)
+		require.NoError(t, err)
 		// the selected tools are listed as platform dependencies from the index.json
-		require.Contains(t, string(stdout), "runtime.tools.avr-gcc.path="+hardwareDir.String()+"/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7")
-		require.Contains(t, string(stdout), "runtime.tools.avrdude.path="+hardwareDir.String()+"/arduino/tools/avrdude/6.3.0-arduino17")
+		require.True(t, res.GetPath("runtime.tools.avr-gcc.path").EquivalentTo(hardwareDir.Join("arduino", "tools", "avr-gcc", "7.3.0-atmel3.6.1-arduino7")))
+		require.True(t, res.GetPath("runtime.tools.avrdude.path").EquivalentTo(hardwareDir.Join("arduino", "tools", "avrdude", "6.3.0-arduino17")))
 	}
 }
