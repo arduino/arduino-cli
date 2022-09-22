@@ -179,6 +179,13 @@ jobs:
           TAG="nightly-$(date -u +"%Y%m%d")"
           sha256sum ${{ env.PROJECT_NAME }}_${TAG}* >> ${TAG}-checksums.txt
 
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: error
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.DIST_DIR }}
+
       # - name: Upload release files on Arduino downloads servers
       #   uses: docker://plugins/s3
       #   env:
