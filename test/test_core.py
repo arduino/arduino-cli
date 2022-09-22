@@ -94,8 +94,10 @@ def test_core_updateindex_url_not_found(run_command, httpserver):
 
     result = run_command(["core", "update-index", f"--additional-urls={url}"])
     assert result.failed
-    lines = [l.strip() for l in result.stderr.splitlines()]
-    assert f"Error updating index: Error downloading index '{url}': Server responded with: 404 NOT FOUND" in lines
+    linesout = [l.strip() for l in result.stdout.splitlines()]
+    assert "Downloading index: test_index.json Server responded with: 404 NOT FOUND" in linesout
+    lineserr = [l.strip() for l in result.stderr.splitlines()]
+    assert "Some indexes could not be updated." in lineserr
 
 
 def test_core_updateindex_internal_server_error(run_command, httpserver):
@@ -107,11 +109,8 @@ def test_core_updateindex_internal_server_error(run_command, httpserver):
 
     result = run_command(["core", "update-index", f"--additional-urls={url}"])
     assert result.failed
-    lines = [l.strip() for l in result.stderr.splitlines()]
-    assert (
-        f"Error updating index: Error downloading index '{url}': Server responded with: 500 INTERNAL SERVER ERROR"
-        in lines
-    )
+    lines = [l.strip() for l in result.stdout.splitlines()]
+    assert "Downloading index: test_index.json Server responded with: 500 INTERNAL SERVER ERROR" in lines
 
 
 def test_core_install_without_updateindex(run_command):
