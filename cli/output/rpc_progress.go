@@ -17,6 +17,7 @@ package output
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/i18n"
@@ -41,21 +42,6 @@ func ProgressBar() rpc.DownloadProgressCB {
 	}
 }
 
-// PrintErrorFromDownloadResult returns a DownloadResultCB that only prints
-// the errors with the give message prefixed.
-func PrintErrorFromDownloadResult(msg string) rpc.DownloadResultCB {
-	if OutputFormat != "json" {
-		return func(res *rpc.DownloadResult) {
-			if !res.GetSuccessful() {
-				feedback.Errorf("%s: %s", msg, res.GetError())
-			}
-		}
-	}
-	return func(res *rpc.DownloadResult) {
-		// XXX: Output result in JSON?
-	}
-}
-
 // TaskProgress returns a TaskProgressCB that prints the task progress.
 // If JSON output format has been selected, the callback outputs nothing.
 func TaskProgress() rpc.TaskProgressCB {
@@ -70,25 +56,39 @@ func TaskProgress() rpc.TaskProgressCB {
 // NewDownloadProgressBarCB creates a progress bar callback that outputs a progress
 // bar on the terminal
 func NewDownloadProgressBarCB() func(*rpc.DownloadProgress) {
+	var mux sync.Mutex
 	var bar *pb.ProgressBar
-	var prefix string
+	var label string
+	started := false
 	return func(curr *rpc.DownloadProgress) {
+		mux.Lock()
+		defer mux.Unlock()
+
 		// fmt.Printf(">>> %v\n", curr)
-		if filename := curr.GetFile(); filename != "" {
-			if curr.GetCompleted() {
-				fmt.Println(tr("%s already downloaded", filename))
-				return
-			}
-			prefix = filename
-			bar = pb.StartNew(int(curr.GetTotalSize()))
-			bar.Prefix(prefix)
+		if start := curr.GetStart(); start != nil {
+			label = start.GetLabel()
+			bar = pb.New(0)
+			bar.Prefix(label)
 			bar.SetUnits(pb.U_BYTES)
 		}
-		if curr.GetDownloaded() != 0 {
-			bar.Set(int(curr.GetDownloaded()))
+		if update := curr.GetUpdate(); update != nil {
+			bar.SetTotal64(update.GetTotalSize())
+			if !started {
+				bar.Start()
+				started = true
+			}
+			bar.Set64(update.GetDownloaded())
 		}
-		if curr.GetCompleted() {
-			bar.FinishPrintOver(tr("%s downloaded", prefix))
+		if end := curr.GetEnd(); end != nil {
+			msg := end.GetMessage()
+			if end.GetSuccess() && msg == "" {
+				msg = tr("downloaded")
+			}
+			if started {
+				bar.FinishPrintOver(label + " " + msg)
+			} else {
+				feedback.Print(label + " " + msg)
+			}
 		}
 	}
 }

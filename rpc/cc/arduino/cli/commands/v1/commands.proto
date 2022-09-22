@@ -238,21 +238,8 @@ message UpdateIndexRequest {
 }
 
 message UpdateIndexResponse {
-  oneof message {
-    // Progress of the platforms index download.
-    DownloadProgress download_progress = 1;
-    // Report of the index update downloads.
-    DownloadResult download_result = 2;
-  }
-}
-
-message DownloadResult {
-  // Index URL.
-  string url = 1;
-  // Download result: true if successful, false if an error occurred.
-  bool successful = 2;
-  // Download error details.
-  string error = 3;
+  // Progress of the platforms index download.
+  DownloadProgress download_progress = 1;
 }
 
 message UpdateLibrariesIndexRequest {

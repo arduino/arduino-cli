@@ -162,12 +162,7 @@ func (s *ArduinoCoreServerImpl) Destroy(ctx context.Context, req *rpc.DestroyReq
 // UpdateIndex FIXMEDOC
 func (s *ArduinoCoreServerImpl) UpdateIndex(req *rpc.UpdateIndexRequest, stream rpc.ArduinoCoreService_UpdateIndexServer) error {
 	err := commands.UpdateIndex(stream.Context(), req,
-		func(p *rpc.DownloadProgress) {
-			stream.Send(&rpc.UpdateIndexResponse{Message: &rpc.UpdateIndexResponse_DownloadProgress{DownloadProgress: p}})
-		},
-		func(r *rpc.DownloadResult) {
-			stream.Send(&rpc.UpdateIndexResponse{Message: &rpc.UpdateIndexResponse_DownloadResult{DownloadResult: r}})
-		},
+		func(p *rpc.DownloadProgress) { stream.Send(&rpc.UpdateIndexResponse{DownloadProgress: p}) },
 	)
 	return convertErrorToRPCStatus(err)
 }
@@ -187,7 +182,6 @@ func (s *ArduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesInd
 func (s *ArduinoCoreServerImpl) UpdateCoreLibrariesIndex(req *rpc.UpdateCoreLibrariesIndexRequest, stream rpc.ArduinoCoreService_UpdateCoreLibrariesIndexServer) error {
 	err := commands.UpdateCoreLibrariesIndex(stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.UpdateCoreLibrariesIndexResponse{DownloadProgress: p}) },
-		func(res *rpc.DownloadResult) { /* ignore */ },
 	)
 	if err != nil {
 		return convertErrorToRPCStatus(err)

@@ -20,6 +20,7 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
@@ -44,10 +45,9 @@ func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 	inst := instance.CreateInstanceAndRunFirstUpdate()
 	logrus.Info("Executing `arduino-cli core update-index`")
 
-	err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{Instance: inst},
-		output.ProgressBar(),
-		output.PrintErrorFromDownloadResult(tr("Error updating index")))
+	err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{Instance: inst}, output.ProgressBar())
 	if err != nil {
+		feedback.Error(err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
 }
