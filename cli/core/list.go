@@ -50,7 +50,11 @@ func initListCommand() *cobra.Command {
 func runListCommand(args []string, all bool, updatableOnly bool) {
 	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli core list`")
+	List(inst, all, updatableOnly)
+}
 
+// List print a list of installed platforms.
+func List(inst *rpc.Instance, all bool, updatableOnly bool) {
 	platforms, err := core.GetPlatforms(&rpc.PlatformListRequest{
 		Instance:      inst,
 		UpdatableOnly: updatableOnly,
