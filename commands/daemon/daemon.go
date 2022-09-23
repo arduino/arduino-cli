@@ -28,9 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/commands/monitor"
-	"github.com/arduino/arduino-cli/commands/outdated"
 	"github.com/arduino/arduino-cli/commands/sketch"
-	"github.com/arduino/arduino-cli/commands/upgrade"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -176,43 +174,6 @@ func (s *ArduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesInd
 		return convertErrorToRPCStatus(err)
 	}
 	return stream.Send(&rpc.UpdateLibrariesIndexResponse{})
-}
-
-// UpdateCoreLibrariesIndex FIXMEDOC
-func (s *ArduinoCoreServerImpl) UpdateCoreLibrariesIndex(req *rpc.UpdateCoreLibrariesIndexRequest, stream rpc.ArduinoCoreService_UpdateCoreLibrariesIndexServer) error {
-	err := commands.UpdateCoreLibrariesIndex(stream.Context(), req,
-		func(p *rpc.DownloadProgress) { stream.Send(&rpc.UpdateCoreLibrariesIndexResponse{DownloadProgress: p}) },
-	)
-	if err != nil {
-		return convertErrorToRPCStatus(err)
-	}
-	return stream.Send(&rpc.UpdateCoreLibrariesIndexResponse{})
-}
-
-// Outdated FIXMEDOC
-func (s *ArduinoCoreServerImpl) Outdated(ctx context.Context, req *rpc.OutdatedRequest) (*rpc.OutdatedResponse, error) {
-	resp, err := outdated.Outdated(ctx, req)
-	return resp, convertErrorToRPCStatus(err)
-}
-
-// Upgrade FIXMEDOC
-func (s *ArduinoCoreServerImpl) Upgrade(req *rpc.UpgradeRequest, stream rpc.ArduinoCoreService_UpgradeServer) error {
-	err := upgrade.Upgrade(stream.Context(), req,
-		func(p *rpc.DownloadProgress) {
-			stream.Send(&rpc.UpgradeResponse{
-				Progress: p,
-			})
-		},
-		func(p *rpc.TaskProgress) {
-			stream.Send(&rpc.UpgradeResponse{
-				TaskProgress: p,
-			})
-		},
-	)
-	if err != nil {
-		return convertErrorToRPCStatus(err)
-	}
-	return stream.Send(&rpc.UpgradeResponse{})
 }
 
 // Create FIXMEDOC

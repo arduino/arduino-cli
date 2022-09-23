@@ -51,16 +51,6 @@ service ArduinoCoreService {
   rpc UpdateLibrariesIndex(UpdateLibrariesIndexRequest)
       returns (stream UpdateLibrariesIndexResponse) {}
 
-  // Update packages indexes for both Cores and Libraries
-  rpc UpdateCoreLibrariesIndex(UpdateCoreLibrariesIndexRequest)
-      returns (stream UpdateCoreLibrariesIndexResponse) {}
-
-  // Outdated returns a message with a list of outdated Cores and Libraries
-  rpc Outdated(OutdatedRequest) returns (OutdatedResponse) {}
-
-  // Upgrade both Cores and Libraries
-  rpc Upgrade(UpgradeRequest) returns (stream UpgradeResponse) {}
-
   // Get the version of Arduino CLI in use.
   rpc Version(VersionRequest) returns (VersionResponse) {}
 
@@ -250,42 +240,6 @@ message UpdateLibrariesIndexRequest {
 message UpdateLibrariesIndexResponse {
   // Progress of the libraries index download.
   DownloadProgress download_progress = 1;
-}
-
-message UpdateCoreLibrariesIndexRequest {
-  // Arduino Core Service instance from the Init response.
-  Instance instance = 1;
-}
-
-message UpdateCoreLibrariesIndexResponse {
-  // Progress of the index download.
-  DownloadProgress download_progress = 1;
-}
-
-message OutdatedRequest {
-  // Arduino Core Service instance from the Init response.
-  Instance instance = 1;
-}
-
-message OutdatedResponse {
-  // List of installed libraries that can be updated.
-  repeated InstalledLibrary outdated_libraries = 1;
-  // List of installed cores that can be updated.
-  repeated Platform outdated_platforms = 2;
-}
-
-message UpgradeRequest {
-  // Arduino Core Service instance from the Init response.
-  Instance instance = 1;
-  // Set to true to not run (eventual) post install scripts
-  bool skip_post_install = 2;
-}
-
-message UpgradeResponse {
-  // Progress of the downloads of the platforms and libraries files.
-  DownloadProgress progress = 1;
-  // Description of the current stage of the upgrade.
-  TaskProgress task_progress = 2;
 }
 
 message VersionRequest {}
