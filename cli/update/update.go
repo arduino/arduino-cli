@@ -31,29 +31,28 @@ var tr = i18n.Tr
 
 // NewCommand creates a new `update` command
 func NewCommand() *cobra.Command {
+	var showOutdated bool
 	updateCommand := &cobra.Command{
 		Use:     "update",
 		Short:   tr("Updates the index of cores and libraries"),
 		Long:    tr("Updates the index of cores and libraries to the latest versions."),
 		Example: "  " + os.Args[0] + " update",
 		Args:    cobra.NoArgs,
-		Run:     runUpdateCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runUpdateCommand(showOutdated)
+		},
 	}
-	updateCommand.Flags().BoolVar(&updateFlags.showOutdated, "show-outdated", false, tr("Show outdated cores and libraries after index update"))
+	updateCommand.Flags().BoolVar(&showOutdated, "show-outdated", false, tr("Show outdated cores and libraries after index update"))
 	return updateCommand
 }
 
-var updateFlags struct {
-	showOutdated bool
-}
-
-func runUpdateCommand(cmd *cobra.Command, args []string) {
+func runUpdateCommand(showOutdated bool) {
 	inst := instance.CreateInstanceAndRunFirstUpdate()
 	logrus.Info("Executing `arduino-cli update`")
 	lib.UpdateIndex(inst)
 	core.UpdateIndex(inst)
 	instance.Init(inst)
-	if updateFlags.showOutdated {
+	if showOutdated {
 		outdated.Outdated(inst)
 	}
 }
