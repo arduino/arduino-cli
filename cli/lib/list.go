@@ -32,12 +32,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	all       bool
-	updatable bool
-)
-
 func initListCommand() *cobra.Command {
+	var all bool
+	var updatable bool
 	listCommand := &cobra.Command{
 		Use:   fmt.Sprintf("list [%s]", tr("LIBNAME")),
 		Short: tr("Shows a list of installed libraries."),
@@ -48,7 +45,9 @@ library. By default the libraries provided as built-in by platforms/core are
 not listed, they can be listed by adding the --all flag.`),
 		Example: "  " + os.Args[0] + " lib list",
 		Args:    cobra.MaximumNArgs(1),
-		Run:     runListCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runListCommand(args, all, updatable)
+		},
 	}
 	listCommand.Flags().BoolVar(&all, "all", false, tr("Include built-in libraries (from platforms and IDE) in listing."))
 	fqbn.AddToCommand(listCommand)
@@ -56,7 +55,7 @@ not listed, they can be listed by adding the --all flag.`),
 	return listCommand
 }
 
-func runListCommand(cmd *cobra.Command, args []string) {
+func runListCommand(args []string, all bool, updatable bool) {
 	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli lib list`")
 
@@ -94,13 +93,17 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		libs = []*rpc.InstalledLibrary{}
 	}
 
-	feedback.PrintResult(installedResult{libs})
+	feedback.PrintResult(installedResult{
+		onlyUpdates:   updatable,
+		installedLibs: libs,
+	})
 	logrus.Info("Done")
 }
 
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type installedResult struct {
+	onlyUpdates   bool
 	installedLibs []*rpc.InstalledLibrary
 }
 
@@ -109,9 +112,9 @@ func (ir installedResult) Data() interface{} {
 }
 
 func (ir installedResult) String() string {
-	if ir.installedLibs == nil || len(ir.installedLibs) == 0 {
-		if updatable {
-			return tr("No updates available.")
+	if len(ir.installedLibs) == 0 {
+		if ir.onlyUpdates {
+			return tr("No libraries update is available.")
 		}
 		return tr("No libraries installed.")
 	}
