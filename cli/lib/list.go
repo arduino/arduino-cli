@@ -58,7 +58,11 @@ not listed, they can be listed by adding the --all flag.`),
 func runListCommand(args []string, all bool, updatable bool) {
 	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli lib list`")
+	List(instance, args, all, updatable)
+}
 
+// List lists all the installed libraries.
+func List(instance *rpc.Instance, args []string, all bool, updatable bool) {
 	name := ""
 	if len(args) > 0 {
 		name = args[0]
