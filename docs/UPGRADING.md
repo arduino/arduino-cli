@@ -19,6 +19,10 @@ can be freely renamed.
 This change improves the overall code base naming coherence since all the structures involving libraries have the `Name`
 field that refers to the library name as it appears in the `library.properties` file.
 
+#### gRPC message `cc.arduino.cli.commands.v1.Library` no longer has `real_name` field
+
+You must use the `name` field instead.
+
 ### `github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager.Install` removed parameter `installLocation`
 
 The method:

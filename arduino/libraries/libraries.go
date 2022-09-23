@@ -132,7 +132,6 @@ func (library *Library) ToRPCLibrary() (*rpc.Library, error) {
 		Location:          library.Location.ToRPCLibraryLocation(),
 		ContainerPlatform: platformOrEmpty(library.ContainerPlatform),
 		Layout:            library.Layout.ToRPCLibraryLayout(),
-		RealName:          library.Name,
 		DotALinkage:       library.DotALinkage,
 		Precompiled:       library.Precompiled,
 		LdFlags:           library.LDflags,

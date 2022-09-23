@@ -250,7 +250,7 @@ message InstalledLibrary {
 }
 
 message Library {
-  // The library's directory name.
+  // Library name (value of `name` field in library.properties).
   string name = 1;
   // Value of the `author` field in library.properties.
   string author = 2;
@@ -279,8 +279,6 @@ message Library {
   // identifying string for the platform containing the library
   // (e.g., `arduino:avr@1.8.2`).
   string container_platform = 14;
-  // Value of the `name` field in library.properties.
-  string real_name = 16 [ deprecated = true ];
   // Value of the `dot_a_linkage` field in library.properties.
   bool dot_a_linkage = 17;
   // Value of the `precompiled` field in library.properties.
