@@ -37,6 +37,10 @@ import (
 	"google.golang.org/grpc"
 )
 
+func init() {
+	testsuite.ProjectName = "cli"
+}
+
 // FindRepositoryRootPath returns the repository root path
 func FindRepositoryRootPath(t *testing.T) *paths.Path {
 	repoRootPath := paths.New(".")
@@ -89,7 +93,7 @@ func NewArduinoCliWithinEnvironment(env *testsuite.Environment, config *ArduinoC
 	cli := &ArduinoCLI{
 		path:          config.ArduinoCLIPath,
 		t:             require.New(env.T()),
-		dataDir:       env.RootDir().Join("Arduino15"),
+		dataDir:       env.RootDir().Join("A"),
 		sketchbookDir: env.RootDir().Join("Arduino"),
 		stagingDir:    env.RootDir().Join("Arduino15/staging"),
 	}
