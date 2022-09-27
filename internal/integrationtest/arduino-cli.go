@@ -43,8 +43,8 @@ func init() {
 
 // FindRepositoryRootPath returns the repository root path
 func FindRepositoryRootPath(t *testing.T) *paths.Path {
-	repoRootPath := paths.New(".")
-	require.NoError(t, repoRootPath.ToAbs())
+	repoRootPath, err := paths.Getwd()
+	require.NoError(t, err)
 	for !repoRootPath.Join(".git").Exist() {
 		require.Contains(t, repoRootPath.String(), "arduino-cli", "Error searching for repository root path")
 		repoRootPath = repoRootPath.Parent()
@@ -75,6 +75,7 @@ type ArduinoCLI struct {
 	stagingDir           *paths.Path
 	dataDir              *paths.Path
 	sketchbookDir        *paths.Path
+	workingDir           *paths.Path
 	daemonAddr           string
 	daemonConn           *grpc.ClientConn
 	daemonClient         commands.ArduinoCoreServiceClient
@@ -96,6 +97,7 @@ func NewArduinoCliWithinEnvironment(env *testsuite.Environment, config *ArduinoC
 		dataDir:       env.RootDir().Join("A"),
 		sketchbookDir: env.RootDir().Join("Arduino"),
 		stagingDir:    env.RootDir().Join("Arduino15/staging"),
+		workingDir:    env.RootDir(),
 	}
 	if config.UseSharedStagingFolder {
 		cli.stagingDir = env.SharedDownloadsDir()
@@ -128,6 +130,11 @@ func (cli *ArduinoCLI) DataDir() *paths.Path {
 // SketchbookDir returns the sketchbook directory
 func (cli *ArduinoCLI) SketchbookDir() *paths.Path {
 	return cli.sketchbookDir
+}
+
+// WorkingDir returns the working directory
+func (cli *ArduinoCLI) WorkingDir() *paths.Path {
+	return cli.workingDir
 }
 
 // CopySketch copies a sketch inside the testing environment and returns its path
@@ -180,6 +187,7 @@ func (cli *ArduinoCLI) RunWithCustomEnv(env map[string]string, args ...string) (
 	cli.t.NoError(err)
 	_, err = cliProc.StdinPipe()
 	cli.t.NoError(err)
+	cliProc.SetDir(cli.WorkingDir().String())
 
 	cli.t.NoError(cliProc.Start())
 

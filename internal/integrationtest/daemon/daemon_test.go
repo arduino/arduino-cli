@@ -19,7 +19,6 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
-	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/testsuite"
 )
@@ -31,7 +30,7 @@ func createEnvForDaemon(t *testing.T) (*testsuite.Environment, *integrationtest.
 	env := testsuite.NewEnvironment(t)
 
 	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
-		ArduinoCLIPath:         paths.New("..", "..", "..", "arduino-cli"),
+		ArduinoCLIPath:         integrationtest.FindRepositoryRootPath(t).Join("arduino-cli"),
 		UseSharedStagingFolder: true,
 	})
 

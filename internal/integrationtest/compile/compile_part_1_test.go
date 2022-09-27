@@ -164,10 +164,7 @@ func TestOutputFlagDefaultPath(t *testing.T) {
 	require.NoError(t, err)
 
 	// Test the --output-dir flag defaulting to current working dir
-	workingDir, err := paths.Getwd()
-	require.NoError(t, err)
-	target := workingDir.Join("test")
-	defer target.RemoveAll()
+	target := cli.WorkingDir().Join("test")
 	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--output-dir", "test")
 	require.NoError(t, err)
 	require.DirExists(t, target.String())
