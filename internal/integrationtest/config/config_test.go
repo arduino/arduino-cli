@@ -20,6 +20,7 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/stretchr/testify/require"
+	"go.bug.st/testifyjson/requirejson"
 	"gopkg.in/yaml.v2"
 )
 
@@ -210,4 +211,30 @@ func TestInitConfigFileFlagWithOverwriteFlag(t *testing.T) {
 	stdout, _, err := cli.Run("config", "init", "--dest-file", configFile.String(), "--overwrite")
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), configFile.String())
+}
+
+func TestDump(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Create a config file first
+	configFile := cli.WorkingDir().Join("config", "test", "config.yaml")
+	require.NoFileExists(t, configFile.String())
+	_, _, err := cli.Run("config", "init", "--dest-file", configFile.String())
+	require.NoError(t, err)
+	require.FileExists(t, configFile.String())
+
+	stdout, _, err := cli.Run("config", "dump", "--config-file", configFile.String(), "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[]")
+
+	stdout, _, err = cli.Run("config", "init", "--additional-urls", "https://example.com")
+	require.NoError(t, err)
+	configFile = cli.DataDir().Join("arduino-cli.yaml")
+	require.Contains(t, string(stdout), configFile.String())
+	require.FileExists(t, configFile.String())
+
+	stdout, _, err = cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[\"https://example.com\"]")
 }
