@@ -191,3 +191,23 @@ func TestInitConfigFileFlagAbsolutePath(t *testing.T) {
 	require.Contains(t, string(stdout), configFile.String())
 	require.FileExists(t, configFile.String())
 }
+
+func TestInitConfigFileFlagWithOverwriteFlag(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	configFile := cli.WorkingDir().Join("config", "test", "config.yaml")
+	require.NoFileExists(t, configFile.String())
+
+	_, _, err := cli.Run("config", "init", "--dest-file", configFile.String())
+	require.NoError(t, err)
+	require.FileExists(t, configFile.String())
+
+	_, stderr, err := cli.Run("config", "init", "--dest-file", configFile.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Config file already exists, use --overwrite to discard the existing one.")
+
+	stdout, _, err := cli.Run("config", "init", "--dest-file", configFile.String(), "--overwrite")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), configFile.String())
+}

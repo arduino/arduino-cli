@@ -26,23 +26,6 @@ def test_init_config_file_flag_relative_path(run_command, working_dir):
     assert config_file.exists()
 
 
-def test_init_config_file_flag_with_overwrite_flag(run_command, working_dir):
-    config_file = Path(working_dir) / "config" / "test" / "config.yaml"
-    assert not config_file.exists()
-
-    result = run_command(["config", "init", "--dest-file", config_file])
-    assert result.ok
-    assert config_file.exists()
-
-    result = run_command(["config", "init", "--dest-file", config_file])
-    assert result.failed
-    assert "Config file already exists, use --overwrite to discard the existing one." in result.stderr
-
-    result = run_command(["config", "init", "--dest-file", config_file, "--overwrite"])
-    assert result.ok
-    assert str(config_file) in result.stdout
-
-
 def test_dump(run_command, data_dir, working_dir):
     # Create a config file first
     config_file = Path(working_dir) / "config" / "test" / "config.yaml"
