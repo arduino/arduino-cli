@@ -238,3 +238,31 @@ func TestDump(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[\"https://example.com\"]")
 }
+
+func TestDumpWithConfigFileFlag(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Create a config file first
+	configFile := cli.WorkingDir().Join("config", "test", "config.yaml")
+	require.NoFileExists(t, configFile.String())
+	_, _, err := cli.Run("config", "init", "--dest-file", configFile.String(), "--additional-urls=https://example.com")
+	require.NoError(t, err)
+	require.FileExists(t, configFile.String())
+
+	stdout, _, err := cli.Run("config", "dump", "--config-file", configFile.String(), "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[\"https://example.com\"]")
+
+	stdout, _, err = cli.Run(
+		"config",
+		"dump",
+		"--config-file",
+		configFile.String(),
+		"--additional-urls=https://another-url.com",
+		"--format",
+		"json",
+	)
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[\"https://another-url.com\"]")
+}
