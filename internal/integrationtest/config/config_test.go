@@ -687,3 +687,22 @@ func TestSetStringWithSingleArgument(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, ".logging | .level", "\"trace\"")
 }
+
+func TestSetStringWithMultipleArguments(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Create a config file
+	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	// Verifies default state
+	stdout, _, err := cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".logging | .level", "\"info\"")
+
+	// Tries to change value
+	_, stderr, err := cli.Run("config", "set", "logging.level", "trace", "debug")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Can't set multiple values in key logging.level")
+}
