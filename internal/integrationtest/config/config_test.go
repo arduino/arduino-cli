@@ -439,3 +439,43 @@ func TestAddOnUnsupportedKey(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, ".daemon | .port", "\"50051\"")
 }
+
+func TestRemoveSingleArgument(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Create a config file
+	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	// Adds URLs
+	urls := [2]string{
+		"https://example.com/package_example_index.json",
+		"https://example.com/yet_another_package_example_index.json",
+	}
+	_, _, err = cli.Run("config", "add", "board_manager.additional_urls", urls[0], urls[1])
+	require.NoError(t, err)
+
+	// Verifies default state
+	stdout, _, err := cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".board_manager | .additional_urls | length", "2")
+	requirejson.Contains(t, stdout, `
+	{
+		"board_manager": {
+			"additional_urls": [
+				"https://example.com/package_example_index.json",
+				"https://example.com/yet_another_package_example_index.json"
+			]
+		}
+	}`)
+
+	// Remove first URL
+	_, _, err = cli.Run("config", "remove", "board_manager.additional_urls", urls[0])
+	require.NoError(t, err)
+
+	// Verifies URLs has been removed
+	stdout, _, err = cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[\"https://example.com/yet_another_package_example_index.json\"]")
+}
