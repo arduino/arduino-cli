@@ -17,27 +17,6 @@ import json
 import yaml
 
 
-def test_add_remove_set_delete_on_unexisting_key(run_command):
-    # Create a config file
-    assert run_command(["config", "init", "--dest-dir", "."])
-
-    res = run_command(["config", "add", "some.key", "some_value"])
-    assert res.failed
-    assert "Settings key doesn't exist" in res.stderr
-
-    res = run_command(["config", "remove", "some.key", "some_value"])
-    assert res.failed
-    assert "Settings key doesn't exist" in res.stderr
-
-    res = run_command(["config", "set", "some.key", "some_value"])
-    assert res.failed
-    assert "Settings key doesn't exist" in res.stderr
-
-    res = run_command(["config", "delete", "some.key"])
-    assert res.failed
-    assert "Settings key doesn't exist" in res.stderr
-
-
 def test_add_single_argument(run_command):
     # Create a config file
     assert run_command(["config", "init", "--dest-dir", "."])

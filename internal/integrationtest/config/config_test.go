@@ -279,3 +279,28 @@ func TestDumpWithConfigFileFlag(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[\"https://another-url.com\"]")
 }
+
+func TestAddRemoveSetDeleteOnUnexistingKey(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Create a config file
+	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	_, stderr, err := cli.Run("config", "add", "some.key", "some_value")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Settings key doesn't exist")
+
+	_, stderr, err = cli.Run("config", "remove", "some.key", "some_value")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Settings key doesn't exist")
+
+	_, stderr, err = cli.Run("config", "set", "some.key", "some_value")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Settings key doesn't exist")
+
+	_, stderr, err = cli.Run("config", "delete", "some.key")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Settings key doesn't exist")
+}
