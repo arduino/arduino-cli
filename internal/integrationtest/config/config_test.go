@@ -748,3 +748,47 @@ func TestSetBoolWithMultipleArguments(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "Can't set multiple values in key library.enable_unsafe_install")
 }
+
+func TestDelete(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Create a config file
+	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	// Verifies default state
+	stdout, _, err := cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".library | .enable_unsafe_install", "false")
+
+	// Delete config key
+	_, _, err = cli.Run("config", "delete", "library.enable_unsafe_install")
+	require.NoError(t, err)
+
+	// Verifies value is not found, we read directly from file instead of using
+	// the dump command since that would still print the deleted value if it has
+	// a default
+	configFile := cli.WorkingDir().Join("arduino-cli.yaml")
+	configLines, err := configFile.ReadFileAsLines()
+	require.NoError(t, err)
+	require.NotContains(t, configLines, "enable_unsafe_install")
+
+	// Verifies default state
+	stdout, _, err = cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[]")
+
+	// Delete config key and sub keys
+	_, _, err = cli.Run("config", "delete", "board_manager")
+	require.NoError(t, err)
+
+	// Verifies value is not found, we read directly from file instead of using
+	// the dump command since that would still print the deleted value if it has
+	// a default
+	configFile = cli.WorkingDir().Join("arduino-cli.yaml")
+	configLines, err = configFile.ReadFileAsLines()
+	require.NoError(t, err)
+	require.NotContains(t, configLines, "additional_urls")
+	require.NotContains(t, configLines, "board_manager")
+}
