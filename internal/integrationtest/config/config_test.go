@@ -519,3 +519,27 @@ func TestRemoveMultipleArguments(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[]")
 }
+
+func TestRemoveOnUnsupportedKey(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Create a config file
+	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	// Verifies default value
+	stdout, _, err := cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".daemon | .port", "\"50051\"")
+
+	// Tries and fails to remove an item
+	_, stderr, err := cli.Run("config", "remove", "daemon.port", "50051")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "The key 'daemon.port' is not a list of items, can't remove from it.\nMaybe use 'config delete'?")
+
+	// Verifies value is not changed
+	stdout, _, err = cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".daemon | .port", "\"50051\"")
+}

@@ -17,31 +17,6 @@ import json
 import yaml
 
 
-def test_remove_on_unsupported_key(run_command):
-    # Create a config file
-    assert run_command(["config", "init", "--dest-dir", "."])
-
-    # Verifies default value
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert "50051" == settings_json["daemon"]["port"]
-
-    # Tries and fails to add a new item
-    result = run_command(["config", "remove", "daemon.port", "50051"])
-    assert result.failed
-    assert (
-        "The key 'daemon.port' is not a list of items, can't remove from it.\nMaybe use 'config delete'?"
-        in result.stderr
-    )
-
-    # Verifies value is not changed
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert "50051" == settings_json["daemon"]["port"]
-
-
 def test_set_slice_with_single_argument(run_command):
     # Create a config file
     assert run_command(["config", "init", "--dest-dir", "."])
