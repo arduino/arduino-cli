@@ -577,3 +577,90 @@ func TestSetSliceWithSingleArgument(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[\"https://example.com/yet_another_package_example_index.json\"]")
 }
+
+func TestSetSliceWithMultipleArguments(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Create a config file
+	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	// Verifies default state
+	stdout, _, err := cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[]")
+
+	// Set some URLs in the list
+	urls := [7]string{
+		"https://example.com/first_package_index.json",
+		"https://example.com/second_package_index.json",
+	}
+	_, _, err = cli.Run("config", "set", "board_manager.additional_urls", urls[0], urls[1])
+	require.NoError(t, err)
+
+	// Verifies value is changed
+	stdout, _, err = cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".board_manager | .additional_urls | length", "2")
+	requirejson.Contains(t, stdout, `
+	{
+		"board_manager": {
+			"additional_urls": [
+				"https://example.com/first_package_index.json",
+        		"https://example.com/second_package_index.json"
+			]
+		}
+	}`)
+
+	// Set some URLs in the list
+	urls = [7]string{
+		"https://example.com/third_package_index.json",
+		"https://example.com/fourth_package_index.json",
+	}
+	_, _, err = cli.Run("config", "set", "board_manager.additional_urls", urls[0], urls[1])
+	require.NoError(t, err)
+
+	// Verifies previous value is overwritten
+	stdout, _, err = cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".board_manager | .additional_urls | length", "2")
+	requirejson.Contains(t, stdout, `
+	{
+		"board_manager": {
+			"additional_urls": [
+				"https://example.com/third_package_index.json",
+				"https://example.com/fourth_package_index.json"
+			]
+		}
+	}`)
+
+	// Sets a third set of 7 URLs (with only 4 unique values)
+	urls = [7]string{
+		"https://example.com/first_package_index.json",
+		"https://example.com/second_package_index.json",
+		"https://example.com/first_package_index.json",
+		"https://example.com/fifth_package_index.json",
+		"https://example.com/second_package_index.json",
+		"https://example.com/sixth_package_index.json",
+		"https://example.com/first_package_index.json",
+	}
+	_, _, err = cli.Run("config", "set", "board_manager.additional_urls", urls[0], urls[1], urls[2], urls[3], urls[4], urls[5], urls[6])
+	require.NoError(t, err)
+
+	// Verifies all unique values exist in config
+	stdout, _, err = cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".board_manager | .additional_urls | length", "4")
+	requirejson.Contains(t, stdout, `
+	{
+		"board_manager": {
+			"additional_urls": [
+				"https://example.com/first_package_index.json",
+				"https://example.com/second_package_index.json",
+				"https://example.com/fifth_package_index.json",
+				"https://example.com/sixth_package_index.json"
+			]
+		}
+	}`)
+}
