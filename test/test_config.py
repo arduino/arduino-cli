@@ -17,26 +17,6 @@ import json
 import yaml
 
 
-def test_set_string_with_single_argument(run_command):
-    # Create a config file
-    assert run_command(["config", "init", "--dest-dir", "."])
-
-    # Verifies default state
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert "info" == settings_json["logging"]["level"]
-
-    # Changes value
-    assert run_command(["config", "set", "logging.level", "trace"])
-
-    # Verifies value is changed
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert "trace" == settings_json["logging"]["level"]
-
-
 def test_set_string_with_multiple_arguments(run_command):
     # Create a config file
     assert run_command(["config", "init", "--dest-dir", "."])

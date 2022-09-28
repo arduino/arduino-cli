@@ -664,3 +664,26 @@ func TestSetSliceWithMultipleArguments(t *testing.T) {
 		}
 	}`)
 }
+
+func TestSetStringWithSingleArgument(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Create a config file
+	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	// Verifies default state
+	stdout, _, err := cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".logging | .level", "\"info\"")
+
+	// Changes value
+	_, _, err = cli.Run("config", "set", "logging.level", "trace")
+	require.NoError(t, err)
+
+	// Verifies value is changed
+	stdout, _, err = cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".logging | .level", "\"trace\"")
+}
