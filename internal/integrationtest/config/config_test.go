@@ -415,3 +415,27 @@ func TestAddMultipleArguments(t *testing.T) {
 		}
 	}`)
 }
+
+func TestAddOnUnsupportedKey(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Create a config file
+	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	// Verifies default value
+	stdout, _, err := cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".daemon | .port", "\"50051\"")
+
+	// Tries and fails to add a new item
+	_, stderr, err := cli.Run("config", "add", "daemon.port", "50000")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "The key 'daemon.port' is not a list of items, can't add to it.\nMaybe use 'config set'?")
+
+	// Verifies value is not changed
+	stdout, _, err = cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".daemon | .port", "\"50051\"")
+}
