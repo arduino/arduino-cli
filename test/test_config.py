@@ -17,35 +17,6 @@ import json
 import yaml
 
 
-def test_remove_multiple_arguments(run_command):
-    # Create a config file
-    assert run_command(["config", "init", "--dest-dir", "."])
-
-    # Adds URLs
-    urls = [
-        "https://example.com/package_example_index.json",
-        "https://example.com/yet_another_package_example_index.json",
-    ]
-    assert run_command(["config", "add", "board_manager.additional_urls"] + urls)
-
-    # Verifies default state
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert 2 == len(settings_json["board_manager"]["additional_urls"])
-    assert urls[0] in settings_json["board_manager"]["additional_urls"]
-    assert urls[1] in settings_json["board_manager"]["additional_urls"]
-
-    # Remove all URLs
-    assert run_command(["config", "remove", "board_manager.additional_urls"] + urls)
-
-    # Verifies all URLs have been removed
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert [] == settings_json["board_manager"]["additional_urls"]
-
-
 def test_remove_on_unsupported_key(run_command):
     # Create a config file
     assert run_command(["config", "init", "--dest-dir", "."])
