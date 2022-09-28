@@ -1,0 +1,13 @@
+{
+  "libraries": [
+    {
+      "name": "ArduinoTestPackage"
+    },
+    {
+      "name": "Arduino"
+    },
+    {
+      "name": "Test"
+    }
+  ]
+}
