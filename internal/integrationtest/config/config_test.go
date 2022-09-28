@@ -729,3 +729,22 @@ func TestSetBoolWithSingleArgument(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, ".library | .enable_unsafe_install", "true")
 }
+
+func TestSetBoolWithMultipleArguments(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Create a config file
+	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	// Verifies default state
+	stdout, _, err := cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".library | .enable_unsafe_install", "false")
+
+	// Changes value
+	_, stderr, err := cli.Run("config", "set", "library.enable_unsafe_install", "true", "foo")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Can't set multiple values in key library.enable_unsafe_install")
+}

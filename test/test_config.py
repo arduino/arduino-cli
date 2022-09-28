@@ -17,22 +17,6 @@ import json
 import yaml
 
 
-def test_set_bool_with_multiple_arguments(run_command):
-    # Create a config file
-    assert run_command(["config", "init", "--dest-dir", "."])
-
-    # Verifies default state
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert not settings_json["library"]["enable_unsafe_install"]
-
-    # Changes value'
-    res = run_command(["config", "set", "library.enable_unsafe_install", "true", "foo"])
-    assert res.failed
-    assert "Can't set multiple values in key library.enable_unsafe_install" in res.stderr
-
-
 def test_delete(run_command, working_dir):
     # Create a config file
     assert run_command(["config", "init", "--dest-dir", "."])
