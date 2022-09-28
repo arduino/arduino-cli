@@ -17,37 +17,6 @@ import json
 import yaml
 
 
-def test_set_slice_with_single_argument(run_command):
-    # Create a config file
-    assert run_command(["config", "init", "--dest-dir", "."])
-
-    # Verifies default state
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert [] == settings_json["board_manager"]["additional_urls"]
-
-    # Set an URL in the list
-    url = "https://example.com/package_example_index.json"
-    assert run_command(["config", "set", "board_manager.additional_urls", url])
-
-    # Verifies value is changed
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert [url] == settings_json["board_manager"]["additional_urls"]
-
-    # Sets another URL
-    url = "https://example.com/yet_another_package_example_index.json"
-    assert run_command(["config", "set", "board_manager.additional_urls", url])
-
-    # Verifies previous value is overwritten
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert [url] == settings_json["board_manager"]["additional_urls"]
-
-
 def test_set_slice_with_multiple_arguments(run_command):
     # Create a config file
     assert run_command(["config", "init", "--dest-dir", "."])
