@@ -337,3 +337,81 @@ func TestAddSingleArgument(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[\"https://example.com\"]")
 }
+
+func TestAddMultipleArguments(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Create a config file
+	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	// Verifies no additional urls are present
+	stdout, _, err := cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[]")
+
+	// Adds multiple URLs at the same time
+	urls := [3]string{
+		"https://example.com/package_example_index.json",
+		"https://example.com/yet_another_package_example_index.json",
+	}
+	_, _, err = cli.Run("config", "add", "board_manager.additional_urls", urls[0], urls[1])
+	require.NoError(t, err)
+
+	// Verifies URL has been saved
+	stdout, _, err = cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".board_manager | .additional_urls | length", "2")
+	requirejson.Contains(t, stdout, `
+	{
+		"board_manager": {
+			"additional_urls": [
+				"https://example.com/package_example_index.json",
+				"https://example.com/yet_another_package_example_index.json"
+			]
+		}
+	}`)
+
+	// Adds both the same URLs a second time
+	_, _, err = cli.Run("config", "add", "board_manager.additional_urls", urls[0], urls[1])
+	require.NoError(t, err)
+
+	// Verifies no change in result array
+	stdout, _, err = cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".board_manager | .additional_urls | length", "2")
+	requirejson.Contains(t, stdout, `
+	{
+		"board_manager": {
+			"additional_urls": [
+				"https://example.com/package_example_index.json",
+				"https://example.com/yet_another_package_example_index.json"
+			]
+		}
+	}`)
+
+	// Adds multiple URLs ... the middle one is the only new URL
+	urls = [3]string{
+		"https://example.com/package_example_index.json",
+		"https://example.com/a_third_package_example_index.json",
+		"https://example.com/yet_another_package_example_index.json",
+	}
+	_, _, err = cli.Run("config", "add", "board_manager.additional_urls", urls[0], urls[1], urls[2])
+	require.NoError(t, err)
+
+	// Verifies URL has been saved
+	stdout, _, err = cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".board_manager | .additional_urls | length", "3")
+	requirejson.Contains(t, stdout, `
+	{
+		"board_manager": {
+			"additional_urls": [
+				"https://example.com/package_example_index.json",
+				"https://example.com/a_third_package_example_index.json",
+				"https://example.com/yet_another_package_example_index.json"
+			]
+		}
+	}`)
+}

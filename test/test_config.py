@@ -17,60 +17,6 @@ import json
 import yaml
 
 
-def test_add_multiple_arguments(run_command):
-    # Create a config file
-    assert run_command(["config", "init", "--dest-dir", "."])
-
-    # Verifies no additional urls are present
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert [] == settings_json["board_manager"]["additional_urls"]
-
-    # Adds multiple URLs at the same time
-    urls = [
-        "https://example.com/package_example_index.json",
-        "https://example.com/yet_another_package_example_index.json",
-    ]
-    assert run_command(["config", "add", "board_manager.additional_urls"] + urls)
-
-    # Verifies URL has been saved
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert 2 == len(settings_json["board_manager"]["additional_urls"])
-    assert urls[0] in settings_json["board_manager"]["additional_urls"]
-    assert urls[1] in settings_json["board_manager"]["additional_urls"]
-
-    # Adds both the same URLs a second time
-    assert run_command(["config", "add", "board_manager.additional_urls"] + urls)
-
-    # Verifies no change in result array
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert 2 == len(settings_json["board_manager"]["additional_urls"])
-    assert urls[0] in settings_json["board_manager"]["additional_urls"]
-    assert urls[1] in settings_json["board_manager"]["additional_urls"]
-
-    # Adds multiple URLs ... the middle one is the only new URL
-    urls = [
-        "https://example.com/package_example_index.json",
-        "https://example.com/a_third_package_example_index.json",
-        "https://example.com/yet_another_package_example_index.json",
-    ]
-    assert run_command(["config", "add", "board_manager.additional_urls"] + urls)
-
-    # Verifies URL has been saved
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert 3 == len(settings_json["board_manager"]["additional_urls"])
-    assert urls[0] in settings_json["board_manager"]["additional_urls"]
-    assert urls[1] in settings_json["board_manager"]["additional_urls"]
-    assert urls[2] in settings_json["board_manager"]["additional_urls"]
-
-
 def test_add_on_unsupported_key(run_command):
     # Create a config file
     assert run_command(["config", "init", "--dest-dir", "."])
