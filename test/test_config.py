@@ -17,26 +17,6 @@ import json
 import yaml
 
 
-def test_set_bool_with_single_argument(run_command):
-    # Create a config file
-    assert run_command(["config", "init", "--dest-dir", "."])
-
-    # Verifies default state
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert not settings_json["library"]["enable_unsafe_install"]
-
-    # Changes value
-    assert run_command(["config", "set", "library.enable_unsafe_install", "true"])
-
-    # Verifies value is changed
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert settings_json["library"]["enable_unsafe_install"]
-
-
 def test_set_bool_with_multiple_arguments(run_command):
     # Create a config file
     assert run_command(["config", "init", "--dest-dir", "."])
