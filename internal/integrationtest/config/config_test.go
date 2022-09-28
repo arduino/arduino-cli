@@ -304,3 +304,36 @@ func TestAddRemoveSetDeleteOnUnexistingKey(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "Settings key doesn't exist")
 }
+
+func TestAddSingleArgument(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Create a config file
+	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	// Verifies no additional urls are present
+	stdout, _, err := cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[]")
+
+	// Adds one URL
+	url := "https://example.com"
+	_, _, err = cli.Run("config", "add", "board_manager.additional_urls", url)
+	require.NoError(t, err)
+
+	// Verifies URL has been saved
+	stdout, _, err = cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[\"https://example.com\"]")
+
+	// Adds the same URL (should not error)
+	_, _, err = cli.Run("config", "add", "board_manager.additional_urls", url)
+	require.NoError(t, err)
+
+	// Verifies a second copy has NOT been added
+	stdout, _, err = cli.Run("config", "dump", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".board_manager | .additional_urls", "[\"https://example.com\"]")
+}

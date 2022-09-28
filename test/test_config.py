@@ -17,37 +17,6 @@ import json
 import yaml
 
 
-def test_add_single_argument(run_command):
-    # Create a config file
-    assert run_command(["config", "init", "--dest-dir", "."])
-
-    # Verifies no additional urls are present
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert [] == settings_json["board_manager"]["additional_urls"]
-
-    # Adds one URL
-    url = "https://example.com"
-    assert run_command(["config", "add", "board_manager.additional_urls", url])
-
-    # Verifies URL has been saved
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert ["https://example.com"] == settings_json["board_manager"]["additional_urls"]
-
-    # Adds the same URL (should not error)
-    url = "https://example.com"
-    assert run_command(["config", "add", "board_manager.additional_urls", url])
-
-    # Verifies a second copy has NOT been added
-    result = run_command(["config", "dump", "--format", "json"])
-    assert result.ok
-    settings_json = json.loads(result.stdout)
-    assert ["https://example.com"] == settings_json["board_manager"]["additional_urls"]
-
-
 def test_add_multiple_arguments(run_command):
     # Create a config file
     assert run_command(["config", "init", "--dest-dir", "."])
