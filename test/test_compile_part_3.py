@@ -39,36 +39,6 @@ from pathlib import Path
 #    assert "Skipping dependencies detection for precompiled library Arduino_TensorFlowLite" in result.stdout
 
 
-def test_compile_sketch_with_pde_extension(run_command, data_dir):
-    # Init the environment explicitly
-    assert run_command(["update"])
-
-    # Install core to compile
-    assert run_command(["core", "install", "arduino:avr@1.8.3"])
-
-    sketch_name = "CompilePdeSketch"
-    sketch_path = Path(data_dir, sketch_name)
-    fqbn = "arduino:avr:uno"
-
-    # Create a test sketch
-    assert run_command(["sketch", "new", sketch_path])
-
-    # Renames sketch file to pde
-    sketch_file = Path(sketch_path, f"{sketch_name}.ino").rename(sketch_path / f"{sketch_name}.pde")
-
-    # Build sketch from folder
-    res = run_command(["compile", "--clean", "-b", fqbn, sketch_path])
-    assert res.ok
-    assert "Sketches with .pde extension are deprecated, please rename the following files to .ino:" in res.stderr
-    assert str(sketch_file) in res.stderr
-
-    # Build sketch from file
-    res = run_command(["compile", "--clean", "-b", fqbn, sketch_file])
-    assert res.ok
-    assert "Sketches with .pde extension are deprecated, please rename the following files to .ino" in res.stderr
-    assert str(sketch_file) in res.stderr
-
-
 def test_compile_sketch_with_multiple_main_files(run_command, data_dir):
     # Init the environment explicitly
     assert run_command(["update"])
