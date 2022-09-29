@@ -24,6 +24,8 @@ on:
   repository_dispatch:
 
 env:
+  # As defined by the Taskfile's PROJECT_NAME variable
+  PROJECT_NAME: arduino-cli
   # As defined by the Taskfile's DIST_DIR variable
   DIST_DIR: dist
   BUILDS_ARTIFACT: build-artifacts
@@ -53,9 +55,41 @@ jobs:
           echo "::set-output name=result::$RESULT"
 
   build:
+    name: Build ${{ matrix.os.name }}
     needs: run-determination
     if: needs.run-determination.outputs.result == 'true'
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        os:
+          - dist: Windows_32bit
+            path: "*Windows_32bit.zip"
+            name: Windows_X86-32
+          - dist: Windows_64bit
+            path: "*Windows_64bit.zip"
+            name: Windows_X86-64
+          - dist: Linux_32bit
+            path: "*Linux_32bit.tar.gz"
+            name: Linux_X86-32
+          - dist: Linux_64bit
+            path: "*Linux_64bit.tar.gz"
+            name: Linux_X86-64
+          - dist: Linux_ARMv6
+            path: "*Linux_ARMv6.tar.gz"
+            name: Linux_ARMv6
+          - dist: Linux_ARMv7
+            path: "*Linux_ARMv7.tar.gz"
+            name: Linux_ARMv7
+          - dist: Linux_ARM64
+            path: "*Linux_ARM64.tar.gz"
+            name: Linux_ARM64
+          - dist: macOS_64bit
+            path: "*macOS_64bit.tar.gz"
+            name: macOS_64
+          - dist: macOS_ARM64
+            path: "*macOS_ARM64.tar.gz"
+            name: macOS_ARM64
 
     steps:
       - name: Checkout repository
@@ -77,63 +111,44 @@ jobs:
           fi
           PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.sha }}-"
           export PACKAGE_NAME_PREFIX
-          task dist:all
+          task dist:${{ matrix.os.dist }}
 
-      # Transfer builds to artifacts job
-      - name: Upload combined builds artifact
+      - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          path: ${{ env.DIST_DIR }}
-          name: ${{ env.BUILDS_ARTIFACT }}
+          path: ${{ env.DIST_DIR }}/${{ matrix.os.path }}
+          name: ${{ matrix.os.name }}
 
-  artifacts:
-    name: ${{ matrix.artifact.name }} artifact
+  checksums:
     needs: build
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        artifact:
-          - path: "*checksums.txt"
-            name: checksums
-          - path: "*Linux_32bit.tar.gz"
-            name: Linux_X86-32
-          - path: "*Linux_64bit.tar.gz"
-            name: Linux_X86-64
-          - path: "*Linux_ARM64.tar.gz"
-            name: Linux_ARM64
-          - path: "*Linux_ARMv6.tar.gz"
-            name: Linux_ARMv6
-          - path: "*Linux_ARMv7.tar.gz"
-            name: Linux_ARMv7
-          - path: "*macOS_64bit.tar.gz"
-            name: macOS_64
-          - path: "*macOS_ARM64.tar.gz"
-            name: macOS_ARM64
-          - path: "*Windows_32bit.zip"
-            name: Windows_X86-32
-          - path: "*Windows_64bit.zip"
-            name: Windows_X86-64
-
     steps:
-      - name: Download combined builds artifact
+      - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: ${{ env.BUILDS_ARTIFACT }}
           path: ${{ env.BUILDS_ARTIFACT }}
 
-      - name: Upload individual build artifact
+      - name: Output checksum
+        working-directory: ${{ env.BUILDS_ARTIFACT}}
+        run: |
+          PACKAGE_NAME_PREFIX="test"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.event.number }}"
+          fi
+          PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.sha }}-"
+          TAG="${PACKAGE_NAME_PREFIX}git-snapshot"
+          declare -a artifacts=($(ls -d */))
+          for artifact in ${artifacts[@]}
+          do
+            cd $artifact
+            checksum=$(sha256sum ${{ env.PROJECT_NAME }}_${TAG}*)
+            cd ..
+            echo $checksum >> ${TAG}-checksums.txt
+          done
+
+      - name: Upload checksum artifact
         uses: actions/upload-artifact@v3
         with:
-          path: ${{ env.BUILDS_ARTIFACT }}/${{ matrix.artifact.path }}
-          name: ${{ matrix.artifact.name }}
-
-  clean:
-    needs: artifacts
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Remove unneeded combined builds artifact
-        uses: geekyeggo/delete-artifact@v1
-        with:
-          name: ${{ env.BUILDS_ARTIFACT }}
+          path: ${{ env.BUILDS_ARTIFACT }}/*checksums.txt
+          name: checksums
