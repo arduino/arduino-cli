@@ -22,6 +22,8 @@ import (
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
 func TestCompileSketchWithPdeExtension(t *testing.T) {
@@ -247,6 +249,37 @@ func TestCompileUsingBoardsLocalTxt(t *testing.T) {
 	err = wd.Parent().Join("testdata", "boards.local.txt").CopyTo(boardsLocalTxt)
 	require.NoError(t, err)
 
+	_, _, err = cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+}
+
+func TestCompileManuallyInstalledPlatform(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	sketchName := "CompileSketchManuallyInstalledPlatformUsingPlatformLocalTxt"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino-beta-development:avr:uno"
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Manually installs a core in sketchbooks hardware folder
+	gitUrl := "https://github.com/arduino/ArduinoCore-avr.git"
+	repoDir := cli.SketchbookDir().Join("hardware", "arduino-beta-development", "avr")
+	_, err = git.PlainClone(repoDir.String(), false, &git.CloneOptions{
+		URL:           gitUrl,
+		ReferenceName: plumbing.NewTagReferenceName("1.8.3"),
+	})
+	require.NoError(t, err)
+
+	// Installs also the same core via CLI so all the necessary tools are installed
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	// Verifies compilation works without issues
 	_, _, err = cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
 	require.NoError(t, err)
 }
