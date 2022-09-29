@@ -59,3 +59,45 @@ func TestCompileSketchWithPdeExtension(t *testing.T) {
 	require.Contains(t, string(stderr), "Sketches with .pde extension are deprecated, please rename the following files to .ino:")
 	require.Contains(t, string(stderr), sketchFilePde.String())
 }
+
+func TestCompileSketchWithMultipleMainFiles(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Install core to compile
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	sketchName := "CompileSketchMultipleMainFiles"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	// Create a test sketch
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Copy .ino sketch file to .pde
+	sketchFileIno := sketchPath.Join(sketchName + ".ino")
+	sketchFilePde := sketchPath.Join(sketchName + ".pde")
+	err = sketchFileIno.CopyTo(sketchFilePde)
+	require.NoError(t, err)
+
+	// Build sketch from folder
+	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error opening sketch: multiple main sketch files found")
+
+	// Build sketch from .ino file
+	_, stderr, err = cli.Run("compile", "--clean", "-b", fqbn, sketchFileIno.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error opening sketch: multiple main sketch files found")
+
+	// Build sketch from .pde file
+	_, stderr, err = cli.Run("compile", "--clean", "-b", fqbn, sketchFilePde.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error opening sketch: multiple main sketch files found")
+}
