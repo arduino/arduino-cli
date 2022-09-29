@@ -26,6 +26,42 @@ import (
 	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
+func TestCompileWithFullyPrecompiledLibrary(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:mbed@1.3.1")
+	require.NoError(t, err)
+	fqbn := "arduino:mbed:nano33ble"
+
+	// Create settings with library unsafe install set to true
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_LIBRARY_ENABLE_UNSAFE_INSTALL"] = "true"
+	_, _, err = cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	// Install fully precompiled library
+	// For more information see:
+	// https://arduino.github.io/arduino-cli/latest/library-specification/#precompiled-binaries
+	wd, err := paths.Getwd()
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "--zip-path", wd.Parent().Join("testdata", "Arduino_TensorFlowLite-2.1.0-ALPHA-precompiled.zip").String())
+	require.NoError(t, err)
+	sketchFolder := cli.SketchbookDir().Join("libraries", "Arduino_TensorFlowLite-2.1.0-ALPHA-precompiled", "examples", "hello_world")
+
+	// Install example dependency
+	_, _, err = cli.Run("lib", "install", "Arduino_LSM9DS1")
+	require.NoError(t, err)
+
+	// Compile and verify dependencies detection for fully precompiled library is skipped
+	stdout, _, err := cli.Run("compile", "-b", fqbn, sketchFolder.String(), "-v")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Skipping dependencies detection for precompiled library Arduino_TensorFlowLite")
+}
+
 func TestCompileSketchWithPdeExtension(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
