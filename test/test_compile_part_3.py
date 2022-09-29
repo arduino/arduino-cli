@@ -39,42 +39,6 @@ from pathlib import Path
 #    assert "Skipping dependencies detection for precompiled library Arduino_TensorFlowLite" in result.stdout
 
 
-def test_compile_with_only_compilation_database_flag(run_command, data_dir):
-    assert run_command(["update"])
-
-    assert run_command(["core", "install", "arduino:avr@1.8.3"])
-
-    sketch_name = "CompileSketchOnlyCompilationDatabaseFlag"
-    sketch_path = Path(data_dir, sketch_name)
-    fqbn = "arduino:avr:uno"
-
-    assert run_command(["sketch", "new", sketch_path])
-
-    # Verifies no binaries exist
-    build_path = Path(sketch_path, "build")
-    assert not build_path.exists()
-
-    # Compile with both --export-binaries and --only-compilation-database flags
-    assert run_command(
-        ["compile", "--export-binaries", "--only-compilation-database", "--clean", "-b", fqbn, sketch_path]
-    )
-
-    # Verifies no binaries are exported
-    assert not build_path.exists()
-
-    # Verifies no binaries exist
-    build_path = Path(data_dir, "export-dir")
-    assert not build_path.exists()
-
-    # Compile by setting the --output-dir flag and --only-compilation-database flags
-    assert run_command(
-        ["compile", "--output-dir", build_path, "--only-compilation-database", "--clean", "-b", fqbn, sketch_path]
-    )
-
-    # Verifies no binaries are exported
-    assert not build_path.exists()
-
-
 def test_compile_using_platform_local_txt(run_command, data_dir):
     assert run_command(["update"])
 

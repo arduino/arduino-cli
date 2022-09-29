@@ -143,3 +143,43 @@ func TestCompileSketchCaseMismatchFails(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "Error opening sketch:")
 }
+
+func TestCompileWithOnlyCompilationDatabaseFlag(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	sketchName := "CompileSketchOnlyCompilationDatabaseFlag"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Verifies no binaries exist
+	buildPath := sketchPath.Join("build")
+	require.NoDirExists(t, buildPath.String())
+
+	// Compile with both --export-binaries and --only-compilation-database flags
+	_, _, err = cli.Run("compile", "--export-binaries", "--only-compilation-database", "--clean", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+
+	// Verifies no binaries are exported
+	require.NoDirExists(t, buildPath.String())
+
+	// Verifies no binaries exist
+	buildPath = cli.SketchbookDir().Join("export-dir")
+	require.NoDirExists(t, buildPath.String())
+
+	// Compile by setting the --output-dir flag and --only-compilation-database flags
+	_, _, err = cli.Run("compile", "--output-dir", buildPath.String(), "--only-compilation-database", "--clean", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+
+	// Verifies no binaries are exported
+	require.NoDirExists(t, buildPath.String())
+}
