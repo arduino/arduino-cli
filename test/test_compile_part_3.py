@@ -39,30 +39,6 @@ from pathlib import Path
 #    assert "Skipping dependencies detection for precompiled library Arduino_TensorFlowLite" in result.stdout
 
 
-def test_compile_using_boards_local_txt(run_command, data_dir):
-    assert run_command(["update"])
-
-    assert run_command(["core", "install", "arduino:avr@1.8.3"])
-
-    sketch_name = "CompileSketchUsingBoardsLocalTxt"
-    sketch_path = Path(data_dir, sketch_name)
-    # Use a made up board
-    fqbn = "arduino:avr:nessuno"
-
-    assert run_command(["sketch", "new", sketch_path])
-
-    # Verifies compilation fails because board doesn't exist
-    res = run_command(["compile", "--clean", "-b", fqbn, sketch_path])
-    assert res.failed
-    assert "Error during build: Error resolving FQBN: board arduino:avr:nessuno not found" in res.stderr
-
-    # Use custom boards.local.txt with made arduino:avr:nessuno board
-    boards_local_txt = Path(data_dir, "packages", "arduino", "hardware", "avr", "1.8.3", "boards.local.txt")
-    shutil.copyfile(Path(__file__).parent / "testdata" / "boards.local.txt", boards_local_txt)
-
-    assert run_command(["compile", "--clean", "-b", fqbn, sketch_path])
-
-
 def test_compile_manually_installed_platform(run_command, data_dir):
     assert run_command(["update"])
 

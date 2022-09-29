@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -214,4 +215,38 @@ func TestCompileUsingPlatformLocalTxt(t *testing.T) {
 	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "my-compiler-that-does-not-exist")
+}
+
+func TestCompileUsingBoardsLocalTxt(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	sketchName := "CompileSketchUsingBoardsLocalTxt"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	// Usa a made up board
+	fqbn := "arduino:avr:nessuno"
+
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Verifies compilation fails because board doesn't exist
+	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error during build: Error resolving FQBN: board arduino:avr:nessuno not found")
+
+	// Use custom boards.local.txt with made arduino:avr:nessuno board
+	boardsLocalTxt := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.8.3", "boards.local.txt")
+	wd, err := paths.Getwd()
+	require.NoError(t, err)
+	err = wd.Parent().Join("testdata", "boards.local.txt").CopyTo(boardsLocalTxt)
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
 }
