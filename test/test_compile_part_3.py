@@ -39,37 +39,6 @@ from pathlib import Path
 #    assert "Skipping dependencies detection for precompiled library Arduino_TensorFlowLite" in result.stdout
 
 
-def test_compile_sketch_case_mismatch_fails(run_command, data_dir):
-    # Init the environment explicitly
-    assert run_command(["update"])
-
-    # Install core to compile
-    assert run_command(["core", "install", "arduino:avr@1.8.3"])
-
-    sketch_name = "CompileSketchCaseMismatch"
-    sketch_path = Path(data_dir, sketch_name)
-    fqbn = "arduino:avr:uno"
-
-    assert run_command(["sketch", "new", sketch_path])
-
-    # Rename main .ino file so casing is different from sketch name
-    sketch_main_file = Path(sketch_path, f"{sketch_name}.ino").rename(sketch_path / f"{sketch_name.lower()}.ino")
-
-    # Verifies compilation fails when:
-    # * Compiling with sketch path
-    res = run_command(["compile", "--clean", "-b", fqbn, sketch_path])
-    assert res.failed
-    assert "Error opening sketch:" in res.stderr
-    # * Compiling with sketch main file
-    res = run_command(["compile", "--clean", "-b", fqbn, sketch_main_file])
-    assert res.failed
-    assert "Error opening sketch:" in res.stderr
-    # * Compiling in sketch path
-    res = run_command(["compile", "--clean", "-b", fqbn], custom_working_dir=sketch_path)
-    assert res.failed
-    assert "Error opening sketch:" in res.stderr
-
-
 def test_compile_with_only_compilation_database_flag(run_command, data_dir):
     assert run_command(["update"])
 

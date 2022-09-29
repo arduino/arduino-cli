@@ -16,6 +16,7 @@
 package compile_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
@@ -100,4 +101,45 @@ func TestCompileSketchWithMultipleMainFiles(t *testing.T) {
 	_, stderr, err = cli.Run("compile", "--clean", "-b", fqbn, sketchFilePde.String())
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "Error opening sketch: multiple main sketch files found")
+}
+
+func TestCompileSketchCaseMismatchFails(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Install core to compile
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	sketchName := "CompileSketchCaseMismatch"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Rename main .ino file so casing is different from sketch name
+	sketchFile := sketchPath.Join(sketchName + ".ino")
+	sketchMainFile := sketchPath.Join(strings.ToLower(sketchName) + ".ino")
+	err = sketchFile.Rename(sketchMainFile)
+	require.NoError(t, err)
+
+	// Verifies compilation fails when:
+	// * Compiling with sketch path
+	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error opening sketch:")
+	// * Compiling with sketch main file
+	_, stderr, err = cli.Run("compile", "--clean", "-b", fqbn, sketchMainFile.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error opening sketch:")
+	// * Compiling in sketch path
+	cli.SetWorkingDir(sketchPath)
+	_, stderr, err = cli.Run("compile", "--clean", "-b", fqbn)
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error opening sketch:")
 }
