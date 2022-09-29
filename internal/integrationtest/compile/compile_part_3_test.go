@@ -283,3 +283,43 @@ func TestCompileManuallyInstalledPlatform(t *testing.T) {
 	_, _, err = cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
 	require.NoError(t, err)
 }
+
+func TestCompileManuallyInstalledPlatformUsingPlatformLocalTxt(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	sketchName := "CompileSketchManuallyInstalledPlatformUsingPlatformLocalTxt"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino-beta-development:avr:uno"
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Manually installs a core in sketchbooks hardware folder
+	gitUrl := "https://github.com/arduino/ArduinoCore-avr.git"
+	repoDir := cli.SketchbookDir().Join("hardware", "arduino-beta-development", "avr")
+	_, err = git.PlainClone(repoDir.String(), false, &git.CloneOptions{
+		URL:           gitUrl,
+		ReferenceName: plumbing.NewTagReferenceName("1.8.3"),
+	})
+	require.NoError(t, err)
+
+	// Installs also the same core via CLI so all the necessary tools are installed
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	// Verifies compilation works without issues
+	_, _, err = cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+
+	// Overrides default platform compiler with an unexisting one
+	platformLocalTxt := repoDir.Join("platform.local.txt")
+	platformLocalTxt.WriteFile([]byte("compiler.c.cmd=my-compiler-that-does-not-exist"))
+
+	// Verifies compilation now fails because compiler is not found
+	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "my-compiler-that-does-not-exist")
+}

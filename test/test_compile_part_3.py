@@ -37,32 +37,3 @@ from pathlib import Path
 #    result = run_command(["compile", "-b", fqbn, sketch_folder, "-v"])
 #    assert result.ok
 #    assert "Skipping dependencies detection for precompiled library Arduino_TensorFlowLite" in result.stdout
-
-
-def test_compile_manually_installed_platform_using_platform_local_txt(run_command, data_dir):
-    assert run_command(["update"])
-
-    sketch_name = "CompileSketchManuallyInstalledPlatformUsingPlatformLocalTxt"
-    sketch_path = Path(data_dir, sketch_name)
-    fqbn = "arduino-beta-development:avr:uno"
-    assert run_command(["sketch", "new", sketch_path])
-
-    # Manually installs a core in sketchbooks hardware folder
-    git_url = "https://github.com/arduino/ArduinoCore-avr.git"
-    repo_dir = Path(data_dir, "hardware", "arduino-beta-development", "avr")
-    assert Repo.clone_from(git_url, repo_dir, multi_options=["-b 1.8.3"])
-
-    # Installs also the same core via CLI so all the necessary tools are installed
-    assert run_command(["core", "install", "arduino:avr@1.8.3"])
-
-    # Verifies compilation works without issues
-    assert run_command(["compile", "--clean", "-b", fqbn, sketch_path])
-
-    # Overrides default platform compiler with an unexisting one
-    platform_local_txt = Path(repo_dir, "platform.local.txt")
-    platform_local_txt.write_text("compiler.c.cmd=my-compiler-that-does-not-exist")
-
-    # Verifies compilation now fails because compiler is not found
-    res = run_command(["compile", "--clean", "-b", fqbn, sketch_path])
-    assert res.failed
-    assert "my-compiler-that-does-not-exist" in res.stderr
