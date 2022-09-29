@@ -183,3 +183,35 @@ func TestCompileWithOnlyCompilationDatabaseFlag(t *testing.T) {
 	// Verifies no binaries are exported
 	require.NoDirExists(t, buildPath.String())
 }
+
+func TestCompileUsingPlatformLocalTxt(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	sketchName := "CompileSketchUsingPlatformLocalTxt"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Verifies compilation works without issues
+	_, _, err = cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+
+	// Overrides default platform compiler with an unexisting one
+	platformLocalTxt := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.8.3", "platform.local.txt")
+	err = platformLocalTxt.WriteFile([]byte("compiler.c.cmd=my-compiler-that-does-not-exist"))
+	require.NoError(t, err)
+
+	// Verifies compilation now fails because compiler is not found
+	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "my-compiler-that-does-not-exist")
+}

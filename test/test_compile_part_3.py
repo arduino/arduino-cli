@@ -39,30 +39,6 @@ from pathlib import Path
 #    assert "Skipping dependencies detection for precompiled library Arduino_TensorFlowLite" in result.stdout
 
 
-def test_compile_using_platform_local_txt(run_command, data_dir):
-    assert run_command(["update"])
-
-    assert run_command(["core", "install", "arduino:avr@1.8.3"])
-
-    sketch_name = "CompileSketchUsingPlatformLocalTxt"
-    sketch_path = Path(data_dir, sketch_name)
-    fqbn = "arduino:avr:uno"
-
-    assert run_command(["sketch", "new", sketch_path])
-
-    # Verifies compilation works without issues
-    assert run_command(["compile", "--clean", "-b", fqbn, sketch_path])
-
-    # Overrides default platform compiler with an unexisting one
-    platform_local_txt = Path(data_dir, "packages", "arduino", "hardware", "avr", "1.8.3", "platform.local.txt")
-    platform_local_txt.write_text("compiler.c.cmd=my-compiler-that-does-not-exist")
-
-    # Verifies compilation now fails because compiler is not found
-    res = run_command(["compile", "--clean", "-b", fqbn, sketch_path])
-    assert res.failed
-    assert "my-compiler-that-does-not-exist" in res.stderr
-
-
 def test_compile_using_boards_local_txt(run_command, data_dir):
     assert run_command(["update"])
 
