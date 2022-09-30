@@ -83,22 +83,6 @@ def test_compile_with_relative_build_path(run_command, data_dir, copy_sketch):
     assert "sketch" in built_files
 
 
-def test_compile_with_known_platform_not_installed(run_command, data_dir):
-    assert run_command(["update"])
-
-    # Create a sketch
-    sketch_name = "SketchSimple"
-    sketch_path = Path(data_dir, sketch_name)
-    assert run_command(["sketch", "new", sketch_path])
-
-    # Try to compile using a platform found in the index but not installed
-    res = run_command(["compile", "-b", "arduino:avr:uno", sketch_path])
-    assert res.failed
-    assert "Error during build: Platform 'arduino:avr' not found: platform not installed" in res.stderr
-    # Verifies command to fix error is shown to user
-    assert "Try running `arduino-cli core install arduino:avr`" in res.stderr
-
-
 def test_compile_with_fake_secure_boot_core(run_command, data_dir):
     assert run_command(["update"])
 

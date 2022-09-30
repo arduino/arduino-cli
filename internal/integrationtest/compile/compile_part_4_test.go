@@ -444,3 +444,23 @@ func TestCompileNonInstalledPlatformWithWrongPackagerAndArch(t *testing.T) {
 	require.Contains(t, string(stderr), "Error during build: Platform 'arduino:wrong' not found: platform not installed")
 	require.Contains(t, string(stderr), "Platform arduino:wrong is not found in any known index")
 }
+
+func TestCompileWithKnownPlatformNotInstalled(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Create a sketch
+	sketchPath := cli.SketchbookDir().Join("SketchSimple")
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Try to compile using a platform found in the index but not installed
+	_, stderr, err := cli.Run("compile", "-b", "arduino:avr:uno", sketchPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error during build: Platform 'arduino:avr' not found: platform not installed")
+	// Verifies command to fix error is shown to user
+	require.Contains(t, string(stderr), "Try running `arduino-cli core install arduino:avr`")
+}
