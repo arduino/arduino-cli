@@ -366,3 +366,21 @@ func TestGenerateCompileCommandsJsonResilience(t *testing.T) {
 	_, _, err = cli.Run("compile", "-b", "esp32:esp32:featheresp32", "--only-compilation-database", sketchPath.String())
 	require.NoError(t, err)
 }
+
+func TestCompileSketchSketchWithTppFileInclude(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Download latest AVR
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+
+	sketchPath := cli.CopySketch("sketch_with_tpp_file_include")
+	fqbn := "arduino:avr:uno"
+
+	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--verbose")
+	require.NoError(t, err)
+}
