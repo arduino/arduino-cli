@@ -50,47 +50,6 @@ def test_compile_manually_installed_platform_using_boards_local_txt(run_command,
     assert run_command(["compile", "--clean", "-b", fqbn, sketch_path])
 
 
-def test_compile_with_esp8266_bundled_libraries(run_command, data_dir, copy_sketch):
-    # Some esp cores have have bundled libraries that are optimize for that architecture,
-    # it might happen that if the user has a library with the same name installed conflicts
-    # can ensue and the wrong library is used for compilation, thus it fails.
-    # This happens because for "historical" reasons these platform have their "name" key
-    # in the "library.properties" flag suffixed with "(esp32)" or similar even though that
-    # doesn't respect the libraries specification.
-    # https://arduino.github.io/arduino-cli/latest/library-specification/#libraryproperties-file-format
-    #
-    # The reason those libraries have these suffixes is to avoid an annoying bug in the Java IDE
-    # that would have caused the libraries that are both bundled with the core and the Java IDE to be
-    # always marked as updatable. For more info see: https://github.com/arduino/Arduino/issues/4189
-    assert run_command(["update"])
-
-    # Update index with esp8266 core and install it
-    url = "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
-    core_version = "2.7.4"
-    assert run_command(["core", "update-index", f"--additional-urls={url}"])
-    assert run_command(["core", "install", f"esp8266:esp8266@{core_version}", f"--additional-urls={url}"])
-
-    # Install a library with the same name as one bundled with the core
-    assert run_command(["lib", "install", "SD"])
-
-    sketch_path = copy_sketch("sketch_with_sd_library")
-    fqbn = "esp8266:esp8266:generic"
-
-    res = run_command(["compile", "-b", fqbn, sketch_path, "--verbose"])
-    assert res.failed
-
-    core_bundled_lib_path = Path(
-        data_dir, "packages", "esp8266", "hardware", "esp8266", core_version, "libraries", "SD"
-    )
-    cli_installed_lib_path = Path(data_dir, "libraries", "SD")
-    expected_output = [
-        'Multiple libraries were found for "SD.h"',
-        f"  Used: {core_bundled_lib_path}",
-        f"  Not used: {cli_installed_lib_path}",
-    ]
-    assert "\n".join(expected_output) not in res.stdout
-
-
 def test_generate_compile_commands_json_resilience(run_command, data_dir, copy_sketch):
     assert run_command(["update"])
 
