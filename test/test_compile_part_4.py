@@ -83,27 +83,6 @@ def test_compile_with_relative_build_path(run_command, data_dir, copy_sketch):
     assert "sketch" in built_files
 
 
-def test_compile_non_installed_platform_with_wrong_packager_and_arch(run_command, data_dir):
-    assert run_command(["update"])
-
-    # Create a sketch
-    sketch_name = "SketchSimple"
-    sketch_path = Path(data_dir, sketch_name)
-    assert run_command(["sketch", "new", sketch_path])
-
-    # Compile with wrong packager
-    res = run_command(["compile", "-b", "wrong:avr:uno", sketch_path])
-    assert res.failed
-    assert "Error during build: Platform 'wrong:avr' not found: platform not installed" in res.stderr
-    assert "Platform wrong:avr is not found in any known index" in res.stderr
-
-    # Compile with wrong arch
-    res = run_command(["compile", "-b", "arduino:wrong:uno", sketch_path])
-    assert res.failed
-    assert "Error during build: Platform 'arduino:wrong' not found: platform not installed" in res.stderr
-    assert "Platform arduino:wrong is not found in any known index" in res.stderr
-
-
 def test_compile_with_known_platform_not_installed(run_command, data_dir):
     assert run_command(["update"])
 

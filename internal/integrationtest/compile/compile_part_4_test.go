@@ -419,3 +419,28 @@ func TestCompileWithoutUploadAndFqbn(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "Missing FQBN (Fully Qualified Board Name)")
 }
+
+func TestCompileNonInstalledPlatformWithWrongPackagerAndArch(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Create a sketch
+	sketchPath := cli.SketchbookDir().Join("SketchSimple")
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Compile with wrong packager
+	_, stderr, err := cli.Run("compile", "-b", "wrong:avr:uno", sketchPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error during build: Platform 'wrong:avr' not found: platform not installed")
+	require.Contains(t, string(stderr), "Platform wrong:avr is not found in any known index")
+
+	// Compile with wrong arch
+	_, stderr, err = cli.Run("compile", "-b", "arduino:wrong:uno", sketchPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error during build: Platform 'arduino:wrong' not found: platform not installed")
+	require.Contains(t, string(stderr), "Platform arduino:wrong is not found in any known index")
+}
