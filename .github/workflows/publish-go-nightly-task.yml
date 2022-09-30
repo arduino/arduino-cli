@@ -162,9 +162,64 @@ jobs:
           name: ${{ env.ARTIFACT_NAME }}
           path: ${{ env.DIST_DIR }}/${{ env.PACKAGE_FILENAME }}
 
+  create-windows-installer:
+    runs-on: windows-latest
+    needs: create-nightly-artifacts
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      INSTALLER_CERT_WINDOWS_PFX: "/tmp/cert.pfx"
+      SIGNTOOL_PATH: "C:/Program Files (x86)/Windows Kits/10/bin/10.0.17763.0/x86/signtool.exe"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.DIST_DIR }}
+
+      - name: Prepare PATH
+        id: setupmsbuild
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Build MSI
+        id: buildmsi
+        env:
+          MSBUILD_PATH: ${{ steps.setupmsbuild.outputs.msbuildPath }}
+        run: |
+          WIX_TAG="0.0.0" # use 0.0.0 as version for the installer since wix is picky about other alternatives, this only affects nightly builds (error CNDL0242)
+          PACKAGE_FILENAME="${{ env.PROJECT_NAME }}_${TAG}_Windows_64bit"
+          SOURCE_DIR="${GITHUB_WORKSPACE}/${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_windows_amd64/"
+          "${{ env.MSBUILD_PATH }}\MSBuild.exe" ./installer/cli.wixproj -p:SourceDir="$SOURCE_DIR" -p:OutputPath="${GITHUB_WORKSPACE}/${{ env.DIST_DIR }}" -p:OutputName="$PACKAGE_FILENAME" -p:ProductVersion="$WIX_TAG"
+
+      - name: Save Win signing certificate to file
+        run: echo "${{ secrets.INSTALLER_CERT_WINDOWS_PFX }}" | base64 --decode > ${{ env.INSTALLER_CERT_WINDOWS_PFX}}
+
+      - name: Sign MSI
+        env:
+          MSI_FILE: ${{ steps.buildmsi.outputs.msi }} # this comes from .installer/cli.wixproj
+          CERT_PASSWORD: ${{ secrets.INSTALLER_CERT_WINDOWS_PASSWORD }}
+        run: |
+          "${{ env.SIGNTOOL_PATH }}" sign -d "Arduino CLI" -f ${{ env.INSTALLER_CERT_WINDOWS_PFX}} -p ${{ env.CERT_PASSWORD }} -fd sha256 -tr http://timestamp.digicert.com -v "${{ env.MSI_FILE }}"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        env:
+          MSI_FILE: ${{ steps.buildmsi.outputs.msi }}
+        with:
+          if-no-files-found: error
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.MSI_FILE }}
+
   publish-nightly:
     runs-on: ubuntu-latest
-    needs: notarize-macos
+    needs: [notarize-macos, create-windows-installer]
 
     steps:
       - name: Download artifact
