@@ -50,32 +50,6 @@ def test_compile_manually_installed_platform_using_boards_local_txt(run_command,
     assert run_command(["compile", "--clean", "-b", fqbn, sketch_path])
 
 
-def test_compile_with_invalid_build_options_json(run_command, data_dir):
-    assert run_command(["update"])
-
-    assert run_command(["core", "install", "arduino:avr@1.8.3"])
-
-    sketch_name = "CompileInvalidBuildOptionsJson"
-    sketch_path = Path(data_dir, sketch_name)
-    fqbn = "arduino:avr:uno"
-
-    # Create a test sketch
-    assert run_command(["sketch", "new", sketch_path])
-
-    # Get the build directory
-    sketch_path_md5 = hashlib.md5(bytes(sketch_path)).hexdigest().upper()
-    build_dir = Path(tempfile.gettempdir(), f"arduino-sketch-{sketch_path_md5}")
-
-    assert run_command(["compile", "-b", fqbn, sketch_path, "--verbose"])
-
-    # Breaks the build.options.json file
-    build_options_json = build_dir / "build.options.json"
-    with open(build_options_json, "w") as f:
-        f.write("invalid json")
-
-    assert run_command(["compile", "-b", fqbn, sketch_path, "--verbose"])
-
-
 def test_compile_with_esp32_bundled_libraries(run_command, data_dir, copy_sketch):
     # Some esp cores have have bundled libraries that are optimize for that architecture,
     # it might happen that if the user has a library with the same name installed conflicts

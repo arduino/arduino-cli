@@ -214,3 +214,39 @@ func TestCompileWithConflictingLibrariesInclude(t *testing.T) {
 	}
 	require.Contains(t, string(stdout), expectedOutput[0]+"\n"+expectedOutput[1]+"\n"+expectedOutput[2]+"\n")
 }
+
+func TestCompileWithInvalidBuildOptionJson(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	sketchName := "CompileInvalidBuildOptionsJson"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	// Create a test sketch
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Get the build directory
+	md5 := md5.Sum(([]byte(sketchPath.String())))
+	sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
+	require.NotEmpty(t, sketchPathMd5)
+	buildDir := paths.TempDir().Join("arduino-sketch-" + sketchPathMd5)
+
+	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--verbose")
+	require.NoError(t, err)
+
+	// Breaks the build.options.json file
+	buildOptionsJson := buildDir.Join("build.options.json")
+	err = buildOptionsJson.WriteFile([]byte("invalid json"))
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--verbose")
+	require.NoError(t, err)
+}
