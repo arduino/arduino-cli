@@ -250,3 +250,49 @@ func TestCompileWithInvalidBuildOptionJson(t *testing.T) {
 	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--verbose")
 	require.NoError(t, err)
 }
+
+func TestCompileWithEsp32BundledLibraries(t *testing.T) {
+	// Some esp cores have have bundled libraries that are optimize for that architecture,
+	// it might happen that if the user has a library with the same name installed conflicts
+	// can ensue and the wrong library is used for compilation, thus it fails.
+	// This happens because for "historical" reasons these platform have their "name" key
+	// in the "library.properties" flag suffixed with "(esp32)" or similar even though that
+	// doesn't respect the libraries specification.
+	// https://arduino.github.io/arduino-cli/latest/library-specification/#libraryproperties-file-format
+	//
+	// The reason those libraries have these suffixes is to avoid an annoying bug in the Java IDE
+	// that would have caused the libraries that are both bundled with the core and the Java IDE to be
+	// always marked as updatable. For more info see: https://github.com/arduino/Arduino/issues/4189
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Update index with esp32 core and install it
+	url := "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
+	coreVersion := "1.0.6"
+	_, _, err = cli.Run("core", "update-index", "--additional-urls="+url)
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "esp32:esp32@"+coreVersion, "--additional-urls="+url)
+	require.NoError(t, err)
+
+	// Install a library with the same name as one bundled with the core
+	_, _, err = cli.Run("lib", "install", "SD")
+	require.NoError(t, err)
+
+	sketchPath := cli.CopySketch("sketch_with_sd_library")
+	fqbn := "esp32:esp32:esp32"
+
+	stdout, _, err := cli.Run("compile", "-b", fqbn, sketchPath.String(), "--verbose")
+	require.Error(t, err)
+
+	coreBundledLibPath := cli.DataDir().Join("packages", "esp32", "hardware", "esp32", coreVersion, "libraries", "SD")
+	cliInstalledLibPath := cli.SketchbookDir().Join("libraries", "SD")
+	expectedOutput := [3]string{
+		"Multiple libraries were found for \"OneWire.h\"",
+		"  Used: " + coreBundledLibPath.String(),
+		"  Not used: " + cliInstalledLibPath.String(),
+	}
+	require.NotContains(t, string(stdout), expectedOutput[0]+"\n"+expectedOutput[1]+"\n"+expectedOutput[2]+"\n")
+}
