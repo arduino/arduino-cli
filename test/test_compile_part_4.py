@@ -50,33 +50,6 @@ def test_compile_manually_installed_platform_using_boards_local_txt(run_command,
     assert run_command(["compile", "--clean", "-b", fqbn, sketch_path])
 
 
-def test_compile_with_conflicting_libraries_include(run_command, data_dir, copy_sketch):
-    assert run_command(["update"])
-
-    assert run_command(["core", "install", "arduino:avr@1.8.3"])
-
-    # Install conflicting libraries
-    git_url = "https://github.com/pstolarz/OneWireNg.git"
-    one_wire_ng_lib_path = Path(data_dir, "libraries", "onewireng_0_8_1")
-    assert Repo.clone_from(git_url, one_wire_ng_lib_path, multi_options=["-b 0.8.1"])
-
-    git_url = "https://github.com/PaulStoffregen/OneWire.git"
-    one_wire_lib_path = Path(data_dir, "libraries", "onewire_2_3_5")
-    assert Repo.clone_from(git_url, one_wire_lib_path, multi_options=["-b v2.3.5"])
-
-    sketch_path = copy_sketch("sketch_with_conflicting_libraries_include")
-    fqbn = "arduino:avr:uno"
-
-    res = run_command(["compile", "-b", fqbn, sketch_path, "--verbose"])
-    assert res.ok
-    expected_output = [
-        'Multiple libraries were found for "OneWire.h"',
-        f"  Used: {one_wire_lib_path}",
-        f"  Not used: {one_wire_ng_lib_path}",
-    ]
-    assert "\n".join(expected_output) in res.stdout
-
-
 def test_compile_with_invalid_build_options_json(run_command, data_dir):
     assert run_command(["update"])
 

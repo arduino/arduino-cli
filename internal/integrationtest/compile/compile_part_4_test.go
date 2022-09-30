@@ -174,3 +174,43 @@ func TestRecompileWithDifferentLibrary(t *testing.T) {
 	require.NoError(t, err)
 	require.NotContains(t, string(stdout), "Using previously compiled file: "+objPath.String())
 }
+
+func TestCompileWithConflictingLibrariesInclude(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	// Installs conflicting libraries
+	gitUrl := "https://github.com/pstolarz/OneWireNg.git"
+	oneWireNgLibPath := cli.SketchbookDir().Join("libraries", "onewireng_0_8_1")
+	_, err = git.PlainClone(oneWireNgLibPath.String(), false, &git.CloneOptions{
+		URL:           gitUrl,
+		ReferenceName: plumbing.NewTagReferenceName("0.8.1"),
+	})
+	require.NoError(t, err)
+
+	gitUrl = "https://github.com/PaulStoffregen/OneWire.git"
+	oneWireLibPath := cli.SketchbookDir().Join("libraries", "onewire_2_3_5")
+	_, err = git.PlainClone(oneWireLibPath.String(), false, &git.CloneOptions{
+		URL:           gitUrl,
+		ReferenceName: plumbing.NewTagReferenceName("v2.3.5"),
+	})
+	require.NoError(t, err)
+
+	sketchPath := cli.CopySketch("sketch_with_conflicting_libraries_include")
+	fqbn := "arduino:avr:uno"
+
+	stdout, _, err := cli.Run("compile", "-b", fqbn, sketchPath.String(), "--verbose")
+	require.NoError(t, err)
+	expectedOutput := [3]string{
+		"Multiple libraries were found for \"OneWire.h\"",
+		"  Used: " + oneWireLibPath.String(),
+		"  Not used: " + oneWireNgLibPath.String(),
+	}
+	require.Contains(t, string(stdout), expectedOutput[0]+"\n"+expectedOutput[1]+"\n"+expectedOutput[2]+"\n")
+}
