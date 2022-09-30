@@ -50,22 +50,6 @@ def test_compile_manually_installed_platform_using_boards_local_txt(run_command,
     assert run_command(["compile", "--clean", "-b", fqbn, sketch_path])
 
 
-def test_generate_compile_commands_json_resilience(run_command, data_dir, copy_sketch):
-    assert run_command(["update"])
-
-    # check it didn't fail with esp32@2.0.1 that has a prebuild hook that must run:
-    # https://github.com/arduino/arduino-cli/issues/1547
-    url = "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
-    assert run_command(["core", "update-index", f"--additional-urls={url}"])
-    assert run_command(["core", "install", "esp32:esp32@2.0.1", f"--additional-urls={url}"])
-    sketch_path = copy_sketch("sketch_simple")
-    assert run_command(["compile", "-b", "esp32:esp32:featheresp32", "--only-compilation-database", sketch_path])
-
-    # check it didn't fail on a sketch with a missing include
-    sketch_path = copy_sketch("sketch_with_missing_include")
-    assert run_command(["compile", "-b", "esp32:esp32:featheresp32", "--only-compilation-database", sketch_path])
-
-
 def test_compile_sketch_with_tpp_file_include(run_command, copy_sketch):
     assert run_command(["update"])
 

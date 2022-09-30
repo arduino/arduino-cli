@@ -342,3 +342,27 @@ func TestCompileWithEsp8266BundledLibraries(t *testing.T) {
 	}
 	require.NotContains(t, string(stdout), expectedOutput[0]+"\n"+expectedOutput[1]+"\n"+expectedOutput[2]+"\n")
 }
+
+func TestGenerateCompileCommandsJsonResilience(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// check it didn't fail with esp32@2.0.1 that has a prebuild hook that must run:
+	// https://github.com/arduino/arduino-cli/issues/1547
+	url := "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
+	_, _, err = cli.Run("core", "update-index", "--additional-urls="+url)
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "esp32:esp32@2.0.1", "--additional-urls="+url)
+	require.NoError(t, err)
+	sketchPath := cli.CopySketch("sketch_simple")
+	_, _, err = cli.Run("compile", "-b", "esp32:esp32:featheresp32", "--only-compilation-database", sketchPath.String())
+	require.NoError(t, err)
+
+	// check it didn't fail on a sketch with a missing include
+	sketchPath = cli.CopySketch("sketch_with_missing_include")
+	_, _, err = cli.Run("compile", "-b", "esp32:esp32:featheresp32", "--only-compilation-database", sketchPath.String())
+	require.NoError(t, err)
+}
