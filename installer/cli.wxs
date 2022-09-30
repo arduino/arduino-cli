@@ -40,19 +40,19 @@
 
         <!-- Determine the directory of a previous installation (if one exists). If not INSTALLDIR stays empty -->
         <Property Id="INSTALLDIR">
-            <RegistrySearch Id="InstallDir" Root="HKLM" Key="SOFTWARE\Arduino\CLI" Name="InstallDir" Type="directory"/>
+            <RegistrySearch Id="InstallDir" Root="HKLM" Key="SOFTWARE\Arduino CLI" Name="InstallDir" Type="directory"/>
         </Property>
 
         <!-- Features define which parts of the application can be installed in a custom installation -->
         <Feature Id="DefaultFeature" ConfigurableDirectory="INSTALLDIR">
-            <Component Directory="INSTALLDIR">
-                <File Name="arduino-cli.exe"/>
+            <Component Directory="INSTALLDIR" Guid="0c407434-5d0f-428a-a855-d823f6acce8d">
+                <File Name="arduino-cli.exe" KeyPath="yes"/>
                 <Environment Id="Path" Action="set" Name="PATH" Part="last" System="yes" Value="[INSTALLDIR]"/>
             </Component>
 
             <!-- Persist the INSTALLDIR and restore it in subsequent installs -->
             <Component Directory="INSTALLDIR">
-                <RegistryValue Root="HKLM" Key="SOFTWARE\Arduino\CLI" Name="InstallDir" Type="string" Value="[INSTALLDIR]"/>
+                <RegistryValue Root="HKLM" Key="SOFTWARE\Arduino CLI" Name="InstallDir" Type="string" Value="[INSTALLDIR]"/>
             </Component>
         </Feature>
 
