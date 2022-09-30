@@ -60,3 +60,55 @@ func TestCompileWithLibrary(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "WiFi101")
 }
+
+func TestCompileWithLibraryPriority(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	sketchName := "CompileSketchWithLibraryPriority"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	// Manually installs a library
+	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
+	manuallyInstalledLibPath := cli.SketchbookDir().Join("my-libraries", "WiFi101")
+	_, err = git.PlainClone(manuallyInstalledLibPath.String(), false, &git.CloneOptions{
+		URL:           gitUrl,
+		ReferenceName: plumbing.NewTagReferenceName("0.16.1"),
+	})
+	require.NoError(t, err)
+
+	// Install the same library we installed manually
+	_, _, err = cli.Run("lib", "install", "WiFi101")
+	require.NoError(t, err)
+
+	// Create new sketch and add library include
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+	sketchFile := sketchPath.Join(sketchName + ".ino")
+	lines, err := sketchFile.ReadFileAsLines()
+	require.NoError(t, err)
+	lines = append([]string{"#include <WiFi101.h>\n"}, lines...)
+	var data []byte
+	for _, l := range lines {
+		data = append(data, []byte(l)...)
+	}
+	err = sketchFile.WriteFile(data)
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("compile", "-b", fqbn, sketchPath.String(), "--library", manuallyInstalledLibPath.String(), "-v")
+	require.NoError(t, err)
+	cliInstalledLibPath := cli.SketchbookDir().Join("libraries", "WiFi101")
+	expectedOutput := [3]string{
+		"Multiple libraries were found for \"WiFi101.h\"",
+		"  Used: " + manuallyInstalledLibPath.String(),
+		"  Not used: " + cliInstalledLibPath.String(),
+	}
+	require.Contains(t, string(stdout), expectedOutput[0]+"\n"+expectedOutput[1]+"\n"+expectedOutput[2]+"\n")
+}
