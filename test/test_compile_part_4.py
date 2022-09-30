@@ -50,19 +50,6 @@ def test_compile_manually_installed_platform_using_boards_local_txt(run_command,
     assert run_command(["compile", "--clean", "-b", fqbn, sketch_path])
 
 
-def test_compile_sketch_with_ipp_file_include(run_command, copy_sketch):
-    assert run_command(["update"])
-
-    # Download latest AVR
-    run_command(["core", "install", "arduino:avr"])
-
-    sketch_name = "sketch_with_ipp_file_include"
-    sketch_path = copy_sketch(sketch_name)
-    fqbn = "arduino:avr:uno"
-
-    assert run_command(["compile", "-b", fqbn, sketch_path, "--verbose"])
-
-
 def test_compile_with_relative_build_path(run_command, data_dir, copy_sketch):
     assert run_command(["update"])
 
