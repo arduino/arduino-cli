@@ -402,3 +402,20 @@ func TestCompileSketchWithIppFileInclude(t *testing.T) {
 	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--verbose")
 	require.NoError(t, err)
 }
+
+func TestCompileWithoutUploadAndFqbn(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Create a sketch
+	sketchPath := cli.SketchbookDir().Join("SketchSimple")
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	_, stderr, err := cli.Run("compile", sketchPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Missing FQBN (Fully Qualified Board Name)")
+}

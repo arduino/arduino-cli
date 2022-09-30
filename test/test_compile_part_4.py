@@ -83,19 +83,6 @@ def test_compile_with_relative_build_path(run_command, data_dir, copy_sketch):
     assert "sketch" in built_files
 
 
-def test_compile_without_upload_and_fqbn(run_command, data_dir):
-    assert run_command(["update"])
-
-    # Create a sketch
-    sketch_name = "SketchSimple"
-    sketch_path = Path(data_dir, sketch_name)
-    assert run_command(["sketch", "new", sketch_path])
-
-    res = run_command(["compile", sketch_path])
-    assert res.failed
-    assert "Missing FQBN (Fully Qualified Board Name)" in res.stderr
-
-
 def test_compile_non_installed_platform_with_wrong_packager_and_arch(run_command, data_dir):
     assert run_command(["update"])
 
