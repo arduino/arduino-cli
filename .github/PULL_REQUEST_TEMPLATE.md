@@ -1,5 +1,7 @@
 ## Please check if the PR fulfills these requirements
 
+See [how to contribute](https://arduino.github.io/arduino-cli/latest/CONTRIBUTING/)
+
 - [ ] The PR has no duplicates (please search among the [Pull Requests](https://github.com/arduino/arduino-cli/pulls)
       before creating one)
 - [ ] The PR follows
@@ -28,7 +30,3 @@ when upgrading from an older version of Arduino CLI? -->
 ## Other information
 
 <!-- Any additional information that could help the review process -->
-
----
-
-See [how to contribute](https://arduino.github.io/arduino-cli/latest/CONTRIBUTING/)
