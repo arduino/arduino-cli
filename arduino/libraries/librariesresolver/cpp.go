@@ -168,7 +168,7 @@ func computePriority(lib *libraries.Library, header, arch string) int {
 	header = strings.TrimSuffix(header, filepath.Ext(header))
 	header = simplify(header)
 	name := simplify(lib.Name)
-	canonicalName := simplify(lib.CanonicalName)
+	dirName := simplify(lib.DirName)
 
 	priority := 0
 
@@ -185,17 +185,17 @@ func computePriority(lib *libraries.Library, header, arch string) int {
 		priority += 0
 	}
 
-	if name == header && canonicalName == header {
+	if name == header && dirName == header {
 		priority += 600
-	} else if name == header || canonicalName == header {
+	} else if name == header || dirName == header {
 		priority += 500
-	} else if name == header+"-master" || canonicalName == header+"-master" {
+	} else if name == header+"-master" || dirName == header+"-master" {
 		priority += 400
-	} else if strings.HasPrefix(name, header) || strings.HasPrefix(canonicalName, header) {
+	} else if strings.HasPrefix(name, header) || strings.HasPrefix(dirName, header) {
 		priority += 300
-	} else if strings.HasSuffix(name, header) || strings.HasSuffix(canonicalName, header) {
+	} else if strings.HasSuffix(name, header) || strings.HasSuffix(dirName, header) {
 		priority += 200
-	} else if strings.Contains(name, header) || strings.Contains(canonicalName, header) {
+	} else if strings.Contains(name, header) || strings.Contains(dirName, header) {
 		priority += 100
 	}
 

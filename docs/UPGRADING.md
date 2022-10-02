@@ -9,12 +9,12 @@ Here you can find a list of migration guides to handle breaking changes between 
 In the structure `github.com/arduino/arduino-cli/arduino/libraries.Library` the field:
 
 - `RealName` has been renamed to `Name`
-- `Name` has been renamed to `CanonicalName`
+- `Name` has been renamed to `DirName`
 
-Now `Name` is the name of the library as it appears in the `library.properties` file and `CanonicalName` it's the name
-of the directory containing the library. The `CanonicalName` is usually the name of the library with non-alphanumeric
-characters converted to underscore, but it could be actually anything since the directory where the library is installed
-can be freely renamed.
+Now `Name` is the name of the library as it appears in the `library.properties` file and `DirName` it's the name of the
+directory containing the library. The `DirName` is usually the name of the library with non-alphanumeric characters
+converted to underscore, but it could be actually anything since the directory where the library is installed can be
+freely renamed.
 
 This change improves the overall code base naming coherence since all the structures involving libraries have the `Name`
 field that refers to the library name as it appears in the `library.properties` file.

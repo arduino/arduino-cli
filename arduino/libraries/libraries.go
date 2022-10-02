@@ -63,7 +63,7 @@ type Library struct {
 	Types []string `json:"types,omitempty"`
 
 	InstallDir             *paths.Path
-	CanonicalName          string
+	DirName                string
 	SourceDir              *paths.Path
 	UtilityDir             *paths.Path
 	Location               LibraryLocation

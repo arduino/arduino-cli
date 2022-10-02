@@ -131,7 +131,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 	if ctx.Verbose {
 		ctx.Info(tr(`Compiling library "%[1]s"`, library.Name))
 	}
-	libraryBuildPath := buildPath.Join(library.CanonicalName)
+	libraryBuildPath := buildPath.Join(library.DirName)
 
 	if err := libraryBuildPath.MkdirAll(); err != nil {
 		return nil, errors.WithStack(err)
@@ -189,7 +189,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 			return nil, errors.WithStack(err)
 		}
 		if library.DotALinkage {
-			archiveFile, err := builder_utils.ArchiveCompiledFiles(ctx, libraryBuildPath, paths.New(library.CanonicalName+".a"), libObjectFiles, buildProperties)
+			archiveFile, err := builder_utils.ArchiveCompiledFiles(ctx, libraryBuildPath, paths.New(library.DirName+".a"), libObjectFiles, buildProperties)
 			if err != nil {
 				return nil, errors.WithStack(err)
 			}
