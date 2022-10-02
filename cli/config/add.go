@@ -96,12 +96,7 @@ func runAddCommand(cmd *cobra.Command, args []string) {
 	}
 
 	v := configuration.Settings.GetStringSlice(key)
-	// only insert values that do not already exist
-	// old code appended all except the first arg (which was the key)
 	v = append(v, args[1:]...)
-	// v now has the original values + the appended values
-	// but, the appended values might have already existed
-	// if so, remove them.
 	v = uniquifyStringSlice(v)
 	configuration.Settings.Set(key, v)
 
