@@ -26,6 +26,48 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// // TODO: When update to go 1.18 or later, convert to generic
+// //       to allow uniquify() on any slice that supports
+// //       `comparable`
+// //       See https://gosamples.dev/generics-remove-duplicates-slice/
+// func uniquify[T comparable](s []T) []T {
+// 	// use a map, which enforces unique keys
+// 	inResult := make(map[T]bool)
+// 	var result []T
+// 	// loop through input slice **in order**,
+// 	// to ensure output retains that order
+// 	// (except that it removes duplicates)
+// 	for i := 0; i < len(s); i++ {
+// 		// attempt to use the element as a key
+// 		if _, ok := inResult[s[i]]; !ok {
+// 			// if key didn't exist in map,
+// 			// add to map and append to result
+// 			inResult[s[i]] = true
+// 			result = append(result, s[i])
+// 		}
+// 	}
+// 	return result
+// }
+
+func uniquify_string_slice(s []string) []string {
+	// use a map, which enforces unique keys
+	inResult := make(map[string]bool)
+	var result []string
+	// loop through input slice **in order**,
+	// to ensure output retains that order
+	// (except that it removes duplicates)
+	for i := 0; i < len(s); i++ {
+		// attempt to use the element as a key
+		if _, ok := inResult[s[i]]; !ok {
+			// if key didn't exist in map,
+			// add to map and append to result
+			inResult[s[i]] = true
+			result = append(result, s[i])
+		}
+	}
+	return result
+}
+
 func initAddCommand() *cobra.Command {
 	addCommand := &cobra.Command{
 		Use:   "add",
@@ -54,7 +96,13 @@ func runAddCommand(cmd *cobra.Command, args []string) {
 	}
 
 	v := configuration.Settings.GetStringSlice(key)
+	// only insert values that do not already exist
+	// old code appended all except the first arg (which was the key)
 	v = append(v, args[1:]...)
+	// v now has the original values + the appended values
+	// but, the appended values might have already existed
+	// if so, remove them.
+	v = uniquify_string_slice(v)
 	configuration.Settings.Set(key, v)
 
 	if err := configuration.Settings.WriteConfig(); err != nil {
