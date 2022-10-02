@@ -545,6 +545,7 @@ def test_set_slice_with_multiple_arguments(run_command):
     assert urls[5] in settings_json["board_manager"]["additional_urls"]
     assert urls[6] in settings_json["board_manager"]["additional_urls"]
 
+
 def test_set_string_with_single_argument(run_command):
     # Create a config file
     assert run_command(["config", "init", "--dest-dir", "."])
