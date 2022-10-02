@@ -49,7 +49,7 @@ import (
 // 	return result
 // }
 
-func uniquify_string_slice(s []string) []string {
+func uniquifyStringSlice(s []string) []string {
 	// use a map, which enforces unique keys
 	inResult := make(map[string]bool)
 	var result []string
@@ -102,7 +102,7 @@ func runAddCommand(cmd *cobra.Command, args []string) {
 	// v now has the original values + the appended values
 	// but, the appended values might have already existed
 	// if so, remove them.
-	v = uniquify_string_slice(v)
+	v = uniquifyStringSlice(v)
 	configuration.Settings.Set(key, v)
 
 	if err := configuration.Settings.WriteConfig(); err != nil {
