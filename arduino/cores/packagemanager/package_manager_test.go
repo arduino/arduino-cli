@@ -218,6 +218,56 @@ func TestBoardOptionsFunctions(t *testing.T) {
 	}
 }
 
+func TestBoardOrdering(t *testing.T) {
+	pmb := packagemanager.NewBuilder(dataDir1, dataDir1.Join("packages"), nil, nil, "")
+	_ = pmb.LoadHardwareFromDirectories(paths.NewPathList(dataDir1.Join("packages").String()))
+	pm := pmb.Build()
+	pme, release := pm.NewExplorer()
+	defer release()
+
+	pl := pme.FindPlatform(&packagemanager.PlatformReference{
+		Package:              "arduino",
+		PlatformArchitecture: "avr",
+	})
+	require.NotNil(t, pl)
+	plReleases := pl.GetAllInstalled()
+	require.NotEmpty(t, plReleases)
+	avr := plReleases[0]
+	res := []string{}
+	for _, board := range avr.GetBoards() {
+		res = append(res, board.Name())
+	}
+	expected := []string{
+		"Arduino Yún",
+		"Arduino Uno",
+		"Arduino Duemilanove or Diecimila",
+		"Arduino Nano",
+		"Arduino Mega or Mega 2560",
+		"Arduino Mega ADK",
+		"Arduino Leonardo",
+		"Arduino Leonardo ETH",
+		"Arduino Micro",
+		"Arduino Esplora",
+		"Arduino Mini",
+		"Arduino Ethernet",
+		"Arduino Fio",
+		"Arduino BT",
+		"LilyPad Arduino USB",
+		"LilyPad Arduino",
+		"Arduino Pro or Pro Mini",
+		"Arduino NG or older",
+		"Arduino Robot Control",
+		"Arduino Robot Motor",
+		"Arduino Gemma",
+		"Adafruit Circuit Playground",
+		"Arduino Yún Mini",
+		"Arduino Industrial 101",
+		"Linino One",
+		"Arduino Uno WiFi",
+	}
+	require.Equal(t, expected, res)
+}
+
 func TestFindToolsRequiredForBoard(t *testing.T) {
 	os.Setenv("ARDUINO_DATA_DIR", dataDir1.String())
 	configuration.Settings = configuration.Init("")
