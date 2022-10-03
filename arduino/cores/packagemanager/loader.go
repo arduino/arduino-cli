@@ -472,11 +472,7 @@ func (pm *Builder) loadBoards(platform *cores.PlatformRelease) error {
 
 	propertiesByBoard := boardsProperties.FirstLevelOf()
 
-	if menus, ok := propertiesByBoard["menu"]; ok {
-		platform.Menus = menus
-	} else {
-		platform.Menus = properties.NewMap()
-	}
+	platform.Menus = boardsProperties.SubTree("menu")
 	// This is not a board id so we remove it to correctly
 	// set all other boards properties
 	delete(propertiesByBoard, "menu")
