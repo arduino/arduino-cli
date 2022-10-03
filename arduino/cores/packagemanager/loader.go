@@ -470,14 +470,15 @@ func (pm *Builder) loadBoards(platform *cores.PlatformRelease) error {
 		return err
 	}
 
-	propertiesByBoard := boardsProperties.FirstLevelOf()
-
 	platform.Menus = boardsProperties.SubTree("menu")
-	// This is not a board id so we remove it to correctly
-	// set all other boards properties
-	delete(propertiesByBoard, "menu")
 
-	for boardID, boardProperties := range propertiesByBoard {
+	// Build to boards structure following the boards.txt board ordering
+	for _, boardID := range boardsProperties.FirstLevelKeys() {
+		if boardID == "menu" {
+			// This is not a board id so we remove it to correctly set all other boards properties
+			continue
+		}
+		boardProperties := boardsProperties.SubTree(boardID)
 		var board *cores.Board
 		if !platform.PluggableDiscoveryAware {
 			convertVidPidIdentificationPropertiesToPluggableDiscovery(boardProperties)
