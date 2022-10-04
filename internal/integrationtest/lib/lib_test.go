@@ -65,7 +65,7 @@ func TestLibUpgradeCommand(t *testing.T) {
 	requirejson.Query(t, stdOut, `.[].library | select(.name=="Servo") | .version`, servoVersion)
 }
 
-func TestLibCommandsUsingNameInsteadOfCanonicalName(t *testing.T) {
+func TestLibCommandsUsingNameInsteadOfDirName(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
 

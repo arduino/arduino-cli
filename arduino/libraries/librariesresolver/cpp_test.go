@@ -147,14 +147,14 @@ func TestCppHeaderResolver(t *testing.T) {
 func TestCppHeaderResolverWithLibrariesInStrangeDirectoryNames(t *testing.T) {
 	resolver := NewCppResolver()
 	librarylist := libraries.List{}
-	librarylist.Add(&libraries.Library{CanonicalName: "onewire_2_3_4", Name: "OneWire", Architectures: []string{"*"}})
-	librarylist.Add(&libraries.Library{CanonicalName: "onewireng_2_3_4", Name: "OneWireNg", Architectures: []string{"avr"}})
+	librarylist.Add(&libraries.Library{DirName: "onewire_2_3_4", Name: "OneWire", Architectures: []string{"*"}})
+	librarylist.Add(&libraries.Library{DirName: "onewireng_2_3_4", Name: "OneWireNg", Architectures: []string{"avr"}})
 	resolver.headers["OneWire.h"] = librarylist
-	require.Equal(t, "onewire_2_3_4", resolver.ResolveFor("OneWire.h", "avr").CanonicalName)
+	require.Equal(t, "onewire_2_3_4", resolver.ResolveFor("OneWire.h", "avr").DirName)
 
 	librarylist2 := libraries.List{}
-	librarylist2.Add(&libraries.Library{CanonicalName: "OneWire", Name: "OneWire", Architectures: []string{"*"}})
-	librarylist2.Add(&libraries.Library{CanonicalName: "onewire_2_3_4", Name: "OneWire", Architectures: []string{"avr"}})
+	librarylist2.Add(&libraries.Library{DirName: "OneWire", Name: "OneWire", Architectures: []string{"*"}})
+	librarylist2.Add(&libraries.Library{DirName: "onewire_2_3_4", Name: "OneWire", Architectures: []string{"avr"}})
 	resolver.headers["OneWire.h"] = librarylist2
-	require.Equal(t, "OneWire", resolver.ResolveFor("OneWire.h", "avr").CanonicalName)
+	require.Equal(t, "OneWire", resolver.ResolveFor("OneWire.h", "avr").DirName)
 }

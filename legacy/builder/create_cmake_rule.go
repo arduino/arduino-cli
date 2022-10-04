@@ -73,7 +73,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	dynamicLibsFromPkgConfig := map[string]bool{}
 	for _, library := range ctx.ImportedLibraries {
 		// Copy used libraries in the correct folder
-		libDir := libBaseFolder.Join(library.CanonicalName)
+		libDir := libBaseFolder.Join(library.DirName)
 		mcu := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_BUILD_MCU)
 		utils.CopyDir(library.InstallDir.String(), libDir.String(), validExportExtensions)
 
