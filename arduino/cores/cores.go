@@ -63,6 +63,7 @@ type PlatformRelease struct {
 	Platform                *Platform                     `json:"-"`
 	Properties              *properties.Map               `json:"-"`
 	Boards                  map[string]*Board             `json:"-"`
+	orderedBoards           []*Board                      `json:"-"` // The Boards of this platform, in the order they are defined in the boards.txt file.
 	Programmers             map[string]*Programmer        `json:"-"`
 	Menus                   *properties.Map               `json:"-"`
 	InstallDir              *paths.Path                   `json:"-"`
@@ -292,7 +293,14 @@ func (release *PlatformRelease) GetOrCreateBoard(boardID string) *Board {
 		PlatformRelease: release,
 	}
 	release.Boards[boardID] = board
+	release.orderedBoards = append(release.orderedBoards, board)
 	return board
+}
+
+// GetBoards returns the boards in this platforms in the order they
+// are defined in the platform.txt file.
+func (release *PlatformRelease) GetBoards() []*Board {
+	return release.orderedBoards
 }
 
 // RequiresToolRelease returns true if the PlatformRelease requires the

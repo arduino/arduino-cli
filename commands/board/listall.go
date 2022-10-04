@@ -70,7 +70,7 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListA
 				targetPackage.Maintainer,
 			}
 
-			for _, board := range installedPlatformRelease.Boards {
+			for _, board := range installedPlatformRelease.GetBoards() {
 				if !req.GetIncludeHiddenBoards() && board.IsHidden() {
 					continue
 				}
