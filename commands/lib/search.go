@@ -41,9 +41,7 @@ func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.Libraries
 	status := rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS
 
 	// Split on anything but 0-9, a-z or :
-	queryTerms := strings.FieldsFunc(strings.ToLower(req.GetQuery()), func(r rune) bool {
-		return !((r >= '0' && r <= '9') || (r >= 'a' && r <= 'z') || r == ':')
-	})
+	queryTerms := rpc.SearchTermsFromQueryString(req.GetQuery())
 
 	for _, lib := range lm.Index.Libraries {
 		matchTerm := func(x string) bool {
