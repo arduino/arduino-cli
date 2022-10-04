@@ -238,7 +238,7 @@ message UpdateIndexRequest {
 }
 
 message UpdateIndexResponse {
-  // Progress of the platforms index download.
+  // Progress of the package index download.
   DownloadProgress download_progress = 1;
 }
 
