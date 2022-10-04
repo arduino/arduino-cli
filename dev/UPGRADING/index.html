@@ -289,6 +289,46 @@
     Breaking changes in libraries name handling
   </a>
   
+    <nav class="md-nav" aria-label="Breaking changes in libraries name handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#grpc-message-ccarduinoclicommandsv1library-no-longer-has-real_name-field" class="md-nav__link">
+    gRPC message cc.arduino.cli.commands.v1.Library no longer has real_name field
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#machine-readable-lib-list-output-no-longer-has-real-name-field" class="md-nav__link">
+    Machine readable lib list output no longer has "real name" field
+  </a>
+  
+    <nav class="md-nav" aria-label="Machine readable lib list output no longer has "real name" field">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#json" class="md-nav__link">
+    JSON
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#yaml" class="md-nav__link">
+    YAML
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -2021,6 +2061,46 @@
     Breaking changes in libraries name handling
   </a>
   
+    <nav class="md-nav" aria-label="Breaking changes in libraries name handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#grpc-message-ccarduinoclicommandsv1library-no-longer-has-real_name-field" class="md-nav__link">
+    gRPC message cc.arduino.cli.commands.v1.Library no longer has real_name field
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#machine-readable-lib-list-output-no-longer-has-real-name-field" class="md-nav__link">
+    Machine readable lib list output no longer has "real name" field
+  </a>
+  
+    <nav class="md-nav" aria-label="Machine readable lib list output no longer has "real name" field">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#json" class="md-nav__link">
+    JSON
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#yaml" class="md-nav__link">
+    YAML
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -2697,6 +2777,15 @@ converted to underscore, but it could be actually anything since the directory w
 freely renamed.</p>
 <p>This change improves the overall code base naming coherence since all the structures involving libraries have the <code>Name</code>
 field that refers to the library name as it appears in the <code>library.properties</code> file.</p>
+<h4 id="grpc-message-ccarduinoclicommandsv1library-no-longer-has-real_name-field">gRPC message <code>cc.arduino.cli.commands.v1.Library</code> no longer has <code>real_name</code> field<a class="headerlink" href="#grpc-message-ccarduinoclicommandsv1library-no-longer-has-real_name-field" title="Permanent link">&para;</a></h4>
+<p>You must use the <code>name</code> field instead.</p>
+<h4 id="machine-readable-lib-list-output-no-longer-has-real-name-field">Machine readable <code>lib list</code> output no longer has "real name" field<a class="headerlink" href="#machine-readable-lib-list-output-no-longer-has-real-name-field" title="Permanent link">&para;</a></h4>
+<h5 id="json">JSON<a class="headerlink" href="#json" title="Permanent link">&para;</a></h5>
+<p>The <code>[*].library.real_name</code> field has been removed.</p>
+<p>You must use the <code>[*].library.name</code> field instead.</p>
+<h5 id="yaml">YAML<a class="headerlink" href="#yaml" title="Permanent link">&para;</a></h5>
+<p>The <code>[*].library.realname</code> field has been removed.</p>
+<p>You must use the <code>[*].library.name</code> field instead.</p>
 <h3 id="githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanagerinstall-removed-parameter-installlocation"><code>github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager.Install</code> removed parameter <code>installLocation</code><a class="headerlink" href="#githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanagerinstall-removed-parameter-installlocation" title="Permanent link">&para;</a></h3>
 <p>The method:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">lm</span><span class="w"> </span><span class="o">*</span><span class="nx">LibrariesManager</span><span class="p">)</span><span class="w"> </span><span class="nx">Install</span><span class="p">(</span><span class="nx">indexLibrary</span><span class="w"> </span><span class="o">*</span><span class="nx">librariesindex</span><span class="p">.</span><span class="nx">Release</span><span class="p">,</span><span class="w"> </span><span class="nx">libPath</span><span class="w"> </span><span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">,</span><span class="w"> </span><span class="nx">installLocation</span><span class="w"> </span><span class="nx">libraries</span><span class="p">.</span><span class="nx">LibraryLocation</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
