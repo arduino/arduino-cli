@@ -23,6 +23,20 @@ field that refers to the library name as it appears in the `library.properties` 
 
 You must use the `name` field instead.
 
+#### Machine readable `lib list` output no longer has "real name" field
+
+##### JSON
+
+The `[*].library.real_name` field has been removed.
+
+You must use the `[*].library.name` field instead.
+
+##### YAML
+
+The `[*].library.realname` field has been removed.
+
+You must use the `[*].library.name` field instead.
+
 ### `github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager.Install` removed parameter `installLocation`
 
 The method:
