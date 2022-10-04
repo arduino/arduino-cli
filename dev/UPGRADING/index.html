@@ -2689,12 +2689,12 @@
 <p>In the structure <code>github.com/arduino/arduino-cli/arduino/libraries.Library</code> the field:</p>
 <ul>
 <li><code>RealName</code> has been renamed to <code>Name</code></li>
-<li><code>Name</code> has been renamed to <code>CanonicalName</code></li>
+<li><code>Name</code> has been renamed to <code>DirName</code></li>
 </ul>
-<p>Now <code>Name</code> is the name of the library as it appears in the <code>library.properties</code> file and <code>CanonicalName</code> it's the name
-of the directory containing the library. The <code>CanonicalName</code> is usually the name of the library with non-alphanumeric
-characters converted to underscore, but it could be actually anything since the directory where the library is installed
-can be freely renamed.</p>
+<p>Now <code>Name</code> is the name of the library as it appears in the <code>library.properties</code> file and <code>DirName</code> it's the name of the
+directory containing the library. The <code>DirName</code> is usually the name of the library with non-alphanumeric characters
+converted to underscore, but it could be actually anything since the directory where the library is installed can be
+freely renamed.</p>
 <p>This change improves the overall code base naming coherence since all the structures involving libraries have the <code>Name</code>
 field that refers to the library name as it appears in the <code>library.properties</code> file.</p>
 <h3 id="githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanagerinstall-removed-parameter-installlocation"><code>github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager.Install</code> removed parameter <code>installLocation</code><a class="headerlink" href="#githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanagerinstall-removed-parameter-installlocation" title="Permanent link">&para;</a></h3>
