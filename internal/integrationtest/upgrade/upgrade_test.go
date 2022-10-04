@@ -28,9 +28,9 @@ func TestUpgrade(t *testing.T) {
 	defer env.CleanUp()
 
 	// Updates index for cores and libraries
-	_, _, err := cli.Run("core", "update-idex")
+	_, _, err := cli.Run("core", "update-index")
 	require.NoError(t, err)
-	_, _, err = cli.Run("lib", "update-idex")
+	_, _, err = cli.Run("lib", "update-index")
 	require.NoError(t, err)
 
 	// Installs an outdated core and library
