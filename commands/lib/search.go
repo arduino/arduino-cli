@@ -17,11 +17,11 @@ package lib
 
 import (
 	"context"
-	"strings"
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	semver "go.bug.st/relaxed-semver"
@@ -38,42 +38,23 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.Lib
 
 func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.LibrariesManager) *rpc.LibrarySearchResponse {
 	res := []*rpc.SearchedLibrary{}
-	status := rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS
-
-	// Split on anything but 0-9, a-z or :
-	queryTerms := strings.FieldsFunc(strings.ToLower(req.GetQuery()), func(r rune) bool {
-		return !((r >= '0' && r <= '9') || (r >= 'a' && r <= 'z') || r == ':')
-	})
+	queryTerms := utils.SearchTermsFromQueryString(req.GetQuery())
 
 	for _, lib := range lm.Index.Libraries {
-		matchTerm := func(x string) bool {
-			if strings.Contains(strings.ToLower(lib.Name), x) ||
-				strings.Contains(strings.ToLower(lib.Latest.Paragraph), x) ||
-				strings.Contains(strings.ToLower(lib.Latest.Sentence), x) ||
-				strings.Contains(strings.ToLower(lib.Latest.Author), x) {
-				return true
-			}
-			for _, include := range lib.Latest.ProvidesIncludes {
-				if strings.Contains(strings.ToLower(include), x) {
-					return true
-				}
-			}
-			return false
+		toTest := lib.Name + " " +
+			lib.Latest.Paragraph + " " +
+			lib.Latest.Sentence + " " +
+			lib.Latest.Author + " "
+		for _, include := range lib.Latest.ProvidesIncludes {
+			toTest += include + " "
 		}
-		match := func() bool {
-			for _, term := range queryTerms {
-				if !matchTerm(term) {
-					return false
-				}
-			}
-			return true
-		}
-		if match() {
+
+		if utils.Match(toTest, queryTerms) {
 			res = append(res, indexLibraryToRPCSearchLibrary(lib))
 		}
 	}
 
-	return &rpc.LibrarySearchResponse{Libraries: res, Status: status}
+	return &rpc.LibrarySearchResponse{Libraries: res, Status: rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS}
 }
 
 // indexLibraryToRPCSearchLibrary converts a librariindex.Library to rpc.SearchLibrary

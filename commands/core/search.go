@@ -29,8 +29,6 @@ import (
 
 // PlatformSearch FIXMEDOC
 func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse, error) {
-	searchArgs := strings.TrimSpace(req.SearchArgs)
-	allVersions := req.AllVersions
 	pme, release := commands.GetPackageManagerExplorer(req)
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
@@ -38,14 +36,14 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 	defer release()
 
 	res := []*cores.PlatformRelease{}
-	if isUsb, _ := regexp.MatchString("[0-9a-f]{4}:[0-9a-f]{4}", searchArgs); isUsb {
-		vid, pid := searchArgs[:4], searchArgs[5:]
+	if isUsb, _ := regexp.MatchString("[0-9a-f]{4}:[0-9a-f]{4}", req.SearchArgs); isUsb {
+		vid, pid := req.SearchArgs[:4], req.SearchArgs[5:]
 		res = pme.FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid)
 	} else {
-
+		searchArgs := utils.SearchTermsFromQueryString(req.SearchArgs)
+		allVersions := req.AllVersions
 		for _, targetPackage := range pme.GetPackages() {
 			for _, platform := range targetPackage.Platforms {
-				// discard invalid platforms
 				// Users can install platforms manually in the Sketchbook hardware folder,
 				// the core search command must operate only on platforms installed through
 				// the PlatformManager, thus we skip the manually installed ones.
@@ -53,34 +51,32 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 					continue
 				}
 
-				// discard invalid releases
-				platformRelease := platform.GetLatestRelease()
-				if platformRelease == nil {
+				// Discard platforms with no releases
+				latestRelease := platform.GetLatestRelease()
+				if latestRelease == nil {
 					continue
 				}
 
 				// Gather all strings that can be used for searching
-				toTest := []string{
-					platform.String(),
-					platform.Name,
-					platform.Architecture,
-					targetPackage.Name,
-					targetPackage.Maintainer,
-					targetPackage.WebsiteURL,
-				}
-				for _, board := range platformRelease.BoardsManifest {
-					toTest = append(toTest, board.Name)
+				toTest := platform.String() + " " +
+					platform.Name + " " +
+					platform.Architecture + " " +
+					targetPackage.Name + " " +
+					targetPackage.Maintainer + " " +
+					targetPackage.WebsiteURL
+				for _, board := range latestRelease.BoardsManifest {
+					toTest += board.Name + " "
 				}
 
 				// Search
-				if !utils.MatchAny(searchArgs, toTest) {
+				if !utils.Match(toTest, searchArgs) {
 					continue
 				}
 
 				if allVersions {
 					res = append(res, platform.GetAllReleases()...)
 				} else {
-					res = append(res, platformRelease)
+					res = append(res, latestRelease)
 				}
 			}
 		}

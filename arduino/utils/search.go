@@ -43,6 +43,16 @@ func removeDiatrics(s string) (string, error) {
 	return s, nil
 }
 
+// SearchTermsFromQueryString returns the terms inside the query string.
+// All non alphanumeric characters (expect ':') are considered separators.
+// All search terms are converted to lowercase.
+func SearchTermsFromQueryString(query string) []string {
+	// Split on anything but 0-9, a-z or :
+	return strings.FieldsFunc(strings.ToLower(query), func(r rune) bool {
+		return !unicode.IsLetter(r) && !unicode.IsNumber(r) && r != ':'
+	})
+}
+
 // Match returns true if all substrings are contained in str.
 // Both str and substrings are transforms to lower case and have their
 // accents and other unicode diatrics removed.
