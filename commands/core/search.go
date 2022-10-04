@@ -40,7 +40,7 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 		vid, pid := req.SearchArgs[:4], req.SearchArgs[5:]
 		res = pme.FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid)
 	} else {
-		searchArgs := rpc.SearchTermsFromQueryString(req.SearchArgs)
+		searchArgs := utils.SearchTermsFromQueryString(req.SearchArgs)
 		allVersions := req.AllVersions
 		for _, targetPackage := range pme.GetPackages() {
 			for _, platform := range targetPackage.Platforms {
