@@ -15,7 +15,10 @@
 
 package commands
 
-import "strings"
+import (
+	"strings"
+	"unicode"
+)
 
 // SearchTermsFromQueryString returns the terms inside the query string.
 // All non alphanumeric characters (expect ':') are considered separators.
@@ -23,6 +26,6 @@ import "strings"
 func SearchTermsFromQueryString(query string) []string {
 	// Split on anything but 0-9, a-z or :
 	return strings.FieldsFunc(strings.ToLower(query), func(r rune) bool {
-		return !((r >= '0' && r <= '9') || (r >= 'a' && r <= 'z') || r == ':')
+		return !unicode.IsLetter(r) && !unicode.IsNumber(r) && r != ':'
 	})
 }
