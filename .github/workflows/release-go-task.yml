@@ -68,9 +68,6 @@ jobs:
     name: Notarize ${{ matrix.artifact.name }}
     runs-on: macos-latest
     needs: create-release-artifacts
-    outputs:
-      checksum-darwin_amd64: ${{ steps.re-package.outputs.checksum-darwin_amd64 }}
-      checksum-darwin_arm64: ${{ steps.re-package.outputs.checksum-darwin_arm64 }}
 
     env:
       GON_CONFIG_PATH: gon.config.hcl
@@ -148,7 +145,6 @@ jobs:
           gon "${{ env.GON_CONFIG_PATH }}"
 
       - name: Re-package binary
-        id: re-package
         working-directory: ${{ env.DIST_DIR }}
         # Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
         run: |
