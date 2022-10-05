@@ -327,6 +327,11 @@ tasks:
     cmds:
       - poetry run mkdocs serve
 
+  get-version:
+    desc: Returns the version used in the project
+    cmds:
+      - echo {{.VERSION}}
+
 vars:
   PROJECT_NAME: "arduino-cli"
   DIST_DIR: "dist"

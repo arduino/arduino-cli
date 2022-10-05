@@ -17,6 +17,8 @@ on:
 
 jobs:
   create-release-artifacts:
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
     runs-on: ubuntu-latest
 
     strategy:
@@ -56,6 +58,10 @@ jobs:
 
       - name: Build
         run: task dist:${{ matrix.os }}
+
+      - name: Output Version
+        id: get-version
+        run: echo "::set-output name=version::$(task get-version)"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
@@ -151,7 +157,7 @@ jobs:
           # GitHub's upload/download-artifact@v2 actions don't preserve file permissions,
           # so we need to add execution permission back until the action is made to do this.
           chmod +x "${{ env.PROJECT_NAME }}_osx_${{ matrix.artifact.name }}/${{ env.PROJECT_NAME }}"
-          TAG="${GITHUB_REF/refs\/tags\//}"
+          TAG=${{ needs.create-release-artifacts.outputs.version }}
           PACKAGE_FILENAME="${{ env.PROJECT_NAME }}_${TAG}_${{ matrix.artifact.path }}"
           tar -czvf "$PACKAGE_FILENAME" \
           -C "${{ env.PROJECT_NAME }}_osx_${{ matrix.artifact.name }}/" "${{ env.PROJECT_NAME }}" \
@@ -196,7 +202,7 @@ jobs:
       - name: Build MSI
         id: buildmsi
         run: |
-          TAG="${GITHUB_REF/refs\/tags\//}"
+          TAG=${{ needs.create-release-artifacts.outputs.version }}
           WIX_TAG="${TAG%%-*}" # removes "-rc*" since wix is not happy with it, this only affects RCs builds (error CNDL0108)
           PACKAGE_FILENAME="${{ env.PROJECT_NAME }}_${TAG}_Windows_64bit"
           SOURCE_DIR="${GITHUB_WORKSPACE}/${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_windows_amd64/"
@@ -224,6 +230,7 @@ jobs:
   create-release:
     runs-on: ubuntu-latest
     needs:
+      - create-release-artifacts
       - notarize-macos
       - create-windows-installer
 
@@ -237,7 +244,7 @@ jobs:
       - name: Create checksum file
         working-directory: ${{ env.DIST_DIR}}
         run: |
-          TAG="${GITHUB_REF/refs\/tags\//}"
+          TAG=${{ needs.create-release-artifacts.outputs.version }}
           sha256sum ${{ env.PROJECT_NAME }}_${TAG}* > ${TAG}-checksums.txt
 
       - name: Identify Prerelease
@@ -247,7 +254,7 @@ jobs:
         run: |
           wget -q -P /tmp https://github.com/fsaintjacques/semver-tool/archive/3.0.0.zip
           unzip -p /tmp/3.0.0.zip semver-tool-3.0.0/src/semver >/tmp/semver && chmod +x /tmp/semver
-          if [[ "$(/tmp/semver get prerel "${GITHUB_REF/refs\/tags\//}")" ]]; then echo "::set-output name=IS_PRE::true"; fi
+          if [[ "$(/tmp/semver get prerel ${{ needs.create-release-artifacts.outputs.version }} )" ]]; then echo "::set-output name=IS_PRE::true"; fi
 
       - name: Create Github Release and upload artifacts
         uses: ncipollo/release-action@v1
