@@ -20,36 +20,6 @@ from git import Repo
 from pathlib import Path
 
 
-def test_compile_manually_installed_platform_using_boards_local_txt(run_command, data_dir):
-    assert run_command(["update"])
-
-    sketch_name = "CompileSketchManuallyInstalledPlatformUsingBoardsLocalTxt"
-    sketch_path = Path(data_dir, sketch_name)
-    fqbn = "arduino-beta-development:avr:nessuno"
-    assert run_command(["sketch", "new", sketch_path])
-
-    # Manually installs a core in sketchbooks hardware folder
-    git_url = "https://github.com/arduino/ArduinoCore-avr.git"
-    repo_dir = Path(data_dir, "hardware", "arduino-beta-development", "avr")
-    assert Repo.clone_from(git_url, repo_dir, multi_options=["-b 1.8.3"])
-
-    # Installs also the same core via CLI so all the necessary tools are installed
-    assert run_command(["core", "install", "arduino:avr@1.8.3"])
-
-    # Verifies compilation fails because board doesn't exist
-    res = run_command(["compile", "--clean", "-b", fqbn, sketch_path])
-    assert res.failed
-    assert (
-        "Error during build: Error resolving FQBN: board arduino-beta-development:avr:nessuno not found" in res.stderr
-    )
-
-    # Use custom boards.local.txt with made arduino:avr:nessuno board
-    boards_local_txt = Path(repo_dir, "boards.local.txt")
-    shutil.copyfile(Path(__file__).parent / "testdata" / "boards.local.txt", boards_local_txt)
-
-    assert run_command(["compile", "--clean", "-b", fqbn, sketch_path])
-
-
 def test_compile_with_relative_build_path(run_command, data_dir, copy_sketch):
     assert run_command(["update"])
 
