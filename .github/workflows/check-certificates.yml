@@ -36,6 +36,9 @@ jobs:
           - identifier: macOS signing certificate # Text used to identify certificate in notifications.
             certificate-secret: INSTALLER_CERT_MAC_P12 # Name of the secret that contains the certificate.
             password-secret: INSTALLER_CERT_MAC_PASSWORD # Name of the secret that contains the certificate password.
+          - identifier: Windows signing certificate
+            certificate-secret: WINDOWS_SIGNING_CERTIFICATE_PFX
+            password-secret: WINDOWS_SIGNING_CERTIFICATE_PASSWORD
 
     steps:
       - name: Set certificate path environment variable
