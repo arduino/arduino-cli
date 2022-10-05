@@ -179,7 +179,10 @@ jobs:
 
     env:
       INSTALLER_CERT_WINDOWS_PFX: "/tmp/cert.pfx"
-      SIGNTOOL_PATH: "C:/Program Files (x86)/Windows Kits/10/bin/10.0.17763.0/x86/signtool.exe"
+      # We are hardcoding the path for signtool because is not present on the windows PATH env var by default.
+      # Keep in mind that this path could change when upgrading to a new runner version
+      # https://github.com/actions/runner-images/blob/main/images/win/Windows2022-Readme.md#installed-windows-sdks
+      SIGNTOOL_PATH: "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x86/signtool.exe"
 
     steps:
       - name: Checkout repository
@@ -214,7 +217,7 @@ jobs:
           MSI_FILE: ${{ steps.buildmsi.outputs.msi }} # this comes from .installer/cli.wixproj
           CERT_PASSWORD: ${{ secrets.INSTALLER_CERT_WINDOWS_PASSWORD }}
         run: |
-          "${{ env.SIGNTOOL_PATH }}" sign -d "Arduino CLI" -f ${{ env.INSTALLER_CERT_WINDOWS_PFX}} -p ${{ env.CERT_PASSWORD }} -fd sha256 -tr http://timestamp.digicert.com -v "${{ env.MSI_FILE }}"
+          "${{ env.SIGNTOOL_PATH }}" sign -d "Arduino CLI" -f ${{ env.INSTALLER_CERT_WINDOWS_PFX}} -p ${{ env.CERT_PASSWORD }} -fd sha256 -tr http://timestamp.digicert.com -td SHA256 -v "${{ env.MSI_FILE }}"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
