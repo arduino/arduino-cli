@@ -20,39 +20,6 @@ from git import Repo
 from pathlib import Path
 
 
-def test_compile_with_relative_build_path(run_command, data_dir, copy_sketch):
-    assert run_command(["update"])
-
-    run_command(["core", "install", "arduino:avr@1.8.3"])
-
-    sketch_name = "sketch_simple"
-    sketch_path = copy_sketch(sketch_name)
-    fqbn = "arduino:avr:uno"
-
-    build_path = Path("..", "build_path")
-    working_dir = Path(data_dir, "working_dir")
-    working_dir.mkdir()
-    assert run_command(
-        ["compile", "-b", fqbn, "--build-path", build_path, sketch_path, "-v"],
-        custom_working_dir=working_dir,
-    )
-
-    absolute_build_path = Path(data_dir, "build_path")
-    built_files = [f.name for f in absolute_build_path.glob("*")]
-    assert f"{sketch_name}.ino.eep" in built_files
-    assert f"{sketch_name}.ino.elf" in built_files
-    assert f"{sketch_name}.ino.hex" in built_files
-    assert f"{sketch_name}.ino.with_bootloader.bin" in built_files
-    assert f"{sketch_name}.ino.with_bootloader.hex" in built_files
-    assert "build.options.json" in built_files
-    assert "compile_commands.json" in built_files
-    assert "core" in built_files
-    assert "includes.cache" in built_files
-    assert "libraries" in built_files
-    assert "preproc" in built_files
-    assert "sketch" in built_files
-
-
 def test_compile_with_fake_secure_boot_core(run_command, data_dir):
     assert run_command(["update"])
 

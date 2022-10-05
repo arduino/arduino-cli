@@ -443,6 +443,46 @@ func TestCompileSketchWithIppFileInclude(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestCompileWithRelativeBuildPath(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	sketchName := "sketch_simple"
+	sketchPath := cli.CopySketch(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	buildPath := paths.New("..").Join("build_path")
+	workingDir := cli.SketchbookDir().Join("working_dir")
+	err = workingDir.Mkdir()
+	require.NoError(t, err)
+	cli.SetWorkingDir(workingDir)
+	_, _, err = cli.Run("compile", "-b", fqbn, "--build-path", buildPath.String(), sketchPath.String(), "-v")
+	require.NoError(t, err)
+	cli.SetWorkingDir(env.RootDir())
+
+	absoluteBuildPath := cli.SketchbookDir().Join("build_path")
+	builtFiles, err := absoluteBuildPath.ReadDir()
+	require.NoError(t, err)
+	require.Contains(t, builtFiles[8].String(), sketchName+".ino.eep")
+	require.Contains(t, builtFiles[9].String(), sketchName+".ino.elf")
+	require.Contains(t, builtFiles[10].String(), sketchName+".ino.hex")
+	require.Contains(t, builtFiles[11].String(), sketchName+".ino.with_bootloader.bin")
+	require.Contains(t, builtFiles[12].String(), sketchName+".ino.with_bootloader.hex")
+	require.Contains(t, builtFiles[0].String(), "build.options.json")
+	require.Contains(t, builtFiles[1].String(), "compile_commands.json")
+	require.Contains(t, builtFiles[2].String(), "core")
+	require.Contains(t, builtFiles[3].String(), "includes.cache")
+	require.Contains(t, builtFiles[4].String(), "libraries")
+	require.Contains(t, builtFiles[6].String(), "preproc")
+	require.Contains(t, builtFiles[7].String(), "sketch")
+}
+
 func TestCompileWithoutUploadAndFqbn(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
