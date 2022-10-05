@@ -1317,13 +1317,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#downloadresult" class="md-nav__link">
-    DownloadResult
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#initrequest" class="md-nav__link">
     InitRequest
   </a>
@@ -1493,6 +1486,27 @@
           <li class="md-nav__item">
   <a href="#downloadprogress" class="md-nav__link">
     DownloadProgress
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#downloadprogressend" class="md-nav__link">
+    DownloadProgressEnd
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#downloadprogressstart" class="md-nav__link">
+    DownloadProgressStart
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#downloadprogressupdate" class="md-nav__link">
+    DownloadProgressUpdate
   </a>
   
 </li>
@@ -2654,13 +2668,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#downloadresult" class="md-nav__link">
-    DownloadResult
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#initrequest" class="md-nav__link">
     InitRequest
   </a>
@@ -2830,6 +2837,27 @@
           <li class="md-nav__item">
   <a href="#downloadprogress" class="md-nav__link">
     DownloadProgress
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#downloadprogressend" class="md-nav__link">
+    DownloadProgressEnd
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#downloadprogressstart" class="md-nav__link">
+    DownloadProgressStart
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#downloadprogressupdate" class="md-nav__link">
+    DownloadProgressUpdate
   </a>
   
 </li>
@@ -3547,7 +3575,6 @@
 <li><a href="#cc.arduino.cli.commands.v1.CreateResponse">CreateResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.DestroyRequest">DestroyRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.DestroyResponse">DestroyResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.DownloadResult">DownloadResult</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.InitRequest">InitRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.InitResponse">InitResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.InitResponse.Progress">InitResponse.Progress</a></li>
@@ -3577,6 +3604,9 @@
 <li><a href="#cc/arduino/cli/commands/v1/common.proto">cc/arduino/cli/commands/v1/common.proto</a><ul>
 <li><a href="#cc.arduino.cli.commands.v1.Board">Board</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.DownloadProgress">DownloadProgress</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.DownloadProgressEnd">DownloadProgressEnd</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.DownloadProgressStart">DownloadProgressStart</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.DownloadProgressUpdate">DownloadProgressUpdate</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.InstalledPlatformReference">InstalledPlatformReference</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.Platform">Platform</a></li>
@@ -4544,38 +4574,6 @@
 </table>
 <p><a name="cc.arduino.cli.commands.v1.DestroyResponse"></a></p>
 <h3 id="destroyresponse">DestroyResponse<a class="headerlink" href="#destroyresponse" title="Permanent link">&para;</a></h3>
-<p><a name="cc.arduino.cli.commands.v1.DownloadResult"></a></p>
-<h3 id="downloadresult">DownloadResult<a class="headerlink" href="#downloadresult" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>url</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>Index URL.</td>
-</tr>
-<tr>
-<td>successful</td>
-<td><a href="#bool">bool</a></td>
-<td></td>
-<td>Download result: true if successful, false if an error occurred.</td>
-</tr>
-<tr>
-<td>error</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>Download error details.</td>
-</tr>
-</tbody>
-</table>
 <p><a name="cc.arduino.cli.commands.v1.InitRequest"></a></p>
 <h3 id="initrequest">InitRequest<a class="headerlink" href="#initrequest" title="Permanent link">&para;</a></h3>
 <table>
@@ -4916,13 +4914,7 @@
 <td>download_progress</td>
 <td><a href="#cc.arduino.cli.commands.v1.DownloadProgress">DownloadProgress</a></td>
 <td></td>
-<td>Progress of the platforms index download.</td>
-</tr>
-<tr>
-<td>download_result</td>
-<td><a href="#cc.arduino.cli.commands.v1.DownloadResult">DownloadResult</a></td>
-<td></td>
-<td>Report of the index update downloads.</td>
+<td>Progress of the package index download.</td>
 </tr>
 </tbody>
 </table>
@@ -5351,23 +5343,89 @@
 </thead>
 <tbody>
 <tr>
+<td>start</td>
+<td><a href="#cc.arduino.cli.commands.v1.DownloadProgressStart">DownloadProgressStart</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>update</td>
+<td><a href="#cc.arduino.cli.commands.v1.DownloadProgressUpdate">DownloadProgressUpdate</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>end</td>
+<td><a href="#cc.arduino.cli.commands.v1.DownloadProgressEnd">DownloadProgressEnd</a></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.DownloadProgressEnd"></a></p>
+<h3 id="downloadprogressend">DownloadProgressEnd<a class="headerlink" href="#downloadprogressend" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>success</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>True if the download is successful</td>
+</tr>
+<tr>
+<td>message</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Info or error message, depending on the value of &#39;success&#39;. Some examples: &#34;File xxx already downloaded&#34; or &#34;Connection timeout&#34;</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.DownloadProgressStart"></a></p>
+<h3 id="downloadprogressstart">DownloadProgressStart<a class="headerlink" href="#downloadprogressstart" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
 <td>url</td>
 <td><a href="#string">string</a></td>
 <td></td>
 <td>URL of the download.</td>
 </tr>
 <tr>
-<td>file</td>
+<td>label</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td>The file being downloaded.</td>
+<td>The label to display on the progress bar.</td>
 </tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.DownloadProgressUpdate"></a></p>
+<h3 id="downloadprogressupdate">DownloadProgressUpdate<a class="headerlink" href="#downloadprogressupdate" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
 <tr>
-<td>total_size</td>
-<td><a href="#int64">int64</a></td>
-<td></td>
-<td>Total size of the file being downloaded.</td>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td>downloaded</td>
 <td><a href="#int64">int64</a></td>
@@ -5375,10 +5433,10 @@
 <td>Size of the downloaded portion of the file.</td>
 </tr>
 <tr>
-<td>completed</td>
-<td><a href="#bool">bool</a></td>
+<td>total_size</td>
+<td><a href="#int64">int64</a></td>
 <td></td>
-<td>Whether the download is complete.</td>
+<td>Total size of the file being downloaded.</td>
 </tr>
 </tbody>
 </table>

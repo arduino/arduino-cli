@@ -2806,43 +2806,75 @@ field that refers to the library name as it appears in the <code>library.propert
 <p>The structure <code>librariesmanager.LibraryAlternatives</code> has been removed. The <code>libraries.List</code> object can be used as a
 replacement.</p>
 <h3 id="breaking-changes-in-updateindex-api-both-grpc-and-go-lang">Breaking changes in UpdateIndex API (both gRPC and go-lang)<a class="headerlink" href="#breaking-changes-in-updateindex-api-both-grpc-and-go-lang" title="Permanent link">&para;</a></h3>
-<p>The gRPC message <code>cc.arduino.cli.commands.v1.UpdateIndexResponse</code> has been changed from:</p>
-<div class="highlight"><pre><span></span><code>message UpdateIndexResponse {
-  // Progress of the platforms index download.
-  DownloadProgress download_progress = 1;
+<p>The gRPC message <code>cc.arduino.cli.commands.v1.DownloadProgress</code> has been changed from:</p>
+<div class="highlight"><pre><span></span><code>message DownloadProgress {
+  // URL of the download.
+  string url = 1;
+  // The file being downloaded.
+  string file = 2;
+  // Total size of the file being downloaded.
+  int64 total_size = 3;
+  // Size of the downloaded portion of the file.
+  int64 downloaded = 4;
+  // Whether the download is complete.
+  bool completed = 5;
 }
 </code></pre></div>
 <p>to</p>
-<div class="highlight"><pre><span></span><code>message UpdateIndexResponse {
+<div class="highlight"><pre><span></span><code>message DownloadProgress {
   oneof message {
-    // Progress of the platforms index download.
-    DownloadProgress download_progress = 1;
-    // Report of the index update downloads.
-    DownloadResult download_result = 2;
+    DownloadProgressStart start = 1;
+    DownloadProgressUpdate update = 2;
+    DownloadProgressEnd end = 3;
   }
 }
 
-message DownloadResult {
-  // Index URL.
+message DownloadProgressStart {
+  // URL of the download.
   string url = 1;
-  // Download result: true if successful, false if an error occurred.
-  bool successful = 2;
-  // Download error details.
-  string error = 3;
+  // The label to display on the progress bar.
+  string label = 2;
+}
+
+message DownloadProgressUpdate {
+  // Size of the downloaded portion of the file.
+  int64 downloaded = 1;
+  // Total size of the file being downloaded.
+  int64 total_size = 2;
+}
+
+message DownloadProgressEnd {
+  // True if the download is successful
+  bool success = 1;
+  // Info or error message, depending on the value of &#39;success&#39;. Some examples:
+  // &quot;File xxx already downloaded&quot; or &quot;Connection timeout&quot;
+  string message = 2;
 }
 </code></pre></div>
-<p>even if not strictly a breaking change it's worth noting that the detailed error message is now streamed in the
-response. About the go-lang API the following functions in <code>github.com/arduino/arduino-cli/commands</code>:</p>
+<p>The new message format allows a better handling of the progress update reports on downloads. Every download now will
+report a sequence of message as follows:</p>
+<div class="highlight"><pre><span></span><code>DownloadProgressStart{url=&quot;https://...&quot;, label=&quot;Downloading package index...&quot;}
+DownloadProgressUpdate{downloaded=0, total_size=103928}
+DownloadProgressUpdate{downloaded=29380, total_size=103928}
+DownloadProgressUpdate{downloaded=69540, total_size=103928}
+DownloadProgressEnd{success=true, message=&quot;&quot;}
+</code></pre></div>
+<p>or if an error occurs:</p>
+<div class="highlight"><pre><span></span><code>DownloadProgressStart{url=&quot;https://...&quot;, label=&quot;Downloading package index...&quot;}
+DownloadProgressUpdate{downloaded=0, total_size=103928}
+DownloadProgressEnd{success=false, message=&quot;Server closed connection&quot;}
+</code></pre></div>
+<p>or if the file is already cached:</p>
+<div class="highlight"><pre><span></span><code>DownloadProgressStart{url=&quot;https://...&quot;, label=&quot;Downloading package index...&quot;}
+DownloadProgressEnd{success=true, message=&quot;Index already downloaded&quot;}
+</code></pre></div>
+<p>About the go-lang API the following functions in <code>github.com/arduino/arduino-cli/commands</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">UpdateIndex</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UpdateIndexRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">downloadCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UpdateIndexResponse</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
-<span class="kd">func</span><span class="w"> </span><span class="nx">UpdateCoreLibrariesIndex</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UpdateCoreLibrariesIndexRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">downloadCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
 </code></pre></div>
 <p>have changed their signature to:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">UpdateIndex</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UpdateIndexRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">downloadCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">,</span><span class="w"> </span><span class="nx">downloadResultCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadResultCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
-<span class="kd">func</span><span class="w"> </span><span class="nx">UpdateCoreLibrariesIndex</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UpdateCoreLibrariesIndexRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">downloadCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadProgressCB</span><span class="p">,</span><span class="w"> </span><span class="nx">downloadResultCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">DownloadResultCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
 </code></pre></div>
-<p><code>UpdateIndex</code> do not return anymore the latest <code>UpdateIndexResponse</code> (it was always empty). Both <code>UpdateIndex</code> and
-<code>UpdateCoreLibrariesIndex</code> now accepts an <code>rpc.DownloadResultCB</code> to get download results, you can pass an empty callback
-if you're not interested in the error details.</p>
+<p><code>UpdateIndex</code> do not return anymore the latest <code>UpdateIndexResponse</code> (beacuse it was always empty).</p>
 <h2 id="0270">0.27.0<a class="headerlink" href="#0270" title="Permanent link">&para;</a></h2>
 <h3 id="breaking-changes-in-golang-api-githubcomarduinoarduino-cliarduinocorespackagemanagerpackagemanager">Breaking changes in golang API <code>github.com/arduino/arduino-cli/arduino/cores/packagemanager.PackageManager</code><a class="headerlink" href="#breaking-changes-in-golang-api-githubcomarduinoarduino-cliarduinocorespackagemanagerpackagemanager" title="Permanent link">&para;</a></h3>
 <p>The <code>PackageManager</code> API has been heavily refactored to correctly handle multitasking and concurrency. Many fields in
