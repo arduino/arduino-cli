@@ -447,8 +447,7 @@ def test_update_index(run_command):
     result = run_command(["lib", "update-index"])
     assert result.ok
     lines = [l.strip() for l in result.stdout.splitlines()]
-    assert "Downloading index: library_index.json.gz downloaded" in lines
-    assert "Downloading index signature: library_index.json.sig downloaded" in lines
+    assert "Downloading index: library_index.tar.bz2 downloaded" in lines
 
 
 def test_uninstall(run_command):
@@ -498,8 +497,7 @@ def test_search(run_command):
     result = run_command(["lib", "search", "--names"])
     assert result.ok
     lines = [l.strip() for l in result.stdout.strip().splitlines()]
-    assert "Downloading index: library_index.json.gz downloaded" in lines
-    assert "Downloading index signature: library_index.json.sig downloaded" in lines
+    assert "Downloading index: library_index.tar.bz2 downloaded" in lines
     libs = [l[6:].strip('"') for l in lines if "Name:" in l]
 
     expected = {"WiFi101", "WiFi101OTA", "Firebase Arduino based on WiFi101"}
