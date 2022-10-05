@@ -32,7 +32,16 @@ var tr = i18n.Tr
 
 // DownloadFile downloads a file from a URL into the specified path. An optional config and options may be passed (or nil to use the defaults).
 // A DownloadProgressCB callback function must be passed to monitor download progress.
-func DownloadFile(path *paths.Path, URL string, label string, downloadCB rpc.DownloadProgressCB, config *downloader.Config, options ...downloader.DownloadOptions) error {
+func DownloadFile(path *paths.Path, URL string, label string, downloadCB rpc.DownloadProgressCB, config *downloader.Config, options ...downloader.DownloadOptions) (returnedError error) {
+	downloadCB.Start(URL, label)
+	defer func() {
+		if returnedError == nil {
+			downloadCB.End(true, "")
+		} else {
+			downloadCB.End(false, returnedError.Error())
+		}
+	}()
+
 	if config == nil {
 		c, err := GetDownloaderConfig()
 		if err != nil {
@@ -45,15 +54,9 @@ func DownloadFile(path *paths.Path, URL string, label string, downloadCB rpc.Dow
 	if err != nil {
 		return err
 	}
-	downloadCB(&rpc.DownloadProgress{
-		File:      label,
-		Url:       d.URL,
-		TotalSize: d.Size(),
-	})
-	defer downloadCB(&rpc.DownloadProgress{Completed: true})
 
 	err = d.RunAndPoll(func(downloaded int64) {
-		downloadCB(&rpc.DownloadProgress{Downloaded: downloaded})
+		downloadCB.Update(downloaded, d.Size())
 	}, 250*time.Millisecond)
 	if err != nil {
 		return err
@@ -61,7 +64,8 @@ func DownloadFile(path *paths.Path, URL string, label string, downloadCB rpc.Dow
 
 	// The URL is not reachable for some reason
 	if d.Resp.StatusCode >= 400 && d.Resp.StatusCode <= 599 {
-		return &arduino.FailedDownloadError{Message: tr("Server responded with: %s", d.Resp.Status)}
+		msg := tr("Server responded with: %s", d.Resp.Status)
+		return &arduino.FailedDownloadError{Message: msg}
 	}
 
 	return nil

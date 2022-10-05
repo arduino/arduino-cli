@@ -67,9 +67,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if indexesNeedUpdating(indexUpdateInterval) {
-		err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{Instance: inst},
-			output.ProgressBar(),
-			output.PrintErrorFromDownloadResult(tr("Error updating index")))
+		err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{Instance: inst}, output.ProgressBar())
 		if err != nil {
 			os.Exit(errorcodes.ErrGeneric)
 		}

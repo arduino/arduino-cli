@@ -25,16 +25,33 @@ message Instance {
 }
 
 message DownloadProgress {
+  oneof message {
+    DownloadProgressStart start = 1;
+    DownloadProgressUpdate update = 2;
+    DownloadProgressEnd end = 3;
+  }
+}
+
+message DownloadProgressStart {
   // URL of the download.
   string url = 1;
-  // The file being downloaded.
-  string file = 2;
-  // Total size of the file being downloaded.
-  int64 total_size = 3;
+  // The label to display on the progress bar.
+  string label = 2;
+}
+
+message DownloadProgressUpdate {
   // Size of the downloaded portion of the file.
-  int64 downloaded = 4;
-  // Whether the download is complete.
-  bool completed = 5;
+  int64 downloaded = 1;
+  // Total size of the file being downloaded.
+  int64 total_size = 2;
+}
+
+message DownloadProgressEnd {
+  // True if the download is successful
+  bool success = 1;
+  // Info or error message, depending on the value of 'success'. Some examples:
+  // "File xxx already downloaded" or "Connection timeout"
+  string message = 2;
 }
 
 message TaskProgress {

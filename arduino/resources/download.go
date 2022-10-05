@@ -44,12 +44,8 @@ func (r *DownloadResource) Download(downloadDir *paths.Path, config *downloader.
 			}
 		} else {
 			// File is cached, nothing to do here
-
-			// This signal means that the file is already downloaded
-			downloadCB(&rpc.DownloadProgress{
-				File:      label,
-				Completed: true,
-			})
+			downloadCB.Start(r.URL, label)
+			downloadCB.End(true, tr("%s already downloaded", label))
 			return nil
 		}
 	} else {

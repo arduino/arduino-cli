@@ -157,8 +157,7 @@ func FirstUpdate(instance *rpc.Instance) error {
 				Instance:                   instance,
 				IgnoreCustomPackageIndexes: true,
 			},
-			output.ProgressBar(),
-			output.PrintErrorFromDownloadResult(tr("Error updating index")))
+			output.ProgressBar())
 		if err != nil {
 			return err
 		}

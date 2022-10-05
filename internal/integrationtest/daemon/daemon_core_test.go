@@ -41,59 +41,38 @@ func TestDaemonCoreUpdateIndex(t *testing.T) {
 			` "http://downloads.arduino.cc/package_inexistent_index.json"]`)
 	require.NoError(t, err)
 
+	analyzeUpdateIndexClient := func(cl commands.ArduinoCoreService_UpdateIndexClient) (error, map[string]*commands.DownloadProgressEnd) {
+		analyzer := NewDownloadProgressAnalyzer(t)
+		for {
+			msg, err := cl.Recv()
+			// fmt.Println("DOWNLOAD>", msg)
+			if err == io.EOF {
+				return nil, analyzer.Results
+			}
+			if err != nil {
+				return err, analyzer.Results
+			}
+			require.NoError(t, err)
+			analyzer.Process(msg.GetDownloadProgress())
+		}
+	}
+
 	{
 		cl, err := grpcInst.UpdateIndex(context.Background(), true)
 		require.NoError(t, err)
-		res, err := analyzeUpdateIndexStream(t, cl)
+		err, res := analyzeUpdateIndexClient(cl)
 		require.NoError(t, err)
 		require.Len(t, res, 1)
-		require.True(t, res["https://downloads.arduino.cc/packages/package_index.tar.bz2"].Successful)
+		require.True(t, res["https://downloads.arduino.cc/packages/package_index.tar.bz2"].Success)
 	}
 	{
 		cl, err := grpcInst.UpdateIndex(context.Background(), false)
 		require.NoError(t, err)
-		res, err := analyzeUpdateIndexStream(t, cl)
+		err, res := analyzeUpdateIndexClient(cl)
 		require.Error(t, err)
 		require.Len(t, res, 3)
-		require.True(t, res["https://downloads.arduino.cc/packages/package_index.tar.bz2"].Successful)
-		require.True(t, res["http://arduino.esp8266.com/stable/package_esp8266com_index.json"].Successful)
-		require.False(t, res["http://downloads.arduino.cc/package_inexistent_index.json"].Successful)
-	}
-}
-
-// analyzeUpdateIndexStream runs an update index checking if the sequence of DownloadProgress and
-// DownloadResult messages is correct. It returns a map reporting all the DownloadResults messages
-// received (it maps urls to DownloadResults).
-func analyzeUpdateIndexStream(t *testing.T, cl commands.ArduinoCoreService_UpdateIndexClient) (map[string]*commands.DownloadResult, error) {
-	ongoingDownload := ""
-	results := map[string]*commands.DownloadResult{}
-	for {
-		msg, err := cl.Recv()
-		if err == io.EOF {
-			return results, nil
-		}
-		if err != nil {
-			return results, err
-		}
-		require.NoError(t, err)
-		fmt.Printf("UPDATE> %+v\n", msg)
-		if progress := msg.GetDownloadProgress(); progress != nil {
-			if progress.Url != "" && progress.Url != ongoingDownload {
-				require.Empty(t, ongoingDownload, "DownloadProgress: started a download without 'completing' the previous one")
-				ongoingDownload = progress.Url
-			}
-			if progress.Completed {
-				require.NotEmpty(t, ongoingDownload, "DownloadProgress: received a 'completed' notification but never initiated a download")
-				ongoingDownload = ""
-			}
-			if progress.Downloaded > 0 {
-				require.NotEmpty(t, ongoingDownload, "DownloadProgress: received a download update but never initiated a download")
-			}
-		} else if result := msg.GetDownloadResult(); result != nil {
-			require.Empty(t, ongoingDownload, "DownloadResult: got a download result without completing the current download first")
-			results[result.Url] = result
-		} else {
-			require.FailNow(t, "DownloadProgress: received an empty message (without a Progress or a Result)")
-		}
+		require.True(t, res["https://downloads.arduino.cc/packages/package_index.tar.bz2"].Success)
+		require.True(t, res["http://arduino.esp8266.com/stable/package_esp8266com_index.json"].Success)
+		require.False(t, res["http://downloads.arduino.cc/package_inexistent_index.json"].Success)
 	}
 }
