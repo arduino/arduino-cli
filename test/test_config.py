@@ -277,6 +277,16 @@ def test_add_single_argument(run_command):
     settings_json = json.loads(result.stdout)
     assert ["https://example.com"] == settings_json["board_manager"]["additional_urls"]
 
+    # Adds the same URL (should not error)
+    url = "https://example.com"
+    assert run_command(["config", "add", "board_manager.additional_urls", url])
+
+    # Verifies a second copy has NOT been added
+    result = run_command(["config", "dump", "--format", "json"])
+    assert result.ok
+    settings_json = json.loads(result.stdout)
+    assert ["https://example.com"] == settings_json["board_manager"]["additional_urls"]
+
 
 def test_add_multiple_arguments(run_command):
     # Create a config file
@@ -302,6 +312,34 @@ def test_add_multiple_arguments(run_command):
     assert 2 == len(settings_json["board_manager"]["additional_urls"])
     assert urls[0] in settings_json["board_manager"]["additional_urls"]
     assert urls[1] in settings_json["board_manager"]["additional_urls"]
+
+    # Adds both the same URLs a second time
+    assert run_command(["config", "add", "board_manager.additional_urls"] + urls)
+
+    # Verifies no change in result array
+    result = run_command(["config", "dump", "--format", "json"])
+    assert result.ok
+    settings_json = json.loads(result.stdout)
+    assert 2 == len(settings_json["board_manager"]["additional_urls"])
+    assert urls[0] in settings_json["board_manager"]["additional_urls"]
+    assert urls[1] in settings_json["board_manager"]["additional_urls"]
+
+    # Adds multiple URLs ... the middle one is the only new URL
+    urls = [
+        "https://example.com/package_example_index.json",
+        "https://example.com/a_third_package_example_index.json",
+        "https://example.com/yet_another_package_example_index.json",
+    ]
+    assert run_command(["config", "add", "board_manager.additional_urls"] + urls)
+
+    # Verifies URL has been saved
+    result = run_command(["config", "dump", "--format", "json"])
+    assert result.ok
+    settings_json = json.loads(result.stdout)
+    assert 3 == len(settings_json["board_manager"]["additional_urls"])
+    assert urls[0] in settings_json["board_manager"]["additional_urls"]
+    assert urls[1] in settings_json["board_manager"]["additional_urls"]
+    assert urls[2] in settings_json["board_manager"]["additional_urls"]
 
 
 def test_add_on_unsupported_key(run_command):
@@ -481,6 +519,31 @@ def test_set_slice_with_multiple_arguments(run_command):
     assert 2 == len(settings_json["board_manager"]["additional_urls"])
     assert urls[0] in settings_json["board_manager"]["additional_urls"]
     assert urls[1] in settings_json["board_manager"]["additional_urls"]
+
+    # Sets a third set of 7 URLs (with only 4 unique values)
+    urls = [
+        "https://example.com/first_package_index.json",
+        "https://example.com/second_package_index.json",
+        "https://example.com/first_package_index.json",
+        "https://example.com/fifth_package_index.json",
+        "https://example.com/second_package_index.json",
+        "https://example.com/sixth_package_index.json",
+        "https://example.com/first_package_index.json",
+    ]
+    assert run_command(["config", "set", "board_manager.additional_urls"] + urls)
+
+    # Verifies all unique values exist in config
+    result = run_command(["config", "dump", "--format", "json"])
+    assert result.ok
+    settings_json = json.loads(result.stdout)
+    assert 4 == len(settings_json["board_manager"]["additional_urls"])
+    assert urls[0] in settings_json["board_manager"]["additional_urls"]
+    assert urls[1] in settings_json["board_manager"]["additional_urls"]
+    assert urls[2] in settings_json["board_manager"]["additional_urls"]
+    assert urls[3] in settings_json["board_manager"]["additional_urls"]
+    assert urls[4] in settings_json["board_manager"]["additional_urls"]
+    assert urls[5] in settings_json["board_manager"]["additional_urls"]
+    assert urls[6] in settings_json["board_manager"]["additional_urls"]
 
 
 def test_set_string_with_single_argument(run_command):
