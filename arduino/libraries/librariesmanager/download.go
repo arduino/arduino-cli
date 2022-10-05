@@ -27,3 +27,6 @@ var LibraryIndexGZURL, _ = url.Parse("https://downloads.arduino.cc/libraries/lib
 
 // LibraryIndexSignature is the URL where to get the library index signature.
 var LibraryIndexSignature, _ = url.Parse("https://downloads.arduino.cc/libraries/library_index.json.sig")
+
+// LibraryIndexWithSignatureArchiveURL is the URL where to get the library index.
+var LibraryIndexWithSignatureArchiveURL, _ = url.Parse("https://downloads.arduino.cc/libraries/library_index.tar.bz2")
