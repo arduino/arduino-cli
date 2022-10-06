@@ -479,8 +479,7 @@ func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequ
 	defer tmp.RemoveAll()
 
 	indexResource := resources.IndexResource{
-		URL:          librariesmanager.LibraryIndexGZURL,
-		SignatureURL: librariesmanager.LibraryIndexSignature,
+		URL: librariesmanager.LibraryIndexWithSignatureArchiveURL,
 	}
 	if err := indexResource.Download(lm.IndexFile.Parent(), downloadCB); err != nil {
 		return err

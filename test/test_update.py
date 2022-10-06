@@ -22,8 +22,7 @@ def test_update(run_command):
     lines = [l.strip() for l in res.stdout.splitlines()]
 
     assert "Downloading index: package_index.tar.bz2 downloaded" in lines
-    assert "Downloading index: library_index.json.gz downloaded" in lines
-    assert "Downloading index signature: library_index.json.sig downloaded" in lines
+    assert "Downloading index: library_index.tar.bz2 downloaded" in lines
 
 
 def test_update_showing_outdated(run_command):
@@ -45,8 +44,7 @@ def test_update_showing_outdated(run_command):
     lines = [l.strip() for l in result.stdout.splitlines()]
 
     assert "Downloading index: package_index.tar.bz2 downloaded" in lines
-    assert "Downloading index: library_index.json.gz downloaded" in lines
-    assert "Downloading index signature: library_index.json.sig downloaded" in lines
+    assert "Downloading index: library_index.tar.bz2 downloaded" in lines
     assert lines[-5].startswith("Arduino AVR Boards")
     assert lines[-2].startswith("USBHost")
 
