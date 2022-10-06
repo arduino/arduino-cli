@@ -223,7 +223,9 @@ jobs:
 
   create-release:
     runs-on: ubuntu-latest
-    needs: [notarize-macos, create-windows-installer]
+    needs:
+      - notarize-macos
+      - create-windows-installer
 
     steps:
       - name: Download artifact
