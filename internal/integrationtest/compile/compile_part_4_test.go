@@ -544,3 +544,89 @@ func TestCompileWithKnownPlatformNotInstalled(t *testing.T) {
 	// Verifies command to fix error is shown to user
 	require.Contains(t, string(stderr), "Try running `arduino-cli core install arduino:avr`")
 }
+
+func TestCompileWithFakeSecureBootCore(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	sketchName := "SketchSimple"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino:avr:uno"
+
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Verifies compilation works
+	_, _, err = cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+
+	// Overrides default platform adding secure_boot support using platform.local.txt
+	avrPlatformPath := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.8.3", "platform.local.txt")
+	testPlatformName := "platform_with_secure_boot"
+	err = paths.New("..", "testdata", testPlatformName, "platform.local.txt").CopyTo(avrPlatformPath)
+	require.NoError(t, err)
+
+	// Overrides default board adding secure boot support using board.local.txt
+	avrBoardPath := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.8.3", "boards.local.txt")
+	err = paths.New("..", "testdata", testPlatformName, "boards.local.txt").CopyTo(avrBoardPath)
+	require.NoError(t, err)
+
+	// Verifies compilation works with secure boot disabled
+	stdout, _, err := cli.Run("compile", "--clean", "-b", fqbn+":security=none", sketchPath.String(), "-v")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "echo exit")
+
+	// Verifies compilation works with secure boot enabled
+	stdout, _, err = cli.Run("compile", "--clean", "-b", fqbn+":security=sien", sketchPath.String(), "-v")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Default_Keys/default-signing-key.pem")
+	require.Contains(t, string(stdout), "Default_Keys/default-encrypt-key.pem")
+
+	// Verifies compilation does not work with secure boot enabled and using only one flag
+	_, stderr, err := cli.Run(
+		"compile",
+		"--clean",
+		"-b",
+		fqbn+":security=sien",
+		sketchPath.String(),
+		"--keys-keychain",
+		cli.SketchbookDir().String(),
+		"-v",
+	)
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Flag --sign-key is mandatory when used in conjunction with flag --keys-keychain")
+
+	// Verifies compilation works with secure boot enabled and when overriding the sign key and encryption key used
+	keysDir := cli.SketchbookDir().Join("keys_dir")
+	err = keysDir.Mkdir()
+	require.NoError(t, err)
+	signKeyPath := keysDir.Join("my-sign-key.pem")
+	err = signKeyPath.WriteFile([]byte{})
+	require.NoError(t, err)
+	encryptKeyPath := cli.SketchbookDir().Join("my-encrypt-key.pem")
+	err = encryptKeyPath.WriteFile([]byte{})
+	require.NoError(t, err)
+	stdout, _, err = cli.Run(
+		"compile",
+		"--clean",
+		"-b",
+		fqbn+":security=sien",
+		sketchPath.String(),
+		"--keys-keychain",
+		keysDir.String(),
+		"--sign-key",
+		"my-sign-key.pem",
+		"--encrypt-key",
+		"my-encrypt-key.pem",
+		"-v",
+	)
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "my-sign-key.pem")
+	require.Contains(t, string(stdout), "my-encrypt-key.pem")
+}
