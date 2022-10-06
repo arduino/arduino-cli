@@ -57,10 +57,7 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-require (
-	go.bug.st/testifyjson v1.1.1
-	go.bug.st/testsuite v0.1.0
-)
+require go.bug.st/testifyjson v1.1.1
 
 require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect

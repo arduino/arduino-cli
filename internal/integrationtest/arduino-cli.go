@@ -33,13 +33,8 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/fatih/color"
 	"github.com/stretchr/testify/require"
-	"go.bug.st/testsuite"
 	"google.golang.org/grpc"
 )
-
-func init() {
-	testsuite.ProjectName = "cli"
-}
 
 // FindRepositoryRootPath returns the repository root path
 func FindRepositoryRootPath(t *testing.T) *paths.Path {
@@ -54,8 +49,8 @@ func FindRepositoryRootPath(t *testing.T) *paths.Path {
 
 // CreateArduinoCLIWithEnvironment performs the minimum amount of actions
 // to build the default test environment.
-func CreateArduinoCLIWithEnvironment(t *testing.T) (*testsuite.Environment, *ArduinoCLI) {
-	env := testsuite.NewEnvironment(t)
+func CreateArduinoCLIWithEnvironment(t *testing.T) (*Environment, *ArduinoCLI) {
+	env := NewEnvironment(t)
 
 	cli := NewArduinoCliWithinEnvironment(env, &ArduinoCLIConfig{
 		ArduinoCLIPath:         FindRepositoryRootPath(t).Join("arduino-cli"),
@@ -89,7 +84,7 @@ type ArduinoCLIConfig struct {
 }
 
 // NewArduinoCliWithinEnvironment creates a new Arduino CLI client inside the given environment.
-func NewArduinoCliWithinEnvironment(env *testsuite.Environment, config *ArduinoCLIConfig) *ArduinoCLI {
+func NewArduinoCliWithinEnvironment(env *Environment, config *ArduinoCLIConfig) *ArduinoCLI {
 	color.NoColor = false
 	cli := &ArduinoCLI{
 		path:          config.ArduinoCLIPath,
