@@ -137,6 +137,11 @@ func (cli *ArduinoCLI) WorkingDir() *paths.Path {
 	return cli.workingDir
 }
 
+// DownloadDir returns the download directory
+func (cli *ArduinoCLI) DownloadDir() *paths.Path {
+	return cli.stagingDir
+}
+
 // CopySketch copies a sketch inside the testing environment and returns its path
 func (cli *ArduinoCLI) CopySketch(sketchName string) *paths.Path {
 	p, err := paths.Getwd()
