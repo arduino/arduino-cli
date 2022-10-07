@@ -28,21 +28,14 @@ var ProjectName = "cli"
 // Environment is a test environment for the test suite.
 type Environment struct {
 	rootDir      *paths.Path
-	downloadsDir *paths.Path
+	downloadsDir *SharedDir
 	t            *testing.T
 	cleanUp      func()
 }
 
-// SharedDir returns the shared downloads directory.
-func SharedDir(t *testing.T, id string) *paths.Path {
-	downloadsDir := paths.TempDir().Join(ProjectName + "-" + id)
-	require.NoError(t, downloadsDir.MkdirAll())
-	return downloadsDir
-}
-
 // NewEnvironment creates a new test environment.
 func NewEnvironment(t *testing.T) *Environment {
-	downloadsDir := SharedDir(t, "downloads")
+	downloadsDir := NewSharedDir(t, "downloads")
 	rootDir, err := paths.MkTempDir("", ProjectName)
 	require.NoError(t, err)
 	return &Environment{
@@ -75,7 +68,7 @@ func (e *Environment) RootDir() *paths.Path {
 }
 
 // SharedDownloadsDir return the shared directory for downloads
-func (e *Environment) SharedDownloadsDir() *paths.Path {
+func (e *Environment) SharedDownloadsDir() *SharedDir {
 	return e.downloadsDir
 }
 

@@ -100,7 +100,11 @@ func NewArduinoCliWithinEnvironment(env *Environment, config *ArduinoCLIConfig) 
 		workingDir:    env.RootDir(),
 	}
 	if config.UseSharedStagingFolder {
-		cli.stagingDir = env.SharedDownloadsDir()
+		sharedDir := env.SharedDownloadsDir()
+		cli.stagingDir = sharedDir.Lock()
+		env.RegisterCleanUpCallback(func() {
+			sharedDir.Unlock()
+		})
 	}
 
 	cli.cliEnvVars = map[string]string{
