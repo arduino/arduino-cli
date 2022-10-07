@@ -95,12 +95,10 @@ tasks:
       - task: go:build
     dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
-      # "-p 1" will not run test in parallel, this is required for integration tests
       - |
         go test \
           -v \
           -short \
-          -p 1 \
           -run '{{default ".*" .GO_TEST_REGEX}}' \
           {{default "-timeout 15m -coverpkg=./... -covermode=atomic" .GO_TEST_FLAGS}} \
           -coverprofile=coverage_unit.txt \
