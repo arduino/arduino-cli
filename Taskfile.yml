@@ -100,7 +100,7 @@ tasks:
           -v \
           -short \
           -run '{{default ".*" .GO_TEST_REGEX}}' \
-          {{default "-timeout 15m -coverpkg=./... -covermode=atomic" .GO_TEST_FLAGS}} \
+          {{default "-timeout 20m -coverpkg=./... -covermode=atomic" .GO_TEST_FLAGS}} \
           -coverprofile=coverage_unit.txt \
           {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}} \
           {{.TEST_LDFLAGS}}
