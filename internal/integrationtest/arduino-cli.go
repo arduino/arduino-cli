@@ -47,13 +47,18 @@ func FindRepositoryRootPath(t *testing.T) *paths.Path {
 	return repoRootPath
 }
 
+// FindArduinoCLIPath returns the path to the arduino-cli executable
+func FindArduinoCLIPath(t *testing.T) *paths.Path {
+	return FindRepositoryRootPath(t).Join("arduino-cli")
+}
+
 // CreateArduinoCLIWithEnvironment performs the minimum amount of actions
 // to build the default test environment.
 func CreateArduinoCLIWithEnvironment(t *testing.T) (*Environment, *ArduinoCLI) {
 	env := NewEnvironment(t)
 
 	cli := NewArduinoCliWithinEnvironment(env, &ArduinoCLIConfig{
-		ArduinoCLIPath:         FindRepositoryRootPath(t).Join("arduino-cli"),
+		ArduinoCLIPath:         FindArduinoCLIPath(t),
 		UseSharedStagingFolder: true,
 	})
 
