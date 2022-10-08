@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package compile_part_1_test
+package compile_test
 
 import (
 	"crypto/md5"
@@ -28,20 +28,10 @@ import (
 	"go.bug.st/testifyjson/requirejson"
 )
 
-func TestCompileWithOutputDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Init the environment explicitly
-	_, _, err := cli.Run("core", "update-index")
-	require.NoError(t, err)
-
-	// Download latest AVR
-	_, _, err = cli.Run("core", "install", "arduino:avr")
-	require.NoError(t, err)
-
+func compileWithOutputDirFlag(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	sketchName := "CompileWithOutputDir"
 	sketchPath := cli.SketchbookDir().Join(sketchName)
+	defer sketchPath.RemoveAll()
 	fqbn := "arduino:avr:uno"
 
 	// Create a test sketch
@@ -74,24 +64,14 @@ func TestCompileWithOutputDirFlag(t *testing.T) {
 	require.FileExists(t, outputDir.Join(sketchName+".ino.with_bootloader.hex").String())
 }
 
-func TestCompileWithExportBinariesFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Init the environment explicitly
-	_, _, err := cli.Run("core", "update-index")
-	require.NoError(t, err)
-
-	// Download latest AVR
-	_, _, err = cli.Run("core", "install", "arduino:avr")
-	require.NoError(t, err)
-
+func compileWithExportBinariesFlag(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	sketchName := "CompileWithExportBinariesFlag"
 	sketchPath := cli.SketchbookDir().Join(sketchName)
+	defer sketchPath.RemoveAll()
 	fqbn := "arduino:avr:uno"
 
 	// Create a test sketch
-	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
 	require.NoError(t, err)
 
 	// Test the --output-dir flag with absolute path
@@ -108,24 +88,14 @@ func TestCompileWithExportBinariesFlag(t *testing.T) {
 	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.with_bootloader.hex").String())
 }
 
-func TestCompileWithCustomBuildPath(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Init the environment explicitly
-	_, _, err := cli.Run("core", "update-index")
-	require.NoError(t, err)
-
-	// Download latest AVR
-	_, _, err = cli.Run("core", "install", "arduino:avr")
-	require.NoError(t, err)
-
+func compileWithCustomBuildPath(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	sketchName := "CompileWithBuildPath"
 	sketchPath := cli.SketchbookDir().Join(sketchName)
+	defer sketchPath.RemoveAll()
 	fqbn := "arduino:avr:uno"
 
 	// Create a test sketch
-	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
 	require.NoError(t, err)
 
 	// Test the --build-path flag with absolute path
@@ -153,24 +123,14 @@ func TestCompileWithCustomBuildPath(t *testing.T) {
 	require.NoFileExists(t, buildDir.Join(sketchName+".ino.with_bootloader.hex").String())
 }
 
-func TestCompileWithExportBinariesEnvVar(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Init the environment explicitly
-	_, _, err := cli.Run("core", "update-index")
-	require.NoError(t, err)
-
-	// Download latest AVR
-	_, _, err = cli.Run("core", "install", "arduino:avr")
-	require.NoError(t, err)
-
+func compileWithExportBinariesEnvVar(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	sketchName := "CompileWithExportBinariesEnvVar"
 	sketchPath := cli.SketchbookDir().Join(sketchName)
+	defer sketchPath.RemoveAll()
 	fqbn := "arduino:avr:uno"
 
 	// Create a test sketch
-	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
 	require.NoError(t, err)
 
 	envVar := cli.GetDefaultEnv()
@@ -190,24 +150,14 @@ func TestCompileWithExportBinariesEnvVar(t *testing.T) {
 	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.with_bootloader.hex").String())
 }
 
-func TestCompileWithExportBinariesConfig(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Init the environment explicitly
-	_, _, err := cli.Run("core", "update-index")
-	require.NoError(t, err)
-
-	// Download latest AVR
-	_, _, err = cli.Run("core", "install", "arduino:avr")
-	require.NoError(t, err)
-
+func compileWithExportBinariesConfig(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	sketchName := "CompileWithExportBinariesEnvVar"
 	sketchPath := cli.SketchbookDir().Join(sketchName)
+	defer sketchPath.RemoveAll()
 	fqbn := "arduino:avr:uno"
 
 	// Create a test sketch
-	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
 	require.NoError(t, err)
 
 	// Create settings with export binaries set to true
@@ -215,6 +165,7 @@ func TestCompileWithExportBinariesConfig(t *testing.T) {
 	envVar["ARDUINO_SKETCH_ALWAYS_EXPORT_BINARIES"] = "true"
 	_, _, err = cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
 	require.NoError(t, err)
+	defer cli.WorkingDir().Join("arduino-cli.yaml").Remove()
 
 	// Test if arduino-cli config file written in the previous run has the `always_export_binaries` flag set.
 	stdout, _, err := cli.Run("config", "dump", "--format", "json")
@@ -240,28 +191,19 @@ func TestCompileWithExportBinariesConfig(t *testing.T) {
 	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.with_bootloader.hex").String())
 }
 
-func TestCompileWithInvalidUrl(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Init the environment explicitly
-	_, _, err := cli.Run("core", "update-index")
-	require.NoError(t, err)
-
-	// Download latest AVR
-	_, _, err = cli.Run("core", "install", "arduino:avr")
-	require.NoError(t, err)
-
+func compileWithInvalidUrl(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	sketchName := "CompileWithInvalidURL"
 	sketchPath := cli.SketchbookDir().Join(sketchName)
+	defer sketchPath.RemoveAll()
 	fqbn := "arduino:avr:uno"
 
 	// Create a test sketch
-	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
 	require.NoError(t, err)
 
 	_, _, err = cli.Run("config", "init", "--dest-dir", ".", "--additional-urls", "https://example.com/package_example_index.json")
 	require.NoError(t, err)
+	defer cli.WorkingDir().Join("arduino-cli.yaml").Remove()
 
 	_, stderr, err := cli.Run("compile", "-b", fqbn, sketchPath.String())
 	require.NoError(t, err)
