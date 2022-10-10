@@ -16,6 +16,7 @@
 package sketch_test
 
 import (
+	"archive/zip"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
@@ -60,4 +61,33 @@ func TestSketchNew(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "Sketch created in: "+currentSketchPath.String())
 	require.FileExists(t, currentSketchPath.Join(sketchName).String()+".ino")
+}
+
+func verifyZipContainsSketchExcludingBuildDir(t *testing.T, files []*zip.File) {
+	require.Len(t, files, 8)
+	require.Equal(t, paths.New("sketch_simple", "doc.txt").String(), files[0].Name)
+	require.Equal(t, paths.New("sketch_simple", "header.h").String(), files[1].Name)
+	require.Equal(t, paths.New("sketch_simple", "merged_sketch.txt").String(), files[2].Name)
+	require.Equal(t, paths.New("sketch_simple", "old.pde").String(), files[3].Name)
+	require.Equal(t, paths.New("sketch_simple", "other.ino").String(), files[4].Name)
+	require.Equal(t, paths.New("sketch_simple", "s_file.S").String(), files[5].Name)
+	require.Equal(t, paths.New("sketch_simple", "sketch_simple.ino").String(), files[6].Name)
+	require.Equal(t, paths.New("sketch_simple", "src", "helper.h").String(), files[7].Name)
+}
+
+func TestSketchArchiveNoArgs(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
+
+	_, _, err := cli.Run("sketch", "archive")
+	require.NoError(t, err)
+
+	cli.SetWorkingDir(env.RootDir())
+
+	archive, err := zip.OpenReader(cli.WorkingDir().Join("sketch_simple.zip").String())
+	require.NoError(t, err)
+	defer require.NoError(t, archive.Close())
+	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
 }
