@@ -62,6 +62,8 @@ jobs:
     if: needs.run-determination.outputs.result == 'true'
 
     strategy:
+      fail-fast: false
+
       matrix:
         operating-system:
           - ubuntu-latest
