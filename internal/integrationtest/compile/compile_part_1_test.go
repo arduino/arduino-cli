@@ -40,21 +40,23 @@ func TestCompile(t *testing.T) {
 	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.5")
 	require.NoError(t, err)
 
-	t.Run("WithoutFqbn", func(t *testing.T) { compileWithoutFqbn(t, env, cli) })
-	t.Run("ErrorMessage", func(t *testing.T) { compileErrorMessage(t, env, cli) })
-	t.Run("WithSimpleSketch", func(t *testing.T) { compileWithSimpleSketch(t, env, cli) })
-	t.Run("OutputFlagDefaultPath", func(t *testing.T) { compileOutputFlagDefaultPath(t, env, cli) })
-	t.Run("WithSketchWithSymlinkSelfloop", func(t *testing.T) { compileWithSketchWithSymlinkSelfloop(t, env, cli) })
-	t.Run("BlacklistedSketchname", func(t *testing.T) { compileBlacklistedSketchname(t, env, cli) })
-	t.Run("WithBuildPropertiesFlag", func(t *testing.T) { compileWithBuildPropertiesFlag(t, env, cli) })
-	t.Run("WithBuildPropertyContainingQuotes", func(t *testing.T) { compileWithBuildPropertyContainingQuotes(t, env, cli) })
-	t.Run("WithMultipleBuildPropertyFlags", func(t *testing.T) { compileWithMultipleBuildPropertyFlags(t, env, cli) })
-	t.Run("WithOutputDirFlag", func(t *testing.T) { compileWithOutputDirFlag(t, env, cli) })
-	t.Run("WithExportBinariesFlag", func(t *testing.T) { compileWithExportBinariesFlag(t, env, cli) })
-	t.Run("WithCustomBuildPath", func(t *testing.T) { compileWithCustomBuildPath(t, env, cli) })
-	t.Run("WithExportBinariesEnvVar", func(t *testing.T) { compileWithExportBinariesEnvVar(t, env, cli) })
-	t.Run("WithExportBinariesConfig", func(t *testing.T) { compileWithExportBinariesConfig(t, env, cli) })
-	t.Run("WithInvalidUrl", func(t *testing.T) { compileWithInvalidUrl(t, env, cli) })
+	integrationtest.CLISubtests{
+		{"WithoutFqbn", compileWithoutFqbn},
+		{"ErrorMessage", compileErrorMessage},
+		{"WithSimpleSketch", compileWithSimpleSketch},
+		{"OutputFlagDefaultPath", compileOutputFlagDefaultPath},
+		{"WithSketchWithSymlinkSelfloop", compileWithSketchWithSymlinkSelfloop},
+		{"BlacklistedSketchname", compileBlacklistedSketchname},
+		{"WithBuildPropertiesFlag", compileWithBuildPropertiesFlag},
+		{"WithBuildPropertyContainingQuotes", compileWithBuildPropertyContainingQuotes},
+		{"WithMultipleBuildPropertyFlags", compileWithMultipleBuildPropertyFlags},
+		{"WithOutputDirFlag", compileWithOutputDirFlag},
+		{"WithExportBinariesFlag", compileWithExportBinariesFlag},
+		{"WithCustomBuildPath", compileWithCustomBuildPath},
+		{"WithExportBinariesEnvVar", compileWithExportBinariesEnvVar},
+		{"WithExportBinariesConfig", compileWithExportBinariesConfig},
+		{"WithInvalidUrl", compileWithInvalidUrl},
+	}.Run(t, env, cli)
 }
 
 func compileWithoutFqbn(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
