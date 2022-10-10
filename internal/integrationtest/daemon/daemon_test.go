@@ -20,14 +20,13 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/stretchr/testify/require"
-	"go.bug.st/testsuite"
 )
 
 // createEnvForDaemon performs the minimum required operations to start the arduino-cli daemon.
 // It returns a testsuite.Environment and an ArduinoCLI client to perform the integration tests.
 // The Environment must be disposed by calling the CleanUp method via defer.
-func createEnvForDaemon(t *testing.T) (*testsuite.Environment, *integrationtest.ArduinoCLI) {
-	env := testsuite.NewEnvironment(t)
+func createEnvForDaemon(t *testing.T) (*integrationtest.Environment, *integrationtest.ArduinoCLI) {
+	env := integrationtest.NewEnvironment(t)
 
 	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
 		ArduinoCLIPath:         integrationtest.FindRepositoryRootPath(t).Join("arduino-cli"),

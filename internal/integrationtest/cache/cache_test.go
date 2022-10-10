@@ -23,8 +23,11 @@ import (
 )
 
 func TestCacheClean(t *testing.T) {
-	// Clean the cache under arduino caching file directory which is "<Arduino configure file path>/staging"
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	// This test should not use shared download directory because it will be cleaned up with 'cache clean' command
+	env := integrationtest.NewEnvironment(t)
+	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
+		ArduinoCLIPath: integrationtest.FindArduinoCLIPath(t),
+	})
 	defer env.CleanUp()
 
 	_, _, err := cli.Run("cache", "clean")

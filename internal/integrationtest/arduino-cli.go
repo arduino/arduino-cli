@@ -33,13 +33,8 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/fatih/color"
 	"github.com/stretchr/testify/require"
-	"go.bug.st/testsuite"
 	"google.golang.org/grpc"
 )
-
-func init() {
-	testsuite.ProjectName = "cli"
-}
 
 // FindRepositoryRootPath returns the repository root path
 func FindRepositoryRootPath(t *testing.T) *paths.Path {
@@ -52,13 +47,18 @@ func FindRepositoryRootPath(t *testing.T) *paths.Path {
 	return repoRootPath
 }
 
+// FindArduinoCLIPath returns the path to the arduino-cli executable
+func FindArduinoCLIPath(t *testing.T) *paths.Path {
+	return FindRepositoryRootPath(t).Join("arduino-cli")
+}
+
 // CreateArduinoCLIWithEnvironment performs the minimum amount of actions
 // to build the default test environment.
-func CreateArduinoCLIWithEnvironment(t *testing.T) (*testsuite.Environment, *ArduinoCLI) {
-	env := testsuite.NewEnvironment(t)
+func CreateArduinoCLIWithEnvironment(t *testing.T) (*Environment, *ArduinoCLI) {
+	env := NewEnvironment(t)
 
 	cli := NewArduinoCliWithinEnvironment(env, &ArduinoCLIConfig{
-		ArduinoCLIPath:         FindRepositoryRootPath(t).Join("arduino-cli"),
+		ArduinoCLIPath:         FindArduinoCLIPath(t),
 		UseSharedStagingFolder: true,
 	})
 
@@ -89,7 +89,7 @@ type ArduinoCLIConfig struct {
 }
 
 // NewArduinoCliWithinEnvironment creates a new Arduino CLI client inside the given environment.
-func NewArduinoCliWithinEnvironment(env *testsuite.Environment, config *ArduinoCLIConfig) *ArduinoCLI {
+func NewArduinoCliWithinEnvironment(env *Environment, config *ArduinoCLIConfig) *ArduinoCLI {
 	color.NoColor = false
 	cli := &ArduinoCLI{
 		path:          config.ArduinoCLIPath,
@@ -100,7 +100,11 @@ func NewArduinoCliWithinEnvironment(env *testsuite.Environment, config *ArduinoC
 		workingDir:    env.RootDir(),
 	}
 	if config.UseSharedStagingFolder {
-		cli.stagingDir = env.SharedDownloadsDir()
+		sharedDir := env.SharedDownloadsDir()
+		cli.stagingDir = sharedDir.Lock()
+		env.RegisterCleanUpCallback(func() {
+			sharedDir.Unlock()
+		})
 	}
 
 	cli.cliEnvVars = map[string]string{
@@ -135,6 +139,11 @@ func (cli *ArduinoCLI) SketchbookDir() *paths.Path {
 // WorkingDir returns the working directory
 func (cli *ArduinoCLI) WorkingDir() *paths.Path {
 	return cli.workingDir
+}
+
+// DownloadDir returns the download directory
+func (cli *ArduinoCLI) DownloadDir() *paths.Path {
+	return cli.stagingDir
 }
 
 // CopySketch copies a sketch inside the testing environment and returns its path

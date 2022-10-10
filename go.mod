@@ -58,8 +58,8 @@ require (
 )
 
 require (
+	github.com/rogpeppe/go-internal v1.3.0
 	go.bug.st/testifyjson v1.1.1
-	go.bug.st/testsuite v0.1.0
 )
 
 require (
