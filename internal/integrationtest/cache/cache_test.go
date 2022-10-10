@@ -23,7 +23,7 @@ import (
 )
 
 func TestCacheClean(t *testing.T) {
-	// This test do not use shared download directory becuase it will be cleaned up with 'cache clean' command
+	// This test should not use shared download directory because it will be cleaned up with 'cache clean' command
 	env := integrationtest.NewEnvironment(t)
 	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
 		ArduinoCLIPath: integrationtest.FindArduinoCLIPath(t),
