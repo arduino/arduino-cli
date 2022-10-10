@@ -22,7 +22,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDebuggerStarts(t *testing.T) {
+func TestDebug(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
 
@@ -34,12 +34,20 @@ func TestDebuggerStarts(t *testing.T) {
 	_, _, err = cli.Run("core", "install", "arduino:samd")
 	require.NoError(t, err)
 
+	integrationtest.CLISubtests{
+		{"Start", testDebuggerStarts},
+		{"WithPdeSketchStarts", testDebuggerWithPdeSketchStarts},
+	}.Run(t, env, cli)
+}
+
+func testDebuggerStarts(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	// Create sketch for testing
 	sketchName := "DebuggerStartTest"
 	sketchPath := cli.DataDir().Join(sketchName)
+	defer sketchPath.RemoveAll()
 	fqbn := "arduino:samd:mkr1000"
 
-	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
 	require.NoError(t, err)
 
 	// Build sketch
@@ -52,22 +60,13 @@ func TestDebuggerStarts(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestDebuggerWithPdeSketchStarts(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_, _, err := cli.Run("update")
-	require.NoError(t, err)
-
-	// Install core
-	_, _, err = cli.Run("core", "install", "arduino:samd")
-	require.NoError(t, err)
-
+func testDebuggerWithPdeSketchStarts(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	sketchName := "DebuggerPdeSketchStartTest"
 	sketchPath := cli.DataDir().Join(sketchName)
+	defer sketchPath.RemoveAll()
 	fqbn := "arduino:samd:mkr1000"
 
-	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
 	require.NoError(t, err)
 
 	// Looks for sketch file .ino
