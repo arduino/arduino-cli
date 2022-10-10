@@ -122,14 +122,8 @@ jobs:
       - name: Send unit tests coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          file: ./coverage_unit.txt
-          flags: unit
-          fail_ci_if_error: ${{ github.repository == 'arduino/arduino-cli' }}
-
-      - name: Send legacy tests coverage to Codecov
-        if: runner.os == 'Linux'
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage_legacy.txt
+          files: >
+            ./coverage_unit.txt,
+            ./coverage_legacy.txt
           flags: unit
           fail_ci_if_error: ${{ github.repository == 'arduino/arduino-cli' }}
