@@ -16,42 +16,6 @@ import zipfile
 from pathlib import Path
 
 
-def test_sketch_new(run_command, working_dir):
-    # Create a test sketch in current directory
-    current_path = working_dir
-    sketch_name = "SketchNewIntegrationTest"
-    current_sketch_path = Path(current_path, sketch_name)
-    result = run_command(["sketch", "new", sketch_name])
-    assert result.ok
-    assert f"Sketch created in: {current_sketch_path}" in result.stdout
-    assert Path(current_sketch_path, f"{sketch_name}.ino").is_file()
-
-    # Create a test sketch in current directory but using an absolute path
-    sketch_name = "SketchNewIntegrationTestAbsolute"
-    current_sketch_path = Path(current_path, sketch_name)
-    result = run_command(["sketch", "new", current_sketch_path])
-    assert result.ok
-    assert f"Sketch created in: {current_sketch_path}" in result.stdout
-    assert Path(current_sketch_path, f"{sketch_name}.ino").is_file()
-
-    # Create a test sketch in current directory subpath but using an absolute path
-    sketch_name = "SketchNewIntegrationTestSubpath"
-    sketch_subpath = Path("subpath", sketch_name)
-    current_sketch_path = Path(current_path, sketch_subpath)
-    result = run_command(["sketch", "new", sketch_subpath])
-    assert result.ok
-    assert f"Sketch created in: {current_sketch_path}" in result.stdout
-    assert Path(current_sketch_path, f"{sketch_name}.ino").is_file()
-
-    # Create a test sketch in current directory using .ino extension
-    sketch_name = "SketchNewIntegrationTestDotIno"
-    current_sketch_path = Path(current_path, sketch_name)
-    result = run_command(["sketch", "new", f"{sketch_name}.ino"])
-    assert result.ok
-    assert f"Sketch created in: {current_sketch_path}" in result.stdout
-    assert Path(current_sketch_path, f"{sketch_name}.ino").is_file()
-
-
 def verify_zip_contains_sketch_excluding_build_dir(files):
     assert "sketch_simple/doc.txt" in files
     assert "sketch_simple/header.h" in files
