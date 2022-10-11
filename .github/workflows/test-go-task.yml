@@ -4,6 +4,7 @@ name: Test Go
 env:
   # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
   GO_VERSION: "1.17"
+  COVERAGE_ARTIFACT: coverage-data
 
 # See: https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows
 on:
@@ -99,18 +100,30 @@ jobs:
         if: runner.os == 'Linux'
         run: task test-legacy
 
-      - name: Send unit tests coverage to Codecov
+      - name: Upload coverage data to workflow artifact
         if: runner.os == 'Linux'
-        uses: codecov/codecov-action@v3
+        uses: actions/upload-artifact@v3
         with:
-          file: ./coverage_unit.txt
-          flags: unit
-          fail_ci_if_error: ${{ github.repository == 'arduino/arduino-cli' }}
+          if-no-files-found: error
+          name: ${{ env.COVERAGE_ARTIFACT }}
+          path: |
+            ./coverage_unit.txt
+            ./coverage_legacy.txt
 
-      - name: Send legacy tests coverage to Codecov
-        if: runner.os == 'Linux'
+  coverage-upload:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Download coverage data artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.COVERAGE_ARTIFACT }}
+
+      - name: Send unit tests coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          file: ./coverage_legacy.txt
+          files: >
+            ./coverage_unit.txt,
+            ./coverage_legacy.txt
           flags: unit
           fail_ci_if_error: ${{ github.repository == 'arduino/arduino-cli' }}
