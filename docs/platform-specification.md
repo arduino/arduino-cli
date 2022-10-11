@@ -437,6 +437,7 @@ no longer used.
 You can specify pre and post actions around each recipe. These are called "hooks". Here is the complete list of
 available hooks:
 
+- `recipe.hooks.prebuild.NUMBER.pattern` (called before sketch preprocessing and libraries discovery)
 - `recipe.hooks.sketch.prebuild.NUMBER.pattern` (called before sketch compilation)
 - `recipe.hooks.sketch.postbuild.NUMBER.pattern` (called after sketch compilation)
 - `recipe.hooks.libraries.prebuild.NUMBER.pattern` (called before libraries compilation)
