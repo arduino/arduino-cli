@@ -57,6 +57,12 @@ func TestCompile(t *testing.T) {
 		{"WithExportBinariesEnvVar", compileWithExportBinariesEnvVar},
 		{"WithExportBinariesConfig", compileWithExportBinariesConfig},
 		{"WithInvalidUrl", compileWithInvalidUrl},
+		{"WithPdeExtension", compileWithPdeExtension},
+		{"WithMultipleMainFiles", compileWithMultipleMainFiles},
+		{"CaseMismatchFails", compileCaseMismatchFails},
+		{"OnlyCompilationDatabaseFlag", compileOnlyCompilationDatabaseFlag},
+		{"UsingPlatformLocalTxt", compileUsingPlatformLocalTxt},
+		{"UsingBoardsLocalTxt", compileUsingBoardsLocalTxt},
 	}.Run(t, env, cli)
 }
 
@@ -525,4 +531,183 @@ func compileWithInvalidUrl(t *testing.T, env *integrationtest.Environment, cli *
 	require.Contains(t, string(stderr), "Error initializing instance: Loading index file: loading json index file")
 	expectedIndexfile := cli.DataDir().Join("package_example_index.json")
 	require.Contains(t, string(stderr), "loading json index file "+expectedIndexfile.String()+": open "+expectedIndexfile.String()+":")
+}
+
+func compileWithPdeExtension(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	sketchName := "CompilePdeSketch"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	defer sketchPath.RemoveAll()
+	fqbn := "arduino:avr:uno"
+
+	// Create a test sketch
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Renames sketch file to pde
+	sketchFileIno := sketchPath.Join(sketchName + ".ino")
+	sketchFilePde := sketchPath.Join(sketchName + ".pde")
+	err = sketchFileIno.Rename(sketchFilePde)
+	require.NoError(t, err)
+
+	// Build sketch from folder
+	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stderr), "Sketches with .pde extension are deprecated, please rename the following files to .ino:")
+	require.Contains(t, string(stderr), sketchFilePde.String())
+
+	// Build sketch from file
+	_, stderr, err = cli.Run("compile", "--clean", "-b", fqbn, sketchFilePde.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stderr), "Sketches with .pde extension are deprecated, please rename the following files to .ino:")
+	require.Contains(t, string(stderr), sketchFilePde.String())
+}
+
+func compileWithMultipleMainFiles(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	sketchName := "CompileSketchMultipleMainFiles"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	defer sketchPath.RemoveAll()
+	fqbn := "arduino:avr:uno"
+
+	// Create a test sketch
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Copy .ino sketch file to .pde
+	sketchFileIno := sketchPath.Join(sketchName + ".ino")
+	sketchFilePde := sketchPath.Join(sketchName + ".pde")
+	err = sketchFileIno.CopyTo(sketchFilePde)
+	require.NoError(t, err)
+
+	// Build sketch from folder
+	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error opening sketch: multiple main sketch files found")
+
+	// Build sketch from .ino file
+	_, stderr, err = cli.Run("compile", "--clean", "-b", fqbn, sketchFileIno.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error opening sketch: multiple main sketch files found")
+
+	// Build sketch from .pde file
+	_, stderr, err = cli.Run("compile", "--clean", "-b", fqbn, sketchFilePde.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error opening sketch: multiple main sketch files found")
+}
+
+func compileCaseMismatchFails(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	sketchName := "CompileSketchCaseMismatch"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	defer sketchPath.RemoveAll()
+	fqbn := "arduino:avr:uno"
+
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Rename main .ino file so casing is different from sketch name
+	sketchFile := sketchPath.Join(sketchName + ".ino")
+	sketchMainFile := sketchPath.Join(strings.ToLower(sketchName) + ".ino")
+	err = sketchFile.Rename(sketchMainFile)
+	require.NoError(t, err)
+
+	// Verifies compilation fails when:
+	// * Compiling with sketch path
+	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error opening sketch:")
+	// * Compiling with sketch main file
+	_, stderr, err = cli.Run("compile", "--clean", "-b", fqbn, sketchMainFile.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error opening sketch:")
+	// * Compiling in sketch path
+	cli.SetWorkingDir(sketchPath)
+	defer cli.SetWorkingDir(env.RootDir())
+	_, stderr, err = cli.Run("compile", "--clean", "-b", fqbn)
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error opening sketch:")
+}
+
+func compileOnlyCompilationDatabaseFlag(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	sketchName := "CompileSketchOnlyCompilationDatabaseFlag"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	defer sketchPath.RemoveAll()
+	fqbn := "arduino:avr:uno"
+
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Verifies no binaries exist
+	buildPath := sketchPath.Join("build")
+	require.NoDirExists(t, buildPath.String())
+
+	// Compile with both --export-binaries and --only-compilation-database flags
+	_, _, err = cli.Run("compile", "--export-binaries", "--only-compilation-database", "--clean", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+
+	// Verifies no binaries are exported
+	require.NoDirExists(t, buildPath.String())
+
+	// Verifies no binaries exist
+	buildPath = cli.SketchbookDir().Join("export-dir")
+	require.NoDirExists(t, buildPath.String())
+
+	// Compile by setting the --output-dir flag and --only-compilation-database flags
+	_, _, err = cli.Run("compile", "--output-dir", buildPath.String(), "--only-compilation-database", "--clean", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+
+	// Verifies no binaries are exported
+	require.NoDirExists(t, buildPath.String())
+}
+
+func compileUsingPlatformLocalTxt(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	sketchName := "CompileSketchUsingPlatformLocalTxt"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	defer sketchPath.RemoveAll()
+	fqbn := "arduino:avr:uno"
+
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Verifies compilation works without issues
+	_, _, err = cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+
+	// Overrides default platform compiler with an unexisting one
+	platformLocalTxt := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.8.5", "platform.local.txt")
+	err = platformLocalTxt.WriteFile([]byte("compiler.c.cmd=my-compiler-that-does-not-exist"))
+	require.NoError(t, err)
+	// Remove the file at the end of the test to avoid disrupting following tests
+	defer platformLocalTxt.Remove()
+
+	// Verifies compilation now fails because compiler is not found
+	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "my-compiler-that-does-not-exist")
+}
+
+func compileUsingBoardsLocalTxt(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	sketchName := "CompileSketchUsingBoardsLocalTxt"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	defer sketchPath.RemoveAll()
+	// Usa a made up board
+	fqbn := "arduino:avr:nessuno"
+
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Verifies compilation fails because board doesn't exist
+	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error during build: Error resolving FQBN: board arduino:avr:nessuno not found")
+
+	// Use custom boards.local.txt with made arduino:avr:nessuno board
+	boardsLocalTxt := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.8.5", "boards.local.txt")
+	wd, err := paths.Getwd()
+	require.NoError(t, err)
+	err = wd.Parent().Join("testdata", "boards.local.txt").CopyTo(boardsLocalTxt)
+	require.NoError(t, err)
+	// Remove the file at the end of the test to avoid disrupting following tests
+	defer boardsLocalTxt.Remove()
+
+	_, _, err = cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
 }
