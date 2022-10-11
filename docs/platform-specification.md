@@ -766,13 +766,17 @@ tools.avrdude.config.path={path}/etc/avrdude.conf
 tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" -p{build.mcu} -c{upload.port.protocol} -P{upload.port.address} -b{upload.speed} -D "-Uflash:w:{build.path}/{build.project_name}.hex:i"
 ```
 
-A **{runtime.tools.TOOL_NAME.path}** and **{runtime.tools.TOOL_NAME-TOOL_VERSION.path}** property is generated for the
-tools of Arduino AVR Boards and any other platform installed via Boards Manager. **{runtime.tools.TOOL_NAME.path}**
-points to the latest version of the tool available.
-
 The tool configuration properties are available globally without the prefix. For example, the **tools.avrdude.cmd.path**
 property can be used as **{cmd.path}** inside the recipe, and the same happens for all the other avrdude configuration
 variables.
+
+### How to retrieve tools path via `{runtime.tools.*}` properties
+
+A **{runtime.tools.TOOLNAME.path}** and **{runtime.tools.TOOLNAME-TOOLVERSION.path}** property is generated for the
+tools provided by the current platform and for any other platform installed via Boards Manager.
+
+See [`{runtime.tools.*.path}` rules](package_index_json-specification.md#how-a-tools-path-is-determined-in-platformtxt)
+for details on how the runtime properties are determined.
 
 ### Environment variables
 
