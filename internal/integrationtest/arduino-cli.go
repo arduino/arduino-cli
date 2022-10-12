@@ -152,7 +152,7 @@ func (cli *ArduinoCLI) CopySketch(sketchName string) *paths.Path {
 	cli.t.NoError(err)
 	cli.t.NotNil(p)
 	testSketch := p.Parent().Join("testdata", sketchName)
-	sketchPath := cli.SketchbookDir().Join(sketchName)
+	sketchPath := cli.WorkingDir().Join(sketchName)
 	err = testSketch.CopyDirTo(sketchPath)
 	cli.t.NoError(err)
 	return sketchPath
