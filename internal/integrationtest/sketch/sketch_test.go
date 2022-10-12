@@ -91,3 +91,20 @@ func TestSketchArchiveNoArgs(t *testing.T) {
 	defer require.NoError(t, archive.Close())
 	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
 }
+
+func TestSketchArchiveDotArg(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
+
+	_, _, err := cli.Run("sketch", "archive", ".")
+	require.NoError(t, err)
+
+	cli.SetWorkingDir(env.RootDir())
+
+	archive, err := zip.OpenReader(cli.WorkingDir().Join("sketch_simple.zip").String())
+	require.NoError(t, err)
+	defer require.NoError(t, archive.Close())
+	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
+}
