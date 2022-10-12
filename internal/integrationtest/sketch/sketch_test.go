@@ -197,3 +197,17 @@ func TestSketchArchiveDotArgCustomZipPathAndNameWithExtension(t *testing.T) {
 	defer require.NoError(t, archive.Close())
 	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
 }
+
+func TestSketchArchiveRelativeSketchPath(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_ = cli.CopySketch("sketch_simple")
+	_, _, err := cli.Run("sketch", "archive", "./sketch_simple")
+	require.NoError(t, err)
+
+	archive, err := zip.OpenReader(cli.WorkingDir().Join("sketch_simple.zip").String())
+	require.NoError(t, err)
+	defer require.NoError(t, archive.Close())
+	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
+}
