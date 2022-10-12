@@ -827,3 +827,25 @@ func TestSketchArchiveAbsoluteSketchPathWithAbsoluteZipPathAndNameWithExtensionW
 	defer require.NoError(t, archive.Close())
 	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
 }
+
+func TestSketchArchiveWithPdeMainFile(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	sketchName := "sketch_pde_main_file"
+	sketchDir := cli.CopySketch(sketchName)
+	sketchFile := sketchDir.Join(sketchName + ".pde")
+	relPath, err := sketchFile.RelFrom(sketchDir)
+	require.NoError(t, err)
+	cli.SetWorkingDir(sketchDir)
+	_, stderr, err := cli.Run("sketch", "archive")
+	require.NoError(t, err)
+	require.Contains(t, string(stderr), "Sketches with .pde extension are deprecated, please rename the following files to .ino")
+	require.Contains(t, string(stderr), relPath.String())
+	cli.SetWorkingDir(env.RootDir())
+
+	archive, err := zip.OpenReader(cli.WorkingDir().Join(sketchName + ".zip").String())
+	require.NoError(t, err)
+	defer require.NoError(t, archive.Close())
+	require.Contains(t, archive.File[0].Name, paths.New(sketchName, sketchName+".pde").String())
+}
