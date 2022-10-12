@@ -126,3 +126,20 @@ func TestSketchDotArgRelativeZipPath(t *testing.T) {
 	defer require.NoError(t, archive.Close())
 	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
 }
+
+func TestSketchDotArgAbsoluteZipPath(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Creates a folder where to save the zip
+	archivesFolder := cli.WorkingDir().Join("my_archives")
+	require.NoError(t, archivesFolder.Mkdir())
+
+	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
+	_, _, err := cli.Run("sketch", "archive", ".", archivesFolder.String())
+	require.NoError(t, err)
+	archive, err := zip.OpenReader(archivesFolder.Join("sketch_simple.zip").String())
+	require.NoError(t, err)
+	defer require.NoError(t, archive.Close())
+	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
+}
