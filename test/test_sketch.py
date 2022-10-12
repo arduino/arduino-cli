@@ -48,25 +48,6 @@ def verify_zip_contains_sketch_including_build_dir(files):
     assert "sketch_simple/build/arduino.avr.uno/sketch_simple.ino.with_bootloader.hex" in files
 
 
-def test_sketch_archive_absolute_sketch_path_with_relative_zip_path_and_name_without_extension(
-    run_command, copy_sketch, working_dir
-):
-    copy_sketch("sketch_simple")
-    # Creates a folder where to save the zip
-    archives_folder = f"{working_dir}/my_archives/"
-    Path(archives_folder).mkdir()
-
-    result = run_command(["sketch", "archive", f"{working_dir}/sketch_simple", "./my_archives/my_custom_sketch"])
-    assert result.ok
-
-    archive = zipfile.ZipFile(f"{working_dir}/my_archives/my_custom_sketch.zip")
-    archive_files = archive.namelist()
-
-    verify_zip_contains_sketch_excluding_build_dir(archive_files)
-
-    archive.close()
-
-
 def test_sketch_archive_absolute_sketch_path_with_relative_zip_path_and_name_with_extension(
     run_command, copy_sketch, working_dir
 ):

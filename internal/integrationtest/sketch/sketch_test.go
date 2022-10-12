@@ -369,3 +369,21 @@ func TestSketchArchiveAbsoluteSketchPathWithAbsoluteZipPath(t *testing.T) {
 	defer require.NoError(t, archive.Close())
 	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
 }
+
+func TestSketchArchiveAbsoluteSketchPathWithRelativeZipPathAndNameWithoutExtension(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_ = cli.CopySketch("sketch_simple")
+	// Creates a folder where to save the zip
+	archivesFolder := cli.WorkingDir().Join("my_archives")
+	require.NoError(t, archivesFolder.Mkdir())
+
+	_, _, err := cli.Run("sketch", "archive", cli.WorkingDir().Join("sketch_simple").String(), "./my_archives/my_custom_sketch")
+	require.NoError(t, err)
+
+	archive, err := zip.OpenReader(cli.WorkingDir().Join("my_archives", "my_custom_sketch.zip").String())
+	require.NoError(t, err)
+	defer require.NoError(t, archive.Close())
+	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
+}
