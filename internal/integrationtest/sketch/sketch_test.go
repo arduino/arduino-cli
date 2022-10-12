@@ -75,6 +75,23 @@ func verifyZipContainsSketchExcludingBuildDir(t *testing.T, files []*zip.File) {
 	require.Equal(t, paths.New("sketch_simple", "src", "helper.h").String(), files[7].Name)
 }
 
+func verifyZipContainsSketchIncludingBuildDir(t *testing.T, files []*zip.File) {
+	require.Len(t, files, 13)
+	require.Equal(t, paths.New("sketch_simple", "doc.txt").String(), files[5].Name)
+	require.Equal(t, paths.New("sketch_simple", "header.h").String(), files[6].Name)
+	require.Equal(t, paths.New("sketch_simple", "merged_sketch.txt").String(), files[7].Name)
+	require.Equal(t, paths.New("sketch_simple", "old.pde").String(), files[8].Name)
+	require.Equal(t, paths.New("sketch_simple", "other.ino").String(), files[9].Name)
+	require.Equal(t, paths.New("sketch_simple", "s_file.S").String(), files[10].Name)
+	require.Equal(t, paths.New("sketch_simple", "sketch_simple.ino").String(), files[11].Name)
+	require.Equal(t, paths.New("sketch_simple", "src", "helper.h").String(), files[12].Name)
+	require.Equal(t, paths.New("sketch_simple", "build", "adafruit.samd.adafruit_feather_m0", "sketch_simple.ino.hex").String(), files[0].Name)
+	require.Equal(t, paths.New("sketch_simple", "build", "adafruit.samd.adafruit_feather_m0", "sketch_simple.ino.map").String(), files[1].Name)
+	require.Equal(t, paths.New("sketch_simple", "build", "arduino.avr.uno", "sketch_simple.ino.eep").String(), files[2].Name)
+	require.Equal(t, paths.New("sketch_simple", "build", "arduino.avr.uno", "sketch_simple.ino.hex").String(), files[3].Name)
+	require.Equal(t, paths.New("sketch_simple", "build", "arduino.avr.uno", "sketch_simple.ino.with_bootloader.hex").String(), files[4].Name)
+}
+
 func TestSketchArchiveNoArgs(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
@@ -440,4 +457,19 @@ func TestSketchArchiveAbsoluteSketchPathWithAbsoluteZipPathAndNameWithExtension(
 	require.NoError(t, err)
 	defer require.NoError(t, archive.Close())
 	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
+}
+
+func TestSketchArchiveNoArgsWithIncludeBuildDirFlag(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
+	_, _, err := cli.Run("sketch", "archive", "--include-build-dir")
+	require.NoError(t, err)
+	cli.SetWorkingDir(env.RootDir())
+
+	archive, err := zip.OpenReader(cli.WorkingDir().Join("sketch_simple.zip").String())
+	require.NoError(t, err)
+	defer require.NoError(t, archive.Close())
+	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
 }
