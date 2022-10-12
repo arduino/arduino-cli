@@ -507,3 +507,22 @@ func TestSketchArchiveDotArgRelativeZipPathWithIncludeBuildDirFlag(t *testing.T)
 	defer require.NoError(t, archive.Close())
 	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
 }
+
+func TestSketchArchiveDotArgAbsoluteZipPathWithIncludeBuildDirFlag(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Creates a folder where to save the zip
+	archivesFolder := cli.WorkingDir().Join("my_archives")
+	require.NoError(t, archivesFolder.Mkdir())
+
+	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
+	_, _, err := cli.Run("sketch", "archive", ".", archivesFolder.String(), "--include-build-dir")
+	require.NoError(t, err)
+	cli.SetWorkingDir(env.RootDir())
+
+	archive, err := zip.OpenReader(archivesFolder.Join("sketch_simple.zip").String())
+	require.NoError(t, err)
+	defer require.NoError(t, archive.Close())
+	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
+}
