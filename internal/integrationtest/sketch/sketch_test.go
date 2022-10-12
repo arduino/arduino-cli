@@ -849,3 +849,20 @@ func TestSketchArchiveWithPdeMainFile(t *testing.T) {
 	defer require.NoError(t, archive.Close())
 	require.Contains(t, archive.File[0].Name, paths.New(sketchName, sketchName+".pde").String())
 }
+
+func TestSketchArchiveWithMultipleMainFiles(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	sketchName := "sketch_multiple_main_files"
+	sketchDir := cli.CopySketch(sketchName)
+	sketchFile := sketchDir.Join(sketchName + ".pde")
+	relPath, err := sketchFile.RelFrom(sketchDir)
+	require.NoError(t, err)
+	cli.SetWorkingDir(sketchDir)
+	_, stderr, err := cli.Run("sketch", "archive")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Sketches with .pde extension are deprecated, please rename the following files to .ino")
+	require.Contains(t, string(stderr), relPath.String())
+	require.Contains(t, string(stderr), "Error archiving: Can't open sketch: multiple main sketch files found")
+}

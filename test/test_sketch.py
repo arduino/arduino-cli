@@ -48,17 +48,6 @@ def verify_zip_contains_sketch_including_build_dir(files):
     assert "sketch_simple/build/arduino.avr.uno/sketch_simple.ino.with_bootloader.hex" in files
 
 
-def test_sketch_archive_with_multiple_main_files(run_command, copy_sketch, working_dir):
-    sketch_name = "sketch_multiple_main_files"
-    sketch_dir = copy_sketch(sketch_name)
-    sketch_file = Path(sketch_dir, f"{sketch_name}.pde")
-    res = run_command(["sketch", "archive"], sketch_dir)
-    assert res.failed
-    assert "Sketches with .pde extension are deprecated, please rename the following files to .ino" in res.stderr
-    assert str(sketch_file.relative_to(sketch_dir)) in res.stderr
-    assert "Error archiving: Can't open sketch: multiple main sketch files found" in res.stderr
-
-
 def test_sketch_archive_case_mismatch_fails(run_command, data_dir):
     sketch_name = "ArchiveSketchCaseMismatch"
     sketch_path = Path(data_dir, sketch_name)
