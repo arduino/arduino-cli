@@ -17,6 +17,7 @@ package sketch_test
 
 import (
 	"archive/zip"
+	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
@@ -865,4 +866,22 @@ func TestSketchArchiveWithMultipleMainFiles(t *testing.T) {
 	require.Contains(t, string(stderr), "Sketches with .pde extension are deprecated, please rename the following files to .ino")
 	require.Contains(t, string(stderr), relPath.String())
 	require.Contains(t, string(stderr), "Error archiving: Can't open sketch: multiple main sketch files found")
+}
+
+func TestSketchArchiveCaseMismatchFails(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	sketchName := "ArchiveSketchCaseMismatch"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Rename main .ino file so casing is different from sketch name
+	require.NoError(t, sketchPath.Join(sketchName+".ino").Rename(sketchPath.Join(strings.ToLower(sketchName)+".ino")))
+
+	_, stderr, err := cli.Run("sketch", "archive", sketchPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error archiving: Can't open sketch:")
 }
