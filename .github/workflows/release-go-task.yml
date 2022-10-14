@@ -180,11 +180,11 @@ jobs:
           name: ${{ env.ARTIFACT_NAME }}
           path: ${{ env.DIST_DIR }}
 
-      - name: Output checksum
+      - name: Create checksum file
         working-directory: ${{ env.DIST_DIR}}
         run: |
           TAG="${GITHUB_REF/refs\/tags\//}"
-          sha256sum ${{ env.PROJECT_NAME }}_${TAG}* >> ${TAG}-checksums.txt
+          sha256sum ${{ env.PROJECT_NAME }}_${TAG}* > ${TAG}-checksums.txt
 
       - name: Identify Prerelease
         # This is a workaround while waiting for create-release action

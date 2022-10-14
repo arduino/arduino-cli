@@ -28,7 +28,6 @@ env:
   PROJECT_NAME: arduino-cli
   # As defined by the Taskfile's DIST_DIR variable
   DIST_DIR: dist
-  BUILDS_ARTIFACT: build-artifacts
 
 jobs:
   run-determination:
@@ -54,40 +53,57 @@ jobs:
 
           echo "::set-output name=result::$RESULT"
 
-  build:
-    name: Build ${{ matrix.os.name }}
+  package-name-prefix:
     needs: run-determination
     if: needs.run-determination.outputs.result == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      prefix: ${{ steps.calculation.outputs.prefix }}
+    steps:
+      - name: package name prefix calculation
+        id: calculation
+        run: |
+          PACKAGE_NAME_PREFIX="test"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.event.number }}"
+          fi
+          PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.sha }}-"
+
+          echo "::set-output name=prefix::$PACKAGE_NAME_PREFIX"
+
+  build:
+    needs: package-name-prefix
+    name: Build ${{ matrix.os.name }}
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         os:
-          - dist: Windows_32bit
+          - task: Windows_32bit
             path: "*Windows_32bit.zip"
             name: Windows_X86-32
-          - dist: Windows_64bit
+          - task: Windows_64bit
             path: "*Windows_64bit.zip"
             name: Windows_X86-64
-          - dist: Linux_32bit
+          - task: Linux_32bit
             path: "*Linux_32bit.tar.gz"
             name: Linux_X86-32
-          - dist: Linux_64bit
+          - task: Linux_64bit
             path: "*Linux_64bit.tar.gz"
             name: Linux_X86-64
-          - dist: Linux_ARMv6
+          - task: Linux_ARMv6
             path: "*Linux_ARMv6.tar.gz"
             name: Linux_ARMv6
-          - dist: Linux_ARMv7
+          - task: Linux_ARMv7
             path: "*Linux_ARMv7.tar.gz"
             name: Linux_ARMv7
-          - dist: Linux_ARM64
+          - task: Linux_ARM64
             path: "*Linux_ARM64.tar.gz"
             name: Linux_ARM64
-          - dist: macOS_64bit
+          - task: macOS_64bit
             path: "*macOS_64bit.tar.gz"
             name: macOS_64
-          - dist: macOS_ARM64
+          - task: macOS_ARM64
             path: "*macOS_ARM64.tar.gz"
             name: macOS_ARM64
 
@@ -105,14 +121,11 @@ jobs:
 
       - name: Build
         run: |
-          PACKAGE_NAME_PREFIX="test"
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.event.number }}"
-          fi
-          PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.sha }}-"
+          PACKAGE_NAME_PREFIX=${{ needs.package-name-prefix.outputs.prefix }}
           export PACKAGE_NAME_PREFIX
-          task dist:${{ matrix.os.dist }}
+          task dist:${{ matrix.os.task }}
 
+      # Transfer builds to artifacts job
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
@@ -120,24 +133,18 @@ jobs:
           name: ${{ matrix.os.name }}
 
   checksums:
-    needs: build
+    needs:
+      - build
+      - package-name-prefix
     runs-on: ubuntu-latest
 
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v3
-        with:
-          path: ${{ env.BUILDS_ARTIFACT }}
 
       - name: Output checksum
-        working-directory: ${{ env.BUILDS_ARTIFACT}}
         run: |
-          PACKAGE_NAME_PREFIX="test"
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.event.number }}"
-          fi
-          PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.sha }}-"
-          TAG="${PACKAGE_NAME_PREFIX}git-snapshot"
+          TAG="${{ needs.package-name-prefix.outputs.prefix }}git-snapshot"
           declare -a artifacts=($(ls -d */))
           for artifact in ${artifacts[@]}
           do
@@ -150,5 +157,5 @@ jobs:
       - name: Upload checksum artifact
         uses: actions/upload-artifact@v3
         with:
-          path: ${{ env.BUILDS_ARTIFACT }}/*checksums.txt
+          path: ./*checksums.txt
           name: checksums
