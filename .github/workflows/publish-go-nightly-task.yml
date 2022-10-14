@@ -173,11 +173,11 @@ jobs:
           name: ${{ env.ARTIFACT_NAME }}
           path: ${{ env.DIST_DIR }}
 
-      - name: Output checksum
+      - name: Create checksum file
         working-directory: ${{ env.DIST_DIR}}
         run: |
           TAG="nightly-$(date -u +"%Y%m%d")"
-          sha256sum ${{ env.PROJECT_NAME }}_${TAG}* >> ${TAG}-checksums.txt
+          sha256sum ${{ env.PROJECT_NAME }}_${TAG}* > ${TAG}-checksums.txt
 
       - name: Upload release files on Arduino downloads servers
         uses: docker://plugins/s3
