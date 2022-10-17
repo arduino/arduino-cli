@@ -61,7 +61,7 @@ jobs:
 
       - name: Output Version
         id: get-version
-        run: echo "::set-output name=version::$(task get-version)"
+        run: echo "::set-output name=version::$(task general:get-version)"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
