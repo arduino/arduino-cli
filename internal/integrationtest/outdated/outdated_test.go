@@ -80,11 +80,5 @@ func TestOutdatedUsingLibraryWithInvalidVersion(t *testing.T) {
 	// Verifies library is correctly returned
 	stdout, _, err = cli.Run("outdated")
 	require.NoError(t, err)
-	lines := strings.Split(string(stdout), "\n")
-	l := make([][]string, len(lines))
-	for i := range lines {
-		lines[i] = strings.TrimSpace(lines[i])
-		l[i] = strings.Split(lines[i], " ")
-	}
-	require.Contains(t, l[1][0], "WiFi101")
+	require.Contains(t, string(stdout), "WiFi101")
 }
