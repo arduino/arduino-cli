@@ -20,6 +20,8 @@ on:
 
 jobs:
   create-nightly-artifacts:
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
     runs-on: ubuntu-latest
 
     strategy:
@@ -50,6 +52,12 @@ jobs:
           NIGHTLY: true
         run: task dist:${{ matrix.os }}
 
+      - name: Output Version
+        id: get-version
+        env:
+          NIGHTLY: true
+        run: echo "::set-output name=version::$(task general:get-version)"
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -61,9 +69,6 @@ jobs:
     name: Notarize ${{ matrix.artifact.name }}
     runs-on: macos-latest
     needs: create-nightly-artifacts
-    outputs:
-      checksum-darwin_amd64: ${{ steps.re-package.outputs.checksum-darwin_amd64 }}
-      checksum-darwin_arm64: ${{ steps.re-package.outputs.checksum-darwin_arm64 }}
 
     env:
       GON_CONFIG_PATH: gon.config.hcl
@@ -141,15 +146,14 @@ jobs:
           gon "${{ env.GON_CONFIG_PATH }}"
 
       - name: Re-package binary
-        id: re-package
         working-directory: ${{ env.DIST_DIR }}
         # Repackage the signed binary replaced in place by Gon (ignoring the output zip file)
         run: |
           # GitHub's upload/download-artifact@v2 actions don't preserve file permissions,
           # so we need to add execution permission back until the action is made to do this.
           chmod +x "${{ env.PROJECT_NAME }}_osx_${{ matrix.artifact.name }}/${{ env.PROJECT_NAME }}"
-          # Use of an array here is required for globbing
-          PACKAGE_FILENAME=(${{ env.PROJECT_NAME }}_nightly-*${{ matrix.artifact.path }})
+          VERSION=${{ needs.create-nightly-artifacts.outputs.version }}
+          PACKAGE_FILENAME=(${{ env.PROJECT_NAME }}_${VERSION}_${{ matrix.artifact.path }})
           tar -czvf "$PACKAGE_FILENAME" \
           -C "${{ env.PROJECT_NAME }}_osx_${{ matrix.artifact.name }}/" "${{ env.PROJECT_NAME }}" \
           -C ../../ LICENSE.txt
@@ -162,9 +166,68 @@ jobs:
           name: ${{ env.ARTIFACT_NAME }}
           path: ${{ env.DIST_DIR }}/${{ env.PACKAGE_FILENAME }}
 
+  create-windows-installer:
+    runs-on: windows-latest
+    needs: create-nightly-artifacts
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      INSTALLER_CERT_WINDOWS_PFX: "/tmp/cert.pfx"
+      # We are hardcoding the path for signtool because is not present on the windows PATH env var by default.
+      # Keep in mind that this path could change when upgrading to a new runner version
+      # https://github.com/actions/runner-images/blob/main/images/win/Windows2022-Readme.md#installed-windows-sdks
+      SIGNTOOL_PATH: "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x86/signtool.exe"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.DIST_DIR }}
+
+      - name: Prepare PATH
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Build MSI
+        id: buildmsi
+        run: |
+          VERSION=${{ needs.create-nightly-artifacts.outputs.version }}
+          WIX_VERSION="0.0.0" # use 0.0.0 as version for the installer since wix is picky about other alternatives, this only affects nightly builds (error CNDL0242)
+          PACKAGE_FILENAME="${{ env.PROJECT_NAME }}_${VERSION}_Windows_64bit"
+          SOURCE_DIR="${GITHUB_WORKSPACE}/${{ env.DIST_DIR }}/${{ env.PROJECT_NAME }}_windows_amd64/"
+          MSBuild.exe ./installer/cli.wixproj -p:SourceDir="$SOURCE_DIR" -p:OutputPath="${GITHUB_WORKSPACE}/${{ env.DIST_DIR }}" -p:OutputName="$PACKAGE_FILENAME" -p:ProductVersion="$WIX_VERSION"
+
+      - name: Save Win signing certificate to file
+        run: echo "${{ secrets.INSTALLER_CERT_WINDOWS_PFX }}" | base64 --decode > ${{ env.INSTALLER_CERT_WINDOWS_PFX}}
+
+      - name: Sign MSI
+        env:
+          MSI_FILE: ${{ steps.buildmsi.outputs.msi }} # this comes from .installer/cli.wixproj
+          CERT_PASSWORD: ${{ secrets.INSTALLER_CERT_WINDOWS_PASSWORD }}
+        run: |
+          "${{ env.SIGNTOOL_PATH }}" sign -d "Arduino CLI" -f ${{ env.INSTALLER_CERT_WINDOWS_PFX}} -p ${{ env.CERT_PASSWORD }} -fd sha256 -tr http://timestamp.digicert.com -td SHA256 -v "${{ env.MSI_FILE }}"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        env:
+          MSI_FILE: ${{ steps.buildmsi.outputs.msi }}
+        with:
+          if-no-files-found: error
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.MSI_FILE }}
+
   publish-nightly:
     runs-on: ubuntu-latest
-    needs: notarize-macos
+    needs:
+      - create-nightly-artifacts
+      - notarize-macos
+      - create-windows-installer
 
     steps:
       - name: Download artifact
@@ -176,8 +239,8 @@ jobs:
       - name: Create checksum file
         working-directory: ${{ env.DIST_DIR}}
         run: |
-          TAG="nightly-$(date -u +"%Y%m%d")"
-          sha256sum ${{ env.PROJECT_NAME }}_${TAG}* > ${TAG}-checksums.txt
+          VERSION=${{ needs.create-nightly-artifacts.outputs.version }}
+          sha256sum ${{ env.PROJECT_NAME }}_${VERSION}* > ${VERSION}-checksums.txt
 
       - name: Upload release files on Arduino downloads servers
         uses: docker://plugins/s3

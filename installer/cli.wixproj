@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <Configuration>Release</Configuration>
+        <Platform Condition="'$(Platform)' == ''">x64</Platform>
+        <!-- "ProductVersion" gets overridden when run with the commandline by the release CI, this is useful to define it if not defined -->
+        <ProductVersion Condition="'$(ProductVersion)' == ''">0.1.0</ProductVersion>
+        <!-- "OutputName" gets overridden when run with the commandline by the release CI, it's the name of the output file -->
+        <OutputName Condition="'$(OutputName)' == ''">$(MSBuildProjectName)</OutputName>
+        <OutputType>package</OutputType>
+        <DefineConstants>
+            $(DefineConstants);
+            ProductVersion=$(ProductVersion);
+        </DefineConstants>
+        <DefineSolutionProperties>false</DefineSolutionProperties>
+        <WixTargetsPath Condition="'$(WixTargetsPath)' == ''">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    </PropertyGroup>
+    <ItemGroup>
+        <!-- path and name of the additional files that contains additional config for the installer generation and needs Compile -->
+        <Compile Include="cli.wxs"/>
+        <Compile Include="ui.wxs"/>
+    </ItemGroup>
+    <ItemGroup>
+        <!-- Include directories containing both user-specified output and unzipped release for ease -->
+        <!-- "SourceDir" is defined when run with the commandline by the release CI, it's the folder containing files to include in the installer  -->
+        <BindInputPaths Include="$(SourceDir)"/>
+    </ItemGroup>
+    <ItemGroup>
+        <!-- https://wixtoolset.org//documentation/manual/v3/wixui/wixui_dialog_library.html -->
+        <WixExtension Include="WixUIExtension"/>
+        <!-- we need the following to be able to broadcast the environment vars change -->
+        <WixExtension Include="WixUtilExtension"/>
+    </ItemGroup>
+    <Target Name="SetStepOutput" AfterTargets="Build" Condition="'$(GITHUB_ACTIONS)' != ''">
+        <!-- Define a GitHub Actions workflow step output containing the target path -->
+        <Message Importance="high" Text="::set-output name=msi::$(TargetPath)"/>
+    </Target>
+    <Import Project="$(WixTargetsPath)"/>
+</Project>
