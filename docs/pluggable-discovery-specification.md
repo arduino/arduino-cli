@@ -380,16 +380,26 @@ will match on both `pears=20, apples=30` and `pears=30, apples=40` but not `pear
 
 #### Identification of board options
 
-The board identification can also identify [custom board options](platform-specification.md#custom-board-options) if the
-corresponding `upload_port` properties are defined:
+[Custom board options](platform-specification.md#custom-board-options) can also be identified.
+
+Identification property values are associated with a custom board option by the board definition in
+[`boards.txt`](platform-specification.md#boardstxt). Two formats are available.
+
+If only a single set of identification properties are associated with the option:
 
 ```
-BOARDNAME.menu.MENUNAME.MENUOPTION.upload_port.IDENTIFIER=Value
-BOARDNAME.menu.MENUNAME.MENUOPTION.upload_port.#.IDENTIFIER=Value
+BOARD_ID.menu.MENU_ID.OPTION_ID.upload_port.PORT_PROPERTY_KEY=PORT_PROPERTY_VALUE
 ```
 
-a discovery tools capable of detecting which menu options where used could report properties to match those lines. Let's
-see an example to clarify it, in the following `boards.txt`:
+If one or more sets of identification properties are associated with the option, an index number is used for each set:
+
+```
+BOARD_ID.menu.MENU_ID.OPTION_ID.upload_port.SET_INDEX.PORT_PROPERTY_KEY=PORT_PROPERTY_VALUE
+```
+
+If multiple identification properties are associated within a set, all must match for the option to be identified.
+
+Let's see an example to clarify it, in the following `boards.txt`:
 
 ```
 myboard.upload_port.pid=0x0010
@@ -410,9 +420,9 @@ myboard.menu.mem.2k.upload_port.2.cd=gh                       <---+-- identifica
 myboard.menu.mem.2k.build_mem=2048
 ```
 
-we have a board called `myboard` with two custom menu options `cpu` and `mem`. The discovery may provide extra
-identification properties to determine the custom menu options of the connected board, for example the following
-properties:
+we have a board called `myboard` with two custom menu options `cpu` and `mem`.
+
+A port with the following identification properties:
 
 ```
 vid=0x0010
@@ -420,8 +430,9 @@ pid=0x2341
 c=atmega2560
 ```
 
-will match the FQBN `mypackage:avr:myboard:cpu=atmega2560` becuase of the property `c=atmega2560`. The identification
-properties:
+will be identified as FQBN `mypackage:avr:myboard:cpu=atmega2560` because of the property `c=atmega2560`.
+
+A port with the following identification properties:
 
 ```
 vid=0x0010
@@ -430,7 +441,9 @@ c=atmega2560
 mem=2
 ```
 
-will match the FQBN `mypackage:avr:myboard:cpu=atmega2560,mem=2k`. The identification properties:
+will be identified as FQBN `mypackage:avr:myboard:cpu=atmega2560,mem=2k`.
+
+A port with the following identification properties:
 
 ```
 vid=0x0010
@@ -440,4 +453,5 @@ ab=ef
 cd=gh
 ```
 
-will match the FQBN `mypackage:avr:myboard:cpu=atmega2560,mem=2k` too (they will match the second set for `mem=2k`).
+will be identified as FQBN `mypackage:avr:myboard:cpu=atmega2560,mem=2k` too (they will match the second identification
+properties set for `mem=2k`).
