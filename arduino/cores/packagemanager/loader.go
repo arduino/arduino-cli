@@ -458,27 +458,27 @@ func (pm *Builder) loadBoards(platform *cores.PlatformRelease) error {
 	}
 
 	boardsTxtPath := platform.InstallDir.Join("boards.txt")
-	boardsProperties, err := properties.LoadFromPath(boardsTxtPath)
+	allBoardsProperties, err := properties.LoadFromPath(boardsTxtPath)
 	if err != nil {
 		return err
 	}
 
 	boardsLocalTxtPath := platform.InstallDir.Join("boards.local.txt")
-	if localProperties, err := properties.SafeLoadFromPath(boardsLocalTxtPath); err == nil {
-		boardsProperties.Merge(localProperties)
+	if boardsLocalProperties, err := properties.SafeLoadFromPath(boardsLocalTxtPath); err == nil {
+		allBoardsProperties.Merge(boardsLocalProperties)
 	} else {
 		return err
 	}
 
-	platform.Menus = boardsProperties.SubTree("menu")
+	platform.Menus = allBoardsProperties.SubTree("menu")
 
 	// Build to boards structure following the boards.txt board ordering
-	for _, boardID := range boardsProperties.FirstLevelKeys() {
+	for _, boardID := range allBoardsProperties.FirstLevelKeys() {
 		if boardID == "menu" {
 			// This is not a board id so we remove it to correctly set all other boards properties
 			continue
 		}
-		boardProperties := boardsProperties.SubTree(boardID)
+		boardProperties := allBoardsProperties.SubTree(boardID)
 		var board *cores.Board
 		if !platform.PluggableDiscoveryAware {
 			convertVidPidIdentificationPropertiesToPluggableDiscovery(boardProperties)

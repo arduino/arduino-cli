@@ -35,3 +35,12 @@ func (pme *Explorer) IdentifyBoard(idProps *properties.Map) []*cores.Board {
 
 	return foundBoards
 }
+
+// IdentifyBoardConfiguration returns the configuration of the board that can be
+// deduced from the given upload port identification properties
+func (pm *PackageManager) IdentifyBoardConfiguration(idProps *properties.Map, board *cores.Board) *properties.Map {
+	if idProps.Size() == 0 {
+		return properties.NewMap()
+	}
+	return board.IdentifyBoardConfiguration(idProps)
+}

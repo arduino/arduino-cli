@@ -377,3 +377,81 @@ myboard.upload_port.1.apples=40
 
 will match on both `pears=20, apples=30` and `pears=30, apples=40` but not `pears=20, apples=40`, in that sense each
 "set" of identification properties is independent from each other and cannot be mixed for port matching.
+
+#### Identification of board options
+
+[Custom board options](platform-specification.md#custom-board-options) can also be identified.
+
+Identification property values are associated with a custom board option by the board definition in
+[`boards.txt`](platform-specification.md#boardstxt). Two formats are available.
+
+If only a single set of identification properties are associated with the option:
+
+```
+BOARD_ID.menu.MENU_ID.OPTION_ID.upload_port.PORT_PROPERTY_KEY=PORT_PROPERTY_VALUE
+```
+
+If one or more sets of identification properties are associated with the option, an index number is used for each set:
+
+```
+BOARD_ID.menu.MENU_ID.OPTION_ID.upload_port.SET_INDEX.PORT_PROPERTY_KEY=PORT_PROPERTY_VALUE
+```
+
+If multiple identification properties are associated within a set, all must match for the option to be identified.
+
+Let's see an example to clarify it, in the following `boards.txt`:
+
+```
+myboard.upload_port.pid=0x0010
+myboard.upload_port.vid=0x2341
+myboard.menu.cpu.atmega1280=ATmega1280
+myboard.menu.cpu.atmega1280.upload_port.c=atmega1280          <--- identification property for cpu=atmega1280
+myboard.menu.cpu.atmega1280.build_cpu=atmega1280
+myboard.menu.cpu.atmega2560=ATmega2560
+myboard.menu.cpu.atmega2560.upload_port.c=atmega2560          <--- identification property for cpu=atmega2560
+myboard.menu.cpu.atmega2560.build_cpu=atmega2560
+myboard.menu.mem.1k=1KB
+myboard.menu.mem.1k.upload_port.mem=1                         <--- identification property for mem=1k
+myboard.menu.mem.1k.build_mem=1024
+myboard.menu.mem.2k=2KB
+myboard.menu.mem.2k.upload_port.1.mem=2                       <------ identification property for mem=2k (case 1)
+myboard.menu.mem.2k.upload_port.2.ab=ef                       <---\
+myboard.menu.mem.2k.upload_port.2.cd=gh                       <---+-- identification property for mem=2k (case 2)
+myboard.menu.mem.2k.build_mem=2048
+```
+
+we have a board called `myboard` with two custom menu options `cpu` and `mem`.
+
+A port with the following identification properties:
+
+```
+vid=0x0010
+pid=0x2341
+c=atmega2560
+```
+
+will be identified as FQBN `mypackage:avr:myboard:cpu=atmega2560` because of the property `c=atmega2560`.
+
+A port with the following identification properties:
+
+```
+vid=0x0010
+pid=0x2341
+c=atmega2560
+mem=2
+```
+
+will be identified as FQBN `mypackage:avr:myboard:cpu=atmega2560,mem=2k`.
+
+A port with the following identification properties:
+
+```
+vid=0x0010
+pid=0x2341
+c=atmega2560
+ab=ef
+cd=gh
+```
+
+will be identified as FQBN `mypackage:avr:myboard:cpu=atmega2560,mem=2k` too (they will match the second identification
+properties set for `mem=2k`).
