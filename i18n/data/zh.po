@@ -3,10 +3,11 @@
 # CLI team <prj_cli_team@arduino.cc>, 2022
 # Kuo Szu-Wei, 2022
 # cike567, 2022
+# ZW, 2022
 # 
 msgid ""
 msgstr ""
-"Last-Translator: cike567, 2022\n"
+"Last-Translator: ZW, 2022\n"
 "Language-Team: Chinese (https://www.transifex.com/arduino-1/teams/108174/zh/)\n"
 "Language: zh\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -47,17 +48,13 @@ msgstr "%[1]s，端口：%[2]s"
 msgid "%[1]s, protocol version: %[2]d"
 msgstr "%[1]s，协议版本：%[2]d"
 
-#: cli/output/rpc_progress.go:63
+#: arduino/resources/download.go:48
 msgid "%s already downloaded"
 msgstr "%s 已经下载"
 
 #: commands/upload/upload.go:541
 msgid "%s and %s cannot be used together"
 msgstr "%s 和 %s 不能一起使用"
-
-#: cli/output/rpc_progress.go:75
-msgid "%s downloaded"
-msgstr "%s 已下载"
 
 #: arduino/cores/packagemanager/install_uninstall.go:329
 msgid "%s installed"
@@ -68,7 +65,7 @@ msgid "%s is already installed."
 msgstr "%s 已安装"
 
 #: arduino/cores/packagemanager/loader.go:65
-#: arduino/cores/packagemanager/loader.go:641
+#: arduino/cores/packagemanager/loader.go:652
 msgid "%s is not a directory"
 msgstr "%s 不是目录"
 
@@ -84,7 +81,7 @@ msgstr "%s 必须安装"
 msgid "%s pattern is missing"
 msgstr "%s 模式丢失"
 
-#: arduino/errors.go:781
+#: arduino/errors.go:782
 msgid "'%s' has an invalid signature"
 msgstr "‘%s’ 的签名无效"
 
@@ -112,7 +109,7 @@ msgstr "--git-url 和 --zip-path 参数允许安装不受信任的文件，使�
 msgid "A new release of Arduino CLI is available:"
 msgstr "新版本的 Arduino CLI 可用："
 
-#: arduino/errors.go:299
+#: arduino/errors.go:300
 msgid "A programmer is required to upload"
 msgstr "需要编译器上传"
 
@@ -129,7 +126,7 @@ msgstr "ARDUINO 命令行手册"
 msgid "Additional help topics:"
 msgstr "更多帮助："
 
-#: cli/config/add.go:32 cli/config/add.go:33
+#: cli/config/add.go:74 cli/config/add.go:75
 msgid "Adds one or more values to a setting."
 msgstr "将一个或多个值添加到设置中。"
 
@@ -141,7 +138,7 @@ msgstr "别名："
 msgid "All the cores are already at the latest version"
 msgstr "所有内核都是最新版本"
 
-#: commands/lib/install.go:86 commands/lib/install.go:131
+#: commands/lib/install.go:87 commands/lib/install.go:132
 msgid "Already installed %s"
 msgstr "已经安装 %s"
 
@@ -221,6 +218,18 @@ msgstr "将项目写入开发板上。"
 msgid "Author: %s"
 msgstr "作者：%s"
 
+#: arduino/libraries/librariesmanager/install.go:77
+msgid ""
+"Automatic library install can't be performed in this case, please manually "
+"remove all duplicates and retry."
+msgstr ""
+
+#: commands/lib/uninstall.go:57
+msgid ""
+"Automatic library uninstall can't be performed in this case, please manually"
+" remove them."
+msgstr ""
+
 #: cli/lib/list.go:124
 msgid "Available"
 msgstr "可用"
@@ -258,11 +267,15 @@ msgstr "已指定引导加载程序文件，缺少：%[1]s"
 msgid "Builds of 'core.a' are saved into this path to be cached and reused."
 msgstr "‘core.a’的构建被保存到这个路径中，以便被缓存和重复使用。"
 
+#: arduino/libraries/librariesmanager/install.go:58
+msgid "Builtin libraries directory not set"
+msgstr "未设置内置库目录"
+
 #: arduino/resources/index.go:45
 msgid "Can't create data directory %s"
 msgstr "无法新建 %s 数据目录"
 
-#: arduino/errors.go:487
+#: arduino/errors.go:488
 msgid "Can't create sketch"
 msgstr "无法新建项目"
 
@@ -275,7 +288,7 @@ msgstr "无法下载库"
 msgid "Can't find dependencies for platform %s"
 msgstr "找不到 %s 平台的依赖"
 
-#: arduino/errors.go:500
+#: arduino/errors.go:501
 msgid "Can't open sketch"
 msgstr "无法打开项目"
 
@@ -287,15 +300,15 @@ msgstr "无法在 %v 键中设置多个值"
 msgid "Can't use %s flags at the same time."
 msgstr "不能同时使用 %s 参数"
 
-#: cli/config/add.go:61 cli/config/delete.go:72 cli/config/remove.go:70
+#: cli/config/add.go:104 cli/config/delete.go:72 cli/config/remove.go:70
 msgid "Can't write config file: %v"
 msgstr "无法写入配置文件：%v"
 
-#: commands/compile/compile.go:163
+#: commands/compile/compile.go:160
 msgid "Cannot create build cache directory"
 msgstr "无法新建构建缓存目录"
 
-#: commands/compile/compile.go:138
+#: commands/compile/compile.go:135
 msgid "Cannot create build directory"
 msgstr "无法新建构建目录"
 
@@ -307,11 +320,11 @@ msgstr "无法新建配置文件目录：%v"
 msgid "Cannot create config file: %v"
 msgstr "无法新建配置文件：%v"
 
-#: arduino/errors.go:744
+#: arduino/errors.go:745
 msgid "Cannot create temp dir"
 msgstr "无法新建临时目录"
 
-#: arduino/errors.go:762
+#: arduino/errors.go:763
 msgid "Cannot create temp file"
 msgstr "无法新建临时文件"
 
@@ -326,10 +339,6 @@ msgstr "无法导出项目元数据"
 #: cli/config/init.go:72 cli/config/init.go:83
 msgid "Cannot find absolute path: %v"
 msgstr "找不到绝对路径：%v"
-
-#: configuration/configuration.go:148 configuration/configuration.go:154
-msgid "Cannot get executable path: %v"
-msgstr "无法获得可执行路径：%v"
 
 #: arduino/cores/packagemanager/install_uninstall.go:139
 msgid "Cannot install platform"
@@ -355,7 +364,7 @@ msgstr "类别：%s"
 msgid "Check dependencies status for the specified library."
 msgstr "检查指定库的依赖状态。"
 
-#: commands/lib/install.go:136
+#: commands/lib/install.go:137
 msgid "Checking lib install prerequisites"
 msgstr "检查依赖安装前提条件"
 
@@ -442,7 +451,7 @@ msgstr "内核"
 msgid "Core name"
 msgstr "内核名"
 
-#: arduino/httpclient/httpclient.go:102
+#: arduino/httpclient/httpclient.go:106
 msgid "Could not connect via HTTP"
 msgstr "无法通过 HTTP 连接"
 
@@ -486,11 +495,11 @@ msgid ""
 "Library Manager."
 msgstr "目前，Build Profiles 只支持通过 Arduino Library Manager 提供的库。"
 
-#: cli/core/list.go:88 cli/core/search.go:118
+#: cli/core/list.go:88 cli/core/search.go:114
 msgid "DEPRECATED"
 msgstr "已弃用"
 
-#: cli/daemon/daemon.go:181
+#: cli/daemon/daemon.go:184
 msgid "Daemon is now listening on %s:%s"
 msgstr "守护进程正在监听 %s：%s"
 
@@ -604,7 +613,8 @@ msgstr "正在下载 %s"
 msgid "Downloading index signature: %s"
 msgstr "正在下载 %s 索引签名"
 
-#: arduino/resources/index.go:58 commands/instances.go:520
+#: arduino/resources/index.go:58 commands/instances.go:510
+#: commands/instances.go:519
 msgid "Downloading index: %s"
 msgstr "正在下载 %s 索引"
 
@@ -668,16 +678,16 @@ msgstr "计算相对文件路径时出错"
 msgid "Error cleaning caches: %v"
 msgstr "清理缓存出错：%v"
 
-#: commands/compile/compile.go:281
+#: commands/compile/compile.go:260
 msgid "Error copying output file %s"
 msgstr "复制输出 %s 文件时出错"
 
-#: cli/core/search.go:66 cli/instance/instance.go:50
+#: cli/core/search.go:65 cli/instance/instance.go:50
 #: cli/instance/instance.go:178 cli/lib/search.go:59
 msgid "Error creating instance: %v"
 msgstr "新建实例时出错：%v"
 
-#: commands/compile/compile.go:261
+#: commands/compile/compile.go:240
 msgid "Error creating output dir"
 msgstr "新建输出目录时出错"
 
@@ -722,7 +732,6 @@ msgid "Error downloading platform %s"
 msgstr "下载 %s 平台时出错"
 
 #: arduino/cores/packagemanager/download.go:127
-#: arduino/cores/packagemanager/download.go:132
 #: arduino/cores/packagemanager/profiles.go:180
 msgid "Error downloading tool %s"
 msgstr "下载 %s 工具时出错"
@@ -794,7 +803,7 @@ msgstr "从 Arduino Cloud 获取开发板信息时出错"
 msgid "Error getting current directory for compilation database: %s"
 msgstr "获取编译数据库的当前目录时出错：%s"
 
-#: commands/compile/compile.go:229 commands/lib/list.go:108
+#: commands/compile/compile.go:208 commands/lib/list.go:109
 msgid "Error getting information for library %s"
 msgstr "获取 %s 库的信息时出错"
 
@@ -810,7 +819,7 @@ msgstr "获取端口元数据出错：%v"
 msgid "Error getting port settings details: %s"
 msgstr "获取端口设置详细信息时出错：%s"
 
-#: cli/core/search.go:81 cli/instance/instance.go:55 cli/lib/search.go:73
+#: cli/core/search.go:77 cli/instance/instance.go:55 cli/lib/search.go:73
 #: cli/update/update.go:71
 msgid "Error initializing instance: %v"
 msgstr "初始化实例时出错：%v"
@@ -854,7 +863,7 @@ msgstr "列出开发板列表时出错：%v"
 msgid "Error listing platforms: %v"
 msgstr "列出平台列表时出错：%v"
 
-#: arduino/errors.go:402
+#: arduino/errors.go:403
 msgid "Error loading hardware platform"
 msgstr "加载硬件平台时出错"
 
@@ -871,7 +880,7 @@ msgstr "加载 %s 索引时出错"
 msgid "Error opening %s"
 msgstr "打开 %s 时出错"
 
-#: cli/daemon/daemon.go:88
+#: cli/daemon/daemon.go:91
 msgid "Error opening debug logging file: %s"
 msgstr "打开调试日志文件出错：%s"
 
@@ -883,11 +892,11 @@ msgstr "打开项目时出错：%v"
 msgid "Error opening source code overrides data file: %v"
 msgstr "打开源代码覆盖数据文件时出错：%v"
 
-#: commands/compile/compile.go:271
+#: commands/compile/compile.go:250
 msgid "Error reading build directory"
 msgstr "读取构建目录时出错"
 
-#: configuration/configuration.go:69
+#: configuration/configuration.go:68
 msgid "Error reading config file: %v"
 msgstr "读取配置文件时出错：%v"
 
@@ -931,7 +940,7 @@ msgstr "搜索开发板时错误：%v"
 msgid "Error searching for Library: %v"
 msgstr "搜索库时出错：%v"
 
-#: cli/core/search.go:93
+#: cli/core/search.go:89
 msgid "Error searching for platforms: %v"
 msgstr "搜索平台时出错：%v"
 
@@ -941,7 +950,7 @@ msgstr "序列化编译数据库时出错：%s"
 
 #: cli/board/list.go:75
 msgid "Error starting discovery: %v"
-msgstr ""
+msgstr "启动时发现出错：%v"
 
 #: cli/lib/uninstall.go:66
 msgid "Error uninstalling %[1]s: %[2]v"
@@ -950,10 +959,6 @@ msgstr "卸载 %[1]s 时出错：%[2]v"
 #: cli/update/update.go:63
 msgid "Error updating core and libraries index: %v"
 msgstr "更新核心和库索引时出错：%v"
-
-#: cli/core/search.go:75 cli/core/update_index.go:52
-msgid "Error updating index: %v"
-msgstr "更新索引时出错：%v"
 
 #: cli/instance/instance.go:187
 msgid "Error updating indexes: %v"
@@ -965,7 +970,7 @@ msgstr "更新库索引时出错：%v"
 
 #: cli/lib/upgrade.go:68
 msgid "Error upgrading libraries"
-msgstr ""
+msgstr "升级库时出错"
 
 #: arduino/cores/packagemanager/install_uninstall.go:149
 msgid "Error upgrading platform: %s"
@@ -1034,7 +1039,7 @@ msgstr "FQBN："
 msgid "Failed chip erase"
 msgstr "芯片擦除失败"
 
-#: cli/daemon/daemon.go:155
+#: cli/daemon/daemon.go:158
 msgid "Failed choosing port, address: %s"
 msgstr "选择端口失败，地址：%s"
 
@@ -1054,19 +1059,19 @@ msgstr "新建数据目录失败"
 msgid "Failed to create downloads directory"
 msgstr "新建下载文件夹失败"
 
-#: cli/daemon/daemon.go:134
+#: cli/daemon/daemon.go:137
 msgid "Failed to listen on TCP port: %[1]s. %[2]s is an invalid port."
 msgstr "未能侦听TCP端口：%[1]s。%[2]s 是无效端口。"
 
-#: cli/daemon/daemon.go:128
+#: cli/daemon/daemon.go:131
 msgid "Failed to listen on TCP port: %[1]s. %[2]s is unknown name."
 msgstr "未能侦听TCP端口：%[1]s。%[2]s 是未知名称。"
 
-#: cli/daemon/daemon.go:143
+#: cli/daemon/daemon.go:146
 msgid "Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v"
 msgstr "未能侦听TCP端口：%[1]s。意外错误：%[2]v"
 
-#: cli/daemon/daemon.go:140
+#: cli/daemon/daemon.go:143
 msgid "Failed to listen on TCP port: %s. Address already in use."
 msgstr "未能侦听TCP端口：%s。地址已被使用。"
 
@@ -1078,7 +1083,7 @@ msgstr "上传失败"
 msgid "File:"
 msgstr "文件："
 
-#: commands/daemon/debug.go:47
+#: commands/daemon/debug.go:46
 msgid "First message must contain debug request, not data"
 msgstr "第一条消息必须包含调试请求，而不是数据"
 
@@ -1100,7 +1105,7 @@ msgid ""
 "Force skip of post-install scripts (if the CLI is running interactively)."
 msgstr "强制跳过安装后脚本（如果 CLI 以交互方式运行）。"
 
-#: arduino/errors.go:802
+#: arduino/errors.go:803
 msgid ""
 "Found %d platform for reference \"%s\":\n"
 "%s"
@@ -1154,7 +1159,7 @@ msgstr " 个全局变量使用 %[1]s 个字节（%[3]s%%）的动态内存，剩
 msgid "Global variables use %[1]s bytes of dynamic memory."
 msgstr "全局变量使用 %[1]s 字节的动态内存。"
 
-#: cli/core/list.go:84 cli/core/search.go:114 cli/monitor/monitor.go:195
+#: cli/core/list.go:84 cli/core/search.go:110 cli/monitor/monitor.go:195
 #: cli/outdated/outdated.go:80
 msgid "ID"
 msgstr "ID"
@@ -1189,7 +1194,7 @@ msgstr "在存档中包含 %s 目录。"
 msgid "Installed"
 msgstr "已安装"
 
-#: commands/lib/install.go:147
+#: commands/lib/install.go:152
 msgid "Installed %s"
 msgstr "已安装 %s"
 
@@ -1199,7 +1204,7 @@ msgid "Installed version"
 msgstr "已安装的版本"
 
 #: arduino/cores/packagemanager/install_uninstall.go:312
-#: commands/lib/install.go:127
+#: commands/lib/install.go:128
 msgid "Installing %s"
 msgstr "正在安装 %s"
 
@@ -1228,7 +1233,7 @@ msgstr "在系统中安装一个或多个指定的库。"
 msgid "Internal error in cache"
 msgstr "缓存中的内部错误"
 
-#: arduino/errors.go:355
+#: arduino/errors.go:356
 msgid "Invalid '%[1]s' property: %[2]s"
 msgstr "无效的 ‘%[1]s’ 属性：%[2]s"
 
@@ -1241,11 +1246,11 @@ msgstr "无效调用：应显示帮助，但仅在文本模式下可用。"
 msgid "Invalid Device URL format"
 msgstr "设备地址格式无效"
 
-#: arduino/errors.go:61
+#: arduino/errors.go:62
 msgid "Invalid FQBN"
 msgstr "无效的 FQBN"
 
-#: arduino/errors.go:79
+#: arduino/errors.go:80
 msgid "Invalid URL"
 msgstr "无效的地址"
 
@@ -1274,7 +1279,7 @@ msgstr "提供的设备端口类型无效"
 msgid "Invalid eeprom size regexp: %s"
 msgstr "无效的 eeprom 大小正则表达式：%s"
 
-#: arduino/errors.go:47
+#: arduino/errors.go:48
 msgid "Invalid instance"
 msgstr "无效的实例"
 
@@ -1282,7 +1287,7 @@ msgstr "无效的实例"
 msgid "Invalid item %s"
 msgstr "无效的 %s 条目"
 
-#: arduino/errors.go:97
+#: arduino/errors.go:98
 msgid "Invalid library"
 msgstr "无效的库"
 
@@ -1298,7 +1303,7 @@ msgstr "--log-level 选项无效：%s"
 msgid "Invalid output format: %s"
 msgstr "无效的输出格式：%s"
 
-#: commands/instances.go:515
+#: commands/instances.go:522
 msgid "Invalid package index in %s"
 msgstr "%s 中的软件包索引无效"
 
@@ -1310,11 +1315,11 @@ msgstr "无效 %s 参数：版本不允许"
 msgid "Invalid pid value: '%s'"
 msgstr "无效的pid值：‘%s’"
 
-#: arduino/errors.go:221
+#: arduino/errors.go:222
 msgid "Invalid profile"
 msgstr "无效的配置文件"
 
-#: commands/monitor/monitor.go:135
+#: commands/monitor/monitor.go:145
 msgid "Invalid recipe in platform.txt"
 msgstr "platform.txt 中的方法无效"
 
@@ -1322,11 +1327,11 @@ msgstr "platform.txt 中的方法无效"
 msgid "Invalid size regexp: %s"
 msgstr "无效的大小正则表达式：%s"
 
-#: cli/core/search.go:138
+#: cli/core/search.go:134
 msgid "Invalid timeout: %s"
 msgstr "超时无效：%s"
 
-#: arduino/errors.go:115
+#: arduino/errors.go:116
 msgid "Invalid version"
 msgstr "无效的版本"
 
@@ -1361,12 +1366,16 @@ msgstr "最新的"
 msgid "Library %[1]s has been declared precompiled:"
 msgstr "%[1]s 库已声明为预编译："
 
-#: commands/lib/install.go:95
+#: commands/lib/install.go:96
 msgid ""
 "Library %[1]s is already installed, but with a different version: %[2]s"
 msgstr "库 %[1]s 已经安装，但有不同的版本。：%[2]s"
 
-#: commands/lib/uninstall.go:37
+#: commands/lib/upgrade.go:59
+msgid "Library %s is already at the latest version"
+msgstr ""
+
+#: commands/lib/uninstall.go:39
 msgid "Library %s is not installed"
 msgstr "%s 库未安装"
 
@@ -1374,7 +1383,7 @@ msgstr "%s 库未安装"
 msgid "Library %s not found"
 msgstr "未找到 %s 库"
 
-#: arduino/errors.go:421
+#: arduino/errors.go:422
 msgid "Library '%s' not found"
 msgstr "未找到 %s 库"
 
@@ -1383,11 +1392,11 @@ msgid ""
 "Library can't use both '%[1]s' and '%[2]s' folders. Double check in '%[3]s'."
 msgstr "库不能同时使用 ‘%[1]s’ 和 ‘%[2]s’ 文件夹。在 ‘%[3]s’ 再次检查。"
 
-#: arduino/errors.go:537
+#: arduino/errors.go:538
 msgid "Library install failed"
 msgstr "库安装失败"
 
-#: commands/lib/install.go:157 commands/lib/install.go:167
+#: commands/lib/install.go:162 commands/lib/install.go:172
 msgid "Library installed"
 msgstr "已安装的库"
 
@@ -1479,19 +1488,19 @@ msgstr "记录此级别及以上的消息。有效级别为 %s"
 msgid "Missing '%[1]s' from library in %[2]s"
 msgstr "%[2]s 中的库中缺少 ‘%[1]s’"
 
-#: arduino/errors.go:170
+#: arduino/errors.go:171
 msgid "Missing FQBN (Fully Qualified Board Name)"
 msgstr "缺少 FQBN（完全合格开发板名）"
 
-#: arduino/errors.go:261
+#: arduino/errors.go:262
 msgid "Missing port"
 msgstr "找不到端口"
 
-#: arduino/errors.go:237 arduino/errors.go:249
+#: arduino/errors.go:238 arduino/errors.go:250
 msgid "Missing port protocol"
 msgstr "找不到端口协议"
 
-#: arduino/errors.go:287
+#: arduino/errors.go:288
 msgid "Missing programmer"
 msgstr "找不到编译器"
 
@@ -1499,11 +1508,11 @@ msgstr "找不到编译器"
 msgid "Missing size regexp"
 msgstr "缺少大小正则表达式"
 
-#: arduino/errors.go:473
+#: arduino/errors.go:474
 msgid "Missing sketch path"
 msgstr "缺少项目路径"
 
-#: arduino/errors.go:336
+#: arduino/errors.go:337
 msgid "Monitor '%s' not found"
 msgstr "未找到 ‘%s’ 监视器"
 
@@ -1515,7 +1524,7 @@ msgstr "监视端口设置："
 msgid "Multiple libraries were found for \"%[1]s\""
 msgstr "为 “%[1]s” 找到了多个库"
 
-#: cli/board/details.go:193 cli/core/list.go:84 cli/core/search.go:114
+#: cli/board/details.go:193 cli/core/list.go:84 cli/core/search.go:110
 #: cli/lib/list.go:124 cli/outdated/outdated.go:80
 msgid "Name"
 msgstr "名"
@@ -1553,11 +1562,11 @@ msgstr ""
 "没有与您的搜索匹配的库。\n"
 "你的意思是。。。\n"
 
-#: arduino/errors.go:275
+#: arduino/errors.go:276
 msgid "No monitor available for the port protocol %s"
 msgstr "没有可用于端口协议 %s 的监视器"
 
-#: cli/core/search.go:124
+#: cli/core/search.go:120
 msgid "No platforms matching your search."
 msgstr "没有与你的搜索匹配的平台。"
 
@@ -1573,7 +1582,7 @@ msgstr "没有可用的更新。"
 msgid "No upload port found, using %s as fallback"
 msgstr "未找到上传端口，使用 %s 作为后备"
 
-#: arduino/errors.go:440
+#: arduino/errors.go:441
 msgid "No valid dependencies solution found"
 msgstr "找不到有效的依赖解决方案"
 
@@ -1718,11 +1727,11 @@ msgstr ""
 msgid "Platform %s uninstalled"
 msgstr "%s 平台已卸载"
 
-#: arduino/errors.go:458
+#: arduino/errors.go:459
 msgid "Platform '%s' is already at the latest version"
 msgstr "‘%s’ 平台已经是最新版本"
 
-#: arduino/errors.go:384
+#: arduino/errors.go:385
 msgid "Platform '%s' not found"
 msgstr "未找到 ‘%s’ 平台"
 
@@ -1762,13 +1771,13 @@ msgstr "平台名称："
 msgid "Platform size (bytes):"
 msgstr "平台大小（字节）："
 
-#: arduino/errors.go:154
+#: arduino/errors.go:155
 msgid ""
 "Please specify an FQBN. Multiple possible boards detected on port %[1]s with"
 " protocol %[2]s"
 msgstr "请指定一个FQBN。在 %[1]s 端口上检测到多个可能的开发板，协议为 %[2]s"
 
-#: arduino/errors.go:134
+#: arduino/errors.go:135
 msgid ""
 "Please specify an FQBN. The board on port %[1]s with protocol %[2]s can't be"
 " identified"
@@ -1782,7 +1791,7 @@ msgstr "端口"
 msgid "Port closed:"
 msgstr "端口关闭："
 
-#: arduino/errors.go:631
+#: arduino/errors.go:632
 msgid "Port monitor error"
 msgstr "端口监视器错误"
 
@@ -1811,11 +1820,11 @@ msgstr "打印当前配置"
 msgid "Prints the current configuration."
 msgstr "打印当前配置。"
 
-#: arduino/errors.go:203
+#: arduino/errors.go:204
 msgid "Profile '%s' not found"
 msgstr "未找到 ‘%s’ 的配置文件''。"
 
-#: arduino/errors.go:317
+#: arduino/errors.go:318
 msgid "Programmer '%s' not found"
 msgstr "未找到 ‘%s’ 编译器"
 
@@ -1831,7 +1840,7 @@ msgstr "要使用的编译器，例如：atmel_ice"
 msgid "Programmers:"
 msgstr "编译器："
 
-#: arduino/errors.go:369
+#: arduino/errors.go:370
 msgid "Property '%s' is undefined"
 msgstr "‘%s’ 属性未定义"
 
@@ -1847,7 +1856,7 @@ msgstr "提供包括：%s"
 msgid "Removes one or more values from a setting."
 msgstr "从设置中删除一个或多个值。"
 
-#: commands/lib/install.go:140
+#: commands/lib/install.go:141
 msgid "Replacing %[1]s with %[2]s"
 msgstr "将 %[1]s 替换为 %[2]s"
 
@@ -1881,11 +1890,11 @@ msgstr "正在运行正常的内核构建。。。"
 msgid "Save build artifacts in this directory."
 msgstr "将生成文件保存在此目录中。"
 
-#: cli/core/search.go:50
+#: cli/core/search.go:49
 msgid "Search for a core in Boards Manager using the specified keywords."
 msgstr "使用指定的关键字在开发板管理器中搜索内核。"
 
-#: cli/core/search.go:49
+#: cli/core/search.go:48
 msgid "Search for a core in Boards Manager."
 msgstr "在开发板管理器中搜索内核。"
 
@@ -1905,7 +1914,7 @@ msgstr "选择FQBN：%s"
 msgid "Sentence: %s"
 msgstr "句子：%s"
 
-#: arduino/httpclient/httpclient.go:63
+#: arduino/httpclient/httpclient.go:67
 msgid "Server responded with: %s"
 msgstr "服务器响应：%s"
 
@@ -1921,11 +1930,11 @@ msgstr "设置保存配置文件的位置。"
 msgid "Setting"
 msgstr "设置"
 
-#: cli/config/delete.go:62 cli/config/validate.go:49
+#: cli/config/delete.go:62 cli/config/validate.go:51
 msgid "Settings key doesn't exist"
 msgstr "设置键不存在"
 
-#: cli/core/search.go:55
+#: cli/core/search.go:54
 msgid "Show all available core versions."
 msgstr "显示所有可用的内核版本。"
 
@@ -2068,6 +2077,10 @@ msgstr "跳过平台配置。"
 msgid "Skipping: %[1]s"
 msgstr "跳过：%[1]s"
 
+#: commands/instances.go:542
+msgid "Some indexes could not be updated."
+msgstr ""
+
 #: arduino/serialutils/serialutils.go:133
 msgid "TOUCH: error during reset: %s"
 msgstr "TOUCH：重置时出错：%s"
@@ -2084,11 +2097,11 @@ msgstr "守护进程将监听的 TCP 端口"
 msgid "The custom config file (if not specified the default will be used)."
 msgstr "自定义配置文件（如果未指定，将使用默认值）。"
 
-#: cli/daemon/daemon.go:79
+#: cli/daemon/daemon.go:82
 msgid "The flag --debug-file must be used with --debug."
 msgstr "参数 --debug-file 必须与 --debug 一起使用。"
 
-#: cli/config/add.go:52
+#: cli/config/add.go:94
 msgid ""
 "The key '%[1]v' is not a list of items, can't add to it.\n"
 "Maybe use '%[2]s'?"
@@ -2103,6 +2116,10 @@ msgid ""
 msgstr ""
 "‘%[1]v’ 键不是列表中的条目，无法从中删除。\n"
 "是否可以使用 ‘%[2]s’？"
+
+#: arduino/errors.go:825
+msgid "The library %s has multiple installations:"
+msgstr ""
 
 #: cli/compile/compile.go:116
 msgid ""
@@ -2198,15 +2215,15 @@ msgid ""
 "Unable to cache built core, please tell %[1]s maintainers to follow %[2]s"
 msgstr "无法缓存构建的内核，请告知 %[1]s 维护者关注 %[2]s"
 
-#: configuration/configuration.go:126
+#: configuration/configuration.go:125
 msgid "Unable to get Documents Folder: %v"
 msgstr "无法获取文档文件夹：%v"
 
-#: configuration/configuration.go:101
+#: configuration/configuration.go:100
 msgid "Unable to get Local App Data Folder: %v"
 msgstr "无法获取本地应用程序数据文件夹：%v"
 
-#: configuration/configuration.go:89 configuration/configuration.go:114
+#: configuration/configuration.go:88 configuration/configuration.go:113
 msgid "Unable to get user home dir: %v"
 msgstr "无法获取用户主目录：%v"
 
@@ -2214,8 +2231,12 @@ msgstr "无法获取用户主目录：%v"
 msgid "Unable to open file for logging: %s"
 msgstr "无法打开文件进行日志记录：%s"
 
+#: commands/instances.go:509
+msgid "Unable to parse URL"
+msgstr ""
+
 #: arduino/cores/packagemanager/install_uninstall.go:273
-#: commands/lib/uninstall.go:39
+#: commands/lib/uninstall.go:44
 msgid "Uninstalling %s"
 msgstr "正在卸载 %s"
 
@@ -2238,7 +2259,7 @@ msgstr "卸载一个或多个库。"
 msgid "Unknown"
 msgstr "未知"
 
-#: arduino/errors.go:184
+#: arduino/errors.go:185
 msgid "Unknown FQBN"
 msgstr "未知 FQBN"
 
@@ -2344,10 +2365,9 @@ msgstr "已使用的平台"
 msgid "Used: %[1]s"
 msgstr "使用：%[1]s"
 
-#: arduino/libraries/librariesmanager/install.go:69
-#: arduino/libraries/librariesmanager/install.go:85
-#: arduino/libraries/librariesmanager/install.go:107
-#: arduino/libraries/librariesmanager/install.go:191
+#: arduino/libraries/librariesmanager/install.go:56
+#: arduino/libraries/librariesmanager/install.go:119
+#: arduino/libraries/librariesmanager/install.go:203
 msgid "User directory not set"
 msgstr "未设置用户目录"
 
@@ -2403,7 +2423,7 @@ msgid "Verify uploaded binary after the upload."
 msgstr "上传后验证上传的二进制文件。"
 
 #: cli/compile/compile.go:390 cli/compile/compile.go:404
-#: cli/core/search.go:114
+#: cli/core/search.go:110
 msgid "Version"
 msgstr "版本"
 
@@ -2485,7 +2505,7 @@ msgstr "和"
 msgid "archive hash differs from hash in index"
 msgstr "存档哈希与索引中的哈希不同"
 
-#: arduino/libraries/librariesmanager/install.go:138
+#: arduino/libraries/librariesmanager/install.go:150
 msgid "archive is not valid: multiple files found in zip file top level"
 msgstr "存档无效：在 zip 文件顶层中找到多个文件"
 
@@ -2535,7 +2555,7 @@ msgstr "找不到 %s 工具的最新版本"
 msgid "can't find main Sketch file in %s"
 msgstr "在 %s 中找不到主项目文件"
 
-#: arduino/cores/packagemanager/loader.go:814
+#: arduino/cores/packagemanager/loader.go:825
 msgid "can't find pattern for discovery with id %s"
 msgstr "找不到 id 为 %s 的 discovery"
 
@@ -2591,6 +2611,10 @@ msgstr "通信不同步，应为 ‘%[1]s’，收到 ‘%[2]s’"
 msgid "computing hash: %s"
 msgstr "计算哈希：%s"
 
+#: arduino/libraries/librariesmanager/install.go:227
+msgid "could not create directory %s: a file with the same name exists!"
+msgstr ""
+
 #: commands/upload/upload.go:623
 msgid "could not find a valid build artifact"
 msgstr "找不到有效的构建项目"
@@ -2598,6 +2622,10 @@ msgstr "找不到有效的构建项目"
 #: commands/core/install.go:62
 msgid "could not overwrite"
 msgstr "无法覆盖"
+
+#: commands/lib/install.go:149
+msgid "could not remove old library"
+msgstr ""
 
 #: arduino/cores/packagemanager/install_uninstall.go:208
 msgid "creating installed.json in %[1]s: %[2]s"
@@ -2623,11 +2651,11 @@ msgstr "‘%s’ 依赖不可用"
 msgid "destination already exists"
 msgstr "目标已存在"
 
-#: arduino/libraries/librariesmanager/install.go:76
+#: arduino/libraries/librariesmanager/install.go:90
 msgid "destination dir %s already exists, cannot install"
 msgstr "%s 目录已经存在，无法安装"
 
-#: arduino/libraries/librariesmanager/install.go:294
+#: arduino/libraries/librariesmanager/install.go:308
 msgid "directory doesn't exist: %s"
 msgstr "目录不存在：%s"
 
@@ -2635,11 +2663,11 @@ msgstr "目录不存在：%s"
 msgid "discovery %[1]s process not started: %[2]w"
 msgstr "发现 %[1]s 进程未启动：%[2]w"
 
-#: arduino/cores/packagemanager/loader.go:745
+#: arduino/cores/packagemanager/loader.go:756
 msgid "discovery %s not found"
 msgstr "未找到 %s discovery"
 
-#: arduino/cores/packagemanager/loader.go:749
+#: arduino/cores/packagemanager/loader.go:760
 msgid "discovery %s not installed"
 msgstr "%s discovery 未安装"
 
@@ -2654,6 +2682,10 @@ msgstr "下载特定版本（在本例中为 1.6.9）。"
 #: cli/core/download.go:40 cli/core/install.go:44
 msgid "download the latest version of Arduino SAMD core."
 msgstr "下载最新版本的 Arduino SAMD 内核。"
+
+#: cli/output/rpc_progress.go:85
+msgid "downloaded"
+msgstr ""
 
 #: commands/instances.go:138
 msgid "downloading %[1]s tool: %[2]s"
@@ -2671,7 +2703,7 @@ msgstr "编译项目元数据：%s"
 msgid "error loading sketch project file:"
 msgstr "加载项目文件时错误："
 
-#: arduino/cores/packagemanager/loader.go:639
+#: arduino/cores/packagemanager/loader.go:650
 msgid "error opening %s"
 msgstr " 开启 %s 时错误"
 
@@ -2695,7 +2727,7 @@ msgstr "查询 Arduino Cloud Api 时出错"
 msgid "extracting archive: %s"
 msgstr "正在提取存档：%s"
 
-#: arduino/libraries/librariesmanager/install.go:126
+#: arduino/libraries/librariesmanager/install.go:138
 msgid "extracting archive: %w"
 msgstr "正在提取存档：%w"
 
@@ -2747,7 +2779,7 @@ msgstr "正在生成安装 id: %w"
 msgid "generating installation.secret: %w"
 msgstr "生成 installation.secret：%w"
 
-#: arduino/resources/download.go:56
+#: arduino/resources/download.go:52
 msgid "getting archive file info: %s"
 msgstr "正在获取存档文件信息：%s"
 
@@ -2773,7 +2805,7 @@ msgstr "获取 %[1]s 平台的discovery依赖：%[2]s"
 msgid "getting monitor dependencies for platform %[1]s: %[2]s"
 msgstr "获取 %[1]s 平台的监视器依赖项：%[2]s"
 
-#: arduino/cores/packagemanager/loader.go:700
+#: arduino/cores/packagemanager/loader.go:711
 msgid "getting parent dir of %[1]s: %[2]s"
 msgstr "正在获取 %[1]s 的父目录：%[2]s"
 
@@ -2785,7 +2817,7 @@ msgstr "正在获取 %[1]s 平台的工具依赖：%[2]s"
 msgid "importing sketch metadata: %s"
 msgstr "正在导入项目元数据：%s"
 
-#: arduino/libraries/librariesmanager/install.go:93
+#: arduino/libraries/librariesmanager/install.go:103
 msgid "install directory not set"
 msgstr "未设置安装目录"
 
@@ -2849,7 +2881,7 @@ msgstr "无效的空库版本：%s"
 msgid "invalid empty option found"
 msgstr "发现无效的空选项"
 
-#: arduino/libraries/librariesmanager/install.go:284
+#: arduino/libraries/librariesmanager/install.go:298
 msgid "invalid git url"
 msgstr "无效的git地址"
 
@@ -2929,24 +2961,24 @@ msgstr "无效的版本："
 msgid "key not found in settings"
 msgstr "在设置中找不到键"
 
-#: cli/core/search.go:48
+#: cli/core/search.go:47
 msgid "keywords"
 msgstr "关键字"
 
-#: arduino/libraries/librariesmanager/install.go:164
-#: arduino/libraries/librariesmanager/install.go:207
+#: arduino/libraries/librariesmanager/install.go:176
+#: arduino/libraries/librariesmanager/install.go:218
 msgid "library %s already installed"
 msgstr "%s 库已安装"
 
-#: arduino/libraries/librariesmanager/install.go:39
+#: arduino/libraries/librariesmanager/install.go:40
 msgid "library already installed"
 msgstr "库已安装"
 
-#: arduino/libraries/librariesmanager/install.go:331
+#: arduino/libraries/librariesmanager/install.go:345
 msgid "library not valid"
 msgstr "库无效"
 
-#: arduino/libraries/librariesmanager/librariesmanager.go:226
+#: arduino/libraries/librariesmanager/librariesmanager.go:188
 msgid "library path does not exist: %s"
 msgstr "库路径不存在：%s"
 
@@ -2964,7 +2996,7 @@ msgstr "正在加载 %[1]s: %[2]s"
 msgid "loading boards: %s"
 msgstr "正在加载开发板：%s"
 
-#: arduino/cores/packagemanager/loader.go:655
+#: arduino/cores/packagemanager/loader.go:666
 msgid "loading bundled tools from %s"
 msgstr "正在从 %s 下载附加工具"
 
@@ -2973,8 +3005,8 @@ msgstr "正在从 %s 下载附加工具"
 msgid "loading json index file %[1]s: %[2]s"
 msgstr "正在加载 %[1]s json 索引文件：%[2]s"
 
-#: arduino/libraries/librariesmanager/librariesmanager.go:205
-#: arduino/libraries/librariesmanager/librariesmanager.go:231
+#: arduino/libraries/librariesmanager/librariesmanager.go:170
+#: arduino/libraries/librariesmanager/librariesmanager.go:193
 msgid "loading library from %[1]s: %[2]s"
 msgstr "正在从 %[1]s 加载库：%[2]s"
 
@@ -2999,7 +3031,7 @@ msgstr "安装所需 %s 平台"
 msgid "loading required tool %s"
 msgstr "安装所需 %s 工具"
 
-#: arduino/cores/packagemanager/loader.go:614
+#: arduino/cores/packagemanager/loader.go:625
 msgid "loading tool release in %s"
 msgstr "在 %s 中加载工具发行版本"
 
@@ -3035,7 +3067,7 @@ msgstr "缺少平台 %[1]s 发行版本：%[2]s 被开发板 %[3]s 引用"
 msgid "monitor release not found: %s"
 msgstr "未找到公开监视器：%s"
 
-#: arduino/libraries/librariesmanager/install.go:181
+#: arduino/libraries/librariesmanager/install.go:193
 #: arduino/resources/install.go:94
 msgid "moving extracted archive to destination dir: %s"
 msgstr "正在将提取的存档移动到目标目录：%s"
@@ -3056,7 +3088,7 @@ msgstr "没有找到 %s 工具与当前操作系统兼容的版本"
 msgid "no executable specified"
 msgstr "没有指定可执行文件"
 
-#: commands/daemon/daemon.go:102
+#: commands/daemon/daemon.go:101
 msgid "no instance specified"
 msgstr "没有指定实例"
 
@@ -3144,7 +3176,7 @@ msgstr "%s 平台未安装"
 
 #: arduino/cores/packagemanager/install_uninstall.go:228
 #: arduino/cores/packagemanager/install_uninstall.go:276
-#: arduino/cores/packagemanager/loader.go:457 commands/compile/compile.go:101
+#: arduino/cores/packagemanager/loader.go:457 commands/compile/compile.go:98
 msgid "platform not installed"
 msgstr "平台未安装"
 
@@ -3172,22 +3204,22 @@ msgstr "不支持协议版本：请求了 %[1]d，获得了 %[2]d"
 msgid "protocol version not supported: requested 1, got %d"
 msgstr "不支持协议版本：请求 1，得到 %d"
 
-#: arduino/cores/packagemanager/loader.go:705
+#: arduino/cores/packagemanager/loader.go:716
 msgid "reading %[1]s: %[2]s"
 msgstr "正在读取 %[1]s： %[2]s"
 
-#: arduino/libraries/librariesmanager/librariesmanager.go:196
+#: arduino/libraries/librariesmanager/librariesmanager.go:161
 msgid "reading dir %[1]s: %[2]s"
 msgstr "正在读取 %[1]s 目录 : %[2]s"
 
 #: arduino/cores/packagemanager/loader.go:71
 #: arduino/cores/packagemanager/loader.go:153
 #: arduino/cores/packagemanager/loader.go:260
-#: arduino/cores/packagemanager/loader.go:606
+#: arduino/cores/packagemanager/loader.go:617
 msgid "reading directory %s"
 msgstr "正在读取 %s 目录"
 
-#: arduino/libraries/librariesmanager/install.go:304
+#: arduino/libraries/librariesmanager/install.go:318
 msgid "reading directory %s content: %w"
 msgstr "正在读取 %s 目录的内容：%w"
 
@@ -3207,7 +3239,7 @@ msgstr "正在读取库存文件：%w"
 msgid "reading lib headers: %s"
 msgstr "正在读取 lib 头文件：%s"
 
-#: arduino/libraries/libraries.go:235
+#: arduino/libraries/libraries.go:234
 msgid "reading lib src dir: %s"
 msgstr "正在读取 lib src 目录：%s"
 
@@ -3244,7 +3276,7 @@ msgstr "发行不能为无"
 msgid "removing corrupted archive file: %s"
 msgstr "正在删除损坏的存档文件：%s"
 
-#: arduino/libraries/librariesmanager/install.go:96
+#: arduino/libraries/librariesmanager/install.go:106
 msgid "removing lib directory: %s"
 msgstr "正在删除lib目录：%s"
 
@@ -3260,11 +3292,11 @@ msgstr "找不到 %[2]s 平台所需的 %[1]s 版本"
 msgid "retrieving Arduino public keys: %s"
 msgstr "正在检索Arduino密钥：%s"
 
-#: arduino/libraries/loader.go:109 arduino/libraries/loader.go:140
+#: arduino/libraries/loader.go:109 arduino/libraries/loader.go:141
 msgid "scanning examples: %s"
 msgstr "扫描示例：%s"
 
-#: arduino/cores/packagemanager/loader.go:691
+#: arduino/cores/packagemanager/loader.go:702
 msgid "searching for builtin_tools_versions.txt in %[1]s: %[2]s"
 msgstr "在 %[1]s 中搜索 builtin_tools_versions.txt：%[2]s"
 
@@ -3284,17 +3316,13 @@ msgstr "项目路径无效"
 msgid "sketchPath"
 msgstr "项目路径"
 
-#: arduino/cores/packagemanager/loader.go:520
-msgid "skipping loading of boards %s: malformed custom board options"
-msgstr "跳过加载 %s 开发板：格式错误的自定义开发板选项"
-
 #: legacy/builder/utils/utils.go:430
 msgid "source is not a directory"
 msgstr "来源不是目录"
 
 #: arduino/discovery/discoverymanager/discoverymanager.go:194
 msgid "starting discovery %s"
-msgstr ""
+msgstr "开始发现 %s"
 
 #: arduino/resources/checksums.go:119
 msgid "testing archive checksum: %s"
@@ -3363,7 +3391,7 @@ msgstr "找不到发行工具：%s"
 msgid "tool version %s not found"
 msgstr "未找到工具的 %s 版本"
 
-#: commands/lib/install.go:59
+#: commands/lib/install.go:60
 msgid ""
 "two different versions of the library %[1]s are required: %[2]s and %[3]s"
 msgstr "需要 %[1]s 库的两个不同版本：%[2]s 和 %[3]s"
