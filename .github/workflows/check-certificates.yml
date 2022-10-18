@@ -37,8 +37,8 @@ jobs:
             certificate-secret: INSTALLER_CERT_MAC_P12 # Name of the secret that contains the certificate.
             password-secret: INSTALLER_CERT_MAC_PASSWORD # Name of the secret that contains the certificate password.
           - identifier: Windows signing certificate
-            certificate-secret: INSTALLER_CERT_WINDOWS_PASSWORD
-            password-secret: INSTALLER_CERT_WINDOWS_PFX
+            certificate-secret: INSTALLER_CERT_WINDOWS_PFX
+            password-secret: INSTALLER_CERT_WINDOWS_PASSWORD
 
     steps:
       - name: Set certificate path environment variable
