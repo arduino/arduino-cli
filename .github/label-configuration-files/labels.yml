@@ -19,3 +19,9 @@
 - name: "topic: packaging"
   color: "00ffff"
   description: Related to the release distribution package
+- name: "topic: build-process"
+  color: "00ffff"
+  description: Related to the sketch build process
+- name: "topic: package-management"
+  color: "00ffff"
+  description: Related to the packaging and managing of the platform/libraries
