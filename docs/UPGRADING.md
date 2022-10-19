@@ -54,6 +54,16 @@ func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *pat
 
 The errors are automatically sent to output via `feedback` package, as for the other `Init*` functions.
 
+### `board attach` CLI command changed behaviour
+
+The `board attach` CLI command has changed behaviour: now it just pick whatever port and FQBN is passed as parameter and
+saves it in the `sketch.json` file, without any validity check or board autodetection.
+
+### `cc.arduino.cli.commands.v1.BoardAttach` gRPC interface command removal
+
+The `cc.arduino.cli.commands.v1.BoardAttach` gRPC command have been removed. This feature is no more available throguh
+gRPC.
+
 ## 0.28.0
 
 ### Breaking changes in libraries name handling
