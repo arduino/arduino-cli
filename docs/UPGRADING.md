@@ -2,6 +2,26 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## 0.29.0
+
+### Changes in golang functions `github.com/arduino/arduino-cli/cli/instance.Init` and `InitWithProfile`
+
+The following functions:
+
+```go
+func Init(instance *rpc.Instance) []error { }
+func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *paths.Path) (*rpc.Profile, []error) { }
+```
+
+no longer return the errors array:
+
+```go
+func Init(instance *rpc.Instance) { }
+func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *paths.Path) *rpc.Profile { }
+```
+
+The errors are automatically sent to output via `feedback` package, as for the other `Init*` functions.
+
 ## 0.28.0
 
 ### Breaking changes in libraries name handling

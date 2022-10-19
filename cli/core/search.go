@@ -73,9 +73,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	for _, err := range instance.Init(inst) {
-		feedback.Errorf(tr("Error initializing instance: %v"), err)
-	}
+	instance.Init(inst)
 
 	arguments := strings.ToLower(strings.Join(args, " "))
 	logrus.Infof("Executing `arduino-cli core search` with args: '%s'", arguments)

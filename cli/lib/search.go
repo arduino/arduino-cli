@@ -69,9 +69,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		os.Exit(errorcodes.ErrGeneric)
 	}
 
-	for _, err := range instance.Init(inst) {
-		feedback.Errorf(tr("Error initializing instance: %v"), err)
-	}
+	instance.Init(inst)
 
 	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
 		Instance: inst,
