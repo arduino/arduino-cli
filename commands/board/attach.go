@@ -27,13 +27,10 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	discovery "github.com/arduino/board-discovery"
 	"github.com/arduino/go-paths-helper"
 )
-
-var tr = i18n.Tr
 
 // Attach FIXMEDOC
 func Attach(ctx context.Context, req *rpc.BoardAttachRequest, taskCB rpc.TaskProgressCB) (*rpc.BoardAttachResponse, error) {
