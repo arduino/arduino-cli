@@ -560,7 +560,7 @@ def test_lib_list_with_updatable_flag(run_command):
     result = run_command(["lib", "list", "--updatable"])
     assert result.ok
     assert "" == result.stderr
-    assert "No updates available." in result.stdout.strip()
+    assert "No libraries update is available." in result.stdout.strip()
     # No library to update in json
     result = run_command(["lib", "list", "--updatable", "--format", "json"])
     assert result.ok

@@ -64,10 +64,10 @@ func TestUpdateShowingOutdated(t *testing.T) {
 		lines[i] = strings.TrimSpace(lines[i])
 	}
 
-	require.Contains(t, lines[0], "Downloading index: package_index.tar.bz2 downloaded")
-	require.Contains(t, lines[1], "Downloading index: library_index.tar.bz2 downloaded")
-	require.True(t, strings.HasPrefix(lines[3], "Arduino AVR Boards"))
-	require.True(t, strings.HasPrefix(lines[6], "USBHost"))
+	require.Contains(t, lines[0], "Downloading index: library_index.tar.bz2 downloaded")
+	require.Contains(t, lines[1], "Downloading index: package_index.tar.bz2 downloaded")
+	require.Contains(t, lines[3], "Arduino AVR Boards")
+	require.Contains(t, lines[6], "USBHost")
 }
 
 func TestUpdateWithUrlNotFound(t *testing.T) {
