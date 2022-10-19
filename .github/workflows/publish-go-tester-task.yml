@@ -132,32 +132,6 @@ jobs:
           path: ${{ env.DIST_DIR }}/${{ matrix.os.path }}
           name: ${{ matrix.os.name }}
 
-  proto-files:
-    needs:
-      - package-name-prefix
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Install Task
-        uses: arduino/setup-task@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: 3.x
-
-      - name: Collect proto files
-        run: task protoc:collect
-
-      - name: Upload proto files zip
-        uses: actions/upload-artifact@v3
-        with:
-          path: ${{ env.DIST_DIR }}/*.zip
-          name: rpc-protocol-files
-
   checksums:
     needs:
       - build
@@ -185,3 +159,35 @@ jobs:
         with:
           path: ./*checksums.txt
           name: checksums
+
+  proto-files:
+    # Run this after checksums or the uploaded proto files zip
+    # will make the checksum job always fail
+    needs:
+      - checksums
+      - package-name-prefix
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Collect proto files
+        run: |
+          PACKAGE_NAME_PREFIX=${{ needs.package-name-prefix.outputs.prefix }}
+          export PACKAGE_NAME_PREFIX
+          task protoc:collect
+
+      - name: Upload proto files zip
+        uses: actions/upload-artifact@v3
+        with:
+          path: ${{ env.DIST_DIR }}/*.zip
+          name: rpc-protocol-files
