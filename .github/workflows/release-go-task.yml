@@ -256,6 +256,15 @@ jobs:
           unzip -p /tmp/3.0.0.zip semver-tool-3.0.0/src/semver >/tmp/semver && chmod +x /tmp/semver
           if [[ "$(/tmp/semver get prerel ${{ needs.create-release-artifacts.outputs.version }} )" ]]; then echo "::set-output name=IS_PRE::true"; fi
 
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Collect proto files
+        run: task protoc:collect
+
       - name: Create Github Release and upload artifacts
         uses: ncipollo/release-action@v1
         with:
