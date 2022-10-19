@@ -69,10 +69,6 @@ service ArduinoCoreService {
   // Requests details about a board
   rpc BoardDetails(BoardDetailsRequest) returns (BoardDetailsResponse);
 
-  // Attach a board to a sketch. When the `fqbn` field of a request is not
-  // provided, the FQBN of the attached board will be used.
-  rpc BoardAttach(BoardAttachRequest) returns (stream BoardAttachResponse);
-
   // List the boards currently connected to the computer.
   rpc BoardList(BoardListRequest) returns (BoardListResponse);
 
