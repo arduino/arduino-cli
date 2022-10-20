@@ -132,39 +132,8 @@ jobs:
           path: ${{ env.DIST_DIR }}/${{ matrix.os.path }}
           name: ${{ matrix.os.name }}
 
-  checksums:
-    needs:
-      - build
-      - package-name-prefix
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-
-      - name: Output checksum
-        run: |
-          TAG="${{ needs.package-name-prefix.outputs.prefix }}git-snapshot"
-          declare -a artifacts=($(ls -d */))
-          for artifact in ${artifacts[@]}
-          do
-            cd $artifact
-            checksum=$(sha256sum ${{ env.PROJECT_NAME }}_${TAG}*)
-            cd ..
-            echo $checksum >> ${TAG}-checksums.txt
-          done
-
-      - name: Upload checksum artifact
-        uses: actions/upload-artifact@v3
-        with:
-          path: ./*checksums.txt
-          name: checksums
-
   proto-files:
-    # Run this after checksums or the uploaded proto files zip
-    # will make the checksum job always fail
     needs:
-      - checksums
       - package-name-prefix
     runs-on: ubuntu-latest
 
@@ -191,3 +160,32 @@ jobs:
         with:
           path: ${{ env.DIST_DIR }}/*.zip
           name: rpc-protocol-files
+
+  checksums:
+    needs:
+      - build
+      - proto-files
+      - package-name-prefix
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Output checksum
+        run: |
+          TAG="${{ needs.package-name-prefix.outputs.prefix }}git-snapshot"
+          declare -a artifacts=($(ls -d */))
+          for artifact in ${artifacts[@]}
+          do
+            cd $artifact
+            checksum=$(sha256sum ${{ env.PROJECT_NAME }}_${TAG}*)
+            cd ..
+            echo $checksum >> ${TAG}-checksums.txt
+          done
+
+      - name: Upload checksum artifact
+        uses: actions/upload-artifact@v3
+        with:
+          path: ./*checksums.txt
+          name: checksums
