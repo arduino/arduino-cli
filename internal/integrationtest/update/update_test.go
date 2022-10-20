@@ -99,3 +99,30 @@ func TestUpdateWithUrlInternalServerError(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, string(stdout), "Downloading index: test_index.json Server responded with: 500 Internal Server Error")
 }
+
+func TestUpdateShowingOutdatedUsingLibraryWithInvalidVersion(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Install latest version of a library
+	_, _, err = cli.Run("lib", "install", "WiFi101")
+	require.NoError(t, err)
+
+	// Verifies library doesn't get updated
+	stdout, _, err := cli.Run("update", "--show-outdated")
+	require.NoError(t, err)
+	require.NotContains(t, string(stdout), "WiFi101")
+
+	// Changes the version of the currently installed library so that it's
+	// invalid
+	libPath := cli.SketchbookDir().Join("libraries", "WiFi101", "library.properties")
+	require.NoError(t, libPath.WriteFile([]byte("name=WiFi101\nversion=1.0001")))
+
+	// Verifies library gets updated
+	stdout, _, err = cli.Run("update", "--show-outdated")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "WiFi101")
+}
