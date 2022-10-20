@@ -16,15 +16,6 @@
 from pathlib import Path
 
 
-def test_update(run_command):
-    res = run_command(["update"])
-    assert res.ok
-    lines = [l.strip() for l in res.stdout.splitlines()]
-
-    assert "Downloading index: package_index.tar.bz2 downloaded" in lines
-    assert "Downloading index: library_index.tar.bz2 downloaded" in lines
-
-
 def test_update_showing_outdated(run_command):
     # Updates index for cores and libraries
     run_command(["core", "update-index"])
