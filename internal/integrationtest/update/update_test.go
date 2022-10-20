@@ -16,6 +16,7 @@
 package update_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
@@ -30,4 +31,40 @@ func TestUpdate(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "Downloading index: package_index.tar.bz2 downloaded")
 	require.Contains(t, string(stdout), "Downloading index: library_index.tar.bz2 downloaded")
+}
+
+func TestUpdateShowingOutdated(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Updates index for cores and libraries
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "update-index")
+	require.NoError(t, err)
+
+	// Installs an outdated core and library
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.6.3")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "USBHost@1.0.0")
+	require.NoError(t, err)
+
+	// Installs latest version of a core and a library
+	_, _, err = cli.Run("core", "install", "arduino:samd")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "ArduinoJson")
+	require.NoError(t, err)
+
+	// Verifies outdated cores and libraries are printed after updating indexes
+	stdout, _, err := cli.Run("update", "--show-outdated")
+	require.NoError(t, err)
+	lines := strings.Split(string(stdout), "\n")
+	for i := range lines {
+		lines[i] = strings.TrimSpace(lines[i])
+	}
+
+	require.Contains(t, lines[0], "Downloading index: package_index.tar.bz2 downloaded")
+	require.Contains(t, lines[1], "Downloading index: library_index.tar.bz2 downloaded")
+	require.True(t, strings.HasPrefix(lines[3], "Arduino AVR Boards"))
+	require.True(t, strings.HasPrefix(lines[6], "USBHost"))
 }

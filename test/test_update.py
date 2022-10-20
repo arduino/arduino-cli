@@ -16,30 +16,6 @@
 from pathlib import Path
 
 
-def test_update_showing_outdated(run_command):
-    # Updates index for cores and libraries
-    run_command(["core", "update-index"])
-    run_command(["lib", "update-index"])
-
-    # Installs an outdated core and library
-    run_command(["core", "install", "arduino:avr@1.6.3"])
-    assert run_command(["lib", "install", "USBHost@1.0.0"])
-
-    # Installs latest version of a core and a library
-    run_command(["core", "install", "arduino:samd"])
-    assert run_command(["lib", "install", "ArduinoJson"])
-
-    # Verifies outdated cores and libraries are printed after updating indexes
-    result = run_command(["update", "--show-outdated"])
-    assert result.ok
-    lines = [l.strip() for l in result.stdout.splitlines()]
-
-    assert "Downloading index: package_index.tar.bz2 downloaded" in lines
-    assert "Downloading index: library_index.tar.bz2 downloaded" in lines
-    assert lines[-5].startswith("Arduino AVR Boards")
-    assert lines[-2].startswith("USBHost")
-
-
 def test_update_with_url_not_found(run_command, httpserver):
     assert run_command(["update"])
 
