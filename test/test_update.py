@@ -16,19 +16,6 @@
 from pathlib import Path
 
 
-def test_update_with_url_not_found(run_command, httpserver):
-    assert run_command(["update"])
-
-    # Brings up a local server to fake a failure
-    httpserver.expect_request("/test_index.json").respond_with_data(status=404)
-    url = httpserver.url_for("/test_index.json")
-
-    res = run_command(["update", f"--additional-urls={url}"])
-    assert res.failed
-    lines = [l.strip() for l in res.stdout.splitlines()]
-    assert "Downloading index: test_index.json Server responded with: 404 NOT FOUND" in lines
-
-
 def test_update_with_url_internal_server_error(run_command, httpserver):
     assert run_command(["update"])
 

@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -67,4 +68,19 @@ func TestUpdateShowingOutdated(t *testing.T) {
 	require.Contains(t, lines[1], "Downloading index: library_index.tar.bz2 downloaded")
 	require.True(t, strings.HasPrefix(lines[3], "Arduino AVR Boards"))
 	require.True(t, strings.HasPrefix(lines[6], "USBHost"))
+}
+
+func TestUpdateWithUrlNotFound(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Brings up a local server to fake a failure
+	url := env.HTTPServeFileError(8000, paths.New("test_index.json"), 404)
+
+	stdout, _, err := cli.Run("update", "--additional-urls="+url.String())
+	require.Error(t, err)
+	require.Contains(t, string(stdout), "Downloading index: test_index.json Server responded with: 404 Not Found")
 }
