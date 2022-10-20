@@ -16,6 +16,7 @@
 package lib_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
@@ -135,4 +136,45 @@ func TestDuplicateLibInstallDetection(t *testing.T) {
 	_, stdErr, err = cli.Run("lib", "uninstall", "ArduinoOTA")
 	require.Error(t, err)
 	require.Contains(t, string(stdErr), "The library ArduinoOTA has multiple installations")
+}
+
+func TestLibDepsOutput(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Updates index for cores and libraries
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "update-index")
+	require.NoError(t, err)
+
+	// Install some libraries that are dependencies of another library
+	_, _, err = cli.Run("lib", "install", "MKRWAN@1.1.0")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "WiFi101@0.16.1")
+	require.NoError(t, err)
+
+	stdOut, _, err := cli.Run("lib", "deps", "Arduino_ConnectionHandler@0.6.6", "--no-color")
+	require.NoError(t, err)
+	lines := strings.Split(strings.TrimSpace(string(stdOut)), "\n")
+	require.Len(t, lines, 7)
+	require.Equal(t, "✓ MKRWAN 1.1.0 is already installed.", lines[0])
+	require.Equal(t, "✓ WiFi101 0.16.1 is already installed.", lines[1])
+	require.Equal(t, "✕ Arduino_ConnectionHandler 0.6.6 must be installed.", lines[2])
+	require.Equal(t, "✕ Arduino_DebugUtils 1.3.0 must be installed.", lines[3])
+	require.Equal(t, "✕ MKRGSM 1.5.0 must be installed.", lines[4])
+	require.Equal(t, "✕ MKRNB 1.5.1 must be installed.", lines[5])
+	require.Equal(t, "✕ WiFiNINA 1.8.13 must be installed.", lines[6])
+
+	stdOut, _, err = cli.Run("lib", "deps", "Arduino_ConnectionHandler@0.6.6", "--format", "json")
+	require.NoError(t, err)
+	expectedOutput := `{"dependencies":[
+	{"name":"Arduino_ConnectionHandler","version_required":"0.6.6"},
+	{"name":"Arduino_DebugUtils","version_required":"1.3.0"},
+	{"name":"MKRGSM","version_required":"1.5.0"},
+	{"name":"MKRNB","version_required":"1.5.1"},
+	{"name":"MKRWAN","version_required":"1.1.0","version_installed":"1.1.0"},
+	{"name":"WiFi101","version_required":"0.16.1","version_installed":"0.16.1"},
+	{"name":"WiFiNINA","version_required":"1.8.13"}]}`
+	require.JSONEq(t, expectedOutput, string(stdOut))
 }

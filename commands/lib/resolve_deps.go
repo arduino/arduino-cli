@@ -18,6 +18,7 @@ package lib
 import (
 	"context"
 	"errors"
+	"sort"
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/libraries"
@@ -74,5 +75,8 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 			VersionInstalled: installed,
 		})
 	}
+	sort.Slice(res, func(i, j int) bool {
+		return res[i].Name < res[j].Name
+	})
 	return &rpc.LibraryResolveDependenciesResponse{Dependencies: res}, nil
 }
