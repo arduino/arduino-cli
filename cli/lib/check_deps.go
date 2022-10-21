@@ -83,10 +83,18 @@ func (dr checkDepResult) Data() interface{} {
 func (dr checkDepResult) String() string {
 	res := ""
 	deps := dr.deps.Dependencies
+
+	// Sort depedencies alphabetically and then puts installed ones on top
 	sort.Slice(deps, func(i, j int) bool {
-		return deps[i].Name > deps[j].Name &&
-			deps[i].VersionInstalled > deps[j].VersionInstalled
+		return deps[i].Name < deps[j].Name
 	})
+	sort.SliceStable(deps, func(i, j int) bool {
+		if deps[i].VersionInstalled != "" && deps[j].VersionInstalled == "" {
+			return true
+		}
+		return false
+	})
+
 	for _, dep := range deps {
 		res += outputDep(dep)
 	}
