@@ -345,3 +345,17 @@ func TestCoreUninstallToolDependencyRemoval(t *testing.T) {
 	// The tool arduino:avrdude@6.3.0-arduino17 that is only a dep of arduino:avr should have been removed
 	require.False(t, avrDudeBinariesPath.Join("avrdude").Exist() || avrDudeBinariesPath.Join("avrdude.exe").Exist())
 }
+
+func TestCoreZipslip(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	url := "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
+	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url)
+	require.NoError(t, err)
+
+	// Install a core and check if malicious content has been extracted.
+	_, _, err = cli.Run("core", "install", "zipslip:x86", "--additional-urls="+url)
+	require.Error(t, err)
+	require.NoFileExists(t, paths.TempDir().Join("evil.txt").String())
+}
