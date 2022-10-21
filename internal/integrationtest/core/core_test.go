@@ -359,3 +359,14 @@ func TestCoreZipslip(t *testing.T) {
 	require.Error(t, err)
 	require.NoFileExists(t, paths.TempDir().Join("evil.txt").String())
 }
+
+func TestCoreBrokenInstall(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	url := "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
+	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url)
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "brokenchecksum:x86", "--additional-urls="+url)
+	require.Error(t, err)
+}

@@ -47,12 +47,6 @@ def test_core_install_esp32(run_command, data_dir):
     assert (build_dir / f"{sketch_name}.ino.partitions.bin").exists()
 
 
-def test_core_broken_install(run_command):
-    url = "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
-    assert run_command(["core", "update-index", f"--additional-urls={url}"])
-    assert not run_command(["core", "install", "brokenchecksum:x86", "--additional-urls={url}"])
-
-
 def test_core_install_creates_installed_json(run_command, data_dir):
     assert run_command(["core", "update-index"])
     assert run_command(["core", "install", "arduino:avr@1.6.23"])
