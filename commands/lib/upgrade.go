@@ -17,11 +17,8 @@ package lib
 
 import (
 	"context"
-	"errors"
 
 	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
@@ -33,7 +30,7 @@ func LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.Downloa
 		return &arduino.InvalidInstanceError{}
 	}
 
-	if err := upgrade(lm, listLibraries(lm, true, false), downloadCB, taskCB); err != nil {
+	if err := upgrade(req.Instance, listLibraries(lm, true, false), downloadCB, taskCB); err != nil {
 		return err
 	}
 
@@ -47,6 +44,9 @@ func LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.Downloa
 // LibraryUpgrade upgrades a library
 func LibraryUpgrade(ctx context.Context, req *rpc.LibraryUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(req)
+	if lm == nil {
+		return &arduino.InvalidInstanceError{}
+	}
 
 	// Get the library to upgrade
 	name := req.GetName()
@@ -61,23 +61,21 @@ func LibraryUpgrade(ctx context.Context, req *rpc.LibraryUpgradeRequest, downloa
 	}
 
 	// Install update
-	return upgrade(lm, []*installedLib{lib}, downloadCB, taskCB)
+	return upgrade(req.Instance, []*installedLib{lib}, downloadCB, taskCB)
 }
 
-func upgrade(lm *librariesmanager.LibrariesManager, libs []*installedLib, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
-	// Go through the list and download them
+func upgrade(instance *rpc.Instance, libs []*installedLib, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	for _, lib := range libs {
-		if err := downloadLibrary(lm, lib.Available, downloadCB, taskCB); err != nil {
-			return err
+		libInstallReq := &rpc.LibraryInstallRequest{
+			Instance:    instance,
+			Name:        lib.Library.Name,
+			Version:     "",
+			NoDeps:      false,
+			NoOverwrite: false,
 		}
-	}
-
-	// Go through the list and install them
-	for _, lib := range libs {
-		if err := installLibrary(lm, lib.Available, libraries.User, taskCB); err != nil {
-			if !errors.Is(err, librariesmanager.ErrAlreadyInstalled) {
-				return err
-			}
+		err := LibraryInstall(context.Background(), libInstallReq, downloadCB, taskCB)
+		if err != nil {
+			return err
 		}
 	}
 
