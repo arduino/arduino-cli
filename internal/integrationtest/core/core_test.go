@@ -256,3 +256,49 @@ func TestCoreDownload(t *testing.T) {
 	require.NoError(t, err)
 	require.FileExists(t, cli.DownloadDir().Join("packages", "core-ArduinoCore-samd-1.8.12.tar.bz2").String())
 }
+
+func TestCoreInstall(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Install a specific core version
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.6.16")
+	require.NoError(t, err)
+	stdout, _, err := cli.Run("core", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".[] | select(.id == \"arduino:avr\") | .installed==\"1.6.16\"", "true")
+
+	// Replace it with the same with --no-overwrite (should NOT fail)
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.6.16", "--no-overwrite")
+	require.NoError(t, err)
+
+	// Replace it with a more recent one with --no-overwrite (should fail)
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.6.17", "--no-overwrite")
+	require.Error(t, err)
+
+	// Replace it with a more recent one without --no-overwrite (should succeed)
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.6.17")
+	require.NoError(t, err)
+	stdout, _, err = cli.Run("core", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".[] | select(.id == \"arduino:avr\") | .installed==\"1.6.17\"", "true")
+
+	// Confirm core is listed as "updatable"
+	stdout, _, err = cli.Run("core", "list", "--updatable", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".[] | select(.id == \"arduino:avr\") | .installed==\"1.6.17\"", "true")
+
+	// Upgrade the core to latest version
+	_, _, err = cli.Run("core", "upgrade", "arduino:avr")
+	require.NoError(t, err)
+	stdout, _, err = cli.Run("core", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".[] | select(.id == \"arduino:avr\") | .installed==\"1.6.17\"", "false")
+	// double check the code isn't updatable anymore
+	stdout, _, err = cli.Run("core", "list", "--updatable", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Empty(t, stdout)
+}
