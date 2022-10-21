@@ -51,3 +51,31 @@ func (env *Environment) HTTPServeFile(port uint16, path *paths.Path) *url.URL {
 
 	return fileURL
 }
+
+// HTTPServeFileError spawns an http server that serves a single file and responds
+// with the given error code.
+func (env *Environment) HTTPServeFileError(port uint16, path *paths.Path, code int) *url.URL {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/"+path.Base(), func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(code)
+	})
+	server := &http.Server{
+		Addr:    fmt.Sprintf(":%d", port),
+		Handler: mux,
+	}
+
+	t := env.T()
+	fileURL, err := url.Parse(fmt.Sprintf("http://127.0.0.1:%d/%s", port, path.Base()))
+	require.NoError(t, err)
+
+	go func() {
+		err := server.ListenAndServe()
+		require.Equal(t, err, http.ErrServerClosed)
+	}()
+
+	env.RegisterCleanUpCallback(func() {
+		server.Close()
+	})
+
+	return fileURL
+}
