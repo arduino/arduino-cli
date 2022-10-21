@@ -302,3 +302,21 @@ func TestCoreInstall(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Empty(t, stdout)
 }
+
+func TestCoreUninstall(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+	stdout, _, err := cli.Run("core", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".[] | select(.id == \"arduino:avr\") | . != \"\"", "true")
+	_, _, err = cli.Run("core", "uninstall", "arduino:avr")
+	require.NoError(t, err)
+	stdout, _, err = cli.Run("core", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Empty(t, stdout)
+}

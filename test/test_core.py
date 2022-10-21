@@ -47,29 +47,6 @@ def test_core_install_esp32(run_command, data_dir):
     assert (build_dir / f"{sketch_name}.ino.partitions.bin").exists()
 
 
-def _in(jsondata, name, version=None):
-    installed_cores = json.loads(jsondata)
-    for c in installed_cores:
-        if name == c.get("id"):
-            if version is None:
-                return True
-            elif version == c.get("installed"):
-                return True
-    return False
-
-
-def test_core_uninstall(run_command):
-    assert run_command(["core", "update-index"])
-    assert run_command(["core", "install", "arduino:avr"])
-    result = run_command(["core", "list", "--format", "json"])
-    assert result.ok
-    assert _in(result.stdout, "arduino:avr")
-    assert run_command(["core", "uninstall", "arduino:avr"])
-    result = run_command(["core", "list", "--format", "json"])
-    assert result.ok
-    assert not _in(result.stdout, "arduino:avr")
-
-
 def test_core_uninstall_tool_dependency_removal(run_command, data_dir):
     # These platforms both have a dependency on the arduino:avr-gcc@7.3.0-atmel3.6.1-arduino5 tool
     # arduino:avr@1.8.2 has a dependency on arduino:avrdude@6.3.0-arduino17
