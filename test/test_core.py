@@ -26,21 +26,6 @@ from pathlib import Path
 import semver
 
 
-def test_core_updateindex_url_not_found(run_command, httpserver):
-    assert run_command(["core", "update-index"])
-
-    # Brings up a local server to fake a failure
-    httpserver.expect_request("/test_index.json").respond_with_data(status=404)
-    url = httpserver.url_for("/test_index.json")
-
-    result = run_command(["core", "update-index", f"--additional-urls={url}"])
-    assert result.failed
-    linesout = [l.strip() for l in result.stdout.splitlines()]
-    assert "Downloading index: test_index.json Server responded with: 404 NOT FOUND" in linesout
-    lineserr = [l.strip() for l in result.stderr.splitlines()]
-    assert "Some indexes could not be updated." in lineserr
-
-
 def test_core_updateindex_internal_server_error(run_command, httpserver):
     assert run_command(["core", "update-index"])
 

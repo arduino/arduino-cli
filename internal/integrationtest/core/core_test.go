@@ -188,3 +188,19 @@ func TestCoreSearchNoArgs(t *testing.T) {
 	requirejson.Query(t, stdout, " .[] | select(.name == \"test_core\") | . != \"\"", "true")
 	requirejson.Query(t, stdout, "length", fmt.Sprint(numPlatforms))
 }
+
+func TestCoreUpdateIndexUrlNotFound(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Brings up a local server to fake a failure
+	url := env.HTTPServeFileError(8000, paths.New("test_index.json"), 404)
+
+	stdout, stderr, err := cli.Run("core", "update-index", "--additional-urls="+url.String())
+	require.Error(t, err)
+	require.Contains(t, string(stdout), "Downloading index: test_index.json Server responded with: 404 Not Found")
+	require.Contains(t, string(stderr), "Some indexes could not be updated.")
+}
