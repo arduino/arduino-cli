@@ -219,3 +219,14 @@ func TestCoreUpdateIndexInternalServerError(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, string(stdout), "Downloading index: test_index.json Server responded with: 500 Internal Server Error")
 }
+
+func TestCoreInstallWithoutUpdateIndex(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Missing "core update-index"
+	// Download samd core pinned to 1.8.6
+	stdout, _, err := cli.Run("core", "install", "arduino:samd@1.8.6")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Downloading index: package_index.tar.bz2 downloaded")
+}
