@@ -62,6 +62,7 @@ in your [`PATH`](https://en.wikipedia.org/wiki/PATH%5F%28variable%29) or add the
 | ----------- | -------------------- | ---------------------- |
 | Linux       | [32 bit][linux32]    | [64 bit][linux64]      |
 | Linux ARM   | [32 bit][linuxarm32] | [64 bit][linuxarm64]   |
+| Linux ARMv6 | [32 bit][linuxarmv6] |                        |
 | Windows exe | [32 bit][windows32]  | [64 bit][windows64]    |
 | Windows msi |                      | [64 bit][windowsmsi64] |
 | macOS       |                      | [64 bit][macos64]      |
@@ -71,6 +72,7 @@ in your [`PATH`](https://en.wikipedia.org/wiki/PATH%5F%28variable%29) or add the
 [linux32]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_32bit.tar.gz
 [linuxarm64]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARM64.tar.gz
 [linuxarm32]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARMv7.tar.gz
+[linuxarmv6]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_ARMv6.tar.gz
 [windows64]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_64bit.zip
 [windows32]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_32bit.zip
 [windowsmsi64]: https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Windows_64bit.msi
@@ -94,6 +96,7 @@ to get the latest nightly build available for the supported platform, use the fo
 | ----------- | ---------------------------- | ------------------------------ |
 | Linux       | [32 bit][linux32-nightly]    | [64 bit][linux64-nightly]      |
 | Linux ARM   | [32 bit][linuxarm32-nightly] | [64 bit][linuxarm64-nightly]   |
+| Linux ARMv6 | [32 bit][linuxarmv6-nightly] |                                |
 | Windows exe | [32 bit][windows32-nightly]  | [64 bit][windows64-nightly]    |
 | Windows msi |                              | [64 bit][windowsmsi64-nightly] |
 | macOS       |                              | [64 bit][macos64-nightly]      |
@@ -103,6 +106,7 @@ to get the latest nightly build available for the supported platform, use the fo
 [linux32-nightly]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_32bit.tar.gz
 [linuxarm64-nightly]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARM64.tar.gz
 [linuxarm32-nightly]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARMv7.tar.gz
+[linuxarmv6-nightly]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Linux_ARMv6.tar.gz
 [windows64-nightly]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_64bit.zip
 [windows32-nightly]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_32bit.zip
 [windowsmsi64-nightly]: https://downloads.arduino.cc/arduino-cli/nightly/arduino-cli_nightly-latest_Windows_64bit.msi
