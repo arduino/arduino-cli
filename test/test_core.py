@@ -47,26 +47,6 @@ def test_core_install_esp32(run_command, data_dir):
     assert (build_dir / f"{sketch_name}.ino.partitions.bin").exists()
 
 
-def test_core_download(run_command, downloads_dir):
-    assert run_command(["core", "update-index"])
-
-    # Download a specific core version
-    assert run_command(["core", "download", "arduino:avr@1.6.16"])
-    assert os.path.exists(os.path.join(downloads_dir, "packages", "avr-1.6.16.tar.bz2"))
-
-    # Wrong core version
-    result = run_command(["core", "download", "arduino:avr@69.42.0"])
-    assert result.failed
-
-    # Wrong core
-    result = run_command(["core", "download", "bananas:avr"])
-    assert result.failed
-
-    # Wrong casing
-    result = run_command(["core", "download", "Arduino:Samd@1.8.12"])
-    assert os.path.exists(os.path.join(downloads_dir, "packages", "core-ArduinoCore-samd-1.8.12.tar.bz2"))
-
-
 def _in(jsondata, name, version=None):
     installed_cores = json.loads(jsondata)
     for c in installed_cores:

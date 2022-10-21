@@ -230,3 +230,29 @@ func TestCoreInstallWithoutUpdateIndex(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "Downloading index: package_index.tar.bz2 downloaded")
 }
+
+func TestCoreDownload(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Download a specific core version
+	_, _, err = cli.Run("core", "download", "arduino:avr@1.6.16")
+	require.NoError(t, err)
+	require.FileExists(t, cli.DownloadDir().Join("packages", "avr-1.6.16.tar.bz2").String())
+
+	// Wrong core version
+	_, _, err = cli.Run("core", "download", "arduino:avr@69.42.0")
+	require.Error(t, err)
+
+	// Wrong core
+	_, _, err = cli.Run("core", "download", "bananas:avr")
+	require.Error(t, err)
+
+	// Wrong casing
+	_, _, err = cli.Run("core", "download", "Arduino:Samd@1.8.12")
+	require.NoError(t, err)
+	require.FileExists(t, cli.DownloadDir().Join("packages", "core-ArduinoCore-samd-1.8.12.tar.bz2").String())
+}
