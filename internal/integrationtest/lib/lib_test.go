@@ -199,3 +199,48 @@ func TestLibDepsOutput(t *testing.T) {
 	require.Equal(t, "WiFiNINA", jsonDeps.Dependencies[6].Name)
 	require.Equal(t, jsonDeps.Dependencies[6].VersionInstalled, jsonDeps.Dependencies[6].VersionRequired)
 }
+
+func TestUpgradeLibraryWithDependencies(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Updates index for cores and libraries
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "update-index")
+	require.NoError(t, err)
+
+	// Install library
+	_, _, err = cli.Run("lib", "install", "Arduino_ConnectionHandler@0.3.3")
+	require.NoError(t, err)
+	stdOut, _, err := cli.Run("lib", "deps", "Arduino_ConnectionHandler@0.3.3", "--format", "json")
+	require.NoError(t, err)
+
+	var jsonDeps struct {
+		Dependencies []struct {
+			Name             string `json:"name"`
+			VersionRequired  string `json:"version_required"`
+			VersionInstalled string `json:"version_installed"`
+		} `json:"dependencies"`
+	}
+	err = json.Unmarshal(stdOut, &jsonDeps)
+	require.NoError(t, err)
+
+	require.Len(t, jsonDeps.Dependencies, 6)
+	require.Equal(t, "Arduino_ConnectionHandler", jsonDeps.Dependencies[0].Name)
+	require.Equal(t, "Arduino_DebugUtils", jsonDeps.Dependencies[1].Name)
+	require.Equal(t, "MKRGSM", jsonDeps.Dependencies[2].Name)
+	require.Equal(t, "MKRNB", jsonDeps.Dependencies[3].Name)
+	require.Equal(t, "WiFi101", jsonDeps.Dependencies[4].Name)
+	require.Equal(t, "WiFiNINA", jsonDeps.Dependencies[5].Name)
+
+	// Test lib upgrade also install new dependencies of already installed library
+	_, _, err = cli.Run("lib", "upgrade", "Arduino_ConnectionHandler")
+	require.NoError(t, err)
+	stdOut, _, err = cli.Run("lib", "deps", "Arduino_ConnectionHandler", "--format", "json")
+	require.NoError(t, err)
+
+	jsonOut := requirejson.Parse(t, stdOut)
+	dependency := jsonOut.Query(`.dependencies[] | select(.name=="MKRWAN")`)
+	require.Equal(t, dependency.Query(".version_required"), dependency.Query(".version_installed"))
+}
