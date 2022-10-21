@@ -26,19 +26,6 @@ from pathlib import Path
 import semver
 
 
-def test_core_updateindex_internal_server_error(run_command, httpserver):
-    assert run_command(["core", "update-index"])
-
-    # Brings up a local server to fake a failure
-    httpserver.expect_request("/test_index.json").respond_with_data(status=500)
-    url = httpserver.url_for("/test_index.json")
-
-    result = run_command(["core", "update-index", f"--additional-urls={url}"])
-    assert result.failed
-    lines = [l.strip() for l in result.stdout.splitlines()]
-    assert "Downloading index: test_index.json Server responded with: 500 INTERNAL SERVER ERROR" in lines
-
-
 def test_core_install_without_updateindex(run_command):
     # Missing "core update-index"
     # Download samd core pinned to 1.8.6
