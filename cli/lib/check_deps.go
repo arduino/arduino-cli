@@ -89,10 +89,7 @@ func (dr checkDepResult) String() string {
 		return deps[i].Name < deps[j].Name
 	})
 	sort.SliceStable(deps, func(i, j int) bool {
-		if deps[i].VersionInstalled != "" && deps[j].VersionInstalled == "" {
-			return true
-		}
-		return false
+		return deps[i].VersionInstalled != "" && deps[j].VersionInstalled == ""
 	})
 
 	for _, dep := range deps {
@@ -102,7 +99,6 @@ func (dr checkDepResult) String() string {
 }
 
 func outputDep(dep *rpc.LibraryDependencyStatus) string {
-
 	res := ""
 	green := color.New(color.FgGreen)
 	red := color.New(color.FgRed)
