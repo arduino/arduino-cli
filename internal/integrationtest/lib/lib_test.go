@@ -16,6 +16,7 @@
 package lib_test
 
 import (
+	"encoding/json"
 	"strings"
 	"testing"
 
@@ -149,36 +150,52 @@ func TestLibDepsOutput(t *testing.T) {
 	require.NoError(t, err)
 
 	// Install some libraries that are dependencies of another library
-	_, _, err = cli.Run("lib", "install", "Arduino_DebugUtils@1.3.0")
+	_, _, err = cli.Run("lib", "install", "Arduino_DebugUtils")
 	require.NoError(t, err)
-	_, _, err = cli.Run("lib", "install", "MKRGSM@1.5.0")
+	_, _, err = cli.Run("lib", "install", "MKRGSM")
 	require.NoError(t, err)
-	_, _, err = cli.Run("lib", "install", "MKRNB@1.5.1")
+	_, _, err = cli.Run("lib", "install", "MKRNB")
 	require.NoError(t, err)
-	_, _, err = cli.Run("lib", "install", "WiFiNINA@1.8.13")
+	_, _, err = cli.Run("lib", "install", "WiFiNINA")
 	require.NoError(t, err)
 
 	stdOut, _, err := cli.Run("lib", "deps", "Arduino_ConnectionHandler@0.6.6", "--no-color")
 	require.NoError(t, err)
 	lines := strings.Split(strings.TrimSpace(string(stdOut)), "\n")
 	require.Len(t, lines, 7)
-	require.Equal(t, "✓ Arduino_DebugUtils 1.3.0 is already installed.", lines[0])
-	require.Equal(t, "✓ MKRGSM 1.5.0 is already installed.", lines[1])
-	require.Equal(t, "✓ MKRNB 1.5.1 is already installed.", lines[2])
-	require.Equal(t, "✓ WiFiNINA 1.8.13 is already installed.", lines[3])
-	require.Equal(t, "✕ Arduino_ConnectionHandler 0.6.6 must be installed.", lines[4])
-	require.Equal(t, "✕ MKRWAN 1.1.0 must be installed.", lines[5])
-	require.Equal(t, "✕ WiFi101 0.16.1 must be installed.", lines[6])
+	require.Regexp(t, `^✓ Arduino_DebugUtils \d+\.\d+\.\d+ is already installed\.$`, lines[0])
+	require.Regexp(t, `^✓ MKRGSM \d+\.\d+\.\d+ is already installed\.$`, lines[1])
+	require.Regexp(t, `^✓ MKRNB \d+\.\d+\.\d+ is already installed\.$`, lines[2])
+	require.Regexp(t, `^✓ WiFiNINA \d+\.\d+\.\d+ is already installed\.$`, lines[3])
+	require.Regexp(t, `^✕ Arduino_ConnectionHandler \d+\.\d+\.\d+ must be installed\.$`, lines[4])
+	require.Regexp(t, `^✕ MKRWAN \d+\.\d+\.\d+ must be installed\.$`, lines[5])
+	require.Regexp(t, `^✕ WiFi101 \d+\.\d+\.\d+ must be installed\.$`, lines[6])
 
 	stdOut, _, err = cli.Run("lib", "deps", "Arduino_ConnectionHandler@0.6.6", "--format", "json")
 	require.NoError(t, err)
-	expectedOutput := `{"dependencies":[
-	{"name":"Arduino_ConnectionHandler","version_required":"0.6.6"},
-	{"name":"Arduino_DebugUtils","version_required":"1.3.0","version_installed":"1.3.0"},
-	{"name":"MKRGSM","version_required":"1.5.0","version_installed":"1.5.0"},
-	{"name":"MKRNB","version_required":"1.5.1","version_installed":"1.5.1"},
-	{"name":"MKRWAN","version_required":"1.1.0"},
-	{"name":"WiFi101","version_required":"0.16.1"},
-	{"name":"WiFiNINA","version_required":"1.8.13","version_installed":"1.8.13"}]}`
-	require.JSONEq(t, expectedOutput, string(stdOut))
+
+	var jsonDeps struct {
+		Dependencies []struct {
+			Name             string `json:"name"`
+			VersionRequired  string `json:"version_required"`
+			VersionInstalled string `json:"version_installed"`
+		} `json:"dependencies"`
+	}
+	err = json.Unmarshal(stdOut, &jsonDeps)
+	require.NoError(t, err)
+
+	require.Equal(t, "Arduino_ConnectionHandler", jsonDeps.Dependencies[0].Name)
+	require.Empty(t, jsonDeps.Dependencies[0].VersionInstalled)
+	require.Equal(t, "Arduino_DebugUtils", jsonDeps.Dependencies[1].Name)
+	require.Equal(t, jsonDeps.Dependencies[1].VersionInstalled, jsonDeps.Dependencies[1].VersionRequired)
+	require.Equal(t, "MKRGSM", jsonDeps.Dependencies[2].Name)
+	require.Equal(t, jsonDeps.Dependencies[2].VersionInstalled, jsonDeps.Dependencies[2].VersionRequired)
+	require.Equal(t, "MKRNB", jsonDeps.Dependencies[3].Name)
+	require.Equal(t, jsonDeps.Dependencies[3].VersionInstalled, jsonDeps.Dependencies[3].VersionRequired)
+	require.Equal(t, "MKRWAN", jsonDeps.Dependencies[4].Name)
+	require.Empty(t, jsonDeps.Dependencies[4].VersionInstalled)
+	require.Equal(t, "WiFi101", jsonDeps.Dependencies[5].Name)
+	require.Empty(t, jsonDeps.Dependencies[5].VersionInstalled)
+	require.Equal(t, "WiFiNINA", jsonDeps.Dependencies[6].Name)
+	require.Equal(t, jsonDeps.Dependencies[6].VersionInstalled, jsonDeps.Dependencies[6].VersionRequired)
 }
