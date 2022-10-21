@@ -16,6 +16,8 @@
 package lib_test
 
 import (
+	"encoding/json"
+	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
@@ -135,4 +137,65 @@ func TestDuplicateLibInstallDetection(t *testing.T) {
 	_, stdErr, err = cli.Run("lib", "uninstall", "ArduinoOTA")
 	require.Error(t, err)
 	require.Contains(t, string(stdErr), "The library ArduinoOTA has multiple installations")
+}
+
+func TestLibDepsOutput(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Updates index for cores and libraries
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "update-index")
+	require.NoError(t, err)
+
+	// Install some libraries that are dependencies of another library
+	_, _, err = cli.Run("lib", "install", "Arduino_DebugUtils")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "MKRGSM")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "MKRNB")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "WiFiNINA")
+	require.NoError(t, err)
+
+	stdOut, _, err := cli.Run("lib", "deps", "Arduino_ConnectionHandler@0.6.6", "--no-color")
+	require.NoError(t, err)
+	lines := strings.Split(strings.TrimSpace(string(stdOut)), "\n")
+	require.Len(t, lines, 7)
+	require.Regexp(t, `^✓ Arduino_DebugUtils \d+\.\d+\.\d+ is already installed\.$`, lines[0])
+	require.Regexp(t, `^✓ MKRGSM \d+\.\d+\.\d+ is already installed\.$`, lines[1])
+	require.Regexp(t, `^✓ MKRNB \d+\.\d+\.\d+ is already installed\.$`, lines[2])
+	require.Regexp(t, `^✓ WiFiNINA \d+\.\d+\.\d+ is already installed\.$`, lines[3])
+	require.Regexp(t, `^✕ Arduino_ConnectionHandler \d+\.\d+\.\d+ must be installed\.$`, lines[4])
+	require.Regexp(t, `^✕ MKRWAN \d+\.\d+\.\d+ must be installed\.$`, lines[5])
+	require.Regexp(t, `^✕ WiFi101 \d+\.\d+\.\d+ must be installed\.$`, lines[6])
+
+	stdOut, _, err = cli.Run("lib", "deps", "Arduino_ConnectionHandler@0.6.6", "--format", "json")
+	require.NoError(t, err)
+
+	var jsonDeps struct {
+		Dependencies []struct {
+			Name             string `json:"name"`
+			VersionRequired  string `json:"version_required"`
+			VersionInstalled string `json:"version_installed"`
+		} `json:"dependencies"`
+	}
+	err = json.Unmarshal(stdOut, &jsonDeps)
+	require.NoError(t, err)
+
+	require.Equal(t, "Arduino_ConnectionHandler", jsonDeps.Dependencies[0].Name)
+	require.Empty(t, jsonDeps.Dependencies[0].VersionInstalled)
+	require.Equal(t, "Arduino_DebugUtils", jsonDeps.Dependencies[1].Name)
+	require.Equal(t, jsonDeps.Dependencies[1].VersionInstalled, jsonDeps.Dependencies[1].VersionRequired)
+	require.Equal(t, "MKRGSM", jsonDeps.Dependencies[2].Name)
+	require.Equal(t, jsonDeps.Dependencies[2].VersionInstalled, jsonDeps.Dependencies[2].VersionRequired)
+	require.Equal(t, "MKRNB", jsonDeps.Dependencies[3].Name)
+	require.Equal(t, jsonDeps.Dependencies[3].VersionInstalled, jsonDeps.Dependencies[3].VersionRequired)
+	require.Equal(t, "MKRWAN", jsonDeps.Dependencies[4].Name)
+	require.Empty(t, jsonDeps.Dependencies[4].VersionInstalled)
+	require.Equal(t, "WiFi101", jsonDeps.Dependencies[5].Name)
+	require.Empty(t, jsonDeps.Dependencies[5].VersionInstalled)
+	require.Equal(t, "WiFiNINA", jsonDeps.Dependencies[6].Name)
+	require.Equal(t, jsonDeps.Dependencies[6].VersionInstalled, jsonDeps.Dependencies[6].VersionRequired)
 }

@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -81,7 +82,17 @@ func (dr checkDepResult) Data() interface{} {
 
 func (dr checkDepResult) String() string {
 	res := ""
-	for _, dep := range dr.deps.GetDependencies() {
+	deps := dr.deps.Dependencies
+
+	// Sort depedencies alphabetically and then puts installed ones on top
+	sort.Slice(deps, func(i, j int) bool {
+		return deps[i].Name < deps[j].Name
+	})
+	sort.SliceStable(deps, func(i, j int) bool {
+		return deps[i].VersionInstalled != "" && deps[j].VersionInstalled == ""
+	})
+
+	for _, dep := range deps {
 		res += outputDep(dep)
 	}
 	return res
