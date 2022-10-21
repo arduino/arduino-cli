@@ -126,3 +126,65 @@ func TestCoreSearch(t *testing.T) {
 	runSearch("ble nano", "arduino:mbed_nano")
 	runSearch("nano", "arduino:avr", "arduino:megaavr", "arduino:samd", "arduino:mbed_nano")
 }
+
+func TestCoreSearchNoArgs(t *testing.T) {
+	// This tests `core search` with and without additional URLs in case no args
+	// are passed (i.e. all results are shown).
+
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Set up an http server to serve our custom index file
+	testIndex := paths.New("..", "testdata", "test_index.json")
+	url := env.HTTPServeFile(8000, testIndex)
+
+	// update custom index and install test core (installed cores affect `core search`)
+	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url.String())
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "test:x86", "--additional-urls="+url.String())
+	require.NoError(t, err)
+
+	// list all with no additional urls, ensure the test core won't show up
+	stdout, _, err := cli.Run("core", "search")
+	require.NoError(t, err)
+	var lines [][]string
+	for _, v := range strings.Split(strings.TrimSpace(string(stdout)), "\n") {
+		lines = append(lines, strings.Fields(strings.TrimSpace(v)))
+	}
+	// The header is printed on the first lines
+	require.Equal(t, []string{"test:x86", "2.0.0", "test_core"}, lines[19])
+	// We use black to format and flake8 to lint .py files but they disagree on certain
+	// things like this one, thus we ignore this specific flake8 rule and stand by black
+	// opinion.
+	// We ignore this specific case because ignoring it globally would probably cause more
+	// issue. For more info about the rule see: https://www.flake8rules.com/rules/E203.html
+	numPlatforms := len(lines) - 1 // noqa: E203
+
+	// same thing in JSON format, also check the number of platforms found is the same
+	stdout, _, err = cli.Run("core", "search", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, " .[] | select(.name == \"test_core\") | . != \"\"", "true")
+	requirejson.Query(t, stdout, "length", fmt.Sprint(numPlatforms))
+
+	// list all with additional urls, check the test core is there
+	stdout, _, err = cli.Run("core", "search", "--additional-urls="+url.String())
+	require.NoError(t, err)
+	lines = nil
+	for _, v := range strings.Split(strings.TrimSpace(string(stdout)), "\n") {
+		lines = append(lines, strings.Fields(strings.TrimSpace(v)))
+	}
+	// The header is printed on the first lines
+	require.Equal(t, []string{"test:x86", "2.0.0", "test_core"}, lines[20])
+	// We use black to format and flake8 to lint .py files but they disagree on certain
+	// things like this one, thus we ignore this specific flake8 rule and stand by black
+	// opinion.
+	// We ignore this specific case because ignoring it globally would probably cause more
+	// issue. For more info about the rule see: https://www.flake8rules.com/rules/E203.html
+	numPlatforms = len(lines) - 1 // noqa: E203
+
+	// same thing in JSON format, also check the number of platforms found is the same
+	stdout, _, err = cli.Run("core", "search", "--format", "json", "--additional-urls="+url.String())
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, " .[] | select(.name == \"test_core\") | . != \"\"", "true")
+	requirejson.Query(t, stdout, "length", fmt.Sprint(numPlatforms))
+}

@@ -26,65 +26,6 @@ from pathlib import Path
 import semver
 
 
-def test_core_search_no_args(run_command, httpserver):
-    """
-    This tests `core search` with and without additional URLs in case no args
-    are passed (i.e. all results are shown).
-    """
-    # Set up the server to serve our custom index file
-    test_index = Path(__file__).parent / "testdata" / "test_index.json"
-    httpserver.expect_request("/test_index.json").respond_with_data(test_index.read_text())
-
-    # update custom index and install test core (installed cores affect `core search`)
-    url = httpserver.url_for("/test_index.json")
-    assert run_command(["core", "update-index", f"--additional-urls={url}"])
-    assert run_command(["core", "install", "test:x86", f"--additional-urls={url}"])
-
-    # list all with no additional urls, ensure the test core won't show up
-    result = run_command(["core", "search"])
-    assert result.ok
-    num_platforms = 0
-    lines = [l.strip().split() for l in result.stdout.strip().splitlines()]
-    # The header is printed on the first lines
-    assert ["test:x86", "2.0.0", "test_core"] in lines
-    header_index = lines.index(["ID", "Version", "Name"])
-    # We use black to format and flake8 to lint .py files but they disagree on certain
-    # things like this one, thus we ignore this specific flake8 rule and stand by black
-    # opinion.
-    # We ignore this specific case because ignoring it globally would probably cause more
-    # issue. For more info about the rule see: https://www.flake8rules.com/rules/E203.html
-    num_platforms = len(lines[header_index + 1 :])  # noqa: E203
-
-    # same thing in JSON format, also check the number of platforms found is the same
-    result = run_command(["core", "search", "--format", "json"])
-    assert result.ok
-    platforms = json.loads(result.stdout)
-    assert 1 == len([e for e in platforms if e.get("name") == "test_core"])
-    assert len(platforms) == num_platforms
-
-    # list all with additional urls, check the test core is there
-    result = run_command(["core", "search", f"--additional-urls={url}"])
-    assert result.ok
-    num_platforms = 0
-    lines = [l.strip().split() for l in result.stdout.strip().splitlines()]
-    # The header is printed on the first lines
-    assert ["test:x86", "2.0.0", "test_core"] in lines
-    header_index = lines.index(["ID", "Version", "Name"])
-    # We use black to format and flake8 to lint .py files but they disagree on certain
-    # things like this one, thus we ignore this specific flake8 rule and stand by black
-    # opinion.
-    # We ignore this specific case because ignoring it globally would probably cause more
-    # issue. For more info about the rule see: https://www.flake8rules.com/rules/E203.html
-    num_platforms = len(lines[header_index + 1 :])  # noqa: E203
-
-    # same thing in JSON format, also check the number of platforms found is the same
-    result = run_command(["core", "search", "--format", "json", f"--additional-urls={url}"])
-    assert result.ok
-    platforms = json.loads(result.stdout)
-    assert 1 == len([e for e in platforms if e.get("name") == "test_core"])
-    assert len(platforms) == num_platforms
-
-
 def test_core_updateindex_url_not_found(run_command, httpserver):
     assert run_command(["core", "update-index"])
 
