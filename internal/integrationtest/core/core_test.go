@@ -320,3 +320,28 @@ func TestCoreUninstall(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Empty(t, stdout)
 }
+
+func TestCoreUninstallToolDependencyRemoval(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// These platforms both have a dependency on the arduino:avr-gcc@7.3.0-atmel3.6.1-arduino5 tool
+	// arduino:avr@1.8.2 has a dependency on arduino:avrdude@6.3.0-arduino17
+	_, _, err := cli.Run("core", "install", "arduino:avr@1.8.2")
+	require.NoError(t, err)
+	// arduino:megaavr@1.8.4 has a dependency on arduino:avrdude@6.3.0-arduino16
+	_, _, err = cli.Run("core", "install", "arduino:megaavr@1.8.4")
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "uninstall", "arduino:avr")
+	require.NoError(t, err)
+
+	arduinoToolsPath := cli.DataDir().Join("packages", "arduino", "tools")
+
+	avrGccBinariesPath := arduinoToolsPath.Join("avr-gcc", "7.3.0-atmel3.6.1-arduino5", "bin")
+	// The tool arduino:avr-gcc@7.3.0-atmel3.6.1-arduino5 that is a dep of another installed platform should remain
+	require.True(t, avrGccBinariesPath.Join("avr-gcc").Exist() || avrGccBinariesPath.Join("avr-gcc.exe").Exist())
+
+	avrDudeBinariesPath := arduinoToolsPath.Join("avrdude", "6.3.0-arduino17", "bin")
+	// The tool arduino:avrdude@6.3.0-arduino17 that is only a dep of arduino:avr should have been removed
+	require.False(t, avrDudeBinariesPath.Join("avrdude").Exist() || avrDudeBinariesPath.Join("avrdude.exe").Exist())
+}

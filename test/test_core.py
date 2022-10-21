@@ -47,27 +47,6 @@ def test_core_install_esp32(run_command, data_dir):
     assert (build_dir / f"{sketch_name}.ino.partitions.bin").exists()
 
 
-def test_core_uninstall_tool_dependency_removal(run_command, data_dir):
-    # These platforms both have a dependency on the arduino:avr-gcc@7.3.0-atmel3.6.1-arduino5 tool
-    # arduino:avr@1.8.2 has a dependency on arduino:avrdude@6.3.0-arduino17
-    assert run_command(["core", "install", "arduino:avr@1.8.2"])
-    # arduino:megaavr@1.8.4 has a dependency on arduino:avrdude@6.3.0-arduino16
-    assert run_command(["core", "install", "arduino:megaavr@1.8.4"])
-    assert run_command(["core", "uninstall", "arduino:avr"])
-
-    arduino_tools_path = Path(data_dir, "packages", "arduino", "tools")
-
-    avr_gcc_binaries_path = arduino_tools_path.joinpath("avr-gcc", "7.3.0-atmel3.6.1-arduino5", "bin")
-    # The tool arduino:avr-gcc@7.3.0-atmel3.6.1-arduino5 that is a dep of another installed platform should remain
-    assert avr_gcc_binaries_path.joinpath("avr-gcc").exists() or avr_gcc_binaries_path.joinpath("avr-gcc.exe").exists()
-
-    avrdude_binaries_path = arduino_tools_path.joinpath("avrdude", "6.3.0-arduino17", "bin")
-    # The tool arduino:avrdude@6.3.0-arduino17 that is only a dep of arduino:avr should have been removed
-    assert (
-        avrdude_binaries_path.joinpath("avrdude").exists() or avrdude_binaries_path.joinpath("avrdude.exe").exists()
-    ) is False
-
-
 def test_core_zipslip(run_command):
     url = "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
     assert run_command(["core", "update-index", f"--additional-urls={url}"])
