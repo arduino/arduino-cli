@@ -91,7 +91,10 @@ func (release *DownloadResource) Install(downloadDir, tempPath, destDir *paths.P
 
 	// Move/rename the extracted root directory in the destination directory
 	if err := root.Rename(destDir); err != nil {
-		return fmt.Errorf(tr("moving extracted archive to destination dir: %s", err))
+		// Copy the extracted root directory to the destination directory, if move failed
+		if err := root.CopyDirTo(destDir); err != nil {
+			return fmt.Errorf(tr("moving extracted archive to destination dir: %s", err))
+		}
 	}
 
 	// TODO
