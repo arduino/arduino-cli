@@ -108,7 +108,7 @@ jobs:
           echo "Certificate expiration date: $EXPIRATION_DATE"
           echo "Days remaining before expiration: $DAYS_BEFORE_EXPIRATION"
 
-          echo "::set-output name=days::$DAYS_BEFORE_EXPIRATION"
+          echo "days=$DAYS_BEFORE_EXPIRATION" >> $GITHUB_OUTPUT
 
       - name: Check if expiration notification period has been reached
         id: check-expiration
