@@ -16,52 +16,39 @@
 package upgrade
 
 import (
-	"context"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/arguments"
-	"github.com/arduino/arduino-cli/cli/feedback"
+	"github.com/arduino/arduino-cli/cli/core"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
-	"github.com/arduino/arduino-cli/commands/upgrade"
+	"github.com/arduino/arduino-cli/cli/lib"
 	"github.com/arduino/arduino-cli/i18n"
-	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-var (
-	tr               = i18n.Tr
-	postInstallFlags arguments.PostInstallFlags
-)
+var tr = i18n.Tr
 
 // NewCommand creates a new `upgrade` command
 func NewCommand() *cobra.Command {
+	var postInstallFlags arguments.PostInstallFlags
 	upgradeCommand := &cobra.Command{
 		Use:     "upgrade",
 		Short:   tr("Upgrades installed cores and libraries."),
 		Long:    tr("Upgrades installed cores and libraries to latest version."),
 		Example: "  " + os.Args[0] + " upgrade",
 		Args:    cobra.NoArgs,
-		Run:     runUpgradeCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runUpgradeCommand(postInstallFlags.DetectSkipPostInstallValue())
+		},
 	}
-
 	postInstallFlags.AddToCommand(upgradeCommand)
 	return upgradeCommand
 }
 
-func runUpgradeCommand(cmd *cobra.Command, args []string) {
+func runUpgradeCommand(skipPostInstall bool) {
 	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli upgrade`")
-
-	err := upgrade.Upgrade(context.Background(), &rpc.UpgradeRequest{
-		Instance:        inst,
-		SkipPostInstall: postInstallFlags.DetectSkipPostInstallValue(),
-	}, output.NewDownloadProgressBarCB(), output.TaskProgress())
-
-	if err != nil {
-		feedback.Errorf(tr("Error upgrading: %v"), err)
-	}
-
-	logrus.Info("Done")
+	lib.Upgrade(inst, []string{})
+	core.Upgrade(inst, []string{}, skipPostInstall)
 }

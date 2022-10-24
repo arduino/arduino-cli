@@ -58,7 +58,7 @@ func TestUpgrade(t *testing.T) {
 	// Verifies cores and libraries have been updated
 	stdout, _, err = cli.Run("outdated")
 	require.NoError(t, err)
-	require.Equal(t, string(stdout), "\n")
+	require.Contains(t, string(stdout), "No libraries update is available.")
 }
 
 func TestUpgradeUsingLibraryWithInvalidVersion(t *testing.T) {

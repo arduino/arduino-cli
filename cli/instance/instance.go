@@ -17,7 +17,6 @@ package instance
 
 import (
 	"context"
-	"errors"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -50,10 +49,7 @@ func CreateAndInitWithProfile(profileName string, sketchPath *paths.Path) (*rpc.
 		feedback.Errorf(tr("Error creating instance: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
-	profile, errs := InitWithProfile(instance, profileName, sketchPath)
-	for _, err := range errs {
-		feedback.Errorf(tr("Error initializing instance: %v"), err)
-	}
+	profile := InitWithProfile(instance, profileName, sketchPath)
 	return instance, profile
 }
 
@@ -71,20 +67,18 @@ func Create() (*rpc.Instance, error) {
 // platform or library that we failed to load.
 // Package and library indexes files are automatically updated if the
 // CLI is run for the first time.
-func Init(instance *rpc.Instance) []error {
-	_, errs := InitWithProfile(instance, "", nil)
-	return errs
+func Init(instance *rpc.Instance) {
+	InitWithProfile(instance, "", nil)
 }
 
 // InitWithProfile initializes instance by loading libraries and platforms specified in the given profile of the given sketch.
 // In case of loading failures return a list of errors for each platform or library that we failed to load.
 // Required Package and library indexes files are automatically downloaded.
-func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *paths.Path) (*rpc.Profile, []error) {
-	errs := []error{}
-
+func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *paths.Path) *rpc.Profile {
 	// In case the CLI is executed for the first time
 	if err := FirstUpdate(instance); err != nil {
-		return nil, append(errs, err)
+		feedback.Errorf(tr("Error initializing instance: %v"), err)
+		return nil
 	}
 
 	downloadCallback := output.ProgressBar()
@@ -98,7 +92,7 @@ func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *pat
 	var profile *rpc.Profile
 	err := commands.Init(initReq, func(res *rpc.InitResponse) {
 		if st := res.GetError(); st != nil {
-			errs = append(errs, errors.New(st.Message))
+			feedback.Errorf(tr("Error initializing instance: %v"), st.Message)
 		}
 
 		if progress := res.GetInitProgress(); progress != nil {
@@ -115,10 +109,10 @@ func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *pat
 		}
 	})
 	if err != nil {
-		errs = append(errs, err)
+		feedback.Errorf(tr("Error initializing instance: %v"), err)
 	}
 
-	return profile, errs
+	return profile
 }
 
 // FirstUpdate downloads libraries and packages indexes if they don't exist.

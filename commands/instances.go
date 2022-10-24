@@ -544,21 +544,6 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 	return nil
 }
 
-// UpdateCoreLibrariesIndex updates both Cores and Libraries indexes
-func UpdateCoreLibrariesIndex(ctx context.Context, req *rpc.UpdateCoreLibrariesIndexRequest, downloadCB rpc.DownloadProgressCB) error {
-	err := UpdateIndex(ctx, &rpc.UpdateIndexRequest{Instance: req.Instance}, downloadCB)
-	if err != nil {
-		return err
-	}
-
-	err = UpdateLibrariesIndex(ctx, &rpc.UpdateLibrariesIndexRequest{Instance: req.Instance}, downloadCB)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // LoadSketch collects and returns all files composing a sketch
 func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketchResponse, error) {
 	// TODO: This should be a ToRpc function for the Sketch struct

@@ -31,12 +31,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	postInstallFlags arguments.PostInstallFlags
-	noOverwrite      bool
-)
-
 func initInstallCommand() *cobra.Command {
+	var noOverwrite bool
+	var postInstallFlags arguments.PostInstallFlags
 	installCommand := &cobra.Command{
 		Use:   fmt.Sprintf("install %s:%s[@%s]...", tr("PACKAGER"), tr("ARCH"), tr("VERSION")),
 		Short: tr("Installs one or more cores and corresponding tool dependencies."),
@@ -49,7 +46,9 @@ func initInstallCommand() *cobra.Command {
 		PreRun: func(cmd *cobra.Command, args []string) {
 			arguments.CheckFlagsConflicts(cmd, "run-post-install", "skip-post-install")
 		},
-		Run: runInstallCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runInstallCommand(args, postInstallFlags, noOverwrite)
+		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 			return arguments.GetInstallableCores(), cobra.ShellCompDirectiveDefault
 		},
@@ -59,7 +58,7 @@ func initInstallCommand() *cobra.Command {
 	return installCommand
 }
 
-func runInstallCommand(cmd *cobra.Command, args []string) {
+func runInstallCommand(args []string, postInstallFlags arguments.PostInstallFlags, noOverwrite bool) {
 	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli core install`")
 

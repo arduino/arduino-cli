@@ -2,6 +2,58 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## 0.29.0
+
+### Removed gRPC API: `cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndex`, `Outdated`, and `Upgrade`
+
+The following gRPC API have been removed:
+
+- `cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndex`: you can use the already available gRPC methods `UpdateIndex`
+  and `UpdateLibrariesIndex` to perform the same tasks.
+- `cc.arduino.cli.commands.v1.Outdated`: you can use the already available gRPC methods `PlatformList` and `LibraryList`
+  to perform the same tasks.
+- `cc.arduino.cli.commands.v1.Upgrade`: you can use the already available gRPC methods `PlatformUpgrade` and
+  `LibraryUpgrade` to perform the same tasks.
+
+The golang API implementation of the same functions has been removed as well, so the following function are no more
+available:
+
+```
+github.com/arduino/arduino-cli/commands.UpdateCoreLibrariesIndex(...)
+github.com/arduino/arduino-cli/commands/outdated.Outdated(...)
+github.com/arduino/arduino-cli/commands/upgrade.Upgrade(...)
+```
+
+you can use the following functions as a replacement to do the same tasks:
+
+```
+github.com/arduino/arduino-cli/commands.UpdateLibrariesIndex(...)
+github.com/arduino/arduino-cli/commands.UpdateIndex(...)
+github.com/arduino/arduino-cli/commands/core.GetPlatforms(...)
+github.com/arduino/arduino-cli/commands/lib.LibraryList(...)
+github.com/arduino/arduino-cli/commands/lib.LibraryUpgrade(...)
+github.com/arduino/arduino-cli/commands/lib.LibraryUpgradeAll(...)
+github.com/arduino/arduino-cli/commands/core.PlatformUpgrade(...)
+```
+
+### Changes in golang functions `github.com/arduino/arduino-cli/cli/instance.Init` and `InitWithProfile`
+
+The following functions:
+
+```go
+func Init(instance *rpc.Instance) []error { }
+func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *paths.Path) (*rpc.Profile, []error) { }
+```
+
+no longer return the errors array:
+
+```go
+func Init(instance *rpc.Instance) { }
+func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *paths.Path) *rpc.Profile { }
+```
+
+The errors are automatically sent to output via `feedback` package, as for the other `Init*` functions.
+
 ## 0.28.0
 
 ### Breaking changes in libraries name handling
