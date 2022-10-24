@@ -17,6 +17,7 @@ package core_test
 
 import (
 	"fmt"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -369,4 +370,19 @@ func TestCoreBrokenInstall(t *testing.T) {
 	require.NoError(t, err)
 	_, _, err = cli.Run("core", "install", "brokenchecksum:x86", "--additional-urls="+url)
 	require.Error(t, err)
+}
+
+func TestCoreUpdateWithLocalUrl(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	wd, _ := paths.Getwd()
+	testIndex := wd.Parent().Join("testdata", "test_index.json").String()
+	if runtime.GOOS == "windows" {
+		testIndex = "/" + strings.ReplaceAll(testIndex, "\\", "/")
+	}
+
+	stdout, _, err := cli.Run("core", "update-index", "--additional-urls=file://"+testIndex)
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Downloading index: test_index.json downloaded")
 }

@@ -68,16 +68,6 @@ def test_core_install_creates_installed_json(run_command, data_dir):
     assert ordered(installed_json) == ordered(expected_installed_json)
 
 
-def test_core_update_with_local_url(run_command):
-    test_index = str(Path(__file__).parent / "testdata" / "test_index.json")
-    if platform.system() == "Windows":
-        test_index = f"/{test_index}".replace("\\", "/")
-
-    res = run_command(["core", "update-index", f'--additional-urls="file://{test_index}"'])
-    assert res.ok
-    assert "Downloading index: test_index.json downloaded" in res.stdout
-
-
 def test_core_search_manually_installed_cores_not_printed(run_command, data_dir):
     assert run_command(["core", "update-index"])
 
