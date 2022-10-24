@@ -511,3 +511,26 @@ func TestCoreUpgradeRemovesUnusedTools(t *testing.T) {
 	// Verifies tool is uninstalled since it's not used by newer core version
 	require.NoDirExists(t, toolPath.String())
 }
+
+func TestCoreInstallRemovesUnusedTools(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Installs a core
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.2")
+	require.NoError(t, err)
+
+	// Verifies expected tool is installed
+	toolPath := cli.DataDir().Join("packages", "arduino", "tools", "avr-gcc", "7.3.0-atmel3.6.1-arduino5")
+	require.DirExists(t, toolPath.String())
+
+	// Installs newer version of already installed core
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	// Verifies tool is uninstalled since it's not used by newer core version
+	require.NoDirExists(t, toolPath.String())
+}

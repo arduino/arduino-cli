@@ -68,23 +68,6 @@ def test_core_install_creates_installed_json(run_command, data_dir):
     assert ordered(installed_json) == ordered(expected_installed_json)
 
 
-def test_core_install_removes_unused_tools(run_command, data_dir):
-    assert run_command(["update"])
-
-    # Installs a core
-    assert run_command(["core", "install", "arduino:avr@1.8.2"])
-
-    # Verifies expected tool is installed
-    tool_path = Path(data_dir, "packages", "arduino", "tools", "avr-gcc", "7.3.0-atmel3.6.1-arduino5")
-    assert tool_path.exists()
-
-    # Installs newer version of already installed core
-    assert run_command(["core", "install", "arduino:avr@1.8.3"])
-
-    # Verifies tool is uninstalled since it's not used by newer core version
-    assert not tool_path.exists()
-
-
 def test_core_list_with_installed_json(run_command, data_dir):
     assert run_command(["update"])
 
