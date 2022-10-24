@@ -68,31 +68,6 @@ def test_core_install_creates_installed_json(run_command, data_dir):
     assert ordered(installed_json) == ordered(expected_installed_json)
 
 
-def test_core_search_manually_installed_cores_not_printed(run_command, data_dir):
-    assert run_command(["core", "update-index"])
-
-    # Verifies only cores in board manager are shown
-    res = run_command(["core", "search", "--format", "json"])
-    assert res.ok
-    cores = json.loads(res.stdout)
-    num_cores = len(cores)
-    assert num_cores > 0
-
-    # Manually installs a core in sketchbooks hardware folder
-    git_url = "https://github.com/arduino/ArduinoCore-avr.git"
-    repo_dir = Path(data_dir, "hardware", "arduino-beta-development", "avr")
-    assert Repo.clone_from(git_url, repo_dir, multi_options=["-b 1.8.3"])
-
-    # Verifies manually installed core is not shown
-    res = run_command(["core", "search", "--format", "json"])
-    assert res.ok
-    cores = json.loads(res.stdout)
-    assert num_cores == len(cores)
-    mapped = {core["id"]: core for core in cores}
-    core_id = "arduino-beta-development:avr"
-    assert core_id not in mapped
-
-
 def test_core_list_all_manually_installed_core(run_command, data_dir):
     assert run_command(["core", "update-index"])
 

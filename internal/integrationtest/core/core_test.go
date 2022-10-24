@@ -25,6 +25,8 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/testifyjson/requirejson"
+	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
 func TestCorrectHandlingOfPlatformVersionProperty(t *testing.T) {
@@ -385,4 +387,33 @@ func TestCoreUpdateWithLocalUrl(t *testing.T) {
 	stdout, _, err := cli.Run("core", "update-index", "--additional-urls=file://"+testIndex)
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "Downloading index: test_index.json downloaded")
+}
+
+func TestCoreSearchManuallyInstalledCoresNotPrinted(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Verifies only cores in board manager are shown
+	stdout, _, err := cli.Run("core", "search", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, "length > 0", "true")
+	oldJson := stdout
+
+	// Manually installs a core in sketchbooks hardware folder
+	gitUrl := "https://github.com/arduino/ArduinoCore-avr.git"
+	repoDir := cli.SketchbookDir().Join("hardware", "arduino-beta-development", "avr")
+	_, err = git.PlainClone(repoDir.String(), false, &git.CloneOptions{
+		URL:           gitUrl,
+		ReferenceName: plumbing.NewTagReferenceName("1.8.3"),
+	})
+	require.NoError(t, err)
+
+	// Verifies manually installed core is not shown
+	stdout, _, err = cli.Run("core", "search", "--format", "json")
+	require.NoError(t, err)
+	requirejson.NotContains(t, stdout, `[{"id": "arduino-beta-development:avr"}]`)
+	require.Equal(t, oldJson, stdout)
 }
