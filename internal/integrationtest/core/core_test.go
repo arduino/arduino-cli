@@ -534,3 +534,51 @@ func TestCoreInstallRemovesUnusedTools(t *testing.T) {
 	// Verifies tool is uninstalled since it's not used by newer core version
 	require.NoDirExists(t, toolPath.String())
 }
+
+func TestCoreListWithInstalledJson(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Install core
+	url := "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json"
+	_, _, err = cli.Run("core", "update-index", "--additional-urls="+url)
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "adafruit:avr@1.4.13", "--additional-urls="+url)
+	require.NoError(t, err)
+
+	// Verifies installed core is correctly found and name is set
+	stdout, _, err := cli.Run("core", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+	requirejson.Contains(t, stdout, `[
+		{
+			"id": "adafruit:avr",
+			"name": "Adafruit AVR Boards"
+		}
+	]`)
+
+	// Deletes installed.json file, this file stores information about the core,
+	// that is used mostly when removing package indexes and their cores are still installed;
+	// this way we don't lose much information about it.
+	// It might happen that the user has old cores installed before the addition of
+	// the installed.json file so we need to handle those cases.
+	installedJson := cli.DataDir().Join("packages", "adafruit", "hardware", "avr", "1.4.13", "installed.json")
+	require.NoError(t, installedJson.Remove())
+
+	// Verifies installed core is still found and name is set
+	stdout, _, err = cli.Run("core", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+	// Name for this core changes since if there's installed.json file we read it from
+	// platform.txt, turns out that this core has different names used in different files
+	// thus the change.
+	requirejson.Contains(t, stdout, `[
+		{
+			"id": "adafruit:avr",
+			"name": "Adafruit Boards"
+		}
+	]`)
+}

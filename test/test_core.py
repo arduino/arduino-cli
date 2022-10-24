@@ -68,44 +68,6 @@ def test_core_install_creates_installed_json(run_command, data_dir):
     assert ordered(installed_json) == ordered(expected_installed_json)
 
 
-def test_core_list_with_installed_json(run_command, data_dir):
-    assert run_command(["update"])
-
-    # Install core
-    url = "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json"
-    assert run_command(["core", "update-index", f"--additional-urls={url}"])
-    assert run_command(["core", "install", "adafruit:avr@1.4.13", f"--additional-urls={url}"])
-
-    # Verifies installed core is correctly found and name is set
-    res = run_command(["core", "list", "--format", "json"])
-    assert res.ok
-    cores = json.loads(res.stdout)
-    mapped = {core["id"]: core for core in cores}
-    assert len(mapped) == 1
-    assert "adafruit:avr" in mapped
-    assert mapped["adafruit:avr"]["name"] == "Adafruit AVR Boards"
-
-    # Deletes installed.json file, this file stores information about the core,
-    # that is used mostly when removing package indexes and their cores are still installed;
-    # this way we don't lose much information about it.
-    # It might happen that the user has old cores installed before the addition of
-    # the installed.json file so we need to handle those cases.
-    installed_json = Path(data_dir, "packages", "adafruit", "hardware", "avr", "1.4.13", "installed.json")
-    installed_json.unlink()
-
-    # Verifies installed core is still found and name is set
-    res = run_command(["core", "list", "--format", "json"])
-    assert res.ok
-    cores = json.loads(res.stdout)
-    mapped = {core["id"]: core for core in cores}
-    assert len(mapped) == 1
-    assert "adafruit:avr" in mapped
-    # Name for this core changes since if there's installed.json file we read it from
-    # platform.txt, turns out that this core has different names used in different files
-    # thus the change.
-    assert mapped["adafruit:avr"]["name"] == "Adafruit Boards"
-
-
 def test_core_search_update_index_delay(run_command, data_dir):
     assert run_command(["update"])
 
