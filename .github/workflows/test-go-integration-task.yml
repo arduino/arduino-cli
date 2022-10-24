@@ -55,7 +55,7 @@ jobs:
             RESULT="false"
           fi
 
-          echo "::set-output name=result::$RESULT"
+          echo "result=$RESULT" >> $GITHUB_OUTPUT
 
   tests-collector:
     runs-on: ubuntu-latest
@@ -70,7 +70,7 @@ jobs:
       - name: Collect tests
         id: collection
         run: |
-          echo "::set-output name=tests-data::$(python .github/tools/get_integration_tests.py ./test/)"
+          echo "tests-data=$(python .github/tools/get_integration_tests.py ./test/)" >> $GITHUB_OUTPUT
 
   test:
     needs: tests-collector

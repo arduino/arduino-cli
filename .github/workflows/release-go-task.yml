@@ -61,7 +61,7 @@ jobs:
 
       - name: Output Version
         id: get-version
-        run: echo "::set-output name=version::$(task general:get-version)"
+        run: echo "version=$(task general:get-version)" >> $GITHUB_OUTPUT
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
@@ -254,7 +254,7 @@ jobs:
         run: |
           wget -q -P /tmp https://github.com/fsaintjacques/semver-tool/archive/3.0.0.zip
           unzip -p /tmp/3.0.0.zip semver-tool-3.0.0/src/semver >/tmp/semver && chmod +x /tmp/semver
-          if [[ "$(/tmp/semver get prerel ${{ needs.create-release-artifacts.outputs.version }} )" ]]; then echo "::set-output name=IS_PRE::true"; fi
+          if [[ "$(/tmp/semver get prerel ${{ needs.create-release-artifacts.outputs.version }} )" ]]; then echo "IS_PRE=true" >> $GITHUB_OUTPUT; fi
 
       - name: Create Github Release and upload artifacts
         uses: ncipollo/release-action@v1

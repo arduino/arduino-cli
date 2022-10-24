@@ -45,7 +45,7 @@ jobs:
             RESULT="false"
           fi
 
-          echo "::set-output name=result::$RESULT"
+          echo "result=$RESULT" >> $GITHUB_OUTPUT
 
   publish:
     runs-on: ubuntu-latest
@@ -93,7 +93,7 @@ jobs:
 
       - name: Determine versioning parameters
         id: determine-versioning
-        run: echo "::set-output name=data::$(poetry run python docs/siteversion/siteversion.py)"
+        run: echo "data=$(poetry run python docs/siteversion/siteversion.py)" >> $GITHUB_OUTPUT
 
       - name: Publish documentation
         if: fromJson(steps.determine-versioning.outputs.data).version != null

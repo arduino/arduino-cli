@@ -56,7 +56,7 @@ jobs:
         id: get-version
         env:
           NIGHTLY: true
-        run: echo "::set-output name=version::$(task general:get-version)"
+        run: echo "version=$(task general:get-version)" >> $GITHUB_OUTPUT
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3

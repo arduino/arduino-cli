@@ -51,7 +51,7 @@ jobs:
             RESULT="false"
           fi
 
-          echo "::set-output name=result::$RESULT"
+          echo "result=$RESULT" >> $GITHUB_OUTPUT
 
   package-name-prefix:
     needs: run-determination
@@ -69,7 +69,7 @@ jobs:
           fi
           PACKAGE_NAME_PREFIX="$PACKAGE_NAME_PREFIX-${{ github.sha }}-"
 
-          echo "::set-output name=prefix::$PACKAGE_NAME_PREFIX"
+          echo "prefix=$PACKAGE_NAME_PREFIX" >> $GITHUB_OUTPUT
 
   build:
     needs: package-name-prefix
