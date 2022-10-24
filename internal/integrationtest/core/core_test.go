@@ -453,3 +453,38 @@ func TestCoreListAllManuallyInstalledCore(t *testing.T) {
 			}
 		]`)
 }
+
+func TestCoreListUpdatableAllFlags(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Verifies only cores in board manager are shown
+	stdout, _, err := cli.Run("core", "list", "--all", "--updatable", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, "length > 0", "true")
+	len, _ := strconv.Atoi(requirejson.Parse(t, stdout).Query("length").String())
+
+	// Manually installs a core in sketchbooks hardware folder
+	gitUrl := "https://github.com/arduino/ArduinoCore-avr.git"
+	repoDir := cli.SketchbookDir().Join("hardware", "arduino-beta-development", "avr")
+	_, err = git.PlainClone(repoDir.String(), false, &git.CloneOptions{
+		URL:           gitUrl,
+		ReferenceName: plumbing.NewTagReferenceName("1.8.3"),
+	})
+	require.NoError(t, err)
+
+	// Verifies using both --updatable and --all flags --all takes precedence
+	stdout, _, err = cli.Run("core", "list", "--all", "--updatable", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, len+1)
+	requirejson.Contains(t, stdout, `[
+		{
+			"id": "arduino-beta-development:avr",
+			"latest": "1.8.3",
+			"name": "Arduino AVR Boards"
+			}
+		]`)
+}
