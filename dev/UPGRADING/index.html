@@ -277,6 +277,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0290" class="md-nav__link">
+    0.29.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.29.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#removed-grpc-api-ccarduinoclicommandsv1updatecorelibrariesindex-outdated-and-upgrade" class="md-nav__link">
+    Removed gRPC API: cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndex, Outdated, and Upgrade
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changes-in-golang-functions-githubcomarduinoarduino-clicliinstanceinit-and-initwithprofile" class="md-nav__link">
+    Changes in golang functions github.com/arduino/arduino-cli/cli/instance.Init and InitWithProfile
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0280" class="md-nav__link">
     0.28.0
   </a>
@@ -2049,6 +2076,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0290" class="md-nav__link">
+    0.29.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.29.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#removed-grpc-api-ccarduinoclicommandsv1updatecorelibrariesindex-outdated-and-upgrade" class="md-nav__link">
+    Removed gRPC API: cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndex, Outdated, and Upgrade
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changes-in-golang-functions-githubcomarduinoarduino-clicliinstanceinit-and-initwithprofile" class="md-nav__link">
+    Changes in golang functions github.com/arduino/arduino-cli/cli/instance.Init and InitWithProfile
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0280" class="md-nav__link">
     0.28.0
   </a>
@@ -2764,6 +2818,42 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<h2 id="0290">0.29.0<a class="headerlink" href="#0290" title="Permanent link">&para;</a></h2>
+<h3 id="removed-grpc-api-ccarduinoclicommandsv1updatecorelibrariesindex-outdated-and-upgrade">Removed gRPC API: <code>cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndex</code>, <code>Outdated</code>, and <code>Upgrade</code><a class="headerlink" href="#removed-grpc-api-ccarduinoclicommandsv1updatecorelibrariesindex-outdated-and-upgrade" title="Permanent link">&para;</a></h3>
+<p>The following gRPC API have been removed:</p>
+<ul>
+<li><code>cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndex</code>: you can use the already available gRPC methods <code>UpdateIndex</code>
+  and <code>UpdateLibrariesIndex</code> to perform the same tasks.</li>
+<li><code>cc.arduino.cli.commands.v1.Outdated</code>: you can use the already available gRPC methods <code>PlatformList</code> and <code>LibraryList</code>
+  to perform the same tasks.</li>
+<li><code>cc.arduino.cli.commands.v1.Upgrade</code>: you can use the already available gRPC methods <code>PlatformUpgrade</code> and
+  <code>LibraryUpgrade</code> to perform the same tasks.</li>
+</ul>
+<p>The golang API implementation of the same functions has been removed as well, so the following function are no more
+available:</p>
+<div class="highlight"><pre><span></span><code>github.com/arduino/arduino-cli/commands.UpdateCoreLibrariesIndex(...)
+github.com/arduino/arduino-cli/commands/outdated.Outdated(...)
+github.com/arduino/arduino-cli/commands/upgrade.Upgrade(...)
+</code></pre></div>
+<p>you can use the following functions as a replacement to do the same tasks:</p>
+<div class="highlight"><pre><span></span><code>github.com/arduino/arduino-cli/commands.UpdateLibrariesIndex(...)
+github.com/arduino/arduino-cli/commands.UpdateIndex(...)
+github.com/arduino/arduino-cli/commands/core.GetPlatforms(...)
+github.com/arduino/arduino-cli/commands/lib.LibraryList(...)
+github.com/arduino/arduino-cli/commands/lib.LibraryUpgrade(...)
+github.com/arduino/arduino-cli/commands/lib.LibraryUpgradeAll(...)
+github.com/arduino/arduino-cli/commands/core.PlatformUpgrade(...)
+</code></pre></div>
+<h3 id="changes-in-golang-functions-githubcomarduinoarduino-clicliinstanceinit-and-initwithprofile">Changes in golang functions <code>github.com/arduino/arduino-cli/cli/instance.Init</code> and <code>InitWithProfile</code><a class="headerlink" href="#changes-in-golang-functions-githubcomarduinoarduino-clicliinstanceinit-and-initwithprofile" title="Permanent link">&para;</a></h3>
+<p>The following functions:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">Init</span><span class="p">(</span><span class="nx">instance</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">Instance</span><span class="p">)</span><span class="w"> </span><span class="p">[]</span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="nx">InitWithProfile</span><span class="p">(</span><span class="nx">instance</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">Instance</span><span class="p">,</span><span class="w"> </span><span class="nx">profileName</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">sketchPath</span><span class="w"> </span><span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">Profile</span><span class="p">,</span><span class="w"> </span><span class="p">[]</span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>no longer return the errors array:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">Init</span><span class="p">(</span><span class="nx">instance</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">Instance</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="nx">InitWithProfile</span><span class="p">(</span><span class="nx">instance</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">Instance</span><span class="p">,</span><span class="w"> </span><span class="nx">profileName</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">sketchPath</span><span class="w"> </span><span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">Profile</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>The errors are automatically sent to output via <code>feedback</code> package, as for the other <code>Init*</code> functions.</p>
 <h2 id="0280">0.28.0<a class="headerlink" href="#0280" title="Permanent link">&para;</a></h2>
 <h3 id="breaking-changes-in-libraries-name-handling">Breaking changes in libraries name handling<a class="headerlink" href="#breaking-changes-in-libraries-name-handling" title="Permanent link">&para;</a></h3>
 <p>In the structure <code>github.com/arduino/arduino-cli/arduino/libraries.Library</code> the field:</p>

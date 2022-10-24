@@ -1366,34 +1366,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#outdatedrequest" class="md-nav__link">
-    OutdatedRequest
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#outdatedresponse" class="md-nav__link">
-    OutdatedResponse
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#updatecorelibrariesindexrequest" class="md-nav__link">
-    UpdateCoreLibrariesIndexRequest
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#updatecorelibrariesindexresponse" class="md-nav__link">
-    UpdateCoreLibrariesIndexResponse
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#updateindexrequest" class="md-nav__link">
     UpdateIndexRequest
   </a>
@@ -1417,20 +1389,6 @@
           <li class="md-nav__item">
   <a href="#updatelibrariesindexresponse" class="md-nav__link">
     UpdateLibrariesIndexResponse
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#upgraderequest" class="md-nav__link">
-    UpgradeRequest
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#upgraderesponse" class="md-nav__link">
-    UpgradeResponse
   </a>
   
 </li>
@@ -2717,34 +2675,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#outdatedrequest" class="md-nav__link">
-    OutdatedRequest
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#outdatedresponse" class="md-nav__link">
-    OutdatedResponse
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#updatecorelibrariesindexrequest" class="md-nav__link">
-    UpdateCoreLibrariesIndexRequest
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#updatecorelibrariesindexresponse" class="md-nav__link">
-    UpdateCoreLibrariesIndexResponse
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#updateindexrequest" class="md-nav__link">
     UpdateIndexRequest
   </a>
@@ -2768,20 +2698,6 @@
           <li class="md-nav__item">
   <a href="#updatelibrariesindexresponse" class="md-nav__link">
     UpdateLibrariesIndexResponse
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#upgraderequest" class="md-nav__link">
-    UpgradeRequest
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#upgraderesponse" class="md-nav__link">
-    UpgradeResponse
   </a>
   
 </li>
@@ -3582,16 +3498,10 @@
 <li><a href="#cc.arduino.cli.commands.v1.LoadSketchResponse">LoadSketchResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.NewSketchRequest">NewSketchRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.NewSketchResponse">NewSketchResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.OutdatedRequest">OutdatedRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.OutdatedResponse">OutdatedResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndexRequest">UpdateCoreLibrariesIndexRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndexResponse">UpdateCoreLibrariesIndexResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.UpdateIndexRequest">UpdateIndexRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.UpdateIndexResponse">UpdateIndexResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.UpdateLibrariesIndexRequest">UpdateLibrariesIndexRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.UpdateLibrariesIndexResponse">UpdateLibrariesIndexResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.UpgradeRequest">UpgradeRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.UpgradeResponse">UpgradeResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.VersionRequest">VersionRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.VersionResponse">VersionResponse</a></li>
 </ul>
@@ -4786,92 +4696,6 @@
 </tr>
 </tbody>
 </table>
-<p><a name="cc.arduino.cli.commands.v1.OutdatedRequest"></a></p>
-<h3 id="outdatedrequest">OutdatedRequest<a class="headerlink" href="#outdatedrequest" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>instance</td>
-<td><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></td>
-<td></td>
-<td>Arduino Core Service instance from the Init response.</td>
-</tr>
-</tbody>
-</table>
-<p><a name="cc.arduino.cli.commands.v1.OutdatedResponse"></a></p>
-<h3 id="outdatedresponse">OutdatedResponse<a class="headerlink" href="#outdatedresponse" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>outdated_libraries</td>
-<td><a href="#cc.arduino.cli.commands.v1.InstalledLibrary">InstalledLibrary</a></td>
-<td>repeated</td>
-<td>List of installed libraries that can be updated.</td>
-</tr>
-<tr>
-<td>outdated_platforms</td>
-<td><a href="#cc.arduino.cli.commands.v1.Platform">Platform</a></td>
-<td>repeated</td>
-<td>List of installed cores that can be updated.</td>
-</tr>
-</tbody>
-</table>
-<p><a name="cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndexRequest"></a></p>
-<h3 id="updatecorelibrariesindexrequest">UpdateCoreLibrariesIndexRequest<a class="headerlink" href="#updatecorelibrariesindexrequest" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>instance</td>
-<td><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></td>
-<td></td>
-<td>Arduino Core Service instance from the Init response.</td>
-</tr>
-</tbody>
-</table>
-<p><a name="cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndexResponse"></a></p>
-<h3 id="updatecorelibrariesindexresponse">UpdateCoreLibrariesIndexResponse<a class="headerlink" href="#updatecorelibrariesindexresponse" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>download_progress</td>
-<td><a href="#cc.arduino.cli.commands.v1.DownloadProgress">DownloadProgress</a></td>
-<td></td>
-<td>Progress of the index download.</td>
-</tr>
-</tbody>
-</table>
 <p><a name="cc.arduino.cli.commands.v1.UpdateIndexRequest"></a></p>
 <h3 id="updateindexrequest">UpdateIndexRequest<a class="headerlink" href="#updateindexrequest" title="Permanent link">&para;</a></h3>
 <table>
@@ -4958,58 +4782,6 @@
 </tr>
 </tbody>
 </table>
-<p><a name="cc.arduino.cli.commands.v1.UpgradeRequest"></a></p>
-<h3 id="upgraderequest">UpgradeRequest<a class="headerlink" href="#upgraderequest" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>instance</td>
-<td><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></td>
-<td></td>
-<td>Arduino Core Service instance from the Init response.</td>
-</tr>
-<tr>
-<td>skip_post_install</td>
-<td><a href="#bool">bool</a></td>
-<td></td>
-<td>Set to true to not run (eventual) post install scripts</td>
-</tr>
-</tbody>
-</table>
-<p><a name="cc.arduino.cli.commands.v1.UpgradeResponse"></a></p>
-<h3 id="upgraderesponse">UpgradeResponse<a class="headerlink" href="#upgraderesponse" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>progress</td>
-<td><a href="#cc.arduino.cli.commands.v1.DownloadProgress">DownloadProgress</a></td>
-<td></td>
-<td>Progress of the downloads of the platforms and libraries files.</td>
-</tr>
-<tr>
-<td>task_progress</td>
-<td><a href="#cc.arduino.cli.commands.v1.TaskProgress">TaskProgress</a></td>
-<td></td>
-<td>Description of the current stage of the upgrade.</td>
-</tr>
-</tbody>
-</table>
 <p><a name="cc.arduino.cli.commands.v1.VersionRequest"></a></p>
 <h3 id="versionrequest">VersionRequest<a class="headerlink" href="#versionrequest" title="Permanent link">&para;</a></h3>
 <p><a name="cc.arduino.cli.commands.v1.VersionResponse"></a></p>
@@ -5075,24 +4847,6 @@
 <td><a href="#cc.arduino.cli.commands.v1.UpdateLibrariesIndexRequest">UpdateLibrariesIndexRequest</a></td>
 <td><a href="#cc.arduino.cli.commands.v1.UpdateLibrariesIndexResponse">UpdateLibrariesIndexResponse</a> stream</td>
 <td>Update libraries index</td>
-</tr>
-<tr>
-<td>UpdateCoreLibrariesIndex</td>
-<td><a href="#cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndexRequest">UpdateCoreLibrariesIndexRequest</a></td>
-<td><a href="#cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndexResponse">UpdateCoreLibrariesIndexResponse</a> stream</td>
-<td>Update packages indexes for both Cores and Libraries</td>
-</tr>
-<tr>
-<td>Outdated</td>
-<td><a href="#cc.arduino.cli.commands.v1.OutdatedRequest">OutdatedRequest</a></td>
-<td><a href="#cc.arduino.cli.commands.v1.OutdatedResponse">OutdatedResponse</a></td>
-<td>Outdated returns a message with a list of outdated Cores and Libraries</td>
-</tr>
-<tr>
-<td>Upgrade</td>
-<td><a href="#cc.arduino.cli.commands.v1.UpgradeRequest">UpgradeRequest</a></td>
-<td><a href="#cc.arduino.cli.commands.v1.UpgradeResponse">UpgradeResponse</a> stream</td>
-<td>Upgrade both Cores and Libraries</td>
 </tr>
 <tr>
 <td>Version</td>
