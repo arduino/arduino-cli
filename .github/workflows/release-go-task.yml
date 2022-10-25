@@ -241,6 +241,15 @@ jobs:
           name: ${{ env.ARTIFACT_NAME }}
           path: ${{ env.DIST_DIR }}
 
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Collect proto files
+        run: task protoc:collect
+
       - name: Create checksum file
         working-directory: ${{ env.DIST_DIR}}
         run: |

@@ -215,6 +215,13 @@ tasks:
     cmds:
       - buf lint rpc
 
+  protoc:collect:
+    desc: Create a zip file containing all .proto files in DIST_DIR
+    dir: rpc
+    cmds:
+      - mkdir ../{{.DIST_DIR}}
+      - zip -r ../{{.DIST_DIR}}/{{.PROJECT_NAME}}_{{.VERSION}}_proto.zip  * -i \*.proto
+
   protoc:format:
     desc: Perform formatting of the protobuf definitions
     cmds:
