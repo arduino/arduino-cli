@@ -791,3 +791,43 @@ func TestCoreListPlatformWithoutPlatformTxt(t *testing.T) {
 	requirejson.Query(t, stdout, ".[] | .id", "\"some-packager:some-arch\"")
 	requirejson.Query(t, stdout, ".[] | .name", "\"some-packager-some-arch\"")
 }
+
+func TestCoreWithMissingCustomBoardOptionsIsLoaded(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Install platform in Sketchbook hardware dir
+	testPlatformName := "platform_with_missing_custom_board_options"
+	platformInstallDir := cli.SketchbookDir().Join("hardware", "arduino-beta-dev")
+	require.NoError(t, platformInstallDir.MkdirAll())
+	require.NoError(t, paths.New("..", "testdata", testPlatformName).CopyDirTo(platformInstallDir.Join(testPlatformName)))
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("core", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+	// Verifies platform is loaded except excluding board with missing options
+	requirejson.Contains(t, stdout, `[
+		{
+			"id": "arduino-beta-dev:platform_with_missing_custom_board_options"
+		}
+	]`)
+	requirejson.Query(t, stdout, ".[] | select(.id == \"arduino-beta-dev:platform_with_missing_custom_board_options\") | .boards | length", "2")
+	// Verify board with malformed options is not loaded
+	// while other board is loaded
+	requirejson.Contains(t, stdout, `[
+		{
+			"id": "arduino-beta-dev:platform_with_missing_custom_board_options",
+			"boards": [
+				{
+					"fqbn": "arduino-beta-dev:platform_with_missing_custom_board_options:nessuno"
+				},
+				{
+					"fqbn": "arduino-beta-dev:platform_with_missing_custom_board_options:altra"
+				}
+			]
+		}
+	]`)
+}
