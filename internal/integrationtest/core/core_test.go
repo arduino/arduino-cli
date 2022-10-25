@@ -765,3 +765,29 @@ func TestCoreListDeprecatedPlatformWithInstalledJson(t *testing.T) {
 	requirejson.Len(t, stdout, 1)
 	requirejson.Query(t, stdout, ".[] | .deprecated", "true")
 }
+
+func TestCoreListPlatformWithoutPlatformTxt(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("core", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 0)
+
+	// Simulates creation of a new core in the sketchbook hardware folder
+	// without a platforms.txt
+	testBoardsTxt := paths.New("..", "testdata", "boards.local.txt")
+	boardsTxt := cli.SketchbookDir().Join("hardware", "some-packager", "some-arch", "boards.txt")
+	require.NoError(t, boardsTxt.Parent().MkdirAll())
+	require.NoError(t, testBoardsTxt.CopyTo(boardsTxt))
+
+	// Verifies no core is installed
+	stdout, _, err = cli.Run("core", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+	requirejson.Query(t, stdout, ".[] | .id", "\"some-packager:some-arch\"")
+	requirejson.Query(t, stdout, ".[] | .name", "\"some-packager-some-arch\"")
+}

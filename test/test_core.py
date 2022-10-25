@@ -93,33 +93,6 @@ def test_core_search_update_index_delay(run_command, data_dir):
     assert "Downloading index" not in res.stdout
 
 
-def test_core_list_platform_without_platform_txt(run_command, data_dir):
-    assert run_command(["update"])
-
-    # Verifies no core is installed
-    res = run_command(["core", "list", "--format", "json"])
-    assert res.ok
-    cores = json.loads(res.stdout)
-    assert len(cores) == 0
-
-    # Simulates creation of a new core in the sketchbook hardware folder
-    # without a platforms.txt
-    test_boards_txt = Path(__file__).parent / "testdata" / "boards.local.txt"
-    boards_txt = Path(data_dir, "hardware", "some-packager", "some-arch", "boards.txt")
-    boards_txt.parent.mkdir(parents=True, exist_ok=True)
-    boards_txt.touch()
-    boards_txt.write_bytes(test_boards_txt.read_bytes())
-
-    # Verifies no core is installed
-    res = run_command(["core", "list", "--format", "json"])
-    assert res.ok
-    cores = json.loads(res.stdout)
-    assert len(cores) == 1
-    core = cores[0]
-    assert core["id"] == "some-packager:some-arch"
-    assert core["name"] == "some-packager-some-arch"
-
-
 @pytest.mark.skipif(
     platform.system() in ["Darwin", "Windows"],
     reason="macOS by default is case insensitive https://github.com/actions/virtual-environments/issues/865 "
