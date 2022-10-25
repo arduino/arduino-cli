@@ -131,13 +131,3 @@ def test_core_download_multiple_platforms(run_command, data_dir):
     res = run_command(["core", "upgrade", "Packager:Arch"])
     assert res.failed
     assert "Invalid argument passed: Found 2 platform for reference" in res.stderr
-
-
-def test_core_index_without_checksum(run_command):
-    assert run_command(["config", "init", "--dest-dir", "."])
-    url = "https://raw.githubusercontent.com/keyboardio/ArduinoCore-GD32-Keyboardio/ae5938af2f485910729e7d27aa233032a1cb4734/package_gd32_index.json"  # noqa: E501
-    assert run_command(["config", "add", "board_manager.additional_urls", url])
-
-    assert run_command(["core", "update-index"])
-    result = run_command(["core", "list", "--all"])
-    assert result.ok  # this should not make the cli crash
