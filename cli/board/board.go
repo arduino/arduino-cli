@@ -34,6 +34,7 @@ func NewCommand() *cobra.Command {
 			"  " + os.Args[0] + " board list",
 	}
 
+	boardCommand.AddCommand(initAttachCommand())
 	boardCommand.AddCommand(initDetailsCommand())
 	boardCommand.AddCommand(initListCommand())
 	boardCommand.AddCommand(initListAllCommand())

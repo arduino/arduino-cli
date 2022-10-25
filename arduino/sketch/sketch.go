@@ -49,9 +49,10 @@ type Metadata struct {
 
 // BoardMetadata represents the board metadata for the sketch
 type BoardMetadata struct {
-	Fqbn string `json:"fqbn"`
-	Name string `json:"name,omitempty"`
-	Port string `json:"port,omitempty"`
+	Fqbn     string `json:"fqbn"`
+	Name     string `json:"name,omitempty"`
+	Port     string `json:"port,omitempty"`
+	Protocol string `json:"protocol,omitempty"`
 }
 
 var tr = i18n.Tr
