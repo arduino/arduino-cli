@@ -855,3 +855,14 @@ func TestCoreListOutdatedCore(t *testing.T) {
 	// Installed version must be older than latest
 	require.True(t, installedVersion.LessThan(latestVersion))
 }
+
+func TestCoreLoadingPackageManager(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Create empty architecture folder (this condition is normally produced by `core uninstall`)
+	require.NoError(t, cli.DataDir().Join("packages", "foovendor", "hardware", "fooarch").MkdirAll())
+
+	_, _, err := cli.Run("core", "list", "--all", "--format", "json")
+	require.NoError(t, err) // this should not make the cli crash
+}
