@@ -26,27 +26,6 @@ from pathlib import Path
 import semver
 
 
-@pytest.mark.skipif(
-    platform.system() == "Windows",
-    reason="core fails with fatal error: bits/c++config.h: No such file or directory",
-)
-def test_core_install_esp32(run_command, data_dir):
-    # update index
-    url = "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
-    assert run_command(["core", "update-index", f"--additional-urls={url}"])
-    # install 3rd-party core
-    assert run_command(["core", "install", "esp32:esp32@2.0.0", f"--additional-urls={url}"])
-    # create a sketch and compile to double check the core was successfully installed
-    sketch_name = "test_core_install_esp32"
-    sketch_path = os.path.join(data_dir, sketch_name)
-    assert run_command(["sketch", "new", sketch_path])
-    assert run_command(["compile", "-b", "esp32:esp32:esp32", sketch_path])
-    # prevent regressions for https://github.com/arduino/arduino-cli/issues/163
-    sketch_path_md5 = hashlib.md5(sketch_path.encode()).hexdigest().upper()
-    build_dir = Path(tempfile.gettempdir(), f"arduino-sketch-{sketch_path_md5}")
-    assert (build_dir / f"{sketch_name}.ino.partitions.bin").exists()
-
-
 def test_core_install_creates_installed_json(run_command, data_dir):
     assert run_command(["core", "update-index"])
     assert run_command(["core", "install", "arduino:avr@1.6.23"])

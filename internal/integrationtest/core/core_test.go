@@ -16,6 +16,8 @@
 package core_test
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"runtime"
 	"sort"
@@ -235,6 +237,32 @@ func TestCoreInstallWithoutUpdateIndex(t *testing.T) {
 	stdout, _, err := cli.Run("core", "install", "arduino:samd@1.8.6")
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "Downloading index: package_index.tar.bz2 downloaded")
+}
+
+func TestCoreInstallEsp32(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// update index
+	url := "https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json"
+	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url)
+	require.NoError(t, err)
+	// install 3rd-party core
+	_, _, err = cli.Run("core", "install", "esp32:esp32@2.0.0", "--additional-urls="+url)
+	require.NoError(t, err)
+	// create a sketch and compile to double check the core was successfully installed
+	sketchName := "test_core_install_esp32"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+	_, _, err = cli.Run("compile", "-b", "esp32:esp32:esp32", sketchPath.String())
+	require.NoError(t, err)
+	// prevent regressions for https://github.com/arduino/arduino-cli/issues/163
+	md5 := md5.Sum(([]byte(sketchPath.String())))
+	sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
+	require.NotEmpty(t, sketchPathMd5)
+	buildDir := paths.TempDir().Join("arduino-sketch-" + sketchPathMd5)
+	require.FileExists(t, buildDir.Join(sketchName+".ino.partitions.bin").String())
 }
 
 func TestCoreDownload(t *testing.T) {
