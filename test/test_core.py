@@ -133,24 +133,6 @@ def test_core_download_multiple_platforms(run_command, data_dir):
     assert "Invalid argument passed: Found 2 platform for reference" in res.stderr
 
 
-def test_core_list_outdated_core(run_command):
-    assert run_command(["update"])
-
-    # Install an old core version
-    assert run_command(["core", "install", "arduino:samd@1.8.6"])
-
-    res = run_command(["core", "list", "--format", "json"])
-
-    data = json.loads(res.stdout)
-    assert len(data) == 1
-    samd_core = data[0]
-    assert samd_core["installed"] == "1.8.6"
-    installed_version = semver.parse_version_info(samd_core["installed"])
-    latest_version = semver.parse_version_info(samd_core["latest"])
-    # Installed version must be older than latest
-    assert installed_version.compare(latest_version) == -1
-
-
 def test_core_loading_package_manager(run_command, data_dir):
     # Create empty architecture folder (this condition is normally produced by `core uninstall`)
     (Path(data_dir) / "packages" / "foovendor" / "hardware" / "fooarch").mkdir(parents=True)

@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
+	semver "go.bug.st/relaxed-semver"
 	"go.bug.st/testifyjson/requirejson"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
@@ -830,4 +831,27 @@ func TestCoreWithMissingCustomBoardOptionsIsLoaded(t *testing.T) {
 			]
 		}
 	]`)
+}
+
+func TestCoreListOutdatedCore(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Install an old core version
+	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.6")
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("core", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+	requirejson.Query(t, stdout, ".[0] | .installed", "\"1.8.6\"")
+	installedVersion, err := semver.Parse(strings.Trim(requirejson.Parse(t, stdout).Query(".[0] | .installed").String(), "\""))
+	require.NoError(t, err)
+	latestVersion, err := semver.Parse(strings.Trim(requirejson.Parse(t, stdout).Query(".[0] | .latest").String(), "\""))
+	require.NoError(t, err)
+	// Installed version must be older than latest
+	require.True(t, installedVersion.LessThan(latestVersion))
 }
