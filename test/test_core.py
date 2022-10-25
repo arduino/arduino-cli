@@ -93,36 +93,6 @@ def test_core_search_update_index_delay(run_command, data_dir):
     assert "Downloading index" not in res.stdout
 
 
-def test_core_list_deprecated_platform_with_installed_json(run_command, httpserver, data_dir):
-    # Set up the server to serve our custom index file
-    test_index = Path(__file__).parent / "testdata" / "test_index.json"
-    httpserver.expect_request("/test_index.json").respond_with_data(test_index.read_text())
-
-    # update custom index
-    url = httpserver.url_for("/test_index.json")
-    assert run_command(["core", "update-index", f"--additional-urls={url}"])
-
-    # install some core for testing
-    assert run_command(["core", "install", "Package:x86", f"--additional-urls={url}"])
-
-    installed_json_file = Path(data_dir, "packages", "Package", "hardware", "x86", "1.2.3", "installed.json")
-    assert installed_json_file.exists()
-    installed_json = json.load(installed_json_file.open("r"))
-    platform = installed_json["packages"][0]["platforms"][0]
-    del platform["deprecated"]
-    installed_json["packages"][0]["platforms"][0] = platform
-    with open(installed_json_file, "w") as f:
-        json.dump(installed_json, f)
-
-    # test same behaviour with json output
-    result = run_command(["core", "list", f"--additional-urls={url}", "--format=json"])
-    assert result.ok
-
-    platforms = json.loads(result.stdout)
-    assert len(platforms) == 1
-    assert platforms[0]["deprecated"]
-
-
 def test_core_list_platform_without_platform_txt(run_command, data_dir):
     assert run_command(["update"])
 

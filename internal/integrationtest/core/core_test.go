@@ -728,3 +728,40 @@ func TestCoreListSortedResults(t *testing.T) {
 	require.True(t, strings.HasSuffix(platform, strings.TrimLeft(notSortedDeprecated, "[")))
 
 }
+
+func TestCoreListDeprecatedPlatformWithInstalledJson(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Set up the server to serve our custom index file
+	testIndex := paths.New("..", "testdata", "test_index.json")
+	url := env.HTTPServeFile(8000, testIndex)
+
+	// update custom index
+	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url.String())
+	require.NoError(t, err)
+
+	// install some core for testing
+	_, _, err = cli.Run("core", "install", "Package:x86", "--additional-urls="+url.String())
+	require.NoError(t, err)
+
+	installedJsonFile := cli.DataDir().Join("packages", "Package", "hardware", "x86", "1.2.3", "installed.json")
+	require.FileExists(t, installedJsonFile.String())
+	lines, err := installedJsonFile.ReadFileAsLines()
+	require.NoError(t, err)
+	var json []byte
+	for i, v := range lines {
+		if i != 13 {
+			json = append(json, []byte(v+"\n")...)
+		}
+	}
+	err = installedJsonFile.WriteFile(json)
+	require.NoError(t, err)
+
+	// test same behaviour with json output
+	stdout, _, err := cli.Run("core", "list", "--additional-urls="+url.String(), "--format=json")
+	require.NoError(t, err)
+
+	requirejson.Len(t, stdout, 1)
+	requirejson.Query(t, stdout, ".[] | .deprecated", "true")
+}
