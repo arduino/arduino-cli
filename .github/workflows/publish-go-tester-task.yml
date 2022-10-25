@@ -71,41 +71,44 @@ jobs:
 
           echo "::set-output name=prefix::$PACKAGE_NAME_PREFIX"
 
-  build:
+  create-artifacts:
     needs: package-name-prefix
-    name: Build ${{ matrix.os.name }}
+    name: Create artifact ${{ matrix.artifact.name }}
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        os:
-          - task: Windows_32bit
+        artifact:
+          - task: dist:Windows_32bit
             path: "*Windows_32bit.zip"
             name: Windows_X86-32
-          - task: Windows_64bit
+          - task: dist:Windows_64bit
             path: "*Windows_64bit.zip"
             name: Windows_X86-64
-          - task: Linux_32bit
+          - task: dist:Linux_32bit
             path: "*Linux_32bit.tar.gz"
             name: Linux_X86-32
-          - task: Linux_64bit
+          - task: dist:Linux_64bit
             path: "*Linux_64bit.tar.gz"
             name: Linux_X86-64
-          - task: Linux_ARMv6
+          - task: dist:Linux_ARMv6
             path: "*Linux_ARMv6.tar.gz"
             name: Linux_ARMv6
-          - task: Linux_ARMv7
+          - task: dist:Linux_ARMv7
             path: "*Linux_ARMv7.tar.gz"
             name: Linux_ARMv7
-          - task: Linux_ARM64
+          - task: dist:Linux_ARM64
             path: "*Linux_ARM64.tar.gz"
             name: Linux_ARM64
-          - task: macOS_64bit
+          - task: dist:macOS_64bit
             path: "*macOS_64bit.tar.gz"
             name: macOS_64
-          - task: macOS_ARM64
+          - task: dist:macOS_ARM64
             path: "*macOS_ARM64.tar.gz"
             name: macOS_ARM64
+          - task: protoc:collect
+            path: "*_proto.zip"
+            name: rpc-protocol-files
 
     steps:
       - name: Checkout repository
@@ -123,48 +126,18 @@ jobs:
         run: |
           PACKAGE_NAME_PREFIX=${{ needs.package-name-prefix.outputs.prefix }}
           export PACKAGE_NAME_PREFIX
-          task dist:${{ matrix.os.task }}
+          task ${{ matrix.artifact.task }}
 
       # Transfer builds to artifacts job
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          path: ${{ env.DIST_DIR }}/${{ matrix.os.path }}
-          name: ${{ matrix.os.name }}
-
-  proto-files:
-    needs:
-      - package-name-prefix
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Install Task
-        uses: arduino/setup-task@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: 3.x
-
-      - name: Collect proto files
-        run: |
-          PACKAGE_NAME_PREFIX=${{ needs.package-name-prefix.outputs.prefix }}
-          export PACKAGE_NAME_PREFIX
-          task protoc:collect
-
-      - name: Upload proto files zip
-        uses: actions/upload-artifact@v3
-        with:
-          path: ${{ env.DIST_DIR }}/*.zip
-          name: rpc-protocol-files
+          path: ${{ env.DIST_DIR }}/${{ matrix.artifact.path }}
+          name: ${{ matrix.artifact.name }}
 
   checksums:
     needs:
       - build
-      - proto-files
       - package-name-prefix
     runs-on: ubuntu-latest
 
