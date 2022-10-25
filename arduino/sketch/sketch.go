@@ -253,10 +253,13 @@ func (s *Sketch) GetProfile(profileName string) *Profile {
 
 // checkSketchCasing returns an error if the casing of the sketch folder and the main file are different.
 // Correct:
-//    MySketch/MySketch.ino
+//
+//	MySketch/MySketch.ino
+//
 // Wrong:
-//    MySketch/mysketch.ino
-//    mysketch/MySketch.ino
+//
+//	MySketch/mysketch.ino
+//	mysketch/MySketch.ino
 //
 // This is mostly necessary to avoid errors on Mac OS X.
 // For more info see: https://github.com/arduino/arduino-cli/issues/1174
