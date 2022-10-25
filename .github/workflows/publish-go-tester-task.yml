@@ -137,7 +137,7 @@ jobs:
 
   checksums:
     needs:
-      - build
+      - create-artifacts
       - package-name-prefix
     runs-on: ubuntu-latest
 
