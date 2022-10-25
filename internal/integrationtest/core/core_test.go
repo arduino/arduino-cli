@@ -655,3 +655,76 @@ func TestCoreSearchSortedResults(t *testing.T) {
 		"[.[] | .name |=ascii_downcase | .name]").String()
 	require.True(t, strings.HasSuffix(platform, strings.TrimLeft(notSortedDeprecated, "[")))
 }
+
+func TestCoreListSortedResults(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Set up the server to serve our custom index file
+	testIndex := paths.New("..", "testdata", "test_index.json")
+	url := env.HTTPServeFile(8000, testIndex)
+
+	// update custom index
+	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url.String())
+	require.NoError(t, err)
+
+	// install some core for testing
+	_, _, err = cli.Run("core", "install", "test:x86", "Retrokits-RK002:arm", "Package:x86", "--additional-urls="+url.String())
+	require.NoError(t, err)
+
+	// list all with additional url specified
+	stdout, _, err := cli.Run("core", "list", "--additional-urls="+url.String())
+	require.NoError(t, err)
+
+	out := strings.Split(strings.TrimSpace(string(stdout)), "\n")
+	var lines, deprecated, notDeprecated [][]string
+	for i, v := range out {
+		if i > 0 {
+			v = strings.Join(strings.Fields(v), " ")
+			lines = append(lines, strings.SplitN(v, " ", 4))
+		}
+	}
+	require.Len(t, lines, 3)
+	for _, v := range lines {
+		if strings.HasPrefix(v[3], "[DEPRECATED]") {
+			deprecated = append(deprecated, v)
+		} else {
+			notDeprecated = append(notDeprecated, v)
+		}
+	}
+
+	// verify that results are already sorted correctly
+	require.True(t, sort.SliceIsSorted(deprecated, func(i, j int) bool {
+		return strings.ToLower(deprecated[i][3]) < strings.ToLower(deprecated[j][3])
+	}))
+	require.True(t, sort.SliceIsSorted(notDeprecated, func(i, j int) bool {
+		return strings.ToLower(notDeprecated[i][3]) < strings.ToLower(notDeprecated[j][3])
+	}))
+
+	// verify that deprecated platforms are the last ones
+	require.Equal(t, lines, append(notDeprecated, deprecated...))
+
+	// test same behaviour with json output
+	stdout, _, err = cli.Run("core", "list", "--additional-urls="+url.String(), "--format=json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 3)
+
+	// verify that results are already sorted correctly
+	sortedDeprecated := requirejson.Parse(t, stdout).Query(
+		"[ .[] | select(.deprecated == true) | .name |=ascii_downcase | .name ] | sort").String()
+	notSortedDeprecated := requirejson.Parse(t, stdout).Query(
+		"[.[] | select(.deprecated == true) | .name |=ascii_downcase | .name]").String()
+	require.Equal(t, sortedDeprecated, notSortedDeprecated)
+
+	sortedNotDeprecated := requirejson.Parse(t, stdout).Query(
+		"[ .[] | select(.deprecated != true) | .name |=ascii_downcase | .name ] | sort").String()
+	notSortedNotDeprecated := requirejson.Parse(t, stdout).Query(
+		"[.[] | select(.deprecated != true) | .name |=ascii_downcase | .name]").String()
+	require.Equal(t, sortedNotDeprecated, notSortedNotDeprecated)
+
+	// verify that deprecated platforms are the last ones
+	platform := requirejson.Parse(t, stdout).Query(
+		"[.[] | .name |=ascii_downcase | .name]").String()
+	require.True(t, strings.HasSuffix(platform, strings.TrimLeft(notSortedDeprecated, "[")))
+
+}
