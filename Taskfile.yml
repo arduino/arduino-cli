@@ -105,6 +105,23 @@ tasks:
           {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}} \
           {{.TEST_LDFLAGS}}
 
+  go:integration-test:
+    desc: Run the Go-based integration tests
+    deps:
+      - task: go:build
+    dir: '{{default "./" .GO_MODULE_PATH}}'
+    cmds:
+      - |
+        go test \
+          -v \
+          -short \
+          {{ .GO_TEST_PACKAGE }} \
+          -run '{{default ".*" .GO_TEST_REGEX}}' \
+          {{default "-timeout 20m -coverpkg=./... -covermode=atomic" .GO_TEST_FLAGS}} \
+          -coverprofile=coverage_unit.txt \
+          {{default .DEFAULT_INTEGRATIONTEST_GO_PACKAGES .GO_PACKAGES}} \
+          {{.TEST_LDFLAGS}}
+
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/test-go-integration-task/Taskfile.yml
   go:test-integration:
     desc: Run integration tests
@@ -342,10 +359,13 @@ tasks:
 vars:
   PROJECT_NAME: "arduino-cli"
   DIST_DIR: "dist"
-  # all modules of this project except for "legacy/..." module
+  # all modules of this project except for "legacy/..." module and integration test
   DEFAULT_GO_PACKAGES:
     sh: |
-      echo $(cd {{default "./" .GO_MODULE_PATH}} && go list ./... | grep -v legacy | tr '\n' ' ' || echo '"ERROR: Unable to discover Go packages"')
+      echo $(cd {{default "./" .GO_MODULE_PATH}} && go list ./... | grep -v internal/integrationtest | grep -v legacy | tr '\n' ' ' || echo '"ERROR: Unable to discover Go packages"')
+  DEFAULT_INTEGRATIONTEST_GO_PACKAGES:
+    sh: |
+      echo $(cd {{default "./" .GO_MODULE_PATH}} && go list ./... | grep internal/integrationtest | tr '\n' ' ' || echo '"ERROR: Unable to discover Go packages"')
   # build vars
   COMMIT:
     sh: echo "$(git log --no-show-signature -n 1 --format=%h)"
