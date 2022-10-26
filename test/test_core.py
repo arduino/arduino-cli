@@ -47,31 +47,6 @@ def test_core_install_creates_installed_json(run_command, data_dir):
     assert ordered(installed_json) == ordered(expected_installed_json)
 
 
-def test_core_search_update_index_delay(run_command, data_dir):
-    assert run_command(["update"])
-
-    # Verifies index update is not run
-    res = run_command(["core", "search"])
-    assert res.ok
-    assert "Downloading index" not in res.stdout
-
-    # Change edit time of package index file
-    index_file = Path(data_dir, "package_index.json")
-    date = datetime.datetime.now() - datetime.timedelta(hours=25)
-    mod_time = time.mktime(date.timetuple())
-    os.utime(index_file, (mod_time, mod_time))
-
-    # Verifies index update is run
-    res = run_command(["core", "search"])
-    assert res.ok
-    assert "Downloading index" in res.stdout
-
-    # Verifies index update is not run again
-    res = run_command(["core", "search"])
-    assert res.ok
-    assert "Downloading index" not in res.stdout
-
-
 @pytest.mark.skipif(
     platform.system() in ["Darwin", "Windows"],
     reason="macOS by default is case insensitive https://github.com/actions/virtual-environments/issues/865 "

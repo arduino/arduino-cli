@@ -19,11 +19,13 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"os"
 	"runtime"
 	"sort"
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
@@ -611,6 +613,31 @@ func TestCoreListWithInstalledJson(t *testing.T) {
 			"name": "Adafruit Boards"
 		}
 	]`)
+}
+
+func TestCoreSearchUpdateIndexDelay(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Verifies index update is not run
+	stdout, _, err := cli.Run("core", "search")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Downloading index")
+
+	// Change edit time of package index file
+	indexFile := cli.DataDir().Join("package_index.json")
+	date := time.Now().Local().Add(time.Hour * (-25))
+	require.NoError(t, os.Chtimes(indexFile.String(), date, date))
+
+	// Verifies index update is run
+	stdout, _, err = cli.Run("core", "search")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Downloading index")
+
+	// Verifies index update is not run again
+	stdout, _, err = cli.Run("core", "search")
+	require.NoError(t, err)
+	require.NotContains(t, string(stdout), "Downloading index")
 }
 
 func TestCoreSearchSortedResults(t *testing.T) {
