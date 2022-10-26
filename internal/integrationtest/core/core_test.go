@@ -848,6 +848,46 @@ func TestCoreListPlatformWithoutPlatformTxt(t *testing.T) {
 	requirejson.Query(t, stdout, ".[] | .name", "\"some-packager-some-arch\"")
 }
 
+func TestCoreDownloadMultiplePlatforms(t *testing.T) {
+	if runtime.GOOS == "windows" || runtime.GOOS == "darwin" {
+		t.Skip("macOS by default is case insensitive https://github.com/actions/virtual-environments/issues/865 ",
+			"Windows too is case insensitive",
+			"https://stackoverflow.com/questions/7199039/file-paths-in-windows-environment-not-case-sensitive")
+	}
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Verifies no core is installed
+	stdout, _, err := cli.Run("core", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 0)
+
+	// Simulates creation of two new cores in the sketchbook hardware folder
+	wd, _ := paths.Getwd()
+	testBoardsTxt := wd.Parent().Join("testdata", "boards.local.txt")
+	boardsTxt := cli.DataDir().Join("packages", "PACKAGER", "hardware", "ARCH", "1.0.0", "boards.txt")
+	require.NoError(t, boardsTxt.Parent().MkdirAll())
+	require.NoError(t, testBoardsTxt.CopyTo(boardsTxt))
+
+	boardsTxt1 := cli.DataDir().Join("packages", "packager", "hardware", "arch", "1.0.0", "boards.txt")
+	require.NoError(t, boardsTxt1.Parent().MkdirAll())
+	require.NoError(t, testBoardsTxt.CopyTo(boardsTxt1))
+
+	// Verifies the two cores are detected
+	stdout, _, err = cli.Run("core", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 2)
+
+	// Try to do an operation on the fake cores.
+	// The cli should not allow it since optimizing the casing results in finding two cores
+	_, stderr, err := cli.Run("core", "upgrade", "Packager:Arch")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Invalid argument passed: Found 2 platform for reference")
+}
+
 func TestCoreWithMissingCustomBoardOptionsIsLoaded(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
