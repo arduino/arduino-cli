@@ -882,8 +882,8 @@ msgid "Error searching boards: %v"
 msgstr "Error searching boards: %v"
 
 #: cli/lib/search.go:81
-msgid "Error searching for Library: %v"
-msgstr "Error searching for Library: %v"
+msgid "Error searching for Libraries: %v"
+msgstr "Error searching for Libraries: %v"
 
 #: cli/core/search.go:93
 msgid "Error searching for platforms: %v"
