@@ -18,8 +18,8 @@
   - `enable_unsafe_install` - set to `true` to enable the use of the `--git-url` and `--zip-file` flags with
     [`arduino-cli lib install`][arduino cli lib install]. These are considered "unsafe" installation methods because
     they allow installing files that have not passed through the Library Manager submission process.
-- `locale` - the language used by Arduino CLI, the parameter is the language identifier in the standard format
-  `<language>_<COUNTRY>.<encoding>` (for example `it` or `it_IT`, or `it_IT.UTF-8`).
+- `locale` - the language used by Arduino CLI to communicate to the user, the parameter is the language identifier in
+  the standard POSIX/Unix format `<language>_<COUNTRY>.<encoding>` (for example `it` or `it_IT`, or `it_IT.UTF-8`).
 - `logging` - configuration options for Arduino CLI's logs.
   - `file` - path to the file where logs will be written.
   - `format` - output format for the logs. Allowed values are `text` or `json`.
