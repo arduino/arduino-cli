@@ -26,6 +26,21 @@ import (
 	"go.bug.st/testifyjson/requirejson"
 )
 
+func TestCorrectHandlingOfPlatformVersionProperty(t *testing.T) {
+	// See: https://github.com/arduino/arduino-cli/issues/1823
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Copy test platform
+	testPlatform := paths.New("testdata", "issue_1823", "DxCore-dev")
+	require.NoError(t, testPlatform.CopyDirTo(cli.SketchbookDir().Join("hardware", "DxCore-dev")))
+
+	// Trigger problematic call
+	out, _, err := cli.Run("core", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Contains(t, out, `[{"id":"DxCore-dev:megaavr","installed":"1.4.10","name":"DxCore"}]`)
+}
+
 func TestCoreSearch(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
