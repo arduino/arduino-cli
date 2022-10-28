@@ -33,6 +33,7 @@ var validMap = map[string]reflect.Kind{
 	"directories.builtin.tools":     reflect.String,
 	"directories.builtin.libraries": reflect.String,
 	"library.enable_unsafe_install": reflect.Bool,
+	"locale":                        reflect.String,
 	"logging.file":                  reflect.String,
 	"logging.format":                reflect.String,
 	"logging.level":                 reflect.String,
