@@ -17,6 +17,7 @@ package sketch_test
 
 import (
 	"archive/zip"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -24,6 +25,14 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
+
+type archiveTest struct {
+	SubTestName         string
+	SketchPathParam     string
+	TargetPathParam     string
+	WorkingDir          *paths.Path
+	ExpectedArchivePath *paths.Path
+}
 
 func TestSketchNew(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
@@ -93,740 +102,208 @@ func verifyZipContainsSketchIncludingBuildDir(t *testing.T, files []*zip.File) {
 	require.Equal(t, paths.New("sketch_simple", "build", "arduino.avr.uno", "sketch_simple.ino.with_bootloader.hex").String(), files[4].Name)
 }
 
-func TestSketchArchiveNoArgs(t *testing.T) {
+func TestSketchArchive(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
 
-	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
-
-	_, _, err := cli.Run("sketch", "archive")
-	require.NoError(t, err)
-
-	cli.SetWorkingDir(env.RootDir())
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveDotArg(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
-
-	_, _, err := cli.Run("sketch", "archive", ".")
-	require.NoError(t, err)
-
-	cli.SetWorkingDir(env.RootDir())
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchDotArgRelativeZipPath(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
+	sketchSimple := cli.CopySketch("sketch_simple")
 
 	// Creates a folder where to save the zip
 	archivesFolder := cli.WorkingDir().Join("my_archives")
 	require.NoError(t, archivesFolder.Mkdir())
 
-	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
-	_, _, err := cli.Run("sketch", "archive", ".", "../my_archives")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(archivesFolder.Join("sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchDotArgAbsoluteZipPath(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
-	_, _, err := cli.Run("sketch", "archive", ".", archivesFolder.String())
-	require.NoError(t, err)
-	archive, err := zip.OpenReader(archivesFolder.Join("sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveDotArgRelativeZipPathAndNameWithoutExtension(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
-	_, _, err := cli.Run("sketch", "archive", ".", "../my_archives/my_custom_sketch")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(archivesFolder.Join("my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveDotArgAbsoluteZipPathAndNameWithoutExtension(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
-	_, _, err := cli.Run("sketch", "archive", ".", archivesFolder.Join("my_custom_sketch").String())
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(archivesFolder.Join("my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveDotArgCustomZipPathAndNameWithExtension(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
-	_, _, err := cli.Run("sketch", "archive", ".", archivesFolder.Join("my_custom_sketch.zip").String())
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(archivesFolder.Join("my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveRelativeSketchPath(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	_, _, err := cli.Run("sketch", "archive", "./sketch_simple")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveAbsoluteSketchPath(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
-	_, _, err := cli.Run("sketch", "archive", env.RootDir().Join("sketch_simple").String())
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(env.RootDir().Join("sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveRelativeSketchPathWithRelativeZipPath(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", "./sketch_simple", "./my_archives")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("my_archives", "sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveRelativeSketchPathWithAbsoluteZipPath(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", "./sketch_simple", archivesFolder.String())
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(archivesFolder.Join("sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveRelativeSketchPathWithRelativeZipPathAndNameWithoutExtension(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", "./sketch_simple", "./my_archives/my_custom_sketch")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("my_archives", "my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveRelativeSketchPathWithRelativeZipPathAndNameWithExtension(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", "./sketch_simple", "./my_archives/my_custom_sketch.zip")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("my_archives", "my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveRelativeSketchPathWithAbsoluteZipPathAndNameWithoutExtension(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", "./sketch_simple", archivesFolder.Join("my_custom_sketch").String())
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(archivesFolder.Join("my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveRelativeSketchPathWithAbsoluteZipPathAndNameWithExtension(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", "./sketch_simple", archivesFolder.Join("my_custom_sketch.zip").String())
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(archivesFolder.Join("my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveAbsoluteSketchPathWithRelativeZipPath(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", cli.WorkingDir().Join("sketch_simple").String(), "./my_archives")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("my_archives", "sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveAbsoluteSketchPathWithAbsoluteZipPath(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
-	_, _, err := cli.Run("sketch", "archive", env.RootDir().Join("sketch_simple").String(), archivesFolder.String())
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(archivesFolder.Join("sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveAbsoluteSketchPathWithRelativeZipPathAndNameWithoutExtension(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", cli.WorkingDir().Join("sketch_simple").String(), "./my_archives/my_custom_sketch")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("my_archives", "my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveAbsoluteSketchPathWithRelativeZipPathAndNameWithExtension(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", cli.WorkingDir().Join("sketch_simple").String(), "./my_archives/my_custom_sketch.zip")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("my_archives", "my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveAbsoluteSketchPathWithAbsoluteZipPathAndNameWithoutExtension(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
-	_, _, err := cli.Run("sketch", "archive", env.RootDir().Join("sketch_simple").String(), archivesFolder.Join("my_custom_sketch").String())
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(archivesFolder.Join("my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveAbsoluteSketchPathWithAbsoluteZipPathAndNameWithExtension(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
-	_, _, err := cli.Run("sketch", "archive", env.RootDir().Join("sketch_simple").String(), archivesFolder.Join("my_custom_sketch.zip").String())
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(archivesFolder.Join("my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchExcludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveNoArgsWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
-	_, _, err := cli.Run("sketch", "archive", "--include-build-dir")
-	require.NoError(t, err)
-	cli.SetWorkingDir(env.RootDir())
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveDotArgWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
-	_, _, err := cli.Run("sketch", "archive", ".", "--include-build-dir")
-	require.NoError(t, err)
-	cli.SetWorkingDir(env.RootDir())
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveDotArgRelativeZipPathWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
-	_, _, err := cli.Run("sketch", "archive", ".", "../my_archives", "--include-build-dir")
-	require.NoError(t, err)
-	cli.SetWorkingDir(env.RootDir())
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("my_archives", "sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveDotArgAbsoluteZipPathWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
-	_, _, err := cli.Run("sketch", "archive", ".", archivesFolder.String(), "--include-build-dir")
-	require.NoError(t, err)
-	cli.SetWorkingDir(env.RootDir())
-
-	archive, err := zip.OpenReader(archivesFolder.Join("sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveDotArgRelativeZipPathAndNameWithoutExtensionWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
-	_, _, err := cli.Run("sketch", "archive", ".", "../my_archives/my_custom_sketch", "--include-build-dir")
-	require.NoError(t, err)
-	cli.SetWorkingDir(env.RootDir())
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("my_archives", "my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveDotArgAbsoluteZipPathAndNameWithoutExtensionWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
-	_, _, err := cli.Run("sketch", "archive", ".", archivesFolder.Join("my_custom_sketch").String(), "--include-build-dir")
-	require.NoError(t, err)
-	cli.SetWorkingDir(env.RootDir())
-
-	archive, err := zip.OpenReader(archivesFolder.Join("my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveDotCustomZipPathAndNameWithExtensionWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	cli.SetWorkingDir(cli.CopySketch("sketch_simple"))
-	_, _, err := cli.Run("sketch", "archive", ".", archivesFolder.Join("my_custom_sketch.zip").String(), "--include-build-dir")
-	require.NoError(t, err)
-	cli.SetWorkingDir(env.RootDir())
-
-	archive, err := zip.OpenReader(archivesFolder.Join("my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveRelativeSketchPathWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	_, _, err := cli.Run("sketch", "archive", "./sketch_simple", "--include-build-dir")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveAbsoluteSketchPathWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	_, _, err := cli.Run("sketch", "archive", cli.WorkingDir().Join("sketch_simple").String(), "--include-build-dir")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveRelativeSketchPathWithRelativeZipPathWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", "./sketch_simple", "./my_archives", "--include-build-dir")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("my_archives", "sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveRelativeSketchPathWithAbsoluteZipPathWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", "./sketch_simple", archivesFolder.String(), "--include-build-dir")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(archivesFolder.Join("sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveRelativeSketchPathWithRelativeZipPathAndNameWithoutExtensionWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", "./sketch_simple", "./my_archives/my_custom_sketch", "--include-build-dir")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("my_archives", "my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveRelativeSketchPathWithRelativeZipPathAndNameWithExtensionWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", "./sketch_simple", "./my_archives/my_custom_sketch.zip", "--include-build-dir")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("my_archives", "my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveRelativeSketchPathWithAbsoluteZipPathAndNameWithoutExtensionWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", "./sketch_simple", archivesFolder.Join("my_custom_sketch").String(), "--include-build-dir")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(archivesFolder.Join("my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveRelativeSketchPathWithAbsoluteZipPathAndNameWithExtensionWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", "./sketch_simple", archivesFolder.Join("my_custom_sketch.zip").String(), "--include-build-dir")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(archivesFolder.Join("my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveAbsoluteSketchPathWithRelativeZipPathWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", cli.WorkingDir().Join("sketch_simple").String(), "./my_archives", "--include-build-dir")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("my_archives", "sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveAbsoluteSketchPathWithAbsoluteZipPathWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", cli.WorkingDir().Join("sketch_simple").String(), archivesFolder.String(), "--include-build-dir")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(archivesFolder.Join("sketch_simple.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveAbsoluteSketchPathWithRelativeZipPathAndNameWithoutExtensionWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", cli.WorkingDir().Join("sketch_simple").String(), "./my_archives/my_custom_sketch", "--include-build-dir")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("my_archives", "my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveAbsoluteSketchPathWithRelativeZipPathAndNameWithExtensionWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", cli.WorkingDir().Join("sketch_simple").String(), "./my_archives/my_custom_sketch.zip", "--include-build-dir")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(cli.WorkingDir().Join("my_archives", "my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveAbsoluteSketchPathWithAbsoluteZipPathAndNameWithoutExtensionWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", cli.WorkingDir().Join("sketch_simple").String(), archivesFolder.Join("my_custom_sketch").String(), "--include-build-dir")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(archivesFolder.Join("my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
-}
-
-func TestSketchArchiveAbsoluteSketchPathWithAbsoluteZipPathAndNameWithExtensionWithIncludeBuildDirFlag(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_ = cli.CopySketch("sketch_simple")
-	// Creates a folder where to save the zip
-	archivesFolder := cli.WorkingDir().Join("my_archives")
-	require.NoError(t, archivesFolder.Mkdir())
-
-	_, _, err := cli.Run("sketch", "archive", cli.WorkingDir().Join("sketch_simple").String(), archivesFolder.Join("my_custom_sketch.zip").String(), "--include-build-dir")
-	require.NoError(t, err)
-
-	archive, err := zip.OpenReader(archivesFolder.Join("my_custom_sketch.zip").String())
-	require.NoError(t, err)
-	defer require.NoError(t, archive.Close())
-	verifyZipContainsSketchIncludingBuildDir(t, archive.File)
+	archiveTests := []archiveTest{
+		{
+			SubTestName:         "ArchiveNoArgs",
+			SketchPathParam:     "",
+			TargetPathParam:     "",
+			WorkingDir:          sketchSimple,
+			ExpectedArchivePath: env.RootDir().Join("sketch_simple.zip"),
+		},
+		{
+			SubTestName:         "ArchiveDotArg",
+			SketchPathParam:     ".",
+			TargetPathParam:     "",
+			WorkingDir:          sketchSimple,
+			ExpectedArchivePath: env.RootDir().Join("sketch_simple.zip"),
+		},
+		{
+			SubTestName:         "DotArgRelativeZipPath",
+			SketchPathParam:     ".",
+			TargetPathParam:     "../my_archives",
+			WorkingDir:          sketchSimple,
+			ExpectedArchivePath: archivesFolder.Join("sketch_simple.zip"),
+		},
+		{
+			SubTestName:         "DotArgAbsoluteZiptPath",
+			SketchPathParam:     ".",
+			TargetPathParam:     archivesFolder.String(),
+			WorkingDir:          sketchSimple,
+			ExpectedArchivePath: archivesFolder.Join("sketch_simple.zip"),
+		},
+		{
+			SubTestName:         "ArchiveDotArgRelativeZipPathAndNameWithoutExtension",
+			SketchPathParam:     ".",
+			TargetPathParam:     "../my_archives/my_custom_sketch",
+			WorkingDir:          sketchSimple,
+			ExpectedArchivePath: archivesFolder.Join("my_custom_sketch.zip"),
+		},
+		{
+			SubTestName:         "ArchiveDotArgAbsoluteZipPathAndNameWithoutExtension",
+			SketchPathParam:     ".",
+			TargetPathParam:     archivesFolder.Join("my_custom_sketch").String(),
+			WorkingDir:          sketchSimple,
+			ExpectedArchivePath: archivesFolder.Join("my_custom_sketch.zip"),
+		},
+		{
+			SubTestName:         "ArchiveDotArgCustomZipPathAndNameWithExtension",
+			SketchPathParam:     ".",
+			TargetPathParam:     archivesFolder.Join("my_custom_sketch.zip").String(),
+			WorkingDir:          sketchSimple,
+			ExpectedArchivePath: archivesFolder.Join("my_custom_sketch.zip"),
+		},
+		{
+			SubTestName:         "ArchiveRelativeSketchPath",
+			SketchPathParam:     "./sketch_simple",
+			TargetPathParam:     "",
+			WorkingDir:          env.RootDir(),
+			ExpectedArchivePath: env.RootDir().Join("sketch_simple.zip"),
+		},
+		{
+			SubTestName:         "ArchiveAbsoluteSketchPath",
+			SketchPathParam:     env.RootDir().Join("sketch_simple").String(),
+			TargetPathParam:     "",
+			WorkingDir:          env.RootDir(),
+			ExpectedArchivePath: env.RootDir().Join("sketch_simple.zip"),
+		},
+		{
+			SubTestName:         "ArchiveRelativeSketchPathWithRelativeZipPath",
+			SketchPathParam:     "./sketch_simple",
+			TargetPathParam:     "./my_archives",
+			WorkingDir:          env.RootDir(),
+			ExpectedArchivePath: archivesFolder.Join("sketch_simple.zip"),
+		},
+		{
+			SubTestName:         "ArchiveRelativeSketchPathWithAbsoluteZipPath",
+			SketchPathParam:     "./sketch_simple",
+			TargetPathParam:     archivesFolder.String(),
+			WorkingDir:          env.RootDir(),
+			ExpectedArchivePath: archivesFolder.Join("sketch_simple.zip"),
+		},
+		{
+			SubTestName:         "ArchiveRelativeSketchPathWithRelativeZipPathAndNameWithoutExtension",
+			SketchPathParam:     "./sketch_simple",
+			TargetPathParam:     "./my_archives/my_custom_sketch",
+			WorkingDir:          env.RootDir(),
+			ExpectedArchivePath: archivesFolder.Join("my_custom_sketch.zip"),
+		},
+		{
+			SubTestName:         "ArchiveRelativeSketchPathWithRelativeZipPathAndNameWithExtension",
+			SketchPathParam:     "./sketch_simple",
+			TargetPathParam:     "./my_archives/my_custom_sketch.zip",
+			WorkingDir:          env.RootDir(),
+			ExpectedArchivePath: archivesFolder.Join("my_custom_sketch.zip"),
+		},
+		{
+			SubTestName:         "ArchiveRelativeSketchPathWithAbsoluteZipPathAndNameWithoutExtension",
+			SketchPathParam:     "./sketch_simple",
+			TargetPathParam:     archivesFolder.Join("my_custom_sketch").String(),
+			WorkingDir:          env.RootDir(),
+			ExpectedArchivePath: archivesFolder.Join("my_custom_sketch.zip"),
+		},
+		{
+			SubTestName:         "ArchiveRelativeSketchPathWithAbsoluteZipPathAndNameWithoutExtension",
+			SketchPathParam:     "./sketch_simple",
+			TargetPathParam:     archivesFolder.Join("my_custom_sketch.zip").String(),
+			WorkingDir:          env.RootDir(),
+			ExpectedArchivePath: archivesFolder.Join("my_custom_sketch.zip"),
+		},
+		{
+			SubTestName:         "ArchiveAbsoluteSketchPathWithRelativeZipPath",
+			SketchPathParam:     cli.WorkingDir().Join("sketch_simple").String(),
+			TargetPathParam:     "./my_archives",
+			WorkingDir:          env.RootDir(),
+			ExpectedArchivePath: archivesFolder.Join("sketch_simple.zip"),
+		},
+		{
+			SubTestName:         "ArchiveAbsoluteSketchPathWithAbsoluteZipPath",
+			SketchPathParam:     env.RootDir().Join("sketch_simple").String(),
+			TargetPathParam:     archivesFolder.String(),
+			WorkingDir:          sketchSimple,
+			ExpectedArchivePath: archivesFolder.Join("sketch_simple.zip"),
+		},
+		{
+			SubTestName:         "ArchiveAbsoluteSketchPathWithRelativeZipPathAndNameWithoutExtension",
+			SketchPathParam:     cli.WorkingDir().Join("sketch_simple").String(),
+			TargetPathParam:     "./my_archives/my_custom_sketch",
+			WorkingDir:          env.RootDir(),
+			ExpectedArchivePath: archivesFolder.Join("my_custom_sketch.zip"),
+		},
+		{
+			SubTestName:         "ArchiveAbsoluteSketchPathWithRelativeZipPathAndNameWithExtension",
+			SketchPathParam:     cli.WorkingDir().Join("sketch_simple").String(),
+			TargetPathParam:     "./my_archives/my_custom_sketch.zip",
+			WorkingDir:          env.RootDir(),
+			ExpectedArchivePath: archivesFolder.Join("my_custom_sketch.zip"),
+		},
+		{
+			SubTestName:         "ArchiveAbsoluteSketchPathWithAbsoluteZipPathAndNameWithoutExtension",
+			SketchPathParam:     env.RootDir().Join("sketch_simple").String(),
+			TargetPathParam:     archivesFolder.Join("my_custom_sketch").String(),
+			WorkingDir:          sketchSimple,
+			ExpectedArchivePath: archivesFolder.Join("my_custom_sketch.zip"),
+		},
+		{
+			SubTestName:         "ArchiveAbsoluteSketchPathWithAbsoluteZipPathAndNameWithExtension",
+			SketchPathParam:     env.RootDir().Join("sketch_simple").String(),
+			TargetPathParam:     archivesFolder.Join("my_custom_sketch.zip").String(),
+			WorkingDir:          sketchSimple,
+			ExpectedArchivePath: archivesFolder.Join("my_custom_sketch.zip"),
+		},
+	}
+
+	for _, test := range archiveTests {
+		t.Run(fmt.Sprint(test.SubTestName), func(t *testing.T) {
+			var err error
+			cli.SetWorkingDir(test.WorkingDir)
+			if test.TargetPathParam == "" {
+				if test.SketchPathParam == "" {
+					_, _, err = cli.Run("sketch", "archive")
+				} else {
+					_, _, err = cli.Run("sketch", "archive", test.SketchPathParam)
+				}
+			} else {
+				_, _, err = cli.Run("sketch", "archive", test.SketchPathParam, test.TargetPathParam)
+			}
+			require.NoError(t, err)
+
+			archive, err := zip.OpenReader(test.ExpectedArchivePath.String())
+			require.NoError(t, err)
+			defer require.NoError(t, archive.Close())
+			defer require.NoError(t, test.ExpectedArchivePath.Remove())
+			verifyZipContainsSketchExcludingBuildDir(t, archive.File)
+		})
+		t.Run(fmt.Sprint(test.SubTestName+"WithIncludeBuildDirFlag"), func(t *testing.T) {
+			var err error
+			cli.SetWorkingDir(test.WorkingDir)
+			if test.TargetPathParam == "" {
+				if test.SketchPathParam == "" {
+					_, _, err = cli.Run("sketch", "archive", "--include-build-dir")
+				} else {
+					_, _, err = cli.Run("sketch", "archive", test.SketchPathParam, "--include-build-dir")
+				}
+			} else {
+				_, _, err = cli.Run("sketch", "archive", test.SketchPathParam, test.TargetPathParam, "--include-build-dir")
+			}
+			require.NoError(t, err)
+
+			archive, err := zip.OpenReader(test.ExpectedArchivePath.String())
+			require.NoError(t, err)
+			defer require.NoError(t, archive.Close())
+			defer require.NoError(t, test.ExpectedArchivePath.Remove())
+			verifyZipContainsSketchIncludingBuildDir(t, archive.File)
+		})
+	}
 }
 
 func TestSketchArchiveWithPdeMainFile(t *testing.T) {
