@@ -140,28 +140,60 @@ no requirement to store sketches in the sketchbook folder.
 
 ## Library/Boards Manager links
 
-A URI in a comment in the form `http://librarymanager#SEARCH_TERM` will open a search for SEARCH_TERM in
+**(available in Arduino IDE >=1.6.9 <2.x || >=2.0.1)**
+
+A URI in a comment in the form:
+
+```text
+http://librarymanager[/TYPE_FILTER[/TOPIC_FILTER]][#SEARCH_KEYWORDS]
+```
+
+will open a search in
 [Library Manager](https://docs.arduino.cc/software/ide-v1/tutorials/installing-libraries#using-the-library-manager) when
 clicked in the Arduino IDE.
 
-A URI in a comment in the form `http://boardsmanager#SEARCH_TERM` will open a search for SEARCH_TERM in
-[Boards Manager](https://docs.arduino.cc/learn/starting-guide/cores) when clicked in the Arduino IDE.
+A URI in a comment in the form:
 
-This can be used to offer the user an easy way to install dependencies of the sketch.
+```text
+http://boardsmanager[/TYPE_FILTER][#SEARCH_KEYWORDS]
+```
+
+will open a search in [Boards Manager](https://docs.arduino.cc/learn/starting-guide/cores) when clicked in the Arduino
+IDE.
+
+These links can be used to offer the user an easy way to install dependencies of the sketch.
+
+The search field will be populated with the `SEARCH_KEYWORDS` fragment component of the URI. Any characters other than
+`A`-`Z`, `a`-`z`, `0`-`9`, and `:` are treated as spaces by the search algorithm, which allows multiple keywords to be
+specified via the URI.
+
+---
+
+**(available in Arduino IDE >=2.0.1)**
+
+The "**Type**" filter will be set to the optional `TYPE_FILTER` path component of the URI.
+
+The Library Manager "**Topic**" filter will be set to the optional `TOPIC_FILTER` path component of the URI.
+
+Unlike the `SEARCH_KEYWORDS` fragment, spaces and reserved characters in these components must be
+[percent-encoded](https://en.wikipedia.org/wiki/Percent-encoding) (e.g., `Signal%20Input%2FOutput`).
+
+Although the filter setting is not supported by previous IDE versions, URIs containing these path components still
+function in all other respects.
+
+---
 
 This feature is only available when using the Arduino IDE, so be sure to provide supplementary documentation to help the
 users of other development software install the sketch dependencies.
-
-This feature was added in Arduino IDE 1.6.9.
 
 ### Example
 
 ```c++
 // install the Arduino SAMD Boards platform to add support for your MKR WiFi 1010 board
-// if using the Arduino IDE, click here: http://boardsmanager#SAMD
+// if using the Arduino IDE, click here: http://boardsmanager/Arduino#SAMD
 
 // install the WiFiNINA library via Library Manager
-// if using the Arduino IDE, click here: http://librarymanager#WiFiNINA
+// if using the Arduino IDE, click here: http://librarymanager/Arduino/Communication#WiFiNINA
 #include <WiFiNINA.h>
 ```
 
