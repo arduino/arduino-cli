@@ -1726,21 +1726,39 @@ place where user libraries and manually installed platforms are installed, the s
 sketches. Sketches in the sketchbook folder appear under the Arduino IDE's <strong>File &gt; Sketchbook</strong> menu. However, there is
 no requirement to store sketches in the sketchbook folder.</p>
 <h2 id="libraryboards-manager-links">Library/Boards Manager links<a class="headerlink" href="#libraryboards-manager-links" title="Permanent link">&para;</a></h2>
-<p>A URI in a comment in the form <code>http://librarymanager#SEARCH_TERM</code> will open a search for SEARCH_TERM in
+<p><strong>(available in Arduino IDE &gt;=1.6.9 &lt;2.x || &gt;=2.0.1)</strong></p>
+<p>A URI in a comment in the form:</p>
+<div class="highlight"><pre><span></span><code>http://librarymanager[/TYPE_FILTER[/TOPIC_FILTER]][#SEARCH_KEYWORDS]
+</code></pre></div>
+<p>will open a search in
 <a href="https://docs.arduino.cc/software/ide-v1/tutorials/installing-libraries#using-the-library-manager">Library Manager</a> when
 clicked in the Arduino IDE.</p>
-<p>A URI in a comment in the form <code>http://boardsmanager#SEARCH_TERM</code> will open a search for SEARCH_TERM in
-<a href="https://docs.arduino.cc/learn/starting-guide/cores">Boards Manager</a> when clicked in the Arduino IDE.</p>
-<p>This can be used to offer the user an easy way to install dependencies of the sketch.</p>
+<p>A URI in a comment in the form:</p>
+<div class="highlight"><pre><span></span><code>http://boardsmanager[/TYPE_FILTER][#SEARCH_KEYWORDS]
+</code></pre></div>
+<p>will open a search in <a href="https://docs.arduino.cc/learn/starting-guide/cores">Boards Manager</a> when clicked in the Arduino
+IDE.</p>
+<p>These links can be used to offer the user an easy way to install dependencies of the sketch.</p>
+<p>The search field will be populated with the <code>SEARCH_KEYWORDS</code> fragment component of the URI. Any characters other than
+<code>A</code>-<code>Z</code>, <code>a</code>-<code>z</code>, <code>0</code>-<code>9</code>, and <code>:</code> are treated as spaces by the search algorithm, which allows multiple keywords to be
+specified via the URI.</p>
+<hr />
+<p><strong>(available in Arduino IDE &gt;=2.0.1)</strong></p>
+<p>The "<strong>Type</strong>" filter will be set to the optional <code>TYPE_FILTER</code> path component of the URI.</p>
+<p>The Library Manager "<strong>Topic</strong>" filter will be set to the optional <code>TOPIC_FILTER</code> path component of the URI.</p>
+<p>Unlike the <code>SEARCH_KEYWORDS</code> fragment, spaces and reserved characters in these components must be
+<a href="https://en.wikipedia.org/wiki/Percent-encoding">percent-encoded</a> (e.g., <code>Signal%20Input%2FOutput</code>).</p>
+<p>Although the filter setting is not supported by previous IDE versions, URIs containing these path components still
+function in all other respects.</p>
+<hr />
 <p>This feature is only available when using the Arduino IDE, so be sure to provide supplementary documentation to help the
 users of other development software install the sketch dependencies.</p>
-<p>This feature was added in Arduino IDE 1.6.9.</p>
 <h3 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1">// install the Arduino SAMD Boards platform to add support for your MKR WiFi 1010 board</span>
-<span class="c1">// if using the Arduino IDE, click here: http://boardsmanager#SAMD</span>
+<span class="c1">// if using the Arduino IDE, click here: http://boardsmanager/Arduino#SAMD</span>
 
 <span class="c1">// install the WiFiNINA library via Library Manager</span>
-<span class="c1">// if using the Arduino IDE, click here: http://librarymanager#WiFiNINA</span>
+<span class="c1">// if using the Arduino IDE, click here: http://librarymanager/Arduino/Communication#WiFiNINA</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;WiFiNINA.h&gt;</span><span class="cp"></span>
 </code></pre></div>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
