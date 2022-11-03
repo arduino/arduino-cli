@@ -49,19 +49,6 @@ def download_lib(url, download_dir):
     z.close()
 
 
-def test_install(run_command):
-    libs = ["Arduino_BQ24195", "CMMC MQTT Connector", "WiFiNINA"]
-    # Should be safe to run install multiple times
-    assert run_command(["lib", "install"] + libs)
-    assert run_command(["lib", "install"] + libs)
-
-    # Test failing-install of library with wrong dependency
-    # (https://github.com/arduino/arduino-cli/issues/534)
-    res = run_command(["lib", "install", "MD_Parola@3.2.0"])
-    assert res.failed
-    assert "No valid dependencies solution found: dependency 'MD_MAX72xx' is not available" in res.stderr
-
-
 def test_install_library_with_dependencies(run_command):
     assert run_command(["update"])
 

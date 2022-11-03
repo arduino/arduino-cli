@@ -512,3 +512,21 @@ func TestLibDownload(t *testing.T) {
 	_, _, err = cli.Run("lib", "download", "AudioZ")
 	require.Error(t, err)
 }
+
+func TestInstall(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	libs := []string{"Arduino_BQ24195", "CMMC MQTT Connector", "WiFiNINA"}
+	// Should be safe to run install multiple times
+	_, _, err := cli.Run("lib", "install", libs[0], libs[1], libs[2])
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", libs[0], libs[1], libs[2])
+	require.NoError(t, err)
+
+	// Test failing-install of library with wrong dependency
+	// (https://github.com/arduino/arduino-cli/issues/534)
+	_, stderr, err := cli.Run("lib", "install", "MD_Parola@3.2.0")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "No valid dependencies solution found: dependency 'MD_MAX72xx' is not available")
+}
