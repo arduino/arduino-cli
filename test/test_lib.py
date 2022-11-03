@@ -49,41 +49,6 @@ def download_lib(url, download_dir):
     z.close()
 
 
-def test_install_library_with_dependencies(run_command):
-    assert run_command(["update"])
-
-    # Verifies libraries are not installed
-    res = run_command(["lib", "list", "--format", "json"])
-    assert res.ok
-    data = json.loads(res.stdout)
-    installed_libraries = [l["library"]["name"] for l in data]
-    assert "MD_Parola" not in installed_libraries
-    assert "MD_MAX72XX" not in installed_libraries
-
-    # Install library
-    assert run_command(["lib", "install", "MD_Parola@3.5.5"])
-
-    # Verifies library's dependencies are correctly installed
-    res = run_command(["lib", "list", "--format", "json"])
-    assert res.ok
-    data = json.loads(res.stdout)
-    installed_libraries = [l["library"]["name"] for l in data]
-    assert "MD_Parola" in installed_libraries
-    assert "MD_MAX72XX" in installed_libraries
-
-    # Try upgrading with --no-overwrite (should fail) and without --no-overwrite (should succeed)
-    res = run_command(["lib", "install", "MD_Parola@3.6.1", "--no-overwrite"])
-    assert res.failed
-    assert run_command(["lib", "install", "MD_Parola@3.6.1"])
-
-    # Test --no-overwrite with transitive dependencies
-    assert run_command(["lib", "install", "SD"])
-    assert run_command(["lib", "install", "Arduino_Builtin", "--no-overwrite"])
-    assert run_command(["lib", "install", "SD@1.2.3"])
-    res = run_command(["lib", "install", "Arduino_Builtin", "--no-overwrite"])
-    assert res.failed
-
-
 def test_install_no_deps(run_command):
     assert run_command(["update"])
 

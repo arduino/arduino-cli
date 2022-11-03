@@ -530,3 +530,41 @@ func TestInstall(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "No valid dependencies solution found: dependency 'MD_MAX72xx' is not available")
 }
+
+func TestInstallLibraryWithDependencies(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Verifies libraries are not installed
+	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Empty(t, stdout)
+
+	// Install library
+	_, _, err = cli.Run("lib", "install", "MD_Parola@3.5.5")
+	require.NoError(t, err)
+
+	// Verifies library's dependencies are correctly installed
+	stdout, _, err = cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, "[ .[] | .library | .name ] | sort", "[\"MD_MAX72XX\",\"MD_Parola\"]")
+
+	// Try upgrading with --no-overwrite (should fail) and without --no-overwrite (should succeed)
+	_, _, err = cli.Run("lib", "install", "MD_Parola@3.6.1", "--no-overwrite")
+	require.Error(t, err)
+	_, _, err = cli.Run("lib", "install", "MD_Parola@3.6.1")
+	require.NoError(t, err)
+
+	// Test --no-overwrite with transitive dependencies
+	_, _, err = cli.Run("lib", "install", "SD")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "Arduino_Builtin", "--no-overwrite")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "SD@1.2.3")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "Arduino_Builtin", "--no-overwrite")
+	require.Error(t, err)
+}
