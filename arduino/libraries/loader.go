@@ -121,7 +121,7 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 	library.Precompiled = libProperties.Get("precompiled") == "true" || library.PrecompiledWithSources
 	library.LDflags = strings.TrimSpace(libProperties.Get("ldflags"))
 	library.Properties = libProperties
-
+	library.InDevelopment = libraryDir.Join(".development").Exist()
 	return library, nil
 }
 
@@ -136,6 +136,7 @@ func makeLegacyLibrary(path *paths.Path, location LibraryLocation) (*Library, er
 		Architectures: []string{"*"},
 		IsLegacy:      true,
 		Version:       semver.MustParse(""),
+		InDevelopment: path.Join(".development").Exist(),
 	}
 	if err := addExamples(library); err != nil {
 		return nil, errors.Errorf(tr("scanning examples: %s"), err)
