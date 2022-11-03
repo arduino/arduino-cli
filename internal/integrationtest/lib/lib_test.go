@@ -368,3 +368,41 @@ func TestList(t *testing.T) {
 	// be sure data contains the correct provides_includes field
 	requirejson.Query(t, stdout, ".[0] | .library | .provides_includes | .[0]", "\"Arduino_APDS9960.h\"")
 }
+
+func TestListExitCode(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "list")
+	require.NoError(t, err)
+
+	// Verifies lib list doesn't fail when platform is not specified
+	_, stderr, err := cli.Run("lib", "list")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+
+	// Verify lib list command fails because specified platform is not installed
+	_, stderr, err = cli.Run("lib", "list", "-b", "arduino:samd:mkr1000")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error listing Libraries: Unknown FQBN: platform arduino:samd is not installed")
+
+	_, _, err = cli.Run("lib", "install", "AllThingsTalk LoRaWAN SDK")
+	require.NoError(t, err)
+
+	// Verifies lib list command keeps failing
+	_, stderr, err = cli.Run("lib", "list", "-b", "arduino:samd:mkr1000")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error listing Libraries: Unknown FQBN: platform arduino:samd is not installed")
+
+	_, _, err = cli.Run("core", "install", "arduino:samd")
+	require.NoError(t, err)
+
+	// Verifies lib list command now works since platform has been installed
+	_, stderr, err = cli.Run("lib", "list", "-b", "arduino:samd:mkr1000")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+}

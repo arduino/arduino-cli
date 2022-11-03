@@ -49,37 +49,6 @@ def download_lib(url, download_dir):
     z.close()
 
 
-def test_list_exit_code(run_command):
-    # Init the environment explicitly
-    assert run_command(["core", "update-index"])
-
-    assert run_command(["core", "list"])
-
-    # Verifies lib list doesn't fail when platform is not specified
-    result = run_command(["lib", "list"])
-    assert result.ok
-    assert result.stderr.strip() == ""
-
-    # Verify lib list command fails because specified platform is not installed
-    result = run_command(["lib", "list", "-b", "arduino:samd:mkr1000"])
-    assert result.failed
-    assert result.stderr.strip() == "Error listing Libraries: Unknown FQBN: platform arduino:samd is not installed"
-
-    assert run_command(["lib", "install", "AllThingsTalk LoRaWAN SDK"])
-
-    # Verifies lib list command keeps failing
-    result = run_command(["lib", "list", "-b", "arduino:samd:mkr1000"])
-    assert result.failed
-    assert result.stderr.strip() == "Error listing Libraries: Unknown FQBN: platform arduino:samd is not installed"
-
-    assert run_command(["core", "install", "arduino:samd"])
-
-    # Verifies lib list command now works since platform has been installed
-    result = run_command(["lib", "list", "-b", "arduino:samd:mkr1000"])
-    assert result.ok
-    assert result.stderr.strip() == ""
-
-
 def test_list_with_fqbn(run_command):
     # Init the environment explicitly
     assert run_command(["core", "update-index"])
