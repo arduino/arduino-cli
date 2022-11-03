@@ -448,3 +448,49 @@ func TestListWithFqbn(t *testing.T) {
 	requirejson.Query(t, stdout, ".[0] | .library | .name", "\"ArduinoJson\"")
 	requirejson.Query(t, stdout, ".[0] | .library | .compatible_with | .\"arduino:avr:uno\"", "true")
 }
+
+func TestListProvidesIncludesFallback(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Verifies "provides_includes" field is returned even if libraries don't declare
+	// the "includes" property in their "library.properties" file
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Install core
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "ArduinoJson@6.17.2")
+	require.NoError(t, err)
+
+	// List all libraries, even the ones installed with the above core
+	stdout, stderr, err := cli.Run("lib", "list", "--all", "--fqbn", "arduino:avr:uno", "--format", "json")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+
+	requirejson.Len(t, stdout, 6)
+
+	requirejson.Query(t, stdout, "[.[] | .library | { (.name): .provides_includes }] | add",
+		`{
+			"SPI": [
+		  		"SPI.h"
+			],
+			"SoftwareSerial": [
+		  		"SoftwareSerial.h"
+			],
+			"Wire": [
+		  		"Wire.h"
+			],
+			"ArduinoJson": [
+		  		"ArduinoJson.h",
+		  		"ArduinoJson.hpp"
+			],
+			"EEPROM": [
+		  		"EEPROM.h"
+			],
+			"HID": [
+		  		"HID.h"
+			]
+	  	}`)
+}

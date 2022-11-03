@@ -49,32 +49,6 @@ def download_lib(url, download_dir):
     z.close()
 
 
-def test_list_provides_includes_fallback(run_command):
-    # Verifies "provides_includes" field is returned even if libraries don't declare
-    # the "includes" property in their "library.properties" file
-    assert run_command(["update"])
-
-    # Install core
-    assert run_command(["core", "install", "arduino:avr@1.8.3"])
-    assert run_command(["lib", "install", "ArduinoJson@6.17.2"])
-
-    # List all libraries, even the ones installed with the above core
-    result = run_command(["lib", "list", "--all", "--fqbn", "arduino:avr:uno", "--format", "json"], hide=True)
-    assert result.ok
-    assert "" == result.stderr
-
-    data = json.loads(result.stdout)
-    assert 6 == len(data)
-
-    libs = {l["library"]["name"]: l["library"]["provides_includes"] for l in data}
-    assert ["SoftwareSerial.h"] == libs["SoftwareSerial"]
-    assert ["Wire.h"] == libs["Wire"]
-    assert ["EEPROM.h"] == libs["EEPROM"]
-    assert ["HID.h"] == libs["HID"]
-    assert ["SPI.h"] == libs["SPI"]
-    assert ["ArduinoJson.h", "ArduinoJson.hpp"] == libs["ArduinoJson"]
-
-
 def test_lib_download(run_command, downloads_dir):
 
     # Download a specific lib version
