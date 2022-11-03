@@ -146,15 +146,6 @@ def test_install_with_zip_path(run_command, data_dir, downloads_dir):
     assert lib_install_dir / "README.adoc" in files
 
 
-def test_uninstall_spaces(run_command):
-    key = "LiquidCrystal I2C"
-    assert run_command(["lib", "install", key])
-    assert run_command(["lib", "uninstall", key])
-    result = run_command(["lib", "list", "--format", "json"])
-    assert result.ok
-    assert len(json.loads(result.stdout)) == 0
-
-
 def test_lib_ops_caseinsensitive(run_command):
     """
     This test is supposed to (un)install the following library,

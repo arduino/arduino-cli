@@ -676,3 +676,17 @@ func TestUninstall(t *testing.T) {
 	_, _, err = cli.Run("lib", "uninstall", libs[0], libs[1])
 	require.NoError(t, err)
 }
+
+func TestUninstallSpaces(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	key := "LiquidCrystal I2C"
+	_, _, err := cli.Run("lib", "install", key)
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "uninstall", key)
+	require.NoError(t, err)
+	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 0)
+}
