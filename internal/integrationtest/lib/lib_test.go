@@ -406,3 +406,45 @@ func TestListExitCode(t *testing.T) {
 	require.NoError(t, err)
 	require.Empty(t, stderr)
 }
+
+func TestListWithFqbn(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Install core
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+
+	// Look at the plain text output
+	_, _, err = cli.Run("lib", "install", "ArduinoJson")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "wm8978-esp32")
+	require.NoError(t, err)
+
+	// Look at the plain text output
+	stdout, stderr, err := cli.Run("lib", "list", "-b", "arduino:avr:uno")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	lines := strings.Split(strings.TrimSpace(string(stdout)), "\n")
+	require.Len(t, lines, 2)
+
+	// Verifies library is compatible
+	lines[1] = strings.Join(strings.Fields(lines[1]), " ")
+	toks := strings.SplitN(lines[1], " ", 5)
+	require.Len(t, toks, 5)
+	require.Equal(t, "ArduinoJson", toks[0])
+
+	// Look at the JSON output
+	stdout, stderr, err = cli.Run("lib", "list", "-b", "arduino:avr:uno", "--format", "json")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	requirejson.Len(t, stdout, 1)
+
+	// Verifies library is compatible
+	requirejson.Query(t, stdout, ".[0] | .library | .name", "\"ArduinoJson\"")
+	requirejson.Query(t, stdout, ".[0] | .library | .compatible_with | .\"arduino:avr:uno\"", "true")
+}

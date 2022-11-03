@@ -49,41 +49,6 @@ def download_lib(url, download_dir):
     z.close()
 
 
-def test_list_with_fqbn(run_command):
-    # Init the environment explicitly
-    assert run_command(["core", "update-index"])
-
-    # Install core
-    assert run_command(["core", "install", "arduino:avr"])
-
-    # Install some library
-    assert run_command(["lib", "install", "ArduinoJson"])
-    assert run_command(["lib", "install", "wm8978-esp32"])
-
-    # Look at the plain text output
-    result = run_command(["lib", "list", "-b", "arduino:avr:uno"])
-    assert result.ok
-    assert "" == result.stderr
-    lines = result.stdout.strip().splitlines()
-    assert 2 == len(lines)
-
-    # Verifies library is compatible
-    toks = [t.strip() for t in lines[1].split(maxsplit=4)]
-    assert 5 == len(toks)
-    assert "ArduinoJson" == toks[0]
-
-    # Look at the JSON output
-    result = run_command(["lib", "list", "-b", "arduino:avr:uno", "--format", "json"], hide=True)
-    assert result.ok
-    assert "" == result.stderr
-    data = json.loads(result.stdout)
-    assert 1 == len(data)
-
-    # Verifies library is compatible
-    assert data[0]["library"]["name"] == "ArduinoJson"
-    assert data[0]["library"]["compatible_with"]["arduino:avr:uno"]
-
-
 def test_list_provides_includes_fallback(run_command):
     # Verifies "provides_includes" field is returned even if libraries don't declare
     # the "includes" property in their "library.properties" file
