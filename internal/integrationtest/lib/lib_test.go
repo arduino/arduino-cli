@@ -664,3 +664,15 @@ func TestUpdateIndex(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "Downloading index: library_index.tar.bz2 downloaded")
 }
+
+func TestUninstall(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	libs := []string{"Arduino_BQ24195", "WiFiNINA"}
+	_, _, err := cli.Run("lib", "install", libs[0], libs[1])
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("lib", "uninstall", libs[0], libs[1])
+	require.NoError(t, err)
+}

@@ -146,14 +146,6 @@ def test_install_with_zip_path(run_command, data_dir, downloads_dir):
     assert lib_install_dir / "README.adoc" in files
 
 
-def test_uninstall(run_command):
-    libs = ["Arduino_BQ24195", "WiFiNINA"]
-    assert run_command(["lib", "install"] + libs)
-
-    result = run_command(["lib", "uninstall"] + libs)
-    assert result.ok
-
-
 def test_uninstall_spaces(run_command):
     key = "LiquidCrystal I2C"
     assert run_command(["lib", "install", key])
