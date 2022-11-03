@@ -622,3 +622,36 @@ func TestInstallWithGitUrl(t *testing.T) {
 	// Verifies library remains installed
 	require.DirExists(t, libInstallDir.String())
 }
+
+func TestInstallWithGitUrlFragmentAsBranch(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Initialize configs to enable --git-url flag
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+	_, _, err := cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101")
+	// Verifies library is not already installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
+
+	// Test that a bad ref fails
+	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#x-ref-does-not-exist")
+	require.Error(t, err)
+
+	// Verifies library is installed in expected path
+	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#0.16.0")
+	require.NoError(t, err)
+	require.DirExists(t, libInstallDir.String())
+
+	// Reinstall library at an existing ref
+	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#master")
+	require.NoError(t, err)
+
+	// Verifies library remains installed
+	require.DirExists(t, libInstallDir.String())
+}

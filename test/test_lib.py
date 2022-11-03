@@ -96,39 +96,6 @@ def test_install_git_url_and_zip_path_flags_visibility(run_command, data_dir, do
     assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
 
 
-def test_install_with_git_url_fragment_as_branch(run_command, data_dir, downloads_dir):
-    # Initialize configs to enable --git-url flag
-    env = {
-        "ARDUINO_DATA_DIR": data_dir,
-        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
-        "ARDUINO_SKETCHBOOK_DIR": data_dir,
-        "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
-    }
-    assert run_command(["config", "init", "--dest-dir", "."], custom_env=env)
-
-    lib_install_dir = Path(data_dir, "libraries", "WiFi101")
-    # Verifies library is not already installed
-    assert not lib_install_dir.exists()
-
-    git_url = "https://github.com/arduino-libraries/WiFi101.git"
-
-    # Test that a bad ref fails
-    res = run_command(["lib", "install", "--git-url", git_url + "#x-ref-does-not-exist"])
-    assert res.failed
-
-    # Verifies library is installed in expected path
-    res = run_command(["lib", "install", "--git-url", git_url + "#0.16.0"])
-    assert res.ok
-    assert lib_install_dir.exists()
-
-    # Reinstall library at an existing ref
-    assert run_command(["lib", "install", "--git-url", git_url + "#master"])
-    assert res.ok
-
-    # Verifies library remains installed
-    assert lib_install_dir.exists()
-
-
 def test_install_with_zip_path(run_command, data_dir, downloads_dir):
     # Initialize configs to enable --zip-path flag
     env = {
