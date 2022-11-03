@@ -568,3 +568,25 @@ func TestInstallLibraryWithDependencies(t *testing.T) {
 	_, _, err = cli.Run("lib", "install", "Arduino_Builtin", "--no-overwrite")
 	require.Error(t, err)
 }
+
+func TestInstallNoDeps(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Verifies libraries are not installed
+	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Empty(t, stdout)
+
+	// Install library skipping dependencies installation
+	_, _, err = cli.Run("lib", "install", "MD_Parola@3.5.5", "--no-deps")
+	require.NoError(t, err)
+
+	// Verifies library's dependencies are not installed
+	stdout, _, err = cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".[] | .library | .name", "\"MD_Parola\"")
+}

@@ -49,29 +49,6 @@ def download_lib(url, download_dir):
     z.close()
 
 
-def test_install_no_deps(run_command):
-    assert run_command(["update"])
-
-    # Verifies libraries are not installed
-    res = run_command(["lib", "list", "--format", "json"])
-    assert res.ok
-    data = json.loads(res.stdout)
-    installed_libraries = [l["library"]["name"] for l in data]
-    assert "MD_Parola" not in installed_libraries
-    assert "MD_MAX72XX" not in installed_libraries
-
-    # Install library skipping dependencies installation
-    assert run_command(["lib", "install", "MD_Parola@3.5.5", "--no-deps"])
-
-    # Verifies library's dependencies are not installed
-    res = run_command(["lib", "list", "--format", "json"])
-    assert res.ok
-    data = json.loads(res.stdout)
-    installed_libraries = [l["library"]["name"] for l in data]
-    assert "MD_Parola" in installed_libraries
-    assert "MD_MAX72XX" not in installed_libraries
-
-
 def test_install_git_url_and_zip_path_flags_visibility(run_command, data_dir, downloads_dir):
     # Verifies installation fail because flags are not found
     git_url = "https://github.com/arduino-libraries/WiFi101.git"
