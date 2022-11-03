@@ -146,54 +146,6 @@ def test_install_with_zip_path(run_command, data_dir, downloads_dir):
     assert lib_install_dir / "README.adoc" in files
 
 
-def test_search(run_command):
-    assert run_command(["update"])
-
-    result = run_command(["lib", "search", "--names"])
-    assert result.ok
-    lines = [l.strip() for l in result.stdout.strip().splitlines()]
-    assert "Downloading index: library_index.tar.bz2 downloaded" in lines
-    libs = [l[6:].strip('"') for l in lines if "Name:" in l]
-
-    expected = {"WiFi101", "WiFi101OTA", "Firebase Arduino based on WiFi101", "WiFi101_Generic"}
-    assert expected == {lib for lib in libs if "WiFi101" in lib}
-
-    result = run_command(["lib", "search", "--names", "--format", "json"])
-    assert result.ok
-    libs_json = json.loads(result.stdout)
-    assert len(libs) == len(libs_json.get("libraries"))
-
-    result = run_command(["lib", "search", "--names"])
-    assert result.ok
-
-    def run_search(search_args, expected_libraries):
-        res = run_command(["lib", "search", "--names", "--format", "json"] + search_args.split(" "))
-        assert res.ok
-        data = json.loads(res.stdout)
-        libraries = [l["name"] for l in data["libraries"]]
-        for l in expected_libraries:
-            assert l in libraries
-
-    run_search("Arduino_MKRIoTCarrier", ["Arduino_MKRIoTCarrier"])
-    run_search("Arduino mkr iot carrier", ["Arduino_MKRIoTCarrier"])
-    run_search("mkr iot carrier", ["Arduino_MKRIoTCarrier"])
-    run_search("mkriotcarrier", ["Arduino_MKRIoTCarrier"])
-
-    run_search(
-        "dht",
-        ["DHT sensor library", "DHT sensor library for ESPx", "DHT12", "SimpleDHT", "TinyDHT sensor library", "SDHT"],
-    )
-    run_search("dht11", ["DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"])
-    run_search("dht12", ["DHT12", "DHT12 sensor library", "SDHT"])
-    run_search("dht22", ["DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"])
-    run_search("dht sensor", ["DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"])
-    run_search("sensor dht", [])
-
-    run_search("arduino json", ["ArduinoJson", "Arduino_JSON"])
-    run_search("arduinojson", ["ArduinoJson"])
-    run_search("json", ["ArduinoJson", "Arduino_JSON"])
-
-
 def test_search_paragraph(run_command):
     """
     Search for a string that's only present in the `paragraph` field

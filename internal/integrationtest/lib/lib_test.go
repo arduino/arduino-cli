@@ -17,6 +17,7 @@ package lib_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -717,4 +718,49 @@ func TestLibOpsCaseInsensitive(t *testing.T) {
 	stdout, _, err := cli.Run("lib", "list", "--format", "json")
 	require.NoError(t, err)
 	requirejson.Len(t, stdout, 0)
+}
+
+func TestSearch(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	stdout, _, err := cli.Run("lib", "search", "--names")
+	require.NoError(t, err)
+	lines := strings.Split(strings.TrimSpace(string(stdout)), "\n")
+	var libs []string
+	for i, v := range lines {
+		lines[i] = strings.TrimSpace(v)
+		if strings.Contains(v, "Name:") {
+			libs = append(libs, strings.Trim(strings.SplitN(v, " ", 2)[1], "\""))
+		}
+	}
+
+	expected := []string{"WiFi101", "WiFi101OTA", "Firebase Arduino based on WiFi101", "WiFi101_Generic"}
+	require.Subset(t, libs, expected)
+
+	stdout, _, err = cli.Run("lib", "search", "--names", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".libraries | length", fmt.Sprint(len(libs)))
+
+	runSearch := func(args string, expectedLibs []string) {
+		stdout, _, err = cli.Run("lib", "search", "--names", "--format", "json", args)
+		require.NoError(t, err)
+		libraries := requirejson.Parse(t, stdout).Query("[ .libraries | .[] | .name ]").String()
+		for _, l := range expectedLibs {
+			require.Contains(t, libraries, l)
+		}
+	}
+	runSearch("Arduino_MKRIoTCarrier", []string{"Arduino_MKRIoTCarrier"})
+	runSearch("Arduino mkr iot carrier", []string{"Arduino_MKRIoTCarrier"})
+	runSearch("mkr iot carrier", []string{"Arduino_MKRIoTCarrier"})
+	runSearch("mkriotcarrier", []string{"Arduino_MKRIoTCarrier"})
+	runSearch("dht", []string{"DHT sensor library", "DHT sensor library for ESPx", "DHT12", "SimpleDHT", "TinyDHT sensor library", "SDHT"})
+	runSearch("dht11", []string{"DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"})
+	runSearch("dht12", []string{"DHT12", "DHT12 sensor library", "SDHT"})
+	runSearch("dht22", []string{"DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"})
+	runSearch("dht sensor", []string{"DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"})
+	runSearch("sensor dht", []string{})
+	runSearch("arduino json", []string{"ArduinoJson", "Arduino_JSON"})
+	runSearch("arduinojson", []string{"ArduinoJson"})
+	runSearch("json", []string{"ArduinoJson", "Arduino_JSON"})
 }
