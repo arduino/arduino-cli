@@ -494,3 +494,21 @@ func TestListProvidesIncludesFallback(t *testing.T) {
 			]
 	  	}`)
 }
+
+func TestLibDownload(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Download a specific lib version
+	_, _, err := cli.Run("lib", "download", "AudioZero@1.0.0")
+	require.NoError(t, err)
+	require.FileExists(t, cli.DownloadDir().Join("libraries", "AudioZero-1.0.0.zip").String())
+
+	// Wrong lib version
+	_, _, err = cli.Run("lib", "download", "AudioZero@69.42.0")
+	require.Error(t, err)
+
+	// Wrong lib
+	_, _, err = cli.Run("lib", "download", "AudioZ")
+	require.Error(t, err)
+}

@@ -49,21 +49,6 @@ def download_lib(url, download_dir):
     z.close()
 
 
-def test_lib_download(run_command, downloads_dir):
-
-    # Download a specific lib version
-    assert run_command(["lib", "download", "AudioZero@1.0.0"])
-    assert Path(downloads_dir, "libraries", "AudioZero-1.0.0.zip").exists()
-
-    # Wrong lib version
-    result = run_command(["lib", "download", "AudioZero@69.42.0"])
-    assert result.failed
-
-    # Wrong lib
-    result = run_command(["lib", "download", "AudioZ"])
-    assert result.failed
-
-
 def test_install(run_command):
     libs = ["Arduino_BQ24195", "CMMC MQTT Connector", "WiFiNINA"]
     # Should be safe to run install multiple times
