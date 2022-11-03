@@ -310,3 +310,61 @@ func TestUpgradeLibraryWithDependencies(t *testing.T) {
 	dependency := jsonOut.Query(`.dependencies[] | select(.name=="MKRWAN")`)
 	require.Equal(t, dependency.Query(".version_required"), dependency.Query(".version_installed"))
 }
+
+func TestList(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// When output is empty, nothing is printed out, no matter the output format
+	stdout, stderr, err := cli.Run("lib", "list")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	require.Contains(t, strings.TrimSpace(string(stdout)), "No libraries installed.")
+	stdout, stderr, err = cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	requirejson.Empty(t, stdout)
+
+	// Install something we can list at a version older than latest
+	_, _, err = cli.Run("lib", "install", "ArduinoJson@6.11.0")
+	require.NoError(t, err)
+
+	// Look at the plain text output
+	stdout, stderr, err = cli.Run("lib", "list")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	lines := strings.Split(strings.TrimSpace(string(stdout)), "\n")
+	require.Equal(t, 2, len(lines))
+	lines[1] = strings.Join(strings.Fields(lines[1]), " ")
+	toks := strings.SplitN(lines[1], " ", 5)
+	// Verifies the expected number of field
+	require.Equal(t, 5, len(toks))
+	// be sure line contain the current version AND the available version
+	require.NotEmpty(t, toks[1])
+	require.NotEmpty(t, toks[2])
+	// Verifies library sentence
+	require.Contains(t, toks[4], "An efficient and elegant JSON library...")
+
+	// Look at the JSON output
+	stdout, stderr, err = cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	requirejson.Len(t, stdout, 1)
+	// be sure data contains the available version
+	requirejson.Query(t, stdout, ".[0] | .release | .version != \"\"", "true")
+
+	// Install something we can list without provides_includes field given in library.properties
+	_, _, err = cli.Run("lib", "install", "Arduino_APDS9960@1.0.3")
+	require.NoError(t, err)
+	// Look at the JSON output
+	stdout, stderr, err = cli.Run("lib", "list", "Arduino_APDS9960", "--format", "json")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	requirejson.Len(t, stdout, 1)
+	// be sure data contains the correct provides_includes field
+	requirejson.Query(t, stdout, ".[0] | .library | .provides_includes | .[0]", "\"Arduino_APDS9960.h\"")
+}

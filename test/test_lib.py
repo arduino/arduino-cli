@@ -49,61 +49,6 @@ def download_lib(url, download_dir):
     z.close()
 
 
-def test_list(run_command):
-    # Init the environment explicitly
-    run_command(["core", "update-index"])
-
-    # When output is empty, nothing is printed out, no matter the output format
-    result = run_command(["lib", "list"])
-    assert result.ok
-    assert "" == result.stderr
-    assert "No libraries installed." in result.stdout.strip()
-    result = run_command(["lib", "list", "--format", "json"], hide=True)
-    assert result.ok
-    assert "" == result.stderr
-    assert 0 == len(json.loads(result.stdout))
-
-    # Install something we can list at a version older than latest
-    result = run_command(["lib", "install", "ArduinoJson@6.11.0"])
-    assert result.ok
-
-    # Look at the plain text output
-    result = run_command(["lib", "list"])
-    assert result.ok
-    assert "" == result.stderr
-    lines = result.stdout.strip().splitlines()
-    assert 2 == len(lines)
-    toks = [t.strip() for t in lines[1].split(maxsplit=4)]
-    # Verifies the expected number of field
-    assert 5 == len(toks)
-    # be sure line contain the current version AND the available version
-    assert "" != toks[1]
-    assert "" != toks[2]
-    # Verifies library sentence
-    assert "An efficient and elegant JSON library..." == toks[4]
-
-    # Look at the JSON output
-    result = run_command(["lib", "list", "--format", "json"], hide=True)
-    assert result.ok
-    assert "" == result.stderr
-    data = json.loads(result.stdout)
-    assert 1 == len(data)
-    # be sure data contains the available version
-    assert "" != data[0]["release"]["version"]
-
-    # Install something we can list without provides_includes field given in library.properties
-    result = run_command(["lib", "install", "Arduino_APDS9960@1.0.3"])
-    assert result.ok
-    # Look at the JSON output
-    result = run_command(["lib", "list", "Arduino_APDS9960", "--format", "json"])
-    assert result.ok
-    assert "" == result.stderr
-    data = json.loads(result.stdout)
-    assert 1 == len(data)
-    # be sure data contains the correct provides_includes field
-    assert "Arduino_APDS9960.h" == data[0]["library"]["provides_includes"][0]
-
-
 def test_list_exit_code(run_command):
     # Init the environment explicitly
     assert run_command(["core", "update-index"])
