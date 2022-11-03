@@ -146,30 +146,6 @@ def test_install_with_zip_path(run_command, data_dir, downloads_dir):
     assert lib_install_dir / "README.adoc" in files
 
 
-def test_lib_ops_caseinsensitive(run_command):
-    """
-    This test is supposed to (un)install the following library,
-    As you can see the name is all caps:
-
-    Name: "PCM"
-      Author: David Mellis <d.mellis@bcmi-labs.cc>, Michael Smith <michael@hurts.ca>
-      Maintainer: David Mellis <d.mellis@bcmi-labs.cc>
-      Sentence: Playback of short audio samples.
-      Paragraph: These samples are encoded directly in the Arduino sketch as an array of numbers.
-      Website: http://highlowtech.org/?p=1963
-      Category: Signal Input/Output
-      Architecture: avr
-      Types: Contributed
-      Versions: [1.0.0]
-    """
-    key = "pcm"
-    assert run_command(["lib", "install", key])
-    assert run_command(["lib", "uninstall", key])
-    result = run_command(["lib", "list", "--format", "json"])
-    assert result.ok
-    assert len(json.loads(result.stdout)) == 0
-
-
 def test_search(run_command):
     assert run_command(["update"])
 

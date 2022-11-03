@@ -690,3 +690,31 @@ func TestUninstallSpaces(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Len(t, stdout, 0)
 }
+
+func TestLibOpsCaseInsensitive(t *testing.T) {
+	/*This test is supposed to (un)install the following library,
+	  As you can see the name is all caps:
+
+	  Name: "PCM"
+	    Author: David Mellis <d.mellis@bcmi-labs.cc>, Michael Smith <michael@hurts.ca>
+	    Maintainer: David Mellis <d.mellis@bcmi-labs.cc>
+	    Sentence: Playback of short audio samples.
+	    Paragraph: These samples are encoded directly in the Arduino sketch as an array of numbers.
+	    Website: http://highlowtech.org/?p=1963
+	    Category: Signal Input/Output
+	    Architecture: avr
+	    Types: Contributed
+	    Versions: [1.0.0]*/
+
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	key := "pcm"
+	_, _, err := cli.Run("lib", "install", key)
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "uninstall", key)
+	require.NoError(t, err)
+	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 0)
+}
