@@ -146,13 +146,6 @@ def test_install_with_zip_path(run_command, data_dir, downloads_dir):
     assert lib_install_dir / "README.adoc" in files
 
 
-def test_update_index(run_command):
-    result = run_command(["lib", "update-index"])
-    assert result.ok
-    lines = [l.strip() for l in result.stdout.splitlines()]
-    assert "Downloading index: library_index.tar.bz2 downloaded" in lines
-
-
 def test_uninstall(run_command):
     libs = ["Arduino_BQ24195", "WiFiNINA"]
     assert run_command(["lib", "install"] + libs)

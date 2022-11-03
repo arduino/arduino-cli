@@ -655,3 +655,12 @@ func TestInstallWithGitUrlFragmentAsBranch(t *testing.T) {
 	// Verifies library remains installed
 	require.DirExists(t, libInstallDir.String())
 }
+
+func TestUpdateIndex(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	stdout, _, err := cli.Run("lib", "update-index")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Downloading index: library_index.tar.bz2 downloaded")
+}
