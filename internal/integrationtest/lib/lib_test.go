@@ -590,3 +590,35 @@ func TestInstallNoDeps(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, ".[] | .library | .name", "\"MD_Parola\"")
 }
+
+func TestInstallWithGitUrl(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Initialize configs to enable --git-url flag
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+	_, _, err := cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101")
+	// Verifies library is not already installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
+
+	// Test git-url library install
+	stdout, _, err := cli.Run("lib", "install", "--git-url", gitUrl)
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
+
+	// Verifies library is installed in expected path
+	require.DirExists(t, libInstallDir.String())
+
+	// Reinstall library
+	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl)
+	require.NoError(t, err)
+
+	// Verifies library remains installed
+	require.DirExists(t, libInstallDir.String())
+}
