@@ -206,41 +206,6 @@ def test_install_with_zip_path_multiple_libraries(run_command, downloads_dir, da
     assert ble_install_dir.exists()
 
 
-def test_lib_examples_with_case_mismatch(run_command, data_dir):
-    assert run_command(["update"])
-
-    assert run_command(["lib", "install", "WiFiManager@2.0.3-alpha"])
-
-    res = run_command(["lib", "examples", "WiFiManager", "--format", "json"])
-    assert res.ok
-    data = json.loads(res.stdout)
-    assert len(data) == 1
-    examples = data[0]["examples"]
-
-    assert len(examples) == 14
-
-    examples_path = Path(data_dir, "libraries", "WiFiManager", "examples")
-    # Verifies sketches with correct casing are listed
-    assert str(examples_path / "Advanced") in examples
-    assert str(examples_path / "AutoConnect" / "AutoConnectWithFeedbackLED") in examples
-    assert str(examples_path / "AutoConnect" / "AutoConnectWithFSParameters") in examples
-    assert str(examples_path / "AutoConnect" / "AutoConnectWithFSParametersAndCustomIP") in examples
-    assert str(examples_path / "Basic") in examples
-    assert str(examples_path / "DEV" / "OnDemandConfigPortal") in examples
-    assert str(examples_path / "NonBlocking" / "AutoConnectNonBlocking") in examples
-    assert str(examples_path / "NonBlocking" / "AutoConnectNonBlockingwParams") in examples
-    assert str(examples_path / "Old_examples" / "AutoConnectWithFeedback") in examples
-    assert str(examples_path / "Old_examples" / "AutoConnectWithReset") in examples
-    assert str(examples_path / "Old_examples" / "AutoConnectWithStaticIP") in examples
-    assert str(examples_path / "Old_examples" / "AutoConnectWithTimeout") in examples
-    assert str(examples_path / "OnDemand" / "OnDemandConfigPortal") in examples
-    assert str(examples_path / "ParamsChildClass") in examples
-
-    # Verifies sketches with wrong casing are not returned
-    assert str(examples_path / "NonBlocking" / "OnDemandNonBlocking") not in examples
-    assert str(examples_path / "OnDemand" / "OnDemandWebPortal") not in examples
-
-
 def test_lib_list_using_library_with_invalid_version(run_command, data_dir):
     assert run_command(["update"])
 

@@ -1024,3 +1024,41 @@ func TestLibExamplesWithPdeFile(t *testing.T) {
 	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Encoder", "examples", "SpeedTest").String())
 	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Encoder", "examples", "TwoKnobs").String())
 }
+
+func TestLibExamplesWithCaseMismatch(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("lib", "install", "WiFiManager@2.0.3-alpha")
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("lib", "examples", "WiFiManager", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+	requirejson.Query(t, stdout, ".[0] | .examples | length", "14")
+
+	examples := requirejson.Parse(t, stdout).Query(".[0] | .examples").String()
+	examples = strings.ReplaceAll(examples, "\\\\", "\\")
+	examplesPath := cli.SketchbookDir().Join("libraries", "WiFiManager", "examples")
+	// Verifies sketches with correct casing are listed
+	require.Contains(t, examples, examplesPath.Join("Advanced").String())
+	require.Contains(t, examples, examplesPath.Join("AutoConnect", "AutoConnectWithFeedbackLED").String())
+	require.Contains(t, examples, examplesPath.Join("AutoConnect", "AutoConnectWithFSParameters").String())
+	require.Contains(t, examples, examplesPath.Join("AutoConnect", "AutoConnectWithFSParametersAndCustomIP").String())
+	require.Contains(t, examples, examplesPath.Join("Basic").String())
+	require.Contains(t, examples, examplesPath.Join("DEV", "OnDemandConfigPortal").String())
+	require.Contains(t, examples, examplesPath.Join("NonBlocking", "AutoConnectNonBlocking").String())
+	require.Contains(t, examples, examplesPath.Join("NonBlocking", "AutoConnectNonBlockingwParams").String())
+	require.Contains(t, examples, examplesPath.Join("Old_examples", "AutoConnectWithFeedback").String())
+	require.Contains(t, examples, examplesPath.Join("Old_examples", "AutoConnectWithReset").String())
+	require.Contains(t, examples, examplesPath.Join("Old_examples", "AutoConnectWithStaticIP").String())
+	require.Contains(t, examples, examplesPath.Join("Old_examples", "AutoConnectWithTimeout").String())
+	require.Contains(t, examples, examplesPath.Join("OnDemand", "OnDemandConfigPortal").String())
+	require.Contains(t, examples, examplesPath.Join("ParamsChildClass").String())
+	// Verifies sketches with wrong casing are not returned
+	require.NotContains(t, examples, examplesPath.Join("NonBlocking", "OnDemandNonBlocking").String())
+	require.NotContains(t, examples, examplesPath.Join("OnDemand", "OnDemandWebPortal").String())
+}
