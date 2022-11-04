@@ -2200,9 +2200,9 @@ be in the Arduino Language Reference.</p>
 <p>Normally the Arduino IDE treats the contents of the library folder as read-only. This is to prevent users from
 accidentally modifying example sketches. During the library development process you may want to edit example sketches in
 place using the Arduino IDE. With Arduino IDE 1.6.6 and newer, the read-only behavior can be disabled by adding a file
-named .development to the root of the library folder. A <a href="#libraryproperties-file-format">library.properties</a> file must
+named <code>.development</code> to the root of the library folder. A <a href="#libraryproperties-file-format">library.properties</a> file must
 also be present. The <a href="https://github.com/arduino/library-registry/blob/main/FAQ.md#readme">Library Manager indexer</a> will
-not pick up releases that contain a .development file so be sure not to push this file to your remote repository.</p>
+not pick up releases that contain a <code>.development</code> file so be sure not to push this file to your remote repository.</p>
 <h3 id="a-complete-example">A complete example<a class="headerlink" href="#a-complete-example" title="Permanent link">&para;</a></h3>
 <p>A hypothetical library named "Servo" that adheres to the specification follows:</p>
 <div class="highlight"><pre><span></span><code>Servo/
