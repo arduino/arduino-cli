@@ -29,6 +29,45 @@ import (
 	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
+func TestCorrectBoardListOrdering(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+	jsonOut, _, err := cli.Run("board", "listall", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, jsonOut, "[.boards[] | .fqbn]", `[
+		"arduino:avr:yun",
+		"arduino:avr:uno",
+		"arduino:avr:unomini",
+		"arduino:avr:diecimila",
+		"arduino:avr:nano",
+		"arduino:avr:mega",
+		"arduino:avr:megaADK",
+		"arduino:avr:leonardo",
+		"arduino:avr:leonardoeth",
+		"arduino:avr:micro",
+		"arduino:avr:esplora",
+		"arduino:avr:mini",
+		"arduino:avr:ethernet",
+		"arduino:avr:fio",
+		"arduino:avr:bt",
+		"arduino:avr:LilyPadUSB",
+		"arduino:avr:lilypad",
+		"arduino:avr:pro",
+		"arduino:avr:atmegang",
+		"arduino:avr:robotControl",
+		"arduino:avr:robotMotor",
+		"arduino:avr:gemma",
+		"arduino:avr:circuitplay32u4cat",
+		"arduino:avr:yunmini",
+		"arduino:avr:chiwawa",
+		"arduino:avr:one",
+		"arduino:avr:unowifi"
+	]`)
+}
+
 func TestBoardList(t *testing.T) {
 	if os.Getenv("CI") != "" {
 		t.Skip("VMs have no serial ports")

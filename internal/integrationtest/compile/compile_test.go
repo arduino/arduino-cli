@@ -27,6 +27,8 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/testifyjson/requirejson"
+	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
 func TestCompile(t *testing.T) {
@@ -710,4 +712,248 @@ func compileUsingBoardsLocalTxt(t *testing.T, env *integrationtest.Environment, 
 
 	_, _, err = cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
 	require.NoError(t, err)
+}
+
+func TestCompileWithoutPrecompiledLibraries(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	url := "https://adafruit.github.io/arduino-board-index/package_adafruit_index.json"
+	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url)
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "arduino:mbed@1.3.1", "--additional-urls="+url)
+	require.NoError(t, err)
+
+	// // Precompiled version of Arduino_TensorflowLite
+	//	_, _, err = cli.Run("lib", "install", "Arduino_LSM9DS1")
+	//	require.NoError(t, err)
+	//	_, _, err = cli.Run("lib", "install", "Arduino_TensorflowLite@2.1.1-ALPHA-precompiled")
+	//	require.NoError(t, err)
+
+	//	sketchPath := cli.SketchbookDir().Join("libraries", "Arduino_TensorFlowLite", "examples", "hello_world")
+	//	_, _, err = cli.Run("compile", "-b", "arduino:mbed:nano33ble", sketchPath.String())
+	//	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.7", "--additional-urls="+url)
+	require.NoError(t, err)
+	//	_, _, err = cli.Run("core", "install", "adafruit:samd@1.6.4", "--additional-urls="+url)
+	//	require.NoError(t, err)
+	//	// should work on adafruit too after https://github.com/arduino/arduino-cli/pull/1134
+	//	_, _, err = cli.Run("compile", "-b", "adafruit:samd:adafruit_feather_m4", sketchPath.String())
+	//	require.NoError(t, err)
+
+	//	// Non-precompiled version of Arduino_TensorflowLite
+	//	_, _, err = cli.Run("lib", "install", "Arduino_TensorflowLite@2.1.0-ALPHA")
+	//	require.NoError(t, err)
+	//	_, _, err = cli.Run("compile", "-b", "arduino:mbed:nano33ble", sketchPath.String())
+	//	require.NoError(t, err)
+	//	_, _, err = cli.Run("compile", "-b", "adafruit:samd:adafruit_feather_m4", sketchPath.String())
+	//	require.NoError(t, err)
+
+	// Bosch sensor library
+	_, _, err = cli.Run("lib", "install", "BSEC Software Library@1.5.1474")
+	require.NoError(t, err)
+	sketchPath := cli.SketchbookDir().Join("libraries", "BSEC_Software_Library", "examples", "basic")
+	_, _, err = cli.Run("compile", "-b", "arduino:samd:mkr1000", sketchPath.String())
+	require.NoError(t, err)
+	_, _, err = cli.Run("compile", "-b", "arduino:mbed:nano33ble", sketchPath.String())
+	require.NoError(t, err)
+
+	// USBBlaster library
+	_, _, err = cli.Run("lib", "install", "USBBlaster@1.0.0")
+	require.NoError(t, err)
+	sketchPath = cli.SketchbookDir().Join("libraries", "USBBlaster", "examples", "USB_Blaster")
+	_, _, err = cli.Run("compile", "-b", "arduino:samd:mkrvidor4000", sketchPath.String())
+	require.NoError(t, err)
+}
+
+func TestCompileWithCustomLibraries(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Creates config with additional URL to install necessary core
+	url := "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
+	_, _, err := cli.Run("config", "init", "--dest-dir", ".", "--additional-urls", url)
+	require.NoError(t, err)
+
+	// Init the environment explicitly
+	_, _, err = cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "esp8266:esp8266")
+	require.NoError(t, err)
+
+	sketchName := "sketch_with_multiple_custom_libraries"
+	sketchPath := cli.CopySketch(sketchName)
+	fqbn := "esp8266:esp8266:nodemcu:xtal=80,vt=heap,eesz=4M1M,wipe=none,baud=115200"
+
+	firstLib := sketchPath.Join("libraries1")
+	secondLib := sketchPath.Join("libraries2")
+	_, _, err = cli.Run("compile", "--libraries", firstLib.String(), "--libraries", secondLib.String(), "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+}
+
+func TestCompileWithArchivesAndLongPaths(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Creates config with additional URL to install necessary core
+	url := "http://arduino.esp8266.com/stable/package_esp8266com_index.json"
+	_, _, err := cli.Run("config", "init", "--dest-dir", ".", "--additional-urls", url)
+	require.NoError(t, err)
+
+	// Init the environment explicitly
+	_, _, err = cli.Run("update")
+	require.NoError(t, err)
+
+	// Install core to compile
+	_, _, err = cli.Run("core", "install", "esp8266:esp8266@2.7.4")
+	require.NoError(t, err)
+
+	// Install test library
+	_, _, err = cli.Run("lib", "install", "ArduinoIoTCloud")
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("lib", "examples", "ArduinoIoTCloud", "--format", "json")
+	require.NoError(t, err)
+	var libOutput []map[string]interface{}
+	err = json.Unmarshal(stdout, &libOutput)
+	require.NoError(t, err)
+	sketchPath := paths.New(libOutput[0]["library"].(map[string]interface{})["install_dir"].(string))
+	sketchPath = sketchPath.Join("examples", "ArduinoIoTCloud-Advanced")
+
+	_, _, err = cli.Run("compile", "-b", "esp8266:esp8266:huzzah", sketchPath.String())
+	require.NoError(t, err)
+}
+
+func TestCompileWithPrecompileLibrary(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.11")
+	require.NoError(t, err)
+	fqbn := "arduino:samd:mkrzero"
+
+	// Install precompiled library
+	// For more information see:
+	// https://arduino.github.io/arduino-cli/latest/library-specification/#precompiled-binaries
+	_, _, err = cli.Run("lib", "install", "BSEC Software Library@1.5.1474")
+	require.NoError(t, err)
+	sketchFolder := cli.SketchbookDir().Join("libraries", "BSEC_Software_Library", "examples", "basic")
+
+	// Compile and verify dependencies detection for fully precompiled library is not skipped
+	stdout, _, err := cli.Run("compile", "-b", fqbn, sketchFolder.String(), "-v")
+	require.NoError(t, err)
+	require.NotContains(t, string(stdout), "Skipping dependencies detection for precompiled library BSEC Software Library")
+}
+
+func TestCompileWithFullyPrecompiledLibrary(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:mbed@1.3.1")
+	require.NoError(t, err)
+	fqbn := "arduino:mbed:nano33ble"
+
+	// Create settings with library unsafe install set to true
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_LIBRARY_ENABLE_UNSAFE_INSTALL"] = "true"
+	_, _, err = cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	// Install fully precompiled library
+	// For more information see:
+	// https://arduino.github.io/arduino-cli/latest/library-specification/#precompiled-binaries
+	wd, err := paths.Getwd()
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "--zip-path", wd.Parent().Join("testdata", "Arduino_TensorFlowLite-2.1.0-ALPHA-precompiled.zip").String())
+	require.NoError(t, err)
+	sketchFolder := cli.SketchbookDir().Join("libraries", "Arduino_TensorFlowLite-2.1.0-ALPHA-precompiled", "examples", "hello_world")
+
+	// Install example dependency
+	_, _, err = cli.Run("lib", "install", "Arduino_LSM9DS1")
+	require.NoError(t, err)
+
+	// Compile and verify dependencies detection for fully precompiled library is skipped
+	stdout, _, err := cli.Run("compile", "-b", fqbn, sketchFolder.String(), "-v")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Skipping dependencies detection for precompiled library Arduino_TensorFlowLite")
+}
+
+func TestCompileManuallyInstalledPlatform(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	sketchName := "CompileSketchManuallyInstalledPlatformUsingPlatformLocalTxt"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino-beta-development:avr:uno"
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Manually installs a core in sketchbooks hardware folder
+	gitUrl := "https://github.com/arduino/ArduinoCore-avr.git"
+	repoDir := cli.SketchbookDir().Join("hardware", "arduino-beta-development", "avr")
+	_, err = git.PlainClone(repoDir.String(), false, &git.CloneOptions{
+		URL:           gitUrl,
+		ReferenceName: plumbing.NewTagReferenceName("1.8.3"),
+	})
+	require.NoError(t, err)
+
+	// Installs also the same core via CLI so all the necessary tools are installed
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	// Verifies compilation works without issues
+	_, _, err = cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+}
+
+func TestCompileManuallyInstalledPlatformUsingPlatformLocalTxt(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	sketchName := "CompileSketchManuallyInstalledPlatformUsingPlatformLocalTxt"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	fqbn := "arduino-beta-development:avr:uno"
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Manually installs a core in sketchbooks hardware folder
+	gitUrl := "https://github.com/arduino/ArduinoCore-avr.git"
+	repoDir := cli.SketchbookDir().Join("hardware", "arduino-beta-development", "avr")
+	_, err = git.PlainClone(repoDir.String(), false, &git.CloneOptions{
+		URL:           gitUrl,
+		ReferenceName: plumbing.NewTagReferenceName("1.8.3"),
+	})
+	require.NoError(t, err)
+
+	// Installs also the same core via CLI so all the necessary tools are installed
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+
+	// Verifies compilation works without issues
+	_, _, err = cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.NoError(t, err)
+
+	// Overrides default platform compiler with an unexisting one
+	platformLocalTxt := repoDir.Join("platform.local.txt")
+	platformLocalTxt.WriteFile([]byte("compiler.c.cmd=my-compiler-that-does-not-exist"))
+
+	// Verifies compilation now fails because compiler is not found
+	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "my-compiler-that-does-not-exist")
 }
