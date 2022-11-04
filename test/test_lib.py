@@ -146,53 +146,6 @@ def test_install_with_zip_path(run_command, data_dir, downloads_dir):
     assert lib_install_dir / "README.adoc" in files
 
 
-def test_lib_list_with_updatable_flag(run_command):
-    # Init the environment explicitly
-    run_command(["lib", "update-index"])
-
-    # No libraries to update
-    result = run_command(["lib", "list", "--updatable"])
-    assert result.ok
-    assert "" == result.stderr
-    assert "No libraries update is available." in result.stdout.strip()
-    # No library to update in json
-    result = run_command(["lib", "list", "--updatable", "--format", "json"])
-    assert result.ok
-    assert "" == result.stderr
-    assert 0 == len(json.loads(result.stdout))
-
-    # Install outdated library
-    assert run_command(["lib", "install", "ArduinoJson@6.11.0"])
-    # Install latest version of library
-    assert run_command(["lib", "install", "WiFi101"])
-
-    res = run_command(["lib", "list", "--updatable"])
-    assert res.ok
-    assert "" == res.stderr
-    # lines = res.stdout.strip().splitlines()
-    lines = [l.strip().split(maxsplit=4) for l in res.stdout.strip().splitlines()]
-    assert 2 == len(lines)
-    assert ["Name", "Installed", "Available", "Location", "Description"] in lines
-    line = lines[1]
-    assert "ArduinoJson" == line[0]
-    assert "6.11.0" == line[1]
-    # Verifies available version is not equal to installed one and not empty
-    assert "6.11.0" != line[2]
-    assert "" != line[2]
-    assert "An efficient and elegant JSON library..." == line[4]
-
-    # Look at the JSON output
-    res = run_command(["lib", "list", "--updatable", "--format", "json"], hide=True)
-    assert res.ok
-    assert "" == res.stderr
-    data = json.loads(res.stdout)
-    assert 1 == len(data)
-    # be sure data contains the available version
-    assert "6.11.0" == data[0]["library"]["version"]
-    assert "6.11.0" != data[0]["release"]["version"]
-    assert "" != data[0]["release"]["version"]
-
-
 def test_install_with_git_url_from_current_directory(run_command, downloads_dir, data_dir):
     assert run_command(["update"])
 

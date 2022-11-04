@@ -783,3 +783,57 @@ func TestSearchParagraph(t *testing.T) {
 		]
 	}`)
 }
+
+func TestLibListWithUpdatableFlag(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("lib", "update-index")
+	require.NoError(t, err)
+
+	// No libraries to update
+	stdout, stderr, err := cli.Run("lib", "list", "--updatable")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	require.Contains(t, string(stdout), "No libraries update is available.")
+	// No library to update in json
+	stdout, stderr, err = cli.Run("lib", "list", "--updatable", "--format", "json")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	requirejson.Empty(t, stdout)
+
+	// Install outdated library
+	_, _, err = cli.Run("lib", "install", "ArduinoJson@6.11.0")
+	require.NoError(t, err)
+	// Install latest version of library
+	_, _, err = cli.Run("lib", "install", "WiFi101")
+	require.NoError(t, err)
+
+	stdout, stderr, err = cli.Run("lib", "list", "--updatable")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	var lines [][]string
+	for _, v := range strings.Split(strings.TrimSpace(string(stdout)), "\n") {
+		v = strings.Join(strings.Fields(v), " ")
+		lines = append(lines, strings.SplitN(v, " ", 5))
+	}
+	require.Len(t, lines, 2)
+	require.Subset(t, lines[0], []string{"Name", "Installed", "Available", "Location", "Description"})
+	require.Equal(t, "ArduinoJson", lines[1][0])
+	require.Equal(t, "6.11.0", lines[1][1])
+	// Verifies available version is not equal to installed one and not empty
+	require.NotEqual(t, "6.11.0", lines[1][2])
+	require.NotEmpty(t, lines[1][2])
+	require.Equal(t, "An efficient and elegant JSON library...", lines[1][4])
+
+	// Look at the JSON output
+	stdout, stderr, err = cli.Run("lib", "list", "--updatable", "--format", "json")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	requirejson.Len(t, stdout, 1)
+	// be sure data contains the available version
+	requirejson.Query(t, stdout, `.[0] | .library | .version`, `"6.11.0"`)
+	requirejson.Query(t, stdout, `.[0] | .release | .version != "6.11.0"`, `true`)
+	requirejson.Query(t, stdout, `.[0] | .release | .version != ""`, `true`)
+}
