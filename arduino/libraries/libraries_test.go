@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -47,4 +48,23 @@ func TestLibLayoutAndLocationJSONUnMarshaler(t *testing.T) {
 	testLocation(ReferencedPlatformBuiltIn)
 	testLocation(User)
 	testLocation(Unmanaged)
+}
+
+func TestLibrariesLoader(t *testing.T) {
+	{
+		lib, err := Load(paths.New("testdata", "TestLib"), User)
+		require.NoError(t, err)
+		require.Equal(t, "TestLib", lib.Name)
+		require.Equal(t, "1.0.3", lib.Version.String())
+		require.False(t, lib.IsLegacy)
+		require.False(t, lib.InDevelopment)
+	}
+	{
+		lib, err := Load(paths.New("testdata", "TestLibInDev"), User)
+		require.NoError(t, err)
+		require.Equal(t, "TestLibInDev", lib.Name)
+		require.Equal(t, "1.0.3", lib.Version.String())
+		require.False(t, lib.IsLegacy)
+		require.True(t, lib.InDevelopment)
+	}
 }

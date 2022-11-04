@@ -305,6 +305,10 @@ message Library {
   repeated string provides_includes = 27;
   // Map of FQBNs that specifies if library is compatible with this library
   map<string, bool> compatible_with = 28;
+  // This value is set to true if the library is in development and should not
+  // be treated as read-only. This status is determined by the presence of a
+  // `.development` file in the library root directory.
+  bool in_development = 29;
 }
 
 enum LibraryLayout {

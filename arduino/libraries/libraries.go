@@ -74,6 +74,7 @@ type Library struct {
 	PrecompiledWithSources bool
 	LDflags                string
 	IsLegacy               bool
+	InDevelopment          bool
 	Version                *semver.Version
 	License                string
 	Properties             *properties.Map
@@ -136,6 +137,7 @@ func (library *Library) ToRPCLibrary() (*rpc.Library, error) {
 		Precompiled:       library.Precompiled,
 		LdFlags:           library.LDflags,
 		IsLegacy:          library.IsLegacy,
+		InDevelopment:     library.InDevelopment,
 		Version:           library.Version.String(),
 		License:           library.License,
 		Examples:          library.Examples.AsStrings(),
