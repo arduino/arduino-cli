@@ -206,22 +206,6 @@ def test_install_with_zip_path_multiple_libraries(run_command, downloads_dir, da
     assert ble_install_dir.exists()
 
 
-def test_lib_examples(run_command, data_dir):
-    assert run_command(["update"])
-
-    assert run_command(["lib", "install", "Arduino_JSON@0.1.0"])
-
-    res = run_command(["lib", "examples", "Arduino_JSON", "--format", "json"])
-    assert res.ok
-    data = json.loads(res.stdout)
-    assert len(data) == 1
-    examples = data[0]["examples"]
-
-    assert str(Path(data_dir, "libraries", "Arduino_JSON", "examples", "JSONArray")) in examples
-    assert str(Path(data_dir, "libraries", "Arduino_JSON", "examples", "JSONKitchenSink")) in examples
-    assert str(Path(data_dir, "libraries", "Arduino_JSON", "examples", "JSONObject")) in examples
-
-
 def test_lib_examples_with_pde_file(run_command, data_dir):
     assert run_command(["update"])
 

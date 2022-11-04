@@ -983,3 +983,23 @@ func TestInstallWithGitUrlMultipleLibraries(t *testing.T) {
 	require.DirExists(t, wifiInstallDir.String())
 	require.DirExists(t, bleInstallDir.String())
 }
+
+func TestLibExamples(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("lib", "install", "Arduino_JSON@0.1.0")
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("lib", "examples", "Arduino_JSON", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+	examples := requirejson.Parse(t, stdout).Query(".[0] | .examples").String()
+	examples = strings.ReplaceAll(examples, "\\\\", "\\")
+	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Arduino_JSON", "examples", "JSONArray").String())
+	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Arduino_JSON", "examples", "JSONKitchenSink").String())
+	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Arduino_JSON", "examples", "JSONObject").String())
+}
