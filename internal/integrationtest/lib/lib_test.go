@@ -868,3 +868,32 @@ func TestInstallWithGitUrlFromCurrentDirectory(t *testing.T) {
 	// Verifies library is installed to correct folder
 	require.DirExists(t, libInstallDir.String())
 }
+
+func TestInstallWithGitLocalUrl(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101")
+	// Verifies library is not installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	// Clone repository locally
+	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
+	repoDir := cli.SketchbookDir().Join("WiFi101")
+	_, err = git.PlainClone(repoDir.String(), false, &git.CloneOptions{
+		URL: gitUrl,
+	})
+	require.NoError(t, err)
+
+	_, _, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", repoDir.String())
+	require.NoError(t, err)
+
+	// Verifies library is installed
+	require.DirExists(t, libInstallDir.String())
+}
