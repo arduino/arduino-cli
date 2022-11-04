@@ -146,19 +146,6 @@ def test_install_with_zip_path(run_command, data_dir, downloads_dir):
     assert lib_install_dir / "README.adoc" in files
 
 
-def test_search_paragraph(run_command):
-    """
-    Search for a string that's only present in the `paragraph` field
-    within the index file.
-    """
-    assert run_command(["lib", "update-index"])
-    result = run_command(["lib", "search", "A simple and efficient JSON library", "--names", "--format", "json"])
-    assert result.ok
-    data = json.loads(result.stdout)
-    libraries = [l["name"] for l in data["libraries"]]
-    assert "ArduinoJson" in libraries
-
-
 def test_lib_list_with_updatable_flag(run_command):
     # Init the environment explicitly
     run_command(["lib", "update-index"])

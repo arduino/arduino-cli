@@ -764,3 +764,22 @@ func TestSearch(t *testing.T) {
 	runSearch("arduinojson", []string{"ArduinoJson"})
 	runSearch("json", []string{"ArduinoJson", "Arduino_JSON"})
 }
+
+func TestSearchParagraph(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Search for a string that's only present in the `paragraph` field
+	// within the index file.
+	_, _, err := cli.Run("lib", "update-index")
+	require.NoError(t, err)
+	stdout, _, err := cli.Run("lib", "search", "A simple and efficient JSON library", "--names", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Contains(t, stdout, `{
+		"libraries": [
+			{
+				"name": "ArduinoJson"
+			}
+		]
+	}`)
+}
