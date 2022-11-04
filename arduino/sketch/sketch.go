@@ -296,6 +296,18 @@ func (s *Sketch) GetProjectPath() *paths.Path {
 	return projectFile
 }
 
+// GetDefaultFQBN returns the default FQBN for the sketch (from the sketch.yaml project file), or the
+// empty string if not set.
+func (s *Sketch) GetDefaultFQBN() string {
+	return s.Project.DefaultFqbn
+}
+
+// GetDefaultPortAddressAndProtocol returns the default port address and port protocol for the sketch
+// (from the sketch.yaml project file), or empty strings if not set.
+func (s *Sketch) GetDefaultPortAddressAndProtocol() (string, string) {
+	return s.Project.DefaultPort, s.Project.DefaultProtocol
+}
+
 // InvalidSketchFolderNameError is returned when the sketch directory doesn't match the sketch name
 type InvalidSketchFolderNameError struct {
 	SketchFolder *paths.Path

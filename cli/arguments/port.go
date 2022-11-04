@@ -17,7 +17,6 @@ package arguments
 
 import (
 	"fmt"
-	"net/url"
 	"os"
 	"time"
 
@@ -80,18 +79,8 @@ func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Po
 	address := p.address
 	protocol := p.protocol
 
-	if address == "" && sk != nil && sk.Metadata != nil {
-		// This is for compatibility with old sketch.json where the address
-		// for serial ports was stored as URL like serial:///dev/ttyACM0, so we
-		// check if we have a URI and the scheme is "serial". In all other
-		// cases we pick the address as is.
-		deviceURI, err := url.Parse(sk.Metadata.CPU.Port)
-		if err == nil && deviceURI.Scheme == "serial" {
-			address = deviceURI.Host + deviceURI.Path
-		} else {
-			address = sk.Metadata.CPU.Port
-		}
-		protocol = sk.Metadata.CPU.Protocol
+	if address == "" && sk != nil {
+		address, protocol = sk.GetDefaultPortAddressAndProtocol()
 	}
 	if address == "" {
 		// If no address is provided we assume the user is trying to upload
