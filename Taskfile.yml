@@ -236,7 +236,7 @@ tasks:
     desc: Create a zip file containing all .proto files in DIST_DIR
     dir: rpc
     cmds:
-      - mkdir ../{{.DIST_DIR}}
+      - mkdir --parents ../{{.DIST_DIR}}
       - zip -r ../{{.DIST_DIR}}/{{.PROJECT_NAME}}_{{.VERSION}}_proto.zip  * -i \*.proto
 
   protoc:format:
