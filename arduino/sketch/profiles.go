@@ -29,10 +29,13 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// Project represents all the profiles defined for the sketch
+// Project represents the sketch project file
 type Project struct {
-	Profiles       Profiles `yaml:"profiles"`
-	DefaultProfile string   `yaml:"default_profile"`
+	Profiles        Profiles `yaml:"profiles"`
+	DefaultProfile  string   `yaml:"default_profile"`
+	DefaultFqbn     string   `yaml:"default_fqbn"`
+	DefaultPort     string   `yaml:"default_port,omitempty"`
+	DefaultProtocol string   `yaml:"default_protocol,omitempty"`
 }
 
 // AsYaml outputs the sketch project file as YAML
@@ -45,6 +48,15 @@ func (p *Project) AsYaml() string {
 	}
 	if p.DefaultProfile != "" {
 		res += fmt.Sprintf("default_profile: %s\n", p.DefaultProfile)
+	}
+	if p.DefaultFqbn != "" {
+		res += fmt.Sprintf("default_fqbn: %s\n", p.DefaultFqbn)
+	}
+	if p.DefaultPort != "" {
+		res += fmt.Sprintf("default_port: %s\n", p.DefaultPort)
+	}
+	if p.DefaultProtocol != "" {
+		res += fmt.Sprintf("default_protocol: %s\n", p.DefaultProtocol)
 	}
 	return res
 }
