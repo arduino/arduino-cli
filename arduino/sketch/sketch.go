@@ -101,13 +101,10 @@ func New(path *paths.Path) (*Sketch, error) {
 		AdditionalFiles:  paths.PathList{},
 		RootFolderFiles:  paths.PathList{},
 		Metadata:         new(Metadata),
+		Project:          &Project{},
 	}
 
-	projectFile := path.Join("sketch.yaml")
-	if !projectFile.Exist() {
-		projectFile = path.Join("sketch.yml")
-	}
-	if projectFile.Exist() {
+	if projectFile := sketch.GetProjectPath(); projectFile.Exist() {
 		prj, err := LoadProjectFile(projectFile)
 		if err != nil {
 			return nil, fmt.Errorf("%s %w", tr("error loading sketch project file:"), err)
@@ -285,6 +282,18 @@ func (s *Sketch) checkSketchCasing() error {
 	}
 
 	return nil
+}
+
+// GetProjectPath returns the path to the sketch project file (sketch.yaml or sketch.yml)
+func (s *Sketch) GetProjectPath() *paths.Path {
+	projectFile := s.FullPath.Join("sketch.yaml")
+	if !projectFile.Exist() {
+		alternateProjectFile := s.FullPath.Join("sketch.yml")
+		if alternateProjectFile.Exist() {
+			return alternateProjectFile
+		}
+	}
+	return projectFile
 }
 
 // InvalidSketchFolderNameError is returned when the sketch directory doesn't match the sketch name
