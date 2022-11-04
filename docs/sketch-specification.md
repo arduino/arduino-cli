@@ -68,14 +68,12 @@ the `data` folder, so any non-code files outside the `data` folder are stripped.
 
 #### `sketch.json`
 
-Arduino CLI and Arduino Web Editor use a file named sketch.json, located in the sketch root folder, to store sketch
-metadata.
+Arduino Web Editor use a file named `sketch.json`, located in the sketch root folder, to store sketch metadata. This
+file is not used by the Arduino CLI or the Arduino IDE, if you're not an Arduino Web Editor user you can safely ignore
+it.
 
-The `cpu` key contains the board configuration information. This can be set via
-[`arduino-cli board attach`](commands/arduino-cli_board_attach.md) or by selecting a board in the Arduino Web Editor
-while the sketch is open. With this configuration set, it is not necessary to specify the `--fqbn` or `--port` flags to
-the [`arduino-cli compile`](commands/arduino-cli_compile.md) or [`arduino-cli upload`](commands/arduino-cli_upload.md)
-commands when compiling or uploading the sketch.
+The `cpu` key contains the board configuration information. This can be set by selecting a board in the Arduino Web
+Editor while the sketch is open.
 
 The `included_libs` key defines the library versions the Arduino Web Editor uses when the sketch is compiled. This is
 Arduino Web Editor specific because all versions of all the Library Manager libraries are pre-installed in Arduino Web
@@ -87,6 +85,9 @@ This is an optional file named `sketch.yaml`, located in the root folder of the 
 
 Inside the sketch project file the user can define one or more "profiles": each profile is a description of all the
 resources needed to build the sketch (platform and libraries each pinned to a specific version).
+
+The sketch project file is also used in the [`arduino-cli board attach`](commands/arduino-cli_board_attach.md) command
+to store the currently selected board and port.
 
 For more information see the [sketch project file](sketch-project-file.md) documentation.
 

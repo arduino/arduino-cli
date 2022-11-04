@@ -57,7 +57,9 @@ The errors are automatically sent to output via `feedback` package, as for the o
 ### `board attach` CLI command changed behaviour
 
 The `board attach` CLI command has changed behaviour: now it just pick whatever port and FQBN is passed as parameter and
-saves it in the `sketch.json` file, without any validity check or board autodetection.
+saves it in the `sketch.yaml` file, without any validity check or board autodetection.
+
+The `sketch.json` file is now completely ignored.
 
 ### `cc.arduino.cli.commands.v1.BoardAttach` gRPC interface command removal
 
