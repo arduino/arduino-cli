@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/testifyjson/requirejson"
+	"gopkg.in/src-d/go-git.v4"
 )
 
 func TestLibUpgradeCommand(t *testing.T) {
@@ -836,4 +837,34 @@ func TestLibListWithUpdatableFlag(t *testing.T) {
 	requirejson.Query(t, stdout, `.[0] | .library | .version`, `"6.11.0"`)
 	requirejson.Query(t, stdout, `.[0] | .release | .version != "6.11.0"`, `true`)
 	requirejson.Query(t, stdout, `.[0] | .release | .version != ""`, `true`)
+}
+
+func TestInstallWithGitUrlFromCurrentDirectory(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101")
+	// Verifies library is not installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	// Clone repository locally
+	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
+	repoDir := cli.SketchbookDir().Join("WiFi101")
+	_, err = git.PlainClone(repoDir.String(), false, &git.CloneOptions{
+		URL: gitUrl,
+	})
+	require.NoError(t, err)
+
+	cli.SetWorkingDir(repoDir)
+	_, _, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", ".")
+	require.NoError(t, err)
+
+	// Verifies library is installed to correct folder
+	require.DirExists(t, libInstallDir.String())
 }

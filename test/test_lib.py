@@ -146,31 +146,6 @@ def test_install_with_zip_path(run_command, data_dir, downloads_dir):
     assert lib_install_dir / "README.adoc" in files
 
 
-def test_install_with_git_url_from_current_directory(run_command, downloads_dir, data_dir):
-    assert run_command(["update"])
-
-    env = {
-        "ARDUINO_DATA_DIR": data_dir,
-        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
-        "ARDUINO_SKETCHBOOK_DIR": data_dir,
-        "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
-    }
-
-    lib_install_dir = Path(data_dir, "libraries", "WiFi101")
-    # Verifies library is not installed
-    assert not lib_install_dir.exists()
-
-    # Clone repository locally
-    git_url = "https://github.com/arduino-libraries/WiFi101.git"
-    repo_dir = Path(data_dir, "WiFi101")
-    assert Repo.clone_from(git_url, repo_dir)
-
-    assert run_command(["lib", "install", "--git-url", "."], custom_working_dir=repo_dir, custom_env=env)
-
-    # Verifies library is installed to correct folder
-    assert lib_install_dir.exists()
-
-
 @pytest.mark.skipif(
     platform.system() == "Windows",
     reason="Using a file uri as git url doesn't work on Windows, "
