@@ -956,3 +956,30 @@ func TestInstallWithGitUrlDoesNotCreateGitRepo(t *testing.T) {
 	// Verifies installed library is not a git repository
 	require.NoDirExists(t, libInstallDir.Join(".git").String())
 }
+
+func TestInstallWithGitUrlMultipleLibraries(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+
+	wifiInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101")
+	bleInstallDir := cli.SketchbookDir().Join("libraries", "ArduinoBLE")
+	// Verifies library are not installed
+	require.NoDirExists(t, wifiInstallDir.String())
+	require.NoDirExists(t, bleInstallDir.String())
+
+	wifiUrl := "https://github.com/arduino-libraries/WiFi101.git"
+	bleUrl := "https://github.com/arduino-libraries/ArduinoBLE.git"
+
+	_, _, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", wifiUrl, bleUrl)
+	require.NoError(t, err)
+
+	// Verifies library are installed
+	require.DirExists(t, wifiInstallDir.String())
+	require.DirExists(t, bleInstallDir.String())
+}

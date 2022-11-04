@@ -176,32 +176,6 @@ def test_install_with_git_url_local_file_uri(run_command, downloads_dir, data_di
     assert lib_install_dir.exists()
 
 
-def test_install_with_git_url_multiple_libraries(run_command, downloads_dir, data_dir):
-    assert run_command(["update"])
-
-    env = {
-        "ARDUINO_DATA_DIR": data_dir,
-        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
-        "ARDUINO_SKETCHBOOK_DIR": data_dir,
-        "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
-    }
-
-    wifi_install_dir = Path(data_dir, "libraries", "WiFi101")
-    ble_install_dir = Path(data_dir, "libraries", "ArduinoBLE")
-    # Verifies libraries are not installed
-    assert not wifi_install_dir.exists()
-    assert not ble_install_dir.exists()
-
-    wifi_url = "https://github.com/arduino-libraries/WiFi101.git"
-    ble_url = "https://github.com/arduino-libraries/ArduinoBLE.git"
-
-    assert run_command(["lib", "install", "--git-url", wifi_url, ble_url], custom_env=env)
-
-    # Verifies library are installed
-    assert wifi_install_dir.exists()
-    assert ble_install_dir.exists()
-
-
 def test_install_with_zip_path_multiple_libraries(run_command, downloads_dir, data_dir):
     assert run_command(["update"])
 
