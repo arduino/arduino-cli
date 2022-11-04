@@ -1003,3 +1003,24 @@ func TestLibExamples(t *testing.T) {
 	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Arduino_JSON", "examples", "JSONKitchenSink").String())
 	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Arduino_JSON", "examples", "JSONObject").String())
 }
+
+func TestLibExamplesWithPdeFile(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("lib", "install", "Encoder@1.4.1")
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("lib", "examples", "Encoder", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+	examples := requirejson.Parse(t, stdout).Query(".[0] | .examples").String()
+	examples = strings.ReplaceAll(examples, "\\\\", "\\")
+	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Encoder", "examples", "Basic").String())
+	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Encoder", "examples", "NoInterrupts").String())
+	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Encoder", "examples", "SpeedTest").String())
+	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Encoder", "examples", "TwoKnobs").String())
+}

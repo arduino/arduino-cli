@@ -206,23 +206,6 @@ def test_install_with_zip_path_multiple_libraries(run_command, downloads_dir, da
     assert ble_install_dir.exists()
 
 
-def test_lib_examples_with_pde_file(run_command, data_dir):
-    assert run_command(["update"])
-
-    assert run_command(["lib", "install", "Encoder@1.4.1"])
-
-    res = run_command(["lib", "examples", "Encoder", "--format", "json"])
-    assert res.ok
-    data = json.loads(res.stdout)
-    assert len(data) == 1
-    examples = data[0]["examples"]
-
-    assert str(Path(data_dir, "libraries", "Encoder", "examples", "Basic")) in examples
-    assert str(Path(data_dir, "libraries", "Encoder", "examples", "NoInterrupts")) in examples
-    assert str(Path(data_dir, "libraries", "Encoder", "examples", "SpeedTest")) in examples
-    assert str(Path(data_dir, "libraries", "Encoder", "examples", "TwoKnobs")) in examples
-
-
 def test_lib_examples_with_case_mismatch(run_command, data_dir):
     assert run_command(["update"])
 
