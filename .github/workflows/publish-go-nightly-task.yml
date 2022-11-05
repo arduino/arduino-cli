@@ -246,6 +246,8 @@ jobs:
           version: 3.x
 
       - name: Collect proto files
+        env:
+          NIGHTLY: true
         run: task protoc:collect
 
       - name: Create checksum file
