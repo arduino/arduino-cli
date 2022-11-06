@@ -1330,10 +1330,9 @@ platform's platform.txt is done as usual.
 
 ### Sketch debugging configuration
 
-Starting from Arduino CLI 0.9.0 / Arduino Pro IDE v0.0.5-alpha.preview, sketch debugging support is available for
-platforms.
+Starting from Arduino CLI 0.9.0 / Arduino IDE 2.x, sketch debugging support is available for platforms.
 
-The debug action is triggered when the user clicks the Debug button in the Arduino Pro IDE or runs the
+The debug action is triggered when the user clicks the Debug button in the Arduino IDE or runs the
 [`arduino-cli debug`](commands/arduino-cli_debug.md) command.
 
 The compiler optimization level that is appropriate for normal usage will often not provide a good experience while
@@ -1486,8 +1485,8 @@ myboard.bootloader.tool=arduino:avrdude
 [....]
 ```
 
-When using Arduino CLI or Arduino Pro IDE (but not Arduino IDE), properties used in the referenced tool recipe may be
-overridden in the referencing platform's platform.txt.
+When using Arduino CLI or Arduino IDE 2.x (but not Arduino IDE 1.x), properties used in the referenced tool recipe may
+be overridden in the referencing platform's platform.txt.
 
 Note that, unlike core references, referencing a tool recipe does _not_ result in any other resources being inherited
 from the referenced platform.
@@ -1548,8 +1547,8 @@ This script may be used to configure the user's system for the platform, such as
 The circumstances under which the post-install script will run are different depending on which Arduino development
 software is in use:
 
-- **Arduino IDE**: (all versions) runs the script when the installed platform is signed with Arduino's private key.
+- **Arduino IDE 1.x**: runs the script when the installed platform is signed with Arduino's private key.
+- **Arduino IDE 2.x**: runs the script for any installed platform.
 - **Arduino CLI**: (since 0.12.0) runs the script for any installed platform when Arduino CLI is in "interactive" mode.
   This behavior
   [can be configured](https://arduino.github.io/arduino-cli/latest/commands/arduino-cli_core_install/#options)
-- **Arduino Pro IDE**: (since 0.1.0) runs the script for any installed platform.

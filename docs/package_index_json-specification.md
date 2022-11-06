@@ -2,8 +2,8 @@ Introduced in Arduino IDE 1.6.4, Boards Manager makes it easy to install and upd
 provide Boards Manager installation support for a platform, a JSON formatted index file must be published. This is the
 specification for that file.
 
-Boards Manager functionality is provided by [Arduino CLI](getting-started.md#adding-3rd-party-cores),
-[Arduino IDE](https://docs.arduino.cc/learn/starting-guide/cores), and Arduino Pro IDE.
+Boards Manager functionality is provided by [Arduino CLI](getting-started.md#adding-3rd-party-cores) and
+[Arduino IDE](https://docs.arduino.cc/learn/starting-guide/cores).
 
 ## Naming of the JSON index file
 
@@ -64,9 +64,8 @@ The metadata fields are:
 - `name`: the folder used for the installed cores. The
   [vendor folder](platform-specification.md#hardware-folders-structure) name of the installed package is determined by
   this field
-- `maintainer`: the extended name of the vendor that is displayed on the Arduino IDE/Pro IDE's Boards Manager GUI
-- `websiteURL`: the URL to the vendor's website, appears on the Arduino IDE/Pro IDE's Boards Manager as a "More info"
-  link
+- `maintainer`: the extended name of the vendor that is displayed on the Arduino IDE Boards Manager GUI
+- `websiteURL`: the URL to the vendor's website, appears on the Arduino IDE Boards Manager as a "More info" link
 - `email`: the email of the vendor/maintainer
 
 Now, before looking at `PLATFORMS`, let's explore first how `TOOLS` are made.
@@ -241,8 +240,8 @@ Each PLATFORM describes a core for a specific architecture. The fields needed ar
 - `help`/`online`: is a URL that is displayed on the Arduino IDE's Boards Manager as an "Online Help" link
 - `url`, `archiveFileName`, `size` and `checksum`: metadata of the core archive file. The meaning is the same as for the
   TOOLS
-- `boards`: the list of boards supported (note: just the names to display on the Arduino IDE and Arduino Pro IDE's
-  Boards Manager GUI! the real boards definitions are inside `boards.txt` inside the core archive file)
+- `boards`: the list of boards supported (note: just the names to display on the Arduino IDE's Boards Manager GUI! the
+  real boards definitions are inside `boards.txt` inside the core archive file)
 - `toolsDependencies`: the tools needed by this platform. They will be installed by Boards Manager along with the
   platform. Each tool is referenced by the triple (`packager`, `name`, `version`) as previously said. Note that you can
   reference tools available in other packages as well, even if no platform of that package is installed.

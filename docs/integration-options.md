@@ -3,9 +3,9 @@
 The Arduino CLI is an open source Command Line Application written in [Golang] that can be used from a terminal to
 compile, verify and upload sketches to Arduino boards and that’s capable of managing all the software and tools needed
 in the process. But don’t get fooled by its name: Arduino CLI can do much more than the average console application, as
-shown by the [Arduino Pro IDE] and [Arduino Cloud], which rely on it for similar purposes but each one in a completely
-different way from the other. In this article we introduce the three pillars of the Arduino CLI, explaining how we
-designed the software so that it can be effectively leveraged under different scenarios.
+shown by [Arduino IDE 2.x][arduino ide 2.x] and [Arduino Cloud], which rely on it for similar purposes but each one in a
+completely different way from the other. In this article we introduce the three pillars of the Arduino CLI, explaining
+how we designed the software so that it can be effectively leveraged under different scenarios.
 
 ## The first pillar: command line interface
 
@@ -57,10 +57,10 @@ instance:
 
 gRPC is language agnostic: even if the example is written in Golang, the programming language used for the client can be
 Python, JavaScript or any of the many [supported ones][grpc supported languages], leading to a variety of possible
-scenarios. The new [Arduino Pro IDE] is a good example of how to leverage the daemon mode of the Arduino CLI with a
-clean separation of concerns: the Pro IDE knows nothing about how to download a core, compile a sketch or talk to an
+scenarios. [Arduino IDE 2.x][arduino ide 2.x] is a good example of how to leverage the daemon mode of the Arduino CLI
+with a clean separation of concerns: the IDE knows nothing about how to download a core, compile a sketch or talk to an
 Arduino board and it demands all these features of an Arduino CLI instance. Conversely, the Arduino CLI doesn’t even
-know that the client that’s connected is the Pro IDE, and neither does it care.
+know that the client that’s connected is the Arduino IDE, and neither does it care.
 
 For more information on Arduino CLI's gRPC interface, see the [gRPC interface reference].
 
@@ -88,7 +88,7 @@ designed the low level API, have a look at the [commands package] and don’t he
 tracker] if you’ve got a use case that doesn’t fit one of the three pillars.
 
 [golang]: https://go.dev/
-[arduino pro ide]: https://www.arduino.cc/pro/arduino-pro-ide
+[arduino ide 2.x]: https://github.com/arduino/arduino-ide
 [arduino cloud]: https://cloud.arduino.cc/home
 [continuous integration]: https://en.wikipedia.org/wiki/Continuous_integration
 [continuous deployment]: https://en.wikipedia.org/wiki/Continuous_deployment
