@@ -204,35 +204,3 @@ def test_install_with_zip_path_multiple_libraries(run_command, downloads_dir, da
     # Verifies library are installed
     assert wifi_install_dir.exists()
     assert ble_install_dir.exists()
-
-
-def test_upgrade_does_not_try_to_upgrade_bundled_core_libraries(run_command, data_dir):
-    test_platform_name = "platform_with_bundled_library"
-    platform_install_dir = Path(data_dir, "packages", "arduino", "hardware", "arch", "4.2.0")
-    platform_install_dir.mkdir(parents=True)
-
-    # Simulate installation of a platform with arduino-cli
-    shutil.copytree(
-        Path(__file__).parent / "testdata" / test_platform_name,
-        platform_install_dir,
-        dirs_exist_ok=True,
-    )
-
-    assert run_command(["update"])
-
-    # Install latest version of library identical to one
-    # bundled with test platform
-    assert run_command(["lib", "install", "USBHost"])
-
-    res = run_command(["lib", "list", "--all", "--format", "json"])
-    assert res.ok
-    libs = json.loads(res.stdout)
-    assert len(libs) == 2
-    # Verify both libraries have the same name
-    assert libs[0]["library"]["name"] == "USBHost"
-    assert libs[1]["library"]["name"] == "USBHost"
-
-    res = run_command(["lib", "upgrade"])
-    assert res.ok
-    # Empty output means nothing has been updated as expected
-    assert res.stdout == ""

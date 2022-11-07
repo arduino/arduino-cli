@@ -1269,3 +1269,37 @@ func TestUpgradeDoesNotTryToUpgradeBundledCoreLibrariesInSketchbook(t *testing.T
 	// Empty output means nothing has been updated as expected
 	require.Empty(t, stdout)
 }
+
+func TestUpgradeDoesNotTryToUpgradeBundledCoreLibraries(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	testPlatformName := "platform_with_bundled_library"
+	platformInstallDir := cli.DataDir().Join("packages", "arduino", "hardware", "arch", "4.2.0")
+	require.NoError(t, platformInstallDir.Parent().MkdirAll())
+
+	// Install platform in Sketchbook hardware dir
+	wd, err := paths.Getwd()
+	require.NoError(t, err)
+	require.NoError(t, wd.Parent().Join("testdata", testPlatformName).CopyDirTo(platformInstallDir))
+
+	_, _, err = cli.Run("update")
+	require.NoError(t, err)
+
+	// Install latest version of library identical to one
+	// bundled with test platform
+	_, _, err = cli.Run("lib", "install", "USBHost")
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("lib", "list", "--all", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 2)
+	// Verify both libraries have the same name
+	requirejson.Query(t, stdout, ".[0] | .library | .name", "\"USBHost\"")
+	requirejson.Query(t, stdout, ".[1] | .library | .name", "\"USBHost\"")
+
+	stdout, _, err = cli.Run("lib", "upgrade")
+	require.NoError(t, err)
+	// Empty output means nothing has been updated as expected
+	require.Empty(t, stdout)
+}
