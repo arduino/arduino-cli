@@ -1138,3 +1138,36 @@ func TestInstallZipLibWithMacosMetadata(t *testing.T) {
 	require.FileExists(t, libInstallDir.Join("library.properties").String())
 	require.FileExists(t, libInstallDir.Join("src", "fake-lib.h").String())
 }
+
+func TestInstallZipInvalidLibrary(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Initialize configs to enable --zip-path flag
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+	_, _, err := cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "lib-without-header")
+	// Verifies library is not already installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	wd, err := paths.Getwd()
+	require.NoError(t, err)
+	zipPath := wd.Parent().Join("testdata", "lib-without-header.zip")
+	// Test zip-path install
+	_, stderr, err := cli.Run("lib", "install", "--zip-path", zipPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "library not valid")
+
+	libInstallDir = cli.SketchbookDir().Join("libraries", "lib-without-properties")
+	// Verifies library is not already installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	zipPath = wd.Parent().Join("testdata", "lib-without-properties.zip")
+	// Test zip-path install
+	_, stderr, err = cli.Run("lib", "install", "--zip-path", zipPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "library not valid")
+}

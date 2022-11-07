@@ -206,37 +206,6 @@ def test_install_with_zip_path_multiple_libraries(run_command, downloads_dir, da
     assert ble_install_dir.exists()
 
 
-def test_install_zip_invalid_library(run_command, data_dir, downloads_dir):
-    # Initialize configs to enable --zip-path flag
-    env = {
-        "ARDUINO_DATA_DIR": data_dir,
-        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
-        "ARDUINO_SKETCHBOOK_DIR": data_dir,
-        "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
-    }
-    assert run_command(["config", "init", "--dest-dir", "."], custom_env=env)
-
-    lib_install_dir = Path(data_dir, "libraries", "lib-without-header")
-    # Verifies library is not already installed
-    assert not lib_install_dir.exists()
-
-    zip_path = Path(__file__).parent / "testdata" / "lib-without-header.zip"
-    # Test zip-path install
-    res = run_command(["lib", "install", "--zip-path", zip_path])
-    assert res.failed
-    assert "library not valid" in res.stderr
-
-    lib_install_dir = Path(data_dir, "libraries", "lib-without-properties")
-    # Verifies library is not already installed
-    assert not lib_install_dir.exists()
-
-    zip_path = Path(__file__).parent / "testdata" / "lib-without-properties.zip"
-    # Test zip-path install
-    res = run_command(["lib", "install", "--zip-path", zip_path])
-    assert res.failed
-    assert "library not valid" in res.stderr
-
-
 def test_install_git_invalid_library(run_command, data_dir, downloads_dir):
     # Initialize configs to enable --zip-path flag
     env = {
