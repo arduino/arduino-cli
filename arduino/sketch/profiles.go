@@ -262,9 +262,3 @@ func LoadProjectFile(file *paths.Path) (*Project, error) {
 	}
 	return res, nil
 }
-
-// SaveProjectFile save the sketch project to a file
-func (s *Sketch) SaveProjectFile() error {
-	projectFile := s.GetProjectPath()
-	return projectFile.WriteFile([]byte(s.Project.AsYaml()))
-}

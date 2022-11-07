@@ -252,7 +252,7 @@ func (s *Sketch) GetDefaultPortAddressAndProtocol() (string, string) {
 // SetDefaultFQBN sets the default FQBN for the sketch and saves it in the sketch.yaml project file.
 func (s *Sketch) SetDefaultFQBN(fqbn string) error {
 	s.Project.DefaultFqbn = fqbn
-	return s.SaveProjectFile()
+	return updateOrAddYamlRootEntry(s.GetProjectPath(), "default_fqbn", fqbn)
 }
 
 // SetDefaultPort sets the default port address and port protocol for the sketch and saves it in the
@@ -260,7 +260,10 @@ func (s *Sketch) SetDefaultFQBN(fqbn string) error {
 func (s *Sketch) SetDefaultPort(address, protocol string) error {
 	s.Project.DefaultPort = address
 	s.Project.DefaultProtocol = protocol
-	return s.SaveProjectFile()
+	if err := updateOrAddYamlRootEntry(s.GetProjectPath(), "default_port", address); err != nil {
+		return err
+	}
+	return updateOrAddYamlRootEntry(s.GetProjectPath(), "default_protocol", protocol)
 }
 
 // InvalidSketchFolderNameError is returned when the sketch directory doesn't match the sketch name
