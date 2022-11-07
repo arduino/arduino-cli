@@ -1468,9 +1468,9 @@
 <p>The Arduino CLI is an open source Command Line Application written in <a href="https://go.dev/">Golang</a> that can be used from a terminal to
 compile, verify and upload sketches to Arduino boards and that’s capable of managing all the software and tools needed
 in the process. But don’t get fooled by its name: Arduino CLI can do much more than the average console application, as
-shown by the <a href="https://www.arduino.cc/pro/arduino-pro-ide">Arduino Pro IDE</a> and <a href="https://cloud.arduino.cc/home">Arduino Cloud</a>, which rely on it for similar purposes but each one in a completely
-different way from the other. In this article we introduce the three pillars of the Arduino CLI, explaining how we
-designed the software so that it can be effectively leveraged under different scenarios.</p>
+shown by <a href="https://github.com/arduino/arduino-ide">Arduino IDE 2.x</a> and <a href="https://cloud.arduino.cc/home">Arduino Cloud</a>, which rely on it for similar purposes but each one in a
+completely different way from the other. In this article we introduce the three pillars of the Arduino CLI, explaining
+how we designed the software so that it can be effectively leveraged under different scenarios.</p>
 <h2 id="the-first-pillar-command-line-interface">The first pillar: command line interface<a class="headerlink" href="#the-first-pillar-command-line-interface" title="Permanent link">&para;</a></h2>
 <h3 id="console-applications-for-humans">Console applications for humans<a class="headerlink" href="#console-applications-for-humans" title="Permanent link">&para;</a></h3>
 <p>As you might expect, the first way to use the Arduino CLI is from a terminal and by a human, and user experience plays a
@@ -1506,10 +1506,10 @@ instance:</p>
 <p><img alt="gRPC interface screenshot" src="../img/CLI_gRPC_interface_screenshot.png" /></p>
 <p>gRPC is language agnostic: even if the example is written in Golang, the programming language used for the client can be
 Python, JavaScript or any of the many <a href="https://grpc.io/docs/languages/">supported ones</a>, leading to a variety of possible
-scenarios. The new <a href="https://www.arduino.cc/pro/arduino-pro-ide">Arduino Pro IDE</a> is a good example of how to leverage the daemon mode of the Arduino CLI with a
-clean separation of concerns: the Pro IDE knows nothing about how to download a core, compile a sketch or talk to an
+scenarios. <a href="https://github.com/arduino/arduino-ide">Arduino IDE 2.x</a> is a good example of how to leverage the daemon mode of the Arduino CLI
+with a clean separation of concerns: the IDE knows nothing about how to download a core, compile a sketch or talk to an
 Arduino board and it demands all these features of an Arduino CLI instance. Conversely, the Arduino CLI doesn’t even
-know that the client that’s connected is the Pro IDE, and neither does it care.</p>
+know that the client that’s connected is the Arduino IDE, and neither does it care.</p>
 <p>For more information on Arduino CLI's gRPC interface, see the <a href="../rpc/commands/">gRPC interface reference</a>.</p>
 <h2 id="the-third-pillar-embedding">The third pillar: embedding<a class="headerlink" href="#the-third-pillar-embedding" title="Permanent link">&para;</a></h2>
 <p>Arduino CLI is written in <a href="https://go.dev/">Golang</a> and the code is organized in a way that makes it easy to use it as a library by

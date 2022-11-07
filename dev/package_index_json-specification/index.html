@@ -1489,8 +1489,8 @@
                 <p>Introduced in Arduino IDE 1.6.4, Boards Manager makes it easy to install and update Arduino platforms. In order to
 provide Boards Manager installation support for a platform, a JSON formatted index file must be published. This is the
 specification for that file.</p>
-<p>Boards Manager functionality is provided by <a href="../getting-started/#adding-3rd-party-cores">Arduino CLI</a>,
-<a href="https://docs.arduino.cc/learn/starting-guide/cores">Arduino IDE</a>, and Arduino Pro IDE.</p>
+<p>Boards Manager functionality is provided by <a href="../getting-started/#adding-3rd-party-cores">Arduino CLI</a> and
+<a href="https://docs.arduino.cc/learn/starting-guide/cores">Arduino IDE</a>.</p>
 <h2 id="naming-of-the-json-index-file">Naming of the JSON index file<a class="headerlink" href="#naming-of-the-json-index-file" title="Permanent link">&para;</a></h2>
 <p>Many different index files coming from different vendors may be in use, so each vendor should name their own index file
 in a way that won't conflict with others. The file must be named as follows:</p>
@@ -1534,9 +1534,8 @@ active users).</p>
 <li><code>name</code>: the folder used for the installed cores. The
   <a href="../platform-specification/#hardware-folders-structure">vendor folder</a> name of the installed package is determined by
   this field</li>
-<li><code>maintainer</code>: the extended name of the vendor that is displayed on the Arduino IDE/Pro IDE's Boards Manager GUI</li>
-<li><code>websiteURL</code>: the URL to the vendor's website, appears on the Arduino IDE/Pro IDE's Boards Manager as a "More info"
-  link</li>
+<li><code>maintainer</code>: the extended name of the vendor that is displayed on the Arduino IDE Boards Manager GUI</li>
+<li><code>websiteURL</code>: the URL to the vendor's website, appears on the Arduino IDE Boards Manager as a "More info" link</li>
 <li><code>email</code>: the email of the vendor/maintainer</li>
 </ul>
 <p>Now, before looking at <code>PLATFORMS</code>, let's explore first how <code>TOOLS</code> are made.</p>
@@ -1697,8 +1696,8 @@ that can be referenced from <code>platform.txt</code> using one of the following
 <li><code>help</code>/<code>online</code>: is a URL that is displayed on the Arduino IDE's Boards Manager as an "Online Help" link</li>
 <li><code>url</code>, <code>archiveFileName</code>, <code>size</code> and <code>checksum</code>: metadata of the core archive file. The meaning is the same as for the
   TOOLS</li>
-<li><code>boards</code>: the list of boards supported (note: just the names to display on the Arduino IDE and Arduino Pro IDE's
-  Boards Manager GUI! the real boards definitions are inside <code>boards.txt</code> inside the core archive file)</li>
+<li><code>boards</code>: the list of boards supported (note: just the names to display on the Arduino IDE's Boards Manager GUI! the
+  real boards definitions are inside <code>boards.txt</code> inside the core archive file)</li>
 <li><code>toolsDependencies</code>: the tools needed by this platform. They will be installed by Boards Manager along with the
   platform. Each tool is referenced by the triple (<code>packager</code>, <code>name</code>, <code>version</code>) as previously said. Note that you can
   reference tools available in other packages as well, even if no platform of that package is installed.</li>

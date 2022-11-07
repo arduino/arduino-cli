@@ -3267,9 +3267,8 @@ the <a href="#platform-terminology">core platform</a> is not used at all in defi
 actions. When using Arduino development software other than the Arduino IDE, the handling of properties from the core
 platform's platform.txt is done as usual.</p>
 <h3 id="sketch-debugging-configuration">Sketch debugging configuration<a class="headerlink" href="#sketch-debugging-configuration" title="Permanent link">&para;</a></h3>
-<p>Starting from Arduino CLI 0.9.0 / Arduino Pro IDE v0.0.5-alpha.preview, sketch debugging support is available for
-platforms.</p>
-<p>The debug action is triggered when the user clicks the Debug button in the Arduino Pro IDE or runs the
+<p>Starting from Arduino CLI 0.9.0 / Arduino IDE 2.x, sketch debugging support is available for platforms.</p>
+<p>The debug action is triggered when the user clicks the Debug button in the Arduino IDE or runs the
 <a href="../commands/arduino-cli_debug/"><code>arduino-cli debug</code></a> command.</p>
 <p>The compiler optimization level that is appropriate for normal usage will often not provide a good experience while
 debugging. For this reason, it may be helpful to use different compiler flags when compiling a sketch for use with the
@@ -3379,8 +3378,8 @@ myboard.upload.tool=arduino:avrdude
 myboard.bootloader.tool=arduino:avrdude
 [....]
 </code></pre></div>
-<p>When using Arduino CLI or Arduino Pro IDE (but not Arduino IDE), properties used in the referenced tool recipe may be
-overridden in the referencing platform's platform.txt.</p>
+<p>When using Arduino CLI or Arduino IDE 2.x (but not Arduino IDE 1.x), properties used in the referenced tool recipe may
+be overridden in the referencing platform's platform.txt.</p>
 <p>Note that, unlike core references, referencing a tool recipe does <em>not</em> result in any other resources being inherited
 from the referenced platform.</p>
 <h3 id="platform-terminology">Platform Terminology<a class="headerlink" href="#platform-terminology" title="Permanent link">&para;</a></h3>
@@ -3424,11 +3423,11 @@ selected. This file follows the <a href="../library-specification/#keywords">sam
 <p>The circumstances under which the post-install script will run are different depending on which Arduino development
 software is in use:</p>
 <ul>
-<li><strong>Arduino IDE</strong>: (all versions) runs the script when the installed platform is signed with Arduino's private key.</li>
+<li><strong>Arduino IDE 1.x</strong>: runs the script when the installed platform is signed with Arduino's private key.</li>
+<li><strong>Arduino IDE 2.x</strong>: runs the script for any installed platform.</li>
 <li><strong>Arduino CLI</strong>: (since 0.12.0) runs the script for any installed platform when Arduino CLI is in "interactive" mode.
   This behavior
   <a href="https://arduino.github.io/arduino-cli/latest/commands/arduino-cli_core_install/#options">can be configured</a></li>
-<li><strong>Arduino Pro IDE</strong>: (since 0.1.0) runs the script for any installed platform.</li>
 </ul>
                 
               
