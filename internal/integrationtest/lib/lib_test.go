@@ -97,7 +97,10 @@ func TestLibInstallMultipleSameLibrary(t *testing.T) {
 	require.NoError(t, err)
 	jsonOut, _, err := cli.Run("lib", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Len(t, jsonOut, 1, "A duplicate library install has been detected")
+	// Count how many libraries with the name "Arduino SigFox for MKRFox1200" are installed
+	requirejson.Parse(t, jsonOut).
+		Query(`[.[].library.name | select(. == "Arduino SigFox for MKRFox1200")]`).
+		LengthMustEqualTo(1, "Found multiple installations of Arduino SigFox for MKRFox1200'")
 
 	// Check that 'lib upgrade' didn't create a double install
 	// https://github.com/arduino/arduino-cli/issues/1870
@@ -109,7 +112,10 @@ func TestLibInstallMultipleSameLibrary(t *testing.T) {
 	require.NoError(t, err)
 	jsonOut, _, err = cli.Run("lib", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Len(t, jsonOut, 1, "A duplicate library install has been detected")
+	// Count how many libraries with the name "Arduino SigFox for MKRFox1200" are installed
+	requirejson.Parse(t, jsonOut).
+		Query(`[.[].library.name | select(. == "Arduino SigFox for MKRFox1200")]`).
+		LengthMustEqualTo(1, "Found multiple installations of Arduino SigFox for MKRFox1200'")
 }
 
 func TestDuplicateLibInstallDetection(t *testing.T) {
