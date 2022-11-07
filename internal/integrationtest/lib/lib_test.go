@@ -1101,3 +1101,40 @@ func TestLibCommandsWithLibraryHavingInvalidVersion(t *testing.T) {
 	requirejson.Len(t, stdout, 1)
 	requirejson.Query(t, stdout, ".[0] | .library | .version != \"\"", "true")
 }
+
+func TestInstallZipLibWithMacosMetadata(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Initialize configs to enable --zip-path flag
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+	_, _, err := cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "fake-lib")
+	// Verifies library is not already installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	wd, err := paths.Getwd()
+	require.NoError(t, err)
+	zipPath := wd.Parent().Join("testdata", "fake-lib.zip")
+	// Test zip-path install
+	stdout, _, err := cli.Run("lib", "install", "--zip-path", zipPath.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
+
+	// Verifies library is installed in expected path
+	require.DirExists(t, libInstallDir.String())
+	require.FileExists(t, libInstallDir.Join("library.properties").String())
+	require.FileExists(t, libInstallDir.Join("src", "fake-lib.h").String())
+
+	// Reinstall library
+	_, _, err = cli.Run("lib", "install", "--zip-path", zipPath.String())
+	require.NoError(t, err)
+
+	// Verifies library remains installed
+	require.DirExists(t, libInstallDir.String())
+	require.FileExists(t, libInstallDir.Join("library.properties").String())
+	require.FileExists(t, libInstallDir.Join("src", "fake-lib.h").String())
+}
