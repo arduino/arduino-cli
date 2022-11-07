@@ -1062,3 +1062,42 @@ func TestLibExamplesWithCaseMismatch(t *testing.T) {
 	require.NotContains(t, examples, examplesPath.Join("NonBlocking", "OnDemandNonBlocking").String())
 	require.NotContains(t, examples, examplesPath.Join("OnDemand", "OnDemandWebPortal").String())
 }
+
+func TestLibCommandsWithLibraryHavingInvalidVersion(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Install a library
+	_, _, err = cli.Run("lib", "install", "WiFi101@0.16.1")
+	require.NoError(t, err)
+
+	// Verifies library is correctly returned
+	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+	requirejson.Query(t, stdout, ".[0] | .library | .version", "\"0.16.1\"")
+
+	// Changes the version of the currently installed library so that it's
+	// invalid
+	libPath := cli.SketchbookDir().Join("libraries", "WiFi101", "library.properties")
+	require.NoError(t, libPath.WriteFile([]byte("name=WiFi101\nversion=1.0001")))
+
+	// Verifies version is now empty
+	stdout, _, err = cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+	requirejson.Query(t, stdout, ".[0] | .library | .version", "null")
+
+	// Upgrade library
+	_, _, err = cli.Run("lib", "upgrade", "WiFi101")
+	require.NoError(t, err)
+
+	// Verifies library has been updated
+	stdout, _, err = cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+	requirejson.Query(t, stdout, ".[0] | .library | .version != \"\"", "true")
+}

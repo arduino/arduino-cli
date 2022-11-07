@@ -206,68 +206,6 @@ def test_install_with_zip_path_multiple_libraries(run_command, downloads_dir, da
     assert ble_install_dir.exists()
 
 
-def test_lib_list_using_library_with_invalid_version(run_command, data_dir):
-    assert run_command(["update"])
-
-    # Install a library
-    assert run_command(["lib", "install", "WiFi101@0.16.1"])
-
-    # Verifies library is correctly returned
-    res = run_command(["lib", "list", "--format", "json"])
-    assert res.ok
-    data = json.loads(res.stdout)
-    assert len(data) == 1
-    assert "0.16.1" == data[0]["library"]["version"]
-
-    # Changes the version of the currently installed library so that it's
-    # invalid
-    lib_path = Path(data_dir, "libraries", "WiFi101")
-    Path(lib_path, "library.properties").write_text("name=WiFi101\nversion=1.0001")
-
-    # Verifies version is now empty
-    res = run_command(["lib", "list", "--format", "json"])
-    assert res.ok
-    data = json.loads(res.stdout)
-    assert len(data) == 1
-    assert "version" not in data[0]["library"]
-
-
-def test_lib_upgrade_using_library_with_invalid_version(run_command, data_dir):
-    assert run_command(["update"])
-
-    # Install a library
-    assert run_command(["lib", "install", "WiFi101@0.16.1"])
-
-    # Verifies library is correctly returned
-    res = run_command(["lib", "list", "--format", "json"])
-    assert res.ok
-    data = json.loads(res.stdout)
-    assert len(data) == 1
-    assert "0.16.1" == data[0]["library"]["version"]
-
-    # Changes the version of the currently installed library so that it's
-    # invalid
-    lib_path = Path(data_dir, "libraries", "WiFi101")
-    Path(lib_path, "library.properties").write_text("name=WiFi101\nversion=1.0001")
-
-    # Verifies version is now empty
-    res = run_command(["lib", "list", "--format", "json"])
-    assert res.ok
-    data = json.loads(res.stdout)
-    assert len(data) == 1
-    assert "version" not in data[0]["library"]
-
-    # Upgrade library
-    assert run_command(["lib", "upgrade", "WiFi101"])
-
-    # Verifies library has been updated
-    res = run_command(["lib", "list", "--format", "json"])
-    assert res.ok
-    data = json.loads(res.stdout)
-    assert len(data) == 1
-    assert "" != data[0]["library"]["version"]
-
-
 def test_install_zip_lib_with_macos_metadata(run_command, data_dir, downloads_dir):
     # Initialize configs to enable --zip-path flag
     env = {
