@@ -22,12 +22,14 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/testifyjson/requirejson"
 	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing/object"
 )
 
 func TestLibUpgradeCommand(t *testing.T) {
@@ -1170,4 +1172,66 @@ func TestInstallZipInvalidLibrary(t *testing.T) {
 	_, stderr, err = cli.Run("lib", "install", "--zip-path", zipPath.String())
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "library not valid")
+}
+
+func TestInstallGitInvalidLibrary(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Initialize configs to enable --zip-path flag
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+	_, _, err := cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	// Create fake library repository
+	repoDir := cli.SketchbookDir().Join("lib-without-header")
+	repo, err := git.PlainInit(repoDir.String(), false)
+	require.NoError(t, err)
+	libProperties := repoDir.Join("library.properties")
+	f, err := libProperties.Create()
+	require.NoError(t, err)
+	f.Close()
+	tree, err := repo.Worktree()
+	require.NoError(t, err)
+	_, err = tree.Add("library.properties")
+	require.NoError(t, err)
+	_, err = tree.Commit("First commit", &git.CommitOptions{
+		All: false, Author: &object.Signature{Name: "a", Email: "b", When: time.Now()}, Committer: nil, Parents: nil, SignKey: nil})
+	require.NoError(t, err)
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "lib-without-header")
+	// Verifies library is not already installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	_, stderr, err := cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", repoDir.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "library not valid")
+	require.NoDirExists(t, libInstallDir.String())
+
+	// Create another fake library repository
+	repoDir = cli.SketchbookDir().Join("lib-without-properties")
+	repo, err = git.PlainInit(repoDir.String(), false)
+	require.NoError(t, err)
+	libHeader := repoDir.Join("src", "lib-without-properties.h")
+	require.NoError(t, libHeader.Parent().MkdirAll())
+	f, err = libHeader.Create()
+	require.NoError(t, err)
+	f.Close()
+	tree, err = repo.Worktree()
+	require.NoError(t, err)
+	_, err = tree.Add("src/lib-without-properties.h")
+	require.NoError(t, err)
+	_, err = tree.Commit("First commit", &git.CommitOptions{
+		All: false, Author: &object.Signature{Name: "a", Email: "b", When: time.Now()}, Committer: nil, Parents: nil, SignKey: nil})
+	require.NoError(t, err)
+
+	libInstallDir = cli.SketchbookDir().Join("libraries", "lib-without-properties")
+	// Verifies library is not already installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	_, stderr, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", repoDir.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "library not valid")
+	require.NoDirExists(t, libInstallDir.String())
 }

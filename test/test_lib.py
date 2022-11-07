@@ -206,52 +206,6 @@ def test_install_with_zip_path_multiple_libraries(run_command, downloads_dir, da
     assert ble_install_dir.exists()
 
 
-def test_install_git_invalid_library(run_command, data_dir, downloads_dir):
-    # Initialize configs to enable --zip-path flag
-    env = {
-        "ARDUINO_DATA_DIR": data_dir,
-        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
-        "ARDUINO_SKETCHBOOK_DIR": data_dir,
-        "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
-    }
-    assert run_command(["config", "init", "--dest-dir", "."], custom_env=env)
-
-    # Create fake library repository
-    repo_dir = Path(data_dir, "lib-without-header")
-    with Repo.init(repo_dir) as repo:
-        lib_properties = Path(repo_dir, "library.properties")
-        lib_properties.touch()
-        repo.index.add([str(lib_properties)])
-        repo.index.commit("First commit")
-
-    lib_install_dir = Path(data_dir, "libraries", "lib-without-header")
-    # Verifies library is not already installed
-    assert not lib_install_dir.exists()
-
-    res = run_command(["lib", "install", "--git-url", repo_dir], custom_env=env)
-    assert res.failed
-    assert "library not valid" in res.stderr
-    assert not lib_install_dir.exists()
-
-    # Create another fake library repository
-    repo_dir = Path(data_dir, "lib-without-properties")
-    with Repo.init(repo_dir) as repo:
-        lib_header = Path(repo_dir, "src", "lib-without-properties.h")
-        lib_header.parent.mkdir(parents=True, exist_ok=True)
-        lib_header.touch()
-        repo.index.add([str(lib_header)])
-        repo.index.commit("First commit")
-
-    lib_install_dir = Path(data_dir, "libraries", "lib-without-properties")
-    # Verifies library is not already installed
-    assert not lib_install_dir.exists()
-
-    res = run_command(["lib", "install", "--git-url", repo_dir], custom_env=env)
-    assert res.failed
-    assert "library not valid" in res.stderr
-    assert not lib_install_dir.exists()
-
-
 def test_upgrade_does_not_try_to_upgrade_bundled_core_libraries_in_sketchbook(run_command, data_dir):
     test_platform_name = "platform_with_bundled_library"
     platform_install_dir = Path(data_dir, "hardware", "arduino-beta-dev", test_platform_name)
