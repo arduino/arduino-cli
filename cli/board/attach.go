@@ -30,7 +30,7 @@ func initAttachCommand() *cobra.Command {
 	attachCommand := &cobra.Command{
 		Use:   fmt.Sprintf("attach [-p <%s>] [-b <%s>] [%s]", tr("port"), tr("FQBN"), tr("sketchPath")),
 		Short: tr("Attaches a sketch to a board."),
-		Long:  tr("Attaches a sketch to a board."),
+		Long:  tr("Sets the default values for port and FQBN. If no port or FQBN are specified, the current default port and FQBN are displayed."),
 		Example: "  " + os.Args[0] + " board attach -p /dev/ttyACM0\n" +
 			"  " + os.Args[0] + " board attach -p /dev/ttyACM0 HelloWorld\n" +
 			"  " + os.Args[0] + " board attach -b arduino:samd:mkr1000",
@@ -53,24 +53,66 @@ func runAttachCommand(path string, port *arguments.Port, fqbn string) {
 	sketchPath := arguments.InitSketchPath(path)
 	sk := arguments.NewSketch(sketchPath)
 
+	var currentPort *boardAttachPortResult
+	if currentAddress, currentProtocol := sk.GetDefaultPortAddressAndProtocol(); currentAddress != "" {
+		currentPort = &boardAttachPortResult{
+			Address:  currentAddress,
+			Protocol: currentProtocol,
+		}
+	}
+	current := &boradAttachResult{
+		Port: currentPort,
+		Fqbn: sk.GetDefaultFQBN(),
+	}
 	address, protocol, _ := port.GetPortAddressAndProtocol(nil, sk)
 	if address != "" {
 		if err := sk.SetDefaultPort(address, protocol); err != nil {
 			feedback.Errorf("%s: %s", tr("Error saving sketch metadata"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
-		msg := fmt.Sprintf("%s: %s", tr("Default port set to"), address)
-		if protocol != "" {
-			msg += " (" + protocol + ")"
+		current.Port = &boardAttachPortResult{
+			Address:  address,
+			Protocol: protocol,
 		}
-		feedback.Print(msg)
 	}
 	if fqbn != "" {
 		if err := sk.SetDefaultFQBN(fqbn); err != nil {
 			feedback.Errorf("%s: %s", tr("Error saving sketch metadata"), err)
 			os.Exit(errorcodes.ErrGeneric)
 		}
-		msg := fmt.Sprintf("%s: %s", tr("Default FQBN set to"), fqbn)
-		feedback.Print(msg)
+		current.Fqbn = fqbn
 	}
+
+	feedback.PrintResult(current)
+}
+
+type boardAttachPortResult struct {
+	Address  string `json:"address,omitempty"`
+	Protocol string `json:"protocol,omitempty"`
+}
+
+func (b *boardAttachPortResult) String() string {
+	port := b.Address
+	if b.Protocol != "" {
+		port += " (" + b.Protocol + ")"
+	}
+	return port
+}
+
+type boradAttachResult struct {
+	Fqbn string                 `json:"fqbn,omitempty"`
+	Port *boardAttachPortResult `json:"port,omitempty"`
+}
+
+func (b *boradAttachResult) Data() interface{} {
+	return b
+}
+
+func (b *boradAttachResult) String() string {
+	if b.Port == nil && b.Fqbn == "" {
+		return tr("No default port or FQBN set")
+	}
+	res := fmt.Sprintf("%s: %s\n", tr("Default port set to"), b.Port)
+	res += fmt.Sprintf("%s: %s\n", tr("Default FQBN set to"), b.Fqbn)
+	return res
 }
