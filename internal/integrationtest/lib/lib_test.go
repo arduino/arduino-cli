@@ -1416,3 +1416,33 @@ func TestInstallWithZipPath(t *testing.T) {
 	require.Contains(t, files, libInstallDir.Join("library.properties"))
 	require.Contains(t, files, libInstallDir.Join("README.adoc"))
 }
+
+func TestInstallWithZipPathMultipleLibraries(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+
+	// Downloads zips to be installed later
+	wifiZipPath := cli.DownloadDir().Join("libraries", "WiFi101-0.16.1.zip")
+	bleZipPath := cli.DownloadDir().Join("libraries", "ArduinoBLE-1.1.3.zip")
+	downloadLib(t, "https://github.com/arduino-libraries/WiFi101/archive/refs/tags/0.16.1.zip", wifiZipPath)
+	downloadLib(t, "https://github.com/arduino-libraries/ArduinoBLE/archive/refs/tags/1.1.3.zip", bleZipPath)
+
+	wifiInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101")
+	bleInstallDir := cli.SketchbookDir().Join("libraries", "ArduinoBLE")
+	// Verifies libraries are not installed
+	require.NoDirExists(t, wifiInstallDir.String())
+	require.NoDirExists(t, bleInstallDir.String())
+
+	_, _, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--zip-path", wifiZipPath.String(), bleZipPath.String())
+	require.NoError(t, err)
+
+	// Verifies libraries are installed
+	require.DirExists(t, wifiInstallDir.String())
+	require.DirExists(t, bleInstallDir.String())
+}

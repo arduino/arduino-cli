@@ -26,29 +26,6 @@ import io
 import re
 
 
-# Util function to download library from URL
-def download_lib(url, download_dir):
-    tmp = Path(tempfile.TemporaryDirectory().name)
-    tmp.mkdir(parents=True, exist_ok=True)
-    regex = re.compile(r"^(.*)-[0-9]+.[0-9]+.[0-9]")
-    response = requests.get(url)
-    # Download and unzips library removing version suffix
-    with zipfile.ZipFile(io.BytesIO(response.content)) as thezip:
-        for zipinfo in thezip.infolist():
-            with thezip.open(zipinfo) as f:
-                dest_dir = tmp / regex.sub("\\g<1>", zipinfo.filename)
-                if zipinfo.is_dir():
-                    dest_dir.mkdir(parents=True, exist_ok=True)
-                else:
-                    dest_dir.write_bytes(f.read())
-
-    # Recreates zip with folder without version suffix
-    z = zipfile.ZipFile(download_dir, "w")
-    for f in tmp.glob("**/*"):
-        z.write(f, arcname=f.relative_to(tmp))
-    z.close()
-
-
 @pytest.mark.skipif(
     platform.system() == "Windows",
     reason="Using a file uri as git url doesn't work on Windows, "
@@ -77,33 +54,3 @@ def test_install_with_git_url_local_file_uri(run_command, downloads_dir, data_di
 
     # Verifies library is installed
     assert lib_install_dir.exists()
-
-
-def test_install_with_zip_path_multiple_libraries(run_command, downloads_dir, data_dir):
-    assert run_command(["update"])
-
-    env = {
-        "ARDUINO_DATA_DIR": data_dir,
-        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
-        "ARDUINO_SKETCHBOOK_DIR": data_dir,
-        "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
-    }
-
-    # Downloads zip to be installed later
-    wifi_zip_path = Path(downloads_dir, "libraries", "WiFi101-0.16.1.zip")
-    ble_zip_path = Path(downloads_dir, "libraries", "ArduinoBLE-1.1.3.zip")
-    download_lib("https://github.com/arduino-libraries/WiFi101/archive/refs/tags/0.16.1.zip", wifi_zip_path)
-    download_lib("https://github.com/arduino-libraries/ArduinoBLE/archive/refs/tags/1.1.3.zip", ble_zip_path)
-
-    wifi_install_dir = Path(data_dir, "libraries", "WiFi101")
-    ble_install_dir = Path(data_dir, "libraries", "ArduinoBLE")
-
-    # Verifies libraries are not installed
-    assert not wifi_install_dir.exists()
-    assert not ble_install_dir.exists()
-
-    assert run_command(["lib", "install", "--zip-path", wifi_zip_path, ble_zip_path], custom_env=env)
-
-    # Verifies library are installed
-    assert wifi_install_dir.exists()
-    assert ble_install_dir.exists()
