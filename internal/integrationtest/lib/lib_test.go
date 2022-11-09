@@ -1363,3 +1363,56 @@ func TestInstallGitUrlAndZipPathFlagsVisibility(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
 }
+
+func TestInstallWithZipPath(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Initialize configs to enable --zip-path flag
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+	_, _, err := cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	// Download a specific lib version
+	// Download library
+	url := "https://github.com/arduino-libraries/AudioZero/archive/refs/tags/1.1.1.zip"
+	zipPath := cli.DownloadDir().Join("libraries", "AudioZero.zip")
+	require.NoError(t, zipPath.Parent().MkdirAll())
+	downloadLib(t, url, zipPath)
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "AudioZero")
+	// Verifies library is not already installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	// Test zip-path install
+	stdout, _, err := cli.Run("lib", "install", "--zip-path", zipPath.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
+
+	// Verifies library is installed in expected path
+	require.DirExists(t, libInstallDir.String())
+	files, err := libInstallDir.ReadDirRecursive()
+	require.NoError(t, err)
+	require.Contains(t, files, libInstallDir.Join("examples", "SimpleAudioPlayerZero", "SimpleAudioPlayerZero.ino"))
+	require.Contains(t, files, libInstallDir.Join("src", "AudioZero.h"))
+	require.Contains(t, files, libInstallDir.Join("src", "AudioZero.cpp"))
+	require.Contains(t, files, libInstallDir.Join("keywords.txt"))
+	require.Contains(t, files, libInstallDir.Join("library.properties"))
+	require.Contains(t, files, libInstallDir.Join("README.adoc"))
+
+	// Reinstall library
+	_, _, err = cli.Run("lib", "install", "--zip-path", zipPath.String())
+	require.NoError(t, err)
+
+	// Verifies library remains installed
+	require.DirExists(t, libInstallDir.String())
+	files, err = libInstallDir.ReadDirRecursive()
+	require.NoError(t, err)
+	require.Contains(t, files, libInstallDir.Join("examples", "SimpleAudioPlayerZero", "SimpleAudioPlayerZero.ino"))
+	require.Contains(t, files, libInstallDir.Join("src", "AudioZero.h"))
+	require.Contains(t, files, libInstallDir.Join("src", "AudioZero.cpp"))
+	require.Contains(t, files, libInstallDir.Join("keywords.txt"))
+	require.Contains(t, files, libInstallDir.Join("library.properties"))
+	require.Contains(t, files, libInstallDir.Join("README.adoc"))
+}

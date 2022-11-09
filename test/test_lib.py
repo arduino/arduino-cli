@@ -49,56 +49,6 @@ def download_lib(url, download_dir):
     z.close()
 
 
-def test_install_with_zip_path(run_command, data_dir, downloads_dir):
-    # Initialize configs to enable --zip-path flag
-    env = {
-        "ARDUINO_DATA_DIR": data_dir,
-        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
-        "ARDUINO_SKETCHBOOK_DIR": data_dir,
-        "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
-    }
-    assert run_command(["config", "init", "--dest-dir", "."], custom_env=env)
-
-    # Download a specific lib version
-    # Download library
-    url = "https://github.com/arduino-libraries/AudioZero/archive/refs/tags/1.1.1.zip"
-    zip_path = Path(downloads_dir, "libraries", "AudioZero.zip")
-    zip_path.parent.mkdir(parents=True, exist_ok=True)
-    download_lib(url, zip_path)
-
-    lib_install_dir = Path(data_dir, "libraries", "AudioZero")
-    # Verifies library is not already installed
-    assert not lib_install_dir.exists()
-
-    # Test zip-path install
-    res = run_command(["lib", "install", "--zip-path", zip_path])
-    assert res.ok
-    assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
-
-    # Verifies library is installed in expected path
-    assert lib_install_dir.exists()
-    files = list(lib_install_dir.glob("**/*"))
-    assert lib_install_dir / "examples" / "SimpleAudioPlayerZero" / "SimpleAudioPlayerZero.ino" in files
-    assert lib_install_dir / "src" / "AudioZero.h" in files
-    assert lib_install_dir / "src" / "AudioZero.cpp" in files
-    assert lib_install_dir / "keywords.txt" in files
-    assert lib_install_dir / "library.properties" in files
-    assert lib_install_dir / "README.adoc" in files
-
-    # Reinstall library
-    assert run_command(["lib", "install", "--zip-path", zip_path])
-
-    # Verifies library remains installed
-    assert lib_install_dir.exists()
-    files = list(lib_install_dir.glob("**/*"))
-    assert lib_install_dir / "examples" / "SimpleAudioPlayerZero" / "SimpleAudioPlayerZero.ino" in files
-    assert lib_install_dir / "src" / "AudioZero.h" in files
-    assert lib_install_dir / "src" / "AudioZero.cpp" in files
-    assert lib_install_dir / "keywords.txt" in files
-    assert lib_install_dir / "library.properties" in files
-    assert lib_install_dir / "README.adoc" in files
-
-
 @pytest.mark.skipif(
     platform.system() == "Windows",
     reason="Using a file uri as git url doesn't work on Windows, "
