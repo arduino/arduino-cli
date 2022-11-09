@@ -49,53 +49,6 @@ def download_lib(url, download_dir):
     z.close()
 
 
-def test_install_git_url_and_zip_path_flags_visibility(run_command, data_dir, downloads_dir):
-    # Verifies installation fail because flags are not found
-    git_url = "https://github.com/arduino-libraries/WiFi101.git"
-    res = run_command(["lib", "install", "--git-url", git_url])
-    assert res.failed
-    assert "--git-url and --zip-path are disabled by default, for more information see:" in res.stderr
-
-    # Download library
-    url = "https://github.com/arduino-libraries/AudioZero/archive/refs/tags/1.1.1.zip"
-    zip_path = Path(downloads_dir, "libraries", "AudioZero.zip")
-    zip_path.parent.mkdir(parents=True, exist_ok=True)
-    download_lib(url, zip_path)
-
-    res = run_command(["lib", "install", "--zip-path", zip_path])
-    assert res.failed
-    assert "--git-url and --zip-path are disabled by default, for more information see:" in res.stderr
-
-    env = {
-        "ARDUINO_DATA_DIR": data_dir,
-        "ARDUINO_DOWNLOADS_DIR": downloads_dir,
-        "ARDUINO_SKETCHBOOK_DIR": data_dir,
-        "ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL": "true",
-    }
-    # Verifies installation is successful when flags are enabled with env var
-    res = run_command(["lib", "install", "--git-url", git_url], custom_env=env)
-    assert res.ok
-    assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
-
-    res = run_command(["lib", "install", "--zip-path", zip_path], custom_env=env)
-    assert res.ok
-    assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
-
-    # Uninstall libraries to install them again
-    assert run_command(["lib", "uninstall", "WiFi101", "AudioZero"])
-
-    # Verifies installation is successful when flags are enabled with settings file
-    assert run_command(["config", "init", "--dest-dir", "."], custom_env=env)
-
-    res = run_command(["lib", "install", "--git-url", git_url])
-    assert res.ok
-    assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
-
-    res = run_command(["lib", "install", "--zip-path", zip_path])
-    assert res.ok
-    assert "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk." in res.stdout
-
-
 def test_install_with_zip_path(run_command, data_dir, downloads_dir):
     # Initialize configs to enable --zip-path flag
     env = {

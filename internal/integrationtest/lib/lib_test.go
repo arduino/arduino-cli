@@ -1303,3 +1303,63 @@ func TestUpgradeDoesNotTryToUpgradeBundledCoreLibraries(t *testing.T) {
 	// Empty output means nothing has been updated as expected
 	require.Empty(t, stdout)
 }
+
+func downloadLib(t *testing.T, url string, zipPath *paths.Path) {
+	response, err := http.Get(url)
+	require.NoError(t, err)
+	require.Equal(t, response.StatusCode, 200)
+	zip, err := zipPath.Create()
+	require.NoError(t, err)
+	_, err = io.Copy(zip, response.Body)
+	require.NoError(t, err)
+	require.NoError(t, response.Body.Close())
+	require.NoError(t, zip.Close())
+}
+
+func TestInstallGitUrlAndZipPathFlagsVisibility(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Verifies installation fail because flags are not found
+	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
+	_, stderr, err := cli.Run("lib", "install", "--git-url", gitUrl)
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "--git-url and --zip-path are disabled by default, for more information see:")
+
+	// Download library
+	url := "https://github.com/arduino-libraries/AudioZero/archive/refs/tags/1.1.1.zip"
+	zipPath := cli.DownloadDir().Join("libraries", "AudioZero.zip")
+	require.NoError(t, zipPath.Parent().MkdirAll())
+	downloadLib(t, url, zipPath)
+
+	_, stderr, err = cli.Run("lib", "install", "--zip-path", zipPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "--git-url and --zip-path are disabled by default, for more information see:")
+
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+	// Verifies installation is successful when flags are enabled with env var
+	stdout, _, err := cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", gitUrl)
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
+
+	stdout, _, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--zip-path", zipPath.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
+
+	// Uninstall libraries to install them again
+	_, _, err = cli.Run("lib", "uninstall", "WiFi101", "AudioZero")
+	require.NoError(t, err)
+
+	// Verifies installation is successful when flags are enabled with settings file
+	_, _, err = cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	stdout, _, err = cli.Run("lib", "install", "--git-url", gitUrl)
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
+
+	stdout, _, err = cli.Run("lib", "install", "--zip-path", zipPath.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
+}
