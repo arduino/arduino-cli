@@ -17,6 +17,7 @@ package librariesmanager
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -192,28 +193,24 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 		return fmt.Errorf(tr("User directory not set"))
 	}
 
-	libraryName, ref, err := parseGitURL(gitURL)
+	gitLibraryName, ref, err := parseGitURL(gitURL)
 	if err != nil {
 		return err
 	}
 
-	// Deletes libraries folder if already installed
-	installPath := installDir.Join(libraryName)
-	if installPath.IsDir() {
-		if !overwrite {
-			return fmt.Errorf(tr("library %s already installed"), libraryName)
-		}
-		installPath.RemoveAll()
+	// Clone library in a temporary directory
+	tmp, err := paths.MkTempDir("", "")
+	if err != nil {
+		return err
 	}
-	if installPath.Exist() {
-		return fmt.Errorf(tr("could not create directory %s: a file with the same name exists!", installPath))
-	}
+	defer tmp.RemoveAll()
+	tmpInstallPath := tmp.Join(gitLibraryName)
 
 	depth := 1
 	if ref != "" {
 		depth = 0
 	}
-	repo, err := git.PlainClone(installPath.String(), false, &git.CloneOptions{
+	repo, err := git.PlainClone(tmpInstallPath.String(), false, &git.CloneOptions{
 		URL:      gitURL,
 		Depth:    depth,
 		Progress: os.Stdout,
@@ -232,14 +229,52 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 		}
 	}
 
-	if err := validateLibrary(installPath); err != nil {
-		// Clean up installation directory since this is not a valid library
-		installPath.RemoveAll()
+	// We don't want the installed library to be a git repository thus we delete this folder
+	tmpInstallPath.Join(".git").RemoveAll()
+
+	// Check if the library is valid and load metatada
+	if err := validateLibrary(tmpInstallPath); err != nil {
+		return err
+	}
+	library, err := libraries.Load(tmpInstallPath, libraries.User)
+	if err != nil {
 		return err
 	}
 
-	// We don't want the installed library to be a git repository thus we delete this folder
-	installPath.Join(".git").RemoveAll()
+	// Check if the library is already installed and determine install path
+	var installPath *paths.Path
+	libInstalled, libReplaced, err := lm.InstallPrerequisiteCheck(library.Name, library.Version, libraries.User)
+	if errors.Is(err, ErrAlreadyInstalled) {
+		if !overwrite {
+			return fmt.Errorf(tr("library %s already installed"), library.Name)
+		}
+		installPath = libInstalled
+	} else if err != nil {
+		return err
+	} else if libReplaced != nil {
+		if !overwrite {
+			return fmt.Errorf(tr("Library %[1]s is already installed, but with a different version: %[2]s", library.Name, libReplaced))
+		}
+		installPath = libReplaced.InstallDir
+	} else {
+		installPath = installDir.Join(library.Name)
+		if !overwrite && installPath.IsDir() {
+			return fmt.Errorf(tr("library %s already installed", library.Name))
+		}
+	}
+
+	// Deletes libraries folder if already installed
+	if installPath.IsDir() {
+		installPath.RemoveAll()
+	}
+	if installPath.Exist() {
+		return fmt.Errorf(tr("could not create directory %s: a file with the same name exists!", installPath))
+	}
+
+	// Copy extracted library in the destination directory
+	if err := tmpInstallPath.CopyDirTo(installPath); err != nil {
+		return fmt.Errorf(tr("moving extracted archive to destination dir: %s"), err)
+	}
 	return nil
 }
 
