@@ -29,7 +29,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/utils"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/codeclysm/extract/v3"
-	"github.com/sirupsen/logrus"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 )
@@ -175,18 +174,8 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 		if !overwrite {
 			return fmt.Errorf(tr("library %s already installed"), libraryName)
 		}
-		logrus.
-			WithField("library name", libraryName).
-			WithField("install path", installPath).
-			Trace("Deleting library")
 		installPath.RemoveAll()
 	}
-
-	logrus.
-		WithField("library name", libraryName).
-		WithField("install path", installPath).
-		WithField("zip file", archivePath).
-		Trace("Installing library")
 
 	// Copy extracted library in the destination directory
 	if err := extractionPath.CopyDirTo(installPath); err != nil {
@@ -205,9 +194,6 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 
 	libraryName, ref, err := parseGitURL(gitURL)
 	if err != nil {
-		logrus.
-			WithError(err).
-			Warn("Parsing git URL")
 		return err
 	}
 
@@ -217,21 +203,11 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 		if !overwrite {
 			return fmt.Errorf(tr("library %s already installed"), libraryName)
 		}
-		logrus.
-			WithField("library name", libraryName).
-			WithField("install path", installPath).
-			Trace("Deleting library")
 		installPath.RemoveAll()
 	}
 	if installPath.Exist() {
 		return fmt.Errorf(tr("could not create directory %s: a file with the same name exists!", installPath))
 	}
-
-	logrus.
-		WithField("library name", libraryName).
-		WithField("install path", installPath).
-		WithField("git url", gitURL).
-		Trace("Installing library")
 
 	depth := 1
 	if ref != "" {
@@ -243,27 +219,15 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 		Progress: os.Stdout,
 	})
 	if err != nil {
-		logrus.
-			WithError(err).
-			Warn("Cloning git repository")
 		return err
 	}
 
 	if ref != "" {
 		if h, err := repo.ResolveRevision(ref); err != nil {
-			logrus.
-				WithError(err).
-				Warnf("Resolving revision %s", ref)
 			return err
 		} else if w, err := repo.Worktree(); err != nil {
-			logrus.
-				WithError(err).
-				Warn("Finding worktree")
 			return err
 		} else if err := w.Checkout(&git.CheckoutOptions{Hash: plumbing.NewHash(h.String())}); err != nil {
-			logrus.
-				WithError(err).
-				Warnf("Checking out %s", h)
 			return err
 		}
 	}
