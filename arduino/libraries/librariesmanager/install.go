@@ -29,6 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/utils"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/codeclysm/extract/v3"
+	semver "go.bug.st/relaxed-semver"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 )
@@ -48,7 +49,7 @@ var (
 // InstallPrerequisiteCheck performs prequisite checks to install a library. It returns the
 // install path, where the library should be installed and the possible library that is already
 // installed on the same folder and it's going to be replaced by the new one.
-func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesindex.Release, installLocation libraries.LibraryLocation) (*paths.Path, *libraries.Library, error) {
+func (lm *LibrariesManager) InstallPrerequisiteCheck(name string, version *semver.Version, installLocation libraries.LibraryLocation) (*paths.Path, *libraries.Library, error) {
 	installDir := lm.getLibrariesDir(installLocation)
 	if installDir == nil {
 		if installLocation == libraries.User {
@@ -57,10 +58,9 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 		return nil, nil, fmt.Errorf(tr("Builtin libraries directory not set"))
 	}
 
-	name := indexLibrary.Library.Name
 	libs := lm.FindByReference(&librariesindex.Reference{Name: name}, installLocation)
 	for _, lib := range libs {
-		if lib.Version != nil && lib.Version.Equal(indexLibrary.Version) {
+		if lib.Version != nil && lib.Version.Equal(version) {
 			return lib.InstallDir, nil, ErrAlreadyInstalled
 		}
 	}
@@ -82,7 +82,7 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 		replaced = libs[0]
 	}
 
-	libPath := installDir.Join(utils.SanitizeName(indexLibrary.Library.Name))
+	libPath := installDir.Join(utils.SanitizeName(name))
 	if replaced != nil && replaced.InstallDir.EquivalentTo(libPath) {
 		return libPath, replaced, nil
 	} else if libPath.IsDir() {

@@ -82,7 +82,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 	// Check if any of the libraries to install is already installed and remove it from the list
 	j := 0
 	for i, libRelease := range libReleasesToInstall {
-		_, libReplaced, err := lm.InstallPrerequisiteCheck(libRelease, installLocation)
+		_, libReplaced, err := lm.InstallPrerequisiteCheck(libRelease.Library.Name, libRelease.Version, installLocation)
 		if errors.Is(err, librariesmanager.ErrAlreadyInstalled) {
 			taskCB(&rpc.TaskProgress{Message: tr("Already installed %s", libRelease), Completed: true})
 		} else if err != nil {
@@ -127,7 +127,7 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *librariesindex.Release, installLocation libraries.LibraryLocation, taskCB rpc.TaskProgressCB) error {
 	taskCB(&rpc.TaskProgress{Name: tr("Installing %s", libRelease)})
 	logrus.WithField("library", libRelease).Info("Installing library")
-	libPath, libReplaced, err := lm.InstallPrerequisiteCheck(libRelease, installLocation)
+	libPath, libReplaced, err := lm.InstallPrerequisiteCheck(libRelease.Library.Name, libRelease.Version, installLocation)
 	if errors.Is(err, librariesmanager.ErrAlreadyInstalled) {
 		taskCB(&rpc.TaskProgress{Message: tr("Already installed %s", libRelease), Completed: true})
 		return err
