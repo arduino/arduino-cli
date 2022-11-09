@@ -23,6 +23,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// updateOrAddYamlRootEntry updates or adds a new entry to the root of the yaml file.
+// If the value is empty the entry is removed.
 func updateOrAddYamlRootEntry(path *paths.Path, key, newValue string) error {
 	var srcYaml []string
 	if path.Exist() {
@@ -46,10 +48,16 @@ func updateOrAddYamlRootEntry(path *paths.Path, key, newValue string) error {
 	updatedLine := key + ": " + strings.TrimSpace(string(v))
 
 	// Update or add the key/value pair into the original yaml
-	addMissing := true
+	addMissing := (newValue != "")
 	for i, line := range srcYaml {
 		if strings.HasPrefix(line, key+": ") {
-			srcYaml[i] = updatedLine
+			if newValue == "" {
+				// Remove the key/value pair
+				srcYaml = append(srcYaml[:i], srcYaml[i+1:]...)
+			} else {
+				// Update the key/value pair
+				srcYaml[i] = updatedLine
+			}
 			addMissing = false
 			break
 		}
@@ -69,7 +77,12 @@ func updateOrAddYamlRootEntry(path *paths.Path, key, newValue string) error {
 	if err := yaml.Unmarshal(dstYaml, &dst); err != nil {
 		return fmt.Errorf("%s: %w", tr("could not update sketch project file"), err)
 	}
-	if dstMap, ok := dst.(map[string]interface{}); !ok || dstMap[key] != newValue {
+	dstMap, ok := dst.(map[string]interface{})
+	if !ok {
+		return fmt.Errorf(tr("could not update sketch project file"))
+	}
+	writtenValue, notRemoved := dstMap[key]
+	if (newValue == "" && notRemoved) || (newValue != "" && newValue != writtenValue) {
 		return fmt.Errorf(tr("could not update sketch project file"))
 	}
 
