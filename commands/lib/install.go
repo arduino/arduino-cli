@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 )
 
@@ -156,7 +157,7 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 // ZipLibraryInstall FIXMEDOC
 func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallRequest, taskCB rpc.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(req)
-	if err := lm.InstallZipLib(ctx, req.Path, req.Overwrite); err != nil {
+	if err := lm.InstallZipLib(ctx, paths.New(req.Path), req.Overwrite); err != nil {
 		return &arduino.FailedLibraryInstallError{Cause: err}
 	}
 	taskCB(&rpc.TaskProgress{Message: tr("Library installed"), Completed: true})

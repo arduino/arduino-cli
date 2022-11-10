@@ -113,20 +113,20 @@ func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
 }
 
 // InstallZipLib installs a Zip library on the specified path.
-func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath string, overwrite bool) error {
-	libsDir := lm.getLibrariesDir(libraries.User)
-	if libsDir == nil {
+func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath *paths.Path, overwrite bool) error {
+	installDir := lm.getLibrariesDir(libraries.User)
+	if installDir == nil {
 		return fmt.Errorf(tr("User directory not set"))
 	}
 
-	tmpDir, err := paths.MkTempDir(paths.TempDir().String(), "arduino-cli-lib-")
+	// Clone library in a temporary directory
+	tmpDir, err := paths.MkTempDir("", "")
 	if err != nil {
 		return err
 	}
-	// Deletes temp dir used to extract archive when finished
 	defer tmpDir.RemoveAll()
 
-	file, err := os.Open(archivePath)
+	file, err := archivePath.Open()
 	if err != nil {
 		return err
 	}
@@ -138,48 +138,63 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 		return fmt.Errorf(tr("extracting archive: %w"), err)
 	}
 
-	paths, err := tmpDir.ReadDir()
+	libRootFiles, err := tmpDir.ReadDir()
+	if err != nil {
+		return err
+	}
+	libRootFiles.FilterOutPrefix("__MACOSX") // Ignores metadata from Mac OS X
+	if len(libRootFiles) > 1 {
+		return fmt.Errorf(tr("archive is not valid: multiple files found in zip file top level"))
+	}
+	if len(libRootFiles) == 0 {
+		return fmt.Errorf(tr("archive is not valid: no files found in zip file top level"))
+	}
+	tmpInstallPath := libRootFiles[0]
+
+	// Check if the library is valid and load metatada
+	if err := validateLibrary(tmpInstallPath); err != nil {
+		return err
+	}
+	library, err := libraries.Load(tmpInstallPath, libraries.User)
 	if err != nil {
 		return err
 	}
 
-	// Ignores metadata from Mac OS X
-	paths.FilterOutPrefix("__MACOSX")
-
-	if len(paths) > 1 {
-		return fmt.Errorf(tr("archive is not valid: multiple files found in zip file top level"))
-	}
-
-	extractionPath := paths[0]
-	libraryName := extractionPath.Base()
-
-	if err := validateLibrary(extractionPath); err != nil {
-		return err
-	}
-
-	installPath := libsDir.Join(libraryName)
-
-	if err := libsDir.MkdirAll(); err != nil {
-		return err
-	}
-	defer func() {
-		// Clean up install dir if installation failed
-		files, err := installPath.ReadDir()
-		if err == nil && len(files) == 0 {
-			installPath.RemoveAll()
-		}
-	}()
-
-	// Delete library folder if already installed
-	if installPath.IsDir() {
+	// Check if the library is already installed and determine install path
+	var installPath *paths.Path
+	libInstalled, libReplaced, err := lm.InstallPrerequisiteCheck(library.Name, library.Version, libraries.User)
+	if errors.Is(err, ErrAlreadyInstalled) {
 		if !overwrite {
-			return fmt.Errorf(tr("library %s already installed"), libraryName)
+			return fmt.Errorf(tr("library %s already installed"), library.Name)
 		}
+		installPath = libInstalled
+	} else if err != nil {
+		return err
+	} else if libReplaced != nil {
+		if !overwrite {
+			return fmt.Errorf(tr("Library %[1]s is already installed, but with a different version: %[2]s", library.Name, libReplaced))
+		}
+		installPath = libReplaced.InstallDir
+	} else {
+		installPath = installDir.Join(library.Name)
+		if !overwrite && installPath.IsDir() {
+			return fmt.Errorf(tr("library %s already installed", library.Name))
+		}
+	}
+
+	// Deletes libraries folder if already installed
+	if installPath.IsDir() {
 		installPath.RemoveAll()
+	}
+	if installPath.Exist() {
+		return fmt.Errorf(tr("could not create directory %s: a file with the same name exists!", installPath))
 	}
 
 	// Copy extracted library in the destination directory
-	if err := extractionPath.CopyDirTo(installPath); err != nil {
+	if err := installDir.MkdirAll(); err != nil {
+		return err
+	}
+	if err := tmpInstallPath.CopyDirTo(installPath); err != nil {
 		return fmt.Errorf(tr("moving extracted archive to destination dir: %s"), err)
 	}
 
