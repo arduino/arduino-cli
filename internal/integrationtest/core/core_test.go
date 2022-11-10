@@ -977,3 +977,25 @@ func TestCoreIndexWithoutChecksum(t *testing.T) {
 	_, _, err = cli.Run("core", "list", "--all")
 	require.NoError(t, err) // this should not make the cli crash
 }
+
+func TestCoreInstallCreatesInstalledJson(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.6.23")
+	require.NoError(t, err)
+
+	installedJsonFile := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.6.23", "installed.json")
+	require.FileExists(t, installedJsonFile.String())
+	installedJson, err := installedJsonFile.ReadFile()
+	require.NoError(t, err)
+	wd, err := paths.Getwd()
+	require.NoError(t, err)
+	expectedInstalledJson, err := wd.Parent().Join("testdata", "installed.json").ReadFile()
+	require.NoError(t, err)
+	sortedInstalled := requirejson.Parse(t, installedJson).Query("walk(if type == \"array\" then sort else . end)").String()
+	sortedExpected := requirejson.Parse(t, expectedInstalledJson).Query("walk(if type == \"array\" then sort else . end)").String()
+	require.Equal(t, sortedExpected, sortedInstalled)
+}
