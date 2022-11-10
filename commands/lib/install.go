@@ -77,28 +77,22 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 		if err != nil {
 			return err
 		}
-		libReleasesToInstall = append(libReleasesToInstall, libRelease)
-	}
-
-	// Check if any of the libraries to install is already installed and remove it from the list
-	j := 0
-	for i, libRelease := range libReleasesToInstall {
 		_, libReplaced, err := lm.InstallPrerequisiteCheck(libRelease.Library.Name, libRelease.Version, installLocation)
 		if errors.Is(err, librariesmanager.ErrAlreadyInstalled) {
 			taskCB(&rpc.TaskProgress{Message: tr("Already installed %s", libRelease), Completed: true})
-		} else if err != nil {
-			return err
-		} else {
-			libReleasesToInstall[j] = libReleasesToInstall[i]
-			j++
+			continue
 		}
+		if err != nil {
+			return err
+		}
+
 		if req.GetNoOverwrite() {
 			if libReplaced != nil {
 				return fmt.Errorf(tr("Library %[1]s is already installed, but with a different version: %[2]s", libRelease, libReplaced))
 			}
 		}
+		libReleasesToInstall = append(libReleasesToInstall, libRelease)
 	}
-	libReleasesToInstall = libReleasesToInstall[:j]
 
 	didInstall := false
 	for _, libRelease := range libReleasesToInstall {
