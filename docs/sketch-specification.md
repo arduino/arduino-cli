@@ -68,9 +68,8 @@ the `data` folder, so any non-code files outside the `data` folder are stripped.
 
 #### `sketch.json`
 
-Arduino Web Editor use a file named `sketch.json`, located in the sketch root folder, to store sketch metadata. This
-file is not used by the Arduino CLI or the Arduino IDE, if you're not an Arduino Web Editor user you can safely ignore
-it.
+Arduino Web Editor uses a file named `sketch.json`, located in the sketch root folder, to store sketch metadata. This
+file is not used by Arduino CLI or Arduino IDE, if you're not an Arduino Web Editor user you can safely ignore the file.
 
 The `cpu` key contains the board configuration information. This can be set by selecting a board in the Arduino Web
 Editor while the sketch is open.

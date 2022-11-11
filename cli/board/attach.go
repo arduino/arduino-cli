@@ -60,7 +60,7 @@ func runAttachCommand(path string, port *arguments.Port, fqbn string) {
 			Protocol: currentProtocol,
 		}
 	}
-	current := &boradAttachResult{
+	current := &boardAttachResult{
 		Port: currentPort,
 		Fqbn: sk.GetDefaultFQBN(),
 	}
@@ -99,16 +99,16 @@ func (b *boardAttachPortResult) String() string {
 	return port
 }
 
-type boradAttachResult struct {
+type boardAttachResult struct {
 	Fqbn string                 `json:"fqbn,omitempty"`
 	Port *boardAttachPortResult `json:"port,omitempty"`
 }
 
-func (b *boradAttachResult) Data() interface{} {
+func (b *boardAttachResult) Data() interface{} {
 	return b
 }
 
-func (b *boradAttachResult) String() string {
+func (b *boardAttachResult) String() string {
 	if b.Port == nil && b.Fqbn == "" {
 		return tr("No default port or FQBN set")
 	}

@@ -121,9 +121,9 @@ and libraries installed in the system.
 The sketch project file may be used to set the default value for some command line flags of the Arduino CLI, in
 particular:
 
-- The `default_fqbn` directive sets the default value for the `--fqbn` flag
-- The `default_port` directive sets the default value for the `--port` flag
-- The `default_protocol` directive sets the default value for the `--protocol` flag
+- The `default_fqbn` key sets the default value for the `--fqbn` flag
+- The `default_port` key sets the default value for the `--port` flag
+- The `default_protocol` key sets the default value for the `--protocol` flag
 
 For example:
 
