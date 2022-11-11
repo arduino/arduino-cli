@@ -53,12 +53,9 @@ type LibraryInstallPlan struct {
 // install path, where the library should be installed and the possible library that is already
 // installed on the same folder and it's going to be replaced by the new one.
 func (lm *LibrariesManager) InstallPrerequisiteCheck(name string, version *semver.Version, installLocation libraries.LibraryLocation) (*LibraryInstallPlan, error) {
-	installDir := lm.getLibrariesDir(installLocation)
-	if installDir == nil {
-		if installLocation == libraries.User {
-			return nil, fmt.Errorf(tr("User directory not set"))
-		}
-		return nil, fmt.Errorf(tr("Builtin libraries directory not set"))
+	installDir, err := lm.getLibrariesDir(installLocation)
+	if err != nil {
+		return nil, err
 	}
 
 	libs := lm.FindByReference(&librariesindex.Reference{Name: name}, installLocation)
@@ -130,11 +127,6 @@ func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
 
 // InstallZipLib installs a Zip library on the specified path.
 func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath *paths.Path, overwrite bool) error {
-	installDir := lm.getLibrariesDir(libraries.User)
-	if installDir == nil {
-		return fmt.Errorf(tr("User directory not set"))
-	}
-
 	// Clone library in a temporary directory
 	tmpDir, err := paths.MkTempDir("", "")
 	if err != nil {
@@ -207,11 +199,6 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath *path
 
 // InstallGitLib installs a library hosted on a git repository on the specified path.
 func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
-	installDir := lm.getLibrariesDir(libraries.User)
-	if installDir == nil {
-		return fmt.Errorf(tr("User directory not set"))
-	}
-
 	gitLibraryName, ref, err := parseGitURL(gitURL)
 	if err != nil {
 		return err
