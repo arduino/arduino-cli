@@ -39,6 +39,12 @@ import (
 // that is going to be replaced by the new one.
 // This is the result of a call to InstallPrerequisiteCheck.
 type LibraryInstallPlan struct {
+	// Name of the library to install
+	Name string
+
+	// Version of the library to install
+	Version *semver.Version
+
 	// TargetPath is the path where the library should be installed.
 	TargetPath *paths.Path
 
@@ -88,6 +94,8 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(name string, version *semve
 	}
 
 	return &LibraryInstallPlan{
+		Name:        name,
+		Version:     version,
 		TargetPath:  libPath,
 		ReplacedLib: replaced,
 		UpToDate:    upToDate,
@@ -99,12 +107,40 @@ func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, instal
 	return indexLibrary.Resource.Install(lm.DownloadsDir, installPath.Parent(), installPath)
 }
 
-// InstallLibraryFromFolder installs a library by copying it from the given folder.
-func (lm *LibrariesManager) InstallLibraryFromFolder(libPath *paths.Path, installPath *paths.Path) error {
-	if installPath.Exist() {
-		return fmt.Errorf("%s: %s", tr("destination directory already exists"), installPath)
+// importLibraryFromDirectory installs a library by copying it from the given directory.
+func (lm *LibrariesManager) importLibraryFromDirectory(libPath *paths.Path, overwrite bool) error {
+	// Check if the library is valid and load metatada
+	if err := validateLibrary(libPath); err != nil {
+		return err
 	}
-	if err := libPath.CopyDirTo(installPath); err != nil {
+	library, err := libraries.Load(libPath, libraries.User)
+	if err != nil {
+		return err
+	}
+
+	// Check if the library is already installed and determine install path
+	installPlan, err := lm.InstallPrerequisiteCheck(library.Name, library.Version, libraries.User)
+	if err != nil {
+		return err
+	}
+
+	if installPlan.UpToDate {
+		if !overwrite {
+			return fmt.Errorf(tr("library %s already installed"), installPlan.Name)
+		}
+	}
+	if installPlan.ReplacedLib != nil {
+		if !overwrite {
+			return fmt.Errorf(tr("Library %[1]s is already installed, but with a different version: %[2]s", installPlan.Name, installPlan.ReplacedLib))
+		}
+		if err := lm.Uninstall(installPlan.ReplacedLib); err != nil {
+			return err
+		}
+	}
+	if installPlan.TargetPath.Exist() {
+		return fmt.Errorf("%s: %s", tr("destination directory already exists"), installPlan.TargetPath)
+	}
+	if err := libPath.CopyDirTo(installPlan.TargetPath); err != nil {
 		return fmt.Errorf("%s: %w", tr("copying library to destination directory:"), err)
 	}
 	return nil
@@ -159,38 +195,8 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath *path
 	}
 	tmpInstallPath := libRootFiles[0]
 
-	// Check if the library is valid and load metatada
-	if err := validateLibrary(tmpInstallPath); err != nil {
-		return err
-	}
-	library, err := libraries.Load(tmpInstallPath, libraries.User)
-	if err != nil {
-		return err
-	}
-
-	// Check if the library is already installed
-	installPlan, err := lm.InstallPrerequisiteCheck(library.Name, library.Version, libraries.User)
-	if err != nil {
-		return err
-	}
-	if installPlan.UpToDate {
-		if !overwrite {
-			return fmt.Errorf(tr("library %s already installed"), library.Name)
-		}
-	}
-
-	// Remove the old library if present
-	if installPlan.ReplacedLib != nil {
-		if !overwrite {
-			return fmt.Errorf(tr("Library %[1]s is already installed, but with a different version: %[2]s", library.Name, installPlan.ReplacedLib))
-		}
-		if err := lm.Uninstall(installPlan.ReplacedLib); err != nil {
-			return err
-		}
-	}
-
 	// Install extracted library in the destination directory
-	if err := lm.InstallLibraryFromFolder(tmpInstallPath, installPlan.TargetPath); err != nil {
+	if err := lm.importLibraryFromDirectory(tmpInstallPath, overwrite); err != nil {
 		return fmt.Errorf(tr("moving extracted archive to destination dir: %s"), err)
 	}
 
@@ -238,36 +244,8 @@ func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
 	// We don't want the installed library to be a git repository thus we delete this folder
 	tmpInstallPath.Join(".git").RemoveAll()
 
-	// Check if the library is valid and load metatada
-	if err := validateLibrary(tmpInstallPath); err != nil {
-		return err
-	}
-	library, err := libraries.Load(tmpInstallPath, libraries.User)
-	if err != nil {
-		return err
-	}
-
-	// Check if the library is already installed and determine install path
-	installPlan, err := lm.InstallPrerequisiteCheck(library.Name, library.Version, libraries.User)
-	if err != nil {
-		return err
-	}
-	if installPlan.UpToDate {
-		if !overwrite {
-			return fmt.Errorf(tr("library %s already installed"), library.Name)
-		}
-	}
-	if installPlan.ReplacedLib != nil {
-		if !overwrite {
-			return fmt.Errorf(tr("Library %[1]s is already installed, but with a different version: %[2]s", library.Name, installPlan.ReplacedLib))
-		}
-		if err := lm.Uninstall(installPlan.ReplacedLib); err != nil {
-			return err
-		}
-	}
-
 	// Install extracted library in the destination directory
-	if err := lm.InstallLibraryFromFolder(tmpInstallPath, installPlan.TargetPath); err != nil {
+	if err := lm.importLibraryFromDirectory(tmpInstallPath, overwrite); err != nil {
 		return fmt.Errorf(tr("moving extracted archive to destination dir: %s"), err)
 	}
 
