@@ -18,6 +18,7 @@ package cores
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/arduino/go-properties-orderedmap"
 )
@@ -27,6 +28,7 @@ type Board struct {
 	BoardID                  string
 	Properties               *properties.Map  `json:"-"`
 	PlatformRelease          *PlatformRelease `json:"-"`
+	configOptionsMux         sync.Mutex
 	configOptions            *properties.Map
 	configOptionValues       map[string]*properties.Map
 	configOptionProperties   map[string]*properties.Map
@@ -69,6 +71,8 @@ func (b *Board) String() string {
 }
 
 func (b *Board) buildConfigOptionsStructures() {
+	b.configOptionsMux.Lock()
+	defer b.configOptionsMux.Unlock()
 	if b.configOptions != nil {
 		return
 	}
