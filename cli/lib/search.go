@@ -34,24 +34,23 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-var (
-	namesOnly bool // if true outputs lib names only.
-)
-
 func initSearchCommand() *cobra.Command {
+	var namesOnly bool // if true outputs lib names only.
 	searchCommand := &cobra.Command{
 		Use:     fmt.Sprintf("search [%s]", tr("LIBRARY_NAME")),
 		Short:   tr("Searches for one or more libraries data."),
 		Long:    tr("Search for one or more libraries data (case insensitive search)."),
 		Example: "  " + os.Args[0] + " lib search audio",
 		Args:    cobra.ArbitraryArgs,
-		Run:     runSearchCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runSearchCommand(args, namesOnly)
+		},
 	}
 	searchCommand.Flags().BoolVar(&namesOnly, "names", false, tr("Show library names only."))
 	return searchCommand
 }
 
-func runSearchCommand(cmd *cobra.Command, args []string) {
+func runSearchCommand(args []string, namesOnly bool) {
 	inst, status := instance.Create()
 	logrus.Info("Executing `arduino-cli lib search`")
 
