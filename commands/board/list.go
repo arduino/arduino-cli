@@ -185,8 +185,8 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardL
 			// the board couldn't be detected, print a warning
 			logrus.Debug("Board not recognized")
 		} else if err != nil {
-			// this is bad, bail out
-			return nil, &arduino.UnavailableError{Message: tr("Error getting board info from Arduino Cloud")}
+			// this is bad, but keep going
+			logrus.WithError(err).Debug("Error querying builder API")
 		}
 
 		// add a DetectedPort entry in any case: the `Boards` field will
