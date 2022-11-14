@@ -65,7 +65,7 @@ func (f *Fqbn) Set(fqbn string) {
 // parameters provided by the user.
 // This determine the FQBN based on:
 // - the value of the FQBN flag if explicitly specified, otherwise
-// - the FQBN value in sketch.json if available, otherwise
+// - the default FQBN value in sketch.yaml (`default_fqbn` key) if available, otherwise
 // - it tries to autodetect the board connected to the given port flags
 // If all above methods fails, it returns the empty string.
 // The Port metadata are always returned except if:

@@ -120,7 +120,7 @@ Foo
 |_ Ghi.h
 |_ Jkl.h
 |_ Jkl.S
-|_ sketch.json
+|_ sketch.yaml
 |_ data
 |  |_ Schematic.pdf
 |_ src
