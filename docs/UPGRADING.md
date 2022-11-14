@@ -63,7 +63,7 @@ The `sketch.json` file is now completely ignored.
 
 ### `cc.arduino.cli.commands.v1.BoardAttach` gRPC interface command removal
 
-The `cc.arduino.cli.commands.v1.BoardAttach` gRPC command have been removed. This feature is no more available throguh
+The `cc.arduino.cli.commands.v1.BoardAttach` gRPC command has been removed. This feature is no longer available through
 gRPC.
 
 ## 0.28.0
