@@ -72,7 +72,7 @@ func runSearchCommand(args []string, namesOnly bool) {
 
 	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
 		Instance: inst,
-		Query:    (strings.Join(args, " ")),
+		Query:    strings.Join(args, " "),
 	})
 	if err != nil {
 		feedback.Errorf(tr("Error searching for Libraries: %v"), err)
