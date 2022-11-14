@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"sort"
 	"strings"
 	"testing"
 
@@ -52,7 +51,6 @@ func TestSearchLibraryFields(t *testing.T) {
 		for _, lib := range searchLibrary(&rpc.LibrarySearchRequest{Query: q}, lm).Libraries {
 			libs = append(libs, lib.Name)
 		}
-		sort.Strings(libs)
 		return libs
 	}
 
@@ -76,4 +74,8 @@ func TestSearchLibraryFields(t *testing.T) {
 	require.Len(t, res, 2)
 	require.Equal(t, "Arduino_ConnectionHandler", res[0])
 	require.Equal(t, "FlashStorage_SAMD", res[1])
+
+	res = query("flashstorage")
+	require.Len(t, res, 19)
+	require.Equal(t, "FlashStorage", res[0])
 }

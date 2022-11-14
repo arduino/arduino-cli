@@ -124,11 +124,6 @@ func (res result) String() string {
 		return tr("No libraries matching your search.")
 	}
 
-	// get a sorted slice of results
-	sort.Slice(results, func(i, j int) bool {
-		return results[i].Name < results[j].Name
-	})
-
 	var out strings.Builder
 
 	if res.results.GetStatus() == rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_FAILED {
