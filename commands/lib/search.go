@@ -17,6 +17,8 @@ package lib
 
 import (
 	"context"
+	"sort"
+	"strings"
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
@@ -38,7 +40,8 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.Lib
 
 func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.LibrariesManager) *rpc.LibrarySearchResponse {
 	res := []*rpc.SearchedLibrary{}
-	queryTerms := utils.SearchTermsFromQueryString(req.GetQuery())
+	query := req.GetQuery()
+	queryTerms := utils.SearchTermsFromQueryString(query)
 
 	for _, lib := range lm.Index.Libraries {
 		toTest := lib.Name + " " +
@@ -53,6 +56,19 @@ func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.Libraries
 			res = append(res, indexLibraryToRPCSearchLibrary(lib))
 		}
 	}
+
+	// get a sorted slice of results
+	sort.Slice(res, func(i, j int) bool {
+		// Sort by name, but bubble up exact matches
+		equalsI := strings.EqualFold(res[i].Name, query)
+		equalsJ := strings.EqualFold(res[j].Name, query)
+		if equalsI && !equalsJ {
+			return true
+		} else if !equalsI && equalsJ {
+			return false
+		}
+		return res[i].Name < res[j].Name
+	})
 
 	return &rpc.LibrarySearchResponse{Libraries: res, Status: rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS}
 }
