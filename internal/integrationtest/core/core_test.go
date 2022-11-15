@@ -315,7 +315,7 @@ func TestCoreInstall(t *testing.T) {
 	require.NoError(t, err)
 	stdout, _, err = cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".[] | select(.id == \"arduino:avr\") | .installed==\"1.6.17\"", "true")
+	requirejson.Query(t, stdout, `.[] | select(.id == "arduino:avr") | .installed`, `"1.6.17"`)
 
 	// Confirm core is listed as "updatable"
 	stdout, _, err = cli.Run("core", "list", "--updatable", "--format", "json")
