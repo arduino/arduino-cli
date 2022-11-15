@@ -258,8 +258,13 @@ func TestCoreInstallEsp32(t *testing.T) {
 }
 
 func TestCoreDownload(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	env := integrationtest.NewEnvironment(t)
 	defer env.CleanUp()
+
+	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
+		ArduinoCLIPath:         integrationtest.FindArduinoCLIPath(t),
+		UseSharedStagingFolder: false,
+	})
 
 	_, _, err := cli.Run("core", "update-index")
 	require.NoError(t, err)
