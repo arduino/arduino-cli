@@ -491,8 +491,9 @@ func TestCoreListUpdatableAllFlags(t *testing.T) {
 	// Verifies only cores in board manager are shown
 	stdout, _, err := cli.Run("core", "list", "--all", "--updatable", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, "length > 0", "true")
-	len, _ := strconv.Atoi(requirejson.Parse(t, stdout).Query("length").String())
+	requirejson.NotEmpty(t, stdout)
+	len, err := strconv.Atoi(requirejson.Parse(t, stdout).Query("length").String())
+	require.NoError(t, err)
 
 	// Manually installs a core in sketchbooks hardware folder
 	gitUrl := "https://github.com/arduino/ArduinoCore-avr.git"
