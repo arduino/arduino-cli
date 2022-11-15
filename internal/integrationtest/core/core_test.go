@@ -163,12 +163,7 @@ func TestCoreSearchNoArgs(t *testing.T) {
 	}
 	// The header is printed on the first lines
 	require.Equal(t, []string{"test:x86", "2.0.0", "test_core"}, lines[19])
-	// We use black to format and flake8 to lint .py files but they disagree on certain
-	// things like this one, thus we ignore this specific flake8 rule and stand by black
-	// opinion.
-	// We ignore this specific case because ignoring it globally would probably cause more
-	// issue. For more info about the rule see: https://www.flake8rules.com/rules/E203.html
-	numPlatforms := len(lines) - 1 // noqa: E203
+	numPlatforms := len(lines) - 1
 
 	// same thing in JSON format, also check the number of platforms found is the same
 	stdout, _, err = cli.Run("core", "search", "--format", "json")
