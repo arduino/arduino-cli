@@ -168,7 +168,7 @@ func TestCoreSearchNoArgs(t *testing.T) {
 	// same thing in JSON format, also check the number of platforms found is the same
 	stdout, _, err = cli.Run("core", "search", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, " .[] | select(.name == \"test_core\") | . != \"\"", "true")
+	requirejson.Contains(t, stdout, `[ { "name":"test_core" } ]`)
 	requirejson.Query(t, stdout, "length", fmt.Sprint(numPlatforms))
 
 	// list all with additional urls, check the test core is there
