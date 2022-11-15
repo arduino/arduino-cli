@@ -300,7 +300,7 @@ func TestCoreInstall(t *testing.T) {
 	require.NoError(t, err)
 	stdout, _, err := cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".[] | select(.id == \"arduino:avr\") | .installed==\"1.6.16\"", "true")
+	requirejson.Query(t, stdout, `.[] | select(.id == "arduino:avr") | .installed`, `"1.6.16"`)
 
 	// Replace it with the same with --no-overwrite (should NOT fail)
 	_, _, err = cli.Run("core", "install", "arduino:avr@1.6.16", "--no-overwrite")
