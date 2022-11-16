@@ -709,7 +709,7 @@ func TestCoreSearchSortedResults(t *testing.T) {
 	// verify that deprecated platforms are the last ones
 	platform := requirejson.Parse(t, stdout).Query(
 		"[.[] | .name |=ascii_downcase | .name]").String()
-	require.True(t, strings.HasSuffix(platform, strings.TrimLeft(notSortedDeprecated, "[")))
+	require.Equal(t, platform, strings.TrimRight(notSortedNotDeprecated, "]")+","+strings.TrimLeft(notSortedDeprecated, "["))
 }
 
 func TestCoreListSortedResults(t *testing.T) {
