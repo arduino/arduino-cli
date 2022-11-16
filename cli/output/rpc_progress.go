@@ -89,6 +89,7 @@ func NewDownloadProgressBarCB() func(*rpc.DownloadProgress) {
 			} else {
 				feedback.Print(label + " " + msg)
 			}
+			started = false
 		}
 	}
 }
