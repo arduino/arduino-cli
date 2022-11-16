@@ -64,7 +64,6 @@ func NewDownloadProgressBarCB() func(*rpc.DownloadProgress) {
 		mux.Lock()
 		defer mux.Unlock()
 
-		// fmt.Printf(">>> %v\n", curr)
 		if start := curr.GetStart(); start != nil {
 			label = start.GetLabel()
 			bar = pb.New(0)
@@ -89,6 +88,7 @@ func NewDownloadProgressBarCB() func(*rpc.DownloadProgress) {
 			} else {
 				feedback.Print(label + " " + msg)
 			}
+			started = false
 		}
 	}
 }
