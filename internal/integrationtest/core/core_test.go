@@ -801,17 +801,12 @@ func TestCoreListDeprecatedPlatformWithInstalledJson(t *testing.T) {
 	require.NoError(t, err)
 
 	installedJsonFile := cli.DataDir().Join("packages", "Package", "hardware", "x86", "1.2.3", "installed.json")
-	require.FileExists(t, installedJsonFile.String())
-	lines, err := installedJsonFile.ReadFileAsLines()
+	installedJsonData, err := installedJsonFile.ReadFile()
 	require.NoError(t, err)
-	var json []byte
-	for i, v := range lines {
-		if i != 13 {
-			json = append(json, []byte(v+"\n")...)
-		}
-	}
-	err = installedJsonFile.WriteFile(json)
-	require.NoError(t, err)
+
+	installedJson := requirejson.Parse(t, installedJsonData)
+	updatedInstalledJsonData := installedJson.Query(`del( .packages[0].platforms[0].deprecated )`).String()
+	require.NoError(t, installedJsonFile.WriteFile([]byte(updatedInstalledJsonData)))
 
 	// test same behaviour with json output
 	stdout, _, err := cli.Run("core", "list", "--additional-urls="+url.String(), "--format=json")
