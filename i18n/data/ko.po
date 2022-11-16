@@ -21,7 +21,7 @@ msgstr ""
 msgid "%[1]s invalid, rebuilding all"
 msgstr ""
 
-#: cli/lib/check_deps.go:102
+#: cli/lib/check_deps.go:113
 msgid "%[1]s is required but %[2]s is currently installed."
 msgstr ""
 
@@ -57,7 +57,7 @@ msgstr ""
 msgid "%s installed"
 msgstr ""
 
-#: cli/lib/check_deps.go:99
+#: cli/lib/check_deps.go:110
 msgid "%s is already installed."
 msgstr ""
 
@@ -70,7 +70,7 @@ msgstr ""
 msgid "%s is not managed by package manager"
 msgstr ""
 
-#: cli/lib/check_deps.go:96
+#: cli/lib/check_deps.go:107
 msgid "%s must be installed."
 msgstr ""
 
@@ -110,8 +110,8 @@ msgstr ""
 msgid "A programmer is required to upload"
 msgstr ""
 
-#: cli/core/download.go:36 cli/core/install.go:41 cli/core/uninstall.go:36
-#: cli/core/upgrade.go:38
+#: cli/core/download.go:36 cli/core/install.go:38 cli/core/uninstall.go:36
+#: cli/core/upgrade.go:39
 msgid "ARCH"
 msgstr ""
 
@@ -131,7 +131,7 @@ msgstr ""
 msgid "Aliases:"
 msgstr ""
 
-#: cli/core/upgrade.go:68
+#: cli/core/upgrade.go:75
 msgid "All the cores are already at the latest version"
 msgstr ""
 
@@ -155,7 +155,7 @@ msgstr ""
 msgid "Append debug logging to the specified file"
 msgstr ""
 
-#: cli/lib/search.go:172
+#: cli/lib/search.go:164
 msgid "Architecture: %s"
 msgstr ""
 
@@ -199,7 +199,7 @@ msgstr ""
 msgid "Arduino core operations."
 msgstr ""
 
-#: cli/lib/check_deps.go:56 cli/lib/install.go:128
+#: cli/lib/check_deps.go:57 cli/lib/install.go:128
 msgid "Arguments error: %v"
 msgstr ""
 
@@ -211,7 +211,7 @@ msgstr ""
 msgid "Attaches a sketch to a board."
 msgstr ""
 
-#: cli/lib/search.go:163
+#: cli/lib/search.go:155
 msgid "Author: %s"
 msgstr ""
 
@@ -227,7 +227,7 @@ msgid ""
 " remove them."
 msgstr ""
 
-#: cli/lib/list.go:124
+#: cli/lib/list.go:131
 msgid "Available"
 msgstr ""
 
@@ -353,11 +353,11 @@ msgstr ""
 msgid "Cannot upgrade platform"
 msgstr ""
 
-#: cli/lib/search.go:171
+#: cli/lib/search.go:163
 msgid "Category: %s"
 msgstr ""
 
-#: cli/lib/check_deps.go:37 cli/lib/check_deps.go:38
+#: cli/lib/check_deps.go:38 cli/lib/check_deps.go:39
 msgid "Check dependencies status for the specified library."
 msgstr ""
 
@@ -444,10 +444,6 @@ msgstr ""
 msgid "Core"
 msgstr ""
 
-#: cli/update/update.go:83
-msgid "Core name"
-msgstr ""
-
 #: arduino/httpclient/httpclient.go:106
 msgid "Could not connect via HTTP"
 msgstr ""
@@ -492,7 +488,7 @@ msgid ""
 "Library Manager."
 msgstr ""
 
-#: cli/core/list.go:88 cli/core/search.go:114
+#: cli/core/list.go:91 cli/core/search.go:112
 msgid "DEPRECATED"
 msgstr ""
 
@@ -539,11 +535,11 @@ msgstr ""
 msgid "Deletes a settings key and all its sub keys."
 msgstr ""
 
-#: cli/lib/search.go:179
+#: cli/lib/search.go:171
 msgid "Dependencies: %s"
 msgstr ""
 
-#: cli/lib/list.go:124
+#: cli/lib/list.go:131
 msgid "Description"
 msgstr ""
 
@@ -590,7 +586,7 @@ msgstr ""
 msgid "Do not overwrite already installed libraries."
 msgstr ""
 
-#: cli/core/install.go:58
+#: cli/core/install.go:57
 msgid "Do not overwrite already installed platforms."
 msgstr ""
 
@@ -679,8 +675,8 @@ msgstr ""
 msgid "Error copying output file %s"
 msgstr ""
 
-#: cli/core/search.go:65 cli/instance/instance.go:50
-#: cli/instance/instance.go:178 cli/lib/search.go:59
+#: cli/core/search.go:65 cli/instance/instance.go:49
+#: cli/instance/instance.go:172 cli/lib/search.go:58
 msgid "Error creating instance: %v"
 msgstr ""
 
@@ -760,7 +756,7 @@ msgstr ""
 msgid "Error during build: %v"
 msgstr ""
 
-#: cli/core/install.go:83
+#: cli/core/install.go:82
 msgid "Error during install: %v"
 msgstr ""
 
@@ -768,7 +764,7 @@ msgstr ""
 msgid "Error during uninstall: %v"
 msgstr ""
 
-#: cli/core/upgrade.go:105
+#: cli/core/upgrade.go:112
 msgid "Error during upgrade: %v"
 msgstr ""
 
@@ -792,7 +788,7 @@ msgstr ""
 msgid "Error getting board details: %v"
 msgstr ""
 
-#: commands/board/list.go:147
+#: commands/board/list.go:154
 msgid "Error getting board info from Arduino Cloud"
 msgstr ""
 
@@ -816,8 +812,8 @@ msgstr ""
 msgid "Error getting port settings details: %s"
 msgstr ""
 
-#: cli/core/search.go:77 cli/instance/instance.go:55 cli/lib/search.go:73
-#: cli/update/update.go:71
+#: cli/instance/instance.go:80 cli/instance/instance.go:95
+#: cli/instance/instance.go:112
 msgid "Error initializing instance: %v"
 msgstr ""
 
@@ -848,7 +844,7 @@ msgstr ""
 msgid "Error installing tool %s"
 msgstr ""
 
-#: cli/lib/list.go:76
+#: cli/lib/list.go:79
 msgid "Error listing Libraries: %v"
 msgstr ""
 
@@ -856,7 +852,7 @@ msgstr ""
 msgid "Error listing boards: %v"
 msgstr ""
 
-#: cli/core/list.go:61
+#: cli/core/list.go:64
 msgid "Error listing platforms: %v"
 msgstr ""
 
@@ -905,16 +901,12 @@ msgstr ""
 msgid "Error resolving FQBN"
 msgstr ""
 
-#: cli/lib/check_deps.go:66
+#: cli/lib/check_deps.go:67
 msgid "Error resolving dependencies for %[1]s: %[2]s"
 msgstr ""
 
-#: cli/core/upgrade.go:63
+#: cli/core/upgrade.go:70
 msgid "Error retrieving core list: %v"
-msgstr ""
-
-#: cli/outdated/outdated.go:57 cli/update/update.go:78
-msgid "Error retrieving outdated cores and libraries: %v"
 msgstr ""
 
 #: arduino/cores/packagemanager/install_uninstall.go:154
@@ -933,11 +925,11 @@ msgstr ""
 msgid "Error searching boards: %v"
 msgstr ""
 
-#: cli/lib/search.go:81
-msgid "Error searching for Library: %v"
+#: cli/lib/search.go:78
+msgid "Error searching for Libraries: %v"
 msgstr ""
 
-#: cli/core/search.go:89
+#: cli/core/search.go:87
 msgid "Error searching for platforms: %v"
 msgstr ""
 
@@ -953,28 +945,20 @@ msgstr ""
 msgid "Error uninstalling %[1]s: %[2]v"
 msgstr ""
 
-#: cli/update/update.go:63
-msgid "Error updating core and libraries index: %v"
-msgstr ""
-
-#: cli/instance/instance.go:187
+#: cli/instance/instance.go:181
 msgid "Error updating indexes: %v"
 msgstr ""
 
-#: cli/lib/search.go:68 cli/lib/update_index.go:52
+#: cli/lib/search.go:67 cli/lib/update_index.go:56
 msgid "Error updating library index: %v"
 msgstr ""
 
-#: cli/lib/upgrade.go:68
+#: cli/lib/upgrade.go:72
 msgid "Error upgrading libraries"
 msgstr ""
 
 #: arduino/cores/packagemanager/install_uninstall.go:149
 msgid "Error upgrading platform: %s"
-msgstr ""
-
-#: cli/upgrade/upgrade.go:63
-msgid "Error upgrading: %v"
 msgstr ""
 
 #: arduino/resources/index.go:125
@@ -1155,8 +1139,7 @@ msgstr ""
 msgid "Global variables use %[1]s bytes of dynamic memory."
 msgstr "전역 변수는 %[1]s 바이트의 동적 메모리를 사용."
 
-#: cli/core/list.go:84 cli/core/search.go:110 cli/monitor/monitor.go:195
-#: cli/outdated/outdated.go:80
+#: cli/core/list.go:87 cli/core/search.go:108 cli/monitor/monitor.go:195
 msgid "ID"
 msgstr ""
 
@@ -1172,13 +1155,13 @@ msgstr ""
 msgid "If set built binaries will be exported to the sketch folder."
 msgstr ""
 
-#: cli/core/list.go:47
+#: cli/core/list.go:46
 msgid ""
 "If set return all installable and installed cores, including manually "
 "installed."
 msgstr ""
 
-#: cli/lib/list.go:53
+#: cli/lib/list.go:52
 msgid "Include built-in libraries (from platforms and IDE) in listing."
 msgstr ""
 
@@ -1186,17 +1169,12 @@ msgstr ""
 msgid "Includes %s directory in the archive."
 msgstr ""
 
-#: cli/core/list.go:84 cli/lib/list.go:124
+#: cli/core/list.go:87 cli/lib/list.go:131
 msgid "Installed"
 msgstr "설치됨"
 
 #: commands/lib/install.go:152
 msgid "Installed %s"
-msgstr ""
-
-#: cli/outdated/outdated.go:80 cli/outdated/outdated.go:89
-#: cli/update/update.go:83 cli/update/update.go:93
-msgid "Installed version"
 msgstr ""
 
 #: arduino/cores/packagemanager/install_uninstall.go:312
@@ -1217,7 +1195,7 @@ msgstr ""
 msgid "Installing tool %s"
 msgstr ""
 
-#: cli/core/install.go:42 cli/core/install.go:43
+#: cli/core/install.go:39 cli/core/install.go:40
 msgid "Installs one or more cores and corresponding tool dependencies."
 msgstr ""
 
@@ -1258,8 +1236,8 @@ msgstr ""
 msgid "Invalid archive: file %{1}s not found in archive %{2}s"
 msgstr ""
 
-#: cli/core/download.go:58 cli/core/install.go:68 cli/core/uninstall.go:55
-#: cli/core/upgrade.go:81 cli/lib/download.go:56 cli/lib/uninstall.go:55
+#: cli/core/download.go:58 cli/core/install.go:67 cli/core/uninstall.go:55
+#: cli/core/upgrade.go:88 cli/lib/download.go:56 cli/lib/uninstall.go:55
 msgid "Invalid argument passed: %v"
 msgstr ""
 
@@ -1279,7 +1257,7 @@ msgstr ""
 msgid "Invalid instance"
 msgstr ""
 
-#: cli/core/upgrade.go:87
+#: cli/core/upgrade.go:94
 msgid "Invalid item %s"
 msgstr ""
 
@@ -1307,7 +1285,7 @@ msgstr ""
 msgid "Invalid parameter %s: version not allowed"
 msgstr ""
 
-#: commands/board/list.go:58
+#: commands/board/list.go:59
 msgid "Invalid pid value: '%s'"
 msgstr ""
 
@@ -1323,7 +1301,7 @@ msgstr ""
 msgid "Invalid size regexp: %s"
 msgstr ""
 
-#: cli/core/search.go:134
+#: cli/core/search.go:132
 msgid "Invalid timeout: %s"
 msgstr ""
 
@@ -1331,7 +1309,7 @@ msgstr ""
 msgid "Invalid version"
 msgstr ""
 
-#: commands/board/list.go:55
+#: commands/board/list.go:56
 msgid "Invalid vid value: '%s'"
 msgstr ""
 
@@ -1341,20 +1319,20 @@ msgid ""
 " commands are skipped except pre* hooks."
 msgstr ""
 
-#: cli/lib/list.go:42
+#: cli/lib/list.go:39
 msgid "LIBNAME"
 msgstr ""
 
-#: cli/lib/check_deps.go:36 cli/lib/install.go:48
+#: cli/lib/check_deps.go:37 cli/lib/install.go:48
 msgid "LIBRARY"
 msgstr ""
 
-#: cli/lib/download.go:36 cli/lib/examples.go:43 cli/lib/search.go:43
+#: cli/lib/download.go:36 cli/lib/examples.go:43 cli/lib/search.go:40
 #: cli/lib/uninstall.go:36
 msgid "LIBRARY_NAME"
 msgstr ""
 
-#: cli/core/list.go:84
+#: cli/core/list.go:87
 msgid "Latest"
 msgstr ""
 
@@ -1396,11 +1374,7 @@ msgstr ""
 msgid "Library installed"
 msgstr ""
 
-#: cli/outdated/outdated.go:89 cli/update/update.go:93
-msgid "Library name"
-msgstr ""
-
-#: cli/lib/search.go:169
+#: cli/lib/search.go:161
 msgid "License: %s"
 msgstr ""
 
@@ -1434,11 +1408,11 @@ msgid ""
 " times for multiple properties."
 msgstr ""
 
-#: cli/lib/list.go:55
+#: cli/lib/list.go:54
 msgid "List updatable libraries."
 msgstr ""
 
-#: cli/core/list.go:46
+#: cli/core/list.go:45
 msgid "List updatable platforms."
 msgstr ""
 
@@ -1446,7 +1420,7 @@ msgstr ""
 msgid "Lists all connected boards."
 msgstr ""
 
-#: cli/outdated/outdated.go:38
+#: cli/outdated/outdated.go:36
 msgid "Lists cores and libraries that can be upgraded"
 msgstr ""
 
@@ -1459,7 +1433,7 @@ msgstr ""
 msgid "Loading libraries: %v"
 msgstr ""
 
-#: cli/lib/list.go:124
+#: cli/lib/list.go:131
 msgid "Location"
 msgstr ""
 
@@ -1467,7 +1441,7 @@ msgstr ""
 msgid "Low memory available, stability problems may occur."
 msgstr "사용 가능한 메모리 부족, 안정성에 문제가 생길 수 있습니다."
 
-#: cli/lib/search.go:164
+#: cli/lib/search.go:156
 msgid "Maintainer: %s"
 msgstr ""
 
@@ -1520,18 +1494,13 @@ msgstr ""
 msgid "Multiple libraries were found for \"%[1]s\""
 msgstr "\"%[1]s\"를 위한 복수개의 라이브러리가 발견되었습니다"
 
-#: cli/board/details.go:193 cli/core/list.go:84 cli/core/search.go:110
-#: cli/lib/list.go:124 cli/outdated/outdated.go:80
+#: cli/board/details.go:193 cli/core/list.go:87 cli/core/search.go:108
+#: cli/lib/list.go:131
 msgid "Name"
 msgstr ""
 
-#: cli/lib/search.go:143
+#: cli/lib/search.go:135
 msgid "Name: \"%s\""
-msgstr ""
-
-#: cli/outdated/outdated.go:80 cli/outdated/outdated.go:89
-#: cli/update/update.go:83 cli/update/update.go:93
-msgid "New version"
 msgstr ""
 
 #: cli/board/list.go:121
@@ -1542,34 +1511,34 @@ msgstr ""
 msgid "No libraries found."
 msgstr ""
 
-#: cli/lib/list.go:116
+#: cli/lib/list.go:123
 msgid "No libraries installed."
 msgstr ""
 
-#: cli/lib/search.go:127
+#: cli/lib/search.go:124
 msgid "No libraries matching your search."
 msgstr ""
 
-#: cli/lib/search.go:138
+#: cli/lib/search.go:130
 msgid ""
 "No libraries matching your search.\n"
 "Did you mean...\n"
+msgstr ""
+
+#: cli/lib/list.go:121
+msgid "No libraries update is available."
 msgstr ""
 
 #: arduino/errors.go:276
 msgid "No monitor available for the port protocol %s"
 msgstr ""
 
-#: cli/core/search.go:120
+#: cli/core/search.go:118
 msgid "No platforms matching your search."
 msgstr ""
 
 #: commands/board/attach.go:93
 msgid "No supported board found at %s"
-msgstr ""
-
-#: cli/lib/list.go:114
-msgid "No updates available."
 msgstr ""
 
 #: commands/upload/upload.go:421
@@ -1642,8 +1611,8 @@ msgstr ""
 msgid "Overwrite existing config file."
 msgstr ""
 
-#: cli/core/download.go:36 cli/core/install.go:41 cli/core/uninstall.go:36
-#: cli/core/upgrade.go:38
+#: cli/core/download.go:36 cli/core/install.go:38 cli/core/uninstall.go:36
+#: cli/core/upgrade.go:39
 msgid "PACKAGER"
 msgstr ""
 
@@ -1667,7 +1636,7 @@ msgstr ""
 msgid "Package website:"
 msgstr ""
 
-#: cli/lib/search.go:166
+#: cli/lib/search.go:158
 msgid "Paragraph: %s"
 msgstr ""
 
@@ -1840,7 +1809,7 @@ msgstr ""
 msgid "Protocol"
 msgstr ""
 
-#: cli/lib/search.go:176
+#: cli/lib/search.go:168
 msgid "Provides includes: %s"
 msgstr ""
 
@@ -1890,11 +1859,11 @@ msgstr ""
 msgid "Search for a core in Boards Manager."
 msgstr ""
 
-#: cli/lib/search.go:45
+#: cli/lib/search.go:42
 msgid "Search for one or more libraries data (case insensitive search)."
 msgstr ""
 
-#: cli/lib/search.go:44
+#: cli/lib/search.go:41
 msgid "Searches for one or more libraries data."
 msgstr ""
 
@@ -1902,7 +1871,7 @@ msgstr ""
 msgid "Selected fqbn: %s"
 msgstr ""
 
-#: cli/lib/search.go:165
+#: cli/lib/search.go:157
 msgid "Sentence: %s"
 msgstr ""
 
@@ -1922,7 +1891,7 @@ msgstr ""
 msgid "Setting"
 msgstr ""
 
-#: cli/config/delete.go:62 cli/config/validate.go:51
+#: cli/config/delete.go:62 cli/config/validate.go:52
 msgid "Settings key doesn't exist"
 msgstr ""
 
@@ -1952,7 +1921,7 @@ msgid ""
 " specified in the FQBN."
 msgstr ""
 
-#: cli/lib/search.go:50
+#: cli/lib/search.go:49
 msgid "Show library names only."
 msgstr ""
 
@@ -1965,15 +1934,15 @@ msgid ""
 "Show metadata about the debug session instead of starting the debugger."
 msgstr ""
 
-#: cli/update/update.go:47
+#: cli/update/update.go:45
 msgid "Show outdated cores and libraries after index update"
 msgstr ""
 
-#: cli/lib/list.go:43
+#: cli/lib/list.go:40
 msgid "Shows a list of installed libraries."
 msgstr ""
 
-#: cli/lib/list.go:44
+#: cli/lib/list.go:41
 msgid ""
 "Shows a list of installed libraries.\n"
 "\n"
@@ -1982,7 +1951,7 @@ msgid ""
 "not listed, they can be listed by adding the --all flag."
 msgstr ""
 
-#: cli/core/list.go:40 cli/core/list.go:41
+#: cli/core/list.go:37 cli/core/list.go:38
 msgid "Shows the list of installed platforms."
 msgstr ""
 
@@ -2141,7 +2110,7 @@ msgid ""
 "update is available."
 msgstr ""
 
-#: cli/outdated/outdated.go:39
+#: cli/outdated/outdated.go:37
 msgid ""
 "This commands shows a list of installed cores and/or libraries\n"
 "that can be upgraded. If nothing needs to be updated the output is empty."
@@ -2188,7 +2157,7 @@ msgstr ""
 msgid "Type"
 msgstr "타입"
 
-#: cli/lib/search.go:173
+#: cli/lib/search.go:165
 msgid "Types: %s"
 msgstr ""
 
@@ -2249,11 +2218,11 @@ msgstr ""
 msgid "Unknown FQBN"
 msgstr ""
 
-#: cli/update/update.go:41
+#: cli/update/update.go:37
 msgid "Updates the index of cores and libraries"
 msgstr ""
 
-#: cli/update/update.go:42
+#: cli/update/update.go:38
 msgid "Updates the index of cores and libraries to the latest versions."
 msgstr ""
 
@@ -2277,11 +2246,11 @@ msgstr ""
 msgid "Upgrade doesn't accept parameters with version"
 msgstr ""
 
-#: cli/upgrade/upgrade.go:43
+#: cli/upgrade/upgrade.go:38
 msgid "Upgrades installed cores and libraries to latest version."
 msgstr ""
 
-#: cli/upgrade/upgrade.go:42
+#: cli/upgrade/upgrade.go:37
 msgid "Upgrades installed cores and libraries."
 msgstr ""
 
@@ -2289,7 +2258,7 @@ msgstr ""
 msgid "Upgrades installed libraries."
 msgstr ""
 
-#: cli/core/upgrade.go:39 cli/core/upgrade.go:40
+#: cli/core/upgrade.go:40 cli/core/upgrade.go:41
 msgid "Upgrades one or all installed platforms to the latest version."
 msgstr ""
 
@@ -2391,11 +2360,11 @@ msgstr ""
 msgid "Using previously compiled file: %[1]s"
 msgstr "이전에 컴파일된 파일: %[1]s 사용"
 
-#: cli/core/download.go:36 cli/core/install.go:41
+#: cli/core/download.go:36 cli/core/install.go:38
 msgid "VERSION"
 msgstr ""
 
-#: cli/lib/check_deps.go:36 cli/lib/install.go:48
+#: cli/lib/check_deps.go:37 cli/lib/install.go:48
 msgid "VERSION_NUMBER"
 msgstr ""
 
@@ -2409,11 +2378,11 @@ msgid "Verify uploaded binary after the upload."
 msgstr ""
 
 #: cli/compile/compile.go:390 cli/compile/compile.go:404
-#: cli/core/search.go:110
+#: cli/core/search.go:108
 msgid "Version"
 msgstr ""
 
-#: cli/lib/search.go:174
+#: cli/lib/search.go:166
 msgid "Versions: %s"
 msgstr ""
 
@@ -2454,7 +2423,7 @@ msgid ""
 "Warning: tool '%s' is not installed. It might not be available for your OS."
 msgstr ""
 
-#: cli/lib/search.go:167
+#: cli/lib/search.go:159
 msgid "Website: %s"
 msgstr ""
 
@@ -2518,7 +2487,7 @@ msgstr ""
 msgid "board %s not found"
 msgstr ""
 
-#: commands/board/list.go:42
+#: commands/board/list.go:43
 msgid "board not found"
 msgstr ""
 
@@ -2632,7 +2601,7 @@ msgstr ""
 msgid "decoding sketch metadata: %s"
 msgstr ""
 
-#: commands/lib/resolve_deps.go:55
+#: commands/lib/resolve_deps.go:56
 msgid "dependency '%s' is not available"
 msgstr ""
 
@@ -2664,11 +2633,11 @@ msgstr ""
 msgid "discovery release not found: %s"
 msgstr ""
 
-#: cli/core/download.go:41 cli/core/install.go:46
+#: cli/core/download.go:41 cli/core/install.go:43
 msgid "download a specific version (in this case 1.6.9)."
 msgstr ""
 
-#: cli/core/download.go:40 cli/core/install.go:44
+#: cli/core/download.go:40 cli/core/install.go:41
 msgid "download the latest version of Arduino SAMD core."
 msgstr ""
 
@@ -2704,11 +2673,11 @@ msgstr ""
 msgid "error parsing version constraints"
 msgstr ""
 
-#: commands/board/list.go:88
+#: commands/board/list.go:89
 msgid "error processing response from server"
 msgstr ""
 
-#: commands/board/list.go:103
+#: commands/board/list.go:104
 msgid "error querying Arduino Cloud Api"
 msgstr ""
 
@@ -2724,7 +2693,7 @@ msgstr ""
 msgid "failed to compute hash of file \"%s\""
 msgstr ""
 
-#: commands/board/list.go:71
+#: commands/board/list.go:72
 msgid "failed to initialize http client"
 msgstr ""
 
@@ -2732,7 +2701,7 @@ msgstr ""
 msgid "fetched archive size differs from size specified in index"
 msgstr ""
 
-#: arduino/resources/install.go:132
+#: arduino/resources/install.go:135
 msgid "files in archive must be placed in a subdirectory"
 msgstr ""
 
@@ -2752,11 +2721,11 @@ msgstr ""
 msgid "for a specific version."
 msgstr ""
 
-#: cli/lib/check_deps.go:40 cli/lib/download.go:40 cli/lib/install.go:52
+#: cli/lib/check_deps.go:41 cli/lib/download.go:40 cli/lib/install.go:52
 msgid "for the latest version."
 msgstr ""
 
-#: cli/lib/check_deps.go:41 cli/lib/install.go:53 cli/lib/install.go:55
+#: cli/lib/check_deps.go:42 cli/lib/install.go:53 cli/lib/install.go:55
 msgid "for the specific version."
 msgstr ""
 
@@ -2866,7 +2835,7 @@ msgstr ""
 msgid "invalid empty library version: %s"
 msgstr ""
 
-#: arduino/cores/board.go:124
+#: arduino/cores/board.go:133
 msgid "invalid empty option found"
 msgstr ""
 
@@ -2894,7 +2863,7 @@ msgstr ""
 msgid "invalid library location: %s"
 msgstr ""
 
-#: arduino/cores/board.go:126
+#: arduino/cores/board.go:136
 msgid "invalid option '%s'"
 msgstr ""
 
@@ -2934,7 +2903,7 @@ msgstr ""
 msgid "invalid recipe '%[1]s': %[2]s"
 msgstr ""
 
-#: arduino/cores/board.go:109
+#: arduino/cores/board.go:140
 msgid "invalid value '%[1]s' for option '%[2]s'"
 msgstr ""
 
@@ -3057,7 +3026,7 @@ msgid "monitor release not found: %s"
 msgstr ""
 
 #: arduino/libraries/librariesmanager/install.go:193
-#: arduino/resources/install.go:94
+#: arduino/resources/install.go:96
 msgid "moving extracted archive to destination dir: %s"
 msgstr ""
 
@@ -3077,7 +3046,7 @@ msgstr ""
 msgid "no executable specified"
 msgstr ""
 
-#: commands/daemon/daemon.go:101
+#: commands/daemon/daemon.go:99
 msgid "no instance specified"
 msgstr ""
 
@@ -3089,7 +3058,7 @@ msgstr ""
 msgid "no such file or directory"
 msgstr ""
 
-#: arduino/resources/install.go:128
+#: arduino/resources/install.go:131
 msgid "no unique root dir in archive, found '%[1]s' and '%[2]s'"
 msgstr ""
 
@@ -3138,7 +3107,7 @@ msgstr ""
 msgid "parsing IDE bundled index"
 msgstr ""
 
-#: arduino/cores/board.go:140
+#: arduino/cores/board.go:156
 #: arduino/cores/packagemanager/package_manager.go:235
 msgid "parsing fqbn: %s"
 msgstr ""
@@ -3228,11 +3197,11 @@ msgstr ""
 msgid "reading lib headers: %s"
 msgstr ""
 
-#: arduino/libraries/libraries.go:234
+#: arduino/libraries/libraries.go:236
 msgid "reading lib src dir: %s"
 msgstr ""
 
-#: arduino/libraries/libraries.go:115
+#: arduino/libraries/libraries.go:116
 msgid "reading library headers: %w"
 msgstr ""
 
@@ -3240,7 +3209,7 @@ msgstr ""
 msgid "reading library_index.json: %s"
 msgstr ""
 
-#: arduino/resources/install.go:118
+#: arduino/resources/install.go:121
 msgid "reading package root dir: %s"
 msgstr ""
 
@@ -3281,7 +3250,7 @@ msgstr ""
 msgid "retrieving Arduino public keys: %s"
 msgstr ""
 
-#: arduino/libraries/loader.go:109 arduino/libraries/loader.go:141
+#: arduino/libraries/loader.go:109 arduino/libraries/loader.go:142
 msgid "scanning examples: %s"
 msgstr ""
 
@@ -3342,7 +3311,7 @@ msgstr ""
 msgid "the platform has no releases"
 msgstr ""
 
-#: commands/board/list.go:79
+#: commands/board/list.go:80
 msgid "the server responded with status %s"
 msgstr ""
 
@@ -3437,11 +3406,11 @@ msgstr ""
 msgid "unsupported hash algorithm: %s"
 msgstr ""
 
-#: cli/core/upgrade.go:44
+#: cli/core/upgrade.go:45
 msgid "upgrade arduino:samd to the latest version"
 msgstr ""
 
-#: cli/core/upgrade.go:42
+#: cli/core/upgrade.go:43
 msgid "upgrade everything to the latest version"
 msgstr ""
 
@@ -3461,6 +3430,6 @@ msgstr ""
 msgid "writing sketch metadata %[1]s: %[2]s"
 msgstr ""
 
-#: commands/board/list.go:95
+#: commands/board/list.go:96
 msgid "wrong format in server response"
 msgstr ""
