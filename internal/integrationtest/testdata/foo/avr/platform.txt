@@ -1,0 +1,10 @@
+name=Foo Platform
+version=0.0.0
+
+recipe.hooks.prebuild.0.pattern=echo PREBUILD-runtime.hardware.path={runtime.hardware.path}
+recipe.hooks.prebuild.0.pattern.windows=cmd /C echo PREBUILD-runtime.hardware.path={runtime.hardware.path}
+
+tools.baz.upload.params.quiet=
+tools.baz.upload.params.verbose=
+tools.baz.upload.pattern=echo UPLOAD-runtime.hardware.path={runtime.hardware.path}
+tools.baz.upload.pattern.windows=cmd /C echo UPLOAD-runtime.hardware.path={runtime.hardware.path}

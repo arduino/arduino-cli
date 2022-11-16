@@ -337,6 +337,7 @@ func (release *PlatformRelease) RuntimeProperties() *properties.Map {
 	res := properties.NewMap()
 	if release.InstallDir != nil {
 		res.Set("runtime.platform.path", release.InstallDir.String())
+		res.Set("runtime.hardware.path", release.InstallDir.Join("..").String())
 	}
 
 	return res
