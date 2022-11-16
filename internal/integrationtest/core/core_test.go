@@ -431,7 +431,7 @@ func TestCoreSearchManuallyInstalledCoresNotPrinted(t *testing.T) {
 	// Verifies only cores in board manager are shown
 	stdout, _, err := cli.Run("core", "search", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, "length > 0", "true")
+	requirejson.NotEmpty(t, stdout)
 	oldJson := stdout
 
 	// Manually installs a core in sketchbooks hardware folder
