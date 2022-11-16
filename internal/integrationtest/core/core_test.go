@@ -320,15 +320,19 @@ func TestCoreInstall(t *testing.T) {
 	// Confirm core is listed as "updatable"
 	stdout, _, err = cli.Run("core", "list", "--updatable", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".[] | select(.id == \"arduino:avr\") | .installed==\"1.6.17\"", "true")
+	jsonout := requirejson.Parse(t, stdout)
+	q := jsonout.Query(`.[] | select(.id == "arduino:avr")`)
+	q.Query(".installed").MustEqual(`"1.6.17"`)
+	latest := q.Query(".latest")
 
 	// Upgrade the core to latest version
 	_, _, err = cli.Run("core", "upgrade", "arduino:avr")
 	require.NoError(t, err)
 	stdout, _, err = cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".[] | select(.id == \"arduino:avr\") | .installed==\"1.6.17\"", "false")
-	// double check the code isn't updatable anymore
+	requirejson.Query(t, stdout, `.[] | select(.id == "arduino:avr") | .installed`, latest.String())
+
+	// double check the core isn't updatable anymore
 	stdout, _, err = cli.Run("core", "list", "--updatable", "--format", "json")
 	require.NoError(t, err)
 	requirejson.Empty(t, stdout)
