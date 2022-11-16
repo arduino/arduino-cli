@@ -392,7 +392,7 @@ func TestCoreZipslip(t *testing.T) {
 	// Install a core and check if malicious content has been extracted.
 	_, _, err = cli.Run("core", "install", "zipslip:x86", "--additional-urls="+url)
 	require.Error(t, err)
-	require.NoFileExists(t, paths.TempDir().Join("evil.txt").String())
+	require.NoFileExists(t, "/tmp/evil.txt")
 }
 
 func TestCoreBrokenInstall(t *testing.T) {
