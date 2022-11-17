@@ -51,7 +51,7 @@ var (
 	validVidPid = regexp.MustCompile(`0[xX][a-fA-F\d]{4}`)
 )
 
-func cachedApiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
+func cachedAPIByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	var resp []*rpc.BoardListItem
 
 	cacheKey := fmt.Sprintf("cache.builder-api.v3/boards/byvid/pid/%s/%s", vid, pid)
@@ -150,7 +150,7 @@ func identifyViaCloudAPI(port *discovery.Port) ([]*rpc.BoardListItem, error) {
 	}
 
 	logrus.Debug("Querying builder API for board identification...")
-	return cachedApiByVidPid(id.Get("vid"), id.Get("pid"))
+	return cachedAPIByVidPid(id.Get("vid"), id.Get("pid"))
 }
 
 // identify returns a list of boards checking first the installed platforms or the Cloud API
