@@ -32,6 +32,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/httpclient"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/inventory"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -49,6 +50,39 @@ var (
 	vidPidURL   = "https://builder.arduino.cc/v3/boards/byVidPid"
 	validVidPid = regexp.MustCompile(`0[xX][a-fA-F\d]{4}`)
 )
+
+func cachedApiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
+	var resp []*rpc.BoardListItem
+
+	cacheKey := fmt.Sprintf("cache.builder-api.v3/boards/byvid/pid/%s/%s", vid, pid)
+	if cachedResp := inventory.Store.GetString(cacheKey + ".data"); cachedResp != "" {
+		ts := inventory.Store.GetTime(cacheKey + ".ts")
+		if time.Since(ts) < time.Hour*24 {
+			// Use cached response
+			if cachedResp == "ErrNotFound" {
+				return nil, ErrNotFound
+			}
+			if err := json.Unmarshal([]byte(cachedResp), &resp); err == nil {
+				return resp, nil
+			}
+		}
+	}
+
+	resp, err := apiByVidPid(vid, pid) // Perform API requrest
+
+	if err == ErrNotFound {
+		inventory.Store.Set(cacheKey+".data", "ErrNotFound")
+		inventory.Store.Set(cacheKey+".ts", time.Now())
+		inventory.WriteStore()
+	} else if err == nil {
+		if cachedResp, err := json.Marshal(resp); err == nil {
+			inventory.Store.Set(cacheKey+".data", string(cachedResp))
+			inventory.Store.Set(cacheKey+".ts", time.Now())
+			inventory.WriteStore()
+		}
+	}
+	return resp, err
+}
 
 func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	// ensure vid and pid are valid before hitting the API
@@ -116,7 +150,7 @@ func identifyViaCloudAPI(port *discovery.Port) ([]*rpc.BoardListItem, error) {
 	}
 
 	logrus.Debug("Querying builder API for board identification...")
-	return apiByVidPid(id.Get("vid"), id.Get("pid"))
+	return cachedApiByVidPid(id.Get("vid"), id.Get("pid"))
 }
 
 // identify returns a list of boards checking first the installed platforms or the Cloud API
