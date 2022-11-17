@@ -35,14 +35,21 @@ jobs:
     outputs:
       result: ${{ steps.determination.outputs.result }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - name: Determine if the rest of the workflow should run
         id: determination
         run: |
           RELEASE_BRANCH_REGEX="refs/heads/[0-9]+.[0-9]+.x"
+          TAG="$(git tag --points-at=HEAD 2> /dev/null | head -n1)"
           # The `create` event trigger doesn't support `branches` filters, so it's necessary to use Bash instead.
           if [[ \
-            "${{ github.event_name }}" != "create" || \
-            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX \
+            ("${{ github.event_name }}" != "create" || \
+            "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX) && \
+            "$TAG" == "" \
           ]]; then
             # Run the other jobs.
             RESULT="true"
