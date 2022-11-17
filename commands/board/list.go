@@ -19,7 +19,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"regexp"
 	"sort"
@@ -60,7 +60,6 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	}
 
 	url := fmt.Sprintf("%s/%s/%s", vidPidURL, vid, pid)
-	retVal := []*rpc.BoardListItem{}
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -72,39 +71,41 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 		return nil, errors.Wrap(err, tr("failed to initialize http client"))
 	}
 
-	if res, err := httpClient.Do(req); err == nil {
-		if res.StatusCode >= 400 {
-			if res.StatusCode == 404 {
-				return nil, ErrNotFound
-			}
-			return nil, errors.Errorf(tr("the server responded with status %s"), res.Status)
-		}
-
-		body, _ := ioutil.ReadAll(res.Body)
-		res.Body.Close()
-
-		var dat map[string]interface{}
-		err = json.Unmarshal(body, &dat)
-		if err != nil {
-			return nil, errors.Wrap(err, tr("error processing response from server"))
-		}
-
-		name, nameFound := dat["name"].(string)
-		fqbn, fbqnFound := dat["fqbn"].(string)
-
-		if !nameFound || !fbqnFound {
-			return nil, errors.New(tr("wrong format in server response"))
-		}
-
-		retVal = append(retVal, &rpc.BoardListItem{
-			Name: name,
-			Fqbn: fqbn,
-		})
-	} else {
+	res, err := httpClient.Do(req)
+	if err != nil {
 		return nil, errors.Wrap(err, tr("error querying Arduino Cloud Api"))
 	}
+	if res.StatusCode >= 400 {
+		if res.StatusCode == 404 {
+			return nil, ErrNotFound
+		}
+		return nil, errors.Errorf(tr("the server responded with status %s"), res.Status)
+	}
 
-	return retVal, nil
+	resp, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	if err := res.Body.Close(); err != nil {
+		return nil, err
+	}
+
+	var dat map[string]interface{}
+	if err := json.Unmarshal(resp, &dat); err != nil {
+		return nil, errors.Wrap(err, tr("error processing response from server"))
+	}
+	name, nameFound := dat["name"].(string)
+	fqbn, fbqnFound := dat["fqbn"].(string)
+	if !nameFound || !fbqnFound {
+		return nil, errors.New(tr("wrong format in server response"))
+	}
+
+	return []*rpc.BoardListItem{
+		{
+			Name: name,
+			Fqbn: fqbn,
+		},
+	}, nil
 }
 
 func identifyViaCloudAPI(port *discovery.Port) ([]*rpc.BoardListItem, error) {
