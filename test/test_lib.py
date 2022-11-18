@@ -500,7 +500,7 @@ def test_search(run_command):
     assert "Downloading index: library_index.tar.bz2 downloaded" in lines
     libs = [l[6:].strip('"') for l in lines if "Name:" in l]
 
-    expected = {"WiFi101", "WiFi101OTA", "Firebase Arduino based on WiFi101"}
+    expected = {"WiFi101", "WiFi101OTA", "Firebase Arduino based on WiFi101", "WiFi101_Generic"}
     assert expected == {lib for lib in libs if "WiFi101" in lib}
 
     result = run_command(["lib", "search", "--names", "--format", "json"])
