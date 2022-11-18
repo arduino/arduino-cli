@@ -38,15 +38,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type boardNotFoundError struct{}
-
-func (e *boardNotFoundError) Error() string {
-	return tr("board not found")
-}
-
 var (
-	// ErrNotFound is returned when the API returns 404
-	ErrNotFound = &boardNotFoundError{}
 	vidPidURL   = "https://builder.arduino.cc/v3/boards/byVidPid"
 	validVidPid = regexp.MustCompile(`0[xX][a-fA-F\d]{4}`)
 )
@@ -59,9 +51,6 @@ func cachedAPIByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 		ts := inventory.Store.GetTime(cacheKey + ".ts")
 		if time.Since(ts) < time.Hour*24 {
 			// Use cached response
-			if cachedResp == "ErrNotFound" {
-				return nil, ErrNotFound
-			}
 			if err := json.Unmarshal([]byte(cachedResp), &resp); err == nil {
 				return resp, nil
 			}
@@ -70,11 +59,7 @@ func cachedAPIByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 
 	resp, err := apiByVidPid(vid, pid) // Perform API requrest
 
-	if err == ErrNotFound {
-		inventory.Store.Set(cacheKey+".data", "ErrNotFound")
-		inventory.Store.Set(cacheKey+".ts", time.Now())
-		inventory.WriteStore()
-	} else if err == nil {
+	if err == nil {
 		if cachedResp, err := json.Marshal(resp); err == nil {
 			inventory.Store.Set(cacheKey+".data", string(cachedResp))
 			inventory.Store.Set(cacheKey+".ts", time.Now())
@@ -109,10 +94,11 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, tr("error querying Arduino Cloud Api"))
 	}
+	if res.StatusCode == 404 {
+		// This is not an error, it just means that the board is not recognized
+		return nil, nil
+	}
 	if res.StatusCode >= 400 {
-		if res.StatusCode == 404 {
-			return nil, ErrNotFound
-		}
 		return nil, errors.Errorf(tr("the server responded with status %s"), res.Status)
 	}
 
@@ -146,7 +132,7 @@ func identifyViaCloudAPI(port *discovery.Port) ([]*rpc.BoardListItem, error) {
 	// If the port is not USB do not try identification via cloud
 	id := port.Properties
 	if !id.ContainsKey("vid") || !id.ContainsKey("pid") {
-		return nil, ErrNotFound
+		return nil, nil
 	}
 
 	logrus.Debug("Querying builder API for board identification...")
@@ -181,17 +167,10 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardL
 	// the builder API if the board is a USB device port
 	if len(boards) == 0 {
 		items, err := identifyViaCloudAPI(port)
-		if errors.Is(err, ErrNotFound) {
-			// the board couldn't be detected, print a warning
-			logrus.Debug("Board not recognized")
-		} else if err != nil {
+		if err != nil {
 			// this is bad, but keep going
 			logrus.WithError(err).Debug("Error querying builder API")
 		}
-
-		// add a DetectedPort entry in any case: the `Boards` field will
-		// be empty but the port will be shown anyways (useful for 3rd party
-		// boards)
 		boards = items
 	}
 
