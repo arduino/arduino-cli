@@ -1465,8 +1465,9 @@
                 <h2 id="arduino-cli-board-attach">arduino-cli board attach<a class="headerlink" href="#arduino-cli-board-attach" title="Permanent link">&para;</a></h2>
 <p>Attaches a sketch to a board.</p>
 <h3 id="synopsis">Synopsis<a class="headerlink" href="#synopsis" title="Permanent link">&para;</a></h3>
-<p>Attaches a sketch to a board.</p>
-<div class="highlight"><pre><span></span><code>arduino-cli board attach -p &lt;port&gt;|-b &lt;FQBN&gt; [sketchPath] [flags]
+<p>Sets the default values for port and FQBN. If no port or FQBN are specified, the current default port and FQBN are
+displayed.</p>
+<div class="highlight"><pre><span></span><code>arduino-cli board attach [-p &lt;port&gt;] [-b &lt;FQBN&gt;] [sketchPath] [flags]
 </code></pre></div>
 <h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>  arduino-cli board attach -p /dev/ttyACM0

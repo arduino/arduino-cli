@@ -1209,6 +1209,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#default-flags-for-arduino-cli-usage" class="md-nav__link">
+    Default flags for Arduino CLI usage
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1385,6 +1392,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#default-flags-for-arduino-cli-usage" class="md-nav__link">
+    Default flags for Arduino CLI usage
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1506,6 +1520,22 @@ resources used to build the sketch.</p>
 not be used in any way. In other words, the build is isolated from the system and will rely only on the resources
 specified in the profile: this will ensure that the build is portable and reproducible independently from the platforms
 and libraries installed in the system.</p>
+<h2 id="default-flags-for-arduino-cli-usage">Default flags for Arduino CLI usage<a class="headerlink" href="#default-flags-for-arduino-cli-usage" title="Permanent link">&para;</a></h2>
+<p>The sketch project file may be used to set the default value for some command line flags of the Arduino CLI, in
+particular:</p>
+<ul>
+<li>The <code>default_fqbn</code> key sets the default value for the <code>--fqbn</code> flag</li>
+<li>The <code>default_port</code> key sets the default value for the <code>--port</code> flag</li>
+<li>The <code>default_protocol</code> key sets the default value for the <code>--protocol</code> flag</li>
+</ul>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><code>default_fqbn: arduino:avr:uno
+default_port: /dev/ttyACM0
+default_protocol: serial
+</code></pre></div>
+<p>With this configuration set, it is not necessary to specify the <code>--fqbn</code>, <code>--port</code>, or <code>--protocol</code> flags to the
+<a href="../commands/arduino-cli_compile/"><code>arduino-cli compile</code></a> or <a href="../commands/arduino-cli_upload/"><code>arduino-cli upload</code></a>
+commands when compiling or uploading the sketch.</p>
                 
               
               

@@ -1672,13 +1672,10 @@ libraries with the sketch in order to make it a self-contained project.</p>
 the <code>data</code> folder, so any non-code files outside the <code>data</code> folder are stripped.</p>
 <h3 id="metadata">Metadata<a class="headerlink" href="#metadata" title="Permanent link">&para;</a></h3>
 <h4 id="sketchjson"><code>sketch.json</code><a class="headerlink" href="#sketchjson" title="Permanent link">&para;</a></h4>
-<p>Arduino CLI and Arduino Web Editor use a file named sketch.json, located in the sketch root folder, to store sketch
-metadata.</p>
-<p>The <code>cpu</code> key contains the board configuration information. This can be set via
-<a href="../commands/arduino-cli_board_attach/"><code>arduino-cli board attach</code></a> or by selecting a board in the Arduino Web Editor
-while the sketch is open. With this configuration set, it is not necessary to specify the <code>--fqbn</code> or <code>--port</code> flags to
-the <a href="../commands/arduino-cli_compile/"><code>arduino-cli compile</code></a> or <a href="../commands/arduino-cli_upload/"><code>arduino-cli upload</code></a>
-commands when compiling or uploading the sketch.</p>
+<p>Arduino Web Editor uses a file named <code>sketch.json</code>, located in the sketch root folder, to store sketch metadata. This
+file is not used by Arduino CLI or Arduino IDE, if you're not an Arduino Web Editor user you can safely ignore the file.</p>
+<p>The <code>cpu</code> key contains the board configuration information. This can be set by selecting a board in the Arduino Web
+Editor while the sketch is open.</p>
 <p>The <code>included_libs</code> key defines the library versions the Arduino Web Editor uses when the sketch is compiled. This is
 Arduino Web Editor specific because all versions of all the Library Manager libraries are pre-installed in Arduino Web
 Editor, while only one version of each library may be installed when using the other Arduino development software.</p>
@@ -1686,6 +1683,8 @@ Editor, while only one version of each library may be installed when using the o
 <p>This is an optional file named <code>sketch.yaml</code>, located in the root folder of the sketch.</p>
 <p>Inside the sketch project file the user can define one or more "profiles": each profile is a description of all the
 resources needed to build the sketch (platform and libraries each pinned to a specific version).</p>
+<p>The sketch project file is also used in the <a href="../commands/arduino-cli_board_attach/"><code>arduino-cli board attach</code></a> command
+to store the currently selected board and port.</p>
 <p>For more information see the <a href="../sketch-project-file/">sketch project file</a> documentation.</p>
 <h3 id="secrets">Secrets<a class="headerlink" href="#secrets" title="Permanent link">&para;</a></h3>
 <p>Arduino Web Editor has a
@@ -1710,7 +1709,7 @@ Web Editor.</p>
 |_ Ghi.h
 |_ Jkl.h
 |_ Jkl.S
-|_ sketch.json
+|_ sketch.yaml
 |_ data
 |  |_ Schematic.pdf
 |_ src

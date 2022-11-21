@@ -277,6 +277,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0300" class="md-nav__link">
+    0.30.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.30.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#board-attach-cli-command-changed-behaviour" class="md-nav__link">
+    board attach CLI command changed behaviour
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ccarduinoclicommandsv1boardattach-grpc-interface-command-removal" class="md-nav__link">
+    cc.arduino.cli.commands.v1.BoardAttach gRPC interface command removal
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0290" class="md-nav__link">
     0.29.0
   </a>
@@ -2076,6 +2103,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0300" class="md-nav__link">
+    0.30.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.30.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#board-attach-cli-command-changed-behaviour" class="md-nav__link">
+    board attach CLI command changed behaviour
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ccarduinoclicommandsv1boardattach-grpc-interface-command-removal" class="md-nav__link">
+    cc.arduino.cli.commands.v1.BoardAttach gRPC interface command removal
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0290" class="md-nav__link">
     0.29.0
   </a>
@@ -2818,6 +2872,14 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<h2 id="0300">0.30.0<a class="headerlink" href="#0300" title="Permanent link">&para;</a></h2>
+<h3 id="board-attach-cli-command-changed-behaviour"><code>board attach</code> CLI command changed behaviour<a class="headerlink" href="#board-attach-cli-command-changed-behaviour" title="Permanent link">&para;</a></h3>
+<p>The <code>board attach</code> CLI command has changed behaviour: now it just pick whatever port and FQBN is passed as parameter and
+saves it in the <code>sketch.yaml</code> file, without any validity check or board autodetection.</p>
+<p>The <code>sketch.json</code> file is now completely ignored.</p>
+<h3 id="ccarduinoclicommandsv1boardattach-grpc-interface-command-removal"><code>cc.arduino.cli.commands.v1.BoardAttach</code> gRPC interface command removal<a class="headerlink" href="#ccarduinoclicommandsv1boardattach-grpc-interface-command-removal" title="Permanent link">&para;</a></h3>
+<p>The <code>cc.arduino.cli.commands.v1.BoardAttach</code> gRPC command has been removed. This feature is no longer available through
+gRPC.</p>
 <h2 id="0290">0.29.0<a class="headerlink" href="#0290" title="Permanent link">&para;</a></h2>
 <h3 id="removed-grpc-api-ccarduinoclicommandsv1updatecorelibrariesindex-outdated-and-upgrade">Removed gRPC API: <code>cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndex</code>, <code>Outdated</code>, and <code>Upgrade</code><a class="headerlink" href="#removed-grpc-api-ccarduinoclicommandsv1updatecorelibrariesindex-outdated-and-upgrade" title="Permanent link">&para;</a></h3>
 <p>The following gRPC API have been removed:</p>

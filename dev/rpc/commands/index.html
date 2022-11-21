@@ -1101,20 +1101,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#boardattachrequest" class="md-nav__link">
-    BoardAttachRequest
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#boardattachresponse" class="md-nav__link">
-    BoardAttachResponse
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#boarddetailsrequest" class="md-nav__link">
     BoardDetailsRequest
   </a>
@@ -2410,20 +2396,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#boardattachrequest" class="md-nav__link">
-    BoardAttachRequest
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#boardattachresponse" class="md-nav__link">
-    BoardAttachResponse
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#boarddetailsrequest" class="md-nav__link">
     BoardDetailsRequest
   </a>
@@ -3457,8 +3429,6 @@
 <h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="#cc/arduino/cli/commands/v1/board.proto">cc/arduino/cli/commands/v1/board.proto</a><ul>
-<li><a href="#cc.arduino.cli.commands.v1.BoardAttachRequest">BoardAttachRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.BoardAttachResponse">BoardAttachResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.BoardDetailsRequest">BoardDetailsRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.BoardDetailsResponse">BoardDetailsResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.BoardIdentificationProperties">BoardIdentificationProperties</a></li>
@@ -3630,64 +3600,6 @@
 <p align="right"><a href="#top">Top</a></p>
 
 <h2 id="ccarduinoclicommandsv1boardproto">cc/arduino/cli/commands/v1/board.proto<a class="headerlink" href="#ccarduinoclicommandsv1boardproto" title="Permanent link">&para;</a></h2>
-<p><a name="cc.arduino.cli.commands.v1.BoardAttachRequest"></a></p>
-<h3 id="boardattachrequest">BoardAttachRequest<a class="headerlink" href="#boardattachrequest" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>instance</td>
-<td><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></td>
-<td></td>
-<td>Arduino Core Service instance from the <code>Init</code> response.</td>
-</tr>
-<tr>
-<td>board_uri</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>The board&#39;s URI (e.g., /dev/ttyACM0).</td>
-</tr>
-<tr>
-<td>sketch_path</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>Path of the sketch to attach the board to. The board attachment metadata will be saved to <code>{sketch_path}/sketch.json</code>.</td>
-</tr>
-<tr>
-<td>search_timeout</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td>Duration in seconds to search the given URI for a connected board before timing out. The default value is 5 seconds.</td>
-</tr>
-</tbody>
-</table>
-<p><a name="cc.arduino.cli.commands.v1.BoardAttachResponse"></a></p>
-<h3 id="boardattachresponse">BoardAttachResponse<a class="headerlink" href="#boardattachresponse" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>task_progress</td>
-<td><a href="#cc.arduino.cli.commands.v1.TaskProgress">TaskProgress</a></td>
-<td></td>
-<td>Description of the current stage of the board attachment.</td>
-</tr>
-</tbody>
-</table>
 <p><a name="cc.arduino.cli.commands.v1.BoardDetailsRequest"></a></p>
 <h3 id="boarddetailsrequest">BoardDetailsRequest<a class="headerlink" href="#boarddetailsrequest" title="Permanent link">&para;</a></h3>
 <table>
@@ -4877,12 +4789,6 @@
 <td><a href="#cc.arduino.cli.commands.v1.BoardDetailsRequest">BoardDetailsRequest</a></td>
 <td><a href="#cc.arduino.cli.commands.v1.BoardDetailsResponse">BoardDetailsResponse</a></td>
 <td>Requests details about a board</td>
-</tr>
-<tr>
-<td>BoardAttach</td>
-<td><a href="#cc.arduino.cli.commands.v1.BoardAttachRequest">BoardAttachRequest</a></td>
-<td><a href="#cc.arduino.cli.commands.v1.BoardAttachResponse">BoardAttachResponse</a> stream</td>
-<td>Attach a board to a sketch. When the <code>fqbn</code> field of a request is not provided, the FQBN of the attached board will be used.</td>
 </tr>
 <tr>
 <td>BoardList</td>
