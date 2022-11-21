@@ -17,7 +17,6 @@ package arguments
 
 import (
 	"fmt"
-	"net/url"
 	"os"
 	"time"
 
@@ -29,7 +28,6 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -57,11 +55,12 @@ func (p *Port) AddToCommand(cmd *cobra.Command) {
 }
 
 // GetPortAddressAndProtocol returns only the port address and the port protocol
-// without any other port metadata obtained from the discoveries. This method allows
-// to bypass the discoveries unless the protocol is not specified: in this
-// case the discoveries are needed to autodetect the protocol.
+// without any other port metadata obtained from the discoveries.
+// This method allows will bypass the discoveries if:
+// - a nil instance is passed: in this case the plain port and protocol arguments are returned (even if empty)
+// - a protocol is specified: in this case the discoveries are not needed to autodetect the protocol.
 func (p *Port) GetPortAddressAndProtocol(instance *rpc.Instance, sk *sketch.Sketch) (string, string, error) {
-	if p.protocol != "" {
+	if p.protocol != "" || instance == nil {
 		return p.address, p.protocol, nil
 	}
 	port, err := p.GetPort(instance, sk)
@@ -80,14 +79,8 @@ func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Po
 	address := p.address
 	protocol := p.protocol
 
-	if address == "" && sk != nil && sk.Metadata != nil {
-		deviceURI, err := url.Parse(sk.Metadata.CPU.Port)
-		if err != nil {
-			return nil, errors.Errorf("invalid Device URL format: %s", err)
-		}
-		if deviceURI.Scheme == "serial" {
-			address = deviceURI.Host + deviceURI.Path
-		}
+	if address == "" && sk != nil {
+		address, protocol = sk.GetDefaultPortAddressAndProtocol()
 	}
 	if address == "" {
 		// If no address is provided we assume the user is trying to upload

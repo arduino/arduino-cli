@@ -147,24 +147,6 @@ message ConfigValue {
   bool selected = 3;
 }
 
-message BoardAttachRequest {
-  // Arduino Core Service instance from the `Init` response.
-  Instance instance = 1;
-  // The board's URI (e.g., /dev/ttyACM0).
-  string board_uri = 2;
-  // Path of the sketch to attach the board to. The board attachment
-  // metadata will be saved to `{sketch_path}/sketch.json`.
-  string sketch_path = 3;
-  // Duration in seconds to search the given URI for a connected board before
-  // timing out. The default value is 5 seconds.
-  string search_timeout = 4;
-}
-
-message BoardAttachResponse {
-  // Description of the current stage of the board attachment.
-  TaskProgress task_progress = 1;
-}
-
 message BoardListRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;

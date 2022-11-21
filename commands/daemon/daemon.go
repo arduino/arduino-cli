@@ -140,17 +140,6 @@ func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCoreService_Boa
 	return nil
 }
 
-// BoardAttach FIXMEDOC
-func (s *ArduinoCoreServerImpl) BoardAttach(req *rpc.BoardAttachRequest, stream rpc.ArduinoCoreService_BoardAttachServer) error {
-	resp, err := board.Attach(stream.Context(), req,
-		func(p *rpc.TaskProgress) { stream.Send(&rpc.BoardAttachResponse{TaskProgress: p}) },
-	)
-	if err != nil {
-		return convertErrorToRPCStatus(err)
-	}
-	return stream.Send(resp)
-}
-
 // Destroy FIXMEDOC
 func (s *ArduinoCoreServerImpl) Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse, error) {
 	resp, err := commands.Destroy(ctx, req)

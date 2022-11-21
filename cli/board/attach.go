@@ -16,35 +16,32 @@
 package board
 
 import (
-	"context"
 	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
-	"github.com/arduino/arduino-cli/commands/board"
-	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
-var (
-	port arguments.Port
-)
-
 func initAttachCommand() *cobra.Command {
+	var port arguments.Port
 	attachCommand := &cobra.Command{
-		Use:   fmt.Sprintf("attach -p <%s>|-b <%s> [%s]", tr("port"), tr("FQBN"), tr("sketchPath")),
+		Use:   fmt.Sprintf("attach [-p <%s>] [-b <%s>] [%s]", tr("port"), tr("FQBN"), tr("sketchPath")),
 		Short: tr("Attaches a sketch to a board."),
-		Long:  tr("Attaches a sketch to a board."),
+		Long:  tr("Sets the default values for port and FQBN. If no port or FQBN are specified, the current default port and FQBN are displayed."),
 		Example: "  " + os.Args[0] + " board attach -p /dev/ttyACM0\n" +
 			"  " + os.Args[0] + " board attach -p /dev/ttyACM0 HelloWorld\n" +
 			"  " + os.Args[0] + " board attach -b arduino:samd:mkr1000",
 		Args: cobra.MaximumNArgs(1),
-		Run:  runAttachCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			sketchPath := ""
+			if len(args) > 0 {
+				sketchPath = args[0]
+			}
+			runAttachCommand(sketchPath, &port, fqbn.String())
+		},
 	}
 	fqbn.AddToCommand(attachCommand)
 	port.AddToCommand(attachCommand)
@@ -52,33 +49,70 @@ func initAttachCommand() *cobra.Command {
 	return attachCommand
 }
 
-func runAttachCommand(cmd *cobra.Command, args []string) {
-	instance := instance.CreateAndInit()
-
-	logrus.Info("Executing `arduino-cli board attach`")
-
-	path := ""
-	if len(args) > 0 {
-		path = args[0]
-	}
+func runAttachCommand(path string, port *arguments.Port, fqbn string) {
 	sketchPath := arguments.InitSketchPath(path)
+	sk := arguments.NewSketch(sketchPath)
 
-	// ugly hack to allow user to specify fqbn and port as flags (consistency)
-	// a more meaningful fix would be to fix board.Attach
-	var boardURI string
-	discoveryPort, _ := port.GetPort(instance, nil)
-	if fqbn.String() != "" {
-		boardURI = fqbn.String()
-	} else if discoveryPort != nil {
-		boardURI = discoveryPort.Address
+	var currentPort *boardAttachPortResult
+	if currentAddress, currentProtocol := sk.GetDefaultPortAddressAndProtocol(); currentAddress != "" {
+		currentPort = &boardAttachPortResult{
+			Address:  currentAddress,
+			Protocol: currentProtocol,
+		}
 	}
-	if _, err := board.Attach(context.Background(), &rpc.BoardAttachRequest{
-		Instance:      instance,
-		BoardUri:      boardURI,
-		SketchPath:    sketchPath.String(),
-		SearchTimeout: port.GetSearchTimeout().String(),
-	}, output.TaskProgress()); err != nil {
-		feedback.Errorf(tr("Attach board error: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+	current := &boardAttachResult{
+		Port: currentPort,
+		Fqbn: sk.GetDefaultFQBN(),
 	}
+	address, protocol, _ := port.GetPortAddressAndProtocol(nil, sk)
+	if address != "" {
+		if err := sk.SetDefaultPort(address, protocol); err != nil {
+			feedback.Errorf("%s: %s", tr("Error saving sketch metadata"), err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+		current.Port = &boardAttachPortResult{
+			Address:  address,
+			Protocol: protocol,
+		}
+	}
+	if fqbn != "" {
+		if err := sk.SetDefaultFQBN(fqbn); err != nil {
+			feedback.Errorf("%s: %s", tr("Error saving sketch metadata"), err)
+			os.Exit(errorcodes.ErrGeneric)
+		}
+		current.Fqbn = fqbn
+	}
+
+	feedback.PrintResult(current)
+}
+
+type boardAttachPortResult struct {
+	Address  string `json:"address,omitempty"`
+	Protocol string `json:"protocol,omitempty"`
+}
+
+func (b *boardAttachPortResult) String() string {
+	port := b.Address
+	if b.Protocol != "" {
+		port += " (" + b.Protocol + ")"
+	}
+	return port
+}
+
+type boardAttachResult struct {
+	Fqbn string                 `json:"fqbn,omitempty"`
+	Port *boardAttachPortResult `json:"port,omitempty"`
+}
+
+func (b *boardAttachResult) Data() interface{} {
+	return b
+}
+
+func (b *boardAttachResult) String() string {
+	if b.Port == nil && b.Fqbn == "" {
+		return tr("No default port or FQBN set")
+	}
+	res := fmt.Sprintf("%s: %s\n", tr("Default port set to"), b.Port)
+	res += fmt.Sprintf("%s: %s\n", tr("Default FQBN set to"), b.Fqbn)
+	return res
 }

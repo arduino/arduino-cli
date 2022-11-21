@@ -2,6 +2,20 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## 0.30.0
+
+### `board attach` CLI command changed behaviour
+
+The `board attach` CLI command has changed behaviour: now it just pick whatever port and FQBN is passed as parameter and
+saves it in the `sketch.yaml` file, without any validity check or board autodetection.
+
+The `sketch.json` file is now completely ignored.
+
+### `cc.arduino.cli.commands.v1.BoardAttach` gRPC interface command removal
+
+The `cc.arduino.cli.commands.v1.BoardAttach` gRPC command has been removed. This feature is no longer available through
+gRPC.
+
 ## 0.29.0
 
 ### Removed gRPC API: `cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndex`, `Outdated`, and `Upgrade`

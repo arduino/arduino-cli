@@ -11,13 +11,11 @@ require (
 )
 
 require (
-	github.com/arduino/board-discovery v0.0.0-20180823133458-1ba29327fb0c // indirect
 	github.com/arduino/go-paths-helper v1.7.0 // indirect
 	github.com/arduino/go-properties-orderedmap v1.7.1 // indirect
 	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b // indirect
 	github.com/arduino/go-win32-utils v0.0.0-20180330194947-ed041402e83b // indirect
 	github.com/cmaglie/pb v1.0.27 // indirect
-	github.com/codeclysm/cc v1.2.2 // indirect
 	github.com/codeclysm/extract/v3 v3.0.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/creack/goselect v0.1.2 // indirect
@@ -25,8 +23,6 @@ require (
 	github.com/djherbis/nio/v3 v3.0.1 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/fatih/color v1.7.0 // indirect
-	github.com/fluxio/iohelpers v0.0.0-20160419043813-3a4dd67a94d2 // indirect
-	github.com/fluxio/multierror v0.0.0-20160419044231-9c68d39025e5 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -45,10 +41,8 @@ require (
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
-	github.com/miekg/dns v1.1.43 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
-	github.com/oleksandr/bonjour v0.0.0-20160508152359-5dcf00d8b228 // indirect
 	github.com/pelletier/go-toml v1.9.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmylund/sortutil v0.0.0-20120526081524-abeda66eb583 // indirect
@@ -71,7 +65,6 @@ require (
 	go.bug.st/downloader/v2 v2.1.1 // indirect
 	go.bug.st/relaxed-semver v0.9.0 // indirect
 	go.bug.st/serial v1.3.2 // indirect
-	go.bug.st/serial.v1 v0.0.0-20180827123349-5f7892a7bb45 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
 	golang.org/x/net v0.0.0-20210505024714-0287a6fb4125 // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
@@ -84,4 +77,5 @@ require (
 	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

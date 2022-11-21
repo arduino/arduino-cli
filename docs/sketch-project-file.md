@@ -115,3 +115,24 @@ When using the profile-based build, the globally installed platforms and librari
 not be used in any way. In other words, the build is isolated from the system and will rely only on the resources
 specified in the profile: this will ensure that the build is portable and reproducible independently from the platforms
 and libraries installed in the system.
+
+## Default flags for Arduino CLI usage
+
+The sketch project file may be used to set the default value for some command line flags of the Arduino CLI, in
+particular:
+
+- The `default_fqbn` key sets the default value for the `--fqbn` flag
+- The `default_port` key sets the default value for the `--port` flag
+- The `default_protocol` key sets the default value for the `--protocol` flag
+
+For example:
+
+```
+default_fqbn: arduino:avr:uno
+default_port: /dev/ttyACM0
+default_protocol: serial
+```
+
+With this configuration set, it is not necessary to specify the `--fqbn`, `--port`, or `--protocol` flags to the
+[`arduino-cli compile`](commands/arduino-cli_compile.md) or [`arduino-cli upload`](commands/arduino-cli_upload.md)
+commands when compiling or uploading the sketch.

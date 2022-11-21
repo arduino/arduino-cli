@@ -161,11 +161,6 @@ func main() {
 	log.Println("calling BoardSearch()")
 	callBoardSearch(client, instance)
 
-	// Attach a board to a sketch.
-	// Uncomment if you do have an actual board connected.
-	// log.Println("calling BoardAttach(serial:///dev/ttyACM0)")
-	// callBoardAttach(client, instance)
-
 	// Compile a sketch
 	log.Println("calling Compile(arduino:samd:mkr1000, VERBOSE, hello.ino)")
 	callCompile(client, instance)
@@ -552,41 +547,6 @@ func callBoardSearch(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance
 
 	for _, board := range res.Boards {
 		log.Printf("Board Name: %s, Board Platform: %s\n", board.Name, board.Platform.Id)
-	}
-}
-
-func callBoardAttach(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance) {
-	currDir, _ := os.Getwd()
-	boardattachresp, err := client.BoardAttach(context.Background(),
-		&rpc.BoardAttachRequest{
-			Instance:   instance,
-			BoardUri:   "/dev/ttyACM0",
-			SketchPath: filepath.Join(currDir, "hello"),
-		})
-
-	if err != nil {
-		log.Fatalf("Attach error: %s", err)
-	}
-
-	// Loop and consume the server stream until all the operations are done.
-	for {
-		attachResp, err := boardattachresp.Recv()
-
-		// The server is done.
-		if err == io.EOF {
-			log.Print("Attach done")
-			break
-		}
-
-		// There was an error.
-		if err != nil {
-			log.Fatalf("Attach error: %s\n", err)
-		}
-
-		// When an overall task is ongoing, log the progress
-		if attachResp.GetTaskProgress() != nil {
-			log.Printf("TASK: %s", attachResp.GetTaskProgress())
-		}
 	}
 }
 

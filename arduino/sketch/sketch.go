@@ -18,7 +18,6 @@ package sketch
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"sort"
 	"strings"
@@ -38,20 +37,7 @@ type Sketch struct {
 	OtherSketchFiles paths.PathList // Sketch files that end in .ino other than main file
 	AdditionalFiles  paths.PathList
 	RootFolderFiles  paths.PathList // All files that are in the Sketch root
-	Metadata         *Metadata
 	Project          *Project
-}
-
-// Metadata is the kind of data associated to a project such as the connected board
-type Metadata struct {
-	CPU BoardMetadata `json:"cpu,omitempty"`
-}
-
-// BoardMetadata represents the board metadata for the sketch
-type BoardMetadata struct {
-	Fqbn string `json:"fqbn"`
-	Name string `json:"name,omitempty"`
-	Port string `json:"port,omitempty"`
 }
 
 var tr = i18n.Tr
@@ -99,14 +85,10 @@ func New(path *paths.Path) (*Sketch, error) {
 		OtherSketchFiles: paths.PathList{},
 		AdditionalFiles:  paths.PathList{},
 		RootFolderFiles:  paths.PathList{},
-		Metadata:         new(Metadata),
+		Project:          &Project{},
 	}
 
-	projectFile := path.Join("sketch.yaml")
-	if !projectFile.Exist() {
-		projectFile = path.Join("sketch.yml")
-	}
-	if projectFile.Exist() {
+	if projectFile := sketch.GetProjectPath(); projectFile.Exist() {
 		prj, err := LoadProjectFile(projectFile)
 		if err != nil {
 			return nil, fmt.Errorf("%s %w", tr("error loading sketch project file:"), err)
@@ -172,9 +154,6 @@ func New(path *paths.Path) (*Sketch, error) {
 	sort.Sort(&sketch.OtherSketchFiles)
 	sort.Sort(&sketch.RootFolderFiles)
 
-	if err := sketch.importMetadata(); err != nil {
-		return nil, fmt.Errorf(tr("importing sketch metadata: %s"), err)
-	}
 	return sketch, nil
 }
 
@@ -199,46 +178,6 @@ func (s *Sketch) supportedFiles() (*paths.PathList, error) {
 
 }
 
-// ImportMetadata imports metadata into the sketch from a sketch.json file in the root
-// path of the sketch.
-func (s *Sketch) importMetadata() error {
-	sketchJSON := s.FullPath.Join("sketch.json")
-	if sketchJSON.NotExist() {
-		// File doesn't exist, nothing to import
-		return nil
-	}
-
-	content, err := sketchJSON.ReadFile()
-	if err != nil {
-		return fmt.Errorf(tr("reading sketch metadata %[1]s: %[2]s"), sketchJSON, err)
-	}
-	var meta Metadata
-	err = json.Unmarshal(content, &meta)
-	if err != nil {
-		if s.Metadata == nil {
-			s.Metadata = new(Metadata)
-		}
-		return fmt.Errorf(tr("encoding sketch metadata: %s"), err)
-	}
-	s.Metadata = &meta
-	return nil
-}
-
-// ExportMetadata writes sketch metadata into a sketch.json file in the root path of
-// the sketch
-func (s *Sketch) ExportMetadata() error {
-	d, err := json.MarshalIndent(&s.Metadata, "", "  ")
-	if err != nil {
-		return fmt.Errorf(tr("decoding sketch metadata: %s"), err)
-	}
-
-	sketchJSON := s.FullPath.Join("sketch.json")
-	if err := sketchJSON.WriteFile(d); err != nil {
-		return fmt.Errorf(tr("writing sketch metadata %[1]s: %[2]s"), sketchJSON, err)
-	}
-	return nil
-}
-
 // GetProfile returns the requested profile or nil if the profile
 // is not found.
 func (s *Sketch) GetProfile(profileName string) *Profile {
@@ -252,10 +191,13 @@ func (s *Sketch) GetProfile(profileName string) *Profile {
 
 // checkSketchCasing returns an error if the casing of the sketch folder and the main file are different.
 // Correct:
-//    MySketch/MySketch.ino
+//
+//	MySketch/MySketch.ino
+//
 // Wrong:
-//    MySketch/mysketch.ino
-//    mysketch/MySketch.ino
+//
+//	MySketch/mysketch.ino
+//	mysketch/MySketch.ino
 //
 // This is mostly necessary to avoid errors on Mac OS X.
 // For more info see: https://github.com/arduino/arduino-cli/issues/1174
@@ -281,6 +223,47 @@ func (s *Sketch) checkSketchCasing() error {
 	}
 
 	return nil
+}
+
+// GetProjectPath returns the path to the sketch project file (sketch.yaml or sketch.yml)
+func (s *Sketch) GetProjectPath() *paths.Path {
+	projectFile := s.FullPath.Join("sketch.yaml")
+	if !projectFile.Exist() {
+		alternateProjectFile := s.FullPath.Join("sketch.yml")
+		if alternateProjectFile.Exist() {
+			return alternateProjectFile
+		}
+	}
+	return projectFile
+}
+
+// GetDefaultFQBN returns the default FQBN for the sketch (from the sketch.yaml project file), or the
+// empty string if not set.
+func (s *Sketch) GetDefaultFQBN() string {
+	return s.Project.DefaultFqbn
+}
+
+// GetDefaultPortAddressAndProtocol returns the default port address and port protocol for the sketch
+// (from the sketch.yaml project file), or empty strings if not set.
+func (s *Sketch) GetDefaultPortAddressAndProtocol() (string, string) {
+	return s.Project.DefaultPort, s.Project.DefaultProtocol
+}
+
+// SetDefaultFQBN sets the default FQBN for the sketch and saves it in the sketch.yaml project file.
+func (s *Sketch) SetDefaultFQBN(fqbn string) error {
+	s.Project.DefaultFqbn = fqbn
+	return updateOrAddYamlRootEntry(s.GetProjectPath(), "default_fqbn", fqbn)
+}
+
+// SetDefaultPort sets the default port address and port protocol for the sketch and saves it in the
+// sketch.yaml project file.
+func (s *Sketch) SetDefaultPort(address, protocol string) error {
+	s.Project.DefaultPort = address
+	s.Project.DefaultProtocol = protocol
+	if err := updateOrAddYamlRootEntry(s.GetProjectPath(), "default_port", address); err != nil {
+		return err
+	}
+	return updateOrAddYamlRootEntry(s.GetProjectPath(), "default_protocol", protocol)
 }
 
 // InvalidSketchFolderNameError is returned when the sketch directory doesn't match the sketch name

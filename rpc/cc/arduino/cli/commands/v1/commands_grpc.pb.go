@@ -43,9 +43,6 @@ type ArduinoCoreServiceClient interface {
 	ArchiveSketch(ctx context.Context, in *ArchiveSketchRequest, opts ...grpc.CallOption) (*ArchiveSketchResponse, error)
 	// Requests details about a board
 	BoardDetails(ctx context.Context, in *BoardDetailsRequest, opts ...grpc.CallOption) (*BoardDetailsResponse, error)
-	// Attach a board to a sketch. When the `fqbn` field of a request is not
-	// provided, the FQBN of the attached board will be used.
-	BoardAttach(ctx context.Context, in *BoardAttachRequest, opts ...grpc.CallOption) (ArduinoCoreService_BoardAttachClient, error)
 	// List the boards currently connected to the computer.
 	BoardList(ctx context.Context, in *BoardListRequest, opts ...grpc.CallOption) (*BoardListResponse, error)
 	// List all the boards provided by installed platforms.
@@ -276,38 +273,6 @@ func (c *arduinoCoreServiceClient) BoardDetails(ctx context.Context, in *BoardDe
 	return out, nil
 }
 
-func (c *arduinoCoreServiceClient) BoardAttach(ctx context.Context, in *BoardAttachRequest, opts ...grpc.CallOption) (ArduinoCoreService_BoardAttachClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[3], "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardAttach", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &arduinoCoreServiceBoardAttachClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-type ArduinoCoreService_BoardAttachClient interface {
-	Recv() (*BoardAttachResponse, error)
-	grpc.ClientStream
-}
-
-type arduinoCoreServiceBoardAttachClient struct {
-	grpc.ClientStream
-}
-
-func (x *arduinoCoreServiceBoardAttachClient) Recv() (*BoardAttachResponse, error) {
-	m := new(BoardAttachResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
 func (c *arduinoCoreServiceClient) BoardList(ctx context.Context, in *BoardListRequest, opts ...grpc.CallOption) (*BoardListResponse, error) {
 	out := new(BoardListResponse)
 	err := c.cc.Invoke(ctx, "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardList", in, out, opts...)
@@ -336,7 +301,7 @@ func (c *arduinoCoreServiceClient) BoardSearch(ctx context.Context, in *BoardSea
 }
 
 func (c *arduinoCoreServiceClient) BoardListWatch(ctx context.Context, opts ...grpc.CallOption) (ArduinoCoreService_BoardListWatchClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[4], "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardListWatch", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[3], "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardListWatch", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -367,7 +332,7 @@ func (x *arduinoCoreServiceBoardListWatchClient) Recv() (*BoardListWatchResponse
 }
 
 func (c *arduinoCoreServiceClient) Compile(ctx context.Context, in *CompileRequest, opts ...grpc.CallOption) (ArduinoCoreService_CompileClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[5], "/cc.arduino.cli.commands.v1.ArduinoCoreService/Compile", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[4], "/cc.arduino.cli.commands.v1.ArduinoCoreService/Compile", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -399,7 +364,7 @@ func (x *arduinoCoreServiceCompileClient) Recv() (*CompileResponse, error) {
 }
 
 func (c *arduinoCoreServiceClient) PlatformInstall(ctx context.Context, in *PlatformInstallRequest, opts ...grpc.CallOption) (ArduinoCoreService_PlatformInstallClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[6], "/cc.arduino.cli.commands.v1.ArduinoCoreService/PlatformInstall", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[5], "/cc.arduino.cli.commands.v1.ArduinoCoreService/PlatformInstall", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -431,7 +396,7 @@ func (x *arduinoCoreServicePlatformInstallClient) Recv() (*PlatformInstallRespon
 }
 
 func (c *arduinoCoreServiceClient) PlatformDownload(ctx context.Context, in *PlatformDownloadRequest, opts ...grpc.CallOption) (ArduinoCoreService_PlatformDownloadClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[7], "/cc.arduino.cli.commands.v1.ArduinoCoreService/PlatformDownload", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[6], "/cc.arduino.cli.commands.v1.ArduinoCoreService/PlatformDownload", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -463,7 +428,7 @@ func (x *arduinoCoreServicePlatformDownloadClient) Recv() (*PlatformDownloadResp
 }
 
 func (c *arduinoCoreServiceClient) PlatformUninstall(ctx context.Context, in *PlatformUninstallRequest, opts ...grpc.CallOption) (ArduinoCoreService_PlatformUninstallClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[8], "/cc.arduino.cli.commands.v1.ArduinoCoreService/PlatformUninstall", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[7], "/cc.arduino.cli.commands.v1.ArduinoCoreService/PlatformUninstall", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -495,7 +460,7 @@ func (x *arduinoCoreServicePlatformUninstallClient) Recv() (*PlatformUninstallRe
 }
 
 func (c *arduinoCoreServiceClient) PlatformUpgrade(ctx context.Context, in *PlatformUpgradeRequest, opts ...grpc.CallOption) (ArduinoCoreService_PlatformUpgradeClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[9], "/cc.arduino.cli.commands.v1.ArduinoCoreService/PlatformUpgrade", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[8], "/cc.arduino.cli.commands.v1.ArduinoCoreService/PlatformUpgrade", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -527,7 +492,7 @@ func (x *arduinoCoreServicePlatformUpgradeClient) Recv() (*PlatformUpgradeRespon
 }
 
 func (c *arduinoCoreServiceClient) Upload(ctx context.Context, in *UploadRequest, opts ...grpc.CallOption) (ArduinoCoreService_UploadClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[10], "/cc.arduino.cli.commands.v1.ArduinoCoreService/Upload", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[9], "/cc.arduino.cli.commands.v1.ArduinoCoreService/Upload", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -559,7 +524,7 @@ func (x *arduinoCoreServiceUploadClient) Recv() (*UploadResponse, error) {
 }
 
 func (c *arduinoCoreServiceClient) UploadUsingProgrammer(ctx context.Context, in *UploadUsingProgrammerRequest, opts ...grpc.CallOption) (ArduinoCoreService_UploadUsingProgrammerClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[11], "/cc.arduino.cli.commands.v1.ArduinoCoreService/UploadUsingProgrammer", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[10], "/cc.arduino.cli.commands.v1.ArduinoCoreService/UploadUsingProgrammer", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -609,7 +574,7 @@ func (c *arduinoCoreServiceClient) ListProgrammersAvailableForUpload(ctx context
 }
 
 func (c *arduinoCoreServiceClient) BurnBootloader(ctx context.Context, in *BurnBootloaderRequest, opts ...grpc.CallOption) (ArduinoCoreService_BurnBootloaderClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[12], "/cc.arduino.cli.commands.v1.ArduinoCoreService/BurnBootloader", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[11], "/cc.arduino.cli.commands.v1.ArduinoCoreService/BurnBootloader", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -659,7 +624,7 @@ func (c *arduinoCoreServiceClient) PlatformList(ctx context.Context, in *Platfor
 }
 
 func (c *arduinoCoreServiceClient) LibraryDownload(ctx context.Context, in *LibraryDownloadRequest, opts ...grpc.CallOption) (ArduinoCoreService_LibraryDownloadClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[13], "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryDownload", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[12], "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryDownload", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -691,7 +656,7 @@ func (x *arduinoCoreServiceLibraryDownloadClient) Recv() (*LibraryDownloadRespon
 }
 
 func (c *arduinoCoreServiceClient) LibraryInstall(ctx context.Context, in *LibraryInstallRequest, opts ...grpc.CallOption) (ArduinoCoreService_LibraryInstallClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[14], "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryInstall", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[13], "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryInstall", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -723,7 +688,7 @@ func (x *arduinoCoreServiceLibraryInstallClient) Recv() (*LibraryInstallResponse
 }
 
 func (c *arduinoCoreServiceClient) LibraryUpgrade(ctx context.Context, in *LibraryUpgradeRequest, opts ...grpc.CallOption) (ArduinoCoreService_LibraryUpgradeClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[15], "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryUpgrade", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[14], "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryUpgrade", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -755,7 +720,7 @@ func (x *arduinoCoreServiceLibraryUpgradeClient) Recv() (*LibraryUpgradeResponse
 }
 
 func (c *arduinoCoreServiceClient) ZipLibraryInstall(ctx context.Context, in *ZipLibraryInstallRequest, opts ...grpc.CallOption) (ArduinoCoreService_ZipLibraryInstallClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[16], "/cc.arduino.cli.commands.v1.ArduinoCoreService/ZipLibraryInstall", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[15], "/cc.arduino.cli.commands.v1.ArduinoCoreService/ZipLibraryInstall", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -787,7 +752,7 @@ func (x *arduinoCoreServiceZipLibraryInstallClient) Recv() (*ZipLibraryInstallRe
 }
 
 func (c *arduinoCoreServiceClient) GitLibraryInstall(ctx context.Context, in *GitLibraryInstallRequest, opts ...grpc.CallOption) (ArduinoCoreService_GitLibraryInstallClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[17], "/cc.arduino.cli.commands.v1.ArduinoCoreService/GitLibraryInstall", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[16], "/cc.arduino.cli.commands.v1.ArduinoCoreService/GitLibraryInstall", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -819,7 +784,7 @@ func (x *arduinoCoreServiceGitLibraryInstallClient) Recv() (*GitLibraryInstallRe
 }
 
 func (c *arduinoCoreServiceClient) LibraryUninstall(ctx context.Context, in *LibraryUninstallRequest, opts ...grpc.CallOption) (ArduinoCoreService_LibraryUninstallClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[18], "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryUninstall", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[17], "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryUninstall", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -851,7 +816,7 @@ func (x *arduinoCoreServiceLibraryUninstallClient) Recv() (*LibraryUninstallResp
 }
 
 func (c *arduinoCoreServiceClient) LibraryUpgradeAll(ctx context.Context, in *LibraryUpgradeAllRequest, opts ...grpc.CallOption) (ArduinoCoreService_LibraryUpgradeAllClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[19], "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryUpgradeAll", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[18], "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryUpgradeAll", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -910,7 +875,7 @@ func (c *arduinoCoreServiceClient) LibraryList(ctx context.Context, in *LibraryL
 }
 
 func (c *arduinoCoreServiceClient) Monitor(ctx context.Context, opts ...grpc.CallOption) (ArduinoCoreService_MonitorClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[20], "/cc.arduino.cli.commands.v1.ArduinoCoreService/Monitor", opts...)
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[19], "/cc.arduino.cli.commands.v1.ArduinoCoreService/Monitor", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -974,9 +939,6 @@ type ArduinoCoreServiceServer interface {
 	ArchiveSketch(context.Context, *ArchiveSketchRequest) (*ArchiveSketchResponse, error)
 	// Requests details about a board
 	BoardDetails(context.Context, *BoardDetailsRequest) (*BoardDetailsResponse, error)
-	// Attach a board to a sketch. When the `fqbn` field of a request is not
-	// provided, the FQBN of the attached board will be used.
-	BoardAttach(*BoardAttachRequest, ArduinoCoreService_BoardAttachServer) error
 	// List the boards currently connected to the computer.
 	BoardList(context.Context, *BoardListRequest) (*BoardListResponse, error)
 	// List all the boards provided by installed platforms.
@@ -1074,9 +1036,6 @@ func (UnimplementedArduinoCoreServiceServer) ArchiveSketch(context.Context, *Arc
 }
 func (UnimplementedArduinoCoreServiceServer) BoardDetails(context.Context, *BoardDetailsRequest) (*BoardDetailsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BoardDetails not implemented")
-}
-func (UnimplementedArduinoCoreServiceServer) BoardAttach(*BoardAttachRequest, ArduinoCoreService_BoardAttachServer) error {
-	return status.Errorf(codes.Unimplemented, "method BoardAttach not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) BoardList(context.Context, *BoardListRequest) (*BoardListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BoardList not implemented")
@@ -1362,27 +1321,6 @@ func _ArduinoCoreService_BoardDetails_Handler(srv interface{}, ctx context.Conte
 		return srv.(ArduinoCoreServiceServer).BoardDetails(ctx, req.(*BoardDetailsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
-}
-
-func _ArduinoCoreService_BoardAttach_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(BoardAttachRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(ArduinoCoreServiceServer).BoardAttach(m, &arduinoCoreServiceBoardAttachServer{stream})
-}
-
-type ArduinoCoreService_BoardAttachServer interface {
-	Send(*BoardAttachResponse) error
-	grpc.ServerStream
-}
-
-type arduinoCoreServiceBoardAttachServer struct {
-	grpc.ServerStream
-}
-
-func (x *arduinoCoreServiceBoardAttachServer) Send(m *BoardAttachResponse) error {
-	return x.ServerStream.SendMsg(m)
 }
 
 func _ArduinoCoreService_BoardList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -2044,11 +1982,6 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "UpdateLibrariesIndex",
 			Handler:       _ArduinoCoreService_UpdateLibrariesIndex_Handler,
-			ServerStreams: true,
-		},
-		{
-			StreamName:    "BoardAttach",
-			Handler:       _ArduinoCoreService_BoardAttach_Handler,
 			ServerStreams: true,
 		},
 		{

@@ -54,8 +54,8 @@ func getDebugProperties(req *debug.DebugConfigRequest, pme *packagemanager.Explo
 
 	// XXX Remove this code duplication!!
 	fqbnIn := req.GetFqbn()
-	if fqbnIn == "" && sk != nil && sk.Metadata != nil {
-		fqbnIn = sk.Metadata.CPU.Fqbn
+	if fqbnIn == "" && sk != nil {
+		fqbnIn = sk.GetDefaultFQBN()
 	}
 	if fqbnIn == "" {
 		return nil, &arduino.MissingFQBNError{}

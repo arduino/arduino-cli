@@ -15,30 +15,6 @@
 
 package board
 
-import (
-	"os"
-
-	"github.com/arduino/arduino-cli/i18n"
-	"github.com/spf13/cobra"
-)
+import "github.com/arduino/arduino-cli/i18n"
 
 var tr = i18n.Tr
-
-// NewCommand created a new `board` command
-func NewCommand() *cobra.Command {
-	boardCommand := &cobra.Command{
-		Use:   "board",
-		Short: tr("Arduino board commands."),
-		Long:  tr("Arduino board commands."),
-		Example: "  # " + tr("Lists all connected boards.") + "\n" +
-			"  " + os.Args[0] + " board list",
-	}
-
-	boardCommand.AddCommand(initAttachCommand())
-	boardCommand.AddCommand(initDetailsCommand())
-	boardCommand.AddCommand(initListCommand())
-	boardCommand.AddCommand(initListAllCommand())
-	boardCommand.AddCommand(initSearchCommand())
-
-	return boardCommand
-}

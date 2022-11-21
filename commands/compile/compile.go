@@ -76,8 +76,8 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	}
 
 	fqbnIn := req.GetFqbn()
-	if fqbnIn == "" && sk != nil && sk.Metadata != nil {
-		fqbnIn = sk.Metadata.CPU.Fqbn
+	if fqbnIn == "" && sk != nil {
+		fqbnIn = sk.GetDefaultFQBN()
 	}
 	if fqbnIn == "" {
 		return nil, &arduino.MissingFQBNError{}
