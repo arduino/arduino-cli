@@ -1,12 +1,13 @@
 ---
-name: golang.org/x/net/internal/socks
-version: v0.0.0-20220722155237-a158d28d115b
+name: golang.org/x/term
+version: v0.0.0-20210927222741-03fcf44c2211
 type: go
-summary: Package socks provides a SOCKS version 5 client implementation.
-homepage: https://pkg.go.dev/golang.org/x/net/internal/socks
+summary: Package term provides support functions for dealing with terminals, as commonly
+  found on UNIX systems.
+homepage: https://pkg.go.dev/golang.org/x/term
 license: bsd-3-clause
 licenses:
-- sources: net@v0.0.0-20220722155237-a158d28d115b/LICENSE
+- sources: LICENSE
   text: |
     Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -35,7 +36,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: net@v0.0.0-20220722155237-a158d28d115b/PATENTS
+- sources: PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 
@@ -59,4 +60,9 @@ licenses:
     infringement, or inducement of patent infringement, then any patent
     rights granted to you under this License for this implementation of Go
     shall terminate as of the date such litigation is filed.
-notices: []
+notices:
+- sources: AUTHORS
+  text: |-
+    # This source code refers to The Go Authors for copyright purposes.
+    # The master list of authors is in the main Go distribution,
+    # visible at http://tip.golang.org/AUTHORS.
