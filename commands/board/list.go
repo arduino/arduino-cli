@@ -19,7 +19,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"regexp"
 	"sort"
@@ -32,23 +32,42 @@ import (
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/httpclient"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/inventory"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
-type boardNotFoundError struct{}
-
-func (e *boardNotFoundError) Error() string {
-	return tr("board not found")
-}
-
 var (
-	// ErrNotFound is returned when the API returns 404
-	ErrNotFound = &boardNotFoundError{}
 	vidPidURL   = "https://builder.arduino.cc/v3/boards/byVidPid"
 	validVidPid = regexp.MustCompile(`0[xX][a-fA-F\d]{4}`)
 )
+
+func cachedAPIByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
+	var resp []*rpc.BoardListItem
+
+	cacheKey := fmt.Sprintf("cache.builder-api.v3/boards/byvid/pid/%s/%s", vid, pid)
+	if cachedResp := inventory.Store.GetString(cacheKey + ".data"); cachedResp != "" {
+		ts := inventory.Store.GetTime(cacheKey + ".ts")
+		if time.Since(ts) < time.Hour*24 {
+			// Use cached response
+			if err := json.Unmarshal([]byte(cachedResp), &resp); err == nil {
+				return resp, nil
+			}
+		}
+	}
+
+	resp, err := apiByVidPid(vid, pid) // Perform API requrest
+
+	if err == nil {
+		if cachedResp, err := json.Marshal(resp); err == nil {
+			inventory.Store.Set(cacheKey+".data", string(cachedResp))
+			inventory.Store.Set(cacheKey+".ts", time.Now())
+			inventory.WriteStore()
+		}
+	}
+	return resp, err
+}
 
 func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	// ensure vid and pid are valid before hitting the API
@@ -60,7 +79,6 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	}
 
 	url := fmt.Sprintf("%s/%s/%s", vidPidURL, vid, pid)
-	retVal := []*rpc.BoardListItem{}
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -72,50 +90,53 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 		return nil, errors.Wrap(err, tr("failed to initialize http client"))
 	}
 
-	if res, err := httpClient.Do(req); err == nil {
-		if res.StatusCode >= 400 {
-			if res.StatusCode == 404 {
-				return nil, ErrNotFound
-			}
-			return nil, errors.Errorf(tr("the server responded with status %s"), res.Status)
-		}
-
-		body, _ := ioutil.ReadAll(res.Body)
-		res.Body.Close()
-
-		var dat map[string]interface{}
-		err = json.Unmarshal(body, &dat)
-		if err != nil {
-			return nil, errors.Wrap(err, tr("error processing response from server"))
-		}
-
-		name, nameFound := dat["name"].(string)
-		fqbn, fbqnFound := dat["fqbn"].(string)
-
-		if !nameFound || !fbqnFound {
-			return nil, errors.New(tr("wrong format in server response"))
-		}
-
-		retVal = append(retVal, &rpc.BoardListItem{
-			Name: name,
-			Fqbn: fqbn,
-		})
-	} else {
+	res, err := httpClient.Do(req)
+	if err != nil {
 		return nil, errors.Wrap(err, tr("error querying Arduino Cloud Api"))
 	}
+	if res.StatusCode == 404 {
+		// This is not an error, it just means that the board is not recognized
+		return nil, nil
+	}
+	if res.StatusCode >= 400 {
+		return nil, errors.Errorf(tr("the server responded with status %s"), res.Status)
+	}
 
-	return retVal, nil
+	resp, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	if err := res.Body.Close(); err != nil {
+		return nil, err
+	}
+
+	var dat map[string]interface{}
+	if err := json.Unmarshal(resp, &dat); err != nil {
+		return nil, errors.Wrap(err, tr("error processing response from server"))
+	}
+	name, nameFound := dat["name"].(string)
+	fqbn, fbqnFound := dat["fqbn"].(string)
+	if !nameFound || !fbqnFound {
+		return nil, errors.New(tr("wrong format in server response"))
+	}
+
+	return []*rpc.BoardListItem{
+		{
+			Name: name,
+			Fqbn: fqbn,
+		},
+	}, nil
 }
 
 func identifyViaCloudAPI(port *discovery.Port) ([]*rpc.BoardListItem, error) {
 	// If the port is not USB do not try identification via cloud
 	id := port.Properties
 	if !id.ContainsKey("vid") || !id.ContainsKey("pid") {
-		return nil, ErrNotFound
+		return nil, nil
 	}
 
 	logrus.Debug("Querying builder API for board identification...")
-	return apiByVidPid(id.Get("vid"), id.Get("pid"))
+	return cachedAPIByVidPid(id.Get("vid"), id.Get("pid"))
 }
 
 // identify returns a list of boards checking first the installed platforms or the Cloud API
@@ -146,17 +167,10 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardL
 	// the builder API if the board is a USB device port
 	if len(boards) == 0 {
 		items, err := identifyViaCloudAPI(port)
-		if errors.Is(err, ErrNotFound) {
-			// the board couldn't be detected, print a warning
-			logrus.Debug("Board not recognized")
-		} else if err != nil {
-			// this is bad, bail out
-			return nil, &arduino.UnavailableError{Message: tr("Error getting board info from Arduino Cloud")}
+		if err != nil {
+			// this is bad, but keep going
+			logrus.WithError(err).Debug("Error querying builder API")
 		}
-
-		// add a DetectedPort entry in any case: the `Boards` field will
-		// be empty but the port will be shown anyways (useful for 3rd party
-		// boards)
 		boards = items
 	}
 

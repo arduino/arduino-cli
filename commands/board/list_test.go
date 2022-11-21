@@ -71,9 +71,8 @@ func TestGetByVidPidNotFound(t *testing.T) {
 
 	vidPidURL = ts.URL
 	res, err := apiByVidPid("0x0420", "0x0069")
-	require.NotNil(t, err)
-	require.Equal(t, "board not found", err.Error())
-	require.Len(t, res, 0)
+	require.NoError(t, err)
+	require.Empty(t, res)
 }
 
 func TestGetByVidPid5xx(t *testing.T) {
@@ -108,7 +107,7 @@ func TestBoardDetectionViaAPIWithNonUSBPort(t *testing.T) {
 		Properties: properties.NewMap(),
 	}
 	items, err := identifyViaCloudAPI(port)
-	require.ErrorIs(t, err, ErrNotFound)
+	require.NoError(t, err)
 	require.Empty(t, items)
 }
 

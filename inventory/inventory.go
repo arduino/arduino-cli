@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/gofrs/uuid"
@@ -77,9 +78,14 @@ func generateInstallationData() error {
 	return nil
 }
 
+var writeStoreMux sync.Mutex
+
 // WriteStore writes the current information from Store to configFilePath.
 // Returns err if it fails.
 func WriteStore() error {
+	writeStoreMux.Lock()
+	defer writeStoreMux.Unlock()
+
 	configPath := filepath.Dir(configFilePath)
 
 	// Create config dir if not present,
