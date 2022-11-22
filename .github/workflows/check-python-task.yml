@@ -53,7 +53,7 @@ jobs:
           version: 3.x
 
       - name: Run flake8
-        uses: liskin/gh-problem-matcher-wrap@v1
+        uses: liskin/gh-problem-matcher-wrap@v2
         with:
           linters: flake8
           run: task python:lint
