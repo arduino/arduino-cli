@@ -16,6 +16,29 @@ The `sketch.json` file is now completely ignored.
 The `cc.arduino.cli.commands.v1.BoardAttach` gRPC command has been removed. This feature is no longer available through
 gRPC.
 
+### golang API change in `github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager`
+
+The following `LibrariesManager.InstallPrerequisiteCheck` methods have changed prototype, from:
+
+```go
+func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesindex.Release, installLocation libraries.LibraryLocation) (*paths.Path, *libraries.Library, error) { ... }
+func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath string, overwrite bool) error { ... }
+```
+
+to
+
+```go
+func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesindex.Release, installLocation libraries.LibraryLocation) (*paths.Path, *libraries.Library, error) { ... }
+func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath *paths.Path, overwrite bool) error { ... }
+```
+
+`InstallPrerequisiteCheck` now requires an explicit `name` and `version` instead of a `librariesindex.Release`, becuase
+it can now be used to check any library, not only the libraries available in the index. Also the return value has
+changed to a `LibraryInstallPlan` structure, it contains the same information as before (`TargetPath` and `ReplacedLib`)
+plus `Name`, `Version`, and an `UpToDate` boolean flag.
+
+`InstallZipLib` method `archivePath` is now a `paths.Path` instead of a `string`.
+
 ## 0.29.0
 
 ### Removed gRPC API: `cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndex`, `Outdated`, and `Upgrade`
