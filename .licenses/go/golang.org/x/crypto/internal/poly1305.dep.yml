@@ -1,12 +1,13 @@
 ---
-name: golang.org/x/net/internal/socks
-version: v0.0.0-20220722155237-a158d28d115b
+name: golang.org/x/crypto/internal/poly1305
+version: v0.0.0-20210921155107-089bfa567519
 type: go
-summary: Package socks provides a SOCKS version 5 client implementation.
-homepage: https://pkg.go.dev/golang.org/x/net/internal/socks
+summary: Package poly1305 implements Poly1305 one-time message authentication code
+  as specified in https://cr.yp.to/mac/poly1305-20050329.pdf.
+homepage: https://pkg.go.dev/golang.org/x/crypto/internal/poly1305
 license: bsd-3-clause
 licenses:
-- sources: net@v0.0.0-20220722155237-a158d28d115b/LICENSE
+- sources: crypto@v0.0.0-20210921155107-089bfa567519/LICENSE
   text: |
     Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -35,7 +36,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: net@v0.0.0-20220722155237-a158d28d115b/PATENTS
+- sources: crypto@v0.0.0-20210921155107-089bfa567519/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 
