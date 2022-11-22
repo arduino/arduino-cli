@@ -878,7 +878,7 @@ func TestCompileWithFullyPrecompiledLibrary(t *testing.T) {
 	require.NoError(t, err)
 	_, _, err = cli.Run("lib", "install", "--zip-path", wd.Parent().Join("testdata", "Arduino_TensorFlowLite-2.1.0-ALPHA-precompiled.zip").String())
 	require.NoError(t, err)
-	sketchFolder := cli.SketchbookDir().Join("libraries", "Arduino_TensorFlowLite-2.1.0-ALPHA-precompiled", "examples", "hello_world")
+	sketchFolder := cli.SketchbookDir().Join("libraries", "Arduino_TensorFlowLite", "examples", "hello_world")
 
 	// Install example dependency
 	_, _, err = cli.Run("lib", "install", "Arduino_LSM9DS1")
