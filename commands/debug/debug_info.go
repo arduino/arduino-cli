@@ -66,7 +66,7 @@ func getDebugProperties(req *debug.DebugConfigRequest, pme *packagemanager.Explo
 	}
 
 	// Find target board and board properties
-	_, platformRelease, board, boardProperties, referencedPlatformRelease, err := pme.ResolveFQBN(fqbn)
+	_, platformRelease, _, boardProperties, referencedPlatformRelease, err := pme.ResolveFQBN(fqbn)
 	if err != nil {
 		return nil, &arduino.UnknownFQBNError{Cause: err}
 	}
@@ -98,7 +98,7 @@ func getDebugProperties(req *debug.DebugConfigRequest, pme *packagemanager.Explo
 	for _, tool := range pme.GetAllInstalledToolsReleases() {
 		toolProperties.Merge(tool.RuntimeProperties())
 	}
-	if requiredTools, err := pme.FindToolsRequiredForBoard(board); err == nil {
+	if requiredTools, err := pme.FindToolsRequiredForBuild(platformRelease, referencedPlatformRelease); err == nil {
 		for _, requiredTool := range requiredTools {
 			logrus.WithField("tool", requiredTool).Info("Tool required for debug")
 			toolProperties.Merge(requiredTool.RuntimeProperties())

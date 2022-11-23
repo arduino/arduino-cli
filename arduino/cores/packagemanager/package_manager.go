@@ -614,11 +614,9 @@ func (pme *Explorer) GetTool(toolID string) *cores.Tool {
 	}
 }
 
-// FindToolsRequiredForBoard FIXMEDOC
-func (pme *Explorer) FindToolsRequiredForBoard(board *cores.Board) ([]*cores.ToolRelease, error) {
-	pme.log.Infof("Searching tools required for board %s", board)
-
-	platform := board.PlatformRelease
+// FindToolsRequiredForBuild returns the list of ToolReleases needed to build for the specified
+// plaftorm. The buildPlatform may be different depending on the selected board.
+func (pme *Explorer) FindToolsRequiredForBuild(platform, buildPlatform *cores.PlatformRelease) ([]*cores.ToolRelease, error) {
 
 	// maps tool name => all available ToolRelease
 	allToolsAlternatives := map[string][]*cores.ToolRelease{}
@@ -631,14 +629,19 @@ func (pme *Explorer) FindToolsRequiredForBoard(board *cores.Board) ([]*cores.Too
 	// selectBest select the tool with best matching, applying the following rules
 	// in order of priority:
 	// - the tool comes from the requested packager
+	// - the tool comes from the build platform packager
 	// - the tool has the greatest version
 	// - the tool packager comes first in alphabetic order
-	selectBest := func(tools []*cores.ToolRelease, packager string) *cores.ToolRelease {
+	packagerPriority := map[string]int{}
+	packagerPriority[platform.Platform.Package.Name] = 2
+	if buildPlatform != nil {
+		packagerPriority[buildPlatform.Platform.Package.Name] = 1
+	}
+	selectBest := func(tools []*cores.ToolRelease) *cores.ToolRelease {
 		selected := tools[0]
-		namePriority := map[string]int{packager: 1}
 		for _, tool := range tools[1:] {
-			if namePriority[tool.Tool.Package.Name] != namePriority[selected.Tool.Package.Name] {
-				if namePriority[tool.Tool.Package.Name] > namePriority[selected.Tool.Package.Name] {
+			if packagerPriority[tool.Tool.Package.Name] != packagerPriority[selected.Tool.Package.Name] {
+				if packagerPriority[tool.Tool.Package.Name] > packagerPriority[selected.Tool.Package.Name] {
 					selected = tool
 				}
 				continue
@@ -662,7 +665,7 @@ func (pme *Explorer) FindToolsRequiredForBoard(board *cores.Board) ([]*cores.Too
 	// on more than one version of the same tool. For example adafruit:samd has both
 	// bossac@1.8.0-48-gb176eee and bossac@1.7.0. To allow the runtime property
 	// {runtime.tools.bossac.path} to be correctly set to the 1.8.0 version we must ensure
-	// taht the returned array is sorted by version.
+	// that the returned array is sorted by version.
 	platform.ToolDependencies.Sort()
 	for _, toolDep := range platform.ToolDependencies {
 		pme.log.WithField("tool", toolDep).Infof("Required tool")
@@ -676,9 +679,9 @@ func (pme *Explorer) FindToolsRequiredForBoard(board *cores.Board) ([]*cores.Too
 
 	// Since a Platform may not specify the required tools (because it's a platform that comes
 	// from a user/hardware dir without a package_index.json) then add all available tools giving
-	// priority to tools coming from the same packager
+	// priority to tools coming from the same packager or referenced packager
 	for _, tools := range allToolsAlternatives {
-		tool := selectBest(tools, platform.Platform.Package.Name)
+		tool := selectBest(tools)
 		requiredTools = append(requiredTools, tool)
 	}
 	return requiredTools, nil

@@ -25,7 +25,7 @@ import (
 type TargetBoardResolver struct{}
 
 func (s *TargetBoardResolver) Run(ctx *types.Context) error {
-	targetPackage, targetPlatform, targetBoard, buildProperties, actualPlatform, err := ctx.PackageManager.ResolveFQBN(ctx.FQBN)
+	targetPackage, targetPlatform, targetBoard, buildProperties, buildPlatform, err := ctx.PackageManager.ResolveFQBN(ctx.FQBN)
 	if err != nil {
 		return fmt.Errorf("%s: %w", tr("Error resolving FQBN"), err)
 	}
@@ -39,7 +39,7 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 
 	if ctx.Verbose {
 		ctx.Info(tr("Using board '%[1]s' from platform in folder: %[2]s", targetBoard.BoardID, targetPlatform.InstallDir))
-		ctx.Info(tr("Using core '%[1]s' from platform in folder: %[2]s", core, actualPlatform.InstallDir))
+		ctx.Info(tr("Using core '%[1]s' from platform in folder: %[2]s", core, buildPlatform.InstallDir))
 	}
 
 	if buildProperties.Get("build.board") == "" {
@@ -50,7 +50,7 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 			targetBoard.String(), "'build.board'", defaultBuildBoard))
 	}
 
-	requiredTools, err := ctx.PackageManager.FindToolsRequiredForBoard(targetBoard)
+	requiredTools, err := ctx.PackageManager.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 	ctx.TargetBoardBuildProperties = buildProperties
 	ctx.TargetPlatform = targetPlatform
 	ctx.TargetPackage = targetPackage
-	ctx.ActualPlatform = actualPlatform
+	ctx.ActualPlatform = buildPlatform
 	ctx.RequiredTools = requiredTools
 	return nil
 }

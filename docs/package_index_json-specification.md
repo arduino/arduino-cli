@@ -278,11 +278,17 @@ are as follows:
 
   1. the tool, version and packager specified via `toolsDependencies` in the `package_index.json`
   1. the highest version of the tool provided by the packager of the current platform
+  1. the highest version of the tool provided by the packager of the referenced platform used for compile (see
+     ["Referencing another core, variant or tool"](platform-specification.md#referencing-another-core-variant-or-tool)
+     for more info)
   1. the highest version of the tool provided by any other packager (in case of tie, the first packager in alphabetical
      order wins)
 
 - The property `{runtime.tools.TOOLNAME-VERSION.path}` points, in order of priority, to:
   1. the tool and version provided by the packager of the current platform
+  1. the tool and version provided by the packager of the referenced platform used for compile (see
+     ["Referencing another core, variant or tool"](platform-specification.md#referencing-another-core-variant-or-tool)
+     for more info)
   1. the tool and version provided by any other packager (in case of tie, the first packager in alphabetical order wins)
 
 ### Example JSON index file
