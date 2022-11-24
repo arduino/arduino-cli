@@ -21,6 +21,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/stretchr/testify/require"
@@ -60,6 +61,27 @@ func detectedBoards(t *testing.T, cli *integrationtest.ArduinoCLI) []board {
 		})
 	}
 	return boards
+}
+
+func waitForBoard(t *testing.T, cli *integrationtest.ArduinoCLI) {
+	timeEnd := time.Now().Unix() + 10
+	for time.Now().Unix() < timeEnd {
+		stdout, _, err := cli.Run("board", "list", "--format", "json")
+		require.NoError(t, err)
+		len, err := strconv.Atoi(requirejson.Parse(t, stdout).Query("length").String())
+		require.NoError(t, err)
+		numBoards := 0
+		for i := 0; i < len; i++ {
+			numBoards, err = strconv.Atoi(requirejson.Parse(t, stdout).Query(".[] | .matching_boards | length").String())
+			require.NoError(t, err)
+			if numBoards > 0 {
+				break
+			}
+		}
+		if numBoards > 0 {
+			break
+		}
+	}
 }
 
 func TestUpload(t *testing.T) {
@@ -175,5 +197,56 @@ func TestUploadWithInputFileFlag(t *testing.T) {
 		// Upload using --input-file
 		_, _, err = cli.Run("upload", "-b", fqbn, "-p", address, "--input-file", inputFile.String())
 		require.NoError(t, err)
+	}
+}
+
+func TestCompileAndUploadCombo(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("VMs have no serial ports")
+	}
+
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Create a test sketch
+	sketchName := "CompileAndUploadIntegrationTest"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	sketchMainFile := sketchPath.Join(sketchName + ".ino")
+	stdout, _, err := cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Sketch created in: "+sketchPath.String())
+
+	// Build sketch for each detected board
+	for _, board := range detectedBoards(t, cli) {
+		logFileName := strings.ReplaceAll(board.fqbn, ":", "-") + "-compile.log"
+		logFilePath := cli.SketchbookDir().Join(logFileName)
+
+		_, _, err = cli.Run("core", "install", board.core)
+		require.NoError(t, err)
+
+		runTest := func(s string) {
+			waitForBoard(t, cli)
+			_, _, err := cli.Run("compile", "-b", board.fqbn, "--upload", "-p", board.address, s,
+				"--log-format", "json", "--log-file", logFilePath.String(), "--log-level", "trace")
+			require.NoError(t, err)
+			logJson, err := logFilePath.ReadFile()
+			require.NoError(t, err)
+
+			// check from the logs if the bin file were uploaded on the current board
+			logJson = []byte("[" + strings.ReplaceAll(strings.TrimSuffix(string(logJson), "\n"), "\n", ",") + "]")
+			traces := requirejson.Parse(t, logJson).Query("[ .[] | select(.level==\"trace\") | .msg ]").String()
+			traces = strings.ReplaceAll(traces, "\\\\", "\\")
+			require.Contains(t, traces, "Compile "+sketchPath.String()+" for "+board.fqbn+" started")
+			require.Contains(t, traces, "Compile "+sketchName+" for "+board.fqbn+" successful")
+			require.Contains(t, traces, "Upload "+sketchPath.String()+" on "+board.fqbn+" started")
+			require.Contains(t, traces, "Upload successful")
+		}
+
+		runTest(sketchPath.String())
+		runTest(sketchMainFile.String())
 	}
 }
