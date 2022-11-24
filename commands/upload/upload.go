@@ -412,13 +412,13 @@ func runProgramAction(pme *packagemanager.Explorer,
 				if portAddress != "" {
 					logrus.WithField("phase", "board reset").Infof("Upload port found on %s", portAddress)
 				} else {
-					logrus.WithField("phase", "board reset").Infof("No upload port found, using %s as fallback", actualPort)
+					logrus.WithField("phase", "board reset").Infof("No upload port found, using %s as fallback", actualPort.Address)
 				}
 				if verbose {
 					if portAddress != "" {
 						outStream.Write([]byte(fmt.Sprintln(tr("Upload port found on %s", portAddress))))
 					} else {
-						outStream.Write([]byte(fmt.Sprintln(tr("No upload port found, using %s as fallback", actualPort))))
+						outStream.Write([]byte(fmt.Sprintln(tr("No upload port found, using %s as fallback", actualPort.Address))))
 					}
 				}
 			},
