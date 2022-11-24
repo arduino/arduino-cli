@@ -42,38 +42,6 @@ def test_upload_after_attach(run_command, data_dir, detected_boards):
         assert run_command(["upload", sketch_path])
 
 
-def test_compile_and_upload_combo_sketch_with_pde_extension(run_command, data_dir, detected_boards, wait_for_board):
-    assert run_command(["update"])
-
-    sketch_name = "CompileAndUploadPdeSketch"
-    sketch_path = Path(data_dir, sketch_name)
-
-    # Create a test sketch
-    assert run_command(["sketch", "new", sketch_path])
-
-    # Renames sketch file to pde
-    sketch_file = Path(sketch_path, f"{sketch_name}.ino").rename(sketch_path / f"{sketch_name}.pde")
-
-    for board in detected_boards:
-        # Install core
-        core = ":".join(board.fqbn.split(":")[:2])
-        assert run_command(["core", "install", core])
-
-        # Build sketch and upload from folder
-        wait_for_board()
-        res = run_command(["compile", "--clean", "-b", board.fqbn, "-u", "-p", board.address, sketch_path])
-        assert res.ok
-        assert "Sketches with .pde extension are deprecated, please rename the following files to .ino" in res.stderr
-        assert str(sketch_file) in res.stderr
-
-        # Build sketch and upload from file
-        wait_for_board()
-        res = run_command(["compile", "--clean", "-b", board.fqbn, "-u", "-p", board.address, sketch_file])
-        assert res.ok
-        assert "Sketches with .pde extension are deprecated, please rename the following files to .ino" in res.stderr
-        assert str(sketch_file) in res.stderr
-
-
 def test_upload_sketch_with_pde_extension(run_command, data_dir, detected_boards, wait_for_board):
     assert run_command(["update"])
 

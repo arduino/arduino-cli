@@ -297,3 +297,46 @@ func TestCompileAndUploadComboWithCustomBuildPath(t *testing.T) {
 		require.Contains(t, traces, "Upload successful")
 	}
 }
+
+func TestCompileAndUploadComboSketchWithPdeExtension(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("VMs have no serial ports")
+	}
+
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	sketchName := "CompileAndUploadPdeSketch"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+
+	// Create a test sketch
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Renames sketch file to pde
+	sketchFile := sketchPath.Join(sketchName + ".pde")
+	require.NoError(t, sketchPath.Join(sketchName+".ino").Rename(sketchFile))
+
+	for _, board := range detectedBoards(t, cli) {
+		// Install core
+		_, _, err = cli.Run("core", "install", board.core)
+		require.NoError(t, err)
+
+		// Build sketch and upload from folder
+		waitForBoard(t, cli)
+		_, stderr, err := cli.Run("compile", "--clean", "-b", board.fqbn, "-u", "-p", board.address, sketchPath.String())
+		require.NoError(t, err)
+		require.Contains(t, string(stderr), "Sketches with .pde extension are deprecated, please rename the following files to .ino")
+		require.Contains(t, string(stderr), sketchFile.String())
+
+		// Build sketch and upload from file
+		waitForBoard(t, cli)
+		_, stderr, err = cli.Run("compile", "--clean", "-b", board.fqbn, "-u", "-p", board.address, sketchFile.String())
+		require.NoError(t, err)
+		require.Contains(t, string(stderr), "Sketches with .pde extension are deprecated, please rename the following files to .ino")
+		require.Contains(t, string(stderr), sketchFile.String())
+	}
+}
