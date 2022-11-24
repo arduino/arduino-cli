@@ -137,3 +137,43 @@ func TestUploadWithInputDirFlag(t *testing.T) {
 		require.NoError(t, err)
 	}
 }
+
+func TestUploadWithInputFileFlag(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("VMs have no serial ports")
+	}
+
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	for _, board := range detectedBoards(t, cli) {
+		// Download board platform
+		_, _, err = cli.Run("core", "install", board.core)
+		require.NoError(t, err)
+
+		// Create a sketch
+		sketchName := "TestUploadSketch" + board.id
+		sketchPath := cli.SketchbookDir().Join(sketchName)
+		fqbn := board.fqbn
+		address := board.address
+		_, _, err = cli.Run("sketch", "new", sketchPath.String())
+		require.NoError(t, err)
+
+		// Build sketch and export binaries to custom directory
+		outputDir := cli.SketchbookDir().Join("test_dir", sketchName, "build")
+		_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--output-dir", outputDir.String())
+		require.NoError(t, err)
+
+		// We don't need a specific file when using the --input-file flag to upload since
+		// it's just used to calculate the directory, so it's enough to get a random file
+		// that's inside that directory
+		inputFile := outputDir.Join(sketchName + ".ino.bin")
+		// Upload using --input-file
+		_, _, err = cli.Run("upload", "-b", fqbn, "-p", address, "--input-file", inputFile.String())
+		require.NoError(t, err)
+	}
+}
