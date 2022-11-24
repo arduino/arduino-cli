@@ -396,10 +396,10 @@ func runProgramAction(pme *packagemanager.Explorer,
 		}
 
 		cb := &serialutils.ResetProgressCallbacks{
-			TouchingPort: func(port string) {
-				logrus.WithField("phase", "board reset").Infof("Performing 1200-bps touch reset on serial port %s", port)
+			TouchingPort: func(portAddress string) {
+				logrus.WithField("phase", "board reset").Infof("Performing 1200-bps touch reset on serial port %s", portAddress)
 				if verbose {
-					outStream.Write([]byte(fmt.Sprintln(tr("Performing 1200-bps touch reset on serial port %s", port))))
+					outStream.Write([]byte(fmt.Sprintln(tr("Performing 1200-bps touch reset on serial port %s", portAddress))))
 				}
 			},
 			WaitingForNewSerial: func() {
@@ -408,17 +408,17 @@ func runProgramAction(pme *packagemanager.Explorer,
 					outStream.Write([]byte(fmt.Sprintln(tr("Waiting for upload port..."))))
 				}
 			},
-			BootloaderPortFound: func(port string) {
-				if port != "" {
-					logrus.WithField("phase", "board reset").Infof("Upload port found on %s", port)
+			BootloaderPortFound: func(portAddress string) {
+				if portAddress != "" {
+					logrus.WithField("phase", "board reset").Infof("Upload port found on %s", portAddress)
 				} else {
-					logrus.WithField("phase", "board reset").Infof("No upload port found, using %s as fallback", actualPort)
+					logrus.WithField("phase", "board reset").Infof("No upload port found, using %s as fallback", actualPort.Address)
 				}
 				if verbose {
-					if port != "" {
-						outStream.Write([]byte(fmt.Sprintln(tr("Upload port found on %s", port))))
+					if portAddress != "" {
+						outStream.Write([]byte(fmt.Sprintln(tr("Upload port found on %s", portAddress))))
 					} else {
-						outStream.Write([]byte(fmt.Sprintln(tr("No upload port found, using %s as fallback", actualPort))))
+						outStream.Write([]byte(fmt.Sprintln(tr("No upload port found, using %s as fallback", actualPort.Address))))
 					}
 				}
 			},
@@ -427,11 +427,11 @@ func runProgramAction(pme *packagemanager.Explorer,
 			},
 		}
 
-		if newPort, err := serialutils.Reset(portToTouch, wait, cb, dryRun); err != nil {
+		if newPortAddress, err := serialutils.Reset(portToTouch, wait, cb, dryRun); err != nil {
 			outStream.Write([]byte(fmt.Sprintln(tr("Cannot perform port reset: %s", err))))
 		} else {
-			if newPort != "" {
-				actualPort.Address = newPort
+			if newPortAddress != "" {
+				actualPort.Address = newPortAddress
 			}
 		}
 	}
