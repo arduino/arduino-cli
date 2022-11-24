@@ -25,32 +25,6 @@ from .common import running_on_ci, parse_json_traces
 pytestmark = pytest.mark.skipif(running_on_ci(), reason="VMs have no serial ports")
 
 
-def test_upload(run_command, data_dir, detected_boards):
-    # Init the environment explicitly
-    run_command(["core", "update-index"])
-
-    for board in detected_boards:
-        # Download platform
-        run_command(["core", "install", board.core])
-        # Create a sketch
-        sketch_name = f"TestUploadSketch{board.id}"
-        sketch_path = Path(data_dir, sketch_name)
-        fqbn = board.fqbn
-        address = board.address
-        assert run_command(["sketch", "new", sketch_path])
-        # Build sketch
-        assert run_command(["compile", "-b", fqbn, sketch_path])
-
-        # Verifies binaries are not exported
-        assert not (sketch_path / "build").exists()
-
-        # Upload without port must fail
-        assert not run_command(["upload", "-b", fqbn, sketch_path])
-
-        # Upload
-        assert run_command(["upload", "-b", fqbn, "-p", address, sketch_path])
-
-
 def test_upload_with_input_dir_flag(run_command, data_dir, detected_boards):
     # Init the environment explicitly
     run_command(["core", "update-index"])
