@@ -250,3 +250,50 @@ func TestCompileAndUploadCombo(t *testing.T) {
 		runTest(sketchMainFile.String())
 	}
 }
+
+func TestCompileAndUploadComboWithCustomBuildPath(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("VMs have no serial ports")
+	}
+
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Create a test sketch
+	sketchName := "CompileAndUploadCustomBuildPathIntegrationTest"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Build sketch for each detected board
+	for _, board := range detectedBoards(t, cli) {
+		fqbnNormalized := strings.ReplaceAll(board.fqbn, ":", "-")
+		logFileName := fqbnNormalized + "-compile.log"
+		logFilePath := cli.SketchbookDir().Join(logFileName)
+
+		_, _, err = cli.Run("core", "install", board.core)
+		require.NoError(t, err)
+
+		waitForBoard(t, cli)
+
+		buildPath := cli.SketchbookDir().Join("test_dir", fqbnNormalized, "build_dir")
+		_, _, err := cli.Run("compile", "-b", board.fqbn, "--upload", "-p", board.address, "--build-path", buildPath.String(),
+			sketchPath.String(), "--log-format", "json", "--log-file", logFilePath.String(), "--log-level", "trace")
+		require.NoError(t, err)
+		logJson, err := logFilePath.ReadFile()
+		require.NoError(t, err)
+
+		// check from the logs if the bin file were uploaded on the current board
+		logJson = []byte("[" + strings.ReplaceAll(strings.TrimSuffix(string(logJson), "\n"), "\n", ",") + "]")
+		traces := requirejson.Parse(t, logJson).Query("[ .[] | select(.level==\"trace\") | .msg ]").String()
+		traces = strings.ReplaceAll(traces, "\\\\", "\\")
+		require.Contains(t, traces, "Compile "+sketchPath.String()+" for "+board.fqbn+" started")
+		require.Contains(t, traces, "Compile "+sketchName+" for "+board.fqbn+" successful")
+		require.Contains(t, traces, "Upload "+sketchPath.String()+" on "+board.fqbn+" started")
+		require.Contains(t, traces, "Upload successful")
+	}
+}

@@ -42,53 +42,6 @@ def test_upload_after_attach(run_command, data_dir, detected_boards):
         assert run_command(["upload", sketch_path])
 
 
-def test_compile_and_upload_combo_with_custom_build_path(run_command, data_dir, detected_boards, wait_for_board):
-    # Init the environment explicitly
-    run_command(["core", "update-index"])
-
-    # Install required core(s)
-    run_command(["core", "install", "arduino:avr@1.8.3"])
-    run_command(["core", "install", "arduino:samd@1.8.6"])
-
-    sketch_name = "CompileAndUploadCustomBuildPathIntegrationTest"
-    sketch_path = Path(data_dir, sketch_name)
-    assert run_command(["sketch", "new", sketch_path])
-
-    for board in detected_boards:
-        fqbn_normalized = board.fqbn.replace(":", "-")
-        log_file_name = f"{fqbn_normalized}-compile.log"
-        log_file = Path(data_dir, log_file_name)
-        command_log_flags = ["--log-format", "json", "--log-file", log_file, "--log-level", "trace"]
-
-        wait_for_board()
-
-        build_path = Path(data_dir, "test_dir", fqbn_normalized, "build_dir")
-        result = run_command(
-            [
-                "compile",
-                "-b",
-                board.fqbn,
-                "--upload",
-                "-p",
-                board.address,
-                "--build-path",
-                build_path,
-                sketch_path,
-            ]
-            + command_log_flags
-        )
-        print(result.stderr)
-        assert result.ok
-
-        # check from the logs if the bin file were uploaded on the current board
-        log_json = open(log_file, "r")
-        traces = parse_json_traces(log_json.readlines())
-        assert f"Compile {sketch_path} for {board.fqbn} started" in traces
-        assert f"Compile {sketch_name} for {board.fqbn} successful" in traces
-        assert f"Upload {sketch_path} on {board.fqbn} started" in traces
-        assert "Upload successful" in traces
-
-
 def test_compile_and_upload_combo_sketch_with_pde_extension(run_command, data_dir, detected_boards, wait_for_board):
     assert run_command(["update"])
 
