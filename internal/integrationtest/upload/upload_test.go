@@ -554,3 +554,29 @@ func TestUploadToPortWithBoardAutodetect(t *testing.T) {
 		require.NoError(t, err)
 	}
 }
+
+func TestCompileAndUploadToPortWithBoardAutodetect(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("VMs have no serial ports")
+	}
+
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Create a sketch
+	sketchPath := cli.SketchbookDir().Join("SketchSimple")
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	for _, board := range detectedBoards(t, cli) {
+		// Install core
+		_, _, err = cli.Run("core", "install", board.core)
+		require.NoError(t, err)
+
+		_, _, err = cli.Run("compile", "-u", "-p", board.address, sketchPath.String())
+		require.NoError(t, err)
+	}
+}
