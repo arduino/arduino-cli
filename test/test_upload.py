@@ -42,28 +42,6 @@ def test_upload_after_attach(run_command, data_dir, detected_boards):
         assert run_command(["upload", sketch_path])
 
 
-def test_compile_and_upload_combo_sketch_with_mismatched_casing(run_command, data_dir, detected_boards, wait_for_board):
-    assert run_command(["update"])
-
-    # Create a sketch
-    sketch_name = "CompileUploadComboMismatchCasing"
-    sketch_path = Path(data_dir, sketch_name)
-    assert run_command(["sketch", "new", sketch_path])
-
-    # Rename main .ino file so casing is different from sketch name
-    Path(sketch_path, f"{sketch_name}.ino").rename(sketch_path / f"{sketch_name.lower()}.ino")
-
-    for board in detected_boards:
-        # Install core
-        core = ":".join(board.fqbn.split(":")[:2])
-        assert run_command(["core", "install", core])
-
-        # Try to compile
-        res = run_command(["compile", "--clean", "-b", board.fqbn, "-u", "-p", board.address, sketch_path])
-        assert res.failed
-        assert "Error opening sketch:" in res.stderr
-
-
 def test_upload_sketch_with_mismatched_casing(run_command, data_dir, detected_boards, wait_for_board):
     assert run_command(["update"])
 

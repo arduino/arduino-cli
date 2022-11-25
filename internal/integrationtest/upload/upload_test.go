@@ -460,3 +460,35 @@ func TestUploadWithInputDirContainingMultipleBinaries(t *testing.T) {
 		require.NoError(t, err)
 	}
 }
+
+func TestCompileAndUploadComboSketchWithMismatchedCasing(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("VMs have no serial ports")
+	}
+
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Create a sketch
+	sketchName := "CompileUploadComboMismatchCasing"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Rename main .ino file so casing is different from sketch name
+	require.NoError(t, sketchPath.Join(sketchName+".ino").Rename(sketchPath.Join(strings.ToLower(sketchName)+".ino")))
+
+	for _, board := range detectedBoards(t, cli) {
+		// Install core
+		_, _, err = cli.Run("core", "install", board.core)
+		require.NoError(t, err)
+
+		// Try to compile
+		_, stderr, err := cli.Run("compile", "--clean", "-b", board.fqbn, "-u", "-p", board.address, sketchPath.String())
+		require.Error(t, err)
+		require.Contains(t, string(stderr), "Error opening sketch:")
+	}
+}
