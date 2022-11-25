@@ -42,29 +42,6 @@ def test_upload_after_attach(run_command, data_dir, detected_boards):
         assert run_command(["upload", sketch_path])
 
 
-def test_upload_sketch_with_mismatched_casing(run_command, data_dir, detected_boards, wait_for_board):
-    assert run_command(["update"])
-
-    # Create a sketch
-    sketch_name = "UploadMismatchCasing"
-    sketch_path = Path(data_dir, sketch_name)
-    assert run_command(["sketch", "new", sketch_path])
-
-    # Rename main .ino file so casing is different from sketch name
-    Path(sketch_path, f"{sketch_name}.ino").rename(sketch_path / f"{sketch_name.lower()}.ino")
-
-    for board in detected_boards:
-        # Install core
-        core = ":".join(board.fqbn.split(":")[:2])
-        assert run_command(["core", "install", core])
-
-        # Tries to upload given sketch, it has not been compiled but it fails even before
-        # searching for binaries since the sketch is not valid
-        res = run_command(["upload", "-b", board.fqbn, "-p", board.address, sketch_path])
-        assert res.failed
-        assert "Error during Upload:" in res.stderr
-
-
 def test_upload_to_port_with_board_autodetect(run_command, data_dir, detected_boards):
     assert run_command(["update"])
 
