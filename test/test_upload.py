@@ -42,55 +42,6 @@ def test_upload_after_attach(run_command, data_dir, detected_boards):
         assert run_command(["upload", sketch_path])
 
 
-def test_upload_sketch_with_pde_extension(run_command, data_dir, detected_boards, wait_for_board):
-    assert run_command(["update"])
-
-    sketch_name = "UploadPdeSketch"
-    sketch_path = Path(data_dir, sketch_name)
-
-    # Create a test sketch
-    assert run_command(["sketch", "new", sketch_path])
-
-    # Renames sketch file to pde
-    sketch_file = Path(sketch_path, f"{sketch_name}.ino").rename(sketch_path / f"{sketch_name}.pde")
-
-    for board in detected_boards:
-        # Install core
-        core = ":".join(board.fqbn.split(":")[:2])
-        assert run_command(["core", "install", core])
-
-        # Compile sketch first
-        res = run_command(["compile", "--clean", "-b", board.fqbn, sketch_path, "--format", "json"])
-        assert res.ok
-        data = json.loads(res.stdout)
-        build_dir = Path(data["builder_result"]["build_path"])
-
-        # Upload from sketch folder
-        wait_for_board()
-        assert run_command(["upload", "-b", board.fqbn, "-p", board.address, sketch_path])
-
-        # Upload from sketch file
-        wait_for_board()
-        assert run_command(["upload", "-b", board.fqbn, "-p", board.address, sketch_file])
-
-        wait_for_board()
-        res = run_command(["upload", "-b", board.fqbn, "-p", board.address, "--input-dir", build_dir])
-        assert (
-            "Sketches with .pde extension are deprecated, please rename the following files to .ino:" not in res.stderr
-        )
-
-        # Upload from binary file
-        wait_for_board()
-        # We don't need a specific file when using the --input-file flag to upload since
-        # it's just used to calculate the directory, so it's enough to get a random file
-        # that's inside that directory
-        binary_file = next(build_dir.glob(f"{sketch_name}.pde.*"))
-        res = run_command(["upload", "-b", board.fqbn, "-p", board.address, "--input-file", binary_file])
-        assert (
-            "Sketches with .pde extension are deprecated, please rename the following files to .ino:" not in res.stderr
-        )
-
-
 def test_upload_with_input_dir_containing_multiple_binaries(run_command, data_dir, detected_boards, wait_for_board):
     # This tests verifies the behaviour outlined in this issue:
     # https://github.com/arduino/arduino-cli/issues/765#issuecomment-699678646

@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/testifyjson/requirejson"
 )
@@ -338,5 +339,65 @@ func TestCompileAndUploadComboSketchWithPdeExtension(t *testing.T) {
 		require.NoError(t, err)
 		require.Contains(t, string(stderr), "Sketches with .pde extension are deprecated, please rename the following files to .ino")
 		require.Contains(t, string(stderr), sketchFile.String())
+	}
+}
+
+func TestUploadSketchWithPdeExtension(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("VMs have no serial ports")
+	}
+
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	sketchName := "UploadPdeSketch"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+
+	// Create a test sketch
+	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Renames sketch file to pde
+	sketchFile := sketchPath.Join(sketchName + ".pde")
+	require.NoError(t, sketchPath.Join(sketchName+".ino").Rename(sketchFile))
+
+	for _, board := range detectedBoards(t, cli) {
+		// Install core
+		_, _, err = cli.Run("core", "install", board.core)
+		require.NoError(t, err)
+
+		// Compile sketch first
+		stdout, _, err := cli.Run("compile", "--clean", "-b", board.fqbn, sketchPath.String(), "--format", "json")
+		require.NoError(t, err)
+		buildDir := requirejson.Parse(t, stdout).Query(".builder_result | .build_path").String()
+		buildDir = strings.Trim(strings.ReplaceAll(buildDir, "\\\\", "\\"), "\"")
+
+		// Upload from sketch folder
+		waitForBoard(t, cli)
+		_, _, err = cli.Run("upload", "-b", board.fqbn, "-p", board.address, sketchPath.String())
+		require.NoError(t, err)
+
+		// Upload from sketch file
+		waitForBoard(t, cli)
+		_, _, err = cli.Run("upload", "-b", board.fqbn, "-p", board.address, sketchFile.String())
+		require.NoError(t, err)
+
+		waitForBoard(t, cli)
+		_, stderr, err := cli.Run("upload", "-b", board.fqbn, "-p", board.address, "--input-dir", buildDir)
+		require.NoError(t, err)
+		require.Contains(t, string(stderr), "Sketches with .pde extension are deprecated, please rename the following files to .ino:")
+
+		// Upload from binary file
+		waitForBoard(t, cli)
+		// We don't need a specific file when using the --input-file flag to upload since
+		// it's just used to calculate the directory, so it's enough to get a random file
+		// that's inside that directory
+		binaryFile := paths.New(buildDir, sketchName+".pde.bin")
+		_, stderr, err = cli.Run("upload", "-b", board.fqbn, "-p", board.address, "--input-file", binaryFile.String())
+		require.NoError(t, err)
+		require.Contains(t, string(stderr), "Sketches with .pde extension are deprecated, please rename the following files to .ino:")
 	}
 }
