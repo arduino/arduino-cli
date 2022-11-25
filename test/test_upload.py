@@ -42,65 +42,6 @@ def test_upload_after_attach(run_command, data_dir, detected_boards):
         assert run_command(["upload", sketch_path])
 
 
-def test_upload_with_input_dir_containing_multiple_binaries(run_command, data_dir, detected_boards, wait_for_board):
-    # This tests verifies the behaviour outlined in this issue:
-    # https://github.com/arduino/arduino-cli/issues/765#issuecomment-699678646
-    assert run_command(["update"])
-
-    # Create a two different sketches
-    sketch_one_name = "UploadMultipleBinariesSketchOne"
-    sketch_one_path = Path(data_dir, sketch_one_name)
-    assert run_command(["sketch", "new", sketch_one_path])
-
-    sketch_two_name = "UploadMultipleBinariesSketchTwo"
-    sketch_two_path = Path(data_dir, sketch_two_name)
-    assert run_command(["sketch", "new", sketch_two_path])
-
-    for board in detected_boards:
-        # Install core
-        core = ":".join(board.fqbn.split(":")[:2])
-        assert run_command(["core", "install", core])
-
-        # Compile both sketches and copy binaries in the same directory same build directory
-        res = run_command(["compile", "--clean", "-b", board.fqbn, sketch_one_path, "--format", "json"])
-        assert res.ok
-        data = json.loads(res.stdout)
-        build_dir_one = Path(data["builder_result"]["build_path"])
-        res = run_command(["compile", "--clean", "-b", board.fqbn, sketch_two_path, "--format", "json"])
-        assert res.ok
-        data = json.loads(res.stdout)
-        build_dir_two = Path(data["builder_result"]["build_path"])
-
-        # Copy binaries to same folder
-        binaries_dir = Path(data_dir, "build", "BuiltBinaries")
-        shutil.copytree(build_dir_one, binaries_dir, dirs_exist_ok=True)
-        shutil.copytree(build_dir_two, binaries_dir, dirs_exist_ok=True)
-
-        wait_for_board()
-        # Verifies upload fails because multiple binaries are found
-        res = run_command(["upload", "-b", board.fqbn, "-p", board.address, "--input-dir", binaries_dir])
-        assert res.failed
-        assert (
-            "Error during Upload: "
-            + "Error finding build artifacts: "
-            + "autodetect build artifact: "
-            + "multiple build artifacts found:"
-            in res.stderr
-        )
-
-        # Copy binaries to folder with same name of a sketch
-        binaries_dir = Path(data_dir, "build", "UploadMultipleBinariesSketchOne")
-        shutil.copytree(build_dir_one, binaries_dir, dirs_exist_ok=True)
-        shutil.copytree(build_dir_two, binaries_dir, dirs_exist_ok=True)
-
-        wait_for_board()
-        # Verifies upload is successful using the binaries with the same name of the containing folder
-        res = run_command(["upload", "-b", board.fqbn, "-p", board.address, "--input-dir", binaries_dir])
-        assert (
-            "Sketches with .pde extension are deprecated, please rename the following files to .ino:" not in res.stderr
-        )
-
-
 def test_compile_and_upload_combo_sketch_with_mismatched_casing(run_command, data_dir, detected_boards, wait_for_board):
     assert run_command(["update"])
 

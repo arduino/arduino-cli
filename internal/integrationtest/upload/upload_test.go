@@ -401,3 +401,62 @@ func TestUploadSketchWithPdeExtension(t *testing.T) {
 		require.Contains(t, string(stderr), "Sketches with .pde extension are deprecated, please rename the following files to .ino:")
 	}
 }
+
+func TestUploadWithInputDirContainingMultipleBinaries(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("VMs have no serial ports")
+	}
+
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// This tests verifies the behaviour outlined in this issue:
+	// https://github.com/arduino/arduino-cli/issues/765#issuecomment-699678646
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Create two different sketches
+	sketchOneName := "UploadMultipleBinariesSketchOne"
+	sketchOnePath := cli.SketchbookDir().Join(sketchOneName)
+	_, _, err = cli.Run("sketch", "new", sketchOnePath.String())
+	require.NoError(t, err)
+
+	sketchTwoName := "UploadMultipleBinariesSketchTwo"
+	sketchTwoPath := cli.SketchbookDir().Join(sketchTwoName)
+	_, _, err = cli.Run("sketch", "new", sketchTwoPath.String())
+	require.NoError(t, err)
+
+	for _, board := range detectedBoards(t, cli) {
+		// Install core
+		_, _, err = cli.Run("core", "install", board.core)
+		require.NoError(t, err)
+
+		// Compile both sketches and copy binaries in the same build directory
+		binariesDir := cli.SketchbookDir().Join("build", "BuiltBinaries")
+		_, _, err = cli.Run("compile", "--clean", "-b", board.fqbn, sketchOnePath.String(), "--build-path", binariesDir.String())
+		require.NoError(t, err)
+		stdout, _, err := cli.Run("compile", "--clean", "-b", board.fqbn, sketchTwoPath.String(), "--format", "json")
+		require.NoError(t, err)
+		buildDirTwo := requirejson.Parse(t, stdout).Query(".builder_result | .build_path").String()
+		buildDirTwo = strings.Trim(strings.ReplaceAll(buildDirTwo, "\\\\", "\\"), "\"")
+		require.NoError(t, paths.New(buildDirTwo).Join(sketchTwoName+".ino.bin").CopyTo(binariesDir.Join(sketchTwoName+".ino.bin")))
+
+		waitForBoard(t, cli)
+		// Verifies upload fails because multiple binaries are found
+		_, stderr, err := cli.Run("upload", "-b", board.fqbn, "-p", board.address, "--input-dir", binariesDir.String())
+		require.Error(t, err)
+		require.Contains(t, string(stderr), "Error during Upload: ")
+		require.Contains(t, string(stderr), "Error finding build artifacts: ")
+		require.Contains(t, string(stderr), "autodetect build artifact: ")
+		require.Contains(t, string(stderr), "multiple build artifacts found:")
+
+		// Copy binaries to folder with same name of a sketch
+		binariesDirSketch := cli.SketchbookDir().Join("build", "UploadMultipleBinariesSketchOne")
+		require.NoError(t, binariesDir.CopyDirTo(binariesDirSketch))
+
+		waitForBoard(t, cli)
+		// Verifies upload is successful using the binaries with the same name of the containing folder
+		_, _, err = cli.Run("upload", "-b", board.fqbn, "-p", board.address, "--input-dir", binariesDirSketch.String())
+		require.NoError(t, err)
+	}
+}
