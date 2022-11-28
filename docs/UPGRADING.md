@@ -32,7 +32,7 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath *paths.Path, overwrite bool) error { ... }
 ```
 
-`InstallPrerequisiteCheck` now requires an explicit `name` and `version` instead of a `librariesindex.Release`, becuase
+`InstallPrerequisiteCheck` now requires an explicit `name` and `version` instead of a `librariesindex.Release`, because
 it can now be used to check any library, not only the libraries available in the index. Also the return value has
 changed to a `LibraryInstallPlan` structure, it contains the same information as before (`TargetPath` and `ReplacedLib`)
 plus `Name`, `Version`, and an `UpToDate` boolean flag.
