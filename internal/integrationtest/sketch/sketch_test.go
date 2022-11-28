@@ -362,3 +362,24 @@ func TestSketchArchiveCaseMismatchFails(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "Error archiving: Can't open sketch:")
 }
+
+func TestSketchNewDotArgOverwrite(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	sketchNew := "SketchNewDotArgOverwrite"
+	sketchPath := cli.SketchbookDir().Join(sketchNew)
+	require.NoError(t, sketchPath.MkdirAll())
+
+	cli.SetWorkingDir(sketchPath)
+	require.NoFileExists(t, sketchPath.Join(sketchNew+".ino").String())
+	// Create a new sketch
+	_, _, err := cli.Run("sketch", "new", ".")
+	require.NoError(t, err)
+
+	require.FileExists(t, sketchPath.Join(sketchNew+".ino").String())
+	// Tries to overwrite the existing sketch with a new one, but it should fail
+	_, stderr, err := cli.Run("sketch", "new", ".")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), ".ino file already exists")
+}
