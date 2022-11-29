@@ -29,49 +29,49 @@ import (
 	"github.com/arduino/arduino-cli/arduino/utils"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/codeclysm/extract/v3"
-	"github.com/sirupsen/logrus"
+	semver "go.bug.st/relaxed-semver"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
-type alreadyInstalledError struct{}
+// LibraryInstallPlan contains the main information required to perform a library
+// install, like the path where the library should be installed and the library
+// that is going to be replaced by the new one.
+// This is the result of a call to InstallPrerequisiteCheck.
+type LibraryInstallPlan struct {
+	// Name of the library to install
+	Name string
 
-func (e *alreadyInstalledError) Error() string {
-	return tr("library already installed")
+	// Version of the library to install
+	Version *semver.Version
+
+	// TargetPath is the path where the library should be installed.
+	TargetPath *paths.Path
+
+	// ReplacedLib is the library that is going to be replaced by the new one.
+	ReplacedLib *libraries.Library
+
+	// UpToDate is true if the library to install has the same version of the library we are going to replace.
+	UpToDate bool
 }
-
-var (
-	// ErrAlreadyInstalled is returned when a library is already installed and task
-	// cannot proceed.
-	ErrAlreadyInstalled = &alreadyInstalledError{}
-)
 
 // InstallPrerequisiteCheck performs prequisite checks to install a library. It returns the
 // install path, where the library should be installed and the possible library that is already
 // installed on the same folder and it's going to be replaced by the new one.
-func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesindex.Release, installLocation libraries.LibraryLocation) (*paths.Path, *libraries.Library, error) {
-	installDir := lm.getLibrariesDir(installLocation)
-	if installDir == nil {
-		if installLocation == libraries.User {
-			return nil, nil, fmt.Errorf(tr("User directory not set"))
-		}
-		return nil, nil, fmt.Errorf(tr("Builtin libraries directory not set"))
+func (lm *LibrariesManager) InstallPrerequisiteCheck(name string, version *semver.Version, installLocation libraries.LibraryLocation) (*LibraryInstallPlan, error) {
+	installDir, err := lm.getLibrariesDir(installLocation)
+	if err != nil {
+		return nil, err
 	}
 
-	name := indexLibrary.Library.Name
 	libs := lm.FindByReference(&librariesindex.Reference{Name: name}, installLocation)
-	for _, lib := range libs {
-		if lib.Version != nil && lib.Version.Equal(indexLibrary.Version) {
-			return lib.InstallDir, nil, ErrAlreadyInstalled
-		}
-	}
 
 	if len(libs) > 1 {
 		libsDir := paths.NewPathList()
 		for _, lib := range libs {
 			libsDir.Add(lib.InstallDir)
 		}
-		return nil, nil, &arduino.MultipleLibraryInstallDetected{
+		return nil, &arduino.MultipleLibraryInstallDetected{
 			LibName: name,
 			LibsDir: libsDir,
 			Message: tr("Automatic library install can't be performed in this case, please manually remove all duplicates and retry."),
@@ -79,22 +79,71 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(indexLibrary *librariesinde
 	}
 
 	var replaced *libraries.Library
+	var upToDate bool
 	if len(libs) == 1 {
-		replaced = libs[0]
+		lib := libs[0]
+		replaced = lib
+		upToDate = lib.Version != nil && lib.Version.Equal(version)
 	}
 
-	libPath := installDir.Join(utils.SanitizeName(indexLibrary.Library.Name))
-	if replaced != nil && replaced.InstallDir.EquivalentTo(libPath) {
-		return libPath, replaced, nil
-	} else if libPath.IsDir() {
-		return nil, nil, fmt.Errorf(tr("destination dir %s already exists, cannot install"), libPath)
+	libPath := installDir.Join(utils.SanitizeName(name))
+	if libPath.IsDir() {
+		if replaced == nil || !replaced.InstallDir.EquivalentTo(libPath) {
+			return nil, fmt.Errorf(tr("destination dir %s already exists, cannot install"), libPath)
+		}
 	}
-	return libPath, replaced, nil
+
+	return &LibraryInstallPlan{
+		Name:        name,
+		Version:     version,
+		TargetPath:  libPath,
+		ReplacedLib: replaced,
+		UpToDate:    upToDate,
+	}, nil
 }
 
 // Install installs a library on the specified path.
-func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, libPath *paths.Path) error {
-	return indexLibrary.Resource.Install(lm.DownloadsDir, libPath.Parent(), libPath)
+func (lm *LibrariesManager) Install(indexLibrary *librariesindex.Release, installPath *paths.Path) error {
+	return indexLibrary.Resource.Install(lm.DownloadsDir, installPath.Parent(), installPath)
+}
+
+// importLibraryFromDirectory installs a library by copying it from the given directory.
+func (lm *LibrariesManager) importLibraryFromDirectory(libPath *paths.Path, overwrite bool) error {
+	// Check if the library is valid and load metatada
+	if err := validateLibrary(libPath); err != nil {
+		return err
+	}
+	library, err := libraries.Load(libPath, libraries.User)
+	if err != nil {
+		return err
+	}
+
+	// Check if the library is already installed and determine install path
+	installPlan, err := lm.InstallPrerequisiteCheck(library.Name, library.Version, libraries.User)
+	if err != nil {
+		return err
+	}
+
+	if installPlan.UpToDate {
+		if !overwrite {
+			return fmt.Errorf(tr("library %s already installed"), installPlan.Name)
+		}
+	}
+	if installPlan.ReplacedLib != nil {
+		if !overwrite {
+			return fmt.Errorf(tr("Library %[1]s is already installed, but with a different version: %[2]s", installPlan.Name, installPlan.ReplacedLib))
+		}
+		if err := lm.Uninstall(installPlan.ReplacedLib); err != nil {
+			return err
+		}
+	}
+	if installPlan.TargetPath.Exist() {
+		return fmt.Errorf("%s: %s", tr("destination directory already exists"), installPlan.TargetPath)
+	}
+	if err := libPath.CopyDirTo(installPlan.TargetPath); err != nil {
+		return fmt.Errorf("%s: %w", tr("copying library to destination directory:"), err)
+	}
+	return nil
 }
 
 // Uninstall removes a Library
@@ -103,7 +152,7 @@ func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
 		return fmt.Errorf(tr("install directory not set"))
 	}
 	if err := lib.InstallDir.RemoveAll(); err != nil {
-		return fmt.Errorf(tr("removing lib directory: %s"), err)
+		return fmt.Errorf(tr("removing library directory: %s"), err)
 	}
 
 	alternatives := lm.Libraries[lib.Name]
@@ -113,20 +162,15 @@ func (lm *LibrariesManager) Uninstall(lib *libraries.Library) error {
 }
 
 // InstallZipLib installs a Zip library on the specified path.
-func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath string, overwrite bool) error {
-	libsDir := lm.getLibrariesDir(libraries.User)
-	if libsDir == nil {
-		return fmt.Errorf(tr("User directory not set"))
-	}
-
-	tmpDir, err := paths.MkTempDir(paths.TempDir().String(), "arduino-cli-lib-")
+func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath *paths.Path, overwrite bool) error {
+	// Clone library in a temporary directory
+	tmpDir, err := paths.MkTempDir("", "")
 	if err != nil {
 		return err
 	}
-	// Deletes temp dir used to extract archive when finished
 	defer tmpDir.RemoveAll()
 
-	file, err := os.Open(archivePath)
+	file, err := archivePath.Open()
 	if err != nil {
 		return err
 	}
@@ -138,58 +182,21 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 		return fmt.Errorf(tr("extracting archive: %w"), err)
 	}
 
-	paths, err := tmpDir.ReadDir()
+	libRootFiles, err := tmpDir.ReadDir()
 	if err != nil {
 		return err
 	}
-
-	// Ignores metadata from Mac OS X
-	paths.FilterOutPrefix("__MACOSX")
-
-	if len(paths) > 1 {
+	libRootFiles.FilterOutPrefix("__MACOSX") // Ignores metadata from Mac OS X
+	if len(libRootFiles) > 1 {
 		return fmt.Errorf(tr("archive is not valid: multiple files found in zip file top level"))
 	}
-
-	extractionPath := paths[0]
-	libraryName := extractionPath.Base()
-
-	if err := validateLibrary(extractionPath); err != nil {
-		return err
+	if len(libRootFiles) == 0 {
+		return fmt.Errorf(tr("archive is not valid: no files found in zip file top level"))
 	}
+	tmpInstallPath := libRootFiles[0]
 
-	installPath := libsDir.Join(libraryName)
-
-	if err := libsDir.MkdirAll(); err != nil {
-		return err
-	}
-	defer func() {
-		// Clean up install dir if installation failed
-		files, err := installPath.ReadDir()
-		if err == nil && len(files) == 0 {
-			installPath.RemoveAll()
-		}
-	}()
-
-	// Delete library folder if already installed
-	if installPath.IsDir() {
-		if !overwrite {
-			return fmt.Errorf(tr("library %s already installed"), libraryName)
-		}
-		logrus.
-			WithField("library name", libraryName).
-			WithField("install path", installPath).
-			Trace("Deleting library")
-		installPath.RemoveAll()
-	}
-
-	logrus.
-		WithField("library name", libraryName).
-		WithField("install path", installPath).
-		WithField("zip file", archivePath).
-		Trace("Installing library")
-
-	// Copy extracted library in the destination directory
-	if err := extractionPath.CopyDirTo(installPath); err != nil {
+	// Install extracted library in the destination directory
+	if err := lm.importLibraryFromDirectory(tmpInstallPath, overwrite); err != nil {
 		return fmt.Errorf(tr("moving extracted archive to destination dir: %s"), err)
 	}
 
@@ -198,84 +205,50 @@ func (lm *LibrariesManager) InstallZipLib(ctx context.Context, archivePath strin
 
 // InstallGitLib installs a library hosted on a git repository on the specified path.
 func (lm *LibrariesManager) InstallGitLib(gitURL string, overwrite bool) error {
-	installDir := lm.getLibrariesDir(libraries.User)
-	if installDir == nil {
-		return fmt.Errorf(tr("User directory not set"))
-	}
-
-	libraryName, ref, err := parseGitURL(gitURL)
+	gitLibraryName, ref, err := parseGitURL(gitURL)
 	if err != nil {
-		logrus.
-			WithError(err).
-			Warn("Parsing git URL")
 		return err
 	}
 
-	// Deletes libraries folder if already installed
-	installPath := installDir.Join(libraryName)
-	if installPath.IsDir() {
-		if !overwrite {
-			return fmt.Errorf(tr("library %s already installed"), libraryName)
-		}
-		logrus.
-			WithField("library name", libraryName).
-			WithField("install path", installPath).
-			Trace("Deleting library")
-		installPath.RemoveAll()
+	// Clone library in a temporary directory
+	tmp, err := paths.MkTempDir("", "")
+	if err != nil {
+		return err
 	}
-	if installPath.Exist() {
-		return fmt.Errorf(tr("could not create directory %s: a file with the same name exists!", installPath))
-	}
-
-	logrus.
-		WithField("library name", libraryName).
-		WithField("install path", installPath).
-		WithField("git url", gitURL).
-		Trace("Installing library")
+	defer tmp.RemoveAll()
+	tmpInstallPath := tmp.Join(gitLibraryName)
 
 	depth := 1
 	if ref != "" {
 		depth = 0
 	}
-	repo, err := git.PlainClone(installPath.String(), false, &git.CloneOptions{
+	repo, err := git.PlainClone(tmpInstallPath.String(), false, &git.CloneOptions{
 		URL:      gitURL,
 		Depth:    depth,
 		Progress: os.Stdout,
 	})
 	if err != nil {
-		logrus.
-			WithError(err).
-			Warn("Cloning git repository")
 		return err
 	}
 
 	if ref != "" {
 		if h, err := repo.ResolveRevision(ref); err != nil {
-			logrus.
-				WithError(err).
-				Warnf("Resolving revision %s", ref)
 			return err
 		} else if w, err := repo.Worktree(); err != nil {
-			logrus.
-				WithError(err).
-				Warn("Finding worktree")
 			return err
 		} else if err := w.Checkout(&git.CheckoutOptions{Hash: plumbing.NewHash(h.String())}); err != nil {
-			logrus.
-				WithError(err).
-				Warnf("Checking out %s", h)
 			return err
 		}
 	}
 
-	if err := validateLibrary(installPath); err != nil {
-		// Clean up installation directory since this is not a valid library
-		installPath.RemoveAll()
-		return err
+	// We don't want the installed library to be a git repository thus we delete this folder
+	tmpInstallPath.Join(".git").RemoveAll()
+
+	// Install extracted library in the destination directory
+	if err := lm.importLibraryFromDirectory(tmpInstallPath, overwrite); err != nil {
+		return fmt.Errorf(tr("moving extracted archive to destination dir: %s"), err)
 	}
 
-	// We don't want the installed library to be a git repository thus we delete this folder
-	installPath.Join(".git").RemoveAll()
 	return nil
 }
 

@@ -17,10 +17,13 @@ package lib_test
 
 import (
 	"encoding/json"
+	"io"
+	"net/http"
 	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/testifyjson/requirejson"
 )
@@ -143,6 +146,63 @@ func TestDuplicateLibInstallDetection(t *testing.T) {
 	_, stdErr, err = cli.Run("lib", "uninstall", "ArduinoOTA")
 	require.Error(t, err)
 	require.Contains(t, string(stdErr), "The library ArduinoOTA has multiple installations")
+}
+
+func TestDuplicateLibInstallFromGitDetection(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+	cliEnv := cli.GetDefaultEnv()
+	cliEnv["ARDUINO_LIBRARY_ENABLE_UNSAFE_INSTALL"] = "true"
+
+	// Make a double install in the sketchbook/user directory
+	_, _, err := cli.Run("lib", "install", "Arduino SigFox for MKRFox1200")
+	require.NoError(t, err)
+
+	_, _, err = cli.RunWithCustomEnv(cliEnv, "lib", "install", "--git-url", "https://github.com/arduino-libraries/SigFox#1.0.3")
+	require.NoError(t, err)
+
+	jsonOut, _, err := cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	// Count how many libraries with the name "Arduino SigFox for MKRFox1200" are installed
+	requirejson.Parse(t, jsonOut).
+		Query(`[.[].library.name | select(. == "Arduino SigFox for MKRFox1200")]`).
+		LengthMustEqualTo(1, "Found multiple installations of Arduino SigFox for MKRFox1200'")
+
+	// Try to make a double install by upgrade
+	_, _, err = cli.Run("lib", "upgrade")
+	require.NoError(t, err)
+
+	// Check if double install happened
+	jsonOut, _, err = cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Parse(t, jsonOut).
+		Query(`[.[].library.name | select(. == "Arduino SigFox for MKRFox1200")]`).
+		LengthMustEqualTo(1, "Found multiple installations of Arduino SigFox for MKRFox1200'")
+
+	// Try to make a double install by zip-installing
+	tmp, err := paths.MkTempDir("", "")
+	require.NoError(t, err)
+	defer tmp.RemoveAll()
+	tmpZip := tmp.Join("SigFox.zip")
+	defer tmpZip.Remove()
+
+	f, err := tmpZip.Create()
+	require.NoError(t, err)
+	resp, err := http.Get("https://github.com/arduino-libraries/SigFox/archive/refs/tags/1.0.3.zip")
+	require.NoError(t, err)
+	_, err = io.Copy(f, resp.Body)
+	require.NoError(t, err)
+	require.NoError(t, f.Close())
+
+	_, _, err = cli.RunWithCustomEnv(cliEnv, "lib", "install", "--zip-path", tmpZip.String())
+	require.NoError(t, err)
+
+	// Check if double install happened
+	jsonOut, _, err = cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Parse(t, jsonOut).
+		Query(`[.[].library.name | select(. == "Arduino SigFox for MKRFox1200")]`).
+		LengthMustEqualTo(1, "Found multiple installations of Arduino SigFox for MKRFox1200'")
 }
 
 func TestLibDepsOutput(t *testing.T) {

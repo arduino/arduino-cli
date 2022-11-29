@@ -16,6 +16,7 @@
 package librariesmanager
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -140,13 +141,20 @@ func (lm *LibrariesManager) RescanLibraries() []*status.Status {
 	return statuses
 }
 
-func (lm *LibrariesManager) getLibrariesDir(installLocation libraries.LibraryLocation) *paths.Path {
+func (lm *LibrariesManager) getLibrariesDir(installLocation libraries.LibraryLocation) (*paths.Path, error) {
 	for _, dir := range lm.LibrariesDir {
 		if dir.Location == installLocation {
-			return dir.Path
+			return dir.Path, nil
 		}
 	}
-	return nil
+	switch installLocation {
+	case libraries.User:
+		return nil, errors.New(tr("user directory not set"))
+	case libraries.IDEBuiltIn:
+		return nil, errors.New(tr("built-in libraries directory not set"))
+	default:
+		return nil, fmt.Errorf("libraries directory not set: %s", installLocation.String())
+	}
 }
 
 // LoadLibrariesFromDir loads all libraries in the given directory. Returns
