@@ -66,8 +66,10 @@ func ArchiveSketch(ctx context.Context, req *rpc.ArchiveSketchRequest) (*rpc.Arc
 		archivePath = paths.New(archivePath.String() + ".zip")
 	}
 
-	if archivePath.Exist() {
-		return nil, &arduino.InvalidArgumentError{Message: tr("Archive already exists")}
+	if !req.Overwrite {
+		if archivePath.Exist() {
+			return nil, &arduino.InvalidArgumentError{Message: tr("Archive already exists")}
+		}
 	}
 
 	filesToZip, err := sketchPath.ReadDirRecursive()
