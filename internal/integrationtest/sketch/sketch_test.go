@@ -382,4 +382,9 @@ func TestSketchNewDotArgOverwrite(t *testing.T) {
 	_, stderr, err := cli.Run("sketch", "new", ".")
 	require.Error(t, err)
 	require.Contains(t, string(stderr), ".ino file already exists")
+
+	// Create a new sketch, overwriting the existing one
+	_, _, err = cli.Run("sketch", "new", ".", "--overwrite")
+	require.NoError(t, err)
+	require.FileExists(t, sketchPath.Join(sketchNew+".ino").String())
 }

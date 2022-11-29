@@ -1770,7 +1770,8 @@ type Library struct {
 	// Map of FQBNs that specifies if library is compatible with this library
 	CompatibleWith map[string]bool `protobuf:"bytes,28,rep,name=compatible_with,json=compatibleWith,proto3" json:"compatible_with,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`
 	// This value is set to true if the library is in development and should not
-	// be treated as read-only.
+	// be treated as read-only. This status is determined by the presence of a
+	// `.development` file in the library root directory.
 	InDevelopment bool `protobuf:"varint,29,opt,name=in_development,json=inDevelopment,proto3" json:"in_development,omitempty"`
 }
 

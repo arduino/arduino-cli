@@ -216,7 +216,6 @@ func (x *DebugConfigRequest) GetProgrammer() string {
 	return ""
 }
 
-//
 type DebugResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
