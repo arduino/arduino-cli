@@ -30,10 +30,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var includeBuildDir bool
-
 // initArchiveCommand creates a new `archive` command
 func initArchiveCommand() *cobra.Command {
+	var includeBuildDir bool
+
 	archiveCommand := &cobra.Command{
 		Use:   fmt.Sprintf("archive <%s> <%s>", tr("sketchPath"), tr("archivePath")),
 		Short: tr("Creates a zip file containing all sketch files."),
@@ -45,7 +45,7 @@ func initArchiveCommand() *cobra.Command {
 			"  " + os.Args[0] + " archive /home/user/Arduino/MySketch\n" +
 			"  " + os.Args[0] + " archive /home/user/Arduino/MySketch /home/user/MySketchArchive.zip",
 		Args: cobra.MaximumNArgs(2),
-		Run:  runArchiveCommand,
+		Run:  func(cmd *cobra.Command, args []string) { runArchiveCommand(args, includeBuildDir) },
 	}
 
 	archiveCommand.Flags().BoolVar(&includeBuildDir, "include-build-dir", false, tr("Includes %s directory in the archive.", "build"))
@@ -53,7 +53,7 @@ func initArchiveCommand() *cobra.Command {
 	return archiveCommand
 }
 
-func runArchiveCommand(cmd *cobra.Command, args []string) {
+func runArchiveCommand(args []string, includeBuildDir bool) {
 	logrus.Info("Executing `arduino-cli sketch archive`")
 
 	sketchPath := paths.New(".")
