@@ -17,6 +17,7 @@ package sketch
 
 import (
 	"context"
+	"errors"
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/globals"
@@ -47,6 +48,11 @@ func NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchRe
 	}
 	sketchName := sketchDirPath.Base()
 	sketchMainFilePath := sketchDirPath.Join(sketchName + globals.MainFileValidExtension)
+	if !req.Overwrite {
+		if sketchMainFilePath.Exist() {
+			return nil, &arduino.CantCreateSketchError{Cause: errors.New(tr(".ino file already exists"))}
+		}
+	}
 	if err := sketchMainFilePath.WriteFile(emptySketch); err != nil {
 		return nil, &arduino.CantCreateSketchError{Cause: err}
 	}

@@ -255,6 +255,8 @@ message NewSketchRequest {
   // Default Sketchbook directory "directories.User" is used if sketch_dir is
   // empty.
   string sketch_dir = 3;
+  // Specificies if an existing .ino sketch should be overwritten
+  bool overwrite = 4;
 }
 
 message NewSketchResponse {

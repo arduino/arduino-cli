@@ -31,18 +31,23 @@ import (
 )
 
 func initNewCommand() *cobra.Command {
+	var overwrite bool
+
 	newCommand := &cobra.Command{
 		Use:     "new",
 		Short:   tr("Create a new Sketch"),
 		Long:    tr("Create a new Sketch"),
 		Example: "  " + os.Args[0] + " sketch new MultiBlinker",
 		Args:    cobra.ExactArgs(1),
-		Run:     runNewCommand,
+		Run:     func(cmd *cobra.Command, args []string) { runNewCommand(args, overwrite) },
 	}
+
+	newCommand.Flags().BoolVarP(&overwrite, "overwrite", "f", false, tr("Overwrites an existing .ino sketch."))
+
 	return newCommand
 }
 
-func runNewCommand(cmd *cobra.Command, args []string) {
+func runNewCommand(args []string, overwrite bool) {
 	logrus.Info("Executing `arduino-cli sketch new`")
 	// Trim to avoid issues if user creates a sketch adding the .ino extesion to the name
 	sketchName := args[0]
@@ -56,6 +61,7 @@ func runNewCommand(cmd *cobra.Command, args []string) {
 		Instance:   nil,
 		SketchName: sketchDirPath.Base(),
 		SketchDir:  sketchDirPath.Parent().String(),
+		Overwrite:  overwrite,
 	})
 	if err != nil {
 		feedback.Errorf(tr("Error creating sketch: %v"), err)
