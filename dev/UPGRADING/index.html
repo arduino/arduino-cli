@@ -298,6 +298,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#golang-api-change-in-githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanager" class="md-nav__link">
+    golang API change in github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2124,6 +2131,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#golang-api-change-in-githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanager" class="md-nav__link">
+    golang API change in github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2880,6 +2894,20 @@ saves it in the <code>sketch.yaml</code> file, without any validity check or boa
 <h3 id="ccarduinoclicommandsv1boardattach-grpc-interface-command-removal"><code>cc.arduino.cli.commands.v1.BoardAttach</code> gRPC interface command removal<a class="headerlink" href="#ccarduinoclicommandsv1boardattach-grpc-interface-command-removal" title="Permanent link">&para;</a></h3>
 <p>The <code>cc.arduino.cli.commands.v1.BoardAttach</code> gRPC command has been removed. This feature is no longer available through
 gRPC.</p>
+<h3 id="golang-api-change-in-githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanager">golang API change in <code>github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager</code><a class="headerlink" href="#golang-api-change-in-githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanager" title="Permanent link">&para;</a></h3>
+<p>The following <code>LibrariesManager.InstallPrerequisiteCheck</code> methods have changed prototype, from:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">lm</span><span class="w"> </span><span class="o">*</span><span class="nx">LibrariesManager</span><span class="p">)</span><span class="w"> </span><span class="nx">InstallPrerequisiteCheck</span><span class="p">(</span><span class="nx">indexLibrary</span><span class="w"> </span><span class="o">*</span><span class="nx">librariesindex</span><span class="p">.</span><span class="nx">Release</span><span class="p">,</span><span class="w"> </span><span class="nx">installLocation</span><span class="w"> </span><span class="nx">libraries</span><span class="p">.</span><span class="nx">LibraryLocation</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="nx">libraries</span><span class="p">.</span><span class="nx">Library</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">lm</span><span class="w"> </span><span class="o">*</span><span class="nx">LibrariesManager</span><span class="p">)</span><span class="w"> </span><span class="nx">InstallZipLib</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">archivePath</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">overwrite</span><span class="w"> </span><span class="kt">bool</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>to</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">lm</span><span class="w"> </span><span class="o">*</span><span class="nx">LibrariesManager</span><span class="p">)</span><span class="w"> </span><span class="nx">InstallPrerequisiteCheck</span><span class="p">(</span><span class="nx">indexLibrary</span><span class="w"> </span><span class="o">*</span><span class="nx">librariesindex</span><span class="p">.</span><span class="nx">Release</span><span class="p">,</span><span class="w"> </span><span class="nx">installLocation</span><span class="w"> </span><span class="nx">libraries</span><span class="p">.</span><span class="nx">LibraryLocation</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="nx">libraries</span><span class="p">.</span><span class="nx">Library</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">lm</span><span class="w"> </span><span class="o">*</span><span class="nx">LibrariesManager</span><span class="p">)</span><span class="w"> </span><span class="nx">InstallZipLib</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">archivePath</span><span class="w"> </span><span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">,</span><span class="w"> </span><span class="nx">overwrite</span><span class="w"> </span><span class="kt">bool</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p><code>InstallPrerequisiteCheck</code> now requires an explicit <code>name</code> and <code>version</code> instead of a <code>librariesindex.Release</code>, because
+it can now be used to check any library, not only the libraries available in the index. Also the return value has
+changed to a <code>LibraryInstallPlan</code> structure, it contains the same information as before (<code>TargetPath</code> and <code>ReplacedLib</code>)
+plus <code>Name</code>, <code>Version</code>, and an <code>UpToDate</code> boolean flag.</p>
+<p><code>InstallZipLib</code> method <code>archivePath</code> is now a <code>paths.Path</code> instead of a <code>string</code>.</p>
 <h2 id="0290">0.29.0<a class="headerlink" href="#0290" title="Permanent link">&para;</a></h2>
 <h3 id="removed-grpc-api-ccarduinoclicommandsv1updatecorelibrariesindex-outdated-and-upgrade">Removed gRPC API: <code>cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndex</code>, <code>Outdated</code>, and <code>Upgrade</code><a class="headerlink" href="#removed-grpc-api-ccarduinoclicommandsv1updatecorelibrariesindex-outdated-and-upgrade" title="Permanent link">&para;</a></h3>
 <p>The following gRPC API have been removed:</p>
