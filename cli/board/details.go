@@ -190,7 +190,7 @@ func (dr detailsResult) String() string {
 		}
 	}
 
-	t.AddRow(tr("Programmers:"), tr("Id"), tr("Name"))
+	t.AddRow(tr("Programmers:"), tr("ID"), tr("Name"))
 	for _, programmer := range details.Programmers {
 		t.AddRow("", programmer.GetId(), programmer.GetName())
 	}
