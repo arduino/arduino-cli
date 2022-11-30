@@ -169,9 +169,9 @@ func (dr detailsResult) String() string {
 				t.AddRow() // get some space from above
 			}
 		}
-		t.AddRow() // get some space from above
 	}
 
+	t.AddRow() // get some space from above
 	for _, option := range details.ConfigOptions {
 		t.AddRow(tr("Option:"), option.OptionLabel, "", option.Option)
 		for _, value := range option.Values {
