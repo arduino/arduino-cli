@@ -293,6 +293,8 @@ message ArchiveSketchRequest {
   string archive_path = 2;
   // Specifies if build directory should be included in the archive
   bool include_build_dir = 3;
+  // Allows to override an already existing archive
+  bool overwrite = 4;
 }
 
 message ArchiveSketchResponse {}

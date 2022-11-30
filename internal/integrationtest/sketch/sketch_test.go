@@ -388,3 +388,26 @@ func TestSketchNewDotArgOverwrite(t *testing.T) {
 	require.NoError(t, err)
 	require.FileExists(t, sketchPath.Join(sketchNew+".ino").String())
 }
+
+func TestSketchArchiveOverwrite(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	sketchName := "ArchiveSketchOverwrite"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("sketch", "archive", sketchPath.String())
+	require.NoError(t, err)
+
+	// It is not possibile to override an archive by default
+	_, stderr, err := cli.Run("sketch", "archive", sketchPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Archive already exists")
+
+	// Override is enabled by the "overwrite" flag
+	_, _, err = cli.Run("sketch", "archive", sketchPath.String(), "--overwrite")
+	require.NoError(t, err)
+}

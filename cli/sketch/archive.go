@@ -30,10 +30,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var includeBuildDir bool
-
 // initArchiveCommand creates a new `archive` command
 func initArchiveCommand() *cobra.Command {
+	var includeBuildDir, overwrite bool
+
 	archiveCommand := &cobra.Command{
 		Use:   fmt.Sprintf("archive <%s> <%s>", tr("sketchPath"), tr("archivePath")),
 		Short: tr("Creates a zip file containing all sketch files."),
@@ -45,15 +45,16 @@ func initArchiveCommand() *cobra.Command {
 			"  " + os.Args[0] + " archive /home/user/Arduino/MySketch\n" +
 			"  " + os.Args[0] + " archive /home/user/Arduino/MySketch /home/user/MySketchArchive.zip",
 		Args: cobra.MaximumNArgs(2),
-		Run:  runArchiveCommand,
+		Run:  func(cmd *cobra.Command, args []string) { runArchiveCommand(args, includeBuildDir, overwrite) },
 	}
 
 	archiveCommand.Flags().BoolVar(&includeBuildDir, "include-build-dir", false, tr("Includes %s directory in the archive.", "build"))
+	archiveCommand.Flags().BoolVarP(&overwrite, "overwrite", "f", false, tr("Overwrites an already existing archive"))
 
 	return archiveCommand
 }
 
-func runArchiveCommand(cmd *cobra.Command, args []string) {
+func runArchiveCommand(args []string, includeBuildDir bool, overwrite bool) {
 	logrus.Info("Executing `arduino-cli sketch archive`")
 
 	sketchPath := paths.New(".")
@@ -73,6 +74,7 @@ func runArchiveCommand(cmd *cobra.Command, args []string) {
 			SketchPath:      sketchPath.String(),
 			ArchivePath:     archivePath,
 			IncludeBuildDir: includeBuildDir,
+			Overwrite:       overwrite,
 		})
 
 	if err != nil {
