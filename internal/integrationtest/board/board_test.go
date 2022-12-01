@@ -326,7 +326,7 @@ func TestBoardDetailsListProgrammersWithoutFlag(t *testing.T) {
 	for i, l := range split {
 		lines[i] = strings.Fields(l)
 	}
-	require.Contains(t, lines, []string{"Programmers:", "Id", "Name"})
+	require.Contains(t, lines, []string{"Programmers:", "ID", "Name"})
 	require.Contains(t, lines, []string{"edbg", "Atmel", "EDBG"})
 	require.Contains(t, lines, []string{"atmel_ice", "Atmel-ICE"})
 	require.Contains(t, lines, []string{"sam_ice", "Atmel", "SAM-ICE"})

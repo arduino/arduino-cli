@@ -109,6 +109,7 @@ func (dr detailsResult) String() string {
 	//                 ATmega328P (Old Bootloader)     cpu=atmega328old
 	//                 ATmega168                       cpu=atmega168
 	t := table.New()
+	tab := table.New()
 	addIfNotEmpty := func(label, content string) {
 		if content != "" {
 			t.AddRow(label, content)
@@ -157,32 +158,34 @@ func (dr detailsResult) String() string {
 	addIfNotEmpty(tr("Platform checksum:"), details.Platform.Checksum)
 
 	t.AddRow() // get some space from above
+
+	tab.SetColumnWidthMode(1, table.Average)
 	for _, tool := range details.ToolsDependencies {
-		t.AddRow(tr("Required tool:"), tool.Packager+":"+tool.Name, tool.Version)
+		tab.AddRow(tr("Required tool:"), tool.Packager+":"+tool.Name, tool.Version)
 		if showFullDetails {
 			for _, sys := range tool.Systems {
-				t.AddRow("", tr("OS:"), sys.Host)
-				t.AddRow("", tr("File:"), sys.ArchiveFilename)
-				t.AddRow("", tr("Size (bytes):"), fmt.Sprint(sys.Size))
-				t.AddRow("", tr("Checksum:"), sys.Checksum)
-				t.AddRow("", tr("URL:"), sys.Url)
-				t.AddRow() // get some space from above
+				tab.AddRow("", tr("OS:"), sys.Host)
+				tab.AddRow("", tr("File:"), sys.ArchiveFilename)
+				tab.AddRow("", tr("Size (bytes):"), fmt.Sprint(sys.Size))
+				tab.AddRow("", tr("Checksum:"), sys.Checksum)
+				tab.AddRow("", tr("URL:"), sys.Url)
+				tab.AddRow() // get some space from above
 			}
 		}
-		t.AddRow() // get some space from above
 	}
 
+	tab.AddRow() // get some space from above
 	for _, option := range details.ConfigOptions {
-		t.AddRow(tr("Option:"), option.OptionLabel, "", option.Option)
+		tab.AddRow(tr("Option:"), option.OptionLabel, "", option.Option)
 		for _, value := range option.Values {
 			green := color.New(color.FgGreen)
 			if value.Selected {
-				t.AddRow("",
+				tab.AddRow("",
 					table.NewCell(value.ValueLabel, green),
 					table.NewCell("✔", green),
 					table.NewCell(option.Option+"="+value.Value, green))
 			} else {
-				t.AddRow("",
+				tab.AddRow("",
 					value.ValueLabel,
 					"",
 					option.Option+"="+value.Value)
@@ -190,10 +193,10 @@ func (dr detailsResult) String() string {
 		}
 	}
 
-	t.AddRow(tr("Programmers:"), tr("Id"), tr("Name"))
+	tab.AddRow(tr("Programmers:"), tr("ID"), tr("Name"))
 	for _, programmer := range details.Programmers {
-		t.AddRow("", programmer.GetId(), programmer.GetName())
+		tab.AddRow("", programmer.GetId(), programmer.GetName())
 	}
 
-	return t.Render()
+	return t.Render() + tab.Render()
 }
