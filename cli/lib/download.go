@@ -24,7 +24,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -63,7 +62,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 			Name:     library.Name,
 			Version:  library.Version,
 		}
-		_, err := lib.LibraryDownload(context.Background(), libraryDownloadRequest, output.ProgressBar())
+		_, err := lib.LibraryDownload(context.Background(), libraryDownloadRequest, feedback.ProgressBar())
 		if err != nil {
 			feedback.Errorf(tr("Error downloading %[1]s: %[2]v"), library, err)
 			os.Exit(errorcodes.ErrNetwork)

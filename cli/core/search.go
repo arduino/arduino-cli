@@ -28,7 +28,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/configuration"
@@ -67,7 +66,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if indexesNeedUpdating(indexUpdateInterval) {
-		err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{Instance: inst}, output.ProgressBar())
+		err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{Instance: inst}, feedback.ProgressBar())
 		if err != nil {
 			os.Exit(errorcodes.ErrGeneric)
 		}

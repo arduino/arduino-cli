@@ -26,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -91,7 +90,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 				Instance:  instance,
 				Path:      path,
 				Overwrite: !noOverwrite,
-			}, output.TaskProgress())
+			}, feedback.TaskProgress())
 			if err != nil {
 				feedback.Errorf(tr("Error installing Zip Library: %v"), err)
 				os.Exit(errorcodes.ErrGeneric)
@@ -114,7 +113,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 				Instance:  instance,
 				Url:       url,
 				Overwrite: !noOverwrite,
-			}, output.TaskProgress())
+			}, feedback.TaskProgress())
 			if err != nil {
 				feedback.Errorf(tr("Error installing Git Library: %v"), err)
 				os.Exit(errorcodes.ErrGeneric)
@@ -137,7 +136,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			NoDeps:      noDeps,
 			NoOverwrite: noOverwrite,
 		}
-		err := lib.LibraryInstall(context.Background(), libraryInstallRequest, output.ProgressBar(), output.TaskProgress())
+		err := lib.LibraryInstall(context.Background(), libraryInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
 		if err != nil {
 			feedback.Errorf(tr("Error installing %s: %v"), libRef.Name, err)
 			os.Exit(errorcodes.ErrGeneric)

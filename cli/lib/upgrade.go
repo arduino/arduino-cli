@@ -22,7 +22,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -54,14 +53,14 @@ func Upgrade(instance *rpc.Instance, libraries []string) {
 	var upgradeErr error
 	if len(libraries) == 0 {
 		req := &rpc.LibraryUpgradeAllRequest{Instance: instance}
-		upgradeErr = lib.LibraryUpgradeAll(req, output.ProgressBar(), output.TaskProgress())
+		upgradeErr = lib.LibraryUpgradeAll(req, feedback.ProgressBar(), feedback.TaskProgress())
 	} else {
 		for _, libName := range libraries {
 			req := &rpc.LibraryUpgradeRequest{
 				Instance: instance,
 				Name:     libName,
 			}
-			upgradeErr = lib.LibraryUpgrade(context.Background(), req, output.ProgressBar(), output.TaskProgress())
+			upgradeErr = lib.LibraryUpgrade(context.Background(), req, feedback.ProgressBar(), feedback.TaskProgress())
 			if upgradeErr != nil {
 				break
 			}

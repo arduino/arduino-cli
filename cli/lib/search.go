@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -62,7 +61,7 @@ func runSearchCommand(args []string, namesOnly bool) {
 	if err := commands.UpdateLibrariesIndex(
 		context.Background(),
 		&rpc.UpdateLibrariesIndexRequest{Instance: inst},
-		output.ProgressBar(),
+		feedback.ProgressBar(),
 	); err != nil {
 		feedback.Errorf(tr("Error updating library index: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)

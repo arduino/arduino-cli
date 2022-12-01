@@ -13,28 +13,20 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package output
+package feedback
 
 import (
 	"fmt"
 	"sync"
 
-	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/cmaglie/pb"
-)
-
-var (
-	// OutputFormat can be "text" or "json"
-	OutputFormat string
-	tr           = i18n.Tr
 )
 
 // ProgressBar returns a DownloadProgressCB that prints a progress bar.
 // If JSON output format has been selected, the callback outputs nothing.
 func ProgressBar() rpc.DownloadProgressCB {
-	if OutputFormat != "json" {
+	if format != JSON {
 		return NewDownloadProgressBarCB()
 	}
 	return func(curr *rpc.DownloadProgress) {
@@ -45,7 +37,7 @@ func ProgressBar() rpc.DownloadProgressCB {
 // TaskProgress returns a TaskProgressCB that prints the task progress.
 // If JSON output format has been selected, the callback outputs nothing.
 func TaskProgress() rpc.TaskProgressCB {
-	if OutputFormat != "json" {
+	if format != JSON {
 		return NewTaskProgressCB()
 	}
 	return func(curr *rpc.TaskProgress) {
@@ -86,7 +78,7 @@ func NewDownloadProgressBarCB() func(*rpc.DownloadProgress) {
 			if started {
 				bar.FinishPrintOver(label + " " + msg)
 			} else {
-				feedback.Print(label + " " + msg)
+				Print(label + " " + msg)
 			}
 			started = false
 		}

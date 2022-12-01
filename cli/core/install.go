@@ -24,7 +24,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -77,7 +76,7 @@ func runInstallCommand(args []string, postInstallFlags arguments.PostInstallFlag
 			SkipPostInstall: postInstallFlags.DetectSkipPostInstallValue(),
 			NoOverwrite:     noOverwrite,
 		}
-		_, err := core.PlatformInstall(context.Background(), platformInstallRequest, output.ProgressBar(), output.TaskProgress())
+		_, err := core.PlatformInstall(context.Background(), platformInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
 		if err != nil {
 			feedback.Errorf(tr("Error during install: %v"), err)
 			os.Exit(errorcodes.ErrGeneric)

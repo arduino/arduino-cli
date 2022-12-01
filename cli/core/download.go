@@ -24,7 +24,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -66,7 +65,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 			Architecture:    platformRef.Architecture,
 			Version:         platformRef.Version,
 		}
-		_, err := core.PlatformDownload(context.Background(), platformDownloadreq, output.ProgressBar())
+		_, err := core.PlatformDownload(context.Background(), platformDownloadreq, feedback.ProgressBar())
 		if err != nil {
 			feedback.Errorf(tr("Error downloading %[1]s: %[2]v"), args[i], err)
 			os.Exit(errorcodes.ErrNetwork)

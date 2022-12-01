@@ -24,7 +24,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -61,7 +60,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 			Instance: instance,
 			Name:     library.Name,
 			Version:  library.Version,
-		}, output.TaskProgress())
+		}, feedback.TaskProgress())
 		if err != nil {
 			feedback.Errorf(tr("Error uninstalling %[1]s: %[2]v"), library, err)
 			os.Exit(errorcodes.ErrGeneric)

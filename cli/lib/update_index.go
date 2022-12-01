@@ -22,7 +22,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -51,7 +50,7 @@ func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 func UpdateIndex(inst *rpc.Instance) {
 	err := commands.UpdateLibrariesIndex(context.Background(), &rpc.UpdateLibrariesIndexRequest{
 		Instance: inst,
-	}, output.ProgressBar())
+	}, feedback.ProgressBar())
 	if err != nil {
 		feedback.Errorf(tr("Error updating library index: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)

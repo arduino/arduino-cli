@@ -22,7 +22,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -49,7 +48,7 @@ func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 
 // UpdateIndex updates the index of platforms.
 func UpdateIndex(inst *rpc.Instance) {
-	err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{Instance: inst}, output.ProgressBar())
+	err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{Instance: inst}, feedback.ProgressBar())
 	if err != nil {
 		feedback.Error(err)
 		os.Exit(errorcodes.ErrGeneric)

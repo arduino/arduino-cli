@@ -26,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands/core"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -103,7 +102,7 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 			SkipPostInstall: skipPostInstall,
 		}
 
-		if _, err := core.PlatformUpgrade(context.Background(), r, output.ProgressBar(), output.TaskProgress()); err != nil {
+		if _, err := core.PlatformUpgrade(context.Background(), r, feedback.ProgressBar(), feedback.TaskProgress()); err != nil {
 			if errors.Is(err, &arduino.PlatformAlreadyAtTheLatestVersionError{}) {
 				feedback.Print(err.Error())
 				continue

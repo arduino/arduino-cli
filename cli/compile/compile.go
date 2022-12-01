@@ -29,7 +29,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
@@ -229,7 +228,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	verboseCompile := configuration.Settings.GetString("logging.level") == "debug"
 	var compileRes *rpc.CompileResponse
 	var compileError error
-	if output.OutputFormat == "json" {
+	if feedback.GetFormat() == feedback.JSON {
 		compileRes, compileError = compile.Compile(context.Background(), compileRequest, compileStdOut, compileStdErr, nil, verboseCompile)
 	} else {
 		compileRes, compileError = compile.Compile(context.Background(), compileRequest, os.Stdout, os.Stderr, nil, verboseCompile)
@@ -265,7 +264,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		}
 
 		var uploadError error
-		if output.OutputFormat == "json" {
+		if feedback.GetFormat() == feedback.JSON {
 			// TODO: do not print upload output in json mode
 			uploadStdOut := new(bytes.Buffer)
 			uploadStdErr := new(bytes.Buffer)

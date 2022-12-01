@@ -37,7 +37,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/lib"
 	"github.com/arduino/arduino-cli/cli/monitor"
 	"github.com/arduino/arduino-cli/cli/outdated"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/cli/sketch"
 	"github.com/arduino/arduino-cli/cli/update"
 	"github.com/arduino/arduino-cli/cli/updater"
@@ -236,10 +235,6 @@ func preRun(cmd *cobra.Command, args []string) {
 	// Prepare the Feedback system
 	//
 
-	// normalize the format strings
-	outputFormat = strings.ToLower(outputFormat)
-	// configure the output package
-	output.OutputFormat = outputFormat
 	// check the right output format was passed
 	format, found := parseFormatString(outputFormat)
 	if !found {

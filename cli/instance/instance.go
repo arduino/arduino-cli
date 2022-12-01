@@ -21,7 +21,6 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/output"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
@@ -81,8 +80,8 @@ func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *pat
 		return nil
 	}
 
-	downloadCallback := output.ProgressBar()
-	taskCallback := output.TaskProgress()
+	downloadCallback := feedback.ProgressBar()
+	taskCallback := feedback.TaskProgress()
 
 	initReq := &rpc.InitRequest{Instance: instance}
 	if sketchPath != nil {
@@ -135,7 +134,7 @@ func FirstUpdate(instance *rpc.Instance) error {
 			&rpc.UpdateLibrariesIndexRequest{
 				Instance: instance,
 			},
-			output.ProgressBar(),
+			feedback.ProgressBar(),
 		)
 		if err != nil {
 			return err
@@ -151,7 +150,7 @@ func FirstUpdate(instance *rpc.Instance) error {
 				Instance:                   instance,
 				IgnoreCustomPackageIndexes: true,
 			},
-			output.ProgressBar())
+			feedback.ProgressBar())
 		if err != nil {
 			return err
 		}
