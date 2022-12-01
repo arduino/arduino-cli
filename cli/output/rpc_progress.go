@@ -93,11 +93,6 @@ func NewDownloadProgressBarCB() func(*rpc.DownloadProgress) {
 	}
 }
 
-// NewNullDownloadProgressCB returns a progress bar callback that outputs nothing.
-func NewNullDownloadProgressCB() func(*rpc.DownloadProgress) {
-	return func(*rpc.DownloadProgress) {}
-}
-
 // NewTaskProgressCB returns a commands.TaskProgressCB progress listener
 // that outputs to terminal
 func NewTaskProgressCB() func(curr *rpc.TaskProgress) {
@@ -120,9 +115,4 @@ func NewTaskProgressCB() func(curr *rpc.TaskProgress) {
 			}
 		}
 	}
-}
-
-// NewNullTaskProgressCB returns a progress bar callback that outputs nothing.
-func NewNullTaskProgressCB() func(curr *rpc.TaskProgress) {
-	return func(curr *rpc.TaskProgress) {}
 }
