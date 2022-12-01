@@ -16,7 +16,6 @@
 package feedback
 
 import (
-	"fmt"
 	"sync"
 
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -86,23 +85,16 @@ func NewDownloadProgressBarCB() func(*rpc.DownloadProgress) {
 // NewTaskProgressCB returns a commands.TaskProgressCB progress listener
 // that outputs to terminal
 func NewTaskProgressCB() func(curr *rpc.TaskProgress) {
-	var name string
 	return func(curr *rpc.TaskProgress) {
-		// fmt.Printf(">>> %v\n", curr)
 		msg := curr.GetMessage()
-		if curr.GetName() != "" {
-			name = curr.GetName()
-			if msg == "" {
-				msg = name
-			}
+		if msg == "" {
+			msg = curr.GetName()
 		}
 		if msg != "" {
-			fmt.Print(msg)
-			if curr.GetCompleted() {
-				fmt.Println()
-			} else {
-				fmt.Println("...")
+			if !curr.GetCompleted() {
+				msg += "..."
 			}
+			Print(msg)
 		}
 	}
 }
