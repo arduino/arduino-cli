@@ -13,6 +13,8 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
+// Package feedback provides an uniform API that can be used to
+// print feedback to the users in different formats.
 package feedback
 
 import (
@@ -22,11 +24,10 @@ import (
 	"io"
 	"os"
 
-	"gopkg.in/yaml.v2"
-
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/status"
+	"gopkg.in/yaml.v2"
 )
 
 // OutputFormat is an output format
@@ -43,6 +44,12 @@ const (
 	YAML
 )
 
+var (
+	stdOut io.Writer    = os.Stdout
+	stdErr io.Writer    = os.Stderr
+	format OutputFormat = Text
+)
+
 // Result is anything more complex than a sentence that needs to be printed
 // for the user.
 type Result interface {
@@ -50,84 +57,62 @@ type Result interface {
 	Data() interface{}
 }
 
-// Feedback wraps an io.Writer and provides an uniform API the CLI can use to
-// provide feedback to the users.
-type Feedback struct {
-	out    io.Writer
-	err    io.Writer
-	format OutputFormat
-}
-
 var tr = i18n.Tr
 
-// New creates a Feedback instance
-func New(out, err io.Writer, format OutputFormat) *Feedback {
-	return &Feedback{
-		out:    out,
-		err:    err,
-		format: format,
-	}
-}
-
-// DefaultFeedback provides a basic feedback object to be used as default.
-func DefaultFeedback() *Feedback {
-	return New(os.Stdout, os.Stderr, Text)
-}
-
 // SetOut can be used to change the out writer at runtime
-func (fb *Feedback) SetOut(out io.Writer) {
-	fb.out = out
+func SetOut(out io.Writer) {
+	stdOut = out
 }
 
 // SetErr can be used to change the err writer at runtime
-func (fb *Feedback) SetErr(err io.Writer) {
-	fb.err = err
+func SetErr(err io.Writer) {
+	stdErr = err
 }
 
 // SetFormat can be used to change the output format at runtime
-func (fb *Feedback) SetFormat(f OutputFormat) {
-	fb.format = f
+func SetFormat(f OutputFormat) {
+	format = f
 }
 
 // GetFormat returns the output format currently set
-func (fb *Feedback) GetFormat() OutputFormat {
-	return fb.format
+func GetFormat() OutputFormat {
+	return format
 }
 
 // OutputWriter returns the underlying io.Writer to be used when the Print*
-// api is not enough.
-func (fb *Feedback) OutputWriter() io.Writer {
-	return fb.out
+// api is not enough
+func OutputWriter() io.Writer {
+	return stdOut
 }
 
 // ErrorWriter is the same as OutputWriter but exposes the underlying error
 // writer.
-func (fb *Feedback) ErrorWriter() io.Writer {
-	return fb.out
+func ErrorWriter() io.Writer {
+	return stdErr
 }
 
 // Printf behaves like fmt.Printf but writes on the out writer and adds a newline.
-func (fb *Feedback) Printf(format string, v ...interface{}) {
-	fb.Print(fmt.Sprintf(format, v...))
+func Printf(format string, v ...interface{}) {
+	Print(fmt.Sprintf(format, v...))
 }
 
 // Print behaves like fmt.Print but writes on the out writer and adds a newline.
-func (fb *Feedback) Print(v interface{}) {
-	switch fb.format {
+func Print(v interface{}) {
+	switch format {
 	case JSON, MinifiedJSON:
-		fb.printJSON(v)
+		printJSON(v)
 	case YAML:
-		fb.printYAML(v)
+		printYAML(v)
 	case Text:
-		fmt.Fprintln(fb.out, v)
+		fmt.Fprintln(stdOut, v)
 	default:
-		panic(fmt.Sprintf("Invalid output format: %v", fb.format))
+		panic("unknown output format")
 	}
 }
 
 // Errorf behaves like fmt.Printf but writes on the error writer and adds a
 // newline. It also logs the error.
-func (fb *Feedback) Errorf(format string, v ...interface{}) {
+func Errorf(format string, v ...interface{}) {
 	// Unbox grpc status errors
 	for i := range v {
 		if s, isStatus := v[i].(*status.Status); isStatus {
@@ -138,56 +123,56 @@ func (fb *Feedback) Errorf(format string, v ...interface{}) {
 			}
 		}
 	}
-	fb.Error(fmt.Sprintf(format, v...))
+	Error(fmt.Sprintf(format, v...))
 }
 
 // Error behaves like fmt.Print but writes on the error writer and adds a
 // newline. It also logs the error.
-func (fb *Feedback) Error(v ...interface{}) {
-	fmt.Fprintln(fb.err, v...)
+func Error(v ...interface{}) {
+	fmt.Fprintln(stdErr, v...)
 	logrus.Error(fmt.Sprint(v...))
 }
 
 // printJSON is a convenient wrapper to provide feedback by printing the
 // desired output in a pretty JSON format. It adds a newline to the output.
-func (fb *Feedback) printJSON(v interface{}) {
+func printJSON(v interface{}) {
 	var d []byte
 	var err error
-	if fb.format == JSON {
+	if format == JSON {
 		d, err = json.MarshalIndent(v, "", "  ")
-	} else if fb.format == MinifiedJSON {
+	} else if format == MinifiedJSON {
 		d, err = json.Marshal(v)
 	}
 	if err != nil {
-		fb.Errorf(tr("Error during JSON encoding of the output: %v"), err)
+		Errorf(tr("Error during JSON encoding of the output: %v"), err)
 	} else {
-		fmt.Fprintf(fb.out, "%v\n", string(d))
+		fmt.Fprintf(stdOut, "%v\n", string(d))
 	}
 }
 
 // printYAML is a convenient wrapper to provide feedback by printing the
 // desired output in YAML format. It adds a newline to the output.
-func (fb *Feedback) printYAML(v interface{}) {
+func printYAML(v interface{}) {
 	d, err := yaml.Marshal(v)
 	if err != nil {
-		fb.Errorf(tr("Error during YAML encoding of the output: %v"), err)
+		Errorf(tr("Error during YAML encoding of the output: %v"), err)
 		return
 	}
-	fmt.Fprintf(fb.out, "%v\n", string(d))
+	fmt.Fprintf(stdOut, "%v\n", string(d))
 }
 
 // PrintResult is a convenient wrapper to provide feedback for complex data,
 // where the contents can't be just serialized to JSON but requires more
 // structure.
-func (fb *Feedback) PrintResult(res Result) {
-	switch fb.format {
+func PrintResult(res Result) {
+	switch format {
 	case JSON, MinifiedJSON:
-		fb.printJSON(res.Data())
+		printJSON(res.Data())
 	case YAML:
-		fb.printYAML(res.Data())
+		printYAML(res.Data())
 	case Text:
-		fb.Print(res.String())
+		Print(res.String())
 	default:
-		panic(fmt.Sprintf("Invalid output format: %v", fb.format))
+		panic("unknown output format")
 	}
 }
