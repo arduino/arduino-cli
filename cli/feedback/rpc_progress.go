@@ -24,24 +24,22 @@ import (
 )
 
 // ProgressBar returns a DownloadProgressCB that prints a progress bar.
-// If JSON output format has been selected, the callback outputs nothing.
 func ProgressBar() rpc.DownloadProgressCB {
-	if format != JSON {
+	if format == Text {
 		return NewDownloadProgressBarCB()
 	}
 	return func(curr *rpc.DownloadProgress) {
-		// XXX: Output progress in JSON?
+		// Non interactive output, no progress bar
 	}
 }
 
 // TaskProgress returns a TaskProgressCB that prints the task progress.
-// If JSON output format has been selected, the callback outputs nothing.
 func TaskProgress() rpc.TaskProgressCB {
-	if format != JSON {
+	if format == Text {
 		return NewTaskProgressCB()
 	}
 	return func(curr *rpc.TaskProgress) {
-		// XXX: Output progress in JSON?
+		// Non interactive output, no task progess
 	}
 }
 
