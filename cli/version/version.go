@@ -61,7 +61,7 @@ func runVersionCommand(cmd *cobra.Command, args []string) {
 	latestVersion := updater.ForceCheckForUpdate(currentVersion)
 
 	versionInfo := globals.VersionInfo
-	if f := feedback.GetFormat(); (f == feedback.JSON || f == feedback.JSONMini || f == feedback.YAML) && latestVersion != nil {
+	if feedback.GetFormat() != feedback.Text && latestVersion != nil {
 		// Set this only we managed to get the latest version
 		versionInfo.LatestVersion = latestVersion.String()
 	}

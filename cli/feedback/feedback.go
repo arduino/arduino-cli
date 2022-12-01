@@ -29,17 +29,17 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// OutputFormat is used to determine the output format
+// OutputFormat is an output format
 type OutputFormat int
 
 const (
-	// Text means plain text format, suitable for ansi terminals
+	// Text is the plain text format, suitable for interactive terminals
 	Text OutputFormat = iota
-	// JSON means JSON format
+	// JSON format
 	JSON
-	// JSONMini is identical to JSON but without whitespaces
-	JSONMini
-	// YAML means YAML format
+	// MinifiedJSON format
+	MinifiedJSON
+	// YAML format
 	YAML
 )
 
@@ -114,12 +114,14 @@ func (fb *Feedback) Printf(format string, v ...interface{}) {
 // Print behaves like fmt.Print but writes on the out writer and adds a newline.
 func (fb *Feedback) Print(v interface{}) {
 	switch fb.format {
-	case JSON, JSONMini:
+	case JSON, MinifiedJSON:
 		fb.printJSON(v)
 	case YAML:
 		fb.printYAML(v)
-	default:
+	case Text:
 		fmt.Fprintln(fb.out, v)
+	default:
+		panic(fmt.Sprintf("Invalid output format: %v", fb.format))
 	}
 }
 
@@ -153,7 +155,7 @@ func (fb *Feedback) printJSON(v interface{}) {
 	var err error
 	if fb.format == JSON {
 		d, err = json.MarshalIndent(v, "", "  ")
-	} else if fb.format == JSONMini {
+	} else if fb.format == MinifiedJSON {
 		d, err = json.Marshal(v)
 	}
 	if err != nil {
@@ -179,11 +181,13 @@ func (fb *Feedback) printYAML(v interface{}) {
 // structure.
 func (fb *Feedback) PrintResult(res Result) {
 	switch fb.format {
-	case JSON, JSONMini:
+	case JSON, MinifiedJSON:
 		fb.printJSON(res.Data())
 	case YAML:
 		fb.printYAML(res.Data())
-	default:
+	case Text:
 		fb.Print(res.String())
+	default:
+		panic(fmt.Sprintf("Invalid output format: %v", fb.format))
 	}
 }

@@ -146,7 +146,7 @@ func toLogLevel(s string) (t logrus.Level, found bool) {
 func parseFormatString(arg string) (feedback.OutputFormat, bool) {
 	f, found := map[string]feedback.OutputFormat{
 		"json":     feedback.JSON,
-		"jsonmini": feedback.JSONMini,
+		"jsonmini": feedback.MinifiedJSON,
 		"text":     feedback.Text,
 		"yaml":     feedback.YAML,
 	}[strings.ToLower(arg)]
