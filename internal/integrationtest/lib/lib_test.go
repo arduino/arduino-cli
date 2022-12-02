@@ -310,3 +310,369 @@ func TestUpgradeLibraryWithDependencies(t *testing.T) {
 	dependency := jsonOut.Query(`.dependencies[] | select(.name=="MKRWAN")`)
 	require.Equal(t, dependency.Query(".version_required"), dependency.Query(".version_installed"))
 }
+
+func TestList(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// When output is empty, nothing is printed out, no matter the output format
+	stdout, stderr, err := cli.Run("lib", "list")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	require.Contains(t, string(stdout), "No libraries installed.")
+	stdout, stderr, err = cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	requirejson.Empty(t, stdout)
+
+	// Install something we can list at a version older than latest
+	_, _, err = cli.Run("lib", "install", "ArduinoJson@6.11.0")
+	require.NoError(t, err)
+
+	// Look at the plain text output
+	stdout, stderr, err = cli.Run("lib", "list")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	lines := strings.Split(strings.TrimSpace(string(stdout)), "\n")
+	require.Len(t, lines, 2)
+	lines[1] = strings.Join(strings.Fields(lines[1]), " ")
+	toks := strings.SplitN(lines[1], " ", 5)
+	// Verifies the expected number of field
+	require.Len(t, toks, 5)
+	// be sure line contain the current version AND the available version
+	require.NotEmpty(t, toks[1])
+	require.NotEmpty(t, toks[2])
+	// Verifies library sentence
+	require.Contains(t, toks[4], "An efficient and elegant JSON library...")
+
+	// Look at the JSON output
+	stdout, stderr, err = cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	requirejson.Len(t, stdout, 1)
+	// be sure data contains the available version
+	requirejson.Query(t, stdout, `.[0] | .release | .version != ""`, "true")
+
+	// Install something we can list without provides_includes field given in library.properties
+	_, _, err = cli.Run("lib", "install", "Arduino_APDS9960@1.0.3")
+	require.NoError(t, err)
+	// Look at the JSON output
+	stdout, stderr, err = cli.Run("lib", "list", "Arduino_APDS9960", "--format", "json")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	requirejson.Len(t, stdout, 1)
+	// be sure data contains the correct provides_includes field
+	requirejson.Query(t, stdout, ".[0] | .library | .provides_includes | .[0]", `"Arduino_APDS9960.h"`)
+}
+
+func TestListExitCode(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "list")
+	require.NoError(t, err)
+
+	// Verifies lib list doesn't fail when platform is not specified
+	_, stderr, err := cli.Run("lib", "list")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+
+	// Verify lib list command fails because specified platform is not installed
+	_, stderr, err = cli.Run("lib", "list", "-b", "arduino:samd:mkr1000")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error listing Libraries: Unknown FQBN: platform arduino:samd is not installed")
+
+	_, _, err = cli.Run("lib", "install", "AllThingsTalk LoRaWAN SDK")
+	require.NoError(t, err)
+
+	// Verifies lib list command keeps failing
+	_, stderr, err = cli.Run("lib", "list", "-b", "arduino:samd:mkr1000")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "Error listing Libraries: Unknown FQBN: platform arduino:samd is not installed")
+
+	_, _, err = cli.Run("core", "install", "arduino:samd")
+	require.NoError(t, err)
+
+	// Verifies lib list command now works since platform has been installed
+	_, stderr, err = cli.Run("lib", "list", "-b", "arduino:samd:mkr1000")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+}
+
+func TestListWithFqbn(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// Install core
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+
+	// Look at the plain text output
+	_, _, err = cli.Run("lib", "install", "ArduinoJson")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "wm8978-esp32")
+	require.NoError(t, err)
+
+	// Look at the plain text output
+	stdout, stderr, err := cli.Run("lib", "list", "-b", "arduino:avr:uno")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	lines := strings.Split(strings.TrimSpace(string(stdout)), "\n")
+	require.Len(t, lines, 2)
+
+	// Verifies library is compatible
+	lines[1] = strings.Join(strings.Fields(lines[1]), " ")
+	toks := strings.SplitN(lines[1], " ", 5)
+	require.Len(t, toks, 5)
+	require.Equal(t, "ArduinoJson", toks[0])
+
+	// Look at the JSON output
+	stdout, stderr, err = cli.Run("lib", "list", "-b", "arduino:avr:uno", "--format", "json")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	requirejson.Len(t, stdout, 1)
+
+	// Verifies library is compatible
+	requirejson.Query(t, stdout, `.[0] | .library | .name`, `"ArduinoJson"`)
+	requirejson.Query(t, stdout, `.[0] | .library | .compatible_with | ."arduino:avr:uno"`, `true`)
+}
+
+func TestListProvidesIncludesFallback(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Verifies "provides_includes" field is returned even if libraries don't declare
+	// the "includes" property in their "library.properties" file
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Install core
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.3")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "ArduinoJson@6.17.2")
+	require.NoError(t, err)
+
+	// List all libraries, even the ones installed with the above core
+	stdout, stderr, err := cli.Run("lib", "list", "--all", "--fqbn", "arduino:avr:uno", "--format", "json")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+
+	requirejson.Len(t, stdout, 6)
+
+	requirejson.Query(t, stdout, "[.[] | .library | { (.name): .provides_includes }] | add",
+		`{
+			"SPI": [
+		  		"SPI.h"
+			],
+			"SoftwareSerial": [
+		  		"SoftwareSerial.h"
+			],
+			"Wire": [
+		  		"Wire.h"
+			],
+			"ArduinoJson": [
+		  		"ArduinoJson.h",
+		  		"ArduinoJson.hpp"
+			],
+			"EEPROM": [
+		  		"EEPROM.h"
+			],
+			"HID": [
+		  		"HID.h"
+			]
+	  	}`)
+}
+
+func TestLibDownload(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Download a specific lib version
+	_, _, err := cli.Run("lib", "download", "AudioZero@1.0.0")
+	require.NoError(t, err)
+	require.FileExists(t, cli.DownloadDir().Join("libraries", "AudioZero-1.0.0.zip").String())
+
+	// Wrong lib version
+	_, _, err = cli.Run("lib", "download", "AudioZero@69.42.0")
+	require.Error(t, err)
+
+	// Wrong lib
+	_, _, err = cli.Run("lib", "download", "AudioZ")
+	require.Error(t, err)
+}
+
+func TestInstall(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	libs := []string{"Arduino_BQ24195", "CMMC MQTT Connector", "WiFiNINA"}
+	// Should be safe to run install multiple times
+	_, _, err := cli.Run("lib", "install", libs[0], libs[1], libs[2])
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", libs[0], libs[1], libs[2])
+	require.NoError(t, err)
+
+	// Test failing-install of library with wrong dependency
+	// (https://github.com/arduino/arduino-cli/issues/534)
+	_, stderr, err := cli.Run("lib", "install", "MD_Parola@3.2.0")
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "No valid dependencies solution found: dependency 'MD_MAX72xx' is not available")
+}
+
+func TestInstallLibraryWithDependencies(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Verifies libraries are not installed
+	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Empty(t, stdout)
+
+	// Install library
+	_, _, err = cli.Run("lib", "install", "MD_Parola@3.5.5")
+	require.NoError(t, err)
+
+	// Verifies library's dependencies are correctly installed
+	stdout, _, err = cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, `[ .[] | .library | .name ] | sort`, `["MD_MAX72XX","MD_Parola"]`)
+
+	// Try upgrading with --no-overwrite (should fail) and without --no-overwrite (should succeed)
+	_, _, err = cli.Run("lib", "install", "MD_Parola@3.6.1", "--no-overwrite")
+	require.Error(t, err)
+	_, _, err = cli.Run("lib", "install", "MD_Parola@3.6.1")
+	require.NoError(t, err)
+
+	// Test --no-overwrite with transitive dependencies
+	_, _, err = cli.Run("lib", "install", "SD")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "Arduino_Builtin", "--no-overwrite")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "SD@1.2.3")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "Arduino_Builtin", "--no-overwrite")
+	require.Error(t, err)
+}
+
+func TestInstallNoDeps(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Verifies libraries are not installed
+	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Empty(t, stdout)
+
+	// Install library skipping dependencies installation
+	_, _, err = cli.Run("lib", "install", "MD_Parola@3.5.5", "--no-deps")
+	require.NoError(t, err)
+
+	// Verifies library's dependencies are not installed
+	stdout, _, err = cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, `.[] | .library | .name`, `"MD_Parola"`)
+}
+
+func TestInstallWithGitUrl(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Initialize configs to enable --git-url flag
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+	_, _, err := cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101")
+	// Verifies library is not already installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
+
+	// Test git-url library install
+	stdout, _, err := cli.Run("lib", "install", "--git-url", gitUrl)
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
+
+	// Verifies library is installed in expected path
+	require.DirExists(t, libInstallDir.String())
+
+	// Reinstall library
+	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl)
+	require.NoError(t, err)
+
+	// Verifies library remains installed
+	require.DirExists(t, libInstallDir.String())
+}
+
+func TestInstallWithGitUrlFragmentAsBranch(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Initialize configs to enable --git-url flag
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+	_, _, err := cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101")
+	// Verifies library is not already installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
+
+	// Test that a bad ref fails
+	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#x-ref-does-not-exist")
+	require.Error(t, err)
+
+	// Verifies library is installed in expected path
+	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#0.16.0")
+	require.NoError(t, err)
+	require.DirExists(t, libInstallDir.String())
+
+	// Reinstall library at an existing ref
+	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#master")
+	require.NoError(t, err)
+
+	// Verifies library remains installed
+	require.DirExists(t, libInstallDir.String())
+}
+
+func TestUpdateIndex(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	stdout, _, err := cli.Run("lib", "update-index")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Downloading index: library_index.tar.bz2 downloaded")
+}
+
+func TestUninstall(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	libs := []string{"Arduino_BQ24195", "WiFiNINA"}
+	_, _, err := cli.Run("lib", "install", libs[0], libs[1])
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("lib", "uninstall", libs[0], libs[1])
+	require.NoError(t, err)
+}
