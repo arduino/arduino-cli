@@ -49,7 +49,7 @@ jobs:
           if [[ \
             ("${{ github.event_name }}" != "create" || \
             "${{ github.ref }}" =~ $RELEASE_BRANCH_REGEX) && \
-            "$TAG" == "" \
+            ! "${{ github.ref }}" =~ $TAG_REGEX \
           ]]; then
             # Run the other jobs.
             RESULT="true"
