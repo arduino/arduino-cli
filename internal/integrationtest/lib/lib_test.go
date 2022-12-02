@@ -323,7 +323,7 @@ func TestList(t *testing.T) {
 	stdout, stderr, err := cli.Run("lib", "list")
 	require.NoError(t, err)
 	require.Empty(t, stderr)
-	require.Contains(t, strings.TrimSpace(string(stdout)), "No libraries installed.")
+	require.Contains(t, string(stdout), "No libraries installed.")
 	stdout, stderr, err = cli.Run("lib", "list", "--format", "json")
 	require.NoError(t, err)
 	require.Empty(t, stderr)
@@ -338,11 +338,11 @@ func TestList(t *testing.T) {
 	require.NoError(t, err)
 	require.Empty(t, stderr)
 	lines := strings.Split(strings.TrimSpace(string(stdout)), "\n")
-	require.Equal(t, 2, len(lines))
+	require.Len(t, lines, 2)
 	lines[1] = strings.Join(strings.Fields(lines[1]), " ")
 	toks := strings.SplitN(lines[1], " ", 5)
 	// Verifies the expected number of field
-	require.Equal(t, 5, len(toks))
+	require.Len(t, toks, 5)
 	// be sure line contain the current version AND the available version
 	require.NotEmpty(t, toks[1])
 	require.NotEmpty(t, toks[2])
@@ -355,7 +355,7 @@ func TestList(t *testing.T) {
 	require.Empty(t, stderr)
 	requirejson.Len(t, stdout, 1)
 	// be sure data contains the available version
-	requirejson.Query(t, stdout, ".[0] | .release | .version != \"\"", "true")
+	requirejson.Query(t, stdout, `.[0] | .release | .version != ""`, "true")
 
 	// Install something we can list without provides_includes field given in library.properties
 	_, _, err = cli.Run("lib", "install", "Arduino_APDS9960@1.0.3")
@@ -366,7 +366,7 @@ func TestList(t *testing.T) {
 	require.Empty(t, stderr)
 	requirejson.Len(t, stdout, 1)
 	// be sure data contains the correct provides_includes field
-	requirejson.Query(t, stdout, ".[0] | .library | .provides_includes | .[0]", "\"Arduino_APDS9960.h\"")
+	requirejson.Query(t, stdout, ".[0] | .library | .provides_includes | .[0]", `"Arduino_APDS9960.h"`)
 }
 
 func TestListExitCode(t *testing.T) {
@@ -445,8 +445,8 @@ func TestListWithFqbn(t *testing.T) {
 	requirejson.Len(t, stdout, 1)
 
 	// Verifies library is compatible
-	requirejson.Query(t, stdout, ".[0] | .library | .name", "\"ArduinoJson\"")
-	requirejson.Query(t, stdout, ".[0] | .library | .compatible_with | .\"arduino:avr:uno\"", "true")
+	requirejson.Query(t, stdout, `.[0] | .library | .name`, `"ArduinoJson"`)
+	requirejson.Query(t, stdout, `.[0] | .library | .compatible_with | ."arduino:avr:uno"`, `true`)
 }
 
 func TestListProvidesIncludesFallback(t *testing.T) {
@@ -550,7 +550,7 @@ func TestInstallLibraryWithDependencies(t *testing.T) {
 	// Verifies library's dependencies are correctly installed
 	stdout, _, err = cli.Run("lib", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, "[ .[] | .library | .name ] | sort", "[\"MD_MAX72XX\",\"MD_Parola\"]")
+	requirejson.Query(t, stdout, `[ .[] | .library | .name ] | sort`, `["MD_MAX72XX","MD_Parola"]`)
 
 	// Try upgrading with --no-overwrite (should fail) and without --no-overwrite (should succeed)
 	_, _, err = cli.Run("lib", "install", "MD_Parola@3.6.1", "--no-overwrite")
@@ -588,7 +588,7 @@ func TestInstallNoDeps(t *testing.T) {
 	// Verifies library's dependencies are not installed
 	stdout, _, err = cli.Run("lib", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, ".[] | .library | .name", "\"MD_Parola\"")
+	requirejson.Query(t, stdout, `.[] | .library | .name`, `"MD_Parola"`)
 }
 
 func TestInstallWithGitUrl(t *testing.T) {
