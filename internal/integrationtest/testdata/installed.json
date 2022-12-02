@@ -1814,36 +1814,43 @@
               "host": "i386-apple-darwin11",
               "url": "http://downloads.arduino.cc/tools/dfu-util-0.11.0-arduino3-osx.tar.bz2",
               "archiveFileName": "dfu-util-0.11.0-arduino3-osx.tar.bz2",
-              "size": "78971",
-              "checksum": "SHA-256:75a396bbb919157f7a38250869ad11028c456af2d9852ae85dde05ba657d50d3"
+              "size": "79057",
+              "checksum": "SHA-256:81d88dae0ed068a7bdde14d7cd56c9b953a3aea87aaaf4bcbaf022ba7df47ad5"
             },
             {
               "host": "arm-linux-gnueabihf",
               "url": "http://downloads.arduino.cc/tools/dfu-util-0.11.0-arduino3-arm.tar.bz2",
               "archiveFileName": "dfu-util-0.11.0-arduino3-arm.tar.bz2",
-              "size": "288723",
-              "checksum": "SHA-256:c7772deb103514e08ad8b70752e59aa5db3c6ace96fc4ea6bf85f07e824e7cd6"
+              "size": "241168",
+              "checksum": "SHA-256:27fb1fc8ba19df08f1805236083c7199f59bdaaacacceead98fee0e817e48425"
+            },
+            {
+              "host": "aarch64-linux-gnu",
+              "url": "http://downloads.arduino.cc/tools/dfu-util-0.11.0-arduino3-arm64.tar.bz2",
+              "archiveFileName": "dfu-util-0.11.0-arduino3-arm64.tar.bz2",
+              "size": "282961",
+              "checksum": "SHA-256:5f212524b6338d06bf833a2375f1012740e0a359c81ad1ff728222cc93a28586"
             },
             {
               "host": "x86_64-linux-gnu",
               "url": "http://downloads.arduino.cc/tools/dfu-util-0.11.0-arduino3-linux64.tar.bz2",
               "archiveFileName": "dfu-util-0.11.0-arduino3-linux64.tar.bz2",
-              "size": "81861",
-              "checksum": "SHA-256:4989f33f2e7b9da2973b397b127843478967d6846f4b763823cce342aa34dd0f"
+              "size": "78422",
+              "checksum": "SHA-256:6a72e62546d4ba1c0c05c00a1e4863b23ab99e1224e6325b458207822fbf0da4"
             },
             {
               "host": "i686-linux-gnu",
               "url": "http://downloads.arduino.cc/tools/dfu-util-0.11.0-arduino3-linux32.tar.bz2",
               "archiveFileName": "dfu-util-0.11.0-arduino3-linux32.tar.bz2",
-              "size": "81885",
-              "checksum": "SHA-256:c6d96acef36773044056be4a592c65416ca831a68f6f36c13f5de730948c870b"
+              "size": "82825",
+              "checksum": "SHA-256:d6e5bd3d1861ac01dc85e85ae44667346a18f56537a95fe63e9dc71b1adeac99"
             },
             {
               "host": "i686-mingw32",
               "url": "http://downloads.arduino.cc/tools/dfu-util-0.11.0-arduino3-windows.tar.bz2",
               "archiveFileName": "dfu-util-0.11.0-arduino3-windows.tar.bz2",
-              "size": "635831",
-              "checksum": "SHA-256:f951ffce899108096eb61ccc892b7ba80cae4314ef5463e75e0e1acab21d05b6"
+              "size": "635719",
+              "checksum": "SHA-256:7dccfadc260c5b13f7267fcd9ed610571bc74f6f64a85c20541c9ae48a1833b3"
             }
           ]
         },
@@ -2391,6 +2398,61 @@
               "archiveFileName": "arduinoOTA-1.2.1-windows_386.zip",
               "size": "2237511",
               "checksum": "SHA-256:e1ebf21f2c073fce25c09548c656da90d4ef6c078401ec6f323e0c58335115e5"
+            }
+          ]
+        },
+        {
+          "name": "arduinoOTA",
+          "version": "1.4.0",
+          "systems": [
+            {
+              "host": "i686-pc-linux-gnu",
+              "url": "https://downloads.arduino.cc/tools/arduinoOTA/arduinoOTA_1.4.0_Linux_32bit.tar.gz",
+              "archiveFileName": "arduinoOTA_1.4.0_Linux_32bit.tar.gz",
+              "size": "3742108",
+              "checksum": "SHA-256:9080b00d784c51bfd3703ae6a1c3c28ac6a2509356c319d44cd87cdb54853f50"
+            },
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "url": "https://downloads.arduino.cc/tools/arduinoOTA/arduinoOTA_1.4.0_Linux_64bit.tar.gz",
+              "archiveFileName": "arduinoOTA_1.4.0_Linux_64bit.tar.gz",
+              "size": "3984473",
+              "checksum": "SHA-256:6bbc317b82753bdae5a98a5785f7ba91171fa4d43c50333801af32c9076b94dc"
+            },
+            {
+              "host": "i686-mingw32",
+              "url": "https://downloads.arduino.cc/tools/arduinoOTA/arduinoOTA_1.4.0_Windows_32bit.zip",
+              "archiveFileName": "arduinoOTA_1.4.0_Windows_32bit.zip",
+              "size": "3723215",
+              "checksum": "SHA-256:2cd10357d743fb678fff73dae73ae52ed310db09d103819702d53add13ca0bbb"
+            },
+            {
+              "host": "x86_64-mingw32",
+              "url": "https://downloads.arduino.cc/tools/arduinoOTA/arduinoOTA_1.4.0_Windows_64bit.zip",
+              "archiveFileName": "arduinoOTA_1.4.0_Windows_64bit.zip",
+              "size": "3895744",
+              "checksum": "SHA-256:05eeebd155cb53e9528ab132bc00af76719f4c082cdcd0fee1f9cd96c56ecdd4"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "https://downloads.arduino.cc/tools/arduinoOTA/arduinoOTA_1.4.0_macOS_64bit.tar.gz",
+              "archiveFileName": "arduinoOTA_1.4.0_macOS_64bit.tar.gz",
+              "size": "3955987",
+              "checksum": "SHA-256:c5e7f3c7cc823bceb617a57ba6875710957a7090d059a5335daffcc2b19cbad4"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "url": "https://downloads.arduino.cc/tools/arduinoOTA/arduinoOTA_1.4.0_Linux_ARMv6.tar.gz",
+              "archiveFileName": "arduinoOTA_1.4.0_Linux_ARMv6.tar.gz",
+              "size": "3583605",
+              "checksum": "SHA-256:d2c75b73db96c22c01b68326539eecab1100f55a30bf7aab0cfa3942583e58c8"
+            },
+            {
+              "host": "arm64-linux-gnueabihf",
+              "url": "https://downloads.arduino.cc/tools/arduinoOTA/arduinoOTA_1.4.0_Linux_ARM64.tar.gz",
+              "archiveFileName": "arduinoOTA_1.4.0_Linux_ARM64.tar.gz",
+              "size": "3649252",
+              "checksum": "SHA-256:98e311c3e84a7fa7403d52d33fcd67ee90ba816b9628379f65446e259e3197b2"
             }
           ]
         },
