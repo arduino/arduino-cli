@@ -141,7 +141,12 @@ func runUploadCommand(command *cobra.Command, args []string) {
 	fields := map[string]string{}
 	if len(userFieldRes.UserFields) > 0 {
 		feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", port.Protocol))
-		fields = arguments.AskForUserFields(userFieldRes.UserFields)
+		if f, err := arguments.AskForUserFields(userFieldRes.UserFields); err != nil {
+			feedback.Errorf("%s: %s", tr("Error getting user input"), err)
+			os.Exit(errorcodes.ErrGeneric)
+		} else {
+			fields = f
+		}
 	}
 
 	if sketchPath != nil {

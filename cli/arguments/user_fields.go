@@ -16,36 +16,21 @@
 package arguments
 
 import (
-	"bufio"
-	"fmt"
-	"os"
-
 	"github.com/arduino/arduino-cli/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"golang.org/x/term"
 )
 
 // AskForUserFields prompts the user to input the provided user fields.
 // If there is an error reading input it panics.
-func AskForUserFields(userFields []*rpc.UserField) map[string]string {
-	writer := feedback.OutputWriter()
+func AskForUserFields(userFields []*rpc.UserField) (map[string]string, error) {
 	fields := map[string]string{}
-	reader := bufio.NewReader(os.Stdin)
 	for _, f := range userFields {
-		fmt.Fprintf(writer, "%s: ", f.Label)
-		var value []byte
-		var err error
-		if f.Secret {
-			value, err = term.ReadPassword(int(os.Stdin.Fd()))
-		} else {
-			value, err = reader.ReadBytes('\n')
-		}
+		value, err := feedback.InputUserField(f.Label, f.Secret)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
-		fields[f.Name] = string(value)
+		fields[f.Name] = value
 	}
-	fmt.Fprintln(writer, "")
 
-	return fields
+	return fields, nil
 }

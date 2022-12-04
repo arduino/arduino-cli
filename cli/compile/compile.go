@@ -248,7 +248,12 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		fields := map[string]string{}
 		if len(userFieldRes.UserFields) > 0 {
 			feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", port.Protocol))
-			fields = arguments.AskForUserFields(userFieldRes.UserFields)
+			if f, err := arguments.AskForUserFields(userFieldRes.UserFields); err != nil {
+				feedback.Error(err)
+				os.Exit(errorcodes.ErrBadArgument)
+			} else {
+				fields = f
+			}
 		}
 
 		uploadRequest := &rpc.UploadRequest{
