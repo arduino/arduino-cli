@@ -201,7 +201,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	if logFile != "" {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
-			fmt.Println(tr("Unable to open file for logging: %s", logFile))
+			feedback.Errorf(tr("Unable to open file for logging: %s", logFile))
 			os.Exit(errorcodes.ErrBadCall)
 		}
 
