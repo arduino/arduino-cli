@@ -102,6 +102,7 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(debug.NewCommand())
 	cmd.AddCommand(burnbootloader.NewCommand())
 	cmd.AddCommand(version.NewCommand())
+	cmd.AddCommand(feedback.NewCommand())
 
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, tr("Print the logs on the standard output."))
 	validLogLevels := []string{"trace", "debug", "info", "warn", "error", "fatal", "panic"}
