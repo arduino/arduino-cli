@@ -38,13 +38,16 @@ func InputUserField(prompt string, secret bool) (string, error) {
 	var err error
 	if secret {
 		value, err = term.ReadPassword(int(os.Stdin.Fd()))
+		fmt.Fprintln(stdOut)
 	} else {
 		value, err = bufio.NewReader(os.Stdin).ReadBytes('\n')
+		if l := len(value); l > 0 {
+			value = value[:l-1]
+		}
 	}
 	if err != nil {
 		panic(err)
 	}
-	fmt.Fprintln(stdOut, "")
 
 	return string(value), nil
 }
