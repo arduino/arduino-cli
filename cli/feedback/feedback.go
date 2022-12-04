@@ -44,6 +44,29 @@ const (
 	YAML
 )
 
+var formats map[string]OutputFormat = map[string]OutputFormat{
+	"json":     JSON,
+	"jsonmini": MinifiedJSON,
+	"yaml":     YAML,
+	"text":     Text,
+}
+
+func (f OutputFormat) String() string {
+	for res, format := range formats {
+		if format == f {
+			return res
+		}
+	}
+	panic("unknown output format")
+}
+
+// ParseOutputFormat parses a string and returns the corresponding OutputFormat.
+// The boolean returned is true if the string was a valid OutputFormat.
+func ParseOutputFormat(in string) (OutputFormat, bool) {
+	format, found := formats[in]
+	return format, found
+}
+
 var (
 	stdOut io.Writer    = os.Stdout
 	stdErr io.Writer    = os.Stderr

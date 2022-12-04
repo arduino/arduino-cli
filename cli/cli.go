@@ -143,17 +143,6 @@ func toLogLevel(s string) (t logrus.Level, found bool) {
 	return
 }
 
-func parseFormatString(arg string) (feedback.OutputFormat, bool) {
-	f, found := map[string]feedback.OutputFormat{
-		"json":     feedback.JSON,
-		"jsonmini": feedback.MinifiedJSON,
-		"text":     feedback.Text,
-		"yaml":     feedback.YAML,
-	}[strings.ToLower(arg)]
-
-	return f, found
-}
-
 func preRun(cmd *cobra.Command, args []string) {
 	configFile := configuration.Settings.ConfigFileUsed()
 
@@ -237,7 +226,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	//
 
 	// check the right output format was passed
-	format, found := parseFormatString(outputFormat)
+	format, found := feedback.ParseOutputFormat(outputFormat)
 	if !found {
 		feedback.Errorf(tr("Invalid output format: %s"), outputFormat)
 		os.Exit(errorcodes.ErrBadCall)

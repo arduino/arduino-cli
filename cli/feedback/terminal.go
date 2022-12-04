@@ -27,7 +27,7 @@ import (
 // InputUserField prompts the user to input the provided user field.
 func InputUserField(prompt string, secret bool) (string, error) {
 	if format != Text {
-		return "", errors.New(tr("user input not supported for the selected output format"))
+		return "", errors.New(tr("user input not supported for the '%s' output format", format))
 	}
 	if !term.IsTerminal(int(os.Stdin.Fd())) {
 		return "", errors.New(tr("user input not supported in non interactive mode"))
