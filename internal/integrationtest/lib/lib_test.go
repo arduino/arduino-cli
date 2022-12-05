@@ -421,7 +421,7 @@ func TestListWithFqbn(t *testing.T) {
 	require.NoError(t, err)
 
 	// Install core
-	_, _, err = cli.Run("core", "install", "arduino:avr")
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.6")
 	require.NoError(t, err)
 
 	// Look at the plain text output
@@ -434,8 +434,12 @@ func TestListWithFqbn(t *testing.T) {
 	stdout, stderr, err := cli.Run("lib", "list", "-b", "arduino:avr:uno")
 	require.NoError(t, err)
 	require.Empty(t, stderr)
+	// Check if output contains bundled libraries
+	require.Contains(t, string(stdout), "ArduinoJson")
+	require.Contains(t, string(stdout), "EEPROM")
+	require.Contains(t, string(stdout), "HID")
 	lines := strings.Split(strings.TrimSpace(string(stdout)), "\n")
-	require.Len(t, lines, 2)
+	require.Len(t, lines, 7)
 
 	// Verifies library is compatible
 	lines[1] = strings.Join(strings.Fields(lines[1]), " ")
@@ -447,11 +451,14 @@ func TestListWithFqbn(t *testing.T) {
 	stdout, stderr, err = cli.Run("lib", "list", "-b", "arduino:avr:uno", "--format", "json")
 	require.NoError(t, err)
 	require.Empty(t, stderr)
-	requirejson.Len(t, stdout, 1)
+	requirejson.Len(t, stdout, 6)
 
 	// Verifies library is compatible
-	requirejson.Query(t, stdout, `.[0] | .library | .name`, `"ArduinoJson"`)
-	requirejson.Query(t, stdout, `.[0] | .library | .compatible_with | ."arduino:avr:uno"`, `true`)
+	requirejson.Query(t, stdout, `sort_by(.library | .name) | .[0] | .library | .name`, `"ArduinoJson"`)
+	requirejson.Query(t, stdout, `sort_by(.library | .name) | .[0] | .library | .compatible_with | ."arduino:avr:uno"`, `true`)
+
+	// Verifies bundled libs are shown if -b flag is used
+	requirejson.Parse(t, stdout).Query(`.[] | .library | select(.container_platform=="arduino:avr@1.8.6")`).MustNotBeEmpty()
 }
 
 func TestListProvidesIncludesFallback(t *testing.T) {
