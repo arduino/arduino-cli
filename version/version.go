@@ -53,6 +53,11 @@ func (i *Info) String() string {
 	return tr("%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s", i.Application, i.Status, i.VersionString, i.Commit, i.Date)
 }
 
+// Data implements feedback.Result interface
+func (i *Info) Data() interface{} {
+	return i
+}
+
 //nolint:gochecknoinits
 func init() {
 	if versionString == "" {

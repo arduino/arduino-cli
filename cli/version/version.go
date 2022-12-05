@@ -49,7 +49,7 @@ func runVersionCommand(cmd *cobra.Command, args []string) {
 	if strings.Contains(globals.VersionInfo.VersionString, "git-snapshot") || strings.Contains(globals.VersionInfo.VersionString, "nightly") {
 		// We're using a development version, no need to check if there's a
 		// new release available
-		feedback.Print(globals.VersionInfo)
+		feedback.PrintResult(globals.VersionInfo)
 		return
 	}
 
@@ -66,7 +66,7 @@ func runVersionCommand(cmd *cobra.Command, args []string) {
 		versionInfo.LatestVersion = latestVersion.String()
 	}
 
-	feedback.Print(versionInfo)
+	feedback.PrintResult(versionInfo)
 
 	if feedback.GetFormat() == feedback.Text && latestVersion != nil {
 		updater.NotifyNewVersionIsAvailable(latestVersion.String())
