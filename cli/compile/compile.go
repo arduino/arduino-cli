@@ -273,9 +273,9 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			// TODO: do not print upload output in json mode
 			uploadStdOut := new(bytes.Buffer)
 			uploadStdErr := new(bytes.Buffer)
-			_, uploadError = upload.Upload(context.Background(), uploadRequest, uploadStdOut, uploadStdErr)
+			uploadError = upload.Upload(context.Background(), uploadRequest, uploadStdOut, uploadStdErr)
 		} else {
-			_, uploadError = upload.Upload(context.Background(), uploadRequest, os.Stdout, os.Stderr)
+			uploadError = upload.Upload(context.Background(), uploadRequest, os.Stdout, os.Stderr)
 		}
 		if uploadError != nil {
 			feedback.Errorf(tr("Error during Upload: %v"), uploadError)
