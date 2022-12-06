@@ -48,22 +48,24 @@ func NewCommand() *cobra.Command {
 }
 
 func runCompletionCommand(cmd *cobra.Command, args []string) {
+	stdOut, _, res := feedback.OutputStreams()
 	logrus.Info("Executing `arduino-cli completion`")
 	if completionNoDesc && (args[0] == "powershell") {
 		feedback.Fatal(tr("Error: command description is not supported by %v", args[0]), errorcodes.ErrGeneric)
 	}
 	switch args[0] {
 	case "bash":
-		cmd.Root().GenBashCompletionV2(os.Stdout, !completionNoDesc)
+		cmd.Root().GenBashCompletionV2(stdOut, !completionNoDesc)
 	case "zsh":
 		if completionNoDesc {
-			cmd.Root().GenZshCompletionNoDesc(os.Stdout)
+			cmd.Root().GenZshCompletionNoDesc(stdOut)
 		} else {
-			cmd.Root().GenZshCompletion(os.Stdout)
+			cmd.Root().GenZshCompletion(stdOut)
 		}
 	case "fish":
-		cmd.Root().GenFishCompletion(os.Stdout, !completionNoDesc)
+		cmd.Root().GenFishCompletion(stdOut, !completionNoDesc)
 	case "powershell":
-		cmd.Root().GenPowerShellCompletion(os.Stdout)
+		cmd.Root().GenPowerShellCompletion(stdOut)
 	}
+	feedback.PrintResult(res())
 }
