@@ -189,10 +189,14 @@ func Fatal(errorMsg string, exitCode int) {
 	}
 
 	type FatalError struct {
-		Error string `json:"error"`
+		Error  string               `json:"error"`
+		Output *OutputStreamsResult `json:"output,omitempty"`
 	}
 	res := FatalError{
 		Error: errorMsg,
+	}
+	if output := getOutputStreamResult(); !output.Empty() {
+		res.Output = output
 	}
 	var d []byte
 	switch format {
