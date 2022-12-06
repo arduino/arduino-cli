@@ -19,14 +19,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
+	"io"
 	"strings"
 	"sync/atomic"
 
 	"google.golang.org/grpc"
 )
 
-var debugStdOut = os.Stdout
+var debugStdOut io.Writer
 var debugSeq uint32
 
 func log(isRequest bool, seq uint32, msg interface{}) {

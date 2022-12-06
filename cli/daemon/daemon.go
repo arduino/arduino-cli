@@ -89,8 +89,15 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 			if err != nil {
 				feedback.Fatal(tr("Error opening debug logging file: %s", err), errorcodes.ErrBadCall)
 			}
-			debugStdOut = f
 			defer f.Close()
+			debugStdOut = f
+		} else {
+			// Attach to os.Stdout only if we are in Text mode
+			if feedback.GetFormat() != feedback.Text {
+				feedback.Fatal(tr("Debug log is only available in text format"), errorcodes.ErrBadArgument)
+			}
+			out, _, _ := feedback.OutputStreams()
+			debugStdOut = out
 		}
 		gRPCOptions = append(gRPCOptions,
 			grpc.UnaryInterceptor(unaryLoggerInterceptor),
