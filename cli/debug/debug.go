@@ -102,7 +102,11 @@ func runDebugCommand(command *cobra.Command, args []string) {
 		ctrlc := make(chan os.Signal, 1)
 		signal.Notify(ctrlc, os.Interrupt)
 
-		if _, err := debug.Debug(context.Background(), debugConfigRequested, os.Stdin, os.Stdout, ctrlc); err != nil {
+		in, out, err := feedback.InteractiveStreams()
+		if err != nil {
+			feedback.FatalError(err, errorcodes.ErrBadArgument)
+		}
+		if _, err := debug.Debug(context.Background(), debugConfigRequested, in, out, ctrlc); err != nil {
 			feedback.Fatal(tr("Error during Debug: %v", err), errorcodes.ErrGeneric)
 		}
 
