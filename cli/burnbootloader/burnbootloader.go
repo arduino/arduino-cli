@@ -73,6 +73,7 @@ func runBootloaderCommand(command *cobra.Command, args []string) {
 		feedback.Fatal(tr("Error during Upload: %v", err), errorcodes.ErrGeneric)
 	}
 
+	stdOut, stdErr, res := feedback.OutputStreams()
 	if _, err := upload.BurnBootloader(context.Background(), &rpc.BurnBootloaderRequest{
 		Instance:   instance,
 		Fqbn:       fqbn.String(),
@@ -81,8 +82,8 @@ func runBootloaderCommand(command *cobra.Command, args []string) {
 		Verify:     verify,
 		Programmer: programmer.String(),
 		DryRun:     dryRun,
-	}, os.Stdout, os.Stderr); err != nil {
+	}, stdOut, stdErr); err != nil {
 		feedback.Fatal(tr("Error during Upload: %v", err), errorcodes.ErrGeneric)
 	}
-	os.Exit(0)
+	feedback.PrintResult(res())
 }
