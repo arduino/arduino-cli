@@ -153,6 +153,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 		path = sketchPath.String()
 	}
 
+	stdOut, stdErr, stdIOResult := feedback.OutputStreams()
 	req := &rpc.UploadRequest{
 		Instance:   instance,
 		Fqbn:       fqbn,
@@ -166,8 +167,9 @@ func runUploadCommand(command *cobra.Command, args []string) {
 		DryRun:     dryRun,
 		UserFields: fields,
 	}
-	if err := upload.Upload(context.Background(), req, os.Stdout, os.Stderr); err != nil {
+	if err := upload.Upload(context.Background(), req, stdOut, stdErr); err != nil {
 		feedback.Errorf(tr("Error during Upload: %v"), err)
 		os.Exit(errorcodes.ErrGeneric)
 	}
+	feedback.PrintResult(stdIOResult())
 }
