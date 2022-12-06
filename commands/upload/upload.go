@@ -629,11 +629,13 @@ func detectSketchNameFromBuildPath(buildPath *paths.Path) (string, error) {
 // specified protocol properties.
 //
 // For example passing the below properties and "upload" as action and "serial" as protocol:
+//
 //	upload.speed=256
 //	upload.serial.speed=57600
 //	upload.network.speed=19200
 //
 // will return:
+//
 //	upload.speed=57600
 //	upload.serial.speed=57600
 //	upload.network.speed=19200
