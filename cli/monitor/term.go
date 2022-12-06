@@ -16,14 +16,26 @@
 package monitor
 
 import (
-	"os"
+	"io"
+
+	"github.com/arduino/arduino-cli/cli/feedback"
 )
 
 type stdInOut struct {
+	in  io.Reader
+	out io.Writer
 }
 
 func newStdInOutTerminal() (*stdInOut, error) {
-	return &stdInOut{}, nil
+	in, out, err := feedback.InteractiveStreams()
+	if err != nil {
+		return nil, err
+	}
+
+	return &stdInOut{
+		in:  in,
+		out: out,
+	}, nil
 }
 
 func (n *stdInOut) Close() error {
@@ -31,9 +43,9 @@ func (n *stdInOut) Close() error {
 }
 
 func (n *stdInOut) Read(buff []byte) (int, error) {
-	return os.Stdin.Read(buff)
+	return n.in.Read(buff)
 }
 
 func (n *stdInOut) Write(buff []byte) (int, error) {
-	return os.Stdout.Write(buff)
+	return n.out.Write(buff)
 }

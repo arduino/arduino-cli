@@ -19,17 +19,38 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 
 	"golang.org/x/term"
 )
+
+// InteractiveStreams returns the underlying io.Reader and io.Writer to directly stream to
+// stdin and stdout. It errors if the selected output format is not Text or the terminal is
+// not interactive.
+func InteractiveStreams() (io.Reader, io.Writer, error) {
+	if !formatSelected {
+		panic("output format not yet selected")
+	}
+	if format != Text {
+		return nil, nil, errors.New(tr("interactive terminal not supported for the '%s' output format", format))
+	}
+	if !isTerminal() {
+		return nil, nil, errors.New(tr("not running in a terminal"))
+	}
+	return os.Stdin, stdOut, nil
+}
+
+func isTerminal() bool {
+	return term.IsTerminal(int(os.Stdin.Fd()))
+}
 
 // InputUserField prompts the user to input the provided user field.
 func InputUserField(prompt string, secret bool) (string, error) {
 	if format != Text {
 		return "", errors.New(tr("user input not supported for the '%s' output format", format))
 	}
-	if !term.IsTerminal(int(os.Stdin.Fd())) {
+	if !isTerminal() {
 		return "", errors.New(tr("user input not supported in non interactive mode"))
 	}
 
