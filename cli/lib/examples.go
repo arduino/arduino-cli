@@ -70,8 +70,7 @@ func runExamplesCommand(cmd *cobra.Command, args []string) {
 		Fqbn:     fqbn.String(),
 	})
 	if err != nil {
-		feedback.Errorf(tr("Error getting libraries info: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error getting libraries info: %v", err), errorcodes.ErrGeneric)
 	}
 
 	found := []*libraryExamples{}

@@ -55,9 +55,8 @@ func (dr dumpResult) Data() interface{} {
 func (dr dumpResult) String() string {
 	bs, err := yaml.Marshal(dr.data)
 	if err != nil {
-		feedback.Errorf(tr("unable to marshal config to YAML: %v"), err)
-		return ""
+		// Should never happen
+		panic(tr("unable to marshal config to YAML: %v", err))
 	}
-
 	return string(bs)
 }

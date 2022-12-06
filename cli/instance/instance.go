@@ -17,7 +17,6 @@ package instance
 
 import (
 	"context"
-	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -45,8 +44,7 @@ func CreateAndInit() *rpc.Instance {
 func CreateAndInitWithProfile(profileName string, sketchPath *paths.Path) (*rpc.Instance, *rpc.Profile) {
 	instance, err := Create()
 	if err != nil {
-		feedback.Errorf(tr("Error creating instance: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error creating instance: %v", err), errorcodes.ErrGeneric)
 	}
 	profile := InitWithProfile(instance, profileName, sketchPath)
 	return instance, profile
@@ -168,8 +166,7 @@ func CreateInstanceAndRunFirstUpdate() *rpc.Instance {
 	// as argument but none would be obviously found.
 	inst, status := Create()
 	if status != nil {
-		feedback.Errorf(tr("Error creating instance: %v"), status)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error creating instance: %v", status), errorcodes.ErrGeneric)
 	}
 
 	// In case this is the first time the CLI is run we need to update indexes
@@ -177,8 +174,7 @@ func CreateInstanceAndRunFirstUpdate() *rpc.Instance {
 	// we must use instance.Create instead of instance.CreateAndInit for the
 	// reason stated above.
 	if err := FirstUpdate(inst); err != nil {
-		feedback.Errorf(tr("Error updating indexes: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error updating indexes: %v", err), errorcodes.ErrGeneric)
 	}
 	return inst
 }

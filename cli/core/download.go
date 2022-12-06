@@ -54,8 +54,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 
 	platformsRefs, err := arguments.ParseReferences(args)
 	if err != nil {
-		feedback.Errorf(tr("Invalid argument passed: %v"), err)
-		os.Exit(errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Invalid argument passed: %v", err), errorcodes.ErrBadArgument)
 	}
 
 	for i, platformRef := range platformsRefs {
@@ -67,8 +66,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 		}
 		_, err := core.PlatformDownload(context.Background(), platformDownloadreq, feedback.ProgressBar())
 		if err != nil {
-			feedback.Errorf(tr("Error downloading %[1]s: %[2]v"), args[i], err)
-			os.Exit(errorcodes.ErrNetwork)
+			feedback.Fatal(tr("Error downloading %[1]s: %[2]v", args[i], err), errorcodes.ErrNetwork)
 		}
 	}
 }

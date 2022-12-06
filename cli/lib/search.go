@@ -54,8 +54,7 @@ func runSearchCommand(args []string, namesOnly bool) {
 	logrus.Info("Executing `arduino-cli lib search`")
 
 	if status != nil {
-		feedback.Errorf(tr("Error creating instance: %v"), status)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error creating instance: %v", status), errorcodes.ErrGeneric)
 	}
 
 	if err := commands.UpdateLibrariesIndex(
@@ -63,8 +62,7 @@ func runSearchCommand(args []string, namesOnly bool) {
 		&rpc.UpdateLibrariesIndexRequest{Instance: inst},
 		feedback.ProgressBar(),
 	); err != nil {
-		feedback.Errorf(tr("Error updating library index: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error updating library index: %v", err), errorcodes.ErrGeneric)
 	}
 
 	instance.Init(inst)
@@ -74,8 +72,7 @@ func runSearchCommand(args []string, namesOnly bool) {
 		Query:    strings.Join(args, " "),
 	})
 	if err != nil {
-		feedback.Errorf(tr("Error searching for Libraries: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error searching for Libraries: %v", err), errorcodes.ErrGeneric)
 	}
 
 	feedback.PrintResult(result{

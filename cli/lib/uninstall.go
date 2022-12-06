@@ -51,8 +51,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 
 	refs, err := ParseLibraryReferenceArgsAndAdjustCase(instance, args)
 	if err != nil {
-		feedback.Errorf(tr("Invalid argument passed: %v"), err)
-		os.Exit(errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Invalid argument passed: %v", err), errorcodes.ErrBadArgument)
 	}
 
 	for _, library := range refs {
@@ -62,8 +61,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 			Version:  library.Version,
 		}, feedback.TaskProgress())
 		if err != nil {
-			feedback.Errorf(tr("Error uninstalling %[1]s: %[2]v"), library, err)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error uninstalling %[1]s: %[2]v", library, err), errorcodes.ErrGeneric)
 		}
 	}
 

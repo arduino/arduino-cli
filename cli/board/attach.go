@@ -67,8 +67,7 @@ func runAttachCommand(path string, port *arguments.Port, fqbn string) {
 	address, protocol, _ := port.GetPortAddressAndProtocol(nil, sk)
 	if address != "" {
 		if err := sk.SetDefaultPort(address, protocol); err != nil {
-			feedback.Errorf("%s: %s", tr("Error saving sketch metadata"), err)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(fmt.Sprintf("%s: %s", tr("Error saving sketch metadata"), err), errorcodes.ErrGeneric)
 		}
 		current.Port = &boardAttachPortResult{
 			Address:  address,
@@ -77,8 +76,7 @@ func runAttachCommand(path string, port *arguments.Port, fqbn string) {
 	}
 	if fqbn != "" {
 		if err := sk.SetDefaultFQBN(fqbn); err != nil {
-			feedback.Errorf("%s: %s", tr("Error saving sketch metadata"), err)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(fmt.Sprintf("%s: %s", tr("Error saving sketch metadata"), err), errorcodes.ErrGeneric)
 		}
 		current.Fqbn = fqbn
 	}

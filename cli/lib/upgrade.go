@@ -17,6 +17,7 @@ package lib
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -68,8 +69,7 @@ func Upgrade(instance *rpc.Instance, libraries []string) {
 	}
 
 	if upgradeErr != nil {
-		feedback.Errorf("%s: %v", tr("Error upgrading libraries"), upgradeErr)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(fmt.Sprintf("%s: %v", tr("Error upgrading libraries"), upgradeErr), errorcodes.ErrGeneric)
 	}
 
 	logrus.Info("Done")

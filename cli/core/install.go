@@ -63,8 +63,7 @@ func runInstallCommand(args []string, postInstallFlags arguments.PostInstallFlag
 
 	platformsRefs, err := arguments.ParseReferences(args)
 	if err != nil {
-		feedback.Errorf(tr("Invalid argument passed: %v"), err)
-		os.Exit(errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Invalid argument passed: %v", err), errorcodes.ErrBadArgument)
 	}
 
 	for _, platformRef := range platformsRefs {
@@ -78,8 +77,7 @@ func runInstallCommand(args []string, postInstallFlags arguments.PostInstallFlag
 		}
 		_, err := core.PlatformInstall(context.Background(), platformInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
 		if err != nil {
-			feedback.Errorf(tr("Error during install: %v"), err)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error during install: %v", err), errorcodes.ErrGeneric)
 		}
 	}
 }

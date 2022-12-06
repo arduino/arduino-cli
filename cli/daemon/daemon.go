@@ -79,8 +79,7 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 	gRPCOptions := []grpc.ServerOption{}
 	if debugFile != "" {
 		if !debug {
-			feedback.Error(tr("The flag --debug-file must be used with --debug."))
-			os.Exit(errorcodes.ErrBadArgument)
+			feedback.Fatal(tr("The flag --debug-file must be used with --debug."), errorcodes.ErrBadArgument)
 		}
 	}
 	if debug {
@@ -88,8 +87,7 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 			outFile := paths.New(debugFile)
 			f, err := outFile.Append()
 			if err != nil {
-				feedback.Error(tr("Error opening debug logging file: %s", err))
-				os.Exit(errorcodes.ErrBadCall)
+				feedback.Fatal(tr("Error opening debug logging file: %s", err), errorcodes.ErrBadCall)
 			}
 			debugStdOut = f
 			defer f.Close()
@@ -128,23 +126,19 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		// Invalid port, such as "Foo"
 		var dnsError *net.DNSError
 		if errors.As(err, &dnsError) {
-			feedback.Errorf(tr("Failed to listen on TCP port: %[1]s. %[2]s is unknown name."), port, dnsError.Name)
-			os.Exit(errorcodes.ErrCoreConfig)
+			feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. %[2]s is unknown name.", port, dnsError.Name), errorcodes.ErrCoreConfig)
 		}
 		// Invalid port number, such as -1
 		var addrError *net.AddrError
 		if errors.As(err, &addrError) {
-			feedback.Errorf(tr("Failed to listen on TCP port: %[1]s. %[2]s is an invalid port."), port, addrError.Addr)
-			os.Exit(errorcodes.ErrCoreConfig)
+			feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. %[2]s is an invalid port.", port, addrError.Addr), errorcodes.ErrCoreConfig)
 		}
 		// Port is already in use
 		var syscallErr *os.SyscallError
 		if errors.As(err, &syscallErr) && errors.Is(syscallErr.Err, syscall.EADDRINUSE) {
-			feedback.Errorf(tr("Failed to listen on TCP port: %s. Address already in use."), port)
-			os.Exit(errorcodes.ErrNetwork)
+			feedback.Fatal(tr("Failed to listen on TCP port: %s. Address already in use.", port), errorcodes.ErrNetwork)
 		}
-		feedback.Errorf(tr("Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v"), port, err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v", port, err), errorcodes.ErrGeneric)
 	}
 
 	// We need to parse the port used only if the user let
@@ -155,7 +149,7 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		split := strings.Split(address.String(), ":")
 
 		if len(split) == 0 {
-			feedback.Error(tr("Failed choosing port, address: %s", address))
+			feedback.Fatal(tr("Invalid TCP address: port is missing"), errorcodes.ErrBadArgument)
 		}
 
 		port = split[len(split)-1]

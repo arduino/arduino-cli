@@ -54,8 +54,7 @@ func runDepsCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli lib deps`")
 	libRef, err := ParseLibraryReferenceArgAndAdjustCase(instance, args[0])
 	if err != nil {
-		feedback.Errorf(tr("Arguments error: %v"), err)
-		os.Exit(errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Arguments error: %v", err), errorcodes.ErrBadArgument)
 	}
 
 	deps, err := lib.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesRequest{
@@ -64,7 +63,7 @@ func runDepsCommand(cmd *cobra.Command, args []string) {
 		Version:  libRef.Version,
 	})
 	if err != nil {
-		feedback.Errorf(tr("Error resolving dependencies for %[1]s: %[2]s", libRef, err))
+		feedback.Fatal(tr("Error resolving dependencies for %[1]s: %[2]s", libRef, err), errorcodes.ErrGeneric)
 	}
 
 	feedback.PrintResult(&checkDepResult{deps: deps})

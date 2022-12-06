@@ -59,8 +59,7 @@ func runDeleteCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if !exists {
-		feedback.Errorf(tr("Settings key doesn't exist"))
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Settings key doesn't exist"), errorcodes.ErrGeneric)
 	}
 
 	updatedSettings := viper.New()
@@ -69,7 +68,6 @@ func runDeleteCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if err := updatedSettings.WriteConfigAs(configuration.Settings.ConfigFileUsed()); err != nil {
-		feedback.Errorf(tr("Can't write config file: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Can't write config file: %v", err), errorcodes.ErrGeneric)
 	}
 }

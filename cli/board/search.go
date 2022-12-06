@@ -59,8 +59,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		IncludeHiddenBoards: showHiddenBoard,
 	})
 	if err != nil {
-		feedback.Errorf(tr("Error searching boards: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error searching boards: %v", err), errorcodes.ErrGeneric)
 	}
 
 	feedback.PrintResult(searchResults{res.Boards})

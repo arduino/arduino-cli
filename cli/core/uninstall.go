@@ -51,14 +51,12 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 
 	platformsRefs, err := arguments.ParseReferences(args)
 	if err != nil {
-		feedback.Errorf(tr("Invalid argument passed: %v"), err)
-		os.Exit(errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Invalid argument passed: %v", err), errorcodes.ErrBadArgument)
 	}
 
 	for _, platformRef := range platformsRefs {
 		if platformRef.Version != "" {
-			feedback.Errorf(tr("Invalid parameter %s: version not allowed"), platformRef)
-			os.Exit(errorcodes.ErrBadArgument)
+			feedback.Fatal(tr("Invalid parameter %s: version not allowed", platformRef), errorcodes.ErrBadArgument)
 		}
 	}
 	for _, platformRef := range platformsRefs {
@@ -68,8 +66,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 			Architecture:    platformRef.Architecture,
 		}, feedback.NewTaskProgressCB())
 		if err != nil {
-			feedback.Errorf(tr("Error during uninstall: %v"), err)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error during uninstall: %v", err), errorcodes.ErrGeneric)
 		}
 	}
 }

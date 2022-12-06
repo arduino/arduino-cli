@@ -149,8 +149,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	// initialize inventory
 	err := inventory.Init(configuration.DataDir(configuration.Settings).String())
 	if err != nil {
-		feedback.Errorf("Error: %v", err)
-		os.Exit(errorcodes.ErrBadArgument)
+		feedback.Fatal(fmt.Sprintf("Error: %v", err), errorcodes.ErrBadArgument)
 	}
 
 	// https://no-color.org/
@@ -201,8 +200,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	if logFile != "" {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
-			feedback.Errorf(tr("Unable to open file for logging: %s", logFile))
-			os.Exit(errorcodes.ErrBadCall)
+			feedback.Fatal(tr("Unable to open file for logging: %s", logFile), errorcodes.ErrBadCall)
 		}
 
 		// we use a hook so we don't get color codes in the log file
@@ -215,8 +213,7 @@ func preRun(cmd *cobra.Command, args []string) {
 
 	// configure logging filter
 	if lvl, found := toLogLevel(configuration.Settings.GetString("logging.level")); !found {
-		feedback.Errorf(tr("Invalid option for --log-level: %s"), configuration.Settings.GetString("logging.level"))
-		os.Exit(errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Invalid option for --log-level: %s", configuration.Settings.GetString("logging.level")), errorcodes.ErrBadArgument)
 	} else {
 		logrus.SetLevel(lvl)
 	}
@@ -228,8 +225,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	// check the right output format was passed
 	format, found := feedback.ParseOutputFormat(outputFormat)
 	if !found {
-		feedback.Errorf(tr("Invalid output format: %s"), outputFormat)
-		os.Exit(errorcodes.ErrBadCall)
+		feedback.Fatal(tr("Invalid output format: %s", outputFormat), errorcodes.ErrBadCall)
 	}
 
 	// use the output format to configure the Feedback
@@ -250,8 +246,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	if outputFormat != "text" {
 		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
 			logrus.Warn("Calling help on JSON format")
-			feedback.Error(tr("Invalid Call : should show Help, but it is available only in TEXT mode."))
-			os.Exit(errorcodes.ErrBadCall)
+			feedback.Fatal(tr("Invalid Call : should show Help, but it is available only in TEXT mode."), errorcodes.ErrBadCall)
 		})
 	}
 }

@@ -25,6 +25,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/status"
@@ -175,6 +176,39 @@ func Error(v ...interface{}) {
 	logrus.Error(fmt.Sprint(v...))
 }
 
+// FatalError outputs the error and exits with status exitCode.
+func FatalError(err error, exitCode int) {
+	Fatal(err.Error(), exitCode)
+}
+
+// Fatal outputs the errorMsg and exits with status exitCode.
+func Fatal(errorMsg string, exitCode int) {
+	if format == Text {
+		fmt.Fprintln(stdErr, errorMsg)
+		os.Exit(exitCode)
+	}
+
+	type FatalError struct {
+		Error string `json:"error"`
+	}
+	res := FatalError{
+		Error: errorMsg,
+	}
+	var d []byte
+	switch format {
+	case JSON:
+		d, _ = json.MarshalIndent(res, "", "  ")
+	case MinifiedJSON:
+		d, _ = json.Marshal(res)
+	case YAML:
+		d, _ = yaml.Marshal(res)
+	default:
+		panic("unknown output format")
+	}
+	fmt.Fprintln(stdErr, string(d))
+	os.Exit(exitCode)
+}
+
 // PrintResult is a convenient wrapper to provide feedback for complex data,
 // where the contents can't be just serialized to JSON but requires more
 // structure.
@@ -184,22 +218,19 @@ func PrintResult(res Result) {
 	case JSON:
 		d, err := json.MarshalIndent(res.Data(), "", "  ")
 		if err != nil {
-			Errorf("Error during JSON encoding of the output: %v", err)
-			return
+			Fatal(fmt.Sprintf("Error during JSON encoding of the output: %v", err), errorcodes.ErrGeneric)
 		}
 		data = string(d)
 	case MinifiedJSON:
 		d, err := json.Marshal(res.Data())
 		if err != nil {
-			Errorf("Error during JSON encoding of the output: %v", err)
-			return
+			Fatal(fmt.Sprintf("Error during JSON encoding of the output: %v", err), errorcodes.ErrGeneric)
 		}
 		data = string(d)
 	case YAML:
 		d, err := yaml.Marshal(res.Data())
 		if err != nil {
-			Errorf("Error during YAML encoding of the output: %v", err)
-			return
+			Fatal(fmt.Sprintf("Error during YAML encoding of the output: %v", err), errorcodes.ErrGeneric)
 		}
 		data = string(d)
 	case Text:

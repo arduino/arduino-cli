@@ -78,7 +78,6 @@ func runArchiveCommand(args []string, includeBuildDir bool, overwrite bool) {
 		})
 
 	if err != nil {
-		feedback.Errorf(tr("Error archiving: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error archiving: %v", err), errorcodes.ErrGeneric)
 	}
 }

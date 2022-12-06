@@ -61,8 +61,7 @@ func runListAllCommand(cmd *cobra.Command, args []string) {
 		IncludeHiddenBoards: showHiddenBoard,
 	})
 	if err != nil {
-		feedback.Errorf(tr("Error listing boards: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error listing boards: %v", err), errorcodes.ErrGeneric)
 	}
 
 	feedback.PrintResult(resultAll{list})

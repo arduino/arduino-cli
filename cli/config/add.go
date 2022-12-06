@@ -91,8 +91,8 @@ func runAddCommand(cmd *cobra.Command, args []string) {
 	kind := validateKey(key)
 
 	if kind != reflect.Slice {
-		feedback.Errorf(tr("The key '%[1]v' is not a list of items, can't add to it.\nMaybe use '%[2]s'?"), key, "config set")
-		os.Exit(errorcodes.ErrGeneric)
+		msg := tr("The key '%[1]v' is not a list of items, can't add to it.\nMaybe use '%[2]s'?", key, "config set")
+		feedback.Fatal(msg, errorcodes.ErrGeneric)
 	}
 
 	v := configuration.Settings.GetStringSlice(key)
@@ -101,7 +101,6 @@ func runAddCommand(cmd *cobra.Command, args []string) {
 	configuration.Settings.Set(key, v)
 
 	if err := configuration.Settings.WriteConfig(); err != nil {
-		feedback.Errorf(tr("Can't write config file: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Can't write config file: %v", err), errorcodes.ErrGeneric)
 	}
 }

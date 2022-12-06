@@ -17,7 +17,6 @@ package config
 
 import (
 	"fmt"
-	"os"
 	"reflect"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
@@ -57,8 +56,7 @@ func typeOf(key string) (reflect.Kind, error) {
 func validateKey(key string) reflect.Kind {
 	kind, err := typeOf(key)
 	if err != nil {
-		feedback.Error(err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.FatalError(err, errorcodes.ErrGeneric)
 	}
 	return kind
 }

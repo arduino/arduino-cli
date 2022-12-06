@@ -49,8 +49,8 @@ func runRemoveCommand(cmd *cobra.Command, args []string) {
 	kind := validateKey(key)
 
 	if kind != reflect.Slice {
-		feedback.Errorf(tr("The key '%[1]v' is not a list of items, can't remove from it.\nMaybe use '%[2]s'?"), key, "config delete")
-		os.Exit(errorcodes.ErrGeneric)
+		msg := tr("The key '%[1]v' is not a list of items, can't remove from it.\nMaybe use '%[2]s'?", key, "config delete")
+		feedback.Fatal(msg, errorcodes.ErrGeneric)
 	}
 
 	mappedValues := map[string]bool{}
@@ -67,7 +67,6 @@ func runRemoveCommand(cmd *cobra.Command, args []string) {
 	configuration.Settings.Set(key, values)
 
 	if err := configuration.Settings.WriteConfig(); err != nil {
-		feedback.Errorf(tr("Can't write config file: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Can't write config file: %v", err), errorcodes.ErrGeneric)
 	}
 }

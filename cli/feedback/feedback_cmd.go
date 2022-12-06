@@ -16,7 +16,7 @@
 package feedback
 
 import (
-	"os"
+	"fmt"
 
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/spf13/cobra"
@@ -38,18 +38,15 @@ func NewCommand() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			user, err := InputUserField("User name", false)
 			if err != nil {
-				Errorf("Error reading input: %v", err)
-				os.Exit(errorcodes.ErrGeneric)
+				Fatal(fmt.Sprintf("Error reading input: %v", err), errorcodes.ErrGeneric)
 			}
 			pass, err := InputUserField("Password", true)
 			if err != nil {
-				Errorf("Error reading input: %v", err)
-				os.Exit(errorcodes.ErrGeneric)
+				Fatal(fmt.Sprintf("Error reading input: %v", err), errorcodes.ErrGeneric)
 			}
 			nick, err := InputUserField("Nickname", false)
 			if err != nil {
-				Errorf("Error reading input: %v", err)
-				os.Exit(errorcodes.ErrGeneric)
+				Fatal(fmt.Sprintf("Error reading input: %v", err), errorcodes.ErrGeneric)
 			}
 			Print("Hello " + user + " (a.k.a " + nick + ")!")
 			Print("Your password is " + pass + "!")

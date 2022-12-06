@@ -16,7 +16,6 @@
 package arguments
 
 import (
-	"os"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino"
@@ -81,21 +80,18 @@ func CalculateFQBNAndPort(portArgs *Port, fqbnArg *Fqbn, instance *rpc.Instance,
 	}
 	if fqbn == "" {
 		if portArgs == nil || portArgs.address == "" {
-			feedback.Error(&arduino.MissingFQBNError{})
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.FatalError(&arduino.MissingFQBNError{}, errorcodes.ErrGeneric)
 		}
 		fqbn, port := portArgs.DetectFQBN(instance)
 		if fqbn == "" {
-			feedback.Error(&arduino.MissingFQBNError{})
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.FatalError(&arduino.MissingFQBNError{}, errorcodes.ErrGeneric)
 		}
 		return fqbn, port
 	}
 
 	port, err := portArgs.GetPort(instance, sk)
 	if err != nil {
-		feedback.Errorf(tr("Error getting port metadata: %v", err))
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error getting port metadata: %v", err), errorcodes.ErrGeneric)
 	}
 	return fqbn, port.ToRPC()
 }

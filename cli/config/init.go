@@ -69,8 +69,7 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	case destFile != "":
 		configFileAbsPath, err = paths.New(destFile).Abs()
 		if err != nil {
-			feedback.Errorf(tr("Cannot find absolute path: %v"), err)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Cannot find absolute path: %v", err), errorcodes.ErrGeneric)
 		}
 
 		absPath = configFileAbsPath.Parent()
@@ -80,22 +79,19 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	default:
 		absPath, err = paths.New(destDir).Abs()
 		if err != nil {
-			feedback.Errorf(tr("Cannot find absolute path: %v"), err)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Cannot find absolute path: %v", err), errorcodes.ErrGeneric)
 		}
 		configFileAbsPath = absPath.Join(defaultFileName)
 	}
 
 	if !overwrite && configFileAbsPath.Exist() {
-		feedback.Error(tr("Config file already exists, use --overwrite to discard the existing one."))
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Config file already exists, use --overwrite to discard the existing one."), errorcodes.ErrGeneric)
 	}
 
 	logrus.Infof("Writing config file to: %s", absPath)
 
 	if err := absPath.MkdirAll(); err != nil {
-		feedback.Errorf(tr("Cannot create config file directory: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Cannot create config file directory: %v", err), errorcodes.ErrGeneric)
 	}
 
 	newSettings := viper.New()
@@ -103,8 +99,7 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	configuration.BindFlags(cmd, newSettings)
 
 	if err := newSettings.WriteConfigAs(configFileAbsPath.String()); err != nil {
-		feedback.Errorf(tr("Cannot create config file: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Cannot create config file: %v", err), errorcodes.ErrGeneric)
 	}
 
 	msg := tr("Config file written to: %s", configFileAbsPath.String())

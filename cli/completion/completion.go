@@ -50,8 +50,7 @@ func NewCommand() *cobra.Command {
 func runCompletionCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli completion`")
 	if completionNoDesc && (args[0] == "powershell") {
-		feedback.Errorf(tr("Error: command description is not supported by %v"), args[0])
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error: command description is not supported by %v", args[0]), errorcodes.ErrGeneric)
 	}
 	switch args[0] {
 	case "bash":

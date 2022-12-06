@@ -50,7 +50,6 @@ func runUpdateIndexCommand(cmd *cobra.Command, args []string) {
 func UpdateIndex(inst *rpc.Instance) {
 	err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{Instance: inst}, feedback.ProgressBar())
 	if err != nil {
-		feedback.Error(err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.FatalError(err, errorcodes.ErrGeneric)
 	}
 }

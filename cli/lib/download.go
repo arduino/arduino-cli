@@ -52,8 +52,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli lib download`")
 	refs, err := ParseLibraryReferenceArgsAndAdjustCase(instance, args)
 	if err != nil {
-		feedback.Errorf(tr("Invalid argument passed: %v"), err)
-		os.Exit(errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Invalid argument passed: %v", err), errorcodes.ErrBadArgument)
 	}
 
 	for _, library := range refs {
@@ -64,8 +63,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 		}
 		_, err := lib.LibraryDownload(context.Background(), libraryDownloadRequest, feedback.ProgressBar())
 		if err != nil {
-			feedback.Errorf(tr("Error downloading %[1]s: %[2]v"), library, err)
-			os.Exit(errorcodes.ErrNetwork)
+			feedback.Fatal(tr("Error downloading %[1]s: %[2]v", library, err), errorcodes.ErrNetwork)
 		}
 	}
 }

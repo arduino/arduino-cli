@@ -77,8 +77,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 
 	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(instance, nil)
 	if err != nil {
-		feedback.Error(err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.FatalError(err, errorcodes.ErrGeneric)
 	}
 
 	enumerateResp, err := monitor.EnumerateMonitorPortSettings(context.Background(), &rpc.EnumerateMonitorPortSettingsRequest{
@@ -87,8 +86,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 		Fqbn:         fqbn.String(),
 	})
 	if err != nil {
-		feedback.Error(tr("Error getting port settings details: %s", err))
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error getting port settings details: %s", err), errorcodes.ErrGeneric)
 	}
 	if describe {
 		feedback.PrintResult(&detailsResult{Settings: enumerateResp.Settings})
@@ -97,8 +95,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 
 	tty, err := newStdInOutTerminal()
 	if err != nil {
-		feedback.Error(err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.FatalError(err, errorcodes.ErrGeneric)
 	}
 	defer tty.Close()
 
@@ -123,8 +120,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 				} else {
 					if strings.EqualFold(s.SettingId, k) {
 						if !contains(s.EnumValues, v) {
-							feedback.Error(tr("invalid port configuration value for %s: %s", k, v))
-							os.Exit(errorcodes.ErrBadArgument)
+							feedback.Fatal(tr("invalid port configuration value for %s: %s", k, v), errorcodes.ErrBadArgument)
 						}
 						setting = s
 						break
@@ -132,8 +128,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 				}
 			}
 			if setting == nil {
-				feedback.Error(tr("invalid port configuration: %s", config))
-				os.Exit(errorcodes.ErrBadArgument)
+				feedback.Fatal(tr("invalid port configuration: %s", config), errorcodes.ErrBadArgument)
 			}
 			configuration.Settings = append(configuration.Settings, &rpc.MonitorPortSetting{
 				SettingId: setting.SettingId,
@@ -152,8 +147,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 		PortConfiguration: configuration,
 	})
 	if err != nil {
-		feedback.Error(err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.FatalError(err, errorcodes.ErrGeneric)
 	}
 	defer portProxy.Close()
 

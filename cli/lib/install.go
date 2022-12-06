@@ -78,8 +78,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 				split := strings.Split(globals.VersionInfo.VersionString, ".")
 				documentationURL = fmt.Sprintf("https://arduino.github.io/arduino-cli/%s.%s/configuration/#configuration-keys", split[0], split[1])
 			}
-			feedback.Errorf(tr("--git-url and --zip-path are disabled by default, for more information see: %v"), documentationURL)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(tr("--git-url and --zip-path are disabled by default, for more information see: %v", documentationURL), errorcodes.ErrGeneric)
 		}
 		feedback.Print(tr("--git-url and --zip-path flags allow installing untrusted files, use it at your own risk."))
 	}
@@ -92,8 +91,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 				Overwrite: !noOverwrite,
 			}, feedback.TaskProgress())
 			if err != nil {
-				feedback.Errorf(tr("Error installing Zip Library: %v"), err)
-				os.Exit(errorcodes.ErrGeneric)
+				feedback.Fatal(tr("Error installing Zip Library: %v", err), errorcodes.ErrGeneric)
 			}
 		}
 		return
@@ -104,8 +102,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			if url == "." {
 				wd, err := paths.Getwd()
 				if err != nil {
-					feedback.Errorf(tr("Couldn't get current working directory: %v"), err)
-					os.Exit(errorcodes.ErrGeneric)
+					feedback.Fatal(tr("Couldn't get current working directory: %v", err), errorcodes.ErrGeneric)
 				}
 				url = wd.String()
 			}
@@ -115,8 +112,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 				Overwrite: !noOverwrite,
 			}, feedback.TaskProgress())
 			if err != nil {
-				feedback.Errorf(tr("Error installing Git Library: %v"), err)
-				os.Exit(errorcodes.ErrGeneric)
+				feedback.Fatal(tr("Error installing Git Library: %v", err), errorcodes.ErrGeneric)
 			}
 		}
 		return
@@ -124,8 +120,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 
 	libRefs, err := ParseLibraryReferenceArgsAndAdjustCase(instance, args)
 	if err != nil {
-		feedback.Errorf(tr("Arguments error: %v"), err)
-		os.Exit(errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Arguments error: %v", err), errorcodes.ErrBadArgument)
 	}
 
 	for _, libRef := range libRefs {
@@ -138,8 +133,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 		}
 		err := lib.LibraryInstall(context.Background(), libraryInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
 		if err != nil {
-			feedback.Errorf(tr("Error installing %s: %v"), libRef.Name, err)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error installing %s: %v", libRef.Name, err), errorcodes.ErrGeneric)
 		}
 	}
 }

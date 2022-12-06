@@ -61,8 +61,7 @@ func List(inst *rpc.Instance, all bool, updatableOnly bool) {
 		All:           all,
 	})
 	if err != nil {
-		feedback.Errorf(tr("Error listing platforms: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error listing platforms: %v", err), errorcodes.ErrGeneric)
 	}
 
 	feedback.PrintResult(installedResult{platforms})

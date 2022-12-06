@@ -91,8 +91,7 @@ func runDebugCommand(command *cobra.Command, args []string) {
 	if printInfo {
 
 		if res, err := debug.GetDebugConfig(context.Background(), debugConfigRequested); err != nil {
-			feedback.Errorf(tr("Error getting Debug info: %v", err))
-			os.Exit(errorcodes.ErrBadArgument)
+			feedback.Fatal(tr("Error getting Debug info: %v", err), errorcodes.ErrBadArgument)
 		} else {
 			feedback.PrintResult(&debugInfoResult{res})
 		}
@@ -104,8 +103,7 @@ func runDebugCommand(command *cobra.Command, args []string) {
 		signal.Notify(ctrlc, os.Interrupt)
 
 		if _, err := debug.Debug(context.Background(), debugConfigRequested, os.Stdin, os.Stdout, ctrlc); err != nil {
-			feedback.Errorf(tr("Error during Debug: %v", err))
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error during Debug: %v", err), errorcodes.ErrGeneric)
 		}
 
 	}

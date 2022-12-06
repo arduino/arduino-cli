@@ -16,6 +16,7 @@
 package version
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -55,8 +56,7 @@ func runVersionCommand(cmd *cobra.Command, args []string) {
 
 	currentVersion, err := semver.Parse(globals.VersionInfo.VersionString)
 	if err != nil {
-		feedback.Errorf("Error parsing current version: %s", err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(fmt.Sprintf("Error parsing current version: %s", err), errorcodes.ErrGeneric)
 	}
 	latestVersion := updater.ForceCheckForUpdate(currentVersion)
 

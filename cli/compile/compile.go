@@ -148,17 +148,14 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli compile`")
 
 	if dumpProfile && feedback.GetFormat() != feedback.Text {
-		feedback.Errorf(tr("You cannot use the %[1]s flag together with %[2]s.", "--dump-profile", "--format json"))
-		os.Exit(errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("You cannot use the %[1]s flag together with %[2]s.", "--dump-profile", "--format json"), errorcodes.ErrBadArgument)
 	}
 	if profileArg.Get() != "" {
 		if len(libraries) > 0 {
-			feedback.Errorf(tr("You cannot use the %s flag while compiling with a profile.", "--libraries"))
-			os.Exit(errorcodes.ErrBadArgument)
+			feedback.Fatal(tr("You cannot use the %s flag while compiling with a profile.", "--libraries"), errorcodes.ErrBadArgument)
 		}
 		if len(library) > 0 {
-			feedback.Errorf(tr("You cannot use the %s flag while compiling with a profile.", "--library"))
-			os.Exit(errorcodes.ErrBadArgument)
+			feedback.Fatal(tr("You cannot use the %s flag while compiling with a profile.", "--library"), errorcodes.ErrBadArgument)
 		}
 	}
 
@@ -185,15 +182,13 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	if sourceOverrides != "" {
 		data, err := paths.New(sourceOverrides).ReadFile()
 		if err != nil {
-			feedback.Errorf(tr("Error opening source code overrides data file: %v"), err)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error opening source code overrides data file: %v", err), errorcodes.ErrGeneric)
 		}
 		var o struct {
 			Overrides map[string]string `json:"overrides"`
 		}
 		if err := json.Unmarshal(data, &o); err != nil {
-			feedback.Errorf(tr("Error: invalid source code overrides data file: %v"), err)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error: invalid source code overrides data file: %v", err), errorcodes.ErrGeneric)
 		}
 		overrides = o.Overrides
 	}
@@ -241,16 +236,14 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			Protocol: port.Protocol,
 		})
 		if err != nil {
-			feedback.Errorf(tr("Error during Upload: %v", err))
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error during Upload: %v", err), errorcodes.ErrGeneric)
 		}
 
 		fields := map[string]string{}
 		if len(userFieldRes.UserFields) > 0 {
 			feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", port.Protocol))
 			if f, err := arguments.AskForUserFields(userFieldRes.UserFields); err != nil {
-				feedback.Error(err)
-				os.Exit(errorcodes.ErrBadArgument)
+				feedback.FatalError(err, errorcodes.ErrBadArgument)
 			} else {
 				fields = f
 			}
@@ -278,8 +271,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			uploadError = upload.Upload(context.Background(), uploadRequest, os.Stdout, os.Stderr)
 		}
 		if uploadError != nil {
-			feedback.Errorf(tr("Error during Upload: %v"), uploadError)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error during Upload: %v", uploadError), errorcodes.ErrGeneric)
 		}
 	}
 
@@ -338,7 +330,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		Success:       compileError == nil,
 	})
 	if compileError != nil {
-		feedback.Errorf(tr("Error during build: %v"), compileError)
+		msg := tr("Error during build: %v", compileError)
 
 		// Check the error type to give the user better feedback on how
 		// to resolve it
@@ -358,14 +350,16 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			release()
 
 			if profileArg.String() == "" {
+				msg += "\n"
 				if platform != nil {
-					feedback.Errorf(tr("Try running %s", fmt.Sprintf("`%s core install %s`", globals.VersionInfo.Application, platformErr.Platform)))
+					suggestion := fmt.Sprintf("`%s core install %s`", globals.VersionInfo.Application, platformErr.Platform)
+					msg += tr("Try running %s", suggestion)
 				} else {
-					feedback.Errorf(tr("Platform %s is not found in any known index\nMaybe you need to add a 3rd party URL?", platformErr.Platform))
+					msg += tr("Platform %s is not found in any known index\nMaybe you need to add a 3rd party URL?", platformErr.Platform)
 				}
 			}
 		}
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(msg, errorcodes.ErrGeneric)
 	}
 }
 

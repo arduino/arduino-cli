@@ -70,8 +70,7 @@ func runBootloaderCommand(command *cobra.Command, args []string) {
 	// We don't need a Sketch to upload a board's bootloader
 	discoveryPort, err := port.GetPort(instance, nil)
 	if err != nil {
-		feedback.Errorf(tr("Error during Upload: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error during Upload: %v", err), errorcodes.ErrGeneric)
 	}
 
 	if _, err := upload.BurnBootloader(context.Background(), &rpc.BurnBootloaderRequest{
@@ -83,8 +82,7 @@ func runBootloaderCommand(command *cobra.Command, args []string) {
 		Programmer: programmer.String(),
 		DryRun:     dryRun,
 	}, os.Stdout, os.Stderr); err != nil {
-		feedback.Errorf(tr("Error during Upload: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error during Upload: %v", err), errorcodes.ErrGeneric)
 	}
 	os.Exit(0)
 }

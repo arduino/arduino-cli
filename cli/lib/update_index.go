@@ -52,7 +52,6 @@ func UpdateIndex(inst *rpc.Instance) {
 		Instance: inst,
 	}, feedback.ProgressBar())
 	if err != nil {
-		feedback.Errorf(tr("Error updating library index: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error updating library index: %v", err), errorcodes.ErrGeneric)
 	}
 }

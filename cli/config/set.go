@@ -52,8 +52,7 @@ func runSetCommand(cmd *cobra.Command, args []string) {
 	kind := validateKey(key)
 
 	if kind != reflect.Slice && len(args) > 2 {
-		feedback.Errorf(tr("Can't set multiple values in key %v"), key)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Can't set multiple values in key %v", key), errorcodes.ErrGeneric)
 	}
 
 	var value interface{}
@@ -66,15 +65,13 @@ func runSetCommand(cmd *cobra.Command, args []string) {
 		var err error
 		value, err = strconv.ParseBool(args[1])
 		if err != nil {
-			feedback.Errorf(tr("error parsing value: %v"), err)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(tr("error parsing value: %v", err), errorcodes.ErrGeneric)
 		}
 	}
 
 	configuration.Settings.Set(key, value)
 
 	if err := configuration.Settings.WriteConfig(); err != nil {
-		feedback.Errorf(tr("Writing config file: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Writing config file: %v", err), errorcodes.ErrGeneric)
 	}
 }

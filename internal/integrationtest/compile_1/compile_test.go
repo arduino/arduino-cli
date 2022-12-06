@@ -1071,7 +1071,7 @@ func compileWithFakeSecureBootCore(t *testing.T, env *integrationtest.Environmen
 		"-v",
 	)
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "Flag --sign-key is mandatory when used in conjunction with flag --keys-keychain")
+	require.Contains(t, string(stderr), "Flag --sign-key is mandatory when used in conjunction with: --keys-keychain, --sign-key, --encrypt-key")
 
 	// Verifies compilation works with secure boot enabled and when overriding the sign key and encryption key used
 	keysDir := cli.SketchbookDir().Join("keys_dir")

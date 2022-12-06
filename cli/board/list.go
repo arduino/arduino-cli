@@ -80,8 +80,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 func watchList(cmd *cobra.Command, inst *rpc.Instance) {
 	eventsChan, closeCB, err := board.Watch(&rpc.BoardListWatchRequest{Instance: inst})
 	if err != nil {
-		feedback.Errorf(tr("Error detecting boards: %v"), err)
-		os.Exit(errorcodes.ErrNetwork)
+		feedback.Fatal(tr("Error detecting boards: %v", err), errorcodes.ErrNetwork)
 	}
 	defer closeCB()
 

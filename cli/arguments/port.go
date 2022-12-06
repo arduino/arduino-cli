@@ -17,7 +17,6 @@ package arguments
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino"
@@ -147,8 +146,7 @@ func (p *Port) DetectFQBN(inst *rpc.Instance) (string, *rpc.Port) {
 		Timeout:  p.timeout.Get().Milliseconds(),
 	})
 	if err != nil {
-		feedback.Errorf(tr("Error during FQBN detection: %v", err))
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error during FQBN detection: %v", err), errorcodes.ErrGeneric)
 	}
 	for _, detectedPort := range detectedPorts {
 		port := detectedPort.GetPort()
@@ -159,12 +157,10 @@ func (p *Port) DetectFQBN(inst *rpc.Instance) (string, *rpc.Port) {
 			continue
 		}
 		if len(detectedPort.MatchingBoards) > 1 {
-			feedback.Error(&arduino.MultipleBoardsDetectedError{Port: port})
-			os.Exit(errorcodes.ErrBadArgument)
+			feedback.FatalError(&arduino.MultipleBoardsDetectedError{Port: port}, errorcodes.ErrBadArgument)
 		}
 		if len(detectedPort.MatchingBoards) == 0 {
-			feedback.Error(&arduino.NoBoardsDetectedError{Port: port})
-			os.Exit(errorcodes.ErrBadArgument)
+			feedback.FatalError(&arduino.NoBoardsDetectedError{Port: port}, errorcodes.ErrBadArgument)
 		}
 		return detectedPort.MatchingBoards[0].Fqbn, port
 	}

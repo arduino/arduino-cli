@@ -54,8 +54,7 @@ func runNewCommand(args []string, overwrite bool) {
 	trimmedSketchName := strings.TrimSuffix(sketchName, globals.MainFileValidExtension)
 	sketchDirPath, err := paths.New(trimmedSketchName).Abs()
 	if err != nil {
-		feedback.Errorf(tr("Error creating sketch: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error creating sketch: %v", err), errorcodes.ErrGeneric)
 	}
 	_, err = sk.NewSketch(context.Background(), &rpc.NewSketchRequest{
 		Instance:   nil,
@@ -64,8 +63,7 @@ func runNewCommand(args []string, overwrite bool) {
 		Overwrite:  overwrite,
 	})
 	if err != nil {
-		feedback.Errorf(tr("Error creating sketch: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error creating sketch: %v", err), errorcodes.ErrGeneric)
 	}
 
 	feedback.Print(tr("Sketch created in: %s", sketchDirPath))

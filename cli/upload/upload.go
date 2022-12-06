@@ -93,8 +93,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 
 	sk, err := sketch.New(sketchPath)
 	if err != nil && importDir == "" && importFile == "" {
-		feedback.Errorf(tr("Error during Upload: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error during Upload: %v", err), errorcodes.ErrGeneric)
 	}
 
 	instance, profile := instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
@@ -110,7 +109,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 		Protocol: port.Protocol,
 	})
 	if err != nil {
-		feedback.Errorf(tr("Error during Upload: %v"), err)
+		msg := tr("Error during Upload: %v", err)
 
 		// Check the error type to give the user better feedback on how
 		// to resolve it
@@ -129,21 +128,22 @@ func runUploadCommand(command *cobra.Command, args []string) {
 			})
 			release()
 
+			msg += "\n"
 			if platform != nil {
-				feedback.Errorf(tr("Try running %s", fmt.Sprintf("`%s core install %s`", globals.VersionInfo.Application, platformErr.Platform)))
+				msg += tr("Try running %s", fmt.Sprintf("`%s core install %s`", globals.VersionInfo.Application, platformErr.Platform))
 			} else {
-				feedback.Errorf(tr("Platform %s is not found in any known index\nMaybe you need to add a 3rd party URL?", platformErr.Platform))
+				msg += tr("Platform %s is not found in any known index\nMaybe you need to add a 3rd party URL?", platformErr.Platform)
 			}
 		}
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(msg, errorcodes.ErrGeneric)
 	}
 
 	fields := map[string]string{}
 	if len(userFieldRes.UserFields) > 0 {
 		feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", port.Protocol))
 		if f, err := arguments.AskForUserFields(userFieldRes.UserFields); err != nil {
-			feedback.Errorf("%s: %s", tr("Error getting user input"), err)
-			os.Exit(errorcodes.ErrGeneric)
+			msg := fmt.Sprintf("%s: %s", tr("Error getting user input"), err)
+			feedback.Fatal(msg, errorcodes.ErrGeneric)
 		} else {
 			fields = f
 		}
@@ -168,8 +168,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 		UserFields: fields,
 	}
 	if err := upload.Upload(context.Background(), req, stdOut, stdErr); err != nil {
-		feedback.Errorf(tr("Error during Upload: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.FatalError(err, errorcodes.ErrGeneric)
 	}
 	feedback.PrintResult(stdIOResult())
 }

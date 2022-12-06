@@ -66,8 +66,7 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 			UpdatableOnly: true,
 		})
 		if err != nil {
-			feedback.Errorf(tr("Error retrieving core list: %v"), err)
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error retrieving core list: %v", err), errorcodes.ErrGeneric)
 		}
 
 		if len(targets) == 0 {
@@ -84,8 +83,7 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 	exitErr := false
 	platformsRefs, err := arguments.ParseReferences(args)
 	if err != nil {
-		feedback.Errorf(tr("Invalid argument passed: %v"), err)
-		os.Exit(errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Invalid argument passed: %v", err), errorcodes.ErrBadArgument)
 	}
 
 	for i, platformRef := range platformsRefs {
@@ -108,8 +106,7 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 				continue
 			}
 
-			feedback.Errorf(tr("Error during upgrade: %v", err))
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error during upgrade: %v", err), errorcodes.ErrGeneric)
 		}
 	}
 

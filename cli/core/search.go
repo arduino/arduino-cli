@@ -61,8 +61,7 @@ const indexUpdateInterval = "24h"
 func runSearchCommand(cmd *cobra.Command, args []string) {
 	inst, status := instance.Create()
 	if status != nil {
-		feedback.Errorf(tr("Error creating instance: %v"), status)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error creating instance: %v", status), errorcodes.ErrGeneric)
 	}
 
 	if indexesNeedUpdating(indexUpdateInterval) {
@@ -83,8 +82,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		AllVersions: allVersions,
 	})
 	if err != nil {
-		feedback.Errorf(tr("Error searching for platforms: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error searching for platforms: %v", err), errorcodes.ErrGeneric)
 	}
 
 	coreslist := resp.GetSearchOutput()
@@ -128,8 +126,7 @@ func indexesNeedUpdating(duration string) bool {
 	now := time.Now()
 	modTimeThreshold, err := time.ParseDuration(duration)
 	if err != nil {
-		feedback.Error(tr("Invalid timeout: %s", err))
-		os.Exit(errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Invalid timeout: %s", err), errorcodes.ErrBadArgument)
 	}
 
 	urls := []string{globals.DefaultIndexURL}

@@ -67,8 +67,7 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 	})
 
 	if err != nil {
-		feedback.Errorf(tr("Error getting board details: %v"), err)
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error getting board details: %v", err), errorcodes.ErrGeneric)
 	}
 
 	feedback.PrintResult(detailsResult{details: res})
