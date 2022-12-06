@@ -18,6 +18,7 @@
 package feedback
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -68,10 +69,31 @@ func ParseOutputFormat(in string) (OutputFormat, bool) {
 }
 
 var (
-	stdOut io.Writer    = os.Stdout
-	stdErr io.Writer    = os.Stderr
-	format OutputFormat = Text
+	stdOut         io.Writer
+	stdErr         io.Writer
+	feedbackOut    io.Writer
+	feedbackErr    io.Writer
+	bufferOut      *bytes.Buffer
+	bufferErr      *bytes.Buffer
+	format         OutputFormat
+	formatSelected bool
 )
+
+func init() {
+	reset()
+}
+
+// reset resets the feedback package to its initial state, useful for unit testing
+func reset() {
+	stdOut = os.Stdout
+	stdErr = os.Stderr
+	feedbackOut = os.Stdout
+	feedbackErr = os.Stderr
+	bufferOut = &bytes.Buffer{}
+	bufferErr = &bytes.Buffer{}
+	format = Text
+	formatSelected = false
+}
 
 // Result is anything more complex than a sentence that needs to be printed
 // for the user.
@@ -84,34 +106,40 @@ var tr = i18n.Tr
 
 // SetOut can be used to change the out writer at runtime
 func SetOut(out io.Writer) {
+	if formatSelected {
+		panic("output format already selected")
+	}
 	stdOut = out
 }
 
 // SetErr can be used to change the err writer at runtime
 func SetErr(err io.Writer) {
+	if formatSelected {
+		panic("output format already selected")
+	}
 	stdErr = err
 }
 
 // SetFormat can be used to change the output format at runtime
 func SetFormat(f OutputFormat) {
+	if formatSelected {
+		panic("output format already selected")
+	}
 	format = f
+	formatSelected = true
+
+	if format == Text {
+		feedbackOut = stdOut
+		feedbackErr = stdErr
+	} else {
+		feedbackOut = bufferOut
+		feedbackErr = bufferErr
+	}
 }
 
 // GetFormat returns the output format currently set
 func GetFormat() OutputFormat {
 	return format
-}
-
-// OutputWriter returns the underlying io.Writer to be used when the Print*
-// api is not enough
-func OutputWriter() io.Writer {
-	return stdOut
-}
-
-// ErrorWriter is the same as OutputWriter but exposes the underlying error
-// writer.
-func ErrorWriter() io.Writer {
-	return stdErr
 }
 
 // Printf behaves like fmt.Printf but writes on the out writer and adds a newline.
@@ -120,17 +148,8 @@ func Printf(format string, v ...interface{}) {
 }
 
 // Print behaves like fmt.Print but writes on the out writer and adds a newline.
-func Print(v interface{}) {
-	switch format {
-	case JSON, MinifiedJSON:
-		printJSON(v)
-	case YAML:
-		printYAML(v)
-	case Text:
-		fmt.Fprintln(stdOut, v)
-	default:
-		panic("unknown output format")
-	}
+func Print(v string) {
+	fmt.Fprintln(feedbackOut, v)
 }
 
 // Errorf behaves like fmt.Printf but writes on the error writer and adds a
@@ -156,46 +175,39 @@ func Error(v ...interface{}) {
 	logrus.Error(fmt.Sprint(v...))
 }
 
-// printJSON is a convenient wrapper to provide feedback by printing the
-// desired output in a pretty JSON format. It adds a newline to the output.
-func printJSON(v interface{}) {
-	var d []byte
-	var err error
-	if format == JSON {
-		d, err = json.MarshalIndent(v, "", "  ")
-	} else if format == MinifiedJSON {
-		d, err = json.Marshal(v)
-	}
-	if err != nil {
-		Errorf(tr("Error during JSON encoding of the output: %v"), err)
-	} else {
-		fmt.Fprintf(stdOut, "%v\n", string(d))
-	}
-}
-
-// printYAML is a convenient wrapper to provide feedback by printing the
-// desired output in YAML format. It adds a newline to the output.
-func printYAML(v interface{}) {
-	d, err := yaml.Marshal(v)
-	if err != nil {
-		Errorf(tr("Error during YAML encoding of the output: %v"), err)
-		return
-	}
-	fmt.Fprintf(stdOut, "%v\n", string(d))
-}
-
 // PrintResult is a convenient wrapper to provide feedback for complex data,
 // where the contents can't be just serialized to JSON but requires more
 // structure.
 func PrintResult(res Result) {
+	var data string
 	switch format {
-	case JSON, MinifiedJSON:
-		printJSON(res.Data())
+	case JSON:
+		d, err := json.MarshalIndent(res.Data(), "", "  ")
+		if err != nil {
+			Errorf("Error during JSON encoding of the output: %v", err)
+			return
+		}
+		data = string(d)
+	case MinifiedJSON:
+		d, err := json.Marshal(res.Data())
+		if err != nil {
+			Errorf("Error during JSON encoding of the output: %v", err)
+			return
+		}
+		data = string(d)
 	case YAML:
-		printYAML(res.Data())
+		d, err := yaml.Marshal(res.Data())
+		if err != nil {
+			Errorf("Error during YAML encoding of the output: %v", err)
+			return
+		}
+		data = string(d)
 	case Text:
-		Print(res.String())
+		data = res.String()
 	default:
 		panic("unknown output format")
+	}
+	if data != "" {
+		fmt.Fprintln(stdOut, data)
 	}
 }
