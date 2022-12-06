@@ -380,24 +380,25 @@ func (r *compileResult) String() string {
 	}
 	res += libraries.Render() + "\n"
 
-	platforms := table.New()
-	platforms.SetHeader(
-		table.NewCell(tr("Used platform"), titleColor),
-		table.NewCell(tr("Version"), titleColor),
-		table.NewCell(tr("Path"), pathColor))
-	boardPlatform := build.GetBoardPlatform()
-	platforms.AddRow(
-		table.NewCell(boardPlatform.GetId(), nameColor),
-		boardPlatform.GetVersion(),
-		table.NewCell(boardPlatform.GetInstallDir(), pathColor))
-	if buildPlatform := build.GetBuildPlatform(); buildPlatform != nil &&
-		buildPlatform.Id != boardPlatform.Id &&
-		buildPlatform.Version != boardPlatform.Version {
+	if boardPlatform := build.GetBoardPlatform(); boardPlatform != nil {
+		platforms := table.New()
+		platforms.SetHeader(
+			table.NewCell(tr("Used platform"), titleColor),
+			table.NewCell(tr("Version"), titleColor),
+			table.NewCell(tr("Path"), pathColor))
 		platforms.AddRow(
-			table.NewCell(buildPlatform.GetId(), nameColor),
-			buildPlatform.GetVersion(),
-			table.NewCell(buildPlatform.GetInstallDir(), pathColor))
+			table.NewCell(boardPlatform.GetId(), nameColor),
+			boardPlatform.GetVersion(),
+			table.NewCell(boardPlatform.GetInstallDir(), pathColor))
+		if buildPlatform := build.GetBuildPlatform(); buildPlatform != nil &&
+			buildPlatform.Id != boardPlatform.Id &&
+			buildPlatform.Version != boardPlatform.Version {
+			platforms.AddRow(
+				table.NewCell(buildPlatform.GetId(), nameColor),
+				buildPlatform.GetVersion(),
+				table.NewCell(buildPlatform.GetInstallDir(), pathColor))
+		}
+		res += platforms.Render()
 	}
-	res += platforms.Render()
 	return res
 }
