@@ -16,7 +16,6 @@
 package compile
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -218,16 +217,9 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		EncryptKey:                    encryptKey,
 		SkipLibrariesDiscovery:        skipLibrariesDiscovery,
 	}
-	compileStdOut := new(bytes.Buffer)
-	compileStdErr := new(bytes.Buffer)
+	stdOut, stdErr, stdIORes := feedback.OutputStreams()
 	verboseCompile := configuration.Settings.GetString("logging.level") == "debug"
-	var compileRes *rpc.CompileResponse
-	var compileError error
-	if feedback.GetFormat() == feedback.JSON {
-		compileRes, compileError = compile.Compile(context.Background(), compileRequest, compileStdOut, compileStdErr, nil, verboseCompile)
-	} else {
-		compileRes, compileError = compile.Compile(context.Background(), compileRequest, os.Stdout, os.Stderr, nil, verboseCompile)
-	}
+	compileRes, compileError := compile.Compile(context.Background(), compileRequest, stdOut, stdErr, nil, verboseCompile)
 
 	if compileError == nil && uploadAfterCompile {
 		userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
@@ -261,17 +253,8 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			UserFields: fields,
 		}
 
-		var uploadError error
-		if feedback.GetFormat() == feedback.JSON {
-			// TODO: do not print upload output in json mode
-			uploadStdOut := new(bytes.Buffer)
-			uploadStdErr := new(bytes.Buffer)
-			uploadError = upload.Upload(context.Background(), uploadRequest, uploadStdOut, uploadStdErr)
-		} else {
-			uploadError = upload.Upload(context.Background(), uploadRequest, os.Stdout, os.Stderr)
-		}
-		if uploadError != nil {
-			feedback.Fatal(tr("Error during Upload: %v", uploadError), errorcodes.ErrGeneric)
+		if err := upload.Upload(context.Background(), uploadRequest, stdOut, stdErr); err != nil {
+			feedback.Fatal(tr("Error during Upload: %v", err), errorcodes.ErrGeneric)
 		}
 	}
 
@@ -323,9 +306,10 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 
+	stdIO := stdIORes()
 	feedback.PrintResult(&compileResult{
-		CompileOut:    compileStdOut.String(),
-		CompileErr:    compileStdErr.String(),
+		CompilerOut:   stdIO.Stdout,
+		CompilerErr:   stdIO.Stderr,
 		BuilderResult: compileRes,
 		Success:       compileError == nil,
 	})
@@ -364,8 +348,8 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 }
 
 type compileResult struct {
-	CompileOut    string               `json:"compiler_out"`
-	CompileErr    string               `json:"compiler_err"`
+	CompilerOut   string               `json:"compiler_out"`
+	CompilerErr   string               `json:"compiler_err"`
 	BuilderResult *rpc.CompileResponse `json:"builder_result"`
 	Success       bool                 `json:"success"`
 }
