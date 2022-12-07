@@ -281,29 +281,36 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		if split := strings.Split(compileRequest.GetFqbn(), ":"); len(split) > 2 {
 			newProfileName = split[2]
 		}
-		fmt.Println()
-		fmt.Println("profiles:")
-		fmt.Println("  " + newProfileName + ":")
-		fmt.Println("    fqbn: " + compileRequest.GetFqbn())
-		fmt.Println("    platforms:")
+		profile := fmt.Sprintln()
+		profile += fmt.Sprintln("profiles:")
+		profile += fmt.Sprintln("  " + newProfileName + ":")
+		profile += fmt.Sprintln("    fqbn: " + compileRequest.GetFqbn())
+		profile += fmt.Sprintln("    platforms:")
 		boardPlatform := compileRes.GetBoardPlatform()
-		fmt.Println("      - platform: " + boardPlatform.GetId() + " (" + boardPlatform.GetVersion() + ")")
+		profile += fmt.Sprintln("      - platform: " + boardPlatform.GetId() + " (" + boardPlatform.GetVersion() + ")")
 		if url := boardPlatform.GetPackageUrl(); url != "" {
-			fmt.Println("        platform_index_url: " + url)
+			profile += fmt.Sprintln("        platform_index_url: " + url)
 		}
 
 		if buildPlatform := compileRes.GetBuildPlatform(); buildPlatform != nil &&
 			buildPlatform.Id != boardPlatform.Id &&
 			buildPlatform.Version != boardPlatform.Version {
-			fmt.Println("      - platform: " + buildPlatform.GetId() + " (" + buildPlatform.GetVersion() + ")")
+			profile += fmt.Sprintln("      - platform: " + buildPlatform.GetId() + " (" + buildPlatform.GetVersion() + ")")
 			if url := buildPlatform.GetPackageUrl(); url != "" {
-				fmt.Println("        platform_index_url: " + url)
+				profile += fmt.Sprintln("        platform_index_url: " + url)
 			}
 		}
 		if len(libs) > 0 {
-			fmt.Println("    libraries:")
-			fmt.Print(libs)
+			profile += fmt.Sprintln("    libraries:")
+			profile += fmt.Sprint(libs)
 		}
+
+		// Output profile as a result
+		if _, err := stdOut.Write([]byte(profile)); err != nil {
+			feedback.FatalError(err, errorcodes.ErrGeneric)
+		}
+		feedback.PrintResult(stdIORes())
+		os.Exit(0)
 	}
 
 	stdIO := stdIORes()
