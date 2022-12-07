@@ -80,16 +80,16 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 	}
 
 	// proceed upgrading, if anything is upgradable
-	exitErr := false
 	platformsRefs, err := arguments.ParseReferences(args)
 	if err != nil {
 		feedback.Fatal(tr("Invalid argument passed: %v", err), errorcodes.ErrBadArgument)
 	}
 
+	hasBadArguments := false
 	for i, platformRef := range platformsRefs {
 		if platformRef.Version != "" {
-			feedback.Errorf(tr("Invalid item %s"), args[i])
-			exitErr = true
+			feedback.Warning(tr("Invalid item %s", args[i]))
+			hasBadArguments = true
 			continue
 		}
 
@@ -99,7 +99,6 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 			Architecture:    platformRef.Architecture,
 			SkipPostInstall: skipPostInstall,
 		}
-
 		if _, err := core.PlatformUpgrade(context.Background(), r, feedback.ProgressBar(), feedback.TaskProgress()); err != nil {
 			if errors.Is(err, &arduino.PlatformAlreadyAtTheLatestVersionError{}) {
 				feedback.Print(err.Error())
@@ -110,7 +109,7 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 		}
 	}
 
-	if exitErr {
-		os.Exit(errorcodes.ErrBadArgument)
+	if hasBadArguments {
+		feedback.Fatal(tr("Some upgrades failed, please check the output for details."), errorcodes.ErrBadArgument)
 	}
 }

@@ -272,9 +272,10 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			libs += fmt.Sprintln("      - " + lib.GetName() + " (" + lib.GetVersion() + ")")
 		}
 		if hasVendoredLibs {
-			fmt.Println()
-			fmt.Println(tr("WARNING: The sketch is compiled using one or more custom libraries."))
-			fmt.Println(tr("Currently, Build Profiles only support libraries available through Arduino Library Manager."))
+			msg := "\n"
+			msg += tr("WARNING: The sketch is compiled using one or more custom libraries.") + "\n"
+			msg += tr("Currently, Build Profiles only support libraries available through Arduino Library Manager.")
+			feedback.Warning(msg)
 		}
 
 		newProfileName := "my_profile_name"

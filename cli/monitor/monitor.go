@@ -155,14 +155,18 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 	go func() {
 		_, err := io.Copy(tty, portProxy)
 		if err != nil && !errors.Is(err, io.EOF) {
-			feedback.Error(tr("Port closed:"), err)
+			if !quiet {
+				feedback.Print(tr("Port closed: %v", err))
+			}
 		}
 		cancel()
 	}()
 	go func() {
 		_, err := io.Copy(portProxy, tty)
 		if err != nil && !errors.Is(err, io.EOF) {
-			feedback.Error(tr("Port closed:"), err)
+			if !quiet {
+				feedback.Print(tr("Port closed: %v", err))
+			}
 		}
 		cancel()
 	}()

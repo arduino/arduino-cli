@@ -20,7 +20,6 @@ package feedback
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -28,7 +27,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc/status"
 	"gopkg.in/yaml.v2"
 )
 
@@ -76,6 +74,7 @@ var (
 	feedbackErr    io.Writer
 	bufferOut      *bytes.Buffer
 	bufferErr      *bytes.Buffer
+	bufferWarnings []string
 	format         OutputFormat
 	formatSelected bool
 )
@@ -92,6 +91,7 @@ func reset() {
 	feedbackErr = os.Stderr
 	bufferOut = &bytes.Buffer{}
 	bufferErr = &bytes.Buffer{}
+	bufferWarnings = nil
 	format = Text
 	formatSelected = false
 }
@@ -135,6 +135,7 @@ func SetFormat(f OutputFormat) {
 	} else {
 		feedbackOut = bufferOut
 		feedbackErr = bufferErr
+		bufferWarnings = nil
 	}
 }
 
@@ -153,27 +154,14 @@ func Print(v string) {
 	fmt.Fprintln(feedbackOut, v)
 }
 
-// Errorf behaves like fmt.Printf but writes on the error writer and adds a
-// newline. It also logs the error.
-func Errorf(format string, v ...interface{}) {
-	// Unbox grpc status errors
-	for i := range v {
-		if s, isStatus := v[i].(*status.Status); isStatus {
-			v[i] = errors.New(s.Message())
-		} else if err, isErr := v[i].(error); isErr {
-			if s, isStatus := status.FromError(err); isStatus {
-				v[i] = errors.New(s.Message())
-			}
-		}
+// Warning outputs a warning message.
+func Warning(msg string) {
+	if format == Text {
+		fmt.Fprintln(feedbackErr, msg)
+	} else {
+		bufferWarnings = append(bufferWarnings, msg)
 	}
-	Error(fmt.Sprintf(format, v...))
-}
-
-// Error behaves like fmt.Print but writes on the error writer and adds a
-// newline. It also logs the error.
-func Error(v ...interface{}) {
-	fmt.Fprintln(stdErr, v...)
-	logrus.Error(fmt.Sprint(v...))
+	logrus.Warning(msg)
 }
 
 // FatalError outputs the error and exits with status exitCode.
@@ -213,6 +201,24 @@ func Fatal(errorMsg string, exitCode int) {
 	os.Exit(exitCode)
 }
 
+func augment(data interface{}) interface{} {
+	if len(bufferWarnings) == 0 {
+		return data
+	}
+	d, err := json.Marshal(data)
+	if err != nil {
+		return data
+	}
+	var res interface{}
+	if err := json.Unmarshal(d, &res); err != nil {
+		return data
+	}
+	if m, ok := res.(map[string]interface{}); ok {
+		m["warnings"] = bufferWarnings
+	}
+	return res
+}
+
 // PrintResult is a convenient wrapper to provide feedback for complex data,
 // where the contents can't be just serialized to JSON but requires more
 // structure.
@@ -220,19 +226,19 @@ func PrintResult(res Result) {
 	var data string
 	switch format {
 	case JSON:
-		d, err := json.MarshalIndent(res.Data(), "", "  ")
+		d, err := json.MarshalIndent(augment(res.Data()), "", "  ")
 		if err != nil {
 			Fatal(fmt.Sprintf("Error during JSON encoding of the output: %v", err), errorcodes.ErrGeneric)
 		}
 		data = string(d)
 	case MinifiedJSON:
-		d, err := json.Marshal(res.Data())
+		d, err := json.Marshal(augment(res.Data()))
 		if err != nil {
 			Fatal(fmt.Sprintf("Error during JSON encoding of the output: %v", err), errorcodes.ErrGeneric)
 		}
 		data = string(d)
 	case YAML:
-		d, err := yaml.Marshal(res.Data())
+		d, err := yaml.Marshal(augment(res.Data()))
 		if err != nil {
 			Fatal(fmt.Sprintf("Error during YAML encoding of the output: %v", err), errorcodes.ErrGeneric)
 		}

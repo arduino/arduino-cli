@@ -16,6 +16,8 @@
 package arguments
 
 import (
+	"fmt"
+
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
@@ -54,9 +56,10 @@ func NewSketch(sketchPath *paths.Path) *sketch.Sketch {
 func WarnDeprecatedFiles(sketchPath *paths.Path) {
 	// .pde files are still supported but deprecated, this warning urges the user to rename them
 	if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 {
-		feedback.Error(tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:"))
+		msg := tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:")
 		for _, f := range files {
-			feedback.Error(f)
+			msg += fmt.Sprintf("\n - %s", f)
 		}
+		feedback.Warning(msg)
 	}
 }

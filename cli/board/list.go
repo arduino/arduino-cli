@@ -69,10 +69,10 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		Timeout:  timeoutArg.Get().Milliseconds(),
 	})
 	if err != nil {
-		feedback.Errorf(tr("Error detecting boards: %v"), err)
+		feedback.Warning(tr("Error detecting boards: %v", err))
 	}
 	for _, err := range discvoeryErrors {
-		feedback.Errorf(tr("Error starting discovery: %v"), err)
+		feedback.Warning(tr("Error starting discovery: %v", err))
 	}
 	feedback.PrintResult(result{ports})
 }

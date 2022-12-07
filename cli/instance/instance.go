@@ -74,7 +74,7 @@ func Init(instance *rpc.Instance) {
 func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *paths.Path) *rpc.Profile {
 	// In case the CLI is executed for the first time
 	if err := FirstUpdate(instance); err != nil {
-		feedback.Errorf(tr("Error initializing instance: %v"), err)
+		feedback.Warning(tr("Error initializing instance: %v", err))
 		return nil
 	}
 
@@ -89,7 +89,7 @@ func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *pat
 	var profile *rpc.Profile
 	err := commands.Init(initReq, func(res *rpc.InitResponse) {
 		if st := res.GetError(); st != nil {
-			feedback.Errorf(tr("Error initializing instance: %v"), st.Message)
+			feedback.Warning(tr("Error initializing instance: %v", st.Message))
 		}
 
 		if progress := res.GetInitProgress(); progress != nil {
@@ -106,7 +106,7 @@ func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *pat
 		}
 	})
 	if err != nil {
-		feedback.Errorf(tr("Error initializing instance: %v"), err)
+		feedback.Warning(tr("Error initializing instance: %v", err))
 	}
 
 	return profile

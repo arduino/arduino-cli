@@ -16,6 +16,7 @@
 package updater
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -66,11 +67,12 @@ func ForceCheckForUpdate(currentVersion *semver.Version) *semver.Version {
 
 // NotifyNewVersionIsAvailable prints information about the new latestVersion
 func NotifyNewVersionIsAvailable(latestVersion string) {
-	feedback.Errorf("\n\n%s %s → %s\n%s",
+	msg := fmt.Sprintf("\n\n%s %s → %s\n%s",
 		color.YellowString(tr("A new release of Arduino CLI is available:")),
 		color.CyanString(globals.VersionInfo.VersionString),
 		color.CyanString(latestVersion),
 		color.YellowString("https://arduino.github.io/arduino-cli/latest/installation/#latest-packages"))
+	feedback.Warning(msg)
 }
 
 // shouldCheckForUpdate return true if it actually makes sense to check for new updates,
