@@ -59,7 +59,9 @@ jobs:
           (
             openssl pkcs12 \
               -in "${{ env.CERTIFICATE_PATH }}" \
-              -noout -passin env:CERTIFICATE_PASSWORD
+              -legacy \
+              -noout \
+              -passin env:CERTIFICATE_PASSWORD
           ) || (
             echo "::error::Verification of ${{ matrix.certificate.identifier }} failed!!!"
             exit 1
@@ -87,6 +89,7 @@ jobs:
               openssl pkcs12 \
                 -in "${{ env.CERTIFICATE_PATH }}" \
                 -clcerts \
+                -legacy \
                 -nodes \
                 -passin env:CERTIFICATE_PASSWORD
             ) | (
