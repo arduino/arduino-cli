@@ -21,7 +21,6 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/arguments"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/core"
@@ -54,7 +53,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 
 	platformsRefs, err := arguments.ParseReferences(args)
 	if err != nil {
-		feedback.Fatal(tr("Invalid argument passed: %v", err), errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}
 
 	for i, platformRef := range platformsRefs {
@@ -66,7 +65,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 		}
 		_, err := core.PlatformDownload(context.Background(), platformDownloadreq, feedback.ProgressBar())
 		if err != nil {
-			feedback.Fatal(tr("Error downloading %[1]s: %[2]v", args[i], err), errorcodes.ErrNetwork)
+			feedback.Fatal(tr("Error downloading %[1]s: %[2]v", args[i], err), feedback.ErrNetwork)
 		}
 	}
 }

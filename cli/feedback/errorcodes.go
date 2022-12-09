@@ -1,6 +1,6 @@
 // This file is part of arduino-cli.
 //
-// Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+// Copyright 2022 ARDUINO SA (http://www.arduino.cc/)
 //
 // This software is released under the GNU General Public License version 3,
 // which covers the main part of arduino-cli.
@@ -13,19 +13,33 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package errorcodes
+package feedback
 
-// Error codes to be used for os.Exit().
+// ExitCode to be used for Fatal.
+type ExitCode int
+
 const (
-	_          = iota // 0 is not a valid exit error code
-	ErrGeneric        // 1 is the reserved "catchall" code in Unix
-	_                 // 2 is reserved in Unix
+	// Success (0 is the no-error return code in Unix)
+	Success ExitCode = iota
+
+	// ErrGeneric Generic error (1 is the reserved "catchall" code in Unix)
+	ErrGeneric
+
+	_ // (2 Is reserved in Unix)
+
+	// ErrNoConfigFile is returned when the config file is not found (3)
 	ErrNoConfigFile
-	ErrBadCall
+
+	_ // (4 was ErrBadCall and has been removed)
+
+	// ErrNetwork is returned when a network error occurs (5)
 	ErrNetwork
+
 	// ErrCoreConfig represents an error in the cli core config, for example some basic
 	// files shipped with the installation are missing, or cannot create or get basic
-	// directories vital for the CLI to work.
+	// directories vital for the CLI to work. (6)
 	ErrCoreConfig
+
+	// ErrBadArgument is returned when the arguments are not valid (7)
 	ErrBadArgument
 )

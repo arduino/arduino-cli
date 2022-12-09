@@ -21,7 +21,6 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/arguments"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/core"
@@ -63,7 +62,7 @@ func runInstallCommand(args []string, postInstallFlags arguments.PostInstallFlag
 
 	platformsRefs, err := arguments.ParseReferences(args)
 	if err != nil {
-		feedback.Fatal(tr("Invalid argument passed: %v", err), errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}
 
 	for _, platformRef := range platformsRefs {
@@ -77,7 +76,7 @@ func runInstallCommand(args []string, postInstallFlags arguments.PostInstallFlag
 		}
 		_, err := core.PlatformInstall(context.Background(), platformInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
 		if err != nil {
-			feedback.Fatal(tr("Error during install: %v", err), errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error during install: %v", err), feedback.ErrGeneric)
 		}
 	}
 }

@@ -20,7 +20,6 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/arguments"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/spf13/cobra"
 )
@@ -67,7 +66,7 @@ func runAttachCommand(path string, port *arguments.Port, fqbn string) {
 	address, protocol, _ := port.GetPortAddressAndProtocol(nil, sk)
 	if address != "" {
 		if err := sk.SetDefaultPort(address, protocol); err != nil {
-			feedback.Fatal(fmt.Sprintf("%s: %s", tr("Error saving sketch metadata"), err), errorcodes.ErrGeneric)
+			feedback.Fatal(fmt.Sprintf("%s: %s", tr("Error saving sketch metadata"), err), feedback.ErrGeneric)
 		}
 		current.Port = &boardAttachPortResult{
 			Address:  address,
@@ -76,7 +75,7 @@ func runAttachCommand(path string, port *arguments.Port, fqbn string) {
 	}
 	if fqbn != "" {
 		if err := sk.SetDefaultFQBN(fqbn); err != nil {
-			feedback.Fatal(fmt.Sprintf("%s: %s", tr("Error saving sketch metadata"), err), errorcodes.ErrGeneric)
+			feedback.Fatal(fmt.Sprintf("%s: %s", tr("Error saving sketch metadata"), err), feedback.ErrGeneric)
 		}
 		current.Fqbn = fqbn
 	}

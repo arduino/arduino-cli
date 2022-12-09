@@ -19,7 +19,6 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/arguments"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/go-paths-helper"
@@ -69,7 +68,7 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	case destFile != "":
 		configFileAbsPath, err = paths.New(destFile).Abs()
 		if err != nil {
-			feedback.Fatal(tr("Cannot find absolute path: %v", err), errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Cannot find absolute path: %v", err), feedback.ErrGeneric)
 		}
 
 		absPath = configFileAbsPath.Parent()
@@ -79,19 +78,19 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	default:
 		absPath, err = paths.New(destDir).Abs()
 		if err != nil {
-			feedback.Fatal(tr("Cannot find absolute path: %v", err), errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Cannot find absolute path: %v", err), feedback.ErrGeneric)
 		}
 		configFileAbsPath = absPath.Join(defaultFileName)
 	}
 
 	if !overwrite && configFileAbsPath.Exist() {
-		feedback.Fatal(tr("Config file already exists, use --overwrite to discard the existing one."), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Config file already exists, use --overwrite to discard the existing one."), feedback.ErrGeneric)
 	}
 
 	logrus.Infof("Writing config file to: %s", absPath)
 
 	if err := absPath.MkdirAll(); err != nil {
-		feedback.Fatal(tr("Cannot create config file directory: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Cannot create config file directory: %v", err), feedback.ErrGeneric)
 	}
 
 	newSettings := viper.New()
@@ -99,7 +98,7 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	configuration.BindFlags(cmd, newSettings)
 
 	if err := newSettings.WriteConfigAs(configFileAbsPath.String()); err != nil {
-		feedback.Fatal(tr("Cannot create config file: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Cannot create config file: %v", err), feedback.ErrGeneric)
 	}
 
 	msg := tr("Config file written to: %s", configFileAbsPath.String())

@@ -19,7 +19,6 @@ import (
 	"os"
 	"reflect"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/sirupsen/logrus"
@@ -50,7 +49,7 @@ func runRemoveCommand(cmd *cobra.Command, args []string) {
 
 	if kind != reflect.Slice {
 		msg := tr("The key '%[1]v' is not a list of items, can't remove from it.\nMaybe use '%[2]s'?", key, "config delete")
-		feedback.Fatal(msg, errorcodes.ErrGeneric)
+		feedback.Fatal(msg, feedback.ErrGeneric)
 	}
 
 	mappedValues := map[string]bool{}
@@ -67,6 +66,6 @@ func runRemoveCommand(cmd *cobra.Command, args []string) {
 	configuration.Settings.Set(key, values)
 
 	if err := configuration.Settings.WriteConfig(); err != nil {
-		feedback.Fatal(tr("Can't write config file: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Can't write config file: %v", err), feedback.ErrGeneric)
 	}
 }

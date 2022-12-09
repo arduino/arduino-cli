@@ -19,7 +19,6 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/sketch"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -34,7 +33,7 @@ func InitSketchPath(path string) (sketchPath *paths.Path) {
 	} else {
 		wd, err := paths.Getwd()
 		if err != nil {
-			feedback.Fatal(tr("Couldn't get current working directory: %v", err), errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Couldn't get current working directory: %v", err), feedback.ErrGeneric)
 		}
 		logrus.Infof("Reading sketch from dir: %s", wd)
 		sketchPath = wd
@@ -47,7 +46,7 @@ func InitSketchPath(path string) (sketchPath *paths.Path) {
 func NewSketch(sketchPath *paths.Path) *sketch.Sketch {
 	sketch, err := sketch.New(sketchPath)
 	if err != nil {
-		feedback.Fatal(tr("Error opening sketch: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error opening sketch: %v", err), feedback.ErrGeneric)
 	}
 	return sketch
 }

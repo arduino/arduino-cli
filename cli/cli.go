@@ -30,7 +30,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/core"
 	"github.com/arduino/arduino-cli/cli/daemon"
 	"github.com/arduino/arduino-cli/cli/debug"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/generatedocs"
 	"github.com/arduino/arduino-cli/cli/globals"
@@ -149,7 +148,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	// initialize inventory
 	err := inventory.Init(configuration.DataDir(configuration.Settings).String())
 	if err != nil {
-		feedback.Fatal(fmt.Sprintf("Error: %v", err), errorcodes.ErrBadArgument)
+		feedback.Fatal(fmt.Sprintf("Error: %v", err), feedback.ErrBadArgument)
 	}
 
 	// https://no-color.org/
@@ -200,7 +199,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	if logFile != "" {
 		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
-			feedback.Fatal(tr("Unable to open file for logging: %s", logFile), errorcodes.ErrBadCall)
+			feedback.Fatal(tr("Unable to open file for logging: %s", logFile), feedback.ErrGeneric)
 		}
 
 		// we use a hook so we don't get color codes in the log file
@@ -213,7 +212,7 @@ func preRun(cmd *cobra.Command, args []string) {
 
 	// configure logging filter
 	if lvl, found := toLogLevel(configuration.Settings.GetString("logging.level")); !found {
-		feedback.Fatal(tr("Invalid option for --log-level: %s", configuration.Settings.GetString("logging.level")), errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Invalid option for --log-level: %s", configuration.Settings.GetString("logging.level")), feedback.ErrBadArgument)
 	} else {
 		logrus.SetLevel(lvl)
 	}
@@ -225,7 +224,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	// check the right output format was passed
 	format, found := feedback.ParseOutputFormat(outputFormat)
 	if !found {
-		feedback.Fatal(tr("Invalid output format: %s", outputFormat), errorcodes.ErrBadCall)
+		feedback.Fatal(tr("Invalid output format: %s", outputFormat), feedback.ErrBadArgument)
 	}
 
 	// use the output format to configure the Feedback
@@ -246,7 +245,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	if outputFormat != "text" {
 		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
 			logrus.Warn("Calling help on JSON format")
-			feedback.Fatal(tr("Invalid Call : should show Help, but it is available only in TEXT mode."), errorcodes.ErrBadCall)
+			feedback.Fatal(tr("Invalid Call : should show Help, but it is available only in TEXT mode."), feedback.ErrBadArgument)
 		})
 	}
 }

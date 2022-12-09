@@ -24,7 +24,6 @@ import (
 	"io"
 	"os"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
@@ -165,15 +164,15 @@ func Warning(msg string) {
 }
 
 // FatalError outputs the error and exits with status exitCode.
-func FatalError(err error, exitCode int) {
+func FatalError(err error, exitCode ExitCode) {
 	Fatal(err.Error(), exitCode)
 }
 
 // Fatal outputs the errorMsg and exits with status exitCode.
-func Fatal(errorMsg string, exitCode int) {
+func Fatal(errorMsg string, exitCode ExitCode) {
 	if format == Text {
 		fmt.Fprintln(stdErr, errorMsg)
-		os.Exit(exitCode)
+		os.Exit(int(exitCode))
 	}
 
 	type FatalError struct {
@@ -198,7 +197,7 @@ func Fatal(errorMsg string, exitCode int) {
 		panic("unknown output format")
 	}
 	fmt.Fprintln(stdErr, string(d))
-	os.Exit(exitCode)
+	os.Exit(int(exitCode))
 }
 
 func augment(data interface{}) interface{} {
@@ -228,19 +227,19 @@ func PrintResult(res Result) {
 	case JSON:
 		d, err := json.MarshalIndent(augment(res.Data()), "", "  ")
 		if err != nil {
-			Fatal(fmt.Sprintf("Error during JSON encoding of the output: %v", err), errorcodes.ErrGeneric)
+			Fatal(fmt.Sprintf("Error during JSON encoding of the output: %v", err), ErrGeneric)
 		}
 		data = string(d)
 	case MinifiedJSON:
 		d, err := json.Marshal(augment(res.Data()))
 		if err != nil {
-			Fatal(fmt.Sprintf("Error during JSON encoding of the output: %v", err), errorcodes.ErrGeneric)
+			Fatal(fmt.Sprintf("Error during JSON encoding of the output: %v", err), ErrGeneric)
 		}
 		data = string(d)
 	case YAML:
 		d, err := yaml.Marshal(augment(res.Data()))
 		if err != nil {
-			Fatal(fmt.Sprintf("Error during YAML encoding of the output: %v", err), errorcodes.ErrGeneric)
+			Fatal(fmt.Sprintf("Error during YAML encoding of the output: %v", err), ErrGeneric)
 		}
 		data = string(d)
 	case Text:

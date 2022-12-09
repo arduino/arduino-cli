@@ -20,7 +20,6 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/arguments"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/upload"
@@ -70,7 +69,7 @@ func runBootloaderCommand(command *cobra.Command, args []string) {
 	// We don't need a Sketch to upload a board's bootloader
 	discoveryPort, err := port.GetPort(instance, nil)
 	if err != nil {
-		feedback.Fatal(tr("Error during Upload: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
 	}
 
 	stdOut, stdErr, res := feedback.OutputStreams()
@@ -83,7 +82,7 @@ func runBootloaderCommand(command *cobra.Command, args []string) {
 		Programmer: programmer.String(),
 		DryRun:     dryRun,
 	}, stdOut, stdErr); err != nil {
-		feedback.Fatal(tr("Error during Upload: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
 	}
 	feedback.PrintResult(res())
 }

@@ -35,7 +35,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/upload"
@@ -147,14 +146,14 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli compile`")
 
 	if dumpProfile && feedback.GetFormat() != feedback.Text {
-		feedback.Fatal(tr("You cannot use the %[1]s flag together with %[2]s.", "--dump-profile", "--format json"), errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("You cannot use the %[1]s flag together with %[2]s.", "--dump-profile", "--format json"), feedback.ErrBadArgument)
 	}
 	if profileArg.Get() != "" {
 		if len(libraries) > 0 {
-			feedback.Fatal(tr("You cannot use the %s flag while compiling with a profile.", "--libraries"), errorcodes.ErrBadArgument)
+			feedback.Fatal(tr("You cannot use the %s flag while compiling with a profile.", "--libraries"), feedback.ErrBadArgument)
 		}
 		if len(library) > 0 {
-			feedback.Fatal(tr("You cannot use the %s flag while compiling with a profile.", "--library"), errorcodes.ErrBadArgument)
+			feedback.Fatal(tr("You cannot use the %s flag while compiling with a profile.", "--library"), feedback.ErrBadArgument)
 		}
 	}
 
@@ -181,13 +180,13 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	if sourceOverrides != "" {
 		data, err := paths.New(sourceOverrides).ReadFile()
 		if err != nil {
-			feedback.Fatal(tr("Error opening source code overrides data file: %v", err), errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error opening source code overrides data file: %v", err), feedback.ErrGeneric)
 		}
 		var o struct {
 			Overrides map[string]string `json:"overrides"`
 		}
 		if err := json.Unmarshal(data, &o); err != nil {
-			feedback.Fatal(tr("Error: invalid source code overrides data file: %v", err), errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error: invalid source code overrides data file: %v", err), feedback.ErrGeneric)
 		}
 		overrides = o.Overrides
 	}
@@ -228,14 +227,14 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			Protocol: port.Protocol,
 		})
 		if err != nil {
-			feedback.Fatal(tr("Error during Upload: %v", err), errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
 		}
 
 		fields := map[string]string{}
 		if len(userFieldRes.UserFields) > 0 {
 			feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", port.Protocol))
 			if f, err := arguments.AskForUserFields(userFieldRes.UserFields); err != nil {
-				feedback.FatalError(err, errorcodes.ErrBadArgument)
+				feedback.FatalError(err, feedback.ErrBadArgument)
 			} else {
 				fields = f
 			}
@@ -254,7 +253,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		}
 
 		if err := upload.Upload(context.Background(), uploadRequest, stdOut, stdErr); err != nil {
-			feedback.Fatal(tr("Error during Upload: %v", err), errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
 		}
 	}
 
@@ -308,7 +307,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 
 		// Output profile as a result
 		if _, err := stdOut.Write([]byte(profile)); err != nil {
-			feedback.FatalError(err, errorcodes.ErrGeneric)
+			feedback.FatalError(err, feedback.ErrGeneric)
 		}
 		feedback.PrintResult(stdIORes())
 		os.Exit(0)
@@ -351,7 +350,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 				}
 			}
 		}
-		feedback.Fatal(msg, errorcodes.ErrGeneric)
+		feedback.Fatal(msg, feedback.ErrGeneric)
 	}
 }
 

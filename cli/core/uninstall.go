@@ -21,7 +21,6 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/arguments"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/core"
@@ -51,12 +50,12 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 
 	platformsRefs, err := arguments.ParseReferences(args)
 	if err != nil {
-		feedback.Fatal(tr("Invalid argument passed: %v", err), errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}
 
 	for _, platformRef := range platformsRefs {
 		if platformRef.Version != "" {
-			feedback.Fatal(tr("Invalid parameter %s: version not allowed", platformRef), errorcodes.ErrBadArgument)
+			feedback.Fatal(tr("Invalid parameter %s: version not allowed", platformRef), feedback.ErrBadArgument)
 		}
 	}
 	for _, platformRef := range platformsRefs {
@@ -66,7 +65,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 			Architecture:    platformRef.Architecture,
 		}, feedback.NewTaskProgressCB())
 		if err != nil {
-			feedback.Fatal(tr("Error during uninstall: %v", err), errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error during uninstall: %v", err), feedback.ErrGeneric)
 		}
 	}
 }

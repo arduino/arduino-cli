@@ -22,7 +22,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/cli/arguments"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/board"
@@ -80,7 +79,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 func watchList(cmd *cobra.Command, inst *rpc.Instance) {
 	eventsChan, closeCB, err := board.Watch(&rpc.BoardListWatchRequest{Instance: inst})
 	if err != nil {
-		feedback.Fatal(tr("Error detecting boards: %v", err), errorcodes.ErrNetwork)
+		feedback.Fatal(tr("Error detecting boards: %v", err), feedback.ErrNetwork)
 	}
 	defer closeCB()
 

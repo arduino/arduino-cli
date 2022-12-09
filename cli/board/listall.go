@@ -21,7 +21,6 @@ import (
 	"os"
 	"sort"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/board"
@@ -61,7 +60,7 @@ func runListAllCommand(cmd *cobra.Command, args []string) {
 		IncludeHiddenBoards: showHiddenBoard,
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error listing boards: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error listing boards: %v", err), feedback.ErrGeneric)
 	}
 
 	feedback.PrintResult(resultAll{list})

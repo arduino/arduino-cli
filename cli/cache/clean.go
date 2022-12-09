@@ -18,7 +18,6 @@ package cache
 import (
 	"os"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/sirupsen/logrus"
@@ -43,6 +42,6 @@ func runCleanCommand(cmd *cobra.Command, args []string) {
 	cachePath := configuration.DownloadsDir(configuration.Settings)
 	err := cachePath.RemoveAll()
 	if err != nil {
-		feedback.Fatal(tr("Error cleaning caches: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error cleaning caches: %v", err), feedback.ErrGeneric)
 	}
 }

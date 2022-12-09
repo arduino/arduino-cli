@@ -20,7 +20,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/sketch"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
@@ -80,18 +79,18 @@ func CalculateFQBNAndPort(portArgs *Port, fqbnArg *Fqbn, instance *rpc.Instance,
 	}
 	if fqbn == "" {
 		if portArgs == nil || portArgs.address == "" {
-			feedback.FatalError(&arduino.MissingFQBNError{}, errorcodes.ErrGeneric)
+			feedback.FatalError(&arduino.MissingFQBNError{}, feedback.ErrGeneric)
 		}
 		fqbn, port := portArgs.DetectFQBN(instance)
 		if fqbn == "" {
-			feedback.FatalError(&arduino.MissingFQBNError{}, errorcodes.ErrGeneric)
+			feedback.FatalError(&arduino.MissingFQBNError{}, feedback.ErrGeneric)
 		}
 		return fqbn, port
 	}
 
 	port, err := portArgs.GetPort(instance, sk)
 	if err != nil {
-		feedback.Fatal(tr("Error getting port metadata: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error getting port metadata: %v", err), feedback.ErrGeneric)
 	}
 	return fqbn, port.ToRPC()
 }

@@ -19,7 +19,6 @@ import (
 	"os"
 	"reflect"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/sirupsen/logrus"
@@ -92,7 +91,7 @@ func runAddCommand(cmd *cobra.Command, args []string) {
 
 	if kind != reflect.Slice {
 		msg := tr("The key '%[1]v' is not a list of items, can't add to it.\nMaybe use '%[2]s'?", key, "config set")
-		feedback.Fatal(msg, errorcodes.ErrGeneric)
+		feedback.Fatal(msg, feedback.ErrGeneric)
 	}
 
 	v := configuration.Settings.GetStringSlice(key)
@@ -101,6 +100,6 @@ func runAddCommand(cmd *cobra.Command, args []string) {
 	configuration.Settings.Set(key, v)
 
 	if err := configuration.Settings.WriteConfig(); err != nil {
-		feedback.Fatal(tr("Can't write config file: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Can't write config file: %v", err), feedback.ErrGeneric)
 	}
 }

@@ -22,7 +22,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/board"
@@ -59,7 +58,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		IncludeHiddenBoards: showHiddenBoard,
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error searching boards: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error searching boards: %v", err), feedback.ErrGeneric)
 	}
 
 	feedback.PrintResult(searchResults{res.Boards})

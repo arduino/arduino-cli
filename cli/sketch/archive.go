@@ -21,7 +21,6 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/arguments"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	sk "github.com/arduino/arduino-cli/commands/sketch"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -78,6 +77,6 @@ func runArchiveCommand(args []string, includeBuildDir bool, overwrite bool) {
 		})
 
 	if err != nil {
-		feedback.Fatal(tr("Error archiving: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error archiving: %v", err), feedback.ErrGeneric)
 	}
 }

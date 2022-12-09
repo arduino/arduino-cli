@@ -19,7 +19,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
+	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -66,7 +66,7 @@ func generateBashCompletions(cmd *cobra.Command, args []string) {
 	err := cmd.Root().GenBashCompletionFile(filepath.Join(outputDir, "arduino"))
 	if err != nil {
 		logrus.WithError(err).Warn("Error Generating bash autocompletions")
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 }
 
@@ -83,6 +83,6 @@ func generateManPages(cmd *cobra.Command, args []string) {
 	err := doc.GenManTree(cmd.Root(), header, outputDir)
 	if err != nil {
 		logrus.WithError(err).Warn("Error Generating manpages")
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 }

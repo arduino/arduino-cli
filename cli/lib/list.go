@@ -22,7 +22,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/lib"
@@ -76,7 +75,7 @@ func List(instance *rpc.Instance, args []string, all bool, updatable bool) {
 		Fqbn:      fqbn.String(),
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error listing Libraries: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error listing Libraries: %v", err), feedback.ErrGeneric)
 	}
 
 	libs := []*rpc.InstalledLibrary{}

@@ -23,7 +23,6 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/cli/arguments"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/lib"
@@ -70,7 +69,7 @@ func runExamplesCommand(cmd *cobra.Command, args []string) {
 		Fqbn:     fqbn.String(),
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error getting libraries info: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error getting libraries info: %v", err), feedback.ErrGeneric)
 	}
 
 	found := []*libraryExamples{}

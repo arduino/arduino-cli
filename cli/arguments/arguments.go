@@ -18,7 +18,6 @@ package arguments
 import (
 	"strings"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/spf13/cobra"
@@ -35,7 +34,7 @@ func CheckFlagsConflicts(command *cobra.Command, flagNames ...string) {
 	}
 	flags := "--" + strings.Join(flagNames, ", --")
 	msg := tr("Can't use the following flags together: %s", flags)
-	feedback.Fatal(msg, errorcodes.ErrBadArgument)
+	feedback.Fatal(msg, feedback.ErrBadArgument)
 }
 
 // CheckFlagsMandatory is a helper function useful to report errors when at least one flag is not used in a group of "required" flags
@@ -46,6 +45,6 @@ func CheckFlagsMandatory(command *cobra.Command, flagNames ...string) {
 		}
 		flags := "--" + strings.Join(flagNames, ", --")
 		msg := tr("Flag %[1]s is mandatory when used in conjunction with: %[2]s", "--"+flagName, flags)
-		feedback.Fatal(msg, errorcodes.ErrBadArgument)
+		feedback.Fatal(msg, feedback.ErrBadArgument)
 	}
 }

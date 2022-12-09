@@ -19,7 +19,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/sirupsen/logrus"
@@ -59,7 +58,7 @@ func runDeleteCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if !exists {
-		feedback.Fatal(tr("Settings key doesn't exist"), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Settings key doesn't exist"), feedback.ErrGeneric)
 	}
 
 	updatedSettings := viper.New()
@@ -68,6 +67,6 @@ func runDeleteCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if err := updatedSettings.WriteConfigAs(configuration.Settings.ConfigFileUsed()); err != nil {
-		feedback.Fatal(tr("Can't write config file: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Can't write config file: %v", err), feedback.ErrGeneric)
 	}
 }

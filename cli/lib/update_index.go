@@ -19,7 +19,6 @@ import (
 	"context"
 	"os"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands"
@@ -52,6 +51,6 @@ func UpdateIndex(inst *rpc.Instance) {
 		Instance: inst,
 	}, feedback.ProgressBar())
 	if err != nil {
-		feedback.Fatal(tr("Error updating library index: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error updating library index: %v", err), feedback.ErrGeneric)
 	}
 }

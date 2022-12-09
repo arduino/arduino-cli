@@ -25,7 +25,6 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/commands/daemon"
@@ -79,7 +78,7 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 	gRPCOptions := []grpc.ServerOption{}
 	if debugFile != "" {
 		if !debug {
-			feedback.Fatal(tr("The flag --debug-file must be used with --debug."), errorcodes.ErrBadArgument)
+			feedback.Fatal(tr("The flag --debug-file must be used with --debug."), feedback.ErrBadArgument)
 		}
 	}
 	if debug {
@@ -87,14 +86,14 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 			outFile := paths.New(debugFile)
 			f, err := outFile.Append()
 			if err != nil {
-				feedback.Fatal(tr("Error opening debug logging file: %s", err), errorcodes.ErrBadCall)
+				feedback.Fatal(tr("Error opening debug logging file: %s", err), feedback.ErrGeneric)
 			}
 			defer f.Close()
 			debugStdOut = f
 		} else {
 			// Attach to os.Stdout only if we are in Text mode
 			if feedback.GetFormat() != feedback.Text {
-				feedback.Fatal(tr("Debug log is only available in text format"), errorcodes.ErrBadArgument)
+				feedback.Fatal(tr("Debug log is only available in text format"), feedback.ErrBadArgument)
 			}
 			out, _, _ := feedback.OutputStreams()
 			debugStdOut = out
@@ -133,19 +132,19 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		// Invalid port, such as "Foo"
 		var dnsError *net.DNSError
 		if errors.As(err, &dnsError) {
-			feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. %[2]s is unknown name.", port, dnsError.Name), errorcodes.ErrCoreConfig)
+			feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. %[2]s is unknown name.", port, dnsError.Name), feedback.ErrCoreConfig)
 		}
 		// Invalid port number, such as -1
 		var addrError *net.AddrError
 		if errors.As(err, &addrError) {
-			feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. %[2]s is an invalid port.", port, addrError.Addr), errorcodes.ErrCoreConfig)
+			feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. %[2]s is an invalid port.", port, addrError.Addr), feedback.ErrCoreConfig)
 		}
 		// Port is already in use
 		var syscallErr *os.SyscallError
 		if errors.As(err, &syscallErr) && errors.Is(syscallErr.Err, syscall.EADDRINUSE) {
-			feedback.Fatal(tr("Failed to listen on TCP port: %s. Address already in use.", port), errorcodes.ErrNetwork)
+			feedback.Fatal(tr("Failed to listen on TCP port: %s. Address already in use.", port), feedback.ErrNetwork)
 		}
-		feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v", port, err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v", port, err), feedback.ErrGeneric)
 	}
 
 	// We need to parse the port used only if the user let
@@ -156,7 +155,7 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 		split := strings.Split(address.String(), ":")
 
 		if len(split) == 0 {
-			feedback.Fatal(tr("Invalid TCP address: port is missing"), errorcodes.ErrBadArgument)
+			feedback.Fatal(tr("Invalid TCP address: port is missing"), feedback.ErrBadArgument)
 		}
 
 		port = split[len(split)-1]

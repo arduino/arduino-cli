@@ -20,7 +20,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/updater"
@@ -56,7 +55,7 @@ func runVersionCommand(cmd *cobra.Command, args []string) {
 
 	currentVersion, err := semver.Parse(globals.VersionInfo.VersionString)
 	if err != nil {
-		feedback.Fatal(fmt.Sprintf("Error parsing current version: %s", err), errorcodes.ErrGeneric)
+		feedback.Fatal(fmt.Sprintf("Error parsing current version: %s", err), feedback.ErrGeneric)
 	}
 	latestVersion := updater.ForceCheckForUpdate(currentVersion)
 

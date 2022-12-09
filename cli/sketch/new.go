@@ -21,7 +21,6 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/globals"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	sk "github.com/arduino/arduino-cli/commands/sketch"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -54,7 +53,7 @@ func runNewCommand(args []string, overwrite bool) {
 	trimmedSketchName := strings.TrimSuffix(sketchName, globals.MainFileValidExtension)
 	sketchDirPath, err := paths.New(trimmedSketchName).Abs()
 	if err != nil {
-		feedback.Fatal(tr("Error creating sketch: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error creating sketch: %v", err), feedback.ErrGeneric)
 	}
 	_, err = sk.NewSketch(context.Background(), &rpc.NewSketchRequest{
 		Instance:   nil,
@@ -63,7 +62,7 @@ func runNewCommand(args []string, overwrite bool) {
 		Overwrite:  overwrite,
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error creating sketch: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error creating sketch: %v", err), feedback.ErrGeneric)
 	}
 
 	feedback.Print(tr("Sketch created in: %s", sketchDirPath))

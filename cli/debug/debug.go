@@ -22,7 +22,6 @@ import (
 	"sort"
 
 	"github.com/arduino/arduino-cli/cli/arguments"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/debug"
@@ -91,7 +90,7 @@ func runDebugCommand(command *cobra.Command, args []string) {
 	if printInfo {
 
 		if res, err := debug.GetDebugConfig(context.Background(), debugConfigRequested); err != nil {
-			feedback.Fatal(tr("Error getting Debug info: %v", err), errorcodes.ErrBadArgument)
+			feedback.Fatal(tr("Error getting Debug info: %v", err), feedback.ErrBadArgument)
 		} else {
 			feedback.PrintResult(&debugInfoResult{res})
 		}
@@ -104,10 +103,10 @@ func runDebugCommand(command *cobra.Command, args []string) {
 
 		in, out, err := feedback.InteractiveStreams()
 		if err != nil {
-			feedback.FatalError(err, errorcodes.ErrBadArgument)
+			feedback.FatalError(err, feedback.ErrBadArgument)
 		}
 		if _, err := debug.Debug(context.Background(), debugConfigRequested, in, out, ctrlc); err != nil {
-			feedback.Fatal(tr("Error during Debug: %v", err), errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error during Debug: %v", err), feedback.ErrGeneric)
 		}
 
 	}

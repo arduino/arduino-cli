@@ -21,7 +21,6 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/arguments"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/board"
@@ -67,7 +66,7 @@ func runDetailsCommand(cmd *cobra.Command, args []string) {
 	})
 
 	if err != nil {
-		feedback.Fatal(tr("Error getting board details: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error getting board details: %v", err), feedback.ErrGeneric)
 	}
 
 	feedback.PrintResult(detailsResult{details: res})

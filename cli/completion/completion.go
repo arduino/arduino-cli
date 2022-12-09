@@ -18,7 +18,6 @@ package completion
 import (
 	"os"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/sirupsen/logrus"
@@ -51,7 +50,7 @@ func runCompletionCommand(cmd *cobra.Command, args []string) {
 	stdOut, _, res := feedback.OutputStreams()
 	logrus.Info("Executing `arduino-cli completion`")
 	if completionNoDesc && (args[0] == "powershell") {
-		feedback.Fatal(tr("Error: command description is not supported by %v", args[0]), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error: command description is not supported by %v", args[0]), feedback.ErrGeneric)
 	}
 	switch args[0] {
 	case "bash":

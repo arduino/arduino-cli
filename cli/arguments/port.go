@@ -22,7 +22,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/sketch"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
@@ -146,7 +145,7 @@ func (p *Port) DetectFQBN(inst *rpc.Instance) (string, *rpc.Port) {
 		Timeout:  p.timeout.Get().Milliseconds(),
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error during FQBN detection: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error during FQBN detection: %v", err), feedback.ErrGeneric)
 	}
 	for _, detectedPort := range detectedPorts {
 		port := detectedPort.GetPort()
@@ -157,10 +156,10 @@ func (p *Port) DetectFQBN(inst *rpc.Instance) (string, *rpc.Port) {
 			continue
 		}
 		if len(detectedPort.MatchingBoards) > 1 {
-			feedback.FatalError(&arduino.MultipleBoardsDetectedError{Port: port}, errorcodes.ErrBadArgument)
+			feedback.FatalError(&arduino.MultipleBoardsDetectedError{Port: port}, feedback.ErrBadArgument)
 		}
 		if len(detectedPort.MatchingBoards) == 0 {
-			feedback.FatalError(&arduino.NoBoardsDetectedError{Port: port}, errorcodes.ErrBadArgument)
+			feedback.FatalError(&arduino.NoBoardsDetectedError{Port: port}, feedback.ErrBadArgument)
 		}
 		return detectedPort.MatchingBoards[0].Fqbn, port
 	}

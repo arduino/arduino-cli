@@ -26,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/cli/arguments"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
@@ -93,7 +92,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 
 	sk, err := sketch.New(sketchPath)
 	if err != nil && importDir == "" && importFile == "" {
-		feedback.Fatal(tr("Error during Upload: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
 	}
 
 	instance, profile := instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
@@ -135,7 +134,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 				msg += tr("Platform %s is not found in any known index\nMaybe you need to add a 3rd party URL?", platformErr.Platform)
 			}
 		}
-		feedback.Fatal(msg, errorcodes.ErrGeneric)
+		feedback.Fatal(msg, feedback.ErrGeneric)
 	}
 
 	fields := map[string]string{}
@@ -143,7 +142,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 		feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", port.Protocol))
 		if f, err := arguments.AskForUserFields(userFieldRes.UserFields); err != nil {
 			msg := fmt.Sprintf("%s: %s", tr("Error getting user input"), err)
-			feedback.Fatal(msg, errorcodes.ErrGeneric)
+			feedback.Fatal(msg, feedback.ErrGeneric)
 		} else {
 			fields = f
 		}
@@ -168,7 +167,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 		UserFields: fields,
 	}
 	if err := upload.Upload(context.Background(), req, stdOut, stdErr); err != nil {
-		feedback.FatalError(err, errorcodes.ErrGeneric)
+		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 	feedback.PrintResult(stdIOResult())
 }

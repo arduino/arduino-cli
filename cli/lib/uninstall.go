@@ -21,7 +21,6 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/cli/arguments"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/lib"
@@ -51,7 +50,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 
 	refs, err := ParseLibraryReferenceArgsAndAdjustCase(instance, args)
 	if err != nil {
-		feedback.Fatal(tr("Invalid argument passed: %v", err), errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}
 
 	for _, library := range refs {
@@ -61,7 +60,7 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 			Version:  library.Version,
 		}, feedback.TaskProgress())
 		if err != nil {
-			feedback.Fatal(tr("Error uninstalling %[1]s: %[2]v", library, err), errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error uninstalling %[1]s: %[2]v", library, err), feedback.ErrGeneric)
 		}
 	}
 

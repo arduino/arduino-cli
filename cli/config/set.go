@@ -20,7 +20,6 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/sirupsen/logrus"
@@ -52,7 +51,7 @@ func runSetCommand(cmd *cobra.Command, args []string) {
 	kind := validateKey(key)
 
 	if kind != reflect.Slice && len(args) > 2 {
-		feedback.Fatal(tr("Can't set multiple values in key %v", key), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Can't set multiple values in key %v", key), feedback.ErrGeneric)
 	}
 
 	var value interface{}
@@ -65,13 +64,13 @@ func runSetCommand(cmd *cobra.Command, args []string) {
 		var err error
 		value, err = strconv.ParseBool(args[1])
 		if err != nil {
-			feedback.Fatal(tr("error parsing value: %v", err), errorcodes.ErrGeneric)
+			feedback.Fatal(tr("error parsing value: %v", err), feedback.ErrGeneric)
 		}
 	}
 
 	configuration.Settings.Set(key, value)
 
 	if err := configuration.Settings.WriteConfig(); err != nil {
-		feedback.Fatal(tr("Writing config file: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Writing config file: %v", err), feedback.ErrGeneric)
 	}
 }

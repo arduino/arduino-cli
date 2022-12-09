@@ -25,7 +25,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/utils"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands"
@@ -61,13 +60,13 @@ const indexUpdateInterval = "24h"
 func runSearchCommand(cmd *cobra.Command, args []string) {
 	inst, status := instance.Create()
 	if status != nil {
-		feedback.Fatal(tr("Error creating instance: %v", status), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error creating instance: %v", status), feedback.ErrGeneric)
 	}
 
 	if indexesNeedUpdating(indexUpdateInterval) {
 		err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{Instance: inst}, feedback.ProgressBar())
 		if err != nil {
-			os.Exit(errorcodes.ErrGeneric)
+			feedback.FatalError(err, feedback.ErrGeneric)
 		}
 	}
 
@@ -82,7 +81,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 		AllVersions: allVersions,
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error searching for platforms: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error searching for platforms: %v", err), feedback.ErrGeneric)
 	}
 
 	coreslist := resp.GetSearchOutput()
@@ -126,7 +125,7 @@ func indexesNeedUpdating(duration string) bool {
 	now := time.Now()
 	modTimeThreshold, err := time.ParseDuration(duration)
 	if err != nil {
-		feedback.Fatal(tr("Invalid timeout: %s", err), errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Invalid timeout: %s", err), feedback.ErrBadArgument)
 	}
 
 	urls := []string{globals.DefaultIndexURL}

@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/core"
@@ -61,7 +60,7 @@ func List(inst *rpc.Instance, all bool, updatableOnly bool) {
 		All:           all,
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error listing platforms: %v", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error listing platforms: %v", err), feedback.ErrGeneric)
 	}
 
 	feedback.PrintResult(installedResult{platforms})

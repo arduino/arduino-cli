@@ -22,7 +22,6 @@ import (
 	"sort"
 
 	"github.com/arduino/arduino-cli/cli/arguments"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/lib"
@@ -54,7 +53,7 @@ func runDepsCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli lib deps`")
 	libRef, err := ParseLibraryReferenceArgAndAdjustCase(instance, args[0])
 	if err != nil {
-		feedback.Fatal(tr("Arguments error: %v", err), errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Arguments error: %v", err), feedback.ErrBadArgument)
 	}
 
 	deps, err := lib.LibraryResolveDependencies(context.Background(), &rpc.LibraryResolveDependenciesRequest{
@@ -63,7 +62,7 @@ func runDepsCommand(cmd *cobra.Command, args []string) {
 		Version:  libRef.Version,
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error resolving dependencies for %[1]s: %[2]s", libRef, err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error resolving dependencies for %[1]s: %[2]s", libRef, err), feedback.ErrGeneric)
 	}
 
 	feedback.PrintResult(&checkDepResult{deps: deps})

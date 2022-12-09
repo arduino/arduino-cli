@@ -23,7 +23,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/cli/arguments"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/core"
@@ -66,7 +65,7 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 			UpdatableOnly: true,
 		})
 		if err != nil {
-			feedback.Fatal(tr("Error retrieving core list: %v", err), errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error retrieving core list: %v", err), feedback.ErrGeneric)
 		}
 
 		if len(targets) == 0 {
@@ -82,7 +81,7 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 	// proceed upgrading, if anything is upgradable
 	platformsRefs, err := arguments.ParseReferences(args)
 	if err != nil {
-		feedback.Fatal(tr("Invalid argument passed: %v", err), errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Invalid argument passed: %v", err), feedback.ErrBadArgument)
 	}
 
 	hasBadArguments := false
@@ -105,11 +104,11 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 				continue
 			}
 
-			feedback.Fatal(tr("Error during upgrade: %v", err), errorcodes.ErrGeneric)
+			feedback.Fatal(tr("Error during upgrade: %v", err), feedback.ErrGeneric)
 		}
 	}
 
 	if hasBadArguments {
-		feedback.Fatal(tr("Some upgrades failed, please check the output for details."), errorcodes.ErrBadArgument)
+		feedback.Fatal(tr("Some upgrades failed, please check the output for details."), feedback.ErrBadArgument)
 	}
 }

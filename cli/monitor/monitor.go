@@ -25,7 +25,6 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/cli/arguments"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/monitor"
@@ -77,7 +76,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 
 	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(instance, nil)
 	if err != nil {
-		feedback.FatalError(err, errorcodes.ErrGeneric)
+		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 
 	enumerateResp, err := monitor.EnumerateMonitorPortSettings(context.Background(), &rpc.EnumerateMonitorPortSettingsRequest{
@@ -86,7 +85,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 		Fqbn:         fqbn.String(),
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error getting port settings details: %s", err), errorcodes.ErrGeneric)
+		feedback.Fatal(tr("Error getting port settings details: %s", err), feedback.ErrGeneric)
 	}
 	if describe {
 		feedback.PrintResult(&detailsResult{Settings: enumerateResp.Settings})
@@ -95,7 +94,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 
 	tty, err := newStdInOutTerminal()
 	if err != nil {
-		feedback.FatalError(err, errorcodes.ErrGeneric)
+		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 	defer tty.Close()
 
@@ -120,7 +119,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 				} else {
 					if strings.EqualFold(s.SettingId, k) {
 						if !contains(s.EnumValues, v) {
-							feedback.Fatal(tr("invalid port configuration value for %s: %s", k, v), errorcodes.ErrBadArgument)
+							feedback.Fatal(tr("invalid port configuration value for %s: %s", k, v), feedback.ErrBadArgument)
 						}
 						setting = s
 						break
@@ -128,7 +127,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 				}
 			}
 			if setting == nil {
-				feedback.Fatal(tr("invalid port configuration: %s", config), errorcodes.ErrBadArgument)
+				feedback.Fatal(tr("invalid port configuration: %s", config), feedback.ErrBadArgument)
 			}
 			configuration.Settings = append(configuration.Settings, &rpc.MonitorPortSetting{
 				SettingId: setting.SettingId,
@@ -147,7 +146,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 		PortConfiguration: configuration,
 	})
 	if err != nil {
-		feedback.FatalError(err, errorcodes.ErrGeneric)
+		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 	defer portProxy.Close()
 
