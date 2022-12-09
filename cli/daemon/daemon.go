@@ -18,8 +18,6 @@ package daemon
 import (
 	"errors"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"net"
 	"os"
 	"strings"
@@ -120,11 +118,7 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 
 	if !daemonize {
 		// When parent process ends terminate also the daemon
-		go func() {
-			// Stdin is closed when the controlling parent process ends
-			_, _ = io.Copy(ioutil.Discard, os.Stdin)
-			os.Exit(0)
-		}()
+		go feedback.ExitWhenParentProcessEnds()
 	}
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", ip, port))

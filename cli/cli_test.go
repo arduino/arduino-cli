@@ -73,6 +73,7 @@ func inspect(t *testing.T, fset *token.FileSet, node ast.Node) bool {
 		wanted := map[string]bool{
 			"os.Stdout": true,
 			"os.Stderr": true,
+			"os.Stdin":  true,
 		}
 		name := expr(n)
 		if wanted[name] {

@@ -72,3 +72,13 @@ func InputUserField(prompt string, secret bool) (string, error) {
 
 	return string(value), nil
 }
+
+// ExitWhenParentProcessEnds waits until the controlling parent process ends and then exits
+// the current process. This is useful to terminate the current process when it is daemonized
+// and the controlling parent process is terminated to avoid leaving zombie processes.
+// It is recommended to call this function as a goroutine.
+func ExitWhenParentProcessEnds() {
+	// Stdin is closed when the controlling parent process ends
+	_, _ = io.Copy(io.Discard, os.Stdin)
+	os.Exit(0)
+}
