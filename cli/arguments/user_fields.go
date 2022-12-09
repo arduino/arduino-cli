@@ -22,7 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 // AskForUserFields prompts the user to input the provided user fields.
@@ -36,7 +36,7 @@ func AskForUserFields(userFields []*rpc.UserField) map[string]string {
 		var value []byte
 		var err error
 		if f.Secret {
-			value, err = terminal.ReadPassword(int(os.Stdin.Fd()))
+			value, err = term.ReadPassword(int(os.Stdin.Fd()))
 		} else {
 			value, err = reader.ReadBytes('\n')
 		}

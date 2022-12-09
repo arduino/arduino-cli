@@ -235,7 +235,7 @@ func (e *InvalidProfileError) ToRPCStatus() *status.Status {
 type MissingPortAddressError struct{}
 
 func (e *MissingPortAddressError) Error() string {
-	return tr("Missing port protocol")
+	return tr("Missing port address")
 }
 
 // ToRPCStatus converts the error into a *status.Status

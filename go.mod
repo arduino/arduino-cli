@@ -6,7 +6,7 @@ go 1.17
 replace github.com/mailru/easyjson => github.com/cmaglie/easyjson v0.8.1
 
 require (
-	github.com/arduino/go-paths-helper v1.7.0
+	github.com/arduino/go-paths-helper v1.8.0
 	github.com/arduino/go-properties-orderedmap v1.7.1
 	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b
 	github.com/arduino/go-win32-utils v0.0.0-20180330194947-ed041402e83b
@@ -51,6 +51,7 @@ require (
 require (
 	github.com/rogpeppe/go-internal v1.3.0
 	go.bug.st/testifyjson v1.1.1
+	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -87,7 +88,6 @@ require (
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
 	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
-	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect

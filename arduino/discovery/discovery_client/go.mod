@@ -11,7 +11,7 @@ require (
 )
 
 require (
-	github.com/arduino/go-paths-helper v1.7.0 // indirect
+	github.com/arduino/go-paths-helper v1.8.0 // indirect
 	github.com/arduino/go-properties-orderedmap v1.7.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
