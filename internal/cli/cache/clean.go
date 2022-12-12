@@ -13,22 +13,35 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package main
+package cache
 
 import (
 	"os"
 
 	"github.com/arduino/arduino-cli/configuration"
-	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/internal/cli"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
-func main() {
-	configuration.Settings = configuration.Init(configuration.FindConfigFileInArgsOrWorkingDirectory(os.Args))
-	i18n.Init(configuration.Settings.GetString("locale"))
-	arduinoCmd := cli.NewCommand()
-	if err := arduinoCmd.Execute(); err != nil {
-		feedback.FatalError(err, feedback.ErrGeneric)
+func initCleanCommand() *cobra.Command {
+	cleanCommand := &cobra.Command{
+		Use:     "clean",
+		Short:   tr("Delete Boards/Library Manager download cache."),
+		Long:    tr("Delete contents of the `directories.downloads` folder, where archive files are staged during installation of libraries and boards platforms."),
+		Example: "  " + os.Args[0] + " cache clean",
+		Args:    cobra.NoArgs,
+		Run:     runCleanCommand,
+	}
+	return cleanCommand
+}
+
+func runCleanCommand(cmd *cobra.Command, args []string) {
+	logrus.Info("Executing `arduino-cli cache clean`")
+
+	cachePath := configuration.DownloadsDir(configuration.Settings)
+	err := cachePath.RemoveAll()
+	if err != nil {
+		feedback.Fatal(tr("Error cleaning caches: %v", err), feedback.ErrGeneric)
 	}
 }

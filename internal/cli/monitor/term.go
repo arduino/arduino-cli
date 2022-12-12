@@ -13,22 +13,39 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package main
+package monitor
 
 import (
-	"os"
+	"io"
 
-	"github.com/arduino/arduino-cli/configuration"
-	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/internal/cli"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 )
 
-func main() {
-	configuration.Settings = configuration.Init(configuration.FindConfigFileInArgsOrWorkingDirectory(os.Args))
-	i18n.Init(configuration.Settings.GetString("locale"))
-	arduinoCmd := cli.NewCommand()
-	if err := arduinoCmd.Execute(); err != nil {
-		feedback.FatalError(err, feedback.ErrGeneric)
+type stdInOut struct {
+	in  io.Reader
+	out io.Writer
+}
+
+func newStdInOutTerminal() (*stdInOut, error) {
+	in, out, err := feedback.InteractiveStreams()
+	if err != nil {
+		return nil, err
 	}
+
+	return &stdInOut{
+		in:  in,
+		out: out,
+	}, nil
+}
+
+func (n *stdInOut) Close() error {
+	return nil
+}
+
+func (n *stdInOut) Read(buff []byte) (int, error) {
+	return n.in.Read(buff)
+}
+
+func (n *stdInOut) Write(buff []byte) (int, error) {
+	return n.out.Write(buff)
 }

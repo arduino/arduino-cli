@@ -13,22 +13,24 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package main
+package arguments
 
 import (
-	"os"
-
-	"github.com/arduino/arduino-cli/configuration"
-	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/internal/cli"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
-func main() {
-	configuration.Settings = configuration.Init(configuration.FindConfigFileInArgsOrWorkingDirectory(os.Args))
-	i18n.Init(configuration.Settings.GetString("locale"))
-	arduinoCmd := cli.NewCommand()
-	if err := arduinoCmd.Execute(); err != nil {
-		feedback.FatalError(err, feedback.ErrGeneric)
+// AskForUserFields prompts the user to input the provided user fields.
+// If there is an error reading input it panics.
+func AskForUserFields(userFields []*rpc.UserField) (map[string]string, error) {
+	fields := map[string]string{}
+	for _, f := range userFields {
+		value, err := feedback.InputUserField(f.Label, f.Secret)
+		if err != nil {
+			return nil, err
+		}
+		fields[f.Name] = value
 	}
+
+	return fields, nil
 }
