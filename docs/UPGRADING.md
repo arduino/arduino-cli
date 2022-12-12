@@ -16,6 +16,27 @@ The `sketch.json` file is now completely ignored.
 The `cc.arduino.cli.commands.v1.BoardAttach` gRPC command has been removed. This feature is no longer available through
 gRPC.
 
+### golang API: methods in `github.com/arduino/arduino-cli/commands/upload` changed return type
+
+The following methods in `github.com/arduino/arduino-cli/commands/upload`:
+
+```go
+func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, errStream io.Writer) (*rpc.UploadResponse, error) { ... }
+func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest, outStream io.Writer, errStream io.Writer) (*rpc.UploadUsingProgrammerResponse, error) { ... }
+```
+
+do not return anymore the response (because it's always empty):
+
+```go
+func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, errStream io.Writer) error { ... }
+func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest, outStream io.Writer, errStream io.Writer) error { ... }
+```
+
+### golang API: package `github.com/arduino/arduino-cli/cli` is no more public
+
+The package `cli` has been made internal. The code in this package is no more public API and can not be directly
+imported in other projects.
+
 ### golang API change in `github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager`
 
 The following `LibrariesManager.InstallPrerequisiteCheck` methods have changed prototype, from:
