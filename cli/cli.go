@@ -32,7 +32,6 @@ import (
 	"github.com/arduino/arduino-cli/cli/debug"
 	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/cli/generatedocs"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/lib"
 	"github.com/arduino/arduino-cli/cli/monitor"
 	"github.com/arduino/arduino-cli/cli/outdated"
@@ -45,6 +44,7 @@ import (
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/inventory"
+	versioninfo "github.com/arduino/arduino-cli/version"
 	"github.com/fatih/color"
 	"github.com/mattn/go-colorable"
 	"github.com/rifflock/lfshook"
@@ -165,7 +165,7 @@ func preRun(cmd *cobra.Command, args []string) {
 			updaterMessageChan <- nil
 		}
 		// Starts checking for updates
-		currentVersion, err := semver.Parse(globals.VersionInfo.VersionString)
+		currentVersion, err := semver.Parse(versioninfo.VersionInfo.VersionString)
 		if err != nil {
 			updaterMessageChan <- nil
 		}
@@ -240,7 +240,7 @@ func preRun(cmd *cobra.Command, args []string) {
 		logrus.Info("Config file not found, using default values")
 	}
 
-	logrus.Info(globals.VersionInfo.Application + " version " + globals.VersionInfo.VersionString)
+	logrus.Info(versioninfo.VersionInfo.Application + " version " + versioninfo.VersionInfo.VersionString)
 
 	if outputFormat != "text" {
 		cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {

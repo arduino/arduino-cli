@@ -21,9 +21,9 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/updater"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/version"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	semver "go.bug.st/relaxed-semver"
@@ -46,26 +46,27 @@ func NewCommand() *cobra.Command {
 
 func runVersionCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli version`")
-	if strings.Contains(globals.VersionInfo.VersionString, "git-snapshot") || strings.Contains(globals.VersionInfo.VersionString, "nightly") {
+
+	info := version.VersionInfo
+	if strings.Contains(info.VersionString, "git-snapshot") || strings.Contains(info.VersionString, "nightly") {
 		// We're using a development version, no need to check if there's a
 		// new release available
-		feedback.PrintResult(globals.VersionInfo)
+		feedback.PrintResult(info)
 		return
 	}
 
-	currentVersion, err := semver.Parse(globals.VersionInfo.VersionString)
+	currentVersion, err := semver.Parse(info.VersionString)
 	if err != nil {
 		feedback.Fatal(fmt.Sprintf("Error parsing current version: %s", err), feedback.ErrGeneric)
 	}
 	latestVersion := updater.ForceCheckForUpdate(currentVersion)
 
-	versionInfo := globals.VersionInfo
 	if feedback.GetFormat() != feedback.Text && latestVersion != nil {
 		// Set this only we managed to get the latest version
-		versionInfo.LatestVersion = latestVersion.String()
+		info.LatestVersion = latestVersion.String()
 	}
 
-	feedback.PrintResult(versionInfo)
+	feedback.PrintResult(info)
 
 	if feedback.GetFormat() == feedback.Text && latestVersion != nil {
 		updater.NotifyNewVersionIsAvailable(latestVersion.String())

@@ -27,19 +27,18 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
-	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/configuration"
-	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/table"
-	"github.com/fatih/color"
-	"github.com/sirupsen/logrus"
-
 	"github.com/arduino/arduino-cli/cli/instance"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/upload"
+	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/arduino-cli/table"
+	"github.com/arduino/arduino-cli/version"
 	"github.com/arduino/go-paths-helper"
+	"github.com/fatih/color"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -343,7 +342,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			if profileArg.String() == "" {
 				msg += "\n"
 				if platform != nil {
-					suggestion := fmt.Sprintf("`%s core install %s`", globals.VersionInfo.Application, platformErr.Platform)
+					suggestion := fmt.Sprintf("`%s core install %s`", version.VersionInfo.Application, platformErr.Platform)
 					msg += tr("Try running %s", suggestion)
 				} else {
 					msg += tr("Platform %s is not found in any known index\nMaybe you need to add a 3rd party URL?", platformErr.Platform)

@@ -23,11 +23,11 @@ import (
 
 	"github.com/arduino/arduino-cli/cli/arguments"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/configuration"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/arduino-cli/version"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -72,9 +72,9 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	if zipPath || gitURL {
 		if !configuration.Settings.GetBool("library.enable_unsafe_install") {
 			documentationURL := "https://arduino.github.io/arduino-cli/latest/configuration/#configuration-keys"
-			_, err := semver.Parse(globals.VersionInfo.VersionString)
+			_, err := semver.Parse(version.VersionInfo.VersionString)
 			if err == nil {
-				split := strings.Split(globals.VersionInfo.VersionString, ".")
+				split := strings.Split(version.VersionInfo.VersionString, ".")
 				documentationURL = fmt.Sprintf("https://arduino.github.io/arduino-cli/%s.%s/configuration/#configuration-keys", split[0], split[1])
 			}
 			feedback.Fatal(tr("--git-url and --zip-path are disabled by default, for more information see: %v", documentationURL), feedback.ErrGeneric)

@@ -26,9 +26,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/version"
 	"github.com/sirupsen/logrus"
 )
 
@@ -227,7 +227,7 @@ func (mon *PluggableMonitor) Run() (err error) {
 		}
 	}()
 
-	if err = mon.sendCommand("HELLO 1 \"arduino-cli " + globals.VersionInfo.VersionString + "\"\n"); err != nil {
+	if err = mon.sendCommand("HELLO 1 \"arduino-cli " + version.VersionInfo.VersionString + "\"\n"); err != nil {
 		return err
 	}
 	if msg, err := mon.waitMessage(time.Second*10, "hello"); err != nil {

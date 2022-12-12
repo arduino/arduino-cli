@@ -23,10 +23,10 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/httpclient"
 	"github.com/arduino/arduino-cli/cli/feedback"
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/inventory"
+	"github.com/arduino/arduino-cli/version"
 	"github.com/fatih/color"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -69,7 +69,7 @@ func ForceCheckForUpdate(currentVersion *semver.Version) *semver.Version {
 func NotifyNewVersionIsAvailable(latestVersion string) {
 	msg := fmt.Sprintf("\n\n%s %s → %s\n%s",
 		color.YellowString(tr("A new release of Arduino CLI is available:")),
-		color.CyanString(globals.VersionInfo.VersionString),
+		color.CyanString(version.VersionInfo.VersionString),
 		color.CyanString(latestVersion),
 		color.YellowString("https://arduino.github.io/arduino-cli/latest/installation/#latest-packages"))
 	feedback.Warning(msg)
