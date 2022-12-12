@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -1445,4 +1446,35 @@ func TestInstallWithZipPathMultipleLibraries(t *testing.T) {
 	// Verifies libraries are installed
 	require.DirExists(t, wifiInstallDir.String())
 	require.DirExists(t, bleInstallDir.String())
+}
+
+func TestInstallWithGitUrlLocalFileUri(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Using a file uri as git url doesn't work on Windows, " +
+			"this must be removed when this issue is fixed: https://github.com/go-git/go-git/issues/247")
+	}
+
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101")
+	// Verifies library is not installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	// Clone repository locally
+	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
+	repoDir := cli.SketchbookDir().Join("WiFi101")
+	_, err := git.PlainClone(repoDir.String(), false, &git.CloneOptions{
+		URL: gitUrl,
+	})
+	require.NoError(t, err)
+
+	_, _, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", "file:///"+repoDir.String())
+	require.NoError(t, err)
+
+	// Verifies library is installed
+	require.DirExists(t, libInstallDir.String())
 }
