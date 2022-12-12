@@ -17,6 +17,7 @@ package lib_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -26,6 +27,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/testifyjson/requirejson"
+	"gopkg.in/src-d/go-git.v4"
 )
 
 func TestLibUpgradeCommand(t *testing.T) {
@@ -675,4 +677,350 @@ func TestUninstall(t *testing.T) {
 
 	_, _, err = cli.Run("lib", "uninstall", libs[0], libs[1])
 	require.NoError(t, err)
+}
+
+func TestUninstallSpaces(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	key := "LiquidCrystal I2C"
+	_, _, err := cli.Run("lib", "install", key)
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "uninstall", key)
+	require.NoError(t, err)
+	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 0)
+}
+
+func TestLibOpsCaseInsensitive(t *testing.T) {
+	/*This test is supposed to (un)install the following library,
+	  As you can see the name is all caps:
+
+	  Name: "PCM"
+	    Author: David Mellis <d.mellis@bcmi-labs.cc>, Michael Smith <michael@hurts.ca>
+	    Maintainer: David Mellis <d.mellis@bcmi-labs.cc>
+	    Sentence: Playback of short audio samples.
+	    Paragraph: These samples are encoded directly in the Arduino sketch as an array of numbers.
+	    Website: http://highlowtech.org/?p=1963
+	    Category: Signal Input/Output
+	    Architecture: avr
+	    Types: Contributed
+	    Versions: [1.0.0]*/
+
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	key := "pcm"
+	_, _, err := cli.Run("lib", "install", key)
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "uninstall", key)
+	require.NoError(t, err)
+	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 0)
+}
+
+func TestSearch(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	stdout, _, err := cli.Run("lib", "search", "--names")
+	require.NoError(t, err)
+	lines := strings.Split(strings.TrimSpace(string(stdout)), "\n")
+	var libs []string
+	for i, v := range lines {
+		lines[i] = strings.TrimSpace(v)
+		if strings.Contains(v, "Name:") {
+			libs = append(libs, strings.Trim(strings.SplitN(v, " ", 2)[1], "\""))
+		}
+	}
+
+	expected := []string{"WiFi101", "WiFi101OTA", "Firebase Arduino based on WiFi101", "WiFi101_Generic"}
+	require.Subset(t, libs, expected)
+
+	stdout, _, err = cli.Run("lib", "search", "--names", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, ".libraries | length", fmt.Sprint(len(libs)))
+
+	runSearch := func(args string, expectedLibs []string) {
+		stdout, _, err = cli.Run("lib", "search", "--names", "--format", "json", args)
+		require.NoError(t, err)
+		libraries := requirejson.Parse(t, stdout).Query("[ .libraries | .[] | .name ]").String()
+		for _, l := range expectedLibs {
+			require.Contains(t, libraries, l)
+		}
+	}
+	runSearch("Arduino_MKRIoTCarrier", []string{"Arduino_MKRIoTCarrier"})
+	runSearch("Arduino mkr iot carrier", []string{"Arduino_MKRIoTCarrier"})
+	runSearch("mkr iot carrier", []string{"Arduino_MKRIoTCarrier"})
+	runSearch("mkriotcarrier", []string{"Arduino_MKRIoTCarrier"})
+	runSearch("dht", []string{"DHT sensor library", "DHT sensor library for ESPx", "DHT12", "SimpleDHT", "TinyDHT sensor library", "SDHT"})
+	runSearch("dht11", []string{"DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"})
+	runSearch("dht12", []string{"DHT12", "DHT12 sensor library", "SDHT"})
+	runSearch("dht22", []string{"DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"})
+	runSearch("dht sensor", []string{"DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"})
+	runSearch("sensor dht", []string{})
+	runSearch("arduino json", []string{"ArduinoJson", "Arduino_JSON"})
+	runSearch("arduinojson", []string{"ArduinoJson"})
+	runSearch("json", []string{"ArduinoJson", "Arduino_JSON"})
+}
+
+func TestSearchParagraph(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Search for a string that's only present in the `paragraph` field
+	// within the index file.
+	_, _, err := cli.Run("lib", "update-index")
+	require.NoError(t, err)
+	stdout, _, err := cli.Run("lib", "search", "A simple and efficient JSON library", "--names", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Contains(t, stdout, `{
+		"libraries": [
+			{
+				"name": "ArduinoJson"
+			}
+		]
+	}`)
+}
+
+func TestLibListWithUpdatableFlag(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("lib", "update-index")
+	require.NoError(t, err)
+
+	// No libraries to update
+	stdout, stderr, err := cli.Run("lib", "list", "--updatable")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	require.Contains(t, string(stdout), "No libraries update is available.")
+	// No library to update in json
+	stdout, stderr, err = cli.Run("lib", "list", "--updatable", "--format", "json")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	requirejson.Empty(t, stdout)
+
+	// Install outdated library
+	_, _, err = cli.Run("lib", "install", "ArduinoJson@6.11.0")
+	require.NoError(t, err)
+	// Install latest version of library
+	_, _, err = cli.Run("lib", "install", "WiFi101")
+	require.NoError(t, err)
+
+	stdout, stderr, err = cli.Run("lib", "list", "--updatable")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	var lines [][]string
+	for _, v := range strings.Split(strings.TrimSpace(string(stdout)), "\n") {
+		v = strings.Join(strings.Fields(v), " ")
+		lines = append(lines, strings.SplitN(v, " ", 5))
+	}
+	require.Len(t, lines, 2)
+	require.Subset(t, lines[0], []string{"Name", "Installed", "Available", "Location", "Description"})
+	require.Equal(t, "ArduinoJson", lines[1][0])
+	require.Equal(t, "6.11.0", lines[1][1])
+	// Verifies available version is not equal to installed one and not empty
+	require.NotEqual(t, "6.11.0", lines[1][2])
+	require.NotEmpty(t, lines[1][2])
+	require.Equal(t, "An efficient and elegant JSON library...", lines[1][4])
+
+	// Look at the JSON output
+	stdout, stderr, err = cli.Run("lib", "list", "--updatable", "--format", "json")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	requirejson.Len(t, stdout, 1)
+	// be sure data contains the available version
+	requirejson.Query(t, stdout, `.[0] | .library | .version`, `"6.11.0"`)
+	requirejson.Query(t, stdout, `.[0] | .release | .version != "6.11.0"`, `true`)
+	requirejson.Query(t, stdout, `.[0] | .release | .version != ""`, `true`)
+}
+
+func TestInstallWithGitUrlFromCurrentDirectory(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101")
+	// Verifies library is not installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	// Clone repository locally
+	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
+	repoDir := cli.SketchbookDir().Join("WiFi101")
+	_, err = git.PlainClone(repoDir.String(), false, &git.CloneOptions{
+		URL: gitUrl,
+	})
+	require.NoError(t, err)
+
+	cli.SetWorkingDir(repoDir)
+	_, _, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", ".")
+	require.NoError(t, err)
+
+	// Verifies library is installed to correct folder
+	require.DirExists(t, libInstallDir.String())
+}
+
+func TestInstallWithGitLocalUrl(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101")
+	// Verifies library is not installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	// Clone repository locally
+	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
+	repoDir := cli.SketchbookDir().Join("WiFi101")
+	_, err = git.PlainClone(repoDir.String(), false, &git.CloneOptions{
+		URL: gitUrl,
+	})
+	require.NoError(t, err)
+
+	_, _, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", repoDir.String())
+	require.NoError(t, err)
+
+	// Verifies library is installed
+	require.DirExists(t, libInstallDir.String())
+}
+
+func TestInstallWithGitUrlRelativePath(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101")
+	// Verifies library is not installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	// Clone repository locally
+	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
+	repoDir := cli.SketchbookDir().Join("WiFi101")
+	_, err = git.PlainClone(repoDir.String(), false, &git.CloneOptions{
+		URL: gitUrl,
+	})
+	require.NoError(t, err)
+
+	cli.SetWorkingDir(cli.SketchbookDir())
+	_, _, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", "./WiFi101")
+	require.NoError(t, err)
+
+	// Verifies library is installed
+	require.DirExists(t, libInstallDir.String())
+}
+
+func TestInstallWithGitUrlDoesNotCreateGitRepo(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101")
+	// Verifies library is not installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	// Clone repository locally
+	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
+	repoDir := cli.SketchbookDir().Join("WiFi101")
+	_, err = git.PlainClone(repoDir.String(), false, &git.CloneOptions{
+		URL: gitUrl,
+	})
+	require.NoError(t, err)
+
+	_, _, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", repoDir.String())
+	require.NoError(t, err)
+
+	// Verifies installed library is not a git repository
+	require.NoDirExists(t, libInstallDir.Join(".git").String())
+}
+
+func TestInstallWithGitUrlMultipleLibraries(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+
+	wifiInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101")
+	bleInstallDir := cli.SketchbookDir().Join("libraries", "ArduinoBLE")
+	// Verifies library are not installed
+	require.NoDirExists(t, wifiInstallDir.String())
+	require.NoDirExists(t, bleInstallDir.String())
+
+	wifiUrl := "https://github.com/arduino-libraries/WiFi101.git"
+	bleUrl := "https://github.com/arduino-libraries/ArduinoBLE.git"
+
+	_, _, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", wifiUrl, bleUrl)
+	require.NoError(t, err)
+
+	// Verifies library are installed
+	require.DirExists(t, wifiInstallDir.String())
+	require.DirExists(t, bleInstallDir.String())
+}
+
+func TestLibExamples(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("lib", "install", "Arduino_JSON@0.1.0")
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("lib", "examples", "Arduino_JSON", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+	examples := requirejson.Parse(t, stdout).Query(".[0] | .examples").String()
+	examples = strings.ReplaceAll(examples, "\\\\", "\\")
+	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Arduino_JSON", "examples", "JSONArray").String())
+	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Arduino_JSON", "examples", "JSONKitchenSink").String())
+	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Arduino_JSON", "examples", "JSONObject").String())
+}
+
+func TestLibExamplesWithPdeFile(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("lib", "install", "Encoder@1.4.1")
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("lib", "examples", "Encoder", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+	examples := requirejson.Parse(t, stdout).Query(".[0] | .examples").String()
+	examples = strings.ReplaceAll(examples, "\\\\", "\\")
+	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Encoder", "examples", "Basic").String())
+	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Encoder", "examples", "NoInterrupts").String())
+	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Encoder", "examples", "SpeedTest").String())
+	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Encoder", "examples", "TwoKnobs").String())
 }
