@@ -1081,7 +1081,7 @@ func TestLibCommandsWithLibraryHavingInvalidVersion(t *testing.T) {
 	stdout, _, err := cli.Run("lib", "list", "--format", "json")
 	require.NoError(t, err)
 	requirejson.Len(t, stdout, 1)
-	requirejson.Query(t, stdout, ".[0] | .library | .version", "\"0.16.1\"")
+	requirejson.Query(t, stdout, ".[0] | .library | .version", `"0.16.1"`)
 
 	// Changes the version of the currently installed library so that it's
 	// invalid
@@ -1119,9 +1119,8 @@ func TestInstallZipLibWithMacosMetadata(t *testing.T) {
 	// Verifies library is not already installed
 	require.NoDirExists(t, libInstallDir.String())
 
-	wd, err := paths.Getwd()
+	zipPath, err := paths.New("..", "testdata", "fake-lib.zip").Abs()
 	require.NoError(t, err)
-	zipPath := wd.Parent().Join("testdata", "fake-lib.zip")
 	// Test zip-path install
 	stdout, _, err := cli.Run("lib", "install", "--zip-path", zipPath.String())
 	require.NoError(t, err)
@@ -1156,9 +1155,8 @@ func TestInstallZipInvalidLibrary(t *testing.T) {
 	// Verifies library is not already installed
 	require.NoDirExists(t, libInstallDir.String())
 
-	wd, err := paths.Getwd()
+	zipPath, err := paths.New("..", "testdata", "lib-without-header.zip").Abs()
 	require.NoError(t, err)
-	zipPath := wd.Parent().Join("testdata", "lib-without-header.zip")
 	// Test zip-path install
 	_, stderr, err := cli.Run("lib", "install", "--zip-path", zipPath.String())
 	require.Error(t, err)
@@ -1168,7 +1166,8 @@ func TestInstallZipInvalidLibrary(t *testing.T) {
 	// Verifies library is not already installed
 	require.NoDirExists(t, libInstallDir.String())
 
-	zipPath = wd.Parent().Join("testdata", "lib-without-properties.zip")
+	zipPath, err = paths.New("..", "testdata", "lib-without-properties.zip").Abs()
+	require.NoError(t, err)
 	// Test zip-path install
 	_, stderr, err = cli.Run("lib", "install", "--zip-path", zipPath.String())
 	require.Error(t, err)
@@ -1192,7 +1191,7 @@ func TestInstallGitInvalidLibrary(t *testing.T) {
 	libProperties := repoDir.Join("library.properties")
 	f, err := libProperties.Create()
 	require.NoError(t, err)
-	f.Close()
+	require.NoError(t, f.Close())
 	tree, err := repo.Worktree()
 	require.NoError(t, err)
 	_, err = tree.Add("library.properties")
@@ -1218,7 +1217,7 @@ func TestInstallGitInvalidLibrary(t *testing.T) {
 	require.NoError(t, libHeader.Parent().MkdirAll())
 	f, err = libHeader.Create()
 	require.NoError(t, err)
-	f.Close()
+	require.NoError(t, f.Close())
 	tree, err = repo.Worktree()
 	require.NoError(t, err)
 	_, err = tree.Add("src/lib-without-properties.h")
@@ -1246,11 +1245,9 @@ func TestUpgradeDoesNotTryToUpgradeBundledCoreLibrariesInSketchbook(t *testing.T
 	require.NoError(t, platformInstallDir.Parent().MkdirAll())
 
 	// Install platform in Sketchbook hardware dir
-	wd, err := paths.Getwd()
-	require.NoError(t, err)
-	require.NoError(t, wd.Parent().Join("testdata", testPlatformName).CopyDirTo(platformInstallDir))
+	require.NoError(t, paths.New("..", "testdata", testPlatformName).CopyDirTo(platformInstallDir))
 
-	_, _, err = cli.Run("update")
+	_, _, err := cli.Run("update")
 	require.NoError(t, err)
 
 	// Install latest version of library identical to one
@@ -1262,8 +1259,8 @@ func TestUpgradeDoesNotTryToUpgradeBundledCoreLibrariesInSketchbook(t *testing.T
 	require.NoError(t, err)
 	requirejson.Len(t, stdout, 2)
 	// Verify both libraries have the same name
-	requirejson.Query(t, stdout, ".[0] | .library | .name", "\"USBHost\"")
-	requirejson.Query(t, stdout, ".[1] | .library | .name", "\"USBHost\"")
+	requirejson.Query(t, stdout, ".[0] | .library | .name", `"USBHost"`)
+	requirejson.Query(t, stdout, ".[1] | .library | .name", `"USBHost"`)
 
 	stdout, _, err = cli.Run("lib", "upgrade")
 	require.NoError(t, err)
@@ -1280,11 +1277,9 @@ func TestUpgradeDoesNotTryToUpgradeBundledCoreLibraries(t *testing.T) {
 	require.NoError(t, platformInstallDir.Parent().MkdirAll())
 
 	// Install platform in Sketchbook hardware dir
-	wd, err := paths.Getwd()
-	require.NoError(t, err)
-	require.NoError(t, wd.Parent().Join("testdata", testPlatformName).CopyDirTo(platformInstallDir))
+	require.NoError(t, paths.New("..", "testdata", testPlatformName).CopyDirTo(platformInstallDir))
 
-	_, _, err = cli.Run("update")
+	_, _, err := cli.Run("update")
 	require.NoError(t, err)
 
 	// Install latest version of library identical to one
@@ -1296,8 +1291,8 @@ func TestUpgradeDoesNotTryToUpgradeBundledCoreLibraries(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Len(t, stdout, 2)
 	// Verify both libraries have the same name
-	requirejson.Query(t, stdout, ".[0] | .library | .name", "\"USBHost\"")
-	requirejson.Query(t, stdout, ".[1] | .library | .name", "\"USBHost\"")
+	requirejson.Query(t, stdout, ".[0] | .library | .name", `"USBHost"`)
+	requirejson.Query(t, stdout, ".[1] | .library | .name", `"USBHost"`)
 
 	stdout, _, err = cli.Run("lib", "upgrade")
 	require.NoError(t, err)
@@ -1472,7 +1467,7 @@ func TestInstallWithGitUrlLocalFileUri(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	_, _, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", "file:///"+repoDir.String())
+	_, _, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", "file://"+repoDir.String())
 	require.NoError(t, err)
 
 	// Verifies library is installed
