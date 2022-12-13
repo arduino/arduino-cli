@@ -20,14 +20,17 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"runtime"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/testifyjson/requirejson"
 	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing/object"
 )
 
 func TestLibUpgradeCommand(t *testing.T) {
@@ -1023,4 +1026,450 @@ func TestLibExamplesWithPdeFile(t *testing.T) {
 	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Encoder", "examples", "NoInterrupts").String())
 	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Encoder", "examples", "SpeedTest").String())
 	require.Contains(t, examples, cli.SketchbookDir().Join("libraries", "Encoder", "examples", "TwoKnobs").String())
+}
+
+func TestLibExamplesWithCaseMismatch(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("lib", "install", "WiFiManager@2.0.3-alpha")
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("lib", "examples", "WiFiManager", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+	requirejson.Query(t, stdout, ".[0] | .examples | length", "14")
+
+	examples := requirejson.Parse(t, stdout).Query(".[0] | .examples").String()
+	examples = strings.ReplaceAll(examples, "\\\\", "\\")
+	examplesPath := cli.SketchbookDir().Join("libraries", "WiFiManager", "examples")
+	// Verifies sketches with correct casing are listed
+	require.Contains(t, examples, examplesPath.Join("Advanced").String())
+	require.Contains(t, examples, examplesPath.Join("AutoConnect", "AutoConnectWithFeedbackLED").String())
+	require.Contains(t, examples, examplesPath.Join("AutoConnect", "AutoConnectWithFSParameters").String())
+	require.Contains(t, examples, examplesPath.Join("AutoConnect", "AutoConnectWithFSParametersAndCustomIP").String())
+	require.Contains(t, examples, examplesPath.Join("Basic").String())
+	require.Contains(t, examples, examplesPath.Join("DEV", "OnDemandConfigPortal").String())
+	require.Contains(t, examples, examplesPath.Join("NonBlocking", "AutoConnectNonBlocking").String())
+	require.Contains(t, examples, examplesPath.Join("NonBlocking", "AutoConnectNonBlockingwParams").String())
+	require.Contains(t, examples, examplesPath.Join("Old_examples", "AutoConnectWithFeedback").String())
+	require.Contains(t, examples, examplesPath.Join("Old_examples", "AutoConnectWithReset").String())
+	require.Contains(t, examples, examplesPath.Join("Old_examples", "AutoConnectWithStaticIP").String())
+	require.Contains(t, examples, examplesPath.Join("Old_examples", "AutoConnectWithTimeout").String())
+	require.Contains(t, examples, examplesPath.Join("OnDemand", "OnDemandConfigPortal").String())
+	require.Contains(t, examples, examplesPath.Join("ParamsChildClass").String())
+	// Verifies sketches with wrong casing are not returned
+	require.NotContains(t, examples, examplesPath.Join("NonBlocking", "OnDemandNonBlocking").String())
+	require.NotContains(t, examples, examplesPath.Join("OnDemand", "OnDemandWebPortal").String())
+}
+
+func TestLibCommandsWithLibraryHavingInvalidVersion(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Install a library
+	_, _, err = cli.Run("lib", "install", "WiFi101@0.16.1")
+	require.NoError(t, err)
+
+	// Verifies library is correctly returned
+	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+	requirejson.Query(t, stdout, ".[0] | .library | .version", `"0.16.1"`)
+
+	// Changes the version of the currently installed library so that it's
+	// invalid
+	libPath := cli.SketchbookDir().Join("libraries", "WiFi101", "library.properties")
+	require.NoError(t, libPath.WriteFile([]byte("name=WiFi101\nversion=1.0001")))
+
+	// Verifies version is now empty
+	stdout, _, err = cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+	requirejson.Query(t, stdout, ".[0] | .library | .version", "null")
+
+	// Upgrade library
+	_, _, err = cli.Run("lib", "upgrade", "WiFi101")
+	require.NoError(t, err)
+
+	// Verifies library has been updated
+	stdout, _, err = cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+	requirejson.Query(t, stdout, ".[0] | .library | .version != \"\"", "true")
+}
+
+func TestInstallZipLibWithMacosMetadata(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Initialize configs to enable --zip-path flag
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+	_, _, err := cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "fake-lib")
+	// Verifies library is not already installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	zipPath, err := paths.New("..", "testdata", "fake-lib.zip").Abs()
+	require.NoError(t, err)
+	// Test zip-path install
+	stdout, _, err := cli.Run("lib", "install", "--zip-path", zipPath.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
+
+	// Verifies library is installed in expected path
+	require.DirExists(t, libInstallDir.String())
+	require.FileExists(t, libInstallDir.Join("library.properties").String())
+	require.FileExists(t, libInstallDir.Join("src", "fake-lib.h").String())
+
+	// Reinstall library
+	_, _, err = cli.Run("lib", "install", "--zip-path", zipPath.String())
+	require.NoError(t, err)
+
+	// Verifies library remains installed
+	require.DirExists(t, libInstallDir.String())
+	require.FileExists(t, libInstallDir.Join("library.properties").String())
+	require.FileExists(t, libInstallDir.Join("src", "fake-lib.h").String())
+}
+
+func TestInstallZipInvalidLibrary(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Initialize configs to enable --zip-path flag
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+	_, _, err := cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "lib-without-header")
+	// Verifies library is not already installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	zipPath, err := paths.New("..", "testdata", "lib-without-header.zip").Abs()
+	require.NoError(t, err)
+	// Test zip-path install
+	_, stderr, err := cli.Run("lib", "install", "--zip-path", zipPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "library not valid")
+
+	libInstallDir = cli.SketchbookDir().Join("libraries", "lib-without-properties")
+	// Verifies library is not already installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	zipPath, err = paths.New("..", "testdata", "lib-without-properties.zip").Abs()
+	require.NoError(t, err)
+	// Test zip-path install
+	_, stderr, err = cli.Run("lib", "install", "--zip-path", zipPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "library not valid")
+}
+
+func TestInstallGitInvalidLibrary(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Initialize configs to enable --zip-path flag
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+	_, _, err := cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	// Create fake library repository
+	repoDir := cli.SketchbookDir().Join("lib-without-header")
+	repo, err := git.PlainInit(repoDir.String(), false)
+	require.NoError(t, err)
+	libProperties := repoDir.Join("library.properties")
+	f, err := libProperties.Create()
+	require.NoError(t, err)
+	require.NoError(t, f.Close())
+	tree, err := repo.Worktree()
+	require.NoError(t, err)
+	_, err = tree.Add("library.properties")
+	require.NoError(t, err)
+	_, err = tree.Commit("First commit", &git.CommitOptions{
+		All: false, Author: &object.Signature{Name: "a", Email: "b", When: time.Now()}, Committer: nil, Parents: nil, SignKey: nil})
+	require.NoError(t, err)
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "lib-without-header")
+	// Verifies library is not already installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	_, stderr, err := cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", repoDir.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "library not valid")
+	require.NoDirExists(t, libInstallDir.String())
+
+	// Create another fake library repository
+	repoDir = cli.SketchbookDir().Join("lib-without-properties")
+	repo, err = git.PlainInit(repoDir.String(), false)
+	require.NoError(t, err)
+	libHeader := repoDir.Join("src", "lib-without-properties.h")
+	require.NoError(t, libHeader.Parent().MkdirAll())
+	f, err = libHeader.Create()
+	require.NoError(t, err)
+	require.NoError(t, f.Close())
+	tree, err = repo.Worktree()
+	require.NoError(t, err)
+	_, err = tree.Add("src/lib-without-properties.h")
+	require.NoError(t, err)
+	_, err = tree.Commit("First commit", &git.CommitOptions{
+		All: false, Author: &object.Signature{Name: "a", Email: "b", When: time.Now()}, Committer: nil, Parents: nil, SignKey: nil})
+	require.NoError(t, err)
+
+	libInstallDir = cli.SketchbookDir().Join("libraries", "lib-without-properties")
+	// Verifies library is not already installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	_, stderr, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", repoDir.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "library not valid")
+	require.NoDirExists(t, libInstallDir.String())
+}
+
+func TestUpgradeDoesNotTryToUpgradeBundledCoreLibrariesInSketchbook(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	testPlatformName := "platform_with_bundled_library"
+	platformInstallDir := cli.SketchbookDir().Join("hardware", "arduino-beta-dev", testPlatformName)
+	require.NoError(t, platformInstallDir.Parent().MkdirAll())
+
+	// Install platform in Sketchbook hardware dir
+	require.NoError(t, paths.New("..", "testdata", testPlatformName).CopyDirTo(platformInstallDir))
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Install latest version of library identical to one
+	// bundled with test platform
+	_, _, err = cli.Run("lib", "install", "USBHost")
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("lib", "list", "--all", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 2)
+	// Verify both libraries have the same name
+	requirejson.Query(t, stdout, ".[0] | .library | .name", `"USBHost"`)
+	requirejson.Query(t, stdout, ".[1] | .library | .name", `"USBHost"`)
+
+	stdout, _, err = cli.Run("lib", "upgrade")
+	require.NoError(t, err)
+	// Empty output means nothing has been updated as expected
+	require.Empty(t, stdout)
+}
+
+func TestUpgradeDoesNotTryToUpgradeBundledCoreLibraries(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	testPlatformName := "platform_with_bundled_library"
+	platformInstallDir := cli.DataDir().Join("packages", "arduino", "hardware", "arch", "4.2.0")
+	require.NoError(t, platformInstallDir.Parent().MkdirAll())
+
+	// Install platform in Sketchbook hardware dir
+	require.NoError(t, paths.New("..", "testdata", testPlatformName).CopyDirTo(platformInstallDir))
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	// Install latest version of library identical to one
+	// bundled with test platform
+	_, _, err = cli.Run("lib", "install", "USBHost")
+	require.NoError(t, err)
+
+	stdout, _, err := cli.Run("lib", "list", "--all", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 2)
+	// Verify both libraries have the same name
+	requirejson.Query(t, stdout, ".[0] | .library | .name", `"USBHost"`)
+	requirejson.Query(t, stdout, ".[1] | .library | .name", `"USBHost"`)
+
+	stdout, _, err = cli.Run("lib", "upgrade")
+	require.NoError(t, err)
+	// Empty output means nothing has been updated as expected
+	require.Empty(t, stdout)
+}
+
+func downloadLib(t *testing.T, url string, zipPath *paths.Path) {
+	response, err := http.Get(url)
+	require.NoError(t, err)
+	require.Equal(t, response.StatusCode, 200)
+	zip, err := zipPath.Create()
+	require.NoError(t, err)
+	_, err = io.Copy(zip, response.Body)
+	require.NoError(t, err)
+	require.NoError(t, response.Body.Close())
+	require.NoError(t, zip.Close())
+}
+
+func TestInstallGitUrlAndZipPathFlagsVisibility(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Verifies installation fail because flags are not found
+	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
+	_, stderr, err := cli.Run("lib", "install", "--git-url", gitUrl)
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "--git-url and --zip-path are disabled by default, for more information see:")
+
+	// Download library
+	url := "https://github.com/arduino-libraries/AudioZero/archive/refs/tags/1.1.1.zip"
+	zipPath := cli.DownloadDir().Join("libraries", "AudioZero.zip")
+	require.NoError(t, zipPath.Parent().MkdirAll())
+	downloadLib(t, url, zipPath)
+
+	_, stderr, err = cli.Run("lib", "install", "--zip-path", zipPath.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "--git-url and --zip-path are disabled by default, for more information see:")
+
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+	// Verifies installation is successful when flags are enabled with env var
+	stdout, _, err := cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", gitUrl)
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
+
+	stdout, _, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--zip-path", zipPath.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
+
+	// Uninstall libraries to install them again
+	_, _, err = cli.Run("lib", "uninstall", "WiFi101", "AudioZero")
+	require.NoError(t, err)
+
+	// Verifies installation is successful when flags are enabled with settings file
+	_, _, err = cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	stdout, _, err = cli.Run("lib", "install", "--git-url", gitUrl)
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
+
+	stdout, _, err = cli.Run("lib", "install", "--zip-path", zipPath.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
+}
+
+func TestInstallWithZipPath(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Initialize configs to enable --zip-path flag
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+	_, _, err := cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+
+	// Download a specific lib version
+	// Download library
+	url := "https://github.com/arduino-libraries/AudioZero/archive/refs/tags/1.1.1.zip"
+	zipPath := cli.DownloadDir().Join("libraries", "AudioZero.zip")
+	require.NoError(t, zipPath.Parent().MkdirAll())
+	downloadLib(t, url, zipPath)
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "AudioZero")
+	// Verifies library is not already installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	// Test zip-path install
+	stdout, _, err := cli.Run("lib", "install", "--zip-path", zipPath.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
+
+	// Verifies library is installed in expected path
+	require.DirExists(t, libInstallDir.String())
+	files, err := libInstallDir.ReadDirRecursive()
+	require.NoError(t, err)
+	require.Contains(t, files, libInstallDir.Join("examples", "SimpleAudioPlayerZero", "SimpleAudioPlayerZero.ino"))
+	require.Contains(t, files, libInstallDir.Join("src", "AudioZero.h"))
+	require.Contains(t, files, libInstallDir.Join("src", "AudioZero.cpp"))
+	require.Contains(t, files, libInstallDir.Join("keywords.txt"))
+	require.Contains(t, files, libInstallDir.Join("library.properties"))
+	require.Contains(t, files, libInstallDir.Join("README.adoc"))
+
+	// Reinstall library
+	_, _, err = cli.Run("lib", "install", "--zip-path", zipPath.String())
+	require.NoError(t, err)
+
+	// Verifies library remains installed
+	require.DirExists(t, libInstallDir.String())
+	files, err = libInstallDir.ReadDirRecursive()
+	require.NoError(t, err)
+	require.Contains(t, files, libInstallDir.Join("examples", "SimpleAudioPlayerZero", "SimpleAudioPlayerZero.ino"))
+	require.Contains(t, files, libInstallDir.Join("src", "AudioZero.h"))
+	require.Contains(t, files, libInstallDir.Join("src", "AudioZero.cpp"))
+	require.Contains(t, files, libInstallDir.Join("keywords.txt"))
+	require.Contains(t, files, libInstallDir.Join("library.properties"))
+	require.Contains(t, files, libInstallDir.Join("README.adoc"))
+}
+
+func TestInstallWithZipPathMultipleLibraries(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("update")
+	require.NoError(t, err)
+
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+
+	// Downloads zips to be installed later
+	wifiZipPath := cli.DownloadDir().Join("libraries", "WiFi101-0.16.1.zip")
+	bleZipPath := cli.DownloadDir().Join("libraries", "ArduinoBLE-1.1.3.zip")
+	downloadLib(t, "https://github.com/arduino-libraries/WiFi101/archive/refs/tags/0.16.1.zip", wifiZipPath)
+	downloadLib(t, "https://github.com/arduino-libraries/ArduinoBLE/archive/refs/tags/1.1.3.zip", bleZipPath)
+
+	wifiInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101")
+	bleInstallDir := cli.SketchbookDir().Join("libraries", "ArduinoBLE")
+	// Verifies libraries are not installed
+	require.NoDirExists(t, wifiInstallDir.String())
+	require.NoDirExists(t, bleInstallDir.String())
+
+	_, _, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--zip-path", wifiZipPath.String(), bleZipPath.String())
+	require.NoError(t, err)
+
+	// Verifies libraries are installed
+	require.DirExists(t, wifiInstallDir.String())
+	require.DirExists(t, bleInstallDir.String())
+}
+
+func TestInstallWithGitUrlLocalFileUri(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Using a file uri as git url doesn't work on Windows, " +
+			"this must be removed when this issue is fixed: https://github.com/go-git/go-git/issues/247")
+	}
+
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	envVar := cli.GetDefaultEnv()
+	envVar["ARDUINO_ENABLE_UNSAFE_LIBRARY_INSTALL"] = "true"
+
+	libInstallDir := cli.SketchbookDir().Join("libraries", "WiFi101")
+	// Verifies library is not installed
+	require.NoDirExists(t, libInstallDir.String())
+
+	// Clone repository locally
+	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
+	repoDir := cli.SketchbookDir().Join("WiFi101")
+	_, err := git.PlainClone(repoDir.String(), false, &git.CloneOptions{
+		URL: gitUrl,
+	})
+	require.NoError(t, err)
+
+	_, _, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", "file://"+repoDir.String())
+	require.NoError(t, err)
+
+	// Verifies library is installed
+	require.DirExists(t, libInstallDir.String())
 }
