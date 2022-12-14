@@ -99,6 +99,9 @@ message Platform {
   bool deprecated = 10;
   // Type of the platform.
   repeated string type = 11;
+  // A URL provided by the author of the platform's package, intended to point
+  // to their online help service.
+  HelpResources help = 12;
 }
 
 message InstalledPlatformReference {
@@ -125,4 +128,10 @@ message Profile {
   string name = 1;
   // FQBN specified in the profile.
   string fqbn = 2;
+}
+
+message HelpResources {
+  // A URL provided by the author of the platform's package, intended to point
+  // to their online help service.
+  string online = 1;
 }
