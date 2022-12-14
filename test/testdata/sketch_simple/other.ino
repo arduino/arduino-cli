@@ -1,3 +1,0 @@
-String hello() {
-  return "world";
-}

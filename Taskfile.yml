@@ -122,15 +122,6 @@ tasks:
           {{default .DEFAULT_INTEGRATIONTEST_GO_PACKAGES .GO_PACKAGES}} \
           {{.TEST_LDFLAGS}}
 
-  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/test-go-integration-task/Taskfile.yml
-  go:test-integration:
-    desc: Run integration tests
-    deps:
-      - task: go:build
-      - task: poetry:install-deps
-    cmds:
-      - poetry run pytest test
-
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
   go:vet:
     desc: Check for errors in Go code
@@ -269,7 +260,7 @@ tasks:
     desc: Run the full testsuite, `legacy` will be skipped
     cmds:
       - task: go:test
-      - task: go:test-integration
+      - task: go:integration-test
 
   test-legacy:
     desc: Run tests for the `legacy` package

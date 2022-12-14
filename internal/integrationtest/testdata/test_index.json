@@ -12,7 +12,7 @@
           "help": {
             "online": "https://github.com/Arduino/arduino-cli"
           },
-          "url": "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/core.zip",
+          "url": "https://raw.githubusercontent.com/arduino/arduino-cli/master/internal/integrationtest/testdata/core.zip",
           "checksum": "SHA-256:6a338cf4d6d501176a2d352c87a8d72ac7488b8c5b82cdf2a4e2cef630391092",
           "name": "test_core",
           "version": "1.0.0",
@@ -31,7 +31,7 @@
           "help": {
             "online": "https://github.com/Arduino/arduino-cli"
           },
-          "url": "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/core.zip",
+          "url": "https://raw.githubusercontent.com/arduino/arduino-cli/master/internal/integrationtest/testdata/core.zip",
           "checksum": "SHA-256:6a338cf4d6d501176a2d352c87a8d72ac7488b8c5b82cdf2a4e2cef630391092",
           "name": "test_core",
           "version": "2.0.0",
@@ -65,7 +65,7 @@
           "help": {
             "online": "https://github.com/Arduino/arduino-cli"
           },
-          "url": "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/evil.zip",
+          "url": "https://raw.githubusercontent.com/arduino/arduino-cli/master/internal/integrationtest/testdata/evil.zip",
           "checksum": "SHA-256:9b85dfe23f13318efc0e541327f584a0f3674a773d46a7eb8b25f0f408d07f96",
           "name": "zipslip",
           "version": "1.0.0",
@@ -96,7 +96,7 @@
           "help": {
             "online": "https://github.com/Arduino/arduino-cli"
           },
-          "url": "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/core.zip",
+          "url": "https://raw.githubusercontent.com/arduino/arduino-cli/master/internal/integrationtest/testdata/core.zip",
           "checksum": "SHA-256:1a338cf4d6d501176a2d352c87a8d72ac7488b8c5b82cdf2a4e2cef630391092",
           "name": "zipslip",
           "version": "1.0.0",
@@ -189,7 +189,7 @@
           "help": {
             "online": "https://github.com/Arduino/arduino-cli"
           },
-          "url": "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/core.zip",
+          "url": "https://raw.githubusercontent.com/arduino/arduino-cli/master/internal/integrationtest/testdata/core.zip",
           "checksum": "SHA-256:6a338cf4d6d501176a2d352c87a8d72ac7488b8c5b82cdf2a4e2cef630391092",
           "name": "Platform",
           "version": "1.2.3",
