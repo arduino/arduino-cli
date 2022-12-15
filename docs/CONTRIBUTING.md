@@ -187,23 +187,6 @@ To run very specific test functions:
 go test -v github.com/arduino/arduino-cli/internal/integrationtest/lib -run TestLibUpgradeCommand
 ```
 
-#### Linting and formatting
-
-When editing any Python file in the project remember to run linting checks with:
-
-```shell
-task python:lint
-```
-
-This will run `flake8` automatically and return any error in the code formatting, if not already installed it will also
-install integration tests dependencies.
-
-In case of linting errors you should be able to solve most of them by automatically formatting with:
-
-```shell
-task python:format
-```
-
 ### Dependency license metadata
 
 Metadata about the license types of all dependencies is cached in the repository. To update this cache, run the

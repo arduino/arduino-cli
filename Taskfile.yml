@@ -235,22 +235,6 @@ tasks:
     cmds:
       - clang-format -i rpc/cc/arduino/cli/*/*/*.proto
 
-  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-python-task/Taskfile.yml
-  python:format:
-    desc: Format Python files
-    deps:
-      - task: poetry:install-deps
-    cmds:
-      - poetry run black .
-
-  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-python-task/Taskfile.yml
-  python:lint:
-    desc: Lint Python code
-    deps:
-      - task: poetry:install-deps
-    cmds:
-      - poetry run flake8 --show-source
-
   build:
     desc: Build the project
     deps:
@@ -288,7 +272,6 @@ tasks:
     cmds:
       - task: go:vet
       - task: go:lint
-      - task: python:lint
       - task: protoc:check
 
   check-legacy:
