@@ -6,7 +6,6 @@ Arduino CLI is an all-in-one solution that provides Boards/Library Managers, ske
 and many other tools needed to use any Arduino compatible board and platform from command line or machine interfaces.
 
 [![Test Go status](https://github.com/arduino/arduino-cli/actions/workflows/test-go-task.yml/badge.svg)](https://github.com/arduino/arduino-cli/actions/workflows/test-go-task.yml)
-[![Test Integration status](https://github.com/arduino/arduino-cli/actions/workflows/test-go-integration-task.yml/badge.svg)](https://github.com/arduino/arduino-cli/actions/workflows/test-go-integration-task.yml)
 [![Publish Nightly Build status](https://github.com/arduino/arduino-cli/actions/workflows/publish-go-nightly-task.yml/badge.svg)](https://github.com/arduino/arduino-cli/actions/workflows/publish-go-nightly-task.yml)
 [![Deploy Website status](https://github.com/arduino/arduino-cli/actions/workflows/deploy-cobra-mkdocs-versioned-poetry.yml/badge.svg)](https://github.com/arduino/arduino-cli/actions/workflows/deploy-cobra-mkdocs-versioned-poetry.yml)
 [![Codecov](https://codecov.io/gh/arduino/arduino-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/arduino/arduino-cli)

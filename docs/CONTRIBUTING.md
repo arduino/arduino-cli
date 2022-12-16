@@ -76,7 +76,6 @@ To build the Arduino CLI from sources you need the following tools to be availab
 If you want to run integration tests you will also need:
 
 - A serial port with an Arduino board attached
-- A working [Python][3] environment, version 3.8 or later
 
 If you're working on the gRPC interface you will also have to:
 
@@ -115,7 +114,7 @@ task go:test
 To run integration tests (these will take some time and require special setup, see following paragraph):
 
 ```shell
-task go:test-integration
+task go:integration-test
 ```
 
 #### Running only some tests
@@ -163,65 +162,29 @@ the above requirements.
 
 ##### Software requirements for running integration tests:
 
-A working Python environment. Chances are that you already have Python installed in your system, if this is not the case
-you can [download][3] the official distribution or use the package manager provided by your Operating System.
-
-Some dependencies need to be installed before running the tests and to avoid polluting your global Python environment
-with dependencies that might be only used by the Arduino CLI, to do so we use [Poetry][poetry-website]. First you need
-to install it (you might need to `sudo` the following command):
-
-```shell
-pip3 install --user poetry
-```
-
-For more installation options read the [official documentation][poetry-docs].
+A working Go environment. Chances are that you already have Go installed in your system, if this is not the case you can
+[download][1] the official distribution or use the package manager provided by your Operating System.
 
 #### Running tests
 
 After the software requirements have been installed you should be able to run the tests with:
 
 ```shell
-task go:test-integration
+task go:integration-test
 ```
 
-This will automatically install the necessary dependencies, if not already installed, and run the integration tests
-automatically.
+This will run the integration tests automatically.
 
-To run specific modules you must run `pytest` from the virtual environment created by Poetry.
+To run specific packages you must run `go test`.
 
 ```shell
-poetry run pytest test/test_lib.py
+go test -v github.com/arduino/arduino-cli/internal/integrationtest/lib
 ```
 
 To run very specific test functions:
 
 ```shell
-poetry run pytest test/test_lib.py::test_list
-```
-
-You can avoid writing the `poetry run` prefix each time by creating a new shell inside the virtual environment:
-
-```shell
-poetry shell
-pytest test_lib.py
-pytest test_lib.py::test_list
-```
-
-#### Linting and formatting
-
-When editing any Python file in the project remember to run linting checks with:
-
-```shell
-task python:lint
-```
-
-This will run `flake8` automatically and return any error in the code formatting, if not already installed it will also
-install integration tests dependencies.
-
-In case of linting errors you should be able to solve most of them by automatically formatting with:
-
-```shell
-task python:format
+go test -v github.com/arduino/arduino-cli/internal/integrationtest/lib -run TestLibUpgradeCommand
 ```
 
 ### Dependency license metadata
