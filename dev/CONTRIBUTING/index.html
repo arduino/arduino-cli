@@ -433,13 +433,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#linting-and-formatting" class="md-nav__link">
-    Linting and formatting
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1674,13 +1667,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#linting-and-formatting" class="md-nav__link">
-    Linting and formatting
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1881,7 +1867,6 @@ submitting a PR:</p>
 <p>If you want to run integration tests you will also need:</p>
 <ul>
 <li>A serial port with an Arduino board attached</li>
-<li>A working <a href="https://www.python.org/downloads/">Python</a> environment, version 3.8 or later</li>
 </ul>
 <p>If you're working on the gRPC interface you will also have to:</p>
 <ul>
@@ -1905,7 +1890,7 @@ of the tests locally.</p>
 <div class="highlight"><pre><span></span><code>task go:test
 </code></pre></div>
 <p>To run integration tests (these will take some time and require special setup, see following paragraph):</p>
-<div class="highlight"><pre><span></span><code>task go:test-integration
+<div class="highlight"><pre><span></span><code>task go:integration-test
 </code></pre></div>
 <h4 id="running-only-some-tests">Running only some tests<a class="headerlink" href="#running-only-some-tests" title="Permanent link">&para;</a></h4>
 <p>By default, all tests from all go packages are run. To run only unit tests from one or more specific packages, you can
@@ -1936,39 +1921,18 @@ Arduino CLI in a different process and assess the options are correctly understo
 <p>Note that running the integration tests will result in a sketch being uploaded to every attached Arduino board meeting
 the above requirements.</p>
 <h5 id="software-requirements-for-running-integration-tests">Software requirements for running integration tests:<a class="headerlink" href="#software-requirements-for-running-integration-tests" title="Permanent link">&para;</a></h5>
-<p>A working Python environment. Chances are that you already have Python installed in your system, if this is not the case
-you can <a href="https://www.python.org/downloads/">download</a> the official distribution or use the package manager provided by your Operating System.</p>
-<p>Some dependencies need to be installed before running the tests and to avoid polluting your global Python environment
-with dependencies that might be only used by the Arduino CLI, to do so we use <a href="https://python-poetry.org/">Poetry</a>. First you need
-to install it (you might need to <code>sudo</code> the following command):</p>
-<div class="highlight"><pre><span></span><code>pip3 install --user poetry
-</code></pre></div>
-<p>For more installation options read the <a href="https://python-poetry.org/docs/">official documentation</a>.</p>
+<p>A working Go environment. Chances are that you already have Go installed in your system, if this is not the case you can
+<a href="https://go.dev/doc/install">download</a> the official distribution or use the package manager provided by your Operating System.</p>
 <h4 id="running-tests">Running tests<a class="headerlink" href="#running-tests" title="Permanent link">&para;</a></h4>
 <p>After the software requirements have been installed you should be able to run the tests with:</p>
-<div class="highlight"><pre><span></span><code>task go:test-integration
+<div class="highlight"><pre><span></span><code>task go:integration-test
 </code></pre></div>
-<p>This will automatically install the necessary dependencies, if not already installed, and run the integration tests
-automatically.</p>
-<p>To run specific modules you must run <code>pytest</code> from the virtual environment created by Poetry.</p>
-<div class="highlight"><pre><span></span><code>poetry run pytest test/test_lib.py
+<p>This will run the integration tests automatically.</p>
+<p>To run specific packages you must run <code>go test</code>.</p>
+<div class="highlight"><pre><span></span><code>go <span class="nb">test</span> -v github.com/arduino/arduino-cli/internal/integrationtest/lib
 </code></pre></div>
 <p>To run very specific test functions:</p>
-<div class="highlight"><pre><span></span><code>poetry run pytest test/test_lib.py::test_list
-</code></pre></div>
-<p>You can avoid writing the <code>poetry run</code> prefix each time by creating a new shell inside the virtual environment:</p>
-<div class="highlight"><pre><span></span><code>poetry shell
-pytest test_lib.py
-pytest test_lib.py::test_list
-</code></pre></div>
-<h4 id="linting-and-formatting">Linting and formatting<a class="headerlink" href="#linting-and-formatting" title="Permanent link">&para;</a></h4>
-<p>When editing any Python file in the project remember to run linting checks with:</p>
-<div class="highlight"><pre><span></span><code>task python:lint
-</code></pre></div>
-<p>This will run <code>flake8</code> automatically and return any error in the code formatting, if not already installed it will also
-install integration tests dependencies.</p>
-<p>In case of linting errors you should be able to solve most of them by automatically formatting with:</p>
-<div class="highlight"><pre><span></span><code>task python:format
+<div class="highlight"><pre><span></span><code>go <span class="nb">test</span> -v github.com/arduino/arduino-cli/internal/integrationtest/lib -run TestLibUpgradeCommand
 </code></pre></div>
 <h3 id="dependency-license-metadata">Dependency license metadata<a class="headerlink" href="#dependency-license-metadata" title="Permanent link">&para;</a></h3>
 <p>Metadata about the license types of all dependencies is cached in the repository. To update this cache, run the
