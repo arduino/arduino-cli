@@ -162,7 +162,7 @@ func TestCoreSearchNoArgs(t *testing.T) {
 		lines = append(lines, strings.Fields(strings.TrimSpace(v)))
 	}
 	// The header is printed on the first lines
-	require.Equal(t, []string{"test:x86", "2.0.0", "test_core"}, lines[19])
+	require.Equal(t, []string{"test:x86", "2.0.0", "test_core"}, lines[20])
 	numPlatforms := len(lines) - 1
 
 	// same thing in JSON format, also check the number of platforms found is the same
@@ -179,7 +179,7 @@ func TestCoreSearchNoArgs(t *testing.T) {
 		lines = append(lines, strings.Fields(strings.TrimSpace(v)))
 	}
 	// The header is printed on the first lines
-	require.Equal(t, []string{"test:x86", "2.0.0", "test_core"}, lines[20])
+	require.Equal(t, []string{"test:x86", "2.0.0", "test_core"}, lines[21])
 	numPlatforms = len(lines) - 1
 
 	// same thing in JSON format, also check the number of platforms found is the same
@@ -385,7 +385,7 @@ func TestCoreZipslip(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
 
-	url := "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
+	url := "https://raw.githubusercontent.com/arduino/arduino-cli/master/internal/integrationtest/testdata/test_index.json"
 	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url)
 	require.NoError(t, err)
 
@@ -399,7 +399,7 @@ func TestCoreBrokenInstall(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
 
-	url := "https://raw.githubusercontent.com/arduino/arduino-cli/master/test/testdata/test_index.json"
+	url := "https://raw.githubusercontent.com/arduino/arduino-cli/master/internal/integrationtest/testdata/test_index.json"
 	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url)
 	require.NoError(t, err)
 	_, _, err = cli.Run("core", "install", "brokenchecksum:x86", "--additional-urls="+url)
