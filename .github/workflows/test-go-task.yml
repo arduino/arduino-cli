@@ -76,6 +76,7 @@ jobs:
   test-integration:
     needs: tests-collector
     strategy:
+      fail-fast: false
       matrix:
         operating-system:
           - ubuntu-latest
@@ -113,6 +114,7 @@ jobs:
   test:
     needs: run-determination
     strategy:
+      fail-fast: false
       matrix:
         operating-system:
           - ubuntu-latest
