@@ -56,6 +56,7 @@ func PlatformReleaseToRPC(platformRelease *cores.PlatformRelease) *rpc.Platform 
 		Maintainer:        platformRelease.Platform.Package.Maintainer,
 		Website:           platformRelease.Platform.Package.WebsiteURL,
 		Email:             platformRelease.Platform.Package.Email,
+		Help:              &rpc.HelpResources{Online: platformRelease.Platform.Package.Help.Online},
 		Boards:            boards,
 		Latest:            platformRelease.Version.String(),
 		ManuallyInstalled: platformRelease.Platform.ManuallyInstalled,
