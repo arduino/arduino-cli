@@ -1456,6 +1456,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#helpresources" class="md-nav__link">
+    HelpResources
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#installedplatformreference" class="md-nav__link">
     InstalledPlatformReference
   </a>
@@ -2751,6 +2758,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#helpresources" class="md-nav__link">
+    HelpResources
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#installedplatformreference" class="md-nav__link">
     InstalledPlatformReference
   </a>
@@ -3487,6 +3501,7 @@
 <li><a href="#cc.arduino.cli.commands.v1.DownloadProgressEnd">DownloadProgressEnd</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.DownloadProgressStart">DownloadProgressStart</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.DownloadProgressUpdate">DownloadProgressUpdate</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.HelpResources">HelpResources</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.InstalledPlatformReference">InstalledPlatformReference</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.Platform">Platform</a></li>
@@ -5112,6 +5127,26 @@
 </tr>
 </tbody>
 </table>
+<p><a name="cc.arduino.cli.commands.v1.HelpResources"></a></p>
+<h3 id="helpresources">HelpResources<a class="headerlink" href="#helpresources" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>online</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>A URL provided by the author of the platform&#39;s package, intended to point to their online help service.</td>
+</tr>
+</tbody>
+</table>
 <p><a name="cc.arduino.cli.commands.v1.InstalledPlatformReference"></a></p>
 <h3 id="installedplatformreference">InstalledPlatformReference<a class="headerlink" href="#installedplatformreference" title="Permanent link">&para;</a></h3>
 <table>
@@ -5247,6 +5282,12 @@
 <td><a href="#string">string</a></td>
 <td>repeated</td>
 <td>Type of the platform.</td>
+</tr>
+<tr>
+<td>help</td>
+<td><a href="#cc.arduino.cli.commands.v1.HelpResources">HelpResources</a></td>
+<td></td>
+<td>A URL provided by the author of the platform&#39;s package, intended to point to their online help service.</td>
 </tr>
 </tbody>
 </table>
