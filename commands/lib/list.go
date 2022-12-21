@@ -48,8 +48,9 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 
 	nameFilter := strings.ToLower(req.GetName())
 
-	allLibs := listLibraries(lm, req.GetUpdatable(), req.GetAll())
+	var allLibs []*installedLib
 	if f := req.GetFqbn(); f != "" {
+		allLibs = listLibraries(lm, req.GetUpdatable(), true)
 		fqbn, err := cores.ParseFQBN(req.GetFqbn())
 		if err != nil {
 			return nil, &arduino.InvalidFQBNError{Cause: err}
@@ -93,6 +94,8 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 		for _, lib := range filteredRes {
 			allLibs = append(allLibs, lib)
 		}
+	} else {
+		allLibs = listLibraries(lm, req.GetUpdatable(), req.GetAll())
 	}
 
 	installedLibs := []*rpc.InstalledLibrary{}
