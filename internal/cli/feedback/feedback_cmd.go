@@ -25,7 +25,7 @@ import (
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:    "feedback",
-		Short:  "Test the feedback functions of the arduino CLI.",
+		Short:  "Test the feedback functions of Arduino CLI.",
 		Long:   "This command is for testing purposes only, it is not intended for use by end users.",
 		Args:   cobra.NoArgs,
 		Hidden: true,
