@@ -50,7 +50,7 @@ type OutputStreamsResult struct {
 
 // Data returns the result object itself, it is used to implement the Result interface.
 func (r *OutputStreamsResult) Data() interface{} {
-	// In case of non-Text output format, the output is accumulared so retrun the buffer as a Result object
+	// In case of non-Text output format, the output is accumulated so return the buffer as a Result object
 	return r
 }
 
