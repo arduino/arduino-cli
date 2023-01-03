@@ -227,19 +227,19 @@ func PrintResult(res Result) {
 	case JSON:
 		d, err := json.MarshalIndent(augment(res.Data()), "", "  ")
 		if err != nil {
-			Fatal(fmt.Sprintf("Error during JSON encoding of the output: %v", err), ErrGeneric)
+			Fatal(tr("Error during JSON encoding of the output: %v", err), ErrGeneric)
 		}
 		data = string(d)
 	case MinifiedJSON:
 		d, err := json.Marshal(augment(res.Data()))
 		if err != nil {
-			Fatal(fmt.Sprintf("Error during JSON encoding of the output: %v", err), ErrGeneric)
+			Fatal(tr("Error during JSON encoding of the output: %v", err), ErrGeneric)
 		}
 		data = string(d)
 	case YAML:
 		d, err := yaml.Marshal(augment(res.Data()))
 		if err != nil {
-			Fatal(fmt.Sprintf("Error during YAML encoding of the output: %v", err), ErrGeneric)
+			Fatal(tr("Error during YAML encoding of the output: %v", err), ErrGeneric)
 		}
 		data = string(d)
 	case Text:
