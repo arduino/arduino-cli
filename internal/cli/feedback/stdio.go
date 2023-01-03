@@ -31,10 +31,7 @@ func OutputStreams() (io.Writer, io.Writer, func() *OutputStreamsResult) {
 	if !formatSelected {
 		panic("output format not yet selected")
 	}
-	if format == Text {
-		return stdOut, stdErr, getOutputStreamResult
-	}
-	return bufferOut, bufferErr, getOutputStreamResult
+	return feedbackOut, feedbackErr, getOutputStreamResult
 }
 
 func getOutputStreamResult() *OutputStreamsResult {
