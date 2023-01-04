@@ -216,8 +216,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		SkipLibrariesDiscovery:        skipLibrariesDiscovery,
 	}
 	stdOut, stdErr, stdIORes := feedback.OutputStreams()
-	verboseCompile := configuration.Settings.GetString("logging.level") == "debug"
-	compileRes, compileError := compile.Compile(context.Background(), compileRequest, stdOut, stdErr, nil, verboseCompile)
+	compileRes, compileError := compile.Compile(context.Background(), compileRequest, stdOut, stdErr, nil)
 
 	if compileError == nil && uploadAfterCompile {
 		userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{

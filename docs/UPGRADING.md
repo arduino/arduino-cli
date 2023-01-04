@@ -32,6 +32,20 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest, outStream io.Writer, errStream io.Writer) error { ... }
 ```
 
+### golang API: methods in `github.com/arduino/arduino-cli/commands/compile` changed signature
+
+The following method in `github.com/arduino/arduino-cli/commands/compile`:
+
+```go
+func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream io.Writer, progressCB rpc.TaskProgressCB, debug bool) (r *rpc.CompileResponse, e error) { ... }
+```
+
+do not require the `debug` parameter anymore:
+
+```go
+func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream io.Writer, progressCB rpc.TaskProgressCB) (r *rpc.CompileResponse, e error) { ... }
+```
+
 ### golang API: package `github.com/arduino/arduino-cli/cli` is no more public
 
 The package `cli` has been made internal. The code in this package is no more public API and can not be directly

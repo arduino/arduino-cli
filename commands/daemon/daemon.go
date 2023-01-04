@@ -209,8 +209,7 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	errStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.CompileResponse{ErrStream: data}) })
 	compileResp, compileErr := compile.Compile(
 		stream.Context(), req, outStream, errStream,
-		func(p *rpc.TaskProgress) { stream.Send(&rpc.CompileResponse{Progress: p}) },
-		false) // Set debug to false
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.CompileResponse{Progress: p}) })
 	outStream.Close()
 	errStream.Close()
 	var compileRespSendErr error
