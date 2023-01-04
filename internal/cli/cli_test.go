@@ -70,14 +70,15 @@ func inspect(t *testing.T, fset *token.FileSet, node ast.Node) bool {
 			t.Fail()
 		}
 	case *ast.SelectorExpr:
-		wanted := map[string]bool{
-			"os.Stdout": true,
-			"os.Stderr": true,
-			"os.Stdin":  true,
+		wanted := map[string]string{
+			"os.Stdout": "%s: object `%s` should not be used in this package (use `feedback.*` instead)\n",
+			"os.Stderr": "%s: object `%s` should not be used in this package (use `feedback.*` instead)\n",
+			"os.Stdin":  "%s: object `%s` should not be used in this package (use `feedback.*` instead)\n",
+			"os.Exit":   "%s: function `%s` should not be used in this package (use `return` or `feedback.FatalError` instead)\n",
 		}
 		name := expr(n)
-		if wanted[name] {
-			fmt.Printf("%s: object `%s` should not be used in this package (use `feedback.*` instead)\n", fset.Position(n.Pos()), name)
+		if msg, banned := wanted[name]; banned {
+			fmt.Printf(msg, fset.Position(n.Pos()), name)
 			t.Fail()
 		}
 	}

@@ -60,7 +60,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 
 	if watch {
 		watchList(cmd, inst)
-		os.Exit(0)
+		return
 	}
 
 	ports, discvoeryErrors, err := board.List(&rpc.BoardListRequest{

@@ -309,7 +309,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			feedback.FatalError(err, feedback.ErrGeneric)
 		}
 		feedback.PrintResult(stdIORes())
-		os.Exit(0)
+		return
 	}
 
 	stdIO := stdIORes()
