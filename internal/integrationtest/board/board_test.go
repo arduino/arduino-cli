@@ -33,7 +33,10 @@ func TestCorrectBoardListOrdering(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
 
-	_, _, err := cli.Run("core", "install", "arduino:avr")
+	// install two cores, boards must be ordered by package name and platform name
+	_, _, err := cli.Run("core", "install", "arduino:sam")
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "arduino:avr")
 	require.NoError(t, err)
 	jsonOut, _, err := cli.Run("board", "listall", "--format", "json")
 	require.NoError(t, err)
@@ -64,7 +67,9 @@ func TestCorrectBoardListOrdering(t *testing.T) {
 		"arduino:avr:yunmini",
 		"arduino:avr:chiwawa",
 		"arduino:avr:one",
-		"arduino:avr:unowifi"
+		"arduino:avr:unowifi",
+		"arduino:sam:arduino_due_x_dbg",
+		"arduino:sam:arduino_due_x"
 	]`)
 }
 

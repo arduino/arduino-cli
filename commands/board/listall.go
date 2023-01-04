@@ -17,9 +17,11 @@ package board
 
 import (
 	"context"
+	"sort"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino"
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -36,8 +38,8 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListA
 	searchArgs := strings.Join(req.GetSearchArgs(), " ")
 
 	list := &rpc.BoardListAllResponse{Boards: []*rpc.BoardListItem{}}
-	for _, targetPackage := range pme.GetPackages() {
-		for _, platform := range targetPackage.Platforms {
+	for _, targetPackage := range toSortedPackageArray(pme.GetPackages()) {
+		for _, platform := range toSortedPlatformArray(targetPackage.Platforms) {
 			installedPlatformRelease := pme.GetInstalledPlatformRelease(platform)
 			// We only want to list boards for installed platforms
 			if installedPlatformRelease == nil {
@@ -92,4 +94,38 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListA
 	}
 
 	return list, nil
+}
+
+// TODO use a generic function instead of the two below once go >1.18 is adopted.
+//		Without generics we either have to create multiple functions for different map types
+//		or resort to type assertions on the caller side
+
+// toSortedPackageArray takes a packages map and returns its values as array
+// ordered by the map keys alphabetically
+func toSortedPackageArray(sourceMap cores.Packages) []*cores.Package {
+	keys := []string{}
+	for key := range sourceMap {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	sortedValues := make([]*cores.Package, len(keys))
+	for i, key := range keys {
+		sortedValues[i] = sourceMap[key]
+	}
+	return sortedValues
+}
+
+// toSortedPlatformArray takes a packages map and returns its values as array
+// ordered by the map keys alphabetically
+func toSortedPlatformArray(sourceMap map[string]*cores.Platform) []*cores.Platform {
+	keys := []string{}
+	for key := range sourceMap {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	sortedValues := make([]*cores.Platform, len(keys))
+	for i, key := range keys {
+		sortedValues[i] = sourceMap[key]
+	}
+	return sortedValues
 }
