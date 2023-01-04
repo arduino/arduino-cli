@@ -46,9 +46,12 @@ func (s *SettingsService) GetAll(ctx context.Context, req *rpc.GetAllRequest) (*
 
 // mapper converts a map of nested maps to a map of scalar values.
 // For example:
-//    {"foo": "bar", "daemon":{"port":"420"}, "sketch": {"always_export_binaries": "true"}}
+//
+//	{"foo": "bar", "daemon":{"port":"420"}, "sketch": {"always_export_binaries": "true"}}
+//
 // would convert to:
-//    {"foo": "bar", "daemon.port":"420", "sketch.always_export_binaries": "true"}
+//
+//	{"foo": "bar", "daemon.port":"420", "sketch.always_export_binaries": "true"}
 func mapper(toMap map[string]interface{}) map[string]interface{} {
 	res := map[string]interface{}{}
 	for k, v := range toMap {
