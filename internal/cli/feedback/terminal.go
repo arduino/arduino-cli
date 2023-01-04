@@ -55,22 +55,18 @@ func InputUserField(prompt string, secret bool) (string, error) {
 	}
 
 	fmt.Fprintf(stdOut, "%s: ", prompt)
-	var value []byte
-	var err error
+
 	if secret {
-		value, err = term.ReadPassword(int(os.Stdin.Fd()))
+		// Read and return a password (no characted echoed on terminal)
+		value, err := term.ReadPassword(int(os.Stdin.Fd()))
 		fmt.Fprintln(stdOut)
-	} else {
-		value, err = bufio.NewReader(os.Stdin).ReadBytes('\n')
-		if l := len(value); l > 0 {
-			value = value[:l-1]
-		}
-	}
-	if err != nil {
-		panic(err)
+		return string(value), err
 	}
 
-	return string(value), nil
+	// Read and return an input line
+	sc := bufio.NewScanner(os.Stdin)
+	sc.Scan()
+	return sc.Text(), sc.Err()
 }
 
 // ExitWhenParentProcessEnds waits until the controlling parent process ends and then exits
