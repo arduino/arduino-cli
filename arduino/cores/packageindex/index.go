@@ -30,6 +30,7 @@ import (
 )
 
 // Index represents Cores and Tools struct as seen from package_index.json file.
+//
 //easyjson:json
 type Index struct {
 	Packages  []*indexPackage `json:"packages"`
@@ -37,6 +38,7 @@ type Index struct {
 }
 
 // indexPackage represents a single entry from package_index.json file.
+//
 //easyjson:json
 type indexPackage struct {
 	Name       string                  `json:"name"`
@@ -50,6 +52,7 @@ type indexPackage struct {
 }
 
 // indexPlatformRelease represents a single Core Platform from package_index.json file.
+//
 //easyjson:json
 type indexPlatformRelease struct {
 	Name                  string                     `json:"name"`
@@ -69,6 +72,7 @@ type indexPlatformRelease struct {
 }
 
 // indexToolDependency represents a single dependency of a core from a tool.
+//
 //easyjson:json
 type indexToolDependency struct {
 	Packager string                 `json:"packager"`
@@ -77,6 +81,7 @@ type indexToolDependency struct {
 }
 
 // indexDiscoveryDependency represents a single dependency of a core from a pluggable discovery tool.
+//
 //easyjson:json
 type indexDiscoveryDependency struct {
 	Packager string `json:"packager"`
@@ -84,6 +89,7 @@ type indexDiscoveryDependency struct {
 }
 
 // indexMonitorDependency represents a single dependency of a core from a pluggable monitor tool.
+//
 //easyjson:json
 type indexMonitorDependency struct {
 	Packager string `json:"packager"`
@@ -91,6 +97,7 @@ type indexMonitorDependency struct {
 }
 
 // indexToolRelease represents a single Tool from package_index.json file.
+//
 //easyjson:json
 type indexToolRelease struct {
 	Name    string                    `json:"name"`
@@ -99,6 +106,7 @@ type indexToolRelease struct {
 }
 
 // indexToolReleaseFlavour represents a single tool flavor in the package_index.json file.
+//
 //easyjson:json
 type indexToolReleaseFlavour struct {
 	OS              string      `json:"host"`
@@ -109,6 +117,7 @@ type indexToolReleaseFlavour struct {
 }
 
 // indexBoard represents a single Board as written in package_index.json file.
+//
 //easyjson:json
 type indexBoard struct {
 	Name string         `json:"name"`
@@ -116,12 +125,14 @@ type indexBoard struct {
 }
 
 // indexBoardID represents the ID of a single board. i.e. uno, yun, diecimila, micro and the likes
+//
 //easyjson:json
 type indexBoardID struct {
 	USB string `json:"usb"`
 }
 
 // indexHelp represents the help URL
+//
 //easyjson:json
 type indexHelp struct {
 	Online string `json:"online,omitempty"`

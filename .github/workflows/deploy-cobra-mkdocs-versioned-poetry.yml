@@ -3,7 +3,7 @@ name: Deploy Website
 
 env:
   # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
-  GO_VERSION: "1.17"
+  GO_VERSION: "1.19"
   # See: https://github.com/actions/setup-python/tree/main#available-versions-of-python
   PYTHON_VERSION: "3.9"
 

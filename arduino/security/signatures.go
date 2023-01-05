@@ -64,7 +64,9 @@ func VerifyDetachedSignature(targetPath *paths.Path, signaturePath *paths.Path, 
 // VerifySignature checks that the detached GPG signature (in the
 // signaturePath file) matches the given targetPath file and is an authentic
 // signature. This function allows to pass an io.Reader to read the custom key.
-//  If any of the above conditions fails this function returns false.
+//
+// If any of the above conditions fails this function returns false.
+//
 // The PGP entity in the trusted keychain that produced the signature is returned too.
 func VerifySignature(targetPath *paths.Path, signaturePath *paths.Path, arduinoKeyringFile io.Reader) (bool, *openpgp.Entity, error) {
 	keyRing, err := openpgp.ReadKeyRing(arduinoKeyringFile)

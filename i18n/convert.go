@@ -26,7 +26,7 @@ var javaFormatPlaceholderRegexp = regexp.MustCompile(`{(\d)}`)
 // FromJavaToGoSyntax convert a translation string made for Java to a one suitable for golang (printf-style).
 // The conversion transforms java placeholders like "{0}","{1}","{2}",etc... with the equivalent for golang
 // "%[1]v","%[2]v","%[3]v",etc...
-// The double single-quote "''" is translated into a single single-quote "'".
+// A pair of adjacent single-quote characters "'" (U+0027) is replaced with one only.
 func FromJavaToGoSyntax(s string) string {
 	// Replace "{x}" => "%[x+1]v"
 	for _, submatch := range javaFormatPlaceholderRegexp.FindAllStringSubmatch(s, -1) {
