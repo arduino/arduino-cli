@@ -20,8 +20,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"os"
+	"sort"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
@@ -47,6 +49,7 @@ func TestCompile(t *testing.T) {
 		{"WithoutFqbn", compileWithoutFqbn},
 		{"ErrorMessage", compileErrorMessage},
 		{"WithSimpleSketch", compileWithSimpleSketch},
+		{"WithCachePurgeNeeded", compileWithCachePurgeNeeded},
 		{"OutputFlagDefaultPath", compileOutputFlagDefaultPath},
 		{"WithSketchWithSymlinkSelfloop", compileWithSketchWithSymlinkSelfloop},
 		{"BlacklistedSketchname", compileBlacklistedSketchname},
@@ -112,6 +115,35 @@ func compileErrorMessage(t *testing.T, env *integrationtest.Environment, cli *in
 }
 
 func compileWithSimpleSketch(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	compileWithSimpleSketchCustomEnv(t, env, cli, cli.GetDefaultEnv())
+}
+
+func compileWithCachePurgeNeeded(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// create directories that must be purged
+	baseDir := paths.TempDir().Join("arduino", "sketches")
+
+	// purge case: last used file too old
+	oldDir1 := baseDir.Join("test_old_sketch_1")
+	require.NoError(t, oldDir1.MkdirAll())
+	require.NoError(t, oldDir1.Join(".last-used").WriteFile([]byte{}))
+	require.NoError(t, oldDir1.Join(".last-used").Chtimes(time.Now(), time.Unix(0, 0)))
+	// no purge case: last used file not existing
+	missingFileDir := baseDir.Join("test_sketch_2")
+	require.NoError(t, missingFileDir.MkdirAll())
+
+	defer oldDir1.RemoveAll()
+	defer missingFileDir.RemoveAll()
+
+	customEnv := cli.GetDefaultEnv()
+	customEnv["ARDUINO_BUILD_CACHE_COMPILATIONS_BEFORE_PURGE"] = "1"
+	compileWithSimpleSketchCustomEnv(t, env, cli, customEnv)
+
+	// check that purge has been run
+	require.NoFileExists(t, oldDir1.String())
+	require.DirExists(t, missingFileDir.String())
+}
+
+func compileWithSimpleSketchCustomEnv(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI, customEnv map[string]string) {
 	sketchName := "CompileIntegrationTest"
 	sketchPath := cli.SketchbookDir().Join(sketchName)
 	defer sketchPath.RemoveAll()
@@ -127,7 +159,7 @@ func compileWithSimpleSketch(t *testing.T, env *integrationtest.Environment, cli
 	require.NoError(t, err)
 
 	// Build sketch for arduino:avr:uno with json output
-	stdout, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--format", "json")
+	stdout, _, err = cli.RunWithCustomEnv(customEnv, "compile", "-b", fqbn, sketchPath.String(), "--format", "json")
 	require.NoError(t, err)
 	// check is a valid json and contains requested data
 	var compileOutput map[string]interface{}
@@ -140,7 +172,7 @@ func compileWithSimpleSketch(t *testing.T, env *integrationtest.Environment, cli
 	md5 := md5.Sum(([]byte(sketchPath.String())))
 	sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
 	require.NotEmpty(t, sketchPathMd5)
-	buildDir := paths.TempDir().Join("arduino", "sketch-"+sketchPathMd5)
+	buildDir := paths.TempDir().Join("arduino", "sketches", sketchPathMd5)
 	require.FileExists(t, buildDir.Join(sketchName+".ino.eep").String())
 	require.FileExists(t, buildDir.Join(sketchName+".ino.elf").String())
 	require.FileExists(t, buildDir.Join(sketchName+".ino.hex").String())
@@ -374,7 +406,7 @@ func compileWithOutputDirFlag(t *testing.T, env *integrationtest.Environment, cl
 	md5 := md5.Sum(([]byte(sketchPath.String())))
 	sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
 	require.NotEmpty(t, sketchPathMd5)
-	buildDir := paths.TempDir().Join("arduino", "sketch-"+sketchPathMd5)
+	buildDir := paths.TempDir().Join("arduino", "sketches", sketchPathMd5)
 	require.FileExists(t, buildDir.Join(sketchName+".ino.eep").String())
 	require.FileExists(t, buildDir.Join(sketchName+".ino.elf").String())
 	require.FileExists(t, buildDir.Join(sketchName+".ino.hex").String())
@@ -441,7 +473,7 @@ func compileWithCustomBuildPath(t *testing.T, env *integrationtest.Environment, 
 	md5 := md5.Sum(([]byte(sketchPath.String())))
 	sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
 	require.NotEmpty(t, sketchPathMd5)
-	buildDir := paths.TempDir().Join("arduino", "sketch-"+sketchPathMd5)
+	buildDir := paths.TempDir().Join("arduino", "sketches", sketchPathMd5)
 	require.NoFileExists(t, buildDir.Join(sketchName+".ino.eep").String())
 	require.NoFileExists(t, buildDir.Join(sketchName+".ino.elf").String())
 	require.NoFileExists(t, buildDir.Join(sketchName+".ino.hex").String())
@@ -975,7 +1007,7 @@ func compileWithInvalidBuildOptionJson(t *testing.T, env *integrationtest.Enviro
 	md5 := md5.Sum(([]byte(sketchPath.String())))
 	sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
 	require.NotEmpty(t, sketchPathMd5)
-	buildDir := paths.TempDir().Join("arduino", "sketch-"+sketchPathMd5)
+	buildDir := paths.TempDir().Join("arduino", "sketches", sketchPathMd5)
 
 	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--verbose")
 	require.NoError(t, err)
@@ -1008,18 +1040,41 @@ func compileWithRelativeBuildPath(t *testing.T, env *integrationtest.Environment
 	absoluteBuildPath := cli.SketchbookDir().Join("build_path")
 	builtFiles, err := absoluteBuildPath.ReadDir()
 	require.NoError(t, err)
-	require.Contains(t, builtFiles[8].String(), sketchName+".ino.eep")
-	require.Contains(t, builtFiles[9].String(), sketchName+".ino.elf")
-	require.Contains(t, builtFiles[10].String(), sketchName+".ino.hex")
-	require.Contains(t, builtFiles[11].String(), sketchName+".ino.with_bootloader.bin")
-	require.Contains(t, builtFiles[12].String(), sketchName+".ino.with_bootloader.hex")
-	require.Contains(t, builtFiles[0].String(), "build.options.json")
-	require.Contains(t, builtFiles[1].String(), "compile_commands.json")
-	require.Contains(t, builtFiles[2].String(), "core")
-	require.Contains(t, builtFiles[3].String(), "includes.cache")
-	require.Contains(t, builtFiles[4].String(), "libraries")
-	require.Contains(t, builtFiles[6].String(), "preproc")
-	require.Contains(t, builtFiles[7].String(), "sketch")
+
+	expectedFiles := []string{
+		sketchName + ".ino.eep",
+		sketchName + ".ino.elf",
+		sketchName + ".ino.hex",
+		sketchName + ".ino.with_bootloader.bin",
+		sketchName + ".ino.with_bootloader.hex",
+		"build.options.json",
+		"compile_commands.json",
+		"core",
+		"includes.cache",
+		"libraries",
+		"preproc",
+		"sketch",
+	}
+
+	foundFiles := []string{}
+	for _, builtFile := range builtFiles {
+		if sliceIncludes(expectedFiles, builtFile.Base()) {
+			foundFiles = append(foundFiles, builtFile.Base())
+		}
+	}
+	sort.Strings(expectedFiles)
+	sort.Strings(foundFiles)
+	require.Equal(t, expectedFiles, foundFiles)
+}
+
+// TODO: remove this when a generic library is introduced
+func sliceIncludes[T comparable](slice []T, target T) bool {
+	for _, e := range slice {
+		if e == target {
+			return true
+		}
+	}
+	return false
 }
 
 func compileWithFakeSecureBootCore(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {

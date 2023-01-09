@@ -302,5 +302,10 @@ func GenBuildPath(sketchPath *paths.Path) *paths.Path {
 	}
 	md5SumBytes := md5.Sum([]byte(path))
 	md5Sum := strings.ToUpper(hex.EncodeToString(md5SumBytes[:]))
-	return paths.TempDir().Join("arduino", "sketch-"+md5Sum)
+
+	return getSketchesCacheDir().Join(md5Sum)
+}
+
+func getSketchesCacheDir() *paths.Path {
+	return paths.TempDir().Join("arduino", "sketches").Canonical()
 }
