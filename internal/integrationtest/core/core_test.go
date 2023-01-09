@@ -253,7 +253,7 @@ func TestCoreInstallEsp32(t *testing.T) {
 	md5 := md5.Sum(([]byte(sketchPath.String())))
 	sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
 	require.NotEmpty(t, sketchPathMd5)
-	buildDir := paths.TempDir().Join("arduino/arduino-sketch-" + sketchPathMd5)
+	buildDir := paths.TempDir().Join("arduino", "sketch-"+sketchPathMd5)
 	require.FileExists(t, buildDir.Join(sketchName+".ino.partitions.bin").String())
 }
 

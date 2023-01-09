@@ -697,7 +697,7 @@ func TestUploadSketch(t *testing.T) {
 func generateBuildDir(sketchPath *paths.Path, t *testing.T) *paths.Path {
 	md5 := md5.Sum(([]byte(sketchPath.String())))
 	sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
-	buildDir := paths.TempDir().Join("arduino/arduino-sketch-" + sketchPathMd5)
+	buildDir := paths.TempDir().Join("arduino", "sketch-"+sketchPathMd5)
 	require.NoError(t, buildDir.MkdirAll())
 	require.NoError(t, buildDir.ToAbs())
 	return buildDir
