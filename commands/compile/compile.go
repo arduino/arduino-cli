@@ -143,7 +143,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	// Optimize for debug
 	builderCtx.OptimizeForDebug = req.GetOptimizeForDebug()
 
-	builderCtx.CoreBuildCachePath = paths.TempDir().Join("arduino-core-cache")
+	builderCtx.CoreBuildCachePath = paths.TempDir().Join("arduino", "core-cache")
 
 	builderCtx.Jobs = int(req.GetJobs())
 

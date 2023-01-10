@@ -145,7 +145,7 @@ func recompileWithDifferentLibrary(t *testing.T, env *integrationtest.Environmen
 	md5 := md5.Sum(([]byte(sketchPath.String())))
 	sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
 	require.NotEmpty(t, sketchPathMd5)
-	buildDir := paths.TempDir().Join("arduino-sketch-" + sketchPathMd5)
+	buildDir := paths.TempDir().Join("arduino", "sketch-"+sketchPathMd5)
 
 	// Compile sketch using library not managed by CLI
 	stdout, _, err := cli.Run("compile", "-b", fqbn, "--library", manuallyInstalledLibPath.String(), sketchPath.String(), "-v")
