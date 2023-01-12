@@ -1799,7 +1799,10 @@ cause the Arduino IDE to no longer load until you have deleted the file from you
 versions of the <code>PACKAGE</code>, 1.0.0 and 1.0.1. No <code>TOOLS</code> needed to be installed so that section was left empty.</p>
 <p>Here is the Boards Manager entry created by the example: <img alt="Boards Manager screenshot" src="../img/boards-manager-screenshot.png" /></p>
 <h2 id="installation-archive-structure">Installation archive structure<a class="headerlink" href="#installation-archive-structure" title="Permanent link">&para;</a></h2>
-<p>The installation archives contain the Board support files. Supported formats are .zip, .tar.bz2, and .tar.gz.</p>
+<p>The installation archives contain the Board support files.</p>
+<p>Supported formats are <code>.zip</code>, <code>.tar.bz2</code>, and <code>.tar.gz</code>. Starting from Arduino CLI &gt;=0.30.0 support for <code>.tar.xz</code>, and
+<code>.tar.zst</code> has been added, by the way, if you want to keep compatiblity with older versions of Arduino IDE and Arduino
+CLI we recommend using one of the older formats.</p>
 <p>The folder structure of the core archive is slightly different from the standard manually installed Arduino IDE 1.5+
 compatible hardware folder structure. You must remove the architecture folder(e.g., <code>avr</code> or <code>arm</code>), moving all the
 files and folders within the architecture folder up a level.</p>
