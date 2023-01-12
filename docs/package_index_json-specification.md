@@ -350,7 +350,11 @@ Here is the Boards Manager entry created by the example: ![Boards Manager screen
 
 ## Installation archive structure
 
-The installation archives contain the Board support files. Supported formats are .zip, .tar.bz2, and .tar.gz.
+The installation archives contain the Board support files.
+
+Supported formats are `.zip`, `.tar.bz2`, and `.tar.gz`. Starting from Arduino CLI >=0.30.0 support for `.tar.xz`, and
+`.tar.zst` has been added, by the way, if you want to keep compatiblity with older versions of Arduino IDE and Arduino
+CLI we recommend using one of the older formats.
 
 The folder structure of the core archive is slightly different from the standard manually installed Arduino IDE 1.5+
 compatible hardware folder structure. You must remove the architecture folder(e.g., `avr` or `arm`), moving all the
