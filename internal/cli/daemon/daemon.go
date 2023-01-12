@@ -89,12 +89,11 @@ func runDaemonCommand(cmd *cobra.Command, args []string) {
 			defer f.Close()
 			debugStdOut = f
 		} else {
-			// Attach to os.Stdout only if we are in Text mode
-			if feedback.GetFormat() != feedback.Text {
-				feedback.Fatal(tr("Debug log is only available in text format"), feedback.ErrBadArgument)
+			if out, _, err := feedback.DirectStreams(); err != nil {
+				feedback.Fatal(tr("Can't write debug log: %s", err), feedback.ErrBadArgument)
+			} else {
+				debugStdOut = out
 			}
-			out, _, _ := feedback.OutputStreams()
-			debugStdOut = out
 		}
 		gRPCOptions = append(gRPCOptions,
 			grpc.UnaryInterceptor(unaryLoggerInterceptor),

@@ -16,17 +16,39 @@
 package feedback
 
 import (
+	"errors"
 	"io"
 )
 
-// OutputStreams returns the underlying io.Writer to directly stream to
+// DirectStreams returns the underlying io.Writer to directly stream to
 // stdout and stderr.
-// If the selected output format is not Text, the returned writers will
-// accumulate the output until command execution is completed.
+// If the selected output format is not Text, the function will error.
+//
+// Using the streams returned by this function allows direct control of
+// the output and the PrintResult function must not be used anymore
+func DirectStreams() (io.Writer, io.Writer, error) {
+	if !formatSelected {
+		panic("output format not yet selected")
+	}
+	if format != Text {
+		return nil, nil, errors.New(tr("available only in text format"))
+	}
+	return stdOut, stdErr, nil
+}
+
+// OutputStreams returns a pair of io.Writer to write the command output.
+// The returned writers will accumulate the output until the command
+// execution is completed, so they are not suitable for printing an unbounded
+// stream like a debug logger or an event watcher (use DirectStreams for
+// that purpose).
+//
+// If the output format is Text the output will be directly streamed to the
+// underlying stdio streams in real time.
+//
 // This function returns also a callback that must be called when the
-// command execution is completed, it will return a *OutputStreamsResult
-// object that can be used as a Result or to retrieve the output to embed
-// it in another object.
+// command execution is completed, it will return an *OutputStreamsResult
+// object that can be used as a Result or to retrieve the accumulated output
+// to embed it in another object.
 func OutputStreams() (io.Writer, io.Writer, func() *OutputStreamsResult) {
 	if !formatSelected {
 		panic("output format not yet selected")
