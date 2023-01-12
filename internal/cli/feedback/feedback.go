@@ -129,8 +129,8 @@ func SetFormat(f OutputFormat) {
 	formatSelected = true
 
 	if format == Text {
-		feedbackOut = stdOut
-		feedbackErr = stdErr
+		feedbackOut = io.MultiWriter(bufferOut, stdOut)
+		feedbackErr = io.MultiWriter(bufferErr, stdErr)
 	} else {
 		feedbackOut = bufferOut
 		feedbackErr = bufferErr
