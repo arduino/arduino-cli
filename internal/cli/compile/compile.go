@@ -367,7 +367,10 @@ func (r *compileResult) String() string {
 	pathColor := color.New(color.FgHiBlack)
 	build := r.BuilderResult
 
-	res := "\n"
+	res := ""
+	if r.CompilerOut != "" || r.CompilerErr != "" {
+		res += fmt.Sprintln()
+	}
 	if len(build.GetUsedLibraries()) > 0 {
 		libraries := table.New()
 		libraries.SetHeader(
