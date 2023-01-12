@@ -144,9 +144,6 @@ func NewCommand() *cobra.Command {
 func runCompileCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli compile`")
 
-	if dumpProfile && feedback.GetFormat() != feedback.Text {
-		feedback.Fatal(tr("You cannot use the %[1]s flag together with %[2]s.", "--dump-profile", "--format json"), feedback.ErrBadArgument)
-	}
 	if profileArg.Get() != "" {
 		if len(libraries) > 0 {
 			feedback.Fatal(tr("You cannot use the %s flag while compiling with a profile.", "--libraries"), feedback.ErrBadArgument)
@@ -255,7 +252,10 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	if dumpProfile {
+	profileOut := ""
+	if dumpProfile && compileError == nil {
+		// Output profile
+
 		libs := ""
 		hasVendoredLibs := false
 		for _, lib := range compileRes.GetUsedLibraries() {
@@ -279,36 +279,29 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		if split := strings.Split(compileRequest.GetFqbn(), ":"); len(split) > 2 {
 			newProfileName = split[2]
 		}
-		profile := fmt.Sprintln()
-		profile += fmt.Sprintln("profiles:")
-		profile += fmt.Sprintln("  " + newProfileName + ":")
-		profile += fmt.Sprintln("    fqbn: " + compileRequest.GetFqbn())
-		profile += fmt.Sprintln("    platforms:")
+		profileOut = fmt.Sprintln("profiles:")
+		profileOut += fmt.Sprintln("  " + newProfileName + ":")
+		profileOut += fmt.Sprintln("    fqbn: " + compileRequest.GetFqbn())
+		profileOut += fmt.Sprintln("    platforms:")
 		boardPlatform := compileRes.GetBoardPlatform()
-		profile += fmt.Sprintln("      - platform: " + boardPlatform.GetId() + " (" + boardPlatform.GetVersion() + ")")
+		profileOut += fmt.Sprintln("      - platform: " + boardPlatform.GetId() + " (" + boardPlatform.GetVersion() + ")")
 		if url := boardPlatform.GetPackageUrl(); url != "" {
-			profile += fmt.Sprintln("        platform_index_url: " + url)
+			profileOut += fmt.Sprintln("        platform_index_url: " + url)
 		}
 
 		if buildPlatform := compileRes.GetBuildPlatform(); buildPlatform != nil &&
 			buildPlatform.Id != boardPlatform.Id &&
 			buildPlatform.Version != boardPlatform.Version {
-			profile += fmt.Sprintln("      - platform: " + buildPlatform.GetId() + " (" + buildPlatform.GetVersion() + ")")
+			profileOut += fmt.Sprintln("      - platform: " + buildPlatform.GetId() + " (" + buildPlatform.GetVersion() + ")")
 			if url := buildPlatform.GetPackageUrl(); url != "" {
-				profile += fmt.Sprintln("        platform_index_url: " + url)
+				profileOut += fmt.Sprintln("        platform_index_url: " + url)
 			}
 		}
 		if len(libs) > 0 {
-			profile += fmt.Sprintln("    libraries:")
-			profile += fmt.Sprint(libs)
+			profileOut += fmt.Sprintln("    libraries:")
+			profileOut += fmt.Sprint(libs)
 		}
-
-		// Output profile as a result
-		if _, err := stdOut.Write([]byte(profile)); err != nil {
-			feedback.FatalError(err, feedback.ErrGeneric)
-		}
-		feedback.PrintResult(stdIORes())
-		return
+		profileOut += fmt.Sprintln()
 	}
 
 	stdIO := stdIORes()
@@ -316,6 +309,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		CompilerOut:   stdIO.Stdout,
 		CompilerErr:   stdIO.Stderr,
 		BuilderResult: compileRes,
+		ProfileOut:    profileOut,
 		Success:       compileError == nil,
 	})
 	if compileError != nil {
@@ -357,6 +351,7 @@ type compileResult struct {
 	CompilerErr   string               `json:"compiler_err"`
 	BuilderResult *rpc.CompileResponse `json:"builder_result"`
 	Success       bool                 `json:"success"`
+	ProfileOut    string               `json:"profile_out,omitempty"`
 }
 
 func (r *compileResult) Data() interface{} {
@@ -404,6 +399,9 @@ func (r *compileResult) String() string {
 				table.NewCell(buildPlatform.GetInstallDir(), pathColor))
 		}
 		res += platforms.Render()
+	}
+	if r.ProfileOut != "" {
+		res += "\n" + fmt.Sprintln(r.ProfileOut)
 	}
 	return res
 }
