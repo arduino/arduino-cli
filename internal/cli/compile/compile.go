@@ -305,15 +305,16 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	}
 
 	stdIO := stdIORes()
-	feedback.PrintResult(&compileResult{
+	res := &compileResult{
 		CompilerOut:   stdIO.Stdout,
 		CompilerErr:   stdIO.Stderr,
 		BuilderResult: compileRes,
 		ProfileOut:    profileOut,
 		Success:       compileError == nil,
-	})
+	}
+
 	if compileError != nil {
-		msg := tr("Error during build: %v", compileError)
+		res.Error = tr("Error during build: %v", compileError)
 
 		// Check the error type to give the user better feedback on how
 		// to resolve it
@@ -333,17 +334,18 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			release()
 
 			if profileArg.String() == "" {
-				msg += "\n"
+				res.Error += fmt.Sprintln()
 				if platform != nil {
 					suggestion := fmt.Sprintf("`%s core install %s`", version.VersionInfo.Application, platformErr.Platform)
-					msg += tr("Try running %s", suggestion)
+					res.Error += tr("Try running %s", suggestion)
 				} else {
-					msg += tr("Platform %s is not found in any known index\nMaybe you need to add a 3rd party URL?", platformErr.Platform)
+					res.Error += tr("Platform %s is not found in any known index\nMaybe you need to add a 3rd party URL?", platformErr.Platform)
 				}
 			}
 		}
-		feedback.Fatal(msg, feedback.ErrGeneric)
+		feedback.FatalResult(res, feedback.ErrGeneric)
 	}
+	feedback.PrintResult(res)
 }
 
 type compileResult struct {
@@ -352,6 +354,7 @@ type compileResult struct {
 	BuilderResult *rpc.CompileResponse `json:"builder_result"`
 	Success       bool                 `json:"success"`
 	ProfileOut    string               `json:"profile_out,omitempty"`
+	Error         string               `json:"error,omitempty"`
 }
 
 func (r *compileResult) Data() interface{} {
@@ -365,8 +368,8 @@ func (r *compileResult) String() string {
 	build := r.BuilderResult
 
 	res := "\n"
-	libraries := table.New()
 	if len(build.GetUsedLibraries()) > 0 {
+		libraries := table.New()
 		libraries.SetHeader(
 			table.NewCell(tr("Used library"), titleColor),
 			table.NewCell(tr("Version"), titleColor),
@@ -377,8 +380,8 @@ func (r *compileResult) String() string {
 				l.GetVersion(),
 				table.NewCell(l.GetInstallDir(), pathColor))
 		}
+		res += fmt.Sprintln(libraries.Render())
 	}
-	res += libraries.Render() + "\n"
 
 	if boardPlatform := build.GetBoardPlatform(); boardPlatform != nil {
 		platforms := table.New()
@@ -398,10 +401,10 @@ func (r *compileResult) String() string {
 				buildPlatform.GetVersion(),
 				table.NewCell(buildPlatform.GetInstallDir(), pathColor))
 		}
-		res += platforms.Render()
+		res += fmt.Sprintln(platforms.Render())
 	}
 	if r.ProfileOut != "" {
-		res += "\n" + fmt.Sprintln(r.ProfileOut)
+		res += fmt.Sprintln(r.ProfileOut)
 	}
-	return res
+	return strings.TrimRight(res, fmt.Sprintln())
 }

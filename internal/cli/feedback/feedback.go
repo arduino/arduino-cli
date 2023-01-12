@@ -168,6 +168,12 @@ func FatalError(err error, exitCode ExitCode) {
 	Fatal(err.Error(), exitCode)
 }
 
+// FatalResult outputs the result and exits with status exitCode.
+func FatalResult(res Result, exitCode ExitCode) {
+	PrintResult(res)
+	os.Exit(int(exitCode))
+}
+
 // Fatal outputs the errorMsg and exits with status exitCode.
 func Fatal(errorMsg string, exitCode ExitCode) {
 	if format == Text {
