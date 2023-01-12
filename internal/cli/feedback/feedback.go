@@ -179,7 +179,7 @@ func Fatal(errorMsg string, exitCode ExitCode) {
 		Error  string               `json:"error"`
 		Output *OutputStreamsResult `json:"output,omitempty"`
 	}
-	res := FatalError{
+	res := &FatalError{
 		Error: errorMsg,
 	}
 	if output := getOutputStreamResult(); !output.Empty() {
@@ -188,11 +188,11 @@ func Fatal(errorMsg string, exitCode ExitCode) {
 	var d []byte
 	switch format {
 	case JSON:
-		d, _ = json.MarshalIndent(res, "", "  ")
+		d, _ = json.MarshalIndent(augment(res), "", "  ")
 	case MinifiedJSON:
-		d, _ = json.Marshal(res)
+		d, _ = json.Marshal(augment(res))
 	case YAML:
-		d, _ = yaml.Marshal(res)
+		d, _ = yaml.Marshal(augment(res))
 	default:
 		panic("unknown output format")
 	}
