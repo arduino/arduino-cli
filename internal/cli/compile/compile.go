@@ -411,3 +411,7 @@ func (r *compileResult) String() string {
 	}
 	return strings.TrimRight(res, fmt.Sprintln())
 }
+
+func (r *compileResult) ErrorString() string {
+	return r.Error
+}

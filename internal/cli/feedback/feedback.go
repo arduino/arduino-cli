@@ -102,6 +102,13 @@ type Result interface {
 	Data() interface{}
 }
 
+// ErrorResult is a result embedding also an error. In case of textual output
+// the error will be printed on stderr.
+type ErrorResult interface {
+	Result
+	ErrorString() string
+}
+
 var tr = i18n.Tr
 
 // SetOut can be used to change the out writer at runtime
@@ -169,7 +176,7 @@ func FatalError(err error, exitCode ExitCode) {
 }
 
 // FatalResult outputs the result and exits with status exitCode.
-func FatalResult(res Result, exitCode ExitCode) {
+func FatalResult(res ErrorResult, exitCode ExitCode) {
 	PrintResult(res)
 	os.Exit(int(exitCode))
 }
@@ -229,6 +236,7 @@ func augment(data interface{}) interface{} {
 // structure.
 func PrintResult(res Result) {
 	var data string
+	var dataErr string
 	switch format {
 	case JSON:
 		d, err := json.MarshalIndent(augment(res.Data()), "", "  ")
@@ -250,10 +258,16 @@ func PrintResult(res Result) {
 		data = string(d)
 	case Text:
 		data = res.String()
+		if resErr, ok := res.(ErrorResult); ok {
+			dataErr = resErr.ErrorString()
+		}
 	default:
 		panic("unknown output format")
 	}
 	if data != "" {
 		fmt.Fprintln(stdOut, data)
+	}
+	if dataErr != "" {
+		fmt.Fprintln(stdErr, dataErr)
 	}
 }
