@@ -1480,3 +1480,43 @@ func TestInstallWithGitUrlLocalFileUri(t *testing.T) {
 	// Verifies library is installed
 	require.DirExists(t, libInstallDir.String())
 }
+
+func TestLibQueryParameters(t *testing.T) {
+	// This test should not use shared download directory because it needs to download the libraries from scratch
+	env := integrationtest.NewEnvironment(t)
+	cli := integrationtest.NewArduinoCliWithinEnvironment(env, &integrationtest.ArduinoCLIConfig{
+		ArduinoCLIPath: integrationtest.FindArduinoCLIPath(t),
+	})
+	defer env.CleanUp()
+
+	// Updates index for cores and libraries
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "update-index")
+	require.NoError(t, err)
+
+	// Check query=install when a library is installed
+	stdout, _, err := cli.Run("lib", "install", "USBHost@1.0.0", "-v", "--log-level", "debug")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout),
+		"Starting download                             \x1b[36murl\x1b[0m=\"https://downloads.arduino.cc/libraries/github.com/arduino-libraries/USBHost-1.0.0.zip?query=install\"\n")
+
+	// Check query=upgrade when a library is upgraded
+	stdout, _, err = cli.Run("lib", "upgrade", "USBHost", "-v", "--log-level", "debug")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout),
+		"Starting download                             \x1b[36murl\x1b[0m=\"https://downloads.arduino.cc/libraries/github.com/arduino-libraries/USBHost-1.0.5.zip?query=upgrade\"\n")
+
+	// Check query=depends when a library dependency is installed
+	stdout, _, err = cli.Run("lib", "install", "MD_Parola@3.5.5", "-v", "--log-level", "debug")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout),
+		"Starting download                             \x1b[36murl\x1b[0m=\"https://downloads.arduino.cc/libraries/github.com/MajicDesigns/MD_MAX72XX-3.3.1.zip?query=depends\"\n")
+
+	// Check query=download when a library is downloaded
+	stdout, _, err = cli.Run("lib", "download", "WiFi101@0.16.1", "-v", "--log-level", "debug")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout),
+		"Starting download                             \x1b[36murl\x1b[0m=\"https://downloads.arduino.cc/libraries/github.com/arduino-libraries/WiFi101-0.16.1.zip?query=download\"\n")
+
+}
