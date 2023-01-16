@@ -21,8 +21,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/arduino/arduino-cli/cli/feedback"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-win32-utils"
 	"github.com/spf13/cobra"
@@ -65,7 +65,7 @@ func Init(configFile string) *viper.Viper {
 		// ConfigFileNotFoundError is acceptable, anything else
 		// should be reported to the user
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			feedback.Errorf(tr("Error reading config file: %v"), err)
+			feedback.Warning(tr("Error reading config file: %v", err))
 		}
 	}
 
@@ -85,7 +85,7 @@ func BindFlags(cmd *cobra.Command, settings *viper.Viper) {
 func getDefaultArduinoDataDir() string {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
-		feedback.Errorf(tr("Unable to get user home dir: %v"), err)
+		feedback.Warning(tr("Unable to get user home dir: %v", err))
 		return "."
 	}
 
@@ -97,7 +97,7 @@ func getDefaultArduinoDataDir() string {
 	case "windows":
 		localAppDataPath, err := win32.GetLocalAppDataFolder()
 		if err != nil {
-			feedback.Errorf(tr("Unable to get Local App Data Folder: %v"), err)
+			feedback.Warning(tr("Unable to get Local App Data Folder: %v", err))
 			return "."
 		}
 		return filepath.Join(localAppDataPath, "Arduino15")
@@ -110,7 +110,7 @@ func getDefaultArduinoDataDir() string {
 func getDefaultUserDir() string {
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
-		feedback.Errorf(tr("Unable to get user home dir: %v"), err)
+		feedback.Warning(tr("Unable to get user home dir: %v", err))
 		return "."
 	}
 
@@ -122,7 +122,7 @@ func getDefaultUserDir() string {
 	case "windows":
 		documentsPath, err := win32.GetDocumentsFolder()
 		if err != nil {
-			feedback.Errorf(tr("Unable to get Documents Folder: %v"), err)
+			feedback.Warning(tr("Unable to get Documents Folder: %v", err))
 			return "."
 		}
 		return filepath.Join(documentsPath, "Arduino")

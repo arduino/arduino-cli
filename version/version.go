@@ -16,8 +16,14 @@
 package version
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/arduino/arduino-cli/i18n"
 )
+
+// VersionInfo contains all info injected during build
+var VersionInfo *Info
 
 var (
 	defaultVersionString = "0.0.0-git"
@@ -53,9 +59,16 @@ func (i *Info) String() string {
 	return tr("%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s", i.Application, i.Status, i.VersionString, i.Commit, i.Date)
 }
 
+// Data implements feedback.Result interface
+func (i *Info) Data() interface{} {
+	return i
+}
+
 //nolint:gochecknoinits
 func init() {
 	if versionString == "" {
 		versionString = defaultVersionString
 	}
+
+	VersionInfo = NewInfo(filepath.Base(os.Args[0]))
 }

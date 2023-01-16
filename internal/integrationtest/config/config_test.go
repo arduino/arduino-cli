@@ -177,7 +177,7 @@ func TestInitDestAndConfigFileFlags(t *testing.T) {
 
 	_, stderr, err := cli.Run("config", "init", "--dest-file", "some_other_path", "--dest-dir", "some_path")
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "Can't use --dest-file and --dest-dir flags at the same time.")
+	require.Contains(t, string(stderr), "Can't use the following flags together: --dest-file, --dest-dir")
 }
 
 func TestInitConfigFileFlagAbsolutePath(t *testing.T) {

@@ -34,10 +34,10 @@ import (
 	"github.com/arduino/arduino-cli/arduino/resources"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/arduino/utils"
-	cliglobals "github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/arduino-cli/version"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -168,7 +168,7 @@ func Create(req *rpc.CreateRequest, extraUserAgent ...string) (*rpc.CreateRespon
 	}
 
 	// Create package manager
-	userAgent := "arduino-cli/" + cliglobals.VersionInfo.VersionString
+	userAgent := "arduino-cli/" + version.VersionInfo.VersionString
 	for _, ua := range extraUserAgent {
 		userAgent += " " + ua
 	}

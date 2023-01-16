@@ -21,7 +21,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/arduino/arduino-cli/cli/globals"
+	"github.com/arduino/arduino-cli/version"
 	"github.com/spf13/viper"
 )
 
@@ -41,11 +41,11 @@ func UserAgent(settings *viper.Viper) string {
 	}
 
 	return fmt.Sprintf("%s/%s%s (%s; %s; %s) Commit:%s%s",
-		globals.VersionInfo.Application,
-		globals.VersionInfo.VersionString,
+		version.VersionInfo.Application,
+		version.VersionInfo.VersionString,
 		subComponent,
 		runtime.GOARCH, runtime.GOOS, runtime.Version(),
-		globals.VersionInfo.Commit,
+		version.VersionInfo.Commit,
 		extendedUA)
 }
 

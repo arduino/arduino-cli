@@ -209,8 +209,7 @@ func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.Ardu
 	errStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.CompileResponse{ErrStream: data}) })
 	compileResp, compileErr := compile.Compile(
 		stream.Context(), req, outStream, errStream,
-		func(p *rpc.TaskProgress) { stream.Send(&rpc.CompileResponse{Progress: p}) },
-		false) // Set debug to false
+		func(p *rpc.TaskProgress) { stream.Send(&rpc.CompileResponse{Progress: p}) })
 	outStream.Close()
 	errStream.Close()
 	var compileRespSendErr error
@@ -292,26 +291,26 @@ func (s *ArduinoCoreServerImpl) PlatformList(ctx context.Context, req *rpc.Platf
 func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.ArduinoCoreService_UploadServer) error {
 	outStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.UploadResponse{OutStream: data}) })
 	errStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.UploadResponse{ErrStream: data}) })
-	resp, err := upload.Upload(stream.Context(), req, outStream, errStream)
+	err := upload.Upload(stream.Context(), req, outStream, errStream)
 	outStream.Close()
 	errStream.Close()
 	if err != nil {
 		return convertErrorToRPCStatus(err)
 	}
-	return stream.Send(resp)
+	return nil
 }
 
 // UploadUsingProgrammer FIXMEDOC
 func (s *ArduinoCoreServerImpl) UploadUsingProgrammer(req *rpc.UploadUsingProgrammerRequest, stream rpc.ArduinoCoreService_UploadUsingProgrammerServer) error {
 	outStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.UploadUsingProgrammerResponse{OutStream: data}) })
 	errStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.UploadUsingProgrammerResponse{ErrStream: data}) })
-	resp, err := upload.UsingProgrammer(stream.Context(), req, outStream, errStream)
+	err := upload.UsingProgrammer(stream.Context(), req, outStream, errStream)
 	outStream.Close()
 	errStream.Close()
 	if err != nil {
 		return convertErrorToRPCStatus(err)
 	}
-	return stream.Send(resp)
+	return nil
 }
 
 // SupportedUserFields FIXMEDOC

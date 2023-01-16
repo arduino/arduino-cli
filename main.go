@@ -18,10 +18,10 @@ package main
 import (
 	"os"
 
-	"github.com/arduino/arduino-cli/cli"
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/internal/cli"
+	"github.com/arduino/arduino-cli/internal/cli/feedback"
 )
 
 func main() {
@@ -29,6 +29,6 @@ func main() {
 	i18n.Init(configuration.Settings.GetString("locale"))
 	arduinoCmd := cli.NewCommand()
 	if err := arduinoCmd.Execute(); err != nil {
-		os.Exit(errorcodes.ErrGeneric)
+		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 }

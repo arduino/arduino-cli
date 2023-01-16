@@ -23,10 +23,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/arduino/arduino-cli/cli/globals"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/arduino-cli/version"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -301,7 +301,7 @@ func (disc *PluggableDiscovery) Run() (err error) {
 		}
 	}()
 
-	if err = disc.sendCommand("HELLO 1 \"arduino-cli " + globals.VersionInfo.VersionString + "\"\n"); err != nil {
+	if err = disc.sendCommand("HELLO 1 \"arduino-cli " + version.VersionInfo.VersionString + "\"\n"); err != nil {
 		return err
 	}
 	if msg, err := disc.waitMessage(time.Second * 10); err != nil {

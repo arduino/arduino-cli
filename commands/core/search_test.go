@@ -19,8 +19,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/arduino/arduino-cli/cli/instance"
 	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"

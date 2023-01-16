@@ -123,7 +123,7 @@ func getUserFields(toolID string, platformRelease *cores.PlatformRelease) []*rpc
 }
 
 // Upload FIXMEDOC
-func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, errStream io.Writer) (*rpc.UploadResponse, error) {
+func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, errStream io.Writer) error {
 	logrus.Tracef("Upload %s on %s started", req.GetSketchPath(), req.GetFqbn())
 
 	// TODO: make a generic function to extract sketch from request
@@ -131,12 +131,12 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 	sketchPath := paths.New(req.GetSketchPath())
 	sk, err := sketch.New(sketchPath)
 	if err != nil && req.GetImportDir() == "" && req.GetImportFile() == "" {
-		return nil, &arduino.CantOpenSketchError{Cause: err}
+		return &arduino.CantOpenSketchError{Cause: err}
 	}
 
 	pme, release := commands.GetPackageManagerExplorer(req)
 	if pme == nil {
-		return nil, &arduino.InvalidInstanceError{}
+		return &arduino.InvalidInstanceError{}
 	}
 	defer release()
 
@@ -156,20 +156,20 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		req.GetDryRun(),
 		req.GetUserFields(),
 	); err != nil {
-		return nil, err
+		return err
 	}
 
-	return &rpc.UploadResponse{}, nil
+	return nil
 }
 
 // UsingProgrammer FIXMEDOC
-func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest, outStream io.Writer, errStream io.Writer) (*rpc.UploadUsingProgrammerResponse, error) {
+func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest, outStream io.Writer, errStream io.Writer) error {
 	logrus.Tracef("Upload using programmer %s on %s started", req.GetSketchPath(), req.GetFqbn())
 
 	if req.GetProgrammer() == "" {
-		return nil, &arduino.MissingProgrammerError{}
+		return &arduino.MissingProgrammerError{}
 	}
-	_, err := Upload(ctx, &rpc.UploadRequest{
+	err := Upload(ctx, &rpc.UploadRequest{
 		Instance:   req.GetInstance(),
 		SketchPath: req.GetSketchPath(),
 		ImportFile: req.GetImportFile(),
@@ -181,7 +181,7 @@ func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest,
 		Verify:     req.GetVerify(),
 		UserFields: req.GetUserFields(),
 	}, outStream, errStream)
-	return &rpc.UploadUsingProgrammerResponse{}, err
+	return err
 }
 
 func runProgramAction(pme *packagemanager.Explorer,

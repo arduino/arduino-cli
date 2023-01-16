@@ -39,7 +39,7 @@ import (
 var tr = i18n.Tr
 
 // Compile FIXMEDOC
-func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream io.Writer, progressCB rpc.TaskProgressCB, debug bool) (r *rpc.CompileResponse, e error) {
+func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream io.Writer, progressCB rpc.TaskProgressCB) (r *rpc.CompileResponse, e error) {
 
 	// There is a binding between the export binaries setting and the CLI flag to explicitly set it,
 	// since we want this binding to work also for the gRPC interface we must read it here in this
