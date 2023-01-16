@@ -299,6 +299,27 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#golang-api-methods-in-githubcomarduinoarduino-clicommandsupload-changed-return-type" class="md-nav__link">
+    golang API: methods in github.com/arduino/arduino-cli/commands/upload changed return type
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#golang-api-methods-in-githubcomarduinoarduino-clicommandscompile-changed-signature" class="md-nav__link">
+    golang API: methods in github.com/arduino/arduino-cli/commands/compile changed signature
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#golang-api-package-githubcomarduinoarduino-clicli-is-no-more-public" class="md-nav__link">
+    golang API: package github.com/arduino/arduino-cli/cli is no more public
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#golang-api-change-in-githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanager" class="md-nav__link">
     golang API change in github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager
   </a>
@@ -2132,6 +2153,27 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#golang-api-methods-in-githubcomarduinoarduino-clicommandsupload-changed-return-type" class="md-nav__link">
+    golang API: methods in github.com/arduino/arduino-cli/commands/upload changed return type
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#golang-api-methods-in-githubcomarduinoarduino-clicommandscompile-changed-signature" class="md-nav__link">
+    golang API: methods in github.com/arduino/arduino-cli/commands/compile changed signature
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#golang-api-package-githubcomarduinoarduino-clicli-is-no-more-public" class="md-nav__link">
+    golang API: package github.com/arduino/arduino-cli/cli is no more public
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#golang-api-change-in-githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanager" class="md-nav__link">
     golang API change in github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager
   </a>
@@ -2894,6 +2936,25 @@ saves it in the <code>sketch.yaml</code> file, without any validity check or boa
 <h3 id="ccarduinoclicommandsv1boardattach-grpc-interface-command-removal"><code>cc.arduino.cli.commands.v1.BoardAttach</code> gRPC interface command removal<a class="headerlink" href="#ccarduinoclicommandsv1boardattach-grpc-interface-command-removal" title="Permanent link">&para;</a></h3>
 <p>The <code>cc.arduino.cli.commands.v1.BoardAttach</code> gRPC command has been removed. This feature is no longer available through
 gRPC.</p>
+<h3 id="golang-api-methods-in-githubcomarduinoarduino-clicommandsupload-changed-return-type">golang API: methods in <code>github.com/arduino/arduino-cli/commands/upload</code> changed return type<a class="headerlink" href="#golang-api-methods-in-githubcomarduinoarduino-clicommandsupload-changed-return-type" title="Permanent link">&para;</a></h3>
+<p>The following methods in <code>github.com/arduino/arduino-cli/commands/upload</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">Upload</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UploadRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">outStream</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="p">,</span><span class="w"> </span><span class="nx">errStream</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UploadResponse</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="nx">UsingProgrammer</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UploadUsingProgrammerRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">outStream</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="p">,</span><span class="w"> </span><span class="nx">errStream</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UploadUsingProgrammerResponse</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>do not return anymore the response (because it's always empty):</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">Upload</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UploadRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">outStream</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="p">,</span><span class="w"> </span><span class="nx">errStream</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="nx">UsingProgrammer</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UploadUsingProgrammerRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">outStream</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="p">,</span><span class="w"> </span><span class="nx">errStream</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<h3 id="golang-api-methods-in-githubcomarduinoarduino-clicommandscompile-changed-signature">golang API: methods in <code>github.com/arduino/arduino-cli/commands/compile</code> changed signature<a class="headerlink" href="#golang-api-methods-in-githubcomarduinoarduino-clicommandscompile-changed-signature" title="Permanent link">&para;</a></h3>
+<p>The following method in <code>github.com/arduino/arduino-cli/commands/compile</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">Compile</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">CompileRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">outStream</span><span class="p">,</span><span class="w"> </span><span class="nx">errStream</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="p">,</span><span class="w"> </span><span class="nx">progressCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">TaskProgressCB</span><span class="p">,</span><span class="w"> </span><span class="nx">debug</span><span class="w"> </span><span class="kt">bool</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nx">r</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">CompileResponse</span><span class="p">,</span><span class="w"> </span><span class="nx">e</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>do not require the <code>debug</code> parameter anymore:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">Compile</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">CompileRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">outStream</span><span class="p">,</span><span class="w"> </span><span class="nx">errStream</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="p">,</span><span class="w"> </span><span class="nx">progressCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">TaskProgressCB</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nx">r</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">CompileResponse</span><span class="p">,</span><span class="w"> </span><span class="nx">e</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<h3 id="golang-api-package-githubcomarduinoarduino-clicli-is-no-more-public">golang API: package <code>github.com/arduino/arduino-cli/cli</code> is no more public<a class="headerlink" href="#golang-api-package-githubcomarduinoarduino-clicli-is-no-more-public" title="Permanent link">&para;</a></h3>
+<p>The package <code>cli</code> has been made internal. The code in this package is no more public API and can not be directly
+imported in other projects.</p>
 <h3 id="golang-api-change-in-githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanager">golang API change in <code>github.com/arduino/arduino-cli/arduino/libraries/librariesmanager.LibrariesManager</code><a class="headerlink" href="#golang-api-change-in-githubcomarduinoarduino-cliarduinolibrarieslibrariesmanagerlibrariesmanager" title="Permanent link">&para;</a></h3>
 <p>The following <code>LibrariesManager.InstallPrerequisiteCheck</code> methods have changed prototype, from:</p>
 <div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">lm</span><span class="w"> </span><span class="o">*</span><span class="nx">LibrariesManager</span><span class="p">)</span><span class="w"> </span><span class="nx">InstallPrerequisiteCheck</span><span class="p">(</span><span class="nx">indexLibrary</span><span class="w"> </span><span class="o">*</span><span class="nx">librariesindex</span><span class="p">.</span><span class="nx">Release</span><span class="p">,</span><span class="w"> </span><span class="nx">installLocation</span><span class="w"> </span><span class="nx">libraries</span><span class="p">.</span><span class="nx">LibraryLocation</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="nx">libraries</span><span class="p">.</span><span class="nx">Library</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
