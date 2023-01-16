@@ -73,7 +73,7 @@ func upgrade(instance *rpc.Instance, libs []*installedLib, downloadCB rpc.Downlo
 			NoDeps:      false,
 			NoOverwrite: false,
 		}
-		err := LibraryInstall(context.Background(), libInstallReq, downloadCB, taskCB)
+		err := LibraryInstall(context.Background(), libInstallReq, downloadCB, taskCB, "upgrade")
 		if err != nil {
 			return err
 		}

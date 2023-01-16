@@ -55,7 +55,7 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadP
 	// Download index file
 	indexFileName := path.Base(res.URL.Path) // == package_index.json[.gz]
 	tmpIndexPath := tmp.Join(indexFileName)
-	if err := httpclient.DownloadFile(tmpIndexPath, res.URL.String(), tr("Downloading index: %s", indexFileName), downloadCB, nil, downloader.NoResume); err != nil {
+	if err := httpclient.DownloadFile(tmpIndexPath, res.URL.String(), "", tr("Downloading index: %s", indexFileName), downloadCB, nil, downloader.NoResume); err != nil {
 		return &arduino.FailedDownloadError{Message: tr("Error downloading index '%s'", res.URL), Cause: err}
 	}
 
@@ -112,7 +112,7 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadP
 		// Download signature
 		signaturePath = destDir.Join(signatureFileName)
 		tmpSignaturePath = tmp.Join(signatureFileName)
-		if err := httpclient.DownloadFile(tmpSignaturePath, res.SignatureURL.String(), tr("Downloading index signature: %s", signatureFileName), downloadCB, nil, downloader.NoResume); err != nil {
+		if err := httpclient.DownloadFile(tmpSignaturePath, res.SignatureURL.String(), "", tr("Downloading index signature: %s", signatureFileName), downloadCB, nil, downloader.NoResume); err != nil {
 			return &arduino.FailedDownloadError{Message: tr("Error downloading index signature '%s'", res.SignatureURL), Cause: err}
 		}
 

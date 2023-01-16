@@ -60,7 +60,7 @@ func runDownloadCommand(cmd *cobra.Command, args []string) {
 			Name:     library.Name,
 			Version:  library.Version,
 		}
-		_, err := lib.LibraryDownload(context.Background(), libraryDownloadRequest, feedback.ProgressBar())
+		_, err := lib.LibraryDownload(context.Background(), libraryDownloadRequest, feedback.ProgressBar(), "download")
 		if err != nil {
 			feedback.Fatal(tr("Error downloading %[1]s: %[2]v", library, err), feedback.ErrNetwork)
 		}

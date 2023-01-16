@@ -31,7 +31,7 @@ import (
 )
 
 // LibraryInstall FIXMEDOC
-func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
+func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, queryParameter string) error {
 	lm := commands.GetLibraryManager(req)
 	if lm == nil {
 		return &arduino.InvalidInstanceError{}
@@ -96,11 +96,20 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 	}
 
 	for libRelease, installTask := range libReleasesToInstall {
-		if err := downloadLibrary(lm, libRelease, downloadCB, taskCB); err != nil {
-			return err
-		}
-		if err := installLibrary(lm, libRelease, installTask, taskCB); err != nil {
-			return err
+		if libRelease.GetName() == req.Name {
+			if err := downloadLibrary(lm, libRelease, downloadCB, taskCB, queryParameter); err != nil {
+				return err
+			}
+			if err := installLibrary(lm, libRelease, installTask, taskCB); err != nil {
+				return err
+			}
+		} else {
+			if err := downloadLibrary(lm, libRelease, downloadCB, taskCB, "depends"); err != nil {
+				return err
+			}
+			if err := installLibrary(lm, libRelease, installTask, taskCB); err != nil {
+				return err
+			}
 		}
 	}
 
