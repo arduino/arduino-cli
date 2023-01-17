@@ -202,7 +202,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		// Just get build properties and exit
 		compileErr := builder.RunParseHardware(builderCtx)
 		if compileErr != nil {
-			compileErr = &arduino.CompileFailedError{Message: err.Error()}
+			compileErr = &arduino.CompileFailedError{Message: compileErr.Error()}
 		}
 		return r, compileErr
 	}
@@ -211,7 +211,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		// Just output preprocessed source code and exit
 		compileErr := builder.RunPreprocess(builderCtx)
 		if compileErr != nil {
-			compileErr = &arduino.CompileFailedError{Message: err.Error()}
+			compileErr = &arduino.CompileFailedError{Message: compileErr.Error()}
 		}
 		return r, compileErr
 	}
