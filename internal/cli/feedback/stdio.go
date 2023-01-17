@@ -16,6 +16,7 @@
 package feedback
 
 import (
+	"bytes"
 	"errors"
 	"io"
 )
@@ -54,6 +55,24 @@ func OutputStreams() (io.Writer, io.Writer, func() *OutputStreamsResult) {
 		panic("output format not yet selected")
 	}
 	return feedbackOut, feedbackErr, getOutputStreamResult
+}
+
+// NewBufferedStreams returns a pair of io.Writer to buffer the command output.
+// The returned writers will accumulate the output until the command
+// execution is completed. The io.Writes will not affect other feedback streams.
+//
+// This function returns also a callback that must be called when the
+// command execution is completed, it will return an *OutputStreamsResult
+// object that can be used as a Result or to retrieve the accumulated output
+// to embed it in another object.
+func NewBufferedStreams() (io.Writer, io.Writer, func() *OutputStreamsResult) {
+	out, err := &bytes.Buffer{}, &bytes.Buffer{}
+	return out, err, func() *OutputStreamsResult {
+		return &OutputStreamsResult{
+			Stdout: out.String(),
+			Stderr: err.String(),
+		}
+	}
 }
 
 func getOutputStreamResult() *OutputStreamsResult {
