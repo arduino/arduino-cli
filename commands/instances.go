@@ -415,7 +415,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 					responseError(err.ToRPCStatus())
 					continue
 				}
-				if err := libRelease.Resource.Download(lm.DownloadsDir, nil, libRelease.String(), downloadCallback); err != nil {
+				if err := libRelease.Resource.Download(lm.DownloadsDir, nil, libRelease.String(), downloadCallback, ""); err != nil {
 					taskCallback(&rpc.TaskProgress{Name: tr("Error downloading library %s", libraryRef)})
 					e := &arduino.FailedLibraryInstallError{Cause: err}
 					responseError(e.ToRPCStatus())

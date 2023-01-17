@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 	"go.bug.st/downloader/v2"
 )
 
@@ -32,7 +33,12 @@ var tr = i18n.Tr
 
 // DownloadFile downloads a file from a URL into the specified path. An optional config and options may be passed (or nil to use the defaults).
 // A DownloadProgressCB callback function must be passed to monitor download progress.
-func DownloadFile(path *paths.Path, URL string, label string, downloadCB rpc.DownloadProgressCB, config *downloader.Config, options ...downloader.DownloadOptions) (returnedError error) {
+// If a not empty queryParameter is passed, it is appended to the URL for analysis purposes.
+func DownloadFile(path *paths.Path, URL string, queryParameter string, label string, downloadCB rpc.DownloadProgressCB, config *downloader.Config, options ...downloader.DownloadOptions) (returnedError error) {
+	if queryParameter != "" {
+		URL = URL + "?query=" + queryParameter
+	}
+	logrus.WithField("url", URL).Info("Starting download")
 	downloadCB.Start(URL, label)
 	defer func() {
 		if returnedError == nil {

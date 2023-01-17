@@ -176,7 +176,7 @@ func (pmb *Builder) installMissingProfileTool(toolRelease *cores.ToolRelease, de
 		return &arduino.InvalidVersionError{Cause: fmt.Errorf(tr("version %s not available for this operating system", toolRelease))}
 	}
 	taskCB(&rpc.TaskProgress{Name: tr("Downloading tool %s", toolRelease)})
-	if err := toolResource.Download(pmb.DownloadDir, nil, toolRelease.String(), downloadCB); err != nil {
+	if err := toolResource.Download(pmb.DownloadDir, nil, toolRelease.String(), downloadCB, ""); err != nil {
 		taskCB(&rpc.TaskProgress{Name: tr("Error downloading tool %s", toolRelease)})
 		return &arduino.FailedInstallError{Message: tr("Error installing tool %s", toolRelease), Cause: err}
 	}

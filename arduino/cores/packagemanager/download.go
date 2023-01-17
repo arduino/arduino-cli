@@ -127,7 +127,7 @@ func (pme *Explorer) DownloadToolRelease(tool *cores.ToolRelease, config *downlo
 			Message: tr("Error downloading tool %s", tool),
 			Cause:   errors.New(tr("no versions available for the current OS"))}
 	}
-	return resource.Download(pme.DownloadDir, config, tool.String(), progressCB)
+	return resource.Download(pme.DownloadDir, config, tool.String(), progressCB, "")
 }
 
 // DownloadPlatformRelease downloads a PlatformRelease. If the platform is already downloaded a
@@ -136,5 +136,5 @@ func (pme *Explorer) DownloadPlatformRelease(platform *cores.PlatformRelease, co
 	if platform.Resource == nil {
 		return &arduino.PlatformNotFoundError{Platform: platform.String()}
 	}
-	return platform.Resource.Download(pme.DownloadDir, config, platform.String(), progressCB)
+	return platform.Resource.Download(pme.DownloadDir, config, platform.String(), progressCB, "")
 }
