@@ -373,11 +373,7 @@ func (r *compileResult) Data() interface{} {
 
 func (r *compileResult) String() string {
 	if r.showOnlyProperties {
-		res := ""
-		for _, s := range r.BuilderResult.BuildProperties {
-			res += fmt.Sprintln(s)
-		}
-		return res
+		return strings.Join(r.BuilderResult.BuildProperties, fmt.Sprintln())
 	}
 
 	titleColor := color.New(color.FgHiGreen)
