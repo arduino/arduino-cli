@@ -30,7 +30,9 @@ import (
 
 var tr = i18n.Tr
 
-// LibraryDownload FIXMEDOC
+// LibraryDownload executes the download of the library.
+// A DownloadProgressCB callback function must be passed to monitor download progress.
+// queryParameter is passed for analysis purposes.
 func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downloadCB rpc.DownloadProgressCB, queryParameter string) (*rpc.LibraryDownloadResponse, error) {
 	logrus.Info("Executing `arduino-cli lib download`")
 
