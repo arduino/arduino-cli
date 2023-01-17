@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -187,6 +188,14 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		overrides = o.Overrides
 	}
 
+	var stdOut, stdErr io.Writer
+	var stdIORes func() *feedback.OutputStreamsResult
+	if showProperties {
+		stdOut, stdErr, stdIORes = feedback.NewBufferedStreams()
+	} else {
+		stdOut, stdErr, stdIORes = feedback.OutputStreams()
+	}
+
 	compileRequest := &rpc.CompileRequest{
 		Instance:                      inst,
 		Fqbn:                          fqbn,
@@ -212,9 +221,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		EncryptKey:                    encryptKey,
 		SkipLibrariesDiscovery:        skipLibrariesDiscovery,
 	}
-	stdOut, stdErr, stdIORes := feedback.OutputStreams()
 	compileRes, compileError := compile.Compile(context.Background(), compileRequest, stdOut, stdErr, nil)
-
 	if compileError == nil && uploadAfterCompile {
 		userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
 			Instance: inst,
@@ -306,11 +313,12 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 
 	stdIO := stdIORes()
 	res := &compileResult{
-		CompilerOut:   stdIO.Stdout,
-		CompilerErr:   stdIO.Stderr,
-		BuilderResult: compileRes,
-		ProfileOut:    profileOut,
-		Success:       compileError == nil,
+		CompilerOut:        stdIO.Stdout,
+		CompilerErr:        stdIO.Stderr,
+		BuilderResult:      compileRes,
+		ProfileOut:         profileOut,
+		Success:            compileError == nil,
+		showOnlyProperties: showProperties,
 	}
 
 	if compileError != nil {
@@ -355,6 +363,8 @@ type compileResult struct {
 	Success       bool                 `json:"success"`
 	ProfileOut    string               `json:"profile_out,omitempty"`
 	Error         string               `json:"error,omitempty"`
+
+	showOnlyProperties bool
 }
 
 func (r *compileResult) Data() interface{} {
@@ -362,6 +372,10 @@ func (r *compileResult) Data() interface{} {
 }
 
 func (r *compileResult) String() string {
+	if r.showOnlyProperties {
+		return strings.Join(r.BuilderResult.BuildProperties, fmt.Sprintln())
+	}
+
 	titleColor := color.New(color.FgHiGreen)
 	nameColor := color.New(color.FgHiYellow)
 	pathColor := color.New(color.FgHiBlack)
