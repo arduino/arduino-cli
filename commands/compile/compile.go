@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino"
@@ -185,21 +186,29 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		}
 	}()
 
-	// if --preprocess or --show-properties were passed, we can stop here
+	defer func() {
+		buildProperties := builderCtx.BuildProperties
+		if buildProperties == nil {
+			return
+		}
+		keys := buildProperties.Keys()
+		sort.Strings(keys)
+		for _, key := range keys {
+			r.BuildProperties = append(r.BuildProperties, key+"="+buildProperties.Get(key))
+		}
+	}()
+
 	if req.GetShowProperties() {
-		compileErr := builder.RunParseHardwareAndDumpBuildProperties(builderCtx)
+		// Just get build properties and exit
+		compileErr := builder.RunParseHardware(builderCtx)
 		if compileErr != nil {
 			compileErr = &arduino.CompileFailedError{Message: err.Error()}
 		}
-		if buildProperties := builderCtx.BuildProperties; buildProperties != nil {
-			keys := buildProperties.Keys()
-			sort.Strings(keys)
-			for _, key := range keys {
-				outStream.Write([]byte(fmt.Sprintln(key + "=" + buildProperties.Get(key))))
-			}
-		}
 		return r, compileErr
-	} else if req.GetPreprocess() {
+	}
+
+	if req.GetPreprocess() {
+		// Just output preprocessed source code and exit
 		compileErr := builder.RunPreprocess(builderCtx)
 		if compileErr != nil {
 			compileErr = &arduino.CompileFailedError{Message: err.Error()}

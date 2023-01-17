@@ -32,7 +32,7 @@ message CompileRequest {
   string fqbn = 2;
   // The path where the sketch is stored.
   string sketch_path = 3;
-  // Show all build preferences used instead of compiling.
+  // Just get the build properties and do not run the full compile.
   bool show_properties = 4;
   // Print preprocessed code to stdout instead of compiling.
   bool preprocess = 5;
@@ -112,6 +112,8 @@ message CompileResponse {
   InstalledPlatformReference build_platform = 7;
   // Completions reports of the compilation process (stream)
   TaskProgress progress = 8;
+  // Build properties used for compiling
+  repeated string build_properties = 9;
 }
 
 message ExecutableSectionSize {
