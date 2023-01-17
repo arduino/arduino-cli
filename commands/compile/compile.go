@@ -191,6 +191,13 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		if compileErr != nil {
 			compileErr = &arduino.CompileFailedError{Message: err.Error()}
 		}
+		if buildProperties := builderCtx.BuildProperties; buildProperties != nil {
+			keys := buildProperties.Keys()
+			sort.Strings(keys)
+			for _, key := range keys {
+				outStream.Write([]byte(fmt.Sprintln(key + "=" + buildProperties.Get(key))))
+			}
+		}
 		return r, compileErr
 	} else if req.GetPreprocess() {
 		compileErr := builder.RunPreprocess(builderCtx)

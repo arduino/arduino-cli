@@ -162,22 +162,6 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 	return nil
 }
 
-type ParseHardwareAndDumpBuildProperties struct{}
-
-func (s *ParseHardwareAndDumpBuildProperties) Run(ctx *types.Context) error {
-	if ctx.BuildPath == nil {
-		ctx.BuildPath = sketch.GenBuildPath(ctx.SketchLocation)
-	}
-
-	commands := []types.Command{
-		&ContainerSetupHardwareToolsLibsSketchAndProps{},
-
-		&DumpBuildProperties{},
-	}
-
-	return runCommands(ctx, commands)
-}
-
 func runCommands(ctx *types.Context, commands []types.Command) error {
 	ctx.Progress.AddSubSteps(len(commands))
 	defer ctx.Progress.RemoveSubSteps()
@@ -203,9 +187,14 @@ func RunBuilder(ctx *types.Context) error {
 	return command.Run(ctx)
 }
 
-func RunParseHardwareAndDumpBuildProperties(ctx *types.Context) error {
-	command := ParseHardwareAndDumpBuildProperties{}
-	return command.Run(ctx)
+func RunParseHardware(ctx *types.Context) error {
+	if ctx.BuildPath == nil {
+		ctx.BuildPath = sketch.GenBuildPath(ctx.SketchLocation)
+	}
+	commands := []types.Command{
+		&ContainerSetupHardwareToolsLibsSketchAndProps{},
+	}
+	return runCommands(ctx, commands)
 }
 
 func RunPreprocess(ctx *types.Context) error {
