@@ -130,15 +130,9 @@ func (lm *LibrariesManager) AddPlatformReleaseLibrariesDir(plaftormRelease *core
 	})
 }
 
-func (lm *LibrariesManager) ClearLibraries() {
-	for k := range lm.Libraries {
-		delete(lm.Libraries, k)
-	}
-}
-
 // RescanLibraries reload all installed libraries in the system.
 func (lm *LibrariesManager) RescanLibraries() []*status.Status {
-	lm.ClearLibraries()
+	lm.clearLibraries()
 	statuses := []*status.Status{}
 	for _, dir := range lm.LibrariesDir {
 		if errs := lm.LoadLibrariesFromDir(dir); len(errs) > 0 {
@@ -223,4 +217,10 @@ func (lm *LibrariesManager) FindByReference(libRef *librariesindex.Reference, in
 		return nil
 	}
 	return alternatives.FilterByVersionAndInstallLocation(libRef.Version, installLocation)
+}
+
+func (lm *LibrariesManager) clearLibraries() {
+	for k := range lm.Libraries {
+		delete(lm.Libraries, k)
+	}
 }
