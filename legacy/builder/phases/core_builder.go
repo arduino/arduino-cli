@@ -16,6 +16,7 @@
 package phases
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -92,11 +93,13 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 	realCoreFolder := coreFolder.Parent().Parent()
 
 	var targetArchivedCore *paths.Path
+	var buildCacheErr error
 	if buildCachePath != nil {
 		archivedCoreName := GetCachedCoreArchiveDirName(buildProperties.Get(constants.BUILD_PROPERTIES_FQBN),
 			buildProperties.Get("compiler.optimization_flags"), realCoreFolder)
-		buildcache.GetOrCreate(buildCachePath.Join(archivedCoreName))
 		targetArchivedCore = buildCachePath.Join(archivedCoreName, "core.a")
+		_, buildCacheErr = buildcache.GetOrCreate(targetArchivedCore.Parent())
+
 		canUseArchivedCore := !ctx.OnlyUpdateCompilationDatabase &&
 			!ctx.Clean &&
 			!builder_utils.CoreOrReferencedCoreHasChanged(realCoreFolder, targetCoreFolder, targetArchivedCore)
@@ -122,6 +125,11 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 
 	// archive core.a
 	if targetArchivedCore != nil && !ctx.OnlyUpdateCompilationDatabase {
+		if buildCacheErr != nil {
+			if err := targetArchivedCore.Parent().Mkdir(); err != nil {
+				return nil, nil, fmt.Errorf(tr("creating core cache folder: %s", err))
+			}
+		}
 		err := archiveFile.CopyTo(targetArchivedCore)
 		if ctx.Verbose {
 			if err == nil {
