@@ -130,7 +130,7 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			NoDeps:      noDeps,
 			NoOverwrite: noOverwrite,
 		}
-		err := lib.LibraryInstall(context.Background(), libraryInstallRequest, feedback.ProgressBar(), feedback.TaskProgress(), "install")
+		err := lib.LibraryInstall(context.Background(), libraryInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
 		if err != nil {
 			feedback.Fatal(tr("Error installing %s: %v", libRef.Name, err), feedback.ErrGeneric)
 		}
