@@ -371,7 +371,7 @@ func TestBuilderCacheCoreAFile(t *testing.T) {
 	SetupBuildPath(t, ctx)
 	defer ctx.BuildPath.RemoveAll()
 	SetupBuildCachePath(t, ctx)
-	defer ctx.BuildCachePath.RemoveAll()
+	defer ctx.CoreBuildCachePath.RemoveAll()
 
 	// Run build
 	bldr := builder.Builder{}

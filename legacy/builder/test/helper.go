@@ -71,7 +71,7 @@ func SetupBuildPath(t *testing.T, ctx *types.Context) *paths.Path {
 func SetupBuildCachePath(t *testing.T, ctx *types.Context) *paths.Path {
 	buildCachePath, err := paths.MkTempDir(constants.EMPTY_STRING, "test_build_cache")
 	NoError(t, err)
-	ctx.BuildCachePath = buildCachePath
+	ctx.CoreBuildCachePath = buildCachePath
 	return buildCachePath
 }
 

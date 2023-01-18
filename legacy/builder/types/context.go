@@ -99,7 +99,6 @@ type Context struct {
 	BuildProperties              *properties.Map
 	BuildCore                    string
 	BuildPath                    *paths.Path
-	BuildCachePath               *paths.Path
 	SketchBuildPath              *paths.Path
 	CoreBuildPath                *paths.Path
 	CoreBuildCachePath           *paths.Path
