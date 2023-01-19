@@ -287,10 +287,8 @@ func TestNewSketchFolderSymlink(t *testing.T) {
 
 func TestGenBuildPath(t *testing.T) {
 	want := paths.TempDir().Join("arduino", "sketch-ACBD18DB4CC2F85CEDEF654FCCC4A4D8")
-	assert.True(t, GenBuildPath(paths.New("foo")).EquivalentTo(want))
-
-	want = paths.TempDir().Join("arduino", "sketch-D41D8CD98F00B204E9800998ECF8427E")
-	assert.True(t, GenBuildPath(nil).EquivalentTo(want))
+	assert.True(t, (&Sketch{FullPath: paths.New("foo")}).DefaultBuildPath().EquivalentTo(want))
+	assert.Equal(t, "ACBD18DB4CC2F85CEDEF654FCCC4A4D8", (&Sketch{FullPath: paths.New("foo")}).Hash())
 }
 
 func TestCheckForPdeFiles(t *testing.T) {

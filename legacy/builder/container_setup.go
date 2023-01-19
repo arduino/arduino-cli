@@ -60,7 +60,6 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		sketch.BuildPath = ctx.BuildPath
 		ctx.SketchLocation = sketch.MainFile
 		ctx.Sketch = sketch
 	}

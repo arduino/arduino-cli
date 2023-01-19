@@ -128,7 +128,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
 	builderCtx.LibraryDirs = paths.NewPathList(req.Library...)
 	if req.GetBuildPath() == "" {
-		builderCtx.BuildPath = sk.BuildPath
+		builderCtx.BuildPath = sk.DefaultBuildPath()
 	} else {
 		builderCtx.BuildPath = paths.New(req.GetBuildPath()).Canonical()
 	}
