@@ -16,7 +16,6 @@
 package builder
 
 import (
-	sk "github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/pkg/errors"
 )
@@ -48,21 +47,6 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 		ctx.PushProgress()
 	}
 
-	if ctx.SketchLocation != nil {
-		// get abs path to sketch
-		sketchLocation, err := ctx.SketchLocation.Abs()
-		if err != nil {
-			return errors.WithStack(err)
-		}
-
-		// load sketch
-		sketch, err := sk.New(sketchLocation)
-		if err != nil {
-			return errors.WithStack(err)
-		}
-		ctx.SketchLocation = sketch.MainFile
-		ctx.Sketch = sketch
-	}
 	ctx.Progress.CompleteStep()
 	ctx.PushProgress()
 

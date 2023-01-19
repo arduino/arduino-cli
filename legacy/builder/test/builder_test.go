@@ -21,19 +21,21 @@ import (
 	"testing"
 	"time"
 
-	"github.com/arduino/go-paths-helper"
-	"github.com/sirupsen/logrus"
-
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/go-paths-helper"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
 
 func prepareBuilderTestContext(t *testing.T, sketchPath *paths.Path, fqbn string) *types.Context {
+	sk, err := sketch.New(sketchPath)
+	require.NoError(t, err)
 	return &types.Context{
-		SketchLocation:       sketchPath,
+		Sketch:               sk,
 		FQBN:                 parseFQBN(t, fqbn),
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
@@ -261,7 +263,7 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 func TestBuilderSketchNoFunctions(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
-	ctx := prepareBuilderTestContext(t, paths.New("sketch_no_functions", "main.ino"), "RedBearLab:avr:blend")
+	ctx := prepareBuilderTestContext(t, paths.New("sketch_no_functions", "sketch_no_functions.ino"), "RedBearLab:avr:blend")
 	ctx.HardwareDirs = append(ctx.HardwareDirs, paths.New("downloaded_board_manager_stuff"))
 	ctx.BuiltInToolsDirs = append(ctx.BuiltInToolsDirs, paths.New("downloaded_board_manager_stuff"))
 

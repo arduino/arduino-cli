@@ -116,7 +116,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	}
 	builderCtx.UseCachedLibrariesResolution = req.GetSkipLibrariesDiscovery()
 	builderCtx.FQBN = fqbn
-	builderCtx.SketchLocation = sk.FullPath
+	builderCtx.Sketch = sk
 	builderCtx.ProgressCB = progressCB
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli

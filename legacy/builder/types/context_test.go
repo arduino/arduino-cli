@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
@@ -33,29 +34,24 @@ func TestInjectBuildOption(t *testing.T) {
 			BuiltInToolsDirs:      paths.NewPathList("ccc", "ddd"),
 			BuiltInLibrariesDirs:  paths.New("eee"),
 			OtherLibrariesDirs:    paths.NewPathList("fff", "ggg"),
-			SketchLocation:        paths.New("hhh"),
+			Sketch:                &sketch.Sketch{FullPath: paths.New("hhh")},
 			FQBN:                  fqbn,
 			ArduinoAPIVersion:     "iii",
 			CustomBuildProperties: []string{"jjj", "kkk"},
 			OptimizationFlags:     "lll",
 		}
-		newCtx := &Context{}
-		newCtx.InjectBuildOptions(ctx.ExtractBuildOptions())
-		require.Equal(t, ctx, newCtx)
-	}
-	{
-		ctx := &Context{
-			HardwareDirs:          paths.NewPathList("aaa", "bbb"),
-			BuiltInToolsDirs:      paths.NewPathList("ccc", "ddd"),
-			OtherLibrariesDirs:    paths.NewPathList("fff", "ggg"),
-			SketchLocation:        paths.New("hhh"),
-			FQBN:                  fqbn,
-			ArduinoAPIVersion:     "iii",
-			CustomBuildProperties: []string{"jjj", "kkk"},
-			OptimizationFlags:     "lll",
-		}
-		newCtx := &Context{}
-		newCtx.InjectBuildOptions(ctx.ExtractBuildOptions())
-		require.Equal(t, ctx, newCtx)
+		opts := ctx.ExtractBuildOptions()
+		require.Equal(t, `properties.Map{
+  "hardwareFolders": "aaa,bbb",
+  "builtInToolsFolders": "ccc,ddd",
+  "builtInLibrariesFolders": "eee",
+  "otherLibrariesFolders": "fff,ggg",
+  "sketchLocation": "hhh",
+  "fqbn": "aaa:bbb:ccc",
+  "runtime.ide.version": "iii",
+  "customBuildProperties": "jjj,kkk",
+  "additionalFiles": "",
+  "compiler.optimization_flags": "lll",
+}`, opts.Dump())
 	}
 }

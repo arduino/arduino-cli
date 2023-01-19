@@ -109,14 +109,7 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 		buildProperties.Set("software", DEFAULT_SOFTWARE)
 	}
 
-	if ctx.SketchLocation != nil {
-		sourcePath, err := ctx.SketchLocation.Abs()
-		if err != nil {
-			return err
-		}
-		sourcePath = sourcePath.Parent()
-		buildProperties.SetPath("build.source.path", sourcePath)
-	}
+	buildProperties.SetPath("build.source.path", ctx.Sketch.FullPath)
 
 	now := time.Now()
 	buildProperties.Set("extra.time.utc", strconv.FormatInt(now.Unix(), 10))

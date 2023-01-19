@@ -23,21 +23,8 @@ import (
 type FailIfBuildPathEqualsSketchPath struct{}
 
 func (s *FailIfBuildPathEqualsSketchPath) Run(ctx *types.Context) error {
-	if ctx.BuildPath == nil || ctx.SketchLocation == nil {
-		return nil
-	}
-
-	buildPath, err := ctx.BuildPath.Abs()
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	sketchPath, err := ctx.SketchLocation.Abs()
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	sketchPath = sketchPath.Parent()
-
+	buildPath := ctx.BuildPath.Canonical()
+	sketchPath := ctx.Sketch.FullPath.Canonical()
 	if buildPath.EqualsTo(sketchPath) {
 		return errors.New(tr("Sketch cannot be located in build path. Please specify a different build path"))
 	}
