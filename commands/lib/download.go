@@ -32,8 +32,7 @@ var tr = i18n.Tr
 
 // LibraryDownload executes the download of the library.
 // A DownloadProgressCB callback function must be passed to monitor download progress.
-// queryParameter is passed for analysis purposes.
-func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downloadCB rpc.DownloadProgressCB, queryParameter string) (*rpc.LibraryDownloadResponse, error) {
+func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downloadCB rpc.DownloadProgressCB) (*rpc.LibraryDownloadResponse, error) {
 	logrus.Info("Executing `arduino-cli lib download`")
 
 	lm := commands.GetLibraryManager(req)
@@ -48,7 +47,7 @@ func LibraryDownload(ctx context.Context, req *rpc.LibraryDownloadRequest, downl
 		return nil, err
 	}
 
-	if err := downloadLibrary(lm, lib, downloadCB, func(*rpc.TaskProgress) {}, queryParameter); err != nil {
+	if err := downloadLibrary(lm, lib, downloadCB, func(*rpc.TaskProgress) {}, "download"); err != nil {
 		return nil, err
 	}
 

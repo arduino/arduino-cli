@@ -31,8 +31,7 @@ import (
 )
 
 // LibraryInstall resolves the library dependencies, then downloads and installs the libraries into the install location.
-// queryParameter is passed for analysis purposes and forwarded to the called functions. It is set to "depends" when a dependency is installed
-func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB, queryParameter string) error {
+func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
 	lm := commands.GetLibraryManager(req)
 	if lm == nil {
 		return &arduino.InvalidInstanceError{}
@@ -98,20 +97,18 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 
 	for libRelease, installTask := range libReleasesToInstall {
 		// Checks if libRelease is the requested library and not a dependency
+		downloadReason := "depends"
 		if libRelease.GetName() == req.Name {
-			if err := downloadLibrary(lm, libRelease, downloadCB, taskCB, queryParameter); err != nil {
-				return err
+			downloadReason = "install"
+			if installTask.ReplacedLib != nil {
+				downloadReason = "upgrade"
 			}
-			if err := installLibrary(lm, libRelease, installTask, taskCB); err != nil {
-				return err
-			}
-		} else {
-			if err := downloadLibrary(lm, libRelease, downloadCB, taskCB, "depends"); err != nil {
-				return err
-			}
-			if err := installLibrary(lm, libRelease, installTask, taskCB); err != nil {
-				return err
-			}
+		}
+		if err := downloadLibrary(lm, libRelease, downloadCB, taskCB, downloadReason); err != nil {
+			return err
+		}
+		if err := installLibrary(lm, libRelease, installTask, taskCB); err != nil {
+			return err
 		}
 	}
 

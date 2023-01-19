@@ -1518,5 +1518,4 @@ func TestLibQueryParameters(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, string(stdout),
 		"Starting download                             \x1b[36murl\x1b[0m=\"https://downloads.arduino.cc/libraries/github.com/arduino-libraries/WiFi101-0.16.1.zip?query=download\"\n")
-
 }
