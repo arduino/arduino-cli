@@ -19,7 +19,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
@@ -216,7 +215,7 @@ func downloadIndex(url string) (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	bytes, err := ioutil.ReadAll(res.Body)
+	bytes, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -632,7 +631,7 @@ func downloadAndUnpack(url string) (*paths.Path, []os.FileInfo, error) {
 		return nil, nil, errors.WithStack(err)
 	}
 
-	bytes, err := ioutil.ReadAll(res.Body)
+	bytes, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, nil, errors.WithStack(err)
 	}
