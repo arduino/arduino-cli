@@ -382,3 +382,36 @@ func TestDaemonBundleLibInstall(t *testing.T) {
 		}
 	}
 }
+
+func TestDaemonLibrariesRescanOnInstall(t *testing.T) {
+	/*
+		Ensures that the libraries are rescanned prior to installing a new one,
+		to avoid clashes with libraries installed after the daemon initialization.
+		To perform the check:
+		 - the daemon is run and a gprc instance initialized
+		 - a library is installed through the cli
+		 - an attempt to install a new version of the library is done
+		   with the gprc instance
+		The last attempt is expected to not raise an error
+	*/
+	env, cli := createEnvForDaemon(t)
+	defer env.CleanUp()
+
+	grpcInst := cli.Create()
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+		fmt.Printf("INIT> %v\n", ir.GetMessage())
+	}))
+	cli.Run("lib", "install", "SD@1.2.3")
+
+	instCl, err := grpcInst.LibraryInstall(context.Background(), "SD", "1.2.4", false, false, true)
+
+	require.NoError(t, err)
+	for {
+		_, err := instCl.Recv()
+		if err == io.EOF {
+			break
+		}
+		require.NoError(t, err)
+	}
+
+}
