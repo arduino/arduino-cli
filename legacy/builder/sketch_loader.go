@@ -42,14 +42,12 @@ func (s *SketchLoader) Run(ctx *types.Context) error {
 		sketchLocation = sketchLocation.Join(mainSketchStat.Name() + ".ino")
 	}
 
-	ctx.SketchLocation = sketchLocation
-
 	sketch, err := sk.New(sketchLocation)
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
 	ctx.SketchLocation = sketchLocation
 	ctx.Sketch = sketch
-
 	return nil
 }
