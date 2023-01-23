@@ -871,7 +871,7 @@ msgid "Error installing tool %s"
 msgstr "خطأ اثناء تثبيت الاداة %s"
 
 #: cli/lib/list.go:79
-msgid "Error listing Libraries: %v"
+msgid "Error listing libraries: %v"
 msgstr "خطا اثناء انشاء قائمة المكتبات : %v"
 
 #: cli/board/listall.go:64
@@ -953,7 +953,7 @@ msgid "Error searching boards: %v"
 msgstr "خطا اثناء البحث عن اللوحات : %v"
 
 #: cli/lib/search.go:78
-msgid "Error searching for Libraries: %v"
+msgid "Error searching for libraries: %v"
 msgstr ""
 
 #: cli/core/search.go:87

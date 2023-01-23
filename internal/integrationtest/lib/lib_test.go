@@ -393,7 +393,7 @@ func TestListExitCode(t *testing.T) {
 	// Verify lib list command fails because specified platform is not installed
 	_, stderr, err = cli.Run("lib", "list", "-b", "arduino:samd:mkr1000")
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "Error listing Libraries: Unknown FQBN: platform arduino:samd is not installed")
+	require.Contains(t, string(stderr), "Error listing libraries: Unknown FQBN: platform arduino:samd is not installed")
 
 	_, _, err = cli.Run("lib", "install", "AllThingsTalk LoRaWAN SDK")
 	require.NoError(t, err)
@@ -401,7 +401,7 @@ func TestListExitCode(t *testing.T) {
 	// Verifies lib list command keeps failing
 	_, stderr, err = cli.Run("lib", "list", "-b", "arduino:samd:mkr1000")
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "Error listing Libraries: Unknown FQBN: platform arduino:samd is not installed")
+	require.Contains(t, string(stderr), "Error listing libraries: Unknown FQBN: platform arduino:samd is not installed")
 
 	_, _, err = cli.Run("core", "install", "arduino:samd")
 	require.NoError(t, err)

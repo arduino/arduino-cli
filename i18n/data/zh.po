@@ -848,7 +848,7 @@ msgid "Error installing tool %s"
 msgstr "安装 %s 工具时出错"
 
 #: cli/lib/list.go:79
-msgid "Error listing Libraries: %v"
+msgid "Error listing libraries: %v"
 msgstr "列出库列表时出错：%v"
 
 #: cli/board/listall.go:64
@@ -929,7 +929,7 @@ msgid "Error searching boards: %v"
 msgstr "搜索开发板时错误：%v"
 
 #: cli/lib/search.go:78
-msgid "Error searching for Libraries: %v"
+msgid "Error searching for libraries: %v"
 msgstr ""
 
 #: cli/core/search.go:87
