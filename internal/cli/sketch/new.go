@@ -40,9 +40,9 @@ func initNewCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " sketch new MultiBlinker",
 		Args:    cobra.ExactArgs(1),
 		Run:     func(cmd *cobra.Command, args []string) {
-			re := regexp.MustCompile("^[a-zA-Z].")
+			re := regexp.MustCompile("^[0-9a-zA-Z][0-9a-zA-Z_.-]{0,62}$")
 			if !re.MatchString(args[0]) {
-				fmt.Println("Error: Value can only contain alphabetic characters")
+				fmt.Println("Sketch names must start with a letter or number, followed by letters, numbers, dashes, dots and underscores. Maximum length is 63 characters.")
 				return
 			}
 			runNewCommand(args, overwrite)
