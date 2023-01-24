@@ -75,7 +75,7 @@ func List(instance *rpc.Instance, args []string, all bool, updatable bool) {
 		Fqbn:      fqbn.String(),
 	})
 	if err != nil {
-		feedback.Fatal(tr("Error listing Libraries: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(tr("Error listing libraries: %v", err), feedback.ErrGeneric)
 	}
 
 	libs := []*rpc.InstalledLibrary{}

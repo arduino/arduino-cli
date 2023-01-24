@@ -869,7 +869,7 @@ msgid "Error installing tool %s"
 msgstr "Error instalando la herramienta %s"
 
 #: cli/lib/list.go:79
-msgid "Error listing Libraries: %v"
+msgid "Error listing libraries: %v"
 msgstr "Error listando las librerías: %v"
 
 #: cli/board/listall.go:64
@@ -950,7 +950,7 @@ msgid "Error searching boards: %v"
 msgstr "Error en la búsqueda de placas: %v"
 
 #: cli/lib/search.go:78
-msgid "Error searching for Libraries: %v"
+msgid "Error searching for libraries: %v"
 msgstr ""
 
 #: cli/core/search.go:87

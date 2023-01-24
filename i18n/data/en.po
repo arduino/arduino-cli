@@ -814,8 +814,8 @@ msgid "Error installing tool %s"
 msgstr "Error installing tool %s"
 
 #: cli/lib/list.go:76
-msgid "Error listing Libraries: %v"
-msgstr "Error listing Libraries: %v"
+msgid "Error listing libraries: %v"
+msgstr "Error listing libraries: %v"
 
 #: cli/board/listall.go:64
 msgid "Error listing boards: %v"
