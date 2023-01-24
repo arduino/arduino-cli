@@ -285,6 +285,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#daemon-cli-commands-ip-flag-removal" class="md-nav__link">
+    daemon CLI command's --ip flag removal
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#board-attach-cli-command-changed-behaviour" class="md-nav__link">
     board attach CLI command changed behaviour
   </a>
@@ -2139,6 +2146,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#daemon-cli-commands-ip-flag-removal" class="md-nav__link">
+    daemon CLI command's --ip flag removal
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#board-attach-cli-command-changed-behaviour" class="md-nav__link">
     board attach CLI command changed behaviour
   </a>
@@ -2929,6 +2943,9 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0300">0.30.0<a class="headerlink" href="#0300" title="Permanent link">&para;</a></h2>
+<h3 id="daemon-cli-commands-ip-flag-removal"><code>daemon</code> CLI command's <code>--ip</code> flag removal<a class="headerlink" href="#daemon-cli-commands-ip-flag-removal" title="Permanent link">&para;</a></h3>
+<p>The <code>daemon</code> CLI command no longer allows to set a custom ip for the gRPC communication. Currently there is not enough
+bandwith to support this feature. For this reason, the <code>--ip</code> flag has been removed.</p>
 <h3 id="board-attach-cli-command-changed-behaviour"><code>board attach</code> CLI command changed behaviour<a class="headerlink" href="#board-attach-cli-command-changed-behaviour" title="Permanent link">&para;</a></h3>
 <p>The <code>board attach</code> CLI command has changed behaviour: now it just pick whatever port and FQBN is passed as parameter and
 saves it in the <code>sketch.yaml</code> file, without any validity check or board autodetection.</p>
