@@ -19,7 +19,8 @@ import (
 	"context"
 	"os"
 	"strings"
-
+	"regexp"
+	"fmt"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	sk "github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
@@ -38,7 +39,14 @@ func initNewCommand() *cobra.Command {
 		Long:    tr("Create a new Sketch"),
 		Example: "  " + os.Args[0] + " sketch new MultiBlinker",
 		Args:    cobra.ExactArgs(1),
-		Run:     func(cmd *cobra.Command, args []string) { runNewCommand(args, overwrite) },
+		Run:     func(cmd *cobra.Command, args []string) {
+			re := regexp.MustCompile("^[a-zA-Z].")
+			if !re.MatchString(args[0]) {
+				fmt.Println("Error: Value can only contain alphabetic characters")
+				return
+			}
+			runNewCommand(args, overwrite)
+		},
 	}
 
 	newCommand.Flags().BoolVarP(&overwrite, "overwrite", "f", false, tr("Overwrites an existing .ino sketch."))
