@@ -18,6 +18,7 @@ package sketch
 import (
 	"context"
 	"errors"
+	"regexp"
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/globals"
@@ -34,6 +35,9 @@ void loop() {
 }
 `)
 
+var sketchNameValidationRegex = regexp.MustCompile(`^([A-Za-z\d]+[_.-]*)+$`)
+var sketchNameMaxLength = 63
+
 // NewSketch creates a new sketch via gRPC
 func NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchResponse, error) {
 	var sketchesDir string
@@ -42,6 +46,19 @@ func NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchRe
 	} else {
 		sketchesDir = configuration.Settings.GetString("directories.User")
 	}
+
+	if len(req.SketchName) > sketchNameMaxLength {
+		return nil, &arduino.CantCreateSketchError{Cause: errors.New(tr("sketch name too long (%d characters). Maximum allowed length is %d",
+			len(req.SketchName),
+			sketchNameMaxLength))}
+	}
+
+	if !sketchNameValidationRegex.MatchString(req.SketchName) {
+		return nil, &arduino.CantCreateSketchError{Cause: errors.New(tr("invalid sketch name \"%s\". Required pattern %s",
+			req.SketchName,
+			sketchNameValidationRegex.String()))}
+	}
+
 	sketchDirPath := paths.New(sketchesDir).Join(req.SketchName)
 	if err := sketchDirPath.MkdirAll(); err != nil {
 		return nil, &arduino.CantCreateSketchError{Cause: err}
