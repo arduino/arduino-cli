@@ -4,6 +4,11 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.30.0
 
+### `daemon` CLI command's `--ip` flag removal
+
+The `daemon` CLI command no longer allows to set a custom ip for the gRPC communication. Currently there is not enough
+bandwith to support this feature. For this reason, the `--ip` flag has been removed.
+
 ### `board attach` CLI command changed behaviour
 
 The `board attach` CLI command has changed behaviour: now it just pick whatever port and FQBN is passed as parameter and
