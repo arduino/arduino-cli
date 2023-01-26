@@ -11,6 +11,7 @@ The sketch name submitted via the `sketch new` command of the CLI or the gRPC co
 [sketch specifications](https://arduino.github.io/arduino-cli/dev/sketch-specification).
 
 Existing sketch names violating the new constraint need to be updated.
+
 ### `daemon` CLI command's `--ip` flag removal
 
 The `daemon` CLI command no longer allows to set a custom ip for the gRPC communication. Currently there is not enough
