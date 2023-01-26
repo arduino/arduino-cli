@@ -38,7 +38,7 @@ func (f *Fqbn) AddToCommand(cmd *cobra.Command) {
 	f.addToCommand(cmd, true)
 }
 
-// AddToCommand adds the flags used to set fqbn to the specified Command, board options flag is not provided
+// AddToCommandWithoutBoardOptions adds the flags used to set fqbn to the specified Command, board options flag is not provided
 func (f *Fqbn) AddToCommandWithoutBoardOptions(cmd *cobra.Command) {
 	f.addToCommand(cmd, false)
 }
