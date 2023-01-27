@@ -25,13 +25,16 @@ import (
 
 const lastUsedFileName = ".last-used"
 
-type buildCache struct {
+// BuildCache represents a cache of built files (sketches and cores), it's designed
+// to work on directories. Given a directory as "base" it handles direct subdirectories as
+// keys
+type BuildCache struct {
 	baseDir *paths.Path
 }
 
 // GetOrCreate retrieves or creates the cache directory at the given path
 // If the cache already exists the lifetime of the cache is extended.
-func (bc *buildCache) GetOrCreate(key string) (*paths.Path, error) {
+func (bc *BuildCache) GetOrCreate(key string) (*paths.Path, error) {
 	keyDir := bc.baseDir.Join(key)
 	if err := keyDir.MkdirAll(); err != nil {
 		return nil, err
@@ -46,7 +49,7 @@ func (bc *buildCache) GetOrCreate(key string) (*paths.Path, error) {
 // Purge removes all cache directories within baseDir that have expired
 // To know how long ago a directory has been last used
 // it checks into the .last-used file.
-func (bc *buildCache) Purge(ttl time.Duration) {
+func (bc *BuildCache) Purge(ttl time.Duration) {
 	files, err := bc.baseDir.ReadDir()
 	if err != nil {
 		return
@@ -59,8 +62,8 @@ func (bc *buildCache) Purge(ttl time.Duration) {
 }
 
 // New instantiates a build cache
-func New(baseDir *paths.Path) *buildCache {
-	return &buildCache{baseDir}
+func New(baseDir *paths.Path) *BuildCache {
+	return &BuildCache{baseDir}
 }
 
 func removeIfExpired(dir *paths.Path, ttl time.Duration) {
