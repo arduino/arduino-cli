@@ -121,3 +121,37 @@ func TestFQBN(t *testing.T) {
 		"properties.Map{\n  \"cpu\": \"atmega\",\n  \"speed\": \"1000\",\n  \"extra\": \"core=arduino\",\n}",
 		f.Configs.Dump())
 }
+
+func TestMatch(t *testing.T) {
+	expectedMatches := [][]string{
+		{"arduino:avr:uno", "arduino:avr:uno"},
+		{"arduino:avr:uno", "arduino:avr:uno:opt1=1,opt2=2"},
+		{"arduino:avr:uno:opt1=1", "arduino:avr:uno:opt1=1,opt2=2"},
+		{"arduino:avr:uno:opt1=1,opt2=2", "arduino:avr:uno:opt1=1,opt2=2"},
+		{"arduino:avr:uno:opt3=3,opt1=1,opt2=2", "arduino:avr:uno:opt2=2,opt3=3,opt1=1,opt4=4"},
+	}
+
+	for _, pair := range expectedMatches {
+		a, err := ParseFQBN(pair[0])
+		require.NoError(t, err)
+		b, err := ParseFQBN(pair[1])
+		require.NoError(t, err)
+		require.True(t, b.Match(a))
+	}
+
+	expectedMismatches := [][]string{
+		{"arduino:avr:uno", "arduino:avr:due"},
+		{"arduino:avr:uno", "arduino:avr:due:opt1=1,opt2=2"},
+		{"arduino:avr:uno:opt1=1", "arduino:avr:uno"},
+		{"arduino:avr:uno:opt1=1,opt2=", "arduino:avr:uno:opt1=1,opt2=3"},
+		{"arduino:avr:uno:opt1=1,opt2=2", "arduino:avr:uno:opt2=2"},
+	}
+
+	for _, pair := range expectedMismatches {
+		a, err := ParseFQBN(pair[0])
+		require.NoError(t, err)
+		b, err := ParseFQBN(pair[1])
+		require.NoError(t, err)
+		require.False(t, b.Match(a))
+	}
+}

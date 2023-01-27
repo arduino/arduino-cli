@@ -239,9 +239,13 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStartError
 	return retVal, discoveryStartErrors, nil
 }
 
-func hasMatchingBoard(b *rpc.DetectedPort, requestedFqbn *cores.FQBN) bool {
+func hasMatchingBoard(b *rpc.DetectedPort, fqbnFilter *cores.FQBN) bool {
 	for _, detectedBoard := range b.MatchingBoards {
-		if detectedBoard.Fqbn == requestedFqbn.String() {
+		detectedFqbn, err := cores.ParseFQBN(detectedBoard.Fqbn)
+		if err != nil {
+			continue
+		}
+		if detectedFqbn.Match(fqbnFilter) {
 			return true
 		}
 	}

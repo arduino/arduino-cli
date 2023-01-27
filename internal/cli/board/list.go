@@ -49,7 +49,7 @@ func initListCommand() *cobra.Command {
 	}
 
 	timeoutArg.AddToCommand(listCommand)
-	fqbn.AddToCommandWithoutBoardOptions(listCommand)
+	fqbn.AddToCommand(listCommand)
 	listCommand.Flags().BoolVarP(&watch, "watch", "w", false, tr("Command keeps running and prints list of connected boards whenever there is a change."))
 
 	return listCommand

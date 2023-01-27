@@ -33,27 +33,14 @@ type Fqbn struct {
 	boardOptions []string // List of boards specific options separated by commas. Or can be used multiple times for multiple options.
 }
 
-// AddToCommand adds the flags used to set fqbn and the board options to the specified Command
+// AddToCommand adds the flags used to set fqbn to the specified Command
 func (f *Fqbn) AddToCommand(cmd *cobra.Command) {
-	f.configureForCommand(cmd, true)
-}
-
-// AddToCommandWithoutBoardOptions adds the flags used to set fqbn to the specified Command, board options flag is not provided
-func (f *Fqbn) AddToCommandWithoutBoardOptions(cmd *cobra.Command) {
-	f.configureForCommand(cmd, false)
-}
-
-func (f *Fqbn) configureForCommand(cmd *cobra.Command, enableBoardOptions bool) bool {
 	cmd.Flags().StringVarP(&f.fqbn, "fqbn", "b", "", tr("Fully Qualified Board Name, e.g.: arduino:avr:uno"))
 	cmd.RegisterFlagCompletionFunc("fqbn", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return GetInstalledBoards(), cobra.ShellCompDirectiveDefault
 	})
-
-	if enableBoardOptions {
-		cmd.Flags().StringSliceVar(&f.boardOptions, "board-options", []string{},
-			tr("List of board options separated by commas. Or can be used multiple times for multiple options."))
-	}
-	return false
+	cmd.Flags().StringSliceVar(&f.boardOptions, "board-options", []string{},
+		tr("List of board options separated by commas. Or can be used multiple times for multiple options."))
 }
 
 // String returns the fqbn with the board options if there are any

@@ -76,6 +76,29 @@ func (fqbn *FQBN) String() string {
 	return res
 }
 
+// Match check if the target FQBN corresponds to the receiver one.
+// The core parts are checked for exact equality while board options are loosely
+// matched: the set of boards options of the target must be fully contained within
+// the one of the receiver and their values must be equal.
+func (fqbn *FQBN) Match(target *FQBN) bool {
+	if fqbn.StringWithoutConfig() != target.StringWithoutConfig() {
+		return false
+	}
+	searchedProperties := target.Configs.Clone()
+	actualConfigs := fqbn.Configs.AsMap()
+	for neededKey, neededValue := range searchedProperties.AsMap() {
+		targetValue, hasKey := actualConfigs[neededKey]
+		if !hasKey {
+			return false
+		}
+		if targetValue != neededValue {
+			return false
+		}
+	}
+
+	return true
+}
+
 // StringWithoutConfig returns the FQBN without the Config part
 func (fqbn *FQBN) StringWithoutConfig() string {
 	return fqbn.Package + ":" + fqbn.PlatformArch + ":" + fqbn.BoardID
