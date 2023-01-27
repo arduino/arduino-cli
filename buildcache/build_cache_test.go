@@ -43,7 +43,7 @@ func Test_UpdateLastUsedFileExisting(t *testing.T) {
 }
 
 func requireCorrectUpdate(t *testing.T, dir *paths.Path, prevModTime time.Time) {
-	_, err := GetOrCreate(dir)
+	_, err := New(dir.Parent()).GetOrCreate(dir.Base())
 	require.NoError(t, err)
 	expectedFile := dir.Join(lastUsedFileName)
 	fileInfo, err := expectedFile.Stat()
@@ -71,7 +71,7 @@ func TestPurge(t *testing.T) {
 		require.NoError(t, infoFilePath.Chtimes(accesstime, lastUsedTime))
 	}
 
-	Purge(dirToPurge, ttl)
+	New(dirToPurge).Purge(ttl)
 
 	files, err := dirToPurge.Join("fresh").Stat()
 	require.Nil(t, err)

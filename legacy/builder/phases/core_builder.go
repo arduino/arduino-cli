@@ -98,7 +98,7 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 		archivedCoreName := GetCachedCoreArchiveDirName(buildProperties.Get(constants.BUILD_PROPERTIES_FQBN),
 			buildProperties.Get("compiler.optimization_flags"), realCoreFolder)
 		targetArchivedCore = buildCachePath.Join(archivedCoreName, "core.a")
-		_, buildCacheErr = buildcache.GetOrCreate(targetArchivedCore.Parent())
+		_, buildCacheErr = buildcache.New(buildCachePath).GetOrCreate(archivedCoreName)
 
 		canUseArchivedCore := !ctx.OnlyUpdateCompilationDatabase &&
 			!ctx.Clean &&

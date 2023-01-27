@@ -138,7 +138,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		return nil, &arduino.PermissionDeniedError{Message: tr("Cannot create build directory"), Cause: err}
 	}
 
-	buildcache.GetOrCreate(builderCtx.BuildPath)
+	buildcache.New(builderCtx.BuildPath.Parent()).GetOrCreate(builderCtx.BuildPath.Base())
 	// cache is purged after compilation to not remove entries that might be required
 	defer maybePurgeBuildCache()
 
@@ -312,6 +312,6 @@ func maybePurgeBuildCache() {
 	}
 	inventory.Store.Set("build_cache.compilation_count_since_last_purge", 0)
 	cacheTTL := configuration.Settings.GetDuration("build_cache.ttl").Abs()
-	buildcache.Purge(paths.TempDir().Join("arduino", "cores"), cacheTTL)
-	buildcache.Purge(paths.TempDir().Join("arduino", "sketches"), cacheTTL)
+	buildcache.New(paths.TempDir().Join("arduino", "cores")).Purge(cacheTTL)
+	buildcache.New(paths.TempDir().Join("arduino", "sketches")).Purge(cacheTTL)
 }

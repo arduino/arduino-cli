@@ -25,26 +25,29 @@ import (
 
 const lastUsedFileName = ".last-used"
 
+type buildCache struct {
+	baseDir *paths.Path
+}
+
 // GetOrCreate retrieves or creates the cache directory at the given path
 // If the cache already exists the lifetime of the cache is extended.
-func GetOrCreate(dir *paths.Path) (*paths.Path, error) {
-	if !dir.Exist() {
-		if err := dir.MkdirAll(); err != nil {
-			return nil, err
-		}
-	}
-
-	if err := dir.Join(lastUsedFileName).WriteFile([]byte{}); err != nil {
+func (bc *buildCache) GetOrCreate(key string) (*paths.Path, error) {
+	keyDir := bc.baseDir.Join(key)
+	if err := keyDir.MkdirAll(); err != nil {
 		return nil, err
 	}
-	return dir, nil
+
+	if err := keyDir.Join(lastUsedFileName).WriteFile([]byte{}); err != nil {
+		return nil, err
+	}
+	return keyDir, nil
 }
 
 // Purge removes all cache directories within baseDir that have expired
 // To know how long ago a directory has been last used
 // it checks into the .last-used file.
-func Purge(baseDir *paths.Path, ttl time.Duration) {
-	files, err := baseDir.ReadDir()
+func (bc *buildCache) Purge(ttl time.Duration) {
+	files, err := bc.baseDir.ReadDir()
 	if err != nil {
 		return
 	}
@@ -53,6 +56,11 @@ func Purge(baseDir *paths.Path, ttl time.Duration) {
 			removeIfExpired(file, ttl)
 		}
 	}
+}
+
+// New instantiates a build cache
+func New(baseDir *paths.Path) *buildCache {
+	return &buildCache{baseDir}
 }
 
 func removeIfExpired(dir *paths.Path, ttl time.Duration) {
