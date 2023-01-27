@@ -32,6 +32,17 @@ func Test_SketchNameWrongPattern(t *testing.T) {
 	}
 }
 
+func Test_SketchNameEmpty(t *testing.T) {
+	emptyName := ""
+	_, err := NewSketch(context.Background(), &commands.NewSketchRequest{
+		SketchName: emptyName,
+		SketchDir:  t.TempDir(),
+	})
+	require.NotNil(t, err)
+
+	require.Error(t, err, `Can't create sketch: sketch name cannot be empty`)
+}
+
 func Test_SketchNameTooLong(t *testing.T) {
 	tooLongName := make([]byte, sketchNameMaxLength+1)
 	for i := range tooLongName {

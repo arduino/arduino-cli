@@ -37,7 +37,7 @@ void loop() {
 
 // sketchNameMaxLength could be part of the regex, but it's intentionally left out for clearer error reporting
 var sketchNameMaxLength = 63
-var sketchNameValidationRegex = regexp.MustCompile(`^[0-9a-zA-Z]{1}[0-9a-zA-Z_\.-]*$`)
+var sketchNameValidationRegex = regexp.MustCompile(`^[0-9a-zA-Z][0-9a-zA-Z_\.-]*$`)
 
 // NewSketch creates a new sketch via gRPC
 func NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchResponse, error) {
@@ -71,12 +71,14 @@ func NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchRe
 }
 
 func validateSketchName(name string) error {
+	if name == "" {
+		return &arduino.CantCreateSketchError{Cause: errors.New(tr("sketch name cannot be empty"))}
+	}
 	if len(name) > sketchNameMaxLength {
 		return &arduino.CantCreateSketchError{Cause: errors.New(tr("sketch name too long (%d characters). Maximum allowed length is %d",
 			len(name),
 			sketchNameMaxLength))}
 	}
-
 	if !sketchNameValidationRegex.MatchString(name) {
 		return &arduino.CantCreateSketchError{Cause: errors.New(tr("invalid sketch name \"%s\". Required pattern %s",
 			name,
