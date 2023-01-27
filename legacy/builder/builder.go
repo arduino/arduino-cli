@@ -19,7 +19,6 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -129,10 +128,6 @@ func (s *PreprocessSketch) Run(ctx *types.Context) error {
 type Preprocess struct{}
 
 func (s *Preprocess) Run(ctx *types.Context) error {
-	if ctx.BuildPath == nil {
-		ctx.BuildPath = sketch.GenBuildPath(ctx.SketchLocation)
-	}
-
 	if err := ctx.BuildPath.MkdirAll(); err != nil {
 		return err
 	}
@@ -188,9 +183,6 @@ func RunBuilder(ctx *types.Context) error {
 }
 
 func RunParseHardware(ctx *types.Context) error {
-	if ctx.BuildPath == nil {
-		ctx.BuildPath = sketch.GenBuildPath(ctx.SketchLocation)
-	}
 	commands := []types.Command{
 		&ContainerSetupHardwareToolsLibsSketchAndProps{},
 	}

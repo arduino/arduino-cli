@@ -115,9 +115,11 @@ func getDebugProperties(req *debug.DebugConfigRequest, pme *packagemanager.Explo
 		}
 	}
 
-	importPath := sk.BuildPath
+	var importPath *paths.Path
 	if importDir := req.GetImportDir(); importDir != "" {
 		importPath = paths.New(importDir)
+	} else {
+		importPath = sk.DefaultBuildPath()
 	}
 	if !importPath.Exist() {
 		return nil, &arduino.NotFoundError{Message: tr("Compiled sketch not found in %s", importPath)}

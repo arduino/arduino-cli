@@ -24,11 +24,13 @@ import (
 	"text/template"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func LoadAndInterpolate(t *testing.T, filename string, ctx *types.Context) string {
@@ -71,8 +73,14 @@ func SetupBuildPath(t *testing.T, ctx *types.Context) *paths.Path {
 func SetupBuildCachePath(t *testing.T, ctx *types.Context) *paths.Path {
 	buildCachePath, err := paths.MkTempDir(constants.EMPTY_STRING, "test_build_cache")
 	NoError(t, err)
-	ctx.BuildCachePath = buildCachePath
+	ctx.CoreBuildCachePath = buildCachePath
 	return buildCachePath
+}
+
+func OpenSketch(t *testing.T, sketchPath *paths.Path) *sketch.Sketch {
+	sketch, err := sketch.New(sketchPath)
+	require.NoError(t, err)
+	return sketch
 }
 
 type ByLibraryName []*libraries.Library

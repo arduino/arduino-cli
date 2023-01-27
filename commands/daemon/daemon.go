@@ -343,7 +343,6 @@ func (s *ArduinoCoreServerImpl) LibraryDownload(req *rpc.LibraryDownloadRequest,
 	resp, err := lib.LibraryDownload(
 		stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.LibraryDownloadResponse{Progress: p}) },
-		"",
 	)
 	if err != nil {
 		return convertErrorToRPCStatus(err)
@@ -357,7 +356,6 @@ func (s *ArduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 		stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.LibraryInstallResponse{Progress: p}) },
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.LibraryInstallResponse{TaskProgress: p}) },
-		"",
 	)
 	if err != nil {
 		return convertErrorToRPCStatus(err)

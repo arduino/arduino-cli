@@ -910,7 +910,7 @@ msgid "Error installing tool %s"
 msgstr "Errore durante l'installazione del tool %s"
 
 #: cli/lib/list.go:79
-msgid "Error listing Libraries: %v"
+msgid "Error listing libraries: %v"
 msgstr ""
 "Si è verificato un errore durante la visualizzazione dell'elenco delle "
 "librerie: %v"
@@ -1010,7 +1010,7 @@ msgid "Error searching boards: %v"
 msgstr "Si è verificato un errore durante la ricerca delle schede: %v"
 
 #: cli/lib/search.go:78
-msgid "Error searching for Libraries: %v"
+msgid "Error searching for libraries: %v"
 msgstr "Si è verificato un errore durante la ricerca delle librerie: %v"
 
 #: cli/core/search.go:87

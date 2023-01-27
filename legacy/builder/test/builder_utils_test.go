@@ -16,7 +16,7 @@
 package test
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 
@@ -32,7 +32,7 @@ func sleep(t *testing.T) {
 }
 
 func tempFile(t *testing.T, prefix string) *paths.Path {
-	file, err := ioutil.TempFile("", prefix)
+	file, err := os.CreateTemp("", prefix)
 	file.Close()
 	NoError(t, err)
 	return paths.New(file.Name())

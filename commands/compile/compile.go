@@ -118,7 +118,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	}
 	builderCtx.UseCachedLibrariesResolution = req.GetSkipLibrariesDiscovery()
 	builderCtx.FQBN = fqbn
-	builderCtx.SketchLocation = sk.FullPath
+	builderCtx.Sketch = sk
 	builderCtx.ProgressCB = progressCB
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
@@ -130,7 +130,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
 	builderCtx.LibraryDirs = paths.NewPathList(req.Library...)
 	if req.GetBuildPath() == "" {
-		builderCtx.BuildPath = sk.BuildPath
+		builderCtx.BuildPath = sk.DefaultBuildPath()
 	} else {
 		builderCtx.BuildPath = paths.New(req.GetBuildPath()).Canonical()
 	}
@@ -150,7 +150,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	// Optimize for debug
 	builderCtx.OptimizeForDebug = req.GetOptimizeForDebug()
-	builderCtx.CoreBuildCachePath = paths.TempDir().Join("arduino", "cores")
 
 	builderCtx.Jobs = int(req.GetJobs())
 
@@ -160,12 +159,17 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.CustomBuildProperties = append(req.GetBuildProperties(), "build.warn_data_percentage=75")
 	builderCtx.CustomBuildProperties = append(req.GetBuildProperties(), securityKeysOverride...)
 
-	if req.GetBuildCachePath() != "" {
-		builderCtx.BuildCachePath = paths.New(req.GetBuildCachePath())
-		err = builderCtx.BuildCachePath.MkdirAll()
+	if req.GetBuildCachePath() == "" {
+		builderCtx.CoreBuildCachePath = paths.TempDir().Join("arduino", "cores")
+	} else {
+		buildCachePath, err := paths.New(req.GetBuildCachePath()).Abs()
 		if err != nil {
 			return nil, &arduino.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
 		}
+		if err := buildCachePath.MkdirAll(); err != nil {
+			return nil, &arduino.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
+		}
+		builderCtx.CoreBuildCachePath = buildCachePath.Join("core")
 	}
 
 	builderCtx.BuiltInLibrariesDirs = configuration.IDEBuiltinLibrariesDir(configuration.Settings)

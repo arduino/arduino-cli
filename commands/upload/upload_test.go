@@ -79,7 +79,7 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 		// 03: error: used both importPath and importFile
 		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", nil, nil, "<nil>", ""},
 		// 04: only sketch without FQBN
-		{"", "", blonk, nil, sketch.GenBuildPath(blonk.FullPath).String(), "Blonk.ino"},
+		{"", "", blonk, nil, blonk.DefaultBuildPath().String(), "Blonk.ino"},
 		// 05: use importFile to detect build.path and project_name, sketch is ignored.
 		{"testdata/build_path_2/Blink.ino.hex", "", blonk, nil, "testdata/build_path_2", "Blink.ino"},
 		// 06: use importPath as build.path and Blink as project name, ignore the sketch Blonk
@@ -95,7 +95,7 @@ func TestDetermineBuildPathAndSketchName(t *testing.T) {
 		// 11: error: used both importPath and importFile
 		{"testdata/build_path_2/Blink.ino.hex", "testdata/build_path_2", nil, fqbn, "<nil>", ""},
 		// 12: use sketch to determine project name and sketch+fqbn to determine build path
-		{"", "", blonk, fqbn, sketch.GenBuildPath(blonk.FullPath).String(), "Blonk.ino"},
+		{"", "", blonk, fqbn, blonk.DefaultBuildPath().String(), "Blonk.ino"},
 		// 13: use importFile to detect build.path and project_name, sketch+fqbn is ignored.
 		{"testdata/build_path_2/Blink.ino.hex", "", blonk, fqbn, "testdata/build_path_2", "Blink.ino"},
 		// 14: use importPath as build.path and Blink as project name, ignore the sketch Blonk, ignore fqbn

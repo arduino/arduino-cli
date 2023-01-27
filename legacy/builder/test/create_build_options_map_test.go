@@ -18,6 +18,7 @@ package test
 import (
 	"testing"
 
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
@@ -29,7 +30,7 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 		HardwareDirs:       paths.NewPathList("hardware", "hardware2"),
 		BuiltInToolsDirs:   paths.NewPathList("tools"),
 		OtherLibrariesDirs: paths.NewPathList("libraries"),
-		SketchLocation:     paths.New("sketchLocation"),
+		Sketch:             &sketch.Sketch{FullPath: paths.New("sketchLocation")},
 		FQBN:               parseFQBN(t, "my:nice:fqbn"),
 		ArduinoAPIVersion:  "ideVersion",
 		Verbose:            true,

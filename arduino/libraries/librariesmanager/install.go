@@ -64,6 +64,7 @@ func (lm *LibrariesManager) InstallPrerequisiteCheck(name string, version *semve
 		return nil, err
 	}
 
+	lm.RescanLibraries()
 	libs := lm.FindByReference(&librariesindex.Reference{Name: name}, installLocation)
 
 	if len(libs) > 1 {
