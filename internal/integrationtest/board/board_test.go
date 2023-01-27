@@ -101,7 +101,7 @@ func TestBoardListWithFqbnFilter(t *testing.T) {
 
 	_, _, err := cli.Run("core", "update-index")
 	require.NoError(t, err)
-	stdout, _, err := cli.Run("board", "list", "-b", "arduino:avr:uno", "--format", "json")
+	stdout, _, err := cli.Run("board", "list", "-b", "foo:bar:baz", "--format", "json")
 	require.NoError(t, err)
 	// this is a bit of a passpartout test, it actually filters the "bluetooth boards" locally
 	// but it would succeed even if the filtering wasn't working properly
