@@ -32,8 +32,7 @@ import (
 type Sketch struct {
 	Name             string
 	MainFile         *paths.Path
-	FullPath         *paths.Path // FullPath is the path to the Sketch folder
-	BuildPath        *paths.Path
+	FullPath         *paths.Path    // FullPath is the path to the Sketch folder
 	OtherSketchFiles paths.PathList // Sketch files that end in .ino other than main file
 	AdditionalFiles  paths.PathList
 	RootFolderFiles  paths.PathList // All files that are in the Sketch root
@@ -81,7 +80,6 @@ func New(path *paths.Path) (*Sketch, error) {
 		Name:             path.Base(),
 		MainFile:         mainFile,
 		FullPath:         path,
-		BuildPath:        GenBuildPath(path),
 		OtherSketchFiles: paths.PathList{},
 		AdditionalFiles:  paths.PathList{},
 		RootFolderFiles:  paths.PathList{},
@@ -293,14 +291,15 @@ func CheckForPdeFiles(sketch *paths.Path) []*paths.Path {
 	return files
 }
 
-// GenBuildPath generates a suitable name for the build folder.
-// The sketchPath, if not nil, is also used to furhter differentiate build paths.
-func GenBuildPath(sketchPath *paths.Path) *paths.Path {
-	path := ""
-	if sketchPath != nil {
-		path = sketchPath.String()
-	}
+// DefaultBuildPath generates the default build directory for a given sketch.
+// The build path is in a temporary directory and is unique for each sketch.
+func (s *Sketch) DefaultBuildPath() *paths.Path {
+	return paths.TempDir().Join("arduino", "sketch-"+s.Hash())
+}
+
+// Hash generate a unique hash for the given sketch.
+func (s *Sketch) Hash() string {
+	path := s.FullPath.String()
 	md5SumBytes := md5.Sum([]byte(path))
-	md5Sum := strings.ToUpper(hex.EncodeToString(md5SumBytes[:]))
-	return paths.TempDir().Join("arduino", "sketch-"+md5Sum)
+	return strings.ToUpper(hex.EncodeToString(md5SumBytes[:]))
 }

@@ -31,7 +31,7 @@ func TestSetupBuildProperties(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
 		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
-		SketchLocation:    paths.New("sketch1", "sketch1.ino"),
+		Sketch:            OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
 		FQBN:              parseFQBN(t, "arduino:avr:uno"),
 		ArduinoAPIVersion: "10600",
 	}
@@ -43,7 +43,6 @@ func TestSetupBuildProperties(t *testing.T) {
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
-		&builder.SketchLoader{},
 		&builder.SetupBuildProperties{},
 	}
 
@@ -96,7 +95,7 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
 		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
-		SketchLocation:    paths.New("sketch1", "sketch1.ino"),
+		Sketch:            OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
 		FQBN:              parseFQBN(t, "arduino:avr:uno"),
 		ArduinoAPIVersion: "10600",
 
@@ -110,7 +109,6 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
-		&builder.SketchLoader{},
 		&builder.SetupBuildProperties{},
 		&builder.SetCustomBuildProperties{},
 	}
@@ -136,7 +134,7 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
 		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
-		SketchLocation:    paths.New("sketch1", "sketch1.ino"),
+		Sketch:            OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
 		FQBN:              parseFQBN(t, "my_avr_platform:avr:custom_yun"),
 		ArduinoAPIVersion: "10600",
 	}
@@ -148,7 +146,6 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 		&builder.TargetBoardResolver{},
-		&builder.SketchLoader{},
 		&builder.SetupBuildProperties{},
 	}
 
@@ -173,7 +170,7 @@ func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testi
 	ctx := &types.Context{
 		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
 		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
-		SketchLocation:    paths.New("sketch1", "sketch1.ino"),
+		Sketch:            OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
 		FQBN:              parseFQBN(t, "my_avr_platform:avr:custom_yun"),
 		ArduinoAPIVersion: "10600",
 	}

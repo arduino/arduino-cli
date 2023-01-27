@@ -22,7 +22,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -71,7 +70,6 @@ type Context struct {
 	BuiltInLibrariesDirs *paths.Path
 	OtherLibrariesDirs   paths.PathList
 	LibraryDirs          paths.PathList // List of paths pointing to individual library root folders
-	SketchLocation       *paths.Path    // SketchLocation points to the main Sketch file
 	WatchedLocations     paths.PathList
 	ArduinoAPIVersion    string
 	FQBN                 *cores.FQBN
@@ -99,7 +97,6 @@ type Context struct {
 	BuildProperties              *properties.Map
 	BuildCore                    string
 	BuildPath                    *paths.Path
-	BuildCachePath               *paths.Path
 	SketchBuildPath              *paths.Path
 	CoreBuildPath                *paths.Path
 	CoreBuildCachePath           *paths.Path
@@ -212,17 +209,15 @@ func (ctx *Context) ExtractBuildOptions() *properties.Map {
 		opts.Set("builtInLibrariesFolders", ctx.BuiltInLibrariesDirs.String())
 	}
 	opts.Set("otherLibrariesFolders", strings.Join(ctx.OtherLibrariesDirs.AsStrings(), ","))
-	opts.SetPath("sketchLocation", ctx.SketchLocation)
+	opts.SetPath("sketchLocation", ctx.Sketch.FullPath)
 	var additionalFilesRelative []string
-	if ctx.Sketch != nil {
-		for _, f := range ctx.Sketch.AdditionalFiles {
-			absPath := ctx.SketchLocation.Parent()
-			relPath, err := f.RelTo(absPath)
-			if err != nil {
-				continue // ignore
-			}
-			additionalFilesRelative = append(additionalFilesRelative, relPath.String())
+	absPath := ctx.Sketch.FullPath.Parent()
+	for _, f := range ctx.Sketch.AdditionalFiles {
+		relPath, err := f.RelTo(absPath)
+		if err != nil {
+			continue // ignore
 		}
+		additionalFilesRelative = append(additionalFilesRelative, relPath.String())
 	}
 	opts.Set("fqbn", ctx.FQBN.String())
 	opts.Set("runtime.ide.version", ctx.ArduinoAPIVersion)
@@ -230,22 +225,6 @@ func (ctx *Context) ExtractBuildOptions() *properties.Map {
 	opts.Set("additionalFiles", strings.Join(additionalFilesRelative, ","))
 	opts.Set("compiler.optimization_flags", ctx.OptimizationFlags)
 	return opts
-}
-
-func (ctx *Context) InjectBuildOptions(opts *properties.Map) {
-	ctx.HardwareDirs = paths.NewPathList(strings.Split(opts.Get("hardwareFolders"), ",")...)
-	ctx.BuiltInToolsDirs = paths.NewPathList(strings.Split(opts.Get("builtInToolsFolders"), ",")...)
-	ctx.BuiltInLibrariesDirs = paths.New(opts.Get("builtInLibrariesFolders"))
-	ctx.OtherLibrariesDirs = paths.NewPathList(strings.Split(opts.Get("otherLibrariesFolders"), ",")...)
-	ctx.SketchLocation = opts.GetPath("sketchLocation")
-	fqbn, err := cores.ParseFQBN(opts.Get("fqbn"))
-	if err != nil {
-		fmt.Fprintln(ctx.Stderr, &arduino.InvalidFQBNError{Cause: err})
-	}
-	ctx.FQBN = fqbn
-	ctx.ArduinoAPIVersion = opts.Get("runtime.ide.version")
-	ctx.CustomBuildProperties = strings.Split(opts.Get("customBuildProperties"), ",")
-	ctx.OptimizationFlags = opts.Get("compiler.optimization_flags")
 }
 
 func (ctx *Context) PushProgress() {

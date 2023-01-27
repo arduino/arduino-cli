@@ -16,7 +16,7 @@
 package test
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/arduino/arduino-cli/legacy/builder"
@@ -26,7 +26,7 @@ import (
 )
 
 func TestReadFileAndStoreInContext(t *testing.T) {
-	filePath, err := ioutil.TempFile("", "test")
+	filePath, err := os.CreateTemp("", "test")
 	NoError(t, err)
 
 	file := paths.New(filePath.Name())

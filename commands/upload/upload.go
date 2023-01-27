@@ -575,7 +575,7 @@ func determineBuildPathAndSketchName(importFile, importDir string, sk *sketch.Sk
 
 	// Case 4: only sketch specified. In this case we use the generated build path
 	// and the given sketch name.
-	return sk.BuildPath, sk.Name + sk.MainFile.Ext(), nil
+	return sk.DefaultBuildPath(), sk.Name + sk.MainFile.Ext(), nil
 }
 
 func detectSketchNameFromBuildPath(buildPath *paths.Path) (string, error) {

@@ -50,15 +50,6 @@ func (*AddAdditionalEntriesToContext) Run(ctx *types.Context) error {
 		ctx.CoreBuildPath = coreBuildPath
 	}
 
-	if ctx.BuildCachePath != nil {
-		coreBuildCachePath, err := ctx.BuildCachePath.Join(constants.FOLDER_CORE).Abs()
-		if err != nil {
-			return errors.WithStack(err)
-		}
-
-		ctx.CoreBuildCachePath = coreBuildCachePath
-	}
-
 	if ctx.WarningsLevel == "" {
 		ctx.WarningsLevel = DEFAULT_WARNINGS_LEVEL
 	}

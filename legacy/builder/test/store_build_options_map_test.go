@@ -18,6 +18,7 @@ package test
 import (
 	"testing"
 
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -31,7 +32,7 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 		BuiltInToolsDirs:      paths.NewPathList("tools"),
 		BuiltInLibrariesDirs:  paths.New("built-in libraries"),
 		OtherLibrariesDirs:    paths.NewPathList("libraries"),
-		SketchLocation:        paths.New("sketchLocation"),
+		Sketch:                &sketch.Sketch{FullPath: paths.New("sketchLocation")},
 		FQBN:                  parseFQBN(t, "my:nice:fqbn"),
 		ArduinoAPIVersion:     "ideVersion",
 		CustomBuildProperties: []string{"custom=prop"},

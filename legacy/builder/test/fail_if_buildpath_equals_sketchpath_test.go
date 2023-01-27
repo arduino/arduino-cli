@@ -18,6 +18,7 @@ package test
 import (
 	"testing"
 
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
@@ -26,8 +27,8 @@ import (
 
 func TestFailIfBuildPathEqualsSketchPath(t *testing.T) {
 	ctx := &types.Context{
-		SketchLocation: paths.New("buildPath/sketch.ino"),
-		BuildPath:      paths.New("buildPath"),
+		Sketch:    &sketch.Sketch{FullPath: paths.New("buildPath")},
+		BuildPath: paths.New("buildPath"),
 	}
 
 	command := builder.FailIfBuildPathEqualsSketchPath{}
@@ -36,8 +37,8 @@ func TestFailIfBuildPathEqualsSketchPath(t *testing.T) {
 
 func TestFailIfBuildPathEqualsSketchPathSketchPathDiffers(t *testing.T) {
 	ctx := &types.Context{
-		SketchLocation: paths.New("sketchPath/sketch.ino"),
-		BuildPath:      paths.New("buildPath"),
+		Sketch:    &sketch.Sketch{FullPath: paths.New("sketchPath")},
+		BuildPath: paths.New("buildPath"),
 	}
 
 	command := builder.FailIfBuildPathEqualsSketchPath{}
