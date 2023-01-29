@@ -17,7 +17,7 @@ package cli
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"strings"
 
@@ -185,7 +185,7 @@ func preRun(cmd *cobra.Command, args []string) {
 			DisableColors: color.NoColor,
 		})
 	} else {
-		logrus.SetOutput(ioutil.Discard)
+		logrus.SetOutput(io.Discard)
 	}
 
 	// set the Logger format

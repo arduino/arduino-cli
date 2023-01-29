@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"hash"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -154,7 +153,7 @@ func computeDirChecksum(root string) (string, error) {
 
 // CheckDirChecksum reads checksum from the package.json and compares it with a recomputed value.
 func CheckDirChecksum(root string) (bool, error) {
-	packageJSON, err := ioutil.ReadFile(filepath.Join(root, packageFileName))
+	packageJSON, err := os.ReadFile(filepath.Join(root, packageFileName))
 	if err != nil {
 		return false, err
 	}

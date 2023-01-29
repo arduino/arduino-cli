@@ -16,7 +16,7 @@
 package resources
 
 import (
-	"io/ioutil"
+	"os"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -67,7 +67,7 @@ func TestDownloadApplyUserAgentHeaderUsingConfig(t *testing.T) {
 	//    User-Agent: arduino-cli/0.0.0-test.preview  (amd64; linux; go1.12.4) Commit:deadbeef/Build:2019-06-12 11:11:11.111
 	//    Accept-Encoding: gzip
 
-	b, err := ioutil.ReadFile(tmp.String() + "/cache/echo.txt") // just pass the file name
+	b, err := os.ReadFile(tmp.String() + "/cache/echo.txt") // just pass the file name
 	require.NoError(t, err)
 
 	requestLines := strings.Split(string(b), "\r\n")

@@ -16,7 +16,7 @@
 package gohasissues
 
 import (
-	"io/ioutil"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"sort"
@@ -84,18 +84,24 @@ func readDirNames(dirname string) ([]string, error) {
 }
 
 func ReadDir(dirname string) ([]os.FileInfo, error) {
-	infos, err := ioutil.ReadDir(dirname)
+	entries, err := os.ReadDir(dirname)
 	if err != nil {
 		return nil, err
 	}
 
-	for idx, info := range infos {
-		info, err := resolveSymlink(dirname, info)
+	infos := make([]fs.FileInfo, 0, len(entries))
+	for _, entry := range entries {
+		info, err := entry.Info()
+		if err != nil {
+			return nil, err
+		}
+
+		info, err = resolveSymlink(dirname, info)
 		if err != nil {
 			// unresolvable symlinks should be skipped silently
 			continue
 		}
-		infos[idx] = info
+		infos = append(infos, info)
 	}
 
 	return infos, nil
