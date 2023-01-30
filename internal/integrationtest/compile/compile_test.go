@@ -43,7 +43,9 @@ func TestRuntimeToolPropertiesGeneration(t *testing.T) {
 	sketch, err := paths.New("testdata", "bare_minimum").Abs()
 	require.NoError(t, err)
 
-	// Multiple runs must always produce the same result
+	// As seen in https://github.com/arduino/arduino-cli/issues/73 the map randomess
+	// may make the function fail half of the times. Repeating the test 3 times
+	// greatly increases the chances to trigger the bad case.
 	for i := 0; i < 3; i++ {
 		stdout, _, err := cli.Run("compile", "-b", "alice:avr:alice", "--show-properties", sketch.String())
 		require.NoError(t, err)

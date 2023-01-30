@@ -287,7 +287,7 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	loadIndex("https://dl.espressif.com/dl/package_esp32_index.json")
 	loadIndex("http://arduino.esp8266.com/stable/package_esp8266com_index.json")
 	loadIndex("https://adafruit.github.io/arduino-board-index/package_adafruit_index.json")
-	loadIndex("https://test.com/package_test_index.json")
+	loadIndex("https://test.com/package_test_index.json") // this is not downloaded, it just picks the "local cached" file package_test_index.json
 
 	// We ignore the errors returned since they might not be necessarily blocking
 	// but just warnings for the user, like in the case a board is not loaded
