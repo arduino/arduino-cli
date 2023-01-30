@@ -84,18 +84,15 @@ func (fqbn *FQBN) Match(target *FQBN) bool {
 	if fqbn.StringWithoutConfig() != target.StringWithoutConfig() {
 		return false
 	}
+
 	searchedProperties := target.Configs.Clone()
 	actualConfigs := fqbn.Configs.AsMap()
 	for neededKey, neededValue := range searchedProperties.AsMap() {
 		targetValue, hasKey := actualConfigs[neededKey]
-		if !hasKey {
-			return false
-		}
-		if targetValue != neededValue {
+		if !hasKey || targetValue != neededValue {
 			return false
 		}
 	}
-
 	return true
 }
 
