@@ -16,9 +16,9 @@
 package resources
 
 import (
-	"os"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 
