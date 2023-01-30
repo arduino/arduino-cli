@@ -285,6 +285,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#sketch-name-validation" class="md-nav__link">
+    Sketch name validation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#daemon-cli-commands-ip-flag-removal" class="md-nav__link">
     daemon CLI command's --ip flag removal
   </a>
@@ -2146,6 +2153,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#sketch-name-validation" class="md-nav__link">
+    Sketch name validation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#daemon-cli-commands-ip-flag-removal" class="md-nav__link">
     daemon CLI command's --ip flag removal
   </a>
@@ -2943,6 +2957,11 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0300">0.30.0<a class="headerlink" href="#0300" title="Permanent link">&para;</a></h2>
+<h3 id="sketch-name-validation">Sketch name validation<a class="headerlink" href="#sketch-name-validation" title="Permanent link">&para;</a></h3>
+<p>The sketch name submitted via the <code>sketch new</code> command of the CLI or the gRPC command
+<code>cc.arduino.cli.commands.v1.NewSketch</code> are now validated. The applied rules follow the
+<a href="https://arduino.github.io/arduino-cli/dev/sketch-specification">sketch specifications</a>.</p>
+<p>Existing sketch names violating the new constraint need to be updated.</p>
 <h3 id="daemon-cli-commands-ip-flag-removal"><code>daemon</code> CLI command's <code>--ip</code> flag removal<a class="headerlink" href="#daemon-cli-commands-ip-flag-removal" title="Permanent link">&para;</a></h3>
 <p>The <code>daemon</code> CLI command no longer allows to set a custom ip for the gRPC communication. Currently there is not enough
 bandwith to support this feature. For this reason, the <code>--ip</code> flag has been removed.</p>
