@@ -49,16 +49,33 @@ func initNewCommand() *cobra.Command {
 func runNewCommand(args []string, overwrite bool) {
 	logrus.Info("Executing `arduino-cli sketch new`")
 	// Trim to avoid issues if user creates a sketch adding the .ino extesion to the name
-	sketchName := args[0]
-	trimmedSketchName := strings.TrimSuffix(sketchName, globals.MainFileValidExtension)
-	sketchDirPath, err := paths.New(trimmedSketchName).Abs()
-	if err != nil {
-		feedback.Fatal(tr("Error creating sketch: %v", err), feedback.ErrGeneric)
+	inputSketchName := args[0]
+	trimmedSketchName := strings.TrimSuffix(inputSketchName, globals.MainFileValidExtension)
+
+	var sketchDir string
+	var sketchName string
+	var sketchDirPath *paths.Path
+	var err error
+
+	if trimmedSketchName == "" {
+		// `paths.New` returns nil with an empty string so `paths.Abs` panics.
+		// if the name is empty we rely on the "new" command to fail nicely later
+		// with the same logic in grpc and cli flows
+		sketchDir = ""
+		sketchName = ""
+	} else {
+		sketchDirPath, err = paths.New(trimmedSketchName).Abs()
+		if err != nil {
+			feedback.Fatal(tr("Error creating sketch: %v", err), feedback.ErrGeneric)
+		}
+		sketchDir = sketchDirPath.Parent().String()
+		sketchName = sketchDirPath.Base()
 	}
+
 	_, err = sk.NewSketch(context.Background(), &rpc.NewSketchRequest{
 		Instance:   nil,
-		SketchName: sketchDirPath.Base(),
-		SketchDir:  sketchDirPath.Parent().String(),
+		SketchName: sketchName,
+		SketchDir:  sketchDir,
 		Overwrite:  overwrite,
 	})
 	if err != nil {
