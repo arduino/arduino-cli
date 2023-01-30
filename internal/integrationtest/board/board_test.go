@@ -91,6 +91,39 @@ func TestBoardList(t *testing.T) {
 		MustBeEmpty()
 }
 
+func TestBoardListWithFqbnFilter(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("VMs have no serial ports")
+	}
+
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+	stdout, _, err := cli.Run("board", "list", "-b", "foo:bar:baz", "--format", "json")
+	require.NoError(t, err)
+	// this is a bit of a passpartout test, it actually filters the "bluetooth boards" locally
+	// but it would succeed even if the filtering wasn't working properly
+	// TODO: find a way to simulate connected boards or create a unit test which
+	// mocks or initializes multiple components
+	requirejson.Parse(t, stdout).
+		MustBeEmpty()
+}
+
+func TestBoardListWithFqbnFilterInvalid(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("VMs have no serial ports")
+	}
+
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, stderr, err := cli.Run("board", "list", "-b", "yadayada", "--format", "json")
+	require.Error(t, err)
+	requirejson.Query(t, stderr, ".error", `"Invalid FQBN: not an FQBN: yadayada"`)
+}
+
 func TestBoardListWithInvalidDiscovery(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()

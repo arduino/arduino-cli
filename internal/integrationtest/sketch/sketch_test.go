@@ -73,6 +73,16 @@ func TestSketchNew(t *testing.T) {
 	require.FileExists(t, currentSketchPath.Join(sketchName).String()+".ino")
 }
 
+func TestSketchNewEmptyName(t *testing.T) {
+	// testing that we fail nicely. It panicked in the past
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	sketchName := ""
+	_, _, err := cli.Run("sketch", "new", sketchName)
+	require.Error(t, err, "Can't create sketch: sketch name cannot be empty")
+}
+
 func verifyZipContainsSketchExcludingBuildDir(t *testing.T, files []*zip.File) {
 	require.Len(t, files, 8)
 	require.Equal(t, paths.New("sketch_simple", "doc.txt").String(), files[0].Name)

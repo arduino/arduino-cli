@@ -205,6 +205,15 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStartError
 	}
 	defer release()
 
+	var fqbnFilter *cores.FQBN
+	if f := req.GetFqbn(); f != "" {
+		var err error
+		fqbnFilter, err = cores.ParseFQBN(f)
+		if err != nil {
+			return nil, nil, &arduino.InvalidFQBNError{Cause: err}
+		}
+	}
+
 	dm := pme.DiscoveryManager()
 	discoveryStartErrors = dm.Start()
 	time.Sleep(time.Duration(req.GetTimeout()) * time.Millisecond)
@@ -222,9 +231,25 @@ func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStartError
 			Port:           port.ToRPC(),
 			MatchingBoards: boards,
 		}
-		retVal = append(retVal, b)
+
+		if fqbnFilter == nil || hasMatchingBoard(b, fqbnFilter) {
+			retVal = append(retVal, b)
+		}
 	}
 	return retVal, discoveryStartErrors, nil
+}
+
+func hasMatchingBoard(b *rpc.DetectedPort, fqbnFilter *cores.FQBN) bool {
+	for _, detectedBoard := range b.MatchingBoards {
+		detectedFqbn, err := cores.ParseFQBN(detectedBoard.Fqbn)
+		if err != nil {
+			continue
+		}
+		if detectedFqbn.Match(fqbnFilter) {
+			return true
+		}
+	}
+	return false
 }
 
 // Watch returns a channel that receives boards connection and disconnection events.
