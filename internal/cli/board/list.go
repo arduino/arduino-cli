@@ -16,10 +16,12 @@
 package board
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"sort"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
@@ -47,6 +49,7 @@ func initListCommand() *cobra.Command {
 	}
 
 	timeoutArg.AddToCommand(listCommand)
+	fqbn.AddToCommand(listCommand)
 	listCommand.Flags().BoolVarP(&watch, "watch", "w", false, tr("Command keeps running and prints list of connected boards whenever there is a change."))
 
 	return listCommand
@@ -63,14 +66,19 @@ func runListCommand(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	ports, discvoeryErrors, err := board.List(&rpc.BoardListRequest{
+	ports, discoveryErrors, err := board.List(&rpc.BoardListRequest{
 		Instance: inst,
 		Timeout:  timeoutArg.Get().Milliseconds(),
+		Fqbn:     fqbn.String(),
 	})
+	var invalidFQBNErr *arduino.InvalidFQBNError
+	if errors.As(err, &invalidFQBNErr) {
+		feedback.Fatal(tr(err.Error()), feedback.ErrBadArgument)
+	}
 	if err != nil {
 		feedback.Warning(tr("Error detecting boards: %v", err))
 	}
-	for _, err := range discvoeryErrors {
+	for _, err := range discoveryErrors {
 		feedback.Warning(tr("Error starting discovery: %v", err))
 	}
 	feedback.PrintResult(result{ports})
