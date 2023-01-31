@@ -152,6 +152,9 @@ message BoardListRequest {
   Instance instance = 1;
   // Search for boards for the given time (in milliseconds)
   int64 timeout = 2;
+  // The fully qualified board name of the board you want information about
+  // (e.g., `arduino:avr:uno`).
+  string fqbn = 3;
 }
 
 message BoardListResponse {
