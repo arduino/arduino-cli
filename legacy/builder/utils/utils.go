@@ -21,7 +21,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -448,16 +447,12 @@ func CopyDir(src string, dst string, extensions []string) (err error) {
 		return
 	}
 
-	infos := make([]fs.FileInfo, 0, len(entries))
-	for _, entry := range entries {
-		info, scopeErr := entry.Info()
+	for _, dirEntry := range entries {
+		entry, scopeErr := dirEntry.Info()
 		if scopeErr != nil {
 			return
 		}
-		infos = append(infos, info)
-	}
 
-	for _, entry := range infos {
 		srcPath := filepath.Join(src, entry.Name())
 		dstPath := filepath.Join(dst, entry.Name())
 
