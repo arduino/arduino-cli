@@ -295,7 +295,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 	for _, tool := range pme.GetAllInstalledToolsReleases() {
 		uploadProperties.Merge(tool.RuntimeProperties())
 	}
-	if requiredTools, err := pme.FindToolsRequiredForBoard(board); err == nil {
+	if requiredTools, err := pme.FindToolsRequiredForBuild(boardPlatform, buildPlatform); err == nil {
 		for _, requiredTool := range requiredTools {
 			logrus.WithField("tool", requiredTool).Info("Tool required for upload")
 			if requiredTool.IsInstalled() {

@@ -1,0 +1,2 @@
+bob.name=Bob's Board
+bob.build.board=BOB

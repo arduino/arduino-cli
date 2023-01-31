@@ -87,6 +87,23 @@ plus `Name`, `Version`, and an `UpToDate` boolean flag.
 
 `InstallZipLib` method `archivePath` is now a `paths.Path` instead of a `string`.
 
+### golang API change in `github.com/arduino/arduino-cli/rduino/cores/packagemanager.Explorer`
+
+The `packagemanager.Explorer` method `FindToolsRequiredForBoard`:
+
+```go
+func (pme *Explorer) FindToolsRequiredForBoard(board *cores.Board) ([]*cores.ToolRelease, error) { ... }
+```
+
+has been renamed to `FindToolsRequiredForBuild:
+
+```go
+func (pme *Explorer) FindToolsRequiredForBuild(platform, buildPlatform *cores.PlatformRelease) ([]*cores.ToolRelease, error) { ... }
+```
+
+moreover it now requires the `platform` and the `buildPlatform` (a.k.a. the referenced platform core used for the
+compile) instead of the `board`. Usually these two value are obtained from the `Explorer.ResolveFQBN(...)` method.
+
 ## 0.29.0
 
 ### Removed gRPC API: `cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndex`, `Outdated`, and `Upgrade`
