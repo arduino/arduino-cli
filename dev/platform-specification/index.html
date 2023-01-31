@@ -1460,6 +1460,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#how-to-retrieve-tools-path-via-runtimetools-properties" class="md-nav__link">
+    How to retrieve tools path via {runtime.tools.*} properties
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#environment-variables" class="md-nav__link">
     Environment variables
   </a>
@@ -2043,6 +2050,13 @@
   
     <nav class="md-nav" aria-label="Tools">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-to-retrieve-tools-path-via-runtimetools-properties" class="md-nav__link">
+    How to retrieve tools path via {runtime.tools.*} properties
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#environment-variables" class="md-nav__link">
@@ -2877,12 +2891,14 @@ tools.avrdude.config.path={path}/etc/avrdude.conf
 
 tools.avrdude.upload.pattern=&quot;{cmd.path}&quot; &quot;-C{config.path}&quot; -p{build.mcu} -c{upload.port.protocol} -P{upload.port.address} -b{upload.speed} -D &quot;-Uflash:w:{build.path}/{build.project_name}.hex:i&quot;
 </code></pre></div>
-<p>A <strong>{runtime.tools.TOOL_NAME.path}</strong> and <strong>{runtime.tools.TOOL_NAME-TOOL_VERSION.path}</strong> property is generated for the
-tools of Arduino AVR Boards and any other platform installed via Boards Manager. <strong>{runtime.tools.TOOL_NAME.path}</strong>
-points to the latest version of the tool available.</p>
 <p>The tool configuration properties are available globally without the prefix. For example, the <strong>tools.avrdude.cmd.path</strong>
 property can be used as <strong>{cmd.path}</strong> inside the recipe, and the same happens for all the other avrdude configuration
 variables.</p>
+<h3 id="how-to-retrieve-tools-path-via-runtimetools-properties">How to retrieve tools path via <code>{runtime.tools.*}</code> properties<a class="headerlink" href="#how-to-retrieve-tools-path-via-runtimetools-properties" title="Permanent link">&para;</a></h3>
+<p>A <strong>{runtime.tools.TOOLNAME.path}</strong> and <strong>{runtime.tools.TOOLNAME-TOOLVERSION.path}</strong> property is generated for the
+tools provided by the current platform and for any other platform installed via Boards Manager.</p>
+<p>See <a href="../package_index_json-specification/#how-a-tools-path-is-determined-in-platformtxt"><code>{runtime.tools.*.path}</code> rules</a>
+for details on how the runtime properties are determined.</p>
 <h3 id="environment-variables">Environment variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h3>
 <p>All the tools launched to compile or upload a sketch will have the following environment variable set:</p>
 <p><code>ARDUINO_USER_AGENT</code>: contains the name and version of the client used by the user in

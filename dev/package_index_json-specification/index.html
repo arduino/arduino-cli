@@ -1284,7 +1284,14 @@
     Tools definitions
   </a>
   
-    <nav class="md-nav" aria-label="Tools definitions">
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#platforms-definitions" class="md-nav__link">
+    Platforms definitions
+  </a>
+  
+    <nav class="md-nav" aria-label="Platforms definitions">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1296,13 +1303,6 @@
         
       </ul>
     </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#platforms-definitions" class="md-nav__link">
-    Platforms definitions
-  </a>
   
 </li>
         
@@ -1426,7 +1426,14 @@
     Tools definitions
   </a>
   
-    <nav class="md-nav" aria-label="Tools definitions">
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#platforms-definitions" class="md-nav__link">
+    Platforms definitions
+  </a>
+  
+    <nav class="md-nav" aria-label="Platforms definitions">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1438,13 +1445,6 @@
         
       </ul>
     </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#platforms-definitions" class="md-nav__link">
-    Platforms definitions
-  </a>
   
 </li>
         
@@ -1638,15 +1638,6 @@ specific version to be used, you should use the notation <code>{runtime.tools.TO
   macOS you can use the command <code>shasum -a 256 filename</code> to generate SHA-256 checksums. There are free options for
   Windows, including md5deep. There are also online utilities for generating checksums.</li>
 </ul>
-<h5 id="how-a-tools-path-is-determined-in-platformtxt">How a tool's path is determined in platform.txt<a class="headerlink" href="#how-a-tools-path-is-determined-in-platformtxt" title="Permanent link">&para;</a></h5>
-<p>When the IDE needs a tool, it downloads the corresponding archive file and unpacks the content into a private folder
-that can be referenced from <code>platform.txt</code> using one of the following properties:</p>
-<ul>
-<li><code>{runtime.tools.TOOLNAME-VERSION.path}</code></li>
-<li><code>{runtime.tools.TOOLNAME.path}</code></li>
-</ul>
-<p>For example, to obtain the avr-gcc 4.8.1 folder we can use <code>{runtime.tools.avr-gcc-4.8.1-arduino5.path}</code> or
-<code>{runtime.tools.avr-gcc.path}</code>.</p>
 <h3 id="platforms-definitions">Platforms definitions<a class="headerlink" href="#platforms-definitions" title="Permanent link">&para;</a></h3>
 <p>Finally, let's see how <code>PLATFORMS</code> are made.</p>
 <div class="highlight"><pre><span></span><code><span class="w">        </span><span class="p">{</span><span class="w"></span>
@@ -1725,6 +1716,42 @@ rules Arduino IDE follows for parsing versions
 </ul>
 <p>Note: if you miss a bracket in the JSON index, then add the URL to your Preferences, and open Boards Manager it can
 cause the Arduino IDE to no longer load until you have deleted the file from your arduino15 folder.</p>
+<h4 id="how-a-tools-path-is-determined-in-platformtxt">How a tool's path is determined in platform.txt<a class="headerlink" href="#how-a-tools-path-is-determined-in-platformtxt" title="Permanent link">&para;</a></h4>
+<p>When the IDE needs a tool, it downloads the corresponding archive file and unpacks the content into a private folder
+that can be referenced from <code>platform.txt</code> using one of the following properties:</p>
+<ul>
+<li><code>{runtime.tools.TOOLNAME-VERSION.path}</code></li>
+<li><code>{runtime.tools.TOOLNAME.path}</code></li>
+</ul>
+<p>For example, to obtain the avr-gcc 4.8.1 folder we can use <code>{runtime.tools.avr-gcc-4.8.1.path}</code> or
+<code>{runtime.tools.avr-gcc.path}</code>.</p>
+<p>In general the same tool may be provided by different packagers (for example the Arduino packager may provide an
+<code>arduino:avr-gcc</code> and another 3rd party packager may provide their own <code>3rdparty:avr-gcc</code>). The rules to disambiguate
+are as follows:</p>
+<ul>
+<li>
+<p>The property <code>{runtime.tools.TOOLNAME.path}</code> points, in order of priority, to:</p>
+<ol>
+<li>the tool, version and packager specified via <code>toolsDependencies</code> in the <code>package_index.json</code></li>
+<li>the highest version of the tool provided by the packager of the current platform</li>
+<li>the highest version of the tool provided by the packager of the referenced platform used for compile (see
+   <a href="../platform-specification/#referencing-another-core-variant-or-tool">"Referencing another core, variant or tool"</a>
+   for more info)</li>
+<li>the highest version of the tool provided by any other packager (in case of tie, the first packager in alphabetical
+   order wins)</li>
+</ol>
+</li>
+</ul>
+<ul>
+<li>The property <code>{runtime.tools.TOOLNAME-VERSION.path}</code> points, in order of priority, to:<ol>
+<li>the tool and version provided by the packager of the current platform</li>
+<li>the tool and version provided by the packager of the referenced platform used for compile (see
+   <a href="../platform-specification/#referencing-another-core-variant-or-tool">"Referencing another core, variant or tool"</a>
+   for more info)</li>
+<li>the tool and version provided by any other packager (in case of tie, the first packager in alphabetical order wins)</li>
+</ol>
+</li>
+</ul>
 <h3 id="example-json-index-file">Example JSON index file<a class="headerlink" href="#example-json-index-file" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
 <span class="w">  </span><span class="nt">&quot;packages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>

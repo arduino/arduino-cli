@@ -340,6 +340,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#golang-api-change-in-githubcomarduinoarduino-clirduinocorespackagemanagerexplorer" class="md-nav__link">
+    golang API change in github.com/arduino/arduino-cli/rduino/cores/packagemanager.Explorer
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2208,6 +2215,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#golang-api-change-in-githubcomarduinoarduino-clirduinocorespackagemanagerexplorer" class="md-nav__link">
+    golang API change in github.com/arduino/arduino-cli/rduino/cores/packagemanager.Explorer
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3005,6 +3019,15 @@ it can now be used to check any library, not only the libraries available in the
 changed to a <code>LibraryInstallPlan</code> structure, it contains the same information as before (<code>TargetPath</code> and <code>ReplacedLib</code>)
 plus <code>Name</code>, <code>Version</code>, and an <code>UpToDate</code> boolean flag.</p>
 <p><code>InstallZipLib</code> method <code>archivePath</code> is now a <code>paths.Path</code> instead of a <code>string</code>.</p>
+<h3 id="golang-api-change-in-githubcomarduinoarduino-clirduinocorespackagemanagerexplorer">golang API change in <code>github.com/arduino/arduino-cli/rduino/cores/packagemanager.Explorer</code><a class="headerlink" href="#golang-api-change-in-githubcomarduinoarduino-clirduinocorespackagemanagerexplorer" title="Permanent link">&para;</a></h3>
+<p>The <code>packagemanager.Explorer</code> method <code>FindToolsRequiredForBoard</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">pme</span><span class="w"> </span><span class="o">*</span><span class="nx">Explorer</span><span class="p">)</span><span class="w"> </span><span class="nx">FindToolsRequiredForBoard</span><span class="p">(</span><span class="nx">board</span><span class="w"> </span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">Board</span><span class="p">)</span><span class="w"> </span><span class="p">([]</span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">ToolRelease</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>has been renamed to `FindToolsRequiredForBuild:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">pme</span><span class="w"> </span><span class="o">*</span><span class="nx">Explorer</span><span class="p">)</span><span class="w"> </span><span class="nx">FindToolsRequiredForBuild</span><span class="p">(</span><span class="nx">platform</span><span class="p">,</span><span class="w"> </span><span class="nx">buildPlatform</span><span class="w"> </span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">PlatformRelease</span><span class="p">)</span><span class="w"> </span><span class="p">([]</span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">ToolRelease</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>moreover it now requires the <code>platform</code> and the <code>buildPlatform</code> (a.k.a. the referenced platform core used for the
+compile) instead of the <code>board</code>. Usually these two value are obtained from the <code>Explorer.ResolveFQBN(...)</code> method.</p>
 <h2 id="0290">0.29.0<a class="headerlink" href="#0290" title="Permanent link">&para;</a></h2>
 <h3 id="removed-grpc-api-ccarduinoclicommandsv1updatecorelibrariesindex-outdated-and-upgrade">Removed gRPC API: <code>cc.arduino.cli.commands.v1.UpdateCoreLibrariesIndex</code>, <code>Outdated</code>, and <code>Upgrade</code><a class="headerlink" href="#removed-grpc-api-ccarduinoclicommandsv1updatecorelibrariesindex-outdated-and-upgrade" title="Permanent link">&para;</a></h3>
 <p>The following gRPC API have been removed:</p>
