@@ -261,13 +261,17 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 			},
 		})
 	}
-
+	var shouldRestartDiscovery bool
 	{
 		// We need to rebuild the PackageManager currently in use by this instance
 		// in case this is not the first Init on this instances, that might happen
 		// after reinitializing an instance after installing or uninstalling a core.
 		// If this is not done the information of the uninstall core is kept in memory,
 		// even if it should not.
+
+		// register whether the discoveries are running, if so we need to start them in
+		// order for the previous watchers to keep receiving events
+		shouldRestartDiscovery = areDiscoveriesRunning(instance.pm)
 		pmb, commitPackageManager := instance.pm.NewBuilder()
 
 		loadBuiltinTools := func() []error {
@@ -463,12 +467,28 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		responseError(s)
 	}
 
+	if shouldRestartDiscovery {
+		pme.DiscoveryManager().Start()
+	}
 	// Refreshes the locale used, this will change the
 	// language of the CLI if the locale is different
 	// after started.
 	i18n.Init(configuration.Settings.GetString("locale"))
 
 	return nil
+}
+
+func areDiscoveriesRunning(pm *packagemanager.PackageManager) bool {
+	if pm == nil {
+		return false
+	}
+	exp, release := pm.NewExplorer()
+	defer release()
+
+	if exp.DiscoveryManager() != nil && exp.DiscoveryManager().AreDiscoveriesRunning() {
+		return true
+	}
+	return false
 }
 
 // Destroy FIXMEDOC

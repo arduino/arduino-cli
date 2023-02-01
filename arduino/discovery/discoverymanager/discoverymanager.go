@@ -65,7 +65,13 @@ func (dm *DiscoveryManager) Clear() {
 			logrus.Infof("Closed and removed discovery %s", d.GetID())
 		}
 	}
+	dm.discoveriesRunning = false
 	dm.discoveries = map[string]*discovery.PluggableDiscovery{}
+}
+
+// AreDiscoveriesRunning returns a boolean representing the running status of discoveries
+func (dm *DiscoveryManager) AreDiscoveriesRunning() bool {
+	return dm.discoveriesRunning
 }
 
 // IDs returns the list of discoveries' ids in this DiscoveryManager
@@ -194,12 +200,14 @@ func (dm *DiscoveryManager) startDiscovery(d *discovery.PluggableDiscovery) (dis
 		return fmt.Errorf("%s: %s", tr("starting discovery %s", d.GetID()), err)
 	}
 
-	go func() {
+	go func(d *discovery.PluggableDiscovery) {
 		// Transfer all incoming events from this discovery to the feed channel
 		for ev := range eventCh {
+			// here from discovery to discovery manager
 			dm.feed <- ev
 		}
-	}()
+		logrus.Infof("Discovery event channel closed %s. Exiting goroutine.", d.GetID())
+	}(d)
 	return nil
 }
 

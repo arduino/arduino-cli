@@ -98,7 +98,11 @@ func (pmb *Builder) BuildIntoExistingPackageManager(target *PackageManager) {
 	target.tempDir = pmb.tempDir
 	target.packagesCustomGlobalProperties = pmb.packagesCustomGlobalProperties
 	target.profile = pmb.profile
-	target.discoveryManager = pmb.discoveryManager
+	if target.discoveryManager != nil {
+		target.discoveryManager.Clear()
+	} else {
+		target.discoveryManager = pmb.discoveryManager
+	}
 	target.userAgent = pmb.userAgent
 }
 
