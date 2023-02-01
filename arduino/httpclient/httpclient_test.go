@@ -17,7 +17,7 @@ package httpclient
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -42,7 +42,7 @@ func TestUserAgentHeader(t *testing.T) {
 	response, err := client.Do(request)
 	require.NoError(t, err)
 
-	b, err := ioutil.ReadAll(response.Body)
+	b, err := io.ReadAll(response.Body)
 	require.NoError(t, err)
 
 	require.Equal(t, "test-user-agent", string(b))

@@ -16,7 +16,7 @@
 package ctags
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -26,7 +26,7 @@ import (
 )
 
 func produceTags(t *testing.T, filename string) []*types.CTag {
-	bytes, err := ioutil.ReadFile(filepath.Join("test_data", filename))
+	bytes, err := os.ReadFile(filepath.Join("test_data", filename))
 	require.NoError(t, err)
 
 	parser := CTagsParser{}

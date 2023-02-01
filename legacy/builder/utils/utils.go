@@ -21,7 +21,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -443,12 +442,17 @@ func CopyDir(src string, dst string, extensions []string) (err error) {
 		return
 	}
 
-	entries, err := ioutil.ReadDir(src)
+	entries, err := os.ReadDir(src)
 	if err != nil {
 		return
 	}
 
-	for _, entry := range entries {
+	for _, dirEntry := range entries {
+		entry, scopeErr := dirEntry.Info()
+		if scopeErr != nil {
+			return
+		}
+
 		srcPath := filepath.Join(src, entry.Name())
 		dstPath := filepath.Join(dst, entry.Name())
 
