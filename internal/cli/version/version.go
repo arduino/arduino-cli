@@ -59,7 +59,7 @@ func runVersionCommand(cmd *cobra.Command, args []string) {
 	if err != nil {
 		feedback.Fatal(fmt.Sprintf("Error parsing current version: %s", err), feedback.ErrGeneric)
 	}
-	latestVersion := updater.ForceCheckForUpdate(currentVersion)
+	latestVersion := updater.CheckForUpdate(currentVersion)
 
 	if feedback.GetFormat() != feedback.Text && latestVersion != nil {
 		// Set this only we managed to get the latest version
