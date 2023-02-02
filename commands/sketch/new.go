@@ -75,14 +75,13 @@ func validateSketchName(name string) error {
 		return &arduino.CantCreateSketchError{Cause: errors.New(tr("sketch name cannot be empty"))}
 	}
 	if len(name) > sketchNameMaxLength {
-		return &arduino.CantCreateSketchError{Cause: errors.New(tr("sketch name too long (%d characters). Maximum allowed length is %d",
+		return &arduino.CantCreateSketchError{Cause: errors.New(tr("sketch name too long (%[1]d characters). Maximum allowed length is %[2]d",
 			len(name),
 			sketchNameMaxLength))}
 	}
 	if !sketchNameValidationRegex.MatchString(name) {
-		return &arduino.CantCreateSketchError{Cause: errors.New(tr("invalid sketch name \"%s\". Required pattern %s",
-			name,
-			sketchNameValidationRegex.String()))}
+		return &arduino.CantCreateSketchError{Cause: errors.New(tr(`invalid sketch name \"%[1]s\": the first character must be alphanumeric, the following ones can also contain "_", "-", and ".".`,
+			name))}
 	}
 	return nil
 }
