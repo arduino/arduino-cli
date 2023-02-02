@@ -159,10 +159,7 @@ func (s *ArduinoCoreServerImpl) UpdateLibrariesIndex(req *rpc.UpdateLibrariesInd
 	err := commands.UpdateLibrariesIndex(stream.Context(), req,
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.UpdateLibrariesIndexResponse{DownloadProgress: p}) },
 	)
-	if err != nil {
-		return convertErrorToRPCStatus(err)
-	}
-	return stream.Send(&rpc.UpdateLibrariesIndexResponse{})
+	return convertErrorToRPCStatus(err)
 }
 
 // Create FIXMEDOC
@@ -357,10 +354,7 @@ func (s *ArduinoCoreServerImpl) LibraryInstall(req *rpc.LibraryInstallRequest, s
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.LibraryInstallResponse{Progress: p}) },
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.LibraryInstallResponse{TaskProgress: p}) },
 	)
-	if err != nil {
-		return convertErrorToRPCStatus(err)
-	}
-	return stream.Send(&rpc.LibraryInstallResponse{})
+	return convertErrorToRPCStatus(err)
 }
 
 // LibraryUpgrade FIXMEDOC
@@ -370,10 +364,7 @@ func (s *ArduinoCoreServerImpl) LibraryUpgrade(req *rpc.LibraryUpgradeRequest, s
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.LibraryUpgradeResponse{Progress: p}) },
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.LibraryUpgradeResponse{TaskProgress: p}) },
 	)
-	if err != nil {
-		return convertErrorToRPCStatus(err)
-	}
-	return stream.Send(&rpc.LibraryUpgradeResponse{})
+	return convertErrorToRPCStatus(err)
 }
 
 // LibraryUninstall FIXMEDOC
@@ -381,10 +372,7 @@ func (s *ArduinoCoreServerImpl) LibraryUninstall(req *rpc.LibraryUninstallReques
 	err := lib.LibraryUninstall(stream.Context(), req,
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.LibraryUninstallResponse{TaskProgress: p}) },
 	)
-	if err != nil {
-		return convertErrorToRPCStatus(err)
-	}
-	return stream.Send(&rpc.LibraryUninstallResponse{})
+	return convertErrorToRPCStatus(err)
 }
 
 // LibraryUpgradeAll FIXMEDOC
@@ -393,10 +381,7 @@ func (s *ArduinoCoreServerImpl) LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequ
 		func(p *rpc.DownloadProgress) { stream.Send(&rpc.LibraryUpgradeAllResponse{Progress: p}) },
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.LibraryUpgradeAllResponse{TaskProgress: p}) },
 	)
-	if err != nil {
-		return convertErrorToRPCStatus(err)
-	}
-	return stream.Send(&rpc.LibraryUpgradeAllResponse{})
+	return convertErrorToRPCStatus(err)
 }
 
 // LibraryResolveDependencies FIXMEDOC
@@ -429,10 +414,7 @@ func (s *ArduinoCoreServerImpl) ZipLibraryInstall(req *rpc.ZipLibraryInstallRequ
 		stream.Context(), req,
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.ZipLibraryInstallResponse{TaskProgress: p}) },
 	)
-	if err != nil {
-		return convertErrorToRPCStatus(err)
-	}
-	return stream.Send(&rpc.ZipLibraryInstallResponse{})
+	return convertErrorToRPCStatus(err)
 }
 
 // GitLibraryInstall FIXMEDOC
@@ -441,10 +423,7 @@ func (s *ArduinoCoreServerImpl) GitLibraryInstall(req *rpc.GitLibraryInstallRequ
 		stream.Context(), req,
 		func(p *rpc.TaskProgress) { stream.Send(&rpc.GitLibraryInstallResponse{TaskProgress: p}) },
 	)
-	if err != nil {
-		return convertErrorToRPCStatus(err)
-	}
-	return stream.Send(&rpc.GitLibraryInstallResponse{})
+	return convertErrorToRPCStatus(err)
 }
 
 // EnumerateMonitorPortSettings FIXMEDOC
