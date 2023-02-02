@@ -2,6 +2,7 @@ package sketch
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -11,7 +12,6 @@ import (
 func Test_SketchNameWrongPattern(t *testing.T) {
 	invalidNames := []string{
 		"&",
-		"",
 		".hello",
 		"_hello",
 		"-hello",
@@ -24,11 +24,9 @@ func Test_SketchNameWrongPattern(t *testing.T) {
 			SketchName: name,
 			SketchDir:  t.TempDir(),
 		})
-		require.NotNil(t, err)
 
-		require.Error(t, err, `Can't create sketch: invalid sketch name "%s". Required pattern %s`,
-			name,
-			sketchNameValidationRegex)
+		require.EqualError(t, err, fmt.Sprintf(`Can't create sketch: invalid sketch name "%s": the first character must be alphanumeric, the following ones can also contain "_", "-", and ".".`,
+			name))
 	}
 }
 
@@ -38,9 +36,8 @@ func Test_SketchNameEmpty(t *testing.T) {
 		SketchName: emptyName,
 		SketchDir:  t.TempDir(),
 	})
-	require.NotNil(t, err)
 
-	require.Error(t, err, `Can't create sketch: sketch name cannot be empty`)
+	require.EqualError(t, err, `Can't create sketch: sketch name cannot be empty`)
 }
 
 func Test_SketchNameTooLong(t *testing.T) {
@@ -52,11 +49,10 @@ func Test_SketchNameTooLong(t *testing.T) {
 		SketchName: string(tooLongName),
 		SketchDir:  t.TempDir(),
 	})
-	require.NotNil(t, err)
 
-	require.Error(t, err, `Can't create sketch: sketch name too long (%d characters). Maximum allowed length is %d`,
+	require.EqualError(t, err, fmt.Sprintf(`Can't create sketch: sketch name too long (%d characters). Maximum allowed length is %d`,
 		len(tooLongName),
-		sketchNameMaxLength)
+		sketchNameMaxLength))
 }
 
 func Test_SketchNameOk(t *testing.T) {
