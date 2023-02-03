@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -53,7 +52,7 @@ func main() {
 	// To avoid polluting an existing arduino-cli installation, the example
 	// client uses a temp folder to keep cores, libraries and the like.
 	// You can point `dataDir` to a location that better fits your needs.
-	dataDir, err = ioutil.TempDir("", "arduino-rpc-client")
+	dataDir, err = os.MkdirTemp("", "arduino-rpc-client")
 	if err != nil {
 		log.Fatal(err)
 	}

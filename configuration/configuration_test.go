@@ -17,7 +17,6 @@ package configuration
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -27,7 +26,7 @@ import (
 )
 
 func tmpDirOrDie() string {
-	dir, err := ioutil.TempDir(os.TempDir(), "cli_test")
+	dir, err := os.MkdirTemp(os.TempDir(), "cli_test")
 	if err != nil {
 		panic(fmt.Sprintf("error creating tmp dir: %v", err))
 	}

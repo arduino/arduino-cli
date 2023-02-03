@@ -287,6 +287,8 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	loadIndex("https://dl.espressif.com/dl/package_esp32_index.json")
 	loadIndex("http://arduino.esp8266.com/stable/package_esp8266com_index.json")
 	loadIndex("https://adafruit.github.io/arduino-board-index/package_adafruit_index.json")
+	loadIndex("https://test.com/package_test_index.json") // this is not downloaded, it just picks the "local cached" file package_test_index.json
+
 	// We ignore the errors returned since they might not be necessarily blocking
 	// but just warnings for the user, like in the case a board is not loaded
 	// because of malformed menus
@@ -310,8 +312,13 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	})
 	require.NotNil(t, esptool0413)
 
+	testPlatform := pme.FindPlatformRelease(&packagemanager.PlatformReference{
+		Package:              "test",
+		PlatformArchitecture: "avr",
+		PlatformVersion:      semver.MustParse("1.1.0")})
+
 	testConflictingToolsInDifferentPackages := func() {
-		tools, err := pme.FindToolsRequiredForBoard(esp32)
+		tools, err := pme.FindToolsRequiredForBuild(esp32.PlatformRelease, nil)
 		require.NoError(t, err)
 		require.Contains(t, tools, esptool231)
 		require.NotContains(t, tools, esptool0413)
@@ -331,10 +338,44 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	testConflictingToolsInDifferentPackages()
 	testConflictingToolsInDifferentPackages()
 
+	{
+		// Test buildPlatform dependencies
+		arduinoBossac180 := pme.FindToolDependency(&cores.ToolDependency{
+			ToolPackager: "arduino",
+			ToolName:     "bossac",
+			ToolVersion:  semver.ParseRelaxed("1.8.0-48-gb176eee"),
+		})
+		require.NotNil(t, arduinoBossac180)
+		testBossac175 := pme.FindToolDependency(&cores.ToolDependency{
+			ToolPackager: "test",
+			ToolName:     "bossac",
+			ToolVersion:  semver.ParseRelaxed("1.7.5"),
+		})
+		require.NotNil(t, testBossac175)
+
+		tools, err := pme.FindToolsRequiredForBuild(esp32.PlatformRelease, nil)
+		require.NoError(t, err)
+		require.Contains(t, tools, esptool231)
+		require.NotContains(t, tools, esptool0413)
+		// When building without testPlatform dependency, arduino:bossac should be selected
+		// since it has the higher version
+		require.NotContains(t, tools, testBossac175)
+		require.Contains(t, tools, arduinoBossac180)
+
+		tools, err = pme.FindToolsRequiredForBuild(esp32.PlatformRelease, testPlatform)
+		require.NoError(t, err)
+		require.Contains(t, tools, esptool231)
+		require.NotContains(t, tools, esptool0413)
+		// When building with testPlatform dependency, test:bossac should be selected
+		// because it has dependency priority
+		require.Contains(t, tools, testBossac175)
+		require.NotContains(t, tools, arduinoBossac180)
+	}
+
 	feather, err := pme.FindBoardWithFQBN("adafruit:samd:adafruit_feather_m0_express")
 	require.NoError(t, err)
 	require.NotNil(t, feather)
-	featherTools, err := pme.FindToolsRequiredForBoard(feather)
+	featherTools, err := pme.FindToolsRequiredForBuild(feather.PlatformRelease, nil)
 	require.NoError(t, err)
 	require.NotNil(t, featherTools)
 

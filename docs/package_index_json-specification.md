@@ -176,17 +176,6 @@ The other fields are:
   macOS you can use the command `shasum -a 256 filename` to generate SHA-256 checksums. There are free options for
   Windows, including md5deep. There are also online utilities for generating checksums.
 
-##### How a tool's path is determined in platform.txt
-
-When the IDE needs a tool, it downloads the corresponding archive file and unpacks the content into a private folder
-that can be referenced from `platform.txt` using one of the following properties:
-
-- `{runtime.tools.TOOLNAME-VERSION.path}`
-- `{runtime.tools.TOOLNAME.path}`
-
-For example, to obtain the avr-gcc 4.8.1 folder we can use `{runtime.tools.avr-gcc-4.8.1-arduino5.path}` or
-`{runtime.tools.avr-gcc.path}`.
-
 ### Platforms definitions
 
 Finally, let's see how `PLATFORMS` are made.
@@ -269,6 +258,38 @@ rules Arduino IDE follows for parsing versions
 
 Note: if you miss a bracket in the JSON index, then add the URL to your Preferences, and open Boards Manager it can
 cause the Arduino IDE to no longer load until you have deleted the file from your arduino15 folder.
+
+#### How a tool's path is determined in platform.txt
+
+When the IDE needs a tool, it downloads the corresponding archive file and unpacks the content into a private folder
+that can be referenced from `platform.txt` using one of the following properties:
+
+- `{runtime.tools.TOOLNAME-VERSION.path}`
+- `{runtime.tools.TOOLNAME.path}`
+
+For example, to obtain the avr-gcc 4.8.1 folder we can use `{runtime.tools.avr-gcc-4.8.1.path}` or
+`{runtime.tools.avr-gcc.path}`.
+
+In general the same tool may be provided by different packagers (for example the Arduino packager may provide an
+`arduino:avr-gcc` and another 3rd party packager may provide their own `3rdparty:avr-gcc`). The rules to disambiguate
+are as follows:
+
+- The property `{runtime.tools.TOOLNAME.path}` points, in order of priority, to:
+
+  1. the tool, version and packager specified via `toolsDependencies` in the `package_index.json`
+  1. the highest version of the tool provided by the packager of the current platform
+  1. the highest version of the tool provided by the packager of the referenced platform used for compile (see
+     ["Referencing another core, variant or tool"](platform-specification.md#referencing-another-core-variant-or-tool)
+     for more info)
+  1. the highest version of the tool provided by any other packager (in case of tie, the first packager in alphabetical
+     order wins)
+
+- The property `{runtime.tools.TOOLNAME-VERSION.path}` points, in order of priority, to:
+  1. the tool and version provided by the packager of the current platform
+  1. the tool and version provided by the packager of the referenced platform used for compile (see
+     ["Referencing another core, variant or tool"](platform-specification.md#referencing-another-core-variant-or-tool)
+     for more info)
+  1. the tool and version provided by any other packager (in case of tie, the first packager in alphabetical order wins)
 
 ### Example JSON index file
 

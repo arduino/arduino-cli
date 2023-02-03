@@ -614,29 +614,58 @@ func (pme *Explorer) GetTool(toolID string) *cores.Tool {
 	}
 }
 
-// FindToolsRequiredForBoard FIXMEDOC
-func (pme *Explorer) FindToolsRequiredForBoard(board *cores.Board) ([]*cores.ToolRelease, error) {
-	pme.log.Infof("Searching tools required for board %s", board)
+// FindToolsRequiredForBuild returns the list of ToolReleases needed to build for the specified
+// plaftorm. The buildPlatform may be different depending on the selected board.
+func (pme *Explorer) FindToolsRequiredForBuild(platform, buildPlatform *cores.PlatformRelease) ([]*cores.ToolRelease, error) {
 
-	// core := board.Properties["build.core"]
-	platform := board.PlatformRelease
-
-	// maps "PACKAGER:TOOL" => ToolRelease
-	foundTools := map[string]*cores.ToolRelease{}
-
-	// a Platform may not specify required tools (because it's a platform that comes from a
-	// user/hardware dir without a package_index.json) then add all available tools
-	for _, targetPackage := range pme.packages {
-		for _, tool := range targetPackage.Tools {
-			rel := tool.GetLatestInstalled()
-			if rel != nil {
-				foundTools[rel.Tool.Name] = rel
-			}
-		}
+	// maps tool name => all available ToolRelease
+	allToolsAlternatives := map[string][]*cores.ToolRelease{}
+	for _, tool := range pme.GetAllInstalledToolsReleases() {
+		alternatives := allToolsAlternatives[tool.Tool.Name]
+		alternatives = append(alternatives, tool)
+		allToolsAlternatives[tool.Tool.Name] = alternatives
 	}
 
-	// replace the default tools above with the specific required by the current platform
+	// selectBest select the tool with best matching, applying the following rules
+	// in order of priority:
+	// - the tool comes from the requested packager
+	// - the tool comes from the build platform packager
+	// - the tool has the greatest version
+	// - the tool packager comes first in alphabetic order
+	packagerPriority := map[string]int{}
+	packagerPriority[platform.Platform.Package.Name] = 2
+	if buildPlatform != nil {
+		packagerPriority[buildPlatform.Platform.Package.Name] = 1
+	}
+	selectBest := func(tools []*cores.ToolRelease) *cores.ToolRelease {
+		selected := tools[0]
+		for _, tool := range tools[1:] {
+			if packagerPriority[tool.Tool.Package.Name] != packagerPriority[selected.Tool.Package.Name] {
+				if packagerPriority[tool.Tool.Package.Name] > packagerPriority[selected.Tool.Package.Name] {
+					selected = tool
+				}
+				continue
+			}
+			if !tool.Version.Equal(selected.Version) {
+				if tool.Version.GreaterThan(selected.Version) {
+					selected = tool
+				}
+				continue
+			}
+			if tool.Tool.Package.Name < selected.Tool.Package.Name {
+				selected = tool
+			}
+		}
+		return selected
+	}
+
+	// First select the specific tools required by the current platform
 	requiredTools := []*cores.ToolRelease{}
+	// The Sorting of the tool dependencies is required because some platforms may depends
+	// on more than one version of the same tool. For example adafruit:samd has both
+	// bossac@1.8.0-48-gb176eee and bossac@1.7.0. To allow the runtime property
+	// {runtime.tools.bossac.path} to be correctly set to the 1.8.0 version we must ensure
+	// that the returned array is sorted by version.
 	platform.ToolDependencies.Sort()
 	for _, toolDep := range platform.ToolDependencies {
 		pme.log.WithField("tool", toolDep).Infof("Required tool")
@@ -645,11 +674,15 @@ func (pme *Explorer) FindToolsRequiredForBoard(board *cores.Board) ([]*cores.Too
 			return nil, fmt.Errorf(tr("tool release not found: %s"), toolDep)
 		}
 		requiredTools = append(requiredTools, tool)
-		delete(foundTools, tool.Tool.Name)
+		delete(allToolsAlternatives, tool.Tool.Name)
 	}
 
-	for _, toolRel := range foundTools {
-		requiredTools = append(requiredTools, toolRel)
+	// Since a Platform may not specify the required tools (because it's a platform that comes
+	// from a user/hardware dir without a package_index.json) then add all available tools giving
+	// priority to tools coming from the same packager or referenced packager
+	for _, tools := range allToolsAlternatives {
+		tool := selectBest(tools)
+		requiredTools = append(requiredTools, tool)
 	}
 	return requiredTools, nil
 }

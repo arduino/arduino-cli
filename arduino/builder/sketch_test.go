@@ -17,7 +17,6 @@ package builder_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -31,7 +30,7 @@ import (
 )
 
 func tmpDirOrDie() *paths.Path {
-	dir, err := ioutil.TempDir(os.TempDir(), "builder_test")
+	dir, err := os.MkdirTemp(os.TempDir(), "builder_test")
 	if err != nil {
 		panic(fmt.Sprintf("error creating tmp dir: %v", err))
 	}
@@ -44,7 +43,7 @@ func TestSaveSketch(t *testing.T) {
 	sketchFile := filepath.Join("testdata", sketchName)
 	tmp := tmpDirOrDie()
 	defer tmp.RemoveAll()
-	source, err := ioutil.ReadFile(sketchFile)
+	source, err := os.ReadFile(sketchFile)
 	if err != nil {
 		t.Fatalf("unable to read golden file %s: %v", sketchFile, err)
 	}
