@@ -67,7 +67,7 @@ func New(baseDir *paths.Path) *BuildCache {
 }
 
 func removeIfExpired(dir *paths.Path, ttl time.Duration) {
-	fileInfo, err := dir.Join().Stat()
+	fileInfo, err := dir.Join(lastUsedFileName).Stat()
 	if err != nil {
 		return
 	}

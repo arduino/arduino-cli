@@ -73,8 +73,6 @@ func TestPurge(t *testing.T) {
 
 	New(dirToPurge).Purge(ttl)
 
-	files, err := dirToPurge.Join("fresh").Stat()
-	require.Nil(t, err)
-	require.True(t, files.IsDir())
-	require.True(t, dirToPurge.Exist())
+	require.False(t, dirToPurge.Join("old").Exist())
+	require.True(t, dirToPurge.Join("fresh").Exist())
 }
