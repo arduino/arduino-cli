@@ -100,7 +100,7 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 		targetArchivedCore = buildCachePath.Join(archivedCoreName, "core.a")
 		_, buildCacheErr = buildcache.New(buildCachePath).GetOrCreate(archivedCoreName)
 
-		if errors.As(buildCacheErr, &buildcache.ErrCreateBaseDir{}) {
+		if errors.Is(buildCacheErr, buildcache.CreateDirErr) {
 			return nil, nil, fmt.Errorf(tr("creating core cache folder: %s", err))
 		}
 

@@ -23,24 +23,35 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type wrapError struct {
-	wrapped error
+const (
+	createDirErrCode = 1
+	fileWriteErrCode = 2
+)
+
+type cacheError struct {
+	Code       int
+	wrappedErr error
 }
 
-func (e wrapError) Error() string {
-	return e.wrapped.Error()
+func (e cacheError) Error() string {
+	return e.wrappedErr.Error()
 }
 
-func (e wrapError) Unwrap() error {
-	return e.wrapped
+func (e cacheError) Unwrap() error {
+	return e.wrappedErr
 }
 
-type ErrCreateBaseDir struct {
-	wrapError
+func (e cacheError) Is(target error) bool {
+	te, ok := target.(cacheError)
+	return ok && te.Code == e.Code
 }
-type ErrWriteLastUsedFile struct {
-	wrapError
-}
+
+var (
+	// CreateDirErr error occurred when creating the cache directory
+	CreateDirErr = cacheError{Code: createDirErrCode}
+	// FileWriteErr error occurred when writing the placeholder file
+	FileWriteErr = cacheError{Code: fileWriteErrCode}
+)
 
 const lastUsedFileName = ".last-used"
 
@@ -56,11 +67,11 @@ type BuildCache struct {
 func (bc *BuildCache) GetOrCreate(key string) (*paths.Path, error) {
 	keyDir := bc.baseDir.Join(key)
 	if err := keyDir.MkdirAll(); err != nil {
-		return nil, &ErrCreateBaseDir{wrapError{err}}
+		return nil, cacheError{createDirErrCode, err}
 	}
 
 	if err := keyDir.Join(lastUsedFileName).WriteFile([]byte{}); err != nil {
-		return nil, &ErrWriteLastUsedFile{wrapError{err}}
+		return nil, cacheError{fileWriteErrCode, err}
 	}
 	return keyDir, nil
 }
