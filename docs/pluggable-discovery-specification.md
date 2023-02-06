@@ -127,6 +127,7 @@ call. The format of the response is the following:
       "label":         <-- HOW THE PORT IS DISPLAYED ON THE GUI
       "protocol":      <-- THE PROTOCOL USED BY THE BOARD
       "protocolLabel": <-- HOW THE PROTOCOL IS DISPLAYED ON THE GUI
+      "hardwareId":    <-- A STRING THAT UNIQUELY IDENTIFIES A BOARD SAMPLE
       "properties": {
                        <-- A LIST OF PROPERTIES OF THE PORT
       }
@@ -147,7 +148,15 @@ Each port has:
   `SSH on 192.168.10.100`)
 - `protocol` is the protocol identifier (such as `serial` or `dfu` or `ssh`)
 - `protocolLabel` is the `protocol` in human readable form (for example `Serial port` or `DFU USB` or `Network (ssh)`)
-- `properties` is a list of key/value pairs that represent information relative to the specific port
+- `hardwareId` (optional) a string that uniquely identify a specific board sample (even among other boards of the same
+  model). Different ports with the same `hardwareId` must belong to the same board sample. The identifier should be
+  sufficiently long to uniquely identify the board sample and reduce the probability of collisions. Good examples of
+  `hardwareId` values are: Ethernet MAC Address, USB Serial Number, CPU-ID number, etc.
+
+  This value **should not** be used to identify the board **model** (see the
+  [board identification](#board-identification) section for more information about identification of the board model).
+
+- `properties` is a list of key/value pairs that represent information relative to the specific port.
 
 To make the above more clear let's show an example output from the `serial-discovery` builtin in the Arduino CLI:
 
@@ -160,6 +169,7 @@ To make the above more clear let's show an example output from the `serial-disco
       "label": "ttyACM0",
       "protocol": "serial",
       "protocolLabel": "Serial Port (USB)",
+      "hardwareId": "EBEABFD6514D32364E202020FF10181E",
       "properties": {
         "pid": "0x804e",
         "vid": "0x2341",
@@ -174,6 +184,8 @@ To make the above more clear let's show an example output from the `serial-disco
 In this case the serial port metadata comes from a USB serial converter. Inside the `properties` we have all the
 properties of the port, and some of them may be useful for product identification (in this case only USB VID/PID is
 useful to identify the board model).
+
+The `hardwareId` field is populated with the USB `serialNumber` since this value is useful to identify the board sample.
 
 The `LIST` command performs a one-shot polling of the ports. The discovery should answer as soon as reasonably possible,
 without any additional delay.
@@ -231,6 +243,7 @@ The `add` event looks like the following:
   "port": {
     "address": "/dev/ttyACM0",
     "label": "ttyACM0",
+    "hardwareId": "EBEABFD6514D32364E202020FF10181E",
     "properties": {
       "pid": "0x804e",
       "vid": "0x2341",
