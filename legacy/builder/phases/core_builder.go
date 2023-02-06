@@ -100,6 +100,10 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 		targetArchivedCore = buildCachePath.Join(archivedCoreName, "core.a")
 		_, buildCacheErr = buildcache.New(buildCachePath).GetOrCreate(archivedCoreName)
 
+		if errors.As(buildCacheErr, &buildcache.ErrCreateBaseDir{}) {
+			return nil, nil, fmt.Errorf(tr("creating core cache folder: %s", err))
+		}
+
 		canUseArchivedCore := !ctx.OnlyUpdateCompilationDatabase &&
 			!ctx.Clean &&
 			!builder_utils.CoreOrReferencedCoreHasChanged(realCoreFolder, targetCoreFolder, targetArchivedCore)
@@ -125,11 +129,6 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 
 	// archive core.a
 	if targetArchivedCore != nil && !ctx.OnlyUpdateCompilationDatabase {
-		if buildCacheErr != nil {
-			if err := targetArchivedCore.Parent().Mkdir(); err != nil {
-				return nil, nil, fmt.Errorf(tr("creating core cache folder: %s", err))
-			}
-		}
 		err := archiveFile.CopyTo(targetArchivedCore)
 		if ctx.Verbose {
 			if err == nil {

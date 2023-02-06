@@ -23,6 +23,25 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type wrapError struct {
+	wrapped error
+}
+
+func (e wrapError) Error() string {
+	return e.wrapped.Error()
+}
+
+func (e wrapError) Unwrap() error {
+	return e.wrapped
+}
+
+type ErrCreateBaseDir struct {
+	wrapError
+}
+type ErrWriteLastUsedFile struct {
+	wrapError
+}
+
 const lastUsedFileName = ".last-used"
 
 // BuildCache represents a cache of built files (sketches and cores), it's designed
@@ -37,11 +56,11 @@ type BuildCache struct {
 func (bc *BuildCache) GetOrCreate(key string) (*paths.Path, error) {
 	keyDir := bc.baseDir.Join(key)
 	if err := keyDir.MkdirAll(); err != nil {
-		return nil, err
+		return nil, &ErrCreateBaseDir{wrapError{err}}
 	}
 
 	if err := keyDir.Join(lastUsedFileName).WriteFile([]byte{}); err != nil {
-		return nil, err
+		return nil, &ErrWriteLastUsedFile{wrapError{err}}
 	}
 	return keyDir, nil
 }
