@@ -127,7 +127,7 @@ call. The format of the response is the following:
       "label":         <-- HOW THE PORT IS DISPLAYED ON THE GUI
       "protocol":      <-- THE PROTOCOL USED BY THE BOARD
       "protocolLabel": <-- HOW THE PROTOCOL IS DISPLAYED ON THE GUI
-      "hardwareId":    <-- A STRING THAT UNIQUELY IDENTIFIES A BOARD SAMPLE
+      "hardwareId":    <-- A STRING THAT UNIQUELY IDENTIFIES A BOARD INSTANCE
       "properties": {
                        <-- A LIST OF PROPERTIES OF THE PORT
       }
@@ -148,10 +148,10 @@ Each port has:
   `SSH on 192.168.10.100`)
 - `protocol` is the protocol identifier (such as `serial` or `dfu` or `ssh`)
 - `protocolLabel` is the `protocol` in human readable form (for example `Serial port` or `DFU USB` or `Network (ssh)`)
-- `hardwareId` (optional) a string that uniquely identify a specific board sample (even among other boards of the same
-  model). Different ports with the same `hardwareId` must belong to the same board sample. The identifier should be
-  sufficiently long to uniquely identify the board sample and reduce the probability of collisions. Good examples of
-  `hardwareId` values are: Ethernet MAC Address, USB Serial Number, CPU-ID number, etc.
+- `hardwareId` (optional) a string that uniquely identifies a specific board instance (even among other boards of the
+  same model). Different ports with the same `hardwareId` must belong to the same board instance. The identifier should
+  be sufficiently long to uniquely identify the board instance and reduce the probability of collisions. Good examples
+  of `hardwareId` values are: Ethernet MAC Address, USB Serial Number, CPU-ID number, etc.
 
   This value **should not** be used to identify the board **model** (see the
   [board identification](#board-identification) section for more information about identification of the board model).
@@ -185,7 +185,8 @@ In this case the serial port metadata comes from a USB serial converter. Inside 
 properties of the port, and some of them may be useful for product identification (in this case only USB VID/PID is
 useful to identify the board model).
 
-The `hardwareId` field is populated with the USB `serialNumber` since this value is useful to identify the board sample.
+The `hardwareId` field is populated with the USB `serialNumber` since this value is useful to identify the board
+instance.
 
 The `LIST` command performs a one-shot polling of the ports. The discovery should answer as soon as reasonably possible,
 without any additional delay.
