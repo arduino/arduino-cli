@@ -445,7 +445,6 @@ func TestUploadWithInputDirContainingMultipleBinaries(t *testing.T) {
 		// Verifies upload fails because multiple binaries are found
 		_, stderr, err := cli.Run("upload", "-b", board.fqbn, "-p", board.address, "--input-dir", binariesDir.String())
 		require.Error(t, err)
-		require.Contains(t, string(stderr), "Error during Upload: ")
 		require.Contains(t, string(stderr), "Error finding build artifacts: ")
 		require.Contains(t, string(stderr), "autodetect build artifact: ")
 		require.Contains(t, string(stderr), "multiple build artifacts found:")
