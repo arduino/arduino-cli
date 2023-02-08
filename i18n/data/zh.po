@@ -2,17 +2,17 @@
 # Translators:
 # CLI team <prj_cli_team@arduino.cc>, 2022
 # Kuo Szu-Wei, 2022
-# cike567, 2022
 # ZW, 2022
+# cike567, 2022
 # 
 msgid ""
 msgstr ""
-"Last-Translator: ZW, 2022\n"
+"Last-Translator: cike567, 2022\n"
 "Language-Team: Chinese (https://www.transifex.com/arduino-1/teams/108174/zh/)\n"
 "Language: zh\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: version/version.go:53
+#: version/version.go:59
 msgid "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
 msgstr "%[1]s %[2]s 版本：%[3]s 提交：%[4]s 日期：%[5]s"
 
@@ -24,7 +24,7 @@ msgstr "%[1]s 文件夹不再受支持！有关详细信息，请参见 %[2]s"
 msgid "%[1]s invalid, rebuilding all"
 msgstr "%[1]s 无效，全部重建"
 
-#: cli/lib/check_deps.go:113
+#: internal/cli/lib/check_deps.go:111
 msgid "%[1]s is required but %[2]s is currently installed."
 msgstr "%[1]s 是必需的，但当前已安装 %[2]s。"
 
@@ -48,7 +48,7 @@ msgstr "%[1]s，端口：%[2]s"
 msgid "%[1]s, protocol version: %[2]d"
 msgstr "%[1]s，协议版本：%[2]d"
 
-#: arduino/resources/download.go:48
+#: arduino/resources/download.go:49
 msgid "%s already downloaded"
 msgstr "%s 已经下载"
 
@@ -60,7 +60,7 @@ msgstr "%s 和 %s 不能一起使用"
 msgid "%s installed"
 msgstr "%s 已安装"
 
-#: cli/lib/check_deps.go:110
+#: internal/cli/lib/check_deps.go:108
 msgid "%s is already installed."
 msgstr "%s 已安装"
 
@@ -73,7 +73,7 @@ msgstr "%s 不是目录"
 msgid "%s is not managed by package manager"
 msgstr "%s 不是由软件包管理器管理的"
 
-#: cli/lib/check_deps.go:107
+#: internal/cli/lib/check_deps.go:105
 msgid "%s must be installed."
 msgstr "%s 必须安装"
 
@@ -85,7 +85,7 @@ msgstr "%s 模式丢失"
 msgid "'%s' has an invalid signature"
 msgstr "‘%s’ 的签名无效"
 
-#: cli/board/listall.go:91 cli/board/search.go:89
+#: internal/cli/board/listall.go:89 internal/cli/board/search.go:87
 msgid "(hidden)"
 msgstr "（隐藏）"
 
@@ -93,19 +93,23 @@ msgstr "（隐藏）"
 msgid "(legacy)"
 msgstr "（遗留）"
 
-#: cli/lib/install.go:82
+#: internal/cli/lib/install.go:80
 msgid ""
 "--git-url and --zip-path are disabled by default, for more information see: "
 "%v"
 msgstr "--git-url 和 --zip-path 默认是禁用的，更多信息参考： %v"
 
-#: cli/lib/install.go:85
+#: internal/cli/lib/install.go:82
 msgid ""
 "--git-url and --zip-path flags allow installing untrusted files, use it at "
 "your own risk."
 msgstr "--git-url 和 --zip-path 参数允许安装不受信任的文件，使用该标志风险自负。"
 
-#: cli/updater/updater.go:70
+#: commands/sketch/new.go:63
+msgid ".ino file already exists"
+msgstr ".ino 文件已存在"
+
+#: internal/cli/updater/updater.go:71
 msgid "A new release of Arduino CLI is available:"
 msgstr "新版本的 Arduino CLI 可用："
 
@@ -113,32 +117,32 @@ msgstr "新版本的 Arduino CLI 可用："
 msgid "A programmer is required to upload"
 msgstr "需要编译器上传"
 
-#: cli/core/download.go:36 cli/core/install.go:38 cli/core/uninstall.go:36
-#: cli/core/upgrade.go:39
+#: internal/cli/core/download.go:34 internal/cli/core/install.go:36
+#: internal/cli/core/uninstall.go:34 internal/cli/core/upgrade.go:37
 msgid "ARCH"
 msgstr "ARCH"
 
-#: cli/generatedocs/generatedocs.go:80
+#: internal/cli/generatedocs/generatedocs.go:80
 msgid "ARDUINO COMMAND LINE MANUAL"
 msgstr "ARDUINO 命令行手册"
 
-#: cli/usage.go:32
+#: internal/cli/usage.go:32
 msgid "Additional help topics:"
 msgstr "更多帮助："
 
-#: cli/config/add.go:74 cli/config/add.go:75
+#: internal/cli/config/add.go:73 internal/cli/config/add.go:74
 msgid "Adds one or more values to a setting."
 msgstr "将一个或多个值添加到设置中。"
 
-#: cli/usage.go:27
+#: internal/cli/usage.go:27
 msgid "Aliases:"
 msgstr "别名："
 
-#: cli/core/upgrade.go:75
+#: internal/cli/core/upgrade.go:72
 msgid "All the cores are already at the latest version"
 msgstr "所有内核都是最新版本"
 
-#: commands/lib/install.go:87 commands/lib/install.go:132
+#: commands/lib/install.go:86
 msgid "Already installed %s"
 msgstr "已经安装 %s"
 
@@ -154,15 +158,15 @@ msgstr "添加原型时出错"
 msgid "An error occurred detecting libraries"
 msgstr "检测库时出错"
 
-#: cli/daemon/daemon.go:67
+#: internal/cli/daemon/daemon.go:62
 msgid "Append debug logging to the specified file"
 msgstr "附加除错日志到特定文件"
 
-#: cli/lib/search.go:164
+#: internal/cli/lib/search.go:159
 msgid "Architecture: %s"
 msgstr "架构：%s"
 
-#: commands/sketch/archive.go:70
+#: commands/sketch/archive.go:71
 msgid "Archive already exists"
 msgstr "存档已经存在"
 
@@ -170,92 +174,84 @@ msgstr "存档已经存在"
 msgid "Archiving built core (caching) in: %[1]s"
 msgstr "存档构建代码（缓存）：%[1]s"
 
-#: cli/sketch/sketch.go:31 cli/sketch/sketch.go:32
+#: internal/cli/sketch/sketch.go:31 internal/cli/sketch/sketch.go:32
 msgid "Arduino CLI sketch commands."
 msgstr "Arduino CLI 项目命令"
 
-#: cli/cli.go:72
+#: internal/cli/cli.go:70
 msgid "Arduino CLI."
 msgstr "Arduino CLI。"
 
-#: cli/cli.go:73
+#: internal/cli/cli.go:71
 msgid "Arduino Command Line Interface (arduino-cli)."
 msgstr "Arduino 命令行界面 (arduino-cli)"
 
-#: cli/board/board.go:31 cli/board/board.go:32
+#: internal/cli/board/board.go:31 internal/cli/board/board.go:32
 msgid "Arduino board commands."
 msgstr "Arduino 开发板命令"
 
-#: cli/cache/cache.go:31 cli/cache/cache.go:32
+#: internal/cli/cache/cache.go:31 internal/cli/cache/cache.go:32
 msgid "Arduino cache commands."
 msgstr "Arduino 缓存命令。"
 
-#: cli/lib/lib.go:31 cli/lib/lib.go:32
+#: internal/cli/lib/lib.go:31 internal/cli/lib/lib.go:32
 msgid "Arduino commands about libraries."
 msgstr "Arduino 关于库的命令。"
 
-#: cli/config/config.go:33
+#: internal/cli/config/config.go:33
 msgid "Arduino configuration commands."
 msgstr "Arduino 配置命令。"
 
-#: cli/core/core.go:31 cli/core/core.go:32
+#: internal/cli/core/core.go:31 internal/cli/core/core.go:32
 msgid "Arduino core operations."
 msgstr "Arduino 内核操作。"
 
-#: cli/lib/check_deps.go:57 cli/lib/install.go:128
+#: internal/cli/lib/check_deps.go:56 internal/cli/lib/install.go:122
 msgid "Arguments error: %v"
 msgstr "参数错误：%v"
 
-#: cli/board/attach.go:81
-msgid "Attach board error: %v"
-msgstr "写入开发板错误：%v"
-
-#: cli/board/attach.go:41 cli/board/attach.go:42 cli/board/board.go:35
+#: internal/cli/board/attach.go:31
 msgid "Attaches a sketch to a board."
 msgstr "将项目写入开发板上。"
 
-#: cli/lib/search.go:155
+#: internal/cli/lib/search.go:150
 msgid "Author: %s"
 msgstr "作者：%s"
 
-#: arduino/libraries/librariesmanager/install.go:77
+#: arduino/libraries/librariesmanager/install.go:78
 msgid ""
 "Automatic library install can't be performed in this case, please manually "
 "remove all duplicates and retry."
-msgstr ""
+msgstr "在这种情况下不能进行自动安装库，请手动删除所有重复的库并重试。"
 
 #: commands/lib/uninstall.go:57
 msgid ""
 "Automatic library uninstall can't be performed in this case, please manually"
 " remove them."
-msgstr ""
+msgstr "在这种情况下不能进行自动卸载库，请手动删除它们。"
 
-#: cli/lib/list.go:131
+#: internal/cli/lib/list.go:129
 msgid "Available"
 msgstr "可用"
 
-#: cli/usage.go:29
+#: internal/cli/usage.go:29
 msgid "Available Commands:"
 msgstr "可用命令："
 
-#: cli/upload/upload.go:72
+#: internal/cli/upload/upload.go:71
 msgid "Binary file to upload."
 msgstr "要上传的二进制文件。"
 
-#: cli/board/list.go:91 cli/board/list.go:131 cli/board/listall.go:87
-#: cli/board/search.go:85
+#: internal/cli/board/list.go:97 internal/cli/board/list.go:137
+#: internal/cli/board/listall.go:85 internal/cli/board/search.go:83
 msgid "Board Name"
 msgstr "开发板名"
 
-#: commands/board/attach.go:95
-msgid "Board found: %s"
-msgstr "找到开发板：%s"
-
-#: cli/board/details.go:119
+#: internal/cli/board/details.go:118
 msgid "Board name:"
 msgstr "开发板名："
 
-#: cli/board/details.go:121
+#: internal/cli/board/details.go:120
 msgid "Board version:"
 msgstr "开发板版本："
 
@@ -263,13 +259,9 @@ msgstr "开发板版本："
 msgid "Bootloader file specified but missing: %[1]s"
 msgstr "已指定引导加载程序文件，缺少：%[1]s"
 
-#: cli/compile/compile.go:103
+#: internal/cli/compile/compile.go:100
 msgid "Builds of 'core.a' are saved into this path to be cached and reused."
-msgstr "‘core.a’的构建被保存到这个路径中，以便被缓存和重复使用。"
-
-#: arduino/libraries/librariesmanager/install.go:58
-msgid "Builtin libraries directory not set"
-msgstr "未设置内置库目录"
+msgstr "‘core.a’ 的构建被保存到这个路径中，以便被缓存和重复使用。"
 
 #: arduino/resources/index.go:45
 msgid "Can't create data directory %s"
@@ -279,7 +271,7 @@ msgstr "无法新建 %s 数据目录"
 msgid "Can't create sketch"
 msgstr "无法新建项目"
 
-#: commands/lib/download.go:62 commands/lib/download.go:65
+#: commands/lib/download.go:63 commands/lib/download.go:66
 msgid "Can't download library"
 msgstr "无法下载库"
 
@@ -292,31 +284,36 @@ msgstr "找不到 %s 平台的依赖"
 msgid "Can't open sketch"
 msgstr "无法打开项目"
 
-#: cli/config/set.go:55
+#: internal/cli/config/set.go:54
 msgid "Can't set multiple values in key %v"
 msgstr "无法在 %v 键中设置多个值"
 
-#: cli/arguments/arguments.go:37
-msgid "Can't use %s flags at the same time."
-msgstr "不能同时使用 %s 参数"
+#: internal/cli/arguments/arguments.go:36
+msgid "Can't use the following flags together: %s"
+msgstr ""
 
-#: cli/config/add.go:104 cli/config/delete.go:72 cli/config/remove.go:70
+#: internal/cli/config/add.go:103 internal/cli/config/delete.go:70
+#: internal/cli/config/remove.go:69
 msgid "Can't write config file: %v"
 msgstr "无法写入配置文件：%v"
 
-#: commands/compile/compile.go:160
+#: internal/cli/daemon/daemon.go:91
+msgid "Can't write debug log: %s"
+msgstr ""
+
+#: commands/compile/compile.go:160 commands/compile/compile.go:163
 msgid "Cannot create build cache directory"
 msgstr "无法新建构建缓存目录"
 
-#: commands/compile/compile.go:135
+#: commands/compile/compile.go:136
 msgid "Cannot create build directory"
 msgstr "无法新建构建目录"
 
-#: cli/config/init.go:97
+#: internal/cli/config/init.go:93
 msgid "Cannot create config file directory: %v"
 msgstr "无法新建配置文件目录：%v"
 
-#: cli/config/init.go:106
+#: internal/cli/config/init.go:101
 msgid "Cannot create config file: %v"
 msgstr "无法新建配置文件：%v"
 
@@ -332,11 +329,7 @@ msgstr "无法新建临时文件"
 msgid "Cannot execute debug tool"
 msgstr "无法运行调试工具"
 
-#: commands/board/attach.go:108
-msgid "Cannot export sketch metadata"
-msgstr "无法导出项目元数据"
-
-#: cli/config/init.go:72 cli/config/init.go:83
+#: internal/cli/config/init.go:71 internal/cli/config/init.go:81
 msgid "Cannot find absolute path: %v"
 msgstr "找不到绝对路径：%v"
 
@@ -356,53 +349,49 @@ msgstr "无法执行端口重置：%s"
 msgid "Cannot upgrade platform"
 msgstr "无法升级平台"
 
-#: cli/lib/search.go:163
+#: internal/cli/lib/search.go:158
 msgid "Category: %s"
 msgstr "类别：%s"
 
-#: cli/lib/check_deps.go:38 cli/lib/check_deps.go:39
+#: internal/cli/lib/check_deps.go:37 internal/cli/lib/check_deps.go:38
 msgid "Check dependencies status for the specified library."
 msgstr "检查指定库的依赖状态。"
 
-#: commands/lib/install.go:137
-msgid "Checking lib install prerequisites"
-msgstr "检查依赖安装前提条件"
-
-#: arduino/resources/checksums.go:168
+#: arduino/resources/checksums.go:167
 msgid "Checksum differs from checksum in package.json"
 msgstr "校验码与 package.json 中的校验码不同"
 
-#: cli/board/details.go:167
+#: internal/cli/board/details.go:168
 msgid "Checksum:"
 msgstr "校验码："
 
-#: cli/cache/cache.go:33
+#: internal/cli/cache/cache.go:33
 msgid "Clean caches."
 msgstr "清理缓存。"
 
-#: cli/cli.go:125
+#: internal/cli/cli.go:124
 msgid "Comma-separated list of additional URLs for the Boards Manager."
 msgstr "以逗号分隔的开发板管理器附加地址列表。"
 
-#: cli/board/list.go:51
+#: internal/cli/board/list.go:53
 msgid ""
 "Command keeps running and prints list of connected boards whenever there is "
 "a change."
 msgstr "命令保持运行，并在发生更改时打印已连接开发板的列表。"
 
-#: commands/debug/debug_info.go:123 commands/upload/upload.go:369
+#: commands/debug/debug_info.go:125 commands/upload/upload.go:369
 msgid "Compiled sketch not found in %s"
 msgstr "在 %s 中找不到已编译项目"
 
-#: cli/compile/compile.go:87 cli/compile/compile.go:88
+#: internal/cli/compile/compile.go:84 internal/cli/compile/compile.go:85
 msgid "Compiles Arduino sketches."
 msgstr "编译 Arduino 项目"
 
-#: legacy/builder/builder.go:74
+#: legacy/builder/builder.go:73
 msgid "Compiling core..."
 msgstr "正在编译内核。。。"
 
-#: legacy/builder/builder.go:68
+#: legacy/builder/builder.go:67
 msgid "Compiling libraries..."
 msgstr "正在编译库。。。"
 
@@ -410,24 +399,24 @@ msgstr "正在编译库。。。"
 msgid "Compiling library \"%[1]s\""
 msgstr "正在编译 “%[1]s” 库"
 
-#: legacy/builder/builder.go:63
+#: legacy/builder/builder.go:62
 msgid "Compiling sketch..."
 msgstr "正在编译项目。。。"
 
-#: cli/config/init.go:90
+#: internal/cli/config/init.go:87
 msgid ""
 "Config file already exists, use --overwrite to discard the existing one."
 msgstr "配置文件已经存在，使用 --overwrite 弃用现有的配置文件。"
 
-#: cli/config/init.go:110
+#: internal/cli/config/init.go:104
 msgid "Config file written to: %s"
 msgstr "配置文件写入：%s"
 
-#: cli/monitor/monitor.go:63
+#: internal/cli/monitor/monitor.go:62
 msgid "Configuration of the port."
 msgstr "端口配置。"
 
-#: cli/debug/debug.go:145
+#: internal/cli/debug/debug.go:146
 msgid "Configuration options for %s"
 msgstr "%s 的配置选项"
 
@@ -435,19 +424,19 @@ msgstr "%s 的配置选项"
 msgid "Configuring platform."
 msgstr "配置平台。"
 
-#: cli/board/list.go:191
+#: internal/cli/board/list.go:197
 msgid "Connected"
 msgstr "已连接"
 
-#: cli/monitor/monitor.go:177
+#: internal/cli/monitor/monitor.go:174
 msgid "Connected to %s! Press CTRL-C to exit."
 msgstr "已连接到 %s！按 CTRL-C 退出。"
 
-#: cli/board/list.go:91 cli/board/list.go:131
+#: internal/cli/board/list.go:97 internal/cli/board/list.go:137
 msgid "Core"
 msgstr "内核"
 
-#: arduino/httpclient/httpclient.go:106
+#: arduino/httpclient/httpclient.go:112
 msgid "Could not connect via HTTP"
 msgstr "无法通过 HTTP 连接"
 
@@ -463,145 +452,154 @@ msgstr "无法深度缓存内核构建：%[1]s"
 msgid "Couldn't determine program size"
 msgstr "无法确定程序大小"
 
-#: cli/arguments/sketch.go:37 cli/lib/install.go:108
+#: internal/cli/arguments/sketch.go:36 internal/cli/lib/install.go:104
 msgid "Couldn't get current working directory: %v"
 msgstr "无法获得当前工作目录：%v"
 
-#: cli/sketch/new.go:36 cli/sketch/new.go:37
+#: internal/cli/sketch/new.go:37 internal/cli/sketch/new.go:38
 msgid "Create a new Sketch"
 msgstr "新建项目"
 
-#: cli/compile/compile.go:100
+#: internal/cli/compile/compile.go:97
 msgid "Create and print a profile configuration from the build."
 msgstr "从构建中创建并打印一个配置文件的内容。"
 
-#: cli/sketch/archive.go:39 cli/sketch/archive.go:40
+#: internal/cli/sketch/archive.go:38 internal/cli/sketch/archive.go:39
 msgid "Creates a zip file containing all sketch files."
 msgstr "新建包含所有项目文件的 zip 文件。"
 
-#: cli/config/init.go:43
+#: internal/cli/config/init.go:42
 msgid ""
 "Creates or updates the configuration file in the data directory or custom "
 "directory with the current configuration settings."
 msgstr "用当前的配置创建或更新数据目录或自定义目录中的配置文件。"
 
-#: cli/compile/compile.go:298
+#: internal/cli/compile/compile.go:281
 msgid ""
 "Currently, Build Profiles only support libraries available through Arduino "
 "Library Manager."
 msgstr "目前，Build Profiles 只支持通过 Arduino Library Manager 提供的库。"
 
-#: cli/core/list.go:91 cli/core/search.go:112
+#: internal/cli/core/list.go:89 internal/cli/core/search.go:108
 msgid "DEPRECATED"
 msgstr "已弃用"
 
-#: cli/daemon/daemon.go:184
+#: internal/cli/daemon/daemon.go:176
 msgid "Daemon is now listening on %s:%s"
 msgstr "守护进程正在监听 %s：%s"
 
-#: cli/debug/debug.go:52
+#: internal/cli/debug/debug.go:51
 msgid "Debug Arduino sketches."
 msgstr "调试 Arduino 项目"
 
-#: cli/debug/debug.go:53
+#: internal/cli/debug/debug.go:52
 msgid ""
 "Debug Arduino sketches. (this command opens an interactive gdb session)"
 msgstr "调试 Arduino 项目（此命令打开交互式 gdb 会话）"
 
-#: cli/debug/debug.go:62
+#: internal/cli/debug/debug.go:61
 msgid "Debug interpreter e.g.: %s"
 msgstr "调试解释器，例如：%s"
 
-#: commands/debug/debug_info.go:146
+#: commands/debug/debug_info.go:148
 msgid "Debugging not supported for board %s"
 msgstr "%s 开发板不支持调试"
 
-#: cli/board/details.go:123
+#: internal/cli/board/details.go:122
 msgid "Debugging supported:"
 msgstr "支持调试："
 
-#: cli/monitor/monitor.go:195
+#: internal/cli/monitor/monitor.go:192
 msgid "Default"
 msgstr "默认"
 
-#: cli/cache/clean.go:31
+#: internal/cli/board/attach.go:113
+msgid "Default FQBN set to"
+msgstr "默认的 FQBN 设置为"
+
+#: internal/cli/board/attach.go:112
+msgid "Default port set to"
+msgstr "默认的端口设置为"
+
+#: internal/cli/cache/clean.go:30
 msgid "Delete Boards/Library Manager download cache."
 msgstr "删除开发板/库管理器下载缓存"
 
-#: cli/cache/clean.go:32
+#: internal/cli/cache/clean.go:31
 msgid ""
 "Delete contents of the `directories.downloads` folder, where archive files "
 "are staged during installation of libraries and boards platforms."
-msgstr "删除下载文件夹内的内容，在安装库和开发板平台期间暂存归档文件。"
+msgstr "删除下载文件夹内的内容，在安装库和开发板平台期间暂存存档文件。"
 
-#: cli/config/delete.go:33 cli/config/delete.go:34
+#: internal/cli/config/delete.go:32 internal/cli/config/delete.go:33
 msgid "Deletes a settings key and all its sub keys."
 msgstr "删除设置键及其所有子键。"
 
-#: cli/lib/search.go:171
+#: internal/cli/lib/search.go:166
 msgid "Dependencies: %s"
 msgstr "依赖：%s"
 
-#: cli/lib/list.go:131
+#: internal/cli/lib/list.go:129
 msgid "Description"
 msgstr "说明"
 
-#: legacy/builder/builder.go:55
+#: legacy/builder/builder.go:54
 msgid "Detecting libraries used..."
 msgstr "正在检测使用的库。。。"
 
-#: cli/board/list.go:44
+#: internal/cli/board/list.go:45
 msgid ""
 "Detects and displays a list of boards connected to the current computer."
 msgstr "检测并显示连接到电脑的开发板的列表。"
 
-#: cli/debug/debug.go:63
+#: internal/cli/debug/debug.go:62
 msgid "Directory containing binaries for debug."
 msgstr "包含用于调试的二进制文件的目录。"
 
-#: cli/upload/upload.go:71
+#: internal/cli/upload/upload.go:70
 msgid "Directory containing binaries to upload."
 msgstr "包含用于上传的二进制文件的目录。"
 
-#: cli/generatedocs/generatedocs.go:45
+#: internal/cli/generatedocs/generatedocs.go:45
 msgid ""
 "Directory where to save generated files. Default is './docs', the directory "
 "must exist."
 msgstr "保存生成文件的目录。默认为 ./docs，该目录必须存在。"
 
-#: cli/completion/completion.go:45
+#: internal/cli/completion/completion.go:44
 msgid "Disable completion description for shells that support it"
 msgstr "对于支持完成描述的 shell，禁用完成描述"
 
-#: cli/board/list.go:192
+#: internal/cli/board/list.go:198
 msgid "Disconnected"
 msgstr "已断开连接"
 
-#: cli/daemon/daemon.go:68
+#: internal/cli/daemon/daemon.go:63
 msgid "Display only the provided gRPC calls"
 msgstr "只显示提供的 gRPC 调用"
 
-#: cli/lib/install.go:63
+#: internal/cli/lib/install.go:61
 msgid "Do not install dependencies."
 msgstr "不要安装依赖。"
 
-#: cli/lib/install.go:64
+#: internal/cli/lib/install.go:62
 msgid "Do not overwrite already installed libraries."
 msgstr "不要覆盖已经安装的库。"
 
-#: cli/core/install.go:57
+#: internal/cli/core/install.go:55
 msgid "Do not overwrite already installed platforms."
 msgstr "不要覆盖已经安装的平台。"
 
-#: cli/burnbootloader/burnbootloader.go:59 cli/upload/upload.go:76
+#: internal/cli/burnbootloader/burnbootloader.go:58
+#: internal/cli/upload/upload.go:75
 msgid "Do not perform the actual upload, just log out actions"
 msgstr "不执行实际上传操作，只注销操作"
 
-#: cli/daemon/daemon.go:65
+#: internal/cli/daemon/daemon.go:60
 msgid "Do not terminate daemon process if the parent process dies"
 msgstr "如果父进程终止，则守护进程不终止。"
 
-#: commands/lib/download.go:59
+#: commands/lib/download.go:60
 msgid "Downloading %s"
 msgstr "正在下载 %s"
 
@@ -634,27 +632,27 @@ msgstr "正在下载 %s 平台"
 msgid "Downloading tool %s"
 msgstr "正在下载 %s 工具"
 
-#: cli/core/download.go:37 cli/core/download.go:38
+#: internal/cli/core/download.go:35 internal/cli/core/download.go:36
 msgid "Downloads one or more cores and corresponding tool dependencies."
 msgstr "下载一个或多个内核和相应的工具依赖"
 
-#: cli/lib/download.go:37 cli/lib/download.go:38
+#: internal/cli/lib/download.go:35 internal/cli/lib/download.go:36
 msgid "Downloads one or more libraries without installing them."
 msgstr "下载一个或多个库而不安装它们。"
 
-#: cli/daemon/daemon.go:66
+#: internal/cli/daemon/daemon.go:61
 msgid "Enable debug logging of gRPC calls"
 msgstr "启用 gRPC 调用的调试日志"
 
-#: cli/lib/install.go:66
+#: internal/cli/lib/install.go:64
 msgid "Enter a path to zip file"
 msgstr "输入压缩文件的路径"
 
-#: cli/lib/install.go:65
+#: internal/cli/lib/install.go:63
 msgid "Enter git url for libraries hosted on repositories"
 msgstr "输入在存储库上托管的库的 git 地址"
 
-#: commands/sketch/archive.go:105
+#: commands/sketch/archive.go:107
 msgid "Error adding file to sketch archive"
 msgstr "将文件添加到项目存档时出错"
 
@@ -662,44 +660,44 @@ msgstr "将文件添加到项目存档时出错"
 msgid "Error archiving built core (caching) in %[1]s: %[2]s"
 msgstr "在 %[1]s 中存档构建内核（缓存）时出错：%[2]s"
 
-#: cli/sketch/archive.go:79
+#: internal/cli/sketch/archive.go:80
 msgid "Error archiving: %v"
 msgstr "错误归档：%v"
 
-#: commands/sketch/archive.go:93
+#: commands/sketch/archive.go:95
 msgid "Error calculating relative file path"
 msgstr "计算相对文件路径时出错"
 
-#: cli/cache/clean.go:46
+#: internal/cli/cache/clean.go:45
 msgid "Error cleaning caches: %v"
 msgstr "清理缓存出错：%v"
 
-#: commands/compile/compile.go:260
+#: commands/compile/compile.go:279
 msgid "Error copying output file %s"
 msgstr "复制输出 %s 文件时出错"
 
-#: cli/core/search.go:65 cli/instance/instance.go:49
-#: cli/instance/instance.go:172 cli/lib/search.go:58
+#: internal/cli/core/search.go:63 internal/cli/instance/instance.go:46
+#: internal/cli/instance/instance.go:168 internal/cli/lib/search.go:56
 msgid "Error creating instance: %v"
 msgstr "新建实例时出错：%v"
 
-#: commands/compile/compile.go:240
+#: commands/compile/compile.go:259
 msgid "Error creating output dir"
 msgstr "新建输出目录时出错"
 
-#: commands/sketch/archive.go:81
+#: commands/sketch/archive.go:83
 msgid "Error creating sketch archive"
 msgstr "新建项目存档时出错"
 
-#: cli/sketch/new.go:52 cli/sketch/new.go:61
+#: internal/cli/sketch/new.go:69 internal/cli/sketch/new.go:82
 msgid "Error creating sketch: %v"
 msgstr "新建项目时出错：%v"
 
-#: cli/board/list.go:72 cli/board/list.go:83
+#: internal/cli/board/list.go:79 internal/cli/board/list.go:90
 msgid "Error detecting boards: %v"
 msgstr "检测开发板时出错：%v"
 
-#: cli/core/download.go:71 cli/lib/download.go:68
+#: internal/cli/core/download.go:68 internal/cli/lib/download.go:65
 msgid "Error downloading %[1]s: %[2]v"
 msgstr "下载 %[1]s 时出错：%[2]v"
 
@@ -732,42 +730,42 @@ msgstr "下载 %s 平台时出错"
 msgid "Error downloading tool %s"
 msgstr "下载 %s 工具时出错"
 
-#: cli/debug/debug.go:107
+#: internal/cli/debug/debug.go:109
 msgid "Error during Debug: %v"
 msgstr "调试时出错：%v"
 
-#: cli/arguments/port.go:157
+#: internal/cli/arguments/port.go:148
 msgid "Error during FQBN detection: %v"
-msgstr "检测FQBN时出错：%v"
+msgstr "检测 FQBN 时出错：%v"
 
-#: cli/feedback/feedback.go:160
+#: internal/cli/feedback/feedback.go:244 internal/cli/feedback/feedback.go:250
 msgid "Error during JSON encoding of the output: %v"
-msgstr "输出编码JSON过程时出错：%v"
+msgstr "输出编码 JSON 过程时出错：%v"
 
-#: cli/burnbootloader/burnbootloader.go:73
-#: cli/burnbootloader/burnbootloader.go:86 cli/compile/compile.go:245
-#: cli/compile/compile.go:277 cli/upload/upload.go:96 cli/upload/upload.go:113
-#: cli/upload/upload.go:164
+#: internal/cli/burnbootloader/burnbootloader.go:72
+#: internal/cli/burnbootloader/burnbootloader.go:85
+#: internal/cli/compile/compile.go:232 internal/cli/compile/compile.go:258
+#: internal/cli/upload/upload.go:95 internal/cli/upload/upload.go:111
 msgid "Error during Upload: %v"
 msgstr "上传时出错：%v"
 
-#: cli/feedback/feedback.go:171
+#: internal/cli/feedback/feedback.go:256
 msgid "Error during YAML encoding of the output: %v"
-msgstr "输出编码YAML过程时出错：%v"
+msgstr "输出编码 YAML 过程时出错：%v"
 
-#: cli/compile/compile.go:337
+#: internal/cli/compile/compile.go:325
 msgid "Error during build: %v"
 msgstr "构建时出错：%v"
 
-#: cli/core/install.go:82
+#: internal/cli/core/install.go:79
 msgid "Error during install: %v"
 msgstr "安装时出错：%v"
 
-#: cli/core/uninstall.go:72
+#: internal/cli/core/uninstall.go:68
 msgid "Error during uninstall: %v"
 msgstr "卸载时出错：%v"
 
-#: cli/core/upgrade.go:112
+#: internal/cli/core/upgrade.go:107
 msgid "Error during upgrade: %v"
 msgstr "升级时出错：%v"
 
@@ -779,7 +777,7 @@ msgstr "提取 %s 时出错"
 msgid "Error finding build artifacts"
 msgstr "查找构建项目时出错"
 
-#: cli/debug/debug.go:94
+#: internal/cli/debug/debug.go:93
 msgid "Error getting Debug info: %v"
 msgstr "获取调试信息时出错：%v"
 
@@ -787,50 +785,50 @@ msgstr "获取调试信息时出错：%v"
 msgid "Error getting absolute path of sketch archive"
 msgstr "获取项目存档的绝对路径时出错"
 
-#: cli/board/details.go:70
+#: internal/cli/board/details.go:69
 msgid "Error getting board details: %v"
 msgstr "获取开发板详细信息时出错：%v"
-
-#: commands/board/list.go:154
-msgid "Error getting board info from Arduino Cloud"
-msgstr "从 Arduino Cloud 获取开发板信息时出错"
 
 #: arduino/builder/compilation_database.go:78
 msgid "Error getting current directory for compilation database: %s"
 msgstr "获取编译数据库的当前目录时出错：%s"
 
-#: commands/compile/compile.go:208 commands/lib/list.go:109
+#: commands/compile/compile.go:227 commands/lib/list.go:112
 msgid "Error getting information for library %s"
 msgstr "获取 %s 库的信息时出错"
 
-#: cli/lib/examples.go:73
+#: internal/cli/lib/examples.go:72
 msgid "Error getting libraries info: %v"
 msgstr "获取库信息时出错：%v"
 
-#: cli/arguments/fqbn.go:99
+#: internal/cli/arguments/fqbn.go:93
 msgid "Error getting port metadata: %v"
 msgstr "获取端口元数据出错：%v"
 
-#: cli/monitor/monitor.go:90
+#: internal/cli/monitor/monitor.go:88
 msgid "Error getting port settings details: %s"
 msgstr "获取端口设置详细信息时出错：%s"
 
-#: cli/instance/instance.go:80 cli/instance/instance.go:95
-#: cli/instance/instance.go:112
+#: internal/cli/upload/upload.go:144
+msgid "Error getting user input"
+msgstr ""
+
+#: internal/cli/instance/instance.go:76 internal/cli/instance/instance.go:91
+#: internal/cli/instance/instance.go:108
 msgid "Error initializing instance: %v"
 msgstr "初始化实例时出错：%v"
 
-#: cli/lib/install.go:142
+#: internal/cli/lib/install.go:135
 msgid "Error installing %s: %v"
 msgstr "安装 %s 时出错：%v"
 
-#: cli/lib/install.go:119
+#: internal/cli/lib/install.go:114
 msgid "Error installing Git Library: %v"
 msgstr "安装 Git 库时出错：%v"
 
-#: cli/lib/install.go:96
+#: internal/cli/lib/install.go:93
 msgid "Error installing Zip Library: %v"
-msgstr "安装Zip库时出错：%v"
+msgstr "安装 Zip 库时出错：%v"
 
 #: commands/instances.go:429
 msgid "Error installing library %s"
@@ -847,15 +845,15 @@ msgstr "安装 %s 平台时出错"
 msgid "Error installing tool %s"
 msgstr "安装 %s 工具时出错"
 
-#: cli/lib/list.go:79
-msgid "Error listing libraries: %v"
-msgstr "列出库列表时出错：%v"
-
-#: cli/board/listall.go:64
+#: internal/cli/board/listall.go:63
 msgid "Error listing boards: %v"
 msgstr "列出开发板列表时出错：%v"
 
-#: cli/core/list.go:64
+#: internal/cli/lib/list.go:78
+msgid "Error listing libraries: %v"
+msgstr ""
+
+#: internal/cli/core/list.go:63
 msgid "Error listing platforms: %v"
 msgstr "列出平台列表时出错：%v"
 
@@ -876,19 +874,19 @@ msgstr "加载 %s 索引时出错"
 msgid "Error opening %s"
 msgstr "打开 %s 时出错"
 
-#: cli/daemon/daemon.go:91
+#: internal/cli/daemon/daemon.go:85
 msgid "Error opening debug logging file: %s"
 msgstr "打开调试日志文件出错：%s"
 
-#: cli/arguments/sketch.go:51
+#: internal/cli/arguments/sketch.go:49
 msgid "Error opening sketch: %v"
 msgstr "打开项目时出错：%v"
 
-#: cli/compile/compile.go:189
+#: internal/cli/compile/compile.go:180
 msgid "Error opening source code overrides data file: %v"
 msgstr "打开源代码覆盖数据文件时出错：%v"
 
-#: commands/compile/compile.go:250
+#: commands/compile/compile.go:269
 msgid "Error reading build directory"
 msgstr "读取构建目录时出错"
 
@@ -896,19 +894,19 @@ msgstr "读取构建目录时出错"
 msgid "Error reading config file: %v"
 msgstr "读取配置文件时出错：%v"
 
-#: commands/sketch/archive.go:75
+#: commands/sketch/archive.go:77
 msgid "Error reading sketch files"
 msgstr "读取项目文件时出错"
 
 #: legacy/builder/target_board_resolver.go:30
 msgid "Error resolving FQBN"
-msgstr "解析FQBN时出错"
+msgstr "解析 FQBN 时出错"
 
-#: cli/lib/check_deps.go:67
+#: internal/cli/lib/check_deps.go:65
 msgid "Error resolving dependencies for %[1]s: %[2]s"
 msgstr "解析 %[1]s 的依赖时出错：%[2]s"
 
-#: cli/core/upgrade.go:70
+#: internal/cli/core/upgrade.go:68
 msgid "Error retrieving core list: %v"
 msgstr "检索内核列表时出错：%v"
 
@@ -924,15 +922,19 @@ msgstr "保存下载的索引时出错"
 msgid "Error saving downloaded index signature"
 msgstr "保存已下载的索引签名时出错"
 
-#: cli/board/search.go:62
+#: internal/cli/board/attach.go:69 internal/cli/board/attach.go:78
+msgid "Error saving sketch metadata"
+msgstr "保存项目元数据时出现错误"
+
+#: internal/cli/board/search.go:61
 msgid "Error searching boards: %v"
 msgstr "搜索开发板时错误：%v"
 
-#: cli/lib/search.go:78
-msgid "Error searching for libraries: %v"
-msgstr ""
+#: internal/cli/lib/search.go:74
+msgid "Error searching for Libraries: %v"
+msgstr "搜索库时出现错误：%v"
 
-#: cli/core/search.go:87
+#: internal/cli/core/search.go:84
 msgid "Error searching for platforms: %v"
 msgstr "搜索平台时出错：%v"
 
@@ -940,23 +942,23 @@ msgstr "搜索平台时出错：%v"
 msgid "Error serializing compilation database: %s"
 msgstr "序列化编译数据库时出错：%s"
 
-#: cli/board/list.go:75
+#: internal/cli/board/list.go:82
 msgid "Error starting discovery: %v"
 msgstr "启动时发现出错：%v"
 
-#: cli/lib/uninstall.go:66
+#: internal/cli/lib/uninstall.go:63
 msgid "Error uninstalling %[1]s: %[2]v"
 msgstr "卸载 %[1]s 时出错：%[2]v"
 
-#: cli/instance/instance.go:181
+#: internal/cli/instance/instance.go:176
 msgid "Error updating indexes: %v"
 msgstr "更新索引时出错：%v"
 
-#: cli/lib/search.go:67 cli/lib/update_index.go:56
+#: internal/cli/lib/search.go:64 internal/cli/lib/update_index.go:54
 msgid "Error updating library index: %v"
 msgstr "更新库索引时出错：%v"
 
-#: cli/lib/upgrade.go:72
+#: internal/cli/lib/upgrade.go:71
 msgid "Error upgrading libraries"
 msgstr "升级库时出错"
 
@@ -982,50 +984,47 @@ msgstr "确定项目大小时出错：%s"
 msgid "Error writing compilation database: %s"
 msgstr "写入编译数据库时出错：%s"
 
-#: cli/completion/completion.go:53
+#: internal/cli/completion/completion.go:56
 msgid "Error: command description is not supported by %v"
 msgstr "错误：%v 不支持命令说明"
 
-#: cli/compile/compile.go:196
+#: internal/cli/compile/compile.go:186
 msgid "Error: invalid source code overrides data file: %v"
 msgstr "错误：无效的源代码覆盖了数据文件：%v"
 
-#: cli/board/list.go:91
+#: internal/cli/board/list.go:97
 msgid "Event"
 msgstr "事件"
 
-#: cli/lib/examples.go:122
+#: internal/cli/lib/examples.go:120
 msgid "Examples for library %s"
 msgstr "%s 库的示例"
 
-#: cli/usage.go:28
+#: internal/cli/usage.go:28
 msgid "Examples:"
 msgstr "示例："
 
-#: cli/debug/debug.go:126
+#: internal/cli/debug/debug.go:127
 msgid "Executable to debug"
 msgstr "可执行调试"
 
-#: commands/debug/debug_info.go:126 commands/upload/upload.go:372
+#: commands/debug/debug_info.go:128 commands/upload/upload.go:372
 msgid "Expected compiled sketch in directory %s, but is a file instead"
 msgstr "应在 %s 目录中编译项目，但它是一个文件"
 
-#: cli/board/attach.go:40 cli/board/details.go:43 cli/board/list.go:91
-#: cli/board/list.go:131 cli/board/listall.go:87 cli/board/search.go:85
+#: internal/cli/board/attach.go:30 internal/cli/board/details.go:42
+#: internal/cli/board/list.go:97 internal/cli/board/list.go:137
+#: internal/cli/board/listall.go:85 internal/cli/board/search.go:83
 msgid "FQBN"
 msgstr "FQBN"
 
-#: cli/board/details.go:120
+#: internal/cli/board/details.go:119
 msgid "FQBN:"
 msgstr "FQBN："
 
 #: commands/upload/upload.go:462
 msgid "Failed chip erase"
 msgstr "芯片擦除失败"
-
-#: cli/daemon/daemon.go:158
-msgid "Failed choosing port, address: %s"
-msgstr "选择端口失败，地址：%s"
 
 #: commands/upload/upload.go:469
 msgid "Failed programming"
@@ -1043,27 +1042,27 @@ msgstr "新建数据目录失败"
 msgid "Failed to create downloads directory"
 msgstr "新建下载文件夹失败"
 
-#: cli/daemon/daemon.go:137
+#: internal/cli/daemon/daemon.go:132
 msgid "Failed to listen on TCP port: %[1]s. %[2]s is an invalid port."
-msgstr "未能侦听TCP端口：%[1]s。%[2]s 是无效端口。"
+msgstr "未能侦听 TCP 端口：%[1]s。%[2]s 是无效端口。"
 
-#: cli/daemon/daemon.go:131
+#: internal/cli/daemon/daemon.go:127
 msgid "Failed to listen on TCP port: %[1]s. %[2]s is unknown name."
-msgstr "未能侦听TCP端口：%[1]s。%[2]s 是未知名称。"
+msgstr "未能侦听 TCP 端口：%[1]s。%[2]s 是未知名称。"
 
-#: cli/daemon/daemon.go:146
+#: internal/cli/daemon/daemon.go:139
 msgid "Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v"
-msgstr "未能侦听TCP端口：%[1]s。意外错误：%[2]v"
+msgstr "未能侦听 TCP 端口：%[1]s。意外错误：%[2]v"
 
-#: cli/daemon/daemon.go:143
+#: internal/cli/daemon/daemon.go:137
 msgid "Failed to listen on TCP port: %s. Address already in use."
-msgstr "未能侦听TCP端口：%s。地址已被使用。"
+msgstr "未能侦听 TCP 端口：%s。地址已被使用。"
 
 #: commands/upload/upload.go:473
 msgid "Failed uploading"
 msgstr "上传失败"
 
-#: cli/board/details.go:165
+#: internal/cli/board/details.go:166
 msgid "File:"
 msgstr "文件："
 
@@ -1071,20 +1070,20 @@ msgstr "文件："
 msgid "First message must contain debug request, not data"
 msgstr "第一条消息必须包含调试请求，而不是数据"
 
-#: cli/arguments/arguments.go:47
-msgid "Flag %[1]s is mandatory when used in conjunction with flag %[2]s."
-msgstr "当与参数 %[1]s 一起使用时，参数 %[2]s 是强制性的。"
+#: internal/cli/arguments/arguments.go:47
+msgid "Flag %[1]s is mandatory when used in conjunction with: %[2]s"
+msgstr ""
 
-#: cli/usage.go:30
+#: internal/cli/usage.go:30
 msgid "Flags:"
 msgstr "参数："
 
-#: cli/arguments/post_install.go:35
+#: internal/cli/arguments/post_install.go:35
 msgid ""
 "Force run of post-install scripts (if the CLI is not running interactively)."
 msgstr "强制运行安装后脚本（如果 CLI 未以交互方式运行）。"
 
-#: cli/arguments/post_install.go:36
+#: internal/cli/arguments/post_install.go:36
 msgid ""
 "Force skip of post-install scripts (if the CLI is running interactively)."
 msgstr "强制跳过安装后脚本（如果 CLI 以交互方式运行）。"
@@ -1097,15 +1096,15 @@ msgstr ""
 "找到 %d 平台以供参考 “%s”：\n"
 "%s"
 
-#: cli/arguments/fqbn.go:40
+#: internal/cli/arguments/fqbn.go:38
 msgid "Fully Qualified Board Name, e.g.: arduino:avr:uno"
 msgstr "完全合格开发板名，例如：arduino:avr:uno"
 
-#: cli/debug/debug.go:140
+#: internal/cli/debug/debug.go:141
 msgid "GDB Server path"
 msgstr "GDB 服务器路径"
 
-#: cli/debug/debug.go:139
+#: internal/cli/debug/debug.go:140
 msgid "GDB Server type"
 msgstr "GDB 服务器类型"
 
@@ -1113,23 +1112,24 @@ msgstr "GDB 服务器类型"
 msgid "GDB server '%s' is not supported"
 msgstr "不支持 GDB 服务器 ‘%s’"
 
-#: cli/generatedocs/generatedocs.go:38 cli/generatedocs/generatedocs.go:39
+#: internal/cli/generatedocs/generatedocs.go:38
+#: internal/cli/generatedocs/generatedocs.go:39
 msgid "Generates bash completion and command manpages."
 msgstr "已生成 bash 和命令手册。"
 
-#: cli/completion/completion.go:39
+#: internal/cli/completion/completion.go:38
 msgid "Generates completion scripts"
 msgstr "已生成脚本"
 
-#: cli/completion/completion.go:40
+#: internal/cli/completion/completion.go:39
 msgid "Generates completion scripts for various shells"
 msgstr "已为各种 shell 生成脚本"
 
-#: legacy/builder/builder.go:60
+#: legacy/builder/builder.go:59
 msgid "Generating function prototypes..."
 msgstr "生成函数原型。。。"
 
-#: cli/usage.go:31
+#: internal/cli/usage.go:31
 msgid "Global Flags:"
 msgstr "全局参数："
 
@@ -1143,46 +1143,47 @@ msgstr " 个全局变量使用 %[1]s 个字节（%[3]s%%）的动态内存，剩
 msgid "Global variables use %[1]s bytes of dynamic memory."
 msgstr "全局变量使用 %[1]s 字节的动态内存。"
 
-#: cli/core/list.go:87 cli/core/search.go:108 cli/monitor/monitor.go:195
+#: internal/cli/board/details.go:194 internal/cli/core/list.go:85
+#: internal/cli/core/search.go:104 internal/cli/monitor/monitor.go:192
 msgid "ID"
 msgstr "ID"
 
-#: cli/board/details.go:92 cli/board/details.go:193
+#: internal/cli/board/details.go:90
 msgid "Id"
 msgstr "Id"
 
-#: cli/board/details.go:134
+#: internal/cli/board/details.go:133
 msgid "Identification properties:"
 msgstr "标识属性："
 
-#: cli/compile/compile.go:136
+#: internal/cli/compile/compile.go:133
 msgid "If set built binaries will be exported to the sketch folder."
 msgstr "如果设定，则构建的二进制文件将导出到项目文件夹。"
 
-#: cli/core/list.go:46
+#: internal/cli/core/list.go:45
 msgid ""
 "If set return all installable and installed cores, including manually "
 "installed."
 msgstr "如果设定，则返回所有可安装和已安装的内核，包括手动安装的内核。"
 
-#: cli/lib/list.go:52
+#: internal/cli/lib/list.go:51
 msgid "Include built-in libraries (from platforms and IDE) in listing."
 msgstr "在列表中包含内置库（来自平台和 IDE）。"
 
-#: cli/sketch/archive.go:51
+#: internal/cli/sketch/archive.go:50
 msgid "Includes %s directory in the archive."
 msgstr "在存档中包含 %s 目录。"
 
-#: cli/core/list.go:87 cli/lib/list.go:131
+#: internal/cli/core/list.go:85 internal/cli/lib/list.go:129
 msgid "Installed"
 msgstr "已安装"
 
-#: commands/lib/install.go:152
+#: commands/lib/install.go:137
 msgid "Installed %s"
 msgstr "已安装 %s"
 
 #: arduino/cores/packagemanager/install_uninstall.go:312
-#: commands/lib/install.go:128
+#: commands/lib/install.go:123
 msgid "Installing %s"
 msgstr "正在安装 %s"
 
@@ -1199,11 +1200,11 @@ msgstr "正在安装 %s 平台"
 msgid "Installing tool %s"
 msgstr "正在安装 %s 工具"
 
-#: cli/core/install.go:39 cli/core/install.go:40
+#: internal/cli/core/install.go:37 internal/cli/core/install.go:38
 msgid "Installs one or more cores and corresponding tool dependencies."
 msgstr "安装一个或多个内核和相应的工具依赖。"
 
-#: cli/lib/install.go:49 cli/lib/install.go:50
+#: internal/cli/lib/install.go:47 internal/cli/lib/install.go:48
 msgid "Installs one or more specified libraries into the system."
 msgstr "在系统中安装一个或多个指定的库。"
 
@@ -1215,18 +1216,18 @@ msgstr "缓存中的内部错误"
 msgid "Invalid '%[1]s' property: %[2]s"
 msgstr "无效的 ‘%[1]s’ 属性：%[2]s"
 
-#: cli/cli.go:268
+#: internal/cli/cli.go:248
 msgid ""
 "Invalid Call : should show Help, but it is available only in TEXT mode."
 msgstr "无效调用：应显示帮助，但仅在文本模式下可用。"
 
-#: commands/board/attach.go:67
-msgid "Invalid Device URL format"
-msgstr "设备地址格式无效"
-
 #: arduino/errors.go:62
 msgid "Invalid FQBN"
 msgstr "无效的 FQBN"
+
+#: internal/cli/daemon/daemon.go:150
+msgid "Invalid TCP address: port is missing"
+msgstr ""
 
 #: arduino/errors.go:80
 msgid "Invalid URL"
@@ -1240,18 +1241,15 @@ msgstr "无效的附加地址：%v"
 msgid "Invalid archive: file %{1}s not found in archive %{2}s"
 msgstr "无效存档：在存档 %{1}s 中未找到文件 %{2}s"
 
-#: cli/core/download.go:58 cli/core/install.go:67 cli/core/uninstall.go:55
-#: cli/core/upgrade.go:88 cli/lib/download.go:56 cli/lib/uninstall.go:55
+#: internal/cli/core/download.go:56 internal/cli/core/install.go:65
+#: internal/cli/core/uninstall.go:53 internal/cli/core/upgrade.go:84
+#: internal/cli/lib/download.go:54 internal/cli/lib/uninstall.go:53
 msgid "Invalid argument passed: %v"
 msgstr "传递的参数无效：%v"
 
 #: legacy/builder/phases/sizer.go:209
 msgid "Invalid data size regexp: %s"
 msgstr "无效的数据大小正则表达式：%s"
-
-#: commands/board/attach.go:77
-msgid "Invalid device port type provided"
-msgstr "提供的设备端口类型无效"
 
 #: legacy/builder/phases/sizer.go:215
 msgid "Invalid eeprom size regexp: %s"
@@ -1261,7 +1259,7 @@ msgstr "无效的 eeprom 大小正则表达式：%s"
 msgid "Invalid instance"
 msgstr "无效的实例"
 
-#: cli/core/upgrade.go:94
+#: internal/cli/core/upgrade.go:90
 msgid "Invalid item %s"
 msgstr "无效的 %s 条目"
 
@@ -1273,11 +1271,11 @@ msgstr "无效的库"
 msgid "Invalid network.proxy '%[1]s': %[2]s"
 msgstr "无效的 ‘%[1]s’ 网络代理: %[2]s"
 
-#: cli/cli.go:229
+#: internal/cli/cli.go:215
 msgid "Invalid option for --log-level: %s"
 msgstr "--log-level 选项无效：%s"
 
-#: cli/cli.go:246
+#: internal/cli/cli.go:227
 msgid "Invalid output format: %s"
 msgstr "无效的输出格式：%s"
 
@@ -1285,11 +1283,11 @@ msgstr "无效的输出格式：%s"
 msgid "Invalid package index in %s"
 msgstr "%s 中的软件包索引无效"
 
-#: cli/core/uninstall.go:61
+#: internal/cli/core/uninstall.go:58
 msgid "Invalid parameter %s: version not allowed"
 msgstr "无效 %s 参数：版本不允许"
 
-#: commands/board/list.go:59
+#: commands/board/list.go:78
 msgid "Invalid pid value: '%s'"
 msgstr "无效的pid值：‘%s’"
 
@@ -1305,7 +1303,7 @@ msgstr "platform.txt 中的方法无效"
 msgid "Invalid size regexp: %s"
 msgstr "无效的大小正则表达式：%s"
 
-#: cli/core/search.go:132
+#: internal/cli/core/search.go:128
 msgid "Invalid timeout: %s"
 msgstr "超时无效：%s"
 
@@ -1313,30 +1311,30 @@ msgstr "超时无效：%s"
 msgid "Invalid version"
 msgstr "无效的版本"
 
-#: commands/board/list.go:56
+#: commands/board/list.go:75
 msgid "Invalid vid value: '%s'"
-msgstr "无效的vid值：‘%s’"
+msgstr "无效的 vid 值：‘%s’"
 
-#: cli/compile/compile.go:131
+#: internal/cli/compile/compile.go:128
 msgid ""
 "Just produce the compilation database, without actually compiling. All build"
 " commands are skipped except pre* hooks."
 msgstr "只生成编译数据库，不实际编译。跳过除 pre*hook 之外的所有生成命令。"
 
-#: cli/lib/list.go:39
+#: internal/cli/lib/list.go:38
 msgid "LIBNAME"
 msgstr "库名"
 
-#: cli/lib/check_deps.go:37 cli/lib/install.go:48
+#: internal/cli/lib/check_deps.go:36 internal/cli/lib/install.go:46
 msgid "LIBRARY"
 msgstr "库"
 
-#: cli/lib/download.go:36 cli/lib/examples.go:43 cli/lib/search.go:40
-#: cli/lib/uninstall.go:36
+#: internal/cli/lib/download.go:34 internal/cli/lib/examples.go:42
+#: internal/cli/lib/search.go:38 internal/cli/lib/uninstall.go:34
 msgid "LIBRARY_NAME"
 msgstr "库_名"
 
-#: cli/core/list.go:87
+#: internal/cli/core/list.go:85
 msgid "Latest"
 msgstr "最新的"
 
@@ -1344,14 +1342,15 @@ msgstr "最新的"
 msgid "Library %[1]s has been declared precompiled:"
 msgstr "%[1]s 库已声明为预编译："
 
-#: commands/lib/install.go:96
+#: arduino/libraries/librariesmanager/install.go:135
+#: commands/lib/install.go:92
 msgid ""
 "Library %[1]s is already installed, but with a different version: %[2]s"
 msgstr "库 %[1]s 已经安装，但有不同的版本。：%[2]s"
 
 #: commands/lib/upgrade.go:59
 msgid "Library %s is already at the latest version"
-msgstr ""
+msgstr "库 %s 已经是最新版本"
 
 #: commands/lib/uninstall.go:39
 msgid "Library %s is not installed"
@@ -1374,57 +1373,57 @@ msgstr "库不能同时使用 ‘%[1]s’ 和 ‘%[2]s’ 文件夹。在 ‘%[3
 msgid "Library install failed"
 msgstr "库安装失败"
 
-#: commands/lib/install.go:162 commands/lib/install.go:172
+#: commands/lib/install.go:147 commands/lib/install.go:157
 msgid "Library installed"
 msgstr "已安装的库"
 
-#: cli/lib/search.go:161
+#: internal/cli/lib/search.go:156
 msgid "License: %s"
 msgstr "许可证：%s"
 
-#: legacy/builder/builder.go:79
+#: legacy/builder/builder.go:78
 msgid "Linking everything together..."
 msgstr "将所有内容链接在一起。。。"
 
-#: cli/board/listall.go:40 cli/board/search.go:39
+#: internal/cli/board/listall.go:39 internal/cli/board/search.go:38
 msgid ""
 "List all boards that have the support platform installed. You can search\n"
 "for a specific board if you specify the board name"
 msgstr "列出已安装的受支持的平台的所有开发板。如果指定开发板名，则可以搜索指定开发板"
 
-#: cli/board/listall.go:39 cli/board/search.go:38
+#: internal/cli/board/listall.go:38 internal/cli/board/search.go:37
 msgid "List all known boards and their corresponding FQBN."
 msgstr "列出所有已知开发板及其相应的 FQBN。"
 
-#: cli/board/list.go:43
+#: internal/cli/board/list.go:44
 msgid "List connected boards."
 msgstr "列出已连接的开发板。"
 
-#: cli/arguments/fqbn.go:45
+#: internal/cli/arguments/fqbn.go:43
 msgid ""
 "List of board options separated by commas. Or can be used multiple times for"
 " multiple options."
 msgstr "用逗号分隔的开发板选项列表。可以对多个选项多次使用。"
 
-#: cli/compile/compile.go:108
+#: internal/cli/compile/compile.go:105
 msgid ""
 "List of custom build properties separated by commas. Or can be used multiple"
 " times for multiple properties."
 msgstr "用逗号分隔的自定义构建属性列表。可以对多个属性多次使用。"
 
-#: cli/lib/list.go:54
+#: internal/cli/lib/list.go:53
 msgid "List updatable libraries."
 msgstr "列出可更新的库。"
 
-#: cli/core/list.go:45
+#: internal/cli/core/list.go:44
 msgid "List updatable platforms."
 msgstr "列出可更新的平台。"
 
-#: cli/board/board.go:33
+#: internal/cli/board/board.go:33
 msgid "Lists all connected boards."
 msgstr "列出所有已连接的开发板。"
 
-#: cli/outdated/outdated.go:36
+#: internal/cli/outdated/outdated.go:36
 msgid "Lists cores and libraries that can be upgraded"
 msgstr "列出可以升级的内核和库"
 
@@ -1437,7 +1436,7 @@ msgstr "正在加载索引文件：%v"
 msgid "Loading libraries: %v"
 msgstr "正在加载库：%v"
 
-#: cli/lib/list.go:131
+#: internal/cli/lib/list.go:129
 msgid "Location"
 msgstr "位置"
 
@@ -1445,15 +1444,15 @@ msgstr "位置"
 msgid "Low memory available, stability problems may occur."
 msgstr "可用内存不足，可能会出现稳定性问题。"
 
-#: cli/lib/search.go:156
+#: internal/cli/lib/search.go:151
 msgid "Maintainer: %s"
 msgstr "维护者：%s"
 
-#: cli/arguments/discovery_timeout.go:31
+#: internal/cli/arguments/discovery_timeout.go:31
 msgid "Max time to wait for port discovery, e.g.: 30s, 1m"
 msgstr "等待端口发现的最长时间，例如：30s, 1m"
 
-#: cli/cli.go:109
+#: internal/cli/cli.go:108
 msgid ""
 "Messages with this level and above will be logged. Valid levels are: %s"
 msgstr "记录此级别及以上的消息。有效级别为 %s"
@@ -1470,7 +1469,11 @@ msgstr "缺少 FQBN（完全合格开发板名）"
 msgid "Missing port"
 msgstr "找不到端口"
 
-#: arduino/errors.go:238 arduino/errors.go:250
+#: arduino/errors.go:238
+msgid "Missing port address"
+msgstr "缺少端口地址"
+
+#: arduino/errors.go:250
 msgid "Missing port protocol"
 msgstr "找不到端口协议"
 
@@ -1490,7 +1493,7 @@ msgstr "缺少项目路径"
 msgid "Monitor '%s' not found"
 msgstr "未找到 ‘%s’ 监视器"
 
-#: cli/monitor/monitor.go:143
+#: internal/cli/monitor/monitor.go:137
 msgid "Monitor port settings:"
 msgstr "监视端口设置："
 
@@ -1498,32 +1501,36 @@ msgstr "监视端口设置："
 msgid "Multiple libraries were found for \"%[1]s\""
 msgstr "为 “%[1]s” 找到了多个库"
 
-#: cli/board/details.go:193 cli/core/list.go:87 cli/core/search.go:108
-#: cli/lib/list.go:131
+#: internal/cli/board/details.go:194 internal/cli/core/list.go:85
+#: internal/cli/core/search.go:104 internal/cli/lib/list.go:129
 msgid "Name"
 msgstr "名"
 
-#: cli/lib/search.go:135
+#: internal/cli/lib/search.go:130
 msgid "Name: \"%s\""
 msgstr "名：“%s”"
 
-#: cli/board/list.go:121
+#: internal/cli/board/list.go:127
 msgid "No boards found."
 msgstr "没有找到开发板"
 
-#: cli/lib/examples.go:107
+#: internal/cli/board/attach.go:110
+msgid "No default port or FQBN set"
+msgstr "未设置默认端口或 FQBN"
+
+#: internal/cli/lib/examples.go:105
 msgid "No libraries found."
 msgstr "没有找到库。"
 
-#: cli/lib/list.go:123
+#: internal/cli/lib/list.go:121
 msgid "No libraries installed."
 msgstr "没有安装库。"
 
-#: cli/lib/search.go:124
+#: internal/cli/lib/search.go:119
 msgid "No libraries matching your search."
 msgstr "没有与你的搜索相匹配的库。"
 
-#: cli/lib/search.go:130
+#: internal/cli/lib/search.go:125
 msgid ""
 "No libraries matching your search.\n"
 "Did you mean...\n"
@@ -1531,21 +1538,17 @@ msgstr ""
 "没有与您的搜索匹配的库。\n"
 "你的意思是。。。\n"
 
-#: cli/lib/list.go:121
+#: internal/cli/lib/list.go:119
 msgid "No libraries update is available."
-msgstr ""
+msgstr "没有可用的库更新。"
 
 #: arduino/errors.go:276
 msgid "No monitor available for the port protocol %s"
 msgstr "没有可用于端口协议 %s 的监视器"
 
-#: cli/core/search.go:118
+#: internal/cli/core/search.go:114
 msgid "No platforms matching your search."
 msgstr "没有与你的搜索匹配的平台。"
-
-#: commands/board/attach.go:93
-msgid "No supported board found at %s"
-msgstr "在 %s 找不到支持的开发板"
 
 #: commands/upload/upload.go:421
 msgid "No upload port found, using %s as fallback"
@@ -1563,110 +1566,118 @@ msgstr "内存不足；有关减少空间的提示，请参见 %[1]s。"
 msgid "Not used: %[1]s"
 msgstr "未使用：%[1]s"
 
-#: cli/board/details.go:164
+#: internal/cli/board/details.go:165
 msgid "OS:"
 msgstr "操作系统："
 
-#: cli/board/details.go:128
+#: internal/cli/board/details.go:127
 msgid "Official Arduino board:"
 msgstr "官方 Arduino 开发板："
 
-#: cli/monitor/monitor.go:54 cli/monitor/monitor.go:55
+#: internal/cli/monitor/monitor.go:53 internal/cli/monitor/monitor.go:54
 msgid "Open a communication port with a board."
 msgstr "开启开发板的通信端口。"
 
-#: cli/board/details.go:176
+#: internal/cli/board/details.go:177
 msgid "Option:"
 msgstr "选项："
 
-#: cli/compile/compile.go:118
+#: internal/cli/compile/compile.go:115
 msgid ""
 "Optional, can be: %s. Used to tell gcc which warning level to use (-W flag)."
 msgstr "可选，可以是：%s。用于告诉 gcc 使用哪个警告级别（-W 参数）。"
 
-#: cli/compile/compile.go:132
+#: internal/cli/compile/compile.go:129
 msgid "Optional, cleanup the build folder and do not use any cached build."
 msgstr "可选，清理构建文件夹并且不使用任何缓存构建。"
 
-#: cli/compile/compile.go:129
+#: internal/cli/compile/compile.go:126
 msgid ""
 "Optional, optimize compile output for debugging, rather than for release."
 msgstr "可选，优化编译输出用于调试，而不是发布。"
 
-#: cli/compile/compile.go:120
+#: internal/cli/compile/compile.go:117
 msgid "Optional, suppresses almost every output."
 msgstr "可选，禁止几乎所有输出。"
 
-#: cli/compile/compile.go:119 cli/upload/upload.go:74
+#: internal/cli/compile/compile.go:116 internal/cli/upload/upload.go:73
 msgid "Optional, turns on verbose mode."
 msgstr "可选，开启详细模式。"
 
-#: cli/compile/compile.go:137
+#: internal/cli/compile/compile.go:134
 msgid ""
 "Optional. Path to a .json file that contains a set of replacements of the "
 "sketch source code."
 msgstr "可选。 包含一组替换项目源代码的文件的路径。"
 
-#: cli/compile/compile.go:110
+#: internal/cli/compile/compile.go:107
 msgid ""
 "Override a build property with a custom value. Can be used multiple times "
 "for multiple properties."
 msgstr "使用自定义值替代构建属性。可以对多个属性多次使用。"
 
-#: cli/config/init.go:57
+#: internal/cli/config/init.go:56
 msgid "Overwrite existing config file."
 msgstr "覆盖现有的配置文件。"
 
-#: cli/core/download.go:36 cli/core/install.go:38 cli/core/uninstall.go:36
-#: cli/core/upgrade.go:39
+#: internal/cli/sketch/archive.go:51
+msgid "Overwrites an already existing archive"
+msgstr "覆盖一个已经存在的存档文件"
+
+#: internal/cli/sketch/new.go:44
+msgid "Overwrites an existing .ino sketch."
+msgstr "覆盖现有的 .ino 项目。"
+
+#: internal/cli/core/download.go:34 internal/cli/core/install.go:36
+#: internal/cli/core/uninstall.go:34 internal/cli/core/upgrade.go:37
 msgid "PACKAGER"
 msgstr "打包程序"
 
-#: cli/board/details.go:144
+#: internal/cli/board/details.go:143
 msgid "Package URL:"
 msgstr "软件包地址："
 
-#: cli/board/details.go:143
+#: internal/cli/board/details.go:142
 msgid "Package maintainer:"
 msgstr "软件包维护者："
 
-#: cli/board/details.go:142
+#: internal/cli/board/details.go:141
 msgid "Package name:"
 msgstr "软件包名："
 
-#: cli/board/details.go:146
+#: internal/cli/board/details.go:145
 msgid "Package online help:"
 msgstr "软件包在线帮助"
 
-#: cli/board/details.go:145
+#: internal/cli/board/details.go:144
 msgid "Package website:"
 msgstr "软件包网站："
 
-#: cli/lib/search.go:158
+#: internal/cli/lib/search.go:153
 msgid "Paragraph: %s"
 msgstr "段落：%s"
 
-#: cli/compile/compile.go:391 cli/compile/compile.go:405
+#: internal/cli/compile/compile.go:393 internal/cli/compile/compile.go:408
 msgid "Path"
 msgstr "路径"
 
-#: cli/compile/compile.go:128
+#: internal/cli/compile/compile.go:125
 msgid ""
 "Path to a collection of libraries. Can be used multiple times or entries can"
 " be comma separated."
 msgstr "一个库的集合的路径。可以多次使用，或者可以用逗号分隔条目。"
 
-#: cli/compile/compile.go:126
+#: internal/cli/compile/compile.go:123
 msgid ""
 "Path to a single library’s root folder. Can be used multiple times or "
 "entries can be comma separated."
 msgstr "单个库的根文件夹的路径。可以多次使用，或者可以用逗号分隔条目。"
 
-#: cli/cli.go:113
+#: internal/cli/cli.go:112
 msgid "Path to the file where logs will be written."
 msgstr "写入日志的文件的路径。"
 
-#: cli/compile/compile.go:106
+#: internal/cli/compile/compile.go:103
 msgid ""
 "Path where to save compiled files. If omitted, a directory will be created "
 "in the default temporary path of your OS."
@@ -1684,7 +1695,7 @@ msgstr "%s 平台已经安装"
 msgid "Platform %s installed"
 msgstr "已安装 %s 平台"
 
-#: cli/compile/compile.go:360 cli/upload/upload.go:135
+#: internal/cli/compile/compile.go:350 internal/cli/upload/upload.go:134
 msgid ""
 "Platform %s is not found in any known index\n"
 "Maybe you need to add a 3rd party URL?"
@@ -1704,39 +1715,39 @@ msgstr "‘%s’ 平台已经是最新版本"
 msgid "Platform '%s' not found"
 msgstr "未找到 ‘%s’ 平台"
 
-#: cli/board/search.go:85
+#: internal/cli/board/search.go:83
 msgid "Platform ID"
 msgstr "平台 ID"
 
-#: cli/compile/compile.go:345 cli/upload/upload.go:121
+#: internal/cli/compile/compile.go:333 internal/cli/upload/upload.go:119
 msgid "Platform ID is not correct"
 msgstr "平台 ID 不正确"
 
-#: cli/board/details.go:152
+#: internal/cli/board/details.go:151
 msgid "Platform URL:"
 msgstr "平台地址："
 
-#: cli/board/details.go:151
+#: internal/cli/board/details.go:150
 msgid "Platform architecture:"
 msgstr "平台架构："
 
-#: cli/board/details.go:150
+#: internal/cli/board/details.go:149
 msgid "Platform category:"
 msgstr "平台类别："
 
-#: cli/board/details.go:157
+#: internal/cli/board/details.go:156
 msgid "Platform checksum:"
 msgstr "平台校验码："
 
-#: cli/board/details.go:153
+#: internal/cli/board/details.go:152
 msgid "Platform file name:"
 msgstr "平台文件名："
 
-#: cli/board/details.go:149
+#: internal/cli/board/details.go:148
 msgid "Platform name:"
 msgstr "平台名称："
 
-#: cli/board/details.go:155
+#: internal/cli/board/details.go:154
 msgid "Platform size (bytes):"
 msgstr "平台大小（字节）："
 
@@ -1744,21 +1755,21 @@ msgstr "平台大小（字节）："
 msgid ""
 "Please specify an FQBN. Multiple possible boards detected on port %[1]s with"
 " protocol %[2]s"
-msgstr "请指定一个FQBN。在 %[1]s 端口上检测到多个可能的开发板，协议为 %[2]s"
+msgstr "请指定一个 FQBN。在 %[1]s 端口上检测到多个可能的开发板，协议为 %[2]s"
 
 #: arduino/errors.go:135
 msgid ""
 "Please specify an FQBN. The board on port %[1]s with protocol %[2]s can't be"
 " identified"
-msgstr "请指定一个FQBN。%[1]s 端口上的开发板与协议 %[2]s 不能被识别"
+msgstr "请指定一个 FQBN。%[1]s 端口上的开发板与协议 %[2]s 不能被识别"
 
-#: cli/board/list.go:91 cli/board/list.go:131
+#: internal/cli/board/list.go:97 internal/cli/board/list.go:137
 msgid "Port"
 msgstr "端口"
 
-#: cli/monitor/monitor.go:164 cli/monitor/monitor.go:171
-msgid "Port closed:"
-msgstr "端口关闭："
+#: internal/cli/monitor/monitor.go:158 internal/cli/monitor/monitor.go:167
+msgid "Port closed: %v"
+msgstr ""
 
 #: arduino/errors.go:632
 msgid "Port monitor error"
@@ -1769,23 +1780,23 @@ msgstr "端口监视器错误"
 msgid "Precompiled library in \"%[1]s\" not found"
 msgstr "在 “%[1]s” 中找不到预编译库"
 
-#: cli/board/details.go:44
+#: internal/cli/board/details.go:43
 msgid "Print details about a board."
 msgstr "打印开发板的详细信息。"
 
-#: cli/compile/compile.go:102
+#: internal/cli/compile/compile.go:99
 msgid "Print preprocessed code to stdout instead of compiling."
 msgstr "将预处理的代码打印到标准输出，而不是编译。"
 
-#: cli/cli.go:107
+#: internal/cli/cli.go:106
 msgid "Print the logs on the standard output."
 msgstr "在标准输出上打印日志。"
 
-#: cli/config/dump.go:31
+#: internal/cli/config/dump.go:31
 msgid "Prints the current configuration"
 msgstr "打印当前配置"
 
-#: cli/config/dump.go:32
+#: internal/cli/config/dump.go:32
 msgid "Prints the current configuration."
 msgstr "打印当前配置。"
 
@@ -1797,15 +1808,15 @@ msgstr "未找到 ‘%s’ 的配置文件''。"
 msgid "Programmer '%s' not found"
 msgstr "未找到 ‘%s’ 编译器"
 
-#: cli/board/details.go:92
+#: internal/cli/board/details.go:90
 msgid "Programmer name"
 msgstr "编译器名"
 
-#: cli/arguments/programmer.go:29
+#: internal/cli/arguments/programmer.go:29
 msgid "Programmer to use, e.g: atmel_ice"
 msgstr "要使用的编译器，例如：atmel_ice"
 
-#: cli/board/details.go:193
+#: internal/cli/board/details.go:194
 msgid "Programmers:"
 msgstr "编译器："
 
@@ -1813,19 +1824,19 @@ msgstr "编译器："
 msgid "Property '%s' is undefined"
 msgstr "‘%s’ 属性未定义"
 
-#: cli/board/list.go:131
+#: internal/cli/board/list.go:137
 msgid "Protocol"
 msgstr "协议"
 
-#: cli/lib/search.go:168
+#: internal/cli/lib/search.go:163
 msgid "Provides includes: %s"
 msgstr "提供包括：%s"
 
-#: cli/config/remove.go:32 cli/config/remove.go:33
+#: internal/cli/config/remove.go:31 internal/cli/config/remove.go:32
 msgid "Removes one or more values from a setting."
 msgstr "从设置中删除一个或多个值。"
 
-#: commands/lib/install.go:141
+#: commands/lib/install.go:127
 msgid "Replacing %[1]s with %[2]s"
 msgstr "将 %[1]s 替换为 %[2]s"
 
@@ -1833,19 +1844,19 @@ msgstr "将 %[1]s 替换为 %[2]s"
 msgid "Replacing platform %[1]s with %[2]s"
 msgstr "用 %[2]s 替换 %[1]s 平台"
 
-#: cli/board/details.go:161
+#: internal/cli/board/details.go:162
 msgid "Required tool:"
 msgstr "需要的工具："
 
-#: cli/daemon/daemon.go:56
+#: internal/cli/daemon/daemon.go:52
 msgid "Run as a daemon on port: %s"
 msgstr "在端口上作为守护进程运行：%s"
 
-#: cli/monitor/monitor.go:64
+#: internal/cli/monitor/monitor.go:63
 msgid "Run in silent mode, show only monitor input and output."
 msgstr "以静默模式运行，仅显示监视器输入和输出。"
 
-#: cli/daemon/daemon.go:57
+#: internal/cli/daemon/daemon.go:53
 msgid ""
 "Running as a daemon the initialization of cores and libraries is done only "
 "once."
@@ -1855,102 +1866,104 @@ msgstr "作为守护进程运行时，只执行一次内核和库的初始化。
 msgid "Running normal build of the core..."
 msgstr "正在运行正常的内核构建。。。"
 
-#: cli/compile/compile.go:104
+#: internal/cli/compile/compile.go:101
 msgid "Save build artifacts in this directory."
 msgstr "将生成文件保存在此目录中。"
 
-#: cli/core/search.go:49
+#: internal/cli/core/search.go:47
 msgid "Search for a core in Boards Manager using the specified keywords."
 msgstr "使用指定的关键字在开发板管理器中搜索内核。"
 
-#: cli/core/search.go:48
+#: internal/cli/core/search.go:46
 msgid "Search for a core in Boards Manager."
 msgstr "在开发板管理器中搜索内核。"
 
-#: cli/lib/search.go:42
+#: internal/cli/lib/search.go:40
 msgid "Search for one or more libraries data (case insensitive search)."
 msgstr "搜索一个或多个库数据（不区分大小写的搜索）。"
 
-#: cli/lib/search.go:41
+#: internal/cli/lib/search.go:39
 msgid "Searches for one or more libraries data."
 msgstr "搜索一个或多个库数据。"
 
-#: commands/board/attach.go:110
-msgid "Selected fqbn: %s"
-msgstr "选择FQBN：%s"
-
-#: cli/lib/search.go:157
+#: internal/cli/lib/search.go:152
 msgid "Sentence: %s"
 msgstr "句子：%s"
 
-#: arduino/httpclient/httpclient.go:67
+#: arduino/httpclient/httpclient.go:73
 msgid "Server responded with: %s"
 msgstr "服务器响应：%s"
 
-#: cli/config/set.go:33 cli/config/set.go:34
+#: internal/cli/config/set.go:32 internal/cli/config/set.go:33
 msgid "Sets a setting value."
 msgstr "设置一个值。"
 
-#: cli/config/init.go:55 cli/config/init.go:56
+#: internal/cli/board/attach.go:32
+msgid ""
+"Sets the default values for port and FQBN. If no port or FQBN are specified,"
+" the current default port and FQBN are displayed."
+msgstr "设置端口和 FQBN 的默认值。如果没有指定端口或 FQBN，将显示当前的默认端口和 FQBN。"
+
+#: internal/cli/config/init.go:54 internal/cli/config/init.go:55
 msgid "Sets where to save the configuration file."
 msgstr "设置保存配置文件的位置。"
 
-#: cli/monitor/monitor.go:195
+#: internal/cli/monitor/monitor.go:192
 msgid "Setting"
 msgstr "设置"
 
-#: cli/config/delete.go:62 cli/config/validate.go:52
+#: internal/cli/config/delete.go:61 internal/cli/config/validate.go:50
 msgid "Settings key doesn't exist"
 msgstr "设置键不存在"
 
-#: cli/core/search.go:54
+#: internal/cli/core/search.go:52
 msgid "Show all available core versions."
 msgstr "显示所有可用的内核版本。"
 
-#: cli/compile/compile.go:101
+#: internal/cli/compile/compile.go:98
 msgid "Show all build properties used instead of compiling."
 msgstr "显示所有使用的构建属性，而不是编译。"
 
-#: cli/monitor/monitor.go:62
+#: internal/cli/monitor/monitor.go:61
 msgid "Show all the settings of the communication port."
 msgstr "显示通讯端口的所有设置。"
 
-#: cli/board/listall.go:48 cli/board/search.go:47
+#: internal/cli/board/listall.go:47 internal/cli/board/search.go:46
 msgid "Show also boards marked as 'hidden' in the platform"
 msgstr "在平台上显示标记为隐藏的开发板"
 
-#: cli/board/details.go:52
+#: internal/cli/board/details.go:51
 msgid "Show full board details"
 msgstr "显示完整的开发板详细信息"
 
-#: cli/board/details.go:45
+#: internal/cli/board/details.go:44
 msgid ""
 "Show information about a board, in particular if the board has options to be"
 " specified in the FQBN."
 msgstr "显示有关开发板的信息，特别是如果开发板在 FQBN 中有指定的选项。"
 
-#: cli/lib/search.go:49
+#: internal/cli/lib/search.go:47
 msgid "Show library names only."
 msgstr "只显示库名。"
 
-#: cli/board/details.go:53
+#: internal/cli/board/details.go:52
 msgid "Show list of available programmers"
 msgstr "显示可用编译器列表"
 
-#: cli/debug/debug.go:64
+#: internal/cli/debug/debug.go:63
 msgid ""
 "Show metadata about the debug session instead of starting the debugger."
 msgstr "显示有关调试会话的元数据，而不是启动调试器。"
 
-#: cli/update/update.go:45
+#: internal/cli/update/update.go:45
 msgid "Show outdated cores and libraries after index update"
 msgstr "在索引更新后显示过时的内核和库"
 
-#: cli/lib/list.go:40
+#: internal/cli/lib/list.go:39
 msgid "Shows a list of installed libraries."
 msgstr "显示已安装库的列表。"
 
-#: cli/lib/list.go:41
+#: internal/cli/lib/list.go:40
 msgid ""
 "Shows a list of installed libraries.\n"
 "\n"
@@ -1961,44 +1974,44 @@ msgstr ""
 "显示已安装库的列表。如果指定了 LIBNAME 范围，则列表仅限于该特定库。默认情况下，不会列出 ‘平台/核心’ 内置的库，可以通过添加 --all "
 "参数来列出它们。"
 
-#: cli/core/list.go:37 cli/core/list.go:38
+#: internal/cli/core/list.go:36 internal/cli/core/list.go:37
 msgid "Shows the list of installed platforms."
 msgstr "显示已安装平台的列表。"
 
-#: cli/lib/examples.go:44
+#: internal/cli/lib/examples.go:43
 msgid "Shows the list of the examples for libraries."
 msgstr "显示库示例列表。"
 
-#: cli/lib/examples.go:45
+#: internal/cli/lib/examples.go:44
 msgid ""
 "Shows the list of the examples for libraries. A name may be given as "
 "argument to search a specific library."
 msgstr "显示库的示例列表。可以指定名称作为搜索特定库的参数。"
 
-#: cli/version/version.go:39
+#: internal/cli/version/version.go:39
 msgid ""
 "Shows the version number of Arduino CLI which is installed on your system."
 msgstr "显示您系统上安装的 Arduino CLI 的版本号。"
 
-#: cli/version/version.go:38
+#: internal/cli/version/version.go:38
 msgid "Shows version number of Arduino CLI."
 msgstr "显示 Arduino CLI 的版本号。"
 
-#: cli/board/details.go:166
+#: internal/cli/board/details.go:167
 msgid "Size (bytes):"
 msgstr "大小（字节）："
 
-#: legacy/builder/fail_if_buildpath_equals_sketchpath.go:42
+#: legacy/builder/fail_if_buildpath_equals_sketchpath.go:29
 msgid ""
 "Sketch cannot be located in build path. Please specify a different build "
 "path"
 msgstr "项目不能位于生成路径中。请指定其他生成路径"
 
-#: cli/sketch/new.go:65
+#: internal/cli/sketch/new.go:85
 msgid "Sketch created in: %s"
 msgstr "项目新建于：%s"
 
-#: cli/arguments/profiles.go:29
+#: internal/cli/arguments/profiles.go:29
 msgid "Sketch profile to use"
 msgstr "使用项目配置文件"
 
@@ -2012,7 +2025,7 @@ msgid ""
 " bytes."
 msgstr " 项目使用 %[1]s 字节（%[3]s%%）的程序存储空间。最大值为 %[2]s 字节。"
 
-#: cli/arguments/sketch.go:61
+#: internal/cli/arguments/sketch.go:58
 msgid ""
 "Sketches with .pde extension are deprecated, please rename the following "
 "files to .ino:"
@@ -2048,29 +2061,29 @@ msgstr "跳过：%[1]s"
 
 #: commands/instances.go:542
 msgid "Some indexes could not be updated."
+msgstr "一些索引无法更新。"
+
+#: internal/cli/core/upgrade.go:112
+msgid "Some upgrades failed, please check the output for details."
 msgstr ""
 
 #: arduino/serialutils/serialutils.go:133
 msgid "TOUCH: error during reset: %s"
 msgstr "TOUCH：重置时出错：%s"
 
-#: cli/daemon/daemon.go:62
-msgid "The IP address the daemon will listen to"
-msgstr "守护进程将侦听的 IP 地址"
-
-#: cli/daemon/daemon.go:63
+#: internal/cli/daemon/daemon.go:58
 msgid "The TCP port the daemon will listen to"
 msgstr "守护进程将监听的 TCP 端口"
 
-#: cli/cli.go:124
+#: internal/cli/cli.go:123
 msgid "The custom config file (if not specified the default will be used)."
 msgstr "自定义配置文件（如果未指定，将使用默认值）。"
 
-#: cli/daemon/daemon.go:82
+#: internal/cli/daemon/daemon.go:77
 msgid "The flag --debug-file must be used with --debug."
 msgstr "参数 --debug-file 必须与 --debug 一起使用。"
 
-#: cli/config/add.go:94
+#: internal/cli/config/add.go:93
 msgid ""
 "The key '%[1]v' is not a list of items, can't add to it.\n"
 "Maybe use '%[2]s'?"
@@ -2078,7 +2091,7 @@ msgstr ""
 "‘%[1]v’ 键不是列表中的条目，无法添加到其中。\n"
 "是否可以使用 ‘%[2]s’？"
 
-#: cli/config/remove.go:52
+#: internal/cli/config/remove.go:51
 msgid ""
 "The key '%[1]v' is not a list of items, can't remove from it.\n"
 "Maybe use '%[2]s'?"
@@ -2088,25 +2101,25 @@ msgstr ""
 
 #: arduino/errors.go:825
 msgid "The library %s has multiple installations:"
-msgstr ""
+msgstr "库 %s 有多个安装。"
 
-#: cli/compile/compile.go:116
+#: internal/cli/compile/compile.go:113
 msgid ""
 "The name of the custom encryption key to use to encrypt a binary during the "
 "compile process. Used only by the platforms that support it."
 msgstr "自定义加密密钥的名称，用于在编译过程中对二进制文件进行加密。只在支持它的平台上使用。"
 
-#: cli/compile/compile.go:114
+#: internal/cli/compile/compile.go:111
 msgid ""
 "The name of the custom signing key to use to sign a binary during the "
 "compile process. Used only by the platforms that support it."
 msgstr "自定义签名密钥的名称，用于在编译过程中对二进制文件进行签名。只在支持它的平台上使用。"
 
-#: cli/cli.go:115 cli/cli.go:120
+#: internal/cli/cli.go:114 internal/cli/cli.go:119
 msgid "The output format for the logs, can be: %s"
 msgstr "日志的输出格​​式，可以是：%s"
 
-#: cli/compile/compile.go:112
+#: internal/cli/compile/compile.go:109
 msgid ""
 "The path of the dir to search for the custom keys to sign and encrypt a "
 "binary. Used only by the platforms that support it."
@@ -2116,7 +2129,7 @@ msgstr "搜索自定义密钥以签署和加密二进制文件的文件夹的路
 msgid "The platform does not support '%[1]s' for precompiled libraries."
 msgstr "该平台不支持预编译库的 ‘%[1]s’。"
 
-#: cli/lib/upgrade.go:36
+#: internal/cli/lib/upgrade.go:35
 msgid ""
 "This command upgrades an installed library to the latest available version. "
 "Multiple libraries can be passed separated by a space. If no arguments are "
@@ -2124,7 +2137,7 @@ msgid ""
 "update is available."
 msgstr "此命令将已安装的库升级到可用的最新版本。可以通过一个空格分隔多个库。如果未提供任何参数，该命令将升级所有已安装的库，其中有可用的更新。"
 
-#: cli/outdated/outdated.go:37
+#: internal/cli/outdated/outdated.go:37
 msgid ""
 "This commands shows a list of installed cores and/or libraries\n"
 "that can be upgraded. If nothing needs to be updated the output is empty."
@@ -2143,39 +2156,39 @@ msgstr "%s 工具已经卸载"
 msgid "Toolchain '%s' is not supported"
 msgstr "不支持 ‘%s’ 工具链"
 
-#: cli/debug/debug.go:134
+#: internal/cli/debug/debug.go:135
 msgid "Toolchain custom configurations"
 msgstr "工具链自定义配置"
 
-#: cli/debug/debug.go:128
+#: internal/cli/debug/debug.go:129
 msgid "Toolchain path"
 msgstr "工具链路径"
 
-#: cli/debug/debug.go:129
+#: internal/cli/debug/debug.go:130
 msgid "Toolchain prefix"
 msgstr "工具链前缀"
 
-#: cli/debug/debug.go:127
+#: internal/cli/debug/debug.go:128
 msgid "Toolchain type"
 msgstr "工具链类型"
 
-#: cli/compile/compile.go:358 cli/upload/upload.go:133
+#: internal/cli/compile/compile.go:348 internal/cli/upload/upload.go:132
 msgid "Try running %s"
 msgstr "尝试运行 %s"
 
-#: cli/burnbootloader/burnbootloader.go:58
+#: internal/cli/burnbootloader/burnbootloader.go:57
 msgid "Turns on verbose mode."
 msgstr "打开详细模式。"
 
-#: cli/board/list.go:91 cli/board/list.go:131
+#: internal/cli/board/list.go:97 internal/cli/board/list.go:137
 msgid "Type"
 msgstr "类型"
 
-#: cli/lib/search.go:165
+#: internal/cli/lib/search.go:160
 msgid "Types: %s"
 msgstr "类型：%s"
 
-#: cli/board/details.go:168
+#: internal/cli/board/details.go:169
 msgid "URL:"
 msgstr "地址："
 
@@ -2196,13 +2209,13 @@ msgstr "无法获取本地应用程序数据文件夹：%v"
 msgid "Unable to get user home dir: %v"
 msgstr "无法获取用户主目录：%v"
 
-#: cli/cli.go:215
+#: internal/cli/cli.go:202
 msgid "Unable to open file for logging: %s"
 msgstr "无法打开文件进行日志记录：%s"
 
 #: commands/instances.go:509
 msgid "Unable to parse URL"
-msgstr ""
+msgstr "无法解析地址"
 
 #: arduino/cores/packagemanager/install_uninstall.go:273
 #: commands/lib/uninstall.go:44
@@ -2214,17 +2227,17 @@ msgstr "正在卸载 %s"
 msgid "Uninstalling %s, tool is no more required"
 msgstr "卸载 %s，工具不再需要了"
 
-#: cli/core/uninstall.go:37 cli/core/uninstall.go:38
+#: internal/cli/core/uninstall.go:35 internal/cli/core/uninstall.go:36
 msgid ""
 "Uninstalls one or more cores and corresponding tool dependencies if no "
 "longer used."
 msgstr "如果不再使用，卸载一个或多个内核和相应的工具依赖。"
 
-#: cli/lib/uninstall.go:37 cli/lib/uninstall.go:38
+#: internal/cli/lib/uninstall.go:35 internal/cli/lib/uninstall.go:36
 msgid "Uninstalls one or more libraries."
 msgstr "卸载一个或多个库。"
 
-#: cli/board/list.go:163
+#: internal/cli/board/list.go:169
 msgid "Unknown"
 msgstr "未知"
 
@@ -2232,27 +2245,27 @@ msgstr "未知"
 msgid "Unknown FQBN"
 msgstr "未知 FQBN"
 
-#: cli/update/update.go:37
+#: internal/cli/update/update.go:37
 msgid "Updates the index of cores and libraries"
 msgstr "更新内核和库的索引"
 
-#: cli/update/update.go:38
+#: internal/cli/update/update.go:38
 msgid "Updates the index of cores and libraries to the latest versions."
 msgstr "将内核和库的索引更新到最新版本。"
 
-#: cli/core/update_index.go:36
+#: internal/cli/core/update_index.go:34
 msgid "Updates the index of cores to the latest version."
 msgstr "更新内核索引到最新版本。"
 
-#: cli/core/update_index.go:35
+#: internal/cli/core/update_index.go:33
 msgid "Updates the index of cores."
 msgstr "更新内核索引。"
 
-#: cli/lib/update_index.go:36
+#: internal/cli/lib/update_index.go:34
 msgid "Updates the libraries index to the latest version."
 msgstr "更新库索引到最新版本。"
 
-#: cli/lib/update_index.go:35
+#: internal/cli/lib/update_index.go:33
 msgid "Updates the libraries index."
 msgstr "更新库索引。"
 
@@ -2260,32 +2273,32 @@ msgstr "更新库索引。"
 msgid "Upgrade doesn't accept parameters with version"
 msgstr "升级不接受带有版本范围"
 
-#: cli/upgrade/upgrade.go:38
+#: internal/cli/upgrade/upgrade.go:38
 msgid "Upgrades installed cores and libraries to latest version."
 msgstr "将安装的内核和库升级到最新版本。"
 
-#: cli/upgrade/upgrade.go:37
+#: internal/cli/upgrade/upgrade.go:37
 msgid "Upgrades installed cores and libraries."
 msgstr "升级已安装的内核和库。"
 
-#: cli/lib/upgrade.go:35
+#: internal/cli/lib/upgrade.go:34
 msgid "Upgrades installed libraries."
 msgstr "升级已安装的库。"
 
-#: cli/core/upgrade.go:40 cli/core/upgrade.go:41
+#: internal/cli/core/upgrade.go:38 internal/cli/core/upgrade.go:39
 msgid "Upgrades one or all installed platforms to the latest version."
 msgstr "将一个或所有已安装的平台升级到最新版本。"
 
-#: cli/upload/upload.go:58
+#: internal/cli/upload/upload.go:57
 msgid "Upload Arduino sketches."
 msgstr "上传 Arduino 项目。"
 
-#: cli/upload/upload.go:59
+#: internal/cli/upload/upload.go:58
 msgid ""
 "Upload Arduino sketches. This does NOT compile the sketch prior to upload."
 msgstr "上传 Arduino 项目。不会在上传之前编译项目。"
 
-#: cli/arguments/port.go:48
+#: internal/cli/arguments/port.go:44
 msgid "Upload port address, e.g.: COM3 or /dev/ttyACM2"
 msgstr "上传端口地址，例如：COM3 或 /dev/ttyACM2"
 
@@ -2293,52 +2306,46 @@ msgstr "上传端口地址，例如：COM3 或 /dev/ttyACM2"
 msgid "Upload port found on %s"
 msgstr "在 %s 上找到上传端口"
 
-#: cli/arguments/port.go:52
+#: internal/cli/arguments/port.go:48
 msgid "Upload port protocol, e.g: serial"
 msgstr "上传端口协议，例如：串行"
 
-#: cli/compile/compile.go:121
+#: internal/cli/compile/compile.go:118
 msgid "Upload the binary after the compilation."
 msgstr "编译后上传二进制文件。"
 
-#: cli/burnbootloader/burnbootloader.go:48
+#: internal/cli/burnbootloader/burnbootloader.go:47
 msgid "Upload the bootloader on the board using an external programmer."
 msgstr "使用外部编译器将引导加载程序上传到板上。"
 
-#: cli/burnbootloader/burnbootloader.go:47
+#: internal/cli/burnbootloader/burnbootloader.go:46
 msgid "Upload the bootloader."
 msgstr "上传引导加载程序。"
 
-#: cli/compile/compile.go:251 cli/upload/upload.go:143
+#: internal/cli/compile/compile.go:237 internal/cli/upload/upload.go:142
 msgid ""
 "Uploading to specified board using %s protocol requires the following info:"
 msgstr "使用 %s 协议上传到指定的开发板需要以下信息："
 
-#: cli/usage.go:26
+#: internal/cli/usage.go:26
 msgid "Usage:"
 msgstr "用法："
 
-#: cli/usage.go:33
+#: internal/cli/usage.go:33
 msgid "Use %s for more information about a command."
 msgstr "使用 %s 获取有关命令的更多信息。"
 
-#: cli/compile/compile.go:389
+#: internal/cli/compile/compile.go:391
 msgid "Used library"
 msgstr "已使用的库"
 
-#: cli/compile/compile.go:403
+#: internal/cli/compile/compile.go:406
 msgid "Used platform"
 msgstr "已使用的平台"
 
 #: legacy/builder/print_used_and_not_used_libraries.go:46
 msgid "Used: %[1]s"
 msgstr "使用：%[1]s"
-
-#: arduino/libraries/librariesmanager/install.go:56
-#: arduino/libraries/librariesmanager/install.go:119
-#: arduino/libraries/librariesmanager/install.go:203
-msgid "User directory not set"
-msgstr "未设置用户目录"
 
 #: legacy/builder/target_board_resolver.go:41
 msgid "Using board '%[1]s' from platform in folder: %[2]s"
@@ -2374,29 +2381,29 @@ msgstr "在 %[1]s 中使用预编译库"
 msgid "Using previously compiled file: %[1]s"
 msgstr "使用以前编译的文件：%[1]s"
 
-#: cli/core/download.go:36 cli/core/install.go:38
+#: internal/cli/core/download.go:34 internal/cli/core/install.go:36
 msgid "VERSION"
 msgstr "版本"
 
-#: cli/lib/check_deps.go:37 cli/lib/install.go:48
+#: internal/cli/lib/check_deps.go:36 internal/cli/lib/install.go:46
 msgid "VERSION_NUMBER"
 msgstr "版本号"
 
-#: cli/monitor/monitor.go:195
+#: internal/cli/monitor/monitor.go:192
 msgid "Values"
 msgstr "值"
 
-#: cli/burnbootloader/burnbootloader.go:57 cli/compile/compile.go:123
-#: cli/upload/upload.go:73
+#: internal/cli/burnbootloader/burnbootloader.go:56
+#: internal/cli/compile/compile.go:120 internal/cli/upload/upload.go:72
 msgid "Verify uploaded binary after the upload."
 msgstr "上传后验证上传的二进制文件。"
 
-#: cli/compile/compile.go:390 cli/compile/compile.go:404
-#: cli/core/search.go:108
+#: internal/cli/compile/compile.go:392 internal/cli/compile/compile.go:407
+#: internal/cli/core/search.go:104
 msgid "Version"
 msgstr "版本"
 
-#: cli/lib/search.go:166
+#: internal/cli/lib/search.go:161
 msgid "Versions: %s"
 msgstr "版本：%s"
 
@@ -2404,7 +2411,7 @@ msgstr "版本：%s"
 msgid "WARNING cannot configure platform: %s"
 msgstr "警告：无法配置平台：%s"
 
-#: cli/compile/compile.go:297
+#: internal/cli/compile/compile.go:280
 msgid "WARNING: The sketch is compiled using one or more custom libraries."
 msgstr "警告：该项目是用一个或多个自定义库编译的。"
 
@@ -2434,51 +2441,47 @@ msgid ""
 "Warning: tool '%s' is not installed. It might not be available for your OS."
 msgstr "警告：‘%s’ 工具未安装。它可能不适用于你的操作系统。"
 
-#: cli/lib/search.go:159
+#: internal/cli/lib/search.go:154
 msgid "Website: %s"
 msgstr "网站：%s"
 
-#: cli/compile/compile.go:124
+#: internal/cli/compile/compile.go:121
 msgid ""
 "When specified, VID/PID specific build properties are used, if board "
 "supports them."
 msgstr "指定时，若开发板支持，则使用 VID/PID 特定的构建属性。"
 
-#: cli/config/init.go:42
+#: internal/cli/config/init.go:41
 msgid "Writes current configuration to a configuration file."
 msgstr "将当前配置写入配置文件。"
 
-#: cli/config/init.go:45
+#: internal/cli/config/init.go:44
 msgid ""
 "Writes current configuration to the configuration file in the data "
 "directory."
 msgstr "将当前配置写入数据目录中的配置文件。"
 
-#: cli/config/set.go:77
+#: internal/cli/config/set.go:74
 msgid "Writing config file: %v"
 msgstr "正在写入配置文件：%v"
 
-#: cli/compile/compile.go:152
-msgid "You cannot use the %[1]s flag together with %[2]s."
-msgstr "你不能和 %[2]s 一起使用 %[1]s 参数。"
-
-#: cli/compile/compile.go:157 cli/compile/compile.go:161
+#: internal/cli/compile/compile.go:150 internal/cli/compile/compile.go:153
 msgid "You cannot use the %s flag while compiling with a profile."
 msgstr "在用配置文件编译时，你不能使用 %s 参数。"
 
-#: cli/arguments/arguments.go:37 cli/arguments/arguments.go:47
-msgid "and"
-msgstr "和"
-
-#: arduino/resources/checksums.go:80
+#: arduino/resources/checksums.go:79
 msgid "archive hash differs from hash in index"
 msgstr "存档哈希与索引中的哈希不同"
 
-#: arduino/libraries/librariesmanager/install.go:150
+#: arduino/libraries/librariesmanager/install.go:192
 msgid "archive is not valid: multiple files found in zip file top level"
 msgstr "存档无效：在 zip 文件顶层中找到多个文件"
 
-#: cli/sketch/archive.go:38
+#: arduino/libraries/librariesmanager/install.go:195
+msgid "archive is not valid: no files found in zip file top level"
+msgstr "存档无效：在压缩文件的顶层没有找到文件"
+
+#: internal/cli/sketch/archive.go:37
 msgid "archivePath"
 msgstr "存档路径"
 
@@ -2490,6 +2493,10 @@ msgstr "缺少 arduino 预处理器程序"
 msgid "autodetect build artifact: %s"
 msgstr "自动检测生成项目：%s"
 
+#: internal/cli/feedback/stdio.go:35
+msgid "available only in text format"
+msgstr ""
+
 #: commands/upload/upload.go:551
 msgid "binary file not found in %s"
 msgstr "在 %s 中找不到二进制文件"
@@ -2498,13 +2505,13 @@ msgstr "在 %s 中找不到二进制文件"
 msgid "board %s not found"
 msgstr "未找到开发板 %s"
 
-#: commands/board/list.go:43
-msgid "board not found"
-msgstr "未找到开发板"
-
-#: cli/board/listall.go:38 cli/board/search.go:37
+#: internal/cli/board/listall.go:37 internal/cli/board/search.go:36
 msgid "boardname"
 msgstr "开发板名"
+
+#: arduino/libraries/librariesmanager/librariesmanager.go:155
+msgid "built-in libraries directory not set"
+msgstr "未设置内置库目录"
 
 #: arduino/discovery/discovery.go:308 arduino/discovery/discovery.go:331
 #: arduino/discovery/discovery.go:353 arduino/discovery/discovery.go:392
@@ -2520,7 +2527,7 @@ msgstr "找不到 %s 的最新版本"
 msgid "can't find latest release of tool %s"
 msgstr "找不到 %s 工具的最新版本"
 
-#: arduino/sketch/sketch.go:126
+#: arduino/sketch/sketch.go:106
 msgid "can't find main Sketch file in %s"
 msgstr "在 %s 中找不到主项目文件"
 
@@ -2553,7 +2560,7 @@ msgstr "检查本地存档完整性"
 msgid "cleaning build path"
 msgstr "清理构建路径"
 
-#: cli/cli.go:74
+#: internal/cli/cli.go:72
 msgid "command"
 msgstr "命令"
 
@@ -2576,13 +2583,13 @@ msgstr "命令失败：%s"
 msgid "communication out of sync, expected '%[1]s', received '%[2]s'"
 msgstr "通信不同步，应为 ‘%[1]s’，收到 ‘%[2]s’"
 
-#: arduino/resources/checksums.go:76
+#: arduino/resources/checksums.go:75
 msgid "computing hash: %s"
 msgstr "计算哈希：%s"
 
-#: arduino/libraries/librariesmanager/install.go:227
-msgid "could not create directory %s: a file with the same name exists!"
-msgstr ""
+#: arduino/libraries/librariesmanager/install.go:145
+msgid "copying library to destination directory:"
+msgstr "将库复制到目标目录："
 
 #: commands/upload/upload.go:623
 msgid "could not find a valid build artifact"
@@ -2592,13 +2599,18 @@ msgstr "找不到有效的构建项目"
 msgid "could not overwrite"
 msgstr "无法覆盖"
 
-#: commands/lib/install.go:149
+#: commands/lib/install.go:130
 msgid "could not remove old library"
-msgstr ""
+msgstr "无法删除旧库"
+
+#: arduino/sketch/yaml.go:78 arduino/sketch/yaml.go:82
+#: arduino/sketch/yaml.go:86
+msgid "could not update sketch project file"
+msgstr "无法更新项目文件"
 
 #: arduino/cores/packagemanager/install_uninstall.go:208
 msgid "creating installed.json in %[1]s: %[2]s"
-msgstr "在 %[1]s 中创建installed.json：%[2]s"
+msgstr "在 %[1]s 中创建 installed.json：%[2]s"
 
 #: arduino/resources/install.go:44 arduino/resources/install.go:48
 msgid "creating temp dir for extraction: %s"
@@ -2608,23 +2620,23 @@ msgstr "新建用于提取的临时目录：%s"
 msgid "data section exceeds available space in board"
 msgstr "数据部分超出开发板中的可用空间"
 
-#: arduino/sketch/sketch.go:232
-msgid "decoding sketch metadata: %s"
-msgstr "解析项目元数据：%s"
-
 #: commands/lib/resolve_deps.go:56
 msgid "dependency '%s' is not available"
 msgstr "‘%s’ 依赖不可用"
 
-#: legacy/builder/utils/utils.go:438
+#: legacy/builder/utils/utils.go:437
 msgid "destination already exists"
 msgstr "目标已存在"
 
-#: arduino/libraries/librariesmanager/install.go:90
+#: arduino/libraries/librariesmanager/install.go:93
 msgid "destination dir %s already exists, cannot install"
 msgstr "%s 目录已经存在，无法安装"
 
-#: arduino/libraries/librariesmanager/install.go:308
+#: arduino/libraries/librariesmanager/install.go:142
+msgid "destination directory already exists"
+msgstr "目标目录已经存在"
+
+#: arduino/libraries/librariesmanager/install.go:282
 msgid "directory doesn't exist: %s"
 msgstr "目录不存在：%s"
 
@@ -2644,17 +2656,17 @@ msgstr "%s discovery 未安装"
 msgid "discovery release not found: %s"
 msgstr "未找到 discovery 版本：%s"
 
-#: cli/core/download.go:41 cli/core/install.go:43
+#: internal/cli/core/download.go:39 internal/cli/core/install.go:41
 msgid "download a specific version (in this case 1.6.9)."
 msgstr "下载特定版本（在本例中为 1.6.9）。"
 
-#: cli/core/download.go:40 cli/core/install.go:41
+#: internal/cli/core/download.go:38 internal/cli/core/install.go:39
 msgid "download the latest version of Arduino SAMD core."
 msgstr "下载最新版本的 Arduino SAMD 内核。"
 
-#: cli/output/rpc_progress.go:85
+#: internal/cli/feedback/rpc_progress.go:73
 msgid "downloaded"
-msgstr ""
+msgstr "下载"
 
 #: commands/instances.go:138
 msgid "downloading %[1]s tool: %[2]s"
@@ -2664,11 +2676,7 @@ msgstr "正在下载 %[1]s 工具：%[2]s"
 msgid "empty board identifier"
 msgstr "空开发板标识符"
 
-#: arduino/sketch/sketch.go:221
-msgid "encoding sketch metadata: %s"
-msgstr "编译项目元数据：%s"
-
-#: arduino/sketch/sketch.go:112
+#: arduino/sketch/sketch.go:92
 msgid "error loading sketch project file:"
 msgstr "加载项目文件时错误："
 
@@ -2676,19 +2684,19 @@ msgstr "加载项目文件时错误："
 msgid "error opening %s"
 msgstr " 开启 %s 时错误"
 
-#: cli/config/set.go:69
+#: internal/cli/config/set.go:67
 msgid "error parsing value: %v"
 msgstr "错误解析值：%v"
 
-#: arduino/sketch/profiles.go:181
+#: arduino/sketch/profiles.go:193
 msgid "error parsing version constraints"
 msgstr "解析版本约束时错误"
 
-#: commands/board/list.go:89
+#: commands/board/list.go:115
 msgid "error processing response from server"
 msgstr "处理来自服务器的响应时出错"
 
-#: commands/board/list.go:104
+#: commands/board/list.go:95
 msgid "error querying Arduino Cloud Api"
 msgstr "查询 Arduino Cloud Api 时出错"
 
@@ -2696,19 +2704,19 @@ msgstr "查询 Arduino Cloud Api 时出错"
 msgid "extracting archive: %s"
 msgstr "正在提取存档：%s"
 
-#: arduino/libraries/librariesmanager/install.go:138
+#: arduino/libraries/librariesmanager/install.go:183
 msgid "extracting archive: %w"
 msgstr "正在提取存档：%w"
 
-#: arduino/resources/checksums.go:145
+#: arduino/resources/checksums.go:144
 msgid "failed to compute hash of file \"%s\""
 msgstr "无法计算 “%s” 文件的哈希值"
 
-#: commands/board/list.go:72
+#: commands/board/list.go:90
 msgid "failed to initialize http client"
 msgstr "未能初始化 http 客户端"
 
-#: arduino/resources/checksums.go:97
+#: arduino/resources/checksums.go:96
 msgid "fetched archive size differs from size specified in index"
 msgstr "提取的档存大小与索引中指定的大小不同"
 
@@ -2720,7 +2728,7 @@ msgstr "存档中的文件必须放在子目录中"
 msgid "finding absolute path of %s"
 msgstr "寻找 %s 的绝对路径"
 
-#: cli/cli.go:74
+#: internal/cli/cli.go:72
 msgid "flags"
 msgstr "参数"
 
@@ -2728,36 +2736,38 @@ msgstr "参数"
 msgid "following symlink %s"
 msgstr "接下来的符号链接 %s"
 
-#: cli/lib/download.go:41
+#: internal/cli/lib/download.go:39
 msgid "for a specific version."
 msgstr "针对特定版本。"
 
-#: cli/lib/check_deps.go:41 cli/lib/download.go:40 cli/lib/install.go:52
+#: internal/cli/lib/check_deps.go:40 internal/cli/lib/download.go:38
+#: internal/cli/lib/install.go:50
 msgid "for the latest version."
 msgstr "最新版本。"
 
-#: cli/lib/check_deps.go:42 cli/lib/install.go:53 cli/lib/install.go:55
+#: internal/cli/lib/check_deps.go:41 internal/cli/lib/install.go:51
+#: internal/cli/lib/install.go:53
 msgid "for the specific version."
 msgstr "针对特定版本。"
 
-#: inventory/inventory.go:68
+#: inventory/inventory.go:69
 msgid "generating installation.id: %w"
 msgstr "正在生成安装 id: %w"
 
-#: inventory/inventory.go:74
+#: inventory/inventory.go:75
 msgid "generating installation.secret: %w"
 msgstr "生成 installation.secret：%w"
 
-#: arduino/resources/download.go:52
+#: arduino/resources/download.go:53
 msgid "getting archive file info: %s"
 msgstr "正在获取存档文件信息：%s"
 
-#: arduino/resources/checksums.go:94
+#: arduino/resources/checksums.go:93
 msgid "getting archive info: %s"
-msgstr "正在获取档案信息：%s"
+msgstr "正在获取存档信息：%s"
 
-#: arduino/resources/checksums.go:67 arduino/resources/checksums.go:90
-#: arduino/resources/download.go:33 arduino/resources/helpers.go:38
+#: arduino/resources/checksums.go:66 arduino/resources/checksums.go:89
+#: arduino/resources/download.go:34 arduino/resources/helpers.go:38
 #: arduino/resources/install.go:55
 msgid "getting archive path: %s"
 msgstr "正在获取存档路径：%s"
@@ -2768,7 +2778,7 @@ msgstr "正在获取 %[1]s 开发板的构建属性：%[2]s"
 
 #: arduino/cores/packagemanager/download.go:106
 msgid "getting discovery dependencies for platform %[1]s: %[2]s"
-msgstr "获取 %[1]s 平台的discovery依赖：%[2]s"
+msgstr "获取 %[1]s 平台的 discovery 依赖：%[2]s"
 
 #: arduino/cores/packagemanager/download.go:114
 msgid "getting monitor dependencies for platform %[1]s: %[2]s"
@@ -2782,11 +2792,7 @@ msgstr "正在获取 %[1]s 的父目录：%[2]s"
 msgid "getting tool dependencies for platform %[1]s: %[2]s"
 msgstr "正在获取 %[1]s 平台的工具依赖：%[2]s"
 
-#: arduino/sketch/sketch.go:176
-msgid "importing sketch metadata: %s"
-msgstr "正在导入项目元数据：%s"
-
-#: arduino/libraries/librariesmanager/install.go:103
+#: arduino/libraries/librariesmanager/install.go:153
 msgid "install directory not set"
 msgstr "未设置安装目录"
 
@@ -2798,19 +2804,23 @@ msgstr "正在安装 %[1]s 工具：%[2]s"
 msgid "installing platform %[1]s: %[2]s"
 msgstr "安装 %[1]s 平台: %[2]s"
 
-#: arduino/sketch/profiles.go:179
+#: internal/cli/feedback/terminal.go:36
+msgid "interactive terminal not supported for the '%s' output format"
+msgstr ""
+
+#: arduino/sketch/profiles.go:191
 msgid "invalid '%s' directive"
 msgstr "无效的 ‘%s’ 指令"
 
 #: arduino/discovery/discovery.go:174
 msgid "invalid 'add' message: missing port"
-msgstr "无效的“添加”消息：找不到端口"
+msgstr "无效的 “添加” 消息：找不到端口"
 
 #: arduino/discovery/discovery.go:184
 msgid "invalid 'remove' message: missing port"
-msgstr "无效的“删除”消息：找不到端口"
+msgstr "无效的 “删除” 消息：找不到端口"
 
-#: arduino/resources/checksums.go:45
+#: arduino/resources/checksums.go:44
 msgid "invalid checksum format: %s"
 msgstr "无效的校验码格式：%s"
 
@@ -2818,31 +2828,31 @@ msgstr "无效的校验码格式：%s"
 msgid "invalid config option: %s"
 msgstr "无效的配置选项：%s"
 
-#: cli/arguments/reference.go:90
+#: internal/cli/arguments/reference.go:90
 msgid "invalid empty core architecture '%s'"
-msgstr "无效的空内核架构’%s‘"
+msgstr "无效的空内核架构 ’%s‘"
 
-#: cli/arguments/reference.go:67
+#: internal/cli/arguments/reference.go:67
 msgid "invalid empty core argument"
 msgstr "无效的空内核参数"
 
-#: cli/arguments/reference.go:86
+#: internal/cli/arguments/reference.go:86
 msgid "invalid empty core name '%s'"
-msgstr "无效的空内核名称’%s‘"
+msgstr "无效的空内核名称 ’%s‘"
 
-#: cli/arguments/reference.go:71
+#: internal/cli/arguments/reference.go:71
 msgid "invalid empty core reference '%s'"
-msgstr "无效的空内核引用’%s‘"
+msgstr "无效的空内核引用 ’%s‘"
 
-#: cli/arguments/reference.go:76
+#: internal/cli/arguments/reference.go:76
 msgid "invalid empty core version: '%s'"
 msgstr "无效的空内核版本：’%s‘"
 
-#: cli/lib/args.go:49
+#: internal/cli/lib/args.go:49
 msgid "invalid empty library name"
 msgstr "无效的空库名"
 
-#: cli/lib/args.go:54
+#: internal/cli/lib/args.go:54
 msgid "invalid empty library version: %s"
 msgstr "无效的空库版本：%s"
 
@@ -2850,19 +2860,19 @@ msgstr "无效的空库版本：%s"
 msgid "invalid empty option found"
 msgstr "发现无效的空选项"
 
-#: arduino/libraries/librariesmanager/install.go:298
+#: arduino/libraries/librariesmanager/install.go:272
 msgid "invalid git url"
-msgstr "无效的git地址"
+msgstr "无效的 git 地址"
 
-#: arduino/resources/checksums.go:49
+#: arduino/resources/checksums.go:48
 msgid "invalid hash '%[1]s': %[2]s"
 msgstr "无效的 ‘%[1]s’ 哈希：%[2]s"
 
-#: cli/arguments/reference.go:83
+#: internal/cli/arguments/reference.go:83
 msgid "invalid item %s"
 msgstr "无效的 %s 条目"
 
-#: arduino/sketch/profiles.go:213
+#: arduino/sketch/profiles.go:225
 msgid "invalid library directive:"
 msgstr "无效的库指令："
 
@@ -2878,23 +2888,23 @@ msgstr "无效的库 location：%s"
 msgid "invalid option '%s'"
 msgstr "无效的 ‘%s’ 选项 "
 
-#: inventory/inventory.go:88
+#: inventory/inventory.go:94
 msgid "invalid path creating config dir: %[1]s error: %[2]w"
 msgstr "新建配置目录的路径无效：%[1]s 错误：%[2]w"
 
-#: inventory/inventory.go:94
+#: inventory/inventory.go:100
 msgid "invalid path writing inventory file: %[1]s error: %[2]w"
 msgstr "写入库存文件的路径无效：%[1]s 错误：%[2]w"
 
-#: arduino/cores/packageindex/index.go:267
+#: arduino/cores/packageindex/index.go:278
 msgid "invalid platform archive size: %s"
 msgstr "无效的平台存档大小：%s"
 
-#: arduino/sketch/profiles.go:183
+#: arduino/sketch/profiles.go:195
 msgid "invalid platform identifier"
 msgstr "无效的平台标识符"
 
-#: arduino/sketch/profiles.go:193
+#: arduino/sketch/profiles.go:205
 msgid "invalid platform index URL:"
 msgstr "无效的平台索引网址："
 
@@ -2902,17 +2912,23 @@ msgstr "无效的平台索引网址："
 msgid "invalid pluggable monitor reference: %s"
 msgstr "无效的热插拔监视器引用：%s"
 
-#: cli/monitor/monitor.go:126
+#: internal/cli/monitor/monitor.go:122
 msgid "invalid port configuration value for %s: %s"
 msgstr "%s 的端口配置值无效：%s"
 
-#: cli/monitor/monitor.go:135
+#: internal/cli/monitor/monitor.go:130
 msgid "invalid port configuration: %s"
 msgstr "无效的端口配置：%s"
 
 #: commands/upload/upload.go:495
 msgid "invalid recipe '%[1]s': %[2]s"
 msgstr "无效的 ‘%[1]s’ 方法: %[2]s"
+
+#: commands/sketch/new.go:83
+msgid ""
+"invalid sketch name \"%[1]s\": the first character must be alphanumeric, the"
+" following ones can also contain \"_\", \"-\", and \".\"."
+msgstr ""
 
 #: arduino/cores/board.go:140
 msgid "invalid value '%[1]s' for option '%[2]s'"
@@ -2922,32 +2938,27 @@ msgstr "‘%[2]s’ 选项的 ‘%[1]s’ 值无效"
 msgid "invalid version directory %s"
 msgstr "%s 版本目录无效"
 
-#: arduino/sketch/profiles.go:215
+#: arduino/sketch/profiles.go:227
 msgid "invalid version:"
 msgstr "无效的版本："
 
-#: commands/daemon/settings.go:108
+#: commands/daemon/settings.go:111
 msgid "key not found in settings"
 msgstr "在设置中找不到键"
 
-#: cli/core/search.go:47
+#: internal/cli/core/search.go:45
 msgid "keywords"
 msgstr "关键字"
 
-#: arduino/libraries/librariesmanager/install.go:176
-#: arduino/libraries/librariesmanager/install.go:218
+#: arduino/libraries/librariesmanager/install.go:130
 msgid "library %s already installed"
 msgstr "%s 库已安装"
 
-#: arduino/libraries/librariesmanager/install.go:40
-msgid "library already installed"
-msgstr "库已安装"
-
-#: arduino/libraries/librariesmanager/install.go:345
+#: arduino/libraries/librariesmanager/install.go:319
 msgid "library not valid"
 msgstr "库无效"
 
-#: arduino/libraries/librariesmanager/librariesmanager.go:188
+#: arduino/libraries/librariesmanager/librariesmanager.go:197
 msgid "library path does not exist: %s"
 msgstr "库路径不存在：%s"
 
@@ -2974,8 +2985,8 @@ msgstr "正在从 %s 下载附加工具"
 msgid "loading json index file %[1]s: %[2]s"
 msgstr "正在加载 %[1]s json 索引文件：%[2]s"
 
-#: arduino/libraries/librariesmanager/librariesmanager.go:170
-#: arduino/libraries/librariesmanager/librariesmanager.go:193
+#: arduino/libraries/librariesmanager/librariesmanager.go:179
+#: arduino/libraries/librariesmanager/librariesmanager.go:202
 msgid "loading library from %[1]s: %[2]s"
 msgstr "正在从 %[1]s 加载库：%[2]s"
 
@@ -3008,15 +3019,15 @@ msgstr "在 %s 中加载工具发行版本"
 msgid "looking for boards.txt in %s"
 msgstr "在 %s 中查找 boards.txt"
 
-#: arduino/sketch/sketch.go:91
+#: arduino/sketch/sketch.go:76
 msgid "main file missing from sketch: %s"
 msgstr "项目中缺少主文件：%s"
 
-#: arduino/sketch/profiles.go:177
+#: arduino/sketch/profiles.go:189
 msgid "missing '%s' directive"
 msgstr "缺少 ‘%s’ 指令"
 
-#: arduino/resources/checksums.go:41
+#: arduino/resources/checksums.go:40
 msgid "missing checksum for: %s"
 msgstr "缺少校验码：%s"
 
@@ -3036,7 +3047,8 @@ msgstr "缺少平台 %[1]s 发行版本：%[2]s 被开发板 %[3]s 引用"
 msgid "monitor release not found: %s"
 msgstr "未找到公开监视器：%s"
 
-#: arduino/libraries/librariesmanager/install.go:193
+#: arduino/libraries/librariesmanager/install.go:201
+#: arduino/libraries/librariesmanager/install.go:250
 #: arduino/resources/install.go:96
 msgid "moving extracted archive to destination dir: %s"
 msgstr "正在将提取的存档移动到目标目录：%s"
@@ -3045,7 +3057,7 @@ msgstr "正在将提取的存档移动到目标目录：%s"
 msgid "multiple build artifacts found: '%[1]s' and '%[2]s'"
 msgstr "找到多个构建文件：‘%[1]s’ 和 ‘%[2]s’"
 
-#: arduino/sketch/sketch.go:83
+#: arduino/sketch/sketch.go:68
 msgid "multiple main sketch files found (%[1]v, %[2]v)"
 msgstr "找到多个主项目文件 (%[1]v, %[2]v)"
 
@@ -3065,7 +3077,7 @@ msgstr "没有指定实例"
 msgid "no sketch or build directory/file specified"
 msgstr "未指定项目或构建目录/文件"
 
-#: arduino/sketch/sketch.go:70
+#: arduino/sketch/sketch.go:55
 msgid "no such file or directory"
 msgstr "没有这样的文件或目录"
 
@@ -3077,7 +3089,7 @@ msgstr "存档中没有唯一的根目录，找到了 ‘%[1]s’ 和 ‘%[2]s�
 msgid "no upload port provided"
 msgstr "未提供上传端口"
 
-#: arduino/sketch/sketch.go:293
+#: arduino/sketch/sketch.go:274
 msgid "no valid sketch found in %[1]s: missing %[2]s"
 msgstr "在 %[1]s 中找不到有效的项目：缺少 %[2]s"
 
@@ -3085,7 +3097,11 @@ msgstr "在 %[1]s 中找不到有效的项目：缺少 %[2]s"
 msgid "no versions available for the current OS"
 msgstr "没有适用于当前操作系统的版本"
 
-#: arduino/resources/checksums.go:72 arduino/resources/install.go:59
+#: internal/cli/feedback/terminal.go:39
+msgid "not running in a terminal"
+msgstr ""
+
+#: arduino/resources/checksums.go:71 arduino/resources/install.go:59
 msgid "opening archive file: %s"
 msgstr "正在打开存档文件：%s"
 
@@ -3097,11 +3113,11 @@ msgstr "正在打开 boards.txt"
 msgid "opening port at 1200bps"
 msgstr "以 1200bps 的速率打开端口"
 
-#: arduino/security/signatures.go:81
+#: arduino/security/signatures.go:83
 msgid "opening signature file: %s"
 msgstr "打开签名文件：%s"
 
-#: arduino/security/signatures.go:76
+#: arduino/security/signatures.go:78
 msgid "opening target file: %s"
 msgstr "打开目标文件：%s"
 
@@ -3145,11 +3161,11 @@ msgstr "%s 平台未安装"
 
 #: arduino/cores/packagemanager/install_uninstall.go:228
 #: arduino/cores/packagemanager/install_uninstall.go:276
-#: arduino/cores/packagemanager/loader.go:457 commands/compile/compile.go:98
+#: arduino/cores/packagemanager/loader.go:457 commands/compile/compile.go:99
 msgid "platform not installed"
 msgstr "平台未安装"
 
-#: cli/compile/compile.go:143
+#: internal/cli/compile/compile.go:140
 msgid "please use --build-property instead."
 msgstr "请改用 --build-property。"
 
@@ -3157,11 +3173,11 @@ msgstr "请改用 --build-property。"
 msgid "pluggable discovery already added: %s"
 msgstr "已添加可插入 discovery：%s"
 
-#: cli/board/attach.go:40
+#: internal/cli/board/attach.go:30
 msgid "port"
 msgstr "端口"
 
-#: cli/arguments/port.go:138
+#: internal/cli/arguments/port.go:129
 msgid "port not found: %[1]s %[2]s"
 msgstr "未找到端口：%[1]s %[2]s"
 
@@ -3177,7 +3193,7 @@ msgstr "不支持协议版本：请求 1，得到 %d"
 msgid "reading %[1]s: %[2]s"
 msgstr "正在读取 %[1]s： %[2]s"
 
-#: arduino/libraries/librariesmanager/librariesmanager.go:161
+#: arduino/libraries/librariesmanager/librariesmanager.go:170
 msgid "reading dir %[1]s: %[2]s"
 msgstr "正在读取 %[1]s 目录 : %[2]s"
 
@@ -3188,7 +3204,7 @@ msgstr "正在读取 %[1]s 目录 : %[2]s"
 msgid "reading directory %s"
 msgstr "正在读取 %s 目录"
 
-#: arduino/libraries/librariesmanager/install.go:318
+#: arduino/libraries/librariesmanager/install.go:292
 msgid "reading directory %s content: %w"
 msgstr "正在读取 %s 目录的内容：%w"
 
@@ -3196,11 +3212,11 @@ msgstr "正在读取 %s 目录的内容：%w"
 msgid "reading file %[1]s: %[2]s"
 msgstr "正在读取 %[1]s 文件： %[2]s"
 
-#: arduino/sketch/sketch.go:265
+#: arduino/sketch/sketch.go:205
 msgid "reading files: %v"
 msgstr "正在读取文件：%v"
 
-#: inventory/inventory.go:58
+#: inventory/inventory.go:59
 msgid "reading inventory file: %w"
 msgstr "正在读取库存文件：%w"
 
@@ -3224,10 +3240,6 @@ msgstr "正在读取 library_index.json: %s"
 msgid "reading package root dir: %s"
 msgstr "正在读取软件包根目录：%s"
 
-#: arduino/sketch/sketch.go:213
-msgid "reading sketch metadata %[1]s: %[2]s"
-msgstr "正在读取项目元数据 %[1]s：%[2]s"
-
 #: commands/upload/upload.go:484
 msgid "recipe not found '%s'"
 msgstr "未找到 ‘%s’ 方法"
@@ -3241,13 +3253,13 @@ msgstr "找不到 %[2]s 工具的 %[1]s 发行版本"
 msgid "release cannot be nil"
 msgstr "发行不能为无"
 
-#: arduino/resources/download.go:43
+#: arduino/resources/download.go:44
 msgid "removing corrupted archive file: %s"
 msgstr "正在删除损坏的存档文件：%s"
 
-#: arduino/libraries/librariesmanager/install.go:106
-msgid "removing lib directory: %s"
-msgstr "正在删除lib目录：%s"
+#: arduino/libraries/librariesmanager/install.go:156
+msgid "removing library directory: %s"
+msgstr "删除库目录：%s"
 
 #: arduino/cores/packagemanager/install_uninstall.go:289
 msgid "removing platform files: %s"
@@ -3257,7 +3269,7 @@ msgstr "正在删除平台文件：%s"
 msgid "required version %[1]s not found for platform %[2]s"
 msgstr "找不到 %[2]s 平台所需的 %[1]s 版本"
 
-#: arduino/security/signatures.go:72
+#: arduino/security/signatures.go:74
 msgid "retrieving Arduino public keys: %s"
 msgstr "正在检索Arduino密钥：%s"
 
@@ -3277,15 +3289,24 @@ msgstr "正在搜索软件包根目录：%s"
 msgid "setting DTR to OFF"
 msgstr "将 DTR 设置为 OFF"
 
-#: arduino/sketch/sketch.go:63 arduino/sketch/sketch.go:68
+#: commands/sketch/new.go:75
+msgid "sketch name cannot be empty"
+msgstr ""
+
+#: commands/sketch/new.go:78
+msgid ""
+"sketch name too long (%[1]d characters). Maximum allowed length is %[2]d"
+msgstr ""
+
+#: arduino/sketch/sketch.go:48 arduino/sketch/sketch.go:53
 msgid "sketch path is not valid"
 msgstr "项目路径无效"
 
-#: cli/board/attach.go:40 cli/sketch/archive.go:38
+#: internal/cli/board/attach.go:30 internal/cli/sketch/archive.go:37
 msgid "sketchPath"
 msgstr "项目路径"
 
-#: legacy/builder/utils/utils.go:430
+#: legacy/builder/utils/utils.go:429
 msgid "source is not a directory"
 msgstr "来源不是目录"
 
@@ -3293,17 +3314,17 @@ msgstr "来源不是目录"
 msgid "starting discovery %s"
 msgstr "开始发现 %s"
 
-#: arduino/resources/checksums.go:119
+#: arduino/resources/checksums.go:118
 msgid "testing archive checksum: %s"
 msgstr "测试存档校验码：%s"
 
-#: arduino/resources/checksums.go:112
+#: arduino/resources/checksums.go:111
 msgid "testing archive size: %s"
-msgstr "测试档案大小：%s"
+msgstr "测试存档大小：%s"
 
-#: arduino/resources/checksums.go:106
+#: arduino/resources/checksums.go:105
 msgid "testing if archive is cached: %s"
-msgstr "测试档案是否被缓存：%s"
+msgstr "测试存档是否被缓存：%s"
 
 #: arduino/resources/install.go:37
 msgid "testing local archive integrity: %s"
@@ -3322,7 +3343,7 @@ msgstr "编译数据库可能不完整或不准确"
 msgid "the platform has no releases"
 msgstr "该平台没有发行版本"
 
-#: commands/board/list.go:80
+#: commands/board/list.go:102
 msgid "the server responded with status %s"
 msgstr "服务器响应状态 %s"
 
@@ -3352,7 +3373,7 @@ msgid "tool not installed"
 msgstr "工具未安装"
 
 #: arduino/cores/packagemanager/package_manager.go:568
-#: arduino/cores/packagemanager/package_manager.go:645
+#: arduino/cores/packagemanager/package_manager.go:674
 msgid "tool release not found: %s"
 msgstr "找不到发行工具：%s"
 
@@ -3360,7 +3381,7 @@ msgstr "找不到发行工具：%s"
 msgid "tool version %s not found"
 msgstr "未找到工具的 %s 版本"
 
-#: commands/lib/install.go:60
+#: commands/lib/install.go:61
 msgid ""
 "two different versions of the library %[1]s are required: %[2]s and %[3]s"
 msgstr "需要 %[1]s 库的两个不同版本：%[2]s 和 %[3]s"
@@ -3381,7 +3402,7 @@ msgstr "无法新建文件夹来保存项目文件"
 msgid "unable to create the folder containing the item"
 msgstr "无法新建包含该项目的文件夹"
 
-#: cli/config/dump.go:58
+#: internal/cli/config/dump.go:59
 msgid "unable to marshal config to YAML: %v"
 msgstr "无法将 config 编码成 YAML：%v"
 
@@ -3409,25 +3430,37 @@ msgstr "未知 %s 软件包 "
 msgid "unknown platform %s:%s"
 msgstr "未知 %s 平台：%s"
 
-#: arduino/sketch/sketch.go:167
+#: arduino/sketch/sketch.go:147
 msgid "unknown sketch file extension '%s'"
 msgstr "未知的项目文件扩展名 ‘%s’"
 
-#: arduino/resources/checksums.go:62
+#: arduino/resources/checksums.go:61
 msgid "unsupported hash algorithm: %s"
 msgstr "不支持的哈希算法：%s"
 
-#: cli/core/upgrade.go:45
+#: internal/cli/core/upgrade.go:43
 msgid "upgrade arduino:samd to the latest version"
 msgstr "将 arduino:samd 升级到最新版本"
 
-#: cli/core/upgrade.go:43
+#: internal/cli/core/upgrade.go:41
 msgid "upgrade everything to the latest version"
 msgstr "将所有内容升级到最新版本"
 
 #: commands/upload/upload.go:519
 msgid "uploading error: %s"
 msgstr "上传错误：%s"
+
+#: arduino/libraries/librariesmanager/librariesmanager.go:153
+msgid "user directory not set"
+msgstr "未设置用户目录"
+
+#: internal/cli/feedback/terminal.go:51
+msgid "user input not supported for the '%s' output format"
+msgstr ""
+
+#: internal/cli/feedback/terminal.go:54
+msgid "user input not supported in non interactive mode"
+msgstr ""
 
 #: arduino/cores/packagemanager/profiles.go:176
 msgid "version %s not available for this operating system"
@@ -3437,10 +3470,6 @@ msgstr "%s 版本不适用于此操作系统"
 msgid "version %s not found"
 msgstr "未找到 %s 版本"
 
-#: arduino/sketch/sketch.go:237
-msgid "writing sketch metadata %[1]s: %[2]s"
-msgstr "正在编写项目元数据 %[1]s：%[2]s"
-
-#: commands/board/list.go:96
+#: commands/board/list.go:120
 msgid "wrong format in server response"
 msgstr "服务器响应格式错误"
