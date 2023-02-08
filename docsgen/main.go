@@ -16,9 +16,11 @@
 package main
 
 import (
+	"io"
 	"os"
 
 	"github.com/arduino/arduino-cli/configuration"
+	"github.com/arduino/arduino-cli/docsgen/schema2docs"
 	"github.com/arduino/arduino-cli/internal/cli"
 	"github.com/spf13/cobra/doc"
 )
@@ -38,4 +40,27 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	generateConfigurationDoc()
+}
+
+func generateConfigurationDoc() {
+	configurationContent := os.Stdout
+
+	header, err := os.Open("./partials/configuration/header.md")
+	if err != nil {
+		panic(err)
+	}
+	io.Copy(configurationContent, header)
+
+	schema2docs.Generate(schema2docs.GenerateOptions{
+		Reader: os.Stdin,
+		Writer: configurationContent,
+	})
+
+	body, err := os.Open("./partials/configuration/body.md")
+	if err != nil {
+		panic(err)
+	}
+	io.Copy(configurationContent, body)
 }
