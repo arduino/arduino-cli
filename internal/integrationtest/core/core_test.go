@@ -990,5 +990,5 @@ func TestCoreInstallCreatesInstalledJson(t *testing.T) {
 	require.NoError(t, err)
 	sortedInstalled := requirejson.Parse(t, installedJson).Query("walk(if type == \"array\" then sort else . end)").String()
 	sortedExpected := requirejson.Parse(t, expectedInstalledJson).Query("walk(if type == \"array\" then sort else . end)").String()
-	require.Equal(t, sortedExpected, sortedInstalled)
+	require.JSONEq(t, sortedExpected, sortedInstalled)
 }
