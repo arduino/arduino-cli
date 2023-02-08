@@ -253,6 +253,11 @@ jobs:
       - name: Collect proto files
         run: task protoc:collect
 
+      - name: Add configuration jsonschema
+        run: |
+          TAG=${{ needs.create-release-artifacts.outputs.version }}
+          cp ./configuration/configuration.schema.json ${{ env.DIST_DIR}}/${TAG}-configuration.schema.json
+
       - name: Create checksum file
         working-directory: ${{ env.DIST_DIR}}
         run: |
