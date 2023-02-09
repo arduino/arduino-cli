@@ -1638,6 +1638,7 @@ call. The format of the response is the following:</p>
       &quot;label&quot;:         &lt;-- HOW THE PORT IS DISPLAYED ON THE GUI
       &quot;protocol&quot;:      &lt;-- THE PROTOCOL USED BY THE BOARD
       &quot;protocolLabel&quot;: &lt;-- HOW THE PROTOCOL IS DISPLAYED ON THE GUI
+      &quot;hardwareId&quot;:    &lt;-- A STRING THAT UNIQUELY IDENTIFIES A BOARD INSTANCE
       &quot;properties&quot;: {
                        &lt;-- A LIST OF PROPERTIES OF THE PORT
       }
@@ -1656,7 +1657,17 @@ call. The format of the response is the following:</p>
   <code>SSH on 192.168.10.100</code>)</li>
 <li><code>protocol</code> is the protocol identifier (such as <code>serial</code> or <code>dfu</code> or <code>ssh</code>)</li>
 <li><code>protocolLabel</code> is the <code>protocol</code> in human readable form (for example <code>Serial port</code> or <code>DFU USB</code> or <code>Network (ssh)</code>)</li>
-<li><code>properties</code> is a list of key/value pairs that represent information relative to the specific port</li>
+<li>
+<p><code>hardwareId</code> (optional) a string that uniquely identifies a specific board instance (even among other boards of the
+  same model). Different ports with the same <code>hardwareId</code> must belong to the same board instance. The identifier should
+  be sufficiently long to uniquely identify the board instance and reduce the probability of collisions. Good examples
+  of <code>hardwareId</code> values are: Ethernet MAC Address, USB Serial Number, CPU-ID number, etc.</p>
+<p>This value <strong>should not</strong> be used to identify the board <strong>model</strong> (see the
+<a href="#board-identification">board identification</a> section for more information about identification of the board model).</p>
+</li>
+</ul>
+<ul>
+<li><code>properties</code> is a list of key/value pairs that represent information relative to the specific port.</li>
 </ul>
 <p>To make the above more clear let's show an example output from the <code>serial-discovery</code> builtin in the Arduino CLI:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
@@ -1667,6 +1678,7 @@ call. The format of the response is the following:</p>
 <span class="w">      </span><span class="nt">&quot;label&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ttyACM0&quot;</span><span class="p">,</span><span class="w"></span>
 <span class="w">      </span><span class="nt">&quot;protocol&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;serial&quot;</span><span class="p">,</span><span class="w"></span>
 <span class="w">      </span><span class="nt">&quot;protocolLabel&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Serial Port (USB)&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="nt">&quot;hardwareId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;EBEABFD6514D32364E202020FF10181E&quot;</span><span class="p">,</span><span class="w"></span>
 <span class="w">      </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">        </span><span class="nt">&quot;pid&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0x804e&quot;</span><span class="p">,</span><span class="w"></span>
 <span class="w">        </span><span class="nt">&quot;vid&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0x2341&quot;</span><span class="p">,</span><span class="w"></span>
@@ -1680,6 +1692,8 @@ call. The format of the response is the following:</p>
 <p>In this case the serial port metadata comes from a USB serial converter. Inside the <code>properties</code> we have all the
 properties of the port, and some of them may be useful for product identification (in this case only USB VID/PID is
 useful to identify the board model).</p>
+<p>The <code>hardwareId</code> field is populated with the USB <code>serialNumber</code> since this value is useful to identify the board
+instance.</p>
 <p>The <code>LIST</code> command performs a one-shot polling of the ports. The discovery should answer as soon as reasonably possible,
 without any additional delay.</p>
 <p>Some discoveries may require some time to discover a new port (for example network protocols like MDNS, Bluetooth, etc.
@@ -1719,6 +1733,7 @@ means that the client must be able to handle these incoming messages at any mome
 <span class="w">  </span><span class="nt">&quot;port&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">    </span><span class="nt">&quot;address&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/dev/ttyACM0&quot;</span><span class="p">,</span><span class="w"></span>
 <span class="w">    </span><span class="nt">&quot;label&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ttyACM0&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;hardwareId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;EBEABFD6514D32364E202020FF10181E&quot;</span><span class="p">,</span><span class="w"></span>
 <span class="w">    </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">      </span><span class="nt">&quot;pid&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0x804e&quot;</span><span class="p">,</span><span class="w"></span>
 <span class="w">      </span><span class="nt">&quot;vid&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0x2341&quot;</span><span class="p">,</span><span class="w"></span>
