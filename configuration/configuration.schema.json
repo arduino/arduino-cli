@@ -7,7 +7,10 @@
       "properties": {
         "additional_urls": {
           "description": "the URLs to any additional Boards Manager package index files needed for your boards platforms.",
-          "type": "string"
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "type": "object"
@@ -35,9 +38,8 @@
       "properties": {
         "port": {
           "description": "TCP port used for gRPC client connections.",
-          "type": "number",
-          "format": "integer",
-          "minimum": 0
+          "type": "string",
+          "pattern": "^[0-9]+$"
         }
       },
       "type": "object"
@@ -107,9 +109,7 @@
       "properties": {
         "addr": {
           "description": "TCP port used for metrics communication.",
-          "type": "number",
-          "format": "integer",
-          "minimum": 0
+          "type": "string"
         },
         "enabled": {
           "description": "controls the use of metrics.",
