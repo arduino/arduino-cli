@@ -91,6 +91,7 @@ type Port struct {
 	AddressLabel  string          `json:"label"`
 	Protocol      string          `json:"protocol"`
 	ProtocolLabel string          `json:"protocolLabel"`
+	HardwareID    string          `json:"hardwareId,omitempty"`
 	Properties    *properties.Map `json:"properties"`
 }
 
@@ -107,6 +108,7 @@ func (p *Port) ToRPC() *rpc.Port {
 		Label:         p.AddressLabel,
 		Protocol:      p.Protocol,
 		ProtocolLabel: p.ProtocolLabel,
+		HardwareId:    p.HardwareID,
 		Properties:    props.AsMap(),
 	}
 }
