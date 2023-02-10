@@ -329,11 +329,6 @@ tasks:
     desc: Returns the version used in the project
     cmds:
       - echo {{.VERSION}}
-  dist:jsonschema:
-    desc: Copy the jsonschema to dist folder
-    cmds:
-      - mkdir --parents {{.DIST_DIR}}
-      - cp ./configuration/configuration.schema.json {{.DIST_DIR}}/{{.PROJECT_NAME}}_{{.VERSION}}_configuration.schema.json
 
 vars:
   PROJECT_NAME: "arduino-cli"
