@@ -191,6 +191,12 @@ tasks:
     cmds:
       - npx markdownlint-cli "**/*.md"
 
+  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/npm-task/Taskfile.yml
+  npm:install-deps:
+    desc: Install dependencies managed by npm
+    cmds:
+      - npm install
+
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/poetry-task/Taskfile.yml
   poetry:install-deps:
     desc: Install dependencies managed by Poetry
@@ -239,6 +245,22 @@ tasks:
     desc: Build the project
     deps:
       - task: go:build
+
+  schema:validate:
+    desc: Validate JSON schema
+    deps:
+      - task: npm:install-deps
+    cmds:
+      - |
+        if [[ "{{.SCHEMA_PATH}}" == "" ]]; then
+          echo "Path to a JSON schema must be specified via the SCHEMA_PATH environment variable."
+          exit 1
+        fi
+      - |
+        npx \
+          ajv-cli \
+            compile \
+            -s "{{.SCHEMA_PATH}}"
 
   test:
     desc: Run the full testsuite, `legacy` will be skipped
