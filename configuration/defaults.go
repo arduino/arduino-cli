@@ -18,6 +18,7 @@ package configuration
 import (
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -41,6 +42,8 @@ func SetDefaults(settings *viper.Viper) {
 
 	// Sketch compilation
 	settings.SetDefault("sketch.always_export_binaries", false)
+	settings.SetDefault("build_cache.ttl", time.Hour*24*30)
+	settings.SetDefault("build_cache.compilations_before_purge", 10)
 
 	// daemon settings
 	settings.SetDefault("daemon.port", "50051")

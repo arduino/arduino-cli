@@ -33,6 +33,12 @@
     to the sketch folder. This is the equivalent of using the [`--export-binaries`][arduino-cli compile options] flag.
 - `updater` - configuration options related to Arduino CLI updates
   - `enable_notification` - set to `false` to disable notifications of new Arduino CLI releases, defaults to `true`
+- `build_cache` configuration options related to the compilation cache
+  - `compilations_before_purge` - interval, in number of compilations, at which the cache is purged, defaults to `10`.
+    When `0` the cache is never purged.
+  - `ttl` - cache expiration time of build folders. If the cache is hit by a compilation the corresponding build files
+    lifetime is renewed. The value format must be a valid input for
+    [time.ParseDuration()](https://pkg.go.dev/time#ParseDuration), defaults to `720h` (30 days).
 
 ## Configuration methods
 

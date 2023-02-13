@@ -27,9 +27,11 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/buildcache"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/inventory"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -135,6 +137,11 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	if err = builderCtx.BuildPath.MkdirAll(); err != nil {
 		return nil, &arduino.PermissionDeniedError{Message: tr("Cannot create build directory"), Cause: err}
 	}
+
+	buildcache.New(builderCtx.BuildPath.Parent()).GetOrCreate(builderCtx.BuildPath.Base())
+	// cache is purged after compilation to not remove entries that might be required
+	defer maybePurgeBuildCache()
+
 	builderCtx.CompilationDatabase = bldr.NewCompilationDatabase(
 		builderCtx.BuildPath.Join("compile_commands.json"),
 	)
@@ -153,7 +160,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.CustomBuildProperties = append(req.GetBuildProperties(), securityKeysOverride...)
 
 	if req.GetBuildCachePath() == "" {
-		builderCtx.CoreBuildCachePath = paths.TempDir().Join("arduino", "core-cache")
+		builderCtx.CoreBuildCachePath = paths.TempDir().Join("arduino", "cores")
 	} else {
 		buildCachePath, err := paths.New(req.GetBuildCachePath()).Abs()
 		if err != nil {
@@ -286,4 +293,25 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	logrus.Tracef("Compile %s for %s successful", sk.Name, fqbnIn)
 
 	return r, nil
+}
+
+// maybePurgeBuildCache runs the build files cache purge if the policy conditions are met.
+func maybePurgeBuildCache() {
+
+	compilationsBeforePurge := configuration.Settings.GetUint("build_cache.compilations_before_purge")
+	// 0 means never purge
+	if compilationsBeforePurge == 0 {
+		return
+	}
+	compilationSinceLastPurge := inventory.Store.GetUint("build_cache.compilation_count_since_last_purge")
+	compilationSinceLastPurge++
+	inventory.Store.Set("build_cache.compilation_count_since_last_purge", compilationSinceLastPurge)
+	defer inventory.WriteStore()
+	if compilationsBeforePurge == 0 || compilationSinceLastPurge < compilationsBeforePurge {
+		return
+	}
+	inventory.Store.Set("build_cache.compilation_count_since_last_purge", 0)
+	cacheTTL := configuration.Settings.GetDuration("build_cache.ttl").Abs()
+	buildcache.New(paths.TempDir().Join("arduino", "cores")).Purge(cacheTTL)
+	buildcache.New(paths.TempDir().Join("arduino", "sketches")).Purge(cacheTTL)
 }
