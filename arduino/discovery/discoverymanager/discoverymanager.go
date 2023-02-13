@@ -203,7 +203,6 @@ func (dm *DiscoveryManager) startDiscovery(d *discovery.PluggableDiscovery) (dis
 	go func(d *discovery.PluggableDiscovery) {
 		// Transfer all incoming events from this discovery to the feed channel
 		for ev := range eventCh {
-			// here from discovery to discovery manager
 			dm.feed <- ev
 		}
 		logrus.Infof("Discovery event channel closed %s. Exiting goroutine.", d.GetID())
