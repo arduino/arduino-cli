@@ -23,7 +23,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/cli/errorcodes"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/configuration"
@@ -53,7 +52,7 @@ func initSearchCommand() *cobra.Command {
 }
 
 // indexUpdateInterval specifies the time threshold over which indexes are updated
-const indexUpdateInterval = "60m"
+const indexUpdateInterval = 60 * time.Minute
 
 func runSearchCommand(args []string, namesOnly bool) {
 	inst, status := instance.Create()
@@ -190,12 +189,8 @@ func versionsFromSearchedLibrary(library *rpc.SearchedLibrary) []*semver.Version
 	return res
 }
 
-// indexNeedsUpdating returns whether library_index.json need updating.
-// A positive duration string must be provided to calculate the time threshold
-// used to update the index.
-// Valid duration units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-// Use a duration of 0 to always update the index.
-func indexNeedsUpdating(duration string) bool {
+// indexNeedsUpdating returns whether library_index.json needs updating
+func indexNeedsUpdating(timeout time.Duration) bool {
 	// Library index path is constant (relative to the data directory).
 	// It does not depend on board manager URLs or any other configuration.
 	dataDir := configuration.Settings.GetString("directories.Data")
@@ -208,19 +203,5 @@ func indexNeedsUpdating(duration string) bool {
 	if err != nil {
 		return true
 	}
-	// Sanity check the given threshold duration string.
-	now := time.Now()
-	modTimeThreshold, err := time.ParseDuration(duration)
-	if err != nil {
-		feedback.Error(tr("Invalid timeout: %s", err))
-		os.Exit(errorcodes.ErrBadArgument)
-	}
-	// The behavior of now.After(T) is confusing if T < 0 and MTIME in the future,
-	// and is probably not what the user intended. Disallow negative T and inform
-	// the user that positive thresholds are expected.
-	if modTimeThreshold < 0 {
-		feedback.Error(tr("Timeout must be non-negative: %dns (%s)", modTimeThreshold, duration))
-		os.Exit(errorcodes.ErrBadArgument)
-	}
-	return modTimeThreshold == 0 || now.After(info.ModTime().Add(modTimeThreshold))
+	return time.Since(info.ModTime()) > timeout
 }
