@@ -1617,6 +1617,14 @@
 <li><code>enable_notification</code> - set to <code>false</code> to disable notifications of new Arduino CLI releases, defaults to <code>true</code></li>
 </ul>
 </li>
+<li><code>build_cache</code> configuration options related to the compilation cache<ul>
+<li><code>compilations_before_purge</code> - interval, in number of compilations, at which the cache is purged, defaults to <code>10</code>.
+  When <code>0</code> the cache is never purged.</li>
+<li><code>ttl</code> - cache expiration time of build folders. If the cache is hit by a compilation the corresponding build files
+  lifetime is renewed. The value format must be a valid input for
+  <a href="https://pkg.go.dev/time#ParseDuration">time.ParseDuration()</a>, defaults to <code>720h</code> (30 days).</li>
+</ul>
+</li>
 </ul>
 <h2 id="configuration-methods">Configuration methods<a class="headerlink" href="#configuration-methods" title="Permanent link">&para;</a></h2>
 <p>Arduino CLI may be configured in three ways:</p>
