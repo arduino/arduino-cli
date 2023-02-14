@@ -992,3 +992,18 @@ func TestCoreInstallCreatesInstalledJson(t *testing.T) {
 	sortedExpected := requirejson.Parse(t, expectedInstalledJson).Query("walk(if type == \"array\" then sort else . end)").String()
 	require.JSONEq(t, sortedExpected, sortedInstalled)
 }
+
+func TestCoreInstallRunsToolPostInstallScript(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	url := "http://drazzy.com/package_drazzy.com_index.json"
+
+	_, _, err := cli.Run("core", "update-index", "--additional-urls", url)
+	require.NoError(t, err)
+
+	// Checks that the post_install script is correctly skipped on the CI
+	stdout, _, err := cli.Run("core", "install", "ATTinyCore:avr", "--verbose", "--additional-urls", url)
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Skipping tool configuration.")
+}
