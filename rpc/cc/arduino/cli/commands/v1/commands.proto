@@ -209,6 +209,13 @@ message InitResponse {
   }
 }
 
+message FailedInstanceInitError {
+  // specific cause of the error
+  string reason = 1;
+  // explanation of the error
+  string message = 2;
+}
+
 message DestroyRequest {
   // The Arduino Core Service instance to destroy.
   Instance instance = 1;
