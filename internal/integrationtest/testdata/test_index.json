@@ -44,9 +44,40 @@
               "name": "Test Board"
             }
           ]
+        },
+        {
+          "category": "Test Category",
+          "help": {
+            "online": "https://github.com/Arduino/arduino-cli"
+          },
+          "url": "https://raw.githubusercontent.com/arduino/arduino-cli/master/internal/integrationtest/testdata/core.zip",
+          "checksum": "SHA-256:6a338cf4d6d501176a2d352c87a8d72ac7488b8c5b82cdf2a4e2cef630391092",
+          "name": "test_core",
+          "version": "3.0.0",
+          "architecture": "x86",
+          "archiveFileName": "core.zip",
+          "size": "486",
+          "toolsDependencies": [
+            {
+              "packager": "test",
+              "version": "1.0.6",
+              "name": "rp2040tools"
+            }
+          ],
+          "boards": [
+            {
+              "name": "Test Board"
+            }
+          ]
         }
       ],
-      "tools": [],
+      "tools": [
+        {
+          "name": "rp2040tools",
+          "version": "1.0.6",
+          "systems": []
+        }
+      ],
       "email": "test@example.com",
       "name": "test"
     },
