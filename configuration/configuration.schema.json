@@ -107,7 +107,7 @@
         "level": {
           "description": "messages with this level and above will be logged. Valid levels are: `trace`, `debug`, `info`, `warn`, `error`, `fatal`, `panic`.",
           "type": "string",
-          "enum": ["trace", "debug", "info", "warn", "error", "fatal"]
+          "enum": ["trace", "debug", "info", "warn", "error", "fatal", "panic"]
         }
       },
       "type": "object"
