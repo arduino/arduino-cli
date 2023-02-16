@@ -52,20 +52,16 @@ const (
 	showPropertiesModeValue
 )
 
-func getShowPropertiesMode(showProperties string) showPropertiesMode {
-	if showProperties == "" {
-		// default with no flag
-		return showPropertiesModeDisabled
-	}
+func parseShowPropertiesMode(showProperties string) (showPropertiesMode, error) {
 	val, ok := map[string]showPropertiesMode{
 		"disabled": showPropertiesModeDisabled,
 		"pattern":  showPropertiesModePattern,
 		"value":    showPropertiesModeValue,
 	}[showProperties]
 	if !ok {
-		return showPropertiesModePattern
+		return showPropertiesModeDisabled, fmt.Errorf(tr("invalid option '%s'.", showProperties))
 	}
-	return val
+	return val, nil
 }
 
 var (
@@ -219,7 +215,11 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		overrides = o.Overrides
 	}
 
-	showPropertiesM := getShowPropertiesMode(showProperties)
+	showPropertiesM, err := parseShowPropertiesMode(showProperties)
+	if err != nil {
+		feedback.Fatal(tr("Error parsing --show-properties flag: %v", err), feedback.ErrGeneric)
+	}
+
 	var stdOut, stdErr io.Writer
 	var stdIORes func() *feedback.OutputStreamsResult
 	if showPropertiesM != showPropertiesModeDisabled {
