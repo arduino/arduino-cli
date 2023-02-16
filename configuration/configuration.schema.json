@@ -1,6 +1,7 @@
 {
   "title": "Arduino CLI configuration schema",
   "description": "Describe the parameters available for the Arduino CLI configuration file. This schema should be considered unstable at this moment, it is not used by the CLI to validate input configuration",
+  "$schema": "http://json-schema.org/draft-06/schema#",
   "properties": {
     "board_manager": {
       "description": "",
@@ -26,9 +27,16 @@
         },
         "ttl": {
           "description": "cache expiration time of build folders. If the cache is hit by a compilation the corresponding build files lifetime is renewed. The value format must be a valid input for time.ParseDuration(), defaults to `720h` (30 days)",
-          "type": "number",
-          "format": "integer",
-          "minimum": 0
+          "oneOf": [
+            {
+              "type": "number",
+              "format": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "string"
+            }
+          ]
         }
       },
       "type": "object"
