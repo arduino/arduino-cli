@@ -150,7 +150,8 @@
       "properties": {
         "enable_notification": {
           "description": "set to `false` to disable notifications of new Arduino CLI releases, defaults to `true`",
-          "type": "boolean"
+          "type": "boolean",
+          "default": true
         }
       },
       "type": "object"
