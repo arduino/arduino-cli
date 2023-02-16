@@ -10,7 +10,8 @@
           "description": "the URLs to any additional Boards Manager package index files needed for your boards platforms.",
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "format": "uri"
           }
         }
       },
