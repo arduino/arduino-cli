@@ -35,8 +35,11 @@ The following extensions are supported:
 - .cpp - C++ files.
 - .c - C Files.
 - .S - Assembly language files.
-- .h, .hpp, .hh - Header files.
-- .tpp, .ipp - Header files (available from Arduino CLI 0.19.0).
+- .h, .hpp, .hh [<sup>1</sup>](#hpp-hh-note) - Header files.
+- .tpp, .ipp [<sup>2</sup>](#tpp-ipp-note) - Header files.
+
+<a id="hpp-hh-note"></a> <sup>1</sup> `.hpp` and `.hh` supported from Arduino IDE 1.8.0/arduino-builder 1.3.22. <br />
+<a id="tpp-ipp-note"></a> <sup>2</sup> Supported from Arduino CLI 0.19.0.
 
 For information about how each of these files and other parts of the sketch are used during compilation, see the
 [Sketch build process documentation](sketch-build-process.md).
