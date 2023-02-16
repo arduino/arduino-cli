@@ -294,7 +294,7 @@ func CheckForPdeFiles(sketch *paths.Path) []*paths.Path {
 // DefaultBuildPath generates the default build directory for a given sketch.
 // The build path is in a temporary directory and is unique for each sketch.
 func (s *Sketch) DefaultBuildPath() *paths.Path {
-	return paths.TempDir().Join("arduino", "sketch-"+s.Hash())
+	return paths.TempDir().Join("arduino", "sketches", s.Hash())
 }
 
 // Hash generate a unique hash for the given sketch.

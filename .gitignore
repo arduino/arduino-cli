@@ -29,3 +29,6 @@ venv
 /docs/rpc/*.md
 /docs/commands/*.md
 /docs/configuration.schema.json
+
+# Delve debugger binary file
+__debug_bin

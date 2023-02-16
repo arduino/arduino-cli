@@ -382,9 +382,12 @@ func TestBuilderCacheCoreAFile(t *testing.T) {
 
 	// Pick timestamp of cached core
 	coreFolder := paths.New("downloaded_hardware", "arduino", "avr")
-	coreFileName := phases.GetCachedCoreArchiveFileName(ctx.FQBN.String(), ctx.OptimizationFlags, coreFolder)
-	cachedCoreFile := ctx.CoreBuildCachePath.Join(coreFileName)
+	coreFileName := phases.GetCachedCoreArchiveDirName(ctx.FQBN.String(), ctx.OptimizationFlags, coreFolder)
+	cachedCoreFile := ctx.CoreBuildCachePath.Join(coreFileName, "core.a")
 	coreStatBefore, err := cachedCoreFile.Stat()
+	require.NoError(t, err)
+	lastUsedFile := ctx.CoreBuildCachePath.Join(coreFileName, ".last-used")
+	_, err = lastUsedFile.Stat()
 	require.NoError(t, err)
 
 	// Run build again, to verify that the builder skips rebuilding core.a
