@@ -253,7 +253,7 @@ jobs:
       - name: Collect proto files
         run: task protoc:collect
 
-      - name: Add configuration jsonschema
+      - name: Add configuration JSON schema
         run: |
           TAG=${{ needs.create-release-artifacts.outputs.version }}
           cp ./configuration/configuration.schema.json ${{ env.DIST_DIR}}/${TAG}-configuration.schema.json
