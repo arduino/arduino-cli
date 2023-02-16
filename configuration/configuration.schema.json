@@ -34,7 +34,8 @@
               "minimum": 0
             },
             {
-              "type": "string"
+              "type": "string",
+              "pattern": "^[-+]?([0-9]*(\\.[0-9]*)?[a-z]+)+$"
             }
           ]
         }
@@ -150,7 +151,8 @@
       "properties": {
         "enable_notification": {
           "description": "set to `false` to disable notifications of new Arduino CLI releases, defaults to `true`",
-          "type": "boolean"
+          "type": "boolean",
+          "default": true
         }
       },
       "type": "object"
