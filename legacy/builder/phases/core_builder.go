@@ -16,9 +16,11 @@
 package phases
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/buildcache"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
@@ -91,10 +93,17 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 	realCoreFolder := coreFolder.Parent().Parent()
 
 	var targetArchivedCore *paths.Path
+	var buildCacheErr error
 	if buildCachePath != nil {
-		archivedCoreName := GetCachedCoreArchiveFileName(buildProperties.Get(constants.BUILD_PROPERTIES_FQBN),
+		archivedCoreName := GetCachedCoreArchiveDirName(buildProperties.Get(constants.BUILD_PROPERTIES_FQBN),
 			buildProperties.Get("compiler.optimization_flags"), realCoreFolder)
-		targetArchivedCore = buildCachePath.Join(archivedCoreName)
+		targetArchivedCore = buildCachePath.Join(archivedCoreName, "core.a")
+		_, buildCacheErr = buildcache.New(buildCachePath).GetOrCreate(archivedCoreName)
+
+		if errors.Is(buildCacheErr, buildcache.CreateDirErr) {
+			return nil, nil, fmt.Errorf(tr("creating core cache folder: %s", err))
+		}
+
 		canUseArchivedCore := !ctx.OnlyUpdateCompilationDatabase &&
 			!ctx.Clean &&
 			!builder_utils.CoreOrReferencedCoreHasChanged(realCoreFolder, targetCoreFolder, targetArchivedCore)
@@ -137,19 +146,19 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 	return archiveFile, variantObjectFiles, nil
 }
 
-// GetCachedCoreArchiveFileName returns the filename to be used to store
+// GetCachedCoreArchiveDirName returns the directory name to be used to store
 // the global cached core.a.
-func GetCachedCoreArchiveFileName(fqbn string, optimizationFlags string, coreFolder *paths.Path) string {
+func GetCachedCoreArchiveDirName(fqbn string, optimizationFlags string, coreFolder *paths.Path) string {
 	fqbnToUnderscore := strings.Replace(fqbn, ":", "_", -1)
 	fqbnToUnderscore = strings.Replace(fqbnToUnderscore, "=", "_", -1)
 	if absCoreFolder, err := coreFolder.Abs(); err == nil {
 		coreFolder = absCoreFolder
 	} // silently continue if absolute path can't be detected
 	hash := utils.MD5Sum([]byte(coreFolder.String() + optimizationFlags))
-	realName := "core_" + fqbnToUnderscore + "_" + hash + ".a"
+	realName := fqbnToUnderscore + "_" + hash
 	if len(realName) > 100 {
-		// avoid really long names, simply hash the final part
-		realName = "core_" + utils.MD5Sum([]byte(fqbnToUnderscore+"_"+hash)) + ".a"
+		// avoid really long names, simply hash the name
+		realName = utils.MD5Sum([]byte(fqbnToUnderscore + "_" + hash))
 	}
 	return realName
 }

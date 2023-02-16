@@ -21,12 +21,15 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	semver "go.bug.st/relaxed-semver"
@@ -48,6 +51,9 @@ func initSearchCommand() *cobra.Command {
 	return searchCommand
 }
 
+// indexUpdateInterval specifies the time threshold over which indexes are updated
+const indexUpdateInterval = 60 * time.Minute
+
 func runSearchCommand(args []string, namesOnly bool) {
 	inst, status := instance.Create()
 	logrus.Info("Executing `arduino-cli lib search`")
@@ -56,12 +62,14 @@ func runSearchCommand(args []string, namesOnly bool) {
 		feedback.Fatal(tr("Error creating instance: %v", status), feedback.ErrGeneric)
 	}
 
-	if err := commands.UpdateLibrariesIndex(
-		context.Background(),
-		&rpc.UpdateLibrariesIndexRequest{Instance: inst},
-		feedback.ProgressBar(),
-	); err != nil {
-		feedback.Fatal(tr("Error updating library index: %v", err), feedback.ErrGeneric)
+	if indexNeedsUpdating(indexUpdateInterval) {
+		if err := commands.UpdateLibrariesIndex(
+			context.Background(),
+			&rpc.UpdateLibrariesIndexRequest{Instance: inst},
+			feedback.ProgressBar(),
+		); err != nil {
+			feedback.Fatal(tr("Error updating library index: %v", err), feedback.ErrGeneric)
+		}
 	}
 
 	instance.Init(inst)
@@ -179,4 +187,21 @@ func versionsFromSearchedLibrary(library *rpc.SearchedLibrary) []*semver.Version
 	}
 	sort.Sort(semver.List(res))
 	return res
+}
+
+// indexNeedsUpdating returns whether library_index.json needs updating
+func indexNeedsUpdating(timeout time.Duration) bool {
+	// Library index path is constant (relative to the data directory).
+	// It does not depend on board manager URLs or any other configuration.
+	dataDir := configuration.Settings.GetString("directories.Data")
+	indexPath := paths.New(dataDir).Join("library_index.json")
+	// Verify the index file exists and we can read its fstat attrs.
+	if indexPath.NotExist() {
+		return true
+	}
+	info, err := indexPath.Stat()
+	if err != nil {
+		return true
+	}
+	return time.Since(info.ModTime()) > timeout
 }

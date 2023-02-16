@@ -253,7 +253,7 @@ func TestCoreInstallEsp32(t *testing.T) {
 	md5 := md5.Sum(([]byte(sketchPath.String())))
 	sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
 	require.NotEmpty(t, sketchPathMd5)
-	buildDir := paths.TempDir().Join("arduino", "sketch-"+sketchPathMd5)
+	buildDir := paths.TempDir().Join("arduino", "sketches", sketchPathMd5)
 	require.FileExists(t, buildDir.Join(sketchName+".ino.partitions.bin").String())
 }
 
@@ -990,5 +990,5 @@ func TestCoreInstallCreatesInstalledJson(t *testing.T) {
 	require.NoError(t, err)
 	sortedInstalled := requirejson.Parse(t, installedJson).Query("walk(if type == \"array\" then sort else . end)").String()
 	sortedExpected := requirejson.Parse(t, expectedInstalledJson).Query("walk(if type == \"array\" then sort else . end)").String()
-	require.Equal(t, sortedExpected, sortedInstalled)
+	require.JSONEq(t, sortedExpected, sortedInstalled)
 }
