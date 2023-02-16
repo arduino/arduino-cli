@@ -55,13 +55,22 @@
     "directories": {
       "description": "directories used by Arduino CLI.",
       "properties": {
-        "builtin.libraries": {
-          "description": "the libraries in this directory will be available to all platforms without the need for the user to install them, but with the lowest priority over other installed libraries with the same name, it's the equivalent of the Arduino IDE's bundled libraries directory.",
-          "type": "string"
-        },
-        "builtin.tools": {
-          "description": "it's a list of directories of tools that will be available to all platforms without the need for the user to install them, it's the equivalent of the Arduino IDE 1.x bundled tools directory.",
-          "type": "string"
+        "builtin": {
+          "description": "",
+          "properties": {
+            "libraries": {
+              "description": "the libraries in this directory will be available to all platforms without the need for the user to install them, but with the lowest priority over other installed libraries with the same name, it's the equivalent of the Arduino IDE's bundled libraries directory.",
+              "type": "string"
+            },
+            "tools": {
+              "description": "it's a list of directories of tools that will be available to all platforms without the need for the user to install them, it's the equivalent of the Arduino IDE 1.x bundled tools directory.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "type": "object"
         },
         "data": {
           "description": "directory used to store Boards/Library Manager index files and Boards Manager platform installations.",
