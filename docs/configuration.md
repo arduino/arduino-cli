@@ -105,6 +105,9 @@ The configuration file must be named `arduino-cli`, with the appropriate file ex
 - envfile
 - [INI]
 
+The configuration file [JSON schema][configuration-schema] can be used to independently validate the file content. This
+schema should be considered unstable in this version.
+
 #### Locations
 
 Configuration files in the following locations are recognized by Arduino CLI:
@@ -158,3 +161,4 @@ additional_urls = [ "https://downloads.arduino.cc/packages/package_staging_index
 [java properties file]: https://en.wikipedia.org/wiki/.properties
 [hcl]: https://github.com/hashicorp/hcl
 [ini]: https://en.wikipedia.org/wiki/INI_file
+[configuration-schema]: ./configuration.schema.json

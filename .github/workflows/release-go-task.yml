@@ -254,12 +254,10 @@ jobs:
         run: task protoc:collect
 
       - name: Add configuration JSON schema
-        run: |
-          TAG=${{ needs.create-release-artifacts.outputs.version }}
-          cp ./configuration/configuration.schema.json ${{ env.DIST_DIR}}/${TAG}-configuration.schema.json
+        run: task dist:jsonschema
 
       - name: Create checksum file
-        working-directory: ${{ env.DIST_DIR}}
+        working-directory: ${{ env.DIST_DIR }}
         run: |
           TAG=${{ needs.create-release-artifacts.outputs.version }}
           sha256sum ${{ env.PROJECT_NAME }}_${TAG}* > ${TAG}-checksums.txt

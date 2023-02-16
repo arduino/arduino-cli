@@ -9,6 +9,7 @@ tasks:
     deps:
       - task: go:cli-docs
       - task: protoc:docs
+      - task: docs:include-configuration-json-schema
     cmds:
       - task: general:format-prettier
 
@@ -217,6 +218,11 @@ tasks:
       - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,commands.md --proto_path=rpc ./rpc/cc/arduino/cli/commands/v1/*.proto'
       - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,settings.md --proto_path=rpc ./rpc/cc/arduino/cli/settings/v1/*.proto'
       - '{{ default "protoc" .PROTOC_BINARY }} --doc_out=./docs/rpc --doc_opt=markdown,debug.md --proto_path=rpc ./rpc/cc/arduino/cli/debug/v1/*.proto'
+
+  docs:include-configuration-json-schema:
+    desc: Copy configuration JSON schema to make it available in documentation
+    cmds:
+      - cp ./configuration/configuration.schema.json ./docs/configuration.schema.json
 
   protoc:check:
     desc: Perform linting of the protobuf definitions

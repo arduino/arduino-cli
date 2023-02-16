@@ -28,3 +28,4 @@ venv
 /docsgen/arduino-cli.exe
 /docs/rpc/*.md
 /docs/commands/*.md
+/docs/configuration.schema.json
