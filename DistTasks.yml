@@ -253,7 +253,7 @@ tasks:
       PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.tar.gz"
 
   jsonschema:
-    desc: Copy the jsonschema to dist folder
+    desc: Copy the JSON schema to dist folder
     cmds:
       - mkdir --parents {{.DIST_DIR}}
       - cp ./configuration/configuration.schema.json {{.DIST_DIR}}/{{.PROJECT_NAME}}_{{.VERSION}}_configuration.schema.json
