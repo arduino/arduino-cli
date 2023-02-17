@@ -22,14 +22,14 @@
       "properties": {
         "compilations_before_purge": {
           "description": "interval, in number of compilations, at which the cache is purged, defaults to `10`. When `0` the cache is never purged.",
-          "type": "integer"
+          "type": "integer",
           "minimum": 0
         },
         "ttl": {
           "description": "cache expiration time of build folders. If the cache is hit by a compilation the corresponding build files lifetime is renewed. The value format must be a valid input for time.ParseDuration(), defaults to `720h` (30 days)",
           "oneOf": [
             {
-              "type": "integer"
+              "type": "integer",
               "minimum": 0
             },
             {
