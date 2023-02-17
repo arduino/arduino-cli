@@ -29,8 +29,7 @@
           "description": "cache expiration time of build folders. If the cache is hit by a compilation the corresponding build files lifetime is renewed. The value format must be a valid input for time.ParseDuration(), defaults to `720h` (30 days)",
           "oneOf": [
             {
-              "type": "number",
-              "format": "integer",
+              "type": "integer"
               "minimum": 0
             },
             {
