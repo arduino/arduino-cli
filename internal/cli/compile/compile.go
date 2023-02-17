@@ -48,15 +48,15 @@ type showPropertiesMode int
 
 const (
 	showPropertiesModeDisabled showPropertiesMode = iota
-	showPropertiesModePattern
-	showPropertiesModeValue
+	showPropertiesModeUnexpanded
+	showPropertiesModeExpanded
 )
 
 func parseShowPropertiesMode(showProperties string) (showPropertiesMode, error) {
 	val, ok := map[string]showPropertiesMode{
-		"disabled": showPropertiesModeDisabled,
-		"pattern":  showPropertiesModePattern,
-		"value":    showPropertiesModeValue,
+		"disabled":   showPropertiesModeDisabled,
+		"unexpanded": showPropertiesModeUnexpanded,
+		"expanded":   showPropertiesModeExpanded,
 	}[showProperties]
 	if !ok {
 		return showPropertiesModeDisabled, fmt.Errorf(tr("invalid option '%s'.", showProperties))
@@ -120,9 +120,9 @@ func NewCommand() *cobra.Command {
 		&showProperties,
 		"show-properties",
 		"disabled",
-		tr(`Show build properties instead of compiling. With "pattern" properties are returned as they are defined. If "value" the placeholders are replaced with compilation context values.`),
+		tr(`Show build properties instead of compiling. With "expanded" the placeholders are replaced with compilation context values.`),
 	)
-	compileCommand.Flags().Lookup("show-properties").NoOptDefVal = "pattern" // default if the flag is present with no value
+	compileCommand.Flags().Lookup("show-properties").NoOptDefVal = "unexpanded" // default if the flag is present with no value
 	compileCommand.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
 	compileCommand.Flags().StringVar(&buildCachePath, "build-cache-path", "", tr("Builds of 'core.a' are saved into this path to be cached and reused."))
 	compileCommand.Flags().StringVarP(&exportDir, "output-dir", "", "", tr("Save build artifacts in this directory."))
@@ -385,7 +385,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		}
 		feedback.FatalResult(res, feedback.ErrGeneric)
 	}
-	if showPropertiesM == showPropertiesModeValue {
+	if showPropertiesM == showPropertiesModeExpanded {
 		expandPropertiesInResult(res)
 	}
 	feedback.PrintResult(res)

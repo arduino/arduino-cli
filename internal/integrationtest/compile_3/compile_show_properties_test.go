@@ -74,9 +74,9 @@ func TestCompileShowProperties(t *testing.T) {
 	require.Empty(t, stderr)
 	requireCompileResponseJson(t, stdout)
 
-	// Test --show-properties=pattern output is clean
+	// Test --show-properties=unexpanded output is clean
 	// properties are not expanded
-	stdout, stderr, err = cli.Run("compile", "--fqbn", "arduino:avr:uno", "-v", "--show-properties=pattern", bareMinimum.String())
+	stdout, stderr, err = cli.Run("compile", "--fqbn", "arduino:avr:uno", "-v", "--show-properties=unexpanded", bareMinimum.String())
 	require.NoError(t, err)
 	props, err = properties.LoadFromBytes(stdout)
 	require.NoError(t, err, "Output must be a clean property list")
@@ -84,9 +84,9 @@ func TestCompileShowProperties(t *testing.T) {
 	require.True(t, props.ContainsKey("archive_file_path"))
 	require.Contains(t, props.Get("archive_file_path"), "{build.path}")
 
-	// Test --show-properties=pattern output is clean
+	// Test --show-properties=unexpanded output is clean
 	// properties are not expanded
-	stdout, stderr, err = cli.Run("compile", "--fqbn", "arduino:avr:uno", "-v", "--show-properties=pattern", "--format", "json", bareMinimum.String())
+	stdout, stderr, err = cli.Run("compile", "--fqbn", "arduino:avr:uno", "-v", "--show-properties=unexpanded", "--format", "json", bareMinimum.String())
 	require.NoError(t, err)
 	require.Empty(t, stderr)
 	props, err = properties.LoadFromSlice(
@@ -95,9 +95,9 @@ func TestCompileShowProperties(t *testing.T) {
 	require.True(t, props.ContainsKey("archive_file_path"))
 	require.Contains(t, props.Get("archive_file_path"), "{build.path}")
 
-	// Test --show-properties=value output is clean
+	// Test --show-properties=expanded output is clean
 	// properties are expanded
-	stdout, stderr, err = cli.Run("compile", "--fqbn", "arduino:avr:uno", "-v", "--show-properties=value", bareMinimum.String())
+	stdout, stderr, err = cli.Run("compile", "--fqbn", "arduino:avr:uno", "-v", "--show-properties=expanded", bareMinimum.String())
 	require.NoError(t, err)
 	props, err = properties.LoadFromBytes(stdout)
 	require.NoError(t, err, "Output must be a clean property list")
@@ -105,9 +105,9 @@ func TestCompileShowProperties(t *testing.T) {
 	require.True(t, props.ContainsKey("archive_file_path"))
 	require.NotContains(t, props.Get("archive_file_path"), "{build.path}")
 
-	// Test --show-properties=value --format JSON output is clean
+	// Test --show-properties=expanded --format JSON output is clean
 	// properties are expanded
-	stdout, stderr, err = cli.Run("compile", "--fqbn", "arduino:avr:uno", "-v", "--show-properties=value", "--format", "json", bareMinimum.String())
+	stdout, stderr, err = cli.Run("compile", "--fqbn", "arduino:avr:uno", "-v", "--show-properties=expanded", "--format", "json", bareMinimum.String())
 	require.NoError(t, err)
 	require.Empty(t, stderr)
 	props, err = properties.LoadFromSlice(
