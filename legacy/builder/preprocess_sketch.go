@@ -146,6 +146,6 @@ func (s *OutputCodeCompletions) Run(ctx *types.Context) error {
 		// we assume it is a json, let's make it compliant at least
 		ctx.CodeCompletions = "[]"
 	}
-	fmt.Fprintln(ctx.Stdout, ctx.CodeCompletions)
+	ctx.WriteStdout([]byte(ctx.CodeCompletions))
 	return nil
 }
