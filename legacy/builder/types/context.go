@@ -249,3 +249,21 @@ func (ctx *Context) Warn(msg string) {
 	}
 	ctx.stdLock.Unlock()
 }
+
+func (ctx *Context) WriteStdout(data []byte) (int, error) {
+	ctx.stdLock.Lock()
+	defer ctx.stdLock.Unlock()
+	if ctx.Stdout == nil {
+		return os.Stdout.Write(data)
+	}
+	return ctx.Stdout.Write(data)
+}
+
+func (ctx *Context) WriteStderr(data []byte) (int, error) {
+	ctx.stdLock.Lock()
+	defer ctx.stdLock.Unlock()
+	if ctx.Stderr == nil {
+		return os.Stderr.Write(data)
+	}
+	return ctx.Stderr.Write(data)
+}
