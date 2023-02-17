@@ -22,8 +22,7 @@
       "properties": {
         "compilations_before_purge": {
           "description": "interval, in number of compilations, at which the cache is purged, defaults to `10`. When `0` the cache is never purged.",
-          "type": "number",
-          "format": "integer",
+          "type": "integer"
           "minimum": 0
         },
         "ttl": {
