@@ -120,7 +120,7 @@ func NewCommand() *cobra.Command {
 		&showProperties,
 		"show-properties",
 		"disabled",
-		tr(`Show build properties instead of compiling. With "expanded" the placeholders are replaced with compilation context values.`),
+		tr(`Show build properties instead of compiling. The properties are returned exactly as they are defined. Use "--show-properties=expanded" to replace placeholders with compilation context values.`),,
 	)
 	compileCommand.Flags().Lookup("show-properties").NoOptDefVal = "unexpanded" // default if the flag is present with no value
 	compileCommand.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
