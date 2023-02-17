@@ -1649,9 +1649,11 @@ recommended.</p>
 <li>.cpp - C++ files.</li>
 <li>.c - C Files.</li>
 <li>.S - Assembly language files.</li>
-<li>.h - Header files.</li>
-<li>.tpp, .ipp - Header files (available from Arduino CLI 0.19.0).</li>
+<li>.h, .hpp, .hh <a href="#hpp-hh-note"><sup>1</sup></a> - Header files.</li>
+<li>.tpp, .ipp <a href="#tpp-ipp-note"><sup>2</sup></a> - Header files.</li>
 </ul>
+<p><a id="hpp-hh-note"></a> <sup>1</sup> <code>.hpp</code> and <code>.hh</code> supported from Arduino IDE 1.8.0/arduino-builder 1.3.22. <br />
+<a id="tpp-ipp-note"></a> <sup>2</sup> Supported from Arduino CLI 0.19.0.</p>
 <p>For information about how each of these files and other parts of the sketch are used during compilation, see the
 <a href="../sketch-build-process/">Sketch build process documentation</a>.</p>
 <h3 id="src-subfolder"><code>src</code> subfolder<a class="headerlink" href="#src-subfolder" title="Permanent link">&para;</a></h3>
