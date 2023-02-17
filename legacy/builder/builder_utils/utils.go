@@ -190,7 +190,15 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 		ctx.CompilationDatabase.Add(source, command)
 	}
 	if !objIsUpToDate && !ctx.OnlyUpdateCompilationDatabase {
-		_, _, err = utils.ExecCommand(ctx, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+		// Since this compile could be multithreaded, we first capture the command output
+		stdout, stderr, err := utils.ExecCommand(ctx, command, utils.Capture, utils.Capture)
+		// and transfer all at once at the end...
+		if ctx.Verbose {
+			ctx.WriteStdout(stdout)
+		}
+		ctx.WriteStderr(stderr)
+
+		// ...and then return the error
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
