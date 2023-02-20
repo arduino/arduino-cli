@@ -102,7 +102,7 @@ func (pme *Explorer) DownloadAndInstallPlatformAndTools(
 
 	// Install tools first
 	for _, tool := range toolsToInstall {
-		if err := pme.InstallTool(tool, taskCB); err != nil {
+		if err := pme.InstallTool(tool, taskCB, skipPostInstall); err != nil {
 			return err
 		}
 	}
@@ -171,7 +171,10 @@ func (pme *Explorer) DownloadAndInstallPlatformAndTools(
 	if !skipPostInstall {
 		log.Info("Running post_install script")
 		taskCB(&rpc.TaskProgress{Message: tr("Configuring platform.")})
-		if err := pme.RunPostInstallScript(platformRelease); err != nil {
+		if !platformRelease.IsInstalled() {
+			return errors.New(tr("platform not installed"))
+		}
+		if err := pme.RunPostInstallScript(platformRelease.InstallDir); err != nil {
 			taskCB(&rpc.TaskProgress{Message: tr("WARNING cannot configure platform: %s", err)})
 		}
 	} else {
@@ -222,22 +225,19 @@ func (pme *Explorer) cacheInstalledJSON(platformRelease *cores.PlatformRelease) 
 }
 
 // RunPostInstallScript runs the post_install.sh (or post_install.bat) script for the
-// specified platformRelease.
-func (pme *Explorer) RunPostInstallScript(platformRelease *cores.PlatformRelease) error {
-	if !platformRelease.IsInstalled() {
-		return errors.New(tr("platform not installed"))
-	}
+// specified platformRelease or toolRelease.
+func (pme *Explorer) RunPostInstallScript(installDir *paths.Path) error {
 	postInstallFilename := "post_install.sh"
 	if runtime.GOOS == "windows" {
 		postInstallFilename = "post_install.bat"
 	}
-	postInstall := platformRelease.InstallDir.Join(postInstallFilename)
+	postInstall := installDir.Join(postInstallFilename)
 	if postInstall.Exist() && postInstall.IsNotDir() {
 		cmd, err := executils.NewProcessFromPath(pme.GetEnvVarsForSpawnedProcess(), postInstall)
 		if err != nil {
 			return err
 		}
-		cmd.SetDirFromPath(platformRelease.InstallDir)
+		cmd.SetDirFromPath(installDir)
 		if err := cmd.Run(); err != nil {
 			return err
 		}
@@ -299,7 +299,7 @@ func (pme *Explorer) UninstallPlatform(platformRelease *cores.PlatformRelease, t
 }
 
 // InstallTool installs a specific release of a tool.
-func (pme *Explorer) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB) error {
+func (pme *Explorer) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB, skipPostInstall bool) error {
 	log := pme.log.WithField("Tool", toolRelease)
 
 	if toolRelease.IsInstalled() {
@@ -324,6 +324,22 @@ func (pme *Explorer) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.Task
 	if err != nil {
 		log.WithError(err).Warn("Cannot install tool")
 		return &arduino.FailedInstallError{Message: tr("Cannot install tool %s", toolRelease), Cause: err}
+	}
+	if d, err := destDir.Abs(); err == nil {
+		toolRelease.InstallDir = d
+	} else {
+		return err
+	}
+	// Perform post install
+	if !skipPostInstall {
+		log.Info("Running tool post_install script")
+		taskCB(&rpc.TaskProgress{Message: tr("Configuring tool.")})
+		if err := pme.RunPostInstallScript(toolRelease.InstallDir); err != nil {
+			taskCB(&rpc.TaskProgress{Message: tr("WARNING cannot configure tool: %s", err)})
+		}
+	} else {
+		log.Info("Skipping tool configuration.")
+		taskCB(&rpc.TaskProgress{Message: tr("Skipping tool configuration.")})
 	}
 	log.Info("Tool installed")
 	taskCB(&rpc.TaskProgress{Message: tr("%s installed", toolRelease), Completed: true})

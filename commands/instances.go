@@ -138,7 +138,7 @@ func installTool(pm *packagemanager.PackageManager, tool *cores.ToolRelease, dow
 		return fmt.Errorf(tr("downloading %[1]s tool: %[2]s"), tool, err)
 	}
 	taskCB(&rpc.TaskProgress{Completed: true})
-	if err := pme.InstallTool(tool, taskCB); err != nil {
+	if err := pme.InstallTool(tool, taskCB, true); err != nil {
 		return fmt.Errorf(tr("installing %[1]s tool: %[2]s"), tool, err)
 	}
 	return nil
