@@ -2,6 +2,31 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## 0.31.0
+
+### Added `post_install` script support for tools
+
+The `post_install` script now runs when a tool is correctly installed and the CLI is in "interactive" mode. This
+behavior can be [configured](https://arduino.github.io/arduino-cli/0.30/commands/arduino-cli_core_install/#options).
+
+### golang API: methods in `github.com/arduino/arduino-cli/arduino/cores/packagemanager` changed signature
+
+The following methods in `github.com/arduino/arduino-cli/arduino/cores/packagemanager`:
+
+```go
+func (pme *Explorer) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB) error { ... }
+func (pme *Explorer) RunPostInstallScript(platformRelease *cores.PlatformRelease) error { ... }
+```
+
+have changed. `InstallTool` requires the new `skipPostInstall` parameter, which must be set to `true` to skip the post
+install script. `RunPostInstallScript` does not require a `*cores.PlatformRelease` parameter but requires a
+`*paths.Path` parameter:
+
+```go
+func (pme *Explorer) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.TaskProgressCB, skipPostInstall bool) error {...}
+func (pme *Explorer) RunPostInstallScript(installDir *paths.Path) error { ... }
+```
+
 ## 0.30.0
 
 ### Sketch name validation

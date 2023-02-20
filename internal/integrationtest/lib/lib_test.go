@@ -1518,4 +1518,18 @@ func TestLibQueryParameters(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, string(stdout),
 		"Starting download                             \x1b[36murl\x1b[0m=\"https://downloads.arduino.cc/libraries/github.com/arduino-libraries/WiFi101-0.16.1.zip?query=download\"\n")
+
+	// Check query=install-builtin when a library dependency is installed in builtin-directory
+	cliEnv := cli.GetDefaultEnv()
+	cliEnv["ARDUINO_DIRECTORIES_BUILTIN_LIBRARIES"] = cli.DataDir().Join("libraries").String()
+	stdout, _, err = cli.RunWithCustomEnv(cliEnv, "lib", "install", "Firmata@2.5.3", "--install-in-builtin-dir", "-v", "--log-level", "debug")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout),
+		"Starting download                             \x1b[36murl\x1b[0m=\"https://downloads.arduino.cc/libraries/github.com/firmata/Firmata-2.5.3.zip?query=install-builtin\"\n")
+
+	// Check query=update-builtin when a library dependency is updated in builtin-directory
+	stdout, _, err = cli.RunWithCustomEnv(cliEnv, "lib", "install", "Firmata@2.5.9", "--install-in-builtin-dir", "-v", "--log-level", "debug")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout),
+		"Starting download                             \x1b[36murl\x1b[0m=\"https://downloads.arduino.cc/libraries/github.com/firmata/Firmata-2.5.9.zip?query=upgrade-builtin\"\n")
 }
