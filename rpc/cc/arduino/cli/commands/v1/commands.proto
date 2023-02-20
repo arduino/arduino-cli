@@ -31,9 +31,6 @@ import "cc/arduino/cli/commands/v1/lib.proto";
 
 // The main Arduino Platform service API
 service ArduinoCoreService {
-  // BOOTSTRAP COMMANDS
-  //-------------------
-
   // Create a new Arduino Core instance
   rpc Create(CreateRequest) returns (CreateResponse) {}
 
