@@ -111,6 +111,8 @@ The configuration file must be named `arduino-cli`, with the appropriate file ex
 - envfile
 - [INI]
 
+#### JSON schema
+
 The configuration file [JSON schema][configuration-schema] can be used to independently validate the file content. This
 schema should be considered unstable in this version.
 
