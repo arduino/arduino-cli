@@ -103,6 +103,9 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 			if installTask.ReplacedLib != nil {
 				downloadReason = "upgrade"
 			}
+			if installLocation == libraries.IDEBuiltIn {
+				downloadReason += "-builtin"
+			}
 		}
 		if err := downloadLibrary(lm, libRelease, downloadCB, taskCB, downloadReason); err != nil {
 			return err

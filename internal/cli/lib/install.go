@@ -34,14 +34,12 @@ import (
 	semver "go.bug.st/relaxed-semver"
 )
 
-var (
-	noDeps      bool
-	noOverwrite bool
-	gitURL      bool
-	zipPath     bool
-)
-
 func initInstallCommand() *cobra.Command {
+	var noDeps bool
+	var noOverwrite bool
+	var gitURL bool
+	var zipPath bool
+	var useBuiltinLibrariesDir bool
 	installCommand := &cobra.Command{
 		Use:   fmt.Sprintf("install %s[@%s]...", tr("LIBRARY"), tr("VERSION_NUMBER")),
 		Short: tr("Installs one or more specified libraries into the system."),
@@ -53,7 +51,9 @@ func initInstallCommand() *cobra.Command {
 			"  " + os.Args[0] + " lib install --git-url https://github.com/arduino-libraries/WiFi101.git#0.16.0 # " + tr("for the specific version.") + "\n" +
 			"  " + os.Args[0] + " lib install --zip-path /path/to/WiFi101.zip /path/to/ArduinoBLE.zip\n",
 		Args: cobra.MinimumNArgs(1),
-		Run:  runInstallCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runInstallCommand(args, noDeps, noOverwrite, gitURL, zipPath, useBuiltinLibrariesDir)
+		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 			return arguments.GetInstallableLibs(), cobra.ShellCompDirectiveDefault
 		},
@@ -62,10 +62,11 @@ func initInstallCommand() *cobra.Command {
 	installCommand.Flags().BoolVar(&noOverwrite, "no-overwrite", false, tr("Do not overwrite already installed libraries."))
 	installCommand.Flags().BoolVar(&gitURL, "git-url", false, tr("Enter git url for libraries hosted on repositories"))
 	installCommand.Flags().BoolVar(&zipPath, "zip-path", false, tr("Enter a path to zip file"))
+	installCommand.Flags().BoolVar(&useBuiltinLibrariesDir, "install-in-builtin-dir", false, tr("Install libraries in the IDE-Builtin directory"))
 	return installCommand
 }
 
-func runInstallCommand(cmd *cobra.Command, args []string) {
+func runInstallCommand(args []string, noDeps bool, noOverwrite bool, gitURL bool, zipPath bool, useBuiltinLibrariesDir bool) {
 	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli lib install`")
 
@@ -80,6 +81,10 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 			feedback.Fatal(tr("--git-url and --zip-path are disabled by default, for more information see: %v", documentationURL), feedback.ErrGeneric)
 		}
 		feedback.Print(tr("--git-url and --zip-path flags allow installing untrusted files, use it at your own risk."))
+
+		if useBuiltinLibrariesDir {
+			feedback.Fatal(tr("--git-url or --zip-path can't be used with --install-in-builtin-dir"), feedback.ErrGeneric)
+		}
 	}
 
 	if zipPath {
@@ -123,12 +128,17 @@ func runInstallCommand(cmd *cobra.Command, args []string) {
 	}
 
 	for _, libRef := range libRefs {
+		installLocation := rpc.LibraryInstallLocation_LIBRARY_INSTALL_LOCATION_USER
+		if useBuiltinLibrariesDir {
+			installLocation = rpc.LibraryInstallLocation_LIBRARY_INSTALL_LOCATION_BUILTIN
+		}
 		libraryInstallRequest := &rpc.LibraryInstallRequest{
-			Instance:    instance,
-			Name:        libRef.Name,
-			Version:     libRef.Version,
-			NoDeps:      noDeps,
-			NoOverwrite: noOverwrite,
+			Instance:        instance,
+			Name:            libRef.Name,
+			Version:         libRef.Version,
+			NoDeps:          noDeps,
+			NoOverwrite:     noOverwrite,
+			InstallLocation: installLocation,
 		}
 		err := lib.LibraryInstall(context.Background(), libraryInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
 		if err != nil {
