@@ -1,0 +1,39 @@
+// See: https://www.graphviz.org/documentation/
+digraph {
+  // This generates library-layout.png using the following command:
+  // dot -Tsvg -olibrary-layout.svg library-layout.dot
+  graph [
+    splines=line
+  ]
+  node [
+    shape=box
+  ]
+
+  subgraph {
+    // This subgraph provides the labels on left margin
+    node [
+      margin="0.0,0.0"
+      shape=none
+      width=0.0
+    ]
+    "Metadata:" -> "Format:" -> "Structure:" -> "Layout:" [style=invis]
+  }
+
+  subgraph cluster1 {
+    peripheries=0
+    "library.properties" [height=1.0 margin="0.0,0.0" shape=diamond width=0.0]
+    "library.properties" -> "1.5" [label="yes"]
+    "library.properties" -> "1.0" [label="no"]
+    subgraph cluster2 {
+      peripheries=0
+      rank=same
+      "1.5"
+      "1.0"
+    }
+    "1.5" -> "src/"
+    "src/" [shape=diamond]
+    "src/" -> "recursive" [label=" yes"]
+    "src/" -> "flat" [label="no"]
+    "1.0" -> "flat"
+  }
+}
