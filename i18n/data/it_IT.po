@@ -172,7 +172,7 @@ msgstr "Si è verificato un errore durante il rilevamento delle librerie"
 msgid "Append debug logging to the specified file"
 msgstr "Aggiungi il log di debug in coda al file specificato"
 
-#: internal/cli/lib/search.go:159
+#: internal/cli/lib/search.go:167
 msgid "Architecture: %s"
 msgstr "Architettura: %s"
 
@@ -180,7 +180,7 @@ msgstr "Architettura: %s"
 msgid "Archive already exists"
 msgstr "L'archivio è esistente"
 
-#: legacy/builder/phases/core_builder.go:126
+#: legacy/builder/phases/core_builder.go:135
 msgid "Archiving built core (caching) in: %[1]s"
 msgstr "Archivio il core compilato (caching) in: %[1]s"
 
@@ -224,7 +224,7 @@ msgstr "Errore di argomenti: %v"
 msgid "Attaches a sketch to a board."
 msgstr "Collega uno sketch ad una scheda."
 
-#: internal/cli/lib/search.go:150
+#: internal/cli/lib/search.go:158
 msgid "Author: %s"
 msgstr "Autore: %s"
 
@@ -256,7 +256,7 @@ msgstr "Comandi disponibili:"
 msgid "Binary file to upload."
 msgstr "File binario da caricare."
 
-#: internal/cli/board/list.go:97 internal/cli/board/list.go:137
+#: internal/cli/board/list.go:97 internal/cli/board/list.go:138
 #: internal/cli/board/listall.go:85 internal/cli/board/search.go:83
 msgid "Board Name"
 msgstr "Nome scheda"
@@ -273,7 +273,7 @@ msgstr "Versione scheda:"
 msgid "Bootloader file specified but missing: %[1]s"
 msgstr "Il file del bootloader specificato è inesistente: %[1]s"
 
-#: internal/cli/compile/compile.go:100
+#: internal/cli/compile/compile.go:127
 msgid "Builds of 'core.a' are saved into this path to be cached and reused."
 msgstr ""
 "Le build di 'core.a' vengono salvate in questo percorso per essere "
@@ -317,11 +317,11 @@ msgstr "Non è possibile salvare il file di configurazione: %v"
 msgid "Can't write debug log: %s"
 msgstr "Non è possibile scrivere il log di debug: %s"
 
-#: commands/compile/compile.go:160 commands/compile/compile.go:163
+#: commands/compile/compile.go:167 commands/compile/compile.go:170
 msgid "Cannot create build cache directory"
 msgstr "Non è possibile creare la directory di build della cache."
 
-#: commands/compile/compile.go:136
+#: commands/compile/compile.go:138
 msgid "Cannot create build directory"
 msgstr "Non è possibile creare la directory per la build"
 
@@ -366,7 +366,7 @@ msgstr "Non è possibile effettuare il reset della porta: %s"
 msgid "Cannot upgrade platform"
 msgstr "Non è possibile aggiornare la piattaforma"
 
-#: internal/cli/lib/search.go:158
+#: internal/cli/lib/search.go:166
 msgid "Category: %s"
 msgstr "Categoria: %s"
 
@@ -403,7 +403,7 @@ msgstr ""
 msgid "Compiled sketch not found in %s"
 msgstr "Sketch compilato non trovato in %s"
 
-#: internal/cli/compile/compile.go:84 internal/cli/compile/compile.go:85
+#: internal/cli/compile/compile.go:105 internal/cli/compile/compile.go:106
 msgid "Compiles Arduino sketches."
 msgstr "Compilazione sketch Arduino"
 
@@ -446,7 +446,7 @@ msgstr "Opzioni di configurazione per %s"
 msgid "Configuring platform."
 msgstr "Configurazione della piattaforma."
 
-#: internal/cli/board/list.go:197
+#: internal/cli/board/list.go:199
 msgid "Connected"
 msgstr "Connesso"
 
@@ -454,7 +454,7 @@ msgstr "Connesso"
 msgid "Connected to %s! Press CTRL-C to exit."
 msgstr "Connesso a %s! Premere CTRL-C per uscire."
 
-#: internal/cli/board/list.go:97 internal/cli/board/list.go:137
+#: internal/cli/board/list.go:97 internal/cli/board/list.go:138
 msgid "Core"
 msgstr "Core"
 
@@ -466,7 +466,7 @@ msgstr "Non è possibile connettersi via HTTP"
 msgid "Could not create index directory"
 msgstr "Impossibile creare la directory dell'indice"
 
-#: legacy/builder/phases/core_builder.go:47
+#: legacy/builder/phases/core_builder.go:49
 msgid "Couldn't deeply cache core build: %[1]s"
 msgstr ""
 "Non è stato possibile creare una cache profonda della build core: %[1]s"
@@ -483,7 +483,7 @@ msgstr "Impossibile ottenere la directory di lavoro corrente: %v"
 msgid "Create a new Sketch"
 msgstr "Crea un nuovo Sketch"
 
-#: internal/cli/compile/compile.go:97
+#: internal/cli/compile/compile.go:118
 msgid "Create and print a profile configuration from the build."
 msgstr "Crea e stampa una configurazione del profilo dalla build."
 
@@ -499,7 +499,7 @@ msgstr ""
 "Crea o aggiorna il file di configurazione nella directory dei dati o nella "
 "directory personalizzata con le impostazioni di configurazione correnti."
 
-#: internal/cli/compile/compile.go:281
+#: internal/cli/compile/compile.go:313
 msgid ""
 "Currently, Build Profiles only support libraries available through Arduino "
 "Library Manager."
@@ -568,7 +568,7 @@ msgid "Deletes a settings key and all its sub keys."
 msgstr ""
 "Elimina una chiave delle impostazioni e tutte le sue chiavi secondarie."
 
-#: internal/cli/lib/search.go:166
+#: internal/cli/lib/search.go:174
 msgid "Dependencies: %s"
 msgstr "Dipendenze: %s"
 
@@ -606,7 +606,7 @@ msgid "Disable completion description for shells that support it"
 msgstr ""
 "Disabilita la descrizione del completamento per le shell che la supportano."
 
-#: internal/cli/board/list.go:198
+#: internal/cli/board/list.go:200
 msgid "Disconnected"
 msgstr "Disconnesso"
 
@@ -695,7 +695,7 @@ msgstr ""
 "Si è verificato un errore durante l'aggiunta del file all'archivio dello "
 "sketch"
 
-#: legacy/builder/phases/core_builder.go:132
+#: legacy/builder/phases/core_builder.go:141
 msgid "Error archiving built core (caching) in %[1]s: %[2]s"
 msgstr ""
 "Si è verificato un errore durante l'archiviazione del core compilato "
@@ -714,16 +714,16 @@ msgstr ""
 msgid "Error cleaning caches: %v"
 msgstr "Si è verificato un errore durante la pulizia della cache: %v"
 
-#: commands/compile/compile.go:279
+#: commands/compile/compile.go:286
 msgid "Error copying output file %s"
 msgstr "Si è verificato un errore durante la copia del file di output %s"
 
 #: internal/cli/core/search.go:63 internal/cli/instance/instance.go:46
-#: internal/cli/instance/instance.go:168 internal/cli/lib/search.go:56
+#: internal/cli/instance/instance.go:168 internal/cli/lib/search.go:62
 msgid "Error creating instance: %v"
 msgstr "Si è verificato un errore durante la creazione dell'istanza: %v"
 
-#: commands/compile/compile.go:259
+#: commands/compile/compile.go:266
 msgid "Error creating output dir"
 msgstr ""
 "Si è verificato un errore durante la creazione della cartella di output"
@@ -790,7 +790,7 @@ msgstr "Si è verificato un errore durante la codifica JSON dell'output: %v"
 
 #: internal/cli/burnbootloader/burnbootloader.go:72
 #: internal/cli/burnbootloader/burnbootloader.go:85
-#: internal/cli/compile/compile.go:232 internal/cli/compile/compile.go:258
+#: internal/cli/compile/compile.go:264 internal/cli/compile/compile.go:290
 #: internal/cli/upload/upload.go:95 internal/cli/upload/upload.go:111
 msgid "Error during Upload: %v"
 msgstr "Errore durante il caricamento di: %v"
@@ -799,7 +799,7 @@ msgstr "Errore durante il caricamento di: %v"
 msgid "Error during YAML encoding of the output: %v"
 msgstr "Si è verificato un errore durante la codifica YAML dell'output: %v"
 
-#: internal/cli/compile/compile.go:325
+#: internal/cli/compile/compile.go:357
 msgid "Error during build: %v"
 msgstr "Si è verificato un errore durante la compilazione: %v"
 
@@ -846,7 +846,7 @@ msgstr ""
 "Si è verificato un errore durante l'acquisizione della directory corrente "
 "per il database di compilazione: %s"
 
-#: commands/compile/compile.go:227 commands/lib/list.go:112
+#: commands/compile/compile.go:234 commands/lib/list.go:112
 msgid "Error getting information for library %s"
 msgstr ""
 "Si è verificato un errore durante l'acquisizione delle informazioni della "
@@ -916,7 +916,7 @@ msgstr ""
 
 #: internal/cli/lib/list.go:78
 msgid "Error listing libraries: %v"
-msgstr ""
+msgstr "Errore nell'elenco delle librerie: %v"
 
 #: internal/cli/core/list.go:63
 msgid "Error listing platforms: %v"
@@ -953,13 +953,18 @@ msgstr ""
 msgid "Error opening sketch: %v"
 msgstr "Si è verificato un errore durante l'apertura dello sketch: %v"
 
-#: internal/cli/compile/compile.go:180
+#: internal/cli/compile/compile.go:207
 msgid "Error opening source code overrides data file: %v"
 msgstr ""
 "Si è verificato un errore durante l'apertura del codice sorgente che "
 "sovrascrive i file: %v"
 
-#: commands/compile/compile.go:269
+#: internal/cli/compile/compile.go:220
+msgid "Error parsing --show-properties flag: %v"
+msgstr ""
+"Si è verificato un errore durante il parsing del flag --show-properties: %v"
+
+#: commands/compile/compile.go:276
 msgid "Error reading build directory"
 msgstr ""
 "Si è verificato un errore durante la lettura della directory di compilazione"
@@ -1010,7 +1015,7 @@ msgstr "Errore nel salvataggio dei metadata"
 msgid "Error searching boards: %v"
 msgstr "Si è verificato un errore durante la ricerca delle schede: %v"
 
-#: internal/cli/lib/search.go:74
+#: internal/cli/lib/search.go:82
 msgid "Error searching for Libraries: %v"
 msgstr "Si è verificato un errore durante la ricerca delle librerie: %v"
 
@@ -1036,7 +1041,7 @@ msgstr "Si è verificato un errore durante la disinstallazione di %[1]s: %[2]v"
 msgid "Error updating indexes: %v"
 msgstr "Si è verificato un errore durante l'aggiornamento degli indici: %v"
 
-#: internal/cli/lib/search.go:64 internal/cli/lib/update_index.go:54
+#: internal/cli/lib/search.go:71 internal/cli/lib/update_index.go:54
 msgid "Error updating library index: %v"
 msgstr ""
 "Si è verificato un errore durante l'aggiornamento dell'indice della "
@@ -1079,7 +1084,7 @@ msgstr ""
 msgid "Error: command description is not supported by %v"
 msgstr "Errore: la descrizione del comando non è supportata da %v"
 
-#: internal/cli/compile/compile.go:186
+#: internal/cli/compile/compile.go:213
 msgid "Error: invalid source code overrides data file: %v"
 msgstr "Errore: il codice sorgente non è valido e sovrascrive i dati: %v"
 
@@ -1106,7 +1111,7 @@ msgstr ""
 "un file"
 
 #: internal/cli/board/attach.go:30 internal/cli/board/details.go:42
-#: internal/cli/board/list.go:97 internal/cli/board/list.go:137
+#: internal/cli/board/list.go:97 internal/cli/board/list.go:138
 #: internal/cli/board/listall.go:85 internal/cli/board/search.go:83
 msgid "FQBN"
 msgstr "FQBN"
@@ -1259,7 +1264,7 @@ msgstr "Id"
 msgid "Identification properties:"
 msgstr "Proprietà identificative:"
 
-#: internal/cli/compile/compile.go:133
+#: internal/cli/compile/compile.go:160
 msgid "If set built binaries will be exported to the sketch folder."
 msgstr "Se impostato, i binari saranno esportati nella cartella degli sketch."
 
@@ -1424,7 +1429,7 @@ msgstr "Versione non è valida"
 msgid "Invalid vid value: '%s'"
 msgstr "Il valore di vid non è valido: '%s'"
 
-#: internal/cli/compile/compile.go:128
+#: internal/cli/compile/compile.go:155
 msgid ""
 "Just produce the compilation database, without actually compiling. All build"
 " commands are skipped except pre* hooks."
@@ -1441,7 +1446,7 @@ msgid "LIBRARY"
 msgstr "LIBRERIA"
 
 #: internal/cli/lib/download.go:34 internal/cli/lib/examples.go:42
-#: internal/cli/lib/search.go:38 internal/cli/lib/uninstall.go:34
+#: internal/cli/lib/search.go:41 internal/cli/lib/uninstall.go:34
 msgid "LIBRARY_NAME"
 msgstr "LIBRARY_NAME"
 
@@ -1491,7 +1496,7 @@ msgstr "Impossibile installare la libreria"
 msgid "Library installed"
 msgstr "La libreria è stata installata"
 
-#: internal/cli/lib/search.go:156
+#: internal/cli/lib/search.go:164
 msgid "License: %s"
 msgstr "Licenza: %s"
 
@@ -1523,7 +1528,7 @@ msgstr ""
 "Elenco delle opzioni della scheda separate da virgole. Oppure può essere "
 "usato più volte per più opzioni."
 
-#: internal/cli/compile/compile.go:105
+#: internal/cli/compile/compile.go:132
 msgid ""
 "List of custom build properties separated by commas. Or can be used multiple"
 " times for multiple properties."
@@ -1565,7 +1570,7 @@ msgid "Low memory available, stability problems may occur."
 msgstr ""
 "Poca memoria disponibile, potrebbero presentarsi problemi di stabilità"
 
-#: internal/cli/lib/search.go:151
+#: internal/cli/lib/search.go:159
 msgid "Maintainer: %s"
 msgstr "Manutentore: %s"
 
@@ -1630,11 +1635,11 @@ msgstr "Più di una libreria trovata per \"%[1]s\""
 msgid "Name"
 msgstr "Nome"
 
-#: internal/cli/lib/search.go:130
+#: internal/cli/lib/search.go:138
 msgid "Name: \"%s\""
 msgstr "Nome: \"%s\""
 
-#: internal/cli/board/list.go:127
+#: internal/cli/board/list.go:128
 msgid "No boards found."
 msgstr "Nessuna scheda trovata."
 
@@ -1650,11 +1655,11 @@ msgstr "Nessuna libreria trovata."
 msgid "No libraries installed."
 msgstr "Nessuna libreria installata."
 
-#: internal/cli/lib/search.go:119
+#: internal/cli/lib/search.go:127
 msgid "No libraries matching your search."
 msgstr "Non ci sono librerie corrispondenti alla tua ricerca."
 
-#: internal/cli/lib/search.go:125
+#: internal/cli/lib/search.go:133
 msgid ""
 "No libraries matching your search.\n"
 "Did you mean...\n"
@@ -1709,35 +1714,35 @@ msgstr "Apre una porta di comunicazione con una scheda."
 msgid "Option:"
 msgstr "Opzione:"
 
-#: internal/cli/compile/compile.go:115
+#: internal/cli/compile/compile.go:142
 msgid ""
 "Optional, can be: %s. Used to tell gcc which warning level to use (-W flag)."
 msgstr ""
 "Facoltativo, può essere: %s. Utilizzato per indicare a gcc quale livello di "
 "warning utilizzare (flag -W)."
 
-#: internal/cli/compile/compile.go:129
+#: internal/cli/compile/compile.go:156
 msgid "Optional, cleanup the build folder and do not use any cached build."
 msgstr ""
 "Facoltativo, ripulisce la cartella di build e non usa nessuna build in "
 "cache."
 
-#: internal/cli/compile/compile.go:126
+#: internal/cli/compile/compile.go:153
 msgid ""
 "Optional, optimize compile output for debugging, rather than for release."
 msgstr ""
 "Facoltativo, ottimizza l'output di compilazione per il debug, piuttosto che "
 "per il rilascio."
 
-#: internal/cli/compile/compile.go:117
+#: internal/cli/compile/compile.go:144
 msgid "Optional, suppresses almost every output."
 msgstr "Facoltativo, sopprime quasi tutti gli output."
 
-#: internal/cli/compile/compile.go:116 internal/cli/upload/upload.go:73
+#: internal/cli/compile/compile.go:143 internal/cli/upload/upload.go:73
 msgid "Optional, turns on verbose mode."
 msgstr "Facoltativo, attiva la modalità verbosa."
 
-#: internal/cli/compile/compile.go:134
+#: internal/cli/compile/compile.go:161
 msgid ""
 "Optional. Path to a .json file that contains a set of replacements of the "
 "sketch source code."
@@ -1745,7 +1750,7 @@ msgstr ""
 "Facoltativo. Percorso di un file .json che contiene una serie di "
 "sostituzioni del codice sorgente dello sketch."
 
-#: internal/cli/compile/compile.go:107
+#: internal/cli/compile/compile.go:134
 msgid ""
 "Override a build property with a custom value. Can be used multiple times "
 "for multiple properties."
@@ -1790,15 +1795,15 @@ msgstr "Aiuto in linea del pacchetto:"
 msgid "Package website:"
 msgstr "Website pacchetto:"
 
-#: internal/cli/lib/search.go:153
+#: internal/cli/lib/search.go:161
 msgid "Paragraph: %s"
 msgstr "Paragrafo: %s"
 
-#: internal/cli/compile/compile.go:393 internal/cli/compile/compile.go:408
+#: internal/cli/compile/compile.go:440 internal/cli/compile/compile.go:455
 msgid "Path"
 msgstr "Percorso"
 
-#: internal/cli/compile/compile.go:125
+#: internal/cli/compile/compile.go:152
 msgid ""
 "Path to a collection of libraries. Can be used multiple times or entries can"
 " be comma separated."
@@ -1806,7 +1811,7 @@ msgstr ""
 "Percorso di un gruppo di librerie. Può essere usato più volte o le voci "
 "possono essere separate da virgole."
 
-#: internal/cli/compile/compile.go:123
+#: internal/cli/compile/compile.go:150
 msgid ""
 "Path to a single library’s root folder. Can be used multiple times or "
 "entries can be comma separated."
@@ -1818,7 +1823,7 @@ msgstr ""
 msgid "Path to the file where logs will be written."
 msgstr "Percorso del file in cui verranno scritti i log."
 
-#: internal/cli/compile/compile.go:103
+#: internal/cli/compile/compile.go:130
 msgid ""
 "Path where to save compiled files. If omitted, a directory will be created "
 "in the default temporary path of your OS."
@@ -1838,7 +1843,7 @@ msgstr "La piattaforma %s è già installata"
 msgid "Platform %s installed"
 msgstr "La piattaforma %s è installata"
 
-#: internal/cli/compile/compile.go:350 internal/cli/upload/upload.go:134
+#: internal/cli/compile/compile.go:382 internal/cli/upload/upload.go:134
 msgid ""
 "Platform %s is not found in any known index\n"
 "Maybe you need to add a 3rd party URL?"
@@ -1862,7 +1867,7 @@ msgstr "Impossibile trovare la piattaforma '%s'"
 msgid "Platform ID"
 msgstr "ID piattaforma"
 
-#: internal/cli/compile/compile.go:333 internal/cli/upload/upload.go:119
+#: internal/cli/compile/compile.go:365 internal/cli/upload/upload.go:119
 msgid "Platform ID is not correct"
 msgstr "L' ID della piattaforma non è esatto"
 
@@ -1910,7 +1915,7 @@ msgstr ""
 "Specificare un FQBN. La scheda sulla porta %[1]s con protocollo %[2]s non "
 "può essere identificata"
 
-#: internal/cli/board/list.go:97 internal/cli/board/list.go:137
+#: internal/cli/board/list.go:97 internal/cli/board/list.go:138
 msgid "Port"
 msgstr "Porta"
 
@@ -1931,7 +1936,7 @@ msgstr "Impossibile trovare la libreria precompilata in \"%[1]s\""
 msgid "Print details about a board."
 msgstr "Visualizza i dettagli di una scheda."
 
-#: internal/cli/compile/compile.go:99
+#: internal/cli/compile/compile.go:126
 msgid "Print preprocessed code to stdout instead of compiling."
 msgstr "Stampa il codice preelaborato su stdout invece di compilarlo."
 
@@ -1971,11 +1976,11 @@ msgstr "Programmatori:"
 msgid "Property '%s' is undefined"
 msgstr "La proprietà '%s' non è definita"
 
-#: internal/cli/board/list.go:137
+#: internal/cli/board/list.go:138
 msgid "Protocol"
 msgstr "Protocollo"
 
-#: internal/cli/lib/search.go:163
+#: internal/cli/lib/search.go:171
 msgid "Provides includes: %s"
 msgstr "La dotazione comprende: %s"
 
@@ -2012,11 +2017,11 @@ msgstr ""
 "Avviato come demone, l'inizializzazione dei core e delle librerie viene "
 "eseguita una sola volta."
 
-#: legacy/builder/phases/core_builder.go:48
+#: legacy/builder/phases/core_builder.go:50
 msgid "Running normal build of the core..."
 msgstr "Esecuzione della normale compilazione del core..."
 
-#: internal/cli/compile/compile.go:101
+#: internal/cli/compile/compile.go:128
 msgid "Save build artifacts in this directory."
 msgstr "Salva gli artefatti di compilazione in questa directory."
 
@@ -2029,17 +2034,17 @@ msgstr ""
 msgid "Search for a core in Boards Manager."
 msgstr "Cerca un core nel gestore delle schede."
 
-#: internal/cli/lib/search.go:40
+#: internal/cli/lib/search.go:43
 msgid "Search for one or more libraries data (case insensitive search)."
 msgstr ""
 "Ricerca di uno o più dati di librerie (ricerca senza distinzione tra "
 "maiuscole e minuscole)."
 
-#: internal/cli/lib/search.go:39
+#: internal/cli/lib/search.go:42
 msgid "Searches for one or more libraries data."
 msgstr "Cerca i dati di una o più librerie."
 
-#: internal/cli/lib/search.go:152
+#: internal/cli/lib/search.go:160
 msgid "Sentence: %s"
 msgstr "Frase: %s"
 
@@ -2076,11 +2081,6 @@ msgstr "La chiave delle impostazioni non esiste"
 msgid "Show all available core versions."
 msgstr "Mostra tutte le versioni del core disponibili."
 
-#: internal/cli/compile/compile.go:98
-msgid "Show all build properties used instead of compiling."
-msgstr ""
-"Mostra tutte le proprietà di build utilizzate al posto della compilazione."
-
 #: internal/cli/monitor/monitor.go:61
 msgid "Show all the settings of the communication port."
 msgstr "Mostra tutte le impostazioni della porta di comunicazione."
@@ -2089,6 +2089,17 @@ msgstr "Mostra tutte le impostazioni della porta di comunicazione."
 msgid "Show also boards marked as 'hidden' in the platform"
 msgstr ""
 "Mostra anche le schede contrassegnate come 'nascoste' nella piattaforma."
+
+#: internal/cli/compile/compile.go:123
+msgid ""
+"Show build properties instead of compiling. The properties are returned "
+"exactly as they are defined. Use \"--show-properties=expanded\" to replace "
+"placeholders with compilation context values."
+msgstr ""
+"Mostra le proprietà di compilazione invece di compilare. Le proprietà "
+"vengono restituite esattamente come sono state definite. Usa \"--show-"
+"properties=expanded\" per sostituire i segnaposto con i valori del contesto "
+"di compilazione."
 
 #: internal/cli/board/details.go:51
 msgid "Show full board details"
@@ -2102,7 +2113,7 @@ msgstr ""
 "Visualizza informazioni dettagliate riguardanti una scheda, in particolare "
 "se ci sono opzioni che possono essere specificate tramite FQBN."
 
-#: internal/cli/lib/search.go:47
+#: internal/cli/lib/search.go:50
 msgid "Show library names only."
 msgstr "Mostra solo i nomi delle librerie."
 
@@ -2285,7 +2296,7 @@ msgstr ""
 msgid "The library %s has multiple installations:"
 msgstr "La libreria %s richiede altre installazioni:"
 
-#: internal/cli/compile/compile.go:113
+#: internal/cli/compile/compile.go:140
 msgid ""
 "The name of the custom encryption key to use to encrypt a binary during the "
 "compile process. Used only by the platforms that support it."
@@ -2294,7 +2305,7 @@ msgstr ""
 "crittografare un binario durante il processo di compilazione. Utilizzata "
 "solo dalle piattaforme che la supportano."
 
-#: internal/cli/compile/compile.go:111
+#: internal/cli/compile/compile.go:138
 msgid ""
 "The name of the custom signing key to use to sign a binary during the "
 "compile process. Used only by the platforms that support it."
@@ -2307,7 +2318,7 @@ msgstr ""
 msgid "The output format for the logs, can be: %s"
 msgstr "Il formato di output dei log può essere: %s"
 
-#: internal/cli/compile/compile.go:109
+#: internal/cli/compile/compile.go:136
 msgid ""
 "The path of the dir to search for the custom keys to sign and encrypt a "
 "binary. Used only by the platforms that support it."
@@ -2369,7 +2380,7 @@ msgstr "Il prefisso della toolchain"
 msgid "Toolchain type"
 msgstr "Il tipo della toolchain"
 
-#: internal/cli/compile/compile.go:348 internal/cli/upload/upload.go:132
+#: internal/cli/compile/compile.go:380 internal/cli/upload/upload.go:132
 msgid "Try running %s"
 msgstr "Prova ad eseguire %s"
 
@@ -2377,11 +2388,11 @@ msgstr "Prova ad eseguire %s"
 msgid "Turns on verbose mode."
 msgstr "Attiva la modalità verbosa."
 
-#: internal/cli/board/list.go:97 internal/cli/board/list.go:137
+#: internal/cli/board/list.go:97 internal/cli/board/list.go:138
 msgid "Type"
 msgstr "Tipo"
 
-#: internal/cli/lib/search.go:160
+#: internal/cli/lib/search.go:168
 msgid "Types: %s"
 msgstr "Tipi: %s"
 
@@ -2389,7 +2400,7 @@ msgstr "Tipi: %s"
 msgid "URL:"
 msgstr "URL:"
 
-#: legacy/builder/phases/core_builder.go:128
+#: legacy/builder/phases/core_builder.go:137
 msgid ""
 "Unable to cache built core, please tell %[1]s maintainers to follow %[2]s"
 msgstr ""
@@ -2438,7 +2449,7 @@ msgstr ""
 msgid "Uninstalls one or more libraries."
 msgstr "Disinstalla una o più librerie."
 
-#: internal/cli/board/list.go:169
+#: internal/cli/board/list.go:170
 msgid "Unknown"
 msgstr "Sconosciuto"
 
@@ -2514,7 +2525,7 @@ msgstr "Porta di caricamento trovata su %s"
 msgid "Upload port protocol, e.g: serial"
 msgstr "Protocollo della porta di caricamento, ad esempio: seriale"
 
-#: internal/cli/compile/compile.go:118
+#: internal/cli/compile/compile.go:145
 msgid "Upload the binary after the compilation."
 msgstr "Carica il binario dopo la compilazione."
 
@@ -2527,7 +2538,7 @@ msgstr ""
 msgid "Upload the bootloader."
 msgstr "Carica il bootloader."
 
-#: internal/cli/compile/compile.go:237 internal/cli/upload/upload.go:142
+#: internal/cli/compile/compile.go:269 internal/cli/upload/upload.go:142
 msgid ""
 "Uploading to specified board using %s protocol requires the following info:"
 msgstr ""
@@ -2542,11 +2553,11 @@ msgstr "Uso: "
 msgid "Use %s for more information about a command."
 msgstr "Usa %s  per ulteriori informazioni su un comando."
 
-#: internal/cli/compile/compile.go:391
+#: internal/cli/compile/compile.go:438
 msgid "Used library"
 msgstr "Libreria utilizzata"
 
-#: internal/cli/compile/compile.go:406
+#: internal/cli/compile/compile.go:453
 msgid "Used platform"
 msgstr "Piattaforma utilizzata"
 
@@ -2575,7 +2586,7 @@ msgstr "Uso la libreria %[1]s alla versione %[2]s nella cartella: %[3]s %[4]s"
 msgid "Using library %[1]s in folder: %[2]s %[3]s"
 msgstr "Uso la libreria %[1]s nella cartella: %[2]s %[3]s"
 
-#: legacy/builder/phases/core_builder.go:105
+#: legacy/builder/phases/core_builder.go:114
 msgid "Using precompiled core: %[1]s"
 msgstr "Utilizzo del core precompilato: %[1]s"
 
@@ -2602,16 +2613,16 @@ msgid "Values"
 msgstr "Valori"
 
 #: internal/cli/burnbootloader/burnbootloader.go:56
-#: internal/cli/compile/compile.go:120 internal/cli/upload/upload.go:72
+#: internal/cli/compile/compile.go:147 internal/cli/upload/upload.go:72
 msgid "Verify uploaded binary after the upload."
 msgstr "Verifica dei binari dopo il caricamento."
 
-#: internal/cli/compile/compile.go:392 internal/cli/compile/compile.go:407
+#: internal/cli/compile/compile.go:439 internal/cli/compile/compile.go:454
 #: internal/cli/core/search.go:104
 msgid "Version"
 msgstr "Versione"
 
-#: internal/cli/lib/search.go:161
+#: internal/cli/lib/search.go:169
 msgid "Versions: %s"
 msgstr "Versioni: %s"
 
@@ -2619,7 +2630,7 @@ msgstr "Versioni: %s"
 msgid "WARNING cannot configure platform: %s"
 msgstr "ATTENZIONE: non è possibile configurare la piattaforma: %s"
 
-#: internal/cli/compile/compile.go:280
+#: internal/cli/compile/compile.go:312
 msgid "WARNING: The sketch is compiled using one or more custom libraries."
 msgstr ""
 "ATTENZIONE: lo sketch è compilato utilizzando una o più librerie "
@@ -2661,11 +2672,11 @@ msgstr ""
 "Attenzione: il tool '%s' non è installato. Potrebbe non essere disponibile "
 "per il tuo sistema operativo."
 
-#: internal/cli/lib/search.go:154
+#: internal/cli/lib/search.go:162
 msgid "Website: %s"
 msgstr "Sito web: %s"
 
-#: internal/cli/compile/compile.go:121
+#: internal/cli/compile/compile.go:148
 msgid ""
 "When specified, VID/PID specific build properties are used, if board "
 "supports them."
@@ -2689,7 +2700,7 @@ msgstr ""
 msgid "Writing config file: %v"
 msgstr "Scrittura del file di configurazione: %v"
 
-#: internal/cli/compile/compile.go:150 internal/cli/compile/compile.go:153
+#: internal/cli/compile/compile.go:177 internal/cli/compile/compile.go:180
 msgid "You cannot use the %s flag while compiling with a profile."
 msgstr ""
 "Non puoi utilizzare il flag %s durante la compilazione con un profilo."
@@ -2742,9 +2753,9 @@ msgstr "nomescheda"
 msgid "built-in libraries directory not set"
 msgstr "la directory delle librerie integrate non è configurata"
 
-#: arduino/discovery/discovery.go:308 arduino/discovery/discovery.go:331
-#: arduino/discovery/discovery.go:353 arduino/discovery/discovery.go:392
-#: arduino/discovery/discovery.go:418
+#: arduino/discovery/discovery.go:310 arduino/discovery/discovery.go:333
+#: arduino/discovery/discovery.go:355 arduino/discovery/discovery.go:394
+#: arduino/discovery/discovery.go:420
 msgid "calling %[1]s: %[2]w"
 msgstr "Chiamata a %[1]s: %[2]w"
 
@@ -2797,17 +2808,17 @@ msgstr "comando"
 msgid "command '%[1]s' failed: %[2]s"
 msgstr "il comando '%[1]s' non è andato a buon fine: %[2]s"
 
-#: arduino/discovery/discovery.go:312 arduino/discovery/discovery.go:335
-#: arduino/discovery/discovery.go:357 arduino/discovery/discovery.go:396
-#: arduino/discovery/discovery.go:422
+#: arduino/discovery/discovery.go:314 arduino/discovery/discovery.go:337
+#: arduino/discovery/discovery.go:359 arduino/discovery/discovery.go:398
+#: arduino/discovery/discovery.go:424
 msgid "command failed: %s"
 msgstr "il comando non è andato a buon fine: %s"
 
-#: arduino/discovery/discovery.go:310 arduino/discovery/discovery.go:314
-#: arduino/discovery/discovery.go:333 arduino/discovery/discovery.go:337
-#: arduino/discovery/discovery.go:355 arduino/discovery/discovery.go:359
-#: arduino/discovery/discovery.go:394 arduino/discovery/discovery.go:420
-#: arduino/discovery/discovery.go:424 arduino/monitor/monitor.go:147
+#: arduino/discovery/discovery.go:312 arduino/discovery/discovery.go:316
+#: arduino/discovery/discovery.go:335 arduino/discovery/discovery.go:339
+#: arduino/discovery/discovery.go:357 arduino/discovery/discovery.go:361
+#: arduino/discovery/discovery.go:396 arduino/discovery/discovery.go:422
+#: arduino/discovery/discovery.go:426 arduino/monitor/monitor.go:147
 #: arduino/monitor/monitor.go:153
 msgid "communication out of sync, expected '%[1]s', received '%[2]s'"
 msgstr "comunicazione fuori sincronia, atteso '%[1]s', ricevuto '%[2]s'"
@@ -2836,6 +2847,10 @@ msgstr "Impossibile rimuovere la vecchia libreria"
 #: arduino/sketch/yaml.go:86
 msgid "could not update sketch project file"
 msgstr "non è stato possibile aggiornare il file di progetto"
+
+#: legacy/builder/phases/core_builder.go:104
+msgid "creating core cache folder: %s"
+msgstr "creazione in corso della cartella cache del core: %s"
 
 #: arduino/cores/packagemanager/install_uninstall.go:208
 msgid "creating installed.json in %[1]s: %[2]s"
@@ -3053,11 +3068,11 @@ msgstr ""
 msgid "invalid '%s' directive"
 msgstr "la direttiva '%s' non è valida"
 
-#: arduino/discovery/discovery.go:174
+#: arduino/discovery/discovery.go:176
 msgid "invalid 'add' message: missing port"
 msgstr "il messaggio 'add' non è valido: porta mancante"
 
-#: arduino/discovery/discovery.go:184
+#: arduino/discovery/discovery.go:186
 msgid "invalid 'remove' message: missing port"
 msgstr "il messaggio 'remove' non è valido: porta mancante"
 
@@ -3129,6 +3144,10 @@ msgstr "la posizione della libreria non è valida: %s"
 msgid "invalid option '%s'"
 msgstr "l'opzione '%s' non è valida"
 
+#: internal/cli/compile/compile.go:62
+msgid "invalid option '%s'."
+msgstr "l'opzione '%s' non è valida."
+
 #: inventory/inventory.go:94
 msgid "invalid path creating config dir: %[1]s error: %[2]w"
 msgstr ""
@@ -3174,6 +3193,8 @@ msgid ""
 "invalid sketch name \"%[1]s\": the first character must be alphanumeric, the"
 " following ones can also contain \"_\", \"-\", and \".\"."
 msgstr ""
+"il nome dello sketch \"%[1]s\" non è valido: il primo carattere deve essere "
+"alfanumerico, i seguenti possono anche contenere \"_\", \"-\", e \".\"."
 
 #: arduino/cores/board.go:140
 msgid "invalid value '%[1]s' for option '%[2]s'"
@@ -3412,11 +3433,11 @@ msgstr "la piattaforma %s non è installata"
 
 #: arduino/cores/packagemanager/install_uninstall.go:228
 #: arduino/cores/packagemanager/install_uninstall.go:276
-#: arduino/cores/packagemanager/loader.go:457 commands/compile/compile.go:99
+#: arduino/cores/packagemanager/loader.go:457 commands/compile/compile.go:101
 msgid "platform not installed"
 msgstr "piattaforma non installata"
 
-#: internal/cli/compile/compile.go:140
+#: internal/cli/compile/compile.go:167
 msgid "please use --build-property instead."
 msgstr "utilizza invece --build-property."
 
@@ -3437,7 +3458,7 @@ msgid "protocol version not supported: requested %[1]d, got %[2]d"
 msgstr ""
 "la versione del protocollo non è supportata: richiesta %[1]d, ottenuta %[2]d"
 
-#: arduino/discovery/discovery.go:316
+#: arduino/discovery/discovery.go:318
 msgid "protocol version not supported: requested 1, got %d"
 msgstr "la versione del protocollo non è supportata: richiesta 1, ottenuta %d"
 
@@ -3544,12 +3565,14 @@ msgstr "sto impostando DTR su OFF"
 
 #: commands/sketch/new.go:75
 msgid "sketch name cannot be empty"
-msgstr ""
+msgstr "Il nome dello sketch non può essere vuoto"
 
 #: commands/sketch/new.go:78
 msgid ""
 "sketch name too long (%[1]d characters). Maximum allowed length is %[2]d"
 msgstr ""
+"il nome dello sketch è troppo lungo (%[1]d caratteri). La lunghezza massima "
+"consentita è %[2]d"
 
 #: arduino/sketch/sketch.go:48 arduino/sketch/sketch.go:53
 msgid "sketch path is not valid"
@@ -3604,7 +3627,7 @@ msgstr "il server ha risposto con lo stato %s"
 msgid "timeout waiting for message"
 msgstr "timeout in attesa del messaggio"
 
-#: arduino/discovery/discovery.go:213
+#: arduino/discovery/discovery.go:215
 msgid "timeout waiting for message from %s"
 msgstr "timeout in attesa di un messaggio da %s"
 
