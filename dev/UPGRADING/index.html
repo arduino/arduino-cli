@@ -277,6 +277,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0310" class="md-nav__link">
+    0.31.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.31.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added-post_install-script-support-for-tools" class="md-nav__link">
+    Added post_install script support for tools
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#golang-api-methods-in-githubcomarduinoarduino-cliarduinocorespackagemanager-changed-signature" class="md-nav__link">
+    golang API: methods in github.com/arduino/arduino-cli/arduino/cores/packagemanager changed signature
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0300" class="md-nav__link">
     0.30.0
   </a>
@@ -2152,6 +2179,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0310" class="md-nav__link">
+    0.31.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.31.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added-post_install-script-support-for-tools" class="md-nav__link">
+    Added post_install script support for tools
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#golang-api-methods-in-githubcomarduinoarduino-cliarduinocorespackagemanager-changed-signature" class="md-nav__link">
+    golang API: methods in github.com/arduino/arduino-cli/arduino/cores/packagemanager changed signature
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0300" class="md-nav__link">
     0.30.0
   </a>
@@ -2970,6 +3024,21 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<h2 id="0310">0.31.0<a class="headerlink" href="#0310" title="Permanent link">&para;</a></h2>
+<h3 id="added-post_install-script-support-for-tools">Added <code>post_install</code> script support for tools<a class="headerlink" href="#added-post_install-script-support-for-tools" title="Permanent link">&para;</a></h3>
+<p>The <code>post_install</code> script now runs when a tool is correctly installed and the CLI is in "interactive" mode. This
+behavior can be <a href="https://arduino.github.io/arduino-cli/0.30/commands/arduino-cli_core_install/#options">configured</a>.</p>
+<h3 id="golang-api-methods-in-githubcomarduinoarduino-cliarduinocorespackagemanager-changed-signature">golang API: methods in <code>github.com/arduino/arduino-cli/arduino/cores/packagemanager</code> changed signature<a class="headerlink" href="#golang-api-methods-in-githubcomarduinoarduino-cliarduinocorespackagemanager-changed-signature" title="Permanent link">&para;</a></h3>
+<p>The following methods in <code>github.com/arduino/arduino-cli/arduino/cores/packagemanager</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">pme</span><span class="w"> </span><span class="o">*</span><span class="nx">Explorer</span><span class="p">)</span><span class="w"> </span><span class="nx">InstallTool</span><span class="p">(</span><span class="nx">toolRelease</span><span class="w"> </span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">ToolRelease</span><span class="p">,</span><span class="w"> </span><span class="nx">taskCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">TaskProgressCB</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">pme</span><span class="w"> </span><span class="o">*</span><span class="nx">Explorer</span><span class="p">)</span><span class="w"> </span><span class="nx">RunPostInstallScript</span><span class="p">(</span><span class="nx">platformRelease</span><span class="w"> </span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">PlatformRelease</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>have changed. <code>InstallTool</code> requires the new <code>skipPostInstall</code> parameter, which must be set to <code>true</code> to skip the post
+install script. <code>RunPostInstallScript</code> does not require a <code>*cores.PlatformRelease</code> parameter but requires a
+<code>*paths.Path</code> parameter:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">pme</span><span class="w"> </span><span class="o">*</span><span class="nx">Explorer</span><span class="p">)</span><span class="w"> </span><span class="nx">InstallTool</span><span class="p">(</span><span class="nx">toolRelease</span><span class="w"> </span><span class="o">*</span><span class="nx">cores</span><span class="p">.</span><span class="nx">ToolRelease</span><span class="p">,</span><span class="w"> </span><span class="nx">taskCB</span><span class="w"> </span><span class="nx">rpc</span><span class="p">.</span><span class="nx">TaskProgressCB</span><span class="p">,</span><span class="w"> </span><span class="nx">skipPostInstall</span><span class="w"> </span><span class="kt">bool</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="o">...</span><span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">pme</span><span class="w"> </span><span class="o">*</span><span class="nx">Explorer</span><span class="p">)</span><span class="w"> </span><span class="nx">RunPostInstallScript</span><span class="p">(</span><span class="nx">installDir</span><span class="w"> </span><span class="o">*</span><span class="nx">paths</span><span class="p">.</span><span class="nx">Path</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
 <h2 id="0300">0.30.0<a class="headerlink" href="#0300" title="Permanent link">&para;</a></h2>
 <h3 id="sketch-name-validation">Sketch name validation<a class="headerlink" href="#sketch-name-validation" title="Permanent link">&para;</a></h3>
 <p>The sketch name submitted via the <code>sketch new</code> command of the CLI or the gRPC command
