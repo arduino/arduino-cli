@@ -111,11 +111,6 @@ The configuration file must be named `arduino-cli`, with the appropriate file ex
 - envfile
 - [INI]
 
-#### JSON schema
-
-The configuration file [JSON schema][configuration-schema] can be used to independently validate the file content. This
-schema should be considered unstable in this version.
-
 #### Locations
 
 Configuration files in the following locations are recognized by Arduino CLI:
@@ -150,6 +145,11 @@ Doing the same using a TOML format file:
 [board_manager]
 additional_urls = [ "https://downloads.arduino.cc/packages/package_staging_index.json" ]
 ```
+
+#### JSON schema
+
+The configuration file [JSON schema][configuration-schema] can be used to independently validate the file content. This
+schema should be considered unstable in this version.
 
 [grpc]: https://grpc.io
 [sketchbook directory]: sketch-specification.md#sketchbook
