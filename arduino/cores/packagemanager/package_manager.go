@@ -299,30 +299,39 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 
 	// Determine the platform used for the build (in case the board refers
 	// to a core contained in another platform)
-	buildPlatformRelease := platformRelease
-	coreParts := strings.Split(buildProperties.Get("build.core"), ":")
-	if len(coreParts) > 1 {
-		referredPackage := coreParts[0]
-		buildPackage := pme.packages[referredPackage]
-		if buildPackage == nil {
+	core := buildProperties.Get("build.core")
+	referredCore := ""
+	if split := strings.Split(core, ":"); len(split) > 1 {
+		core, referredCore = split[1], split[0]
+	}
+
+	var referredPlatformRelease *cores.PlatformRelease
+	referredPackageName := referredCore
+	if referredPackageName != "" {
+		referredPackage := pme.packages[referredPackageName]
+		if referredPackage == nil {
 			return targetPackage, platformRelease, board, buildProperties, nil,
-				fmt.Errorf(tr("missing package %[1]s referenced by board %[2]s"), referredPackage, fqbn)
+				fmt.Errorf(tr("missing package %[1]s referenced by board %[2]s"), referredPackageName, fqbn)
 		}
-		buildPlatform := buildPackage.Platforms[fqbn.PlatformArch]
-		if buildPlatform == nil {
+		referredPlatform := referredPackage.Platforms[fqbn.PlatformArch]
+		if referredPlatform == nil {
 			return targetPackage, platformRelease, board, buildProperties, nil,
-				fmt.Errorf(tr("missing platform %[1]s:%[2]s referenced by board %[3]s"), referredPackage, fqbn.PlatformArch, fqbn)
+				fmt.Errorf(tr("missing platform %[1]s:%[2]s referenced by board %[3]s"), referredPackageName, fqbn.PlatformArch, fqbn)
 		}
-		buildPlatformRelease = pme.GetInstalledPlatformRelease(buildPlatform)
-		if buildPlatformRelease == nil {
+		referredPlatformRelease = pme.GetInstalledPlatformRelease(referredPlatform)
+		if referredPlatformRelease == nil {
 			return targetPackage, platformRelease, board, buildProperties, nil,
-				fmt.Errorf(tr("missing platform release %[1]s:%[2]s referenced by board %[3]s"), referredPackage, fqbn.PlatformArch, fqbn)
+				fmt.Errorf(tr("missing platform release %[1]s:%[2]s referenced by board %[3]s"), referredPackageName, fqbn.PlatformArch, fqbn)
 		}
 	}
 
 	// Runtime build properties
+	buildPlatformRelease := platformRelease
+	if referredCore != "" {
+		buildPlatformRelease = referredPlatformRelease
+	}
 	buildProperties.Merge(platformRelease.RuntimeProperties())
-	buildProperties.SetPath("build.core.path", buildPlatformRelease.InstallDir.Join("cores", coreParts[0]))
+	buildProperties.SetPath("build.core.path", buildPlatformRelease.InstallDir.Join("cores", core))
 	buildProperties.SetPath("build.system.path", buildPlatformRelease.InstallDir.Join("system"))
 	for _, tool := range pme.GetAllInstalledToolsReleases() {
 		buildProperties.Merge(tool.RuntimeProperties())
