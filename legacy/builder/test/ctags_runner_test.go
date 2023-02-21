@@ -38,7 +38,6 @@ func TestCTagsRunner(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, sketchLocation),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -88,7 +87,6 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, sketchLocation),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -136,7 +134,6 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, sketchLocation),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -183,7 +180,6 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, sketchLocation),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -229,7 +225,6 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, sketchLocation),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 

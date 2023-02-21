@@ -174,9 +174,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	builderCtx.BuiltInLibrariesDirs = configuration.IDEBuiltinLibrariesDir(configuration.Settings)
 
-	// Will be deprecated.
-	builderCtx.ArduinoAPIVersion = "10607"
-
 	builderCtx.Stdout = outStream
 	builderCtx.Stderr = errStream
 	builderCtx.Clean = req.GetClean()

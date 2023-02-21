@@ -16,9 +16,6 @@
 package builder
 
 import (
-	"os"
-	"path/filepath"
-
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -41,19 +38,6 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	if ctx.Sketch != nil {
 		buildProperties.Set("build.project_name", ctx.Sketch.MainFile.Base())
 	}
-
-	// get base folder and use it to populate BUILD_PROPERTIES_RUNTIME_IDE_PATH (arduino and arduino-builder live in the same dir)
-	ex, err := os.Executable()
-	exPath := ""
-	if err == nil {
-		exPath = filepath.Dir(ex)
-	}
-
-	buildProperties.Set("runtime.ide.version", ctx.ArduinoAPIVersion)
-	buildProperties.Set("runtime.ide.path", exPath)
-	buildProperties.Set("ide_version", ctx.ArduinoAPIVersion)
-	buildProperties.Set("runtime.os", properties.GetOSSuffix())
-	buildProperties.Set("build.library_discovery_phase", "0")
 
 	if ctx.OptimizeForDebug {
 		if buildProperties.ContainsKey("compiler.optimization_flags.debug") {

@@ -18,7 +18,9 @@ package packagemanager
 import (
 	"fmt"
 	"net/url"
+	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -370,6 +372,19 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 	buildProperties.Set("extra.time.local", strconv.FormatInt(timeutils.LocalUnix(now), 10))
 	buildProperties.Set("extra.time.zone", strconv.Itoa(timeutils.TimezoneOffsetNoDST(now)))
 	buildProperties.Set("extra.time.dst", strconv.Itoa(timeutils.DaylightSavingsOffset(now)))
+
+	if !buildProperties.ContainsKey("runtime.ide.path") {
+		if ex, err := os.Executable(); err == nil {
+			buildProperties.Set("runtime.ide.path", filepath.Dir(ex))
+		} else {
+			buildProperties.Set("runtime.ide.path", "")
+		}
+	}
+	buildProperties.Set("runtime.os", properties.GetOSSuffix())
+	buildProperties.Set("build.library_discovery_phase", "0")
+	// Deprecated properties
+	buildProperties.Set("ide_version", "10607")
+	buildProperties.Set("runtime.ide.version", "10607")
 
 	// No errors... phew!
 	return targetPackage, platformRelease, board, buildProperties, buildPlatformRelease, nil
