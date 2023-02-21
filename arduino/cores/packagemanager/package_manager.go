@@ -385,6 +385,9 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 	// Deprecated properties
 	buildProperties.Set("ide_version", "10607")
 	buildProperties.Set("runtime.ide.version", "10607")
+	if !buildProperties.ContainsKey("software") {
+		buildProperties.Set("software", "ARDUINO")
+	}
 
 	// No errors... phew!
 	return targetPackage, platformRelease, board, buildProperties, buildPlatformRelease, nil

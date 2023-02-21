@@ -50,10 +50,6 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	}
 	ctx.OptimizationFlags = buildProperties.Get("compiler.optimization_flags")
 
-	if !buildProperties.ContainsKey("software") {
-		buildProperties.Set("software", DEFAULT_SOFTWARE)
-	}
-
 	buildProperties.SetPath("build.source.path", ctx.Sketch.FullPath)
 
 	buildProperties.Merge(ctx.PackageManager.GetCustomGlobalProperties())
