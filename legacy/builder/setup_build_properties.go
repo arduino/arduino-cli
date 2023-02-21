@@ -18,9 +18,7 @@ package builder
 import (
 	"os"
 	"path/filepath"
-	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -29,8 +27,6 @@ import (
 type SetupBuildProperties struct{}
 
 func (s *SetupBuildProperties) Run(ctx *types.Context) error {
-	packages := ctx.Hardware
-
 	targetPlatform := ctx.TargetPlatform
 	actualPlatform := ctx.ActualPlatform
 
@@ -70,22 +66,6 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 		}
 	}
 	ctx.OptimizationFlags = buildProperties.Get("compiler.optimization_flags")
-
-	variant := buildProperties.Get("build.variant")
-	if variant == "" {
-		buildProperties.Set("build.variant.path", "")
-	} else {
-		var variantPlatformRelease *cores.PlatformRelease
-		variantParts := strings.Split(variant, ":")
-		if len(variantParts) > 1 {
-			variantPlatform := packages[variantParts[0]].Platforms[targetPlatform.Platform.Architecture]
-			variantPlatformRelease = ctx.PackageManager.GetInstalledPlatformRelease(variantPlatform)
-			variant = variantParts[1]
-		} else {
-			variantPlatformRelease = targetPlatform
-		}
-		buildProperties.SetPath("build.variant.path", variantPlatformRelease.InstallDir.Join("variants", variant))
-	}
 
 	if !buildProperties.ContainsKey("software") {
 		buildProperties.Set("software", DEFAULT_SOFTWARE)

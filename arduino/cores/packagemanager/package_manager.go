@@ -304,9 +304,21 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 	if split := strings.Split(core, ":"); len(split) > 1 {
 		core, referredCore = split[1], split[0]
 	}
+	variant := buildProperties.Get("build.variant")
+	referredVariant := ""
+	if split := strings.Split(variant, ":"); len(split) > 1 {
+		variant, referredVariant = split[1], split[0]
+	}
+	if referredCore != "" && referredVariant != "" && referredCore != referredVariant {
+		return targetPackage, platformRelease, board, buildProperties, nil,
+			fmt.Errorf(tr("'build.core' and 'build.variant' refer to different platforms: %[1]s and %[2]s"), core+":"+referredCore, variant+":"+referredVariant)
+	}
 
 	var referredPlatformRelease *cores.PlatformRelease
 	referredPackageName := referredCore
+	if referredPackageName == "" {
+		referredPackageName = referredVariant
+	}
 	if referredPackageName != "" {
 		referredPackage := pme.packages[referredPackageName]
 		if referredPackage == nil {
@@ -336,6 +348,16 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 	for _, tool := range pme.GetAllInstalledToolsReleases() {
 		buildProperties.Merge(tool.RuntimeProperties())
 	}
+
+	buildProperties.Set("build.variant.path", "")
+	if variant != "" {
+		variantPlatformRelease := platformRelease
+		if referredVariant != "" {
+			variantPlatformRelease = referredPlatformRelease
+		}
+		buildProperties.SetPath("build.variant.path", variantPlatformRelease.InstallDir.Join("variants", variant))
+	}
+
 	requiredTools, err := pme.FindToolsRequiredForBuild(platformRelease, buildPlatformRelease)
 	if err != nil {
 		return targetPackage, platformRelease, board, buildProperties, buildPlatformRelease, err
