@@ -336,8 +336,8 @@ func (release *PlatformRelease) RequiresToolRelease(toolRelease *ToolRelease) bo
 func (release *PlatformRelease) RuntimeProperties() *properties.Map {
 	res := properties.NewMap()
 	if release.InstallDir != nil {
-		res.Set("runtime.platform.path", release.InstallDir.String())
-		res.Set("runtime.hardware.path", release.InstallDir.Join("..").String())
+		res.SetPath("runtime.platform.path", release.InstallDir)
+		res.SetPath("runtime.hardware.path", release.InstallDir.Join(".."))
 	}
 
 	return res

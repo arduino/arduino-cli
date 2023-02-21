@@ -317,6 +317,11 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 		}
 	}
 
+	// Runtime build properties
+	buildProperties.Merge(platformRelease.RuntimeProperties())
+	buildProperties.SetPath("build.core.path", buildPlatformRelease.InstallDir.Join("cores", coreParts[0]))
+	buildProperties.SetPath("build.system.path", buildPlatformRelease.InstallDir.Join("system"))
+
 	// No errors... phew!
 	return targetPackage, platformRelease, board, buildProperties, buildPlatformRelease, nil
 }
