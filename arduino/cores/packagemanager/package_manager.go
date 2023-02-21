@@ -397,6 +397,8 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 		buildProperties.Set("software", "ARDUINO")
 	}
 
+	buildProperties.Merge(pme.GetCustomGlobalProperties())
+
 	return targetPackage, platformRelease, board, buildProperties, buildPlatformRelease, nil
 }
 

@@ -47,8 +47,6 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 
 	buildProperties.SetPath("build.source.path", ctx.Sketch.FullPath)
 
-	buildProperties.Merge(ctx.PackageManager.GetCustomGlobalProperties())
-
 	keychainProp := buildProperties.ContainsKey("build.keys.keychain")
 	signProp := buildProperties.ContainsKey("build.keys.sign_key")
 	encryptProp := buildProperties.ContainsKey("build.keys.encrypt_key")
