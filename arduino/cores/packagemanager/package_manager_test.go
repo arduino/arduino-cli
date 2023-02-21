@@ -141,7 +141,7 @@ func TestResolveFQBN(t *testing.T) {
 	require.Equal(t, platformRelease.Platform.String(), "referenced:avr")
 	require.NotNil(t, board)
 	require.Equal(t, board.Name(), "Referenced dummy with invalid package")
-	require.NotNil(t, props)
+	require.Nil(t, props)
 	require.Nil(t, buildPlatformRelease)
 
 	// Test a board referenced from a non-existent platform/architecture
@@ -156,7 +156,7 @@ func TestResolveFQBN(t *testing.T) {
 	require.Equal(t, platformRelease.Platform.String(), "referenced:avr")
 	require.NotNil(t, board)
 	require.Equal(t, board.Name(), "Referenced dummy with invalid platform")
-	require.NotNil(t, props)
+	require.Nil(t, props)
 	require.Nil(t, buildPlatformRelease)
 
 	// Test a board referenced from a non-existent core

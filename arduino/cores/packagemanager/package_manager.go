@@ -293,7 +293,7 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 			fmt.Errorf(tr("board %s not found"), fqbn.StringWithoutConfig())
 	}
 
-	buildProperties, err := board.GetBuildProperties(fqbn.Configs)
+	boardBuildProperties, err := board.GetBuildProperties(fqbn.Configs)
 	if err != nil {
 		return targetPackage, platformRelease, board, nil, nil,
 			fmt.Errorf(tr("getting build properties for board %[1]s: %[2]s"), board, err)
@@ -301,18 +301,18 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 
 	// Determine the platform used for the build (in case the board refers
 	// to a core contained in another platform)
-	core := buildProperties.Get("build.core")
+	core := boardBuildProperties.Get("build.core")
 	referredCore := ""
 	if split := strings.Split(core, ":"); len(split) > 1 {
 		core, referredCore = split[1], split[0]
 	}
-	variant := buildProperties.Get("build.variant")
+	variant := boardBuildProperties.Get("build.variant")
 	referredVariant := ""
 	if split := strings.Split(variant, ":"); len(split) > 1 {
 		variant, referredVariant = split[1], split[0]
 	}
 	if referredCore != "" && referredVariant != "" && referredCore != referredVariant {
-		return targetPackage, platformRelease, board, buildProperties, nil,
+		return targetPackage, platformRelease, board, nil, nil,
 			fmt.Errorf(tr("'build.core' and 'build.variant' refer to different platforms: %[1]s and %[2]s"), core+":"+referredCore, variant+":"+referredVariant)
 	}
 
@@ -324,26 +324,34 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 	if referredPackageName != "" {
 		referredPackage := pme.packages[referredPackageName]
 		if referredPackage == nil {
-			return targetPackage, platformRelease, board, buildProperties, nil,
+			return targetPackage, platformRelease, board, nil, nil,
 				fmt.Errorf(tr("missing package %[1]s referenced by board %[2]s"), referredPackageName, fqbn)
 		}
 		referredPlatform := referredPackage.Platforms[fqbn.PlatformArch]
 		if referredPlatform == nil {
-			return targetPackage, platformRelease, board, buildProperties, nil,
+			return targetPackage, platformRelease, board, nil, nil,
 				fmt.Errorf(tr("missing platform %[1]s:%[2]s referenced by board %[3]s"), referredPackageName, fqbn.PlatformArch, fqbn)
 		}
 		referredPlatformRelease = pme.GetInstalledPlatformRelease(referredPlatform)
 		if referredPlatformRelease == nil {
-			return targetPackage, platformRelease, board, buildProperties, nil,
+			return targetPackage, platformRelease, board, nil, nil,
 				fmt.Errorf(tr("missing platform release %[1]s:%[2]s referenced by board %[3]s"), referredPackageName, fqbn.PlatformArch, fqbn)
 		}
 	}
 
-	// Runtime build properties
+	// Create the build properties map by overlaying the properties of the
+	// referenced platform propeties, the board platform properties and the
+	// board specific properties.
+	buildProperties := properties.NewMap()
 	buildPlatformRelease := platformRelease
 	if referredCore != "" {
 		buildPlatformRelease = referredPlatformRelease
 	}
+	buildProperties.Merge(buildPlatformRelease.Properties)
+	buildProperties.Merge(platformRelease.Properties)
+	buildProperties.Merge(boardBuildProperties)
+
+	// Add runtime build properties
 	buildProperties.Merge(platformRelease.RuntimeProperties())
 	buildProperties.SetPath("build.core.path", buildPlatformRelease.InstallDir.Join("cores", core))
 	buildProperties.SetPath("build.system.path", buildPlatformRelease.InstallDir.Join("system"))
@@ -389,7 +397,6 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 		buildProperties.Set("software", "ARDUINO")
 	}
 
-	// No errors... phew!
 	return targetPackage, platformRelease, board, buildProperties, buildPlatformRelease, nil
 }
 

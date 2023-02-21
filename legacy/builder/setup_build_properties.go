@@ -24,12 +24,7 @@ import (
 type SetupBuildProperties struct{}
 
 func (s *SetupBuildProperties) Run(ctx *types.Context) error {
-	targetPlatform := ctx.TargetPlatform
-	actualPlatform := ctx.ActualPlatform
-
 	buildProperties := properties.NewMap()
-	buildProperties.Merge(actualPlatform.Properties)
-	buildProperties.Merge(targetPlatform.Properties)
 	buildProperties.Merge(ctx.TargetBoardBuildProperties)
 
 	if ctx.BuildPath != nil {
@@ -59,7 +54,7 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	encryptProp := buildProperties.ContainsKey("build.keys.encrypt_key")
 	// we verify that all the properties for the secure boot keys are defined or none of them is defined.
 	if (keychainProp || signProp || encryptProp) && !(keychainProp && signProp && encryptProp) {
-		return errors.Errorf("%s platform does not specify correctly default sign and encryption keys", targetPlatform.Platform)
+		return errors.Errorf("%s platform does not specify correctly default sign and encryption keys", ctx.TargetPlatform.Platform)
 	}
 
 	ctx.BuildProperties = buildProperties
