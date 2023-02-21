@@ -321,6 +321,16 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 	buildProperties.Merge(platformRelease.RuntimeProperties())
 	buildProperties.SetPath("build.core.path", buildPlatformRelease.InstallDir.Join("cores", coreParts[0]))
 	buildProperties.SetPath("build.system.path", buildPlatformRelease.InstallDir.Join("system"))
+	for _, tool := range pme.GetAllInstalledToolsReleases() {
+		buildProperties.Merge(tool.RuntimeProperties())
+	}
+	requiredTools, err := pme.FindToolsRequiredForBuild(platformRelease, buildPlatformRelease)
+	if err != nil {
+		return targetPackage, platformRelease, board, buildProperties, buildPlatformRelease, err
+	}
+	for _, tool := range requiredTools {
+		buildProperties.Merge(tool.RuntimeProperties())
+	}
 
 	// No errors... phew!
 	return targetPackage, platformRelease, board, buildProperties, buildPlatformRelease, nil

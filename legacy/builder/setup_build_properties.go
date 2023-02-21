@@ -90,15 +90,6 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 		buildProperties.SetPath("build.variant.path", variantPlatformRelease.InstallDir.Join("variants", variant))
 	}
 
-	for _, tool := range ctx.AllTools {
-		buildProperties.SetPath("runtime.tools."+tool.Tool.Name+".path", tool.InstallDir)
-		buildProperties.SetPath("runtime.tools."+tool.Tool.Name+"-"+tool.Version.String()+".path", tool.InstallDir)
-	}
-	for _, tool := range ctx.RequiredTools {
-		buildProperties.SetPath("runtime.tools."+tool.Tool.Name+".path", tool.InstallDir)
-		buildProperties.SetPath("runtime.tools."+tool.Tool.Name+"-"+tool.Version.String()+".path", tool.InstallDir)
-	}
-
 	if !buildProperties.ContainsKey("software") {
 		buildProperties.Set("software", DEFAULT_SOFTWARE)
 	}
