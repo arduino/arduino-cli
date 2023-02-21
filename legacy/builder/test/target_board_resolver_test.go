@@ -180,7 +180,7 @@ func TestTargetBoardResolverCustomCore(t *testing.T) {
 	require.Equal(t, "avr", targetPlatform.Platform.Architecture)
 	targetBoard := ctx.TargetBoard
 	require.Equal(t, "attiny841", targetBoard.BoardID)
-	require.Equal(t, "tiny841", ctx.BuildCore)
+	require.Equal(t, "tiny841", ctx.TargetBoardBuildProperties.Get("build.core"))
 	targetBoardBuildProperties := ctx.TargetBoardBuildProperties
 	require.Equal(t, "tiny14", targetBoardBuildProperties.Get("build.variant"))
 }

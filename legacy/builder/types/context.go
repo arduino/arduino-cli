@@ -95,7 +95,6 @@ type Context struct {
 	HardwareRewriteResults map[*cores.PlatformRelease][]PlatforKeyRewrite
 
 	BuildProperties              *properties.Map
-	BuildCore                    string
 	BuildPath                    *paths.Path
 	SketchBuildPath              *paths.Path
 	CoreBuildPath                *paths.Path

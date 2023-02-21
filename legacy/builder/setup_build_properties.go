@@ -49,7 +49,6 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 		exPath = filepath.Dir(ex)
 	}
 
-	buildProperties.Set("build.core", ctx.BuildCore)
 	buildProperties.Set("runtime.ide.version", ctx.ArduinoAPIVersion)
 	buildProperties.Set("runtime.ide.path", exPath)
 	buildProperties.Set("ide_version", ctx.ArduinoAPIVersion)

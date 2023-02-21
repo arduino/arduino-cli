@@ -30,14 +30,13 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 		return fmt.Errorf("%s: %w", tr("Error resolving FQBN"), err)
 	}
 
-	core := buildProperties.Get("build.core")
-	if core == "" {
-		core = "arduino"
-	}
-	// select the core name in case of "package:core" format
-	core = core[strings.Index(core, ":")+1:]
-
 	if ctx.Verbose {
+		core := buildProperties.Get("build.core")
+		if core == "" {
+			core = "arduino"
+		}
+		// select the core name in case of "package:core" format
+		core = core[strings.Index(core, ":")+1:]
 		ctx.Info(tr("Using board '%[1]s' from platform in folder: %[2]s", targetBoard.BoardID, targetPlatform.InstallDir))
 		ctx.Info(tr("Using core '%[1]s' from platform in folder: %[2]s", core, buildPlatform.InstallDir))
 	}
@@ -55,7 +54,6 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 		return err
 	}
 
-	ctx.BuildCore = core
 	ctx.TargetBoard = targetBoard
 	ctx.TargetBoardBuildProperties = buildProperties
 	ctx.TargetPlatform = targetPlatform
