@@ -48,7 +48,6 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	if ctx.Sketch != nil {
 		buildProperties.Set("build.project_name", ctx.Sketch.MainFile.Base())
 	}
-	buildProperties.Set("build.arch", strings.ToUpper(targetPlatform.Platform.Architecture))
 
 	// get base folder and use it to populate BUILD_PROPERTIES_RUNTIME_IDE_PATH (arduino and arduino-builder live in the same dir)
 	ex, err := os.Executable()
@@ -64,7 +63,6 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	buildProperties.Set("runtime.hardware.path", targetPlatform.InstallDir.Join("..").String())
 	buildProperties.Set("runtime.ide.version", ctx.ArduinoAPIVersion)
 	buildProperties.Set("runtime.ide.path", exPath)
-	buildProperties.Set("build.fqbn", ctx.FQBN.String())
 	buildProperties.Set("ide_version", ctx.ArduinoAPIVersion)
 	buildProperties.Set("runtime.os", properties.GetOSSuffix())
 	buildProperties.Set("build.library_discovery_phase", "0")
