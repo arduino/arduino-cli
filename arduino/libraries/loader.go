@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -126,6 +127,11 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 }
 
 func makeLegacyLibrary(path *paths.Path, location LibraryLocation) (*Library, error) {
+	if foundHeader, err := containsHeaderFile(path); err != nil {
+		return nil, err
+	} else if !foundHeader {
+		return nil, errors.Errorf(tr("invalid library: no header files found"))
+	}
 	library := &Library{
 		InstallDir:    path.Canonical(),
 		Location:      location,
@@ -185,4 +191,20 @@ func addExamplesToPathList(examplesPath *paths.Path, list *paths.PathList) error
 		}
 	}
 	return nil
+}
+
+// containsHeaderFile returns true if the directory contains a ".h" file.
+// Returns false otherwise
+func containsHeaderFile(d *paths.Path) (bool, error) {
+	dirContent, err := d.ReadDir()
+	if err != nil {
+		return false, fmt.Errorf(tr("reading directory %[1]s content: %[2]w", d, err))
+	}
+	dirContent.FilterOutDirs()
+	headerExtensions := []string{}
+	for k := range globals.HeaderFilesValidExtensions {
+		headerExtensions = append(headerExtensions, k)
+	}
+	dirContent.FilterSuffix(headerExtensions...)
+	return len(dirContent) > 0, nil
 }
