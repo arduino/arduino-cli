@@ -18,14 +18,11 @@ package builder
 import (
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
-	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	properties "github.com/arduino/go-properties-orderedmap"
-	timeutils "github.com/arduino/go-timeutils"
 	"github.com/pkg/errors"
 )
 
@@ -95,12 +92,6 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	}
 
 	buildProperties.SetPath("build.source.path", ctx.Sketch.FullPath)
-
-	now := time.Now()
-	buildProperties.Set("extra.time.utc", strconv.FormatInt(now.Unix(), 10))
-	buildProperties.Set("extra.time.local", strconv.FormatInt(timeutils.LocalUnix(now), 10))
-	buildProperties.Set("extra.time.zone", strconv.Itoa(timeutils.TimezoneOffsetNoDST(now)))
-	buildProperties.Set("extra.time.dst", strconv.Itoa(timeutils.DaylightSavingsOffset(now)))
 
 	buildProperties.Merge(ctx.PackageManager.GetCustomGlobalProperties())
 

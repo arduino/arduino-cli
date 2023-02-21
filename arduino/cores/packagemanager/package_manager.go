@@ -19,8 +19,10 @@ import (
 	"fmt"
 	"net/url"
 	"path"
+	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
@@ -29,6 +31,7 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"github.com/arduino/go-timeutils"
 	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -331,6 +334,11 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 	for _, tool := range requiredTools {
 		buildProperties.Merge(tool.RuntimeProperties())
 	}
+	now := time.Now()
+	buildProperties.Set("extra.time.utc", strconv.FormatInt(now.Unix(), 10))
+	buildProperties.Set("extra.time.local", strconv.FormatInt(timeutils.LocalUnix(now), 10))
+	buildProperties.Set("extra.time.zone", strconv.Itoa(timeutils.TimezoneOffsetNoDST(now)))
+	buildProperties.Set("extra.time.dst", strconv.Itoa(timeutils.DaylightSavingsOffset(now)))
 
 	// No errors... phew!
 	return targetPackage, platformRelease, board, buildProperties, buildPlatformRelease, nil
