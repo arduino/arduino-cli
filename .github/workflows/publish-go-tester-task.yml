@@ -111,6 +111,9 @@ jobs:
           - task: protoc:collect
             path: "*_proto.zip"
             name: rpc-protocol-files
+          - task: dist:jsonschema
+            path: "*configuration.schema.json"
+            name: configuration-schema
 
     steps:
       - name: Checkout repository
@@ -146,7 +149,6 @@ jobs:
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v3
-
       - name: Output checksum
         run: |
           TAG="${{ needs.package-name-prefix.outputs.prefix }}git-snapshot"

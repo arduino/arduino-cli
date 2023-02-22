@@ -9,6 +9,7 @@ See [how to contribute](https://arduino.github.io/arduino-cli/latest/CONTRIBUTIN
 - [ ] Tests for the changes have been added (for bug fixes / features)
 - [ ] Docs have been added / updated (for bug fixes / features)
 - [ ] `UPGRADING.md` has been updated with a migration guide (for breaking changes)
+- [ ] `configuration.schema.json` updated if new parameters are added.
 
 ## What kind of change does this PR introduce?
 

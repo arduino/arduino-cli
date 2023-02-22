@@ -36,6 +36,7 @@ jobs:
           - Linux_ARM64
           - macOS_64bit
           - macOS_ARM64
+          - jsonschema
 
     steps:
       - name: Checkout repository
