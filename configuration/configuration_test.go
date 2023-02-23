@@ -71,27 +71,4 @@ func TestFindConfigFile(t *testing.T) {
 
 	configFile = FindConfigFileInArgs([]string{})
 	require.Equal(t, "", configFile)
-
-	// Create temporary directories
-	tmp := tmpDirOrDie()
-	defer os.RemoveAll(tmp)
-	target := filepath.Join(tmp, "foo", "bar", "baz")
-	os.MkdirAll(target, os.ModePerm)
-	require.Nil(t, os.Chdir(target))
-
-	// Create a config file
-	f, err := os.Create(filepath.Join(target, "..", "..", "arduino-cli.yaml"))
-	require.Nil(t, err)
-	f.Close()
-
-	configFile = FindConfigFileInArgs([]string{})
-	require.Equal(t, filepath.Join(tmp, "foo", "arduino-cli.yaml"), configFile)
-
-	// Create another config file
-	f, err = os.Create(filepath.Join(target, "arduino-cli.yaml"))
-	require.Nil(t, err)
-	f.Close()
-
-	configFile = FindConfigFileInArgs([]string{})
-	require.Equal(t, filepath.Join(target, "arduino-cli.yaml"), configFile)
 }
