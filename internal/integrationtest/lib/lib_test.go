@@ -620,7 +620,7 @@ func TestInstallWithGitUrl(t *testing.T) {
 	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
 
 	// Test git-url library install
-	stdout, _, err := cli.Run("lib", "install", "--git-url", gitUrl)
+	stdout, _, err := cli.Run("lib", "install", "--git-url", gitUrl, "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
 
@@ -628,7 +628,7 @@ func TestInstallWithGitUrl(t *testing.T) {
 	require.DirExists(t, libInstallDir.String())
 
 	// Reinstall library
-	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl)
+	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl, "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 
 	// Verifies library remains installed
@@ -652,16 +652,16 @@ func TestInstallWithGitUrlFragmentAsBranch(t *testing.T) {
 	gitUrl := "https://github.com/arduino-libraries/WiFi101.git"
 
 	// Test that a bad ref fails
-	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#x-ref-does-not-exist")
+	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#x-ref-does-not-exist", "--config-file", "arduino-cli.yaml")
 	require.Error(t, err)
 
 	// Verifies library is installed in expected path
-	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#0.16.0")
+	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#0.16.0", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 	require.DirExists(t, libInstallDir.String())
 
 	// Reinstall library at an existing ref
-	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#master")
+	_, _, err = cli.Run("lib", "install", "--git-url", gitUrl+"#master", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 
 	// Verifies library remains installed
@@ -1129,7 +1129,7 @@ func TestInstallZipLibWithMacosMetadata(t *testing.T) {
 	zipPath, err := paths.New("..", "testdata", "fake-lib.zip").Abs()
 	require.NoError(t, err)
 	// Test zip-path install
-	stdout, _, err := cli.Run("lib", "install", "--zip-path", zipPath.String())
+	stdout, _, err := cli.Run("lib", "install", "--zip-path", zipPath.String(), "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
 
@@ -1139,7 +1139,9 @@ func TestInstallZipLibWithMacosMetadata(t *testing.T) {
 	require.FileExists(t, libInstallDir.Join("src", "fake-lib.h").String())
 
 	// Reinstall library
-	_, _, err = cli.Run("lib", "install", "--zip-path", zipPath.String())
+	_, _, err = cli.Run("lib", "install",
+		"--zip-path", zipPath.String(),
+		"--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 
 	// Verifies library remains installed
@@ -1165,7 +1167,7 @@ func TestInstallZipInvalidLibrary(t *testing.T) {
 	zipPath, err := paths.New("..", "testdata", "lib-without-header.zip").Abs()
 	require.NoError(t, err)
 	// Test zip-path install
-	_, stderr, err := cli.Run("lib", "install", "--zip-path", zipPath.String())
+	_, stderr, err := cli.Run("lib", "install", "--zip-path", zipPath.String(), "--config-file", "arduino-cli.yaml")
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "library not valid")
 
@@ -1176,7 +1178,7 @@ func TestInstallZipInvalidLibrary(t *testing.T) {
 	zipPath, err = paths.New("..", "testdata", "lib-without-properties.zip").Abs()
 	require.NoError(t, err)
 	// Test zip-path install
-	_, stderr, err = cli.Run("lib", "install", "--zip-path", zipPath.String())
+	_, stderr, err = cli.Run("lib", "install", "--zip-path", zipPath.String(), "--config-file", "arduino-cli.yaml")
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "library not valid")
 }
@@ -1211,7 +1213,7 @@ func TestInstallGitInvalidLibrary(t *testing.T) {
 	// Verifies library is not already installed
 	require.NoDirExists(t, libInstallDir.String())
 
-	_, stderr, err := cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", repoDir.String())
+	_, stderr, err := cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", repoDir.String(), "--config-file", "arduino-cli.yaml")
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "library not valid")
 	require.NoDirExists(t, libInstallDir.String())
@@ -1237,7 +1239,7 @@ func TestInstallGitInvalidLibrary(t *testing.T) {
 	// Verifies library is not already installed
 	require.NoDirExists(t, libInstallDir.String())
 
-	_, stderr, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", repoDir.String())
+	_, stderr, err = cli.RunWithCustomEnv(envVar, "lib", "install", "--git-url", repoDir.String(), "--config-file", "arduino-cli.yaml")
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "library not valid")
 	require.NoDirExists(t, libInstallDir.String())
@@ -1358,11 +1360,11 @@ func TestInstallGitUrlAndZipPathFlagsVisibility(t *testing.T) {
 	_, _, err = cli.RunWithCustomEnv(envVar, "config", "init", "--dest-dir", ".")
 	require.NoError(t, err)
 
-	stdout, _, err = cli.Run("lib", "install", "--git-url", gitUrl)
+	stdout, _, err = cli.Run("lib", "install", "--git-url", gitUrl, "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
 
-	stdout, _, err = cli.Run("lib", "install", "--zip-path", zipPath.String())
+	stdout, _, err = cli.Run("lib", "install", "--zip-path", zipPath.String(), "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
 }
@@ -1389,7 +1391,7 @@ func TestInstallWithZipPath(t *testing.T) {
 	require.NoDirExists(t, libInstallDir.String())
 
 	// Test zip-path install
-	stdout, _, err := cli.Run("lib", "install", "--zip-path", zipPath.String())
+	stdout, _, err := cli.Run("lib", "install", "--zip-path", zipPath.String(), "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk.")
 
@@ -1405,7 +1407,7 @@ func TestInstallWithZipPath(t *testing.T) {
 	require.Contains(t, files, libInstallDir.Join("README.adoc"))
 
 	// Reinstall library
-	_, _, err = cli.Run("lib", "install", "--zip-path", zipPath.String())
+	_, _, err = cli.Run("lib", "install", "--zip-path", zipPath.String(), "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 
 	// Verifies library remains installed

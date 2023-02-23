@@ -964,12 +964,12 @@ func TestCoreIndexWithoutChecksum(t *testing.T) {
 	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
 	require.NoError(t, err)
 	url := "https://raw.githubusercontent.com/keyboardio/ArduinoCore-GD32-Keyboardio/ae5938af2f485910729e7d27aa233032a1cb4734/package_gd32_index.json" // noqa: E501
-	_, _, err = cli.Run("config", "add", "board_manager.additional_urls", url)
+	_, _, err = cli.Run("config", "add", "board_manager.additional_urls", url, "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 
-	_, _, err = cli.Run("core", "update-index")
+	_, _, err = cli.Run("core", "update-index", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
-	_, _, err = cli.Run("core", "list", "--all")
+	_, _, err = cli.Run("core", "list", "--all", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err) // this should not make the cli crash
 }
 

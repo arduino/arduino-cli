@@ -526,7 +526,7 @@ func compileWithExportBinariesConfig(t *testing.T, env *integrationtest.Environm
 	defer cli.WorkingDir().Join("arduino-cli.yaml").Remove()
 
 	// Test if arduino-cli config file written in the previous run has the `always_export_binaries` flag set.
-	stdout, _, err := cli.Run("config", "dump", "--format", "json")
+	stdout, _, err := cli.Run("config", "dump", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 	requirejson.Contains(t, stdout, `
 		{
@@ -536,7 +536,7 @@ func compileWithExportBinariesConfig(t *testing.T, env *integrationtest.Environm
 		}`)
 
 	// Test compilation with export binaries env var set
-	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String())
+	_, _, err = cli.Run("compile", "-b", fqbn, "--config-file", "arduino-cli.yaml", sketchPath.String())
 	require.NoError(t, err)
 	require.DirExists(t, sketchPath.Join("build").String())
 
@@ -563,7 +563,7 @@ func compileWithInvalidUrl(t *testing.T, env *integrationtest.Environment, cli *
 	require.NoError(t, err)
 	defer cli.WorkingDir().Join("arduino-cli.yaml").Remove()
 
-	_, stderr, err := cli.Run("compile", "-b", fqbn, sketchPath.String())
+	_, stderr, err := cli.Run("compile", "-b", fqbn, "--config-file", "arduino-cli.yaml", sketchPath.String())
 	require.NoError(t, err)
 	require.Contains(t, string(stderr), "Error initializing instance: Loading index file: loading json index file")
 	expectedIndexfile := cli.DataDir().Join("package_example_index.json")
@@ -813,10 +813,10 @@ func TestCompileWithCustomLibraries(t *testing.T) {
 	require.NoError(t, err)
 
 	// Init the environment explicitly
-	_, _, err = cli.Run("update")
+	_, _, err = cli.Run("update", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 
-	_, _, err = cli.Run("core", "install", "esp8266:esp8266")
+	_, _, err = cli.Run("core", "install", "esp8266:esp8266", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 
 	sketchName := "sketch_with_multiple_custom_libraries"
@@ -825,7 +825,12 @@ func TestCompileWithCustomLibraries(t *testing.T) {
 
 	firstLib := sketchPath.Join("libraries1")
 	secondLib := sketchPath.Join("libraries2")
-	_, _, err = cli.Run("compile", "--libraries", firstLib.String(), "--libraries", secondLib.String(), "-b", fqbn, sketchPath.String())
+	_, _, err = cli.Run("compile", "--libraries",
+		firstLib.String(),
+		"--libraries", secondLib.String(),
+		"-b", fqbn,
+		"--config-file", "arduino-cli.yaml",
+		sketchPath.String())
 	require.NoError(t, err)
 }
 
@@ -839,18 +844,18 @@ func TestCompileWithArchivesAndLongPaths(t *testing.T) {
 	require.NoError(t, err)
 
 	// Init the environment explicitly
-	_, _, err = cli.Run("update")
+	_, _, err = cli.Run("update", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 
 	// Install core to compile
-	_, _, err = cli.Run("core", "install", "esp8266:esp8266@2.7.4")
+	_, _, err = cli.Run("core", "install", "esp8266:esp8266@2.7.4", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 
 	// Install test library
-	_, _, err = cli.Run("lib", "install", "ArduinoIoTCloud")
+	_, _, err = cli.Run("lib", "install", "ArduinoIoTCloud", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 
-	stdout, _, err := cli.Run("lib", "examples", "ArduinoIoTCloud", "--format", "json")
+	stdout, _, err := cli.Run("lib", "examples", "ArduinoIoTCloud", "--format", "json", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 	var libOutput []map[string]interface{}
 	err = json.Unmarshal(stdout, &libOutput)
@@ -858,7 +863,7 @@ func TestCompileWithArchivesAndLongPaths(t *testing.T) {
 	sketchPath := paths.New(libOutput[0]["library"].(map[string]interface{})["install_dir"].(string))
 	sketchPath = sketchPath.Join("examples", "ArduinoIoTCloud-Advanced")
 
-	_, _, err = cli.Run("compile", "-b", "esp8266:esp8266:huzzah", sketchPath.String())
+	_, _, err = cli.Run("compile", "-b", "esp8266:esp8266:huzzah", sketchPath.String(), "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 }
 
@@ -908,16 +913,19 @@ func TestCompileWithFullyPrecompiledLibrary(t *testing.T) {
 	// https://arduino.github.io/arduino-cli/latest/library-specification/#precompiled-binaries
 	wd, err := paths.Getwd()
 	require.NoError(t, err)
-	_, _, err = cli.Run("lib", "install", "--zip-path", wd.Parent().Join("testdata", "Arduino_TensorFlowLite-2.1.0-ALPHA-precompiled.zip").String())
+	_, _, err = cli.Run("lib", "install",
+		"--zip-path", wd.Parent().Join("testdata", "Arduino_TensorFlowLite-2.1.0-ALPHA-precompiled.zip").String(),
+		"--config-file", "arduino-cli.yaml",
+	)
 	require.NoError(t, err)
 	sketchFolder := cli.SketchbookDir().Join("libraries", "Arduino_TensorFlowLite", "examples", "hello_world")
 
 	// Install example dependency
-	_, _, err = cli.Run("lib", "install", "Arduino_LSM9DS1")
+	_, _, err = cli.Run("lib", "install", "Arduino_LSM9DS1", "--config-file", "arduino-cli.yaml")
 	require.NoError(t, err)
 
 	// Compile and verify dependencies detection for fully precompiled library is skipped
-	stdout, _, err := cli.Run("compile", "-b", fqbn, sketchFolder.String(), "-v")
+	stdout, _, err := cli.Run("compile", "-b", fqbn, "--config-file", "arduino-cli.yaml", sketchFolder.String(), "-v")
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "Skipping dependencies detection for precompiled library Arduino_TensorFlowLite")
 }
