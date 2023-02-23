@@ -306,7 +306,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 				e := &arduino.InitFailedError{
 					Code:   codes.InvalidArgument,
 					Cause:  fmt.Errorf(tr("Invalid additional URL: %v", err)),
-					Reason: arduino.InvalidIndexURL,
+					Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INVALID_INDEX_URL,
 				}
 				responseError(e.ToRPCStatus())
 				continue
@@ -318,7 +318,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 					e := &arduino.InitFailedError{
 						Code:   codes.FailedPrecondition,
 						Cause:  fmt.Errorf(tr("Loading index file: %v", err)),
-						Reason: arduino.ErrorIndexLoad,
+						Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR,
 					}
 					responseError(e.ToRPCStatus())
 				}
@@ -329,7 +329,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 				e := &arduino.InitFailedError{
 					Code:   codes.FailedPrecondition,
 					Cause:  fmt.Errorf(tr("Loading index file: %v", err)),
-					Reason: arduino.ErrorIndexLoad,
+					Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR,
 				}
 				responseError(e.ToRPCStatus())
 			}
@@ -346,7 +346,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 				e := &arduino.InitFailedError{
 					Code:   codes.Internal,
 					Cause:  fmt.Errorf(tr("can't find latest release of tool %s", name)),
-					Reason: arduino.ErrorToolLoad,
+					Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR,
 				}
 				responseError(e.ToRPCStatus())
 			} else if !latest.IsInstalled() {
@@ -361,7 +361,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 					e := &arduino.InitFailedError{
 						Code:   codes.Internal,
 						Cause:  err,
-						Reason: arduino.ErrorToolLoad,
+						Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR,
 					}
 					responseError(e.ToRPCStatus())
 				}

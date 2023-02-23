@@ -308,25 +308,11 @@ func (e *ProgrammerRequiredForUploadError) ToRPCStatus() *status.Status {
 	return st
 }
 
-// FailedInstanceInitReason specifies the reason of a failed initialization
-type FailedInstanceInitReason string
-
-const (
-	// Unspecified the error reason is not specialized
-	Unspecified FailedInstanceInitReason = "UNSPECIFIED"
-	// InvalidIndexURL a package index url is malformed
-	InvalidIndexURL FailedInstanceInitReason = "INVALID_INDEX_URL"
-	// ErrorIndexLoad failure encountered while loading an index
-	ErrorIndexLoad FailedInstanceInitReason = "INDEX_LOAD_ERROR"
-	// ErrorToolLoad failure encountered while loading a tool
-	ErrorToolLoad FailedInstanceInitReason = "TOOL_LOAD_ERROR"
-)
-
 // InitFailedError is returned when the instance initialization fails
 type InitFailedError struct {
 	Code   codes.Code
 	Cause  error
-	Reason FailedInstanceInitReason
+	Reason rpc.FailedInstanceInitReason
 }
 
 func (ife *InitFailedError) Error() string {
@@ -338,7 +324,7 @@ func (ife *InitFailedError) ToRPCStatus() *status.Status {
 	st, _ := status.
 		New(ife.Code, ife.Cause.Error()).
 		WithDetails(&rpc.FailedInstanceInitError{
-			Reason:  string(ife.Reason),
+			Reason:  ife.Reason,
 			Message: ife.Cause.Error(),
 		})
 	return st
