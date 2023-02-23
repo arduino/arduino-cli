@@ -34,9 +34,8 @@ import (
 func initSearchCommand() *cobra.Command {
 	var searchCommand = &cobra.Command{
 		Use:   fmt.Sprintf("search [%s]", tr("boardname")),
-		Short: tr("List all known boards and their corresponding FQBN."),
-		Long: tr(`List all boards that have the support platform installed. You can search
-for a specific board if you specify the board name`),
+		Short: tr("Search for a board in the Boards Manager."),
+		Long:  tr(`Search for a board in the Boards Manager using the specified keywords.`),
 		Example: "" +
 			"  " + os.Args[0] + " board search\n" +
 			"  " + os.Args[0] + " board search zero",

@@ -251,3 +251,9 @@ tasks:
       CONTAINER_TAG: "{{.GO_VERSION}}-darwin-arm64-debian10"
       PACKAGE_PLATFORM: "macOS_ARM64"
       PACKAGE_NAME: "{{.PROJECT_NAME}}_{{.VERSION}}_{{.PACKAGE_PLATFORM}}.tar.gz"
+
+  jsonschema:
+    desc: Copy the JSON schema to dist folder
+    cmds:
+      - mkdir --parents {{.DIST_DIR}}
+      - cp ./configuration/configuration.schema.json {{.DIST_DIR}}/{{.PROJECT_NAME}}_{{.VERSION}}_configuration.schema.json

@@ -146,6 +146,11 @@ Doing the same using a TOML format file:
 additional_urls = [ "https://downloads.arduino.cc/packages/package_staging_index.json" ]
 ```
 
+#### JSON schema
+
+The configuration file [JSON schema][configuration-schema] can be used to independently validate the file content. This
+schema should be considered unstable in this version.
+
 [grpc]: https://grpc.io
 [sketchbook directory]: sketch-specification.md#sketchbook
 [arduino cli lib install]: commands/arduino-cli_lib_install.md
@@ -164,3 +169,4 @@ additional_urls = [ "https://downloads.arduino.cc/packages/package_staging_index
 [java properties file]: https://en.wikipedia.org/wiki/.properties
 [hcl]: https://github.com/hashicorp/hcl
 [ini]: https://en.wikipedia.org/wiki/INI_file
+[configuration-schema]: ./configuration.schema.json

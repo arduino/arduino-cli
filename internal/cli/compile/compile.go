@@ -38,15 +38,36 @@ import (
 	"github.com/arduino/arduino-cli/table"
 	"github.com/arduino/arduino-cli/version"
 	"github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
+type showPropertiesMode int
+
+const (
+	showPropertiesModeDisabled showPropertiesMode = iota
+	showPropertiesModeUnexpanded
+	showPropertiesModeExpanded
+)
+
+func parseShowPropertiesMode(showProperties string) (showPropertiesMode, error) {
+	val, ok := map[string]showPropertiesMode{
+		"disabled":   showPropertiesModeDisabled,
+		"unexpanded": showPropertiesModeUnexpanded,
+		"expanded":   showPropertiesModeExpanded,
+	}[showProperties]
+	if !ok {
+		return showPropertiesModeDisabled, fmt.Errorf(tr("invalid option '%s'.", showProperties))
+	}
+	return val, nil
+}
+
 var (
 	fqbnArg                 arguments.Fqbn       // Fully Qualified Board Name, e.g.: arduino:avr:uno.
 	profileArg              arguments.Profile    // Profile to use
-	showProperties          bool                 // Show all build preferences used instead of compiling.
+	showProperties          string               // Show all build preferences used instead of compiling.
 	preprocess              bool                 // Print preprocessed code to stdout.
 	buildCachePath          string               // Builds of 'core.a' are saved into this path to be cached and reused.
 	buildPath               string               // Path where to save compiled files.
@@ -95,7 +116,13 @@ func NewCommand() *cobra.Command {
 	fqbnArg.AddToCommand(compileCommand)
 	profileArg.AddToCommand(compileCommand)
 	compileCommand.Flags().BoolVar(&dumpProfile, "dump-profile", false, tr("Create and print a profile configuration from the build."))
-	compileCommand.Flags().BoolVar(&showProperties, "show-properties", false, tr("Show all build properties used instead of compiling."))
+	compileCommand.Flags().StringVar(
+		&showProperties,
+		"show-properties",
+		"disabled",
+		tr(`Show build properties instead of compiling. The properties are returned exactly as they are defined. Use "--show-properties=expanded" to replace placeholders with compilation context values.`),
+	)
+	compileCommand.Flags().Lookup("show-properties").NoOptDefVal = "unexpanded" // default if the flag is present with no value
 	compileCommand.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
 	compileCommand.Flags().StringVar(&buildCachePath, "build-cache-path", "", tr("Builds of 'core.a' are saved into this path to be cached and reused."))
 	compileCommand.Flags().StringVarP(&exportDir, "output-dir", "", "", tr("Save build artifacts in this directory."))
@@ -188,9 +215,14 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		overrides = o.Overrides
 	}
 
+	showPropertiesM, err := parseShowPropertiesMode(showProperties)
+	if err != nil {
+		feedback.Fatal(tr("Error parsing --show-properties flag: %v", err), feedback.ErrGeneric)
+	}
+
 	var stdOut, stdErr io.Writer
 	var stdIORes func() *feedback.OutputStreamsResult
-	if showProperties {
+	if showPropertiesM != showPropertiesModeDisabled {
 		stdOut, stdErr, stdIORes = feedback.NewBufferedStreams()
 	} else {
 		stdOut, stdErr, stdIORes = feedback.OutputStreams()
@@ -200,7 +232,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		Instance:                      inst,
 		Fqbn:                          fqbn,
 		SketchPath:                    sketchPath.String(),
-		ShowProperties:                showProperties,
+		ShowProperties:                showPropertiesM != showPropertiesModeDisabled,
 		Preprocess:                    preprocess,
 		BuildCachePath:                buildCachePath,
 		BuildPath:                     buildPath,
@@ -318,7 +350,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		BuilderResult:      compileRes,
 		ProfileOut:         profileOut,
 		Success:            compileError == nil,
-		showOnlyProperties: showProperties,
+		showPropertiesMode: showPropertiesM,
 	}
 
 	if compileError != nil {
@@ -353,7 +385,22 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		}
 		feedback.FatalResult(res, feedback.ErrGeneric)
 	}
+	if showPropertiesM == showPropertiesModeExpanded {
+		expandPropertiesInResult(res)
+	}
 	feedback.PrintResult(res)
+}
+
+func expandPropertiesInResult(res *compileResult) {
+	expanded, err := properties.LoadFromSlice(res.BuilderResult.GetBuildProperties())
+	if err != nil {
+		res.Error = tr(err.Error())
+	}
+	expandedSlice := make([]string, expanded.Size())
+	for i, k := range expanded.Keys() {
+		expandedSlice[i] = strings.Join([]string{k, expanded.ExpandPropsInString(expanded.Get(k))}, "=")
+	}
+	res.BuilderResult.BuildProperties = expandedSlice
 }
 
 type compileResult struct {
@@ -364,7 +411,7 @@ type compileResult struct {
 	ProfileOut    string               `json:"profile_out,omitempty"`
 	Error         string               `json:"error,omitempty"`
 
-	showOnlyProperties bool
+	showPropertiesMode showPropertiesMode
 }
 
 func (r *compileResult) Data() interface{} {
@@ -372,8 +419,8 @@ func (r *compileResult) Data() interface{} {
 }
 
 func (r *compileResult) String() string {
-	if r.showOnlyProperties {
-		return strings.Join(r.BuilderResult.BuildProperties, fmt.Sprintln())
+	if r.showPropertiesMode != showPropertiesModeDisabled {
+		return strings.Join(r.BuilderResult.GetBuildProperties(), fmt.Sprintln())
 	}
 
 	titleColor := color.New(color.FgHiGreen)
