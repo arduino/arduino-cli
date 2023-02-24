@@ -73,10 +73,13 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		return nil, &arduino.MissingSketchPathError{}
 	}
 	sketchPath := paths.New(req.GetSketchPath())
-	sk, err := sketch.New(sketchPath)
-	if err != nil {
-		return nil, &arduino.CantOpenSketchError{Cause: err}
+	builderCtx := &types.Context{}
+	builderCtx.PackageManager = pme
+	if pme.GetProfile() != nil {
+		builderCtx.LibrariesManager = lm
 	}
+
+	sk, newSketchErr := sketch.New(sketchPath)
 
 	fqbnIn := req.GetFqbn()
 	if fqbnIn == "" && sk != nil {
@@ -111,13 +114,23 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		securityKeysOverride = append(securityKeysOverride, "build.keys.keychain="+req.KeysKeychain, "build.keys.sign_key="+req.GetSignKey(), "build.keys.encrypt_key="+req.EncryptKey)
 	}
 
-	builderCtx := &types.Context{}
-	builderCtx.PackageManager = pme
-	if pme.GetProfile() != nil {
-		builderCtx.LibrariesManager = lm
-	}
 	builderCtx.UseCachedLibrariesResolution = req.GetSkipLibrariesDiscovery()
 	builderCtx.FQBN = fqbn
+	defer func() {
+		appendBuildProperties(r, builderCtx)
+	}()
+	r = &rpc.CompileResponse{}
+	if newSketchErr != nil {
+		if req.GetShowProperties() {
+			// Just get build properties and exit
+			compileErr := builder.RunParseHardware(builderCtx)
+			if compileErr != nil {
+				compileErr = &arduino.CompileFailedError{Message: compileErr.Error()}
+			}
+			return r, compileErr
+		}
+		return nil, &arduino.CantOpenSketchError{Cause: err}
+	}
 	builderCtx.Sketch = sk
 	builderCtx.ProgressCB = progressCB
 
@@ -187,7 +200,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.OnlyUpdateCompilationDatabase = req.GetCreateCompilationDatabaseOnly()
 	builderCtx.SourceOverride = req.GetSourceOverride()
 
-	r = &rpc.CompileResponse{}
 	defer func() {
 		if p := builderCtx.BuildPath; p != nil {
 			r.BuildPath = p.String()
@@ -197,18 +209,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		}
 		if pl := builderCtx.ActualPlatform; pl != nil {
 			r.BuildPlatform = pl.ToRPCPlatformReference()
-		}
-	}()
-
-	defer func() {
-		buildProperties := builderCtx.BuildProperties
-		if buildProperties == nil {
-			return
-		}
-		keys := buildProperties.Keys()
-		sort.Strings(keys)
-		for _, key := range keys {
-			r.BuildProperties = append(r.BuildProperties, key+"="+buildProperties.Get(key))
 		}
 	}()
 
@@ -231,16 +231,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	}
 
 	defer func() {
-		importedLibs := []*rpc.Library{}
-		for _, lib := range builderCtx.ImportedLibraries {
-			rpcLib, err := lib.ToRPCLibrary()
-			if err != nil {
-				msg := tr("Error getting information for library %s", lib.Name) + ": " + err.Error() + "\n"
-				errStream.Write([]byte(msg))
-			}
-			importedLibs = append(importedLibs, rpcLib)
-		}
-		r.UsedLibraries = importedLibs
+		appendUserLibraries(r, builderCtx, errStream)
 	}()
 
 	// if it's a regular build, go on...
@@ -307,6 +298,32 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	logrus.Tracef("Compile %s for %s successful", sk.Name, fqbnIn)
 
 	return r, nil
+}
+
+func appendUserLibraries(r *rpc.CompileResponse, builderCtx *types.Context, errStream io.Writer) {
+	importedLibs := []*rpc.Library{}
+	for _, lib := range builderCtx.ImportedLibraries {
+		rpcLib, err := lib.ToRPCLibrary()
+		if err != nil {
+			msg := tr("Error getting information for library %s", lib.Name) + ": " + err.Error() + "\n"
+			errStream.Write([]byte(msg))
+		}
+		importedLibs = append(importedLibs, rpcLib)
+	}
+	r.UsedLibraries = importedLibs
+}
+
+func appendBuildProperties(r *rpc.CompileResponse, builderCtx *types.Context) bool {
+	buildProperties := builderCtx.BuildProperties
+	if buildProperties == nil {
+		return true
+	}
+	keys := buildProperties.Keys()
+	sort.Strings(keys)
+	for _, key := range keys {
+		r.BuildProperties = append(r.BuildProperties, key+"="+buildProperties.Get(key))
+	}
+	return false
 }
 
 // maybePurgeBuildCache runs the build files cache purge if the policy conditions are met.

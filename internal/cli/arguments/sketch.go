@@ -43,7 +43,13 @@ func InitSketchPath(path string) (sketchPath *paths.Path) {
 }
 
 // NewSketch is a helper function useful to create a sketch instance
-func NewSketch(sketchPath *paths.Path) *sketch.Sketch {
+func NewSketch(sketchPath *paths.Path) (*sketch.Sketch, error) {
+	return sketch.New(sketchPath)
+}
+
+// MustNewSketch is a helper function useful to create a sketch instance, exits if the
+// initialization fails
+func MustNewSketch(sketchPath *paths.Path) *sketch.Sketch {
 	sketch, err := sketch.New(sketchPath)
 	if err != nil {
 		feedback.Fatal(tr("Error opening sketch: %v", err), feedback.ErrGeneric)

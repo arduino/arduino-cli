@@ -180,6 +180,10 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			feedback.Fatal(tr("You cannot use the %s flag while compiling with a profile.", "--library"), feedback.ErrBadArgument)
 		}
 	}
+	showPropertiesM, err := parseShowPropertiesMode(showProperties)
+	if err != nil {
+		feedback.Fatal(tr("Error parsing --show-properties flag: %v", err), feedback.ErrGeneric)
+	}
 
 	path := ""
 	if len(args) > 0 {
@@ -187,7 +191,18 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	}
 
 	sketchPath := arguments.InitSketchPath(path)
-	sk := arguments.NewSketch(sketchPath)
+	sk, err := arguments.NewSketch(sketchPath)
+
+	if err != nil {
+		showPropertiesWithEmptySketchPath := path == "" && showPropertiesM != showPropertiesModeDisabled
+		if showPropertiesWithEmptySketchPath {
+			// properties were requested and no sketch path was provided
+			// let's use an empty sketch struct and hope for the best
+			sk = nil
+		} else {
+			feedback.Fatal(tr("Error opening sketch: %v", err), feedback.ErrGeneric)
+		}
+	}
 
 	inst, profile := instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
 	if fqbnArg.String() == "" {
@@ -213,11 +228,6 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			feedback.Fatal(tr("Error: invalid source code overrides data file: %v", err), feedback.ErrGeneric)
 		}
 		overrides = o.Overrides
-	}
-
-	showPropertiesM, err := parseShowPropertiesMode(showProperties)
-	if err != nil {
-		feedback.Fatal(tr("Error parsing --show-properties flag: %v", err), feedback.ErrGeneric)
 	}
 
 	var stdOut, stdErr io.Writer

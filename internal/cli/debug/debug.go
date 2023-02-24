@@ -75,7 +75,7 @@ func runDebugCommand(command *cobra.Command, args []string) {
 	}
 
 	sketchPath := arguments.InitSketchPath(path)
-	sk := arguments.NewSketch(sketchPath)
+	sk := arguments.MustNewSketch(sketchPath)
 	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, instance, sk)
 	debugConfigRequested := &dbg.DebugConfigRequest{
 		Instance:    instance,

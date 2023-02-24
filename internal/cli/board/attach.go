@@ -50,7 +50,7 @@ func initAttachCommand() *cobra.Command {
 
 func runAttachCommand(path string, port *arguments.Port, fqbn string) {
 	sketchPath := arguments.InitSketchPath(path)
-	sk := arguments.NewSketch(sketchPath)
+	sk := arguments.MustNewSketch(sketchPath)
 
 	var currentPort *boardAttachPortResult
 	if currentAddress, currentProtocol := sk.GetDefaultPortAddressAndProtocol(); currentAddress != "" {

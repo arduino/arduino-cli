@@ -23,6 +23,9 @@ import (
 type FailIfBuildPathEqualsSketchPath struct{}
 
 func (s *FailIfBuildPathEqualsSketchPath) Run(ctx *types.Context) error {
+	if ctx.BuildPath == nil || ctx.Sketch == nil {
+		return nil
+	}
 	buildPath := ctx.BuildPath.Canonical()
 	sketchPath := ctx.Sketch.FullPath.Canonical()
 	if buildPath.EqualsTo(sketchPath) {
