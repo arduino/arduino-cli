@@ -2,6 +2,11 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## 0.32.0
+
+Configuration file lookup in current working directory and its parents is dropped. The command line flag `--config-file`
+must be specified to use an alternative configuration file from the one in the data directory.
+
 ## 0.31.0
 
 ### Added `post_install` script support for tools
