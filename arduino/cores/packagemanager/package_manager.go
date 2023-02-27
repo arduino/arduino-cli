@@ -280,97 +280,56 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 		return targetPackage, nil, nil, nil, nil,
 			fmt.Errorf(tr("unknown platform %s:%s"), targetPackage, fqbn.PlatformArch)
 	}
-	platformRelease := pme.GetInstalledPlatformRelease(platform)
-	if platformRelease == nil {
+	boardPlatformRelease := pme.GetInstalledPlatformRelease(platform)
+	if boardPlatformRelease == nil {
 		return targetPackage, nil, nil, nil, nil,
 			fmt.Errorf(tr("platform %s is not installed"), platform)
 	}
 
 	// Find board
-	board := platformRelease.Boards[fqbn.BoardID]
+	board := boardPlatformRelease.Boards[fqbn.BoardID]
 	if board == nil {
-		return targetPackage, platformRelease, nil, nil, nil,
+		return targetPackage, boardPlatformRelease, nil, nil, nil,
 			fmt.Errorf(tr("board %s not found"), fqbn.StringWithoutConfig())
 	}
 
 	boardBuildProperties, err := board.GetBuildProperties(fqbn.Configs)
 	if err != nil {
-		return targetPackage, platformRelease, board, nil, nil,
+		return targetPackage, boardPlatformRelease, board, nil, nil,
 			fmt.Errorf(tr("getting build properties for board %[1]s: %[2]s"), board, err)
 	}
 
-	// Determine the platform used for the build (in case the board refers
+	// Determine the platform used for the build and the variant (in case the board refers
 	// to a core contained in another platform)
-	core := boardBuildProperties.Get("build.core")
-	referredCore := ""
-	if split := strings.Split(core, ":"); len(split) > 1 {
-		core, referredCore = split[1], split[0]
-	}
-	variant := boardBuildProperties.Get("build.variant")
-	referredVariant := ""
-	if split := strings.Split(variant, ":"); len(split) > 1 {
-		variant, referredVariant = split[1], split[0]
-	}
-	if referredCore != "" && referredVariant != "" && referredCore != referredVariant {
-		return targetPackage, platformRelease, board, nil, nil,
-			fmt.Errorf(tr("'build.core' and 'build.variant' refer to different platforms: %[1]s and %[2]s"), core+":"+referredCore, variant+":"+referredVariant)
-	}
-
-	var referredPlatformRelease *cores.PlatformRelease
-	referredPackageName := referredCore
-	if referredPackageName == "" {
-		referredPackageName = referredVariant
-	}
-	if referredPackageName != "" {
-		referredPackage := pme.packages[referredPackageName]
-		if referredPackage == nil {
-			return targetPackage, platformRelease, board, nil, nil,
-				fmt.Errorf(tr("missing package %[1]s referenced by board %[2]s"), referredPackageName, fqbn)
-		}
-		referredPlatform := referredPackage.Platforms[fqbn.PlatformArch]
-		if referredPlatform == nil {
-			return targetPackage, platformRelease, board, nil, nil,
-				fmt.Errorf(tr("missing platform %[1]s:%[2]s referenced by board %[3]s"), referredPackageName, fqbn.PlatformArch, fqbn)
-		}
-		referredPlatformRelease = pme.GetInstalledPlatformRelease(referredPlatform)
-		if referredPlatformRelease == nil {
-			return targetPackage, platformRelease, board, nil, nil,
-				fmt.Errorf(tr("missing platform release %[1]s:%[2]s referenced by board %[3]s"), referredPackageName, fqbn.PlatformArch, fqbn)
-		}
+	core, corePlatformRelease, variant, variantPlatformRelease, err := pme.determineReferencedPlatformRelease(boardBuildProperties, boardPlatformRelease, fqbn)
+	if err != nil {
+		return targetPackage, boardPlatformRelease, board, nil, nil, err
 	}
 
 	// Create the build properties map by overlaying the properties of the
 	// referenced platform propeties, the board platform properties and the
 	// board specific properties.
 	buildProperties := properties.NewMap()
-	buildPlatformRelease := platformRelease
-	if referredCore != "" {
-		buildPlatformRelease = referredPlatformRelease
-	}
-	buildProperties.Merge(buildPlatformRelease.Properties)
-	buildProperties.Merge(platformRelease.Properties)
+	buildProperties.Merge(variantPlatformRelease.Properties)
+	buildProperties.Merge(corePlatformRelease.Properties)
+	buildProperties.Merge(boardPlatformRelease.Properties)
 	buildProperties.Merge(boardBuildProperties)
 
 	// Add runtime build properties
-	buildProperties.Merge(platformRelease.RuntimeProperties())
-	buildProperties.SetPath("build.core.path", buildPlatformRelease.InstallDir.Join("cores", core))
-	buildProperties.SetPath("build.system.path", buildPlatformRelease.InstallDir.Join("system"))
-	for _, tool := range pme.GetAllInstalledToolsReleases() {
-		buildProperties.Merge(tool.RuntimeProperties())
-	}
-
+	buildProperties.Merge(boardPlatformRelease.RuntimeProperties())
+	buildProperties.SetPath("build.core.path", corePlatformRelease.InstallDir.Join("cores", core))
+	buildProperties.SetPath("build.system.path", corePlatformRelease.InstallDir.Join("system"))
 	buildProperties.Set("build.variant.path", "")
 	if variant != "" {
-		variantPlatformRelease := platformRelease
-		if referredVariant != "" {
-			variantPlatformRelease = referredPlatformRelease
-		}
 		buildProperties.SetPath("build.variant.path", variantPlatformRelease.InstallDir.Join("variants", variant))
 	}
 
-	requiredTools, err := pme.FindToolsRequiredForBuild(platformRelease, buildPlatformRelease)
+	for _, tool := range pme.GetAllInstalledToolsReleases() {
+		buildProperties.Merge(tool.RuntimeProperties())
+	}
+	requiredTools, err := pme.FindToolsRequiredForBuild(boardPlatformRelease, corePlatformRelease)
 	if err != nil {
-		return targetPackage, platformRelease, board, buildProperties, buildPlatformRelease, err
+		return targetPackage, boardPlatformRelease, board, buildProperties, corePlatformRelease, err
 	}
 	for _, tool := range requiredTools {
 		buildProperties.Merge(tool.RuntimeProperties())
@@ -399,7 +358,63 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 
 	buildProperties.Merge(pme.GetCustomGlobalProperties())
 
-	return targetPackage, platformRelease, board, buildProperties, buildPlatformRelease, nil
+	return targetPackage, boardPlatformRelease, board, buildProperties, corePlatformRelease, nil
+}
+
+func (pme *Explorer) determineReferencedPlatformRelease(boardBuildProperties *properties.Map, boardPlatformRelease *cores.PlatformRelease, fqbn *cores.FQBN) (string, *cores.PlatformRelease, string, *cores.PlatformRelease, error) {
+	core := boardBuildProperties.Get("build.core")
+	referredCore := ""
+	if split := strings.Split(core, ":"); len(split) > 1 {
+		referredCore, core = split[0], split[1]
+	}
+
+	variant := boardBuildProperties.Get("build.variant")
+	referredVariant := ""
+	if split := strings.Split(variant, ":"); len(split) > 1 {
+		referredVariant, variant = split[0], split[1]
+	}
+
+	// core and variant cannot refer to two different platforms
+	if referredCore != "" && referredVariant != "" && referredCore != referredVariant {
+		return "", nil, "", nil,
+			fmt.Errorf(tr("'build.core' and 'build.variant' refer to different platforms: %[1]s and %[2]s"), referredCore+":"+core, referredVariant+":"+variant)
+	}
+
+	// extract the referred platform
+	var referredPlatformRelease *cores.PlatformRelease
+	referredPackageName := referredCore
+	if referredPackageName == "" {
+		referredPackageName = referredVariant
+	}
+	if referredPackageName != "" {
+		referredPackage := pme.packages[referredPackageName]
+		if referredPackage == nil {
+			return "", nil, "", nil,
+				fmt.Errorf(tr("missing package %[1]s referenced by board %[2]s"), referredPackageName, fqbn)
+		}
+		referredPlatform := referredPackage.Platforms[fqbn.PlatformArch]
+		if referredPlatform == nil {
+			return "", nil, "", nil,
+				fmt.Errorf(tr("missing platform %[1]s:%[2]s referenced by board %[3]s"), referredPackageName, fqbn.PlatformArch, fqbn)
+		}
+		referredPlatformRelease = pme.GetInstalledPlatformRelease(referredPlatform)
+		if referredPlatformRelease == nil {
+			return "", nil, "", nil,
+				fmt.Errorf(tr("missing platform release %[1]s:%[2]s referenced by board %[3]s"), referredPackageName, fqbn.PlatformArch, fqbn)
+		}
+	}
+
+	corePlatformRelease := boardPlatformRelease
+	if referredCore != "" {
+		corePlatformRelease = referredPlatformRelease
+	}
+
+	variantPlatformRelease := boardPlatformRelease
+	if referredVariant != "" {
+		variantPlatformRelease = referredPlatformRelease
+	}
+
+	return core, corePlatformRelease, variant, variantPlatformRelease, nil
 }
 
 // LoadPackageIndex loads a package index by looking up the local cached file from the specified URL
