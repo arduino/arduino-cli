@@ -22,10 +22,10 @@
               "name": "Arduino Yún"
             },
             {
-              "name": "Arduino Uno"
+              "name": "Arduino UNO"
             },
             {
-              "name": "Arduino Uno WiFi"
+              "name": "Arduino UNO WiFi"
             },
             {
               "name": "Arduino Diecimila"
@@ -37,7 +37,7 @@
               "name": "Arduino Mega"
             },
             {
-              "name": "Arduino MegaADK"
+              "name": "Arduino Mega ADK"
             },
             {
               "name": "Arduino Leonardo"
@@ -64,10 +64,10 @@
               "name": "Arduino BT"
             },
             {
-              "name": "Arduino LilyPadUSB"
+              "name": "Arduino LilyPad USB"
             },
             {
-              "name": "Arduino Lilypad"
+              "name": "Arduino LilyPad"
             },
             {
               "name": "Arduino Pro"
