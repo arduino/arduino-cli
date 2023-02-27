@@ -136,9 +136,9 @@ func GetDefaultBuiltinLibrariesDir() string {
 	return filepath.Join(getDefaultArduinoDataDir(), "libraries")
 }
 
-// FindConfigFileInArgsOrWorkingDirectory returns the config file path using the
+// FindConfigFileInArgs returns the config file path using the
 // argument '--config-file' (if specified) or looking in the current working dir
-func FindConfigFileInArgsOrWorkingDirectory(args []string) string {
+func FindConfigFileInArgs(args []string) string {
 	// Look for '--config-file' argument
 	for i, arg := range args {
 		if arg == "--config-file" {
@@ -147,23 +147,5 @@ func FindConfigFileInArgsOrWorkingDirectory(args []string) string {
 			}
 		}
 	}
-
-	// Look into current working directory
-	if cwd, err := paths.Getwd(); err != nil {
-		return ""
-	} else if configFile := searchConfigTree(cwd); configFile != nil {
-		return configFile.Join("arduino-cli.yaml").String()
-	}
 	return ""
-}
-
-func searchConfigTree(cwd *paths.Path) *paths.Path {
-	// go back up to root and search for the config file
-	for _, path := range cwd.Parents() {
-		if path.Join("arduino-cli.yaml").Exist() {
-			return path
-		}
-	}
-
-	return nil
 }
