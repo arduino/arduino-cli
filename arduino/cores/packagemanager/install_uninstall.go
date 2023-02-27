@@ -18,6 +18,7 @@ package packagemanager
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"runtime"
 
 	"github.com/arduino/arduino-cli/arduino"
@@ -237,6 +238,9 @@ func (pme *Explorer) RunPostInstallScript(installDir *paths.Path) error {
 		if err != nil {
 			return err
 		}
+		cmd.RedirectStdoutTo(os.Stdout)
+		cmd.RedirectStderrTo(os.Stderr)
+
 		cmd.SetDirFromPath(installDir)
 		if err := cmd.Run(); err != nil {
 			return err

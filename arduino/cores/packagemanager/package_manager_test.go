@@ -17,8 +17,11 @@ package packagemanager_test
 
 import (
 	"fmt"
+	"io"
 	"net/url"
 	"os"
+	"runtime"
+	"sync"
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -638,4 +641,72 @@ func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 		require.Equal(t, "builtin:serial-monitor", platformProps.Get("pluggable_monitor.required.serial"))
 		require.Equal(t, `"{network_cmd}" -address {upload.port.address} -port {upload.port.properties.port} -sketch "{build.path}/{build.project_name}.hex" -upload {upload.port.properties.endpoint_upload} -sync {upload.port.properties.endpoint_sync} -reset {upload.port.properties.endpoint_reset} -sync_exp {upload.port.properties.sync_return}`, platformProps.Get("tools.avrdude__pluggable_network.upload.pattern"))
 	}
+}
+
+func TestRunPostInstall(t *testing.T) {
+	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test")
+	pm := pmb.Build()
+	pme, release := pm.NewExplorer()
+	defer release()
+
+	// prepare dummy post install script
+	dir := paths.New(t.TempDir())
+
+	// check that the script output is redirected to the current process
+	// standard one
+	outputR, outputW, err := os.Pipe()
+	require.NoError(t, err)
+	errorR, errorW, err := os.Pipe()
+	require.NoError(t, err)
+
+	prevStdout, prevStderr := os.Stdout, os.Stderr
+
+	var stdout []byte
+	var stderr []byte
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		var err error
+		stdout, err = io.ReadAll(outputR)
+		require.NoError(t, err)
+	}()
+
+	go func() {
+		defer wg.Done()
+		var err error
+		stderr, err = io.ReadAll(errorR)
+		require.NoError(t, err)
+	}()
+	var scriptPath *paths.Path
+	if runtime.GOOS == "windows" {
+		scriptPath = dir.Join("post_install.bat")
+
+		err = scriptPath.WriteFile([]byte(
+			`@echo off
+			echo sent in stdout
+			echo sent in stderr 1>&2`))
+	} else {
+		scriptPath = dir.Join("post_install.sh")
+		err = scriptPath.WriteFile([]byte(
+			`#!/bin/sh
+			echo "sent in stdout"
+			echo "sent in stderr" 1>&2`))
+	}
+	require.NoError(t, err)
+	err = os.Chmod(scriptPath.String(), 0777)
+	require.NoError(t, err)
+	os.Stdout = outputW
+	os.Stderr = errorW
+	pme.RunPostInstallScript(dir)
+
+	outputW.Close()
+	errorW.Close()
+	wg.Wait()
+	os.Stdout = prevStdout
+	os.Stderr = prevStderr
+
+	require.Equal(t, "sent in stdout\n", string(stdout))
+	require.Equal(t, "sent in stderr\n", string(stderr))
 }
