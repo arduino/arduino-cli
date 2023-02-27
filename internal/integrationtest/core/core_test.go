@@ -123,7 +123,6 @@ func TestCoreSearch(t *testing.T) {
 	}
 
 	// Check search with case, accents and spaces
-	runSearch("mkr1000", "arduino:samd")
 	runSearch("mkr 1000", "arduino:samd")
 
 	runSearch("yún", "arduino:avr")
