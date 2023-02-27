@@ -293,7 +293,7 @@ func (e *MissingProgrammerError) ToRPCStatus() *status.Status {
 	return status.New(codes.InvalidArgument, e.Error())
 }
 
-// ProgrammerRequiredForUploadError is returned then the upload can be done only using a programmer
+// ProgrammerRequiredForUploadError is returned when the upload can be done only using a programmer
 type ProgrammerRequiredForUploadError struct{}
 
 func (e *ProgrammerRequiredForUploadError) Error() string {
@@ -305,6 +305,28 @@ func (e *ProgrammerRequiredForUploadError) ToRPCStatus() *status.Status {
 	st, _ := status.
 		New(codes.InvalidArgument, e.Error()).
 		WithDetails(&rpc.ProgrammerIsRequiredForUploadError{})
+	return st
+}
+
+// InitFailedError is returned when the instance initialization fails
+type InitFailedError struct {
+	Code   codes.Code
+	Cause  error
+	Reason rpc.FailedInstanceInitReason
+}
+
+func (ife *InitFailedError) Error() string {
+	return ife.Cause.Error()
+}
+
+// ToRPCStatus converts the error into a *status.Status
+func (ife *InitFailedError) ToRPCStatus() *status.Status {
+	st, _ := status.
+		New(ife.Code, ife.Cause.Error()).
+		WithDetails(&rpc.FailedInstanceInitError{
+			Reason:  ife.Reason,
+			Message: ife.Cause.Error(),
+		})
 	return st
 }
 
@@ -405,7 +427,9 @@ func (e *PlatformLoadingError) Error() string {
 
 // ToRPCStatus converts the error into a *status.Status
 func (e *PlatformLoadingError) ToRPCStatus() *status.Status {
-	return status.New(codes.FailedPrecondition, e.Error())
+	s, _ := status.New(codes.FailedPrecondition, e.Error()).
+		WithDetails(&rpc.PlatformLoadingError{})
+	return s
 }
 
 func (e *PlatformLoadingError) Unwrap() error {

@@ -303,23 +303,35 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		for _, u := range urls {
 			URL, err := utils.URLParse(u)
 			if err != nil {
-				s := status.Newf(codes.InvalidArgument, tr("Invalid additional URL: %v"), err)
-				responseError(s)
+				e := &arduino.InitFailedError{
+					Code:   codes.InvalidArgument,
+					Cause:  fmt.Errorf(tr("Invalid additional URL: %v", err)),
+					Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INVALID_INDEX_URL,
+				}
+				responseError(e.ToRPCStatus())
 				continue
 			}
 
 			if URL.Scheme == "file" {
 				_, err := pmb.LoadPackageIndexFromFile(paths.New(URL.Path))
 				if err != nil {
-					s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
-					responseError(s)
+					e := &arduino.InitFailedError{
+						Code:   codes.FailedPrecondition,
+						Cause:  fmt.Errorf(tr("Loading index file: %v", err)),
+						Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR,
+					}
+					responseError(e.ToRPCStatus())
 				}
 				continue
 			}
 
 			if err := pmb.LoadPackageIndex(URL); err != nil {
-				s := status.Newf(codes.FailedPrecondition, tr("Loading index file: %v"), err)
-				responseError(s)
+				e := &arduino.InitFailedError{
+					Code:   codes.FailedPrecondition,
+					Cause:  fmt.Errorf(tr("Loading index file: %v", err)),
+					Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR,
+				}
+				responseError(e.ToRPCStatus())
 			}
 		}
 
@@ -331,8 +343,12 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		for name, tool := range pmb.GetOrCreatePackage("builtin").Tools {
 			latest := tool.LatestRelease()
 			if latest == nil {
-				s := status.Newf(codes.Internal, tr("can't find latest release of tool %s", name))
-				responseError(s)
+				e := &arduino.InitFailedError{
+					Code:   codes.Internal,
+					Cause:  fmt.Errorf(tr("can't find latest release of tool %s", name)),
+					Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR,
+				}
+				responseError(e.ToRPCStatus())
 			} else if !latest.IsInstalled() {
 				builtinToolsToInstall = append(builtinToolsToInstall, latest)
 			}
@@ -342,8 +358,12 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		if len(builtinToolsToInstall) > 0 {
 			for _, toolRelease := range builtinToolsToInstall {
 				if err := installTool(pmb.Build(), toolRelease, downloadCallback, taskCallback); err != nil {
-					s := status.Newf(codes.Internal, err.Error())
-					responseError(s)
+					e := &arduino.InitFailedError{
+						Code:   codes.Internal,
+						Cause:  err,
+						Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR,
+					}
+					responseError(e.ToRPCStatus())
 				}
 			}
 

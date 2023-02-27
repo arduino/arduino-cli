@@ -206,6 +206,26 @@ message InitResponse {
   }
 }
 
+enum FailedInstanceInitReason {
+  // FAILED_INSTANCE_INIT_REASON_UNSPECIFIED the error reason is not specialized
+  FAILED_INSTANCE_INIT_REASON_UNSPECIFIED = 0;
+  // INVALID_INDEX_URL a package index url is malformed
+  FAILED_INSTANCE_INIT_REASON_INVALID_INDEX_URL = 1;
+  // FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR failure encountered while
+  // loading an index
+  FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR = 2;
+  // FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR failure encountered while
+  // loading a tool
+  FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR = 3;
+}
+
+message FailedInstanceInitError {
+  // specific cause of the error
+  FailedInstanceInitReason reason = 1;
+  // explanation of the error
+  string message = 2;
+}
+
 message DestroyRequest {
   // The Arduino Core Service instance to destroy.
   Instance instance = 1;

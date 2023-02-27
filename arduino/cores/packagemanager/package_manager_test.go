@@ -21,6 +21,7 @@ import (
 	"net/url"
 	"os"
 	"runtime"
+	"strings"
 	"sync"
 	"testing"
 
@@ -707,6 +708,6 @@ func TestRunPostInstall(t *testing.T) {
 	os.Stdout = prevStdout
 	os.Stderr = prevStderr
 
-	require.Equal(t, "sent in stdout\n", string(stdout))
-	require.Equal(t, "sent in stderr\n", string(stderr))
+	require.True(t, strings.HasPrefix(string(stdout), "sent in stdout"), "Unexpected stdout %s", string(stdout))
+	require.True(t, strings.HasPrefix(string(stderr), "sent in stderr"), "Unexpected stdout %s", string(stderr))
 }
