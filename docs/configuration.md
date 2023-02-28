@@ -116,8 +116,6 @@ The configuration file must be named `arduino-cli`, with the appropriate file ex
 Configuration files in the following locations are recognized by Arduino CLI:
 
 1. Location specified by the [`--config-file`][arduino cli command reference] command line flag
-1. Current working directory
-1. Any parent directory of the current working directory (more immediate parents having higher precedence)
 1. Arduino CLI data directory (as configured by `directories.data`)
 
 If multiple configuration files are present, the one highest on the above list is used. Configuration files are not
