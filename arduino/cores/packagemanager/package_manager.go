@@ -103,6 +103,7 @@ func (pmb *Builder) BuildIntoExistingPackageManager(target *PackageManager) {
 	} else {
 		target.discoveryManager = pmb.discoveryManager
 	}
+	target.discoveryManager.AddAllDiscoveriesFrom(pmb.discoveryManager)
 	target.userAgent = pmb.userAgent
 }
 

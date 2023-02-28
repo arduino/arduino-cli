@@ -65,13 +65,7 @@ func (dm *DiscoveryManager) Clear() {
 			logrus.Infof("Closed and removed discovery %s", d.GetID())
 		}
 	}
-	dm.discoveriesRunning = false
 	dm.discoveries = map[string]*discovery.PluggableDiscovery{}
-}
-
-// AreDiscoveriesRunning returns a boolean representing the running status of discoveries
-func (dm *DiscoveryManager) AreDiscoveriesRunning() bool {
-	return dm.discoveriesRunning
 }
 
 // IDs returns the list of discoveries' ids in this DiscoveryManager
@@ -282,4 +276,15 @@ func (dm *DiscoveryManager) List() []*discovery.Port {
 		}
 	}
 	return res
+}
+
+// AddAllDiscoveriesFrom transfers discoveries from src to the receiver
+func (dm *DiscoveryManager) AddAllDiscoveriesFrom(src *DiscoveryManager) {
+	for id, d := range src.discoveries {
+		dm.discoveries[id] = d
+	}
+
+	if src.discoveriesRunning {
+		dm.Start()
+	}
 }
