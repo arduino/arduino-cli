@@ -72,3 +72,27 @@ func TestRuntimeToolPropertiesGeneration(t *testing.T) {
 		require.True(t, res.GetPath("runtime.tools.avrdude.path").EquivalentTo(hardwareDir.Join("arduino", "tools", "avrdude", "6.3.0-arduino17")))
 	}
 }
+
+func TestCompileBuildPathInsideSketch(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+
+	sketch := "sketchSimple"
+	_, _, err = cli.Run("sketch", "new", sketch)
+	require.NoError(t, err)
+
+	cli.SetWorkingDir(cli.WorkingDir().Join(sketch))
+	// Compile the sketch creating the build directory inside the sketch directory
+	_, _, err = cli.Run("compile", "-b", "arduino:avr:mega", "--build-path", "build-mega")
+	require.NoError(t, err)
+
+	// Compile again using the same build path
+	_, _, err = cli.Run("compile", "-b", "arduino:avr:mega", "--build-path", "build-mega")
+	require.NoError(t, err)
+}

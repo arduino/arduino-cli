@@ -133,6 +133,13 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		builderCtx.BuildPath = sk.DefaultBuildPath()
 	} else {
 		builderCtx.BuildPath = paths.New(req.GetBuildPath()).Canonical()
+		if in, err := builderCtx.BuildPath.IsInsideDir(sk.FullPath); err != nil {
+			return nil, &arduino.NotFoundError{Message: tr("Cannot find build path"), Cause: err}
+		} else if in && builderCtx.BuildPath.IsDir() {
+			if sk.AdditionalFiles, err = removeBuildFromSketchFiles(sk.AdditionalFiles, builderCtx.BuildPath); err != nil {
+				return nil, err
+			}
+		}
 	}
 	if err = builderCtx.BuildPath.MkdirAll(); err != nil {
 		return nil, &arduino.PermissionDeniedError{Message: tr("Cannot create build directory"), Cause: err}
@@ -314,4 +321,25 @@ func maybePurgeBuildCache() {
 	cacheTTL := configuration.Settings.GetDuration("build_cache.ttl").Abs()
 	buildcache.New(paths.TempDir().Join("arduino", "cores")).Purge(cacheTTL)
 	buildcache.New(paths.TempDir().Join("arduino", "sketches")).Purge(cacheTTL)
+}
+
+// removeBuildFromSketchFiles removes the files contained in the build directory from
+// the list of the sketch files
+func removeBuildFromSketchFiles(files paths.PathList, build *paths.Path) (paths.PathList, error) {
+	var res paths.PathList
+	ignored := false
+	for _, file := range files {
+		if in, err := file.IsInsideDir(build); err != nil {
+			return nil, &arduino.NotFoundError{Message: tr("Cannot find build path"), Cause: err}
+		} else if !in {
+			res = append(res, file)
+		} else if !ignored {
+			ignored = true
+		}
+	}
+	// log only if at least a file is ignored
+	if ignored {
+		logrus.Tracef("Build path %s is a child of sketch path and it is ignored for additional files.", build.String())
+	}
+	return res, nil
 }
