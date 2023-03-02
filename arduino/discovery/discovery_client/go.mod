@@ -7,14 +7,13 @@ replace github.com/arduino/arduino-cli => ../../..
 require (
 	github.com/arduino/arduino-cli v0.0.0-00010101000000-000000000000
 	github.com/gizak/termui/v3 v3.1.0
-	github.com/sirupsen/logrus v1.4.2
+	github.com/sirupsen/logrus v1.9.0
 )
 
 require (
 	github.com/arduino/go-paths-helper v1.8.0 // indirect
 	github.com/arduino/go-properties-orderedmap v1.7.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
 	github.com/leonelquinteros/gotext v1.4.0 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect

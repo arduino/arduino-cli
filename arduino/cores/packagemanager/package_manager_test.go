@@ -16,13 +16,13 @@
 package packagemanager_test
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/url"
 	"os"
 	"runtime"
 	"strings"
-	"sync"
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -30,6 +30,8 @@ import (
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
+	"github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus/hooks/writer"
 	"github.com/stretchr/testify/require"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -644,7 +646,13 @@ func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 	}
 }
 
+type plainFormatter struct{}
+
+func (f *plainFormatter) Format(e *logrus.Entry) ([]byte, error) {
+	return []byte(e.Message), nil
+}
 func TestRunPostInstall(t *testing.T) {
+	logger := logrus.StandardLogger()
 	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test")
 	pm := pmb.Build()
 	pme, release := pm.NewExplorer()
@@ -653,34 +661,25 @@ func TestRunPostInstall(t *testing.T) {
 	// prepare dummy post install script
 	dir := paths.New(t.TempDir())
 
-	// check that the script output is redirected to the current process
-	// standard one
-	outputR, outputW, err := os.Pipe()
-	require.NoError(t, err)
-	errorR, errorW, err := os.Pipe()
-	require.NoError(t, err)
+	// capture logs for inspection
+	infoBuffer, errorBuffer := bytes.NewBuffer([]byte{}), bytes.NewBuffer([]byte{})
+	logger.SetOutput(io.Discard)
+	logger.SetFormatter(&plainFormatter{})
+	logger.AddHook(&writer.Hook{
+		Writer: infoBuffer,
+		LogLevels: []logrus.Level{
+			logrus.InfoLevel,
+		},
+	})
+	logger.AddHook(&writer.Hook{
+		Writer: errorBuffer,
+		LogLevels: []logrus.Level{
+			logrus.ErrorLevel,
+		},
+	})
 
-	prevStdout, prevStderr := os.Stdout, os.Stderr
-
-	var stdout []byte
-	var stderr []byte
-	wg := sync.WaitGroup{}
-	wg.Add(2)
-
-	go func() {
-		defer wg.Done()
-		var err error
-		stdout, err = io.ReadAll(outputR)
-		require.NoError(t, err)
-	}()
-
-	go func() {
-		defer wg.Done()
-		var err error
-		stderr, err = io.ReadAll(errorR)
-		require.NoError(t, err)
-	}()
 	var scriptPath *paths.Path
+	var err error
 	if runtime.GOOS == "windows" {
 		scriptPath = dir.Join("post_install.bat")
 
@@ -698,16 +697,9 @@ func TestRunPostInstall(t *testing.T) {
 	require.NoError(t, err)
 	err = os.Chmod(scriptPath.String(), 0777)
 	require.NoError(t, err)
-	os.Stdout = outputW
-	os.Stderr = errorW
 	pme.RunPostInstallScript(dir)
+	// `HasPrefix` because windows seem to add a trailing space at the end
 
-	outputW.Close()
-	errorW.Close()
-	wg.Wait()
-	os.Stdout = prevStdout
-	os.Stderr = prevStderr
-
-	require.True(t, strings.HasPrefix(string(stdout), "sent in stdout"), "Unexpected stdout %s", string(stdout))
-	require.True(t, strings.HasPrefix(string(stderr), "sent in stderr"), "Unexpected stdout %s", string(stderr))
+	require.Equal(t, "sent in stdout", strings.Trim(infoBuffer.String(), "\n\r "))
+	require.Equal(t, "sent in stderr", strings.Trim(errorBuffer.String(), "\n\r "))
 }

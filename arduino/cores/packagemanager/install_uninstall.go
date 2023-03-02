@@ -18,7 +18,6 @@ package packagemanager
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"runtime"
 
 	"github.com/arduino/arduino-cli/arduino"
@@ -28,6 +27,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 // DownloadAndInstallPlatformUpgrades runs a full installation process to upgrade the given platform.
@@ -238,8 +238,14 @@ func (pme *Explorer) RunPostInstallScript(installDir *paths.Path) error {
 		if err != nil {
 			return err
 		}
-		cmd.RedirectStdoutTo(os.Stdout)
-		cmd.RedirectStderrTo(os.Stderr)
+		logInfo := pme.log.WriterLevel(logrus.InfoLevel)
+		logErr := pme.log.WriterLevel(logrus.ErrorLevel)
+		defer func() {
+			logInfo.Close()
+			logErr.Close()
+		}()
+		cmd.RedirectStdoutTo(logInfo)
+		cmd.RedirectStderrTo(logErr)
 
 		cmd.SetDirFromPath(installDir)
 		if err := cmd.Run(); err != nil {
