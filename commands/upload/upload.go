@@ -292,20 +292,6 @@ func runProgramAction(pme *packagemanager.Explorer,
 		uploadProperties.Merge(programmer.Properties)
 	}
 
-	for _, tool := range pme.GetAllInstalledToolsReleases() {
-		uploadProperties.Merge(tool.RuntimeProperties())
-	}
-	if requiredTools, err := pme.FindToolsRequiredForBuild(boardPlatform, buildPlatform); err == nil {
-		for _, requiredTool := range requiredTools {
-			logrus.WithField("tool", requiredTool).Info("Tool required for upload")
-			if requiredTool.IsInstalled() {
-				uploadProperties.Merge(requiredTool.RuntimeProperties())
-			} else {
-				errStream.Write([]byte(tr("Warning: tool '%s' is not installed. It might not be available for your OS.", requiredTool)))
-			}
-		}
-	}
-
 	// Certain tools require the user to provide custom fields at run time,
 	// if they've been provided set them
 	// For more info:

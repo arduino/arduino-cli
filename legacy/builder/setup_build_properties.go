@@ -16,30 +16,15 @@
 package builder
 
 import (
-	"os"
-	"path/filepath"
-	"strconv"
-	"strings"
-	"time"
-
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	properties "github.com/arduino/go-properties-orderedmap"
-	timeutils "github.com/arduino/go-timeutils"
 	"github.com/pkg/errors"
 )
 
 type SetupBuildProperties struct{}
 
 func (s *SetupBuildProperties) Run(ctx *types.Context) error {
-	packages := ctx.Hardware
-
-	targetPlatform := ctx.TargetPlatform
-	actualPlatform := ctx.ActualPlatform
-
 	buildProperties := properties.NewMap()
-	buildProperties.Merge(actualPlatform.Properties)
-	buildProperties.Merge(targetPlatform.Properties)
 	buildProperties.Merge(ctx.TargetBoardBuildProperties)
 
 	if ctx.BuildPath != nil {
@@ -48,26 +33,6 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	if ctx.Sketch != nil {
 		buildProperties.Set("build.project_name", ctx.Sketch.MainFile.Base())
 	}
-	buildProperties.Set("build.arch", strings.ToUpper(targetPlatform.Platform.Architecture))
-
-	// get base folder and use it to populate BUILD_PROPERTIES_RUNTIME_IDE_PATH (arduino and arduino-builder live in the same dir)
-	ex, err := os.Executable()
-	exPath := ""
-	if err == nil {
-		exPath = filepath.Dir(ex)
-	}
-
-	buildProperties.Set("build.core", ctx.BuildCore)
-	buildProperties.SetPath("build.core.path", actualPlatform.InstallDir.Join("cores", buildProperties.Get("build.core")))
-	buildProperties.Set("build.system.path", actualPlatform.InstallDir.Join("system").String())
-	buildProperties.Set("runtime.platform.path", targetPlatform.InstallDir.String())
-	buildProperties.Set("runtime.hardware.path", targetPlatform.InstallDir.Join("..").String())
-	buildProperties.Set("runtime.ide.version", ctx.ArduinoAPIVersion)
-	buildProperties.Set("runtime.ide.path", exPath)
-	buildProperties.Set("build.fqbn", ctx.FQBN.String())
-	buildProperties.Set("ide_version", ctx.ArduinoAPIVersion)
-	buildProperties.Set("runtime.os", properties.GetOSSuffix())
-	buildProperties.Set("build.library_discovery_phase", "0")
 
 	if ctx.OptimizeForDebug {
 		if buildProperties.ContainsKey("compiler.optimization_flags.debug") {
@@ -80,51 +45,14 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	}
 	ctx.OptimizationFlags = buildProperties.Get("compiler.optimization_flags")
 
-	variant := buildProperties.Get("build.variant")
-	if variant == "" {
-		buildProperties.Set("build.variant.path", "")
-	} else {
-		var variantPlatformRelease *cores.PlatformRelease
-		variantParts := strings.Split(variant, ":")
-		if len(variantParts) > 1 {
-			variantPlatform := packages[variantParts[0]].Platforms[targetPlatform.Platform.Architecture]
-			variantPlatformRelease = ctx.PackageManager.GetInstalledPlatformRelease(variantPlatform)
-			variant = variantParts[1]
-		} else {
-			variantPlatformRelease = targetPlatform
-		}
-		buildProperties.SetPath("build.variant.path", variantPlatformRelease.InstallDir.Join("variants", variant))
-	}
-
-	for _, tool := range ctx.AllTools {
-		buildProperties.SetPath("runtime.tools."+tool.Tool.Name+".path", tool.InstallDir)
-		buildProperties.SetPath("runtime.tools."+tool.Tool.Name+"-"+tool.Version.String()+".path", tool.InstallDir)
-	}
-	for _, tool := range ctx.RequiredTools {
-		buildProperties.SetPath("runtime.tools."+tool.Tool.Name+".path", tool.InstallDir)
-		buildProperties.SetPath("runtime.tools."+tool.Tool.Name+"-"+tool.Version.String()+".path", tool.InstallDir)
-	}
-
-	if !buildProperties.ContainsKey("software") {
-		buildProperties.Set("software", DEFAULT_SOFTWARE)
-	}
-
 	buildProperties.SetPath("build.source.path", ctx.Sketch.FullPath)
-
-	now := time.Now()
-	buildProperties.Set("extra.time.utc", strconv.FormatInt(now.Unix(), 10))
-	buildProperties.Set("extra.time.local", strconv.FormatInt(timeutils.LocalUnix(now), 10))
-	buildProperties.Set("extra.time.zone", strconv.Itoa(timeutils.TimezoneOffsetNoDST(now)))
-	buildProperties.Set("extra.time.dst", strconv.Itoa(timeutils.DaylightSavingsOffset(now)))
-
-	buildProperties.Merge(ctx.PackageManager.GetCustomGlobalProperties())
 
 	keychainProp := buildProperties.ContainsKey("build.keys.keychain")
 	signProp := buildProperties.ContainsKey("build.keys.sign_key")
 	encryptProp := buildProperties.ContainsKey("build.keys.encrypt_key")
 	// we verify that all the properties for the secure boot keys are defined or none of them is defined.
 	if (keychainProp || signProp || encryptProp) && !(keychainProp && signProp && encryptProp) {
-		return errors.Errorf("%s platform does not specify correctly default sign and encryption keys", targetPlatform.Platform)
+		return errors.Errorf("%s platform does not specify correctly default sign and encryption keys", ctx.TargetPlatform.Platform)
 	}
 
 	ctx.BuildProperties = buildProperties

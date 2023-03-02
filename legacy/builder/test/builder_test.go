@@ -41,7 +41,6 @@ func prepareBuilderTestContext(t *testing.T, sketchPath *paths.Path, fqbn string
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              false,
 	}
 }

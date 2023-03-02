@@ -213,7 +213,6 @@ func makeDefaultContext(t *testing.T) *types.Context {
 		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10607",
 		Verbose:              true,
 		DebugPreprocessor:    true,
 	}

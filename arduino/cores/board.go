@@ -125,6 +125,8 @@ func (b *Board) GetBuildProperties(userConfigs *properties.Map) (*properties.Map
 
 	// Start with board's base properties
 	buildProperties := b.Properties.Clone()
+	buildProperties.Set("build.fqbn", b.FQBN())
+	buildProperties.Set("build.arch", strings.ToUpper(b.PlatformRelease.Platform.Architecture))
 
 	// Add all sub-configurations one by one (a config is: option=value)
 	// Check for residual invalid options...

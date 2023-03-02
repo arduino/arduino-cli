@@ -29,11 +29,10 @@ func TestSetupBuildProperties(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
-		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
-		Sketch:            OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
-		FQBN:              parseFQBN(t, "arduino:avr:uno"),
-		ArduinoAPIVersion: "10600",
+		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
+		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
+		Sketch:           OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
+		FQBN:             parseFQBN(t, "arduino:avr:uno"),
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
@@ -63,7 +62,7 @@ func TestSetupBuildProperties(t *testing.T) {
 
 	requireEquivalentPaths(t, buildProperties.Get("runtime.platform.path"), "downloaded_hardware/arduino/avr")
 	requireEquivalentPaths(t, buildProperties.Get("runtime.hardware.path"), "downloaded_hardware/arduino")
-	require.Equal(t, "10600", buildProperties.Get("runtime.ide.version"))
+	require.Equal(t, "10607", buildProperties.Get("runtime.ide.version"))
 	require.NotEmpty(t, buildProperties.Get("runtime.os"))
 
 	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.arm-none-eabi-gcc.path"), "downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1")
@@ -93,11 +92,10 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
-		Sketch:            OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
-		FQBN:              parseFQBN(t, "arduino:avr:uno"),
-		ArduinoAPIVersion: "10600",
+		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
+		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
+		Sketch:           OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
+		FQBN:             parseFQBN(t, "arduino:avr:uno"),
 
 		CustomBuildProperties: []string{"name=fake name", "tools.avrdude.config.path=non existent path with space and a ="},
 	}
@@ -132,11 +130,10 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
-		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
-		Sketch:            OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
-		FQBN:              parseFQBN(t, "my_avr_platform:avr:custom_yun"),
-		ArduinoAPIVersion: "10600",
+		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
+		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
+		Sketch:           OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
+		FQBN:             parseFQBN(t, "my_avr_platform:avr:custom_yun"),
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
@@ -168,11 +165,10 @@ func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testi
 	DownloadCoresAndToolsAndLibraries(t)
 
 	ctx := &types.Context{
-		HardwareDirs:      paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
-		BuiltInToolsDirs:  paths.NewPathList("downloaded_tools", "tools_builtin"),
-		Sketch:            OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
-		FQBN:              parseFQBN(t, "my_avr_platform:avr:custom_yun"),
-		ArduinoAPIVersion: "10600",
+		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
+		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
+		Sketch:           OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
+		FQBN:             parseFQBN(t, "my_avr_platform:avr:custom_yun"),
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
@@ -199,7 +195,7 @@ func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testi
 
 	requireEquivalentPaths(t, buildProperties.Get("runtime.platform.path"), "user_hardware/my_avr_platform/avr")
 	requireEquivalentPaths(t, buildProperties.Get("runtime.hardware.path"), "user_hardware/my_avr_platform")
-	require.Equal(t, "10600", buildProperties.Get("runtime.ide.version"))
+	require.Equal(t, "10607", buildProperties.Get("runtime.ide.version"))
 	require.NotEmpty(t, buildProperties.Get("runtime.os"))
 
 	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.arm-none-eabi-gcc.path"), "downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1")

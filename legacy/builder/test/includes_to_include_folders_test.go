@@ -36,7 +36,6 @@ func TestIncludesToIncludeFolders(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -72,7 +71,6 @@ func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, paths.New("SketchWithIfDef", "SketchWithIfDef.ino")),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -107,7 +105,6 @@ func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, paths.New("sketch9", "sketch9.ino")),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -145,7 +142,6 @@ func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, paths.New("sketch10", "sketch10.ino")),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -179,7 +175,6 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		Sketch:               OpenSketch(t, paths.New("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino")),
 		FQBN:                 parseFQBN(t, "my_avr_platform:avr:custom_yun"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -217,7 +212,6 @@ func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatfo
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, paths.New("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino")),
 		FQBN:                 parseFQBN(t, "my_avr_platform:avr:custom_yun"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -255,7 +249,6 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, paths.New("sketch_usbhost", "sketch_usbhost.ino")),
 		FQBN:                 parseFQBN(t, "arduino:samd:arduino_zero_native"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -293,7 +286,6 @@ func TestIncludesToIncludeFoldersSubfolders(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, paths.New("sketch_with_subfolders", "sketch_with_subfolders.ino")),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
