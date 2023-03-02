@@ -1,6 +1,6 @@
 ---
 name: github.com/sirupsen/logrus
-version: v1.4.2
+version: v1.9.0
 type: go
 summary: Package logrus is a structured logger for Go, completely API compatible with
   the standard library logger.
