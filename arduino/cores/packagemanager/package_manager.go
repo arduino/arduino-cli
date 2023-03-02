@@ -48,7 +48,7 @@ type PackageManager struct {
 	packages                       cores.Packages
 	packagesCustomGlobalProperties *properties.Map
 
-	log              *logrus.Logger
+	log              logrus.FieldLogger
 	IndexDir         *paths.Path
 	PackagesDir      *paths.Path
 	DownloadDir      *paths.Path
