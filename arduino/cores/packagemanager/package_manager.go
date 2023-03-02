@@ -18,9 +18,13 @@ package packagemanager
 import (
 	"fmt"
 	"net/url"
+	"os"
 	"path"
+	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
@@ -29,6 +33,7 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"github.com/arduino/go-timeutils"
 	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -275,50 +280,141 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 		return targetPackage, nil, nil, nil, nil,
 			fmt.Errorf(tr("unknown platform %s:%s"), targetPackage, fqbn.PlatformArch)
 	}
-	platformRelease := pme.GetInstalledPlatformRelease(platform)
-	if platformRelease == nil {
+	boardPlatformRelease := pme.GetInstalledPlatformRelease(platform)
+	if boardPlatformRelease == nil {
 		return targetPackage, nil, nil, nil, nil,
 			fmt.Errorf(tr("platform %s is not installed"), platform)
 	}
 
 	// Find board
-	board := platformRelease.Boards[fqbn.BoardID]
+	board := boardPlatformRelease.Boards[fqbn.BoardID]
 	if board == nil {
-		return targetPackage, platformRelease, nil, nil, nil,
+		return targetPackage, boardPlatformRelease, nil, nil, nil,
 			fmt.Errorf(tr("board %s not found"), fqbn.StringWithoutConfig())
 	}
 
-	buildProperties, err := board.GetBuildProperties(fqbn.Configs)
+	boardBuildProperties, err := board.GetBuildProperties(fqbn.Configs)
 	if err != nil {
-		return targetPackage, platformRelease, board, nil, nil,
+		return targetPackage, boardPlatformRelease, board, nil, nil,
 			fmt.Errorf(tr("getting build properties for board %[1]s: %[2]s"), board, err)
 	}
 
-	// Determine the platform used for the build (in case the board refers
+	// Determine the platform used for the build and the variant (in case the board refers
 	// to a core contained in another platform)
-	buildPlatformRelease := platformRelease
-	coreParts := strings.Split(buildProperties.Get("build.core"), ":")
-	if len(coreParts) > 1 {
-		referredPackage := coreParts[0]
-		buildPackage := pme.packages[referredPackage]
-		if buildPackage == nil {
-			return targetPackage, platformRelease, board, buildProperties, nil,
-				fmt.Errorf(tr("missing package %[1]s referenced by board %[2]s"), referredPackage, fqbn)
+	core, corePlatformRelease, variant, variantPlatformRelease, err := pme.determineReferencedPlatformRelease(boardBuildProperties, boardPlatformRelease, fqbn)
+	if err != nil {
+		return targetPackage, boardPlatformRelease, board, nil, nil, err
+	}
+
+	// Create the build properties map by overlaying the properties of the
+	// referenced platform propeties, the board platform properties and the
+	// board specific properties.
+	buildProperties := properties.NewMap()
+	buildProperties.Merge(variantPlatformRelease.Properties)
+	buildProperties.Merge(corePlatformRelease.Properties)
+	buildProperties.Merge(boardPlatformRelease.Properties)
+	buildProperties.Merge(boardBuildProperties)
+
+	// Add runtime build properties
+	buildProperties.Merge(boardPlatformRelease.RuntimeProperties())
+	buildProperties.SetPath("build.core.path", corePlatformRelease.InstallDir.Join("cores", core))
+	buildProperties.SetPath("build.system.path", corePlatformRelease.InstallDir.Join("system"))
+	buildProperties.Set("build.variant.path", "")
+	if variant != "" {
+		buildProperties.SetPath("build.variant.path", variantPlatformRelease.InstallDir.Join("variants", variant))
+	}
+
+	for _, tool := range pme.GetAllInstalledToolsReleases() {
+		buildProperties.Merge(tool.RuntimeProperties())
+	}
+	requiredTools, err := pme.FindToolsRequiredForBuild(boardPlatformRelease, corePlatformRelease)
+	if err != nil {
+		return targetPackage, boardPlatformRelease, board, buildProperties, corePlatformRelease, err
+	}
+	for _, tool := range requiredTools {
+		buildProperties.Merge(tool.RuntimeProperties())
+	}
+	now := time.Now()
+	buildProperties.Set("extra.time.utc", strconv.FormatInt(now.Unix(), 10))
+	buildProperties.Set("extra.time.local", strconv.FormatInt(timeutils.LocalUnix(now), 10))
+	buildProperties.Set("extra.time.zone", strconv.Itoa(timeutils.TimezoneOffsetNoDST(now)))
+	buildProperties.Set("extra.time.dst", strconv.Itoa(timeutils.DaylightSavingsOffset(now)))
+
+	if !buildProperties.ContainsKey("runtime.ide.path") {
+		if ex, err := os.Executable(); err == nil {
+			buildProperties.Set("runtime.ide.path", filepath.Dir(ex))
+		} else {
+			buildProperties.Set("runtime.ide.path", "")
 		}
-		buildPlatform := buildPackage.Platforms[fqbn.PlatformArch]
-		if buildPlatform == nil {
-			return targetPackage, platformRelease, board, buildProperties, nil,
-				fmt.Errorf(tr("missing platform %[1]s:%[2]s referenced by board %[3]s"), referredPackage, fqbn.PlatformArch, fqbn)
+	}
+	buildProperties.Set("runtime.os", properties.GetOSSuffix())
+	buildProperties.Set("build.library_discovery_phase", "0")
+	// Deprecated properties
+	buildProperties.Set("ide_version", "10607")
+	buildProperties.Set("runtime.ide.version", "10607")
+	if !buildProperties.ContainsKey("software") {
+		buildProperties.Set("software", "ARDUINO")
+	}
+
+	buildProperties.Merge(pme.GetCustomGlobalProperties())
+
+	return targetPackage, boardPlatformRelease, board, buildProperties, corePlatformRelease, nil
+}
+
+func (pme *Explorer) determineReferencedPlatformRelease(boardBuildProperties *properties.Map, boardPlatformRelease *cores.PlatformRelease, fqbn *cores.FQBN) (string, *cores.PlatformRelease, string, *cores.PlatformRelease, error) {
+	core := boardBuildProperties.Get("build.core")
+	referredCore := ""
+	if split := strings.Split(core, ":"); len(split) > 1 {
+		referredCore, core = split[0], split[1]
+	}
+
+	variant := boardBuildProperties.Get("build.variant")
+	referredVariant := ""
+	if split := strings.Split(variant, ":"); len(split) > 1 {
+		referredVariant, variant = split[0], split[1]
+	}
+
+	// core and variant cannot refer to two different platforms
+	if referredCore != "" && referredVariant != "" && referredCore != referredVariant {
+		return "", nil, "", nil,
+			fmt.Errorf(tr("'build.core' and 'build.variant' refer to different platforms: %[1]s and %[2]s"), referredCore+":"+core, referredVariant+":"+variant)
+	}
+
+	// extract the referred platform
+	var referredPlatformRelease *cores.PlatformRelease
+	referredPackageName := referredCore
+	if referredPackageName == "" {
+		referredPackageName = referredVariant
+	}
+	if referredPackageName != "" {
+		referredPackage := pme.packages[referredPackageName]
+		if referredPackage == nil {
+			return "", nil, "", nil,
+				fmt.Errorf(tr("missing package %[1]s referenced by board %[2]s"), referredPackageName, fqbn)
 		}
-		buildPlatformRelease = pme.GetInstalledPlatformRelease(buildPlatform)
-		if buildPlatformRelease == nil {
-			return targetPackage, platformRelease, board, buildProperties, nil,
-				fmt.Errorf(tr("missing platform release %[1]s:%[2]s referenced by board %[3]s"), referredPackage, fqbn.PlatformArch, fqbn)
+		referredPlatform := referredPackage.Platforms[fqbn.PlatformArch]
+		if referredPlatform == nil {
+			return "", nil, "", nil,
+				fmt.Errorf(tr("missing platform %[1]s:%[2]s referenced by board %[3]s"), referredPackageName, fqbn.PlatformArch, fqbn)
+		}
+		referredPlatformRelease = pme.GetInstalledPlatformRelease(referredPlatform)
+		if referredPlatformRelease == nil {
+			return "", nil, "", nil,
+				fmt.Errorf(tr("missing platform release %[1]s:%[2]s referenced by board %[3]s"), referredPackageName, fqbn.PlatformArch, fqbn)
 		}
 	}
 
-	// No errors... phew!
-	return targetPackage, platformRelease, board, buildProperties, buildPlatformRelease, nil
+	corePlatformRelease := boardPlatformRelease
+	if referredCore != "" {
+		corePlatformRelease = referredPlatformRelease
+	}
+
+	variantPlatformRelease := boardPlatformRelease
+	if referredVariant != "" {
+		variantPlatformRelease = referredPlatformRelease
+	}
+
+	return core, corePlatformRelease, variant, variantPlatformRelease, nil
 }
 
 // LoadPackageIndex loads a package index by looking up the local cached file from the specified URL

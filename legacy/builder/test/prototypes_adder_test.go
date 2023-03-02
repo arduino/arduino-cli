@@ -41,7 +41,6 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, sketchLocation),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -81,7 +80,6 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, paths.New("SketchWithIfDef", "SketchWithIfDef.ino")),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -121,7 +119,6 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, paths.New("Baladuino", "Baladuino.ino")),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -161,7 +158,6 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, paths.New("CharWithEscapedDoubleQuote", "CharWithEscapedDoubleQuote.ino")),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -201,7 +197,6 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, paths.New("IncludeBetweenMultilineComment", "IncludeBetweenMultilineComment.ino")),
 		FQBN:                 parseFQBN(t, "arduino:sam:arduino_due_x_dbg"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -241,7 +236,6 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, paths.New("LineContinuations", "LineContinuations.ino")),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -281,7 +275,6 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, paths.New("StringWithComment", "StringWithComment.ino")),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -321,7 +314,6 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, paths.New("SketchWithStruct", "SketchWithStruct.ino")),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -369,7 +361,6 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, sketchLocation),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -415,7 +406,6 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, paths.New("sketch_no_functions_two_files", "sketch_no_functions_two_files.ino")),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -455,7 +445,6 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, paths.New("sketch_no_functions", "sketch_no_functions.ino")),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -501,7 +490,6 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, sketchLocation),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -544,7 +532,6 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, sketchLocation),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -598,7 +585,6 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, sketchLocation),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -641,7 +627,6 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		Sketch:               OpenSketch(t, sketchLocation),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -683,7 +668,6 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		Sketch:               OpenSketch(t, sketchLocation),
 		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -732,7 +716,6 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, sketchLocation),
 		FQBN:                 parseFQBN(t, "arduino:avr:yun"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -778,7 +761,6 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, sketchLocation),
 		FQBN:                 parseFQBN(t, "arduino:sam:arduino_due_x_dbg"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -824,7 +806,6 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, sketchLocation),
 		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -864,7 +845,6 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, paths.New("eol_processing", "eol_processing.ino")),
 		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 
@@ -904,7 +884,6 @@ func TestPrototypesAdderSketchWithSubstringFunctionMember(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Sketch:               OpenSketch(t, sketchLocation),
 		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
-		ArduinoAPIVersion:    "10600",
 		Verbose:              true,
 	}
 

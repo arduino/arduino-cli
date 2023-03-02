@@ -71,7 +71,6 @@ type Context struct {
 	OtherLibrariesDirs   paths.PathList
 	LibraryDirs          paths.PathList // List of paths pointing to individual library root folders
 	WatchedLocations     paths.PathList
-	ArduinoAPIVersion    string
 	FQBN                 *cores.FQBN
 	CodeCompleteAt       string
 	Clean                bool
@@ -95,7 +94,6 @@ type Context struct {
 	HardwareRewriteResults map[*cores.PlatformRelease][]PlatforKeyRewrite
 
 	BuildProperties              *properties.Map
-	BuildCore                    string
 	BuildPath                    *paths.Path
 	SketchBuildPath              *paths.Path
 	CoreBuildPath                *paths.Path
@@ -220,7 +218,6 @@ func (ctx *Context) ExtractBuildOptions() *properties.Map {
 		additionalFilesRelative = append(additionalFilesRelative, relPath.String())
 	}
 	opts.Set("fqbn", ctx.FQBN.String())
-	opts.Set("runtime.ide.version", ctx.ArduinoAPIVersion)
 	opts.Set("customBuildProperties", strings.Join(ctx.CustomBuildProperties, ","))
 	opts.Set("additionalFiles", strings.Join(additionalFilesRelative, ","))
 	opts.Set("compiler.optimization_flags", ctx.OptimizationFlags)

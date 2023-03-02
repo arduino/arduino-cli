@@ -36,7 +36,6 @@ func TestInjectBuildOption(t *testing.T) {
 			OtherLibrariesDirs:    paths.NewPathList("fff", "ggg"),
 			Sketch:                &sketch.Sketch{FullPath: paths.New("hhh")},
 			FQBN:                  fqbn,
-			ArduinoAPIVersion:     "iii",
 			CustomBuildProperties: []string{"jjj", "kkk"},
 			OptimizationFlags:     "lll",
 		}
@@ -48,7 +47,6 @@ func TestInjectBuildOption(t *testing.T) {
   "otherLibrariesFolders": "fff,ggg",
   "sketchLocation": "hhh",
   "fqbn": "aaa:bbb:ccc",
-  "runtime.ide.version": "iii",
   "customBuildProperties": "jjj,kkk",
   "additionalFiles": "",
   "compiler.optimization_flags": "lll",
