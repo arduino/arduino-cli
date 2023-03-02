@@ -16,9 +16,7 @@
 package packagemanager_test
 
 import (
-	"bytes"
 	"fmt"
-	"io"
 	"net/url"
 	"os"
 	"runtime"
@@ -30,8 +28,6 @@ import (
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
-	"github.com/sirupsen/logrus"
-	"github.com/sirupsen/logrus/hooks/writer"
 	"github.com/stretchr/testify/require"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -646,13 +642,7 @@ func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 	}
 }
 
-type plainFormatter struct{}
-
-func (f *plainFormatter) Format(e *logrus.Entry) ([]byte, error) {
-	return []byte(e.Message), nil
-}
 func TestRunPostInstall(t *testing.T) {
-	logger := logrus.StandardLogger()
 	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test")
 	pm := pmb.Build()
 	pme, release := pm.NewExplorer()
@@ -660,23 +650,6 @@ func TestRunPostInstall(t *testing.T) {
 
 	// prepare dummy post install script
 	dir := paths.New(t.TempDir())
-
-	// capture logs for inspection
-	infoBuffer, errorBuffer := bytes.NewBuffer([]byte{}), bytes.NewBuffer([]byte{})
-	logger.SetOutput(io.Discard)
-	logger.SetFormatter(&plainFormatter{})
-	logger.AddHook(&writer.Hook{
-		Writer: infoBuffer,
-		LogLevels: []logrus.Level{
-			logrus.InfoLevel,
-		},
-	})
-	logger.AddHook(&writer.Hook{
-		Writer: errorBuffer,
-		LogLevels: []logrus.Level{
-			logrus.ErrorLevel,
-		},
-	})
 
 	var scriptPath *paths.Path
 	var err error
@@ -697,9 +670,10 @@ func TestRunPostInstall(t *testing.T) {
 	require.NoError(t, err)
 	err = os.Chmod(scriptPath.String(), 0777)
 	require.NoError(t, err)
-	pme.RunPostInstallScript(dir)
-	// `HasPrefix` because windows seem to add a trailing space at the end
+	stdout, stderr, err := pme.RunPostInstallScript(dir)
+	require.NoError(t, err)
 
-	require.Equal(t, "sent in stdout", strings.Trim(infoBuffer.String(), "\n\r "))
-	require.Equal(t, "sent in stderr", strings.Trim(errorBuffer.String(), "\n\r "))
+	// `HasPrefix` because windows seem to add a trailing space at the end
+	require.Equal(t, "sent in stdout", strings.Trim(string(stdout), "\n\r "))
+	require.Equal(t, "sent in stderr", strings.Trim(string(stderr), "\n\r "))
 }
