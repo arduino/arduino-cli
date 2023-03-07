@@ -4,6 +4,10 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.32.0
 
+### PlatformLoadingError error reshaped
+In the gRPC API the type `PlatformLoadingError` is dropped. Now a `FailedInstanceInitError` is returned as error details
+instead of it with the reason field set to `FAILED_INSTANCE_INIT_REASON_PLATFORM_LOAD_ERROR`.
+
 ### `arduino-cli` doesn't lookup anymore in the current directory for configuration file.
 
 Configuration file lookup in current working directory and its parents is dropped. The command line flag `--config-file`

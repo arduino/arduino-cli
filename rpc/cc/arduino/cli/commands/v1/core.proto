@@ -45,8 +45,6 @@ message PlatformInstallResponse {
   TaskProgress task_progress = 2;
 }
 
-message PlatformLoadingError {}
-
 message PlatformDownloadRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
