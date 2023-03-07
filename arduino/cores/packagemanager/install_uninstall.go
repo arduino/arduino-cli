@@ -320,7 +320,8 @@ func (pme *Explorer) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.Task
 
 	toolResource := toolRelease.GetCompatibleFlavour()
 	if toolResource == nil {
-		return fmt.Errorf(tr("no compatible version of %s tools found for the current os"), toolRelease.Tool.Name)
+		return fmt.Errorf(tr("no compatible version of %s tools found for the current os, try contacting %s"),
+			toolRelease.Tool.Name, toolRelease.Tool.Package.Email)
 	}
 	destDir := pme.PackagesDir.Join(
 		toolRelease.Tool.Package.Name,

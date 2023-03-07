@@ -125,7 +125,7 @@ func (pme *Explorer) DownloadToolRelease(tool *cores.ToolRelease, config *downlo
 	if resource == nil {
 		return &arduino.FailedDownloadError{
 			Message: tr("Error downloading tool %s", tool),
-			Cause:   errors.New(tr("no versions available for the current OS"))}
+			Cause:   errors.New(tr("no versions available for the current OS, try contacting %s", tool.Tool.Package.Email))}
 	}
 	return resource.Download(pme.DownloadDir, config, tool.String(), progressCB, "")
 }

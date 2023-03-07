@@ -257,6 +257,11 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		exportBinaries = false
 	}
 	if exportBinaries {
+		presaveHex := builder.RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.savehex.presavehex", Suffix: ".pattern"}
+		if err := presaveHex.Run(builderCtx); err != nil {
+			return r, err
+		}
+
 		var exportPath *paths.Path
 		if exportDir := req.GetExportDir(); exportDir != "" {
 			exportPath = paths.New(exportDir)
@@ -289,6 +294,11 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 			if err = buildFile.CopyTo(exportedFile); err != nil {
 				return r, &arduino.PermissionDeniedError{Message: tr("Error copying output file %s", buildFile), Cause: err}
 			}
+		}
+
+		postsaveHex := builder.RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.savehex.postsavehex", Suffix: ".pattern"}
+		if err := postsaveHex.Run(builderCtx); err != nil {
+			return r, err
 		}
 	}
 

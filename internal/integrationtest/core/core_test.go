@@ -80,7 +80,7 @@ func TestCoreSearch(t *testing.T) {
 	// show all versions
 	out, _, err = cli.Run("core", "search", "test_core", "--all", "--format", "json", "--additional-urls="+url.String())
 	require.NoError(t, err)
-	requirejson.Len(t, out, 2)
+	requirejson.Len(t, out, 3)
 
 	checkPlatformIsInJSONOutput := func(stdout []byte, id, version string) {
 		jqquery := fmt.Sprintf(`[{id:"%s", latest:"%s"}]`, id, version)
@@ -150,7 +150,7 @@ func TestCoreSearchNoArgs(t *testing.T) {
 	// update custom index and install test core (installed cores affect `core search`)
 	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url.String())
 	require.NoError(t, err)
-	_, _, err = cli.Run("core", "install", "test:x86", "--additional-urls="+url.String())
+	_, _, err = cli.Run("core", "install", "test:x86@2.0.0", "--additional-urls="+url.String())
 	require.NoError(t, err)
 
 	// list all with no additional urls, ensure the test core won't show up
@@ -161,7 +161,6 @@ func TestCoreSearchNoArgs(t *testing.T) {
 		lines = append(lines, strings.Fields(strings.TrimSpace(v)))
 	}
 	// The header is printed on the first lines
-	// TODO: make test more resilient (no hardcoded line number)
 	require.Equal(t, []string{"test:x86", "2.0.0", "test_core"}, lines[21])
 	numPlatforms := len(lines) - 1
 
@@ -179,8 +178,8 @@ func TestCoreSearchNoArgs(t *testing.T) {
 		lines = append(lines, strings.Fields(strings.TrimSpace(v)))
 	}
 	// The header is printed on the first lines
-	// TODO: make test more resilient (no hardcoded line number)
-	require.Equal(t, []string{"test:x86", "2.0.0", "test_core"}, lines[22])
+
+	require.Equal(t, []string{"test:x86", "3.0.0", "test_core"}, lines[22])
 	numPlatforms = len(lines) - 1
 
 	// same thing in JSON format, also check the number of platforms found is the same
@@ -727,7 +726,7 @@ func TestCoreListSortedResults(t *testing.T) {
 	require.NoError(t, err)
 
 	// install some core for testing
-	_, _, err = cli.Run("core", "install", "test:x86", "Retrokits-RK002:arm", "Package:x86", "--additional-urls="+url.String())
+	_, _, err = cli.Run("core", "install", "test:x86@2.0.0", "Retrokits-RK002:arm", "Package:x86", "--additional-urls="+url.String())
 	require.NoError(t, err)
 
 	// list all with additional url specified
@@ -1007,4 +1006,22 @@ func TestCoreInstallRunsToolPostInstallScript(t *testing.T) {
 	stdout, _, err := cli.Run("core", "install", "ATTinyCore:avr", "--verbose", "--additional-urls", url)
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "Skipping tool configuration.")
+}
+
+func TestCoreBrokenDependency(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Set up an http server to serve our custom index file
+	test_index := paths.New("..", "testdata", "test_index.json")
+	url := env.HTTPServeFile(8000, test_index)
+
+	// Run update-index with our test index
+	_, _, err := cli.Run("core", "update-index", "--additional-urls="+url.String())
+	require.NoError(t, err)
+
+	// Check that the download fails and the correct message is displayed
+	_, stderr, err := cli.Run("core", "install", "test:x86@3.0.0", "--additional-urls="+url.String())
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "try contacting test@example.com")
 }
