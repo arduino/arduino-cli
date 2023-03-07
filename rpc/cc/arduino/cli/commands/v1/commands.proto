@@ -217,6 +217,12 @@ enum FailedInstanceInitReason {
   // FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR failure encountered while
   // loading a tool
   FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR = 3;
+  // FAILED_INSTANCE_INIT_REASON_LIBRARY_LOAD_ERROR failure encountered while
+  // loading a library
+  FAILED_INSTANCE_INIT_REASON_LIBRARY_LOAD_ERROR = 4;
+  // FAILED_INSTANCE_INIT_REASON_PLATFORM_LOAD_ERROR failure encountered while
+  // loading a platform
+  FAILED_INSTANCE_INIT_REASON_PLATFORM_LOAD_ERROR = 5;
 }
 
 message FailedInstanceInitError {

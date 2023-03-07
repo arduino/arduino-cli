@@ -427,9 +427,11 @@ func (e *PlatformLoadingError) Error() string {
 
 // ToRPCStatus converts the error into a *status.Status
 func (e *PlatformLoadingError) ToRPCStatus() *status.Status {
-	s, _ := status.New(codes.FailedPrecondition, e.Error()).
-		WithDetails(&rpc.PlatformLoadingError{})
-	return s
+	return (&InitFailedError{
+		Code:   codes.FailedPrecondition,
+		Cause:  e.Cause,
+		Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_PLATFORM_LOAD_ERROR,
+	}).ToRPCStatus()
 }
 
 func (e *PlatformLoadingError) Unwrap() error {
