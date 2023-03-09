@@ -177,17 +177,26 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install gocovmerge
+        run: go install github.com/wadey/gocovmerge@b5bfa59
+
       - name: Download coverage data artifact
         uses: actions/download-artifact@v3
         with:
           name: ${{ env.COVERAGE_ARTIFACT }}
 
+      - name: Merge all code coverage artifacts
+        run: gocovmerge coverage*.txt > coverage.txt
+
       - name: Send unit tests coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          files: >
-            ./coverage_unit.txt,
-            ./coverage_legacy.txt,
-            ./coverage_integration_*.txt
+          files: ./coverage.txt
           flags: unit
           fail_ci_if_error: ${{ github.repository == 'arduino/arduino-cli' }}
