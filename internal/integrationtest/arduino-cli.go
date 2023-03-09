@@ -185,6 +185,11 @@ func (cli *ArduinoCLI) convertEnvForExecutils(env map[string]string) []string {
 	for k, v := range env {
 		envVars = append(envVars, fmt.Sprintf("%s=%s", k, v))
 	}
+
+	// Proxy code-coverage related env vars
+	if gocoverdir := os.Getenv("INTEGRATION_GOCOVERDIR"); gocoverdir != "" {
+		envVars = append(envVars, "GOCOVERDIR="+gocoverdir)
+	}
 	return envVars
 }
 

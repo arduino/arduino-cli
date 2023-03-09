@@ -110,6 +110,15 @@ jobs:
         run: |
           export GO_TEST_PACKAGE="github.com/arduino/arduino-cli/internal/integrationtest/${{ matrix.tests }}"
           task go:integration-test
+          mv coverage_integration.txt coverage_integration_${{ matrix.operating-system }}_${{ matrix.tests }}.txt
+
+      - name: Upload coverage data to workflow artifact
+        uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: error
+          name: ${{ env.COVERAGE_ARTIFACT }}
+          path: |
+            ./coverage_integration_*.txt
 
   test:
     needs: run-determination
@@ -162,7 +171,9 @@ jobs:
 
   coverage-upload:
     runs-on: ubuntu-latest
-    needs: test
+    needs:
+      - test
+      - test-integration
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -176,6 +187,7 @@ jobs:
         with:
           files: >
             ./coverage_unit.txt,
-            ./coverage_legacy.txt
+            ./coverage_legacy.txt,
+            ./coverage_integration_*.txt
           flags: unit
           fail_ci_if_error: ${{ github.repository == 'arduino/arduino-cli' }}
