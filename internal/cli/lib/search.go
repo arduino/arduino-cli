@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"sort"
 	"strings"
 	"time"
 
@@ -32,11 +31,11 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	semver "go.bug.st/relaxed-semver"
 )
 
 func initSearchCommand() *cobra.Command {
-	var namesOnly bool // if true outputs lib names only.
+	var namesOnly bool
+	var omitReleasesDetails bool
 	searchCommand := &cobra.Command{
 		Use:     fmt.Sprintf("search [%s]", tr("LIBRARY_NAME")),
 		Short:   tr("Searches for one or more libraries data."),
@@ -44,17 +43,18 @@ func initSearchCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " lib search audio",
 		Args:    cobra.ArbitraryArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runSearchCommand(args, namesOnly)
+			runSearchCommand(args, namesOnly, omitReleasesDetails)
 		},
 	}
 	searchCommand.Flags().BoolVar(&namesOnly, "names", false, tr("Show library names only."))
+	searchCommand.Flags().BoolVar(&omitReleasesDetails, "omit-releases-details", false, tr("Omit library details far all versions except the latest (produce a more compact JSON output)."))
 	return searchCommand
 }
 
 // indexUpdateInterval specifies the time threshold over which indexes are updated
 const indexUpdateInterval = 60 * time.Minute
 
-func runSearchCommand(args []string, namesOnly bool) {
+func runSearchCommand(args []string, namesOnly bool, omitReleasesDetails bool) {
 	inst, status := instance.Create()
 	logrus.Info("Executing `arduino-cli lib search`")
 
@@ -75,8 +75,9 @@ func runSearchCommand(args []string, namesOnly bool) {
 	instance.Init(inst)
 
 	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
-		Instance: inst,
-		Query:    strings.Join(args, " "),
+		Instance:            inst,
+		Query:               strings.Join(args, " "),
+		OmitReleasesDetails: omitReleasesDetails,
 	})
 	if err != nil {
 		feedback.Fatal(tr("Error searching for Libraries: %v", err), feedback.ErrGeneric)
@@ -166,7 +167,7 @@ func (res result) String() string {
 		out.WriteString(fmt.Sprintf("  "+tr("Category: %s")+"\n", latest.Category))
 		out.WriteString(fmt.Sprintf("  "+tr("Architecture: %s")+"\n", strings.Join(latest.Architectures, ", ")))
 		out.WriteString(fmt.Sprintf("  "+tr("Types: %s")+"\n", strings.Join(latest.Types, ", ")))
-		out.WriteString(fmt.Sprintf("  "+tr("Versions: %s")+"\n", strings.Replace(fmt.Sprint(versionsFromSearchedLibrary(lib)), " ", ", ", -1)))
+		out.WriteString(fmt.Sprintf("  "+tr("Versions: %s")+"\n", strings.Replace(fmt.Sprint(lib.GetAvailableVersions()), " ", ", ", -1)))
 		if len(latest.ProvidesIncludes) > 0 {
 			out.WriteString(fmt.Sprintf("  "+tr("Provides includes: %s")+"\n", strings.Join(latest.ProvidesIncludes, ", ")))
 		}
@@ -176,17 +177,6 @@ func (res result) String() string {
 	}
 
 	return out.String()
-}
-
-func versionsFromSearchedLibrary(library *rpc.SearchedLibrary) []*semver.Version {
-	res := []*semver.Version{}
-	for str := range library.Releases {
-		if v, err := semver.Parse(str); err == nil {
-			res = append(res, v)
-		}
-	}
-	sort.Sort(semver.List(res))
-	return res
 }
 
 // indexNeedsUpdating returns whether library_index.json needs updating
