@@ -268,9 +268,6 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		// after reinitializing an instance after installing or uninstalling a core.
 		// If this is not done the information of the uninstall core is kept in memory,
 		// even if it should not.
-
-		// register whether the discoveries are running, if so we need to start them in
-		// order for the previous watchers to keep receiving events
 		pmb, commitPackageManager := instance.pm.NewBuilder()
 
 		loadBuiltinTools := func() []error {
