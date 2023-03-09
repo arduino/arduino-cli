@@ -280,7 +280,7 @@ func (dm *DiscoveryManager) List() []*discovery.Port {
 
 // AddAllDiscoveriesFrom transfers discoveries from src to the receiver
 func (dm *DiscoveryManager) AddAllDiscoveriesFrom(src *DiscoveryManager) {
-	for id, d := range src.discoveries {
+	for _, d := range src.discoveries {
 		dm.Add(d)
 	}
 }
