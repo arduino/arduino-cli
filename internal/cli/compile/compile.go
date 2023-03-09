@@ -196,8 +196,8 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	if err != nil {
 		showPropertiesWithEmptySketchPath := path == "" && showPropertiesM != showPropertiesModeDisabled
 		if showPropertiesWithEmptySketchPath {
-			// properties were requested and no sketch path was provided
-			// let's use an empty sketch struct and hope for the best
+			// only properties were requested and no sketch path was provided
+			// an empty sketch is used to collect properties without sketch related values
 			sk = nil
 		} else {
 			feedback.Fatal(tr("Error opening sketch: %v", err), feedback.ErrGeneric)
