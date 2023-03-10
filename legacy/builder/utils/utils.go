@@ -184,13 +184,6 @@ const (
 )
 
 func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) ([]byte, []byte, error) {
-	if ctx.Stdout == nil {
-		ctx.Stdout = os.Stdout
-	}
-	if ctx.Stderr == nil {
-		ctx.Stderr = os.Stderr
-	}
-
 	if ctx.Verbose {
 		ctx.Info(PrintableCommand(command.Args))
 	}
@@ -198,15 +191,23 @@ func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) 
 	if stdout == Capture {
 		buffer := &bytes.Buffer{}
 		command.Stdout = buffer
-	} else if stdout == Show || stdout == ShowIfVerbose && ctx.Verbose {
-		command.Stdout = ctx.Stdout
+	} else if stdout == Show || (stdout == ShowIfVerbose && ctx.Verbose) {
+		if ctx.Stdout != nil {
+			command.Stdout = ctx.Stdout
+		} else {
+			command.Stdout = os.Stdout
+		}
 	}
 
 	if stderr == Capture {
 		buffer := &bytes.Buffer{}
 		command.Stderr = buffer
-	} else if stderr == Show || stderr == ShowIfVerbose && ctx.Verbose {
-		command.Stderr = ctx.Stderr
+	} else if stderr == Show || (stderr == ShowIfVerbose && ctx.Verbose) {
+		if ctx.Stderr != nil {
+			command.Stderr = ctx.Stderr
+		} else {
+			command.Stderr = os.Stderr
+		}
 	}
 
 	err := command.Start()
