@@ -176,10 +176,10 @@ func (pme *Explorer) DownloadAndInstallPlatformAndTools(
 			return errors.New(tr("platform not installed"))
 		}
 		stdout, stderr, err := pme.RunPostInstallScript(platformRelease.InstallDir)
-		skipEmptyMessageTaskProgressCB(taskCB)(&rpc.TaskProgress{Message: string(stdout)})
-		skipEmptyMessageTaskProgressCB(taskCB)(&rpc.TaskProgress{Message: string(stderr)})
+		skipEmptyMessageTaskProgressCB(taskCB)(&rpc.TaskProgress{Message: string(stdout), Completed: true})
+		skipEmptyMessageTaskProgressCB(taskCB)(&rpc.TaskProgress{Message: string(stderr), Completed: true})
 		if err != nil {
-			taskCB(&rpc.TaskProgress{Message: tr("WARNING cannot configure platform: %s", err)})
+			taskCB(&rpc.TaskProgress{Message: tr("WARNING cannot configure platform: %s", err), Completed: true})
 		}
 
 	} else {
