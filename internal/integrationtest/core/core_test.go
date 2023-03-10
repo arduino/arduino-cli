@@ -178,7 +178,6 @@ func TestCoreSearchNoArgs(t *testing.T) {
 		lines = append(lines, strings.Fields(strings.TrimSpace(v)))
 	}
 	// The header is printed on the first lines
-
 	require.Equal(t, []string{"test:x86", "3.0.0", "test_core"}, lines[22])
 	numPlatforms = len(lines) - 1
 
