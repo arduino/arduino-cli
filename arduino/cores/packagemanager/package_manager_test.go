@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -638,4 +640,40 @@ func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 		require.Equal(t, "builtin:serial-monitor", platformProps.Get("pluggable_monitor.required.serial"))
 		require.Equal(t, `"{network_cmd}" -address {upload.port.address} -port {upload.port.properties.port} -sketch "{build.path}/{build.project_name}.hex" -upload {upload.port.properties.endpoint_upload} -sync {upload.port.properties.endpoint_sync} -reset {upload.port.properties.endpoint_reset} -sync_exp {upload.port.properties.sync_return}`, platformProps.Get("tools.avrdude__pluggable_network.upload.pattern"))
 	}
+}
+
+func TestRunPostInstall(t *testing.T) {
+	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test")
+	pm := pmb.Build()
+	pme, release := pm.NewExplorer()
+	defer release()
+
+	// prepare dummy post install script
+	dir := paths.New(t.TempDir())
+
+	var scriptPath *paths.Path
+	var err error
+	if runtime.GOOS == "windows" {
+		scriptPath = dir.Join("post_install.bat")
+
+		err = scriptPath.WriteFile([]byte(
+			`@echo off
+			echo sent in stdout
+			echo sent in stderr 1>&2`))
+	} else {
+		scriptPath = dir.Join("post_install.sh")
+		err = scriptPath.WriteFile([]byte(
+			`#!/bin/sh
+			echo "sent in stdout"
+			echo "sent in stderr" 1>&2`))
+	}
+	require.NoError(t, err)
+	err = os.Chmod(scriptPath.String(), 0777)
+	require.NoError(t, err)
+	stdout, stderr, err := pme.RunPostInstallScript(dir)
+	require.NoError(t, err)
+
+	// `HasPrefix` because windows seem to add a trailing space at the end
+	require.Equal(t, "sent in stdout", strings.Trim(string(stdout), "\n\r "))
+	require.Equal(t, "sent in stderr", strings.Trim(string(stderr), "\n\r "))
 }

@@ -16,6 +16,7 @@
 package packagemanager
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"runtime"
@@ -174,9 +175,13 @@ func (pme *Explorer) DownloadAndInstallPlatformAndTools(
 		if !platformRelease.IsInstalled() {
 			return errors.New(tr("platform not installed"))
 		}
-		if err := pme.RunPostInstallScript(platformRelease.InstallDir); err != nil {
-			taskCB(&rpc.TaskProgress{Message: tr("WARNING cannot configure platform: %s", err)})
+		stdout, stderr, err := pme.RunPostInstallScript(platformRelease.InstallDir)
+		skipEmptyMessageTaskProgressCB(taskCB)(&rpc.TaskProgress{Message: string(stdout), Completed: true})
+		skipEmptyMessageTaskProgressCB(taskCB)(&rpc.TaskProgress{Message: string(stderr), Completed: true})
+		if err != nil {
+			taskCB(&rpc.TaskProgress{Message: tr("WARNING cannot configure platform: %s", err), Completed: true})
 		}
+
 	} else {
 		log.Info("Skipping platform configuration.")
 		taskCB(&rpc.TaskProgress{Message: tr("Skipping platform configuration.")})
@@ -226,7 +231,7 @@ func (pme *Explorer) cacheInstalledJSON(platformRelease *cores.PlatformRelease) 
 
 // RunPostInstallScript runs the post_install.sh (or post_install.bat) script for the
 // specified platformRelease or toolRelease.
-func (pme *Explorer) RunPostInstallScript(installDir *paths.Path) error {
+func (pme *Explorer) RunPostInstallScript(installDir *paths.Path) ([]byte, []byte, error) {
 	postInstallFilename := "post_install.sh"
 	if runtime.GOOS == "windows" {
 		postInstallFilename = "post_install.bat"
@@ -235,14 +240,16 @@ func (pme *Explorer) RunPostInstallScript(installDir *paths.Path) error {
 	if postInstall.Exist() && postInstall.IsNotDir() {
 		cmd, err := executils.NewProcessFromPath(pme.GetEnvVarsForSpawnedProcess(), postInstall)
 		if err != nil {
-			return err
+			return []byte{}, []byte{}, err
 		}
+		cmdStdout, cmdStderr := bytes.NewBuffer([]byte{}), bytes.NewBuffer([]byte{})
+		cmd.RedirectStdoutTo(cmdStdout)
+		cmd.RedirectStderrTo(cmdStderr)
 		cmd.SetDirFromPath(installDir)
-		if err := cmd.Run(); err != nil {
-			return err
-		}
+		err = cmd.Run()
+		return cmdStdout.Bytes(), cmdStderr.Bytes(), err
 	}
-	return nil
+	return []byte{}, []byte{}, nil
 }
 
 // IsManagedPlatformRelease returns true if the PlatforRelease is managed by the PackageManager
@@ -335,7 +342,10 @@ func (pme *Explorer) InstallTool(toolRelease *cores.ToolRelease, taskCB rpc.Task
 	if !skipPostInstall {
 		log.Info("Running tool post_install script")
 		taskCB(&rpc.TaskProgress{Message: tr("Configuring tool.")})
-		if err := pme.RunPostInstallScript(toolRelease.InstallDir); err != nil {
+		stdout, stderr, err := pme.RunPostInstallScript(toolRelease.InstallDir)
+		skipEmptyMessageTaskProgressCB(taskCB)(&rpc.TaskProgress{Message: string(stdout)})
+		skipEmptyMessageTaskProgressCB(taskCB)(&rpc.TaskProgress{Message: string(stderr)})
+		if err != nil {
 			taskCB(&rpc.TaskProgress{Message: tr("WARNING cannot configure tool: %s", err)})
 		}
 	} else {
@@ -411,4 +421,13 @@ func (pme *Explorer) IsToolRequired(toolRelease *cores.ToolRelease) bool {
 		}
 	}
 	return false
+}
+
+func skipEmptyMessageTaskProgressCB(taskCB rpc.TaskProgressCB) rpc.TaskProgressCB {
+	return func(msg *rpc.TaskProgress) {
+		if msg != nil && len(msg.Message) == 0 {
+			return
+		}
+		taskCB(msg)
+	}
 }
