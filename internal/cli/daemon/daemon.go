@@ -16,6 +16,7 @@
 package daemon
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
@@ -173,5 +174,6 @@ func (r daemonResult) Data() interface{} {
 }
 
 func (r daemonResult) String() string {
-	return tr("Daemon is now listening on %s:%s", r.IP, r.Port)
+	j, _ := json.Marshal(r)
+	return fmt.Sprintln(tr("Daemon is now listening on %s:%s", r.IP, r.Port)) + fmt.Sprintln(string(j))
 }

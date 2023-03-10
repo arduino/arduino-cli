@@ -22,6 +22,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
+	"go.bug.st/testifyjson/requirejson"
 )
 
 func TestRuntimeToolPropertiesGeneration(t *testing.T) {
@@ -95,4 +96,23 @@ func TestCompileBuildPathInsideSketch(t *testing.T) {
 	// Compile again using the same build path
 	_, _, err = cli.Run("compile", "-b", "arduino:avr:mega", "--build-path", "build-mega")
 	require.NoError(t, err)
+}
+
+func TestCompilerErrOutput(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Run update-index with our test index
+	_, _, err := cli.Run("core", "install", "arduino:avr@1.8.5")
+	require.NoError(t, err)
+
+	// prepare sketch
+	sketch, err := paths.New("testdata", "blink_with_wrong_cpp").Abs()
+	require.NoError(t, err)
+
+	// Run compile and catch err stream
+	out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "--format", "json", sketch.String())
+	require.Error(t, err)
+	compilerErr := requirejson.Parse(t, out).Query(".compiler_err")
+	compilerErr.MustContain(`"error"`)
 }
