@@ -139,6 +139,9 @@ message LibrarySearchRequest {
   Instance instance = 1;
   // The search query.
   string query = 2;
+  // Set to true to not populate the releases field in the response (may save a
+  // lot of bandwidth/CPU).
+  bool omit_releases_details = 3;
 }
 
 enum LibrarySearchStatus {
@@ -163,6 +166,8 @@ message SearchedLibrary {
   map<string, LibraryRelease> releases = 2;
   // The index data for the latest version of the library.
   LibraryRelease latest = 3;
+  // The available versions of this library.
+  repeated string available_versions = 4;
 }
 
 message LibraryRelease {

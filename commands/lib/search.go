@@ -53,7 +53,7 @@ func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.Libraries
 		}
 
 		if utils.Match(toTest, queryTerms) {
-			res = append(res, indexLibraryToRPCSearchLibrary(lib))
+			res = append(res, indexLibraryToRPCSearchLibrary(lib, req.GetOmitReleasesDetails()))
 		}
 	}
 
@@ -74,17 +74,31 @@ func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.Libraries
 }
 
 // indexLibraryToRPCSearchLibrary converts a librariindex.Library to rpc.SearchLibrary
-func indexLibraryToRPCSearchLibrary(lib *librariesindex.Library) *rpc.SearchedLibrary {
-	releases := map[string]*rpc.LibraryRelease{}
-	for str, rel := range lib.Releases {
-		releases[str] = getLibraryParameters(rel)
+func indexLibraryToRPCSearchLibrary(lib *librariesindex.Library, omitReleasesDetails bool) *rpc.SearchedLibrary {
+	var releases map[string]*rpc.LibraryRelease
+	if !omitReleasesDetails {
+		releases = map[string]*rpc.LibraryRelease{}
+		for str, rel := range lib.Releases {
+			releases[str] = getLibraryParameters(rel)
+		}
 	}
-	latest := getLibraryParameters(lib.Latest)
+
+	versions := semver.List{}
+	for _, rel := range lib.Releases {
+		versions = append(versions, rel.Version)
+	}
+	sort.Sort(versions)
+
+	versionsString := []string{}
+	for _, v := range versions {
+		versionsString = append(versionsString, v.String())
+	}
 
 	return &rpc.SearchedLibrary{
-		Name:     lib.Name,
-		Releases: releases,
-		Latest:   latest,
+		Name:              lib.Name,
+		Releases:          releases,
+		Latest:            getLibraryParameters(lib.Latest),
+		AvailableVersions: versionsString,
 	}
 }
 
