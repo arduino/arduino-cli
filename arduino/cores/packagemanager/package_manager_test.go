@@ -645,7 +645,7 @@ func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 }
 
 func TestRunPostInstall(t *testing.T) {
-	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test")
+	pmb := NewBuilder(nil, nil, nil, nil, "test")
 	pm := pmb.Build()
 	pme, release := pm.NewExplorer()
 	defer release()
