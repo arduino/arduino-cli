@@ -1628,9 +1628,12 @@
 <p>The programs that run on Arduino boards are called "sketches". This term was inherited from
 <a href="https://processing.org/">Processing</a>, upon which the Arduino IDE and the core API were based.</p>
 <h2 id="sketch-folders-and-files">Sketch folders and files<a class="headerlink" href="#sketch-folders-and-files" title="Permanent link">&para;</a></h2>
-<p>The sketch root folder name and code file names must start with a basic letter (<code>A</code>-<code>Z</code> or <code>a</code>-<code>z</code>) or number (<code>0</code>-<code>9</code>),
-followed by basic letters, numbers, underscores (<code>_</code>), dots (<code>.</code>) and dashes (<code>-</code>). The maximum length is 63 characters.</p>
-<p>Support for names starting with a number was added in Arduino IDE 1.8.4.</p>
+<p>The sketch root folder name and code file names must start with a basic letter (<code>A</code>-<code>Z</code> or <code>a</code>-<code>z</code>), number (<code>0</code>-<code>9</code>)
+<a href="#leading-number-note"><sup>1</sup></a>, or underscore (<code>_</code>) <a href="#leading-underscore-note"><sup>2</sup></a> followed by basic
+letters, numbers, underscores, dots (<code>.</code>) and dashes (<code>-</code>). The maximum length is 63 characters.</p>
+<p><a id="leading-number-note"></a> <sup>1</sup> Supported from Arduino IDE 1.8.4. <br />
+<a id="leading-underscore-note"></a> <sup>2</sup> Supported in all versions except Arduino IDE 2.0.4/Arduino CLI
+0.30.0 - 0.30.1.</p>
 <h3 id="sketch-root-folder">Sketch root folder<a class="headerlink" href="#sketch-root-folder" title="Permanent link">&para;</a></h3>
 <p>Because many Arduino sketches only contain a single .ino file, it's easy to think of that file as the sketch. However,
 it is the folder that is the sketch. The reason is that sketches may consist of multiple code files and the folder is
