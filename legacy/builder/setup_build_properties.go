@@ -45,7 +45,9 @@ func (s *SetupBuildProperties) Run(ctx *types.Context) error {
 	}
 	ctx.OptimizationFlags = buildProperties.Get("compiler.optimization_flags")
 
-	buildProperties.SetPath("build.source.path", ctx.Sketch.FullPath)
+	if ctx.Sketch != nil {
+		buildProperties.SetPath("build.source.path", ctx.Sketch.FullPath)
+	}
 
 	keychainProp := buildProperties.ContainsKey("build.keys.keychain")
 	signProp := buildProperties.ContainsKey("build.keys.sign_key")

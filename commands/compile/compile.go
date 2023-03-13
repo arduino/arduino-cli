@@ -120,17 +120,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		appendBuildProperties(r, builderCtx)
 	}()
 	r = &rpc.CompileResponse{}
-	if newSketchErr != nil {
-		if req.GetShowProperties() {
-			// Just get build properties and exit
-			compileErr := builder.RunParseHardware(builderCtx)
-			if compileErr != nil {
-				compileErr = &arduino.CompileFailedError{Message: compileErr.Error()}
-			}
-			return r, compileErr
-		}
-		return nil, &arduino.CantOpenSketchError{Cause: err}
-	}
+
 	builderCtx.Sketch = sk
 	builderCtx.ProgressCB = progressCB
 
@@ -142,29 +132,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
 	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
 	builderCtx.LibraryDirs = paths.NewPathList(req.Library...)
-	if req.GetBuildPath() == "" {
-		builderCtx.BuildPath = sk.DefaultBuildPath()
-	} else {
-		builderCtx.BuildPath = paths.New(req.GetBuildPath()).Canonical()
-		if in, err := builderCtx.BuildPath.IsInsideDir(sk.FullPath); err != nil {
-			return nil, &arduino.NotFoundError{Message: tr("Cannot find build path"), Cause: err}
-		} else if in && builderCtx.BuildPath.IsDir() {
-			if sk.AdditionalFiles, err = removeBuildFromSketchFiles(sk.AdditionalFiles, builderCtx.BuildPath); err != nil {
-				return nil, err
-			}
-		}
+	err = prepareBuildPath(sk, req.GetBuildPath(), builderCtx)
+	if err != nil {
+		return r, err
 	}
-	if err = builderCtx.BuildPath.MkdirAll(); err != nil {
-		return nil, &arduino.PermissionDeniedError{Message: tr("Cannot create build directory"), Cause: err}
-	}
-
-	buildcache.New(builderCtx.BuildPath.Parent()).GetOrCreate(builderCtx.BuildPath.Base())
-	// cache is purged after compilation to not remove entries that might be required
-	defer maybePurgeBuildCache()
-
-	builderCtx.CompilationDatabase = bldr.NewCompilationDatabase(
-		builderCtx.BuildPath.Join("compile_commands.json"),
-	)
 
 	builderCtx.Verbose = req.GetVerbose()
 
@@ -220,6 +191,15 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		}
 		return r, compileErr
 	}
+
+	if newSketchErr != nil {
+		// newSketchErr causes to exit only here since the request could have
+		// been to only show properties until now
+		return r, &arduino.CantOpenSketchError{Cause: err}
+	}
+
+	// cache is purged after compilation to not remove entries that might be required
+	defer maybePurgeBuildCache()
 
 	if req.GetPreprocess() {
 		// Just output preprocessed source code and exit
@@ -298,6 +278,35 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	logrus.Tracef("Compile %s for %s successful", sk.Name, fqbnIn)
 
 	return r, nil
+}
+
+func prepareBuildPath(sk *sketch.Sketch, requestedBuildPath string, builderCtx *types.Context) error {
+	if sk == nil {
+		return nil
+	}
+
+	if requestedBuildPath == "" {
+		builderCtx.BuildPath = sk.DefaultBuildPath()
+	} else {
+		builderCtx.BuildPath = paths.New(requestedBuildPath).Canonical()
+		if in, err := builderCtx.BuildPath.IsInsideDir(sk.FullPath); err != nil {
+			return &arduino.NotFoundError{Message: tr("Cannot find build path"), Cause: err}
+		} else if in && builderCtx.BuildPath.IsDir() {
+			if sk.AdditionalFiles, err = removeBuildFromSketchFiles(sk.AdditionalFiles, builderCtx.BuildPath); err != nil {
+				return err
+			}
+		}
+	}
+
+	if err := builderCtx.BuildPath.MkdirAll(); err != nil {
+		return &arduino.PermissionDeniedError{Message: tr("Cannot create build directory"), Cause: err}
+	}
+
+	builderCtx.CompilationDatabase = bldr.NewCompilationDatabase(
+		builderCtx.BuildPath.Join("compile_commands.json"),
+	)
+	buildcache.New(builderCtx.BuildPath.Parent()).GetOrCreate(builderCtx.BuildPath.Base())
+	return nil
 }
 
 func appendUserLibraries(r *rpc.CompileResponse, builderCtx *types.Context, errStream io.Writer) {
