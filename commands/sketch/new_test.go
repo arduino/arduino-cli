@@ -13,7 +13,6 @@ func Test_SketchNameWrongPattern(t *testing.T) {
 	invalidNames := []string{
 		"&",
 		".hello",
-		"_hello",
 		"-hello",
 		"hello*",
 		"||||||||||||||",
@@ -25,7 +24,7 @@ func Test_SketchNameWrongPattern(t *testing.T) {
 			SketchDir:  t.TempDir(),
 		})
 
-		require.EqualError(t, err, fmt.Sprintf(`Can't create sketch: invalid sketch name "%s": the first character must be alphanumeric, the following ones can also contain "_", "-", and ".".`,
+		require.EqualError(t, err, fmt.Sprintf(`Can't create sketch: invalid sketch name "%s": the first character must be alphanumeric or "_", the following ones can also contain "-" and ".".`,
 			name))
 	}
 }
@@ -66,6 +65,7 @@ func Test_SketchNameOk(t *testing.T) {
 		"h..ello-world",
 		"h..ello-world.",
 		"hello_world__",
+		"_hello_world",
 		string(lengthLimitName),
 	}
 	for _, name := range validNames {
