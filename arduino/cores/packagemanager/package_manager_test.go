@@ -457,6 +457,8 @@ func TestPackageManagerClear(t *testing.T) {
 func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 	// Create all the necessary data to load discoveries
 	fakePath := paths.New("fake-path")
+	require.NoError(t, fakePath.Join("LICENSE").MkdirAll())
+	defer fakePath.RemoveAll()
 
 	pmb := NewBuilder(fakePath, fakePath, fakePath, fakePath, "test")
 	pack := pmb.GetOrCreatePackage("arduino")

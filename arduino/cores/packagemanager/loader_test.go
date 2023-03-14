@@ -170,6 +170,8 @@ arduino_zero_edbg.serial.disableRTS=true
 func TestLoadDiscoveries(t *testing.T) {
 	// Create all the necessary data to load discoveries
 	fakePath := paths.New("fake-path")
+	require.NoError(t, fakePath.Join("LICENSE").MkdirAll())
+	defer fakePath.RemoveAll()
 
 	createTestPackageManager := func() *PackageManager {
 		pmb := NewBuilder(fakePath, fakePath, fakePath, fakePath, "test")
@@ -277,6 +279,8 @@ func TestLoadDiscoveries(t *testing.T) {
 		require.Contains(t, discoveries, "teensy")
 		pmeRelease()
 	}
+
+	require.NoError(t, fakePath.RemoveAll())
 }
 
 func TestConvertUploadToolsToPluggableDiscovery(t *testing.T) {
