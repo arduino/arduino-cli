@@ -541,6 +541,18 @@ func TestInstall(t *testing.T) {
 	_, stderr, err := cli.Run("lib", "install", "MD_Parola@3.2.0")
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "No valid dependencies solution found: dependency 'MD_MAX72xx' is not available")
+
+	// Test installing a library with a "relaxed" version
+	// https://github.com/arduino/arduino-cli/issues/1727
+	_, _, err = cli.Run("lib", "install", "ILI9341_t3@1.0")
+	require.NoError(t, err)
+	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Parse(t, stdout).Query(`.[] | select(.library.name == "ILI9341_t3") | .library.version`).MustEqual(`"1.0"`)
+	_, _, err = cli.Run("lib", "install", "ILI9341_t3@1")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "ILI9341_t3@1.0.0")
+	require.NoError(t, err)
 }
 
 func TestInstallLibraryWithDependencies(t *testing.T) {
