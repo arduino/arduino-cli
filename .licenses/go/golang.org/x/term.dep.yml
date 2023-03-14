@@ -1,6 +1,6 @@
 ---
 name: golang.org/x/term
-version: v0.0.0-20210927222741-03fcf44c2211
+version: v0.6.0
 type: go
 summary: Package term provides support functions for dealing with terminals, as commonly
   found on UNIX systems.
@@ -60,9 +60,4 @@ licenses:
     infringement, or inducement of patent infringement, then any patent
     rights granted to you under this License for this implementation of Go
     shall terminate as of the date such litigation is filed.
-notices:
-- sources: AUTHORS
-  text: |-
-    # This source code refers to The Go Authors for copyright purposes.
-    # The master list of authors is in the main Go distribution,
-    # visible at http://tip.golang.org/AUTHORS.
+notices: []

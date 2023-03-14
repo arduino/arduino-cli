@@ -24,12 +24,14 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/discovery/discoverymanager"
-	ui "github.com/gizak/termui/v3"
-	"github.com/gizak/termui/v3/widgets"
 	"github.com/sirupsen/logrus"
 )
 
 func main() {
+	if len(os.Args) < 2 {
+		fmt.Println("Please specify at least one discovery.")
+		os.Exit(1)
+	}
 	logrus.SetLevel(logrus.ErrorLevel)
 	dm := discoverymanager.New()
 	for _, discCmd := range os.Args[1:] {
@@ -38,98 +40,23 @@ func main() {
 	}
 	dm.Start()
 
-	activePorts := map[string]*discovery.Port{}
 	watcher, err := dm.Watch()
 	if err != nil {
 		log.Fatalf("failed to start discoveries: %v", err)
 	}
-	if err := ui.Init(); err != nil {
-		log.Fatalf("failed to initialize termui: %v", err)
-	}
-	defer ui.Close()
 
-	l := widgets.NewList()
-	l.Title = "List"
-	l.TextStyle = ui.NewStyle(ui.ColorYellow)
-	l.WrapText = false
-	w, h := ui.TerminalDimensions()
-	l.SetRect(0, 0, w, h)
-
-	updateList := func() {
-		rows := []string{}
-		rows = append(rows, "Available ports list:")
-
-		ids := sort.StringSlice{}
-		for id := range activePorts {
-			ids = append(ids, id)
-		}
-		ids.Sort()
-		for _, id := range ids {
-			port := activePorts[id]
-			rows = append(rows, fmt.Sprintf("> Address: %s", port.AddressLabel))
-			rows = append(rows, fmt.Sprintf("  Protocol: %s", port.ProtocolLabel))
+	for ev := range watcher.Feed() {
+		port := ev.Port
+		fmt.Printf("> Port %s\n", ev.Type)
+		fmt.Printf("   Address: %s\n", port.Address)
+		fmt.Printf("  Protocol: %s\n", port.Protocol)
+		if ev.Type == "add" {
 			keys := port.Properties.Keys()
 			sort.Strings(keys)
 			for _, k := range keys {
-				rows = append(rows, fmt.Sprintf("                  %s=%s", k, port.Properties.Get(k)))
+				fmt.Printf("            %s=%s\n", k, port.Properties.Get(k))
 			}
 		}
-		l.Rows = rows
-	}
-	updateList()
-	ui.Render(l)
-
-	previousKey := ""
-	uiEvents := ui.PollEvents()
-out:
-	for {
-		select {
-		case e := <-uiEvents:
-			switch e.ID {
-			case "<Resize>":
-				payload := e.Payload.(ui.Resize)
-				l.SetRect(0, 0, payload.Width, payload.Height)
-				ui.Clear()
-			case "q", "<C-c>":
-				break out
-			case "j", "<Down>":
-				l.ScrollDown()
-			case "k", "<Up>":
-				l.ScrollUp()
-			case "<C-d>":
-				l.ScrollHalfPageDown()
-			case "<C-u>":
-				l.ScrollHalfPageUp()
-			case "<C-f>":
-				l.ScrollPageDown()
-			case "<C-b>":
-				l.ScrollPageUp()
-			case "g":
-				if previousKey == "g" {
-					l.ScrollTop()
-				}
-			case "<Home>":
-				l.ScrollTop()
-			case "G", "<End>":
-				l.ScrollBottom()
-			}
-
-			if previousKey == "g" {
-				previousKey = ""
-			} else {
-				previousKey = e.ID
-			}
-
-		case ev := <-watcher.Feed():
-			if ev.Type == "add" {
-				activePorts[ev.Port.Address+"|"+ev.Port.Protocol] = ev.Port
-			}
-			if ev.Type == "remove" {
-				delete(activePorts, ev.Port.Address+"|"+ev.Port.Protocol)
-			}
-			updateList()
-		}
-
-		ui.Render(l)
+		fmt.Println()
 	}
 }
