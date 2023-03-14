@@ -61,10 +61,6 @@ jobs:
       matrix:
         module:
           - path: ./
-          - path: arduino/discovery/discovery_client
-          - path: client_example
-          - path: commands/daemon/term_example
-          - path: docsgen
 
     steps:
       - name: Checkout repository
@@ -98,10 +94,6 @@ jobs:
       matrix:
         module:
           - path: ./
-          - path: arduino/discovery/discovery_client
-          - path: client_example
-          - path: commands/daemon/term_example
-          - path: docsgen
 
     steps:
       - name: Checkout repository
@@ -138,10 +130,6 @@ jobs:
       matrix:
         module:
           - path: ./
-          - path: arduino/discovery/discovery_client
-          - path: client_example
-          - path: commands/daemon/term_example
-          - path: docsgen
 
     steps:
       - name: Checkout repository
@@ -178,10 +166,6 @@ jobs:
       matrix:
         module:
           - path: ./
-          - path: arduino/discovery/discovery_client
-          - path: client_example
-          - path: commands/daemon/term_example
-          - path: docsgen
 
     steps:
       - name: Checkout repository
@@ -218,9 +202,6 @@ jobs:
       matrix:
         module:
           - path: ./
-          - path: arduino/discovery/discovery_client
-          - path: client_example
-          - path: docsgen
 
     steps:
       - name: Checkout repository
