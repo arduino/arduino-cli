@@ -78,8 +78,8 @@ func indexLibraryToRPCSearchLibrary(lib *librariesindex.Library, omitReleasesDet
 	var releases map[string]*rpc.LibraryRelease
 	if !omitReleasesDetails {
 		releases = map[string]*rpc.LibraryRelease{}
-		for str, rel := range lib.Releases {
-			releases[str] = getLibraryParameters(rel)
+		for _, rel := range lib.Releases {
+			releases[rel.Version.String()] = getLibraryParameters(rel)
 		}
 	}
 
