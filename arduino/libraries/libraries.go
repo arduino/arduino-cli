@@ -212,21 +212,6 @@ func (library *Library) SourceDirs() []SourceDir {
 	return dirs
 }
 
-// LocationPriorityFor returns a number representing the location priority for the given library
-// using the given platform and referenced-platform. Higher value means higher priority.
-func (library *Library) LocationPriorityFor(platformRelease, refPlatformRelease *cores.PlatformRelease) int {
-	if library.Location == IDEBuiltIn {
-		return 1
-	} else if library.ContainerPlatform == refPlatformRelease {
-		return 2
-	} else if library.ContainerPlatform == platformRelease {
-		return 3
-	} else if library.Location == User {
-		return 4
-	}
-	return 0
-}
-
 // DeclaredHeaders returns the C++ headers that the library declares in library.properties
 func (library *Library) DeclaredHeaders() []string {
 	if library.declaredHeaders == nil {

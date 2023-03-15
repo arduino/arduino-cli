@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
@@ -69,7 +70,9 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 				}
 			}
 			if latest, has := filteredRes[lib.Library.Name]; has {
-				if latest.Library.LocationPriorityFor(boardPlatform, refBoardPlatform) >= lib.Library.LocationPriorityFor(boardPlatform, refBoardPlatform) {
+				latestPriority := librariesresolver.ComputePriority(latest.Library, "", fqbn.PlatformArch)
+				libPriority := librariesresolver.ComputePriority(lib.Library, "", fqbn.PlatformArch)
+				if latestPriority >= libPriority {
 					// Pick library with the best priority
 					continue
 				}
