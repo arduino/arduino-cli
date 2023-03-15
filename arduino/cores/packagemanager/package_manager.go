@@ -98,15 +98,25 @@ func (pmb *Builder) BuildIntoExistingPackageManager(target *PackageManager) {
 	target.tempDir = pmb.tempDir
 	target.packagesCustomGlobalProperties = pmb.packagesCustomGlobalProperties
 	target.profile = pmb.profile
-	target.discoveryManager = pmb.discoveryManager
+	target.discoveryManager.Clear()
+	target.discoveryManager.AddAllDiscoveriesFrom(pmb.discoveryManager)
 	target.userAgent = pmb.userAgent
 }
 
 // Build builds a new PackageManager.
 func (pmb *Builder) Build() *PackageManager {
-	res := &PackageManager{}
-	pmb.BuildIntoExistingPackageManager(res)
-	return res
+	return &PackageManager{
+		log:                            pmb.log,
+		packages:                       pmb.packages,
+		IndexDir:                       pmb.IndexDir,
+		PackagesDir:                    pmb.PackagesDir,
+		DownloadDir:                    pmb.DownloadDir,
+		tempDir:                        pmb.tempDir,
+		packagesCustomGlobalProperties: pmb.packagesCustomGlobalProperties,
+		profile:                        pmb.profile,
+		discoveryManager:               pmb.discoveryManager,
+		userAgent:                      pmb.userAgent,
+	}
 }
 
 // NewBuilder creates a Builder with the same configuration

@@ -194,12 +194,13 @@ func (dm *DiscoveryManager) startDiscovery(d *discovery.PluggableDiscovery) (dis
 		return fmt.Errorf("%s: %s", tr("starting discovery %s", d.GetID()), err)
 	}
 
-	go func() {
+	go func(d *discovery.PluggableDiscovery) {
 		// Transfer all incoming events from this discovery to the feed channel
 		for ev := range eventCh {
 			dm.feed <- ev
 		}
-	}()
+		logrus.Infof("Discovery event channel closed %s. Exiting goroutine.", d.GetID())
+	}(d)
 	return nil
 }
 
@@ -275,4 +276,11 @@ func (dm *DiscoveryManager) List() []*discovery.Port {
 		}
 	}
 	return res
+}
+
+// AddAllDiscoveriesFrom transfers discoveries from src to the receiver
+func (dm *DiscoveryManager) AddAllDiscoveriesFrom(src *DiscoveryManager) {
+	for _, d := range src.discoveries {
+		dm.Add(d)
+	}
 }
