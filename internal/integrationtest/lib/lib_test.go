@@ -1547,3 +1547,29 @@ func TestLibQueryParameters(t *testing.T) {
 	require.Contains(t, string(stdout),
 		"Starting download                             \x1b[36murl\x1b[0m=\"https://downloads.arduino.cc/libraries/github.com/firmata/Firmata-2.5.9.zip?query=upgrade-builtin\"\n")
 }
+
+func TestLibBundlesWhenLibWithTheSameNameIsInstalledGlobally(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// See: https://github.com/arduino/arduino-cli/issues/1566
+	_, _, err := cli.Run("core", "install", "arduino:samd@1.8.13")
+	require.NoError(t, err)
+	{
+		stdout, _, err := cli.Run("lib", "list", "--all", "--fqbn", "arduino:samd:mkrzero", "USBHost", "--format", "json")
+		require.NoError(t, err)
+		j := requirejson.Parse(t, stdout)
+		j.Query(`.[0].library.name`).MustEqual(`"USBHost"`)
+		j.Query(`.[0].library.compatible_with."arduino:samd:mkrzero"`).MustEqual(`true`)
+	}
+	_, _, err = cli.Run("lib", "install", "USBHost@1.0.5")
+	require.NoError(t, err)
+	{
+		// Check that the architecture-specific library is still listed
+		stdout, _, err := cli.Run("lib", "list", "--all", "--fqbn", "arduino:samd:mkrzero", "USBHost", "--format", "json")
+		require.NoError(t, err)
+		j := requirejson.Parse(t, stdout)
+		j.Query(`.[0].library.name`).MustEqual(`"USBHost"`)
+		j.Query(`.[0].library.compatible_with."arduino:samd:mkrzero"`).MustEqual(`true`)
+	}
+}
