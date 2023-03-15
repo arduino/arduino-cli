@@ -40,10 +40,10 @@ type Platform struct {
 	Architecture      string // The name of the architecture of this package.
 	Name              string
 	Category          string
-	Releases          map[string]*PlatformRelease // The Releases of this platform, labeled by version.
-	Package           *Package                    `json:"-"`
-	ManuallyInstalled bool                        // true if the Platform has been installed without the CLI
-	Deprecated        bool                        // true if the Platform has been deprecated
+	Releases          map[semver.NormalizedString]*PlatformRelease // The Releases of this platform, labeled by version.
+	Package           *Package                                     `json:"-"`
+	ManuallyInstalled bool                                         // true if the Platform has been installed without the CLI
+	Deprecated        bool                                         // true if the Platform has been deprecated
 }
 
 // PlatformReleaseHelp represents the help URL for this Platform release
@@ -191,9 +191,9 @@ func (d *MonitorDependency) String() string {
 // GetOrCreateRelease returns the specified release corresponding the provided version,
 // or creates a new one if not found.
 func (platform *Platform) GetOrCreateRelease(version *semver.Version) *PlatformRelease {
-	tag := ""
+	var tag semver.NormalizedString
 	if version != nil {
-		tag = version.String()
+		tag = version.NormalizedString()
 	}
 	if release, ok := platform.Releases[tag]; ok {
 		return release
@@ -213,7 +213,7 @@ func (platform *Platform) GetOrCreateRelease(version *semver.Version) *PlatformR
 // or nil if not found.
 func (platform *Platform) FindReleaseWithVersion(version *semver.Version) *PlatformRelease {
 	// use as an fmt.Stringer
-	return platform.Releases[version.String()]
+	return platform.Releases[version.NormalizedString()]
 }
 
 // GetLatestRelease returns the latest release of this platform, or nil if no releases

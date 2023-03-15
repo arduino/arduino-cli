@@ -61,7 +61,7 @@ func (pme *Explorer) FindPlatformRelease(ref *PlatformReference) *cores.Platform
 	if platform == nil {
 		return nil
 	}
-	platformRelease, ok := platform.Releases[ref.PlatformVersion.String()]
+	platformRelease, ok := platform.Releases[ref.PlatformVersion.NormalizedString()]
 	if !ok {
 		return nil
 	}

@@ -27,9 +27,9 @@ import (
 
 // Tool represents a single Tool, part of a Package.
 type Tool struct {
-	Name     string                  `json:"name"`     // The Name of the Tool.
-	Releases map[string]*ToolRelease `json:"releases"` // Maps Version to Release.
-	Package  *Package                `json:"-"`
+	Name     string                                   `json:"name"`     // The Name of the Tool.
+	Releases map[semver.NormalizedString]*ToolRelease `json:"releases"` // Maps Version to Release.
+	Package  *Package                                 `json:"-"`
 }
 
 // ToolRelease represents a single release of a tool
@@ -49,21 +49,21 @@ type Flavor struct {
 // GetOrCreateRelease returns the ToolRelease object with the specified version
 // or creates a new one if not found
 func (tool *Tool) GetOrCreateRelease(version *semver.RelaxedVersion) *ToolRelease {
-	if release, ok := tool.Releases[version.String()]; ok {
+	if release, ok := tool.Releases[version.NormalizedString()]; ok {
 		return release
 	}
 	release := &ToolRelease{
 		Version: version,
 		Tool:    tool,
 	}
-	tool.Releases[version.String()] = release
+	tool.Releases[version.NormalizedString()] = release
 	return release
 }
 
 // FindReleaseWithRelaxedVersion returns the specified release corresponding the provided version,
 // or nil if not found.
 func (tool *Tool) FindReleaseWithRelaxedVersion(version *semver.RelaxedVersion) *ToolRelease {
-	return tool.Releases[version.String()]
+	return tool.Releases[version.NormalizedString()]
 }
 
 // GetAllReleasesVersions returns all the version numbers in this Core Package.
