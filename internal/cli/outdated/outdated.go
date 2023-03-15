@@ -16,13 +16,18 @@
 package outdated
 
 import (
+	"fmt"
 	"os"
+	"sort"
+	"strings"
 
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/core"
+	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	"github.com/arduino/arduino-cli/internal/cli/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/arduino-cli/table"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -49,8 +54,97 @@ func runOutdatedCommand(cmd *cobra.Command, args []string) {
 	Outdated(inst)
 }
 
-// Outdated returns a list of outdated platforms and libraries
+// Outdated prints a list of outdated platforms and libraries
 func Outdated(inst *rpc.Instance) {
-	core.List(inst, false, true)
-	lib.List(inst, []string{}, false, true)
+	feedback.PrintResult(
+		outdatedResult{core.GetList(inst, false, true), lib.GetList(inst, []string{}, false, true)},
+	)
+}
+
+// output from this command requires special formatting, let's create a dedicated
+// feedback.Result implementation
+type outdatedResult struct {
+	Platforms     []*rpc.Platform         `json:"platforms,omitempty"`
+	InstalledLibs []*rpc.InstalledLibrary `json:"libraries,omitempty"`
+}
+
+func (ir outdatedResult) Data() interface{} {
+	return &ir
+}
+
+func (ir outdatedResult) String() string {
+	if len(ir.Platforms) == 0 && len(ir.InstalledLibs) == 0 {
+		return tr("No outdated platforms or libraries found.")
+	}
+
+	// A table useful both for platforms and libraries, where some of the fields will be blank.
+	t := table.New()
+	t.SetHeader(
+		tr("ID"),
+		tr("Name"),
+		tr("Installed"),
+		tr("Latest"),
+		tr("Location"),
+		tr("Description"),
+	)
+	t.SetColumnWidthMode(2, table.Average)
+	t.SetColumnWidthMode(3, table.Average)
+	t.SetColumnWidthMode(5, table.Average)
+
+	// Based on internal/cli/core/list.go
+	for _, p := range ir.Platforms {
+		name := p.Name
+		if p.Deprecated {
+			name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), name)
+		}
+		t.AddRow(p.Id, name, p.Installed, p.Latest, "", "")
+	}
+
+	// Based on internal/cli/lib/list.go
+	sort.Slice(ir.InstalledLibs, func(i, j int) bool {
+		return strings.ToLower(
+			ir.InstalledLibs[i].Library.Name,
+		) < strings.ToLower(
+			ir.InstalledLibs[j].Library.Name,
+		) ||
+			strings.ToLower(
+				ir.InstalledLibs[i].Library.ContainerPlatform,
+			) < strings.ToLower(
+				ir.InstalledLibs[j].Library.ContainerPlatform,
+			)
+	})
+	lastName := ""
+	for _, libMeta := range ir.InstalledLibs {
+		lib := libMeta.GetLibrary()
+		name := lib.Name
+		if name == lastName {
+			name = ` "`
+		} else {
+			lastName = name
+		}
+
+		location := lib.GetLocation().String()
+		if lib.ContainerPlatform != "" {
+			location = lib.GetContainerPlatform()
+		}
+
+		available := ""
+		sentence := ""
+		if libMeta.GetRelease() != nil {
+			available = libMeta.GetRelease().GetVersion()
+			sentence = lib.Sentence
+		}
+
+		if available == "" {
+			available = "-"
+		}
+		if sentence == "" {
+			sentence = "-"
+		} else if len(sentence) > 40 {
+			sentence = sentence[:37] + "..."
+		}
+		t.AddRow("", name, lib.Version, available, location, sentence)
+	}
+
+	return t.Render()
 }

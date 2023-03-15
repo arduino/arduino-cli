@@ -7,6 +7,48 @@ Here you can find a list of migration guides to handle breaking changes between 
 Configuration file lookup in current working directory and its parents is dropped. The command line flag `--config-file`
 must be specified to use an alternative configuration file from the one in the data directory.
 
+### Command `outdated` output change
+
+For `text` format (default), the command prints now a single table for platforms and libraries instead of two separate
+tables.
+
+Similarly, for JSON and YAML formats, the command prints now a single valid object, with `platform` and `libraries`
+top-level keys. For example, for JSON output:
+
+```
+$ arduino-cli outdated --format json
+{
+  "platforms": [
+    {
+      "id": "arduino:avr",
+      "installed": "1.6.3",
+      "latest": "1.8.6",
+      "name": "Arduino AVR Boards",
+      ...
+    }
+  ],
+  "libraries": [
+    {
+      "library": {
+        "name": "USBHost",
+        "author": "Arduino",
+        "maintainer": "Arduino \u003cinfo@arduino.cc\u003e",
+        "category": "Device Control",
+        "version": "1.0.0",
+        ...
+      },
+      "release": {
+        "author": "Arduino",
+        "version": "1.0.5",
+        "maintainer": "Arduino \u003cinfo@arduino.cc\u003e",
+        "category": "Device Control",
+        ...
+      }
+    }
+  ]
+}
+```
+
 ## 0.31.0
 
 ### Added `post_install` script support for tools
