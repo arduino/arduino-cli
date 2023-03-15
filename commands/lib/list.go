@@ -49,7 +49,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 	nameFilter := strings.ToLower(req.GetName())
 
 	var allLibs []*installedLib
-	if f := req.GetFqbn(); f != "" {
+	if fqbnString := req.GetFqbn(); fqbnString != "" {
 		allLibs = listLibraries(lm, req.GetUpdatable(), true)
 		fqbn, err := cores.ParseFQBN(req.GetFqbn())
 		if err != nil {
@@ -76,15 +76,8 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 			}
 
 			// Check if library is compatible with board specified by FBQN
-			compatible := false
-			for _, arch := range lib.Library.Architectures {
-				compatible = (arch == fqbn.PlatformArch || arch == "*")
-				if compatible {
-					break
-				}
-			}
 			lib.Library.CompatibleWith = map[string]bool{
-				f: compatible,
+				fqbnString: lib.Library.IsCompatibleWith(fqbn.PlatformArch),
 			}
 
 			filteredRes[lib.Library.Name] = lib
