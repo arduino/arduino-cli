@@ -4,6 +4,8 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.32.0
 
+### `arduino-cli` doesn't lookup anymore in the current directory for configuration file.
+
 Configuration file lookup in current working directory and its parents is dropped. The command line flag `--config-file`
 must be specified to use an alternative configuration file from the one in the data directory.
 
@@ -48,6 +50,10 @@ $ arduino-cli outdated --format json
   ]
 }
 ```
+
+### golang API: method `github.com/arduino/arduino-cli/arduino/libraries/Library.LocationPriorityFor` removed
+
+That method was outdated and must not be used.
 
 ## 0.31.0
 
