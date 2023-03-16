@@ -160,6 +160,9 @@ func (p *Process) SetEnvironment(values []string) {
 // RunWithinContext starts the specified command and waits for it to complete. If the given context
 // is canceled before the normal process termination, the process is killed.
 func (p *Process) RunWithinContext(ctx context.Context) error {
+	if err := p.Start(); err != nil {
+		return err
+	}
 	completed := make(chan struct{})
 	defer close(completed)
 	go func() {
@@ -169,6 +172,5 @@ func (p *Process) RunWithinContext(ctx context.Context) error {
 		case <-completed:
 		}
 	}()
-	res := p.cmd.Run()
-	return res
+	return p.Wait()
 }

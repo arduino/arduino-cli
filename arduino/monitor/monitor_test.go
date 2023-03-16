@@ -74,13 +74,13 @@ func TestDummyMonitor(t *testing.T) {
 	go func() {
 		buff := [1024]byte{}
 		// Receive "TEST" echoed back
-		n, err = rw.Read(buff[:])
+		_, err := rw.Read(buff[:])
 		require.NoError(t, err)
 		require.Equal(t, 4, n)
 		require.Equal(t, "TEST", string(buff[:4]))
 
 		// Block on read until the port is closed
-		n, err = rw.Read(buff[:])
+		_, err = rw.Read(buff[:])
 		require.ErrorIs(t, err, io.EOF)
 		atomic.StoreInt32(&completed, 1) // notify completion
 	}()
