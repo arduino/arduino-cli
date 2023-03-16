@@ -90,7 +90,7 @@ func (indexLib *indexRelease) extractLibraryIn(index *Index) {
 	if !exist {
 		library = &Library{
 			Name:     indexLib.Name,
-			Releases: map[string]*Release{},
+			Releases: map[semver.NormalizedString]*Release{},
 		}
 		index.Libraries[indexLib.Name] = library
 	}
@@ -120,7 +120,7 @@ func (indexLib *indexRelease) extractReleaseIn(library *Library) {
 		License:          indexLib.License,
 		ProvidesIncludes: indexLib.ProvidesIncludes,
 	}
-	library.Releases[indexLib.Version.String()] = release
+	library.Releases[indexLib.Version.NormalizedString()] = release
 	if library.Latest == nil || library.Latest.Version.LessThan(release.Version) {
 		library.Latest = release
 	}

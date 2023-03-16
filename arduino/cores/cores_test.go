@@ -73,7 +73,7 @@ func TestRequiresToolReleaseDiscovery(t *testing.T) {
 		Version: semver.ParseRelaxed("0.1.0"),
 		Tool: &Tool{
 			Name: toolDependencyName + "not",
-			Releases: map[string]*ToolRelease{
+			Releases: map[semver.NormalizedString]*ToolRelease{
 				"1.0.0": {Version: semver.ParseRelaxed("1.0.0")},
 				"0.1.0": {Version: semver.ParseRelaxed("0.1.0")},
 				"0.0.1": {Version: semver.ParseRelaxed("0.0.1")},

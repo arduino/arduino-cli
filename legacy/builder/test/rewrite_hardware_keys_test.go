@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
+	semver "go.bug.st/relaxed-semver"
 )
 
 func TestRewriteHardwareKeys(t *testing.T) {
@@ -41,7 +42,7 @@ func TestRewriteHardwareKeys(t *testing.T) {
 	}
 	aPackage.Platforms["dummy"] = &cores.Platform{
 		Architecture: "dummy",
-		Releases: map[string]*cores.PlatformRelease{
+		Releases: map[semver.NormalizedString]*cores.PlatformRelease{
 			"": platform,
 		},
 	}
@@ -82,7 +83,7 @@ func TestRewriteHardwareKeysWithRewritingDisabled(t *testing.T) {
 	}
 	aPackage.Platforms["dummy"] = &cores.Platform{
 		Architecture: "dummy",
-		Releases: map[string]*cores.PlatformRelease{
+		Releases: map[semver.NormalizedString]*cores.PlatformRelease{
 			"": platform,
 		},
 	}

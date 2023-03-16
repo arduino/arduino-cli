@@ -35,7 +35,7 @@ var EmptyIndex = &Index{Libraries: map[string]*Library{}}
 // Library is a library available for download
 type Library struct {
 	Name     string
-	Releases map[string]*Release
+	Releases map[semver.NormalizedString]*Release
 	Latest   *Release `json:"-"`
 	Index    *Index   `json:"-"`
 }
@@ -117,7 +117,7 @@ func (idx *Index) FindRelease(ref *Reference) *Release {
 		if ref.Version == nil {
 			return library.Latest
 		}
-		return library.Releases[ref.Version.String()]
+		return library.Releases[ref.Version.NormalizedString()]
 	}
 	return nil
 }
@@ -173,13 +173,10 @@ func (idx *Index) ResolveDependencies(lib *Release) []*Release {
 
 // Versions returns an array of all versions available of the library
 func (library *Library) Versions() []*semver.Version {
-	res := []*semver.Version{}
-	for version := range library.Releases {
-		v, err := semver.Parse(version)
-		if err == nil {
-			res = append(res, v)
-		}
+	res := semver.List{}
+	for _, release := range library.Releases {
+		res = append(res, release.Version)
 	}
-	sort.Sort(semver.List(res))
+	sort.Sort(res)
 	return res
 }
