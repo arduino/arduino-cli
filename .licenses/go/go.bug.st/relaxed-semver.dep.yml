@@ -1,8 +1,8 @@
 ---
 name: go.bug.st/relaxed-semver
-version: v0.9.1-0.20230314182316-c6633824f06f
+version: v0.10.0
 type: go
-summary: 
+summary:
 homepage: https://pkg.go.dev/go.bug.st/relaxed-semver
 license: bsd-3-clause
 licenses:
@@ -42,3 +42,4 @@ licenses:
     POSSIBILITY OF SUCH DAMAGE.
 
 notices: []
+...
