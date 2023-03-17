@@ -67,7 +67,7 @@ func TestUpdateShowingOutdated(t *testing.T) {
 	require.Contains(t, lines[0], "Downloading index: library_index.tar.bz2 downloaded")
 	require.Contains(t, lines[1], "Downloading index: package_index.tar.bz2 downloaded")
 	require.Contains(t, lines[3], "Arduino AVR Boards")
-	require.Contains(t, lines[6], "USBHost")
+	require.Contains(t, lines[4], "USBHost")
 }
 
 func TestUpdateWithUrlNotFound(t *testing.T) {

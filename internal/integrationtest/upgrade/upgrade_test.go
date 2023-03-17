@@ -50,7 +50,7 @@ func TestUpgrade(t *testing.T) {
 	require.NoError(t, err)
 	lines := strings.Split(string(stdout), "\n")
 	require.Contains(t, lines[1], "Arduino AVR Boards")
-	require.Contains(t, lines[4], "USBHost")
+	require.Contains(t, lines[2], "USBHost")
 
 	_, _, err = cli.Run("upgrade")
 	require.NoError(t, err)
@@ -58,7 +58,7 @@ func TestUpgrade(t *testing.T) {
 	// Verifies cores and libraries have been updated
 	stdout, _, err = cli.Run("outdated")
 	require.NoError(t, err)
-	require.Contains(t, string(stdout), "No libraries update is available.")
+	require.Contains(t, string(stdout), "No outdated platforms or libraries found.")
 }
 
 func TestUpgradeUsingLibraryWithInvalidVersion(t *testing.T) {
