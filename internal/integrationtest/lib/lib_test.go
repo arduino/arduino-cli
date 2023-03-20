@@ -1572,4 +1572,18 @@ func TestLibBundlesWhenLibWithTheSameNameIsInstalledGlobally(t *testing.T) {
 		j.Query(`.[0].library.name`).MustEqual(`"USBHost"`)
 		j.Query(`.[0].library.compatible_with."arduino:samd:mkrzero"`).MustEqual(`true`)
 	}
+
+	// See: https://github.com/arduino/arduino-cli/issues/1656
+	{
+		_, _, err = cli.Run("core", "update-index", "--additional-urls", "https://arduino.esp8266.com/stable/package_esp8266com_index.json")
+		require.NoError(t, err)
+		_, _, err = cli.Run("core", "install", "--additional-urls", "https://arduino.esp8266.com/stable/package_esp8266com_index.json", "esp8266:esp8266@3.0.2")
+		require.NoError(t, err)
+		_, _, err = cli.Run("lib", "install", "ArduinoOTA@1.0.7")
+		require.NoError(t, err)
+		stdout, _, err := cli.Run("lib", "examples", "--fqbn", "esp8266:esp8266:generic", "ArduinoOTA", "--format", "json")
+		require.NoError(t, err)
+		requirejson.Parse(t, stdout).Query(`.[].library.examples[0]`).MustContain(`"BasicOTA"`)
+		requirejson.Parse(t, stdout).Query(`.[].library.examples[1]`).MustContain(`"OTALeds"`)
+	}
 }
