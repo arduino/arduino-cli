@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
@@ -49,7 +50,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 	nameFilter := strings.ToLower(req.GetName())
 
 	var allLibs []*installedLib
-	if f := req.GetFqbn(); f != "" {
+	if fqbnString := req.GetFqbn(); fqbnString != "" {
 		allLibs = listLibraries(lm, req.GetUpdatable(), true)
 		fqbn, err := cores.ParseFQBN(req.GetFqbn())
 		if err != nil {
@@ -69,22 +70,17 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 				}
 			}
 			if latest, has := filteredRes[lib.Library.Name]; has {
-				if latest.Library.LocationPriorityFor(boardPlatform, refBoardPlatform) >= lib.Library.LocationPriorityFor(boardPlatform, refBoardPlatform) {
+				latestPriority := librariesresolver.ComputePriority(latest.Library, "", fqbn.PlatformArch)
+				libPriority := librariesresolver.ComputePriority(lib.Library, "", fqbn.PlatformArch)
+				if latestPriority >= libPriority {
 					// Pick library with the best priority
 					continue
 				}
 			}
 
 			// Check if library is compatible with board specified by FBQN
-			compatible := false
-			for _, arch := range lib.Library.Architectures {
-				compatible = (arch == fqbn.PlatformArch || arch == "*")
-				if compatible {
-					break
-				}
-			}
 			lib.Library.CompatibleWith = map[string]bool{
-				f: compatible,
+				fqbnString: lib.Library.IsCompatibleWith(fqbn.PlatformArch),
 			}
 
 			filteredRes[lib.Library.Name] = lib

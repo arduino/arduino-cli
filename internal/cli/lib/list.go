@@ -45,19 +45,15 @@ not listed, they can be listed by adding the --all flag.`),
 		Example: "  " + os.Args[0] + " lib list",
 		Args:    cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runListCommand(args, all, updatable)
+			instance := instance.CreateAndInit()
+			logrus.Info("Executing `arduino-cli lib list`")
+			List(instance, args, all, updatable)
 		},
 	}
 	listCommand.Flags().BoolVar(&all, "all", false, tr("Include built-in libraries (from platforms and IDE) in listing."))
 	fqbn.AddToCommand(listCommand)
 	listCommand.Flags().BoolVar(&updatable, "updatable", false, tr("List updatable libraries."))
 	return listCommand
-}
-
-func runListCommand(args []string, all bool, updatable bool) {
-	instance := instance.CreateAndInit()
-	logrus.Info("Executing `arduino-cli lib list`")
-	List(instance, args, all, updatable)
 }
 
 // List gets and prints a list of installed libraries.

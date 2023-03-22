@@ -181,6 +181,13 @@ func (library *Library) IsArchitectureIndependent() bool {
 	return library.IsOptimizedForArchitecture("*") || library.Architectures == nil || len(library.Architectures) == 0
 }
 
+// IsCompatibleWith returns true if the library declares compatibility with
+// the given architecture. If this function returns false, the library may still
+// be compatible with the given architecture, but it's not explicitly declared.
+func (library *Library) IsCompatibleWith(arch string) bool {
+	return library.IsArchitectureIndependent() || library.IsOptimizedForArchitecture(arch)
+}
+
 // SourceDir represents a source dir of a library
 type SourceDir struct {
 	Dir     *paths.Path
@@ -203,21 +210,6 @@ func (library *Library) SourceDirs() []SourceDir {
 			})
 	}
 	return dirs
-}
-
-// LocationPriorityFor returns a number representing the location priority for the given library
-// using the given platform and referenced-platform. Higher value means higher priority.
-func (library *Library) LocationPriorityFor(platformRelease, refPlatformRelease *cores.PlatformRelease) int {
-	if library.Location == IDEBuiltIn {
-		return 1
-	} else if library.ContainerPlatform == refPlatformRelease {
-		return 2
-	} else if library.ContainerPlatform == platformRelease {
-		return 3
-	} else if library.Location == User {
-		return 4
-	}
-	return 0
 }
 
 // DeclaredHeaders returns the C++ headers that the library declares in library.properties
