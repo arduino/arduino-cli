@@ -406,7 +406,7 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		responseError(&arduino.InitFailedError{
 			Code:   codes.FailedPrecondition,
 			Cause:  fmt.Errorf(tr("Loading index file: %v", err)),
-			Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INDEX_LOAD_ERROR,
+			Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_LIBRARY_LOAD_ERROR,
 		})
 	}
 
