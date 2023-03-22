@@ -106,7 +106,11 @@ func (tool *Tool) String() string {
 
 // IsInstalled returns true if the ToolRelease is installed
 func (tr *ToolRelease) IsInstalled() bool {
-	return tr.InstallDir != nil
+	if tr.InstallDir == nil {
+		return false
+	}
+	dirContent, _ := tr.InstallDir.ReadDir()
+	return dirContent.Len() != 0
 }
 
 func (tr *ToolRelease) String() string {
