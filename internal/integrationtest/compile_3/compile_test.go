@@ -116,3 +116,41 @@ func TestCompilerErrOutput(t *testing.T) {
 	compilerErr := requirejson.Parse(t, out).Query(".compiler_err")
 	compilerErr.MustContain(`"error"`)
 }
+
+func TestCompileRelativeLibraryPath(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Initialize configs to enable --zip-path flag
+	_, _, err := cli.Run("config", "init", "--dest-dir", ".")
+	require.NoError(t, err)
+	_, _, err = cli.Run("config", "set", "library.enable_unsafe_install", "true", "--config-file", "arduino-cli.yaml")
+	require.NoError(t, err)
+	configFile := cli.WorkingDir().Join("arduino-cli.yaml")
+
+	_, _, err = cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+
+	// Install library and its dependencies
+	zipPath, err := paths.New("..", "testdata", "FooLib.zip").Abs()
+	require.NoError(t, err)
+	// Manually install the library and move into one of the example's directories
+	FooLib := cli.WorkingDir().Join("FooLib")
+	err = paths.New("..", "testdata", "FooLib").CopyDirTo(FooLib)
+	require.NoError(t, err)
+	cli.SetWorkingDir(FooLib.Join("examples", "FooSketch"))
+
+	// Compile using a relative path to the library
+	_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--library", "../../")
+	require.NoError(t, err)
+
+	// Install the same library using lib install and compile again using the relative path.
+	// The manually installed library should be chosen
+	_, _, err = cli.Run("lib", "install", "--zip-path", zipPath.String(), "--config-file", configFile.String())
+	require.NoError(t, err)
+	stdout, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "--library", "../../", "-v")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "Multiple libraries were found for \"FooLib.h\"")
+	require.Contains(t, string(stdout), "Used: "+FooLib.String())
+	require.Contains(t, string(stdout), "Not used: "+cli.SketchbookDir().Join("libraries", "FooLib").String())
+}
