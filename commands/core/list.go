@@ -25,9 +25,9 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
-// GetPlatforms returns a list of installed platforms, optionally filtered by
+// PlatformList returns a list of installed platforms, optionally filtered by
 // those requiring an update.
-func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, error) {
+func PlatformList(req *rpc.PlatformListRequest) (*rpc.PlatformListResponse, error) {
 	pme, release := commands.GetPackageManagerExplorer(req)
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
@@ -85,5 +85,5 @@ func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, error) {
 		}
 		return false
 	})
-	return res, nil
+	return &rpc.PlatformListResponse{InstalledPlatforms: res}, nil
 }

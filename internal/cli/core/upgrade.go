@@ -60,7 +60,7 @@ func runUpgradeCommand(args []string, skipPostInstall bool) {
 func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 	// if no platform was passed, upgrade allthethings
 	if len(args) == 0 {
-		targets, err := core.GetPlatforms(&rpc.PlatformListRequest{
+		targets, err := core.PlatformList(&rpc.PlatformListRequest{
 			Instance:      inst,
 			UpdatableOnly: true,
 		})
@@ -68,12 +68,12 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 			feedback.Fatal(tr("Error retrieving core list: %v", err), feedback.ErrGeneric)
 		}
 
-		if len(targets) == 0 {
+		if len(targets.InstalledPlatforms) == 0 {
 			feedback.Print(tr("All the cores are already at the latest version"))
 			return
 		}
 
-		for _, t := range targets {
+		for _, t := range targets.InstalledPlatforms {
 			args = append(args, t.Id)
 		}
 	}
