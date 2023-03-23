@@ -111,9 +111,6 @@ func createEnvForDaemon(t *testing.T) (*integrationtest.Environment, *integratio
 		UseSharedStagingFolder: true,
 	})
 
-	_, _, err := cli.Run("core", "update-index")
-	require.NoError(t, err)
-
 	_ = cli.StartDaemon(false)
 	return env, cli
 }

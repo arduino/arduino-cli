@@ -16,10 +16,7 @@
 package instance
 
 import (
-	"context"
-
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -71,12 +68,6 @@ func Init(instance *rpc.Instance) {
 // In case of loading failures return a list of errors for each platform or library that we failed to load.
 // Required Package and library indexes files are automatically downloaded.
 func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *paths.Path) *rpc.Profile {
-	// In case the CLI is executed for the first time
-	if err := FirstUpdate(instance); err != nil {
-		feedback.Warning(tr("Error initializing instance: %v", err))
-		return nil
-	}
-
 	downloadCallback := feedback.ProgressBar()
 	taskCallback := feedback.TaskProgress()
 
@@ -109,71 +100,4 @@ func InitWithProfile(instance *rpc.Instance, profileName string, sketchPath *pat
 	}
 
 	return profile
-}
-
-// FirstUpdate downloads libraries and packages indexes if they don't exist.
-// This ideally is only executed the first time the CLI is run.
-func FirstUpdate(instance *rpc.Instance) error {
-	// Gets the data directory to verify if library_index.json and package_index.json exist
-	dataDir := configuration.DataDir(configuration.Settings)
-
-	libraryIndex := dataDir.Join("library_index.json")
-	packageIndex := dataDir.Join("package_index.json")
-
-	if libraryIndex.Exist() && packageIndex.Exist() {
-		return nil
-	}
-
-	// The library_index.json file doesn't exists, that means the CLI is run for the first time
-	// so we proceed with the first update that downloads the file
-	if libraryIndex.NotExist() {
-		err := commands.UpdateLibrariesIndex(context.Background(),
-			&rpc.UpdateLibrariesIndexRequest{
-				Instance: instance,
-			},
-			feedback.ProgressBar(),
-		)
-		if err != nil {
-			return err
-		}
-	}
-
-	// The package_index.json file doesn't exists, that means the CLI is run for the first time,
-	// similarly to the library update we download that file and all the other package indexes
-	// from additional_urls
-	if packageIndex.NotExist() {
-		err := commands.UpdateIndex(context.Background(),
-			&rpc.UpdateIndexRequest{
-				Instance:                   instance,
-				IgnoreCustomPackageIndexes: true,
-			},
-			feedback.ProgressBar())
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// CreateInstanceAndRunFirstUpdate creates an instance and runs `FirstUpdate`.
-// It is mandatory for all `update-index` commands to call this
-func CreateInstanceAndRunFirstUpdate() *rpc.Instance {
-	// We don't initialize any CoreInstance when updating indexes since we don't need to.
-	// Also meaningless errors might be returned when calling this command with --additional-urls
-	// since the CLI would be searching for a corresponding file for the additional urls set
-	// as argument but none would be obviously found.
-	inst, status := Create()
-	if status != nil {
-		feedback.Fatal(tr("Error creating instance: %v", status), feedback.ErrGeneric)
-	}
-
-	// In case this is the first time the CLI is run we need to update indexes
-	// to make it work correctly, we must do this explicitly in this command since
-	// we must use instance.Create instead of instance.CreateAndInit for the
-	// reason stated above.
-	if err := FirstUpdate(inst); err != nil {
-		feedback.Fatal(tr("Error updating indexes: %v", err), feedback.ErrGeneric)
-	}
-	return inst
 }

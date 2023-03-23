@@ -47,7 +47,7 @@ func NewCommand() *cobra.Command {
 }
 
 func runUpdateCommand(showOutdated bool) {
-	inst := instance.CreateInstanceAndRunFirstUpdate()
+	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli update`")
 	lib.UpdateIndex(inst)
 	core.UpdateIndex(inst)

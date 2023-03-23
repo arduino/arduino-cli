@@ -240,6 +240,9 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		})
 	}
 
+	// Perform first-update of indexes if needed
+	firstUpdate(context.Background(), req.GetInstance(), downloadCallback)
+
 	// Try to extract profile if specified
 	var profile *sketch.Profile
 	if req.GetProfile() != "" {
@@ -594,4 +597,34 @@ func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketc
 		AdditionalFiles:  additionalFiles,
 		RootFolderFiles:  rootFolderFiles,
 	}, nil
+}
+
+// firstUpdate downloads libraries and packages indexes if they don't exist.
+// This ideally is only executed the first time the CLI is run.
+func firstUpdate(ctx context.Context, instance *rpc.Instance, downloadCb func(msg *rpc.DownloadProgress)) error {
+	// Gets the data directory to verify if library_index.json and package_index.json exist
+	dataDir := configuration.DataDir(configuration.Settings)
+	libraryIndex := dataDir.Join("library_index.json")
+	packageIndex := dataDir.Join("package_index.json")
+
+	if libraryIndex.NotExist() {
+		// The library_index.json file doesn't exists, that means the CLI is run for the first time
+		// so we proceed with the first update that downloads the file
+		req := &rpc.UpdateLibrariesIndexRequest{Instance: instance}
+		if err := UpdateLibrariesIndex(ctx, req, downloadCb); err != nil {
+			return err
+		}
+	}
+
+	if packageIndex.NotExist() {
+		// The package_index.json file doesn't exists, that means the CLI is run for the first time,
+		// similarly to the library update we download that file and all the other package indexes
+		// from additional_urls
+		req := &rpc.UpdateIndexRequest{Instance: instance, IgnoreCustomPackageIndexes: true}
+		if err := UpdateIndex(ctx, req, downloadCb); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
