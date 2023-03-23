@@ -38,7 +38,7 @@ func CreateAndInit() *rpc.Instance {
 // If Create fails the CLI prints an error and exits since to execute further operations a valid Instance is mandatory.
 // If Init returns errors they're printed only.
 func CreateAndInitWithProfile(profileName string, sketchPath *paths.Path) (*rpc.Instance, *rpc.Profile) {
-	instance, err := Create()
+	instance, err := create()
 	if err != nil {
 		feedback.Fatal(tr("Error creating instance: %v", err), feedback.ErrGeneric)
 	}
@@ -46,8 +46,8 @@ func CreateAndInitWithProfile(profileName string, sketchPath *paths.Path) (*rpc.
 	return instance, profile
 }
 
-// Create and return a new Instance.
-func Create() (*rpc.Instance, error) {
+// create and return a new Instance.
+func create() (*rpc.Instance, error) {
 	res, err := commands.Create(&rpc.CreateRequest{})
 	if err != nil {
 		return nil, err
