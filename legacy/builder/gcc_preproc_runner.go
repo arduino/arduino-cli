@@ -20,7 +20,6 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
@@ -58,18 +57,18 @@ func GCCPreprocRunnerForDiscoveringIncludes(ctx *types.Context, sourceFilePath *
 func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.PathList) (*exec.Cmd, error) {
 	properties := ctx.BuildProperties.Clone()
 	properties.Set("build.library_discovery_phase", "1")
-	properties.SetPath(constants.BUILD_PROPERTIES_SOURCE_FILE, sourceFilePath)
-	properties.SetPath(constants.BUILD_PROPERTIES_PREPROCESSED_FILE_PATH, targetFilePath)
+	properties.SetPath("source_file", sourceFilePath)
+	properties.SetPath("preprocessed_file_path", targetFilePath)
 
 	includesStrings := utils.Map(includes.AsStrings(), utils.WrapWithHyphenI)
-	properties.Set(constants.BUILD_PROPERTIES_INCLUDES, strings.Join(includesStrings, constants.SPACE))
+	properties.Set("includes", strings.Join(includesStrings, " "))
 
-	if properties.Get(constants.RECIPE_PREPROC_MACROS) == "" {
+	if properties.Get("recipe.preproc.macros") == "" {
 		//generate PREPROC_MACROS from RECIPE_CPP_PATTERN
-		properties.Set(constants.RECIPE_PREPROC_MACROS, GeneratePreprocPatternFromCompile(properties.Get("recipe.cpp.o.pattern")))
+		properties.Set("recipe.preproc.macros", GeneratePreprocPatternFromCompile(properties.Get("recipe.cpp.o.pattern")))
 	}
 
-	cmd, err := builder_utils.PrepareCommandForRecipe(properties, constants.RECIPE_PREPROC_MACROS, true, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+	cmd, err := builder_utils.PrepareCommandForRecipe(properties, "recipe.preproc.macros", true, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

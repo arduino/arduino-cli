@@ -19,7 +19,6 @@ import (
 	"fmt"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/pkg/errors"
 )
@@ -31,7 +30,7 @@ func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 	if err := ctx.PreprocPath.MkdirAll(); err != nil {
 		return errors.WithStack(err)
 	}
-	targetFilePath := ctx.PreprocPath.Join(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E)
+	targetFilePath := ctx.PreprocPath.Join("ctags_target_for_gcc_minus_e.cpp")
 
 	// Run preprocessor
 	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp")
@@ -53,7 +52,7 @@ func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
 	commands := []types.Command{
 		&ReadFileAndStoreInContext{FileToRead: targetFilePath, Target: &ctx.SourceGccMinusE},
 		&FilterSketchSource{Source: &ctx.SourceGccMinusE},
-		&CTagsTargetFileSaver{Source: &ctx.SourceGccMinusE, TargetFileName: constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E},
+		&CTagsTargetFileSaver{Source: &ctx.SourceGccMinusE, TargetFileName: "ctags_target_for_gcc_minus_e.cpp"},
 		&CTagsRunner{},
 		&PrototypesAdder{},
 	}
