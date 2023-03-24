@@ -78,7 +78,6 @@ var (
 	warnings                string               // Used to tell gcc which warning level to use.
 	verbose                 bool                 // Turns on verbose mode.
 	quiet                   bool                 // Suppresses almost every output.
-	vidPid                  string               // VID/PID specific build properties.
 	uploadAfterCompile      bool                 // Upload the binary after the compilation.
 	portArgs                arguments.Port       // Upload port, e.g.: COM10 or /dev/ttyACM0.
 	verify                  bool                 // Upload, verify uploaded binary after the upload.
@@ -145,7 +144,6 @@ func NewCommand() *cobra.Command {
 	compileCommand.Flags().BoolVarP(&uploadAfterCompile, "upload", "u", false, tr("Upload the binary after the compilation."))
 	portArgs.AddToCommand(compileCommand)
 	compileCommand.Flags().BoolVarP(&verify, "verify", "t", false, tr("Verify uploaded binary after the upload."))
-	compileCommand.Flags().StringVar(&vidPid, "vid-pid", "", tr("When specified, VID/PID specific build properties are used, if board supports them."))
 	compileCommand.Flags().StringSliceVar(&library, "library", []string{},
 		tr("Path to a single library’s root folder. Can be used multiple times or entries can be comma separated."))
 	compileCommand.Flags().StringSliceVar(&libraries, "libraries", []string{},
@@ -240,7 +238,6 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		Warnings:                      warnings,
 		Verbose:                       verbose,
 		Quiet:                         quiet,
-		VidPid:                        vidPid,
 		ExportDir:                     exportDir,
 		Libraries:                     libraries,
 		OptimizeForDebug:              optimizeForDebug,

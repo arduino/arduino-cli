@@ -51,6 +51,11 @@ $ arduino-cli outdated --format json
 }
 ```
 
+### Command `compile` does not support `--vid-pid` flag anymore
+
+It was a legacy and undocumented feature that is now useless. The corresponding field in gRPC `CompileRequest.vid_pid`
+has been removed as well.
+
 ### golang API: method `github.com/arduino/arduino-cli/arduino/libraries/Library.LocationPriorityFor` removed
 
 That method was outdated and must not be used.

@@ -52,7 +52,6 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 
 	commands = []types.Command{
 		&SetupBuildProperties{},
-		&LoadVIDPIDSpecificProperties{},
 		&SetCustomBuildProperties{},
 		&AddMissingBuildPropertiesFromParentPlatformTxtFiles{},
 	}
