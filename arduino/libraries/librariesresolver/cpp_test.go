@@ -102,13 +102,13 @@ func TestClosestMatchWithTotallyDifferentNames(t *testing.T) {
 }
 
 func TestCppHeaderPriority(t *testing.T) {
-	r1 := computePriority(l1, "calculus_lib.h", "avr")
-	r2 := computePriority(l2, "calculus_lib.h", "avr")
-	r3 := computePriority(l3, "calculus_lib.h", "avr")
-	r4 := computePriority(l4, "calculus_lib.h", "avr")
-	r5 := computePriority(l5, "calculus_lib.h", "avr")
-	r6 := computePriority(l6, "calculus_lib.h", "avr")
-	r7 := computePriority(l7, "calculus_lib.h", "avr")
+	r1 := ComputePriority(l1, "calculus_lib.h", "avr")
+	r2 := ComputePriority(l2, "calculus_lib.h", "avr")
+	r3 := ComputePriority(l3, "calculus_lib.h", "avr")
+	r4 := ComputePriority(l4, "calculus_lib.h", "avr")
+	r5 := ComputePriority(l5, "calculus_lib.h", "avr")
+	r6 := ComputePriority(l6, "calculus_lib.h", "avr")
+	r7 := ComputePriority(l7, "calculus_lib.h", "avr")
 	require.True(t, r1 > r2)
 	require.True(t, r2 > r3)
 	require.True(t, r3 > r4)

@@ -123,7 +123,7 @@ func (resolver *Cpp) ResolveFor(header, architecture string) *libraries.Library 
 	var found libraries.List
 	var foundPriority int
 	for _, lib := range resolver.headers[header] {
-		libPriority := computePriority(lib, header, architecture)
+		libPriority := ComputePriority(lib, header, architecture)
 		msg := "  discarded"
 		if found == nil || foundPriority < libPriority {
 			found = libraries.List{}
@@ -164,7 +164,10 @@ func simplify(name string) string {
 	return name
 }
 
-func computePriority(lib *libraries.Library, header, arch string) int {
+// ComputePriority returns an integer value representing the priority of the library
+// for the specified header and architecture. The higher the value, the higher the
+// priority.
+func ComputePriority(lib *libraries.Library, header, arch string) int {
 	header = strings.TrimSuffix(header, filepath.Ext(header))
 	header = simplify(header)
 	name := simplify(lib.Name)

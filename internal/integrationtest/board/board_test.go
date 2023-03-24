@@ -558,3 +558,27 @@ func TestBoardSearchWithOutdatedCore(t *testing.T) {
 	// Installed version must be older than latest
 	require.True(t, installedVersion.LessThan(latestVersion))
 }
+
+func TestBoardListWithFailedBuiltinInstallation(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// board list to install builtin tools
+	_, _, err = cli.Run("board", "list")
+	require.NoError(t, err)
+
+	// remove files from serial-discovery directory to simulate a failed installation
+	serialDiscovery, err := cli.DataDir().Join("packages", "builtin", "tools", "serial-discovery").ReadDir()
+	require.NoError(t, err)
+	require.NoError(t, serialDiscovery[0].Join("LICENSE.txt").Remove())
+	require.NoError(t, serialDiscovery[0].Join("serial-discovery.exe").Remove())
+
+	// board list should install serial-discovery again
+	stdout, stderr, err := cli.Run("board", "list")
+	require.NoError(t, err)
+	require.Empty(t, stderr)
+	require.Contains(t, string(stdout), "Downloading missing tool builtin:serial-discovery")
+}

@@ -53,7 +53,7 @@ func TestOutdated(t *testing.T) {
 		lines[i] = strings.TrimSpace(lines[i])
 	}
 	require.Contains(t, lines[1], "Arduino AVR Boards")
-	require.Contains(t, lines[4], "USBHost")
+	require.Contains(t, lines[2], "USBHost")
 }
 
 func TestOutdatedUsingLibraryWithInvalidVersion(t *testing.T) {

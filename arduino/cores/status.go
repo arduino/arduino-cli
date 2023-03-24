@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/pmylund/sortutil"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // Packages represents a set of Packages
@@ -91,7 +92,7 @@ func (packages Packages) GetPlatformReleaseToolDependencies(release *PlatformRel
 		if !exists {
 			return nil, fmt.Errorf(tr("tool %s not found"), dep.ToolName)
 		}
-		toolRelease, exists := tool.Releases[dep.ToolVersion.String()]
+		toolRelease, exists := tool.Releases[dep.ToolVersion.NormalizedString()]
 		if !exists {
 			return nil, fmt.Errorf(tr("tool version %s not found"), dep.ToolVersion)
 		}
@@ -162,7 +163,7 @@ func (targetPackage *Package) GetOrCreatePlatform(architecture string) *Platform
 	}
 	targetPlatform := &Platform{
 		Architecture: architecture,
-		Releases:     map[string]*PlatformRelease{},
+		Releases:     map[semver.NormalizedString]*PlatformRelease{},
 		Package:      targetPackage,
 	}
 	targetPackage.Platforms[architecture] = targetPlatform
@@ -178,7 +179,7 @@ func (targetPackage *Package) GetOrCreateTool(name string) *Tool {
 	tool := &Tool{
 		Name:     name,
 		Package:  targetPackage,
-		Releases: map[string]*ToolRelease{},
+		Releases: map[semver.NormalizedString]*ToolRelease{},
 	}
 	targetPackage.Tools[name] = tool
 	return tool

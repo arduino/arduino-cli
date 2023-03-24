@@ -1,13 +1,12 @@
 ---
-name: golang.org/x/sys/internal/unsafeheader
-version: v0.0.0-20220722155257-8c9f86f7a55f
+name: golang.org/x/crypto/internal/alias
+version: v0.7.0
 type: go
-summary: Package unsafeheader contains header declarations for the Go runtime's slice
-  and string implementations.
-homepage: https://pkg.go.dev/golang.org/x/sys/internal/unsafeheader
+summary: Package alias implements memory aliasing tests.
+homepage: https://pkg.go.dev/golang.org/x/crypto/internal/alias
 license: bsd-3-clause
 licenses:
-- sources: sys@v0.0.0-20220722155257-8c9f86f7a55f/LICENSE
+- sources: crypto@v0.7.0/LICENSE
   text: |
     Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -36,7 +35,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: sys@v0.0.0-20220722155257-8c9f86f7a55f/PATENTS
+- sources: crypto@v0.7.0/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 

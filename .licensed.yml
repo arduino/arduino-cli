@@ -7,10 +7,6 @@ cache_path: .licenses/
 
 apps:
   - source_path: ./
-  - source_path: arduino/discovery/discovery_client/
-  - source_path: client_example/
-  - source_path: commands/daemon/term_example/
-  - source_path: docsgen/
 
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-dependencies/GPL-3.0/.licensed.yml
 allowed:

@@ -381,6 +381,7 @@ func (disc *PluggableDiscovery) Quit() {
 	if _, err := disc.waitMessage(time.Second * 5); err != nil {
 		logrus.Errorf("Quitting discovery %s: %s", disc.id, err)
 	}
+	disc.stopSync()
 	disc.killProcess()
 }
 

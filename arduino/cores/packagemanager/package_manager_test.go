@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package packagemanager_test
+package packagemanager
 
 import (
 	"fmt"
@@ -24,7 +24,6 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -39,7 +38,7 @@ var dataDir1 = paths.New("testdata", "data_dir_1")
 var extraHardware = paths.New("testdata", "extra_hardware")
 
 func TestFindBoardWithFQBN(t *testing.T) {
-	pmb := packagemanager.NewBuilder(customHardware, customHardware, customHardware, customHardware, "test")
+	pmb := NewBuilder(customHardware, customHardware, customHardware, customHardware, "test")
 	pmb.LoadHardwareFromDirectory(customHardware)
 	pm := pmb.Build()
 	pme, release := pm.NewExplorer()
@@ -57,7 +56,7 @@ func TestFindBoardWithFQBN(t *testing.T) {
 
 func TestResolveFQBN(t *testing.T) {
 	// Pass nil, since these paths are only used for installing
-	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test")
+	pmb := NewBuilder(nil, nil, nil, nil, "test")
 	// Hardware from main packages directory
 	pmb.LoadHardwareFromDirectory(dataDir1.Join("packages"))
 	// This contains the arduino:avr core
@@ -181,7 +180,7 @@ func TestResolveFQBN(t *testing.T) {
 }
 
 func TestBoardOptionsFunctions(t *testing.T) {
-	pmb := packagemanager.NewBuilder(customHardware, customHardware, customHardware, customHardware, "test")
+	pmb := NewBuilder(customHardware, customHardware, customHardware, customHardware, "test")
 	pmb.LoadHardwareFromDirectory(customHardware)
 	pm := pmb.Build()
 	pme, release := pm.NewExplorer()
@@ -221,13 +220,13 @@ func TestBoardOptionsFunctions(t *testing.T) {
 }
 
 func TestBoardOrdering(t *testing.T) {
-	pmb := packagemanager.NewBuilder(dataDir1, dataDir1.Join("packages"), nil, nil, "")
+	pmb := NewBuilder(dataDir1, dataDir1.Join("packages"), nil, nil, "")
 	_ = pmb.LoadHardwareFromDirectories(paths.NewPathList(dataDir1.Join("packages").String()))
 	pm := pmb.Build()
 	pme, release := pm.NewExplorer()
 	defer release()
 
-	pl := pme.FindPlatform(&packagemanager.PlatformReference{
+	pl := pme.FindPlatform(&PlatformReference{
 		Package:              "arduino",
 		PlatformArchitecture: "avr",
 	})
@@ -273,7 +272,7 @@ func TestBoardOrdering(t *testing.T) {
 func TestFindToolsRequiredForBoard(t *testing.T) {
 	os.Setenv("ARDUINO_DATA_DIR", dataDir1.String())
 	configuration.Settings = configuration.Init("")
-	pmb := packagemanager.NewBuilder(
+	pmb := NewBuilder(
 		dataDir1,
 		configuration.PackagesDir(configuration.Settings),
 		configuration.DownloadsDir(configuration.Settings),
@@ -314,7 +313,7 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 	})
 	require.NotNil(t, esptool0413)
 
-	testPlatform := pme.FindPlatformRelease(&packagemanager.PlatformReference{
+	testPlatform := pme.FindPlatformRelease(&PlatformReference{
 		Package:              "test",
 		PlatformArchitecture: "avr",
 		PlatformVersion:      semver.MustParse("1.1.0")})
@@ -407,7 +406,7 @@ func TestFindToolsRequiredForBoard(t *testing.T) {
 }
 
 func TestIdentifyBoard(t *testing.T) {
-	pmb := packagemanager.NewBuilder(customHardware, customHardware, customHardware, customHardware, "test")
+	pmb := NewBuilder(customHardware, customHardware, customHardware, customHardware, "test")
 	pmb.LoadHardwareFromDirectory(customHardware)
 	pm := pmb.Build()
 	pme, release := pm.NewExplorer()
@@ -434,12 +433,12 @@ func TestIdentifyBoard(t *testing.T) {
 
 func TestPackageManagerClear(t *testing.T) {
 	// Create a PackageManager and load the harware
-	pmb := packagemanager.NewBuilder(customHardware, customHardware, customHardware, customHardware, "test")
+	pmb := NewBuilder(customHardware, customHardware, customHardware, customHardware, "test")
 	pmb.LoadHardwareFromDirectory(customHardware)
 	pm := pmb.Build()
 
 	// Creates another PackageManager but don't load the hardware
-	emptyPmb := packagemanager.NewBuilder(customHardware, customHardware, customHardware, customHardware, "test")
+	emptyPmb := NewBuilder(customHardware, customHardware, customHardware, customHardware, "test")
 	emptyPm := emptyPmb.Build()
 
 	// Verifies they're not equal
@@ -448,15 +447,20 @@ func TestPackageManagerClear(t *testing.T) {
 	// Clear the first PackageManager that contains loaded hardware
 	emptyPmb.BuildIntoExistingPackageManager(pm)
 
-	// Verifies both PackageManagers are now equal
+	// the discovery manager is maintained
+	require.NotEqual(t, pm.discoveryManager, emptyPm.discoveryManager)
+	// Verifies all other fields are assigned to target
+	pm.discoveryManager = emptyPm.discoveryManager
 	require.Equal(t, pm, emptyPm)
 }
 
 func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 	// Create all the necessary data to load discoveries
 	fakePath := paths.New("fake-path")
+	require.NoError(t, fakePath.Join("LICENSE").MkdirAll())
+	defer fakePath.RemoveAll()
 
-	pmb := packagemanager.NewBuilder(fakePath, fakePath, fakePath, fakePath, "test")
+	pmb := NewBuilder(fakePath, fakePath, fakePath, fakePath, "test")
 	pack := pmb.GetOrCreatePackage("arduino")
 
 	{
@@ -559,13 +563,13 @@ func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 }
 
 func TestFindPlatformReleaseDependencies(t *testing.T) {
-	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test")
+	pmb := NewBuilder(nil, nil, nil, nil, "test")
 	pmb.LoadPackageIndexFromFile(paths.New("testdata", "package_tooltest_index.json"))
 	pm := pmb.Build()
 	pme, release := pm.NewExplorer()
 	defer release()
 
-	pl, tools, err := pme.FindPlatformReleaseDependencies(&packagemanager.PlatformReference{Package: "test", PlatformArchitecture: "avr"})
+	pl, tools, err := pme.FindPlatformReleaseDependencies(&PlatformReference{Package: "test", PlatformArchitecture: "avr"})
 	require.NoError(t, err)
 	require.NotNil(t, pl)
 	require.Len(t, tools, 3)
@@ -574,7 +578,7 @@ func TestFindPlatformReleaseDependencies(t *testing.T) {
 
 func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 	// Pass nil, since these paths are only used for installing
-	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test")
+	pmb := NewBuilder(nil, nil, nil, nil, "test")
 	// Hardware from main packages directory
 	pmb.LoadHardwareFromDirectory(dataDir1.Join("packages"))
 	pm := pmb.Build()
@@ -643,7 +647,7 @@ func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 }
 
 func TestRunPostInstall(t *testing.T) {
-	pmb := packagemanager.NewBuilder(nil, nil, nil, nil, "test")
+	pmb := NewBuilder(nil, nil, nil, nil, "test")
 	pm := pmb.Build()
 	pme, release := pm.NewExplorer()
 	defer release()

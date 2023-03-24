@@ -106,7 +106,7 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 				Tools: map[string]*cores.Tool{
 					"serial-discovery": {
 						Name: "serial-discovery",
-						Releases: map[string]*cores.ToolRelease{
+						Releases: map[semver.NormalizedString]*cores.ToolRelease{
 							"1.0.0": {
 								Version: semver.ParseRelaxed("1.0.0"),
 								Flavors: []*cores.Flavor{
@@ -157,7 +157,7 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 					},
 					"ble-discovery": {
 						Name: "ble-discovery",
-						Releases: map[string]*cores.ToolRelease{
+						Releases: map[semver.NormalizedString]*cores.ToolRelease{
 							"1.0.0": {
 								Version: semver.ParseRelaxed("1.0.0"),
 								Flavors: []*cores.Flavor{
@@ -209,7 +209,7 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 					},
 					"bossac": {
 						Name: "bossac",
-						Releases: map[string]*cores.ToolRelease{
+						Releases: map[semver.NormalizedString]*cores.ToolRelease{
 							"1.6.1-arduino": {
 								Version: semver.ParseRelaxed("1.6.1-arduino"),
 								Flavors: []*cores.Flavor{
@@ -260,7 +260,7 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 					},
 					"arm-none-eabi-gcc": {
 						Name: "arm-none-eabi-gcc",
-						Releases: map[string]*cores.ToolRelease{
+						Releases: map[semver.NormalizedString]*cores.ToolRelease{
 							"4.8.3-2014q1": {
 								Version: semver.ParseRelaxed("4.8.3-2014q1"),
 								Flavors: []*cores.Flavor{

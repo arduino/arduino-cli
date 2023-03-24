@@ -541,6 +541,18 @@ func TestInstall(t *testing.T) {
 	_, stderr, err := cli.Run("lib", "install", "MD_Parola@3.2.0")
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "No valid dependencies solution found: dependency 'MD_MAX72xx' is not available")
+
+	// Test installing a library with a "relaxed" version
+	// https://github.com/arduino/arduino-cli/issues/1727
+	_, _, err = cli.Run("lib", "install", "ILI9341_t3@1.0")
+	require.NoError(t, err)
+	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Parse(t, stdout).Query(`.[] | select(.library.name == "ILI9341_t3") | .library.version`).MustEqual(`"1.0"`)
+	_, _, err = cli.Run("lib", "install", "ILI9341_t3@1")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "ILI9341_t3@1.0.0")
+	require.NoError(t, err)
 }
 
 func TestInstallLibraryWithDependencies(t *testing.T) {
@@ -1534,4 +1546,44 @@ func TestLibQueryParameters(t *testing.T) {
 	require.NoError(t, err)
 	require.Contains(t, string(stdout),
 		"Starting download                             \x1b[36murl\x1b[0m=\"https://downloads.arduino.cc/libraries/github.com/firmata/Firmata-2.5.9.zip?query=upgrade-builtin\"\n")
+}
+
+func TestLibBundlesWhenLibWithTheSameNameIsInstalledGlobally(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// See: https://github.com/arduino/arduino-cli/issues/1566
+	_, _, err := cli.Run("core", "install", "arduino:samd@1.8.13")
+	require.NoError(t, err)
+	{
+		stdout, _, err := cli.Run("lib", "list", "--all", "--fqbn", "arduino:samd:mkrzero", "USBHost", "--format", "json")
+		require.NoError(t, err)
+		j := requirejson.Parse(t, stdout)
+		j.Query(`.[0].library.name`).MustEqual(`"USBHost"`)
+		j.Query(`.[0].library.compatible_with."arduino:samd:mkrzero"`).MustEqual(`true`)
+	}
+	_, _, err = cli.Run("lib", "install", "USBHost@1.0.5")
+	require.NoError(t, err)
+	{
+		// Check that the architecture-specific library is still listed
+		stdout, _, err := cli.Run("lib", "list", "--all", "--fqbn", "arduino:samd:mkrzero", "USBHost", "--format", "json")
+		require.NoError(t, err)
+		j := requirejson.Parse(t, stdout)
+		j.Query(`.[0].library.name`).MustEqual(`"USBHost"`)
+		j.Query(`.[0].library.compatible_with."arduino:samd:mkrzero"`).MustEqual(`true`)
+	}
+
+	// See: https://github.com/arduino/arduino-cli/issues/1656
+	{
+		_, _, err = cli.Run("core", "update-index", "--additional-urls", "https://arduino.esp8266.com/stable/package_esp8266com_index.json")
+		require.NoError(t, err)
+		_, _, err = cli.Run("core", "install", "--additional-urls", "https://arduino.esp8266.com/stable/package_esp8266com_index.json", "esp8266:esp8266@3.0.2")
+		require.NoError(t, err)
+		_, _, err = cli.Run("lib", "install", "ArduinoOTA@1.0.7")
+		require.NoError(t, err)
+		stdout, _, err := cli.Run("lib", "examples", "--fqbn", "esp8266:esp8266:generic", "ArduinoOTA", "--format", "json")
+		require.NoError(t, err)
+		requirejson.Parse(t, stdout).Query(`.[].library.examples[0]`).MustContain(`"BasicOTA"`)
+		requirejson.Parse(t, stdout).Query(`.[].library.examples[1]`).MustContain(`"OTALeds"`)
+	}
 }

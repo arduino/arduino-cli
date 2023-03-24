@@ -45,7 +45,9 @@ not listed, they can be listed by adding the --all flag.`),
 		Example: "  " + os.Args[0] + " lib list",
 		Args:    cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runListCommand(args, all, updatable)
+			instance := instance.CreateAndInit()
+			logrus.Info("Executing `arduino-cli lib list`")
+			List(instance, args, all, updatable)
 		},
 	}
 	listCommand.Flags().BoolVar(&all, "all", false, tr("Include built-in libraries (from platforms and IDE) in listing."))
@@ -54,14 +56,23 @@ not listed, they can be listed by adding the --all flag.`),
 	return listCommand
 }
 
-func runListCommand(args []string, all bool, updatable bool) {
-	instance := instance.CreateAndInit()
-	logrus.Info("Executing `arduino-cli lib list`")
-	List(instance, args, all, updatable)
+// List gets and prints a list of installed libraries.
+func List(instance *rpc.Instance, args []string, all bool, updatable bool) {
+	installedLibs := GetList(instance, args, all, updatable)
+	feedback.PrintResult(installedResult{
+		onlyUpdates:   updatable,
+		installedLibs: installedLibs,
+	})
+	logrus.Info("Done")
 }
 
-// List lists all the installed libraries.
-func List(instance *rpc.Instance, args []string, all bool, updatable bool) {
+// GetList returns a list of installed libraries.
+func GetList(
+	instance *rpc.Instance,
+	args []string,
+	all bool,
+	updatable bool,
+) []*rpc.InstalledLibrary {
 	name := ""
 	if len(args) > 0 {
 		name = args[0]
@@ -95,11 +106,7 @@ func List(instance *rpc.Instance, args []string, all bool, updatable bool) {
 		libs = []*rpc.InstalledLibrary{}
 	}
 
-	feedback.PrintResult(installedResult{
-		onlyUpdates:   updatable,
-		installedLibs: libs,
-	})
-	logrus.Info("Done")
+	return libs
 }
 
 // output from this command requires special formatting, let's create a dedicated
