@@ -39,9 +39,7 @@ var ArduinoPreprocessorProperties = properties.NewFromHashmap(map[string]string{
 	"preproc.macros.flags": "-w -x c++ -E -CC",
 })
 
-type PreprocessSketchArduino struct{}
-
-func (s *PreprocessSketchArduino) Run(ctx *types.Context) error {
+func PreprocessSketchWithArduinoPreprocessor(ctx *types.Context) error {
 	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp")
 	commands := []types.Command{
 		&ArduinoPreprocessorRunner{},

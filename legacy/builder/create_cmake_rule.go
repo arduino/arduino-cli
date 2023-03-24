@@ -114,13 +114,14 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		fmt.Println(err)
 	}
 
-	// Use old ctags method to generate export file
-	commands := []types.Command{
-		//&ContainerMergeCopySketchFiles{},
-		&ContainerAddPrototypes{},
-		&FilterSketchSource{Source: &ctx.Source, RemoveLineMarkers: true},
+	if err := PreprocessSketchWithCtags(ctx); err != nil {
+		return err
 	}
 
+	// Use old ctags method to generate export file
+	commands := []types.Command{
+		&FilterSketchSource{Source: &ctx.Source, RemoveLineMarkers: true},
+	}
 	for _, command := range commands {
 		command.Run(ctx)
 	}

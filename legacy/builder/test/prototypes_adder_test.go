@@ -51,13 +51,13 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "#line 33 "+quotedSketchLocation+"\nvoid setup();\n#line 46 "+quotedSketchLocation+"\nvoid loop();\n#line 62 "+quotedSketchLocation+"\nvoid process(BridgeClient client);\n#line 82 "+quotedSketchLocation+"\nvoid digitalCommand(BridgeClient client);\n#line 109 "+quotedSketchLocation+"\nvoid analogCommand(BridgeClient client);\n#line 149 "+quotedSketchLocation+"\nvoid modeCommand(BridgeClient client);\n#line 33 "+quotedSketchLocation+"\n", ctx.PrototypesSection)
@@ -83,13 +83,13 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("SketchWithIfDef", "SketchWithIfDef.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
@@ -115,13 +115,13 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("Baladuino", "Baladuino.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
@@ -147,13 +147,13 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("CharWithEscapedDoubleQuote", "CharWithEscapedDoubleQuote.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
@@ -179,13 +179,13 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("IncludeBetweenMultilineComment", "IncludeBetweenMultilineComment.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
@@ -211,13 +211,13 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("LineContinuations", "LineContinuations.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
@@ -243,13 +243,13 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("StringWithComment", "StringWithComment.preprocessed.txt"), ctx)
 	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
@@ -275,13 +275,13 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("SketchWithStruct", "SketchWithStruct.preprocessed.txt"), ctx)
 	obtained := strings.Replace(ctx.Source, "\r\n", "\n", -1)
@@ -315,13 +315,13 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "#line 13 "+quotedSketchLocation+"\nvoid setup();\n#line 17 "+quotedSketchLocation+"\nvoid loop();\n#line 13 "+quotedSketchLocation+"\n", ctx.PrototypesSection)
@@ -353,13 +353,13 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "", ctx.PrototypesSection)
@@ -388,13 +388,13 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "", ctx.PrototypesSection)
@@ -423,13 +423,13 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "#line 4 "+quotedSketchLocation+"\nvoid setup();\n#line 7 "+quotedSketchLocation+"\nvoid loop();\n#line 1 "+quotedSketchLocation+"\n", ctx.PrototypesSection)
@@ -458,13 +458,13 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 
@@ -504,13 +504,13 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "#line 1 "+quotedSketchLocation+"\nvoid setup();\n#line 3 "+quotedSketchLocation+"\nvoid loop();\n#line 15 "+quotedSketchLocation+"\nint8_t adalight();\n#line 1 "+quotedSketchLocation+"\n", ctx.PrototypesSection)
@@ -539,13 +539,13 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "#line 5 "+quotedSketchLocation+"\nvoid ciao();\n#line 10 "+quotedSketchLocation+"\nvoid setup();\n#line 15 "+quotedSketchLocation+"\nvoid loop();\n#line 5 "+quotedSketchLocation+"\n", ctx.PrototypesSection)
@@ -573,13 +573,13 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	expected := "#line 6 " + quotedSketchLocation + "\nvoid setup();\n#line 10 " + quotedSketchLocation + "\nvoid loop();\n#line 12 " + quotedSketchLocation + "\ntypename Foo<char>::Bar func();\n#line 6 " + quotedSketchLocation + "\n"
@@ -614,13 +614,13 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "#line 5 "+quotedSketchLocation+"\nvoid elseBranch();\n#line 9 "+quotedSketchLocation+"\nvoid f1();\n#line 10 "+quotedSketchLocation+"\nvoid f2();\n#line 12 "+quotedSketchLocation+"\nvoid setup();\n#line 14 "+quotedSketchLocation+"\nvoid loop();\n#line 5 "+quotedSketchLocation+"\n", ctx.PrototypesSection)
@@ -652,13 +652,13 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "#line 2 "+quotedSketchLocation+"\nvoid ifBranch();\n#line 9 "+quotedSketchLocation+"\nvoid f1();\n#line 10 "+quotedSketchLocation+"\nvoid f2();\n#line 12 "+quotedSketchLocation+"\nvoid setup();\n#line 14 "+quotedSketchLocation+"\nvoid loop();\n#line 2 "+quotedSketchLocation+"\n", ctx.PrototypesSection)
@@ -690,13 +690,13 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "#line 1 "+quotedSketchLocation+"\nvoid setup();\n#line 2 "+quotedSketchLocation+"\nvoid loop();\n#line 4 "+quotedSketchLocation+"\nconst __FlashStringHelper* test();\n#line 6 "+quotedSketchLocation+"\nconst int test3();\n#line 8 "+quotedSketchLocation+"\nvolatile __FlashStringHelper* test2();\n#line 10 "+quotedSketchLocation+"\nvolatile int test4();\n#line 1 "+quotedSketchLocation+"\n", ctx.PrototypesSection)
@@ -722,13 +722,13 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 	// only requires no error as result
 }
 
@@ -754,13 +754,13 @@ func TestPrototypesAdderSketchWithSubstringFunctionMember(t *testing.T) {
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
-		&builder.ContainerAddPrototypes{},
 	}
 
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	require.Contains(t, ctx.Source, "class Foo {\nint blooper(int x) { return x+1; }\n};\n\nFoo foo;\n\n#line 7 "+quotedSketchLocation+"\nvoid setup();")
 }

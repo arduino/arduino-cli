@@ -23,9 +23,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-type ContainerAddPrototypes struct{}
-
-func (s *ContainerAddPrototypes) Run(ctx *types.Context) error {
+func PreprocessSketchWithCtags(ctx *types.Context) error {
 	// Generate the full pathname for the preproc output file
 	if err := ctx.PreprocPath.MkdirAll(); err != nil {
 		return errors.WithStack(err)
