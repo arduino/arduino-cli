@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
+	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
 
@@ -55,20 +56,28 @@ func GCCPreprocRunnerForDiscoveringIncludes(ctx *types.Context, sourceFilePath *
 }
 
 func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.PathList) (*exec.Cmd, error) {
-	properties := ctx.BuildProperties.Clone()
-	properties.Set("build.library_discovery_phase", "1")
-	properties.SetPath("source_file", sourceFilePath)
-	properties.SetPath("preprocessed_file_path", targetFilePath)
+	buildProperties := properties.NewMap()
+	buildProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
+	buildProperties.Merge(ctx.BuildProperties)
+	buildProperties.Set("build.library_discovery_phase", "1")
+	buildProperties.SetPath("source_file", sourceFilePath)
+	buildProperties.SetPath("preprocessed_file_path", targetFilePath)
 
 	includesStrings := utils.Map(includes.AsStrings(), utils.WrapWithHyphenI)
-	properties.Set("includes", strings.Join(includesStrings, " "))
+	buildProperties.Set("includes", strings.Join(includesStrings, " "))
 
-	if properties.Get("recipe.preproc.macros") == "" {
-		//generate PREPROC_MACROS from RECIPE_CPP_PATTERN
-		properties.Set("recipe.preproc.macros", GeneratePreprocPatternFromCompile(properties.Get("recipe.cpp.o.pattern")))
+	if buildProperties.Get("recipe.preproc.macros") == "" {
+		// autogenerate preprocess macros recipe from compile recipe
+		preprocPattern := buildProperties.Get("recipe.cpp.o.pattern")
+		// add {preproc.macros.flags} to {compiler.cpp.flags}
+		preprocPattern = strings.Replace(preprocPattern, "{compiler.cpp.flags}", "{compiler.cpp.flags} {preproc.macros.flags}", 1)
+		// replace "{object_file}" with "{preprocessed_file_path}"
+		preprocPattern = strings.Replace(preprocPattern, "{object_file}", "{preprocessed_file_path}", 1)
+
+		buildProperties.Set("recipe.preproc.macros", preprocPattern)
 	}
 
-	cmd, err := builder_utils.PrepareCommandForRecipe(properties, "recipe.preproc.macros", true, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+	cmd, err := builder_utils.PrepareCommandForRecipe(buildProperties, "recipe.preproc.macros", true, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -78,13 +87,4 @@ func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath *paths
 	cmd.Args = utils.Filter(cmd.Args, func(a string) bool { return a != "-MMD" })
 
 	return cmd, nil
-}
-
-func GeneratePreprocPatternFromCompile(compilePattern string) string {
-	// add {preproc.macros.flags}
-	// replace "{object_file}" with "{preprocessed_file_path}"
-	returnString := compilePattern
-	returnString = strings.Replace(returnString, "{compiler.cpp.flags}", "{compiler.cpp.flags} {preproc.macros.flags}", 1)
-	returnString = strings.Replace(returnString, "{object_file}", "{preprocessed_file_path}", 1)
-	return returnString
 }

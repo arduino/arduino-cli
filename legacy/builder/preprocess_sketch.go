@@ -29,56 +29,30 @@ import (
 	"github.com/pkg/errors"
 )
 
-// ArduinoPreprocessorProperties are the platform properties needed to run arduino-preprocessor
-var ArduinoPreprocessorProperties = properties.NewFromHashmap(map[string]string{
-	// Ctags
-	"tools.arduino-preprocessor.path":     "{runtime.tools.arduino-preprocessor.path}",
-	"tools.arduino-preprocessor.cmd.path": "{path}/arduino-preprocessor",
-	"tools.arduino-preprocessor.pattern":  `"{cmd.path}" "{source_file}" -- -std=gnu++11`,
-
-	"preproc.macros.flags": "-w -x c++ -E -CC",
-})
-
 func PreprocessSketchWithArduinoPreprocessor(ctx *types.Context) error {
-	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp")
-	commands := []types.Command{
-		&ArduinoPreprocessorRunner{},
-	}
-
 	if err := ctx.PreprocPath.MkdirAll(); err != nil {
 		return errors.WithStack(err)
 	}
 
+	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp")
 	GCCPreprocRunner(ctx, sourceFile, ctx.PreprocPath.Join("ctags_target_for_gcc_minus_e.cpp"), ctx.IncludeFolders)
 
-	for _, command := range commands {
-		PrintRingNameIfDebug(ctx, command)
-		err := command.Run(ctx)
-		if err != nil {
-			return errors.WithStack(err)
-		}
-	}
-
-	return bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, []byte(ctx.Source), ctx.SketchBuildPath)
-}
-
-type ArduinoPreprocessorRunner struct{}
-
-func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
-	buildProperties := ctx.BuildProperties
 	targetFilePath := ctx.PreprocPath.Join("ctags_target_for_gcc_minus_e.cpp")
+	buildProperties := properties.NewMap()
+	buildProperties.Set("tools.arduino-preprocessor.path", "{runtime.tools.arduino-preprocessor.path}")
+	buildProperties.Set("tools.arduino-preprocessor.cmd.path", "{path}/arduino-preprocessor")
+	buildProperties.Set("tools.arduino-preprocessor.pattern", `"{cmd.path}" "{source_file}" -- -std=gnu++11`)
+	buildProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
+	buildProperties.Merge(ctx.BuildProperties)
+	buildProperties.Merge(buildProperties.SubTree("tools").SubTree("arduino-preprocessor"))
+	buildProperties.SetPath("source_file", targetFilePath)
 
-	preprocProperties := buildProperties.Clone()
-	toolProps := buildProperties.SubTree("tools").SubTree("arduino-preprocessor")
-	preprocProperties.Merge(toolProps)
-	preprocProperties.SetPath("source_file", targetFilePath)
-
-	pattern := preprocProperties.Get("pattern")
+	pattern := buildProperties.Get("pattern")
 	if pattern == "" {
 		return errors.New(tr("arduino-preprocessor pattern is missing"))
 	}
 
-	commandLine := preprocProperties.ExpandPropsInString(pattern)
+	commandLine := buildProperties.ExpandPropsInString(pattern)
 	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
 	if err != nil {
 		return errors.WithStack(err)
@@ -106,5 +80,6 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 
 	//fmt.Printf("PREPROCESSOR OUTPUT:\n%s\n", output)
 	ctx.Source = string(result)
-	return nil
+
+	return bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, []byte(ctx.Source), ctx.SketchBuildPath)
 }

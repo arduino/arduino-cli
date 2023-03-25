@@ -360,6 +360,7 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 	buildProperties.Set("runtime.os", properties.GetOSSuffix())
 	buildProperties.Set("build.library_discovery_phase", "0")
 	// Deprecated properties
+	buildProperties.Set("tools.avrdude.path", "{runtime.tools.avrdude.path}")
 	buildProperties.Set("ide_version", "10607")
 	buildProperties.Set("runtime.ide.version", "10607")
 	if !buildProperties.ContainsKey("software") {

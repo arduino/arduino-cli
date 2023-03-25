@@ -29,19 +29,22 @@ import (
 type CTagsRunner struct{}
 
 func (s *CTagsRunner) Run(ctx *types.Context) error {
-	buildProperties := ctx.BuildProperties
 	ctagsTargetFilePath := ctx.CTagsTargetFile
 
-	ctagsProperties := buildProperties.Clone()
-	ctagsProperties.Merge(buildProperties.SubTree("tools").SubTree("ctags"))
-	ctagsProperties.SetPath("source_file", ctagsTargetFilePath)
+	buildProperties := properties.NewMap()
+	buildProperties.Set("tools.ctags.path", "{runtime.tools.ctags.path}")
+	buildProperties.Set("tools.ctags.cmd.path", "{path}/ctags")
+	buildProperties.Set("tools.ctags.pattern", `"{cmd.path}" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns --line-directives "{source_file}"`)
+	buildProperties.Merge(ctx.BuildProperties)
+	buildProperties.Merge(buildProperties.SubTree("tools").SubTree("ctags"))
+	buildProperties.SetPath("source_file", ctagsTargetFilePath)
 
-	pattern := ctagsProperties.Get("pattern")
+	pattern := buildProperties.Get("pattern")
 	if pattern == "" {
 		return errors.Errorf(tr("%s pattern is missing"), "ctags")
 	}
 
-	commandLine := ctagsProperties.ExpandPropsInString(pattern)
+	commandLine := buildProperties.ExpandPropsInString(pattern)
 	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
 	if err != nil {
 		return errors.WithStack(err)
