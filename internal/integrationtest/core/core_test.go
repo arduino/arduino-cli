@@ -160,8 +160,8 @@ func TestCoreSearchNoArgs(t *testing.T) {
 	for _, v := range strings.Split(strings.TrimSpace(string(stdout)), "\n") {
 		lines = append(lines, strings.Fields(strings.TrimSpace(v)))
 	}
-	// The header is printed on the first lines
-	require.Equal(t, []string{"test:x86", "2.0.0", "test_core"}, lines[21])
+	// Check the presence of test:x86@2.0.0
+	require.Contains(t, lines, []string{"test:x86", "2.0.0", "test_core"})
 	numPlatforms := len(lines) - 1
 
 	// same thing in JSON format, also check the number of platforms found is the same
@@ -177,8 +177,8 @@ func TestCoreSearchNoArgs(t *testing.T) {
 	for _, v := range strings.Split(strings.TrimSpace(string(stdout)), "\n") {
 		lines = append(lines, strings.Fields(strings.TrimSpace(v)))
 	}
-	// The header is printed on the first lines
-	require.Equal(t, []string{"test:x86", "3.0.0", "test_core"}, lines[22])
+	// Check the presence of test:x86@3.0.0
+	require.Contains(t, lines, []string{"test:x86", "3.0.0", "test_core"})
 	numPlatforms = len(lines) - 1
 
 	// same thing in JSON format, also check the number of platforms found is the same
