@@ -3,7 +3,7 @@ name: Test Go
 
 env:
   # See: https://github.com/actions/setup-go/tree/main#supported-version-syntax
-  GO_VERSION: "1.19"
+  GO_VERSION: "1.20"
   COVERAGE_ARTIFACT: coverage-data
 
 # See: https://docs.github.com/en/free-pro-team@latest/actions/reference/events-that-trigger-workflows
@@ -110,6 +110,15 @@ jobs:
         run: |
           export GO_TEST_PACKAGE="github.com/arduino/arduino-cli/internal/integrationtest/${{ matrix.tests }}"
           task go:integration-test
+          mv coverage_integration.txt coverage_integration_${{ matrix.operating-system }}_${{ matrix.tests }}.txt
+
+      - name: Upload coverage data to workflow artifact
+        uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: error
+          name: ${{ env.COVERAGE_ARTIFACT }}
+          path: |
+            ./coverage_integration_*.txt
 
   test:
     needs: run-determination
@@ -162,20 +171,32 @@ jobs:
 
   coverage-upload:
     runs-on: ubuntu-latest
-    needs: test
+    needs:
+      - test
+      - test-integration
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install gocovmerge
+        run: go install github.com/wadey/gocovmerge@b5bfa59
+
       - name: Download coverage data artifact
         uses: actions/download-artifact@v3
         with:
           name: ${{ env.COVERAGE_ARTIFACT }}
 
+      - name: Merge all code coverage artifacts
+        run: gocovmerge coverage*.txt > coverage.txt
+
       - name: Send unit tests coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          files: >
-            ./coverage_unit.txt,
-            ./coverage_legacy.txt
+          files: ./coverage.txt
           flags: unit
           fail_ci_if_error: ${{ github.repository == 'arduino/arduino-cli' }}

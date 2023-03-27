@@ -70,6 +70,7 @@ type ArduinoCLI struct {
 	path                 *paths.Path
 	t                    *require.Assertions
 	proc                 *executils.Process
+	stdIn                io.WriteCloser
 	cliEnvVars           map[string]string
 	cliConfigPath        *paths.Path
 	stagingDir           *paths.Path
@@ -122,7 +123,12 @@ func NewArduinoCliWithinEnvironment(env *Environment, config *ArduinoCLIConfig) 
 func (cli *ArduinoCLI) CleanUp() {
 	if cli.proc != nil {
 		cli.daemonConn.Close()
-		cli.proc.Kill()
+		cli.stdIn.Close()
+		proc := cli.proc
+		go func() {
+			time.Sleep(time.Second)
+			proc.Kill()
+		}()
 		cli.proc.Wait()
 	}
 }
@@ -185,6 +191,11 @@ func (cli *ArduinoCLI) convertEnvForExecutils(env map[string]string) []string {
 	for k, v := range env {
 		envVars = append(envVars, fmt.Sprintf("%s=%s", k, v))
 	}
+
+	// Proxy code-coverage related env vars
+	if gocoverdir := os.Getenv("INTEGRATION_GOCOVERDIR"); gocoverdir != "" {
+		envVars = append(envVars, "GOCOVERDIR="+gocoverdir)
+	}
 	return envVars
 }
 
@@ -246,10 +257,11 @@ func (cli *ArduinoCLI) StartDaemon(verbose bool) string {
 	cli.t.NoError(err)
 	stderr, err := cliProc.StderrPipe()
 	cli.t.NoError(err)
-	_, err = cliProc.StdinPipe()
+	stdIn, err := cliProc.StdinPipe()
 	cli.t.NoError(err)
 
 	cli.t.NoError(cliProc.Start())
+	cli.stdIn = stdIn
 	cli.proc = cliProc
 	cli.daemonAddr = "127.0.0.1:50051"
 

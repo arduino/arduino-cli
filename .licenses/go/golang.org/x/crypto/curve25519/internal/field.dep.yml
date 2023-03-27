@@ -1,9 +1,9 @@
 ---
-name: golang.org/x/crypto/internal/alias
+name: golang.org/x/crypto/curve25519/internal/field
 version: v0.7.0
 type: go
-summary: Package alias implements memory aliasing tests.
-homepage: https://pkg.go.dev/golang.org/x/crypto/internal/alias
+summary: Package field implements fast arithmetic modulo 2^255-19.
+homepage: https://pkg.go.dev/golang.org/x/crypto/curve25519/internal/field
 license: bsd-3-clause
 licenses:
 - sources: crypto@v0.7.0/LICENSE

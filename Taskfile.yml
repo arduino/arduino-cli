@@ -48,7 +48,7 @@ tasks:
     desc: Build the Go code
     dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
-      - go build -v {{.LDFLAGS}}
+      - go build -v {{default "" .EXTRA_FLAGS}} {{.LDFLAGS}}
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/deploy-cobra-mkdocs-versioned-poetry/Taskfile.yml
   go:cli-docs:
@@ -110,10 +110,14 @@ tasks:
     desc: Run the Go-based integration tests
     deps:
       - task: go:build
+        vars:
+          EXTRA_FLAGS: "-covermode=atomic"
     dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
       - |
-        go test \
+        rm -fr coverage_data
+        mkdir coverage_data
+        INTEGRATION_GOCOVERDIR={{ .ROOT_DIR }}/coverage_data go test \
           -v \
           -short \
           {{ .GO_TEST_PACKAGE }} \
@@ -122,6 +126,7 @@ tasks:
           -coverprofile=coverage_unit.txt \
           {{default .DEFAULT_INTEGRATIONTEST_GO_PACKAGES .GO_PACKAGES}} \
           {{.TEST_LDFLAGS}}
+        go tool covdata textfmt -i=coverage_data -o coverage_integration.txt
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
   go:vet:
