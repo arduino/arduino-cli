@@ -1041,7 +1041,8 @@ type LibrarySearchRequest struct {
 	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
 	// The search query.
 	Query string `protobuf:"bytes,2,opt,name=query,proto3" json:"query,omitempty"`
-	// Set to true to not populate the releases field in the response (may save a lot of bandwidth/CPU).
+	// Set to true to not populate the releases field in the response (may save a
+	// lot of bandwidth/CPU).
 	OmitReleasesDetails bool `protobuf:"varint,3,opt,name=omit_releases_details,json=omitReleasesDetails,proto3" json:"omit_releases_details,omitempty"`
 }
 

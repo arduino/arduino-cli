@@ -88,7 +88,6 @@ type Context struct {
 	TargetPackage              *cores.Package
 	TargetPlatform             *cores.PlatformRelease
 	ActualPlatform             *cores.PlatformRelease
-	USBVidPid                  string
 
 	PlatformKeyRewrites    PlatforKeysRewrite
 	HardwareRewriteResults map[*cores.PlatformRelease][]PlatforKeyRewrite

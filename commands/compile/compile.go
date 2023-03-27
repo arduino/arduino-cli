@@ -160,7 +160,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	builderCtx.Jobs = int(req.GetJobs())
 
-	builderCtx.USBVidPid = req.GetVidPid()
 	builderCtx.WarningsLevel = req.GetWarnings()
 
 	builderCtx.CustomBuildProperties = append(req.GetBuildProperties(), "build.warn_data_percentage=75")

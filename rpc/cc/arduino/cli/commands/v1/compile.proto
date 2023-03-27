@@ -51,8 +51,6 @@ message CompileRequest {
   bool verbose = 10;
   // Suppresses almost every output.
   bool quiet = 11;
-  // VID/PID specific build properties.
-  string vid_pid = 12;
   // The max number of concurrent compiler instances to run (as `make -jx`).
   // If jobs is set to 0, it will use the number of available CPUs as the
   // maximum.
