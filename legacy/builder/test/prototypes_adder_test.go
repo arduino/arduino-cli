@@ -48,16 +48,9 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -87,16 +80,9 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -126,16 +112,9 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -165,16 +144,9 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -204,16 +176,9 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -243,16 +208,9 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -282,16 +240,9 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -321,16 +272,9 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -368,16 +312,9 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -413,16 +350,9 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -455,16 +385,9 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -497,16 +420,9 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -539,16 +455,9 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -592,16 +501,9 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -634,16 +536,9 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -675,16 +570,9 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -723,16 +611,9 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -768,16 +649,9 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -813,16 +687,9 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -852,16 +719,9 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
@@ -891,16 +751,9 @@ func TestPrototypesAdderSketchWithSubstringFunctionMember(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-
 		&builder.ContainerAddPrototypes{},
 	}
 
