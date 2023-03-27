@@ -82,8 +82,6 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
-		&builder.PlatformKeysRewriteLoader{},
-		&builder.RewriteHardwareKeys{},
 	}
 
 	for _, command := range commands {
