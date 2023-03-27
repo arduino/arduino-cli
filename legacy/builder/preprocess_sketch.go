@@ -21,7 +21,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strings"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
@@ -36,7 +35,7 @@ var ArduinoPreprocessorProperties = properties.NewFromHashmap(map[string]string{
 	// Ctags
 	"tools.arduino-preprocessor.path":     "{runtime.tools.arduino-preprocessor.path}",
 	"tools.arduino-preprocessor.cmd.path": "{path}/arduino-preprocessor",
-	"tools.arduino-preprocessor.pattern":  `"{cmd.path}" "{source_file}" "{codecomplete}" -- -std=gnu++11`,
+	"tools.arduino-preprocessor.pattern":  `"{cmd.path}" "{source_file}" -- -std=gnu++11`,
 
 	"preproc.macros.flags": "-w -x c++ -E -CC",
 })
@@ -63,14 +62,7 @@ func (s *PreprocessSketchArduino) Run(ctx *types.Context) error {
 		}
 	}
 
-	var err error
-	if ctx.CodeCompleteAt != "" {
-		err = new(OutputCodeCompletions).Run(ctx)
-	} else {
-		err = bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, []byte(ctx.Source), ctx.SketchBuildPath)
-	}
-
-	return err
+	return bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, []byte(ctx.Source), ctx.SketchBuildPath)
 }
 
 type ArduinoPreprocessorRunner struct{}
@@ -83,21 +75,6 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 	toolProps := buildProperties.SubTree("tools").SubTree("arduino-preprocessor")
 	preprocProperties.Merge(toolProps)
 	preprocProperties.SetPath(constants.BUILD_PROPERTIES_SOURCE_FILE, targetFilePath)
-	if ctx.CodeCompleteAt != "" {
-		if runtime.GOOS == "windows" {
-			//use relative filepath to avoid ":" escaping
-			splt := strings.Split(ctx.CodeCompleteAt, ":")
-			if len(splt) == 3 {
-				//all right, do nothing
-			} else {
-				splt[1] = filepath.Base(splt[0] + ":" + splt[1])
-				ctx.CodeCompleteAt = strings.Join(splt[1:], ":")
-			}
-		}
-		preprocProperties.Set("codecomplete", "-output-code-completions="+ctx.CodeCompleteAt)
-	} else {
-		preprocProperties.Set("codecomplete", "")
-	}
 
 	pattern := preprocProperties.Get(constants.BUILD_PROPERTIES_PATTERN)
 	if pattern == constants.EMPTY_STRING {
@@ -131,21 +108,6 @@ func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 	result := utils.NormalizeUTF8(buf)
 
 	//fmt.Printf("PREPROCESSOR OUTPUT:\n%s\n", output)
-	if ctx.CodeCompleteAt != "" {
-		ctx.CodeCompletions = string(result)
-	} else {
-		ctx.Source = string(result)
-	}
-	return nil
-}
-
-type OutputCodeCompletions struct{}
-
-func (s *OutputCodeCompletions) Run(ctx *types.Context) error {
-	if ctx.CodeCompletions == "" {
-		// we assume it is a json, let's make it compliant at least
-		ctx.CodeCompletions = "[]"
-	}
-	ctx.WriteStdout([]byte(ctx.CodeCompletions))
+	ctx.Source = string(result)
 	return nil
 }

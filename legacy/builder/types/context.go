@@ -72,7 +72,6 @@ type Context struct {
 	LibraryDirs          paths.PathList // List of paths pointing to individual library root folders
 	WatchedLocations     paths.PathList
 	FQBN                 *cores.FQBN
-	CodeCompleteAt       string
 	Clean                bool
 
 	// Build options are serialized here
@@ -110,7 +109,6 @@ type Context struct {
 	Sketch          *sketch.Sketch
 	Source          string
 	SourceGccMinusE string
-	CodeCompletions string
 
 	WarningsLevel string
 
