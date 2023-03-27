@@ -197,6 +197,7 @@ jobs:
       - name: Send unit tests coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.txt
           flags: unit
           fail_ci_if_error: ${{ github.repository == 'arduino/arduino-cli' }}
