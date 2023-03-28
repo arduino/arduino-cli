@@ -419,6 +419,6 @@ allowing the compilation to fail in a difficult to understand way):
 ## Old library format (pre-1.5)
 
 In order to support old libraries (from Arduino IDE 1.0.x), Arduino IDE and Arduino CLI will also compile libraries
-missing a library.properties metadata file. As a result, these libraries should behave as they did in Arduino IDE 1.0.x,
-although they will be available for all boards, including non-AVR ones (which wouldn’t have been present in Arduino IDE
-1.0.x).
+missing a library.properties metadata file (the header file is still required). As a result, these libraries should
+behave as they did in Arduino IDE 1.0.x, although they will be available for all boards, including non-AVR ones (which
+wouldn’t have been present in Arduino IDE 1.0.x).

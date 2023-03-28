@@ -1587,3 +1587,40 @@ func TestLibBundlesWhenLibWithTheSameNameIsInstalledGlobally(t *testing.T) {
 		requirejson.Parse(t, stdout).Query(`.[].library.examples[1]`).MustContain(`"OTALeds"`)
 	}
 }
+
+func TestLibListDoesNotIncludeEmptyLibraries(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("lib", "update-index")
+	require.NoError(t, err)
+
+	// Create a library that does not have neither a library.properties nor a ".h" file
+	emptyLib := cli.SketchbookDir().Join("libraries", "empty")
+	require.NoError(t, emptyLib.MkdirAll())
+
+	// Check that the output of lib list and lib examples is empty
+	stdout, _, err := cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Empty(t, stdout)
+
+	stdout, _, err = cli.Run("lib", "examples", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Empty(t, stdout)
+
+	// Create a library with a header
+	libWithHeader := cli.SketchbookDir().Join("libraries", "libWithHeader")
+	require.NoError(t, libWithHeader.MkdirAll())
+	f, err := libWithHeader.Join("libWithHeader.h").Create()
+	require.NoError(t, err)
+	require.NoError(t, f.Close())
+
+	// Check that the output of lib list and lib examples contains the library
+	stdout, _, err = cli.Run("lib", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+
+	stdout, _, err = cli.Run("lib", "examples", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Len(t, stdout, 1)
+}
