@@ -73,4 +73,15 @@ func TestLibrariesLoader(t *testing.T) {
 		require.Equal(t, "LibWithNonUTF8Properties", lib.Name)
 		require.Equal(t, "àrduìnò", lib.Author)
 	}
+	{
+		lib, err := Load(paths.New("testdata", "EmptyLib"), User)
+		require.Error(t, err)
+		require.Nil(t, lib)
+	}
+	{
+		lib, err := Load(paths.New("testdata", "LegacyLib"), User)
+		require.NoError(t, err)
+		require.Equal(t, "LegacyLib", lib.Name)
+		require.True(t, lib.IsLegacy)
+	}
 }
