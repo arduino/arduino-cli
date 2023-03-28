@@ -23,7 +23,6 @@ import (
 	"runtime"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -40,9 +39,7 @@ var ArduinoPreprocessorProperties = properties.NewFromHashmap(map[string]string{
 	"preproc.macros.flags": "-w -x c++ -E -CC",
 })
 
-type PreprocessSketchArduino struct{}
-
-func (s *PreprocessSketchArduino) Run(ctx *types.Context) error {
+func PreprocessSketchWithArduinoPreprocessor(ctx *types.Context) error {
 	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp")
 	commands := []types.Command{
 		&ArduinoPreprocessorRunner{},
@@ -52,7 +49,7 @@ func (s *PreprocessSketchArduino) Run(ctx *types.Context) error {
 		return errors.WithStack(err)
 	}
 
-	GCCPreprocRunner(ctx, sourceFile, ctx.PreprocPath.Join(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E), ctx.IncludeFolders)
+	GCCPreprocRunner(ctx, sourceFile, ctx.PreprocPath.Join("ctags_target_for_gcc_minus_e.cpp"), ctx.IncludeFolders)
 
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
@@ -69,15 +66,15 @@ type ArduinoPreprocessorRunner struct{}
 
 func (s *ArduinoPreprocessorRunner) Run(ctx *types.Context) error {
 	buildProperties := ctx.BuildProperties
-	targetFilePath := ctx.PreprocPath.Join(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E)
+	targetFilePath := ctx.PreprocPath.Join("ctags_target_for_gcc_minus_e.cpp")
 
 	preprocProperties := buildProperties.Clone()
 	toolProps := buildProperties.SubTree("tools").SubTree("arduino-preprocessor")
 	preprocProperties.Merge(toolProps)
-	preprocProperties.SetPath(constants.BUILD_PROPERTIES_SOURCE_FILE, targetFilePath)
+	preprocProperties.SetPath("source_file", targetFilePath)
 
-	pattern := preprocProperties.Get(constants.BUILD_PROPERTIES_PATTERN)
-	if pattern == constants.EMPTY_STRING {
+	pattern := preprocProperties.Get("pattern")
+	if pattern == "" {
 		return errors.New(tr("arduino-preprocessor pattern is missing"))
 	}
 

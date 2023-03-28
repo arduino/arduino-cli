@@ -19,7 +19,6 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/ctags"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
@@ -34,12 +33,12 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 	ctagsTargetFilePath := ctx.CTagsTargetFile
 
 	ctagsProperties := buildProperties.Clone()
-	ctagsProperties.Merge(buildProperties.SubTree(constants.BUILD_PROPERTIES_TOOLS_KEY).SubTree(constants.CTAGS))
-	ctagsProperties.SetPath(constants.BUILD_PROPERTIES_SOURCE_FILE, ctagsTargetFilePath)
+	ctagsProperties.Merge(buildProperties.SubTree("tools").SubTree("ctags"))
+	ctagsProperties.SetPath("source_file", ctagsTargetFilePath)
 
-	pattern := ctagsProperties.Get(constants.BUILD_PROPERTIES_PATTERN)
-	if pattern == constants.EMPTY_STRING {
-		return errors.Errorf(tr("%s pattern is missing"), constants.CTAGS)
+	pattern := ctagsProperties.Get("pattern")
+	if pattern == "" {
+		return errors.Errorf(tr("%s pattern is missing"), "ctags")
 	}
 
 	commandLine := ctagsProperties.ExpandPropsInString(pattern)
