@@ -68,6 +68,30 @@ func TestResolveFQBN(t *testing.T) {
 	defer release()
 
 	{
+		testNormalization := func(in, expected string) {
+			fqbn, err := cores.ParseFQBN(in)
+			require.Nil(t, err)
+			require.NotNil(t, fqbn)
+			normalized, err := pme.NormalizeFQBN(fqbn)
+			if expected == "ERROR" {
+				require.Error(t, err)
+				require.Nil(t, normalized)
+			} else {
+				require.NoError(t, err)
+				require.NotNil(t, normalized)
+				require.Equal(t, expected, normalized.String())
+			}
+		}
+		testNormalization("arduino:avr:mega", "arduino:avr:mega")
+		testNormalization("arduino:avr:mega:cpu=atmega2560", "arduino:avr:mega")
+		testNormalization("arduino:avr:mega:cpu=atmega1280", "arduino:avr:mega:cpu=atmega1280")
+		testNormalization("esp8266:esp8266:generic:baud=57600,wipe=sdk", "esp8266:esp8266:generic:baud=57600,wipe=sdk")
+		testNormalization("esp8266:esp8266:generic:baud=115200,wipe=sdk", "esp8266:esp8266:generic:wipe=sdk")
+		testNormalization("arduino:avr:mega:cpu=nonexistent", "ERROR")
+		testNormalization("arduino:avr:mega:nonexistent=blah", "ERROR")
+	}
+
+	{
 		fqbn, err := cores.ParseFQBN("arduino:avr:uno")
 		require.Nil(t, err)
 		require.NotNil(t, fqbn)
