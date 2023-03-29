@@ -76,6 +76,16 @@ func (fqbn *FQBN) String() string {
 	return res
 }
 
+// Clone returns a copy of this FQBN.
+func (fqbn *FQBN) Clone() *FQBN {
+	return &FQBN{
+		Package:      fqbn.Package,
+		PlatformArch: fqbn.PlatformArch,
+		BoardID:      fqbn.BoardID,
+		Configs:      fqbn.Configs.Clone(),
+	}
+}
+
 // Match check if the target FQBN corresponds to the receiver one.
 // The core parts are checked for exact equality while board options are loosely
 // matched: the set of boards options of the target must be fully contained within
