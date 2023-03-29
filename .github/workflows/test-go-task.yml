@@ -194,9 +194,24 @@ jobs:
       - name: Merge all code coverage artifacts
         run: gocovmerge coverage*.txt > coverage.txt
 
+      # A token is used to avoid intermittent spurious job failures caused by rate limiting.
+      - name: Set up Codecov upload token
+        run: |
+          if [[ "${{ github.repository }}" == "arduino/arduino-cli" ]]; then
+            # In order to avoid uploads of data from forks, only use the token for runs in the arduino/arduino-ide repo.
+            # Token is intentionally exposed.
+            # See: https://community.codecov.com/t/upload-issues-unable-to-locate-build-via-github-actions-api/3954
+            CODECOV_TOKEN="18b9885b-cbf2-4166-bfbb-39617323daf0"
+          else
+            # codecov/codecov-action does unauthenticated upload if empty string is passed via the `token` input.
+            CODECOV_TOKEN=""
+          fi
+          echo "CODECOV_TOKEN=$CODECOV_TOKEN" >> "$GITHUB_ENV"
+
       - name: Send unit tests coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
+          token: ${{ env.CODECOV_TOKEN }}
           files: ./coverage.txt
           flags: unit
           fail_ci_if_error: ${{ github.repository == 'arduino/arduino-cli' }}
