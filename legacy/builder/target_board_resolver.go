@@ -36,9 +36,18 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 			core = "arduino"
 		}
 		// select the core name in case of "package:core" format
+		normalizedFQBN, err := ctx.PackageManager.NormalizeFQBN(ctx.FQBN)
+		if err != nil {
+			ctx.Warn(fmt.Sprintf("Could not normalize FQBN: %s", err))
+			normalizedFQBN = ctx.FQBN
+		}
+		ctx.Info(fmt.Sprintf("FQBN: %s", normalizedFQBN))
+
 		core = core[strings.Index(core, ":")+1:]
 		ctx.Info(tr("Using board '%[1]s' from platform in folder: %[2]s", targetBoard.BoardID, targetPlatform.InstallDir))
 		ctx.Info(tr("Using core '%[1]s' from platform in folder: %[2]s", core, buildPlatform.InstallDir))
+
+		ctx.Info("")
 	}
 
 	if buildProperties.Get("build.board") == "" {
