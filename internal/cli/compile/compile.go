@@ -226,6 +226,14 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		stdOut, stdErr, stdIORes = feedback.OutputStreams()
 	}
 
+	var libraryAbs []string
+	for _, libPath := range paths.NewPathList(library...) {
+		if libPath, err = libPath.Abs(); err != nil {
+			feedback.Fatal(tr("Error converting path to absolute: %v", err), feedback.ErrGeneric)
+		}
+		libraryAbs = append(libraryAbs, libPath.String())
+	}
+
 	compileRequest := &rpc.CompileRequest{
 		Instance:                      inst,
 		Fqbn:                          fqbn,
@@ -244,7 +252,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		Clean:                         clean,
 		CreateCompilationDatabaseOnly: compilationDatabaseOnly,
 		SourceOverride:                overrides,
-		Library:                       library,
+		Library:                       libraryAbs,
 		KeysKeychain:                  keysKeychain,
 		SignKey:                       signKey,
 		EncryptKey:                    encryptKey,
