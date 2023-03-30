@@ -16,7 +16,6 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/pkg/errors"
@@ -57,7 +56,6 @@ func (*AddAdditionalEntriesToContext) Run(ctx *types.Context) error {
 	ctx.CollectedSourceFiles = &types.UniqueSourceFileQueue{}
 
 	ctx.LibrariesResolutionResults = map[string]types.LibraryResolutionResult{}
-	ctx.HardwareRewriteResults = map[*cores.PlatformRelease][]types.PlatforKeyRewrite{}
 
 	return nil
 }

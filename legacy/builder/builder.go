@@ -44,8 +44,6 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		&ContainerBuildOptions{},
 
-		&WarnAboutPlatformRewrites{},
-
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
 
 		&ContainerMergeCopySketchFiles{},

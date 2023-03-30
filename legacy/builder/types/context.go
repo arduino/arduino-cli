@@ -88,9 +88,6 @@ type Context struct {
 	TargetPlatform             *cores.PlatformRelease
 	ActualPlatform             *cores.PlatformRelease
 
-	PlatformKeyRewrites    PlatforKeysRewrite
-	HardwareRewriteResults map[*cores.PlatformRelease][]PlatforKeyRewrite
-
 	BuildProperties              *properties.Map
 	BuildPath                    *paths.Path
 	SketchBuildPath              *paths.Path
