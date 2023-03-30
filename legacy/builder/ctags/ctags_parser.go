@@ -43,8 +43,8 @@ type CTagsParser struct {
 	mainFile *paths.Path
 }
 
-func (p *CTagsParser) Parse(ctagsOutput string, mainFile *paths.Path) []*types.CTag {
-	rows := strings.Split(ctagsOutput, "\n")
+func (p *CTagsParser) Parse(ctagsOutput []byte, mainFile *paths.Path) []*types.CTag {
+	rows := strings.Split(string(ctagsOutput), "\n")
 	rows = removeEmpty(rows)
 
 	p.mainFile = mainFile
