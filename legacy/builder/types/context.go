@@ -115,7 +115,6 @@ type Context struct {
 	UseCachedLibrariesResolution bool
 
 	// C++ Parsing
-	CTagsOutput                 string
 	CTagsTargetFile             *paths.Path
 	CTagsOfPreprocessedSource   []*CTag
 	LineOffset                  int

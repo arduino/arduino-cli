@@ -26,9 +26,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-type CTagsRunner struct{}
+type CTagsRunner struct {
+	// Needed for unit-testing
+	CtagsOutput []byte
+}
 
-func (s *CTagsRunner) Run(ctx *types.Context) error {
+func (r *CTagsRunner) Run(ctx *types.Context) error {
 	ctagsTargetFilePath := ctx.CTagsTargetFile
 
 	buildProperties := properties.NewMap()
@@ -52,16 +55,13 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 	command := exec.Command(parts[0], parts[1:]...)
 	command.Env = append(os.Environ(), ctx.PackageManager.GetEnvVarsForSpawnedProcess()...)
 
-	sourceBytes, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.ShowIfVerbose /* stderr */)
+	ctagsOutput, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.ShowIfVerbose /* stderr */)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	ctx.CTagsOutput = string(sourceBytes)
-
 	parser := &ctags.CTagsParser{}
-
-	ctx.CTagsOfPreprocessedSource = parser.Parse(sourceBytes, ctx.Sketch.MainFile)
+	ctx.CTagsOfPreprocessedSource = parser.Parse(ctagsOutput, ctx.Sketch.MainFile)
 	parser.FixCLinkageTagsDeclarations(ctx.CTagsOfPreprocessedSource)
 
 	protos, line := parser.GeneratePrototypes()
@@ -70,5 +70,7 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 	}
 	ctx.Prototypes = protos
 
+	// Needed for unit-testing
+	r.CtagsOutput = ctagsOutput
 	return nil
 }
