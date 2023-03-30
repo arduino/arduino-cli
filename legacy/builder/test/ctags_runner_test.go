@@ -31,14 +31,13 @@ func TestCTagsRunner(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	ctagsRunner := &builder.CTagsRunner{}
+	ctagsRunner := &builder.CTagsRunner{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"}
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"},
 		ctagsRunner,
 	}
 	for _, command := range commands {
@@ -63,14 +62,13 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	ctagsRunner := &builder.CTagsRunner{}
+	ctagsRunner := &builder.CTagsRunner{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"}
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"},
 		ctagsRunner,
 	}
 	for _, command := range commands {
@@ -93,14 +91,13 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	ctagsRunner := &builder.CTagsRunner{}
+	ctagsRunner := &builder.CTagsRunner{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"}
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"},
 		ctagsRunner,
 	}
 	for _, command := range commands {
@@ -122,14 +119,13 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	ctagsRunner := &builder.CTagsRunner{}
+	ctagsRunner := &builder.CTagsRunner{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"}
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"},
 		ctagsRunner,
 	}
 	for _, command := range commands {
@@ -150,14 +146,13 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	ctagsRunner := &builder.CTagsRunner{}
+	ctagsRunner := &builder.CTagsRunner{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"}
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"},
 		ctagsRunner,
 	}
 	for _, command := range commands {
