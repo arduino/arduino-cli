@@ -23,14 +23,12 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 )
 
-func (p *CTagsParser) FixCLinkageTagsDeclarations(tags []*types.CTag) {
-
-	linesMap := p.FindCLinkageLines(tags)
-	for i := range tags {
-
-		if sliceContainsInt(linesMap[tags[i].Filename], tags[i].Line) &&
-			!strings.Contains(tags[i].PrototypeModifiers, EXTERN) {
-			tags[i].PrototypeModifiers = tags[i].PrototypeModifiers + " " + EXTERN
+func (p *CTagsParser) FixCLinkageTagsDeclarations() {
+	linesMap := p.FindCLinkageLines(p.tags)
+	for i := range p.tags {
+		if sliceContainsInt(linesMap[p.tags[i].Filename], p.tags[i].Line) &&
+			!strings.Contains(p.tags[i].PrototypeModifiers, EXTERN) {
+			p.tags[i].PrototypeModifiers = p.tags[i].PrototypeModifiers + " " + EXTERN
 		}
 	}
 }
