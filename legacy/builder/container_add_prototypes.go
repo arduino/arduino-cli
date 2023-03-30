@@ -50,8 +50,7 @@ func PreprocessSketchWithCtags(ctx *types.Context) error {
 	commands := []types.Command{
 		&ReadFileAndStoreInContext{FileToRead: targetFilePath, Target: &ctx.SourceGccMinusE},
 		&FilterSketchSource{Source: &ctx.SourceGccMinusE},
-		&CTagsTargetFileSaver{Source: &ctx.SourceGccMinusE, TargetFileName: "ctags_target_for_gcc_minus_e.cpp"},
-		&CTagsRunner{},
+		&CTagsRunner{Source: &ctx.SourceGccMinusE, TargetFileName: "ctags_target_for_gcc_minus_e.cpp"},
 		&PrototypesAdder{},
 	}
 

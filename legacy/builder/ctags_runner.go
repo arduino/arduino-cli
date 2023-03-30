@@ -27,12 +27,25 @@ import (
 )
 
 type CTagsRunner struct {
+	Source         *string
+	TargetFileName string
+
 	// Needed for unit-testing
 	CtagsOutput []byte
 }
 
 func (r *CTagsRunner) Run(ctx *types.Context) error {
-	ctagsTargetFilePath := ctx.CTagsTargetFile
+	source := *r.Source
+
+	preprocPath := ctx.PreprocPath
+	if err := preprocPath.MkdirAll(); err != nil {
+		return errors.WithStack(err)
+	}
+
+	ctagsTargetFilePath := preprocPath.Join(r.TargetFileName)
+	if err := ctagsTargetFilePath.WriteFile([]byte(source)); err != nil {
+		return errors.WithStack(err)
+	}
 
 	buildProperties := properties.NewMap()
 	buildProperties.Set("tools.ctags.path", "{runtime.tools.ctags.path}")

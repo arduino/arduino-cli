@@ -14,30 +14,3 @@
 // To purchase a commercial license, send an email to license@arduino.cc.
 
 package builder
-
-import (
-	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/pkg/errors"
-)
-
-type CTagsTargetFileSaver struct {
-	Source         *string
-	TargetFileName string
-}
-
-func (s *CTagsTargetFileSaver) Run(ctx *types.Context) error {
-	source := *s.Source
-
-	preprocPath := ctx.PreprocPath
-	if err := preprocPath.MkdirAll(); err != nil {
-		return errors.WithStack(err)
-	}
-
-	ctagsTargetFilePath := preprocPath.Join(s.TargetFileName)
-	if err := ctagsTargetFilePath.WriteFile([]byte(source)); err != nil {
-		return errors.WithStack(err)
-	}
-
-	ctx.CTagsTargetFile = ctagsTargetFilePath
-	return nil
-}

@@ -115,7 +115,6 @@ type Context struct {
 	UseCachedLibrariesResolution bool
 
 	// C++ Parsing
-	CTagsTargetFile             *paths.Path
 	LineOffset                  int
 	PrototypesSection           string
 	PrototypesLineWhereToInsert int
