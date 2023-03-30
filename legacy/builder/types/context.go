@@ -116,7 +116,6 @@ type Context struct {
 
 	// C++ Parsing
 	CTagsTargetFile             *paths.Path
-	CTagsOfPreprocessedSource   []*CTag
 	LineOffset                  int
 	PrototypesSection           string
 	PrototypesLineWhereToInsert int

@@ -61,8 +61,8 @@ func (r *CTagsRunner) Run(ctx *types.Context) error {
 	}
 
 	parser := &ctags.CTagsParser{}
-	ctx.CTagsOfPreprocessedSource = parser.Parse(ctagsOutput, ctx.Sketch.MainFile)
-	parser.FixCLinkageTagsDeclarations(ctx.CTagsOfPreprocessedSource)
+	parser.Parse(ctagsOutput, ctx.Sketch.MainFile)
+	parser.FixCLinkageTagsDeclarations()
 
 	protos, line := parser.GeneratePrototypes()
 	if line != -1 {
