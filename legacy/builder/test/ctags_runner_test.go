@@ -31,7 +31,7 @@ func TestCTagsRunner(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	ctagsRunner := &builder.CTagsRunner{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"}
+	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
@@ -62,7 +62,7 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	ctagsRunner := &builder.CTagsRunner{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"}
+	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
@@ -91,7 +91,7 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	ctagsRunner := &builder.CTagsRunner{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"}
+	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
@@ -119,7 +119,7 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	ctagsRunner := &builder.CTagsRunner{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"}
+	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},
@@ -146,7 +146,7 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	ctagsRunner := &builder.CTagsRunner{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"}
+	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.ContainerMergeCopySketchFiles{},

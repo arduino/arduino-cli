@@ -17,19 +17,20 @@ package builder
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
-	"strconv"
-	"strings"
 )
 
 type PrototypesAdder struct{}
 
 func (s *PrototypesAdder) Run(ctx *types.Context) error {
 	debugOutput := ctx.DebugPreprocessor
-	source := ctx.Source
 
+	source := ctx.SketchSourceMerged
 	source = strings.Replace(source, "\r\n", "\n", -1)
 	source = strings.Replace(source, "\r", "\n", -1)
 
@@ -61,7 +62,7 @@ func (s *PrototypesAdder) Run(ctx *types.Context) error {
 		}
 		fmt.Println("#END OF PREPROCESSED SOURCE")
 	}
-	ctx.Source = source
+	ctx.SketchSourceAfterArduinoPreprocessing = source
 
 	return nil
 }

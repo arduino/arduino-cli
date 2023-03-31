@@ -36,9 +36,9 @@ func TestReadFileAndStoreInContext(t *testing.T) {
 
 	ctx := &types.Context{}
 
-	command := &builder.ReadFileAndStoreInContext{FileToRead: file, Target: &ctx.SourceGccMinusE}
+	command := &builder.ReadFileAndStoreInContext{FileToRead: file, Target: &ctx.SketchSourceAfterCppPreprocessing}
 	err = command.Run(ctx)
 	NoError(t, err)
 
-	require.Equal(t, "test test\nciao", ctx.SourceGccMinusE)
+	require.Equal(t, "test test\nciao", ctx.SketchSourceAfterCppPreprocessing)
 }

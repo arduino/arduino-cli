@@ -24,14 +24,14 @@ import (
 type ContainerMergeCopySketchFiles struct{}
 
 func (s *ContainerMergeCopySketchFiles) Run(ctx *types.Context) error {
-	offset, source, err := bldr.SketchMergeSources(ctx.Sketch, ctx.SourceOverride)
+	offset, mergedSource, err := bldr.SketchMergeSources(ctx.Sketch, ctx.SourceOverride)
 	if err != nil {
 		return err
 	}
 	ctx.LineOffset = offset
-	ctx.Source = source
+	ctx.SketchSourceMerged = mergedSource
 
-	if err := bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, []byte(ctx.Source), ctx.SketchBuildPath); err != nil {
+	if err := bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, []byte(mergedSource), ctx.SketchBuildPath); err != nil {
 		return errors.WithStack(err)
 	}
 

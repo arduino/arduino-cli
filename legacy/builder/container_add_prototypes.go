@@ -28,7 +28,7 @@ func PreprocessSketchWithCtags(ctx *types.Context) error {
 	if err := ctx.PreprocPath.MkdirAll(); err != nil {
 		return errors.WithStack(err)
 	}
-	targetFilePath := ctx.PreprocPath.Join("ctags_target_for_gcc_minus_e.cpp")
+	targetFilePath := ctx.PreprocPath.Join("sketch_merged.cpp")
 
 	// Run preprocessor
 	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp")
@@ -48,9 +48,9 @@ func PreprocessSketchWithCtags(ctx *types.Context) error {
 	}
 
 	commands := []types.Command{
-		&ReadFileAndStoreInContext{FileToRead: targetFilePath, Target: &ctx.SourceGccMinusE},
-		&FilterSketchSource{Source: &ctx.SourceGccMinusE},
-		&CTagsRunner{Source: &ctx.SourceGccMinusE, TargetFileName: "ctags_target_for_gcc_minus_e.cpp"},
+		&ReadFileAndStoreInContext{FileToRead: targetFilePath, Target: &ctx.SketchSourceAfterCppPreprocessing},
+		&FilterSketchSource{Source: &ctx.SketchSourceAfterCppPreprocessing},
+		&CTagsRunner{Source: &ctx.SketchSourceAfterCppPreprocessing, TargetFileName: "sketch_merged.cpp"},
 		&PrototypesAdder{},
 	}
 
@@ -62,7 +62,7 @@ func PreprocessSketchWithCtags(ctx *types.Context) error {
 		}
 	}
 
-	if err := bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, []byte(ctx.Source), ctx.SketchBuildPath); err != nil {
+	if err := bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, []byte(ctx.SketchSourceAfterArduinoPreprocessing), ctx.SketchBuildPath); err != nil {
 		return errors.WithStack(err)
 	}
 
