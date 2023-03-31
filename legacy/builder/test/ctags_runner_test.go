@@ -32,9 +32,13 @@ func TestCTagsRunner(t *testing.T) {
 	ctx.Verbose = true
 
 	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
@@ -63,9 +67,13 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 	ctx.Verbose = true
 
 	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
@@ -92,9 +100,13 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	ctx.Verbose = true
 
 	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
@@ -120,9 +132,13 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	ctx.Verbose = true
 
 	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
@@ -147,9 +163,13 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 	ctx.Verbose = true
 
 	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},

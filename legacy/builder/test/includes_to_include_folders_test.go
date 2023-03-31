@@ -31,9 +31,13 @@ func TestIncludesToIncludeFolders(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -51,9 +55,13 @@ func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -70,9 +78,13 @@ func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -92,9 +104,13 @@ func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -119,9 +135,13 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino"), "my_avr_platform:avr:custom_yun")
 	defer cleanUpBuilderTestContext(t, ctx)
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -147,9 +167,13 @@ func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatfo
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino"), "my_avr_platform:avr:custom_yun")
 	defer cleanUpBuilderTestContext(t, ctx)
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -175,9 +199,13 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch_usbhost", "sketch_usbhost.ino"), "arduino:samd:arduino_zero_native")
 	defer cleanUpBuilderTestContext(t, ctx)
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -197,9 +225,13 @@ func TestIncludesToIncludeFoldersSubfolders(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {

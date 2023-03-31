@@ -17,27 +17,19 @@ package builder
 
 import (
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/pkg/errors"
+	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/go-paths-helper"
 )
 
-type ContainerMergeCopySketchFiles struct{}
-
-func (s *ContainerMergeCopySketchFiles) Run(ctx *types.Context) error {
-	offset, mergedSource, err := bldr.SketchMergeSources(ctx.Sketch, ctx.SourceOverride)
-	if err != nil {
-		return err
+func CopySketchFilesToBuildPath(sketch *sketch.Sketch, sourceOverrides map[string]string, buildPath *paths.Path) (offset int, mergedSource string, err error) {
+	if offset, mergedSource, err = bldr.SketchMergeSources(sketch, sourceOverrides); err != nil {
+		return
 	}
-	ctx.LineOffset = offset
-	ctx.SketchSourceMerged = mergedSource
-
-	if err := bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, []byte(mergedSource), ctx.SketchBuildPath); err != nil {
-		return errors.WithStack(err)
+	if err = bldr.SketchSaveItemCpp(sketch.MainFile, []byte(mergedSource), buildPath); err != nil {
+		return
 	}
-
-	if err := bldr.SketchCopyAdditionalFiles(ctx.Sketch, ctx.SketchBuildPath, ctx.SourceOverride); err != nil {
-		return errors.WithStack(err)
+	if err = bldr.SketchCopyAdditionalFiles(sketch, buildPath, sourceOverrides); err != nil {
+		return
 	}
-
-	return nil
+	return
 }
