@@ -37,9 +37,13 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -58,9 +62,13 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -79,9 +87,13 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -100,9 +112,13 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -121,9 +137,13 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -142,9 +162,13 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -163,9 +187,13 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -184,9 +212,13 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -213,9 +245,13 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -240,9 +276,13 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -263,10 +303,13 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 
 	sketchLocation := paths.New("sketch_no_functions", "sketch_no_functions.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
-
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -288,9 +331,13 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -312,9 +359,13 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -347,9 +398,13 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -376,9 +431,13 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, sketchLocation, "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -404,9 +463,13 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, sketchLocation, "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -434,9 +497,13 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -461,9 +528,13 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -488,9 +559,13 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -509,9 +584,13 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -531,9 +610,13 @@ func TestPrototypesAdderSketchWithSubstringFunctionMember(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
