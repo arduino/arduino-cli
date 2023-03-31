@@ -827,3 +827,26 @@ func (pme *Explorer) FindMonitorDependency(discovery *cores.MonitorDependency) *
 		return toolRelease.GetLatestInstalled()
 	}
 }
+
+// NormalizeFQBN return a normalized copy of the given FQBN, that is the same
+// FQBN but with the unneeded or invalid options removed.
+func (pme *Explorer) NormalizeFQBN(fqbn *cores.FQBN) (*cores.FQBN, error) {
+	_, _, board, _, _, err := pme.ResolveFQBN(fqbn)
+	if err != nil {
+		return nil, err
+	}
+	normalizedFqbn := fqbn.Clone()
+	for _, option := range fqbn.Configs.Keys() {
+		values := board.GetConfigOptionValues(option)
+		if values == nil || values.Size() == 0 {
+			normalizedFqbn.Configs.Remove(option)
+			continue
+		}
+
+		defaultValue := values.Keys()[0]
+		if fqbn.Configs.Get(option) == defaultValue {
+			normalizedFqbn.Configs.Remove(option)
+		}
+	}
+	return normalizedFqbn, nil
+}
