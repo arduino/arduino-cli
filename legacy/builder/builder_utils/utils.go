@@ -26,6 +26,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/i18n"
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
@@ -262,10 +263,10 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool
 		return false, errors.WithStack(err)
 	}
 
-	rows = utils.Map(rows, removeEndingBackSlash)
-	rows = utils.Map(rows, strings.TrimSpace)
-	rows = utils.Map(rows, unescapeDep)
-	rows = utils.Filter(rows, nonEmptyString)
+	rows = f.Map(rows, removeEndingBackSlash)
+	rows = f.Map(rows, strings.TrimSpace)
+	rows = f.Map(rows, unescapeDep)
+	rows = f.Filter(rows, f.NotEquals(""))
 
 	if len(rows) == 0 {
 		return true, nil
@@ -325,10 +326,6 @@ func unescapeDep(s string) string {
 
 func removeEndingBackSlash(s string) string {
 	return strings.TrimSuffix(s, "\\")
-}
-
-func nonEmptyString(s string) bool {
-	return s != constants.EMPTY_STRING
 }
 
 func CoreOrReferencedCoreHasChanged(corePath, targetCorePath, targetFile *paths.Path) bool {

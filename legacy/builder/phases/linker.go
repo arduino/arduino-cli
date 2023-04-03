@@ -18,6 +18,7 @@ package phases
 import (
 	"strings"
 
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -64,7 +65,7 @@ func (s *Linker) Run(ctx *types.Context) error {
 }
 
 func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths.Path, coreArchiveFilePath *paths.Path, buildProperties *properties.Map) error {
-	objectFileList := strings.Join(utils.Map(objectFiles.AsStrings(), wrapWithDoubleQuotes), " ")
+	objectFileList := strings.Join(f.Map(objectFiles.AsStrings(), wrapWithDoubleQuotes), " ")
 
 	// If command line length is too big (> 30000 chars), try to collect the object files into archives
 	// and use that archives to complete the build.
@@ -102,7 +103,7 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 			}
 		}
 
-		objectFileList = strings.Join(utils.Map(archives.AsStrings(), wrapWithDoubleQuotes), " ")
+		objectFileList = strings.Join(f.Map(archives.AsStrings(), wrapWithDoubleQuotes), " ")
 		objectFileList = "-Wl,--whole-archive " + objectFileList + " -Wl,--no-whole-archive"
 	}
 

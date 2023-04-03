@@ -19,6 +19,7 @@ import (
 	"os/exec"
 	"strings"
 
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
@@ -44,7 +45,7 @@ func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath *paths
 	buildProperties.SetPath("source_file", sourceFilePath)
 	buildProperties.SetPath("preprocessed_file_path", targetFilePath)
 
-	includesStrings := utils.Map(includes.AsStrings(), utils.WrapWithHyphenI)
+	includesStrings := f.Map(includes.AsStrings(), utils.WrapWithHyphenI)
 	buildProperties.Set("includes", strings.Join(includesStrings, " "))
 
 	if buildProperties.Get("recipe.preproc.macros") == "" {
@@ -65,7 +66,7 @@ func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath *paths
 
 	// Remove -MMD argument if present. Leaving it will make gcc try
 	// to create a /dev/null.d dependency file, which won't work.
-	cmd.Args = utils.Filter(cmd.Args, func(a string) bool { return a != "-MMD" })
+	cmd.Args = f.Filter(cmd.Args, f.NotEquals("-MMD"))
 
 	return cmd, nil
 }
