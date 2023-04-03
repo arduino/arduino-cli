@@ -29,6 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/legacy/builder/ctags"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -123,7 +124,7 @@ type Context struct {
 	LineOffset                  int
 	PrototypesSection           string
 	PrototypesLineWhereToInsert int
-	Prototypes                  []*Prototype
+	Prototypes                  []*ctags.Prototype
 
 	// Verbosity settings
 	Verbose           bool
