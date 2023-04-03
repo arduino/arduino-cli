@@ -38,8 +38,6 @@ func TestAddAdditionalEntriesToContextNoBuildPath(t *testing.T) {
 
 	require.NotNil(t, ctx.WarningsLevel)
 
-	require.True(t, ctx.CollectedSourceFiles.Empty())
-
 	require.Equal(t, 0, len(ctx.LibrariesResolutionResults))
 }
 
@@ -56,8 +54,6 @@ func TestAddAdditionalEntriesToContextWithBuildPath(t *testing.T) {
 	require.Equal(t, Abs(t, paths.New("folder", constants.FOLDER_CORE)), ctx.CoreBuildPath)
 
 	require.NotNil(t, ctx.WarningsLevel)
-
-	require.True(t, ctx.CollectedSourceFiles.Empty())
 
 	require.Equal(t, 0, len(ctx.LibrariesResolutionResults))
 }
