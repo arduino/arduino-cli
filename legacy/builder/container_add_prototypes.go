@@ -47,8 +47,13 @@ func PreprocessSketchWithCtags(ctx *types.Context) error {
 		}
 	}
 
+	if src, err := targetFilePath.ReadFile(); err != nil {
+		return err
+	} else {
+		ctx.SketchSourceAfterCppPreprocessing = string(src)
+	}
+
 	commands := []types.Command{
-		&ReadFileAndStoreInContext{FileToRead: targetFilePath, Target: &ctx.SketchSourceAfterCppPreprocessing},
 		&FilterSketchSource{Source: &ctx.SketchSourceAfterCppPreprocessing},
 		&CTagsRunner{Source: &ctx.SketchSourceAfterCppPreprocessing, TargetFileName: "sketch_merged.cpp"},
 		&PrototypesAdder{},
