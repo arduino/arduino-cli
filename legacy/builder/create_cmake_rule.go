@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	properties "github.com/arduino/go-properties-orderedmap"
+	"golang.org/x/exp/slices"
 
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
@@ -213,7 +214,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		lib := staticLib.Base()
 		lib = strings.TrimPrefix(lib, "lib")
 		lib = strings.TrimSuffix(lib, ".a")
-		if !utils.SliceContains(dynamicLibsFromGccMinusL, lib) {
+		if !slices.Contains(dynamicLibsFromGccMinusL, lib) {
 			linkGroup += " " + lib
 			cmakelist += "add_library (" + lib + " STATIC IMPORTED)\n"
 			location := strings.TrimPrefix(staticLib.String(), cmakeFolder.String())
@@ -268,7 +269,7 @@ func findUniqueFoldersRelative(slice []string, base string) string {
 	for _, element := range slice {
 		path := filepath.Dir(element)
 		path = strings.TrimPrefix(path, base+"/")
-		if !utils.SliceContains(out, path) {
+		if !slices.Contains(out, path) {
 			out = append(out, path)
 		}
 	}

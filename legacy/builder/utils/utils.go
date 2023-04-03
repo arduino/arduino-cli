@@ -33,6 +33,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
+	"golang.org/x/exp/slices"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
@@ -64,7 +65,7 @@ func FilterFilesWithExtensions(extensions ...string) filterFiles {
 	return func(files []os.FileInfo) []os.FileInfo {
 		var filtered []os.FileInfo
 		for _, file := range files {
-			if !file.IsDir() && SliceContains(extensions, filepath.Ext(file.Name())) {
+			if !file.IsDir() && slices.Contains(extensions, filepath.Ext(file.Name())) {
 				filtered = append(filtered, file)
 			}
 		}
@@ -117,15 +118,6 @@ func IsHiddenFile(file os.FileInfo) bool {
 func IsSCCSFile(file os.FileInfo) bool {
 	name := filepath.Base(file.Name())
 	return SOURCE_CONTROL_FOLDERS[name]
-}
-
-func SliceContains(slice []string, target string) bool {
-	for _, value := range slice {
-		if value == target {
-			return true
-		}
-	}
-	return false
 }
 
 type mapFunc func(string) string
@@ -263,7 +255,7 @@ func FindFilesInFolder(dir *paths.Path, recurse bool, extensions []string) (path
 
 func AppendIfNotPresent(target []string, elements ...string) []string {
 	for _, element := range elements {
-		if !SliceContains(target, element) {
+		if !slices.Contains(target, element) {
 			target = append(target, element)
 		}
 	}
