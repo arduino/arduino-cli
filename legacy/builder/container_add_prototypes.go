@@ -16,6 +16,7 @@
 package builder
 
 import (
+	"bytes"
 	"fmt"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
@@ -50,11 +51,10 @@ func PreprocessSketchWithCtags(ctx *types.Context) error {
 	if src, err := targetFilePath.ReadFile(); err != nil {
 		return err
 	} else {
-		ctx.SketchSourceAfterCppPreprocessing = string(src)
+		ctx.SketchSourceAfterCppPreprocessing = FilterSketchSource(ctx.Sketch, bytes.NewReader(src), false)
 	}
 
 	commands := []types.Command{
-		&FilterSketchSource{Source: &ctx.SketchSourceAfterCppPreprocessing},
 		&CTagsRunner{Source: &ctx.SketchSourceAfterCppPreprocessing, TargetFileName: "sketch_merged.cpp"},
 		&PrototypesAdder{},
 	}

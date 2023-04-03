@@ -17,34 +17,30 @@ package builder
 
 import (
 	"bufio"
+	"io"
 	"strconv"
 	"strings"
 
 	"github.com/arduino/go-paths-helper"
 
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 )
 
-type FilterSketchSource struct {
-	Source            *string
-	RemoveLineMarkers bool
-}
-
-func (s *FilterSketchSource) Run(ctx *types.Context) error {
+func FilterSketchSource(sketch *sketch.Sketch, source io.Reader, removeLineMarkers bool) string {
 	fileNames := paths.NewPathList()
-	fileNames.Add(ctx.Sketch.MainFile)
-	fileNames.AddAll(ctx.Sketch.OtherSketchFiles)
+	fileNames.Add(sketch.MainFile)
+	fileNames.AddAll(sketch.OtherSketchFiles)
 
 	inSketch := false
 	filtered := ""
 
-	scanner := bufio.NewScanner(strings.NewReader(*s.Source))
+	scanner := bufio.NewScanner(source)
 	for scanner.Scan() {
 		line := scanner.Text()
 		if filename := parseLineMarker(line); filename != nil {
 			inSketch = fileNames.Contains(filename)
-			if inSketch && s.RemoveLineMarkers {
+			if inSketch && removeLineMarkers {
 				continue
 			}
 		}
@@ -54,8 +50,7 @@ func (s *FilterSketchSource) Run(ctx *types.Context) error {
 		}
 	}
 
-	*s.Source = filtered
-	return nil
+	return filtered
 }
 
 // Parses the given line as a gcc line marker and returns the contained
