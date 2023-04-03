@@ -19,7 +19,6 @@ import (
 	"bytes"
 	"fmt"
 	"regexp"
-	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
@@ -33,15 +32,6 @@ var (
 	includesArduinoH = regexp.MustCompile(`(?m)^\s*#\s*include\s*[<\"]Arduino\.h[>\"]`)
 	tr               = i18n.Tr
 )
-
-// quoteCppString returns the given string as a quoted string for use with the C
-// preprocessor. This adds double quotes around it and escapes any
-// double quotes and backslashes in the string.
-func quoteCppString(str string) string {
-	str = strings.Replace(str, "\\", "\\\\", -1)
-	str = strings.Replace(str, "\"", "\\\"", -1)
-	return "\"" + str + "\""
-}
 
 // PrepareSketchBuildPath copies the sketch source files in the build path.
 // The .ino files are merged together to create a .cpp file (by the way, the
@@ -106,7 +96,7 @@ func sketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, st
 		lineOffset++
 	}
 
-	mergedSource += "#line 1 " + quoteCppString(sk.MainFile.String()) + "\n"
+	mergedSource += "#line 1 " + QuoteCppString(sk.MainFile.String()) + "\n"
 	mergedSource += mainSrc + "\n"
 	lineOffset++
 
@@ -115,7 +105,7 @@ func sketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, st
 		if err != nil {
 			return 0, "", err
 		}
-		mergedSource += "#line 1 " + quoteCppString(file.String()) + "\n"
+		mergedSource += "#line 1 " + QuoteCppString(file.String()) + "\n"
 		mergedSource += src + "\n"
 	}
 
@@ -155,7 +145,7 @@ func sketchCopyAdditionalFiles(sketch *sketch.Sketch, destPath *paths.Path, over
 		}
 
 		// tag each addtional file with the filename of the source it was copied from
-		sourceBytes = append([]byte("#line 1 "+quoteCppString(file.String())+"\n"), sourceBytes...)
+		sourceBytes = append([]byte("#line 1 "+QuoteCppString(file.String())+"\n"), sourceBytes...)
 
 		err = writeIfDifferent(sourceBytes, targetPath)
 		if err != nil {
