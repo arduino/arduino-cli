@@ -20,8 +20,6 @@ import (
 	"strings"
 
 	"github.com/arduino/go-paths-helper"
-
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 )
 
 const KIND_PROTOTYPE = "prototype"
@@ -39,11 +37,28 @@ var KNOWN_TAG_KINDS = map[string]bool{
 }
 
 type CTagsParser struct {
-	tags     []*types.CTag
+	tags     []*CTag
 	mainFile *paths.Path
 }
 
-func (p *CTagsParser) Parse(ctagsOutput []byte, mainFile *paths.Path) []*types.CTag {
+type CTag struct {
+	FunctionName string
+	Kind         string
+	Line         int
+	Code         string
+	Class        string
+	Struct       string
+	Namespace    string
+	Filename     string
+	Typeref      string
+	SkipMe       bool
+	Signature    string
+
+	Prototype          string
+	PrototypeModifiers string
+}
+
+func (p *CTagsParser) Parse(ctagsOutput []byte, mainFile *paths.Path) []*CTag {
 	rows := strings.Split(string(ctagsOutput), "\n")
 	rows = removeEmpty(rows)
 
@@ -71,7 +86,7 @@ func (p *CTagsParser) addPrototypes() {
 	}
 }
 
-func addPrototype(tag *types.CTag) {
+func addPrototype(tag *CTag) {
 	if strings.Index(tag.Prototype, TEMPLATE) == 0 {
 		if strings.Index(tag.Code, TEMPLATE) == 0 {
 			code := tag.Code
@@ -129,7 +144,7 @@ func (p *CTagsParser) skipDuplicates() {
 	}
 }
 
-type skipFuncType func(tag *types.CTag) bool
+type skipFuncType func(tag *CTag) bool
 
 func (p *CTagsParser) skipTagsWhere(skipFunc skipFuncType) {
 	for _, tag := range p.tags {
@@ -153,11 +168,11 @@ func removeSpacesAndTabs(s string) string {
 	return s
 }
 
-func tagIsUnhandled(tag *types.CTag) bool {
+func tagIsUnhandled(tag *CTag) bool {
 	return !isHandled(tag)
 }
 
-func isHandled(tag *types.CTag) bool {
+func isHandled(tag *CTag) bool {
 	if tag.Class != "" {
 		return false
 	}
@@ -170,12 +185,12 @@ func isHandled(tag *types.CTag) bool {
 	return true
 }
 
-func tagIsUnknown(tag *types.CTag) bool {
+func tagIsUnknown(tag *CTag) bool {
 	return !KNOWN_TAG_KINDS[tag.Kind]
 }
 
-func parseTag(row string) *types.CTag {
-	tag := &types.CTag{}
+func parseTag(row string) *CTag {
+	tag := &CTag{}
 	parts := strings.Split(row, "\t")
 
 	tag.FunctionName = parts[0]

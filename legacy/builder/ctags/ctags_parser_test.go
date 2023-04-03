@@ -20,12 +20,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/arduino/arduino-cli/legacy/builder/types"
-
 	"github.com/stretchr/testify/require"
 )
 
-func produceTags(t *testing.T, filename string) []*types.CTag {
+func produceTags(t *testing.T, filename string) []*CTag {
 	bytes, err := os.ReadFile(filepath.Join("test_data", filename))
 	require.NoError(t, err)
 

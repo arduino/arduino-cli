@@ -17,7 +17,6 @@ package types
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -117,38 +116,9 @@ type PlatforKeyRewrite struct {
 	NewValue string
 }
 
-type Prototype struct {
-	FunctionName string
-	File         string
-	Prototype    string
-	Modifiers    string
-	Line         int
-}
-
-func (proto *Prototype) String() string {
-	return proto.Modifiers + " " + proto.Prototype + " @ " + strconv.Itoa(proto.Line)
-}
-
 type LibraryResolutionResult struct {
 	Library          *libraries.Library
 	NotUsedLibraries []*libraries.Library
-}
-
-type CTag struct {
-	FunctionName string
-	Kind         string
-	Line         int
-	Code         string
-	Class        string
-	Struct       string
-	Namespace    string
-	Filename     string
-	Typeref      string
-	SkipMe       bool
-	Signature    string
-
-	Prototype          string
-	PrototypeModifiers string
 }
 
 type Command interface {
