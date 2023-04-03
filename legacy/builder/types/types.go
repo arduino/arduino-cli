@@ -84,38 +84,6 @@ func (f *SourceFile) DepfilePath(ctx *Context) *paths.Path {
 	return buildRoot(ctx, f.Origin).Join(f.RelativePath.String() + ".d")
 }
 
-type SketchFile struct {
-	Name *paths.Path
-}
-
-type SketchFileSortByName []SketchFile
-
-func (s SketchFileSortByName) Len() int {
-	return len(s)
-}
-
-func (s SketchFileSortByName) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-
-func (s SketchFileSortByName) Less(i, j int) bool {
-	return s[i].Name.String() < s[j].Name.String()
-}
-
-type PlatforKeysRewrite struct {
-	Rewrites []PlatforKeyRewrite
-}
-
-func (p *PlatforKeysRewrite) Empty() bool {
-	return len(p.Rewrites) == 0
-}
-
-type PlatforKeyRewrite struct {
-	Key      string
-	OldValue string
-	NewValue string
-}
-
 type LibraryResolutionResult struct {
 	Library          *libraries.Library
 	NotUsedLibraries []*libraries.Library
