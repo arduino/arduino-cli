@@ -47,8 +47,13 @@ func PreprocessSketchWithCtags(ctx *types.Context) error {
 		}
 	}
 
+	if src, err := targetFilePath.ReadFile(); err != nil {
+		return err
+	} else {
+		ctx.SourceGccMinusE = string(src)
+	}
+
 	commands := []types.Command{
-		&ReadFileAndStoreInContext{FileToRead: targetFilePath, Target: &ctx.SourceGccMinusE},
 		&FilterSketchSource{Source: &ctx.SourceGccMinusE},
 		&CTagsTargetFileSaver{Source: &ctx.SourceGccMinusE, TargetFileName: "ctags_target_for_gcc_minus_e.cpp"},
 		&CTagsRunner{},
