@@ -19,6 +19,7 @@ import (
 	"strings"
 	"testing"
 
+	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
@@ -36,7 +37,7 @@ func TestCTagsRunner(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -71,7 +72,7 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -104,7 +105,7 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -136,7 +137,7 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -167,7 +168,7 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.CopySketchFilesToBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
