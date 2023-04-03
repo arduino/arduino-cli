@@ -15,6 +15,8 @@
 
 package types
 
+import "golang.org/x/exp/slices"
+
 type UniqueStringQueue []string
 
 func (queue UniqueStringQueue) Len() int           { return len(queue) }
@@ -22,7 +24,7 @@ func (queue UniqueStringQueue) Less(i, j int) bool { return false }
 func (queue UniqueStringQueue) Swap(i, j int)      { panic("Who called me?!?") }
 
 func (queue *UniqueStringQueue) Push(value string) {
-	if !sliceContains(*queue, value) {
+	if !slices.Contains(*queue, value) {
 		*queue = append(*queue, value)
 	}
 }
@@ -45,7 +47,10 @@ func (queue UniqueSourceFileQueue) Less(i, j int) bool { return false }
 func (queue UniqueSourceFileQueue) Swap(i, j int)      { panic("Who called me?!?") }
 
 func (queue *UniqueSourceFileQueue) Push(value SourceFile) {
-	if !sliceContainsSourceFile(*queue, value) {
+	equals := func(elem SourceFile) bool {
+		return elem.Origin == value.Origin && elem.RelativePath.EqualsTo(value.RelativePath)
+	}
+	if !slices.ContainsFunc(*queue, equals) {
 		*queue = append(*queue, value)
 	}
 }
