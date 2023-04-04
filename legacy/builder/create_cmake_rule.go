@@ -119,9 +119,6 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		return err
 	}
 
-	// Use old ctags method to generate export file
-	ctx.SketchSourceMerged = filterSketchSource(ctx.Sketch, strings.NewReader(ctx.SketchSourceMerged), true)
-
 	err = utils.CopyDir(ctx.SketchBuildPath.String(), cmakeFolder.Join("sketch").String(), validExportExtensions)
 	if err != nil {
 		fmt.Println(err)
