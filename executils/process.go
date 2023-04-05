@@ -16,6 +16,7 @@
 package executils
 
 import (
+	"bytes"
 	"context"
 	"io"
 	"os"
@@ -173,4 +174,16 @@ func (p *Process) RunWithinContext(ctx context.Context) error {
 		}
 	}()
 	return p.Wait()
+}
+
+// RunAndCaptureOutput starts the specified command and waits for it to complete. If the given context
+// is canceled before the normal process termination, the process is killed. The standard output and
+// standard error of the process are captured and returned at process termination.
+func (p *Process) RunAndCaptureOutput(ctx context.Context) ([]byte, []byte, error) {
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	p.RedirectStdoutTo(stdout)
+	p.RedirectStderrTo(stderr)
+	err := p.RunWithinContext(ctx)
+	return stdout.Bytes(), stderr.Bytes(), err
 }
