@@ -16,74 +16,72 @@
 package builder
 
 import (
-	"os"
-	"os/exec"
+	"bytes"
+	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/legacy/builder/ctags"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/legacy/builder/utils"
+	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
 
-type CTagsRunner struct {
-	Source         *string
-	TargetFileName string
-
-	// Needed for unit-testing
-	CtagsOutput []byte
-}
-
-func (r *CTagsRunner) Run(ctx *types.Context) error {
-	source := *r.Source
-
-	preprocPath := ctx.PreprocPath
-	if err := preprocPath.MkdirAll(); err != nil {
-		return errors.WithStack(err)
+func RunCTags(sketch *sketch.Sketch, source string, targetFileName string, buildProperties *properties.Map, preprocPath *paths.Path,
+) (ctagsStdout, ctagsStderr []byte, prototypesLineWhereToInsert int, prototypes []*ctags.Prototype, err error) {
+	if err = preprocPath.MkdirAll(); err != nil {
+		return
 	}
 
-	ctagsTargetFilePath := preprocPath.Join(r.TargetFileName)
-	if err := ctagsTargetFilePath.WriteFile([]byte(source)); err != nil {
-		return errors.WithStack(err)
+	ctagsTargetFilePath := preprocPath.Join(targetFileName)
+	if err = ctagsTargetFilePath.WriteFile([]byte(source)); err != nil {
+		return
 	}
 
-	buildProperties := properties.NewMap()
-	buildProperties.Set("tools.ctags.path", "{runtime.tools.ctags.path}")
-	buildProperties.Set("tools.ctags.cmd.path", "{path}/ctags")
-	buildProperties.Set("tools.ctags.pattern", `"{cmd.path}" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns --line-directives "{source_file}"`)
-	buildProperties.Merge(ctx.BuildProperties)
-	buildProperties.Merge(buildProperties.SubTree("tools").SubTree("ctags"))
-	buildProperties.SetPath("source_file", ctagsTargetFilePath)
+	ctagsBuildProperties := properties.NewMap()
+	ctagsBuildProperties.Set("tools.ctags.path", "{runtime.tools.ctags.path}")
+	ctagsBuildProperties.Set("tools.ctags.cmd.path", "{path}/ctags")
+	ctagsBuildProperties.Set("tools.ctags.pattern", `"{cmd.path}" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns --line-directives "{source_file}"`)
+	ctagsBuildProperties.Merge(buildProperties)
+	ctagsBuildProperties.Merge(ctagsBuildProperties.SubTree("tools").SubTree("ctags"))
+	ctagsBuildProperties.SetPath("source_file", ctagsTargetFilePath)
 
-	pattern := buildProperties.Get("pattern")
+	pattern := ctagsBuildProperties.Get("pattern")
 	if pattern == "" {
-		return errors.Errorf(tr("%s pattern is missing"), "ctags")
+		err = errors.Errorf(tr("%s pattern is missing"), "ctags")
+		return
 	}
 
-	commandLine := buildProperties.ExpandPropsInString(pattern)
+	commandLine := ctagsBuildProperties.ExpandPropsInString(pattern)
 	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
 	if err != nil {
-		return errors.WithStack(err)
+		return
 	}
-	command := exec.Command(parts[0], parts[1:]...)
-	command.Env = append(os.Environ(), ctx.PackageManager.GetEnvVarsForSpawnedProcess()...)
-
-	ctagsOutput, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.ShowIfVerbose /* stderr */)
+	proc, err := executils.NewProcess(nil, parts...)
 	if err != nil {
-		return errors.WithStack(err)
+		return
+	}
+	stdout := &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	proc.RedirectStdoutTo(stdout)
+	proc.RedirectStderrTo(stderr)
+	if err = proc.Run(); err != nil {
+		return
+	}
+	stderr.WriteString(strings.Join(parts, " "))
+	ctagsStdout = stdout.Bytes()
+	ctagsStderr = stderr.Bytes()
+	if err != nil {
+		return
 	}
 
 	parser := &ctags.CTagsParser{}
-	parser.Parse(ctagsOutput, ctx.Sketch.MainFile)
+	parser.Parse(ctagsStdout, sketch.MainFile)
 	parser.FixCLinkageTagsDeclarations()
 
-	protos, line := parser.GeneratePrototypes()
+	prototypes, line := parser.GeneratePrototypes()
 	if line != -1 {
-		ctx.PrototypesLineWhereToInsert = line
+		prototypesLineWhereToInsert = line
 	}
-	ctx.Prototypes = protos
-
-	// Needed for unit-testing
-	r.CtagsOutput = ctagsOutput
-	return nil
+	return
 }

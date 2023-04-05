@@ -62,8 +62,14 @@ func PreprocessSketchWithCtags(ctx *types.Context) error {
 		ctx.SketchSourceAfterCppPreprocessing = filterSketchSource(ctx.Sketch, bytes.NewReader(src), false)
 	}
 
-	if err := (&CTagsRunner{Source: &ctx.SketchSourceAfterCppPreprocessing, TargetFileName: "sketch_merged.cpp"}).Run(ctx); err != nil {
-		return errors.WithStack(err)
+	var ctagsStderr []byte
+	_, ctagsStderr, ctx.PrototypesLineWhereToInsert, ctx.Prototypes, err = RunCTags(
+		ctx.Sketch, ctx.SketchSourceAfterCppPreprocessing, "sketch_merged.cpp", ctx.BuildProperties, ctx.PreprocPath)
+	if ctx.Verbose {
+		ctx.WriteStderr(ctagsStderr)
+	}
+	if err != nil {
+		return err
 	}
 	ctx.SketchSourceAfterArduinoPreprocessing, ctx.PrototypesSection = PrototypesAdder(ctx.SketchSourceMerged, ctx.PrototypesLineWhereToInsert, ctx.LineOffset, ctx.Prototypes, ctx.DebugPreprocessor)
 
