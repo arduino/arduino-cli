@@ -98,6 +98,7 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
@@ -370,7 +371,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 			}
 		} else {
 			var preproc_stdout []byte
-			preproc_stdout, preproc_stderr, preproc_err = GCCPreprocRunner(sourcePath, targetFilePath, includes, ctx.BuildProperties)
+			preproc_stdout, preproc_stderr, preproc_err = preprocessor.GCC(sourcePath, targetFilePath, includes, ctx.BuildProperties)
 			if ctx.Verbose {
 				ctx.WriteStdout(preproc_stdout)
 				ctx.WriteStdout(preproc_stderr)
@@ -405,7 +406,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 			if preproc_err == nil || preproc_stderr == nil {
 				// Filename came from cache, so run preprocessor to obtain error to show
 				var preproc_stdout []byte
-				preproc_stdout, preproc_stderr, preproc_err = GCCPreprocRunner(sourcePath, targetFilePath, includes, ctx.BuildProperties)
+				preproc_stdout, preproc_stderr, preproc_err = preprocessor.GCC(sourcePath, targetFilePath, includes, ctx.BuildProperties)
 				if ctx.Verbose {
 					ctx.WriteStdout(preproc_stdout)
 				}

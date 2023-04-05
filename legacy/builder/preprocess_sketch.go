@@ -23,6 +23,7 @@ import (
 	"runtime"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -36,7 +37,7 @@ func PreprocessSketchWithArduinoPreprocessor(ctx *types.Context) error {
 
 	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp")
 	targetFile := ctx.PreprocPath.Join("sketch_merged.cpp")
-	gccStdout, gccStderr, err := GCCPreprocRunner(sourceFile, targetFile, ctx.IncludeFolders, ctx.BuildProperties)
+	gccStdout, gccStderr, err := preprocessor.GCC(sourceFile, targetFile, ctx.IncludeFolders, ctx.BuildProperties)
 	if ctx.Verbose {
 		ctx.WriteStdout(gccStdout)
 		ctx.WriteStderr(gccStderr)
