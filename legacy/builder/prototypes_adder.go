@@ -26,7 +26,9 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 )
 
-func PrototypesAdder(sketch *sketch.Sketch, source string, ctagsStdout []byte, lineOffset int, debugOutput bool) string {
+var DebugPreprocessor bool
+
+func PrototypesAdder(sketch *sketch.Sketch, source string, ctagsStdout []byte, lineOffset int) string {
 	parser := &ctags.CTagsParser{}
 	parser.Parse(ctagsStdout, sketch.MainFile)
 	parser.FixCLinkageTagsDeclarations()
@@ -48,7 +50,7 @@ func PrototypesAdder(sketch *sketch.Sketch, source string, ctagsStdout []byte, l
 	prototypeSection := composePrototypeSection(firstFunctionLine, prototypes)
 	preprocessedSource := source[:firstFunctionChar] + prototypeSection + source[firstFunctionChar:]
 
-	if debugOutput {
+	if DebugPreprocessor {
 		fmt.Println("#PREPROCESSED SOURCE")
 		prototypesRows := strings.Split(prototypeSection, "\n")
 		prototypesRows = prototypesRows[:len(prototypesRows)-1]
