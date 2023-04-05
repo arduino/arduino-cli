@@ -36,11 +36,15 @@ func PreprocessSketchWithArduinoPreprocessor(ctx *types.Context) error {
 
 	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp")
 	targetFile := ctx.PreprocPath.Join("sketch_merged.cpp")
-	stderr, err := GCCPreprocRunner(ctx, sourceFile, targetFile, ctx.IncludeFolders)
-	ctx.WriteStderr(stderr)
+	gccStdout, gccStderr, err := GCCPreprocRunner(sourceFile, targetFile, ctx.IncludeFolders, ctx.BuildProperties)
+	if ctx.Verbose {
+		ctx.WriteStdout(gccStdout)
+		ctx.WriteStderr(gccStderr)
+	}
 	if err != nil {
 		return err
 	}
+
 	buildProperties := properties.NewMap()
 	buildProperties.Set("tools.arduino-preprocessor.path", "{runtime.tools.arduino-preprocessor.path}")
 	buildProperties.Set("tools.arduino-preprocessor.cmd.path", "{path}/arduino-preprocessor")
