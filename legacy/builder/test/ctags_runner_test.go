@@ -32,8 +32,8 @@ func TestCTagsRunner(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
 	var _err error
+	var ctagsOutput []byte
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
@@ -43,7 +43,10 @@ func TestCTagsRunner(t *testing.T) {
 		&builder.ContainerFindIncludes{},
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		ctagsRunner,
+		types.BareCommand(func(ctx *types.Context) error {
+			ctagsOutput, _, _, _, _err = builder.RunCTags(ctx.Sketch, ctx.SketchSourceMerged, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
+			return _err
+		}),
 	}
 	for _, command := range commands {
 		err := command.Run(ctx)
@@ -58,7 +61,7 @@ func TestCTagsRunner(t *testing.T) {
 		"digitalCommand	" + quotedSketchLocation + "	/^void digitalCommand(BridgeClient client) {$/;\"	kind:function	line:82	signature:(BridgeClient client)	returntype:void\n" +
 		"analogCommand	" + quotedSketchLocation + "	/^void analogCommand(BridgeClient client) {$/;\"	kind:function	line:109	signature:(BridgeClient client)	returntype:void\n" +
 		"modeCommand	" + quotedSketchLocation + "	/^void modeCommand(BridgeClient client) {$/;\"	kind:function	line:149	signature:(BridgeClient client)	returntype:void\n"
-	require.Equal(t, expectedOutput, strings.Replace(string(ctagsRunner.CtagsOutput), "\r\n", "\n", -1))
+	require.Equal(t, expectedOutput, strings.Replace(string(ctagsOutput), "\r\n", "\n", -1))
 }
 
 func TestCTagsRunnerSketchWithClass(t *testing.T) {
@@ -67,8 +70,8 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
 	var _err error
+	var ctagsOutput []byte
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
@@ -78,7 +81,10 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 		&builder.ContainerFindIncludes{},
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		ctagsRunner,
+		types.BareCommand(func(ctx *types.Context) error {
+			ctagsOutput, _, _, _, _err = builder.RunCTags(ctx.Sketch, ctx.SketchSourceMerged, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
+			return _err
+		}),
 	}
 	for _, command := range commands {
 		err := command.Run(ctx)
@@ -91,7 +97,7 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 		"set_values\t" + quotedSketchLocation + "\t/^void Rectangle::set_values (int x, int y) {$/;\"\tkind:function\tline:8\tclass:Rectangle\tsignature:(int x, int y)\treturntype:void\n" +
 		"setup\t" + quotedSketchLocation + "\t/^void setup() {$/;\"\tkind:function\tline:13\tsignature:()\treturntype:void\n" +
 		"loop\t" + quotedSketchLocation + "\t/^void loop() {$/;\"\tkind:function\tline:17\tsignature:()\treturntype:void\n"
-	require.Equal(t, expectedOutput, strings.Replace(string(ctagsRunner.CtagsOutput), "\r\n", "\n", -1))
+	require.Equal(t, expectedOutput, strings.Replace(string(ctagsOutput), "\r\n", "\n", -1))
 }
 
 func TestCTagsRunnerSketchWithTypename(t *testing.T) {
@@ -100,8 +106,8 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
 	var _err error
+	var ctagsOutput []byte
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
@@ -111,7 +117,10 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 		&builder.ContainerFindIncludes{},
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		ctagsRunner,
+		types.BareCommand(func(ctx *types.Context) error {
+			ctagsOutput, _, _, _, _err = builder.RunCTags(ctx.Sketch, ctx.SketchSourceMerged, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
+			return _err
+		}),
 	}
 	for _, command := range commands {
 		err := command.Run(ctx)
@@ -123,7 +132,7 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 		"setup\t" + quotedSketchLocation + "\t/^void setup() {$/;\"\tkind:function\tline:6\tsignature:()\treturntype:void\n" +
 		"loop\t" + quotedSketchLocation + "\t/^void loop() {}$/;\"\tkind:function\tline:10\tsignature:()\treturntype:void\n" +
 		"func\t" + quotedSketchLocation + "\t/^typename Foo<char>::Bar func(){$/;\"\tkind:function\tline:12\tsignature:()\treturntype:Foo::Bar\n"
-	require.Equal(t, expectedOutput, strings.Replace(string(ctagsRunner.CtagsOutput), "\r\n", "\n", -1))
+	require.Equal(t, expectedOutput, strings.Replace(string(ctagsOutput), "\r\n", "\n", -1))
 }
 
 func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
@@ -132,8 +141,8 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
 	var _err error
+	var ctagsOutput []byte
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
@@ -143,7 +152,10 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 		&builder.ContainerFindIncludes{},
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		ctagsRunner,
+		types.BareCommand(func(ctx *types.Context) error {
+			ctagsOutput, _, _, _, _err = builder.RunCTags(ctx.Sketch, ctx.SketchSourceMerged, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
+			return _err
+		}),
 	}
 	for _, command := range commands {
 		err := command.Run(ctx)
@@ -154,7 +166,7 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	expectedOutput := "value\t" + quotedSketchLocation + "\t/^\tint value() {$/;\"\tkind:function\tline:2\tnamespace:Test\tsignature:()\treturntype:int\n" +
 		"setup\t" + quotedSketchLocation + "\t/^void setup() {}$/;\"\tkind:function\tline:7\tsignature:()\treturntype:void\n" +
 		"loop\t" + quotedSketchLocation + "\t/^void loop() {}$/;\"\tkind:function\tline:8\tsignature:()\treturntype:void\n"
-	require.Equal(t, expectedOutput, strings.Replace(string(ctagsRunner.CtagsOutput), "\r\n", "\n", -1))
+	require.Equal(t, expectedOutput, strings.Replace(string(ctagsOutput), "\r\n", "\n", -1))
 }
 
 func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
@@ -163,8 +175,8 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
 	var _err error
+	var ctagsOutput []byte
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
@@ -174,7 +186,10 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 		&builder.ContainerFindIncludes{},
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
-		ctagsRunner,
+		types.BareCommand(func(ctx *types.Context) error {
+			ctagsOutput, _, _, _, _err = builder.RunCTags(ctx.Sketch, ctx.SketchSourceMerged, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
+			return _err
+		}),
 	}
 	for _, command := range commands {
 		err := command.Run(ctx)
@@ -186,5 +201,5 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 		"bVar\t" + quotedSketchLocation + "\t/^c< 8 > bVar;$/;\"\tkind:variable\tline:15\n" +
 		"aVar\t" + quotedSketchLocation + "\t/^c< 1<<8 > aVar;$/;\"\tkind:variable\tline:16\n" +
 		"func\t" + quotedSketchLocation + "\t/^template<int X> func( c< 1<<X> & aParam) {$/;\"\tkind:function\tline:18\tsignature:( c< 1<<X> & aParam)\treturntype:template\n"
-	require.Equal(t, expectedOutput, strings.Replace(string(ctagsRunner.CtagsOutput), "\r\n", "\n", -1))
+	require.Equal(t, expectedOutput, strings.Replace(string(ctagsOutput), "\r\n", "\n", -1))
 }
