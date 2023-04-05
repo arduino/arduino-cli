@@ -19,23 +19,21 @@ import (
 	"bytes"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/executils"
-	"github.com/arduino/arduino-cli/legacy/builder/ctags"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
 
-func RunCTags(sketch *sketch.Sketch, source string, targetFileName string, buildProperties *properties.Map, preprocPath *paths.Path,
-) (ctagsStdout, ctagsStderr []byte, prototypesLineWhereToInsert int, prototypes []*ctags.Prototype, err error) {
-	if err = preprocPath.MkdirAll(); err != nil {
-		return
+func RunCTags(source string, targetFileName string, buildProperties *properties.Map, preprocPath *paths.Path,
+) ([]byte, []byte, error) {
+	if err := preprocPath.MkdirAll(); err != nil {
+		return nil, nil, err
 	}
 
 	ctagsTargetFilePath := preprocPath.Join(targetFileName)
-	if err = ctagsTargetFilePath.WriteFile([]byte(source)); err != nil {
-		return
+	if err := ctagsTargetFilePath.WriteFile([]byte(source)); err != nil {
+		return nil, nil, err
 	}
 
 	ctagsBuildProperties := properties.NewMap()
@@ -48,40 +46,25 @@ func RunCTags(sketch *sketch.Sketch, source string, targetFileName string, build
 
 	pattern := ctagsBuildProperties.Get("pattern")
 	if pattern == "" {
-		err = errors.Errorf(tr("%s pattern is missing"), "ctags")
-		return
+		return nil, nil, errors.Errorf(tr("%s pattern is missing"), "ctags")
 	}
 
 	commandLine := ctagsBuildProperties.ExpandPropsInString(pattern)
 	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
 	if err != nil {
-		return
+		return nil, nil, err
 	}
 	proc, err := executils.NewProcess(nil, parts...)
 	if err != nil {
-		return
+		return nil, nil, err
 	}
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
 	proc.RedirectStdoutTo(stdout)
 	proc.RedirectStderrTo(stderr)
 	if err = proc.Run(); err != nil {
-		return
+		return nil, nil, err
 	}
-	stderr.WriteString(strings.Join(parts, " "))
-	ctagsStdout = stdout.Bytes()
-	ctagsStderr = stderr.Bytes()
-	if err != nil {
-		return
-	}
-
-	parser := &ctags.CTagsParser{}
-	parser.Parse(ctagsStdout, sketch.MainFile)
-	parser.FixCLinkageTagsDeclarations()
-
-	prototypes, line := parser.GeneratePrototypes()
-	if line != -1 {
-		prototypesLineWhereToInsert = line
-	}
-	return
+	_, _ = stderr.WriteString(strings.Join(parts, " "))
+	return stdout.Bytes(), stderr.Bytes(), err
 }

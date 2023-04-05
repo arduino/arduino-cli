@@ -36,7 +36,7 @@ func TestCTagsRunner(t *testing.T) {
 	NoError(t, err)
 	_, source, err := bldr.PrepareSketchBuildPath(ctx.Sketch, nil, ctx.SketchBuildPath)
 	NoError(t, err)
-	ctagsOutput, _, _, _, err := builder.RunCTags(ctx.Sketch, source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
+	ctagsOutput, _, err := builder.RunCTags(source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
 	NoError(t, err)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
@@ -60,7 +60,7 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 	NoError(t, err)
 	_, source, err := bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 	NoError(t, err)
-	ctagsOutput, _, _, _, err := builder.RunCTags(ctx.Sketch, source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
+	ctagsOutput, _, err := builder.RunCTags(source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
 	NoError(t, err)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
@@ -82,7 +82,7 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	NoError(t, err)
 	_, source, err := bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 	NoError(t, err)
-	ctagsOutput, _, _, _, err := builder.RunCTags(ctx.Sketch, source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
+	ctagsOutput, _, err := builder.RunCTags(source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
 	NoError(t, err)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
@@ -103,7 +103,7 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	NoError(t, err)
 	_, source, err := bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 	NoError(t, err)
-	ctagsOutput, _, _, _, err := builder.RunCTags(ctx.Sketch, source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
+	ctagsOutput, _, err := builder.RunCTags(source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
 	NoError(t, err)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
@@ -123,7 +123,7 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 	NoError(t, err)
 	_, source, err := bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 	NoError(t, err)
-	ctagsOutput, _, _, _, err := builder.RunCTags(ctx.Sketch, source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
+	ctagsOutput, _, err := builder.RunCTags(source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
 	NoError(t, err)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
