@@ -32,23 +32,12 @@ func TestCTagsRunner(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	var _err error
-	var ctagsOutput []byte
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		types.BareCommand(func(ctx *types.Context) error {
-			ctagsOutput, _, _, _, _err = builder.RunCTags(ctx.Sketch, ctx.SketchSourceMerged, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
-			return _err
-		}),
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
+	err := (&builder.ContainerSetupHardwareToolsLibsSketchAndProps{}).Run(ctx)
+	NoError(t, err)
+	_, source, err := bldr.PrepareSketchBuildPath(ctx.Sketch, nil, ctx.SketchBuildPath)
+	NoError(t, err)
+	ctagsOutput, _, _, _, err := builder.RunCTags(ctx.Sketch, source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
+	NoError(t, err)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
 	expectedOutput := "server	" + quotedSketchLocation + "	/^BridgeServer server;$/;\"	kind:variable	line:31\n" +
@@ -67,23 +56,12 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	var _err error
-	var ctagsOutput []byte
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		types.BareCommand(func(ctx *types.Context) error {
-			ctagsOutput, _, _, _, _err = builder.RunCTags(ctx.Sketch, ctx.SketchSourceMerged, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
-			return _err
-		}),
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
+	err := (&builder.ContainerSetupHardwareToolsLibsSketchAndProps{}).Run(ctx)
+	NoError(t, err)
+	_, source, err := bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+	NoError(t, err)
+	ctagsOutput, _, _, _, err := builder.RunCTags(ctx.Sketch, source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
+	NoError(t, err)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
 	expectedOutput := "set_values\t" + quotedSketchLocation + "\t/^    void set_values (int,int);$/;\"\tkind:prototype\tline:4\tclass:Rectangle\tsignature:(int,int)\treturntype:void\n" +
@@ -100,23 +78,12 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	var _err error
-	var ctagsOutput []byte
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		types.BareCommand(func(ctx *types.Context) error {
-			ctagsOutput, _, _, _, _err = builder.RunCTags(ctx.Sketch, ctx.SketchSourceMerged, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
-			return _err
-		}),
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
+	err := (&builder.ContainerSetupHardwareToolsLibsSketchAndProps{}).Run(ctx)
+	NoError(t, err)
+	_, source, err := bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+	NoError(t, err)
+	ctagsOutput, _, _, _, err := builder.RunCTags(ctx.Sketch, source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
+	NoError(t, err)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
 	expectedOutput := "Foo\t" + quotedSketchLocation + "\t/^  struct Foo{$/;\"\tkind:struct\tline:2\n" +
@@ -132,23 +99,12 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	var _err error
-	var ctagsOutput []byte
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		types.BareCommand(func(ctx *types.Context) error {
-			ctagsOutput, _, _, _, _err = builder.RunCTags(ctx.Sketch, ctx.SketchSourceMerged, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
-			return _err
-		}),
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
+	err := (&builder.ContainerSetupHardwareToolsLibsSketchAndProps{}).Run(ctx)
+	NoError(t, err)
+	_, source, err := bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+	NoError(t, err)
+	ctagsOutput, _, _, _, err := builder.RunCTags(ctx.Sketch, source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
+	NoError(t, err)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
 	expectedOutput := "value\t" + quotedSketchLocation + "\t/^\tint value() {$/;\"\tkind:function\tline:2\tnamespace:Test\tsignature:()\treturntype:int\n" +
@@ -163,23 +119,12 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	var _err error
-	var ctagsOutput []byte
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		types.BareCommand(func(ctx *types.Context) error {
-			ctagsOutput, _, _, _, _err = builder.RunCTags(ctx.Sketch, ctx.SketchSourceMerged, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
-			return _err
-		}),
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
+	err := (&builder.ContainerSetupHardwareToolsLibsSketchAndProps{}).Run(ctx)
+	NoError(t, err)
+	_, source, err := bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+	NoError(t, err)
+	ctagsOutput, _, _, _, err := builder.RunCTags(ctx.Sketch, source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
+	NoError(t, err)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
 	expectedOutput := "printGyro\t" + quotedSketchLocation + "\t/^void printGyro()$/;\"\tkind:function\tline:10\tsignature:()\treturntype:void\n" +
