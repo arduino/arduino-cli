@@ -16,20 +16,22 @@
 package builder
 
 import (
+	"context"
+	"fmt"
 	"strings"
 
+	"github.com/arduino/arduino-cli/executils"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
+	"github.com/pkg/errors"
 )
 
-func GCCPreprocRunner(ctx *types.Context, sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.PathList) ([]byte, error) {
+func GCCPreprocRunner(sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.PathList, buildProperties *properties.Map) ([]byte, []byte, error) {
 	gccBuildProperties := properties.NewMap()
 	gccBuildProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
-	gccBuildProperties.Merge(ctx.BuildProperties)
+	gccBuildProperties.Merge(buildProperties)
 	gccBuildProperties.Set("build.library_discovery_phase", "1")
 	gccBuildProperties.SetPath("source_file", sourceFilePath)
 	gccBuildProperties.SetPath("preprocessed_file_path", targetFilePath)
@@ -37,7 +39,8 @@ func GCCPreprocRunner(ctx *types.Context, sourceFilePath *paths.Path, targetFile
 	includesStrings := f.Map(includes.AsStrings(), utils.WrapWithHyphenI)
 	gccBuildProperties.Set("includes", strings.Join(includesStrings, " "))
 
-	if gccBuildProperties.Get("recipe.preproc.macros") == "" {
+	const GCC_PATTERN_PROPERTY = "recipe.preproc.macros"
+	if gccBuildProperties.Get(GCC_PATTERN_PROPERTY) == "" {
 		// autogenerate preprocess macros recipe from compile recipe
 		preprocPattern := gccBuildProperties.Get("recipe.cpp.o.pattern")
 		// add {preproc.macros.flags} to {compiler.cpp.flags}
@@ -45,18 +48,32 @@ func GCCPreprocRunner(ctx *types.Context, sourceFilePath *paths.Path, targetFile
 		// replace "{object_file}" with "{preprocessed_file_path}"
 		preprocPattern = strings.Replace(preprocPattern, "{object_file}", "{preprocessed_file_path}", 1)
 
-		gccBuildProperties.Set("recipe.preproc.macros", preprocPattern)
+		gccBuildProperties.Set(GCC_PATTERN_PROPERTY, preprocPattern)
 	}
 
-	cmd, err := builder_utils.PrepareCommandForRecipe(gccBuildProperties, "recipe.preproc.macros", true, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+	pattern := gccBuildProperties.Get(GCC_PATTERN_PROPERTY)
+	if pattern == "" {
+		return nil, nil, errors.Errorf(tr("%s pattern is missing"), GCC_PATTERN_PROPERTY)
+	}
+
+	commandLine := gccBuildProperties.ExpandPropsInString(pattern)
+	args, err := properties.SplitQuotedString(commandLine, `"'`, false)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Remove -MMD argument if present. Leaving it will make gcc try
 	// to create a /dev/null.d dependency file, which won't work.
-	cmd.Args = f.Filter(cmd.Args, f.NotEquals("-MMD"))
+	args = f.Filter(args, f.NotEquals("-MMD"))
 
-	_, stderr, err := utils.ExecCommand(ctx, cmd, utils.ShowIfVerbose /* stdout */, utils.Capture /* stderr */)
-	return stderr, err
+	proc, err := executils.NewProcess(nil, args...)
+	if err != nil {
+		return nil, nil, err
+	}
+	stdout, stderr, err := proc.RunAndCaptureOutput(context.Background())
+
+	// Append gcc arguments to stdout
+	stdout = append([]byte(fmt.Sprintln(strings.Join(args, " "))), stdout...)
+
+	return stdout, stderr, err
 }

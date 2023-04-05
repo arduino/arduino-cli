@@ -369,7 +369,12 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 				ctx.Info(tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
 		} else {
-			preproc_stderr, preproc_err = GCCPreprocRunner(ctx, sourcePath, targetFilePath, includes)
+			var preproc_stdout []byte
+			preproc_stdout, preproc_stderr, preproc_err = GCCPreprocRunner(sourcePath, targetFilePath, includes, ctx.BuildProperties)
+			if ctx.Verbose {
+				ctx.WriteStdout(preproc_stdout)
+				ctx.WriteStdout(preproc_stderr)
+			}
 			// Unwrap error and see if it is an ExitError.
 			_, is_exit_error := errors.Cause(preproc_err).(*exec.ExitError)
 			if preproc_err == nil {
@@ -397,11 +402,13 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 		library := ResolveLibrary(ctx, include)
 		if library == nil {
 			// Library could not be resolved, show error
-			// err := runCommand(ctx, &GCCPreprocRunner{SourceFilePath: sourcePath, TargetFileName: paths.New(constants.FILE_CTAGS_TARGET_FOR_GCC_MINUS_E), Includes: includes})
-			// return errors.WithStack(err)
 			if preproc_err == nil || preproc_stderr == nil {
 				// Filename came from cache, so run preprocessor to obtain error to show
-				preproc_stderr, preproc_err = GCCPreprocRunner(ctx, sourcePath, targetFilePath, includes)
+				var preproc_stdout []byte
+				preproc_stdout, preproc_stderr, preproc_err = GCCPreprocRunner(sourcePath, targetFilePath, includes, ctx.BuildProperties)
+				if ctx.Verbose {
+					ctx.WriteStdout(preproc_stdout)
+				}
 				if preproc_err == nil {
 					// If there is a missing #include in the cache, but running
 					// gcc does not reproduce that, there is something wrong.
