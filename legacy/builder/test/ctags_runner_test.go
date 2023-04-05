@@ -21,23 +21,33 @@ import (
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/legacy/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
-func TestCTagsRunner(t *testing.T) {
-	sketchLocation := Abs(t, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"))
+func ctagsRunnerTestTemplate(t *testing.T, sketchLocation *paths.Path) []byte {
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
 	err := (&builder.ContainerSetupHardwareToolsLibsSketchAndProps{}).Run(ctx)
 	NoError(t, err)
+
 	_, source, err := bldr.PrepareSketchBuildPath(ctx.Sketch, nil, ctx.SketchBuildPath)
 	NoError(t, err)
-	ctagsOutput, _, err := builder.RunCTags(source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
+
+	target := ctx.BuildPath.Join("ctags_target.cpp")
+	NoError(t, target.WriteFile([]byte(source)))
+
+	ctagsOutput, _, err := builder.RunCTags(target, ctx.BuildProperties)
 	NoError(t, err)
+
+	return ctagsOutput
+}
+
+func TestCTagsRunner(t *testing.T) {
+	sketchLocation := Abs(t, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"))
+	ctagsOutput := ctagsRunnerTestTemplate(t, sketchLocation)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
 	expectedOutput := "server	" + quotedSketchLocation + "	/^BridgeServer server;$/;\"	kind:variable	line:31\n" +
@@ -52,16 +62,7 @@ func TestCTagsRunner(t *testing.T) {
 
 func TestCTagsRunnerSketchWithClass(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("sketch_with_class", "sketch_with_class.ino"))
-	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-	ctx.Verbose = true
-
-	err := (&builder.ContainerSetupHardwareToolsLibsSketchAndProps{}).Run(ctx)
-	NoError(t, err)
-	_, source, err := bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-	NoError(t, err)
-	ctagsOutput, _, err := builder.RunCTags(source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
-	NoError(t, err)
+	ctagsOutput := ctagsRunnerTestTemplate(t, sketchLocation)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
 	expectedOutput := "set_values\t" + quotedSketchLocation + "\t/^    void set_values (int,int);$/;\"\tkind:prototype\tline:4\tclass:Rectangle\tsignature:(int,int)\treturntype:void\n" +
@@ -74,16 +75,7 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 
 func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("sketch_with_typename", "sketch_with_typename.ino"))
-	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-	ctx.Verbose = true
-
-	err := (&builder.ContainerSetupHardwareToolsLibsSketchAndProps{}).Run(ctx)
-	NoError(t, err)
-	_, source, err := bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-	NoError(t, err)
-	ctagsOutput, _, err := builder.RunCTags(source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
-	NoError(t, err)
+	ctagsOutput := ctagsRunnerTestTemplate(t, sketchLocation)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
 	expectedOutput := "Foo\t" + quotedSketchLocation + "\t/^  struct Foo{$/;\"\tkind:struct\tline:2\n" +
@@ -95,16 +87,7 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 
 func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("sketch_with_namespace", "sketch_with_namespace.ino"))
-	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-	ctx.Verbose = true
-
-	err := (&builder.ContainerSetupHardwareToolsLibsSketchAndProps{}).Run(ctx)
-	NoError(t, err)
-	_, source, err := bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-	NoError(t, err)
-	ctagsOutput, _, err := builder.RunCTags(source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
-	NoError(t, err)
+	ctagsOutput := ctagsRunnerTestTemplate(t, sketchLocation)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
 	expectedOutput := "value\t" + quotedSketchLocation + "\t/^\tint value() {$/;\"\tkind:function\tline:2\tnamespace:Test\tsignature:()\treturntype:int\n" +
@@ -115,16 +98,7 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 
 func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("sketch_with_templates_and_shift", "sketch_with_templates_and_shift.ino"))
-	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-	ctx.Verbose = true
-
-	err := (&builder.ContainerSetupHardwareToolsLibsSketchAndProps{}).Run(ctx)
-	NoError(t, err)
-	_, source, err := bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-	NoError(t, err)
-	ctagsOutput, _, err := builder.RunCTags(source, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
-	NoError(t, err)
+	ctagsOutput := ctagsRunnerTestTemplate(t, sketchLocation)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
 	expectedOutput := "printGyro\t" + quotedSketchLocation + "\t/^void printGyro()$/;\"\tkind:function\tline:10\tsignature:()\treturntype:void\n" +
