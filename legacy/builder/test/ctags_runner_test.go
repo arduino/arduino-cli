@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -39,7 +40,7 @@ func ctagsRunnerTestTemplate(t *testing.T, sketchLocation *paths.Path) []byte {
 	target := ctx.BuildPath.Join("ctags_target.cpp")
 	NoError(t, target.WriteFile([]byte(source)))
 
-	ctagsOutput, _, err := builder.RunCTags(target, ctx.BuildProperties)
+	ctagsOutput, _, err := preprocessor.RunCTags(target, ctx.BuildProperties)
 	NoError(t, err)
 
 	return ctagsOutput

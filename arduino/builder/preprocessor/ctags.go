@@ -1,6 +1,6 @@
 // This file is part of arduino-cli.
 //
-// Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+// Copyright 2023 ARDUINO SA (http://www.arduino.cc/)
 //
 // This software is released under the GNU General Public License version 3,
 // which covers the main part of arduino-cli.
@@ -13,18 +13,23 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package builder
+package preprocessor
 
 import (
-	"bytes"
+	"context"
+	"fmt"
 	"strings"
 
 	"github.com/arduino/arduino-cli/executils"
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/go-paths-helper"
-	properties "github.com/arduino/go-properties-orderedmap"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
 
+var tr = i18n.Tr
+
+// RunCTags performs a run of ctags on the given source file. Returns the ctags output and the stderr contents.
 func RunCTags(sourceFile *paths.Path, buildProperties *properties.Map) ([]byte, []byte, error) {
 	ctagsBuildProperties := properties.NewMap()
 	ctagsBuildProperties.Set("tools.ctags.path", "{runtime.tools.ctags.path}")
@@ -48,13 +53,10 @@ func RunCTags(sourceFile *paths.Path, buildProperties *properties.Map) ([]byte, 
 	if err != nil {
 		return nil, nil, err
 	}
-	stdout := &bytes.Buffer{}
-	stderr := &bytes.Buffer{}
-	proc.RedirectStdoutTo(stdout)
-	proc.RedirectStderrTo(stderr)
-	if err = proc.Run(); err != nil {
-		return nil, nil, err
-	}
-	_, _ = stderr.WriteString(strings.Join(parts, " "))
-	return stdout.Bytes(), stderr.Bytes(), err
+	stdout, stderr, err := proc.RunAndCaptureOutput(context.Background())
+
+	// Append ctags arguments to stderr
+	args := fmt.Sprintln(strings.Join(parts, " "))
+	stderr = append([]byte(args), stderr...)
+	return stdout, stderr, err
 }
