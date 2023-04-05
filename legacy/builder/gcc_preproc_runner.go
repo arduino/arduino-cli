@@ -16,7 +16,6 @@
 package builder
 
 import (
-	"os/exec"
 	"strings"
 
 	f "github.com/arduino/arduino-cli/internal/algorithms"
@@ -25,19 +24,9 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
-	"github.com/pkg/errors"
 )
 
 func GCCPreprocRunner(ctx *types.Context, sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.PathList) ([]byte, error) {
-	cmd, err := prepareGCCPreprocRecipeProperties(ctx, sourceFilePath, targetFilePath, includes)
-	if err != nil {
-		return nil, err
-	}
-	_, stderr, err := utils.ExecCommand(ctx, cmd, utils.ShowIfVerbose /* stdout */, utils.Capture /* stderr */)
-	return stderr, err
-}
-
-func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.PathList) (*exec.Cmd, error) {
 	buildProperties := properties.NewMap()
 	buildProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
 	buildProperties.Merge(ctx.BuildProperties)
@@ -61,12 +50,13 @@ func prepareGCCPreprocRecipeProperties(ctx *types.Context, sourceFilePath *paths
 
 	cmd, err := builder_utils.PrepareCommandForRecipe(buildProperties, "recipe.preproc.macros", true, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	// Remove -MMD argument if present. Leaving it will make gcc try
 	// to create a /dev/null.d dependency file, which won't work.
 	cmd.Args = f.Filter(cmd.Args, f.NotEquals("-MMD"))
 
-	return cmd, nil
+	_, stderr, err := utils.ExecCommand(ctx, cmd, utils.ShowIfVerbose /* stdout */, utils.Capture /* stderr */)
+	return stderr, err
 }
