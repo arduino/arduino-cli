@@ -25,24 +25,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-func RunCTags(source string, targetFileName string, buildProperties *properties.Map, preprocPath *paths.Path,
-) ([]byte, []byte, error) {
-	if err := preprocPath.MkdirAll(); err != nil {
-		return nil, nil, err
-	}
-
-	ctagsTargetFilePath := preprocPath.Join(targetFileName)
-	if err := ctagsTargetFilePath.WriteFile([]byte(source)); err != nil {
-		return nil, nil, err
-	}
-
+func RunCTags(sourceFile *paths.Path, buildProperties *properties.Map) ([]byte, []byte, error) {
 	ctagsBuildProperties := properties.NewMap()
 	ctagsBuildProperties.Set("tools.ctags.path", "{runtime.tools.ctags.path}")
 	ctagsBuildProperties.Set("tools.ctags.cmd.path", "{path}/ctags")
 	ctagsBuildProperties.Set("tools.ctags.pattern", `"{cmd.path}" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns --line-directives "{source_file}"`)
 	ctagsBuildProperties.Merge(buildProperties)
 	ctagsBuildProperties.Merge(ctagsBuildProperties.SubTree("tools").SubTree("ctags"))
-	ctagsBuildProperties.SetPath("source_file", ctagsTargetFilePath)
+	ctagsBuildProperties.SetPath("source_file", sourceFile)
 
 	pattern := ctagsBuildProperties.Get("pattern")
 	if pattern == "" {
