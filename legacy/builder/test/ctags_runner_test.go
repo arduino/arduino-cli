@@ -40,9 +40,6 @@ func TestCTagsRunner(t *testing.T) {
 			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
-		&builder.ContainerFindIncludes{},
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
 		types.BareCommand(func(ctx *types.Context) error {
 			ctagsOutput, _, _, _, _err = builder.RunCTags(ctx.Sketch, ctx.SketchSourceMerged, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
 			return _err
@@ -78,9 +75,6 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
-		&builder.ContainerFindIncludes{},
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
 		types.BareCommand(func(ctx *types.Context) error {
 			ctagsOutput, _, _, _, _err = builder.RunCTags(ctx.Sketch, ctx.SketchSourceMerged, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
 			return _err
@@ -114,9 +108,6 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
-		&builder.ContainerFindIncludes{},
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
 		types.BareCommand(func(ctx *types.Context) error {
 			ctagsOutput, _, _, _, _err = builder.RunCTags(ctx.Sketch, ctx.SketchSourceMerged, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
 			return _err
@@ -149,9 +140,6 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
-		&builder.ContainerFindIncludes{},
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
 		types.BareCommand(func(ctx *types.Context) error {
 			ctagsOutput, _, _, _, _err = builder.RunCTags(ctx.Sketch, ctx.SketchSourceMerged, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
 			return _err
@@ -183,9 +171,6 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
-		&builder.ContainerFindIncludes{},
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
 		types.BareCommand(func(ctx *types.Context) error {
 			ctagsOutput, _, _, _, _err = builder.RunCTags(ctx.Sketch, ctx.SketchSourceMerged, "ctags_target.cpp", ctx.BuildProperties, ctx.PreprocPath)
 			return _err
