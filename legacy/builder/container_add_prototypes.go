@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
@@ -66,7 +67,7 @@ func PreprocessSketchWithCtags(ctx *types.Context) error {
 		return err
 	}
 
-	ctagsStdout, ctagsStderr, err := RunCTags(targetFilePath, ctx.BuildProperties)
+	ctagsStdout, ctagsStderr, err := preprocessor.RunCTags(targetFilePath, ctx.BuildProperties)
 	if ctx.Verbose {
 		ctx.WriteStderr(ctagsStderr)
 	}
