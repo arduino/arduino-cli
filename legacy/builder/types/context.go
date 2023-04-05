@@ -121,8 +121,7 @@ type Context struct {
 	LineOffset int
 
 	// Verbosity settings
-	Verbose           bool
-	DebugPreprocessor bool
+	Verbose bool
 
 	// Dry run, only create progress map
 	Progress ProgressStruct

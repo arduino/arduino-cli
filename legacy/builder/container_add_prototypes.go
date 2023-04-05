@@ -73,8 +73,7 @@ func PreprocessSketchWithCtags(ctx *types.Context) error {
 	if err != nil {
 		return err
 	}
-	ctx.SketchSourceAfterArduinoPreprocessing = PrototypesAdder(
-		ctx.Sketch, ctx.SketchSourceMerged, ctagsStdout, ctx.LineOffset, ctx.DebugPreprocessor)
+	ctx.SketchSourceAfterArduinoPreprocessing = PrototypesAdder(ctx.Sketch, ctx.SketchSourceMerged, ctagsStdout, ctx.LineOffset)
 
 	if err := bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, []byte(ctx.SketchSourceAfterArduinoPreprocessing), ctx.SketchBuildPath); err != nil {
 		return errors.WithStack(err)
