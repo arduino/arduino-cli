@@ -32,10 +32,6 @@ func (proto *Prototype) String() string {
 	return proto.Modifiers + " " + proto.Prototype + " @ " + strconv.Itoa(proto.Line)
 }
 
-func (p *CTagsParser) GeneratePrototypes() ([]*Prototype, int) {
-	return p.toPrototypes(), p.findLineWhereToInsertPrototypes()
-}
-
 func (p *CTagsParser) findLineWhereToInsertPrototypes() int {
 	firstFunctionLine := p.firstFunctionAtLine()
 	firstFunctionPointerAsArgument := p.firstFunctionPointerUsedAsArgument()
