@@ -30,10 +30,7 @@ var DebugPreprocessor bool
 
 func PrototypesAdder(sketch *sketch.Sketch, source string, ctagsStdout []byte, lineOffset int) string {
 	parser := &ctags.CTagsParser{}
-	parser.Parse(ctagsStdout, sketch.MainFile)
-	parser.FixCLinkageTagsDeclarations()
-
-	prototypes, firstFunctionLine := parser.GeneratePrototypes()
+	prototypes, firstFunctionLine := parser.Parse(ctagsStdout, sketch.MainFile)
 	if firstFunctionLine == -1 {
 		firstFunctionLine = 0
 	}

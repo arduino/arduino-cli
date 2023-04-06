@@ -23,7 +23,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-func (p *CTagsParser) FixCLinkageTagsDeclarations() {
+func (p *CTagsParser) fixCLinkageTagsDeclarations() {
 	linesMap := p.FindCLinkageLines(p.tags)
 	for i := range p.tags {
 		if slices.Contains(linesMap[p.tags[i].Filename], p.tags[i].Line) &&

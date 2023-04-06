@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -28,7 +29,8 @@ func produceTags(t *testing.T, filename string) []*CTag {
 	require.NoError(t, err)
 
 	parser := CTagsParser{}
-	return parser.Parse(bytes, nil)
+	parser.Parse(bytes, paths.New("sketch.ino"))
+	return parser.tags
 }
 
 func TestCTagsParserShouldListPrototypes(t *testing.T) {
