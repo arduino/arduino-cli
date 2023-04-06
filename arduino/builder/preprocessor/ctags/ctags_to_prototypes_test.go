@@ -25,7 +25,7 @@ import (
 )
 
 func producePrototypes(t *testing.T, filename string, mainFile string) ([]*Prototype, int) {
-	bytes, err := os.ReadFile(filepath.Join("test_data", filename))
+	bytes, err := os.ReadFile(filepath.Join("testdata", filename))
 	require.NoError(t, err)
 
 	parser := &CTagsParser{}
