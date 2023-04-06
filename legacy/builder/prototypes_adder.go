@@ -20,9 +20,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/builder/preprocessor/ctags"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/ctags"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 )
 

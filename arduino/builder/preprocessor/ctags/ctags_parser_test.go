@@ -25,7 +25,7 @@ import (
 )
 
 func produceTags(t *testing.T, filename string) []*CTag {
-	bytes, err := os.ReadFile(filepath.Join("test_data", filename))
+	bytes, err := os.ReadFile(filepath.Join("testdata", filename))
 	require.NoError(t, err)
 
 	parser := CTagsParser{}

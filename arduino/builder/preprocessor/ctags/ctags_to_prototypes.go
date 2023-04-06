@@ -20,6 +20,7 @@ import (
 	"strings"
 )
 
+// Prototype is a C++ prototype generated from ctags output
 type Prototype struct {
 	FunctionName string
 	File         string
