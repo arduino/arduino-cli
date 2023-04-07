@@ -381,18 +381,22 @@ func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
 	}
 
 	jsonSignatureFile := jsonIndexFile.Parent().Join(jsonIndexFile.Base() + ".sig")
-	trusted, _, err := security.VerifyArduinoDetachedSignature(jsonIndexFile, jsonSignatureFile)
-	if err != nil {
-		logrus.
-			WithField("index", jsonIndexFile).
-			WithField("signatureFile", jsonSignatureFile).
-			WithError(err).Infof("Checking signature")
+	if jsonSignatureFile.Exist() {
+		trusted, _, err := security.VerifyArduinoDetachedSignature(jsonIndexFile, jsonSignatureFile)
+		if err != nil {
+			logrus.
+				WithField("index", jsonIndexFile).
+				WithField("signatureFile", jsonSignatureFile).
+				WithError(err).Warnf("Checking signature")
+		} else {
+			logrus.
+				WithField("index", jsonIndexFile).
+				WithField("signatureFile", jsonSignatureFile).
+				WithField("trusted", trusted).Infof("Checking signature")
+			index.IsTrusted = trusted
+		}
 	} else {
-		logrus.
-			WithField("index", jsonIndexFile).
-			WithField("signatureFile", jsonSignatureFile).
-			WithField("trusted", trusted).Infof("Checking signature")
-		index.IsTrusted = trusted
+		logrus.WithField("index", jsonIndexFile).Infof("Missing signature file")
 	}
 	return &index, nil
 }
