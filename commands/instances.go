@@ -458,9 +458,9 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		}
 	}
 
-	for _, err := range lm.RescanLibraries() {
-		s := status.Newf(codes.FailedPrecondition, tr("Loading libraries: %v"), err)
-		responseError(s)
+	for _, status := range lm.RescanLibraries() {
+		logrus.WithError(status.Err()).Warnf("Error loading library")
+		// TODO: report as warning: responseError(err)
 	}
 
 	// Refreshes the locale used, this will change the
