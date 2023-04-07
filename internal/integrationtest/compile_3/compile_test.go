@@ -16,6 +16,7 @@
 package compile_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
@@ -153,4 +154,29 @@ func TestCompileRelativeLibraryPath(t *testing.T) {
 	require.Contains(t, string(stdout), "Multiple libraries were found for \"FooLib.h\"")
 	require.Contains(t, string(stdout), "Used: "+FooLib.String())
 	require.Contains(t, string(stdout), "Not used: "+cli.SketchbookDir().Join("libraries", "FooLib").String())
+}
+
+func TestCompileWithInvalidLibrary(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "install", "arduino:avr")
+	require.NoError(t, err)
+
+	// Make an empty library
+	emptyLibPath := cli.SketchbookDir().Join("libraries", "EmptyLib")
+	require.NoError(t, emptyLibPath.MkdirAll())
+
+	// prepare sketch
+	sketch, err := paths.New("testdata", "bare_minimum").Abs()
+	require.NoError(t, err)
+
+	// Compile must succeed
+	_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", sketch.String())
+	require.NoError(t, err)
+
+	// Verbose compile must report invalid library
+	_, stderr, err := cli.Run("compile", "-v", "-b", "arduino:avr:uno", sketch.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stderr), fmt.Sprintf("loading library from %s: invalid library: no header files found", emptyLibPath))
 }
