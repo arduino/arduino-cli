@@ -1060,7 +1060,6 @@ func compileWithRelativeBuildPath(t *testing.T, env *integrationtest.Environment
 		"core",
 		"includes.cache",
 		"libraries",
-		"preproc",
 		"sketch",
 	}
 

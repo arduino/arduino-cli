@@ -16,8 +16,11 @@
 package preprocessor
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"strconv"
 	"strings"
 
@@ -37,30 +40,74 @@ var tr = i18n.Tr
 // this is useful for unit-testing to provide more infos
 var DebugPreprocessor bool
 
-func CTags(sourceFile *paths.Path, targetFile *paths.Path, sketch *sketch.Sketch, lineOffset int, buildProperties *properties.Map) ([]byte, error) {
-	ctagsOutput, ctagsStdErr, err := RunCTags(sourceFile, buildProperties)
+// PreprocessSketchWithCtags performs preprocessing of the arduino sketch using CTags.
+func PreprocessSketchWithCtags(sketch *sketch.Sketch, buildPath *paths.Path, includes paths.PathList, lineOffset int, buildProperties *properties.Map, onlyUpdateCompilationDatabase bool) ([]byte, []byte, error) {
+	// Create a temporary working directory
+	tmpDir, err := paths.MkTempDir("", "")
 	if err != nil {
-		return ctagsStdErr, err
+		return nil, nil, err
+	}
+	defer tmpDir.RemoveAll()
+	ctagsTarget := tmpDir.Join("sketch_merged.cpp")
+
+	normalOutput := &bytes.Buffer{}
+	verboseOutput := &bytes.Buffer{}
+
+	// Run GCC preprocessor
+	sourceFile := buildPath.Join("sketch", sketch.MainFile.Base()+".cpp")
+	gccStdout, gccStderr, err := GCC(sourceFile, ctagsTarget, includes, buildProperties)
+	verboseOutput.Write(gccStdout)
+	verboseOutput.Write(gccStderr)
+	normalOutput.Write(gccStderr)
+	if err != nil {
+		if !onlyUpdateCompilationDatabase {
+			return normalOutput.Bytes(), verboseOutput.Bytes(), errors.WithStack(err)
+		}
+
+		// Do not bail out if we are generating the compile commands database
+		normalOutput.WriteString(fmt.Sprintf("%s: %s",
+			tr("An error occurred adding prototypes"),
+			tr("the compilation database may be incomplete or inaccurate")))
+		if err := sourceFile.CopyTo(ctagsTarget); err != nil {
+			return normalOutput.Bytes(), verboseOutput.Bytes(), errors.WithStack(err)
+		}
 	}
 
-	// func PrototypesAdder(sketch *sketch.Sketch, source string, ctagsStdout []byte, lineOffset int) string {
+	if src, err := ctagsTarget.ReadFile(); err == nil {
+		filteredSource := filterSketchSource(sketch, bytes.NewReader(src), false)
+		if err := ctagsTarget.WriteFile([]byte(filteredSource)); err != nil {
+			return normalOutput.Bytes(), verboseOutput.Bytes(), err
+		}
+	} else {
+		return normalOutput.Bytes(), verboseOutput.Bytes(), err
+	}
+
+	// Run CTags on gcc-preprocessed source
+	ctagsOutput, ctagsStdErr, err := RunCTags(ctagsTarget, buildProperties)
+	verboseOutput.Write(ctagsStdErr)
+	if err != nil {
+		return normalOutput.Bytes(), verboseOutput.Bytes(), err
+	}
+
+	// Parse CTags output
 	parser := &ctags.CTagsParser{}
 	prototypes, firstFunctionLine := parser.Parse(ctagsOutput, sketch.MainFile)
 	if firstFunctionLine == -1 {
 		firstFunctionLine = 0
 	}
 
+	// Add prototypes to the original sketch source
 	var source string
-	if sourceData, err := targetFile.ReadFile(); err != nil {
-		return nil, err
-	} else {
+	if sourceData, err := sourceFile.ReadFile(); err == nil {
 		source = string(sourceData)
+	} else {
+		return normalOutput.Bytes(), verboseOutput.Bytes(), err
 	}
 	source = strings.Replace(source, "\r\n", "\n", -1)
 	source = strings.Replace(source, "\r", "\n", -1)
 	sourceRows := strings.Split(source, "\n")
 	if isFirstFunctionOutsideOfSource(firstFunctionLine, sourceRows) {
-		return nil, nil
+		return normalOutput.Bytes(), verboseOutput.Bytes(), nil
 	}
 
 	insertionLine := firstFunctionLine + lineOffset - 1
@@ -84,8 +131,9 @@ func CTags(sourceFile *paths.Path, targetFile *paths.Path, sketch *sketch.Sketch
 		fmt.Println("#END OF PREPROCESSED SOURCE")
 	}
 
-	err = targetFile.WriteFile([]byte(preprocessedSource))
-	return ctagsStdErr, err
+	// Write back arduino-preprocess output to the sourceFile
+	err = sourceFile.WriteFile([]byte(preprocessedSource))
+	return normalOutput.Bytes(), verboseOutput.Bytes(), err
 }
 
 func composePrototypeSection(line int, prototypes []*ctags.Prototype) string {
@@ -156,4 +204,30 @@ func RunCTags(sourceFile *paths.Path, buildProperties *properties.Map) ([]byte, 
 	args := fmt.Sprintln(strings.Join(parts, " "))
 	stderr = append([]byte(args), stderr...)
 	return stdout, stderr, err
+}
+
+func filterSketchSource(sketch *sketch.Sketch, source io.Reader, removeLineMarkers bool) string {
+	fileNames := paths.NewPathList()
+	fileNames.Add(sketch.MainFile)
+	fileNames.AddAll(sketch.OtherSketchFiles)
+
+	inSketch := false
+	filtered := ""
+
+	scanner := bufio.NewScanner(source)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if filename := cpp.ParseLineMarker(line); filename != nil {
+			inSketch = fileNames.Contains(filename)
+			if inSketch && removeLineMarkers {
+				continue
+			}
+		}
+
+		if inSketch {
+			filtered += line + "\n"
+		}
+	}
+
+	return filtered
 }

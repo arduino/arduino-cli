@@ -31,12 +31,12 @@ import (
 )
 
 func PreprocessSketchWithArduinoPreprocessor(ctx *types.Context) error {
-	if err := ctx.PreprocPath.MkdirAll(); err != nil {
+	if err := ctx.BuildPath.Join("preproc").MkdirAll(); err != nil {
 		return errors.WithStack(err)
 	}
 
 	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp")
-	targetFile := ctx.PreprocPath.Join("sketch_merged.cpp")
+	targetFile := ctx.BuildPath.Join("preproc", "sketch_merged.cpp")
 	gccStdout, gccStderr, err := preprocessor.GCC(sourceFile, targetFile, ctx.IncludeFolders, ctx.BuildProperties)
 	if ctx.Verbose {
 		ctx.WriteStdout(gccStdout)

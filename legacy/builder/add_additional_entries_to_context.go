@@ -26,10 +26,6 @@ type AddAdditionalEntriesToContext struct{}
 func (*AddAdditionalEntriesToContext) Run(ctx *types.Context) error {
 	if ctx.BuildPath != nil {
 		buildPath := ctx.BuildPath
-		preprocPath, err := buildPath.Join(constants.FOLDER_PREPROC).Abs()
-		if err != nil {
-			return errors.WithStack(err)
-		}
 		sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
 		if err != nil {
 			return errors.WithStack(err)
@@ -43,7 +39,6 @@ func (*AddAdditionalEntriesToContext) Run(ctx *types.Context) error {
 			return errors.WithStack(err)
 		}
 
-		ctx.PreprocPath = preprocPath
 		ctx.SketchBuildPath = sketchBuildPath
 		ctx.LibrariesBuildPath = librariesBuildPath
 		ctx.CoreBuildPath = coreBuildPath
