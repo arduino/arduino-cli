@@ -74,17 +74,7 @@ func PreprocessSketchWithCtags(ctx *types.Context) error {
 	if ctx.Verbose {
 		ctx.WriteStderr(ctagsStderr)
 	}
-	if err != nil {
-		return err
-	}
-
-	// Save preprocesssed source in context
-	if d, err := sketchCpp.ReadFile(); err != nil {
-		return err
-	} else {
-		ctx.SketchSourceAfterArduinoPreprocessing = string(d)
-	}
-	return nil
+	return err
 }
 
 func filterSketchSource(sketch *sketch.Sketch, source io.Reader, removeLineMarkers bool) string {
