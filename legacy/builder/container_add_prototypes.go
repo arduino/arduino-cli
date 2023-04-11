@@ -70,19 +70,21 @@ func PreprocessSketchWithCtags(ctx *types.Context) error {
 		return err
 	}
 
-	ctagsStdout, ctagsStderr, err := preprocessor.RunCTags(targetFilePath, ctx.BuildProperties)
+	sketchCpp := ctx.SketchBuildPath.Join(fmt.Sprintf("%s.cpp", ctx.Sketch.MainFile.Base()))
+	ctagsStderr, err := preprocessor.CTags(targetFilePath, sketchCpp, ctx.Sketch, ctx.LineOffset, ctx.BuildProperties)
 	if ctx.Verbose {
 		ctx.WriteStderr(ctagsStderr)
 	}
 	if err != nil {
 		return err
 	}
-	ctx.SketchSourceAfterArduinoPreprocessing = PrototypesAdder(ctx.Sketch, ctx.SketchSourceMerged, ctagsStdout, ctx.LineOffset)
 
-	if err := bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, []byte(ctx.SketchSourceAfterArduinoPreprocessing), ctx.SketchBuildPath); err != nil {
-		return errors.WithStack(err)
+	// Save preprocesssed source in context
+	if d, err := sketchCpp.ReadFile(); err != nil {
+		return err
+	} else {
+		ctx.SketchSourceAfterArduinoPreprocessing = string(d)
 	}
-
 	return nil
 }
 

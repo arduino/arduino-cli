@@ -18,16 +18,114 @@ package preprocessor
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/builder/preprocessor/ctags"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
+	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
 
 var tr = i18n.Tr
+
+// DebugPreprocessor when set to true the CTags preprocessor will output debugging info to stdout
+// this is useful for unit-testing to provide more infos
+var DebugPreprocessor bool
+
+func CTags(sourceFile *paths.Path, targetFile *paths.Path, sketch *sketch.Sketch, lineOffset int, buildProperties *properties.Map) ([]byte, error) {
+	ctagsOutput, ctagsStdErr, err := RunCTags(sourceFile, buildProperties)
+	if err != nil {
+		return ctagsStdErr, err
+	}
+
+	// func PrototypesAdder(sketch *sketch.Sketch, source string, ctagsStdout []byte, lineOffset int) string {
+	parser := &ctags.CTagsParser{}
+	prototypes, firstFunctionLine := parser.Parse(ctagsOutput, sketch.MainFile)
+	if firstFunctionLine == -1 {
+		firstFunctionLine = 0
+	}
+
+	var source string
+	if sourceData, err := targetFile.ReadFile(); err != nil {
+		return nil, err
+	} else {
+		source = string(sourceData)
+	}
+	source = strings.Replace(source, "\r\n", "\n", -1)
+	source = strings.Replace(source, "\r", "\n", -1)
+	sourceRows := strings.Split(source, "\n")
+	if isFirstFunctionOutsideOfSource(firstFunctionLine, sourceRows) {
+		return nil, nil
+	}
+
+	insertionLine := firstFunctionLine + lineOffset - 1
+	firstFunctionChar := len(strings.Join(sourceRows[:insertionLine], "\n")) + 1
+	prototypeSection := composePrototypeSection(firstFunctionLine, prototypes)
+	preprocessedSource := source[:firstFunctionChar] + prototypeSection + source[firstFunctionChar:]
+
+	if DebugPreprocessor {
+		fmt.Println("#PREPROCESSED SOURCE")
+		prototypesRows := strings.Split(prototypeSection, "\n")
+		prototypesRows = prototypesRows[:len(prototypesRows)-1]
+		for i := 0; i < len(sourceRows)+len(prototypesRows); i++ {
+			if i < insertionLine {
+				fmt.Printf("   |%s\n", sourceRows[i])
+			} else if i < insertionLine+len(prototypesRows) {
+				fmt.Printf("PRO|%s\n", prototypesRows[i-insertionLine])
+			} else {
+				fmt.Printf("   |%s\n", sourceRows[i-len(prototypesRows)])
+			}
+		}
+		fmt.Println("#END OF PREPROCESSED SOURCE")
+	}
+
+	err = targetFile.WriteFile([]byte(preprocessedSource))
+	return ctagsStdErr, err
+}
+
+func composePrototypeSection(line int, prototypes []*ctags.Prototype) string {
+	if len(prototypes) == 0 {
+		return ""
+	}
+
+	str := joinPrototypes(prototypes)
+	str += "\n#line "
+	str += strconv.Itoa(line)
+	str += " " + utils.QuoteCppString(prototypes[0].File)
+	str += "\n"
+
+	return str
+}
+
+func joinPrototypes(prototypes []*ctags.Prototype) string {
+	prototypesSlice := []string{}
+	for _, proto := range prototypes {
+		if signatureContainsaDefaultArg(proto) {
+			continue
+		}
+		prototypesSlice = append(prototypesSlice, "#line "+strconv.Itoa(proto.Line)+" "+utils.QuoteCppString(proto.File))
+		prototypeParts := []string{}
+		if proto.Modifiers != "" {
+			prototypeParts = append(prototypeParts, proto.Modifiers)
+		}
+		prototypeParts = append(prototypeParts, proto.Prototype)
+		prototypesSlice = append(prototypesSlice, strings.Join(prototypeParts, " "))
+	}
+	return strings.Join(prototypesSlice, "\n")
+}
+
+func signatureContainsaDefaultArg(proto *ctags.Prototype) bool {
+	return strings.Contains(proto.Prototype, "=")
+}
+
+func isFirstFunctionOutsideOfSource(firstFunctionLine int, sourceRows []string) bool {
+	return firstFunctionLine > len(sourceRows)-1
+}
 
 func RunCTags(sourceFile *paths.Path, buildProperties *properties.Map) ([]byte, []byte, error) {
 	ctagsBuildProperties := properties.NewMap()

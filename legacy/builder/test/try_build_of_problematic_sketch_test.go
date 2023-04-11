@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
@@ -202,7 +203,7 @@ func TestTryBuild042(t *testing.T) {
 }
 
 func makeDefaultContext() *types.Context {
-	builder.DebugPreprocessor = true
+	preprocessor.DebugPreprocessor = true
 	return &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "downloaded_board_manager_stuff"),
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
