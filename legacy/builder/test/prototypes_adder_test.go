@@ -22,16 +22,16 @@ import (
 	"testing"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
 func TestPrototypesAdderBridgeExample(t *testing.T) {
 	sketchLocation := paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")
-	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
+	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
 
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
@@ -239,7 +239,7 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 
 func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 	sketchLocation := paths.New("sketch_with_config", "sketch_with_config.ino")
-	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
+	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
 
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
@@ -270,7 +270,7 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 
 func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 	sketchLocation := paths.New("sketch_no_functions_two_files", "sketch_no_functions_two_files.ino")
-	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
+	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
 
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch_no_functions_two_files", "sketch_no_functions_two_files.ino"), "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
@@ -303,7 +303,7 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 	ctx.Verbose = true
 
 	sketchLocation := paths.New("sketch_no_functions", "sketch_no_functions.ino")
-	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
+	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
 	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -325,7 +325,7 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 
 func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 	sketchLocation := paths.New("sketch_with_default_args", "sketch_with_default_args.ino")
-	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
+	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
 
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
@@ -353,7 +353,7 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 
 func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 	sketchLocation := paths.New("sketch_with_inline_function", "sketch_with_inline_function.ino")
-	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
+	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
 
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
@@ -392,7 +392,7 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 
 func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 	sketchLocation := paths.New("sketch_with_function_signature_inside_ifdef", "sketch_with_function_signature_inside_ifdef.ino")
-	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
+	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
 
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
@@ -420,7 +420,7 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 
 func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	sketchLocation := paths.New("sketch_with_usbcon", "sketch_with_usbcon.ino")
-	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
+	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
 
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
@@ -453,7 +453,7 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 
 func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 	sketchLocation := paths.New("sketch_with_typename", "sketch_with_typename.ino")
-	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
+	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
 
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
@@ -491,7 +491,7 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 
 func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 	sketchLocation := paths.New("sketch_with_ifdef", "sketch_with_ifdef.ino")
-	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
+	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
 
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:yun")
 	defer cleanUpBuilderTestContext(t, ctx)
@@ -522,7 +522,7 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 
 func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 	sketchLocation := paths.New("sketch_with_ifdef", "sketch_with_ifdef.ino")
-	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
+	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
 
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:sam:arduino_due_x_dbg")
 	defer cleanUpBuilderTestContext(t, ctx)
@@ -553,7 +553,7 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 
 func TestPrototypesAdderSketchWithConst(t *testing.T) {
 	sketchLocation := paths.New("sketch_with_const", "sketch_with_const.ino")
-	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
+	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
 
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:uno")
 	defer cleanUpBuilderTestContext(t, ctx)
@@ -604,7 +604,7 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 
 func TestPrototypesAdderSketchWithSubstringFunctionMember(t *testing.T) {
 	sketchLocation := paths.New("sketch_with_class_and_method_substring", "sketch_with_class_and_method_substring.ino")
-	quotedSketchLocation := utils.QuoteCppString(Abs(t, sketchLocation).String())
+	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
 
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:uno")
 	defer cleanUpBuilderTestContext(t, ctx)

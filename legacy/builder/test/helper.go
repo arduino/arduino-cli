@@ -23,11 +23,11 @@ import (
 	"testing"
 	"text/template"
 
+	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -35,7 +35,7 @@ import (
 
 func LoadAndInterpolate(t *testing.T, filename string, ctx *types.Context) string {
 	funcsMap := template.FuncMap{
-		"QuoteCppString": utils.QuoteCppPath,
+		"QuoteCppString": func(p *paths.Path) string { return cpp.QuoteString(p.String()) },
 	}
 
 	tpl, err := template.New(filepath.Base(filename)).Funcs(funcsMap).ParseFiles(filename)

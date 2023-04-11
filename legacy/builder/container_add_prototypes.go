@@ -23,7 +23,7 @@ import (
 	"strconv"
 	"strings"
 
-	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -137,7 +137,7 @@ func parseLineMarker(line string) *paths.Path {
 	// If we get here, we found a # followed by a line number, so
 	// assume this is a line marker and see if the rest of the line
 	// starts with a string containing the filename
-	str, rest, ok := bldr.ParseCppString(split[2])
+	str, rest, ok := cpp.ParseString(split[2])
 
 	if ok && (rest == "" || rest[0] == ' ') {
 		return paths.New(str)

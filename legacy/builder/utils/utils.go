@@ -262,19 +262,6 @@ func LogIfVerbose(warn bool, msg string) types.Command {
 	return &loggerAction{onlyIfVerbose: true, warn: warn, msg: msg}
 }
 
-// Returns the given string as a quoted string for use with the C
-// preprocessor. This adds double quotes around it and escapes any
-// double quotes and backslashes in the string.
-func QuoteCppString(str string) string {
-	str = strings.Replace(str, "\\", "\\\\", -1)
-	str = strings.Replace(str, "\"", "\\\"", -1)
-	return "\"" + str + "\""
-}
-
-func QuoteCppPath(path *paths.Path) string {
-	return QuoteCppString(path.String())
-}
-
 // Normalizes an UTF8 byte slice
 // TODO: use it more often troughout all the project (maybe on logger interface?)
 func NormalizeUTF8(buf []byte) []byte {
