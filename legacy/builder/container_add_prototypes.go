@@ -63,11 +63,10 @@ func PreprocessSketchWithCtags(ctx *types.Context) error {
 	if src, err := targetFilePath.ReadFile(); err != nil {
 		return err
 	} else {
-		ctx.SketchSourceAfterCppPreprocessing = filterSketchSource(ctx.Sketch, bytes.NewReader(src), false)
-	}
-
-	if err := targetFilePath.WriteFile([]byte(ctx.SketchSourceAfterCppPreprocessing)); err != nil {
-		return err
+		filteredSource := filterSketchSource(ctx.Sketch, bytes.NewReader(src), false)
+		if err := targetFilePath.WriteFile([]byte(filteredSource)); err != nil {
+			return err
+		}
 	}
 
 	sketchCpp := ctx.SketchBuildPath.Join(fmt.Sprintf("%s.cpp", ctx.Sketch.MainFile.Base()))

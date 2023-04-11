@@ -104,8 +104,6 @@ type Context struct {
 	// Arduino sketch (.ino) to C++ (.cpp) conversion steps:
 	// 1. Concatenate *.ino files into a single merged source file -> SketchSourceMerged
 	SketchSourceMerged string
-	// 2. Run a pass of C++ preprocessor to remove macro definitions and ifdef-ed code -> SketchSourceAfterCppPreprocessing
-	SketchSourceAfterCppPreprocessing string
 	// 3. Do the Arduino preprocessing of the sketch (add missing prototypes) -> SketchSourceAfterArduinoPreprocessing
 	SketchSourceAfterArduinoPreprocessing string
 
