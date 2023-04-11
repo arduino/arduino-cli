@@ -101,10 +101,6 @@ type Context struct {
 	Sketch        *sketch.Sketch
 	WarningsLevel string
 
-	// Arduino sketch (.ino) to C++ (.cpp) conversion steps:
-	// 1. Concatenate *.ino files into a single merged source file -> SketchSourceMerged
-	SketchSourceMerged string
-
 	// Libraries handling
 	LibrariesManager             *librariesmanager.LibrariesManager
 	LibrariesResolver            *librariesresolver.Cpp

@@ -34,9 +34,10 @@ func ctagsRunnerTestTemplate(t *testing.T, sketchLocation *paths.Path) []byte {
 	err := (&builder.ContainerSetupHardwareToolsLibsSketchAndProps{}).Run(ctx)
 	NoError(t, err)
 
-	_, source, err := bldr.PrepareSketchBuildPath(ctx.Sketch, nil, ctx.SketchBuildPath)
+	_, err = bldr.PrepareSketchBuildPath(ctx.Sketch, nil, ctx.SketchBuildPath)
 	NoError(t, err)
 
+	source := loadPreprocessedSketch(t, ctx)
 	target := ctx.BuildPath.Join("ctags_target.cpp")
 	NoError(t, target.WriteFile([]byte(source)))
 

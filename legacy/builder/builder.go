@@ -49,7 +49,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
 
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = builder.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 
@@ -141,7 +141,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
 
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = builder.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 

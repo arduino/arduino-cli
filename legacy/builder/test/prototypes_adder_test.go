@@ -48,7 +48,7 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -74,7 +74,7 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -100,7 +100,7 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -126,7 +126,7 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -152,7 +152,7 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -178,7 +178,7 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -204,7 +204,7 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -230,7 +230,7 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -264,7 +264,7 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -296,7 +296,7 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -305,11 +305,12 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	mergedSketch := loadPreprocessedSketch(t, ctx)
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
 	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-	require.Equal(t, ctx.SketchSourceMerged, preprocessedSketch) // No prototypes added
+	require.Equal(t, mergedSketch, preprocessedSketch) // No prototypes added
 }
 
 func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
@@ -324,7 +325,7 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -333,11 +334,12 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
+	mergedSketch := loadPreprocessedSketch(t, ctx)
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
 	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-	require.Equal(t, ctx.SketchSourceMerged, preprocessedSketch) // No prototypes added
+	require.Equal(t, mergedSketch, preprocessedSketch) // No prototypes added
 }
 
 func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
@@ -353,7 +355,7 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -382,7 +384,7 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -422,7 +424,7 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -456,7 +458,7 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -489,7 +491,7 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -524,7 +526,7 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -556,7 +558,7 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -588,7 +590,7 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -614,7 +616,7 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
@@ -640,7 +642,7 @@ func TestPrototypesAdderSketchWithSubstringFunctionMember(t *testing.T) {
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 		&builder.ContainerFindIncludes{},
