@@ -37,17 +37,16 @@ var (
 // PrepareSketchBuildPath copies the sketch source files in the build path.
 // The .ino files are merged together to create a .cpp file (by the way, the
 // .cpp file still needs to be Arduino-preprocessed to compile).
-func PrepareSketchBuildPath(sketch *sketch.Sketch, sourceOverrides map[string]string, buildPath *paths.Path) (offset int, mergedSource string, err error) {
-	if offset, mergedSource, err = sketchMergeSources(sketch, sourceOverrides); err != nil {
-		return
+func PrepareSketchBuildPath(sketch *sketch.Sketch, sourceOverrides map[string]string, buildPath *paths.Path) (int, error) {
+	if offset, mergedSource, err := sketchMergeSources(sketch, sourceOverrides); err != nil {
+		return 0, err
+	} else if err := SketchSaveItemCpp(sketch.MainFile, []byte(mergedSource), buildPath); err != nil {
+		return 0, err
+	} else if err := sketchCopyAdditionalFiles(sketch, buildPath, sourceOverrides); err != nil {
+		return 0, err
+	} else {
+		return offset, nil
 	}
-	if err = SketchSaveItemCpp(sketch.MainFile, []byte(mergedSource), buildPath); err != nil {
-		return
-	}
-	if err = sketchCopyAdditionalFiles(sketch, buildPath, sourceOverrides); err != nil {
-		return
-	}
-	return
 }
 
 // SketchSaveItemCpp saves a preprocessed .cpp sketch file on disk
