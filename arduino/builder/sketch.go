@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/go-paths-helper"
@@ -96,7 +97,7 @@ func sketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, st
 		lineOffset++
 	}
 
-	mergedSource += "#line 1 " + QuoteCppString(sk.MainFile.String()) + "\n"
+	mergedSource += "#line 1 " + cpp.QuoteString(sk.MainFile.String()) + "\n"
 	mergedSource += mainSrc + "\n"
 	lineOffset++
 
@@ -105,7 +106,7 @@ func sketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, st
 		if err != nil {
 			return 0, "", err
 		}
-		mergedSource += "#line 1 " + QuoteCppString(file.String()) + "\n"
+		mergedSource += "#line 1 " + cpp.QuoteString(file.String()) + "\n"
 		mergedSource += src + "\n"
 	}
 
@@ -145,7 +146,7 @@ func sketchCopyAdditionalFiles(sketch *sketch.Sketch, destPath *paths.Path, over
 		}
 
 		// tag each addtional file with the filename of the source it was copied from
-		sourceBytes = append([]byte("#line 1 "+QuoteCppString(file.String())+"\n"), sourceBytes...)
+		sourceBytes = append([]byte("#line 1 "+cpp.QuoteString(file.String())+"\n"), sourceBytes...)
 
 		err = writeIfDifferent(sourceBytes, targetPath)
 		if err != nil {

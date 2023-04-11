@@ -21,11 +21,11 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/builder/preprocessor/ctags"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -96,7 +96,7 @@ func composePrototypeSection(line int, prototypes []*ctags.Prototype) string {
 	str := joinPrototypes(prototypes)
 	str += "\n#line "
 	str += strconv.Itoa(line)
-	str += " " + utils.QuoteCppString(prototypes[0].File)
+	str += " " + cpp.QuoteString(prototypes[0].File)
 	str += "\n"
 
 	return str
@@ -108,7 +108,7 @@ func joinPrototypes(prototypes []*ctags.Prototype) string {
 		if signatureContainsaDefaultArg(proto) {
 			continue
 		}
-		prototypesSlice = append(prototypesSlice, "#line "+strconv.Itoa(proto.Line)+" "+utils.QuoteCppString(proto.File))
+		prototypesSlice = append(prototypesSlice, "#line "+strconv.Itoa(proto.Line)+" "+cpp.QuoteString(proto.File))
 		prototypeParts := []string{}
 		if proto.Modifiers != "" {
 			prototypeParts = append(prototypeParts, proto.Modifiers)
