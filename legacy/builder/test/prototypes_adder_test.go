@@ -29,6 +29,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func loadPreprocessedSketch(t *testing.T, ctx *types.Context) string {
+	res, err := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp").ReadFile()
+	NoError(t, err)
+	return string(res)
+}
+
 func TestPrototypesAdderBridgeExample(t *testing.T) {
 	sketchLocation := paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")
 	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
@@ -53,8 +59,9 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#line 33 "+quotedSketchLocation+"\nvoid setup();\n#line 46 "+quotedSketchLocation+"\nvoid loop();\n#line 62 "+quotedSketchLocation+"\nvoid process(BridgeClient client);\n#line 82 "+quotedSketchLocation+"\nvoid digitalCommand(BridgeClient client);\n#line 109 "+quotedSketchLocation+"\nvoid analogCommand(BridgeClient client);\n#line 149 "+quotedSketchLocation+"\nvoid modeCommand(BridgeClient client);\n#line 33 "+quotedSketchLocation+"\n")
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, preprocessedSketch, "#line 33 "+quotedSketchLocation+"\nvoid setup();\n#line 46 "+quotedSketchLocation+"\nvoid loop();\n#line 62 "+quotedSketchLocation+"\nvoid process(BridgeClient client);\n#line 82 "+quotedSketchLocation+"\nvoid digitalCommand(BridgeClient client);\n#line 109 "+quotedSketchLocation+"\nvoid analogCommand(BridgeClient client);\n#line 149 "+quotedSketchLocation+"\nvoid modeCommand(BridgeClient client);\n#line 33 "+quotedSketchLocation+"\n")
 }
 
 func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
@@ -79,7 +86,8 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("SketchWithIfDef", "SketchWithIfDef.preprocessed.txt"), ctx)
-	require.Equal(t, preprocessed, strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1))
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Equal(t, preprocessed, strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderBaladuino(t *testing.T) {
@@ -104,7 +112,8 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("Baladuino", "Baladuino.preprocessed.txt"), ctx)
-	require.Equal(t, preprocessed, strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1))
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Equal(t, preprocessed, strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
@@ -129,7 +138,8 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("CharWithEscapedDoubleQuote", "CharWithEscapedDoubleQuote.preprocessed.txt"), ctx)
-	require.Equal(t, preprocessed, strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1))
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Equal(t, preprocessed, strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
@@ -154,7 +164,8 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("IncludeBetweenMultilineComment", "IncludeBetweenMultilineComment.preprocessed.txt"), ctx)
-	require.Equal(t, preprocessed, strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1))
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Equal(t, preprocessed, strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderLineContinuations(t *testing.T) {
@@ -179,7 +190,8 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("LineContinuations", "LineContinuations.preprocessed.txt"), ctx)
-	require.Equal(t, preprocessed, strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1))
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Equal(t, preprocessed, strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderStringWithComment(t *testing.T) {
@@ -204,7 +216,8 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("StringWithComment", "StringWithComment.preprocessed.txt"), ctx)
-	require.Equal(t, preprocessed, strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1))
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Equal(t, preprocessed, strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderSketchWithStruct(t *testing.T) {
@@ -229,7 +242,8 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("SketchWithStruct", "SketchWithStruct.preprocessed.txt"), ctx)
-	obtained := strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1)
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	obtained := strings.Replace(preprocessedSketch, "\r\n", "\n", -1)
 	// ctags based preprocessing removes the space after "dostuff", but this is still OK
 	// TODO: remove this exception when moving to a more powerful parser
 	preprocessed = strings.Replace(preprocessed, "void dostuff (A_NEW_TYPE * bar);", "void dostuff(A_NEW_TYPE * bar);", 1)
@@ -261,11 +275,12 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#line 13 "+quotedSketchLocation+"\nvoid setup();\n#line 17 "+quotedSketchLocation+"\nvoid loop();\n#line 13 "+quotedSketchLocation+"\n")
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, preprocessedSketch, "#line 13 "+quotedSketchLocation+"\nvoid setup();\n#line 17 "+quotedSketchLocation+"\nvoid loop();\n#line 13 "+quotedSketchLocation+"\n")
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch_with_config", "sketch_with_config.preprocessed.txt"), ctx)
-	require.Equal(t, preprocessed, strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1))
+	require.Equal(t, preprocessed, strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
@@ -292,8 +307,9 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-	require.Equal(t, ctx.SketchSourceMerged, ctx.SketchSourceAfterArduinoPreprocessing) // No prototypes added
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Equal(t, ctx.SketchSourceMerged, preprocessedSketch) // No prototypes added
 }
 
 func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
@@ -319,8 +335,9 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-	require.Equal(t, ctx.SketchSourceMerged, ctx.SketchSourceAfterArduinoPreprocessing) // No prototypes added
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Equal(t, ctx.SketchSourceMerged, preprocessedSketch) // No prototypes added
 }
 
 func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
@@ -347,8 +364,9 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#line 4 "+quotedSketchLocation+"\nvoid setup();\n#line 7 "+quotedSketchLocation+"\nvoid loop();\n#line 1 "+quotedSketchLocation+"\n")
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, preprocessedSketch, "#line 4 "+quotedSketchLocation+"\nvoid setup();\n#line 7 "+quotedSketchLocation+"\nvoid loop();\n#line 1 "+quotedSketchLocation+"\n")
 }
 
 func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
@@ -375,10 +393,11 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 
 	expected := "#line 1 " + quotedSketchLocation + "\nvoid setup();\n#line 2 " + quotedSketchLocation + "\nvoid loop();\n#line 4 " + quotedSketchLocation + "\nshort unsigned int testInt();\n#line 8 " + quotedSketchLocation + "\nstatic int8_t testInline();\n#line 12 " + quotedSketchLocation + "\n__attribute__((always_inline)) uint8_t testAttribute();\n#line 1 " + quotedSketchLocation + "\n"
-	obtained := ctx.SketchSourceAfterArduinoPreprocessing
+	obtained := preprocessedSketch
 	// ctags based preprocessing removes "inline" but this is still OK
 	// TODO: remove this exception when moving to a more powerful parser
 	expected = strings.Replace(expected, "static inline int8_t testInline();", "static int8_t testInline();", -1)
@@ -414,8 +433,9 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#line 1 "+quotedSketchLocation+"\nvoid setup();\n#line 3 "+quotedSketchLocation+"\nvoid loop();\n#line 15 "+quotedSketchLocation+"\nint8_t adalight();\n#line 1 "+quotedSketchLocation+"\n")
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, preprocessedSketch, "#line 1 "+quotedSketchLocation+"\nvoid setup();\n#line 3 "+quotedSketchLocation+"\nvoid loop();\n#line 15 "+quotedSketchLocation+"\nint8_t adalight();\n#line 1 "+quotedSketchLocation+"\n")
 }
 
 func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
@@ -447,8 +467,9 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#line 5 "+quotedSketchLocation+"\nvoid ciao();\n#line 10 "+quotedSketchLocation+"\nvoid setup();\n#line 15 "+quotedSketchLocation+"\nvoid loop();\n#line 5 "+quotedSketchLocation+"\n")
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, preprocessedSketch, "#line 5 "+quotedSketchLocation+"\nvoid ciao();\n#line 10 "+quotedSketchLocation+"\nvoid setup();\n#line 15 "+quotedSketchLocation+"\nvoid loop();\n#line 5 "+quotedSketchLocation+"\n")
 }
 
 func TestPrototypesAdderSketchWithTypename(t *testing.T) {
@@ -479,9 +500,10 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	expected := "#line 6 " + quotedSketchLocation + "\nvoid setup();\n#line 10 " + quotedSketchLocation + "\nvoid loop();\n#line 12 " + quotedSketchLocation + "\ntypename Foo<char>::Bar func();\n#line 6 " + quotedSketchLocation + "\n"
-	obtained := ctx.SketchSourceAfterArduinoPreprocessing
+	obtained := preprocessedSketch
 	// ctags based preprocessing ignores line with typename
 	// TODO: remove this exception when moving to a more powerful parser
 	expected = strings.Replace(expected, "#line 12 "+quotedSketchLocation+"\ntypename Foo<char>::Bar func();\n", "", -1)
@@ -513,11 +535,12 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#line 5 "+quotedSketchLocation+"\nvoid elseBranch();\n#line 9 "+quotedSketchLocation+"\nvoid f1();\n#line 10 "+quotedSketchLocation+"\nvoid f2();\n#line 12 "+quotedSketchLocation+"\nvoid setup();\n#line 14 "+quotedSketchLocation+"\nvoid loop();\n#line 5 "+quotedSketchLocation+"\n")
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, preprocessedSketch, "#line 5 "+quotedSketchLocation+"\nvoid elseBranch();\n#line 9 "+quotedSketchLocation+"\nvoid f1();\n#line 10 "+quotedSketchLocation+"\nvoid f2();\n#line 12 "+quotedSketchLocation+"\nvoid setup();\n#line 14 "+quotedSketchLocation+"\nvoid loop();\n#line 5 "+quotedSketchLocation+"\n")
 
 	expectedSource := LoadAndInterpolate(t, filepath.Join("sketch_with_ifdef", "sketch.preprocessed.txt"), ctx)
-	require.Equal(t, expectedSource, strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1))
+	require.Equal(t, expectedSource, strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
@@ -544,11 +567,12 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#line 2 "+quotedSketchLocation+"\nvoid ifBranch();\n#line 9 "+quotedSketchLocation+"\nvoid f1();\n#line 10 "+quotedSketchLocation+"\nvoid f2();\n#line 12 "+quotedSketchLocation+"\nvoid setup();\n#line 14 "+quotedSketchLocation+"\nvoid loop();\n#line 2 "+quotedSketchLocation+"\n")
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, preprocessedSketch, "#line 2 "+quotedSketchLocation+"\nvoid ifBranch();\n#line 9 "+quotedSketchLocation+"\nvoid f1();\n#line 10 "+quotedSketchLocation+"\nvoid f2();\n#line 12 "+quotedSketchLocation+"\nvoid setup();\n#line 14 "+quotedSketchLocation+"\nvoid loop();\n#line 2 "+quotedSketchLocation+"\n")
 
 	expectedSource := LoadAndInterpolate(t, filepath.Join("sketch_with_ifdef", "sketch.preprocessed.SAM.txt"), ctx)
-	require.Equal(t, expectedSource, strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1))
+	require.Equal(t, expectedSource, strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderSketchWithConst(t *testing.T) {
@@ -575,8 +599,9 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#line 1 "+quotedSketchLocation+"\nvoid setup();\n#line 2 "+quotedSketchLocation+"\nvoid loop();\n#line 4 "+quotedSketchLocation+"\nconst __FlashStringHelper* test();\n#line 6 "+quotedSketchLocation+"\nconst int test3();\n#line 8 "+quotedSketchLocation+"\nvolatile __FlashStringHelper* test2();\n#line 10 "+quotedSketchLocation+"\nvolatile int test4();\n#line 1 "+quotedSketchLocation+"\n")
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, preprocessedSketch, "#line 1 "+quotedSketchLocation+"\nvoid setup();\n#line 2 "+quotedSketchLocation+"\nvoid loop();\n#line 4 "+quotedSketchLocation+"\nconst __FlashStringHelper* test();\n#line 6 "+quotedSketchLocation+"\nconst int test3();\n#line 8 "+quotedSketchLocation+"\nvolatile __FlashStringHelper* test2();\n#line 10 "+quotedSketchLocation+"\nvolatile int test4();\n#line 1 "+quotedSketchLocation+"\n")
 }
 
 func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
@@ -626,5 +651,6 @@ func TestPrototypesAdderSketchWithSubstringFunctionMember(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "class Foo {\nint blooper(int x) { return x+1; }\n};\n\nFoo foo;\n\n#line 7 "+quotedSketchLocation+"\nvoid setup();")
+	preprocessedSketch := loadPreprocessedSketch(t, ctx)
+	require.Contains(t, preprocessedSketch, "class Foo {\nint blooper(int x) { return x+1; }\n};\n\nFoo foo;\n\n#line 7 "+quotedSketchLocation+"\nvoid setup();")
 }

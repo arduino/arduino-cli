@@ -85,8 +85,5 @@ func PreprocessSketchWithArduinoPreprocessor(ctx *types.Context) error {
 	}
 
 	result := utils.NormalizeUTF8(buf)
-
-	//fmt.Printf("PREPROCESSOR OUTPUT:\n%s\n", output)
-	ctx.SketchSourceAfterArduinoPreprocessing = string(result)
 	return bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, result, ctx.SketchBuildPath)
 }

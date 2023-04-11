@@ -157,7 +157,11 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 	}
 
 	// Output arduino-preprocessed source
-	ctx.WriteStdout([]byte(ctx.SketchSourceAfterArduinoPreprocessing))
+	preprocessedSketch, err := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp").ReadFile()
+	if err != nil {
+		return err
+	}
+	ctx.WriteStdout(preprocessedSketch)
 	return nil
 }
 
