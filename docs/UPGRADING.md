@@ -2,6 +2,34 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## 0.32.2
+
+### golang API: method `github.com/arduino/arduino-cli/arduino/cores/Board.GetBuildProperties` changed signature
+
+The method:
+
+```go
+func (b *Board) GetBuildProperties(userConfigs *properties.Map) (*properties.Map, error) { ... }
+```
+
+now requires a full `FQBN` object;
+
+```go
+func (b *Board) GetBuildProperties(fqbn *FQBN) (*properties.Map, error) { ... }
+```
+
+Existing code may be updated from:
+
+```go
+b.GetBuildProperties(fqbn.Configs)
+```
+
+to
+
+```
+b.GetBuildProperties(fqbn)
+```
+
 ## 0.32.0
 
 ### `arduino-cli` doesn't lookup anymore in the current directory for configuration file.
