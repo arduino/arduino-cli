@@ -1663,9 +1663,13 @@ configuration key names, with each component separated by <code>_</code>. For ex
 variable sets the <code>directories.user</code> configuration option.</p>
 <p>On Linux or macOS, you can use the <a href="https://ss64.com/bash/export.html"><code>export</code> command</a> to set environment variables. On Windows cmd, you
 can use the <a href="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/set_1"><code>set</code> command</a>.</p>
+<p><code>ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</code> environment variables can be a list of space-separated URLs.</p>
 <h4 id="example_1">Example<a class="headerlink" href="#example_1" title="Permanent link">&para;</a></h4>
 <p>Setting an additional Boards Manager URL using the <code>ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</code> environment variable:</p>
 <div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</span><span class="o">=</span>https://downloads.arduino.cc/packages/package_staging_index.json
+</code></pre></div>
+<p>Setting multiple additional Boards Manager URLs using the <code>ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</code> environment variable:</p>
+<div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</span><span class="o">=</span><span class="s2">&quot;https://downloads.arduino.cc/packages/package_staging_index.json https://downloads.arduino.cc/packages/package_mbed_index.json&quot;</span>
 </code></pre></div>
 <h3 id="configuration-file">Configuration file<a class="headerlink" href="#configuration-file" title="Permanent link">&para;</a></h3>
 <p><a href="../commands/arduino-cli_config_init/"><code>arduino-cli config init</code></a> creates or updates a configuration file with the current
