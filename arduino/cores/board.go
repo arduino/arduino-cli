@@ -116,16 +116,16 @@ func (b *Board) GetConfigOptionValues(option string) *properties.Map {
 
 // GetBuildProperties returns the build properties and the build
 // platform for the Board with the configuration passed as parameter.
-func (b *Board) GetBuildProperties(userConfigs *properties.Map) (*properties.Map, error) {
+func (b *Board) GetBuildProperties(fqbn *FQBN) (*properties.Map, error) {
 	b.buildConfigOptionsStructures()
 
 	// Override default configs with user configs
 	config := b.defaultConfig.Clone()
-	config.Merge(userConfigs)
+	config.Merge(fqbn.Configs)
 
 	// Start with board's base properties
 	buildProperties := b.Properties.Clone()
-	buildProperties.Set("build.fqbn", b.FQBN())
+	buildProperties.Set("build.fqbn", fqbn.String())
 	buildProperties.Set("build.arch", strings.ToUpper(b.PlatformRelease.Platform.Architecture))
 
 	// Add all sub-configurations one by one (a config is: option=value)
@@ -157,7 +157,7 @@ func (b *Board) GeneratePropertiesForConfiguration(config string) (*properties.M
 	if err != nil {
 		return nil, fmt.Errorf(tr("parsing fqbn: %s"), err)
 	}
-	return b.GetBuildProperties(fqbn.Configs)
+	return b.GetBuildProperties(fqbn)
 }
 
 // GetIdentificationProperties calculates and returns a list of properties sets

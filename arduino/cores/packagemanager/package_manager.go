@@ -303,7 +303,7 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 			fmt.Errorf(tr("board %s not found"), fqbn.StringWithoutConfig())
 	}
 
-	boardBuildProperties, err := board.GetBuildProperties(fqbn.Configs)
+	boardBuildProperties, err := board.GetBuildProperties(fqbn)
 	if err != nil {
 		return targetPackage, boardPlatformRelease, board, nil, nil,
 			fmt.Errorf(tr("getting build properties for board %[1]s: %[2]s"), board, err)
