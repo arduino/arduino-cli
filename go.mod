@@ -51,6 +51,7 @@ require (
 	github.com/rogpeppe/go-internal v1.3.0
 	github.com/xeipuuv/gojsonschema v1.2.0
 	go.bug.st/testifyjson v1.1.1
+	golang.org/x/exp v0.0.0-20230321023759-10a507213a29
 	golang.org/x/term v0.6.0
 	gopkg.in/yaml.v3 v3.0.1
 )
