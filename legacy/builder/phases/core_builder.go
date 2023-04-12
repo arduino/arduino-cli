@@ -95,8 +95,10 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 	var targetArchivedCore *paths.Path
 	var buildCacheErr error
 	if buildCachePath != nil {
-		archivedCoreName := GetCachedCoreArchiveDirName(buildProperties.Get(constants.BUILD_PROPERTIES_FQBN),
-			buildProperties.Get("compiler.optimization_flags"), realCoreFolder)
+		archivedCoreName := GetCachedCoreArchiveDirName(
+			buildProperties.Get("build.fqbn"),
+			buildProperties.Get("compiler.optimization_flags"),
+			realCoreFolder)
 		targetArchivedCore = buildCachePath.Join(archivedCoreName, "core.a")
 		_, buildCacheErr = buildcache.New(buildCachePath).GetOrCreate(archivedCoreName)
 
