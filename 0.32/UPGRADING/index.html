@@ -277,6 +277,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0322" class="md-nav__link">
+    0.32.2
+  </a>
+  
+    <nav class="md-nav" aria-label="0.32.2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#golang-api-method-githubcomarduinoarduino-cliarduinocoresboardgetbuildproperties-changed-signature" class="md-nav__link">
+    golang API: method github.com/arduino/arduino-cli/arduino/cores/Board.GetBuildProperties changed signature
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0320" class="md-nav__link">
     0.32.0
   </a>
@@ -2220,6 +2240,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0322" class="md-nav__link">
+    0.32.2
+  </a>
+  
+    <nav class="md-nav" aria-label="0.32.2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#golang-api-method-githubcomarduinoarduino-cliarduinocoresboardgetbuildproperties-changed-signature" class="md-nav__link">
+    golang API: method github.com/arduino/arduino-cli/arduino/cores/Board.GetBuildProperties changed signature
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0320" class="md-nav__link">
     0.32.0
   </a>
@@ -3106,6 +3146,20 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<h2 id="0322">0.32.2<a class="headerlink" href="#0322" title="Permanent link">&para;</a></h2>
+<h3 id="golang-api-method-githubcomarduinoarduino-cliarduinocoresboardgetbuildproperties-changed-signature">golang API: method <code>github.com/arduino/arduino-cli/arduino/cores/Board.GetBuildProperties</code> changed signature<a class="headerlink" href="#golang-api-method-githubcomarduinoarduino-cliarduinocoresboardgetbuildproperties-changed-signature" title="Permanent link">&para;</a></h3>
+<p>The method:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">b</span><span class="w"> </span><span class="o">*</span><span class="nx">Board</span><span class="p">)</span><span class="w"> </span><span class="nx">GetBuildProperties</span><span class="p">(</span><span class="nx">userConfigs</span><span class="w"> </span><span class="o">*</span><span class="nx">properties</span><span class="p">.</span><span class="nx">Map</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">properties</span><span class="p">.</span><span class="nx">Map</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>now requires a full <code>FQBN</code> object;</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="p">(</span><span class="nx">b</span><span class="w"> </span><span class="o">*</span><span class="nx">Board</span><span class="p">)</span><span class="w"> </span><span class="nx">GetBuildProperties</span><span class="p">(</span><span class="nx">fqbn</span><span class="w"> </span><span class="o">*</span><span class="nx">FQBN</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">properties</span><span class="p">.</span><span class="nx">Map</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>Existing code may be updated from:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">b</span><span class="p">.</span><span class="nx">GetBuildProperties</span><span class="p">(</span><span class="nx">fqbn</span><span class="p">.</span><span class="nx">Configs</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<p>to</p>
+<div class="highlight"><pre><span></span><code>b.GetBuildProperties(fqbn)
+</code></pre></div>
 <h2 id="0320">0.32.0<a class="headerlink" href="#0320" title="Permanent link">&para;</a></h2>
 <h3 id="arduino-cli-doesnt-lookup-anymore-in-the-current-directory-for-configuration-file"><code>arduino-cli</code> doesn't lookup anymore in the current directory for configuration file.<a class="headerlink" href="#arduino-cli-doesnt-lookup-anymore-in-the-current-directory-for-configuration-file" title="Permanent link">&para;</a></h3>
 <p>Configuration file lookup in current working directory and its parents is dropped. The command line flag <code>--config-file</code>
