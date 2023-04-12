@@ -20,7 +20,6 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/globals"
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -176,20 +175,11 @@ func addExamples(lib *Library) error {
 }
 
 func addExamplesToPathList(examplesPath *paths.Path, list *paths.PathList) error {
-	files, err := examplesPath.ReadDir()
+	files, err := examplesPath.ReadDirRecursiveFiltered(nil, paths.AndFilter(paths.FilterDirectories(), filterExamplesDirs))
 	if err != nil {
 		return err
 	}
-	for _, file := range files {
-		_, err := sketch.New(file)
-		if err == nil {
-			list.Add(file)
-		} else if file.IsDir() {
-			if err := addExamplesToPathList(file, list); err != nil {
-				return err
-			}
-		}
-	}
+	list.AddAll(files)
 	return nil
 }
 
@@ -207,4 +197,18 @@ func containsHeaderFile(d *paths.Path) (bool, error) {
 	}
 	dirContent.FilterSuffix(headerExtensions...)
 	return len(dirContent) > 0, nil
+}
+
+// filterExamplesDirs filters out any directory that does not contain a ".ino" or ".pde" file
+// with the correct casing
+func filterExamplesDirs(dir *paths.Path) bool {
+	if list, err := dir.ReadDir(); err == nil {
+		list.FilterOutDirs()
+		list.FilterPrefix(dir.Base()+".ino", dir.Base()+".pde")
+		// accept only directories that contain a single correct sketch
+		if list.Len() == 1 {
+			return true
+		}
+	}
+	return false
 }
