@@ -17,6 +17,7 @@ package config
 
 import (
 	"os"
+	"strings"
 
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
@@ -96,6 +97,13 @@ func runInitCommand(cmd *cobra.Command, args []string) {
 	newSettings := viper.New()
 	configuration.SetDefaults(newSettings)
 	configuration.BindFlags(cmd, newSettings)
+
+	for _, url := range newSettings.GetStringSlice("board_manager.additional_urls") {
+		if strings.Contains(url, ",") {
+			feedback.Fatal(tr("Urls cannot contain commas. Separate multiple urls exported as env var with a space:\n%s", url),
+				feedback.ErrGeneric)
+		}
+	}
 
 	if err := newSettings.WriteConfigAs(configFileAbsPath.String()); err != nil {
 		feedback.Fatal(tr("Cannot create config file: %v", err), feedback.ErrGeneric)

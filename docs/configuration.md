@@ -76,12 +76,20 @@ variable sets the `directories.user` configuration option.
 On Linux or macOS, you can use the [`export` command][export command] to set environment variables. On Windows cmd, you
 can use the [`set` command][set command].
 
+`ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS` environment variables can be a list of space-separated URLs.
+
 #### Example
 
 Setting an additional Boards Manager URL using the `ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS` environment variable:
 
 ```sh
 $ export ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS=https://downloads.arduino.cc/packages/package_staging_index.json
+```
+
+Setting multiple additional Boards Manager URLs using the `ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS` environment variable:
+
+```sh
+$ export ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS="https://downloads.arduino.cc/packages/package_staging_index.json https://downloads.arduino.cc/packages/package_mbed_index.json"
 ```
 
 ### Configuration file
