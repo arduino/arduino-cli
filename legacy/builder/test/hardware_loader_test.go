@@ -34,11 +34,11 @@ func TestLoadHardware(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware")),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, nil, "")
 
 	commands := []types.Command{
 		&builder.HardwareLoader{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -67,23 +67,18 @@ func TestLoadHardware(t *testing.T) {
 	require.Equal(t, "/my/personal/avrdude", avrPlatform.Releases["1.6.10"].Properties.Get("tools.avrdude.cmd.path"))
 
 	require.Equal(t, "AVRISP mkII", avrPlatform.Releases["1.6.10"].Programmers["avrispmkii"].Name)
-
-	//require.Equal(t, "{runtime.tools.ctags.path}", packages.Properties.Get("tools.ctags.path"])
-	//require.Equal(t, "\"{cmd.path}\" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns --line-directives \"{source_file}\"", packages.Properties.Get("tools.ctags.pattern"])
-	//require.Equal(t, "{runtime.tools.avrdude.path}", packages.Properties.Get("tools.avrdude.path"])
-	//require.Equal(t, "-w -x c++ -E -CC", packages.Properties.Get("preproc.macros.flags"])
 }
 
 func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware"), "user_hardware"),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, nil, "")
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
 		&builder.HardwareLoader{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -146,11 +141,11 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList("downloaded_board_manager_stuff"),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, nil, "")
 
 	commands := []types.Command{
 		&builder.HardwareLoader{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -194,11 +189,11 @@ func TestLoadLotsOfHardware(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList("downloaded_board_manager_stuff", "downloaded_hardware", filepath.Join("..", "hardware"), "user_hardware"),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, nil, "")
 
 	commands := []types.Command{
 		&builder.HardwareLoader{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)

@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino"
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/buildcache"
 	"github.com/arduino/arduino-cli/commands"
@@ -90,17 +89,20 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	if err != nil {
 		return nil, &arduino.InvalidFQBNError{Cause: err}
 	}
-
-	targetPlatform := pme.FindPlatform(&packagemanager.PlatformReference{
-		Package:              fqbn.Package,
-		PlatformArchitecture: fqbn.PlatformArch,
-	})
-	if targetPlatform == nil || pme.GetInstalledPlatformRelease(targetPlatform) == nil {
-		return nil, &arduino.PlatformNotFoundError{
-			Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
-			Cause:    fmt.Errorf(tr("platform not installed")),
+	targetPackage, targetPlatform, targetBoard, buildProperties, buildPlatform, err := pme.ResolveFQBN(fqbn)
+	if err != nil {
+		if targetPlatform == nil {
+			return nil, &arduino.PlatformNotFoundError{
+				Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
+				Cause:    fmt.Errorf(tr("platform not installed")),
+			}
 		}
+		return nil, &arduino.InvalidFQBNError{Cause: err}
 	}
+
+	r = &rpc.CompileResponse{}
+	r.BoardPlatform = targetPlatform.ToRPCPlatformReference()
+	r.BuildPlatform = buildPlatform.ToRPCPlatformReference()
 
 	// At the current time we do not have a way of knowing if a board supports the secure boot or not,
 	// so, if the flags to override the default keys are used, we try override the corresponding platform property nonetheless.
@@ -111,11 +113,22 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		securityKeysOverride = append(securityKeysOverride, "build.keys.keychain="+req.KeysKeychain, "build.keys.sign_key="+req.GetSignKey(), "build.keys.encrypt_key="+req.EncryptKey)
 	}
 
+	requiredTools, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
+	if err != nil {
+		return nil, err
+	}
+
 	builderCtx := &types.Context{}
 	builderCtx.PackageManager = pme
 	if pme.GetProfile() != nil {
 		builderCtx.LibrariesManager = lm
 	}
+	builderCtx.TargetBoard = targetBoard
+	builderCtx.TargetBoardBuildProperties = buildProperties
+	builderCtx.TargetPlatform = targetPlatform
+	builderCtx.TargetPackage = targetPackage
+	builderCtx.ActualPlatform = buildPlatform
+	builderCtx.RequiredTools = requiredTools
 	builderCtx.UseCachedLibrariesResolution = req.GetSkipLibrariesDiscovery()
 	builderCtx.FQBN = fqbn
 	builderCtx.Sketch = sk
@@ -186,16 +199,9 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.OnlyUpdateCompilationDatabase = req.GetCreateCompilationDatabaseOnly()
 	builderCtx.SourceOverride = req.GetSourceOverride()
 
-	r = &rpc.CompileResponse{}
 	defer func() {
 		if p := builderCtx.BuildPath; p != nil {
 			r.BuildPath = p.String()
-		}
-		if pl := builderCtx.TargetPlatform; pl != nil {
-			r.BoardPlatform = pl.ToRPCPlatformReference()
-		}
-		if pl := builderCtx.ActualPlatform; pl != nil {
-			r.BuildPlatform = pl.ToRPCPlatformReference()
 		}
 	}()
 
@@ -243,6 +249,30 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	}()
 
 	// if it's a regular build, go on...
+
+	if req.GetVerbose() {
+		core := buildProperties.Get("build.core")
+		if core == "" {
+			core = "arduino"
+		}
+		// select the core name in case of "package:core" format
+		normalizedFQBN, err := pme.NormalizeFQBN(fqbn)
+		if err != nil {
+			outStream.Write([]byte(fmt.Sprintf("Could not normalize FQBN: %s\n", err)))
+			normalizedFQBN = fqbn
+		}
+		outStream.Write([]byte(fmt.Sprintf("FQBN: %s\n", normalizedFQBN)))
+		core = core[strings.Index(core, ":")+1:]
+		outStream.Write([]byte(tr("Using board '%[1]s' from platform in folder: %[2]s", targetBoard.BoardID, targetPlatform.InstallDir) + "\n"))
+		outStream.Write([]byte(tr("Using core '%[1]s' from platform in folder: %[2]s", core, buildPlatform.InstallDir) + "\n"))
+		outStream.Write([]byte("\n"))
+	}
+	if !targetBoard.Properties.ContainsKey("build.board") {
+		outStream.Write([]byte(
+			tr("Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s",
+				targetBoard.String(), "'build.board'", buildProperties.Get("build.board")) + "\n"))
+	}
+
 	if err := builder.RunBuilder(builderCtx); err != nil {
 		return r, &arduino.CompileFailedError{Message: err.Error()}
 	}

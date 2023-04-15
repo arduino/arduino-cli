@@ -29,20 +29,11 @@ import (
 )
 
 func TestPrototypesAdderBridgeExample(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	sketchLocation := paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, sketchLocation),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -52,7 +43,6 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -64,17 +54,8 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 }
 
 func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, paths.New("SketchWithIfDef", "SketchWithIfDef.ino")),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, paths.New("SketchWithIfDef", "SketchWithIfDef.ino"), "arduino:avr:leonardo")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -84,7 +65,6 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -96,17 +76,8 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 }
 
 func TestPrototypesAdderBaladuino(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, paths.New("Baladuino", "Baladuino.ino")),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, paths.New("Baladuino", "Baladuino.ino"), "arduino:avr:leonardo")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -116,7 +87,6 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -128,17 +98,8 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 }
 
 func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, paths.New("CharWithEscapedDoubleQuote", "CharWithEscapedDoubleQuote.ino")),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, paths.New("CharWithEscapedDoubleQuote", "CharWithEscapedDoubleQuote.ino"), "arduino:avr:leonardo")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -148,7 +109,6 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -160,17 +120,8 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 }
 
 func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, paths.New("IncludeBetweenMultilineComment", "IncludeBetweenMultilineComment.ino")),
-		FQBN:                 parseFQBN(t, "arduino:sam:arduino_due_x_dbg"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, paths.New("IncludeBetweenMultilineComment", "IncludeBetweenMultilineComment.ino"), "arduino:sam:arduino_due_x_dbg")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -180,7 +131,6 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -192,17 +142,8 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 }
 
 func TestPrototypesAdderLineContinuations(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, paths.New("LineContinuations", "LineContinuations.ino")),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, paths.New("LineContinuations", "LineContinuations.ino"), "arduino:avr:leonardo")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -212,7 +153,6 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -224,17 +164,8 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 }
 
 func TestPrototypesAdderStringWithComment(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, paths.New("StringWithComment", "StringWithComment.ino")),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, paths.New("StringWithComment", "StringWithComment.ino"), "arduino:avr:leonardo")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -244,7 +175,6 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -256,17 +186,8 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 }
 
 func TestPrototypesAdderSketchWithStruct(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, paths.New("SketchWithStruct", "SketchWithStruct.ino")),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, paths.New("SketchWithStruct", "SketchWithStruct.ino"), "arduino:avr:leonardo")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -276,7 +197,6 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -293,20 +213,11 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 }
 
 func TestPrototypesAdderSketchWithConfig(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	sketchLocation := paths.New("sketch_with_config", "sketch_with_config.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, sketchLocation),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -316,7 +227,6 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -331,20 +241,11 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 }
 
 func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	sketchLocation := paths.New("sketch_no_functions_two_files", "sketch_no_functions_two_files.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, paths.New("sketch_no_functions_two_files", "sketch_no_functions_two_files.ino")),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch_no_functions_two_files", "sketch_no_functions_two_files.ino"), "arduino:avr:leonardo")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -354,7 +255,6 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -366,17 +266,8 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 }
 
 func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, paths.New("sketch_no_functions", "sketch_no_functions.ino")),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch_no_functions", "sketch_no_functions.ino"), "arduino:avr:leonardo")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -389,7 +280,6 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -401,20 +291,11 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 }
 
 func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	sketchLocation := paths.New("sketch_with_default_args", "sketch_with_default_args.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, sketchLocation),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -424,7 +305,6 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -436,20 +316,11 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 }
 
 func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	sketchLocation := paths.New("sketch_with_inline_function", "sketch_with_inline_function.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, sketchLocation),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -459,7 +330,6 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -482,20 +352,11 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 }
 
 func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	sketchLocation := paths.New("sketch_with_function_signature_inside_ifdef", "sketch_with_function_signature_inside_ifdef.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, sketchLocation),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -505,7 +366,6 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -517,8 +377,6 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 }
 
 func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	sketchLocation := paths.New("sketch_with_usbcon", "sketch_with_usbcon.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
@@ -527,10 +385,9 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		Sketch:               OpenSketch(t, sketchLocation),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
 		Verbose:              true,
 	}
+	ctx = prepareBuilderTestContext(t, ctx, sketchLocation, "arduino:avr:leonardo")
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -540,7 +397,6 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -552,8 +408,6 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 }
 
 func TestPrototypesAdderSketchWithTypename(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	sketchLocation := paths.New("sketch_with_typename", "sketch_with_typename.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
@@ -561,10 +415,9 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
 		BuiltInLibrariesDirs: paths.New("libraries", "downloaded_libraries"),
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		Sketch:               OpenSketch(t, sketchLocation),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
 		Verbose:              true,
 	}
+	ctx = prepareBuilderTestContext(t, ctx, sketchLocation, "arduino:avr:leonardo")
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -574,7 +427,6 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -592,20 +444,11 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 }
 
 func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	sketchLocation := paths.New("sketch_with_ifdef", "sketch_with_ifdef.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, sketchLocation),
-		FQBN:                 parseFQBN(t, "arduino:avr:yun"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:yun")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -615,7 +458,6 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -630,20 +472,11 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 }
 
 func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	sketchLocation := paths.New("sketch_with_ifdef", "sketch_with_ifdef.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, sketchLocation),
-		FQBN:                 parseFQBN(t, "arduino:sam:arduino_due_x_dbg"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:sam:arduino_due_x_dbg")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -653,7 +486,6 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -668,20 +500,11 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 }
 
 func TestPrototypesAdderSketchWithConst(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	sketchLocation := paths.New("sketch_with_const", "sketch_with_const.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, sketchLocation),
-		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:uno")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -691,7 +514,6 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -703,17 +525,8 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 }
 
 func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, paths.New("eol_processing", "eol_processing.ino")),
-		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, paths.New("eol_processing", "eol_processing.ino"), "arduino:avr:uno")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -723,7 +536,6 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -733,19 +545,11 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 }
 
 func TestPrototypesAdderSketchWithSubstringFunctionMember(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
 	sketchLocation := paths.New("sketch_with_class_and_method_substring", "sketch_with_class_and_method_substring.ino")
 	quotedSketchLocation := utils.QuoteCppString(Abs(t, sketchLocation).String())
 
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, sketchLocation),
-		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
-		Verbose:              true,
-	}
+	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:uno")
+	ctx.Verbose = true
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -755,7 +559,6 @@ func TestPrototypesAdderSketchWithSubstringFunctionMember(t *testing.T) {
 		&builder.ContainerMergeCopySketchFiles{},
 		&builder.ContainerFindIncludes{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)

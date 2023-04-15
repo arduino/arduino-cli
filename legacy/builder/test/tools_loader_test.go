@@ -62,11 +62,10 @@ func requireEquivalentPaths(t *testing.T, actual string, expected ...string) {
 }
 
 func TestLoadTools(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	ctx := &types.Context{
 		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, nil, "")
 
 	NoError(t, (&builder.HardwareLoader{}).Run(ctx))
 
@@ -105,10 +104,10 @@ func TestLoadTools(t *testing.T) {
 }
 
 func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList("downloaded_board_manager_stuff"),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, nil, "")
 
 	NoError(t, (&builder.HardwareLoader{}).Run(ctx))
 
@@ -129,12 +128,11 @@ func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
 }
 
 func TestLoadLotsOfTools(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	ctx := &types.Context{
 		HardwareDirs:     paths.NewPathList("downloaded_board_manager_stuff"),
 		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, nil, "")
 
 	NoError(t, (&builder.HardwareLoader{}).Run(ctx))
 

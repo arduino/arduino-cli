@@ -29,16 +29,7 @@ import (
 )
 
 func TestMergeSketchWithBootloader(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
-		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
-	}
+	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -98,16 +89,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 }
 
 func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
-		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
-	}
+	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -168,16 +150,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 }
 
 func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
-		FQBN:                 parseFQBN(t, "arduino:avr:uno"),
-	}
+	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
@@ -205,16 +178,13 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 }
 
 func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
-		FQBN:                 parseFQBN(t, "my_avr_platform:avr:mymega:cpu=atmega2560"),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "my_avr_platform:avr:mymega:cpu=atmega2560")
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
