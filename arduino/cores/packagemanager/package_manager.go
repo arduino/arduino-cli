@@ -359,6 +359,13 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 	}
 	buildProperties.Set("runtime.os", properties.GetOSSuffix())
 	buildProperties.Set("build.library_discovery_phase", "0")
+
+	if buildProperties.Get("build.board") == "" {
+		architecture := board.PlatformRelease.Platform.Architecture
+		defaultBuildBoard := strings.ToUpper(architecture + "_" + board.BoardID)
+		buildProperties.Set("build.board", defaultBuildBoard)
+	}
+
 	// Deprecated properties
 	buildProperties.Set("tools.avrdude.path", "{runtime.tools.avrdude.path}")
 	buildProperties.Set("ide_version", "10607")

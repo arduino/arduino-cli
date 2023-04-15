@@ -50,12 +50,9 @@ func (s *TargetBoardResolver) Run(ctx *types.Context) error {
 		ctx.Info("")
 	}
 
-	if buildProperties.Get("build.board") == "" {
-		architecture := targetBoard.PlatformRelease.Platform.Architecture
-		defaultBuildBoard := strings.ToUpper(architecture + "_" + targetBoard.BoardID)
-		buildProperties.Set("build.board", defaultBuildBoard)
+	if !targetBoard.Properties.ContainsKey("build.board") {
 		ctx.Info(tr("Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s",
-			targetBoard.String(), "'build.board'", defaultBuildBoard))
+			targetBoard.String(), "'build.board'", buildProperties.Get("build.board")))
 	}
 
 	requiredTools, err := ctx.PackageManager.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
