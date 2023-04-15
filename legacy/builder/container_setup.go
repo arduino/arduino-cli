@@ -30,7 +30,6 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 	commands := []types.Command{
 		&AddAdditionalEntriesToContext{},
 		&FailIfBuildPathEqualsSketchPath{},
-		&HardwareLoader{},
 		&LibrariesLoader{},
 	}
 

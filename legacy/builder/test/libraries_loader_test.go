@@ -48,7 +48,6 @@ func TestLoadLibrariesAVR(t *testing.T) {
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
-		&builder.HardwareLoader{},
 		&builder.LibrariesLoader{},
 	}
 	for _, command := range commands {
@@ -154,7 +153,6 @@ func TestLoadLibrariesSAM(t *testing.T) {
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
-		&builder.HardwareLoader{},
 		&builder.LibrariesLoader{},
 	}
 	for _, command := range commands {
@@ -257,7 +255,6 @@ func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
-		&builder.HardwareLoader{},
 		&builder.LibrariesLoader{},
 	}
 	for _, command := range commands {

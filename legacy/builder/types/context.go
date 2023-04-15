@@ -79,8 +79,6 @@ type Context struct {
 	BuildOptionsJsonPrevious string
 
 	PackageManager             *packagemanager.Explorer
-	Hardware                   cores.Packages
-	AllTools                   []*cores.ToolRelease
 	RequiredTools              []*cores.ToolRelease
 	TargetBoard                *cores.Board
 	TargetBoardBuildProperties *properties.Map

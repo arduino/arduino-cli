@@ -36,15 +36,7 @@ func TestLoadHardware(t *testing.T) {
 	}
 	ctx = prepareBuilderTestContext(t, ctx, nil, "")
 
-	commands := []types.Command{
-		&builder.HardwareLoader{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-
-	packages := ctx.Hardware
+	packages := ctx.PackageManager.GetPackages()
 	require.Equal(t, 1, len(packages))
 	require.NotNil(t, packages["arduino"])
 	require.Equal(t, 2, len(packages["arduino"].Platforms))
@@ -77,14 +69,13 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
-		&builder.HardwareLoader{},
 	}
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	packages := ctx.Hardware
+	packages := ctx.PackageManager.GetPackages()
 
 	if runtime.GOOS == "windows" {
 		//a package is a symlink, and windows does not support them
@@ -143,15 +134,7 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 	}
 	ctx = prepareBuilderTestContext(t, ctx, nil, "")
 
-	commands := []types.Command{
-		&builder.HardwareLoader{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-
-	packages := ctx.Hardware
+	packages := ctx.PackageManager.GetPackages()
 	require.Equal(t, 3, len(packages))
 	require.NotNil(t, packages["arduino"])
 	require.Equal(t, 1, len(packages["arduino"].Platforms))
@@ -191,15 +174,7 @@ func TestLoadLotsOfHardware(t *testing.T) {
 	}
 	ctx = prepareBuilderTestContext(t, ctx, nil, "")
 
-	commands := []types.Command{
-		&builder.HardwareLoader{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-
-	packages := ctx.Hardware
+	packages := ctx.PackageManager.GetPackages()
 
 	if runtime.GOOS == "windows" {
 		//a package is a symlink, and windows does not support them

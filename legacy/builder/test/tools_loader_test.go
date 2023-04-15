@@ -21,7 +21,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -67,9 +66,7 @@ func TestLoadTools(t *testing.T) {
 	}
 	ctx = prepareBuilderTestContext(t, ctx, nil, "")
 
-	NoError(t, (&builder.HardwareLoader{}).Run(ctx))
-
-	tools := ctx.AllTools
+	tools := ctx.PackageManager.GetAllInstalledToolsReleases()
 	require.Equal(t, 9, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
@@ -109,9 +106,7 @@ func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
 	}
 	ctx = prepareBuilderTestContext(t, ctx, nil, "")
 
-	NoError(t, (&builder.HardwareLoader{}).Run(ctx))
-
-	tools := ctx.AllTools
+	tools := ctx.PackageManager.GetAllInstalledToolsReleases()
 	require.Equal(t, 3, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
@@ -134,9 +129,7 @@ func TestLoadLotsOfTools(t *testing.T) {
 	}
 	ctx = prepareBuilderTestContext(t, ctx, nil, "")
 
-	NoError(t, (&builder.HardwareLoader{}).Run(ctx))
-
-	tools := ctx.AllTools
+	tools := ctx.PackageManager.GetAllInstalledToolsReleases()
 	require.Equal(t, 12, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
@@ -191,7 +184,5 @@ func TestAllToolsContextIsPopulated(t *testing.T) {
 		PackageManager: pme,
 	}
 
-	hl := &builder.HardwareLoader{}
-	require.NoError(t, hl.Run(ctx))
-	require.NotEmpty(t, ctx.AllTools)
+	require.NotEmpty(t, ctx.PackageManager.GetAllInstalledToolsReleases())
 }

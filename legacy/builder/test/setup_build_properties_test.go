@@ -36,7 +36,6 @@ func TestSetupBuildProperties(t *testing.T) {
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
-		&builder.HardwareLoader{},
 		&builder.SetupBuildProperties{},
 	}
 	for _, command := range commands {
@@ -95,7 +94,6 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
-		&builder.HardwareLoader{},
 		&builder.SetupBuildProperties{},
 		&builder.SetCustomBuildProperties{},
 	}
@@ -126,7 +124,6 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
-		&builder.HardwareLoader{},
 		&builder.SetupBuildProperties{},
 	}
 	for _, command := range commands {
