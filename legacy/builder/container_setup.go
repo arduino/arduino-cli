@@ -30,7 +30,6 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 		&AddAdditionalEntriesToContext{},
 		&FailIfBuildPathEqualsSketchPath{},
 		&LibrariesLoader{},
-		&SetCustomBuildProperties{},
 	}
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)

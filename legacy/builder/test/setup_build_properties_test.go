@@ -22,6 +22,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
 )
 
@@ -87,21 +88,12 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	}
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
 	defer cleanUpBuilderTestContext(t, ctx)
-
-	commands := []types.Command{
-		&builder.AddAdditionalEntriesToContext{},
-		&builder.SetCustomBuildProperties{},
-	}
-
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
+	customProps, err := properties.LoadFromSlice(ctx.CustomBuildProperties)
+	NoError(t, err)
+	ctx.BuildProperties.Merge(customProps)
 
 	buildProperties := ctx.BuildProperties
-
 	require.Equal(t, "ARDUINO", buildProperties.Get("software"))
-
 	require.Equal(t, "uno", buildProperties.Get("_id"))
 	require.Equal(t, "fake name", buildProperties.Get("name"))
 	require.Equal(t, "\"{compiler.path}{compiler.c.cmd}\" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} \"{source_file}\" -o \"{object_file}\"", buildProperties.Get("recipe.c.o.pattern"))

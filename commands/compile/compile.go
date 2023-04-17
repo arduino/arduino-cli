@@ -35,6 +35,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 )
 
@@ -151,6 +152,14 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	// Add build properites related to sketch data
 	buildProperties = bldr.SetupBuildProperties(buildProperties, buildPath, sk, req.GetOptimizeForDebug())
 
+	// Add user provided custom build properties
+	customBuildPropertiesArgs := append(req.GetBuildProperties(), "build.warn_data_percentage=75")
+	if customBuildProperties, err := properties.LoadFromSlice(req.GetBuildProperties()); err == nil {
+		buildProperties.Merge(customBuildProperties)
+	} else {
+		return nil, &arduino.InvalidArgumentError{Message: tr("Invalid build properties"), Cause: err}
+	}
+
 	requiredTools, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 	if err != nil {
 		return nil, err
@@ -167,6 +176,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.ActualPlatform = buildPlatform
 	builderCtx.RequiredTools = requiredTools
 	builderCtx.BuildProperties = buildProperties
+	builderCtx.CustomBuildProperties = customBuildPropertiesArgs
 	builderCtx.UseCachedLibrariesResolution = req.GetSkipLibrariesDiscovery()
 	builderCtx.FQBN = fqbn
 	builderCtx.Sketch = sk
@@ -187,8 +197,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.Verbose = req.GetVerbose()
 	builderCtx.Jobs = int(req.GetJobs())
 	builderCtx.WarningsLevel = req.GetWarnings()
-
-	builderCtx.CustomBuildProperties = append(req.GetBuildProperties(), "build.warn_data_percentage=75")
 
 	if req.GetBuildCachePath() == "" {
 		builderCtx.CoreBuildCachePath = paths.TempDir().Join("arduino", "cores")

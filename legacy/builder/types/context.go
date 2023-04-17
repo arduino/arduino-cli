@@ -132,7 +132,7 @@ type Context struct {
 	// Send progress events to this callback
 	ProgressCB rpc.TaskProgressCB
 
-	// Contents of a custom build properties file (line by line)
+	// Custom build properties defined by user (line by line as "key=value" pairs)
 	CustomBuildProperties []string
 
 	// Reuse old tools since the backing storage didn't change
