@@ -60,6 +60,8 @@ message BoardDetailsResponse {
   bool debugging_supported = 14;
   // Identifying information for the board (e.g., USB VID/PID).
   repeated BoardIdentificationProperties identification_properties = 15;
+  // Board build properties used for compiling
+  repeated string build_properties = 16;
 }
 
 message BoardIdentificationProperties {

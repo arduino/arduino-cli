@@ -365,21 +365,24 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		feedback.FatalResult(res, feedback.ErrGeneric)
 	}
 	if showProperties == arguments.ShowPropertiesExpanded {
-		expandPropertiesInResult(res)
+		res.BuilderResult.BuildProperties, _ = ExpandBuildProperties(res.BuilderResult.GetBuildProperties())
+		// ignore error, it should never fail
 	}
 	feedback.PrintResult(res)
 }
 
-func expandPropertiesInResult(res *compileResult) {
-	expanded, err := properties.LoadFromSlice(res.BuilderResult.GetBuildProperties())
+// ExpandBuildProperties expands the build properties placeholders in the slice of properties.
+func ExpandBuildProperties(props []string) ([]string, error) {
+	expanded, err := properties.LoadFromSlice(props)
 	if err != nil {
-		res.Error = tr(err.Error())
+		return nil, err
 	}
-	expandedSlice := make([]string, expanded.Size())
-	for i, k := range expanded.Keys() {
-		expandedSlice[i] = strings.Join([]string{k, expanded.ExpandPropsInString(expanded.Get(k))}, "=")
+	expandedProps := []string{}
+	for _, k := range expanded.Keys() {
+		v := expanded.Get(k)
+		expandedProps = append(expandedProps, k+"="+expanded.ExpandPropsInString(v))
 	}
-	res.BuilderResult.BuildProperties = expandedSlice
+	return expandedProps, nil
 }
 
 type compileResult struct {

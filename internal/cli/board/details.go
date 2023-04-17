@@ -22,6 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
+	"github.com/arduino/arduino-cli/internal/cli/compile"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -35,6 +36,7 @@ func initDetailsCommand() *cobra.Command {
 	var showFullDetails bool
 	var listProgrammers bool
 	var fqbn arguments.Fqbn
+	var showProperties arguments.ShowProperties
 	var detailsCommand = &cobra.Command{
 		Use:     fmt.Sprintf("details -b <%s>", tr("FQBN")),
 		Short:   tr("Print details about a board."),
@@ -42,7 +44,7 @@ func initDetailsCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " board details -b arduino:avr:nano",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runDetailsCommand(fqbn.String(), showFullDetails, listProgrammers)
+			runDetailsCommand(fqbn.String(), showFullDetails, listProgrammers, showProperties)
 		},
 	}
 
@@ -50,28 +52,36 @@ func initDetailsCommand() *cobra.Command {
 	detailsCommand.Flags().BoolVarP(&showFullDetails, "full", "f", false, tr("Show full board details"))
 	detailsCommand.Flags().BoolVarP(&listProgrammers, "list-programmers", "", false, tr("Show list of available programmers"))
 	detailsCommand.MarkFlagRequired("fqbn")
-
+	showProperties.AddToCommand(detailsCommand)
 	return detailsCommand
 }
 
-func runDetailsCommand(fqbn string, showFullDetails, listProgrammers bool) {
+func runDetailsCommand(fqbn string, showFullDetails, listProgrammers bool, showProperties arguments.ShowProperties) {
 	inst := instance.CreateAndInit()
 
 	logrus.Info("Executing `arduino-cli board details`")
 
+	showPropertiesMode, err := showProperties.Get()
+	if err != nil {
+		feedback.Fatal(err.Error(), feedback.ErrBadArgument)
+	}
 	res, err := board.Details(context.Background(), &rpc.BoardDetailsRequest{
 		Instance: inst,
 		Fqbn:     fqbn,
 	})
-
 	if err != nil {
 		feedback.Fatal(tr("Error getting board details: %v", err), feedback.ErrGeneric)
+	}
+
+	if showPropertiesMode == arguments.ShowPropertiesExpanded {
+		res.BuildProperties, _ = compile.ExpandBuildProperties(res.GetBuildProperties())
 	}
 
 	feedback.PrintResult(detailsResult{
 		details:         res,
 		listProgrammers: listProgrammers,
 		showFullDetails: showFullDetails,
+		showProperties:  showPropertiesMode != arguments.ShowPropertiesDisabled,
 	})
 }
 
@@ -81,6 +91,7 @@ type detailsResult struct {
 	details         *rpc.BoardDetailsResponse
 	listProgrammers bool
 	showFullDetails bool
+	showProperties  bool
 }
 
 func (dr detailsResult) Data() interface{} {
@@ -89,6 +100,14 @@ func (dr detailsResult) Data() interface{} {
 
 func (dr detailsResult) String() string {
 	details := dr.details
+
+	if dr.showProperties {
+		res := ""
+		for _, prop := range details.GetBuildProperties() {
+			res += fmt.Sprintln(prop)
+		}
+		return res
+	}
 
 	if dr.listProgrammers {
 		t := table.New()

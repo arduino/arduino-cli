@@ -55,6 +55,10 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 			Properties: p.AsMap(),
 		})
 	}
+	for _, k := range boardProperties.Keys() {
+		v := boardProperties.Get(k)
+		details.BuildProperties = append(details.BuildProperties, k+"="+v)
+	}
 
 	details.DebuggingSupported = boardProperties.ContainsKey("debug.executable") ||
 		boardPlatform.Properties.ContainsKey("debug.executable") ||
