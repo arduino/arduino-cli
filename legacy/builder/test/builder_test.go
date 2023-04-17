@@ -22,6 +22,7 @@ import (
 	"testing"
 	"time"
 
+	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder"
@@ -89,7 +90,7 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		requiredTools, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 		require.NoError(t, err)
 
-		buildProperties = builder.SetupBuildProperties(buildProperties, ctx.BuildPath, ctx.Sketch, false /*OptimizeForDebug*/)
+		buildProperties = bldr.SetupBuildProperties(buildProperties, ctx.BuildPath, ctx.Sketch, false /*OptimizeForDebug*/)
 		ctx.PackageManager = pme
 		ctx.TargetBoard = targetBoard
 		ctx.BuildProperties = buildProperties

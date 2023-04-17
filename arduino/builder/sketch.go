@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-properties-orderedmap"
 
 	"github.com/pkg/errors"
 )
@@ -168,4 +169,30 @@ func writeIfDifferent(source []byte, destPath *paths.Path) error {
 
 	// Source and destination are the same, don't write anything
 	return nil
+}
+
+// SetupBuildProperties adds the build properties related to the sketch to the
+// default board build properties map.
+func SetupBuildProperties(boardBuildProperties *properties.Map, buildPath *paths.Path, sketch *sketch.Sketch, optimizeForDebug bool) *properties.Map {
+	buildProperties := properties.NewMap()
+	buildProperties.Merge(boardBuildProperties)
+
+	if buildPath != nil {
+		buildProperties.SetPath("build.path", buildPath)
+	}
+	if sketch != nil {
+		buildProperties.Set("build.project_name", sketch.MainFile.Base())
+		buildProperties.SetPath("build.source.path", sketch.FullPath)
+	}
+	if optimizeForDebug {
+		if debugFlags, ok := buildProperties.GetOk("compiler.optimization_flags.debug"); ok {
+			buildProperties.Set("compiler.optimization_flags", debugFlags)
+		}
+	} else {
+		if releaseFlags, ok := buildProperties.GetOk("compiler.optimization_flags.release"); ok {
+			buildProperties.Set("compiler.optimization_flags", releaseFlags)
+		}
+	}
+
+	return buildProperties
 }

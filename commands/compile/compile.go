@@ -149,7 +149,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	defer maybePurgeBuildCache()
 
 	// Add build properites related to sketch data
-	buildProperties = builder.SetupBuildProperties(buildProperties, buildPath, sk, req.GetOptimizeForDebug())
+	buildProperties = bldr.SetupBuildProperties(buildProperties, buildPath, sk, req.GetOptimizeForDebug())
 
 	requiredTools, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 	if err != nil {
