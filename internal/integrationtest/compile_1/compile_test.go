@@ -734,13 +734,11 @@ func compileUsingBoardsLocalTxt(t *testing.T, env *integrationtest.Environment, 
 	// Verifies compilation fails because board doesn't exist
 	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "Error during build: Error resolving FQBN: board arduino:avr:nessuno not found")
+	require.Contains(t, string(stderr), "Error during build: Invalid FQBN: board arduino:avr:nessuno not found")
 
 	// Use custom boards.local.txt with made arduino:avr:nessuno board
 	boardsLocalTxt := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.8.5", "boards.local.txt")
-	wd, err := paths.Getwd()
-	require.NoError(t, err)
-	err = wd.Parent().Join("testdata", "boards.local.txt").CopyTo(boardsLocalTxt)
+	err = paths.New("..", "testdata", "boards.local.txt").CopyTo(boardsLocalTxt)
 	require.NoError(t, err)
 	// Remove the file at the end of the test to avoid disrupting following tests
 	defer boardsLocalTxt.Remove()
