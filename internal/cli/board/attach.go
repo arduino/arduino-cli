@@ -26,6 +26,7 @@ import (
 
 func initAttachCommand() *cobra.Command {
 	var port arguments.Port
+	var fqbn arguments.Fqbn
 	attachCommand := &cobra.Command{
 		Use:   fmt.Sprintf("attach [-p <%s>] [-b <%s>] [%s]", tr("port"), tr("FQBN"), tr("sketchPath")),
 		Short: tr("Attaches a sketch to a board."),

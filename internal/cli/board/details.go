@@ -31,20 +31,19 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	showFullDetails bool
-	listProgrammers bool
-	fqbn            arguments.Fqbn
-)
-
 func initDetailsCommand() *cobra.Command {
+	var showFullDetails bool
+	var listProgrammers bool
+	var fqbn arguments.Fqbn
 	var detailsCommand = &cobra.Command{
 		Use:     fmt.Sprintf("details -b <%s>", tr("FQBN")),
 		Short:   tr("Print details about a board."),
 		Long:    tr("Show information about a board, in particular if the board has options to be specified in the FQBN."),
 		Example: "  " + os.Args[0] + " board details -b arduino:avr:nano",
 		Args:    cobra.NoArgs,
-		Run:     runDetailsCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runDetailsCommand(fqbn.String(), showFullDetails, listProgrammers)
+		},
 	}
 
 	fqbn.AddToCommand(detailsCommand)
@@ -55,27 +54,33 @@ func initDetailsCommand() *cobra.Command {
 	return detailsCommand
 }
 
-func runDetailsCommand(cmd *cobra.Command, args []string) {
+func runDetailsCommand(fqbn string, showFullDetails, listProgrammers bool) {
 	inst := instance.CreateAndInit()
 
 	logrus.Info("Executing `arduino-cli board details`")
 
 	res, err := board.Details(context.Background(), &rpc.BoardDetailsRequest{
 		Instance: inst,
-		Fqbn:     fqbn.String(),
+		Fqbn:     fqbn,
 	})
 
 	if err != nil {
 		feedback.Fatal(tr("Error getting board details: %v", err), feedback.ErrGeneric)
 	}
 
-	feedback.PrintResult(detailsResult{details: res})
+	feedback.PrintResult(detailsResult{
+		details:         res,
+		listProgrammers: listProgrammers,
+		showFullDetails: showFullDetails,
+	})
 }
 
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type detailsResult struct {
-	details *rpc.BoardDetailsResponse
+	details         *rpc.BoardDetailsResponse
+	listProgrammers bool
+	showFullDetails bool
 }
 
 func (dr detailsResult) Data() interface{} {
@@ -85,7 +90,7 @@ func (dr detailsResult) Data() interface{} {
 func (dr detailsResult) String() string {
 	details := dr.details
 
-	if listProgrammers {
+	if dr.listProgrammers {
 		t := table.New()
 		t.AddRow(tr("Id"), tr("Programmer name"))
 		for _, programmer := range details.Programmers {
@@ -160,7 +165,7 @@ func (dr detailsResult) String() string {
 	tab.SetColumnWidthMode(1, table.Average)
 	for _, tool := range details.ToolsDependencies {
 		tab.AddRow(tr("Required tool:"), tool.Packager+":"+tool.Name, tool.Version)
-		if showFullDetails {
+		if dr.showFullDetails {
 			for _, sys := range tool.Systems {
 				tab.AddRow("", tr("OS:"), sys.Host)
 				tab.AddRow("", tr("File:"), sys.ArchiveFilename)
