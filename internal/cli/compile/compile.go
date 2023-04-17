@@ -44,50 +44,30 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type showPropertiesMode int
-
-const (
-	showPropertiesModeDisabled showPropertiesMode = iota
-	showPropertiesModeUnexpanded
-	showPropertiesModeExpanded
-)
-
-func parseShowPropertiesArg(showProperties string) (showPropertiesMode, error) {
-	val, ok := map[string]showPropertiesMode{
-		"disabled":   showPropertiesModeDisabled,
-		"unexpanded": showPropertiesModeUnexpanded,
-		"expanded":   showPropertiesModeExpanded,
-	}[showProperties]
-	if !ok {
-		return showPropertiesModeDisabled, fmt.Errorf(tr("invalid option '%s'.", showProperties))
-	}
-	return val, nil
-}
-
 var (
-	fqbnArg                 arguments.Fqbn       // Fully Qualified Board Name, e.g.: arduino:avr:uno.
-	profileArg              arguments.Profile    // Profile to use
-	showPropertiesArg       string               // Show all build preferences used instead of compiling.
-	preprocess              bool                 // Print preprocessed code to stdout.
-	buildCachePath          string               // Builds of 'core.a' are saved into this path to be cached and reused.
-	buildPath               string               // Path where to save compiled files.
-	buildProperties         []string             // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
-	keysKeychain            string               // The path of the dir where to search for the custom keys to sign and encrypt a binary. Used only by the platforms that supports it
-	signKey                 string               // The name of the custom signing key to use to sign a binary during the compile process. Used only by the platforms that supports it
-	encryptKey              string               // The name of the custom encryption key to use to encrypt a binary during the compile process. Used only by the platforms that supports it
-	warnings                string               // Used to tell gcc which warning level to use.
-	verbose                 bool                 // Turns on verbose mode.
-	quiet                   bool                 // Suppresses almost every output.
-	uploadAfterCompile      bool                 // Upload the binary after the compilation.
-	portArgs                arguments.Port       // Upload port, e.g.: COM10 or /dev/ttyACM0.
-	verify                  bool                 // Upload, verify uploaded binary after the upload.
-	exportDir               string               // The compiled binary is written to this file
-	optimizeForDebug        bool                 // Optimize compile output for debug, not for release
-	programmer              arguments.Programmer // Use the specified programmer to upload
-	clean                   bool                 // Cleanup the build folder and do not use any cached build
-	compilationDatabaseOnly bool                 // Only create compilation database without actually compiling
-	sourceOverrides         string               // Path to a .json file that contains a set of replacements of the sketch source code.
-	dumpProfile             bool                 // Create and print a profile configuration from the build
+	fqbnArg                 arguments.Fqbn           // Fully Qualified Board Name, e.g.: arduino:avr:uno.
+	profileArg              arguments.Profile        // Profile to use
+	showPropertiesArg       arguments.ShowProperties // Show all build preferences used instead of compiling.
+	preprocess              bool                     // Print preprocessed code to stdout.
+	buildCachePath          string                   // Builds of 'core.a' are saved into this path to be cached and reused.
+	buildPath               string                   // Path where to save compiled files.
+	buildProperties         []string                 // List of custom build properties separated by commas. Or can be used multiple times for multiple properties.
+	keysKeychain            string                   // The path of the dir where to search for the custom keys to sign and encrypt a binary. Used only by the platforms that supports it
+	signKey                 string                   // The name of the custom signing key to use to sign a binary during the compile process. Used only by the platforms that supports it
+	encryptKey              string                   // The name of the custom encryption key to use to encrypt a binary during the compile process. Used only by the platforms that supports it
+	warnings                string                   // Used to tell gcc which warning level to use.
+	verbose                 bool                     // Turns on verbose mode.
+	quiet                   bool                     // Suppresses almost every output.
+	uploadAfterCompile      bool                     // Upload the binary after the compilation.
+	portArgs                arguments.Port           // Upload port, e.g.: COM10 or /dev/ttyACM0.
+	verify                  bool                     // Upload, verify uploaded binary after the upload.
+	exportDir               string                   // The compiled binary is written to this file
+	optimizeForDebug        bool                     // Optimize compile output for debug, not for release
+	programmer              arguments.Programmer     // Use the specified programmer to upload
+	clean                   bool                     // Cleanup the build folder and do not use any cached build
+	compilationDatabaseOnly bool                     // Only create compilation database without actually compiling
+	sourceOverrides         string                   // Path to a .json file that contains a set of replacements of the sketch source code.
+	dumpProfile             bool                     // Create and print a profile configuration from the build
 	// library and libraries sound similar but they're actually different.
 	// library expects a path to the root folder of one single library.
 	// libraries expects a path to a directory containing multiple libraries, similarly to the <directories.user>/libraries path.
@@ -115,10 +95,7 @@ func NewCommand() *cobra.Command {
 	fqbnArg.AddToCommand(compileCommand)
 	profileArg.AddToCommand(compileCommand)
 	compileCommand.Flags().BoolVar(&dumpProfile, "dump-profile", false, tr("Create and print a profile configuration from the build."))
-	compileCommand.Flags().StringVar(&showPropertiesArg, "show-properties", "disabled",
-		tr(`Show build properties instead of compiling. The properties are returned exactly as they are defined. Use "--show-properties=expanded" to replace placeholders with compilation context values.`),
-	)
-	compileCommand.Flags().Lookup("show-properties").NoOptDefVal = "unexpanded" // default if the flag is present with no value
+	showPropertiesArg.AddToCommand(compileCommand)
 	compileCommand.Flags().BoolVar(&preprocess, "preprocess", false, tr("Print preprocessed code to stdout instead of compiling."))
 	compileCommand.Flags().StringVar(&buildCachePath, "build-cache-path", "", tr("Builds of 'core.a' are saved into this path to be cached and reused."))
 	compileCommand.Flags().StringVarP(&exportDir, "output-dir", "", "", tr("Save build artifacts in this directory."))
@@ -210,14 +187,14 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		overrides = o.Overrides
 	}
 
-	showProperties, err := parseShowPropertiesArg(showPropertiesArg)
+	showProperties, err := showPropertiesArg.Get()
 	if err != nil {
 		feedback.Fatal(tr("Error parsing --show-properties flag: %v", err), feedback.ErrGeneric)
 	}
 
 	var stdOut, stdErr io.Writer
 	var stdIORes func() *feedback.OutputStreamsResult
-	if showProperties != showPropertiesModeDisabled {
+	if showProperties != arguments.ShowPropertiesDisabled {
 		stdOut, stdErr, stdIORes = feedback.NewBufferedStreams()
 	} else {
 		stdOut, stdErr, stdIORes = feedback.OutputStreams()
@@ -235,7 +212,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		Instance:                      inst,
 		Fqbn:                          fqbn,
 		SketchPath:                    sketchPath.String(),
-		ShowProperties:                showProperties != showPropertiesModeDisabled,
+		ShowProperties:                showProperties != arguments.ShowPropertiesDisabled,
 		Preprocess:                    preprocess,
 		BuildCachePath:                buildCachePath,
 		BuildPath:                     buildPath,
@@ -387,7 +364,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		}
 		feedback.FatalResult(res, feedback.ErrGeneric)
 	}
-	if showProperties == showPropertiesModeExpanded {
+	if showProperties == arguments.ShowPropertiesExpanded {
 		expandPropertiesInResult(res)
 	}
 	feedback.PrintResult(res)
@@ -413,7 +390,7 @@ type compileResult struct {
 	ProfileOut    string               `json:"profile_out,omitempty"`
 	Error         string               `json:"error,omitempty"`
 
-	showPropertiesMode showPropertiesMode
+	showPropertiesMode arguments.ShowPropertiesMode
 }
 
 func (r *compileResult) Data() interface{} {
@@ -421,7 +398,7 @@ func (r *compileResult) Data() interface{} {
 }
 
 func (r *compileResult) String() string {
-	if r.showPropertiesMode != showPropertiesModeDisabled {
+	if r.showPropertiesMode != arguments.ShowPropertiesDisabled {
 		return strings.Join(r.BuilderResult.GetBuildProperties(), fmt.Sprintln())
 	}
 
