@@ -78,13 +78,12 @@ type Context struct {
 	BuildOptionsJson         string
 	BuildOptionsJsonPrevious string
 
-	PackageManager             *packagemanager.Explorer
-	RequiredTools              []*cores.ToolRelease
-	TargetBoard                *cores.Board
-	TargetBoardBuildProperties *properties.Map
-	TargetPackage              *cores.Package
-	TargetPlatform             *cores.PlatformRelease
-	ActualPlatform             *cores.PlatformRelease
+	PackageManager *packagemanager.Explorer
+	RequiredTools  []*cores.ToolRelease
+	TargetBoard    *cores.Board
+	TargetPackage  *cores.Package
+	TargetPlatform *cores.PlatformRelease
+	ActualPlatform *cores.PlatformRelease
 
 	BuildProperties              *properties.Map
 	BuildPath                    *paths.Path
@@ -127,10 +126,6 @@ type Context struct {
 	// Verbosity settings
 	Verbose           bool
 	DebugPreprocessor bool
-
-	// Compile optimization settings
-	OptimizeForDebug  bool
-	OptimizationFlags string
 
 	// Dry run, only create progress map
 	Progress ProgressStruct
@@ -212,7 +207,7 @@ func (ctx *Context) ExtractBuildOptions() *properties.Map {
 	opts.Set("fqbn", ctx.FQBN.String())
 	opts.Set("customBuildProperties", strings.Join(ctx.CustomBuildProperties, ","))
 	opts.Set("additionalFiles", strings.Join(additionalFilesRelative, ","))
-	opts.Set("compiler.optimization_flags", ctx.OptimizationFlags)
+	opts.Set("compiler.optimization_flags", ctx.BuildProperties.Get("compiler.optimization_flags"))
 	return opts
 }
 

@@ -28,10 +28,8 @@ import (
 func TestCTagsRunner(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"))
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
+	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -62,10 +60,8 @@ func TestCTagsRunner(t *testing.T) {
 func TestCTagsRunnerSketchWithClass(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("sketch_with_class", "sketch_with_class.ino"))
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
+	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -93,10 +89,8 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("sketch_with_typename", "sketch_with_typename.ino"))
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
+	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -123,10 +117,8 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("sketch_with_namespace", "sketch_with_namespace.ino"))
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
+	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -152,10 +144,8 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("sketch_with_templates_and_shift", "sketch_with_templates_and_shift.ino"))
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
+	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},

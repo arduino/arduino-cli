@@ -33,10 +33,9 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -55,10 +54,9 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 
 func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("SketchWithIfDef", "SketchWithIfDef.ino"), "arduino:avr:leonardo")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -77,10 +75,9 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 
 func TestPrototypesAdderBaladuino(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("Baladuino", "Baladuino.ino"), "arduino:avr:leonardo")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -99,10 +96,9 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 
 func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("CharWithEscapedDoubleQuote", "CharWithEscapedDoubleQuote.ino"), "arduino:avr:leonardo")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -121,10 +117,9 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 
 func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("IncludeBetweenMultilineComment", "IncludeBetweenMultilineComment.ino"), "arduino:sam:arduino_due_x_dbg")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -143,10 +138,9 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 
 func TestPrototypesAdderLineContinuations(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("LineContinuations", "LineContinuations.ino"), "arduino:avr:leonardo")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -165,10 +159,9 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 
 func TestPrototypesAdderStringWithComment(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("StringWithComment", "StringWithComment.ino"), "arduino:avr:leonardo")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -187,10 +180,9 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 
 func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("SketchWithStruct", "SketchWithStruct.ino"), "arduino:avr:leonardo")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -217,10 +209,9 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -245,10 +236,9 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch_no_functions_two_files", "sketch_no_functions_two_files.ino"), "arduino:avr:leonardo")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -267,10 +257,9 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 
 func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch_no_functions", "sketch_no_functions.ino"), "arduino:avr:leonardo")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	sketchLocation := paths.New("sketch_no_functions", "sketch_no_functions.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
@@ -295,10 +284,9 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -320,10 +308,9 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -356,10 +343,9 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -388,9 +374,7 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 		Verbose:              true,
 	}
 	ctx = prepareBuilderTestContext(t, ctx, sketchLocation, "arduino:avr:leonardo")
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -418,9 +402,7 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 		Verbose:              true,
 	}
 	ctx = prepareBuilderTestContext(t, ctx, sketchLocation, "arduino:avr:leonardo")
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -448,10 +430,9 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:yun")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -476,10 +457,9 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:sam:arduino_due_x_dbg")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -504,10 +484,9 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
 
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:uno")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -526,10 +505,9 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 
 func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("eol_processing", "eol_processing.ino"), "arduino:avr:uno")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -549,10 +527,9 @@ func TestPrototypesAdderSketchWithSubstringFunctionMember(t *testing.T) {
 	quotedSketchLocation := utils.QuoteCppString(Abs(t, sketchLocation).String())
 
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:uno")
-	ctx.Verbose = true
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx.Verbose = true
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},

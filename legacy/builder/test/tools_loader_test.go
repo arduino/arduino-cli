@@ -16,6 +16,7 @@
 package test
 
 import (
+	"path/filepath"
 	"sort"
 	"testing"
 
@@ -62,9 +63,11 @@ func requireEquivalentPaths(t *testing.T, actual string, expected ...string) {
 
 func TestLoadTools(t *testing.T) {
 	ctx := &types.Context{
+		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
 		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
 	}
 	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	tools := ctx.PackageManager.GetAllInstalledToolsReleases()
 	require.Equal(t, 9, len(tools))
@@ -105,6 +108,7 @@ func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
 		HardwareDirs: paths.NewPathList("downloaded_board_manager_stuff"),
 	}
 	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	tools := ctx.PackageManager.GetAllInstalledToolsReleases()
 	require.Equal(t, 3, len(tools))
@@ -128,6 +132,7 @@ func TestLoadLotsOfTools(t *testing.T) {
 		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
 	}
 	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	tools := ctx.PackageManager.GetAllInstalledToolsReleases()
 	require.Equal(t, 12, len(tools))

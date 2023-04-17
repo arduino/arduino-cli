@@ -104,14 +104,52 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	r.BoardPlatform = targetPlatform.ToRPCPlatformReference()
 	r.BuildPlatform = buildPlatform.ToRPCPlatformReference()
 
+	// Setup sign keys if requested
+	if req.KeysKeychain != "" {
+		buildProperties.Set("build.keys.keychain", req.GetKeysKeychain())
+	}
+	if req.SignKey != "" {
+		buildProperties.Set("build.keys.sign_key", req.GetSignKey())
+	}
+	if req.EncryptKey != "" {
+		buildProperties.Set("build.keys.encrypt_key", req.GetEncryptKey())
+	}
 	// At the current time we do not have a way of knowing if a board supports the secure boot or not,
 	// so, if the flags to override the default keys are used, we try override the corresponding platform property nonetheless.
 	// It's not possible to use the default name for the keys since there could be more tools to sign and encrypt.
 	// So it's mandatory to use all three flags to sign and encrypt the binary
-	securityKeysOverride := []string{}
-	if req.KeysKeychain != "" && req.SignKey != "" && req.EncryptKey != "" {
-		securityKeysOverride = append(securityKeysOverride, "build.keys.keychain="+req.KeysKeychain, "build.keys.sign_key="+req.GetSignKey(), "build.keys.encrypt_key="+req.EncryptKey)
+	keychainProp := buildProperties.ContainsKey("build.keys.keychain")
+	signProp := buildProperties.ContainsKey("build.keys.sign_key")
+	encryptProp := buildProperties.ContainsKey("build.keys.encrypt_key")
+	// we verify that all the properties for the secure boot keys are defined or none of them is defined.
+	if !(keychainProp == signProp && signProp == encryptProp) {
+		return nil, fmt.Errorf(tr("Firmware encryption/signing requires all the following properties to be defined: %s", "build.keys.keychain, build.keys.sign_key, build.keys.encrypt_key"))
 	}
+
+	// Generate or retrieve build path
+	var buildPath *paths.Path
+	if buildPathArg := req.GetBuildPath(); buildPathArg != "" {
+		buildPath = paths.New(req.GetBuildPath()).Canonical()
+		if in, err := buildPath.IsInsideDir(sk.FullPath); err != nil {
+			return nil, &arduino.NotFoundError{Message: tr("Cannot find build path"), Cause: err}
+		} else if in && buildPath.IsDir() {
+			if sk.AdditionalFiles, err = removeBuildFromSketchFiles(sk.AdditionalFiles, buildPath); err != nil {
+				return nil, err
+			}
+		}
+	}
+	if buildPath == nil {
+		buildPath = sk.DefaultBuildPath()
+	}
+	if err = buildPath.MkdirAll(); err != nil {
+		return nil, &arduino.PermissionDeniedError{Message: tr("Cannot create build directory"), Cause: err}
+	}
+	buildcache.New(buildPath.Parent()).GetOrCreate(buildPath.Base())
+	// cache is purged after compilation to not remove entries that might be required
+	defer maybePurgeBuildCache()
+
+	// Add build properites related to sketch data
+	buildProperties = builder.SetupBuildProperties(buildProperties, buildPath, sk, req.GetOptimizeForDebug())
 
 	requiredTools, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 	if err != nil {
@@ -124,59 +162,33 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		builderCtx.LibrariesManager = lm
 	}
 	builderCtx.TargetBoard = targetBoard
-	builderCtx.TargetBoardBuildProperties = buildProperties
 	builderCtx.TargetPlatform = targetPlatform
 	builderCtx.TargetPackage = targetPackage
 	builderCtx.ActualPlatform = buildPlatform
 	builderCtx.RequiredTools = requiredTools
+	builderCtx.BuildProperties = buildProperties
 	builderCtx.UseCachedLibrariesResolution = req.GetSkipLibrariesDiscovery()
 	builderCtx.FQBN = fqbn
 	builderCtx.Sketch = sk
+	builderCtx.BuildPath = buildPath
 	builderCtx.ProgressCB = progressCB
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.HardwareDirs = configuration.HardwareDirectories(configuration.Settings)
 	builderCtx.BuiltInToolsDirs = configuration.BuiltinToolsDirectories(configuration.Settings)
-
-	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
 	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
 	builderCtx.LibraryDirs = paths.NewPathList(req.Library...)
-	if req.GetBuildPath() == "" {
-		builderCtx.BuildPath = sk.DefaultBuildPath()
-	} else {
-		builderCtx.BuildPath = paths.New(req.GetBuildPath()).Canonical()
-		if in, err := builderCtx.BuildPath.IsInsideDir(sk.FullPath); err != nil {
-			return nil, &arduino.NotFoundError{Message: tr("Cannot find build path"), Cause: err}
-		} else if in && builderCtx.BuildPath.IsDir() {
-			if sk.AdditionalFiles, err = removeBuildFromSketchFiles(sk.AdditionalFiles, builderCtx.BuildPath); err != nil {
-				return nil, err
-			}
-		}
-	}
-	if err = builderCtx.BuildPath.MkdirAll(); err != nil {
-		return nil, &arduino.PermissionDeniedError{Message: tr("Cannot create build directory"), Cause: err}
-	}
-
-	buildcache.New(builderCtx.BuildPath.Parent()).GetOrCreate(builderCtx.BuildPath.Base())
-	// cache is purged after compilation to not remove entries that might be required
-	defer maybePurgeBuildCache()
 
 	builderCtx.CompilationDatabase = bldr.NewCompilationDatabase(
 		builderCtx.BuildPath.Join("compile_commands.json"),
 	)
 
 	builderCtx.Verbose = req.GetVerbose()
-
-	// Optimize for debug
-	builderCtx.OptimizeForDebug = req.GetOptimizeForDebug()
-
 	builderCtx.Jobs = int(req.GetJobs())
-
 	builderCtx.WarningsLevel = req.GetWarnings()
 
 	builderCtx.CustomBuildProperties = append(req.GetBuildProperties(), "build.warn_data_percentage=75")
-	builderCtx.CustomBuildProperties = append(req.GetBuildProperties(), securityKeysOverride...)
 
 	if req.GetBuildCachePath() == "" {
 		builderCtx.CoreBuildCachePath = paths.TempDir().Join("arduino", "cores")

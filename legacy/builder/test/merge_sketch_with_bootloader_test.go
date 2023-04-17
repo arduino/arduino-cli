@@ -30,10 +30,9 @@ import (
 
 func TestMergeSketchWithBootloader(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
-
+	buildPath := ctx.BuildPath
 	err := buildPath.Join("sketch").MkdirAll()
 	NoError(t, err)
 
@@ -90,10 +89,9 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 
 func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
-
+	buildPath := ctx.BuildPath
 	err := buildPath.Join("sketch").MkdirAll()
 	NoError(t, err)
 
@@ -151,10 +149,9 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 
 func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
-
+	buildPath := ctx.BuildPath
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 	}
@@ -185,10 +182,9 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 	}
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "my_avr_platform:avr:mymega:cpu=atmega2560")
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
-
+	buildPath := ctx.BuildPath
 	err := buildPath.Join("sketch").MkdirAll()
 	NoError(t, err)
 

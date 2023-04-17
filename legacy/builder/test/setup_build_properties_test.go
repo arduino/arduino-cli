@@ -31,12 +31,10 @@ func TestSetupBuildProperties(t *testing.T) {
 		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
 	}
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
-		&builder.SetupBuildProperties{},
 	}
 	for _, command := range commands {
 		err := command.Run(ctx)
@@ -88,13 +86,10 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 		CustomBuildProperties: []string{"name=fake name", "tools.avrdude.config.path=non existent path with space and a ="},
 	}
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
-		&builder.SetupBuildProperties{},
 		&builder.SetCustomBuildProperties{},
 	}
 
@@ -119,12 +114,10 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
 	}
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "my_avr_platform:avr:custom_yun")
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
-		&builder.SetupBuildProperties{},
 	}
 	for _, command := range commands {
 		err := command.Run(ctx)
@@ -147,8 +140,7 @@ func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testi
 		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
 	}
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "my_avr_platform:avr:custom_yun")
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},

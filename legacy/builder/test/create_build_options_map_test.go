@@ -22,6 +22,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
 )
 
@@ -34,7 +35,7 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 		FQBN:               parseFQBN(t, "my:nice:fqbn"),
 		Verbose:            true,
 		BuildPath:          paths.New("buildPath"),
-		OptimizationFlags:  "-Os",
+		BuildProperties:    properties.NewFromHashmap(map[string]string{"compiler.optimization_flags": "-Os"}),
 	}
 
 	create := builder.CreateBuildOptionsMap{}

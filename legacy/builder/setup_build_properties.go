@@ -16,46 +16,35 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
-	"github.com/pkg/errors"
 )
 
-type SetupBuildProperties struct{}
-
-func (s *SetupBuildProperties) Run(ctx *types.Context) error {
+func SetupBuildProperties(boardBuildProperties *properties.Map,
+	buildPath *paths.Path,
+	sketch *sketch.Sketch,
+	optimizeForDebug bool,
+) *properties.Map {
 	buildProperties := properties.NewMap()
-	buildProperties.Merge(ctx.TargetBoardBuildProperties)
+	buildProperties.Merge(boardBuildProperties)
 
-	if ctx.BuildPath != nil {
-		buildProperties.SetPath("build.path", ctx.BuildPath)
+	if buildPath != nil {
+		buildProperties.SetPath("build.path", buildPath)
 	}
-	if ctx.Sketch != nil {
-		buildProperties.Set("build.project_name", ctx.Sketch.MainFile.Base())
+	if sketch != nil {
+		buildProperties.Set("build.project_name", sketch.MainFile.Base())
+		buildProperties.SetPath("build.source.path", sketch.FullPath)
 	}
-
-	if ctx.OptimizeForDebug {
-		if buildProperties.ContainsKey("compiler.optimization_flags.debug") {
-			buildProperties.Set("compiler.optimization_flags", buildProperties.Get("compiler.optimization_flags.debug"))
+	if optimizeForDebug {
+		if debugFlags, ok := buildProperties.GetOk("compiler.optimization_flags.debug"); ok {
+			buildProperties.Set("compiler.optimization_flags", debugFlags)
 		}
 	} else {
-		if buildProperties.ContainsKey("compiler.optimization_flags.release") {
-			buildProperties.Set("compiler.optimization_flags", buildProperties.Get("compiler.optimization_flags.release"))
+		if releaseFlags, ok := buildProperties.GetOk("compiler.optimization_flags.release"); ok {
+			buildProperties.Set("compiler.optimization_flags", releaseFlags)
 		}
 	}
-	ctx.OptimizationFlags = buildProperties.Get("compiler.optimization_flags")
 
-	buildProperties.SetPath("build.source.path", ctx.Sketch.FullPath)
-
-	keychainProp := buildProperties.ContainsKey("build.keys.keychain")
-	signProp := buildProperties.ContainsKey("build.keys.sign_key")
-	encryptProp := buildProperties.ContainsKey("build.keys.encrypt_key")
-	// we verify that all the properties for the secure boot keys are defined or none of them is defined.
-	if (keychainProp || signProp || encryptProp) && !(keychainProp && signProp && encryptProp) {
-		return errors.Errorf("%s platform does not specify correctly default sign and encryption keys", ctx.TargetPlatform.Platform)
-	}
-
-	ctx.BuildProperties = buildProperties
-
-	return nil
+	return buildProperties
 }

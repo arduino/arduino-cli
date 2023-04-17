@@ -33,16 +33,29 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func cleanUpBuilderTestContext(t *testing.T, ctx *types.Context) {
+	if ctx.BuildPath != nil {
+		err := ctx.BuildPath.RemoveAll()
+		require.NoError(t, err)
+	}
+}
+
 func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *paths.Path, fqbn string) *types.Context {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	if ctx == nil {
-		ctx = &types.Context{
-			HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-			BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-			BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-			OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		}
+		ctx = &types.Context{}
+	}
+	if ctx.HardwareDirs.Len() == 0 {
+		ctx.HardwareDirs = paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware")
+		ctx.BuiltInToolsDirs = paths.NewPathList("downloaded_tools")
+		ctx.BuiltInLibrariesDirs = paths.New("downloaded_libraries")
+		ctx.OtherLibrariesDirs = paths.NewPathList("libraries")
+	}
+	if ctx.BuildPath == nil {
+		buildPath, err := paths.MkTempDir("", "test_build_path")
+		NoError(t, err)
+		ctx.BuildPath = buildPath
 	}
 
 	// Create a Package Manager from the given context
@@ -76,9 +89,10 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		requiredTools, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 		require.NoError(t, err)
 
+		buildProperties = builder.SetupBuildProperties(buildProperties, ctx.BuildPath, ctx.Sketch, false /*OptimizeForDebug*/)
 		ctx.PackageManager = pme
 		ctx.TargetBoard = targetBoard
-		ctx.TargetBoardBuildProperties = buildProperties
+		ctx.BuildProperties = buildProperties
 		ctx.TargetPlatform = targetPlatform
 		ctx.TargetPackage = targetPackage
 		ctx.ActualPlatform = buildPlatform
@@ -90,15 +104,14 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 
 func TestBuilderEmptySketch(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
 
+	buildPath := ctx.BuildPath
 	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
@@ -118,15 +131,14 @@ func TestBuilderEmptySketch(t *testing.T) {
 
 func TestBuilderBridge(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:avr:leonardo")
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
 
+	buildPath := ctx.BuildPath
 	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
@@ -149,15 +161,14 @@ func TestBuilderBridge(t *testing.T) {
 
 func TestBuilderSketchWithConfig(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch_with_config", "sketch_with_config.ino"), "arduino:avr:leonardo")
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
 
+	buildPath := ctx.BuildPath
 	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
@@ -180,9 +191,7 @@ func TestBuilderSketchWithConfig(t *testing.T) {
 
 func TestBuilderBridgeTwice(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:avr:leonardo")
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	// Run builder
 	command := builder.Builder{}
@@ -194,6 +203,7 @@ func TestBuilderBridgeTwice(t *testing.T) {
 	err = command.Run(ctx)
 	NoError(t, err)
 
+	buildPath := ctx.BuildPath
 	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
@@ -217,15 +227,14 @@ func TestBuilderBridgeTwice(t *testing.T) {
 func TestBuilderBridgeSAM(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:sam:arduino_due_x_dbg")
 	ctx.WarningsLevel = "all"
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
 
+	buildPath := ctx.BuildPath
 	exist, err := buildPath.Join(constants.FOLDER_CORE, "syscalls_sam3.c.o").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
@@ -265,15 +274,14 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 	}
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "RedBearLab:avr:blend")
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	// Run builder
 	command := builder.Builder{}
 	err := command.Run(ctx)
 	NoError(t, err)
 
+	buildPath := ctx.BuildPath
 	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
@@ -302,9 +310,7 @@ func TestBuilderSketchNoFunctions(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 	}
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch_no_functions", "sketch_no_functions.ino"), "RedBearLab:avr:blend")
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	// Run builder
 	command := builder.Builder{}
@@ -320,9 +326,7 @@ func TestBuilderSketchWithBackup(t *testing.T) {
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 	}
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch_with_backup_files", "sketch_with_backup_files.ino"), "arduino:avr:uno")
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	// Run builder
 	command := builder.Builder{}
@@ -332,9 +336,7 @@ func TestBuilderSketchWithBackup(t *testing.T) {
 
 func TestBuilderSketchWithOldLib(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch_with_old_lib", "sketch_with_old_lib.ino"), "arduino:avr:uno")
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	// Run builder
 	command := builder.Builder{}
@@ -345,9 +347,7 @@ func TestBuilderSketchWithOldLib(t *testing.T) {
 func TestBuilderSketchWithSubfolders(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch_with_subfolders", "sketch_with_subfolders.ino"), "arduino:avr:uno")
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	// Run builder
 	command := builder.Builder{}
@@ -357,10 +357,9 @@ func TestBuilderSketchWithSubfolders(t *testing.T) {
 
 func TestBuilderSketchBuildPathContainsUnusedPreviouslyCompiledLibrary(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:avr:leonardo")
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
-
+	buildPath := ctx.BuildPath
 	NoError(t, buildPath.Join("libraries", "SPI").MkdirAll())
 
 	// Run builder
@@ -377,12 +376,10 @@ func TestBuilderSketchBuildPathContainsUnusedPreviouslyCompiledLibrary(t *testin
 }
 
 func TestBuilderWithBuildPathInSketchDir(t *testing.T) {
-	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
-
-	var err error
-	ctx.BuildPath, err = paths.New("sketch1", "build").Abs()
+	buildPath, err := paths.New("sketch1", "build").Abs()
 	NoError(t, err)
-	defer ctx.BuildPath.RemoveAll()
+	ctx := prepareBuilderTestContext(t, &types.Context{BuildPath: buildPath}, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	// Run build
 	command := builder.Builder{}
@@ -397,9 +394,8 @@ func TestBuilderWithBuildPathInSketchDir(t *testing.T) {
 
 func TestBuilderCacheCoreAFile(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	SetupBuildPath(t, ctx)
-	defer ctx.BuildPath.RemoveAll()
 	SetupBuildCachePath(t, ctx)
 	defer ctx.CoreBuildCachePath.RemoveAll()
 
@@ -410,7 +406,7 @@ func TestBuilderCacheCoreAFile(t *testing.T) {
 
 	// Pick timestamp of cached core
 	coreFolder := paths.New("downloaded_hardware", "arduino", "avr")
-	coreFileName := phases.GetCachedCoreArchiveDirName(ctx.FQBN.String(), ctx.OptimizationFlags, coreFolder)
+	coreFileName := phases.GetCachedCoreArchiveDirName(ctx.FQBN.String(), ctx.BuildProperties.Get("compiler.optimization_flags"), coreFolder)
 	cachedCoreFile := ctx.CoreBuildCachePath.Join(coreFileName, "core.a")
 	coreStatBefore, err := cachedCoreFile.Stat()
 	require.NoError(t, err)

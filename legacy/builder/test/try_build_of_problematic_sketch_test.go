@@ -218,9 +218,7 @@ func tryBuild(t *testing.T, sketchLocation *paths.Path) {
 
 func tryBuildWithContext(t *testing.T, ctx *types.Context, fqbn string, sketchLocation *paths.Path) {
 	ctx = prepareBuilderTestContext(t, ctx, sketchLocation, fqbn)
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	err := builder.RunBuilder(ctx)
 	NoError(t, err, "Build error for "+sketchLocation.String())
@@ -232,9 +230,7 @@ func tryPreprocess(t *testing.T, sketchLocation *paths.Path) {
 
 func tryPreprocessWithContext(t *testing.T, ctx *types.Context, fqbn string, sketchLocation *paths.Path) {
 	ctx = prepareBuilderTestContext(t, ctx, sketchLocation, fqbn)
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	err := builder.RunPreprocess(ctx)
 	NoError(t, err, "Build error for "+sketchLocation.String())

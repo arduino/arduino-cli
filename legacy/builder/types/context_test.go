@@ -21,6 +21,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
 )
 
@@ -37,7 +38,7 @@ func TestInjectBuildOption(t *testing.T) {
 			Sketch:                &sketch.Sketch{FullPath: paths.New("hhh")},
 			FQBN:                  fqbn,
 			CustomBuildProperties: []string{"jjj", "kkk"},
-			OptimizationFlags:     "lll",
+			BuildProperties:       properties.NewFromHashmap(map[string]string{"compiler.optimization_flags": "lll"}),
 		}
 		opts := ctx.ExtractBuildOptions()
 		require.Equal(t, `properties.Map{

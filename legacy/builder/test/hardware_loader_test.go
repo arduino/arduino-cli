@@ -35,6 +35,7 @@ func TestLoadHardware(t *testing.T) {
 		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware")),
 	}
 	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	packages := ctx.PackageManager.GetPackages()
 	require.Equal(t, 1, len(packages))
@@ -66,6 +67,7 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware"), "user_hardware"),
 	}
 	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
@@ -133,6 +135,7 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 		HardwareDirs: paths.NewPathList("downloaded_board_manager_stuff"),
 	}
 	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	packages := ctx.PackageManager.GetPackages()
 	require.Equal(t, 3, len(packages))
@@ -173,6 +176,7 @@ func TestLoadLotsOfHardware(t *testing.T) {
 		HardwareDirs: paths.NewPathList("downloaded_board_manager_stuff", "downloaded_hardware", filepath.Join("..", "hardware"), "user_hardware"),
 	}
 	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	packages := ctx.PackageManager.GetPackages()
 

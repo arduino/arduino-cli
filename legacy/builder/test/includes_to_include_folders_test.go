@@ -28,10 +28,8 @@ import (
 
 func TestIncludesToIncludeFolders(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:avr:leonardo")
+	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -50,10 +48,8 @@ func TestIncludesToIncludeFolders(t *testing.T) {
 
 func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("SketchWithIfDef", "SketchWithIfDef.ino"), "arduino:avr:leonardo")
+	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -71,10 +67,8 @@ func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
 
 func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch9", "sketch9.ino"), "arduino:avr:leonardo")
+	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -95,10 +89,8 @@ func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 
 func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch10", "sketch10.ino"), "arduino:avr:leonardo")
+	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -125,9 +117,7 @@ func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 		Verbose:              true,
 	}
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino"), "my_avr_platform:avr:custom_yun")
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -155,9 +145,7 @@ func TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatfo
 		Verbose:              true,
 	}
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("user_hardware", "my_avr_platform", "avr", "libraries", "SPI", "examples", "BarometricPressureSensor", "BarometricPressureSensor.ino"), "my_avr_platform:avr:custom_yun")
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -185,9 +173,7 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 		Verbose:              true,
 	}
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch_usbhost", "sketch_usbhost.ino"), "arduino:samd:arduino_zero_native")
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
@@ -208,10 +194,8 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 
 func TestIncludesToIncludeFoldersSubfolders(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch_with_subfolders", "sketch_with_subfolders.ino"), "arduino:avr:leonardo")
+	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
