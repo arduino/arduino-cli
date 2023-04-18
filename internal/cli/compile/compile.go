@@ -330,6 +330,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		ProfileOut:         profileOut,
 		Success:            compileError == nil,
 		showPropertiesMode: showProperties,
+		hideStats:          preprocess,
 	}
 
 	if compileError != nil {
@@ -394,6 +395,7 @@ type compileResult struct {
 	Error         string               `json:"error,omitempty"`
 
 	showPropertiesMode arguments.ShowPropertiesMode
+	hideStats          bool
 }
 
 func (r *compileResult) Data() interface{} {
@@ -403,6 +405,10 @@ func (r *compileResult) Data() interface{} {
 func (r *compileResult) String() string {
 	if r.showPropertiesMode != arguments.ShowPropertiesDisabled {
 		return strings.Join(r.BuilderResult.GetBuildProperties(), fmt.Sprintln())
+	}
+
+	if r.hideStats {
+		return ""
 	}
 
 	titleColor := color.New(color.FgHiGreen)
