@@ -25,6 +25,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -71,6 +72,7 @@ func TestCompile(t *testing.T) {
 		{"WithInvalidBuildOptionJson", compileWithInvalidBuildOptionJson},
 		{"WithRelativeBuildPath", compileWithRelativeBuildPath},
 		{"WithFakeSecureBootCore", compileWithFakeSecureBootCore},
+		{"PreprocessFlagDoNotMessUpWithOutput", preprocessFlagDoNotMessUpWithOutput},
 	}.Run(t, env, cli)
 }
 
@@ -1161,4 +1163,45 @@ func compileWithFakeSecureBootCore(t *testing.T, env *integrationtest.Environmen
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "my-sign-key.pem")
 	require.Contains(t, string(stdout), "my-encrypt-key.pem")
+}
+
+func preprocessFlagDoNotMessUpWithOutput(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// https://github.com/arduino/arduino-cli/issues/2150
+
+	// go test -v ./internal/integrationtest/compile_1 --run=TestCompile$/PreprocessFlagDoNotMessUpWithOutput
+
+	sketchPath := cli.SketchbookDir().Join("SketchSimple")
+	defer sketchPath.RemoveAll()
+	fqbn := "arduino:avr:uno"
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	expected := `#include <Arduino.h>
+#line 1 %SKETCH_PATH%
+
+#line 2 %SKETCH_PATH%
+void setup();
+#line 5 %SKETCH_PATH%
+void loop();
+#line 2 %SKETCH_PATH%
+void setup() {
+}
+
+void loop() {
+}
+
+`
+	expected = strings.ReplaceAll(expected, "%SKETCH_PATH%", builder.QuoteCppString(sketchPath.Join("SketchSimple.ino").String()))
+
+	jsonOut, _, err := cli.Run("compile", "-b", fqbn, "--preprocess", sketchPath.String(), "--format", "json")
+	require.NoError(t, err)
+	var ex struct {
+		CompilerOut string `json:"compiler_out"`
+	}
+	require.NoError(t, json.Unmarshal(jsonOut, &ex))
+	require.Equal(t, expected, ex.CompilerOut)
+
+	output, _, err := cli.Run("compile", "-b", fqbn, "--preprocess", sketchPath.String())
+	require.NoError(t, err)
+	require.Equal(t, expected, string(output))
 }
