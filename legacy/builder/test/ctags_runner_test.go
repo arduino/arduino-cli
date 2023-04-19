@@ -16,7 +16,6 @@
 package test
 
 import (
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -27,37 +26,20 @@ import (
 )
 
 func TestCTagsRunner(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	sketchLocation := Abs(t, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"))
-
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, sketchLocation),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		Verbose:              true,
-	}
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
+	defer cleanUpBuilderTestContext(t, ctx)
+	ctx.Verbose = true
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
 		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"},
 		&builder.CTagsRunner{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -76,37 +58,20 @@ func TestCTagsRunner(t *testing.T) {
 }
 
 func TestCTagsRunnerSketchWithClass(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	sketchLocation := Abs(t, paths.New("sketch_with_class", "sketch_with_class.ino"))
-
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, sketchLocation),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		Verbose:              true,
-	}
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
+	defer cleanUpBuilderTestContext(t, ctx)
+	ctx.Verbose = true
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
 		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"},
 		&builder.CTagsRunner{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -118,42 +83,24 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 		"set_values\t" + quotedSketchLocation + "\t/^void Rectangle::set_values (int x, int y) {$/;\"\tkind:function\tline:8\tclass:Rectangle\tsignature:(int x, int y)\treturntype:void\n" +
 		"setup\t" + quotedSketchLocation + "\t/^void setup() {$/;\"\tkind:function\tline:13\tsignature:()\treturntype:void\n" +
 		"loop\t" + quotedSketchLocation + "\t/^void loop() {$/;\"\tkind:function\tline:17\tsignature:()\treturntype:void\n"
-
 	require.Equal(t, expectedOutput, strings.Replace(ctx.CTagsOutput, "\r\n", "\n", -1))
 }
 
 func TestCTagsRunnerSketchWithTypename(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	sketchLocation := Abs(t, paths.New("sketch_with_typename", "sketch_with_typename.ino"))
-
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, sketchLocation),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		Verbose:              true,
-	}
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
+	defer cleanUpBuilderTestContext(t, ctx)
+	ctx.Verbose = true
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
 		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"},
 		&builder.CTagsRunner{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -164,42 +111,24 @@ func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 		"setup\t" + quotedSketchLocation + "\t/^void setup() {$/;\"\tkind:function\tline:6\tsignature:()\treturntype:void\n" +
 		"loop\t" + quotedSketchLocation + "\t/^void loop() {}$/;\"\tkind:function\tline:10\tsignature:()\treturntype:void\n" +
 		"func\t" + quotedSketchLocation + "\t/^typename Foo<char>::Bar func(){$/;\"\tkind:function\tline:12\tsignature:()\treturntype:Foo::Bar\n"
-
 	require.Equal(t, expectedOutput, strings.Replace(ctx.CTagsOutput, "\r\n", "\n", -1))
 }
 
 func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	sketchLocation := Abs(t, paths.New("sketch_with_namespace", "sketch_with_namespace.ino"))
-
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, sketchLocation),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		Verbose:              true,
-	}
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
+	defer cleanUpBuilderTestContext(t, ctx)
+	ctx.Verbose = true
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
 		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"},
 		&builder.CTagsRunner{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -209,42 +138,24 @@ func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	expectedOutput := "value\t" + quotedSketchLocation + "\t/^\tint value() {$/;\"\tkind:function\tline:2\tnamespace:Test\tsignature:()\treturntype:int\n" +
 		"setup\t" + quotedSketchLocation + "\t/^void setup() {}$/;\"\tkind:function\tline:7\tsignature:()\treturntype:void\n" +
 		"loop\t" + quotedSketchLocation + "\t/^void loop() {}$/;\"\tkind:function\tline:8\tsignature:()\treturntype:void\n"
-
 	require.Equal(t, expectedOutput, strings.Replace(ctx.CTagsOutput, "\r\n", "\n", -1))
 }
 
 func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	sketchLocation := Abs(t, paths.New("sketch_with_templates_and_shift", "sketch_with_templates_and_shift.ino"))
-
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Sketch:               OpenSketch(t, sketchLocation),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
-		Verbose:              true,
-	}
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
+	defer cleanUpBuilderTestContext(t, ctx)
+	ctx.Verbose = true
 
 	commands := []types.Command{
-
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&builder.ContainerMergeCopySketchFiles{},
-
 		&builder.ContainerFindIncludes{},
-
 		&builder.PrintUsedLibrariesIfVerbose{},
 		&builder.WarnAboutArchIncompatibleLibraries{},
 		&builder.CTagsTargetFileSaver{Source: &ctx.Source, TargetFileName: "ctags_target.cpp"},
 		&builder.CTagsRunner{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -255,6 +166,5 @@ func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 		"bVar\t" + quotedSketchLocation + "\t/^c< 8 > bVar;$/;\"\tkind:variable\tline:15\n" +
 		"aVar\t" + quotedSketchLocation + "\t/^c< 1<<8 > aVar;$/;\"\tkind:variable\tline:16\n" +
 		"func\t" + quotedSketchLocation + "\t/^template<int X> func( c< 1<<X> & aParam) {$/;\"\tkind:function\tline:18\tsignature:( c< 1<<X> & aParam)\treturntype:template\n"
-
 	require.Equal(t, expectedOutput, strings.Replace(ctx.CTagsOutput, "\r\n", "\n", -1))
 }

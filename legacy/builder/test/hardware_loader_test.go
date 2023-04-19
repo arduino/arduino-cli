@@ -34,17 +34,10 @@ func TestLoadHardware(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware")),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	commands := []types.Command{
-		&builder.HardwareLoader{},
-	}
-
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-
-	packages := ctx.Hardware
+	packages := ctx.PackageManager.GetPackages()
 	require.Equal(t, 1, len(packages))
 	require.NotNil(t, packages["arduino"])
 	require.Equal(t, 2, len(packages["arduino"].Platforms))
@@ -67,29 +60,24 @@ func TestLoadHardware(t *testing.T) {
 	require.Equal(t, "/my/personal/avrdude", avrPlatform.Releases["1.6.10"].Properties.Get("tools.avrdude.cmd.path"))
 
 	require.Equal(t, "AVRISP mkII", avrPlatform.Releases["1.6.10"].Programmers["avrispmkii"].Name)
-
-	//require.Equal(t, "{runtime.tools.ctags.path}", packages.Properties.Get("tools.ctags.path"])
-	//require.Equal(t, "\"{cmd.path}\" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns --line-directives \"{source_file}\"", packages.Properties.Get("tools.ctags.pattern"])
-	//require.Equal(t, "{runtime.tools.avrdude.path}", packages.Properties.Get("tools.avrdude.path"])
-	//require.Equal(t, "-w -x c++ -E -CC", packages.Properties.Get("preproc.macros.flags"])
 }
 
 func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware"), "user_hardware"),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
-		&builder.HardwareLoader{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
 
-	packages := ctx.Hardware
+	packages := ctx.PackageManager.GetPackages()
 
 	if runtime.GOOS == "windows" {
 		//a package is a symlink, and windows does not support them
@@ -146,17 +134,10 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList("downloaded_board_manager_stuff"),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	commands := []types.Command{
-		&builder.HardwareLoader{},
-	}
-
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-
-	packages := ctx.Hardware
+	packages := ctx.PackageManager.GetPackages()
 	require.Equal(t, 3, len(packages))
 	require.NotNil(t, packages["arduino"])
 	require.Equal(t, 1, len(packages["arduino"].Platforms))
@@ -194,17 +175,10 @@ func TestLoadLotsOfHardware(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList("downloaded_board_manager_stuff", "downloaded_hardware", filepath.Join("..", "hardware"), "user_hardware"),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	commands := []types.Command{
-		&builder.HardwareLoader{},
-	}
-
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-
-	packages := ctx.Hardware
+	packages := ctx.PackageManager.GetPackages()
 
 	if runtime.GOOS == "windows" {
 		//a package is a symlink, and windows does not support them

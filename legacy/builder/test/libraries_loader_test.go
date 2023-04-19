@@ -39,22 +39,18 @@ func extractLibraries(ctx *types.Context) []*libraries.Library {
 }
 
 func TestLoadLibrariesAVR(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
 		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, nil, "arduino:avr:leonardo")
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
-		&builder.HardwareLoader{},
-		&builder.TargetBoardResolver{},
 		&builder.LibrariesLoader{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -149,22 +145,18 @@ func TestLoadLibrariesAVR(t *testing.T) {
 }
 
 func TestLoadLibrariesSAM(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
 		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		FQBN:                 parseFQBN(t, "arduino:sam:arduino_due_x_dbg"),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, nil, "arduino:sam:arduino_due_x_dbg")
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
-		&builder.HardwareLoader{},
-		&builder.TargetBoardResolver{},
 		&builder.LibrariesLoader{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -232,22 +224,18 @@ func TestLoadLibrariesSAM(t *testing.T) {
 }
 
 func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
 		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries", filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")),
-		FQBN:                 parseFQBN(t, "arduino:avr:leonardo"),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, nil, "arduino:avr:leonardo")
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
-		&builder.HardwareLoader{},
-		&builder.TargetBoardResolver{},
 		&builder.LibrariesLoader{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -261,22 +249,18 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 }
 
 func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "user_hardware", "downloaded_hardware"),
 		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries", filepath.Join("downloaded_hardware", "arduino", "avr", "libraries")),
-		FQBN:                 parseFQBN(t, "my_avr_platform:avr:custom_yun"),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, nil, "my_avr_platform:avr:custom_yun")
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
-		&builder.HardwareLoader{},
-		&builder.TargetBoardResolver{},
 		&builder.LibrariesLoader{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)

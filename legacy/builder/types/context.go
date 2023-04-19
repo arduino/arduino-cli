@@ -78,15 +78,12 @@ type Context struct {
 	BuildOptionsJson         string
 	BuildOptionsJsonPrevious string
 
-	PackageManager             *packagemanager.Explorer
-	Hardware                   cores.Packages
-	AllTools                   []*cores.ToolRelease
-	RequiredTools              []*cores.ToolRelease
-	TargetBoard                *cores.Board
-	TargetBoardBuildProperties *properties.Map
-	TargetPackage              *cores.Package
-	TargetPlatform             *cores.PlatformRelease
-	ActualPlatform             *cores.PlatformRelease
+	PackageManager *packagemanager.Explorer
+	RequiredTools  []*cores.ToolRelease
+	TargetBoard    *cores.Board
+	TargetPackage  *cores.Package
+	TargetPlatform *cores.PlatformRelease
+	ActualPlatform *cores.PlatformRelease
 
 	BuildProperties              *properties.Map
 	BuildPath                    *paths.Path
@@ -130,16 +127,12 @@ type Context struct {
 	Verbose           bool
 	DebugPreprocessor bool
 
-	// Compile optimization settings
-	OptimizeForDebug  bool
-	OptimizationFlags string
-
 	// Dry run, only create progress map
 	Progress ProgressStruct
 	// Send progress events to this callback
 	ProgressCB rpc.TaskProgressCB
 
-	// Contents of a custom build properties file (line by line)
+	// Custom build properties defined by user (line by line as "key=value" pairs)
 	CustomBuildProperties []string
 
 	// Reuse old tools since the backing storage didn't change
@@ -214,7 +207,7 @@ func (ctx *Context) ExtractBuildOptions() *properties.Map {
 	opts.Set("fqbn", ctx.FQBN.String())
 	opts.Set("customBuildProperties", strings.Join(ctx.CustomBuildProperties, ","))
 	opts.Set("additionalFiles", strings.Join(additionalFilesRelative, ","))
-	opts.Set("compiler.optimization_flags", ctx.OptimizationFlags)
+	opts.Set("compiler.optimization_flags", ctx.BuildProperties.Get("compiler.optimization_flags"))
 	return opts
 }
 

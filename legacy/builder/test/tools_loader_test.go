@@ -16,12 +16,12 @@
 package test
 
 import (
+	"path/filepath"
 	"sort"
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -62,15 +62,14 @@ func requireEquivalentPaths(t *testing.T, actual string, expected ...string) {
 }
 
 func TestLoadTools(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	ctx := &types.Context{
+		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
 		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	NoError(t, (&builder.HardwareLoader{}).Run(ctx))
-
-	tools := ctx.AllTools
+	tools := ctx.PackageManager.GetAllInstalledToolsReleases()
 	require.Equal(t, 9, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
@@ -105,14 +104,13 @@ func TestLoadTools(t *testing.T) {
 }
 
 func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList("downloaded_board_manager_stuff"),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	NoError(t, (&builder.HardwareLoader{}).Run(ctx))
-
-	tools := ctx.AllTools
+	tools := ctx.PackageManager.GetAllInstalledToolsReleases()
 	require.Equal(t, 3, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
@@ -129,16 +127,14 @@ func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
 }
 
 func TestLoadLotsOfTools(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	ctx := &types.Context{
 		HardwareDirs:     paths.NewPathList("downloaded_board_manager_stuff"),
 		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
 	}
+	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	defer cleanUpBuilderTestContext(t, ctx)
 
-	NoError(t, (&builder.HardwareLoader{}).Run(ctx))
-
-	tools := ctx.AllTools
+	tools := ctx.PackageManager.GetAllInstalledToolsReleases()
 	require.Equal(t, 12, len(tools))
 
 	sort.Sort(ByToolIDAndVersion(tools))
@@ -193,7 +189,5 @@ func TestAllToolsContextIsPopulated(t *testing.T) {
 		PackageManager: pme,
 	}
 
-	hl := &builder.HardwareLoader{}
-	require.NoError(t, hl.Run(ctx))
-	require.NotEmpty(t, ctx.AllTools)
+	require.NotEmpty(t, ctx.PackageManager.GetAllInstalledToolsReleases())
 }

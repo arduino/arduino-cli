@@ -22,29 +22,21 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
 )
 
 func TestSetupBuildProperties(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	ctx := &types.Context{
 		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
 		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
-		Sketch:           OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
-		FQBN:             parseFQBN(t, "arduino:avr:uno"),
 	}
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
-		&builder.HardwareLoader{},
-		&builder.TargetBoardResolver{},
-		&builder.SetupBuildProperties{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -89,37 +81,19 @@ func TestSetupBuildProperties(t *testing.T) {
 }
 
 func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	ctx := &types.Context{
-		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
-		Sketch:           OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
-		FQBN:             parseFQBN(t, "arduino:avr:uno"),
-
+		HardwareDirs:          paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
+		BuiltInToolsDirs:      paths.NewPathList("downloaded_tools", "tools_builtin"),
 		CustomBuildProperties: []string{"name=fake name", "tools.avrdude.config.path=non existent path with space and a ="},
 	}
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
-
-	commands := []types.Command{
-		&builder.AddAdditionalEntriesToContext{},
-		&builder.HardwareLoader{},
-		&builder.TargetBoardResolver{},
-		&builder.SetupBuildProperties{},
-		&builder.SetCustomBuildProperties{},
-	}
-
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
+	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
+	defer cleanUpBuilderTestContext(t, ctx)
+	customProps, err := properties.LoadFromSlice(ctx.CustomBuildProperties)
+	NoError(t, err)
+	ctx.BuildProperties.Merge(customProps)
 
 	buildProperties := ctx.BuildProperties
-
 	require.Equal(t, "ARDUINO", buildProperties.Get("software"))
-
 	require.Equal(t, "uno", buildProperties.Get("_id"))
 	require.Equal(t, "fake name", buildProperties.Get("name"))
 	require.Equal(t, "\"{compiler.path}{compiler.c.cmd}\" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} \"{source_file}\" -o \"{object_file}\"", buildProperties.Get("recipe.c.o.pattern"))
@@ -127,25 +101,16 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 }
 
 func TestSetupBuildPropertiesUserHardware(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	ctx := &types.Context{
 		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
 		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
-		Sketch:           OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
-		FQBN:             parseFQBN(t, "my_avr_platform:avr:custom_yun"),
 	}
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "my_avr_platform:avr:custom_yun")
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
 		&builder.AddAdditionalEntriesToContext{},
-		&builder.HardwareLoader{},
-		&builder.TargetBoardResolver{},
-		&builder.SetupBuildProperties{},
 	}
-
 	for _, command := range commands {
 		err := command.Run(ctx)
 		NoError(t, err)
@@ -162,17 +127,12 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 }
 
 func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-
 	ctx := &types.Context{
 		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
 		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
-		Sketch:           OpenSketch(t, paths.New("sketch1", "sketch1.ino")),
-		FQBN:             parseFQBN(t, "my_avr_platform:avr:custom_yun"),
 	}
-
-	buildPath := SetupBuildPath(t, ctx)
-	defer buildPath.RemoveAll()
+	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "my_avr_platform:avr:custom_yun")
+	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},

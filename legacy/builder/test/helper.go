@@ -23,8 +23,8 @@ import (
 	"testing"
 	"text/template"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
@@ -77,10 +77,10 @@ func SetupBuildCachePath(t *testing.T, ctx *types.Context) *paths.Path {
 	return buildCachePath
 }
 
-func OpenSketch(t *testing.T, sketchPath *paths.Path) *sketch.Sketch {
-	sketch, err := sketch.New(sketchPath)
+func parseFQBN(t *testing.T, fqbnIn string) *cores.FQBN {
+	fqbn, err := cores.ParseFQBN(fqbnIn)
 	require.NoError(t, err)
-	return sketch
+	return fqbn
 }
 
 type ByLibraryName []*libraries.Library

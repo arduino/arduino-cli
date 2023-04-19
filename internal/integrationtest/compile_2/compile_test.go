@@ -163,13 +163,10 @@ func TestCompileManuallyInstalledPlatformUsingBoardsLocalTxt(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
 
-	_, _, err := cli.Run("update")
-	require.NoError(t, err)
-
 	sketchName := "CompileSketchManuallyInstalledPlatformUsingBoardsLocalTxt"
 	sketchPath := cli.SketchbookDir().Join(sketchName)
 	fqbn := "arduino-beta-development:avr:nessuno"
-	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
 	require.NoError(t, err)
 
 	// Manually installs a core in sketchbooks hardware folder
@@ -188,7 +185,7 @@ func TestCompileManuallyInstalledPlatformUsingBoardsLocalTxt(t *testing.T) {
 	// Verifies compilation fails because board doesn't exist
 	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "Error during build: Error resolving FQBN: board arduino-beta-development:avr:nessuno not found")
+	require.Contains(t, string(stderr), "Error during build: Invalid FQBN: board arduino-beta-development:avr:nessuno not found")
 
 	// Use custom boards.local.txt with made arduino:avr:nessuno board
 	boardsLocalTxt := repoDir.Join("boards.local.txt")

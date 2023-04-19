@@ -33,43 +33,42 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	timeoutArg arguments.DiscoveryTimeout
-	watch      bool
-)
-
 func initListCommand() *cobra.Command {
+	var timeoutArg arguments.DiscoveryTimeout
+	var watch bool
+	var fqbn arguments.Fqbn
 	listCommand := &cobra.Command{
 		Use:     "list",
 		Short:   tr("List connected boards."),
 		Long:    tr("Detects and displays a list of boards connected to the current computer."),
 		Example: "  " + os.Args[0] + " board list --discovery-timeout 10s",
 		Args:    cobra.NoArgs,
-		Run:     runListCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runListCommand(watch, timeoutArg.Get().Milliseconds(), fqbn.String())
+		},
 	}
 
 	timeoutArg.AddToCommand(listCommand)
 	fqbn.AddToCommand(listCommand)
 	listCommand.Flags().BoolVarP(&watch, "watch", "w", false, tr("Command keeps running and prints list of connected boards whenever there is a change."))
-
 	return listCommand
 }
 
 // runListCommand detects and lists the connected arduino boards
-func runListCommand(cmd *cobra.Command, args []string) {
+func runListCommand(watch bool, timeout int64, fqbn string) {
 	inst := instance.CreateAndInit()
 
 	logrus.Info("Executing `arduino-cli board list`")
 
 	if watch {
-		watchList(cmd, inst)
+		watchList(inst)
 		return
 	}
 
 	ports, discoveryErrors, err := board.List(&rpc.BoardListRequest{
 		Instance: inst,
-		Timeout:  timeoutArg.Get().Milliseconds(),
-		Fqbn:     fqbn.String(),
+		Timeout:  timeout,
+		Fqbn:     fqbn,
 	})
 	var invalidFQBNErr *arduino.InvalidFQBNError
 	if errors.As(err, &invalidFQBNErr) {
@@ -84,7 +83,7 @@ func runListCommand(cmd *cobra.Command, args []string) {
 	feedback.PrintResult(result{ports})
 }
 
-func watchList(cmd *cobra.Command, inst *rpc.Instance) {
+func watchList(inst *rpc.Instance) {
 	eventsChan, closeCB, err := board.Watch(&rpc.BoardListWatchRequest{Instance: inst})
 	if err != nil {
 		feedback.Fatal(tr("Error detecting boards: %v", err), feedback.ErrNetwork)
