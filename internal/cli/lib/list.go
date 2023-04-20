@@ -67,12 +67,7 @@ func List(instance *rpc.Instance, args []string, all bool, updatable bool) {
 }
 
 // GetList returns a list of installed libraries.
-func GetList(
-	instance *rpc.Instance,
-	args []string,
-	all bool,
-	updatable bool,
-) []*rpc.InstalledLibrary {
+func GetList(instance *rpc.Instance, args []string, all bool, updatable bool) []*rpc.InstalledLibrary {
 	name := ""
 	if len(args) > 0 {
 		name = args[0]

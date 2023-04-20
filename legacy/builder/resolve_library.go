@@ -34,7 +34,7 @@ func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {
 		ctx.Info(fmt.Sprintf("  -> %s: %s", tr("candidates"), candidates))
 	}
 
-	if candidates == nil || len(candidates) == 0 {
+	if len(candidates) == 0 {
 		return nil
 	}
 
