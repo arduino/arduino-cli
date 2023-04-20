@@ -183,10 +183,21 @@ func (library *Library) IsArchitectureIndependent() bool {
 }
 
 // IsCompatibleWith returns true if the library declares compatibility with
-// the given architecture. If this function returns false, the library may still
-// be compatible with the given architecture, but it's not explicitly declared.
-func (library *Library) IsCompatibleWith(arch string) bool {
-	return library.IsArchitectureIndependent() || library.IsOptimizedForArchitecture(arch)
+// the given FQBN. If this function returns false, the library may still
+// be compatible with the given FQBN, but it's not explicitly declared.
+func (library *Library) IsCompatibleWith(fqbn *cores.FQBN) bool {
+	// If the library does not specify compatibility use "architecture" field
+	if len(library.SupportedFQBN) == 0 {
+		return library.IsArchitectureIndependent() || library.IsOptimizedForArchitecture(fqbn.PlatformArch)
+	}
+
+	// otherwise check if the given FQBN is supported
+	for _, supported := range library.SupportedFQBN {
+		if supported.Match(fqbn) {
+			return true
+		}
+	}
+	return false
 }
 
 // SourceDir represents a source dir of a library

@@ -118,12 +118,12 @@ func (resolver *Cpp) AlternativesFor(header string) libraries.List {
 
 // ResolveFor finds the most suitable library for the specified combination of
 // header and architecture. If no libraries provides the requested header, nil is returned
-func (resolver *Cpp) ResolveFor(header, architecture string) *libraries.Library {
-	logrus.Infof("Resolving include %s for arch %s", header, architecture)
+func (resolver *Cpp) ResolveFor(header string, fqbn *cores.FQBN) *libraries.Library {
+	logrus.Infof("Resolving include %s for %s", header, fqbn)
 	var found libraries.List
 	var foundPriority int
 	for _, lib := range resolver.headers[header] {
-		libPriority := ComputePriority(lib, header, architecture)
+		libPriority := ComputePriority(lib, header, fqbn)
 		msg := "  discarded"
 		if found == nil || foundPriority < libPriority {
 			found = libraries.List{}
@@ -167,7 +167,7 @@ func simplify(name string) string {
 // ComputePriority returns an integer value representing the priority of the library
 // for the specified header and architecture. The higher the value, the higher the
 // priority.
-func ComputePriority(lib *libraries.Library, header, arch string) int {
+func ComputePriority(lib *libraries.Library, header string, fqbn *cores.FQBN) int {
 	header = strings.TrimSuffix(header, filepath.Ext(header))
 	header = simplify(header)
 	name := simplify(lib.Name)
@@ -175,8 +175,15 @@ func ComputePriority(lib *libraries.Library, header, arch string) int {
 
 	priority := 0
 
-	// Bonus for core-optimized libraries
-	if lib.IsOptimizedForArchitecture(arch) {
+	if lib.IsCompatibleWith(fqbn) {
+		// Bonus for board-optimized libraries
+
+		// give a bonus for libraries that declares specific compatibliity with a board.
+		// (it is more important than Location but less important than Name)
+		priority += 1020
+	} else if lib.IsOptimizedForArchitecture(fqbn.PlatformArch) {
+		// Bonus for core-optimized libraries
+
 		// give a slightly better bonus for libraries that have specific optimization
 		// (it is more important than Location but less important than Name)
 		priority += 1010

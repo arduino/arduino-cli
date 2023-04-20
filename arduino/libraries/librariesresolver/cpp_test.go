@@ -18,6 +18,7 @@ package librariesresolver
 import (
 	"testing"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/stretchr/testify/require"
 )
@@ -31,12 +32,17 @@ var l6 = &libraries.Library{Name: "Calculus Unified Lib", Location: libraries.Us
 var l7 = &libraries.Library{Name: "AnotherLib", Location: libraries.User}
 var bundleServo = &libraries.Library{Name: "Servo", Location: libraries.IDEBuiltIn, Architectures: []string{"avr", "sam", "samd"}}
 
+func mustParseFQBN(fqbn string) *cores.FQBN {
+	res, _ := cores.ParseFQBN(fqbn)
+	return res
+}
+
 func runResolver(include string, arch string, libs ...*libraries.Library) *libraries.Library {
 	libraryList := libraries.List{}
 	libraryList.Add(libs...)
 	resolver := NewCppResolver()
 	resolver.headers[include] = libraryList
-	return resolver.ResolveFor(include, arch)
+	return resolver.ResolveFor(include, mustParseFQBN("x:"+arch+":y"))
 }
 
 func TestArchitecturePriority(t *testing.T) {
@@ -96,19 +102,19 @@ func TestClosestMatchWithTotallyDifferentNames(t *testing.T) {
 	libraryList.Add(l7)
 	resolver := NewCppResolver()
 	resolver.headers["XYZ.h"] = libraryList
-	res := resolver.ResolveFor("XYZ.h", "xyz")
+	res := resolver.ResolveFor("XYZ.h", mustParseFQBN("arduino:xyz:uno"))
 	require.NotNil(t, res)
 	require.Equal(t, l7, res, "selected library")
 }
 
 func TestCppHeaderPriority(t *testing.T) {
-	r1 := ComputePriority(l1, "calculus_lib.h", "avr")
-	r2 := ComputePriority(l2, "calculus_lib.h", "avr")
-	r3 := ComputePriority(l3, "calculus_lib.h", "avr")
-	r4 := ComputePriority(l4, "calculus_lib.h", "avr")
-	r5 := ComputePriority(l5, "calculus_lib.h", "avr")
-	r6 := ComputePriority(l6, "calculus_lib.h", "avr")
-	r7 := ComputePriority(l7, "calculus_lib.h", "avr")
+	r1 := ComputePriority(l1, "calculus_lib.h", mustParseFQBN("arduino:avr:uno"))
+	r2 := ComputePriority(l2, "calculus_lib.h", mustParseFQBN("arduino:avr:uno"))
+	r3 := ComputePriority(l3, "calculus_lib.h", mustParseFQBN("arduino:avr:uno"))
+	r4 := ComputePriority(l4, "calculus_lib.h", mustParseFQBN("arduino:avr:uno"))
+	r5 := ComputePriority(l5, "calculus_lib.h", mustParseFQBN("arduino:avr:uno"))
+	r6 := ComputePriority(l6, "calculus_lib.h", mustParseFQBN("arduino:avr:uno"))
+	r7 := ComputePriority(l7, "calculus_lib.h", mustParseFQBN("arduino:avr:uno"))
 	require.True(t, r1 > r2)
 	require.True(t, r2 > r3)
 	require.True(t, r3 > r4)
@@ -122,7 +128,7 @@ func TestCppHeaderResolverWithNilResult(t *testing.T) {
 	libraryList := libraries.List{}
 	libraryList.Add(l1)
 	resolver.headers["aaa.h"] = libraryList
-	require.Nil(t, resolver.ResolveFor("bbb.h", "avr"))
+	require.Nil(t, resolver.ResolveFor("bbb.h", mustParseFQBN("arduino:avr:uno")))
 }
 
 func TestCppHeaderResolver(t *testing.T) {
@@ -133,7 +139,7 @@ func TestCppHeaderResolver(t *testing.T) {
 			librarylist.Add(lib)
 		}
 		resolver.headers[header] = librarylist
-		return resolver.ResolveFor(header, "avr").Name
+		return resolver.ResolveFor(header, mustParseFQBN("arduino:avr:uno")).Name
 	}
 	require.Equal(t, "Calculus Lib", resolve("calculus_lib.h", l1, l2, l3, l4, l5, l6, l7))
 	require.Equal(t, "Calculus Lib-master", resolve("calculus_lib.h", l2, l3, l4, l5, l6, l7))
@@ -150,11 +156,11 @@ func TestCppHeaderResolverWithLibrariesInStrangeDirectoryNames(t *testing.T) {
 	librarylist.Add(&libraries.Library{DirName: "onewire_2_3_4", Name: "OneWire", Architectures: []string{"*"}})
 	librarylist.Add(&libraries.Library{DirName: "onewireng_2_3_4", Name: "OneWireNg", Architectures: []string{"avr"}})
 	resolver.headers["OneWire.h"] = librarylist
-	require.Equal(t, "onewire_2_3_4", resolver.ResolveFor("OneWire.h", "avr").DirName)
+	require.Equal(t, "onewire_2_3_4", resolver.ResolveFor("OneWire.h", mustParseFQBN("arduino:avr:uno")).DirName)
 
 	librarylist2 := libraries.List{}
 	librarylist2.Add(&libraries.Library{DirName: "OneWire", Name: "OneWire", Architectures: []string{"*"}})
 	librarylist2.Add(&libraries.Library{DirName: "onewire_2_3_4", Name: "OneWire", Architectures: []string{"avr"}})
 	resolver.headers["OneWire.h"] = librarylist2
-	require.Equal(t, "OneWire", resolver.ResolveFor("OneWire.h", "avr").DirName)
+	require.Equal(t, "OneWire", resolver.ResolveFor("OneWire.h", mustParseFQBN("arduino:avr:uno")).DirName)
 }
