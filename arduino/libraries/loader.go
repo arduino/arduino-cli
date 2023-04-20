@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
@@ -82,7 +83,15 @@ func makeNewLibrary(libraryDir *paths.Path, location LibraryLocation) (*Library,
 		libProperties.Set("architectures", "*")
 	}
 	library.Architectures = commaSeparatedToList(libProperties.Get("architectures"))
-
+	if supported := libProperties.Get("supported"); supported != "" {
+		for _, formula := range strings.Split(supported, ",") {
+			constraint, err := cores.ParseFQBNMatcher(formula)
+			if err != nil {
+				return nil, errors.New(tr("invalid value '%[1]s': %[2]s", formula, err))
+			}
+			library.SupportedFQBN = append(library.SupportedFQBN, constraint)
+		}
+	}
 	libProperties.Set("category", strings.TrimSpace(libProperties.Get("category")))
 	if !ValidCategories[libProperties.Get("category")] {
 		libProperties.Set("category", "Uncategorized")

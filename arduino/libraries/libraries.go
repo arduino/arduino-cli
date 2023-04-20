@@ -59,6 +59,7 @@ type Library struct {
 	Website       string
 	Category      string
 	Architectures []string
+	SupportedFQBN []*cores.FQBNMatcher
 
 	Types []string `json:"types,omitempty"`
 
