@@ -28,7 +28,7 @@ func producePrototypes(t *testing.T, filename string, mainFile string) ([]*Proto
 	bytes, err := os.ReadFile(filepath.Join("testdata", filename))
 	require.NoError(t, err)
 
-	parser := &CTagsParser{}
+	parser := &Parser{}
 	return parser.Parse(bytes, paths.New(mainFile))
 }
 

@@ -24,11 +24,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func produceTags(t *testing.T, filename string) []*CTag {
+func produceTags(t *testing.T, filename string) []*Tag {
 	bytes, err := os.ReadFile(filepath.Join("testdata", filename))
 	require.NoError(t, err)
 
-	parser := CTagsParser{}
+	parser := Parser{}
 	parser.Parse(bytes, paths.New("sketch.ino"))
 	return parser.tags
 }

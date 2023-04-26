@@ -90,7 +90,7 @@ func PreprocessSketchWithCtags(sketch *sketch.Sketch, buildPath *paths.Path, inc
 	}
 
 	// Parse CTags output
-	parser := &ctags.CTagsParser{}
+	parser := &ctags.Parser{}
 	prototypes, firstFunctionLine := parser.Parse(ctagsOutput, sketch.MainFile)
 	if firstFunctionLine == -1 {
 		firstFunctionLine = 0
