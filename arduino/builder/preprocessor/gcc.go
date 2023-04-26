@@ -39,8 +39,8 @@ func GCC(sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.
 	includesStrings := f.Map(includes.AsStrings(), utils.WrapWithHyphenI)
 	gccBuildProperties.Set("includes", strings.Join(includesStrings, " "))
 
-	const GCC_PATTERN_PROPERTY = "recipe.preproc.macros"
-	if gccBuildProperties.Get(GCC_PATTERN_PROPERTY) == "" {
+	const gccPreprocRecipeProperty = "recipe.preproc.macros"
+	if gccBuildProperties.Get(gccPreprocRecipeProperty) == "" {
 		// autogenerate preprocess macros recipe from compile recipe
 		preprocPattern := gccBuildProperties.Get("recipe.cpp.o.pattern")
 		// add {preproc.macros.flags} to {compiler.cpp.flags}
@@ -48,12 +48,12 @@ func GCC(sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.
 		// replace "{object_file}" with "{preprocessed_file_path}"
 		preprocPattern = strings.Replace(preprocPattern, "{object_file}", "{preprocessed_file_path}", 1)
 
-		gccBuildProperties.Set(GCC_PATTERN_PROPERTY, preprocPattern)
+		gccBuildProperties.Set(gccPreprocRecipeProperty, preprocPattern)
 	}
 
-	pattern := gccBuildProperties.Get(GCC_PATTERN_PROPERTY)
+	pattern := gccBuildProperties.Get(gccPreprocRecipeProperty)
 	if pattern == "" {
-		return nil, nil, errors.Errorf(tr("%s pattern is missing"), GCC_PATTERN_PROPERTY)
+		return nil, nil, errors.Errorf(tr("%s pattern is missing"), gccPreprocRecipeProperty)
 	}
 
 	commandLine := gccBuildProperties.ExpandPropsInString(pattern)
