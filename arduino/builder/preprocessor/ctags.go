@@ -90,7 +90,7 @@ func PreprocessSketchWithCtags(sketch *sketch.Sketch, buildPath *paths.Path, inc
 	}
 
 	// Parse CTags output
-	parser := &ctags.CTagsParser{}
+	parser := &ctags.Parser{}
 	prototypes, firstFunctionLine := parser.Parse(ctagsOutput, sketch.MainFile)
 	if firstFunctionLine == -1 {
 		firstFunctionLine = 0
@@ -175,6 +175,7 @@ func isFirstFunctionOutsideOfSource(firstFunctionLine int, sourceRows []string) 
 	return firstFunctionLine > len(sourceRows)-1
 }
 
+// RunCTags performs a run of ctags on the given source file. Returns the ctags output and the stderr contents.
 func RunCTags(sourceFile *paths.Path, buildProperties *properties.Map) ([]byte, []byte, error) {
 	ctagsBuildProperties := properties.NewMap()
 	ctagsBuildProperties.Set("tools.ctags.path", "{runtime.tools.ctags.path}")
