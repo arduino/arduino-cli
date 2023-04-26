@@ -315,7 +315,7 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 		return fmt.Errorf(tr("loading %[1]s: %[2]s"), platformTxtLocalPath, err)
 	}
 
-	if platform.Properties.SubTree("pluggable_discovery").Size() > 0 {
+	if platform.Properties.SubTree("pluggable_discovery").Size() > 0 || platform.Properties.SubTree("pluggable_monitor").Size() > 0 {
 		platform.PluggableDiscoveryAware = true
 	} else {
 		platform.Properties.Set("pluggable_discovery.required.0", "builtin:serial-discovery")
