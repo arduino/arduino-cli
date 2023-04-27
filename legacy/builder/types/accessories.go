@@ -15,33 +15,7 @@
 
 package types
 
-import (
-	"bytes"
-	"sync"
-)
-
-type UniqueStringQueue []string
-
-func (queue UniqueStringQueue) Len() int           { return len(queue) }
-func (queue UniqueStringQueue) Less(i, j int) bool { return false }
-func (queue UniqueStringQueue) Swap(i, j int)      { panic("Who called me?!?") }
-
-func (queue *UniqueStringQueue) Push(value string) {
-	if !sliceContains(*queue, value) {
-		*queue = append(*queue, value)
-	}
-}
-
-func (queue *UniqueStringQueue) Pop() interface{} {
-	old := *queue
-	x := old[0]
-	*queue = old[1:]
-	return x
-}
-
-func (queue *UniqueStringQueue) Empty() bool {
-	return queue.Len() == 0
-}
+import "golang.org/x/exp/slices"
 
 type UniqueSourceFileQueue []SourceFile
 
@@ -50,7 +24,10 @@ func (queue UniqueSourceFileQueue) Less(i, j int) bool { return false }
 func (queue UniqueSourceFileQueue) Swap(i, j int)      { panic("Who called me?!?") }
 
 func (queue *UniqueSourceFileQueue) Push(value SourceFile) {
-	if !sliceContainsSourceFile(*queue, value) {
+	equals := func(elem SourceFile) bool {
+		return elem.Origin == value.Origin && elem.RelativePath.EqualsTo(value.RelativePath)
+	}
+	if !slices.ContainsFunc(*queue, equals) {
 		*queue = append(*queue, value)
 	}
 }
@@ -64,33 +41,4 @@ func (queue *UniqueSourceFileQueue) Pop() SourceFile {
 
 func (queue *UniqueSourceFileQueue) Empty() bool {
 	return queue.Len() == 0
-}
-
-type BufferedUntilNewLineWriter struct {
-	PrintFunc PrintFunc
-	Buffer    bytes.Buffer
-	lock      sync.Mutex
-}
-
-type PrintFunc func([]byte)
-
-func (w *BufferedUntilNewLineWriter) Write(p []byte) (n int, err error) {
-	w.lock.Lock()
-	defer w.lock.Unlock()
-
-	writtenToBuffer, err := w.Buffer.Write(p)
-	return writtenToBuffer, err
-}
-
-func (w *BufferedUntilNewLineWriter) Flush() {
-	w.lock.Lock()
-	defer w.lock.Unlock()
-
-	remainingBytes := w.Buffer.Bytes()
-	if len(remainingBytes) > 0 {
-		if remainingBytes[len(remainingBytes)-1] != '\n' {
-			remainingBytes = append(remainingBytes, '\n')
-		}
-		w.PrintFunc(remainingBytes)
-	}
 }

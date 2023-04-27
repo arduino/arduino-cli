@@ -29,10 +29,10 @@ import (
 
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/gohasissues"
-	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
+	"golang.org/x/exp/slices"
 )
 
 var hardwareFolder = paths.New("downloaded_hardware")
@@ -692,7 +692,7 @@ func translateGOOSGOARCHToPackageIndexValue() []string {
 func findToolUrl(index map[string]interface{}, tool Tool, host []string) (string, error) {
 	if len(tool.OsUrls) > 0 {
 		for _, osUrl := range tool.OsUrls {
-			if utils.SliceContains(host, osUrl.Os) {
+			if slices.Contains(host, osUrl.Os) {
 				return osUrl.Url, nil
 			}
 		}
@@ -709,7 +709,7 @@ func findToolUrl(index map[string]interface{}, tool Tool, host []string) (string
 					systems := packageTool["systems"].([]interface{})
 					for _, s := range systems {
 						system := s.(map[string]interface{})
-						if utils.SliceContains(host, system["host"].(string)) {
+						if slices.Contains(host, system["host"].(string)) {
 							return system[constants.TOOL_URL].(string), nil
 						}
 					}

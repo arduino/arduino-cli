@@ -18,8 +18,8 @@ package builder
 import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/pkg/errors"
+	"golang.org/x/exp/slices"
 )
 
 type UnusedCompiledLibrariesRemover struct{}
@@ -39,7 +39,7 @@ func (s *UnusedCompiledLibrariesRemover) Run(ctx *types.Context) error {
 	}
 	for _, file := range files {
 		if file.IsDir() {
-			if !utils.SliceContains(libraryNames, file.Base()) {
+			if !slices.Contains(libraryNames, file.Base()) {
 				if err := file.RemoveAll(); err != nil {
 					return errors.WithStack(err)
 				}
