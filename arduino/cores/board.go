@@ -81,7 +81,7 @@ func (b *Board) buildConfigOptionsStructures() {
 	allConfigs := b.Properties.SubTree("menu")
 	allConfigOptions := allConfigs.FirstLevelOf()
 
-	// Used to show the config options in the same order as the menu, defined at the begging of platform.txt
+	// Used to show the config options in the same order as the menu, defined at the begging of boards.txt
 	if b.PlatformRelease.Menus != nil {
 		for _, menuOption := range b.PlatformRelease.Menus.FirstLevelKeys() {
 			if _, ok := allConfigOptions[menuOption]; ok {
