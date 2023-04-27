@@ -16,6 +16,7 @@
 package cores
 
 import (
+	"fmt"
 	"testing"
 
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -368,6 +369,41 @@ func TestBoardOptions(t *testing.T) {
 	// data, err := json.MarshalIndent(prop, "", "  ")
 	// require.NoError(t, err, "marshaling result")
 	// fmt.Print(string(data))
+}
+
+func TestBoarConfigOptionSortingSameAsMenu(t *testing.T) {
+	menus := properties.NewMap()
+	menus.Set("BoardModel", "Model")
+	menus.Set("xtal", "CPU Frequency")
+	menus.Set("vt", "VTables")
+	menus.Set("wipe", "Erase Flash")
+
+	props := properties.NewMap()
+	props.Set("menu.xtal.80", "80 MHz")
+	props.Set("menu.wipe.none", "Only Sketch")
+	props.Set("menu.BoardModel.primo", "Primo")
+	props.Set("menu.BoardModel.primo.build.board", "ESP8266_ARDUINO_PRIMO")
+	props.Set("menu.vt.flash", "Flash")
+
+	esp8266 := &Board{
+		BoardID:    "arduino-esp8266",
+		Properties: props,
+		PlatformRelease: &PlatformRelease{
+			Platform: &Platform{
+				Architecture: "esp8266",
+				Package: &Package{
+					Name: "esp8266",
+				},
+			},
+			Menus: menus,
+		},
+	}
+
+	config := `xtal=80,wipe=none,BoardModel=primo,vt=flash`
+
+	_, err := esp8266.GeneratePropertiesForConfiguration(config)
+	require.NoError(t, err, fmt.Sprintf("generating %s configuration", config))
+	require.True(t, esp8266.configOptions.EqualsWithOrder(menus))
 }
 
 func TestOSSpecificBoardOptions(t *testing.T) {

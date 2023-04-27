@@ -79,14 +79,21 @@ func (b *Board) buildConfigOptionsStructures() {
 
 	b.configOptions = properties.NewMap()
 	allConfigs := b.Properties.SubTree("menu")
-	for _, option := range allConfigs.FirstLevelKeys() {
-		b.configOptions.Set(option, b.PlatformRelease.Menus.Get(option))
+	allConfigOptions := allConfigs.FirstLevelOf()
+
+	// Used to show the config options in the same order as the menu, defined at the begging of boards.txt
+	if b.PlatformRelease.Menus != nil {
+		for _, menuOption := range b.PlatformRelease.Menus.FirstLevelKeys() {
+			if _, ok := allConfigOptions[menuOption]; ok {
+				b.configOptions.Set(menuOption, b.PlatformRelease.Menus.Get(menuOption))
+			}
+		}
 	}
 
 	b.configOptionValues = map[string]*properties.Map{}
 	b.configOptionProperties = map[string]*properties.Map{}
 	b.defaultConfig = properties.NewMap()
-	for option, optionProps := range allConfigs.FirstLevelOf() {
+	for option, optionProps := range allConfigOptions {
 		b.configOptionValues[option] = properties.NewMap()
 		values := optionProps.FirstLevelKeys()
 		b.defaultConfig.Set(option, values[0])
