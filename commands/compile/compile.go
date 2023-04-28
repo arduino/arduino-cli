@@ -131,9 +131,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	var buildPath *paths.Path
 	if buildPathArg := req.GetBuildPath(); buildPathArg != "" {
 		buildPath = paths.New(req.GetBuildPath()).Canonical()
-		if in, err := buildPath.IsInsideDir(sk.FullPath); err != nil {
-			return nil, &arduino.NotFoundError{Message: tr("Cannot find build path"), Cause: err}
-		} else if in && buildPath.IsDir() {
+		if in := buildPath.IsInsideDir(sk.FullPath); in && buildPath.IsDir() {
 			if sk.AdditionalFiles, err = removeBuildFromSketchFiles(sk.AdditionalFiles, buildPath); err != nil {
 				return nil, err
 			}
@@ -385,9 +383,7 @@ func removeBuildFromSketchFiles(files paths.PathList, build *paths.Path) (paths.
 	var res paths.PathList
 	ignored := false
 	for _, file := range files {
-		if in, err := file.IsInsideDir(build); err != nil {
-			return nil, &arduino.NotFoundError{Message: tr("Cannot find build path"), Cause: err}
-		} else if !in {
+		if !file.IsInsideDir(build) {
 			res = append(res, file)
 		} else if !ignored {
 			ignored = true
