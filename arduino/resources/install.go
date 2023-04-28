@@ -120,6 +120,9 @@ func findPackageRoot(parent *paths.Path) (*paths.Path, error) {
 	if err != nil {
 		return nil, fmt.Errorf(tr("reading package root dir: %s", err))
 	}
+
+	files.FilterOutPrefix("__MACOSX")
+
 	var root *paths.Path
 	for _, file := range files {
 		if !file.IsDir() {
