@@ -996,15 +996,17 @@ func TestCoreInstallRunsToolPostInstallScript(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
 
-	url := "http://drazzy.com/package_drazzy.com_index.json"
+	url := env.HTTPServeFile(8080, paths.New("testdata", "package_with_postinstall_index.json"))
+	env.HTTPServeFile(8081, paths.New("testdata", "core_with_postinst.zip"))
 
-	_, _, err := cli.Run("core", "update-index", "--additional-urls", url)
+	_, _, err := cli.Run("core", "update-index", "--additional-urls", url.String())
 	require.NoError(t, err)
 
 	// Checks that the post_install script is correctly skipped on the CI
-	stdout, _, err := cli.Run("core", "install", "ATTinyCore:avr", "--verbose", "--additional-urls", url)
+	stdout, _, err := cli.Run("core", "install", "Test:x86", "--additional-urls", url.String())
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "Skipping tool configuration.")
+	require.Contains(t, string(stdout), "Skipping platform configuration.")
 }
 
 func TestCoreBrokenDependency(t *testing.T) {

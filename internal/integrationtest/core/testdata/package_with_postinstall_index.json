@@ -1,0 +1,41 @@
+{
+  "packages": [
+    {
+      "maintainer": "Test",
+      "help": {
+        "online": "https://github.com/Arduino/arduino-cli"
+      },
+      "websiteURL": "https://github.com/Arduino/arduino-cli",
+      "platforms": [
+        {
+          "category": "Test Category",
+          "help": {
+            "online": "https://github.com/Arduino/arduino-cli"
+          },
+          "url": "http://127.0.0.1:8081/core_with_postinst.zip",
+          "checksum": "SHA-256:b08f89eae117254f01215082a2504d94ab28560a7bf944f0b5dcd2772a8f0b7e",
+          "name": "test_core",
+          "version": "2.0.0",
+          "architecture": "x86",
+          "archiveFileName": "core.zip",
+          "size": "828",
+          "toolsDependencies": [
+            {
+              "packager": "arduino",
+              "version": "6.3.0-arduino17",
+              "name": "avrdude"
+            }
+          ],
+          "boards": [
+            {
+              "name": "Test Board"
+            }
+          ]
+        }
+      ],
+      "tools": [],
+      "email": "test@example.com",
+      "name": "test"
+    }
+  ]
+}
