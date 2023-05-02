@@ -120,19 +120,16 @@ func findPackageRoot(parent *paths.Path) (*paths.Path, error) {
 	if err != nil {
 		return nil, fmt.Errorf(tr("reading package root dir: %s", err))
 	}
-	var root *paths.Path
-	for _, file := range files {
-		if !file.IsDir() {
-			continue
-		}
-		if root == nil {
-			root = file
-		} else {
-			return nil, fmt.Errorf(tr("no unique root dir in archive, found '%[1]s' and '%[2]s'", root, file))
-		}
-	}
-	if root == nil {
+
+	files.FilterDirs()
+	files.FilterOutPrefix("__MACOSX")
+
+	if len(files) == 0 {
 		return nil, fmt.Errorf(tr("files in archive must be placed in a subdirectory"))
 	}
-	return root, nil
+	if len(files) > 1 {
+		return nil, fmt.Errorf(tr("no unique root dir in archive, found '%[1]s' and '%[2]s'", files[0], files[1]))
+	}
+
+	return files[0], nil
 }
