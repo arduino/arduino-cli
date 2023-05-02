@@ -135,7 +135,7 @@ func New(path *paths.Path) (*Sketch, error) {
 		} else if _, found := globals.AdditionalFileValidExtensions[ext]; found {
 			// If the user exported the compiles binaries to the Sketch "build" folder
 			// they would be picked up but we don't want them, so we skip them like so
-			if isInBuildFolder, err := p.IsInsideDir(sketch.FullPath.Join("build")); isInBuildFolder || err != nil {
+			if p.IsInsideDir(sketch.FullPath.Join("build")) {
 				continue
 			}
 
