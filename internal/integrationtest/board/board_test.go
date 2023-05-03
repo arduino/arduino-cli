@@ -573,7 +573,6 @@ func TestBoardListWithFailedBuiltinInstallation(t *testing.T) {
 	// remove files from serial-discovery directory to simulate a failed installation
 	serialDiscovery, err := cli.DataDir().Join("packages", "builtin", "tools", "serial-discovery").ReadDir()
 	require.NoError(t, err)
-	require.NoError(t, serialDiscovery[0].Join("LICENSE.txt").Remove())
 	require.NoError(t, serialDiscovery[0].Join("serial-discovery.exe").Remove())
 
 	// board list should install serial-discovery again

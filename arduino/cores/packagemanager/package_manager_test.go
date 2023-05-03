@@ -617,8 +617,8 @@ func TestPackageManagerClear(t *testing.T) {
 
 func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 	// Create all the necessary data to load discoveries
-	fakePath := paths.New("fake-path")
-	require.NoError(t, fakePath.Join("LICENSE").MkdirAll())
+	fakePath, err := paths.TempDir().MkTempDir("fake-path")
+	require.NoError(t, err)
 	defer fakePath.RemoveAll()
 
 	pmb := NewBuilder(fakePath, fakePath, fakePath, fakePath, "test")
@@ -630,6 +630,9 @@ func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("4.2.0"))
 		// We set this to fake the tool is installed
 		toolRelease.InstallDir = fakePath
+		f, err := toolRelease.InstallDir.Join(toolRelease.Tool.Name + ".exe").Create()
+		require.NoError(t, err)
+		require.NoError(t, f.Close())
 	}
 
 	{
@@ -646,6 +649,9 @@ func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("6.6.6"))
 		// We set this to fake the tool is installed
 		toolRelease.InstallDir = fakePath
+		f, err := toolRelease.InstallDir.Join(toolRelease.Tool.Name + ".exe").Create()
+		require.NoError(t, err)
+		require.NoError(t, f.Close())
 	}
 
 	{
@@ -654,6 +660,9 @@ func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
 		// We set this to fake the tool is installed
 		toolRelease.InstallDir = fakePath
+		f, err := toolRelease.InstallDir.Join(toolRelease.Tool.Name + ".exe").Create()
+		require.NoError(t, err)
+		require.NoError(t, f.Close())
 		tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
 	}
 
@@ -664,6 +673,9 @@ func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
 		// We set this to fake the tool is installed
 		toolRelease.InstallDir = fakePath
+		f, err := toolRelease.InstallDir.Join(toolRelease.Tool.Name + ".exe").Create()
+		require.NoError(t, err)
+		require.NoError(t, f.Close())
 	}
 
 	{
@@ -672,6 +684,9 @@ func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
 		// We set this to fake the tool is installed
 		toolRelease.InstallDir = fakePath
+		f, err := toolRelease.InstallDir.Join(toolRelease.Tool.Name + ".exe").Create()
+		require.NoError(t, err)
+		require.NoError(t, f.Close())
 		tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
 	}
 
@@ -682,6 +697,9 @@ func TestFindToolsRequiredFromPlatformRelease(t *testing.T) {
 		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
 		// We set this to fake the tool is installed
 		toolRelease.InstallDir = fakePath
+		f, err := toolRelease.InstallDir.Join(toolRelease.Tool.Name + ".exe").Create()
+		require.NoError(t, err)
+		require.NoError(t, f.Close())
 	}
 
 	platform := pack.GetOrCreatePlatform("avr")

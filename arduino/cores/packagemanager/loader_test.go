@@ -169,8 +169,8 @@ arduino_zero_edbg.serial.disableRTS=true
 
 func TestLoadDiscoveries(t *testing.T) {
 	// Create all the necessary data to load discoveries
-	fakePath := paths.New("fake-path")
-	require.NoError(t, fakePath.Join("LICENSE").MkdirAll())
+	fakePath, err := paths.TempDir().MkTempDir("fake-path")
+	require.NoError(t, err)
 	defer fakePath.RemoveAll()
 
 	createTestPackageManager := func() *PackageManager {
@@ -181,6 +181,9 @@ func TestLoadDiscoveries(t *testing.T) {
 		toolRelease := tool.GetOrCreateRelease(semver.ParseRelaxed("1.0.0"))
 		// We set this to fake the tool is installed
 		toolRelease.InstallDir = fakePath
+		f, err := toolRelease.InstallDir.Join(toolRelease.Tool.Name + ".exe").Create()
+		require.NoError(t, err)
+		require.NoError(t, f.Close())
 		tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
 
 		// serial-discovery tool
@@ -189,6 +192,9 @@ func TestLoadDiscoveries(t *testing.T) {
 		toolRelease = tool.GetOrCreateRelease(semver.ParseRelaxed("0.1.0"))
 		// We set this to fake the tool is installed
 		toolRelease.InstallDir = fakePath
+		f, err = toolRelease.InstallDir.Join(toolRelease.Tool.Name + ".exe").Create()
+		require.NoError(t, err)
+		require.NoError(t, f.Close())
 
 		platform := pack.GetOrCreatePlatform("avr")
 		release := platform.GetOrCreateRelease(semver.MustParse("1.0.0"))
@@ -279,8 +285,6 @@ func TestLoadDiscoveries(t *testing.T) {
 		require.Contains(t, discoveries, "teensy")
 		pmeRelease()
 	}
-
-	require.NoError(t, fakePath.RemoveAll())
 }
 
 func TestConvertUploadToolsToPluggableDiscovery(t *testing.T) {
