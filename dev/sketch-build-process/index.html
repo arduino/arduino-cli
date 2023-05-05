@@ -1575,6 +1575,8 @@ generated for the path to each library dependency and appended to the
 <p>If multiple libraries contain a file that matches the <code>#include</code> directive, the priority is determined by applying the
 following rules, one by one in this order, until a rule determines a winner:</p>
 <ol>
+<li>A library that has been specified using the <a href="../commands/arduino-cli_compile/#options"><code>--library</code> option</a> of
+   <code>arduino-cli compile</code> wins against a library in other locations</li>
 <li>A library that is architecture compatible wins against a library that is not architecture compatible (see
    <a href="#architecture-matching"><strong>Architecture Matching</strong></a>)</li>
 <li>A library with both <a href="#library-name-priority">library name</a> and <a href="#folder-name-priority">folder name</a> matching the
@@ -1714,8 +1716,6 @@ field. That value is sanitized by replacing spaces with <code>_</code> before co
 <h3 id="location-priority">Location Priority<a class="headerlink" href="#location-priority" title="Permanent link">&para;</a></h3>
 <p>The "location priority" is determined as follows (in order of highest to lowest priority):</p>
 <ol>
-<li>The library is specified using the <a href="../commands/arduino-cli_compile/#options"><code>--library</code> option</a> of
-   <code>arduino-cli compile</code></li>
 <li>The library is under a custom libraries path specified via the
    <a href="../commands/arduino-cli_compile/#options"><code>--libraries</code> option</a> of <code>arduino-cli compile</code> (in decreasing order of
    priority when multiple custom paths are defined)</li>
