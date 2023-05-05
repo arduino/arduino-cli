@@ -52,6 +52,8 @@ generated for the path to each library dependency and appended to the
 If multiple libraries contain a file that matches the `#include` directive, the priority is determined by applying the
 following rules, one by one in this order, until a rule determines a winner:
 
+1. A library that has been specified using the [`--library` option](commands/arduino-cli_compile.md#options) of
+   `arduino-cli compile` wins against a library in other locations
 1. A library that is architecture compatible wins against a library that is not architecture compatible (see
    [**Architecture Matching**](#architecture-matching))
 1. A library with both [library name](#library-name-priority) and [folder name](#folder-name-priority) matching the
@@ -120,8 +122,6 @@ The "folder name priority" is determined as follows (in order of highest to lowe
 
 The "location priority" is determined as follows (in order of highest to lowest priority):
 
-1. The library is specified using the [`--library` option](commands/arduino-cli_compile.md#options) of
-   `arduino-cli compile`
 1. The library is under a custom libraries path specified via the
    [`--libraries` option](commands/arduino-cli_compile.md#options) of `arduino-cli compile` (in decreasing order of
    priority when multiple custom paths are defined)
