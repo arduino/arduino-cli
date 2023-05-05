@@ -202,16 +202,17 @@ func (s *ArduinoCoreServerImpl) LoadSketch(ctx context.Context, req *rpc.LoadSke
 
 // Compile FIXMEDOC
 func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.ArduinoCoreService_CompileServer) error {
-	outStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.CompileResponse{OutStream: data}) })
-	errStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.CompileResponse{ErrStream: data}) })
+	syncSend := NewSynchronizedSend(stream.Send)
+	outStream := feedStreamTo(func(data []byte) { syncSend.Send(&rpc.CompileResponse{OutStream: data}) })
+	errStream := feedStreamTo(func(data []byte) { syncSend.Send(&rpc.CompileResponse{ErrStream: data}) })
 	compileResp, compileErr := compile.Compile(
 		stream.Context(), req, outStream, errStream,
-		func(p *rpc.TaskProgress) { stream.Send(&rpc.CompileResponse{Progress: p}) })
+		func(p *rpc.TaskProgress) { syncSend.Send(&rpc.CompileResponse{Progress: p}) })
 	outStream.Close()
 	errStream.Close()
 	var compileRespSendErr error
 	if compileResp != nil {
-		compileRespSendErr = stream.Send(compileResp)
+		compileRespSendErr = syncSend.Send(compileResp)
 	}
 	if compileErr != nil {
 		return convertErrorToRPCStatus(compileErr)
