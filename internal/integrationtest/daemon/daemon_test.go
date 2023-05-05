@@ -135,7 +135,7 @@ func TestDaemonCompileOptions(t *testing.T) {
 
 	// Build sketch (with errors)
 	sk := paths.New("testdata", "bare_minimum")
-	compile, err := grpcInst.Compile(context.Background(), "arduino:avr:uno:some_menu=bad", sk.String())
+	compile, err := grpcInst.Compile(context.Background(), "arduino:avr:uno:some_menu=bad", sk.String(), "")
 	require.NoError(t, err)
 	for {
 		msg, err := compile.Recv()
@@ -153,7 +153,7 @@ func TestDaemonCompileOptions(t *testing.T) {
 	}
 
 	// Build sketch (without errors)
-	compile, err = grpcInst.Compile(context.Background(), "arduino:avr:uno:some_menu=good", sk.String())
+	compile, err = grpcInst.Compile(context.Background(), "arduino:avr:uno:some_menu=good", sk.String(), "")
 	require.NoError(t, err)
 	for {
 		msg, err := compile.Recv()
@@ -180,7 +180,7 @@ func TestDaemonCompileAfterFailedLibInstall(t *testing.T) {
 
 	// Build sketch (with errors)
 	sk := paths.New("testdata", "bare_minimum")
-	compile, err := grpcInst.Compile(context.Background(), "", sk.String())
+	compile, err := grpcInst.Compile(context.Background(), "", sk.String(), "")
 	require.NoError(t, err)
 	for {
 		msg, err := compile.Recv()

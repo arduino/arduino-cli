@@ -388,14 +388,15 @@ func (inst *ArduinoCLIInstance) PlatformInstall(ctx context.Context, packager, a
 }
 
 // Compile calls the "Compile" gRPC method.
-func (inst *ArduinoCLIInstance) Compile(ctx context.Context, fqbn, sketchPath string) (commands.ArduinoCoreService_CompileClient, error) {
+func (inst *ArduinoCLIInstance) Compile(ctx context.Context, fqbn, sketchPath string, warnings string) (commands.ArduinoCoreService_CompileClient, error) {
 	compileCl, err := inst.cli.daemonClient.Compile(ctx, &commands.CompileRequest{
 		Instance:   inst.instance,
 		Fqbn:       fqbn,
 		SketchPath: sketchPath,
 		Verbose:    true,
+		Warnings:   warnings,
 	})
-	logCallf(">>> Compile(%v %v)\n", fqbn, sketchPath)
+	logCallf(">>> Compile(%v %v warnings=%v)\n", fqbn, sketchPath, warnings)
 	return compileCl, err
 }
 
