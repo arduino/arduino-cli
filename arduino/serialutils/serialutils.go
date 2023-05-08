@@ -106,6 +106,8 @@ func Reset(portToTouch string, wait bool, cb *ResetProgressCallbacks, dryRun boo
 			}
 			if strings.HasSuffix(emulatedPort, "999") {
 				emulatedPort += "0"
+			} else if emulatedPort == "" {
+				emulatedPort = "newport"
 			}
 			return res, nil
 		}
