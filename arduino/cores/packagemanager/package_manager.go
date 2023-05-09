@@ -380,13 +380,13 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 }
 
 func (pme *Explorer) determineReferencedPlatformRelease(boardBuildProperties *properties.Map, boardPlatformRelease *cores.PlatformRelease, fqbn *cores.FQBN) (string, *cores.PlatformRelease, string, *cores.PlatformRelease, error) {
-	core := boardBuildProperties.Get("build.core")
+	core := boardBuildProperties.ExpandPropsInString(boardBuildProperties.Get("build.core"))
 	referredCore := ""
 	if split := strings.Split(core, ":"); len(split) > 1 {
 		referredCore, core = split[0], split[1]
 	}
 
-	variant := boardBuildProperties.Get("build.variant")
+	variant := boardBuildProperties.ExpandPropsInString(boardBuildProperties.Get("build.variant"))
 	referredVariant := ""
 	if split := strings.Split(variant, ":"); len(split) > 1 {
 		referredVariant, variant = split[0], split[1]

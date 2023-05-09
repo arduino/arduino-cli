@@ -807,6 +807,102 @@ func TestLegacyPackageConversionToPluggableDiscovery(t *testing.T) {
 	}
 }
 
+func TestVariantAndCoreSelection(t *testing.T) {
+	// Pass nil, since these paths are only used for installing
+	pmb := NewBuilder(nil, nil, nil, nil, "test")
+	// Hardware from main packages directory
+	pmb.LoadHardwareFromDirectory(dataDir1.Join("packages"))
+	pm := pmb.Build()
+	pme, release := pm.NewExplorer()
+	defer release()
+
+	requireSameFile := func(f1, f2 *paths.Path) {
+		require.True(t, f1.EquivalentTo(f2), "%s must be equivalent to %s", f1, f2)
+	}
+
+	// build.core test suite
+	t.Run("CoreWithoutSubstitutions", func(t *testing.T) {
+		fqbn, err := cores.ParseFQBN("test2:avr:test")
+		require.NoError(t, err)
+		require.NotNil(t, fqbn)
+		_, _, _, buildProps, _, err := pme.ResolveFQBN(fqbn)
+		require.NoError(t, err)
+		require.Equal(t, "arduino", buildProps.Get("build.core"))
+		requireSameFile(buildProps.GetPath("build.core.path"), dataDir1.Join("packages", "test2", "hardware", "avr", "1.0.0", "cores", "arduino"))
+	})
+	t.Run("CoreWithSubstitutions", func(t *testing.T) {
+		fqbn, err := cores.ParseFQBN("test2:avr:test2")
+		require.NoError(t, err)
+		require.NotNil(t, fqbn)
+		_, _, _, buildProps, _, err := pme.ResolveFQBN(fqbn)
+		require.NoError(t, err)
+		require.Equal(t, "{my_core}", buildProps.Get("build.core"))
+		require.Equal(t, "arduino", buildProps.Get("my_core"))
+		requireSameFile(buildProps.GetPath("build.core.path"), dataDir1.Join("packages", "test2", "hardware", "avr", "1.0.0", "cores", "arduino"))
+	})
+	t.Run("CoreWithSubstitutionsAndDefaultOption", func(t *testing.T) {
+		fqbn, err := cores.ParseFQBN("test2:avr:test3")
+		require.NoError(t, err)
+		require.NotNil(t, fqbn)
+		_, _, _, buildProps, _, err := pme.ResolveFQBN(fqbn)
+		require.NoError(t, err)
+		require.Equal(t, "{my_core}", buildProps.Get("build.core"))
+		require.Equal(t, "arduino", buildProps.Get("my_core"))
+		requireSameFile(buildProps.GetPath("build.core.path"), dataDir1.Join("packages", "test2", "hardware", "avr", "1.0.0", "cores", "arduino"))
+	})
+	t.Run("CoreWithSubstitutionsAndNonDefaultOption", func(t *testing.T) {
+		fqbn, err := cores.ParseFQBN("test2:avr:test3:core=referenced")
+		require.NoError(t, err)
+		require.NotNil(t, fqbn)
+		_, _, _, buildProps, _, err := pme.ResolveFQBN(fqbn)
+		require.NoError(t, err)
+		require.Equal(t, "{my_core}", buildProps.Get("build.core"))
+		require.Equal(t, "arduino:arduino", buildProps.Get("my_core"))
+		requireSameFile(buildProps.GetPath("build.core.path"), dataDir1.Join("packages", "arduino", "hardware", "avr", "1.8.3", "cores", "arduino"))
+	})
+
+	// build.variant test suite
+	t.Run("VariantWithoutSubstitutions", func(t *testing.T) {
+		fqbn, err := cores.ParseFQBN("test2:avr:test4")
+		require.NoError(t, err)
+		require.NotNil(t, fqbn)
+		_, _, _, buildProps, _, err := pme.ResolveFQBN(fqbn)
+		require.NoError(t, err)
+		require.Equal(t, "standard", buildProps.Get("build.variant"))
+		requireSameFile(buildProps.GetPath("build.variant.path"), dataDir1.Join("packages", "test2", "hardware", "avr", "1.0.0", "variants", "standard"))
+	})
+	t.Run("VariantWithSubstitutions", func(t *testing.T) {
+		fqbn, err := cores.ParseFQBN("test2:avr:test5")
+		require.NoError(t, err)
+		require.NotNil(t, fqbn)
+		_, _, _, buildProps, _, err := pme.ResolveFQBN(fqbn)
+		require.NoError(t, err)
+		require.Equal(t, "{my_variant}", buildProps.Get("build.variant"))
+		require.Equal(t, "standard", buildProps.Get("my_variant"))
+		requireSameFile(buildProps.GetPath("build.variant.path"), dataDir1.Join("packages", "test2", "hardware", "avr", "1.0.0", "variants", "standard"))
+	})
+	t.Run("VariantWithSubstitutionsAndDefaultOption", func(t *testing.T) {
+		fqbn, err := cores.ParseFQBN("test2:avr:test6")
+		require.NoError(t, err)
+		require.NotNil(t, fqbn)
+		_, _, _, buildProps, _, err := pme.ResolveFQBN(fqbn)
+		require.NoError(t, err)
+		require.Equal(t, "{my_variant}", buildProps.Get("build.variant"))
+		require.Equal(t, "standard", buildProps.Get("my_variant"))
+		requireSameFile(buildProps.GetPath("build.variant.path"), dataDir1.Join("packages", "test2", "hardware", "avr", "1.0.0", "variants", "standard"))
+	})
+	t.Run("VariantWithSubstitutionsAndNonDefaultOption", func(t *testing.T) {
+		fqbn, err := cores.ParseFQBN("test2:avr:test6:variant=referenced")
+		require.NoError(t, err)
+		require.NotNil(t, fqbn)
+		_, _, _, buildProps, _, err := pme.ResolveFQBN(fqbn)
+		require.NoError(t, err)
+		require.Equal(t, "{my_variant}", buildProps.Get("build.variant"))
+		require.Equal(t, "arduino:standard", buildProps.Get("my_variant"))
+		requireSameFile(buildProps.GetPath("build.variant.path"), dataDir1.Join("packages", "arduino", "hardware", "avr", "1.8.3", "variants", "standard"))
+	})
+}
+
 func TestRunPostInstall(t *testing.T) {
 	pmb := NewBuilder(nil, nil, nil, nil, "test")
 	pm := pmb.Build()
