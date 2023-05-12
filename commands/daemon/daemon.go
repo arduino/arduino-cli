@@ -270,10 +270,10 @@ func (s *ArduinoCoreServerImpl) PlatformUpgrade(req *rpc.PlatformUpgradeRequest,
 		func(p *rpc.DownloadProgress) { syncSend.Send(&rpc.PlatformUpgradeResponse{Progress: p}) },
 		func(p *rpc.TaskProgress) { syncSend.Send(&rpc.PlatformUpgradeResponse{TaskProgress: p}) },
 	)
-	if err != nil {
-		return convertErrorToRPCStatus(err)
+	if err2 := syncSend.Send(resp); err2 != nil {
+		return err2
 	}
-	return syncSend.Send(resp)
+	return convertErrorToRPCStatus(err)
 }
 
 // PlatformSearch FIXMEDOC

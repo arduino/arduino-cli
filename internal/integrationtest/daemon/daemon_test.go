@@ -19,12 +19,15 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"os"
 	"testing"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
+
 	"github.com/stretchr/testify/require"
 )
 
@@ -215,26 +218,10 @@ func TestDaemonCoreUpdateIndex(t *testing.T) {
 			` "http://downloads.arduino.cc/package_inexistent_index.json"]`)
 	require.NoError(t, err)
 
-	analyzeUpdateIndexClient := func(cl commands.ArduinoCoreService_UpdateIndexClient) (map[string]*commands.DownloadProgressEnd, error) {
-		analyzer := NewDownloadProgressAnalyzer(t)
-		for {
-			msg, err := cl.Recv()
-			// fmt.Println("DOWNLOAD>", msg)
-			if err == io.EOF {
-				return analyzer.Results, nil
-			}
-			if err != nil {
-				return analyzer.Results, err
-			}
-			require.NoError(t, err)
-			analyzer.Process(msg.GetDownloadProgress())
-		}
-	}
-
 	{
 		cl, err := grpcInst.UpdateIndex(context.Background(), true)
 		require.NoError(t, err)
-		res, err := analyzeUpdateIndexClient(cl)
+		res, err := analyzeUpdateIndexClient(t, cl)
 		require.NoError(t, err)
 		require.Len(t, res, 1)
 		require.True(t, res["https://downloads.arduino.cc/packages/package_index.tar.bz2"].Success)
@@ -242,7 +229,7 @@ func TestDaemonCoreUpdateIndex(t *testing.T) {
 	{
 		cl, err := grpcInst.UpdateIndex(context.Background(), false)
 		require.NoError(t, err)
-		res, err := analyzeUpdateIndexClient(cl)
+		res, err := analyzeUpdateIndexClient(t, cl)
 		require.Error(t, err)
 		require.Len(t, res, 3)
 		require.True(t, res["https://downloads.arduino.cc/packages/package_index.tar.bz2"].Success)
@@ -412,4 +399,159 @@ func TestDaemonLibrariesRescanOnInstall(t *testing.T) {
 		require.NoError(t, err)
 	}
 
+}
+
+func TestDaemonCoreUpgradePlatform(t *testing.T) {
+	refreshInstance := func(t *testing.T, grpcInst *integrationtest.ArduinoCLIInstance) {
+		require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {}))
+	}
+	updateIndexAndInstallPlatform := func(cli *integrationtest.ArduinoCLI, grpcInst *integrationtest.ArduinoCLIInstance, version string) {
+		refreshInstance(t, grpcInst)
+
+		// adding the additional urls
+		err := cli.SetValue("board_manager.additional_urls", `["https://arduino.esp8266.com/stable/package_esp8266com_index.json"]`)
+		require.NoError(t, err)
+
+		cl, err := grpcInst.UpdateIndex(context.Background(), false)
+		require.NoError(t, err)
+		res, err := analyzeUpdateIndexClient(t, cl)
+		require.NoError(t, err)
+		require.Len(t, res, 2)
+		require.True(t, res["https://arduino.esp8266.com/stable/package_esp8266com_index.json"].Success)
+
+		refreshInstance(t, grpcInst)
+
+		// installing outdated version
+		plInst, err := grpcInst.PlatformInstall(context.Background(), "esp8266", "esp8266", version, true)
+		require.NoError(t, err)
+		for {
+			_, err := plInst.Recv()
+			if err == io.EOF {
+				break
+			}
+			require.NoError(t, err)
+		}
+	}
+
+	t.Run("upgraded successfully with additional urls", func(t *testing.T) {
+		t.Run("and install.json is present", func(t *testing.T) {
+			env, cli := createEnvForDaemon(t)
+			defer env.CleanUp()
+
+			grpcInst := cli.Create()
+			updateIndexAndInstallPlatform(cli, grpcInst, "3.1.0")
+
+			plUpgrade, err := grpcInst.PlatformUpgrade(context.Background(), "esp8266", "esp8266", true)
+			require.NoError(t, err)
+
+			platform, upgradeError := analyzePlatformUpgradeClient(plUpgrade)
+			require.NoError(t, upgradeError)
+			require.NotNil(t, platform)
+			require.True(t, platform.Indexed)          // the esp866 is present in the additional-urls
+			require.False(t, platform.MissingMetadata) // install.json is present
+		})
+		t.Run("and install.json is missing", func(t *testing.T) {
+			env, cli := createEnvForDaemon(t)
+			defer env.CleanUp()
+
+			grpcInst := cli.Create()
+			updateIndexAndInstallPlatform(cli, grpcInst, "3.1.0")
+
+			// remove installed.json{
+			x := env.RootDir().Join("A/packages/esp8266/hardware/esp8266/3.1.0/installed.json")
+			require.NoError(t, os.Remove(x.String()))
+
+			plUpgrade, err := grpcInst.PlatformUpgrade(context.Background(), "esp8266", "esp8266", true)
+			require.NoError(t, err)
+
+			platform, upgradeError := analyzePlatformUpgradeClient(plUpgrade)
+			require.NoError(t, upgradeError)
+			require.NotNil(t, platform)
+			require.True(t, platform.Indexed)          // the esp866 is not present in the additional-urls
+			require.False(t, platform.MissingMetadata) // install.json is present because the old version got upgraded
+
+		})
+	})
+
+	t.Run("upgrade failed", func(t *testing.T) {
+		t.Run("without additional URLs", func(t *testing.T) {
+			env, cli := createEnvForDaemon(t)
+			defer env.CleanUp()
+
+			grpcInst := cli.Create()
+			updateIndexAndInstallPlatform(cli, grpcInst, "3.1.0")
+
+			// remove esp8266 from the additional-urls
+			require.NoError(t, cli.SetValue("board_manager.additional_urls", `[]`))
+			refreshInstance(t, grpcInst)
+
+			plUpgrade, err := grpcInst.PlatformUpgrade(context.Background(), "esp8266", "esp8266", true)
+			require.NoError(t, err)
+
+			platform, upgradeError := analyzePlatformUpgradeClient(plUpgrade)
+			require.ErrorIs(t, upgradeError, (&arduino.PlatformAlreadyAtTheLatestVersionError{Platform: "esp8266:esp8266"}).ToRPCStatus().Err())
+			require.NotNil(t, platform)
+			require.False(t, platform.Indexed)         // the esp866 is not present in the additional-urls
+			require.False(t, platform.MissingMetadata) // install.json is present
+		})
+		t.Run("missing both additional URLs and install.json", func(t *testing.T) {
+			env, cli := createEnvForDaemon(t)
+			defer env.CleanUp()
+
+			grpcInst := cli.Create()
+			updateIndexAndInstallPlatform(cli, grpcInst, "3.1.0")
+
+			// remove additional urls and installed.json
+			{
+				require.NoError(t, cli.SetValue("board_manager.additional_urls", `[]`))
+				refreshInstance(t, grpcInst)
+
+				x := env.RootDir().Join("A/packages/esp8266/hardware/esp8266/3.1.0/installed.json")
+				require.NoError(t, os.Remove(x.String()))
+			}
+
+			plUpgrade, err := grpcInst.PlatformUpgrade(context.Background(), "esp8266", "esp8266", true)
+			require.NoError(t, err)
+
+			platform, upgradeError := analyzePlatformUpgradeClient(plUpgrade)
+			require.ErrorIs(t, upgradeError, (&arduino.PlatformAlreadyAtTheLatestVersionError{Platform: "esp8266:esp8266"}).ToRPCStatus().Err())
+			require.NotNil(t, platform)
+			require.False(t, platform.Indexed)        // the esp866 is not present in the additional-urls
+			require.True(t, platform.MissingMetadata) // install.json is present
+		})
+	})
+}
+
+func analyzeUpdateIndexClient(t *testing.T, cl commands.ArduinoCoreService_UpdateIndexClient) (map[string]*commands.DownloadProgressEnd, error) {
+	analyzer := NewDownloadProgressAnalyzer(t)
+	for {
+		msg, err := cl.Recv()
+		if err == io.EOF {
+			return analyzer.Results, nil
+		}
+		if err != nil {
+			return analyzer.Results, err
+		}
+		require.NoError(t, err)
+		analyzer.Process(msg.GetDownloadProgress())
+	}
+}
+
+func analyzePlatformUpgradeClient(cl commands.ArduinoCoreService_PlatformUpgradeClient) (*commands.Platform, error) {
+	var platform *commands.Platform
+	var upgradeError error
+	for {
+		msg, err := cl.Recv()
+		if err == io.EOF {
+			break
+		}
+		if msg.GetPlatform() != nil {
+			platform = msg.GetPlatform()
+		}
+		if err != nil {
+			upgradeError = err
+			break
+		}
+	}
+	return platform, upgradeError
 }
