@@ -102,6 +102,10 @@ message Platform {
   // A URL provided by the author of the platform's package, intended to point
   // to their online help service.
   HelpResources help = 12;
+  // If true the platform is indexed
+  bool indexed = 13;
+  // This field is true when the platform is installed with the Arduino IDE 1.8
+  bool missing_metadata = 14;
 }
 
 message InstalledPlatformReference {
