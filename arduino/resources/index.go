@@ -37,6 +37,15 @@ type IndexResource struct {
 	SignatureURL *url.URL
 }
 
+// IndexFileName returns the index file name as it is saved in data dir (package_xxx_index.json).
+func (res *IndexResource) IndexFileName() string {
+	filename := path.Base(res.URL.Path) // == package_index.json[.gz] || packacge_index.tar.bz2
+	if i := strings.Index(filename, "."); i != -1 {
+		filename = filename[:i]
+	}
+	return filename + ".json"
+}
+
 // Download will download the index and possibly check the signature using the Arduino's public key.
 // If the file is in .gz format it will be unpacked first.
 func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadProgressCB) error {
@@ -53,9 +62,10 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadP
 	defer tmp.RemoveAll()
 
 	// Download index file
-	indexFileName := path.Base(res.URL.Path) // == package_index.json[.gz]
-	tmpIndexPath := tmp.Join(indexFileName)
-	if err := httpclient.DownloadFile(tmpIndexPath, res.URL.String(), "", tr("Downloading index: %s", indexFileName), downloadCB, nil, downloader.NoResume); err != nil {
+	downloadFileName := path.Base(res.URL.Path) // == package_index.json[.gz] || package_index.tar.bz2
+	indexFileName := res.IndexFileName()        // == package_index.json
+	tmpIndexPath := tmp.Join(downloadFileName)
+	if err := httpclient.DownloadFile(tmpIndexPath, res.URL.String(), "", tr("Downloading index: %s", downloadFileName), downloadCB, nil, downloader.NoResume); err != nil {
 		return &arduino.FailedDownloadError{Message: tr("Error downloading index '%s'", res.URL), Cause: err}
 	}
 
@@ -63,8 +73,7 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadP
 	hasSignature := false
 
 	// Expand the index if it is compressed
-	if strings.HasSuffix(indexFileName, ".tar.bz2") {
-		indexFileName = strings.TrimSuffix(indexFileName, ".tar.bz2") + ".json" // == package_index.json
+	if strings.HasSuffix(downloadFileName, ".tar.bz2") {
 		signatureFileName := indexFileName + ".sig"
 		signaturePath = destDir.Join(signatureFileName)
 
@@ -95,8 +104,7 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadP
 		} else {
 			logrus.Infof("No signature %s found in package index archive %s", signatureFileName, tmpArchivePath.Base())
 		}
-	} else if strings.HasSuffix(indexFileName, ".gz") {
-		indexFileName = strings.TrimSuffix(indexFileName, ".gz") // == package_index.json
+	} else if strings.HasSuffix(downloadFileName, ".gz") {
 		tmpUnzippedIndexPath := tmp.Join(indexFileName)
 		if err := paths.GUnzip(tmpIndexPath, tmpUnzippedIndexPath); err != nil {
 			return &arduino.PermissionDeniedError{Message: tr("Error extracting %s", indexFileName), Cause: err}
