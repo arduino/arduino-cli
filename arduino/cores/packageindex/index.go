@@ -33,8 +33,9 @@ import (
 //
 //easyjson:json
 type Index struct {
-	Packages  []*indexPackage `json:"packages"`
-	IsTrusted bool
+	Packages        []*indexPackage `json:"packages"`
+	IsTrusted       bool
+	isInstalledJSON bool
 }
 
 // indexPackage represents a single entry from package_index.json file.
@@ -144,7 +145,7 @@ var tr = i18n.Tr
 // with the existing contents of the cores.Packages passed as parameter.
 func (index Index) MergeIntoPackages(outPackages cores.Packages) {
 	for _, inPackage := range index.Packages {
-		inPackage.extractPackageIn(outPackages, index.IsTrusted)
+		inPackage.extractPackageIn(outPackages, index.IsTrusted, index.isInstalledJSON)
 	}
 }
 
@@ -243,7 +244,7 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 	}
 }
 
-func (inPackage indexPackage) extractPackageIn(outPackages cores.Packages, trusted bool) {
+func (inPackage indexPackage) extractPackageIn(outPackages cores.Packages, trusted bool, isInstallJSON bool) {
 	outPackage := outPackages.GetOrCreatePackage(inPackage.Name)
 	outPackage.Maintainer = inPackage.Maintainer
 	outPackage.WebsiteURL = inPackage.WebsiteURL
@@ -256,15 +257,19 @@ func (inPackage indexPackage) extractPackageIn(outPackages cores.Packages, trust
 	}
 
 	for _, inPlatform := range inPackage.Platforms {
-		inPlatform.extractPlatformIn(outPackage, trusted)
+		inPlatform.extractPlatformIn(outPackage, trusted, isInstallJSON)
 	}
 }
 
-func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *cores.Package, trusted bool) error {
+func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *cores.Package, trusted bool, isInstallJSON bool) error {
 	outPlatform := outPackage.GetOrCreatePlatform(inPlatformRelease.Architecture)
 	// FIXME: shall we use the Name and Category of the latest release? or maybe move Name and Category in PlatformRelease?
 	outPlatform.Name = inPlatformRelease.Name
 	outPlatform.Category = inPlatformRelease.Category
+	// If the variable `isInstallJSON` is false it means that the index we're reading is coming from the additional-urls.
+	// Therefore, the `outPlatform.Indexed` will be set at `true`.
+	outPlatform.Indexed = outPlatform.Indexed || !isInstallJSON
+
 	// If the Platform is installed before deprecation installed.json file does not include "deprecated" field.
 	// The installed.json is read during loading phase of an installed Platform, if the deprecated field is not found
 	// the package_index.json field would be overwritten and the deprecation info would be lost.
@@ -398,6 +403,11 @@ func LoadIndex(jsonIndexFile *paths.Path) (*Index, error) {
 	} else {
 		logrus.WithField("index", jsonIndexFile).Infof("Missing signature file")
 	}
+
+	if jsonIndexFile.Base() == "installed.json" {
+		index.isInstalledJSON = true
+	}
+
 	return &index, nil
 }
 
