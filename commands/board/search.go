@@ -54,6 +54,7 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 				Website:           platform.Package.WebsiteURL,
 				Email:             platform.Package.Email,
 				ManuallyInstalled: platform.ManuallyInstalled,
+				Indexed:           platform.Indexed,
 			}
 
 			if latestPlatformRelease != nil {
@@ -61,6 +62,7 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 			}
 			if installedPlatformRelease != nil {
 				rpcPlatform.Installed = installedPlatformRelease.Version.String()
+				rpcPlatform.MissingMetadata = !installedPlatformRelease.HasMetadata()
 			}
 
 			// Platforms that are not installed don't have a list of boards
