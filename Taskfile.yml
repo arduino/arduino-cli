@@ -142,6 +142,12 @@ tasks:
       - easyjson arduino/cores/packageindex/index.go
       - easyjson arduino/libraries/librariesindex/json.go
 
+  go:add-license-headers:
+    desc: Add missing go license headers
+    cmds:
+      - go install github.com/google/addlicense@v1.1.1
+      - addlicense -c "ARDUINO SA (http://www.arduino.cc/)" -f ./license_header.tpl **/*.go
+
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-markdown-task/Taskfile.yml
   markdown:check-links:
     desc: Check for broken links
