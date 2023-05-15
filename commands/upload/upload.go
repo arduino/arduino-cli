@@ -195,7 +195,10 @@ func runProgramAction(pme *packagemanager.Explorer,
 	if burnBootloader && programmerID == "" {
 		return &arduino.MissingProgrammerError{}
 	}
-
+	if port == nil {
+		// For no-port uploads use "default" protocol
+		port = &rpc.Port{Protocol: "default"}
+	}
 	logrus.WithField("port", port).Tracef("Upload port")
 
 	fqbn, err := cores.ParseFQBN(fqbnIn)
