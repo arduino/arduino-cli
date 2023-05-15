@@ -9,7 +9,7 @@ require (
 	github.com/arduino/go-paths-helper v1.9.0
 	github.com/arduino/go-properties-orderedmap v1.7.1
 	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b
-	github.com/arduino/go-win32-utils v0.0.0-20180330194947-ed041402e83b
+	github.com/arduino/go-win32-utils v1.0.0
 	github.com/cmaglie/pb v1.0.27
 	github.com/codeclysm/extract/v3 v3.1.0
 	github.com/djherbis/buffer v1.1.0

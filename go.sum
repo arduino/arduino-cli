@@ -51,8 +51,8 @@ github.com/arduino/go-properties-orderedmap v1.7.1 h1:HQ9Pn/mk3+XyfrE39EEvaZwJkr
 github.com/arduino/go-properties-orderedmap v1.7.1/go.mod h1:DKjD2VXY/NZmlingh4lSFMEYCVubfeArCsGPGDwb2yk=
 github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b h1:9hDi4F2st6dbLC3y4i02zFT5quS4X6iioWifGlVwfy4=
 github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b/go.mod h1:uwGy5PpN4lqW97FiLnbcx+xx8jly5YuPMJWfVwwjJiQ=
-github.com/arduino/go-win32-utils v0.0.0-20180330194947-ed041402e83b h1:3PjgYG5gVPA7cipp7vIR2lF96KkEJIFBJ+ANnuv6J20=
-github.com/arduino/go-win32-utils v0.0.0-20180330194947-ed041402e83b/go.mod h1:iIPnclBMYm1g32Q5kXoqng4jLhMStReIP7ZxaoUC2y8=
+github.com/arduino/go-win32-utils v1.0.0 h1:/cXB86sOJxOsCHP7sQmXGLkdValwJt56mIwOHYxgQjQ=
+github.com/arduino/go-win32-utils v1.0.0/go.mod h1:0jqM7doGEAs6DaJCxxhLBUDS5OawrqF48HqXkcEie/Q=
 github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e/go.mod h1:3U/XgcO3hCbHZ8TKRvWD2dDTCfh9M9ya+I9JpbB7O8o=
 github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da/go.mod h1:Q73ZrmVTwzkszR9V5SSuryQ31EELlFMUz1kKyl939pY=
 github.com/armon/go-radix v0.0.0-20180808171621-7fddfc383310/go.mod h1:ufUuZ+zHj4x4TnLV4JWEpy2hxWSpsRywHrMgIH9cCH8=
