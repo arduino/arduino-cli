@@ -1,8 +1,9 @@
 ---
 name: github.com/arduino/go-win32-utils
-version: v0.0.0-20180330194947-ed041402e83b
+version: v1.0.0
 type: go
-summary:
+summary: win32 is a collection of useful bindings to Win32 API that are not available
+  in the standard golang windows/syscall package.
 homepage: https://pkg.go.dev/github.com/arduino/go-win32-utils
 license: gpl-2.0-or-later
 licenses:
