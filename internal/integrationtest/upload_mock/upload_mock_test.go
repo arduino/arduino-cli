@@ -162,10 +162,22 @@ func TestUploadSketch(t *testing.T) {
 			Output:     "Performing 1200-bps touch reset on serial port /dev/ttyACM999\nWaiting for upload port...\nUpload port found on /dev/ttyACM9990\n\"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude\" \"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf\" -v -V -patmega32u4 -cavr109 \"-P/dev/ttyACM9990\" -b57600 -D \"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i\"\n",
 		},
 		{
+			Fqbn:       "arduino:avr:leonardo",
+			UploadPort: "",
+			Programmer: "",
+			Output:     "Skipping 1200-bps touch reset: no serial port selected!\nWaiting for upload port...\nUpload port found on newport\n\"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude\" \"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf\" -v -V -patmega32u4 -cavr109 \"-Pnewport\" -b57600 -D \"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i\"\n",
+		},
+		{
 			Fqbn:       "arduino:avr:micro",
 			UploadPort: "/dev/ttyACM999",
 			Programmer: "",
 			Output:     "Performing 1200-bps touch reset on serial port /dev/ttyACM999\nWaiting for upload port...\nUpload port found on /dev/ttyACM9990\n\"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude\" \"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf\" -v -V -patmega32u4 -cavr109 \"-P/dev/ttyACM9990\" -b57600 -D \"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i\"\n",
+		},
+		{
+			Fqbn:       "arduino:avr:micro",
+			UploadPort: "",
+			Programmer: "",
+			Output:     "Skipping 1200-bps touch reset: no serial port selected!\nWaiting for upload port...\nUpload port found on newport\n\"{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude\" \"-C{data_dir}/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf\" -v -V -patmega32u4 -cavr109 \"-Pnewport\" -b57600 -D \"-Uflash:w:{build_dir}/{sketch_name}.ino.hex:i\"\n",
 		},
 		{
 			Fqbn:       "arduino:avr:circuitplay32u4cat",
@@ -500,6 +512,16 @@ func TestUploadSketch(t *testing.T) {
 				"darwin": "Performing 1200-bps touch reset on serial port /dev/ttyACM0\nWaiting for upload port...\nNo upload port found, using /dev/ttyACM0 as fallback\n\"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac\" -i -d --port=ttyACM0 -U true -i -e -w -v \"{build_dir}/{sketch_name}.ino.bin\" -R\n",
 				"linux":  "Performing 1200-bps touch reset on serial port /dev/ttyACM0\nWaiting for upload port...\nNo upload port found, using /dev/ttyACM0 as fallback\n\"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac\" -i -d --port=ttyACM0 -U true -i -e -w -v \"{build_dir}/{sketch_name}.ino.bin\" -R\n",
 				"win32":  "Performing 1200-bps touch reset on serial port /dev/ttyACM0\nWaiting for upload port...\nNo upload port found, using /dev/ttyACM0 as fallback\n\"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe\" -i -d --port=ttyACM0 -U true -i -e -w -v \"{build_dir}/{sketch_name}.ino.bin\" -R\n",
+			},
+		},
+		{
+			Fqbn:       "arduino:samd:mkr1000",
+			UploadPort: "",
+			Programmer: "",
+			Output: map[string]string{
+				"darwin": "Skipping 1200-bps touch reset: no serial port selected!\nWaiting for upload port...\nUpload port found on newport\n\"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac\" -i -d --port=newport -U true -i -e -w -v \"{build_dir}/{sketch_name}.ino.bin\" -R\n",
+				"linux":  "Skipping 1200-bps touch reset: no serial port selected!\nWaiting for upload port...\nUpload port found on newport\n\"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac\" -i -d --port=newport -U true -i -e -w -v \"{build_dir}/{sketch_name}.ino.bin\" -R\n",
+				"win32":  "Skipping 1200-bps touch reset: no serial port selected!\nWaiting for upload port...\nUpload port found on newport\n\"{data_dir}/packages/arduino/tools/bossac/1.7.0-arduino3/bossac.exe\" -i -d --port=newport -U true -i -e -w -v \"{build_dir}/{sketch_name}.ino.bin\" -R\n",
 			},
 		},
 		{

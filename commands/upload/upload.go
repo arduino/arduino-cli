@@ -195,7 +195,10 @@ func runProgramAction(pme *packagemanager.Explorer,
 	if burnBootloader && programmerID == "" {
 		return &arduino.MissingProgrammerError{}
 	}
-
+	if port == nil {
+		// For no-port uploads use "default" protocol
+		port = &rpc.Port{Protocol: "default"}
+	}
 	logrus.WithField("port", port).Tracef("Upload port")
 
 	fqbn, err := cores.ParseFQBN(fqbnIn)
@@ -361,11 +364,24 @@ func runProgramAction(pme *packagemanager.Explorer,
 		uploadProperties.Set("build.project_name", sketchName)
 	}
 
+	// Force port wait to make easier to unbrick boards like the Arduino Leonardo, or similar with native USB,
+	// when a sketch causes a crash and the native USB serial port is lost.
+	// See https://github.com/arduino/arduino-cli/issues/1943 for the details.
+	//
+	// In order to trigger the forced serial-port-wait the following conditions must be met:
+	// - No upload port specified (protocol == "default")
+	// - "upload.wait_for_upload_port" == true (developers requested the touch + port wait)
+	// - "upload.tool.serial" not defained, or
+	//   "upload.tool.serial" is the same as "upload.tool.default"
+	forcedSerialPortWait := port.Protocol == "default" && // this is the value when no port is specified
+		uploadProperties.GetBoolean("upload.wait_for_upload_port") &&
+		(!uploadProperties.ContainsKey("upload.tool.serial") ||
+			uploadProperties.Get("upload.tool.serial") == uploadProperties.Get("upload.tool.default"))
+
 	// If not using programmer perform some action required
 	// to set the board in bootloader mode
 	actualPort := port
-	if programmer == nil && !burnBootloader && port.Protocol == "serial" {
-
+	if programmer == nil && !burnBootloader && (port.Protocol == "serial" || forcedSerialPortWait) {
 		// Perform reset via 1200bps touch if requested and wait for upload port also if requested.
 		touch := uploadProperties.GetBoolean("upload.use_1200bps_touch")
 		wait := false
@@ -425,7 +441,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 	if actualPort.Address != "" {
 		// Set serial port property
 		uploadProperties.Set("serial.port", actualPort.Address)
-		if actualPort.Protocol == "serial" {
+		if actualPort.Protocol == "serial" || actualPort.Protocol == "default" {
 			// This must be done only for serial ports
 			portFile := strings.TrimPrefix(actualPort.Address, "/dev/")
 			uploadProperties.Set("serial.port.file", portFile)
