@@ -25,6 +25,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder/internal/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/internal/detector"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/diagnostics"
 	"github.com/arduino/arduino-cli/arduino/builder/internal/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/internal/progress"
 	"github.com/arduino/arduino-cli/arduino/builder/internal/utils"
@@ -90,6 +91,10 @@ type Builder struct {
 	buildOptions *buildOptions
 
 	libsDetector *detector.SketchLibrariesDetector
+
+	// This is a function used to parse the output of the compiler
+	// It is used to extract errors and warnings
+	compilerOutputParser diagnostics.CompilerOutputParserCB
 }
 
 // buildArtifacts contains the result of various build
