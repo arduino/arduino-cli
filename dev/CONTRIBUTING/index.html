@@ -1870,8 +1870,13 @@ submitting a PR:</p>
 </ul>
 <p>If you're working on the gRPC interface you will also have to:</p>
 <ul>
-<li>download the <a href="https://github.com/protocolbuffers/protobuf/releases">protoc</a> compiler</li>
-<li>run <code>go get -u github.com/golang/protobuf/protoc-gen-go</code></li>
+<li>download and install the <a href="https://github.com/protocolbuffers/protobuf/releases">protoc</a> compiler (use the version required to match the generated code, please note that
+  the latest releases does not follow semantic versioning anymore so, for example, the version 3.21.12 must be searched
+  as 21.12 dropping the major number)</li>
+<li>install <code>protoc-gen-go</code> using: <code>go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.26.0</code> (use the version
+  required to match the generated code)</li>
+<li>install <code>protoc-gen-go-grpc</code> using: <code>go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0</code> (use the version
+  required to match the generated code)</li>
 </ul>
 <h3 id="building-the-source-code">Building the source code<a class="headerlink" href="#building-the-source-code" title="Permanent link">&para;</a></h3>
 <p>From the project folder root, just run:</p>
