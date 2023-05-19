@@ -115,10 +115,53 @@ message CompileResponse {
   TaskProgress progress = 8;
   // Build properties used for compiling
   repeated string build_properties = 9;
+  // Compiler errors and warnings
+  repeated CompileDiagnostic diagnostics = 10;
 }
 
 message ExecutableSectionSize {
   string name = 1;
   int64 size = 2;
   int64 max_size = 3;
+}
+
+message CompileDiagnostic {
+  // Severity of the diagnostic
+  string severity = 1;
+  // The explanation of the diagnostic (it may be multiple preformatted lines)
+  string message = 2;
+  // The file containing the diagnostic
+  string file = 3;
+  // The line of the diagnostic if available (starts from 1)
+  int64 line = 4;
+  // The column of the diagnostic if available (starts from 1)
+  int64 column = 5;
+  // The context where this diagnostic is found (it may be multiple files that
+  // represents a chain of includes, or a text describing where the diagnostic
+  // is found)
+  repeated CompileDiagnosticContext context = 6;
+  // Annotations or suggestions to the diagnostic made by the compiler
+  repeated CompileDiagnosticNote notes = 7;
+}
+
+message CompileDiagnosticContext {
+  // The message describing the context reference
+  string message = 1;
+  // The file of the context reference
+  string file = 2;
+  // The line of the context reference
+  int64 line = 3;
+  // The column of the context reference
+  int64 column = 4;
+}
+
+message CompileDiagnosticNote {
+  // The message describing the compiler note
+  string message = 1;
+  // The file of the compiler note
+  string file = 2;
+  // The line of the compiler note
+  int64 line = 3;
+  // The column of the compiler note
+  int64 column = 4;
 }
