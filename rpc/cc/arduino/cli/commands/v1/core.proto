@@ -97,7 +97,7 @@ message PlatformUpgradeResponse {
   DownloadProgress progress = 1;
   // Description of the current stage of the upgrade.
   TaskProgress task_progress = 2;
-  // Platform to be upgraded.
+  // The upgraded platform.
   Platform platform = 3;
 }
 

@@ -82,7 +82,7 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 		if response == nil || response.Platform == nil {
 			return
 		}
-		if !response.Platform.Indexed || (response.Platform.MissingMetadata && !response.Platform.Indexed) {
+		if !response.Platform.Indexed {
 			feedback.Warning(tr("missing package index for %s, future updates cannot be guaranteed", response.Platform.Id))
 		}
 	}

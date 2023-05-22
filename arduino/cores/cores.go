@@ -418,8 +418,5 @@ func (release *PlatformRelease) HasMetadata() bool {
 	}
 
 	installedJSONPath := release.InstallDir.Join("installed.json")
-	if installedJSONPath == nil {
-		return false
-	}
 	return installedJSONPath.Exist()
 }

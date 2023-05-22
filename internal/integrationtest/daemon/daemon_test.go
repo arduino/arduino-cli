@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os"
 	"testing"
 	"time"
 
@@ -457,9 +456,9 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 			grpcInst := cli.Create()
 			updateIndexAndInstallPlatform(cli, grpcInst, "3.1.0")
 
-			// remove installed.json{
+			// remove installed.json
 			x := env.RootDir().Join("A/packages/esp8266/hardware/esp8266/3.1.0/installed.json")
-			require.NoError(t, os.Remove(x.String()))
+			require.NoError(t, x.Remove())
 
 			plUpgrade, err := grpcInst.PlatformUpgrade(context.Background(), "esp8266", "esp8266", true)
 			require.NoError(t, err)
@@ -507,7 +506,7 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 				refreshInstance(t, grpcInst)
 
 				x := env.RootDir().Join("A/packages/esp8266/hardware/esp8266/3.1.0/installed.json")
-				require.NoError(t, os.Remove(x.String()))
+				require.NoError(t, x.Remove())
 			}
 
 			plUpgrade, err := grpcInst.PlatformUpgrade(context.Background(), "esp8266", "esp8266", true)

@@ -525,7 +525,9 @@ type Platform struct {
 	Help *HelpResources `protobuf:"bytes,12,opt,name=help,proto3" json:"help,omitempty"`
 	// If true the platform is indexed
 	Indexed bool `protobuf:"varint,13,opt,name=indexed,proto3" json:"indexed,omitempty"`
-	// This field is true when the platform is installed with the Arduino IDE 1.8
+	// This field is true when the platform is installed with the Arduino IDE 1.8.
+	// If the platform is also not indexed it may fail to work correctly in some
+	// circumstances, and it may need to be re-installed.
 	MissingMetadata bool `protobuf:"varint,14,opt,name=missing_metadata,json=missingMetadata,proto3" json:"missing_metadata,omitempty"`
 }
 

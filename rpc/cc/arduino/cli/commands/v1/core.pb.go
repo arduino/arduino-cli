@@ -586,7 +586,7 @@ type PlatformUpgradeResponse struct {
 	Progress *DownloadProgress `protobuf:"bytes,1,opt,name=progress,proto3" json:"progress,omitempty"`
 	// Description of the current stage of the upgrade.
 	TaskProgress *TaskProgress `protobuf:"bytes,2,opt,name=task_progress,json=taskProgress,proto3" json:"task_progress,omitempty"`
-	// Platform to be upgraded.
+	// The upgraded platform.
 	Platform *Platform `protobuf:"bytes,3,opt,name=platform,proto3" json:"platform,omitempty"`
 }
 

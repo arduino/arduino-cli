@@ -104,7 +104,9 @@ message Platform {
   HelpResources help = 12;
   // If true the platform is indexed
   bool indexed = 13;
-  // This field is true when the platform is installed with the Arduino IDE 1.8
+  // This field is true when the platform is installed with the Arduino IDE 1.8.
+  // If the platform is also not indexed it may fail to work correctly in some
+  // circumstances, and it may need to be re-installed.
   bool missing_metadata = 14;
 }
 
