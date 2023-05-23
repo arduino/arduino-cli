@@ -54,16 +54,16 @@ func (pme *Explorer) DownloadAndInstallPlatformUpgrades(
 	}
 	latest := platform.GetLatestRelease()
 	if !latest.Version.GreaterThan(installed.Version) {
-		return latest, &arduino.PlatformAlreadyAtTheLatestVersionError{Platform: platformRef.String()}
+		return installed, &arduino.PlatformAlreadyAtTheLatestVersionError{Platform: platformRef.String()}
 	}
 	platformRef.PlatformVersion = latest.Version
 
 	platformRelease, tools, err := pme.FindPlatformReleaseDependencies(platformRef)
 	if err != nil {
-		return platformRelease, &arduino.PlatformNotFoundError{Platform: platformRef.String()}
+		return nil, &arduino.PlatformNotFoundError{Platform: platformRef.String()}
 	}
 	if err := pme.DownloadAndInstallPlatformAndTools(platformRelease, tools, downloadCB, taskCB, skipPostInstall); err != nil {
-		return platformRelease, err
+		return nil, err
 	}
 
 	return platformRelease, nil
