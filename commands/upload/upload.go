@@ -430,7 +430,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 		}
 
 		if newPortAddress, err := serialutils.Reset(portToTouch, wait, cb, dryRun); err != nil {
-			outStream.Write([]byte(fmt.Sprintln(tr("Cannot perform port reset: %s", err))))
+			errStream.Write([]byte(fmt.Sprintln(tr("Cannot perform port reset: %s", err))))
 		} else {
 			if newPortAddress != "" {
 				actualPort.Address = newPortAddress
