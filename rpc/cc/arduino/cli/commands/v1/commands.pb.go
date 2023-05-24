@@ -252,6 +252,7 @@ type InitResponse struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Message:
+	//
 	//	*InitResponse_InitProgress
 	//	*InitResponse_Error
 	//	*InitResponse_Profile

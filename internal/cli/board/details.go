@@ -22,7 +22,6 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
-	"github.com/arduino/arduino-cli/internal/cli/compile"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -66,15 +65,12 @@ func runDetailsCommand(fqbn string, showFullDetails, listProgrammers bool, showP
 		feedback.Fatal(err.Error(), feedback.ErrBadArgument)
 	}
 	res, err := board.Details(context.Background(), &rpc.BoardDetailsRequest{
-		Instance: inst,
-		Fqbn:     fqbn,
+		Instance:                   inst,
+		Fqbn:                       fqbn,
+		DoNotExpandBuildProperties: showPropertiesMode == arguments.ShowPropertiesUnexpanded,
 	})
 	if err != nil {
 		feedback.Fatal(tr("Error getting board details: %v", err), feedback.ErrGeneric)
-	}
-
-	if showPropertiesMode == arguments.ShowPropertiesExpanded {
-		res.BuildProperties, _ = compile.ExpandBuildProperties(res.GetBuildProperties())
 	}
 
 	feedback.PrintResult(detailsResult{

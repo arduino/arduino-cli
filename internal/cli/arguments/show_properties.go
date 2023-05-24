@@ -56,7 +56,7 @@ func (p *ShowProperties) Get() (ShowPropertiesMode, error) {
 func (p *ShowProperties) AddToCommand(command *cobra.Command) {
 	command.Flags().StringVar(&p.arg,
 		"show-properties", "disabled",
-		tr(`Show build properties. The properties are returned exactly as they are defined. Use "--show-properties=expanded" to replace placeholders with context values.`),
+		tr(`Show build properties. The properties are expanded, use "--show-properties=unexpanded" if you want them exactly as they are defined.`),
 	)
-	command.Flags().Lookup("show-properties").NoOptDefVal = "unexpanded" // default if the flag is present with no value
+	command.Flags().Lookup("show-properties").NoOptDefVal = "expanded" // default if the flag is present with no value
 }

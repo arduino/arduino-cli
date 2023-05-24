@@ -41,17 +41,17 @@ func TestCompileShowProperties(t *testing.T) {
 	bareMinimum := cli.CopySketch("bare_minimum")
 
 	// Test --show-properties output is clean
-	// properties are not expanded
+	// properties are expanded
 	stdout, stderr, err := cli.Run("compile", "--fqbn", "arduino:avr:uno", "-v", "--show-properties", bareMinimum.String())
 	require.NoError(t, err)
 	props, err := properties.LoadFromBytes(stdout)
 	require.NoError(t, err, "Output must be a clean property list")
 	require.Empty(t, stderr)
 	require.True(t, props.ContainsKey("archive_file_path"))
-	require.Contains(t, props.Get("archive_file_path"), "{build.path}")
+	require.NotContains(t, props.Get("archive_file_path"), "{build.path}")
 
 	// Test --show-properties --format JSON output is clean
-	// properties are not expanded
+	// properties are expanded
 	stdout, stderr, err = cli.Run("compile", "--fqbn", "arduino:avr:uno", "-v", "--show-properties", "--format", "json", bareMinimum.String())
 	require.NoError(t, err)
 	require.Empty(t, stderr)
@@ -59,7 +59,7 @@ func TestCompileShowProperties(t *testing.T) {
 		requireCompileResponseJson(t, stdout).BuilderResult.GetBuildProperties())
 	require.NoError(t, err)
 	require.True(t, props.ContainsKey("archive_file_path"))
-	require.Contains(t, props.Get("archive_file_path"), "{build.path}")
+	require.NotContains(t, props.Get("archive_file_path"), "{build.path}")
 
 	// Test --show-properties output is clean, with a wrong FQBN
 	stdout, stderr, err = cli.Run("compile", "--fqbn", "arduino:avr:unoa", "-v", "--show-properties", bareMinimum.String())

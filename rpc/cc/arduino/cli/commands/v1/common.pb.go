@@ -89,6 +89,7 @@ type DownloadProgress struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Message:
+	//
 	//	*DownloadProgress_Start
 	//	*DownloadProgress_Update
 	//	*DownloadProgress_End
