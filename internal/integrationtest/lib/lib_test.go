@@ -1520,9 +1520,14 @@ func TestLibQueryParameters(t *testing.T) {
 	require.Contains(t, string(stdout), `"url":"https://downloads.arduino.cc/libraries/github.com/arduino-libraries/USBHost-1.0.5.zip?query=upgrade"`)
 
 	// Check query=depends when a library dependency is installed
+	stdout, _, err = cli.Run("lib", "deps", "MD_Parola@3.5.5", "--format", "json")
+	require.NoError(t, err)
+	// determine the version installed as dependency
+	MDMAX72XXversion := strings.Trim(requirejson.Parse(t, stdout).Query(`.dependencies[0].version_required`).String(), `"`)
+
 	stdout, _, err = cli.Run("lib", "install", "MD_Parola@3.5.5", "-v", "--log-level", "debug", "--log-format", "json")
 	require.NoError(t, err)
-	require.Contains(t, string(stdout), `"url":"https://downloads.arduino.cc/libraries/github.com/MajicDesigns/MD_MAX72XX-3.3.1.zip?query=depends"`)
+	require.Contains(t, string(stdout), `"url":"https://downloads.arduino.cc/libraries/github.com/MajicDesigns/MD_MAX72XX-`+MDMAX72XXversion+`.zip?query=depends"`)
 
 	// Check query=download when a library is downloaded
 	stdout, _, err = cli.Run("lib", "download", "WiFi101@0.16.1", "-v", "--log-level", "debug", "--log-format", "json")
