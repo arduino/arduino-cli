@@ -1510,42 +1510,41 @@ func TestLibQueryParameters(t *testing.T) {
 	require.NoError(t, err)
 
 	// Check query=install when a library is installed
-	stdout, _, err := cli.Run("lib", "install", "USBHost@1.0.0", "-v", "--log-level", "debug")
+	stdout, _, err := cli.Run("lib", "install", "USBHost@1.0.0", "-v", "--log-level", "debug", "--log-format", "json")
 	require.NoError(t, err)
-	require.Contains(t, string(stdout),
-		"Starting download                             \x1b[36murl\x1b[0m=\"https://downloads.arduino.cc/libraries/github.com/arduino-libraries/USBHost-1.0.0.zip?query=install\"\n")
+	require.Contains(t, string(stdout), `"url":"https://downloads.arduino.cc/libraries/github.com/arduino-libraries/USBHost-1.0.0.zip?query=install"`)
 
 	// Check query=upgrade when a library is upgraded
-	stdout, _, err = cli.Run("lib", "upgrade", "USBHost", "-v", "--log-level", "debug")
+	stdout, _, err = cli.Run("lib", "upgrade", "USBHost", "-v", "--log-level", "debug", "--log-format", "json")
 	require.NoError(t, err)
-	require.Contains(t, string(stdout),
-		"Starting download                             \x1b[36murl\x1b[0m=\"https://downloads.arduino.cc/libraries/github.com/arduino-libraries/USBHost-1.0.5.zip?query=upgrade\"\n")
+	require.Contains(t, string(stdout), `"url":"https://downloads.arduino.cc/libraries/github.com/arduino-libraries/USBHost-1.0.5.zip?query=upgrade"`)
 
 	// Check query=depends when a library dependency is installed
-	stdout, _, err = cli.Run("lib", "install", "MD_Parola@3.5.5", "-v", "--log-level", "debug")
+	stdout, _, err = cli.Run("lib", "deps", "MD_Parola@3.5.5", "--format", "json")
 	require.NoError(t, err)
-	require.Contains(t, string(stdout),
-		"Starting download                             \x1b[36murl\x1b[0m=\"https://downloads.arduino.cc/libraries/github.com/MajicDesigns/MD_MAX72XX-3.3.1.zip?query=depends\"\n")
+	// determine the version installed as dependency
+	MDMAX72XXversion := strings.Trim(requirejson.Parse(t, stdout).Query(`.dependencies[0].version_required`).String(), `"`)
+
+	stdout, _, err = cli.Run("lib", "install", "MD_Parola@3.5.5", "-v", "--log-level", "debug", "--log-format", "json")
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), `"url":"https://downloads.arduino.cc/libraries/github.com/MajicDesigns/MD_MAX72XX-`+MDMAX72XXversion+`.zip?query=depends"`)
 
 	// Check query=download when a library is downloaded
-	stdout, _, err = cli.Run("lib", "download", "WiFi101@0.16.1", "-v", "--log-level", "debug")
+	stdout, _, err = cli.Run("lib", "download", "WiFi101@0.16.1", "-v", "--log-level", "debug", "--log-format", "json")
 	require.NoError(t, err)
-	require.Contains(t, string(stdout),
-		"Starting download                             \x1b[36murl\x1b[0m=\"https://downloads.arduino.cc/libraries/github.com/arduino-libraries/WiFi101-0.16.1.zip?query=download\"\n")
+	require.Contains(t, string(stdout), `"url":"https://downloads.arduino.cc/libraries/github.com/arduino-libraries/WiFi101-0.16.1.zip?query=download"`)
 
 	// Check query=install-builtin when a library dependency is installed in builtin-directory
 	cliEnv := cli.GetDefaultEnv()
 	cliEnv["ARDUINO_DIRECTORIES_BUILTIN_LIBRARIES"] = cli.DataDir().Join("libraries").String()
-	stdout, _, err = cli.RunWithCustomEnv(cliEnv, "lib", "install", "Firmata@2.5.3", "--install-in-builtin-dir", "-v", "--log-level", "debug")
+	stdout, _, err = cli.RunWithCustomEnv(cliEnv, "lib", "install", "Firmata@2.5.3", "--install-in-builtin-dir", "-v", "--log-level", "debug", "--log-format", "json")
 	require.NoError(t, err)
-	require.Contains(t, string(stdout),
-		"Starting download                             \x1b[36murl\x1b[0m=\"https://downloads.arduino.cc/libraries/github.com/firmata/Firmata-2.5.3.zip?query=install-builtin\"\n")
+	require.Contains(t, string(stdout), `"url":"https://downloads.arduino.cc/libraries/github.com/firmata/Firmata-2.5.3.zip?query=install-builtin`)
 
 	// Check query=update-builtin when a library dependency is updated in builtin-directory
-	stdout, _, err = cli.RunWithCustomEnv(cliEnv, "lib", "install", "Firmata@2.5.9", "--install-in-builtin-dir", "-v", "--log-level", "debug")
+	stdout, _, err = cli.RunWithCustomEnv(cliEnv, "lib", "install", "Firmata@2.5.9", "--install-in-builtin-dir", "-v", "--log-level", "debug", "--log-format", "json")
 	require.NoError(t, err)
-	require.Contains(t, string(stdout),
-		"Starting download                             \x1b[36murl\x1b[0m=\"https://downloads.arduino.cc/libraries/github.com/firmata/Firmata-2.5.9.zip?query=upgrade-builtin\"\n")
+	require.Contains(t, string(stdout), `"url":"https://downloads.arduino.cc/libraries/github.com/firmata/Firmata-2.5.9.zip?query=upgrade-builtin"`)
 }
 
 func TestLibBundlesWhenLibWithTheSameNameIsInstalledGlobally(t *testing.T) {
