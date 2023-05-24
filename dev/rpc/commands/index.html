@@ -5392,6 +5392,18 @@
 <td></td>
 <td>A URL provided by the author of the platform&#39;s package, intended to point to their online help service.</td>
 </tr>
+<tr>
+<td>indexed</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>If true the platform is indexed</td>
+</tr>
+<tr>
+<td>missing_metadata</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>This field is true when the platform is installed with the Arduino IDE 1.8. If the platform is also not indexed it may fail to work correctly in some circumstances, and it may need to be re-installed.</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.Profile"></a></p>
@@ -6138,6 +6150,12 @@
 <td><a href="#cc.arduino.cli.commands.v1.TaskProgress">TaskProgress</a></td>
 <td></td>
 <td>Description of the current stage of the upgrade.</td>
+</tr>
+<tr>
+<td>platform</td>
+<td><a href="#cc.arduino.cli.commands.v1.Platform">Platform</a></td>
+<td></td>
+<td>The upgraded platform.</td>
 </tr>
 </tbody>
 </table>
