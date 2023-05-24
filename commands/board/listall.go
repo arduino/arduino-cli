@@ -62,6 +62,8 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListA
 				Website:           platform.Package.WebsiteURL,
 				Email:             platform.Package.Email,
 				ManuallyInstalled: platform.ManuallyInstalled,
+				Indexed:           platform.Indexed,
+				MissingMetadata:   !installedPlatformRelease.HasMetadata(),
 			}
 
 			toTest := []string{

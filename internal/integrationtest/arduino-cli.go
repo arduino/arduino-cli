@@ -458,3 +458,15 @@ func (inst *ArduinoCLIInstance) UpdateIndex(ctx context.Context, ignoreCustomPac
 	logCallf(">>> UpdateIndex(%+v)\n", req)
 	return updCl, err
 }
+
+// PlatformUpgrade calls the "PlatformUpgrade" gRPC method.
+func (inst *ArduinoCLIInstance) PlatformUpgrade(ctx context.Context, packager, arch string, skipPostInst bool) (commands.ArduinoCoreService_PlatformUpgradeClient, error) {
+	installCl, err := inst.cli.daemonClient.PlatformUpgrade(ctx, &commands.PlatformUpgradeRequest{
+		Instance:        inst.instance,
+		PlatformPackage: packager,
+		Architecture:    arch,
+		SkipPostInstall: skipPostInst,
+	})
+	logCallf(">>> PlatformUpgrade(%v:%v)\n", packager, arch)
+	return installCl, err
+}

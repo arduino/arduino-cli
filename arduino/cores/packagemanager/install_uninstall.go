@@ -38,35 +38,35 @@ func (pme *Explorer) DownloadAndInstallPlatformUpgrades(
 	downloadCB rpc.DownloadProgressCB,
 	taskCB rpc.TaskProgressCB,
 	skipPostInstall bool,
-) error {
+) (*cores.PlatformRelease, error) {
 	if platformRef.PlatformVersion != nil {
-		return &arduino.InvalidArgumentError{Message: tr("Upgrade doesn't accept parameters with version")}
+		return nil, &arduino.InvalidArgumentError{Message: tr("Upgrade doesn't accept parameters with version")}
 	}
 
 	// Search the latest version for all specified platforms
 	platform := pme.FindPlatform(platformRef)
 	if platform == nil {
-		return &arduino.PlatformNotFoundError{Platform: platformRef.String()}
+		return nil, &arduino.PlatformNotFoundError{Platform: platformRef.String()}
 	}
 	installed := pme.GetInstalledPlatformRelease(platform)
 	if installed == nil {
-		return &arduino.PlatformNotFoundError{Platform: platformRef.String()}
+		return nil, &arduino.PlatformNotFoundError{Platform: platformRef.String()}
 	}
 	latest := platform.GetLatestRelease()
 	if !latest.Version.GreaterThan(installed.Version) {
-		return &arduino.PlatformAlreadyAtTheLatestVersionError{}
+		return installed, &arduino.PlatformAlreadyAtTheLatestVersionError{Platform: platformRef.String()}
 	}
 	platformRef.PlatformVersion = latest.Version
 
 	platformRelease, tools, err := pme.FindPlatformReleaseDependencies(platformRef)
 	if err != nil {
-		return &arduino.PlatformNotFoundError{Platform: platformRef.String()}
+		return nil, &arduino.PlatformNotFoundError{Platform: platformRef.String()}
 	}
 	if err := pme.DownloadAndInstallPlatformAndTools(platformRelease, tools, downloadCB, taskCB, skipPostInstall); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return platformRelease, nil
 }
 
 // DownloadAndInstallPlatformAndTools runs a full installation process for the given platform and tools.

@@ -270,31 +270,6 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		// even if it should not.
 		pmb, commitPackageManager := instance.pm.NewBuilder()
 
-		loadBuiltinTools := func() []error {
-			builtinPackage := pmb.GetOrCreatePackage("builtin")
-			return pmb.LoadToolsFromPackageDir(builtinPackage, pmb.PackagesDir.Join("builtin", "tools"))
-		}
-
-		// Load Platforms
-		if profile == nil {
-			for _, err := range pmb.LoadHardware() {
-				s := &arduino.PlatformLoadingError{Cause: err}
-				responseError(s.ToRPCStatus())
-			}
-		} else {
-			// Load platforms from profile
-			errs := pmb.LoadHardwareForProfile(
-				profile, true, downloadCallback, taskCallback,
-			)
-			for _, err := range errs {
-				s := &arduino.PlatformLoadingError{Cause: err}
-				responseError(s.ToRPCStatus())
-			}
-
-			// Load "builtin" tools
-			_ = loadBuiltinTools()
-		}
-
 		// Load packages index
 		urls := []string{globals.DefaultIndexURL}
 		if profile == nil {
@@ -333,6 +308,31 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 				}
 				responseError(e.ToRPCStatus())
 			}
+		}
+
+		loadBuiltinTools := func() []error {
+			builtinPackage := pmb.GetOrCreatePackage("builtin")
+			return pmb.LoadToolsFromPackageDir(builtinPackage, pmb.PackagesDir.Join("builtin", "tools"))
+		}
+
+		// Load Platforms
+		if profile == nil {
+			for _, err := range pmb.LoadHardware() {
+				s := &arduino.PlatformLoadingError{Cause: err}
+				responseError(s.ToRPCStatus())
+			}
+		} else {
+			// Load platforms from profile
+			errs := pmb.LoadHardwareForProfile(
+				profile, true, downloadCallback, taskCallback,
+			)
+			for _, err := range errs {
+				s := &arduino.PlatformLoadingError{Cause: err}
+				responseError(s.ToRPCStatus())
+			}
+
+			// Load "builtin" tools
+			_ = loadBuiltinTools()
 		}
 
 		// We load hardware before verifying builtin tools are installed

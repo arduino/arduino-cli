@@ -62,6 +62,8 @@ func PlatformReleaseToRPC(platformRelease *cores.PlatformRelease) *rpc.Platform 
 		ManuallyInstalled: platformRelease.Platform.ManuallyInstalled,
 		Deprecated:        platformRelease.Platform.Deprecated,
 		Type:              []string{platformRelease.Platform.Category},
+		Indexed:           platformRelease.Platform.Indexed,
+		MissingMetadata:   !platformRelease.HasMetadata(),
 	}
 
 	return result

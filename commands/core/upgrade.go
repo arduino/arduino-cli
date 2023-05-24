@@ -17,6 +17,7 @@ package core
 
 import (
 	"context"
+	"github.com/arduino/arduino-cli/arduino/cores"
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -26,10 +27,10 @@ import (
 
 // PlatformUpgrade FIXMEDOC
 func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformUpgradeResponse, error) {
-	upgrade := func() error {
+	upgrade := func() (*cores.PlatformRelease, error) {
 		pme, release := commands.GetPackageManagerExplorer(req)
 		if pme == nil {
-			return &arduino.InvalidInstanceError{}
+			return nil, &arduino.InvalidInstanceError{}
 		}
 		defer release()
 
@@ -38,18 +39,26 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest, downl
 			Package:              req.PlatformPackage,
 			PlatformArchitecture: req.Architecture,
 		}
-		if err := pme.DownloadAndInstallPlatformUpgrades(ref, downloadCB, taskCB, req.GetSkipPostInstall()); err != nil {
-			return err
+		platform, err := pme.DownloadAndInstallPlatformUpgrades(ref, downloadCB, taskCB, req.GetSkipPostInstall())
+		if err != nil {
+			return platform, err
 		}
 
-		return nil
+		return platform, nil
 	}
 
-	if err := upgrade(); err != nil {
-		return nil, err
+	var rpcPlatform *rpc.Platform
+
+	platformRelease, err := upgrade()
+	if platformRelease != nil {
+		rpcPlatform = commands.PlatformReleaseToRPC(platformRelease)
+	}
+	if err != nil {
+		return &rpc.PlatformUpgradeResponse{Platform: rpcPlatform}, err
 	}
 	if err := commands.Init(&rpc.InitRequest{Instance: req.Instance}, nil); err != nil {
 		return nil, err
 	}
-	return &rpc.PlatformUpgradeResponse{}, nil
+
+	return &rpc.PlatformUpgradeResponse{Platform: rpcPlatform}, nil
 }

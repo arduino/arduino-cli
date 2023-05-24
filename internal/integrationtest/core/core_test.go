@@ -1026,3 +1026,31 @@ func TestCoreBrokenDependency(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "try contacting test@example.com")
 }
+
+func TestCoreUpgradeWarningWithPackageInstalledButNotIndexed(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	url := env.HTTPServeFile(8000, paths.New("..", "testdata", "test_index.json")).String()
+
+	t.Run("missing additional-urls", func(t *testing.T) {
+		// update index
+		_, _, err := cli.Run("core", "update-index", "--additional-urls="+url)
+		require.NoError(t, err)
+		// install 3rd-party core outdated version
+		_, _, err = cli.Run("core", "install", "test:x86@1.0.0", "--additional-urls="+url)
+		require.NoError(t, err)
+		//upgrade without index fires a warning
+		_, jsonStderr, _ := cli.Run("core", "upgrade", "test:x86", "--format", "json")
+		requirejson.Query(t, jsonStderr, ".warnings[]", `"missing package index for test:x86, future updates cannot be guaranteed"`)
+	})
+
+	// removing installed.json
+	installedJson := cli.DataDir().Join("packages", "test", "hardware", "x86", "1.0.0", "installed.json")
+	require.NoError(t, os.Remove(installedJson.String()))
+
+	t.Run("missing both installed.json and additional-urls", func(t *testing.T) {
+		_, jsonStderr, _ := cli.Run("core", "upgrade", "test:x86", "--format", "json")
+		requirejson.Query(t, jsonStderr, ".warnings[]", `"missing package index for test:x86, future updates cannot be guaranteed"`)
+	})
+}

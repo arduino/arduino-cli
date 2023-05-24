@@ -78,6 +78,15 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 		}
 	}
 
+	warningMissingIndex := func(response *rpc.PlatformUpgradeResponse) {
+		if response == nil || response.Platform == nil {
+			return
+		}
+		if !response.Platform.Indexed {
+			feedback.Warning(tr("missing package index for %s, future updates cannot be guaranteed", response.Platform.Id))
+		}
+	}
+
 	// proceed upgrading, if anything is upgradable
 	platformsRefs, err := arguments.ParseReferences(args)
 	if err != nil {
@@ -98,7 +107,9 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 			Architecture:    platformRef.Architecture,
 			SkipPostInstall: skipPostInstall,
 		}
-		if _, err := core.PlatformUpgrade(context.Background(), r, feedback.ProgressBar(), feedback.TaskProgress()); err != nil {
+		response, err := core.PlatformUpgrade(context.Background(), r, feedback.ProgressBar(), feedback.TaskProgress())
+		warningMissingIndex(response)
+		if err != nil {
 			if errors.Is(err, &arduino.PlatformAlreadyAtTheLatestVersionError{}) {
 				feedback.Print(err.Error())
 				continue

@@ -44,6 +44,7 @@ type Platform struct {
 	Package           *Package                                     `json:"-"`
 	ManuallyInstalled bool                                         // true if the Platform has been installed without the CLI
 	Deprecated        bool                                         // true if the Platform has been deprecated
+	Indexed           bool                                         // true if the Platform has been indexed from additional-urls
 }
 
 // PlatformReleaseHelp represents the help URL for this Platform release
@@ -408,4 +409,14 @@ func (release *PlatformRelease) MarshalJSON() ([]byte, error) {
 		Latest:    latestStr,
 		Name:      release.Platform.Name,
 	})
+}
+
+// HasMetadata returns true if the PlatformRelease installation dir contains the installed.json file
+func (release *PlatformRelease) HasMetadata() bool {
+	if release.InstallDir == nil {
+		return false
+	}
+
+	installedJSONPath := release.InstallDir.Join("installed.json")
+	return installedJSONPath.Exist()
 }
