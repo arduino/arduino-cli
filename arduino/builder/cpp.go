@@ -29,7 +29,7 @@ func QuoteCppString(str string) string {
 	return "\"" + str + "\""
 }
 
-// Parse a C-preprocessor string as emitted by the preprocessor. This
+// ParseCppString parse a C-preprocessor string as emitted by the preprocessor. This
 // is a string contained in double quotes, with any backslashes or
 // quotes escaped with a backslash. If a valid string was present at the
 // start of the given line, returns the unquoted string contents, the
