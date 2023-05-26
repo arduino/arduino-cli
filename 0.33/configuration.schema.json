@@ -1,0 +1,161 @@
+{
+  "title": "Arduino CLI configuration schema",
+  "description": "Describe the parameters available for the Arduino CLI configuration file. This schema should be considered unstable at this moment, it is not used by the CLI to validate input configuration",
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "properties": {
+    "board_manager": {
+      "description": "",
+      "properties": {
+        "additional_urls": {
+          "description": "the URLs to any additional Boards Manager package index files needed for your boards platforms.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "build_cache": {
+      "description": "configuration options related to the compilation cache",
+      "properties": {
+        "compilations_before_purge": {
+          "description": "interval, in number of compilations, at which the cache is purged, defaults to `10`. When `0` the cache is never purged.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "ttl": {
+          "description": "cache expiration time of build folders. If the cache is hit by a compilation the corresponding build files lifetime is renewed. The value format must be a valid input for time.ParseDuration(), defaults to `720h` (30 days)",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "string",
+              "pattern": "^\\+?([0-9]?\\.?[0-9]+(([nuµm]?s)|m|h))+$"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "daemon": {
+      "description": "options related to running Arduino CLI as a [gRPC] server.",
+      "properties": {
+        "port": {
+          "description": "TCP port used for gRPC client connections.",
+          "type": "string",
+          "pattern": "^[0-9]+$"
+        }
+      },
+      "type": "object"
+    },
+    "directories": {
+      "description": "directories used by Arduino CLI.",
+      "properties": {
+        "builtin": {
+          "description": "",
+          "properties": {
+            "libraries": {
+              "description": "the libraries in this directory will be available to all platforms without the need for the user to install them, but with the lowest priority over other installed libraries with the same name, it's the equivalent of the Arduino IDE's bundled libraries directory.",
+              "type": "string"
+            },
+            "tools": {
+              "description": "it's a list of directories of tools that will be available to all platforms without the need for the user to install them, it's the equivalent of the Arduino IDE 1.x bundled tools directory.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "type": "object"
+        },
+        "data": {
+          "description": "directory used to store Boards/Library Manager index files and Boards Manager platform installations.",
+          "type": "string"
+        },
+        "downloads": {
+          "description": "directory used to stage downloaded archives during Boards/Library Manager installations.",
+          "type": "string"
+        },
+        "user": {
+          "description": "the equivalent of the Arduino IDE's [\"sketchbook\" directory][sketchbook directory]. Library Manager installations are made to the `libraries` subdirectory of the user directory.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "library": {
+      "description": "configuration options relating to Arduino libraries.",
+      "properties": {
+        "enable_unsafe_install": {
+          "description": "set to `true` to enable the use of the `--git-url` and `--zip-file` flags with [`arduino-cli lib install`][arduino cli lib install]. These are considered \"unsafe\" installation methods because they allow installing files that have not passed through the Library Manager submission process.",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "locale": {
+      "description": "the language used by Arduino CLI to communicate to the user, the parameter is the language identifier in the standard POSIX format `<language>[_<TERRITORY>[.<encoding>]]` (for example `it` or `it_IT`, or `it_IT.UTF-8`).",
+      "type": "string"
+    },
+    "logging": {
+      "description": "configuration options for Arduino CLI's logs.",
+      "properties": {
+        "file": {
+          "description": "path to the file where logs will be written.",
+          "type": "string"
+        },
+        "format": {
+          "description": "output format for the logs. Allowed values are `text` or `json`.",
+          "type": "string",
+          "enum": ["text", "json"]
+        },
+        "level": {
+          "description": "messages with this level and above will be logged. Valid levels are: `trace`, `debug`, `info`, `warn`, `error`, `fatal`, `panic`.",
+          "type": "string",
+          "enum": ["trace", "debug", "info", "warn", "error", "fatal", "panic"]
+        }
+      },
+      "type": "object"
+    },
+    "metrics": {
+      "description": "settings related to the collection of data used for continued improvement of Arduino CLI.",
+      "properties": {
+        "addr": {
+          "description": "TCP port used for metrics communication.",
+          "type": "string"
+        },
+        "enabled": {
+          "description": "controls the use of metrics.",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "sketch": {
+      "description": "configuration options relating to [Arduino sketches][sketch specification].",
+      "properties": {
+        "always_export_binaries": {
+          "description": "set to `true` to make [`arduino-cli compile`][arduino-cli compile] always save binaries to the sketch folder. This is the equivalent of using the [`--export-binaries`][arduino-cli compile options] flag.",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "updater": {
+      "description": "configuration options related to Arduino CLI updates",
+      "properties": {
+        "enable_notification": {
+          "description": "set to `false` to disable notifications of new Arduino CLI releases, defaults to `true`",
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}
