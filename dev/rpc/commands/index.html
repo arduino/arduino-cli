@@ -3672,6 +3672,12 @@
 <td></td>
 <td>The fully qualified board name of the board you want information about (e.g., <code>arduino:avr:uno</code>).</td>
 </tr>
+<tr>
+<td>do_not_expand_build_properties</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>If set to true the returned build properties will be left unexpanded, with the variables placeholders exactly as defined in the platform.</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.BoardDetailsResponse"></a></p>
@@ -5661,6 +5667,12 @@
 <td><a href="#bool">bool</a></td>
 <td></td>
 <td>If set to true the build will skip the library discovery process and will use the same libraries of latest build. Enabling this flag may produce a wrong output and should not be used in regular compiles unless there is a very specific reason to do so. This flag is mainly provided for usage in language servers to optimize the build speed in some particular cases.</td>
+</tr>
+<tr>
+<td>do_not_expand_build_properties</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>If set to true the returned build properties will be left unexpanded, with the variables placeholders exactly as defined in the platform.</td>
 </tr>
 </tbody>
 </table>

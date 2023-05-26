@@ -277,6 +277,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0330" class="md-nav__link">
+    0.33.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.33.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#grpc-ccarduinoclicommandsv1compile-command-now-return-expanded-build_properties-by-default" class="md-nav__link">
+    gRPC cc.arduino.cli.commands.v1.Compile command now return expanded build_properties by default.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compile-show-properties-now-return-the-expanded-build-properties" class="md-nav__link">
+    compile --show-properties now return the expanded build properties.
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0322" class="md-nav__link">
     0.32.2
   </a>
@@ -2240,6 +2267,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0330" class="md-nav__link">
+    0.33.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.33.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#grpc-ccarduinoclicommandsv1compile-command-now-return-expanded-build_properties-by-default" class="md-nav__link">
+    gRPC cc.arduino.cli.commands.v1.Compile command now return expanded build_properties by default.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compile-show-properties-now-return-the-expanded-build-properties" class="md-nav__link">
+    compile --show-properties now return the expanded build properties.
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0322" class="md-nav__link">
     0.32.2
   </a>
@@ -3146,6 +3200,25 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<h2 id="0330">0.33.0<a class="headerlink" href="#0330" title="Permanent link">&para;</a></h2>
+<h3 id="grpc-ccarduinoclicommandsv1compile-command-now-return-expanded-build_properties-by-default">gRPC <code>cc.arduino.cli.commands.v1.Compile</code> command now return expanded build_properties by default.<a class="headerlink" href="#grpc-ccarduinoclicommandsv1compile-command-now-return-expanded-build_properties-by-default" title="Permanent link">&para;</a></h3>
+<p>The gRPC <code>cc.arduino.cli.commands.v1.Compile</code> command now return expanded <code>build_properties</code> by default. If you want the
+**un**expanded <code>build_properties</code> you must set to <code>true</code> the field <code>do_not_expand_build_properties</code> in the
+<code>CompileRequest</code>.</p>
+<h3 id="compile-show-properties-now-return-the-expanded-build-properties"><code>compile --show-properties</code> now return the expanded build properties.<a class="headerlink" href="#compile-show-properties-now-return-the-expanded-build-properties" title="Permanent link">&para;</a></h3>
+<p>The command <code>compile --show-properties</code> now returns the <strong>expanded</strong> build properties, with the variable placeholders
+replaced with their current value. If you need the **un**expanded build properties you must change the command line to
+<code>compile --show-properties=unexpanded</code>.</p>
+<p>Before:</p>
+<div class="highlight"><pre><span></span><code>$ arduino-cli board details -b arduino:avr:uno --show-properties | grep ^tools.avrdude.path
+tools.avrdude.path={runtime.tools.avrdude.path}
+</code></pre></div>
+<p>Now:</p>
+<div class="highlight"><pre><span></span><code>$ arduino-cli board details -b arduino:avr:uno --show-properties | grep ^tools.avrdude.path
+tools.avrdude.path=/home/megabug/.arduino15/packages/arduino/tools/avrdude/6.3.0-arduino17
+$ arduino-cli board details -b arduino:avr:uno --show-properties=unexpanded | grep ^tools.avrdude.path
+tools.avrdude.path={runtime.tools.avrdude.path}
+</code></pre></div>
 <h2 id="0322">0.32.2<a class="headerlink" href="#0322" title="Permanent link">&para;</a></h2>
 <h3 id="golang-api-method-githubcomarduinoarduino-cliarduinocoresboardgetbuildproperties-changed-signature">golang API: method <code>github.com/arduino/arduino-cli/arduino/cores/Board.GetBuildProperties</code> changed signature<a class="headerlink" href="#golang-api-method-githubcomarduinoarduino-cliarduinocoresboardgetbuildproperties-changed-signature" title="Permanent link">&para;</a></h3>
 <p>The method:</p>
