@@ -219,6 +219,41 @@ jobs:
       - name: Check whether any tidying was needed
         run: git diff --color --exit-code
 
+  check-license-headers:
+    name: check-license-headers (${{ matrix.module.path }})
+    needs: run-determination
+    if: needs.run-determination.outputs.result == 'true'
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        module:
+          - path: ./
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Install Task
+        uses: arduino/setup-task@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: 3.x
+
+      - name: Check for missing license headers
+        env:
+          GO_MODULE_PATH: ${{ matrix.module.path }}
+        run: |
+          task go:add-license-headers
+          git diff --color --exit-code
+
   # Do a simple "smoke test" build for the modules with no other form of validation
   build:
     name: build (${{ matrix.module.path }})
