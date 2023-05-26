@@ -2,6 +2,36 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## 0.33.0
+
+### gRPC `cc.arduino.cli.commands.v1.Compile` command now return expanded build_properties by default.
+
+The gRPC `cc.arduino.cli.commands.v1.Compile` command now return expanded `build_properties` by default. If you want the
+**un**expanded `build_properties` you must set to `true` the field `do_not_expand_build_properties` in the
+`CompileRequest`.
+
+### `compile --show-properties` now return the expanded build properties.
+
+The command `compile --show-properties` now returns the **expanded** build properties, with the variable placeholders
+replaced with their current value. If you need the **un**expanded build properties you must change the command line to
+`compile --show-properties=unexpanded`.
+
+Before:
+
+```
+$ arduino-cli board details -b arduino:avr:uno --show-properties | grep ^tools.avrdude.path
+tools.avrdude.path={runtime.tools.avrdude.path}
+```
+
+Now:
+
+```
+$ arduino-cli board details -b arduino:avr:uno --show-properties | grep ^tools.avrdude.path
+tools.avrdude.path=/home/megabug/.arduino15/packages/arduino/tools/avrdude/6.3.0-arduino17
+$ arduino-cli board details -b arduino:avr:uno --show-properties=unexpanded | grep ^tools.avrdude.path
+tools.avrdude.path={runtime.tools.avrdude.path}
+```
+
 ## 0.32.2
 
 ### golang API: method `github.com/arduino/arduino-cli/arduino/cores/Board.GetBuildProperties` changed signature

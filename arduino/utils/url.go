@@ -18,6 +18,8 @@ package utils
 import (
 	"net/url"
 	"runtime"
+
+	"github.com/arduino/go-properties-orderedmap"
 )
 
 // URLParse parses a raw URL string and handles local files URLs depending on the platform
@@ -32,4 +34,18 @@ func URLParse(rawURL string) (*url.URL, error) {
 		URL.Path = URL.Path[1:]
 	}
 	return URL, nil
+}
+
+// ExpandBuildProperties expands the build properties placeholders in the slice of properties.
+func ExpandBuildProperties(props []string) ([]string, error) {
+	expanded, err := properties.LoadFromSlice(props)
+	if err != nil {
+		return nil, err
+	}
+	expandedProps := []string{}
+	for _, k := range expanded.Keys() {
+		v := expanded.Get(k)
+		expandedProps = append(expandedProps, k+"="+expanded.ExpandPropsInString(v))
+	}
+	return expandedProps, nil
 }

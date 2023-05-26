@@ -28,6 +28,9 @@ message BoardDetailsRequest {
   // The fully qualified board name of the board you want information about
   // (e.g., `arduino:avr:uno`).
   string fqbn = 2;
+  // If set to true the returned build properties will be left unexpanded, with
+  // the variables placeholders exactly as defined in the platform.
+  bool do_not_expand_build_properties = 3;
 }
 
 message BoardDetailsResponse {

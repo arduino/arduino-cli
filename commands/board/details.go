@@ -20,6 +20,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
@@ -58,6 +59,9 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 	for _, k := range boardProperties.Keys() {
 		v := boardProperties.Get(k)
 		details.BuildProperties = append(details.BuildProperties, k+"="+v)
+	}
+	if !req.GetDoNotExpandBuildProperties() {
+		details.BuildProperties, _ = utils.ExpandBuildProperties(details.BuildProperties)
 	}
 
 	details.DebuggingSupported = boardProperties.ContainsKey("debug.executable") ||

@@ -26,6 +26,7 @@ import (
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/buildcache"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/configuration"
@@ -232,6 +233,9 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		sort.Strings(keys)
 		for _, key := range keys {
 			r.BuildProperties = append(r.BuildProperties, key+"="+buildProperties.Get(key))
+		}
+		if !req.GetDoNotExpandBuildProperties() {
+			r.BuildProperties, _ = utils.ExpandBuildProperties(r.BuildProperties)
 		}
 	}()
 

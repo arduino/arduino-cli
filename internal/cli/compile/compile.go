@@ -38,7 +38,6 @@ import (
 	"github.com/arduino/arduino-cli/table"
 	"github.com/arduino/arduino-cli/version"
 	"github.com/arduino/go-paths-helper"
-	"github.com/arduino/go-properties-orderedmap"
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -231,6 +230,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		SignKey:                       signKey,
 		EncryptKey:                    encryptKey,
 		SkipLibrariesDiscovery:        skipLibrariesDiscovery,
+		DoNotExpandBuildProperties:    showProperties == arguments.ShowPropertiesUnexpanded,
 	}
 	compileRes, compileError := compile.Compile(context.Background(), compileRequest, stdOut, stdErr, nil)
 	if compileError == nil && uploadAfterCompile {
@@ -365,25 +365,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		}
 		feedback.FatalResult(res, feedback.ErrGeneric)
 	}
-	if showProperties == arguments.ShowPropertiesExpanded {
-		res.BuilderResult.BuildProperties, _ = ExpandBuildProperties(res.BuilderResult.GetBuildProperties())
-		// ignore error, it should never fail
-	}
 	feedback.PrintResult(res)
-}
-
-// ExpandBuildProperties expands the build properties placeholders in the slice of properties.
-func ExpandBuildProperties(props []string) ([]string, error) {
-	expanded, err := properties.LoadFromSlice(props)
-	if err != nil {
-		return nil, err
-	}
-	expandedProps := []string{}
-	for _, k := range expanded.Keys() {
-		v := expanded.Get(k)
-		expandedProps = append(expandedProps, k+"="+expanded.ExpandPropsInString(v))
-	}
-	return expandedProps, nil
 }
 
 type compileResult struct {
