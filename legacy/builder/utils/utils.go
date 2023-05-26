@@ -26,7 +26,6 @@ import (
 	"path/filepath"
 	"strings"
 	"unicode"
-	"unicode/utf8"
 
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/gohasissues"
@@ -299,50 +298,6 @@ func QuoteCppString(str string) string {
 
 func QuoteCppPath(path *paths.Path) string {
 	return QuoteCppString(path.String())
-}
-
-// Parse a C-preprocessor string as emitted by the preprocessor. This
-// is a string contained in double quotes, with any backslashes or
-// quotes escaped with a backslash. If a valid string was present at the
-// start of the given line, returns the unquoted string contents, the
-// remainder of the line (everything after the closing "), and true.
-// Otherwise, returns the empty string, the entire line and false.
-func ParseCppString(line string) (string, string, bool) {
-	// For details about how these strings are output by gcc, see:
-	// https://github.com/gcc-mirror/gcc/blob/a588355ab948cf551bc9d2b89f18e5ae5140f52c/libcpp/macro.c#L491-L511
-	// Note that the documentation suggests all non-printable
-	// characters are also escaped, but the implementation does not
-	// actually do this. See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=51259
-	if len(line) < 1 || line[0] != '"' {
-		return "", line, false
-	}
-
-	i := 1
-	res := ""
-	for {
-		if i >= len(line) {
-			return "", line, false
-		}
-
-		c, width := utf8.DecodeRuneInString(line[i:])
-
-		switch c {
-		case '\\':
-			// Backslash, next character is used unmodified
-			i += width
-			if i >= len(line) {
-				return "", line, false
-			}
-			res += string(line[i])
-		case '"':
-			// Quote, end of string
-			return res, line[i+width:], true
-		default:
-			res += string(c)
-		}
-
-		i += width
-	}
 }
 
 // Normalizes an UTF8 byte slice

@@ -122,3 +122,9 @@ type CTag struct {
 type Command interface {
 	Run(ctx *Context) error
 }
+
+type BareCommand func(ctx *Context) error
+
+func (cmd BareCommand) Run(ctx *Context) error {
+	return cmd(ctx)
+}

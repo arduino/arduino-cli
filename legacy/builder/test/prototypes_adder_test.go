@@ -21,6 +21,7 @@ import (
 	"strings"
 	"testing"
 
+	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
@@ -37,9 +38,13 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -48,7 +53,7 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "#line 33 "+quotedSketchLocation+"\nvoid setup();\n#line 46 "+quotedSketchLocation+"\nvoid loop();\n#line 62 "+quotedSketchLocation+"\nvoid process(BridgeClient client);\n#line 82 "+quotedSketchLocation+"\nvoid digitalCommand(BridgeClient client);\n#line 109 "+quotedSketchLocation+"\nvoid analogCommand(BridgeClient client);\n#line 149 "+quotedSketchLocation+"\nvoid modeCommand(BridgeClient client);\n#line 33 "+quotedSketchLocation+"\n", ctx.PrototypesSection)
 }
 
@@ -58,9 +63,13 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -70,7 +79,7 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("SketchWithIfDef", "SketchWithIfDef.preprocessed.txt"), ctx)
-	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
+	require.Equal(t, preprocessed, strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderBaladuino(t *testing.T) {
@@ -79,9 +88,13 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -91,7 +104,7 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("Baladuino", "Baladuino.preprocessed.txt"), ctx)
-	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
+	require.Equal(t, preprocessed, strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
@@ -100,9 +113,13 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -112,7 +129,7 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("CharWithEscapedDoubleQuote", "CharWithEscapedDoubleQuote.preprocessed.txt"), ctx)
-	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
+	require.Equal(t, preprocessed, strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
@@ -121,9 +138,13 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -133,7 +154,7 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("IncludeBetweenMultilineComment", "IncludeBetweenMultilineComment.preprocessed.txt"), ctx)
-	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
+	require.Equal(t, preprocessed, strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderLineContinuations(t *testing.T) {
@@ -142,9 +163,13 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -154,7 +179,7 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("LineContinuations", "LineContinuations.preprocessed.txt"), ctx)
-	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
+	require.Equal(t, preprocessed, strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderStringWithComment(t *testing.T) {
@@ -163,9 +188,13 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -175,7 +204,7 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("StringWithComment", "StringWithComment.preprocessed.txt"), ctx)
-	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
+	require.Equal(t, preprocessed, strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderSketchWithStruct(t *testing.T) {
@@ -184,9 +213,13 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -196,7 +229,7 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("SketchWithStruct", "SketchWithStruct.preprocessed.txt"), ctx)
-	obtained := strings.Replace(ctx.Source, "\r\n", "\n", -1)
+	obtained := strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1)
 	// ctags based preprocessing removes the space after "dostuff", but this is still OK
 	// TODO: remove this exception when moving to a more powerful parser
 	preprocessed = strings.Replace(preprocessed, "void dostuff (A_NEW_TYPE * bar);", "void dostuff(A_NEW_TYPE * bar);", 1)
@@ -213,9 +246,13 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -224,11 +261,11 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "#line 13 "+quotedSketchLocation+"\nvoid setup();\n#line 17 "+quotedSketchLocation+"\nvoid loop();\n#line 13 "+quotedSketchLocation+"\n", ctx.PrototypesSection)
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch_with_config", "sketch_with_config.preprocessed.txt"), ctx)
-	require.Equal(t, preprocessed, strings.Replace(ctx.Source, "\r\n", "\n", -1))
+	require.Equal(t, preprocessed, strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
@@ -240,9 +277,13 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -251,7 +292,7 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "", ctx.PrototypesSection)
 }
 
@@ -263,10 +304,13 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 
 	sketchLocation := paths.New("sketch_no_functions", "sketch_no_functions.ino")
 	quotedSketchLocation := utils.QuoteCppPath(Abs(t, sketchLocation))
-
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -275,7 +319,7 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "", ctx.PrototypesSection)
 }
 
@@ -288,9 +332,13 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -299,7 +347,7 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "#line 4 "+quotedSketchLocation+"\nvoid setup();\n#line 7 "+quotedSketchLocation+"\nvoid loop();\n#line 1 "+quotedSketchLocation+"\n", ctx.PrototypesSection)
 }
 
@@ -312,9 +360,13 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -323,7 +375,7 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 
 	expected := "#line 1 " + quotedSketchLocation + "\nvoid setup();\n#line 2 " + quotedSketchLocation + "\nvoid loop();\n#line 4 " + quotedSketchLocation + "\nshort unsigned int testInt();\n#line 8 " + quotedSketchLocation + "\nstatic int8_t testInline();\n#line 12 " + quotedSketchLocation + "\n__attribute__((always_inline)) uint8_t testAttribute();\n#line 1 " + quotedSketchLocation + "\n"
 	obtained := ctx.PrototypesSection
@@ -347,9 +399,13 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -358,7 +414,7 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "#line 1 "+quotedSketchLocation+"\nvoid setup();\n#line 3 "+quotedSketchLocation+"\nvoid loop();\n#line 15 "+quotedSketchLocation+"\nint8_t adalight();\n#line 1 "+quotedSketchLocation+"\n", ctx.PrototypesSection)
 }
 
@@ -376,9 +432,13 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, sketchLocation, "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -387,7 +447,7 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "#line 5 "+quotedSketchLocation+"\nvoid ciao();\n#line 10 "+quotedSketchLocation+"\nvoid setup();\n#line 15 "+quotedSketchLocation+"\nvoid loop();\n#line 5 "+quotedSketchLocation+"\n", ctx.PrototypesSection)
 }
 
@@ -404,9 +464,13 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, sketchLocation, "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -415,7 +479,7 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	expected := "#line 6 " + quotedSketchLocation + "\nvoid setup();\n#line 10 " + quotedSketchLocation + "\nvoid loop();\n#line 12 " + quotedSketchLocation + "\ntypename Foo<char>::Bar func();\n#line 6 " + quotedSketchLocation + "\n"
 	obtained := ctx.PrototypesSection
 	// ctags based preprocessing ignores line with typename
@@ -434,9 +498,13 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -445,11 +513,11 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "#line 5 "+quotedSketchLocation+"\nvoid elseBranch();\n#line 9 "+quotedSketchLocation+"\nvoid f1();\n#line 10 "+quotedSketchLocation+"\nvoid f2();\n#line 12 "+quotedSketchLocation+"\nvoid setup();\n#line 14 "+quotedSketchLocation+"\nvoid loop();\n#line 5 "+quotedSketchLocation+"\n", ctx.PrototypesSection)
 
 	expectedSource := LoadAndInterpolate(t, filepath.Join("sketch_with_ifdef", "sketch.preprocessed.txt"), ctx)
-	require.Equal(t, expectedSource, strings.Replace(ctx.Source, "\r\n", "\n", -1))
+	require.Equal(t, expectedSource, strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
@@ -461,9 +529,13 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -472,11 +544,11 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "#line 2 "+quotedSketchLocation+"\nvoid ifBranch();\n#line 9 "+quotedSketchLocation+"\nvoid f1();\n#line 10 "+quotedSketchLocation+"\nvoid f2();\n#line 12 "+quotedSketchLocation+"\nvoid setup();\n#line 14 "+quotedSketchLocation+"\nvoid loop();\n#line 2 "+quotedSketchLocation+"\n", ctx.PrototypesSection)
 
 	expectedSource := LoadAndInterpolate(t, filepath.Join("sketch_with_ifdef", "sketch.preprocessed.SAM.txt"), ctx)
-	require.Equal(t, expectedSource, strings.Replace(ctx.Source, "\r\n", "\n", -1))
+	require.Equal(t, expectedSource, strings.Replace(ctx.SketchSourceAfterArduinoPreprocessing, "\r\n", "\n", -1))
 }
 
 func TestPrototypesAdderSketchWithConst(t *testing.T) {
@@ -488,9 +560,13 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -499,7 +575,7 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.Source, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
+	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
 	require.Equal(t, "#line 1 "+quotedSketchLocation+"\nvoid setup();\n#line 2 "+quotedSketchLocation+"\nvoid loop();\n#line 4 "+quotedSketchLocation+"\nconst __FlashStringHelper* test();\n#line 6 "+quotedSketchLocation+"\nconst int test3();\n#line 8 "+quotedSketchLocation+"\nvolatile __FlashStringHelper* test2();\n#line 10 "+quotedSketchLocation+"\nvolatile int test4();\n#line 1 "+quotedSketchLocation+"\n", ctx.PrototypesSection)
 }
 
@@ -509,9 +585,13 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -531,9 +611,13 @@ func TestPrototypesAdderSketchWithSubstringFunctionMember(t *testing.T) {
 
 	ctx.Verbose = true
 
+	var _err error
 	commands := []types.Command{
 		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		&builder.ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 		&builder.ContainerFindIncludes{},
 	}
 	for _, command := range commands {
@@ -542,5 +626,5 @@ func TestPrototypesAdderSketchWithSubstringFunctionMember(t *testing.T) {
 	}
 	NoError(t, builder.PreprocessSketchWithCtags(ctx))
 
-	require.Contains(t, ctx.Source, "class Foo {\nint blooper(int x) { return x+1; }\n};\n\nFoo foo;\n\n#line 7 "+quotedSketchLocation+"\nvoid setup();")
+	require.Contains(t, ctx.SketchSourceAfterArduinoPreprocessing, "class Foo {\nint blooper(int x) { return x+1; }\n};\n\nFoo foo;\n\n#line 7 "+quotedSketchLocation+"\nvoid setup();")
 }

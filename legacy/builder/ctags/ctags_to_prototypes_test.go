@@ -30,7 +30,7 @@ func producePrototypes(t *testing.T, filename string, mainFile string) ([]*types
 	require.NoError(t, err)
 
 	parser := &CTagsParser{}
-	parser.Parse(string(bytes), paths.New(mainFile))
+	parser.Parse(bytes, paths.New(mainFile))
 	return parser.GeneratePrototypes()
 }
 

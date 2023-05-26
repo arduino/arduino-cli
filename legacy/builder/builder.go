@@ -19,6 +19,7 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -39,6 +40,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		return err
 	}
 
+	var _err error
 	commands := []types.Command{
 		&ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -46,7 +48,10 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
 
-		&ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 
 		utils.LogIfVerbose(false, tr("Detecting libraries used...")),
 		&ContainerFindIncludes{},
@@ -127,6 +132,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 		return err
 	}
 
+	var _err error
 	commands := []types.Command{
 		&ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -134,7 +140,10 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
 
-		&ContainerMergeCopySketchFiles{},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			return _err
+		}),
 
 		&ContainerFindIncludes{},
 
@@ -148,7 +157,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 	}
 
 	// Output arduino-preprocessed source
-	ctx.WriteStdout([]byte(ctx.Source))
+	ctx.WriteStdout([]byte(ctx.SketchSourceAfterArduinoPreprocessing))
 	return nil
 }
 

@@ -26,10 +26,26 @@ import (
 	"github.com/pkg/errors"
 )
 
-type CTagsRunner struct{}
+type CTagsRunner struct {
+	Source         *string
+	TargetFileName string
 
-func (s *CTagsRunner) Run(ctx *types.Context) error {
-	ctagsTargetFilePath := ctx.CTagsTargetFile
+	// Needed for unit-testing
+	CtagsOutput []byte
+}
+
+func (r *CTagsRunner) Run(ctx *types.Context) error {
+	source := *r.Source
+
+	preprocPath := ctx.PreprocPath
+	if err := preprocPath.MkdirAll(); err != nil {
+		return errors.WithStack(err)
+	}
+
+	ctagsTargetFilePath := preprocPath.Join(r.TargetFileName)
+	if err := ctagsTargetFilePath.WriteFile([]byte(source)); err != nil {
+		return errors.WithStack(err)
+	}
 
 	buildProperties := properties.NewMap()
 	buildProperties.Set("tools.ctags.path", "{runtime.tools.ctags.path}")
@@ -52,17 +68,14 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 	command := exec.Command(parts[0], parts[1:]...)
 	command.Env = append(os.Environ(), ctx.PackageManager.GetEnvVarsForSpawnedProcess()...)
 
-	sourceBytes, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.ShowIfVerbose /* stderr */)
+	ctagsOutput, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.ShowIfVerbose /* stderr */)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	ctx.CTagsOutput = string(sourceBytes)
-
 	parser := &ctags.CTagsParser{}
-
-	ctx.CTagsOfPreprocessedSource = parser.Parse(ctx.CTagsOutput, ctx.Sketch.MainFile)
-	parser.FixCLinkageTagsDeclarations(ctx.CTagsOfPreprocessedSource)
+	parser.Parse(ctagsOutput, ctx.Sketch.MainFile)
+	parser.FixCLinkageTagsDeclarations()
 
 	protos, line := parser.GeneratePrototypes()
 	if line != -1 {
@@ -70,5 +83,7 @@ func (s *CTagsRunner) Run(ctx *types.Context) error {
 	}
 	ctx.Prototypes = protos
 
+	// Needed for unit-testing
+	r.CtagsOutput = ctagsOutput
 	return nil
 }

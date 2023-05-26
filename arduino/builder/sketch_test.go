@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package builder_test
+package builder
 
 import (
 	"fmt"
@@ -23,7 +23,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -48,7 +47,7 @@ func TestSaveSketch(t *testing.T) {
 		t.Fatalf("unable to read golden file %s: %v", sketchFile, err)
 	}
 
-	builder.SketchSaveItemCpp(paths.New(sketchName), source, tmp)
+	SketchSaveItemCpp(paths.New(sketchName), source, tmp)
 
 	out, err := tmp.Join(outName).ReadFile()
 	if err != nil {
@@ -82,7 +81,7 @@ func TestMergeSketchSources(t *testing.T) {
 	}
 	mergedSources := strings.ReplaceAll(string(mergedBytes), "%s", pathToGoldenSource)
 
-	offset, source, err := builder.SketchMergeSources(s, nil)
+	offset, source, err := sketchMergeSources(s, nil)
 	require.Nil(t, err)
 	require.Equal(t, 2, offset)
 	require.Equal(t, mergedSources, source)
@@ -94,7 +93,7 @@ func TestMergeSketchSourcesArduinoIncluded(t *testing.T) {
 	require.NotNil(t, s)
 
 	// ensure not to include Arduino.h when it's already there
-	_, source, err := builder.SketchMergeSources(s, nil)
+	_, source, err := sketchMergeSources(s, nil)
 	require.Nil(t, err)
 	require.Equal(t, 1, strings.Count(source, "<Arduino.h>"))
 }
@@ -110,7 +109,7 @@ func TestCopyAdditionalFiles(t *testing.T) {
 
 	// copy the sketch over, create a fake main file we don't care about it
 	// but we need it for `SketchLoad` to succeed later
-	err = builder.SketchCopyAdditionalFiles(s1, tmp, nil)
+	err = sketchCopyAdditionalFiles(s1, tmp, nil)
 	require.Nil(t, err)
 	fakeIno := tmp.Join(fmt.Sprintf("%s.ino", tmp.Base()))
 	require.Nil(t, fakeIno.WriteFile([]byte{}))
@@ -125,7 +124,7 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	require.Nil(t, err)
 
 	// copy again
-	err = builder.SketchCopyAdditionalFiles(s1, tmp, nil)
+	err = sketchCopyAdditionalFiles(s1, tmp, nil)
 	require.Nil(t, err)
 
 	// verify file hasn't changed

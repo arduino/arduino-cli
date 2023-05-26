@@ -35,9 +35,9 @@ func PreprocessSketchWithArduinoPreprocessor(ctx *types.Context) error {
 	}
 
 	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp")
-	GCCPreprocRunner(ctx, sourceFile, ctx.PreprocPath.Join("ctags_target_for_gcc_minus_e.cpp"), ctx.IncludeFolders)
+	targetFile := ctx.PreprocPath.Join("sketch_merged.cpp")
+	GCCPreprocRunner(ctx, sourceFile, targetFile, ctx.IncludeFolders)
 
-	targetFilePath := ctx.PreprocPath.Join("ctags_target_for_gcc_minus_e.cpp")
 	buildProperties := properties.NewMap()
 	buildProperties.Set("tools.arduino-preprocessor.path", "{runtime.tools.arduino-preprocessor.path}")
 	buildProperties.Set("tools.arduino-preprocessor.cmd.path", "{path}/arduino-preprocessor")
@@ -45,7 +45,7 @@ func PreprocessSketchWithArduinoPreprocessor(ctx *types.Context) error {
 	buildProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
 	buildProperties.Merge(ctx.BuildProperties)
 	buildProperties.Merge(buildProperties.SubTree("tools").SubTree("arduino-preprocessor"))
-	buildProperties.SetPath("source_file", targetFilePath)
+	buildProperties.SetPath("source_file", targetFile)
 
 	pattern := buildProperties.Get("pattern")
 	if pattern == "" {
@@ -79,7 +79,6 @@ func PreprocessSketchWithArduinoPreprocessor(ctx *types.Context) error {
 	result := utils.NormalizeUTF8(buf)
 
 	//fmt.Printf("PREPROCESSOR OUTPUT:\n%s\n", output)
-	ctx.Source = string(result)
-
-	return bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, []byte(ctx.Source), ctx.SketchBuildPath)
+	ctx.SketchSourceAfterArduinoPreprocessing = string(result)
+	return bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, []byte(ctx.SketchSourceAfterArduinoPreprocessing), ctx.SketchBuildPath)
 }

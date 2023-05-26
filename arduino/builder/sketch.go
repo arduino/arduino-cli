@@ -19,7 +19,6 @@ import (
 	"bytes"
 	"fmt"
 	"regexp"
-	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
@@ -34,13 +33,20 @@ var (
 	tr               = i18n.Tr
 )
 
-// QuoteCppString returns the given string as a quoted string for use with the C
-// preprocessor. This adds double quotes around it and escapes any
-// double quotes and backslashes in the string.
-func QuoteCppString(str string) string {
-	str = strings.Replace(str, "\\", "\\\\", -1)
-	str = strings.Replace(str, "\"", "\\\"", -1)
-	return "\"" + str + "\""
+// PrepareSketchBuildPath copies the sketch source files in the build path.
+// The .ino files are merged together to create a .cpp file (by the way, the
+// .cpp file still needs to be Arduino-preprocessed to compile).
+func PrepareSketchBuildPath(sketch *sketch.Sketch, sourceOverrides map[string]string, buildPath *paths.Path) (offset int, mergedSource string, err error) {
+	if offset, mergedSource, err = sketchMergeSources(sketch, sourceOverrides); err != nil {
+		return
+	}
+	if err = SketchSaveItemCpp(sketch.MainFile, []byte(mergedSource), buildPath); err != nil {
+		return
+	}
+	if err = sketchCopyAdditionalFiles(sketch, buildPath, sourceOverrides); err != nil {
+		return
+	}
+	return
 }
 
 // SketchSaveItemCpp saves a preprocessed .cpp sketch file on disk
@@ -59,8 +65,9 @@ func SketchSaveItemCpp(path *paths.Path, contents []byte, destPath *paths.Path) 
 	return nil
 }
 
-// SketchMergeSources merges all the source files included in a sketch
-func SketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, string, error) {
+// sketchMergeSources merges all the .ino source files included in a sketch to produce
+// a single .cpp file.
+func sketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, string, error) {
 	lineOffset := 0
 	mergedSource := ""
 
@@ -105,9 +112,9 @@ func SketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, st
 	return lineOffset, mergedSource, nil
 }
 
-// SketchCopyAdditionalFiles copies the additional files for a sketch to the
+// sketchCopyAdditionalFiles copies the additional files for a sketch to the
 // specified destination directory.
-func SketchCopyAdditionalFiles(sketch *sketch.Sketch, destPath *paths.Path, overrides map[string]string) error {
+func sketchCopyAdditionalFiles(sketch *sketch.Sketch, destPath *paths.Path, overrides map[string]string) error {
 	if err := destPath.MkdirAll(); err != nil {
 		return errors.Wrap(err, tr("unable to create a folder to save the sketch files"))
 	}
