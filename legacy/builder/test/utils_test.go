@@ -16,7 +16,6 @@
 package test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
@@ -40,17 +39,6 @@ func TestPrintableCommand(t *testing.T) {
 		" lastarg"
 	result := utils.PrintableCommand(parts)
 	require.Equal(t, correct, result)
-}
-
-func TestMapTrimSpace(t *testing.T) {
-	value := "hello, world , how are,you? "
-	parts := utils.Map(strings.Split(value, ","), utils.TrimSpace)
-
-	require.Equal(t, 4, len(parts))
-	require.Equal(t, "hello", parts[0])
-	require.Equal(t, "world", parts[1])
-	require.Equal(t, "how are", parts[2])
-	require.Equal(t, "you?", parts[3])
 }
 
 func TestQuoteCppString(t *testing.T) {

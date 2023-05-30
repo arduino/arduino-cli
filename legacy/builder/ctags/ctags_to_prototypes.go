@@ -16,12 +16,23 @@
 package ctags
 
 import (
+	"strconv"
 	"strings"
-
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 )
 
-func (p *CTagsParser) GeneratePrototypes() ([]*types.Prototype, int) {
+type Prototype struct {
+	FunctionName string
+	File         string
+	Prototype    string
+	Modifiers    string
+	Line         int
+}
+
+func (proto *Prototype) String() string {
+	return proto.Modifiers + " " + proto.Prototype + " @ " + strconv.Itoa(proto.Line)
+}
+
+func (p *CTagsParser) GeneratePrototypes() ([]*Prototype, int) {
 	return p.toPrototypes(), p.findLineWhereToInsertPrototypes()
 }
 
@@ -53,7 +64,7 @@ func (p *CTagsParser) firstFunctionPointerUsedAsArgument() int {
 	return -1
 }
 
-func functionNameUsedAsFunctionPointerIn(tag *types.CTag, functionTags []*types.CTag) bool {
+func functionNameUsedAsFunctionPointerIn(tag *CTag, functionTags []*CTag) bool {
 	for _, functionTag := range functionTags {
 		if tag.Line != functionTag.Line && strings.Contains(tag.Code, "&"+functionTag.FunctionName) {
 			return true
@@ -65,8 +76,8 @@ func functionNameUsedAsFunctionPointerIn(tag *types.CTag, functionTags []*types.
 	return false
 }
 
-func (p *CTagsParser) collectFunctions() []*types.CTag {
-	functionTags := []*types.CTag{}
+func (p *CTagsParser) collectFunctions() []*CTag {
+	functionTags := []*CTag{}
 	for _, tag := range p.tags {
 		if tag.Kind == KIND_FUNCTION && !tag.SkipMe {
 			functionTags = append(functionTags, tag)
@@ -84,14 +95,14 @@ func (p *CTagsParser) firstFunctionAtLine() int {
 	return -1
 }
 
-func (p *CTagsParser) toPrototypes() []*types.Prototype {
-	prototypes := []*types.Prototype{}
+func (p *CTagsParser) toPrototypes() []*Prototype {
+	prototypes := []*Prototype{}
 	for _, tag := range p.tags {
 		if strings.TrimSpace(tag.Prototype) == "" {
 			continue
 		}
 		if !tag.SkipMe {
-			prototype := &types.Prototype{
+			prototype := &Prototype{
 				FunctionName: tag.FunctionName,
 				File:         tag.Filename,
 				Prototype:    tag.Prototype,

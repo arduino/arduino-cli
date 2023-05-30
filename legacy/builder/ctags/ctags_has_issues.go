@@ -19,8 +19,6 @@ import (
 	"bufio"
 	"os"
 	"strings"
-
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 )
 
 func (p *CTagsParser) FixCLinkageTagsDeclarations() {
@@ -42,7 +40,7 @@ func sliceContainsInt(s []int, e int) bool {
 	return false
 }
 
-func (p *CTagsParser) prototypeAndCodeDontMatch(tag *types.CTag) bool {
+func (p *CTagsParser) prototypeAndCodeDontMatch(tag *CTag) bool {
 	if tag.SkipMe {
 		return true
 	}
@@ -107,7 +105,7 @@ func (p *CTagsParser) prototypeAndCodeDontMatch(tag *types.CTag) bool {
 	return ret == -1
 }
 
-func findTemplateMultiline(tag *types.CTag) string {
+func findTemplateMultiline(tag *CTag) string {
 	code, _ := getFunctionProtoUntilTemplateToken(tag, tag.Code)
 	return removeEverythingAfterClosingRoundBracket(code)
 }
@@ -117,7 +115,7 @@ func removeEverythingAfterClosingRoundBracket(s string) string {
 	return s[0 : n+1]
 }
 
-func getFunctionProtoUntilTemplateToken(tag *types.CTag, code string) (string, int) {
+func getFunctionProtoUntilTemplateToken(tag *CTag, code string) (string, int) {
 
 	/* FIXME I'm ugly */
 	line := 0
@@ -150,7 +148,7 @@ func getFunctionProtoUntilTemplateToken(tag *types.CTag, code string) (string, i
 	return code, line
 }
 
-func getFunctionProtoWithNPreviousCharacters(tag *types.CTag, code string, n int) (string, int) {
+func getFunctionProtoWithNPreviousCharacters(tag *CTag, code string, n int) (string, int) {
 
 	/* FIXME I'm ugly */
 	expectedPrototypeLen := len(code) + n
@@ -216,7 +214,7 @@ func removeComments(text string, multilinecomment bool) (string, bool) {
 /* This function scans the source files searching for "extern C" context
  * It save the line numbers in a map filename -> {lines...}
  */
-func (p *CTagsParser) FindCLinkageLines(tags []*types.CTag) map[string][]int {
+func (p *CTagsParser) FindCLinkageLines(tags []*CTag) map[string][]int {
 
 	lines := make(map[string][]int)
 

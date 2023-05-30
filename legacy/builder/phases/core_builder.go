@@ -22,6 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/buildcache"
 	"github.com/arduino/arduino-cli/i18n"
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -77,7 +78,7 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 	if variantFolder != nil && variantFolder.IsDir() {
 		includes = append(includes, variantFolder.String())
 	}
-	includes = utils.Map(includes, utils.WrapWithHyphenI)
+	includes = f.Map(includes, utils.WrapWithHyphenI)
 
 	var err error
 

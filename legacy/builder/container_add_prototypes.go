@@ -39,7 +39,9 @@ func PreprocessSketchWithCtags(ctx *types.Context) error {
 
 	// Run preprocessor
 	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp")
-	if err := GCCPreprocRunner(ctx, sourceFile, targetFilePath, ctx.IncludeFolders); err != nil {
+	stderr, err := GCCPreprocRunner(ctx, sourceFile, targetFilePath, ctx.IncludeFolders)
+	ctx.WriteStderr(stderr)
+	if err != nil {
 		if !ctx.OnlyUpdateCompilationDatabase {
 			return errors.WithStack(err)
 		}
@@ -60,18 +62,10 @@ func PreprocessSketchWithCtags(ctx *types.Context) error {
 		ctx.SketchSourceAfterCppPreprocessing = filterSketchSource(ctx.Sketch, bytes.NewReader(src), false)
 	}
 
-	commands := []types.Command{
-		&CTagsRunner{Source: &ctx.SketchSourceAfterCppPreprocessing, TargetFileName: "sketch_merged.cpp"},
-		&PrototypesAdder{},
+	if err := (&CTagsRunner{Source: &ctx.SketchSourceAfterCppPreprocessing, TargetFileName: "sketch_merged.cpp"}).Run(ctx); err != nil {
+		return errors.WithStack(err)
 	}
-
-	for _, command := range commands {
-		PrintRingNameIfDebug(ctx, command)
-		err := command.Run(ctx)
-		if err != nil {
-			return errors.WithStack(err)
-		}
-	}
+	ctx.SketchSourceAfterArduinoPreprocessing, ctx.PrototypesSection = PrototypesAdder(ctx.SketchSourceMerged, ctx.PrototypesLineWhereToInsert, ctx.LineOffset, ctx.Prototypes, ctx.DebugPreprocessor)
 
 	if err := bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, []byte(ctx.SketchSourceAfterArduinoPreprocessing), ctx.SketchBuildPath); err != nil {
 		return errors.WithStack(err)

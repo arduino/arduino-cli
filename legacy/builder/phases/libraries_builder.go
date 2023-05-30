@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/libraries"
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -36,7 +37,7 @@ type LibrariesBuilder struct{}
 func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	librariesBuildPath := ctx.LibrariesBuildPath
 	buildProperties := ctx.BuildProperties
-	includes := utils.Map(ctx.IncludeFolders.AsStrings(), utils.WrapWithHyphenI)
+	includes := f.Map(ctx.IncludeFolders.AsStrings(), utils.WrapWithHyphenI)
 	libs := ctx.ImportedLibraries
 
 	if err := librariesBuildPath.MkdirAll(); err != nil {

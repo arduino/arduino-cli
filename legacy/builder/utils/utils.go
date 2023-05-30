@@ -28,6 +28,7 @@ import (
 	"unicode"
 
 	"github.com/arduino/arduino-cli/i18n"
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/legacy/builder/gohasissues"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
@@ -119,34 +120,8 @@ func IsSCCSFile(file os.FileInfo) bool {
 	return SOURCE_CONTROL_FOLDERS[name]
 }
 
-type mapFunc func(string) string
-
-func Map(slice []string, fn mapFunc) []string {
-	newSlice := []string{}
-	for _, elem := range slice {
-		newSlice = append(newSlice, fn(elem))
-	}
-	return newSlice
-}
-
-type filterFunc func(string) bool
-
-func Filter(slice []string, fn filterFunc) []string {
-	newSlice := []string{}
-	for _, elem := range slice {
-		if fn(elem) {
-			newSlice = append(newSlice, elem)
-		}
-	}
-	return newSlice
-}
-
 func WrapWithHyphenI(value string) string {
 	return "\"-I" + value + "\""
-}
-
-func TrimSpace(value string) string {
-	return strings.TrimSpace(value)
 }
 
 func printableArgument(arg string) string {
@@ -164,7 +139,7 @@ func printableArgument(arg string) string {
 // probably not for shell interpretation. This essentially reverses
 // ParseCommandLine.
 func PrintableCommand(parts []string) string {
-	return strings.Join(Map(parts, printableArgument), " ")
+	return strings.Join(f.Map(parts, printableArgument), " ")
 }
 
 const (

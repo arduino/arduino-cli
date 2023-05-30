@@ -143,23 +143,24 @@ func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 		appendIncludeFolder(ctx, cache, nil, "", ctx.BuildProperties.GetPath("build.variant.path"))
 	}
 
+	sourceFileQueue := &types.UniqueSourceFileQueue{}
+
 	if !ctx.UseCachedLibrariesResolution {
 		sketch := ctx.Sketch
 		mergedfile, err := types.MakeSourceFile(ctx, sketch, paths.New(sketch.MainFile.Base()+".cpp"))
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		ctx.CollectedSourceFiles.Push(mergedfile)
+		sourceFileQueue.Push(mergedfile)
 
-		sourceFilePaths := ctx.CollectedSourceFiles
-		queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, ctx.SketchBuildPath, false /* recurse */)
+		queueSourceFilesFromFolder(ctx, sourceFileQueue, sketch, ctx.SketchBuildPath, false /* recurse */)
 		srcSubfolderPath := ctx.SketchBuildPath.Join("src")
 		if srcSubfolderPath.IsDir() {
-			queueSourceFilesFromFolder(ctx, sourceFilePaths, sketch, srcSubfolderPath, true /* recurse */)
+			queueSourceFilesFromFolder(ctx, sourceFileQueue, sketch, srcSubfolderPath, true /* recurse */)
 		}
 
-		for !sourceFilePaths.Empty() {
-			err := findIncludesUntilDone(ctx, cache, sourceFilePaths.Pop())
+		for !sourceFileQueue.Empty() {
+			err := findIncludesUntilDone(ctx, cache, sourceFileQueue)
 			if err != nil {
 				cachePath.Remove()
 				return errors.WithStack(err)
@@ -314,7 +315,8 @@ func writeCache(cache *includeCache, path *paths.Path) error {
 	return nil
 }
 
-func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile types.SourceFile) error {
+func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQueue *types.UniqueSourceFileQueue) error {
+	sourceFile := sourceFileQueue.Pop()
 	sourcePath := sourceFile.SourcePath(ctx)
 	targetFilePath := paths.NullPath()
 	depPath := sourceFile.DepfilePath(ctx)
@@ -367,7 +369,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 				ctx.Info(tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
 		} else {
-			preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
+			preproc_stderr, preproc_err = GCCPreprocRunner(ctx, sourcePath, targetFilePath, includes)
 			// Unwrap error and see if it is an ExitError.
 			_, is_exit_error := errors.Cause(preproc_err).(*exec.ExitError)
 			if preproc_err == nil {
@@ -399,7 +401,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 			// return errors.WithStack(err)
 			if preproc_err == nil || preproc_stderr == nil {
 				// Filename came from cache, so run preprocessor to obtain error to show
-				preproc_stderr, preproc_err = GCCPreprocRunnerForDiscoveringIncludes(ctx, sourcePath, targetFilePath, includes)
+				preproc_stderr, preproc_err = GCCPreprocRunner(ctx, sourcePath, targetFilePath, includes)
 				if preproc_err == nil {
 					// If there is a missing #include in the cache, but running
 					// gcc does not reproduce that, there is something wrong.
@@ -419,13 +421,13 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFile t
 		appendIncludeFolder(ctx, cache, sourcePath, include, library.SourceDir)
 		sourceDirs := library.SourceDirs()
 		for _, sourceDir := range sourceDirs {
-			queueSourceFilesFromFolder(ctx, ctx.CollectedSourceFiles, library, sourceDir.Dir, sourceDir.Recurse)
+			queueSourceFilesFromFolder(ctx, sourceFileQueue, library, sourceDir.Dir, sourceDir.Recurse)
 		}
 		first = false
 	}
 }
 
-func queueSourceFilesFromFolder(ctx *types.Context, queue *types.UniqueSourceFileQueue, origin interface{}, folder *paths.Path, recurse bool) error {
+func queueSourceFilesFromFolder(ctx *types.Context, sourceFileQueue *types.UniqueSourceFileQueue, origin interface{}, folder *paths.Path, recurse bool) error {
 	sourceFileExtensions := []string{}
 	for k := range globals.SourceFilesValidExtensions {
 		sourceFileExtensions = append(sourceFileExtensions, k)
@@ -440,7 +442,7 @@ func queueSourceFilesFromFolder(ctx *types.Context, queue *types.UniqueSourceFil
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		queue.Push(sourceFile)
+		sourceFileQueue.Push(sourceFile)
 	}
 
 	return nil

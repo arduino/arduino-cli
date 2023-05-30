@@ -20,12 +20,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
-func producePrototypes(t *testing.T, filename string, mainFile string) ([]*types.Prototype, int) {
+func producePrototypes(t *testing.T, filename string, mainFile string) ([]*Prototype, int) {
 	bytes, err := os.ReadFile(filepath.Join("test_data", filename))
 	require.NoError(t, err)
 

@@ -21,31 +21,22 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/legacy/builder/ctags"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 )
 
-type PrototypesAdder struct{}
-
-func (s *PrototypesAdder) Run(ctx *types.Context) error {
-	debugOutput := ctx.DebugPreprocessor
-
-	source := ctx.SketchSourceMerged
+func PrototypesAdder(source string, firstFunctionLine, lineOffset int, prototypes []*ctags.Prototype, debugOutput bool) (preprocessedSource, prototypeSection string) {
 	source = strings.Replace(source, "\r\n", "\n", -1)
 	source = strings.Replace(source, "\r", "\n", -1)
-
 	sourceRows := strings.Split(source, "\n")
-
-	firstFunctionLine := ctx.PrototypesLineWhereToInsert
 	if isFirstFunctionOutsideOfSource(firstFunctionLine, sourceRows) {
-		return nil
+		return
 	}
 
-	insertionLine := firstFunctionLine + ctx.LineOffset - 1
+	insertionLine := firstFunctionLine + lineOffset - 1
 	firstFunctionChar := len(strings.Join(sourceRows[:insertionLine], "\n")) + 1
-	prototypeSection := composePrototypeSection(firstFunctionLine, ctx.Prototypes)
-	ctx.PrototypesSection = prototypeSection
-	source = source[:firstFunctionChar] + prototypeSection + source[firstFunctionChar:]
+	prototypeSection = composePrototypeSection(firstFunctionLine, prototypes)
+	preprocessedSource = source[:firstFunctionChar] + prototypeSection + source[firstFunctionChar:]
 
 	if debugOutput {
 		fmt.Println("#PREPROCESSED SOURCE")
@@ -62,12 +53,10 @@ func (s *PrototypesAdder) Run(ctx *types.Context) error {
 		}
 		fmt.Println("#END OF PREPROCESSED SOURCE")
 	}
-	ctx.SketchSourceAfterArduinoPreprocessing = source
-
-	return nil
+	return
 }
 
-func composePrototypeSection(line int, prototypes []*types.Prototype) string {
+func composePrototypeSection(line int, prototypes []*ctags.Prototype) string {
 	if len(prototypes) == 0 {
 		return constants.EMPTY_STRING
 	}
@@ -81,7 +70,7 @@ func composePrototypeSection(line int, prototypes []*types.Prototype) string {
 	return str
 }
 
-func joinPrototypes(prototypes []*types.Prototype) string {
+func joinPrototypes(prototypes []*ctags.Prototype) string {
 	prototypesSlice := []string{}
 	for _, proto := range prototypes {
 		if signatureContainsaDefaultArg(proto) {
@@ -98,7 +87,7 @@ func joinPrototypes(prototypes []*types.Prototype) string {
 	return strings.Join(prototypesSlice, "\n")
 }
 
-func signatureContainsaDefaultArg(proto *types.Prototype) bool {
+func signatureContainsaDefaultArg(proto *ctags.Prototype) bool {
 	return strings.Contains(proto.Prototype, "=")
 }
 
