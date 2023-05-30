@@ -1623,3 +1623,26 @@ func TestLibListDoesNotIncludeEmptyLibraries(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Len(t, stdout, 1)
 }
+
+func TestDependencyResolver(t *testing.T) {
+	// See: https://github.com/arduino/arduino-cli/issues/2135
+
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("lib", "update-index")
+	require.NoError(t, err)
+
+	done := make(chan bool)
+	go func() {
+		_, _, err := cli.Run("lib", "install", "NTPClient_Generic")
+		close(done)
+		require.Error(t, err)
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(time.Second * 2):
+		require.FailNow(t, "The install command didn't complete in the allocated time")
+	}
+}
