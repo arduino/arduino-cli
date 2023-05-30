@@ -77,7 +77,9 @@ jobs:
 
       - name: Check protocol buffers compile correctly
         if: runner.os == 'Linux'
-        run: task protoc:compile
+        run: |
+          task protoc:compile
+          git diff --color --exit-code
 
   check:
     needs: run-determination
