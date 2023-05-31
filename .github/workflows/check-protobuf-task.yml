@@ -61,13 +61,13 @@ jobs:
       - name: Install protoc compiler
         uses: arduino/setup-protoc@v2
         with:
-          version: v21.12
+          version: v23.2
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Go deps
         run: |
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.26.0
-          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.30.0
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
 
       - name: Install Task
         uses: arduino/setup-task@v1
