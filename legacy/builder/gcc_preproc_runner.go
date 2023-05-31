@@ -27,28 +27,28 @@ import (
 )
 
 func GCCPreprocRunner(ctx *types.Context, sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.PathList) ([]byte, error) {
-	buildProperties := properties.NewMap()
-	buildProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
-	buildProperties.Merge(ctx.BuildProperties)
-	buildProperties.Set("build.library_discovery_phase", "1")
-	buildProperties.SetPath("source_file", sourceFilePath)
-	buildProperties.SetPath("preprocessed_file_path", targetFilePath)
+	gccBuildProperties := properties.NewMap()
+	gccBuildProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
+	gccBuildProperties.Merge(ctx.BuildProperties)
+	gccBuildProperties.Set("build.library_discovery_phase", "1")
+	gccBuildProperties.SetPath("source_file", sourceFilePath)
+	gccBuildProperties.SetPath("preprocessed_file_path", targetFilePath)
 
 	includesStrings := f.Map(includes.AsStrings(), utils.WrapWithHyphenI)
-	buildProperties.Set("includes", strings.Join(includesStrings, " "))
+	gccBuildProperties.Set("includes", strings.Join(includesStrings, " "))
 
-	if buildProperties.Get("recipe.preproc.macros") == "" {
+	if gccBuildProperties.Get("recipe.preproc.macros") == "" {
 		// autogenerate preprocess macros recipe from compile recipe
-		preprocPattern := buildProperties.Get("recipe.cpp.o.pattern")
+		preprocPattern := gccBuildProperties.Get("recipe.cpp.o.pattern")
 		// add {preproc.macros.flags} to {compiler.cpp.flags}
 		preprocPattern = strings.Replace(preprocPattern, "{compiler.cpp.flags}", "{compiler.cpp.flags} {preproc.macros.flags}", 1)
 		// replace "{object_file}" with "{preprocessed_file_path}"
 		preprocPattern = strings.Replace(preprocPattern, "{object_file}", "{preprocessed_file_path}", 1)
 
-		buildProperties.Set("recipe.preproc.macros", preprocPattern)
+		gccBuildProperties.Set("recipe.preproc.macros", preprocPattern)
 	}
 
-	cmd, err := builder_utils.PrepareCommandForRecipe(buildProperties, "recipe.preproc.macros", true, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+	cmd, err := builder_utils.PrepareCommandForRecipe(gccBuildProperties, "recipe.preproc.macros", true, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
 	if err != nil {
 		return nil, err
 	}
