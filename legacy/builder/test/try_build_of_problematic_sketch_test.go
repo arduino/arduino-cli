@@ -202,13 +202,13 @@ func TestTryBuild042(t *testing.T) {
 }
 
 func makeDefaultContext() *types.Context {
+	builder.DebugPreprocessor = true
 	return &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "downloaded_board_manager_stuff"),
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 		Verbose:              true,
-		DebugPreprocessor:    true,
 	}
 }
 

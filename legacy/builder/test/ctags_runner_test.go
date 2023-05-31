@@ -20,35 +20,35 @@ import (
 	"testing"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
 	"github.com/arduino/arduino-cli/legacy/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
-func TestCTagsRunner(t *testing.T) {
-	sketchLocation := Abs(t, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"))
+func ctagsRunnerTestTemplate(t *testing.T, sketchLocation *paths.Path) []byte {
 	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
 	ctx.Verbose = true
 
-	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-		ctagsRunner,
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
+	err := (&builder.ContainerSetupHardwareToolsLibsSketchAndProps{}).Run(ctx)
+	NoError(t, err)
+
+	_, source, err := bldr.PrepareSketchBuildPath(ctx.Sketch, nil, ctx.SketchBuildPath)
+	NoError(t, err)
+
+	target := ctx.BuildPath.Join("ctags_target.cpp")
+	NoError(t, target.WriteFile([]byte(source)))
+
+	ctagsOutput, _, err := preprocessor.RunCTags(target, ctx.BuildProperties)
+	NoError(t, err)
+
+	return ctagsOutput
+}
+
+func TestCTagsRunner(t *testing.T) {
+	sketchLocation := Abs(t, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"))
+	ctagsOutput := ctagsRunnerTestTemplate(t, sketchLocation)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
 	expectedOutput := "server	" + quotedSketchLocation + "	/^BridgeServer server;$/;\"	kind:variable	line:31\n" +
@@ -58,32 +58,12 @@ func TestCTagsRunner(t *testing.T) {
 		"digitalCommand	" + quotedSketchLocation + "	/^void digitalCommand(BridgeClient client) {$/;\"	kind:function	line:82	signature:(BridgeClient client)	returntype:void\n" +
 		"analogCommand	" + quotedSketchLocation + "	/^void analogCommand(BridgeClient client) {$/;\"	kind:function	line:109	signature:(BridgeClient client)	returntype:void\n" +
 		"modeCommand	" + quotedSketchLocation + "	/^void modeCommand(BridgeClient client) {$/;\"	kind:function	line:149	signature:(BridgeClient client)	returntype:void\n"
-	require.Equal(t, expectedOutput, strings.Replace(string(ctagsRunner.CtagsOutput), "\r\n", "\n", -1))
+	require.Equal(t, expectedOutput, strings.Replace(string(ctagsOutput), "\r\n", "\n", -1))
 }
 
 func TestCTagsRunnerSketchWithClass(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("sketch_with_class", "sketch_with_class.ino"))
-	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-	ctx.Verbose = true
-
-	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-		ctagsRunner,
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
+	ctagsOutput := ctagsRunnerTestTemplate(t, sketchLocation)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
 	expectedOutput := "set_values\t" + quotedSketchLocation + "\t/^    void set_values (int,int);$/;\"\tkind:prototype\tline:4\tclass:Rectangle\tsignature:(int,int)\treturntype:void\n" +
@@ -91,100 +71,40 @@ func TestCTagsRunnerSketchWithClass(t *testing.T) {
 		"set_values\t" + quotedSketchLocation + "\t/^void Rectangle::set_values (int x, int y) {$/;\"\tkind:function\tline:8\tclass:Rectangle\tsignature:(int x, int y)\treturntype:void\n" +
 		"setup\t" + quotedSketchLocation + "\t/^void setup() {$/;\"\tkind:function\tline:13\tsignature:()\treturntype:void\n" +
 		"loop\t" + quotedSketchLocation + "\t/^void loop() {$/;\"\tkind:function\tline:17\tsignature:()\treturntype:void\n"
-	require.Equal(t, expectedOutput, strings.Replace(string(ctagsRunner.CtagsOutput), "\r\n", "\n", -1))
+	require.Equal(t, expectedOutput, strings.Replace(string(ctagsOutput), "\r\n", "\n", -1))
 }
 
 func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("sketch_with_typename", "sketch_with_typename.ino"))
-	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-	ctx.Verbose = true
-
-	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-		ctagsRunner,
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
+	ctagsOutput := ctagsRunnerTestTemplate(t, sketchLocation)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
 	expectedOutput := "Foo\t" + quotedSketchLocation + "\t/^  struct Foo{$/;\"\tkind:struct\tline:2\n" +
 		"setup\t" + quotedSketchLocation + "\t/^void setup() {$/;\"\tkind:function\tline:6\tsignature:()\treturntype:void\n" +
 		"loop\t" + quotedSketchLocation + "\t/^void loop() {}$/;\"\tkind:function\tline:10\tsignature:()\treturntype:void\n" +
 		"func\t" + quotedSketchLocation + "\t/^typename Foo<char>::Bar func(){$/;\"\tkind:function\tline:12\tsignature:()\treturntype:Foo::Bar\n"
-	require.Equal(t, expectedOutput, strings.Replace(string(ctagsRunner.CtagsOutput), "\r\n", "\n", -1))
+	require.Equal(t, expectedOutput, strings.Replace(string(ctagsOutput), "\r\n", "\n", -1))
 }
 
 func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("sketch_with_namespace", "sketch_with_namespace.ino"))
-	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-	ctx.Verbose = true
-
-	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-		ctagsRunner,
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
+	ctagsOutput := ctagsRunnerTestTemplate(t, sketchLocation)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
 	expectedOutput := "value\t" + quotedSketchLocation + "\t/^\tint value() {$/;\"\tkind:function\tline:2\tnamespace:Test\tsignature:()\treturntype:int\n" +
 		"setup\t" + quotedSketchLocation + "\t/^void setup() {}$/;\"\tkind:function\tline:7\tsignature:()\treturntype:void\n" +
 		"loop\t" + quotedSketchLocation + "\t/^void loop() {}$/;\"\tkind:function\tline:8\tsignature:()\treturntype:void\n"
-	require.Equal(t, expectedOutput, strings.Replace(string(ctagsRunner.CtagsOutput), "\r\n", "\n", -1))
+	require.Equal(t, expectedOutput, strings.Replace(string(ctagsOutput), "\r\n", "\n", -1))
 }
 
 func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("sketch_with_templates_and_shift", "sketch_with_templates_and_shift.ino"))
-	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-	ctx.Verbose = true
-
-	ctagsRunner := &builder.CTagsRunner{Source: &ctx.SketchSourceMerged, TargetFileName: "ctags_target.cpp"}
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-		&builder.PrintUsedLibrariesIfVerbose{},
-		&builder.WarnAboutArchIncompatibleLibraries{},
-		ctagsRunner,
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
+	ctagsOutput := ctagsRunnerTestTemplate(t, sketchLocation)
 
 	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
 	expectedOutput := "printGyro\t" + quotedSketchLocation + "\t/^void printGyro()$/;\"\tkind:function\tline:10\tsignature:()\treturntype:void\n" +
 		"bVar\t" + quotedSketchLocation + "\t/^c< 8 > bVar;$/;\"\tkind:variable\tline:15\n" +
 		"aVar\t" + quotedSketchLocation + "\t/^c< 1<<8 > aVar;$/;\"\tkind:variable\tline:16\n" +
 		"func\t" + quotedSketchLocation + "\t/^template<int X> func( c< 1<<X> & aParam) {$/;\"\tkind:function\tline:18\tsignature:( c< 1<<X> & aParam)\treturntype:template\n"
-	require.Equal(t, expectedOutput, strings.Replace(string(ctagsRunner.CtagsOutput), "\r\n", "\n", -1))
+	require.Equal(t, expectedOutput, strings.Replace(string(ctagsOutput), "\r\n", "\n", -1))
 }

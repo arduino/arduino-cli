@@ -20,25 +20,37 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/ctags"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 )
 
-func PrototypesAdder(source string, firstFunctionLine, lineOffset int, prototypes []*ctags.Prototype, debugOutput bool) (preprocessedSource, prototypeSection string) {
+var DebugPreprocessor bool
+
+func PrototypesAdder(sketch *sketch.Sketch, source string, ctagsStdout []byte, lineOffset int) string {
+	parser := &ctags.CTagsParser{}
+	parser.Parse(ctagsStdout, sketch.MainFile)
+	parser.FixCLinkageTagsDeclarations()
+
+	prototypes, firstFunctionLine := parser.GeneratePrototypes()
+	if firstFunctionLine == -1 {
+		firstFunctionLine = 0
+	}
+
 	source = strings.Replace(source, "\r\n", "\n", -1)
 	source = strings.Replace(source, "\r", "\n", -1)
 	sourceRows := strings.Split(source, "\n")
 	if isFirstFunctionOutsideOfSource(firstFunctionLine, sourceRows) {
-		return
+		return ""
 	}
 
 	insertionLine := firstFunctionLine + lineOffset - 1
 	firstFunctionChar := len(strings.Join(sourceRows[:insertionLine], "\n")) + 1
-	prototypeSection = composePrototypeSection(firstFunctionLine, prototypes)
-	preprocessedSource = source[:firstFunctionChar] + prototypeSection + source[firstFunctionChar:]
+	prototypeSection := composePrototypeSection(firstFunctionLine, prototypes)
+	preprocessedSource := source[:firstFunctionChar] + prototypeSection + source[firstFunctionChar:]
 
-	if debugOutput {
+	if DebugPreprocessor {
 		fmt.Println("#PREPROCESSED SOURCE")
 		prototypesRows := strings.Split(prototypeSection, "\n")
 		prototypesRows = prototypesRows[:len(prototypesRows)-1]
@@ -53,7 +65,7 @@ func PrototypesAdder(source string, firstFunctionLine, lineOffset int, prototype
 		}
 		fmt.Println("#END OF PREPROCESSED SOURCE")
 	}
-	return
+	return preprocessedSource
 }
 
 func composePrototypeSection(line int, prototypes []*ctags.Prototype) string {
