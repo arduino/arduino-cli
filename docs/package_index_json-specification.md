@@ -369,12 +369,48 @@ versions of the `PACKAGE`, 1.0.0 and 1.0.1. No `TOOLS` needed to be installed so
 
 Here is the Boards Manager entry created by the example: ![Boards Manager screenshot](img/boards-manager-screenshot.png)
 
-## Installation archive structure
+## Archive structure
+
+It must contain a single folder in the root. All files and `__MACOSX` folder present in the root will be ignored.
+
+Valid structure
+
+```
+.
+└── avr/
+    ├── bootloaders
+    ├── cores
+    ├── firmwares
+    ├── libraries
+    ├── variants
+    ├── boards.txt
+    ├── platform.txt
+    └── programmers.txt
+```
+
+Invalid structure:
+
+```
+.
+├── avr/
+│   ├── ...
+│   ├── boards.txt
+│   ├── platform.txt
+│   └── programmers.txt
+├── folder2
+└── folder3
+```
+
+**Note**: the folder structure of the core archive is slightly different from the standard manually installed Arduino
+IDE 1.5+ compatible hardware folder structure. You must remove the architecture folder(e.g., `avr` or `arm`), moving all
+the files and folders within the architecture folder up a level.
+
+### Installation
 
 The installation archives contain the Board support files.
 
 Supported formats are `.zip`, `.tar.bz2`, and `.tar.gz`. Starting from Arduino CLI >=0.30.0 support for `.tar.xz`, and
-`.tar.zst` has been added, by the way, if you want to keep compatiblity with older versions of Arduino IDE and Arduino
+`.tar.zst` has been added, by the way, if you want to keep compatibility with older versions of Arduino IDE and Arduino
 CLI we recommend using one of the older formats.
 
 The folder structure of the core archive is slightly different from the standard manually installed Arduino IDE 1.5+
