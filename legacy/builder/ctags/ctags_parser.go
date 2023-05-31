@@ -58,7 +58,7 @@ type CTag struct {
 	PrototypeModifiers string
 }
 
-func (p *CTagsParser) Parse(ctagsOutput []byte, mainFile *paths.Path) []*CTag {
+func (p *CTagsParser) Parse(ctagsOutput []byte, mainFile *paths.Path) ([]*Prototype, int) {
 	rows := strings.Split(string(ctagsOutput), "\n")
 	rows = removeEmpty(rows)
 
@@ -74,8 +74,9 @@ func (p *CTagsParser) Parse(ctagsOutput []byte, mainFile *paths.Path) []*CTag {
 	p.removeDefinedProtypes()
 	p.skipDuplicates()
 	p.skipTagsWhere(p.prototypeAndCodeDontMatch)
+	p.fixCLinkageTagsDeclarations()
 
-	return p.tags
+	return p.toPrototypes(), p.findLineWhereToInsertPrototypes()
 }
 
 func (p *CTagsParser) addPrototypes() {

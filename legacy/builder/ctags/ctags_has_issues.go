@@ -19,25 +19,18 @@ import (
 	"bufio"
 	"os"
 	"strings"
+
+	"golang.org/x/exp/slices"
 )
 
-func (p *CTagsParser) FixCLinkageTagsDeclarations() {
+func (p *CTagsParser) fixCLinkageTagsDeclarations() {
 	linesMap := p.FindCLinkageLines(p.tags)
 	for i := range p.tags {
-		if sliceContainsInt(linesMap[p.tags[i].Filename], p.tags[i].Line) &&
+		if slices.Contains(linesMap[p.tags[i].Filename], p.tags[i].Line) &&
 			!strings.Contains(p.tags[i].PrototypeModifiers, EXTERN) {
 			p.tags[i].PrototypeModifiers = p.tags[i].PrototypeModifiers + " " + EXTERN
 		}
 	}
-}
-
-func sliceContainsInt(s []int, e int) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
 }
 
 func (p *CTagsParser) prototypeAndCodeDontMatch(tag *CTag) bool {

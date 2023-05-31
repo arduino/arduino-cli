@@ -40,8 +40,11 @@ func PreprocessSketchWithCtags(ctx *types.Context) error {
 
 	// Run preprocessor
 	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp")
-	stderr, err := GCCPreprocRunner(ctx, sourceFile, targetFilePath, ctx.IncludeFolders)
-	ctx.WriteStderr(stderr)
+	gccStdout, gccStderr, err := preprocessor.GCC(sourceFile, targetFilePath, ctx.IncludeFolders, ctx.BuildProperties)
+	if ctx.Verbose {
+		ctx.WriteStdout(gccStdout)
+		ctx.WriteStderr(gccStderr)
+	}
 	if err != nil {
 		if !ctx.OnlyUpdateCompilationDatabase {
 			return errors.WithStack(err)

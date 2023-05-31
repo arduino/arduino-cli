@@ -29,8 +29,7 @@ func producePrototypes(t *testing.T, filename string, mainFile string) ([]*Proto
 	require.NoError(t, err)
 
 	parser := &CTagsParser{}
-	parser.Parse(bytes, paths.New(mainFile))
-	return parser.GeneratePrototypes()
+	return parser.Parse(bytes, paths.New(mainFile))
 }
 
 func TestCTagsToPrototypesShouldListPrototypes(t *testing.T) {

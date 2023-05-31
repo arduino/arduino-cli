@@ -23,6 +23,7 @@ import (
 	"runtime"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -36,11 +37,15 @@ func PreprocessSketchWithArduinoPreprocessor(ctx *types.Context) error {
 
 	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp")
 	targetFile := ctx.PreprocPath.Join("sketch_merged.cpp")
-	stderr, err := GCCPreprocRunner(ctx, sourceFile, targetFile, ctx.IncludeFolders)
-	ctx.WriteStderr(stderr)
+	gccStdout, gccStderr, err := preprocessor.GCC(sourceFile, targetFile, ctx.IncludeFolders, ctx.BuildProperties)
+	if ctx.Verbose {
+		ctx.WriteStdout(gccStdout)
+		ctx.WriteStderr(gccStderr)
+	}
 	if err != nil {
 		return err
 	}
+
 	buildProperties := properties.NewMap()
 	buildProperties.Set("tools.arduino-preprocessor.path", "{runtime.tools.arduino-preprocessor.path}")
 	buildProperties.Set("tools.arduino-preprocessor.cmd.path", "{path}/arduino-preprocessor")
