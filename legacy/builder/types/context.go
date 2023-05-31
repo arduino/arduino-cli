@@ -94,7 +94,6 @@ type Context struct {
 	CoreObjectsFiles             paths.PathList
 	LibrariesBuildPath           *paths.Path
 	LibrariesObjectFiles         paths.PathList
-	PreprocPath                  *paths.Path
 	SketchObjectFiles            paths.PathList
 	IgnoreSketchFolderNameErrors bool
 

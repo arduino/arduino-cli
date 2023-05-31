@@ -57,7 +57,7 @@ func TestPrototypesAdderBridgeExample(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
 	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
@@ -83,7 +83,7 @@ func TestPrototypesAdderSketchWithIfDef(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("SketchWithIfDef", "SketchWithIfDef.preprocessed.txt"), ctx)
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
@@ -109,7 +109,7 @@ func TestPrototypesAdderBaladuino(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("Baladuino", "Baladuino.preprocessed.txt"), ctx)
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
@@ -135,7 +135,7 @@ func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("CharWithEscapedDoubleQuote", "CharWithEscapedDoubleQuote.preprocessed.txt"), ctx)
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
@@ -161,7 +161,7 @@ func TestPrototypesAdderIncludeBetweenMultilineComment(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("IncludeBetweenMultilineComment", "IncludeBetweenMultilineComment.preprocessed.txt"), ctx)
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
@@ -187,7 +187,7 @@ func TestPrototypesAdderLineContinuations(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("LineContinuations", "LineContinuations.preprocessed.txt"), ctx)
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
@@ -213,7 +213,7 @@ func TestPrototypesAdderStringWithComment(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("StringWithComment", "StringWithComment.preprocessed.txt"), ctx)
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
@@ -239,7 +239,7 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessed := LoadAndInterpolate(t, filepath.Join("SketchWithStruct", "SketchWithStruct.preprocessed.txt"), ctx)
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
@@ -273,7 +273,7 @@ func TestPrototypesAdderSketchWithConfig(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
 	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
@@ -306,7 +306,7 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 		NoError(t, err)
 	}
 	mergedSketch := loadPreprocessedSketch(t, ctx)
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
 	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
@@ -335,7 +335,7 @@ func TestPrototypesAdderSketchNoFunctions(t *testing.T) {
 		NoError(t, err)
 	}
 	mergedSketch := loadPreprocessedSketch(t, ctx)
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
 	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
@@ -364,7 +364,7 @@ func TestPrototypesAdderSketchWithDefaultArgs(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
 	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
@@ -393,7 +393,7 @@ func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
 	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
@@ -433,7 +433,7 @@ func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
 	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
@@ -467,7 +467,7 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
 	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
@@ -500,7 +500,7 @@ func TestPrototypesAdderSketchWithTypename(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
 	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
@@ -535,7 +535,7 @@ func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
 	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
@@ -567,7 +567,7 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
 	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
@@ -599,7 +599,7 @@ func TestPrototypesAdderSketchWithConst(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
 	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
@@ -625,7 +625,7 @@ func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 	// only requires no error as result
 }
 
@@ -651,7 +651,7 @@ func TestPrototypesAdderSketchWithSubstringFunctionMember(t *testing.T) {
 		err := command.Run(ctx)
 		NoError(t, err)
 	}
-	NoError(t, builder.PreprocessSketchWithCtags(ctx))
+	NoError(t, builder.PreprocessSketch(ctx))
 
 	preprocessedSketch := loadPreprocessedSketch(t, ctx)
 	require.Contains(t, preprocessedSketch, "class Foo {\nint blooper(int x) { return x+1; }\n};\n\nFoo foo;\n\n#line 7 "+quotedSketchLocation+"\nvoid setup();")

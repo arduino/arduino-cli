@@ -116,9 +116,6 @@ func TestBuilderEmptySketch(t *testing.T) {
 	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
-	exist, err = buildPath.Join(constants.FOLDER_PREPROC, "sketch_merged.cpp").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
 	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "sketch1.ino.cpp.o").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
@@ -141,9 +138,6 @@ func TestBuilderBridge(t *testing.T) {
 
 	buildPath := ctx.BuildPath
 	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join(constants.FOLDER_PREPROC, "sketch_merged.cpp").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
 	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "Bridge.ino.cpp.o").ExistCheck()
@@ -171,9 +165,6 @@ func TestBuilderSketchWithConfig(t *testing.T) {
 
 	buildPath := ctx.BuildPath
 	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join(constants.FOLDER_PREPROC, "sketch_merged.cpp").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
 	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "sketch_with_config.ino.cpp.o").ExistCheck()
@@ -208,9 +199,6 @@ func TestBuilderBridgeTwice(t *testing.T) {
 	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
-	exist, err = buildPath.Join(constants.FOLDER_PREPROC, "sketch_merged.cpp").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
 	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "Bridge.ino.cpp.o").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
@@ -243,9 +231,6 @@ func TestBuilderBridgeSAM(t *testing.T) {
 	NoError(t, err)
 	require.True(t, exist)
 	exist, err = buildPath.Join(constants.FOLDER_CORE, "avr", "dtostrf.c.d").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join(constants.FOLDER_PREPROC, "sketch_merged.cpp").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
 	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "Bridge.ino.cpp.o").ExistCheck()
@@ -284,9 +269,6 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 
 	buildPath := ctx.BuildPath
 	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join(constants.FOLDER_PREPROC, "sketch_merged.cpp").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
 	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "Bridge.ino.cpp.o").ExistCheck()
