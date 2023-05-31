@@ -95,17 +95,25 @@ func runUploadCommand(command *cobra.Command, args []string) {
 		feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
 	}
 
-	instance, profile := instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
+	var inst *rpc.Instance
+	var profile *rpc.Profile
+
+	if profileArg.Get() == "" {
+		inst, profile = instance.CreateAndInitWithProfile(sk.Project.DefaultProfile, sketchPath)
+	} else {
+		inst, profile = instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
+	}
+
 	if fqbnArg.String() == "" {
 		fqbnArg.Set(profile.GetFqbn())
 	}
 
 	defaultFQBN := sk.GetDefaultFQBN()
 	defaultAddress, defaultProtocol := sk.GetDefaultPortAddressAndProtocol()
-	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, instance, defaultFQBN, defaultAddress, defaultProtocol)
+	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, defaultFQBN, defaultAddress, defaultProtocol)
 
 	userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
-		Instance: instance,
+		Instance: inst,
 		Fqbn:     fqbn,
 		Protocol: port.Protocol,
 	})
@@ -122,7 +130,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 			}
 
 			// FIXME: Here we must not access package manager...
-			pme, release := commands.GetPackageManagerExplorer(&rpc.UploadRequest{Instance: instance})
+			pme, release := commands.GetPackageManagerExplorer(&rpc.UploadRequest{Instance: inst})
 			platform := pme.FindPlatform(&packagemanager.PlatformReference{
 				Package:              split[0],
 				PlatformArchitecture: split[1],
@@ -156,7 +164,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 
 	stdOut, stdErr, stdIOResult := feedback.OutputStreams()
 	req := &rpc.UploadRequest{
-		Instance:   instance,
+		Instance:   inst,
 		Fqbn:       fqbn,
 		SketchPath: path,
 		Port:       port,
