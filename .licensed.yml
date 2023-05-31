@@ -8,6 +8,11 @@ cache_path: .licenses/
 apps:
   - source_path: ./
 
+reviewed:
+  go:
+    - google.golang.org/protobuf/encoding/protojson
+    - google.golang.org/protobuf/internal/encoding/json
+
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-dependencies/GPL-3.0/.licensed.yml
 allowed:
   # The following are based on: https://www.gnu.org/licenses/license-list.html#GPLCompatibleLicenses
