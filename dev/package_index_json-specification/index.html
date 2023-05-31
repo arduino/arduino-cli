@@ -1319,9 +1319,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#installation-archive-structure" class="md-nav__link">
-    Installation archive structure
+  <a href="#archive-structure" class="md-nav__link">
+    Archive structure
   </a>
+  
+    <nav class="md-nav" aria-label="Archive structure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1461,9 +1474,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#installation-archive-structure" class="md-nav__link">
-    Installation archive structure
+  <a href="#archive-structure" class="md-nav__link">
+    Archive structure
   </a>
+  
+    <nav class="md-nav" aria-label="Archive structure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1825,10 +1851,37 @@ are as follows:</p>
 <p>In the example there is one <code>PACKAGE</code>, My Board. The package is compatible with the AVR architecture. There are two
 versions of the <code>PACKAGE</code>, 1.0.0 and 1.0.1. No <code>TOOLS</code> needed to be installed so that section was left empty.</p>
 <p>Here is the Boards Manager entry created by the example: <img alt="Boards Manager screenshot" src="../img/boards-manager-screenshot.png" /></p>
-<h2 id="installation-archive-structure">Installation archive structure<a class="headerlink" href="#installation-archive-structure" title="Permanent link">&para;</a></h2>
+<h2 id="archive-structure">Archive structure<a class="headerlink" href="#archive-structure" title="Permanent link">&para;</a></h2>
+<p>It must contain a single folder in the root. All files and <code>__MACOSX</code> folder present in the root will be ignored.</p>
+<p>Valid structure</p>
+<div class="highlight"><pre><span></span><code>.
+└── avr/
+    ├── bootloaders
+    ├── cores
+    ├── firmwares
+    ├── libraries
+    ├── variants
+    ├── boards.txt
+    ├── platform.txt
+    └── programmers.txt
+</code></pre></div>
+<p>Invalid structure:</p>
+<div class="highlight"><pre><span></span><code>.
+├── avr/
+│   ├── ...
+│   ├── boards.txt
+│   ├── platform.txt
+│   └── programmers.txt
+├── folder2
+└── folder3
+</code></pre></div>
+<p><strong>Note</strong>: the folder structure of the core archive is slightly different from the standard manually installed Arduino
+IDE 1.5+ compatible hardware folder structure. You must remove the architecture folder(e.g., <code>avr</code> or <code>arm</code>), moving all
+the files and folders within the architecture folder up a level.</p>
+<h3 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h3>
 <p>The installation archives contain the Board support files.</p>
 <p>Supported formats are <code>.zip</code>, <code>.tar.bz2</code>, and <code>.tar.gz</code>. Starting from Arduino CLI &gt;=0.30.0 support for <code>.tar.xz</code>, and
-<code>.tar.zst</code> has been added, by the way, if you want to keep compatiblity with older versions of Arduino IDE and Arduino
+<code>.tar.zst</code> has been added, by the way, if you want to keep compatibility with older versions of Arduino IDE and Arduino
 CLI we recommend using one of the older formats.</p>
 <p>The folder structure of the core archive is slightly different from the standard manually installed Arduino IDE 1.5+
 compatible hardware folder structure. You must remove the architecture folder(e.g., <code>avr</code> or <code>arm</code>), moving all the
