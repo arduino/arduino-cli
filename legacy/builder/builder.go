@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -49,7 +50,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
 
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = builder.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 
@@ -59,7 +60,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		&WarnAboutArchIncompatibleLibraries{},
 
 		utils.LogIfVerbose(false, tr("Generating function prototypes...")),
-		&PreprocessSketch{},
+		types.BareCommand(PreprocessSketch),
 
 		utils.LogIfVerbose(false, tr("Compiling sketch...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.sketch.prebuild", Suffix: ".pattern"},
@@ -115,13 +116,19 @@ func (s *Builder) Run(ctx *types.Context) error {
 	return otherErr
 }
 
-type PreprocessSketch struct{}
-
-func (s *PreprocessSketch) Run(ctx *types.Context) error {
+func PreprocessSketch(ctx *types.Context) error {
 	if ctx.UseArduinoPreprocessor {
 		return PreprocessSketchWithArduinoPreprocessor(ctx)
 	} else {
-		return PreprocessSketchWithCtags(ctx)
+		normalOutput, verboseOutput, err := preprocessor.PreprocessSketchWithCtags(
+			ctx.Sketch, ctx.BuildPath, ctx.IncludeFolders, ctx.LineOffset,
+			ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)
+		if ctx.Verbose {
+			ctx.WriteStdout(verboseOutput)
+		} else {
+			ctx.WriteStdout(normalOutput)
+		}
+		return err
 	}
 }
 
@@ -141,7 +148,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
 
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, ctx.SketchSourceMerged, _err = builder.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = builder.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 
@@ -149,7 +156,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 
 		&WarnAboutArchIncompatibleLibraries{},
 
-		&PreprocessSketch{},
+		types.BareCommand(PreprocessSketch),
 	}
 
 	if err := runCommands(ctx, commands); err != nil {
@@ -157,7 +164,11 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 	}
 
 	// Output arduino-preprocessed source
-	ctx.WriteStdout([]byte(ctx.SketchSourceAfterArduinoPreprocessing))
+	preprocessedSketch, err := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp").ReadFile()
+	if err != nil {
+		return err
+	}
+	ctx.WriteStdout(preprocessedSketch)
 	return nil
 }
 

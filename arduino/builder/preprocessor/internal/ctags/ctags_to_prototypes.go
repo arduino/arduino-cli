@@ -20,6 +20,7 @@ import (
 	"strings"
 )
 
+// Prototype is a C++ prototype generated from ctags output
 type Prototype struct {
 	FunctionName string
 	File         string
@@ -32,15 +33,14 @@ func (proto *Prototype) String() string {
 	return proto.Modifiers + " " + proto.Prototype + " @ " + strconv.Itoa(proto.Line)
 }
 
-func (p *CTagsParser) findLineWhereToInsertPrototypes() int {
+func (p *Parser) findLineWhereToInsertPrototypes() int {
 	firstFunctionLine := p.firstFunctionAtLine()
 	firstFunctionPointerAsArgument := p.firstFunctionPointerUsedAsArgument()
 	if firstFunctionLine != -1 && firstFunctionPointerAsArgument != -1 {
 		if firstFunctionLine < firstFunctionPointerAsArgument {
 			return firstFunctionLine
-		} else {
-			return firstFunctionPointerAsArgument
 		}
+		return firstFunctionPointerAsArgument
 	} else if firstFunctionLine != -1 {
 		return firstFunctionLine
 	} else if firstFunctionPointerAsArgument != -1 {
@@ -50,7 +50,7 @@ func (p *CTagsParser) findLineWhereToInsertPrototypes() int {
 	}
 }
 
-func (p *CTagsParser) firstFunctionPointerUsedAsArgument() int {
+func (p *Parser) firstFunctionPointerUsedAsArgument() int {
 	functionTags := p.collectFunctions()
 	for _, tag := range p.tags {
 		if functionNameUsedAsFunctionPointerIn(tag, functionTags) {
@@ -60,7 +60,7 @@ func (p *CTagsParser) firstFunctionPointerUsedAsArgument() int {
 	return -1
 }
 
-func functionNameUsedAsFunctionPointerIn(tag *CTag, functionTags []*CTag) bool {
+func functionNameUsedAsFunctionPointerIn(tag *Tag, functionTags []*Tag) bool {
 	for _, functionTag := range functionTags {
 		if tag.Line != functionTag.Line && strings.Contains(tag.Code, "&"+functionTag.FunctionName) {
 			return true
@@ -72,26 +72,26 @@ func functionNameUsedAsFunctionPointerIn(tag *CTag, functionTags []*CTag) bool {
 	return false
 }
 
-func (p *CTagsParser) collectFunctions() []*CTag {
-	functionTags := []*CTag{}
+func (p *Parser) collectFunctions() []*Tag {
+	functionTags := []*Tag{}
 	for _, tag := range p.tags {
-		if tag.Kind == KIND_FUNCTION && !tag.SkipMe {
+		if tag.Kind == kindFunction && !tag.SkipMe {
 			functionTags = append(functionTags, tag)
 		}
 	}
 	return functionTags
 }
 
-func (p *CTagsParser) firstFunctionAtLine() int {
+func (p *Parser) firstFunctionAtLine() int {
 	for _, tag := range p.tags {
-		if !tagIsUnknown(tag) && isHandled(tag) && tag.Kind == KIND_FUNCTION && tag.Filename == p.mainFile.String() {
+		if !tagIsUnknown(tag) && isHandled(tag) && tag.Kind == kindFunction && tag.Filename == p.mainFile.String() {
 			return tag.Line
 		}
 	}
 	return -1
 }
 
-func (p *CTagsParser) toPrototypes() []*Prototype {
+func (p *Parser) toPrototypes() []*Prototype {
 	prototypes := []*Prototype{}
 	for _, tag := range p.tags {
 		if strings.TrimSpace(tag.Prototype) == "" {

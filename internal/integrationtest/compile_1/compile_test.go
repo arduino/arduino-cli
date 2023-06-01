@@ -25,7 +25,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -1060,7 +1060,6 @@ func compileWithRelativeBuildPath(t *testing.T, env *integrationtest.Environment
 		"core",
 		"includes.cache",
 		"libraries",
-		"preproc",
 		"sketch",
 	}
 
@@ -1191,7 +1190,7 @@ void loop() {
 }
 
 `
-	expected = strings.ReplaceAll(expected, "%SKETCH_PATH%", builder.QuoteCppString(sketchPath.Join("SketchSimple.ino").String()))
+	expected = strings.ReplaceAll(expected, "%SKETCH_PATH%", cpp.QuoteString(sketchPath.Join("SketchSimple.ino").String()))
 
 	jsonOut, _, err := cli.Run("compile", "-b", fqbn, "--preprocess", sketchPath.String(), "--format", "json")
 	require.NoError(t, err)

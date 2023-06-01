@@ -31,7 +31,6 @@ func TestAddAdditionalEntriesToContextNoBuildPath(t *testing.T) {
 	command := builder.AddAdditionalEntriesToContext{}
 	NoError(t, command.Run(ctx))
 
-	require.Empty(t, ctx.PreprocPath)
 	require.Empty(t, ctx.SketchBuildPath)
 	require.Empty(t, ctx.LibrariesBuildPath)
 	require.Empty(t, ctx.CoreBuildPath)
@@ -48,7 +47,6 @@ func TestAddAdditionalEntriesToContextWithBuildPath(t *testing.T) {
 	command := builder.AddAdditionalEntriesToContext{}
 	NoError(t, command.Run(ctx))
 
-	require.Equal(t, Abs(t, paths.New("folder", constants.FOLDER_PREPROC)), ctx.PreprocPath)
 	require.Equal(t, Abs(t, paths.New("folder", constants.FOLDER_SKETCH)), ctx.SketchBuildPath)
 	require.Equal(t, Abs(t, paths.New("folder", "libraries")), ctx.LibrariesBuildPath)
 	require.Equal(t, Abs(t, paths.New("folder", constants.FOLDER_CORE)), ctx.CoreBuildPath)

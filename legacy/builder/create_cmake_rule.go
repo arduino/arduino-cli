@@ -115,7 +115,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		fmt.Println(err)
 	}
 
-	if err := PreprocessSketchWithCtags(ctx); err != nil {
+	if err := PreprocessSketch(ctx); err != nil {
 		return err
 	}
 

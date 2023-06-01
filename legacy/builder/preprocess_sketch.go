@@ -31,12 +31,12 @@ import (
 )
 
 func PreprocessSketchWithArduinoPreprocessor(ctx *types.Context) error {
-	if err := ctx.PreprocPath.MkdirAll(); err != nil {
+	if err := ctx.BuildPath.Join("preproc").MkdirAll(); err != nil {
 		return errors.WithStack(err)
 	}
 
 	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp")
-	targetFile := ctx.PreprocPath.Join("sketch_merged.cpp")
+	targetFile := ctx.BuildPath.Join("preproc", "sketch_merged.cpp")
 	gccStdout, gccStderr, err := preprocessor.GCC(sourceFile, targetFile, ctx.IncludeFolders, ctx.BuildProperties)
 	if ctx.Verbose {
 		ctx.WriteStdout(gccStdout)
@@ -85,8 +85,5 @@ func PreprocessSketchWithArduinoPreprocessor(ctx *types.Context) error {
 	}
 
 	result := utils.NormalizeUTF8(buf)
-
-	//fmt.Printf("PREPROCESSOR OUTPUT:\n%s\n", output)
-	ctx.SketchSourceAfterArduinoPreprocessing = string(result)
-	return bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, []byte(ctx.SketchSourceAfterArduinoPreprocessing), ctx.SketchBuildPath)
+	return bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, result, ctx.SketchBuildPath)
 }

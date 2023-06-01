@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/go-paths-helper"
@@ -36,17 +37,16 @@ var (
 // PrepareSketchBuildPath copies the sketch source files in the build path.
 // The .ino files are merged together to create a .cpp file (by the way, the
 // .cpp file still needs to be Arduino-preprocessed to compile).
-func PrepareSketchBuildPath(sketch *sketch.Sketch, sourceOverrides map[string]string, buildPath *paths.Path) (offset int, mergedSource string, err error) {
-	if offset, mergedSource, err = sketchMergeSources(sketch, sourceOverrides); err != nil {
-		return
+func PrepareSketchBuildPath(sketch *sketch.Sketch, sourceOverrides map[string]string, buildPath *paths.Path) (int, error) {
+	if offset, mergedSource, err := sketchMergeSources(sketch, sourceOverrides); err != nil {
+		return 0, err
+	} else if err := SketchSaveItemCpp(sketch.MainFile, []byte(mergedSource), buildPath); err != nil {
+		return 0, err
+	} else if err := sketchCopyAdditionalFiles(sketch, buildPath, sourceOverrides); err != nil {
+		return 0, err
+	} else {
+		return offset, nil
 	}
-	if err = SketchSaveItemCpp(sketch.MainFile, []byte(mergedSource), buildPath); err != nil {
-		return
-	}
-	if err = sketchCopyAdditionalFiles(sketch, buildPath, sourceOverrides); err != nil {
-		return
-	}
-	return
 }
 
 // SketchSaveItemCpp saves a preprocessed .cpp sketch file on disk
@@ -96,7 +96,7 @@ func sketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, st
 		lineOffset++
 	}
 
-	mergedSource += "#line 1 " + QuoteCppString(sk.MainFile.String()) + "\n"
+	mergedSource += "#line 1 " + cpp.QuoteString(sk.MainFile.String()) + "\n"
 	mergedSource += mainSrc + "\n"
 	lineOffset++
 
@@ -105,7 +105,7 @@ func sketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, st
 		if err != nil {
 			return 0, "", err
 		}
-		mergedSource += "#line 1 " + QuoteCppString(file.String()) + "\n"
+		mergedSource += "#line 1 " + cpp.QuoteString(file.String()) + "\n"
 		mergedSource += src + "\n"
 	}
 
@@ -145,7 +145,7 @@ func sketchCopyAdditionalFiles(sketch *sketch.Sketch, destPath *paths.Path, over
 		}
 
 		// tag each addtional file with the filename of the source it was copied from
-		sourceBytes = append([]byte("#line 1 "+QuoteCppString(file.String())+"\n"), sourceBytes...)
+		sourceBytes = append([]byte("#line 1 "+cpp.QuoteString(file.String())+"\n"), sourceBytes...)
 
 		err = writeIfDifferent(sourceBytes, targetPath)
 		if err != nil {

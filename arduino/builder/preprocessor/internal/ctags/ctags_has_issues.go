@@ -23,17 +23,17 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-func (p *CTagsParser) fixCLinkageTagsDeclarations() {
+func (p *Parser) fixCLinkageTagsDeclarations() {
 	linesMap := p.FindCLinkageLines(p.tags)
 	for i := range p.tags {
 		if slices.Contains(linesMap[p.tags[i].Filename], p.tags[i].Line) &&
-			!strings.Contains(p.tags[i].PrototypeModifiers, EXTERN) {
-			p.tags[i].PrototypeModifiers = p.tags[i].PrototypeModifiers + " " + EXTERN
+			!strings.Contains(p.tags[i].PrototypeModifiers, keywordExternC) {
+			p.tags[i].PrototypeModifiers = p.tags[i].PrototypeModifiers + " " + keywordExternC
 		}
 	}
 }
 
-func (p *CTagsParser) prototypeAndCodeDontMatch(tag *CTag) bool {
+func (p *Parser) prototypeAndCodeDontMatch(tag *Tag) bool {
 	if tag.SkipMe {
 		return true
 	}
@@ -98,7 +98,7 @@ func (p *CTagsParser) prototypeAndCodeDontMatch(tag *CTag) bool {
 	return ret == -1
 }
 
-func findTemplateMultiline(tag *CTag) string {
+func findTemplateMultiline(tag *Tag) string {
 	code, _ := getFunctionProtoUntilTemplateToken(tag, tag.Code)
 	return removeEverythingAfterClosingRoundBracket(code)
 }
@@ -108,7 +108,7 @@ func removeEverythingAfterClosingRoundBracket(s string) string {
 	return s[0 : n+1]
 }
 
-func getFunctionProtoUntilTemplateToken(tag *CTag, code string) (string, int) {
+func getFunctionProtoUntilTemplateToken(tag *Tag, code string) (string, int) {
 
 	/* FIXME I'm ugly */
 	line := 0
@@ -128,7 +128,7 @@ func getFunctionProtoUntilTemplateToken(tag *CTag, code string) (string, int) {
 			textBuffer = append(textBuffer, text)
 		}
 
-		for line > 0 && !strings.Contains(code, TEMPLATE) {
+		for line > 0 && !strings.Contains(code, keywordTemplate) {
 
 			line = line - 1
 			text := textBuffer[line]
@@ -141,7 +141,7 @@ func getFunctionProtoUntilTemplateToken(tag *CTag, code string) (string, int) {
 	return code, line
 }
 
-func getFunctionProtoWithNPreviousCharacters(tag *CTag, code string, n int) (string, int) {
+func getFunctionProtoWithNPreviousCharacters(tag *Tag, code string, n int) (string, int) {
 
 	/* FIXME I'm ugly */
 	expectedPrototypeLen := len(code) + n
@@ -204,10 +204,9 @@ func removeComments(text string, multilinecomment bool) (string, bool) {
 	return text, multilinecomment
 }
 
-/* This function scans the source files searching for "extern C" context
- * It save the line numbers in a map filename -> {lines...}
- */
-func (p *CTagsParser) FindCLinkageLines(tags []*CTag) map[string][]int {
+// FindCLinkageLines scans the source files searching for "extern C" context
+// It save the line numbers in a map filename -> {lines...}
+func (p *Parser) FindCLinkageLines(tags []*Tag) map[string][]int {
 
 	lines := make(map[string][]int)
 
@@ -245,7 +244,7 @@ func (p *CTagsParser) FindCLinkageLines(tags []*CTag) map[string][]int {
 			indentLevels := 0
 			line := 0
 
-			externCDecl := removeSpacesAndTabs(EXTERN)
+			externCDecl := removeSpacesAndTabs(keywordExternC)
 
 			for scanner.Scan() {
 				line++
