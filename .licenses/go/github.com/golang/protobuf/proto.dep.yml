@@ -1,12 +1,12 @@
 ---
 name: github.com/golang/protobuf/proto
-version: v1.5.2
+version: v1.5.3
 type: go
 summary: Package proto provides functionality for handling protocol buffer messages.
 homepage: https://pkg.go.dev/github.com/golang/protobuf/proto
 license: bsd-3-clause
 licenses:
-- sources: protobuf@v1.5.2/LICENSE
+- sources: protobuf@v1.5.3/LICENSE
   text: |+
     Copyright 2010 The Go Authors.  All rights reserved.
 

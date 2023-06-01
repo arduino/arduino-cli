@@ -1,9 +1,10 @@
 ---
-name: github.com/golang/protobuf/ptypes/duration
+name: github.com/golang/protobuf/jsonpb
 version: v1.5.3
 type: go
-summary: 
-homepage: https://pkg.go.dev/github.com/golang/protobuf/ptypes/duration
+summary: Package jsonpb provides functionality to marshal and unmarshal between a
+  protocol buffer message and JSON.
+homepage: https://pkg.go.dev/github.com/golang/protobuf/jsonpb
 license: bsd-3-clause
 licenses:
 - sources: protobuf@v1.5.3/LICENSE

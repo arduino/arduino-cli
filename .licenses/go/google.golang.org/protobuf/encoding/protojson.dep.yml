@@ -1,10 +1,11 @@
 ---
-name: google.golang.org/protobuf/internal/set
+name: google.golang.org/protobuf/encoding/protojson
 version: v1.30.0
 type: go
-summary: Package set provides simple set data structures for uint64s.
-homepage: https://pkg.go.dev/google.golang.org/protobuf/internal/set
-license: bsd-3-clause
+summary: Package protojson marshals and unmarshals protocol buffer messages as JSON
+  format.
+homepage: https://pkg.go.dev/google.golang.org/protobuf/encoding/protojson
+license: other
 licenses:
 - sources: protobuf@v1.30.0/LICENSE
   text: |

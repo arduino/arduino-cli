@@ -1,13 +1,13 @@
 ---
 name: google.golang.org/grpc/internal/channelz
-version: v1.38.0
+version: v1.55.0
 type: go
 summary: Package channelz defines APIs for enabling channelz service, entry registration/deletion,
   and accessing channelz data.
 homepage: https://pkg.go.dev/google.golang.org/grpc/internal/channelz
 license: apache-2.0
 licenses:
-- sources: grpc@v1.38.0/LICENSE
+- sources: grpc@v1.55.0/LICENSE
   text: |2
 
                                      Apache License
