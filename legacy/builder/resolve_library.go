@@ -34,7 +34,7 @@ func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {
 		ctx.Info(fmt.Sprintf("  -> %s: %s", tr("candidates"), candidates))
 	}
 
-	if candidates == nil || len(candidates) == 0 {
+	if len(candidates) == 0 {
 		return nil
 	}
 
@@ -44,7 +44,7 @@ func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {
 		}
 	}
 
-	selected := resolver.ResolveFor(header, ctx.TargetPlatform.Platform.Architecture)
+	selected := resolver.ResolveFor(header, ctx.FQBN)
 	if alreadyImported := importedLibraries.FindByName(selected.Name); alreadyImported != nil {
 		// Certain libraries might have the same name but be different.
 		// This usually happens when the user includes two or more custom libraries that have

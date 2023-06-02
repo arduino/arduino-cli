@@ -110,3 +110,40 @@ func (fqbn *FQBN) Match(target *FQBN) bool {
 func (fqbn *FQBN) StringWithoutConfig() string {
 	return fqbn.Package + ":" + fqbn.PlatformArch + ":" + fqbn.BoardID
 }
+
+// FQBNMatcher contains a pattern to match an FQBN
+type FQBNMatcher struct {
+	Package      string
+	PlatformArch string
+	BoardID      string
+}
+
+// ParseFQBNMatcher parse a formula for an FQBN pattern and returns the corresponding
+// FQBNMatcher. In the formula is allowed the glob char `*`. The formula must contains
+// the triple `PACKAGE:ARCHITECTURE:BOARDID`, some exaples are:
+// - `arduino:avr:uno`
+// - `*:avr:*`
+// - `arduino:avr:mega*`
+func ParseFQBNMatcher(formula string) (*FQBNMatcher, error) {
+	parts := strings.Split(strings.TrimSpace(formula), ":")
+	if len(parts) < 3 || len(parts) > 4 {
+		return nil, fmt.Errorf("invalid formula: %s", formula)
+	}
+	return &FQBNMatcher{
+		Package:      parts[0],
+		PlatformArch: parts[1],
+		BoardID:      parts[2],
+	}, nil
+}
+
+// Match checks if this FQBNMatcher matches the given fqbn
+func (m *FQBNMatcher) Match(fqbn *FQBN) bool {
+	// TODO: allow in-fix syntax like `*name`
+	return (m.Package == fqbn.Package || m.Package == "*") &&
+		(m.PlatformArch == fqbn.PlatformArch || m.PlatformArch == "*") &&
+		(m.BoardID == fqbn.BoardID || m.BoardID == "*")
+}
+
+func (m *FQBNMatcher) String() string {
+	return m.Package + "." + m.PlatformArch + ":" + m.BoardID
+}

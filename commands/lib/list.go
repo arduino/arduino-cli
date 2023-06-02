@@ -70,8 +70,8 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 				}
 			}
 			if latest, has := filteredRes[lib.Library.Name]; has {
-				latestPriority := librariesresolver.ComputePriority(latest.Library, "", fqbn.PlatformArch)
-				libPriority := librariesresolver.ComputePriority(lib.Library, "", fqbn.PlatformArch)
+				latestPriority := librariesresolver.ComputePriority(latest.Library, "", fqbn)
+				libPriority := librariesresolver.ComputePriority(lib.Library, "", fqbn)
 				if latestPriority >= libPriority {
 					// Pick library with the best priority
 					continue
@@ -80,7 +80,7 @@ func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.Library
 
 			// Check if library is compatible with board specified by FBQN
 			lib.Library.CompatibleWith = map[string]bool{
-				fqbnString: lib.Library.IsCompatibleWith(fqbn.PlatformArch),
+				fqbnString: lib.Library.IsCompatibleWith(fqbn),
 			}
 
 			filteredRes[lib.Library.Name] = lib
