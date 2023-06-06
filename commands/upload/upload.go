@@ -195,7 +195,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 	if burnBootloader && programmerID == "" {
 		return &arduino.MissingProgrammerError{}
 	}
-	if port == nil {
+	if port == nil || (port.Address == "" && port.Protocol == "") {
 		// For no-port uploads use "default" protocol
 		port = &rpc.Port{Protocol: "default"}
 	}
