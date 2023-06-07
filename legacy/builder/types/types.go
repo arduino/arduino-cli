@@ -30,6 +30,11 @@ type SourceFile struct {
 	RelativePath *paths.Path
 }
 
+func (f *SourceFile) Equals(g *SourceFile) bool {
+	return f.Origin == g.Origin &&
+		f.RelativePath.EqualsTo(g.RelativePath)
+}
+
 // Create a SourceFile containing the given source file path within the
 // given origin. The given path can be absolute, or relative within the
 // origin's root source folder

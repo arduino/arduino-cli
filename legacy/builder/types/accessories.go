@@ -19,17 +19,14 @@ import "golang.org/x/exp/slices"
 
 type UniqueSourceFileQueue []*SourceFile
 
-func (queue UniqueSourceFileQueue) Len() int           { return len(queue) }
-func (queue UniqueSourceFileQueue) Less(i, j int) bool { return false }
-func (queue UniqueSourceFileQueue) Swap(i, j int)      { panic("Who called me?!?") }
-
 func (queue *UniqueSourceFileQueue) Push(value *SourceFile) {
-	equals := func(elem *SourceFile) bool {
-		return elem.Origin == value.Origin && elem.RelativePath.EqualsTo(value.RelativePath)
-	}
-	if !slices.ContainsFunc(*queue, equals) {
+	if !queue.Contains(value) {
 		*queue = append(*queue, value)
 	}
+}
+
+func (queue UniqueSourceFileQueue) Contains(target *SourceFile) bool {
+	return slices.ContainsFunc(queue, target.Equals)
 }
 
 func (queue *UniqueSourceFileQueue) Pop() *SourceFile {
@@ -39,6 +36,6 @@ func (queue *UniqueSourceFileQueue) Pop() *SourceFile {
 	return x
 }
 
-func (queue *UniqueSourceFileQueue) Empty() bool {
-	return queue.Len() == 0
+func (queue UniqueSourceFileQueue) Empty() bool {
+	return len(queue) == 0
 }
