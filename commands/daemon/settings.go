@@ -144,3 +144,36 @@ func (s *SettingsService) Write(ctx context.Context, req *rpc.WriteRequest) (*rp
 	}
 	return &rpc.WriteResponse{}, nil
 }
+
+// Delete removes a key from the config file
+func (s *SettingsService) Delete(ctx context.Context, req *rpc.DeleteRequest) (*rpc.DeleteResponse, error) {
+	toDelete := req.GetKey()
+
+	// Check if settings key actually existing, we don't use Viper.InConfig()
+	// since that doesn't check for keys formatted like daemon.port or those set
+	// with Viper.Set(). This way we check for all existing settings for sure.
+	keyExists := false
+	keys := []string{}
+	for _, k := range configuration.Settings.AllKeys() {
+		if !strings.HasPrefix(k, toDelete) {
+			keys = append(keys, k)
+			continue
+		}
+		keyExists = true
+	}
+
+	if !keyExists {
+		return nil, errors.New(tr("key not found in settings"))
+	}
+
+	// Override current settings to delete the key
+	updatedSettings := configuration.Init("")
+	for _, k := range keys {
+		updatedSettings.Set(k, configuration.Settings.Get(k))
+	}
+	configPath := configuration.Settings.ConfigFileUsed()
+	updatedSettings.SetConfigFile(configPath)
+	configuration.Settings = updatedSettings
+
+	return &rpc.DeleteResponse{}, nil
+}
