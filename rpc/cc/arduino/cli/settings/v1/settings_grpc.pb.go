@@ -39,6 +39,7 @@ const (
 	SettingsService_GetValue_FullMethodName = "/cc.arduino.cli.settings.v1.SettingsService/GetValue"
 	SettingsService_SetValue_FullMethodName = "/cc.arduino.cli.settings.v1.SettingsService/SetValue"
 	SettingsService_Write_FullMethodName    = "/cc.arduino.cli.settings.v1.SettingsService/Write"
+	SettingsService_Delete_FullMethodName   = "/cc.arduino.cli.settings.v1.SettingsService/Delete"
 )
 
 // SettingsServiceClient is the client API for SettingsService service.
@@ -55,6 +56,8 @@ type SettingsServiceClient interface {
 	SetValue(ctx context.Context, in *SetValueRequest, opts ...grpc.CallOption) (*SetValueResponse, error)
 	// Writes to file settings currently stored in memory
 	Write(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*WriteResponse, error)
+	// Deletes an entry and rewrites the file settings
+	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 }
 
 type settingsServiceClient struct {
@@ -110,6 +113,15 @@ func (c *settingsServiceClient) Write(ctx context.Context, in *WriteRequest, opt
 	return out, nil
 }
 
+func (c *settingsServiceClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
+	out := new(DeleteResponse)
+	err := c.cc.Invoke(ctx, SettingsService_Delete_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SettingsServiceServer is the server API for SettingsService service.
 // All implementations must embed UnimplementedSettingsServiceServer
 // for forward compatibility
@@ -124,6 +136,8 @@ type SettingsServiceServer interface {
 	SetValue(context.Context, *SetValueRequest) (*SetValueResponse, error)
 	// Writes to file settings currently stored in memory
 	Write(context.Context, *WriteRequest) (*WriteResponse, error)
+	// Deletes an entry and rewrites the file settings
+	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
 	mustEmbedUnimplementedSettingsServiceServer()
 }
 
@@ -145,6 +159,9 @@ func (UnimplementedSettingsServiceServer) SetValue(context.Context, *SetValueReq
 }
 func (UnimplementedSettingsServiceServer) Write(context.Context, *WriteRequest) (*WriteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Write not implemented")
+}
+func (UnimplementedSettingsServiceServer) Delete(context.Context, *DeleteRequest) (*DeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 func (UnimplementedSettingsServiceServer) mustEmbedUnimplementedSettingsServiceServer() {}
 
@@ -249,6 +266,24 @@ func _SettingsService_Write_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SettingsService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SettingsServiceServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SettingsService_Delete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SettingsServiceServer).Delete(ctx, req.(*DeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SettingsService_ServiceDesc is the grpc.ServiceDesc for SettingsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -275,6 +310,10 @@ var SettingsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Write",
 			Handler:    _SettingsService_Write_Handler,
+		},
+		{
+			MethodName: "Delete",
+			Handler:    _SettingsService_Delete_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
