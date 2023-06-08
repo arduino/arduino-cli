@@ -342,12 +342,12 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 
 	first := true
 	for {
-		var include string
+		var missingIncludeH string
 		cache.ExpectFile(sourcePath)
 
-		includes := ctx.IncludeFolders
+		includeFolders := ctx.IncludeFolders
 		if library, ok := sourceFile.Origin.(*libraries.Library); ok && library.UtilityDir != nil {
-			includes = append(includes, library.UtilityDir)
+			includeFolders = append(includeFolders, library.UtilityDir)
 		}
 
 		if library, ok := sourceFile.Origin.(*libraries.Library); ok {
@@ -361,56 +361,56 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 			}
 		}
 
-		var preproc_err error
-		var preproc_stderr []byte
+		var preprocErr error
+		var preprocStderr []byte
 
 		if unchanged && cache.valid {
-			include = cache.Next().Include
+			missingIncludeH = cache.Next().Include
 			if first && ctx.Verbose {
 				ctx.Info(tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
 		} else {
-			var preproc_stdout []byte
-			preproc_stdout, preproc_stderr, preproc_err = preprocessor.GCC(sourcePath, targetFilePath, includes, ctx.BuildProperties)
+			var preprocStdout []byte
+			preprocStdout, preprocStderr, preprocErr = preprocessor.GCC(sourcePath, targetFilePath, includeFolders, ctx.BuildProperties)
 			if ctx.Verbose {
-				ctx.WriteStdout(preproc_stdout)
-				ctx.WriteStdout(preproc_stderr)
+				ctx.WriteStdout(preprocStdout)
+				ctx.WriteStdout(preprocStderr)
 			}
 			// Unwrap error and see if it is an ExitError.
-			_, is_exit_error := errors.Cause(preproc_err).(*exec.ExitError)
-			if preproc_err == nil {
+			_, isExitErr := errors.Cause(preprocErr).(*exec.ExitError)
+			if preprocErr == nil {
 				// Preprocessor successful, done
-				include = ""
-			} else if !is_exit_error || preproc_stderr == nil {
+				missingIncludeH = ""
+			} else if !isExitErr || preprocStderr == nil {
 				// Ignore ExitErrors (e.g. gcc returning
 				// non-zero status), but bail out on
 				// other errors
-				return errors.WithStack(preproc_err)
+				return errors.WithStack(preprocErr)
 			} else {
-				include = IncludesFinderWithRegExp(string(preproc_stderr))
-				if include == "" && ctx.Verbose {
+				missingIncludeH = IncludesFinderWithRegExp(string(preprocStderr))
+				if missingIncludeH == "" && ctx.Verbose {
 					ctx.Info(tr("Error while detecting libraries included by %[1]s", sourcePath))
 				}
 			}
 		}
 
-		if include == "" {
+		if missingIncludeH == "" {
 			// No missing includes found, we're done
 			cache.ExpectEntry(sourcePath, "", nil)
 			return nil
 		}
 
-		library := ResolveLibrary(ctx, include)
+		library := ResolveLibrary(ctx, missingIncludeH)
 		if library == nil {
 			// Library could not be resolved, show error
-			if preproc_err == nil || preproc_stderr == nil {
+			if preprocErr == nil || preprocStderr == nil {
 				// Filename came from cache, so run preprocessor to obtain error to show
-				var preproc_stdout []byte
-				preproc_stdout, preproc_stderr, preproc_err = preprocessor.GCC(sourcePath, targetFilePath, includes, ctx.BuildProperties)
+				var preprocStdout []byte
+				preprocStdout, preprocStderr, preprocErr = preprocessor.GCC(sourcePath, targetFilePath, includeFolders, ctx.BuildProperties)
 				if ctx.Verbose {
-					ctx.WriteStdout(preproc_stdout)
+					ctx.WriteStdout(preprocStdout)
 				}
-				if preproc_err == nil {
+				if preprocErr == nil {
 					// If there is a missing #include in the cache, but running
 					// gcc does not reproduce that, there is something wrong.
 					// Returning an error here will cause the cache to be
@@ -418,15 +418,15 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 					return errors.New(tr("Internal error in cache"))
 				}
 			}
-			ctx.WriteStderr(preproc_stderr)
-			return errors.WithStack(preproc_err)
+			ctx.WriteStderr(preprocStderr)
+			return errors.WithStack(preprocErr)
 		}
 
 		// Add this library to the list of libraries, the
 		// include path and queue its source files for further
 		// include scanning
 		ctx.ImportedLibraries = append(ctx.ImportedLibraries, library)
-		appendIncludeFolder(ctx, cache, sourcePath, include, library.SourceDir)
+		appendIncludeFolder(ctx, cache, sourcePath, missingIncludeH, library.SourceDir)
 		sourceDirs := library.SourceDirs()
 		for _, sourceDir := range sourceDirs {
 			queueSourceFilesFromFolder(ctx, sourceFileQueue, library, sourceDir.Dir, sourceDir.Recurse)
@@ -454,4 +454,49 @@ func queueSourceFilesFromFolder(ctx *types.Context, sourceFileQueue *types.Uniqu
 	}
 
 	return nil
+}
+
+func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {
+	resolver := ctx.LibrariesResolver
+	importedLibraries := ctx.ImportedLibraries
+
+	candidates := resolver.AlternativesFor(header)
+
+	if ctx.Verbose {
+		ctx.Info(tr("Alternatives for %[1]s: %[2]s", header, candidates))
+		ctx.Info(fmt.Sprintf("ResolveLibrary(%s)", header))
+		ctx.Info(fmt.Sprintf("  -> %s: %s", tr("candidates"), candidates))
+	}
+
+	if len(candidates) == 0 {
+		return nil
+	}
+
+	for _, candidate := range candidates {
+		if importedLibraries.Contains(candidate) {
+			return nil
+		}
+	}
+
+	selected := resolver.ResolveFor(header, ctx.TargetPlatform.Platform.Architecture)
+	if alreadyImported := importedLibraries.FindByName(selected.Name); alreadyImported != nil {
+		// Certain libraries might have the same name but be different.
+		// This usually happens when the user includes two or more custom libraries that have
+		// different header name but are stored in a parent folder with identical name, like
+		// ./libraries1/Lib/lib1.h and ./libraries2/Lib/lib2.h
+		// Without this check the library resolution would be stuck in a loop.
+		// This behaviour has been reported in this issue:
+		// https://github.com/arduino/arduino-cli/issues/973
+		if selected == alreadyImported {
+			selected = alreadyImported
+		}
+	}
+
+	candidates.Remove(selected)
+	ctx.LibrariesResolutionResults[header] = types.LibraryResolutionResult{
+		Library:          selected,
+		NotUsedLibraries: candidates,
+	}
+
+	return selected
 }
