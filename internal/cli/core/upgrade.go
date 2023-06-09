@@ -17,7 +17,6 @@ package core
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 
@@ -110,7 +109,7 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 		response, err := core.PlatformUpgrade(context.Background(), r, feedback.ProgressBar(), feedback.TaskProgress())
 		warningMissingIndex(response)
 		if err != nil {
-			if errors.Is(err, &arduino.PlatformAlreadyAtTheLatestVersionError{}) {
+			if _, ok := err.(*arduino.PlatformAlreadyAtTheLatestVersionError); ok {
 				feedback.Print(err.Error())
 				continue
 			}
