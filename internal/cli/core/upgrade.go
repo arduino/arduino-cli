@@ -110,7 +110,7 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 		warningMissingIndex(response)
 		if err != nil {
 			if _, ok := err.(*arduino.PlatformAlreadyAtTheLatestVersionError); ok {
-				feedback.Print(err.Error())
+				feedback.Fatal(err.Error(), feedback.Success)
 				continue
 			}
 
