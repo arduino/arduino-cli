@@ -25,7 +25,7 @@ import (
 
 type SourceFile struct {
 	// Path to the source file within the sketch/library root folder
-	RelativePath *paths.Path
+	relativePath *paths.Path
 
 	// Set to the Library object of origin if this source file comes
 	// from a library
@@ -43,8 +43,7 @@ type SourceFile struct {
 }
 
 func (f *SourceFile) Equals(g *SourceFile) bool {
-	return f.Library == g.Library &&
-		f.RelativePath.EqualsTo(g.RelativePath) &&
+	return f.relativePath.EqualsTo(g.relativePath) &&
 		f.buildRoot.EqualsTo(g.buildRoot) &&
 		f.sourceRoot.EqualsTo(g.sourceRoot)
 }
@@ -74,20 +73,20 @@ func MakeSourceFile(ctx *Context, origin interface{}, path *paths.Path) (*Source
 			return nil, err
 		}
 	}
-	res.RelativePath = path
+	res.relativePath = path
 	return res, nil
 }
 
 func (f *SourceFile) SourcePath() *paths.Path {
-	return f.sourceRoot.JoinPath(f.RelativePath)
+	return f.sourceRoot.JoinPath(f.relativePath)
 }
 
 func (f *SourceFile) ObjectPath() *paths.Path {
-	return f.buildRoot.Join(f.RelativePath.String() + ".o")
+	return f.buildRoot.Join(f.relativePath.String() + ".o")
 }
 
 func (f *SourceFile) DepfilePath() *paths.Path {
-	return f.buildRoot.Join(f.RelativePath.String() + ".d")
+	return f.buildRoot.Join(f.relativePath.String() + ".d")
 }
 
 type LibraryResolutionResult struct {
