@@ -157,3 +157,18 @@ func TestWrite(t *testing.T) {
 	// We don't verify the content since we expect config library, Viper, to work
 	require.True(t, configFile.Exist())
 }
+
+func TestDelete(t *testing.T) {
+	_, err := svc.Delete(context.Background(), &rpc.DeleteRequest{
+		Key: "doesnotexist",
+	})
+	require.Error(t, err)
+
+	_, err = svc.Delete(context.Background(), &rpc.DeleteRequest{
+		Key: "network",
+	})
+	require.NoError(t, err)
+
+	_, err = svc.GetValue(context.Background(), &rpc.GetValueRequest{Key: "network"})
+	require.Error(t, err)
+}
