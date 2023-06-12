@@ -27,9 +27,11 @@ type SourceFile struct {
 	// Path to the source file within the sketch/library root folder
 	relativePath *paths.Path
 
-	// Set to the Library object of origin if this source file comes
-	// from a library
-	Library *libraries.Library
+	// ExtraIncludePath contains an extra include path that must be
+	// used to compile this source file.
+	// This is mainly used for source files that comes from old-style libraries
+	// (Arduino IDE <1.5) requiring an extra include path to the "utility" folder.
+	extraIncludePath *paths.Path
 
 	// The source root for the given origin, where its source files
 	// can be found. Prepending this to SourceFile.RelativePath will give
@@ -61,7 +63,7 @@ func MakeSourceFile(ctx *Context, origin interface{}, path *paths.Path) (*Source
 	case *libraries.Library:
 		res.buildRoot = ctx.LibrariesBuildPath.Join(o.DirName)
 		res.sourceRoot = o.SourceDir
-		res.Library = o
+		res.extraIncludePath = o.UtilityDir
 	default:
 		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
 	}
@@ -75,6 +77,10 @@ func MakeSourceFile(ctx *Context, origin interface{}, path *paths.Path) (*Source
 	}
 	res.relativePath = path
 	return res, nil
+}
+
+func (f *SourceFile) ExtraIncludePath() *paths.Path {
+	return f.extraIncludePath
 }
 
 func (f *SourceFile) SourcePath() *paths.Path {

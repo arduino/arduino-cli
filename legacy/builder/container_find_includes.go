@@ -340,9 +340,8 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 		// copy the current search path list and add the library' utility directory
 		// if needed.
 		includeFolders := ctx.IncludeFolders
-		if library := sourceFile.Library; library != nil && library.UtilityDir != nil {
-			includeFolders = append(includeFolders, library.UtilityDir)
-		}
+		if extraInclude := sourceFile.ExtraIncludePath(); extraInclude != nil {
+			includeFolders = append(includeFolders, extraInclude)
 		}
 
 		var preprocErr error
