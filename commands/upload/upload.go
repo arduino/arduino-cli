@@ -272,13 +272,18 @@ func runProgramAction(pme *packagemanager.Explorer,
 			Property: fmt.Sprintf("%s.tool.%s", action, port.Protocol), // TODO: Can be done better, maybe inline getToolID(...)
 			Value:    uploadToolID}
 	} else if len(split) == 2 {
+		p := pme.FindPlatform(&packagemanager.PlatformReference{
+			Package:              split[0],
+			PlatformArchitecture: boardPlatform.Platform.Architecture,
+		})
+		if p == nil {
+			return &arduino.PlatformNotFoundError{Platform: split[0] + ":" + boardPlatform.Platform.Architecture}
+		}
 		uploadToolID = split[1]
-		uploadToolPlatform = pme.GetInstalledPlatformRelease(
-			pme.FindPlatform(&packagemanager.PlatformReference{
-				Package:              split[0],
-				PlatformArchitecture: boardPlatform.Platform.Architecture,
-			}),
-		)
+		uploadToolPlatform = pme.GetInstalledPlatformRelease(p)
+		if uploadToolPlatform == nil {
+			return &arduino.PlatformNotFoundError{Platform: split[0] + ":" + boardPlatform.Platform.Architecture}
+		}
 	}
 
 	// Build configuration for upload
