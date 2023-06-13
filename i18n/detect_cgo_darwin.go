@@ -13,6 +13,8 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
+//go:build darwin && cgo
+
 package i18n
 
 /*
