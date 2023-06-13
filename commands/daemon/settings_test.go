@@ -142,7 +142,9 @@ func TestWrite(t *testing.T) {
 	require.NoError(t, err)
 
 	tempDir := paths.TempDir()
-	testFolder, _ := tempDir.MkTempDir("testdata")
+	testFolder, err := tempDir.MkTempDir("testdata")
+	require.NoError(t, err)
+	defer testFolder.RemoveAll()
 
 	// Verifies config files doesn't exist
 	configFile := testFolder.Join("arduino-cli.yml")
