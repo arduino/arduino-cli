@@ -579,3 +579,27 @@ func TestCompileAndUploadToPortWithBoardAutodetect(t *testing.T) {
 		require.NoError(t, err)
 	}
 }
+
+func TestPanicIfUploadToolReferenceAnInexistentPlatform(t *testing.T) {
+	// See: https://github.com/arduino/arduino-cli/issues/2042
+
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Run update-index with our test index
+	_, _, err := cli.Run("core", "install", "arduino:avr@1.8.5")
+	require.NoError(t, err)
+
+	// Install test data into datadir
+	boardsTxt := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.8.5", "boards.txt")
+	boardsTxtData, err := boardsTxt.ReadFile()
+	require.NoError(t, err)
+	boardsTxtData = append(boardsTxtData, []byte("uno.upload.tool.default=foo:bar\n")...)
+	require.NoError(t, boardsTxt.WriteFile(boardsTxtData))
+
+	sketch, err := paths.New("..", "testdata", "bare_minimum").Abs()
+	require.NoError(t, err)
+
+	stdout, _, _ := cli.Run("compile", "-b", "arduino:avr:uno", "--upload", sketch.String())
+	require.NotContains(t, stdout, []byte("panic:"))
+}
