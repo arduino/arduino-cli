@@ -37,7 +37,7 @@ void loop() {
 
 // sketchNameMaxLength could be part of the regex, but it's intentionally left out for clearer error reporting
 var sketchNameMaxLength = 63
-var sketchNameValidationRegex = regexp.MustCompile(`^[0-9a-zA-Z_][0-9a-zA-Z_\.-]*$`)
+var sketchNameValidationRegex = regexp.MustCompile(`^[0-9a-zA-Z_](?:[0-9a-zA-Z_\.-]*[0-9a-zA-Z_-]|)$`)
 
 // NewSketch creates a new sketch via gRPC
 func NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchResponse, error) {
@@ -80,7 +80,7 @@ func validateSketchName(name string) error {
 			sketchNameMaxLength))}
 	}
 	if !sketchNameValidationRegex.MatchString(name) {
-		return &arduino.CantCreateSketchError{Cause: errors.New(tr(`invalid sketch name "%[1]s": the first character must be alphanumeric or "_", the following ones can also contain "-" and ".".`,
+		return &arduino.CantCreateSketchError{Cause: errors.New(tr(`invalid sketch name "%[1]s": the first character must be alphanumeric or "_", the following ones can also contain "-" and ".". The last one cannot be ".".`,
 			name))}
 	}
 	return nil
