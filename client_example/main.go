@@ -881,8 +881,8 @@ func callLibUpgradeAll(client rpc.ArduinoCoreServiceClient, instance *rpc.Instan
 func callLibSearch(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance) {
 	libSearchResp, err := client.LibrarySearch(context.Background(),
 		&rpc.LibrarySearchRequest{
-			Instance: instance,
-			Query:    "audio",
+			Instance:   instance,
+			SearchArgs: "audio",
 		})
 
 	if err != nil {

@@ -77,8 +77,8 @@ func ParseLibraryReferenceArgs(args []string) ([]*LibraryReferenceArg, error) {
 func ParseLibraryReferenceArgAndAdjustCase(instance *rpc.Instance, arg string) (*LibraryReferenceArg, error) {
 	libRef, _ := ParseLibraryReferenceArg(arg)
 	res, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
-		Instance: instance,
-		Query:    libRef.Name,
+		Instance:   instance,
+		SearchArgs: libRef.Name,
 	})
 	if err != nil {
 		return nil, err
