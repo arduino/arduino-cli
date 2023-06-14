@@ -263,8 +263,6 @@ message VersionResponse {
 }
 
 message NewSketchRequest {
-  // Arduino Core Service instance from the Init response.
-  Instance instance = 1;
   // New sketch name
   string sketch_name = 2;
   // Optional: create a Sketch in this directory
@@ -274,6 +272,8 @@ message NewSketchRequest {
   string sketch_dir = 3;
   // Specificies if an existing .ino sketch should be overwritten
   bool overwrite = 4;
+
+  reserved 1;
 }
 
 message NewSketchResponse {
@@ -282,10 +282,10 @@ message NewSketchResponse {
 }
 
 message LoadSketchRequest {
-  // Arduino Core Service instance from the Init response.
-  Instance instance = 1;
   // Absolute path to single sketch file or a sketch folder
   string sketch_path = 2;
+
+  reserved 1;
 }
 
 message LoadSketchResponse {
