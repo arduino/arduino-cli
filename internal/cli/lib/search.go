@@ -76,7 +76,7 @@ func runSearchCommand(args []string, namesOnly bool, omitReleasesDetails bool) {
 
 	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
 		Instance:            inst,
-		Query:               strings.Join(args, " "),
+		SearchArgs:          strings.Join(args, " "),
 		OmitReleasesDetails: omitReleasesDetails,
 	})
 	if err != nil {

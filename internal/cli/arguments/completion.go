@@ -190,8 +190,8 @@ func GetInstallableLibs() []string {
 	inst := instance.CreateAndInit()
 
 	libs, _ := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
-		Instance: inst,
-		Query:    "", // if no query is specified all the libs are returned
+		Instance:   inst,
+		SearchArgs: "", // if no query is specified all the libs are returned
 	})
 	var res []string
 	// transform the data structure for the completion

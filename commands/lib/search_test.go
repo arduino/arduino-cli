@@ -33,7 +33,7 @@ func TestSearchLibrary(t *testing.T) {
 	lm := librariesmanager.NewLibraryManager(customIndexPath, nil)
 	lm.LoadIndex()
 
-	resp := searchLibrary(&rpc.LibrarySearchRequest{Query: "test"}, lm)
+	resp := searchLibrary(&rpc.LibrarySearchRequest{SearchArgs: "test"}, lm)
 	assert := assert.New(t)
 	assert.Equal(resp.GetStatus(), rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS)
 	assert.Equal(len(resp.GetLibraries()), 2)
@@ -45,7 +45,7 @@ func TestSearchLibrarySimilar(t *testing.T) {
 	lm := librariesmanager.NewLibraryManager(customIndexPath, nil)
 	lm.LoadIndex()
 
-	resp := searchLibrary(&rpc.LibrarySearchRequest{Query: "arduino"}, lm)
+	resp := searchLibrary(&rpc.LibrarySearchRequest{SearchArgs: "arduino"}, lm)
 	assert := assert.New(t)
 	assert.Equal(resp.GetStatus(), rpc.LibrarySearchStatus_LIBRARY_SEARCH_STATUS_SUCCESS)
 	assert.Equal(len(resp.GetLibraries()), 2)
@@ -63,7 +63,7 @@ func TestSearchLibraryFields(t *testing.T) {
 
 	query := func(q string) []string {
 		libs := []string{}
-		for _, lib := range searchLibrary(&rpc.LibrarySearchRequest{Query: q}, lm).Libraries {
+		for _, lib := range searchLibrary(&rpc.LibrarySearchRequest{SearchArgs: q}, lm).Libraries {
 			libs = append(libs, lib.Name)
 		}
 		return libs

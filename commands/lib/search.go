@@ -40,7 +40,10 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.Lib
 
 func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.LibrariesManager) *rpc.LibrarySearchResponse {
 	res := []*rpc.SearchedLibrary{}
-	query := req.GetQuery()
+	query := req.GetSearchArgs()
+	if query == "" {
+		query = req.GetQuery()
+	}
 	queryTerms := utils.SearchTermsFromQueryString(query)
 
 	for _, lib := range lm.Index.Libraries {
