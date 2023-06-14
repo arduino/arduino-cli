@@ -91,3 +91,15 @@ func Test_SketchNameOk(t *testing.T) {
 		require.Nil(t, err)
 	}
 }
+
+func Test_SketchNameReserved(t *testing.T) {
+	invalidNames := []string{"CON", "PRN", "AUX", "NUL", "COM0", "COM1", "COM2", "COM3", "COM4", "COM5",
+		"COM6", "COM7", "COM8", "COM9", "LPT0", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"}
+	for _, name := range invalidNames {
+		_, err := NewSketch(context.Background(), &commands.NewSketchRequest{
+			SketchName: name,
+			SketchDir:  t.TempDir(),
+		})
+		require.EqualError(t, err, fmt.Sprintf(`Can't create sketch: sketch name cannot be the reserved name "%s"`, name))
+	}
+}
