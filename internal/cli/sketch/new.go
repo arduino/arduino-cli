@@ -73,7 +73,6 @@ func runNewCommand(args []string, overwrite bool) {
 	}
 
 	_, err = sk.NewSketch(context.Background(), &rpc.NewSketchRequest{
-		Instance:   nil,
 		SketchName: sketchName,
 		SketchDir:  sketchDir,
 		Overwrite:  overwrite,
