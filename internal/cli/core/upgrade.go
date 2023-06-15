@@ -110,8 +110,9 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 		response, err := core.PlatformUpgrade(context.Background(), r, feedback.ProgressBar(), feedback.TaskProgress())
 		warningMissingIndex(response)
 		if err != nil {
-			if errors.Is(err, &arduino.PlatformAlreadyAtTheLatestVersionError{}) {
-				feedback.Print(err.Error())
+			var alreadyAtLatestVersionErr *arduino.PlatformAlreadyAtTheLatestVersionError
+			if errors.As(err, &alreadyAtLatestVersionErr) {
+				feedback.Warning(err.Error())
 				continue
 			}
 
@@ -122,4 +123,19 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 	if hasBadArguments {
 		feedback.Fatal(tr("Some upgrades failed, please check the output for details."), feedback.ErrBadArgument)
 	}
+
+	feedback.PrintResult(&platformUpgradeResult{})
+}
+
+// This is needed so we can print warning messages in case users use --format json
+type platformUpgradeResult struct{}
+
+// Data implements feedback.Result.
+func (r *platformUpgradeResult) Data() interface{} {
+	return r
+}
+
+// String implements feedback.Result.
+func (r *platformUpgradeResult) String() string {
+	return ""
 }

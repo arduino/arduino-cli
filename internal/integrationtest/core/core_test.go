@@ -1041,8 +1041,8 @@ func TestCoreUpgradeWarningWithPackageInstalledButNotIndexed(t *testing.T) {
 		_, _, err = cli.Run("core", "install", "test:x86@1.0.0", "--additional-urls="+url)
 		require.NoError(t, err)
 		//upgrade without index fires a warning
-		_, jsonStderr, _ := cli.Run("core", "upgrade", "test:x86", "--format", "json")
-		requirejson.Query(t, jsonStderr, ".warnings[]", `"missing package index for test:x86, future updates cannot be guaranteed"`)
+		jsonStdout, _, _ := cli.Run("core", "upgrade", "test:x86", "--format", "json")
+		requirejson.Query(t, jsonStdout, ".warnings[]", `"missing package index for test:x86, future updates cannot be guaranteed"`)
 	})
 
 	// removing installed.json
@@ -1050,7 +1050,7 @@ func TestCoreUpgradeWarningWithPackageInstalledButNotIndexed(t *testing.T) {
 	require.NoError(t, os.Remove(installedJson.String()))
 
 	t.Run("missing both installed.json and additional-urls", func(t *testing.T) {
-		_, jsonStderr, _ := cli.Run("core", "upgrade", "test:x86", "--format", "json")
-		requirejson.Query(t, jsonStderr, ".warnings[]", `"missing package index for test:x86, future updates cannot be guaranteed"`)
+		jsonStdout, _, _ := cli.Run("core", "upgrade", "test:x86", "--format", "json")
+		requirejson.Query(t, jsonStdout, ".warnings[]", `"missing package index for test:x86, future updates cannot be guaranteed"`)
 	})
 }
