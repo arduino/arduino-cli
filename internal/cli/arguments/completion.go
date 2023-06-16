@@ -124,14 +124,14 @@ func GetInstalledProgrammers() []string {
 func GetUninstallableCores() []string {
 	inst := instance.CreateAndInit()
 
-	platforms, _ := core.GetPlatforms(&rpc.PlatformListRequest{
+	platforms, _ := core.PlatformList(&rpc.PlatformListRequest{
 		Instance:      inst,
 		UpdatableOnly: false,
 		All:           false,
 	})
 	var res []string
 	// transform the data structure for the completion
-	for _, i := range platforms {
+	for _, i := range platforms.InstalledPlatforms {
 		res = append(res, i.Id+"\t"+i.Name)
 	}
 	return res

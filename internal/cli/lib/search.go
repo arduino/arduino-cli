@@ -55,12 +55,9 @@ func initSearchCommand() *cobra.Command {
 const indexUpdateInterval = 60 * time.Minute
 
 func runSearchCommand(args []string, namesOnly bool, omitReleasesDetails bool) {
-	inst, status := instance.Create()
-	logrus.Info("Executing `arduino-cli lib search`")
+	inst := instance.CreateAndInit()
 
-	if status != nil {
-		feedback.Fatal(tr("Error creating instance: %v", status), feedback.ErrGeneric)
-	}
+	logrus.Info("Executing `arduino-cli lib search`")
 
 	if indexNeedsUpdating(indexUpdateInterval) {
 		if err := commands.UpdateLibrariesIndex(
@@ -70,9 +67,8 @@ func runSearchCommand(args []string, namesOnly bool, omitReleasesDetails bool) {
 		); err != nil {
 			feedback.Fatal(tr("Error updating library index: %v", err), feedback.ErrGeneric)
 		}
+		instance.Init(inst)
 	}
-
-	instance.Init(inst)
 
 	searchResp, err := lib.LibrarySearch(context.Background(), &rpc.LibrarySearchRequest{
 		Instance:            inst,

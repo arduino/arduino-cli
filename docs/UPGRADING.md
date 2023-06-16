@@ -118,6 +118,40 @@ has been removed as well.
 
 That method was outdated and must not be used.
 
+### golang API: method `github.com/arduino/arduino-cli/commands/core/GetPlatforms` renamed
+
+The following method in `github.com/arduino/arduino-cli/commands/core`:
+
+```go
+func GetPlatforms(req *rpc.PlatformListRequest) ([]*rpc.Platform, error) { ... }
+```
+
+has been changed to:
+
+```go
+func PlatformList(req *rpc.PlatformListRequest) (*rpc.PlatformListResponse, error) { ... }
+```
+
+now it better follows the gRPC API interface. Old code like the following:
+
+```go
+platforms, _ := core.GetPlatforms(&rpc.PlatformListRequest{Instance: inst})
+for _, i := range platforms {
+    ...
+}
+```
+
+must be changed as follows:
+
+```go
+// Use PlatformList function instead of GetPlatforms
+platforms, _ := core.PlatformList(&rpc.PlatformListRequest{Instance: inst})
+// Access installed platforms through the .InstalledPlatforms field
+for _, i := range platforms.InstalledPlatforms {
+    ...
+}
+```
+
 ## 0.31.0
 
 ### Added `post_install` script support for tools

@@ -83,6 +83,23 @@ func TestArduinoCliDaemon(t *testing.T) {
 	testWatcher()
 }
 
+func TestDaemonAutoUpdateIndexOnFirstInit(t *testing.T) {
+	// https://github.com/arduino/arduino-cli/issues/1529
+
+	env, cli := createEnvForDaemon(t)
+	defer env.CleanUp()
+
+	grpcInst := cli.Create()
+	require.NoError(t, grpcInst.Init("", "", func(ir *commands.InitResponse) {
+		fmt.Printf("INIT> %v\n", ir.GetMessage())
+	}))
+
+	_, err := grpcInst.PlatformList(context.Background())
+	require.NoError(t, err)
+
+	require.FileExists(t, cli.DataDir().Join("package_index.json").String())
+}
+
 // createEnvForDaemon performs the minimum required operations to start the arduino-cli daemon.
 // It returns a testsuite.Environment and an ArduinoCLI client to perform the integration tests.
 // The Environment must be disposed by calling the CleanUp method via defer.
@@ -93,9 +110,6 @@ func createEnvForDaemon(t *testing.T) (*integrationtest.Environment, *integratio
 		ArduinoCLIPath:         integrationtest.FindRepositoryRootPath(t).Join("arduino-cli"),
 		UseSharedStagingFolder: true,
 	})
-
-	_, _, err := cli.Run("core", "update-index")
-	require.NoError(t, err)
 
 	_ = cli.StartDaemon(false)
 	return env, cli

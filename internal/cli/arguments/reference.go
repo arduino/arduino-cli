@@ -92,15 +92,15 @@ func ParseReference(arg string) (*Reference, error) {
 	ret.Architecture = toks[1]
 
 	// Now that we have the required informations in `ret` we can
-	// try to use core.GetPlatforms to optimize what the user typed
+	// try to use core.PlatformList to optimize what the user typed
 	// (by replacing the PackageName and Architecture in ret with the content of core.GetPlatform())
-	platforms, _ := core.GetPlatforms(&rpc.PlatformListRequest{
+	platforms, _ := core.PlatformList(&rpc.PlatformListRequest{
 		Instance:      instance.CreateAndInit(),
 		UpdatableOnly: false,
 		All:           true, // this is true because we want also the installable platforms
 	})
 	foundPlatforms := []string{}
-	for _, platform := range platforms {
+	for _, platform := range platforms.InstalledPlatforms {
 		platformID := platform.GetId()
 		platformUser := ret.PackageName + ":" + ret.Architecture
 		// At first we check if the platform the user is searching for matches an available one,

@@ -60,7 +60,7 @@ func List(inst *rpc.Instance, all bool, updatableOnly bool) {
 
 // GetList returns a list of installed platforms.
 func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.Platform {
-	platforms, err := core.GetPlatforms(&rpc.PlatformListRequest{
+	platforms, err := core.PlatformList(&rpc.PlatformListRequest{
 		Instance:      inst,
 		UpdatableOnly: updatableOnly,
 		All:           all,
@@ -68,7 +68,7 @@ func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.Platform {
 	if err != nil {
 		feedback.Fatal(tr("Error listing platforms: %v", err), feedback.ErrGeneric)
 	}
-	return platforms
+	return platforms.InstalledPlatforms
 }
 
 // output from this command requires special formatting, let's create a dedicated

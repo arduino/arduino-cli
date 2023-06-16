@@ -262,20 +262,11 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 		})
 	}
 
-	{
-		// We need to rebuild the PackageManager currently in use by this instance
-		// in case this is not the first Init on this instances, that might happen
-		// after reinitializing an instance after installing or uninstalling a core.
-		// If this is not done the information of the uninstall core is kept in memory,
-		// even if it should not.
-		pmb, commitPackageManager := instance.pm.NewBuilder()
-
-		// Load packages index
-		urls := []string{globals.DefaultIndexURL}
-		if profile == nil {
-			urls = append(urls, configuration.Settings.GetStringSlice("board_manager.additional_urls")...)
-		}
-		for _, u := range urls {
+	// Perform first-update of indexes if needed
+	defaultIndexURL, _ := utils.URLParse(globals.DefaultIndexURL)
+	allPackageIndexUrls := []*url.URL{defaultIndexURL}
+	if profile == nil {
+		for _, u := range configuration.Settings.GetStringSlice("board_manager.additional_urls") {
 			URL, err := utils.URLParse(u)
 			if err != nil {
 				e := &arduino.InitFailedError{
@@ -286,7 +277,21 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 				responseError(e.ToRPCStatus())
 				continue
 			}
+			allPackageIndexUrls = append(allPackageIndexUrls, URL)
+		}
+	}
+	firstUpdate(context.Background(), req.GetInstance(), downloadCallback, allPackageIndexUrls)
 
+	{
+		// We need to rebuild the PackageManager currently in use by this instance
+		// in case this is not the first Init on this instances, that might happen
+		// after reinitializing an instance after installing or uninstalling a core.
+		// If this is not done the information of the uninstall core is kept in memory,
+		// even if it should not.
+		pmb, commitPackageManager := instance.pm.NewBuilder()
+
+		// Load packages index
+		for _, URL := range allPackageIndexUrls {
 			if URL.Scheme == "file" {
 				_, err := pmb.LoadPackageIndexFromFile(paths.New(URL.Path))
 				if err != nil {
@@ -594,4 +599,42 @@ func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketc
 		AdditionalFiles:  additionalFiles,
 		RootFolderFiles:  rootFolderFiles,
 	}, nil
+}
+
+// firstUpdate downloads libraries and packages indexes if they don't exist.
+// This ideally is only executed the first time the CLI is run.
+func firstUpdate(ctx context.Context, instance *rpc.Instance, downloadCb func(msg *rpc.DownloadProgress), externalPackageIndexes []*url.URL) error {
+	// Gets the data directory to verify if library_index.json and package_index.json exist
+	dataDir := configuration.DataDir(configuration.Settings)
+	libraryIndex := dataDir.Join("library_index.json")
+
+	if libraryIndex.NotExist() {
+		// The library_index.json file doesn't exists, that means the CLI is run for the first time
+		// so we proceed with the first update that downloads the file
+		req := &rpc.UpdateLibrariesIndexRequest{Instance: instance}
+		if err := UpdateLibrariesIndex(ctx, req, downloadCb); err != nil {
+			return err
+		}
+	}
+
+	for _, URL := range externalPackageIndexes {
+		if URL.Scheme == "file" {
+			continue
+		}
+		packageIndexFileName := (&resources.IndexResource{URL: URL}).IndexFileName()
+		packageIndexFile := dataDir.Join(packageIndexFileName)
+		if packageIndexFile.NotExist() {
+			// The index file doesn't exists, that means the CLI is run for the first time,
+			// or the 3rd party package index URL has just been added. Similarly to the
+			// library update we download that file and all the other package indexes from
+			// additional_urls
+			req := &rpc.UpdateIndexRequest{Instance: instance}
+			if err := UpdateIndex(ctx, req, downloadCb); err != nil {
+				return err
+			}
+			break
+		}
+	}
+
+	return nil
 }

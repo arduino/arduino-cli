@@ -58,19 +58,15 @@ func initSearchCommand() *cobra.Command {
 const indexUpdateInterval = "24h"
 
 func runSearchCommand(cmd *cobra.Command, args []string) {
-	inst, status := instance.Create()
-	if status != nil {
-		feedback.Fatal(tr("Error creating instance: %v", status), feedback.ErrGeneric)
-	}
+	inst := instance.CreateAndInit()
 
 	if indexesNeedUpdating(indexUpdateInterval) {
 		err := commands.UpdateIndex(context.Background(), &rpc.UpdateIndexRequest{Instance: inst}, feedback.ProgressBar())
 		if err != nil {
 			feedback.FatalError(err, feedback.ErrGeneric)
 		}
+		instance.Init(inst)
 	}
-
-	instance.Init(inst)
 
 	arguments := strings.ToLower(strings.Join(args, " "))
 	logrus.Infof("Executing `arduino-cli core search` with args: '%s'", arguments)

@@ -284,11 +284,8 @@ func (s *ArduinoCoreServerImpl) PlatformSearch(ctx context.Context, req *rpc.Pla
 
 // PlatformList FIXMEDOC
 func (s *ArduinoCoreServerImpl) PlatformList(ctx context.Context, req *rpc.PlatformListRequest) (*rpc.PlatformListResponse, error) {
-	platforms, err := core.GetPlatforms(req)
-	if err != nil {
-		return nil, convertErrorToRPCStatus(err)
-	}
-	return &rpc.PlatformListResponse{InstalledPlatforms: platforms}, nil
+	platforms, err := core.PlatformList(req)
+	return platforms, convertErrorToRPCStatus(err)
 }
 
 // Upload FIXMEDOC

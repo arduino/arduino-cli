@@ -470,3 +470,11 @@ func (inst *ArduinoCLIInstance) PlatformUpgrade(ctx context.Context, packager, a
 	logCallf(">>> PlatformUpgrade(%v:%v)\n", packager, arch)
 	return installCl, err
 }
+
+// PlatformList calls the "PlatformList" gRPC method.
+func (inst *ArduinoCLIInstance) PlatformList(ctx context.Context) (*commands.PlatformListResponse, error) {
+	req := &commands.PlatformListRequest{Instance: inst.instance}
+	logCallf(">>> PlatformList(%+v)\n", req)
+	resp, err := inst.cli.daemonClient.PlatformList(ctx, req)
+	return resp, err
+}
