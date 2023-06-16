@@ -359,6 +359,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#golang-api-method-githubcomarduinoarduino-clicommandscoregetplatforms-renamed" class="md-nav__link">
+    golang API: method github.com/arduino/arduino-cli/commands/core/GetPlatforms renamed
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2349,6 +2356,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#golang-api-method-githubcomarduinoarduino-clicommandscoregetplatforms-renamed" class="md-nav__link">
+    golang API: method github.com/arduino/arduino-cli/commands/core/GetPlatforms renamed
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3279,6 +3293,27 @@ top-level keys. For example, for JSON output:</p>
 has been removed as well.</p>
 <h3 id="golang-api-method-githubcomarduinoarduino-cliarduinolibrarieslibrarylocationpriorityfor-removed">golang API: method <code>github.com/arduino/arduino-cli/arduino/libraries/Library.LocationPriorityFor</code> removed<a class="headerlink" href="#golang-api-method-githubcomarduinoarduino-cliarduinolibrarieslibrarylocationpriorityfor-removed" title="Permanent link">&para;</a></h3>
 <p>That method was outdated and must not be used.</p>
+<h3 id="golang-api-method-githubcomarduinoarduino-clicommandscoregetplatforms-renamed">golang API: method <code>github.com/arduino/arduino-cli/commands/core/GetPlatforms</code> renamed<a class="headerlink" href="#golang-api-method-githubcomarduinoarduino-clicommandscoregetplatforms-renamed" title="Permanent link">&para;</a></h3>
+<p>The following method in <code>github.com/arduino/arduino-cli/commands/core</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">GetPlatforms</span><span class="p">(</span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">PlatformListRequest</span><span class="p">)</span><span class="w"> </span><span class="p">([]</span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">Platform</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>has been changed to:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">PlatformList</span><span class="p">(</span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">PlatformListRequest</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">PlatformListResponse</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>now it better follows the gRPC API interface. Old code like the following:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">platforms</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">core</span><span class="p">.</span><span class="nx">GetPlatforms</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">PlatformListRequest</span><span class="p">{</span><span class="nx">Instance</span><span class="p">:</span><span class="w"> </span><span class="nx">inst</span><span class="p">})</span><span class="w"></span>
+<span class="k">for</span><span class="w"> </span><span class="nx">_</span><span class="p">,</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">range</span><span class="w"> </span><span class="nx">platforms</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>must be changed as follows:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Use PlatformList function instead of GetPlatforms</span><span class="w"></span>
+<span class="nx">platforms</span><span class="p">,</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">core</span><span class="p">.</span><span class="nx">PlatformList</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">PlatformListRequest</span><span class="p">{</span><span class="nx">Instance</span><span class="p">:</span><span class="w"> </span><span class="nx">inst</span><span class="p">})</span><span class="w"></span>
+<span class="c1">// Access installed platforms through the .InstalledPlatforms field</span><span class="w"></span>
+<span class="k">for</span><span class="w"> </span><span class="nx">_</span><span class="p">,</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">range</span><span class="w"> </span><span class="nx">platforms</span><span class="p">.</span><span class="nx">InstalledPlatforms</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="o">...</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
 <h2 id="0310">0.31.0<a class="headerlink" href="#0310" title="Permanent link">&para;</a></h2>
 <h3 id="added-post_install-script-support-for-tools">Added <code>post_install</code> script support for tools<a class="headerlink" href="#added-post_install-script-support-for-tools" title="Permanent link">&para;</a></h3>
 <p>The <code>post_install</code> script now runs when a tool is correctly installed and the CLI is in "interactive" mode. This
