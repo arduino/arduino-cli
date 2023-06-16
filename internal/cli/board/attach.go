@@ -16,11 +16,14 @@
 package board
 
 import (
+	"context"
 	"fmt"
 	"os"
 
+	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
 )
 
@@ -51,39 +54,28 @@ func initAttachCommand() *cobra.Command {
 
 func runAttachCommand(path string, port *arguments.Port, fqbn string) {
 	sketchPath := arguments.InitSketchPath(path)
-	sk := arguments.NewSketch(sketchPath)
 
-	var currentPort *boardAttachPortResult
-	if currentAddress, currentProtocol := sk.GetDefaultPortAddressAndProtocol(); currentAddress != "" {
-		currentPort = &boardAttachPortResult{
-			Address:  currentAddress,
-			Protocol: currentProtocol,
-		}
-	}
-	current := &boardAttachResult{
-		Port: currentPort,
-		Fqbn: sk.GetDefaultFQBN(),
+	portAddress, portProtocol, _ := port.GetPortAddressAndProtocol(nil, "", "")
+	newDefaults, err := sketch.SetSketchDefaults(context.Background(), &rpc.SetSketchDefaultsRequest{
+		SketchPath:          sketchPath.String(),
+		DefaultFqbn:         fqbn,
+		DefaultPortAddress:  portAddress,
+		DefaultPortProtocol: portProtocol,
+	})
+	if err != nil {
+		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 
-	defaultAddress, defaultProtocol := sk.GetDefaultPortAddressAndProtocol()
-	address, protocol, _ := port.GetPortAddressAndProtocol(nil, defaultAddress, defaultProtocol)
-	if address != "" {
-		if err := sk.SetDefaultPort(address, protocol); err != nil {
-			feedback.Fatal(fmt.Sprintf("%s: %s", tr("Error saving sketch metadata"), err), feedback.ErrGeneric)
-		}
-		current.Port = &boardAttachPortResult{
-			Address:  address,
-			Protocol: protocol,
+	res := &boardAttachResult{
+		Fqbn: newDefaults.GetDefaultFqbn(),
+	}
+	if newDefaults.GetDefaultPortAddress() != "" {
+		res.Port = &boardAttachPortResult{
+			Address:  newDefaults.GetDefaultPortAddress(),
+			Protocol: newDefaults.GetDefaultPortProtocol(),
 		}
 	}
-	if fqbn != "" {
-		if err := sk.SetDefaultFQBN(fqbn); err != nil {
-			feedback.Fatal(fmt.Sprintf("%s: %s", tr("Error saving sketch metadata"), err), feedback.ErrGeneric)
-		}
-		current.Fqbn = fqbn
-	}
-
-	feedback.PrintResult(current)
+	feedback.PrintResult(res)
 }
 
 type boardAttachPortResult struct {

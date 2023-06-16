@@ -202,6 +202,12 @@ func (s *ArduinoCoreServerImpl) LoadSketch(ctx context.Context, req *rpc.LoadSke
 	return resp, convertErrorToRPCStatus(err)
 }
 
+// SetSketchDefaults FIXMEDOC
+func (s *ArduinoCoreServerImpl) SetSketchDefaults(ctx context.Context, req *rpc.SetSketchDefaultsRequest) (*rpc.SetSketchDefaultsResponse, error) {
+	resp, err := sketch.SetSketchDefaults(ctx, req)
+	return resp, convertErrorToRPCStatus(err)
+}
+
 // Compile FIXMEDOC
 func (s *ArduinoCoreServerImpl) Compile(req *rpc.CompileRequest, stream rpc.ArduinoCoreService_CompileServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)

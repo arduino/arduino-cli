@@ -516,6 +516,19 @@ func (e *CantCreateSketchError) Unwrap() error {
 	return e.Cause
 }
 
+// CantUpdateSketchError is returned when the sketch cannot be updated
+type CantUpdateSketchError struct {
+	Cause error
+}
+
+func (e *CantUpdateSketchError) Error() string {
+	return composeErrorMsg(tr("Can't update sketch"), e.Cause)
+}
+
+func (e *CantUpdateSketchError) Unwrap() error {
+	return e.Cause
+}
+
 // CantOpenSketchError is returned when the sketch is not found or cannot be opened
 type CantOpenSketchError struct {
 	Cause error

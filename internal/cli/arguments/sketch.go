@@ -42,16 +42,6 @@ func InitSketchPath(path string) (sketchPath *paths.Path) {
 	return sketchPath
 }
 
-// NewSketch is a helper function useful to create a sketch instance
-// TODO: Remove this function, we should not access sketch:Sketch directly
-func NewSketch(sketchPath *paths.Path) *sketch.Sketch {
-	sketch, err := sketch.New(sketchPath)
-	if err != nil {
-		feedback.Fatal(tr("Error opening sketch: %v", err), feedback.ErrGeneric)
-	}
-	return sketch
-}
-
 // WarnDeprecatedFiles warns the user that a type of sketch files are deprecated
 func WarnDeprecatedFiles(sketchPath *paths.Path) {
 	// .pde files are still supported but deprecated, this warning urges the user to rename them

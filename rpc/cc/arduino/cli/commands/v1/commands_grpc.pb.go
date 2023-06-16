@@ -43,6 +43,7 @@ const (
 	ArduinoCoreService_NewSketch_FullMethodName                         = "/cc.arduino.cli.commands.v1.ArduinoCoreService/NewSketch"
 	ArduinoCoreService_LoadSketch_FullMethodName                        = "/cc.arduino.cli.commands.v1.ArduinoCoreService/LoadSketch"
 	ArduinoCoreService_ArchiveSketch_FullMethodName                     = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ArchiveSketch"
+	ArduinoCoreService_SetSketchDefaults_FullMethodName                 = "/cc.arduino.cli.commands.v1.ArduinoCoreService/SetSketchDefaults"
 	ArduinoCoreService_BoardDetails_FullMethodName                      = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardDetails"
 	ArduinoCoreService_BoardList_FullMethodName                         = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardList"
 	ArduinoCoreService_BoardListAll_FullMethodName                      = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BoardListAll"
@@ -97,6 +98,10 @@ type ArduinoCoreServiceClient interface {
 	LoadSketch(ctx context.Context, in *LoadSketchRequest, opts ...grpc.CallOption) (*LoadSketchResponse, error)
 	// Creates a zip file containing all files of specified Sketch
 	ArchiveSketch(ctx context.Context, in *ArchiveSketchRequest, opts ...grpc.CallOption) (*ArchiveSketchResponse, error)
+	// Sets the sketch default FQBN and Port Address/Protocol in
+	// the sketch project file (skteth.yaml). These metedata can be retrieved
+	// using LoadSketch.
+	SetSketchDefaults(ctx context.Context, in *SetSketchDefaultsRequest, opts ...grpc.CallOption) (*SetSketchDefaultsResponse, error)
 	// Requests details about a board
 	BoardDetails(ctx context.Context, in *BoardDetailsRequest, opts ...grpc.CallOption) (*BoardDetailsResponse, error)
 	// List the boards currently connected to the computer.
@@ -314,6 +319,15 @@ func (c *arduinoCoreServiceClient) LoadSketch(ctx context.Context, in *LoadSketc
 func (c *arduinoCoreServiceClient) ArchiveSketch(ctx context.Context, in *ArchiveSketchRequest, opts ...grpc.CallOption) (*ArchiveSketchResponse, error) {
 	out := new(ArchiveSketchResponse)
 	err := c.cc.Invoke(ctx, ArduinoCoreService_ArchiveSketch_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arduinoCoreServiceClient) SetSketchDefaults(ctx context.Context, in *SetSketchDefaultsRequest, opts ...grpc.CallOption) (*SetSketchDefaultsResponse, error) {
+	out := new(SetSketchDefaultsResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_SetSketchDefaults_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -993,6 +1007,10 @@ type ArduinoCoreServiceServer interface {
 	LoadSketch(context.Context, *LoadSketchRequest) (*LoadSketchResponse, error)
 	// Creates a zip file containing all files of specified Sketch
 	ArchiveSketch(context.Context, *ArchiveSketchRequest) (*ArchiveSketchResponse, error)
+	// Sets the sketch default FQBN and Port Address/Protocol in
+	// the sketch project file (skteth.yaml). These metedata can be retrieved
+	// using LoadSketch.
+	SetSketchDefaults(context.Context, *SetSketchDefaultsRequest) (*SetSketchDefaultsResponse, error)
 	// Requests details about a board
 	BoardDetails(context.Context, *BoardDetailsRequest) (*BoardDetailsResponse, error)
 	// List the boards currently connected to the computer.
@@ -1089,6 +1107,9 @@ func (UnimplementedArduinoCoreServiceServer) LoadSketch(context.Context, *LoadSk
 }
 func (UnimplementedArduinoCoreServiceServer) ArchiveSketch(context.Context, *ArchiveSketchRequest) (*ArchiveSketchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ArchiveSketch not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) SetSketchDefaults(context.Context, *SetSketchDefaultsRequest) (*SetSketchDefaultsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetSketchDefaults not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) BoardDetails(context.Context, *BoardDetailsRequest) (*BoardDetailsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BoardDetails not implemented")
@@ -1357,6 +1378,24 @@ func _ArduinoCoreService_ArchiveSketch_Handler(srv interface{}, ctx context.Cont
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ArduinoCoreServiceServer).ArchiveSketch(ctx, req.(*ArchiveSketchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArduinoCoreService_SetSketchDefaults_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetSketchDefaultsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).SetSketchDefaults(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArduinoCoreService_SetSketchDefaults_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).SetSketchDefaults(ctx, req.(*SetSketchDefaultsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1974,6 +2013,10 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ArchiveSketch",
 			Handler:    _ArduinoCoreService_ArchiveSketch_Handler,
+		},
+		{
+			MethodName: "SetSketchDefaults",
+			Handler:    _ArduinoCoreService_SetSketchDefaults_Handler,
 		},
 		{
 			MethodName: "BoardDetails",

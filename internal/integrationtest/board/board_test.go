@@ -510,23 +510,55 @@ func TestBoardSearch(t *testing.T) {
 	]`)
 }
 
-func TestBoardAttachWithoutSketchJson(t *testing.T) {
+func TestBoardAttach(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
 
-	_, _, err := cli.Run("update")
-	require.NoError(t, err)
-
-	sketchName := "BoardAttachWithoutSketchJson"
+	sketchName := "BoardAttach"
 	sketchPath := cli.SketchbookDir().Join(sketchName)
-	fqbn := "arduino:avr:uno"
+	sketchProjectFlie := sketchPath.Join("sketch.yaml")
 
 	// Create a test sketch
-	_, _, err = cli.Run("sketch", "new", sketchPath.String())
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
 	require.NoError(t, err)
 
-	_, _, err = cli.Run("board", "attach", "-b", fqbn, sketchPath.String())
-	require.NoError(t, err)
+	{
+		stdout, _, err := cli.Run("board", "attach", "-b", "arduino:avr:uno", sketchPath.String(), "--format", "json")
+		require.NoError(t, err)
+		requirejson.Query(t, stdout, ".fqbn", `"arduino:avr:uno"`)
+
+		yamlData, err := sketchProjectFlie.ReadFile()
+		require.NoError(t, err)
+		require.Contains(t, string(yamlData), "default_fqbn: arduino:avr:uno")
+		require.NotContains(t, string(yamlData), "default_port:")
+		require.NotContains(t, string(yamlData), "default_protocol:")
+	}
+	{
+		stdout, _, err := cli.Run("board", "attach", "-p", "/dev/ttyACM0", "-l", "serial", sketchPath.String(), "--format", "json")
+		require.NoError(t, err)
+		requirejson.Query(t, stdout, ".fqbn", `"arduino:avr:uno"`)
+		requirejson.Query(t, stdout, ".port.address", `"/dev/ttyACM0"`)
+		requirejson.Query(t, stdout, ".port.protocol", `"serial"`)
+
+		yamlData, err := sketchProjectFlie.ReadFile()
+		require.NoError(t, err)
+		require.Contains(t, string(yamlData), "default_fqbn: arduino:avr:uno")
+		require.Contains(t, string(yamlData), "default_port: /dev/ttyACM0")
+		require.Contains(t, string(yamlData), "default_protocol: serial")
+	}
+	{
+		stdout, _, err := cli.Run("board", "attach", "-p", "/dev/ttyACM0", sketchPath.String(), "--format", "json")
+		require.NoError(t, err)
+		requirejson.Query(t, stdout, ".fqbn", `"arduino:avr:uno"`)
+		requirejson.Query(t, stdout, ".port.address", `"/dev/ttyACM0"`)
+		requirejson.Query(t, stdout, ".port.protocol", `null`)
+
+		yamlData, err := sketchProjectFlie.ReadFile()
+		require.NoError(t, err)
+		require.Contains(t, string(yamlData), "default_fqbn: arduino:avr:uno")
+		require.Contains(t, string(yamlData), "default_port: /dev/ttyACM0")
+		require.NotContains(t, string(yamlData), "default_protocol:")
+	}
 }
 
 func TestBoardSearchWithOutdatedCore(t *testing.T) {
