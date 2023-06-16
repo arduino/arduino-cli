@@ -300,6 +300,12 @@ message LoadSketchResponse {
   // List of absolute paths to supported files in the sketch root folder, main
   // file excluded
   repeated string root_folder_files = 5;
+  // Default FQBN set in project file (sketch.yaml)
+  string default_fqbn = 6;
+  // Default Port set in project file (sketch.yaml)
+  string default_port = 7;
+  // Default Protocol set in project file (sketch.yaml)
+  string default_protocol = 8;
 }
 
 message ArchiveSketchRequest {

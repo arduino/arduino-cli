@@ -47,11 +47,15 @@ func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketc
 		rootFolderFiles[i] = file.String()
 	}
 
+	defaultPort, defaultProtocol := sk.GetDefaultPortAddressAndProtocol()
 	return &rpc.LoadSketchResponse{
 		MainFile:         sk.MainFile.String(),
 		LocationPath:     sk.FullPath.String(),
 		OtherSketchFiles: otherSketchFiles,
 		AdditionalFiles:  additionalFiles,
 		RootFolderFiles:  rootFolderFiles,
+		DefaultFqbn:      sk.GetDefaultFQBN(),
+		DefaultPort:      defaultPort,
+		DefaultProtocol:  defaultProtocol,
 	}, nil
 }

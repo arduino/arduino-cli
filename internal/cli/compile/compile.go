@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/compile"
+	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
@@ -163,10 +164,11 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		fqbnArg.Set(profile.GetFqbn())
 	}
 
-	sk := arguments.NewSketch(sketchPath)
-	defaultFQBN := sk.GetDefaultFQBN()
-	defaultAddress, defaultProtocol := sk.GetDefaultPortAddressAndProtocol()
-	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, defaultFQBN, defaultAddress, defaultProtocol)
+	sk, err := sketch.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
+	if err != nil {
+		feedback.FatalError(err, feedback.ErrGeneric)
+	}
+	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
 
 	if keysKeychain != "" || signKey != "" || encryptKey != "" {
 		arguments.CheckFlagsMandatory(cmd, "keys-keychain", "sign-key", "encrypt-key")
