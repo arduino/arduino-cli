@@ -2,6 +2,13 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## 0.34.0
+
+### golang API: `LoadSketch` function has been moved
+
+The function `github.com/arduino/arduino-cli/commands.LoadSketch` has been moved to package
+`github.com/arduino/arduino-cli/commands/sketch.LoadSketch`. You must change the import accordingly.
+
 ## 0.33.0
 
 ### gRPC `cc.arduino.cli.commands.v1.Compile` command now return expanded build_properties by default.
