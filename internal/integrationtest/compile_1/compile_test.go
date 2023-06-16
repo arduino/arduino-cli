@@ -226,7 +226,7 @@ func compileWithSketchWithSymlinkSelfloop(t *testing.T, env *integrationtest.Env
 		_, stderr, err := cli.Run("compile", "-b", fqbn, sketchPath.String())
 		// The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
 		// returning a different error detailed message
-		require.Contains(t, string(stderr), "Error opening sketch:")
+		require.Contains(t, string(stderr), "Can't open sketch:")
 		require.Error(t, err)
 	}
 	{
@@ -252,7 +252,7 @@ func compileWithSketchWithSymlinkSelfloop(t *testing.T, env *integrationtest.Env
 		_, stderr, err := cli.Run("compile", "-b", fqbn, sketchPath.String())
 		// The assertion is a bit relaxed in this case because win behaves differently from macOs and linux
 		// returning a different error detailed message
-		require.Contains(t, string(stderr), "Error opening sketch:")
+		require.Contains(t, string(stderr), "Can't open sketch:")
 		require.Error(t, err)
 	}
 }
@@ -620,17 +620,17 @@ func compileWithMultipleMainFiles(t *testing.T, env *integrationtest.Environment
 	// Build sketch from folder
 	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "Error opening sketch: multiple main sketch files found")
+	require.Contains(t, string(stderr), "Can't open sketch: multiple main sketch files found")
 
 	// Build sketch from .ino file
 	_, stderr, err = cli.Run("compile", "--clean", "-b", fqbn, sketchFileIno.String())
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "Error opening sketch: multiple main sketch files found")
+	require.Contains(t, string(stderr), "Can't open sketch: multiple main sketch files found")
 
 	// Build sketch from .pde file
 	_, stderr, err = cli.Run("compile", "--clean", "-b", fqbn, sketchFilePde.String())
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "Error opening sketch: multiple main sketch files found")
+	require.Contains(t, string(stderr), "Can't open sketch: multiple main sketch files found")
 }
 
 func compileCaseMismatchFails(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
@@ -652,17 +652,17 @@ func compileCaseMismatchFails(t *testing.T, env *integrationtest.Environment, cl
 	// * Compiling with sketch path
 	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "Error opening sketch:")
+	require.Contains(t, string(stderr), "Can't open sketch:")
 	// * Compiling with sketch main file
 	_, stderr, err = cli.Run("compile", "--clean", "-b", fqbn, sketchMainFile.String())
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "Error opening sketch:")
+	require.Contains(t, string(stderr), "Can't open sketch:")
 	// * Compiling in sketch path
 	cli.SetWorkingDir(sketchPath)
 	defer cli.SetWorkingDir(env.RootDir())
 	_, stderr, err = cli.Run("compile", "--clean", "-b", fqbn)
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "Error opening sketch:")
+	require.Contains(t, string(stderr), "Can't open sketch:")
 }
 
 func compileOnlyCompilationDatabaseFlag(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
