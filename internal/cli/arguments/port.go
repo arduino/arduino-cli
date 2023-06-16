@@ -21,7 +21,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/discovery"
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
@@ -57,11 +56,12 @@ func (p *Port) AddToCommand(cmd *cobra.Command) {
 // This method allows will bypass the discoveries if:
 // - a nil instance is passed: in this case the plain port and protocol arguments are returned (even if empty)
 // - a protocol is specified: in this case the discoveries are not needed to autodetect the protocol.
-func (p *Port) GetPortAddressAndProtocol(instance *rpc.Instance, sk *sketch.Sketch) (string, string, error) {
+func (p *Port) GetPortAddressAndProtocol(instance *rpc.Instance, defaultAddress, defaultProtocol string) (string, string, error) {
 	if p.protocol != "" || instance == nil {
 		return p.address, p.protocol, nil
 	}
-	port, err := p.GetPort(instance, sk)
+
+	port, err := p.GetPort(instance, defaultAddress, defaultProtocol)
 	if err != nil {
 		return "", "", err
 	}
@@ -70,15 +70,13 @@ func (p *Port) GetPortAddressAndProtocol(instance *rpc.Instance, sk *sketch.Sket
 
 // GetPort returns the Port obtained by parsing command line arguments.
 // The extra metadata for the ports is obtained using the pluggable discoveries.
-func (p *Port) GetPort(instance *rpc.Instance, sk *sketch.Sketch) (*discovery.Port, error) {
-	// TODO: REMOVE sketch.Sketch from here
+func (p *Port) GetPort(instance *rpc.Instance, defaultAddress, defaultProtocol string) (*discovery.Port, error) {
 	// TODO: REMOVE discovery from here (use board.List instead)
 
 	address := p.address
 	protocol := p.protocol
-
-	if address == "" && sk != nil {
-		address, protocol = sk.GetDefaultPortAddressAndProtocol()
+	if address == "" && (defaultAddress != "" || defaultProtocol != "") {
+		address, protocol = defaultAddress, defaultProtocol
 	}
 	if address == "" {
 		// If no address is provided we assume the user is trying to upload

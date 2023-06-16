@@ -100,7 +100,9 @@ func runUploadCommand(command *cobra.Command, args []string) {
 		fqbnArg.Set(profile.GetFqbn())
 	}
 
-	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, instance, sk)
+	defaultFQBN := sk.GetDefaultFQBN()
+	defaultAddress, defaultProtocol := sk.GetDefaultPortAddressAndProtocol()
+	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, instance, defaultFQBN, defaultAddress, defaultProtocol)
 
 	userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
 		Instance: instance,

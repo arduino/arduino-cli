@@ -74,7 +74,8 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 		quiet = true
 	}
 
-	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(instance, nil)
+	// TODO: Should use sketch default_port/protocol?
+	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(instance, "", "")
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}

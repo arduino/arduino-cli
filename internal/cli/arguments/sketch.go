@@ -43,6 +43,7 @@ func InitSketchPath(path string) (sketchPath *paths.Path) {
 }
 
 // NewSketch is a helper function useful to create a sketch instance
+// TODO: Remove this function, we should not access sketch:Sketch directly
 func NewSketch(sketchPath *paths.Path) *sketch.Sketch {
 	sketch, err := sketch.New(sketchPath)
 	if err != nil {

@@ -67,7 +67,7 @@ func runBootloaderCommand(command *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli burn-bootloader`")
 
 	// We don't need a Sketch to upload a board's bootloader
-	discoveryPort, err := port.GetPort(instance, nil)
+	discoveryPort, err := port.GetPort(instance, "", "")
 	if err != nil {
 		feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
 	}

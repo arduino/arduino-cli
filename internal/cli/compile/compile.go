@@ -158,14 +158,15 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	}
 
 	sketchPath := arguments.InitSketchPath(path)
-	sk := arguments.NewSketch(sketchPath)
-
 	inst, profile := instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
 	if fqbnArg.String() == "" {
 		fqbnArg.Set(profile.GetFqbn())
 	}
 
-	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, sk)
+	sk := arguments.NewSketch(sketchPath)
+	defaultFQBN := sk.GetDefaultFQBN()
+	defaultAddress, defaultProtocol := sk.GetDefaultPortAddressAndProtocol()
+	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, defaultFQBN, defaultAddress, defaultProtocol)
 
 	if keysKeychain != "" || signKey != "" || encryptKey != "" {
 		arguments.CheckFlagsMandatory(cmd, "keys-keychain", "sign-key", "encrypt-key")
