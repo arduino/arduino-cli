@@ -569,38 +569,6 @@ func UpdateIndex(ctx context.Context, req *rpc.UpdateIndexRequest, downloadCB rp
 	return nil
 }
 
-// LoadSketch collects and returns all files composing a sketch
-func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketchResponse, error) {
-	// TODO: This should be a ToRpc function for the Sketch struct
-	sk, err := sketch.New(paths.New(req.SketchPath))
-	if err != nil {
-		return nil, &arduino.CantOpenSketchError{Cause: err}
-	}
-
-	otherSketchFiles := make([]string, sk.OtherSketchFiles.Len())
-	for i, file := range sk.OtherSketchFiles {
-		otherSketchFiles[i] = file.String()
-	}
-
-	additionalFiles := make([]string, sk.AdditionalFiles.Len())
-	for i, file := range sk.AdditionalFiles {
-		additionalFiles[i] = file.String()
-	}
-
-	rootFolderFiles := make([]string, sk.RootFolderFiles.Len())
-	for i, file := range sk.RootFolderFiles {
-		rootFolderFiles[i] = file.String()
-	}
-
-	return &rpc.LoadSketchResponse{
-		MainFile:         sk.MainFile.String(),
-		LocationPath:     sk.FullPath.String(),
-		OtherSketchFiles: otherSketchFiles,
-		AdditionalFiles:  additionalFiles,
-		RootFolderFiles:  rootFolderFiles,
-	}, nil
-}
-
 // firstUpdate downloads libraries and packages indexes if they don't exist.
 // This ideally is only executed the first time the CLI is run.
 func firstUpdate(ctx context.Context, instance *rpc.Instance, downloadCb func(msg *rpc.DownloadProgress), externalPackageIndexes []*url.URL) error {

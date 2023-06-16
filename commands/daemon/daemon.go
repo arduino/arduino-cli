@@ -198,7 +198,7 @@ func (s *ArduinoCoreServerImpl) NewSketch(ctx context.Context, req *rpc.NewSketc
 
 // LoadSketch FIXMEDOC
 func (s *ArduinoCoreServerImpl) LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketchResponse, error) {
-	resp, err := commands.LoadSketch(ctx, req)
+	resp, err := sketch.LoadSketch(ctx, req)
 	return resp, convertErrorToRPCStatus(err)
 }
 
