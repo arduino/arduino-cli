@@ -166,7 +166,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 
 	sk, err := sketch.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if err != nil {
-		feedback.FatalError(err, feedback.ErrGeneric)
+		feedback.FatalError(err, feedback.ErrSketchError)
 	}
 	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
 
@@ -269,7 +269,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		}
 
 		if err := upload.Upload(context.Background(), uploadRequest, stdOut, stdErr); err != nil {
-			feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
+			feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrBoardUpload)
 		}
 	}
 
@@ -366,7 +366,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 				}
 			}
 		}
-		feedback.FatalResult(res, feedback.ErrGeneric)
+		feedback.FatalResult(res, feedback.ErrCompilation)
 	}
 	feedback.PrintResult(res)
 }
