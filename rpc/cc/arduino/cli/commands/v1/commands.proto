@@ -60,6 +60,12 @@ service ArduinoCoreService {
   // Creates a zip file containing all files of specified Sketch
   rpc ArchiveSketch(ArchiveSketchRequest) returns (ArchiveSketchResponse) {}
 
+  // Sets the sketch default FQBN and Port Address/Protocol in
+  // the sketch project file (sketch.yaml). These metadata can be retrieved
+  // using LoadSketch.
+  rpc SetSketchDefaults(SetSketchDefaultsRequest)
+      returns (SetSketchDefaultsResponse) {}
+
   // BOARD COMMANDS
   // --------------
 
@@ -300,6 +306,12 @@ message LoadSketchResponse {
   // List of absolute paths to supported files in the sketch root folder, main
   // file excluded
   repeated string root_folder_files = 5;
+  // Default FQBN set in project file (sketch.yaml)
+  string default_fqbn = 6;
+  // Default Port set in project file (sketch.yaml)
+  string default_port = 7;
+  // Default Protocol set in project file (sketch.yaml)
+  string default_protocol = 8;
 }
 
 message ArchiveSketchRequest {
@@ -315,3 +327,26 @@ message ArchiveSketchRequest {
 }
 
 message ArchiveSketchResponse {}
+
+message SetSketchDefaultsRequest {
+  // Absolute path to Sketch file or folder containing Sketch file
+  string sketch_path = 1;
+  // The desired value for default_fqbn in project file (sketch.yaml)
+  string default_fqbn = 2;
+  // The desired value for default_port in project file (sketch.yaml)
+  string default_port_address = 3;
+  // The desired value for default_protocol in project file (sketch.yaml)
+  string default_port_protocol = 4;
+}
+
+message SetSketchDefaultsResponse {
+  // The value of default_fqnn that has been written in project file
+  // (sketch.yaml)
+  string default_fqbn = 1;
+  // The value of default_port that has been written in project file
+  // (sketch.yaml)
+  string default_port_address = 2;
+  // The value of default_protocol that has been written in project file
+  // (sketch.yaml)
+  string default_port_protocol = 3;
+}

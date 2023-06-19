@@ -19,7 +19,6 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/spf13/cobra"
@@ -70,12 +69,10 @@ func (f *Fqbn) Set(fqbn string) {
 //   - the port is not found, in this case nil is returned
 //   - the FQBN autodetection fail, in this case the function prints an error and
 //     terminates the execution
-func CalculateFQBNAndPort(portArgs *Port, fqbnArg *Fqbn, instance *rpc.Instance, sk *sketch.Sketch) (string, *rpc.Port) {
-	// TODO: REMOVE sketch.Sketch from here
-
+func CalculateFQBNAndPort(portArgs *Port, fqbnArg *Fqbn, instance *rpc.Instance, defaultFQBN, defaultAddress, defaultProtocol string) (string, *rpc.Port) {
 	fqbn := fqbnArg.String()
-	if fqbn == "" && sk != nil {
-		fqbn = sk.GetDefaultFQBN()
+	if fqbn == "" {
+		fqbn = defaultFQBN
 	}
 	if fqbn == "" {
 		if portArgs == nil || portArgs.address == "" {
@@ -88,7 +85,7 @@ func CalculateFQBNAndPort(portArgs *Port, fqbnArg *Fqbn, instance *rpc.Instance,
 		return fqbn, port
 	}
 
-	port, err := portArgs.GetPort(instance, sk)
+	port, err := portArgs.GetPort(instance, defaultAddress, defaultProtocol)
 	if err != nil {
 		feedback.Fatal(tr("Error getting port metadata: %v", err), feedback.ErrGeneric)
 	}

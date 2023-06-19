@@ -22,10 +22,12 @@ import (
 	"sort"
 
 	"github.com/arduino/arduino-cli/commands/debug"
+	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	dbg "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/arduino/go-properties-orderedmap"
@@ -75,8 +77,11 @@ func runDebugCommand(command *cobra.Command, args []string) {
 	}
 
 	sketchPath := arguments.InitSketchPath(path)
-	sk := arguments.NewSketch(sketchPath)
-	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, instance, sk)
+	sk, err := sketch.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
+	if err != nil {
+		feedback.FatalError(err, feedback.ErrGeneric)
+	}
+	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, instance, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
 	debugConfigRequested := &dbg.DebugConfigRequest{
 		Instance:    instance,
 		Fqbn:        fqbn,
