@@ -42,4 +42,13 @@ const (
 
 	// ErrBadArgument is returned when the arguments are not valid (7)
 	ErrBadArgument
+
+	// ErrSketchError is return when the occurs some error in the sketch package (8)
+	ErrSketchError
+
+	// ErrCompilation is returned when the compiler throw some errors (9)
+	ErrCompilation
+
+	// ErrBoardUpload is returned when the upload to board fails (10)
+	ErrBoardUpload
 )
