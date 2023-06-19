@@ -92,7 +92,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 
 	sk, err := sketch.New(sketchPath)
 	if err != nil && importDir == "" && importFile == "" {
-		feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
+		feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrSketchError)
 	}
 
 	instance, profile := instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
@@ -136,7 +136,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 				msg += tr("Platform %s is not found in any known index\nMaybe you need to add a 3rd party URL?", platformErr.Platform)
 			}
 		}
-		feedback.Fatal(msg, feedback.ErrGeneric)
+		feedback.Fatal(msg, feedback.ErrBoardUpload)
 	}
 
 	fields := map[string]string{}
@@ -169,7 +169,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 		UserFields: fields,
 	}
 	if err := upload.Upload(context.Background(), req, stdOut, stdErr); err != nil {
-		feedback.FatalError(err, feedback.ErrGeneric)
+		feedback.FatalError(err, feedback.ErrBoardUpload)
 	}
 	feedback.PrintResult(stdIOResult())
 }

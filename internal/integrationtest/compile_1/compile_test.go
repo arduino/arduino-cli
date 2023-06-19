@@ -26,7 +26,9 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/integrationtest"
+	"github.com/arduino/arduino-cli/internal/integrationtest/assert"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/testifyjson/requirejson"
@@ -91,21 +93,26 @@ func compileErrorMessage(t *testing.T, env *integrationtest.Environment, cli *in
 	_, stderr, err := cli.Run("compile", "-b", "arduino:avr:uno", abcdef.String())
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "no such file or directory:")
+	assert.CmdExitCode(t, feedback.ErrSketchError, err)
 	_, stderr, err = cli.Run("compile", "-b", "arduino:avr:uno", abcdef.Join("ABCDEF.ino").String())
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "no such file or directory:")
+	assert.CmdExitCode(t, feedback.ErrSketchError, err)
 	_, stderr, err = cli.Run("compile", "-b", "arduino:avr:uno", abcdef.Join("QWERTY").String())
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "no such file or directory:")
+	assert.CmdExitCode(t, feedback.ErrSketchError, err)
 
 	err = abcdef.Mkdir()
 	require.NoError(t, err)
 	_, stderr, err = cli.Run("compile", "-b", "arduino:avr:uno", abcdef.String())
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "main file missing from sketch:")
+	assert.CmdExitCode(t, feedback.ErrSketchError, err)
 	_, stderr, err = cli.Run("compile", "-b", "arduino:avr:uno", abcdef.Join("ABCDEF.ino").String())
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "no such file or directory:")
+	assert.CmdExitCode(t, feedback.ErrSketchError, err)
 
 	qwertyIno := abcdef.Join("QWERTY.ino")
 	f, err := qwertyIno.Create()
@@ -114,6 +121,7 @@ func compileErrorMessage(t *testing.T, env *integrationtest.Environment, cli *in
 	_, stderr, err = cli.Run("compile", "-b", "arduino:avr:uno", qwertyIno.String())
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "main file missing from sketch:")
+	assert.CmdExitCode(t, feedback.ErrSketchError, err)
 }
 
 func compileWithSimpleSketch(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
@@ -228,6 +236,7 @@ func compileWithSketchWithSymlinkSelfloop(t *testing.T, env *integrationtest.Env
 		// returning a different error detailed message
 		require.Contains(t, string(stderr), "Can't open sketch:")
 		require.Error(t, err)
+		assert.CmdExitCode(t, feedback.ErrSketchError, err)
 	}
 	{
 		sketchName := "CompileIntegrationTestSymlinkDirLoop"
@@ -254,6 +263,7 @@ func compileWithSketchWithSymlinkSelfloop(t *testing.T, env *integrationtest.Env
 		// returning a different error detailed message
 		require.Contains(t, string(stderr), "Can't open sketch:")
 		require.Error(t, err)
+		assert.CmdExitCode(t, feedback.ErrSketchError, err)
 	}
 }
 
@@ -349,6 +359,7 @@ func compileWithMultipleBuildPropertyFlags(t *testing.T, env *integrationtest.En
 		sketchPath.String(), "--verbose", "--clean",
 	)
 	require.Error(t, err)
+	assert.CmdExitCode(t, feedback.ErrCompilation, err)
 
 	// Compile using multiple build properties separated by a space and properly quoted
 	stdout, _, err := cli.Run(
@@ -366,6 +377,7 @@ func compileWithMultipleBuildPropertyFlags(t *testing.T, env *integrationtest.En
 		sketchPath.String(), "--verbose", "--clean",
 	)
 	require.Error(t, err)
+	assert.CmdExitCode(t, feedback.ErrCompilation, err)
 
 	stdout, _, err = cli.Run(
 		"compile", "-b", fqbn,
@@ -376,6 +388,7 @@ func compileWithMultipleBuildPropertyFlags(t *testing.T, env *integrationtest.En
 	require.Error(t, err)
 	require.NotContains(t, string(stdout), "-DPIN=2")
 	require.Contains(t, string(stdout), "-DSSID=\\\"This is a String\\\"")
+	assert.CmdExitCode(t, feedback.ErrCompilation, err)
 
 	stdout, _, err = cli.Run(
 		"compile", "-b", fqbn,
@@ -621,16 +634,19 @@ func compileWithMultipleMainFiles(t *testing.T, env *integrationtest.Environment
 	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "Can't open sketch: multiple main sketch files found")
+	assert.CmdExitCode(t, feedback.ErrSketchError, err)
 
 	// Build sketch from .ino file
 	_, stderr, err = cli.Run("compile", "--clean", "-b", fqbn, sketchFileIno.String())
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "Can't open sketch: multiple main sketch files found")
+	assert.CmdExitCode(t, feedback.ErrSketchError, err)
 
 	// Build sketch from .pde file
 	_, stderr, err = cli.Run("compile", "--clean", "-b", fqbn, sketchFilePde.String())
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "Can't open sketch: multiple main sketch files found")
+	assert.CmdExitCode(t, feedback.ErrSketchError, err)
 }
 
 func compileCaseMismatchFails(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
@@ -653,16 +669,19 @@ func compileCaseMismatchFails(t *testing.T, env *integrationtest.Environment, cl
 	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "Can't open sketch:")
+	assert.CmdExitCode(t, feedback.ErrSketchError, err)
 	// * Compiling with sketch main file
 	_, stderr, err = cli.Run("compile", "--clean", "-b", fqbn, sketchMainFile.String())
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "Can't open sketch:")
+	assert.CmdExitCode(t, feedback.ErrSketchError, err)
 	// * Compiling in sketch path
 	cli.SetWorkingDir(sketchPath)
 	defer cli.SetWorkingDir(env.RootDir())
 	_, stderr, err = cli.Run("compile", "--clean", "-b", fqbn)
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "Can't open sketch:")
+	assert.CmdExitCode(t, feedback.ErrSketchError, err)
 }
 
 func compileOnlyCompilationDatabaseFlag(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
@@ -721,6 +740,7 @@ func compileUsingPlatformLocalTxt(t *testing.T, env *integrationtest.Environment
 	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "my-compiler-that-does-not-exist")
+	assert.CmdExitCode(t, feedback.ErrCompilation, err)
 }
 
 func compileUsingBoardsLocalTxt(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
@@ -737,6 +757,7 @@ func compileUsingBoardsLocalTxt(t *testing.T, env *integrationtest.Environment, 
 	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "Error during build: Invalid FQBN: board arduino:avr:nessuno not found")
+	assert.CmdExitCode(t, feedback.ErrCompilation, err)
 
 	// Use custom boards.local.txt with made arduino:avr:nessuno board
 	boardsLocalTxt := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.8.5", "boards.local.txt")
@@ -999,6 +1020,7 @@ func TestCompileManuallyInstalledPlatformUsingPlatformLocalTxt(t *testing.T) {
 	_, stderr, err := cli.Run("compile", "--clean", "-b", fqbn, sketchPath.String())
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "my-compiler-that-does-not-exist")
+	assert.CmdExitCode(t, feedback.ErrCompilation, err)
 }
 
 func compileWithInvalidBuildOptionJson(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
@@ -1134,6 +1156,7 @@ func compileWithFakeSecureBootCore(t *testing.T, env *integrationtest.Environmen
 	)
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "Flag --sign-key is mandatory when used in conjunction with: --keys-keychain, --sign-key, --encrypt-key")
+	assert.CmdExitCode(t, feedback.ErrBadArgument, err)
 
 	// Verifies compilation works with secure boot enabled and when overriding the sign key and encryption key used
 	keysDir := cli.SketchbookDir().Join("keys_dir")
