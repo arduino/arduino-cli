@@ -1359,6 +1359,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#setsketchdefaultsrequest" class="md-nav__link">
+    SetSketchDefaultsRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setsketchdefaultsresponse" class="md-nav__link">
+    SetSketchDefaultsResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#updateindexrequest" class="md-nav__link">
     UpdateIndexRequest
   </a>
@@ -2675,6 +2689,20 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#setsketchdefaultsrequest" class="md-nav__link">
+    SetSketchDefaultsRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setsketchdefaultsresponse" class="md-nav__link">
+    SetSketchDefaultsResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#updateindexrequest" class="md-nav__link">
     UpdateIndexRequest
   </a>
@@ -3511,6 +3539,8 @@
 <li><a href="#cc.arduino.cli.commands.v1.LoadSketchResponse">LoadSketchResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.NewSketchRequest">NewSketchRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.NewSketchResponse">NewSketchResponse</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.SetSketchDefaultsRequest">SetSketchDefaultsRequest</a></li>
+<li><a href="#cc.arduino.cli.commands.v1.SetSketchDefaultsResponse">SetSketchDefaultsResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.UpdateIndexRequest">UpdateIndexRequest</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.UpdateIndexResponse">UpdateIndexResponse</a></li>
 <li><a href="#cc.arduino.cli.commands.v1.UpdateLibrariesIndexRequest">UpdateLibrariesIndexRequest</a></li>
@@ -4646,6 +4676,24 @@
 <td>repeated</td>
 <td>List of absolute paths to supported files in the sketch root folder, main file excluded</td>
 </tr>
+<tr>
+<td>default_fqbn</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Default FQBN set in project file (sketch.yaml)</td>
+</tr>
+<tr>
+<td>default_port</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Default Port set in project file (sketch.yaml)</td>
+</tr>
+<tr>
+<td>default_protocol</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Default Protocol set in project file (sketch.yaml)</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.NewSketchRequest"></a></p>
@@ -4697,6 +4745,76 @@
 <td><a href="#string">string</a></td>
 <td></td>
 <td>Absolute path to a main sketch file</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.SetSketchDefaultsRequest"></a></p>
+<h3 id="setsketchdefaultsrequest">SetSketchDefaultsRequest<a class="headerlink" href="#setsketchdefaultsrequest" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sketch_path</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Absolute path to Sketch file or folder containing Sketch file</td>
+</tr>
+<tr>
+<td>default_fqbn</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The desired value for default_fqbn in project file (sketch.yaml)</td>
+</tr>
+<tr>
+<td>default_port_address</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The desired value for default_port in project file (sketch.yaml)</td>
+</tr>
+<tr>
+<td>default_port_protocol</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The desired value for default_protocol in project file (sketch.yaml)</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.SetSketchDefaultsResponse"></a></p>
+<h3 id="setsketchdefaultsresponse">SetSketchDefaultsResponse<a class="headerlink" href="#setsketchdefaultsresponse" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>default_fqbn</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The value of default_fqnn that has been written in project file (sketch.yaml)</td>
+</tr>
+<tr>
+<td>default_port_address</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The value of default_port that has been written in project file (sketch.yaml)</td>
+</tr>
+<tr>
+<td>default_port_protocol</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The value of default_protocol that has been written in project file (sketch.yaml)</td>
 </tr>
 </tbody>
 </table>
@@ -4907,6 +5025,12 @@
 <td><a href="#cc.arduino.cli.commands.v1.ArchiveSketchRequest">ArchiveSketchRequest</a></td>
 <td><a href="#cc.arduino.cli.commands.v1.ArchiveSketchResponse">ArchiveSketchResponse</a></td>
 <td>Creates a zip file containing all files of specified Sketch</td>
+</tr>
+<tr>
+<td>SetSketchDefaults</td>
+<td><a href="#cc.arduino.cli.commands.v1.SetSketchDefaultsRequest">SetSketchDefaultsRequest</a></td>
+<td><a href="#cc.arduino.cli.commands.v1.SetSketchDefaultsResponse">SetSketchDefaultsResponse</a></td>
+<td>Sets the sketch default FQBN and Port Address/Protocol in the sketch project file (sketch.yaml). These metadata can be retrieved using LoadSketch.</td>
 </tr>
 <tr>
 <td>BoardDetails</td>
