@@ -302,7 +302,7 @@ func TestAddRemoveSetDeleteOnUnexistingKey(t *testing.T) {
 
 	_, stderr, err = cli.Run("config", "delete", "some.key", "--config-file", "arduino-cli.yaml")
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "Settings key doesn't exist")
+	require.Contains(t, string(stderr), "Cannot delete the key some.key: key not found in settings\n")
 }
 
 func TestAddSingleArgument(t *testing.T) {
