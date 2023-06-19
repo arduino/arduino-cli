@@ -99,7 +99,7 @@ type ArduinoCoreServiceClient interface {
 	// Creates a zip file containing all files of specified Sketch
 	ArchiveSketch(ctx context.Context, in *ArchiveSketchRequest, opts ...grpc.CallOption) (*ArchiveSketchResponse, error)
 	// Sets the sketch default FQBN and Port Address/Protocol in
-	// the sketch project file (skteth.yaml). These metedata can be retrieved
+	// the sketch project file (sketch.yaml). These metadata can be retrieved
 	// using LoadSketch.
 	SetSketchDefaults(ctx context.Context, in *SetSketchDefaultsRequest, opts ...grpc.CallOption) (*SetSketchDefaultsResponse, error)
 	// Requests details about a board
@@ -1008,7 +1008,7 @@ type ArduinoCoreServiceServer interface {
 	// Creates a zip file containing all files of specified Sketch
 	ArchiveSketch(context.Context, *ArchiveSketchRequest) (*ArchiveSketchResponse, error)
 	// Sets the sketch default FQBN and Port Address/Protocol in
-	// the sketch project file (skteth.yaml). These metedata can be retrieved
+	// the sketch project file (sketch.yaml). These metadata can be retrieved
 	// using LoadSketch.
 	SetSketchDefaults(context.Context, *SetSketchDefaultsRequest) (*SetSketchDefaultsResponse, error)
 	// Requests details about a board

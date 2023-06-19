@@ -61,7 +61,7 @@ service ArduinoCoreService {
   rpc ArchiveSketch(ArchiveSketchRequest) returns (ArchiveSketchResponse) {}
 
   // Sets the sketch default FQBN and Port Address/Protocol in
-  // the sketch project file (skteth.yaml). These metedata can be retrieved
+  // the sketch project file (sketch.yaml). These metadata can be retrieved
   // using LoadSketch.
   rpc SetSketchDefaults(SetSketchDefaultsRequest)
       returns (SetSketchDefaultsResponse) {}
