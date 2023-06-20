@@ -4,6 +4,58 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.34.0
 
+### `board list --watch` command JSON output has changed
+
+`board list --watch` command JSON output changed from:
+
+```
+{
+  "type": "add",
+  "address": "COM3",
+  "label": "COM3",
+  "protocol": "serial",
+  "protocol_label": "Serial Port (USB)",
+  "hardwareId": "93B0245008567CB2",
+  "properties": {
+    "pid": "0x005E",
+    "serialNumber": "93B0245008567CB2",
+    "vid": "0x2341"
+  },
+  "boards": [
+    {
+      "name": "Arduino Nano RP2040 Connect",
+      "fqbn": "arduino:mbed_nano:nanorp2040connect"
+    }
+  ]
+}
+```
+
+to:
+
+```
+{
+  "eventType": "add",
+  "matching_boards": [
+    {
+      "name": "Arduino Nano RP2040 Connect",
+      "fqbn": "arduino:mbed_nano:nanorp2040connect"
+    }
+  ],
+  "port": {
+    "address": "COM3",
+    "label": "COM3",
+    "protocol": "serial",
+    "protocol_label": "Serial Port (USB)",
+    "properties": {
+      "pid": "0x005E",
+      "serialNumber": "93B0245008567CB2",
+      "vid": "0x2341"
+    },
+    "hardware_id": "93B0245008567CB2"
+  }
+}
+```
+
 ### Updated sketch name specifications
 
 [Sketch name specifications](https://arduino.github.io/arduino-cli/dev/sketch-specification) have been updated to
