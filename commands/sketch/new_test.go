@@ -30,6 +30,7 @@ func Test_SketchNameWrongPattern(t *testing.T) {
 		".hello",
 		"-hello",
 		"hello*",
+		"hello.",
 		"||||||||||||||",
 		",`hack[}attempt{];",
 	}
@@ -39,7 +40,7 @@ func Test_SketchNameWrongPattern(t *testing.T) {
 			SketchDir:  t.TempDir(),
 		})
 
-		require.EqualError(t, err, fmt.Sprintf(`Can't create sketch: invalid sketch name "%s": the first character must be alphanumeric or "_", the following ones can also contain "-" and ".".`,
+		require.EqualError(t, err, fmt.Sprintf(`Can't create sketch: invalid sketch name "%s": the first character must be alphanumeric or "_", the following ones can also contain "-" and ".". The last one cannot be ".".`,
 			name))
 	}
 }
@@ -78,7 +79,6 @@ func Test_SketchNameOk(t *testing.T) {
 		"h",
 		"h.ello",
 		"h..ello-world",
-		"h..ello-world.",
 		"hello_world__",
 		"_hello_world",
 		string(lengthLimitName),
@@ -89,5 +89,17 @@ func Test_SketchNameOk(t *testing.T) {
 			SketchDir:  t.TempDir(),
 		})
 		require.Nil(t, err)
+	}
+}
+
+func Test_SketchNameReserved(t *testing.T) {
+	invalidNames := []string{"CON", "PRN", "AUX", "NUL", "COM0", "COM1", "COM2", "COM3", "COM4", "COM5",
+		"COM6", "COM7", "COM8", "COM9", "LPT0", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"}
+	for _, name := range invalidNames {
+		_, err := NewSketch(context.Background(), &commands.NewSketchRequest{
+			SketchName: name,
+			SketchDir:  t.TempDir(),
+		})
+		require.EqualError(t, err, fmt.Sprintf(`Can't create sketch: sketch name cannot be the reserved name "%s"`, name))
 	}
 }

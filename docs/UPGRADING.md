@@ -4,6 +4,13 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.34.0
 
+### Updated sketch name specifications
+
+[Sketch name specifications](https://arduino.github.io/arduino-cli/dev/sketch-specification) have been updated to
+achieve cross-platform compatibility.
+
+Existing sketch names violating the new constraint need to be updated.
+
 ### golang API: `LoadSketch` function has been moved
 
 The function `github.com/arduino/arduino-cli/commands.LoadSketch` has been moved to package

@@ -7,7 +7,9 @@ The programs that run on Arduino boards are called "sketches". This term was inh
 
 The sketch root folder name and code file names must start with a basic letter (`A`-`Z` or `a`-`z`), number (`0`-`9`)
 [<sup>1</sup>](#leading-number-note), or underscore (`_`) [<sup>2</sup>](#leading-underscore-note) followed by basic
-letters, numbers, underscores, dots (`.`) and dashes (`-`). The maximum length is 63 characters.
+letters, numbers, underscores, dots (`.`) and dashes (`-`). The maximum length is 63 characters. The sketch name cannot
+end with a dot (`.`) and cannot be a
+[reserved name](https://learn.microsoft.com/windows/win32/fileio/naming-a-file#naming-conventions).
 
 <a id="leading-number-note"></a> <sup>1</sup> Supported from Arduino IDE 1.8.4. <br />
 <a id="leading-underscore-note"></a> <sup>2</sup> Supported in all versions except Arduino IDE 2.0.4/Arduino CLI
