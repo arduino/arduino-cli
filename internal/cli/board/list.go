@@ -99,15 +99,10 @@ func watchList(inst *rpc.Instance) {
 
 	for event := range eventsChan {
 		feedback.PrintResult(watchEvent{
-			Type:          event.EventType,
-			Label:         event.Port.Port.Label,
-			Address:       event.Port.Port.Address,
-			Protocol:      event.Port.Port.Protocol,
-			ProtocolLabel: event.Port.Port.ProtocolLabel,
-			HardwareID:    event.Port.Port.HardwareId,
-			Properties:    event.Port.Port.Properties,
-			Boards:        event.Port.MatchingBoards,
-			Error:         event.Error,
+			Type:   event.EventType,
+			Boards: event.Port.MatchingBoards,
+			Port:   event.Port.Port,
+			Error:  event.Error,
 		})
 	}
 }
@@ -176,15 +171,10 @@ func (dr result) String() string {
 }
 
 type watchEvent struct {
-	Type          string               `json:"type"`
-	Address       string               `json:"address,omitempty"`
-	Label         string               `json:"label,omitempty"`
-	Protocol      string               `json:"protocol,omitempty"`
-	ProtocolLabel string               `json:"protocol_label,omitempty"`
-	HardwareID    string               `json:"hardwareId,omitempty"`
-	Properties    map[string]string    `json:"properties"`
-	Boards        []*rpc.BoardListItem `json:"boards,omitempty"`
-	Error         string               `json:"error,omitempty"`
+	Type   string               `json:"eventType"`
+	Boards []*rpc.BoardListItem `json:"matching_boards,omitempty"`
+	Port   *rpc.Port            `json:"port,omitempty"`
+	Error  string               `json:"error,omitempty"`
 }
 
 func (dr watchEvent) Data() interface{} {
@@ -199,11 +189,11 @@ func (dr watchEvent) String() string {
 		"remove": tr("Disconnected"),
 	}[dr.Type]
 
-	address := fmt.Sprintf("%s://%s", dr.Protocol, dr.Address)
-	if dr.Protocol == "serial" || dr.Protocol == "" {
-		address = dr.Address
+	address := fmt.Sprintf("%s://%s", dr.Port.Protocol, dr.Port.Address)
+	if dr.Port.Protocol == "serial" || dr.Port.Protocol == "" {
+		address = dr.Port.Address
 	}
-	protocol := dr.ProtocolLabel
+	protocol := dr.Port.ProtocolLabel
 	if boards := dr.Boards; len(boards) > 0 {
 		sort.Slice(boards, func(i, j int) bool {
 			x, y := boards[i], boards[j]
