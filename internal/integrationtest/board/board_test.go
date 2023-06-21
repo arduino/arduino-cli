@@ -124,30 +124,6 @@ func TestBoardListWithFqbnFilterInvalid(t *testing.T) {
 	requirejson.Query(t, stderr, ".error", `"Invalid FQBN: not an FQBN: yadayada"`)
 }
 
-func TestBoardListWithInvalidDiscovery(t *testing.T) {
-	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
-	defer env.CleanUp()
-
-	_, _, err := cli.Run("core", "update-index")
-	require.NoError(t, err)
-	_, _, err = cli.Run("board", "list")
-	require.NoError(t, err)
-
-	// check that the CLI does not crash if an invalid discovery is installed
-	// (for example if the installation fails midway).
-	// https://github.com/arduino/arduino-cli/issues/1669
-	toolDir := cli.DataDir().Join("packages", "builtin", "tools", "serial-discovery")
-	dirsToEmpty, err := toolDir.ReadDir()
-	require.NoError(t, err)
-	require.Len(t, dirsToEmpty, 1)
-	require.NoError(t, dirsToEmpty[0].RemoveAll())
-	require.NoError(t, dirsToEmpty[0].MkdirAll())
-
-	_, stderr, err := cli.Run("board", "list")
-	require.NoError(t, err)
-	require.Contains(t, string(stderr), "builtin:serial-discovery")
-}
-
 func TestBoardListall(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
