@@ -285,6 +285,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#board-list-watch-command-json-output-has-changed" class="md-nav__link">
+    board list --watch command JSON output has changed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#updated-sketch-name-specifications" class="md-nav__link">
     Updated sketch name specifications
   </a>
@@ -2309,6 +2316,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#board-list-watch-command-json-output-has-changed" class="md-nav__link">
+    board list --watch command JSON output has changed
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#updated-sketch-name-specifications" class="md-nav__link">
     Updated sketch name specifications
   </a>
@@ -3269,6 +3283,51 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0340">0.34.0<a class="headerlink" href="#0340" title="Permanent link">&para;</a></h2>
+<h3 id="board-list-watch-command-json-output-has-changed"><code>board list --watch</code> command JSON output has changed<a class="headerlink" href="#board-list-watch-command-json-output-has-changed" title="Permanent link">&para;</a></h3>
+<p><code>board list --watch</code> command JSON output changed from:</p>
+<div class="highlight"><pre><span></span><code>{
+  &quot;type&quot;: &quot;add&quot;,
+  &quot;address&quot;: &quot;COM3&quot;,
+  &quot;label&quot;: &quot;COM3&quot;,
+  &quot;protocol&quot;: &quot;serial&quot;,
+  &quot;protocol_label&quot;: &quot;Serial Port (USB)&quot;,
+  &quot;hardwareId&quot;: &quot;93B0245008567CB2&quot;,
+  &quot;properties&quot;: {
+    &quot;pid&quot;: &quot;0x005E&quot;,
+    &quot;serialNumber&quot;: &quot;93B0245008567CB2&quot;,
+    &quot;vid&quot;: &quot;0x2341&quot;
+  },
+  &quot;boards&quot;: [
+    {
+      &quot;name&quot;: &quot;Arduino Nano RP2040 Connect&quot;,
+      &quot;fqbn&quot;: &quot;arduino:mbed_nano:nanorp2040connect&quot;
+    }
+  ]
+}
+</code></pre></div>
+<p>to:</p>
+<div class="highlight"><pre><span></span><code>{
+  &quot;eventType&quot;: &quot;add&quot;,
+  &quot;matching_boards&quot;: [
+    {
+      &quot;name&quot;: &quot;Arduino Nano RP2040 Connect&quot;,
+      &quot;fqbn&quot;: &quot;arduino:mbed_nano:nanorp2040connect&quot;
+    }
+  ],
+  &quot;port&quot;: {
+    &quot;address&quot;: &quot;COM3&quot;,
+    &quot;label&quot;: &quot;COM3&quot;,
+    &quot;protocol&quot;: &quot;serial&quot;,
+    &quot;protocol_label&quot;: &quot;Serial Port (USB)&quot;,
+    &quot;properties&quot;: {
+      &quot;pid&quot;: &quot;0x005E&quot;,
+      &quot;serialNumber&quot;: &quot;93B0245008567CB2&quot;,
+      &quot;vid&quot;: &quot;0x2341&quot;
+    },
+    &quot;hardware_id&quot;: &quot;93B0245008567CB2&quot;
+  }
+}
+</code></pre></div>
 <h3 id="updated-sketch-name-specifications">Updated sketch name specifications<a class="headerlink" href="#updated-sketch-name-specifications" title="Permanent link">&para;</a></h3>
 <p><a href="https://arduino.github.io/arduino-cli/dev/sketch-specification">Sketch name specifications</a> have been updated to
 achieve cross-platform compatibility.</p>
