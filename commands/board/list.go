@@ -159,6 +159,7 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardL
 		boards = append(boards, &rpc.BoardListItem{
 			Name:     board.Name(),
 			Fqbn:     fqbn.String(),
+			IsHidden: board.IsHidden(),
 			Platform: platform,
 		})
 	}
