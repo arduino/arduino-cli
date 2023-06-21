@@ -405,7 +405,7 @@ func TestBoardSearch(t *testing.T) {
 	// Verifies no board has FQBN set since no platform is installed
 	requirejson.Query(t, stdout, "[ .[] | select(.fqbn) ] | length", "0")
 	requirejson.Contains(t, stdout, `[
-		{"name": "Arduino Uno"},
+		{"name": "Arduino UNO"},
 		{"name": "Arduino Yún"},
 		{"name": "Arduino Zero"},
 		{"name": "Arduino Nano 33 BLE"},
