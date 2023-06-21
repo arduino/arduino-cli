@@ -68,9 +68,13 @@ func TestCoreSearch(t *testing.T) {
 	require.NoError(t, err)
 	require.Greater(t, len(strings.Split(string(out), "\n")), 2)
 
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.6")
+	require.NoError(t, err)
 	out, _, err = cli.Run("core", "search", "avr", "--format", "json")
 	require.NoError(t, err)
 	requirejson.NotEmpty(t, out)
+	// Verify that "installed" is set
+	requirejson.Contains(t, out, `[{installed: "1.8.6"}]`)
 
 	// additional URL
 	out, _, err = cli.Run("core", "search", "test_core", "--format", "json", "--additional-urls="+url.String())

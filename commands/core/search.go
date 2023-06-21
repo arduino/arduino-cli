@@ -85,6 +85,9 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 	out := make([]*rpc.Platform, len(res))
 	for i, platformRelease := range res {
 		out[i] = commands.PlatformReleaseToRPC(platformRelease)
+		if platformRelease.IsInstalled() {
+			out[i].Installed = platformRelease.Version.String()
+		}
 	}
 	// Sort result alphabetically and put deprecated platforms at the bottom
 	sort.Slice(
