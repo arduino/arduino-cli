@@ -171,6 +171,7 @@ func TestDaemonCompileOptions(t *testing.T) {
 	// Build sketch (without errors)
 	compile, err = grpcInst.Compile(context.Background(), "arduino:avr:uno:some_menu=good", sk.String(), "")
 	require.NoError(t, err)
+	analyzer := NewTaskProgressAnalyzer(t)
 	for {
 		msg, err := compile.Recv()
 		if err == io.EOF {
@@ -180,7 +181,19 @@ func TestDaemonCompileOptions(t *testing.T) {
 		if msg.ErrStream != nil {
 			fmt.Printf("COMPILE> %v\n", string(msg.GetErrStream()))
 		}
+		analyzer.Process(msg.GetProgress())
 	}
+	// https://github.com/arduino/arduino-cli/issues/2016
+	// assert that the task progress is increasing and doesn't contain multiple 100% values
+	results := analyzer.Results[""]
+	require.True(t, results[len(results)-1].Completed)
+	require.IsNonDecreasing(t, func() []float32{
+		res := make([]float32, len(results))
+		for i := 0; i < len(results); i++ {
+			res[i] = results[i].Percent
+		}
+		return res
+	}())
 }
 
 func TestDaemonCompileAfterFailedLibInstall(t *testing.T) {
