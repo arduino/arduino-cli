@@ -200,7 +200,10 @@ func (ctx *Context) ExtractBuildOptions() *properties.Map {
 
 func (ctx *Context) PushProgress() {
 	if ctx.ProgressCB != nil {
-		ctx.ProgressCB(&rpc.TaskProgress{Percent: ctx.Progress.Progress})
+		ctx.ProgressCB(&rpc.TaskProgress{
+			Percent:   ctx.Progress.Progress,
+			Completed: ctx.Progress.Progress >= 100.0,
+		})
 	}
 }
 
