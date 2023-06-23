@@ -23,14 +23,13 @@ import (
 type ContainerSetupHardwareToolsLibsSketchAndProps struct{}
 
 func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) error {
-	// total number of steps in this container: 4
-	ctx.Progress.AddSubSteps(4)
-	defer ctx.Progress.RemoveSubSteps()
 	commands := []types.Command{
 		&AddAdditionalEntriesToContext{},
 		&FailIfBuildPathEqualsSketchPath{},
 		&LibrariesLoader{},
 	}
+	ctx.Progress.AddSubSteps(len(commands))
+	defer ctx.Progress.RemoveSubSteps()
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
 		err := command.Run(ctx)
