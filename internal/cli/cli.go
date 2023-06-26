@@ -43,7 +43,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/upgrade"
 	"github.com/arduino/arduino-cli/internal/cli/upload"
 	"github.com/arduino/arduino-cli/internal/cli/version"
-	"github.com/arduino/arduino-cli/inventory"
+	"github.com/arduino/arduino-cli/internal/inventory"
 	versioninfo "github.com/arduino/arduino-cli/version"
 	"github.com/fatih/color"
 	"github.com/mattn/go-colorable"
