@@ -142,7 +142,9 @@ func TestWrite(t *testing.T) {
 	require.NoError(t, err)
 
 	tempDir := paths.TempDir()
-	testFolder, _ := tempDir.MkTempDir("testdata")
+	testFolder, err := tempDir.MkTempDir("testdata")
+	require.NoError(t, err)
+	defer testFolder.RemoveAll()
 
 	// Verifies config files doesn't exist
 	configFile := testFolder.Join("arduino-cli.yml")
@@ -156,4 +158,19 @@ func TestWrite(t *testing.T) {
 	// Verifies config file is created.
 	// We don't verify the content since we expect config library, Viper, to work
 	require.True(t, configFile.Exist())
+}
+
+func TestDelete(t *testing.T) {
+	_, err := svc.Delete(context.Background(), &rpc.DeleteRequest{
+		Key: "doesnotexist",
+	})
+	require.Error(t, err)
+
+	_, err = svc.Delete(context.Background(), &rpc.DeleteRequest{
+		Key: "network",
+	})
+	require.NoError(t, err)
+
+	_, err = svc.GetValue(context.Background(), &rpc.GetValueRequest{Key: "network"})
+	require.Error(t, err)
 }

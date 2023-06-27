@@ -17,13 +17,13 @@ package config
 
 import (
 	"os"
-	"strings"
 
+	"github.com/arduino/arduino-cli/commands/daemon"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 func initDeleteCommand() *cobra.Command {
@@ -47,26 +47,13 @@ func runDeleteCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli config delete`")
 	toDelete := args[0]
 
-	keys := []string{}
-	exists := false
-	for _, v := range configuration.Settings.AllKeys() {
-		if !strings.HasPrefix(v, toDelete) {
-			keys = append(keys, v)
-			continue
-		}
-		exists = true
+	svc := daemon.SettingsService{}
+	_, err := svc.Delete(cmd.Context(), &settings.DeleteRequest{Key: toDelete})
+	if err != nil {
+		feedback.Fatal(tr("Cannot delete the key %[1]s: %[2]v", toDelete, err), feedback.ErrGeneric)
 	}
-
-	if !exists {
-		feedback.Fatal(tr("Settings key doesn't exist"), feedback.ErrGeneric)
-	}
-
-	updatedSettings := viper.New()
-	for _, k := range keys {
-		updatedSettings.Set(k, configuration.Settings.Get(k))
-	}
-
-	if err := updatedSettings.WriteConfigAs(configuration.Settings.ConfigFileUsed()); err != nil {
-		feedback.Fatal(tr("Can't write config file: %v", err), feedback.ErrGeneric)
+	_, err = svc.Write(cmd.Context(), &settings.WriteRequest{FilePath: configuration.Settings.ConfigFileUsed()})
+	if err != nil {
+		feedback.Fatal(tr("Cannot write the file %[1]s: %[2]v", configuration.Settings.ConfigFileUsed(), err), feedback.ErrGeneric)
 	}
 }

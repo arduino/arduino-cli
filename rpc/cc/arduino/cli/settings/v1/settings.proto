@@ -36,6 +36,9 @@ service SettingsService {
 
   // Writes to file settings currently stored in memory
   rpc Write(WriteRequest) returns (WriteResponse);
+
+  // Deletes an entry and rewrites the file settings
+  rpc Delete(DeleteRequest) returns (DeleteResponse);
 }
 
 message GetAllResponse {
@@ -79,3 +82,10 @@ message WriteRequest {
 }
 
 message WriteResponse {}
+
+message DeleteRequest {
+  // The key of the setting to delete.
+  string key = 1;
+}
+
+message DeleteResponse {}
