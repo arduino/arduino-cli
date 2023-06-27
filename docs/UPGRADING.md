@@ -4,6 +4,10 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.34.0
 
+### golang package `github.com/arduino/arduino-cli/inventory` removed from public API
+
+The package `inventory` is no more a public golang API.
+
 ### `board list --watch` command JSON output has changed
 
 `board list --watch` command JSON output changed from:

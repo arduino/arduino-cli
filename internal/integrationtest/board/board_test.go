@@ -589,3 +589,21 @@ func TestBoardListWithFailedBuiltinInstallation(t *testing.T) {
 	require.Empty(t, stderr)
 	require.Contains(t, string(stdout), "Downloading missing tool builtin:serial-discovery")
 }
+
+func TestCLIStartupWithCorruptedInventory(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	f, err := cli.DataDir().Join("inventory.yaml").Append()
+	require.NoError(t, err)
+	_, err = f.WriteString(`data: '[{"name":"WCH;32?'","fqbn":"esp32:esp32:esp32s3camlcd"}]'`)
+	require.NoError(t, err)
+
+	// the CLI should not be able to load inventory and report it to the logs
+	_, stderr, err := cli.Run("core", "update-index", "-v")
+	require.NoError(t, err)
+	require.Contains(t, string(stderr), "Error loading inventory store")
+}

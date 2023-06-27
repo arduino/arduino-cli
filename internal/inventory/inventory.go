@@ -23,6 +23,7 @@ import (
 
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/gofrs/uuid"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -46,17 +47,15 @@ func Init(configPath string) error {
 	Store.AddConfigPath(configPath)
 	// Attempt to read config file
 	if err := Store.ReadInConfig(); err != nil {
-		// ConfigFileNotFoundError is acceptable, anything else
-		// should be reported to the user
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			if err := generateInstallationData(); err != nil {
-				return err
-			}
-			if err := WriteStore(); err != nil {
-				return err
-			}
-		} else {
-			return fmt.Errorf(tr("reading inventory file: %w"), err)
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			// If an error occurs during initalization of the store, just log it and recreate it from scratch.
+			logrus.WithError(err).Error("Error loading inventory store")
+		}
+		if err := generateInstallationData(); err != nil {
+			return err
+		}
+		if err := WriteStore(); err != nil {
+			return err
 		}
 	}
 
