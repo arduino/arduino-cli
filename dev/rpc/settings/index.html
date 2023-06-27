@@ -1115,6 +1115,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#deleterequest" class="md-nav__link">
+    DeleteRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deleteresponse" class="md-nav__link">
+    DeleteResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#getallrequest" class="md-nav__link">
     GetAllRequest
   </a>
@@ -1473,6 +1487,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#deleterequest" class="md-nav__link">
+    DeleteRequest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deleteresponse" class="md-nav__link">
+    DeleteResponse
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#getallrequest" class="md-nav__link">
     GetAllRequest
   </a>
@@ -1585,6 +1613,8 @@
 <li>
 <p><a href="#cc/arduino/cli/settings/v1/settings.proto">cc/arduino/cli/settings/v1/settings.proto</a></p>
 <ul>
+<li><a href="#cc.arduino.cli.settings.v1.DeleteRequest">DeleteRequest</a></li>
+<li><a href="#cc.arduino.cli.settings.v1.DeleteResponse">DeleteResponse</a></li>
 <li><a href="#cc.arduino.cli.settings.v1.GetAllRequest">GetAllRequest</a></li>
 <li><a href="#cc.arduino.cli.settings.v1.GetAllResponse">GetAllResponse</a></li>
 <li><a href="#cc.arduino.cli.settings.v1.GetValueRequest">GetValueRequest</a></li>
@@ -1608,6 +1638,28 @@
 <p align="right"><a href="#top">Top</a></p>
 
 <h2 id="ccarduinoclisettingsv1settingsproto">cc/arduino/cli/settings/v1/settings.proto<a class="headerlink" href="#ccarduinoclisettingsv1settingsproto" title="Permanent link">&para;</a></h2>
+<p><a name="cc.arduino.cli.settings.v1.DeleteRequest"></a></p>
+<h3 id="deleterequest">DeleteRequest<a class="headerlink" href="#deleterequest" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>key</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>The key of the setting to delete.</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.settings.v1.DeleteResponse"></a></p>
+<h3 id="deleteresponse">DeleteResponse<a class="headerlink" href="#deleteresponse" title="Permanent link">&para;</a></h3>
 <p><a name="cc.arduino.cli.settings.v1.GetAllRequest"></a></p>
 <h3 id="getallrequest">GetAllRequest<a class="headerlink" href="#getallrequest" title="Permanent link">&para;</a></h3>
 <p><a name="cc.arduino.cli.settings.v1.GetAllResponse"></a></p>
@@ -1790,6 +1842,12 @@
 <td><a href="#cc.arduino.cli.settings.v1.WriteRequest">WriteRequest</a></td>
 <td><a href="#cc.arduino.cli.settings.v1.WriteResponse">WriteResponse</a></td>
 <td>Writes to file settings currently stored in memory</td>
+</tr>
+<tr>
+<td>Delete</td>
+<td><a href="#cc.arduino.cli.settings.v1.DeleteRequest">DeleteRequest</a></td>
+<td><a href="#cc.arduino.cli.settings.v1.DeleteResponse">DeleteResponse</a></td>
+<td>Deletes an entry and rewrites the file settings</td>
 </tr>
 </tbody>
 </table>
