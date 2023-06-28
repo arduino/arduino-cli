@@ -192,6 +192,8 @@ func ComputePriority(lib *libraries.Library, header, arch string) int {
 		priority += 600
 	} else if name == header || dirName == header {
 		priority += 500
+	} else if name == header+"-main" || dirName == header+"-main" {
+		priority += 410
 	} else if name == header+"-master" || dirName == header+"-master" {
 		priority += 400
 	} else if strings.HasPrefix(name, header) || strings.HasPrefix(dirName, header) {
