@@ -17,6 +17,7 @@ package serialutils
 
 import (
 	"fmt"
+	"runtime"
 	"strings"
 	"time"
 
@@ -37,10 +38,15 @@ func TouchSerialPortAt1200bps(port string) error {
 		return errors.WithMessage(err, tr("opening port at 1200bps"))
 	}
 
-	// Set DTR to false
-	if err = p.SetDTR(false); err != nil {
-		p.Close()
-		return errors.WithMessage(err, tr("setting DTR to OFF"))
+	if runtime.GOOS != "windows" {
+		// This is not required on Windows
+		// TODO: Investigate if it can be removed for other OS too
+
+		// Set DTR to false
+		if err = p.SetDTR(false); err != nil {
+			p.Close()
+			return errors.WithMessage(err, tr("setting DTR to OFF"))
+		}
 	}
 
 	// Close serial port
