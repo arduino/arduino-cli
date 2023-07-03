@@ -110,6 +110,7 @@ func TestCppHeaderPriority(t *testing.T) {
 	r5 := ComputePriority(l5, "calculus_lib.h", "avr")
 	r6 := ComputePriority(l6, "calculus_lib.h", "avr")
 	r7 := ComputePriority(l7, "calculus_lib.h", "avr")
+	r8 := ComputePriority(l8, "calculus_lib.h", "avr")
 	require.True(t, r1 > r2)
 	require.True(t, r2 > r3)
 	require.True(t, r3 > r4)
