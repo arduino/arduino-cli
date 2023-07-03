@@ -92,14 +92,14 @@ func TestArchitecturePriority(t *testing.T) {
 
 func TestClosestMatchWithTotallyDifferentNames(t *testing.T) {
 	libraryList := libraries.List{}
-	libraryList.Add(l5)
 	libraryList.Add(l6)
 	libraryList.Add(l7)
+	libraryList.Add(l8)
 	resolver := NewCppResolver()
 	resolver.headers["XYZ.h"] = libraryList
 	res := resolver.ResolveFor("XYZ.h", "xyz")
 	require.NotNil(t, res)
-	require.Equal(t, l7, res, "selected library")
+	require.Equal(t, l8, res, "selected library")
 }
 
 func TestCppHeaderPriority(t *testing.T) {
