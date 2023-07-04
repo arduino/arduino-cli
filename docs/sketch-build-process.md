@@ -101,6 +101,7 @@ The "library name priority" is determined as follows (in order of highest to low
 | Rule                                                                      | Example for `Arduino_Low_Power.h` |
 | ------------------------------------------------------------------------- | --------------------------------- |
 | The library name matches the include 100%                                 | `Arduino Low Power`               |
+| The library name matches the include 100%, except with a `-main` suffix   | `Arduino Low Power-main`          |
 | The library name matches the include 100%, except with a `-master` suffix | `Arduino Low Power-master`        |
 | The library name has a matching prefix                                    | `Arduino Low Power Whatever`      |
 | The library name has a matching suffix                                    | `Awesome Arduino Low Power`       |
@@ -113,6 +114,7 @@ The "folder name priority" is determined as follows (in order of highest to lowe
 | Rule                                                                     | Example for `Servo.h`       |
 | ------------------------------------------------------------------------ | --------------------------- |
 | The folder name matches the include 100%                                 | `Servo`                     |
+| The folder name matches the include 100%, except with a `-main` suffix   | `Servo-main`                |
 | The folder name matches the include 100%, except with a `-master` suffix | `Servo-master`              |
 | The folder name has a matching prefix                                    | `ServoWhatever`             |
 | The folder name has a matching suffix                                    | `AwesomeServo`              |
