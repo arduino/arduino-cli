@@ -1058,3 +1058,16 @@ func TestCoreUpgradeWarningWithPackageInstalledButNotIndexed(t *testing.T) {
 		requirejson.Query(t, jsonStdout, ".warnings[]", `"missing package index for test:x86, future updates cannot be guaranteed"`)
 	})
 }
+
+func TestCoreListWhenNoPlatformAreInstalled(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	stdout, _, err := cli.Run("core", "list", "--format", "json")
+	require.NoError(t, err)
+	requirejson.Empty(t, stdout)
+
+	stdout, _, err = cli.Run("core", "list")
+	require.NoError(t, err)
+	require.Equal(t, "ID Installed Latest Name\n\n", string(stdout))
+}
