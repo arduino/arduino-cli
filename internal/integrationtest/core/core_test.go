@@ -1069,5 +1069,5 @@ func TestCoreListWhenNoPlatformAreInstalled(t *testing.T) {
 
 	stdout, _, err = cli.Run("core", "list")
 	require.NoError(t, err)
-	require.Equal(t, "ID Installed Latest Name\n\n", string(stdout))
+	require.Equal(t, "No platforms installed.\n", string(stdout))
 }

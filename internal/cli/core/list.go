@@ -82,6 +82,9 @@ func (ir installedResult) Data() interface{} {
 }
 
 func (ir installedResult) String() string {
+	if len(ir.platforms) == 0 {
+		return tr("No platforms installed.")
+	}
 	t := table.New()
 	t.SetHeader(tr("ID"), tr("Installed"), tr("Latest"), tr("Name"))
 	for _, p := range ir.platforms {
