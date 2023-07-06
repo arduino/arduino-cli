@@ -1526,19 +1526,13 @@
 <p><a name="top"></a></p>
 <h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h2>
 <ul>
-<li>
-<p><a href="#cc/arduino/cli/debug/v1/debug.proto">cc/arduino/cli/debug/v1/debug.proto</a></p>
-<ul>
-<li><a href="#cc.arduino.cli.debug.v1.DebugConfigRequest">DebugConfigRequest</a></li>
-<li><a href="#cc.arduino.cli.debug.v1.DebugRequest">DebugRequest</a></li>
-<li><a href="#cc.arduino.cli.debug.v1.DebugResponse">DebugResponse</a></li>
-<li><a href="#cc.arduino.cli.debug.v1.GetDebugConfigResponse">GetDebugConfigResponse</a></li>
-<li><a href="#cc.arduino.cli.debug.v1.GetDebugConfigResponse.ServerConfigurationEntry">GetDebugConfigResponse.ServerConfigurationEntry</a></li>
-<li><a href="#cc.arduino.cli.debug.v1.GetDebugConfigResponse.ToolchainConfigurationEntry">GetDebugConfigResponse.ToolchainConfigurationEntry</a></li>
-</ul>
-<ul>
-<li><a href="#cc.arduino.cli.debug.v1.DebugService">DebugService</a></li>
-</ul>
+<li><a href="#cc/arduino/cli/debug/v1/debug.proto">cc/arduino/cli/debug/v1/debug.proto</a>
+    - <a href="#cc.arduino.cli.debug.v1.DebugConfigRequest">DebugConfigRequest</a>
+    - <a href="#cc.arduino.cli.debug.v1.DebugRequest">DebugRequest</a>
+    - <a href="#cc.arduino.cli.debug.v1.DebugResponse">DebugResponse</a>
+    - <a href="#cc.arduino.cli.debug.v1.GetDebugConfigResponse">GetDebugConfigResponse</a>
+    - <a href="#cc.arduino.cli.debug.v1.GetDebugConfigResponse.ServerConfigurationEntry">GetDebugConfigResponse.ServerConfigurationEntry</a>
+    - <a href="#cc.arduino.cli.debug.v1.GetDebugConfigResponse.ToolchainConfigurationEntry">GetDebugConfigResponse.ToolchainConfigurationEntry</a><p>- <a href="#cc.arduino.cli.debug.v1.DebugService">DebugService</a></p>
 </li>
 </ul>
 <ul>
@@ -1606,9 +1600,11 @@
 </table>
 <p><a name="cc.arduino.cli.debug.v1.DebugRequest"></a></p>
 <h3 id="debugrequest">DebugRequest<a class="headerlink" href="#debugrequest" title="Permanent link">&para;</a></h3>
-<p>The top-level message sent by the client for the <code>Debug</code> method. Multiple <code>DebugReq</code> messages can be sent but the first
-message must contain a <code>DebugConfigReq</code> message to initialize the debug session. All subsequent messages must contain
-bytes to be sent to the debug session and must not contain a <code>DebugReq</code> message.</p>
+<p>The top-level message sent by the client for the <code>Debug</code> method.
+Multiple <code>DebugReq</code> messages can be sent but the first message
+must contain a <code>DebugConfigReq</code> message to initialize the debug session.
+All subsequent messages must contain bytes to be sent to the debug session
+and must not contain a <code>DebugReq</code> message.</p>
 <p>Content must be either a debug session config or data to be sent.</p>
 <table>
 <thead>

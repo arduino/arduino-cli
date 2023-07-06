@@ -3498,180 +3498,166 @@
 <p><a name="top"></a></p>
 <h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="#cc/arduino/cli/commands/v1/board.proto">cc/arduino/cli/commands/v1/board.proto</a><ul>
-<li><a href="#cc.arduino.cli.commands.v1.BoardDetailsRequest">BoardDetailsRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.BoardDetailsResponse">BoardDetailsResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.BoardIdentificationProperties">BoardIdentificationProperties</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.BoardIdentificationProperties.PropertiesEntry">BoardIdentificationProperties.PropertiesEntry</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.BoardListAllRequest">BoardListAllRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.BoardListAllResponse">BoardListAllResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.BoardListItem">BoardListItem</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.BoardListRequest">BoardListRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.BoardListResponse">BoardListResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.BoardListWatchRequest">BoardListWatchRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.BoardListWatchResponse">BoardListWatchResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.BoardPlatform">BoardPlatform</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.BoardSearchRequest">BoardSearchRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.BoardSearchResponse">BoardSearchResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.ConfigOption">ConfigOption</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.ConfigValue">ConfigValue</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.DetectedPort">DetectedPort</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.Help">Help</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.Package">Package</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.Systems">Systems</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.ToolsDependencies">ToolsDependencies</a></li>
-</ul>
-</li>
-<li>
-<p><a href="#cc/arduino/cli/commands/v1/commands.proto">cc/arduino/cli/commands/v1/commands.proto</a></p>
-<ul>
-<li><a href="#cc.arduino.cli.commands.v1.ArchiveSketchRequest">ArchiveSketchRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.ArchiveSketchResponse">ArchiveSketchResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.CreateRequest">CreateRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.CreateResponse">CreateResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.DestroyRequest">DestroyRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.DestroyResponse">DestroyResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.FailedInstanceInitError">FailedInstanceInitError</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.InitRequest">InitRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.InitResponse">InitResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.InitResponse.Progress">InitResponse.Progress</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LoadSketchRequest">LoadSketchRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LoadSketchResponse">LoadSketchResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.NewSketchRequest">NewSketchRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.NewSketchResponse">NewSketchResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.SetSketchDefaultsRequest">SetSketchDefaultsRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.SetSketchDefaultsResponse">SetSketchDefaultsResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.UpdateIndexRequest">UpdateIndexRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.UpdateIndexResponse">UpdateIndexResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.UpdateLibrariesIndexRequest">UpdateLibrariesIndexRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.UpdateLibrariesIndexResponse">UpdateLibrariesIndexResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.VersionRequest">VersionRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.VersionResponse">VersionResponse</a></li>
+<li><a href="#cc/arduino/cli/commands/v1/board.proto">cc/arduino/cli/commands/v1/board.proto</a>
+    - <a href="#cc.arduino.cli.commands.v1.BoardDetailsRequest">BoardDetailsRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.BoardDetailsResponse">BoardDetailsResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.BoardIdentificationProperties">BoardIdentificationProperties</a>
+    - <a href="#cc.arduino.cli.commands.v1.BoardIdentificationProperties.PropertiesEntry">BoardIdentificationProperties.PropertiesEntry</a>
+    - <a href="#cc.arduino.cli.commands.v1.BoardListAllRequest">BoardListAllRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.BoardListAllResponse">BoardListAllResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.BoardListItem">BoardListItem</a>
+    - <a href="#cc.arduino.cli.commands.v1.BoardListRequest">BoardListRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.BoardListResponse">BoardListResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.BoardListWatchRequest">BoardListWatchRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.BoardListWatchResponse">BoardListWatchResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.BoardPlatform">BoardPlatform</a>
+    - <a href="#cc.arduino.cli.commands.v1.BoardSearchRequest">BoardSearchRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.BoardSearchResponse">BoardSearchResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.ConfigOption">ConfigOption</a>
+    - <a href="#cc.arduino.cli.commands.v1.ConfigValue">ConfigValue</a>
+    - <a href="#cc.arduino.cli.commands.v1.DetectedPort">DetectedPort</a>
+    - <a href="#cc.arduino.cli.commands.v1.Help">Help</a>
+    - <a href="#cc.arduino.cli.commands.v1.Package">Package</a>
+    - <a href="#cc.arduino.cli.commands.v1.Systems">Systems</a>
+    - <a href="#cc.arduino.cli.commands.v1.ToolsDependencies">ToolsDependencies</a></li>
 </ul>
 <ul>
-<li><a href="#cc.arduino.cli.commands.v1.FailedInstanceInitReason">FailedInstanceInitReason</a></li>
-</ul>
-<ul>
-<li><a href="#cc.arduino.cli.commands.v1.ArduinoCoreService">ArduinoCoreService</a></li>
-</ul>
+<li><a href="#cc/arduino/cli/commands/v1/commands.proto">cc/arduino/cli/commands/v1/commands.proto</a>
+    - <a href="#cc.arduino.cli.commands.v1.ArchiveSketchRequest">ArchiveSketchRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.ArchiveSketchResponse">ArchiveSketchResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.CreateRequest">CreateRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.CreateResponse">CreateResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.DestroyRequest">DestroyRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.DestroyResponse">DestroyResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.FailedInstanceInitError">FailedInstanceInitError</a>
+    - <a href="#cc.arduino.cli.commands.v1.InitRequest">InitRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.InitResponse">InitResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.InitResponse.Progress">InitResponse.Progress</a>
+    - <a href="#cc.arduino.cli.commands.v1.LoadSketchRequest">LoadSketchRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.LoadSketchResponse">LoadSketchResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.NewSketchRequest">NewSketchRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.NewSketchResponse">NewSketchResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.SetSketchDefaultsRequest">SetSketchDefaultsRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.SetSketchDefaultsResponse">SetSketchDefaultsResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.UpdateIndexRequest">UpdateIndexRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.UpdateIndexResponse">UpdateIndexResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.UpdateLibrariesIndexRequest">UpdateLibrariesIndexRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.UpdateLibrariesIndexResponse">UpdateLibrariesIndexResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.VersionRequest">VersionRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.VersionResponse">VersionResponse</a><p>- <a href="#cc.arduino.cli.commands.v1.FailedInstanceInitReason">FailedInstanceInitReason</a></p>
+<p>- <a href="#cc.arduino.cli.commands.v1.ArduinoCoreService">ArduinoCoreService</a></p>
 </li>
 </ul>
 <ul>
-<li><a href="#cc/arduino/cli/commands/v1/common.proto">cc/arduino/cli/commands/v1/common.proto</a><ul>
-<li><a href="#cc.arduino.cli.commands.v1.Board">Board</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.DownloadProgress">DownloadProgress</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.DownloadProgressEnd">DownloadProgressEnd</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.DownloadProgressStart">DownloadProgressStart</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.DownloadProgressUpdate">DownloadProgressUpdate</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.HelpResources">HelpResources</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.InstalledPlatformReference">InstalledPlatformReference</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.Instance">Instance</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.Platform">Platform</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.Profile">Profile</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.Programmer">Programmer</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.TaskProgress">TaskProgress</a></li>
-</ul>
-</li>
-<li><a href="#cc/arduino/cli/commands/v1/compile.proto">cc/arduino/cli/commands/v1/compile.proto</a><ul>
-<li><a href="#cc.arduino.cli.commands.v1.CompileRequest">CompileRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.CompileRequest.SourceOverrideEntry">CompileRequest.SourceOverrideEntry</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.CompileResponse">CompileResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.ExecutableSectionSize">ExecutableSectionSize</a></li>
-</ul>
-</li>
-<li><a href="#cc/arduino/cli/commands/v1/core.proto">cc/arduino/cli/commands/v1/core.proto</a><ul>
-<li><a href="#cc.arduino.cli.commands.v1.AlreadyAtLatestVersionError">AlreadyAtLatestVersionError</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.PlatformDownloadRequest">PlatformDownloadRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.PlatformDownloadResponse">PlatformDownloadResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.PlatformInstallRequest">PlatformInstallRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.PlatformInstallResponse">PlatformInstallResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.PlatformListRequest">PlatformListRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.PlatformListResponse">PlatformListResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.PlatformLoadingError">PlatformLoadingError</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.PlatformSearchRequest">PlatformSearchRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.PlatformSearchResponse">PlatformSearchResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.PlatformUninstallRequest">PlatformUninstallRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.PlatformUninstallResponse">PlatformUninstallResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.PlatformUpgradeRequest">PlatformUpgradeRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.PlatformUpgradeResponse">PlatformUpgradeResponse</a></li>
-</ul>
-</li>
-<li>
-<p><a href="#cc/arduino/cli/commands/v1/lib.proto">cc/arduino/cli/commands/v1/lib.proto</a></p>
-<ul>
-<li><a href="#cc.arduino.cli.commands.v1.DownloadResource">DownloadResource</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.GitLibraryInstallRequest">GitLibraryInstallRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.GitLibraryInstallResponse">GitLibraryInstallResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.InstalledLibrary">InstalledLibrary</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.Library">Library</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.Library.CompatibleWithEntry">Library.CompatibleWithEntry</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.Library.PropertiesEntry">Library.PropertiesEntry</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryDependency">LibraryDependency</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryDependencyStatus">LibraryDependencyStatus</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryDownloadRequest">LibraryDownloadRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryDownloadResponse">LibraryDownloadResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryInstallRequest">LibraryInstallRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryInstallResponse">LibraryInstallResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryListRequest">LibraryListRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryListResponse">LibraryListResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryRelease">LibraryRelease</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryResolveDependenciesRequest">LibraryResolveDependenciesRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryResolveDependenciesResponse">LibraryResolveDependenciesResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibrarySearchRequest">LibrarySearchRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibrarySearchResponse">LibrarySearchResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryUninstallRequest">LibraryUninstallRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryUninstallResponse">LibraryUninstallResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryUpgradeAllRequest">LibraryUpgradeAllRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryUpgradeAllResponse">LibraryUpgradeAllResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryUpgradeRequest">LibraryUpgradeRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryUpgradeResponse">LibraryUpgradeResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.SearchedLibrary">SearchedLibrary</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.SearchedLibrary.ReleasesEntry">SearchedLibrary.ReleasesEntry</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.ZipLibraryInstallRequest">ZipLibraryInstallRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.ZipLibraryInstallResponse">ZipLibraryInstallResponse</a></li>
+<li><a href="#cc/arduino/cli/commands/v1/common.proto">cc/arduino/cli/commands/v1/common.proto</a>
+    - <a href="#cc.arduino.cli.commands.v1.Board">Board</a>
+    - <a href="#cc.arduino.cli.commands.v1.DownloadProgress">DownloadProgress</a>
+    - <a href="#cc.arduino.cli.commands.v1.DownloadProgressEnd">DownloadProgressEnd</a>
+    - <a href="#cc.arduino.cli.commands.v1.DownloadProgressStart">DownloadProgressStart</a>
+    - <a href="#cc.arduino.cli.commands.v1.DownloadProgressUpdate">DownloadProgressUpdate</a>
+    - <a href="#cc.arduino.cli.commands.v1.HelpResources">HelpResources</a>
+    - <a href="#cc.arduino.cli.commands.v1.InstalledPlatformReference">InstalledPlatformReference</a>
+    - <a href="#cc.arduino.cli.commands.v1.Instance">Instance</a>
+    - <a href="#cc.arduino.cli.commands.v1.Platform">Platform</a>
+    - <a href="#cc.arduino.cli.commands.v1.Profile">Profile</a>
+    - <a href="#cc.arduino.cli.commands.v1.Programmer">Programmer</a>
+    - <a href="#cc.arduino.cli.commands.v1.TaskProgress">TaskProgress</a></li>
 </ul>
 <ul>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryInstallLocation">LibraryInstallLocation</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryLayout">LibraryLayout</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibraryLocation">LibraryLocation</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.LibrarySearchStatus">LibrarySearchStatus</a></li>
+<li><a href="#cc/arduino/cli/commands/v1/compile.proto">cc/arduino/cli/commands/v1/compile.proto</a>
+    - <a href="#cc.arduino.cli.commands.v1.CompileRequest">CompileRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.CompileRequest.SourceOverrideEntry">CompileRequest.SourceOverrideEntry</a>
+    - <a href="#cc.arduino.cli.commands.v1.CompileResponse">CompileResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.ExecutableSectionSize">ExecutableSectionSize</a></li>
 </ul>
+<ul>
+<li><a href="#cc/arduino/cli/commands/v1/core.proto">cc/arduino/cli/commands/v1/core.proto</a>
+    - <a href="#cc.arduino.cli.commands.v1.AlreadyAtLatestVersionError">AlreadyAtLatestVersionError</a>
+    - <a href="#cc.arduino.cli.commands.v1.PlatformDownloadRequest">PlatformDownloadRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.PlatformDownloadResponse">PlatformDownloadResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.PlatformInstallRequest">PlatformInstallRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.PlatformInstallResponse">PlatformInstallResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.PlatformListRequest">PlatformListRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.PlatformListResponse">PlatformListResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.PlatformLoadingError">PlatformLoadingError</a>
+    - <a href="#cc.arduino.cli.commands.v1.PlatformSearchRequest">PlatformSearchRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.PlatformSearchResponse">PlatformSearchResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.PlatformUninstallRequest">PlatformUninstallRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.PlatformUninstallResponse">PlatformUninstallResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.PlatformUpgradeRequest">PlatformUpgradeRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.PlatformUpgradeResponse">PlatformUpgradeResponse</a></li>
+</ul>
+<ul>
+<li><a href="#cc/arduino/cli/commands/v1/lib.proto">cc/arduino/cli/commands/v1/lib.proto</a>
+    - <a href="#cc.arduino.cli.commands.v1.DownloadResource">DownloadResource</a>
+    - <a href="#cc.arduino.cli.commands.v1.GitLibraryInstallRequest">GitLibraryInstallRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.GitLibraryInstallResponse">GitLibraryInstallResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.InstalledLibrary">InstalledLibrary</a>
+    - <a href="#cc.arduino.cli.commands.v1.Library">Library</a>
+    - <a href="#cc.arduino.cli.commands.v1.Library.CompatibleWithEntry">Library.CompatibleWithEntry</a>
+    - <a href="#cc.arduino.cli.commands.v1.Library.PropertiesEntry">Library.PropertiesEntry</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibraryDependency">LibraryDependency</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibraryDependencyStatus">LibraryDependencyStatus</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibraryDownloadRequest">LibraryDownloadRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibraryDownloadResponse">LibraryDownloadResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibraryInstallRequest">LibraryInstallRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibraryInstallResponse">LibraryInstallResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibraryListRequest">LibraryListRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibraryListResponse">LibraryListResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibraryRelease">LibraryRelease</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibraryResolveDependenciesRequest">LibraryResolveDependenciesRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibraryResolveDependenciesResponse">LibraryResolveDependenciesResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibrarySearchRequest">LibrarySearchRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibrarySearchResponse">LibrarySearchResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibraryUninstallRequest">LibraryUninstallRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibraryUninstallResponse">LibraryUninstallResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibraryUpgradeAllRequest">LibraryUpgradeAllRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibraryUpgradeAllResponse">LibraryUpgradeAllResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibraryUpgradeRequest">LibraryUpgradeRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.LibraryUpgradeResponse">LibraryUpgradeResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.SearchedLibrary">SearchedLibrary</a>
+    - <a href="#cc.arduino.cli.commands.v1.SearchedLibrary.ReleasesEntry">SearchedLibrary.ReleasesEntry</a>
+    - <a href="#cc.arduino.cli.commands.v1.ZipLibraryInstallRequest">ZipLibraryInstallRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.ZipLibraryInstallResponse">ZipLibraryInstallResponse</a><p>- <a href="#cc.arduino.cli.commands.v1.LibraryInstallLocation">LibraryInstallLocation</a>
+  - <a href="#cc.arduino.cli.commands.v1.LibraryLayout">LibraryLayout</a>
+  - <a href="#cc.arduino.cli.commands.v1.LibraryLocation">LibraryLocation</a>
+  - <a href="#cc.arduino.cli.commands.v1.LibrarySearchStatus">LibrarySearchStatus</a></p>
 </li>
 </ul>
 <ul>
-<li><a href="#cc/arduino/cli/commands/v1/monitor.proto">cc/arduino/cli/commands/v1/monitor.proto</a><ul>
-<li><a href="#cc.arduino.cli.commands.v1.EnumerateMonitorPortSettingsRequest">EnumerateMonitorPortSettingsRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.EnumerateMonitorPortSettingsResponse">EnumerateMonitorPortSettingsResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.MonitorPortConfiguration">MonitorPortConfiguration</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.MonitorPortSetting">MonitorPortSetting</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.MonitorPortSettingDescriptor">MonitorPortSettingDescriptor</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.MonitorRequest">MonitorRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.MonitorResponse">MonitorResponse</a></li>
+<li><a href="#cc/arduino/cli/commands/v1/monitor.proto">cc/arduino/cli/commands/v1/monitor.proto</a>
+    - <a href="#cc.arduino.cli.commands.v1.EnumerateMonitorPortSettingsRequest">EnumerateMonitorPortSettingsRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.EnumerateMonitorPortSettingsResponse">EnumerateMonitorPortSettingsResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.MonitorPortConfiguration">MonitorPortConfiguration</a>
+    - <a href="#cc.arduino.cli.commands.v1.MonitorPortSetting">MonitorPortSetting</a>
+    - <a href="#cc.arduino.cli.commands.v1.MonitorPortSettingDescriptor">MonitorPortSettingDescriptor</a>
+    - <a href="#cc.arduino.cli.commands.v1.MonitorRequest">MonitorRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.MonitorResponse">MonitorResponse</a></li>
 </ul>
-</li>
-<li><a href="#cc/arduino/cli/commands/v1/port.proto">cc/arduino/cli/commands/v1/port.proto</a><ul>
-<li><a href="#cc.arduino.cli.commands.v1.Port">Port</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.Port.PropertiesEntry">Port.PropertiesEntry</a></li>
+<ul>
+<li><a href="#cc/arduino/cli/commands/v1/port.proto">cc/arduino/cli/commands/v1/port.proto</a>
+    - <a href="#cc.arduino.cli.commands.v1.Port">Port</a>
+    - <a href="#cc.arduino.cli.commands.v1.Port.PropertiesEntry">Port.PropertiesEntry</a></li>
 </ul>
-</li>
-<li><a href="#cc/arduino/cli/commands/v1/upload.proto">cc/arduino/cli/commands/v1/upload.proto</a><ul>
-<li><a href="#cc.arduino.cli.commands.v1.BurnBootloaderRequest">BurnBootloaderRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.BurnBootloaderRequest.UserFieldsEntry">BurnBootloaderRequest.UserFieldsEntry</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.BurnBootloaderResponse">BurnBootloaderResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.ListProgrammersAvailableForUploadRequest">ListProgrammersAvailableForUploadRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.ListProgrammersAvailableForUploadResponse">ListProgrammersAvailableForUploadResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.ProgrammerIsRequiredForUploadError">ProgrammerIsRequiredForUploadError</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.SupportedUserFieldsRequest">SupportedUserFieldsRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.SupportedUserFieldsResponse">SupportedUserFieldsResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.UploadRequest">UploadRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.UploadRequest.UserFieldsEntry">UploadRequest.UserFieldsEntry</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.UploadResponse">UploadResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.UploadUsingProgrammerRequest">UploadUsingProgrammerRequest</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.UploadUsingProgrammerRequest.UserFieldsEntry">UploadUsingProgrammerRequest.UserFieldsEntry</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.UploadUsingProgrammerResponse">UploadUsingProgrammerResponse</a></li>
-<li><a href="#cc.arduino.cli.commands.v1.UserField">UserField</a></li>
+<ul>
+<li><a href="#cc/arduino/cli/commands/v1/upload.proto">cc/arduino/cli/commands/v1/upload.proto</a>
+    - <a href="#cc.arduino.cli.commands.v1.BurnBootloaderRequest">BurnBootloaderRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.BurnBootloaderRequest.UserFieldsEntry">BurnBootloaderRequest.UserFieldsEntry</a>
+    - <a href="#cc.arduino.cli.commands.v1.BurnBootloaderResponse">BurnBootloaderResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.ListProgrammersAvailableForUploadRequest">ListProgrammersAvailableForUploadRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.ListProgrammersAvailableForUploadResponse">ListProgrammersAvailableForUploadResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.ProgrammerIsRequiredForUploadError">ProgrammerIsRequiredForUploadError</a>
+    - <a href="#cc.arduino.cli.commands.v1.SupportedUserFieldsRequest">SupportedUserFieldsRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.SupportedUserFieldsResponse">SupportedUserFieldsResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.UploadRequest">UploadRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.UploadRequest.UserFieldsEntry">UploadRequest.UserFieldsEntry</a>
+    - <a href="#cc.arduino.cli.commands.v1.UploadResponse">UploadResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.UploadUsingProgrammerRequest">UploadUsingProgrammerRequest</a>
+    - <a href="#cc.arduino.cli.commands.v1.UploadUsingProgrammerRequest.UserFieldsEntry">UploadUsingProgrammerRequest.UserFieldsEntry</a>
+    - <a href="#cc.arduino.cli.commands.v1.UploadUsingProgrammerResponse">UploadUsingProgrammerResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.UserField">UserField</a></li>
 </ul>
-</li>
+<ul>
 <li><a href="#scalar-value-types">Scalar Value Types</a></li>
 </ul>
 <p><a name="cc/arduino/cli/commands/v1/board.proto"></a></p>
@@ -5920,7 +5906,8 @@
 <h2 id="ccarduinoclicommandsv1coreproto">cc/arduino/cli/commands/v1/core.proto<a class="headerlink" href="#ccarduinoclicommandsv1coreproto" title="Permanent link">&para;</a></h2>
 <p><a name="cc.arduino.cli.commands.v1.AlreadyAtLatestVersionError"></a></p>
 <h3 id="alreadyatlatestversionerror">AlreadyAtLatestVersionError<a class="headerlink" href="#alreadyatlatestversionerror" title="Permanent link">&para;</a></h3>
-<p>AlreadyAtLatestVersionError is returned when an upgrade is not possible because already at latest version.</p>
+<p>AlreadyAtLatestVersionError is returned when an upgrade is not possible
+because already at latest version.</p>
 <p><a name="cc.arduino.cli.commands.v1.PlatformDownloadRequest"></a></p>
 <h3 id="platformdownloadrequest">PlatformDownloadRequest<a class="headerlink" href="#platformdownloadrequest" title="Permanent link">&para;</a></h3>
 <table>
