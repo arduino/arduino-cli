@@ -1,7 +1,7 @@
 #include "config.h"
 
 #ifdef DEBUG
-#include "src/includes/de bug.h"
+#include "src/includes/debug.h"
 #endif
 
 #ifdef UNDEF
