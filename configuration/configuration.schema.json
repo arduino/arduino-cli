@@ -135,6 +135,16 @@
       },
       "type": "object"
     },
+    "output": {
+      "description": "settings related to text output.",
+      "properties": {
+        "no_color": {
+          "description": "ANSI color escape codes are added by default to the output. Set to `true` to disable colored text output.",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
     "sketch": {
       "description": "configuration options relating to [Arduino sketches][sketch specification].",
       "properties": {
