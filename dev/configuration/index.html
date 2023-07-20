@@ -1660,7 +1660,7 @@ overwrites the ones below it.</p>
 <p>Arduino CLI's command line flags are documented in the command line help and the <a href="../commands/arduino-cli/">Arduino CLI command reference</a>.</p>
 <h4 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h4>
 <p>Setting an additional Boards Manager URL using the <a href="../commands/arduino-cli_config/#options-inherited-from-parent-commands"><code>--additional-urls</code></a> command line flag:</p>
-<div class="highlight"><pre><span></span><code>$ arduino-cli core update-index --additional-urls https://downloads.arduino.cc/packages/package_staging_index.json
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arduino-cli<span class="w"> </span>core<span class="w"> </span>update-index<span class="w"> </span>--additional-urls<span class="w"> </span>https://downloads.arduino.cc/packages/package_staging_index.json
 </code></pre></div>
 <h3 id="environment-variables">Environment variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h3>
 <p>All configuration options can be set via environment variables. The variable names start with <code>ARDUINO</code>, followed by the
@@ -1671,16 +1671,16 @@ can use the <a href="https://docs.microsoft.com/en-us/windows-server/administrat
 <p><code>ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</code> environment variables can be a list of space-separated URLs.</p>
 <h4 id="example_1">Example<a class="headerlink" href="#example_1" title="Permanent link">&para;</a></h4>
 <p>Setting an additional Boards Manager URL using the <code>ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</code> environment variable:</p>
-<div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</span><span class="o">=</span>https://downloads.arduino.cc/packages/package_staging_index.json
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</span><span class="o">=</span>https://downloads.arduino.cc/packages/package_staging_index.json
 </code></pre></div>
 <p>Setting multiple additional Boards Manager URLs using the <code>ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</code> environment variable:</p>
-<div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</span><span class="o">=</span><span class="s2">&quot;https://downloads.arduino.cc/packages/package_staging_index.json https://downloads.arduino.cc/packages/package_mbed_index.json&quot;</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">ARDUINO_BOARD_MANAGER_ADDITIONAL_URLS</span><span class="o">=</span><span class="s2">&quot;https://downloads.arduino.cc/packages/package_staging_index.json https://downloads.arduino.cc/packages/package_mbed_index.json&quot;</span>
 </code></pre></div>
 <h3 id="configuration-file">Configuration file<a class="headerlink" href="#configuration-file" title="Permanent link">&para;</a></h3>
 <p><a href="../commands/arduino-cli_config_init/"><code>arduino-cli config init</code></a> creates or updates a configuration file with the current
 configuration settings.</p>
 <p>This allows saving the options set by command line flags or environment variables. For example:</p>
-<div class="highlight"><pre><span></span><code>arduino-cli config init --additional-urls https://downloads.arduino.cc/packages/package_staging_index.json
+<div class="highlight"><pre><span></span><code>arduino-cli<span class="w"> </span>config<span class="w"> </span>init<span class="w"> </span>--additional-urls<span class="w"> </span>https://downloads.arduino.cc/packages/package_staging_index.json
 </code></pre></div>
 <h4 id="file-name">File name<a class="headerlink" href="#file-name" title="Permanent link">&para;</a></h4>
 <p>The configuration file must be named <code>arduino-cli</code>, with the appropriate file extension for the file's format.</p>
@@ -1704,17 +1704,17 @@ configuration settings.</p>
 <p>If multiple configuration files are present, the one highest on the above list is used. Configuration files are not
 combined.</p>
 <p>The location of the active configuration file can be determined by running the command:</p>
-<div class="highlight"><pre><span></span><code>arduino-cli config dump --verbose
+<div class="highlight"><pre><span></span><code>arduino-cli<span class="w"> </span>config<span class="w"> </span>dump<span class="w"> </span>--verbose
 </code></pre></div>
 <h4 id="example_2">Example<a class="headerlink" href="#example_2" title="Permanent link">&para;</a></h4>
 <p>Setting an additional Boards Manager URL using a YAML format configuration file:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">board_manager</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">additional_urls</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://downloads.arduino.cc/packages/package_staging_index.json</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nt">board_manager</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">additional_urls</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://downloads.arduino.cc/packages/package_staging_index.json</span>
 </code></pre></div>
 <p>Doing the same using a TOML format file:</p>
-<div class="highlight"><pre><span></span><code><span class="k">[board_manager]</span><span class="w"></span>
-<span class="n">additional_urls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="s">&quot;https://downloads.arduino.cc/packages/package_staging_index.json&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">[board_manager]</span>
+<span class="n">additional_urls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="s">&quot;https://downloads.arduino.cc/packages/package_staging_index.json&quot;</span><span class="w"> </span><span class="p">]</span>
 </code></pre></div>
 <h4 id="json-schema">JSON schema<a class="headerlink" href="#json-schema" title="Permanent link">&para;</a></h4>
 <p>The configuration file <a href="../configuration.schema.json">JSON schema</a> can be used to independently validate the file content. This

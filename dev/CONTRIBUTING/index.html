@@ -1880,7 +1880,7 @@ submitting a PR:</p>
 </ul>
 <h3 id="building-the-source-code">Building the source code<a class="headerlink" href="#building-the-source-code" title="Permanent link">&para;</a></h3>
 <p>From the project folder root, just run:</p>
-<div class="highlight"><pre><span></span><code>task build
+<div class="highlight"><pre><span></span><code>task<span class="w"> </span>build
 </code></pre></div>
 <p>The project uses Go modules so dependencies will be downloaded automatically. At the end of the build, you should find
 an <code>arduino-cli</code> executable in the same folder.</p>
@@ -1889,13 +1889,13 @@ an <code>arduino-cli</code> executable in the same folder.</p>
 consistent across the whole codebase. To avoid pushing changes that will cause the CI system to fail, you can run most
 of the tests locally.</p>
 <p>To ensure code style is consistent, run:</p>
-<div class="highlight"><pre><span></span><code>task check
+<div class="highlight"><pre><span></span><code>task<span class="w"> </span>check
 </code></pre></div>
 <p>To run unit tests:</p>
-<div class="highlight"><pre><span></span><code>task go:test
+<div class="highlight"><pre><span></span><code>task<span class="w"> </span>go:test
 </code></pre></div>
 <p>To run integration tests (these will take some time and require special setup, see following paragraph):</p>
-<div class="highlight"><pre><span></span><code>task go:integration-test
+<div class="highlight"><pre><span></span><code>task<span class="w"> </span>go:integration-test
 </code></pre></div>
 <h4 id="running-only-some-tests">Running only some tests<a class="headerlink" href="#running-only-some-tests" title="Permanent link">&para;</a></h4>
 <p>By default, all tests from all go packages are run. To run only unit tests from one or more specific packages, you can
@@ -1930,14 +1930,14 @@ the above requirements.</p>
 <a href="https://go.dev/doc/install">download</a> the official distribution or use the package manager provided by your Operating System.</p>
 <h4 id="running-tests">Running tests<a class="headerlink" href="#running-tests" title="Permanent link">&para;</a></h4>
 <p>After the software requirements have been installed you should be able to run the tests with:</p>
-<div class="highlight"><pre><span></span><code>task go:integration-test
+<div class="highlight"><pre><span></span><code>task<span class="w"> </span>go:integration-test
 </code></pre></div>
 <p>This will run the integration tests automatically.</p>
 <p>To run specific packages you must run <code>go test</code>.</p>
-<div class="highlight"><pre><span></span><code>go <span class="nb">test</span> -v github.com/arduino/arduino-cli/internal/integrationtest/lib
+<div class="highlight"><pre><span></span><code>go<span class="w"> </span><span class="nb">test</span><span class="w"> </span>-v<span class="w"> </span>github.com/arduino/arduino-cli/internal/integrationtest/lib
 </code></pre></div>
 <p>To run very specific test functions:</p>
-<div class="highlight"><pre><span></span><code>go <span class="nb">test</span> -v github.com/arduino/arduino-cli/internal/integrationtest/lib -run TestLibUpgradeCommand
+<div class="highlight"><pre><span></span><code>go<span class="w"> </span><span class="nb">test</span><span class="w"> </span>-v<span class="w"> </span>github.com/arduino/arduino-cli/internal/integrationtest/lib<span class="w"> </span>-run<span class="w"> </span>TestLibUpgradeCommand
 </code></pre></div>
 <h3 id="dependency-license-metadata">Dependency license metadata<a class="headerlink" href="#dependency-license-metadata" title="Permanent link">&para;</a></h3>
 <p>Metadata about the license types of all dependencies is cached in the repository. To update this cache, run the
@@ -1955,7 +1955,7 @@ extension</a> to automatically format as you write.</p>
 <p>Otherwise you can use the following tasks. To do so you'll need to install <code>npm</code> if not already installed. Check the
 <a href="https://docs.npmjs.com/downloading-and-installing-node-js-and-npm">official documentation</a> to learn how to install <code>npm</code> for your platform.</p>
 <p>Ensure the formatting is compliant by running the command:</p>
-<div class="highlight"><pre><span></span><code>task general:format-prettier
+<div class="highlight"><pre><span></span><code>task<span class="w"> </span>general:format-prettier
 </code></pre></div>
 <p>When opening a new Pull Request, checks are automatically run to verify that configuration files are correctly
 formatted. In case of failures we might ask you to update the PR with correct formatting.</p>
@@ -1983,7 +1983,7 @@ virtual environment, activate it before proceeding):</p>
 <p>When working on docs, you can launch a command that will take care of generating the docs, build the static website and
 start a local server you can later access with a web browser to see a preview of your changes. From the root of the git
 repository run:</p>
-<div class="highlight"><pre><span></span><code>task website:serve
+<div class="highlight"><pre><span></span><code>task<span class="w"> </span>website:serve
 </code></pre></div>
 <p>If you don't see any error, hit <a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a> with your browser to navigate the generated docs.</p>
 <h4 id="docs-publishing">Docs publishing<a class="headerlink" href="#docs-publishing" title="Permanent link">&para;</a></h4>
@@ -2000,7 +2000,7 @@ extension</a> to automatically format as you write.</p>
 <p>Otherwise you can use the following tasks. To do so you'll need to install <code>npm</code> if not already installed. Check the
 <a href="https://docs.npmjs.com/downloading-and-installing-node-js-and-npm">official documentation</a> to learn how to install <code>npm</code> for your platform.</p>
 <p>Ensure the formatting is compliant by running the command:</p>
-<div class="highlight"><pre><span></span><code>task general:format-prettier
+<div class="highlight"><pre><span></span><code>task<span class="w"> </span>general:format-prettier
 </code></pre></div>
 <p>When opening a new Pull Request, checks are automatically run to verify that documentation is correctly formatted. In
 case of failures we might ask you to update the PR with correct formatting.</p>
@@ -2014,16 +2014,16 @@ Website</a>.</p>
 <code>i18n.Tr</code>. This call allows us to build a catalog of translatable strings, replacing the reference string at runtime
 with the localized value.</p>
 <p>Example usage:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">package</span><span class="w"> </span><span class="nx">main</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="kn">package</span><span class="w"> </span><span class="nx">main</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="p">(</span><span class="w"></span>
-<span class="w">  </span><span class="s">&quot;fmt&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="s">&quot;github.com/arduino/arduino-cli/i18n&quot;</span><span class="w"></span>
-<span class="p">)</span><span class="w"></span>
+<span class="kn">import</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="s">&quot;fmt&quot;</span>
+<span class="w">  </span><span class="s">&quot;github.com/arduino/arduino-cli/i18n&quot;</span>
+<span class="p">)</span>
 
-<span class="kd">func</span><span class="w"> </span><span class="nx">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">i18n</span><span class="p">.</span><span class="nx">Tr</span><span class="p">(</span><span class="s">&quot;Hello World!&quot;</span><span class="p">))</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="kd">func</span><span class="w"> </span><span class="nx">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">i18n</span><span class="p">.</span><span class="nx">Tr</span><span class="p">(</span><span class="s">&quot;Hello World!&quot;</span><span class="p">))</span>
+<span class="p">}</span>
 </code></pre></div>
 <h3 id="about-easyjson-golang-library">About <code>easyjson</code> golang library<a class="headerlink" href="#about-easyjson-golang-library" title="Permanent link">&para;</a></h3>
 <p>We use the hi-performance <code>easyjson</code> library to parse the large JSON index files for libraries and platforms. To obtain

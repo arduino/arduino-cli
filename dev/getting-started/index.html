@@ -1495,7 +1495,7 @@ IDE. Let's see some examples.</p>
 <h2 id="before-you-start">Before you start<a class="headerlink" href="#before-you-start" title="Permanent link">&para;</a></h2>
 <p><code>arduino-cli</code> is a container of commands and each command has its own dedicated help text that can be shown with the
 <code>help</code> command like this:</p>
-<div class="highlight"><pre><span></span><code><span class="gp">$ </span>arduino-cli <span class="nb">help</span> core
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>arduino-cli<span class="w"> </span><span class="nb">help</span><span class="w"> </span>core
 <span class="go">Arduino Core operations.</span>
 
 <span class="go">Usage:</span>
@@ -1531,216 +1531,216 @@ IDE. Let's see some examples.</p>
 <p>Arduino CLI doesn't strictly require a configuration file to work because the command line interface provides any
 possible functionality. However, having one can spare you a lot of typing when issuing a command, so let's go ahead and
 create it with:</p>
-<div class="highlight"><pre><span></span><code>$ arduino-cli config init
-Config file written: /home/luca/.arduino15/arduino-cli.yaml
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arduino-cli<span class="w"> </span>config<span class="w"> </span>init
+Config<span class="w"> </span>file<span class="w"> </span>written:<span class="w"> </span>/home/luca/.arduino15/arduino-cli.yaml
 </code></pre></div>
 <p>If you inspect the contents of <code>arduino-cli.yaml</code>, you'll find the available options with their respective default
 values. For more information, see the <a href="../configuration/">configuration documentation</a>.</p>
 <h2 id="create-a-new-sketch">Create a new sketch<a class="headerlink" href="#create-a-new-sketch" title="Permanent link">&para;</a></h2>
 <p>To create a new sketch named <code>MyFirstSketch</code> in the current directory, run the following command:</p>
-<div class="highlight"><pre><span></span><code>$ arduino-cli sketch new MyFirstSketch
-Sketch created <span class="k">in</span>: /home/luca/MyFirstSketch
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arduino-cli<span class="w"> </span>sketch<span class="w"> </span>new<span class="w"> </span>MyFirstSketch
+Sketch<span class="w"> </span>created<span class="w"> </span><span class="k">in</span>:<span class="w"> </span>/home/luca/MyFirstSketch
 </code></pre></div>
 <p>A sketch is a folder containing assets like source files and libraries; the <code>new</code> command creates for you a .ino file
 called <code>MyFirstSketch.ino</code> containing Arduino boilerplate code:</p>
-<div class="highlight"><pre><span></span><code>$ cat <span class="nv">$HOME</span>/MyFirstSketch/MyFirstSketch.ino
-void setup<span class="o">()</span> <span class="o">{</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>cat<span class="w"> </span><span class="nv">$HOME</span>/MyFirstSketch/MyFirstSketch.ino
+void<span class="w"> </span>setup<span class="o">()</span><span class="w"> </span><span class="o">{</span>
 <span class="o">}</span>
 
-void loop<span class="o">()</span> <span class="o">{</span>
+void<span class="w"> </span>loop<span class="o">()</span><span class="w"> </span><span class="o">{</span>
 <span class="o">}</span>
 </code></pre></div>
 <p>At this point you can use your favourite file editor or IDE to open the file <code>$HOME/MyFirstSketch/MyFirstSketch.ino</code> and
 change the code like this:</p>
-<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">pinMode</span><span class="p">(</span><span class="n">LED_BUILTIN</span><span class="p">,</span><span class="w"> </span><span class="n">OUTPUT</span><span class="p">);</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">pinMode</span><span class="p">(</span><span class="n">LED_BUILTIN</span><span class="p">,</span><span class="w"> </span><span class="n">OUTPUT</span><span class="p">);</span>
+<span class="p">}</span>
 
-<span class="kt">void</span><span class="w"> </span><span class="nf">loop</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">digitalWrite</span><span class="p">(</span><span class="n">LED_BUILTIN</span><span class="p">,</span><span class="w"> </span><span class="n">HIGH</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="n">delay</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="n">digitalWrite</span><span class="p">(</span><span class="n">LED_BUILTIN</span><span class="p">,</span><span class="w"> </span><span class="n">LOW</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="n">delay</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">loop</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">digitalWrite</span><span class="p">(</span><span class="n">LED_BUILTIN</span><span class="p">,</span><span class="w"> </span><span class="n">HIGH</span><span class="p">);</span>
+<span class="w">    </span><span class="n">delay</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
+<span class="w">    </span><span class="n">digitalWrite</span><span class="p">(</span><span class="n">LED_BUILTIN</span><span class="p">,</span><span class="w"> </span><span class="n">LOW</span><span class="p">);</span>
+<span class="w">    </span><span class="n">delay</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
+<span class="p">}</span>
 </code></pre></div>
 <h2 id="connect-the-board-to-your-pc">Connect the board to your PC<a class="headerlink" href="#connect-the-board-to-your-pc" title="Permanent link">&para;</a></h2>
 <p>The first thing to do upon a fresh install is to update the local cache of available platforms and libraries by running:</p>
-<div class="highlight"><pre><span></span><code>$ arduino-cli core update-index
-Updating index: package_index.json downloaded
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arduino-cli<span class="w"> </span>core<span class="w"> </span>update-index
+Updating<span class="w"> </span>index:<span class="w"> </span>package_index.json<span class="w"> </span>downloaded
 </code></pre></div>
 <p>After connecting the board to your PC by using the USB cable, you should be able to check whether it's been recognized
 by running:</p>
-<div class="highlight"><pre><span></span><code>$ arduino-cli board list
-Port         Type              Board Name              FQBN                 Core
-/dev/ttyACM1 Serial Port <span class="o">(</span>USB<span class="o">)</span> Arduino/Genuino MKR1000 arduino:samd:mkr1000 arduino:samd
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arduino-cli<span class="w"> </span>board<span class="w"> </span>list
+Port<span class="w">         </span>Type<span class="w">              </span>Board<span class="w"> </span>Name<span class="w">              </span>FQBN<span class="w">                 </span>Core
+/dev/ttyACM1<span class="w"> </span>Serial<span class="w"> </span>Port<span class="w"> </span><span class="o">(</span>USB<span class="o">)</span><span class="w"> </span>Arduino/Genuino<span class="w"> </span>MKR1000<span class="w"> </span>arduino:samd:mkr1000<span class="w"> </span>arduino:samd
 </code></pre></div>
 <p>In this example, the MKR1000 board was recognized and from the output of the command you see the platform core called
 <code>arduino:samd</code> is the one that needs to be installed to make it work.</p>
 <p>If you see an <code>Unknown</code> board listed, uploading should still work as long as you identify the platform core and use the
 correct FQBN string. When a board is not detected for whatever reason, you can list all the supported boards and their
 FQBN strings by running the following:</p>
-<div class="highlight"><pre><span></span><code>$ arduino-cli board listall mkr
-Board Name              FQBN
-Arduino MKR FOX <span class="m">1200</span>    arduino:samd:mkrfox1200
-Arduino MKR GSM <span class="m">1400</span>    arduino:samd:mkrgsm1400
-Arduino MKR WAN <span class="m">1300</span>    arduino:samd:mkrwan1300
-Arduino MKR WiFi <span class="m">1010</span>   arduino:samd:mkrwifi1010
-Arduino MKRZERO         arduino:samd:mkrzero
-Arduino/Genuino MKR1000 arduino:samd:mkr1000
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arduino-cli<span class="w"> </span>board<span class="w"> </span>listall<span class="w"> </span>mkr
+Board<span class="w"> </span>Name<span class="w">              </span>FQBN
+Arduino<span class="w"> </span>MKR<span class="w"> </span>FOX<span class="w"> </span><span class="m">1200</span><span class="w">    </span>arduino:samd:mkrfox1200
+Arduino<span class="w"> </span>MKR<span class="w"> </span>GSM<span class="w"> </span><span class="m">1400</span><span class="w">    </span>arduino:samd:mkrgsm1400
+Arduino<span class="w"> </span>MKR<span class="w"> </span>WAN<span class="w"> </span><span class="m">1300</span><span class="w">    </span>arduino:samd:mkrwan1300
+Arduino<span class="w"> </span>MKR<span class="w"> </span>WiFi<span class="w"> </span><span class="m">1010</span><span class="w">   </span>arduino:samd:mkrwifi1010
+Arduino<span class="w"> </span>MKRZERO<span class="w">         </span>arduino:samd:mkrzero
+Arduino/Genuino<span class="w"> </span>MKR1000<span class="w"> </span>arduino:samd:mkr1000
 </code></pre></div>
 <h2 id="install-the-core-for-your-board">Install the core for your board<a class="headerlink" href="#install-the-core-for-your-board" title="Permanent link">&para;</a></h2>
 <p>To install the <code>arduino:samd</code> platform core, run the following:</p>
-<div class="highlight"><pre><span></span><code>$ arduino-cli core install arduino:samd
-Downloading tools...
-arduino:arm-none-eabi-gcc@4.8.3-2014q1 downloaded
-arduino:bossac@1.7.0 downloaded
-arduino:openocd@0.9.0-arduino6-static downloaded
-arduino:CMSIS@4.5.0 downloaded
-arduino:CMSIS-Atmel@1.1.0 downloaded
-arduino:arduinoOTA@1.2.0 downloaded
-Downloading cores...
-arduino:samd@1.6.19 downloaded
-Installing tools...
-Installing platforms...
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arduino-cli<span class="w"> </span>core<span class="w"> </span>install<span class="w"> </span>arduino:samd
+Downloading<span class="w"> </span>tools...
+arduino:arm-none-eabi-gcc@4.8.3-2014q1<span class="w"> </span>downloaded
+arduino:bossac@1.7.0<span class="w"> </span>downloaded
+arduino:openocd@0.9.0-arduino6-static<span class="w"> </span>downloaded
+arduino:CMSIS@4.5.0<span class="w"> </span>downloaded
+arduino:CMSIS-Atmel@1.1.0<span class="w"> </span>downloaded
+arduino:arduinoOTA@1.2.0<span class="w"> </span>downloaded
+Downloading<span class="w"> </span>cores...
+arduino:samd@1.6.19<span class="w"> </span>downloaded
+Installing<span class="w"> </span>tools...
+Installing<span class="w"> </span>platforms...
 Results:
-arduino:samd@1.6.19 - Installed
-arduino:arm-none-eabi-gcc@4.8.3-2014q1 - Installed
-arduino:bossac@1.7.0 - Installed
-arduino:openocd@0.9.0-arduino6-static - Installed
-arduino:CMSIS@4.5.0 - Installed
-arduino:CMSIS-Atmel@1.1.0 - Installed
-arduino:arduinoOTA@1.2.0 - Installed
+arduino:samd@1.6.19<span class="w"> </span>-<span class="w"> </span>Installed
+arduino:arm-none-eabi-gcc@4.8.3-2014q1<span class="w"> </span>-<span class="w"> </span>Installed
+arduino:bossac@1.7.0<span class="w"> </span>-<span class="w"> </span>Installed
+arduino:openocd@0.9.0-arduino6-static<span class="w"> </span>-<span class="w"> </span>Installed
+arduino:CMSIS@4.5.0<span class="w"> </span>-<span class="w"> </span>Installed
+arduino:CMSIS-Atmel@1.1.0<span class="w"> </span>-<span class="w"> </span>Installed
+arduino:arduinoOTA@1.2.0<span class="w"> </span>-<span class="w"> </span>Installed
 </code></pre></div>
 <p>Now verify we have installed the core properly by running:</p>
-<div class="highlight"><pre><span></span><code>$ arduino-cli core list
-ID              Installed       Latest  Name
-arduino:samd    <span class="m">1</span>.6.19          <span class="m">1</span>.6.19  Arduino SAMD Boards <span class="o">(</span><span class="m">32</span>-bits ARM Cortex-M0+<span class="o">)</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arduino-cli<span class="w"> </span>core<span class="w"> </span>list
+ID<span class="w">              </span>Installed<span class="w">       </span>Latest<span class="w">  </span>Name
+arduino:samd<span class="w">    </span><span class="m">1</span>.6.19<span class="w">          </span><span class="m">1</span>.6.19<span class="w">  </span>Arduino<span class="w"> </span>SAMD<span class="w"> </span>Boards<span class="w"> </span><span class="o">(</span><span class="m">32</span>-bits<span class="w"> </span>ARM<span class="w"> </span>Cortex-M0+<span class="o">)</span>
 </code></pre></div>
 <p>Great! Now we are ready to compile and upload the sketch.</p>
 <h2 id="adding-3rd-party-cores">Adding 3rd party cores<a class="headerlink" href="#adding-3rd-party-cores" title="Permanent link">&para;</a></h2>
 <p>If your board requires 3rd party core packages to work, you can list the URLs to additional package indexes in the
 Arduino CLI configuration file.</p>
 <p>For example, to add the ESP8266 core, edit the configuration file and change the <code>board_manager</code> settings as follows:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">board_manager</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">additional_urls</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://arduino.esp8266.com/stable/package_esp8266com_index.json</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nt">board_manager</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">additional_urls</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://arduino.esp8266.com/stable/package_esp8266com_index.json</span>
 </code></pre></div>
 <p>If you have your package indexes locally installed, you can list their file path in the Arduino CLI configuration file.</p>
 <p>For example, to add the NRF52832 core, edit the configuration file and change the <code>board_manager</code> settings as follows:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">board_manager</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">additional_urls</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://arduino.esp8266.com/stable/package_esp8266com_index.json</span><span class="w"></span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">file:///absolute/path/to/your/package_nrf52832_index.json</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nt">board_manager</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">additional_urls</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://arduino.esp8266.com/stable/package_esp8266com_index.json</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">file:///absolute/path/to/your/package_nrf52832_index.json</span>
 </code></pre></div>
 <p>From now on, commands supporting custom cores will automatically use the additional URL from the configuration file:</p>
-<div class="highlight"><pre><span></span><code>$ arduino-cli core update-index
-Updating index: package_index.json downloaded
-Updating index: package_esp8266com_index.json downloaded
-Updating index: package_nrf52832_index.json
-Updating index: package_index.json downloaded
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arduino-cli<span class="w"> </span>core<span class="w"> </span>update-index
+Updating<span class="w"> </span>index:<span class="w"> </span>package_index.json<span class="w"> </span>downloaded
+Updating<span class="w"> </span>index:<span class="w"> </span>package_esp8266com_index.json<span class="w"> </span>downloaded
+Updating<span class="w"> </span>index:<span class="w"> </span>package_nrf52832_index.json
+Updating<span class="w"> </span>index:<span class="w"> </span>package_index.json<span class="w"> </span>downloaded
 
-$ arduino-cli core search esp8266
-ID              Version Name
-esp8266:esp8266 <span class="m">2</span>.5.2   esp8266
+$<span class="w"> </span>arduino-cli<span class="w"> </span>core<span class="w"> </span>search<span class="w"> </span>esp8266
+ID<span class="w">              </span>Version<span class="w"> </span>Name
+esp8266:esp8266<span class="w"> </span><span class="m">2</span>.5.2<span class="w">   </span>esp8266
 </code></pre></div>
 <p>Alternatively, you can pass a link to the additional package index file with the <code>--additional-urls</code> option, that has to
 be specified every time and for every command that operates on a 3rd party platform core, for example:</p>
-<div class="highlight"><pre><span></span><code>$ arduino-cli  core update-index --additional-urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
-Updating index: package_esp8266com_index.json downloaded
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arduino-cli<span class="w">  </span>core<span class="w"> </span>update-index<span class="w"> </span>--additional-urls<span class="w"> </span>https://arduino.esp8266.com/stable/package_esp8266com_index.json
+Updating<span class="w"> </span>index:<span class="w"> </span>package_esp8266com_index.json<span class="w"> </span>downloaded
 
-$ arduino-cli core search esp8266 --additional-urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
-ID              Version Name
-esp8266:esp8266 <span class="m">2</span>.5.2   esp8266
+$<span class="w"> </span>arduino-cli<span class="w"> </span>core<span class="w"> </span>search<span class="w"> </span>esp8266<span class="w"> </span>--additional-urls<span class="w"> </span>https://arduino.esp8266.com/stable/package_esp8266com_index.json
+ID<span class="w">              </span>Version<span class="w"> </span>Name
+esp8266:esp8266<span class="w"> </span><span class="m">2</span>.5.2<span class="w">   </span>esp8266
 </code></pre></div>
 <p>The same applies to the additional package index file provided by file paths:</p>
-<div class="highlight"><pre><span></span><code>$ arduino-cli  core update-index --additional-urls file:///absolute/path/to/your/package_esp8266com_index.json
-Updating index: package_esp8266com_index.json downloaded
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arduino-cli<span class="w">  </span>core<span class="w"> </span>update-index<span class="w"> </span>--additional-urls<span class="w"> </span>file:///absolute/path/to/your/package_esp8266com_index.json
+Updating<span class="w"> </span>index:<span class="w"> </span>package_esp8266com_index.json<span class="w"> </span>downloaded
 
-$ arduino-cli core search esp8266 --additional-urls file:///absolute/path/to/your/package_esp8266com_index.json
-ID              Version Name
-esp8266:esp8266 <span class="m">2</span>.5.2   esp8266
+$<span class="w"> </span>arduino-cli<span class="w"> </span>core<span class="w"> </span>search<span class="w"> </span>esp8266<span class="w"> </span>--additional-urls<span class="w"> </span>file:///absolute/path/to/your/package_esp8266com_index.json
+ID<span class="w">              </span>Version<span class="w"> </span>Name
+esp8266:esp8266<span class="w"> </span><span class="m">2</span>.5.2<span class="w">   </span>esp8266
 </code></pre></div>
 <h2 id="compile-and-upload-the-sketch">Compile and upload the sketch<a class="headerlink" href="#compile-and-upload-the-sketch" title="Permanent link">&para;</a></h2>
 <p>To compile the sketch you run the <code>compile</code> command, passing the proper FQBN string:</p>
-<div class="highlight"><pre><span></span><code>$ arduino-cli compile --fqbn arduino:samd:mkr1000 MyFirstSketch
-Sketch uses <span class="m">9600</span> bytes <span class="o">(</span><span class="m">3</span>%<span class="o">)</span> of program storage space. Maximum is <span class="m">262144</span> bytes.
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arduino-cli<span class="w"> </span>compile<span class="w"> </span>--fqbn<span class="w"> </span>arduino:samd:mkr1000<span class="w"> </span>MyFirstSketch
+Sketch<span class="w"> </span>uses<span class="w"> </span><span class="m">9600</span><span class="w"> </span>bytes<span class="w"> </span><span class="o">(</span><span class="m">3</span>%<span class="o">)</span><span class="w"> </span>of<span class="w"> </span>program<span class="w"> </span>storage<span class="w"> </span>space.<span class="w"> </span>Maximum<span class="w"> </span>is<span class="w"> </span><span class="m">262144</span><span class="w"> </span>bytes.
 </code></pre></div>
 <p>To upload the sketch to your board, run the following command, using the serial port your board is connected to:</p>
-<div class="highlight"><pre><span></span><code>$ arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:samd:mkr1000 MyFirstSketch
-No new serial port detected.
-Atmel SMART device 0x10010005 found
-Device       : ATSAMD21G18A
-Chip ID      : <span class="m">10010005</span>
-Version      : v2.0 <span class="o">[</span>Arduino:XYZ<span class="o">]</span> Dec <span class="m">20</span> <span class="m">2016</span> <span class="m">15</span>:36:43
-Address      : <span class="m">8192</span>
-Pages        : <span class="m">3968</span>
-Page Size    : <span class="m">64</span> bytes
-Total Size   : 248KB
-Planes       : <span class="m">1</span>
-Lock Regions : <span class="m">16</span>
-Locked       : none
-Security     : <span class="nb">false</span>
-Boot Flash   : <span class="nb">true</span>
-BOD          : <span class="nb">true</span>
-BOR          : <span class="nb">true</span>
-Arduino      : FAST_CHIP_ERASE
-Arduino      : FAST_MULTI_PAGE_WRITE
-Arduino      : CAN_CHECKSUM_MEMORY_BUFFER
-Erase flash
-<span class="k">done</span> <span class="k">in</span> <span class="m">0</span>.784 seconds
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arduino-cli<span class="w"> </span>upload<span class="w"> </span>-p<span class="w"> </span>/dev/ttyACM0<span class="w"> </span>--fqbn<span class="w"> </span>arduino:samd:mkr1000<span class="w"> </span>MyFirstSketch
+No<span class="w"> </span>new<span class="w"> </span>serial<span class="w"> </span>port<span class="w"> </span>detected.
+Atmel<span class="w"> </span>SMART<span class="w"> </span>device<span class="w"> </span>0x10010005<span class="w"> </span>found
+Device<span class="w">       </span>:<span class="w"> </span>ATSAMD21G18A
+Chip<span class="w"> </span>ID<span class="w">      </span>:<span class="w"> </span><span class="m">10010005</span>
+Version<span class="w">      </span>:<span class="w"> </span>v2.0<span class="w"> </span><span class="o">[</span>Arduino:XYZ<span class="o">]</span><span class="w"> </span>Dec<span class="w"> </span><span class="m">20</span><span class="w"> </span><span class="m">2016</span><span class="w"> </span><span class="m">15</span>:36:43
+Address<span class="w">      </span>:<span class="w"> </span><span class="m">8192</span>
+Pages<span class="w">        </span>:<span class="w"> </span><span class="m">3968</span>
+Page<span class="w"> </span>Size<span class="w">    </span>:<span class="w"> </span><span class="m">64</span><span class="w"> </span>bytes
+Total<span class="w"> </span>Size<span class="w">   </span>:<span class="w"> </span>248KB
+Planes<span class="w">       </span>:<span class="w"> </span><span class="m">1</span>
+Lock<span class="w"> </span>Regions<span class="w"> </span>:<span class="w"> </span><span class="m">16</span>
+Locked<span class="w">       </span>:<span class="w"> </span>none
+Security<span class="w">     </span>:<span class="w"> </span><span class="nb">false</span>
+Boot<span class="w"> </span>Flash<span class="w">   </span>:<span class="w"> </span><span class="nb">true</span>
+BOD<span class="w">          </span>:<span class="w"> </span><span class="nb">true</span>
+BOR<span class="w">          </span>:<span class="w"> </span><span class="nb">true</span>
+Arduino<span class="w">      </span>:<span class="w"> </span>FAST_CHIP_ERASE
+Arduino<span class="w">      </span>:<span class="w"> </span>FAST_MULTI_PAGE_WRITE
+Arduino<span class="w">      </span>:<span class="w"> </span>CAN_CHECKSUM_MEMORY_BUFFER
+Erase<span class="w"> </span>flash
+<span class="k">done</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">0</span>.784<span class="w"> </span>seconds
 
-Write <span class="m">9856</span> bytes to flash <span class="o">(</span><span class="m">154</span> pages<span class="o">)</span>
-<span class="o">[==============================]</span> <span class="m">100</span>% <span class="o">(</span><span class="m">154</span>/154 pages<span class="o">)</span>
-<span class="k">done</span> <span class="k">in</span> <span class="m">0</span>.069 seconds
+Write<span class="w"> </span><span class="m">9856</span><span class="w"> </span>bytes<span class="w"> </span>to<span class="w"> </span>flash<span class="w"> </span><span class="o">(</span><span class="m">154</span><span class="w"> </span>pages<span class="o">)</span>
+<span class="o">[==============================]</span><span class="w"> </span><span class="m">100</span>%<span class="w"> </span><span class="o">(</span><span class="m">154</span>/154<span class="w"> </span>pages<span class="o">)</span>
+<span class="k">done</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">0</span>.069<span class="w"> </span>seconds
 
-Verify <span class="m">9856</span> bytes of flash with checksum.
-Verify successful
-<span class="k">done</span> <span class="k">in</span> <span class="m">0</span>.009 seconds
-CPU reset.
+Verify<span class="w"> </span><span class="m">9856</span><span class="w"> </span>bytes<span class="w"> </span>of<span class="w"> </span>flash<span class="w"> </span>with<span class="w"> </span>checksum.
+Verify<span class="w"> </span>successful
+<span class="k">done</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">0</span>.009<span class="w"> </span>seconds
+CPU<span class="w"> </span>reset.
 </code></pre></div>
 <h2 id="add-libraries">Add libraries<a class="headerlink" href="#add-libraries" title="Permanent link">&para;</a></h2>
 <p>If you need to add more functionalities to your sketch, chances are some of the libraries available in the Arduino
 ecosystem already provide what you need. For example, if you need a debouncing strategy to better handle button inputs,
 you can try searching for the <code>debouncer</code> keyword:</p>
-<div class="highlight"><pre><span></span><code>$ arduino-cli lib search debouncer
-Name: <span class="s2">&quot;Debouncer&quot;</span>
-    Author: hideakitai
-    Maintainer: hideakitai
-    Sentence: Debounce library <span class="k">for</span> Arduino
-    Paragraph: Debounce library <span class="k">for</span> Arduino
-    Website: https://github.com/hideakitai
-    Category: Timing
-    Architecture: *
-    Types: Contributed
-    Versions: <span class="o">[</span><span class="m">0</span>.1.0<span class="o">]</span>
-Name: <span class="s2">&quot;FTDebouncer&quot;</span>
-    Author: Ubi de Feo
-    Maintainer: Ubi de Feo, Sebastian Hunkeler
-    Sentence: An efficient, low footprint, fast pin debouncing library <span class="k">for</span> Arduino
-    Paragraph: This pin state supervisor manages debouncing of buttons and handles transitions between LOW and HIGH state, calling a <span class="k">function</span> and notifying your code of which pin has been activated or deactivated.
-    Website: https://github.com/ubidefeo/FTDebouncer
-    Category: Uncategorized
-    Architecture: *
-    Types: Contributed
-    Versions: <span class="o">[</span><span class="m">1</span>.3.0<span class="o">]</span>
-Name: <span class="s2">&quot;SoftTimer&quot;</span>
-    Author: Balazs Kelemen &lt;prampec+arduino@gmail.com&gt;
-    Maintainer: Balazs Kelemen &lt;prampec+arduino@gmail.com&gt;
-    Sentence: SoftTimer is a lightweight pseudo multitasking solution <span class="k">for</span> Arduino.
-    Paragraph: SoftTimer enables higher level Arduino programing, yet easy to use, and lightweight. You are often faced with the problem that you need to <span class="k">do</span> multiple tasks at the same time. In SoftTimer, the programmer creates Tasks that runs periodically. This library comes with a collection of handy tools like blinker, pwm, debouncer.
-    Website: https://github.com/prampec/arduino-softtimer
-    Category: Timing
-    Architecture: *
-    Types: Contributed
-    Versions: <span class="o">[</span><span class="m">3</span>.0.0, <span class="m">3</span>.1.0, <span class="m">3</span>.1.1, <span class="m">3</span>.1.2, <span class="m">3</span>.1.3, <span class="m">3</span>.1.5, <span class="m">3</span>.2.0<span class="o">]</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arduino-cli<span class="w"> </span>lib<span class="w"> </span>search<span class="w"> </span>debouncer
+Name:<span class="w"> </span><span class="s2">&quot;Debouncer&quot;</span>
+<span class="w">    </span>Author:<span class="w"> </span>hideakitai
+<span class="w">    </span>Maintainer:<span class="w"> </span>hideakitai
+<span class="w">    </span>Sentence:<span class="w"> </span>Debounce<span class="w"> </span>library<span class="w"> </span><span class="k">for</span><span class="w"> </span>Arduino
+<span class="w">    </span>Paragraph:<span class="w"> </span>Debounce<span class="w"> </span>library<span class="w"> </span><span class="k">for</span><span class="w"> </span>Arduino
+<span class="w">    </span>Website:<span class="w"> </span>https://github.com/hideakitai
+<span class="w">    </span>Category:<span class="w"> </span>Timing
+<span class="w">    </span>Architecture:<span class="w"> </span>*
+<span class="w">    </span>Types:<span class="w"> </span>Contributed
+<span class="w">    </span>Versions:<span class="w"> </span><span class="o">[</span><span class="m">0</span>.1.0<span class="o">]</span>
+Name:<span class="w"> </span><span class="s2">&quot;FTDebouncer&quot;</span>
+<span class="w">    </span>Author:<span class="w"> </span>Ubi<span class="w"> </span>de<span class="w"> </span>Feo
+<span class="w">    </span>Maintainer:<span class="w"> </span>Ubi<span class="w"> </span>de<span class="w"> </span>Feo,<span class="w"> </span>Sebastian<span class="w"> </span>Hunkeler
+<span class="w">    </span>Sentence:<span class="w"> </span>An<span class="w"> </span>efficient,<span class="w"> </span>low<span class="w"> </span>footprint,<span class="w"> </span>fast<span class="w"> </span>pin<span class="w"> </span>debouncing<span class="w"> </span>library<span class="w"> </span><span class="k">for</span><span class="w"> </span>Arduino
+<span class="w">    </span>Paragraph:<span class="w"> </span>This<span class="w"> </span>pin<span class="w"> </span>state<span class="w"> </span>supervisor<span class="w"> </span>manages<span class="w"> </span>debouncing<span class="w"> </span>of<span class="w"> </span>buttons<span class="w"> </span>and<span class="w"> </span>handles<span class="w"> </span>transitions<span class="w"> </span>between<span class="w"> </span>LOW<span class="w"> </span>and<span class="w"> </span>HIGH<span class="w"> </span>state,<span class="w"> </span>calling<span class="w"> </span>a<span class="w"> </span><span class="k">function</span><span class="w"> </span>and<span class="w"> </span>notifying<span class="w"> </span>your<span class="w"> </span>code<span class="w"> </span>of<span class="w"> </span>which<span class="w"> </span>pin<span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>activated<span class="w"> </span>or<span class="w"> </span>deactivated.
+<span class="w">    </span>Website:<span class="w"> </span>https://github.com/ubidefeo/FTDebouncer
+<span class="w">    </span>Category:<span class="w"> </span>Uncategorized
+<span class="w">    </span>Architecture:<span class="w"> </span>*
+<span class="w">    </span>Types:<span class="w"> </span>Contributed
+<span class="w">    </span>Versions:<span class="w"> </span><span class="o">[</span><span class="m">1</span>.3.0<span class="o">]</span>
+Name:<span class="w"> </span><span class="s2">&quot;SoftTimer&quot;</span>
+<span class="w">    </span>Author:<span class="w"> </span>Balazs<span class="w"> </span>Kelemen<span class="w"> </span>&lt;prampec+arduino@gmail.com&gt;
+<span class="w">    </span>Maintainer:<span class="w"> </span>Balazs<span class="w"> </span>Kelemen<span class="w"> </span>&lt;prampec+arduino@gmail.com&gt;
+<span class="w">    </span>Sentence:<span class="w"> </span>SoftTimer<span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>lightweight<span class="w"> </span>pseudo<span class="w"> </span>multitasking<span class="w"> </span>solution<span class="w"> </span><span class="k">for</span><span class="w"> </span>Arduino.
+<span class="w">    </span>Paragraph:<span class="w"> </span>SoftTimer<span class="w"> </span>enables<span class="w"> </span>higher<span class="w"> </span>level<span class="w"> </span>Arduino<span class="w"> </span>programing,<span class="w"> </span>yet<span class="w"> </span>easy<span class="w"> </span>to<span class="w"> </span>use,<span class="w"> </span>and<span class="w"> </span>lightweight.<span class="w"> </span>You<span class="w"> </span>are<span class="w"> </span>often<span class="w"> </span>faced<span class="w"> </span>with<span class="w"> </span>the<span class="w"> </span>problem<span class="w"> </span>that<span class="w"> </span>you<span class="w"> </span>need<span class="w"> </span>to<span class="w"> </span><span class="k">do</span><span class="w"> </span>multiple<span class="w"> </span>tasks<span class="w"> </span>at<span class="w"> </span>the<span class="w"> </span>same<span class="w"> </span>time.<span class="w"> </span>In<span class="w"> </span>SoftTimer,<span class="w"> </span>the<span class="w"> </span>programmer<span class="w"> </span>creates<span class="w"> </span>Tasks<span class="w"> </span>that<span class="w"> </span>runs<span class="w"> </span>periodically.<span class="w"> </span>This<span class="w"> </span>library<span class="w"> </span>comes<span class="w"> </span>with<span class="w"> </span>a<span class="w"> </span>collection<span class="w"> </span>of<span class="w"> </span>handy<span class="w"> </span>tools<span class="w"> </span>like<span class="w"> </span>blinker,<span class="w"> </span>pwm,<span class="w"> </span>debouncer.
+<span class="w">    </span>Website:<span class="w"> </span>https://github.com/prampec/arduino-softtimer
+<span class="w">    </span>Category:<span class="w"> </span>Timing
+<span class="w">    </span>Architecture:<span class="w"> </span>*
+<span class="w">    </span>Types:<span class="w"> </span>Contributed
+<span class="w">    </span>Versions:<span class="w"> </span><span class="o">[</span><span class="m">3</span>.0.0,<span class="w"> </span><span class="m">3</span>.1.0,<span class="w"> </span><span class="m">3</span>.1.1,<span class="w"> </span><span class="m">3</span>.1.2,<span class="w"> </span><span class="m">3</span>.1.3,<span class="w"> </span><span class="m">3</span>.1.5,<span class="w"> </span><span class="m">3</span>.2.0<span class="o">]</span>
 </code></pre></div>
 <p>Our favourite is <code>FTDebouncer</code>, let's install it by running:</p>
-<div class="highlight"><pre><span></span><code>$ arduino-cli lib install FTDebouncer
-FTDebouncer depends on FTDebouncer@1.3.0
-Downloading FTDebouncer@1.3.0...
-FTDebouncer@1.3.0 downloaded
-Installing FTDebouncer@1.3.0...
-Installed FTDebouncer@1.3.0
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>arduino-cli<span class="w"> </span>lib<span class="w"> </span>install<span class="w"> </span>FTDebouncer
+FTDebouncer<span class="w"> </span>depends<span class="w"> </span>on<span class="w"> </span>FTDebouncer@1.3.0
+Downloading<span class="w"> </span>FTDebouncer@1.3.0...
+FTDebouncer@1.3.0<span class="w"> </span>downloaded
+Installing<span class="w"> </span>FTDebouncer@1.3.0...
+Installed<span class="w"> </span>FTDebouncer@1.3.0
 </code></pre></div>
 <h2 id="using-the-daemon-mode-and-the-grpc-interface">Using the <code>daemon</code> mode and the gRPC interface<a class="headerlink" href="#using-the-daemon-mode-and-the-grpc-interface" title="Permanent link">&para;</a></h2>
 <p>Arduino CLI can be launched as a gRPC server via the <code>daemon</code> command.</p>
@@ -1756,9 +1756,9 @@ daemon_compile{buildProperties=&quot;&quot;,exportFile=&quot;&quot;,fqbn=&quot;a
 daemon_board_list{installationID=&quot;ed6f1f22-1fbe-4b1f-84be-84d035b6369c&quot;,success=&quot;true&quot;} 1 1580385724833
 </code></pre></div>
 <p>The metrics settings are exposed via the <code>metrics</code> section in the CLI configuration:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">metrics</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
-<span class="w">  </span><span class="nt">addr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">:9090</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="nt">metrics</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">addr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">:9090</span>
 </code></pre></div>
                 
               
