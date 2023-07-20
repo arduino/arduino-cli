@@ -28,6 +28,9 @@
 - `metrics` - settings related to the collection of data used for continued improvement of Arduino CLI.
   - `addr` - TCP port used for metrics communication.
   - `enabled` - controls the use of metrics.
+- `output` - settings related to text output.
+  - `no_color` - ANSI color escape codes are added by default to the output. Set to `true` to disable colored text
+    output.
 - `sketch` - configuration options relating to [Arduino sketches][sketch specification].
   - `always_export_binaries` - set to `true` to make [`arduino-cli compile`][arduino-cli compile] always save binaries
     to the sketch folder. This is the equivalent of using the [`--export-binaries`][arduino-cli compile options] flag.
