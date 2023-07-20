@@ -42,7 +42,7 @@ jobs:
           TRANSIFEX_API_KEY: ${{ secrets.TRANSIFEX_API_KEY }}
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v5
         with:
           commit-message: Updated translation files
           title: Updated translation files
