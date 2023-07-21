@@ -361,6 +361,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#how-to-change-monitor-configuration" class="md-nav__link">
+    How to change monitor configuration?
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#additional-assistance" class="md-nav__link">
     Additional assistance
   </a>
@@ -1409,6 +1416,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#how-to-change-monitor-configuration" class="md-nav__link">
+    How to change monitor configuration?
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#additional-assistance" class="md-nav__link">
     Additional assistance
   </a>
@@ -1452,6 +1466,12 @@
 by this command is very limited and you may want to look for other tools if you need more advanced functionality.</p>
 <p>There are many excellent serial terminals to chose from. On Linux or macOS, you may already have <a href="https://www.gnu.org/software/screen/manual/screen.html">screen</a>
 installed. On Windows, a good choice for command line usage is Plink, included with <a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/">PuTTY</a>.</p>
+<h2 id="how-to-change-monitor-configuration">How to change monitor configuration?<a class="headerlink" href="#how-to-change-monitor-configuration" title="Permanent link">&para;</a></h2>
+<p><a href="../pluggable-monitor-specification/#describe-command">Configuration parameters</a> of the monitor can be obtained by executing the following command:</p>
+<p><code>$ arduino-cli monitor -p &lt;port&gt; --describe</code></p>
+<p>These parameters can be modified by passing a list of <code>&lt;key&gt;=&lt;desiredValue&gt;</code> pairs to the <code>--config</code> flag. For example,
+when using a serial port, the monitor baud rate can be set to 4800 with the following command:</p>
+<p><code>$ arduino-cli monitor -p &lt;port&gt; --config baudrate=4800</code></p>
 <h2 id="additional-assistance">Additional assistance<a class="headerlink" href="#additional-assistance" title="Permanent link">&para;</a></h2>
 <p>If your question wasn't answered, feel free to ask on <a href="https://forum.arduino.cc/c/software/arduino-cli/89">Arduino CLI's forum board</a>.</p>
                 
