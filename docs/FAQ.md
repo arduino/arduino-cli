@@ -25,6 +25,17 @@ by this command is very limited and you may want to look for other tools if you 
 There are many excellent serial terminals to chose from. On Linux or macOS, you may already have [screen][screen]
 installed. On Windows, a good choice for command line usage is Plink, included with [PuTTY][putty].
 
+## How to change monitor configuration?
+
+[Configuration parameters][configuration parameters] of the monitor can be obtained by executing the following command:
+
+`$ arduino-cli monitor -p <port> --describe`
+
+These parameters can be modified by passing a list of `<key>=<desiredValue>` pairs to the `--config` flag. For example,
+when using a serial port, the monitor baud rate can be set to 4800 with the following command:
+
+`$ arduino-cli monitor -p <port> --config baudrate=4800`
+
 ## Additional assistance
 
 If your question wasn't answered, feel free to ask on [Arduino CLI's forum board][1].
@@ -35,3 +46,4 @@ If your question wasn't answered, feel free to ask on [Arduino CLI's forum board
 [screen]: https://www.gnu.org/software/screen/manual/screen.html
 [putty]: https://www.chiark.greenend.org.uk/~sgtatham/putty/
 [monitor command]: commands/arduino-cli_monitor.md
+[configuration parameters]: pluggable-monitor-specification.md#describe-command
