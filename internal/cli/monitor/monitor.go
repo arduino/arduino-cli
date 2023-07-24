@@ -59,7 +59,7 @@ func NewCommand() *cobra.Command {
 	}
 	portArgs.AddToCommand(monitorCommand)
 	monitorCommand.Flags().BoolVar(&describe, "describe", false, tr("Show all the settings of the communication port."))
-	monitorCommand.Flags().StringSliceVarP(&configs, "config", "c", []string{}, tr("Configuration of the port."))
+	monitorCommand.Flags().StringSliceVarP(&configs, "config", "c", []string{}, tr("Configure communication port settings. The format is <ID>=<value>[,<ID>=<value>]..."))
 	monitorCommand.Flags().BoolVarP(&quiet, "quiet", "q", false, tr("Run in silent mode, show only monitor input and output."))
 	fqbn.AddToCommand(monitorCommand)
 	monitorCommand.MarkFlagRequired("port")
