@@ -123,7 +123,7 @@ func getUserFields(toolID string, platformRelease *cores.PlatformRelease) []*rpc
 }
 
 // Upload FIXMEDOC
-func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, errStream io.Writer) error {
+func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, errStream io.Writer) (*rpc.UploadResult, error) {
 	logrus.Tracef("Upload %s on %s started", req.GetSketchPath(), req.GetFqbn())
 
 	// TODO: make a generic function to extract sketch from request
@@ -131,16 +131,16 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 	sketchPath := paths.New(req.GetSketchPath())
 	sk, err := sketch.New(sketchPath)
 	if err != nil && req.GetImportDir() == "" && req.GetImportFile() == "" {
-		return &arduino.CantOpenSketchError{Cause: err}
+		return nil, &arduino.CantOpenSketchError{Cause: err}
 	}
 
 	pme, release := commands.GetPackageManagerExplorer(req)
 	if pme == nil {
-		return &arduino.InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 	defer release()
 
-	if err := runProgramAction(
+	updatedPort, err := runProgramAction(
 		pme,
 		sk,
 		req.GetImportFile(),
@@ -155,11 +155,14 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		errStream,
 		req.GetDryRun(),
 		req.GetUserFields(),
-	); err != nil {
-		return err
+	)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	return &rpc.UploadResult{
+		UpdatedUploadPort: updatedPort,
+	}, nil
 }
 
 // UsingProgrammer FIXMEDOC
@@ -169,7 +172,7 @@ func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest,
 	if req.GetProgrammer() == "" {
 		return &arduino.MissingProgrammerError{}
 	}
-	err := Upload(ctx, &rpc.UploadRequest{
+	_, err := Upload(ctx, &rpc.UploadRequest{
 		Instance:   req.GetInstance(),
 		SketchPath: req.GetSketchPath(),
 		ImportFile: req.GetImportFile(),
@@ -190,10 +193,10 @@ func runProgramAction(pme *packagemanager.Explorer,
 	programmerID string,
 	verbose, verify, burnBootloader bool,
 	outStream, errStream io.Writer,
-	dryRun bool, userFields map[string]string) error {
+	dryRun bool, userFields map[string]string) (*rpc.Port, error) {
 
 	if burnBootloader && programmerID == "" {
-		return &arduino.MissingProgrammerError{}
+		return nil, &arduino.MissingProgrammerError{}
 	}
 	if port == nil || (port.Address == "" && port.Protocol == "") {
 		// For no-port uploads use "default" protocol
@@ -203,19 +206,19 @@ func runProgramAction(pme *packagemanager.Explorer,
 
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return &arduino.InvalidFQBNError{Cause: err}
+		return nil, &arduino.InvalidFQBNError{Cause: err}
 	}
 	logrus.WithField("fqbn", fqbn).Tracef("Detected FQBN")
 
 	// Find target board and board properties
 	_, boardPlatform, board, boardProperties, buildPlatform, err := pme.ResolveFQBN(fqbn)
 	if boardPlatform == nil {
-		return &arduino.PlatformNotFoundError{
+		return nil, &arduino.PlatformNotFoundError{
 			Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
 			Cause:    err,
 		}
 	} else if err != nil {
-		return &arduino.UnknownFQBNError{Cause: err}
+		return nil, &arduino.UnknownFQBNError{Cause: err}
 	}
 	logrus.
 		WithField("boardPlatform", boardPlatform).
@@ -232,7 +235,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 			programmer = buildPlatform.Programmers[programmerID]
 		}
 		if programmer == nil {
-			return &arduino.ProgrammerNotFoundError{Programmer: programmerID}
+			return nil, &arduino.ProgrammerNotFoundError{Programmer: programmerID}
 		}
 	}
 
@@ -253,7 +256,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 	}
 	uploadToolID, err := getToolID(props, action, port.Protocol)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var uploadToolPlatform *cores.PlatformRelease
@@ -268,7 +271,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 		Trace("Upload tool")
 
 	if split := strings.Split(uploadToolID, ":"); len(split) > 2 {
-		return &arduino.InvalidPlatformPropertyError{
+		return nil, &arduino.InvalidPlatformPropertyError{
 			Property: fmt.Sprintf("%s.tool.%s", action, port.Protocol), // TODO: Can be done better, maybe inline getToolID(...)
 			Value:    uploadToolID}
 	} else if len(split) == 2 {
@@ -277,12 +280,12 @@ func runProgramAction(pme *packagemanager.Explorer,
 			PlatformArchitecture: boardPlatform.Platform.Architecture,
 		})
 		if p == nil {
-			return &arduino.PlatformNotFoundError{Platform: split[0] + ":" + boardPlatform.Platform.Architecture}
+			return nil, &arduino.PlatformNotFoundError{Platform: split[0] + ":" + boardPlatform.Platform.Architecture}
 		}
 		uploadToolID = split[1]
 		uploadToolPlatform = pme.GetInstalledPlatformRelease(p)
 		if uploadToolPlatform == nil {
-			return &arduino.PlatformNotFoundError{Platform: split[0] + ":" + boardPlatform.Platform.Architecture}
+			return nil, &arduino.PlatformNotFoundError{Platform: split[0] + ":" + boardPlatform.Platform.Architecture}
 		}
 	}
 
@@ -309,7 +312,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 	}
 
 	if !uploadProperties.ContainsKey("upload.protocol") && programmer == nil {
-		return &arduino.ProgrammerRequiredForUploadError{}
+		return nil, &arduino.ProgrammerRequiredForUploadError{}
 	}
 
 	// Set properties for verbose upload
@@ -357,13 +360,13 @@ func runProgramAction(pme *packagemanager.Explorer,
 	if !burnBootloader {
 		importPath, sketchName, err := determineBuildPathAndSketchName(importFile, importDir, sk, fqbn)
 		if err != nil {
-			return &arduino.NotFoundError{Message: tr("Error finding build artifacts"), Cause: err}
+			return nil, &arduino.NotFoundError{Message: tr("Error finding build artifacts"), Cause: err}
 		}
 		if !importPath.Exist() {
-			return &arduino.NotFoundError{Message: tr("Compiled sketch not found in %s", importPath)}
+			return nil, &arduino.NotFoundError{Message: tr("Compiled sketch not found in %s", importPath)}
 		}
 		if !importPath.IsDir() {
-			return &arduino.NotFoundError{Message: tr("Expected compiled sketch in directory %s, but is a file instead", importPath)}
+			return nil, &arduino.NotFoundError{Message: tr("Expected compiled sketch in directory %s, but is a file instead", importPath)}
 		}
 		uploadProperties.SetPath("build.path", importPath)
 		uploadProperties.Set("build.project_name", sketchName)
@@ -466,22 +469,28 @@ func runProgramAction(pme *packagemanager.Explorer,
 	toolEnv := pme.GetEnvVarsForSpawnedProcess()
 	if burnBootloader {
 		if err := runTool("erase.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
-			return &arduino.FailedUploadError{Message: tr("Failed chip erase"), Cause: err}
+			return nil, &arduino.FailedUploadError{Message: tr("Failed chip erase"), Cause: err}
 		}
 		if err := runTool("bootloader.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
-			return &arduino.FailedUploadError{Message: tr("Failed to burn bootloader"), Cause: err}
+			return nil, &arduino.FailedUploadError{Message: tr("Failed to burn bootloader"), Cause: err}
 		}
 	} else if programmer != nil {
 		if err := runTool("program.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
-			return &arduino.FailedUploadError{Message: tr("Failed programming"), Cause: err}
+			return nil, &arduino.FailedUploadError{Message: tr("Failed programming"), Cause: err}
 		}
 	} else {
 		if err := runTool("upload.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
-			return &arduino.FailedUploadError{Message: tr("Failed uploading"), Cause: err}
+			return nil, &arduino.FailedUploadError{Message: tr("Failed uploading"), Cause: err}
 		}
 	}
 
 	logrus.Tracef("Upload successful")
+	return nil, nil // TODO: return new port
+}
+
+func detectNewUploadPort(oldPort *rpc.Port) *rpc.Port {
+	logrus.Tracef("Detecting new board port")
+	// TODO
 	return nil
 }
 

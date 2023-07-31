@@ -39,7 +39,7 @@ func BurnBootloader(ctx context.Context, req *rpc.BurnBootloaderRequest, outStre
 	}
 	defer release()
 
-	err := runProgramAction(
+	_, err := runProgramAction(
 		pme,
 		nil, // sketch
 		"",  // importFile

@@ -307,13 +307,17 @@ func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.Arduin
 			Message: &rpc.UploadResponse_ErrStream{ErrStream: data},
 		})
 	})
-	err := upload.Upload(stream.Context(), req, outStream, errStream)
+	res, err := upload.Upload(stream.Context(), req, outStream, errStream)
 	outStream.Close()
 	errStream.Close()
-	if err != nil {
-		return convertErrorToRPCStatus(err)
+	if res != nil {
+		syncSend.Send(&rpc.UploadResponse{
+			Message: &rpc.UploadResponse_Result{
+				Result: res,
+			},
+		})
 	}
-	return nil
+	return convertErrorToRPCStatus(err)
 }
 
 // UploadUsingProgrammer FIXMEDOC

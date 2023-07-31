@@ -67,7 +67,15 @@ message UploadResponse {
     bytes out_stream = 1;
     // The error output of the upload process.
     bytes err_stream = 2;
+    // The upload result
+    UploadResult result = 3;
   }
+}
+
+message UploadResult {
+  // When a board requires a port disconnection to perform the upload, this
+  // field returns the port where the board reconnects after the upload.
+  Port updated_upload_port = 1;
 }
 
 message ProgrammerIsRequiredForUploadError {}
