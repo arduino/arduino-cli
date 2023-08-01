@@ -21,6 +21,8 @@ import (
 	"io"
 	"path/filepath"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -29,8 +31,10 @@ import (
 	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -134,15 +138,23 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		return nil, &arduino.CantOpenSketchError{Cause: err}
 	}
 
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, pmeRelease := commands.GetPackageManagerExplorer(req)
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
-	defer release()
+	defer pmeRelease()
+
+	watch, watchRelease, err := board.Watch(&rpc.BoardListWatchRequest{Instance: req.GetInstance()})
+	if err != nil {
+		logrus.WithError(err).Error("Error watching board ports")
+	} else {
+		defer watchRelease()
+	}
 
 	updatedPort, err := runProgramAction(
 		pme,
 		sk,
+		watch,
 		req.GetImportFile(),
 		req.GetImportDir(),
 		req.GetFqbn(),
@@ -189,20 +201,42 @@ func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest,
 
 func runProgramAction(pme *packagemanager.Explorer,
 	sk *sketch.Sketch,
+	watch <-chan *rpc.BoardListWatchResponse,
 	importFile, importDir, fqbnIn string, port *rpc.Port,
 	programmerID string,
 	verbose, verify, burnBootloader bool,
 	outStream, errStream io.Writer,
 	dryRun bool, userFields map[string]string) (*rpc.Port, error) {
 
-	if burnBootloader && programmerID == "" {
-		return nil, &arduino.MissingProgrammerError{}
-	}
 	if port == nil || (port.Address == "" && port.Protocol == "") {
 		// For no-port uploads use "default" protocol
 		port = &rpc.Port{Protocol: "default"}
 	}
 	logrus.WithField("port", port).Tracef("Upload port")
+
+	// Default newPort
+	uploadCompleted := func() *rpc.Port { return nil }
+	if watch != nil {
+		// Run port detector
+		uploadCompletedCtx, cancel := context.WithCancel(context.Background())
+		var newUploadPort *rpc.Port
+		var wg sync.WaitGroup
+		wg.Add(1)
+		go func() {
+			newUploadPort = detectUploadPort(port, watch, uploadCompletedCtx)
+			wg.Done()
+		}()
+		uploadCompleted = func() *rpc.Port {
+			cancel()
+			wg.Wait()
+			return newUploadPort
+		}
+		defer uploadCompleted() // defer in case of exit on error (ensures goroutine completion)
+	}
+
+	if burnBootloader && programmerID == "" {
+		return nil, &arduino.MissingProgrammerError{}
+	}
 
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
@@ -485,13 +519,73 @@ func runProgramAction(pme *packagemanager.Explorer,
 	}
 
 	logrus.Tracef("Upload successful")
-	return nil, nil // TODO: return new port
+	return uploadCompleted(), nil
 }
 
-func detectNewUploadPort(oldPort *rpc.Port) *rpc.Port {
-	logrus.Tracef("Detecting new board port")
-	// TODO
-	return nil
+func detectUploadPort(uploadPort *rpc.Port, watch <-chan *rpc.BoardListWatchResponse, uploadCtx context.Context) *rpc.Port {
+	log := logrus.WithField("task", "port_detection")
+	log.Tracef("Detecting new board port after upload")
+
+	defer func() {
+		// On exit, discard all events until the watcher is closed
+		go f.DiscardCh(watch)
+	}()
+
+	// Ignore all events during the upload
+	for {
+		select {
+		case ev, ok := <-watch:
+			if !ok {
+				log.Error("Upload port detection failed, watcher closed")
+				return nil
+			}
+			log.WithField("event", ev).Trace("Ignored watcher event before upload")
+			continue
+		case <-uploadCtx.Done():
+			// Upload completed, move to the next phase
+		}
+		break
+	}
+
+	// Pick the first port that is detected after the upload
+	desiredHwID := uploadPort.HardwareId
+	timeout := time.After(5 * time.Second)
+	var candidate *rpc.Port
+	for {
+		select {
+		case ev, ok := <-watch:
+			if !ok {
+				log.Error("Upload port detection failed, watcher closed")
+				return candidate
+			}
+			if ev.EventType == "remove" && candidate != nil {
+				if candidate.Equals(ev.Port.GetPort()) {
+					log.WithField("event", ev).Trace("Candidate port is no more available")
+					candidate = nil
+					continue
+				}
+			}
+			if ev.EventType != "add" {
+				log.WithField("event", ev).Trace("Ignored non-add event")
+				continue
+			}
+			candidate = ev.Port.GetPort()
+			log.WithField("event", ev).Trace("New upload port candidate")
+
+			// If the current candidate port does not have the desired HW-ID do
+			// not return it immediately.
+			if desiredHwID != "" && candidate.GetHardwareId() != desiredHwID {
+				log.Trace("New candidate port did not match desired HW ID, keep watching...")
+				continue
+			}
+
+			log.Trace("Found new upload port!")
+			return candidate
+		case <-timeout:
+			log.Trace("Timeout waiting for candidate port")
+			return candidate
+		}
+	}
 }
 
 func runTool(recipeID string, props *properties.Map, outStream, errStream io.Writer, verbose bool, dryRun bool, toolEnv []string) error {

@@ -187,6 +187,7 @@ func TestUploadPropertiesComposition(t *testing.T) {
 		_, err := runProgramAction(
 			pme,
 			nil,                     // sketch
+			nil,                     // board watcher
 			"",                      // importFile
 			test.importDir.String(), // importDir
 			test.fqbn,               // FQBN
