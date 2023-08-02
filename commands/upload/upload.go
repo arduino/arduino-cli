@@ -21,7 +21,6 @@ import (
 	"io"
 	"path/filepath"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino"
@@ -219,17 +218,11 @@ func runProgramAction(pme *packagemanager.Explorer,
 	if watch != nil {
 		// Run port detector
 		uploadCompletedCtx, cancel := context.WithCancel(context.Background())
-		var newUploadPort *rpc.Port
-		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			newUploadPort = detectUploadPort(port, watch, uploadCompletedCtx)
-			wg.Done()
-		}()
+		newUploadPort := f.NewFuture[*rpc.Port]()
+		go detectUploadPort(port, watch, uploadCompletedCtx, newUploadPort)
 		uploadCompleted = func() *rpc.Port {
 			cancel()
-			wg.Wait()
-			return newUploadPort
+			return newUploadPort.Await()
 		}
 		defer uploadCompleted() // defer in case of exit on error (ensures goroutine completion)
 	}
@@ -522,13 +515,15 @@ func runProgramAction(pme *packagemanager.Explorer,
 	return uploadCompleted(), nil
 }
 
-func detectUploadPort(uploadPort *rpc.Port, watch <-chan *rpc.BoardListWatchResponse, uploadCtx context.Context) *rpc.Port {
+func detectUploadPort(uploadPort *rpc.Port, watch <-chan *rpc.BoardListWatchResponse, uploadCtx context.Context, result f.Future[*rpc.Port]) {
 	log := logrus.WithField("task", "port_detection")
 	log.Tracef("Detecting new board port after upload")
 
+	var candidate *rpc.Port
 	defer func() {
 		// On exit, discard all events until the watcher is closed
 		go f.DiscardCh(watch)
+		result.Send(candidate)
 	}()
 
 	// Ignore all events during the upload
@@ -537,7 +532,7 @@ func detectUploadPort(uploadPort *rpc.Port, watch <-chan *rpc.BoardListWatchResp
 		case ev, ok := <-watch:
 			if !ok {
 				log.Error("Upload port detection failed, watcher closed")
-				return nil
+				return
 			}
 			log.WithField("event", ev).Trace("Ignored watcher event before upload")
 			continue
@@ -550,13 +545,12 @@ func detectUploadPort(uploadPort *rpc.Port, watch <-chan *rpc.BoardListWatchResp
 	// Pick the first port that is detected after the upload
 	desiredHwID := uploadPort.HardwareId
 	timeout := time.After(5 * time.Second)
-	var candidate *rpc.Port
 	for {
 		select {
 		case ev, ok := <-watch:
 			if !ok {
 				log.Error("Upload port detection failed, watcher closed")
-				return candidate
+				return
 			}
 			if ev.EventType == "remove" && candidate != nil {
 				if candidate.Equals(ev.Port.GetPort()) {
@@ -580,10 +574,10 @@ func detectUploadPort(uploadPort *rpc.Port, watch <-chan *rpc.BoardListWatchResp
 			}
 
 			log.Trace("Found new upload port!")
-			return candidate
+			return
 		case <-timeout:
 			log.Trace("Timeout waiting for candidate port")
-			return candidate
+			return
 		}
 	}
 }
