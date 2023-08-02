@@ -390,21 +390,17 @@ func runProgramAction(pme *packagemanager.Explorer,
 		uploadProperties.Set("build.project_name", sketchName)
 	}
 
-	// By default do not return any new port...
-	uploadCompleted := func() *rpc.Port { return nil }
-	// ...but if there is an expected port change then run the detector...
-	if uploadProperties.GetBoolean("upload.wait_for_upload_port") && watch != nil {
-		uploadCompletedCtx, cancel := context.WithCancel(context.Background())
-		newUploadPort := f.NewFuture[*rpc.Port]()
-		go detectUploadPort(port, watch, uploadCompletedCtx, newUploadPort)
-		uploadCompleted = func() *rpc.Port {
-			cancel()
-			return newUploadPort.Await()
-		}
+	// This context is kept alive for the entire duration of the upload
+	uploadCtx, uploadCompleted := context.WithCancel(context.Background())
+	defer uploadCompleted()
 
-		// Ensures goroutines completion in case of exit on error
-		defer uploadCompleted()
+	// By default do not return any new port but if there is an
+	// expected port change then run the detector.
+	updatedUploadPort := f.NewFuture[*rpc.Port]()
+	if uploadProperties.GetBoolean("upload.wait_for_upload_port") && watch != nil {
+		go detectUploadPort(port, watch, uploadCtx, updatedUploadPort)
 	} else {
+		updatedUploadPort.Send(nil)
 		go f.DiscardCh(watch)
 	}
 
@@ -520,8 +516,10 @@ func runProgramAction(pme *packagemanager.Explorer,
 		}
 	}
 
+	uploadCompleted()
 	logrus.Tracef("Upload successful")
-	return uploadCompleted(), nil
+
+	return updatedUploadPort.Await(), nil
 }
 
 func detectUploadPort(uploadPort *rpc.Port, watch <-chan *rpc.BoardListWatchResponse, uploadCtx context.Context, result f.Future[*rpc.Port]) {
