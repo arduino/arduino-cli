@@ -223,6 +223,9 @@ enum FailedInstanceInitReason {
   // FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR failure encountered while
   // loading a tool
   FAILED_INSTANCE_INIT_REASON_TOOL_LOAD_ERROR = 3;
+  // FAILED_INSTANCE_INIT_REASON_INDEX_DOWNLOAD_ERROR failure encountered while
+  // downloading an index
+  FAILED_INSTANCE_INIT_REASON_INDEX_DOWNLOAD_ERROR = 4;
 }
 
 message FailedInstanceInitError {
