@@ -207,6 +207,11 @@ func runProgramAction(pme *packagemanager.Explorer,
 	outStream, errStream io.Writer,
 	dryRun bool, userFields map[string]string) (*rpc.Port, error) {
 
+	defer func() {
+		// On exit, discard all events until the watcher is closed
+		go f.DiscardCh(watch)
+	}()
+
 	if port == nil || (port.Address == "" && port.Protocol == "") {
 		// For no-port uploads use "default" protocol
 		port = &rpc.Port{Protocol: "default"}
@@ -521,8 +526,6 @@ func detectUploadPort(uploadPort *rpc.Port, watch <-chan *rpc.BoardListWatchResp
 
 	var candidate *rpc.Port
 	defer func() {
-		// On exit, discard all events until the watcher is closed
-		go f.DiscardCh(watch)
 		result.Send(candidate)
 	}()
 
