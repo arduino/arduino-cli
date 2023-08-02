@@ -398,7 +398,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 	// expected port change then run the detector.
 	updatedUploadPort := f.NewFuture[*rpc.Port]()
 	if uploadProperties.GetBoolean("upload.wait_for_upload_port") && watch != nil {
-		go detectUploadPort(port, watch, uploadCtx, updatedUploadPort)
+		go detectUploadPort(uploadCtx, port, watch, updatedUploadPort)
 	} else {
 		updatedUploadPort.Send(nil)
 		go f.DiscardCh(watch)
@@ -522,7 +522,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 	return updatedUploadPort.Await(), nil
 }
 
-func detectUploadPort(uploadPort *rpc.Port, watch <-chan *rpc.BoardListWatchResponse, uploadCtx context.Context, result f.Future[*rpc.Port]) {
+func detectUploadPort(uploadCtx context.Context, uploadPort *rpc.Port, watch <-chan *rpc.BoardListWatchResponse, result f.Future[*rpc.Port]) {
 	log := logrus.WithField("task", "port_detection")
 	log.Tracef("Detecting new board port after upload")
 
