@@ -207,8 +207,8 @@ func runProgramAction(pme *packagemanager.Explorer,
 	outStream, errStream io.Writer,
 	dryRun bool, userFields map[string]string) (*rpc.Port, error) {
 
+	// Ensure watcher events consumption in case of exit on error
 	defer func() {
-		// On exit, discard all events until the watcher is closed
 		go f.DiscardCh(watch)
 	}()
 
@@ -217,20 +217,6 @@ func runProgramAction(pme *packagemanager.Explorer,
 		port = &rpc.Port{Protocol: "default"}
 	}
 	logrus.WithField("port", port).Tracef("Upload port")
-
-	// Default newPort
-	uploadCompleted := func() *rpc.Port { return nil }
-	if watch != nil {
-		// Run port detector
-		uploadCompletedCtx, cancel := context.WithCancel(context.Background())
-		newUploadPort := f.NewFuture[*rpc.Port]()
-		go detectUploadPort(port, watch, uploadCompletedCtx, newUploadPort)
-		uploadCompleted = func() *rpc.Port {
-			cancel()
-			return newUploadPort.Await()
-		}
-		defer uploadCompleted() // defer in case of exit on error (ensures goroutine completion)
-	}
 
 	if burnBootloader && programmerID == "" {
 		return nil, &arduino.MissingProgrammerError{}
@@ -402,6 +388,24 @@ func runProgramAction(pme *packagemanager.Explorer,
 		}
 		uploadProperties.SetPath("build.path", importPath)
 		uploadProperties.Set("build.project_name", sketchName)
+	}
+
+	// By default do not return any new port...
+	uploadCompleted := func() *rpc.Port { return nil }
+	// ...but if there is an expected port change then run the detector...
+	if uploadProperties.GetBoolean("upload.wait_for_upload_port") && watch != nil {
+		uploadCompletedCtx, cancel := context.WithCancel(context.Background())
+		newUploadPort := f.NewFuture[*rpc.Port]()
+		go detectUploadPort(port, watch, uploadCompletedCtx, newUploadPort)
+		uploadCompleted = func() *rpc.Port {
+			cancel()
+			return newUploadPort.Await()
+		}
+
+		// Ensures goroutines completion in case of exit on error
+		defer uploadCompleted()
+	} else {
+		go f.DiscardCh(watch)
 	}
 
 	// Force port wait to make easier to unbrick boards like the Arduino Leonardo, or similar with native USB,
