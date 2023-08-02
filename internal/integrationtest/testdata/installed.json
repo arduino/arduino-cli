@@ -4432,6 +4432,47 @@
           ]
         },
         {
+          "name": "esptool",
+          "version": "4.6.2",
+          "systems": [
+            {
+              "host": "x86_64-pc-linux-gnu",
+              "archiveFileName": "esptool_4.6.2_Linux_64bit.tar.gz",
+              "url": "https://downloads.arduino.cc/tools/esptool_4.6.2_Linux_64bit.tar.gz",
+              "size": "13034467",
+              "checksum": "SHA-256:e29437dfbd12b025cd5e23d724481b6262f5b8fb75ce2fa5d0498a4cf65eca95"
+            },
+            {
+              "host": "x86_64-mingw32",
+              "archiveFileName": "esptool_4.6.2_Windows_64bit.zip",
+              "url": "https://downloads.arduino.cc/tools/esptool_4.6.2_Windows_64bit.zip",
+              "size": "6400257",
+              "checksum": "SHA-256:a103423b367c5dcb7343e1093f4a1a9ff041ca95756919c2b9c91ad2f312294d"
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "archiveFileName": "esptool_4.6.2_macOS_64bit.tar.gz",
+              "url": "https://downloads.arduino.cc/tools/esptool_4.6.2_macOS_64bit.tar.gz",
+              "size": "5859915",
+              "checksum": "SHA-256:546e964c0012d5e708985d70f5a7ff081219dff332c9f49eebec6b16c26a37a9"
+            },
+            {
+              "host": "arm-linux-gnueabihf",
+              "archiveFileName": "esptool_4.6.2_Linux_ARMv6.tar.gz",
+              "url": "https://downloads.arduino.cc/tools/esptool_4.6.2_Linux_ARMv6.tar.gz",
+              "size": "9659362",
+              "checksum": "SHA-256:d5efb2b80ad21157228cbca43e13d9187a9dc12b944a3c63d69e9139e424568b"
+            },
+            {
+              "host": "arm64-linux-gnueabihf",
+              "archiveFileName": "esptool_4.6.2_Linux_ARM64.tar.gz",
+              "url": "https://downloads.arduino.cc/tools/esptool_4.6.2_Linux_ARM64.tar.gz",
+              "size": "10221768",
+              "checksum": "SHA-256:33e1f2edb04def19e17f8ffa1cd37f9638ecccae8c05f95e54667e44496bd28d"
+            }
+          ]
+        },
+        {
           "name": "uno-r4-wifi-fwuploader-plugin",
           "version": "1.0.0",
           "systems": [
