@@ -26,6 +26,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packageindex"
 	"github.com/arduino/arduino-cli/arduino/discovery/discoverymanager"
@@ -34,6 +35,7 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/arduino/go-timeutils"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	semver "go.bug.st/relaxed-semver"
 )
@@ -438,6 +440,9 @@ func (pme *Explorer) determineReferencedPlatformRelease(boardBuildProperties *pr
 // LoadPackageIndex loads a package index by looking up the local cached file from the specified URL
 func (pmb *Builder) LoadPackageIndex(URL *url.URL) error {
 	indexFileName := path.Base(URL.Path)
+	if indexFileName == "." || indexFileName == "" {
+		return &arduino.InvalidURLError{Cause: errors.New(URL.String())}
+	}
 	if strings.HasSuffix(indexFileName, ".tar.bz2") {
 		indexFileName = strings.TrimSuffix(indexFileName, ".tar.bz2") + ".json"
 	}

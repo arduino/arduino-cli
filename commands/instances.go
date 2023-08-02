@@ -280,7 +280,14 @@ func Init(req *rpc.InitRequest, responseCallback func(r *rpc.InitResponse)) erro
 			allPackageIndexUrls = append(allPackageIndexUrls, URL)
 		}
 	}
-	firstUpdate(context.Background(), req.GetInstance(), downloadCallback, allPackageIndexUrls)
+	if err := firstUpdate(context.Background(), req.GetInstance(), downloadCallback, allPackageIndexUrls); err != nil {
+		e := &arduino.InitFailedError{
+			Code:   codes.InvalidArgument,
+			Cause:  err,
+			Reason: rpc.FailedInstanceInitReason_FAILED_INSTANCE_INIT_REASON_INDEX_DOWNLOAD_ERROR,
+		}
+		responseError(e.ToRPCStatus())
+	}
 
 	{
 		// We need to rebuild the PackageManager currently in use by this instance
@@ -589,7 +596,12 @@ func firstUpdate(ctx context.Context, instance *rpc.Instance, downloadCb func(ms
 		if URL.Scheme == "file" {
 			continue
 		}
-		packageIndexFileName := (&resources.IndexResource{URL: URL}).IndexFileName()
+		packageIndexFileName, err := (&resources.IndexResource{URL: URL}).IndexFileName()
+		if err != nil {
+			return &arduino.FailedDownloadError{
+				Message: tr("Error downloading index '%s'", URL),
+				Cause:   &arduino.InvalidURLError{}}
+		}
 		packageIndexFile := dataDir.Join(packageIndexFileName)
 		if packageIndexFile.NotExist() {
 			// The index file doesn't exists, that means the CLI is run for the first time,
