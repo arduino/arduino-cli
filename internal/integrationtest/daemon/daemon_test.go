@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino"
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -187,13 +188,7 @@ func TestDaemonCompileOptions(t *testing.T) {
 	// assert that the task progress is increasing and doesn't contain multiple 100% values
 	results := analyzer.Results[""]
 	require.True(t, results[len(results)-1].Completed)
-	require.IsNonDecreasing(t, func() []float32{
-		res := make([]float32, len(results))
-		for i := 0; i < len(results); i++ {
-			res[i] = results[i].Percent
-		}
-		return res
-	}())
+	require.IsNonDecreasing(t, f.Map(results, (*commands.TaskProgress).GetPercent))
 }
 
 func TestDaemonCompileAfterFailedLibInstall(t *testing.T) {
