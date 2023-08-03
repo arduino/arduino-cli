@@ -38,12 +38,15 @@ type IndexResource struct {
 }
 
 // IndexFileName returns the index file name as it is saved in data dir (package_xxx_index.json).
-func (res *IndexResource) IndexFileName() string {
+func (res *IndexResource) IndexFileName() (string, error) {
 	filename := path.Base(res.URL.Path) // == package_index.json[.gz] || packacge_index.tar.bz2
+	if filename == "." || filename == "" {
+		return "", &arduino.InvalidURLError{}
+	}
 	if i := strings.Index(filename, "."); i != -1 {
 		filename = filename[:i]
 	}
-	return filename + ".json"
+	return filename + ".json", nil
 }
 
 // Download will download the index and possibly check the signature using the Arduino's public key.
@@ -63,7 +66,10 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadP
 
 	// Download index file
 	downloadFileName := path.Base(res.URL.Path) // == package_index.json[.gz] || package_index.tar.bz2
-	indexFileName := res.IndexFileName()        // == package_index.json
+	indexFileName, err := res.IndexFileName()   // == package_index.json
+	if err != nil {
+		return err
+	}
 	tmpIndexPath := tmp.Join(downloadFileName)
 	if err := httpclient.DownloadFile(tmpIndexPath, res.URL.String(), "", tr("Downloading index: %s", downloadFileName), downloadCB, nil, downloader.NoResume); err != nil {
 		return &arduino.FailedDownloadError{Message: tr("Error downloading index '%s'", res.URL), Cause: err}
