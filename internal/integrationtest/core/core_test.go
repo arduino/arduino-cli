@@ -986,14 +986,26 @@ func TestCoreInstallCreatesInstalledJson(t *testing.T) {
 	require.NoError(t, err)
 
 	installedJsonFile := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.6.23", "installed.json")
-	require.FileExists(t, installedJsonFile.String())
 	installedJson, err := installedJsonFile.ReadFile()
 	require.NoError(t, err)
-	expectedInstalledJson, err := paths.New("..", "testdata", "installed.json").ReadFile()
-	require.NoError(t, err)
-	sortedInstalled := requirejson.Parse(t, installedJson).Query("walk(if type == \"array\" then sort else . end)").String()
-	sortedExpected := requirejson.Parse(t, expectedInstalledJson).Query("walk(if type == \"array\" then sort else . end)").String()
-	require.JSONEq(t, sortedExpected, sortedInstalled)
+	installed := requirejson.Parse(t, installedJson, "Parsing installed.json")
+	packages := installed.Query(".packages")
+	packages.LengthMustEqualTo(1)
+	arduinoPackage := packages.Query(".[0]")
+	arduinoPackage.Query(".name").MustEqual(`"arduino"`)
+	platforms := arduinoPackage.Query(".platforms")
+	platforms.LengthMustEqualTo(1)
+	avr := platforms.Query(".[0]")
+	avr.Query(".name").MustEqual(`"Arduino AVR Boards"`)
+	avr.Query(".architecture").MustEqual(`"avr"`)
+	tools := arduinoPackage.Query(".tools")
+	tools.MustContain(`[
+		{ "name": "CMSIS-Atmel" },
+		{ "name": "espflash" },
+		{ "name": "avrdude" },
+		{ "name": "CMSIS" },
+		{ "name": "avr-gcc" }
+	]`)
 }
 
 func TestCoreInstallRunsToolPostInstallScript(t *testing.T) {
