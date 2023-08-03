@@ -41,7 +41,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		return err
 	}
 
-	var _err error
+	var _err, mainErr error
 	commands := []types.Command{
 		&ContainerSetupHardwareToolsLibsSketchAndProps{},
 
@@ -92,12 +92,25 @@ func (s *Builder) Run(ctx *types.Context) error {
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 	}
 
-	mainErr := runCommands(ctx, commands)
+	ctx.Progress.AddSubSteps(len(commands) + 4)
+	defer ctx.Progress.RemoveSubSteps()
+
+	for _, command := range commands {
+		PrintRingNameIfDebug(ctx, command)
+		err := command.Run(ctx)
+		if err != nil {
+			mainErr = errors.WithStack(err)
+			break
+		}
+		ctx.Progress.CompleteStep()
+		ctx.PushProgress()
+	}
 
 	if ctx.CompilationDatabase != nil {
 		ctx.CompilationDatabase.SaveToFile()
 	}
 
+	var otherErr error
 	commands = []types.Command{
 		&PrintUsedAndNotUsedLibraries{SketchError: mainErr != nil},
 
@@ -107,7 +120,16 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		&phases.Sizer{SketchError: mainErr != nil},
 	}
-	otherErr := runCommands(ctx, commands)
+	for _, command := range commands {
+		PrintRingNameIfDebug(ctx, command)
+		err := command.Run(ctx)
+		if err != nil {
+			otherErr = errors.WithStack(err)
+			break
+		}
+		ctx.Progress.CompleteStep()
+		ctx.PushProgress()
+	}
 
 	if mainErr != nil {
 		return mainErr
@@ -193,8 +215,7 @@ func PrintRingNameIfDebug(ctx *types.Context, command types.Command) {
 }
 
 func RunBuilder(ctx *types.Context) error {
-	command := Builder{}
-	return command.Run(ctx)
+	return runCommands(ctx, []types.Command{&Builder{}})
 }
 
 func RunParseHardware(ctx *types.Context) error {
