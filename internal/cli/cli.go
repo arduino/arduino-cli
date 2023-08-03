@@ -104,6 +104,8 @@ func createCliCommandTree(cmd *cobra.Command) {
 	cmd.AddCommand(feedback.NewCommand())
 
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, tr("Print the logs on the standard output."))
+	cmd.Flag("verbose").Hidden = true
+	cmd.PersistentFlags().BoolVar(&verbose, "log", false, tr("Print the logs on the standard output."))
 	validLogLevels := []string{"trace", "debug", "info", "warn", "error", "fatal", "panic"}
 	cmd.PersistentFlags().String("log-level", "", tr("Messages with this level and above will be logged. Valid levels are: %s", strings.Join(validLogLevels, ", ")))
 	cmd.RegisterFlagCompletionFunc("log-level", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
