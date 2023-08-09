@@ -201,7 +201,7 @@ func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest,
 func runProgramAction(pme *packagemanager.Explorer,
 	sk *sketch.Sketch,
 	watch <-chan *rpc.BoardListWatchResponse,
-	importFile, importDir, fqbnIn string, port *rpc.Port,
+	importFile, importDir, fqbnIn string, userPort *rpc.Port,
 	programmerID string,
 	verbose, verify, burnBootloader bool,
 	outStream, errStream io.Writer,
@@ -212,6 +212,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 		go f.DiscardCh(watch)
 	}()
 
+	port := userPort
 	if port == nil || (port.Address == "" && port.Protocol == "") {
 		// For no-port uploads use "default" protocol
 		port = &rpc.Port{Protocol: "default"}
@@ -519,7 +520,11 @@ func runProgramAction(pme *packagemanager.Explorer,
 	uploadCompleted()
 	logrus.Tracef("Upload successful")
 
-	return updatedUploadPort.Await(), nil
+	updatedPort := updatedUploadPort.Await()
+	if updatedPort == nil {
+		updatedPort = userPort
+	}
+	return userPort, nil
 }
 
 func detectUploadPort(uploadCtx context.Context, uploadPort *rpc.Port, watch <-chan *rpc.BoardListWatchResponse, result f.Future[*rpc.Port]) {
