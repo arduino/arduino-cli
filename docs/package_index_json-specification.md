@@ -151,19 +151,7 @@ package. There can be many different versions of the same tool available at the 
 - (`arduino`, `avrdude`, `6.1`)
 - .....
 
-Each tool version may come in different build flavours for different OS. Each flavour is listed under the `systems`
-array. In the example above `avr-gcc` comes with builds for:
-
-- ARM Linux 32-bit (`arm-linux-gnueabihf`),
-- ARM Linux 64-bit (`aarch64-linux-gnu`),
-- macOS 64-bit (`x86_64-apple-darwin14`),
-- Windows (`i686-mingw32`),
-- Linux 32-bit (`i686-linux-gnu`),
-- Linux 64-bit (`x86_64-linux-gnu`)
-
-The IDE will take care to install the right flavour based on the `host` value, or fail if a needed flavour is
-missing.<br> Note that this information is not used to select the toolchain during compilation. If you want this
-specific version to be used, you should use the notation `{runtime.tools.TOOLNAME-VERSION.path}` in the platform.txt.
+The `systems` field lists all available [Tools Flavours](#tools-flavours-available-builds-made-for-different-os).
 
 The other fields are:
 
@@ -175,6 +163,56 @@ The other fields are:
   `ALGORITHM:CHECKSUM`, currently `MD5`, `SHA-1`,`SHA-256` algorithm are supported, we recommend `SHA-256`. On \*nix or
   macOS you can use the command `shasum -a 256 filename` to generate SHA-256 checksums. There are free options for
   Windows, including md5deep. There are also online utilities for generating checksums.
+
+#### Tools flavours (available builds made for different OS)
+
+Each tool version may come in different build flavours for different OS. Each flavour is listed under the `systems`
+array. The IDE will take care to install the right flavor for the user's OS by matching the `host` value with the
+follwing table, or fail if a needed flavour is missing.
+
+| OS flavour   | `host` regexp value                   | `host` suggested value             |
+| ------------ | ------------------------------------- | ---------------------------------- |
+| Linux 32     | `i[3456]86-.*linux-gnu`               | `i686-linux-gnu`                   |
+| Linux 64     | `x86_64-.*linux-gnu`                  | `x86_64-linux-gnu`                 |
+| Linux Arm    | `arm.*-linux-gnueabihf`               | `arm-linux-gnueabihf`              |
+| Linux Arm64  | `(aarch64\|arm64)-linux-gnu`          | `aarch64-linux-gnu`                |
+| Windows 32   | `i[3456]86-.*(mingw32\|cygwin)`       | `i686-mingw32` or `i686-cygwin`    |
+| Windows 64   | `(amd64\|x86_64)-.*(mingw32\|cygwin)` | `x86_64-migw32` or `x86_64-cygwin` |
+| MacOSX 32    | `i[3456]86-apple-darwin.*`            | `i686-apple-darwin`                |
+| MacOSX 64    | `x86_64-apple-darwin.*`               | `x86_64-apple-darwin`              |
+| MacOSX Arm64 | `arm64-apple-darwin.*`                | `arm64-apple-darwin`               |
+| FreeBSD 32   | `i?[3456]86-freebsd[0-9]*`            | `i686-freebsd`                     |
+| FreeBSD 64   | `amd64-freebsd[0-9]*`                 | `amd64-freebsd`                    |
+| FreeBSD Arm  | `arm.*-freebsd[0-9]*`                 | `arm-freebsd`                      |
+
+The `host` value is matched with the regexp, this means that a more specific value for the `host` field is allowed (for
+example you may write `x86_64-apple-darwin14.1` for MacOSX instead of the suggested `x86_64-apple-darwin`), by the way,
+we recommend to keep it simple and stick to the suggested value in the table.
+
+Some OS allows to run different flavours:
+
+| The OS...    | ...may also run builds for |
+| ------------ | -------------------------- |
+| Windows 64   | Windows 32                 |
+| MacOSX 64    | MacOSX 32                  |
+| MacOSX Arm64 | MacOSX 64 or MacOSX 32     |
+
+This is taken into account when the tools are downloaded (for example if we are on a Windows 64 machine and the needed
+tool is available only for the Windows 32 flavour, then the Windows 32 flavour will be downloaded and used).
+
+For completeness, the previous example `avr-gcc` comes with builds for:
+
+- ARM Linux 32 (`arm-linux-gnueabihf`),
+- ARM Linux 64 (`aarch64-linux-gnu`),
+- MacOSX 64 (`x86_64-apple-darwin14`),
+- Windows 32 (`i686-mingw32`),
+- Linux 32 (`i686-linux-gnu`),
+- Linux 64 (`x86_64-linux-gnu`)
+- MacOSX Arm64 will use the MacOSX 64 flavour
+- Windows 64 will use the Windows 32 flavour
+
+Note: this information is not used to select the toolchain during compilation. If you want a specific version to be
+used, you should use the notation `{runtime.tools.TOOLNAME-VERSION.path}` in the platform.txt.
 
 ### Platforms definitions
 
