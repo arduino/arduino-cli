@@ -167,8 +167,8 @@ The other fields are:
 #### Tools flavours (available builds made for different OS)
 
 Each tool version may come in different build flavours for different OS. Each flavour is listed under the `systems`
-array. The IDE will take care to install the right flavor for the user's OS by matching the `host` value with the
-follwing table, or fail if a needed flavour is missing.
+array. The IDE will take care to install the right flavour for the user's OS by matching the `host` value with the
+following table or fail if a needed flavour is missing.
 
 | OS flavour   | `host` regexp value                   | `host` suggested value             |
 | ------------ | ------------------------------------- | ---------------------------------- |
