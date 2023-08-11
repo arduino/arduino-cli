@@ -333,7 +333,7 @@ func (disc *PluggableDiscovery) Run() (err error) {
 }
 
 // Start initializes and start the discovery internal subroutines. This command must be
-// called before List or StartSync.
+// called before List.
 func (disc *PluggableDiscovery) Start() error {
 	if err := disc.sendCommand("START\n"); err != nil {
 		return err
