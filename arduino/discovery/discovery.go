@@ -113,11 +113,36 @@ func (p *Port) ToRPC() *rpc.Port {
 	}
 }
 
+// PortFromRPCPort converts an *rpc.Port to a *Port
+func PortFromRPCPort(o *rpc.Port) (p *Port) {
+	if o == nil {
+		return nil
+	}
+	return &Port{
+		Address:       o.Address,
+		AddressLabel:  o.Label,
+		Protocol:      o.Protocol,
+		ProtocolLabel: o.ProtocolLabel,
+		HardwareID:    o.HardwareId,
+		Properties:    properties.NewFromHashmap(o.Properties),
+	}
+}
+
 func (p *Port) String() string {
 	if p == nil {
 		return "none"
 	}
 	return p.Address
+}
+
+// Clone creates a copy of this Port
+func (p *Port) Clone() *Port {
+	if p == nil {
+		return nil
+	}
+	var res Port = *p
+	res.Properties = p.Properties.Clone()
+	return &res
 }
 
 // Event is a pluggable discovery event

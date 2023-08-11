@@ -26,6 +26,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -212,10 +213,10 @@ func runProgramAction(pme *packagemanager.Explorer,
 		go f.DiscardCh(watch)
 	}()
 
-	port := userPort
+	port := discovery.PortFromRPCPort(userPort)
 	if port == nil || (port.Address == "" && port.Protocol == "") {
 		// For no-port uploads use "default" protocol
-		port = &rpc.Port{Protocol: "default"}
+		port = &discovery.Port{Protocol: "default"}
 	}
 	logrus.WithField("port", port).Tracef("Upload port")
 
@@ -421,7 +422,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 
 	// If not using programmer perform some action required
 	// to set the board in bootloader mode
-	actualPort := port
+	actualPort := port.Clone()
 	if programmer == nil && !burnBootloader && (port.Protocol == "serial" || forcedSerialPortWait) {
 		// Perform reset via 1200bps touch if requested and wait for upload port also if requested.
 		touch := uploadProperties.GetBoolean("upload.use_1200bps_touch")
@@ -491,10 +492,10 @@ func runProgramAction(pme *packagemanager.Explorer,
 
 	// Get Port properties gathered using pluggable discovery
 	uploadProperties.Set("upload.port.address", port.Address)
-	uploadProperties.Set("upload.port.label", port.Label)
+	uploadProperties.Set("upload.port.label", port.AddressLabel)
 	uploadProperties.Set("upload.port.protocol", port.Protocol)
 	uploadProperties.Set("upload.port.protocolLabel", port.ProtocolLabel)
-	for prop, value := range actualPort.Properties {
+	for prop, value := range actualPort.Properties.AsMap() {
 		uploadProperties.Set(fmt.Sprintf("upload.port.properties.%s", prop), value)
 	}
 
@@ -527,7 +528,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 	return userPort, nil
 }
 
-func detectUploadPort(uploadCtx context.Context, uploadPort *rpc.Port, watch <-chan *rpc.BoardListWatchResponse, result f.Future[*rpc.Port]) {
+func detectUploadPort(uploadCtx context.Context, uploadPort *discovery.Port, watch <-chan *rpc.BoardListWatchResponse, result f.Future[*rpc.Port]) {
 	log := logrus.WithField("task", "port_detection")
 	log.Tracef("Detecting new board port after upload")
 
@@ -553,7 +554,7 @@ func detectUploadPort(uploadCtx context.Context, uploadPort *rpc.Port, watch <-c
 	}
 
 	// Pick the first port that is detected after the upload
-	desiredHwID := uploadPort.HardwareId
+	desiredHwID := uploadPort.HardwareID
 	timeout := time.After(5 * time.Second)
 	for {
 		select {
