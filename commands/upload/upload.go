@@ -31,7 +31,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
@@ -144,17 +143,9 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 	}
 	defer pmeRelease()
 
-	watch, watchRelease, err := board.Watch(&rpc.BoardListWatchRequest{Instance: req.GetInstance()})
-	if err != nil {
-		logrus.WithError(err).Error("Error watching board ports")
-	} else {
-		defer watchRelease()
-	}
-
 	updatedPort, err := runProgramAction(
 		pme,
 		sk,
-		watch,
 		req.GetImportFile(),
 		req.GetImportDir(),
 		req.GetFqbn(),
@@ -201,18 +192,12 @@ func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest,
 
 func runProgramAction(pme *packagemanager.Explorer,
 	sk *sketch.Sketch,
-	watch <-chan *rpc.BoardListWatchResponse,
 	importFile, importDir, fqbnIn string, userPort *rpc.Port,
 	programmerID string,
 	verbose, verify, burnBootloader bool,
 	outStream, errStream io.Writer,
-	dryRun bool, userFields map[string]string) (*rpc.Port, error) {
-
-	// Ensure watcher events consumption in case of exit on error
-	defer func() {
-		go f.DiscardCh(watch)
-	}()
-
+	dryRun bool, userFields map[string]string,
+) (*rpc.Port, error) {
 	port := discovery.PortFromRPCPort(userPort)
 	if port == nil || (port.Address == "" && port.Protocol == "") {
 		// For no-port uploads use "default" protocol
@@ -398,12 +383,17 @@ func runProgramAction(pme *packagemanager.Explorer,
 
 	// By default do not return any new port but if there is an
 	// expected port change then run the detector.
-	updatedUploadPort := f.NewFuture[*rpc.Port]()
-	if uploadProperties.GetBoolean("upload.wait_for_upload_port") && watch != nil {
-		go detectUploadPort(uploadCtx, port, watch, updatedUploadPort)
+	updatedUploadPort := f.NewFuture[*discovery.Port]()
+	if uploadProperties.GetBoolean("upload.wait_for_upload_port") {
+		watcher, err := pme.DiscoveryManager().Watch()
+		if err != nil {
+			return nil, err
+		}
+		defer watcher.Close()
+
+		go detectUploadPort(uploadCtx, port, watcher.Feed(), updatedUploadPort)
 	} else {
 		updatedUploadPort.Send(nil)
-		go f.DiscardCh(watch)
 	}
 
 	// Force port wait to make easier to unbrick boards like the Arduino Leonardo, or similar with native USB,
@@ -526,16 +516,16 @@ func runProgramAction(pme *packagemanager.Explorer,
 
 	updatedPort := updatedUploadPort.Await()
 	if updatedPort == nil {
-		updatedPort = userPort
+		return userPort, nil
 	}
-	return userPort, nil
+	return updatedPort.ToRPC(), nil
 }
 
-func detectUploadPort(uploadCtx context.Context, uploadPort *discovery.Port, watch <-chan *rpc.BoardListWatchResponse, result f.Future[*rpc.Port]) {
+func detectUploadPort(uploadCtx context.Context, uploadPort *discovery.Port, watch <-chan *discovery.Event, result f.Future[*discovery.Port]) {
 	log := logrus.WithField("task", "port_detection")
 	log.Tracef("Detecting new board port after upload")
 
-	var candidate *rpc.Port
+	var candidate *discovery.Port
 	defer func() {
 		result.Send(candidate)
 	}()
@@ -566,23 +556,23 @@ func detectUploadPort(uploadCtx context.Context, uploadPort *discovery.Port, wat
 				log.Error("Upload port detection failed, watcher closed")
 				return
 			}
-			if ev.EventType == "remove" && candidate != nil {
-				if candidate.Equals(ev.Port.GetPort()) {
+			if ev.Type == "remove" && candidate != nil {
+				if candidate.Equals(ev.Port) {
 					log.WithField("event", ev).Trace("Candidate port is no more available")
 					candidate = nil
 					continue
 				}
 			}
-			if ev.EventType != "add" {
+			if ev.Type != "add" {
 				log.WithField("event", ev).Trace("Ignored non-add event")
 				continue
 			}
-			candidate = ev.Port.GetPort()
+			candidate = ev.Port
 			log.WithField("event", ev).Trace("New upload port candidate")
 
 			// If the current candidate port does not have the desired HW-ID do
 			// not return it immediately.
-			if desiredHwID != "" && candidate.GetHardwareId() != desiredHwID {
+			if desiredHwID != "" && candidate.HardwareID != desiredHwID {
 				log.Trace("New candidate port did not match desired HW ID, keep watching...")
 				continue
 			}
