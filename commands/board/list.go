@@ -34,6 +34,7 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/internal/inventory"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -128,20 +129,22 @@ func apiByVidPid(vid, pid string) ([]*rpc.BoardListItem, error) {
 	}, nil
 }
 
-func identifyViaCloudAPI(port *discovery.Port) ([]*rpc.BoardListItem, error) {
+func identifyViaCloudAPI(props *properties.Map) ([]*rpc.BoardListItem, error) {
 	// If the port is not USB do not try identification via cloud
-	id := port.Properties
-	if !id.ContainsKey("vid") || !id.ContainsKey("pid") {
+	if !props.ContainsKey("vid") || !props.ContainsKey("pid") {
 		return nil, nil
 	}
 
 	logrus.Debug("Querying builder API for board identification...")
-	return cachedAPIByVidPid(id.Get("vid"), id.Get("pid"))
+	return cachedAPIByVidPid(props.Get("vid"), props.Get("pid"))
 }
 
 // identify returns a list of boards checking first the installed platforms or the Cloud API
 func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardListItem, error) {
 	boards := []*rpc.BoardListItem{}
+	if port.Properties == nil {
+		return boards, nil
+	}
 
 	// first query installed cores through the Package Manager
 	logrus.Debug("Querying installed cores for board identification...")
@@ -167,7 +170,7 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardL
 	// if installed cores didn't recognize the board, try querying
 	// the builder API if the board is a USB device port
 	if len(boards) == 0 {
-		items, err := identifyViaCloudAPI(port)
+		items, err := identifyViaCloudAPI(port.Properties)
 		if err != nil {
 			// this is bad, but keep going
 			logrus.WithError(err).Debug("Error querying builder API")

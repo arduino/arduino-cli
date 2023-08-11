@@ -496,8 +496,10 @@ func runProgramAction(pme *packagemanager.Explorer,
 	uploadProperties.Set("upload.port.label", port.AddressLabel)
 	uploadProperties.Set("upload.port.protocol", port.Protocol)
 	uploadProperties.Set("upload.port.protocolLabel", port.ProtocolLabel)
-	for prop, value := range actualPort.Properties.AsMap() {
-		uploadProperties.Set(fmt.Sprintf("upload.port.properties.%s", prop), value)
+	if actualPort.Properties != nil {
+		for prop, value := range actualPort.Properties.AsMap() {
+			uploadProperties.Set(fmt.Sprintf("upload.port.properties.%s", prop), value)
+		}
 	}
 
 	// Run recipes for upload

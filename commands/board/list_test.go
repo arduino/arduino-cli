@@ -103,10 +103,7 @@ func TestGetByVidPidMalformedResponse(t *testing.T) {
 }
 
 func TestBoardDetectionViaAPIWithNonUSBPort(t *testing.T) {
-	port := &discovery.Port{
-		Properties: properties.NewMap(),
-	}
-	items, err := identifyViaCloudAPI(port)
+	items, err := identifyViaCloudAPI(properties.NewMap())
 	require.NoError(t, err)
 	require.Empty(t, items)
 }

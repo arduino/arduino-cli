@@ -118,14 +118,17 @@ func PortFromRPCPort(o *rpc.Port) (p *Port) {
 	if o == nil {
 		return nil
 	}
-	return &Port{
+	res := &Port{
 		Address:       o.Address,
 		AddressLabel:  o.Label,
 		Protocol:      o.Protocol,
 		ProtocolLabel: o.ProtocolLabel,
 		HardwareID:    o.HardwareId,
-		Properties:    properties.NewFromHashmap(o.Properties),
 	}
+	if o.Properties != nil {
+		res.Properties = properties.NewFromHashmap(o.Properties)
+	}
+	return res
 }
 
 func (p *Port) String() string {
@@ -141,7 +144,9 @@ func (p *Port) Clone() *Port {
 		return nil
 	}
 	var res Port = *p
-	res.Properties = p.Properties.Clone()
+	if p.Properties != nil {
+		res.Properties = p.Properties.Clone()
+	}
 	return &res
 }
 
