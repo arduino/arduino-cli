@@ -32,17 +32,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// To work correctly a Pluggable Discovery must respect the state machine specified on the documentation:
-// https://arduino.github.io/arduino-cli/latest/pluggable-discovery-specification/#state-machine
-// States a PluggableDiscovery can be in
-const (
-	Alive int = iota
-	Idling
-	Running
-	Syncing
-	Dead
-)
-
 // PluggableDiscovery is a tool that detects communication ports to interact
 // with the boards.
 type PluggableDiscovery struct {
@@ -55,7 +44,6 @@ type PluggableDiscovery struct {
 	// All the following fields are guarded by statusMutex
 	statusMutex           sync.Mutex
 	incomingMessagesError error
-	state                 int
 	eventChan             chan<- *Event
 }
 
@@ -168,7 +156,6 @@ func New(id string, args ...string) *PluggableDiscovery {
 	return &PluggableDiscovery{
 		id:          id,
 		processArgs: args,
-		state:       Dead,
 	}
 }
 
@@ -185,7 +172,6 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 	decoder := json.NewDecoder(in)
 	closeAndReportError := func(err error) {
 		disc.statusMutex.Lock()
-		disc.state = Dead
 		disc.incomingMessagesError = err
 		disc.statusMutex.Unlock()
 		close(outChan)
@@ -197,7 +183,6 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 		if err := decoder.Decode(&msg); errors.Is(err, io.EOF) {
 			// This is fine, we exit gracefully
 			disc.statusMutex.Lock()
-			disc.state = Dead
 			disc.incomingMessagesError = err
 			disc.statusMutex.Unlock()
 			close(outChan)
@@ -231,13 +216,6 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 			outChan <- &msg
 		}
 	}
-}
-
-// State returns the current state of this PluggableDiscovery
-func (disc *PluggableDiscovery) State() int {
-	disc.statusMutex.Lock()
-	defer disc.statusMutex.Unlock()
-	return disc.state
 }
 
 func (disc *PluggableDiscovery) waitMessage(timeout time.Duration) (*discoveryMessage, error) {
@@ -294,7 +272,6 @@ func (disc *PluggableDiscovery) runProcess() error {
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
 	disc.process = proc
-	disc.state = Alive
 	logrus.Infof("started discovery %s process", disc.id)
 	return nil
 }
@@ -312,7 +289,6 @@ func (disc *PluggableDiscovery) killProcess() error {
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
 	disc.stopSync()
-	disc.state = Dead
 	logrus.Infof("killed discovery %s process", disc.id)
 	return nil
 }
@@ -353,9 +329,6 @@ func (disc *PluggableDiscovery) Run() (err error) {
 	} else if msg.ProtocolVersion > 1 {
 		return errors.Errorf(tr("protocol version not supported: requested 1, got %d"), msg.ProtocolVersion)
 	}
-	disc.statusMutex.Lock()
-	defer disc.statusMutex.Unlock()
-	disc.state = Idling
 	return nil
 }
 
@@ -374,9 +347,6 @@ func (disc *PluggableDiscovery) Start() error {
 	} else if strings.ToUpper(msg.Message) != "OK" {
 		return errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "OK", msg.Message)
 	}
-	disc.statusMutex.Lock()
-	defer disc.statusMutex.Unlock()
-	disc.state = Running
 	return nil
 }
 
@@ -399,7 +369,6 @@ func (disc *PluggableDiscovery) Stop() error {
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
 	disc.stopSync()
-	disc.state = Idling
 	return nil
 }
 
@@ -463,7 +432,6 @@ func (disc *PluggableDiscovery) StartSync(size int) (<-chan *Event, error) {
 		return nil, errors.Errorf(tr("communication out of sync, expected '%[1]s', received '%[2]s'"), "OK", msg.Message)
 	}
 
-	disc.state = Syncing
 	// In case there is already an existing event channel in use we close it before creating a new one.
 	disc.stopSync()
 	c := make(chan *Event, size)
