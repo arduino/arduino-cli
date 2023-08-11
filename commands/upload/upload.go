@@ -476,6 +476,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 		} else {
 			if newPortAddress != "" {
 				actualPort.Address = newPortAddress
+				actualPort.AddressLabel = newPortAddress
 			}
 		}
 	}
