@@ -175,7 +175,7 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 		disc.incomingMessagesError = err
 		disc.statusMutex.Unlock()
 		close(outChan)
-		logrus.Errorf("stopped discovery %s decode loop: %v", disc.id, err)
+		logrus.Errorf("stopped discovery %s decode loop: %v", disc, err)
 	}
 
 	for {
@@ -191,7 +191,7 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 			closeAndReportError(err)
 			return
 		}
-		logrus.Infof("from discovery %s received message %s", disc.id, msg)
+		logrus.Infof("from discovery %s received message %s", disc, msg)
 		if msg.EventType == "add" {
 			if msg.Port == nil {
 				closeAndReportError(errors.New(tr("invalid 'add' message: missing port")))
@@ -246,7 +246,7 @@ func (disc *PluggableDiscovery) sendCommand(command string) error {
 }
 
 func (disc *PluggableDiscovery) runProcess() error {
-	logrus.Infof("starting discovery %s process", disc.id)
+	logrus.Infof("starting discovery %s process", disc)
 	proc, err := executils.NewProcess(nil, disc.processArgs...)
 	if err != nil {
 		return err
@@ -272,12 +272,12 @@ func (disc *PluggableDiscovery) runProcess() error {
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
 	disc.process = proc
-	logrus.Infof("started discovery %s process", disc.id)
+	logrus.Infof("started discovery %s process", disc)
 	return nil
 }
 
 func (disc *PluggableDiscovery) killProcess() error {
-	logrus.Infof("killing discovery %s process", disc.id)
+	logrus.Infof("killing discovery %s process", disc)
 	if disc.process != nil {
 		if err := disc.process.Kill(); err != nil {
 			return err
@@ -289,7 +289,7 @@ func (disc *PluggableDiscovery) killProcess() error {
 	disc.statusMutex.Lock()
 	defer disc.statusMutex.Unlock()
 	disc.stopSync()
-	logrus.Infof("killed discovery %s process", disc.id)
+	logrus.Infof("killed discovery %s process", disc)
 	return nil
 }
 
@@ -384,7 +384,7 @@ func (disc *PluggableDiscovery) stopSync() {
 func (disc *PluggableDiscovery) Quit() {
 	_ = disc.sendCommand("QUIT\n")
 	if _, err := disc.waitMessage(time.Second * 5); err != nil {
-		logrus.Errorf("Quitting discovery %s: %s", disc.id, err)
+		logrus.Errorf("Quitting discovery %s: %s", disc, err)
 	}
 	disc.stopSync()
 	disc.killProcess()
