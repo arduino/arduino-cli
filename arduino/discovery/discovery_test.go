@@ -63,11 +63,11 @@ func TestDiscoveryStdioHandling(t *testing.T) {
 	require.NotNil(t, msg)
 	require.Equal(t, "ev2", msg.EventType)
 
-	// require.Equal(t, disc.State(), Alive)
+	require.True(t, disc.Alive())
 
 	err = disc.outgoingCommandsPipe.(io.ReadCloser).Close()
 	require.NoError(t, err)
 	time.Sleep(time.Millisecond * 100)
 
-	// require.Equal(t, disc.State(), Dead)
+	require.False(t, disc.Alive())
 }

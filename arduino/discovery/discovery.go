@@ -174,6 +174,7 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 		disc.statusMutex.Lock()
 		disc.incomingMessagesError = err
 		disc.statusMutex.Unlock()
+		disc.killProcess()
 		close(outChan)
 		if err != nil {
 			logrus.Errorf("stopped discovery %s decode loop: %v", disc, err)
@@ -215,6 +216,12 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 			outChan <- &msg
 		}
 	}
+}
+
+func (disc *PluggableDiscovery) Alive() bool {
+	disc.statusMutex.Lock()
+	defer disc.statusMutex.Unlock()
+	return disc.process != nil
 }
 
 func (disc *PluggableDiscovery) waitMessage(timeout time.Duration) (*discoveryMessage, error) {
@@ -276,6 +283,8 @@ func (disc *PluggableDiscovery) runProcess() error {
 }
 
 func (disc *PluggableDiscovery) killProcess() error {
+	disc.statusMutex.Lock()
+	defer disc.statusMutex.Unlock()
 	logrus.Infof("killing discovery %s process", disc)
 	if disc.process != nil {
 		if err := disc.process.Kill(); err != nil {
@@ -284,9 +293,8 @@ func (disc *PluggableDiscovery) killProcess() error {
 		if err := disc.process.Wait(); err != nil {
 			return err
 		}
+		disc.process = nil
 	}
-	disc.statusMutex.Lock()
-	defer disc.statusMutex.Unlock()
 	disc.stopSync()
 	logrus.Infof("killed discovery %s process", disc)
 	return nil
