@@ -1284,6 +1284,19 @@
     Tools definitions
   </a>
   
+    <nav class="md-nav" aria-label="Tools definitions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tools-flavours-available-builds-made-for-different-os" class="md-nav__link">
+    Tools flavours (available builds made for different OS)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1438,6 +1451,19 @@
   <a href="#tools-definitions" class="md-nav__link">
     Tools definitions
   </a>
+  
+    <nav class="md-nav" aria-label="Tools definitions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tools-flavours-available-builds-made-for-different-os" class="md-nav__link">
+    Tools flavours (available builds made for different OS)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1640,19 +1666,7 @@ package. There can be many different versions of the same tool available at the 
 <li>(<code>arduino</code>, <code>avrdude</code>, <code>6.1</code>)</li>
 <li>.....</li>
 </ul>
-<p>Each tool version may come in different build flavours for different OS. Each flavour is listed under the <code>systems</code>
-array. In the example above <code>avr-gcc</code> comes with builds for:</p>
-<ul>
-<li>ARM Linux 32-bit (<code>arm-linux-gnueabihf</code>),</li>
-<li>ARM Linux 64-bit (<code>aarch64-linux-gnu</code>),</li>
-<li>macOS 64-bit (<code>x86_64-apple-darwin14</code>),</li>
-<li>Windows (<code>i686-mingw32</code>),</li>
-<li>Linux 32-bit (<code>i686-linux-gnu</code>),</li>
-<li>Linux 64-bit (<code>x86_64-linux-gnu</code>)</li>
-</ul>
-<p>The IDE will take care to install the right flavour based on the <code>host</code> value, or fail if a needed flavour is
-missing.<br> Note that this information is not used to select the toolchain during compilation. If you want this
-specific version to be used, you should use the notation <code>{runtime.tools.TOOLNAME-VERSION.path}</code> in the platform.txt.</p>
+<p>The <code>systems</code> field lists all available <a href="#tools-flavours-available-builds-made-for-different-os">Tools Flavours</a>.</p>
 <p>The other fields are:</p>
 <ul>
 <li><code>url</code>: the download URL of the tool's archive</li>
@@ -1664,6 +1678,122 @@ specific version to be used, you should use the notation <code>{runtime.tools.TO
   macOS you can use the command <code>shasum -a 256 filename</code> to generate SHA-256 checksums. There are free options for
   Windows, including md5deep. There are also online utilities for generating checksums.</li>
 </ul>
+<h4 id="tools-flavours-available-builds-made-for-different-os">Tools flavours (available builds made for different OS)<a class="headerlink" href="#tools-flavours-available-builds-made-for-different-os" title="Permanent link">&para;</a></h4>
+<p>Each tool version may come in different build flavours for different OS. Each flavour is listed under the <code>systems</code>
+array. The IDE will take care to install the right flavour for the user's OS by matching the <code>host</code> value with the
+following table or fail if a needed flavour is missing.</p>
+<table>
+<thead>
+<tr>
+<th>OS flavour</th>
+<th><code>host</code> regexp value</th>
+<th><code>host</code> suggested value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linux 32</td>
+<td><code>i[3456]86-.*linux-gnu</code></td>
+<td><code>i686-linux-gnu</code></td>
+</tr>
+<tr>
+<td>Linux 64</td>
+<td><code>x86_64-.*linux-gnu</code></td>
+<td><code>x86_64-linux-gnu</code></td>
+</tr>
+<tr>
+<td>Linux Arm</td>
+<td><code>arm.*-linux-gnueabihf</code></td>
+<td><code>arm-linux-gnueabihf</code></td>
+</tr>
+<tr>
+<td>Linux Arm64</td>
+<td><code>(aarch64\|arm64)-linux-gnu</code></td>
+<td><code>aarch64-linux-gnu</code></td>
+</tr>
+<tr>
+<td>Windows 32</td>
+<td><code>i[3456]86-.*(mingw32\|cygwin)</code></td>
+<td><code>i686-mingw32</code> or <code>i686-cygwin</code></td>
+</tr>
+<tr>
+<td>Windows 64</td>
+<td><code>(amd64\|x86_64)-.*(mingw32\|cygwin)</code></td>
+<td><code>x86_64-migw32</code> or <code>x86_64-cygwin</code></td>
+</tr>
+<tr>
+<td>MacOSX 32</td>
+<td><code>i[3456]86-apple-darwin.*</code></td>
+<td><code>i686-apple-darwin</code></td>
+</tr>
+<tr>
+<td>MacOSX 64</td>
+<td><code>x86_64-apple-darwin.*</code></td>
+<td><code>x86_64-apple-darwin</code></td>
+</tr>
+<tr>
+<td>MacOSX Arm64</td>
+<td><code>arm64-apple-darwin.*</code></td>
+<td><code>arm64-apple-darwin</code></td>
+</tr>
+<tr>
+<td>FreeBSD 32</td>
+<td><code>i?[3456]86-freebsd[0-9]*</code></td>
+<td><code>i686-freebsd</code></td>
+</tr>
+<tr>
+<td>FreeBSD 64</td>
+<td><code>amd64-freebsd[0-9]*</code></td>
+<td><code>amd64-freebsd</code></td>
+</tr>
+<tr>
+<td>FreeBSD Arm</td>
+<td><code>arm.*-freebsd[0-9]*</code></td>
+<td><code>arm-freebsd</code></td>
+</tr>
+</tbody>
+</table>
+<p>The <code>host</code> value is matched with the regexp, this means that a more specific value for the <code>host</code> field is allowed (for
+example you may write <code>x86_64-apple-darwin14.1</code> for MacOSX instead of the suggested <code>x86_64-apple-darwin</code>), by the way,
+we recommend to keep it simple and stick to the suggested value in the table.</p>
+<p>Some OS allows to run different flavours:</p>
+<table>
+<thead>
+<tr>
+<th>The OS...</th>
+<th>...may also run builds for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Windows 64</td>
+<td>Windows 32</td>
+</tr>
+<tr>
+<td>MacOSX 64</td>
+<td>MacOSX 32</td>
+</tr>
+<tr>
+<td>MacOSX Arm64</td>
+<td>MacOSX 64 or MacOSX 32</td>
+</tr>
+</tbody>
+</table>
+<p>This is taken into account when the tools are downloaded (for example if we are on a Windows 64 machine and the needed
+tool is available only for the Windows 32 flavour, then the Windows 32 flavour will be downloaded and used).</p>
+<p>For completeness, the previous example <code>avr-gcc</code> comes with builds for:</p>
+<ul>
+<li>ARM Linux 32 (<code>arm-linux-gnueabihf</code>),</li>
+<li>ARM Linux 64 (<code>aarch64-linux-gnu</code>),</li>
+<li>MacOSX 64 (<code>x86_64-apple-darwin14</code>),</li>
+<li>Windows 32 (<code>i686-mingw32</code>),</li>
+<li>Linux 32 (<code>i686-linux-gnu</code>),</li>
+<li>Linux 64 (<code>x86_64-linux-gnu</code>)</li>
+<li>MacOSX Arm64 will use the MacOSX 64 flavour</li>
+<li>Windows 64 will use the Windows 32 flavour</li>
+</ul>
+<p>Note: this information is not used to select the toolchain during compilation. If you want a specific version to be
+used, you should use the notation <code>{runtime.tools.TOOLNAME-VERSION.path}</code> in the platform.txt.</p>
 <h3 id="platforms-definitions">Platforms definitions<a class="headerlink" href="#platforms-definitions" title="Permanent link">&para;</a></h3>
 <p>Finally, let's see how <code>PLATFORMS</code> are made.</p>
 <div class="highlight"><pre><span></span><code><span class="w">        </span><span class="p">{</span>
