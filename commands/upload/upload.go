@@ -381,20 +381,18 @@ func runProgramAction(pme *packagemanager.Explorer,
 	uploadCtx, uploadCompleted := context.WithCancel(context.Background())
 	defer uploadCompleted()
 
-	// By default do not return any new port but if there is an
-	// expected port change then run the detector.
-	updatedUploadPort := f.NewFuture[*discovery.Port]()
-	if uploadProperties.GetBoolean("upload.wait_for_upload_port") {
-		watcher, err := pme.DiscoveryManager().Watch()
-		if err != nil {
-			return nil, err
-		}
-		defer watcher.Close()
-
-		go detectUploadPort(uploadCtx, port, watcher.Feed(), updatedUploadPort)
-	} else {
-		updatedUploadPort.Send(nil)
+	// Start the upload port change detector.
+	watcher, err := pme.DiscoveryManager().Watch()
+	if err != nil {
+		return nil, err
 	}
+	defer watcher.Close()
+	updatedUploadPort := f.NewFuture[*discovery.Port]()
+	go detectUploadPort(
+		uploadCtx,
+		port, watcher.Feed(),
+		uploadProperties.GetBoolean("upload.wait_for_upload_port"),
+		updatedUploadPort)
 
 	// Force port wait to make easier to unbrick boards like the Arduino Leonardo, or similar with native USB,
 	// when a sketch causes a crash and the native USB serial port is lost.
@@ -514,18 +512,19 @@ func runProgramAction(pme *packagemanager.Explorer,
 	uploadCompleted()
 	logrus.Tracef("Upload successful")
 
-	updatedPort := updatedUploadPort.Await()
-	if updatedPort == nil {
-		return userPort, nil
-	}
-	return updatedPort.ToRPC(), nil
+	return updatedUploadPort.Await().ToRPC(), nil
 }
 
-func detectUploadPort(uploadCtx context.Context, uploadPort *discovery.Port, watch <-chan *discovery.Event, result f.Future[*discovery.Port]) {
+func detectUploadPort(
+	uploadCtx context.Context,
+	uploadPort *discovery.Port, watch <-chan *discovery.Event,
+	waitForUploadPort bool,
+	result f.Future[*discovery.Port],
+) {
 	log := logrus.WithField("task", "port_detection")
 	log.Tracef("Detecting new board port after upload")
 
-	var candidate *discovery.Port
+	candidate := uploadPort.Clone()
 	defer func() {
 		result.Send(candidate)
 	}()
@@ -538,7 +537,13 @@ func detectUploadPort(uploadCtx context.Context, uploadPort *discovery.Port, wat
 				log.Error("Upload port detection failed, watcher closed")
 				return
 			}
-			log.WithField("event", ev).Trace("Ignored watcher event before upload")
+			if candidate != nil && ev.Type == "remove" && ev.Port.Equals(candidate) {
+				log.WithField("event", ev).Trace("User-specified port has been disconnected, forcing waiting for upload port")
+				waitForUploadPort = true
+				candidate = nil
+			} else {
+				log.WithField("event", ev).Trace("Ignored watcher event before upload")
+			}
 			continue
 		case <-uploadCtx.Done():
 			// Upload completed, move to the next phase
@@ -549,6 +554,9 @@ func detectUploadPort(uploadCtx context.Context, uploadPort *discovery.Port, wat
 	// Pick the first port that is detected after the upload
 	desiredHwID := uploadPort.HardwareID
 	timeout := time.After(5 * time.Second)
+	if !waitForUploadPort {
+		timeout = time.After(time.Second)
+	}
 	for {
 		select {
 		case ev, ok := <-watch:
@@ -556,12 +564,15 @@ func detectUploadPort(uploadCtx context.Context, uploadPort *discovery.Port, wat
 				log.Error("Upload port detection failed, watcher closed")
 				return
 			}
-			if ev.Type == "remove" && candidate != nil {
-				if candidate.Equals(ev.Port) {
-					log.WithField("event", ev).Trace("Candidate port is no more available")
-					candidate = nil
-					continue
+			if candidate != nil && ev.Type == "remove" && candidate.Equals(ev.Port) {
+				log.WithField("event", ev).Trace("Candidate port is no more available")
+				candidate = nil
+				if !waitForUploadPort {
+					waitForUploadPort = true
+					timeout = time.After(5 * time.Second)
+					log.Trace("User-specified port has been disconnected, now waiting for upload port, timeout exteneded by 5 seconds")
 				}
+				continue
 			}
 			if ev.Type != "add" {
 				log.WithField("event", ev).Trace("Ignored non-add event")
