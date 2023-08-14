@@ -48,6 +48,22 @@ func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketc
 	}
 
 	defaultPort, defaultProtocol := sk.GetDefaultPortAddressAndProtocol()
+
+	profiles := make([](*rpc.SketchProfile), len(sk.Project.Profiles))
+	for i, profile := range sk.Project.Profiles {
+		profiles[i] = &rpc.SketchProfile{
+			Name: profile.Name,
+			Fqbn: profile.FQBN,
+		}
+	}
+
+	defaultProfileResp := &rpc.SketchProfile{}
+	defaultProfile := sk.GetProfile(sk.Project.DefaultProfile)
+	if defaultProfile != nil {
+		defaultProfileResp.Name = defaultProfile.Name
+		defaultProfileResp.Fqbn = defaultProfile.FQBN
+	}
+
 	return &rpc.LoadSketchResponse{
 		MainFile:         sk.MainFile.String(),
 		LocationPath:     sk.FullPath.String(),
@@ -57,5 +73,7 @@ func LoadSketch(ctx context.Context, req *rpc.LoadSketchRequest) (*rpc.LoadSketc
 		DefaultFqbn:      sk.GetDefaultFQBN(),
 		DefaultPort:      defaultPort,
 		DefaultProtocol:  defaultProtocol,
+		Profiles:         profiles,
+		DefaultProfile:   defaultProfileResp,
 	}, nil
 }
