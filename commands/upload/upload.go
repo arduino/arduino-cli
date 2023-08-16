@@ -538,7 +538,7 @@ func detectUploadPort(
 				return
 			}
 			if candidate != nil && ev.Type == "remove" && ev.Port.Equals(candidate) {
-				log.WithField("event", ev).Trace("User-specified port has been disconnected, forcing waiting for upload port")
+				log.WithField("event", ev).Trace("User-specified port has been disconnected, forcing wait for upload port")
 				waitForUploadPort = true
 				candidate = nil
 			} else {
@@ -565,12 +565,12 @@ func detectUploadPort(
 				return
 			}
 			if candidate != nil && ev.Type == "remove" && candidate.Equals(ev.Port) {
-				log.WithField("event", ev).Trace("Candidate port is no more available")
+				log.WithField("event", ev).Trace("Candidate port is no longer available")
 				candidate = nil
 				if !waitForUploadPort {
 					waitForUploadPort = true
 					timeout = time.After(5 * time.Second)
-					log.Trace("User-specified port has been disconnected, now waiting for upload port, timeout exteneded by 5 seconds")
+					log.Trace("User-specified port has been disconnected, now waiting for upload port, timeout extended by 5 seconds")
 				}
 				continue
 			}

@@ -17,7 +17,7 @@ package f
 
 import "sync"
 
-// DiscardCh consume all incoming messages from the given channel until its closed.
+// DiscardCh consumes all incoming messages from the given channel until it's closed.
 func DiscardCh[T any](ch <-chan T) {
 	for range ch {
 	}

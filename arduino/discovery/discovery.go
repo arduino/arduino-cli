@@ -97,7 +97,7 @@ type Port struct {
 
 var tr = i18n.Tr
 
-// Equals return true if the given port has the same address and protocol
+// Equals returns true if the given port has the same address and protocol
 // of the current port.
 func (p *Port) Equals(o *Port) bool {
 	return p.Address == o.Address && p.Protocol == o.Protocol
