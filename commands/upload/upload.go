@@ -512,7 +512,11 @@ func runProgramAction(pme *packagemanager.Explorer,
 	uploadCompleted()
 	logrus.Tracef("Upload successful")
 
-	return updatedUploadPort.Await().ToRPC(), nil
+	updatedPort := updatedUploadPort.Await()
+	if updatedPort == nil {
+		return nil, nil
+	}
+	return updatedPort.ToRPC(), nil
 }
 
 func detectUploadPort(
