@@ -556,7 +556,6 @@ func detectUploadPort(
 	}
 
 	// Pick the first port that is detected after the upload
-	desiredHwID := uploadPort.HardwareID
 	timeout := time.After(5 * time.Second)
 	if !waitForUploadPort {
 		timeout = time.After(time.Second)
@@ -582,20 +581,41 @@ func detectUploadPort(
 				log.WithField("event", ev).Trace("Ignored non-add event")
 				continue
 			}
-			candidate = ev.Port
-			log.WithField("event", ev).Trace("New upload port candidate")
 
-			// If the current candidate port does not have the desired HW-ID do
-			// not return it immediately.
-			if desiredHwID != "" && candidate.HardwareID != desiredHwID {
-				log.Trace("New candidate port did not match desired HW ID, keep watching...")
+			portPriority := func(port *discovery.Port) int {
+				if port == nil {
+					return 0
+				}
+				prio := 0
+				if port.HardwareID == uploadPort.HardwareID {
+					prio += 1000
+				}
+				if port.Protocol == uploadPort.Protocol {
+					prio += 100
+				}
+				if port.Address == uploadPort.Address {
+					prio += 10
+				}
+				return prio
+			}
+			evPortPriority := portPriority(ev.Port)
+			candidatePriority := portPriority(candidate)
+			if evPortPriority <= candidatePriority {
+				log.WithField("event", ev).Tracef("New upload port candidate is worse than the current one (prio=%d)", evPortPriority)
+				continue
+			}
+			log.WithField("event", ev).Tracef("Found new upload port candidate (prio=%d)", evPortPriority)
+			candidate = ev.Port
+
+			// If the current candidate have the desired HW-ID return it quickly.
+			if candidate.HardwareID == ev.Port.HardwareID {
+				timeout = time.After(time.Second)
+				log.Trace("New candidate port match the desired HW ID, timeout reduced to 1 second.")
 				continue
 			}
 
-			log.Trace("Found new upload port!")
-			return
 		case <-timeout:
-			log.Trace("Timeout waiting for candidate port")
+			log.WithField("selected_port", candidate).Trace("Timeout waiting for candidate port")
 			return
 		}
 	}
