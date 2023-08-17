@@ -374,7 +374,6 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 			preprocStdout, preprocStderr, preprocErr = preprocessor.GCC(sourcePath, targetFilePath, includeFolders, ctx.BuildProperties)
 			if ctx.Verbose {
 				ctx.WriteStdout(preprocStdout)
-				ctx.WriteStdout(preprocStderr)
 			}
 			// Unwrap error and see if it is an ExitError.
 			_, isExitErr := errors.Cause(preprocErr).(*exec.ExitError)
