@@ -28,6 +28,13 @@ import (
 
 // Load loads a library from the given LibraryLocation
 func Load(libDir *paths.Path, location LibraryLocation) (*Library, error) {
+	if !libDir.IsAbs() {
+		if abs, err := libDir.Abs(); err == nil {
+			libDir = abs
+		} else {
+			return nil, err
+		}
+	}
 	if libDir.Join("library.properties").Exist() {
 		return makeNewLibrary(libDir, location)
 	}

@@ -54,12 +54,16 @@ func TestLibLayoutAndLocationJSONUnMarshaler(t *testing.T) {
 
 func TestLibrariesLoader(t *testing.T) {
 	{
-		lib, err := Load(paths.New("testdata", "TestLib"), User)
+		libPath := paths.New("testdata", "TestLib")
+		lib, err := Load(libPath, User)
 		require.NoError(t, err)
 		require.Equal(t, "TestLib", lib.Name)
 		require.Equal(t, "1.0.3", lib.Version.String())
 		require.False(t, lib.IsLegacy)
 		require.False(t, lib.InDevelopment)
+		absPath, err := libPath.Abs()
+		require.NoError(t, err)
+		require.Equal(t, lib.InstallDir.String(), absPath.String())
 	}
 	{
 		lib, err := Load(paths.New("testdata", "TestLibInDev"), User)
