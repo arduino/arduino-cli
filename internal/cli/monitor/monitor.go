@@ -150,6 +150,10 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 	}
 	defer portProxy.Close()
 
+	if !quiet {
+		feedback.Print(tr("Connected to %s! Press CTRL-C to exit.", portAddress))
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		_, err := io.Copy(ttyOut, portProxy)
@@ -169,10 +173,6 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 		}
 		cancel()
 	}()
-
-	if !quiet {
-		feedback.Print(tr("Connected to %s! Press CTRL-C to exit.", portAddress))
-	}
 
 	// Wait for port closed
 	<-ctx.Done()
