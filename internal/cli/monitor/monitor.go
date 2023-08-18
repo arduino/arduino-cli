@@ -93,11 +93,10 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	tty, err := newStdInOutTerminal()
+	ttyIn, ttyOut, err := feedback.InteractiveStreams()
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
-	defer tty.Close()
 
 	configuration := &rpc.MonitorPortConfiguration{}
 	if len(configs) > 0 {
@@ -153,7 +152,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
-		_, err := io.Copy(tty, portProxy)
+		_, err := io.Copy(ttyOut, portProxy)
 		if err != nil && !errors.Is(err, io.EOF) {
 			if !quiet {
 				feedback.Print(tr("Port closed: %v", err))
@@ -162,7 +161,7 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 		cancel()
 	}()
 	go func() {
-		_, err := io.Copy(portProxy, tty)
+		_, err := io.Copy(portProxy, ttyIn)
 		if err != nil && !errors.Is(err, io.EOF) {
 			if !quiet {
 				feedback.Print(tr("Port closed: %v", err))
