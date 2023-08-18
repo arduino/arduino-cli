@@ -285,6 +285,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1uploadrepsonse-command-response-has-been-changed" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.UploadRepsonse command response has been changed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#golang-api-method-githubcomarduinoarduino-clicommandsuploadupload-changed-signature" class="md-nav__link">
+    golang API: method github.com/arduino/arduino-cli/commands/upload.Upload changed signature
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#golang-package-githubcomarduinoarduino-cliinventory-removed-from-public-api" class="md-nav__link">
     golang package github.com/arduino/arduino-cli/inventory removed from public API
   </a>
@@ -2323,6 +2337,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1uploadrepsonse-command-response-has-been-changed" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.UploadRepsonse command response has been changed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#golang-api-method-githubcomarduinoarduino-clicommandsuploadupload-changed-signature" class="md-nav__link">
+    golang API: method github.com/arduino/arduino-cli/commands/upload.Upload changed signature
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#golang-package-githubcomarduinoarduino-cliinventory-removed-from-public-api" class="md-nav__link">
     golang package github.com/arduino/arduino-cli/inventory removed from public API
   </a>
@@ -3297,6 +3325,43 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0340">0.34.0<a class="headerlink" href="#0340" title="Permanent link">&para;</a></h2>
+<h3 id="the-grpc-ccarduinoclicommandsv1uploadrepsonse-command-response-has-been-changed">The gRPC <code>cc.arduino.cli.commands.v1.UploadRepsonse</code> command response has been changed.<a class="headerlink" href="#the-grpc-ccarduinoclicommandsv1uploadrepsonse-command-response-has-been-changed" title="Permanent link">&para;</a></h3>
+<p>Previously the <code>UploadResponse</code> was used only to stream the tool output:</p>
+<div class="highlight"><pre><span></span><code>message UploadResponse {
+  // The output of the upload process.
+  bytes out_stream = 1;
+  // The error output of the upload process.
+  bytes err_stream = 2;
+}
+</code></pre></div>
+<p>Now the API logic has been clarified using the <code>oneof</code> clause and another field has been added providing an
+<code>UploadResult</code> message that is sent when a successful upload completes.</p>
+<div class="highlight"><pre><span></span><code>message UploadResponse {
+  oneof message {
+    // The output of the upload process.
+    bytes out_stream = 1;
+    // The error output of the upload process.
+    bytes err_stream = 2;
+    // The upload result
+    UploadResult result = 3;
+  }
+}
+
+message UploadResult {
+  // When a board requires a port disconnection to perform the upload, this
+  // field returns the port where the board reconnects after the upload.
+  Port updated_upload_port = 1;
+}
+</code></pre></div>
+<h3 id="golang-api-method-githubcomarduinoarduino-clicommandsuploadupload-changed-signature">golang API: method <code>github.com/arduino/arduino-cli/commands/upload.Upload</code> changed signature<a class="headerlink" href="#golang-api-method-githubcomarduinoarduino-clicommandsuploadupload-changed-signature" title="Permanent link">&para;</a></h3>
+<p>The <code>Upload</code> method signature has been changed from:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">Upload</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UploadRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">outStream</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="p">,</span><span class="w"> </span><span class="nx">errStream</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="p">)</span><span class="w"> </span><span class="kt">error</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>to:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">func</span><span class="w"> </span><span class="nx">Upload</span><span class="p">(</span><span class="nx">ctx</span><span class="w"> </span><span class="nx">context</span><span class="p">.</span><span class="nx">Context</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="w"> </span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UploadRequest</span><span class="p">,</span><span class="w"> </span><span class="nx">outStream</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="p">,</span><span class="w"> </span><span class="nx">errStream</span><span class="w"> </span><span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="nx">rpc</span><span class="p">.</span><span class="nx">UploadResult</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">...</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>Now an <code>UploadResult</code> structure is returned together with the error. If you are not interested in the information
+contained in the structure you can safely ignore it.</p>
 <h3 id="golang-package-githubcomarduinoarduino-cliinventory-removed-from-public-api">golang package <code>github.com/arduino/arduino-cli/inventory</code> removed from public API<a class="headerlink" href="#golang-package-githubcomarduinoarduino-cliinventory-removed-from-public-api" title="Permanent link">&para;</a></h3>
 <p>The package <code>inventory</code> is no more a public golang API.</p>
 <h3 id="board-list-watch-command-json-output-has-changed"><code>board list --watch</code> command JSON output has changed<a class="headerlink" href="#board-list-watch-command-json-output-has-changed" title="Permanent link">&para;</a></h3>
