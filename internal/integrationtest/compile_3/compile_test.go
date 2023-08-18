@@ -107,15 +107,32 @@ func TestCompilerErrOutput(t *testing.T) {
 	_, _, err := cli.Run("core", "install", "arduino:avr@1.8.5")
 	require.NoError(t, err)
 
-	// prepare sketch
-	sketch, err := paths.New("testdata", "blink_with_wrong_cpp").Abs()
-	require.NoError(t, err)
+	{
+		// prepare sketch
+		sketch, err := paths.New("testdata", "blink_with_wrong_cpp").Abs()
+		require.NoError(t, err)
 
-	// Run compile and catch err stream
-	out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "--format", "json", sketch.String())
-	require.Error(t, err)
-	compilerErr := requirejson.Parse(t, out).Query(".compiler_err")
-	compilerErr.MustContain(`"error"`)
+		// Run compile and catch err stream
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "--format", "json", sketch.String())
+		require.Error(t, err)
+		compilerErr := requirejson.Parse(t, out).Query(".compiler_err")
+		compilerErr.MustContain(`"error"`)
+	}
+
+	// Check that library discover do not generate false errors
+	// https://github.com/arduino/arduino-cli/issues/2263
+	{
+		// prepare sketch
+		sketch, err := paths.New("testdata", "using_Wire").Abs()
+		require.NoError(t, err)
+
+		// Run compile and catch err stream
+		out, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "-v", "--format", "json", sketch.String())
+		require.NoError(t, err)
+		jsonOut := requirejson.Parse(t, out)
+		jsonOut.Query(".compiler_out").MustNotContain(`"fatal error"`)
+		jsonOut.Query(".compiler_err").MustNotContain(`"fatal error"`)
+	}
 }
 
 func TestCompileRelativeLibraryPath(t *testing.T) {
