@@ -4,6 +4,58 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.34.0
 
+### The gRPC `cc.arduino.cli.commands.v1.UploadRepsonse` command response has been changed.
+
+Previously the `UploadResponse` was used only to stream the tool output:
+
+```
+message UploadResponse {
+  // The output of the upload process.
+  bytes out_stream = 1;
+  // The error output of the upload process.
+  bytes err_stream = 2;
+}
+```
+
+Now the API logic has been clarified using the `oneof` clause and another field has been added providing an
+`UploadResult` message that is sent when a successful upload completes.
+
+```
+message UploadResponse {
+  oneof message {
+    // The output of the upload process.
+    bytes out_stream = 1;
+    // The error output of the upload process.
+    bytes err_stream = 2;
+    // The upload result
+    UploadResult result = 3;
+  }
+}
+
+message UploadResult {
+  // When a board requires a port disconnection to perform the upload, this
+  // field returns the port where the board reconnects after the upload.
+  Port updated_upload_port = 1;
+}
+```
+
+### golang API: method `github.com/arduino/arduino-cli/commands/upload.Upload` changed signature
+
+The `Upload` method signature has been changed from:
+
+```go
+func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, errStream io.Writer) error { ... }
+```
+
+to:
+
+```go
+func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, errStream io.Writer) (*rpc.UploadResult, error) { ... }
+```
+
+Now an `UploadResult` structure is returned together with the error. If you are not interested in the information
+contained in the structure you can safely ignore it.
+
 ### golang package `github.com/arduino/arduino-cli/inventory` removed from public API
 
 The package `inventory` is no more a public golang API.

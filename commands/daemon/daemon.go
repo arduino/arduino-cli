@@ -297,15 +297,27 @@ func (s *ArduinoCoreServerImpl) PlatformList(ctx context.Context, req *rpc.Platf
 // Upload FIXMEDOC
 func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.ArduinoCoreService_UploadServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)
-	outStream := feedStreamTo(func(data []byte) { syncSend.Send(&rpc.UploadResponse{OutStream: data}) })
-	errStream := feedStreamTo(func(data []byte) { syncSend.Send(&rpc.UploadResponse{ErrStream: data}) })
-	err := upload.Upload(stream.Context(), req, outStream, errStream)
+	outStream := feedStreamTo(func(data []byte) {
+		syncSend.Send(&rpc.UploadResponse{
+			Message: &rpc.UploadResponse_OutStream{OutStream: data},
+		})
+	})
+	errStream := feedStreamTo(func(data []byte) {
+		syncSend.Send(&rpc.UploadResponse{
+			Message: &rpc.UploadResponse_ErrStream{ErrStream: data},
+		})
+	})
+	res, err := upload.Upload(stream.Context(), req, outStream, errStream)
 	outStream.Close()
 	errStream.Close()
-	if err != nil {
-		return convertErrorToRPCStatus(err)
+	if res != nil {
+		syncSend.Send(&rpc.UploadResponse{
+			Message: &rpc.UploadResponse_Result{
+				Result: res,
+			},
+		})
 	}
-	return nil
+	return convertErrorToRPCStatus(err)
 }
 
 // UploadUsingProgrammer FIXMEDOC

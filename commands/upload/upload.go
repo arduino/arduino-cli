@@ -21,16 +21,19 @@ import (
 	"io"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
+	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -123,7 +126,7 @@ func getUserFields(toolID string, platformRelease *cores.PlatformRelease) []*rpc
 }
 
 // Upload FIXMEDOC
-func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, errStream io.Writer) error {
+func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, errStream io.Writer) (*rpc.UploadResult, error) {
 	logrus.Tracef("Upload %s on %s started", req.GetSketchPath(), req.GetFqbn())
 
 	// TODO: make a generic function to extract sketch from request
@@ -131,16 +134,16 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 	sketchPath := paths.New(req.GetSketchPath())
 	sk, err := sketch.New(sketchPath)
 	if err != nil && req.GetImportDir() == "" && req.GetImportFile() == "" {
-		return &arduino.CantOpenSketchError{Cause: err}
+		return nil, &arduino.CantOpenSketchError{Cause: err}
 	}
 
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, pmeRelease := commands.GetPackageManagerExplorer(req)
 	if pme == nil {
-		return &arduino.InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
-	defer release()
+	defer pmeRelease()
 
-	if err := runProgramAction(
+	updatedPort, err := runProgramAction(
 		pme,
 		sk,
 		req.GetImportFile(),
@@ -155,11 +158,14 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		errStream,
 		req.GetDryRun(),
 		req.GetUserFields(),
-	); err != nil {
-		return err
+	)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	return &rpc.UploadResult{
+		UpdatedUploadPort: updatedPort,
+	}, nil
 }
 
 // UsingProgrammer FIXMEDOC
@@ -169,7 +175,7 @@ func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest,
 	if req.GetProgrammer() == "" {
 		return &arduino.MissingProgrammerError{}
 	}
-	err := Upload(ctx, &rpc.UploadRequest{
+	_, err := Upload(ctx, &rpc.UploadRequest{
 		Instance:   req.GetInstance(),
 		SketchPath: req.GetSketchPath(),
 		ImportFile: req.GetImportFile(),
@@ -186,36 +192,38 @@ func UsingProgrammer(ctx context.Context, req *rpc.UploadUsingProgrammerRequest,
 
 func runProgramAction(pme *packagemanager.Explorer,
 	sk *sketch.Sketch,
-	importFile, importDir, fqbnIn string, port *rpc.Port,
+	importFile, importDir, fqbnIn string, userPort *rpc.Port,
 	programmerID string,
 	verbose, verify, burnBootloader bool,
 	outStream, errStream io.Writer,
-	dryRun bool, userFields map[string]string) error {
-
-	if burnBootloader && programmerID == "" {
-		return &arduino.MissingProgrammerError{}
-	}
+	dryRun bool, userFields map[string]string,
+) (*rpc.Port, error) {
+	port := discovery.PortFromRPCPort(userPort)
 	if port == nil || (port.Address == "" && port.Protocol == "") {
 		// For no-port uploads use "default" protocol
-		port = &rpc.Port{Protocol: "default"}
+		port = &discovery.Port{Protocol: "default"}
 	}
 	logrus.WithField("port", port).Tracef("Upload port")
 
+	if burnBootloader && programmerID == "" {
+		return nil, &arduino.MissingProgrammerError{}
+	}
+
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	if err != nil {
-		return &arduino.InvalidFQBNError{Cause: err}
+		return nil, &arduino.InvalidFQBNError{Cause: err}
 	}
 	logrus.WithField("fqbn", fqbn).Tracef("Detected FQBN")
 
 	// Find target board and board properties
 	_, boardPlatform, board, boardProperties, buildPlatform, err := pme.ResolveFQBN(fqbn)
 	if boardPlatform == nil {
-		return &arduino.PlatformNotFoundError{
+		return nil, &arduino.PlatformNotFoundError{
 			Platform: fmt.Sprintf("%s:%s", fqbn.Package, fqbn.PlatformArch),
 			Cause:    err,
 		}
 	} else if err != nil {
-		return &arduino.UnknownFQBNError{Cause: err}
+		return nil, &arduino.UnknownFQBNError{Cause: err}
 	}
 	logrus.
 		WithField("boardPlatform", boardPlatform).
@@ -232,7 +240,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 			programmer = buildPlatform.Programmers[programmerID]
 		}
 		if programmer == nil {
-			return &arduino.ProgrammerNotFoundError{Programmer: programmerID}
+			return nil, &arduino.ProgrammerNotFoundError{Programmer: programmerID}
 		}
 	}
 
@@ -253,7 +261,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 	}
 	uploadToolID, err := getToolID(props, action, port.Protocol)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var uploadToolPlatform *cores.PlatformRelease
@@ -268,7 +276,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 		Trace("Upload tool")
 
 	if split := strings.Split(uploadToolID, ":"); len(split) > 2 {
-		return &arduino.InvalidPlatformPropertyError{
+		return nil, &arduino.InvalidPlatformPropertyError{
 			Property: fmt.Sprintf("%s.tool.%s", action, port.Protocol), // TODO: Can be done better, maybe inline getToolID(...)
 			Value:    uploadToolID}
 	} else if len(split) == 2 {
@@ -277,12 +285,12 @@ func runProgramAction(pme *packagemanager.Explorer,
 			PlatformArchitecture: boardPlatform.Platform.Architecture,
 		})
 		if p == nil {
-			return &arduino.PlatformNotFoundError{Platform: split[0] + ":" + boardPlatform.Platform.Architecture}
+			return nil, &arduino.PlatformNotFoundError{Platform: split[0] + ":" + boardPlatform.Platform.Architecture}
 		}
 		uploadToolID = split[1]
 		uploadToolPlatform = pme.GetInstalledPlatformRelease(p)
 		if uploadToolPlatform == nil {
-			return &arduino.PlatformNotFoundError{Platform: split[0] + ":" + boardPlatform.Platform.Architecture}
+			return nil, &arduino.PlatformNotFoundError{Platform: split[0] + ":" + boardPlatform.Platform.Architecture}
 		}
 	}
 
@@ -309,7 +317,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 	}
 
 	if !uploadProperties.ContainsKey("upload.protocol") && programmer == nil {
-		return &arduino.ProgrammerRequiredForUploadError{}
+		return nil, &arduino.ProgrammerRequiredForUploadError{}
 	}
 
 	// Set properties for verbose upload
@@ -357,17 +365,34 @@ func runProgramAction(pme *packagemanager.Explorer,
 	if !burnBootloader {
 		importPath, sketchName, err := determineBuildPathAndSketchName(importFile, importDir, sk, fqbn)
 		if err != nil {
-			return &arduino.NotFoundError{Message: tr("Error finding build artifacts"), Cause: err}
+			return nil, &arduino.NotFoundError{Message: tr("Error finding build artifacts"), Cause: err}
 		}
 		if !importPath.Exist() {
-			return &arduino.NotFoundError{Message: tr("Compiled sketch not found in %s", importPath)}
+			return nil, &arduino.NotFoundError{Message: tr("Compiled sketch not found in %s", importPath)}
 		}
 		if !importPath.IsDir() {
-			return &arduino.NotFoundError{Message: tr("Expected compiled sketch in directory %s, but is a file instead", importPath)}
+			return nil, &arduino.NotFoundError{Message: tr("Expected compiled sketch in directory %s, but is a file instead", importPath)}
 		}
 		uploadProperties.SetPath("build.path", importPath)
 		uploadProperties.Set("build.project_name", sketchName)
 	}
+
+	// This context is kept alive for the entire duration of the upload
+	uploadCtx, uploadCompleted := context.WithCancel(context.Background())
+	defer uploadCompleted()
+
+	// Start the upload port change detector.
+	watcher, err := pme.DiscoveryManager().Watch()
+	if err != nil {
+		return nil, err
+	}
+	defer watcher.Close()
+	updatedUploadPort := f.NewFuture[*discovery.Port]()
+	go detectUploadPort(
+		uploadCtx,
+		port, watcher.Feed(),
+		uploadProperties.GetBoolean("upload.wait_for_upload_port"),
+		updatedUploadPort)
 
 	// Force port wait to make easier to unbrick boards like the Arduino Leonardo, or similar with native USB,
 	// when a sketch causes a crash and the native USB serial port is lost.
@@ -385,7 +410,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 
 	// If not using programmer perform some action required
 	// to set the board in bootloader mode
-	actualPort := port
+	actualPort := port.Clone()
 	if programmer == nil && !burnBootloader && (port.Protocol == "serial" || forcedSerialPortWait) {
 		// Perform reset via 1200bps touch if requested and wait for upload port also if requested.
 		touch := uploadProperties.GetBoolean("upload.use_1200bps_touch")
@@ -439,6 +464,7 @@ func runProgramAction(pme *packagemanager.Explorer,
 		} else {
 			if newPortAddress != "" {
 				actualPort.Address = newPortAddress
+				actualPort.AddressLabel = newPortAddress
 			}
 		}
 	}
@@ -455,34 +481,144 @@ func runProgramAction(pme *packagemanager.Explorer,
 
 	// Get Port properties gathered using pluggable discovery
 	uploadProperties.Set("upload.port.address", port.Address)
-	uploadProperties.Set("upload.port.label", port.Label)
+	uploadProperties.Set("upload.port.label", port.AddressLabel)
 	uploadProperties.Set("upload.port.protocol", port.Protocol)
 	uploadProperties.Set("upload.port.protocolLabel", port.ProtocolLabel)
-	for prop, value := range actualPort.Properties {
-		uploadProperties.Set(fmt.Sprintf("upload.port.properties.%s", prop), value)
+	if actualPort.Properties != nil {
+		for prop, value := range actualPort.Properties.AsMap() {
+			uploadProperties.Set(fmt.Sprintf("upload.port.properties.%s", prop), value)
+		}
 	}
 
 	// Run recipes for upload
 	toolEnv := pme.GetEnvVarsForSpawnedProcess()
 	if burnBootloader {
 		if err := runTool("erase.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
-			return &arduino.FailedUploadError{Message: tr("Failed chip erase"), Cause: err}
+			return nil, &arduino.FailedUploadError{Message: tr("Failed chip erase"), Cause: err}
 		}
 		if err := runTool("bootloader.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
-			return &arduino.FailedUploadError{Message: tr("Failed to burn bootloader"), Cause: err}
+			return nil, &arduino.FailedUploadError{Message: tr("Failed to burn bootloader"), Cause: err}
 		}
 	} else if programmer != nil {
 		if err := runTool("program.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
-			return &arduino.FailedUploadError{Message: tr("Failed programming"), Cause: err}
+			return nil, &arduino.FailedUploadError{Message: tr("Failed programming"), Cause: err}
 		}
 	} else {
 		if err := runTool("upload.pattern", uploadProperties, outStream, errStream, verbose, dryRun, toolEnv); err != nil {
-			return &arduino.FailedUploadError{Message: tr("Failed uploading"), Cause: err}
+			return nil, &arduino.FailedUploadError{Message: tr("Failed uploading"), Cause: err}
 		}
 	}
 
+	uploadCompleted()
 	logrus.Tracef("Upload successful")
-	return nil
+
+	updatedPort := updatedUploadPort.Await()
+	if updatedPort == nil {
+		return nil, nil
+	}
+	return updatedPort.ToRPC(), nil
+}
+
+func detectUploadPort(
+	uploadCtx context.Context,
+	uploadPort *discovery.Port, watch <-chan *discovery.Event,
+	waitForUploadPort bool,
+	result f.Future[*discovery.Port],
+) {
+	log := logrus.WithField("task", "port_detection")
+	log.Tracef("Detecting new board port after upload")
+
+	candidate := uploadPort.Clone()
+	defer func() {
+		result.Send(candidate)
+	}()
+
+	// Ignore all events during the upload
+	for {
+		select {
+		case ev, ok := <-watch:
+			if !ok {
+				log.Error("Upload port detection failed, watcher closed")
+				return
+			}
+			if candidate != nil && ev.Type == "remove" && ev.Port.Equals(candidate) {
+				log.WithField("event", ev).Trace("User-specified port has been disconnected, forcing wait for upload port")
+				waitForUploadPort = true
+				candidate = nil
+			} else {
+				log.WithField("event", ev).Trace("Ignored watcher event before upload")
+			}
+			continue
+		case <-uploadCtx.Done():
+			// Upload completed, move to the next phase
+		}
+		break
+	}
+
+	// Pick the first port that is detected after the upload
+	timeout := time.After(5 * time.Second)
+	if !waitForUploadPort {
+		timeout = time.After(time.Second)
+	}
+	for {
+		select {
+		case ev, ok := <-watch:
+			if !ok {
+				log.Error("Upload port detection failed, watcher closed")
+				return
+			}
+			if candidate != nil && ev.Type == "remove" && candidate.Equals(ev.Port) {
+				log.WithField("event", ev).Trace("Candidate port is no longer available")
+				candidate = nil
+				if !waitForUploadPort {
+					waitForUploadPort = true
+					timeout = time.After(5 * time.Second)
+					log.Trace("User-specified port has been disconnected, now waiting for upload port, timeout extended by 5 seconds")
+				}
+				continue
+			}
+			if ev.Type != "add" {
+				log.WithField("event", ev).Trace("Ignored non-add event")
+				continue
+			}
+
+			portPriority := func(port *discovery.Port) int {
+				if port == nil {
+					return 0
+				}
+				prio := 0
+				if port.HardwareID == uploadPort.HardwareID {
+					prio += 1000
+				}
+				if port.Protocol == uploadPort.Protocol {
+					prio += 100
+				}
+				if port.Address == uploadPort.Address {
+					prio += 10
+				}
+				return prio
+			}
+			evPortPriority := portPriority(ev.Port)
+			candidatePriority := portPriority(candidate)
+			if evPortPriority <= candidatePriority {
+				log.WithField("event", ev).Tracef("New upload port candidate is worse than the current one (prio=%d)", evPortPriority)
+				continue
+			}
+			log.WithField("event", ev).Tracef("Found new upload port candidate (prio=%d)", evPortPriority)
+			candidate = ev.Port
+
+			// If the current candidate have the desired HW-ID return it quickly.
+			if candidate.HardwareID == ev.Port.HardwareID {
+				timeout = time.After(time.Second)
+				log.Trace("New candidate port match the desired HW ID, timeout reduced to 1 second.")
+				continue
+			}
+
+		case <-timeout:
+			log.WithField("selected_port", candidate).Trace("Timeout waiting for candidate port")
+			return
+		}
+	}
 }
 
 func runTool(recipeID string, props *properties.Map, outStream, errStream io.Writer, verbose bool, dryRun bool, toolEnv []string) error {

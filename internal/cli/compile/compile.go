@@ -236,6 +236,8 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		DoNotExpandBuildProperties:    showProperties == arguments.ShowPropertiesUnexpanded,
 	}
 	compileRes, compileError := compile.Compile(context.Background(), compileRequest, stdOut, stdErr, nil)
+
+	var uploadRes *rpc.UploadResult
 	if compileError == nil && uploadAfterCompile {
 		userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
 			Instance: inst,
@@ -268,8 +270,10 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			UserFields: fields,
 		}
 
-		if err := upload.Upload(context.Background(), uploadRequest, stdOut, stdErr); err != nil {
+		if res, err := upload.Upload(context.Background(), uploadRequest, stdOut, stdErr); err != nil {
 			feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
+		} else {
+			uploadRes = res
 		}
 	}
 
@@ -330,6 +334,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		CompilerOut:        stdIO.Stdout,
 		CompilerErr:        stdIO.Stderr,
 		BuilderResult:      compileRes,
+		UploadResult:       uploadRes,
 		ProfileOut:         profileOut,
 		Success:            compileError == nil,
 		showPropertiesMode: showProperties,
@@ -375,6 +380,7 @@ type compileResult struct {
 	CompilerOut   string               `json:"compiler_out"`
 	CompilerErr   string               `json:"compiler_err"`
 	BuilderResult *rpc.CompileResponse `json:"builder_result"`
+	UploadResult  *rpc.UploadResult    `json:"upload_result"`
 	Success       bool                 `json:"success"`
 	ProfileOut    string               `json:"profile_out,omitempty"`
 	Error         string               `json:"error,omitempty"`

@@ -168,8 +168,31 @@ func runUploadCommand(command *cobra.Command, args []string) {
 		DryRun:     dryRun,
 		UserFields: fields,
 	}
-	if err := upload.Upload(context.Background(), req, stdOut, stdErr); err != nil {
+	if res, err := upload.Upload(context.Background(), req, stdOut, stdErr); err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
+	} else {
+		io := stdIOResult()
+		feedback.PrintResult(&uploadResult{
+			Stdout:            io.Stdout,
+			Stderr:            io.Stderr,
+			UpdatedUploadPort: res.UpdatedUploadPort,
+		})
 	}
-	feedback.PrintResult(stdIOResult())
+}
+
+type uploadResult struct {
+	Stdout            string    `json:"stdout"`
+	Stderr            string    `json:"stderr"`
+	UpdatedUploadPort *rpc.Port `json:"updated_upload_port,omitempty"`
+}
+
+func (r *uploadResult) Data() interface{} {
+	return r
+}
+
+func (r *uploadResult) String() string {
+	if r.UpdatedUploadPort == nil {
+		return ""
+	}
+	return tr("New upload port: %[1]s (%[2]s)", r.UpdatedUploadPort.Address, r.UpdatedUploadPort.Protocol)
 }

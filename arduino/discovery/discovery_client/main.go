@@ -51,10 +51,12 @@ func main() {
 		fmt.Printf("   Address: %s\n", port.Address)
 		fmt.Printf("  Protocol: %s\n", port.Protocol)
 		if ev.Type == "add" {
-			keys := port.Properties.Keys()
-			sort.Strings(keys)
-			for _, k := range keys {
-				fmt.Printf("            %s=%s\n", k, port.Properties.Get(k))
+			if port.Properties != nil {
+				keys := port.Properties.Keys()
+				sort.Strings(keys)
+				for _, k := range keys {
+					fmt.Printf("            %s=%s\n", k, port.Properties.Get(k))
+				}
 			}
 		}
 		fmt.Println()

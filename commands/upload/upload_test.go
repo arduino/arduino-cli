@@ -184,7 +184,7 @@ func TestUploadPropertiesComposition(t *testing.T) {
 	testRunner := func(t *testing.T, test test, verboseVerify bool) {
 		outStream := &bytes.Buffer{}
 		errStream := &bytes.Buffer{}
-		err := runProgramAction(
+		_, err := runProgramAction(
 			pme,
 			nil,                     // sketch
 			"",                      // importFile
