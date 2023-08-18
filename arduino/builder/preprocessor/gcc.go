@@ -59,6 +59,7 @@ func GCC(sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.
 	}
 
 	commandLine := gccBuildProperties.ExpandPropsInString(pattern)
+	commandLine = properties.DeleteUnexpandedPropsFromString(commandLine)
 	args, err := properties.SplitQuotedString(commandLine, `"'`, false)
 	if err != nil {
 		return nil, nil, err
