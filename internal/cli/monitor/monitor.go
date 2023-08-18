@@ -16,6 +16,7 @@
 package monitor
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -35,6 +36,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"go.bug.st/cleanup"
 )
 
 var (
@@ -48,6 +50,7 @@ var (
 
 // NewCommand created a new `monitor` command
 func NewCommand() *cobra.Command {
+	var raw bool
 	monitorCommand := &cobra.Command{
 		Use:   "monitor",
 		Short: tr("Open a communication port with a board."),
@@ -55,9 +58,12 @@ func NewCommand() *cobra.Command {
 		Example: "" +
 			"  " + os.Args[0] + " monitor -p /dev/ttyACM0\n" +
 			"  " + os.Args[0] + " monitor -p /dev/ttyACM0 --describe",
-		Run: runMonitorCmd,
+		Run: func(cmd *cobra.Command, args []string) {
+			runMonitorCmd(raw)
+		},
 	}
 	portArgs.AddToCommand(monitorCommand)
+	monitorCommand.Flags().BoolVar(&raw, "raw", false, tr("Set terminal in raw mode (unbuffered)."))
 	monitorCommand.Flags().BoolVar(&describe, "describe", false, tr("Show all the settings of the communication port."))
 	monitorCommand.Flags().StringSliceVarP(&configs, "config", "c", []string{}, tr("Configure communication port settings. The format is <ID>=<value>[,<ID>=<value>]..."))
 	monitorCommand.Flags().BoolVarP(&quiet, "quiet", "q", false, tr("Run in silent mode, show only monitor input and output."))
@@ -66,7 +72,7 @@ func NewCommand() *cobra.Command {
 	return monitorCommand
 }
 
-func runMonitorCmd(cmd *cobra.Command, args []string) {
+func runMonitorCmd(raw bool) {
 	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli monitor`")
 
@@ -91,11 +97,6 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 	if describe {
 		feedback.PrintResult(&detailsResult{Settings: enumerateResp.Settings})
 		return
-	}
-
-	ttyIn, ttyOut, err := feedback.InteractiveStreams()
-	if err != nil {
-		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 
 	configuration := &rpc.MonitorPortConfiguration{}
@@ -154,7 +155,27 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 		feedback.Print(tr("Connected to %s! Press CTRL-C to exit.", portAddress))
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ttyIn, ttyOut, err := feedback.InteractiveStreams()
+	if err != nil {
+		feedback.FatalError(err, feedback.ErrGeneric)
+	}
+
+	ctx, cancel := cleanup.InterruptableContext(context.Background())
+	if raw {
+		feedback.SetRawModeStdin()
+		defer func() {
+			feedback.RestoreModeStdin()
+		}()
+
+		// In RAW mode CTRL-C is not converted into an Interrupt by
+		// the terminal, we must intercept ASCII 3 (CTRL-C) on our own...
+		ctrlCDetector := &charDetectorWriter{
+			callback:     cancel,
+			detectedChar: 3, // CTRL-C
+		}
+		ttyIn = io.TeeReader(ttyIn, ctrlCDetector)
+	}
+
 	go func() {
 		_, err := io.Copy(ttyOut, portProxy)
 		if err != nil && !errors.Is(err, io.EOF) {
@@ -176,6 +197,18 @@ func runMonitorCmd(cmd *cobra.Command, args []string) {
 
 	// Wait for port closed
 	<-ctx.Done()
+}
+
+type charDetectorWriter struct {
+	callback     func()
+	detectedChar byte
+}
+
+func (cd *charDetectorWriter) Write(buf []byte) (int, error) {
+	if bytes.IndexByte(buf, cd.detectedChar) != -1 {
+		cd.callback()
+	}
+	return len(buf), nil
 }
 
 type detailsResult struct {
