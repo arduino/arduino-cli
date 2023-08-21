@@ -297,6 +297,13 @@ message LoadSketchRequest {
   reserved 1;
 }
 
+message SketchProfile {
+  // Name of the profile
+  string name = 1;
+  // FQBN used by the profile
+  string fqbn = 2;
+}
+
 message LoadSketchResponse {
   // Absolute path to a main sketch files
   string main_file = 1;
@@ -315,6 +322,10 @@ message LoadSketchResponse {
   string default_port = 7;
   // Default Protocol set in project file (sketch.yaml)
   string default_protocol = 8;
+  // List of profiles present in the project file (sketch.yaml)
+  repeated SketchProfile profiles = 9;
+  // Default profile set in the project file (sketch.yaml)
+  SketchProfile default_profile = 10;
 }
 
 message ArchiveSketchRequest {
