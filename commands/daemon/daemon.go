@@ -477,7 +477,11 @@ func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 		return err
 	}
 
-	portProxy, _, err := monitor.Monitor(stream.Context(), req)
+	openReq := req.GetOpenRequest()
+	if openReq == nil {
+		return &cmderrors.InvalidInstanceError{}
+	}
+	portProxy, _, err := monitor.Monitor(stream.Context(), openReq)
 	if err != nil {
 		return err
 	}
@@ -497,7 +501,7 @@ func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 				syncSend.Send(&rpc.MonitorResponse{Error: err.Error()})
 				return
 			}
-			if conf := msg.GetPortConfiguration(); conf != nil {
+			if conf := msg.GetUpdatedConfiguration(); conf != nil {
 				for _, c := range conf.GetSettings() {
 					if err := portProxy.Config(c.GetSettingId(), c.GetValue()); err != nil {
 						syncSend.Send(&rpc.MonitorResponse{Error: err.Error()})

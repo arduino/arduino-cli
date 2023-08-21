@@ -89,8 +89,10 @@ func connectToPort(cli commands.ArduinoCoreServiceClient, instance *commands.Ins
 		log.Fatal("Error opening Monitor:", err)
 	}
 	if err := monitorClient.Send(&commands.MonitorRequest{
-		Instance: instance,
-		Port:     port,
+		Message: &commands.MonitorRequest_OpenRequest{OpenRequest: &commands.MonitorPortOpenRequest{
+			Instance: instance,
+			Port:     port,
+		}},
 	}); err != nil {
 		log.Fatal("Error sending Monitor config:", err)
 	}
@@ -106,9 +108,9 @@ func connectToPort(cli commands.ArduinoCoreServiceClient, instance *commands.Ins
 		}
 	}()
 
-	hello := &commands.MonitorRequest{
+	hello := &commands.MonitorRequest{Message: &commands.MonitorRequest_TxData{
 		TxData: []byte("HELLO!"),
-	}
+	}}
 	fmt.Println("Send:", hello)
 	if err := monitorClient.Send(hello); err != nil {
 		log.Fatal("Monitor send HELLO:", err)

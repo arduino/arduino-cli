@@ -203,7 +203,7 @@ func runMonitorCmd(
 			}
 		}
 	}
-	portProxy, _, err := monitor.Monitor(context.Background(), &rpc.MonitorRequest{
+	portProxy, _, err := monitor.Monitor(context.Background(), &rpc.MonitorPortOpenRequest{
 		Instance:          inst,
 		Port:              &rpc.Port{Address: portAddress, Protocol: portProtocol},
 		Fqbn:              fqbn,
