@@ -33,18 +33,20 @@ var tr = i18n.Tr
 
 // NewCommand created a new `version` command
 func NewCommand() *cobra.Command {
+	var noUpdateCheck bool
 	versionCommand := &cobra.Command{
 		Use:     "version",
 		Short:   tr("Shows version number of Arduino CLI."),
 		Long:    tr("Shows the version number of Arduino CLI which is installed on your system."),
 		Example: "  " + os.Args[0] + " version",
 		Args:    cobra.NoArgs,
-		Run:     runVersionCommand,
+		Run:     func(cmd *cobra.Command, args []string) { runVersionCommand(noUpdateCheck) },
 	}
+	versionCommand.Flags().BoolVar(&noUpdateCheck, "no-check-for-updates", false, tr("Do not check for updates, just print the current version."))
 	return versionCommand
 }
 
-func runVersionCommand(cmd *cobra.Command, args []string) {
+func runVersionCommand(noUpdateCheck bool) {
 	logrus.Info("Executing `arduino-cli version`")
 
 	info := version.VersionInfo
@@ -59,15 +61,17 @@ func runVersionCommand(cmd *cobra.Command, args []string) {
 	if err != nil {
 		feedback.Fatal(fmt.Sprintf("Error parsing current version: %s", err), feedback.ErrGeneric)
 	}
-	latestVersion := updater.CheckForUpdate(currentVersion)
+
+	var latestVersion *semver.Version
+	if !noUpdateCheck {
+		latestVersion = updater.CheckForUpdate(currentVersion)
+	}
 
 	if feedback.GetFormat() != feedback.Text && latestVersion != nil {
 		// Set this only we managed to get the latest version
 		info.LatestVersion = latestVersion.String()
 	}
-
 	feedback.PrintResult(info)
-
 	if feedback.GetFormat() == feedback.Text && latestVersion != nil {
 		updater.NotifyNewVersionIsAvailable(latestVersion.String())
 	}
