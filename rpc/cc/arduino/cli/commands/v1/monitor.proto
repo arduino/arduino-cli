@@ -30,6 +30,10 @@ message MonitorRequest {
     bytes tx_data = 2;
     // Port configuration, contains settings of the port to be changed
     MonitorPortConfiguration updated_configuration = 3;
+    // Close message, set to true to gracefully close a port (this ensure
+    // that the gRPC streaming call is closed by the daemon AFTER the port
+    // has been successfully closed)
+    bool close = 4;
   }
 }
 

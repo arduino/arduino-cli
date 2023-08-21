@@ -508,6 +508,11 @@ func (s *ArduinoCoreServerImpl) Monitor(stream rpc.ArduinoCoreService_MonitorSer
 					}
 				}
 			}
+			if close := msg.GetClose(); close {
+				if err := portProxy.Close(); err != nil {
+					logrus.WithError(err).Debug("Error closing monitor port")
+				}
+			}
 			tx := msg.GetTxData()
 			for len(tx) > 0 {
 				n, err := portProxy.Write(tx)
