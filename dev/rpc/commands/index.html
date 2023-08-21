@@ -1373,6 +1373,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#sketchprofile" class="md-nav__link">
+    SketchProfile
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#updateindexrequest" class="md-nav__link">
     UpdateIndexRequest
   </a>
@@ -2710,6 +2717,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#sketchprofile" class="md-nav__link">
+    SketchProfile
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#updateindexrequest" class="md-nav__link">
     UpdateIndexRequest
   </a>
@@ -3553,6 +3567,7 @@
     - <a href="#cc.arduino.cli.commands.v1.NewSketchResponse">NewSketchResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.SetSketchDefaultsRequest">SetSketchDefaultsRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.SetSketchDefaultsResponse">SetSketchDefaultsResponse</a>
+    - <a href="#cc.arduino.cli.commands.v1.SketchProfile">SketchProfile</a>
     - <a href="#cc.arduino.cli.commands.v1.UpdateIndexRequest">UpdateIndexRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.UpdateIndexResponse">UpdateIndexResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.UpdateLibrariesIndexRequest">UpdateLibrariesIndexRequest</a>
@@ -4695,6 +4710,18 @@
 <td></td>
 <td>Default Protocol set in project file (sketch.yaml)</td>
 </tr>
+<tr>
+<td>profiles</td>
+<td><a href="#cc.arduino.cli.commands.v1.SketchProfile">SketchProfile</a></td>
+<td>repeated</td>
+<td>List of profiles present in the project file (sketch.yaml)</td>
+</tr>
+<tr>
+<td>default_profile</td>
+<td><a href="#cc.arduino.cli.commands.v1.SketchProfile">SketchProfile</a></td>
+<td></td>
+<td>Default profile set in the project file (sketch.yaml)</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.NewSketchRequest"></a></p>
@@ -4816,6 +4843,32 @@
 <td><a href="#string">string</a></td>
 <td></td>
 <td>The value of default_protocol that has been written in project file (sketch.yaml)</td>
+</tr>
+</tbody>
+</table>
+<p><a name="cc.arduino.cli.commands.v1.SketchProfile"></a></p>
+<h3 id="sketchprofile">SketchProfile<a class="headerlink" href="#sketchprofile" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>Name of the profile</td>
+</tr>
+<tr>
+<td>fqbn</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>FQBN used by the profile</td>
 </tr>
 </tbody>
 </table>
