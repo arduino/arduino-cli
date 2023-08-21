@@ -69,3 +69,25 @@ func TestBuilderDidNotCatchLibsFromUnusedPlatforms(t *testing.T) {
 	require.NotContains(t, string(stdout), "samd")
 	require.NotContains(t, string(stderr), "samd")
 }
+
+func TestCompileWithDefaultProfile(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Init the environment explicitly
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	// copy sketch_with_profile into the working directory
+	sketchPath := cli.CopySketch("sketch_with_profile")
+
+	// compile using the default profile with its fqbn
+	stdout, _, err := cli.Run("compile", sketchPath.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "arduino:avr")
+
+	// compile using a different fbqn -> should have priority over the one in the default profile
+	stdout, _, err = cli.Run("compile", "-b", "arduino:samd:mkr1000", sketchPath.String())
+	require.NoError(t, err)
+	require.Contains(t, string(stdout), "arduino:samd")
+}

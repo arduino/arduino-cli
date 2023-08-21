@@ -8,5 +8,8 @@ profiles:
     fqbn: arduino:avr:uno
     platforms:
       - platform: arduino:avr (1.8.5)
+      - platform: arduino:samd (1.8.13)
     libraries:
       - Arduino_JSON (0.1.0)
+
+default_profile: avr2
