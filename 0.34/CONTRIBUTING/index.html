@@ -1,0 +1,2122 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Arduino Command Line Interface">
+      
+      
+      
+      
+        <link rel="canonical" href="https://arduino.github.io/arduino-cli/0.34/CONTRIBUTING/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-7.3.6">
+    
+    
+      
+        <title>How to contribute - Arduino CLI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.a57b2b03.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#009485">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="teal" data-md-color-accent="orange">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#how-to-contribute" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Arduino CLI" class="md-header__button md-logo" aria-label="Arduino CLI" data-md-component="logo">
+      
+  <img src="../img/icon_mac_light.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Arduino CLI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              How to contribute
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/arduino/arduino-cli" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    arduino/arduino-cli
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Arduino CLI" class="md-nav__button md-logo" aria-label="Arduino CLI" data-md-component="logo">
+      
+  <img src="../img/icon_mac_light.png" alt="logo">
+
+    </a>
+    Arduino CLI
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/arduino/arduino-cli" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    arduino/arduino-cli
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        Installation
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../UPGRADING/" class="md-nav__link">
+        Upgrading
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        Getting started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../command-line-completion/" class="md-nav__link">
+        Command line completion
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          How to contribute
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        How to contribute
+      </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#issue-reports" class="md-nav__link">
+    Issue Reports
+  </a>
+  
+    <nav class="md-nav" aria-label="Issue Reports">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#before-reporting-an-issue" class="md-nav__link">
+    Before reporting an issue
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qualities-of-an-excellent-report" class="md-nav__link">
+    Qualities of an excellent report
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pull-requests" class="md-nav__link">
+    Pull Requests
+  </a>
+  
+    <nav class="md-nav" aria-label="Pull Requests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#legal-requirements" class="md-nav__link">
+    Legal requirements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pull-request-checklist" class="md-nav__link">
+    Pull request checklist
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    Prerequisites
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#building-the-source-code" class="md-nav__link">
+    Building the source code
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-the-tests" class="md-nav__link">
+    Running the tests
+  </a>
+  
+    <nav class="md-nav" aria-label="Running the tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-only-some-tests" class="md-nav__link">
+    Running only some tests
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-tests" class="md-nav__link">
+    Integration tests
+  </a>
+  
+    <nav class="md-nav" aria-label="Integration tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hardware-requirements-for-running-the-full-suite-of-integration-tests" class="md-nav__link">
+    Hardware requirements for running the full suite of integration tests:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#software-requirements-for-running-integration-tests" class="md-nav__link">
+    Software requirements for running integration tests:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-tests" class="md-nav__link">
+    Running tests
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dependency-license-metadata" class="md-nav__link">
+    Dependency license metadata
+  </a>
+  
+    <nav class="md-nav" aria-label="Dependency license metadata">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-files-formatting" class="md-nav__link">
+    Configuration files formatting
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#working-on-docs" class="md-nav__link">
+    Working on docs
+  </a>
+  
+    <nav class="md-nav" aria-label="Working on docs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#local-development" class="md-nav__link">
+    Local development
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docs-publishing" class="md-nav__link">
+    Docs publishing
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docs-formatting" class="md-nav__link">
+    Docs formatting
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docs-automation" class="md-nav__link">
+    Docs automation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internationalization-i18n" class="md-nav__link">
+    Internationalization (i18n)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#about-easyjson-golang-library" class="md-nav__link">
+    About easyjson golang library
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-settings" class="md-nav__link">
+    Additional settings
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FAQ/" class="md-nav__link">
+        FAQ
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8">
+          Command reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Command reference" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          Command reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli/" class="md-nav__link">
+        arduino-cli
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board/" class="md-nav__link">
+        board
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board_attach/" class="md-nav__link">
+        board attach
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board_details/" class="md-nav__link">
+        board details
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board_list/" class="md-nav__link">
+        board list
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board_listall/" class="md-nav__link">
+        board listall
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board_search/" class="md-nav__link">
+        board search
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_burn-bootloader/" class="md-nav__link">
+        burn-bootloader
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_cache/" class="md-nav__link">
+        cache
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_cache_clean/" class="md-nav__link">
+        cache clean
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_compile/" class="md-nav__link">
+        compile
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_completion/" class="md-nav__link">
+        completion
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config/" class="md-nav__link">
+        config
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_dump/" class="md-nav__link">
+        config dump
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_init/" class="md-nav__link">
+        config init
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_add/" class="md-nav__link">
+        config add
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_delete/" class="md-nav__link">
+        config delete
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_remove/" class="md-nav__link">
+        config remove
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_set/" class="md-nav__link">
+        config set
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core/" class="md-nav__link">
+        core
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_download/" class="md-nav__link">
+        core download
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_install/" class="md-nav__link">
+        core install
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_list/" class="md-nav__link">
+        core list
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_search/" class="md-nav__link">
+        core search
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_uninstall/" class="md-nav__link">
+        core uninstall
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_update-index/" class="md-nav__link">
+        core update-index
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_upgrade/" class="md-nav__link">
+        core upgrade
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_daemon/" class="md-nav__link">
+        daemon
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_debug/" class="md-nav__link">
+        debug
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib/" class="md-nav__link">
+        lib
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_deps/" class="md-nav__link">
+        lib deps
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_download/" class="md-nav__link">
+        lib download
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_examples/" class="md-nav__link">
+        lib examples
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_install/" class="md-nav__link">
+        lib install
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_list/" class="md-nav__link">
+        lib list
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_search/" class="md-nav__link">
+        lib search
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_uninstall/" class="md-nav__link">
+        lib uninstall
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_update-index/" class="md-nav__link">
+        lib update-index
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_upgrade/" class="md-nav__link">
+        lib upgrade
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_monitor/" class="md-nav__link">
+        monitor
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_outdated/" class="md-nav__link">
+        outdated
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_sketch/" class="md-nav__link">
+        sketch
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_sketch_archive/" class="md-nav__link">
+        sketch archive
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_sketch_new/" class="md-nav__link">
+        sketch new
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_update/" class="md-nav__link">
+        update
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_upgrade/" class="md-nav__link">
+        upgrade
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_upload/" class="md-nav__link">
+        upload
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_version/" class="md-nav__link">
+        version
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9">
+          gRPC reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="gRPC reference" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          gRPC reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rpc/commands/" class="md-nav__link">
+        commands
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rpc/settings/" class="md-nav__link">
+        settings
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rpc/debug/" class="md-nav__link">
+        debug
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        Configuration
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../integration-options/" class="md-nav__link">
+        Integration options
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sketch-build-process/" class="md-nav__link">
+        Sketch build process
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sketch-specification/" class="md-nav__link">
+        Sketch specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sketch-project-file/" class="md-nav__link">
+        Sketch project file
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../library-specification/" class="md-nav__link">
+        Library specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../platform-specification/" class="md-nav__link">
+        Platform specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pluggable-discovery-specification/" class="md-nav__link">
+        Pluggable discovery specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pluggable-monitor-specification/" class="md-nav__link">
+        Pluggable monitor specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../package_index_json-specification/" class="md-nav__link">
+        Package index specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_20" type="checkbox" id="__nav_20" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_20">
+          Guides
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Guides" data-md-level="1">
+        <label class="md-nav__title" for="__nav_20">
+          <span class="md-nav__icon md-icon"></span>
+          Guides
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/secure-boot/" class="md-nav__link">
+        Secure boot
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#issue-reports" class="md-nav__link">
+    Issue Reports
+  </a>
+  
+    <nav class="md-nav" aria-label="Issue Reports">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#before-reporting-an-issue" class="md-nav__link">
+    Before reporting an issue
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qualities-of-an-excellent-report" class="md-nav__link">
+    Qualities of an excellent report
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pull-requests" class="md-nav__link">
+    Pull Requests
+  </a>
+  
+    <nav class="md-nav" aria-label="Pull Requests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#legal-requirements" class="md-nav__link">
+    Legal requirements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pull-request-checklist" class="md-nav__link">
+    Pull request checklist
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    Prerequisites
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#building-the-source-code" class="md-nav__link">
+    Building the source code
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-the-tests" class="md-nav__link">
+    Running the tests
+  </a>
+  
+    <nav class="md-nav" aria-label="Running the tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-only-some-tests" class="md-nav__link">
+    Running only some tests
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-tests" class="md-nav__link">
+    Integration tests
+  </a>
+  
+    <nav class="md-nav" aria-label="Integration tests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hardware-requirements-for-running-the-full-suite-of-integration-tests" class="md-nav__link">
+    Hardware requirements for running the full suite of integration tests:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#software-requirements-for-running-integration-tests" class="md-nav__link">
+    Software requirements for running integration tests:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-tests" class="md-nav__link">
+    Running tests
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dependency-license-metadata" class="md-nav__link">
+    Dependency license metadata
+  </a>
+  
+    <nav class="md-nav" aria-label="Dependency license metadata">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration-files-formatting" class="md-nav__link">
+    Configuration files formatting
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#working-on-docs" class="md-nav__link">
+    Working on docs
+  </a>
+  
+    <nav class="md-nav" aria-label="Working on docs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#local-development" class="md-nav__link">
+    Local development
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docs-publishing" class="md-nav__link">
+    Docs publishing
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docs-formatting" class="md-nav__link">
+    Docs formatting
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docs-automation" class="md-nav__link">
+    Docs automation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#internationalization-i18n" class="md-nav__link">
+    Internationalization (i18n)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#about-easyjson-golang-library" class="md-nav__link">
+    About easyjson golang library
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-settings" class="md-nav__link">
+    Additional settings
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/arduino/arduino-cli/blob/master/docs/CONTRIBUTING.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="how-to-contribute">How to contribute<a class="headerlink" href="#how-to-contribute" title="Permanent link">&para;</a></h1>
+<p>First of all, thanks for contributing! This document provides some basic guidelines for contributing to this repository.</p>
+<p>There are several ways you can get involved:</p>
+<table>
+<thead>
+<tr>
+<th>Type of contribution</th>
+<th>Contribution method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>- Support request<br/>- Question<br/>- Discussion</td>
+<td>Post on the <a href="https://forum.arduino.cc/index.php?board=145.0">Arduino Forum</a></td>
+</tr>
+<tr>
+<td>- Bug report<br/>- Feature request</td>
+<td>Issue report (read the <a href="#issue-reports">issue guidelines</a>)</td>
+</tr>
+<tr>
+<td>Beta testing</td>
+<td>Try out the <a href="https://arduino.github.io/arduino-cli/latest/installation/#nightly-builds">nightly build</a></td>
+</tr>
+<tr>
+<td>- Bug fix<br/>- Enhancement</td>
+<td>Pull Request (read the <a href="#pull-requests">pull request guidelines</a>)</td>
+</tr>
+<tr>
+<td>Translations for Arduino CLI</td>
+<td><a href="https://www.transifex.com/arduino-1/arduino-cli/">transifex</a></td>
+</tr>
+<tr>
+<td>Monetary</td>
+<td>- <a href="https://www.arduino.cc/en/Main/Contribute">Donate</a><br/>- <a href="https://store.arduino.cc">Buy official products</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="issue-reports">Issue Reports<a class="headerlink" href="#issue-reports" title="Permanent link">&para;</a></h2>
+<p>Do you need help or have a question about using Arduino CLI? Support requests should be made to Arduino CLI's dedicated
+board in the <a href="https://forum.arduino.cc/index.php?board=145.0">Arduino forum</a>.</p>
+<p>High quality bug reports and feature requests are valuable contributions to the Arduino CLI project.</p>
+<h3 id="before-reporting-an-issue">Before reporting an issue<a class="headerlink" href="#before-reporting-an-issue" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Give the <a href="https://arduino.github.io/arduino-cli/latest/installation/#nightly-builds">nightly build</a> a test drive to see if your issue was already resolved.</li>
+<li>Search <a href="https://github.com/arduino/arduino-cli/issues?q=">existing pull requests and issues</a> to see if it was already reported. If you have additional
+  information to provide about an existing issue, please comment there. You can use the <a href="https://github.com/blog/2119-add-reactions-to-pull-requests-issues-and-comments">Reactions feature</a>
+  if you only want to express support.</li>
+</ul>
+<h3 id="qualities-of-an-excellent-report">Qualities of an excellent report<a class="headerlink" href="#qualities-of-an-excellent-report" title="Permanent link">&para;</a></h3>
+<ul>
+<li>The issue title should be descriptive. Vague titles make it difficult to understand the purpose of the issue, which
+  might cause your issue to be overlooked.</li>
+<li>Provide a full set of steps necessary to reproduce the issue. Demonstration code or commands should be complete and
+  simplified to the minimum necessary to reproduce the issue.</li>
+<li>Be responsive. We may need you to provide additional information in order to investigate and resolve the issue.</li>
+<li>If you find a solution to your problem, please comment on your issue report with an explanation of how you were able
+  to fix it and close the issue.</li>
+</ul>
+<h2 id="pull-requests">Pull Requests<a class="headerlink" href="#pull-requests" title="Permanent link">&para;</a></h2>
+<p>To propose improvements or fix a bug, feel free to submit a PR.</p>
+<h3 id="legal-requirements">Legal requirements<a class="headerlink" href="#legal-requirements" title="Permanent link">&para;</a></h3>
+<p>Before we can accept your contributions you have to sign the <a href="https://cla-assistant.io/arduino/arduino-cli">Contributor License Agreement</a></p>
+<h3 id="pull-request-checklist">Pull request checklist<a class="headerlink" href="#pull-request-checklist" title="Permanent link">&para;</a></h3>
+<p>In order to ease code reviews and have your contributions merged faster, here is a list of items you can check before
+submitting a PR:</p>
+<ul>
+<li>Create small PRs that are narrowly focused on addressing a single concern.</li>
+<li>PR titles indirectly become part of the CHANGELOG so it's crucial to provide a good record of <strong>what</strong> change is being
+  made in the title; <strong>why</strong> it was made will go in the PR description, along with a link to a GitHub issue if it
+  exists.</li>
+<li><a id="breaking"></a> If the PR contains a breaking change, please start the commit message and PR title with the
+  string <strong>[breaking]</strong>. Don't forget to describe in the PR description and in the <a href="../UPGRADING/"><code>UPGRADING.md</code></a> file
+  what changes users might need to make in their workflow or application due to this PR. A breaking change is a change
+  that forces users to change their code, command-line invocations, build scripts or data files when upgrading from an
+  older version of Arduino CLI.</li>
+<li>Write tests for the code you wrote.</li>
+<li>Open your PR against the <code>master</code> branch.</li>
+<li>Maintain <strong>clean commit history</strong> and use <strong>meaningful commit messages</strong>. PRs with messy commit history are difficult
+  to review and require a lot of work to be merged.</li>
+<li>Your PR must pass all CI tests before we will merge it. If you're seeing an error and don't think it's your fault, it
+  may not be! The reviewer will help you if there are test failures that seem not related to the change you are making.</li>
+</ul>
+<h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h3>
+<p>To build the Arduino CLI from sources you need the following tools to be available in your local environment:</p>
+<ul>
+<li><a href="https://go.dev/doc/install">Go</a> version 1.20 or later</li>
+<li><a href="https://taskfile.dev/#/installation">Taskfile</a> to help you run the most common tasks from the command line</li>
+</ul>
+<p>If you want to run integration tests you will also need:</p>
+<ul>
+<li>A serial port with an Arduino board attached</li>
+</ul>
+<p>If you're working on the gRPC interface you will also have to:</p>
+<ul>
+<li>download and install the <a href="https://github.com/protocolbuffers/protobuf/releases">protoc</a> compiler (use the version required to match the generated code, please note that
+  the latest releases does not follow semantic versioning anymore so, for example, the version 4.23.2 must be searched
+  as 23.2 dropping the major number)</li>
+<li>install <code>protoc-gen-go</code> using: <code>go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.30.0</code> (use the version
+  required to match the generated code)</li>
+<li>install <code>protoc-gen-go-grpc</code> using: <code>go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0</code> (use the version
+  required to match the generated code)</li>
+</ul>
+<h3 id="building-the-source-code">Building the source code<a class="headerlink" href="#building-the-source-code" title="Permanent link">&para;</a></h3>
+<p>From the project folder root, just run:</p>
+<div class="highlight"><pre><span></span><code>task<span class="w"> </span>build
+</code></pre></div>
+<p>The project uses Go modules so dependencies will be downloaded automatically. At the end of the build, you should find
+an <code>arduino-cli</code> executable in the same folder.</p>
+<h3 id="running-the-tests">Running the tests<a class="headerlink" href="#running-the-tests" title="Permanent link">&para;</a></h3>
+<p>There are several checks and test suites in place to ensure the code works as expected and is written in a way that's
+consistent across the whole codebase. To avoid pushing changes that will cause the CI system to fail, you can run most
+of the tests locally.</p>
+<p>To ensure code style is consistent, run:</p>
+<div class="highlight"><pre><span></span><code>task<span class="w"> </span>check
+</code></pre></div>
+<p>To run unit tests:</p>
+<div class="highlight"><pre><span></span><code>task<span class="w"> </span>go:test
+</code></pre></div>
+<p>To run integration tests (these will take some time and require special setup, see following paragraph):</p>
+<div class="highlight"><pre><span></span><code>task<span class="w"> </span>go:integration-test
+</code></pre></div>
+<h4 id="running-only-some-tests">Running only some tests<a class="headerlink" href="#running-only-some-tests" title="Permanent link">&para;</a></h4>
+<p>By default, all tests from all go packages are run. To run only unit tests from one or more specific packages, you can
+set the TARGETS environment variable, e.g.:</p>
+<div class="highlight"><pre><span></span><code>TARGETS=./arduino/cores/packagemanager task go:test
+</code></pre></div>
+<p>Alternatively, to run only some specific test(s), you can specify a regex to match against the test function name:</p>
+<div class="highlight"><pre><span></span><code>TEST_REGEX=&#39;^TestTryBuild.*&#39; task go:test
+</code></pre></div>
+<p>Both can be combined as well, typically to run only a specific test:</p>
+<div class="highlight"><pre><span></span><code>TEST_REGEX=&#39;^TestFindBoardWithFQBN$&#39; TARGETS=./arduino/cores/packagemanager task go:test
+</code></pre></div>
+<h3 id="integration-tests">Integration tests<a class="headerlink" href="#integration-tests" title="Permanent link">&para;</a></h3>
+<p>Being a command line interface, Arduino CLI is heavily interactive and it has to stay consistent in accepting the user
+input and providing the expected output and proper exit codes. On top of this, many Arduino CLI features involve
+communicating with external devices, most likely through a serial port, so unit tests can only go so far in giving us
+confidence that the code is working.</p>
+<p>For these reasons, in addition to regular unit tests the project has a suite of integration tests that actually run
+Arduino CLI in a different process and assess the options are correctly understood and the output is what we expect.</p>
+<h5 id="hardware-requirements-for-running-the-full-suite-of-integration-tests">Hardware requirements for running the full suite of integration tests:<a class="headerlink" href="#hardware-requirements-for-running-the-full-suite-of-integration-tests" title="Permanent link">&para;</a></h5>
+<p>An Arduino board attached to a serial port. The board must:</p>
+<ul>
+<li>Use one of the VID/PID pairs used by Arduino or their partners (as is the case with all modern official Arduino boards
+  except the classic Nano).</li>
+<li>Accept uploads using the FQBN associated with that VID/PID (which will be the case unless you have installed a custom
+  bootloader or removed the bootloader).</li>
+</ul>
+<p>Note that running the integration tests will result in a sketch being uploaded to every attached Arduino board meeting
+the above requirements.</p>
+<h5 id="software-requirements-for-running-integration-tests">Software requirements for running integration tests:<a class="headerlink" href="#software-requirements-for-running-integration-tests" title="Permanent link">&para;</a></h5>
+<p>A working Go environment. Chances are that you already have Go installed in your system, if this is not the case you can
+<a href="https://go.dev/doc/install">download</a> the official distribution or use the package manager provided by your Operating System.</p>
+<h4 id="running-tests">Running tests<a class="headerlink" href="#running-tests" title="Permanent link">&para;</a></h4>
+<p>After the software requirements have been installed you should be able to run the tests with:</p>
+<div class="highlight"><pre><span></span><code>task<span class="w"> </span>go:integration-test
+</code></pre></div>
+<p>This will run the integration tests automatically.</p>
+<p>To run specific packages you must run <code>go test</code>.</p>
+<div class="highlight"><pre><span></span><code>go<span class="w"> </span><span class="nb">test</span><span class="w"> </span>-v<span class="w"> </span>github.com/arduino/arduino-cli/internal/integrationtest/lib
+</code></pre></div>
+<p>To run very specific test functions:</p>
+<div class="highlight"><pre><span></span><code>go<span class="w"> </span><span class="nb">test</span><span class="w"> </span>-v<span class="w"> </span>github.com/arduino/arduino-cli/internal/integrationtest/lib<span class="w"> </span>-run<span class="w"> </span>TestLibUpgradeCommand
+</code></pre></div>
+<h3 id="dependency-license-metadata">Dependency license metadata<a class="headerlink" href="#dependency-license-metadata" title="Permanent link">&para;</a></h3>
+<p>Metadata about the license types of all dependencies is cached in the repository. To update this cache, run the
+following command from the repository root folder:</p>
+<div class="highlight"><pre><span></span><code>task general:cache-dep-licenses
+</code></pre></div>
+<p>The necessary <strong>Licensed</strong> tool can be installed by following
+<a href="https://github.com/github/licensed#as-an-executable">these instructions</a>.</p>
+<h4 id="configuration-files-formatting">Configuration files formatting<a class="headerlink" href="#configuration-files-formatting" title="Permanent link">&para;</a></h4>
+<p>To keep the configurations tidy and in order we use <a href="https://prettier.io/">Prettier</a> to automatically format all YAML files
+in the project. Keeping and enforcing a formatting standard helps everyone make small PRs and avoids the introduction of
+formatting changes made by unconfigured editors.</p>
+<p>There are several ways to run Prettier. If you're using Visual Studio Code you can easily use the <a href="https://github.com/prettier/prettier-vscode"><code>prettier-vscode</code>
+extension</a> to automatically format as you write.</p>
+<p>Otherwise you can use the following tasks. To do so you'll need to install <code>npm</code> if not already installed. Check the
+<a href="https://docs.npmjs.com/downloading-and-installing-node-js-and-npm">official documentation</a> to learn how to install <code>npm</code> for your platform.</p>
+<p>Ensure the formatting is compliant by running the command:</p>
+<div class="highlight"><pre><span></span><code>task<span class="w"> </span>general:format-prettier
+</code></pre></div>
+<p>When opening a new Pull Request, checks are automatically run to verify that configuration files are correctly
+formatted. In case of failures we might ask you to update the PR with correct formatting.</p>
+<h3 id="working-on-docs">Working on docs<a class="headerlink" href="#working-on-docs" title="Permanent link">&para;</a></h3>
+<p>Documentation is provided to final users in form of static HTML content generated from a tool called <a href="https://www.mkdocs.org/">MkDocs</a> and
+hosted on <a href="https://pages.github.com/">GitHub Pages</a>.</p>
+<h4 id="local-development">Local development<a class="headerlink" href="#local-development" title="Permanent link">&para;</a></h4>
+<p>Most of the documentation consists of static content written over several Markdown files under the <code>docs</code> folder at the
+root of this git repository but some other content is dynamically generated from the CI pipelines - this is the case
+with the command line reference and the gRPC interface, for example.</p>
+<p>If you want to check out how the documentation would look after some local changes, you might need to reproduce what
+happens in the CI, generating the full documentation website from your personal computer. To run the docs toolchain
+locally, you need to have a few dependencies and tools installed:</p>
+<ul>
+<li><a href="https://go.dev/doc/install">Go</a> version 1.17 or later</li>
+<li><a href="https://taskfile.dev/#/installation">Taskfile</a> to help you run the most common tasks from the command line</li>
+<li>A working <a href="https://www.python.org/downloads/">Python</a> environment, see <a href="#integration-tests">this paragraph</a> if you need to setup one</li>
+</ul>
+<p>Before running the toolchain, perform the following operations from the root of the git repository (if you have a Python
+virtual environment, activate it before proceeding):</p>
+<ul>
+<li>go get -u github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc</li>
+<li>poetry install</li>
+</ul>
+<p>When working on docs, you can launch a command that will take care of generating the docs, build the static website and
+start a local server you can later access with a web browser to see a preview of your changes. From the root of the git
+repository run:</p>
+<div class="highlight"><pre><span></span><code>task<span class="w"> </span>website:serve
+</code></pre></div>
+<p>If you don't see any error, hit <a href="http://127.0.0.1:8000">http://127.0.0.1:8000</a> with your browser to navigate the generated docs.</p>
+<h4 id="docs-publishing">Docs publishing<a class="headerlink" href="#docs-publishing" title="Permanent link">&para;</a></h4>
+<p>The present git repository has a special branch called <code>gh-pages</code> that contains the generated HTML code for the docs
+website; every time a change is pushed to this special branch, GitHub automatically triggers a deployment to pull the
+change and publish a new version of the website. Do not open Pull Requests to push changes to the <code>gh-pages</code> branch,
+that will be done exclusively from the CI.</p>
+<h4 id="docs-formatting">Docs formatting<a class="headerlink" href="#docs-formatting" title="Permanent link">&para;</a></h4>
+<p>To keep the documentation tidy and in order we use <a href="https://prettier.io/">Prettier</a> to automatically format all Markdown
+files in the project. Keeping and enforcing a formatting standard helps everyone make small PRs and avoids the
+introduction of formatting changes made by unconfigured editors.</p>
+<p>There are several ways to run Prettier. If you're using Visual Studio Code you can easily use the <a href="https://github.com/prettier/prettier-vscode"><code>prettier-vscode</code>
+extension</a> to automatically format as you write.</p>
+<p>Otherwise you can use the following tasks. To do so you'll need to install <code>npm</code> if not already installed. Check the
+<a href="https://docs.npmjs.com/downloading-and-installing-node-js-and-npm">official documentation</a> to learn how to install <code>npm</code> for your platform.</p>
+<p>Ensure the formatting is compliant by running the command:</p>
+<div class="highlight"><pre><span></span><code>task<span class="w"> </span>general:format-prettier
+</code></pre></div>
+<p>When opening a new Pull Request, checks are automatically run to verify that documentation is correctly formatted. In
+case of failures we might ask you to update the PR with correct formatting.</p>
+<h4 id="docs-automation">Docs automation<a class="headerlink" href="#docs-automation" title="Permanent link">&para;</a></h4>
+<p>In order to avoid unwanted changes to the public website hosting the Arduino CLI documentation, only Mike is allowed to
+push changes to the <code>gh-pages</code> branch, and this only happens from within the CI, in a workflow named <a href="https://github.com/arduino/arduino-cli/blob/master/.github/workflows/deploy-cobra-mkdocs-versioned-poetry.yml">Deploy
+Website</a>.</p>
+<p>Details on the documentation publishing system are available <a href="https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/deploy-cobra-mkdocs-versioned-poetry.md">here</a>.</p>
+<h3 id="internationalization-i18n">Internationalization (i18n)<a class="headerlink" href="#internationalization-i18n" title="Permanent link">&para;</a></h3>
+<p>In order to support i18n in the CLI, any messages that are intended to be translated should be wrapped in a call to
+<code>i18n.Tr</code>. This call allows us to build a catalog of translatable strings, replacing the reference string at runtime
+with the localized value.</p>
+<p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">package</span><span class="w"> </span><span class="nx">main</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="s">&quot;fmt&quot;</span>
+<span class="w">  </span><span class="s">&quot;github.com/arduino/arduino-cli/i18n&quot;</span>
+<span class="p">)</span>
+
+<span class="kd">func</span><span class="w"> </span><span class="nx">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">i18n</span><span class="p">.</span><span class="nx">Tr</span><span class="p">(</span><span class="s">&quot;Hello World!&quot;</span><span class="p">))</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="about-easyjson-golang-library">About <code>easyjson</code> golang library<a class="headerlink" href="#about-easyjson-golang-library" title="Permanent link">&para;</a></h3>
+<p>We use the hi-performance <code>easyjson</code> library to parse the large JSON index files for libraries and platforms. To obtain
+the best performance we must do some code generation, this is done via <code>task go:easyjson-generate</code>. If you ever touch
+source code using the <code>easyjson</code> library, make sure to re-run the <code>go:easyjson-generate</code> task to see if there are
+changes in the generated code.</p>
+<h3 id="additional-settings">Additional settings<a class="headerlink" href="#additional-settings" title="Permanent link">&para;</a></h3>
+<p>If you need to push a commit that's only shipping documentation changes or example files, thus a complete no-op for the
+test suite, please start the commit message with the string <strong>[skip ci]</strong> to skip the build and give that slot to
+someone else who does need it.</p>
+<p>If your PR doesn't need to be included in the changelog, please start the commit message and PR title with the string
+<strong>[skip changelog]</strong></p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../command-line-completion/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Command line completion" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Command line completion
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../FAQ/" class="md-footer__link md-footer__link--next" aria-label="Next: FAQ" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              FAQ
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+          </div>
+        
+        
+          Made with
+          <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+            Material for MkDocs
+          </a>
+        
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.fcfe8b6d.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.b1047164.min.js"></script>
+      
+    
+  </body>
+</html>
