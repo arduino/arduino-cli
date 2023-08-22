@@ -35,6 +35,8 @@ var (
 		".hpp":  empty,
 		".hh":   empty,
 		".cpp":  empty,
+		".cxx":  empty,
+		".cc":   empty,
 		".S":    empty,
 		".adoc": empty,
 		".md":   empty,
@@ -43,11 +45,15 @@ var (
 		".ipp":  empty,
 	}
 
-	// SourceFilesValidExtensions lists valid extensions for source files (no headers)
-	SourceFilesValidExtensions = map[string]struct{}{
-		".c":   empty,
-		".cpp": empty,
-		".S":   empty,
+	// SourceFilesValidExtensions lists valid extensions for source files (no headers).
+	// If a platform do not provide a compile recipe for a specific file extension, this
+	// map provides the equivalent extension to use as a fallback.
+	SourceFilesValidExtensions = map[string]string{
+		".c":   "",
+		".cpp": "",
+		".cxx": ".cpp",
+		".cc":  ".cpp",
+		".S":   "",
 	}
 
 	// HeaderFilesValidExtensions lists valid extensions for header files

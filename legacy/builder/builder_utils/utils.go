@@ -109,6 +109,9 @@ func compileFiles(ctx *types.Context, sourcePath *paths.Path, recurse bool, buil
 	queue := make(chan *paths.Path)
 	job := func(source *paths.Path) {
 		recipe := fmt.Sprintf("recipe%s.o.pattern", source.Ext())
+		if !buildProperties.ContainsKey(recipe) {
+			recipe = fmt.Sprintf("recipe%s.o.pattern", globals.SourceFilesValidExtensions[source.Ext()])
+		}
 		objectFile, err := compileFileWithRecipe(ctx, sourcePath, source, buildPath, buildProperties, includes, recipe)
 		if err != nil {
 			errorsMux.Lock()
