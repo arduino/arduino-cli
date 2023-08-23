@@ -81,7 +81,11 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	fqbnIn := req.GetFqbn()
 	if fqbnIn == "" && sk != nil {
-		fqbnIn = sk.GetDefaultFQBN()
+		if pme.GetProfile() != nil {
+			fqbnIn = pme.GetProfile().FQBN
+		} else {
+			fqbnIn = sk.GetDefaultFQBN()
+		}
 	}
 	if fqbnIn == "" {
 		return nil, &arduino.MissingFQBNError{}
