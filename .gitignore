@@ -1,7 +1,6 @@
 /debug
 /arduino-cli*
 /main
-/.vscode/
 /cmd/formatter/debug.test
 /arduino-cli.yaml
 /wiki
