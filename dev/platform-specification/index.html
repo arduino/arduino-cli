@@ -2431,13 +2431,15 @@ the name of the architecture is set as well.</p>
 <a href="../commands/arduino-cli_compile/">compile</a> flags in the Arduino CLI.</p>
 <h4 id="recipes-to-compile-source-code">Recipes to compile source code<a class="headerlink" href="#recipes-to-compile-source-code" title="Permanent link">&para;</a></h4>
 <p>We said that the Arduino development software determines a list of files to compile. Each file can be source code
-written in C (.c files), C++ (.cpp files) or Assembly (.S files). Every language is compiled using its respective
-<strong>recipe</strong>:</p>
+written in C (.c files), C++ (.cpp/.cxx/.cc files) or Assembly (.S files). Every language is compiled using its
+respective <strong>recipe</strong>:</p>
 <ul>
-<li><code>recipe.c.o.pattern</code>: for C files</li>
-<li><code>recipe.cpp.o.pattern</code>: for CPP files</li>
-<li><code>recipe.S.o.pattern</code>: for Assembly files</li>
+<li><code>recipe.c.o.pattern</code>: for C files (.c)</li>
+<li><code>recipe.cpp.o.pattern</code>: for CPP files (.cpp/.cxx/.cc)</li>
+<li><code>recipe.S.o.pattern</code>: for Assembly files (.S)</li>
 </ul>
+<p>(an optional <code>recipe.cxx.o.pattern</code> and <code>recipe.cc.o.pattern</code> may be provided, if <code>.cxx</code> or <code>.cc</code> needs special
+handling, but it's not required and we do not recommend it)</p>
 <p>The recipes can be built concatenating the following automatically generated properties (for each file compiled):</p>
 <ul>
 <li><code>{includes}</code>: the list of include paths in the format "-I/include/path -I/another/path...."</li>
