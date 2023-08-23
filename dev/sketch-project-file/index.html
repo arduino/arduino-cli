@@ -1204,6 +1204,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#using-a-default-profile" class="md-nav__link">
+    Using a default profile
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1387,6 +1394,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#using-a-default-profile" class="md-nav__link">
+    Using a default profile
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1506,6 +1520,8 @@ otherwise below). The available fields are:</p>
       - ArduinoIoTCloud (1.0.2)
       - Arduino_ConnectionHandler (0.6.4)
       - TinyDHT sensor library (1.1.0)
+
+default_profile: nanorp
 </code></pre></div>
 <h3 id="building-a-sketch">Building a sketch<a class="headerlink" href="#building-a-sketch" title="Permanent link">&para;</a></h3>
 <p>When a sketch project file is present, it can be leveraged to compile the sketch with the <code>--profile/-m</code> flag in the
@@ -1520,6 +1536,11 @@ resources used to build the sketch.</p>
 not be used in any way. In other words, the build is isolated from the system and will rely only on the resources
 specified in the profile: this will ensure that the build is portable and reproducible independently from the platforms
 and libraries installed in the system.</p>
+<h3 id="using-a-default-profile">Using a default profile<a class="headerlink" href="#using-a-default-profile" title="Permanent link">&para;</a></h3>
+<p>If a <code>default_profile</code> is specified in the <code>sketch.yaml</code> then the “classic” compile command:</p>
+<div class="highlight"><pre><span></span><code>arduino-cli compile [sketch]
+</code></pre></div>
+<p>will, instead, trigger a profile-based build using the default profile indicated in the <code>sketch.yaml</code>.</p>
 <h2 id="default-flags-for-arduino-cli-usage">Default flags for Arduino CLI usage<a class="headerlink" href="#default-flags-for-arduino-cli-usage" title="Permanent link">&para;</a></h2>
 <p>The sketch project file may be used to set the default value for some command line flags of the Arduino CLI, in
 particular:</p>
@@ -1527,14 +1548,16 @@ particular:</p>
 <li>The <code>default_fqbn</code> key sets the default value for the <code>--fqbn</code> flag</li>
 <li>The <code>default_port</code> key sets the default value for the <code>--port</code> flag</li>
 <li>The <code>default_protocol</code> key sets the default value for the <code>--protocol</code> flag</li>
+<li>The <code>default_profile</code> key sets the default value for the <code>--profile</code> flag</li>
 </ul>
 <p>For example:</p>
 <div class="highlight"><pre><span></span><code>default_fqbn: arduino:avr:uno
 default_port: /dev/ttyACM0
 default_protocol: serial
+default_profile: myprofile
 </code></pre></div>
-<p>With this configuration set, it is not necessary to specify the <code>--fqbn</code>, <code>--port</code>, or <code>--protocol</code> flags to the
-<a href="../commands/arduino-cli_compile/"><code>arduino-cli compile</code></a> or <a href="../commands/arduino-cli_upload/"><code>arduino-cli upload</code></a>
+<p>With this configuration set, it is not necessary to specify the <code>--fqbn</code>, <code>--port</code>, <code>--protocol</code> or <code>--profile</code> flags to
+the <a href="../commands/arduino-cli_compile/"><code>arduino-cli compile</code></a> or <a href="../commands/arduino-cli_upload/"><code>arduino-cli upload</code></a>
 commands when compiling or uploading the sketch.</p>
                 
               
