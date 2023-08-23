@@ -95,6 +95,8 @@ profiles:
       - ArduinoIoTCloud (1.0.2)
       - Arduino_ConnectionHandler (0.6.4)
       - TinyDHT sensor library (1.1.0)
+
+default_profile: nanorp
 ```
 
 ### Building a sketch
@@ -116,6 +118,16 @@ not be used in any way. In other words, the build is isolated from the system an
 specified in the profile: this will ensure that the build is portable and reproducible independently from the platforms
 and libraries installed in the system.
 
+### Using a default profile
+
+If a `default_profile` is specified in the `sketch.yaml` then the “classic” compile command:
+
+```
+arduino-cli compile [sketch]
+```
+
+will, instead, trigger a profile-based build using the default profile indicated in the `sketch.yaml`.
+
 ## Default flags for Arduino CLI usage
 
 The sketch project file may be used to set the default value for some command line flags of the Arduino CLI, in
@@ -124,6 +136,7 @@ particular:
 - The `default_fqbn` key sets the default value for the `--fqbn` flag
 - The `default_port` key sets the default value for the `--port` flag
 - The `default_protocol` key sets the default value for the `--protocol` flag
+- The `default_profile` key sets the default value for the `--profile` flag
 
 For example:
 
@@ -131,8 +144,9 @@ For example:
 default_fqbn: arduino:avr:uno
 default_port: /dev/ttyACM0
 default_protocol: serial
+default_profile: myprofile
 ```
 
-With this configuration set, it is not necessary to specify the `--fqbn`, `--port`, or `--protocol` flags to the
-[`arduino-cli compile`](commands/arduino-cli_compile.md) or [`arduino-cli upload`](commands/arduino-cli_upload.md)
+With this configuration set, it is not necessary to specify the `--fqbn`, `--port`, `--protocol` or `--profile` flags to
+the [`arduino-cli compile`](commands/arduino-cli_compile.md) or [`arduino-cli upload`](commands/arduino-cli_upload.md)
 commands when compiling or uploading the sketch.

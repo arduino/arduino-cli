@@ -159,15 +159,25 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 	}
 
 	sketchPath := arguments.InitSketchPath(path)
-	inst, profile := instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
-	if fqbnArg.String() == "" {
-		fqbnArg.Set(profile.GetFqbn())
-	}
 
 	sk, err := sketch.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
+
+	var inst *rpc.Instance
+	var profile *rpc.Profile
+
+	if profileArg.Get() == "" {
+		inst, profile = instance.CreateAndInitWithProfile(sk.GetDefaultProfile().GetName(), sketchPath)
+	} else {
+		inst, profile = instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
+	}
+
+	if fqbnArg.String() == "" {
+		fqbnArg.Set(profile.GetFqbn())
+	}
+
 	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
 
 	if keysKeychain != "" || signKey != "" || encryptKey != "" {

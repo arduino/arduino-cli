@@ -1,0 +1,10 @@
+profiles:
+  avr1:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.4)
+
+  avr2:
+    fqbn: arduino:avr:leonardo
+    platforms:
+      - platform: arduino:avr (1.8.5)
