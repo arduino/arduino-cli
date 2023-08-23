@@ -8,6 +8,65 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 We're dropping the `builtin.tools` support. It was the equivalent of Arduino IDE 1.x bundled tools directory.
 
+### The gRPC `cc.arduino.cli.commands.v1.MonitorRequest` message has been changed.
+
+Previously the `MonitorRequest` was a single message used to open the monitor, to stream data, and to change the port
+configuration:
+
+```proto
+message MonitorRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Port to open, must be filled only on the first request
+  Port port = 2;
+  // The board FQBN we are trying to connect to. This is optional, and  it's
+  // needed to disambiguate if more than one platform provides the pluggable
+  // monitor for a given port protocol.
+  string fqbn = 3;
+  // Data to send to the port
+  bytes tx_data = 4;
+  // Port configuration, optional, contains settings of the port to be applied
+  MonitorPortConfiguration port_configuration = 5;
+}
+```
+
+Now the meaning of the fields has been clarified with the `oneof` clause, making it more explicit:
+
+```proto
+message MonitorRequest {
+  oneof message {
+    // Open request, it must be the first incoming message
+    MonitorPortOpenRequest open_request = 1;
+    // Data to send to the port
+    bytes tx_data = 2;
+    // Port configuration, contains settings of the port to be changed
+    MonitorPortConfiguration updated_configuration = 3;
+    // Close message, set to true to gracefully close a port (this ensure
+    // that the gRPC streaming call is closed by the daemon AFTER the port
+    // has been successfully closed)
+    bool close = 4;
+  }
+}
+
+message MonitorPortOpenRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Port to open, must be filled only on the first request
+  Port port = 2;
+  // The board FQBN we are trying to connect to. This is optional, and  it's
+  // needed to disambiguate if more than one platform provides the pluggable
+  // monitor for a given port protocol.
+  string fqbn = 3;
+  // Port configuration, optional, contains settings of the port to be applied
+  MonitorPortConfiguration port_configuration = 4;
+}
+```
+
+Now the message field `MonitorPortOpenRequest.open_request` must be sent in the first message after opening the
+streaming gRPC call.
+
+The identification number of the fields has been changed, this change is not binary compatible with old clients.
+
 ### Some golang modules from `github.com/arduino/arduino-cli/*` have been made private.
 
 The following golang modules are no longer available as public API:
