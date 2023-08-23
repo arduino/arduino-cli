@@ -172,12 +172,15 @@ These properties can be overwritten respectively with `--keys-keychain`, `--sign
 #### Recipes to compile source code
 
 We said that the Arduino development software determines a list of files to compile. Each file can be source code
-written in C (.c files), C++ (.cpp files) or Assembly (.S files). Every language is compiled using its respective
-**recipe**:
+written in C (.c files), C++ (.cpp/.cxx/.cc files) or Assembly (.S files). Every language is compiled using its
+respective **recipe**:
 
-- `recipe.c.o.pattern`: for C files
-- `recipe.cpp.o.pattern`: for CPP files
-- `recipe.S.o.pattern`: for Assembly files
+- `recipe.c.o.pattern`: for C files (.c)
+- `recipe.cpp.o.pattern`: for CPP files (.cpp/.cxx/.cc)
+- `recipe.S.o.pattern`: for Assembly files (.S)
+
+(an optional `recipe.cxx.o.pattern` and `recipe.cc.o.pattern` may be provided, if `.cxx` or `.cc` needs special
+handling, but it's not required and we do not recommend it)
 
 The recipes can be built concatenating the following automatically generated properties (for each file compiled):
 
