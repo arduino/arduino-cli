@@ -21,24 +21,17 @@ import (
 	"encoding/hex"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"unicode"
 
-	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
-	"golang.org/x/exp/slices"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
-
-type filterFiles func([]os.FileInfo) []os.FileInfo
-
-var tr = i18n.Tr
 
 var SOURCE_CONTROL_FOLDERS = map[string]bool{"CVS": true, "RCS": true, ".git": true, ".github": true, ".svn": true, ".hg": true, ".bzr": true, ".vscode": true, ".settings": true, ".pioenvs": true, ".piolibdeps": true}
 
@@ -59,20 +52,6 @@ func FilterReadableFiles(file *paths.Path) bool {
 	}
 	f.Close()
 	return true
-}
-
-func IsSCCSOrHiddenFile(file os.FileInfo) bool {
-	return IsSCCSFile(file) || IsHiddenFile(file)
-}
-
-func IsHiddenFile(file os.FileInfo) bool {
-	name := filepath.Base(file.Name())
-	return name[0] == '.'
-}
-
-func IsSCCSFile(file os.FileInfo) bool {
-	name := filepath.Base(file.Name())
-	return SOURCE_CONTROL_FOLDERS[name]
 }
 
 func WrapWithHyphenI(value string) string {
@@ -147,21 +126,6 @@ func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) 
 	}
 
 	return outbytes, errbytes, errors.WithStack(err)
-}
-
-func AbsolutizePaths(files []string) ([]string, error) {
-	for idx, file := range files {
-		if file == "" {
-			continue
-		}
-		absFile, err := filepath.Abs(file)
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-		files[idx] = absFile
-	}
-
-	return files, nil
 }
 
 func FindFilesInFolder(dir *paths.Path, recurse bool, extensions []string) (paths.PathList, error) {
