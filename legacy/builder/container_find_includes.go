@@ -175,7 +175,7 @@ func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 		}
 	}
 
-	if err := runCommand(ctx, &FailIfImportedLibraryIsWrong{}); err != nil {
+	if err := failIfImportedLibraryIsWrong(ctx); err != nil {
 		return errors.WithStack(err)
 	}
 
@@ -196,15 +196,6 @@ func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 func appendIncludeFolder(ctx *types.Context, cache *includeCache, sourceFilePath *paths.Path, include string, folder *paths.Path) {
 	ctx.IncludeFolders = append(ctx.IncludeFolders, folder)
 	cache.ExpectEntry(sourceFilePath, include, folder)
-}
-
-func runCommand(ctx *types.Context, command types.Command) error {
-	PrintRingNameIfDebug(ctx, command)
-	err := command.Run(ctx)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	return nil
 }
 
 type includeCacheEntry struct {
@@ -318,10 +309,10 @@ func writeCache(cache *includeCache, path *paths.Path) error {
 
 func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQueue *types.UniqueSourceFileQueue) error {
 	sourceFile := sourceFileQueue.Pop()
-	sourcePath := sourceFile.SourcePath(ctx)
+	sourcePath := sourceFile.SourcePath()
 	targetFilePath := paths.NullPath()
-	depPath := sourceFile.DepfilePath(ctx)
-	objPath := sourceFile.ObjectPath(ctx)
+	depPath := sourceFile.DepfilePath()
+	objPath := sourceFile.ObjectPath()
 
 	// TODO: This should perhaps also compare against the
 	// include.cache file timestamp. Now, it only checks if the file
@@ -342,28 +333,21 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 
 	first := true
 	for {
-		var missingIncludeH string
 		cache.ExpectFile(sourcePath)
 
+		// Libraries may require the "utility" directory to be added to the include
+		// search path, but only for the source code of the library, so we temporary
+		// copy the current search path list and add the library' utility directory
+		// if needed.
 		includeFolders := ctx.IncludeFolders
-		if library, ok := sourceFile.Origin.(*libraries.Library); ok && library.UtilityDir != nil {
-			includeFolders = append(includeFolders, library.UtilityDir)
-		}
-
-		if library, ok := sourceFile.Origin.(*libraries.Library); ok {
-			if library.Precompiled && library.PrecompiledWithSources {
-				// Fully precompiled libraries should have no dependencies
-				// to avoid ABI breakage
-				if ctx.Verbose {
-					ctx.Info(tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
-				}
-				return nil
-			}
+		if extraInclude := sourceFile.ExtraIncludePath(); extraInclude != nil {
+			includeFolders = append(includeFolders, extraInclude)
 		}
 
 		var preprocErr error
 		var preprocStderr []byte
 
+		var missingIncludeH string
 		if unchanged && cache.valid {
 			missingIncludeH = cache.Next().Include
 			if first && ctx.Verbose {
@@ -376,14 +360,11 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 				ctx.WriteStdout(preprocStdout)
 			}
 			// Unwrap error and see if it is an ExitError.
-			_, isExitErr := errors.Cause(preprocErr).(*exec.ExitError)
 			if preprocErr == nil {
 				// Preprocessor successful, done
 				missingIncludeH = ""
-			} else if !isExitErr || preprocStderr == nil {
-				// Ignore ExitErrors (e.g. gcc returning
-				// non-zero status), but bail out on
-				// other errors
+			} else if _, isExitErr := errors.Cause(preprocErr).(*exec.ExitError); !isExitErr || preprocStderr == nil {
+				// Ignore ExitErrors (e.g. gcc returning non-zero status), but bail out on other errors
 				return errors.WithStack(preprocErr)
 			} else {
 				missingIncludeH = IncludesFinderWithRegExp(string(preprocStderr))
@@ -426,9 +407,16 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 		// include scanning
 		ctx.ImportedLibraries = append(ctx.ImportedLibraries, library)
 		appendIncludeFolder(ctx, cache, sourcePath, missingIncludeH, library.SourceDir)
-		sourceDirs := library.SourceDirs()
-		for _, sourceDir := range sourceDirs {
-			queueSourceFilesFromFolder(ctx, sourceFileQueue, library, sourceDir.Dir, sourceDir.Recurse)
+
+		if library.Precompiled && library.PrecompiledWithSources {
+			// Fully precompiled libraries should have no dependencies to avoid ABI breakage
+			if ctx.Verbose {
+				ctx.Info(tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
+			}
+		} else {
+			for _, sourceDir := range library.SourceDirs() {
+				queueSourceFilesFromFolder(ctx, sourceFileQueue, library, sourceDir.Dir, sourceDir.Recurse)
+			}
 		}
 		first = false
 	}
@@ -498,4 +486,30 @@ func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {
 	}
 
 	return selected
+}
+
+func failIfImportedLibraryIsWrong(ctx *types.Context) error {
+	if len(ctx.ImportedLibraries) == 0 {
+		return nil
+	}
+
+	for _, library := range ctx.ImportedLibraries {
+		if !library.IsLegacy {
+			if library.InstallDir.Join("arch").IsDir() {
+				return errors.New(tr("%[1]s folder is no longer supported! See %[2]s for more information", "'arch'", "http://goo.gl/gfFJzU"))
+			}
+			for _, propName := range libraries.MandatoryProperties {
+				if !library.Properties.ContainsKey(propName) {
+					return errors.New(tr("Missing '%[1]s' from library in %[2]s", propName, library.InstallDir))
+				}
+			}
+			if library.Layout == libraries.RecursiveLayout {
+				if library.UtilityDir != nil {
+					return errors.New(tr("Library can't use both '%[1]s' and '%[2]s' folders. Double check in '%[3]s'.", "src", "utility", library.InstallDir))
+				}
+			}
+		}
+	}
+
+	return nil
 }
