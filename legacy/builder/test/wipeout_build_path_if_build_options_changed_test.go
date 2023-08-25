@@ -19,7 +19,6 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/legacy/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/gohasissues"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/stretchr/testify/require"
 )
@@ -48,7 +47,7 @@ func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
 	NoError(t, err)
 	require.True(t, exist)
 
-	files, err := gohasissues.ReadDir(buildPath.String())
+	files, err := buildPath.ReadDir()
 	NoError(t, err)
 	require.Equal(t, 0, len(files))
 
@@ -80,7 +79,7 @@ func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.
 	NoError(t, err)
 	require.True(t, exist)
 
-	files, err := gohasissues.ReadDir(buildPath.String())
+	files, err := buildPath.ReadDir()
 	NoError(t, err)
 	require.Equal(t, 1, len(files))
 

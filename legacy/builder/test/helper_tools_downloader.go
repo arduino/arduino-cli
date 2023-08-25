@@ -27,7 +27,6 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/gohasissues"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -462,7 +461,7 @@ func downloadAndUnpackCore(core Core, url string, targetPath *paths.Path) error 
 			return errors.WithStack(err)
 		}
 	}
-	if err := unpackFolder.Join(files[0].Name()).CopyDirTo(corePath); err != nil {
+	if err := unpackFolder.Join(files[0].Base()).CopyDirTo(corePath); err != nil {
 		return errors.WithStack(err)
 	}
 	return nil
@@ -492,7 +491,7 @@ func downloadAndUnpackBoardManagerCore(core Core, url string, targetPath *paths.
 	if err := corePath.MkdirAll(); err != nil {
 		return errors.WithStack(err)
 	}
-	if err := unpackFolder.Join(files[0].Name()).CopyDirTo(corePath.Join(core.Version)); err != nil {
+	if err := unpackFolder.Join(files[0].Base()).CopyDirTo(corePath.Join(core.Version)); err != nil {
 		return errors.WithStack(err)
 	}
 	return nil
@@ -516,7 +515,7 @@ func downloadAndUnpackBoardsManagerTool(tool Tool, url string, targetPath *paths
 	if err := targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name).MkdirAll(); err != nil {
 		return errors.WithStack(err)
 	}
-	if err := unpackFolder.Join(files[0].Name()).CopyDirTo(targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name, tool.Version)); err != nil {
+	if err := unpackFolder.Join(files[0].Base()).CopyDirTo(targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name, tool.Version)); err != nil {
 		return errors.WithStack(err)
 	}
 	return nil
@@ -550,7 +549,7 @@ func downloadAndUnpackTool(tool Tool, url string, targetPath *paths.Path, delete
 	}
 	destDir := toolPath.Join(tool.Version)
 	if len(files) == 1 && files[0].IsDir() {
-		if err := unpackFolder.Join(files[0].Name()).CopyDirTo(destDir); err != nil {
+		if err := unpackFolder.Join(files[0].Base()).CopyDirTo(destDir); err != nil {
 			return errors.WithStack(err)
 		}
 	} else {
@@ -560,7 +559,7 @@ func downloadAndUnpackTool(tool Tool, url string, targetPath *paths.Path, delete
 	return nil
 }
 
-func downloadAndUnpack(url string) (*paths.Path, []os.FileInfo, error) {
+func downloadAndUnpack(url string) (*paths.Path, paths.PathList, error) {
 	fmt.Fprintln(os.Stderr, "Downloading "+url)
 
 	unpackFolder, err := paths.MkTempDir("", "arduino-builder-tool")
@@ -597,7 +596,7 @@ func downloadAndUnpack(url string) (*paths.Path, []os.FileInfo, error) {
 
 	archiveFilePath.Remove()
 
-	files, err := gohasissues.ReadDir(unpackFolder.String())
+	files, err := unpackFolder.ReadDir()
 	if err != nil {
 		return nil, nil, errors.WithStack(err)
 	}
@@ -719,7 +718,7 @@ func downloadAndUnpackLibrary(library Library, url string, targetPath *paths.Pat
 		}
 	}
 
-	if err := unpackFolder.Join(files[0].Name()).CopyDirTo(libPath); err != nil {
+	if err := unpackFolder.Join(files[0].Base()).CopyDirTo(libPath); err != nil {
 		return errors.WithStack(err)
 	}
 
