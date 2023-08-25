@@ -29,7 +29,6 @@ import (
 
 	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	"github.com/arduino/arduino-cli/legacy/builder/gohasissues"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
@@ -42,48 +41,6 @@ import (
 type filterFiles func([]os.FileInfo) []os.FileInfo
 
 var tr = i18n.Tr
-
-func ReadDirFiltered(folder string, fn filterFiles) ([]os.FileInfo, error) {
-	files, err := gohasissues.ReadDir(folder)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	return fn(files), nil
-}
-
-func FilterDirs(files []os.FileInfo) []os.FileInfo {
-	var filtered []os.FileInfo
-	for _, info := range files {
-		if info.IsDir() {
-			filtered = append(filtered, info)
-		}
-	}
-	return filtered
-}
-
-func FilterFilesWithExtensions(extensions ...string) filterFiles {
-	return func(files []os.FileInfo) []os.FileInfo {
-		var filtered []os.FileInfo
-		for _, file := range files {
-			if !file.IsDir() && slices.Contains(extensions, filepath.Ext(file.Name())) {
-				filtered = append(filtered, file)
-			}
-		}
-		return filtered
-	}
-}
-
-func FilterFiles() filterFiles {
-	return func(files []os.FileInfo) []os.FileInfo {
-		var filtered []os.FileInfo
-		for _, file := range files {
-			if !file.IsDir() {
-				filtered = append(filtered, file)
-			}
-		}
-		return filtered
-	}
-}
 
 var SOURCE_CONTROL_FOLDERS = map[string]bool{"CVS": true, "RCS": true, ".git": true, ".github": true, ".svn": true, ".hg": true, ".bzr": true, ".vscode": true, ".settings": true, ".pioenvs": true, ".piolibdeps": true}
 

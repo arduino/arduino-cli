@@ -39,30 +39,31 @@ import (
 var tr = i18n.Tr
 
 func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
-	files, err := utils.ReadDirFiltered(sourcePath, utils.FilterFiles())
+	allFiles, err := paths.New(sourcePath).ReadDir()
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+	files := allFiles.Clone()
+	files.FilterOutDirs()
 	var sources []string
 	for _, file := range files {
-		sources = append(sources, filepath.Join(sourcePath, file.Name()))
+		sources = append(sources, filepath.Join(sourcePath, file.Base()))
 	}
 
 	if recurse {
-		folders, err := utils.ReadDirFiltered(sourcePath, utils.FilterDirs)
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-
+		folders := allFiles.Clone()
+		folders.FilterOutHiddenFiles()
+		folders.FilterDirs()
 		for _, folder := range folders {
-			if !utils.IsSCCSOrHiddenFile(folder) {
-				// Skip SCCS directories as they do not influence the build and can be very large
-				otherSources, err := findAllFilesInFolder(filepath.Join(sourcePath, folder.Name()), recurse)
-				if err != nil {
-					return nil, errors.WithStack(err)
-				}
-				sources = append(sources, otherSources...)
+			// Skip SCCS directories as they do not influence the build and can be very large
+			if utils.SOURCE_CONTROL_FOLDERS[folder.Base()] {
+				continue
 			}
+			otherSources, err := findAllFilesInFolder(filepath.Join(sourcePath, folder.Base()), recurse)
+			if err != nil {
+				return nil, errors.WithStack(err)
+			}
+			sources = append(sources, otherSources...)
 		}
 	}
 
