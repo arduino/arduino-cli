@@ -22,7 +22,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
@@ -465,8 +464,7 @@ func downloadAndUnpackCore(core Core, url string, targetPath *paths.Path) error 
 		if err := packagerPath.MkdirAll(); err != nil {
 			return errors.WithStack(err)
 		}
-		err = copyRecursive(unpackFolder.Join(files[0].Name()), targetPath.Join(core.Maintainer, core.Arch))
-		if err != nil {
+		if err := unpackFolder.Join(files[0].Name()).CopyDirTo(targetPath.Join(core.Maintainer, core.Arch)); err != nil {
 			return errors.WithStack(err)
 		}
 	} else {
@@ -474,8 +472,7 @@ func downloadAndUnpackCore(core Core, url string, targetPath *paths.Path) error 
 			return errors.WithStack(err)
 		}
 		for _, file := range files {
-			err = copyRecursive(unpackFolder.Join(file.Name()), targetPath.Join(core.Maintainer, core.Arch, file.Name()))
-			if err != nil {
+			if err := unpackFolder.Join(file.Name()).CopyDirTo(targetPath.Join(core.Maintainer, core.Arch, file.Name())); err != nil {
 				return errors.WithStack(err)
 			}
 		}
@@ -510,8 +507,7 @@ func downloadAndUnpackBoardManagerCore(core Core, url string, targetPath *paths.
 		if err := corePath.MkdirAll(); err != nil {
 			return errors.WithStack(err)
 		}
-		err = copyRecursive(unpackFolder.Join(files[0].Name()), corePath.Join(core.Version))
-		if err != nil {
+		if err := unpackFolder.Join(files[0].Name()).CopyDirTo(corePath.Join(core.Version)); err != nil {
 			return errors.WithStack(err)
 		}
 	} else {
@@ -519,8 +515,7 @@ func downloadAndUnpackBoardManagerCore(core Core, url string, targetPath *paths.
 			return errors.WithStack(err)
 		}
 		for _, file := range files {
-			err = copyRecursive(unpackFolder.Join(file.Name()), corePath.Join(core.Version, file.Name()))
-			if err != nil {
+			if err := unpackFolder.Join(file.Name()).CopyDirTo(corePath.Join(core.Version, file.Name())); err != nil {
 				return errors.WithStack(err)
 			}
 		}
@@ -548,8 +543,7 @@ func downloadAndUnpackBoardsManagerTool(tool Tool, url string, targetPath *paths
 		if err := targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name).MkdirAll(); err != nil {
 			return errors.WithStack(err)
 		}
-		err = copyRecursive(unpackFolder.Join(files[0].Name()), targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name, tool.Version))
-		if err != nil {
+		if err := unpackFolder.Join(files[0].Name()).CopyDirTo(targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name, tool.Version)); err != nil {
 			return errors.WithStack(err)
 		}
 	} else {
@@ -557,8 +551,7 @@ func downloadAndUnpackBoardsManagerTool(tool Tool, url string, targetPath *paths
 			return errors.WithStack(err)
 		}
 		for _, file := range files {
-			err = copyRecursive(unpackFolder.Join(file.Name()), targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name, tool.Version, file.Name()))
-			if err != nil {
+			if err := unpackFolder.Join(file.Name()).CopyDirTo(targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name, tool.Version, file.Name())); err != nil {
 				return errors.WithStack(err)
 			}
 		}
@@ -595,17 +588,16 @@ func downloadAndUnpackTool(tool Tool, url string, targetPath *paths.Path, delete
 		if err := toolPath.MkdirAll(); err != nil {
 			return errors.WithStack(err)
 		}
-		err = copyRecursive(unpackFolder.Join(files[0].Name()), toolPath.Join(tool.Version))
-		if err != nil {
+		if err := unpackFolder.Join(files[0].Name()).CopyDirTo(toolPath.Join(tool.Version)); err != nil {
 			return errors.WithStack(err)
 		}
 	} else {
+		unpackFolder.CopyDirTo(toolPath.Join(tool.Version))
 		if err := toolPath.Join(tool.Version).MkdirAll(); err != nil {
 			return errors.WithStack(err)
 		}
 		for _, file := range files {
-			err = copyRecursive(unpackFolder.Join(file.Name()), toolPath.Join(tool.Version, file.Name()))
-			if err != nil {
+			if err := unpackFolder.Join(file.Name()).CopyTo(toolPath.Join(tool.Version, file.Name())); err != nil {
 				return errors.WithStack(err)
 			}
 		}
@@ -773,65 +765,9 @@ func downloadAndUnpackLibrary(library Library, url string, targetPath *paths.Pat
 		}
 	}
 
-	err = copyRecursive(unpackFolder.Join(files[0].Name()), libPath)
-	if err != nil {
+	if err := unpackFolder.Join(files[0].Name()).CopyDirTo(libPath); err != nil {
 		return errors.WithStack(err)
 	}
 
 	return nil
-}
-
-func copyRecursive(from, to *paths.Path) error {
-	copyFunc := func(currentPath string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		rel, err := filepath.Rel(from.String(), currentPath)
-		if err != nil {
-			return errors.WithStack(err)
-		}
-		targetPath := filepath.Join(to.String(), rel)
-		if info.IsDir() {
-			err := os.MkdirAll(targetPath, info.Mode())
-			if err != nil {
-				return errors.WithStack(err)
-			}
-		} else if info.Mode().IsRegular() {
-			fromFile, err := os.Open(currentPath)
-			if err != nil {
-				return errors.WithStack(err)
-			}
-			defer fromFile.Close()
-			targetFile, err := os.Create(targetPath)
-			if err != nil {
-				return errors.WithStack(err)
-			}
-			defer targetFile.Close()
-			_, err = io.Copy(targetFile, fromFile)
-			if err != nil {
-				return errors.WithStack(err)
-			}
-			err = os.Chmod(targetPath, info.Mode())
-			if err != nil {
-				return errors.WithStack(err)
-			}
-		} else if info.Mode()&os.ModeSymlink == os.ModeSymlink {
-			linkedFile, err := os.Readlink(currentPath)
-			if err != nil {
-				return errors.WithStack(err)
-			}
-			fromFile := filepath.Join(filepath.Dir(targetPath), linkedFile)
-			err = os.Symlink(fromFile, targetPath)
-			if err != nil {
-				return errors.WithStack(err)
-			}
-		} else {
-			return errors.Errorf("unable to copy file " + currentPath)
-		}
-
-		return nil
-	}
-	err := gohasissues.Walk(from.String(), copyFunc)
-	return errors.WithStack(err)
 }
