@@ -454,30 +454,17 @@ func downloadAndUnpackCore(core Core, url string, targetPath *paths.Path) error 
 	packagerPath := targetPath.Join(core.Maintainer)
 	corePath := targetPath.Join(core.Maintainer, core.Arch)
 
+	if err := packagerPath.MkdirAll(); err != nil {
+		return errors.WithStack(err)
+	}
 	if corePath.Exist() {
 		if err := corePath.RemoveAll(); err != nil {
 			return errors.WithStack(err)
 		}
 	}
-
-	if len(files) == 1 && files[0].IsDir() {
-		if err := packagerPath.MkdirAll(); err != nil {
-			return errors.WithStack(err)
-		}
-		if err := unpackFolder.Join(files[0].Name()).CopyDirTo(targetPath.Join(core.Maintainer, core.Arch)); err != nil {
-			return errors.WithStack(err)
-		}
-	} else {
-		if err := targetPath.Join(core.Maintainer, core.Arch).MkdirAll(); err != nil {
-			return errors.WithStack(err)
-		}
-		for _, file := range files {
-			if err := unpackFolder.Join(file.Name()).CopyDirTo(targetPath.Join(core.Maintainer, core.Arch, file.Name())); err != nil {
-				return errors.WithStack(err)
-			}
-		}
+	if err := unpackFolder.Join(files[0].Name()).CopyDirTo(corePath); err != nil {
+		return errors.WithStack(err)
 	}
-
 	return nil
 }
 
@@ -502,25 +489,12 @@ func downloadAndUnpackBoardManagerCore(core Core, url string, targetPath *paths.
 			return errors.WithStack(err)
 		}
 	}
-
-	if len(files) == 1 && files[0].IsDir() {
-		if err := corePath.MkdirAll(); err != nil {
-			return errors.WithStack(err)
-		}
-		if err := unpackFolder.Join(files[0].Name()).CopyDirTo(corePath.Join(core.Version)); err != nil {
-			return errors.WithStack(err)
-		}
-	} else {
-		if err := corePath.Join(core.Version).MkdirAll(); err != nil {
-			return errors.WithStack(err)
-		}
-		for _, file := range files {
-			if err := unpackFolder.Join(file.Name()).CopyDirTo(corePath.Join(core.Version, file.Name())); err != nil {
-				return errors.WithStack(err)
-			}
-		}
+	if err := corePath.MkdirAll(); err != nil {
+		return errors.WithStack(err)
 	}
-
+	if err := unpackFolder.Join(files[0].Name()).CopyDirTo(corePath.Join(core.Version)); err != nil {
+		return errors.WithStack(err)
+	}
 	return nil
 }
 
@@ -539,24 +513,12 @@ func downloadAndUnpackBoardsManagerTool(tool Tool, url string, targetPath *paths
 	}
 	defer unpackFolder.RemoveAll()
 
-	if len(files) == 1 && files[0].IsDir() {
-		if err := targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name).MkdirAll(); err != nil {
-			return errors.WithStack(err)
-		}
-		if err := unpackFolder.Join(files[0].Name()).CopyDirTo(targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name, tool.Version)); err != nil {
-			return errors.WithStack(err)
-		}
-	} else {
-		if err := targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name, tool.Version).MkdirAll(); err != nil {
-			return errors.WithStack(err)
-		}
-		for _, file := range files {
-			if err := unpackFolder.Join(file.Name()).CopyDirTo(targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name, tool.Version, file.Name())); err != nil {
-				return errors.WithStack(err)
-			}
-		}
+	if err := targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name).MkdirAll(); err != nil {
+		return errors.WithStack(err)
 	}
-
+	if err := unpackFolder.Join(files[0].Name()).CopyDirTo(targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name, tool.Version)); err != nil {
+		return errors.WithStack(err)
+	}
 	return nil
 }
 
@@ -583,24 +545,16 @@ func downloadAndUnpackTool(tool Tool, url string, targetPath *paths.Path, delete
 			}
 		}
 	}
-
+	if err := toolPath.MkdirAll(); err != nil {
+		return errors.WithStack(err)
+	}
+	destDir := toolPath.Join(tool.Version)
 	if len(files) == 1 && files[0].IsDir() {
-		if err := toolPath.MkdirAll(); err != nil {
-			return errors.WithStack(err)
-		}
-		if err := unpackFolder.Join(files[0].Name()).CopyDirTo(toolPath.Join(tool.Version)); err != nil {
+		if err := unpackFolder.Join(files[0].Name()).CopyDirTo(destDir); err != nil {
 			return errors.WithStack(err)
 		}
 	} else {
-		unpackFolder.CopyDirTo(toolPath.Join(tool.Version))
-		if err := toolPath.Join(tool.Version).MkdirAll(); err != nil {
-			return errors.WithStack(err)
-		}
-		for _, file := range files {
-			if err := unpackFolder.Join(file.Name()).CopyTo(toolPath.Join(tool.Version, file.Name())); err != nil {
-				return errors.WithStack(err)
-			}
-		}
+		unpackFolder.CopyDirTo(destDir)
 	}
 
 	return nil
