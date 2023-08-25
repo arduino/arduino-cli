@@ -16,6 +16,8 @@
 package phases
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"strings"
@@ -157,11 +159,16 @@ func GetCachedCoreArchiveDirName(fqbn string, optimizationFlags string, coreFold
 	if absCoreFolder, err := coreFolder.Abs(); err == nil {
 		coreFolder = absCoreFolder
 	} // silently continue if absolute path can't be detected
-	hash := utils.MD5Sum([]byte(coreFolder.String() + optimizationFlags))
+
+	md5Sum := func(data []byte) string {
+		md5sumBytes := md5.Sum(data)
+		return hex.EncodeToString(md5sumBytes[:])
+	}
+	hash := md5Sum([]byte(coreFolder.String() + optimizationFlags))
 	realName := fqbnToUnderscore + "_" + hash
 	if len(realName) > 100 {
-		// avoid really long names, simply hash the name
-		realName = utils.MD5Sum([]byte(fqbnToUnderscore + "_" + hash))
+		// avoid really long names, simply hash the name again
+		realName = md5Sum([]byte(realName))
 	}
 	return realName
 }

@@ -17,8 +17,6 @@ package utils
 
 import (
 	"bytes"
-	"crypto/md5"
-	"encoding/hex"
 	"os"
 	"os/exec"
 	"strings"
@@ -144,11 +142,6 @@ func FindFilesInFolder(dir *paths.Path, recurse bool, extensions []string) (path
 		return dir.ReadDirRecursiveFiltered(dirFilter, fileFilter)
 	}
 	return dir.ReadDir(fileFilter)
-}
-
-func MD5Sum(data []byte) string {
-	md5sumBytes := md5.Sum(data)
-	return hex.EncodeToString(md5sumBytes[:])
 }
 
 type loggerAction struct {
