@@ -39,31 +39,12 @@ import (
 var tr = i18n.Tr
 
 func findAllFilesInFolder(sourcePath *paths.Path, recurse bool) (paths.PathList, error) {
-	allFiles, err := sourcePath.ReadDir()
-	if err != nil {
-		return nil, errors.WithStack(err)
+	if !recurse {
+		return sourcePath.ReadDir(paths.FilterOutDirectories())
 	}
-	sources := allFiles.Clone()
-	sources.FilterOutDirs()
-
-	if recurse {
-		folders := allFiles.Clone()
-		folders.FilterOutHiddenFiles()
-		folders.FilterDirs()
-		for _, folder := range folders {
-			// Skip SCCS directories as they do not influence the build and can be very large
-			if utils.SOURCE_CONTROL_FOLDERS[folder.Base()] {
-				continue
-			}
-			otherSources, err := findAllFilesInFolder(folder, recurse)
-			if err != nil {
-				return nil, errors.WithStack(err)
-			}
-			sources = append(sources, otherSources...)
-		}
-	}
-
-	return sources, nil
+	return sourcePath.ReadDirRecursiveFiltered(
+		utils.FilterOutSCCS,
+		paths.FilterOutDirectories())
 }
 
 func CompileFiles(ctx *types.Context, sourcePath *paths.Path, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
