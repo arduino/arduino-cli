@@ -19,7 +19,6 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/phases"
@@ -50,7 +49,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
 
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = builder.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = ctx.Builder.PrepareSketchBuildPath(ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 
@@ -170,7 +169,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
 
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = builder.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = ctx.Builder.PrepareSketchBuildPath(ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 

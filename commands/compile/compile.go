@@ -169,6 +169,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	}
 
 	builderCtx := &types.Context{}
+	builderCtx.Builder = bldr.NewBuilder(sk)
 	builderCtx.PackageManager = pme
 	if pme.GetProfile() != nil {
 		builderCtx.LibrariesManager = lm

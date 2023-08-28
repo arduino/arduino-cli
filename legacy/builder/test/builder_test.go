@@ -98,6 +98,7 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		ctx.RequiredTools = requiredTools
 	}
 
+	ctx.Builder = bldr.NewBuilder(ctx.Sketch)
 	return ctx
 }
 
