@@ -67,24 +67,21 @@ func (db *CompilationDatabase) SaveToFile() {
 	}
 }
 
-func dirForCommand(command *exec.Cmd) string {
-	// This mimics what Cmd.Run also does: Use Dir if specified,
-	// current directory otherwise
-	if command.Dir != "" {
-		return command.Dir
-	}
-	dir, err := os.Getwd()
-	if err != nil {
-		fmt.Println(tr("Error getting current directory for compilation database: %s", err))
-		return ""
-	}
-	return dir
-}
-
 // Add adds a new CompilationDatabase entry
 func (db *CompilationDatabase) Add(target *paths.Path, command *exec.Cmd) {
+	commandDir := command.Dir
+	if commandDir == "" {
+		// This mimics what Cmd.Run also does: Use Dir if specified,
+		// current directory otherwise
+		dir, err := os.Getwd()
+		if err != nil {
+			fmt.Println(tr("Error getting current directory for compilation database: %s", err))
+		}
+		commandDir = dir
+	}
+
 	entry := CompilationCommand{
-		Directory: dirForCommand(command),
+		Directory: commandDir,
 		Arguments: command.Args,
 		File:      target.String(),
 	}

@@ -64,32 +64,25 @@ func DirContentIsOlderThan(dir *paths.Path, target *paths.Path, extensions ...st
 	return true, nil
 }
 
-func CompileFiles(ctx *types.Context, sourcePath *paths.Path, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
-	return compileFiles(ctx, sourcePath, false, buildPath, buildProperties, includes)
+func CompileFiles(ctx *types.Context, sourceDir *paths.Path, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
+	return compileFiles(ctx, sourceDir, false, buildPath, buildProperties, includes)
 }
 
-func CompileFilesRecursive(ctx *types.Context, sourcePath *paths.Path, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
-	return compileFiles(ctx, sourcePath, true, buildPath, buildProperties, includes)
+func CompileFilesRecursive(ctx *types.Context, sourceDir *paths.Path, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
+	return compileFiles(ctx, sourceDir, true, buildPath, buildProperties, includes)
 }
 
-func compileFiles(ctx *types.Context, sourcePath *paths.Path, recurse bool, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
-	var sources paths.PathList
-	var err error
-	if recurse {
-		sources, err = sourcePath.ReadDirRecursive()
-	} else {
-		sources, err = sourcePath.ReadDir()
-	}
-	if err != nil {
-		return nil, err
-	}
-
+func compileFiles(ctx *types.Context, sourceDir *paths.Path, recurse bool, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
 	validExtensions := []string{}
 	for ext := range globals.SourceFilesValidExtensions {
 		validExtensions = append(validExtensions, ext)
 	}
 
-	sources.FilterSuffix(validExtensions...)
+	sources, err := utils.FindFilesInFolder(sourceDir, recurse, validExtensions...)
+	if err != nil {
+		return nil, err
+	}
+
 	ctx.Progress.AddSubSteps(len(sources))
 	defer ctx.Progress.RemoveSubSteps()
 
@@ -107,7 +100,7 @@ func compileFiles(ctx *types.Context, sourcePath *paths.Path, recurse bool, buil
 		if !buildProperties.ContainsKey(recipe) {
 			recipe = fmt.Sprintf("recipe%s.o.pattern", globals.SourceFilesValidExtensions[source.Ext()])
 		}
-		objectFile, err := compileFileWithRecipe(ctx, sourcePath, source, buildPath, buildProperties, includes, recipe)
+		objectFile, err := compileFileWithRecipe(ctx, sourceDir, source, buildPath, buildProperties, includes, recipe)
 		if err != nil {
 			errorsMux.Lock()
 			errorsList = append(errorsList, err)
