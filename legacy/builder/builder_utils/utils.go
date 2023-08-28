@@ -38,17 +38,13 @@ import (
 
 var tr = i18n.Tr
 
-func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
-	allFiles, err := paths.New(sourcePath).ReadDir()
+func findAllFilesInFolder(sourcePath *paths.Path, recurse bool) (paths.PathList, error) {
+	allFiles, err := sourcePath.ReadDir()
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	files := allFiles.Clone()
-	files.FilterOutDirs()
-	var sources []string
-	for _, file := range files {
-		sources = append(sources, filepath.Join(sourcePath, file.Base()))
-	}
+	sources := allFiles.Clone()
+	sources.FilterOutDirs()
 
 	if recurse {
 		folders := allFiles.Clone()
@@ -59,7 +55,7 @@ func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
 			if utils.SOURCE_CONTROL_FOLDERS[folder.Base()] {
 				continue
 			}
-			otherSources, err := findAllFilesInFolder(filepath.Join(sourcePath, folder.Base()), recurse)
+			otherSources, err := findAllFilesInFolder(folder, recurse)
 			if err != nil {
 				return nil, errors.WithStack(err)
 			}
@@ -336,12 +332,12 @@ func CoreOrReferencedCoreHasChanged(corePath, targetCorePath, targetFile *paths.
 
 	targetFileStat, err := targetFile.Stat()
 	if err == nil {
-		files, err := findAllFilesInFolder(corePath.String(), true)
+		files, err := findAllFilesInFolder(corePath, true)
 		if err != nil {
 			return true
 		}
 		for _, file := range files {
-			fileStat, err := os.Stat(file)
+			fileStat, err := file.Stat()
 			if err != nil || fileStat.ModTime().After(targetFileStat.ModTime()) {
 				return true
 			}
@@ -358,16 +354,16 @@ func TXTBuildRulesHaveChanged(corePath, targetCorePath, targetFile *paths.Path) 
 
 	targetFileStat, err := targetFile.Stat()
 	if err == nil {
-		files, err := findAllFilesInFolder(corePath.String(), true)
+		files, err := findAllFilesInFolder(corePath, true)
 		if err != nil {
 			return true
 		}
 		for _, file := range files {
 			// report changes only for .txt files
-			if filepath.Ext(file) != ".txt" {
+			if file.Ext() != ".txt" {
 				continue
 			}
-			fileStat, err := os.Stat(file)
+			fileStat, err := file.Stat()
 			if err != nil || fileStat.ModTime().After(targetFileStat.ModTime()) {
 				return true
 			}
