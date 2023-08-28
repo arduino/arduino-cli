@@ -38,13 +38,20 @@ import (
 
 var tr = i18n.Tr
 
-// FilesAreOlderThan returns true if the given files are older than target.
-func FilesAreOlderThan(files paths.PathList, target *paths.Path) (bool, error) {
+// DirContentIsOlderThan returns true if the content of the given directory is
+// older than target file. If extensions are given, only the files with these
+// extensions are tested.
+func DirContentIsOlderThan(dir *paths.Path, target *paths.Path, extensions ...string) (bool, error) {
 	targetStat, err := target.Stat()
 	if err != nil {
 		return false, err
 	}
 	targetModTime := targetStat.ModTime()
+
+	files, err := utils.FindFilesInFolder(dir, true, extensions...)
+	if err != nil {
+		return false, err
+	}
 	for _, file := range files {
 		file, err := file.Stat()
 		if err != nil {
@@ -320,12 +327,7 @@ func removeEndingBackSlash(s string) string {
 }
 
 func CoreOrReferencedCoreHasChanged(corePath, targetCorePath, targetFile *paths.Path) bool {
-	files, err := utils.FindFilesInFolder(corePath, true)
-	if err != nil {
-		return true
-	}
-
-	if isOlder, err := FilesAreOlderThan(files, targetFile); err != nil || !isOlder {
+	if isOlder, err := DirContentIsOlderThan(corePath, targetFile); err != nil || !isOlder {
 		return true
 	}
 
@@ -336,12 +338,7 @@ func CoreOrReferencedCoreHasChanged(corePath, targetCorePath, targetFile *paths.
 }
 
 func TXTBuildRulesHaveChanged(corePath, targetCorePath, targetFile *paths.Path) bool {
-	files, err := utils.FindFilesInFolder(corePath, true, ".txt")
-	if err != nil {
-		return true
-	}
-
-	if isOlder, err := FilesAreOlderThan(files, targetFile); err != nil || !isOlder {
+	if isOlder, err := DirContentIsOlderThan(corePath, targetFile, ".txt"); err != nil || !isOlder {
 		return true
 	}
 
