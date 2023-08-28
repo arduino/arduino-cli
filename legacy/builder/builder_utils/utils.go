@@ -326,17 +326,6 @@ func removeEndingBackSlash(s string) string {
 	return strings.TrimSuffix(s, "\\")
 }
 
-func TXTBuildRulesHaveChanged(corePath, targetCorePath, targetFile *paths.Path) bool {
-	if isOlder, err := DirContentIsOlderThan(corePath, targetFile, ".txt"); err != nil || !isOlder {
-		return true
-	}
-
-	if targetCorePath != nil && !corePath.EqualsTo(targetCorePath) {
-		return TXTBuildRulesHaveChanged(targetCorePath, nil, targetFile)
-	}
-	return false
-}
-
 func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile *paths.Path, objectFilesToArchive paths.PathList, buildProperties *properties.Map) (*paths.Path, error) {
 	archiveFilePath := buildPath.JoinPath(archiveFile)
 
