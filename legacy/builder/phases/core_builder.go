@@ -92,26 +92,33 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 		}
 	}
 
-	// Recreate the archive if ANY of the core files (including platform.txt) has changed
-	realCoreFolder := coreFolder.Parent().Parent()
-
 	var targetArchivedCore *paths.Path
-	var buildCacheErr error
 	if buildCachePath != nil {
+		realCoreFolder := coreFolder.Parent().Parent()
 		archivedCoreName := GetCachedCoreArchiveDirName(
 			buildProperties.Get("build.fqbn"),
 			buildProperties.Get("compiler.optimization_flags"),
 			realCoreFolder)
 		targetArchivedCore = buildCachePath.Join(archivedCoreName, "core.a")
-		_, buildCacheErr = buildcache.New(buildCachePath).GetOrCreate(archivedCoreName)
 
-		if errors.Is(buildCacheErr, buildcache.CreateDirErr) {
+		if _, err := buildcache.New(buildCachePath).GetOrCreate(archivedCoreName); errors.Is(err, buildcache.CreateDirErr) {
 			return nil, nil, fmt.Errorf(tr("creating core cache folder: %s", err))
 		}
 
-		canUseArchivedCore := !ctx.OnlyUpdateCompilationDatabase &&
-			!ctx.Clean &&
-			!builder_utils.CoreOrReferencedCoreHasChanged(realCoreFolder, targetCoreFolder, targetArchivedCore)
+		var canUseArchivedCore bool
+		if ctx.OnlyUpdateCompilationDatabase || ctx.Clean {
+			canUseArchivedCore = false
+		} else if isOlder, err := builder_utils.DirContentIsOlderThan(realCoreFolder, targetArchivedCore); err != nil || !isOlder {
+			// Recreate the archive if ANY of the core files (including platform.txt) has changed
+			canUseArchivedCore = false
+		} else if targetCoreFolder == nil || realCoreFolder.EquivalentTo(targetCoreFolder) {
+			canUseArchivedCore = true
+		} else if isOlder, err := builder_utils.DirContentIsOlderThan(targetCoreFolder, targetArchivedCore); err != nil || !isOlder {
+			// Recreate the archive if ANY of the build core files (including platform.txt) has changed
+			canUseArchivedCore = false
+		} else {
+			canUseArchivedCore = true
+		}
 
 		if canUseArchivedCore {
 			// use archived core
