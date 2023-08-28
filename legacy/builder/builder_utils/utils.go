@@ -38,15 +38,6 @@ import (
 
 var tr = i18n.Tr
 
-func findAllFilesInFolder(sourcePath *paths.Path, recurse bool) (paths.PathList, error) {
-	if !recurse {
-		return sourcePath.ReadDir(paths.FilterOutDirectories())
-	}
-	return sourcePath.ReadDirRecursiveFiltered(
-		utils.FilterOutSCCS,
-		paths.FilterOutDirectories())
-}
-
 // FilesAreOlderThan returns true if the given files are older than target.
 func FilesAreOlderThan(files paths.PathList, target *paths.Path) (bool, error) {
 	targetStat, err := target.Stat()
@@ -329,7 +320,7 @@ func removeEndingBackSlash(s string) string {
 }
 
 func CoreOrReferencedCoreHasChanged(corePath, targetCorePath, targetFile *paths.Path) bool {
-	files, err := findAllFilesInFolder(corePath, true)
+	files, err := utils.FindFilesInFolder(corePath, true)
 	if err != nil {
 		return true
 	}
@@ -345,7 +336,7 @@ func CoreOrReferencedCoreHasChanged(corePath, targetCorePath, targetFile *paths.
 }
 
 func TXTBuildRulesHaveChanged(corePath, targetCorePath, targetFile *paths.Path) bool {
-	files, err := utils.FindFilesInFolder(corePath, true, []string{".txt"})
+	files, err := utils.FindFilesInFolder(corePath, true, ".txt")
 	if err != nil {
 		return true
 	}

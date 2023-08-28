@@ -126,14 +126,19 @@ func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) 
 	return outbytes, errbytes, errors.WithStack(err)
 }
 
-func FindFilesInFolder(dir *paths.Path, recurse bool, extensions []string) (paths.PathList, error) {
+func FindFilesInFolder(dir *paths.Path, recurse bool, extensions ...string) (paths.PathList, error) {
 	fileFilter := paths.AndFilter(
-		paths.FilterSuffixes(extensions...),
 		FilterOutHiddenFiles,
 		FilterOutSCCS,
 		paths.FilterOutDirectories(),
 		FilterReadableFiles,
 	)
+	if len(extensions) > 0 {
+		fileFilter = paths.AndFilter(
+			paths.FilterSuffixes(extensions...),
+			fileFilter,
+		)
+	}
 	if recurse {
 		dirFilter := paths.AndFilter(
 			FilterOutHiddenFiles,

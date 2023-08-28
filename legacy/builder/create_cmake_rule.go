@@ -222,7 +222,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		}
 
 		// Remove stray folders contining incompatible or not needed libraries archives
-		files, _ := utils.FindFilesInFolder(libDir.Join("src"), true, validStaticLibExtensions)
+		files, _ := utils.FindFilesInFolder(libDir.Join("src"), true, validStaticLibExtensions...)
 		for _, file := range files {
 			staticLibDir := file.Parent()
 			if !isStaticLib || !strings.Contains(staticLibDir.String(), mcu) {
@@ -251,7 +251,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	}
 
 	// remove "#line 1 ..." from exported c_make folder sketch
-	sketchFiles, _ := utils.FindFilesInFolder(cmakeFolder.Join("sketch"), false, validExportExtensions)
+	sketchFiles, _ := utils.FindFilesInFolder(cmakeFolder.Join("sketch"), false, validExportExtensions...)
 
 	for _, file := range sketchFiles {
 		input, err := file.ReadFile()
@@ -285,11 +285,11 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	extractCompileFlags(ctx, "recipe.cpp.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
 
 	// Extract folders with .h in them for adding in include list
-	headerFiles, _ := utils.FindFilesInFolder(cmakeFolder, true, validHeaderExtensions)
+	headerFiles, _ := utils.FindFilesInFolder(cmakeFolder, true, validHeaderExtensions...)
 	foldersContainingHeaders := findUniqueFoldersRelative(headerFiles.AsStrings(), cmakeFolder.String())
 
 	// Extract folders with .a in them for adding in static libs paths list
-	staticLibs, _ := utils.FindFilesInFolder(cmakeFolder, true, validStaticLibExtensions)
+	staticLibs, _ := utils.FindFilesInFolder(cmakeFolder, true, validStaticLibExtensions...)
 
 	// Generate the CMakeLists global file
 
