@@ -26,28 +26,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSaveSketch(t *testing.T) {
-	sketchName := t.Name() + ".ino"                 // "TestSaveSketch.ino"
-	outName := sketchName + ".cpp"                  // "TestSaveSketch.ino.cpp"
-	sketchFile := paths.New("testdata", sketchName) // "testdata/TestSaveSketch.ino.cpp"
-	tmp, err := paths.MkTempDir("", "")
-	require.NoError(t, err)
-	defer tmp.RemoveAll()
-	source, err := sketchFile.ReadFile()
-	if err != nil {
-		t.Fatalf("unable to read golden file %s: %v", sketchFile, err)
-	}
-
-	SketchSaveItemCpp(paths.New(sketchName), source, tmp)
-
-	out, err := tmp.Join(outName).ReadFile()
-	if err != nil {
-		t.Fatalf("unable to read output file %s: %v", outName, err)
-	}
-
-	require.Equal(t, source, out)
-}
-
 func TestMergeSketchSources(t *testing.T) {
 	// borrow the sketch from TestLoadSketchFolder to avoid boilerplate
 	sk, err := sketch.New(paths.New("testdata", "TestLoadSketchFolder"))

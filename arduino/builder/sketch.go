@@ -41,28 +41,22 @@ func (b *Builder) PrepareSketchBuildPath(sourceOverrides map[string]string, buil
 	if err := buildPath.MkdirAll(); err != nil {
 		return 0, errors.Wrap(err, tr("unable to create a folder to save the sketch"))
 	}
-	if offset, mergedSource, err := b.sketchMergeSources(sourceOverrides); err != nil {
-		return 0, err
-	} else if err := SketchSaveItemCpp(b.sketch.MainFile, []byte(mergedSource), buildPath); err != nil {
-		return 0, err
-	} else if err := sketchCopyAdditionalFiles(b.sketch, buildPath, sourceOverrides); err != nil {
-		return 0, err
-	} else {
-		return offset, nil
-	}
-}
 
-// SketchSaveItemCpp saves a preprocessed .cpp sketch file on disk
-func SketchSaveItemCpp(path *paths.Path, contents []byte, buildPath *paths.Path) error {
-	sketchName := path.Base()
-
-	destFile := buildPath.Join(fmt.Sprintf("%s.cpp", sketchName))
-
-	if err := destFile.WriteFile(contents); err != nil {
-		return errors.Wrap(err, tr("unable to save the sketch on disk"))
+	offset, mergedSource, err := b.sketchMergeSources(sourceOverrides)
+	if err != nil {
+		return 0, err
 	}
 
-	return nil
+	destFile := buildPath.Join(b.sketch.MainFile.Base() + ".cpp")
+	if err := destFile.WriteFile([]byte(mergedSource)); err != nil {
+		return 0, err
+	}
+
+	if err := sketchCopyAdditionalFiles(b.sketch, buildPath, sourceOverrides); err != nil {
+		return 0, err
+	}
+
+	return offset, nil
 }
 
 // sketchMergeSources merges all the .ino source files included in a sketch to produce

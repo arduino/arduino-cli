@@ -21,7 +21,6 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
@@ -84,6 +83,10 @@ func PreprocessSketchWithArduinoPreprocessor(sk *sketch.Sketch, buildPath *paths
 	}
 	result := utils.NormalizeUTF8(commandStdOut)
 
-	err = builder.SketchSaveItemCpp(sk.MainFile, result, buildPath.Join("sketch"))
+	destFile := buildPath.Join(sk.MainFile.Base() + ".cpp")
+	if err := destFile.WriteFile(result); err != nil {
+		return normalOut.Bytes(), verboseOut.Bytes(), err
+	}
+
 	return normalOut.Bytes(), verboseOut.Bytes(), err
 }
