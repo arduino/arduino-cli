@@ -52,7 +52,7 @@ func (b *Builder) PrepareSketchBuildPath(sourceOverrides map[string]string, buil
 		return 0, err
 	}
 
-	if err := sketchCopyAdditionalFiles(b.sketch, buildPath, sourceOverrides); err != nil {
+	if err := b.sketchCopyAdditionalFiles(buildPath, sourceOverrides); err != nil {
 		return 0, err
 	}
 
@@ -108,9 +108,9 @@ func (b *Builder) sketchMergeSources(overrides map[string]string) (int, string, 
 
 // sketchCopyAdditionalFiles copies the additional files for a sketch to the
 // specified destination directory.
-func sketchCopyAdditionalFiles(sketch *sketch.Sketch, buildPath *paths.Path, overrides map[string]string) error {
-	for _, file := range sketch.AdditionalFiles {
-		relpath, err := sketch.FullPath.RelTo(file)
+func (b *Builder) sketchCopyAdditionalFiles(buildPath *paths.Path, overrides map[string]string) error {
+	for _, file := range b.sketch.AdditionalFiles {
+		relpath, err := b.sketch.FullPath.RelTo(file)
 		if err != nil {
 			return errors.Wrap(err, tr("unable to compute relative path to the sketch for the item"))
 		}

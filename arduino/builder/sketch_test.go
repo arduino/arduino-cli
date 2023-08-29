@@ -76,10 +76,11 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	sk1, err := sketch.New(paths.New("testdata", t.Name()))
 	require.Nil(t, err)
 	require.Equal(t, sk1.AdditionalFiles.Len(), 1)
+	b1 := NewBuilder(sk1)
 
 	// copy the sketch over, create a fake main file we don't care about it
 	// but we need it for `SketchLoad` to succeed later
-	err = sketchCopyAdditionalFiles(sk1, tmp, nil)
+	err = b1.sketchCopyAdditionalFiles(tmp, nil)
 	require.Nil(t, err)
 	fakeIno := tmp.Join(fmt.Sprintf("%s.ino", tmp.Base()))
 	require.Nil(t, fakeIno.WriteFile([]byte{}))
@@ -94,7 +95,7 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	require.Nil(t, err)
 
 	// copy again
-	err = sketchCopyAdditionalFiles(sk1, tmp, nil)
+	err = b1.sketchCopyAdditionalFiles(tmp, nil)
 	require.Nil(t, err)
 
 	// verify file hasn't changed
