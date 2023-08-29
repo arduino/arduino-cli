@@ -41,7 +41,7 @@ func (b *Builder) PrepareSketchBuildPath(sourceOverrides map[string]string, buil
 	if err := buildPath.MkdirAll(); err != nil {
 		return 0, errors.Wrap(err, tr("unable to create a folder to save the sketch"))
 	}
-	if offset, mergedSource, err := sketchMergeSources(b.sketch, sourceOverrides); err != nil {
+	if offset, mergedSource, err := b.sketchMergeSources(sourceOverrides); err != nil {
 		return 0, err
 	} else if err := SketchSaveItemCpp(b.sketch.MainFile, []byte(mergedSource), buildPath); err != nil {
 		return 0, err
@@ -67,12 +67,12 @@ func SketchSaveItemCpp(path *paths.Path, contents []byte, buildPath *paths.Path)
 
 // sketchMergeSources merges all the .ino source files included in a sketch to produce
 // a single .cpp file.
-func sketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, string, error) {
+func (b *Builder) sketchMergeSources(overrides map[string]string) (int, string, error) {
 	lineOffset := 0
 	mergedSource := ""
 
 	getSource := func(f *paths.Path) (string, error) {
-		path, err := sk.FullPath.RelTo(f)
+		path, err := b.sketch.FullPath.RelTo(f)
 		if err != nil {
 			return "", errors.Wrap(err, tr("unable to compute relative path to the sketch for the item"))
 		}
@@ -87,7 +87,7 @@ func sketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, st
 	}
 
 	// add Arduino.h inclusion directive if missing
-	mainSrc, err := getSource(sk.MainFile)
+	mainSrc, err := getSource(b.sketch.MainFile)
 	if err != nil {
 		return 0, "", err
 	}
@@ -96,11 +96,11 @@ func sketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, st
 		lineOffset++
 	}
 
-	mergedSource += "#line 1 " + cpp.QuoteString(sk.MainFile.String()) + "\n"
+	mergedSource += "#line 1 " + cpp.QuoteString(b.sketch.MainFile.String()) + "\n"
 	mergedSource += mainSrc + "\n"
 	lineOffset++
 
-	for _, file := range sk.OtherSketchFiles {
+	for _, file := range b.sketch.OtherSketchFiles {
 		src, err := getSource(file)
 		if err != nil {
 			return 0, "", err
