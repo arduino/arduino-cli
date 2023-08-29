@@ -38,6 +38,9 @@ var (
 // The .ino files are merged together to create a .cpp file (by the way, the
 // .cpp file still needs to be Arduino-preprocessed to compile).
 func (b *Builder) PrepareSketchBuildPath(sourceOverrides map[string]string, buildPath *paths.Path) (int, error) {
+	if err := buildPath.MkdirAll(); err != nil {
+		return 0, errors.Wrap(err, tr("unable to create a folder to save the sketch"))
+	}
 	if offset, mergedSource, err := sketchMergeSources(b.sketch, sourceOverrides); err != nil {
 		return 0, err
 	} else if err := SketchSaveItemCpp(b.sketch.MainFile, []byte(mergedSource), buildPath); err != nil {
@@ -50,13 +53,10 @@ func (b *Builder) PrepareSketchBuildPath(sourceOverrides map[string]string, buil
 }
 
 // SketchSaveItemCpp saves a preprocessed .cpp sketch file on disk
-func SketchSaveItemCpp(path *paths.Path, contents []byte, destPath *paths.Path) error {
+func SketchSaveItemCpp(path *paths.Path, contents []byte, buildPath *paths.Path) error {
 	sketchName := path.Base()
-	if err := destPath.MkdirAll(); err != nil {
-		return errors.Wrap(err, tr("unable to create a folder to save the sketch"))
-	}
 
-	destFile := destPath.Join(fmt.Sprintf("%s.cpp", sketchName))
+	destFile := buildPath.Join(fmt.Sprintf("%s.cpp", sketchName))
 
 	if err := destFile.WriteFile(contents); err != nil {
 		return errors.Wrap(err, tr("unable to save the sketch on disk"))
@@ -114,18 +114,14 @@ func sketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, st
 
 // sketchCopyAdditionalFiles copies the additional files for a sketch to the
 // specified destination directory.
-func sketchCopyAdditionalFiles(sketch *sketch.Sketch, destPath *paths.Path, overrides map[string]string) error {
-	if err := destPath.MkdirAll(); err != nil {
-		return errors.Wrap(err, tr("unable to create a folder to save the sketch files"))
-	}
-
+func sketchCopyAdditionalFiles(sketch *sketch.Sketch, buildPath *paths.Path, overrides map[string]string) error {
 	for _, file := range sketch.AdditionalFiles {
 		relpath, err := sketch.FullPath.RelTo(file)
 		if err != nil {
 			return errors.Wrap(err, tr("unable to compute relative path to the sketch for the item"))
 		}
 
-		targetPath := destPath.JoinPath(relpath)
+		targetPath := buildPath.JoinPath(relpath)
 		// create the directory containing the target
 		if err = targetPath.Parent().MkdirAll(); err != nil {
 			return errors.Wrap(err, tr("unable to create the folder containing the item"))
