@@ -138,19 +138,23 @@ func (s *Builder) Run(ctx *types.Context) error {
 }
 
 func PreprocessSketch(ctx *types.Context) error {
+	var normalOutput, verboseOutput []byte
+	var err error
 	if ctx.UseArduinoPreprocessor {
-		return PreprocessSketchWithArduinoPreprocessor(ctx)
+		normalOutput, verboseOutput, err = PreprocessSketchWithArduinoPreprocessor(
+			ctx.Sketch, ctx.BuildPath, ctx.IncludeFolders, ctx.SketchBuildPath,
+			ctx.BuildProperties)
 	} else {
-		normalOutput, verboseOutput, err := preprocessor.PreprocessSketchWithCtags(
+		normalOutput, verboseOutput, err = preprocessor.PreprocessSketchWithCtags(
 			ctx.Sketch, ctx.BuildPath, ctx.IncludeFolders, ctx.LineOffset,
 			ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)
-		if ctx.Verbose {
-			ctx.WriteStdout(verboseOutput)
-		} else {
-			ctx.WriteStdout(normalOutput)
-		}
-		return err
 	}
+	if ctx.Verbose {
+		ctx.WriteStdout(verboseOutput)
+	} else {
+		ctx.WriteStdout(normalOutput)
+	}
+	return err
 }
 
 type Preprocess struct{}

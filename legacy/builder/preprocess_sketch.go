@@ -16,74 +16,72 @@
 package builder
 
 import (
-	"fmt"
-	"os"
-	"os/exec"
+	"bytes"
+	"context"
 	"path/filepath"
 	"runtime"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
+	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
 
-func PreprocessSketchWithArduinoPreprocessor(ctx *types.Context) error {
-	if err := ctx.BuildPath.Join("preproc").MkdirAll(); err != nil {
-		return errors.WithStack(err)
+func PreprocessSketchWithArduinoPreprocessor(sk *sketch.Sketch, buildPath *paths.Path, includeFolders paths.PathList, sketchBuildPath *paths.Path, buildProperties *properties.Map) ([]byte, []byte, error) {
+	verboseOut := &bytes.Buffer{}
+	normalOut := &bytes.Buffer{}
+	if err := buildPath.Join("preproc").MkdirAll(); err != nil {
+		return nil, nil, err
 	}
 
-	sourceFile := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp")
-	targetFile := ctx.BuildPath.Join("preproc", "sketch_merged.cpp")
-	gccStdout, gccStderr, err := preprocessor.GCC(sourceFile, targetFile, ctx.IncludeFolders, ctx.BuildProperties)
-	if ctx.Verbose {
-		ctx.WriteStdout(gccStdout)
-		ctx.WriteStderr(gccStderr)
-	}
+	sourceFile := sketchBuildPath.Join(sk.MainFile.Base() + ".cpp")
+	targetFile := buildPath.Join("preproc", "sketch_merged.cpp")
+	gccStdout, gccStderr, err := preprocessor.GCC(sourceFile, targetFile, includeFolders, buildProperties)
+	verboseOut.Write(gccStdout)
+	verboseOut.Write(gccStderr)
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 
-	buildProperties := properties.NewMap()
-	buildProperties.Set("tools.arduino-preprocessor.path", "{runtime.tools.arduino-preprocessor.path}")
-	buildProperties.Set("tools.arduino-preprocessor.cmd.path", "{path}/arduino-preprocessor")
-	buildProperties.Set("tools.arduino-preprocessor.pattern", `"{cmd.path}" "{source_file}" -- -std=gnu++11`)
-	buildProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
-	buildProperties.Merge(ctx.BuildProperties)
-	buildProperties.Merge(buildProperties.SubTree("tools").SubTree("arduino-preprocessor"))
-	buildProperties.SetPath("source_file", targetFile)
-
-	pattern := buildProperties.Get("pattern")
+	arduiniPreprocessorProperties := properties.NewMap()
+	arduiniPreprocessorProperties.Set("tools.arduino-preprocessor.path", "{runtime.tools.arduino-preprocessor.path}")
+	arduiniPreprocessorProperties.Set("tools.arduino-preprocessor.cmd.path", "{path}/arduino-preprocessor")
+	arduiniPreprocessorProperties.Set("tools.arduino-preprocessor.pattern", `"{cmd.path}" "{source_file}" -- -std=gnu++11`)
+	arduiniPreprocessorProperties.Set("preproc.macros.flags", "-w -x c++ -E -CC")
+	arduiniPreprocessorProperties.Merge(buildProperties)
+	arduiniPreprocessorProperties.Merge(arduiniPreprocessorProperties.SubTree("tools").SubTree("arduino-preprocessor"))
+	arduiniPreprocessorProperties.SetPath("source_file", targetFile)
+	pattern := arduiniPreprocessorProperties.Get("pattern")
 	if pattern == "" {
-		return errors.New(tr("arduino-preprocessor pattern is missing"))
+		return nil, nil, errors.New(tr("arduino-preprocessor pattern is missing"))
 	}
 
-	commandLine := buildProperties.ExpandPropsInString(pattern)
+	commandLine := arduiniPreprocessorProperties.ExpandPropsInString(pattern)
 	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
 	if err != nil {
-		return errors.WithStack(err)
+		return nil, nil, errors.WithStack(err)
 	}
-	command := exec.Command(parts[0], parts[1:]...)
-	command.Env = append(os.Environ(), ctx.PackageManager.GetEnvVarsForSpawnedProcess()...)
 
+	command, err := executils.NewProcess(nil, parts...)
+	if err != nil {
+		return nil, nil, err
+	}
 	if runtime.GOOS == "windows" {
 		// chdir in the uppermost directory to avoid UTF-8 bug in clang (https://github.com/arduino/arduino-preprocessor/issues/2)
-		command.Dir = filepath.VolumeName(command.Args[0]) + "/"
-		//command.Args[0], _ = filepath.Rel(command.Dir, command.Args[0])
+		command.SetDir(filepath.VolumeName(parts[0]) + "/")
 	}
 
-	verbose := ctx.Verbose
-	if verbose {
-		fmt.Println(commandLine)
-	}
-
-	buf, err := command.Output()
+	verboseOut.WriteString(commandLine)
+	commandStdOut, commandStdErr, err := command.RunAndCaptureOutput(context.Background())
+	verboseOut.Write(commandStdErr)
 	if err != nil {
-		return errors.New(errors.WithStack(err).Error() + string(err.(*exec.ExitError).Stderr))
+		return normalOut.Bytes(), verboseOut.Bytes(), err
 	}
+	result := utils.NormalizeUTF8(commandStdOut)
 
-	result := utils.NormalizeUTF8(buf)
-	return bldr.SketchSaveItemCpp(ctx.Sketch.MainFile, result, ctx.SketchBuildPath)
+	return normalOut.Bytes(), verboseOut.Bytes(), bldr.SketchSaveItemCpp(sk.MainFile, result, sketchBuildPath)
 }
