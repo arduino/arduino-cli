@@ -1,6 +1,6 @@
 // This file is part of arduino-cli.
 //
-// Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+// Copyright 2023 ARDUINO SA (http://www.arduino.cc/)
 //
 // This software is released under the GNU General Public License version 3,
 // which covers the main part of arduino-cli.
@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package builder
+package preprocessor
 
 import (
 	"bytes"
@@ -21,16 +21,17 @@ import (
 	"path/filepath"
 	"runtime"
 
-	bldr "github.com/arduino/arduino-cli/arduino/builder"
-	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
-	properties "github.com/arduino/go-properties-orderedmap"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
 
+// PreprocessSketchWithArduinoPreprocessor performs preprocessing of the arduino sketch
+// using arduino-preprocessor (https://github.com/arduino/arduino-preprocessor).
 func PreprocessSketchWithArduinoPreprocessor(sk *sketch.Sketch, buildPath *paths.Path, includeFolders paths.PathList, lineOffset int, buildProperties *properties.Map, onlyUpdateCompilationDatabase bool) ([]byte, []byte, error) {
 	verboseOut := &bytes.Buffer{}
 	normalOut := &bytes.Buffer{}
@@ -40,7 +41,7 @@ func PreprocessSketchWithArduinoPreprocessor(sk *sketch.Sketch, buildPath *paths
 
 	sourceFile := buildPath.Join("sketch", sk.MainFile.Base()+".cpp")
 	targetFile := buildPath.Join("preproc", "sketch_merged.cpp")
-	gccStdout, gccStderr, err := preprocessor.GCC(sourceFile, targetFile, includeFolders, buildProperties)
+	gccStdout, gccStderr, err := GCC(sourceFile, targetFile, includeFolders, buildProperties)
 	verboseOut.Write(gccStdout)
 	verboseOut.Write(gccStderr)
 	if err != nil {
@@ -83,6 +84,6 @@ func PreprocessSketchWithArduinoPreprocessor(sk *sketch.Sketch, buildPath *paths
 	}
 	result := utils.NormalizeUTF8(commandStdOut)
 
-	err = bldr.SketchSaveItemCpp(sk.MainFile, result, buildPath.Join("sketch"))
+	err = builder.SketchSaveItemCpp(sk.MainFile, result, buildPath.Join("sketch"))
 	return normalOut.Bytes(), verboseOut.Bytes(), err
 }

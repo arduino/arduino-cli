@@ -138,17 +138,13 @@ func (s *Builder) Run(ctx *types.Context) error {
 }
 
 func PreprocessSketch(ctx *types.Context) error {
-	var normalOutput, verboseOutput []byte
-	var err error
+	preprocessorImpl := preprocessor.PreprocessSketchWithCtags
 	if ctx.UseArduinoPreprocessor {
-		normalOutput, verboseOutput, err = PreprocessSketchWithArduinoPreprocessor(
-			ctx.Sketch, ctx.BuildPath, ctx.IncludeFolders, ctx.LineOffset,
-			ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)
-	} else {
-		normalOutput, verboseOutput, err = preprocessor.PreprocessSketchWithCtags(
-			ctx.Sketch, ctx.BuildPath, ctx.IncludeFolders, ctx.LineOffset,
-			ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)
+		preprocessorImpl = preprocessor.PreprocessSketchWithArduinoPreprocessor
 	}
+	normalOutput, verboseOutput, err := preprocessorImpl(
+		ctx.Sketch, ctx.BuildPath, ctx.IncludeFolders, ctx.LineOffset,
+		ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)
 	if ctx.Verbose {
 		ctx.WriteStdout(verboseOutput)
 	} else {
