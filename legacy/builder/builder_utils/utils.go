@@ -38,35 +38,30 @@ import (
 
 var tr = i18n.Tr
 
-func findAllFilesInFolder(sourcePath string, recurse bool) ([]string, error) {
-	files, err := utils.ReadDirFiltered(sourcePath, utils.FilterFiles())
+// DirContentIsOlderThan returns true if the content of the given directory is
+// older than target file. If extensions are given, only the files with these
+// extensions are tested.
+func DirContentIsOlderThan(dir *paths.Path, target *paths.Path, extensions ...string) (bool, error) {
+	targetStat, err := target.Stat()
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return false, err
 	}
-	var sources []string
+	targetModTime := targetStat.ModTime()
+
+	files, err := utils.FindFilesInFolder(dir, true, extensions...)
+	if err != nil {
+		return false, err
+	}
 	for _, file := range files {
-		sources = append(sources, filepath.Join(sourcePath, file.Name()))
-	}
-
-	if recurse {
-		folders, err := utils.ReadDirFiltered(sourcePath, utils.FilterDirs)
+		file, err := file.Stat()
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return false, err
 		}
-
-		for _, folder := range folders {
-			if !utils.IsSCCSOrHiddenFile(folder) {
-				// Skip SCCS directories as they do not influence the build and can be very large
-				otherSources, err := findAllFilesInFolder(filepath.Join(sourcePath, folder.Name()), recurse)
-				if err != nil {
-					return nil, errors.WithStack(err)
-				}
-				sources = append(sources, otherSources...)
-			}
+		if file.ModTime().After(targetModTime) {
+			return false, nil
 		}
 	}
-
-	return sources, nil
+	return true, nil
 }
 
 func CompileFiles(ctx *types.Context, sourcePath *paths.Path, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
@@ -329,54 +324,6 @@ func unescapeDep(s string) string {
 
 func removeEndingBackSlash(s string) string {
 	return strings.TrimSuffix(s, "\\")
-}
-
-func CoreOrReferencedCoreHasChanged(corePath, targetCorePath, targetFile *paths.Path) bool {
-
-	targetFileStat, err := targetFile.Stat()
-	if err == nil {
-		files, err := findAllFilesInFolder(corePath.String(), true)
-		if err != nil {
-			return true
-		}
-		for _, file := range files {
-			fileStat, err := os.Stat(file)
-			if err != nil || fileStat.ModTime().After(targetFileStat.ModTime()) {
-				return true
-			}
-		}
-		if targetCorePath != nil && !strings.EqualFold(corePath.String(), targetCorePath.String()) {
-			return CoreOrReferencedCoreHasChanged(targetCorePath, nil, targetFile)
-		}
-		return false
-	}
-	return true
-}
-
-func TXTBuildRulesHaveChanged(corePath, targetCorePath, targetFile *paths.Path) bool {
-
-	targetFileStat, err := targetFile.Stat()
-	if err == nil {
-		files, err := findAllFilesInFolder(corePath.String(), true)
-		if err != nil {
-			return true
-		}
-		for _, file := range files {
-			// report changes only for .txt files
-			if filepath.Ext(file) != ".txt" {
-				continue
-			}
-			fileStat, err := os.Stat(file)
-			if err != nil || fileStat.ModTime().After(targetFileStat.ModTime()) {
-				return true
-			}
-		}
-		if targetCorePath != nil && !corePath.EqualsTo(targetCorePath) {
-			return TXTBuildRulesHaveChanged(targetCorePath, nil, targetFile)
-		}
-		return false
-	}
-	return true
 }
 
 func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile *paths.Path, objectFilesToArchive paths.PathList, buildProperties *properties.Map) (*paths.Path, error) {

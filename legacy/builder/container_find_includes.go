@@ -427,7 +427,7 @@ func queueSourceFilesFromFolder(ctx *types.Context, sourceFileQueue *types.Uniqu
 	for k := range globals.SourceFilesValidExtensions {
 		sourceFileExtensions = append(sourceFileExtensions, k)
 	}
-	filePaths, err := utils.FindFilesInFolder(folder, recurse, sourceFileExtensions)
+	filePaths, err := utils.FindFilesInFolder(folder, recurse, sourceFileExtensions...)
 	if err != nil {
 		return errors.WithStack(err)
 	}

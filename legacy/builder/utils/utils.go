@@ -17,73 +17,19 @@ package utils
 
 import (
 	"bytes"
-	"crypto/md5"
-	"encoding/hex"
-	"fmt"
-	"io"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"unicode"
 
-	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	"github.com/arduino/arduino-cli/legacy/builder/gohasissues"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
-	"golang.org/x/exp/slices"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
-
-type filterFiles func([]os.FileInfo) []os.FileInfo
-
-var tr = i18n.Tr
-
-func ReadDirFiltered(folder string, fn filterFiles) ([]os.FileInfo, error) {
-	files, err := gohasissues.ReadDir(folder)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-	return fn(files), nil
-}
-
-func FilterDirs(files []os.FileInfo) []os.FileInfo {
-	var filtered []os.FileInfo
-	for _, info := range files {
-		if info.IsDir() {
-			filtered = append(filtered, info)
-		}
-	}
-	return filtered
-}
-
-func FilterFilesWithExtensions(extensions ...string) filterFiles {
-	return func(files []os.FileInfo) []os.FileInfo {
-		var filtered []os.FileInfo
-		for _, file := range files {
-			if !file.IsDir() && slices.Contains(extensions, filepath.Ext(file.Name())) {
-				filtered = append(filtered, file)
-			}
-		}
-		return filtered
-	}
-}
-
-func FilterFiles() filterFiles {
-	return func(files []os.FileInfo) []os.FileInfo {
-		var filtered []os.FileInfo
-		for _, file := range files {
-			if !file.IsDir() {
-				filtered = append(filtered, file)
-			}
-		}
-		return filtered
-	}
-}
 
 var SOURCE_CONTROL_FOLDERS = map[string]bool{"CVS": true, "RCS": true, ".git": true, ".github": true, ".svn": true, ".hg": true, ".bzr": true, ".vscode": true, ".settings": true, ".pioenvs": true, ".piolibdeps": true}
 
@@ -104,20 +50,6 @@ func FilterReadableFiles(file *paths.Path) bool {
 	}
 	f.Close()
 	return true
-}
-
-func IsSCCSOrHiddenFile(file os.FileInfo) bool {
-	return IsSCCSFile(file) || IsHiddenFile(file)
-}
-
-func IsHiddenFile(file os.FileInfo) bool {
-	name := filepath.Base(file.Name())
-	return name[0] == '.'
-}
-
-func IsSCCSFile(file os.FileInfo) bool {
-	name := filepath.Base(file.Name())
-	return SOURCE_CONTROL_FOLDERS[name]
 }
 
 func WrapWithHyphenI(value string) string {
@@ -194,29 +126,19 @@ func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) 
 	return outbytes, errbytes, errors.WithStack(err)
 }
 
-func AbsolutizePaths(files []string) ([]string, error) {
-	for idx, file := range files {
-		if file == "" {
-			continue
-		}
-		absFile, err := filepath.Abs(file)
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-		files[idx] = absFile
-	}
-
-	return files, nil
-}
-
-func FindFilesInFolder(dir *paths.Path, recurse bool, extensions []string) (paths.PathList, error) {
+func FindFilesInFolder(dir *paths.Path, recurse bool, extensions ...string) (paths.PathList, error) {
 	fileFilter := paths.AndFilter(
-		paths.FilterSuffixes(extensions...),
 		FilterOutHiddenFiles,
 		FilterOutSCCS,
 		paths.FilterOutDirectories(),
 		FilterReadableFiles,
 	)
+	if len(extensions) > 0 {
+		fileFilter = paths.AndFilter(
+			paths.FilterSuffixes(extensions...),
+			fileFilter,
+		)
+	}
 	if recurse {
 		dirFilter := paths.AndFilter(
 			FilterOutHiddenFiles,
@@ -225,20 +147,6 @@ func FindFilesInFolder(dir *paths.Path, recurse bool, extensions []string) (path
 		return dir.ReadDirRecursiveFiltered(dirFilter, fileFilter)
 	}
 	return dir.ReadDir(fileFilter)
-}
-
-func AppendIfNotPresent(target []string, elements ...string) []string {
-	for _, element := range elements {
-		if !slices.Contains(target, element) {
-			target = append(target, element)
-		}
-	}
-	return target
-}
-
-func MD5Sum(data []byte) string {
-	md5sumBytes := md5.Sum(data)
-	return hex.EncodeToString(md5sumBytes[:])
 }
 
 type loggerAction struct {
@@ -268,125 +176,4 @@ func NormalizeUTF8(buf []byte) []byte {
 	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 	result, _, _ := transform.Bytes(t, buf)
 	return result
-}
-
-// CopyFile copies the contents of the file named src to the file named
-// by dst. The file will be created if it does not already exist. If the
-// destination file exists, all it's contents will be replaced by the contents
-// of the source file. The file mode will be copied from the source and
-// the copied data is synced/flushed to stable storage.
-func CopyFile(src, dst string) (err error) {
-	in, err := os.Open(src)
-	if err != nil {
-		return
-	}
-	defer in.Close()
-
-	out, err := os.Create(dst)
-	if err != nil {
-		return
-	}
-	defer func() {
-		if e := out.Close(); e != nil {
-			err = e
-		}
-	}()
-
-	_, err = io.Copy(out, in)
-	if err != nil {
-		return
-	}
-
-	err = out.Sync()
-	if err != nil {
-		return
-	}
-
-	si, err := os.Stat(src)
-	if err != nil {
-		return
-	}
-	err = os.Chmod(dst, si.Mode())
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-// CopyDir recursively copies a directory tree, attempting to preserve permissions.
-// Source directory must exist, destination directory must *not* exist.
-// Symlinks are ignored and skipped.
-func CopyDir(src string, dst string, extensions []string) (err error) {
-	isAcceptedExtension := func(ext string) bool {
-		ext = strings.ToLower(ext)
-		for _, valid := range extensions {
-			if ext == valid {
-				return true
-			}
-		}
-		return false
-	}
-
-	src = filepath.Clean(src)
-	dst = filepath.Clean(dst)
-
-	si, err := os.Stat(src)
-	if err != nil {
-		return err
-	}
-	if !si.IsDir() {
-		return fmt.Errorf(tr("source is not a directory"))
-	}
-
-	_, err = os.Stat(dst)
-	if err != nil && !os.IsNotExist(err) {
-		return
-	}
-	if err == nil {
-		return fmt.Errorf(tr("destination already exists"))
-	}
-
-	err = os.MkdirAll(dst, si.Mode())
-	if err != nil {
-		return
-	}
-
-	entries, err := os.ReadDir(src)
-	if err != nil {
-		return
-	}
-
-	for _, dirEntry := range entries {
-		entry, scopeErr := dirEntry.Info()
-		if scopeErr != nil {
-			return
-		}
-
-		srcPath := filepath.Join(src, entry.Name())
-		dstPath := filepath.Join(dst, entry.Name())
-
-		if entry.IsDir() {
-			err = CopyDir(srcPath, dstPath, extensions)
-			if err != nil {
-				return
-			}
-		} else {
-			// Skip symlinks.
-			if entry.Mode()&os.ModeSymlink != 0 {
-				continue
-			}
-
-			if !isAcceptedExtension(filepath.Ext(srcPath)) {
-				continue
-			}
-
-			err = CopyFile(srcPath, dstPath)
-			if err != nil {
-				return
-			}
-		}
-	}
-
-	return
 }

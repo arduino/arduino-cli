@@ -17,6 +17,8 @@ package builder
 
 import (
 	"fmt"
+	"io"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -39,6 +41,130 @@ type ExportProjectCMake struct {
 var lineMatcher = regexp.MustCompile(`^#line\s\d+\s"`)
 
 func (s *ExportProjectCMake) Run(ctx *types.Context) error {
+	// copies the contents of the file named src to the file named
+	// by dst. The file will be created if it does not already exist. If the
+	// destination file exists, all it's contents will be replaced by the contents
+	// of the source file. The file mode will be copied from the source and
+	// the copied data is synced/flushed to stable storage.
+	// TODO: Replace with call to go-paths-helper...
+	copyFile := func(src, dst string) (err error) {
+		in, err := os.Open(src)
+		if err != nil {
+			return
+		}
+		defer in.Close()
+
+		out, err := os.Create(dst)
+		if err != nil {
+			return
+		}
+		defer func() {
+			if e := out.Close(); e != nil {
+				err = e
+			}
+		}()
+
+		_, err = io.Copy(out, in)
+		if err != nil {
+			return
+		}
+
+		err = out.Sync()
+		if err != nil {
+			return
+		}
+
+		si, err := os.Stat(src)
+		if err != nil {
+			return
+		}
+		err = os.Chmod(dst, si.Mode())
+		if err != nil {
+			return
+		}
+
+		return
+	}
+
+	// recursively copies a directory tree, attempting to preserve permissions.
+	// Source directory must exist, destination directory must *not* exist.
+	// Symlinks are ignored and skipped.
+	// TODO: Replace with call to go-paths-helper...
+	var copyDir func(src string, dst string, extensions []string) (err error)
+	copyDir = func(src string, dst string, extensions []string) (err error) {
+		isAcceptedExtension := func(ext string) bool {
+			ext = strings.ToLower(ext)
+			for _, valid := range extensions {
+				if ext == valid {
+					return true
+				}
+			}
+			return false
+		}
+
+		src = filepath.Clean(src)
+		dst = filepath.Clean(dst)
+
+		si, err := os.Stat(src)
+		if err != nil {
+			return err
+		}
+		if !si.IsDir() {
+			return fmt.Errorf(tr("source is not a directory"))
+		}
+
+		_, err = os.Stat(dst)
+		if err != nil && !os.IsNotExist(err) {
+			return
+		}
+		if err == nil {
+			return fmt.Errorf(tr("destination already exists"))
+		}
+
+		err = os.MkdirAll(dst, si.Mode())
+		if err != nil {
+			return
+		}
+
+		entries, err := os.ReadDir(src)
+		if err != nil {
+			return
+		}
+
+		for _, dirEntry := range entries {
+			entry, scopeErr := dirEntry.Info()
+			if scopeErr != nil {
+				return
+			}
+
+			srcPath := filepath.Join(src, entry.Name())
+			dstPath := filepath.Join(dst, entry.Name())
+
+			if entry.IsDir() {
+				err = copyDir(srcPath, dstPath, extensions)
+				if err != nil {
+					return
+				}
+			} else {
+				// Skip symlinks.
+				if entry.Mode()&os.ModeSymlink != 0 {
+					continue
+				}
+
+				if !isAcceptedExtension(filepath.Ext(srcPath)) {
+					continue
+				}
+
+				err = copyFile(srcPath, dstPath)
+				if err != nil {
+					return
+				}
+			}
+		}
+
+		return
+	}
+
 	var validExportExtensions = []string{".a", ".properties"}
 	for ext := range globals.SourceFilesValidExtensions {
 		validExportExtensions = append(validExportExtensions, ext)
@@ -76,7 +202,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		// Copy used libraries in the correct folder
 		libDir := libBaseFolder.Join(library.DirName)
 		mcu := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_BUILD_MCU)
-		utils.CopyDir(library.InstallDir.String(), libDir.String(), validExportExtensions)
+		copyDir(library.InstallDir.String(), libDir.String(), validExportExtensions)
 
 		// Read cmake options if available
 		isStaticLib := true
@@ -96,7 +222,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		}
 
 		// Remove stray folders contining incompatible or not needed libraries archives
-		files, _ := utils.FindFilesInFolder(libDir.Join("src"), true, validStaticLibExtensions)
+		files, _ := utils.FindFilesInFolder(libDir.Join("src"), true, validStaticLibExtensions...)
 		for _, file := range files {
 			staticLibDir := file.Parent()
 			if !isStaticLib || !strings.Contains(staticLibDir.String(), mcu) {
@@ -106,11 +232,11 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	}
 
 	// Copy core + variant in use + preprocessed sketch in the correct folders
-	err := utils.CopyDir(ctx.BuildProperties.Get("build.core.path"), coreFolder.String(), validExportExtensions)
+	err := copyDir(ctx.BuildProperties.Get("build.core.path"), coreFolder.String(), validExportExtensions)
 	if err != nil {
 		fmt.Println(err)
 	}
-	err = utils.CopyDir(ctx.BuildProperties.Get("build.variant.path"), coreFolder.Join("variant").String(), validExportExtensions)
+	err = copyDir(ctx.BuildProperties.Get("build.variant.path"), coreFolder.Join("variant").String(), validExportExtensions)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -119,13 +245,13 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 		return err
 	}
 
-	err = utils.CopyDir(ctx.SketchBuildPath.String(), cmakeFolder.Join("sketch").String(), validExportExtensions)
+	err = copyDir(ctx.SketchBuildPath.String(), cmakeFolder.Join("sketch").String(), validExportExtensions)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	// remove "#line 1 ..." from exported c_make folder sketch
-	sketchFiles, _ := utils.FindFilesInFolder(cmakeFolder.Join("sketch"), false, validExportExtensions)
+	sketchFiles, _ := utils.FindFilesInFolder(cmakeFolder.Join("sketch"), false, validExportExtensions...)
 
 	for _, file := range sketchFiles {
 		input, err := file.ReadFile()
@@ -159,11 +285,11 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	extractCompileFlags(ctx, "recipe.cpp.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
 
 	// Extract folders with .h in them for adding in include list
-	headerFiles, _ := utils.FindFilesInFolder(cmakeFolder, true, validHeaderExtensions)
+	headerFiles, _ := utils.FindFilesInFolder(cmakeFolder, true, validHeaderExtensions...)
 	foldersContainingHeaders := findUniqueFoldersRelative(headerFiles.AsStrings(), cmakeFolder.String())
 
 	// Extract folders with .a in them for adding in static libs paths list
-	staticLibs, _ := utils.FindFilesInFolder(cmakeFolder, true, validStaticLibExtensions)
+	staticLibs, _ := utils.FindFilesInFolder(cmakeFolder, true, validStaticLibExtensions...)
 
 	// Generate the CMakeLists global file
 
@@ -232,25 +358,34 @@ func canExportCmakeProject(ctx *types.Context) bool {
 }
 
 func extractCompileFlags(ctx *types.Context, recipe string, defines, dynamicLibs, linkerflags, linkDirectories *[]string) {
+	appendIfNotPresent := func(target []string, elements ...string) []string {
+		for _, element := range elements {
+			if !slices.Contains(target, element) {
+				target = append(target, element)
+			}
+		}
+		return target
+	}
+
 	command, _ := builder_utils.PrepareCommandForRecipe(ctx.BuildProperties, recipe, true, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
 
 	for _, arg := range command.Args {
 		if strings.HasPrefix(arg, "-D") {
-			*defines = utils.AppendIfNotPresent(*defines, arg)
+			*defines = appendIfNotPresent(*defines, arg)
 			continue
 		}
 		if strings.HasPrefix(arg, "-l") {
-			*dynamicLibs = utils.AppendIfNotPresent(*dynamicLibs, arg[2:])
+			*dynamicLibs = appendIfNotPresent(*dynamicLibs, arg[2:])
 			continue
 		}
 		if strings.HasPrefix(arg, "-L") {
-			*linkDirectories = utils.AppendIfNotPresent(*linkDirectories, arg[2:])
+			*linkDirectories = appendIfNotPresent(*linkDirectories, arg[2:])
 			continue
 		}
 		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "-I") && !strings.HasPrefix(arg, "-o") {
 			// HACK : from linkerflags remove MMD (no cache is produced)
 			if !strings.HasPrefix(arg, "-MMD") {
-				*linkerflags = utils.AppendIfNotPresent(*linkerflags, arg)
+				*linkerflags = appendIfNotPresent(*linkerflags, arg)
 			}
 		}
 	}

@@ -16,6 +16,8 @@
 package phases
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"strings"
@@ -90,26 +92,33 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 		}
 	}
 
-	// Recreate the archive if ANY of the core files (including platform.txt) has changed
-	realCoreFolder := coreFolder.Parent().Parent()
-
 	var targetArchivedCore *paths.Path
-	var buildCacheErr error
 	if buildCachePath != nil {
+		realCoreFolder := coreFolder.Parent().Parent()
 		archivedCoreName := GetCachedCoreArchiveDirName(
 			buildProperties.Get("build.fqbn"),
 			buildProperties.Get("compiler.optimization_flags"),
 			realCoreFolder)
 		targetArchivedCore = buildCachePath.Join(archivedCoreName, "core.a")
-		_, buildCacheErr = buildcache.New(buildCachePath).GetOrCreate(archivedCoreName)
 
-		if errors.Is(buildCacheErr, buildcache.CreateDirErr) {
+		if _, err := buildcache.New(buildCachePath).GetOrCreate(archivedCoreName); errors.Is(err, buildcache.CreateDirErr) {
 			return nil, nil, fmt.Errorf(tr("creating core cache folder: %s", err))
 		}
 
-		canUseArchivedCore := !ctx.OnlyUpdateCompilationDatabase &&
-			!ctx.Clean &&
-			!builder_utils.CoreOrReferencedCoreHasChanged(realCoreFolder, targetCoreFolder, targetArchivedCore)
+		var canUseArchivedCore bool
+		if ctx.OnlyUpdateCompilationDatabase || ctx.Clean {
+			canUseArchivedCore = false
+		} else if isOlder, err := builder_utils.DirContentIsOlderThan(realCoreFolder, targetArchivedCore); err != nil || !isOlder {
+			// Recreate the archive if ANY of the core files (including platform.txt) has changed
+			canUseArchivedCore = false
+		} else if targetCoreFolder == nil || realCoreFolder.EquivalentTo(targetCoreFolder) {
+			canUseArchivedCore = true
+		} else if isOlder, err := builder_utils.DirContentIsOlderThan(targetCoreFolder, targetArchivedCore); err != nil || !isOlder {
+			// Recreate the archive if ANY of the build core files (including platform.txt) has changed
+			canUseArchivedCore = false
+		} else {
+			canUseArchivedCore = true
+		}
 
 		if canUseArchivedCore {
 			// use archived core
@@ -157,11 +166,16 @@ func GetCachedCoreArchiveDirName(fqbn string, optimizationFlags string, coreFold
 	if absCoreFolder, err := coreFolder.Abs(); err == nil {
 		coreFolder = absCoreFolder
 	} // silently continue if absolute path can't be detected
-	hash := utils.MD5Sum([]byte(coreFolder.String() + optimizationFlags))
+
+	md5Sum := func(data []byte) string {
+		md5sumBytes := md5.Sum(data)
+		return hex.EncodeToString(md5sumBytes[:])
+	}
+	hash := md5Sum([]byte(coreFolder.String() + optimizationFlags))
 	realName := fqbnToUnderscore + "_" + hash
 	if len(realName) > 100 {
-		// avoid really long names, simply hash the name
-		realName = utils.MD5Sum([]byte(fqbnToUnderscore + "_" + hash))
+		// avoid really long names, simply hash the name again
+		realName = md5Sum([]byte(realName))
 	}
 	return realName
 }

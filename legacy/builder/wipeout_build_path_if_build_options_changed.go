@@ -66,9 +66,11 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 		coreFolder := buildProperties.GetPath("build.core.path")
 		realCoreFolder := coreFolder.Parent().Parent()
 		jsonPath := ctx.BuildPath.Join(constants.BUILD_OPTIONS_FILE)
-		coreHasChanged := builder_utils.TXTBuildRulesHaveChanged(realCoreFolder, targetCoreFolder, jsonPath)
-
-		if !coreHasChanged {
+		coreUnchanged, _ := builder_utils.DirContentIsOlderThan(realCoreFolder, jsonPath, ".txt")
+		if coreUnchanged && targetCoreFolder != nil && !realCoreFolder.EqualsTo(targetCoreFolder) {
+			coreUnchanged, _ = builder_utils.DirContentIsOlderThan(targetCoreFolder, jsonPath, ".txt")
+		}
+		if coreUnchanged {
 			return nil
 		}
 	}
