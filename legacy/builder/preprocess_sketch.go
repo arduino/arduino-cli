@@ -31,14 +31,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-func PreprocessSketchWithArduinoPreprocessor(sk *sketch.Sketch, buildPath *paths.Path, includeFolders paths.PathList, sketchBuildPath *paths.Path, buildProperties *properties.Map) ([]byte, []byte, error) {
+func PreprocessSketchWithArduinoPreprocessor(sk *sketch.Sketch, buildPath *paths.Path, includeFolders paths.PathList, lineOffset int, buildProperties *properties.Map, onlyUpdateCompilationDatabase bool) ([]byte, []byte, error) {
 	verboseOut := &bytes.Buffer{}
 	normalOut := &bytes.Buffer{}
 	if err := buildPath.Join("preproc").MkdirAll(); err != nil {
 		return nil, nil, err
 	}
 
-	sourceFile := sketchBuildPath.Join(sk.MainFile.Base() + ".cpp")
+	sourceFile := buildPath.Join("sketch", sk.MainFile.Base()+".cpp")
 	targetFile := buildPath.Join("preproc", "sketch_merged.cpp")
 	gccStdout, gccStderr, err := preprocessor.GCC(sourceFile, targetFile, includeFolders, buildProperties)
 	verboseOut.Write(gccStdout)
@@ -83,5 +83,6 @@ func PreprocessSketchWithArduinoPreprocessor(sk *sketch.Sketch, buildPath *paths
 	}
 	result := utils.NormalizeUTF8(commandStdOut)
 
-	return normalOut.Bytes(), verboseOut.Bytes(), bldr.SketchSaveItemCpp(sk.MainFile, result, sketchBuildPath)
+	err = bldr.SketchSaveItemCpp(sk.MainFile, result, buildPath.Join("sketch"))
+	return normalOut.Bytes(), verboseOut.Bytes(), err
 }

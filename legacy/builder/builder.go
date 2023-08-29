@@ -142,8 +142,8 @@ func PreprocessSketch(ctx *types.Context) error {
 	var err error
 	if ctx.UseArduinoPreprocessor {
 		normalOutput, verboseOutput, err = PreprocessSketchWithArduinoPreprocessor(
-			ctx.Sketch, ctx.BuildPath, ctx.IncludeFolders, ctx.SketchBuildPath,
-			ctx.BuildProperties)
+			ctx.Sketch, ctx.BuildPath, ctx.IncludeFolders, ctx.LineOffset,
+			ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)
 	} else {
 		normalOutput, verboseOutput, err = preprocessor.PreprocessSketchWithCtags(
 			ctx.Sketch, ctx.BuildPath, ctx.IncludeFolders, ctx.LineOffset,
