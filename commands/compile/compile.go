@@ -152,8 +152,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	// cache is purged after compilation to not remove entries that might be required
 	defer maybePurgeBuildCache()
 
+	sketchBuilder := bldr.NewBuilder(sk)
+
 	// Add build properites related to sketch data
-	buildProperties = bldr.SetupBuildProperties(buildProperties, buildPath, sk, req.GetOptimizeForDebug())
+	buildProperties = sketchBuilder.SetupBuildProperties(buildProperties, buildPath, req.GetOptimizeForDebug())
 
 	// Add user provided custom build properties
 	customBuildPropertiesArgs := append(req.GetBuildProperties(), "build.warn_data_percentage=75")
@@ -169,7 +171,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	}
 
 	builderCtx := &types.Context{}
-	builderCtx.Builder = bldr.NewBuilder(sk)
+	builderCtx.Builder = sketchBuilder
 	builderCtx.PackageManager = pme
 	if pme.GetProfile() != nil {
 		builderCtx.LibrariesManager = lm
