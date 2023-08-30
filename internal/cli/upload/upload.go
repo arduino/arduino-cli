@@ -86,8 +86,8 @@ func runUploadCommand(command *cobra.Command, args []string) {
 	}
 	sketchPath := arguments.InitSketchPath(path)
 
-	if importDir == "" && importFile == "" {
-		arguments.WarnDeprecatedFiles(sketchPath)
+	if msg := sk.WarnDeprecatedFiles(sketchPath); importDir == "" && importFile == "" && msg != "" {
+		feedback.Warning(msg)
 	}
 
 	sketch, err := sk.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
