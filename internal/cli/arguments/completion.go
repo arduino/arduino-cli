@@ -18,11 +18,11 @@ package arguments
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/lib"
+	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
@@ -103,10 +103,12 @@ func GetInstalledProgrammers() []string {
 
 	installedProgrammers := make(map[string]string)
 	for _, board := range list.Boards {
-		fqbn, _ := cores.ParseFQBN(board.Fqbn)
-		_, boardPlatform, _, _, _, _ := pme.ResolveFQBN(fqbn)
-		for programmerID, programmer := range boardPlatform.Programmers {
-			installedProgrammers[programmerID] = programmer.Name
+		programmers, _ := upload.ListProgrammersAvailableForUpload(context.Background(), &rpc.ListProgrammersAvailableForUploadRequest{
+			Instance: inst,
+			Fqbn:     board.Fqbn,
+		})
+		for _, programmer := range programmers.GetProgrammers() {
+			installedProgrammers[programmer.GetId()] = programmer.GetName()
 		}
 	}
 
