@@ -514,7 +514,8 @@ func runProgramAction(pme *packagemanager.Explorer,
 
 	updatedPort := updatedUploadPort.Await()
 	if updatedPort == nil {
-		return nil, nil
+		// If the algorithms can not detect the new port, fallback to the user-provided port.
+		return userPort, nil
 	}
 	return updatedPort.ToRPC(), nil
 }
@@ -526,7 +527,7 @@ func detectUploadPort(
 	result f.Future[*discovery.Port],
 ) {
 	log := logrus.WithField("task", "port_detection")
-	log.Tracef("Detecting new board port after upload")
+	log.Debugf("Detecting new board port after upload")
 
 	candidate := uploadPort.Clone()
 	defer func() {
@@ -542,11 +543,11 @@ func detectUploadPort(
 				return
 			}
 			if candidate != nil && ev.Type == "remove" && ev.Port.Equals(candidate) {
-				log.WithField("event", ev).Trace("User-specified port has been disconnected, forcing wait for upload port")
+				log.WithField("event", ev).Debug("User-specified port has been disconnected, forcing wait for upload port")
 				waitForUploadPort = true
 				candidate = nil
 			} else {
-				log.WithField("event", ev).Trace("Ignored watcher event before upload")
+				log.WithField("event", ev).Debug("Ignored watcher event before upload")
 			}
 			continue
 		case <-uploadCtx.Done():
@@ -568,17 +569,17 @@ func detectUploadPort(
 				return
 			}
 			if candidate != nil && ev.Type == "remove" && candidate.Equals(ev.Port) {
-				log.WithField("event", ev).Trace("Candidate port is no longer available")
+				log.WithField("event", ev).Debug("Candidate port is no longer available")
 				candidate = nil
 				if !waitForUploadPort {
 					waitForUploadPort = true
 					timeout = time.After(5 * time.Second)
-					log.Trace("User-specified port has been disconnected, now waiting for upload port, timeout extended by 5 seconds")
+					log.Debug("User-specified port has been disconnected, now waiting for upload port, timeout extended by 5 seconds")
 				}
 				continue
 			}
 			if ev.Type != "add" {
-				log.WithField("event", ev).Trace("Ignored non-add event")
+				log.WithField("event", ev).Debug("Ignored non-add event")
 				continue
 			}
 
@@ -601,21 +602,21 @@ func detectUploadPort(
 			evPortPriority := portPriority(ev.Port)
 			candidatePriority := portPriority(candidate)
 			if evPortPriority <= candidatePriority {
-				log.WithField("event", ev).Tracef("New upload port candidate is worse than the current one (prio=%d)", evPortPriority)
+				log.WithField("event", ev).Debugf("New upload port candidate is worse than the current one (prio=%d)", evPortPriority)
 				continue
 			}
-			log.WithField("event", ev).Tracef("Found new upload port candidate (prio=%d)", evPortPriority)
+			log.WithField("event", ev).Debugf("Found new upload port candidate (prio=%d)", evPortPriority)
 			candidate = ev.Port
 
 			// If the current candidate have the desired HW-ID return it quickly.
 			if candidate.HardwareID == ev.Port.HardwareID {
 				timeout = time.After(time.Second)
-				log.Trace("New candidate port match the desired HW ID, timeout reduced to 1 second.")
+				log.Debug("New candidate port match the desired HW ID, timeout reduced to 1 second.")
 				continue
 			}
 
 		case <-timeout:
-			log.WithField("selected_port", candidate).Trace("Timeout waiting for candidate port")
+			log.WithField("selected_port", candidate).Debug("Timeout waiting for candidate port")
 			return
 		}
 	}
