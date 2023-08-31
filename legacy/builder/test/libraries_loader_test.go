@@ -28,9 +28,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func extractLibraries(ctx *types.Context) []*libraries.Library {
+func extractLibraries(libs map[string]libraries.List) []*libraries.Library {
 	res := []*libraries.Library{}
-	for _, lib := range ctx.LibrariesManager.Libraries {
+	for _, lib := range libs {
 		for _, libAlternative := range lib {
 			res = append(res, libAlternative)
 		}
@@ -47,21 +47,20 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, nil, "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
 
-	commands := []types.Command{
-		&builder.LibrariesLoader{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
+	lm, libsResolver, _, err := builder.LibrariesLoader(
+		ctx.UseCachedLibrariesResolution, ctx.LibrariesManager,
+		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
+		ctx.ActualPlatform, ctx.TargetPlatform,
+	)
+	NoError(t, err)
 
-	librariesFolders := ctx.LibrariesManager.LibrariesDir
+	librariesFolders := lm.LibrariesDir
 	require.Equal(t, 3, len(librariesFolders))
 	require.True(t, Abs(t, paths.New("downloaded_libraries")).EquivalentTo(librariesFolders[0].Path))
 	require.True(t, Abs(t, paths.New("downloaded_hardware", "arduino", "avr", "libraries")).EquivalentTo(librariesFolders[1].Path))
 	require.True(t, Abs(t, paths.New("libraries")).EquivalentTo(librariesFolders[2].Path))
 
-	libs := extractLibraries(ctx)
+	libs := extractLibraries(lm.Libraries)
 	require.Equal(t, 24, len(libs))
 
 	sort.Sort(ByLibraryName(libs))
@@ -124,21 +123,21 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	idx++
 	require.Equal(t, "Wire", libs[idx].Name)
 
-	libs = ctx.LibrariesResolver.AlternativesFor("Audio.h")
+	libs = libsResolver.AlternativesFor("Audio.h")
 	require.Len(t, libs, 2)
 	sort.Sort(ByLibraryName(libs))
 	require.Equal(t, "Audio", libs[0].Name)
 	require.Equal(t, "FakeAudio", libs[1].Name)
 
-	libs = ctx.LibrariesResolver.AlternativesFor("FakeAudio.h")
+	libs = libsResolver.AlternativesFor("FakeAudio.h")
 	require.Len(t, libs, 1)
 	require.Equal(t, "FakeAudio", libs[0].Name)
 
-	libs = ctx.LibrariesResolver.AlternativesFor("Adafruit_PN532.h")
+	libs = libsResolver.AlternativesFor("Adafruit_PN532.h")
 	require.Len(t, libs, 1)
 	require.Equal(t, "Adafruit PN532", libs[0].Name)
 
-	libs = ctx.LibrariesResolver.AlternativesFor("IRremote.h")
+	libs = libsResolver.AlternativesFor("IRremote.h")
 	require.Len(t, libs, 1)
 	require.Equal(t, "IRremote", libs[0].Name)
 }
@@ -152,21 +151,20 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, nil, "arduino:sam:arduino_due_x_dbg")
 	defer cleanUpBuilderTestContext(t, ctx)
 
-	commands := []types.Command{
-		&builder.LibrariesLoader{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
+	lm, libsResolver, _, err := builder.LibrariesLoader(
+		ctx.UseCachedLibrariesResolution, ctx.LibrariesManager,
+		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
+		ctx.ActualPlatform, ctx.TargetPlatform,
+	)
+	NoError(t, err)
 
-	librariesFolders := ctx.LibrariesManager.LibrariesDir
+	librariesFolders := lm.LibrariesDir
 	require.Equal(t, 3, len(librariesFolders))
 	require.True(t, Abs(t, paths.New("downloaded_libraries")).EquivalentTo(librariesFolders[0].Path))
 	require.True(t, Abs(t, paths.New("downloaded_hardware", "arduino", "sam", "libraries")).EquivalentTo(librariesFolders[1].Path))
 	require.True(t, Abs(t, paths.New("libraries")).EquivalentTo(librariesFolders[2].Path))
 
-	libraries := extractLibraries(ctx)
+	libraries := extractLibraries(lm.Libraries)
 	require.Equal(t, 22, len(libraries))
 
 	sort.Sort(ByLibraryName(libraries))
@@ -206,17 +204,17 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	idx++
 	require.Equal(t, "Wire", libraries[idx].Name)
 
-	libs := ctx.LibrariesResolver.AlternativesFor("Audio.h")
+	libs := libsResolver.AlternativesFor("Audio.h")
 	require.Len(t, libs, 2)
 	sort.Sort(ByLibraryName(libs))
 	require.Equal(t, "Audio", libs[0].Name)
 	require.Equal(t, "FakeAudio", libs[1].Name)
 
-	libs = ctx.LibrariesResolver.AlternativesFor("FakeAudio.h")
+	libs = libsResolver.AlternativesFor("FakeAudio.h")
 	require.Len(t, libs, 1)
 	require.Equal(t, "FakeAudio", libs[0].Name)
 
-	libs = ctx.LibrariesResolver.AlternativesFor("IRremote.h")
+	libs = libsResolver.AlternativesFor("IRremote.h")
 	require.Len(t, libs, 1)
 	require.Equal(t, "IRremote", libs[0].Name)
 }
@@ -230,15 +228,14 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, nil, "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
 
-	commands := []types.Command{
-		&builder.LibrariesLoader{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
+	lm, _, _, err := builder.LibrariesLoader(
+		ctx.UseCachedLibrariesResolution, ctx.LibrariesManager,
+		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
+		ctx.ActualPlatform, ctx.TargetPlatform,
+	)
+	NoError(t, err)
 
-	librariesFolders := ctx.LibrariesManager.LibrariesDir
+	librariesFolders := lm.LibrariesDir
 	require.Equal(t, 3, len(librariesFolders))
 	require.True(t, Abs(t, paths.New("downloaded_libraries")).EquivalentTo(librariesFolders[0].Path))
 	require.True(t, Abs(t, paths.New("downloaded_hardware", "arduino", "avr", "libraries")).EquivalentTo(librariesFolders[1].Path))
@@ -254,15 +251,14 @@ func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, nil, "my_avr_platform:avr:custom_yun")
 	defer cleanUpBuilderTestContext(t, ctx)
 
-	commands := []types.Command{
-		&builder.LibrariesLoader{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
+	lm, _, _, err := builder.LibrariesLoader(
+		ctx.UseCachedLibrariesResolution, ctx.LibrariesManager,
+		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
+		ctx.ActualPlatform, ctx.TargetPlatform,
+	)
+	NoError(t, err)
 
-	librariesFolders := ctx.LibrariesManager.LibrariesDir
+	librariesFolders := lm.LibrariesDir
 	require.Equal(t, 4, len(librariesFolders))
 	require.True(t, Abs(t, paths.New("downloaded_libraries")).EquivalentTo(librariesFolders[0].Path))
 	require.True(t, Abs(t, paths.New("downloaded_hardware", "arduino", "avr", "libraries")).EquivalentTo(librariesFolders[1].Path))

@@ -16,41 +16,48 @@
 package builder
 
 import (
+	"bytes"
+
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 )
 
-type LibrariesLoader struct{}
-
-func (s *LibrariesLoader) Run(ctx *types.Context) error {
-	if ctx.UseCachedLibrariesResolution {
+func LibrariesLoader(
+	useCachedLibrariesResolution bool,
+	librariesManager *librariesmanager.LibrariesManager,
+	builtInLibrariesDirs *paths.Path, libraryDirs, otherLibrariesDirs paths.PathList,
+	actualPlatform, targetPlatform *cores.PlatformRelease,
+) (*librariesmanager.LibrariesManager, *librariesresolver.Cpp, []byte, error) {
+	verboseOut := &bytes.Buffer{}
+	lm := librariesManager
+	if useCachedLibrariesResolution {
 		// Since we are using the cached libraries resolution
 		// the library manager is not needed.
-		lm := librariesmanager.NewLibraryManager(nil, nil)
-		ctx.LibrariesManager = lm
-	} else if ctx.LibrariesManager == nil {
-		lm := librariesmanager.NewLibraryManager(nil, nil)
-		ctx.LibrariesManager = lm
+		lm = librariesmanager.NewLibraryManager(nil, nil)
+	}
+	if librariesManager == nil {
+		lm = librariesmanager.NewLibraryManager(nil, nil)
 
-		builtInLibrariesFolders := ctx.BuiltInLibrariesDirs
+		builtInLibrariesFolders := builtInLibrariesDirs
 		if builtInLibrariesFolders != nil {
 			if err := builtInLibrariesFolders.ToAbs(); err != nil {
-				return errors.WithStack(err)
+				return nil, nil, nil, errors.WithStack(err)
 			}
 			lm.AddLibrariesDir(builtInLibrariesFolders, libraries.IDEBuiltIn)
 		}
 
-		if ctx.ActualPlatform != ctx.TargetPlatform {
-			lm.AddPlatformReleaseLibrariesDir(ctx.ActualPlatform, libraries.ReferencedPlatformBuiltIn)
+		if actualPlatform != targetPlatform {
+			lm.AddPlatformReleaseLibrariesDir(actualPlatform, libraries.ReferencedPlatformBuiltIn)
 		}
-		lm.AddPlatformReleaseLibrariesDir(ctx.TargetPlatform, libraries.PlatformBuiltIn)
+		lm.AddPlatformReleaseLibrariesDir(targetPlatform, libraries.PlatformBuiltIn)
 
-		librariesFolders := ctx.OtherLibrariesDirs
+		librariesFolders := otherLibrariesDirs
 		if err := librariesFolders.ToAbs(); err != nil {
-			return errors.WithStack(err)
+			return nil, nil, nil, errors.WithStack(err)
 		}
 		for _, folder := range librariesFolders {
 			lm.AddLibrariesDir(folder, libraries.User)
@@ -63,35 +70,31 @@ func (s *LibrariesLoader) Run(ctx *types.Context) error {
 			// I have no intention right now to start a refactoring of the legacy package too, so
 			// here's this shitty solution for now.
 			// When we're gonna refactor the legacy package this will be gone.
-			if ctx.Verbose {
-				ctx.Warn(status.Message())
-			}
+			verboseOut.Write([]byte(status.Message()))
 		}
 
-		for _, dir := range ctx.LibraryDirs {
+		for _, dir := range libraryDirs {
 			// Libraries specified this way have top priority
 			if err := lm.LoadLibraryFromDir(dir, libraries.Unmanaged); err != nil {
-				return err
+				return nil, nil, nil, errors.WithStack(err)
 			}
 		}
 	}
 
 	resolver := librariesresolver.NewCppResolver()
-	if err := resolver.ScanIDEBuiltinLibraries(ctx.LibrariesManager); err != nil {
-		return errors.WithStack(err)
+	if err := resolver.ScanIDEBuiltinLibraries(lm); err != nil {
+		return nil, nil, nil, errors.WithStack(err)
 	}
-	if err := resolver.ScanUserAndUnmanagedLibraries(ctx.LibrariesManager); err != nil {
-		return errors.WithStack(err)
+	if err := resolver.ScanUserAndUnmanagedLibraries(lm); err != nil {
+		return nil, nil, nil, errors.WithStack(err)
 	}
-	if err := resolver.ScanPlatformLibraries(ctx.LibrariesManager, ctx.TargetPlatform); err != nil {
-		return errors.WithStack(err)
+	if err := resolver.ScanPlatformLibraries(lm, targetPlatform); err != nil {
+		return nil, nil, nil, errors.WithStack(err)
 	}
-	if ctx.ActualPlatform != ctx.TargetPlatform {
-		if err := resolver.ScanPlatformLibraries(ctx.LibrariesManager, ctx.ActualPlatform); err != nil {
-			return errors.WithStack(err)
+	if actualPlatform != targetPlatform {
+		if err := resolver.ScanPlatformLibraries(lm, actualPlatform); err != nil {
+			return nil, nil, nil, errors.WithStack(err)
 		}
 	}
-	ctx.LibrariesResolver = resolver
-
-	return nil
+	return lm, resolver, verboseOut.Bytes(), nil
 }

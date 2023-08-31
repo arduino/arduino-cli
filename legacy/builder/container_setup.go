@@ -33,20 +33,23 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 	ctx.CoreBuildPath = coreBuildPath
 	ctx.WarningsLevel = warningsLevel
 
-	commands := []types.Command{
-		&FailIfBuildPathEqualsSketchPath{},
-		&LibrariesLoader{},
+	if ctx.BuildPath.Canonical().EqualsTo(ctx.Sketch.FullPath.Canonical()) {
+		return errors.New(tr("Sketch cannot be located in build path. Please specify a different build path"))
 	}
-	ctx.Progress.AddSubSteps(len(commands))
-	defer ctx.Progress.RemoveSubSteps()
-	for _, command := range commands {
-		PrintRingNameIfDebug(ctx, command)
-		err := command.Run(ctx)
-		if err != nil {
-			return errors.WithStack(err)
-		}
-		ctx.Progress.CompleteStep()
-		ctx.PushProgress()
+
+	lm, libsResolver, verboseOut, err := LibrariesLoader(
+		ctx.UseCachedLibrariesResolution, ctx.LibrariesManager,
+		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
+		ctx.ActualPlatform, ctx.TargetPlatform,
+	)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	ctx.LibrariesManager = lm
+	ctx.LibrariesResolver = libsResolver
+	if ctx.Verbose {
+		ctx.Warn(string(verboseOut))
 	}
 	return nil
 }
