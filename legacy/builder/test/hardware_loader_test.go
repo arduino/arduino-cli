@@ -20,7 +20,6 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -68,14 +67,6 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	}
 	ctx = prepareBuilderTestContext(t, ctx, nil, "")
 	defer cleanUpBuilderTestContext(t, ctx)
-
-	commands := []types.Command{
-		&builder.AddAdditionalEntriesToContext{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
 
 	packages := ctx.PackageManager.GetPackages()
 

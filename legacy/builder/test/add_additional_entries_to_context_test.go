@@ -28,30 +28,28 @@ import (
 func TestAddAdditionalEntriesToContextNoBuildPath(t *testing.T) {
 	ctx := &types.Context{}
 
-	command := builder.AddAdditionalEntriesToContext{}
-	NoError(t, command.Run(ctx))
+	sketchBuildPath, librariesBuildPath, coreBuildPath,
+		warningsLevel, err := builder.AddAdditionalEntriesToContext(ctx.BuildPath, ctx.WarningsLevel)
+	NoError(t, err)
 
-	require.Empty(t, ctx.SketchBuildPath)
-	require.Empty(t, ctx.LibrariesBuildPath)
-	require.Empty(t, ctx.CoreBuildPath)
+	require.Empty(t, sketchBuildPath)
+	require.Empty(t, librariesBuildPath)
+	require.Empty(t, coreBuildPath)
 
-	require.NotNil(t, ctx.WarningsLevel)
-
-	require.Equal(t, 0, len(ctx.LibrariesResolutionResults))
+	require.NotNil(t, warningsLevel)
 }
 
 func TestAddAdditionalEntriesToContextWithBuildPath(t *testing.T) {
 	ctx := &types.Context{}
 	ctx.BuildPath = paths.New("folder")
 
-	command := builder.AddAdditionalEntriesToContext{}
-	NoError(t, command.Run(ctx))
+	sketchBuildPath, librariesBuildPath, coreBuildPath,
+		warningsLevel, err := builder.AddAdditionalEntriesToContext(ctx.BuildPath, ctx.WarningsLevel)
+	NoError(t, err)
 
-	require.Equal(t, Abs(t, paths.New("folder", constants.FOLDER_SKETCH)), ctx.SketchBuildPath)
-	require.Equal(t, Abs(t, paths.New("folder", "libraries")), ctx.LibrariesBuildPath)
-	require.Equal(t, Abs(t, paths.New("folder", constants.FOLDER_CORE)), ctx.CoreBuildPath)
+	require.Equal(t, Abs(t, paths.New("folder", constants.FOLDER_SKETCH)), sketchBuildPath)
+	require.Equal(t, Abs(t, paths.New("folder", "libraries")), librariesBuildPath)
+	require.Equal(t, Abs(t, paths.New("folder", constants.FOLDER_CORE)), coreBuildPath)
 
-	require.NotNil(t, ctx.WarningsLevel)
-
-	require.Equal(t, 0, len(ctx.LibrariesResolutionResults))
+	require.NotNil(t, warningsLevel)
 }

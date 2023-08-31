@@ -447,6 +447,10 @@ func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {
 	resolver := ctx.LibrariesResolver
 	importedLibraries := ctx.ImportedLibraries
 
+	if ctx.LibrariesResolutionResults == nil {
+		ctx.LibrariesResolutionResults = map[string]types.LibraryResolutionResult{}
+	}
+
 	candidates := resolver.AlternativesFor(header)
 
 	if ctx.Verbose {

@@ -48,7 +48,6 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
-		&builder.AddAdditionalEntriesToContext{},
 		&builder.LibrariesLoader{},
 	}
 	for _, command := range commands {
@@ -154,7 +153,6 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
-		&builder.AddAdditionalEntriesToContext{},
 		&builder.LibrariesLoader{},
 	}
 	for _, command := range commands {
@@ -233,7 +231,6 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
-		&builder.AddAdditionalEntriesToContext{},
 		&builder.LibrariesLoader{},
 	}
 	for _, command := range commands {
@@ -258,7 +255,6 @@ func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 
 	commands := []types.Command{
-		&builder.AddAdditionalEntriesToContext{},
 		&builder.LibrariesLoader{},
 	}
 	for _, command := range commands {

@@ -17,38 +17,32 @@ package builder
 
 import (
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 )
 
-type AddAdditionalEntriesToContext struct{}
+func AddAdditionalEntriesToContext(buildPath *paths.Path, warningLevel string) (*paths.Path, *paths.Path, *paths.Path, string, error) {
+	var sketchBuildPath, librariesBuildPath, coreBuildPath *paths.Path
+	var err error
 
-func (*AddAdditionalEntriesToContext) Run(ctx *types.Context) error {
-	if ctx.BuildPath != nil {
-		buildPath := ctx.BuildPath
-		sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
+	if buildPath != nil {
+		sketchBuildPath, err = buildPath.Join(constants.FOLDER_SKETCH).Abs()
 		if err != nil {
-			return errors.WithStack(err)
+			return nil, nil, nil, "", errors.WithStack(err)
 		}
-		librariesBuildPath, err := buildPath.Join(constants.FOLDER_LIBRARIES).Abs()
+		librariesBuildPath, err = buildPath.Join(constants.FOLDER_LIBRARIES).Abs()
 		if err != nil {
-			return errors.WithStack(err)
+			return nil, nil, nil, "", errors.WithStack(err)
 		}
-		coreBuildPath, err := buildPath.Join(constants.FOLDER_CORE).Abs()
+		coreBuildPath, err = buildPath.Join(constants.FOLDER_CORE).Abs()
 		if err != nil {
-			return errors.WithStack(err)
+			return nil, nil, nil, "", errors.WithStack(err)
 		}
-
-		ctx.SketchBuildPath = sketchBuildPath
-		ctx.LibrariesBuildPath = librariesBuildPath
-		ctx.CoreBuildPath = coreBuildPath
 	}
 
-	if ctx.WarningsLevel == "" {
-		ctx.WarningsLevel = DEFAULT_WARNINGS_LEVEL
+	if warningLevel == "" {
+		warningLevel = DEFAULT_WARNINGS_LEVEL
 	}
 
-	ctx.LibrariesResolutionResults = map[string]types.LibraryResolutionResult{}
-
-	return nil
+	return sketchBuildPath, librariesBuildPath, coreBuildPath, warningLevel, nil
 }
