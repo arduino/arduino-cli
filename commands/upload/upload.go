@@ -575,9 +575,6 @@ func detectUploadPort(
 					waitForUploadPort = true
 					timeout = time.After(5 * time.Second)
 					log.Debug("User-specified port has been disconnected, now waiting for upload port, timeout extended by 5 seconds")
-				} else {
-					timeout = time.After(time.Second)
-					log.Debug("Candidate port has been disconnected, timeout extended by 1 second")
 				}
 				continue
 			}
