@@ -514,7 +514,8 @@ func runProgramAction(pme *packagemanager.Explorer,
 
 	updatedPort := updatedUploadPort.Await()
 	if updatedPort == nil {
-		return nil, nil
+		// If the algorithms can not detect the new port, fallback to the user-provided port.
+		return userPort, nil
 	}
 	return updatedPort.ToRPC(), nil
 }
