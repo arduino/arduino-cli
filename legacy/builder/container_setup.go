@@ -16,6 +16,7 @@
 package builder
 
 import (
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/pkg/errors"
 )
@@ -37,7 +38,7 @@ func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) 
 		return errors.New(tr("Sketch cannot be located in build path. Please specify a different build path"))
 	}
 
-	lm, libsResolver, verboseOut, err := LibrariesLoader(
+	lm, libsResolver, verboseOut, err := builder.LibrariesLoader(
 		ctx.UseCachedLibrariesResolution, ctx.LibrariesManager,
 		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
 		ctx.ActualPlatform, ctx.TargetPlatform,
