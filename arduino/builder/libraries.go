@@ -17,6 +17,7 @@ package builder
 
 import (
 	"bytes"
+	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
@@ -26,6 +27,97 @@ import (
 	"github.com/pkg/errors"
 )
 
+type libraryResolutionResult struct {
+	Library          *libraries.Library
+	NotUsedLibraries []*libraries.Library
+}
+
+// SketchLibrariesDetector todo
+type SketchLibrariesDetector struct {
+	librariesManager             *librariesmanager.LibrariesManager
+	librariesResolver            *librariesresolver.Cpp
+	useCachedLibrariesResolution bool
+	verbose                      bool
+	verboseInfoFn                func(msg string)
+	verboseWarnFn                func(msg string)
+
+	importedLibraries          libraries.List
+	librariesResolutionResults map[string]libraryResolutionResult
+}
+
+// NewSketchLibrariesDetector todo
+func NewSketchLibrariesDetector(
+	lm *librariesmanager.LibrariesManager,
+	libsResolver *librariesresolver.Cpp,
+	importedLibraries libraries.List,
+	verbose, useCachedLibrariesResolution bool,
+	verboseInfoFn func(msg string),
+	verboseWarnFn func(msg string),
+) *SketchLibrariesDetector {
+
+	return &SketchLibrariesDetector{
+		librariesManager:             lm,
+		librariesResolver:            libsResolver,
+		useCachedLibrariesResolution: useCachedLibrariesResolution,
+		librariesResolutionResults:   map[string]libraryResolutionResult{},
+		verbose:                      verbose,
+		verboseInfoFn:                verboseInfoFn,
+		verboseWarnFn:                verboseWarnFn,
+
+		importedLibraries: importedLibraries,
+	}
+}
+
+// ResolveLibrary todo
+func (l *SketchLibrariesDetector) ResolveLibrary(header, platformArch string) *libraries.Library {
+	importedLibraries := l.importedLibraries
+	candidates := l.librariesResolver.AlternativesFor(header)
+
+	if l.verbose {
+		l.verboseInfoFn(tr("Alternatives for %[1]s: %[2]s", header, candidates))
+		l.verboseInfoFn(fmt.Sprintf("ResolveLibrary(%s)", header))
+		l.verboseInfoFn(fmt.Sprintf("  -> %s: %s", tr("candidates"), candidates))
+	}
+
+	if len(candidates) == 0 {
+		return nil
+	}
+
+	for _, candidate := range candidates {
+		if importedLibraries.Contains(candidate) {
+			return nil
+		}
+	}
+
+	selected := l.librariesResolver.ResolveFor(header, platformArch)
+	if alreadyImported := importedLibraries.FindByName(selected.Name); alreadyImported != nil {
+		// Certain libraries might have the same name but be different.
+		// This usually happens when the user includes two or more custom libraries that have
+		// different header name but are stored in a parent folder with identical name, like
+		// ./libraries1/Lib/lib1.h and ./libraries2/Lib/lib2.h
+		// Without this check the library resolution would be stuck in a loop.
+		// This behaviour has been reported in this issue:
+		// https://github.com/arduino/arduino-cli/issues/973
+		if selected == alreadyImported {
+			selected = alreadyImported
+		}
+	}
+
+	candidates.Remove(selected)
+	l.librariesResolutionResults[header] = libraryResolutionResult{
+		Library:          selected,
+		NotUsedLibraries: candidates,
+	}
+
+	return selected
+}
+
+func (l *SketchLibrariesDetector) ImportedLibraries() libraries.List {
+	// TODO understand if we have to do a deepcopy
+	return l.importedLibraries
+}
+
+// LibrariesLoader todo
 func LibrariesLoader(
 	useCachedLibrariesResolution bool,
 	librariesManager *librariesmanager.LibrariesManager,

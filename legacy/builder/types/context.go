@@ -64,7 +64,8 @@ func (p *ProgressStruct) CompleteStep() {
 
 // Context structure
 type Context struct {
-	Builder *builder.Builder
+	Builder                 *builder.Builder
+	SketchLibrariesDetector *builder.SketchLibrariesDetector
 
 	// Build options
 	HardwareDirs         paths.PathList
