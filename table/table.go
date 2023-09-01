@@ -127,7 +127,6 @@ func (t *Table) Render() string {
 
 	res := ""
 	for _, row := range t.rows {
-		separator := ""
 		for x, cell := range row.cells {
 			selectedWidth := widths[x]
 			if x < len(t.columnsWidthMode) {
@@ -141,9 +140,10 @@ func (t *Table) Render() string {
 			if selectedWidth < minimum[x] {
 				selectedWidth = minimum[x]
 			}
-			res += separator
+			if x > 0 {
+				line += " "
+			}
 			res += cell.Pad(selectedWidth)
-			separator = " "
 		}
 		res += "\n"
 	}
