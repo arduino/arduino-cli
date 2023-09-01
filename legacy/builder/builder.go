@@ -42,8 +42,6 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 	var _err, mainErr error
 	commands := []types.Command{
-		&ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&ContainerBuildOptions{},
 
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
@@ -162,8 +160,6 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 
 	var _err error
 	commands := []types.Command{
-		&ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&ContainerBuildOptions{},
 
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
@@ -215,13 +211,6 @@ func PrintRingNameIfDebug(ctx *types.Context, command types.Command) {
 
 func RunBuilder(ctx *types.Context) error {
 	return runCommands(ctx, []types.Command{&Builder{}})
-}
-
-func RunParseHardware(ctx *types.Context) error {
-	commands := []types.Command{
-		&ContainerSetupHardwareToolsLibsSketchAndProps{},
-	}
-	return runCommands(ctx, commands)
 }
 
 func RunPreprocess(ctx *types.Context) error {

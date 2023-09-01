@@ -17,7 +17,6 @@ package compile
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"sort"
@@ -175,9 +174,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx := &types.Context{}
 	builderCtx.Builder = sketchBuilder
 	builderCtx.PackageManager = pme
-	if pme.GetProfile() != nil {
-		builderCtx.LibrariesManager = lm
-	}
 	builderCtx.TargetBoard = targetBoard
 	builderCtx.TargetPlatform = targetPlatform
 	builderCtx.TargetPackage = targetPackage
@@ -185,33 +181,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.RequiredTools = requiredTools
 	builderCtx.BuildProperties = buildProperties
 	builderCtx.CustomBuildProperties = customBuildPropertiesArgs
-	builderCtx.UseCachedLibrariesResolution = req.GetSkipLibrariesDiscovery()
 	builderCtx.FQBN = fqbn
 	builderCtx.Sketch = sk
 	builderCtx.BuildPath = buildPath
 	builderCtx.ProgressCB = progressCB
-
-	sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
-	if err != nil {
-		return nil, err
-	}
-	builderCtx.SketchBuildPath = sketchBuildPath
-
-	librariesBuildPath, err := buildPath.Join(constants.FOLDER_LIBRARIES).Abs()
-	if err != nil {
-		return nil, err
-	}
-	builderCtx.LibrariesBuildPath = librariesBuildPath
-
-	coreBuildPath, err := buildPath.Join(constants.FOLDER_CORE).Abs()
-	if err != nil {
-		return nil, err
-	}
-	builderCtx.CoreBuildPath = coreBuildPath
-
-	if builderCtx.BuildPath.Canonical().EqualsTo(builderCtx.Sketch.FullPath.Canonical()) {
-		return nil, errors.New(tr("Sketch cannot be located in build path. Please specify a different build path"))
-	}
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.HardwareDirs = configuration.HardwareDirectories(configuration.Settings)
@@ -253,6 +226,57 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.OnlyUpdateCompilationDatabase = req.GetCreateCompilationDatabaseOnly()
 	builderCtx.SourceOverride = req.GetSourceOverride()
 
+	sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
+	if err != nil {
+		return r, &arduino.CompileFailedError{Message: err.Error()}
+	}
+	librariesBuildPath, err := buildPath.Join(constants.FOLDER_LIBRARIES).Abs()
+	if err != nil {
+		return r, &arduino.CompileFailedError{Message: err.Error()}
+	}
+	coreBuildPath, err := buildPath.Join(constants.FOLDER_CORE).Abs()
+	if err != nil {
+		return r, &arduino.CompileFailedError{Message: err.Error()}
+	}
+	builderCtx.SketchBuildPath = sketchBuildPath
+	builderCtx.LibrariesBuildPath = librariesBuildPath
+	builderCtx.CoreBuildPath = coreBuildPath
+
+	if builderCtx.BuildPath.Canonical().EqualsTo(builderCtx.Sketch.FullPath.Canonical()) {
+		return r, &arduino.CompileFailedError{
+			Message: tr("Sketch cannot be located in build path. Please specify a different build path"),
+		}
+	}
+
+	// TODO replace all UseCache call with our SketchLibrariesDetector
+	builderCtx.UseCachedLibrariesResolution = req.GetSkipLibrariesDiscovery()
+	if pme.GetProfile() != nil {
+		builderCtx.LibrariesManager = lm
+	}
+	lm, libsResolver, verboseOut, err := bldr.LibrariesLoader(
+		builderCtx.UseCachedLibrariesResolution, builderCtx.LibrariesManager,
+		builderCtx.BuiltInLibrariesDirs, builderCtx.LibraryDirs, builderCtx.OtherLibrariesDirs,
+		builderCtx.ActualPlatform, builderCtx.TargetPlatform,
+	)
+	if err != nil {
+		return r, &arduino.CompileFailedError{Message: err.Error()}
+	}
+
+	builderCtx.LibrariesManager = lm
+	builderCtx.LibrariesResolver = libsResolver
+	if builderCtx.Verbose {
+		builderCtx.Warn(string(verboseOut))
+	}
+
+	builderCtx.SketchLibrariesDetector = bldr.NewSketchLibrariesDetector(
+		lm, libsResolver,
+		builderCtx.ImportedLibraries,
+		builderCtx.Verbose,
+		builderCtx.UseCachedLibrariesResolution,
+		func(msg string) { builderCtx.Info(msg) },
+		func(msg string) { builderCtx.Warn(msg) },
+	)
+
 	defer func() {
 		if p := builderCtx.BuildPath; p != nil {
 			r.BuildPath = p.String()
@@ -274,13 +298,9 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		}
 	}()
 
+	// Just get build properties and exit
 	if req.GetShowProperties() {
-		// Just get build properties and exit
-		compileErr := builder.RunParseHardware(builderCtx)
-		if compileErr != nil {
-			compileErr = &arduino.CompileFailedError{Message: compileErr.Error()}
-		}
-		return r, compileErr
+		return r, nil
 	}
 
 	if req.GetPreprocess() {

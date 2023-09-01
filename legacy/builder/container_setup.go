@@ -16,27 +16,11 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/pkg/errors"
 )
 
 type ContainerSetupHardwareToolsLibsSketchAndProps struct{}
 
 func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) error {
-	lm, libsResolver, verboseOut, err := builder.LibrariesLoader(
-		ctx.UseCachedLibrariesResolution, ctx.LibrariesManager,
-		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
-		ctx.ActualPlatform, ctx.TargetPlatform,
-	)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	ctx.LibrariesManager = lm
-	ctx.LibrariesResolver = libsResolver
-	if ctx.Verbose {
-		ctx.Warn(string(verboseOut))
-	}
 	return nil
 }
