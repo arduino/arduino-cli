@@ -22,22 +22,17 @@ import (
 )
 
 func AddAdditionalEntriesToContext(buildPath *paths.Path, warningLevel string) (*paths.Path, *paths.Path, *paths.Path, string, error) {
-	var sketchBuildPath, librariesBuildPath, coreBuildPath *paths.Path
-	var err error
-
-	if buildPath != nil {
-		sketchBuildPath, err = buildPath.Join(constants.FOLDER_SKETCH).Abs()
-		if err != nil {
-			return nil, nil, nil, "", errors.WithStack(err)
-		}
-		librariesBuildPath, err = buildPath.Join(constants.FOLDER_LIBRARIES).Abs()
-		if err != nil {
-			return nil, nil, nil, "", errors.WithStack(err)
-		}
-		coreBuildPath, err = buildPath.Join(constants.FOLDER_CORE).Abs()
-		if err != nil {
-			return nil, nil, nil, "", errors.WithStack(err)
-		}
+	sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
+	if err != nil {
+		return nil, nil, nil, "", errors.WithStack(err)
+	}
+	librariesBuildPath, err := buildPath.Join(constants.FOLDER_LIBRARIES).Abs()
+	if err != nil {
+		return nil, nil, nil, "", errors.WithStack(err)
+	}
+	coreBuildPath, err := buildPath.Join(constants.FOLDER_CORE).Abs()
+	if err != nil {
+		return nil, nil, nil, "", errors.WithStack(err)
 	}
 
 	if warningLevel == "" {
