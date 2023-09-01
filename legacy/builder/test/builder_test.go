@@ -57,6 +57,18 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		ctx.BuildPath = buildPath
 	}
 
+	buildPath := ctx.BuildPath
+	sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
+	NoError(t, err)
+	librariesBuildPath, err := buildPath.Join(constants.FOLDER_LIBRARIES).Abs()
+	NoError(t, err)
+	coreBuildPath, err := buildPath.Join(constants.FOLDER_CORE).Abs()
+	NoError(t, err)
+
+	ctx.SketchBuildPath = sketchBuildPath
+	ctx.LibrariesBuildPath = librariesBuildPath
+	ctx.CoreBuildPath = coreBuildPath
+
 	// Create a Package Manager from the given context
 	// This should happen only on legacy arduino-builder.
 	// Hopefully this piece will be removed once the legacy package will be cleanedup.

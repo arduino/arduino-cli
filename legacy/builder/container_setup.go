@@ -24,16 +24,6 @@ import (
 type ContainerSetupHardwareToolsLibsSketchAndProps struct{}
 
 func (s *ContainerSetupHardwareToolsLibsSketchAndProps) Run(ctx *types.Context) error {
-	sketchBuildPath, librariesBuildPath, coreBuildPath,
-		warningsLevel, err := AddAdditionalEntriesToContext(ctx.BuildPath, ctx.WarningsLevel)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	ctx.SketchBuildPath = sketchBuildPath
-	ctx.LibrariesBuildPath = librariesBuildPath
-	ctx.CoreBuildPath = coreBuildPath
-	ctx.WarningsLevel = warningsLevel
-
 	if ctx.BuildPath.Canonical().EqualsTo(ctx.Sketch.FullPath.Canonical()) {
 		return errors.New(tr("Sketch cannot be located in build path. Please specify a different build path"))
 	}

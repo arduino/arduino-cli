@@ -18,6 +18,7 @@ package compile
 import (
 	"context"
 	"fmt"
+	"go/build"
 	"io"
 	"sort"
 	"strings"
@@ -33,6 +34,7 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/inventory"
 	"github.com/arduino/arduino-cli/legacy/builder"
+	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
@@ -189,6 +191,25 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.BuildPath = buildPath
 	builderCtx.ProgressCB = progressCB
 
+	sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
+	if err != nil {
+		return nil, err
+	}
+	builderCtx.SketchBuildPath = sketchBuildPath
+
+	librariesBuildPath, err := buildPath.Join(constants.FOLDER_LIBRARIES).Abs()
+	if err != nil {
+		return nil, err
+	}
+	builderCtx.LibrariesBuildPath = librariesBuildPath
+
+	coreBuildPath, err := buildPath.Join(constants.FOLDER_CORE).Abs()
+	if err != nil {
+		return nil, err
+	}
+	builderCtx.CoreBuildPath = coreBuildPath
+	//ctx.WarningsLevel = warningsLevel
+
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.HardwareDirs = configuration.HardwareDirectories(configuration.Settings)
 	builderCtx.BuiltInToolsDirs = configuration.BuiltinToolsDirectories(configuration.Settings)
@@ -202,7 +223,11 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	builderCtx.Verbose = req.GetVerbose()
 	builderCtx.Jobs = int(req.GetJobs())
+
 	builderCtx.WarningsLevel = req.GetWarnings()
+	if builderCtx.WarningsLevel == "" {
+		builderCtx.WarningsLevel = builder.DEFAULT_WARNINGS_LEVEL
+	}
 
 	if req.GetBuildCachePath() == "" {
 		builderCtx.CoreBuildCachePath = paths.TempDir().Join("arduino", "cores")
