@@ -117,6 +117,10 @@ func (l *SketchLibrariesDetector) ImportedLibraries() libraries.List {
 	return l.importedLibraries
 }
 
+func (l *SketchLibrariesDetector) UseCachedLibrariesResolution() bool {
+	return l.useCachedLibrariesResolution
+}
+
 // LibrariesLoader todo
 func LibrariesLoader(
 	useCachedLibrariesResolution bool,

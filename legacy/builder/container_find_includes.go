@@ -124,7 +124,7 @@ func (s *ContainerFindIncludes) Run(ctx *types.Context) error {
 
 func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 	librariesResolutionCache := ctx.BuildPath.Join("libraries.cache")
-	if ctx.UseCachedLibrariesResolution && librariesResolutionCache.Exist() {
+	if ctx.SketchLibrariesDetector.UseCachedLibrariesResolution() && librariesResolutionCache.Exist() {
 		if d, err := librariesResolutionCache.ReadFile(); err != nil {
 			return err
 		} else if err := json.Unmarshal(d, &ctx.IncludeFolders); err != nil {
@@ -146,7 +146,7 @@ func (s *ContainerFindIncludes) findIncludes(ctx *types.Context) error {
 
 	sourceFileQueue := &types.UniqueSourceFileQueue{}
 
-	if !ctx.UseCachedLibrariesResolution {
+	if !ctx.SketchLibrariesDetector.UseCachedLibrariesResolution() {
 		sketch := ctx.Sketch
 		mergedfile, err := types.MakeSourceFile(ctx, sketch, paths.New(sketch.MainFile.Base()+".cpp"))
 		if err != nil {

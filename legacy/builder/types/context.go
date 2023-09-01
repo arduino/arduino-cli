@@ -27,7 +27,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
@@ -108,7 +107,6 @@ type Context struct {
 	ImportedLibraries            libraries.List
 	LibrariesResolutionResults   map[string]LibraryResolutionResult
 	IncludeFolders               paths.PathList
-	UseCachedLibrariesResolution bool
 
 	// C++ Parsing
 	LineOffset int

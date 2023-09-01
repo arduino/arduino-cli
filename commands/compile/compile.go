@@ -249,12 +249,12 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	}
 
 	// TODO replace all UseCache call with our SketchLibrariesDetector
-	builderCtx.UseCachedLibrariesResolution = req.GetSkipLibrariesDiscovery()
+	useCachedLibrariesResolution := req.GetSkipLibrariesDiscovery()
 	if pme.GetProfile() != nil {
 		builderCtx.LibrariesManager = lm
 	}
 	lm, libsResolver, verboseOut, err := bldr.LibrariesLoader(
-		builderCtx.UseCachedLibrariesResolution, builderCtx.LibrariesManager,
+		useCachedLibrariesResolution, builderCtx.LibrariesManager,
 		builderCtx.BuiltInLibrariesDirs, builderCtx.LibraryDirs, builderCtx.OtherLibrariesDirs,
 		builderCtx.ActualPlatform, builderCtx.TargetPlatform,
 	)
@@ -271,7 +271,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		lm, libsResolver,
 		builderCtx.ImportedLibraries,
 		builderCtx.Verbose,
-		builderCtx.UseCachedLibrariesResolution,
+		useCachedLibrariesResolution,
 		func(msg string) { builderCtx.Info(msg) },
 		func(msg string) { builderCtx.Warn(msg) },
 	)
