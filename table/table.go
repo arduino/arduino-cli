@@ -18,6 +18,7 @@ package table
 import (
 	"fmt"
 	"math"
+	"strings"
 )
 
 // ColumnWidthMode is used to configure columns type
@@ -127,6 +128,7 @@ func (t *Table) Render() string {
 
 	res := ""
 	for _, row := range t.rows {
+		line := ""
 		for x, cell := range row.cells {
 			selectedWidth := widths[x]
 			if x < len(t.columnsWidthMode) {
@@ -143,9 +145,10 @@ func (t *Table) Render() string {
 			if x > 0 {
 				line += " "
 			}
-			res += cell.Pad(selectedWidth)
+			line += cell.Pad(selectedWidth)
 		}
-		res += "\n"
+
+		res += strings.TrimRight(line, " ") + "\n"
 	}
 	return res
 }
