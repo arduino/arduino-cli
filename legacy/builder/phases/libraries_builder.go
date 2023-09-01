@@ -38,7 +38,7 @@ func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	librariesBuildPath := ctx.LibrariesBuildPath
 	buildProperties := ctx.BuildProperties
 	includes := f.Map(ctx.IncludeFolders.AsStrings(), utils.WrapWithHyphenI)
-	libs := ctx.ImportedLibraries
+	libs := ctx.SketchLibrariesDetector.ImportedLibraries()
 
 	if err := librariesBuildPath.MkdirAll(); err != nil {
 		return errors.WithStack(err)

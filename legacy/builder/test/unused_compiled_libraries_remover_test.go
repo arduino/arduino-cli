@@ -18,6 +18,7 @@ package test
 import (
 	"testing"
 
+	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -36,7 +37,10 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = temp
-	ctx.ImportedLibraries = []*libraries.Library{{Name: "Bridge"}}
+	ctx.SketchLibrariesDetector = bldr.NewSketchLibrariesDetector(
+		nil, nil, false, false, nil, nil,
+	)
+	ctx.SketchLibrariesDetector.AppendImportedLibraries(&libraries.Library{Name: "Bridge"})
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
 	err = cmd.Run(ctx)
@@ -56,7 +60,10 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 func TestUnusedCompiledLibrariesRemoverLibDoesNotExist(t *testing.T) {
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = paths.TempDir().Join("test")
-	ctx.ImportedLibraries = []*libraries.Library{{Name: "Bridge"}}
+	ctx.SketchLibrariesDetector = bldr.NewSketchLibrariesDetector(
+		nil, nil, false, false, nil, nil,
+	)
+	ctx.SketchLibrariesDetector.AppendImportedLibraries(&libraries.Library{Name: "Bridge"})
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
 	err := cmd.Run(ctx)
@@ -73,8 +80,10 @@ func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
 	NoError(t, temp.Join("dummy_file").WriteFile([]byte{}))
 
 	ctx := &types.Context{}
+	ctx.SketchLibrariesDetector = bldr.NewSketchLibrariesDetector(
+		nil, nil, false, false, nil, nil,
+	)
 	ctx.LibrariesBuildPath = temp
-	ctx.ImportedLibraries = []*libraries.Library{}
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
 	err = cmd.Run(ctx)

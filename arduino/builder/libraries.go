@@ -40,21 +40,18 @@ type SketchLibrariesDetector struct {
 	verbose                      bool
 	verboseInfoFn                func(msg string)
 	verboseWarnFn                func(msg string)
-
-	importedLibraries          libraries.List
-	librariesResolutionResults map[string]libraryResolutionResult
+	importedLibraries            libraries.List
+	librariesResolutionResults   map[string]libraryResolutionResult
 }
 
 // NewSketchLibrariesDetector todo
 func NewSketchLibrariesDetector(
 	lm *librariesmanager.LibrariesManager,
 	libsResolver *librariesresolver.Cpp,
-	importedLibraries libraries.List,
 	verbose, useCachedLibrariesResolution bool,
 	verboseInfoFn func(msg string),
 	verboseWarnFn func(msg string),
 ) *SketchLibrariesDetector {
-
 	return &SketchLibrariesDetector{
 		librariesManager:             lm,
 		librariesResolver:            libsResolver,
@@ -63,8 +60,7 @@ func NewSketchLibrariesDetector(
 		verbose:                      verbose,
 		verboseInfoFn:                verboseInfoFn,
 		verboseWarnFn:                verboseWarnFn,
-
-		importedLibraries: importedLibraries,
+		importedLibraries:            libraries.List{},
 	}
 }
 
@@ -112,14 +108,29 @@ func (l *SketchLibrariesDetector) ResolveLibrary(header, platformArch string) *l
 	return selected
 }
 
+// ImportedLibraries todo
 func (l *SketchLibrariesDetector) ImportedLibraries() libraries.List {
 	// TODO understand if we have to do a deepcopy
 	return l.importedLibraries
 }
 
+// AppendImportedLibraries todo should rename this, probably after refactoring the
+// container_find_includes command.
+func (l *SketchLibrariesDetector) AppendImportedLibraries(library *libraries.Library) {
+	l.importedLibraries = append(l.importedLibraries, library)
+}
+
+// UseCachedLibrariesResolution todo
 func (l *SketchLibrariesDetector) UseCachedLibrariesResolution() bool {
 	return l.useCachedLibrariesResolution
 }
+
+// AppendIncludeFolder todo should rename this, probably after refactoring the
+// container_find_includes command.
+//func (l *SketchLibrariesDetector) AppendIncludeFolder(ctx *types.Context, cache *includeCache, sourceFilePath *paths.Path, include string, folder *paths.Path) {
+//	ctx.IncludeFolders = append(ctx.IncludeFolders, folder)
+//	cache.ExpectEntry(sourceFilePath, include, folder)
+//}
 
 // LibrariesLoader todo
 func LibrariesLoader(

@@ -405,7 +405,7 @@ func findIncludesUntilDone(ctx *types.Context, cache *includeCache, sourceFileQu
 		// Add this library to the list of libraries, the
 		// include path and queue its source files for further
 		// include scanning
-		ctx.ImportedLibraries = append(ctx.ImportedLibraries, library)
+		ctx.SketchLibrariesDetector.AppendImportedLibraries(library)
 		appendIncludeFolder(ctx, cache, sourcePath, missingIncludeH, library.SourceDir)
 
 		if library.Precompiled && library.PrecompiledWithSources {
@@ -448,11 +448,11 @@ func ResolveLibrary(ctx *types.Context, header string) *libraries.Library {
 }
 
 func failIfImportedLibraryIsWrong(ctx *types.Context) error {
-	if len(ctx.ImportedLibraries) == 0 {
+	if len(ctx.SketchLibrariesDetector.ImportedLibraries()) == 0 {
 		return nil
 	}
 
-	for _, library := range ctx.ImportedLibraries {
+	for _, library := range ctx.SketchLibrariesDetector.ImportedLibraries() {
 		if !library.IsLegacy {
 			if library.InstallDir.Join("arch").IsDir() {
 				return errors.New(tr("%[1]s folder is no longer supported! See %[2]s for more information", "'arch'", "http://goo.gl/gfFJzU"))

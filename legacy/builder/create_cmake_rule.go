@@ -198,7 +198,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	cmakeFile := cmakeFolder.Join("CMakeLists.txt")
 
 	dynamicLibsFromPkgConfig := map[string]bool{}
-	for _, library := range ctx.ImportedLibraries {
+	for _, library := range ctx.SketchLibrariesDetector.ImportedLibraries() {
 		// Copy used libraries in the correct folder
 		libDir := libBaseFolder.Join(library.DirName)
 		mcu := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_BUILD_MCU)

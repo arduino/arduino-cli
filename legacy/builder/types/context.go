@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -104,7 +103,6 @@ type Context struct {
 
 	// Libraries handling
 	LibrariesManager             *librariesmanager.LibrariesManager
-	ImportedLibraries            libraries.List
 	LibrariesResolutionResults   map[string]LibraryResolutionResult
 	IncludeFolders               paths.PathList
 

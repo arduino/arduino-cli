@@ -269,7 +269,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	builderCtx.SketchLibrariesDetector = bldr.NewSketchLibrariesDetector(
 		lm, libsResolver,
-		builderCtx.ImportedLibraries,
 		builderCtx.Verbose,
 		useCachedLibrariesResolution,
 		func(msg string) { builderCtx.Info(msg) },
@@ -313,7 +312,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	defer func() {
 		importedLibs := []*rpc.Library{}
-		for _, lib := range builderCtx.ImportedLibraries {
+		for _, lib := range builderCtx.SketchLibrariesDetector.ImportedLibraries() {
 			rpcLib, err := lib.ToRPCLibrary()
 			if err != nil {
 				msg := tr("Error getting information for library %s", lib.Name) + ": " + err.Error() + "\n"

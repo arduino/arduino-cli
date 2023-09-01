@@ -135,7 +135,6 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		ctx.LibrariesManager = lm
 		ctx.SketchLibrariesDetector = bldr.NewSketchLibrariesDetector(
 			lm, libsResolver,
-			ctx.ImportedLibraries,
 			ctx.Verbose,
 			false,
 			func(msg string) { ctx.Info(msg) },
