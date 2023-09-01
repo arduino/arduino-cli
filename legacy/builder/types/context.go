@@ -105,7 +105,6 @@ type Context struct {
 
 	// Libraries handling
 	LibrariesManager             *librariesmanager.LibrariesManager
-	LibrariesResolver            *librariesresolver.Cpp
 	ImportedLibraries            libraries.List
 	LibrariesResolutionResults   map[string]LibraryResolutionResult
 	IncludeFolders               paths.PathList

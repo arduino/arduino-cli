@@ -263,7 +263,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	}
 
 	builderCtx.LibrariesManager = lm
-	builderCtx.LibrariesResolver = libsResolver
 	if builderCtx.Verbose {
 		builderCtx.Warn(string(verboseOut))
 	}
