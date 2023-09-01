@@ -126,13 +126,12 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 
 	if !stepToSkip[skipLibraries] {
 		lm, libsResolver, _, err := bldr.LibrariesLoader(
-			false, ctx.LibrariesManager,
+			false, nil,
 			ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
 			ctx.ActualPlatform, ctx.TargetPlatform,
 		)
 		NoError(t, err)
 
-		ctx.LibrariesManager = lm
 		ctx.SketchLibrariesDetector = bldr.NewSketchLibrariesDetector(
 			lm, libsResolver,
 			ctx.Verbose,

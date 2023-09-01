@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
@@ -102,7 +101,6 @@ type Context struct {
 	WarningsLevel string
 
 	// Libraries handling
-	LibrariesManager *librariesmanager.LibrariesManager
 	IncludeFolders   paths.PathList
 
 	// C++ Parsing

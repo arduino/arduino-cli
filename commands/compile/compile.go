@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino"
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/buildcache"
@@ -248,13 +249,13 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		}
 	}
 
-	// TODO replace all UseCache call with our SketchLibrariesDetector
-	useCachedLibrariesResolution := req.GetSkipLibrariesDiscovery()
+	var libsManager *librariesmanager.LibrariesManager
 	if pme.GetProfile() != nil {
-		builderCtx.LibrariesManager = lm
+		libsManager = lm
 	}
-	lm, libsResolver, verboseOut, err := bldr.LibrariesLoader(
-		useCachedLibrariesResolution, builderCtx.LibrariesManager,
+	useCachedLibrariesResolution := req.GetSkipLibrariesDiscovery()
+	libsManager, libsResolver, verboseOut, err := bldr.LibrariesLoader(
+		useCachedLibrariesResolution, libsManager,
 		builderCtx.BuiltInLibrariesDirs, builderCtx.LibraryDirs, builderCtx.OtherLibrariesDirs,
 		builderCtx.ActualPlatform, builderCtx.TargetPlatform,
 	)
@@ -262,13 +263,12 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		return r, &arduino.CompileFailedError{Message: err.Error()}
 	}
 
-	builderCtx.LibrariesManager = lm
 	if builderCtx.Verbose {
 		builderCtx.Warn(string(verboseOut))
 	}
 
 	builderCtx.SketchLibrariesDetector = bldr.NewSketchLibrariesDetector(
-		lm, libsResolver,
+		libsManager, libsResolver,
 		builderCtx.Verbose,
 		useCachedLibrariesResolution,
 		func(msg string) { builderCtx.Info(msg) },

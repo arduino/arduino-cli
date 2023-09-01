@@ -48,7 +48,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 
 	lm, libsResolver, _, err := builder.LibrariesLoader(
-		false, ctx.LibrariesManager,
+		false, nil,
 		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
 		ctx.ActualPlatform, ctx.TargetPlatform,
 	)
@@ -152,7 +152,7 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 
 	lm, libsResolver, _, err := builder.LibrariesLoader(
-		false, ctx.LibrariesManager,
+		false, nil,
 		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
 		ctx.ActualPlatform, ctx.TargetPlatform,
 	)
@@ -229,7 +229,7 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 
 	lm, _, _, err := builder.LibrariesLoader(
-		false, ctx.LibrariesManager,
+		false, nil,
 		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
 		ctx.ActualPlatform, ctx.TargetPlatform,
 	)
@@ -252,7 +252,7 @@ func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 
 	lm, _, _, err := builder.LibrariesLoader(
-		false, ctx.LibrariesManager,
+		false, nil,
 		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
 		ctx.ActualPlatform, ctx.TargetPlatform,
 	)
