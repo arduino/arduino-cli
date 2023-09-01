@@ -89,7 +89,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 	}
 
-	ctx.Progress.AddSubSteps(len(commands) + 4)
+	ctx.Progress.AddSubSteps(len(commands) + 5)
 	defer ctx.Progress.RemoveSubSteps()
 
 	for _, command := range commands {
