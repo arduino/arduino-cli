@@ -102,9 +102,8 @@ type Context struct {
 	WarningsLevel string
 
 	// Libraries handling
-	LibrariesManager             *librariesmanager.LibrariesManager
-	LibrariesResolutionResults   map[string]LibraryResolutionResult
-	IncludeFolders               paths.PathList
+	LibrariesManager *librariesmanager.LibrariesManager
+	IncludeFolders   paths.PathList
 
 	// C++ Parsing
 	LineOffset int

@@ -95,11 +95,6 @@ func (f *SourceFile) DepfilePath() *paths.Path {
 	return f.buildRoot.Join(f.relativePath.String() + ".d")
 }
 
-type LibraryResolutionResult struct {
-	Library          *libraries.Library
-	NotUsedLibraries []*libraries.Library
-}
-
 type Command interface {
 	Run(ctx *Context) error
 }

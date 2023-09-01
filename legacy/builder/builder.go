@@ -109,7 +109,10 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 	var otherErr error
 	commands = []types.Command{
-		&PrintUsedAndNotUsedLibraries{SketchError: mainErr != nil},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.SketchLibrariesDetector.PrintUsedAndNotUsedLibraries(mainErr != nil)
+			return nil
+		}),
 
 		&PrintUsedLibrariesIfVerbose{},
 
