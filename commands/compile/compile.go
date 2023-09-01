@@ -17,8 +17,8 @@ package compile
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"go/build"
 	"io"
 	"sort"
 	"strings"
@@ -208,7 +208,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		return nil, err
 	}
 	builderCtx.CoreBuildPath = coreBuildPath
-	//ctx.WarningsLevel = warningsLevel
+
+	if builderCtx.BuildPath.Canonical().EqualsTo(builderCtx.Sketch.FullPath.Canonical()) {
+		return nil, errors.New(tr("Sketch cannot be located in build path. Please specify a different build path"))
+	}
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.HardwareDirs = configuration.HardwareDirectories(configuration.Settings)
