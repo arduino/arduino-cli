@@ -39,18 +39,18 @@ import (
 	"go.bug.st/cleanup"
 )
 
-var (
-	portArgs arguments.Port
-	describe bool
-	configs  []string
-	quiet    bool
-	fqbn     arguments.Fqbn
-	tr       = i18n.Tr
-)
+var tr = i18n.Tr
 
 // NewCommand created a new `monitor` command
 func NewCommand() *cobra.Command {
-	var raw bool
+	var (
+		raw      bool
+		portArgs arguments.Port
+		describe bool
+		configs  []string
+		quiet    bool
+		fqbn     arguments.Fqbn
+	)
 	monitorCommand := &cobra.Command{
 		Use:   "monitor",
 		Short: tr("Open a communication port with a board."),
@@ -59,7 +59,7 @@ func NewCommand() *cobra.Command {
 			"  " + os.Args[0] + " monitor -p /dev/ttyACM0\n" +
 			"  " + os.Args[0] + " monitor -p /dev/ttyACM0 --describe",
 		Run: func(cmd *cobra.Command, args []string) {
-			runMonitorCmd(raw)
+			runMonitorCmd(&portArgs, &fqbn, configs, describe, quiet, raw)
 		},
 	}
 	portArgs.AddToCommand(monitorCommand)
@@ -72,7 +72,7 @@ func NewCommand() *cobra.Command {
 	return monitorCommand
 }
 
-func runMonitorCmd(raw bool) {
+func runMonitorCmd(portArgs *arguments.Port, fqbn *arguments.Fqbn, configs []string, describe, quiet, raw bool) {
 	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli monitor`")
 
