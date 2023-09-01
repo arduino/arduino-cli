@@ -70,7 +70,6 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 	NoError(t, err)
 
 	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.MergeSketchWithBootloader{},
 	}
 
@@ -129,7 +128,6 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	NoError(t, err)
 
 	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.MergeSketchWithBootloader{},
 	}
 
@@ -152,15 +150,6 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 
 	buildPath := ctx.BuildPath
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-	}
-
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-
 	buildProperties := ctx.BuildProperties
 	buildProperties.Remove(constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK)
 	buildProperties.Remove(constants.BUILD_PROPERTIES_BOOTLOADER_FILE)
@@ -222,7 +211,6 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 	NoError(t, err)
 
 	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
 		&builder.MergeSketchWithBootloader{},
 	}
 

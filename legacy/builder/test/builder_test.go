@@ -39,8 +39,17 @@ func cleanUpBuilderTestContext(t *testing.T, ctx *types.Context) {
 	}
 }
 
-func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *paths.Path, fqbn string) *types.Context {
+type skipContextPreparationStepName string
+
+const skipLibraries = skipContextPreparationStepName("libraries")
+
+func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *paths.Path, fqbn string, skips ...skipContextPreparationStepName) *types.Context {
 	DownloadCoresAndToolsAndLibraries(t)
+
+	stepToSkip := map[skipContextPreparationStepName]bool{}
+	for _, skip := range skips {
+		stepToSkip[skip] = true
+	}
 
 	if ctx == nil {
 		ctx = &types.Context{}
@@ -109,6 +118,30 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		ctx.TargetPackage = targetPackage
 		ctx.ActualPlatform = buildPlatform
 		ctx.RequiredTools = requiredTools
+	}
+
+	if ctx.Sketch != nil {
+		require.False(t, ctx.BuildPath.Canonical().EqualsTo(ctx.Sketch.FullPath.Canonical()))
+	}
+
+	if !stepToSkip[skipLibraries] {
+		lm, libsResolver, _, err := bldr.LibrariesLoader(
+			ctx.UseCachedLibrariesResolution, ctx.LibrariesManager,
+			ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
+			ctx.ActualPlatform, ctx.TargetPlatform,
+		)
+		NoError(t, err)
+
+		ctx.LibrariesManager = lm
+		ctx.LibrariesResolver = libsResolver
+		ctx.SketchLibrariesDetector = bldr.NewSketchLibrariesDetector(
+			lm, libsResolver,
+			ctx.ImportedLibraries,
+			ctx.Verbose,
+			ctx.UseCachedLibrariesResolution,
+			func(msg string) { ctx.Info(msg) },
+			func(msg string) { ctx.Warn(msg) },
+		)
 	}
 
 	return ctx
