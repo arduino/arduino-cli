@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/exp/slices"
 )
 
 func TestCompileOfProblematicSketches(t *testing.T) {
@@ -65,14 +66,16 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithDefaultArgs", tryBuildAvrLeonardo},
 		{"SketchWithClass", tryBuildAvrLeonardo},
 		{"SketchWithBackupFiles", testBuilderSketchWithBackupFiles},
-		{"SketchWithSubfolders", tryBuildAvrLeonardo},
+		{"SketchWithSubfolders", testBuilderSketchWithSubfolders},
 	}.Run(t, env, cli)
 }
 
 func testBuilderSketchWithConfig(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	// Compile
-	buildPath, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+	out, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
 	require.NoError(t, err)
+	buildPath := out.BuilderResult.BuildPath
+	require.NotNil(t, buildPath)
 	require.True(t, buildPath.Join("core", "HardwareSerial.cpp.o").Exist())
 	require.True(t, buildPath.Join("sketch", "SketchWithConfig.ino.cpp.o").Exist())
 	require.True(t, buildPath.Join("SketchWithConfig.ino.elf").Exist())
@@ -121,12 +124,38 @@ func testBuilderSketchWithOldLibrary(t *testing.T, env *integrationtest.Environm
 	require.NoError(t, err)
 }
 
+func testBuilderSketchWithSubfolders(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// Build
+	out, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+	importedLibraries := out.BuilderResult.UsedLibraries
+	slices.SortFunc(importedLibraries, func(x, y *builderLibrary) bool { return x.Name < y.Name })
+	require.NoError(t, err)
+	require.Equal(t, 3, len(importedLibraries))
+	require.Equal(t, "testlib1", importedLibraries[0].Name)
+	require.Equal(t, "testlib2", importedLibraries[1].Name)
+	require.Equal(t, "testlib3", importedLibraries[2].Name)
+
+	_, err = tryBuild(t, env, cli, "arduino:avr:uno")
+	require.NoError(t, err)
+}
+
 func tryBuildAvrLeonardo(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
 	require.NoError(t, err)
 }
 
-func tryBuild(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI, fqbn string) (*paths.Path, error) {
+type builderOutput struct {
+	BuilderResult struct {
+		BuildPath     *paths.Path       `json:"build_path"`
+		UsedLibraries []*builderLibrary `json:"used_libraries"`
+	} `json:"builder_result"`
+}
+
+type builderLibrary struct {
+	Name string `json:"Name"`
+}
+
+func tryBuild(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI, fqbn string) (*builderOutput, error) {
 	subTestName := filepath.Base(t.Name())
 	sketchPath, err := paths.New("testdata", subTestName).Abs()
 	require.NoError(t, err)
@@ -134,14 +163,9 @@ func tryBuild(t *testing.T, env *integrationtest.Environment, cli *integrationte
 	require.NoError(t, err)
 	jsonOut, _, err := cli.Run("compile", "-b", fqbn, "--libraries", libsPath.String(), "--clean", "--format", "json", sketchPath.String())
 	//require.NoError(t, err)
-	var builderOutput struct {
-		BuilderResult struct {
-			BuildPath *paths.Path `json:"build_path"`
-		} `json:"builder_result"`
-	}
-	require.NoError(t, json.Unmarshal(jsonOut, &builderOutput))
-	require.NotNil(t, builderOutput.BuilderResult.BuildPath)
-	return builderOutput.BuilderResult.BuildPath, err
+	var out builderOutput
+	require.NoError(t, json.Unmarshal(jsonOut, &out))
+	return &out, err
 }
 
 func tryPreprocessAvrLeonardo(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {

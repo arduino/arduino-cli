@@ -220,30 +220,3 @@ func TestIncludesToIncludeFoldersDuplicateLibs2(t *testing.T) {
 	require.Equal(t, "USBHost", importedLibraries[0].Name)
 	requireEquivalentPaths(t, importedLibraries[0].SourceDir.String(), filepath.Join("libraries", "USBHost", "src"))
 }
-
-func TestIncludesToIncludeFoldersSubfolders(t *testing.T) {
-	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch_with_subfolders", "sketch_with_subfolders.ino"), "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-	ctx.Verbose = true
-
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-
-	importedLibraries := ctx.ImportedLibraries
-	sort.Sort(ByLibraryName(importedLibraries))
-	require.Equal(t, 3, len(importedLibraries))
-	require.Equal(t, "testlib1", importedLibraries[0].Name)
-	require.Equal(t, "testlib2", importedLibraries[1].Name)
-	require.Equal(t, "testlib3", importedLibraries[2].Name)
-}

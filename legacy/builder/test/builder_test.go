@@ -30,7 +30,6 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
 
@@ -256,17 +255,6 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 	exist, err = buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
-}
-
-func TestBuilderSketchWithSubfolders(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
-	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch_with_subfolders", "sketch_with_subfolders.ino"), "arduino:avr:uno")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	// Run builder
-	command := builder.Builder{}
-	err := command.Run(ctx)
-	NoError(t, err)
 }
 
 func TestBuilderSketchBuildPathContainsUnusedPreviouslyCompiledLibrary(t *testing.T) {
