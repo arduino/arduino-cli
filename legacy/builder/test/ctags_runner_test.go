@@ -62,19 +62,6 @@ func TestCTagsRunner(t *testing.T) {
 	require.Equal(t, expectedOutput, strings.Replace(string(ctagsOutput), "\r\n", "\n", -1))
 }
 
-func TestCTagsRunnerSketchWithClass(t *testing.T) {
-	sketchLocation := Abs(t, paths.New("sketch_with_class", "sketch_with_class.ino"))
-	ctagsOutput := ctagsRunnerTestTemplate(t, sketchLocation)
-
-	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
-	expectedOutput := "set_values\t" + quotedSketchLocation + "\t/^    void set_values (int,int);$/;\"\tkind:prototype\tline:4\tclass:Rectangle\tsignature:(int,int)\treturntype:void\n" +
-		"area\t" + quotedSketchLocation + "\t/^    int area() {return width*height;}$/;\"\tkind:function\tline:5\tclass:Rectangle\tsignature:()\treturntype:int\n" +
-		"set_values\t" + quotedSketchLocation + "\t/^void Rectangle::set_values (int x, int y) {$/;\"\tkind:function\tline:8\tclass:Rectangle\tsignature:(int x, int y)\treturntype:void\n" +
-		"setup\t" + quotedSketchLocation + "\t/^void setup() {$/;\"\tkind:function\tline:13\tsignature:()\treturntype:void\n" +
-		"loop\t" + quotedSketchLocation + "\t/^void loop() {$/;\"\tkind:function\tline:17\tsignature:()\treturntype:void\n"
-	require.Equal(t, expectedOutput, strings.Replace(string(ctagsOutput), "\r\n", "\n", -1))
-}
-
 func TestCTagsRunnerSketchWithTypename(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("sketch_with_typename", "sketch_with_typename.ino"))
 	ctagsOutput := ctagsRunnerTestTemplate(t, sketchLocation)

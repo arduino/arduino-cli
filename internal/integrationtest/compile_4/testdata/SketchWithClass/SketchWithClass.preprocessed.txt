@@ -1,3 +1,5 @@
+#include <Arduino.h>
+#line 1 {{QuoteCppString .sketchMainFile}}
 class Rectangle {
     int width, height;
   public:
@@ -10,6 +12,11 @@ void Rectangle::set_values (int x, int y) {
   height = y;
 }
 
+#line 13 {{QuoteCppString .sketchMainFile}}
+void setup();
+#line 17 {{QuoteCppString .sketchMainFile}}
+void loop();
+#line 13 {{QuoteCppString .sketchMainFile}}
 void setup() {
 
 }
