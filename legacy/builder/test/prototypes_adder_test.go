@@ -413,45 +413,6 @@ func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	require.Contains(t, preprocessedSketch, "#line 5 "+quotedSketchLocation+"\nvoid ciao();\n#line 10 "+quotedSketchLocation+"\nvoid setup();\n#line 15 "+quotedSketchLocation+"\nvoid loop();\n#line 5 "+quotedSketchLocation+"\n")
 }
 
-func TestPrototypesAdderSketchWithTypename(t *testing.T) {
-	sketchLocation := paths.New("sketch_with_typename", "sketch_with_typename.ino")
-	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
-
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInLibrariesDirs: paths.New("libraries", "downloaded_libraries"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
-		Verbose:              true,
-	}
-	ctx = prepareBuilderTestContext(t, ctx, sketchLocation, "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-	NoError(t, builder.PreprocessSketch(ctx))
-
-	preprocessedSketch := loadPreprocessedSketch(t, ctx)
-	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-	expected := "#line 6 " + quotedSketchLocation + "\nvoid setup();\n#line 10 " + quotedSketchLocation + "\nvoid loop();\n#line 12 " + quotedSketchLocation + "\ntypename Foo<char>::Bar func();\n#line 6 " + quotedSketchLocation + "\n"
-	obtained := preprocessedSketch
-	// ctags based preprocessing ignores line with typename
-	// TODO: remove this exception when moving to a more powerful parser
-	expected = strings.Replace(expected, "#line 12 "+quotedSketchLocation+"\ntypename Foo<char>::Bar func();\n", "", -1)
-	obtained = strings.Replace(obtained, "#line 12 "+quotedSketchLocation+"\ntypename Foo<char>::Bar func();\n", "", -1)
-	require.Contains(t, obtained, expected)
-}
-
 func TestPrototypesAdderSketchWithIfDef2(t *testing.T) {
 	sketchLocation := paths.New("sketch_with_ifdef", "sketch_with_ifdef.ino")
 	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())

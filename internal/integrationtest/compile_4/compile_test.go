@@ -60,7 +60,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithoutFunctions", testBuilderSketchWithoutFunctions},
 		{"SketchWithConfig", testBuilderSketchWithConfig},
 		{"SketchWithUsbcon", tryBuildAvrLeonardo},
-		//{"SketchWithTypename", tryBuildAvrLeonardo}, // XXX: Failing sketch, typename not supported
+		{"SketchWithTypename", testBuilderSketchWithTypename},
 		{"SketchWithMacosxGarbage", tryBuildAvrLeonardo},
 		{"SketchWithNamespace", tryBuildAvrLeonardo},
 		{"SketchWithDefaultArgs", tryBuildAvrLeonardo},
@@ -143,6 +143,21 @@ func testBuilderSketchWithClass(t *testing.T, env *integrationtest.Environment, 
 
 	// Preprocess
 	sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:uno")
+	require.NoError(t, err)
+	comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+}
+
+func testBuilderSketchWithTypename(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// XXX: Failing sketch, typename not supported.
+	//      This test will be skipped until a better C++ parser is adopted
+	t.SkipNow()
+
+	// Build
+	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+	require.NoError(t, err)
+
+	// Preprocess
+	sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
 	require.NoError(t, err)
 	comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
 }

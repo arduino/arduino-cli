@@ -1,0 +1,24 @@
+#include <Arduino.h>
+#line 1 {{QuoteCppString .sketchMainFile}}
+template< typename T >
+  struct Foo{
+    typedef T Bar;
+};
+
+#line 6 {{QuoteCppString .sketchMainFile}}
+void setup();
+#line 10 {{QuoteCppString .sketchMainFile}}
+void loop();
+#line 12
+Foo<char>::Bar func();
+#line 6 {{QuoteCppString .sketchMainFile}}
+void setup() {
+  func();
+}
+
+void loop() {}
+
+typename Foo<char>::Bar func(){
+
+}
+
