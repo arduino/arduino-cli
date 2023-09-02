@@ -83,14 +83,9 @@ func testBuilderSketchWithConfig(t *testing.T, env *integrationtest.Environment,
 	require.True(t, buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").Exist())
 
 	// Preprocessing
-	sketchPath, preprocessedSketchData, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+	sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
 	require.NoError(t, err)
-	preprocessedSketch := string(preprocessedSketchData)
-	quotedSketchMainFile := cpp.QuoteString(sketchPath.Join(sketchPath.Base() + ".ino").String())
-	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchMainFile+"\n")
-	require.Contains(t, preprocessedSketch, "#line 13 "+quotedSketchMainFile+"\nvoid setup();\n#line 17 "+quotedSketchMainFile+"\nvoid loop();\n#line 13 "+quotedSketchMainFile+"\n")
-	preprocessed := loadPreprocessedGoldenFileAndInterpolate(t, sketchPath)
-	require.Equal(t, preprocessed, strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
+	comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
 }
 
 func testBuilderSketchWithoutFunctions(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
@@ -147,11 +142,9 @@ func testBuilderSketchWithClass(t *testing.T, env *integrationtest.Environment, 
 	require.NoError(t, err)
 
 	// Preprocess
-	sketchPath, preprocessedSketchData, err := tryPreprocess(t, env, cli, "arduino:avr:uno")
+	sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:uno")
 	require.NoError(t, err)
-	preprocessedSketch := string(preprocessedSketchData)
-	preprocessed := loadPreprocessedGoldenFileAndInterpolate(t, sketchPath)
-	require.Equal(t, preprocessed, strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
+	comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
 }
 
 func tryBuildAvrLeonardo(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
@@ -196,7 +189,9 @@ func tryPreprocess(t *testing.T, env *integrationtest.Environment, cli *integrat
 	return sketchPath, out, err
 }
 
-func loadPreprocessedGoldenFileAndInterpolate(t *testing.T, sketchDir *paths.Path) string {
+func comparePreprocessGoldenFile(t *testing.T, sketchDir *paths.Path, preprocessedSketchData []byte) {
+	preprocessedSketch := string(preprocessedSketchData)
+
 	sketchName := sketchDir.Base()
 	sketchMainFile := sketchDir.Join(sketchName + ".ino")
 	sketchTemplate := sketchDir.Join(sketchName + ".preprocessed.txt")
@@ -216,5 +211,5 @@ func loadPreprocessedGoldenFileAndInterpolate(t *testing.T, sketchDir *paths.Pat
 	err = tpl.Execute(&buf, data)
 	require.NoError(t, err)
 
-	return buf.String()
+	require.Equal(t, buf.String(), strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
 }
