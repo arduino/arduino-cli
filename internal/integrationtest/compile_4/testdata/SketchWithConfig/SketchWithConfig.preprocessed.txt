@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#line 1 {{QuoteCppString .sketch.MainFile}}
+#line 1 {{QuoteCppString .sketchMainFile}}
 #include "config.h"
 
 #ifdef DEBUG
@@ -12,11 +12,11 @@
 
 #include <Bridge.h>
 
-#line 13 {{QuoteCppString .sketch.MainFile}}
+#line 13 {{QuoteCppString .sketchMainFile}}
 void setup();
-#line 17 {{QuoteCppString .sketch.MainFile}}
+#line 17 {{QuoteCppString .sketchMainFile}}
 void loop();
-#line 13 {{QuoteCppString .sketch.MainFile}}
+#line 13 {{QuoteCppString .sketchMainFile}}
 void setup() {
 
 }

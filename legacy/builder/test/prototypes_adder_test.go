@@ -251,38 +251,6 @@ func TestPrototypesAdderSketchWithStruct(t *testing.T) {
 	require.Equal(t, preprocessed, obtained)
 }
 
-func TestPrototypesAdderSketchWithConfig(t *testing.T) {
-	sketchLocation := paths.New("sketch_with_config", "sketch_with_config.ino")
-	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
-
-	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	ctx.Verbose = true
-
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-	NoError(t, builder.PreprocessSketch(ctx))
-
-	preprocessedSketch := loadPreprocessedSketch(t, ctx)
-	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-	require.Contains(t, preprocessedSketch, "#line 13 "+quotedSketchLocation+"\nvoid setup();\n#line 17 "+quotedSketchLocation+"\nvoid loop();\n#line 13 "+quotedSketchLocation+"\n")
-
-	preprocessed := LoadAndInterpolate(t, filepath.Join("sketch_with_config", "sketch_with_config.preprocessed.txt"), ctx)
-	require.Equal(t, preprocessed, strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
-}
-
 func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 	sketchLocation := paths.New("sketch_no_functions_two_files", "sketch_no_functions_two_files.ino")
 	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
