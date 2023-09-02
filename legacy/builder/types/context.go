@@ -23,6 +23,7 @@ import (
 	"sync"
 
 	"github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -62,7 +63,7 @@ func (p *ProgressStruct) CompleteStep() {
 // Context structure
 type Context struct {
 	Builder                 *builder.Builder
-	SketchLibrariesDetector *builder.SketchLibrariesDetector
+	SketchLibrariesDetector *detector.SketchLibrariesDetector
 
 	// Build options
 	HardwareDirs         paths.PathList
@@ -99,9 +100,6 @@ type Context struct {
 
 	Sketch        *sketch.Sketch
 	WarningsLevel string
-
-	// Libraries handling
-	IncludeFolders   paths.PathList
 
 	// C++ Parsing
 	LineOffset int

@@ -24,16 +24,15 @@ import (
 	"strings"
 	"sync"
 
+	bUtils "github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/i18n"
-	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 var tr = i18n.Tr
@@ -48,7 +47,7 @@ func DirContentIsOlderThan(dir *paths.Path, target *paths.Path, extensions ...st
 	}
 	targetModTime := targetStat.ModTime()
 
-	files, err := utils.FindFilesInFolder(dir, true, extensions...)
+	files, err := bUtils.FindFilesInFolder(dir, true, extensions...)
 	if err != nil {
 		return false, err
 	}
@@ -78,7 +77,7 @@ func compileFiles(ctx *types.Context, sourceDir *paths.Path, recurse bool, build
 		validExtensions = append(validExtensions, ext)
 	}
 
-	sources, err := utils.FindFilesInFolder(sourceDir, recurse, validExtensions...)
+	sources, err := bUtils.FindFilesInFolder(sourceDir, recurse, validExtensions...)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +168,7 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 		return nil, errors.WithStack(err)
 	}
 
-	objIsUpToDate, err := ObjFileIsUpToDate(source, objectFile, depsFile)
+	objIsUpToDate, err := bUtils.ObjFileIsUpToDate(source, objectFile, depsFile)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -203,120 +202,6 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 	}
 
 	return objectFile, nil
-}
-
-func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool, error) {
-	logrus.Debugf("Checking previous results for %v (result = %v, dep = %v)", sourceFile, objectFile, dependencyFile)
-	if objectFile == nil || dependencyFile == nil {
-		logrus.Debugf("Not found: nil")
-		return false, nil
-	}
-
-	sourceFile = sourceFile.Clean()
-	sourceFileStat, err := sourceFile.Stat()
-	if err != nil {
-		return false, errors.WithStack(err)
-	}
-
-	objectFile = objectFile.Clean()
-	objectFileStat, err := objectFile.Stat()
-	if err != nil {
-		if os.IsNotExist(err) {
-			logrus.Debugf("Not found: %v", objectFile)
-			return false, nil
-		} else {
-			return false, errors.WithStack(err)
-		}
-	}
-
-	dependencyFile = dependencyFile.Clean()
-	dependencyFileStat, err := dependencyFile.Stat()
-	if err != nil {
-		if os.IsNotExist(err) {
-			logrus.Debugf("Not found: %v", dependencyFile)
-			return false, nil
-		} else {
-			return false, errors.WithStack(err)
-		}
-	}
-
-	if sourceFileStat.ModTime().After(objectFileStat.ModTime()) {
-		logrus.Debugf("%v newer than %v", sourceFile, objectFile)
-		return false, nil
-	}
-	if sourceFileStat.ModTime().After(dependencyFileStat.ModTime()) {
-		logrus.Debugf("%v newer than %v", sourceFile, dependencyFile)
-		return false, nil
-	}
-
-	rows, err := dependencyFile.ReadFileAsLines()
-	if err != nil {
-		return false, errors.WithStack(err)
-	}
-
-	rows = f.Map(rows, removeEndingBackSlash)
-	rows = f.Map(rows, strings.TrimSpace)
-	rows = f.Map(rows, unescapeDep)
-	rows = f.Filter(rows, f.NotEquals(""))
-
-	if len(rows) == 0 {
-		return true, nil
-	}
-
-	firstRow := rows[0]
-	if !strings.HasSuffix(firstRow, ":") {
-		logrus.Debugf("No colon in first line of depfile")
-		return false, nil
-	}
-	objFileInDepFile := firstRow[:len(firstRow)-1]
-	if objFileInDepFile != objectFile.String() {
-		logrus.Debugf("Depfile is about different file: %v", objFileInDepFile)
-		return false, nil
-	}
-
-	// The first line of the depfile contains the path to the object file to generate.
-	// The second line of the depfile contains the path to the source file.
-	// All subsequent lines contain the header files necessary to compile the object file.
-
-	// If we don't do this check it might happen that trying to compile a source file
-	// that has the same name but a different path wouldn't recreate the object file.
-	if sourceFile.String() != strings.Trim(rows[1], " ") {
-		return false, nil
-	}
-
-	rows = rows[1:]
-	for _, row := range rows {
-		depStat, err := os.Stat(row)
-		if err != nil && !os.IsNotExist(err) {
-			// There is probably a parsing error of the dep file
-			// Ignore the error and trigger a full rebuild anyway
-			logrus.WithError(err).Debugf("Failed to read: %v", row)
-			return false, nil
-		}
-		if os.IsNotExist(err) {
-			logrus.Debugf("Not found: %v", row)
-			return false, nil
-		}
-		if depStat.ModTime().After(objectFileStat.ModTime()) {
-			logrus.Debugf("%v newer than %v", row, objectFile)
-			return false, nil
-		}
-	}
-
-	return true, nil
-}
-
-func unescapeDep(s string) string {
-	s = strings.Replace(s, "\\ ", " ", -1)
-	s = strings.Replace(s, "\\\t", "\t", -1)
-	s = strings.Replace(s, "\\#", "#", -1)
-	s = strings.Replace(s, "$$", "$", -1)
-	s = strings.Replace(s, "\\\\", "\\", -1)
-	return s
-}
-
-func removeEndingBackSlash(s string) string {
-	return strings.TrimSuffix(s, "\\")
 }
 
 func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile *paths.Path, objectFilesToArchive paths.PathList, buildProperties *properties.Map) (*paths.Path, error) {

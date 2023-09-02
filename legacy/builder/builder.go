@@ -52,7 +52,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		utils.LogIfVerbose(false, tr("Detecting libraries used...")),
-		&ContainerFindIncludes{},
+		findIncludes(ctx),
 
 		&WarnAboutArchIncompatibleLibraries{},
 
@@ -144,7 +144,7 @@ func PreprocessSketch(ctx *types.Context) error {
 		preprocessorImpl = preprocessor.PreprocessSketchWithArduinoPreprocessor
 	}
 	normalOutput, verboseOutput, err := preprocessorImpl(
-		ctx.Sketch, ctx.BuildPath, ctx.IncludeFolders, ctx.LineOffset,
+		ctx.Sketch, ctx.BuildPath, ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset,
 		ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)
 	if ctx.Verbose {
 		ctx.WriteStdout(verboseOutput)
@@ -172,7 +172,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 			return _err
 		}),
 
-		&ContainerFindIncludes{},
+		findIncludes(ctx),
 
 		&WarnAboutArchIncompatibleLibraries{},
 
@@ -219,4 +219,20 @@ func RunBuilder(ctx *types.Context) error {
 func RunPreprocess(ctx *types.Context) error {
 	command := Preprocess{}
 	return command.Run(ctx)
+}
+
+func findIncludes(ctx *types.Context) types.BareCommand {
+	return types.BareCommand(func(ctx *types.Context) error {
+		ctx.SketchLibrariesDetector.FindIncludes(
+			ctx.BuildPath,
+			ctx.BuildProperties.GetPath("build.core.path"),
+			ctx.BuildProperties.GetPath("build.variant.path"),
+			ctx.SketchBuildPath,
+			ctx.Sketch,
+			ctx.LibrariesBuildPath,
+			ctx.BuildProperties,
+			ctx.TargetPlatform.Platform.Architecture,
+		)
+		return nil
+	})
 }

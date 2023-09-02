@@ -24,6 +24,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -254,7 +255,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		libsManager = lm
 	}
 	useCachedLibrariesResolution := req.GetSkipLibrariesDiscovery()
-	libsManager, libsResolver, verboseOut, err := bldr.LibrariesLoader(
+	libsManager, libsResolver, verboseOut, err := detector.LibrariesLoader(
 		useCachedLibrariesResolution, libsManager,
 		builderCtx.BuiltInLibrariesDirs, builderCtx.LibraryDirs, builderCtx.OtherLibrariesDirs,
 		builderCtx.ActualPlatform, builderCtx.TargetPlatform,
@@ -267,12 +268,15 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		builderCtx.Warn(string(verboseOut))
 	}
 
-	builderCtx.SketchLibrariesDetector = bldr.NewSketchLibrariesDetector(
+	builderCtx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
 		libsManager, libsResolver,
 		builderCtx.Verbose,
 		useCachedLibrariesResolution,
+		req.GetCreateCompilationDatabaseOnly(),
 		func(msg string) { builderCtx.Info(msg) },
 		func(msg string) { builderCtx.Warn(msg) },
+		func(data []byte) { builderCtx.WriteStdout(data) },
+		func(data []byte) { builderCtx.WriteStderr(data) },
 	)
 
 	defer func() {

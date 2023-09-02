@@ -136,8 +136,11 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 			lm, libsResolver,
 			ctx.Verbose,
 			false,
+			false,
 			func(msg string) { ctx.Info(msg) },
 			func(msg string) { ctx.Warn(msg) },
+			func(data []byte) { ctx.WriteStdout(data) },
+			func(data []byte) { ctx.WriteStderr(data) },
 		)
 	}
 

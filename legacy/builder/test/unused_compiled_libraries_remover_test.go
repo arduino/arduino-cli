@@ -38,7 +38,7 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = temp
 	ctx.SketchLibrariesDetector = bldr.NewSketchLibrariesDetector(
-		nil, nil, false, false, nil, nil,
+		nil, nil, false, false, false, nil, nil, nil, nil,
 	)
 	ctx.SketchLibrariesDetector.AppendImportedLibraries(&libraries.Library{Name: "Bridge"})
 
@@ -61,7 +61,7 @@ func TestUnusedCompiledLibrariesRemoverLibDoesNotExist(t *testing.T) {
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = paths.TempDir().Join("test")
 	ctx.SketchLibrariesDetector = bldr.NewSketchLibrariesDetector(
-		nil, nil, false, false, nil, nil,
+		nil, nil, false, false, false, nil, nil, nil, nil,
 	)
 	ctx.SketchLibrariesDetector.AppendImportedLibraries(&libraries.Library{Name: "Bridge"})
 
@@ -81,7 +81,7 @@ func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
 
 	ctx := &types.Context{}
 	ctx.SketchLibrariesDetector = bldr.NewSketchLibrariesDetector(
-		nil, nil, false, false, nil, nil,
+		nil, nil, false, false, false, nil, nil, nil, nil,
 	)
 	ctx.LibrariesBuildPath = temp
 
