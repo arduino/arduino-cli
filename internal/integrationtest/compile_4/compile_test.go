@@ -55,7 +55,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithInlineFunction", tryBuildAvrLeonardo},
 		{"SketchWithConst", tryBuildAvrLeonardo},
 		{"SketchWithFunctionSignatureInsideIfdef", tryBuildAvrLeonardo},
-		{"SketchWithOldLibrary", tryBuildAvrLeonardo},
+		{"SketchWithOldLibrary", testBuilderSketchWithOldLibrary},
 		{"SketchWithoutFunctions", testBuilderSketchWithoutFunctions},
 		{"SketchWithConfig", testBuilderSketchWithConfig},
 		{"SketchWithUsbcon", tryBuildAvrLeonardo},
@@ -106,6 +106,14 @@ func testBuilderSketchWithoutFunctions(t *testing.T, env *integrationtest.Enviro
 }
 
 func testBuilderSketchWithBackupFiles(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// Build
+	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+	require.NoError(t, err)
+	_, err = tryBuild(t, env, cli, "arduino:avr:uno")
+	require.NoError(t, err)
+}
+
+func testBuilderSketchWithOldLibrary(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	// Build
 	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
 	require.NoError(t, err)

@@ -258,16 +258,6 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 	require.True(t, exist)
 }
 
-func TestBuilderSketchWithOldLib(t *testing.T) {
-	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch_with_old_lib", "sketch_with_old_lib.ino"), "arduino:avr:uno")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	// Run builder
-	command := builder.Builder{}
-	err := command.Run(ctx)
-	NoError(t, err)
-}
-
 func TestBuilderSketchWithSubfolders(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch_with_subfolders", "sketch_with_subfolders.ino"), "arduino:avr:uno")
