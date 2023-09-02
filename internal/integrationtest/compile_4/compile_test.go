@@ -64,7 +64,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithNamespace", tryBuildAvrLeonardo},
 		{"SketchWithDefaultArgs", tryBuildAvrLeonardo},
 		{"SketchWithClass", tryBuildAvrLeonardo},
-		{"SketchWithBackupFiles", tryBuildAvrLeonardo},
+		{"SketchWithBackupFiles", testBuilderSketchWithBackupFiles},
 		{"SketchWithSubfolders", tryBuildAvrLeonardo},
 	}.Run(t, env, cli)
 }
@@ -103,6 +103,14 @@ func testBuilderSketchWithoutFunctions(t *testing.T, env *integrationtest.Enviro
 	preprocessedSketch := string(preprocessedSketchData)
 	quotedSketchMainFile := cpp.QuoteString(sketchPath.Join(sketchPath.Base() + ".ino").String())
 	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchMainFile+"\n")
+}
+
+func testBuilderSketchWithBackupFiles(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// Build
+	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+	require.NoError(t, err)
+	_, err = tryBuild(t, env, cli, "arduino:avr:uno")
+	require.NoError(t, err)
 }
 
 func tryBuildAvrLeonardo(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {

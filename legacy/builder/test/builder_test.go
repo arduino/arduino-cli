@@ -258,22 +258,6 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 	require.True(t, exist)
 }
 
-func TestBuilderSketchWithBackup(t *testing.T) {
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "downloaded_board_manager_stuff"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools", "downloaded_board_manager_stuff"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-	}
-	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch_with_backup_files", "sketch_with_backup_files.ino"), "arduino:avr:uno")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	// Run builder
-	command := builder.Builder{}
-	err := command.Run(ctx)
-	NoError(t, err)
-}
-
 func TestBuilderSketchWithOldLib(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch_with_old_lib", "sketch_with_old_lib.ino"), "arduino:avr:uno")
 	defer cleanUpBuilderTestContext(t, ctx)
