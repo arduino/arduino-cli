@@ -62,17 +62,6 @@ func TestCTagsRunner(t *testing.T) {
 	require.Equal(t, expectedOutput, strings.Replace(string(ctagsOutput), "\r\n", "\n", -1))
 }
 
-func TestCTagsRunnerSketchWithNamespace(t *testing.T) {
-	sketchLocation := Abs(t, paths.New("sketch_with_namespace", "sketch_with_namespace.ino"))
-	ctagsOutput := ctagsRunnerTestTemplate(t, sketchLocation)
-
-	quotedSketchLocation := strings.Replace(sketchLocation.String(), "\\", "\\\\", -1)
-	expectedOutput := "value\t" + quotedSketchLocation + "\t/^\tint value() {$/;\"\tkind:function\tline:2\tnamespace:Test\tsignature:()\treturntype:int\n" +
-		"setup\t" + quotedSketchLocation + "\t/^void setup() {}$/;\"\tkind:function\tline:7\tsignature:()\treturntype:void\n" +
-		"loop\t" + quotedSketchLocation + "\t/^void loop() {}$/;\"\tkind:function\tline:8\tsignature:()\treturntype:void\n"
-	require.Equal(t, expectedOutput, strings.Replace(string(ctagsOutput), "\r\n", "\n", -1))
-}
-
 func TestCTagsRunnerSketchWithTemplates(t *testing.T) {
 	sketchLocation := Abs(t, paths.New("sketch_with_templates_and_shift", "sketch_with_templates_and_shift.ino"))
 	ctagsOutput := ctagsRunnerTestTemplate(t, sketchLocation)

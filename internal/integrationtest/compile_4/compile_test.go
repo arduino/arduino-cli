@@ -62,7 +62,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithUsbcon", tryBuildAvrLeonardo},
 		{"SketchWithTypename", testBuilderSketchWithTypename},
 		{"SketchWithMacosxGarbage", tryBuildAvrLeonardo},
-		{"SketchWithNamespace", tryBuildAvrLeonardo},
+		{"SketchWithNamespace", testBuilderSketchWithNamespace},
 		{"SketchWithDefaultArgs", tryBuildAvrLeonardo},
 		{"SketchWithClass", testBuilderSketchWithClass},
 		{"SketchWithBackupFiles", testBuilderSketchWithBackupFiles},
@@ -152,6 +152,17 @@ func testBuilderSketchWithTypename(t *testing.T, env *integrationtest.Environmen
 	//      This test will be skipped until a better C++ parser is adopted
 	t.SkipNow()
 
+	// Build
+	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+	require.NoError(t, err)
+
+	// Preprocess
+	sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+	require.NoError(t, err)
+	comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+}
+
+func testBuilderSketchWithNamespace(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	// Build
 	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
 	require.NoError(t, err)
