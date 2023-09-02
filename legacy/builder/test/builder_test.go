@@ -258,22 +258,6 @@ func TestBuilderBridgeRedBearLab(t *testing.T) {
 	require.True(t, exist)
 }
 
-func TestBuilderSketchNoFunctions(t *testing.T) {
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "downloaded_board_manager_stuff"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools", "downloaded_board_manager_stuff"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-	}
-	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch_no_functions", "sketch_no_functions.ino"), "RedBearLab:avr:blend")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	// Run builder
-	command := builder.Builder{}
-	err := command.Run(ctx)
-	require.Error(t, err)
-}
-
 func TestBuilderSketchWithBackup(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "downloaded_board_manager_stuff"),

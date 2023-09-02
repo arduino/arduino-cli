@@ -37,6 +37,16 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 	_, _, err := cli.Run("core", "install", "arduino:avr@1.8.6")
 	require.NoError(t, err)
 
+	// Install REDBear Lad platform
+	_, _, err = cli.Run("config", "init")
+	require.NoError(t, err)
+	_, _, err = cli.Run("config", "add", "board_manager.additional_urls", "https://redbearlab.github.io/arduino/package_redbearlab_index.json")
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "update-index")
+	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "RedBear:avr@1.0.0")
+	require.NoError(t, err)
+
 	// Install Libraries required for tests
 	_, _, err = cli.Run("lib", "install", "Bridge@1.6.1")
 	require.NoError(t, err)
@@ -46,7 +56,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithConst", tryBuildAvrLeonardo},
 		{"SketchWithFunctionSignatureInsideIfdef", tryBuildAvrLeonardo},
 		{"SketchWithOldLibrary", tryBuildAvrLeonardo},
-		{"SketchWithoutFunctions", tryPreprocessAvrLeonardo},
+		{"SketchWithoutFunctions", testBuilderSketchWithoutFunctions},
 		{"SketchWithConfig", testBuilderSketchWithConfig},
 		{"SketchWithUsbcon", tryBuildAvrLeonardo},
 		//{"SketchWithTypename", tryBuildAvrLeonardo}, // XXX: Failing sketch, typename not supported
@@ -61,7 +71,8 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 
 func testBuilderSketchWithConfig(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	// Compile
-	buildPath := tryBuildAvrLeonardoAndGetBuildPath(t, env, cli)
+	buildPath, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+	require.NoError(t, err)
 	require.True(t, buildPath.Join("core", "HardwareSerial.cpp.o").Exist())
 	require.True(t, buildPath.Join("sketch", "SketchWithConfig.ino.cpp.o").Exist())
 	require.True(t, buildPath.Join("SketchWithConfig.ino.elf").Exist())
@@ -69,7 +80,8 @@ func testBuilderSketchWithConfig(t *testing.T, env *integrationtest.Environment,
 	require.True(t, buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").Exist())
 
 	// Preprocessing
-	sketchPath, preprocessedSketchData := tryPreprocessAvrLeonardoAndGetResult(t, env, cli)
+	sketchPath, preprocessedSketchData, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+	require.NoError(t, err)
 	preprocessedSketch := string(preprocessedSketchData)
 	quotedSketchMainFile := cpp.QuoteString(sketchPath.Join(sketchPath.Base() + ".ino").String())
 	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchMainFile+"\n")
@@ -78,39 +90,55 @@ func testBuilderSketchWithConfig(t *testing.T, env *integrationtest.Environment,
 	require.Equal(t, preprocessed, strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
 }
 
-func tryBuildAvrLeonardo(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
-	_ = tryBuildAvrLeonardoAndGetBuildPath(t, env, cli)
+func testBuilderSketchWithoutFunctions(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// Build
+	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+	require.Error(t, err)
+	_, err = tryBuild(t, env, cli, "RedBear:avr:blend")
+	require.Error(t, err)
+
+	// Preprocess
+	sketchPath, preprocessedSketchData, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+	require.NoError(t, err)
+	preprocessedSketch := string(preprocessedSketchData)
+	quotedSketchMainFile := cpp.QuoteString(sketchPath.Join(sketchPath.Base() + ".ino").String())
+	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchMainFile+"\n")
 }
 
-func tryBuildAvrLeonardoAndGetBuildPath(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) *paths.Path {
+func tryBuildAvrLeonardo(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+	require.NoError(t, err)
+}
+
+func tryBuild(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI, fqbn string) (*paths.Path, error) {
 	subTestName := filepath.Base(t.Name())
 	sketchPath, err := paths.New("testdata", subTestName).Abs()
 	require.NoError(t, err)
 	libsPath, err := paths.New("testdata", "libraries").Abs()
 	require.NoError(t, err)
-	jsonOut, _, err := cli.Run("compile", "-b", "arduino:avr:leonardo", "--libraries", libsPath.String(), "--format", "json", sketchPath.String())
-	require.NoError(t, err)
+	jsonOut, _, err := cli.Run("compile", "-b", fqbn, "--libraries", libsPath.String(), "--clean", "--format", "json", sketchPath.String())
+	//require.NoError(t, err)
 	var builderOutput struct {
 		BuilderResult struct {
 			BuildPath *paths.Path `json:"build_path"`
 		} `json:"builder_result"`
 	}
-	require.NotNil(t, builderOutput.BuilderResult.BuildPath)
 	require.NoError(t, json.Unmarshal(jsonOut, &builderOutput))
-	return builderOutput.BuilderResult.BuildPath
+	require.NotNil(t, builderOutput.BuilderResult.BuildPath)
+	return builderOutput.BuilderResult.BuildPath, err
 }
 
 func tryPreprocessAvrLeonardo(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
-	_, _ = tryPreprocessAvrLeonardoAndGetResult(t, env, cli)
+	_, _, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+	require.NoError(t, err)
 }
 
-func tryPreprocessAvrLeonardoAndGetResult(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) (*paths.Path, []byte) {
+func tryPreprocess(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI, fqbn string) (*paths.Path, []byte, error) {
 	subTestName := filepath.Base(t.Name())
 	sketchPath, err := paths.New("testdata", subTestName).Abs()
 	require.NoError(t, err)
-	out, _, err := cli.Run("compile", "-b", "arduino:avr:leonardo", "--preprocess", sketchPath.String())
-	require.NoError(t, err)
-	return sketchPath, out
+	out, _, err := cli.Run("compile", "-b", fqbn, "--preprocess", sketchPath.String())
+	return sketchPath, out, err
 }
 
 func loadPreprocessedGoldenFileAndInterpolate(t *testing.T, sketchDir *paths.Path) string {
