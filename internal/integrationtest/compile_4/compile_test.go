@@ -87,6 +87,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithIncludeBetweenMultilineComment", testBuilderSketchWithIncludeBetweenMultilineComment},
 		{"SketchWithLineContinuations", testBuilderSketchWithLineContinuations},
 		{"SketchWithStringWithComment", testBuilderSketchWithStringWithComment},
+		{"SketchWithStruct", testBuilderSketchWithStruct},
 	}.Run(t, env, cli)
 }
 
@@ -446,6 +447,21 @@ func testBuilderSketchWithLineContinuations(t *testing.T, env *integrationtest.E
 }
 
 func testBuilderSketchWithStringWithComment(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchWithStruct(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	t.Run("Build", func(t *testing.T) {
 		// Build
 		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")

@@ -17,8 +17,6 @@
 package test
 
 import (
-	"path/filepath"
-	"strings"
 	"testing"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
@@ -33,37 +31,6 @@ func loadPreprocessedSketch(t *testing.T, ctx *types.Context) string {
 	res, err := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp").ReadFile()
 	NoError(t, err)
 	return string(res)
-}
-
-func TestPrototypesAdderSketchWithStruct(t *testing.T) {
-	ctx := prepareBuilderTestContext(t, nil, paths.New("SketchWithStruct", "SketchWithStruct.ino"), "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	ctx.Verbose = true
-
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-	NoError(t, builder.PreprocessSketch(ctx))
-
-	preprocessed := LoadAndInterpolate(t, filepath.Join("SketchWithStruct", "SketchWithStruct.preprocessed.txt"), ctx)
-	preprocessedSketch := loadPreprocessedSketch(t, ctx)
-	obtained := strings.Replace(preprocessedSketch, "\r\n", "\n", -1)
-	// ctags based preprocessing removes the space after "dostuff", but this is still OK
-	// TODO: remove this exception when moving to a more powerful parser
-	preprocessed = strings.Replace(preprocessed, "void dostuff (A_NEW_TYPE * bar);", "void dostuff(A_NEW_TYPE * bar);", 1)
-	obtained = strings.Replace(obtained, "void dostuff (A_NEW_TYPE * bar);", "void dostuff(A_NEW_TYPE * bar);", 1)
-	require.Equal(t, preprocessed, obtained)
 }
 
 func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {

@@ -58,10 +58,6 @@ func TestTryBuild023(t *testing.T) {
 	tryBuild(t, paths.New("sketch1", "sketch1.ino"))
 }
 
-func TestTryBuild030(t *testing.T) {
-	tryBuild(t, paths.New("SketchWithStruct", "SketchWithStruct.ino"))
-}
-
 func TestTryBuild031(t *testing.T) {
 	tryBuild(t, paths.New("sketch9", "sketch9.ino"))
 }
