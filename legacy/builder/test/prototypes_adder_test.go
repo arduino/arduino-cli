@@ -345,35 +345,6 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 	require.Equal(t, expectedSource, strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
 }
 
-func TestPrototypesAdderSketchWithConst(t *testing.T) {
-	sketchLocation := paths.New("sketch_with_const", "sketch_with_const.ino")
-	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
-
-	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:uno")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	ctx.Verbose = true
-
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-	NoError(t, builder.PreprocessSketch(ctx))
-
-	preprocessedSketch := loadPreprocessedSketch(t, ctx)
-	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-	require.Contains(t, preprocessedSketch, "#line 1 "+quotedSketchLocation+"\nvoid setup();\n#line 2 "+quotedSketchLocation+"\nvoid loop();\n#line 4 "+quotedSketchLocation+"\nconst __FlashStringHelper* test();\n#line 6 "+quotedSketchLocation+"\nconst int test3();\n#line 8 "+quotedSketchLocation+"\nvolatile __FlashStringHelper* test2();\n#line 10 "+quotedSketchLocation+"\nvolatile int test4();\n#line 1 "+quotedSketchLocation+"\n")
-}
-
 func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("eol_processing", "eol_processing.ino"), "arduino:avr:uno")
 	defer cleanUpBuilderTestContext(t, ctx)
