@@ -35,35 +35,6 @@ func loadPreprocessedSketch(t *testing.T, ctx *types.Context) string {
 	return string(res)
 }
 
-func TestPrototypesAdderBridgeExample(t *testing.T) {
-	sketchLocation := paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino")
-	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
-
-	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	ctx.Verbose = true
-
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-	NoError(t, builder.PreprocessSketch(ctx))
-
-	preprocessedSketch := loadPreprocessedSketch(t, ctx)
-	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-	require.Contains(t, preprocessedSketch, "#line 33 "+quotedSketchLocation+"\nvoid setup();\n#line 46 "+quotedSketchLocation+"\nvoid loop();\n#line 62 "+quotedSketchLocation+"\nvoid process(BridgeClient client);\n#line 82 "+quotedSketchLocation+"\nvoid digitalCommand(BridgeClient client);\n#line 109 "+quotedSketchLocation+"\nvoid analogCommand(BridgeClient client);\n#line 149 "+quotedSketchLocation+"\nvoid modeCommand(BridgeClient client);\n#line 33 "+quotedSketchLocation+"\n")
-}
-
 func TestPrototypesAdderBaladuino(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("Baladuino", "Baladuino.ino"), "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)

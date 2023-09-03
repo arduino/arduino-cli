@@ -74,6 +74,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithIfDef", testBuilderSketchWithIfDef},
 		{"SketchWithIfDef2", testBuilderSketchWithIfDef2},
 		{"SketchWithIfDef3", testBuilderSketchWithIfDef3},
+		{"BridgeExample", testBuilderBridgeExample},
 	}.Run(t, env, cli)
 }
 
@@ -282,6 +283,17 @@ func testBuilderSketchWithIfDef3(t *testing.T, env *integrationtest.Environment,
 
 	// Preprocess
 	sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:sam:arduino_due_x_dbg")
+	require.NoError(t, err)
+	comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+}
+
+func testBuilderBridgeExample(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// Build
+	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+	require.NoError(t, err)
+
+	// Preprocess
+	sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
 	require.NoError(t, err)
 	comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
 }
