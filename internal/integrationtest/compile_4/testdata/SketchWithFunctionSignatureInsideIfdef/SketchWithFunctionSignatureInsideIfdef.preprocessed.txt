@@ -1,3 +1,12 @@
+#include <Arduino.h>
+#line 1 {{QuoteCppString .sketchMainFile}}
+#line 1 {{QuoteCppString .sketchMainFile}}
+void setup();
+#line 3 {{QuoteCppString .sketchMainFile}}
+void loop();
+#line 15 {{QuoteCppString .sketchMainFile}}
+int8_t adalight();
+#line 1 {{QuoteCppString .sketchMainFile}}
 void setup() {}
 
 void loop() {
@@ -18,3 +27,4 @@ int8_t adalight()
   // Flag if the leds got a new frame that should be updated
   return 0;
 }
+

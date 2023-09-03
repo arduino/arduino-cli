@@ -281,35 +281,6 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 	require.Equal(t, mergedSketch, preprocessedSketch) // No prototypes added
 }
 
-func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
-	sketchLocation := paths.New("sketch_with_function_signature_inside_ifdef", "sketch_with_function_signature_inside_ifdef.ino")
-	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
-
-	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	ctx.Verbose = true
-
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-	NoError(t, builder.PreprocessSketch(ctx))
-
-	preprocessedSketch := loadPreprocessedSketch(t, ctx)
-	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-	require.Contains(t, preprocessedSketch, "#line 1 "+quotedSketchLocation+"\nvoid setup();\n#line 3 "+quotedSketchLocation+"\nvoid loop();\n#line 15 "+quotedSketchLocation+"\nint8_t adalight();\n#line 1 "+quotedSketchLocation+"\n")
-}
-
 func TestPrototypesAdderSketchWithUSBCON(t *testing.T) {
 	sketchLocation := paths.New("sketch_with_usbcon", "sketch_with_usbcon.ino")
 	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
