@@ -17,7 +17,6 @@ package test
 
 import (
 	"fmt"
-	"os/exec"
 	"path/filepath"
 	"testing"
 	"time"
@@ -122,78 +121,6 @@ func TestBuilderEmptySketch(t *testing.T) {
 	NoError(t, err)
 	require.True(t, exist)
 	exist, err = buildPath.Join("sketch1.ino.hex").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-}
-
-func TestBuilderBridgeSAM(t *testing.T) {
-	ctx := prepareBuilderTestContext(t, nil, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:sam:arduino_due_x_dbg")
-	ctx.WarningsLevel = "all"
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	// Run builder
-	command := builder.Builder{}
-	err := command.Run(ctx)
-	NoError(t, err)
-
-	buildPath := ctx.BuildPath
-	exist, err := buildPath.Join(constants.FOLDER_CORE, "syscalls_sam3.c.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join(constants.FOLDER_CORE, "USB", "PluggableUSB.cpp.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join(constants.FOLDER_CORE, "avr", "dtostrf.c.d").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "Bridge.ino.cpp.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join("Bridge.ino.elf").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join("Bridge.ino.bin").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-
-	cmd := exec.Command(filepath.Join("downloaded_tools", "arm-none-eabi-gcc", "4.8.3-2014q1", "bin", "arm-none-eabi-objdump"), "-f", buildPath.Join(constants.FOLDER_CORE, "core.a").String())
-	bytes, err := cmd.CombinedOutput()
-	NoError(t, err)
-	require.NotContains(t, string(bytes), "variant.cpp.o")
-}
-
-func TestBuilderBridgeRedBearLab(t *testing.T) {
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "downloaded_board_manager_stuff"),
-		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools", "downloaded_board_manager_stuff"),
-		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-	}
-	ctx = prepareBuilderTestContext(t, ctx, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "RedBearLab:avr:blend")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	// Run builder
-	command := builder.Builder{}
-	err := command.Run(ctx)
-	NoError(t, err)
-
-	buildPath := ctx.BuildPath
-	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "Bridge.ino.cpp.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join("Bridge.ino.elf").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join("Bridge.ino.hex").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").ExistCheck()
 	NoError(t, err)
 	require.True(t, exist)
 }

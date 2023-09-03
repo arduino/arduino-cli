@@ -18,6 +18,7 @@ package compile_test
 import (
 	"bytes"
 	"encoding/json"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -49,6 +50,11 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 	require.NoError(t, err)
 	_, _, err = cli.Run("core", "install", "RedBear:avr@1.0.0")
 	require.NoError(t, err)
+
+	// XXX: This compiler gives an error "sorry - this program has been built without plugin support"
+	//      for avr-gcc/4.8.1-arduino5/bin/avr-gcc-ar. Maybe it's a problem of the very old avr-gcc...
+	//      Removing it will enforce the builder to use the more recent avr-gcc from arduino:avr platform.
+	require.NoError(t, cli.DataDir().Join("packages", "arduino", "tools", "avr-gcc", "4.8.1-arduino5").RemoveAll())
 
 	// Install Libraries required for tests
 	_, _, err = cli.Run("lib", "install", "Bridge@1.6.1")
@@ -313,6 +319,41 @@ func testBuilderBridgeExample(t *testing.T, env *integrationtest.Environment, cl
 		require.True(t, buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").Exist())
 	}
 
+	{
+		// Build again for SAM...
+		out, err := tryBuild(t, env, cli, "arduino:sam:arduino_due_x_dbg", "all-warnings")
+		require.NoError(t, err)
+
+		buildPath := out.BuilderResult.BuildPath
+		require.True(t, buildPath.Join("core", "syscalls_sam3.c.o").Exist())
+		require.True(t, buildPath.Join("core", "USB", "PluggableUSB.cpp.o").Exist())
+		require.True(t, buildPath.Join("core", "avr", "dtostrf.c.d").Exist())
+		require.True(t, buildPath.Join("sketch", "BridgeExample.ino.cpp.o").Exist())
+		require.True(t, buildPath.Join("BridgeExample.ino.elf").Exist())
+		require.True(t, buildPath.Join("BridgeExample.ino.bin").Exist())
+		require.True(t, buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").Exist())
+
+		objdump := cli.DataDir().Join("packages", "arduino", "tools", "arm-none-eabi-gcc", "4.8.3-2014q1", "bin", "arm-none-eabi-objdump")
+		cmd := exec.Command(
+			objdump.String(),
+			"-f", buildPath.Join("core", "core.a").String())
+		bytes, err := cmd.CombinedOutput()
+		require.NoError(t, err)
+		require.NotContains(t, string(bytes), "variant.cpp.o")
+	}
+
+	{
+		// Build again for RedBearLab...
+		out, err := tryBuild(t, env, cli, "RedBear:avr:blend", "verbose")
+		require.NoError(t, err)
+		buildPath := out.BuilderResult.BuildPath
+		require.True(t, buildPath.Join("core", "HardwareSerial.cpp.o").Exist())
+		require.True(t, buildPath.Join("sketch", "BridgeExample.ino.cpp.o").Exist())
+		require.True(t, buildPath.Join("BridgeExample.ino.elf").Exist())
+		require.True(t, buildPath.Join("BridgeExample.ino.hex").Exist())
+		require.True(t, buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").Exist())
+	}
+
 	// Preprocess
 	sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
 	require.NoError(t, err)
@@ -349,6 +390,12 @@ func tryBuild(t *testing.T, env *integrationtest.Environment, cli *integrationte
 		sketchPath.String()}
 	if !slices.Contains(options, "no-clean") {
 		args = append(args, "--clean")
+	}
+	if slices.Contains(options, "all-warnings") {
+		args = append(args, "--warnings", "all")
+	}
+	if slices.Contains(options, "verbose") {
+		args = append(args, "-v")
 	}
 	jsonOut, _, err := cli.Run(args...)
 	var out builderOutput
