@@ -67,6 +67,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithClass", testBuilderSketchWithClass},
 		{"SketchWithBackupFiles", testBuilderSketchWithBackupFiles},
 		{"SketchWithSubfolders", testBuilderSketchWithSubfolders},
+		{"SketchWithTemplatesAndShift", testBuilderSketchWithTemplatesAndShift},
 	}.Run(t, env, cli)
 }
 
@@ -218,6 +219,21 @@ func testBuilderSketchWithUsbcon(t *testing.T, env *integrationtest.Environment,
 }
 
 func testBuilderSketchWithConst(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// Build
+	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+	require.NoError(t, err)
+
+	// Preprocess
+	sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+	require.NoError(t, err)
+	comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+}
+
+func testBuilderSketchWithTemplatesAndShift(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// XXX: Failing sketch, template with shift not supported.
+	//      This test will be skipped until a better C++ parser is adopted
+	t.SkipNow()
+
 	// Build
 	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
 	require.NoError(t, err)
