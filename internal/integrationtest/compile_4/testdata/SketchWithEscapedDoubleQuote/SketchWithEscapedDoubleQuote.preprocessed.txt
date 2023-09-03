@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#line 1 {{QuoteCppString .sketch.MainFile}}
+#line 1 {{QuoteCppString .sketchMainFile}}
 #include <SoftwareSerial.h> // required to send and receive AT commands from the GPRS Shield
 #include <Wire.h> // required for I2C communication with the RTC
 
@@ -38,49 +38,49 @@ Code Exclusively for GPRS shield:
 //  Default set of instructions for GPRS Shield power control
 //
 
-#line 39 {{QuoteCppString .sketch.MainFile}}
+#line 39 {{QuoteCppString .sketchMainFile}}
 void setPowerStateTo( int newState );
-#line 64 {{QuoteCppString .sketch.MainFile}}
+#line 64 {{QuoteCppString .sketchMainFile}}
 int getPowerState();
-#line 75 {{QuoteCppString .sketch.MainFile}}
+#line 75 {{QuoteCppString .sketchMainFile}}
 void powerUpOrDown();
-#line 90 {{QuoteCppString .sketch.MainFile}}
+#line 90 {{QuoteCppString .sketchMainFile}}
 void clearBufferArray();
-#line 96 {{QuoteCppString .sketch.MainFile}}
+#line 96 {{QuoteCppString .sketchMainFile}}
 void makeMissedCall( char num[] );
-#line 111 {{QuoteCppString .sketch.MainFile}}
+#line 111 {{QuoteCppString .sketchMainFile}}
 void sendTextMessage( char number[], char messg[] );
-#line 129 {{QuoteCppString .sketch.MainFile}}
+#line 129 {{QuoteCppString .sketchMainFile}}
 void analise(byte incoming[], int length);
-#line 179 {{QuoteCppString .sketch.MainFile}}
+#line 179 {{QuoteCppString .sketchMainFile}}
 byte decToBcd( byte b );
-#line 184 {{QuoteCppString .sketch.MainFile}}
+#line 184 {{QuoteCppString .sketchMainFile}}
 boolean getBit( byte addr, int pos );
-#line 190 {{QuoteCppString .sketch.MainFile}}
+#line 190 {{QuoteCppString .sketchMainFile}}
 void setBit( byte addr, int pos, boolean newBit );
-#line 204 {{QuoteCppString .sketch.MainFile}}
+#line 204 {{QuoteCppString .sketchMainFile}}
 byte getByte( byte addr );
-#line 213 {{QuoteCppString .sketch.MainFile}}
+#line 213 {{QuoteCppString .sketchMainFile}}
 boolean getBytes( byte addr, int amount );
-#line 230 {{QuoteCppString .sketch.MainFile}}
+#line 230 {{QuoteCppString .sketchMainFile}}
 void setByte( byte addr, byte newByte );
-#line 235 {{QuoteCppString .sketch.MainFile}}
+#line 235 {{QuoteCppString .sketchMainFile}}
 void setBytes( byte addr, byte newBytes[], int amount );
-#line 244 {{QuoteCppString .sketch.MainFile}}
+#line 244 {{QuoteCppString .sketchMainFile}}
 void getTime();
-#line 260 {{QuoteCppString .sketch.MainFile}}
+#line 260 {{QuoteCppString .sketchMainFile}}
 void setTime( byte newTime[ 7 ] );
-#line 267 {{QuoteCppString .sketch.MainFile}}
+#line 267 {{QuoteCppString .sketchMainFile}}
 void getRTCTemperature();
-#line 277 {{QuoteCppString .sketch.MainFile}}
+#line 277 {{QuoteCppString .sketchMainFile}}
 void gprsListen();
-#line 294 {{QuoteCppString .sketch.MainFile}}
+#line 294 {{QuoteCppString .sketchMainFile}}
 void printTime();
-#line 317 {{QuoteCppString .sketch.MainFile}}
+#line 317 {{QuoteCppString .sketchMainFile}}
 void setup();
-#line 334 {{QuoteCppString .sketch.MainFile}}
+#line 334 {{QuoteCppString .sketchMainFile}}
 void loop();
-#line 39 {{QuoteCppString .sketch.MainFile}}
+#line 39 {{QuoteCppString .sketchMainFile}}
 void setPowerStateTo( int newState )
 {
   if( newState != 1 && newState != 0 ) { // tests for an invalid state. In this case no change is made to powerstate

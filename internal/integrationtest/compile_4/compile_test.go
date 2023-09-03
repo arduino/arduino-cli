@@ -81,6 +81,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithIfDef3", testBuilderSketchWithIfDef3},
 		{"BridgeExample", testBuilderBridgeExample},
 		{"Baladuino", testBuilderBaladuino},
+		{"SketchWithEscapedDoubleQuote", testBuilderSketchWithEscapedDoubleQuote},
 	}.Run(t, env, cli)
 }
 
@@ -384,6 +385,21 @@ func testBuilderBaladuino(t *testing.T, env *integrationtest.Environment, cli *i
 		output, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
 		require.NoError(t, err)
 		require.Empty(t, output.BuilderResult.UsedLibraries)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchWithEscapedDoubleQuote(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
 	})
 
 	t.Run("Preprocess", func(t *testing.T) {
