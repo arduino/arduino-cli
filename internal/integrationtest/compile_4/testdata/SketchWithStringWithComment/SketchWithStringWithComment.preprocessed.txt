@@ -1,10 +1,10 @@
 #include <Arduino.h>
-#line 1 {{QuoteCppString .sketch.MainFile}}
-#line 1 {{QuoteCppString .sketch.MainFile}}
+#line 1 {{QuoteCppString .sketchMainFile}}
+#line 1 {{QuoteCppString .sketchMainFile}}
 void setup();
-#line 10 {{QuoteCppString .sketch.MainFile}}
+#line 10 {{QuoteCppString .sketchMainFile}}
 void loop();
-#line 1 {{QuoteCppString .sketch.MainFile}}
+#line 1 {{QuoteCppString .sketchMainFile}}
 void setup() {
   // put your setup code here, to run once:
   // "comment with a double quote
