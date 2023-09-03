@@ -288,9 +288,30 @@ func testBuilderSketchWithIfDef3(t *testing.T, env *integrationtest.Environment,
 }
 
 func testBuilderBridgeExample(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
-	// Build
-	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
-	require.NoError(t, err)
+	{
+		// Build
+		out, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+
+		buildPath := out.BuilderResult.BuildPath
+		require.True(t, buildPath.Join("core", "HardwareSerial.cpp.o").Exist())
+		require.True(t, buildPath.Join("sketch", "BridgeExample.ino.cpp.o").Exist())
+		require.True(t, buildPath.Join("BridgeExample.ino.elf").Exist())
+		require.True(t, buildPath.Join("BridgeExample.ino.hex").Exist())
+		require.True(t, buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").Exist())
+	}
+
+	{
+		// Build again...
+		out, err := tryBuild(t, env, cli, "arduino:avr:leonardo", "no-clean")
+		require.NoError(t, err)
+		buildPath := out.BuilderResult.BuildPath
+		require.True(t, buildPath.Join("core", "HardwareSerial.cpp.o").Exist())
+		require.True(t, buildPath.Join("sketch", "BridgeExample.ino.cpp.o").Exist())
+		require.True(t, buildPath.Join("BridgeExample.ino.elf").Exist())
+		require.True(t, buildPath.Join("BridgeExample.ino.hex").Exist())
+		require.True(t, buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").Exist())
+	}
 
 	// Preprocess
 	sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
@@ -314,14 +335,22 @@ type builderLibrary struct {
 	Name string `json:"Name"`
 }
 
-func tryBuild(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI, fqbn string) (*builderOutput, error) {
+func tryBuild(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI, fqbn string, options ...string) (*builderOutput, error) {
 	subTestName := filepath.Base(t.Name())
 	sketchPath, err := paths.New("testdata", subTestName).Abs()
 	require.NoError(t, err)
 	libsPath, err := paths.New("testdata", "libraries").Abs()
 	require.NoError(t, err)
-	jsonOut, _, err := cli.Run("compile", "-b", fqbn, "--libraries", libsPath.String(), "--clean", "--format", "json", sketchPath.String())
-	//require.NoError(t, err)
+	args := []string{
+		"compile",
+		"-b", fqbn,
+		"--libraries", libsPath.String(),
+		"--format", "json",
+		sketchPath.String()}
+	if !slices.Contains(options, "no-clean") {
+		args = append(args, "--clean")
+	}
+	jsonOut, _, err := cli.Run(args...)
 	var out builderOutput
 	require.NoError(t, json.Unmarshal(jsonOut, &out))
 	return &out, err

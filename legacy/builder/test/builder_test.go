@@ -126,65 +126,6 @@ func TestBuilderEmptySketch(t *testing.T) {
 	require.True(t, exist)
 }
 
-func TestBuilderBridge(t *testing.T) {
-	ctx := prepareBuilderTestContext(t, nil, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	// Run builder
-	command := builder.Builder{}
-	err := command.Run(ctx)
-	NoError(t, err)
-
-	buildPath := ctx.BuildPath
-	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "Bridge.ino.cpp.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join("Bridge.ino.elf").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join("Bridge.ino.hex").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-}
-
-func TestBuilderBridgeTwice(t *testing.T) {
-	ctx := prepareBuilderTestContext(t, nil, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	// Run builder
-	command := builder.Builder{}
-	err := command.Run(ctx)
-	NoError(t, err)
-
-	// Run builder again
-	command = builder.Builder{}
-	err = command.Run(ctx)
-	NoError(t, err)
-
-	buildPath := ctx.BuildPath
-	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "Bridge.ino.cpp.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join("Bridge.ino.elf").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join("Bridge.ino.hex").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-}
-
 func TestBuilderBridgeSAM(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:sam:arduino_due_x_dbg")
 	ctx.WarningsLevel = "all"
