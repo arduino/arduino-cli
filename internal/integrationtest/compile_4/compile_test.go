@@ -68,6 +68,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithBackupFiles", testBuilderSketchWithBackupFiles},
 		{"SketchWithSubfolders", testBuilderSketchWithSubfolders},
 		{"SketchWithTemplatesAndShift", testBuilderSketchWithTemplatesAndShift},
+		{"SketchRequiringEOLProcessing", tryBuildAvrLeonardo},
 	}.Run(t, env, cli)
 }
 

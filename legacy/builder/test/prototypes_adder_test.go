@@ -345,29 +345,6 @@ func TestPrototypesAdderSketchWithIfDef2SAM(t *testing.T) {
 	require.Equal(t, expectedSource, strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
 }
 
-func TestPrototypesAdderSketchWithDosEol(t *testing.T) {
-	ctx := prepareBuilderTestContext(t, nil, paths.New("eol_processing", "eol_processing.ino"), "arduino:avr:uno")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	ctx.Verbose = true
-
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-	NoError(t, builder.PreprocessSketch(ctx))
-	// only requires no error as result
-}
-
 func TestPrototypesAdderSketchWithSubstringFunctionMember(t *testing.T) {
 	sketchLocation := paths.New("sketch_with_class_and_method_substring", "sketch_with_class_and_method_substring.ino")
 	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
