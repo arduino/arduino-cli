@@ -19,7 +19,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"testing"
 	"text/template"
@@ -294,7 +293,7 @@ func testBuilderSketchWithIfDef3(t *testing.T, env *integrationtest.Environment,
 }
 
 func testBuilderBridgeExample(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
-	{
+	t.Run("BuildForAVR", func(t *testing.T) {
 		// Build
 		out, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
 		require.NoError(t, err)
@@ -305,21 +304,19 @@ func testBuilderBridgeExample(t *testing.T, env *integrationtest.Environment, cl
 		require.True(t, buildPath.Join("BridgeExample.ino.elf").Exist())
 		require.True(t, buildPath.Join("BridgeExample.ino.hex").Exist())
 		require.True(t, buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").Exist())
-	}
 
-	{
 		// Build again...
-		out, err := tryBuild(t, env, cli, "arduino:avr:leonardo", "no-clean")
-		require.NoError(t, err)
-		buildPath := out.BuilderResult.BuildPath
-		require.True(t, buildPath.Join("core", "HardwareSerial.cpp.o").Exist())
-		require.True(t, buildPath.Join("sketch", "BridgeExample.ino.cpp.o").Exist())
-		require.True(t, buildPath.Join("BridgeExample.ino.elf").Exist())
-		require.True(t, buildPath.Join("BridgeExample.ino.hex").Exist())
-		require.True(t, buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").Exist())
-	}
+		out2, err2 := tryBuild(t, env, cli, "arduino:avr:leonardo", "no-clean")
+		require.NoError(t, err2)
+		buildPath2 := out2.BuilderResult.BuildPath
+		require.True(t, buildPath2.Join("core", "HardwareSerial.cpp.o").Exist())
+		require.True(t, buildPath2.Join("sketch", "BridgeExample.ino.cpp.o").Exist())
+		require.True(t, buildPath2.Join("BridgeExample.ino.elf").Exist())
+		require.True(t, buildPath2.Join("BridgeExample.ino.hex").Exist())
+		require.True(t, buildPath2.Join("libraries", "Bridge", "Mailbox.cpp.o").Exist())
+	})
 
-	{
+	t.Run("BuildForSAM", func(t *testing.T) {
 		// Build again for SAM...
 		out, err := tryBuild(t, env, cli, "arduino:sam:arduino_due_x_dbg", "all-warnings")
 		require.NoError(t, err)
@@ -340,9 +337,9 @@ func testBuilderBridgeExample(t *testing.T, env *integrationtest.Environment, cl
 		bytes, err := cmd.CombinedOutput()
 		require.NoError(t, err)
 		require.NotContains(t, string(bytes), "variant.cpp.o")
-	}
+	})
 
-	{
+	t.Run("BuildForRedBearAVR", func(t *testing.T) {
 		// Build again for RedBearLab...
 		out, err := tryBuild(t, env, cli, "RedBear:avr:blend", "verbose")
 		require.NoError(t, err)
@@ -352,12 +349,14 @@ func testBuilderBridgeExample(t *testing.T, env *integrationtest.Environment, cl
 		require.True(t, buildPath.Join("BridgeExample.ino.elf").Exist())
 		require.True(t, buildPath.Join("BridgeExample.ino.hex").Exist())
 		require.True(t, buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").Exist())
-	}
+	})
 
-	// Preprocess
-	sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
-	require.NoError(t, err)
-	comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
 }
 
 func tryBuildAvrLeonardo(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
@@ -377,7 +376,7 @@ type builderLibrary struct {
 }
 
 func tryBuild(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI, fqbn string, options ...string) (*builderOutput, error) {
-	subTestName := filepath.Base(t.Name())
+	subTestName := strings.Split(t.Name(), "/")[1]
 	sketchPath, err := paths.New("testdata", subTestName).Abs()
 	require.NoError(t, err)
 	libsPath, err := paths.New("testdata", "libraries").Abs()
@@ -409,7 +408,7 @@ func tryPreprocessAvrLeonardo(t *testing.T, env *integrationtest.Environment, cl
 }
 
 func tryPreprocess(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI, fqbn string) (*paths.Path, []byte, error) {
-	subTestName := filepath.Base(t.Name())
+	subTestName := strings.Split(t.Name(), "/")[1]
 	sketchPath, err := paths.New("testdata", subTestName).Abs()
 	require.NoError(t, err)
 	out, _, err := cli.Run("compile", "-b", fqbn, "--preprocess", sketchPath.String())
