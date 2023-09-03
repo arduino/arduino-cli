@@ -125,26 +125,6 @@ func TestBuilderEmptySketch(t *testing.T) {
 	require.True(t, exist)
 }
 
-func TestBuilderSketchBuildPathContainsUnusedPreviouslyCompiledLibrary(t *testing.T) {
-	ctx := prepareBuilderTestContext(t, nil, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	buildPath := ctx.BuildPath
-	NoError(t, buildPath.Join("libraries", "SPI").MkdirAll())
-
-	// Run builder
-	command := builder.Builder{}
-	err := command.Run(ctx)
-	NoError(t, err)
-
-	exist, err := buildPath.Join("libraries", "SPI").ExistCheck()
-	NoError(t, err)
-	require.False(t, exist)
-	exist, err = buildPath.Join("libraries", "Bridge").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-}
-
 func TestBuilderWithBuildPathInSketchDir(t *testing.T) {
 	buildPath, err := paths.New("sketch1", "build").Abs()
 	NoError(t, err)

@@ -351,6 +351,22 @@ func testBuilderBridgeExample(t *testing.T, env *integrationtest.Environment, cl
 		require.True(t, buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").Exist())
 	})
 
+	t.Run("BuildPathMustNotContainsUnusedPreviouslyCompiledLibrary", func(t *testing.T) {
+		out, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		buildPath := out.BuilderResult.BuildPath
+
+		// Simulate a library use in libraries build path
+		require.NoError(t, buildPath.Join("libraries", "SPI").MkdirAll())
+
+		// Build again...
+		_, err = tryBuild(t, env, cli, "arduino:avr:leonardo", "no-clean")
+		require.NoError(t, err)
+
+		require.False(t, buildPath.Join("libraries", "SPI").Exist())
+		require.True(t, buildPath.Join("libraries", "Bridge").Exist())
+	})
+
 	t.Run("Preprocess", func(t *testing.T) {
 		// Preprocess
 		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
