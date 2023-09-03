@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#line 1 {{QuoteCppString .sketch.MainFile}}
+#line 1 {{QuoteCppString .sketchMainFile}}
 #define DEBUG 1
 #define DISABLED 0
 
@@ -15,17 +15,17 @@ typedef int MyType;
 
 #include "empty_2.h"
 
-#line 16 {{QuoteCppString .sketch.MainFile}}
+#line 16 {{QuoteCppString .sketchMainFile}}
 void setup();
-#line 21 {{QuoteCppString .sketch.MainFile}}
+#line 21 {{QuoteCppString .sketchMainFile}}
 void loop();
-#line 33 {{QuoteCppString .sketch.MainFile}}
+#line 33 {{QuoteCppString .sketchMainFile}}
 void debug();
-#line 44 {{QuoteCppString .sketch.MainFile}}
+#line 44 {{QuoteCppString .sketchMainFile}}
 void disabledIsDefined();
-#line 48 {{QuoteCppString .sketch.MainFile}}
+#line 48 {{QuoteCppString .sketchMainFile}}
 int useMyType(MyType type);
-#line 16 {{QuoteCppString .sketch.MainFile}}
+#line 16 {{QuoteCppString .sketchMainFile}}
 void setup() {
   // put your setup code here, to run once:
 

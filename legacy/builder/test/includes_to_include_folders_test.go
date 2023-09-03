@@ -51,29 +51,6 @@ func TestIncludesToIncludeFolders(t *testing.T) {
 	require.Equal(t, "Bridge", importedLibraries[0].Name)
 }
 
-func TestIncludesToIncludeFoldersSketchWithIfDef(t *testing.T) {
-	ctx := prepareBuilderTestContext(t, nil, paths.New("SketchWithIfDef", "SketchWithIfDef.ino"), "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-	ctx.Verbose = true
-
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-
-	importedLibraries := ctx.ImportedLibraries
-	require.Equal(t, 0, len(importedLibraries))
-}
-
 func TestIncludesToIncludeFoldersIRremoteLibrary(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch9", "sketch9.ino"), "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)

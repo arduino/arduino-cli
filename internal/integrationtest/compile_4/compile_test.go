@@ -69,6 +69,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithSubfolders", testBuilderSketchWithSubfolders},
 		{"SketchWithTemplatesAndShift", testBuilderSketchWithTemplatesAndShift},
 		{"SketchRequiringEOLProcessing", tryBuildAvrLeonardo},
+		{"SketchWithIfDef", testBuilderSketchWithIfDef},
 	}.Run(t, env, cli)
 }
 
@@ -238,6 +239,18 @@ func testBuilderSketchWithTemplatesAndShift(t *testing.T, env *integrationtest.E
 	// Build
 	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
 	require.NoError(t, err)
+
+	// Preprocess
+	sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+	require.NoError(t, err)
+	comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+}
+
+func testBuilderSketchWithIfDef(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// Build
+	output, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+	require.NoError(t, err)
+	require.Empty(t, output.BuilderResult.UsedLibraries)
 
 	// Preprocess
 	sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")

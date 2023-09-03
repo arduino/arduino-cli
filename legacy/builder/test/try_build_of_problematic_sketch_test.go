@@ -62,10 +62,6 @@ func TestTryBuild023(t *testing.T) {
 	tryBuild(t, paths.New("sketch1", "sketch1.ino"))
 }
 
-func TestTryBuild024(t *testing.T) {
-	tryBuild(t, paths.New("SketchWithIfDef", "SketchWithIfDef.ino"))
-}
-
 // The library for this sketch is missing
 //func TestTryBuild025(t *testing.T) {
 //	tryBuild(t, paths.New("sketch3", "Baladuino.ino"))
