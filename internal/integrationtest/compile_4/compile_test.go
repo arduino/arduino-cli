@@ -58,6 +58,8 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 	// Install Libraries required for tests
 	_, _, err = cli.Run("lib", "install", "Bridge@1.6.1")
 	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "CapacitiveSensor@0.5")
+	require.NoError(t, err)
 
 	integrationtest.CLISubtests{
 		{"SketchWithInlineFunction", testBuilderSketchWithInlineFunction},
@@ -82,6 +84,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"BridgeExample", testBuilderBridgeExample},
 		{"Baladuino", testBuilderBaladuino},
 		{"SketchWithEscapedDoubleQuote", testBuilderSketchWithEscapedDoubleQuote},
+		{"SketchWithIncludeBetweenMultilineComment", testBuilderSketchWithIncludeBetweenMultilineComment},
 	}.Run(t, env, cli)
 }
 
@@ -396,6 +399,21 @@ func testBuilderBaladuino(t *testing.T, env *integrationtest.Environment, cli *i
 }
 
 func testBuilderSketchWithEscapedDoubleQuote(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchWithIncludeBetweenMultilineComment(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	t.Run("Build", func(t *testing.T) {
 		// Build
 		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")

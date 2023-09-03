@@ -58,10 +58,6 @@ func TestTryBuild023(t *testing.T) {
 	tryBuild(t, paths.New("sketch1", "sketch1.ino"))
 }
 
-func TestTryBuild027(t *testing.T) {
-	tryBuild(t, paths.New("IncludeBetweenMultilineComment", "IncludeBetweenMultilineComment.ino"))
-}
-
 func TestTryBuild028(t *testing.T) {
 	tryBuild(t, paths.New("LineContinuations", "LineContinuations.ino"))
 }
