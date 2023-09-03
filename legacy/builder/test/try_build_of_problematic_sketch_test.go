@@ -26,67 +26,6 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 )
 
-func TestTryBuild001(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_inline_function", "sketch_with_inline_function.ino"))
-}
-
-func TestTryBuild002(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_function_signature_inside_ifdef", "sketch_with_function_signature_inside_ifdef.ino"))
-}
-
-func TestTryBuild003(t *testing.T) {
-	tryPreprocess(t, paths.New("sketch_no_functions", "sketch_no_functions.ino"))
-}
-
-func TestTryBuild004(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_const", "sketch_with_const.ino"))
-}
-
-func TestTryBuild005(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_old_lib", "sketch_with_old_lib.ino"))
-}
-
-func TestTryBuild006(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_macosx_garbage", "sketch_with_macosx_garbage.ino"))
-}
-
-func TestTryBuild007(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_config", "sketch_with_config.ino"))
-}
-
-// XXX: Failing sketch, typename not supported
-//func TestTryBuild008(t *testing.T) {
-//	tryBuild(t, paths.New("sketch_with_typename", "sketch.ino"))
-//}
-
-func TestTryBuild009(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_usbcon", "sketch_with_usbcon.ino"))
-}
-
-func TestTryBuild010(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_namespace", "sketch_with_namespace.ino"))
-}
-
-func TestTryBuild011(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_inline_function", "sketch_with_inline_function.ino"))
-}
-
-func TestTryBuild012(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_default_args", "sketch_with_default_args.ino"))
-}
-
-func TestTryBuild013(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_class", "sketch_with_class.ino"))
-}
-
-func TestTryBuild014(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_backup_files", "sketch_with_backup_files.ino"))
-}
-
-func TestTryBuild015(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_subfolders"))
-}
-
 // This is a sketch that fails to build on purpose
 //func TestTryBuild016(t *testing.T) {
 //	tryBuild(t, paths.New("sketch_that_checks_if_SPI_has_transactions_and_includes_missing_Ethernet", "sketch.ino"))

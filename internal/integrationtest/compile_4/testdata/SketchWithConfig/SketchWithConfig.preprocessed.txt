@@ -1,0 +1,27 @@
+#include <Arduino.h>
+#line 1 {{QuoteCppString .sketch.MainFile}}
+#include "config.h"
+
+#ifdef DEBUG
+#include "src/includes/de bug.h"
+#endif
+
+#ifdef UNDEF
+#error
+#endif
+
+#include <Bridge.h>
+
+#line 13 {{QuoteCppString .sketch.MainFile}}
+void setup();
+#line 17 {{QuoteCppString .sketch.MainFile}}
+void loop();
+#line 13 {{QuoteCppString .sketch.MainFile}}
+void setup() {
+
+}
+
+void loop() {
+
+}
+
