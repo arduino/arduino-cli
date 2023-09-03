@@ -281,46 +281,6 @@ func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
 	require.Equal(t, mergedSketch, preprocessedSketch) // No prototypes added
 }
 
-func TestPrototypesAdderSketchWithInlineFunction(t *testing.T) {
-	sketchLocation := paths.New("sketch_with_inline_function", "sketch_with_inline_function.ino")
-	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
-
-	ctx := prepareBuilderTestContext(t, nil, sketchLocation, "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	ctx.Verbose = true
-
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-	NoError(t, builder.PreprocessSketch(ctx))
-
-	preprocessedSketch := loadPreprocessedSketch(t, ctx)
-	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-
-	expected := "#line 1 " + quotedSketchLocation + "\nvoid setup();\n#line 2 " + quotedSketchLocation + "\nvoid loop();\n#line 4 " + quotedSketchLocation + "\nshort unsigned int testInt();\n#line 8 " + quotedSketchLocation + "\nstatic int8_t testInline();\n#line 12 " + quotedSketchLocation + "\n__attribute__((always_inline)) uint8_t testAttribute();\n#line 1 " + quotedSketchLocation + "\n"
-	obtained := preprocessedSketch
-	// ctags based preprocessing removes "inline" but this is still OK
-	// TODO: remove this exception when moving to a more powerful parser
-	expected = strings.Replace(expected, "static inline int8_t testInline();", "static int8_t testInline();", -1)
-	obtained = strings.Replace(obtained, "static inline int8_t testInline();", "static int8_t testInline();", -1)
-	// ctags based preprocessing removes "__attribute__ ....." but this is still OK
-	// TODO: remove this exception when moving to a more powerful parser
-	expected = strings.Replace(expected, "__attribute__((always_inline)) uint8_t testAttribute();", "uint8_t testAttribute();", -1)
-	obtained = strings.Replace(obtained, "__attribute__((always_inline)) uint8_t testAttribute();", "uint8_t testAttribute();", -1)
-	require.Contains(t, obtained, expected)
-}
-
 func TestPrototypesAdderSketchWithFunctionSignatureInsideIFDEF(t *testing.T) {
 	sketchLocation := paths.New("sketch_with_function_signature_inside_ifdef", "sketch_with_function_signature_inside_ifdef.ino")
 	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())

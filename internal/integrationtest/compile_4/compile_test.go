@@ -53,7 +53,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 	require.NoError(t, err)
 
 	integrationtest.CLISubtests{
-		{"SketchWithInlineFunction", tryBuildAvrLeonardo},
+		{"SketchWithInlineFunction", testBuilderSketchWithInlineFunction},
 		{"SketchWithConst", tryBuildAvrLeonardo},
 		{"SketchWithFunctionSignatureInsideIfdef", tryBuildAvrLeonardo},
 		{"SketchWithOldLibrary", testBuilderSketchWithOldLibrary},
@@ -174,6 +174,17 @@ func testBuilderSketchWithNamespace(t *testing.T, env *integrationtest.Environme
 }
 
 func testBuilderSketchWithDefaultArgs(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// Build
+	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+	require.NoError(t, err)
+
+	// Preprocess
+	sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+	require.NoError(t, err)
+	comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+}
+
+func testBuilderSketchWithInlineFunction(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	// Build
 	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
 	require.NoError(t, err)
