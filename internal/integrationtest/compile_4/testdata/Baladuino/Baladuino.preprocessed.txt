@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#line 1 {{QuoteCppString .sketch.MainFile}}
+#line 1 {{QuoteCppString .sketchMainFile}}
 /*
  * The code is released under the GNU General Public License.
  * Developed by Kristian Lauszus, TKJ Electronics 2013
@@ -87,11 +87,11 @@ WII Wii(&Btd); // The Wii library can communicate with Wiimotes and the Nunchuck
 // This can also be done using the Android or Processing application
 #endif
 
-#line 88 {{QuoteCppString .sketch.MainFile}}
+#line 88 {{QuoteCppString .sketchMainFile}}
 void setup();
-#line 204 {{QuoteCppString .sketch.MainFile}}
+#line 204 {{QuoteCppString .sketchMainFile}}
 void loop();
-#line 88 {{QuoteCppString .sketch.MainFile}}
+#line 88 {{QuoteCppString .sketchMainFile}}
 void setup() {
   /* Initialize UART */
   Serial.begin(115200);

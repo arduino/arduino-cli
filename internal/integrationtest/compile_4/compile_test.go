@@ -80,6 +80,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithIfDef2", testBuilderSketchWithIfDef2},
 		{"SketchWithIfDef3", testBuilderSketchWithIfDef3},
 		{"BridgeExample", testBuilderBridgeExample},
+		{"Baladuino", testBuilderBaladuino},
 	}.Run(t, env, cli)
 }
 
@@ -375,6 +376,24 @@ func testBuilderBridgeExample(t *testing.T, env *integrationtest.Environment, cl
 	})
 }
 
+func testBuilderBaladuino(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		t.Skip("The sketch is missing required libraries to build")
+
+		// Build
+		output, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		require.Empty(t, output.BuilderResult.UsedLibraries)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
 func tryBuildAvrLeonardo(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
 	require.NoError(t, err)
@@ -427,7 +446,9 @@ func tryPreprocess(t *testing.T, env *integrationtest.Environment, cli *integrat
 	subTestName := strings.Split(t.Name(), "/")[1]
 	sketchPath, err := paths.New("testdata", subTestName).Abs()
 	require.NoError(t, err)
-	out, _, err := cli.Run("compile", "-b", fqbn, "--preprocess", sketchPath.String())
+	libsPath, err := paths.New("testdata", "libraries").Abs()
+	require.NoError(t, err)
+	out, _, err := cli.Run("compile", "-b", fqbn, "--preprocess", "--libraries", libsPath.String(), sketchPath.String())
 	return sketchPath, out, err
 }
 

@@ -35,32 +35,6 @@ func loadPreprocessedSketch(t *testing.T, ctx *types.Context) string {
 	return string(res)
 }
 
-func TestPrototypesAdderBaladuino(t *testing.T) {
-	ctx := prepareBuilderTestContext(t, nil, paths.New("Baladuino", "Baladuino.ino"), "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	ctx.Verbose = true
-
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-	NoError(t, builder.PreprocessSketch(ctx))
-
-	preprocessed := LoadAndInterpolate(t, filepath.Join("Baladuino", "Baladuino.preprocessed.txt"), ctx)
-	preprocessedSketch := loadPreprocessedSketch(t, ctx)
-	require.Equal(t, preprocessed, strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
-}
-
 func TestPrototypesAdderCharWithEscapedDoubleQuote(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("CharWithEscapedDoubleQuote", "CharWithEscapedDoubleQuote.ino"), "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
