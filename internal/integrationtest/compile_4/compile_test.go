@@ -37,6 +37,8 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 	// Install Arduino AVR Boards
 	_, _, err := cli.Run("core", "install", "arduino:avr@1.8.6")
 	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "arduino:sam@1.6.12")
+	require.NoError(t, err)
 
 	// Install REDBear Lad platform
 	_, _, err = cli.Run("config", "init")
@@ -70,6 +72,8 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithTemplatesAndShift", testBuilderSketchWithTemplatesAndShift},
 		{"SketchRequiringEOLProcessing", tryBuildAvrLeonardo},
 		{"SketchWithIfDef", testBuilderSketchWithIfDef},
+		{"SketchWithIfDef2", testBuilderSketchWithIfDef2},
+		{"SketchWithIfDef3", testBuilderSketchWithIfDef3},
 	}.Run(t, env, cli)
 }
 
@@ -254,6 +258,30 @@ func testBuilderSketchWithIfDef(t *testing.T, env *integrationtest.Environment, 
 
 	// Preprocess
 	sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+	require.NoError(t, err)
+	comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+}
+
+func testBuilderSketchWithIfDef2(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// Build
+	output, err := tryBuild(t, env, cli, "arduino:avr:yun")
+	require.NoError(t, err)
+	require.Empty(t, output.BuilderResult.UsedLibraries)
+
+	// Preprocess
+	sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:yun")
+	require.NoError(t, err)
+	comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+}
+
+func testBuilderSketchWithIfDef3(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// Build
+	output, err := tryBuild(t, env, cli, "arduino:sam:arduino_due_x_dbg")
+	require.NoError(t, err)
+	require.Empty(t, output.BuilderResult.UsedLibraries)
+
+	// Preprocess
+	sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:sam:arduino_due_x_dbg")
 	require.NoError(t, err)
 	comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
 }

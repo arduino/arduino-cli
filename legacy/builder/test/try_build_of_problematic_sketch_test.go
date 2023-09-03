@@ -39,10 +39,6 @@ func TestTryBuild018(t *testing.T) {
 	tryBuild(t, paths.New("sketch_that_checks_if_SPI_has_transactions", "sketch_that_checks_if_SPI_has_transactions.ino"))
 }
 
-func TestTryBuild019(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_ifdef", "sketch_with_ifdef.ino"))
-}
-
 func TestTryBuild020(t *testing.T) {
 	ctx := makeDefaultContext()
 	ctx.OtherLibrariesDirs = paths.NewPathList("dependent_libraries", "libraries")
