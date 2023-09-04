@@ -1,0 +1,28 @@
+#include <Arduino.h>
+#line 1 {{QuoteCppString .sketchMainFile}}
+#line 1 {{QuoteCppString .sketchMainFile}}
+void setup();
+#line 2 {{QuoteCppString .sketchMainFile}}
+void loop();
+#line 4 {{QuoteCppString .sketchMainFile}}
+short unsigned int testInt();
+#line 8 {{QuoteCppString .sketchMainFile}}
+static int8_t testInline();
+#line 12 {{QuoteCppString .sketchMainFile}}
+uint8_t testAttribute();
+#line 1 {{QuoteCppString .sketchMainFile}}
+void setup() {}
+void loop() {}
+
+short unsigned int testInt(){
+
+}
+
+static inline int8_t testInline(){
+
+}
+
+__attribute__((always_inline)) uint8_t testAttribute() {
+
+}
+

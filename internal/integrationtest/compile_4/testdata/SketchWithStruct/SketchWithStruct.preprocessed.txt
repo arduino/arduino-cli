@@ -1,0 +1,31 @@
+#include <Arduino.h>
+#line 1 {{QuoteCppString .sketchMainFile}}
+/* START CODE */
+
+struct A_NEW_TYPE {
+  int a = 10;
+  int b;
+  int c;
+} foo;
+
+#line 9 {{QuoteCppString .sketchMainFile}}
+void setup();
+#line 13 {{QuoteCppString .sketchMainFile}}
+void loop();
+#line 17 {{QuoteCppString .sketchMainFile}}
+void dostuff(A_NEW_TYPE * bar);
+#line 9 {{QuoteCppString .sketchMainFile}}
+void setup() {
+
+}
+
+void loop() {
+ dostuff(&foo);
+}
+
+void dostuff (A_NEW_TYPE * bar)
+{
+  Serial.print("bar.a: ");
+  Serial.print(bar->a);
+}
+/* END CODE */
