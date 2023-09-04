@@ -96,6 +96,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithDependendLibraries", tryBuildAvrLeonardo},
 		{"SketchWithFunctionPointer", tryBuildAvrLeonardo},
 		{"USBHostExample", testBuilderUSBHostExample},
+		{"SketchWithConflictingLibraries", testBuilderSketchWithConflictingLibraries},
 	}.Run(t, env, cli)
 }
 
@@ -520,6 +521,23 @@ func testBuilderUSBHostExample(t *testing.T, env *integrationtest.Environment, c
 		// Build
 		_, err := tryBuild(t, env, cli, "arduino:samd:arduino_zero_native")
 		require.NoError(t, err)
+	})
+}
+
+func testBuilderSketchWithConflictingLibraries(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// This library has a conflicting IRremote.h
+		_, _, err := cli.Run("lib", "install", "Robot IR Remote@1.0.2")
+		require.NoError(t, err)
+
+		// Build
+		out, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		libs := out.BuilderResult.UsedLibraries
+		slices.SortFunc(libs, func(x, y *builderLibrary) bool { return x.Name < y.Name })
+		require.Len(t, libs, 2)
+		require.Equal(t, "Bridge", libs[0].Name)
+		require.Equal(t, "IRremote", libs[1].Name)
 	})
 }
 

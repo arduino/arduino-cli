@@ -31,10 +31,6 @@ import (
 //	tryBuild(t, paths.New("sketch_that_checks_if_SPI_has_transactions_and_includes_missing_Ethernet", "sketch.ino"))
 //}
 
-func TestTryBuild031(t *testing.T) {
-	tryBuild(t, paths.New("sketch9", "sketch9.ino"))
-}
-
 func TestTryBuild032(t *testing.T) {
 	tryBuild(t, paths.New("sketch10", "sketch10.ino"))
 }
