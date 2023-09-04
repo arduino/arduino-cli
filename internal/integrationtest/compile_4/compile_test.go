@@ -39,6 +39,8 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 	require.NoError(t, err)
 	_, _, err = cli.Run("core", "install", "arduino:sam@1.6.12")
 	require.NoError(t, err)
+	_, _, err = cli.Run("core", "install", "arduino:samd@1.8.13")
+	require.NoError(t, err)
 
 	// Install REDBear Lad platform
 	_, _, err = cli.Run("config", "init")
@@ -93,6 +95,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchThatChecksIfSPIHasTransactions", tryBuildAvrLeonardo},
 		{"SketchWithDependendLibraries", tryBuildAvrLeonardo},
 		{"SketchWithFunctionPointer", tryBuildAvrLeonardo},
+		{"USBHostExample", testBuilderUSBHostExample},
 	}.Run(t, env, cli)
 }
 
@@ -509,6 +512,14 @@ func testBuilderSketchWithClassAndMethodSubstring(t *testing.T, env *integration
 		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:uno")
 		require.NoError(t, err)
 		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderUSBHostExample(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:samd:arduino_zero_native")
+		require.NoError(t, err)
 	})
 }
 
