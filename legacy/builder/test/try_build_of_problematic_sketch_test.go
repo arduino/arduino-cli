@@ -31,10 +31,6 @@ import (
 //	tryBuild(t, paths.New("sketch_that_checks_if_SPI_has_transactions_and_includes_missing_Ethernet", "sketch.ino"))
 //}
 
-func TestTryBuild021(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_function_pointer", "sketch_with_function_pointer.ino"))
-}
-
 func TestTryBuild022(t *testing.T) {
 	ctx := makeDefaultContext()
 	tryBuildWithContext(t, ctx, "arduino:samd:arduino_zero_native", paths.New("sketch_usbhost", "sketch_usbhost.ino"))

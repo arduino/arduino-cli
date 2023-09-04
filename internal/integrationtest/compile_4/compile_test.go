@@ -92,6 +92,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithClassAndMethodSubstring", testBuilderSketchWithClassAndMethodSubstring},
 		{"SketchThatChecksIfSPIHasTransactions", tryBuildAvrLeonardo},
 		{"SketchWithDependendLibraries", tryBuildAvrLeonardo},
+		{"SketchWithFunctionPointer", tryBuildAvrLeonardo},
 	}.Run(t, env, cli)
 }
 
