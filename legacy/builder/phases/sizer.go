@@ -50,7 +50,7 @@ func (s *Sizer) Run(ctx *types.Context) error {
 }
 
 func checkSizeAdvanced(ctx *types.Context, properties *properties.Map) error {
-	command, err := builder_utils.PrepareCommandForRecipe(properties, "recipe.advanced_size.pattern", false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+	command, err := builder_utils.PrepareCommandForRecipe(properties, "recipe.advanced_size.pattern", false)
 	if err != nil {
 		return errors.New(tr("Error while determining sketch size: %s", err))
 	}
@@ -179,7 +179,7 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 }
 
 func execSizeRecipe(ctx *types.Context, properties *properties.Map) (textSize int, dataSize int, eepromSize int, resErr error) {
-	command, err := builder_utils.PrepareCommandForRecipe(properties, "recipe.size.pattern", false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+	command, err := builder_utils.PrepareCommandForRecipe(properties, "recipe.size.pattern", false)
 	if err != nil {
 		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)
 		return

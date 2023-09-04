@@ -18,7 +18,6 @@ package builder_utils
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -26,6 +25,7 @@ import (
 
 	bUtils "github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/globals"
+	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -173,7 +173,7 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 		return nil, errors.WithStack(err)
 	}
 
-	command, err := PrepareCommandForRecipe(properties, recipe, false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+	command, err := PrepareCommandForRecipe(properties, recipe, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -244,7 +244,7 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 		properties.SetPath(constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH, archiveFilePath)
 		properties.SetPath(constants.BUILD_PROPERTIES_OBJECT_FILE, objectFile)
 
-		command, err := PrepareCommandForRecipe(properties, constants.RECIPE_AR_PATTERN, false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+		command, err := PrepareCommandForRecipe(properties, constants.RECIPE_AR_PATTERN, false)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
@@ -260,7 +260,7 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 
 const COMMANDLINE_LIMIT = 30000
 
-func PrepareCommandForRecipe(buildProperties *properties.Map, recipe string, removeUnsetProperties bool, toolEnv []string) (*exec.Cmd, error) {
+func PrepareCommandForRecipe(buildProperties *properties.Map, recipe string, removeUnsetProperties bool) (*executils.Process, error) {
 	pattern := buildProperties.Get(recipe)
 	if pattern == "" {
 		return nil, errors.Errorf(tr("%[1]s pattern is missing"), recipe)
@@ -275,24 +275,30 @@ func PrepareCommandForRecipe(buildProperties *properties.Map, recipe string, rem
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	command := exec.Command(parts[0], parts[1:]...)
-	command.Env = append(os.Environ(), toolEnv...)
 
 	// if the overall commandline is too long for the platform
 	// try reducing the length by making the filenames relative
 	// and changing working directory to build.path
+	var relativePath string
 	if len(commandLine) > COMMANDLINE_LIMIT {
-		relativePath := buildProperties.Get("build.path")
-		for i, arg := range command.Args {
+		relativePath = buildProperties.Get("build.path")
+		for i, arg := range parts {
 			if _, err := os.Stat(arg); os.IsNotExist(err) {
 				continue
 			}
 			rel, err := filepath.Rel(relativePath, arg)
 			if err == nil && !strings.Contains(rel, "..") && len(rel) < len(arg) {
-				command.Args[i] = rel
+				parts[i] = rel
 			}
 		}
-		command.Dir = relativePath
+	}
+
+	command, err := executils.NewProcess(nil, parts...)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	if relativePath != "" {
+		command.SetDir(relativePath)
 	}
 
 	return command, nil

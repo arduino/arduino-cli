@@ -16,7 +16,7 @@
 package phases
 
 import (
-	"github.com/arduino/arduino-cli/arduino/builder/utils"
+	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -29,7 +29,7 @@ func (s *SketchBuilder) Run(ctx *types.Context) error {
 	sketchBuildPath := ctx.SketchBuildPath
 	buildProperties := ctx.BuildProperties
 	includesFolders := ctx.SketchLibrariesDetector.IncludeFolders()
-	includes := f.Map(includesFolders.AsStrings(), utils.WrapWithHyphenI)
+	includes := f.Map(includesFolders.AsStrings(), cpp.WrapWithHyphenI)
 
 	if err := sketchBuildPath.MkdirAll(); err != nil {
 		return errors.WithStack(err)

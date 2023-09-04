@@ -180,6 +180,3 @@ func FindFilesInFolder(dir *paths.Path, recurse bool, extensions ...string) (pat
 	return dir.ReadDir(fileFilter)
 }
 
-func WrapWithHyphenI(value string) string {
-	return "\"-I" + value + "\""
-}

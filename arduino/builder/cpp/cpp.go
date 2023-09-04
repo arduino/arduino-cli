@@ -106,3 +106,7 @@ func ParseString(line string) (string, string, bool) {
 		i += width
 	}
 }
+
+func WrapWithHyphenI(value string) string {
+	return "\"-I" + value + "\""
+}

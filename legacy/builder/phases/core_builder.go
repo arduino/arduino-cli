@@ -22,13 +22,13 @@ import (
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/buildcache"
 	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -80,7 +80,7 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 	if variantFolder != nil && variantFolder.IsDir() {
 		includes = append(includes, variantFolder.String())
 	}
-	includes = f.Map(includes, utils.WrapWithHyphenI)
+	includes = f.Map(includes, cpp.WrapWithHyphenI)
 
 	var err error
 

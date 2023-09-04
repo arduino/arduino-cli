@@ -367,9 +367,9 @@ func extractCompileFlags(ctx *types.Context, recipe string, defines, dynamicLibs
 		return target
 	}
 
-	command, _ := builder_utils.PrepareCommandForRecipe(ctx.BuildProperties, recipe, true, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+	command, _ := builder_utils.PrepareCommandForRecipe(ctx.BuildProperties, recipe, true)
 
-	for _, arg := range command.Args {
+	for _, arg := range command.GetArgs() {
 		if strings.HasPrefix(arg, "-D") {
 			*defines = appendIfNotPresent(*defines, arg)
 			continue

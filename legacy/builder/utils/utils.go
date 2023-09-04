@@ -18,9 +18,9 @@ package utils
 import (
 	"bytes"
 	"os"
-	"os/exec"
 	"strings"
 
+	"github.com/arduino/arduino-cli/executils"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/pkg/errors"
@@ -51,30 +51,30 @@ const (
 	Capture       = 3 // Capture into buffer
 )
 
-func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) ([]byte, []byte, error) {
+func ExecCommand(ctx *types.Context, command *executils.Process, stdout int, stderr int) ([]byte, []byte, error) {
 	if ctx.Verbose {
-		ctx.Info(PrintableCommand(command.Args))
+		ctx.Info(PrintableCommand(command.GetArgs()))
 	}
 
+	stdoutBuffer := &bytes.Buffer{}
 	if stdout == Capture {
-		buffer := &bytes.Buffer{}
-		command.Stdout = buffer
+		command.RedirectStdoutTo(stdoutBuffer)
 	} else if stdout == Show || (stdout == ShowIfVerbose && ctx.Verbose) {
 		if ctx.Stdout != nil {
-			command.Stdout = ctx.Stdout
+			command.RedirectStdoutTo(ctx.Stdout)
 		} else {
-			command.Stdout = os.Stdout
+			command.RedirectStdoutTo(os.Stdout)
 		}
 	}
 
+	stderrBuffer := &bytes.Buffer{}
 	if stderr == Capture {
-		buffer := &bytes.Buffer{}
-		command.Stderr = buffer
+		command.RedirectStderrTo(stderrBuffer)
 	} else if stderr == Show || (stderr == ShowIfVerbose && ctx.Verbose) {
 		if ctx.Stderr != nil {
-			command.Stderr = ctx.Stderr
+			command.RedirectStderrTo(ctx.Stderr)
 		} else {
-			command.Stderr = os.Stderr
+			command.RedirectStderrTo(os.Stderr)
 		}
 	}
 
@@ -84,16 +84,7 @@ func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) 
 	}
 
 	err = command.Wait()
-
-	var outbytes, errbytes []byte
-	if buf, ok := command.Stdout.(*bytes.Buffer); ok {
-		outbytes = buf.Bytes()
-	}
-	if buf, ok := command.Stderr.(*bytes.Buffer); ok {
-		errbytes = buf.Bytes()
-	}
-
-	return outbytes, errbytes, errors.WithStack(err)
+	return stdoutBuffer.Bytes(), stderrBuffer.Bytes(), errors.WithStack(err)
 }
 
 type loggerAction struct {

@@ -19,8 +19,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"os/exec"
 
+	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/go-paths-helper"
 )
 
@@ -68,8 +68,8 @@ func (db *CompilationDatabase) SaveToFile() {
 }
 
 // Add adds a new CompilationDatabase entry
-func (db *CompilationDatabase) Add(target *paths.Path, command *exec.Cmd) {
-	commandDir := command.Dir
+func (db *CompilationDatabase) Add(target *paths.Path, command *executils.Process) {
+	commandDir := command.GetDir()
 	if commandDir == "" {
 		// This mimics what Cmd.Run also does: Use Dir if specified,
 		// current directory otherwise
@@ -82,7 +82,7 @@ func (db *CompilationDatabase) Add(target *paths.Path, command *exec.Cmd) {
 
 	entry := CompilationCommand{
 		Directory: commandDir,
-		Arguments: command.Args,
+		Arguments: command.GetArgs(),
 		File:      target.String(),
 	}
 
