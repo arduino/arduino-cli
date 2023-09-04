@@ -586,11 +586,6 @@ func tryBuild(t *testing.T, env *integrationtest.Environment, cli *integrationte
 	return &out, err
 }
 
-func tryPreprocessAvrLeonardo(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
-	_, _, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
-	require.NoError(t, err)
-}
-
 func tryPreprocess(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI, fqbn string) (*paths.Path, []byte, error) {
 	subTestName := strings.Split(t.Name(), "/")[1]
 	sketchPath, err := paths.New("testdata", subTestName).Abs()

@@ -99,15 +99,3 @@ func tryBuildWithContext(t *testing.T, ctx *types.Context, fqbn string, sketchLo
 	err := builder.RunBuilder(ctx)
 	NoError(t, err, "Build error for "+sketchLocation.String())
 }
-
-func tryPreprocess(t *testing.T, sketchLocation *paths.Path) {
-	tryPreprocessWithContext(t, makeDefaultContext(), "arduino:avr:leonardo", sketchLocation)
-}
-
-func tryPreprocessWithContext(t *testing.T, ctx *types.Context, fqbn string, sketchLocation *paths.Path) {
-	ctx = prepareBuilderTestContext(t, ctx, sketchLocation, fqbn)
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	err := builder.RunPreprocess(ctx)
-	NoError(t, err, "Build error for "+sketchLocation.String())
-}
