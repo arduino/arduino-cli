@@ -519,8 +519,15 @@ func testBuilderSketchWithClassAndMethodSubstring(t *testing.T, env *integration
 func testBuilderUSBHostExample(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	t.Run("Build", func(t *testing.T) {
 		// Build
-		_, err := tryBuild(t, env, cli, "arduino:samd:arduino_zero_native")
+		out, err := tryBuild(t, env, cli, "arduino:samd:arduino_zero_native")
 		require.NoError(t, err)
+
+		libs := out.BuilderResult.UsedLibraries
+		require.Len(t, libs, 1)
+		require.Equal(t, "USBHost", libs[0].Name)
+		usbHostLibDir, err := paths.New("testdata", "libraries", "USBHost", "src").Abs()
+		require.NoError(t, err)
+		require.True(t, libs[0].SourceDir.EquivalentTo(usbHostLibDir))
 	})
 }
 
@@ -556,7 +563,9 @@ type builderOutput struct {
 }
 
 type builderLibrary struct {
-	Name string `json:"Name"`
+	Name       string      `json:"Name"`
+	InstallDir *paths.Path `json:"install_dir"`
+	SourceDir  *paths.Path `json:"source_dir"`
 }
 
 func tryBuild(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI, fqbn string, options ...string) (*builderOutput, error) {
