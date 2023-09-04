@@ -89,6 +89,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithStringWithComment", testBuilderSketchWithStringWithComment},
 		{"SketchWithStruct", testBuilderSketchWithStruct},
 		{"SketchNoFunctionsTwoFiles", testBuilderSketchNoFunctionsTwoFiles},
+		{"SketchWithClassAndMethodSubstring", testBuilderSketchWithClassAndMethodSubstring},
 	}.Run(t, env, cli)
 }
 
@@ -488,6 +489,21 @@ func testBuilderSketchNoFunctionsTwoFiles(t *testing.T, env *integrationtest.Env
 	t.Run("Preprocess", func(t *testing.T) {
 		// Preprocess
 		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchWithClassAndMethodSubstring(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:uno")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:uno")
 		require.NoError(t, err)
 		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
 	})
