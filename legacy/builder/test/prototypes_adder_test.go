@@ -33,36 +33,6 @@ func loadPreprocessedSketch(t *testing.T, ctx *types.Context) string {
 	return string(res)
 }
 
-func TestPrototypesAdderSketchNoFunctionsTwoFiles(t *testing.T) {
-	sketchLocation := paths.New("sketch_no_functions_two_files", "sketch_no_functions_two_files.ino")
-	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())
-
-	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch_no_functions_two_files", "sketch_no_functions_two_files.ino"), "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	ctx.Verbose = true
-
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-	mergedSketch := loadPreprocessedSketch(t, ctx)
-	NoError(t, builder.PreprocessSketch(ctx))
-
-	preprocessedSketch := loadPreprocessedSketch(t, ctx)
-	require.Contains(t, preprocessedSketch, "#include <Arduino.h>\n#line 1 "+quotedSketchLocation+"\n")
-	require.Equal(t, mergedSketch, preprocessedSketch) // No prototypes added
-}
-
 func TestPrototypesAdderSketchWithSubstringFunctionMember(t *testing.T) {
 	sketchLocation := paths.New("sketch_with_class_and_method_substring", "sketch_with_class_and_method_substring.ino")
 	quotedSketchLocation := cpp.QuoteString(Abs(t, sketchLocation).String())

@@ -1,0 +1,16 @@
+#include <Arduino.h>
+#line 1 {{QuoteCppString .sketchMainFile}}
+/*
+
+Test sketch
+
+
+
+*/
+
+
+#line 1 {{QuoteCppString ( .sketchDir.Join "partb.ino" ) }}
+#include <SPI.h>
+
+int a = 0;
+int b = 0;

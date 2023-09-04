@@ -31,10 +31,6 @@ import (
 //	tryBuild(t, paths.New("sketch_that_checks_if_SPI_has_transactions_and_includes_missing_Ethernet", "sketch.ino"))
 //}
 
-func TestTryBuild017(t *testing.T) {
-	tryPreprocess(t, paths.New("sketch_no_functions_two_files", "sketch_no_functions_two_files.ino"))
-}
-
 func TestTryBuild018(t *testing.T) {
 	tryBuild(t, paths.New("sketch_that_checks_if_SPI_has_transactions", "sketch_that_checks_if_SPI_has_transactions.ino"))
 }

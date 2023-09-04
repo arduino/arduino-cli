@@ -88,6 +88,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithLineContinuations", testBuilderSketchWithLineContinuations},
 		{"SketchWithStringWithComment", testBuilderSketchWithStringWithComment},
 		{"SketchWithStruct", testBuilderSketchWithStruct},
+		{"SketchNoFunctionsTwoFiles", testBuilderSketchNoFunctionsTwoFiles},
 	}.Run(t, env, cli)
 }
 
@@ -476,12 +477,30 @@ func testBuilderSketchWithStruct(t *testing.T, env *integrationtest.Environment,
 	})
 }
 
+func testBuilderSketchNoFunctionsTwoFiles(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		out, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.Error(t, err)
+		require.Contains(t, out.CompilerErr, "undefined reference to `loop'")
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
 func tryBuildAvrLeonardo(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
 	require.NoError(t, err)
 }
 
 type builderOutput struct {
+	CompilerOut   string `json:"compiler_out"`
+	CompilerErr   string `json:"compiler_err"`
 	BuilderResult struct {
 		BuildPath     *paths.Path       `json:"build_path"`
 		UsedLibraries []*builderLibrary `json:"used_libraries"`
@@ -551,7 +570,7 @@ func comparePreprocessGoldenFile(t *testing.T, sketchDir *paths.Path, preprocess
 
 	data := make(map[string]interface{})
 	data["sketchMainFile"] = sketchMainFile
-
+	data["sketchDir"] = sketchDir
 	var buf bytes.Buffer
 	err = tpl.Execute(&buf, data)
 	require.NoError(t, err)
