@@ -31,12 +31,6 @@ import (
 //	tryBuild(t, paths.New("sketch_that_checks_if_SPI_has_transactions_and_includes_missing_Ethernet", "sketch.ino"))
 //}
 
-func TestTryBuild020(t *testing.T) {
-	ctx := makeDefaultContext()
-	ctx.OtherLibrariesDirs = paths.NewPathList("dependent_libraries", "libraries")
-	tryPreprocessWithContext(t, ctx, "arduino:avr:leonardo", paths.New("sketch_with_dependend_libraries", "sketch_with_dependend_libraries.ino"))
-}
-
 func TestTryBuild021(t *testing.T) {
 	tryBuild(t, paths.New("sketch_with_function_pointer", "sketch_with_function_pointer.ino"))
 }
