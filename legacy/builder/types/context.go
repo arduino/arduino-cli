@@ -70,7 +70,6 @@ type Context struct {
 	BuiltInToolsDirs     paths.PathList
 	BuiltInLibrariesDirs *paths.Path
 	OtherLibrariesDirs   paths.PathList
-	WatchedLocations     paths.PathList
 	FQBN                 *cores.FQBN
 	Clean                bool
 
