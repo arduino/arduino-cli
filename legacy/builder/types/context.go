@@ -70,7 +70,6 @@ type Context struct {
 	BuiltInToolsDirs     paths.PathList
 	BuiltInLibrariesDirs *paths.Path
 	OtherLibrariesDirs   paths.PathList
-	LibraryDirs          paths.PathList // List of paths pointing to individual library root folders
 	WatchedLocations     paths.PathList
 	FQBN                 *cores.FQBN
 	Clean                bool

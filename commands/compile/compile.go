@@ -193,7 +193,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.BuiltInToolsDirs = configuration.BuiltinToolsDirectories(configuration.Settings)
 	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
 	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
-	builderCtx.LibraryDirs = paths.NewPathList(req.Library...)
 
 	builderCtx.CompilationDatabase = bldr.NewCompilationDatabase(
 		builderCtx.BuildPath.Join("compile_commands.json"),
@@ -255,9 +254,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		libsManager = lm
 	}
 	useCachedLibrariesResolution := req.GetSkipLibrariesDiscovery()
+	libraryDir := paths.NewPathList(req.Library...)
 	libsManager, libsResolver, verboseOut, err := detector.LibrariesLoader(
 		useCachedLibrariesResolution, libsManager,
-		builderCtx.BuiltInLibrariesDirs, builderCtx.LibraryDirs, builderCtx.OtherLibrariesDirs,
+		builderCtx.BuiltInLibrariesDirs, libraryDir, builderCtx.OtherLibrariesDirs,
 		builderCtx.ActualPlatform, builderCtx.TargetPlatform,
 	)
 	if err != nil {

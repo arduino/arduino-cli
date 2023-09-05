@@ -49,7 +49,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 
 	lm, libsResolver, _, err := detector.LibrariesLoader(
 		false, nil,
-		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
+		ctx.BuiltInLibrariesDirs, nil, ctx.OtherLibrariesDirs,
 		ctx.ActualPlatform, ctx.TargetPlatform,
 	)
 	require.NoError(t, err)
@@ -153,7 +153,7 @@ func TestLoadLibrariesSAM(t *testing.T) {
 
 	lm, libsResolver, _, err := detector.LibrariesLoader(
 		false, nil,
-		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
+		ctx.BuiltInLibrariesDirs, nil, ctx.OtherLibrariesDirs,
 		ctx.ActualPlatform, ctx.TargetPlatform,
 	)
 	require.NoError(t, err)
@@ -230,7 +230,7 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 
 	lm, _, _, err := detector.LibrariesLoader(
 		false, nil,
-		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
+		ctx.BuiltInLibrariesDirs, nil, ctx.OtherLibrariesDirs,
 		ctx.ActualPlatform, ctx.TargetPlatform,
 	)
 	require.NoError(t, err)
@@ -253,7 +253,7 @@ func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 
 	lm, _, _, err := detector.LibrariesLoader(
 		false, nil,
-		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
+		ctx.BuiltInLibrariesDirs, nil, ctx.OtherLibrariesDirs,
 		ctx.ActualPlatform, ctx.TargetPlatform,
 	)
 	require.NoError(t, err)
