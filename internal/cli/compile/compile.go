@@ -25,7 +25,6 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/compile"
 	"github.com/arduino/arduino-cli/commands/sketch"
@@ -363,12 +362,8 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 				panic(tr("Platform ID is not correct"))
 			}
 
-			// FIXME: Here we should not access PackageManager...
 			pme, release := commands.GetPackageManagerExplorer(compileRequest)
-			platform := pme.FindPlatform(&packagemanager.PlatformReference{
-				Package:              split[0],
-				PlatformArchitecture: split[1],
-			})
+			platform := pme.FindPlatform(split[0], split[1])
 			release()
 
 			if profileArg.String() == "" {

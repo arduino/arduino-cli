@@ -45,7 +45,7 @@ func (pme *Explorer) DownloadAndInstallPlatformUpgrades(
 	}
 
 	// Search the latest version for all specified platforms
-	platform := pme.FindPlatform(platformRef)
+	platform := pme.FindPlatform(platformRef.Package, platformRef.PlatformArchitecture)
 	if platform == nil {
 		return nil, &arduino.PlatformNotFoundError{Platform: platformRef.String()}
 	}

@@ -23,7 +23,6 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
 	sk "github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upload"
@@ -130,12 +129,8 @@ func runUploadCommand(command *cobra.Command, args []string) {
 				panic(tr("Platform ID is not correct"))
 			}
 
-			// FIXME: Here we must not access package manager...
 			pme, release := commands.GetPackageManagerExplorer(&rpc.UploadRequest{Instance: inst})
-			platform := pme.FindPlatform(&packagemanager.PlatformReference{
-				Package:              split[0],
-				PlatformArchitecture: split[1],
-			})
+			platform := pme.FindPlatform(split[0], split[1])
 			release()
 
 			msg += "\n"

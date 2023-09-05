@@ -43,12 +43,12 @@ func (platform *PlatformReference) String() string {
 
 // FindPlatform returns the Platform matching the PlatformReference or nil if not found.
 // The PlatformVersion field of the reference is ignored.
-func (pme *Explorer) FindPlatform(ref *PlatformReference) *cores.Platform {
-	targetPackage, ok := pme.packages[ref.Package]
+func (pme *Explorer) FindPlatform(platformPackage, platformArchitecture string) *cores.Platform {
+	targetPackage, ok := pme.packages[platformPackage]
 	if !ok {
 		return nil
 	}
-	platform, ok := targetPackage.Platforms[ref.PlatformArchitecture]
+	platform, ok := targetPackage.Platforms[platformArchitecture]
 	if !ok {
 		return nil
 	}
@@ -57,7 +57,7 @@ func (pme *Explorer) FindPlatform(ref *PlatformReference) *cores.Platform {
 
 // FindPlatformRelease returns the PlatformRelease matching the PlatformReference or nil if not found
 func (pme *Explorer) FindPlatformRelease(ref *PlatformReference) *cores.PlatformRelease {
-	platform := pme.FindPlatform(ref)
+	platform := pme.FindPlatform(ref.Package, ref.PlatformArchitecture)
 	if platform == nil {
 		return nil
 	}
