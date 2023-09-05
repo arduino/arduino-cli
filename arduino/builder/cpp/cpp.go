@@ -107,6 +107,7 @@ func ParseString(line string) (string, string, bool) {
 	}
 }
 
+// WrapWithHyphenI fixdoc
 func WrapWithHyphenI(value string) string {
 	return "\"-I" + value + "\""
 }

@@ -14,6 +14,7 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
+// ObjFileIsUpToDate fixdoc
 func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool, error) {
 	logrus.Debugf("Checking previous results for %v (result = %v, dep = %v)", sourceFile, objectFile, dependencyFile)
 	if objectFile == nil || dependencyFile == nil {
@@ -33,9 +34,8 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool
 		if os.IsNotExist(err) {
 			logrus.Debugf("Not found: %v", objectFile)
 			return false, nil
-		} else {
-			return false, errors.WithStack(err)
 		}
+		return false, errors.WithStack(err)
 	}
 
 	dependencyFile = dependencyFile.Clean()
@@ -44,9 +44,8 @@ func ObjFileIsUpToDate(sourceFile, objectFile, dependencyFile *paths.Path) (bool
 		if os.IsNotExist(err) {
 			logrus.Debugf("Not found: %v", dependencyFile)
 			return false, nil
-		} else {
-			return false, errors.WithStack(err)
 		}
+		return false, errors.WithStack(err)
 	}
 
 	if sourceFileStat.ModTime().After(objectFileStat.ModTime()) {
@@ -128,7 +127,7 @@ func unescapeDep(s string) string {
 	return s
 }
 
-// Normalizes an UTF8 byte slice
+// NormalizeUTF8 byte slice
 // TODO: use it more often troughout all the project (maybe on logger interface?)
 func NormalizeUTF8(buf []byte) []byte {
 	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
@@ -136,11 +135,11 @@ func NormalizeUTF8(buf []byte) []byte {
 	return result
 }
 
-var SOURCE_CONTROL_FOLDERS = map[string]bool{"CVS": true, "RCS": true, ".git": true, ".github": true, ".svn": true, ".hg": true, ".bzr": true, ".vscode": true, ".settings": true, ".pioenvs": true, ".piolibdeps": true}
+var sourceControlFolders = map[string]bool{"CVS": true, "RCS": true, ".git": true, ".github": true, ".svn": true, ".hg": true, ".bzr": true, ".vscode": true, ".settings": true, ".pioenvs": true, ".piolibdeps": true}
 
 // FilterOutSCCS is a ReadDirFilter that excludes known VSC or project files
 func FilterOutSCCS(file *paths.Path) bool {
-	return !SOURCE_CONTROL_FOLDERS[file.Base()]
+	return !sourceControlFolders[file.Base()]
 }
 
 // FilterReadableFiles is a ReadDirFilter that accepts only readable files
@@ -154,12 +153,13 @@ func FilterReadableFiles(file *paths.Path) bool {
 	return true
 }
 
-// FilterOutHiddenFiles is a ReadDirFilter that exclude files with a "." prefix in their name
-var FilterOutHiddenFiles = paths.FilterOutPrefixes(".")
+// filterOutHiddenFiles is a ReadDirFilter that exclude files with a "." prefix in their name
+var filterOutHiddenFiles = paths.FilterOutPrefixes(".")
 
+// FindFilesInFolder fixdoc
 func FindFilesInFolder(dir *paths.Path, recurse bool, extensions ...string) (paths.PathList, error) {
 	fileFilter := paths.AndFilter(
-		FilterOutHiddenFiles,
+		filterOutHiddenFiles,
 		FilterOutSCCS,
 		paths.FilterOutDirectories(),
 		FilterReadableFiles,
@@ -172,11 +172,10 @@ func FindFilesInFolder(dir *paths.Path, recurse bool, extensions ...string) (pat
 	}
 	if recurse {
 		dirFilter := paths.AndFilter(
-			FilterOutHiddenFiles,
+			filterOutHiddenFiles,
 			FilterOutSCCS,
 		)
 		return dir.ReadDirRecursiveFiltered(dirFilter, fileFilter)
 	}
 	return dir.ReadDir(fileFilter)
 }
-

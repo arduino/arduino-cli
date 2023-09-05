@@ -146,11 +146,6 @@ func (l *SketchLibrariesDetector) AppendImportedLibraries(library *libraries.Lib
 	l.importedLibraries = append(l.importedLibraries, library)
 }
 
-// UseCachedLibrariesResolution todo
-func (l *SketchLibrariesDetector) UseCachedLibrariesResolution() bool {
-	return l.useCachedLibrariesResolution
-}
-
 // PrintUsedAndNotUsedLibraries todo
 func (l *SketchLibrariesDetector) PrintUsedAndNotUsedLibraries(sketchError bool) {
 	// Print this message:
@@ -182,12 +177,13 @@ func (l *SketchLibrariesDetector) PrintUsedAndNotUsedLibraries(sketchError bool)
 	time.Sleep(100 * time.Millisecond)
 }
 
+// IncludeFolders fixdoc
 func (l *SketchLibrariesDetector) IncludeFolders() paths.PathList {
 	// TODO should we do a deep copy?
 	return l.includeFolders
 }
 
-// AppendIncludeFolder todo should rename this, probably after refactoring the
+// appendIncludeFolder todo should rename this, probably after refactoring the
 // container_find_includes command.
 // Original comment:
 // Append the given folder to the include path and match or append it to
@@ -195,7 +191,7 @@ func (l *SketchLibrariesDetector) IncludeFolders() paths.PathList {
 // include (e.g. what #include line in what file it was resolved from)
 // and should be the empty string for the default include folders, like
 // the core or variant.
-func (l *SketchLibrariesDetector) AppendIncludeFolder(
+func (l *SketchLibrariesDetector) appendIncludeFolder(
 	cache *includeCache,
 	sourceFilePath *paths.Path,
 	include string,
@@ -242,13 +238,13 @@ func (l *SketchLibrariesDetector) findIncludes(
 ) error {
 	librariesResolutionCache := buildPath.Join("libraries.cache")
 	if l.useCachedLibrariesResolution && librariesResolutionCache.Exist() {
-		if d, err := librariesResolutionCache.ReadFile(); err != nil {
+		d, err := librariesResolutionCache.ReadFile()
+		if err != nil {
 			return err
-		} else {
-			includeFolders := l.includeFolders
-			if err := json.Unmarshal(d, &includeFolders); err != nil {
-				return err
-			}
+		}
+		includeFolders := l.includeFolders
+		if err := json.Unmarshal(d, &includeFolders); err != nil {
+			return err
 		}
 		if l.verbose {
 			l.verboseInfoFn("Using cached library discovery: " + librariesResolutionCache.String())
@@ -259,20 +255,20 @@ func (l *SketchLibrariesDetector) findIncludes(
 	cachePath := buildPath.Join("includes.cache")
 	cache := readCache(cachePath)
 
-	l.AppendIncludeFolder(cache, nil, "", buildCorePath)
+	l.appendIncludeFolder(cache, nil, "", buildCorePath)
 	if buildVariantPath != nil {
-		l.AppendIncludeFolder(cache, nil, "", buildVariantPath)
+		l.appendIncludeFolder(cache, nil, "", buildVariantPath)
 	}
 
-	sourceFileQueue := &UniqueSourceFileQueue{}
+	sourceFileQueue := &uniqueSourceFileQueue{}
 
 	if !l.useCachedLibrariesResolution {
 		sketch := sketch
-		mergedfile, err := MakeSourceFile(sketchBuildPath, librariesBuildPath, sketch, paths.New(sketch.MainFile.Base()+".cpp"))
+		mergedfile, err := makeSourceFile(sketchBuildPath, librariesBuildPath, sketch, paths.New(sketch.MainFile.Base()+".cpp"))
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		sourceFileQueue.Push(mergedfile)
+		sourceFileQueue.push(mergedfile)
 
 		l.queueSourceFilesFromFolder(sketchBuildPath, librariesBuildPath, sourceFileQueue, sketch, sketchBuildPath, false /* recurse */)
 		srcSubfolderPath := sketchBuildPath.Join("src")
@@ -280,7 +276,7 @@ func (l *SketchLibrariesDetector) findIncludes(
 			l.queueSourceFilesFromFolder(sketchBuildPath, librariesBuildPath, sourceFileQueue, sketch, srcSubfolderPath, true /* recurse */)
 		}
 
-		for !sourceFileQueue.Empty() {
+		for !sourceFileQueue.empty() {
 			err := l.findIncludesUntilDone(cache, sourceFileQueue, buildProperties, sketchBuildPath, librariesBuildPath, platformArch)
 			if err != nil {
 				cachePath.Remove()
@@ -310,13 +306,13 @@ func (l *SketchLibrariesDetector) findIncludes(
 
 func (l *SketchLibrariesDetector) findIncludesUntilDone(
 	cache *includeCache,
-	sourceFileQueue *UniqueSourceFileQueue,
+	sourceFileQueue *uniqueSourceFileQueue,
 	buildProperties *properties.Map,
 	sketchBuildPath *paths.Path,
 	librariesBuildPath *paths.Path,
 	platformArch string,
 ) error {
-	sourceFile := sourceFileQueue.Pop()
+	sourceFile := sourceFileQueue.pop()
 	sourcePath := sourceFile.SourcePath()
 	targetFilePath := paths.NullPath()
 	depPath := sourceFile.DepfilePath()
@@ -414,7 +410,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 		// include path and queue its source files for further
 		// include scanning
 		l.AppendImportedLibraries(library)
-		l.AppendIncludeFolder(cache, sourcePath, missingIncludeH, library.SourceDir)
+		l.appendIncludeFolder(cache, sourcePath, missingIncludeH, library.SourceDir)
 
 		if library.Precompiled && library.PrecompiledWithSources {
 			// Fully precompiled libraries should have no dependencies to avoid ABI breakage
@@ -433,7 +429,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 	sketchBuildPath *paths.Path,
 	librariesBuildPath *paths.Path,
-	sourceFileQueue *UniqueSourceFileQueue,
+	sourceFileQueue *uniqueSourceFileQueue,
 	origin interface{},
 	folder *paths.Path,
 	recurse bool,
@@ -448,11 +444,11 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 	}
 
 	for _, filePath := range filePaths {
-		sourceFile, err := MakeSourceFile(sketchBuildPath, librariesBuildPath, origin, filePath)
+		sourceFile, err := makeSourceFile(sketchBuildPath, librariesBuildPath, origin, filePath)
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		sourceFileQueue.Push(sourceFile)
+		sourceFileQueue.push(sourceFile)
 	}
 
 	return nil
@@ -484,10 +480,12 @@ func (l *SketchLibrariesDetector) failIfImportedLibraryIsWrong() error {
 	return nil
 }
 
-var INCLUDE_REGEXP = regexp.MustCompile("(?ms)^\\s*#[ \t]*include\\s*[<\"](\\S+)[\">]")
+// includeRegexp fixdoc
+var includeRegexp = regexp.MustCompile("(?ms)^\\s*#[ \t]*include\\s*[<\"](\\S+)[\">]")
 
+// IncludesFinderWithRegExp fixdoc
 func IncludesFinderWithRegExp(source string) string {
-	match := INCLUDE_REGEXP.FindStringSubmatch(source)
+	match := includeRegexp.FindStringSubmatch(source)
 	if match != nil {
 		return strings.TrimSpace(match[1])
 	}
@@ -507,7 +505,7 @@ func findIncludeForOldCompilers(source string) string {
 	return ""
 }
 
-type SourceFile struct {
+type sourceFile struct {
 	// Path to the source file within the sketch/library root folder
 	relativePath *paths.Path
 
@@ -528,22 +526,23 @@ type SourceFile struct {
 	buildRoot *paths.Path
 }
 
-func (f *SourceFile) Equals(g *SourceFile) bool {
+// Equals fixdoc
+func (f *sourceFile) Equals(g *sourceFile) bool {
 	return f.relativePath.EqualsTo(g.relativePath) &&
 		f.buildRoot.EqualsTo(g.buildRoot) &&
 		f.sourceRoot.EqualsTo(g.sourceRoot)
 }
 
-// Create a SourceFile containing the given source file path within the
+// makeSourceFile containing the given source file path within the
 // given origin. The given path can be absolute, or relative within the
 // origin's root source folder
-func MakeSourceFile(
+func makeSourceFile(
 	sketchBuildPath *paths.Path,
 	librariesBuildPath *paths.Path,
 	origin interface{},
 	path *paths.Path,
-) (*SourceFile, error) {
-	res := &SourceFile{}
+) (*sourceFile, error) {
+	res := &sourceFile{}
 
 	switch o := origin.(type) {
 	case *sketch.Sketch:
@@ -568,19 +567,23 @@ func MakeSourceFile(
 	return res, nil
 }
 
-func (f *SourceFile) ExtraIncludePath() *paths.Path {
+// ExtraIncludePath fixdoc
+func (f *sourceFile) ExtraIncludePath() *paths.Path {
 	return f.extraIncludePath
 }
 
-func (f *SourceFile) SourcePath() *paths.Path {
+// SourcePath fixdoc
+func (f *sourceFile) SourcePath() *paths.Path {
 	return f.sourceRoot.JoinPath(f.relativePath)
 }
 
-func (f *SourceFile) ObjectPath() *paths.Path {
+// ObjectPath fixdoc
+func (f *sourceFile) ObjectPath() *paths.Path {
 	return f.buildRoot.Join(f.relativePath.String() + ".o")
 }
 
-func (f *SourceFile) DepfilePath() *paths.Path {
+// DepfilePath fixdoc
+func (f *sourceFile) DepfilePath() *paths.Path {
 	return f.buildRoot.Join(f.relativePath.String() + ".d")
 }
 
@@ -658,21 +661,19 @@ func LibrariesLoader(
 	return lm, resolver, verboseOut.Bytes(), nil
 }
 
-func (l *SketchLibrariesDetector) OnlyUpdateCompilationDatabase() bool {
-	return l.onlyUpdateCompilationDatabase
-}
-
 type includeCacheEntry struct {
 	Sourcefile  *paths.Path
 	Include     string
 	Includepath *paths.Path
 }
 
+// String fixdoc
 func (entry *includeCacheEntry) String() string {
 	return fmt.Sprintf("SourceFile: %s; Include: %s; IncludePath: %s",
 		entry.Sourcefile, entry.Include, entry.Includepath)
 }
 
+// Equals fixdoc
 func (entry *includeCacheEntry) Equals(other *includeCacheEntry) bool {
 	return entry.String() == other.String()
 }
@@ -686,14 +687,14 @@ type includeCache struct {
 	entries []*includeCacheEntry
 }
 
-// Return the next cache entry. Should only be called when the cache is
+// Next Return the next cache entry. Should only be called when the cache is
 // valid and a next entry is available (the latter can be checked with
 // ExpectFile). Does not advance the cache.
 func (cache *includeCache) Next() *includeCacheEntry {
 	return cache.entries[cache.next]
 }
 
-// Check that the next cache entry is about the given file. If it is
+// ExpectFile check that the next cache entry is about the given file. If it is
 // not, or no entry is available, the cache is invalidated. Does not
 // advance the cache.
 func (cache *includeCache) ExpectFile(sourcefile *paths.Path) {
@@ -703,7 +704,7 @@ func (cache *includeCache) ExpectFile(sourcefile *paths.Path) {
 	}
 }
 
-// Check that the next entry matches the given values. If so, advance
+// ExpectEntry check that the next entry matches the given values. If so, advance
 // the cache. If not, the cache is invalidated. If the cache is
 // invalidated, or was already invalid, an entry with the given values
 // is appended.
@@ -723,7 +724,7 @@ func (cache *includeCache) ExpectEntry(sourcefile *paths.Path, include string, l
 	}
 }
 
-// Check that the cache is completely consumed. If not, the cache is
+// ExpectEnd check that the cache is completely consumed. If not, the cache is
 // invalidated.
 func (cache *includeCache) ExpectEnd() {
 	if cache.valid && cache.next < len(cache.entries) {
@@ -771,25 +772,25 @@ func writeCache(cache *includeCache, path *paths.Path) error {
 	return nil
 }
 
-type UniqueSourceFileQueue []*SourceFile
+type uniqueSourceFileQueue []*sourceFile
 
-func (queue *UniqueSourceFileQueue) Push(value *SourceFile) {
-	if !queue.Contains(value) {
+func (queue *uniqueSourceFileQueue) push(value *sourceFile) {
+	if !queue.contains(value) {
 		*queue = append(*queue, value)
 	}
 }
 
-func (queue UniqueSourceFileQueue) Contains(target *SourceFile) bool {
+func (queue uniqueSourceFileQueue) contains(target *sourceFile) bool {
 	return slices.ContainsFunc(queue, target.Equals)
 }
 
-func (queue *UniqueSourceFileQueue) Pop() *SourceFile {
+func (queue *uniqueSourceFileQueue) pop() *sourceFile {
 	old := *queue
 	x := old[0]
 	*queue = old[1:]
 	return x
 }
 
-func (queue UniqueSourceFileQueue) Empty() bool {
+func (queue uniqueSourceFileQueue) empty() bool {
 	return len(queue) == 0
 }
