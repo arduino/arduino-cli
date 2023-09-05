@@ -322,6 +322,10 @@ func testBuilderBridgeExample(t *testing.T, env *integrationtest.Environment, cl
 		require.True(t, buildPath.Join("BridgeExample.ino.hex").Exist())
 		require.True(t, buildPath.Join("libraries", "Bridge", "Mailbox.cpp.o").Exist())
 
+		libs := out.BuilderResult.UsedLibraries
+		require.Len(t, libs, 1)
+		require.Equal(t, "Bridge", libs[0].Name)
+
 		// Build again...
 		out2, err2 := tryBuild(t, env, cli, "arduino:avr:leonardo", "no-clean")
 		require.NoError(t, err2)

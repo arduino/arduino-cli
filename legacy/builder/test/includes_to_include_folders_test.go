@@ -27,30 +27,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestIncludesToIncludeFolders(t *testing.T) {
-	ctx := prepareBuilderTestContext(t, nil, paths.New("downloaded_libraries", "Bridge", "examples", "Bridge", "Bridge.ino"), "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-	ctx.Verbose = true
-
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-
-	importedLibraries := ctx.ImportedLibraries
-	require.Equal(t, 1, len(importedLibraries))
-	require.Equal(t, "Bridge", importedLibraries[0].Name)
-}
-
 func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch10", "sketch10.ino"), "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
