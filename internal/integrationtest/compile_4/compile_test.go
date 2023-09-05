@@ -63,6 +63,11 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 	_, _, err = cli.Run("lib", "install", "CapacitiveSensor@0.5")
 	require.NoError(t, err)
 
+	// Install custom hardware required for tests
+	customHwDir, err := paths.New("testdata", "user_hardware").Abs()
+	require.NoError(t, err)
+	require.NoError(t, customHwDir.CopyDirTo(cli.SketchbookDir().Join("hardware")))
+
 	integrationtest.CLISubtests{
 		{"SketchWithInlineFunction", testBuilderSketchWithInlineFunction},
 		{"SketchWithConst", testBuilderSketchWithConst},
@@ -98,6 +103,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"USBHostExample", testBuilderUSBHostExample},
 		{"SketchWithConflictingLibraries", testBuilderSketchWithConflictingLibraries},
 		{"SketchLibraryProvidesAllIncludes", testBuilderSketchLibraryProvidesAllIncludes},
+		{"UserHardware", testBuilderWithUserHardware},
 	}.Run(t, env, cli)
 }
 
@@ -328,7 +334,7 @@ func testBuilderBridgeExample(t *testing.T, env *integrationtest.Environment, cl
 		require.Equal(t, "Bridge", libs[0].Name)
 
 		// Build again...
-		out2, err2 := tryBuild(t, env, cli, "arduino:avr:leonardo", "no-clean")
+		out2, err2 := tryBuild(t, env, cli, "arduino:avr:leonardo", &buildOptions{NoClean: true})
 		require.NoError(t, err2)
 		buildPath2 := out2.BuilderResult.BuildPath
 		require.True(t, buildPath2.Join("core", "HardwareSerial.cpp.o").Exist())
@@ -340,7 +346,7 @@ func testBuilderBridgeExample(t *testing.T, env *integrationtest.Environment, cl
 
 	t.Run("BuildForSAM", func(t *testing.T) {
 		// Build again for SAM...
-		out, err := tryBuild(t, env, cli, "arduino:sam:arduino_due_x_dbg", "all-warnings")
+		out, err := tryBuild(t, env, cli, "arduino:sam:arduino_due_x_dbg", &buildOptions{AllWarnings: true})
 		require.NoError(t, err)
 
 		buildPath := out.BuilderResult.BuildPath
@@ -363,7 +369,7 @@ func testBuilderBridgeExample(t *testing.T, env *integrationtest.Environment, cl
 
 	t.Run("BuildForRedBearAVR", func(t *testing.T) {
 		// Build again for RedBearLab...
-		out, err := tryBuild(t, env, cli, "RedBear:avr:blend", "verbose")
+		out, err := tryBuild(t, env, cli, "RedBear:avr:blend", &buildOptions{Verbose: true})
 		require.NoError(t, err)
 		buildPath := out.BuilderResult.BuildPath
 		require.True(t, buildPath.Join("core", "HardwareSerial.cpp.o").Exist())
@@ -382,7 +388,7 @@ func testBuilderBridgeExample(t *testing.T, env *integrationtest.Environment, cl
 		require.NoError(t, buildPath.Join("libraries", "SPI").MkdirAll())
 
 		// Build again...
-		_, err = tryBuild(t, env, cli, "arduino:avr:leonardo", "no-clean")
+		_, err = tryBuild(t, env, cli, "arduino:avr:leonardo", &buildOptions{NoClean: true})
 		require.NoError(t, err)
 
 		require.False(t, buildPath.Join("libraries", "SPI").Exist())
@@ -566,6 +572,39 @@ func testBuilderSketchLibraryProvidesAllIncludes(t *testing.T, env *integrationt
 	})
 }
 
+func testBuilderWithUserHardware(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	coreSPILib, err := cli.SketchbookDir().Join("hardware", "my_avr_platform", "avr", "libraries", "SPI").Abs()
+	require.NoError(t, err)
+	sketchPath := coreSPILib.Join("examples", "BarometricPressureSensor", "BarometricPressureSensor.ino")
+
+	t.Run("TestIncludesToIncludeFoldersDuplicateLibs", func(t *testing.T) {
+		out, err := tryBuild(t, env, cli, "my_avr_platform:avr:custom_yun", &buildOptions{
+			Sketch:          sketchPath,
+			NoTestLibraries: true,
+		})
+		require.NoError(t, err)
+
+		importedLibraries := out.BuilderResult.UsedLibraries
+		require.Equal(t, 1, len(importedLibraries))
+		require.Equal(t, "SPI", importedLibraries[0].Name)
+		require.True(t, importedLibraries[0].SourceDir.EquivalentTo(coreSPILib))
+	})
+
+	t.Run("TestIncludesToIncludeFoldersDuplicateLibsWithConflictingLibsOutsideOfPlatform", func(t *testing.T) {
+		SPILib, err := paths.New("testdata", "libraries", "SPI").Abs()
+		require.NoError(t, err)
+		out, err := tryBuild(t, env, cli, "my_avr_platform:avr:custom_yun", &buildOptions{
+			Sketch: sketchPath,
+		})
+		require.NoError(t, err)
+
+		importedLibraries := out.BuilderResult.UsedLibraries
+		require.Equal(t, 1, len(importedLibraries))
+		require.Equal(t, "SPI", importedLibraries[0].Name)
+		require.True(t, importedLibraries[0].SourceDir.EquivalentTo(SPILib))
+	})
+}
+
 func tryBuildAvrLeonardo(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
 	require.NoError(t, err)
@@ -586,25 +625,49 @@ type builderLibrary struct {
 	SourceDir  *paths.Path `json:"source_dir"`
 }
 
-func tryBuild(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI, fqbn string, options ...string) (*builderOutput, error) {
-	subTestName := strings.Split(t.Name(), "/")[1]
-	sketchPath, err := paths.New("testdata", subTestName).Abs()
-	require.NoError(t, err)
-	libsPath, err := paths.New("testdata", "libraries").Abs()
-	require.NoError(t, err)
+type buildOptions struct {
+	Sketch          *paths.Path
+	NoTestLibraries bool
+	CustomLibPath   *paths.Path
+	NoClean         bool
+	AllWarnings     bool
+	Verbose         bool
+}
+
+func tryBuild(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI, fqbn string, optionsArg ...*buildOptions) (*builderOutput, error) {
+	var options *buildOptions
+	if len(optionsArg) == 0 {
+		options = &buildOptions{}
+	} else {
+		require.Len(t, optionsArg, 1)
+		options = optionsArg[0]
+	}
+	if options.Sketch == nil {
+		subTestName := strings.Split(t.Name(), "/")[1]
+		sketchPath, err := paths.New("testdata", subTestName).Abs()
+		require.NoError(t, err)
+		options.Sketch = sketchPath
+	}
 	args := []string{
 		"compile",
 		"-b", fqbn,
-		"--libraries", libsPath.String(),
 		"--format", "json",
-		sketchPath.String()}
-	if !slices.Contains(options, "no-clean") {
+		options.Sketch.String()}
+	if !options.NoTestLibraries {
+		libsPath, err := paths.New("testdata", "libraries").Abs()
+		require.NoError(t, err)
+		args = append(args, "--libraries", libsPath.String())
+	}
+	if options.CustomLibPath != nil {
+		args = append(args, "--library", options.CustomLibPath.String())
+	}
+	if !options.NoClean {
 		args = append(args, "--clean")
 	}
-	if slices.Contains(options, "all-warnings") {
+	if options.AllWarnings {
 		args = append(args, "--warnings", "all")
 	}
-	if slices.Contains(options, "verbose") {
+	if options.Verbose {
 		args = append(args, "-v")
 	}
 	jsonOut, _, err := cli.Run(args...)
