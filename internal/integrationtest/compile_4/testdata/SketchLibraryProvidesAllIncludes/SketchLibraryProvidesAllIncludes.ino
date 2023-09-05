@@ -1,5 +1,5 @@
 #include <anewlibrary.h>
-#include <IRremoteInt.h>
+#include <IRremote.h>
 
 void setup() {}
 void loop() {}

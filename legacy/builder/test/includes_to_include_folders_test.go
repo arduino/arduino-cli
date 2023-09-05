@@ -27,32 +27,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestIncludesToIncludeFoldersANewLibrary(t *testing.T) {
-	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch10", "sketch10.ino"), "arduino:avr:leonardo")
-	defer cleanUpBuilderTestContext(t, ctx)
-	ctx.Verbose = true
-
-	var _err error
-	commands := []types.Command{
-		&builder.ContainerSetupHardwareToolsLibsSketchAndProps{},
-		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = bldr.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
-		}),
-		&builder.ContainerFindIncludes{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
-
-	importedLibraries := ctx.ImportedLibraries
-	sort.Sort(ByLibraryName(importedLibraries))
-	require.Equal(t, 2, len(importedLibraries))
-	require.Equal(t, "ANewLibrary-master", importedLibraries[0].Name)
-	require.Equal(t, "IRremote", importedLibraries[1].Name)
-}
-
 func TestIncludesToIncludeFoldersDuplicateLibs(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
