@@ -84,11 +84,8 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		// NoError(t, err)
 		fmt.Println(err)
 	}
-	if !ctx.CanUseCachedTools {
-		if ctx.BuiltInToolsDirs != nil {
-			pmb.LoadToolsFromBundleDirectories(ctx.BuiltInToolsDirs)
-		}
-		ctx.CanUseCachedTools = true
+	if ctx.BuiltInToolsDirs != nil {
+		pmb.LoadToolsFromBundleDirectories(ctx.BuiltInToolsDirs)
 	}
 	pm := pmb.Build()
 	pme, _ /* never release... */ := pm.NewExplorer()

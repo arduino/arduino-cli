@@ -112,9 +112,6 @@ type Context struct {
 	// Custom build properties defined by user (line by line as "key=value" pairs)
 	CustomBuildProperties []string
 
-	// Reuse old tools since the backing storage didn't change
-	CanUseCachedTools bool
-
 	// Experimental: use arduino-preprocessor to create prototypes
 	UseArduinoPreprocessor bool
 
