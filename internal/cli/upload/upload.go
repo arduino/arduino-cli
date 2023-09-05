@@ -24,8 +24,8 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/commands"
+	sk "github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
@@ -90,7 +90,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 		arguments.WarnDeprecatedFiles(sketchPath)
 	}
 
-	sk, err := sketch.New(sketchPath)
+	sketch, err := sk.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if err != nil && importDir == "" && importFile == "" {
 		feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
 	}
@@ -99,7 +99,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 	var profile *rpc.Profile
 
 	if profileArg.Get() == "" {
-		inst, profile = instance.CreateAndInitWithProfile(sk.Project.DefaultProfile, sketchPath)
+		inst, profile = instance.CreateAndInitWithProfile(sketch.GetDefaultProfile().GetName(), sketchPath)
 	} else {
 		inst, profile = instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
 	}
@@ -108,8 +108,9 @@ func runUploadCommand(command *cobra.Command, args []string) {
 		fqbnArg.Set(profile.GetFqbn())
 	}
 
-	defaultFQBN := sk.GetDefaultFQBN()
-	defaultAddress, defaultProtocol := sk.GetDefaultPortAddressAndProtocol()
+	defaultFQBN := sketch.GetDefaultFqbn()
+	defaultAddress := sketch.GetDefaultPort()
+	defaultProtocol := sketch.GetDefaultProtocol()
 	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, defaultFQBN, defaultAddress, defaultProtocol)
 
 	userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
