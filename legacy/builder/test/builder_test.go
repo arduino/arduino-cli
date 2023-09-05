@@ -22,6 +22,7 @@ import (
 	"time"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder"
@@ -125,14 +126,14 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 	}
 
 	if !stepToSkip[skipLibraries] {
-		lm, libsResolver, _, err := bldr.LibrariesLoader(
+		lm, libsResolver, _, err := detector.LibrariesLoader(
 			false, nil,
 			ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
 			ctx.ActualPlatform, ctx.TargetPlatform,
 		)
 		NoError(t, err)
 
-		ctx.SketchLibrariesDetector = bldr.NewSketchLibrariesDetector(
+		ctx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
 			lm, libsResolver,
 			ctx.Verbose,
 			false,

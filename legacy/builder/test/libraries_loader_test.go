@@ -20,8 +20,8 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
@@ -47,7 +47,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, nil, "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
 
-	lm, libsResolver, _, err := builder.LibrariesLoader(
+	lm, libsResolver, _, err := detector.LibrariesLoader(
 		false, nil,
 		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
 		ctx.ActualPlatform, ctx.TargetPlatform,
@@ -151,7 +151,7 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, nil, "arduino:sam:arduino_due_x_dbg")
 	defer cleanUpBuilderTestContext(t, ctx)
 
-	lm, libsResolver, _, err := builder.LibrariesLoader(
+	lm, libsResolver, _, err := detector.LibrariesLoader(
 		false, nil,
 		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
 		ctx.ActualPlatform, ctx.TargetPlatform,
@@ -228,7 +228,7 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, nil, "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
 
-	lm, _, _, err := builder.LibrariesLoader(
+	lm, _, _, err := detector.LibrariesLoader(
 		false, nil,
 		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
 		ctx.ActualPlatform, ctx.TargetPlatform,
@@ -251,7 +251,7 @@ func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, nil, "my_avr_platform:avr:custom_yun")
 	defer cleanUpBuilderTestContext(t, ctx)
 
-	lm, _, _, err := builder.LibrariesLoader(
+	lm, _, _, err := detector.LibrariesLoader(
 		false, nil,
 		ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
 		ctx.ActualPlatform, ctx.TargetPlatform,

@@ -223,7 +223,7 @@ func RunPreprocess(ctx *types.Context) error {
 
 func findIncludes(ctx *types.Context) types.BareCommand {
 	return types.BareCommand(func(ctx *types.Context) error {
-		ctx.SketchLibrariesDetector.FindIncludes(
+		return ctx.SketchLibrariesDetector.FindIncludes(
 			ctx.BuildPath,
 			ctx.BuildProperties.GetPath("build.core.path"),
 			ctx.BuildProperties.GetPath("build.variant.path"),
@@ -233,6 +233,5 @@ func findIncludes(ctx *types.Context) types.BareCommand {
 			ctx.BuildProperties,
 			ctx.TargetPlatform.Platform.Architecture,
 		)
-		return nil
 	})
 }
