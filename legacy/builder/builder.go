@@ -140,9 +140,6 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 func PreprocessSketch(ctx *types.Context) error {
 	preprocessorImpl := preprocessor.PreprocessSketchWithCtags
-	if ctx.UseArduinoPreprocessor {
-		preprocessorImpl = preprocessor.PreprocessSketchWithArduinoPreprocessor
-	}
 	normalOutput, verboseOutput, err := preprocessorImpl(
 		ctx.Sketch, ctx.BuildPath, ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset,
 		ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)

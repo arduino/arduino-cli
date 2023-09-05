@@ -112,9 +112,6 @@ type Context struct {
 	// Custom build properties defined by user (line by line as "key=value" pairs)
 	CustomBuildProperties []string
 
-	// Experimental: use arduino-preprocessor to create prototypes
-	UseArduinoPreprocessor bool
-
 	// Parallel processes
 	Jobs int
 
