@@ -84,17 +84,16 @@ type Context struct {
 	TargetPlatform *cores.PlatformRelease
 	ActualPlatform *cores.PlatformRelease
 
-	BuildProperties              *properties.Map
-	BuildPath                    *paths.Path
-	SketchBuildPath              *paths.Path
-	CoreBuildPath                *paths.Path
-	CoreBuildCachePath           *paths.Path
-	CoreArchiveFilePath          *paths.Path
-	CoreObjectsFiles             paths.PathList
-	LibrariesBuildPath           *paths.Path
-	LibrariesObjectFiles         paths.PathList
-	SketchObjectFiles            paths.PathList
-	IgnoreSketchFolderNameErrors bool
+	BuildProperties      *properties.Map
+	BuildPath            *paths.Path
+	SketchBuildPath      *paths.Path
+	CoreBuildPath        *paths.Path
+	CoreBuildCachePath   *paths.Path
+	CoreArchiveFilePath  *paths.Path
+	CoreObjectsFiles     paths.PathList
+	LibrariesBuildPath   *paths.Path
+	LibrariesObjectFiles paths.PathList
+	SketchObjectFiles    paths.PathList
 
 	Sketch        *sketch.Sketch
 	WarningsLevel string
