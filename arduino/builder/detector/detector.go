@@ -264,16 +264,16 @@ func (l *SketchLibrariesDetector) findIncludes(
 
 	if !l.useCachedLibrariesResolution {
 		sketch := sketch
-		mergedfile, err := makeSourceFile(sketchBuildPath, librariesBuildPath, sketch, paths.New(sketch.MainFile.Base()+".cpp"))
+		mergedfile, err := makeSourceFile(sketchBuildPath, sketchBuildPath, paths.New(sketch.MainFile.Base()+".cpp"))
 		if err != nil {
 			return errors.WithStack(err)
 		}
 		sourceFileQueue.push(mergedfile)
 
-		l.queueSourceFilesFromFolder(sketchBuildPath, librariesBuildPath, sourceFileQueue, sketch, sketchBuildPath, false /* recurse */)
+		l.queueSourceFilesFromFolder(sourceFileQueue, sketchBuildPath, false /* recurse */, sketchBuildPath, sketchBuildPath)
 		srcSubfolderPath := sketchBuildPath.Join("src")
 		if srcSubfolderPath.IsDir() {
-			l.queueSourceFilesFromFolder(sketchBuildPath, librariesBuildPath, sourceFileQueue, sketch, srcSubfolderPath, true /* recurse */)
+			l.queueSourceFilesFromFolder(sourceFileQueue, srcSubfolderPath, true /* recurse */, sketchBuildPath, sketchBuildPath)
 		}
 
 		for !sourceFileQueue.empty() {
@@ -419,7 +419,8 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 			}
 		} else {
 			for _, sourceDir := range library.SourceDirs() {
-				l.queueSourceFilesFromFolder(sketchBuildPath, librariesBuildPath, sourceFileQueue, library, sourceDir.Dir, sourceDir.Recurse)
+				l.queueSourceFilesFromFolder(sourceFileQueue, sourceDir.Dir, sourceDir.Recurse,
+					library.SourceDir, librariesBuildPath.Join(library.DirName), library.UtilityDir)
 			}
 		}
 		first = false
@@ -427,12 +428,12 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 }
 
 func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
-	sketchBuildPath *paths.Path,
-	librariesBuildPath *paths.Path,
 	sourceFileQueue *uniqueSourceFileQueue,
-	origin interface{},
 	folder *paths.Path,
 	recurse bool,
+	sourceDir *paths.Path,
+	buildDir *paths.Path,
+	extraIncludePath ...*paths.Path,
 ) error {
 	sourceFileExtensions := []string{}
 	for k := range globals.SourceFilesValidExtensions {
@@ -444,7 +445,7 @@ func (l *SketchLibrariesDetector) queueSourceFilesFromFolder(
 	}
 
 	for _, filePath := range filePaths {
-		sourceFile, err := makeSourceFile(sketchBuildPath, librariesBuildPath, origin, filePath)
+		sourceFile, err := makeSourceFile(sourceDir, buildDir, filePath, extraIncludePath...)
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -537,33 +538,42 @@ func (f *sourceFile) Equals(g *sourceFile) bool {
 // given origin. The given path can be absolute, or relative within the
 // origin's root source folder
 func makeSourceFile(
-	sketchBuildPath *paths.Path,
-	librariesBuildPath *paths.Path,
-	origin interface{},
-	path *paths.Path,
+	sourceDir *paths.Path,
+	buildDir *paths.Path,
+	sourceFilePath *paths.Path,
+	extraIncludePath ...*paths.Path,
 ) (*sourceFile, error) {
-	res := &sourceFile{}
-
-	switch o := origin.(type) {
-	case *sketch.Sketch:
-		res.buildRoot = sketchBuildPath
-		res.sourceRoot = sketchBuildPath
-	case *libraries.Library:
-		res.buildRoot = librariesBuildPath.Join(o.DirName)
-		res.sourceRoot = o.SourceDir
-		res.extraIncludePath = o.UtilityDir
-	default:
-		panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
+	res := &sourceFile{
+		buildRoot:  buildDir,
+		sourceRoot: sourceDir,
 	}
 
-	if path.IsAbs() {
+	if len(extraIncludePath) > 1 {
+		panic("only one extra include path allowed")
+	}
+	if len(extraIncludePath) > 0 {
+		res.extraIncludePath = extraIncludePath[0]
+	}
+	// switch o := origin.(type) {
+	// case *sketch.Sketch:
+	// 	res.buildRoot = sketchBuildPath
+	// 	res.sourceRoot = sketchBuildPath
+	// case *libraries.Library:
+	// 	res.buildRoot = librariesBuildPath.Join(o.DirName)
+	// 	res.sourceRoot = o.SourceDir
+	// 	res.extraIncludePath = o.UtilityDir
+	// default:
+	// 	panic("Unexpected origin for SourceFile: " + fmt.Sprint(origin))
+	// }
+
+	if sourceFilePath.IsAbs() {
 		var err error
-		path, err = res.sourceRoot.RelTo(path)
+		sourceFilePath, err = res.sourceRoot.RelTo(sourceFilePath)
 		if err != nil {
 			return nil, err
 		}
 	}
-	res.relativePath = path
+	res.relativePath = sourceFilePath
 	return res, nil
 }
 
