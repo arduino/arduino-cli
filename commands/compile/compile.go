@@ -98,7 +98,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	if err != nil {
 		return nil, &arduino.InvalidFQBNError{Cause: err}
 	}
-	targetPackage, targetPlatform, targetBoard, buildProperties, buildPlatform, err := pme.ResolveFQBN(fqbn)
+	targetPackage, targetPlatform, targetBoard, boardBuildProperties, buildPlatform, err := pme.ResolveFQBN(fqbn)
 	if err != nil {
 		if targetPlatform == nil {
 			return nil, &arduino.PlatformNotFoundError{
@@ -115,21 +115,21 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	// Setup sign keys if requested
 	if req.KeysKeychain != "" {
-		buildProperties.Set("build.keys.keychain", req.GetKeysKeychain())
+		boardBuildProperties.Set("build.keys.keychain", req.GetKeysKeychain())
 	}
 	if req.SignKey != "" {
-		buildProperties.Set("build.keys.sign_key", req.GetSignKey())
+		boardBuildProperties.Set("build.keys.sign_key", req.GetSignKey())
 	}
 	if req.EncryptKey != "" {
-		buildProperties.Set("build.keys.encrypt_key", req.GetEncryptKey())
+		boardBuildProperties.Set("build.keys.encrypt_key", req.GetEncryptKey())
 	}
 	// At the current time we do not have a way of knowing if a board supports the secure boot or not,
 	// so, if the flags to override the default keys are used, we try override the corresponding platform property nonetheless.
 	// It's not possible to use the default name for the keys since there could be more tools to sign and encrypt.
 	// So it's mandatory to use all three flags to sign and encrypt the binary
-	keychainProp := buildProperties.ContainsKey("build.keys.keychain")
-	signProp := buildProperties.ContainsKey("build.keys.sign_key")
-	encryptProp := buildProperties.ContainsKey("build.keys.encrypt_key")
+	keychainProp := boardBuildProperties.ContainsKey("build.keys.keychain")
+	signProp := boardBuildProperties.ContainsKey("build.keys.sign_key")
+	encryptProp := boardBuildProperties.ContainsKey("build.keys.encrypt_key")
 	// we verify that all the properties for the secure boot keys are defined or none of them is defined.
 	if !(keychainProp == signProp && signProp == encryptProp) {
 		return nil, fmt.Errorf(tr("Firmware encryption/signing requires all the following properties to be defined: %s", "build.keys.keychain, build.keys.sign_key, build.keys.encrypt_key"))
@@ -169,10 +169,9 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		coreBuildCachePath = buildCachePath.Join("core")
 	}
 
-	sketchBuilder := bldr.NewBuilder(sk, coreBuildCachePath)
+	sketchBuilder := bldr.NewBuilder(sk, boardBuildProperties, buildPath, req.GetOptimizeForDebug(), coreBuildCachePath)
 
-	// Add build properites related to sketch data
-	buildProperties = sketchBuilder.SetupBuildProperties(buildProperties, buildPath, req.GetOptimizeForDebug())
+	buildProperties := sketchBuilder.GetBuildProperties()
 
 	// Add user provided custom build properties
 	customBuildPropertiesArgs := append(req.GetBuildProperties(), "build.warn_data_percentage=75")

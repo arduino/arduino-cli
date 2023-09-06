@@ -97,18 +97,18 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		ctx.Sketch = sk
 	}
 
-	ctx.Builder = bldr.NewBuilder(ctx.Sketch, nil)
+	ctx.Builder = bldr.NewBuilder(ctx.Sketch, nil, nil, false, nil)
 	if fqbn != "" {
 		ctx.FQBN = parseFQBN(t, fqbn)
-		targetPackage, targetPlatform, targetBoard, buildProperties, buildPlatform, err := pme.ResolveFQBN(ctx.FQBN)
+		targetPackage, targetPlatform, targetBoard, boardBuildProperties, buildPlatform, err := pme.ResolveFQBN(ctx.FQBN)
 		require.NoError(t, err)
 		requiredTools, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 		require.NoError(t, err)
 
-		buildProperties = ctx.Builder.SetupBuildProperties(buildProperties, ctx.BuildPath, false /*OptimizeForDebug*/)
+		ctx.Builder = bldr.NewBuilder(ctx.Sketch, boardBuildProperties, ctx.BuildPath, false /*OptimizeForDebug*/, nil)
 		ctx.PackageManager = pme
 		ctx.TargetBoard = targetBoard
-		ctx.BuildProperties = buildProperties
+		ctx.BuildProperties = ctx.Builder.GetBuildProperties()
 		ctx.TargetPlatform = targetPlatform
 		ctx.TargetPackage = targetPackage
 		ctx.ActualPlatform = buildPlatform
