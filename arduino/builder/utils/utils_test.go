@@ -1,9 +1,8 @@
-package utils_test
+package utils
 
 import (
 	"testing"
 
-	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/stretchr/testify/require"
 )
 
@@ -22,6 +21,6 @@ func TestPrintableCommand(t *testing.T) {
 		" \"specialchar-`~!@#$%^&*()-_=+[{]}\\\\|;:'\\\",<.>/?-argument\"" +
 		" \"arg   with spaces\" \"arg\twith\t\ttabs\"" +
 		" lastarg"
-	result := utils.PrintableCommand(parts)
+	result := printableCommand(parts)
 	require.Equal(t, correct, result)
 }

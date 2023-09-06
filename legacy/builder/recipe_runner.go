@@ -20,7 +20,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -44,7 +43,7 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 	for _, recipe := range recipes {
 		logrus.Debugf(fmt.Sprintf("Running recipe: %s", recipe))
 
-		command, err := builder_utils.PrepareCommandForRecipe(properties, recipe, false)
+		command, err := utils.PrepareCommandForRecipe(properties, recipe, false)
 		if err != nil {
 			return errors.WithStack(err)
 		}

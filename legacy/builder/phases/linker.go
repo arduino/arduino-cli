@@ -21,7 +21,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
@@ -94,7 +93,7 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 			properties.SetPath("archive_file_path", archive)
 			properties.SetPath("object_file", object)
 
-			command, err := builder_utils.PrepareCommandForRecipe(properties, builder.RecipeARPattern, false)
+			command, err := utils.PrepareCommandForRecipe(properties, builder.RecipeARPattern, false)
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -118,7 +117,7 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 	properties.Set(builder.BuildPropertiesArchiveFilePath, coreArchiveFilePath.String())
 	properties.Set("object_files", objectFileList)
 
-	command, err := builder_utils.PrepareCommandForRecipe(properties, constants.RECIPE_C_COMBINE_PATTERN, false)
+	command, err := utils.PrepareCommandForRecipe(properties, constants.RECIPE_C_COMBINE_PATTERN, false)
 	if err != nil {
 		return err
 	}

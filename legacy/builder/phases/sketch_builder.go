@@ -17,8 +17,8 @@ package phases
 
 import (
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/pkg/errors"
 )
@@ -35,7 +35,7 @@ func (s *SketchBuilder) Run(ctx *types.Context) error {
 		return errors.WithStack(err)
 	}
 
-	objectFiles, err := builder_utils.CompileFiles(
+	objectFiles, err := utils.CompileFiles(
 		sketchBuildPath, sketchBuildPath, buildProperties, includes,
 		ctx.OnlyUpdateCompilationDatabase,
 		ctx.CompilationDatabase,
@@ -55,7 +55,7 @@ func (s *SketchBuilder) Run(ctx *types.Context) error {
 	// The "src/" subdirectory of a sketch is compiled recursively
 	sketchSrcPath := sketchBuildPath.Join("src")
 	if sketchSrcPath.IsDir() {
-		srcObjectFiles, err := builder_utils.CompileFilesRecursive(
+		srcObjectFiles, err := utils.CompileFilesRecursive(
 			sketchSrcPath, sketchSrcPath, buildProperties, includes,
 			ctx.OnlyUpdateCompilationDatabase,
 			ctx.CompilationDatabase,

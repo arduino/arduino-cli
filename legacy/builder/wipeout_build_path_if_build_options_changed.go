@@ -19,7 +19,7 @@ import (
 	"encoding/json"
 	"path/filepath"
 
-	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
+	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
@@ -66,9 +66,9 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 		coreFolder := buildProperties.GetPath("build.core.path")
 		realCoreFolder := coreFolder.Parent().Parent()
 		jsonPath := ctx.BuildPath.Join(constants.BUILD_OPTIONS_FILE)
-		coreUnchanged, _ := builder_utils.DirContentIsOlderThan(realCoreFolder, jsonPath, ".txt")
+		coreUnchanged, _ := utils.DirContentIsOlderThan(realCoreFolder, jsonPath, ".txt")
 		if coreUnchanged && targetCoreFolder != nil && !realCoreFolder.EqualsTo(targetCoreFolder) {
-			coreUnchanged, _ = builder_utils.DirContentIsOlderThan(targetCoreFolder, jsonPath, ".txt")
+			coreUnchanged, _ = utils.DirContentIsOlderThan(targetCoreFolder, jsonPath, ".txt")
 		}
 		if coreUnchanged {
 			return nil

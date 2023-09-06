@@ -19,9 +19,9 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
@@ -67,7 +67,7 @@ func findExpectedPrecompiledLibFolder(ctx *types.Context, library *libraries.Lib
 	// Add fpu specifications if they exist
 	// To do so, resolve recipe.cpp.o.pattern,
 	// search for -mfpu=xxx -mfloat-abi=yyy and add to a subfolder
-	command, _ := builder_utils.PrepareCommandForRecipe(ctx.BuildProperties, "recipe.cpp.o.pattern", true)
+	command, _ := utils.PrepareCommandForRecipe(ctx.BuildProperties, "recipe.cpp.o.pattern", true)
 	fpuSpecs := ""
 	for _, el := range command.GetArgs() {
 		if strings.Contains(el, FPU_CFLAG) {
@@ -186,7 +186,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 	}
 
 	if library.Layout == libraries.RecursiveLayout {
-		libObjectFiles, err := builder_utils.CompileFilesRecursive(
+		libObjectFiles, err := utils.CompileFilesRecursive(
 			library.SourceDir, libraryBuildPath, buildProperties, includes,
 			ctx.OnlyUpdateCompilationDatabase,
 			ctx.CompilationDatabase,
@@ -203,7 +203,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 			return nil, errors.WithStack(err)
 		}
 		if library.DotALinkage {
-			archiveFile, verboseInfo, err := builder_utils.ArchiveCompiledFiles(
+			archiveFile, verboseInfo, err := utils.ArchiveCompiledFiles(
 				libraryBuildPath, paths.New(library.DirName+".a"), libObjectFiles, buildProperties,
 				ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
 				ctx.Stdout, ctx.Stderr,
@@ -222,7 +222,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 		if library.UtilityDir != nil {
 			includes = append(includes, cpp.WrapWithHyphenI(library.UtilityDir.String()))
 		}
-		libObjectFiles, err := builder_utils.CompileFiles(
+		libObjectFiles, err := utils.CompileFiles(
 			library.SourceDir, libraryBuildPath, buildProperties, includes,
 			ctx.OnlyUpdateCompilationDatabase,
 			ctx.CompilationDatabase,
@@ -242,7 +242,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 
 		if library.UtilityDir != nil {
 			utilityBuildPath := libraryBuildPath.Join("utility")
-			utilityObjectFiles, err := builder_utils.CompileFiles(
+			utilityObjectFiles, err := utils.CompileFiles(
 				library.UtilityDir, utilityBuildPath, buildProperties, includes,
 				ctx.OnlyUpdateCompilationDatabase,
 				ctx.CompilationDatabase,

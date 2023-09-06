@@ -28,7 +28,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/globals"
-	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 )
@@ -367,7 +366,7 @@ func extractCompileFlags(ctx *types.Context, recipe string, defines, dynamicLibs
 		return target
 	}
 
-	command, _ := builder_utils.PrepareCommandForRecipe(ctx.BuildProperties, recipe, true)
+	command, _ := utils.PrepareCommandForRecipe(ctx.BuildProperties, recipe, true)
 
 	for _, arg := range command.GetArgs() {
 		if strings.HasPrefix(arg, "-D") {

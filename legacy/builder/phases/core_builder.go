@@ -26,20 +26,17 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
+	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/buildcache"
 	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
-
-// Trasformo in un command
-// provo a spostare builder_utils in arduino/Builder
 
 var tr = i18n.Tr
 
@@ -116,7 +113,7 @@ func compileCore(
 	var err error
 	variantObjectFiles := paths.NewPathList()
 	if variantFolder != nil && variantFolder.IsDir() {
-		variantObjectFiles, err = builder_utils.CompileFilesRecursive(
+		variantObjectFiles, err = utils.CompileFilesRecursive(
 			variantFolder, buildPath, buildProperties, includes,
 			onlyUpdateCompilationDatabase,
 			compilationDatabase,
@@ -149,12 +146,12 @@ func compileCore(
 		var canUseArchivedCore bool
 		if onlyUpdateCompilationDatabase || clean {
 			canUseArchivedCore = false
-		} else if isOlder, err := builder_utils.DirContentIsOlderThan(realCoreFolder, targetArchivedCore); err != nil || !isOlder {
+		} else if isOlder, err := utils.DirContentIsOlderThan(realCoreFolder, targetArchivedCore); err != nil || !isOlder {
 			// Recreate the archive if ANY of the core files (including platform.txt) has changed
 			canUseArchivedCore = false
 		} else if targetCoreFolder == nil || realCoreFolder.EquivalentTo(targetCoreFolder) {
 			canUseArchivedCore = true
-		} else if isOlder, err := builder_utils.DirContentIsOlderThan(targetCoreFolder, targetArchivedCore); err != nil || !isOlder {
+		} else if isOlder, err := utils.DirContentIsOlderThan(targetCoreFolder, targetArchivedCore); err != nil || !isOlder {
 			// Recreate the archive if ANY of the build core files (including platform.txt) has changed
 			canUseArchivedCore = false
 		} else {
@@ -170,7 +167,7 @@ func compileCore(
 		}
 	}
 
-	coreObjectFiles, err := builder_utils.CompileFilesRecursive(
+	coreObjectFiles, err := utils.CompileFilesRecursive(
 		coreFolder, buildPath, buildProperties, includes,
 		onlyUpdateCompilationDatabase,
 		compilationDatabase,
@@ -185,7 +182,7 @@ func compileCore(
 		return nil, nil, errors.WithStack(err)
 	}
 
-	archiveFile, verboseInfo, err := builder_utils.ArchiveCompiledFiles(
+	archiveFile, verboseInfo, err := utils.ArchiveCompiledFiles(
 		buildPath, paths.New("core.a"), coreObjectFiles, buildProperties,
 		onlyUpdateCompilationDatabase, verbose, stdoutWriter, stderrWriter,
 	)
