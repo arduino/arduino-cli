@@ -31,7 +31,7 @@ var tr = i18n.Tr
 
 // NewCommand creates a new `upgrade` command
 func NewCommand() *cobra.Command {
-	var postInstallFlags arguments.PostInstallFlags
+	var postInstallFlags arguments.PrePostScriptsFlags
 	upgradeCommand := &cobra.Command{
 		Use:     "upgrade",
 		Short:   tr("Upgrades installed cores and libraries."),

@@ -31,7 +31,7 @@ import (
 
 func initInstallCommand() *cobra.Command {
 	var noOverwrite bool
-	var postInstallFlags arguments.PostInstallFlags
+	var postInstallFlags arguments.PrePostScriptsFlags
 	installCommand := &cobra.Command{
 		Use:   fmt.Sprintf("install %s:%s[@%s]...", tr("PACKAGER"), tr("ARCH"), tr("VERSION")),
 		Short: tr("Installs one or more cores and corresponding tool dependencies."),
@@ -56,7 +56,7 @@ func initInstallCommand() *cobra.Command {
 	return installCommand
 }
 
-func runInstallCommand(args []string, postInstallFlags arguments.PostInstallFlags, noOverwrite bool) {
+func runInstallCommand(args []string, postInstallFlags arguments.PrePostScriptsFlags, noOverwrite bool) {
 	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli core install`")
 

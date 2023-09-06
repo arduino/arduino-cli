@@ -32,7 +32,7 @@ import (
 )
 
 func initUpgradeCommand() *cobra.Command {
-	var postInstallFlags arguments.PostInstallFlags
+	var postInstallFlags arguments.PrePostScriptsFlags
 	upgradeCommand := &cobra.Command{
 		Use:   fmt.Sprintf("upgrade [%s:%s] ...", tr("PACKAGER"), tr("ARCH")),
 		Short: tr("Upgrades one or all installed platforms to the latest version."),
