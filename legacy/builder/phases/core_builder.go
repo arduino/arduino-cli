@@ -16,6 +16,7 @@
 package phases
 
 import (
+	"bytes"
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
@@ -23,6 +24,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/buildcache"
 	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
@@ -34,61 +36,72 @@ import (
 	"github.com/pkg/errors"
 )
 
-type CoreBuilder struct{}
+// Trasformo in un command
+// provo a spostare builder_utils in arduino/Builder
 
 var tr = i18n.Tr
 
-func (s *CoreBuilder) Run(ctx *types.Context) error {
-	coreBuildPath := ctx.CoreBuildPath
-	coreBuildCachePath := ctx.CoreBuildCachePath
-	buildProperties := ctx.BuildProperties
-
+func CoreBuilder(
+	ctx *types.Context,
+	buildPath, coreBuildPath, coreBuildCachePath *paths.Path,
+	buildProperties *properties.Map,
+	actualPlatform *cores.PlatformRelease,
+	verbose, onlyUpdateCompilationDatabase, clean bool,
+) (paths.PathList, *paths.Path, *paths.Path, []byte, []byte, error) {
+	normalOut := &bytes.Buffer{}
 	if err := coreBuildPath.MkdirAll(); err != nil {
-		return errors.WithStack(err)
+		return nil, nil, coreBuildCachePath, nil, nil, errors.WithStack(err)
 	}
 
 	if coreBuildCachePath != nil {
-		if _, err := coreBuildCachePath.RelTo(ctx.BuildPath); err != nil {
-			ctx.Info(tr("Couldn't deeply cache core build: %[1]s", err))
-			ctx.Info(tr("Running normal build of the core..."))
+		if _, err := coreBuildCachePath.RelTo(buildPath); err != nil {
+			normalOut.WriteString(tr("Couldn't deeply cache core build: %[1]s", err))
+			normalOut.WriteString(tr("Running normal build of the core..."))
 			coreBuildCachePath = nil
-			ctx.CoreBuildCachePath = nil
 		} else if err := coreBuildCachePath.MkdirAll(); err != nil {
-			return errors.WithStack(err)
+			return nil, nil, coreBuildCachePath, nil, nil, errors.WithStack(err)
 		}
 	}
 
-	archiveFile, objectFiles, err := compileCore(ctx, coreBuildPath, coreBuildCachePath, buildProperties)
+	archiveFile, objectFiles, verboseOut, err := compileCore(
+		ctx,
+		verbose, onlyUpdateCompilationDatabase, clean,
+		actualPlatform,
+		coreBuildPath, coreBuildCachePath,
+		buildProperties,
+	)
 	if err != nil {
-		return errors.WithStack(err)
+		return nil, nil, coreBuildCachePath, normalOut.Bytes(), verboseOut, errors.WithStack(err)
 	}
 
-	ctx.CoreArchiveFilePath = archiveFile
-	ctx.CoreObjectsFiles = objectFiles
-
-	return nil
+	return objectFiles, archiveFile, coreBuildCachePath, normalOut.Bytes(), verboseOut, nil
 }
 
-func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *paths.Path, buildProperties *properties.Map) (*paths.Path, paths.PathList, error) {
+func compileCore(
+	ctx *types.Context,
+	verbose, onlyUpdateCompilationDatabase, clean bool,
+	actualPlatform *cores.PlatformRelease,
+	buildPath, buildCachePath *paths.Path,
+	buildProperties *properties.Map,
+) (*paths.Path, paths.PathList, []byte, error) {
+	verboseOut := &bytes.Buffer{}
+
 	coreFolder := buildProperties.GetPath("build.core.path")
 	variantFolder := buildProperties.GetPath("build.variant.path")
-
 	targetCoreFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH)
 
-	includes := []string{}
-	includes = append(includes, coreFolder.String())
+	includes := []string{coreFolder.String()}
 	if variantFolder != nil && variantFolder.IsDir() {
 		includes = append(includes, variantFolder.String())
 	}
 	includes = f.Map(includes, cpp.WrapWithHyphenI)
 
 	var err error
-
 	variantObjectFiles := paths.NewPathList()
 	if variantFolder != nil && variantFolder.IsDir() {
 		variantObjectFiles, err = builder_utils.CompileFilesRecursive(ctx, variantFolder, buildPath, buildProperties, includes)
 		if err != nil {
-			return nil, nil, errors.WithStack(err)
+			return nil, nil, verboseOut.Bytes(), errors.WithStack(err)
 		}
 	}
 
@@ -98,15 +111,16 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 		archivedCoreName := GetCachedCoreArchiveDirName(
 			buildProperties.Get("build.fqbn"),
 			buildProperties.Get("compiler.optimization_flags"),
-			realCoreFolder)
+			realCoreFolder,
+		)
 		targetArchivedCore = buildCachePath.Join(archivedCoreName, "core.a")
 
 		if _, err := buildcache.New(buildCachePath).GetOrCreate(archivedCoreName); errors.Is(err, buildcache.CreateDirErr) {
-			return nil, nil, fmt.Errorf(tr("creating core cache folder: %s", err))
+			return nil, nil, verboseOut.Bytes(), fmt.Errorf(tr("creating core cache folder: %s", err))
 		}
 
 		var canUseArchivedCore bool
-		if ctx.OnlyUpdateCompilationDatabase || ctx.Clean {
+		if onlyUpdateCompilationDatabase || clean {
 			canUseArchivedCore = false
 		} else if isOlder, err := builder_utils.DirContentIsOlderThan(realCoreFolder, targetArchivedCore); err != nil || !isOlder {
 			// Recreate the archive if ANY of the core files (including platform.txt) has changed
@@ -122,47 +136,47 @@ func compileCore(ctx *types.Context, buildPath *paths.Path, buildCachePath *path
 
 		if canUseArchivedCore {
 			// use archived core
-			if ctx.Verbose {
-				ctx.Info(tr("Using precompiled core: %[1]s", targetArchivedCore))
+			if verbose {
+				verboseOut.WriteString(tr("Using precompiled core: %[1]s", targetArchivedCore))
 			}
-			return targetArchivedCore, variantObjectFiles, nil
+			return targetArchivedCore, variantObjectFiles, verboseOut.Bytes(), nil
 		}
 	}
 
 	coreObjectFiles, err := builder_utils.CompileFilesRecursive(ctx, coreFolder, buildPath, buildProperties, includes)
 	if err != nil {
-		return nil, nil, errors.WithStack(err)
+		return nil, nil, verboseOut.Bytes(), errors.WithStack(err)
 	}
 
 	archiveFile, err := builder_utils.ArchiveCompiledFiles(ctx, buildPath, paths.New("core.a"), coreObjectFiles, buildProperties)
 	if err != nil {
-		return nil, nil, errors.WithStack(err)
+		return nil, nil, verboseOut.Bytes(), errors.WithStack(err)
 	}
 
 	// archive core.a
-	if targetArchivedCore != nil && !ctx.OnlyUpdateCompilationDatabase {
+	if targetArchivedCore != nil && !onlyUpdateCompilationDatabase {
 		err := archiveFile.CopyTo(targetArchivedCore)
-		if ctx.Verbose {
+		if verbose {
 			if err == nil {
-				ctx.Info(tr("Archiving built core (caching) in: %[1]s", targetArchivedCore))
+				verboseOut.WriteString(tr("Archiving built core (caching) in: %[1]s", targetArchivedCore))
 			} else if os.IsNotExist(err) {
-				ctx.Info(tr("Unable to cache built core, please tell %[1]s maintainers to follow %[2]s",
-					ctx.ActualPlatform,
+				verboseOut.WriteString(tr("Unable to cache built core, please tell %[1]s maintainers to follow %[2]s",
+					actualPlatform,
 					"https://arduino.github.io/arduino-cli/latest/platform-specification/#recipes-to-build-the-corea-archive-file"))
 			} else {
-				ctx.Info(tr("Error archiving built core (caching) in %[1]s: %[2]s", targetArchivedCore, err))
+				verboseOut.WriteString(tr("Error archiving built core (caching) in %[1]s: %[2]s", targetArchivedCore, err))
 			}
 		}
 	}
 
-	return archiveFile, variantObjectFiles, nil
+	return archiveFile, variantObjectFiles, verboseOut.Bytes(), nil
 }
 
 // GetCachedCoreArchiveDirName returns the directory name to be used to store
 // the global cached core.a.
 func GetCachedCoreArchiveDirName(fqbn string, optimizationFlags string, coreFolder *paths.Path) string {
-	fqbnToUnderscore := strings.Replace(fqbn, ":", "_", -1)
-	fqbnToUnderscore = strings.Replace(fqbnToUnderscore, "=", "_", -1)
+	fqbnToUnderscore := strings.ReplaceAll(fqbn, ":", "_")
+	fqbnToUnderscore = strings.ReplaceAll(fqbnToUnderscore, "=", "_")
 	if absCoreFolder, err := coreFolder.Abs(); err == nil {
 		coreFolder = absCoreFolder
 	} // silently continue if absolute path can't be detected

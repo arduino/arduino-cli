@@ -72,7 +72,29 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		utils.LogIfVerbose(false, tr("Compiling core...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.core.prebuild", Suffix: ".pattern"},
-		&phases.CoreBuilder{},
+
+		types.BareCommand(func(ctx *types.Context) error {
+			objectFiles, archiveFile, coreBuildCachePath,
+				normalOut, verboseOut, err := phases.CoreBuilder(
+				ctx,
+				ctx.BuildPath, ctx.CoreBuildPath, ctx.CoreBuildCachePath,
+				ctx.BuildProperties,
+				ctx.ActualPlatform,
+				ctx.Verbose, ctx.OnlyUpdateCompilationDatabase, ctx.Clean,
+			)
+
+			ctx.CoreObjectsFiles = objectFiles
+			ctx.CoreArchiveFilePath = archiveFile
+			ctx.CoreBuildCachePath = coreBuildCachePath
+
+			ctx.Info(string(normalOut))
+			if ctx.Verbose {
+				ctx.Info(string(verboseOut))
+			}
+
+			return err
+		}),
+
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.core.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
 		utils.LogIfVerbose(false, tr("Linking everything together...")),
