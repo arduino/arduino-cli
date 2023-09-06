@@ -56,7 +56,10 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 			return nil
 		}
 
-		_, _, err = utils.ExecCommand(ctx, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+		verboseInfo, _, _, err := utils.ExecCommand(ctx.Verbose, ctx.Stdout, ctx.Stderr, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+		if ctx.Verbose {
+			ctx.Info(string(verboseInfo))
+		}
 		if err != nil {
 			return errors.WithStack(err)
 		}

@@ -16,13 +16,16 @@
 package builder_utils
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
 
+	"github.com/arduino/arduino-cli/arduino/builder"
 	bUtils "github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/executils"
@@ -30,6 +33,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -63,15 +67,81 @@ func DirContentIsOlderThan(dir *paths.Path, target *paths.Path, extensions ...st
 	return true, nil
 }
 
-func CompileFiles(ctx *types.Context, sourceDir *paths.Path, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
-	return compileFiles(ctx, sourceDir, false, buildPath, buildProperties, includes)
+func CompileFiles(
+	sourceDir, buildPath *paths.Path,
+	buildProperties *properties.Map,
+	includes []string,
+	onlyUpdateCompilationDatabase bool,
+	compilationDatabase *builder.CompilationDatabase,
+	jobs int,
+	verbose bool,
+	warningsLevel string,
+	stdoutWriter, stderrWriter io.Writer,
+	verboseInfoFn func(msg string),
+	verboseStdoutFn, verboseStderrFn func(data []byte),
+	progress *types.ProgressStruct, progressCB rpc.TaskProgressCB,
+) (paths.PathList, error) {
+	return compileFiles(
+		onlyUpdateCompilationDatabase,
+		compilationDatabase,
+		jobs,
+		sourceDir,
+		false,
+		buildPath, buildProperties, includes,
+		verbose,
+		warningsLevel,
+		stdoutWriter, stderrWriter,
+		verboseInfoFn, verboseStdoutFn, verboseStderrFn,
+		progress, progressCB,
+	)
 }
 
-func CompileFilesRecursive(ctx *types.Context, sourceDir *paths.Path, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
-	return compileFiles(ctx, sourceDir, true, buildPath, buildProperties, includes)
+func CompileFilesRecursive(
+	sourceDir, buildPath *paths.Path,
+	buildProperties *properties.Map,
+	includes []string,
+	onlyUpdateCompilationDatabase bool,
+	compilationDatabase *builder.CompilationDatabase,
+	jobs int,
+	verbose bool,
+	warningsLevel string,
+	stdoutWriter, stderrWriter io.Writer,
+	verboseInfoFn func(msg string),
+	verboseStdoutFn, verboseStderrFn func(data []byte),
+	progress *types.ProgressStruct, progressCB rpc.TaskProgressCB,
+) (paths.PathList, error) {
+	return compileFiles(
+		onlyUpdateCompilationDatabase,
+		compilationDatabase,
+		jobs,
+		sourceDir,
+		true,
+		buildPath, buildProperties, includes,
+		verbose,
+		warningsLevel,
+		stdoutWriter, stderrWriter,
+		verboseInfoFn, verboseStdoutFn, verboseStderrFn,
+		progress, progressCB,
+	)
 }
 
-func compileFiles(ctx *types.Context, sourceDir *paths.Path, recurse bool, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
+func compileFiles(
+	onlyUpdateCompilationDatabase bool,
+	compilationDatabase *builder.CompilationDatabase,
+	jobs int,
+	sourceDir *paths.Path,
+	recurse bool,
+	buildPath *paths.Path,
+	buildProperties *properties.Map,
+	includes []string,
+	verbose bool,
+	warningsLevel string,
+	stdoutWriter, stderrWriter io.Writer,
+	verboseInfoFn func(msg string),
+	verboseStdoutFn, verboseStderrFn func(data []byte),
+	progress *types.ProgressStruct,
+	progressCB rpc.TaskProgressCB,
+) (paths.PathList, error) {
 	validExtensions := []string{}
 	for ext := range globals.SourceFilesValidExtensions {
 		validExtensions = append(validExtensions, ext)
@@ -82,8 +152,8 @@ func compileFiles(ctx *types.Context, sourceDir *paths.Path, recurse bool, build
 		return nil, err
 	}
 
-	ctx.Progress.AddSubSteps(len(sources))
-	defer ctx.Progress.RemoveSubSteps()
+	progress.AddSubSteps(len(sources))
+	defer progress.RemoveSubSteps()
 
 	objectFiles := paths.NewPathList()
 	var objectFilesMux sync.Mutex
@@ -99,7 +169,19 @@ func compileFiles(ctx *types.Context, sourceDir *paths.Path, recurse bool, build
 		if !buildProperties.ContainsKey(recipe) {
 			recipe = fmt.Sprintf("recipe%s.o.pattern", globals.SourceFilesValidExtensions[source.Ext()])
 		}
-		objectFile, err := compileFileWithRecipe(ctx, sourceDir, source, buildPath, buildProperties, includes, recipe)
+		objectFile, verboseInfo, verboseStdout, stderr, err := compileFileWithRecipe(
+			stdoutWriter, stderrWriter,
+			warningsLevel,
+			compilationDatabase,
+			verbose,
+			onlyUpdateCompilationDatabase,
+			sourceDir, source, buildPath, buildProperties, includes, recipe,
+		)
+		if verbose {
+			verboseStdoutFn(verboseStdout)
+			verboseInfoFn(string(verboseInfo))
+		}
+		verboseStderrFn(stderr)
 		if err != nil {
 			errorsMux.Lock()
 			errorsList = append(errorsList, err)
@@ -113,7 +195,6 @@ func compileFiles(ctx *types.Context, sourceDir *paths.Path, recurse bool, build
 
 	// Spawn jobs runners
 	var wg sync.WaitGroup
-	jobs := ctx.Jobs
 	if jobs == 0 {
 		jobs = runtime.NumCPU()
 	}
@@ -137,8 +218,14 @@ func compileFiles(ctx *types.Context, sourceDir *paths.Path, recurse bool, build
 		}
 		queue <- source
 
-		ctx.Progress.CompleteStep()
-		ctx.PushProgress()
+		progress.CompleteStep()
+		// PushProgress
+		if progressCB != nil {
+			progressCB(&rpc.TaskProgress{
+				Percent:   progress.Progress,
+				Completed: progress.Progress >= 100.0,
+			})
+		}
 	}
 	close(queue)
 	wg.Wait()
@@ -150,14 +237,27 @@ func compileFiles(ctx *types.Context, sourceDir *paths.Path, recurse bool, build
 	return objectFiles, nil
 }
 
-func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *paths.Path, buildPath *paths.Path, buildProperties *properties.Map, includes []string, recipe string) (*paths.Path, error) {
+func compileFileWithRecipe(
+	stdoutWriter, stderrWriter io.Writer,
+	warningsLevel string,
+	compilationDatabase *builder.CompilationDatabase,
+	verbose, onlyUpdateCompilationDatabase bool,
+	sourcePath *paths.Path,
+	source *paths.Path,
+	buildPath *paths.Path,
+	buildProperties *properties.Map,
+	includes []string,
+	recipe string,
+) (*paths.Path, []byte, []byte, []byte, error) {
+	verboseStdout, verboseInfo, errOut := &bytes.Buffer{}, &bytes.Buffer{}, &bytes.Buffer{}
+
 	properties := buildProperties.Clone()
-	properties.Set(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel))
+	properties.Set(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+warningsLevel))
 	properties.Set(constants.BUILD_PROPERTIES_INCLUDES, strings.Join(includes, constants.SPACE))
 	properties.SetPath("source_file", source)
 	relativeSource, err := sourcePath.RelTo(source)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, nil, nil, nil, errors.WithStack(err)
 	}
 	depsFile := buildPath.Join(relativeSource.String() + ".d")
 	objectFile := buildPath.Join(relativeSource.String() + ".o")
@@ -165,53 +265,59 @@ func compileFileWithRecipe(ctx *types.Context, sourcePath *paths.Path, source *p
 	properties.SetPath(constants.BUILD_PROPERTIES_OBJECT_FILE, objectFile)
 	err = objectFile.Parent().MkdirAll()
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, nil, nil, nil, errors.WithStack(err)
 	}
 
 	objIsUpToDate, err := bUtils.ObjFileIsUpToDate(source, objectFile, depsFile)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, nil, nil, nil, errors.WithStack(err)
 	}
 
 	command, err := PrepareCommandForRecipe(properties, recipe, false)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, nil, nil, nil, errors.WithStack(err)
 	}
-	if ctx.CompilationDatabase != nil {
-		ctx.CompilationDatabase.Add(source, command)
+	if compilationDatabase != nil {
+		compilationDatabase.Add(source, command)
 	}
-	if !objIsUpToDate && !ctx.OnlyUpdateCompilationDatabase {
+	if !objIsUpToDate && !onlyUpdateCompilationDatabase {
 		// Since this compile could be multithreaded, we first capture the command output
-		stdout, stderr, err := utils.ExecCommand(ctx, command, utils.Capture, utils.Capture)
+		info, stdout, stderr, err := utils.ExecCommand(verbose, stdoutWriter, stderrWriter, command, utils.Capture, utils.Capture)
 		// and transfer all at once at the end...
-		if ctx.Verbose {
-			ctx.WriteStdout(stdout)
+		if verbose {
+			verboseInfo.Write(info)
+			verboseStdout.Write(stdout)
 		}
-		ctx.WriteStderr(stderr)
+		errOut.Write(stderr)
 
 		// ...and then return the error
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, verboseInfo.Bytes(), verboseStdout.Bytes(), errOut.Bytes(), errors.WithStack(err)
 		}
-	} else if ctx.Verbose {
+	} else if verbose {
 		if objIsUpToDate {
-			ctx.Info(tr("Using previously compiled file: %[1]s", objectFile))
+			verboseInfo.WriteString(tr("Using previously compiled file: %[1]s", objectFile))
 		} else {
-			ctx.Info(tr("Skipping compile of: %[1]s", objectFile))
+			verboseInfo.WriteString(tr("Skipping compile of: %[1]s", objectFile))
 		}
 	}
 
-	return objectFile, nil
+	return objectFile, verboseInfo.Bytes(), verboseStdout.Bytes(), errOut.Bytes(), nil
 }
 
-func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile *paths.Path, objectFilesToArchive paths.PathList, buildProperties *properties.Map) (*paths.Path, error) {
+func ArchiveCompiledFiles(
+	buildPath *paths.Path, archiveFile *paths.Path, objectFilesToArchive paths.PathList, buildProperties *properties.Map,
+	onlyUpdateCompilationDatabase, verbose bool,
+	stdoutWriter, stderrWriter io.Writer,
+) (*paths.Path, []byte, error) {
+	verboseInfobuf := &bytes.Buffer{}
 	archiveFilePath := buildPath.JoinPath(archiveFile)
 
-	if ctx.OnlyUpdateCompilationDatabase {
-		if ctx.Verbose {
-			ctx.Info(tr("Skipping archive creation of: %[1]s", archiveFilePath))
+	if onlyUpdateCompilationDatabase {
+		if verbose {
+			verboseInfobuf.WriteString(tr("Skipping archive creation of: %[1]s", archiveFilePath))
 		}
-		return archiveFilePath, nil
+		return archiveFilePath, verboseInfobuf.Bytes(), nil
 	}
 
 	if archiveFileStat, err := archiveFilePath.Stat(); err == nil {
@@ -228,13 +334,13 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 		// something changed, rebuild the core archive
 		if rebuildArchive {
 			if err := archiveFilePath.Remove(); err != nil {
-				return nil, errors.WithStack(err)
+				return nil, nil, errors.WithStack(err)
 			}
 		} else {
-			if ctx.Verbose {
-				ctx.Info(tr("Using previously compiled file: %[1]s", archiveFilePath))
+			if verbose {
+				verboseInfobuf.WriteString(tr("Using previously compiled file: %[1]s", archiveFilePath))
 			}
-			return archiveFilePath, nil
+			return archiveFilePath, verboseInfobuf.Bytes(), nil
 		}
 	}
 
@@ -246,16 +352,19 @@ func ArchiveCompiledFiles(ctx *types.Context, buildPath *paths.Path, archiveFile
 
 		command, err := PrepareCommandForRecipe(properties, constants.RECIPE_AR_PATTERN, false)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, verboseInfobuf.Bytes(), errors.WithStack(err)
 		}
 
-		_, _, err = utils.ExecCommand(ctx, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+		verboseInfo, _, _, err := utils.ExecCommand(verbose, stdoutWriter, stderrWriter, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+		if verbose {
+			verboseInfobuf.WriteString(string(verboseInfo))
+		}
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, verboseInfobuf.Bytes(), errors.WithStack(err)
 		}
 	}
 
-	return archiveFilePath, nil
+	return archiveFilePath, verboseInfobuf.Bytes(), nil
 }
 
 const COMMANDLINE_LIMIT = 30000

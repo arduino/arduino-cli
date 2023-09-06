@@ -74,23 +74,24 @@ func (s *Builder) Run(ctx *types.Context) error {
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.core.prebuild", Suffix: ".pattern"},
 
 		types.BareCommand(func(ctx *types.Context) error {
-			objectFiles, archiveFile, coreBuildCachePath,
-				normalOut, verboseOut, err := phases.CoreBuilder(
-				ctx,
+			objectFiles, archiveFile, coreBuildCachePath, err := phases.CoreBuilder(
 				ctx.BuildPath, ctx.CoreBuildPath, ctx.CoreBuildCachePath,
 				ctx.BuildProperties,
 				ctx.ActualPlatform,
 				ctx.Verbose, ctx.OnlyUpdateCompilationDatabase, ctx.Clean,
+				ctx.CompilationDatabase,
+				ctx.Jobs,
+				ctx.WarningsLevel,
+				ctx.Stdout, ctx.Stderr,
+				func(msg string) { ctx.Info(msg) },
+				func(data []byte) { ctx.WriteStdout(data) },
+				func(data []byte) { ctx.WriteStderr(data) },
+				&ctx.Progress, ctx.ProgressCB,
 			)
 
 			ctx.CoreObjectsFiles = objectFiles
 			ctx.CoreArchiveFilePath = archiveFile
 			ctx.CoreBuildCachePath = coreBuildCachePath
-
-			ctx.Info(string(normalOut))
-			if ctx.Verbose {
-				ctx.Info(string(verboseOut))
-			}
 
 			return err
 		}),

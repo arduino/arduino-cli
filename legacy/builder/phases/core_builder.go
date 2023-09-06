@@ -16,13 +16,14 @@
 package phases
 
 import (
-	"bytes"
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/buildcache"
@@ -31,6 +32,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -42,50 +44,65 @@ import (
 var tr = i18n.Tr
 
 func CoreBuilder(
-	ctx *types.Context,
 	buildPath, coreBuildPath, coreBuildCachePath *paths.Path,
 	buildProperties *properties.Map,
 	actualPlatform *cores.PlatformRelease,
 	verbose, onlyUpdateCompilationDatabase, clean bool,
-) (paths.PathList, *paths.Path, *paths.Path, []byte, []byte, error) {
-	normalOut := &bytes.Buffer{}
+	compilationDatabase *builder.CompilationDatabase,
+	jobs int,
+	warningsLevel string,
+	stdoutWriter, stderrWriter io.Writer,
+	verboseInfoFn func(msg string),
+	verboseStdoutFn, verboseStderrFn func(data []byte),
+	progress *types.ProgressStruct, progressCB rpc.TaskProgressCB,
+) (paths.PathList, *paths.Path, *paths.Path, error) {
 	if err := coreBuildPath.MkdirAll(); err != nil {
-		return nil, nil, coreBuildCachePath, nil, nil, errors.WithStack(err)
+		return nil, nil, coreBuildCachePath, errors.WithStack(err)
 	}
 
 	if coreBuildCachePath != nil {
 		if _, err := coreBuildCachePath.RelTo(buildPath); err != nil {
-			normalOut.WriteString(tr("Couldn't deeply cache core build: %[1]s", err))
-			normalOut.WriteString(tr("Running normal build of the core..."))
+			verboseInfoFn(tr("Couldn't deeply cache core build: %[1]s", err))
+			verboseInfoFn(tr("Running normal build of the core..."))
 			coreBuildCachePath = nil
 		} else if err := coreBuildCachePath.MkdirAll(); err != nil {
-			return nil, nil, coreBuildCachePath, nil, nil, errors.WithStack(err)
+			return nil, nil, coreBuildCachePath, errors.WithStack(err)
 		}
 	}
 
-	archiveFile, objectFiles, verboseOut, err := compileCore(
-		ctx,
+	archiveFile, objectFiles, err := compileCore(
 		verbose, onlyUpdateCompilationDatabase, clean,
 		actualPlatform,
 		coreBuildPath, coreBuildCachePath,
 		buildProperties,
+		compilationDatabase,
+		jobs,
+		warningsLevel,
+		stdoutWriter, stderrWriter,
+		verboseInfoFn,
+		verboseStdoutFn, verboseStderrFn,
+		progress, progressCB,
 	)
 	if err != nil {
-		return nil, nil, coreBuildCachePath, normalOut.Bytes(), verboseOut, errors.WithStack(err)
+		return nil, nil, coreBuildCachePath, errors.WithStack(err)
 	}
 
-	return objectFiles, archiveFile, coreBuildCachePath, normalOut.Bytes(), verboseOut, nil
+	return objectFiles, archiveFile, coreBuildCachePath, nil
 }
 
 func compileCore(
-	ctx *types.Context,
 	verbose, onlyUpdateCompilationDatabase, clean bool,
 	actualPlatform *cores.PlatformRelease,
 	buildPath, buildCachePath *paths.Path,
 	buildProperties *properties.Map,
-) (*paths.Path, paths.PathList, []byte, error) {
-	verboseOut := &bytes.Buffer{}
-
+	compilationDatabase *builder.CompilationDatabase,
+	jobs int,
+	warningsLevel string,
+	stdoutWriter, stderrWriter io.Writer,
+	verboseInfoFn func(msg string),
+	verboseStdoutFn, verboseStderrFn func(data []byte),
+	progress *types.ProgressStruct, progressCB rpc.TaskProgressCB,
+) (*paths.Path, paths.PathList, error) {
 	coreFolder := buildProperties.GetPath("build.core.path")
 	variantFolder := buildProperties.GetPath("build.variant.path")
 	targetCoreFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH)
@@ -99,9 +116,19 @@ func compileCore(
 	var err error
 	variantObjectFiles := paths.NewPathList()
 	if variantFolder != nil && variantFolder.IsDir() {
-		variantObjectFiles, err = builder_utils.CompileFilesRecursive(ctx, variantFolder, buildPath, buildProperties, includes)
+		variantObjectFiles, err = builder_utils.CompileFilesRecursive(
+			variantFolder, buildPath, buildProperties, includes,
+			onlyUpdateCompilationDatabase,
+			compilationDatabase,
+			jobs,
+			verbose,
+			warningsLevel,
+			stdoutWriter, stderrWriter,
+			verboseInfoFn, verboseStdoutFn, verboseStderrFn,
+			progress, progressCB,
+		)
 		if err != nil {
-			return nil, nil, verboseOut.Bytes(), errors.WithStack(err)
+			return nil, nil, errors.WithStack(err)
 		}
 	}
 
@@ -116,7 +143,7 @@ func compileCore(
 		targetArchivedCore = buildCachePath.Join(archivedCoreName, "core.a")
 
 		if _, err := buildcache.New(buildCachePath).GetOrCreate(archivedCoreName); errors.Is(err, buildcache.CreateDirErr) {
-			return nil, nil, verboseOut.Bytes(), fmt.Errorf(tr("creating core cache folder: %s", err))
+			return nil, nil, fmt.Errorf(tr("creating core cache folder: %s", err))
 		}
 
 		var canUseArchivedCore bool
@@ -137,20 +164,36 @@ func compileCore(
 		if canUseArchivedCore {
 			// use archived core
 			if verbose {
-				verboseOut.WriteString(tr("Using precompiled core: %[1]s", targetArchivedCore))
+				verboseInfoFn(tr("Using precompiled core: %[1]s", targetArchivedCore))
 			}
-			return targetArchivedCore, variantObjectFiles, verboseOut.Bytes(), nil
+			return targetArchivedCore, variantObjectFiles, nil
 		}
 	}
 
-	coreObjectFiles, err := builder_utils.CompileFilesRecursive(ctx, coreFolder, buildPath, buildProperties, includes)
+	coreObjectFiles, err := builder_utils.CompileFilesRecursive(
+		coreFolder, buildPath, buildProperties, includes,
+		onlyUpdateCompilationDatabase,
+		compilationDatabase,
+		jobs,
+		verbose,
+		warningsLevel,
+		stdoutWriter, stderrWriter,
+		verboseInfoFn, verboseStdoutFn, verboseStderrFn,
+		progress, progressCB,
+	)
 	if err != nil {
-		return nil, nil, verboseOut.Bytes(), errors.WithStack(err)
+		return nil, nil, errors.WithStack(err)
 	}
 
-	archiveFile, err := builder_utils.ArchiveCompiledFiles(ctx, buildPath, paths.New("core.a"), coreObjectFiles, buildProperties)
+	archiveFile, verboseInfo, err := builder_utils.ArchiveCompiledFiles(
+		buildPath, paths.New("core.a"), coreObjectFiles, buildProperties,
+		onlyUpdateCompilationDatabase, verbose, stdoutWriter, stderrWriter,
+	)
+	if verbose {
+		verboseInfoFn(string(verboseInfo))
+	}
 	if err != nil {
-		return nil, nil, verboseOut.Bytes(), errors.WithStack(err)
+		return nil, nil, errors.WithStack(err)
 	}
 
 	// archive core.a
@@ -158,18 +201,18 @@ func compileCore(
 		err := archiveFile.CopyTo(targetArchivedCore)
 		if verbose {
 			if err == nil {
-				verboseOut.WriteString(tr("Archiving built core (caching) in: %[1]s", targetArchivedCore))
+				verboseInfoFn(tr("Archiving built core (caching) in: %[1]s", targetArchivedCore))
 			} else if os.IsNotExist(err) {
-				verboseOut.WriteString(tr("Unable to cache built core, please tell %[1]s maintainers to follow %[2]s",
+				verboseInfoFn(tr("Unable to cache built core, please tell %[1]s maintainers to follow %[2]s",
 					actualPlatform,
 					"https://arduino.github.io/arduino-cli/latest/platform-specification/#recipes-to-build-the-corea-archive-file"))
 			} else {
-				verboseOut.WriteString(tr("Error archiving built core (caching) in %[1]s: %[2]s", targetArchivedCore, err))
+				verboseInfoFn(tr("Error archiving built core (caching) in %[1]s: %[2]s", targetArchivedCore, err))
 			}
 		}
 	}
 
-	return archiveFile, variantObjectFiles, verboseOut.Bytes(), nil
+	return archiveFile, variantObjectFiles, nil
 }
 
 // GetCachedCoreArchiveDirName returns the directory name to be used to store

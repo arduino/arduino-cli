@@ -186,12 +186,31 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 	}
 
 	if library.Layout == libraries.RecursiveLayout {
-		libObjectFiles, err := builder_utils.CompileFilesRecursive(ctx, library.SourceDir, libraryBuildPath, buildProperties, includes)
+		libObjectFiles, err := builder_utils.CompileFilesRecursive(
+			library.SourceDir, libraryBuildPath, buildProperties, includes,
+			ctx.OnlyUpdateCompilationDatabase,
+			ctx.CompilationDatabase,
+			ctx.Jobs,
+			ctx.Verbose,
+			ctx.WarningsLevel,
+			ctx.Stdout, ctx.Stderr,
+			func(msg string) { ctx.Info(msg) },
+			func(data []byte) { ctx.WriteStdout(data) },
+			func(data []byte) { ctx.WriteStderr(data) },
+			&ctx.Progress, ctx.ProgressCB,
+		)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
 		if library.DotALinkage {
-			archiveFile, err := builder_utils.ArchiveCompiledFiles(ctx, libraryBuildPath, paths.New(library.DirName+".a"), libObjectFiles, buildProperties)
+			archiveFile, verboseInfo, err := builder_utils.ArchiveCompiledFiles(
+				libraryBuildPath, paths.New(library.DirName+".a"), libObjectFiles, buildProperties,
+				ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
+				ctx.Stdout, ctx.Stderr,
+			)
+			if ctx.Verbose {
+				ctx.Info(string(verboseInfo))
+			}
 			if err != nil {
 				return nil, errors.WithStack(err)
 			}
@@ -203,7 +222,19 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 		if library.UtilityDir != nil {
 			includes = append(includes, cpp.WrapWithHyphenI(library.UtilityDir.String()))
 		}
-		libObjectFiles, err := builder_utils.CompileFiles(ctx, library.SourceDir, libraryBuildPath, buildProperties, includes)
+		libObjectFiles, err := builder_utils.CompileFiles(
+			library.SourceDir, libraryBuildPath, buildProperties, includes,
+			ctx.OnlyUpdateCompilationDatabase,
+			ctx.CompilationDatabase,
+			ctx.Jobs,
+			ctx.Verbose,
+			ctx.WarningsLevel,
+			ctx.Stdout, ctx.Stderr,
+			func(msg string) { ctx.Info(msg) },
+			func(data []byte) { ctx.WriteStdout(data) },
+			func(data []byte) { ctx.WriteStderr(data) },
+			&ctx.Progress, ctx.ProgressCB,
+		)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
@@ -211,7 +242,19 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 
 		if library.UtilityDir != nil {
 			utilityBuildPath := libraryBuildPath.Join("utility")
-			utilityObjectFiles, err := builder_utils.CompileFiles(ctx, library.UtilityDir, utilityBuildPath, buildProperties, includes)
+			utilityObjectFiles, err := builder_utils.CompileFiles(
+				library.UtilityDir, utilityBuildPath, buildProperties, includes,
+				ctx.OnlyUpdateCompilationDatabase,
+				ctx.CompilationDatabase,
+				ctx.Jobs,
+				ctx.Verbose,
+				ctx.WarningsLevel,
+				ctx.Stdout, ctx.Stderr,
+				func(msg string) { ctx.Info(msg) },
+				func(data []byte) { ctx.WriteStdout(data) },
+				func(data []byte) { ctx.WriteStderr(data) },
+				&ctx.Progress, ctx.ProgressCB,
+			)
 			if err != nil {
 				return nil, errors.WithStack(err)
 			}

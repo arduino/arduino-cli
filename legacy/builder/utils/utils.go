@@ -17,6 +17,7 @@ package utils
 
 import (
 	"bytes"
+	"io"
 	"os"
 	"strings"
 
@@ -51,17 +52,22 @@ const (
 	Capture       = 3 // Capture into buffer
 )
 
-func ExecCommand(ctx *types.Context, command *executils.Process, stdout int, stderr int) ([]byte, []byte, error) {
-	if ctx.Verbose {
-		ctx.Info(PrintableCommand(command.GetArgs()))
+func ExecCommand(
+	verbose bool,
+	stdoutWriter, stderrWriter io.Writer,
+	command *executils.Process, stdout int, stderr int,
+) ([]byte, []byte, []byte, error) {
+	verboseInfoBuf := &bytes.Buffer{}
+	if verbose {
+		verboseInfoBuf.WriteString(PrintableCommand(command.GetArgs()))
 	}
 
 	stdoutBuffer := &bytes.Buffer{}
 	if stdout == Capture {
 		command.RedirectStdoutTo(stdoutBuffer)
-	} else if stdout == Show || (stdout == ShowIfVerbose && ctx.Verbose) {
-		if ctx.Stdout != nil {
-			command.RedirectStdoutTo(ctx.Stdout)
+	} else if stdout == Show || (stdout == ShowIfVerbose && verbose) {
+		if stdoutWriter != nil {
+			command.RedirectStdoutTo(stdoutWriter)
 		} else {
 			command.RedirectStdoutTo(os.Stdout)
 		}
@@ -70,9 +76,9 @@ func ExecCommand(ctx *types.Context, command *executils.Process, stdout int, std
 	stderrBuffer := &bytes.Buffer{}
 	if stderr == Capture {
 		command.RedirectStderrTo(stderrBuffer)
-	} else if stderr == Show || (stderr == ShowIfVerbose && ctx.Verbose) {
-		if ctx.Stderr != nil {
-			command.RedirectStderrTo(ctx.Stderr)
+	} else if stderr == Show || (stderr == ShowIfVerbose && verbose) {
+		if stderrWriter != nil {
+			command.RedirectStderrTo(stderrWriter)
 		} else {
 			command.RedirectStderrTo(os.Stderr)
 		}
@@ -80,11 +86,11 @@ func ExecCommand(ctx *types.Context, command *executils.Process, stdout int, std
 
 	err := command.Start()
 	if err != nil {
-		return nil, nil, errors.WithStack(err)
+		return verboseInfoBuf.Bytes(), nil, nil, errors.WithStack(err)
 	}
 
 	err = command.Wait()
-	return stdoutBuffer.Bytes(), stderrBuffer.Bytes(), errors.WithStack(err)
+	return verboseInfoBuf.Bytes(), stdoutBuffer.Bytes(), stderrBuffer.Bytes(), errors.WithStack(err)
 }
 
 type loggerAction struct {

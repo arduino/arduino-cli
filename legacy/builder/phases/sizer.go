@@ -55,7 +55,10 @@ func checkSizeAdvanced(ctx *types.Context, properties *properties.Map) error {
 		return errors.New(tr("Error while determining sketch size: %s", err))
 	}
 
-	out, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.Show /* stderr */)
+	verboseInfo, out, _, err := utils.ExecCommand(ctx.Verbose, ctx.Stdout, ctx.Stderr, command, utils.Capture /* stdout */, utils.Show /* stderr */)
+	if ctx.Verbose {
+		ctx.Info(string(verboseInfo))
+	}
 	if err != nil {
 		return errors.New(tr("Error while determining sketch size: %s", err))
 	}
@@ -185,7 +188,10 @@ func execSizeRecipe(ctx *types.Context, properties *properties.Map) (textSize in
 		return
 	}
 
-	out, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.Show /* stderr */)
+	verboseInfo, out, _, err := utils.ExecCommand(ctx.Verbose, ctx.Stdout, ctx.Stderr, command, utils.Capture /* stdout */, utils.Show /* stderr */)
+	if ctx.Verbose {
+		ctx.Info(string(verboseInfo))
+	}
 	if err != nil {
 		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)
 		return

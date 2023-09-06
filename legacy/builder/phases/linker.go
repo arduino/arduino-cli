@@ -98,7 +98,10 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 				return errors.WithStack(err)
 			}
 
-			if _, _, err := utils.ExecCommand(ctx, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */); err != nil {
+			if verboseInfo, _, _, err := utils.ExecCommand(ctx.Verbose, ctx.Stdout, ctx.Stderr, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */); err != nil {
+				if ctx.Verbose {
+					ctx.Info(string(verboseInfo))
+				}
 				return errors.WithStack(err)
 			}
 		}
@@ -117,9 +120,12 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 	command, err := builder_utils.PrepareCommandForRecipe(properties, constants.RECIPE_C_COMBINE_PATTERN, false)
 	if err != nil {
 		return err
-}
+	}
 
-	_, _, err = utils.ExecCommand(ctx, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+	verboseInfo, _, _, err := utils.ExecCommand(ctx.Verbose, ctx.Stdout, ctx.Stderr, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+	if ctx.Verbose {
+		ctx.Info(string(verboseInfo))
+	}
 	return err
 }
 

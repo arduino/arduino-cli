@@ -35,7 +35,19 @@ func (s *SketchBuilder) Run(ctx *types.Context) error {
 		return errors.WithStack(err)
 	}
 
-	objectFiles, err := builder_utils.CompileFiles(ctx, sketchBuildPath, sketchBuildPath, buildProperties, includes)
+	objectFiles, err := builder_utils.CompileFiles(
+		sketchBuildPath, sketchBuildPath, buildProperties, includes,
+		ctx.OnlyUpdateCompilationDatabase,
+		ctx.CompilationDatabase,
+		ctx.Jobs,
+		ctx.Verbose,
+		ctx.WarningsLevel,
+		ctx.Stdout, ctx.Stderr,
+		func(msg string) { ctx.Info(msg) },
+		func(data []byte) { ctx.WriteStdout(data) },
+		func(data []byte) { ctx.WriteStderr(data) },
+		&ctx.Progress, ctx.ProgressCB,
+	)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -43,7 +55,19 @@ func (s *SketchBuilder) Run(ctx *types.Context) error {
 	// The "src/" subdirectory of a sketch is compiled recursively
 	sketchSrcPath := sketchBuildPath.Join("src")
 	if sketchSrcPath.IsDir() {
-		srcObjectFiles, err := builder_utils.CompileFilesRecursive(ctx, sketchSrcPath, sketchSrcPath, buildProperties, includes)
+		srcObjectFiles, err := builder_utils.CompileFilesRecursive(
+			sketchSrcPath, sketchSrcPath, buildProperties, includes,
+			ctx.OnlyUpdateCompilationDatabase,
+			ctx.CompilationDatabase,
+			ctx.Jobs,
+			ctx.Verbose,
+			ctx.WarningsLevel,
+			ctx.Stdout, ctx.Stderr,
+			func(msg string) { ctx.Info(msg) },
+			func(data []byte) { ctx.WriteStdout(data) },
+			func(data []byte) { ctx.WriteStderr(data) },
+			&ctx.Progress, ctx.ProgressCB,
+		)
 		if err != nil {
 			return errors.WithStack(err)
 		}
