@@ -22,7 +22,6 @@ import (
 	"io"
 	"os"
 
-	"golang.org/x/crypto/ssh/terminal"
 	"golang.org/x/term"
 )
 
@@ -42,7 +41,7 @@ func InteractiveStreams() (io.Reader, io.Writer, error) {
 	return os.Stdin, stdOut, nil
 }
 
-var oldStateStdin *terminal.State
+var oldStateStdin *term.State
 
 // SetRawModeStdin sets the stdin stream in RAW mode (no buffering, echo disabled,
 // no terminal escape codes nor signals interpreted)
@@ -50,7 +49,7 @@ func SetRawModeStdin() {
 	if oldStateStdin != nil {
 		panic("terminal already in RAW mode")
 	}
-	oldStateStdin, _ = terminal.MakeRaw(int(os.Stdin.Fd()))
+	oldStateStdin, _ = term.MakeRaw(int(os.Stdin.Fd()))
 }
 
 // RestoreModeStdin restore the terminal settings to the normal non-RAW state. This
@@ -60,7 +59,7 @@ func RestoreModeStdin() {
 	if oldStateStdin == nil {
 		return
 	}
-	_ = terminal.Restore(int(os.Stdin.Fd()), oldStateStdin)
+	_ = term.Restore(int(os.Stdin.Fd()), oldStateStdin)
 	oldStateStdin = nil
 }
 
