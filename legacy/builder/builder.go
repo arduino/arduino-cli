@@ -23,7 +23,6 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -51,26 +50,26 @@ func (s *Builder) Run(ctx *types.Context) error {
 			return _err
 		}),
 
-		utils.LogIfVerbose(false, tr("Detecting libraries used...")),
+		logIfVerbose(false, tr("Detecting libraries used...")),
 		findIncludes(ctx),
 
 		&WarnAboutArchIncompatibleLibraries{},
 
-		utils.LogIfVerbose(false, tr("Generating function prototypes...")),
+		logIfVerbose(false, tr("Generating function prototypes...")),
 		types.BareCommand(PreprocessSketch),
 
-		utils.LogIfVerbose(false, tr("Compiling sketch...")),
+		logIfVerbose(false, tr("Compiling sketch...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.sketch.prebuild", Suffix: ".pattern"},
 		&phases.SketchBuilder{},
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.sketch.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
-		utils.LogIfVerbose(false, tr("Compiling libraries...")),
+		logIfVerbose(false, tr("Compiling libraries...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.libraries.prebuild", Suffix: ".pattern"},
 		&UnusedCompiledLibrariesRemover{},
 		&phases.LibrariesBuilder{},
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.libraries.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
-		utils.LogIfVerbose(false, tr("Compiling core...")),
+		logIfVerbose(false, tr("Compiling core...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.core.prebuild", Suffix: ".pattern"},
 
 		types.BareCommand(func(ctx *types.Context) error {
@@ -98,7 +97,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.core.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
-		utils.LogIfVerbose(false, tr("Linking everything together...")),
+		logIfVerbose(false, tr("Linking everything together...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.linking.prelink", Suffix: ".pattern"},
 		&phases.Linker{},
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.linking.postlink", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
@@ -253,5 +252,19 @@ func findIncludes(ctx *types.Context) types.BareCommand {
 			ctx.BuildProperties,
 			ctx.TargetPlatform.Platform.Architecture,
 		)
+	})
+}
+
+func logIfVerbose(warn bool, msg string) types.BareCommand {
+	return types.BareCommand(func(ctx *types.Context) error {
+		if !ctx.Verbose {
+			return nil
+		}
+		if warn {
+			ctx.Warn(msg)
+		} else {
+			ctx.Info(msg)
+		}
+		return nil
 	})
 }
