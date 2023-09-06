@@ -24,7 +24,9 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/buildcache"
@@ -33,6 +35,7 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/inventory"
 	"github.com/arduino/arduino-cli/legacy/builder"
+	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
@@ -152,8 +155,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	// cache is purged after compilation to not remove entries that might be required
 	defer maybePurgeBuildCache()
 
+	sketchBuilder := bldr.NewBuilder(sk)
+
 	// Add build properites related to sketch data
-	buildProperties = bldr.SetupBuildProperties(buildProperties, buildPath, sk, req.GetOptimizeForDebug())
+	buildProperties = sketchBuilder.SetupBuildProperties(buildProperties, buildPath, req.GetOptimizeForDebug())
 
 	// Add user provided custom build properties
 	customBuildPropertiesArgs := append(req.GetBuildProperties(), "build.warn_data_percentage=75")
@@ -169,10 +174,8 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	}
 
 	builderCtx := &types.Context{}
+	builderCtx.Builder = sketchBuilder
 	builderCtx.PackageManager = pme
-	if pme.GetProfile() != nil {
-		builderCtx.LibrariesManager = lm
-	}
 	builderCtx.TargetBoard = targetBoard
 	builderCtx.TargetPlatform = targetPlatform
 	builderCtx.TargetPackage = targetPackage
@@ -180,7 +183,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.RequiredTools = requiredTools
 	builderCtx.BuildProperties = buildProperties
 	builderCtx.CustomBuildProperties = customBuildPropertiesArgs
-	builderCtx.UseCachedLibrariesResolution = req.GetSkipLibrariesDiscovery()
 	builderCtx.FQBN = fqbn
 	builderCtx.Sketch = sk
 	builderCtx.BuildPath = buildPath
@@ -199,7 +201,11 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	builderCtx.Verbose = req.GetVerbose()
 	builderCtx.Jobs = int(req.GetJobs())
+
 	builderCtx.WarningsLevel = req.GetWarnings()
+	if builderCtx.WarningsLevel == "" {
+		builderCtx.WarningsLevel = builder.DEFAULT_WARNINGS_LEVEL
+	}
 
 	if req.GetBuildCachePath() == "" {
 		builderCtx.CoreBuildCachePath = paths.TempDir().Join("arduino", "cores")
@@ -222,6 +228,57 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.OnlyUpdateCompilationDatabase = req.GetCreateCompilationDatabaseOnly()
 	builderCtx.SourceOverride = req.GetSourceOverride()
 
+	sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
+	if err != nil {
+		return r, &arduino.CompileFailedError{Message: err.Error()}
+	}
+	librariesBuildPath, err := buildPath.Join(constants.FOLDER_LIBRARIES).Abs()
+	if err != nil {
+		return r, &arduino.CompileFailedError{Message: err.Error()}
+	}
+	coreBuildPath, err := buildPath.Join(constants.FOLDER_CORE).Abs()
+	if err != nil {
+		return r, &arduino.CompileFailedError{Message: err.Error()}
+	}
+	builderCtx.SketchBuildPath = sketchBuildPath
+	builderCtx.LibrariesBuildPath = librariesBuildPath
+	builderCtx.CoreBuildPath = coreBuildPath
+
+	if builderCtx.BuildPath.Canonical().EqualsTo(builderCtx.Sketch.FullPath.Canonical()) {
+		return r, &arduino.CompileFailedError{
+			Message: tr("Sketch cannot be located in build path. Please specify a different build path"),
+		}
+	}
+
+	var libsManager *librariesmanager.LibrariesManager
+	if pme.GetProfile() != nil {
+		libsManager = lm
+	}
+	useCachedLibrariesResolution := req.GetSkipLibrariesDiscovery()
+	libsManager, libsResolver, verboseOut, err := detector.LibrariesLoader(
+		useCachedLibrariesResolution, libsManager,
+		builderCtx.BuiltInLibrariesDirs, builderCtx.LibraryDirs, builderCtx.OtherLibrariesDirs,
+		builderCtx.ActualPlatform, builderCtx.TargetPlatform,
+	)
+	if err != nil {
+		return r, &arduino.CompileFailedError{Message: err.Error()}
+	}
+
+	if builderCtx.Verbose {
+		builderCtx.Warn(string(verboseOut))
+	}
+
+	builderCtx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
+		libsManager, libsResolver,
+		builderCtx.Verbose,
+		useCachedLibrariesResolution,
+		req.GetCreateCompilationDatabaseOnly(),
+		func(msg string) { builderCtx.Info(msg) },
+		func(msg string) { builderCtx.Warn(msg) },
+		func(data []byte) { builderCtx.WriteStdout(data) },
+		func(data []byte) { builderCtx.WriteStderr(data) },
+	)
+
 	defer func() {
 		if p := builderCtx.BuildPath; p != nil {
 			r.BuildPath = p.String()
@@ -243,13 +300,9 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		}
 	}()
 
+	// Just get build properties and exit
 	if req.GetShowProperties() {
-		// Just get build properties and exit
-		compileErr := builder.RunParseHardware(builderCtx)
-		if compileErr != nil {
-			compileErr = &arduino.CompileFailedError{Message: compileErr.Error()}
-		}
-		return r, compileErr
+		return r, nil
 	}
 
 	if req.GetPreprocess() {
@@ -263,7 +316,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	defer func() {
 		importedLibs := []*rpc.Library{}
-		for _, lib := range builderCtx.ImportedLibraries {
+		for _, lib := range builderCtx.SketchLibrariesDetector.ImportedLibraries() {
 			rpcLib, err := lib.ToRPCLibrary()
 			if err != nil {
 				msg := tr("Error getting information for library %s", lib.Name) + ": " + err.Error() + "\n"

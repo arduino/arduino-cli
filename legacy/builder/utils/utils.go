@@ -18,43 +18,13 @@ package utils
 import (
 	"bytes"
 	"os"
-	"os/exec"
 	"strings"
-	"unicode"
 
+	"github.com/arduino/arduino-cli/executils"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	paths "github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
-	"golang.org/x/text/runes"
-	"golang.org/x/text/transform"
-	"golang.org/x/text/unicode/norm"
 )
-
-var SOURCE_CONTROL_FOLDERS = map[string]bool{"CVS": true, "RCS": true, ".git": true, ".github": true, ".svn": true, ".hg": true, ".bzr": true, ".vscode": true, ".settings": true, ".pioenvs": true, ".piolibdeps": true}
-
-// FilterOutHiddenFiles is a ReadDirFilter that exclude files with a "." prefix in their name
-var FilterOutHiddenFiles = paths.FilterOutPrefixes(".")
-
-// FilterOutSCCS is a ReadDirFilter that excludes known VSC or project files
-func FilterOutSCCS(file *paths.Path) bool {
-	return !SOURCE_CONTROL_FOLDERS[file.Base()]
-}
-
-// FilterReadableFiles is a ReadDirFilter that accepts only readable files
-func FilterReadableFiles(file *paths.Path) bool {
-	// See if the file is readable by opening it
-	f, err := file.Open()
-	if err != nil {
-		return false
-	}
-	f.Close()
-	return true
-}
-
-func WrapWithHyphenI(value string) string {
-	return "\"-I" + value + "\""
-}
 
 func printableArgument(arg string) string {
 	if strings.ContainsAny(arg, "\"\\ \t") {
@@ -81,30 +51,30 @@ const (
 	Capture       = 3 // Capture into buffer
 )
 
-func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) ([]byte, []byte, error) {
+func ExecCommand(ctx *types.Context, command *executils.Process, stdout int, stderr int) ([]byte, []byte, error) {
 	if ctx.Verbose {
-		ctx.Info(PrintableCommand(command.Args))
+		ctx.Info(PrintableCommand(command.GetArgs()))
 	}
 
+	stdoutBuffer := &bytes.Buffer{}
 	if stdout == Capture {
-		buffer := &bytes.Buffer{}
-		command.Stdout = buffer
+		command.RedirectStdoutTo(stdoutBuffer)
 	} else if stdout == Show || (stdout == ShowIfVerbose && ctx.Verbose) {
 		if ctx.Stdout != nil {
-			command.Stdout = ctx.Stdout
+			command.RedirectStdoutTo(ctx.Stdout)
 		} else {
-			command.Stdout = os.Stdout
+			command.RedirectStdoutTo(os.Stdout)
 		}
 	}
 
+	stderrBuffer := &bytes.Buffer{}
 	if stderr == Capture {
-		buffer := &bytes.Buffer{}
-		command.Stderr = buffer
+		command.RedirectStderrTo(stderrBuffer)
 	} else if stderr == Show || (stderr == ShowIfVerbose && ctx.Verbose) {
 		if ctx.Stderr != nil {
-			command.Stderr = ctx.Stderr
+			command.RedirectStderrTo(ctx.Stderr)
 		} else {
-			command.Stderr = os.Stderr
+			command.RedirectStderrTo(os.Stderr)
 		}
 	}
 
@@ -114,39 +84,7 @@ func ExecCommand(ctx *types.Context, command *exec.Cmd, stdout int, stderr int) 
 	}
 
 	err = command.Wait()
-
-	var outbytes, errbytes []byte
-	if buf, ok := command.Stdout.(*bytes.Buffer); ok {
-		outbytes = buf.Bytes()
-	}
-	if buf, ok := command.Stderr.(*bytes.Buffer); ok {
-		errbytes = buf.Bytes()
-	}
-
-	return outbytes, errbytes, errors.WithStack(err)
-}
-
-func FindFilesInFolder(dir *paths.Path, recurse bool, extensions ...string) (paths.PathList, error) {
-	fileFilter := paths.AndFilter(
-		FilterOutHiddenFiles,
-		FilterOutSCCS,
-		paths.FilterOutDirectories(),
-		FilterReadableFiles,
-	)
-	if len(extensions) > 0 {
-		fileFilter = paths.AndFilter(
-			paths.FilterSuffixes(extensions...),
-			fileFilter,
-		)
-	}
-	if recurse {
-		dirFilter := paths.AndFilter(
-			FilterOutHiddenFiles,
-			FilterOutSCCS,
-		)
-		return dir.ReadDirRecursiveFiltered(dirFilter, fileFilter)
-	}
-	return dir.ReadDir(fileFilter)
+	return stdoutBuffer.Bytes(), stderrBuffer.Bytes(), errors.WithStack(err)
 }
 
 type loggerAction struct {
@@ -168,12 +106,4 @@ func (l *loggerAction) Run(ctx *types.Context) error {
 
 func LogIfVerbose(warn bool, msg string) types.Command {
 	return &loggerAction{onlyIfVerbose: true, warn: warn, msg: msg}
-}
-
-// Normalizes an UTF8 byte slice
-// TODO: use it more often troughout all the project (maybe on logger interface?)
-func NormalizeUTF8(buf []byte) []byte {
-	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
-	result, _, _ := transform.Bytes(t, buf)
-	return result
 }

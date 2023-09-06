@@ -66,7 +66,7 @@ func TestLoadTools(t *testing.T) {
 		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
 		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
 	}
-	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	ctx = prepareBuilderTestContext(t, ctx, nil, "", skipLibraries)
 	defer cleanUpBuilderTestContext(t, ctx)
 
 	tools := ctx.PackageManager.GetAllInstalledToolsReleases()
@@ -107,7 +107,7 @@ func TestLoadToolsWithBoardManagerFolderStructure(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList("downloaded_board_manager_stuff"),
 	}
-	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	ctx = prepareBuilderTestContext(t, ctx, nil, "", skipLibraries)
 	defer cleanUpBuilderTestContext(t, ctx)
 
 	tools := ctx.PackageManager.GetAllInstalledToolsReleases()
@@ -131,7 +131,7 @@ func TestLoadLotsOfTools(t *testing.T) {
 		HardwareDirs:     paths.NewPathList("downloaded_board_manager_stuff"),
 		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
 	}
-	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	ctx = prepareBuilderTestContext(t, ctx, nil, "", skipLibraries)
 	defer cleanUpBuilderTestContext(t, ctx)
 
 	tools := ctx.PackageManager.GetAllInstalledToolsReleases()

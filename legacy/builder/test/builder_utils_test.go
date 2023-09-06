@@ -20,7 +20,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
+	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
@@ -42,7 +42,7 @@ func TestObjFileIsUpToDateObjMissing(t *testing.T) {
 	sourceFile := tempFile(t, "source")
 	defer sourceFile.RemoveAll()
 
-	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, nil, nil)
+	upToDate, err := utils.ObjFileIsUpToDate(sourceFile, nil, nil)
 	NoError(t, err)
 	require.False(t, upToDate)
 }
@@ -54,7 +54,7 @@ func TestObjFileIsUpToDateDepMissing(t *testing.T) {
 	objFile := tempFile(t, "obj")
 	defer objFile.RemoveAll()
 
-	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, objFile, nil)
+	upToDate, err := utils.ObjFileIsUpToDate(sourceFile, objFile, nil)
 	NoError(t, err)
 	require.False(t, upToDate)
 }
@@ -70,7 +70,7 @@ func TestObjFileIsUpToDateObjOlder(t *testing.T) {
 	sourceFile := tempFile(t, "source")
 	defer sourceFile.RemoveAll()
 
-	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
+	upToDate, err := utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
 	NoError(t, err)
 	require.False(t, upToDate)
 }
@@ -86,7 +86,7 @@ func TestObjFileIsUpToDateObjNewer(t *testing.T) {
 	depFile := tempFile(t, "dep")
 	defer depFile.RemoveAll()
 
-	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
+	upToDate, err := utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
 	NoError(t, err)
 	require.True(t, upToDate)
 }
@@ -110,7 +110,7 @@ func TestObjFileIsUpToDateDepIsNewer(t *testing.T) {
 	data := objFile.String() + ": \\\n\t" + sourceFile.String() + " \\\n\t" + headerFile.String()
 	depFile.WriteFile([]byte(data))
 
-	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
+	upToDate, err := utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
 	NoError(t, err)
 	require.False(t, upToDate)
 }
@@ -132,7 +132,7 @@ func TestObjFileIsUpToDateDepIsOlder(t *testing.T) {
 	res := objFile.String() + ": \\\n\t" + sourceFile.String() + " \\\n\t" + headerFile.String()
 	depFile.WriteFile([]byte(res))
 
-	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
+	upToDate, err := utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
 	NoError(t, err)
 	require.True(t, upToDate)
 }
@@ -156,7 +156,7 @@ func TestObjFileIsUpToDateDepIsWrong(t *testing.T) {
 	res := sourceFile.String() + ": \\\n\t" + sourceFile.String() + " \\\n\t" + headerFile.String()
 	depFile.WriteFile([]byte(res))
 
-	upToDate, err := builder_utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
+	upToDate, err := utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
 	NoError(t, err)
 	require.False(t, upToDate)
 }

@@ -20,7 +20,6 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -34,7 +33,8 @@ func TestLoadHardware(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware")),
 	}
-	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+
+	ctx = prepareBuilderTestContext(t, ctx, nil, "", skipLibraries)
 	defer cleanUpBuilderTestContext(t, ctx)
 
 	packages := ctx.PackageManager.GetPackages()
@@ -66,16 +66,8 @@ func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware"), "user_hardware"),
 	}
-	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	ctx = prepareBuilderTestContext(t, ctx, nil, "", skipLibraries)
 	defer cleanUpBuilderTestContext(t, ctx)
-
-	commands := []types.Command{
-		&builder.AddAdditionalEntriesToContext{},
-	}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		NoError(t, err)
-	}
 
 	packages := ctx.PackageManager.GetPackages()
 
@@ -134,7 +126,7 @@ func TestLoadHardwareWithBoardManagerFolderStructure(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList("downloaded_board_manager_stuff"),
 	}
-	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	ctx = prepareBuilderTestContext(t, ctx, nil, "", skipLibraries)
 	defer cleanUpBuilderTestContext(t, ctx)
 
 	packages := ctx.PackageManager.GetPackages()
@@ -175,7 +167,7 @@ func TestLoadLotsOfHardware(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList("downloaded_board_manager_stuff", "downloaded_hardware", filepath.Join("..", "hardware"), "user_hardware"),
 	}
-	ctx = prepareBuilderTestContext(t, ctx, nil, "")
+	ctx = prepareBuilderTestContext(t, ctx, nil, "", skipLibraries)
 	defer cleanUpBuilderTestContext(t, ctx)
 
 	packages := ctx.PackageManager.GetPackages()

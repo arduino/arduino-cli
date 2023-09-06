@@ -31,7 +31,7 @@ func (s *UnusedCompiledLibrariesRemover) Run(ctx *types.Context) error {
 		return nil
 	}
 
-	libraryNames := toLibraryNames(ctx.ImportedLibraries)
+	libraryNames := toLibraryNames(ctx.SketchLibrariesDetector.ImportedLibraries())
 
 	files, err := librariesBuildPath.ReadDir()
 	if err != nil {

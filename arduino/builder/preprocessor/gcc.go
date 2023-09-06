@@ -20,9 +20,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/executils"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -38,7 +38,7 @@ func GCC(sourceFilePath *paths.Path, targetFilePath *paths.Path, includes paths.
 	gccBuildProperties.SetPath("source_file", sourceFilePath)
 	gccBuildProperties.SetPath("preprocessed_file_path", targetFilePath)
 
-	includesStrings := f.Map(includes.AsStrings(), utils.WrapWithHyphenI)
+	includesStrings := f.Map(includes.AsStrings(), cpp.WrapWithHyphenI)
 	gccBuildProperties.Set("includes", strings.Join(includesStrings, " "))
 
 	const gccPreprocRecipeProperty = "recipe.preproc.macros"

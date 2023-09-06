@@ -93,7 +93,7 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 			properties.SetPath("archive_file_path", archive)
 			properties.SetPath("object_file", object)
 
-			command, err := builder_utils.PrepareCommandForRecipe(properties, constants.RECIPE_AR_PATTERN, false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+			command, err := builder_utils.PrepareCommandForRecipe(properties, constants.RECIPE_AR_PATTERN, false)
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -114,10 +114,10 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 	properties.Set(constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH, coreArchiveFilePath.String())
 	properties.Set("object_files", objectFileList)
 
-	command, err := builder_utils.PrepareCommandForRecipe(properties, constants.RECIPE_C_COMBINE_PATTERN, false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+	command, err := builder_utils.PrepareCommandForRecipe(properties, constants.RECIPE_C_COMBINE_PATTERN, false)
 	if err != nil {
 		return err
-	}
+}
 
 	_, _, err = utils.ExecCommand(ctx, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
 	return err

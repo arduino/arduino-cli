@@ -137,6 +137,11 @@ func (p *Process) SetDir(dir string) {
 	p.cmd.Dir = dir
 }
 
+// GetDir gets the working directory of the command.
+func (p *Process) GetDir() string {
+	return p.cmd.Dir
+}
+
 // SetDirFromPath sets the working directory of the command. If path is nil, Run
 // runs the command in the calling process's current directory.
 func (p *Process) SetDirFromPath(path *paths.Path) {
@@ -186,4 +191,9 @@ func (p *Process) RunAndCaptureOutput(ctx context.Context) ([]byte, []byte, erro
 	p.RedirectStderrTo(stderr)
 	err := p.RunWithinContext(ctx)
 	return stdout.Bytes(), stderr.Bytes(), err
+}
+
+// GetArgs returns the command arguments
+func (p *Process) GetArgs() []string {
+	return p.cmd.Args
 }

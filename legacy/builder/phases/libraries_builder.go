@@ -18,12 +18,12 @@ package phases
 import (
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -37,8 +37,9 @@ type LibrariesBuilder struct{}
 func (s *LibrariesBuilder) Run(ctx *types.Context) error {
 	librariesBuildPath := ctx.LibrariesBuildPath
 	buildProperties := ctx.BuildProperties
-	includes := f.Map(ctx.IncludeFolders.AsStrings(), utils.WrapWithHyphenI)
-	libs := ctx.ImportedLibraries
+	includesFolders := ctx.SketchLibrariesDetector.IncludeFolders()
+	includes := f.Map(includesFolders.AsStrings(), cpp.WrapWithHyphenI)
+	libs := ctx.SketchLibrariesDetector.ImportedLibraries()
 
 	if err := librariesBuildPath.MkdirAll(); err != nil {
 		return errors.WithStack(err)
@@ -66,9 +67,9 @@ func findExpectedPrecompiledLibFolder(ctx *types.Context, library *libraries.Lib
 	// Add fpu specifications if they exist
 	// To do so, resolve recipe.cpp.o.pattern,
 	// search for -mfpu=xxx -mfloat-abi=yyy and add to a subfolder
-	command, _ := builder_utils.PrepareCommandForRecipe(ctx.BuildProperties, "recipe.cpp.o.pattern", true, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+	command, _ := builder_utils.PrepareCommandForRecipe(ctx.BuildProperties, "recipe.cpp.o.pattern", true)
 	fpuSpecs := ""
-	for _, el := range strings.Split(command.String(), " ") {
+	for _, el := range command.GetArgs() {
 		if strings.Contains(el, FPU_CFLAG) {
 			toAdd := strings.Split(el, "=")
 			if len(toAdd) > 1 {
@@ -77,7 +78,7 @@ func findExpectedPrecompiledLibFolder(ctx *types.Context, library *libraries.Lib
 			}
 		}
 	}
-	for _, el := range strings.Split(command.String(), " ") {
+	for _, el := range command.GetArgs() {
 		if strings.Contains(el, FLOAT_ABI_CFLAG) {
 			toAdd := strings.Split(el, "=")
 			if len(toAdd) > 1 {
@@ -200,7 +201,7 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 		}
 	} else {
 		if library.UtilityDir != nil {
-			includes = append(includes, utils.WrapWithHyphenI(library.UtilityDir.String()))
+			includes = append(includes, cpp.WrapWithHyphenI(library.UtilityDir.String()))
 		}
 		libObjectFiles, err := builder_utils.CompileFiles(ctx, library.SourceDir, libraryBuildPath, buildProperties, includes)
 		if err != nil {

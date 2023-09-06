@@ -15,30 +15,16 @@
 
 package builder
 
-import (
-	"regexp"
-	"strings"
-)
+import "github.com/arduino/arduino-cli/arduino/sketch"
 
-var INCLUDE_REGEXP = regexp.MustCompile("(?ms)^\\s*#[ \t]*include\\s*[<\"](\\S+)[\">]")
-
-func IncludesFinderWithRegExp(source string) string {
-	match := INCLUDE_REGEXP.FindStringSubmatch(source)
-	if match != nil {
-		return strings.TrimSpace(match[1])
-	}
-	return findIncludeForOldCompilers(source)
+// Builder is a Sketch builder.
+type Builder struct {
+	sketch *sketch.Sketch
 }
 
-func findIncludeForOldCompilers(source string) string {
-	lines := strings.Split(source, "\n")
-	for _, line := range lines {
-		splittedLine := strings.Split(line, ":")
-		for i := range splittedLine {
-			if strings.Contains(splittedLine[i], "fatal error") {
-				return strings.TrimSpace(splittedLine[i+1])
-			}
-		}
+// NewBuilder creates a sketch Builder.
+func NewBuilder(sk *sketch.Sketch) *Builder {
+	return &Builder{
+		sketch: sk,
 	}
-	return ""
 }
