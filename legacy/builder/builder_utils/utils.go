@@ -26,12 +26,12 @@ import (
 	"sync"
 
 	"github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	bUtils "github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -79,7 +79,7 @@ func CompileFiles(
 	stdoutWriter, stderrWriter io.Writer,
 	verboseInfoFn func(msg string),
 	verboseStdoutFn, verboseStderrFn func(data []byte),
-	progress *types.ProgressStruct, progressCB rpc.TaskProgressCB,
+	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, error) {
 	return compileFiles(
 		onlyUpdateCompilationDatabase,
@@ -108,7 +108,7 @@ func CompileFilesRecursive(
 	stdoutWriter, stderrWriter io.Writer,
 	verboseInfoFn func(msg string),
 	verboseStdoutFn, verboseStderrFn func(data []byte),
-	progress *types.ProgressStruct, progressCB rpc.TaskProgressCB,
+	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, error) {
 	return compileFiles(
 		onlyUpdateCompilationDatabase,
@@ -139,7 +139,7 @@ func compileFiles(
 	stdoutWriter, stderrWriter io.Writer,
 	verboseInfoFn func(msg string),
 	verboseStdoutFn, verboseStderrFn func(data []byte),
-	progress *types.ProgressStruct,
+	progress *progress.Struct,
 	progressCB rpc.TaskProgressCB,
 ) (paths.PathList, error) {
 	validExtensions := []string{}

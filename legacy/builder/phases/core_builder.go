@@ -25,13 +25,13 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/buildcache"
 	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -54,7 +54,7 @@ func CoreBuilder(
 	stdoutWriter, stderrWriter io.Writer,
 	verboseInfoFn func(msg string),
 	verboseStdoutFn, verboseStderrFn func(data []byte),
-	progress *types.ProgressStruct, progressCB rpc.TaskProgressCB,
+	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, *paths.Path, *paths.Path, error) {
 	if err := coreBuildPath.MkdirAll(); err != nil {
 		return nil, nil, coreBuildCachePath, errors.WithStack(err)
@@ -101,7 +101,7 @@ func compileCore(
 	stdoutWriter, stderrWriter io.Writer,
 	verboseInfoFn func(msg string),
 	verboseStdoutFn, verboseStderrFn func(data []byte),
-	progress *types.ProgressStruct, progressCB rpc.TaskProgressCB,
+	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (*paths.Path, paths.PathList, error) {
 	coreFolder := buildProperties.GetPath("build.core.path")
 	variantFolder := buildProperties.GetPath("build.variant.path")

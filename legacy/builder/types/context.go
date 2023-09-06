@@ -24,6 +24,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
+	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -31,34 +32,6 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 )
-
-type ProgressStruct struct {
-	Progress   float32
-	StepAmount float32
-	Parent     *ProgressStruct
-}
-
-func (p *ProgressStruct) AddSubSteps(steps int) {
-	p.Parent = &ProgressStruct{
-		Progress:   p.Progress,
-		StepAmount: p.StepAmount,
-		Parent:     p.Parent,
-	}
-	if p.StepAmount == 0.0 {
-		p.StepAmount = 100.0
-	}
-	p.StepAmount /= float32(steps)
-}
-
-func (p *ProgressStruct) RemoveSubSteps() {
-	p.Progress = p.Parent.Progress
-	p.StepAmount = p.Parent.StepAmount
-	p.Parent = p.Parent.Parent
-}
-
-func (p *ProgressStruct) CompleteStep() {
-	p.Progress += p.StepAmount
-}
 
 // Context structure
 type Context struct {
@@ -105,7 +78,7 @@ type Context struct {
 	Verbose bool
 
 	// Dry run, only create progress map
-	Progress ProgressStruct
+	Progress progress.Struct
 	// Send progress events to this callback
 	ProgressCB rpc.TaskProgressCB
 
