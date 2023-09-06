@@ -27,12 +27,11 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
-	bUtils "github.com/arduino/arduino-cli/arduino/builder/utils"
+	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -51,7 +50,7 @@ func DirContentIsOlderThan(dir *paths.Path, target *paths.Path, extensions ...st
 	}
 	targetModTime := targetStat.ModTime()
 
-	files, err := bUtils.FindFilesInFolder(dir, true, extensions...)
+	files, err := utils.FindFilesInFolder(dir, true, extensions...)
 	if err != nil {
 		return false, err
 	}
@@ -147,7 +146,7 @@ func compileFiles(
 		validExtensions = append(validExtensions, ext)
 	}
 
-	sources, err := bUtils.FindFilesInFolder(sourceDir, recurse, validExtensions...)
+	sources, err := utils.FindFilesInFolder(sourceDir, recurse, validExtensions...)
 	if err != nil {
 		return nil, err
 	}
@@ -268,7 +267,7 @@ func compileFileWithRecipe(
 		return nil, nil, nil, nil, errors.WithStack(err)
 	}
 
-	objIsUpToDate, err := bUtils.ObjFileIsUpToDate(source, objectFile, depsFile)
+	objIsUpToDate, err := utils.ObjFileIsUpToDate(source, objectFile, depsFile)
 	if err != nil {
 		return nil, nil, nil, nil, errors.WithStack(err)
 	}

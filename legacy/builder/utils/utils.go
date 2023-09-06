@@ -16,82 +16,8 @@
 package utils
 
 import (
-	"bytes"
-	"io"
-	"os"
-	"strings"
-
-	"github.com/arduino/arduino-cli/executils"
-	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/pkg/errors"
 )
-
-func printableArgument(arg string) string {
-	if strings.ContainsAny(arg, "\"\\ \t") {
-		arg = strings.Replace(arg, "\\", "\\\\", -1)
-		arg = strings.Replace(arg, "\"", "\\\"", -1)
-		return "\"" + arg + "\""
-	} else {
-		return arg
-	}
-}
-
-// Convert a command and argument slice back to a printable string.
-// This adds basic escaping which is sufficient for debug output, but
-// probably not for shell interpretation. This essentially reverses
-// ParseCommandLine.
-func PrintableCommand(parts []string) string {
-	return strings.Join(f.Map(parts, printableArgument), " ")
-}
-
-const (
-	Ignore        = 0 // Redirect to null
-	Show          = 1 // Show on stdout/stderr as normal
-	ShowIfVerbose = 2 // Show if verbose is set, Ignore otherwise
-	Capture       = 3 // Capture into buffer
-)
-
-func ExecCommand(
-	verbose bool,
-	stdoutWriter, stderrWriter io.Writer,
-	command *executils.Process, stdout int, stderr int,
-) ([]byte, []byte, []byte, error) {
-	verboseInfoBuf := &bytes.Buffer{}
-	if verbose {
-		verboseInfoBuf.WriteString(PrintableCommand(command.GetArgs()))
-	}
-
-	stdoutBuffer := &bytes.Buffer{}
-	if stdout == Capture {
-		command.RedirectStdoutTo(stdoutBuffer)
-	} else if stdout == Show || (stdout == ShowIfVerbose && verbose) {
-		if stdoutWriter != nil {
-			command.RedirectStdoutTo(stdoutWriter)
-		} else {
-			command.RedirectStdoutTo(os.Stdout)
-		}
-	}
-
-	stderrBuffer := &bytes.Buffer{}
-	if stderr == Capture {
-		command.RedirectStderrTo(stderrBuffer)
-	} else if stderr == Show || (stderr == ShowIfVerbose && verbose) {
-		if stderrWriter != nil {
-			command.RedirectStderrTo(stderrWriter)
-		} else {
-			command.RedirectStderrTo(os.Stderr)
-		}
-	}
-
-	err := command.Start()
-	if err != nil {
-		return verboseInfoBuf.Bytes(), nil, nil, errors.WithStack(err)
-	}
-
-	err = command.Wait()
-	return verboseInfoBuf.Bytes(), stdoutBuffer.Bytes(), stderrBuffer.Bytes(), errors.WithStack(err)
-}
 
 type loggerAction struct {
 	onlyIfVerbose bool
