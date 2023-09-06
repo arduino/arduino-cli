@@ -17,6 +17,7 @@ package core
 
 import (
 	"context"
+
 	"github.com/arduino/arduino-cli/arduino/cores"
 
 	"github.com/arduino/arduino-cli/arduino"
@@ -39,7 +40,7 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest, downl
 			Package:              req.PlatformPackage,
 			PlatformArchitecture: req.Architecture,
 		}
-		platform, err := pme.DownloadAndInstallPlatformUpgrades(ref, downloadCB, taskCB, req.GetSkipPostInstall())
+		platform, err := pme.DownloadAndInstallPlatformUpgrades(ref, downloadCB, taskCB, req.GetSkipPostInstall(), req.GetSkipPreUninstall())
 		if err != nil {
 			return platform, err
 		}

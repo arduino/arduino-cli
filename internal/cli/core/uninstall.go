@@ -30,21 +30,25 @@ import (
 )
 
 func initUninstallCommand() *cobra.Command {
+	var preUninstallFlags arguments.PrePostScriptsFlags
 	uninstallCommand := &cobra.Command{
 		Use:     fmt.Sprintf("uninstall %s:%s ...", tr("PACKAGER"), tr("ARCH")),
 		Short:   tr("Uninstalls one or more cores and corresponding tool dependencies if no longer used."),
 		Long:    tr("Uninstalls one or more cores and corresponding tool dependencies if no longer used."),
 		Example: "  " + os.Args[0] + " core uninstall arduino:samd\n",
 		Args:    cobra.MinimumNArgs(1),
-		Run:     runUninstallCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runUninstallCommand(args, preUninstallFlags)
+		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 			return arguments.GetUninstallableCores(), cobra.ShellCompDirectiveDefault
 		},
 	}
+	preUninstallFlags.AddToCommand(uninstallCommand)
 	return uninstallCommand
 }
 
-func runUninstallCommand(cmd *cobra.Command, args []string) {
+func runUninstallCommand(args []string, preUninstallFlags arguments.PrePostScriptsFlags) {
 	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli core uninstall`")
 
@@ -60,9 +64,10 @@ func runUninstallCommand(cmd *cobra.Command, args []string) {
 	}
 	for _, platformRef := range platformsRefs {
 		_, err := core.PlatformUninstall(context.Background(), &rpc.PlatformUninstallRequest{
-			Instance:        inst,
-			PlatformPackage: platformRef.PackageName,
-			Architecture:    platformRef.Architecture,
+			Instance:         inst,
+			PlatformPackage:  platformRef.PackageName,
+			Architecture:     platformRef.Architecture,
+			SkipPreUninstall: preUninstallFlags.DetectSkipPreUninstallValue(),
 		}, feedback.NewTaskProgressCB())
 		if err != nil {
 			feedback.Fatal(tr("Error during uninstall: %v", err), feedback.ErrGeneric)

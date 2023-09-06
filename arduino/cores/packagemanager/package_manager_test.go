@@ -949,7 +949,7 @@ func TestRunPostInstall(t *testing.T) {
 	require.NoError(t, err)
 	err = os.Chmod(scriptPath.String(), 0777)
 	require.NoError(t, err)
-	stdout, stderr, err := pme.RunPostInstallScript(dir)
+	stdout, stderr, err := pme.RunPreOrPostScript(dir, "post_install")
 	require.NoError(t, err)
 
 	// `HasPrefix` because windows seem to add a trailing space at the end

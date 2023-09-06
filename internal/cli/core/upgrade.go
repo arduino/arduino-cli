@@ -43,21 +43,21 @@ func initUpgradeCommand() *cobra.Command {
 			"  # " + tr("upgrade arduino:samd to the latest version") + "\n" +
 			"  " + os.Args[0] + " core upgrade arduino:samd",
 		Run: func(cmd *cobra.Command, args []string) {
-			runUpgradeCommand(args, postInstallFlags.DetectSkipPostInstallValue())
+			runUpgradeCommand(args, postInstallFlags.DetectSkipPostInstallValue(), postInstallFlags.DetectSkipPreUninstallValue())
 		},
 	}
 	postInstallFlags.AddToCommand(upgradeCommand)
 	return upgradeCommand
 }
 
-func runUpgradeCommand(args []string, skipPostInstall bool) {
+func runUpgradeCommand(args []string, skipPostInstall bool, skipPreUninstall bool) {
 	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli core upgrade`")
-	Upgrade(inst, args, skipPostInstall)
+	Upgrade(inst, args, skipPostInstall, skipPreUninstall)
 }
 
 // Upgrade upgrades one or all installed platforms to the latest version.
-func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
+func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUninstall bool) {
 	// if no platform was passed, upgrade allthethings
 	if len(args) == 0 {
 		targets, err := core.PlatformList(&rpc.PlatformListRequest{
@@ -102,10 +102,11 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool) {
 		}
 
 		r := &rpc.PlatformUpgradeRequest{
-			Instance:        inst,
-			PlatformPackage: platformRef.PackageName,
-			Architecture:    platformRef.Architecture,
-			SkipPostInstall: skipPostInstall,
+			Instance:         inst,
+			PlatformPackage:  platformRef.PackageName,
+			Architecture:     platformRef.Architecture,
+			SkipPostInstall:  skipPostInstall,
+			SkipPreUninstall: skipPreUninstall,
 		}
 		response, err := core.PlatformUpgrade(context.Background(), r, feedback.ProgressBar(), feedback.TaskProgress())
 		warningMissingIndex(response)

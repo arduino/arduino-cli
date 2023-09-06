@@ -64,14 +64,14 @@ func platformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 		return &arduino.NotFoundError{Message: tr("Can't find dependencies for platform %s", ref), Cause: err}
 	}
 
-	if err := pme.UninstallPlatform(platform, taskCB); err != nil {
+	if err := pme.UninstallPlatform(platform, taskCB, req.GetSkipPreUninstall()); err != nil {
 		return err
 	}
 
 	for _, tool := range tools {
 		if !pme.IsToolRequired(tool) {
 			taskCB(&rpc.TaskProgress{Name: tr("Uninstalling %s, tool is no more required", tool)})
-			pme.UninstallTool(tool, taskCB)
+			pme.UninstallTool(tool, taskCB, req.GetSkipPreUninstall())
 		}
 	}
 
