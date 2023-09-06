@@ -17,6 +17,16 @@ package builder
 
 import "github.com/arduino/arduino-cli/arduino/sketch"
 
+const (
+	BuildPropertiesArchiveFile          = "archive_file"
+	BuildPropertiesArchiveFilePath      = "archive_file_path"
+	BuildPropertiesObjectFile           = "object_file"
+	RecipeARPattern                     = "recipe.ar.pattern"
+	BuildPropertiesIncludes             = "includes"
+	BuildPropertiesCompilerWarningFlags = "compiler.warning_flags"
+	Space                               = " "
+)
+
 // Builder is a Sketch builder.
 type Builder struct {
 	sketch *sketch.Sketch

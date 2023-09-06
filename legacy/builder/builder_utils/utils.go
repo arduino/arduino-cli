@@ -31,7 +31,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -251,8 +250,8 @@ func compileFileWithRecipe(
 	verboseStdout, verboseInfo, errOut := &bytes.Buffer{}, &bytes.Buffer{}, &bytes.Buffer{}
 
 	properties := buildProperties.Clone()
-	properties.Set(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+warningsLevel))
-	properties.Set(constants.BUILD_PROPERTIES_INCLUDES, strings.Join(includes, constants.SPACE))
+	properties.Set(builder.BuildPropertiesCompilerWarningFlags, properties.Get(builder.BuildPropertiesCompilerWarningFlags+"."+warningsLevel))
+	properties.Set(builder.BuildPropertiesIncludes, strings.Join(includes, builder.Space))
 	properties.SetPath("source_file", source)
 	relativeSource, err := sourcePath.RelTo(source)
 	if err != nil {
@@ -261,7 +260,7 @@ func compileFileWithRecipe(
 	depsFile := buildPath.Join(relativeSource.String() + ".d")
 	objectFile := buildPath.Join(relativeSource.String() + ".o")
 
-	properties.SetPath(constants.BUILD_PROPERTIES_OBJECT_FILE, objectFile)
+	properties.SetPath(builder.BuildPropertiesObjectFile, objectFile)
 	err = objectFile.Parent().MkdirAll()
 	if err != nil {
 		return nil, nil, nil, nil, errors.WithStack(err)
@@ -345,11 +344,11 @@ func ArchiveCompiledFiles(
 
 	for _, objectFile := range objectFilesToArchive {
 		properties := buildProperties.Clone()
-		properties.Set(constants.BUILD_PROPERTIES_ARCHIVE_FILE, archiveFilePath.Base())
-		properties.SetPath(constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH, archiveFilePath)
-		properties.SetPath(constants.BUILD_PROPERTIES_OBJECT_FILE, objectFile)
+		properties.Set(builder.BuildPropertiesArchiveFile, archiveFilePath.Base())
+		properties.SetPath(builder.BuildPropertiesArchiveFilePath, archiveFilePath)
+		properties.SetPath(builder.BuildPropertiesObjectFile, objectFile)
 
-		command, err := PrepareCommandForRecipe(properties, constants.RECIPE_AR_PATTERN, false)
+		command, err := PrepareCommandForRecipe(properties, builder.RecipeARPattern, false)
 		if err != nil {
 			return nil, verboseInfobuf.Bytes(), errors.WithStack(err)
 		}

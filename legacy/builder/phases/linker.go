@@ -18,6 +18,7 @@ package phases
 import (
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
@@ -93,7 +94,7 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 			properties.SetPath("archive_file_path", archive)
 			properties.SetPath("object_file", object)
 
-			command, err := builder_utils.PrepareCommandForRecipe(properties, constants.RECIPE_AR_PATTERN, false)
+			command, err := builder_utils.PrepareCommandForRecipe(properties, builder.RecipeARPattern, false)
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -112,9 +113,9 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 
 	properties := buildProperties.Clone()
 	properties.Set(constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS))
-	properties.Set(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_WARNING_FLAGS+"."+ctx.WarningsLevel))
-	properties.Set(constants.BUILD_PROPERTIES_ARCHIVE_FILE, coreDotARelPath.String())
-	properties.Set(constants.BUILD_PROPERTIES_ARCHIVE_FILE_PATH, coreArchiveFilePath.String())
+	properties.Set(builder.BuildPropertiesCompilerWarningFlags, properties.Get(builder.BuildPropertiesCompilerWarningFlags+"."+ctx.WarningsLevel))
+	properties.Set(builder.BuildPropertiesArchiveFile, coreDotARelPath.String())
+	properties.Set(builder.BuildPropertiesArchiveFilePath, coreArchiveFilePath.String())
 	properties.Set("object_files", objectFileList)
 
 	command, err := builder_utils.PrepareCommandForRecipe(properties, constants.RECIPE_C_COMBINE_PATTERN, false)
