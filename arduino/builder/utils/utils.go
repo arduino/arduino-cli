@@ -195,6 +195,7 @@ func FindFilesInFolder(dir *paths.Path, recurse bool, extensions ...string) (pat
 	return dir.ReadDir(fileFilter)
 }
 
+// nolint
 const (
 	Ignore        = 0 // Redirect to null
 	Show          = 1 // Show on stdout/stderr as normal
@@ -207,9 +208,8 @@ func printableArgument(arg string) string {
 		arg = strings.ReplaceAll(arg, "\\", "\\\\")
 		arg = strings.ReplaceAll(arg, "\"", "\\\"")
 		return "\"" + arg + "\""
-	} else {
-		return arg
 	}
+	return arg
 }
 
 // Convert a command and argument slice back to a printable string.

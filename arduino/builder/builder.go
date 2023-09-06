@@ -17,6 +17,7 @@ package builder
 
 import "github.com/arduino/arduino-cli/arduino/sketch"
 
+// nolint
 const (
 	BuildPropertiesArchiveFile          = "archive_file"
 	BuildPropertiesArchiveFilePath      = "archive_file_path"
