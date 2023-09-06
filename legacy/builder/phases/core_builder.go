@@ -52,9 +52,9 @@ func CoreBuilder(
 	verboseInfoFn func(msg string),
 	verboseStdoutFn, verboseStderrFn func(data []byte),
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
-) (paths.PathList, *paths.Path, *paths.Path, error) {
+) (paths.PathList, *paths.Path, error) {
 	if err := coreBuildPath.MkdirAll(); err != nil {
-		return nil, nil, coreBuildCachePath, errors.WithStack(err)
+		return nil, nil, errors.WithStack(err)
 	}
 
 	if coreBuildCachePath != nil {
@@ -63,7 +63,7 @@ func CoreBuilder(
 			verboseInfoFn(tr("Running normal build of the core..."))
 			coreBuildCachePath = nil
 		} else if err := coreBuildCachePath.MkdirAll(); err != nil {
-			return nil, nil, coreBuildCachePath, errors.WithStack(err)
+			return nil, nil, errors.WithStack(err)
 		}
 	}
 
@@ -81,10 +81,10 @@ func CoreBuilder(
 		progress, progressCB,
 	)
 	if err != nil {
-		return nil, nil, coreBuildCachePath, errors.WithStack(err)
+		return nil, nil, errors.WithStack(err)
 	}
 
-	return objectFiles, archiveFile, coreBuildCachePath, nil
+	return objectFiles, archiveFile, nil
 }
 
 func compileCore(

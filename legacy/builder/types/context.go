@@ -61,7 +61,6 @@ type Context struct {
 	BuildPath            *paths.Path
 	SketchBuildPath      *paths.Path
 	CoreBuildPath        *paths.Path
-	CoreBuildCachePath   *paths.Path
 	CoreArchiveFilePath  *paths.Path
 	CoreObjectsFiles     paths.PathList
 	LibrariesBuildPath   *paths.Path

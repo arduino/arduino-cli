@@ -155,7 +155,21 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	// cache is purged after compilation to not remove entries that might be required
 	defer maybePurgeBuildCache()
 
-	sketchBuilder := bldr.NewBuilder(sk)
+	var coreBuildCachePath *paths.Path
+	if req.GetBuildCachePath() == "" {
+		coreBuildCachePath = paths.TempDir().Join("arduino", "cores")
+	} else {
+		buildCachePath, err := paths.New(req.GetBuildCachePath()).Abs()
+		if err != nil {
+			return nil, &arduino.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
+		}
+		if err := buildCachePath.MkdirAll(); err != nil {
+			return nil, &arduino.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
+		}
+		coreBuildCachePath = buildCachePath.Join("core")
+	}
+
+	sketchBuilder := bldr.NewBuilder(sk, coreBuildCachePath)
 
 	// Add build properites related to sketch data
 	buildProperties = sketchBuilder.SetupBuildProperties(buildProperties, buildPath, req.GetOptimizeForDebug())
@@ -204,19 +218,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.WarningsLevel = req.GetWarnings()
 	if builderCtx.WarningsLevel == "" {
 		builderCtx.WarningsLevel = builder.DEFAULT_WARNINGS_LEVEL
-	}
-
-	if req.GetBuildCachePath() == "" {
-		builderCtx.CoreBuildCachePath = paths.TempDir().Join("arduino", "cores")
-	} else {
-		buildCachePath, err := paths.New(req.GetBuildCachePath()).Abs()
-		if err != nil {
-			return nil, &arduino.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
-		}
-		if err := buildCachePath.MkdirAll(); err != nil {
-			return nil, &arduino.PermissionDeniedError{Message: tr("Cannot create build cache directory"), Cause: err}
-		}
-		builderCtx.CoreBuildCachePath = buildCachePath.Join("core")
 	}
 
 	builderCtx.BuiltInLibrariesDirs = configuration.IDEBuiltinLibrariesDir(configuration.Settings)

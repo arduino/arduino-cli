@@ -97,7 +97,7 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		ctx.Sketch = sk
 	}
 
-	ctx.Builder = bldr.NewBuilder(ctx.Sketch)
+	ctx.Builder = bldr.NewBuilder(ctx.Sketch, nil)
 	if fqbn != "" {
 		ctx.FQBN = parseFQBN(t, fqbn)
 		targetPackage, targetPlatform, targetBoard, buildProperties, buildPlatform, err := pme.ResolveFQBN(ctx.FQBN)

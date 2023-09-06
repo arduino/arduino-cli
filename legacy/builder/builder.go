@@ -73,8 +73,8 @@ func (s *Builder) Run(ctx *types.Context) error {
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.core.prebuild", Suffix: ".pattern"},
 
 		types.BareCommand(func(ctx *types.Context) error {
-			objectFiles, archiveFile, coreBuildCachePath, err := phases.CoreBuilder(
-				ctx.BuildPath, ctx.CoreBuildPath, ctx.CoreBuildCachePath,
+			objectFiles, archiveFile, err := phases.CoreBuilder(
+				ctx.BuildPath, ctx.CoreBuildPath, ctx.Builder.CoreBuildCachePath(),
 				ctx.BuildProperties,
 				ctx.ActualPlatform,
 				ctx.Verbose, ctx.OnlyUpdateCompilationDatabase, ctx.Clean,
@@ -90,7 +90,6 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 			ctx.CoreObjectsFiles = objectFiles
 			ctx.CoreArchiveFilePath = archiveFile
-			ctx.CoreBuildCachePath = coreBuildCachePath
 
 			return err
 		}),
