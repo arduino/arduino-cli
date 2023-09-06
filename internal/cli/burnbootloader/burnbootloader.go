@@ -76,7 +76,7 @@ func runBootloaderCommand(command *cobra.Command, args []string) {
 	if _, err := upload.BurnBootloader(context.Background(), &rpc.BurnBootloaderRequest{
 		Instance:   instance,
 		Fqbn:       fqbn.String(),
-		Port:       discoveryPort.ToRPC(),
+		Port:       discoveryPort,
 		Verbose:    verbose,
 		Verify:     verify,
 		Programmer: programmer.String(),

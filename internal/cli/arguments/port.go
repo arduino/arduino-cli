@@ -20,7 +20,6 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
@@ -70,8 +69,7 @@ func (p *Port) GetPortAddressAndProtocol(instance *rpc.Instance, defaultAddress,
 
 // GetPort returns the Port obtained by parsing command line arguments.
 // The extra metadata for the ports is obtained using the pluggable discoveries.
-func (p *Port) GetPort(instance *rpc.Instance, defaultAddress, defaultProtocol string) (*discovery.Port, error) {
-	// TODO: REMOVE discovery from here (use board.List instead)
+func (p *Port) GetPort(instance *rpc.Instance, defaultAddress, defaultProtocol string) (*rpc.Port, error) {
 
 	address := p.address
 	protocol := p.protocol
@@ -84,7 +82,7 @@ func (p *Port) GetPort(instance *rpc.Instance, defaultAddress, defaultProtocol s
 		// the attached board without specifying explictly a port.
 		// Tools that work this way must be specified using the property
 		// "BOARD_ID.upload.tool.default" in the platform's boards.txt.
-		return &discovery.Port{
+		return &rpc.Port{
 			Protocol: "default",
 		}, nil
 	}
@@ -113,13 +111,13 @@ func (p *Port) GetPort(instance *rpc.Instance, defaultAddress, defaultProtocol s
 			}
 			port := portEvent.Port
 			if (protocol == "" || protocol == port.Protocol) && address == port.Address {
-				return port, nil
+				return port.ToRPC(), nil
 			}
 
 		case <-deadline:
 			// No matching port found
 			if protocol == "" {
-				return &discovery.Port{
+				return &rpc.Port{
 					Address:  address,
 					Protocol: "serial",
 				}, nil
