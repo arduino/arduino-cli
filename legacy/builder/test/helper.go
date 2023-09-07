@@ -17,13 +17,9 @@
 package test
 
 import (
-	"bytes"
 	"fmt"
-	"path/filepath"
 	"testing"
-	"text/template"
 
-	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
@@ -32,23 +28,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-func LoadAndInterpolate(t *testing.T, filename string, ctx *types.Context) string {
-	funcsMap := template.FuncMap{
-		"QuoteCppString": func(p *paths.Path) string { return cpp.QuoteString(p.String()) },
-	}
-
-	tpl, err := template.New(filepath.Base(filename)).Funcs(funcsMap).ParseFiles(filename)
-	NoError(t, err)
-
-	var buf bytes.Buffer
-	data := make(map[string]interface{})
-	data["sketch"] = ctx.Sketch
-	err = tpl.Execute(&buf, data)
-	NoError(t, err)
-
-	return buf.String()
-}
 
 func Abs(t *testing.T, rel *paths.Path) *paths.Path {
 	absPath, err := rel.Abs()
