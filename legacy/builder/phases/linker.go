@@ -16,55 +16,68 @@
 package phases
 
 import (
+	"bytes"
+	"io"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
 
-type Linker struct{}
-
-func (s *Linker) Run(ctx *types.Context) error {
-	if ctx.OnlyUpdateCompilationDatabase {
-		if ctx.Verbose {
-			ctx.Info(tr("Skip linking of final executable."))
+func Linker(
+	onlyUpdateCompilationDatabase, verbose bool,
+	sketchObjectFiles, librariesObjectFiles, coreObjectsFiles paths.PathList,
+	coreArchiveFilePath, buildPath *paths.Path,
+	buildProperties *properties.Map,
+	stdoutWriter, stderrWriter io.Writer,
+	warningsLevel string,
+) ([]byte, error) {
+	verboseInfo := &bytes.Buffer{}
+	if onlyUpdateCompilationDatabase {
+		if verbose {
+			verboseInfo.WriteString(tr("Skip linking of final executable."))
 		}
-		return nil
+		return verboseInfo.Bytes(), nil
 	}
 
-	objectFilesSketch := ctx.SketchObjectFiles
-	objectFilesLibraries := ctx.LibrariesObjectFiles
-	objectFilesCore := ctx.CoreObjectsFiles
+	objectFilesSketch := sketchObjectFiles
+	objectFilesLibraries := librariesObjectFiles
+	objectFilesCore := coreObjectsFiles
 
 	objectFiles := paths.NewPathList()
 	objectFiles.AddAll(objectFilesSketch)
 	objectFiles.AddAll(objectFilesLibraries)
 	objectFiles.AddAll(objectFilesCore)
 
-	coreArchiveFilePath := ctx.CoreArchiveFilePath
-	buildPath := ctx.BuildPath
 	coreDotARelPath, err := buildPath.RelTo(coreArchiveFilePath)
 	if err != nil {
-		return errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
-	buildProperties := ctx.BuildProperties
-
-	err = link(ctx, objectFiles, coreDotARelPath, coreArchiveFilePath, buildProperties)
+	verboseInfoOut, err := link(
+		objectFiles, coreDotARelPath, coreArchiveFilePath, buildProperties,
+		verbose, stdoutWriter, stderrWriter, warningsLevel,
+	)
+	verboseInfo.Write(verboseInfoOut)
 	if err != nil {
-		return errors.WithStack(err)
+		return verboseInfo.Bytes(), errors.WithStack(err)
 	}
 
-	return nil
+	return verboseInfo.Bytes(), nil
 }
 
-func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths.Path, coreArchiveFilePath *paths.Path, buildProperties *properties.Map) error {
+func link(
+	objectFiles paths.PathList, coreDotARelPath *paths.Path, coreArchiveFilePath *paths.Path, buildProperties *properties.Map,
+	verbose bool,
+	stdoutWriter, stderrWriter io.Writer,
+	warningsLevel string,
+) ([]byte, error) {
+	verboseBuffer := &bytes.Buffer{}
+	wrapWithDoubleQuotes := func(value string) string { return "\"" + value + "\"" }
 	objectFileList := strings.Join(f.Map(objectFiles.AsStrings(), wrapWithDoubleQuotes), " ")
 
 	// If command line length is too big (> 30000 chars), try to collect the object files into archives
@@ -95,14 +108,14 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 
 			command, err := utils.PrepareCommandForRecipe(properties, builder.RecipeARPattern, false)
 			if err != nil {
-				return errors.WithStack(err)
+				return nil, errors.WithStack(err)
 			}
 
-			if verboseInfo, _, _, err := utils.ExecCommand(ctx.Verbose, ctx.Stdout, ctx.Stderr, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */); err != nil {
-				if ctx.Verbose {
-					ctx.Info(string(verboseInfo))
+			if verboseInfo, _, _, err := utils.ExecCommand(verbose, stdoutWriter, stderrWriter, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */); err != nil {
+				if verbose {
+					verboseBuffer.WriteString(string(verboseInfo))
 				}
-				return errors.WithStack(err)
+				return verboseBuffer.Bytes(), errors.WithStack(err)
 			}
 		}
 
@@ -111,24 +124,20 @@ func link(ctx *types.Context, objectFiles paths.PathList, coreDotARelPath *paths
 	}
 
 	properties := buildProperties.Clone()
-	properties.Set(constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS, properties.Get(constants.BUILD_PROPERTIES_COMPILER_C_ELF_FLAGS))
-	properties.Set(builder.BuildPropertiesCompilerWarningFlags, properties.Get(builder.BuildPropertiesCompilerWarningFlags+"."+ctx.WarningsLevel))
+	properties.Set("compiler.c.elf.flags", properties.Get("compiler.c.elf.flags"))
+	properties.Set(builder.BuildPropertiesCompilerWarningFlags, properties.Get(builder.BuildPropertiesCompilerWarningFlags+"."+warningsLevel))
 	properties.Set(builder.BuildPropertiesArchiveFile, coreDotARelPath.String())
 	properties.Set(builder.BuildPropertiesArchiveFilePath, coreArchiveFilePath.String())
 	properties.Set("object_files", objectFileList)
 
-	command, err := utils.PrepareCommandForRecipe(properties, constants.RECIPE_C_COMBINE_PATTERN, false)
+	command, err := utils.PrepareCommandForRecipe(properties, "recipe.c.combine.pattern", false)
 	if err != nil {
-		return err
+		return verboseBuffer.Bytes(), err
 	}
 
-	verboseInfo, _, _, err := utils.ExecCommand(ctx.Verbose, ctx.Stdout, ctx.Stderr, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
-	if ctx.Verbose {
-		ctx.Info(string(verboseInfo))
+	verboseInfo, _, _, err := utils.ExecCommand(verbose, stdoutWriter, stderrWriter, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+	if verbose {
+		verboseBuffer.WriteString(string(verboseInfo))
 	}
-	return err
-}
-
-func wrapWithDoubleQuotes(value string) string {
-	return "\"" + value + "\""
+	return verboseBuffer.Bytes(), err
 }

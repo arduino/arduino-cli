@@ -98,7 +98,27 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		logIfVerbose(false, tr("Linking everything together...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.linking.prelink", Suffix: ".pattern"},
-		&phases.Linker{},
+
+		types.BareCommand(func(ctx *types.Context) error {
+			verboseInfoOut, err := phases.Linker(
+				ctx.OnlyUpdateCompilationDatabase,
+				ctx.Verbose,
+				ctx.SketchObjectFiles,
+				ctx.LibrariesObjectFiles,
+				ctx.CoreObjectsFiles,
+				ctx.CoreArchiveFilePath,
+				ctx.BuildPath,
+				ctx.BuildProperties,
+				ctx.Stdout,
+				ctx.Stderr,
+				ctx.WarningsLevel,
+			)
+			if ctx.Verbose {
+				ctx.Info(string(verboseInfoOut))
+			}
+			return err
+		}),
+
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.linking.postlink", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.objcopy.preobjcopy", Suffix: ".pattern"},
