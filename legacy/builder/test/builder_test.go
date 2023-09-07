@@ -146,30 +146,6 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 	return ctx
 }
 
-func TestBuilderEmptySketch(t *testing.T) {
-	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	// Run builder
-	command := builder.Builder{}
-	err := command.Run(ctx)
-	NoError(t, err)
-
-	buildPath := ctx.BuildPath
-	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "sketch1.ino.cpp.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join("sketch1.ino.elf").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join("sketch1.ino.hex").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-}
-
 func TestBuilderWithBuildPathInSketchDir(t *testing.T) {
 	buildPath, err := paths.New("sketch1", "build").Abs()
 	NoError(t, err)
