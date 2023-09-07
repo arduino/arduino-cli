@@ -59,7 +59,6 @@ func TestCompile(t *testing.T) {
 		{"WithMultipleBuildPropertyFlags", compileWithMultipleBuildPropertyFlags},
 		{"WithOutputDirFlag", compileWithOutputDirFlag},
 		{"WithExportBinariesFlag", compileWithExportBinariesFlag},
-		{"WithCustomBuildPath", compileWithCustomBuildPath},
 		{"WithExportBinariesEnvVar", compileWithExportBinariesEnvVar},
 		{"WithExportBinariesConfig", compileWithExportBinariesConfig},
 		{"WithInvalidUrl", compileWithInvalidUrl},
@@ -73,7 +72,7 @@ func TestCompile(t *testing.T) {
 		{"WithRelativeBuildPath", compileWithRelativeBuildPath},
 		{"WithFakeSecureBootCore", compileWithFakeSecureBootCore},
 		{"PreprocessFlagDoNotMessUpWithOutput", preprocessFlagDoNotMessUpWithOutput},
-		{"BuildWithBuildPathInSketchDir", buildWithBuildPathInSketchDir},
+		{"WithCustomBuildPath", buildWithCustomBuildPath},
 	}.Run(t, env, cli)
 }
 
@@ -447,41 +446,6 @@ func compileWithExportBinariesFlag(t *testing.T, env *integrationtest.Environmen
 	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.hex").String())
 	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.with_bootloader.bin").String())
 	require.FileExists(t, sketchPath.Join("build", fqbn, sketchName+".ino.with_bootloader.hex").String())
-}
-
-func compileWithCustomBuildPath(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
-	sketchName := "CompileWithBuildPath"
-	sketchPath := cli.SketchbookDir().Join(sketchName)
-	defer sketchPath.RemoveAll()
-	fqbn := "arduino:avr:uno"
-
-	// Create a test sketch
-	_, _, err := cli.Run("sketch", "new", sketchPath.String())
-	require.NoError(t, err)
-
-	// Test the --build-path flag with absolute path
-	buildPath := cli.DataDir().Join("test_dir", "build_dir")
-	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--build-path", buildPath.String())
-	require.NoError(t, err)
-
-	// Verifies expected binaries have been built to build_path
-	require.DirExists(t, buildPath.String())
-	require.FileExists(t, buildPath.Join(sketchName+".ino.eep").String())
-	require.FileExists(t, buildPath.Join(sketchName+".ino.elf").String())
-	require.FileExists(t, buildPath.Join(sketchName+".ino.hex").String())
-	require.FileExists(t, buildPath.Join(sketchName+".ino.with_bootloader.bin").String())
-	require.FileExists(t, buildPath.Join(sketchName+".ino.with_bootloader.hex").String())
-
-	// Verifies there are no binaries in temp directory
-	md5 := md5.Sum(([]byte(sketchPath.String())))
-	sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
-	require.NotEmpty(t, sketchPathMd5)
-	buildDir := paths.TempDir().Join("arduino", "sketches", sketchPathMd5)
-	require.NoFileExists(t, buildDir.Join(sketchName+".ino.eep").String())
-	require.NoFileExists(t, buildDir.Join(sketchName+".ino.elf").String())
-	require.NoFileExists(t, buildDir.Join(sketchName+".ino.hex").String())
-	require.NoFileExists(t, buildDir.Join(sketchName+".ino.with_bootloader.bin").String())
-	require.NoFileExists(t, buildDir.Join(sketchName+".ino.with_bootloader.hex").String())
 }
 
 func compileWithExportBinariesEnvVar(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
@@ -1206,17 +1170,54 @@ void loop() {
 	require.Equal(t, expected, string(output))
 }
 
-func buildWithBuildPathInSketchDir(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+func buildWithCustomBuildPath(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	sketchName := "bare_minimum"
 	sketchPath := cli.CopySketch(sketchName)
 	defer sketchPath.RemoveAll()
-	buildPath := sketchPath.Join("build")
 
-	// Run build
-	_, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(), sketchPath.String())
-	require.NoError(t, err)
+	t.Run("OutsideSketch", func(t *testing.T) {
+		sketchName := "CompileWithBuildPath"
+		sketchPath := cli.SketchbookDir().Join(sketchName)
+		defer sketchPath.RemoveAll()
+		fqbn := "arduino:avr:uno"
 
-	// Run build twice, to verify the build still works when the build directory is present at the start
-	_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(), sketchPath.String())
-	require.NoError(t, err)
+		// Create a test sketch
+		_, _, err := cli.Run("sketch", "new", sketchPath.String())
+		require.NoError(t, err)
+
+		// Test the --build-path flag with absolute path
+		buildPath := cli.DataDir().Join("test_dir", "build_dir")
+		_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--build-path", buildPath.String())
+		require.NoError(t, err)
+
+		// Verifies expected binaries have been built to build_path
+		require.DirExists(t, buildPath.String())
+		require.FileExists(t, buildPath.Join(sketchName+".ino.eep").String())
+		require.FileExists(t, buildPath.Join(sketchName+".ino.elf").String())
+		require.FileExists(t, buildPath.Join(sketchName+".ino.hex").String())
+		require.FileExists(t, buildPath.Join(sketchName+".ino.with_bootloader.bin").String())
+		require.FileExists(t, buildPath.Join(sketchName+".ino.with_bootloader.hex").String())
+
+		// Verifies there are no binaries in temp directory
+		md5 := md5.Sum(([]byte(sketchPath.String())))
+		sketchPathMd5 := strings.ToUpper(hex.EncodeToString(md5[:]))
+		require.NotEmpty(t, sketchPathMd5)
+		buildDir := paths.TempDir().Join("arduino", "sketches", sketchPathMd5)
+		require.NoFileExists(t, buildDir.Join(sketchName+".ino.eep").String())
+		require.NoFileExists(t, buildDir.Join(sketchName+".ino.elf").String())
+		require.NoFileExists(t, buildDir.Join(sketchName+".ino.hex").String())
+		require.NoFileExists(t, buildDir.Join(sketchName+".ino.with_bootloader.bin").String())
+		require.NoFileExists(t, buildDir.Join(sketchName+".ino.with_bootloader.hex").String())
+	})
+
+	t.Run("InsideSketch", func(t *testing.T) {
+		buildPath := sketchPath.Join("build")
+
+		// Run build
+		_, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(), sketchPath.String())
+		require.NoError(t, err)
+		// Run build twice, to verify the build still works when the build directory is present at the start
+		_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(), sketchPath.String())
+		require.NoError(t, err)
+	})
 }
