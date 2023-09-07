@@ -60,17 +60,17 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 	}
 	if ctx.BuildPath == nil {
 		buildPath, err := paths.MkTempDir("", "test_build_path")
-		NoError(t, err)
+		require.NoError(t, err)
 		ctx.BuildPath = buildPath
 	}
 
 	buildPath := ctx.BuildPath
 	sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
-	NoError(t, err)
+	require.NoError(t, err)
 	librariesBuildPath, err := buildPath.Join(constants.FOLDER_LIBRARIES).Abs()
-	NoError(t, err)
+	require.NoError(t, err)
 	coreBuildPath, err := buildPath.Join(constants.FOLDER_CORE).Abs()
-	NoError(t, err)
+	require.NoError(t, err)
 
 	ctx.SketchBuildPath = sketchBuildPath
 	ctx.LibrariesBuildPath = librariesBuildPath
@@ -128,7 +128,7 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 			ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
 			ctx.ActualPlatform, ctx.TargetPlatform,
 		)
-		NoError(t, err)
+		require.NoError(t, err)
 
 		ctx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
 			lm, libsResolver,

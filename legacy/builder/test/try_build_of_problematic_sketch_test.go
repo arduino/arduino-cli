@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
+	"github.com/stretchr/testify/require"
 )
 
 // This is a sketch that fails to build on purpose
@@ -93,5 +94,5 @@ func tryBuildWithContext(t *testing.T, ctx *types.Context, fqbn string, sketchLo
 	defer cleanUpBuilderTestContext(t, ctx)
 
 	err := builder.RunBuilder(ctx)
-	NoError(t, err, "Build error for "+sketchLocation.String())
+	require.NoError(t, err, "Build error for "+sketchLocation.String())
 }

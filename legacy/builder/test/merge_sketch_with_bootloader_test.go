@@ -34,7 +34,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 
 	buildPath := ctx.BuildPath
 	err := buildPath.Join("sketch").MkdirAll()
-	NoError(t, err)
+	require.NoError(t, err)
 
 	fakeSketchHex := `:100000000C9434000C9446000C9446000C9446006A
 :100010000C9446000C9446000C9446000C94460048
@@ -67,7 +67,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 :00000001FF
 `
 	err = buildPath.Join("sketch", "sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
-	NoError(t, err)
+	require.NoError(t, err)
 
 	commands := []types.Command{
 		&builder.MergeSketchWithBootloader{},
@@ -75,11 +75,11 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 
 	for _, command := range commands {
 		err := command.Run(ctx)
-		NoError(t, err)
+		require.NoError(t, err)
 	}
 
 	bytes, err := buildPath.Join("sketch", "sketch1.ino.with_bootloader.hex").ReadFile()
-	NoError(t, err)
+	require.NoError(t, err)
 	mergedSketchHex := string(bytes)
 
 	require.Contains(t, mergedSketchHex, ":100000000C9434000C9446000C9446000C9446006A\n")
@@ -92,7 +92,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 
 	buildPath := ctx.BuildPath
 	err := buildPath.Join("sketch").MkdirAll()
-	NoError(t, err)
+	require.NoError(t, err)
 
 	fakeSketchHex := `:100000000C9434000C9446000C9446000C9446006A
 :100010000C9446000C9446000C9446000C94460048
@@ -125,7 +125,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 :00000001FF
 `
 	err = buildPath.Join("sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
-	NoError(t, err)
+	require.NoError(t, err)
 
 	commands := []types.Command{
 		&builder.MergeSketchWithBootloader{},
@@ -133,11 +133,11 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 
 	for _, command := range commands {
 		err := command.Run(ctx)
-		NoError(t, err)
+		require.NoError(t, err)
 	}
 
 	bytes, err := buildPath.Join("sketch1.ino.with_bootloader.hex").ReadFile()
-	NoError(t, err)
+	require.NoError(t, err)
 	mergedSketchHex := string(bytes)
 
 	fmt.Println(string(mergedSketchHex))
@@ -156,7 +156,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 
 	command := &builder.MergeSketchWithBootloader{}
 	err := command.Run(ctx)
-	NoError(t, err)
+	require.NoError(t, err)
 
 	exist, err := buildPath.Join("sketch.ino.with_bootloader.hex").ExistCheck()
 	require.NoError(t, err)
@@ -175,7 +175,7 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 
 	buildPath := ctx.BuildPath
 	err := buildPath.Join("sketch").MkdirAll()
-	NoError(t, err)
+	require.NoError(t, err)
 
 	fakeSketchHex := `:100000000C9434000C9446000C9446000C9446006A
 :100010000C9446000C9446000C9446000C94460048
@@ -208,7 +208,7 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 :00000001FF
 `
 	err = buildPath.Join("sketch", "sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
-	NoError(t, err)
+	require.NoError(t, err)
 
 	commands := []types.Command{
 		&builder.MergeSketchWithBootloader{},
@@ -216,11 +216,11 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 
 	for _, command := range commands {
 		err := command.Run(ctx)
-		NoError(t, err)
+		require.NoError(t, err)
 	}
 
 	bytes, err := buildPath.Join("sketch", "sketch1.ino.with_bootloader.hex").ReadFile()
-	NoError(t, err)
+	require.NoError(t, err)
 	mergedSketchHex := string(bytes)
 
 	require.Contains(t, mergedSketchHex, ":100000000C9434000C9446000C9446000C9446006A\n")

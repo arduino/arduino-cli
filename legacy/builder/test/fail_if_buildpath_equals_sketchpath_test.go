@@ -42,5 +42,5 @@ func TestFailIfBuildPathEqualsSketchPathSketchPathDiffers(t *testing.T) {
 	}
 
 	command := builder.FailIfBuildPathEqualsSketchPath{}
-	NoError(t, command.Run(ctx))
+	require.NoError(t, command.Run(ctx))
 }

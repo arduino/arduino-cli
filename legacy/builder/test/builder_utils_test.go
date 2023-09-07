@@ -28,7 +28,7 @@ import (
 func tempFile(t *testing.T, prefix string) *paths.Path {
 	file, err := os.CreateTemp("", prefix)
 	file.Close()
-	NoError(t, err)
+	require.NoError(t, err)
 	return paths.New(file.Name())
 }
 
@@ -37,7 +37,7 @@ func TestObjFileIsUpToDateObjMissing(t *testing.T) {
 	defer sourceFile.RemoveAll()
 
 	upToDate, err := utils.ObjFileIsUpToDate(sourceFile, nil, nil)
-	NoError(t, err)
+	require.NoError(t, err)
 	require.False(t, upToDate)
 }
 
@@ -49,7 +49,7 @@ func TestObjFileIsUpToDateDepMissing(t *testing.T) {
 	defer objFile.RemoveAll()
 
 	upToDate, err := utils.ObjFileIsUpToDate(sourceFile, objFile, nil)
-	NoError(t, err)
+	require.NoError(t, err)
 	require.False(t, upToDate)
 }
 
@@ -65,7 +65,7 @@ func TestObjFileIsUpToDateObjOlder(t *testing.T) {
 	defer sourceFile.RemoveAll()
 
 	upToDate, err := utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
-	NoError(t, err)
+	require.NoError(t, err)
 	require.False(t, upToDate)
 }
 
@@ -81,7 +81,7 @@ func TestObjFileIsUpToDateObjNewer(t *testing.T) {
 	defer depFile.RemoveAll()
 
 	upToDate, err := utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
-	NoError(t, err)
+	require.NoError(t, err)
 	require.True(t, upToDate)
 }
 
@@ -105,7 +105,7 @@ func TestObjFileIsUpToDateDepIsNewer(t *testing.T) {
 	depFile.WriteFile([]byte(data))
 
 	upToDate, err := utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
-	NoError(t, err)
+	require.NoError(t, err)
 	require.False(t, upToDate)
 }
 
@@ -127,7 +127,7 @@ func TestObjFileIsUpToDateDepIsOlder(t *testing.T) {
 	depFile.WriteFile([]byte(res))
 
 	upToDate, err := utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
-	NoError(t, err)
+	require.NoError(t, err)
 	require.True(t, upToDate)
 }
 
@@ -151,6 +151,6 @@ func TestObjFileIsUpToDateDepIsWrong(t *testing.T) {
 	depFile.WriteFile([]byte(res))
 
 	upToDate, err := utils.ObjFileIsUpToDate(sourceFile, objFile, depFile)
-	NoError(t, err)
+	require.NoError(t, err)
 	require.False(t, upToDate)
 }
