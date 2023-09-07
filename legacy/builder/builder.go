@@ -87,7 +87,31 @@ func (s *Builder) Run(ctx *types.Context) error {
 		logIfVerbose(false, tr("Compiling libraries...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.libraries.prebuild", Suffix: ".pattern"},
 		&UnusedCompiledLibrariesRemover{},
-		&phases.LibrariesBuilder{},
+		types.BareCommand(func(ctx *types.Context) error {
+			librariesObjectFiles, err := phases.LibrariesBuilder(
+				ctx.LibrariesBuildPath,
+				ctx.BuildProperties,
+				ctx.SketchLibrariesDetector.IncludeFolders(),
+				ctx.SketchLibrariesDetector.ImportedLibraries(),
+				ctx.Verbose,
+				ctx.OnlyUpdateCompilationDatabase,
+				ctx.CompilationDatabase,
+				ctx.Jobs,
+				ctx.WarningsLevel,
+				ctx.Stdout,
+				ctx.Stderr,
+				func(msg string) { ctx.Info(msg) },
+				func(data []byte) { ctx.WriteStdout(data) },
+				func(data []byte) { ctx.WriteStderr(data) },
+				&ctx.Progress, ctx.ProgressCB,
+			)
+			if err != nil {
+				return err
+			}
+			ctx.LibrariesObjectFiles = librariesObjectFiles
+
+			return nil
+		}),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.libraries.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
 		logIfVerbose(false, tr("Compiling core...")),
