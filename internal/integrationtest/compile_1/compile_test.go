@@ -73,6 +73,7 @@ func TestCompile(t *testing.T) {
 		{"WithRelativeBuildPath", compileWithRelativeBuildPath},
 		{"WithFakeSecureBootCore", compileWithFakeSecureBootCore},
 		{"PreprocessFlagDoNotMessUpWithOutput", preprocessFlagDoNotMessUpWithOutput},
+		{"BuildWithBuildPathInSketchDir", buildWithBuildPathInSketchDir},
 	}.Run(t, env, cli)
 }
 
@@ -1203,4 +1204,19 @@ void loop() {
 	output, _, err := cli.Run("compile", "-b", fqbn, "--preprocess", sketchPath.String())
 	require.NoError(t, err)
 	require.Equal(t, expected, string(output))
+}
+
+func buildWithBuildPathInSketchDir(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	sketchName := "bare_minimum"
+	sketchPath := cli.CopySketch(sketchName)
+	defer sketchPath.RemoveAll()
+	buildPath := sketchPath.Join("build")
+
+	// Run build
+	_, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(), sketchPath.String())
+	require.NoError(t, err)
+
+	// Run build twice, to verify the build still works when the build directory is present at the start
+	_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(), sketchPath.String())
+	require.NoError(t, err)
 }

@@ -24,7 +24,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
-	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
@@ -144,21 +143,4 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 	}
 
 	return ctx
-}
-
-func TestBuilderWithBuildPathInSketchDir(t *testing.T) {
-	buildPath, err := paths.New("sketch1", "build").Abs()
-	NoError(t, err)
-	ctx := prepareBuilderTestContext(t, &types.Context{BuildPath: buildPath}, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	// Run build
-	command := builder.Builder{}
-	err = command.Run(ctx)
-	NoError(t, err)
-
-	// Run build twice, to verify the build still works when the
-	// build directory is present at the start
-	err = command.Run(ctx)
-	NoError(t, err)
 }
