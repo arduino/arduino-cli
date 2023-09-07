@@ -16,6 +16,7 @@
 package board_test
 
 import (
+	"runtime"
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
@@ -40,100 +41,211 @@ func TestHardwareLoading(t *testing.T) {
 	localTxt.Join("boards.local.txt").CopyTo(downloadedHardwareAvr.Join("boards.local.txt"))
 	localTxt.Join("platform.local.txt").CopyTo(downloadedHardwareAvr.Join("platform.local.txt"))
 
-	{
-		out, _, err := cli.Run("core", "list", "--format", "json")
-		require.NoError(t, err)
-		jsonOut := requirejson.Parse(t, out)
-		jsonOut.LengthMustEqualTo(1)
-		jsonOut.MustContain(`[
-			{
-				"id": "arduino:avr",
-				"installed": "1.8.6",
-				"name": "Arduino AVR Boards",
-				"boards": [
+	t.Run("Simple", func(t *testing.T) {
+		{
+			out, _, err := cli.Run("core", "list", "--format", "json")
+			require.NoError(t, err)
+			jsonOut := requirejson.Parse(t, out)
+			jsonOut.LengthMustEqualTo(1)
+			jsonOut.MustContain(`[
+				{
+					"id": "arduino:avr",
+					"installed": "1.8.6",
+					"name": "Arduino AVR Boards",
+					"boards": [
+						{
+							"name": "Arduino Uno",
+							"fqbn": "arduino:avr:uno"
+						},
+						{
+							"name": "Arduino Yún",
+							"fqbn": "arduino:avr:yun"
+						}
+					]
+				}
+			]`)
+		}
+
+		{
+			// Also test local platform.txt properties override
+			out, _, err := cli.Run("board", "details", "-b", "arduino:avr:uno", "--format", "json")
+			require.NoError(t, err)
+			jsonOut := requirejson.Parse(t, out)
+			jsonOut.MustContain(`{
+				"version": "1.8.6",
+				"properties_id": "uno",
+				"build_properties": [
+					"_id=uno",
+					"tools.avrdude.bootloader.params.verbose=-v",
+					"tools.avrdude.cmd.path=/my/personal/avrdude"
+				],
+				"programmers": [
 					{
-						"name": "Arduino Uno",
-						"fqbn": "arduino:avr:uno"
+					"platform": "Arduino AVR Boards",
+					"id": "usbasp",
+					"name": "USBasp"
 					},
 					{
-						"name": "Arduino Yún",
-						"fqbn": "arduino:avr:yun"
+					"platform": "Arduino AVR Boards",
+					"id": "avrispmkii",
+					"name": "AVRISP mkII"
 					}
+				]			
+			}`)
+		}
+
+		{
+			out, _, err := cli.Run("board", "details", "-b", "arduino:avr:yun", "--format", "json")
+			require.NoError(t, err)
+			jsonOut := requirejson.Parse(t, out)
+			jsonOut.MustContain(`{
+				"version": "1.8.6",
+				"properties_id": "yun",
+				"build_properties": [
+					"_id=yun",
+					"upload.wait_for_upload_port=true"
 				]
+			}`)
+		}
+
+		{
+			// Check un-expansion of board_properties
+			out, _, err := cli.Run("board", "details", "-b", "arduino:avr:robotMotor", "--show-properties=unexpanded", "--format", "json")
+			require.NoError(t, err)
+			jsonOut := requirejson.Parse(t, out)
+			jsonOut.MustContain(`{
+				"version": "1.8.6",
+				"properties_id": "robotMotor",
+				"build_properties": [
+					"_id=robotMotor",
+					"build.extra_flags={build.usb_flags}",
+					"upload.wait_for_upload_port=true"
+				]
+			}`)
+		}
+
+		{
+			// Also test local boards.txt properties override
+			out, _, err := cli.Run("board", "details", "-b", "arduino:avr:diecimila", "--show-properties=unexpanded", "--format", "json")
+			require.NoError(t, err)
+			jsonOut := requirejson.Parse(t, out)
+			jsonOut.MustContain(`{
+				"version": "1.8.6",
+				"properties_id": "diecimila",
+				"build_properties": [
+					"_id=diecimila",
+					"menu.cpu.atmega123=ATmega123"
+				]
+			}`)
+		}
+	})
+
+	t.Run("MixingUserHardware", func(t *testing.T) {
+		// Install custom hardware required for tests
+		customHwDir, err := paths.New("..", "testdata", "user_hardware").Abs()
+		require.NoError(t, err)
+		require.NoError(t, customHwDir.CopyDirTo(cli.SketchbookDir().Join("hardware")))
+
+		{
+			out, _, err := cli.Run("core", "list", "--format", "json")
+			require.NoError(t, err)
+			jsonOut := requirejson.Parse(t, out)
+			if runtime.GOOS == "windows" {
+				//a package is a symlink, and windows does not support them
+				jsonOut.LengthMustEqualTo(2)
+			} else {
+				jsonOut.LengthMustEqualTo(3)
 			}
-		]`)
-	}
-
-	{
-		// Also test local platform.txt properties override
-		out, _, err := cli.Run("board", "details", "-b", "arduino:avr:uno", "--format", "json")
-		require.NoError(t, err)
-		jsonOut := requirejson.Parse(t, out)
-		jsonOut.MustContain(`{
-			"version": "1.8.6",
-			"properties_id": "uno",
-			"build_properties": [
-				"_id=uno",
-				"tools.avrdude.bootloader.params.verbose=-v",
-				"tools.avrdude.cmd.path=/my/personal/avrdude"
-			],
-			"programmers": [
+			jsonOut.MustContain(`[
 				{
-				  "platform": "Arduino AVR Boards",
-				  "id": "usbasp",
-				  "name": "USBasp"
-				},
-				{
-				  "platform": "Arduino AVR Boards",
-				  "id": "avrispmkii",
-				  "name": "AVRISP mkII"
+					"id": "arduino:avr",
+					"installed": "1.8.6",
+					"name": "Arduino AVR Boards",
+					"boards": [
+						{
+							"name": "Arduino Uno",
+							"fqbn": "arduino:avr:uno"
+						},
+						{
+							"name": "Arduino Yún",
+							"fqbn": "arduino:avr:yun"
+						}
+					]
 				}
-			]			
-		}`)
-	}
+			]`)
+			jsonOut.MustContain(`[
+				{
+					"id": "my_avr_platform:avr",
+					"installed": "9.9.9",
+					"name": "My AVR Boards",
+					"boards": [
+						{
+							"name": "Arduino Yún",
+							"fqbn": "my_avr_platform:avr:custom_yun"
+						}
+					],
+					"manually_installed": true,
+					"missing_metadata": true
+				}
+			]`)
 
-	{
-		out, _, err := cli.Run("board", "details", "-b", "arduino:avr:yun", "--format", "json")
-		require.NoError(t, err)
-		jsonOut := requirejson.Parse(t, out)
-		jsonOut.MustContain(`{
-			"version": "1.8.6",
-			"properties_id": "yun",
-			"build_properties": [
-				"_id=yun",
-				"upload.wait_for_upload_port=true"
-			]
-		}`)
-	}
+			//		require.False(t, myAVRPlatformAvrArch.Properties.ContainsKey("preproc.includes.flags"))
 
-	{
-		// Check un-expansion of board_properties
-		out, _, err := cli.Run("board", "details", "-b", "arduino:avr:robotMotor", "--show-properties=unexpanded", "--format", "json")
-		require.NoError(t, err)
-		jsonOut := requirejson.Parse(t, out)
-		jsonOut.MustContain(`{
-			"version": "1.8.6",
-			"properties_id": "robotMotor",
-			"build_properties": [
-				"_id=robotMotor",
-				"build.extra_flags={build.usb_flags}",
-				"upload.wait_for_upload_port=true"
-			]
-		}`)
-	}
+			if runtime.GOOS != "windows" {
+				jsonOut.MustContain(`[
+					{
+						"id": "my_symlinked_avr_platform:avr",
+						"manually_installed": true,
+						"missing_metadata": true
+					}
+				]`)
+			}
+		}
 
-	{
-		// Also test local boards.txt properties override
-		out, _, err := cli.Run("board", "details", "-b", "arduino:avr:diecimila", "--show-properties=unexpanded", "--format", "json")
-		require.NoError(t, err)
-		jsonOut := requirejson.Parse(t, out)
-		jsonOut.MustContain(`{
-			"version": "1.8.6",
-			"properties_id": "diecimila",
-			"build_properties": [
-				"_id=diecimila",
-				"menu.cpu.atmega123=ATmega123"
-			]
-		}`)
-	}
+		{
+			// Also test local platform.txt properties override
+			out, _, err := cli.Run("board", "details", "-b", "arduino:avr:uno", "--format", "json")
+			require.NoError(t, err)
+			jsonOut := requirejson.Parse(t, out)
+			jsonOut.MustContain(`{
+				"version": "1.8.6",
+				"properties_id": "uno",
+				"build_properties": [
+					"_id=uno",
+					"tools.avrdude.bootloader.params.verbose=-v",
+					"tools.avrdude.cmd.path=/my/personal/avrdude"
+				],
+				"programmers": [
+					{
+						"platform": "Arduino AVR Boards",
+						"id": "usbasp",
+						"name": "USBasp"
+					},
+					{
+						"platform": "Arduino AVR Boards",
+						"id": "avrispmkii",
+						"name": "AVRISP mkII"
+					}
+				]			
+			}`)
+		}
+
+		{
+			out, _, err := cli.Run("board", "details", "-b", "arduino:avr:yun", "--show-properties=unexpanded", "--format", "json")
+			require.NoError(t, err)
+			jsonOut := requirejson.Parse(t, out)
+			jsonOut.MustContain(`{
+				"version": "1.8.6",
+				"properties_id": "yun",
+				"build_properties": [
+					"_id=yun",
+					"upload.wait_for_upload_port=true",
+					"preproc.includes.flags=-w -x c++ -M -MG -MP",
+					"preproc.macros.flags=-w -x c++ -E -CC",
+					"recipe.preproc.includes=\"{compiler.path}{compiler.cpp.cmd}\" {compiler.cpp.flags} {preproc.includes.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} \"{source_file}\""
+				]
+			}`)
+			jsonOut.Query(`isempty( .build_properties[] | select(startswith("preproc.macros.compatibility_flags")) )`).MustEqual("true")
+		}
+	})
 }
