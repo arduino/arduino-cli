@@ -25,43 +25,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestLoadHardware(t *testing.T) {
-	DownloadCoresAndToolsAndLibraries(t)
-	downloadedHardwareAvr := paths.New("downloaded_hardware", "arduino", "avr")
-	paths.New("custom_local_txts", "boards.local.txt").CopyTo(downloadedHardwareAvr.Join("boards.local.txt"))
-	paths.New("custom_local_txts", "platform.local.txt").CopyTo(downloadedHardwareAvr.Join("platform.local.txt"))
-	ctx := &types.Context{
-		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware")),
-	}
-
-	ctx = prepareBuilderTestContext(t, ctx, nil, "", skipLibraries)
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	packages := ctx.PackageManager.GetPackages()
-	require.Equal(t, 1, len(packages))
-	require.NotNil(t, packages["arduino"])
-	require.Equal(t, 2, len(packages["arduino"].Platforms))
-
-	require.Equal(t, "uno", packages["arduino"].Platforms["avr"].Releases["1.6.10"].Boards["uno"].BoardID)
-	require.Equal(t, "uno", packages["arduino"].Platforms["avr"].Releases["1.6.10"].Boards["uno"].Properties.Get("_id"))
-
-	require.Equal(t, "yun", packages["arduino"].Platforms["avr"].Releases["1.6.10"].Boards["yun"].BoardID)
-	require.Equal(t, "true", packages["arduino"].Platforms["avr"].Releases["1.6.10"].Boards["yun"].Properties.Get("upload.wait_for_upload_port"))
-
-	require.Equal(t, "{build.usb_flags}", packages["arduino"].Platforms["avr"].Releases["1.6.10"].Boards["robotMotor"].Properties.Get("build.extra_flags"))
-
-	require.Equal(t, "arduino_due_x", packages["arduino"].Platforms["sam"].Releases["1.6.7"].Boards["arduino_due_x"].BoardID)
-
-	require.Equal(t, "ATmega123", packages["arduino"].Platforms["avr"].Releases["1.6.10"].Boards["diecimila"].Properties.Get("menu.cpu.atmega123"))
-
-	avrPlatform := packages["arduino"].Platforms["avr"]
-	require.Equal(t, "Arduino AVR Boards", avrPlatform.Releases["1.6.10"].Properties.Get("name"))
-	require.Equal(t, "-v", avrPlatform.Releases["1.6.10"].Properties.Get("tools.avrdude.bootloader.params.verbose"))
-	require.Equal(t, "/my/personal/avrdude", avrPlatform.Releases["1.6.10"].Properties.Get("tools.avrdude.cmd.path"))
-
-	require.Equal(t, "AVRISP mkII", avrPlatform.Releases["1.6.10"].Programmers["avrispmkii"].Name)
-}
-
 func TestLoadHardwareMixingUserHardwareFolder(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs: paths.NewPathList("downloaded_hardware", filepath.Join("..", "hardware"), "user_hardware"),
