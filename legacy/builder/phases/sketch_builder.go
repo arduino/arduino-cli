@@ -16,40 +16,53 @@
 package phases
 
 import (
+	"io"
+
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+	"github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
 
-type SketchBuilder struct{}
-
-func (s *SketchBuilder) Run(ctx *types.Context) error {
-	sketchBuildPath := ctx.SketchBuildPath
-	buildProperties := ctx.BuildProperties
-	includesFolders := ctx.SketchLibrariesDetector.IncludeFolders()
+func SketchBuilder(
+	sketchBuildPath *paths.Path,
+	buildProperties *properties.Map,
+	includesFolders paths.PathList,
+	onlyUpdateCompilationDatabase, verbose bool,
+	compilationDatabase *builder.CompilationDatabase,
+	jobs int,
+	warningsLevel string,
+	stdoutWriter, stderrWriter io.Writer,
+	verboseInfoFn func(msg string),
+	verboseStdoutFn, verboseStderrFn func(data []byte),
+	progress *progress.Struct, progressCB rpc.TaskProgressCB,
+) (paths.PathList, error) {
 	includes := f.Map(includesFolders.AsStrings(), cpp.WrapWithHyphenI)
 
 	if err := sketchBuildPath.MkdirAll(); err != nil {
-		return errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
-	objectFiles, err := utils.CompileFiles(
+	sketchObjectFiles, err := utils.CompileFiles(
 		sketchBuildPath, sketchBuildPath, buildProperties, includes,
-		ctx.OnlyUpdateCompilationDatabase,
-		ctx.CompilationDatabase,
-		ctx.Jobs,
-		ctx.Verbose,
-		ctx.WarningsLevel,
-		ctx.Stdout, ctx.Stderr,
-		func(msg string) { ctx.Info(msg) },
-		func(data []byte) { ctx.WriteStdout(data) },
-		func(data []byte) { ctx.WriteStderr(data) },
-		&ctx.Progress, ctx.ProgressCB,
+		onlyUpdateCompilationDatabase,
+		compilationDatabase,
+		jobs,
+		verbose,
+		warningsLevel,
+		stdoutWriter, stderrWriter,
+		verboseInfoFn,
+		verboseStdoutFn,
+		verboseStderrFn,
+		progress, progressCB,
 	)
 	if err != nil {
-		return errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
 	// The "src/" subdirectory of a sketch is compiled recursively
@@ -57,24 +70,22 @@ func (s *SketchBuilder) Run(ctx *types.Context) error {
 	if sketchSrcPath.IsDir() {
 		srcObjectFiles, err := utils.CompileFilesRecursive(
 			sketchSrcPath, sketchSrcPath, buildProperties, includes,
-			ctx.OnlyUpdateCompilationDatabase,
-			ctx.CompilationDatabase,
-			ctx.Jobs,
-			ctx.Verbose,
-			ctx.WarningsLevel,
-			ctx.Stdout, ctx.Stderr,
-			func(msg string) { ctx.Info(msg) },
-			func(data []byte) { ctx.WriteStdout(data) },
-			func(data []byte) { ctx.WriteStderr(data) },
-			&ctx.Progress, ctx.ProgressCB,
+			onlyUpdateCompilationDatabase,
+			compilationDatabase,
+			jobs,
+			verbose,
+			warningsLevel,
+			stdoutWriter, stderrWriter,
+			verboseInfoFn,
+			verboseStdoutFn,
+			verboseStderrFn,
+			progress, progressCB,
 		)
 		if err != nil {
-			return errors.WithStack(err)
+			return nil, errors.WithStack(err)
 		}
-		objectFiles.AddAll(srcObjectFiles)
+		sketchObjectFiles.AddAll(srcObjectFiles)
 	}
 
-	ctx.SketchObjectFiles = objectFiles
-
-	return nil
+	return sketchObjectFiles, nil
 }

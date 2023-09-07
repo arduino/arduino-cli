@@ -60,7 +60,28 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		logIfVerbose(false, tr("Compiling sketch...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.sketch.prebuild", Suffix: ".pattern"},
-		&phases.SketchBuilder{},
+		types.BareCommand(func(ctx *types.Context) error {
+			sketchObjectFiles, err := phases.SketchBuilder(
+				ctx.SketchBuildPath,
+				ctx.BuildProperties,
+				ctx.SketchLibrariesDetector.IncludeFolders(),
+				ctx.OnlyUpdateCompilationDatabase,
+				ctx.Verbose,
+				ctx.CompilationDatabase,
+				ctx.Jobs,
+				ctx.WarningsLevel,
+				ctx.Stdout, ctx.Stderr,
+				func(msg string) { ctx.Info(msg) },
+				func(data []byte) { ctx.WriteStdout(data) },
+				func(data []byte) { ctx.WriteStderr(data) },
+				&ctx.Progress, ctx.ProgressCB,
+			)
+			if err != nil {
+				return err
+			}
+			ctx.SketchObjectFiles = sketchObjectFiles
+			return nil
+		}),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.sketch.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
 		logIfVerbose(false, tr("Compiling libraries...")),
