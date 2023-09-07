@@ -65,7 +65,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 	require.NoError(t, err)
 
 	// Install custom hardware required for tests
-	customHwDir, err := paths.New("testdata", "user_hardware").Abs()
+	customHwDir, err := paths.New("..", "testdata", "user_hardware").Abs()
 	require.NoError(t, err)
 	require.NoError(t, customHwDir.CopyDirTo(cli.SketchbookDir().Join("hardware")))
 
