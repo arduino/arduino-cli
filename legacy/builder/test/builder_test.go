@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"testing"
-	"time"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
@@ -27,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -187,49 +185,4 @@ func TestBuilderWithBuildPathInSketchDir(t *testing.T) {
 	// build directory is present at the start
 	err = command.Run(ctx)
 	NoError(t, err)
-}
-
-func TestBuilderCacheCoreAFile(t *testing.T) {
-	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	SetupBuildCachePath(t, ctx)
-	defer ctx.CoreBuildCachePath.RemoveAll()
-
-	// Run build
-	bldr := builder.Builder{}
-	err := bldr.Run(ctx)
-	NoError(t, err)
-
-	// Pick timestamp of cached core
-	coreFolder := paths.New("downloaded_hardware", "arduino", "avr")
-	coreFileName := phases.GetCachedCoreArchiveDirName(ctx.FQBN.String(), ctx.BuildProperties.Get("compiler.optimization_flags"), coreFolder)
-	cachedCoreFile := ctx.CoreBuildCachePath.Join(coreFileName, "core.a")
-	coreStatBefore, err := cachedCoreFile.Stat()
-	require.NoError(t, err)
-	lastUsedFile := ctx.CoreBuildCachePath.Join(coreFileName, ".last-used")
-	_, err = lastUsedFile.Stat()
-	require.NoError(t, err)
-
-	// Run build again, to verify that the builder skips rebuilding core.a
-	err = bldr.Run(ctx)
-	NoError(t, err)
-
-	coreStatAfterRebuild, err := cachedCoreFile.Stat()
-	require.NoError(t, err)
-	require.Equal(t, coreStatBefore.ModTime(), coreStatAfterRebuild.ModTime())
-
-	// Touch a file of the core and check if the builder invalidate the cache
-	time.Sleep(time.Second)
-	now := time.Now().Local()
-	err = coreFolder.Join("cores", "arduino", "Arduino.h").Chtimes(now, now)
-	require.NoError(t, err)
-
-	// Run build again, to verify that the builder rebuilds core.a
-	err = bldr.Run(ctx)
-	NoError(t, err)
-
-	coreStatAfterTouch, err := cachedCoreFile.Stat()
-	require.NoError(t, err)
-	require.NotEqual(t, coreStatBefore.ModTime(), coreStatAfterTouch.ModTime())
 }

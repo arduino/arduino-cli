@@ -22,6 +22,7 @@ import (
 	"strings"
 	"testing"
 	"text/template"
+	"time"
 
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/internal/integrationtest"
@@ -709,4 +710,56 @@ func comparePreprocessGoldenFile(t *testing.T, sketchDir *paths.Path, preprocess
 	require.NoError(t, err)
 
 	require.Equal(t, buf.String(), strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
+}
+
+func TestCoreCaching(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	sketchPath, err := paths.New("..", "testdata", "bare_minimum").Abs()
+	require.NoError(t, err)
+
+	// Install Arduino AVR Boards
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.6")
+	require.NoError(t, err)
+
+	// Create temporary cache dir
+	buildCachePath, err := paths.MkTempDir("", "test_build_cache")
+	require.NoError(t, err)
+	defer buildCachePath.RemoveAll()
+
+	// Build first time
+	_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-cache-path", buildCachePath.String(), sketchPath.String())
+	require.NoError(t, err)
+
+	// Find cached core and save timestamp
+	pathList, err := buildCachePath.ReadDirRecursiveFiltered(nil, paths.FilterPrefixes("core.a"))
+	require.NoError(t, err)
+	require.Len(t, pathList, 1)
+	cachedCoreFile := pathList[0]
+	lastUsedPath := cachedCoreFile.Parent().Join(".last-used")
+	require.True(t, lastUsedPath.Exist())
+	coreStatBefore, err := cachedCoreFile.Stat()
+	require.NoError(t, err)
+
+	// Run build again and check timestamp is unchanged
+	_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-cache-path", buildCachePath.String(), sketchPath.String())
+	require.NoError(t, err)
+	coreStatAfterRebuild, err := cachedCoreFile.Stat()
+	require.NoError(t, err)
+	require.Equal(t, coreStatBefore.ModTime(), coreStatAfterRebuild.ModTime())
+
+	// Touch a file of the core and check if the builder invalidate the cache
+	time.Sleep(time.Second)
+	now := time.Now().Local()
+	coreFolder := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.8.6")
+	err = coreFolder.Join("cores", "arduino", "Arduino.h").Chtimes(now, now)
+	require.NoError(t, err)
+
+	// Run build again, to verify that the builder rebuilds core.a
+	_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-cache-path", buildCachePath.String(), sketchPath.String())
+	require.NoError(t, err)
+	coreStatAfterTouch, err := cachedCoreFile.Stat()
+	require.NoError(t, err)
+	require.NotEqual(t, coreStatBefore.ModTime(), coreStatAfterTouch.ModTime())
 }
