@@ -25,12 +25,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func sleep(t *testing.T) {
-	dur, err := time.ParseDuration("1s")
-	NoError(t, err)
-	time.Sleep(dur)
-}
-
 func tempFile(t *testing.T, prefix string) *paths.Path {
 	file, err := os.CreateTemp("", prefix)
 	file.Close()
@@ -65,7 +59,7 @@ func TestObjFileIsUpToDateObjOlder(t *testing.T) {
 	depFile := tempFile(t, "dep")
 	defer depFile.RemoveAll()
 
-	sleep(t)
+	time.Sleep(time.Second)
 
 	sourceFile := tempFile(t, "source")
 	defer sourceFile.RemoveAll()
@@ -79,7 +73,7 @@ func TestObjFileIsUpToDateObjNewer(t *testing.T) {
 	sourceFile := tempFile(t, "source")
 	defer sourceFile.RemoveAll()
 
-	sleep(t)
+	time.Sleep(time.Second)
 
 	objFile := tempFile(t, "obj")
 	defer objFile.RemoveAll()
@@ -95,14 +89,14 @@ func TestObjFileIsUpToDateDepIsNewer(t *testing.T) {
 	sourceFile := tempFile(t, "source")
 	defer sourceFile.RemoveAll()
 
-	sleep(t)
+	time.Sleep(time.Second)
 
 	objFile := tempFile(t, "obj")
 	defer objFile.RemoveAll()
 	depFile := tempFile(t, "dep")
 	defer depFile.RemoveAll()
 
-	sleep(t)
+	time.Sleep(time.Second)
 
 	headerFile := tempFile(t, "header")
 	defer headerFile.RemoveAll()
@@ -122,7 +116,7 @@ func TestObjFileIsUpToDateDepIsOlder(t *testing.T) {
 	headerFile := tempFile(t, "header")
 	defer headerFile.RemoveAll()
 
-	sleep(t)
+	time.Sleep(time.Second)
 
 	objFile := tempFile(t, "obj")
 	defer objFile.RemoveAll()
@@ -141,14 +135,14 @@ func TestObjFileIsUpToDateDepIsWrong(t *testing.T) {
 	sourceFile := tempFile(t, "source")
 	defer sourceFile.RemoveAll()
 
-	sleep(t)
+	time.Sleep(time.Second)
 
 	objFile := tempFile(t, "obj")
 	defer objFile.RemoveAll()
 	depFile := tempFile(t, "dep")
 	defer depFile.RemoveAll()
 
-	sleep(t)
+	time.Sleep(time.Second)
 
 	headerFile := tempFile(t, "header")
 	defer headerFile.RemoveAll()
