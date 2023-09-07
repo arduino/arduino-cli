@@ -204,7 +204,18 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		&ExportProjectCMake{SketchError: mainErr != nil},
 
-		&phases.Sizer{SketchError: mainErr != nil},
+		types.BareCommand(func(ctx *types.Context) error {
+			executableSectionsSize, err := phases.Sizer(
+				ctx.OnlyUpdateCompilationDatabase, mainErr != nil, ctx.Verbose,
+				ctx.BuildProperties,
+				ctx.Stdout, ctx.Stderr,
+				func(msg string) { ctx.Info(msg) },
+				func(msg string) { ctx.Warn(msg) },
+				ctx.WarningsLevel,
+			)
+			ctx.ExecutableSectionsSize = executableSectionsSize
+			return err
+		}),
 	}
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
