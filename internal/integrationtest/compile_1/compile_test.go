@@ -1220,4 +1220,10 @@ func buildWithCustomBuildPath(t *testing.T, env *integrationtest.Environment, cl
 		_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(), sketchPath.String())
 		require.NoError(t, err)
 	})
+
+	t.Run("SameAsSektch", func(t *testing.T) {
+		// Run build
+		_, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", sketchPath.String(), sketchPath.String())
+		require.Error(t, err)
+	})
 }
