@@ -20,7 +20,6 @@ import (
 	"io"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/go-paths-helper"
@@ -106,7 +105,7 @@ func link(
 			properties.SetPath("archive_file_path", archive)
 			properties.SetPath("object_file", object)
 
-			command, err := utils.PrepareCommandForRecipe(properties, builder.RecipeARPattern, false)
+			command, err := utils.PrepareCommandForRecipe(properties, "recipe.ar.pattern", false)
 			if err != nil {
 				return nil, errors.WithStack(err)
 			}
@@ -125,9 +124,9 @@ func link(
 
 	properties := buildProperties.Clone()
 	properties.Set("compiler.c.elf.flags", properties.Get("compiler.c.elf.flags"))
-	properties.Set(builder.BuildPropertiesCompilerWarningFlags, properties.Get(builder.BuildPropertiesCompilerWarningFlags+"."+warningsLevel))
-	properties.Set(builder.BuildPropertiesArchiveFile, coreDotARelPath.String())
-	properties.Set(builder.BuildPropertiesArchiveFilePath, coreArchiveFilePath.String())
+	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+warningsLevel))
+	properties.Set("archive_file", coreDotARelPath.String())
+	properties.Set("archive_file_path", coreArchiveFilePath.String())
 	properties.Set("object_files", objectFileList)
 
 	command, err := utils.PrepareCommandForRecipe(properties, "recipe.c.combine.pattern", false)

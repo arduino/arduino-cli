@@ -200,7 +200,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	for _, library := range ctx.SketchLibrariesDetector.ImportedLibraries() {
 		// Copy used libraries in the correct folder
 		libDir := libBaseFolder.Join(library.DirName)
-		mcu := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_BUILD_MCU)
+		mcu := ctx.BuildProperties.Get("build.mcu")
 		copyDir(library.InstallDir.String(), libDir.String(), validExportExtensions)
 
 		// Read cmake options if available

@@ -62,7 +62,7 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 		// since the json was generated - like platform.txt or similar
 		// if so, trigger a "safety" wipe
 		buildProperties := ctx.BuildProperties
-		targetCoreFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH)
+		targetCoreFolder := buildProperties.GetPath("runtime.platform.path")
 		coreFolder := buildProperties.GetPath("build.core.path")
 		realCoreFolder := coreFolder.Parent().Parent()
 		jsonPath := ctx.BuildPath.Join(constants.BUILD_OPTIONS_FILE)

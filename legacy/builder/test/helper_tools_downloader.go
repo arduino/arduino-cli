@@ -275,7 +275,7 @@ func findCoreUrl(index map[string]interface{}, core Core) (string, error) {
 		}
 	}
 
-	return constants.EMPTY_STRING, errors.Errorf("Unable to find tool " + core.Maintainer + " " + core.Arch + " " + core.Version)
+	return "", errors.Errorf("Unable to find tool " + core.Maintainer + " " + core.Arch + " " + core.Version)
 }
 
 func downloadTools(tools []Tool, index map[string]interface{}) error {
@@ -664,7 +664,7 @@ func findToolUrl(index map[string]interface{}, tool Tool, host []string) (string
 		}
 	}
 
-	return constants.EMPTY_STRING, errors.Errorf("Unable to find tool " + tool.Name + " " + tool.Version)
+	return "", errors.Errorf("Unable to find tool " + tool.Name + " " + tool.Version)
 }
 
 func downloadLibraries(libraries []Library, index map[string]interface{}) error {
@@ -694,7 +694,7 @@ func findLibraryUrl(index map[string]interface{}, library Library) (string, erro
 		}
 	}
 
-	return constants.EMPTY_STRING, errors.Errorf("Unable to find library " + library.Name + " " + library.Version)
+	return "", errors.Errorf("Unable to find library " + library.Name + " " + library.Version)
 }
 
 func downloadAndUnpackLibrary(library Library, url string, targetPath *paths.Path) error {
