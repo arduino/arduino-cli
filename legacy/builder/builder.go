@@ -97,7 +97,14 @@ func (s *Builder) Run(ctx *types.Context) error {
 		types.BareCommand(func(ctx *types.Context) error {
 			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.libraries.prebuild", ".pattern", false)
 		}),
-		&UnusedCompiledLibrariesRemover{},
+
+		types.BareCommand(func(ctx *types.Context) error {
+			return UnusedCompiledLibrariesRemover(
+				ctx.LibrariesBuildPath,
+				ctx.SketchLibrariesDetector.ImportedLibraries(),
+			)
+		}),
+
 		types.BareCommand(func(ctx *types.Context) error {
 			librariesObjectFiles, err := phases.LibrariesBuilder(
 				ctx.LibrariesBuildPath,
