@@ -520,8 +520,8 @@ func compileFileWithRecipe(
 	verboseStdout, verboseInfo, errOut := &bytes.Buffer{}, &bytes.Buffer{}, &bytes.Buffer{}
 
 	properties := buildProperties.Clone()
-	properties.Set(builder.BuildPropertiesCompilerWarningFlags, properties.Get(builder.BuildPropertiesCompilerWarningFlags+"."+warningsLevel))
-	properties.Set(builder.BuildPropertiesIncludes, strings.Join(includes, builder.Space))
+	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+warningsLevel))
+	properties.Set("includes", strings.Join(includes, " "))
 	properties.SetPath("source_file", source)
 	relativeSource, err := sourcePath.RelTo(source)
 	if err != nil {
@@ -530,7 +530,7 @@ func compileFileWithRecipe(
 	depsFile := buildPath.Join(relativeSource.String() + ".d")
 	objectFile := buildPath.Join(relativeSource.String() + ".o")
 
-	properties.SetPath(builder.BuildPropertiesObjectFile, objectFile)
+	properties.SetPath("object_file", objectFile)
 	err = objectFile.Parent().MkdirAll()
 	if err != nil {
 		return nil, nil, nil, nil, errors.WithStack(err)
@@ -615,11 +615,11 @@ func ArchiveCompiledFiles(
 
 	for _, objectFile := range objectFilesToArchive {
 		properties := buildProperties.Clone()
-		properties.Set(builder.BuildPropertiesArchiveFile, archiveFilePath.Base())
-		properties.SetPath(builder.BuildPropertiesArchiveFilePath, archiveFilePath)
-		properties.SetPath(builder.BuildPropertiesObjectFile, objectFile)
+		properties.Set("archive_file", archiveFilePath.Base())
+		properties.SetPath("archive_file_path", archiveFilePath)
+		properties.SetPath("object_file", objectFile)
 
-		command, err := PrepareCommandForRecipe(properties, builder.RecipeARPattern, false)
+		command, err := PrepareCommandForRecipe(properties, "recipe.ar.pattern", false)
 		if err != nil {
 			return nil, verboseInfobuf.Bytes(), errors.WithStack(err)
 		}
