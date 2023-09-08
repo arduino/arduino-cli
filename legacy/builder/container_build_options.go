@@ -33,8 +33,13 @@ func (s *ContainerBuildOptions) Run(ctx *types.Context) error {
 	}
 	ctx.BuildOptionsJson = buildOptionsJSON
 
+	buildOptionsJsonPrevious, err := LoadPreviousBuildOptionsMap(ctx.BuildPath)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	ctx.BuildOptionsJsonPrevious = buildOptionsJsonPrevious
+
 	commands := []types.Command{
-		&LoadPreviousBuildOptionsMap{},
 		&WipeoutBuildPathIfBuildOptionsChanged{},
 		&StoreBuildOptionsMap{},
 	}
