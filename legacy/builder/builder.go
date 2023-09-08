@@ -19,7 +19,6 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/phases"
@@ -43,19 +42,17 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 	var _err, mainErr error
 	commands := []types.Command{
-		&ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&ContainerBuildOptions{},
 
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
 
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = builder.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = ctx.Builder.PrepareSketchBuildPath(ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 
 		utils.LogIfVerbose(false, tr("Detecting libraries used...")),
-		&ContainerFindIncludes{},
+		findIncludes(ctx),
 
 		&WarnAboutArchIncompatibleLibraries{},
 
@@ -92,7 +89,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 	}
 
-	ctx.Progress.AddSubSteps(len(commands) + 4)
+	ctx.Progress.AddSubSteps(len(commands) + 5)
 	defer ctx.Progress.RemoveSubSteps()
 
 	for _, command := range commands {
@@ -112,7 +109,10 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 	var otherErr error
 	commands = []types.Command{
-		&PrintUsedAndNotUsedLibraries{SketchError: mainErr != nil},
+		types.BareCommand(func(ctx *types.Context) error {
+			ctx.SketchLibrariesDetector.PrintUsedAndNotUsedLibraries(mainErr != nil)
+			return nil
+		}),
 
 		&PrintUsedLibrariesIfVerbose{},
 
@@ -139,19 +139,19 @@ func (s *Builder) Run(ctx *types.Context) error {
 }
 
 func PreprocessSketch(ctx *types.Context) error {
+	preprocessorImpl := preprocessor.PreprocessSketchWithCtags
 	if ctx.UseArduinoPreprocessor {
-		return PreprocessSketchWithArduinoPreprocessor(ctx)
-	} else {
-		normalOutput, verboseOutput, err := preprocessor.PreprocessSketchWithCtags(
-			ctx.Sketch, ctx.BuildPath, ctx.IncludeFolders, ctx.LineOffset,
-			ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)
-		if ctx.Verbose {
-			ctx.WriteStdout(verboseOutput)
-		} else {
-			ctx.WriteStdout(normalOutput)
-		}
-		return err
+		preprocessorImpl = preprocessor.PreprocessSketchWithArduinoPreprocessor
 	}
+	normalOutput, verboseOutput, err := preprocessorImpl(
+		ctx.Sketch, ctx.BuildPath, ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset,
+		ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)
+	if ctx.Verbose {
+		ctx.WriteStdout(verboseOutput)
+	} else {
+		ctx.WriteStdout(normalOutput)
+	}
+	return err
 }
 
 type Preprocess struct{}
@@ -163,18 +163,16 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 
 	var _err error
 	commands := []types.Command{
-		&ContainerSetupHardwareToolsLibsSketchAndProps{},
-
 		&ContainerBuildOptions{},
 
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
 
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = builder.PrepareSketchBuildPath(ctx.Sketch, ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = ctx.Builder.PrepareSketchBuildPath(ctx.SourceOverride, ctx.SketchBuildPath)
 			return _err
 		}),
 
-		&ContainerFindIncludes{},
+		findIncludes(ctx),
 
 		&WarnAboutArchIncompatibleLibraries{},
 
@@ -218,14 +216,22 @@ func RunBuilder(ctx *types.Context) error {
 	return runCommands(ctx, []types.Command{&Builder{}})
 }
 
-func RunParseHardware(ctx *types.Context) error {
-	commands := []types.Command{
-		&ContainerSetupHardwareToolsLibsSketchAndProps{},
-	}
-	return runCommands(ctx, commands)
-}
-
 func RunPreprocess(ctx *types.Context) error {
 	command := Preprocess{}
 	return command.Run(ctx)
+}
+
+func findIncludes(ctx *types.Context) types.BareCommand {
+	return types.BareCommand(func(ctx *types.Context) error {
+		return ctx.SketchLibrariesDetector.FindIncludes(
+			ctx.BuildPath,
+			ctx.BuildProperties.GetPath("build.core.path"),
+			ctx.BuildProperties.GetPath("build.variant.path"),
+			ctx.SketchBuildPath,
+			ctx.Sketch,
+			ctx.LibrariesBuildPath,
+			ctx.BuildProperties,
+			ctx.TargetPlatform.Platform.Architecture,
+		)
+	})
 }

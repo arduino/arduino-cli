@@ -26,11 +26,11 @@ import (
 	properties "github.com/arduino/go-properties-orderedmap"
 	"golang.org/x/exp/slices"
 
+	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/legacy/builder/utils"
 )
 
 type ExportProjectCMake struct {
@@ -198,7 +198,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	cmakeFile := cmakeFolder.Join("CMakeLists.txt")
 
 	dynamicLibsFromPkgConfig := map[string]bool{}
-	for _, library := range ctx.ImportedLibraries {
+	for _, library := range ctx.SketchLibrariesDetector.ImportedLibraries() {
 		// Copy used libraries in the correct folder
 		libDir := libBaseFolder.Join(library.DirName)
 		mcu := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_BUILD_MCU)
@@ -367,9 +367,9 @@ func extractCompileFlags(ctx *types.Context, recipe string, defines, dynamicLibs
 		return target
 	}
 
-	command, _ := builder_utils.PrepareCommandForRecipe(ctx.BuildProperties, recipe, true, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+	command, _ := builder_utils.PrepareCommandForRecipe(ctx.BuildProperties, recipe, true)
 
-	for _, arg := range command.Args {
+	for _, arg := range command.GetArgs() {
 		if strings.HasPrefix(arg, "-D") {
 			*defines = appendIfNotPresent(*defines, arg)
 			continue

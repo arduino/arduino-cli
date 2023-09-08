@@ -21,7 +21,6 @@ import (
 	"regexp"
 
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -37,42 +36,36 @@ var (
 // PrepareSketchBuildPath copies the sketch source files in the build path.
 // The .ino files are merged together to create a .cpp file (by the way, the
 // .cpp file still needs to be Arduino-preprocessed to compile).
-func PrepareSketchBuildPath(sketch *sketch.Sketch, sourceOverrides map[string]string, buildPath *paths.Path) (int, error) {
-	if offset, mergedSource, err := sketchMergeSources(sketch, sourceOverrides); err != nil {
-		return 0, err
-	} else if err := SketchSaveItemCpp(sketch.MainFile, []byte(mergedSource), buildPath); err != nil {
-		return 0, err
-	} else if err := sketchCopyAdditionalFiles(sketch, buildPath, sourceOverrides); err != nil {
-		return 0, err
-	} else {
-		return offset, nil
-	}
-}
-
-// SketchSaveItemCpp saves a preprocessed .cpp sketch file on disk
-func SketchSaveItemCpp(path *paths.Path, contents []byte, destPath *paths.Path) error {
-	sketchName := path.Base()
-	if err := destPath.MkdirAll(); err != nil {
-		return errors.Wrap(err, tr("unable to create a folder to save the sketch"))
+func (b *Builder) PrepareSketchBuildPath(sourceOverrides map[string]string, buildPath *paths.Path) (int, error) {
+	if err := buildPath.MkdirAll(); err != nil {
+		return 0, errors.Wrap(err, tr("unable to create a folder to save the sketch"))
 	}
 
-	destFile := destPath.Join(fmt.Sprintf("%s.cpp", sketchName))
-
-	if err := destFile.WriteFile(contents); err != nil {
-		return errors.Wrap(err, tr("unable to save the sketch on disk"))
+	offset, mergedSource, err := b.sketchMergeSources(sourceOverrides)
+	if err != nil {
+		return 0, err
 	}
 
-	return nil
+	destFile := buildPath.Join(b.sketch.MainFile.Base() + ".cpp")
+	if err := destFile.WriteFile([]byte(mergedSource)); err != nil {
+		return 0, err
+	}
+
+	if err := b.sketchCopyAdditionalFiles(buildPath, sourceOverrides); err != nil {
+		return 0, err
+	}
+
+	return offset, nil
 }
 
 // sketchMergeSources merges all the .ino source files included in a sketch to produce
 // a single .cpp file.
-func sketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, string, error) {
+func (b *Builder) sketchMergeSources(overrides map[string]string) (int, string, error) {
 	lineOffset := 0
 	mergedSource := ""
 
 	getSource := func(f *paths.Path) (string, error) {
-		path, err := sk.FullPath.RelTo(f)
+		path, err := b.sketch.FullPath.RelTo(f)
 		if err != nil {
 			return "", errors.Wrap(err, tr("unable to compute relative path to the sketch for the item"))
 		}
@@ -87,7 +80,7 @@ func sketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, st
 	}
 
 	// add Arduino.h inclusion directive if missing
-	mainSrc, err := getSource(sk.MainFile)
+	mainSrc, err := getSource(b.sketch.MainFile)
 	if err != nil {
 		return 0, "", err
 	}
@@ -96,11 +89,11 @@ func sketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, st
 		lineOffset++
 	}
 
-	mergedSource += "#line 1 " + cpp.QuoteString(sk.MainFile.String()) + "\n"
+	mergedSource += "#line 1 " + cpp.QuoteString(b.sketch.MainFile.String()) + "\n"
 	mergedSource += mainSrc + "\n"
 	lineOffset++
 
-	for _, file := range sk.OtherSketchFiles {
+	for _, file := range b.sketch.OtherSketchFiles {
 		src, err := getSource(file)
 		if err != nil {
 			return 0, "", err
@@ -114,18 +107,14 @@ func sketchMergeSources(sk *sketch.Sketch, overrides map[string]string) (int, st
 
 // sketchCopyAdditionalFiles copies the additional files for a sketch to the
 // specified destination directory.
-func sketchCopyAdditionalFiles(sketch *sketch.Sketch, destPath *paths.Path, overrides map[string]string) error {
-	if err := destPath.MkdirAll(); err != nil {
-		return errors.Wrap(err, tr("unable to create a folder to save the sketch files"))
-	}
-
-	for _, file := range sketch.AdditionalFiles {
-		relpath, err := sketch.FullPath.RelTo(file)
+func (b *Builder) sketchCopyAdditionalFiles(buildPath *paths.Path, overrides map[string]string) error {
+	for _, file := range b.sketch.AdditionalFiles {
+		relpath, err := b.sketch.FullPath.RelTo(file)
 		if err != nil {
 			return errors.Wrap(err, tr("unable to compute relative path to the sketch for the item"))
 		}
 
-		targetPath := destPath.JoinPath(relpath)
+		targetPath := buildPath.JoinPath(relpath)
 		// create the directory containing the target
 		if err = targetPath.Parent().MkdirAll(); err != nil {
 			return errors.Wrap(err, tr("unable to create the folder containing the item"))
@@ -180,16 +169,16 @@ func writeIfDifferent(source []byte, destPath *paths.Path) error {
 
 // SetupBuildProperties adds the build properties related to the sketch to the
 // default board build properties map.
-func SetupBuildProperties(boardBuildProperties *properties.Map, buildPath *paths.Path, sketch *sketch.Sketch, optimizeForDebug bool) *properties.Map {
+func (b *Builder) SetupBuildProperties(boardBuildProperties *properties.Map, buildPath *paths.Path, optimizeForDebug bool) *properties.Map {
 	buildProperties := properties.NewMap()
 	buildProperties.Merge(boardBuildProperties)
 
 	if buildPath != nil {
 		buildProperties.SetPath("build.path", buildPath)
 	}
-	if sketch != nil {
-		buildProperties.Set("build.project_name", sketch.MainFile.Base())
-		buildProperties.SetPath("build.source.path", sketch.FullPath)
+	if b.sketch != nil {
+		buildProperties.Set("build.project_name", b.sketch.MainFile.Base())
+		buildProperties.SetPath("build.source.path", b.sketch.FullPath)
 	}
 	if optimizeForDebug {
 		if debugFlags, ok := buildProperties.GetOk("compiler.optimization_flags.debug"); ok {

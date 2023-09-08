@@ -24,11 +24,11 @@ import (
 type PrintUsedLibrariesIfVerbose struct{}
 
 func (s *PrintUsedLibrariesIfVerbose) Run(ctx *types.Context) error {
-	if !ctx.Verbose || len(ctx.ImportedLibraries) == 0 {
+	if !ctx.Verbose || len(ctx.SketchLibrariesDetector.ImportedLibraries()) == 0 {
 		return nil
 	}
 
-	for _, library := range ctx.ImportedLibraries {
+	for _, library := range ctx.SketchLibrariesDetector.ImportedLibraries() {
 		legacy := ""
 		if library.IsLegacy {
 			legacy = tr("(legacy)")

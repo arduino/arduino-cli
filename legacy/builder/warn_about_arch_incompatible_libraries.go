@@ -33,7 +33,7 @@ func (s *WarnAboutArchIncompatibleLibraries) Run(ctx *types.Context) error {
 		archs = append(archs, strings.Split(overrides, ",")...)
 	}
 
-	for _, importedLibrary := range ctx.ImportedLibraries {
+	for _, importedLibrary := range ctx.SketchLibrariesDetector.ImportedLibraries() {
 		if !importedLibrary.SupportsAnyArchitectureIn(archs...) {
 			ctx.Info(
 				tr("WARNING: library %[1]s claims to run on %[2]s architecture(s) and may be incompatible with your current board which runs on %[3]s architecture(s).",

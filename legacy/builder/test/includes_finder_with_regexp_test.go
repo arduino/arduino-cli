@@ -18,7 +18,7 @@ package test
 import (
 	"testing"
 
-	"github.com/arduino/arduino-cli/legacy/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/stretchr/testify/require"
 )
 
@@ -27,13 +27,13 @@ func TestIncludesFinderWithRegExp(t *testing.T) {
 		"#include <SPI.h>\n" +
 		"^\n" +
 		"compilation terminated."
-	include := builder.IncludesFinderWithRegExp(output)
+	include := detector.IncludesFinderWithRegExp(output)
 
 	require.Equal(t, "SPI.h", include)
 }
 
 func TestIncludesFinderWithRegExpEmptyOutput(t *testing.T) {
-	include := builder.IncludesFinderWithRegExp("")
+	include := detector.IncludesFinderWithRegExp("")
 
 	require.Equal(t, "", include)
 }
@@ -43,7 +43,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes(t *testing.T) {
 		" #               include <Wire.h>\n" +
 		"                                 ^\n" +
 		"compilation terminated.\n"
-	include := builder.IncludesFinderWithRegExp(output)
+	include := detector.IncludesFinderWithRegExp(output)
 
 	require.Equal(t, "Wire.h", include)
 }
@@ -53,7 +53,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes2(t *testing.T) {
 		" #\t\t\tinclude <Wire.h>\n" +
 		"                                 ^\n" +
 		"compilation terminated.\n"
-	include := builder.IncludesFinderWithRegExp(output)
+	include := detector.IncludesFinderWithRegExp(output)
 
 	require.Equal(t, "Wire.h", include)
 }
@@ -62,7 +62,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes3(t *testing.T) {
 	output := "/some/path/sketch.ino:1:33: fatal error: SPI.h: No such file or directory\n" +
 		"compilation terminated.\n"
 
-	include := builder.IncludesFinderWithRegExp(output)
+	include := detector.IncludesFinderWithRegExp(output)
 
 	require.Equal(t, "SPI.h", include)
 }
@@ -71,7 +71,7 @@ func TestIncludesFinderWithRegExpPaddedIncludes4(t *testing.T) {
 	output := "In file included from /tmp/arduino_modified_sketch_815412/binouts.ino:52:0:\n" +
 		"/tmp/arduino_build_static/sketch/regtable.h:31:22: fatal error: register.h: No such file or directory\n"
 
-	include := builder.IncludesFinderWithRegExp(output)
+	include := detector.IncludesFinderWithRegExp(output)
 
 	require.Equal(t, "register.h", include)
 }

@@ -89,5 +89,5 @@ func CalculateFQBNAndPort(portArgs *Port, fqbnArg *Fqbn, instance *rpc.Instance,
 	if err != nil {
 		feedback.Fatal(tr("Error getting port metadata: %v", err), feedback.ErrGeneric)
 	}
-	return fqbn, port.ToRPC()
+	return fqbn, port
 }

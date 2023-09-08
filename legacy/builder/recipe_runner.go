@@ -44,14 +44,14 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 	for _, recipe := range recipes {
 		logrus.Debugf(fmt.Sprintf("Running recipe: %s", recipe))
 
-		command, err := builder_utils.PrepareCommandForRecipe(properties, recipe, false, ctx.PackageManager.GetEnvVarsForSpawnedProcess())
+		command, err := builder_utils.PrepareCommandForRecipe(properties, recipe, false)
 		if err != nil {
 			return errors.WithStack(err)
 		}
 
 		if ctx.OnlyUpdateCompilationDatabase && s.SkipIfOnlyUpdatingCompilationDatabase {
 			if ctx.Verbose {
-				ctx.Info(tr("Skipping: %[1]s", strings.Join(command.Args, " ")))
+				ctx.Info(tr("Skipping: %[1]s", strings.Join(command.GetArgs(), " ")))
 			}
 			return nil
 		}

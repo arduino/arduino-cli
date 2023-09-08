@@ -22,6 +22,7 @@ import (
 	"time"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder"
@@ -39,8 +40,17 @@ func cleanUpBuilderTestContext(t *testing.T, ctx *types.Context) {
 	}
 }
 
-func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *paths.Path, fqbn string) *types.Context {
+type skipContextPreparationStepName string
+
+const skipLibraries = skipContextPreparationStepName("libraries")
+
+func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *paths.Path, fqbn string, skips ...skipContextPreparationStepName) *types.Context {
 	DownloadCoresAndToolsAndLibraries(t)
+
+	stepToSkip := map[skipContextPreparationStepName]bool{}
+	for _, skip := range skips {
+		stepToSkip[skip] = true
+	}
 
 	if ctx == nil {
 		ctx = &types.Context{}
@@ -56,6 +66,18 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		NoError(t, err)
 		ctx.BuildPath = buildPath
 	}
+
+	buildPath := ctx.BuildPath
+	sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
+	NoError(t, err)
+	librariesBuildPath, err := buildPath.Join(constants.FOLDER_LIBRARIES).Abs()
+	NoError(t, err)
+	coreBuildPath, err := buildPath.Join(constants.FOLDER_CORE).Abs()
+	NoError(t, err)
+
+	ctx.SketchBuildPath = sketchBuildPath
+	ctx.LibrariesBuildPath = librariesBuildPath
+	ctx.CoreBuildPath = coreBuildPath
 
 	// Create a Package Manager from the given context
 	// This should happen only on legacy arduino-builder.
@@ -81,6 +103,7 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		ctx.Sketch = sk
 	}
 
+	ctx.Builder = bldr.NewBuilder(ctx.Sketch)
 	if fqbn != "" {
 		ctx.FQBN = parseFQBN(t, fqbn)
 		targetPackage, targetPlatform, targetBoard, buildProperties, buildPlatform, err := pme.ResolveFQBN(ctx.FQBN)
@@ -88,7 +111,7 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		requiredTools, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 		require.NoError(t, err)
 
-		buildProperties = bldr.SetupBuildProperties(buildProperties, ctx.BuildPath, ctx.Sketch, false /*OptimizeForDebug*/)
+		buildProperties = ctx.Builder.SetupBuildProperties(buildProperties, ctx.BuildPath, false /*OptimizeForDebug*/)
 		ctx.PackageManager = pme
 		ctx.TargetBoard = targetBoard
 		ctx.BuildProperties = buildProperties
@@ -96,6 +119,30 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		ctx.TargetPackage = targetPackage
 		ctx.ActualPlatform = buildPlatform
 		ctx.RequiredTools = requiredTools
+	}
+
+	if ctx.Sketch != nil {
+		require.False(t, ctx.BuildPath.Canonical().EqualsTo(ctx.Sketch.FullPath.Canonical()))
+	}
+
+	if !stepToSkip[skipLibraries] {
+		lm, libsResolver, _, err := detector.LibrariesLoader(
+			false, nil,
+			ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
+			ctx.ActualPlatform, ctx.TargetPlatform,
+		)
+		NoError(t, err)
+
+		ctx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
+			lm, libsResolver,
+			ctx.Verbose,
+			false,
+			false,
+			func(msg string) { ctx.Info(msg) },
+			func(msg string) { ctx.Warn(msg) },
+			func(data []byte) { ctx.WriteStdout(data) },
+			func(data []byte) { ctx.WriteStderr(data) },
+		)
 	}
 
 	return ctx

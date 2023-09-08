@@ -35,7 +35,6 @@ func TestRecipeRunner(t *testing.T) {
 	buildProperties.Set("recipe.hooks.prebuild.1.pattern", "echo")
 
 	commands := []types.Command{
-		&builder.AddAdditionalEntriesToContext{},
 		&builder.RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
 	}
 

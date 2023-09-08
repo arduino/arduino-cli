@@ -23,11 +23,9 @@ import (
 	"sync"
 
 	"github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/arduino/arduino-cli/arduino/libraries/librariesresolver"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
@@ -64,6 +62,9 @@ func (p *ProgressStruct) CompleteStep() {
 
 // Context structure
 type Context struct {
+	Builder                 *builder.Builder
+	SketchLibrariesDetector *detector.SketchLibrariesDetector
+
 	// Build options
 	HardwareDirs         paths.PathList
 	BuiltInToolsDirs     paths.PathList
@@ -99,14 +100,6 @@ type Context struct {
 
 	Sketch        *sketch.Sketch
 	WarningsLevel string
-
-	// Libraries handling
-	LibrariesManager             *librariesmanager.LibrariesManager
-	LibrariesResolver            *librariesresolver.Cpp
-	ImportedLibraries            libraries.List
-	LibrariesResolutionResults   map[string]LibraryResolutionResult
-	IncludeFolders               paths.PathList
-	UseCachedLibrariesResolution bool
 
 	// C++ Parsing
 	LineOffset int
