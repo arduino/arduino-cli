@@ -51,11 +51,8 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 	require.NoError(t, err)
 	ctx.BuildOptionsJson = buildPropertiesJSON
 
-	commands := []types.Command{&builder.StoreBuildOptionsMap{}}
-	for _, command := range commands {
-		err := command.Run(ctx)
-		require.NoError(t, err)
-	}
+	err = builder.StoreBuildOptionsMap(ctx.BuildPath, ctx.BuildOptionsJson)
+	require.NoError(t, err)
 
 	exist, err := buildPath.Join(constants.BUILD_OPTIONS_FILE).ExistCheck()
 	require.NoError(t, err)

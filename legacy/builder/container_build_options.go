@@ -39,11 +39,7 @@ func (s *ContainerBuildOptions) Run(ctx *types.Context) error {
 	}
 	ctx.BuildOptionsJsonPrevious = buildOptionsJsonPrevious
 
-	commands := []types.Command{
-		&WipeoutBuildPathIfBuildOptionsChanged{},
-		&StoreBuildOptionsMap{},
-	}
-
+	commands := []types.Command{&WipeoutBuildPathIfBuildOptionsChanged{}}
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
 		err := command.Run(ctx)
@@ -52,5 +48,5 @@ func (s *ContainerBuildOptions) Run(ctx *types.Context) error {
 		}
 	}
 
-	return nil
+	return StoreBuildOptionsMap(ctx.BuildPath, ctx.BuildOptionsJson)
 }
