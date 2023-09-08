@@ -43,7 +43,9 @@ func (s *Builder) Run(ctx *types.Context) error {
 	commands := []types.Command{
 		&ContainerBuildOptions{},
 
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.prebuild", ".pattern", false)
+		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
 			ctx.LineOffset, _err = ctx.Builder.PrepareSketchBuildPath(ctx.SourceOverride, ctx.SketchBuildPath)
@@ -59,7 +61,11 @@ func (s *Builder) Run(ctx *types.Context) error {
 		types.BareCommand(PreprocessSketch),
 
 		logIfVerbose(false, tr("Compiling sketch...")),
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.sketch.prebuild", Suffix: ".pattern"},
+
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.sketch.prebuild", ".pattern", false)
+		}),
+
 		types.BareCommand(func(ctx *types.Context) error {
 			sketchObjectFiles, err := phases.SketchBuilder(
 				ctx.SketchBuildPath,
@@ -82,10 +88,15 @@ func (s *Builder) Run(ctx *types.Context) error {
 			ctx.SketchObjectFiles = sketchObjectFiles
 			return nil
 		}),
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.sketch.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
+
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.sketch.postbuild", ".pattern", true)
+		}),
 
 		logIfVerbose(false, tr("Compiling libraries...")),
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.libraries.prebuild", Suffix: ".pattern"},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.libraries.prebuild", ".pattern", false)
+		}),
 		&UnusedCompiledLibrariesRemover{},
 		types.BareCommand(func(ctx *types.Context) error {
 			librariesObjectFiles, err := phases.LibrariesBuilder(
@@ -112,10 +123,14 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 			return nil
 		}),
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.libraries.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.libraries.postbuild", ".pattern", true)
+		}),
 
 		logIfVerbose(false, tr("Compiling core...")),
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.core.prebuild", Suffix: ".pattern"},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.core.prebuild", ".pattern", false)
+		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
 			objectFiles, archiveFile, err := phases.CoreBuilder(
@@ -139,10 +154,14 @@ func (s *Builder) Run(ctx *types.Context) error {
 			return err
 		}),
 
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.core.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.core.postbuild", ".pattern", true)
+		}),
 
 		logIfVerbose(false, tr("Linking everything together...")),
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.linking.prelink", Suffix: ".pattern"},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.linking.prelink", ".pattern", false)
+		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
 			verboseInfoOut, err := phases.Linker(
@@ -164,15 +183,25 @@ func (s *Builder) Run(ctx *types.Context) error {
 			return err
 		}),
 
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.linking.postlink", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.linking.postlink", ".pattern", true)
+		}),
 
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.objcopy.preobjcopy", Suffix: ".pattern"},
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.objcopy.", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.objcopy.postobjcopy", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.objcopy.preobjcopy", ".pattern", false)
+		}),
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.objcopy.", ".pattern", true)
+		}),
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.objcopy.postobjcopy", ".pattern", true)
+		}),
 
 		&MergeSketchWithBootloader{},
 
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.postbuild", ".pattern", true)
+		}),
 	}
 
 	ctx.Progress.AddSubSteps(len(commands) + 5)
@@ -259,7 +288,9 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 	commands := []types.Command{
 		&ContainerBuildOptions{},
 
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.prebuild", ".pattern", false)
+		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
 			ctx.LineOffset, _err = ctx.Builder.PrepareSketchBuildPath(ctx.SourceOverride, ctx.SketchBuildPath)
@@ -342,4 +373,13 @@ func logIfVerbose(warn bool, msg string) types.BareCommand {
 		}
 		return nil
 	})
+}
+
+func recipeByPrefixSuffixRunner(ctx *types.Context, prefix, suffix string, skipIfOnlyUpdatingCompilationDatabase bool) error {
+	return RecipeByPrefixSuffixRunner(
+		prefix, suffix, skipIfOnlyUpdatingCompilationDatabase,
+		ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
+		ctx.BuildProperties, ctx.Stdout, ctx.Stderr,
+		func(msg string) { ctx.Info(msg) },
+	)
 }

@@ -365,8 +365,13 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		exportBinaries = false
 	}
 	if exportBinaries {
-		presaveHex := builder.RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.savehex.presavehex", Suffix: ".pattern"}
-		if err := presaveHex.Run(builderCtx); err != nil {
+		err := builder.RecipeByPrefixSuffixRunner(
+			"recipe.hooks.savehex.presavehex", ".pattern", false,
+			builderCtx.OnlyUpdateCompilationDatabase, builderCtx.Verbose,
+			builderCtx.BuildProperties, builderCtx.Stdout, builderCtx.Stderr,
+			func(msg string) { builderCtx.Info(msg) },
+		)
+		if err != nil {
 			return r, err
 		}
 
@@ -404,8 +409,13 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 			}
 		}
 
-		postsaveHex := builder.RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.savehex.postsavehex", Suffix: ".pattern"}
-		if err := postsaveHex.Run(builderCtx); err != nil {
+		err = builder.RecipeByPrefixSuffixRunner(
+			"recipe.hooks.savehex.postsavehex", ".pattern", false,
+			builderCtx.OnlyUpdateCompilationDatabase, builderCtx.Verbose,
+			builderCtx.BuildProperties, builderCtx.Stdout, builderCtx.Stderr,
+			func(msg string) { builderCtx.Info(msg) },
+		)
+		if err != nil {
 			return r, err
 		}
 	}
