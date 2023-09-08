@@ -236,7 +236,11 @@ func (s *Builder) Run(ctx *types.Context) error {
 			return nil
 		}),
 
-		&PrintUsedLibrariesIfVerbose{},
+		types.BareCommand(func(ctx *types.Context) error {
+			infoOut, _ := PrintUsedLibrariesIfVerbose(ctx.Verbose, ctx.SketchLibrariesDetector.ImportedLibraries())
+			ctx.Info(string(infoOut))
+			return nil
+		}),
 
 		&ExportProjectCMake{SketchError: mainErr != nil},
 
