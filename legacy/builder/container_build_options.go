@@ -23,8 +23,17 @@ import (
 type ContainerBuildOptions struct{}
 
 func (s *ContainerBuildOptions) Run(ctx *types.Context) error {
+	buildOptionsJSON, err := CreateBuildOptionsMap(
+		ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
+		ctx.BuiltInLibrariesDirs, ctx.Sketch, ctx.CustomBuildProperties,
+		ctx.FQBN.String(), ctx.BuildProperties.Get("compiler.optimization_flags"),
+	)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	ctx.BuildOptionsJson = buildOptionsJSON
+
 	commands := []types.Command{
-		&CreateBuildOptionsMap{},
 		&LoadPreviousBuildOptionsMap{},
 		&WipeoutBuildPathIfBuildOptionsChanged{},
 		&StoreBuildOptionsMap{},

@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 	"sync"
 
 	"github.com/arduino/arduino-cli/arduino/builder"
@@ -104,31 +103,6 @@ type Context struct {
 	// The provided source data is used instead of reading it from disk.
 	// The keys of the map are paths relative to sketch folder.
 	SourceOverride map[string]string
-}
-
-func (ctx *Context) ExtractBuildOptions() *properties.Map {
-	opts := properties.NewMap()
-	opts.Set("hardwareFolders", strings.Join(ctx.HardwareDirs.AsStrings(), ","))
-	opts.Set("builtInToolsFolders", strings.Join(ctx.BuiltInToolsDirs.AsStrings(), ","))
-	if ctx.BuiltInLibrariesDirs != nil {
-		opts.Set("builtInLibrariesFolders", ctx.BuiltInLibrariesDirs.String())
-	}
-	opts.Set("otherLibrariesFolders", strings.Join(ctx.OtherLibrariesDirs.AsStrings(), ","))
-	opts.SetPath("sketchLocation", ctx.Sketch.FullPath)
-	var additionalFilesRelative []string
-	absPath := ctx.Sketch.FullPath.Parent()
-	for _, f := range ctx.Sketch.AdditionalFiles {
-		relPath, err := f.RelTo(absPath)
-		if err != nil {
-			continue // ignore
-		}
-		additionalFilesRelative = append(additionalFilesRelative, relPath.String())
-	}
-	opts.Set("fqbn", ctx.FQBN.String())
-	opts.Set("customBuildProperties", strings.Join(ctx.CustomBuildProperties, ","))
-	opts.Set("additionalFiles", strings.Join(additionalFilesRelative, ","))
-	opts.Set("compiler.optimization_flags", ctx.BuildProperties.Get("compiler.optimization_flags"))
-	return opts
 }
 
 func (ctx *Context) PushProgress() {

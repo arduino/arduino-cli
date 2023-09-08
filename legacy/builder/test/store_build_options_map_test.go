@@ -43,11 +43,15 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
 
-	commands := []types.Command{
-		&builder.CreateBuildOptionsMap{},
-		&builder.StoreBuildOptionsMap{},
-	}
+	buildPropertiesJSON, err := builder.CreateBuildOptionsMap(
+		ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
+		ctx.BuiltInLibrariesDirs, ctx.Sketch, ctx.CustomBuildProperties,
+		ctx.FQBN.String(), ctx.BuildProperties.Get("compiler.optimization_flags"),
+	)
+	require.NoError(t, err)
+	ctx.BuildOptionsJson = buildPropertiesJSON
 
+	commands := []types.Command{&builder.StoreBuildOptionsMap{}}
 	for _, command := range commands {
 		err := command.Run(ctx)
 		require.NoError(t, err)
