@@ -20,29 +20,30 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-properties-orderedmap"
 	"github.com/marcinbor85/gohex"
 	"github.com/pkg/errors"
 )
 
-type MergeSketchWithBootloader struct{}
-
-func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
-	if ctx.OnlyUpdateCompilationDatabase {
+func MergeSketchWithBootloader(
+	onlyUpdateCompilationDatabase, verbose bool,
+	buildPath *paths.Path,
+	sketch *sketch.Sketch,
+	buildProperties *properties.Map,
+	printInfoFn, printWarnFn func(string),
+) error {
+	if onlyUpdateCompilationDatabase {
 		return nil
 	}
 
-	buildProperties := ctx.BuildProperties
 	if !buildProperties.ContainsKey(constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK) && !buildProperties.ContainsKey(constants.BUILD_PROPERTIES_BOOTLOADER_FILE) {
 		return nil
 	}
 
-	buildPath := ctx.BuildPath
-	sketch := ctx.Sketch
 	sketchFileName := sketch.MainFile.Base()
-
 	sketchInBuildPath := buildPath.Join(sketchFileName + ".hex")
 	sketchInSubfolder := buildPath.Join(constants.FOLDER_SKETCH, sketchFileName+".hex")
 
@@ -65,8 +66,8 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 
 	bootloaderPath := buildProperties.GetPath("runtime.platform.path").Join(constants.FOLDER_BOOTLOADERS, bootloader)
 	if bootloaderPath.NotExist() {
-		if ctx.Verbose {
-			ctx.Warn(tr("Bootloader file specified but missing: %[1]s", bootloaderPath))
+		if verbose {
+			printWarnFn(tr("Bootloader file specified but missing: %[1]s", bootloaderPath))
 		}
 		return nil
 	}
@@ -75,13 +76,13 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 
 	// Ignore merger errors for the first iteration
 	maximumBinSize := 16000000
-	if uploadMaxSize, ok := ctx.BuildProperties.GetOk("upload.maximum_size"); ok {
+	if uploadMaxSize, ok := buildProperties.GetOk("upload.maximum_size"); ok {
 		maximumBinSize, _ = strconv.Atoi(uploadMaxSize)
 		maximumBinSize *= 2
 	}
 	err := merge(builtSketchPath, bootloaderPath, mergedSketchPath, maximumBinSize)
-	if err != nil && ctx.Verbose {
-		ctx.Info(err.Error())
+	if err != nil && verbose {
+		printInfoFn(err.Error())
 	}
 
 	return nil

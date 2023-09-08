@@ -197,7 +197,14 @@ func (s *Builder) Run(ctx *types.Context) error {
 			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.objcopy.postobjcopy", ".pattern", true)
 		}),
 
-		&MergeSketchWithBootloader{},
+		types.BareCommand(func(ctx *types.Context) error {
+			return MergeSketchWithBootloader(
+				ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
+				ctx.BuildPath, ctx.Sketch, ctx.BuildProperties,
+				func(s string) { ctx.Info(s) },
+				func(s string) { ctx.Warn(s) },
+			)
+		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
 			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.postbuild", ".pattern", true)
