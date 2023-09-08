@@ -40,7 +40,7 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 
 	create := builder.CreateBuildOptionsMap{}
 	err := create.Run(ctx)
-	NoError(t, err)
+	require.NoError(t, err)
 
 	require.Equal(t, `{
   "additionalFiles": "",

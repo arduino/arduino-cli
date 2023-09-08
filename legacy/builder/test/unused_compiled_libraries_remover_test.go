@@ -28,12 +28,12 @@ import (
 
 func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 	temp, err := paths.MkTempDir("", "test")
-	NoError(t, err)
+	require.NoError(t, err)
 	defer temp.RemoveAll()
 
-	NoError(t, temp.Join("SPI").MkdirAll())
-	NoError(t, temp.Join("Bridge").MkdirAll())
-	NoError(t, temp.Join("dummy_file").WriteFile([]byte{}))
+	require.NoError(t, temp.Join("SPI").MkdirAll())
+	require.NoError(t, temp.Join("Bridge").MkdirAll())
+	require.NoError(t, temp.Join("dummy_file").WriteFile([]byte{}))
 
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = temp
@@ -44,16 +44,16 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
 	err = cmd.Run(ctx)
-	NoError(t, err)
+	require.NoError(t, err)
 
 	exist, err := temp.Join("SPI").ExistCheck()
 	require.NoError(t, err)
 	require.False(t, exist)
 	exist, err = temp.Join("Bridge").ExistCheck()
-	NoError(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 	exist, err = temp.Join("dummy_file").ExistCheck()
-	NoError(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 }
 
@@ -67,17 +67,17 @@ func TestUnusedCompiledLibrariesRemoverLibDoesNotExist(t *testing.T) {
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
 	err := cmd.Run(ctx)
-	NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
 	temp, err := paths.MkTempDir("", "test")
-	NoError(t, err)
+	require.NoError(t, err)
 	defer temp.RemoveAll()
 
-	NoError(t, temp.Join("SPI").MkdirAll())
-	NoError(t, temp.Join("Bridge").MkdirAll())
-	NoError(t, temp.Join("dummy_file").WriteFile([]byte{}))
+	require.NoError(t, temp.Join("SPI").MkdirAll())
+	require.NoError(t, temp.Join("Bridge").MkdirAll())
+	require.NoError(t, temp.Join("dummy_file").WriteFile([]byte{}))
 
 	ctx := &types.Context{}
 	ctx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
@@ -87,7 +87,7 @@ func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
 
 	cmd := builder.UnusedCompiledLibrariesRemover{}
 	err = cmd.Run(ctx)
-	NoError(t, err)
+	require.NoError(t, err)
 
 	exist, err := temp.Join("SPI").ExistCheck()
 	require.NoError(t, err)
@@ -96,6 +96,6 @@ func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
 	require.NoError(t, err)
 	require.False(t, exist)
 	exist, err = temp.Join("dummy_file").ExistCheck()
-	NoError(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 }

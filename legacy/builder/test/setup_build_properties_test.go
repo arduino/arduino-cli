@@ -80,7 +80,7 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
 	defer cleanUpBuilderTestContext(t, ctx)
 	customProps, err := properties.LoadFromSlice(ctx.CustomBuildProperties)
-	NoError(t, err)
+	require.NoError(t, err)
 	ctx.BuildProperties.Merge(customProps)
 
 	buildProperties := ctx.BuildProperties

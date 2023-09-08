@@ -31,11 +31,11 @@ func TestLoadPreviousBuildOptionsMap(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	err := buildPath.Join(constants.BUILD_OPTIONS_FILE).WriteFile([]byte("test"))
-	NoError(t, err)
+	require.NoError(t, err)
 
 	command := builder.LoadPreviousBuildOptionsMap{}
 	err = command.Run(ctx)
-	NoError(t, err)
+	require.NoError(t, err)
 
 	require.Equal(t, "test", ctx.BuildOptionsJsonPrevious)
 }
@@ -48,7 +48,7 @@ func TestLoadPreviousBuildOptionsMapMissingFile(t *testing.T) {
 
 	command := builder.LoadPreviousBuildOptionsMap{}
 	err := command.Run(ctx)
-	NoError(t, err)
+	require.NoError(t, err)
 
 	require.Empty(t, ctx.BuildOptionsJsonPrevious)
 }

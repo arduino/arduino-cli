@@ -50,15 +50,15 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 
 	for _, command := range commands {
 		err := command.Run(ctx)
-		NoError(t, err)
+		require.NoError(t, err)
 	}
 
 	exist, err := buildPath.Join(constants.BUILD_OPTIONS_FILE).ExistCheck()
-	NoError(t, err)
+	require.NoError(t, err)
 	require.True(t, exist)
 
 	bytes, err := buildPath.Join(constants.BUILD_OPTIONS_FILE).ReadFile()
-	NoError(t, err)
+	require.NoError(t, err)
 
 	require.Equal(t, `{
   "additionalFiles": "",

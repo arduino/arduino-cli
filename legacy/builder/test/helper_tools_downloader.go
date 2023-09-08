@@ -30,6 +30,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/slices"
 )
 
@@ -136,9 +137,9 @@ func DownloadCoresAndToolsAndLibraries(t *testing.T) {
 
 func patchFiles(t *testing.T) {
 	err := patchesFolder.MkdirAll()
-	NoError(t, err)
+	require.NoError(t, err)
 	files, err := patchesFolder.ReadDir()
-	NoError(t, err)
+	require.NoError(t, err)
 
 	for _, file := range files {
 		if file.Ext() == ".patch" {
@@ -147,9 +148,9 @@ func patchFiles(t *testing.T) {
 			// https://github.com/arduino/arduino-builder/issues/147
 			/*
 				data, err := ioutil.ReadFile(Abs(t, filepath.Join(PATCHES_FOLDER, file.Name())))
-				NoError(t, err)
+				require.NoError(t, err)
 				patchSet, err := patch.Parse(data)
-				NoError(t, err)
+				require.NoError(t, err)
 				operations, err := patchSet.Apply(ioutil.ReadFile)
 				for _, op := range operations {
 					utils.WriteFileBytes(op.Dst, op.Data)
@@ -161,7 +162,7 @@ func patchFiles(t *testing.T) {
 
 func download(t *testing.T, cores, boardsManagerCores, boardsManagerRedBearCores []Core, tools, toolsMultipleVersions, boardsManagerTools, boardsManagerRFduinoTools []Tool, libraries []Library) {
 	allCoresDownloaded, err := allCoresAlreadyDownloadedAndUnpacked(hardwareFolder, cores)
-	NoError(t, err)
+	require.NoError(t, err)
 	if allCoresDownloaded &&
 		allBoardsManagerCoresAlreadyDownloadedAndUnpacked(boardManagerFolder, boardsManagerCores) &&
 		allBoardsManagerCoresAlreadyDownloadedAndUnpacked(boardManagerFolder, boardsManagerRedBearCores) &&
@@ -174,37 +175,37 @@ func download(t *testing.T, cores, boardsManagerCores, boardsManagerRedBearCores
 	}
 
 	index, err := downloadIndex("http://downloads.arduino.cc/packages/package_index.json")
-	NoError(t, err)
+	require.NoError(t, err)
 
 	err = downloadCores(cores, index)
-	NoError(t, err)
+	require.NoError(t, err)
 
 	err = downloadBoardManagerCores(boardsManagerCores, index)
-	NoError(t, err)
+	require.NoError(t, err)
 
 	err = downloadTools(tools, index)
-	NoError(t, err)
+	require.NoError(t, err)
 
 	err = downloadToolsMultipleVersions(toolsMultipleVersions, index)
-	NoError(t, err)
+	require.NoError(t, err)
 
 	err = downloadBoardsManagerTools(boardsManagerTools, index)
-	NoError(t, err)
+	require.NoError(t, err)
 
 	rfduinoIndex, err := downloadIndex("http://downloads.arduino.cc/packages/test_package_rfduino_index.json")
-	NoError(t, err)
+	require.NoError(t, err)
 
 	err = downloadBoardsManagerTools(boardsManagerRFduinoTools, rfduinoIndex)
-	NoError(t, err)
+	require.NoError(t, err)
 
 	err = downloadBoardManagerCores(boardsManagerRedBearCores, nil)
-	NoError(t, err)
+	require.NoError(t, err)
 
 	librariesIndex, err := downloadIndex("http://downloads.arduino.cc/libraries/library_index.json")
-	NoError(t, err)
+	require.NoError(t, err)
 
 	err = downloadLibraries(libraries, librariesIndex)
-	NoError(t, err)
+	require.NoError(t, err)
 }
 
 func downloadIndex(url string) (map[string]interface{}, error) {

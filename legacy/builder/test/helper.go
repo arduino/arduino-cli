@@ -17,62 +17,32 @@
 package test
 
 import (
-	"bytes"
-	"fmt"
-	"path/filepath"
 	"testing"
-	"text/template"
 
-	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func LoadAndInterpolate(t *testing.T, filename string, ctx *types.Context) string {
-	funcsMap := template.FuncMap{
-		"QuoteCppString": func(p *paths.Path) string { return cpp.QuoteString(p.String()) },
-	}
-
-	tpl, err := template.New(filepath.Base(filename)).Funcs(funcsMap).ParseFiles(filename)
-	NoError(t, err)
-
-	var buf bytes.Buffer
-	data := make(map[string]interface{})
-	data["sketch"] = ctx.Sketch
-	err = tpl.Execute(&buf, data)
-	NoError(t, err)
-
-	return buf.String()
-}
-
 func Abs(t *testing.T, rel *paths.Path) *paths.Path {
 	absPath, err := rel.Abs()
-	NoError(t, err)
+	require.NoError(t, err)
 	return absPath
-}
-
-func NoError(t *testing.T, err error, msgAndArgs ...interface{}) {
-	if !assert.NoError(t, err, msgAndArgs...) {
-		fmt.Printf("%+v\n", err) // Outputs stack trace in case of wrapped error
-		t.FailNow()
-	}
 }
 
 func SetupBuildPath(t *testing.T, ctx *types.Context) *paths.Path {
 	buildPath, err := paths.MkTempDir("", "test_build_path")
-	NoError(t, err)
+	require.NoError(t, err)
 	ctx.BuildPath = buildPath
 	return buildPath
 }
 
 func SetupBuildCachePath(t *testing.T, ctx *types.Context) *paths.Path {
 	buildCachePath, err := paths.MkTempDir(constants.EMPTY_STRING, "test_build_cache")
-	NoError(t, err)
+	require.NoError(t, err)
 	ctx.CoreBuildCachePath = buildCachePath
 	return buildCachePath
 }
