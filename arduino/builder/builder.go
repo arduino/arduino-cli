@@ -15,16 +15,34 @@
 
 package builder
 
-import "github.com/arduino/arduino-cli/arduino/sketch"
+import (
+	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/go-paths-helper"
+)
+
+// nolint
+const (
+	BuildPropertiesArchiveFile          = "archive_file"
+	BuildPropertiesArchiveFilePath      = "archive_file_path"
+	BuildPropertiesObjectFile           = "object_file"
+	RecipeARPattern                     = "recipe.ar.pattern"
+	BuildPropertiesIncludes             = "includes"
+	BuildPropertiesCompilerWarningFlags = "compiler.warning_flags"
+	Space                               = " "
+)
 
 // Builder is a Sketch builder.
 type Builder struct {
 	sketch *sketch.Sketch
+
+	// core related
+	coreBuildCachePath *paths.Path
 }
 
 // NewBuilder creates a sketch Builder.
-func NewBuilder(sk *sketch.Sketch) *Builder {
+func NewBuilder(sk *sketch.Sketch, coreBuildCachePath *paths.Path) *Builder {
 	return &Builder{
-		sketch: sk,
+		sketch:             sk,
+		coreBuildCachePath: coreBuildCachePath,
 	}
 }

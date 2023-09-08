@@ -84,11 +84,8 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		// NoError(t, err)
 		fmt.Println(err)
 	}
-	if !ctx.CanUseCachedTools {
-		if ctx.BuiltInToolsDirs != nil {
-			pmb.LoadToolsFromBundleDirectories(ctx.BuiltInToolsDirs)
-		}
-		ctx.CanUseCachedTools = true
+	if ctx.BuiltInToolsDirs != nil {
+		pmb.LoadToolsFromBundleDirectories(ctx.BuiltInToolsDirs)
 	}
 	pm := pmb.Build()
 	pme, _ /* never release... */ := pm.NewExplorer()
@@ -100,7 +97,7 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		ctx.Sketch = sk
 	}
 
-	ctx.Builder = bldr.NewBuilder(ctx.Sketch)
+	ctx.Builder = bldr.NewBuilder(ctx.Sketch, nil)
 	if fqbn != "" {
 		ctx.FQBN = parseFQBN(t, fqbn)
 		targetPackage, targetPlatform, targetBoard, buildProperties, buildPlatform, err := pme.ResolveFQBN(ctx.FQBN)
@@ -125,7 +122,7 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 	if !stepToSkip[skipLibraries] {
 		lm, libsResolver, _, err := detector.LibrariesLoader(
 			false, nil,
-			ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
+			ctx.BuiltInLibrariesDirs, nil, ctx.OtherLibrariesDirs,
 			ctx.ActualPlatform, ctx.TargetPlatform,
 		)
 		require.NoError(t, err)

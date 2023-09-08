@@ -21,7 +21,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -38,13 +37,6 @@ func SetupBuildPath(t *testing.T, ctx *types.Context) *paths.Path {
 	require.NoError(t, err)
 	ctx.BuildPath = buildPath
 	return buildPath
-}
-
-func SetupBuildCachePath(t *testing.T, ctx *types.Context) *paths.Path {
-	buildCachePath, err := paths.MkTempDir(constants.EMPTY_STRING, "test_build_cache")
-	require.NoError(t, err)
-	ctx.CoreBuildCachePath = buildCachePath
-	return buildCachePath
 }
 
 func parseFQBN(t *testing.T, fqbnIn string) *cores.FQBN {

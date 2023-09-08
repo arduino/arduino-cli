@@ -18,46 +18,50 @@ package phases
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"regexp"
 	"strconv"
 
-	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/legacy/builder/utils"
+	"github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
 
-type Sizer struct {
-	SketchError bool
-}
-
-func (s *Sizer) Run(ctx *types.Context) error {
-	if ctx.OnlyUpdateCompilationDatabase {
-		return nil
+func Sizer(
+	onlyUpdateCompilationDatabase, sketchError, verbose bool,
+	buildProperties *properties.Map,
+	stdoutWriter, stderrWriter io.Writer,
+	printInfoFn, printWarnFn func(msg string),
+	warningsLevel string,
+) (builder.ExecutablesFileSections, error) {
+	if onlyUpdateCompilationDatabase || sketchError {
+		return nil, nil
 	}
-	if s.SketchError {
-		return nil
-	}
-
-	buildProperties := ctx.BuildProperties
 
 	if buildProperties.ContainsKey("recipe.advanced_size.pattern") {
-		return checkSizeAdvanced(ctx, buildProperties)
+		return checkSizeAdvanced(buildProperties, verbose, stdoutWriter, stderrWriter, printInfoFn, printWarnFn)
 	}
 
-	return checkSize(ctx, buildProperties)
+	return checkSize(buildProperties, verbose, stdoutWriter, stderrWriter, printInfoFn, printWarnFn, warningsLevel)
 }
 
-func checkSizeAdvanced(ctx *types.Context, properties *properties.Map) error {
-	command, err := builder_utils.PrepareCommandForRecipe(properties, "recipe.advanced_size.pattern", false)
+func checkSizeAdvanced(buildProperties *properties.Map,
+	verbose bool,
+	stdoutWriter, stderrWriter io.Writer,
+	printInfoFn, printWarnFn func(msg string),
+) (builder.ExecutablesFileSections, error) {
+	command, err := utils.PrepareCommandForRecipe(buildProperties, "recipe.advanced_size.pattern", false)
 	if err != nil {
-		return errors.New(tr("Error while determining sketch size: %s", err))
+		return nil, errors.New(tr("Error while determining sketch size: %s", err))
 	}
 
-	out, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.Show /* stderr */)
+	verboseInfo, out, _, err := utils.ExecCommand(verbose, stdoutWriter, stderrWriter, command, utils.Capture /* stdout */, utils.Show /* stderr */)
+	if verbose {
+		printInfoFn(string(verboseInfo))
+	}
 	if err != nil {
-		return errors.New(tr("Error while determining sketch size: %s", err))
+		return nil, errors.New(tr("Error while determining sketch size: %s", err))
 	}
 
 	type AdvancedSizerResponse struct {
@@ -67,7 +71,7 @@ func checkSizeAdvanced(ctx *types.Context, properties *properties.Map) error {
 		// likely be printed in red. Errors will stop build/upload.
 		Severity string `json:"severity"`
 		// Sections are the sections sizes for machine readable use
-		Sections []types.ExecutableSectionSize `json:"sections"`
+		Sections []builder.ExecutableSectionSize `json:"sections"`
 		// ErrorMessage is a one line error message like:
 		// "text section exceeds available space in board"
 		// it must be set when Severity is "error"
@@ -76,71 +80,76 @@ func checkSizeAdvanced(ctx *types.Context, properties *properties.Map) error {
 
 	var resp AdvancedSizerResponse
 	if err := json.Unmarshal(out, &resp); err != nil {
-		return errors.New(tr("Error while determining sketch size: %s", err))
+		return nil, errors.New(tr("Error while determining sketch size: %s", err))
 	}
 
-	ctx.ExecutableSectionsSize = resp.Sections
+	executableSectionsSize := resp.Sections
 	switch resp.Severity {
 	case "error":
-		ctx.Warn(resp.Output)
-		return errors.New(resp.ErrorMessage)
+		printWarnFn(resp.Output)
+		return executableSectionsSize, errors.New(resp.ErrorMessage)
 	case "warning":
-		ctx.Warn(resp.Output)
+		printWarnFn(resp.Output)
 	case "info":
-		ctx.Info(resp.Output)
+		printInfoFn(resp.Output)
 	default:
-		return fmt.Errorf("invalid '%s' severity from sketch sizer: it must be 'error', 'warning' or 'info'", resp.Severity)
+		return executableSectionsSize, fmt.Errorf("invalid '%s' severity from sketch sizer: it must be 'error', 'warning' or 'info'", resp.Severity)
 	}
-	return nil
+	return executableSectionsSize, nil
 }
 
-func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
+func checkSize(buildProperties *properties.Map,
+	verbose bool,
+	stdoutWriter, stderrWriter io.Writer,
+	printInfoFn, printWarnFn func(msg string),
+	warningsLevel string,
+) (builder.ExecutablesFileSections, error) {
 	properties := buildProperties.Clone()
-	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+ctx.WarningsLevel))
+	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+warningsLevel))
 
 	maxTextSizeString := properties.Get("upload.maximum_size")
 	maxDataSizeString := properties.Get("upload.maximum_data_size")
 
 	if maxTextSizeString == "" {
-		return nil
+		return nil, nil
 	}
 
 	maxTextSize, err := strconv.Atoi(maxTextSizeString)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	maxDataSize := -1
 	if maxDataSizeString != "" {
 		maxDataSize, err = strconv.Atoi(maxDataSizeString)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	textSize, dataSize, _, err := execSizeRecipe(ctx, properties)
+	textSize, dataSize, _, err := execSizeRecipe(properties, verbose, stdoutWriter, stderrWriter, printInfoFn)
 	if err != nil {
-		ctx.Warn(tr("Couldn't determine program size"))
-		return nil
+		printWarnFn(tr("Couldn't determine program size"))
+		return nil, nil
 	}
 
-	ctx.Info(tr("Sketch uses %[1]s bytes (%[3]s%%) of program storage space. Maximum is %[2]s bytes.",
+	printInfoFn(tr("Sketch uses %[1]s bytes (%[3]s%%) of program storage space. Maximum is %[2]s bytes.",
 		strconv.Itoa(textSize),
 		strconv.Itoa(maxTextSize),
 		strconv.Itoa(textSize*100/maxTextSize)))
 	if dataSize >= 0 {
 		if maxDataSize > 0 {
-			ctx.Info(tr("Global variables use %[1]s bytes (%[3]s%%) of dynamic memory, leaving %[4]s bytes for local variables. Maximum is %[2]s bytes.",
+			printInfoFn(tr("Global variables use %[1]s bytes (%[3]s%%) of dynamic memory, leaving %[4]s bytes for local variables. Maximum is %[2]s bytes.",
 				strconv.Itoa(dataSize),
 				strconv.Itoa(maxDataSize),
 				strconv.Itoa(dataSize*100/maxDataSize),
 				strconv.Itoa(maxDataSize-dataSize)))
 		} else {
-			ctx.Info(tr("Global variables use %[1]s bytes of dynamic memory.", strconv.Itoa(dataSize)))
+			printInfoFn(tr("Global variables use %[1]s bytes of dynamic memory.", strconv.Itoa(dataSize)))
 		}
 	}
 
-	ctx.ExecutableSectionsSize = []types.ExecutableSectionSize{
+	executableSectionsSize := []builder.ExecutableSectionSize{
 		{
 			Name:    "text",
 			Size:    textSize,
@@ -148,7 +157,7 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 		},
 	}
 	if maxDataSize > 0 {
-		ctx.ExecutableSectionsSize = append(ctx.ExecutableSectionsSize, types.ExecutableSectionSize{
+		executableSectionsSize = append(executableSectionsSize, builder.ExecutableSectionSize{
 			Name:    "data",
 			Size:    dataSize,
 			MaxSize: maxDataSize,
@@ -156,36 +165,43 @@ func checkSize(ctx *types.Context, buildProperties *properties.Map) error {
 	}
 
 	if textSize > maxTextSize {
-		ctx.Warn(tr("Sketch too big; see %[1]s for tips on reducing it.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
-		return errors.New(tr("text section exceeds available space in board"))
+		printWarnFn(tr("Sketch too big; see %[1]s for tips on reducing it.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
+		return executableSectionsSize, errors.New(tr("text section exceeds available space in board"))
 	}
 
 	if maxDataSize > 0 && dataSize > maxDataSize {
-		ctx.Warn(tr("Not enough memory; see %[1]s for tips on reducing your footprint.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
-		return errors.New(tr("data section exceeds available space in board"))
+		printWarnFn(tr("Not enough memory; see %[1]s for tips on reducing your footprint.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
+		return executableSectionsSize, errors.New(tr("data section exceeds available space in board"))
 	}
 
 	if w := properties.Get("build.warn_data_percentage"); w != "" {
 		warnDataPercentage, err := strconv.Atoi(w)
 		if err != nil {
-			return err
+			return executableSectionsSize, err
 		}
 		if maxDataSize > 0 && dataSize > maxDataSize*warnDataPercentage/100 {
-			ctx.Warn(tr("Low memory available, stability problems may occur."))
+			printWarnFn(tr("Low memory available, stability problems may occur."))
 		}
 	}
 
-	return nil
+	return executableSectionsSize, nil
 }
 
-func execSizeRecipe(ctx *types.Context, properties *properties.Map) (textSize int, dataSize int, eepromSize int, resErr error) {
-	command, err := builder_utils.PrepareCommandForRecipe(properties, "recipe.size.pattern", false)
+func execSizeRecipe(properties *properties.Map,
+	verbose bool,
+	stdoutWriter, stderrWriter io.Writer,
+	printInfoFn func(msg string),
+) (textSize int, dataSize int, eepromSize int, resErr error) {
+	command, err := utils.PrepareCommandForRecipe(properties, "recipe.size.pattern", false)
 	if err != nil {
 		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)
 		return
 	}
 
-	out, _, err := utils.ExecCommand(ctx, command, utils.Capture /* stdout */, utils.Show /* stderr */)
+	verboseInfo, out, _, err := utils.ExecCommand(verbose, stdoutWriter, stderrWriter, command, utils.Capture /* stdout */, utils.Show /* stderr */)
+	if verbose {
+		printInfoFn(string(verboseInfo))
+	}
 	if err != nil {
 		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)
 		return

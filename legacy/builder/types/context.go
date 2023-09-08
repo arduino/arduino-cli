@@ -24,6 +24,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
+	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -31,34 +32,6 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 )
-
-type ProgressStruct struct {
-	Progress   float32
-	StepAmount float32
-	Parent     *ProgressStruct
-}
-
-func (p *ProgressStruct) AddSubSteps(steps int) {
-	p.Parent = &ProgressStruct{
-		Progress:   p.Progress,
-		StepAmount: p.StepAmount,
-		Parent:     p.Parent,
-	}
-	if p.StepAmount == 0.0 {
-		p.StepAmount = 100.0
-	}
-	p.StepAmount /= float32(steps)
-}
-
-func (p *ProgressStruct) RemoveSubSteps() {
-	p.Progress = p.Parent.Progress
-	p.StepAmount = p.Parent.StepAmount
-	p.Parent = p.Parent.Parent
-}
-
-func (p *ProgressStruct) CompleteStep() {
-	p.Progress += p.StepAmount
-}
 
 // Context structure
 type Context struct {
@@ -70,8 +43,6 @@ type Context struct {
 	BuiltInToolsDirs     paths.PathList
 	BuiltInLibrariesDirs *paths.Path
 	OtherLibrariesDirs   paths.PathList
-	LibraryDirs          paths.PathList // List of paths pointing to individual library root folders
-	WatchedLocations     paths.PathList
 	FQBN                 *cores.FQBN
 	Clean                bool
 
@@ -86,17 +57,15 @@ type Context struct {
 	TargetPlatform *cores.PlatformRelease
 	ActualPlatform *cores.PlatformRelease
 
-	BuildProperties              *properties.Map
-	BuildPath                    *paths.Path
-	SketchBuildPath              *paths.Path
-	CoreBuildPath                *paths.Path
-	CoreBuildCachePath           *paths.Path
-	CoreArchiveFilePath          *paths.Path
-	CoreObjectsFiles             paths.PathList
-	LibrariesBuildPath           *paths.Path
-	LibrariesObjectFiles         paths.PathList
-	SketchObjectFiles            paths.PathList
-	IgnoreSketchFolderNameErrors bool
+	BuildProperties      *properties.Map
+	BuildPath            *paths.Path
+	SketchBuildPath      *paths.Path
+	CoreBuildPath        *paths.Path
+	CoreArchiveFilePath  *paths.Path
+	CoreObjectsFiles     paths.PathList
+	LibrariesBuildPath   *paths.Path
+	LibrariesObjectFiles paths.PathList
+	SketchObjectFiles    paths.PathList
 
 	Sketch        *sketch.Sketch
 	WarningsLevel string
@@ -108,18 +77,12 @@ type Context struct {
 	Verbose bool
 
 	// Dry run, only create progress map
-	Progress ProgressStruct
+	Progress progress.Struct
 	// Send progress events to this callback
 	ProgressCB rpc.TaskProgressCB
 
 	// Custom build properties defined by user (line by line as "key=value" pairs)
 	CustomBuildProperties []string
-
-	// Reuse old tools since the backing storage didn't change
-	CanUseCachedTools bool
-
-	// Experimental: use arduino-preprocessor to create prototypes
-	UseArduinoPreprocessor bool
 
 	// Parallel processes
 	Jobs int
@@ -130,7 +93,7 @@ type Context struct {
 	stdLock sync.Mutex
 
 	// Sizer results
-	ExecutableSectionsSize ExecutablesFileSections
+	ExecutableSectionsSize builder.ExecutablesFileSections
 
 	// Compilation Database to build/update
 	CompilationDatabase *builder.CompilationDatabase
@@ -141,29 +104,6 @@ type Context struct {
 	// The provided source data is used instead of reading it from disk.
 	// The keys of the map are paths relative to sketch folder.
 	SourceOverride map[string]string
-}
-
-// ExecutableSectionSize represents a section of the executable output file
-type ExecutableSectionSize struct {
-	Name    string `json:"name"`
-	Size    int    `json:"size"`
-	MaxSize int    `json:"max_size"`
-}
-
-// ExecutablesFileSections is an array of ExecutablesFileSection
-type ExecutablesFileSections []ExecutableSectionSize
-
-// ToRPCExecutableSectionSizeArray transforms this array into a []*rpc.ExecutableSectionSize
-func (s ExecutablesFileSections) ToRPCExecutableSectionSizeArray() []*rpc.ExecutableSectionSize {
-	res := []*rpc.ExecutableSectionSize{}
-	for _, section := range s {
-		res = append(res, &rpc.ExecutableSectionSize{
-			Name:    section.Name,
-			Size:    int64(section.Size),
-			MaxSize: int64(section.MaxSize),
-		})
-	}
-	return res
 }
 
 func (ctx *Context) ExtractBuildOptions() *properties.Map {
