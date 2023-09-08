@@ -1,0 +1,3346 @@
+#
+msgid ""
+msgstr "" 
+"Last-Translator: coby2023t@gmail.com 2023\n" 
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#
+msgid "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
+msgstr "%[1]s %[2]s 版本：%[3]s 交付：%[4]s 日期：%[5]s"
+
+#
+msgid "%[1]s folder is no longer supported! See %[2]s for more information"
+msgstr "已不支援 %[1]s 檔案夾！詳細資訊，請見 %[2]s"
+
+#
+msgid "%[1]s invalid, rebuilding all"
+msgstr "%[1]s 無效，重新建構全部"
+
+#
+msgid "%[1]s is required but %[2]s is currently installed."
+msgstr "需要 %[1]s ，但已安裝 %[2]s。"
+
+#
+msgid "%[1]s pattern is missing"
+msgstr "%[1]s 樣態遺失"
+
+#
+msgid "%[1]s, message: %[2]s"
+msgstr "%[1]s，訊息：%[2]s"
+
+#
+msgid "%[1]s, port: %[2]s"
+msgstr "%[1]s，連接埠：%[2]s"
+
+#
+msgid "%[1]s, ports: %[2]s"
+msgstr "%[1]s，連接埠：%[2]s"
+
+#
+msgid "%[1]s, protocol version: %[2]d"
+msgstr "%[1]s，協議版本：%[2]d"
+
+#
+msgid "%s already downloaded"
+msgstr "%s 已經下載"
+
+#
+msgid "%s and %s cannot be used together"
+msgstr "%s 和 %s 不能一起使用"
+
+#
+msgid "%s installed"
+msgstr "%s 已安裝"
+
+#
+msgid "%s is already installed."
+msgstr "%s 已安裝"
+
+#
+msgid "%s is not a directory"
+msgstr "%s 不是目錄"
+
+#
+msgid "%s is not managed by package manager"
+msgstr "%s 不是由套件管理員管理的"
+
+#
+msgid "%s must be installed."
+msgstr "%s 必須安裝"
+
+#
+msgid "%s pattern is missing"
+msgstr "%s 樣態遺失..."
+
+#
+msgid "'%s' has an invalid signature"
+msgstr "'%s'的簽名無效"
+
+#
+msgid "'build.core' and 'build.variant' refer to different platforms: %[1]s and %[2]s"
+msgstr "'build.core' 和 'build.variant' 參照到不同的平台: %[1]s 和 %[2]s"
+
+#
+msgid "(hidden)"
+msgstr "（隱藏）"
+
+#
+msgid "(legacy)"
+msgstr "（舊版）"
+
+#
+msgid "--git-url and --zip-path are disabled by default, for more information see: %v"
+msgstr "--git-url 和 --zip-path 預設為不能使用, 更多訊息請見: %v"
+
+#
+msgid "--git-url and --zip-path flags allow installing untrusted files, use it at your own risk."
+msgstr "--git-url 和 --zip-path 旗標允許安裝未被信任的檔案, 風險自負."
+
+#
+msgid "--git-url or --zip-path can't be used with --install-in-builtin-dir"
+msgstr "--git-url 或 --zip-path 不能和 --install-in-builtin-dir 一起使用。"
+
+#
+msgid ".ino file already exists"
+msgstr ".ino 檔案已存在"
+
+#
+msgid "A new release of Arduino CLI is available:"
+msgstr "有新版的 Arduino CLI :"
+
+#
+msgid "A programmer is required to upload"
+msgstr "上傳需使用編寫器/燒錄器"
+
+#
+msgid "ARCH"
+msgstr "架構"
+
+#
+msgid "ARDUINO COMMAND LINE MANUAL"
+msgstr "ARDUINO 命令列手冊"
+
+#
+msgid "Additional help topics:"
+msgstr "更多求助主題:"
+
+#
+msgid "Adds one or more values to a setting."
+msgstr "將一或多個值加入設定中。"
+
+#
+msgid "Aliases:"
+msgstr "別名："
+
+#
+msgid "All the cores are already at the latest version"
+msgstr "所有核心都是最新版"
+
+#
+msgid "Already installed %s"
+msgstr "已經安裝 %s"
+
+#
+msgid "Alternatives for %[1]s: %[2]s"
+msgstr "%[1]s 的替代品: %[2]s"
+
+#
+msgid "An error occurred adding prototypes"
+msgstr "新增原型時出錯"
+
+#
+msgid "An error occurred detecting libraries"
+msgstr "檢測程式庫時出錯"
+
+#
+msgid "Append debug logging to the specified file"
+msgstr "擴增除錯日誌到指定檔案"
+
+#
+msgid "Architecture: %s"
+msgstr "架構：%s"
+
+#
+msgid "Archive already exists"
+msgstr "歸存檔已存在"
+
+#
+msgid "Archiving built core (caching) in: %[1]s"
+msgstr "歸存已建構核心（快取）在: %[1]s"
+
+#
+msgid "Arduino CLI sketch commands."
+msgstr "Arduino CLI sketch 命令"
+
+#
+msgid "Arduino CLI."
+msgstr "Arduino CLI."
+
+#
+msgid "Arduino Command Line Interface (arduino-cli)."
+msgstr "Arduino 命令列界面 (arduino-cli)"
+
+#
+msgid "Arduino board commands."
+msgstr "Arduino 開發板指令"
+
+#
+msgid "Arduino cache commands."
+msgstr "Arduino 快取指令。"
+
+#
+msgid "Arduino commands about libraries."
+msgstr "Arduino 程式庫的命令。"
+
+#
+msgid "Arduino configuration commands."
+msgstr "Arduino 設定指令。"
+
+#
+msgid "Arduino core operations."
+msgstr "Arduino 核心操作。"
+
+#
+msgid "Arguments error: %v"
+msgstr "參數錯誤：%v"
+
+#
+msgid "Attaches a sketch to a board."
+msgstr "將 sketch 寫入開發板上。"
+
+#
+msgid "Author: %s"
+msgstr "作者：%s"
+
+#
+msgid "Automatic library install can't be performed in this case, please manually remove all duplicates and retry."
+msgstr "在這情況下無法自動化程式庫安裝, 請手動移除重覆的再試."
+
+#
+msgid "Automatic library uninstall can't be performed in this case, please manually remove them."
+msgstr "在這情況下無法自動化程式庫卸除, 請手動移除."
+
+#
+msgid "Available"
+msgstr "可用的"
+
+#
+msgid "Available Commands:"
+msgstr "可用命令："
+
+#
+msgid "Binary file to upload."
+msgstr "要上傳的二進位檔。"
+
+#
+msgid "Board Name"
+msgstr "開發板名"
+
+#
+msgid "Board name:"
+msgstr "開發板名："
+
+#
+msgid "Board version:"
+msgstr "開發板版本："
+
+#
+msgid "Bootloader file specified but missing: %[1]s"
+msgstr "找不到指定的 Bootloader 檔: %[1]s"
+
+#
+msgid "Builds of 'core.a' are saved into this path to be cached and reused."
+msgstr "'core.a'的編譯檔已存到本路徑中，以便快取和重複使用。"
+
+#
+msgid "Can't create data directory %s"
+msgstr "無法建立 %s 資料目錄"
+
+#
+msgid "Can't create sketch"
+msgstr "無法新增 sketch"
+
+#
+msgid "Can't download library"
+msgstr "無法下載程式庫"
+
+#
+msgid "Can't find dependencies for platform %s"
+msgstr "找不到 %s 平台的相依"
+
+#
+msgid "Can't open sketch"
+msgstr "無法打開 sketch"
+
+#
+msgid "Can't set multiple values in key %v"
+msgstr "無法在 %v 鍵中設立多個值"
+
+#
+msgid "Can't update sketch"
+msgstr "無法更新 sketch"
+
+#
+msgid "Can't use the following flags together: %s"
+msgstr "不能同時使用以下參數: %s"
+
+#
+msgid "Can't write config file: %v"
+msgstr "無法寫入設定檔: %v"
+
+#
+msgid "Can't write debug log: %s"
+msgstr "無法寫入除錯日誌: %s"
+
+#
+msgid "Cannot create build cache directory"
+msgstr "無法建立編譯快取目錄"
+
+#
+msgid "Cannot create build directory"
+msgstr "無法建立編譯目錄"
+
+#
+msgid "Cannot create config file directory: %v"
+msgstr "無法建立設定檔的目錄: %v"
+
+#
+msgid "Cannot create config file: %v"
+msgstr "無法建立設定檔: %v"
+
+#
+msgid "Cannot create temp dir"
+msgstr "無法建立臨時目錄"
+
+#
+msgid "Cannot create temp file"
+msgstr "無法建立臨時檔"
+
+#
+msgid "Cannot delete the key %[1]s: %[2]v"
+msgstr "無法刪除鍵值 %[1]s: %[2]v"
+
+#
+msgid "Cannot execute debug tool"
+msgstr "無法執行除錯工具"
+
+#
+msgid "Cannot find absolute path: %v"
+msgstr "找不到絕對路徑: %v"
+
+#
+msgid "Cannot install platform"
+msgstr "無法安裝平台"
+
+#
+msgid "Cannot install tool %s"
+msgstr "無法安裝工具 %s"
+
+#
+msgid "Cannot perform port reset: %s"
+msgstr "無法執行連接埠重設: %s"
+
+#
+msgid "Cannot upgrade platform"
+msgstr "無法升級平台"
+
+#
+msgid "Cannot write the file %[1]s: %[2]v"
+msgstr "無法寫入檔案 %[1]s: %[2]v"
+
+#
+msgid "Category: %s"
+msgstr "類別：%s"
+
+#
+msgid "Check dependencies status for the specified library."
+msgstr "檢查指定程式庫的相依狀態。"
+
+#
+msgid "Checksum differs from checksum in package.json"
+msgstr "校驗碼與 package.json 檔案內的校驗碼不同"
+
+#
+msgid "Checksum:"
+msgstr "校驗碼："
+
+#
+msgid "Clean caches."
+msgstr "清除快取。"
+
+#
+msgid "Comma-separated list of additional URLs for the Boards Manager."
+msgstr "給開發板管理員用的網址清單(以逗號分隔)。"
+
+#
+msgid "Command keeps running and prints list of connected boards whenever there is a change."
+msgstr "指令保持執行狀態, 列出連接的開發板."
+
+#
+msgid "Compiled sketch not found in %s"
+msgstr "在 %s 中找不到已編譯的 sketch"
+
+#
+msgid "Compiles Arduino sketches."
+msgstr "編譯 Arduino sketch"
+
+#
+msgid "Compiling core..."
+msgstr "編譯核心中..."
+
+#
+msgid "Compiling libraries..."
+msgstr "編譯程式庫中..."
+
+#
+msgid "Compiling library \"%[1]s\""
+msgstr "編譯程式庫“%[1]s”中..."
+
+#
+msgid "Compiling sketch..."
+msgstr "編譯 sketch 中..."
+
+#
+msgid "Config file already exists, use --overwrite to discard the existing one."
+msgstr "設定檔已存在，使用 --overwrite 覆蓋原設定檔。"
+
+#
+msgid "Config file written to: %s"
+msgstr "設定檔寫入:%s"
+
+#
+msgid "Configuration options for %s"
+msgstr "%s 的設定選項"
+
+#
+msgid "Configure communication port settings. The format is <ID>=<value>[,<ID>=<value>]..."
+msgstr "通訊埠設定, 格式為 <ID>=<value>[,<ID>=<value>]..."
+
+#
+msgid "Configuring platform."
+msgstr "設定平台。"
+
+#
+msgid "Configuring tool."
+msgstr "設定工具。"
+
+#
+msgid "Connected"
+msgstr "已連接"
+
+#
+msgid "Connected to %s! Press CTRL-C to exit."
+msgstr "已連接到 %s！按 CTRL-C 退出。"
+
+#
+msgid "Core"
+msgstr "核心"
+
+#
+msgid "Could not connect via HTTP"
+msgstr "無法通過 HTTP 連接"
+
+#
+msgid "Could not create index directory"
+msgstr "無法建立索引目錄"
+
+#
+msgid "Couldn't deeply cache core build: %[1]s"
+msgstr "無法深入快取核心編譯：%[1]s"
+
+#
+msgid "Couldn't determine program size"
+msgstr "無法確定程式大小"
+
+#
+msgid "Couldn't get current working directory: %v"
+msgstr "無法取得工作目錄：%v"
+
+#
+msgid "Create a new Sketch"
+msgstr "建立新 sketch"
+
+#
+msgid "Create and print a profile configuration from the build."
+msgstr "從建構中建立並印出設定檔內容。"
+
+#
+msgid "Creates a zip file containing all sketch files."
+msgstr "建立含全部 sketch 檔的 zip 壓縮檔。"
+
+#
+msgid "Creates or updates the configuration file in the data directory or custom directory with the current configuration settings."
+msgstr "用目前的設定值建立或更新資料或自定義目錄內的設定檔。"
+
+#
+msgid "Currently, Build Profiles only support libraries available through Arduino Library Manager."
+msgstr "目前 Build Profiles 只支持 Arduino 程式庫管理員所提供的程式庫。"
+
+#
+msgid "DEPRECATED"
+msgstr "已棄用"
+
+#
+msgid "Daemon is now listening on %s:%s"
+msgstr "背景程式正在監聽 %s：%s"
+
+#
+msgid "Debug Arduino sketches."
+msgstr "除錯 Arduino sketch"
+
+#
+msgid "Debug Arduino sketches. (this command opens an interactive gdb session)"
+msgstr "除錯 Arduino sketch（此命令會開啟互動式 gdb 對話）"
+
+#
+msgid "Debug interpreter e.g.: %s"
+msgstr "除錯解譯器，例如：%s"
+
+#
+msgid "Debugging not supported for board %s"
+msgstr "不支援 %s 開發板除錯"
+
+#
+msgid "Debugging supported:"
+msgstr "支持除錯："
+
+#
+msgid "Default"
+msgstr "預設"
+
+#
+msgid "Default FQBN set to"
+msgstr "預設的 FQBN 設定為"
+
+#
+msgid "Default port set to"
+msgstr "預設的連接埠設定為"
+
+#
+msgid "Delete Boards/Library Manager download cache."
+msgstr "刪除開發板/程式庫管理員下載快取"
+
+#
+msgid "Delete contents of the `directories.downloads` folder, where archive files are staged during installation of libraries and boards platforms."
+msgstr "刪除 `directories.downloads` 裏面的內容, 裏面有在安裝程式庫和開發板平台時所暫存的檔案。"
+
+#
+msgid "Deletes a settings key and all its sub keys."
+msgstr "刪除某設定鍵和所有子鍵。"
+
+#
+msgid "Dependencies: %s"
+msgstr "相依：%s"
+
+#
+msgid "Description"
+msgstr "說明"
+
+#
+msgid "Detecting libraries used..."
+msgstr "檢測有使用的程式庫中..."
+
+#
+msgid "Detects and displays a list of boards connected to the current computer."
+msgstr "檢測並顯示連接到電腦的開發板清單。"
+
+#
+msgid "Directory containing binaries for debug."
+msgstr "內含供除錯用二進位檔的目錄。"
+
+#
+msgid "Directory containing binaries to upload."
+msgstr "內含供上傳用二進位檔的目錄。"
+
+#
+msgid "Directory where to save generated files. Default is './docs', the directory must exist."
+msgstr "保存生成檔的目錄。預設為 ./docs，該目錄必須存在。"
+
+#
+msgid "Disable completion description for shells that support it"
+msgstr "關閉 shell 的完成描述功能"
+
+#
+msgid "Disconnected"
+msgstr "已斷開連接"
+
+#
+msgid "Display only the provided gRPC calls"
+msgstr "只顯示提供的 gRPC 呼叫"
+
+#
+msgid "Do not install dependencies."
+msgstr "不要安裝相依檔。"
+
+#
+msgid "Do not overwrite already installed libraries."
+msgstr "不要覆蓋已安裝的程式庫。"
+
+#
+msgid "Do not overwrite already installed platforms."
+msgstr "不要覆蓋已安裝的平台。"
+
+#
+msgid "Do not perform the actual upload, just log out actions"
+msgstr "不要真的上傳，取消實際行動"
+
+#
+msgid "Do not terminate daemon process if the parent process dies"
+msgstr "就算父程序已GG了，也不需中止背景程式。"
+
+#
+msgid "Downloading %s"
+msgstr "下載 %s 中"
+
+#
+msgid "Downloading index signature: %s"
+msgstr "下載索引簽名: %s "
+
+#
+msgid "Downloading index: %s"
+msgstr "下載索引: %s "
+
+#
+msgid "Downloading library %s"
+msgstr "下載程式庫 %s"
+
+#
+msgid "Downloading missing tool %s"
+msgstr "下載遺失的工具  %s "
+
+#
+msgid "Downloading packages"
+msgstr "下載安裝包"
+
+#
+msgid "Downloading platform %s"
+msgstr "下載平台 %s"
+
+#
+msgid "Downloading tool %s"
+msgstr "下載工具 %s "
+
+#
+msgid "Downloads one or more cores and corresponding tool dependencies."
+msgstr "下載一或多個核心及相依工具"
+
+#
+msgid "Downloads one or more libraries without installing them."
+msgstr "下載一或多個程式庫, 但不安裝。"
+
+#
+msgid "Enable debug logging of gRPC calls"
+msgstr "啟用 gRPC 呼叫的除錯日誌"
+
+#
+msgid "Enter a path to zip file"
+msgstr "輸入 zip 壓縮檔的路徑"
+
+#
+msgid "Enter git url for libraries hosted on repositories"
+msgstr "輸入托管程式庫的 git 位址"
+
+#
+msgid "Error adding file to sketch archive"
+msgstr "將檔案加入 sketch 時出錯"
+
+#
+msgid "Error archiving built core (caching) in %[1]s: %[2]s"
+msgstr "在 %[1]s 中儲存編譯核心（快取）時出錯：%[2]s"
+
+#
+msgid "Error archiving: %v"
+msgstr "錯誤歸檔：%v"
+
+#
+msgid "Error calculating relative file path"
+msgstr "計算相關檔案路徑時出錯"
+
+#
+msgid "Error cleaning caches: %v"
+msgstr "清理快取時出錯：%v"
+
+#
+msgid "Error converting path to absolute: %v"
+msgstr "將路徑轉換成絕對路徑時出錯：%v"
+
+#
+msgid "Error copying output file %s"
+msgstr "複製輸出檔 %s 時出錯"
+
+#
+msgid "Error creating instance: %v"
+msgstr "建立實例時出錯：%v"
+
+#
+msgid "Error creating output dir"
+msgstr "建立輸出目錄時出錯"
+
+#
+msgid "Error creating sketch archive"
+msgstr "建立 sketch 檔時出錯"
+
+#
+msgid "Error creating sketch: %v"
+msgstr "建立 sketch 時出錯：%v"
+
+#
+msgid "Error detecting boards: %v"
+msgstr "偵測開發板時出錯：%v"
+
+#
+msgid "Error downloading %[1]s: %[2]v"
+msgstr "下載 %[1]s 時出錯：%[2]v"
+
+#
+msgid "Error downloading %s"
+msgstr "下載 %s 時出錯"
+
+#
+msgid "Error downloading index '%s'"
+msgstr "下載索引'%s'時出錯"
+
+#
+msgid "Error downloading index signature '%s'"
+msgstr "下載索引簽名 '%s' 時出錯"
+
+#
+msgid "Error downloading library %s"
+msgstr "下載程式庫 %s 時出錯"
+
+#
+msgid "Error downloading platform %s"
+msgstr "下載平台 %s 時出錯"
+
+#
+msgid "Error downloading tool %s"
+msgstr "下載工具 %s 時出錯"
+
+#
+msgid "Error during Debug: %v"
+msgstr "除錯時出錯：%v"
+
+#
+msgid "Error during FQBN detection: %v"
+msgstr "FQBN 偵測時出錯：%v"
+
+#
+msgid "Error during JSON encoding of the output: %v"
+msgstr "輸出 JSON 編碼過程時出錯：%v"
+
+#
+msgid "Error during Upload: %v"
+msgstr "上傳時出錯：%v"
+
+#
+msgid "Error during YAML encoding of the output: %v"
+msgstr "輸出 YAML 編碼過程時出錯：%v"
+
+#
+msgid "Error during build: %v"
+msgstr "建構時出錯：%v"
+
+#
+msgid "Error during install: %v"
+msgstr "安裝時出錯：%v"
+
+#
+msgid "Error during uninstall: %v"
+msgstr "卸載時出錯：%v"
+
+#
+msgid "Error during upgrade: %v"
+msgstr "升級時出錯：%v"
+
+#
+msgid "Error extracting %s"
+msgstr "解開 %s 時出錯"
+
+#
+msgid "Error finding build artifacts"
+msgstr "尋找建構成品時出錯"
+
+#
+msgid "Error getting Debug info: %v"
+msgstr "取得除錯資訊時出錯：%v"
+
+#
+msgid "Error getting absolute path of sketch archive"
+msgstr "獲取項目存檔的絕對路徑時出錯"
+
+#
+msgid "Error getting board details: %v"
+msgstr "獲取開發板詳細資訊時出錯：%v"
+
+#
+msgid "Error getting current directory for compilation database: %s"
+msgstr "取得編譯資料庫所在目錄時出錯：%s"
+
+#
+msgid "Error getting information for library %s"
+msgstr "取得程式庫 %s 資訊時出錯"
+
+#
+msgid "Error getting libraries info: %v"
+msgstr "取得程式庫資訊時出錯：%v"
+
+#
+msgid "Error getting port metadata: %v"
+msgstr "取得連接埠資料出錯：%v"
+
+#
+msgid "Error getting port settings details: %s"
+msgstr "取得連接埠詳細設定時出錯：%s"
+
+#
+msgid "Error getting user input"
+msgstr "取得用戶輸入時出錯"
+
+#
+msgid "Error initializing instance: %v"
+msgstr "初始化實例時出錯：%v"
+
+#
+msgid "Error installing %s: %v"
+msgstr "安裝 %s 時出錯：%v"
+
+#
+msgid "Error installing Git Library: %v"
+msgstr "安裝 Git 程式庫時出錯：%v"
+
+#
+msgid "Error installing Zip Library: %v"
+msgstr "安裝 Zip 程式庫時出錯：%v"
+
+#
+msgid "Error installing library %s"
+msgstr "安裝 %s 程式庫時出錯"
+
+#
+msgid "Error installing platform %s"
+msgstr "安裝 %s 平台時出錯"
+
+#
+msgid "Error installing tool %s"
+msgstr "安裝 %s 工具時出錯"
+
+#
+msgid "Error listing boards: %v"
+msgstr "列出開發板清單時出錯：%v"
+
+#
+msgid "Error listing libraries: %v"
+msgstr "列出程式庫清單時出錯：%v"
+
+#
+msgid "Error listing platforms: %v"
+msgstr "列出平台清單時出錯：%v"
+
+#
+msgid "Error loading hardware platform"
+msgstr "載入硬體平台時出錯"
+
+#
+msgid "Error loading index %s"
+msgstr "載入 %s 索引時出錯"
+
+#
+msgid "Error opening %s"
+msgstr "打開 %s 時出錯"
+
+#
+msgid "Error opening debug logging file: %s"
+msgstr "打開除錯日誌檔時出錯：%s"
+
+#
+msgid "Error opening source code overrides data file: %v"
+msgstr "打開原始碼覆寫資料檔時出錯：%v"
+
+#
+msgid "Error parsing --show-properties flag: %v"
+msgstr "解析 --show-properties 參數時出錯：%v"
+
+#
+msgid "Error reading build directory"
+msgstr "讀取建構目錄時出錯"
+
+#
+msgid "Error reading config file: %v"
+msgstr "讀取設定檔時出錯：%v"
+
+#
+msgid "Error reading sketch files"
+msgstr "讀取 sketch 檔時出錯"
+
+#
+msgid "Error resolving dependencies for %[1]s: %[2]s"
+msgstr "解析 %[1]s 的相依時出錯：%[2]s"
+
+#
+msgid "Error retrieving core list: %v"
+msgstr "取得核心列表時出錯：%v"
+
+#
+msgid "Error rolling-back changes: %s"
+msgstr "回復更改時出錯：%s"
+
+#
+msgid "Error saving downloaded index"
+msgstr "儲存下載的索引時出錯"
+
+#
+msgid "Error saving downloaded index signature"
+msgstr "儲存下載的索引簽名時出錯"
+
+#
+msgid "Error searching boards: %v"
+msgstr "搜尋開發板時出錯: %v"
+
+#
+msgid "Error searching for Libraries: %v"
+msgstr "搜尋程式庫時出錯: %v"
+
+#
+msgid "Error searching for platforms: %v"
+msgstr "搜尋平台時出錯：%v"
+
+#
+msgid "Error serializing compilation database: %s"
+msgstr "序列化編譯資料庫時出錯：%s"
+
+#
+msgid "Error starting discovery: %v"
+msgstr "啟動探索時出錯：%v"
+
+#
+msgid "Error uninstalling %[1]s: %[2]v"
+msgstr "卸載 %[1]s 時出錯：%[2]v"
+
+#
+msgid "Error updating library index: %v"
+msgstr "更新程式庫索引時出錯：%v"
+
+#
+msgid "Error upgrading libraries"
+msgstr "更新程式庫時出錯"
+
+#
+msgid "Error upgrading platform: %s"
+msgstr "更新平台時出錯：%s"
+
+#
+msgid "Error verifying signature"
+msgstr "驗證簽名時出錯"
+
+#
+msgid "Error while detecting libraries included by %[1]s"
+msgstr "偵測 %[1]s 所包含的程式庫時出錯"
+
+#
+msgid "Error while determining sketch size: %s"
+msgstr "確定 sketch 大小時出錯：%s"
+
+#
+msgid "Error writing compilation database: %s"
+msgstr "寫入編譯資料庫時出錯：%s"
+
+#
+msgid "Error: command description is not supported by %v"
+msgstr "錯誤：%v 不支持命令說明"
+
+#
+msgid "Error: invalid source code overrides data file: %v"
+msgstr "錯誤：無效的原始碼覆蓋了資料檔：%v"
+
+#
+msgid "Event"
+msgstr "事件"
+
+#
+msgid "Examples for library %s"
+msgstr "%s 程式庫的範例"
+
+#
+msgid "Examples:"
+msgstr "範例："
+
+#
+msgid "Executable to debug"
+msgstr "可執行來除錯"
+
+#
+msgid "Expected compiled sketch in directory %s, but is a file instead"
+msgstr "%s 目錄內理應有已編譯的 sketch，卻只有個檔案"
+
+#
+msgid "FQBN"
+msgstr "FQBN"
+
+#
+msgid "FQBN:"
+msgstr "FQBN："
+
+#
+msgid "Failed chip erase"
+msgstr "晶片擦除失敗"
+
+#
+msgid "Failed programming"
+msgstr "燒錄失敗"
+
+#
+msgid "Failed to burn bootloader"
+msgstr "無法燒錄 bootloader"
+
+#
+msgid "Failed to create data directory"
+msgstr "建立資料目錄失敗"
+
+#
+msgid "Failed to create downloads directory"
+msgstr "建立下載檔案夾失敗"
+
+#
+msgid "Failed to listen on TCP port: %[1]s. %[2]s is an invalid port."
+msgstr "監聽 TCP 埠失敗：%[1]s. %[2]s 是無效連接埠。"
+
+#
+msgid "Failed to listen on TCP port: %[1]s. %[2]s is unknown name."
+msgstr "監聽 TCP 埠失敗：%[1]s. %[2]s 是未知名稱。"
+
+#
+msgid "Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v"
+msgstr "監聽 TCP 埠失敗：%[1]s. 未預期的錯誤：%[2]v"
+
+#
+msgid "Failed to listen on TCP port: %s. Address already in use."
+msgstr "監聽 TCP 埠：%s 失敗。位址已被使用。"
+
+#
+msgid "Failed uploading"
+msgstr "上傳失敗"
+
+#
+msgid "File:"
+msgstr "檔案："
+
+#
+msgid "Firmware encryption/signing requires all the following properties to be defined: %s"
+msgstr "韌體加密/簽名需要定義以下全部屬性：%s"
+
+#
+msgid "First message must contain debug request, not data"
+msgstr "第一則訊息必須包含除錯請求，而不是資料"
+
+#
+msgid "Flag %[1]s is mandatory when used in conjunction with: %[2]s"
+msgstr "參數 %[1]s 當與：%[2]s 一起使用時必須強制使用"
+
+#
+msgid "Flags:"
+msgstr "參數："
+
+#
+msgid "Force run of post-install scripts (if the CLI is not running interactively)."
+msgstr "強制執行安裝後指令檔（如果 CLI 未以互動方式執行）"
+
+#
+msgid "Force skip of post-install scripts (if the CLI is running interactively)."
+msgstr "強制跳過安裝後指令檔（如果 CLI 以互動方式運行）。"
+
+#
+msgid "Found %d platform for reference \"%s\":\n" 
+"%s"
+msgstr "找到 %d 平台供參照 \"%s\":\n"
+"%s"
+
+#
+msgid "Fully Qualified Board Name, e.g.: arduino:avr:uno"
+msgstr "完全合格的開發板名，例如：arduino:avr:uno"
+
+#
+msgid "GDB Server path"
+msgstr "GDB 伺服器路徑"
+
+#
+msgid "GDB Server type"
+msgstr "GDB 伺服器類型"
+
+#
+msgid "GDB server '%s' is not supported"
+msgstr "不支持 GDB 伺服器 '%s'"
+
+#
+msgid "Generates bash completion and command manpages."
+msgstr "已生成 bash 和命令手冊。"
+
+#
+msgid "Generates completion scripts"
+msgstr "已生成指令檔"
+
+#
+msgid "Generates completion scripts for various shells"
+msgstr "已為各种 shell 生成指令檔"
+
+#
+msgid "Generating function prototypes..."
+msgstr "生成函數原型。。。"
+
+#
+msgid "Global Flags:"
+msgstr "全域旗標："
+
+#
+msgid "Global variables use %[1]s bytes (%[3]s%%) of dynamic memory, leaving %[4]s bytes for local variables. Maximum is %[2]s bytes."
+msgstr "全域變數使用 %[1]s 位元組 (%[3]s%%) 的動態記憶體, 保留 %[4]s 位元組給區域變數. 最大 %[2]s 位元組."
+
+#
+msgid "Global variables use %[1]s bytes of dynamic memory."
+msgstr "全域變數使用 %[1]s 位元組的動態記憶體。"
+
+#
+msgid "ID"
+msgstr "ID"
+
+#
+msgid "Id"
+msgstr "Id"
+
+#
+msgid "Identification properties:"
+msgstr "標識屬性："
+
+#
+msgid "If set built binaries will be exported to the sketch folder."
+msgstr "一經設定，建構的二進位檔將導出到 sketch 檔案夾。"
+
+#
+msgid "If set return all installable and installed cores, including manually installed."
+msgstr "如有設定，傳回所有可安裝和已安裝的核心，包括手動安裝的核心。"
+
+#
+msgid "Include built-in libraries (from platforms and IDE) in listing."
+msgstr "列表內包含內建程式庫（來自平台和 IDE）。"
+
+#
+msgid "Includes %s directory in the archive."
+msgstr "在存檔中包含 %s 目錄。"
+
+#
+msgid "Install libraries in the IDE-Builtin directory"
+msgstr "安裝程式庫到 IDE-Builtin 目錄"
+
+#
+msgid "Installed"
+msgstr "已安裝"
+
+#
+msgid "Installed %s"
+msgstr "已安裝 %s"
+
+#
+msgid "Installing %s"
+msgstr "安裝 %s ..."
+
+#
+msgid "Installing library %s"
+msgstr "安裝程式庫 %s ..."
+
+#
+msgid "Installing platform %s"
+msgstr "安裝 %s 平台..."
+
+#
+msgid "Installing tool %s"
+msgstr "安裝 %s 工具..."
+
+#
+msgid "Installs one or more cores and corresponding tool dependencies."
+msgstr "安裝一或多個核心和相關的工具相依。"
+
+#
+msgid "Installs one or more specified libraries into the system."
+msgstr "安裝一或多個指定的程式庫到系統中。"
+
+#
+msgid "Internal error in cache"
+msgstr "快取中的內部錯誤"
+
+#
+msgid "Invalid '%[1]s' property: %[2]s"
+msgstr "無效的 '%[1]s' 屬性：%[2]s"
+
+#
+msgid "Invalid Call : should show Help, but it is available only in TEXT mode."
+msgstr "無效呼叫：應顯示求助，但只在文字模式下能用。"
+
+#
+msgid "Invalid FQBN"
+msgstr "無效的 FQBN"
+
+#
+msgid "Invalid TCP address: port is missing"
+msgstr "無效的 TCP 位址：缺少連接埠"
+
+#
+msgid "Invalid URL"
+msgstr "無效的網址"
+
+#
+msgid "Invalid additional URL: %v"
+msgstr "無效的額外網址：%v"
+
+#
+msgid "Invalid archive: file %{1}s not found in archive %{2}s"
+msgstr "無效存檔：存檔 %{1}s 中未找到檔案 %{2}s"
+
+#
+msgid "Invalid argument passed: %v"
+msgstr "傳送的參數無效：%v"
+
+#
+msgid "Invalid build properties"
+msgstr "無效的建構屬性"
+
+#
+msgid "Invalid data size regexp: %s"
+msgstr "無效的資料大小正規表示式：%s"
+
+#
+msgid "Invalid eeprom size regexp: %s"
+msgstr "無效的 eeprom 大小正規表示式：%s"
+
+#
+msgid "Invalid instance"
+msgstr "無效的實例"
+
+#
+msgid "Invalid item %s"
+msgstr "無效的項目 %s"
+
+#
+msgid "Invalid library"
+msgstr "無效的程式庫"
+
+#
+msgid "Invalid network.proxy '%[1]s': %[2]s"
+msgstr "無效的 '%[1]s' 網路代理: %[2]s"
+
+#
+msgid "Invalid option for --log-level: %s"
+msgstr "--log-level: %s 選項無效"
+
+#
+msgid "Invalid output format: %s"
+msgstr "無效的輸出格式：%s"
+
+#
+msgid "Invalid package index in %s"
+msgstr "%s 內的套件包索引無效"
+
+#
+msgid "Invalid parameter %s: version not allowed"
+msgstr "無效 %s 參數：版本不允許"
+
+#
+msgid "Invalid pid value: '%s'"
+msgstr "無效的 pid 值：'%s'"
+
+#
+msgid "Invalid profile"
+msgstr "無效的設定檔"
+
+#
+msgid "Invalid recipe in platform.txt"
+msgstr "platform.txt 中的方法無效"
+
+#
+msgid "Invalid size regexp: %s"
+msgstr "無效的大小正規表示式：%s"
+
+#
+msgid "Invalid timeout: %s"
+msgstr "無效的超時：%s"
+
+#
+msgid "Invalid version"
+msgstr "無效的版本"
+
+#
+msgid "Invalid vid value: '%s'"
+msgstr "無效的 vid 值：'%s'"
+
+#
+msgid "Just produce the compilation database, without actually compiling. All build commands are skipped except pre* hooks."
+msgstr "只產生編譯資料庫，不實際編譯。跳過除 pre* 以外的所有建構指令。"
+
+#
+msgid "LIBNAME"
+msgstr "程式庫名"
+
+#
+msgid "LIBRARY"
+msgstr "程式庫"
+
+#
+msgid "LIBRARY_NAME"
+msgstr "程式庫_名"
+
+#
+msgid "Latest"
+msgstr "最新的"
+
+#
+msgid "Library %[1]s has been declared precompiled:"
+msgstr "程式庫 %[1]s 已聲明為預編譯："
+
+#
+msgid "Library %[1]s is already installed, but with a different version: %[2]s"
+msgstr "程式庫 %[1]s 已經安裝, 但版本不同: %[2]s"
+
+#
+msgid "Library %s is already at the latest version"
+msgstr "程式庫 %s 已是最新版"
+
+#
+msgid "Library %s is not installed"
+msgstr "%s 程式庫未安裝"
+
+#
+msgid "Library %s not found"
+msgstr "未找到程式庫 %s "
+
+#
+msgid "Library '%s' not found"
+msgstr "未找到程式庫 '%s'"
+
+#
+msgid "Library can't use both '%[1]s' and '%[2]s' folders. Double check in '%[3]s'."
+msgstr "程式庫不能同時用'%[1]s'和'%[2]s'檔案夾。再檢查 '%[3]s'."
+
+#
+msgid "Library install failed"
+msgstr "程式庫安裝失敗"
+
+#
+msgid "Library installed"
+msgstr "已安裝的程式庫"
+
+#
+msgid "License: %s"
+msgstr "許可證：%s"
+
+#
+msgid "Linking everything together..."
+msgstr "將所有內容鏈接在一起。。。"
+
+#
+msgid "List all boards that have the support platform installed. You can search\n"
+"for a specific board if you specify the board name"
+msgstr "列出已安裝被支援平台的所有開發板。輸入開發板名，也可進行搜尋"
+
+#
+msgid "List all known boards and their corresponding FQBN."
+msgstr "列出所有已知開發板及其相應的 FQBN。"
+
+#
+msgid "List connected boards."
+msgstr "列出已連接的開發板。"
+
+#
+msgid "List of board options separated by commas. Or can be used multiple times for multiple options."
+msgstr "列出開發板選項列表。可多選項多次使用。"
+
+#
+msgid "List of custom build properties separated by commas. Or can be used multiple times for multiple properties."
+msgstr "列出自定義屬性列表。可多屬性多次使用。"
+
+#
+msgid "List updatable libraries."
+msgstr "列出可更新的程式庫。"
+
+#
+msgid "List updatable platforms."
+msgstr "列出可更新的平台。"
+
+#
+msgid "Lists all connected boards."
+msgstr "列出所有連接的開發板。"
+
+#
+msgid "Lists cores and libraries that can be upgraded"
+msgstr "列出可升級的核心和程式庫"
+
+#
+msgid "Loading index file: %v"
+msgstr "載入索引檔：%v"
+
+#
+msgid "Location"
+msgstr "位置"
+
+#
+msgid "Low memory available, stability problems may occur."
+msgstr "可用記憶體不足，可能會有穩定性問題。"
+
+#
+msgid "Maintainer: %s"
+msgstr "維護者：%s"
+
+#
+msgid "Max time to wait for port discovery, e.g.: 30s, 1m"
+msgstr "等待連接埠探尋的最長時間，例如：30s, 1m"
+
+#
+msgid "Messages with this level and above will be logged. Valid levels are: %s"
+msgstr "記錄此等級(含)以上的訊息。有效等級為 %s"
+
+#
+msgid "Missing '%[1]s' from library in %[2]s"
+msgstr "%[2]s 的程式庫缺少 '%[1]s'"
+
+#
+msgid "Missing FQBN (Fully Qualified Board Name)"
+msgstr "缺少 FQBN（完全合格開發板名）"
+
+#
+msgid "Missing port"
+msgstr "找不到連接埠"
+
+#
+msgid "Missing port address"
+msgstr "缺少連接埠地址"
+
+#
+msgid "Missing port protocol"
+msgstr "找不到連接埠協議"
+
+#
+msgid "Missing programmer"
+msgstr "找不到燒錄器"
+
+#
+msgid "Missing size regexp"
+msgstr "缺少大小正規表示式"
+
+#
+msgid "Missing sketch path"
+msgstr "缺少 sketch 路徑"
+
+#
+msgid "Monitor '%s' not found"
+msgstr "找不到'%s' 監視器"
+
+#
+msgid "Monitor port settings:"
+msgstr "監視連接埠設定："
+
+#
+msgid "Multiple libraries were found for \"%[1]s\""
+msgstr "為 “%[1]s” 找到了多個程式庫"
+
+#
+msgid "Name"
+msgstr "名"
+
+#
+msgid "Name: \"%s\""
+msgstr "名：“%s”"
+
+#
+msgid "New upload port: %[1]s (%[2]s)"
+msgstr "新上傳連接埠: %[1]s (%[2]s)"
+
+#
+msgid "No boards found."
+msgstr "沒找到開發板"
+
+#
+msgid "No default port or FQBN set"
+msgstr "未設定預設連接埠或 FQBN"
+
+#
+msgid "No libraries found."
+msgstr "沒找到程式庫。"
+
+#
+msgid "No libraries installed."
+msgstr "沒安裝程式庫。"
+
+#
+msgid "No libraries matching your search."
+msgstr "沒有你想找的程式庫。"
+
+#
+msgid "No libraries matching your search.\n" 
+"Did you mean...\n" 
+""
+msgstr "沒有符合你想找的程式庫.\n"
+"你的意思是...\n" 
+""
+
+#
+msgid "No libraries update is available."
+msgstr "沒的程式庫更新檔。"
+
+#
+msgid "No monitor available for the port protocol %s"
+msgstr "沒有可用於連接埠協議 %s 的監視器"
+
+#
+msgid "No outdated platforms or libraries found."
+msgstr "沒找到已過時的平台或程式庫。"
+
+#
+msgid "No platforms installed."
+msgstr "沒安裝任何平台。"
+
+#
+msgid "No platforms matching your search."
+msgstr "沒有你想找的平台。"
+
+#
+msgid "No upload port found, using %s as fallback"
+msgstr "沒找到上傳連接埠，使用 %s 作為後援"
+
+#
+msgid "No valid dependencies solution found"
+msgstr "找不到有效的相依性解決方案"
+
+#
+msgid "Not enough memory; see %[1]s for tips on reducing your footprint."
+msgstr "記憶體不足；有關減少用量的提示，請參見 %[1]s。"
+
+#
+msgid "Not used: %[1]s"
+msgstr "未使用：%[1]s"
+
+#
+msgid "OS:"
+msgstr "作業系統："
+
+#
+msgid "Official Arduino board:"
+msgstr "官方 Arduino 開發板："
+
+#
+msgid "Omit library details far all versions except the latest (produce a more compact JSON output)."
+msgstr "省略程式庫中除最新版本以外的所有版本（產出更精簡的 JSON ）."
+
+#
+msgid "Open a communication port with a board."
+msgstr "開啟開發板的通信連接埠。"
+
+#
+msgid "Option:"
+msgstr "選項："
+
+#
+msgid "Optional, can be: %s. Used to tell gcc which warning level to use (-W flag)."
+msgstr "選項，可以是：%s。用來告訴 gcc 使用哪個警告級別（-W 參數）."
+
+#
+msgid "Optional, cleanup the build folder and do not use any cached build."
+msgstr "選項，清理建構用的檔案夾且不使用任何快取。"
+
+#
+msgid "Optional, optimize compile output for debugging, rather than for release."
+msgstr "選項，優化編譯用於除錯的輸出，還不到發佈用."
+
+#
+msgid "Optional, suppresses almost every output."
+msgstr "選項，禁止全部輸出。"
+
+#
+msgid "Optional, turns on verbose mode."
+msgstr "選項，開啟詳細模式。"
+
+#
+msgid "Optional. Path to a .json file that contains a set of replacements of the sketch source code."
+msgstr "選項。 包含一組替代 sketch 原始碼的 .json 檔的路徑."
+
+#
+msgid "Override a build property with a custom value. Can be used multiple times for multiple properties."
+msgstr "用自定義值替代建構屬性。可多次使用多個屬性."
+
+#
+msgid "Overwrite existing config file."
+msgstr "覆蓋現有的設定檔。"
+
+#
+msgid "Overwrites an already existing archive"
+msgstr "覆蓋一個已存在的存檔"
+
+#
+msgid "Overwrites an existing .ino sketch."
+msgstr "覆蓋現有的 .ino sketch 檔。"
+
+#
+msgid "PACKAGER"
+msgstr "套件程式"
+
+#
+msgid "Package URL:"
+msgstr "套件網址："
+
+#
+msgid "Package maintainer:"
+msgstr "套件維護者："
+
+#
+msgid "Package name:"
+msgstr "套件名："
+
+#
+msgid "Package online help:"
+msgstr "套件線上協助"
+
+#
+msgid "Package website:"
+msgstr "套件網站："
+
+#
+msgid "Paragraph: %s"
+msgstr "段落：%s"
+
+#
+msgid "Path"
+msgstr "路徑"
+
+#
+msgid "Path to a collection of libraries. Can be used multiple times or entries can be comma separated."
+msgstr "程式庫集合的路徑。可多次使用，或以逗號分隔。"
+
+#
+msgid "Path to a single library's root folder. Can be used multiple times or entries can be comma separated."
+msgstr "單一程式庫的根目錄路徑。可多次使用，或以逗號分隔。"
+
+#
+msgid "Path to the file where logs will be written."
+msgstr "日誌檔的路徑。"
+
+#
+msgid "Path where to save compiled files. If omitted, a directory will be created in the default temporary path of your OS."
+msgstr "保存已編譯檔的路徑。如果省略，將在作業系統預設的臨時目錄中建立。"
+
+#
+msgid "Performing 1200-bps touch reset on serial port %s"
+msgstr "在 %s 連接埠上執行 1200-bps TOUCH 重置"
+
+#
+msgid "Platform %s already installed"
+msgstr "%s 平台已安裝過"
+
+#
+msgid "Platform %s installed"
+msgstr "已安裝 %s 平台"
+
+#
+msgid "Platform %s is not found in any known index\n"
+"Maybe you need to add a 3rd party URL?"
+msgstr "在已知索引中找不到 %s 平台\n"
+"也許你需要加上第三方位址？"
+
+#
+msgid "Platform %s uninstalled"
+msgstr "%s 平台已卸載"
+
+#
+msgid "Platform '%s' is already at the latest version"
+msgstr "'%s' 平台已是最新版"
+
+#
+msgid "Platform '%s' not found"
+msgstr "未找到 '%s' 平台"
+
+#
+msgid "Platform ID"
+msgstr "平台 ID"
+
+#
+msgid "Platform ID is not correct"
+msgstr "平台 ID 不正確"
+
+#
+msgid "Platform URL:"
+msgstr "平台位址："
+
+#
+msgid "Platform architecture:"
+msgstr "平台架構："
+
+#
+msgid "Platform category:"
+msgstr "平台類別："
+
+#
+msgid "Platform checksum:"
+msgstr "平台校驗碼："
+
+#
+msgid "Platform file name:"
+msgstr "平台檔案名："
+
+#
+msgid "Platform name:"
+msgstr "平台名稱："
+
+#
+msgid "Platform size (bytes):"
+msgstr "平台大小（位元組）："
+
+#
+msgid "Please specify an FQBN. Multiple possible boards detected on port %[1]s with protocol %[2]s"
+msgstr "請指定一個 FQBN。在 %[1]s 連接埠以協議 %[2]s 檢測到多個可能的開發板"
+
+#
+msgid "Please specify an FQBN. The board on port %[1]s with protocol %[2]s can't be identified"
+msgstr "請指定一個 FQBN。%[1]s 連接埠以協議 %[2]s 的開發板無法識別"
+
+#
+msgid "Port"
+msgstr "連接埠"
+
+#
+msgid "Port closed: %v"
+msgstr "連接埠關閉：%v"
+
+#
+msgid "Port monitor error"
+msgstr "連接埠監視器錯誤"
+
+#
+msgid "Precompiled library in \"%[1]s\" not found"
+msgstr "在“%[1]s”找不到預編譯程式庫"
+
+#
+msgid "Print details about a board."
+msgstr "列出開發板的詳細資訊。"
+
+#
+msgid "Print preprocessed code to stdout instead of compiling."
+msgstr "將預處理的代碼在標準輸出列出，而不是編譯。"
+
+#
+msgid "Print the logs on the standard output."
+msgstr "在標準輸出上印出日誌。"
+
+#
+msgid "Prints the current configuration"
+msgstr "印出目前設定"
+
+#
+msgid "Prints the current configuration."
+msgstr "印出目前設定。"
+
+#
+msgid "Profile '%s' not found"
+msgstr "未找到'%s'的設定檔''。"
+
+#
+msgid "Programmer '%s' not found"
+msgstr "未找到'%s'燒錄器"
+
+#
+msgid "Programmer name"
+msgstr "燒錄器名"
+
+#
+msgid "Programmer to use, e.g: atmel_ice"
+msgstr "要使用的燒錄器，例如：atmel_ice"
+
+#
+msgid "Programmers:"
+msgstr "燒錄器："
+
+#
+msgid "Property '%s' is undefined"
+msgstr "'%s' 屬性未定義"
+
+#
+msgid "Protocol"
+msgstr "協議"
+
+#
+msgid "Provides includes: %s"
+msgstr "提供包括：%s"
+
+#
+msgid "Removes one or more values from a setting."
+msgstr "從設定中刪除一或多個值。"
+
+#
+msgid "Replacing %[1]s with %[2]s"
+msgstr "將 %[1]s 替換成 %[2]s"
+
+#
+msgid "Replacing platform %[1]s with %[2]s"
+msgstr "用 %[2]s 替換 %[1]s 平台"
+
+#
+msgid "Required tool:"
+msgstr "需要的工具："
+
+#
+msgid "Run as a daemon on port: %s"
+msgstr "在連接埠: %s 以背景程式執行"
+
+#
+msgid "Run in silent mode, show only monitor input and output."
+msgstr "以靜默模式執行，只顯示監視輸入和輸出。"
+
+#
+msgid "Running as a daemon the initialization of cores and libraries is done only once."
+msgstr "以背景程式執行時，只執行一次核心和程式庫的初始化。"
+
+#
+msgid "Running normal build of the core..."
+msgstr "以正常建構的核心執行..."
+
+#
+msgid "Save build artifacts in this directory."
+msgstr "將建構成品存在此目錄。"
+
+#
+msgid "Search for a board in the Boards Manager using the specified keywords."
+msgstr "使用指定的關鍵詞在開發板管理員中尋找開發板。"
+
+#
+msgid "Search for a board in the Boards Manager."
+msgstr "在開發板管理員中尋找開發板。"
+
+#
+msgid "Search for a core in Boards Manager using the specified keywords."
+msgstr "使用指定的關鍵字在開發板管理員中尋找核心。"
+
+#
+msgid "Search for a core in Boards Manager."
+msgstr "在開發板管理員中尋找核心。"
+
+#
+msgid "Search for one or more libraries data (case insensitive search)."
+msgstr "尋找一或多個程式庫資料（不分大小寫）。"
+
+#
+msgid "Searches for one or more libraries data."
+msgstr "尋找一或多個程式庫資料。"
+
+#
+msgid "Sentence: %s"
+msgstr "句子：%s"
+
+#
+msgid "Server responded with: %s"
+msgstr "伺服器回應：%s"
+
+#
+msgid "Sets a setting value."
+msgstr "設定一個值。"
+
+#
+msgid "Sets the default values for port and FQBN. If no port or FQBN are specified, the current default port and FQBN are displayed."
+msgstr "設定連接埠和 FQBN 的預設值。如果沒有指定連接埠或 FQBN，將顯示當前的預設連接埠和 FQBN。"
+
+#
+msgid "Sets where to save the configuration file."
+msgstr "設定保存設定文件的位置。"
+
+#
+msgid "Setting"
+msgstr "設定"
+
+#
+msgid "Settings key doesn't exist"
+msgstr "設定鍵不存在"
+
+#
+msgid "Show all available core versions."
+msgstr "顯示所有可用的核心版本。"
+
+#
+msgid "Show all the settings of the communication port."
+msgstr "顯示通訊連接埠的所有設定。"
+
+#
+msgid "Show also boards marked as 'hidden' in the platform"
+msgstr "在平台上顯示標記為隱藏的開發板"
+
+#
+msgid "Show build properties. The properties are expanded, use \"--show-properties=unexpanded\" if you want them exactly as they are defined."
+msgstr "顯示編譯屬性. 屬性是攤開的, 如只想看定義, 請用 \"--show-properties=unexpanded\"."
+
+#
+msgid "Show full board details"
+msgstr "顯示完整的開發板詳細資訊"
+
+#
+msgid "Show information about a board, in particular if the board has options to be specified in the FQBN."
+msgstr "顯示開發板的資訊，特別是如果開發板在 FQBN 中有指定的選項。"
+
+#
+msgid "Show library names only."
+msgstr "只顯示程式庫名。"
+
+#
+msgid "Show list of available programmers"
+msgstr "顯示可用的燒錄器列表"
+
+#
+msgid "Show metadata about the debug session instead of starting the debugger."
+msgstr "顯示有關除錯對話的資料，而不是啟動除錯器。"
+
+#
+msgid "Show outdated cores and libraries after index update"
+msgstr "在索引更新後顯示過時的核心和程式庫"
+
+#
+msgid "Shows a list of installed libraries."
+msgstr "顯示已安裝的程式庫。"
+
+#
+msgid "Shows a list of installed libraries.\n"
+"\n"
+"If the LIBNAME parameter is specified the listing is limited to that specific\n"
+"library. By default the libraries provided as built-in by platforms/core are\n"
+"not listed, they can be listed by adding the --all flag."
+msgstr "顯示已安裝的程式庫。\n如果指定了 LIBNAME 程式庫名參數，則只列出該程式庫。\n預設情況下，不會列出 '平台/核心' 內建的程式庫，\n可以通過 --all 來顯示"
+
+#
+msgid "Shows the list of installed platforms."
+msgstr "顯示已安裝的平台。"
+
+#
+msgid "Shows the list of the examples for libraries."
+msgstr "顯示程式庫範例。"
+
+#
+msgid "Shows the list of the examples for libraries. A name may be given as argument to search a specific library."
+msgstr "顯示程式庫的範例列表。可以指定名稱。"
+
+#
+msgid "Shows the version number of Arduino CLI which is installed on your system."
+msgstr "顯示安裝在系統上的 Arduino CLI 的版本。"
+
+#
+msgid "Shows version number of Arduino CLI."
+msgstr "顯示 Arduino CLI 的版本。"
+
+#
+msgid "Size (bytes):"
+msgstr "大小（字元組）："
+
+#
+msgid "Sketch cannot be located in build path. Please specify a different build path"
+msgstr "sketch 不能放在編譯路徑上。請指定不同的編譯路徑"
+
+#
+msgid "Sketch created in: %s"
+msgstr "Sketch 建立在：%s"
+
+#
+msgid "Sketch profile to use"
+msgstr "Sketch 設定檔"
+
+#
+msgid "Sketch too big; see %[1]s for tips on reducing it."
+msgstr "Sketch 太大；請參閱 %[1]s，減少專案大小的提示。"
+
+#
+msgid "Sketch uses %[1]s bytes (%[3]s%%) of program storage space. Maximum is %[2]s bytes."
+msgstr "Sketch 使用 %[1]s 字元組（%[3]s%%）的程式儲存空間。最大 %[2]s 字元組。"
+
+#
+msgid "Sketches with .pde extension are deprecated, please rename the following files to .ino:"
+msgstr "使用 .pde 副檔名的 Sketch 專案已棄用，請將以下檔案的副檔名改成.ino"
+
+#
+msgid "Skip linking of final executable."
+msgstr "跳過鏈結成可執行檔。"
+
+#
+msgid "Skipping 1200-bps touch reset: no serial port selected!"
+msgstr "跳過 1200-bps TOUCH 重設：未選擇序列埠！"
+
+#
+msgid "Skipping archive creation of: %[1]s"
+msgstr "跳過以下的檔案建立：%[1]s"
+
+#
+msgid "Skipping compile of: %[1]s"
+msgstr "跳過編譯：%[1]s"
+
+#
+msgid "Skipping dependencies detection for precompiled library %[1]s"
+msgstr "跳過 %[1]s 預編譯程式庫的相依檢測"
+
+#
+msgid "Skipping platform configuration."
+msgstr "跳過平台設定。"
+
+#
+msgid "Skipping tool configuration."
+msgstr "跳過工具設定。"
+
+#
+msgid "Skipping: %[1]s"
+msgstr "跳過：%[1]s"
+
+#
+msgid "Some indexes could not be updated."
+msgstr "一些索引無法更新。"
+
+#
+msgid "Some upgrades failed, please check the output for details."
+msgstr "有些升級失敗了，詳情請看輸出結果。"
+
+#
+msgid "TOUCH: error during reset: %s"
+msgstr "TOUCH：重設時出錯：%s"
+
+#
+msgid "The TCP port the daemon will listen to"
+msgstr "背景程式將監聽 TCP 埠"
+
+#
+msgid "The custom config file (if not specified the default will be used)."
+msgstr "自定義設定檔（如果未指定，將使用預設值）。"
+
+#
+msgid "The flag --debug-file must be used with --debug."
+msgstr "參數 --debug-file 必須與 --debug 一起使用。"
+
+#
+msgid "The key '%[1]v' is not a list of items, can't add to it.\n"
+"Maybe use '%[2]s'?"
+msgstr "'%[1]v' 鍵不是項目列表，無法加入其中。\n"
+"是否使用 '%[2]s'？"
+
+#
+msgid "The key '%[1]v' is not a list of items, can't remove from it.\n"
+"Maybe use '%[2]s'?"
+msgstr "'%[1]v' 鍵不是項目列表，無法進行移除。\n"
+"是否使用 '%[2]s'？"
+
+#
+msgid "The library %s has multiple installations:"
+msgstr "程式庫 %s 有多個安裝。"
+
+#
+msgid "The name of the custom encryption key to use to encrypt a binary during the compile process. Used only by the platforms that support it."
+msgstr "自定義加密密鑰的名稱，用在編譯過程中對二進位碼進行加密。只在有支援的平台上使用。"
+
+#
+msgid "The name of the custom signing key to use to sign a binary during the compile process. Used only by the platforms that support it."
+msgstr "用在編譯過程中對二進位碼進行簽名的自定義簽名密鑰的名稱。只在有支援的平台上使用。"
+
+#
+msgid "The output format for the logs, can be: %s"
+msgstr "日誌的輸出格​​式，可以是：%s"
+
+#
+msgid "The path of the dir to search for the custom keys to sign and encrypt a binary. Used only by the platforms that support it."
+msgstr "尋找用以簽名和加密二進位碼的自定義密鑰檔案夾路徑。只在有支援的平台上使用。"
+
+#
+msgid "The platform does not support '%[1]s' for precompiled libraries."
+msgstr "本平台不支援預編譯程式庫的 '%[1]s'。"
+
+#
+msgid "This command upgrades an installed library to the latest available version. Multiple libraries can be passed separated by a space. If no arguments are provided, the command will upgrade all the installed libraries where an update is available."
+msgstr "本指令將升級已安裝的程式庫到最新版。多程式庫可以空格間格。如果未提供任何參數，將升級所有已安裝的程式庫。"
+
+#
+msgid "This commands shows a list of installed cores and/or libraries\n"
+"that can be upgraded. If nothing needs to be updated the output is empty."
+msgstr "本指令顯示可升級的已安裝核心和程式庫。\n如果沒需更新的，則輸出為空白。"
+
+#
+msgid "Tool %s already installed"
+msgstr "%s 工具已安裝"
+
+#
+msgid "Tool %s uninstalled"
+msgstr "%s 工具已卸載"
+
+#
+msgid "Toolchain '%s' is not supported"
+msgstr "不支持 '%s' 工具鏈"
+
+#
+msgid "Toolchain custom configurations"
+msgstr "工具鏈客製設定"
+
+#
+msgid "Toolchain path"
+msgstr "工具鏈路徑"
+
+#
+msgid "Toolchain prefix"
+msgstr "工具鏈前綴"
+
+#
+msgid "Toolchain type"
+msgstr "工具鏈類型"
+
+#
+msgid "Try running %s"
+msgstr "嘗試執行 %s"
+
+#
+msgid "Turns on verbose mode."
+msgstr "開啟詳細模式。"
+
+#
+msgid "Type"
+msgstr "類型"
+
+#
+msgid "Types: %s"
+msgstr "類型：%s"
+
+#
+msgid "URL:"
+msgstr "網址："
+
+#
+msgid "Unable to cache built core, please tell %[1]s maintainers to follow %[2]s"
+msgstr "無法快取建構核心，請告知 %[1]s 維護者注意 %[2]s"
+
+#
+msgid "Unable to get Documents Folder: %v"
+msgstr "無法取得文件檔案夾：%v"
+
+#
+msgid "Unable to get Local App Data Folder: %v"
+msgstr "無法取得本地應用程式資料檔案夾：%v"
+
+#
+msgid "Unable to get user home dir: %v"
+msgstr "無法取得用戶家目錄：%v"
+
+#
+msgid "Unable to open file for logging: %s"
+msgstr "無法開啟檔案做日誌記錄：%s"
+
+#
+msgid "Unable to parse URL"
+msgstr "無法解析位址"
+
+#
+msgid "Uninstalling %s"
+msgstr "正在卸載 %s"
+
+#
+msgid "Uninstalling %s, tool is no more required"
+msgstr "卸載 %s，工具不再需要了"
+
+#
+msgid "Uninstalls one or more cores and corresponding tool dependencies if no longer used."
+msgstr "如果不再需用到, 卸除一或多個核心及相依"
+
+#
+msgid "Uninstalls one or more libraries."
+msgstr "卸載一或多個程式庫。"
+
+#
+msgid "Unknown"
+msgstr "未知"
+
+#
+msgid "Unknown FQBN"
+msgstr "未知 FQBN"
+
+#
+msgid "Updates the index of cores and libraries"
+msgstr "更新核心和程式庫的索引"
+
+#
+msgid "Updates the index of cores and libraries to the latest versions."
+msgstr "將核心和程式庫的索引更新到最新。"
+
+#
+msgid "Updates the index of cores to the latest version."
+msgstr "更新核心索引到最新。"
+
+#
+msgid "Updates the index of cores."
+msgstr "更新核心索引。"
+
+#
+msgid "Updates the libraries index to the latest version."
+msgstr "更新程式庫索引到最新。"
+
+#
+msgid "Updates the libraries index."
+msgstr "更新程式庫索引。"
+
+#
+msgid "Upgrade doesn't accept parameters with version"
+msgstr "升級不接受版本參數"
+
+#
+msgid "Upgrades installed cores and libraries to latest version."
+msgstr "將已安裝的核心和程式庫升級到最新。"
+
+#
+msgid "Upgrades installed cores and libraries."
+msgstr "升級已安裝的核心和程式庫。"
+
+#
+msgid "Upgrades installed libraries."
+msgstr "升級已安裝的程式庫。"
+
+#
+msgid "Upgrades one or all installed platforms to the latest version."
+msgstr "將已安裝的平台升級到最新。"
+
+#
+msgid "Upload Arduino sketches."
+msgstr "上傳 Arduino sketch。"
+
+#
+msgid "Upload Arduino sketches. This does NOT compile the sketch prior to upload."
+msgstr "上傳 Arduino sketch。不會在上傳前編譯它。"
+
+#
+msgid "Upload port address, e.g.: COM3 or /dev/ttyACM2"
+msgstr "上傳連接埠地址，例如：COM3 或 /dev/ttyACM2"
+
+#
+msgid "Upload port found on %s"
+msgstr "在 %s 上找到上傳連接埠"
+
+#
+msgid "Upload port protocol, e.g: serial"
+msgstr "上傳連接埠協議，例如：序列"
+
+#
+msgid "Upload the binary after the compilation."
+msgstr "編譯完就上傳二進位碼。"
+
+#
+msgid "Upload the bootloader on the board using an external programmer."
+msgstr "使用外部燒錄器將 bootloader 上傳到開發板。"
+
+#
+msgid "Upload the bootloader."
+msgstr "上傳 bootloader。"
+
+#
+msgid "Uploading to specified board using %s protocol requires the following info:"
+msgstr "以 %s 協議上傳到指定開發板需以下資訊:"
+
+#
+msgid "Urls cannot contain commas. Separate multiple urls exported as env var with a space:\n"
+"%s"
+msgstr "網址不能包含逗號。用空格隔開多個位址, 例如 env var:\n"
+"%s"
+
+#
+msgid "Usage:"
+msgstr "用法："
+
+#
+msgid "Use %s for more information about a command."
+msgstr "使用 %s 取得有關指令的更多資訊。"
+
+#
+msgid "Used library"
+msgstr "已使用的程式庫"
+
+#
+msgid "Used platform"
+msgstr "已使用的平台"
+
+#
+msgid "Used: %[1]s"
+msgstr "使用：%[1]s"
+
+#
+msgid "Using board '%[1]s' from platform in folder: %[2]s"
+msgstr "使用平台的'%[1]s' 開發板，在檔案夾：%[2]s"
+
+#
+msgid "Using cached library dependencies for file: %[1]s"
+msgstr "%[1]s 檔案使用快取程式庫相依"
+
+#
+msgid "Using core '%[1]s' from platform in folder: %[2]s"
+msgstr "使用平台的 '%[1]s'核心，在檔案夾：%[2]s"
+
+#
+msgid "Using library %[1]s at version %[2]s in folder: %[3]s %[4]s"
+msgstr "使用 %[2]s 版的 %[1]s 程式庫，在檔案夾：%[3]s%[4]s"
+
+#
+msgid "Using library %[1]s in folder: %[2]s %[3]s"
+msgstr "使用的 %[1]s 程式庫，在檔案夾：%[2]s%[3]s"
+
+#
+msgid "Using precompiled core: %[1]s"
+msgstr "使用預編譯核心：%[1]s"
+
+#
+msgid "Using precompiled library in %[1]s"
+msgstr "在 %[1]s 中使用預編譯程式庫"
+
+#
+msgid "Using previously compiled file: %[1]s"
+msgstr "使用之前編譯的檔案：%[1]s"
+
+#
+msgid "VERSION"
+msgstr "版本"
+
+#
+msgid "VERSION_NUMBER"
+msgstr "版本號"
+
+#
+msgid "Values"
+msgstr "值"
+
+#
+msgid "Verify uploaded binary after the upload."
+msgstr "上傳後驗證上傳的二進碼。"
+
+#
+msgid "Version"
+msgstr "版本"
+
+#
+msgid "Versions: %s"
+msgstr "版本：%s"
+
+#
+msgid "WARNING cannot configure platform: %s"
+msgstr "警告!無法設定平台：%s"
+
+#
+msgid "WARNING cannot configure tool: %s"
+msgstr "警告!無法設定工具：%s"
+
+#
+msgid "WARNING: The sketch is compiled using one or more custom libraries."
+msgstr "警告! sketch 是用一或多個自定義程式庫來編譯的。"
+
+#
+msgid "WARNING: library %[1]s claims to run on %[2]s architecture(s) and may be incompatible with your current board which runs on %[3]s architecture(s)."
+msgstr "警告：%[1]s 程式庫為 %[2]s 架構，可能與選擇的開發板不相容 ( %[3]s 架構)。"
+
+#
+msgid "Waiting for upload port..."
+msgstr "等待上傳連接埠..."
+
+#
+msgid "Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s"
+msgstr "警告：%[1]s 開發板並沒定義 %[2]s 喜好。自動設定成：%[3]s"
+
+#
+msgid "Website: %s"
+msgstr "網站：%s"
+
+#
+msgid "Writes current configuration to a configuration file."
+msgstr "將目前的設定寫入設定檔。"
+
+#
+msgid "Writes current configuration to the configuration file in the data directory."
+msgstr "將目前設定寫入資料目錄下的設定檔。"
+
+#
+msgid "Writing config file: %v"
+msgstr "寫入設定檔：%v"
+
+#
+msgid "You cannot use the %s flag while compiling with a profile."
+msgstr "在用設定檔編譯時，不能使用 %s 旗標。"
+
+#
+msgid "archive hash differs from hash in index"
+msgstr "保存在與索引內不同的雜湊"
+
+#
+msgid "archive is not valid: multiple files found in zip file top level"
+msgstr "存檔無效：在 zip 文件頂層找到多個檔案"
+
+#
+msgid "archive is not valid: no files found in zip file top level"
+msgstr "存檔無效：在 zip 檔的頂層沒找到檔案"
+
+#
+msgid "archivePath"
+msgstr "存檔路徑"
+
+#
+msgid "arduino-preprocessor pattern is missing"
+msgstr "缺少 arduino 預處理器樣態"
+
+#
+msgid "autodetect build artifact: %s"
+msgstr "自動檢測建構成品：%s"
+
+#
+msgid "available only in text format"
+msgstr "只提供本文格式"
+
+#
+msgid "binary file not found in %s"
+msgstr "在 %s 找不到二進位檔"
+
+#
+msgid "board %s not found"
+msgstr "找不到開發板 %s"
+
+#
+msgid "boardname"
+msgstr "開發板名"
+
+#
+msgid "built-in libraries directory not set"
+msgstr "內建程式庫目錄未設定"
+
+#
+msgid "calling %[1]s: %[2]w"
+msgstr "呼叫 %[1]s: %[2]w"
+
+#
+msgid "can't find latest release of %s"
+msgstr "找不到 %s 的最新版"
+
+#
+msgid "can't find latest release of tool %s"
+msgstr "找不到 %s 工具的最新版"
+
+#
+msgid "can't find main Sketch file in %s"
+msgstr "在 %s 中找不到主要的 sketch 檔"
+
+#
+msgid "can't find pattern for discovery with id %s"
+msgstr "找不到 id 為 %s 的樣態"
+
+#
+msgid "can't retrieve standard error stream: %s"
+msgstr "無法取得標準錯誤流：%s"
+
+#
+msgid "can't retrieve standard output stream: %s"
+msgstr "無法取得標準輸出流：%s"
+
+#
+msgid "candidates"
+msgstr "候選"
+
+#
+msgid "cannot execute upload tool: %s"
+msgstr "無法執行上傳工具：%s"
+
+#
+msgid "checking local archive integrity"
+msgstr "檢查本地端存檔的完整性"
+
+#
+msgid "cleaning build path"
+msgstr "清理建構路徑"
+
+#
+msgid "command"
+msgstr "指令"
+
+#
+msgid "command '%[1]s' failed: %[2]s"
+msgstr "'%[1]s' 指令失敗：%[2]s"
+
+#
+msgid "command failed: %s"
+msgstr "指令失敗：%s"
+
+#
+msgid "communication out of sync, expected '%[1]s', received '%[2]s'"
+msgstr "通信不同步，應為 '%[1]s'，收到 '%[2]s'"
+
+#
+msgid "computing hash: %s"
+msgstr "計算雜湊：%s"
+
+#
+msgid "copying library to destination directory:"
+msgstr "將程式庫拷貝到目標目錄："
+
+#
+msgid "could not find a valid build artifact"
+msgstr "找不到有效的建構成品"
+
+#
+msgid "could not overwrite"
+msgstr "無法覆寫"
+
+#
+msgid "could not remove old library"
+msgstr "無法刪除舊程式庫"
+
+#
+msgid "could not update sketch project file"
+msgstr "無法更新 sketch 專案檔"
+
+#
+msgid "creating core cache folder: %s"
+msgstr "建立核心快取檔案夾：%s"
+
+#
+msgid "creating installed.json in %[1]s: %[2]s"
+msgstr "在 %[1]s：%[2]s 建位 installed.json"
+
+#
+msgid "creating temp dir for extraction: %s"
+msgstr "建立提取用的臨時目錄：%s"
+
+#
+msgid "data section exceeds available space in board"
+msgstr "資料區已超出開發板的可用空間"
+
+#
+msgid "dependency '%s' is not available"
+msgstr "'%s' 的相依找不到"
+
+#
+msgid "destination already exists"
+msgstr "目標已存在"
+
+#
+msgid "destination dir %s already exists, cannot install"
+msgstr "目標目錄 %s 已存在，無法安裝"
+
+#
+msgid "destination directory already exists"
+msgstr "目標目錄已存在"
+
+#
+msgid "directory doesn't exist: %s"
+msgstr "目錄不存在：%s"
+
+#
+msgid "discovery %[1]s process not started: %[2]w"
+msgstr "discovery %[1]s 程序未開始：%[2]w"
+
+#
+msgid "discovery %s not found"
+msgstr "未找到 %s discovery"
+
+#
+msgid "discovery %s not installed"
+msgstr "%s discovery 未安裝"
+
+#
+msgid "discovery release not found: %s"
+msgstr "未找到 discovery 版本：%s"
+
+#
+msgid "download a specific version (in this case 1.6.9)."
+msgstr "下載指定版本（在本例中為 1.6.9）。"
+
+#
+msgid "download the latest version of Arduino SAMD core."
+msgstr "下載最新版 Arduino SAMD 核心。"
+
+#
+msgid "downloaded"
+msgstr "下載"
+
+#
+msgid "downloading %[1]s tool: %[2]s"
+msgstr "正在下載 %[1]s 工具：%[2]s"
+
+#
+msgid "empty board identifier"
+msgstr "清空開發板標識"
+
+#
+msgid "error loading sketch project file:"
+msgstr "輸入 sketch 專案時出錯："
+
+#
+msgid "error opening %s"
+msgstr " 開啟 %s 時出錯"
+
+#
+msgid "error parsing value: %v"
+msgstr "錯誤解析值：%v"
+
+#
+msgid "error parsing version constraints"
+msgstr "解析版本限制時出錯"
+
+#
+msgid "error processing response from server"
+msgstr "處理伺服器回應時出錯"
+
+#
+msgid "error querying Arduino Cloud Api"
+msgstr "查詢 Arduino Cloud Api 時出錯"
+
+#
+msgid "extracting archive: %s"
+msgstr "正在解開存檔：%s"
+
+#
+msgid "extracting archive: %w"
+msgstr "正在解開存檔：%w"
+
+#
+msgid "failed to compute hash of file \"%s\""
+msgstr "無法計算 “%s” 檔案的雜湊值"
+
+#
+msgid "failed to initialize http client"
+msgstr "無法初始化 http 客戶端"
+
+#
+msgid "fetched archive size differs from size specified in index"
+msgstr "抓取的存檔大小與索引中的大小不同"
+
+#
+msgid "files in archive must be placed in a subdirectory"
+msgstr "存檔中的檔案必須放在子目錄下"
+
+#
+msgid "finding absolute path of %s"
+msgstr "尋找 %s 的絕對路徑"
+
+#
+msgid "flags"
+msgstr "旗標"
+
+#
+msgid "following symlink %s"
+msgstr "跟隨符式鏈接 %s"
+
+#
+msgid "for a specific version."
+msgstr "針對特定版本。"
+
+#
+msgid "for the latest version."
+msgstr "最新版本。"
+
+#
+msgid "for the specific version."
+msgstr "針對特定版本。"
+
+#
+msgid "generating installation.id: %w"
+msgstr "正在產出 installation.id: %w"
+
+#
+msgid "generating installation.secret: %w"
+msgstr "產出 installation.secret：%w"
+
+#
+msgid "getting archive file info: %s"
+msgstr "取得存檔文件的資訊：%s"
+
+#
+msgid "getting archive info: %s"
+msgstr "正在取得存檔資訊：%s"
+
+#
+msgid "getting archive path: %s"
+msgstr "取得存檔路徑：%s"
+
+#
+msgid "getting build properties for board %[1]s: %[2]s"
+msgstr "取得開發板 %[1]s：%[2]s 的建構屬性"
+
+#
+msgid "getting discovery dependencies for platform %[1]s: %[2]s"
+msgstr "取得 %[1]s 平台的 discovery 相依：%[2]s"
+
+#
+msgid "getting monitor dependencies for platform %[1]s: %[2]s"
+msgstr "取得 %[1]s 平台的監視器相依：%[2]s"
+
+#
+msgid "getting parent dir of %[1]s: %[2]s"
+msgstr "取得 %[1]s 的父目錄：%[2]s"
+
+#
+msgid "getting tool dependencies for platform %[1]s: %[2]s"
+msgstr "正在獲取 %[1]s 平台的工具依賴：%[2]s"
+
+#
+msgid "install directory not set"
+msgstr "未設定安裝目錄"
+
+#
+msgid "installing %[1]s tool: %[2]s"
+msgstr "正在安裝 %[1]s 工具：%[2]s"
+
+#
+msgid "installing platform %[1]s: %[2]s"
+msgstr "安裝 %[1]s 平台: %[2]s"
+
+#
+msgid "interactive terminal not supported for the '%s' output format"
+msgstr "互動終端不支援“%s” 輸出格式"
+
+#
+msgid "invalid '%s' directive"
+msgstr "無效的 '%s' 指令"
+
+#
+msgid "invalid 'add' message: missing port"
+msgstr "無效的 “新增” 訊息：找不到連接埠"
+
+#
+msgid "invalid 'remove' message: missing port"
+msgstr "無效的 “移除” 訊息：找不到連接埠"
+
+#
+msgid "invalid checksum format: %s"
+msgstr "無效的校驗碼格式：%s"
+
+#
+msgid "invalid config option: %s"
+msgstr "無效的設定選項：%s"
+
+#
+msgid "invalid empty core architecture '%s'"
+msgstr "無效的空核心架構 '%s'"
+
+#
+msgid "invalid empty core argument"
+msgstr "無效的空核心參數"
+
+#
+msgid "invalid empty core name '%s'"
+msgstr "無效的空核心名 '%s'"
+
+#
+msgid "invalid empty core reference '%s'"
+msgstr "無效的空核心參照 '%s'"
+
+#
+msgid "invalid empty core version: '%s'"
+msgstr "無效的空核心版本：'%s'"
+
+#
+msgid "invalid empty library name"
+msgstr "無效的空程式庫名"
+
+#
+msgid "invalid empty library version: %s"
+msgstr "無效的空程式庫版本：%s"
+
+#
+msgid "invalid empty option found"
+msgstr "找到無效的空選項"
+
+#
+msgid "invalid git url"
+msgstr "無效的 git 位址"
+
+#
+msgid "invalid hash '%[1]s': %[2]s"
+msgstr "無效的 '%[1]s' 雜湊：%[2]s"
+
+#
+msgid "invalid item %s"
+msgstr "無效的 %s 項目"
+
+#
+msgid "invalid library directive:"
+msgstr "無效的程式庫指令："
+
+#
+msgid "invalid library layout: %s"
+msgstr "無效的程式庫佈局：%s"
+
+#
+msgid "invalid library location: %s"
+msgstr "無效的程式庫位置：%s"
+
+#
+msgid "invalid library: no header files found"
+msgstr "無效的程式庫：沒找到.h 引入檔"
+
+#
+msgid "invalid option '%s'"
+msgstr "無效的選項'%s'"
+
+#
+msgid "invalid option '%s'."
+msgstr "無效的選項 '%s'。"
+
+#
+msgid "invalid path creating config dir: %[1]s error: %[2]w"
+msgstr "新設定目錄的路徑無效：%[1]s 錯誤：%[2]w"
+
+#
+msgid "invalid path writing inventory file: %[1]s error: %[2]w"
+msgstr "寫入庫存檔的路徑無效：%[1]s 錯誤：%[2]w"
+
+#
+msgid "invalid platform archive size: %s"
+msgstr "無效的平台存檔大小：%s"
+
+#
+msgid "invalid platform identifier"
+msgstr "無效的平台識別"
+
+#
+msgid "invalid platform index URL:"
+msgstr "無效的平台索引位址："
+
+#
+msgid "invalid pluggable monitor reference: %s"
+msgstr "無效的可插拔監視器參照：%s"
+
+#
+msgid "invalid port configuration value for %s: %s"
+msgstr "無效的連接埠設定值 %s ：%s"
+
+#
+msgid "invalid port configuration: %s"
+msgstr "無效的連接埠設定：%s"
+
+#
+msgid "invalid recipe '%[1]s': %[2]s"
+msgstr "無效的作法'%[1]s': %[2]s"
+
+#
+msgid "invalid sketch name \"%[1]s\": the first character must be alphanumeric or \"_\", the following ones can also contain \"-\" and \".\". The last one cannot be \".\"."
+msgstr "無效的 sketch 名 \"%[1]s\": 首字元必須是英數字或底線, 接著可以是減號和逗點, 但最後字元不可以是逗點"
+
+#
+msgid "invalid value '%[1]s' for option '%[2]s'"
+msgstr "'%[2]s' 選項的 '%[1]s' 值無效"
+
+#
+msgid "invalid version directory %s"
+msgstr "無效的版本目錄 %s"
+
+#
+msgid "invalid version:"
+msgstr "無效的版本："
+
+#
+msgid "key not found in settings"
+msgstr "設定中找不到鍵值"
+
+#
+msgid "keywords"
+msgstr "關鍵字"
+
+#
+msgid "library %s already installed"
+msgstr "程式庫 %s 已安裝"
+
+#
+msgid "library not valid"
+msgstr "程式庫無效"
+
+#
+msgid "library path does not exist: %s"
+msgstr "程式庫路徑不存在：%s"
+
+#
+msgid "listing serial ports"
+msgstr "列出序列埠"
+
+#
+msgid "loading %[1]s: %[2]s"
+msgstr "載入 %[1]s: %[2]s"
+
+#
+msgid "loading boards: %s"
+msgstr "載入開發板：%s"
+
+#
+msgid "loading bundled tools from %s"
+msgstr "從 %s 載入整捆的工具"
+
+#
+msgid "loading json index file %[1]s: %[2]s"
+msgstr "載入json 索引檔 %[1]s ：%[2]s"
+
+#
+msgid "loading library from %[1]s: %[2]s"
+msgstr "從 %[1]s 載入程式庫：%[2]s"
+
+#
+msgid "loading library.properties: %s"
+msgstr "載入程式庫屬性：%s"
+
+#
+msgid "loading platform release %s"
+msgstr "載入平台發行版 %s "
+
+#
+msgid "loading platform.txt"
+msgstr "載入 platform.txt"
+
+#
+msgid "loading required platform %s"
+msgstr "載入需要的平台 %s "
+
+#
+msgid "loading required tool %s"
+msgstr "載入需要的工具 %s"
+
+#
+msgid "loading tool release in %s"
+msgstr "載入在 %s 的工具發行版"
+
+#
+msgid "looking for boards.txt in %s"
+msgstr "在 %s 尋找 boards.txt"
+
+#
+msgid "main file missing from sketch: %s"
+msgstr "sketch 裏缺少主檔：%s"
+
+#
+msgid "missing '%s' directive"
+msgstr "缺少 '%s'指令"
+
+#
+msgid "missing checksum for: %s"
+msgstr "缺少 %s 的校驗碼"
+
+#
+msgid "missing package %[1]s referenced by board %[2]s"
+msgstr "缺少開發板 %[2]s 參照的套件 %[1]s "
+
+#
+msgid "missing package index for %s, future updates cannot be guaranteed"
+msgstr "缺少 %s 的套件索引, 未來更新與否不保証"
+
+#
+msgid "missing platform %[1]s:%[2]s referenced by board %[3]s"
+msgstr "缺少被開發板 %[3]s 參照的平台 %[1]s ：%[2]s "
+
+#
+msgid "missing platform release %[1]s:%[2]s referenced by board %[3]s"
+msgstr "缺少被開發板 %[3]s 參照的平台發行版 %[1]s ：%[2]s"
+
+#
+msgid "monitor release not found: %s"
+msgstr "未找到發行版監視器：%s"
+
+#
+msgid "moving extracted archive to destination dir: %s"
+msgstr "移動解開的存檔到目標資料夾：%s"
+
+#
+msgid "multiple build artifacts found: '%[1]s' and '%[2]s'"
+msgstr "找到多個建構成品：'%[1]s' 和 '%[2]s'"
+
+#
+msgid "multiple main sketch files found (%[1]v, %[2]v)"
+msgstr "找到多個 sketch 檔 (%[1]v, %[2]v)"
+
+#
+msgid "no compatible version of %[1]s tools found for the current os, try contacting %[2]s"
+msgstr "沒找到目前作業系統相容 %[1]s 版本的工具，請聯絡 %[2]s"
+
+#
+msgid "no executable specified"
+msgstr "未指定可執行檔"
+
+#
+msgid "no instance specified"
+msgstr "未指定實例"
+
+#
+msgid "no sketch or build directory/file specified"
+msgstr "未指定 sketch 或建構目錄/檔案"
+
+#
+msgid "no such file or directory"
+msgstr "沒有這個檔案/目錄"
+
+#
+msgid "no unique root dir in archive, found '%[1]s' and '%[2]s'"
+msgstr "存檔中沒有單一的根目錄，找到了 '%[1]s' 和 '%[2]s'"
+
+#
+msgid "no upload port provided"
+msgstr "未提供上傳連接埠"
+
+#
+msgid "no valid sketch found in %[1]s: missing %[2]s"
+msgstr "在 %[1]s 找不到有效的 sketch：缺少 %[2]s"
+
+#
+msgid "no versions available for the current OS, try contacting %s"
+msgstr "目前的作業系統沒可用的版本，請聯絡 %s"
+
+#
+msgid "not running in a terminal"
+msgstr "沒在終端裏執行"
+
+#
+msgid "opening archive file: %s"
+msgstr "開啟存檔：%s"
+
+#
+msgid "opening boards.txt"
+msgstr "開啟 boards.txt"
+
+#
+msgid "opening port at 1200bps"
+msgstr "以 1200 bps 開啟連接埠"
+
+#
+msgid "opening signature file: %s"
+msgstr "打開簽名檔：%s"
+
+#
+msgid "opening target file: %s"
+msgstr "打開目標檔：%s"
+
+#
+msgid "package %s not found"
+msgstr "套件 %s 沒找到"
+
+#
+msgid "package '%s' not found"
+msgstr "套件 '%s' 沒找到"
+
+#
+msgid "parsing IDE bundled index"
+msgstr "正在解析 IDE 同捆的索引"
+
+#
+msgid "parsing fqbn: %s"
+msgstr "解析 FQBN：%s"
+
+#
+msgid "parsing library_index.json: %s"
+msgstr "解析 library_index.json: %s"
+
+#
+msgid "path is not a platform directory: %s"
+msgstr "路徑不是平台目錄：%s"
+
+#
+msgid "platform %[1]s not found in package %[2]s"
+msgstr "在 %[2]s 套件裏找不到 %[1]s 平台"
+
+#
+msgid "platform %s has no available releases"
+msgstr "平台 %s 沒有可用的版本"
+
+#
+msgid "platform %s is not installed"
+msgstr "平台 %s 未安裝"
+
+#
+msgid "platform not installed"
+msgstr "平台未安裝"
+
+#
+msgid "please use --build-property instead."
+msgstr "請改用 --build-property。"
+
+#
+msgid "pluggable discovery already added: %s"
+msgstr "已加入可插拔 discovery：%s"
+
+#
+msgid "port"
+msgstr "連接埠"
+
+#
+msgid "port not found: %[1]s %[2]s"
+msgstr "沒找到連接埠：%[1]s %[2]s"
+
+#
+msgid "protocol version not supported: requested %[1]d, got %[2]d"
+msgstr "不支持協議版本：要 %[1]d，卻得到 %[2]d"
+
+#
+msgid "protocol version not supported: requested 1, got %d"
+msgstr "不支持協議版本：要 1，卻得到 %d"
+
+#
+msgid "reading %[1]s: %[2]s"
+msgstr "正在讀取 %[1]s： %[2]s"
+
+#
+msgid "reading dir %[1]s: %[2]s"
+msgstr "正在讀取目錄 %[1]s: %[2]s"
+
+#
+msgid "reading directory %[1]s content: %[2]w"
+msgstr "閱讀目錄 %[1]s 內容：%[2]w"
+
+#
+msgid "reading directory %s"
+msgstr "正在讀取目錄 %s"
+
+#
+msgid "reading directory %s content: %w"
+msgstr "正在讀取目錄 %s 的內容：%w"
+
+#
+msgid "reading file %[1]s: %[2]s"
+msgstr "正在讀取檔案 %[1]s: %[2]s"
+
+#
+msgid "reading files: %v"
+msgstr "正在讀取檔案：%v"
+
+#
+msgid "reading lib headers: %s"
+msgstr "正在讀取程式庫頭檔：%s"
+
+#
+msgid "reading lib src dir: %s"
+msgstr "正在讀取程式庫 src 目錄：%s"
+
+#
+msgid "reading library headers: %w"
+msgstr "正在讀取程式庫頭檔：%w"
+
+#
+msgid "reading library_index.json: %s"
+msgstr "正在讀取 library_index.json: %s"
+
+#
+msgid "reading package root dir: %s"
+msgstr "正在讀取套件根目錄：%s"
+
+#
+msgid "recipe not found '%s'"
+msgstr "作法未找到 %s"
+
+#
+msgid "release %[1]s not found for tool %[2]s"
+msgstr "找不到工具 %[2]s 的 %[1]s 發行版"
+
+#
+msgid "release cannot be nil"
+msgstr "發行不能是無"
+
+#
+msgid "removing corrupted archive file: %s"
+msgstr "刪除損壞的存檔：%s"
+
+#
+msgid "removing library directory: %s"
+msgstr "刪除程式庫目錄：%s"
+
+#
+msgid "removing platform files: %s"
+msgstr "刪除平台檔：%s"
+
+#
+msgid "required version %[1]s not found for platform %[2]s"
+msgstr "找不到平台 %[2]s 需要的 %[1]s 版本"
+
+#
+msgid "retrieving Arduino public keys: %s"
+msgstr "正在取得 Arduino 公鑰：%s"
+
+#
+msgid "scanning examples: %s"
+msgstr "掃描範例：%s"
+
+#
+msgid "searching for builtin_tools_versions.txt in %[1]s: %[2]s"
+msgstr "在 %[1]s: %[2]s 尋找 builtin_tools_versions.txt"
+
+#
+msgid "searching package root dir: %s"
+msgstr "尋找套件根目錄：%s"
+
+#
+msgid "setting DTR to OFF"
+msgstr "將 DTR 設定為 OFF"
+
+#
+msgid "sketch name cannot be empty"
+msgstr "sketch 名字不能空白"
+
+#
+msgid "sketch name cannot be the reserved name \"%[1]s\""
+msgstr "sketch 名字不能使用保留名'%[1]s'"
+
+#
+msgid "sketch name too long (%[1]d characters). Maximum allowed length is %[2]d"
+msgstr "sketch 名字過長（%[1]d 字元）。 最大允許 %[2]d 字元"
+
+#
+msgid "sketch path is not valid"
+msgstr "sketch 路徑無效"
+
+#
+msgid "sketchPath"
+msgstr "sketch 路徑"
+
+#
+msgid "source is not a directory"
+msgstr "來源不是目錄"
+
+#
+msgid "starting discovery %s"
+msgstr "開始 discovery 探索 %s"
+
+#
+msgid "testing archive checksum: %s"
+msgstr "測試存檔校驗碼：%s"
+
+#
+msgid "testing archive size: %s"
+msgstr "測試存檔大小：%s"
+
+#
+msgid "testing if archive is cached: %s"
+msgstr "測試存檔是否已快取：%s"
+
+#
+msgid "testing local archive integrity: %s"
+msgstr "測試本地存檔完整性：%s"
+
+#
+msgid "text section exceeds available space in board"
+msgstr "本文區已超出開發板的可用空間"
+
+#
+msgid "the compilation database may be incomplete or inaccurate"
+msgstr "編譯資料庫可能不完整或不準確"
+
+#
+msgid "the platform has no releases"
+msgstr "該平台沒有發行版"
+
+#
+msgid "the server responded with status %s"
+msgstr "伺服器回應狀態 %s"
+
+#
+msgid "timeout waiting for message"
+msgstr "等待訊息超時"
+
+#
+msgid "timeout waiting for message from %s"
+msgstr "等待來自 %s 的訊息超時"
+
+#
+msgid "tool %s is not managed by package manager"
+msgstr "工具 %s 不是由套件管理員管理的"
+
+#
+msgid "tool %s not found"
+msgstr "找不到工具 %s"
+
+#
+msgid "tool '%[1]s' not found in package '%[2]s'"
+msgstr "在套件 '%[2]s' 中找不到工具 '%[1]s'"
+
+#
+msgid "tool not installed"
+msgstr "工具未安裝"
+
+#
+msgid "tool release not found: %s"
+msgstr "工具發行未找到：%s"
+
+#
+msgid "tool version %s not found"
+msgstr "工具版本 %s 未找到"
+
+#
+msgid "two different versions of the library %[1]s are required: %[2]s and %[3]s"
+msgstr "需要兩個不同版本的程式庫 %[1]s ：%[2]s 和 %[3]s"
+
+#
+msgid "unable to compute relative path to the sketch for the item"
+msgstr "無法計算 sketch 的相對路徑"
+
+#
+msgid "unable to create a folder to save the sketch"
+msgstr "無法建立保存 sketch 的檔案夾"
+
+#
+msgid "unable to create a folder to save the sketch files"
+msgstr "無法建立保存 sketch 的檔案夾"
+
+#
+msgid "unable to create the folder containing the item"
+msgstr "無法建立包含該項目的檔案夾"
+
+#
+msgid "unable to marshal config to YAML: %v"
+msgstr "無法將 config 轉成 YAML：%v"
+
+#
+msgid "unable to read contents of the destination item"
+msgstr "無法讀取目標項目的內容"
+
+#
+msgid "unable to read contents of the source item"
+msgstr "無法讀取來源項目的內容"
+
+#
+msgid "unable to save the sketch on disk"
+msgstr "無法在磁碟上儲存 sketch"
+
+#
+msgid "unable to write to destination file"
+msgstr "無法寫入目標檔"
+
+#
+msgid "unknown package %s"
+msgstr "未知的套件 %s"
+
+#
+msgid "unknown platform %s:%s"
+msgstr "未知的平台 %s:%s"
+
+#
+msgid "unknown sketch file extension '%s'"
+msgstr "未知的 sketch 副檔名 %s'"
+
+#
+msgid "unsupported hash algorithm: %s"
+msgstr "未支擾的雜湊演算法：%s"
+
+#
+msgid "upgrade arduino:samd to the latest version"
+msgstr "升級 arduino:samd 到最新版"
+
+#
+msgid "upgrade everything to the latest version"
+msgstr "升級全部內容到最新版"
+
+#
+msgid "uploading error: %s"
+msgstr "上傳錯誤：%s"
+
+#
+msgid "user directory not set"
+msgstr "用戶目錄未設定"
+
+#
+msgid "user input not supported for the '%s' output format"
+msgstr "用戶輸入不支援 '%s' 輸出格式"
+
+#
+msgid "user input not supported in non interactive mode"
+msgstr "在非互動模式下不支援用戶輸入"
+
+#
+msgid "version %s not available for this operating system"
+msgstr "沒有適合於本作業系統的版本 %s"
+
+#
+msgid "version %s not found"
+msgstr "沒找到版本 %s"
+
+#
+msgid "wrong format in server response"
+msgstr "伺服器回應格式錯誤"
