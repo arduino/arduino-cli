@@ -16,42 +16,45 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/go-paths-helper"
+	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
 
-type ContainerBuildOptions struct{}
-
-func (s *ContainerBuildOptions) Run(ctx *types.Context) error {
+func ContainerBuildOptions(
+	hardwareDirs, builtInToolsDirs, otherLibrariesDirs paths.PathList,
+	builtInLibrariesDirs, buildPath *paths.Path,
+	sketch *sketch.Sketch,
+	customBuildProperties []string,
+	fqbn string,
+	clean bool,
+	buildProperties *properties.Map,
+) (string, string, string, error) {
 	buildOptionsJSON, err := CreateBuildOptionsMap(
-		ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
-		ctx.BuiltInLibrariesDirs, ctx.Sketch, ctx.CustomBuildProperties,
-		ctx.FQBN.String(), ctx.BuildProperties.Get("compiler.optimization_flags"),
+		hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
+		builtInLibrariesDirs, sketch, customBuildProperties,
+		fqbn, buildProperties.Get("compiler.optimization_flags"),
 	)
 	if err != nil {
-		return errors.WithStack(err)
+		return "", "", "", errors.WithStack(err)
 	}
-	ctx.BuildOptionsJson = buildOptionsJSON
 
-	buildOptionsJsonPrevious, err := LoadPreviousBuildOptionsMap(ctx.BuildPath)
+	buildOptionsJSONPrevious, err := LoadPreviousBuildOptionsMap(buildPath)
 	if err != nil {
-		return errors.WithStack(err)
+		return "", "", "", errors.WithStack(err)
 	}
-	ctx.BuildOptionsJsonPrevious = buildOptionsJsonPrevious
 
 	infoOut, err := WipeoutBuildPathIfBuildOptionsChanged(
-		ctx.Clean,
-		ctx.BuildPath,
-		ctx.BuildOptionsJson,
-		ctx.BuildOptionsJsonPrevious,
-		ctx.BuildProperties,
+		clean,
+		buildPath,
+		buildOptionsJSON,
+		buildOptionsJSONPrevious,
+		buildProperties,
 	)
 	if err != nil {
-		return errors.WithStack(err)
-	}
-	if infoOut != "" {
-		ctx.Info(infoOut)
+		return "", "", "", errors.WithStack(err)
 	}
 
-	return StoreBuildOptionsMap(ctx.BuildPath, ctx.BuildOptionsJson)
+	return buildOptionsJSON, buildOptionsJSONPrevious, infoOut, StoreBuildOptionsMap(buildPath, buildOptionsJSON)
 }

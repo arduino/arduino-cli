@@ -41,7 +41,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 	var _err, mainErr error
 	commands := []types.Command{
-		&ContainerBuildOptions{},
+		containerBuildOptions(ctx),
 
 		types.BareCommand(func(ctx *types.Context) error {
 			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.prebuild", ".pattern", false)
@@ -286,7 +286,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 
 	var _err error
 	commands := []types.Command{
-		&ContainerBuildOptions{},
+		containerBuildOptions(ctx),
 
 		types.BareCommand(func(ctx *types.Context) error {
 			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.prebuild", ".pattern", false)
@@ -382,4 +382,27 @@ func recipeByPrefixSuffixRunner(ctx *types.Context, prefix, suffix string, skipI
 		ctx.BuildProperties, ctx.Stdout, ctx.Stderr,
 		func(msg string) { ctx.Info(msg) },
 	)
+}
+
+func containerBuildOptions(ctx *types.Context) types.BareCommand {
+	return types.BareCommand(func(ctx *types.Context) error {
+		// TODO here we can pass only the properties we're reading from the
+		// ctx.BuildProperties
+		buildOptionsJSON, buildOptionsJSONPrevious, infoMessage, err := ContainerBuildOptions(
+			ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
+			ctx.BuiltInLibrariesDirs, ctx.BuildPath, ctx.Sketch, ctx.CustomBuildProperties,
+			ctx.FQBN.String(), ctx.Clean, ctx.BuildProperties,
+		)
+		if infoMessage != "" {
+			ctx.Info(infoMessage)
+		}
+		if err != nil {
+			return err
+		}
+
+		ctx.BuildOptionsJson = buildOptionsJSON
+		ctx.BuildOptionsJsonPrevious = buildOptionsJSONPrevious
+
+		return nil
+	})
 }
