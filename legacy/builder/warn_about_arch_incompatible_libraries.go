@@ -18,24 +18,24 @@ package builder
 import (
 	"strings"
 
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/libraries"
 )
 
-type WarnAboutArchIncompatibleLibraries struct{}
-
-func (s *WarnAboutArchIncompatibleLibraries) Run(ctx *types.Context) error {
-	targetPlatform := ctx.TargetPlatform
-	buildProperties := ctx.BuildProperties
-
+func WarnAboutArchIncompatibleLibraries(
+	targetPlatform *cores.PlatformRelease,
+	overrides string,
+	importedLibraries libraries.List,
+	printInfoFn func(string),
+) error {
 	archs := []string{targetPlatform.Platform.Architecture}
-	if overrides, ok := buildProperties.GetOk(constants.BUILD_PROPERTIES_ARCH_OVERRIDE_CHECK); ok {
+	if overrides != "" {
 		archs = append(archs, strings.Split(overrides, ",")...)
 	}
 
-	for _, importedLibrary := range ctx.SketchLibrariesDetector.ImportedLibraries() {
+	for _, importedLibrary := range importedLibraries {
 		if !importedLibrary.SupportsAnyArchitectureIn(archs...) {
-			ctx.Info(
+			printInfoFn(
 				tr("WARNING: library %[1]s claims to run on %[2]s architecture(s) and may be incompatible with your current board which runs on %[3]s architecture(s).",
 					importedLibrary.Name,
 					strings.Join(importedLibrary.Architectures, ", "),

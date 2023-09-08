@@ -55,7 +55,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		logIfVerbose(false, tr("Detecting libraries used...")),
 		findIncludes(ctx),
 
-		&WarnAboutArchIncompatibleLibraries{},
+		warnAboutArchIncompatibleLibraries(ctx),
 
 		logIfVerbose(false, tr("Generating function prototypes...")),
 		types.BareCommand(PreprocessSketch),
@@ -317,7 +317,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 
 		findIncludes(ctx),
 
-		&WarnAboutArchIncompatibleLibraries{},
+		warnAboutArchIncompatibleLibraries(ctx),
 
 		types.BareCommand(PreprocessSketch),
 	}
@@ -421,6 +421,19 @@ func containerBuildOptions(ctx *types.Context) types.BareCommand {
 		ctx.BuildOptionsJson = buildOptionsJSON
 		ctx.BuildOptionsJsonPrevious = buildOptionsJSONPrevious
 
+		return nil
+	})
+}
+
+func warnAboutArchIncompatibleLibraries(ctx *types.Context) types.BareCommand {
+	return types.BareCommand(func(ctx *types.Context) error {
+		overrides, _ := ctx.BuildProperties.GetOk("architecture.override_check")
+		_ = WarnAboutArchIncompatibleLibraries(
+			ctx.TargetPlatform,
+			overrides,
+			ctx.SketchLibrariesDetector.ImportedLibraries(),
+			func(s string) { ctx.Info(s) },
+		)
 		return nil
 	})
 }
