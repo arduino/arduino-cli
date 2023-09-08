@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -87,7 +86,7 @@ func findExpectedPrecompiledLibFolder(
 	buildProperties *properties.Map,
 	verboseInfoFn func(msg string),
 ) *paths.Path {
-	mcu := buildProperties.Get(constants.BUILD_PROPERTIES_BUILD_MCU)
+	mcu := buildProperties.Get("build.mcu")
 	// Add fpu specifications if they exist
 	// To do so, resolve recipe.cpp.o.pattern,
 	// search for -mfpu=xxx -mfloat-abi=yyy and add to a subfolder

@@ -31,7 +31,6 @@ import (
 	"github.com/arduino/arduino-cli/buildcache"
 	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -102,7 +101,7 @@ func compileCore(
 ) (*paths.Path, paths.PathList, error) {
 	coreFolder := buildProperties.GetPath("build.core.path")
 	variantFolder := buildProperties.GetPath("build.variant.path")
-	targetCoreFolder := buildProperties.GetPath(constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH)
+	targetCoreFolder := buildProperties.GetPath("runtime.platform.path")
 
 	includes := []string{coreFolder.String()}
 	if variantFolder != nil && variantFolder.IsDir() {

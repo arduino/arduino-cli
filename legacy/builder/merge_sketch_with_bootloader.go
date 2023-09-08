@@ -55,7 +55,7 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 		return nil
 	}
 
-	bootloader := constants.EMPTY_STRING
+	bootloader := ""
 	if bootloaderNoBlink, ok := buildProperties.GetOk(constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK); ok {
 		bootloader = bootloaderNoBlink
 	} else {
@@ -63,7 +63,7 @@ func (s *MergeSketchWithBootloader) Run(ctx *types.Context) error {
 	}
 	bootloader = buildProperties.ExpandPropsInString(bootloader)
 
-	bootloaderPath := buildProperties.GetPath(constants.BUILD_PROPERTIES_RUNTIME_PLATFORM_PATH).Join(constants.FOLDER_BOOTLOADERS, bootloader)
+	bootloaderPath := buildProperties.GetPath("runtime.platform.path").Join(constants.FOLDER_BOOTLOADERS, bootloader)
 	if bootloaderPath.NotExist() {
 		if ctx.Verbose {
 			ctx.Warn(tr("Bootloader file specified but missing: %[1]s", bootloaderPath))
