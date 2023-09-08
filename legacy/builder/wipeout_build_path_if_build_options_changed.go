@@ -21,23 +21,23 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
 
-type WipeoutBuildPathIfBuildOptionsChanged struct{}
-
-func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
-	if ctx.Clean {
-		return doCleanup(ctx.BuildPath)
+func WipeoutBuildPathIfBuildOptionsChanged(
+	clean bool,
+	buildPath *paths.Path,
+	buildOptionsJson, buildOptionsJsonPrevious string,
+	buildProperties *properties.Map,
+) (string, error) {
+	if clean {
+		return "", doCleanup(buildPath)
 	}
-	if ctx.BuildOptionsJsonPrevious == "" {
-		return nil
+	if buildOptionsJsonPrevious == "" {
+		return "", nil
 	}
-	buildOptionsJson := ctx.BuildOptionsJson
-	previousBuildOptionsJson := ctx.BuildOptionsJsonPrevious
 
 	var opts *properties.Map
 	if err := json.Unmarshal([]byte(buildOptionsJson), &opts); err != nil || opts == nil {
@@ -45,9 +45,8 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 	}
 
 	var prevOpts *properties.Map
-	if err := json.Unmarshal([]byte(previousBuildOptionsJson), &prevOpts); err != nil || prevOpts == nil {
-		ctx.Info(tr("%[1]s invalid, rebuilding all", constants.BUILD_OPTIONS_FILE))
-		return doCleanup(ctx.BuildPath)
+	if err := json.Unmarshal([]byte(buildOptionsJsonPrevious), &prevOpts); err != nil || prevOpts == nil {
+		return tr("%[1]s invalid, rebuilding all", constants.BUILD_OPTIONS_FILE), doCleanup(buildPath)
 	}
 
 	// If SketchLocation path is different but filename is the same, consider it equal
@@ -61,21 +60,20 @@ func (s *WipeoutBuildPathIfBuildOptionsChanged) Run(ctx *types.Context) error {
 		// check if any of the files contained in the core folders has changed
 		// since the json was generated - like platform.txt or similar
 		// if so, trigger a "safety" wipe
-		buildProperties := ctx.BuildProperties
 		targetCoreFolder := buildProperties.GetPath("runtime.platform.path")
 		coreFolder := buildProperties.GetPath("build.core.path")
 		realCoreFolder := coreFolder.Parent().Parent()
-		jsonPath := ctx.BuildPath.Join(constants.BUILD_OPTIONS_FILE)
+		jsonPath := buildPath.Join(constants.BUILD_OPTIONS_FILE)
 		coreUnchanged, _ := utils.DirContentIsOlderThan(realCoreFolder, jsonPath, ".txt")
 		if coreUnchanged && targetCoreFolder != nil && !realCoreFolder.EqualsTo(targetCoreFolder) {
 			coreUnchanged, _ = utils.DirContentIsOlderThan(targetCoreFolder, jsonPath, ".txt")
 		}
 		if coreUnchanged {
-			return nil
+			return "", nil
 		}
 	}
 
-	return doCleanup(ctx.BuildPath)
+	return "", doCleanup(buildPath)
 }
 
 func doCleanup(buildPath *paths.Path) error {
