@@ -67,6 +67,7 @@ func NewBuilder(
 	}
 }
 
+// GetBuildProperties returns the build properties for running this build
 func (b *Builder) GetBuildProperties() *properties.Map {
 	return b.buildProperties
 }
