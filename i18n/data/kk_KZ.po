@@ -1,0 +1,3402 @@
+# 
+msgid ""
+msgstr ""
+
+#: version/version.go:53
+msgid "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
+msgstr "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
+
+#: legacy/builder/fail_if_imported_library_is_wrong.go:36
+msgid "%[1]s folder is no longer supported! See %[2]s for more information"
+msgstr "%[1]s folder is no longer supported! See %[2]s for more information"
+
+#: legacy/builder/wipeout_build_path_if_build_options_changed.go:49
+msgid "%[1]s invalid, rebuilding all"
+msgstr "%[1]s invalid, rebuilding all"
+
+#: cli/lib/check_deps.go:102
+msgid "%[1]s is required but %[2]s is currently installed."
+msgstr "%[1]s is required but %[2]s is currently installed."
+
+#: legacy/builder/builder_utils/utils.go:491
+msgid "%[1]s pattern is missing"
+msgstr "%[1]s pattern is missing"
+
+#: arduino/discovery/discovery.go:75
+msgid "%[1]s, message: %[2]s"
+msgstr "%[1]s, message: %[2]s"
+
+#: arduino/discovery/discovery.go:84
+msgid "%[1]s, port: %[2]s"
+msgstr "%[1]s, port: %[2]s"
+
+#: arduino/discovery/discovery.go:81
+msgid "%[1]s, ports: %[2]s"
+msgstr "%[1]s, ports: %[2]s"
+
+#: arduino/discovery/discovery.go:78
+msgid "%[1]s, protocol version: %[2]d"
+msgstr "%[1]s, protocol version: %[2]d"
+
+#: cli/output/rpc_progress.go:64
+msgid "%s already downloaded"
+msgstr "%s already downloaded"
+
+#: commands/upload/upload.go:615
+msgid "%s and %s cannot be used together"
+msgstr "%s and %s cannot be used together"
+
+#: cli/output/rpc_progress.go:76
+msgid "%s downloaded"
+msgstr "%s downloaded"
+
+#: commands/bundled_tools.go:56
+msgid "%s installed"
+msgstr "%s installed"
+
+#: cli/lib/check_deps.go:99
+msgid "%s is already installed."
+msgstr "%s is already installed."
+
+#: arduino/cores/packagemanager/loader.go:72
+msgid "%s is not a directory"
+msgstr "%s is not a directory"
+
+#: arduino/cores/packagemanager/install_uninstall.go:113
+msgid "%s is not managed by package manager"
+msgstr "%s is not managed by package manager"
+
+#: cli/lib/check_deps.go:96
+msgid "%s must be installed."
+msgstr "%s must be installed."
+
+#: legacy/builder/ctags_runner.go:41
+msgid "%s pattern is missing"
+msgstr "%s pattern is missing"
+
+#: commands/instances.go:846
+msgid "%s uninstalled"
+msgstr "%s uninstalled"
+
+#: arduino/errors.go:708
+msgid "'%s' has an invalid signature"
+msgstr "'%s' has an invalid signature"
+
+#: cli/board/listall.go:91 cli/board/search.go:89
+msgid "(hidden)"
+msgstr "(hidden)"
+
+#: legacy/builder/print_used_libraries_if_verbose.go:34
+msgid "(legacy)"
+msgstr "(legacy)"
+
+#: cli/lib/install.go:79
+msgid ""
+"--git-url and --zip-path are disabled by default, for more information see: "
+"%v"
+msgstr ""
+"--git-url and --zip-path are disabled by default, for more information see: "
+"%v"
+
+#: cli/lib/install.go:82
+msgid ""
+"--git-url and --zip-path flags allow installing untrusted files, use it at "
+"your own risk."
+msgstr ""
+"--git-url and --zip-path flags allow installing untrusted files, use it at "
+"your own risk."
+
+#: cli/updater/updater.go:70
+msgid "A new release of Arduino CLI is available:"
+msgstr "A new release of Arduino CLI is available:"
+
+#: arduino/errors.go:244
+msgid "A programmer is required to upload"
+msgstr "A programmer is required to upload"
+
+#: cli/core/download.go:36 cli/core/install.go:40 cli/core/uninstall.go:36
+#: cli/core/upgrade.go:38
+msgid "ARCH"
+msgstr "ARCH"
+
+#: cli/generatedocs/generatedocs.go:80
+msgid "ARDUINO COMMAND LINE MANUAL"
+msgstr "ARDUINO COMMAND LINE MANUAL"
+
+#: cli/usage.go:32
+msgid "Additional help topics:"
+msgstr "Additional help topics:"
+
+#: cli/config/add.go:32 cli/config/add.go:33
+msgid "Adds one or more values to a setting."
+msgstr "Adds one or more values to a setting."
+
+#: cli/usage.go:27
+msgid "Aliases:"
+msgstr "Aliases:"
+
+#: cli/core/upgrade.go:68
+msgid "All the cores are already at the latest version"
+msgstr "All the cores are already at the latest version"
+
+#: commands/instances.go:715 commands/lib/install.go:97
+msgid "Already installed %s"
+msgstr "Already installed %s"
+
+#: legacy/builder/resolve_library.go:32
+msgid "Alternatives for %[1]s: %[2]s"
+msgstr "Alternatives for %[1]s: %[2]s"
+
+#: legacy/builder/container_add_prototypes.go:46
+msgid "An error occurred adding prototypes"
+msgstr "An error occurred adding prototypes"
+
+#: legacy/builder/container_find_includes.go:116
+msgid "An error occurred detecting libraries"
+msgstr "An error occurred detecting libraries"
+
+#: cli/lib/search.go:172
+msgid "Architecture: %s"
+msgstr "Architecture: %s"
+
+#: commands/sketch/archive.go:70
+msgid "Archive already exists"
+msgstr "Archive already exists"
+
+#: legacy/builder/phases/core_builder.go:126
+msgid "Archiving built core (caching) in: %[1]s"
+msgstr "Archiving built core (caching) in: %[1]s"
+
+#: cli/sketch/sketch.go:31 cli/sketch/sketch.go:32
+msgid "Arduino CLI sketch commands."
+msgstr "Arduino CLI sketch commands."
+
+#: cli/cli.go:72
+msgid "Arduino CLI."
+msgstr "Arduino CLI."
+
+#: cli/cli.go:73
+msgid "Arduino Command Line Interface (arduino-cli)."
+msgstr "Arduino Command Line Interface (arduino-cli)."
+
+#: cli/board/board.go:31 cli/board/board.go:32
+msgid "Arduino board commands."
+msgstr "Arduino board commands."
+
+#: cli/cache/cache.go:31 cli/cache/cache.go:32
+msgid "Arduino cache commands."
+msgstr "Arduino cache commands."
+
+#: cli/lib/lib.go:31 cli/lib/lib.go:32
+msgid "Arduino commands about libraries."
+msgstr "Arduino commands about libraries."
+
+#: cli/config/config.go:33
+msgid "Arduino configuration commands."
+msgstr "Arduino configuration commands."
+
+#: cli/core/core.go:31 cli/core/core.go:32
+msgid "Arduino core operations."
+msgstr "Arduino core operations."
+
+#: cli/lib/check_deps.go:56 cli/lib/install.go:125
+msgid "Arguments error: %v"
+msgstr "Arguments error: %v"
+
+#: cli/board/attach.go:81
+msgid "Attach board error: %v"
+msgstr "Attach board error: %v"
+
+#: cli/board/attach.go:41 cli/board/attach.go:42 cli/board/board.go:35
+msgid "Attaches a sketch to a board."
+msgstr "Attaches a sketch to a board."
+
+#: cli/lib/search.go:163
+msgid "Author: %s"
+msgstr "Author: %s"
+
+#: cli/lib/list.go:124
+msgid "Available"
+msgstr "Available"
+
+#: cli/usage.go:29
+msgid "Available Commands:"
+msgstr "Available Commands:"
+
+#: cli/upload/upload.go:63
+msgid "Binary file to upload."
+msgstr "Binary file to upload."
+
+#: cli/board/list.go:88 cli/board/list.go:126 cli/board/listall.go:87
+#: cli/board/search.go:85
+msgid "Board Name"
+msgstr "Board Name"
+
+#: commands/board/attach.go:94
+msgid "Board found: %s"
+msgstr "Board found: %s"
+
+#: cli/board/details.go:119
+msgid "Board name:"
+msgstr "Board name:"
+
+#: cli/board/details.go:121
+msgid "Board version:"
+msgstr "Board version:"
+
+#: legacy/builder/merge_sketch_with_bootloader.go:69
+msgid "Bootloader file specified but missing: %[1]s"
+msgstr "Bootloader file specified but missing: %[1]s"
+
+#: cli/compile/compile.go:89
+msgid "Builds of 'core.a' are saved into this path to be cached and reused."
+msgstr "Builds of 'core.a' are saved into this path to be cached and reused."
+
+#: commands/instances.go:528
+msgid "Can't create data directory %s"
+msgstr "Can't create data directory %s"
+
+#: arduino/errors.go:414
+msgid "Can't create sketch"
+msgstr "Can't create sketch"
+
+#: commands/lib/download.go:61 commands/lib/download.go:64
+#: commands/lib/download.go:66
+msgid "Can't download library"
+msgstr "Can't download library"
+
+#: commands/core/install.go:127 commands/core/uninstall.go:53
+#: commands/instances.go:754 commands/instances.go:766
+msgid "Can't find dependencies for platform %s"
+msgstr "Can't find dependencies for platform %s"
+
+#: arduino/errors.go:427
+msgid "Can't open sketch"
+msgstr "Can't open sketch"
+
+#: cli/config/set.go:55
+msgid "Can't set multiple values in key %v"
+msgstr "Can't set multiple values in key %v"
+
+#: cli/arguments/arguments.go:37
+msgid "Can't use %s flags at the same time."
+msgstr "Can't use %s flags at the same time."
+
+#: cli/config/add.go:61 cli/config/delete.go:72 cli/config/remove.go:70
+msgid "Can't write config file: %v"
+msgstr "Can't write config file: %v"
+
+#: commands/compile/compile.go:175
+msgid "Cannot create build cache directory"
+msgstr "Cannot create build cache directory"
+
+#: commands/compile/compile.go:151
+msgid "Cannot create build directory"
+msgstr "Cannot create build directory"
+
+#: cli/config/init.go:97
+msgid "Cannot create config file directory: %v"
+msgstr "Cannot create config file directory: %v"
+
+#: cli/config/init.go:106
+msgid "Cannot create config file: %v"
+msgstr "Cannot create config file: %v"
+
+#: arduino/errors.go:671
+msgid "Cannot create temp dir"
+msgstr "Cannot create temp dir"
+
+#: arduino/errors.go:689
+msgid "Cannot create temp file"
+msgstr "Cannot create temp file"
+
+#: commands/debug/debug.go:67
+msgid "Cannot execute debug tool"
+msgstr "Cannot execute debug tool"
+
+#: commands/board/attach.go:107
+msgid "Cannot export sketch metadata"
+msgstr "Cannot export sketch metadata"
+
+#: cli/config/init.go:72 cli/config/init.go:83
+msgid "Cannot find absolute path: %v"
+msgstr "Cannot find absolute path: %v"
+
+#: configuration/configuration.go:148 configuration/configuration.go:154
+msgid "Cannot get executable path: %v"
+msgstr "Cannot get executable path: %v"
+
+#: commands/core/install.go:134
+msgid "Cannot install platform"
+msgstr "Cannot install platform"
+
+#: commands/bundled_tools.go:53
+msgid "Cannot install tool %s"
+msgstr "Cannot install tool %s"
+
+#: commands/upload/upload.go:506
+msgid "Cannot perform port reset: %s"
+msgstr "Cannot perform port reset: %s"
+
+#: commands/core/install.go:152
+msgid "Cannot upgrade platform"
+msgstr "Cannot upgrade platform"
+
+#: cli/lib/search.go:171
+msgid "Category: %s"
+msgstr "Category: %s"
+
+#: cli/lib/check_deps.go:37 cli/lib/check_deps.go:38
+msgid "Check dependencies status for the specified library."
+msgstr "Check dependencies status for the specified library."
+
+#: commands/lib/install.go:102
+msgid "Checking lib install prerequisites"
+msgstr "Checking lib install prerequisites"
+
+#: arduino/resources/checksums.go:182
+msgid "Checksum differs from checksum in package.json"
+msgstr "Checksum differs from checksum in package.json"
+
+#: cli/board/details.go:167
+msgid "Checksum:"
+msgstr "Checksum:"
+
+#: cli/cache/cache.go:33
+msgid "Clean caches."
+msgstr "Clean caches."
+
+#: cli/cli.go:125
+msgid "Comma-separated list of additional URLs for the Boards Manager."
+msgstr "Comma-separated list of additional URLs for the Boards Manager."
+
+#: cli/board/list.go:51
+msgid ""
+"Command keeps running and prints list of connected boards whenever there is "
+"a change."
+msgstr ""
+"Command keeps running and prints list of connected boards whenever there is "
+"a change."
+
+#: commands/debug/debug_info.go:119 commands/upload/upload.go:444
+msgid "Compiled sketch not found in %s"
+msgstr "Compiled sketch not found in %s"
+
+#: cli/compile/compile.go:75 cli/compile/compile.go:76
+msgid "Compiles Arduino sketches."
+msgstr "Compiles Arduino sketches."
+
+#: legacy/builder/builder.go:78
+msgid "Compiling core..."
+msgstr "Compiling core..."
+
+#: legacy/builder/builder.go:72
+msgid "Compiling libraries..."
+msgstr "Compiling libraries..."
+
+#: legacy/builder/phases/libraries_builder.go:132
+msgid "Compiling library \"%[1]s\""
+msgstr "Compiling library \"%[1]s\""
+
+#: legacy/builder/builder.go:67
+msgid "Compiling sketch..."
+msgstr "Compiling sketch..."
+
+#: cli/config/init.go:90
+msgid ""
+"Config file already exists, use --overwrite to discard the existing one."
+msgstr ""
+"Config file already exists, use --overwrite to discard the existing one."
+
+#: cli/config/init.go:110
+msgid "Config file written to: %s"
+msgstr "Config file written to: %s"
+
+#: cli/monitor/monitor.go:63
+msgid "Configuration of the port."
+msgstr "Configuration of the port."
+
+#: cli/debug/debug.go:146
+msgid "Configuration options for %s"
+msgstr "Configuration options for %s"
+
+#: commands/instances.go:853
+msgid "Configuring platform"
+msgstr "Configuring platform"
+
+#: commands/core/install.go:167
+msgid "Configuring platform."
+msgstr "Configuring platform."
+
+#: cli/board/list.go:184
+msgid "Connected"
+msgstr "Connected"
+
+#: cli/monitor/monitor.go:177
+msgid "Connected to %s! Press CTRL-C to exit."
+msgstr "Connected to %s! Press CTRL-C to exit."
+
+#: cli/board/list.go:88 cli/board/list.go:126
+msgid "Core"
+msgstr "Core"
+
+#: cli/update/update.go:82
+msgid "Core name"
+msgstr "Core name"
+
+#: commands/download.go:32
+msgid "Could not connect via HTTP"
+msgstr "Could not connect via HTTP"
+
+#: commands/instances.go:369
+msgid "Could not create index directory"
+msgstr "Could not create index directory"
+
+#: legacy/builder/phases/core_builder.go:47
+msgid "Couldn't deeply cache core build: %[1]s"
+msgstr "Couldn't deeply cache core build: %[1]s"
+
+#: legacy/builder/phases/sizer.go:79
+msgid "Couldn't determine program size"
+msgstr "Couldn't determine program size"
+
+#: cli/arguments/sketch.go:37 cli/lib/install.go:105
+msgid "Couldn't get current working directory: %v"
+msgstr "Couldn't get current working directory: %v"
+
+#: cli/sketch/new.go:36 cli/sketch/new.go:37
+msgid "Create a new Sketch"
+msgstr "Create a new Sketch"
+
+#: cli/sketch/archive.go:39 cli/sketch/archive.go:40
+msgid "Creates a zip file containing all sketch files."
+msgstr "Creates a zip file containing all sketch files."
+
+#: cli/config/init.go:43
+msgid ""
+"Creates or updates the configuration file in the data directory or custom "
+"directory with the current configuration settings."
+msgstr ""
+"Creates or updates the configuration file in the data directory or custom "
+"directory with the current configuration settings."
+
+#: cli/core/list.go:88 cli/core/search.go:118
+msgid "DEPRECATED"
+msgstr "DEPRECATED"
+
+#: cli/daemon/daemon.go:174
+msgid "Daemon is now listening on %s:%s"
+msgstr "Daemon is now listening on %s:%s"
+
+#: cli/debug/debug.go:52
+msgid "Debug Arduino sketches."
+msgstr "Debug Arduino sketches."
+
+#: cli/debug/debug.go:53
+msgid ""
+"Debug Arduino sketches. (this command opens an interactive gdb session)"
+msgstr ""
+"Debug Arduino sketches. (this command opens an interactive gdb session)"
+
+#: cli/debug/debug.go:62
+msgid "Debug interpreter e.g.: %s"
+msgstr "Debug interpreter e.g.: %s"
+
+#: commands/debug/debug_info.go:142
+msgid "Debugging not supported for board %s"
+msgstr "Debugging not supported for board %s"
+
+#: cli/board/details.go:123
+msgid "Debugging supported:"
+msgstr "Debugging supported:"
+
+#: cli/monitor/monitor.go:195
+msgid "Default"
+msgstr "Default"
+
+#: cli/cache/clean.go:31
+msgid "Delete Boards/Library Manager download cache."
+msgstr "Delete Boards/Library Manager download cache."
+
+#: cli/cache/clean.go:32
+msgid ""
+"Delete contents of the `directories.downloads` folder, where archive files "
+"are staged during installation of libraries and boards platforms."
+msgstr ""
+"Delete contents of the `directories.downloads` folder, where archive files "
+"are staged during installation of libraries and boards platforms."
+
+#: cli/config/delete.go:33 cli/config/delete.go:34
+msgid "Deletes a settings key and all its sub keys."
+msgstr "Deletes a settings key and all its sub keys."
+
+#: cli/lib/search.go:179
+msgid "Dependencies: %s"
+msgstr "Dependencies: %s"
+
+#: cli/lib/list.go:124
+msgid "Description"
+msgstr "Description"
+
+#: legacy/builder/builder.go:59
+msgid "Detecting libraries used..."
+msgstr "Detecting libraries used..."
+
+#: cli/board/list.go:44
+msgid ""
+"Detects and displays a list of boards connected to the current computer."
+msgstr ""
+"Detects and displays a list of boards connected to the current computer."
+
+#: cli/debug/debug.go:63
+msgid "Directory containing binaries for debug."
+msgstr "Directory containing binaries for debug."
+
+#: cli/upload/upload.go:62
+msgid "Directory containing binaries to upload."
+msgstr "Directory containing binaries to upload."
+
+#: cli/generatedocs/generatedocs.go:45
+msgid ""
+"Directory where to save generated files. Default is './docs', the directory "
+"must exist."
+msgstr ""
+"Directory where to save generated files. Default is './docs', the directory "
+"must exist."
+
+#: cli/completion/completion.go:45
+msgid "Disable completion description for shells that support it"
+msgstr "Disable completion description for shells that support it"
+
+#: cli/board/list.go:185
+msgid "Disconnected"
+msgstr "Disconnected"
+
+#: cli/daemon/daemon.go:66
+msgid "Display only the provided gRPC calls"
+msgstr "Display only the provided gRPC calls"
+
+#: cli/lib/install.go:61
+msgid "Do not install dependencies."
+msgstr "Do not install dependencies."
+
+#: cli/burnbootloader/burnbootloader.go:59 cli/upload/upload.go:67
+msgid "Do not perform the actual upload, just log out actions"
+msgstr "Do not perform the actual upload, just log out actions"
+
+#: cli/daemon/daemon.go:64
+msgid "Do not terminate daemon process if the parent process dies"
+msgstr "Do not terminate daemon process if the parent process dies"
+
+#: commands/instances.go:704 commands/instances.go:763
+#: commands/lib/download.go:58
+msgid "Downloading %s"
+msgstr "Downloading %s"
+
+#: commands/instances.go:97
+msgid "Downloading missing tool %s"
+msgstr "Downloading missing tool %s"
+
+#: commands/core/install.go:87
+msgid "Downloading packages"
+msgstr "Downloading packages"
+
+#: cli/core/download.go:37 cli/core/download.go:38
+msgid "Downloads one or more cores and corresponding tool dependencies."
+msgstr "Downloads one or more cores and corresponding tool dependencies."
+
+#: cli/lib/download.go:37 cli/lib/download.go:38
+msgid "Downloads one or more libraries without installing them."
+msgstr "Downloads one or more libraries without installing them."
+
+#: cli/daemon/daemon.go:65
+msgid "Enable debug logging of gRPC calls"
+msgstr "Enable debug logging of gRPC calls"
+
+#: cli/lib/install.go:63
+msgid "Enter a path to zip file"
+msgstr "Enter a path to zip file"
+
+#: cli/lib/install.go:62
+msgid "Enter git url for libraries hosted on repositories"
+msgstr "Enter git url for libraries hosted on repositories"
+
+#: commands/sketch/archive.go:105
+msgid "Error adding file to sketch archive"
+msgstr "Error adding file to sketch archive"
+
+#: legacy/builder/phases/core_builder.go:132
+msgid "Error archiving built core (caching) in %[1]s: %[2]s"
+msgstr "Error archiving built core (caching) in %[1]s: %[2]s"
+
+#: cli/sketch/archive.go:79
+msgid "Error archiving: %v"
+msgstr "Error archiving: %v"
+
+#: commands/sketch/archive.go:93
+msgid "Error calculating relative file path"
+msgstr "Error calculating relative file path"
+
+#: cli/cache/clean.go:46
+msgid "Error cleaning caches: %v"
+msgstr "Error cleaning caches: %v"
+
+#: commands/compile/compile.go:280
+msgid "Error copying output file %s"
+msgstr "Error copying output file %s"
+
+#: cli/core/search.go:66 cli/instance/instance.go:42
+#: cli/instance/instance.go:153 cli/lib/search.go:59
+msgid "Error creating instance: %v"
+msgstr "Error creating instance: %v"
+
+#: commands/compile/compile.go:260
+msgid "Error creating output dir"
+msgstr "Error creating output dir"
+
+#: commands/sketch/archive.go:81
+msgid "Error creating sketch archive"
+msgstr "Error creating sketch archive"
+
+#: cli/arguments/sketch.go:51 cli/sketch/new.go:52 cli/sketch/new.go:61
+msgid "Error creating sketch: %v"
+msgstr "Error creating sketch: %v"
+
+#: cli/board/list.go:72 cli/board/list.go:81
+msgid "Error detecting boards: %v"
+msgstr "Error detecting boards: %v"
+
+#: cli/arguments/port.go:159
+msgid "Error discovering port: %v"
+msgstr "Error discovering port: %v"
+
+#: cli/core/download.go:71 cli/lib/download.go:68
+msgid "Error downloading %[1]s: %[2]v"
+msgstr "Error downloading %[1]s: %[2]v"
+
+#: commands/instances.go:474 commands/instances.go:478
+#: commands/instances.go:483
+msgid "Error downloading index '%s'"
+msgstr "Error downloading index '%s'"
+
+#: commands/instances.go:507 commands/instances.go:513
+msgid "Error downloading index signature '%s'"
+msgstr "Error downloading index signature '%s'"
+
+#: commands/instances.go:706 commands/instances.go:708
+msgid "Error downloading library"
+msgstr "Error downloading library"
+
+#: commands/instances.go:383 commands/instances.go:386
+msgid "Error downloading library_index.json.gz"
+msgstr "Error downloading library_index.json.gz"
+
+#: commands/instances.go:393 commands/instances.go:396
+msgid "Error downloading library_index.json.sig"
+msgstr "Error downloading library_index.json.sig"
+
+#: commands/core/download.go:71 commands/core/download.go:75
+#: commands/instances.go:789 commands/instances.go:791
+msgid "Error downloading platform %s"
+msgstr "Error downloading platform %s"
+
+#: commands/core/download.go:84 commands/core/download.go:89
+#: commands/instances.go:782 commands/instances.go:783
+msgid "Error downloading tool %s"
+msgstr "Error downloading tool %s"
+
+#: cli/debug/debug.go:108
+msgid "Error during Debug: %v"
+msgstr "Error during Debug: %v"
+
+#: cli/compile/compile.go:170
+msgid "Error during FQBN detection: %v"
+msgstr "Error during FQBN detection: %v"
+
+#: cli/feedback/feedback.go:160
+msgid "Error during JSON encoding of the output: %v"
+msgstr "Error during JSON encoding of the output: %v"
+
+#: cli/burnbootloader/burnbootloader.go:73
+#: cli/burnbootloader/burnbootloader.go:86 cli/compile/compile.go:222
+#: cli/compile/compile.go:254 cli/upload/upload.go:88 cli/upload/upload.go:94
+#: cli/upload/upload.go:111 cli/upload/upload.go:138
+msgid "Error during Upload: %v"
+msgstr "Error during Upload: %v"
+
+#: cli/feedback/feedback.go:171
+msgid "Error during YAML encoding of the output: %v"
+msgstr "Error during YAML encoding of the output: %v"
+
+#: cli/compile/compile.go:266
+msgid "Error during build: %v"
+msgstr "Error during build: %v"
+
+#: cli/core/install.go:80
+msgid "Error during install: %v"
+msgstr "Error during install: %v"
+
+#: cli/core/uninstall.go:72
+msgid "Error during uninstall: %v"
+msgstr "Error during uninstall: %v"
+
+#: cli/core/upgrade.go:105
+msgid "Error during upgrade: %v"
+msgstr "Error during upgrade: %v"
+
+#: commands/instances.go:402
+msgid "Error extracting library_index.json.gz"
+msgstr "Error extracting library_index.json.gz"
+
+#: commands/upload/upload.go:441
+msgid "Error finding build artifacts"
+msgstr "Error finding build artifacts"
+
+#: cli/debug/debug.go:95
+msgid "Error getting Debug info: %v"
+msgstr "Error getting Debug info: %v"
+
+#: commands/sketch/archive.go:59
+msgid "Error getting absolute path of sketch archive"
+msgstr "Error getting absolute path of sketch archive"
+
+#: cli/board/details.go:70
+msgid "Error getting board details: %v"
+msgstr "Error getting board details: %v"
+
+#: commands/board/list.go:147
+msgid "Error getting board info from Arduino Cloud"
+msgstr "Error getting board info from Arduino Cloud"
+
+#: commands/board/list.go:212
+msgid "Error getting board list"
+msgstr "Error getting board list"
+
+#: arduino/builder/compilation_database.go:78
+msgid "Error getting current directory for compilation database: %s"
+msgstr "Error getting current directory for compilation database: %s"
+
+#: commands/compile/compile.go:289 commands/lib/list.go:107
+msgid "Error getting information for library %s"
+msgstr "Error getting information for library %s"
+
+#: cli/lib/examples.go:73
+msgid "Error getting libraries info: %v"
+msgstr "Error getting libraries info: %v"
+
+#: cli/monitor/monitor.go:90
+msgid "Error getting port settings details: %s"
+msgstr "Error getting port settings details: %s"
+
+#: cli/core/search.go:81 cli/instance/instance.go:46 cli/lib/search.go:73
+#: cli/update/update.go:70
+msgid "Error initializing instance: %v"
+msgstr "Error initializing instance: %v"
+
+#: cli/lib/install.go:138
+msgid "Error installing %s: %v"
+msgstr "Error installing %s: %v"
+
+#: cli/lib/install.go:116
+msgid "Error installing Git Library: %v"
+msgstr "Error installing Git Library: %v"
+
+#: cli/lib/install.go:93
+msgid "Error installing Zip Library: %v"
+msgstr "Error installing Zip Library: %v"
+
+#: commands/instances.go:810
+msgid "Error installing platform %s"
+msgstr "Error installing platform %s"
+
+#: commands/instances.go:800
+msgid "Error installing tool %s"
+msgstr "Error installing tool %s"
+
+#: cli/lib/list.go:76
+msgid "Error listing libraries: %v"
+msgstr "Error listing libraries: %v"
+
+#: cli/board/listall.go:64
+msgid "Error listing boards: %v"
+msgstr "Error listing boards: %v"
+
+#: cli/core/list.go:61
+msgid "Error listing platforms: %v"
+msgstr "Error listing platforms: %v"
+
+#: legacy/builder/hardware_loader.go:38
+msgid "Error loading hardware platform: %[1]s"
+msgstr "Error loading hardware platform: %[1]s"
+
+#: cli/compile/compile.go:143
+msgid "Error opening source code overrides data file: %v"
+msgstr "Error opening source code overrides data file: %v"
+
+#: commands/compile/compile.go:270
+msgid "Error reading build directory"
+msgstr "Error reading build directory"
+
+#: configuration/configuration.go:69
+msgid "Error reading config file: %v"
+msgstr "Error reading config file: %v"
+
+#: commands/sketch/archive.go:75
+msgid "Error reading sketch files"
+msgstr "Error reading sketch files"
+
+#: legacy/builder/target_board_resolver.go:30
+msgid "Error resolving FQBN"
+msgstr "Error resolving FQBN"
+
+#: cli/lib/check_deps.go:66
+msgid "Error resolving dependencies for %[1]s: %[2]s"
+msgstr "Error resolving dependencies for %[1]s: %[2]s"
+
+#: cli/core/upgrade.go:63
+msgid "Error retrieving core list: %v"
+msgstr "Error retrieving core list: %v"
+
+#: cli/outdated/outdated.go:57 cli/update/update.go:77
+msgid "Error retrieving outdated cores and libraries: %v"
+msgstr "Error retrieving outdated cores and libraries: %v"
+
+#: commands/instances.go:826
+msgid "Error rolling-back changes"
+msgstr "Error rolling-back changes"
+
+#: commands/core/install.go:149
+msgid "Error rolling-back changes: %s"
+msgstr "Error rolling-back changes: %s"
+
+#: commands/instances.go:532
+msgid "Error saving downloaded index %s"
+msgstr "Error saving downloaded index %s"
+
+#: commands/instances.go:536
+msgid "Error saving downloaded index signature"
+msgstr "Error saving downloaded index signature"
+
+#: cli/board/search.go:62
+msgid "Error searching boards: %v"
+msgstr "Error searching boards: %v"
+
+#: cli/lib/search.go:81
+msgid "Error searching for Library: %v"
+msgstr "Error searching for Library: %v"
+
+#: cli/core/search.go:93
+msgid "Error searching for platforms: %v"
+msgstr "Error searching for platforms: %v"
+
+#: arduino/builder/compilation_database.go:63
+msgid "Error serializing compilation database: %s"
+msgstr "Error serializing compilation database: %s"
+
+#: commands/board/list.go:197 commands/board/list.go:200
+#: commands/board/list.go:241
+msgid "Error starting board discoveries"
+msgstr "Error starting board discoveries"
+
+#: cli/lib/uninstall.go:66
+msgid "Error uninstalling %[1]s: %[2]v"
+msgstr "Error uninstalling %[1]s: %[2]v"
+
+#: commands/core/uninstall.go:81
+msgid "Error uninstalling platform %s"
+msgstr "Error uninstalling platform %s"
+
+#: commands/core/uninstall.go:97 commands/instances.go:842
+msgid "Error uninstalling tool %s"
+msgstr "Error uninstalling tool %s"
+
+#: cli/update/update.go:62
+msgid "Error updating core and libraries index: %v"
+msgstr "Error updating core and libraries index: %v"
+
+#: cli/core/search.go:75 cli/core/update_index.go:52
+msgid "Error updating index: %v"
+msgstr "Error updating index: %v"
+
+#: cli/instance/instance.go:162
+msgid "Error updating indexes: %v"
+msgstr "Error updating indexes: %v"
+
+#: cli/lib/search.go:68 cli/lib/update_index.go:52
+msgid "Error updating library index: %v"
+msgstr "Error updating library index: %v"
+
+#: cli/lib/upgrade.go:51 cli/lib/upgrade.go:57
+msgid "Error upgrading libraries: %v"
+msgstr "Error upgrading libraries: %v"
+
+#: commands/core/install.go:144 commands/instances.go:821
+msgid "Error upgrading platform: %s"
+msgstr "Error upgrading platform: %s"
+
+#: cli/upgrade/upgrade.go:63
+msgid "Error upgrading: %v"
+msgstr "Error upgrading: %v"
+
+#: commands/instances.go:407 commands/instances.go:517
+msgid "Error verifying signature"
+msgstr "Error verifying signature"
+
+#: legacy/builder/container_find_includes.go:364
+msgid "Error while detecting libraries included by %[1]s"
+msgstr "Error while detecting libraries included by %[1]s"
+
+#: legacy/builder/phases/sizer.go:140 legacy/builder/phases/sizer.go:146
+msgid "Error while determining sketch size: %s"
+msgstr "Error while determining sketch size: %s"
+
+#: arduino/builder/compilation_database.go:66
+msgid "Error writing compilation database: %s"
+msgstr "Error writing compilation database: %s"
+
+#: commands/instances.go:416
+msgid "Error writing library_index.json"
+msgstr "Error writing library_index.json"
+
+#: commands/instances.go:419
+msgid "Error writing library_index.json.sig"
+msgstr "Error writing library_index.json.sig"
+
+#: cli/completion/completion.go:53
+msgid "Error: command description is not supported by %v"
+msgstr "Error: command description is not supported by %v"
+
+#: cli/compile/compile.go:150
+msgid "Error: invalid source code overrides data file: %v"
+msgstr "Error: invalid source code overrides data file: %v"
+
+#: cli/board/list.go:88
+msgid "Event"
+msgstr "Event"
+
+#: cli/lib/examples.go:122
+msgid "Examples for library %s"
+msgstr "Examples for library %s"
+
+#: cli/usage.go:28
+msgid "Examples:"
+msgstr "Examples:"
+
+#: cli/debug/debug.go:127
+msgid "Executable to debug"
+msgstr "Executable to debug"
+
+#: commands/debug/debug_info.go:122 commands/upload/upload.go:447
+msgid "Expected compiled sketch in directory %s, but is a file instead"
+msgstr "Expected compiled sketch in directory %s, but is a file instead"
+
+#: cli/board/attach.go:40 cli/board/details.go:43 cli/board/list.go:88
+#: cli/board/list.go:126 cli/board/listall.go:87 cli/board/search.go:85
+msgid "FQBN"
+msgstr "FQBN"
+
+#: cli/board/details.go:120
+msgid "FQBN:"
+msgstr "FQBN:"
+
+#: commands/upload/upload.go:536
+msgid "Failed chip erase"
+msgstr "Failed chip erase"
+
+#: cli/daemon/daemon.go:148
+msgid "Failed choosing port, address: %s"
+msgstr "Failed choosing port, address: %s"
+
+#: commands/upload/upload.go:543
+msgid "Failed programming"
+msgstr "Failed programming"
+
+#: commands/upload/upload.go:539
+msgid "Failed to burn bootloader"
+msgstr "Failed to burn bootloader"
+
+#: commands/instances.go:127
+msgid "Failed to create data directory"
+msgstr "Failed to create data directory"
+
+#: commands/instances.go:117
+msgid "Failed to create downloads directory"
+msgstr "Failed to create downloads directory"
+
+#: cli/daemon/daemon.go:127
+msgid "Failed to listen on TCP port: %[1]s. %[2]s is an invalid port."
+msgstr "Failed to listen on TCP port: %[1]s. %[2]s is an invalid port."
+
+#: cli/daemon/daemon.go:121
+msgid "Failed to listen on TCP port: %[1]s. %[2]s is unknown name."
+msgstr "Failed to listen on TCP port: %[1]s. %[2]s is unknown name."
+
+#: cli/daemon/daemon.go:136
+msgid "Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v"
+msgstr "Failed to listen on TCP port: %[1]s. Unexpected error: %[2]v"
+
+#: cli/daemon/daemon.go:133
+msgid "Failed to listen on TCP port: %s. Address already in use."
+msgstr "Failed to listen on TCP port: %s. Address already in use."
+
+#: commands/upload/upload.go:547
+msgid "Failed uploading"
+msgstr "Failed uploading"
+
+#: cli/board/details.go:165
+msgid "File:"
+msgstr "File:"
+
+#: commands/daemon/debug.go:47
+msgid "First message must contain debug request, not data"
+msgstr "First message must contain debug request, not data"
+
+#: cli/usage.go:30
+msgid "Flags:"
+msgstr "Flags:"
+
+#: cli/arguments/post_install.go:35
+msgid ""
+"Force run of post-install scripts (if the CLI is not running interactively)."
+msgstr ""
+"Force run of post-install scripts (if the CLI is not running interactively)."
+
+#: cli/arguments/post_install.go:36
+msgid ""
+"Force skip of post-install scripts (if the CLI is running interactively)."
+msgstr ""
+"Force skip of post-install scripts (if the CLI is running interactively)."
+
+#: arduino/errors.go:729
+msgid ""
+"Found %d platform for reference \"%s\":\n"
+"%s"
+msgstr ""
+"Found %d platform for reference \"%s\":\n"
+"%s"
+
+#: cli/arguments/fqbn.go:29
+msgid "Fully Qualified Board Name, e.g.: arduino:avr:uno"
+msgstr "Fully Qualified Board Name, e.g.: arduino:avr:uno"
+
+#: cli/debug/debug.go:141
+msgid "GDB Server path"
+msgstr "GDB Server path"
+
+#: cli/debug/debug.go:140
+msgid "GDB Server type"
+msgstr "GDB Server type"
+
+#: commands/debug/debug.go:173
+msgid "GDB server '%s' is not supported"
+msgstr "GDB server '%s' is not supported"
+
+#: cli/generatedocs/generatedocs.go:38 cli/generatedocs/generatedocs.go:39
+msgid "Generates bash completion and command manpages."
+msgstr "Generates bash completion and command manpages."
+
+#: cli/completion/completion.go:39
+msgid "Generates completion scripts"
+msgstr "Generates completion scripts"
+
+#: cli/completion/completion.go:40
+msgid "Generates completion scripts for various shells"
+msgstr "Generates completion scripts for various shells"
+
+#: legacy/builder/builder.go:64
+msgid "Generating function prototypes..."
+msgstr "Generating function prototypes..."
+
+#: cli/usage.go:31
+msgid "Global Flags:"
+msgstr "Global Flags:"
+
+#: legacy/builder/phases/sizer.go:89
+msgid ""
+"Global variables use %[1]s bytes (%[3]s%%) of dynamic memory, leaving %[4]s "
+"bytes for local variables. Maximum is %[2]s bytes."
+msgstr ""
+"Global variables use %[1]s bytes (%[3]s%%) of dynamic memory, leaving %[4]s "
+"bytes for local variables. Maximum is %[2]s bytes."
+
+#: legacy/builder/phases/sizer.go:95
+msgid "Global variables use %[1]s bytes of dynamic memory."
+msgstr "Global variables use %[1]s bytes of dynamic memory."
+
+#: cli/core/list.go:84 cli/core/search.go:114 cli/monitor/monitor.go:195
+#: cli/outdated/outdated.go:62
+msgid "ID"
+msgstr "ID"
+
+#: cli/board/details.go:92 cli/board/details.go:193
+msgid "Id"
+msgstr "Id"
+
+#: cli/board/details.go:134
+msgid "Identification properties:"
+msgstr "Identification properties:"
+
+#: cli/compile/compile.go:116
+msgid "If set built binaries will be exported to the sketch folder."
+msgstr "If set built binaries will be exported to the sketch folder."
+
+#: cli/core/list.go:47
+msgid ""
+"If set return all installable and installed cores, including manually "
+"installed."
+msgstr ""
+"If set return all installable and installed cores, including manually "
+"installed."
+
+#: cli/lib/list.go:53
+msgid "Include built-in libraries (from platforms and IDE) in listing."
+msgstr "Include built-in libraries (from platforms and IDE) in listing."
+
+#: cli/sketch/archive.go:51
+msgid "Includes %s directory in the archive."
+msgstr "Includes %s directory in the archive."
+
+#: cli/core/list.go:84 cli/lib/list.go:124
+msgid "Installed"
+msgstr "Installed"
+
+#: commands/instances.go:729 commands/lib/install.go:113
+msgid "Installed %s"
+msgstr "Installed %s"
+
+#: cli/outdated/outdated.go:62 cli/outdated/outdated.go:72
+#: cli/update/update.go:82 cli/update/update.go:92
+msgid "Installed version"
+msgstr "Installed version"
+
+#: commands/bundled_tools.go:49 commands/instances.go:712
+#: commands/lib/install.go:93
+msgid "Installing %s"
+msgstr "Installing %s"
+
+#: commands/core/install.go:110
+msgid "Installing platform %s"
+msgstr "Installing platform %s"
+
+#: cli/core/install.go:41 cli/core/install.go:42
+msgid "Installs one or more cores and corresponding tool dependencies."
+msgstr "Installs one or more cores and corresponding tool dependencies."
+
+#: cli/lib/install.go:48 cli/lib/install.go:49
+msgid "Installs one or more specified libraries into the system."
+msgstr "Installs one or more specified libraries into the system."
+
+#: legacy/builder/container_find_includes.go:388
+msgid "Internal error in cache"
+msgstr "Internal error in cache"
+
+#: arduino/errors.go:300
+msgid "Invalid '%[1]s' property: %[2]s"
+msgstr "Invalid '%[1]s' property: %[2]s"
+
+#: cli/cli.go:268
+msgid ""
+"Invalid Call : should show Help, but it is available only in TEXT mode."
+msgstr ""
+"Invalid Call : should show Help, but it is available only in TEXT mode."
+
+#: commands/board/attach.go:66
+msgid "Invalid Device URL format"
+msgstr "Invalid Device URL format"
+
+#: arduino/errors.go:62
+msgid "Invalid FQBN"
+msgstr "Invalid FQBN"
+
+#: arduino/errors.go:80
+msgid "Invalid URL"
+msgstr "Invalid URL"
+
+#: commands/instances.go:193
+msgid "Invalid additional URL: %v"
+msgstr "Invalid additional URL: %v"
+
+#: cli/core/download.go:58 cli/core/install.go:66 cli/core/uninstall.go:55
+#: cli/core/upgrade.go:81 cli/lib/download.go:56 cli/lib/uninstall.go:55
+msgid "Invalid argument passed: %v"
+msgstr "Invalid argument passed: %v"
+
+#: legacy/builder/phases/sizer.go:165
+msgid "Invalid data size regexp: %s"
+msgstr "Invalid data size regexp: %s"
+
+#: commands/board/attach.go:76
+msgid "Invalid device port type provided"
+msgstr "Invalid device port type provided"
+
+#: legacy/builder/phases/sizer.go:171
+msgid "Invalid eeprom size regexp: %s"
+msgstr "Invalid eeprom size regexp: %s"
+
+#: arduino/errors.go:48
+msgid "Invalid instance"
+msgstr "Invalid instance"
+
+#: cli/core/upgrade.go:87
+msgid "Invalid item %s"
+msgstr "Invalid item %s"
+
+#: arduino/errors.go:98
+msgid "Invalid library"
+msgstr "Invalid library"
+
+#: httpclient/httpclient_config.go:44
+msgid "Invalid network.proxy '%[1]s': %[2]s"
+msgstr "Invalid network.proxy '%[1]s': %[2]s"
+
+#: cli/cli.go:229
+msgid "Invalid option for --log-level: %s"
+msgstr "Invalid option for --log-level: %s"
+
+#: cli/cli.go:246
+msgid "Invalid output format: %s"
+msgstr "Invalid output format: %s"
+
+#: commands/instances.go:450 commands/instances.go:524
+msgid "Invalid package index in %s"
+msgstr "Invalid package index in %s"
+
+#: cli/core/uninstall.go:61
+msgid "Invalid parameter %s: version not allowed"
+msgstr "Invalid parameter %s: version not allowed"
+
+#: commands/board/list.go:58
+msgid "Invalid pid value: '%s'"
+msgstr "Invalid pid value: '%s'"
+
+#: commands/monitor/monitor.go:127
+msgid "Invalid recipe in platform.txt"
+msgstr "Invalid recipe in platform.txt"
+
+#: legacy/builder/phases/sizer.go:155
+msgid "Invalid size regexp: %s"
+msgstr "Invalid size regexp: %s"
+
+#: arduino/errors.go:116
+msgid "Invalid version"
+msgstr "Invalid version"
+
+#: commands/board/list.go:55
+msgid "Invalid vid value: '%s'"
+msgstr "Invalid vid value: '%s'"
+
+#: cli/compile/compile.go:111
+msgid ""
+"Just produce the compilation database, without actually compiling. All build"
+" commands are skipped except pre* hooks."
+msgstr ""
+"Just produce the compilation database, without actually compiling. All build"
+" commands are skipped except pre* hooks."
+
+#: cli/lib/list.go:42
+msgid "LIBNAME"
+msgstr "LIBNAME"
+
+#: cli/lib/check_deps.go:36 cli/lib/install.go:47
+msgid "LIBRARY"
+msgstr "LIBRARY"
+
+#: cli/lib/download.go:36 cli/lib/examples.go:43 cli/lib/search.go:43
+#: cli/lib/uninstall.go:36
+msgid "LIBRARY_NAME"
+msgstr "LIBRARY_NAME"
+
+#: cli/core/list.go:84
+msgid "Latest"
+msgstr "Latest"
+
+#: legacy/builder/phases/libraries_builder.go:89
+msgid "Library %[1]s has been declared precompiled:"
+msgstr "Library %[1]s has been declared precompiled:"
+
+#: commands/lib/uninstall.go:37
+msgid "Library %s is not installed"
+msgstr "Library %s is not installed"
+
+#: arduino/errors.go:348
+msgid "Library '%s' not found"
+msgstr "Library '%s' not found"
+
+#: legacy/builder/fail_if_imported_library_is_wrong.go:45
+msgid ""
+"Library can't use both '%[1]s' and '%[2]s' folders. Double check in '%[3]s'."
+msgstr ""
+"Library can't use both '%[1]s' and '%[2]s' folders. Double check in '%[3]s'."
+
+#: arduino/errors.go:464
+msgid "Library install failed"
+msgstr "Library install failed"
+
+#: commands/lib/install.go:123 commands/lib/install.go:133
+msgid "Library installed"
+msgstr "Library installed"
+
+#: cli/outdated/outdated.go:72 cli/update/update.go:92
+msgid "Library name"
+msgstr "Library name"
+
+#: cli/lib/search.go:169
+msgid "License: %s"
+msgstr "License: %s"
+
+#: legacy/builder/builder.go:83
+msgid "Linking everything together..."
+msgstr "Linking everything together..."
+
+#: cli/board/listall.go:40 cli/board/search.go:39
+msgid ""
+"List all boards that have the support platform installed. You can search\n"
+"for a specific board if you specify the board name"
+msgstr ""
+"List all boards that have the support platform installed. You can search\n"
+"for a specific board if you specify the board name"
+
+#: cli/board/listall.go:39 cli/board/search.go:38
+msgid "List all known boards and their corresponding FQBN."
+msgstr "List all known boards and their corresponding FQBN."
+
+#: cli/board/list.go:43
+msgid "List connected boards."
+msgstr "List connected boards."
+
+#: cli/compile/compile.go:94
+msgid ""
+"List of custom build properties separated by commas. Or can be used multiple"
+" times for multiple properties."
+msgstr ""
+"List of custom build properties separated by commas. Or can be used multiple"
+" times for multiple properties."
+
+#: cli/compile/compile.go:108
+msgid ""
+"List of custom libraries dir paths separated by commas. Or can be used "
+"multiple times for multiple libraries dir paths."
+msgstr ""
+"List of custom libraries dir paths separated by commas. Or can be used "
+"multiple times for multiple libraries dir paths."
+
+#: cli/compile/compile.go:106
+msgid ""
+"List of paths to libraries root folders. Libraries set this way have top "
+"priority in case of conflicts. Can be used multiple times for different "
+"libraries."
+msgstr ""
+"List of paths to libraries root folders. Libraries set this way have top "
+"priority in case of conflicts. Can be used multiple times for different "
+"libraries."
+
+#: cli/lib/list.go:55
+msgid "List updatable libraries."
+msgstr "List updatable libraries."
+
+#: cli/core/list.go:46
+msgid "List updatable platforms."
+msgstr "List updatable platforms."
+
+#: cli/board/board.go:33
+msgid "Lists all connected boards."
+msgstr "Lists all connected boards."
+
+#: cli/outdated/outdated.go:38
+msgid "Lists cores and libraries that can be upgraded"
+msgstr "Lists cores and libraries that can be upgraded"
+
+#: commands/instances.go:207 commands/instances.go:218
+#: commands/instances.go:320
+msgid "Loading index file: %v"
+msgstr "Loading index file: %v"
+
+#: commands/instances.go:329
+msgid "Loading libraries: %v"
+msgstr "Loading libraries: %v"
+
+#: cli/lib/list.go:124
+msgid "Location"
+msgstr "Location"
+
+#: legacy/builder/phases/sizer.go:130
+msgid "Low memory available, stability problems may occur."
+msgstr "Low memory available, stability problems may occur."
+
+#: cli/lib/search.go:164
+msgid "Maintainer: %s"
+msgstr "Maintainer: %s"
+
+#: cli/arguments/port.go:54 cli/board/list.go:50
+msgid "Max time to wait for port discovery, e.g.: 30s, 1m"
+msgstr "Max time to wait for port discovery, e.g.: 30s, 1m"
+
+#: cli/cli.go:109
+msgid ""
+"Messages with this level and above will be logged. Valid levels are: %s"
+msgstr ""
+"Messages with this level and above will be logged. Valid levels are: %s"
+
+#: legacy/builder/fail_if_imported_library_is_wrong.go:40
+msgid "Missing '%[1]s' from library in %[2]s"
+msgstr "Missing '%[1]s' from library in %[2]s"
+
+#: arduino/errors.go:152
+msgid "Missing FQBN (Fully Qualified Board Name)"
+msgstr "Missing FQBN (Fully Qualified Board Name)"
+
+#: arduino/errors.go:206
+msgid "Missing port"
+msgstr "Missing port"
+
+#: arduino/errors.go:182 arduino/errors.go:194
+msgid "Missing port protocol"
+msgstr "Missing port protocol"
+
+#: arduino/errors.go:232
+msgid "Missing programmer"
+msgstr "Missing programmer"
+
+#: legacy/builder/phases/sizer.go:159
+msgid "Missing size regexp"
+msgstr "Missing size regexp"
+
+#: arduino/errors.go:400
+msgid "Missing sketch path"
+msgstr "Missing sketch path"
+
+#: arduino/errors.go:281
+msgid "Monitor '%s' not found"
+msgstr "Monitor '%s' not found"
+
+#: cli/monitor/monitor.go:143
+msgid "Monitor port settings:"
+msgstr "Monitor port settings:"
+
+#: legacy/builder/print_used_and_not_used_libraries.go:45
+msgid "Multiple libraries were found for \"%[1]s\""
+msgstr "Multiple libraries were found for \"%[1]s\""
+
+#: cli/board/details.go:193 cli/core/list.go:84 cli/core/search.go:114
+#: cli/lib/list.go:124 cli/outdated/outdated.go:62
+msgid "Name"
+msgstr "Name"
+
+#: cli/lib/search.go:143
+msgid "Name: \"%s\""
+msgstr "Name: \"%s\""
+
+#: cli/outdated/outdated.go:62 cli/outdated/outdated.go:72
+#: cli/update/update.go:82 cli/update/update.go:92
+msgid "New version"
+msgstr "New version"
+
+#: cli/board/list.go:116
+msgid "No boards found."
+msgstr "No boards found."
+
+#: cli/lib/examples.go:107
+msgid "No libraries found."
+msgstr "No libraries found."
+
+#: cli/lib/list.go:116
+msgid "No libraries installed."
+msgstr "No libraries installed."
+
+#: cli/lib/search.go:127
+msgid "No libraries matching your search."
+msgstr "No libraries matching your search."
+
+#: cli/lib/search.go:138
+msgid ""
+"No libraries matching your search.\n"
+"Did you mean...\n"
+msgstr ""
+"No libraries matching your search.\n"
+"Did you mean...\n"
+
+#: arduino/errors.go:220
+msgid "No monitor available for the port protocol %s"
+msgstr "No monitor available for the port protocol %s"
+
+#: cli/core/search.go:124
+msgid "No platforms matching your search."
+msgstr "No platforms matching your search."
+
+#: commands/board/attach.go:92
+msgid "No supported board found at %s"
+msgstr "No supported board found at %s"
+
+#: cli/lib/list.go:114
+msgid "No updates available."
+msgstr "No updates available."
+
+#: commands/upload/upload.go:496
+msgid "No upload port found, using %s as fallback"
+msgstr "No upload port found, using %s as fallback"
+
+#: arduino/errors.go:367
+msgid "No valid dependencies solution found"
+msgstr "No valid dependencies solution found"
+
+#: legacy/builder/phases/sizer.go:120
+msgid "Not enough memory; see %[1]s for tips on reducing your footprint."
+msgstr "Not enough memory; see %[1]s for tips on reducing your footprint."
+
+#: legacy/builder/print_used_and_not_used_libraries.go:48
+msgid "Not used: %[1]s"
+msgstr "Not used: %[1]s"
+
+#: cli/board/details.go:164
+msgid "OS:"
+msgstr "OS:"
+
+#: cli/board/details.go:128
+msgid "Official Arduino board:"
+msgstr "Official Arduino board:"
+
+#: cli/monitor/monitor.go:54 cli/monitor/monitor.go:55
+msgid "Open a communication port with a board."
+msgstr "Open a communication port with a board."
+
+#: cli/board/details.go:176
+msgid "Option:"
+msgstr "Option:"
+
+#: cli/compile/compile.go:98
+msgid ""
+"Optional, can be: %s. Used to tell gcc which warning level to use (-W flag)."
+msgstr ""
+"Optional, can be: %s. Used to tell gcc which warning level to use (-W flag)."
+
+#: cli/compile/compile.go:112
+msgid "Optional, cleanup the build folder and do not use any cached build."
+msgstr "Optional, cleanup the build folder and do not use any cached build."
+
+#: cli/compile/compile.go:109
+msgid ""
+"Optional, optimize compile output for debugging, rather than for release."
+msgstr ""
+"Optional, optimize compile output for debugging, rather than for release."
+
+#: cli/compile/compile.go:100
+msgid "Optional, suppresses almost every output."
+msgstr "Optional, suppresses almost every output."
+
+#: cli/compile/compile.go:99 cli/upload/upload.go:65
+msgid "Optional, turns on verbose mode."
+msgstr "Optional, turns on verbose mode."
+
+#: cli/compile/compile.go:117
+msgid ""
+"Optional. Path to a .json file that contains a set of replacements of the "
+"sketch source code."
+msgstr ""
+"Optional. Path to a .json file that contains a set of replacements of the "
+"sketch source code."
+
+#: commands/daemon/monitor.go:72
+msgid "OutputRate in Null monitor must be a float64"
+msgstr "OutputRate in Null monitor must be a float64"
+
+#: cli/compile/compile.go:96
+msgid ""
+"Override a build property with a custom value. Can be used multiple times "
+"for multiple properties."
+msgstr ""
+"Override a build property with a custom value. Can be used multiple times "
+"for multiple properties."
+
+#: cli/config/init.go:57
+msgid "Overwrite existing config file."
+msgstr "Overwrite existing config file."
+
+#: cli/core/download.go:36 cli/core/install.go:40 cli/core/uninstall.go:36
+#: cli/core/upgrade.go:38
+msgid "PACKAGER"
+msgstr "PACKAGER"
+
+#: cli/board/details.go:144
+msgid "Package URL:"
+msgstr "Package URL:"
+
+#: cli/board/details.go:143
+msgid "Package maintainer:"
+msgstr "Package maintainer:"
+
+#: cli/board/details.go:142
+msgid "Package name:"
+msgstr "Package name:"
+
+#: cli/board/details.go:146
+msgid "Package online help:"
+msgstr "Package online help:"
+
+#: cli/board/details.go:145
+msgid "Package website:"
+msgstr "Package website:"
+
+#: cli/lib/search.go:166
+msgid "Paragraph: %s"
+msgstr "Paragraph: %s"
+
+#: cli/cli.go:113
+msgid "Path to the file where logs will be written."
+msgstr "Path to the file where logs will be written."
+
+#: cli/compile/compile.go:92
+msgid ""
+"Path where to save compiled files. If omitted, a directory will be created "
+"in the default temporary path of your OS."
+msgstr ""
+"Path where to save compiled files. If omitted, a directory will be created "
+"in the default temporary path of your OS."
+
+#: commands/upload/upload.go:477
+msgid "Performing 1200-bps touch reset on serial port %s"
+msgstr "Performing 1200-bps touch reset on serial port %s"
+
+#: commands/core/install.go:73
+msgid "Platform %s already installed"
+msgstr "Platform %s already installed"
+
+#: commands/core/install.go:177
+msgid "Platform %s installed"
+msgstr "Platform %s installed"
+
+#: commands/core/uninstall.go:85
+msgid "Platform %s uninstalled"
+msgstr "Platform %s uninstalled"
+
+#: arduino/errors.go:385
+msgid "Platform '%s' is already at the latest version"
+msgstr "Platform '%s' is already at the latest version"
+
+#: arduino/errors.go:329
+msgid "Platform '%s' not found"
+msgstr "Platform '%s' not found"
+
+#: cli/board/search.go:85
+msgid "Platform ID"
+msgstr "Platform ID"
+
+#: cli/board/details.go:152
+msgid "Platform URL:"
+msgstr "Platform URL:"
+
+#: cli/board/details.go:151
+msgid "Platform architecture:"
+msgstr "Platform architecture:"
+
+#: cli/board/details.go:150
+msgid "Platform category:"
+msgstr "Platform category:"
+
+#: cli/board/details.go:157
+msgid "Platform checksum:"
+msgstr "Platform checksum:"
+
+#: cli/board/details.go:153
+msgid "Platform file name:"
+msgstr "Platform file name:"
+
+#: cli/board/details.go:149
+msgid "Platform name:"
+msgstr "Platform name:"
+
+#: cli/board/details.go:155
+msgid "Platform size (bytes):"
+msgstr "Platform size (bytes):"
+
+#: arduino/errors.go:136
+msgid ""
+"Please specify an FQBN. Multiple possible ports detected on port %s with "
+"protocol %s"
+msgstr ""
+"Please specify an FQBN. Multiple possible ports detected on port %s with "
+"protocol %s"
+
+#: cli/board/list.go:88 cli/board/list.go:126
+msgid "Port"
+msgstr "Port"
+
+#: cli/monitor/monitor.go:164 cli/monitor/monitor.go:171
+msgid "Port closed:"
+msgstr "Port closed:"
+
+#: arduino/errors.go:558
+msgid "Port monitor error"
+msgstr "Port monitor error"
+
+#: legacy/builder/phases/libraries_builder.go:99
+#: legacy/builder/phases/libraries_builder.go:107
+msgid "Precompiled library in \"%[1]s\" not found"
+msgstr "Precompiled library in \"%[1]s\" not found"
+
+#: cli/board/details.go:44
+msgid "Print details about a board."
+msgstr "Print details about a board."
+
+#: cli/compile/compile.go:88
+msgid "Print preprocessed code to stdout instead of compiling."
+msgstr "Print preprocessed code to stdout instead of compiling."
+
+#: cli/cli.go:107
+msgid "Print the logs on the standard output."
+msgstr "Print the logs on the standard output."
+
+#: cli/config/dump.go:31
+msgid "Prints the current configuration"
+msgstr "Prints the current configuration"
+
+#: cli/config/dump.go:32
+msgid "Prints the current configuration."
+msgstr "Prints the current configuration."
+
+#: arduino/errors.go:262
+msgid "Programmer '%s' not found"
+msgstr "Programmer '%s' not found"
+
+#: cli/board/details.go:92
+msgid "Programmer name"
+msgstr "Programmer name"
+
+#: cli/arguments/programmer.go:29
+msgid "Programmer to use, e.g: atmel_ice"
+msgstr "Programmer to use, e.g: atmel_ice"
+
+#: cli/board/details.go:193
+msgid "Programmers:"
+msgstr "Programmers:"
+
+#: arduino/errors.go:314
+msgid "Property '%s' is undefined"
+msgstr "Property '%s' is undefined"
+
+#: cli/board/list.go:126
+msgid "Protocol"
+msgstr "Protocol"
+
+#: cli/lib/search.go:176
+msgid "Provides includes: %s"
+msgstr "Provides includes: %s"
+
+#: cli/config/remove.go:32 cli/config/remove.go:33
+msgid "Removes one or more values from a setting."
+msgstr "Removes one or more values from a setting."
+
+#: commands/instances.go:722 commands/lib/install.go:106
+msgid "Replacing %[1]s with %[2]s"
+msgstr "Replacing %[1]s with %[2]s"
+
+#: cli/board/details.go:161
+msgid "Required tool:"
+msgstr "Required tool:"
+
+#: cli/daemon/daemon.go:56
+msgid "Run as a daemon on port: %s"
+msgstr "Run as a daemon on port: %s"
+
+#: cli/monitor/monitor.go:64
+msgid "Run in silent mode, show only monitor input and output."
+msgstr "Run in silent mode, show only monitor input and output."
+
+#: cli/daemon/daemon.go:57
+msgid ""
+"Running as a daemon the initialization of cores and libraries is done only "
+"once."
+msgstr ""
+"Running as a daemon the initialization of cores and libraries is done only "
+"once."
+
+#: legacy/builder/phases/core_builder.go:48
+msgid "Running normal build of the core..."
+msgstr "Running normal build of the core..."
+
+#: cli/compile/compile.go:90
+msgid "Save build artifacts in this directory."
+msgstr "Save build artifacts in this directory."
+
+#: cli/core/search.go:50
+msgid "Search for a core in Boards Manager using the specified keywords."
+msgstr "Search for a core in Boards Manager using the specified keywords."
+
+#: cli/core/search.go:49
+msgid "Search for a core in Boards Manager."
+msgstr "Search for a core in Boards Manager."
+
+#: cli/lib/search.go:45
+msgid "Search for one or more libraries data (case insensitive search)."
+msgstr "Search for one or more libraries data (case insensitive search)."
+
+#: cli/lib/search.go:44
+msgid "Searches for one or more libraries data."
+msgstr "Searches for one or more libraries data."
+
+#: commands/board/attach.go:109
+msgid "Selected fqbn: %s"
+msgstr "Selected fqbn: %s"
+
+#: cli/lib/search.go:165
+msgid "Sentence: %s"
+msgstr "Sentence: %s"
+
+#: commands/download.go:63
+msgid "Server responded with: %s"
+msgstr "Server responded with: %s"
+
+#: cli/config/set.go:33 cli/config/set.go:34
+msgid "Sets a setting value."
+msgstr "Sets a setting value."
+
+#: cli/config/init.go:55 cli/config/init.go:56
+msgid "Sets where to save the configuration file."
+msgstr "Sets where to save the configuration file."
+
+#: cli/monitor/monitor.go:195
+msgid "Setting"
+msgstr "Setting"
+
+#: cli/config/delete.go:62 cli/config/validate.go:49
+msgid "Settings key doesn't exist"
+msgstr "Settings key doesn't exist"
+
+#: cli/core/search.go:55
+msgid "Show all available core versions."
+msgstr "Show all available core versions."
+
+#: cli/compile/compile.go:87
+msgid "Show all build properties used instead of compiling."
+msgstr "Show all build properties used instead of compiling."
+
+#: cli/monitor/monitor.go:62
+msgid "Show all the settings of the communication port."
+msgstr "Show all the settings of the communication port."
+
+#: cli/board/listall.go:48 cli/board/search.go:47
+msgid "Show also boards marked as 'hidden' in the platform"
+msgstr "Show also boards marked as 'hidden' in the platform"
+
+#: cli/board/details.go:52
+msgid "Show full board details"
+msgstr "Show full board details"
+
+#: cli/board/details.go:45
+msgid ""
+"Show information about a board, in particular if the board has options to be"
+" specified in the FQBN."
+msgstr ""
+"Show information about a board, in particular if the board has options to be"
+" specified in the FQBN."
+
+#: cli/lib/search.go:50
+msgid "Show library names only."
+msgstr "Show library names only."
+
+#: cli/board/details.go:53
+msgid "Show list of available programmers"
+msgstr "Show list of available programmers"
+
+#: cli/debug/debug.go:64
+msgid ""
+"Show metadata about the debug session instead of starting the debugger."
+msgstr ""
+"Show metadata about the debug session instead of starting the debugger."
+
+#: cli/update/update.go:46
+msgid "Show outdated cores and libraries after index update"
+msgstr "Show outdated cores and libraries after index update"
+
+#: cli/lib/list.go:43
+msgid "Shows a list of installed libraries."
+msgstr "Shows a list of installed libraries."
+
+#: cli/lib/list.go:44
+msgid ""
+"Shows a list of installed libraries.\n"
+"\n"
+"If the LIBNAME parameter is specified the listing is limited to that specific\n"
+"library. By default the libraries provided as built-in by platforms/core are\n"
+"not listed, they can be listed by adding the --all flag."
+msgstr ""
+"Shows a list of installed libraries.\n"
+"\n"
+"If the LIBNAME parameter is specified the listing is limited to that specific\n"
+"library. By default the libraries provided as built-in by platforms/core are\n"
+"not listed, they can be listed by adding the --all flag."
+
+#: cli/core/list.go:40 cli/core/list.go:41
+msgid "Shows the list of installed platforms."
+msgstr "Shows the list of installed platforms."
+
+#: cli/lib/examples.go:44
+msgid "Shows the list of the examples for libraries."
+msgstr "Shows the list of the examples for libraries."
+
+#: cli/lib/examples.go:45
+msgid ""
+"Shows the list of the examples for libraries. A name may be given as "
+"argument to search a specific library."
+msgstr ""
+"Shows the list of the examples for libraries. A name may be given as "
+"argument to search a specific library."
+
+#: cli/version/version.go:39
+msgid ""
+"Shows the version number of Arduino CLI which is installed on your system."
+msgstr ""
+"Shows the version number of Arduino CLI which is installed on your system."
+
+#: cli/version/version.go:38
+msgid "Shows version number of Arduino CLI."
+msgstr "Shows version number of Arduino CLI."
+
+#: cli/board/details.go:166
+msgid "Size (bytes):"
+msgstr "Size (bytes):"
+
+#: legacy/builder/fail_if_buildpath_equals_sketchpath.go:42
+msgid ""
+"Sketch cannot be located in build path. Please specify a different build "
+"path"
+msgstr ""
+"Sketch cannot be located in build path. Please specify a different build "
+"path"
+
+#: cli/sketch/new.go:65
+msgid "Sketch created in: %s"
+msgstr "Sketch created in: %s"
+
+#: legacy/builder/phases/sizer.go:115
+msgid "Sketch too big; see %[1]s for tips on reducing it."
+msgstr "Sketch too big; see %[1]s for tips on reducing it."
+
+#: legacy/builder/phases/sizer.go:83
+msgid ""
+"Sketch uses %[1]s bytes (%[3]s%%) of program storage space. Maximum is %[2]s"
+" bytes."
+msgstr ""
+"Sketch uses %[1]s bytes (%[3]s%%) of program storage space. Maximum is %[2]s"
+" bytes."
+
+#: cli/arguments/sketch.go:61
+msgid ""
+"Sketches with .pde extension are deprecated, please rename the following "
+"files to .ino:"
+msgstr ""
+"Sketches with .pde extension are deprecated, please rename the following "
+"files to .ino:"
+
+#: legacy/builder/phases/linker.go:35
+msgid "Skip linking of final executable."
+msgstr "Skip linking of final executable."
+
+#: commands/upload/upload.go:470
+msgid "Skipping 1200-bps touch reset: no serial port selected!"
+msgstr "Skipping 1200-bps touch reset: no serial port selected!"
+
+#: legacy/builder/builder_utils/utils.go:437
+msgid "Skipping archive creation of: %[1]s"
+msgstr "Skipping archive creation of: %[1]s"
+
+#: legacy/builder/builder_utils/utils.go:256
+msgid "Skipping compile of: %[1]s"
+msgstr "Skipping compile of: %[1]s"
+
+#: legacy/builder/container_find_includes.go:335
+msgid "Skipping dependencies detection for precompiled library %[1]s"
+msgstr "Skipping dependencies detection for precompiled library %[1]s"
+
+#: commands/instances.go:859
+msgid "Skipping platform configuration"
+msgstr "Skipping platform configuration"
+
+#: commands/core/install.go:173
+msgid "Skipping platform configuration."
+msgstr "Skipping platform configuration."
+
+#: legacy/builder/recipe_runner.go:54
+msgid "Skipping: %[1]s"
+msgstr "Skipping: %[1]s"
+
+#: arduino/serialutils/serialutils.go:133
+msgid "TOUCH: error during reset: %s"
+msgstr "TOUCH: error during reset: %s"
+
+#: cli/daemon/daemon.go:62
+msgid "The TCP port the daemon will listen to"
+msgstr "The TCP port the daemon will listen to"
+
+#: cli/cli.go:124
+msgid "The custom config file (if not specified the default will be used)."
+msgstr "The custom config file (if not specified the default will be used)."
+
+#: cli/config/add.go:52
+msgid ""
+"The key '%[1]v' is not a list of items, can't add to it.\n"
+"Maybe use '%[2]s'?"
+msgstr ""
+"The key '%[1]v' is not a list of items, can't add to it.\n"
+"Maybe use '%[2]s'?"
+
+#: cli/config/remove.go:52
+msgid ""
+"The key '%[1]v' is not a list of items, can't remove from it.\n"
+"Maybe use '%[2]s'?"
+msgstr ""
+"The key '%[1]v' is not a list of items, can't remove from it.\n"
+"Maybe use '%[2]s'?"
+
+#: cli/cli.go:115 cli/cli.go:120
+msgid "The output format for the logs, can be: %s"
+msgstr "The output format for the logs, can be: %s"
+
+#: legacy/builder/phases/libraries_builder.go:147
+msgid "The platform does not support '%[1]s' for precompiled libraries."
+msgstr "The platform does not support '%[1]s' for precompiled libraries."
+
+#: cli/lib/upgrade.go:34
+msgid ""
+"This command upgrades an installed library to the latest available version. "
+"Multiple libraries can be passed separated by a space. If no arguments are "
+"provided, the command will upgrade all the installed libraries where an "
+"update is available."
+msgstr ""
+"This command upgrades an installed library to the latest available version. "
+"Multiple libraries can be passed separated by a space. If no arguments are "
+"provided, the command will upgrade all the installed libraries where an "
+"update is available."
+
+#: cli/outdated/outdated.go:39
+msgid ""
+"This commands shows a list of installed cores and/or libraries\n"
+"that can be upgraded. If nothing needs to be updated the output is empty."
+msgstr ""
+"This commands shows a list of installed cores and/or libraries\n"
+"that can be upgraded. If nothing needs to be updated the output is empty."
+
+#: commands/bundled_tools.go:44 commands/core/install.go:80
+#: commands/instances.go:773
+msgid "Tool %s already installed"
+msgstr "Tool %s already installed"
+
+#: commands/core/uninstall.go:101
+msgid "Tool %s uninstalled"
+msgstr "Tool %s uninstalled"
+
+#: commands/debug/debug.go:134
+msgid "Toolchain '%s' is not supported"
+msgstr "Toolchain '%s' is not supported"
+
+#: cli/debug/debug.go:135
+msgid "Toolchain custom configurations"
+msgstr "Toolchain custom configurations"
+
+#: cli/debug/debug.go:129
+msgid "Toolchain path"
+msgstr "Toolchain path"
+
+#: cli/debug/debug.go:130
+msgid "Toolchain prefix"
+msgstr "Toolchain prefix"
+
+#: cli/debug/debug.go:128
+msgid "Toolchain type"
+msgstr "Toolchain type"
+
+#: cli/burnbootloader/burnbootloader.go:58
+msgid "Turns on verbose mode."
+msgstr "Turns on verbose mode."
+
+#: cli/board/list.go:88 cli/board/list.go:126
+msgid "Type"
+msgstr "Type"
+
+#: cli/lib/search.go:173
+msgid "Types: %s"
+msgstr "Types: %s"
+
+#: cli/board/details.go:168
+msgid "URL:"
+msgstr "URL:"
+
+#: legacy/builder/phases/core_builder.go:128
+msgid ""
+"Unable to cache built core, please tell %[1]s maintainers to follow %[2]s"
+msgstr ""
+"Unable to cache built core, please tell %[1]s maintainers to follow %[2]s"
+
+#: configuration/configuration.go:126
+msgid "Unable to get Documents Folder: %v"
+msgstr "Unable to get Documents Folder: %v"
+
+#: configuration/configuration.go:101
+msgid "Unable to get Local App Data Folder: %v"
+msgstr "Unable to get Local App Data Folder: %v"
+
+#: configuration/configuration.go:89 configuration/configuration.go:114
+msgid "Unable to get user home dir: %v"
+msgstr "Unable to get user home dir: %v"
+
+#: cli/cli.go:215
+msgid "Unable to open file for logging: %s"
+msgstr "Unable to open file for logging: %s"
+
+#: commands/core/uninstall.go:77 commands/lib/uninstall.go:39
+msgid "Uninstalling %s"
+msgstr "Uninstalling %s"
+
+#: commands/core/uninstall.go:93
+msgid "Uninstalling %s, tool is no more required"
+msgstr "Uninstalling %s, tool is no more required"
+
+#: commands/instances.go:838
+msgid "Uninstalling %s: tool is no more required"
+msgstr "Uninstalling %s: tool is no more required"
+
+#: cli/core/uninstall.go:37 cli/core/uninstall.go:38
+msgid ""
+"Uninstalls one or more cores and corresponding tool dependencies if no "
+"longer used."
+msgstr ""
+"Uninstalls one or more cores and corresponding tool dependencies if no "
+"longer used."
+
+#: cli/lib/uninstall.go:37 cli/lib/uninstall.go:38
+msgid "Uninstalls one or more libraries."
+msgstr "Uninstalls one or more libraries."
+
+#: cli/board/list.go:158
+msgid "Unknown"
+msgstr "Unknown"
+
+#: arduino/errors.go:166
+msgid "Unknown FQBN"
+msgstr "Unknown FQBN"
+
+#: cli/update/update.go:40
+msgid "Updates the index of cores and libraries"
+msgstr "Updates the index of cores and libraries"
+
+#: cli/update/update.go:41
+msgid "Updates the index of cores and libraries to the latest versions."
+msgstr "Updates the index of cores and libraries to the latest versions."
+
+#: cli/core/update_index.go:36
+msgid "Updates the index of cores to the latest version."
+msgstr "Updates the index of cores to the latest version."
+
+#: cli/core/update_index.go:35
+msgid "Updates the index of cores."
+msgstr "Updates the index of cores."
+
+#: cli/lib/update_index.go:36
+msgid "Updates the libraries index to the latest version."
+msgstr "Updates the libraries index to the latest version."
+
+#: cli/lib/update_index.go:35
+msgid "Updates the libraries index."
+msgstr "Updates the libraries index."
+
+#: commands/instances.go:455 commands/instances.go:481
+#: commands/instances.go:511
+msgid "Updating index: %s"
+msgstr "Updating index: %s"
+
+#: commands/instances.go:382
+msgid "Updating index: library_index.json.gz"
+msgstr "Updating index: library_index.json.gz"
+
+#: commands/instances.go:392
+msgid "Updating index: library_index.json.sig"
+msgstr "Updating index: library_index.json.sig"
+
+#: commands/instances.go:795
+msgid "Updating platform %s"
+msgstr "Updating platform %s"
+
+#: commands/core/upgrade.go:55
+msgid "Upgrade doesn't accept parameters with version"
+msgstr "Upgrade doesn't accept parameters with version"
+
+#: cli/upgrade/upgrade.go:43
+msgid "Upgrades installed cores and libraries to latest version."
+msgstr "Upgrades installed cores and libraries to latest version."
+
+#: cli/upgrade/upgrade.go:42
+msgid "Upgrades installed cores and libraries."
+msgstr "Upgrades installed cores and libraries."
+
+#: cli/lib/upgrade.go:33
+msgid "Upgrades installed libraries."
+msgstr "Upgrades installed libraries."
+
+#: cli/core/upgrade.go:39 cli/core/upgrade.go:40
+msgid "Upgrades one or all installed platforms to the latest version."
+msgstr "Upgrades one or all installed platforms to the latest version."
+
+#: commands/core/install.go:114
+msgid "Upgrading platform %[1]s with %[2]s"
+msgstr "Upgrading platform %[1]s with %[2]s"
+
+#: cli/upload/upload.go:50
+msgid "Upload Arduino sketches."
+msgstr "Upload Arduino sketches."
+
+#: cli/upload/upload.go:51
+msgid ""
+"Upload Arduino sketches. This does NOT compile the sketch prior to upload."
+msgstr ""
+"Upload Arduino sketches. This does NOT compile the sketch prior to upload."
+
+#: cli/arguments/port.go:46
+msgid "Upload port address, e.g.: COM3 or /dev/ttyACM2"
+msgstr "Upload port address, e.g.: COM3 or /dev/ttyACM2"
+
+#: commands/upload/upload.go:494
+msgid "Upload port found on %s"
+msgstr "Upload port found on %s"
+
+#: cli/arguments/port.go:50
+msgid "Upload port protocol, e.g: serial"
+msgstr "Upload port protocol, e.g: serial"
+
+#: cli/compile/compile.go:101
+msgid "Upload the binary after the compilation."
+msgstr "Upload the binary after the compilation."
+
+#: cli/burnbootloader/burnbootloader.go:48
+msgid "Upload the bootloader on the board using an external programmer."
+msgstr "Upload the bootloader on the board using an external programmer."
+
+#: cli/burnbootloader/burnbootloader.go:47
+msgid "Upload the bootloader."
+msgstr "Upload the bootloader."
+
+#: cli/compile/compile.go:228 cli/upload/upload.go:117
+msgid ""
+"Uploading to specified board using %s protocol requires the following info:"
+msgstr ""
+"Uploading to specified board using %s protocol requires the following info:"
+
+#: cli/usage.go:26
+msgid "Usage:"
+msgstr "Usage:"
+
+#: cli/usage.go:33
+msgid "Use %s for more information about a command."
+msgstr "Use %s for more information about a command."
+
+#: legacy/builder/print_used_and_not_used_libraries.go:46
+msgid "Used: %[1]s"
+msgstr "Used: %[1]s"
+
+#: arduino/libraries/librariesmanager/install.go:68
+#: arduino/libraries/librariesmanager/install.go:84
+#: arduino/libraries/librariesmanager/install.go:106
+#: arduino/libraries/librariesmanager/install.go:190
+msgid "User directory not set"
+msgstr "User directory not set"
+
+#: legacy/builder/target_board_resolver.go:43
+msgid "Using board '%[1]s' from platform in folder: %[2]s"
+msgstr "Using board '%[1]s' from platform in folder: %[2]s"
+
+#: legacy/builder/container_find_includes.go:347
+msgid "Using cached library dependencies for file: %[1]s"
+msgstr "Using cached library dependencies for file: %[1]s"
+
+#: legacy/builder/target_board_resolver.go:44
+msgid "Using core '%[1]s' from platform in folder: %[2]s"
+msgstr "Using core '%[1]s' from platform in folder: %[2]s"
+
+#: legacy/builder/print_used_libraries_if_verbose.go:44
+msgid "Using library %[1]s at version %[2]s in folder: %[3]s %[4]s"
+msgstr "Using library %[1]s at version %[2]s in folder: %[3]s %[4]s"
+
+#: legacy/builder/print_used_libraries_if_verbose.go:38
+msgid "Using library %[1]s in folder: %[2]s %[3]s"
+msgstr "Using library %[1]s in folder: %[2]s %[3]s"
+
+#: legacy/builder/phases/core_builder.go:105
+msgid "Using precompiled core: %[1]s"
+msgstr "Using precompiled core: %[1]s"
+
+#: legacy/builder/phases/libraries_builder.go:96
+#: legacy/builder/phases/libraries_builder.go:104
+msgid "Using precompiled library in %[1]s"
+msgstr "Using precompiled library in %[1]s"
+
+#: legacy/builder/builder_utils/utils.go:254
+#: legacy/builder/builder_utils/utils.go:460
+msgid "Using previously compiled file: %[1]s"
+msgstr "Using previously compiled file: %[1]s"
+
+#: cli/core/download.go:36 cli/core/install.go:40
+msgid "VERSION"
+msgstr "VERSION"
+
+#: cli/lib/check_deps.go:36 cli/lib/install.go:47
+msgid "VERSION_NUMBER"
+msgstr "VERSION_NUMBER"
+
+#: cli/monitor/monitor.go:195
+msgid "Values"
+msgstr "Values"
+
+#: cli/burnbootloader/burnbootloader.go:57 cli/compile/compile.go:103
+#: cli/upload/upload.go:64
+msgid "Verify uploaded binary after the upload."
+msgstr "Verify uploaded binary after the upload."
+
+#: cli/core/search.go:114
+msgid "Version"
+msgstr "Version"
+
+#: cli/lib/search.go:174
+msgid "Versions: %s"
+msgstr "Versions: %s"
+
+#: commands/core/install.go:169
+msgid "WARNING cannot configure platform: %s"
+msgstr "WARNING cannot configure platform: %s"
+
+#: commands/instances.go:855
+msgid "WARNING: cannot run post install: %s"
+msgstr "WARNING: cannot run post install: %s"
+
+#: legacy/builder/warn_about_arch_incompatible_libraries.go:39
+msgid ""
+"WARNING: library %[1]s claims to run on %[2]s architecture(s) and may be "
+"incompatible with your current board which runs on %[3]s architecture(s)."
+msgstr ""
+"WARNING: library %[1]s claims to run on %[2]s architecture(s) and may be "
+"incompatible with your current board which runs on %[3]s architecture(s)."
+
+#: commands/upload/upload.go:483
+msgid "Waiting for upload port..."
+msgstr "Waiting for upload port..."
+
+#: legacy/builder/add_build_board_property_if_missing.go:36
+msgid ""
+"Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s"
+msgstr ""
+"Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s"
+
+#: legacy/builder/warn_about_platform_rewrites.go:40
+msgid ""
+"Warning: platform.txt from core '%[1]s' contains deprecated %[2]s, "
+"automatically converted to %[3]s. Consider upgrading this core."
+msgstr ""
+"Warning: platform.txt from core '%[1]s' contains deprecated %[2]s, "
+"automatically converted to %[3]s. Consider upgrading this core."
+
+#: commands/upload/upload.go:379
+msgid ""
+"Warning: tool '%s' is not installed. It might not be available for your OS."
+msgstr ""
+"Warning: tool '%s' is not installed. It might not be available for your OS."
+
+#: cli/lib/search.go:167
+msgid "Website: %s"
+msgstr "Website: %s"
+
+#: cli/compile/compile.go:104
+msgid ""
+"When specified, VID/PID specific build properties are used, if board "
+"supports them."
+msgstr ""
+"When specified, VID/PID specific build properties are used, if board "
+"supports them."
+
+#: cli/config/init.go:42
+msgid "Writes current configuration to a configuration file."
+msgstr "Writes current configuration to a configuration file."
+
+#: cli/config/init.go:45
+msgid ""
+"Writes current configuration to the configuration file in the data "
+"directory."
+msgstr ""
+"Writes current configuration to the configuration file in the data "
+"directory."
+
+#: cli/config/set.go:77
+msgid "Writing config file: %v"
+msgstr "Writing config file: %v"
+
+#: cli/arguments/arguments.go:37
+msgid "and"
+msgstr "and"
+
+#: arduino/resources/checksums.go:80
+msgid "archive hash differs from hash in index"
+msgstr "archive hash differs from hash in index"
+
+#: arduino/libraries/librariesmanager/install.go:137
+msgid "archive is not valid: multiple files found in zip file top level"
+msgstr "archive is not valid: multiple files found in zip file top level"
+
+#: cli/sketch/archive.go:38
+msgid "archivePath"
+msgstr "archivePath"
+
+#: legacy/builder/preprocess_sketch.go:103
+msgid "arduino-preprocessor pattern is missing"
+msgstr "arduino-preprocessor pattern is missing"
+
+#: commands/upload/upload.go:640
+msgid "autodetect build artifact: %s"
+msgstr "autodetect build artifact: %s"
+
+#: commands/upload/upload.go:625
+msgid "binary file not found in %s"
+msgstr "binary file not found in %s"
+
+#: arduino/cores/packagemanager/package_manager.go:189
+msgid "board %s not found"
+msgstr "board %s not found"
+
+#: commands/board/list.go:42
+msgid "board not found"
+msgstr "board not found"
+
+#: cli/board/listall.go:38 cli/board/search.go:37
+msgid "boardname"
+msgstr "boardname"
+
+#: arduino/discovery/discovery.go:312 arduino/discovery/discovery.go:335
+#: arduino/discovery/discovery.go:357 arduino/discovery/discovery.go:382
+#: arduino/discovery/discovery.go:401 arduino/discovery/discovery.go:424
+msgid "calling %[1]s: %[2]w"
+msgstr "calling %[1]s: %[2]w"
+
+#: arduino/cores/status.go:123 arduino/cores/status.go:150
+msgid "can't find latest release of %s"
+msgstr "can't find latest release of %s"
+
+#: commands/instances.go:263
+msgid "can't find latest release of tool %s"
+msgstr "can't find latest release of tool %s"
+
+#: arduino/sketch/sketch.go:105
+msgid "can't find main Sketch file in %s"
+msgstr "can't find main Sketch file in %s"
+
+#: arduino/cores/packagemanager/loader.go:820
+msgid "can't find pattern for discovery with id %s"
+msgstr "can't find pattern for discovery with id %s"
+
+#: executils/output.go:52
+msgid "can't retrieve standard error stream: %s"
+msgstr "can't retrieve standard error stream: %s"
+
+#: executils/output.go:34
+msgid "can't retrieve standard output stream: %s"
+msgstr "can't retrieve standard output stream: %s"
+
+#: legacy/builder/resolve_library.go:34
+msgid "candidates"
+msgstr "candidates"
+
+#: commands/upload/upload.go:582 commands/upload/upload.go:589
+msgid "cannot execute upload tool: %s"
+msgstr "cannot execute upload tool: %s"
+
+#: arduino/resources/install.go:39
+msgid "checking local archive integrity"
+msgstr "checking local archive integrity"
+
+#: legacy/builder/wipeout_build_path_if_build_options_changed.go:85
+#: legacy/builder/wipeout_build_path_if_build_options_changed.go:89
+msgid "cleaning build path"
+msgstr "cleaning build path"
+
+#: cli/cli.go:74
+msgid "command"
+msgstr "command"
+
+#: arduino/monitor/monitor.go:149
+msgid "command '%[1]s' failed: %[2]s"
+msgstr "command '%[1]s' failed: %[2]s"
+
+#: arduino/discovery/discovery.go:316 arduino/discovery/discovery.go:339
+#: arduino/discovery/discovery.go:361 arduino/discovery/discovery.go:386
+#: arduino/discovery/discovery.go:405 arduino/discovery/discovery.go:428
+msgid "command failed: %s"
+msgstr "command failed: %s"
+
+#: arduino/discovery/discovery.go:314 arduino/discovery/discovery.go:318
+#: arduino/discovery/discovery.go:337 arduino/discovery/discovery.go:341
+#: arduino/discovery/discovery.go:359 arduino/discovery/discovery.go:363
+#: arduino/discovery/discovery.go:384 arduino/discovery/discovery.go:388
+#: arduino/discovery/discovery.go:403 arduino/discovery/discovery.go:426
+#: arduino/discovery/discovery.go:430 arduino/monitor/monitor.go:146
+#: arduino/monitor/monitor.go:152
+msgid "communication out of sync, expected '%[1]s', received '%[2]s'"
+msgstr "communication out of sync, expected '%[1]s', received '%[2]s'"
+
+#: arduino/resources/checksums.go:76
+msgid "computing hash: %s"
+msgstr "computing hash: %s"
+
+#: commands/upload/upload.go:697
+msgid "could not find a valid build artifact"
+msgstr "could not find a valid build artifact"
+
+#: arduino/cores/packagemanager/loader.go:757
+msgid "creating discovery: %s"
+msgstr "creating discovery: %s"
+
+#: arduino/cores/packagemanager/install_uninstall.go:45
+msgid "creating installed.json in %[1]s: %[2]s"
+msgstr "creating installed.json in %[1]s: %[2]s"
+
+#: arduino/resources/install.go:44 arduino/resources/install.go:48
+msgid "creating temp dir for extraction: %s"
+msgstr "creating temp dir for extraction: %s"
+
+#: legacy/builder/phases/sizer.go:121
+msgid "data section exceeds available space in board"
+msgstr "data section exceeds available space in board"
+
+#: arduino/sketch/sketch.go:211
+msgid "decoding sketch metadata: %s"
+msgstr "decoding sketch metadata: %s"
+
+#: commands/lib/resolve_deps.go:55
+msgid "dependency '%s' is not available"
+msgstr "dependency '%s' is not available"
+
+#: legacy/builder/utils/utils.go:474
+msgid "destination already exists"
+msgstr "destination already exists"
+
+#: arduino/libraries/librariesmanager/install.go:75
+msgid "destination dir %s already exists, cannot install"
+msgstr "destination dir %s already exists, cannot install"
+
+#: arduino/libraries/librariesmanager/install.go:268
+msgid "directory doesn't exist: %s"
+msgstr "directory doesn't exist: %s"
+
+#: arduino/discovery/discoverymanager/discoverymanager.go:106
+msgid "discovery %[1]s process not started: %[2]w"
+msgstr "discovery %[1]s process not started: %[2]w"
+
+#: arduino/cores/packagemanager/loader.go:748
+msgid "discovery not found: %s"
+msgstr "discovery not found: %s"
+
+#: arduino/cores/packagemanager/loader.go:752
+msgid "discovery not installed: %s"
+msgstr "discovery not installed: %s"
+
+#: arduino/cores/packagemanager/package_manager.go:478
+msgid "discovery release not found: %s"
+msgstr "discovery release not found: %s"
+
+#: cli/core/download.go:41 cli/core/install.go:45
+msgid "download a specific version (in this case 1.6.9)."
+msgstr "download a specific version (in this case 1.6.9)."
+
+#: cli/core/download.go:40 cli/core/install.go:43
+msgid "download the latest version of Arduino SAMD core."
+msgstr "download the latest version of Arduino SAMD core."
+
+#: commands/instances.go:99
+msgid "downloading %[1]s tool: %[2]s"
+msgstr "downloading %[1]s tool: %[2]s"
+
+#: arduino/cores/fqbn.go:48
+msgid "empty board identifier"
+msgstr "empty board identifier"
+
+#: arduino/sketch/sketch.go:200
+msgid "encoding sketch metadata: %s"
+msgstr "encoding sketch metadata: %s"
+
+#: arduino/monitors/serial.go:44
+msgid "error opening serial monitor"
+msgstr "error opening serial monitor"
+
+#: cli/config/set.go:69
+msgid "error parsing value: %v"
+msgstr "error parsing value: %v"
+
+#: commands/board/list.go:88
+msgid "error processing response from server"
+msgstr "error processing response from server"
+
+#: commands/board/list.go:103
+msgid "error querying Arduino Cloud Api"
+msgstr "error querying Arduino Cloud Api"
+
+#: arduino/resources/install.go:67
+msgid "extracting archive: %s"
+msgstr "extracting archive: %s"
+
+#: arduino/libraries/librariesmanager/install.go:125
+msgid "extracting archive: %w"
+msgstr "extracting archive: %w"
+
+#: arduino/resources/checksums.go:145
+msgid "failed to compute hash of file \"%s\""
+msgstr "failed to compute hash of file \"%s\""
+
+#: commands/board/list.go:71
+msgid "failed to initialize http client"
+msgstr "failed to initialize http client"
+
+#: arduino/resources/checksums.go:97
+msgid "fetched archive size differs from size specified in index"
+msgstr "fetched archive size differs from size specified in index"
+
+#: arduino/resources/install.go:132
+msgid "files in archive must be placed in a subdirectory"
+msgstr "files in archive must be placed in a subdirectory"
+
+#: arduino/cores/packagemanager/loader.go:67
+msgid "find abs path: %s"
+msgstr "find abs path: %s"
+
+#: commands/daemon/monitor.go:45
+msgid "first message must contain monitor configuration, not data"
+msgstr "first message must contain monitor configuration, not data"
+
+#: cli/cli.go:74
+msgid "flags"
+msgstr "flags"
+
+#: arduino/cores/packagemanager/loader.go:109
+msgid "following possible symlink %[1]s: %[2]s"
+msgstr "following possible symlink %[1]s: %[2]s"
+
+#: cli/lib/download.go:41
+msgid "for a specific version."
+msgstr "for a specific version."
+
+#: cli/lib/check_deps.go:40 cli/lib/download.go:40 cli/lib/install.go:51
+msgid "for the latest version."
+msgstr "for the latest version."
+
+#: cli/lib/check_deps.go:41 cli/lib/install.go:52
+msgid "for the specific version."
+msgstr "for the specific version."
+
+#: inventory/inventory.go:68
+msgid "generating installation.id: %w"
+msgstr "generating installation.id: %w"
+
+#: inventory/inventory.go:74
+msgid "generating installation.secret: %w"
+msgstr "generating installation.secret: %w"
+
+#: arduino/resources/helpers.go:68
+msgid "getting archive file info: %s"
+msgstr "getting archive file info: %s"
+
+#: arduino/resources/checksums.go:94
+msgid "getting archive info: %s"
+msgstr "getting archive info: %s"
+
+#: arduino/resources/checksums.go:67 arduino/resources/checksums.go:90
+#: arduino/resources/helpers.go:40 arduino/resources/helpers.go:49
+#: arduino/resources/install.go:55
+msgid "getting archive path: %s"
+msgstr "getting archive path: %s"
+
+#: arduino/cores/packagemanager/package_manager.go:195
+msgid "getting build properties for board %[1]s: %[2]s"
+msgstr "getting build properties for board %[1]s: %[2]s"
+
+#: arduino/cores/packagemanager/download.go:103
+msgid "getting discovery dependencies for platform %[1]s: %[2]s"
+msgstr "getting discovery dependencies for platform %[1]s: %[2]s"
+
+#: arduino/cores/packagemanager/download.go:111
+msgid "getting monitor dependencies for platform %[1]s: %[2]s"
+msgstr "getting monitor dependencies for platform %[1]s: %[2]s"
+
+#: arduino/cores/packagemanager/loader.go:701
+msgid "getting parent dir of %[1]s: %[2]s"
+msgstr "getting parent dir of %[1]s: %[2]s"
+
+#: arduino/cores/packagemanager/download.go:96
+msgid "getting tool dependencies for platform %[1]s: %[2]s"
+msgstr "getting tool dependencies for platform %[1]s: %[2]s"
+
+#: arduino/sketch/sketch.go:155
+msgid "importing sketch metadata: %s"
+msgstr "importing sketch metadata: %s"
+
+#: arduino/libraries/librariesmanager/install.go:92
+msgid "install directory not set"
+msgstr "install directory not set"
+
+#: commands/instances.go:103
+msgid "installing %[1]s tool: %[2]s"
+msgstr "installing %[1]s tool: %[2]s"
+
+#: arduino/cores/packagemanager/install_uninstall.go:37
+msgid "installing platform %[1]s: %[2]s"
+msgstr "installing platform %[1]s: %[2]s"
+
+#: arduino/discovery/discovery.go:176
+msgid "invalid 'add' message: missing port"
+msgstr "invalid 'add' message: missing port"
+
+#: arduino/discovery/discovery.go:187
+msgid "invalid 'remove' message: missing port"
+msgstr "invalid 'remove' message: missing port"
+
+#: arduino/resources/checksums.go:45
+msgid "invalid checksum format: %s"
+msgstr "invalid checksum format: %s"
+
+#: arduino/cores/fqbn.go:54 arduino/cores/fqbn.go:59
+msgid "invalid config option: %s"
+msgstr "invalid config option: %s"
+
+#: cli/arguments/reference.go:90
+msgid "invalid empty core architecture '%s'"
+msgstr "invalid empty core architecture '%s'"
+
+#: cli/arguments/reference.go:67
+msgid "invalid empty core argument"
+msgstr "invalid empty core argument"
+
+#: cli/arguments/reference.go:86
+msgid "invalid empty core name '%s'"
+msgstr "invalid empty core name '%s'"
+
+#: cli/arguments/reference.go:71
+msgid "invalid empty core reference '%s'"
+msgstr "invalid empty core reference '%s'"
+
+#: cli/arguments/reference.go:76
+msgid "invalid empty core version: '%s'"
+msgstr "invalid empty core version: '%s'"
+
+#: cli/lib/args.go:49
+msgid "invalid empty library name"
+msgstr "invalid empty library name"
+
+#: cli/lib/args.go:54
+msgid "invalid empty library version: %s"
+msgstr "invalid empty library version: %s"
+
+#: arduino/cores/board.go:123
+msgid "invalid empty option found"
+msgstr "invalid empty option found"
+
+#: arduino/libraries/librariesmanager/install.go:258
+msgid "invalid git url"
+msgstr "invalid git url"
+
+#: arduino/resources/checksums.go:49
+msgid "invalid hash '%[1]s': %[2]s"
+msgstr "invalid hash '%[1]s': %[2]s"
+
+#: cli/arguments/reference.go:83
+msgid "invalid item %s"
+msgstr "invalid item %s"
+
+#: arduino/libraries/libraries_layout.go:53
+msgid "invalid library layout value: %d"
+msgstr "invalid library layout value: %d"
+
+#: arduino/libraries/libraries_layout.go:68
+msgid "invalid library layout: %s"
+msgstr "invalid library layout: %s"
+
+#: arduino/libraries/libraries_location.go:73
+msgid "invalid library location value: %d"
+msgstr "invalid library location value: %d"
+
+#: arduino/libraries/libraries_location.go:94
+msgid "invalid library location: %s"
+msgstr "invalid library location: %s"
+
+#: arduino/cores/board.go:125
+msgid "invalid option '%s'"
+msgstr "invalid option '%s'"
+
+#: inventory/inventory.go:88
+msgid "invalid path creating config dir: %[1]s error: %[2]w"
+msgstr "invalid path creating config dir: %[1]s error: %[2]w"
+
+#: inventory/inventory.go:94
+msgid "invalid path writing inventory file: %[1]s error: %[2]w"
+msgstr "invalid path writing inventory file: %[1]s error: %[2]w"
+
+#: arduino/cores/packageindex/index.go:255
+msgid "invalid platform archive size: %s"
+msgstr "invalid platform archive size: %s"
+
+#: arduino/cores/packagemanager/loader.go:374
+msgid "invalid pluggable monitor reference: %s"
+msgstr "invalid pluggable monitor reference: %s"
+
+#: cli/monitor/monitor.go:126
+msgid "invalid port configuration value for %s: %s"
+msgstr "invalid port configuration value for %s: %s"
+
+#: cli/monitor/monitor.go:135
+msgid "invalid port configuration: %s"
+msgstr "invalid port configuration: %s"
+
+#: commands/upload/upload.go:569
+msgid "invalid recipe '%[1]s': %[2]s"
+msgstr "invalid recipe '%[1]s': %[2]s"
+
+#: arduino/cores/board.go:109
+msgid "invalid value '%[1]s' for option '%[2]s'"
+msgstr "invalid value '%[1]s' for option '%[2]s'"
+
+#: arduino/cores/packagemanager/loader.go:284
+msgid "invalid version dir %[1]s: %[2]s"
+msgstr "invalid version dir %[1]s: %[2]s"
+
+#: commands/daemon/settings.go:108
+msgid "key not found in settings"
+msgstr "key not found in settings"
+
+#: cli/core/search.go:48
+msgid "keywords"
+msgstr "keywords"
+
+#: arduino/libraries/librariesmanager/install.go:163
+#: arduino/libraries/librariesmanager/install.go:206
+msgid "library %s already installed"
+msgstr "library %s already installed"
+
+#: arduino/libraries/librariesmanager/install.go:38
+msgid "library already installed"
+msgstr "library already installed"
+
+#: arduino/libraries/librariesmanager/install.go:305
+msgid "library not valid"
+msgstr "library not valid"
+
+#: arduino/libraries/librariesmanager/librariesmanager.go:226
+msgid "library path does not exist: %s"
+msgstr "library path does not exist: %s"
+
+#: arduino/discovery/discoverymanager/discoverymanager.go:217
+msgid "listing ports from discovery %[1]s: %[2]w"
+msgstr "listing ports from discovery %[1]s: %[2]w"
+
+#: arduino/serialutils/serialutils.go:61
+msgid "listing serial ports"
+msgstr "listing serial ports"
+
+#: arduino/cores/packagemanager/loader.go:312
+#: arduino/cores/packagemanager/loader.go:321
+#: arduino/cores/packagemanager/loader.go:326
+msgid "loading %[1]s: %[2]s"
+msgstr "loading %[1]s: %[2]s"
+
+#: arduino/cores/packagemanager/loader.go:362
+msgid "loading boards: %s"
+msgstr "loading boards: %s"
+
+#: arduino/cores/packagemanager/loader.go:656
+msgid "loading bundled tools from %[1]s: %[2]s"
+msgstr "loading bundled tools from %[1]s: %[2]s"
+
+#: arduino/cores/packagemanager/package_manager.go:230
+#: arduino/cores/packagemanager/package_manager.go:245
+msgid "loading json index file %[1]s: %[2]s"
+msgstr "loading json index file %[1]s: %[2]s"
+
+#: arduino/libraries/librariesmanager/librariesmanager.go:205
+#: arduino/libraries/librariesmanager/librariesmanager.go:231
+msgid "loading library from %[1]s: %[2]s"
+msgstr "loading library from %[1]s: %[2]s"
+
+#: arduino/libraries/loader.go:47
+msgid "loading library.properties: %s"
+msgstr "loading library.properties: %s"
+
+#: arduino/cores/packagemanager/loader.go:261
+#: arduino/cores/packagemanager/loader.go:289
+msgid "loading platform release %[1]s: %[2]s"
+msgstr "loading platform release %[1]s: %[2]s"
+
+#: arduino/cores/packagemanager/loader.go:212
+msgid "loading platform.txt: %v"
+msgstr "loading platform.txt: %v"
+
+#: arduino/cores/packagemanager/loader.go:623
+msgid "loading tool release in %[1]s: %[2]s"
+msgstr "loading tool release in %[1]s: %[2]s"
+
+#: arduino/cores/packagemanager/loader.go:205
+msgid "looking for boards.txt in %[1]s: %[2]s"
+msgstr "looking for boards.txt in %[1]s: %[2]s"
+
+#: legacy/builder/container_setup.go:73
+msgid "main file missing from sketch"
+msgstr "main file missing from sketch"
+
+#: arduino/resources/checksums.go:41
+msgid "missing checksum for: %s"
+msgstr "missing checksum for: %s"
+
+#: arduino/cores/packagemanager/package_manager.go:207
+msgid "missing package %[1]s referenced by board %[2]s"
+msgstr "missing package %[1]s referenced by board %[2]s"
+
+#: arduino/cores/packagemanager/package_manager.go:212
+msgid "missing platform %[1]s:%[2]s referenced by board %[3]s"
+msgstr "missing platform %[1]s:%[2]s referenced by board %[3]s"
+
+#: arduino/cores/packagemanager/package_manager.go:217
+msgid "missing platform release %[1]s:%[2]s referenced by board %[3]s"
+msgstr "missing platform release %[1]s:%[2]s referenced by board %[3]s"
+
+#: arduino/cores/packagemanager/package_manager.go:489
+msgid "monitor release not found: %s"
+msgstr "monitor release not found: %s"
+
+#: arduino/libraries/librariesmanager/install.go:180
+#: arduino/resources/install.go:94
+msgid "moving extracted archive to destination dir: %s"
+msgstr "moving extracted archive to destination dir: %s"
+
+#: commands/upload/upload.go:692
+msgid "multiple build artifacts found: '%[1]s' and '%[2]s'"
+msgstr "multiple build artifacts found: '%[1]s' and '%[2]s'"
+
+#: arduino/sketch/sketch.go:77
+msgid "multiple main sketch files found (%[1]v, %[2]v)"
+msgstr "multiple main sketch files found (%[1]v, %[2]v)"
+
+#: arduino/cores/packagemanager/install_uninstall.go:127
+msgid "no compatible version of %s tools found for the current os"
+msgstr "no compatible version of %s tools found for the current os"
+
+#: executils/process.go:38
+msgid "no executable specified"
+msgstr "no executable specified"
+
+#: commands/daemon/daemon.go:101
+msgid "no instance specified"
+msgstr "no instance specified"
+
+#: commands/upload/upload.go:647
+msgid "no sketch or build directory/file specified"
+msgstr "no sketch or build directory/file specified"
+
+#: arduino/resources/install.go:128
+msgid "no unique root dir in archive, found '%[1]s' and '%[2]s'"
+msgstr "no unique root dir in archive, found '%[1]s' and '%[2]s'"
+
+#: commands/upload/upload.go:564
+msgid "no upload port provided"
+msgstr "no upload port provided"
+
+#: arduino/sketch/sketch.go:263
+msgid "no valid sketch found in %[1]s: missing %[2]s"
+msgstr "no valid sketch found in %[1]s: missing %[2]s"
+
+#: commands/core/download.go:85
+msgid "no versions available for the current OS"
+msgstr "no versions available for the current OS"
+
+#: arduino/resources/checksums.go:72 arduino/resources/install.go:59
+msgid "opening archive file: %s"
+msgstr "opening archive file: %s"
+
+#: arduino/cores/packagemanager/loader.go:277
+msgid "opening boards.txt: %s"
+msgstr "opening boards.txt: %s"
+
+#: arduino/serialutils/serialutils.go:37
+msgid "opening port at 1200bps"
+msgstr "opening port at 1200bps"
+
+#: arduino/security/signatures.go:80
+msgid "opening signature file: %s"
+msgstr "opening signature file: %s"
+
+#: arduino/security/signatures.go:75
+msgid "opening target file: %s"
+msgstr "opening target file: %s"
+
+#: arduino/cores/packagemanager/download.go:73 arduino/cores/status.go:88
+#: arduino/cores/status.go:113 arduino/cores/status.go:140
+msgid "package %s not found"
+msgstr "package %s not found"
+
+#: arduino/cores/packagemanager/package_manager.go:259
+msgid "package '%s' not found"
+msgstr "package '%s' not found"
+
+#: arduino/cores/status.go:194
+msgid "package not found"
+msgstr "package not found"
+
+#: arduino/cores/packagemanager/loader.go:232
+msgid "parsing IDE bundled index: %s"
+msgstr "parsing IDE bundled index: %s"
+
+#: arduino/cores/board.go:139
+#: arduino/cores/packagemanager/package_manager.go:136
+msgid "parsing fqbn: %s"
+msgstr "parsing fqbn: %s"
+
+#: arduino/libraries/librariesindex/json.go:69
+msgid "parsing library_index.json: %s"
+msgstr "parsing library_index.json: %s"
+
+#: arduino/cores/packagemanager/loader.go:194
+msgid "path is not a platform directory: %s"
+msgstr "path is not a platform directory: %s"
+
+#: arduino/cores/packagemanager/download.go:77
+msgid "platform %[1]s not found in package %[2]s"
+msgstr "platform %[1]s not found in package %[2]s"
+
+#: arduino/cores/packagemanager/download.go:89
+msgid "platform %s has no available releases"
+msgstr "platform %s has no available releases"
+
+#: arduino/cores/packagemanager/package_manager.go:182
+msgid "platform %s is not installed"
+msgstr "platform %s is not installed"
+
+#: arduino/cores/packagemanager/install_uninstall.go:65
+#: arduino/cores/packagemanager/install_uninstall.go:108
+#: arduino/cores/packagemanager/loader.go:468 commands/compile/compile.go:127
+msgid "platform not installed"
+msgstr "platform not installed"
+
+#: cli/compile/compile.go:122
+msgid "please use --build-property instead."
+msgstr "please use --build-property instead."
+
+#: arduino/discovery/discoverymanager/discoverymanager.go:61
+msgid "pluggable discovery already added: %s"
+msgstr "pluggable discovery already added: %s"
+
+#: cli/board/attach.go:40
+msgid "port"
+msgstr "port"
+
+#: cli/arguments/port.go:145
+msgid "port not found: %[1]s %[2]s"
+msgstr "port not found: %[1]s %[2]s"
+
+#: arduino/monitor/monitor.go:241
+msgid "protocol version not supported: requested %[1]d, got %[2]d"
+msgstr "protocol version not supported: requested %[1]d, got %[2]d"
+
+#: arduino/discovery/discovery.go:320
+msgid "protocol version not supported: requested 1, got %d"
+msgstr "protocol version not supported: requested 1, got %d"
+
+#: arduino/discovery/discoverymanager/discoverymanager.go:189
+msgid "quitting discovery %[1]s: %[2]w"
+msgstr "quitting discovery %[1]s: %[2]w"
+
+#: arduino/cores/packagemanager/loader.go:79
+msgid "reading %[1]s directory: %[2]s"
+msgstr "reading %[1]s directory: %[2]s"
+
+#: arduino/cores/packagemanager/loader.go:706
+msgid "reading %[1]s: %[2]s"
+msgstr "reading %[1]s: %[2]s"
+
+#: arduino/cores/packagemanager/loader.go:271
+#: arduino/libraries/librariesmanager/librariesmanager.go:196
+msgid "reading dir %[1]s: %[2]s"
+msgstr "reading dir %[1]s: %[2]s"
+
+#: arduino/cores/packagemanager/loader.go:167
+#: arduino/cores/packagemanager/loader.go:614
+msgid "reading directory %[1]s: %[2]s"
+msgstr "reading directory %[1]s: %[2]s"
+
+#: arduino/libraries/librariesmanager/install.go:278
+msgid "reading directory %s content: %w"
+msgstr "reading directory %s content: %w"
+
+#: arduino/builder/sketch.go:76
+msgid "reading file %[1]s: %[2]s"
+msgstr "reading file %[1]s: %[2]s"
+
+#: arduino/sketch/sketch.go:233
+msgid "reading files: %v"
+msgstr "reading files: %v"
+
+#: inventory/inventory.go:58
+msgid "reading inventory file: %w"
+msgstr "reading inventory file: %w"
+
+#: arduino/libraries/librariesresolver/cpp.go:60
+msgid "reading lib headers: %s"
+msgstr "reading lib headers: %s"
+
+#: arduino/libraries/libraries.go:235
+msgid "reading lib src dir: %s"
+msgstr "reading lib src dir: %s"
+
+#: arduino/libraries/libraries.go:115
+msgid "reading library headers: %w"
+msgstr "reading library headers: %w"
+
+#: arduino/libraries/librariesindex/json.go:63
+msgid "reading library_index.json: %s"
+msgstr "reading library_index.json: %s"
+
+#: arduino/resources/install.go:118
+msgid "reading package root dir: %s"
+msgstr "reading package root dir: %s"
+
+#: arduino/sketch/sketch.go:192
+msgid "reading sketch metadata %[1]s: %[2]s"
+msgstr "reading sketch metadata %[1]s: %[2]s"
+
+#: commands/upload/upload.go:558
+msgid "recipe not found '%s'"
+msgstr "recipe not found '%s'"
+
+#: arduino/cores/packagemanager/package_manager.go:335
+msgid "release %[1]s not found for tool %[2]s"
+msgstr "release %[1]s not found for tool %[2]s"
+
+#: arduino/cores/status.go:82 arduino/cores/status.go:106
+#: arduino/cores/status.go:133
+msgid "release cannot be nil"
+msgstr "release cannot be nil"
+
+#: arduino/cores/status.go:210
+msgid "release not found"
+msgstr "release not found"
+
+#: arduino/resources/helpers.go:59
+msgid "removing corrupted archive file: %s"
+msgstr "removing corrupted archive file: %s"
+
+#: arduino/libraries/librariesmanager/install.go:95
+msgid "removing lib directory: %s"
+msgstr "removing lib directory: %s"
+
+#: arduino/cores/packagemanager/install_uninstall.go:117
+msgid "removing platform files: %s"
+msgstr "removing platform files: %s"
+
+#: arduino/cores/packagemanager/install_uninstall.go:169
+msgid "removing tool files: %s"
+msgstr "removing tool files: %s"
+
+#: arduino/cores/packagemanager/download.go:84
+msgid "required version %[1]s not found for platform %[2]s"
+msgstr "required version %[1]s not found for platform %[2]s"
+
+#: arduino/security/signatures.go:71
+msgid "retrieving Arduino public keys: %s"
+msgstr "retrieving Arduino public keys: %s"
+
+#: arduino/libraries/loader.go:109 arduino/libraries/loader.go:140
+msgid "scanning examples: %s"
+msgstr "scanning examples: %s"
+
+#: arduino/cores/packagemanager/loader.go:692
+msgid "searching for builtin_tools_versions.txt in %[1]s: %[2]s"
+msgstr "searching for builtin_tools_versions.txt in %[1]s: %[2]s"
+
+#: arduino/resources/install.go:73
+msgid "searching package root dir: %s"
+msgstr "searching package root dir: %s"
+
+#: arduino/serialutils/serialutils.go:43
+msgid "setting DTR to OFF"
+msgstr "setting DTR to OFF"
+
+#: arduino/sketch/sketch.go:62
+msgid "sketch path is not valid"
+msgstr "sketch path is not valid"
+
+#: cli/board/attach.go:40 cli/sketch/archive.go:38
+msgid "sketchPath"
+msgstr "sketchPath"
+
+#: arduino/cores/packagemanager/loader.go:531
+msgid "skipping loading of boards %s: malformed custom board options"
+msgstr "skipping loading of boards %s: malformed custom board options"
+
+#: legacy/builder/utils/utils.go:466
+msgid "source is not a directory"
+msgstr "source is not a directory"
+
+#: arduino/discovery/discoverymanager/discoverymanager.go:142
+msgid "start syncing discovery %[1]s: %[2]w"
+msgstr "start syncing discovery %[1]s: %[2]w"
+
+#: arduino/discovery/discoverymanager/discoverymanager.go:122
+msgid "starting discovery %[1]s: %[2]w"
+msgstr "starting discovery %[1]s: %[2]w"
+
+#: commands/board/list.go:303
+msgid "stopping discoveries: %s"
+msgstr "stopping discoveries: %s"
+
+#: arduino/discovery/discoverymanager/discoverymanager.go:173
+msgid "stopping discovery %[1]s: %[2]w"
+msgstr "stopping discovery %[1]s: %[2]w"
+
+#: arduino/resources/checksums.go:119
+msgid "testing archive checksum: %s"
+msgstr "testing archive checksum: %s"
+
+#: arduino/resources/checksums.go:112
+msgid "testing archive size: %s"
+msgstr "testing archive size: %s"
+
+#: arduino/resources/checksums.go:106
+msgid "testing if archive is cached: %s"
+msgstr "testing if archive is cached: %s"
+
+#: arduino/resources/install.go:37
+msgid "testing local archive integrity: %s"
+msgstr "testing local archive integrity: %s"
+
+#: legacy/builder/phases/sizer.go:116
+msgid "text section exceeds available space in board"
+msgstr "text section exceeds available space in board"
+
+#: legacy/builder/container_add_prototypes.go:47
+#: legacy/builder/container_find_includes.go:117
+msgid "the compilation database may be incomplete or inaccurate"
+msgstr "the compilation database may be incomplete or inaccurate"
+
+#: commands/core/list.go:62
+msgid "the platform has no releases"
+msgstr "the platform has no releases"
+
+#: commands/board/list.go:79
+msgid "the server responded with status %s"
+msgstr "the server responded with status %s"
+
+#: arduino/monitor/monitor.go:139
+msgid "timeout waiting for message"
+msgstr "timeout waiting for message"
+
+#: arduino/discovery/discovery.go:217
+msgid "timeout waiting for message from %s"
+msgstr "timeout waiting for message from %s"
+
+#: arduino/cores/packagemanager/install_uninstall.go:165
+msgid "tool %s is not managed by package manager"
+msgstr "tool %s is not managed by package manager"
+
+#: arduino/cores/status.go:92 arduino/cores/status.go:117
+#: arduino/cores/status.go:144
+msgid "tool %s not found"
+msgstr "tool %s not found"
+
+#: arduino/cores/packagemanager/package_manager.go:285
+msgid "tool '%[1]s' not found in package '%[2]s'"
+msgstr "tool '%[1]s' not found in package '%[2]s'"
+
+#: arduino/cores/packagemanager/download.go:123
+msgid "tool not available for your OS"
+msgstr "tool not available for your OS"
+
+#: arduino/cores/status.go:198
+msgid "tool not found"
+msgstr "tool not found"
+
+#: arduino/cores/packagemanager/install_uninstall.go:160
+msgid "tool not installed"
+msgstr "tool not installed"
+
+#: arduino/cores/packagemanager/package_manager.go:467
+#: arduino/cores/packagemanager/package_manager.go:544
+msgid "tool release not found: %s"
+msgstr "tool release not found: %s"
+
+#: arduino/cores/status.go:96
+msgid "tool version %s not found"
+msgstr "tool version %s not found"
+
+#: commands/lib/install.go:59
+msgid ""
+"two different versions of the library %[1]s are required: %[2]s and %[3]s"
+msgstr ""
+"two different versions of the library %[1]s are required: %[2]s and %[3]s"
+
+#: arduino/builder/sketch.go:69 arduino/builder/sketch.go:117
+msgid "unable to compute relative path to the sketch for the item"
+msgstr "unable to compute relative path to the sketch for the item"
+
+#: arduino/builder/sketch.go:49
+msgid "unable to create a folder to save the sketch"
+msgstr "unable to create a folder to save the sketch"
+
+#: arduino/builder/sketch.go:111
+msgid "unable to create a folder to save the sketch files"
+msgstr "unable to create a folder to save the sketch files"
+
+#: arduino/builder/sketch.go:123
+msgid "unable to create the folder containing the item"
+msgstr "unable to create the folder containing the item"
+
+#: cli/config/dump.go:58
+msgid "unable to marshal config to YAML: %v"
+msgstr "unable to marshal config to YAML: %v"
+
+#: arduino/builder/sketch.go:161
+msgid "unable to read contents of the destination item"
+msgstr "unable to read contents of the destination item"
+
+#: arduino/builder/sketch.go:134
+msgid "unable to read contents of the source item"
+msgstr "unable to read contents of the source item"
+
+#: arduino/builder/sketch.go:55
+msgid "unable to save the sketch on disk"
+msgstr "unable to save the sketch on disk"
+
+#: arduino/builder/sketch.go:144
+msgid "unable to write to destination file"
+msgstr "unable to write to destination file"
+
+#: arduino/cores/packagemanager/package_manager.go:170
+msgid "unknown package %s"
+msgstr "unknown package %s"
+
+#: arduino/cores/packagemanager/package_manager.go:177
+msgid "unknown platform %s:%s"
+msgstr "unknown platform %s:%s"
+
+#: arduino/sketch/sketch.go:146
+msgid "unknown sketch file extension '%s'"
+msgstr "unknown sketch file extension '%s'"
+
+#: arduino/resources/checksums.go:62
+msgid "unsupported hash algorithm: %s"
+msgstr "unsupported hash algorithm: %s"
+
+#: cli/core/upgrade.go:44
+msgid "upgrade arduino:samd to the latest version"
+msgstr "upgrade arduino:samd to the latest version"
+
+#: cli/core/upgrade.go:42
+msgid "upgrade everything to the latest version"
+msgstr "upgrade everything to the latest version"
+
+#: commands/upload/upload.go:593
+msgid "uploading error: %s"
+msgstr "uploading error: %s"
+
+#: arduino/sketch/sketch.go:216
+msgid "writing sketch metadata %[1]s: %[2]s"
+msgstr "writing sketch metadata %[1]s: %[2]s"
+
+#: commands/board/list.go:95
+msgid "wrong format in server response"
+msgstr "wrong format in server response"
