@@ -29,12 +29,11 @@ import (
 func initGetCommand() *cobra.Command {
 	getCommand := &cobra.Command{
 		Use:   "get",
-		Short: tr("Gets a setting value."),
-		Long:  tr("Gets a setting value."),
+		Short: tr("Gets settings key values."),
+		Long:  tr("Gets settings key values."),
 		Example: "" +
-			"  " + os.Args[0] + " config get logging.level\n" +
-			"  " + os.Args[0] + " config get logging.file\n" +
-			"  " + os.Args[0] + " config get sketch.always_export_binaries\n" +
+			"  " + os.Args[0] + " config get logging\n" +
+			"  " + os.Args[0] + " config get logging.level logging.file\n" +
 			"  " + os.Args[0] + " config get board_manager.additional_urls",
 		Args: cobra.MinimumNArgs(1),
 		Run:  runGetCommand,
@@ -47,24 +46,15 @@ func initGetCommand() *cobra.Command {
 
 func runGetCommand(cmd *cobra.Command, args []string) {
 	logrus.Info("Executing `arduino-cli config get`")
-	key := args[0]
-	kind := validateKey(key)
 
-	if kind != reflect.Slice && len(args) > 1 {
-		feedback.Fatal(tr("Can't get multiple key values"), feedback.ErrGeneric)
+        svc := daemon.ArduinoCoreServerImpl{}
+	for _, toGet := range args {
+		resp, err := svc.SettingsGetValue(cmd.Context(), &rpc.SettingsGetValueRequest{Key: toGet})
+		if err != nil {
+			feedback.Fatal(tr("Cannot get the key %[1]s: %[2]v", toGet, err), feedback.ErrGeneric)
+		}
+		feedback.PrintResult(resp.GetJsonData())
 	}
-
-	var value interface{}
-	switch kind {
-	case reflect.Slice:
-		value = configuration.Settings.GetStringSlice(key)
-	case reflect.String:
-		value = configuration.Settings.GetString(key)
-	case reflect.Bool:
-		value = configuration.Settings.GetBool(key)
-	}
-
-	feedback.PrintResult(getResult{value})
 }
 
 // output from this command may require special formatting.
