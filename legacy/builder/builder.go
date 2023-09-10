@@ -23,7 +23,6 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/legacy/builder/utils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -51,33 +50,120 @@ func (s *Builder) Run(ctx *types.Context) error {
 			return _err
 		}),
 
-		utils.LogIfVerbose(false, tr("Detecting libraries used...")),
+		logIfVerbose(false, tr("Detecting libraries used...")),
 		findIncludes(ctx),
 
 		&WarnAboutArchIncompatibleLibraries{},
 
-		utils.LogIfVerbose(false, tr("Generating function prototypes...")),
+		logIfVerbose(false, tr("Generating function prototypes...")),
 		types.BareCommand(PreprocessSketch),
 
-		utils.LogIfVerbose(false, tr("Compiling sketch...")),
+		logIfVerbose(false, tr("Compiling sketch...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.sketch.prebuild", Suffix: ".pattern"},
-		&phases.SketchBuilder{},
+		types.BareCommand(func(ctx *types.Context) error {
+			sketchObjectFiles, err := phases.SketchBuilder(
+				ctx.SketchBuildPath,
+				ctx.BuildProperties,
+				ctx.SketchLibrariesDetector.IncludeFolders(),
+				ctx.OnlyUpdateCompilationDatabase,
+				ctx.Verbose,
+				ctx.CompilationDatabase,
+				ctx.Jobs,
+				ctx.WarningsLevel,
+				ctx.Stdout, ctx.Stderr,
+				func(msg string) { ctx.Info(msg) },
+				func(data []byte) { ctx.WriteStdout(data) },
+				func(data []byte) { ctx.WriteStderr(data) },
+				&ctx.Progress, ctx.ProgressCB,
+			)
+			if err != nil {
+				return err
+			}
+			ctx.SketchObjectFiles = sketchObjectFiles
+			return nil
+		}),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.sketch.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
-		utils.LogIfVerbose(false, tr("Compiling libraries...")),
+		logIfVerbose(false, tr("Compiling libraries...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.libraries.prebuild", Suffix: ".pattern"},
 		&UnusedCompiledLibrariesRemover{},
-		&phases.LibrariesBuilder{},
+		types.BareCommand(func(ctx *types.Context) error {
+			librariesObjectFiles, err := phases.LibrariesBuilder(
+				ctx.LibrariesBuildPath,
+				ctx.BuildProperties,
+				ctx.SketchLibrariesDetector.IncludeFolders(),
+				ctx.SketchLibrariesDetector.ImportedLibraries(),
+				ctx.Verbose,
+				ctx.OnlyUpdateCompilationDatabase,
+				ctx.CompilationDatabase,
+				ctx.Jobs,
+				ctx.WarningsLevel,
+				ctx.Stdout,
+				ctx.Stderr,
+				func(msg string) { ctx.Info(msg) },
+				func(data []byte) { ctx.WriteStdout(data) },
+				func(data []byte) { ctx.WriteStderr(data) },
+				&ctx.Progress, ctx.ProgressCB,
+			)
+			if err != nil {
+				return err
+			}
+			ctx.LibrariesObjectFiles = librariesObjectFiles
+
+			return nil
+		}),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.libraries.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
-		utils.LogIfVerbose(false, tr("Compiling core...")),
+		logIfVerbose(false, tr("Compiling core...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.core.prebuild", Suffix: ".pattern"},
-		&phases.CoreBuilder{},
+
+		types.BareCommand(func(ctx *types.Context) error {
+			objectFiles, archiveFile, err := phases.CoreBuilder(
+				ctx.BuildPath, ctx.CoreBuildPath, ctx.Builder.CoreBuildCachePath(),
+				ctx.BuildProperties,
+				ctx.ActualPlatform,
+				ctx.Verbose, ctx.OnlyUpdateCompilationDatabase, ctx.Clean,
+				ctx.CompilationDatabase,
+				ctx.Jobs,
+				ctx.WarningsLevel,
+				ctx.Stdout, ctx.Stderr,
+				func(msg string) { ctx.Info(msg) },
+				func(data []byte) { ctx.WriteStdout(data) },
+				func(data []byte) { ctx.WriteStderr(data) },
+				&ctx.Progress, ctx.ProgressCB,
+			)
+
+			ctx.CoreObjectsFiles = objectFiles
+			ctx.CoreArchiveFilePath = archiveFile
+
+			return err
+		}),
+
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.core.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
-		utils.LogIfVerbose(false, tr("Linking everything together...")),
+		logIfVerbose(false, tr("Linking everything together...")),
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.linking.prelink", Suffix: ".pattern"},
-		&phases.Linker{},
+
+		types.BareCommand(func(ctx *types.Context) error {
+			verboseInfoOut, err := phases.Linker(
+				ctx.OnlyUpdateCompilationDatabase,
+				ctx.Verbose,
+				ctx.SketchObjectFiles,
+				ctx.LibrariesObjectFiles,
+				ctx.CoreObjectsFiles,
+				ctx.CoreArchiveFilePath,
+				ctx.BuildPath,
+				ctx.BuildProperties,
+				ctx.Stdout,
+				ctx.Stderr,
+				ctx.WarningsLevel,
+			)
+			if ctx.Verbose {
+				ctx.Info(string(verboseInfoOut))
+			}
+			return err
+		}),
+
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.linking.postlink", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
 
 		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.objcopy.preobjcopy", Suffix: ".pattern"},
@@ -118,7 +204,18 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		&ExportProjectCMake{SketchError: mainErr != nil},
 
-		&phases.Sizer{SketchError: mainErr != nil},
+		types.BareCommand(func(ctx *types.Context) error {
+			executableSectionsSize, err := phases.Sizer(
+				ctx.OnlyUpdateCompilationDatabase, mainErr != nil, ctx.Verbose,
+				ctx.BuildProperties,
+				ctx.Stdout, ctx.Stderr,
+				func(msg string) { ctx.Info(msg) },
+				func(msg string) { ctx.Warn(msg) },
+				ctx.WarningsLevel,
+			)
+			ctx.ExecutableSectionsSize = executableSectionsSize
+			return err
+		}),
 	}
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
@@ -140,9 +237,6 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 func PreprocessSketch(ctx *types.Context) error {
 	preprocessorImpl := preprocessor.PreprocessSketchWithCtags
-	if ctx.UseArduinoPreprocessor {
-		preprocessorImpl = preprocessor.PreprocessSketchWithArduinoPreprocessor
-	}
 	normalOutput, verboseOutput, err := preprocessorImpl(
 		ctx.Sketch, ctx.BuildPath, ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset,
 		ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)
@@ -233,5 +327,19 @@ func findIncludes(ctx *types.Context) types.BareCommand {
 			ctx.BuildProperties,
 			ctx.TargetPlatform.Platform.Architecture,
 		)
+	})
+}
+
+func logIfVerbose(warn bool, msg string) types.BareCommand {
+	return types.BareCommand(func(ctx *types.Context) error {
+		if !ctx.Verbose {
+			return nil
+		}
+		if warn {
+			ctx.Warn(msg)
+		} else {
+			ctx.Info(msg)
+		}
+		return nil
 	})
 }

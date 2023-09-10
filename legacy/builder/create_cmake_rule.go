@@ -28,7 +28,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/globals"
-	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 )
@@ -201,7 +200,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	for _, library := range ctx.SketchLibrariesDetector.ImportedLibraries() {
 		// Copy used libraries in the correct folder
 		libDir := libBaseFolder.Join(library.DirName)
-		mcu := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_BUILD_MCU)
+		mcu := ctx.BuildProperties.Get("build.mcu")
 		copyDir(library.InstallDir.String(), libDir.String(), validExportExtensions)
 
 		// Read cmake options if available
@@ -367,7 +366,7 @@ func extractCompileFlags(ctx *types.Context, recipe string, defines, dynamicLibs
 		return target
 	}
 
-	command, _ := builder_utils.PrepareCommandForRecipe(ctx.BuildProperties, recipe, true)
+	command, _ := utils.PrepareCommandForRecipe(ctx.BuildProperties, recipe, true)
 
 	for _, arg := range command.GetArgs() {
 		if strings.HasPrefix(arg, "-D") {

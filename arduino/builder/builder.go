@@ -15,16 +15,59 @@
 
 package builder
 
-import "github.com/arduino/arduino-cli/arduino/sketch"
+import (
+	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-properties-orderedmap"
+)
 
 // Builder is a Sketch builder.
 type Builder struct {
-	sketch *sketch.Sketch
+	sketch          *sketch.Sketch
+	buildProperties *properties.Map
+
+	// core related
+	coreBuildCachePath *paths.Path
 }
 
 // NewBuilder creates a sketch Builder.
-func NewBuilder(sk *sketch.Sketch) *Builder {
-	return &Builder{
-		sketch: sk,
+func NewBuilder(
+	sk *sketch.Sketch,
+	boardBuildProperties *properties.Map,
+	buildPath *paths.Path,
+	optimizeForDebug bool,
+	coreBuildCachePath *paths.Path,
+) *Builder {
+	buildProperties := properties.NewMap()
+	if boardBuildProperties != nil {
+		buildProperties.Merge(boardBuildProperties)
 	}
+
+	if buildPath != nil {
+		buildProperties.SetPath("build.path", buildPath)
+	}
+	if sk != nil {
+		buildProperties.Set("build.project_name", sk.MainFile.Base())
+		buildProperties.SetPath("build.source.path", sk.FullPath)
+	}
+	if optimizeForDebug {
+		if debugFlags, ok := buildProperties.GetOk("compiler.optimization_flags.debug"); ok {
+			buildProperties.Set("compiler.optimization_flags", debugFlags)
+		}
+	} else {
+		if releaseFlags, ok := buildProperties.GetOk("compiler.optimization_flags.release"); ok {
+			buildProperties.Set("compiler.optimization_flags", releaseFlags)
+		}
+	}
+
+	return &Builder{
+		sketch:             sk,
+		buildProperties:    buildProperties,
+		coreBuildCachePath: coreBuildCachePath,
+	}
+}
+
+// GetBuildProperties returns the build properties for running this build
+func (b *Builder) GetBuildProperties() *properties.Map {
+	return b.buildProperties
 }

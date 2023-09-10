@@ -21,6 +21,7 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-properties-orderedmap"
+	"github.com/stretchr/testify/require"
 )
 
 // TODO
@@ -40,6 +41,6 @@ func TestRecipeRunner(t *testing.T) {
 
 	for _, command := range commands {
 		err := command.Run(ctx)
-		NoError(t, err)
+		require.NoError(t, err)
 	}
 }

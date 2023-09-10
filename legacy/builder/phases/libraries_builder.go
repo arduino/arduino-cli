@@ -16,14 +16,16 @@
 package phases
 
 import (
+	"io"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/arduino/builder/progress"
+	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -32,26 +34,43 @@ import (
 var FLOAT_ABI_CFLAG = "float-abi"
 var FPU_CFLAG = "fpu"
 
-type LibrariesBuilder struct{}
-
-func (s *LibrariesBuilder) Run(ctx *types.Context) error {
-	librariesBuildPath := ctx.LibrariesBuildPath
-	buildProperties := ctx.BuildProperties
-	includesFolders := ctx.SketchLibrariesDetector.IncludeFolders()
+func LibrariesBuilder(
+	librariesBuildPath *paths.Path,
+	buildProperties *properties.Map,
+	includesFolders paths.PathList,
+	importedLibraries libraries.List,
+	verbose, onlyUpdateCompilationDatabase bool,
+	compilationDatabase *builder.CompilationDatabase,
+	jobs int,
+	warningsLevel string,
+	stdoutWriter, stderrWriter io.Writer,
+	verboseInfoFn func(msg string),
+	verboseStdoutFn, verboseStderrFn func(data []byte),
+	progress *progress.Struct, progressCB rpc.TaskProgressCB,
+) (paths.PathList, error) {
 	includes := f.Map(includesFolders.AsStrings(), cpp.WrapWithHyphenI)
-	libs := ctx.SketchLibrariesDetector.ImportedLibraries()
+	libs := importedLibraries
 
 	if err := librariesBuildPath.MkdirAll(); err != nil {
-		return errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
-	objectFiles, err := compileLibraries(ctx, libs, librariesBuildPath, buildProperties, includes)
+	librariesObjectFiles, err := compileLibraries(
+		libs, librariesBuildPath, buildProperties, includes,
+		verbose, onlyUpdateCompilationDatabase,
+		compilationDatabase,
+		jobs,
+		warningsLevel,
+		stdoutWriter, stderrWriter,
+		verboseInfoFn,
+		verboseStdoutFn, verboseStderrFn,
+		progress, progressCB,
+	)
 	if err != nil {
-		return errors.WithStack(err)
+		return nil, errors.WithStack(err)
 	}
 
-	ctx.LibrariesObjectFiles = objectFiles
-	return nil
+	return librariesObjectFiles, nil
 }
 
 func directoryContainsFile(folder *paths.Path) bool {
@@ -62,12 +81,16 @@ func directoryContainsFile(folder *paths.Path) bool {
 	return false
 }
 
-func findExpectedPrecompiledLibFolder(ctx *types.Context, library *libraries.Library) *paths.Path {
-	mcu := ctx.BuildProperties.Get(constants.BUILD_PROPERTIES_BUILD_MCU)
+func findExpectedPrecompiledLibFolder(
+	library *libraries.Library,
+	buildProperties *properties.Map,
+	verboseInfoFn func(msg string),
+) *paths.Path {
+	mcu := buildProperties.Get("build.mcu")
 	// Add fpu specifications if they exist
 	// To do so, resolve recipe.cpp.o.pattern,
 	// search for -mfpu=xxx -mfloat-abi=yyy and add to a subfolder
-	command, _ := builder_utils.PrepareCommandForRecipe(ctx.BuildProperties, "recipe.cpp.o.pattern", true)
+	command, _ := utils.PrepareCommandForRecipe(buildProperties, "recipe.cpp.o.pattern", true)
 	fpuSpecs := ""
 	for _, el := range command.GetArgs() {
 		if strings.Contains(el, FPU_CFLAG) {
@@ -88,50 +111,85 @@ func findExpectedPrecompiledLibFolder(ctx *types.Context, library *libraries.Lib
 		}
 	}
 
-	ctx.Info(tr("Library %[1]s has been declared precompiled:", library.Name))
+	verboseInfoFn(tr("Library %[1]s has been declared precompiled:", library.Name))
 
 	// Try directory with full fpuSpecs first, if available
 	if len(fpuSpecs) > 0 {
 		fpuSpecs = strings.TrimRight(fpuSpecs, "-")
 		fullPrecompDir := library.SourceDir.Join(mcu).Join(fpuSpecs)
 		if fullPrecompDir.Exist() && directoryContainsFile(fullPrecompDir) {
-			ctx.Info(tr("Using precompiled library in %[1]s", fullPrecompDir))
+			verboseInfoFn(tr("Using precompiled library in %[1]s", fullPrecompDir))
 			return fullPrecompDir
 		}
-		ctx.Info(tr(`Precompiled library in "%[1]s" not found`, fullPrecompDir))
+		verboseInfoFn(tr(`Precompiled library in "%[1]s" not found`, fullPrecompDir))
 	}
 
 	precompDir := library.SourceDir.Join(mcu)
 	if precompDir.Exist() && directoryContainsFile(precompDir) {
-		ctx.Info(tr("Using precompiled library in %[1]s", precompDir))
+		verboseInfoFn(tr("Using precompiled library in %[1]s", precompDir))
 		return precompDir
 	}
-	ctx.Info(tr(`Precompiled library in "%[1]s" not found`, precompDir))
+	verboseInfoFn(tr(`Precompiled library in "%[1]s" not found`, precompDir))
 	return nil
 }
 
-func compileLibraries(ctx *types.Context, libraries libraries.List, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
-	ctx.Progress.AddSubSteps(len(libraries))
-	defer ctx.Progress.RemoveSubSteps()
+func compileLibraries(
+	libraries libraries.List, buildPath *paths.Path, buildProperties *properties.Map, includes []string,
+	verbose, onlyUpdateCompilationDatabase bool,
+	compilationDatabase *builder.CompilationDatabase,
+	jobs int,
+	warningsLevel string,
+	stdoutWriter, stderrWriter io.Writer,
+	verboseInfoFn func(msg string),
+	verboseStdoutFn, verboseStderrFn func(data []byte),
+	progress *progress.Struct, progressCB rpc.TaskProgressCB,
+) (paths.PathList, error) {
+	progress.AddSubSteps(len(libraries))
+	defer progress.RemoveSubSteps()
 
 	objectFiles := paths.NewPathList()
 	for _, library := range libraries {
-		libraryObjectFiles, err := compileLibrary(ctx, library, buildPath, buildProperties, includes)
+		libraryObjectFiles, err := compileLibrary(
+			library, buildPath, buildProperties, includes,
+			verbose, onlyUpdateCompilationDatabase,
+			compilationDatabase,
+			jobs,
+			warningsLevel,
+			stdoutWriter, stderrWriter,
+			verboseInfoFn, verboseStdoutFn, verboseStderrFn,
+			progress, progressCB,
+		)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
 		objectFiles.AddAll(libraryObjectFiles)
 
-		ctx.Progress.CompleteStep()
-		ctx.PushProgress()
+		progress.CompleteStep()
+		// PushProgress
+		if progressCB != nil {
+			progressCB(&rpc.TaskProgress{
+				Percent:   progress.Progress,
+				Completed: progress.Progress >= 100.0,
+			})
+		}
 	}
 
 	return objectFiles, nil
 }
 
-func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *paths.Path, buildProperties *properties.Map, includes []string) (paths.PathList, error) {
-	if ctx.Verbose {
-		ctx.Info(tr(`Compiling library "%[1]s"`, library.Name))
+func compileLibrary(
+	library *libraries.Library, buildPath *paths.Path, buildProperties *properties.Map, includes []string,
+	verbose, onlyUpdateCompilationDatabase bool,
+	compilationDatabase *builder.CompilationDatabase,
+	jobs int,
+	warningsLevel string,
+	stdoutWriter, stderrWriter io.Writer,
+	verboseInfoFn func(msg string),
+	verboseStdoutFn, verboseStderrFn func(data []byte),
+	progress *progress.Struct, progressCB rpc.TaskProgressCB,
+) (paths.PathList, error) {
+	if verbose {
+		verboseInfoFn(tr(`Compiling library "%[1]s"`, library.Name))
 	}
 	libraryBuildPath := buildPath.Join(library.DirName)
 
@@ -142,11 +200,15 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 	objectFiles := paths.NewPathList()
 
 	if library.Precompiled {
-		coreSupportPrecompiled := ctx.BuildProperties.ContainsKey("compiler.libraries.ldflags")
-		precompiledPath := findExpectedPrecompiledLibFolder(ctx, library)
+		coreSupportPrecompiled := buildProperties.ContainsKey("compiler.libraries.ldflags")
+		precompiledPath := findExpectedPrecompiledLibFolder(
+			library,
+			buildProperties,
+			verboseInfoFn,
+		)
 
 		if !coreSupportPrecompiled {
-			ctx.Info(tr("The platform does not support '%[1]s' for precompiled libraries.", "compiler.libraries.ldflags"))
+			verboseInfoFn(tr("The platform does not support '%[1]s' for precompiled libraries.", "compiler.libraries.ldflags"))
 		} else if precompiledPath != nil {
 			// Find all libraries in precompiledPath
 			libs, err := precompiledPath.ReadDir()
@@ -165,8 +227,8 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 				}
 			}
 
-			currLDFlags := ctx.BuildProperties.Get("compiler.libraries.ldflags")
-			ctx.BuildProperties.Set("compiler.libraries.ldflags", currLDFlags+" \"-L"+precompiledPath.String()+"\" "+libsCmd+" ")
+			currLDFlags := buildProperties.Get("compiler.libraries.ldflags")
+			buildProperties.Set("compiler.libraries.ldflags", currLDFlags+" \"-L"+precompiledPath.String()+"\" "+libsCmd+" ")
 
 			// TODO: This codepath is just taken for .a with unusual names that would
 			// be ignored by -L / -l methods.
@@ -186,12 +248,29 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 	}
 
 	if library.Layout == libraries.RecursiveLayout {
-		libObjectFiles, err := builder_utils.CompileFilesRecursive(ctx, library.SourceDir, libraryBuildPath, buildProperties, includes)
+		libObjectFiles, err := utils.CompileFilesRecursive(
+			library.SourceDir, libraryBuildPath, buildProperties, includes,
+			onlyUpdateCompilationDatabase,
+			compilationDatabase,
+			jobs,
+			verbose,
+			warningsLevel,
+			stdoutWriter, stderrWriter,
+			verboseInfoFn, verboseStdoutFn, verboseStderrFn,
+			progress, progressCB,
+		)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
 		if library.DotALinkage {
-			archiveFile, err := builder_utils.ArchiveCompiledFiles(ctx, libraryBuildPath, paths.New(library.DirName+".a"), libObjectFiles, buildProperties)
+			archiveFile, verboseInfo, err := utils.ArchiveCompiledFiles(
+				libraryBuildPath, paths.New(library.DirName+".a"), libObjectFiles, buildProperties,
+				onlyUpdateCompilationDatabase, verbose,
+				stdoutWriter, stderrWriter,
+			)
+			if verbose {
+				verboseInfoFn(string(verboseInfo))
+			}
 			if err != nil {
 				return nil, errors.WithStack(err)
 			}
@@ -203,7 +282,17 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 		if library.UtilityDir != nil {
 			includes = append(includes, cpp.WrapWithHyphenI(library.UtilityDir.String()))
 		}
-		libObjectFiles, err := builder_utils.CompileFiles(ctx, library.SourceDir, libraryBuildPath, buildProperties, includes)
+		libObjectFiles, err := utils.CompileFiles(
+			library.SourceDir, libraryBuildPath, buildProperties, includes,
+			onlyUpdateCompilationDatabase,
+			compilationDatabase,
+			jobs,
+			verbose,
+			warningsLevel,
+			stdoutWriter, stderrWriter,
+			verboseInfoFn, verboseStdoutFn, verboseStderrFn,
+			progress, progressCB,
+		)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
@@ -211,7 +300,17 @@ func compileLibrary(ctx *types.Context, library *libraries.Library, buildPath *p
 
 		if library.UtilityDir != nil {
 			utilityBuildPath := libraryBuildPath.Join("utility")
-			utilityObjectFiles, err := builder_utils.CompileFiles(ctx, library.UtilityDir, utilityBuildPath, buildProperties, includes)
+			utilityObjectFiles, err := utils.CompileFiles(
+				library.UtilityDir, utilityBuildPath, buildProperties, includes,
+				onlyUpdateCompilationDatabase,
+				compilationDatabase,
+				jobs,
+				verbose,
+				warningsLevel,
+				stdoutWriter, stderrWriter,
+				verboseInfoFn, verboseStdoutFn, verboseStderrFn,
+				progress, progressCB,
+			)
 			if err != nil {
 				return nil, errors.WithStack(err)
 			}

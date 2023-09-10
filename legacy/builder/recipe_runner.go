@@ -20,9 +20,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/legacy/builder/builder_utils"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/arduino-cli/legacy/builder/utils"
+	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -44,7 +43,7 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 	for _, recipe := range recipes {
 		logrus.Debugf(fmt.Sprintf("Running recipe: %s", recipe))
 
-		command, err := builder_utils.PrepareCommandForRecipe(properties, recipe, false)
+		command, err := utils.PrepareCommandForRecipe(properties, recipe, false)
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -56,7 +55,10 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 			return nil
 		}
 
-		_, _, err = utils.ExecCommand(ctx, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+		verboseInfo, _, _, err := utils.ExecCommand(ctx.Verbose, ctx.Stdout, ctx.Stderr, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+		if ctx.Verbose {
+			ctx.Info(string(verboseInfo))
+		}
 		if err != nil {
 			return errors.WithStack(err)
 		}

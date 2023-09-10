@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package types
+package progress
 
 import (
 	"fmt"
@@ -23,7 +23,7 @@ import (
 )
 
 func TestProgress(t *testing.T) {
-	p := &ProgressStruct{}
+	p := &Struct{}
 	p.AddSubSteps(3)
 	require.Equal(t, float32(0.0), p.Progress)
 	require.InEpsilon(t, 33.33333, p.StepAmount, 0.00001)

@@ -19,15 +19,12 @@ import (
 	"fmt"
 	"path/filepath"
 	"testing"
-	"time"
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
-	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -63,17 +60,17 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 	}
 	if ctx.BuildPath == nil {
 		buildPath, err := paths.MkTempDir("", "test_build_path")
-		NoError(t, err)
+		require.NoError(t, err)
 		ctx.BuildPath = buildPath
 	}
 
 	buildPath := ctx.BuildPath
 	sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
-	NoError(t, err)
+	require.NoError(t, err)
 	librariesBuildPath, err := buildPath.Join(constants.FOLDER_LIBRARIES).Abs()
-	NoError(t, err)
+	require.NoError(t, err)
 	coreBuildPath, err := buildPath.Join(constants.FOLDER_CORE).Abs()
-	NoError(t, err)
+	require.NoError(t, err)
 
 	ctx.SketchBuildPath = sketchBuildPath
 	ctx.LibrariesBuildPath = librariesBuildPath
@@ -87,11 +84,8 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		// NoError(t, err)
 		fmt.Println(err)
 	}
-	if !ctx.CanUseCachedTools {
-		if ctx.BuiltInToolsDirs != nil {
-			pmb.LoadToolsFromBundleDirectories(ctx.BuiltInToolsDirs)
-		}
-		ctx.CanUseCachedTools = true
+	if ctx.BuiltInToolsDirs != nil {
+		pmb.LoadToolsFromBundleDirectories(ctx.BuiltInToolsDirs)
 	}
 	pm := pmb.Build()
 	pme, _ /* never release... */ := pm.NewExplorer()
@@ -103,18 +97,18 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		ctx.Sketch = sk
 	}
 
-	ctx.Builder = bldr.NewBuilder(ctx.Sketch)
+	ctx.Builder = bldr.NewBuilder(ctx.Sketch, nil, nil, false, nil)
 	if fqbn != "" {
 		ctx.FQBN = parseFQBN(t, fqbn)
-		targetPackage, targetPlatform, targetBoard, buildProperties, buildPlatform, err := pme.ResolveFQBN(ctx.FQBN)
+		targetPackage, targetPlatform, targetBoard, boardBuildProperties, buildPlatform, err := pme.ResolveFQBN(ctx.FQBN)
 		require.NoError(t, err)
 		requiredTools, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 		require.NoError(t, err)
 
-		buildProperties = ctx.Builder.SetupBuildProperties(buildProperties, ctx.BuildPath, false /*OptimizeForDebug*/)
+		ctx.Builder = bldr.NewBuilder(ctx.Sketch, boardBuildProperties, ctx.BuildPath, false /*OptimizeForDebug*/, nil)
 		ctx.PackageManager = pme
 		ctx.TargetBoard = targetBoard
-		ctx.BuildProperties = buildProperties
+		ctx.BuildProperties = ctx.Builder.GetBuildProperties()
 		ctx.TargetPlatform = targetPlatform
 		ctx.TargetPackage = targetPackage
 		ctx.ActualPlatform = buildPlatform
@@ -128,10 +122,10 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 	if !stepToSkip[skipLibraries] {
 		lm, libsResolver, _, err := detector.LibrariesLoader(
 			false, nil,
-			ctx.BuiltInLibrariesDirs, ctx.LibraryDirs, ctx.OtherLibrariesDirs,
+			ctx.BuiltInLibrariesDirs, nil, ctx.OtherLibrariesDirs,
 			ctx.ActualPlatform, ctx.TargetPlatform,
 		)
-		NoError(t, err)
+		require.NoError(t, err)
 
 		ctx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
 			lm, libsResolver,
@@ -146,90 +140,4 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 	}
 
 	return ctx
-}
-
-func TestBuilderEmptySketch(t *testing.T) {
-	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	// Run builder
-	command := builder.Builder{}
-	err := command.Run(ctx)
-	NoError(t, err)
-
-	buildPath := ctx.BuildPath
-	exist, err := buildPath.Join(constants.FOLDER_CORE, "HardwareSerial.cpp.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join(constants.FOLDER_SKETCH, "sketch1.ino.cpp.o").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join("sketch1.ino.elf").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-	exist, err = buildPath.Join("sketch1.ino.hex").ExistCheck()
-	NoError(t, err)
-	require.True(t, exist)
-}
-
-func TestBuilderWithBuildPathInSketchDir(t *testing.T) {
-	buildPath, err := paths.New("sketch1", "build").Abs()
-	NoError(t, err)
-	ctx := prepareBuilderTestContext(t, &types.Context{BuildPath: buildPath}, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	// Run build
-	command := builder.Builder{}
-	err = command.Run(ctx)
-	NoError(t, err)
-
-	// Run build twice, to verify the build still works when the
-	// build directory is present at the start
-	err = command.Run(ctx)
-	NoError(t, err)
-}
-
-func TestBuilderCacheCoreAFile(t *testing.T) {
-	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	SetupBuildCachePath(t, ctx)
-	defer ctx.CoreBuildCachePath.RemoveAll()
-
-	// Run build
-	bldr := builder.Builder{}
-	err := bldr.Run(ctx)
-	NoError(t, err)
-
-	// Pick timestamp of cached core
-	coreFolder := paths.New("downloaded_hardware", "arduino", "avr")
-	coreFileName := phases.GetCachedCoreArchiveDirName(ctx.FQBN.String(), ctx.BuildProperties.Get("compiler.optimization_flags"), coreFolder)
-	cachedCoreFile := ctx.CoreBuildCachePath.Join(coreFileName, "core.a")
-	coreStatBefore, err := cachedCoreFile.Stat()
-	require.NoError(t, err)
-	lastUsedFile := ctx.CoreBuildCachePath.Join(coreFileName, ".last-used")
-	_, err = lastUsedFile.Stat()
-	require.NoError(t, err)
-
-	// Run build again, to verify that the builder skips rebuilding core.a
-	err = bldr.Run(ctx)
-	NoError(t, err)
-
-	coreStatAfterRebuild, err := cachedCoreFile.Stat()
-	require.NoError(t, err)
-	require.Equal(t, coreStatBefore.ModTime(), coreStatAfterRebuild.ModTime())
-
-	// Touch a file of the core and check if the builder invalidate the cache
-	time.Sleep(time.Second)
-	now := time.Now().Local()
-	err = coreFolder.Join("cores", "arduino", "Arduino.h").Chtimes(now, now)
-	require.NoError(t, err)
-
-	// Run build again, to verify that the builder rebuilds core.a
-	err = bldr.Run(ctx)
-	NoError(t, err)
-
-	coreStatAfterTouch, err := cachedCoreFile.Stat()
-	require.NoError(t, err)
-	require.NotEqual(t, coreStatBefore.ModTime(), coreStatAfterTouch.ModTime())
 }
