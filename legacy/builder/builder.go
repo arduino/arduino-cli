@@ -82,7 +82,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.WarningsLevel,
 				ctx.Stdout, ctx.Stderr,
 				func(msg string) { ctx.BuilderLogger.Info(msg) },
-				func(data []byte) { ctx.WriteStdout(data) },
+				func(data []byte) { ctx.BuilderLogger.WriteStdout(data) },
 				func(data []byte) { ctx.WriteStderr(data) },
 				&ctx.Progress, ctx.ProgressCB,
 			)
@@ -123,7 +123,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.Stdout,
 				ctx.Stderr,
 				func(msg string) { ctx.BuilderLogger.Info(msg) },
-				func(data []byte) { ctx.WriteStdout(data) },
+				func(data []byte) { ctx.BuilderLogger.WriteStdout(data) },
 				func(data []byte) { ctx.WriteStderr(data) },
 				&ctx.Progress, ctx.ProgressCB,
 			)
@@ -154,7 +154,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.WarningsLevel,
 				ctx.Stdout, ctx.Stderr,
 				func(msg string) { ctx.BuilderLogger.Info(msg) },
-				func(data []byte) { ctx.WriteStdout(data) },
+				func(data []byte) { ctx.BuilderLogger.WriteStdout(data) },
 				func(data []byte) { ctx.WriteStderr(data) },
 				&ctx.Progress, ctx.ProgressCB,
 			)
@@ -265,9 +265,9 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.OnlyUpdateCompilationDatabase,
 			)
 			if ctx.Verbose {
-				ctx.WriteStdout(verboseOutput)
+				ctx.BuilderLogger.WriteStdout(verboseOutput)
 			} else {
-				ctx.WriteStdout(normalOutput)
+				ctx.BuilderLogger.WriteStdout(normalOutput)
 			}
 			return err
 		}),
@@ -309,9 +309,9 @@ func preprocessSketchCommand(ctx *types.Context) types.BareCommand {
 			ctx.Builder.Sketch(), ctx.BuildPath, ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset,
 			ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)
 		if ctx.Verbose {
-			ctx.WriteStdout(verboseOutput)
+			ctx.BuilderLogger.WriteStdout(verboseOutput)
 		} else {
-			ctx.WriteStdout(normalOutput)
+			ctx.BuilderLogger.WriteStdout(normalOutput)
 		}
 		return err
 	}
@@ -362,7 +362,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 	if err != nil {
 		return err
 	}
-	ctx.WriteStdout(preprocessedSketch)
+	ctx.BuilderLogger.WriteStdout(preprocessedSketch)
 	return nil
 }
 
