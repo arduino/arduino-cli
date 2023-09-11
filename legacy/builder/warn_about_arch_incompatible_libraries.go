@@ -27,7 +27,7 @@ func WarnAboutArchIncompatibleLibraries(
 	overrides string,
 	importedLibraries libraries.List,
 	printInfoFn func(string),
-) error {
+) {
 	archs := []string{targetPlatform.Platform.Architecture}
 	if overrides != "" {
 		archs = append(archs, strings.Split(overrides, ",")...)
@@ -42,6 +42,4 @@ func WarnAboutArchIncompatibleLibraries(
 					strings.Join(archs, ", ")))
 		}
 	}
-
-	return nil
 }

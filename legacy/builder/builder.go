@@ -458,7 +458,7 @@ func containerBuildOptions(ctx *types.Context) types.BareCommand {
 func warnAboutArchIncompatibleLibraries(ctx *types.Context) types.BareCommand {
 	return types.BareCommand(func(ctx *types.Context) error {
 		overrides, _ := ctx.BuildProperties.GetOk("architecture.override_check")
-		_ = WarnAboutArchIncompatibleLibraries(
+		WarnAboutArchIncompatibleLibraries(
 			ctx.TargetPlatform,
 			overrides,
 			ctx.SketchLibrariesDetector.ImportedLibraries(),
