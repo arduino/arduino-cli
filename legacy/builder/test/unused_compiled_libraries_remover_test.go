@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -38,7 +39,7 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = temp
 	ctx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
-		nil, nil, false, false, false, nil, nil, nil, nil,
+		nil, nil, false, false, logger.New(nil, nil, false, ""),
 	)
 	ctx.SketchLibrariesDetector.AppendImportedLibraries(&libraries.Library{Name: "Bridge"})
 
@@ -63,7 +64,7 @@ func TestUnusedCompiledLibrariesRemoverLibDoesNotExist(t *testing.T) {
 	ctx := &types.Context{}
 	ctx.LibrariesBuildPath = paths.TempDir().Join("test")
 	ctx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
-		nil, nil, false, false, false, nil, nil, nil, nil,
+		nil, nil, false, false, logger.New(nil, nil, false, ""),
 	)
 	ctx.SketchLibrariesDetector.AppendImportedLibraries(&libraries.Library{Name: "Bridge"})
 
@@ -85,7 +86,7 @@ func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
 
 	ctx := &types.Context{}
 	ctx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
-		nil, nil, false, false, false, nil, nil, nil, nil,
+		nil, nil, false, false, logger.New(nil, nil, false, ""),
 	)
 	ctx.LibrariesBuildPath = temp
 

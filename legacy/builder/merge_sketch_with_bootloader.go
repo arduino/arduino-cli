@@ -20,6 +20,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/go-paths-helper"
@@ -29,11 +30,11 @@ import (
 )
 
 func MergeSketchWithBootloader(
-	onlyUpdateCompilationDatabase, verbose bool,
+	onlyUpdateCompilationDatabase bool,
 	buildPath *paths.Path,
 	sketch *sketch.Sketch,
 	buildProperties *properties.Map,
-	printInfoFn, printWarnFn func(string),
+	builderLogger *logger.BuilderLogger,
 ) error {
 	if onlyUpdateCompilationDatabase {
 		return nil
@@ -66,8 +67,8 @@ func MergeSketchWithBootloader(
 
 	bootloaderPath := buildProperties.GetPath("runtime.platform.path").Join(constants.FOLDER_BOOTLOADERS, bootloader)
 	if bootloaderPath.NotExist() {
-		if verbose {
-			printWarnFn(tr("Bootloader file specified but missing: %[1]s", bootloaderPath))
+		if builderLogger.Verbose() {
+			builderLogger.Warn(tr("Bootloader file specified but missing: %[1]s", bootloaderPath))
 		}
 		return nil
 	}
@@ -81,8 +82,8 @@ func MergeSketchWithBootloader(
 		maximumBinSize *= 2
 	}
 	err := merge(builtSketchPath, bootloaderPath, mergedSketchPath, maximumBinSize)
-	if err != nil && verbose {
-		printInfoFn(err.Error())
+	if err != nil && builderLogger.Verbose() {
+		builderLogger.Info(err.Error())
 	}
 
 	return nil

@@ -22,6 +22,7 @@ import (
 
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
@@ -98,6 +99,8 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		sk = s
 	}
 
+	builderLogger := logger.New(nil, nil, false, "")
+	ctx.BuilderLogger = builderLogger
 	ctx.Builder = bldr.NewBuilder(sk, nil, nil, false, nil, 0)
 	if fqbn != "" {
 		ctx.FQBN = parseFQBN(t, fqbn)
@@ -130,13 +133,9 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 
 		ctx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
 			lm, libsResolver,
-			ctx.Verbose,
 			false,
 			false,
-			func(msg string) { ctx.Info(msg) },
-			func(msg string) { ctx.Warn(msg) },
-			func(data []byte) { ctx.WriteStdout(data) },
-			func(data []byte) { ctx.WriteStderr(data) },
+			builderLogger,
 		)
 	}
 

@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package builder
+package compilation
 
 import (
 	"encoding/json"
@@ -21,44 +21,47 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/executils"
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/go-paths-helper"
 )
 
-// CompilationDatabase keeps track of all the compile commands run by the builder
-type CompilationDatabase struct {
-	Contents []CompilationCommand
+var tr = i18n.Tr
+
+// Database keeps track of all the compile commands run by the builder
+type Database struct {
+	Contents []Command
 	File     *paths.Path
 }
 
-// CompilationCommand keeps track of a single run of a compile command
-type CompilationCommand struct {
+// Command keeps track of a single run of a compile command
+type Command struct {
 	Directory string   `json:"directory"`
 	Command   string   `json:"command,omitempty"`
 	Arguments []string `json:"arguments,omitempty"`
 	File      string   `json:"file"`
 }
 
-// NewCompilationDatabase creates an empty CompilationDatabase
-func NewCompilationDatabase(filename *paths.Path) *CompilationDatabase {
-	return &CompilationDatabase{
+// NewDatabase creates an empty CompilationDatabase
+func NewDatabase(filename *paths.Path) *Database {
+	return &Database{
 		File:     filename,
-		Contents: []CompilationCommand{},
+		Contents: []Command{},
 	}
 }
 
-// LoadCompilationDatabase reads a compilation database from a file
-func LoadCompilationDatabase(file *paths.Path) (*CompilationDatabase, error) {
+// LoadDatabase reads a compilation database from a file
+func LoadDatabase(file *paths.Path) (*Database, error) {
 	f, err := file.ReadFile()
 	if err != nil {
 		return nil, err
 	}
-	res := NewCompilationDatabase(file)
+	res := NewDatabase(file)
 	return res, json.Unmarshal(f, &res.Contents)
 }
 
 // SaveToFile save the CompilationDatabase to file as a clangd-compatible compile_commands.json,
 // see https://clang.llvm.org/docs/JSONCompilationDatabase.html
-func (db *CompilationDatabase) SaveToFile() {
+func (db *Database) SaveToFile() {
 	if jsonContents, err := json.MarshalIndent(db.Contents, "", " "); err != nil {
 		fmt.Println(tr("Error serializing compilation database: %s", err))
 		return
@@ -68,7 +71,7 @@ func (db *CompilationDatabase) SaveToFile() {
 }
 
 // Add adds a new CompilationDatabase entry
-func (db *CompilationDatabase) Add(target *paths.Path, command *executils.Process) {
+func (db *Database) Add(target *paths.Path, command *executils.Process) {
 	commandDir := command.GetDir()
 	if commandDir == "" {
 		// This mimics what Cmd.Run also does: Use Dir if specified,
@@ -80,7 +83,7 @@ func (db *CompilationDatabase) Add(target *paths.Path, command *executils.Proces
 		commandDir = dir
 	}
 
-	entry := CompilationCommand{
+	entry := Command{
 		Directory: commandDir,
 		Arguments: command.GetArgs(),
 		File:      target.String(),

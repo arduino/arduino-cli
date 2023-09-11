@@ -19,10 +19,11 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
+	"github.com/arduino/arduino-cli/arduino/builder/sizer"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -33,7 +34,6 @@ import (
 var tr = i18n.Tr
 
 const DEFAULT_DEBUG_LEVEL = 5
-const DEFAULT_WARNINGS_LEVEL = "none"
 
 type Builder struct{}
 
@@ -70,19 +70,14 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			sketchObjectFiles, err := phases.SketchBuilder(
+			sketchObjectFiles, err := builder.SketchBuilder(
 				ctx.SketchBuildPath,
 				ctx.BuildProperties,
 				ctx.SketchLibrariesDetector.IncludeFolders(),
 				ctx.OnlyUpdateCompilationDatabase,
-				ctx.Verbose,
 				ctx.CompilationDatabase,
 				ctx.Builder.Jobs(),
-				ctx.WarningsLevel,
-				ctx.Stdout, ctx.Stderr,
-				func(msg string) { ctx.Info(msg) },
-				func(data []byte) { ctx.WriteStdout(data) },
-				func(data []byte) { ctx.WriteStderr(data) },
+				ctx.BuilderLogger,
 				&ctx.Progress, ctx.ProgressCB,
 			)
 			if err != nil {
@@ -109,21 +104,15 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			librariesObjectFiles, err := phases.LibrariesBuilder(
+			librariesObjectFiles, err := builder.LibrariesBuilder(
 				ctx.LibrariesBuildPath,
 				ctx.BuildProperties,
 				ctx.SketchLibrariesDetector.IncludeFolders(),
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
-				ctx.Verbose,
 				ctx.OnlyUpdateCompilationDatabase,
 				ctx.CompilationDatabase,
 				ctx.Builder.Jobs(),
-				ctx.WarningsLevel,
-				ctx.Stdout,
-				ctx.Stderr,
-				func(msg string) { ctx.Info(msg) },
-				func(data []byte) { ctx.WriteStdout(data) },
-				func(data []byte) { ctx.WriteStderr(data) },
+				ctx.BuilderLogger,
 				&ctx.Progress, ctx.ProgressCB,
 			)
 			if err != nil {
@@ -143,18 +132,14 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			objectFiles, archiveFile, err := phases.CoreBuilder(
+			objectFiles, archiveFile, err := builder.CoreBuilder(
 				ctx.BuildPath, ctx.CoreBuildPath, ctx.Builder.CoreBuildCachePath(),
 				ctx.BuildProperties,
 				ctx.ActualPlatform,
-				ctx.Verbose, ctx.OnlyUpdateCompilationDatabase, ctx.Clean,
+				ctx.OnlyUpdateCompilationDatabase, ctx.Clean,
 				ctx.CompilationDatabase,
 				ctx.Builder.Jobs(),
-				ctx.WarningsLevel,
-				ctx.Stdout, ctx.Stderr,
-				func(msg string) { ctx.Info(msg) },
-				func(data []byte) { ctx.WriteStdout(data) },
-				func(data []byte) { ctx.WriteStderr(data) },
+				ctx.BuilderLogger,
 				&ctx.Progress, ctx.ProgressCB,
 			)
 
@@ -174,21 +159,18 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			verboseInfoOut, err := phases.Linker(
+			verboseInfoOut, err := builder.Linker(
 				ctx.OnlyUpdateCompilationDatabase,
-				ctx.Verbose,
 				ctx.SketchObjectFiles,
 				ctx.LibrariesObjectFiles,
 				ctx.CoreObjectsFiles,
 				ctx.CoreArchiveFilePath,
 				ctx.BuildPath,
 				ctx.BuildProperties,
-				ctx.Stdout,
-				ctx.Stderr,
-				ctx.WarningsLevel,
+				ctx.BuilderLogger,
 			)
-			if ctx.Verbose {
-				ctx.Info(string(verboseInfoOut))
+			if ctx.BuilderLogger.Verbose() {
+				ctx.BuilderLogger.Info(string(verboseInfoOut))
 			}
 			return err
 		}),
@@ -209,10 +191,9 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		types.BareCommand(func(ctx *types.Context) error {
 			return MergeSketchWithBootloader(
-				ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
+				ctx.OnlyUpdateCompilationDatabase,
 				ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
-				func(s string) { ctx.Info(s) },
-				func(s string) { ctx.Warn(s) },
+				ctx.BuilderLogger,
 			)
 		}),
 
@@ -247,8 +228,8 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			infoOut, _ := PrintUsedLibrariesIfVerbose(ctx.Verbose, ctx.SketchLibrariesDetector.ImportedLibraries())
-			ctx.Info(string(infoOut))
+			infoOut, _ := PrintUsedLibrariesIfVerbose(ctx.BuilderLogger.Verbose(), ctx.SketchLibrariesDetector.ImportedLibraries())
+			ctx.BuilderLogger.Info(string(infoOut))
 			return nil
 		}),
 
@@ -263,22 +244,19 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.LineOffset,
 				ctx.OnlyUpdateCompilationDatabase,
 			)
-			if ctx.Verbose {
-				ctx.WriteStdout(verboseOutput)
+			if ctx.BuilderLogger.Verbose() {
+				ctx.BuilderLogger.WriteStdout(verboseOutput)
 			} else {
-				ctx.WriteStdout(normalOutput)
+				ctx.BuilderLogger.WriteStdout(normalOutput)
 			}
 			return err
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			executableSectionsSize, err := phases.Sizer(
-				ctx.OnlyUpdateCompilationDatabase, mainErr != nil, ctx.Verbose,
+			executableSectionsSize, err := sizer.Size(
+				ctx.OnlyUpdateCompilationDatabase, mainErr != nil,
 				ctx.BuildProperties,
-				ctx.Stdout, ctx.Stderr,
-				func(msg string) { ctx.Info(msg) },
-				func(msg string) { ctx.Warn(msg) },
-				ctx.WarningsLevel,
+				ctx.BuilderLogger,
 			)
 			ctx.ExecutableSectionsSize = executableSectionsSize
 			return err
@@ -307,10 +285,10 @@ func preprocessSketchCommand(ctx *types.Context) types.BareCommand {
 		normalOutput, verboseOutput, err := PreprocessSketch(
 			ctx.Builder.Sketch(), ctx.BuildPath, ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset,
 			ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)
-		if ctx.Verbose {
-			ctx.WriteStdout(verboseOutput)
+		if ctx.BuilderLogger.Verbose() {
+			ctx.BuilderLogger.WriteStdout(verboseOutput)
 		} else {
-			ctx.WriteStdout(normalOutput)
+			ctx.BuilderLogger.WriteStdout(normalOutput)
 		}
 		return err
 	}
@@ -361,7 +339,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 	if err != nil {
 		return err
 	}
-	ctx.WriteStdout(preprocessedSketch)
+	ctx.BuilderLogger.WriteStdout(preprocessedSketch)
 	return nil
 }
 
@@ -411,13 +389,13 @@ func findIncludes(ctx *types.Context) types.BareCommand {
 
 func logIfVerbose(warn bool, msg string) types.BareCommand {
 	return types.BareCommand(func(ctx *types.Context) error {
-		if !ctx.Verbose {
+		if !ctx.BuilderLogger.Verbose() {
 			return nil
 		}
 		if warn {
-			ctx.Warn(msg)
+			ctx.BuilderLogger.Warn(msg)
 		} else {
-			ctx.Info(msg)
+			ctx.BuilderLogger.Info(msg)
 		}
 		return nil
 	})
@@ -426,9 +404,9 @@ func logIfVerbose(warn bool, msg string) types.BareCommand {
 func recipeByPrefixSuffixRunner(ctx *types.Context, prefix, suffix string, skipIfOnlyUpdatingCompilationDatabase bool) error {
 	return RecipeByPrefixSuffixRunner(
 		prefix, suffix, skipIfOnlyUpdatingCompilationDatabase,
-		ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
-		ctx.BuildProperties, ctx.Stdout, ctx.Stderr,
-		func(msg string) { ctx.Info(msg) },
+		ctx.OnlyUpdateCompilationDatabase,
+		ctx.BuildProperties,
+		ctx.BuilderLogger,
 	)
 }
 
@@ -442,7 +420,7 @@ func containerBuildOptions(ctx *types.Context) types.BareCommand {
 			ctx.FQBN.String(), ctx.Clean, ctx.BuildProperties,
 		)
 		if infoMessage != "" {
-			ctx.Info(infoMessage)
+			ctx.BuilderLogger.Info(infoMessage)
 		}
 		if err != nil {
 			return err
@@ -462,7 +440,7 @@ func warnAboutArchIncompatibleLibraries(ctx *types.Context) types.BareCommand {
 			ctx.TargetPlatform,
 			overrides,
 			ctx.SketchLibrariesDetector.ImportedLibraries(),
-			func(s string) { ctx.Info(s) },
+			func(s string) { ctx.BuilderLogger.Info(s) },
 		)
 		return nil
 	})

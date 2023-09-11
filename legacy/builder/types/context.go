@@ -16,14 +16,12 @@
 package types
 
 import (
-	"fmt"
-	"io"
-	"os"
-	"sync"
-
 	"github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
+	"github.com/arduino/arduino-cli/arduino/builder/sizer"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -35,6 +33,7 @@ import (
 type Context struct {
 	Builder                 *builder.Builder
 	SketchLibrariesDetector *detector.SketchLibrariesDetector
+	BuilderLogger           *logger.BuilderLogger
 
 	// Build options
 	HardwareDirs         paths.PathList
@@ -65,13 +64,8 @@ type Context struct {
 	LibrariesObjectFiles paths.PathList
 	SketchObjectFiles    paths.PathList
 
-	WarningsLevel string
-
 	// C++ Parsing
 	LineOffset int
-
-	// Verbosity settings
-	Verbose bool
 
 	// Dry run, only create progress map
 	Progress progress.Struct
@@ -81,16 +75,11 @@ type Context struct {
 	// Custom build properties defined by user (line by line as "key=value" pairs)
 	CustomBuildProperties []string
 
-	// Out and Err stream to redirect all output
-	Stdout  io.Writer
-	Stderr  io.Writer
-	stdLock sync.Mutex
-
 	// Sizer results
-	ExecutableSectionsSize builder.ExecutablesFileSections
+	ExecutableSectionsSize sizer.ExecutablesFileSections
 
 	// Compilation Database to build/update
-	CompilationDatabase *builder.CompilationDatabase
+	CompilationDatabase *compilation.Database
 	// Set to true to skip build and produce only Compilation Database
 	OnlyUpdateCompilationDatabase bool
 
@@ -107,42 +96,4 @@ func (ctx *Context) PushProgress() {
 			Completed: ctx.Progress.Progress >= 100.0,
 		})
 	}
-}
-
-func (ctx *Context) Info(msg string) {
-	ctx.stdLock.Lock()
-	if ctx.Stdout == nil {
-		fmt.Fprintln(os.Stdout, msg)
-	} else {
-		fmt.Fprintln(ctx.Stdout, msg)
-	}
-	ctx.stdLock.Unlock()
-}
-
-func (ctx *Context) Warn(msg string) {
-	ctx.stdLock.Lock()
-	if ctx.Stderr == nil {
-		fmt.Fprintln(os.Stderr, msg)
-	} else {
-		fmt.Fprintln(ctx.Stderr, msg)
-	}
-	ctx.stdLock.Unlock()
-}
-
-func (ctx *Context) WriteStdout(data []byte) (int, error) {
-	ctx.stdLock.Lock()
-	defer ctx.stdLock.Unlock()
-	if ctx.Stdout == nil {
-		return os.Stdout.Write(data)
-	}
-	return ctx.Stdout.Write(data)
-}
-
-func (ctx *Context) WriteStderr(data []byte) (int, error) {
-	ctx.stdLock.Lock()
-	defer ctx.stdLock.Unlock()
-	if ctx.Stderr == nil {
-		return os.Stderr.Write(data)
-	}
-	return ctx.Stderr.Write(data)
 }

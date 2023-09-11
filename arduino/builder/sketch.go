@@ -20,10 +20,17 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
+	"github.com/arduino/arduino-cli/arduino/builder/progress"
+	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
+	f "github.com/arduino/arduino-cli/internal/algorithms"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
+	"github.com/arduino/go-properties-orderedmap"
 
 	"github.com/pkg/errors"
 )
@@ -170,4 +177,53 @@ func writeIfDifferent(source []byte, destPath *paths.Path) error {
 
 	// Source and destination are the same, don't write anything
 	return nil
+}
+
+// SketchBuilder fixdoc
+func SketchBuilder(
+	sketchBuildPath *paths.Path,
+	buildProperties *properties.Map,
+	includesFolders paths.PathList,
+	onlyUpdateCompilationDatabase bool,
+	compilationDatabase *compilation.Database,
+	jobs int,
+	builderLogger *logger.BuilderLogger,
+	progress *progress.Struct, progressCB rpc.TaskProgressCB,
+) (paths.PathList, error) {
+	includes := f.Map(includesFolders.AsStrings(), cpp.WrapWithHyphenI)
+
+	if err := sketchBuildPath.MkdirAll(); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	sketchObjectFiles, err := utils.CompileFiles(
+		sketchBuildPath, sketchBuildPath, buildProperties, includes,
+		onlyUpdateCompilationDatabase,
+		compilationDatabase,
+		jobs,
+		builderLogger,
+		progress, progressCB,
+	)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	// The "src/" subdirectory of a sketch is compiled recursively
+	sketchSrcPath := sketchBuildPath.Join("src")
+	if sketchSrcPath.IsDir() {
+		srcObjectFiles, err := utils.CompileFilesRecursive(
+			sketchSrcPath, sketchSrcPath, buildProperties, includes,
+			onlyUpdateCompilationDatabase,
+			compilationDatabase,
+			jobs,
+			builderLogger,
+			progress, progressCB,
+		)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		sketchObjectFiles.AddAll(srcObjectFiles)
+	}
+
+	return sketchObjectFiles, nil
 }
