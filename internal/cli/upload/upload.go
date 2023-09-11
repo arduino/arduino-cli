@@ -24,8 +24,8 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/commands"
+	sk "github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
@@ -90,22 +90,31 @@ func runUploadCommand(command *cobra.Command, args []string) {
 		arguments.WarnDeprecatedFiles(sketchPath)
 	}
 
-	sk, err := sketch.New(sketchPath)
+	sketch, err := sk.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if err != nil && importDir == "" && importFile == "" {
 		feedback.Fatal(tr("Error during Upload: %v", err), feedback.ErrGeneric)
 	}
 
-	instance, profile := instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
+	var inst *rpc.Instance
+	var profile *rpc.Profile
+
+	if profileArg.Get() == "" {
+		inst, profile = instance.CreateAndInitWithProfile(sketch.GetDefaultProfile().GetName(), sketchPath)
+	} else {
+		inst, profile = instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
+	}
+
 	if fqbnArg.String() == "" {
 		fqbnArg.Set(profile.GetFqbn())
 	}
 
-	defaultFQBN := sk.GetDefaultFQBN()
-	defaultAddress, defaultProtocol := sk.GetDefaultPortAddressAndProtocol()
-	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, instance, defaultFQBN, defaultAddress, defaultProtocol)
+	defaultFQBN := sketch.GetDefaultFqbn()
+	defaultAddress := sketch.GetDefaultPort()
+	defaultProtocol := sketch.GetDefaultProtocol()
+	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, inst, defaultFQBN, defaultAddress, defaultProtocol)
 
 	userFieldRes, err := upload.SupportedUserFields(context.Background(), &rpc.SupportedUserFieldsRequest{
-		Instance: instance,
+		Instance: inst,
 		Fqbn:     fqbn,
 		Protocol: port.Protocol,
 	})
@@ -122,7 +131,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 			}
 
 			// FIXME: Here we must not access package manager...
-			pme, release := commands.GetPackageManagerExplorer(&rpc.UploadRequest{Instance: instance})
+			pme, release := commands.GetPackageManagerExplorer(&rpc.UploadRequest{Instance: inst})
 			platform := pme.FindPlatform(&packagemanager.PlatformReference{
 				Package:              split[0],
 				PlatformArchitecture: split[1],
@@ -156,7 +165,7 @@ func runUploadCommand(command *cobra.Command, args []string) {
 
 	stdOut, stdErr, stdIOResult := feedback.OutputStreams()
 	req := &rpc.UploadRequest{
-		Instance:   instance,
+		Instance:   inst,
 		Fqbn:       fqbn,
 		SketchPath: path,
 		Port:       port,

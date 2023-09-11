@@ -143,12 +143,17 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 	}
 	defer pmeRelease()
 
+	fqbn := req.GetFqbn()
+	if fqbn == "" && pme.GetProfile() != nil {
+		fqbn = pme.GetProfile().FQBN
+	}
+
 	updatedPort, err := runProgramAction(
 		pme,
 		sk,
 		req.GetImportFile(),
 		req.GetImportDir(),
-		req.GetFqbn(),
+		fqbn,
 		req.GetPort(),
 		req.GetProgrammer(),
 		req.GetVerbose(),
