@@ -256,12 +256,9 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		types.BareCommand(func(ctx *types.Context) error {
 			executableSectionsSize, err := sizer.Size(
-				ctx.OnlyUpdateCompilationDatabase, mainErr != nil, ctx.Verbose,
+				ctx.OnlyUpdateCompilationDatabase, mainErr != nil,
 				ctx.BuildProperties,
-				ctx.Stdout, ctx.Stderr,
-				func(msg string) { ctx.BuilderLogger.Info(msg) },
-				func(msg string) { ctx.BuilderLogger.Warn(msg) },
-				ctx.WarningsLevel,
+				ctx.BuilderLogger,
 			)
 			ctx.ExecutableSectionsSize = executableSectionsSize
 			return err
