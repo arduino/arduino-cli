@@ -219,15 +219,13 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		builderCtx.BuildPath.Join("compile_commands.json"),
 	)
 
-	builderCtx.Verbose = req.GetVerbose()
-
 	builderCtx.BuiltInLibrariesDirs = configuration.IDEBuiltinLibrariesDir(configuration.Settings)
 
 	builderCtx.Clean = req.GetClean()
 	builderCtx.OnlyUpdateCompilationDatabase = req.GetCreateCompilationDatabaseOnly()
 	builderCtx.SourceOverride = req.GetSourceOverride()
 
-	builderLogger := logger.New(outStream, errStream, builderCtx.Verbose, req.GetWarnings())
+	builderLogger := logger.New(outStream, errStream, req.GetVerbose(), req.GetWarnings())
 	builderCtx.BuilderLogger = builderLogger
 
 	sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
@@ -267,7 +265,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		return r, &arduino.CompileFailedError{Message: err.Error()}
 	}
 
-	if builderCtx.Verbose {
+	if builderLogger.Verbose() {
 		builderLogger.Warn(string(verboseOut))
 	}
 

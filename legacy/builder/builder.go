@@ -169,7 +169,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.BuildProperties,
 				ctx.BuilderLogger,
 			)
-			if ctx.Verbose {
+			if ctx.BuilderLogger.Verbose() {
 				ctx.BuilderLogger.Info(string(verboseInfoOut))
 			}
 			return err
@@ -191,10 +191,9 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		types.BareCommand(func(ctx *types.Context) error {
 			return MergeSketchWithBootloader(
-				ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
+				ctx.OnlyUpdateCompilationDatabase,
 				ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
-				func(s string) { ctx.BuilderLogger.Info(s) },
-				func(s string) { ctx.BuilderLogger.Warn(s) },
+				ctx.BuilderLogger,
 			)
 		}),
 
@@ -229,7 +228,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			infoOut, _ := PrintUsedLibrariesIfVerbose(ctx.Verbose, ctx.SketchLibrariesDetector.ImportedLibraries())
+			infoOut, _ := PrintUsedLibrariesIfVerbose(ctx.BuilderLogger.Verbose(), ctx.SketchLibrariesDetector.ImportedLibraries())
 			ctx.BuilderLogger.Info(string(infoOut))
 			return nil
 		}),
@@ -245,7 +244,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.LineOffset,
 				ctx.OnlyUpdateCompilationDatabase,
 			)
-			if ctx.Verbose {
+			if ctx.BuilderLogger.Verbose() {
 				ctx.BuilderLogger.WriteStdout(verboseOutput)
 			} else {
 				ctx.BuilderLogger.WriteStdout(normalOutput)
@@ -286,7 +285,7 @@ func preprocessSketchCommand(ctx *types.Context) types.BareCommand {
 		normalOutput, verboseOutput, err := PreprocessSketch(
 			ctx.Builder.Sketch(), ctx.BuildPath, ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset,
 			ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)
-		if ctx.Verbose {
+		if ctx.BuilderLogger.Verbose() {
 			ctx.BuilderLogger.WriteStdout(verboseOutput)
 		} else {
 			ctx.BuilderLogger.WriteStdout(normalOutput)
@@ -390,7 +389,7 @@ func findIncludes(ctx *types.Context) types.BareCommand {
 
 func logIfVerbose(warn bool, msg string) types.BareCommand {
 	return types.BareCommand(func(ctx *types.Context) error {
-		if !ctx.Verbose {
+		if !ctx.BuilderLogger.Verbose() {
 			return nil
 		}
 		if warn {

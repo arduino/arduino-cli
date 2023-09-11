@@ -35,7 +35,6 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 		OtherLibrariesDirs:    paths.NewPathList("libraries"),
 		FQBN:                  parseFQBN(t, "my:nice:fqbn"),
 		CustomBuildProperties: []string{"custom=prop"},
-		Verbose:               true,
 		BuildProperties:       properties.NewFromHashmap(map[string]string{"compiler.optimization_flags": "-Os"}),
 	}
 

@@ -67,9 +67,6 @@ type Context struct {
 	// C++ Parsing
 	LineOffset int
 
-	// Verbosity settings
-	Verbose bool
-
 	// Dry run, only create progress map
 	Progress progress.Struct
 	// Send progress events to this callback
