@@ -26,6 +26,9 @@ type Builder struct {
 	sketch          *sketch.Sketch
 	buildProperties *properties.Map
 
+	// Parallel processes
+	jobs int
+
 	// core related
 	coreBuildCachePath *paths.Path
 }
@@ -37,6 +40,7 @@ func NewBuilder(
 	buildPath *paths.Path,
 	optimizeForDebug bool,
 	coreBuildCachePath *paths.Path,
+	jobs int,
 ) *Builder {
 	buildProperties := properties.NewMap()
 	if boardBuildProperties != nil {
@@ -64,10 +68,16 @@ func NewBuilder(
 		sketch:             sk,
 		buildProperties:    buildProperties,
 		coreBuildCachePath: coreBuildCachePath,
+		jobs:               jobs,
 	}
 }
 
 // GetBuildProperties returns the build properties for running this build
 func (b *Builder) GetBuildProperties() *properties.Map {
 	return b.buildProperties
+}
+
+// Jobs number of parallel processes
+func (b *Builder) Jobs() int {
+	return b.jobs
 }

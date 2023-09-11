@@ -83,9 +83,6 @@ type Context struct {
 	// Custom build properties defined by user (line by line as "key=value" pairs)
 	CustomBuildProperties []string
 
-	// Parallel processes
-	Jobs int
-
 	// Out and Err stream to redirect all output
 	Stdout  io.Writer
 	Stderr  io.Writer

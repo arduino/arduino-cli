@@ -169,7 +169,14 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		coreBuildCachePath = buildCachePath.Join("core")
 	}
 
-	sketchBuilder := bldr.NewBuilder(sk, boardBuildProperties, buildPath, req.GetOptimizeForDebug(), coreBuildCachePath)
+	sketchBuilder := bldr.NewBuilder(
+		sk,
+		boardBuildProperties,
+		buildPath,
+		req.GetOptimizeForDebug(),
+		coreBuildCachePath,
+		int(req.GetJobs()),
+	)
 
 	buildProperties := sketchBuilder.GetBuildProperties()
 
@@ -212,7 +219,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	)
 
 	builderCtx.Verbose = req.GetVerbose()
-	builderCtx.Jobs = int(req.GetJobs())
 
 	builderCtx.WarningsLevel = req.GetWarnings()
 	if builderCtx.WarningsLevel == "" {
