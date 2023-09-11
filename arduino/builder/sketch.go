@@ -179,6 +179,7 @@ func writeIfDifferent(source []byte, destPath *paths.Path) error {
 	return nil
 }
 
+// SketchBuilder fixdoc
 func SketchBuilder(
 	sketchBuildPath *paths.Path,
 	buildProperties *properties.Map,

@@ -41,6 +41,7 @@ func (b *Builder) CoreBuildCachePath() *paths.Path {
 	return b.coreBuildCachePath
 }
 
+// CoreBuilder fixdoc
 func CoreBuilder(
 	buildPath, coreBuildPath, coreBuildCachePath *paths.Path,
 	buildProperties *properties.Map,

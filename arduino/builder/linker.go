@@ -27,6 +27,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Linker fixdoc
 func Linker(
 	onlyUpdateCompilationDatabase bool,
 	sketchObjectFiles, librariesObjectFiles, coreObjectsFiles paths.PathList,

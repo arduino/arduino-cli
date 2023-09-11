@@ -29,12 +29,12 @@ var tr = i18n.Tr
 
 // Database keeps track of all the compile commands run by the builder
 type Database struct {
-	Contents []CompilationCommand
+	Contents []Command
 	File     *paths.Path
 }
 
-// CompilationCommand keeps track of a single run of a compile command
-type CompilationCommand struct {
+// Command keeps track of a single run of a compile command
+type Command struct {
 	Directory string   `json:"directory"`
 	Command   string   `json:"command,omitempty"`
 	Arguments []string `json:"arguments,omitempty"`
@@ -45,7 +45,7 @@ type CompilationCommand struct {
 func NewDatabase(filename *paths.Path) *Database {
 	return &Database{
 		File:     filename,
-		Contents: []CompilationCommand{},
+		Contents: []Command{},
 	}
 }
 
@@ -83,7 +83,7 @@ func (db *Database) Add(target *paths.Path, command *executils.Process) {
 		commandDir = dir
 	}
 
-	entry := CompilationCommand{
+	entry := Command{
 		Directory: commandDir,
 		Arguments: command.GetArgs(),
 		File:      target.String(),

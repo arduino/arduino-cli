@@ -31,9 +31,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-var FLOAT_ABI_CFLAG = "float-abi"
-var FPU_CFLAG = "fpu"
+// nolint
+var (
+	FloatAbiCflag = "float-abi"
+	FpuCflag      = "fpu"
+)
 
+// LibrariesBuilder fixdoc
 func LibrariesBuilder(
 	librariesBuildPath *paths.Path,
 	buildProperties *properties.Map,
@@ -87,7 +91,7 @@ func findExpectedPrecompiledLibFolder(
 	command, _ := utils.PrepareCommandForRecipe(buildProperties, "recipe.cpp.o.pattern", true)
 	fpuSpecs := ""
 	for _, el := range command.GetArgs() {
-		if strings.Contains(el, FPU_CFLAG) {
+		if strings.Contains(el, FpuCflag) {
 			toAdd := strings.Split(el, "=")
 			if len(toAdd) > 1 {
 				fpuSpecs += strings.TrimSpace(toAdd[1]) + "-"
@@ -96,7 +100,7 @@ func findExpectedPrecompiledLibFolder(
 		}
 	}
 	for _, el := range command.GetArgs() {
-		if strings.Contains(el, FLOAT_ABI_CFLAG) {
+		if strings.Contains(el, FloatAbiCflag) {
 			toAdd := strings.Split(el, "=")
 			if len(toAdd) > 1 {
 				fpuSpecs += strings.TrimSpace(toAdd[1]) + "-"
