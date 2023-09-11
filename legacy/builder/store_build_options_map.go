@@ -17,12 +17,9 @@ package builder
 
 import (
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/go-paths-helper"
 )
 
-type StoreBuildOptionsMap struct{}
-
-func (s *StoreBuildOptionsMap) Run(ctx *types.Context) error {
-	ctx.BuildPath.Join(constants.BUILD_OPTIONS_FILE).WriteFile([]byte(ctx.BuildOptionsJson))
-	return nil
+func StoreBuildOptionsMap(buildPath *paths.Path, buildOptionsJson string) error {
+	return buildPath.Join(constants.BUILD_OPTIONS_FILE).WriteFile([]byte(buildOptionsJson))
 }

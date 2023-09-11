@@ -42,8 +42,10 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 	)
 	ctx.SketchLibrariesDetector.AppendImportedLibraries(&libraries.Library{Name: "Bridge"})
 
-	cmd := builder.UnusedCompiledLibrariesRemover{}
-	err = cmd.Run(ctx)
+	err = builder.UnusedCompiledLibrariesRemover(
+		ctx.LibrariesBuildPath,
+		ctx.SketchLibrariesDetector.ImportedLibraries(),
+	)
 	require.NoError(t, err)
 
 	exist, err := temp.Join("SPI").ExistCheck()
@@ -65,8 +67,10 @@ func TestUnusedCompiledLibrariesRemoverLibDoesNotExist(t *testing.T) {
 	)
 	ctx.SketchLibrariesDetector.AppendImportedLibraries(&libraries.Library{Name: "Bridge"})
 
-	cmd := builder.UnusedCompiledLibrariesRemover{}
-	err := cmd.Run(ctx)
+	err := builder.UnusedCompiledLibrariesRemover(
+		ctx.LibrariesBuildPath,
+		ctx.SketchLibrariesDetector.ImportedLibraries(),
+	)
 	require.NoError(t, err)
 }
 
@@ -85,8 +89,10 @@ func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
 	)
 	ctx.LibrariesBuildPath = temp
 
-	cmd := builder.UnusedCompiledLibrariesRemover{}
-	err = cmd.Run(ctx)
+	err = builder.UnusedCompiledLibrariesRemover(
+		ctx.LibrariesBuildPath,
+		ctx.SketchLibrariesDetector.ImportedLibraries(),
+	)
 	require.NoError(t, err)
 
 	exist, err := temp.Join("SPI").ExistCheck()

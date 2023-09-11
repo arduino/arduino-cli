@@ -31,15 +31,17 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 		HardwareDirs:       paths.NewPathList("hardware", "hardware2"),
 		BuiltInToolsDirs:   paths.NewPathList("tools"),
 		OtherLibrariesDirs: paths.NewPathList("libraries"),
-		Sketch:             &sketch.Sketch{FullPath: paths.New("sketchLocation")},
 		FQBN:               parseFQBN(t, "my:nice:fqbn"),
 		Verbose:            true,
 		BuildPath:          paths.New("buildPath"),
 		BuildProperties:    properties.NewFromHashmap(map[string]string{"compiler.optimization_flags": "-Os"}),
 	}
 
-	create := builder.CreateBuildOptionsMap{}
-	err := create.Run(ctx)
+	buildPropertiesJSON, err := builder.CreateBuildOptionsMap(
+		ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
+		ctx.BuiltInLibrariesDirs, &sketch.Sketch{FullPath: paths.New("sketchLocation")}, ctx.CustomBuildProperties,
+		ctx.FQBN.String(), ctx.BuildProperties.Get("compiler.optimization_flags"),
+	)
 	require.NoError(t, err)
 
 	require.Equal(t, `{
@@ -51,5 +53,5 @@ func TestCreateBuildOptionsMap(t *testing.T) {
   "hardwareFolders": "hardware,hardware2",
   "otherLibrariesFolders": "libraries",
   "sketchLocation": "sketchLocation"
-}`, ctx.BuildOptionsJson)
+}`, buildPropertiesJSON)
 }

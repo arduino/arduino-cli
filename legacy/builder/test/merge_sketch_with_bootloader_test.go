@@ -69,14 +69,13 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 	err = buildPath.Join("sketch", "sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
 	require.NoError(t, err)
 
-	commands := []types.Command{
-		&builder.MergeSketchWithBootloader{},
-	}
-
-	for _, command := range commands {
-		err := command.Run(ctx)
-		require.NoError(t, err)
-	}
+	err = builder.MergeSketchWithBootloader(
+		ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
+		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
+		func(s string) { ctx.Info(s) },
+		func(s string) { ctx.Warn(s) },
+	)
+	require.NoError(t, err)
 
 	bytes, err := buildPath.Join("sketch", "sketch1.ino.with_bootloader.hex").ReadFile()
 	require.NoError(t, err)
@@ -127,14 +126,13 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	err = buildPath.Join("sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
 	require.NoError(t, err)
 
-	commands := []types.Command{
-		&builder.MergeSketchWithBootloader{},
-	}
-
-	for _, command := range commands {
-		err := command.Run(ctx)
-		require.NoError(t, err)
-	}
+	err = builder.MergeSketchWithBootloader(
+		ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
+		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
+		func(s string) { ctx.Info(s) },
+		func(s string) { ctx.Warn(s) },
+	)
+	require.NoError(t, err)
 
 	bytes, err := buildPath.Join("sketch1.ino.with_bootloader.hex").ReadFile()
 	require.NoError(t, err)
@@ -154,8 +152,12 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	buildProperties.Remove(constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK)
 	buildProperties.Remove(constants.BUILD_PROPERTIES_BOOTLOADER_FILE)
 
-	command := &builder.MergeSketchWithBootloader{}
-	err := command.Run(ctx)
+	err := builder.MergeSketchWithBootloader(
+		ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
+		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
+		func(s string) { ctx.Info(s) },
+		func(s string) { ctx.Warn(s) },
+	)
 	require.NoError(t, err)
 
 	exist, err := buildPath.Join("sketch.ino.with_bootloader.hex").ExistCheck()
@@ -210,14 +212,13 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 	err = buildPath.Join("sketch", "sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
 	require.NoError(t, err)
 
-	commands := []types.Command{
-		&builder.MergeSketchWithBootloader{},
-	}
-
-	for _, command := range commands {
-		err := command.Run(ctx)
-		require.NoError(t, err)
-	}
+	err = builder.MergeSketchWithBootloader(
+		ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
+		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
+		func(s string) { ctx.Info(s) },
+		func(s string) { ctx.Warn(s) },
+	)
+	require.NoError(t, err)
 
 	bytes, err := buildPath.Join("sketch", "sketch1.ino.with_bootloader.hex").ReadFile()
 	require.NoError(t, err)

@@ -91,13 +91,14 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 	pme, _ /* never release... */ := pm.NewExplorer()
 	ctx.PackageManager = pme
 
+	var sk *sketch.Sketch
 	if sketchPath != nil {
-		sk, err := sketch.New(sketchPath)
+		s, err := sketch.New(sketchPath)
 		require.NoError(t, err)
-		ctx.Sketch = sk
+		sk = s
 	}
 
-	ctx.Builder = bldr.NewBuilder(ctx.Sketch, nil, nil, false, nil)
+	ctx.Builder = bldr.NewBuilder(sk, nil, nil, false, nil, 0)
 	if fqbn != "" {
 		ctx.FQBN = parseFQBN(t, fqbn)
 		targetPackage, targetPlatform, targetBoard, boardBuildProperties, buildPlatform, err := pme.ResolveFQBN(ctx.FQBN)
@@ -105,7 +106,7 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		requiredTools, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 		require.NoError(t, err)
 
-		ctx.Builder = bldr.NewBuilder(ctx.Sketch, boardBuildProperties, ctx.BuildPath, false /*OptimizeForDebug*/, nil)
+		ctx.Builder = bldr.NewBuilder(sk, boardBuildProperties, ctx.BuildPath, false /*OptimizeForDebug*/, nil, 0)
 		ctx.PackageManager = pme
 		ctx.TargetBoard = targetBoard
 		ctx.BuildProperties = ctx.Builder.GetBuildProperties()
@@ -115,8 +116,8 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		ctx.RequiredTools = requiredTools
 	}
 
-	if ctx.Sketch != nil {
-		require.False(t, ctx.BuildPath.Canonical().EqualsTo(ctx.Sketch.FullPath.Canonical()))
+	if sk != nil {
+		require.False(t, ctx.BuildPath.Canonical().EqualsTo(sk.FullPath.Canonical()))
 	}
 
 	if !stepToSkip[skipLibraries] {

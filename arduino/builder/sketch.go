@@ -21,6 +21,7 @@ import (
 	"regexp"
 
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/go-paths-helper"
 
@@ -31,6 +32,11 @@ var (
 	includesArduinoH = regexp.MustCompile(`(?m)^\s*#\s*include\s*[<\"]Arduino\.h[>\"]`)
 	tr               = i18n.Tr
 )
+
+// Sketch fixdoc
+func (b *Builder) Sketch() *sketch.Sketch {
+	return b.sketch
+}
 
 // PrepareSketchBuildPath copies the sketch source files in the build path.
 // The .ino files are merged together to create a .cpp file (by the way, the

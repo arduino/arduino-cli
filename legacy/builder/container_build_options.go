@@ -16,27 +16,45 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/go-paths-helper"
+	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
 
-type ContainerBuildOptions struct{}
-
-func (s *ContainerBuildOptions) Run(ctx *types.Context) error {
-	commands := []types.Command{
-		&CreateBuildOptionsMap{},
-		&LoadPreviousBuildOptionsMap{},
-		&WipeoutBuildPathIfBuildOptionsChanged{},
-		&StoreBuildOptionsMap{},
+func ContainerBuildOptions(
+	hardwareDirs, builtInToolsDirs, otherLibrariesDirs paths.PathList,
+	builtInLibrariesDirs, buildPath *paths.Path,
+	sketch *sketch.Sketch,
+	customBuildProperties []string,
+	fqbn string,
+	clean bool,
+	buildProperties *properties.Map,
+) (string, string, string, error) {
+	buildOptionsJSON, err := CreateBuildOptionsMap(
+		hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
+		builtInLibrariesDirs, sketch, customBuildProperties,
+		fqbn, buildProperties.Get("compiler.optimization_flags"),
+	)
+	if err != nil {
+		return "", "", "", errors.WithStack(err)
 	}
 
-	for _, command := range commands {
-		PrintRingNameIfDebug(ctx, command)
-		err := command.Run(ctx)
-		if err != nil {
-			return errors.WithStack(err)
-		}
+	buildOptionsJSONPrevious, err := LoadPreviousBuildOptionsMap(buildPath)
+	if err != nil {
+		return "", "", "", errors.WithStack(err)
 	}
 
-	return nil
+	infoOut, err := WipeoutBuildPathIfBuildOptionsChanged(
+		clean,
+		buildPath,
+		buildOptionsJSON,
+		buildOptionsJSONPrevious,
+		buildProperties,
+	)
+	if err != nil {
+		return "", "", "", errors.WithStack(err)
+	}
+
+	return buildOptionsJSON, buildOptionsJSONPrevious, infoOut, StoreBuildOptionsMap(buildPath, buildOptionsJSON)
 }

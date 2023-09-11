@@ -23,23 +23,29 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"golang.org/x/exp/slices"
 
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/globals"
+	"github.com/arduino/arduino-cli/arduino/libraries"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 )
-
-type ExportProjectCMake struct {
-	// Was there an error while compiling the sketch?
-	SketchError bool
-}
 
 var lineMatcher = regexp.MustCompile(`^#line\s\d+\s"`)
 
-func (s *ExportProjectCMake) Run(ctx *types.Context) error {
+func ExportProjectCMake(
+	sketchError bool, // Was there an error while compiling the sketch?
+	buildPath, sketchBuildPath *paths.Path,
+	importedLibraries libraries.List,
+	buildProperties *properties.Map,
+	sketch *sketch.Sketch,
+	includeFolders paths.PathList,
+	lineOffset int,
+	onlyUpdateCompilationDatabase bool,
+) ([]byte, []byte, error) {
 	// copies the contents of the file named src to the file named
 	// by dst. The file will be created if it does not already exist. If the
 	// destination file exists, all it's contents will be replaced by the contents
@@ -175,12 +181,13 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	}
 	var validStaticLibExtensions = []string{".a"}
 
-	if s.SketchError || !canExportCmakeProject(ctx) {
-		return nil
+	//	If sketch error or cannot export Cmake project
+	if sketchError || buildProperties.Get("compiler.export_cmake") == "" {
+		return nil, nil, nil
 	}
 
 	// Create new cmake subFolder - clean if the folder is already there
-	cmakeFolder := ctx.BuildPath.Join("_cmake")
+	cmakeFolder := buildPath.Join("_cmake")
 	if _, err := cmakeFolder.Stat(); err == nil {
 		cmakeFolder.RemoveAll()
 	}
@@ -197,10 +204,10 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	cmakeFile := cmakeFolder.Join("CMakeLists.txt")
 
 	dynamicLibsFromPkgConfig := map[string]bool{}
-	for _, library := range ctx.SketchLibrariesDetector.ImportedLibraries() {
+	for _, library := range importedLibraries {
 		// Copy used libraries in the correct folder
 		libDir := libBaseFolder.Join(library.DirName)
-		mcu := ctx.BuildProperties.Get("build.mcu")
+		mcu := buildProperties.Get("build.mcu")
 		copyDir(library.InstallDir.String(), libDir.String(), validExportExtensions)
 
 		// Read cmake options if available
@@ -231,20 +238,28 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	}
 
 	// Copy core + variant in use + preprocessed sketch in the correct folders
-	err := copyDir(ctx.BuildProperties.Get("build.core.path"), coreFolder.String(), validExportExtensions)
+	err := copyDir(buildProperties.Get("build.core.path"), coreFolder.String(), validExportExtensions)
 	if err != nil {
 		fmt.Println(err)
 	}
-	err = copyDir(ctx.BuildProperties.Get("build.variant.path"), coreFolder.Join("variant").String(), validExportExtensions)
+	err = copyDir(buildProperties.Get("build.variant.path"), coreFolder.Join("variant").String(), validExportExtensions)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	if err := PreprocessSketch(ctx); err != nil {
-		return err
+	normalOutput, verboseOutput, err := PreprocessSketch(
+		sketch,
+		buildPath,
+		includeFolders,
+		lineOffset,
+		buildProperties,
+		onlyUpdateCompilationDatabase,
+	)
+	if err != nil {
+		return normalOutput, verboseOutput, err
 	}
 
-	err = copyDir(ctx.SketchBuildPath.String(), cmakeFolder.Join("sketch").String(), validExportExtensions)
+	err = copyDir(sketchBuildPath.String(), cmakeFolder.Join("sketch").String(), validExportExtensions)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -279,9 +294,9 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 	var dynamicLibsFromGccMinusL []string
 	var linkDirectories []string
 
-	extractCompileFlags(ctx, constants.RECIPE_C_COMBINE_PATTERN, &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
-	extractCompileFlags(ctx, "recipe.c.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
-	extractCompileFlags(ctx, "recipe.cpp.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
+	extractCompileFlags(buildProperties, constants.RECIPE_C_COMBINE_PATTERN, &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
+	extractCompileFlags(buildProperties, "recipe.c.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
+	extractCompileFlags(buildProperties, "recipe.cpp.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
 
 	// Extract folders with .h in them for adding in include list
 	headerFiles, _ := utils.FindFilesInFolder(cmakeFolder, true, validHeaderExtensions...)
@@ -292,7 +307,7 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 
 	// Generate the CMakeLists global file
 
-	projectName := ctx.Sketch.Name
+	projectName := sketch.Name
 
 	cmakelist := "cmake_minimum_required(VERSION 3.5.0)\n"
 	cmakelist += "INCLUDE(FindPkgConfig)\n"
@@ -349,14 +364,10 @@ func (s *ExportProjectCMake) Run(ctx *types.Context) error {
 
 	cmakeFile.WriteFile([]byte(cmakelist))
 
-	return nil
+	return normalOutput, verboseOutput, nil
 }
 
-func canExportCmakeProject(ctx *types.Context) bool {
-	return ctx.BuildProperties.Get("compiler.export_cmake") != ""
-}
-
-func extractCompileFlags(ctx *types.Context, recipe string, defines, dynamicLibs, linkerflags, linkDirectories *[]string) {
+func extractCompileFlags(buildProperties *properties.Map, recipe string, defines, dynamicLibs, linkerflags, linkDirectories *[]string) {
 	appendIfNotPresent := func(target []string, elements ...string) []string {
 		for _, element := range elements {
 			if !slices.Contains(target, element) {
@@ -366,7 +377,7 @@ func extractCompileFlags(ctx *types.Context, recipe string, defines, dynamicLibs
 		return target
 	}
 
-	command, _ := utils.PrepareCommandForRecipe(ctx.BuildProperties, recipe, true)
+	command, _ := utils.PrepareCommandForRecipe(buildProperties, recipe, true)
 
 	for _, arg := range command.GetArgs() {
 		if strings.HasPrefix(arg, "-D") {
