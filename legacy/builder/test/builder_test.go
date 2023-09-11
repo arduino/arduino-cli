@@ -100,6 +100,7 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 	}
 
 	builderLogger := logger.New(ctx.Stdout, ctx.Stderr, ctx.Verbose, ctx.WarningsLevel)
+	ctx.BuilderLogger = builderLogger
 	ctx.Builder = bldr.NewBuilder(sk, nil, nil, false, nil, 0)
 	if fqbn != "" {
 		ctx.FQBN = parseFQBN(t, fqbn)

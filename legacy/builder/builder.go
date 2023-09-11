@@ -81,7 +81,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.Builder.Jobs(),
 				ctx.WarningsLevel,
 				ctx.Stdout, ctx.Stderr,
-				func(msg string) { ctx.Info(msg) },
+				func(msg string) { ctx.BuilderLogger.Info(msg) },
 				func(data []byte) { ctx.WriteStdout(data) },
 				func(data []byte) { ctx.WriteStderr(data) },
 				&ctx.Progress, ctx.ProgressCB,
@@ -122,7 +122,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.WarningsLevel,
 				ctx.Stdout,
 				ctx.Stderr,
-				func(msg string) { ctx.Info(msg) },
+				func(msg string) { ctx.BuilderLogger.Info(msg) },
 				func(data []byte) { ctx.WriteStdout(data) },
 				func(data []byte) { ctx.WriteStderr(data) },
 				&ctx.Progress, ctx.ProgressCB,
@@ -153,7 +153,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.Builder.Jobs(),
 				ctx.WarningsLevel,
 				ctx.Stdout, ctx.Stderr,
-				func(msg string) { ctx.Info(msg) },
+				func(msg string) { ctx.BuilderLogger.Info(msg) },
 				func(data []byte) { ctx.WriteStdout(data) },
 				func(data []byte) { ctx.WriteStderr(data) },
 				&ctx.Progress, ctx.ProgressCB,
@@ -189,7 +189,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.WarningsLevel,
 			)
 			if ctx.Verbose {
-				ctx.Info(string(verboseInfoOut))
+				ctx.BuilderLogger.Info(string(verboseInfoOut))
 			}
 			return err
 		}),
@@ -212,7 +212,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 			return MergeSketchWithBootloader(
 				ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
 				ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
-				func(s string) { ctx.Info(s) },
+				func(s string) { ctx.BuilderLogger.Info(s) },
 				func(s string) { ctx.Warn(s) },
 			)
 		}),
@@ -249,7 +249,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		types.BareCommand(func(ctx *types.Context) error {
 			infoOut, _ := PrintUsedLibrariesIfVerbose(ctx.Verbose, ctx.SketchLibrariesDetector.ImportedLibraries())
-			ctx.Info(string(infoOut))
+			ctx.BuilderLogger.Info(string(infoOut))
 			return nil
 		}),
 
@@ -277,7 +277,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.OnlyUpdateCompilationDatabase, mainErr != nil, ctx.Verbose,
 				ctx.BuildProperties,
 				ctx.Stdout, ctx.Stderr,
-				func(msg string) { ctx.Info(msg) },
+				func(msg string) { ctx.BuilderLogger.Info(msg) },
 				func(msg string) { ctx.Warn(msg) },
 				ctx.WarningsLevel,
 			)
@@ -418,7 +418,7 @@ func logIfVerbose(warn bool, msg string) types.BareCommand {
 		if warn {
 			ctx.Warn(msg)
 		} else {
-			ctx.Info(msg)
+			ctx.BuilderLogger.Info(msg)
 		}
 		return nil
 	})
@@ -429,7 +429,7 @@ func recipeByPrefixSuffixRunner(ctx *types.Context, prefix, suffix string, skipI
 		prefix, suffix, skipIfOnlyUpdatingCompilationDatabase,
 		ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
 		ctx.BuildProperties, ctx.Stdout, ctx.Stderr,
-		func(msg string) { ctx.Info(msg) },
+		func(msg string) { ctx.BuilderLogger.Info(msg) },
 	)
 }
 
@@ -443,7 +443,7 @@ func containerBuildOptions(ctx *types.Context) types.BareCommand {
 			ctx.FQBN.String(), ctx.Clean, ctx.BuildProperties,
 		)
 		if infoMessage != "" {
-			ctx.Info(infoMessage)
+			ctx.BuilderLogger.Info(infoMessage)
 		}
 		if err != nil {
 			return err
@@ -463,7 +463,7 @@ func warnAboutArchIncompatibleLibraries(ctx *types.Context) types.BareCommand {
 			ctx.TargetPlatform,
 			overrides,
 			ctx.SketchLibrariesDetector.ImportedLibraries(),
-			func(s string) { ctx.Info(s) },
+			func(s string) { ctx.BuilderLogger.Info(s) },
 		)
 		return nil
 	})

@@ -221,10 +221,12 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	builderCtx.Verbose = req.GetVerbose()
 
-	builderCtx.WarningsLevel = req.GetWarnings()
-	if builderCtx.WarningsLevel == "" {
-		builderCtx.WarningsLevel = builder.DEFAULT_WARNINGS_LEVEL
+	warningsLevel := req.GetWarnings()
+	// TODO move this inside the logger
+	if warningsLevel == "" {
+		warningsLevel = builder.DEFAULT_WARNINGS_LEVEL
 	}
+	builderCtx.WarningsLevel = warningsLevel
 
 	builderCtx.BuiltInLibrariesDirs = configuration.IDEBuiltinLibrariesDir(configuration.Settings)
 
@@ -233,6 +235,9 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.Clean = req.GetClean()
 	builderCtx.OnlyUpdateCompilationDatabase = req.GetCreateCompilationDatabaseOnly()
 	builderCtx.SourceOverride = req.GetSourceOverride()
+
+	builderLogger := logger.New(outStream, errStream, builderCtx.Verbose, warningsLevel)
+	builderCtx.BuilderLogger = builderLogger
 
 	sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
 	if err != nil {
@@ -272,10 +277,8 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	}
 
 	if builderCtx.Verbose {
-		builderCtx.Warn(string(verboseOut))
+		builderLogger.Warn(string(verboseOut))
 	}
-
-	builderLogger := logger.New(outStream, errStream, builderCtx.Verbose, builderCtx.WarningsLevel)
 
 	builderCtx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
 		libsManager, libsResolver,
@@ -374,7 +377,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 			"recipe.hooks.savehex.presavehex", ".pattern", false,
 			builderCtx.OnlyUpdateCompilationDatabase, builderCtx.Verbose,
 			builderCtx.BuildProperties, builderCtx.Stdout, builderCtx.Stderr,
-			func(msg string) { builderCtx.Info(msg) },
+			func(msg string) { builderLogger.Info(msg) },
 		)
 		if err != nil {
 			return r, err
@@ -418,7 +421,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 			"recipe.hooks.savehex.postsavehex", ".pattern", false,
 			builderCtx.OnlyUpdateCompilationDatabase, builderCtx.Verbose,
 			builderCtx.BuildProperties, builderCtx.Stdout, builderCtx.Stderr,
-			func(msg string) { builderCtx.Info(msg) },
+			func(msg string) { builderLogger.Info(msg) },
 		)
 		if err != nil {
 			return r, err

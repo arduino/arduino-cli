@@ -21,6 +21,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -69,10 +70,11 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 	err = buildPath.Join("sketch", "sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
 	require.NoError(t, err)
 
+	builderLogger := logger.New(nil, nil, false, "")
 	err = builder.MergeSketchWithBootloader(
 		ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
 		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
-		func(s string) { ctx.Info(s) },
+		func(s string) { builderLogger.Info(s) },
 		func(s string) { ctx.Warn(s) },
 	)
 	require.NoError(t, err)
@@ -126,10 +128,11 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	err = buildPath.Join("sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
 	require.NoError(t, err)
 
+	builderLogger := logger.New(nil, nil, false, "")
 	err = builder.MergeSketchWithBootloader(
 		ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
 		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
-		func(s string) { ctx.Info(s) },
+		func(s string) { builderLogger.Info(s) },
 		func(s string) { ctx.Warn(s) },
 	)
 	require.NoError(t, err)
@@ -152,10 +155,11 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	buildProperties.Remove(constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK)
 	buildProperties.Remove(constants.BUILD_PROPERTIES_BOOTLOADER_FILE)
 
+	builderLogger := logger.New(nil, nil, false, "")
 	err := builder.MergeSketchWithBootloader(
 		ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
 		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
-		func(s string) { ctx.Info(s) },
+		func(s string) { builderLogger.Info(s) },
 		func(s string) { ctx.Warn(s) },
 	)
 	require.NoError(t, err)
@@ -212,10 +216,11 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 	err = buildPath.Join("sketch", "sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
 	require.NoError(t, err)
 
+	builderLogger := logger.New(nil, nil, false, "")
 	err = builder.MergeSketchWithBootloader(
 		ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
 		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
-		func(s string) { ctx.Info(s) },
+		func(s string) { builderLogger.Info(s) },
 		func(s string) { ctx.Warn(s) },
 	)
 	require.NoError(t, err)

@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/builder/sizer"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -37,6 +38,7 @@ import (
 type Context struct {
 	Builder                 *builder.Builder
 	SketchLibrariesDetector *detector.SketchLibrariesDetector
+	BuilderLogger           *logger.BuilderLogger
 
 	// Build options
 	HardwareDirs         paths.PathList
@@ -109,16 +111,6 @@ func (ctx *Context) PushProgress() {
 			Completed: ctx.Progress.Progress >= 100.0,
 		})
 	}
-}
-
-func (ctx *Context) Info(msg string) {
-	ctx.stdLock.Lock()
-	if ctx.Stdout == nil {
-		fmt.Fprintln(os.Stdout, msg)
-	} else {
-		fmt.Fprintln(ctx.Stdout, msg)
-	}
-	ctx.stdLock.Unlock()
 }
 
 func (ctx *Context) Warn(msg string) {
