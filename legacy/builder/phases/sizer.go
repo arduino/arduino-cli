@@ -24,9 +24,12 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
+
+var tr = i18n.Tr
 
 func Sizer(
 	onlyUpdateCompilationDatabase, sketchError, verbose bool,

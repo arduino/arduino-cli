@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package phases
+package builder
 
 import (
 	"io"
@@ -24,7 +24,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -32,7 +31,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var tr = i18n.Tr
+
 var FLOAT_ABI_CFLAG = "float-abi"
 var FPU_CFLAG = "fpu"
 

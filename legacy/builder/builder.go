@@ -110,7 +110,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			librariesObjectFiles, err := phases.LibrariesBuilder(
+			librariesObjectFiles, err := builder.LibrariesBuilder(
 				ctx.LibrariesBuildPath,
 				ctx.BuildProperties,
 				ctx.SketchLibrariesDetector.IncludeFolders(),
