@@ -16,7 +16,6 @@
 package types
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"sync"
@@ -111,16 +110,6 @@ func (ctx *Context) PushProgress() {
 			Completed: ctx.Progress.Progress >= 100.0,
 		})
 	}
-}
-
-func (ctx *Context) Warn(msg string) {
-	ctx.stdLock.Lock()
-	if ctx.Stderr == nil {
-		fmt.Fprintln(os.Stderr, msg)
-	} else {
-		fmt.Fprintln(ctx.Stderr, msg)
-	}
-	ctx.stdLock.Unlock()
 }
 
 func (ctx *Context) WriteStdout(data []byte) (int, error) {

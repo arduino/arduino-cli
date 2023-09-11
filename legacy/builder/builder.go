@@ -213,7 +213,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
 				ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
 				func(s string) { ctx.BuilderLogger.Info(s) },
-				func(s string) { ctx.Warn(s) },
+				func(s string) { ctx.BuilderLogger.Warn(s) },
 			)
 		}),
 
@@ -278,7 +278,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.BuildProperties,
 				ctx.Stdout, ctx.Stderr,
 				func(msg string) { ctx.BuilderLogger.Info(msg) },
-				func(msg string) { ctx.Warn(msg) },
+				func(msg string) { ctx.BuilderLogger.Warn(msg) },
 				ctx.WarningsLevel,
 			)
 			ctx.ExecutableSectionsSize = executableSectionsSize
@@ -416,7 +416,7 @@ func logIfVerbose(warn bool, msg string) types.BareCommand {
 			return nil
 		}
 		if warn {
-			ctx.Warn(msg)
+			ctx.BuilderLogger.Warn(msg)
 		} else {
 			ctx.BuilderLogger.Info(msg)
 		}
