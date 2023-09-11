@@ -16,9 +16,6 @@
 package types
 
 import (
-	"io"
-	"sync"
-
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
@@ -83,11 +80,6 @@ type Context struct {
 	// Custom build properties defined by user (line by line as "key=value" pairs)
 	CustomBuildProperties []string
 
-	// Out and Err stream to redirect all output
-	Stdout  io.Writer
-	Stderr  io.Writer
-	stdLock sync.Mutex
-
 	// Sizer results
 	ExecutableSectionsSize sizer.ExecutablesFileSections
 
@@ -110,4 +102,3 @@ func (ctx *Context) PushProgress() {
 		})
 	}
 }
-
