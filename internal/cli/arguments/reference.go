@@ -116,11 +116,13 @@ func ParseReference(arg string) (*Reference, error) {
 	}
 	// replace the returned Reference only if only one occurrence is found,
 	// otherwise return an error to the user because we don't know on which platform operate
-	if len(foundPlatforms) == 1 {
-		ret.PackageName = toks[0]
-		ret.Architecture = toks[1]
-	} else {
+	if len(foundPlatforms) == 0 {
+		return nil, &arduino.PlatformNotFoundError{Platform: arg}
+	}
+	if len(foundPlatforms) > 1 {
 		return nil, &arduino.MultiplePlatformsError{Platforms: foundPlatforms, UserPlatform: arg}
 	}
+	ret.PackageName = toks[0]
+	ret.Architecture = toks[1]
 	return ret, nil
 }
