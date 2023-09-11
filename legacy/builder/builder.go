@@ -71,7 +71,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			sketchObjectFiles, err := phases.SketchBuilder(
+			sketchObjectFiles, err := builder.SketchBuilder(
 				ctx.SketchBuildPath,
 				ctx.BuildProperties,
 				ctx.SketchLibrariesDetector.IncludeFolders(),
