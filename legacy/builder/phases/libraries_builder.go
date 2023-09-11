@@ -42,7 +42,7 @@ func LibrariesBuilder(
 	includesFolders paths.PathList,
 	importedLibraries libraries.List,
 	verbose, onlyUpdateCompilationDatabase bool,
-	compilationDatabase *compilation.CompilationDatabase,
+	compilationDatabase *compilation.Database,
 	jobs int,
 	warningsLevel string,
 	stdoutWriter, stderrWriter io.Writer,
@@ -138,7 +138,7 @@ func findExpectedPrecompiledLibFolder(
 func compileLibraries(
 	libraries libraries.List, buildPath *paths.Path, buildProperties *properties.Map, includes []string,
 	verbose, onlyUpdateCompilationDatabase bool,
-	compilationDatabase *compilation.CompilationDatabase,
+	compilationDatabase *compilation.Database,
 	jobs int,
 	warningsLevel string,
 	stdoutWriter, stderrWriter io.Writer,
@@ -182,7 +182,7 @@ func compileLibraries(
 func compileLibrary(
 	library *libraries.Library, buildPath *paths.Path, buildProperties *properties.Map, includes []string,
 	verbose, onlyUpdateCompilationDatabase bool,
-	compilationDatabase *compilation.CompilationDatabase,
+	compilationDatabase *compilation.Database,
 	jobs int,
 	warningsLevel string,
 	stdoutWriter, stderrWriter io.Writer,

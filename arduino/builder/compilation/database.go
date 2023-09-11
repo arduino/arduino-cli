@@ -27,8 +27,8 @@ import (
 
 var tr = i18n.Tr
 
-// CompilationDatabase keeps track of all the compile commands run by the builder
-type CompilationDatabase struct {
+// Database keeps track of all the compile commands run by the builder
+type Database struct {
 	Contents []CompilationCommand
 	File     *paths.Path
 }
@@ -41,27 +41,27 @@ type CompilationCommand struct {
 	File      string   `json:"file"`
 }
 
-// NewCompilationDatabase creates an empty CompilationDatabase
-func NewCompilationDatabase(filename *paths.Path) *CompilationDatabase {
-	return &CompilationDatabase{
+// NewDatabase creates an empty CompilationDatabase
+func NewDatabase(filename *paths.Path) *Database {
+	return &Database{
 		File:     filename,
 		Contents: []CompilationCommand{},
 	}
 }
 
-// LoadCompilationDatabase reads a compilation database from a file
-func LoadCompilationDatabase(file *paths.Path) (*CompilationDatabase, error) {
+// LoadDatabase reads a compilation database from a file
+func LoadDatabase(file *paths.Path) (*Database, error) {
 	f, err := file.ReadFile()
 	if err != nil {
 		return nil, err
 	}
-	res := NewCompilationDatabase(file)
+	res := NewDatabase(file)
 	return res, json.Unmarshal(f, &res.Contents)
 }
 
 // SaveToFile save the CompilationDatabase to file as a clangd-compatible compile_commands.json,
 // see https://clang.llvm.org/docs/JSONCompilationDatabase.html
-func (db *CompilationDatabase) SaveToFile() {
+func (db *Database) SaveToFile() {
 	if jsonContents, err := json.MarshalIndent(db.Contents, "", " "); err != nil {
 		fmt.Println(tr("Error serializing compilation database: %s", err))
 		return
@@ -71,7 +71,7 @@ func (db *CompilationDatabase) SaveToFile() {
 }
 
 // Add adds a new CompilationDatabase entry
-func (db *CompilationDatabase) Add(target *paths.Path, command *executils.Process) {
+func (db *Database) Add(target *paths.Path, command *executils.Process) {
 	commandDir := command.GetDir()
 	if commandDir == "" {
 		// This mimics what Cmd.Run also does: Use Dir if specified,

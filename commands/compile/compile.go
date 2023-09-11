@@ -214,7 +214,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
 	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
 
-	builderCtx.CompilationDatabase = compilation.NewCompilationDatabase(
+	builderCtx.CompilationDatabase = compilation.NewDatabase(
 		builderCtx.BuildPath.Join("compile_commands.json"),
 	)
 

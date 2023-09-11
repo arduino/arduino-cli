@@ -34,7 +34,7 @@ func SketchBuilder(
 	buildProperties *properties.Map,
 	includesFolders paths.PathList,
 	onlyUpdateCompilationDatabase, verbose bool,
-	compilationDatabase *compilation.CompilationDatabase,
+	compilationDatabase *compilation.Database,
 	jobs int,
 	warningsLevel string,
 	stdoutWriter, stderrWriter io.Writer,

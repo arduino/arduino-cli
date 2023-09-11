@@ -30,11 +30,11 @@ func TestCompilationDatabase(t *testing.T) {
 
 	cmd, err := executils.NewProcess(nil, "gcc", "arg1", "arg2")
 	require.NoError(t, err)
-	db := NewCompilationDatabase(tmpfile)
+	db := NewDatabase(tmpfile)
 	db.Add(paths.New("test"), cmd)
 	db.SaveToFile()
 
-	db2, err := LoadCompilationDatabase(tmpfile)
+	db2, err := LoadDatabase(tmpfile)
 	require.NoError(t, err)
 	require.Equal(t, db, db2)
 	require.Len(t, db2.Contents, 1)

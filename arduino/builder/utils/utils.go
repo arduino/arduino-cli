@@ -339,7 +339,7 @@ func CompileFiles(
 	buildProperties *properties.Map,
 	includes []string,
 	onlyUpdateCompilationDatabase bool,
-	compilationDatabase *compilation.CompilationDatabase,
+	compilationDatabase *compilation.Database,
 	jobs int,
 	verbose bool,
 	warningsLevel string,
@@ -369,7 +369,7 @@ func CompileFilesRecursive(
 	buildProperties *properties.Map,
 	includes []string,
 	onlyUpdateCompilationDatabase bool,
-	compilationDatabase *compilation.CompilationDatabase,
+	compilationDatabase *compilation.Database,
 	jobs int,
 	verbose bool,
 	warningsLevel string,
@@ -395,7 +395,7 @@ func CompileFilesRecursive(
 
 func compileFiles(
 	onlyUpdateCompilationDatabase bool,
-	compilationDatabase *compilation.CompilationDatabase,
+	compilationDatabase *compilation.Database,
 	jobs int,
 	sourceDir *paths.Path,
 	recurse bool,
@@ -508,7 +508,7 @@ func compileFiles(
 func compileFileWithRecipe(
 	stdoutWriter, stderrWriter io.Writer,
 	warningsLevel string,
-	compilationDatabase *compilation.CompilationDatabase,
+	compilationDatabase *compilation.Database,
 	verbose, onlyUpdateCompilationDatabase bool,
 	sourcePath *paths.Path,
 	source *paths.Path,

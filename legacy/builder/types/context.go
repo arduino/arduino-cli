@@ -91,7 +91,7 @@ type Context struct {
 	ExecutableSectionsSize builder.ExecutablesFileSections
 
 	// Compilation Database to build/update
-	CompilationDatabase *compilation.CompilationDatabase
+	CompilationDatabase *compilation.Database
 	// Set to true to skip build and produce only Compilation Database
 	OnlyUpdateCompilationDatabase bool
 
