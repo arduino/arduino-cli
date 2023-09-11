@@ -18,11 +18,11 @@ package builder
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"regexp"
 
 	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -183,13 +183,10 @@ func SketchBuilder(
 	sketchBuildPath *paths.Path,
 	buildProperties *properties.Map,
 	includesFolders paths.PathList,
-	onlyUpdateCompilationDatabase, verbose bool,
+	onlyUpdateCompilationDatabase bool,
 	compilationDatabase *compilation.Database,
 	jobs int,
-	warningsLevel string,
-	stdoutWriter, stderrWriter io.Writer,
-	verboseInfoFn func(msg string),
-	verboseStdoutFn, verboseStderrFn func(data []byte),
+	builderLogger *logger.BuilderLogger,
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, error) {
 	includes := f.Map(includesFolders.AsStrings(), cpp.WrapWithHyphenI)
@@ -203,12 +200,7 @@ func SketchBuilder(
 		onlyUpdateCompilationDatabase,
 		compilationDatabase,
 		jobs,
-		verbose,
-		warningsLevel,
-		stdoutWriter, stderrWriter,
-		verboseInfoFn,
-		verboseStdoutFn,
-		verboseStderrFn,
+		builderLogger,
 		progress, progressCB,
 	)
 	if err != nil {
@@ -223,12 +215,7 @@ func SketchBuilder(
 			onlyUpdateCompilationDatabase,
 			compilationDatabase,
 			jobs,
-			verbose,
-			warningsLevel,
-			stdoutWriter, stderrWriter,
-			verboseInfoFn,
-			verboseStdoutFn,
-			verboseStderrFn,
+			builderLogger,
 			progress, progressCB,
 		)
 		if err != nil {

@@ -19,12 +19,12 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -45,13 +45,10 @@ func CoreBuilder(
 	buildPath, coreBuildPath, coreBuildCachePath *paths.Path,
 	buildProperties *properties.Map,
 	actualPlatform *cores.PlatformRelease,
-	verbose, onlyUpdateCompilationDatabase, clean bool,
+	onlyUpdateCompilationDatabase, clean bool,
 	compilationDatabase *compilation.Database,
 	jobs int,
-	warningsLevel string,
-	stdoutWriter, stderrWriter io.Writer,
-	verboseInfoFn func(msg string),
-	verboseStdoutFn, verboseStderrFn func(data []byte),
+	builderLogger *logger.BuilderLogger,
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, *paths.Path, error) {
 	if err := coreBuildPath.MkdirAll(); err != nil {
@@ -60,8 +57,8 @@ func CoreBuilder(
 
 	if coreBuildCachePath != nil {
 		if _, err := coreBuildCachePath.RelTo(buildPath); err != nil {
-			verboseInfoFn(tr("Couldn't deeply cache core build: %[1]s", err))
-			verboseInfoFn(tr("Running normal build of the core..."))
+			builderLogger.Info(tr("Couldn't deeply cache core build: %[1]s", err))
+			builderLogger.Info(tr("Running normal build of the core..."))
 			coreBuildCachePath = nil
 		} else if err := coreBuildCachePath.MkdirAll(); err != nil {
 			return nil, nil, errors.WithStack(err)
@@ -69,16 +66,13 @@ func CoreBuilder(
 	}
 
 	archiveFile, objectFiles, err := compileCore(
-		verbose, onlyUpdateCompilationDatabase, clean,
+		onlyUpdateCompilationDatabase, clean,
 		actualPlatform,
 		coreBuildPath, coreBuildCachePath,
 		buildProperties,
 		compilationDatabase,
 		jobs,
-		warningsLevel,
-		stdoutWriter, stderrWriter,
-		verboseInfoFn,
-		verboseStdoutFn, verboseStderrFn,
+		builderLogger,
 		progress, progressCB,
 	)
 	if err != nil {
@@ -89,16 +83,13 @@ func CoreBuilder(
 }
 
 func compileCore(
-	verbose, onlyUpdateCompilationDatabase, clean bool,
+	onlyUpdateCompilationDatabase, clean bool,
 	actualPlatform *cores.PlatformRelease,
 	buildPath, buildCachePath *paths.Path,
 	buildProperties *properties.Map,
 	compilationDatabase *compilation.Database,
 	jobs int,
-	warningsLevel string,
-	stdoutWriter, stderrWriter io.Writer,
-	verboseInfoFn func(msg string),
-	verboseStdoutFn, verboseStderrFn func(data []byte),
+	builderLogger *logger.BuilderLogger,
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (*paths.Path, paths.PathList, error) {
 	coreFolder := buildProperties.GetPath("build.core.path")
@@ -119,10 +110,7 @@ func compileCore(
 			onlyUpdateCompilationDatabase,
 			compilationDatabase,
 			jobs,
-			verbose,
-			warningsLevel,
-			stdoutWriter, stderrWriter,
-			verboseInfoFn, verboseStdoutFn, verboseStderrFn,
+			builderLogger,
 			progress, progressCB,
 		)
 		if err != nil {
@@ -161,8 +149,8 @@ func compileCore(
 
 		if canUseArchivedCore {
 			// use archived core
-			if verbose {
-				verboseInfoFn(tr("Using precompiled core: %[1]s", targetArchivedCore))
+			if builderLogger.Verbose() {
+				builderLogger.Info(tr("Using precompiled core: %[1]s", targetArchivedCore))
 			}
 			return targetArchivedCore, variantObjectFiles, nil
 		}
@@ -173,10 +161,7 @@ func compileCore(
 		onlyUpdateCompilationDatabase,
 		compilationDatabase,
 		jobs,
-		verbose,
-		warningsLevel,
-		stdoutWriter, stderrWriter,
-		verboseInfoFn, verboseStdoutFn, verboseStderrFn,
+		builderLogger,
 		progress, progressCB,
 	)
 	if err != nil {
@@ -185,10 +170,10 @@ func compileCore(
 
 	archiveFile, verboseInfo, err := utils.ArchiveCompiledFiles(
 		buildPath, paths.New("core.a"), coreObjectFiles, buildProperties,
-		onlyUpdateCompilationDatabase, verbose, stdoutWriter, stderrWriter,
+		onlyUpdateCompilationDatabase, builderLogger.Verbose(), builderLogger.Stdout(), builderLogger.Stderr(),
 	)
-	if verbose {
-		verboseInfoFn(string(verboseInfo))
+	if builderLogger.Verbose() {
+		builderLogger.Info(string(verboseInfo))
 	}
 	if err != nil {
 		return nil, nil, errors.WithStack(err)
@@ -197,15 +182,15 @@ func compileCore(
 	// archive core.a
 	if targetArchivedCore != nil && !onlyUpdateCompilationDatabase {
 		err := archiveFile.CopyTo(targetArchivedCore)
-		if verbose {
+		if builderLogger.Verbose() {
 			if err == nil {
-				verboseInfoFn(tr("Archiving built core (caching) in: %[1]s", targetArchivedCore))
+				builderLogger.Info(tr("Archiving built core (caching) in: %[1]s", targetArchivedCore))
 			} else if os.IsNotExist(err) {
-				verboseInfoFn(tr("Unable to cache built core, please tell %[1]s maintainers to follow %[2]s",
+				builderLogger.Info(tr("Unable to cache built core, please tell %[1]s maintainers to follow %[2]s",
 					actualPlatform,
 					"https://arduino.github.io/arduino-cli/latest/platform-specification/#recipes-to-build-the-corea-archive-file"))
 			} else {
-				verboseInfoFn(tr("Error archiving built core (caching) in %[1]s: %[2]s", targetArchivedCore, err))
+				builderLogger.Info(tr("Error archiving built core (caching) in %[1]s: %[2]s", targetArchivedCore, err))
 			}
 		}
 	}
