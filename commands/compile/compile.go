@@ -221,20 +221,13 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	builderCtx.Verbose = req.GetVerbose()
 
-	warningsLevel := req.GetWarnings()
-	// TODO move this inside the logger
-	if warningsLevel == "" {
-		warningsLevel = builder.DEFAULT_WARNINGS_LEVEL
-	}
-	builderCtx.WarningsLevel = warningsLevel
-
 	builderCtx.BuiltInLibrariesDirs = configuration.IDEBuiltinLibrariesDir(configuration.Settings)
 
 	builderCtx.Clean = req.GetClean()
 	builderCtx.OnlyUpdateCompilationDatabase = req.GetCreateCompilationDatabaseOnly()
 	builderCtx.SourceOverride = req.GetSourceOverride()
 
-	builderLogger := logger.New(outStream, errStream, builderCtx.Verbose, warningsLevel)
+	builderLogger := logger.New(outStream, errStream, builderCtx.Verbose, req.GetWarnings())
 	builderCtx.BuilderLogger = builderLogger
 
 	sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()

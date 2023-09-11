@@ -64,8 +64,6 @@ type Context struct {
 	LibrariesObjectFiles paths.PathList
 	SketchObjectFiles    paths.PathList
 
-	WarningsLevel string
-
 	// C++ Parsing
 	LineOffset int
 

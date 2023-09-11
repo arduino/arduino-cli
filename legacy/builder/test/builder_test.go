@@ -99,7 +99,7 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		sk = s
 	}
 
-	builderLogger := logger.New(nil, nil, ctx.Verbose, ctx.WarningsLevel)
+	builderLogger := logger.New(nil, nil, ctx.Verbose, "")
 	ctx.BuilderLogger = builderLogger
 	ctx.Builder = bldr.NewBuilder(sk, nil, nil, false, nil, 0)
 	if fqbn != "" {

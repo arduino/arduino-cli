@@ -34,7 +34,6 @@ import (
 var tr = i18n.Tr
 
 const DEFAULT_DEBUG_LEVEL = 5
-const DEFAULT_WARNINGS_LEVEL = "none"
 
 type Builder struct{}
 

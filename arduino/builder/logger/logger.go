@@ -40,6 +40,9 @@ func New(stdout, stderr io.Writer, verbose bool, warningsLevel string) *BuilderL
 	if stderr == nil {
 		stderr = os.Stderr
 	}
+	if warningsLevel == "" {
+		warningsLevel = "none"
+	}
 	return &BuilderLogger{
 		stdout:        stdout,
 		stderr:        stderr,
