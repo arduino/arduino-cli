@@ -25,6 +25,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
+	"github.com/arduino/arduino-cli/arduino/builder/sizer"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -88,7 +89,7 @@ type Context struct {
 	stdLock sync.Mutex
 
 	// Sizer results
-	ExecutableSectionsSize builder.ExecutablesFileSections
+	ExecutableSectionsSize sizer.ExecutablesFileSections
 
 	// Compilation Database to build/update
 	CompilationDatabase *compilation.Database

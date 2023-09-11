@@ -21,9 +21,9 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
+	"github.com/arduino/arduino-cli/arduino/builder/sizer"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -273,7 +273,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			executableSectionsSize, err := phases.Sizer(
+			executableSectionsSize, err := sizer.Size(
 				ctx.OnlyUpdateCompilationDatabase, mainErr != nil, ctx.Verbose,
 				ctx.BuildProperties,
 				ctx.Stdout, ctx.Stderr,

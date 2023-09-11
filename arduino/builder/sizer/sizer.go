@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package phases
+package sizer
 
 import (
 	"encoding/json"
@@ -22,22 +22,46 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/i18n"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
 
 var tr = i18n.Tr
 
-func Sizer(
+// ExecutableSectionSize represents a section of the executable output file
+type ExecutableSectionSize struct {
+	Name    string `json:"name"`
+	Size    int    `json:"size"`
+	MaxSize int    `json:"max_size"`
+}
+
+// ExecutablesFileSections is an array of ExecutablesFileSection
+type ExecutablesFileSections []ExecutableSectionSize
+
+// ToRPCExecutableSectionSizeArray transforms this array into a []*rpc.ExecutableSectionSize
+func (s ExecutablesFileSections) ToRPCExecutableSectionSizeArray() []*rpc.ExecutableSectionSize {
+	res := []*rpc.ExecutableSectionSize{}
+	for _, section := range s {
+		res = append(res, &rpc.ExecutableSectionSize{
+			Name:    section.Name,
+			Size:    int64(section.Size),
+			MaxSize: int64(section.MaxSize),
+		})
+	}
+	return res
+}
+
+// Size fixdoc
+func Size(
 	onlyUpdateCompilationDatabase, sketchError, verbose bool,
 	buildProperties *properties.Map,
 	stdoutWriter, stderrWriter io.Writer,
 	printInfoFn, printWarnFn func(msg string),
 	warningsLevel string,
-) (builder.ExecutablesFileSections, error) {
+) (ExecutablesFileSections, error) {
 	if onlyUpdateCompilationDatabase || sketchError {
 		return nil, nil
 	}
@@ -53,7 +77,7 @@ func checkSizeAdvanced(buildProperties *properties.Map,
 	verbose bool,
 	stdoutWriter, stderrWriter io.Writer,
 	printInfoFn, printWarnFn func(msg string),
-) (builder.ExecutablesFileSections, error) {
+) (ExecutablesFileSections, error) {
 	command, err := utils.PrepareCommandForRecipe(buildProperties, "recipe.advanced_size.pattern", false)
 	if err != nil {
 		return nil, errors.New(tr("Error while determining sketch size: %s", err))
@@ -74,7 +98,7 @@ func checkSizeAdvanced(buildProperties *properties.Map,
 		// likely be printed in red. Errors will stop build/upload.
 		Severity string `json:"severity"`
 		// Sections are the sections sizes for machine readable use
-		Sections []builder.ExecutableSectionSize `json:"sections"`
+		Sections []ExecutableSectionSize `json:"sections"`
 		// ErrorMessage is a one line error message like:
 		// "text section exceeds available space in board"
 		// it must be set when Severity is "error"
@@ -106,7 +130,7 @@ func checkSize(buildProperties *properties.Map,
 	stdoutWriter, stderrWriter io.Writer,
 	printInfoFn, printWarnFn func(msg string),
 	warningsLevel string,
-) (builder.ExecutablesFileSections, error) {
+) (ExecutablesFileSections, error) {
 	properties := buildProperties.Clone()
 	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+warningsLevel))
 
@@ -152,7 +176,7 @@ func checkSize(buildProperties *properties.Map,
 		}
 	}
 
-	executableSectionsSize := []builder.ExecutableSectionSize{
+	executableSectionsSize := []ExecutableSectionSize{
 		{
 			Name:    "text",
 			Size:    textSize,
@@ -160,7 +184,7 @@ func checkSize(buildProperties *properties.Map,
 		},
 	}
 	if maxDataSize > 0 {
-		executableSectionsSize = append(executableSectionsSize, builder.ExecutableSectionSize{
+		executableSectionsSize = append(executableSectionsSize, ExecutableSectionSize{
 			Name:    "data",
 			Size:    dataSize,
 			MaxSize: maxDataSize,
