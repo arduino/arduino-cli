@@ -883,7 +883,7 @@ func TestCoreDownloadMultiplePlatforms(t *testing.T) {
 	// The cli should not allow it since optimizing the casing results in finding two cores
 	_, stderr, err := cli.Run("core", "upgrade", "Packager:Arch")
 	require.Error(t, err)
-	require.Contains(t, string(stderr), "Invalid argument passed: Found 2 platform for reference")
+	require.Contains(t, string(stderr), "Invalid argument passed: Found 2 platforms matching")
 }
 
 func TestCoreWithMissingCustomBoardOptionsIsLoaded(t *testing.T) {
