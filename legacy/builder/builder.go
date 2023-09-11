@@ -83,7 +83,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.Stdout, ctx.Stderr,
 				func(msg string) { ctx.BuilderLogger.Info(msg) },
 				func(data []byte) { ctx.BuilderLogger.WriteStdout(data) },
-				func(data []byte) { ctx.WriteStderr(data) },
+				func(data []byte) { ctx.BuilderLogger.WriteStderr(data) },
 				&ctx.Progress, ctx.ProgressCB,
 			)
 			if err != nil {
@@ -124,7 +124,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.Stderr,
 				func(msg string) { ctx.BuilderLogger.Info(msg) },
 				func(data []byte) { ctx.BuilderLogger.WriteStdout(data) },
-				func(data []byte) { ctx.WriteStderr(data) },
+				func(data []byte) { ctx.BuilderLogger.WriteStderr(data) },
 				&ctx.Progress, ctx.ProgressCB,
 			)
 			if err != nil {
@@ -155,7 +155,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.Stdout, ctx.Stderr,
 				func(msg string) { ctx.BuilderLogger.Info(msg) },
 				func(data []byte) { ctx.BuilderLogger.WriteStdout(data) },
-				func(data []byte) { ctx.WriteStderr(data) },
+				func(data []byte) { ctx.BuilderLogger.WriteStderr(data) },
 				&ctx.Progress, ctx.ProgressCB,
 			)
 

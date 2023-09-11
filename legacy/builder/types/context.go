@@ -17,7 +17,6 @@ package types
 
 import (
 	"io"
-	"os"
 	"sync"
 
 	"github.com/arduino/arduino-cli/arduino/builder"
@@ -112,11 +111,3 @@ func (ctx *Context) PushProgress() {
 	}
 }
 
-func (ctx *Context) WriteStderr(data []byte) (int, error) {
-	ctx.stdLock.Lock()
-	defer ctx.stdLock.Unlock()
-	if ctx.Stderr == nil {
-		return os.Stderr.Write(data)
-	}
-	return ctx.Stderr.Write(data)
-}
