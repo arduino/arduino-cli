@@ -70,3 +70,13 @@ func (l *BuilderLogger) Verbose() bool {
 func (l *BuilderLogger) WarningsLevel() string {
 	return l.warningsLevel
 }
+
+// Stdout fixdoc
+func (l *BuilderLogger) Stdout() io.Writer {
+	return l.stdout
+}
+
+// Stderr fixdoc
+func (l *BuilderLogger) Stderr() io.Writer {
+	return l.stderr
+}

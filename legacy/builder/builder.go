@@ -427,9 +427,9 @@ func logIfVerbose(warn bool, msg string) types.BareCommand {
 func recipeByPrefixSuffixRunner(ctx *types.Context, prefix, suffix string, skipIfOnlyUpdatingCompilationDatabase bool) error {
 	return RecipeByPrefixSuffixRunner(
 		prefix, suffix, skipIfOnlyUpdatingCompilationDatabase,
-		ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
-		ctx.BuildProperties, ctx.Stdout, ctx.Stderr,
-		func(msg string) { ctx.BuilderLogger.Info(msg) },
+		ctx.OnlyUpdateCompilationDatabase,
+		ctx.BuildProperties,
+		ctx.BuilderLogger,
 	)
 }
 

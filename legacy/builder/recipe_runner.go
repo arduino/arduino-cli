@@ -17,10 +17,10 @@ package builder
 
 import (
 	"fmt"
-	"io"
 	"sort"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -29,10 +29,9 @@ import (
 
 func RecipeByPrefixSuffixRunner(
 	prefix, suffix string,
-	skipIfOnlyUpdatingCompilationDatabase, onlyUpdateCompilationDatabase, verbose bool,
+	skipIfOnlyUpdatingCompilationDatabase, onlyUpdateCompilationDatabase bool,
 	buildProps *properties.Map,
-	stdoutWriter, stderrWriter io.Writer,
-	printInfoFn func(string),
+	builderLogger *logger.BuilderLogger,
 ) error {
 	logrus.Debugf(fmt.Sprintf("Looking for recipes like %s", prefix+"*"+suffix))
 
@@ -51,15 +50,15 @@ func RecipeByPrefixSuffixRunner(
 		}
 
 		if onlyUpdateCompilationDatabase && skipIfOnlyUpdatingCompilationDatabase {
-			if verbose {
-				printInfoFn(tr("Skipping: %[1]s", strings.Join(command.GetArgs(), " ")))
+			if builderLogger.Verbose() {
+				builderLogger.Info(tr("Skipping: %[1]s", strings.Join(command.GetArgs(), " ")))
 			}
 			return nil
 		}
 
-		verboseInfo, _, _, err := utils.ExecCommand(verbose, stdoutWriter, stderrWriter, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
-		if verbose {
-			printInfoFn(string(verboseInfo))
+		verboseInfo, _, _, err := utils.ExecCommand(builderLogger.Verbose(), builderLogger.Stdout(), builderLogger.Stderr(), command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+		if builderLogger.Verbose() {
+			builderLogger.Info(string(verboseInfo))
 		}
 		if err != nil {
 			return errors.WithStack(err)
