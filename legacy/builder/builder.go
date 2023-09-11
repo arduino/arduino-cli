@@ -210,7 +210,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		types.BareCommand(func(ctx *types.Context) error {
 			return MergeSketchWithBootloader(
 				ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
-				ctx.BuildPath, ctx.Sketch, ctx.BuildProperties,
+				ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
 				func(s string) { ctx.Info(s) },
 				func(s string) { ctx.Warn(s) },
 			)
@@ -258,7 +258,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.BuildPath, ctx.SketchBuildPath,
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
 				ctx.BuildProperties,
-				ctx.Sketch,
+				ctx.Builder.Sketch(),
 				ctx.SketchLibrariesDetector.IncludeFolders(),
 				ctx.LineOffset,
 				ctx.OnlyUpdateCompilationDatabase,
@@ -305,7 +305,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 func preprocessSketchCommand(ctx *types.Context) types.BareCommand {
 	return func(ctx *types.Context) error {
 		normalOutput, verboseOutput, err := PreprocessSketch(
-			ctx.Sketch, ctx.BuildPath, ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset,
+			ctx.Builder.Sketch(), ctx.BuildPath, ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset,
 			ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)
 		if ctx.Verbose {
 			ctx.WriteStdout(verboseOutput)
@@ -357,7 +357,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 	}
 
 	// Output arduino-preprocessed source
-	preprocessedSketch, err := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp").ReadFile()
+	preprocessedSketch, err := ctx.SketchBuildPath.Join(ctx.Builder.Sketch().MainFile.Base() + ".cpp").ReadFile()
 	if err != nil {
 		return err
 	}
@@ -401,7 +401,7 @@ func findIncludes(ctx *types.Context) types.BareCommand {
 			ctx.BuildProperties.GetPath("build.core.path"),
 			ctx.BuildProperties.GetPath("build.variant.path"),
 			ctx.SketchBuildPath,
-			ctx.Sketch,
+			ctx.Builder.Sketch(),
 			ctx.LibrariesBuildPath,
 			ctx.BuildProperties,
 			ctx.TargetPlatform.Platform.Architecture,
@@ -438,7 +438,7 @@ func containerBuildOptions(ctx *types.Context) types.BareCommand {
 		// ctx.BuildProperties
 		buildOptionsJSON, buildOptionsJSONPrevious, infoMessage, err := ContainerBuildOptions(
 			ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
-			ctx.BuiltInLibrariesDirs, ctx.BuildPath, ctx.Sketch, ctx.CustomBuildProperties,
+			ctx.BuiltInLibrariesDirs, ctx.BuildPath, ctx.Builder.Sketch(), ctx.CustomBuildProperties,
 			ctx.FQBN.String(), ctx.Clean, ctx.BuildProperties,
 		)
 		if infoMessage != "" {

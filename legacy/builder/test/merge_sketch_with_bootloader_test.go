@@ -71,7 +71,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 
 	err = builder.MergeSketchWithBootloader(
 		ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
-		ctx.BuildPath, ctx.Sketch, ctx.BuildProperties,
+		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
 		func(s string) { ctx.Info(s) },
 		func(s string) { ctx.Warn(s) },
 	)
@@ -128,7 +128,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 
 	err = builder.MergeSketchWithBootloader(
 		ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
-		ctx.BuildPath, ctx.Sketch, ctx.BuildProperties,
+		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
 		func(s string) { ctx.Info(s) },
 		func(s string) { ctx.Warn(s) },
 	)
@@ -154,7 +154,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 
 	err := builder.MergeSketchWithBootloader(
 		ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
-		ctx.BuildPath, ctx.Sketch, ctx.BuildProperties,
+		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
 		func(s string) { ctx.Info(s) },
 		func(s string) { ctx.Warn(s) },
 	)
@@ -214,7 +214,7 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 
 	err = builder.MergeSketchWithBootloader(
 		ctx.OnlyUpdateCompilationDatabase, ctx.Verbose,
-		ctx.BuildPath, ctx.Sketch, ctx.BuildProperties,
+		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
 		func(s string) { ctx.Info(s) },
 		func(s string) { ctx.Warn(s) },
 	)

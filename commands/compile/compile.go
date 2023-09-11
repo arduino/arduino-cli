@@ -204,7 +204,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.BuildProperties = buildProperties
 	builderCtx.CustomBuildProperties = customBuildPropertiesArgs
 	builderCtx.FQBN = fqbn
-	builderCtx.Sketch = sk
 	builderCtx.BuildPath = buildPath
 	builderCtx.ProgressCB = progressCB
 
@@ -249,7 +248,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.LibrariesBuildPath = librariesBuildPath
 	builderCtx.CoreBuildPath = coreBuildPath
 
-	if builderCtx.BuildPath.Canonical().EqualsTo(builderCtx.Sketch.FullPath.Canonical()) {
+	if builderCtx.BuildPath.Canonical().EqualsTo(sk.FullPath.Canonical()) {
 		return r, &arduino.CompileFailedError{
 			Message: tr("Sketch cannot be located in build path. Please specify a different build path"),
 		}

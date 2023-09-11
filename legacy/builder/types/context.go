@@ -26,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -66,7 +65,6 @@ type Context struct {
 	LibrariesObjectFiles paths.PathList
 	SketchObjectFiles    paths.PathList
 
-	Sketch        *sketch.Sketch
 	WarningsLevel string
 
 	// C++ Parsing

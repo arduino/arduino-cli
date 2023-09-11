@@ -33,7 +33,6 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 		BuiltInToolsDirs:      paths.NewPathList("tools"),
 		BuiltInLibrariesDirs:  paths.New("built-in libraries"),
 		OtherLibrariesDirs:    paths.NewPathList("libraries"),
-		Sketch:                &sketch.Sketch{FullPath: paths.New("sketchLocation")},
 		FQBN:                  parseFQBN(t, "my:nice:fqbn"),
 		CustomBuildProperties: []string{"custom=prop"},
 		Verbose:               true,
@@ -45,7 +44,7 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 
 	buildPropertiesJSON, err := builder.CreateBuildOptionsMap(
 		ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
-		ctx.BuiltInLibrariesDirs, ctx.Sketch, ctx.CustomBuildProperties,
+		ctx.BuiltInLibrariesDirs, &sketch.Sketch{FullPath: paths.New("sketchLocation")}, ctx.CustomBuildProperties,
 		ctx.FQBN.String(), ctx.BuildProperties.Get("compiler.optimization_flags"),
 	)
 	require.NoError(t, err)
