@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package builder
+package compilation
 
 import (
 	"encoding/json"
@@ -21,8 +21,11 @@ import (
 	"os"
 
 	"github.com/arduino/arduino-cli/executils"
+	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/go-paths-helper"
 )
+
+var tr = i18n.Tr
 
 // CompilationDatabase keeps track of all the compile commands run by the builder
 type CompilationDatabase struct {

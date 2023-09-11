@@ -11,7 +11,7 @@ import (
 	"sync"
 	"unicode"
 
-	"github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/executils"
@@ -339,7 +339,7 @@ func CompileFiles(
 	buildProperties *properties.Map,
 	includes []string,
 	onlyUpdateCompilationDatabase bool,
-	compilationDatabase *builder.CompilationDatabase,
+	compilationDatabase *compilation.CompilationDatabase,
 	jobs int,
 	verbose bool,
 	warningsLevel string,
@@ -369,7 +369,7 @@ func CompileFilesRecursive(
 	buildProperties *properties.Map,
 	includes []string,
 	onlyUpdateCompilationDatabase bool,
-	compilationDatabase *builder.CompilationDatabase,
+	compilationDatabase *compilation.CompilationDatabase,
 	jobs int,
 	verbose bool,
 	warningsLevel string,
@@ -395,7 +395,7 @@ func CompileFilesRecursive(
 
 func compileFiles(
 	onlyUpdateCompilationDatabase bool,
-	compilationDatabase *builder.CompilationDatabase,
+	compilationDatabase *compilation.CompilationDatabase,
 	jobs int,
 	sourceDir *paths.Path,
 	recurse bool,
@@ -508,7 +508,7 @@ func compileFiles(
 func compileFileWithRecipe(
 	stdoutWriter, stderrWriter io.Writer,
 	warningsLevel string,
-	compilationDatabase *builder.CompilationDatabase,
+	compilationDatabase *compilation.CompilationDatabase,
 	verbose, onlyUpdateCompilationDatabase bool,
 	sourcePath *paths.Path,
 	source *paths.Path,

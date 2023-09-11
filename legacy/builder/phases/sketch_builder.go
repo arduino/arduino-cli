@@ -18,7 +18,7 @@ package phases
 import (
 	"io"
 
-	"github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
@@ -34,7 +34,7 @@ func SketchBuilder(
 	buildProperties *properties.Map,
 	includesFolders paths.PathList,
 	onlyUpdateCompilationDatabase, verbose bool,
-	compilationDatabase *builder.CompilationDatabase,
+	compilationDatabase *compilation.CompilationDatabase,
 	jobs int,
 	warningsLevel string,
 	stdoutWriter, stderrWriter io.Writer,

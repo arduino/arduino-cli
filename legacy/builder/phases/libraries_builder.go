@@ -19,11 +19,12 @@ import (
 	"io"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/libraries"
+	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -31,6 +32,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+var tr = i18n.Tr
 var FLOAT_ABI_CFLAG = "float-abi"
 var FPU_CFLAG = "fpu"
 
@@ -40,7 +42,7 @@ func LibrariesBuilder(
 	includesFolders paths.PathList,
 	importedLibraries libraries.List,
 	verbose, onlyUpdateCompilationDatabase bool,
-	compilationDatabase *builder.CompilationDatabase,
+	compilationDatabase *compilation.CompilationDatabase,
 	jobs int,
 	warningsLevel string,
 	stdoutWriter, stderrWriter io.Writer,
@@ -136,7 +138,7 @@ func findExpectedPrecompiledLibFolder(
 func compileLibraries(
 	libraries libraries.List, buildPath *paths.Path, buildProperties *properties.Map, includes []string,
 	verbose, onlyUpdateCompilationDatabase bool,
-	compilationDatabase *builder.CompilationDatabase,
+	compilationDatabase *compilation.CompilationDatabase,
 	jobs int,
 	warningsLevel string,
 	stdoutWriter, stderrWriter io.Writer,
@@ -180,7 +182,7 @@ func compileLibraries(
 func compileLibrary(
 	library *libraries.Library, buildPath *paths.Path, buildProperties *properties.Map, includes []string,
 	verbose, onlyUpdateCompilationDatabase bool,
-	compilationDatabase *builder.CompilationDatabase,
+	compilationDatabase *compilation.CompilationDatabase,
 	jobs int,
 	warningsLevel string,
 	stdoutWriter, stderrWriter io.Writer,

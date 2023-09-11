@@ -19,6 +19,7 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
@@ -143,7 +144,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			objectFiles, archiveFile, err := phases.CoreBuilder(
+			objectFiles, archiveFile, err := builder.CoreBuilder(
 				ctx.BuildPath, ctx.CoreBuildPath, ctx.Builder.CoreBuildCachePath(),
 				ctx.BuildProperties,
 				ctx.ActualPlatform,

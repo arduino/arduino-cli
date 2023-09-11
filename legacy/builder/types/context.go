@@ -22,6 +22,7 @@ import (
 	"sync"
 
 	"github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -90,7 +91,7 @@ type Context struct {
 	ExecutableSectionsSize builder.ExecutablesFileSections
 
 	// Compilation Database to build/update
-	CompilationDatabase *builder.CompilationDatabase
+	CompilationDatabase *compilation.CompilationDatabase
 	// Set to true to skip build and produce only Compilation Database
 	OnlyUpdateCompilationDatabase bool
 

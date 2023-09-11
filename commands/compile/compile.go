@@ -24,6 +24,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
@@ -213,7 +214,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
 	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
 
-	builderCtx.CompilationDatabase = bldr.NewCompilationDatabase(
+	builderCtx.CompilationDatabase = compilation.NewCompilationDatabase(
 		builderCtx.BuildPath.Join("compile_commands.json"),
 	)
 
