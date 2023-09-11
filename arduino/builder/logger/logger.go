@@ -7,6 +7,7 @@ import (
 	"sync"
 )
 
+// BuilderLogger fixdoc
 type BuilderLogger struct {
 	stdLock sync.Mutex
 	stdout  io.Writer
@@ -16,7 +17,14 @@ type BuilderLogger struct {
 	warningsLevel string
 }
 
+// New fixdoc
 func New(stdout, stderr io.Writer, verbose bool, warningsLevel string) *BuilderLogger {
+	if stdout == nil {
+		stdout = os.Stdout
+	}
+	if stderr == nil {
+		stderr = os.Stderr
+	}
 	return &BuilderLogger{
 		stdout:        stdout,
 		stderr:        stderr,
@@ -25,40 +33,40 @@ func New(stdout, stderr io.Writer, verbose bool, warningsLevel string) *BuilderL
 	}
 }
 
+// Info fixdoc
 func (l *BuilderLogger) Info(msg string) {
 	l.stdLock.Lock()
-	if l.stdout == nil {
-		fmt.Fprintln(os.Stdout, msg)
-	} else {
-		fmt.Fprintln(l.stdout, msg)
-	}
-	l.stdLock.Unlock()
+	defer l.stdLock.Unlock()
+	fmt.Fprintln(l.stdout, msg)
 }
 
+// Warn fixdoc
 func (l *BuilderLogger) Warn(msg string) {
 	l.stdLock.Lock()
-	if l.stderr == nil {
-		fmt.Fprintln(os.Stderr, msg)
-	} else {
-		fmt.Fprintln(l.stderr, msg)
-	}
-	l.stdLock.Unlock()
+	defer l.stdLock.Unlock()
+	fmt.Fprintln(l.stderr, msg)
 }
 
+// WriteStdout fixdoc
 func (l *BuilderLogger) WriteStdout(data []byte) (int, error) {
 	l.stdLock.Lock()
 	defer l.stdLock.Unlock()
-	if l.stdout == nil {
-		return os.Stdout.Write(data)
-	}
 	return l.stdout.Write(data)
 }
 
+// WriteStderr fixdoc
 func (l *BuilderLogger) WriteStderr(data []byte) (int, error) {
 	l.stdLock.Lock()
 	defer l.stdLock.Unlock()
-	if l.stderr == nil {
-		return os.Stderr.Write(data)
-	}
 	return l.stderr.Write(data)
+}
+
+// Verbose fixdoc
+func (l *BuilderLogger) Verbose() bool {
+	return l.verbose
+}
+
+// WarningsLevel fixdoc
+func (l *BuilderLogger) WarningsLevel() string {
+	return l.warningsLevel
 }
