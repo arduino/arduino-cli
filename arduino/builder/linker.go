@@ -17,9 +17,9 @@ package builder
 
 import (
 	"bytes"
-	"io"
 	"strings"
 
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/go-paths-helper"
@@ -28,16 +28,15 @@ import (
 )
 
 func Linker(
-	onlyUpdateCompilationDatabase, verbose bool,
+	onlyUpdateCompilationDatabase bool,
 	sketchObjectFiles, librariesObjectFiles, coreObjectsFiles paths.PathList,
 	coreArchiveFilePath, buildPath *paths.Path,
 	buildProperties *properties.Map,
-	stdoutWriter, stderrWriter io.Writer,
-	warningsLevel string,
+	builderLogger *logger.BuilderLogger,
 ) ([]byte, error) {
 	verboseInfo := &bytes.Buffer{}
 	if onlyUpdateCompilationDatabase {
-		if verbose {
+		if builderLogger.Verbose() {
 			verboseInfo.WriteString(tr("Skip linking of final executable."))
 		}
 		return verboseInfo.Bytes(), nil
@@ -57,10 +56,7 @@ func Linker(
 		return nil, errors.WithStack(err)
 	}
 
-	verboseInfoOut, err := link(
-		objectFiles, coreDotARelPath, coreArchiveFilePath, buildProperties,
-		verbose, stdoutWriter, stderrWriter, warningsLevel,
-	)
+	verboseInfoOut, err := link(objectFiles, coreDotARelPath, coreArchiveFilePath, buildProperties, builderLogger)
 	verboseInfo.Write(verboseInfoOut)
 	if err != nil {
 		return verboseInfo.Bytes(), errors.WithStack(err)
@@ -71,9 +67,7 @@ func Linker(
 
 func link(
 	objectFiles paths.PathList, coreDotARelPath *paths.Path, coreArchiveFilePath *paths.Path, buildProperties *properties.Map,
-	verbose bool,
-	stdoutWriter, stderrWriter io.Writer,
-	warningsLevel string,
+	builderLogger *logger.BuilderLogger,
 ) ([]byte, error) {
 	verboseBuffer := &bytes.Buffer{}
 	wrapWithDoubleQuotes := func(value string) string { return "\"" + value + "\"" }
@@ -110,8 +104,8 @@ func link(
 				return nil, errors.WithStack(err)
 			}
 
-			if verboseInfo, _, _, err := utils.ExecCommand(verbose, stdoutWriter, stderrWriter, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */); err != nil {
-				if verbose {
+			if verboseInfo, _, _, err := utils.ExecCommand(builderLogger.Verbose(), builderLogger.Stdout(), builderLogger.Stderr(), command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */); err != nil {
+				if builderLogger.Verbose() {
 					verboseBuffer.WriteString(string(verboseInfo))
 				}
 				return verboseBuffer.Bytes(), errors.WithStack(err)
@@ -124,7 +118,7 @@ func link(
 
 	properties := buildProperties.Clone()
 	properties.Set("compiler.c.elf.flags", properties.Get("compiler.c.elf.flags"))
-	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+warningsLevel))
+	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+builderLogger.WarningsLevel()))
 	properties.Set("archive_file", coreDotARelPath.String())
 	properties.Set("archive_file_path", coreArchiveFilePath.String())
 	properties.Set("object_files", objectFileList)
@@ -134,8 +128,8 @@ func link(
 		return verboseBuffer.Bytes(), err
 	}
 
-	verboseInfo, _, _, err := utils.ExecCommand(verbose, stdoutWriter, stderrWriter, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
-	if verbose {
+	verboseInfo, _, _, err := utils.ExecCommand(builderLogger.Verbose(), builderLogger.Stdout(), builderLogger.Stderr(), command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+	if builderLogger.Verbose() {
 		verboseBuffer.WriteString(string(verboseInfo))
 	}
 	return verboseBuffer.Bytes(), err

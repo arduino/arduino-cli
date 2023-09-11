@@ -162,16 +162,13 @@ func (s *Builder) Run(ctx *types.Context) error {
 		types.BareCommand(func(ctx *types.Context) error {
 			verboseInfoOut, err := builder.Linker(
 				ctx.OnlyUpdateCompilationDatabase,
-				ctx.Verbose,
 				ctx.SketchObjectFiles,
 				ctx.LibrariesObjectFiles,
 				ctx.CoreObjectsFiles,
 				ctx.CoreArchiveFilePath,
 				ctx.BuildPath,
 				ctx.BuildProperties,
-				ctx.Stdout,
-				ctx.Stderr,
-				ctx.WarningsLevel,
+				ctx.BuilderLogger,
 			)
 			if ctx.Verbose {
 				ctx.BuilderLogger.Info(string(verboseInfoOut))
