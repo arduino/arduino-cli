@@ -175,7 +175,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			verboseInfoOut, err := phases.Linker(
+			verboseInfoOut, err := builder.Linker(
 				ctx.OnlyUpdateCompilationDatabase,
 				ctx.Verbose,
 				ctx.SketchObjectFiles,
