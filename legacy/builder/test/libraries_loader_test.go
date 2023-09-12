@@ -22,7 +22,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -74,7 +73,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	require.True(t, Abs(t, paths.New("downloaded_libraries/Adafruit_PN532")).EquivalentTo(libs[idx].InstallDir))
 	require.True(t, Abs(t, paths.New("downloaded_libraries/Adafruit_PN532")).EquivalentTo(libs[idx].SourceDir))
 	require.Equal(t, 1, len(libs[idx].Architectures))
-	require.Equal(t, constants.LIBRARY_ALL_ARCHS, libs[idx].Architectures[0])
+	require.Equal(t, "*", libs[idx].Architectures[0])
 	require.False(t, libs[idx].IsLegacy)
 
 	idx++
@@ -90,7 +89,7 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	require.True(t, Abs(t, paths.New("downloaded_libraries/Bridge")).EquivalentTo(bridgeLib.InstallDir))
 	require.True(t, Abs(t, paths.New("downloaded_libraries/Bridge/src")).EquivalentTo(bridgeLib.SourceDir))
 	require.Equal(t, 1, len(bridgeLib.Architectures))
-	require.Equal(t, constants.LIBRARY_ALL_ARCHS, bridgeLib.Architectures[0])
+	require.Equal(t, "*", bridgeLib.Architectures[0])
 	require.Equal(t, "Arduino", bridgeLib.Author)
 	require.Equal(t, "Arduino <info@arduino.cc>", bridgeLib.Maintainer)
 

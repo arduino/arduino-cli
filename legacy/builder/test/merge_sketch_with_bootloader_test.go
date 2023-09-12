@@ -21,7 +21,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -138,8 +137,8 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 
 	buildPath := ctx.Builder.GetBuildPath()
 	buildProperties := ctx.Builder.GetBuildProperties()
-	buildProperties.Remove(constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK)
-	buildProperties.Remove(constants.BUILD_PROPERTIES_BOOTLOADER_FILE)
+	buildProperties.Remove("bootloader.noblink")
+	buildProperties.Remove("bootloader.file")
 
 	err := ctx.Builder.MergeSketchWithBootloader(ctx.OnlyUpdateCompilationDatabase)
 	require.NoError(t, err)

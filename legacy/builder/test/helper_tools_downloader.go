@@ -26,7 +26,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -264,12 +263,12 @@ func findCoreUrl(index map[string]interface{}, core Core) (string, error) {
 	packages := index["packages"].([]interface{})
 	for _, p := range packages {
 		pack := p.(map[string]interface{})
-		if pack[constants.PACKAGE_NAME].(string) == core.Maintainer {
+		if pack["name"].(string) == core.Maintainer {
 			packagePlatforms := pack["platforms"].([]interface{})
 			for _, pt := range packagePlatforms {
 				packagePlatform := pt.(map[string]interface{})
-				if packagePlatform[constants.PLATFORM_ARCHITECTURE] == core.Arch && packagePlatform[constants.PLATFORM_VERSION] == core.Version {
-					return packagePlatform[constants.PLATFORM_URL].(string), nil
+				if packagePlatform["architecture"] == core.Arch && packagePlatform["version"] == core.Version {
+					return packagePlatform["url"].(string), nil
 				}
 			}
 		}
@@ -394,7 +393,7 @@ func allBoardsManagerToolsAlreadyDownloadedAndUnpacked(targetPath *paths.Path, t
 }
 
 func boardManagerToolAlreadyDownloadedAndUnpacked(targetPath *paths.Path, tool Tool) bool {
-	return targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name, tool.Version).Exist()
+	return targetPath.Join(tool.Package, "tools", tool.Name, tool.Version).Exist()
 }
 
 func allToolsAlreadyDownloadedAndUnpacked(targetPath *paths.Path, tools []Tool) bool {
@@ -513,10 +512,10 @@ func downloadAndUnpackBoardsManagerTool(tool Tool, url string, targetPath *paths
 	}
 	defer unpackFolder.RemoveAll()
 
-	if err := targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name).MkdirAll(); err != nil {
+	if err := targetPath.Join(tool.Package, "tools", tool.Name).MkdirAll(); err != nil {
 		return errors.WithStack(err)
 	}
-	if err := unpackFolder.Join(files[0].Base()).CopyDirTo(targetPath.Join(tool.Package, constants.FOLDER_TOOLS, tool.Name, tool.Version)); err != nil {
+	if err := unpackFolder.Join(files[0].Base()).CopyDirTo(targetPath.Join(tool.Package, "tools", tool.Name, tool.Version)); err != nil {
 		return errors.WithStack(err)
 	}
 	return nil
@@ -646,17 +645,17 @@ func findToolUrl(index map[string]interface{}, tool Tool, host []string) (string
 		packages := index["packages"].([]interface{})
 		for _, p := range packages {
 			pack := p.(map[string]interface{})
-			packageTools := pack[constants.PACKAGE_TOOLS].([]interface{})
+			packageTools := pack["tools"].([]interface{})
 			for _, pt := range packageTools {
 				packageTool := pt.(map[string]interface{})
-				name := packageTool[constants.TOOL_NAME].(string)
-				version := packageTool[constants.TOOL_VERSION].(string)
+				name := packageTool["name"].(string)
+				version := packageTool["version"].(string)
 				if name == tool.Name && version == tool.Version {
 					systems := packageTool["systems"].([]interface{})
 					for _, s := range systems {
 						system := s.(map[string]interface{})
 						if slices.Contains(host, system["host"].(string)) {
-							return system[constants.TOOL_URL].(string), nil
+							return system["url"].(string), nil
 						}
 					}
 				}

@@ -30,7 +30,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 )
 
 var lineMatcher = regexp.MustCompile(`^#line\s\d+\s"`)
@@ -283,7 +282,7 @@ func (b *Builder) ExportProjectCMake(
 	var dynamicLibsFromGccMinusL []string
 	var linkDirectories []string
 
-	extractCompileFlags(b.buildProperties, constants.RECIPE_C_COMBINE_PATTERN, &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
+	extractCompileFlags(b.buildProperties, "recipe.c.combine.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
 	extractCompileFlags(b.buildProperties, "recipe.c.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
 	extractCompileFlags(b.buildProperties, "recipe.cpp.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
 
