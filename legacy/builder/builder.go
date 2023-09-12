@@ -177,11 +177,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			return MergeSketchWithBootloader(
-				ctx.OnlyUpdateCompilationDatabase,
-				ctx.Builder.GetBuildPath(), ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
-				ctx.BuilderLogger,
-			)
+			return ctx.Builder.MergeSketchWithBootloader(ctx.OnlyUpdateCompilationDatabase)
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {

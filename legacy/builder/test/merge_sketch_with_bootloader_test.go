@@ -21,8 +21,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/arduino/arduino-cli/arduino/builder/logger"
-	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
@@ -70,12 +68,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 	err = buildPath.Join("sketch", "sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
 	require.NoError(t, err)
 
-	builderLogger := logger.New(nil, nil, false, "")
-	err = builder.MergeSketchWithBootloader(
-		ctx.OnlyUpdateCompilationDatabase,
-		ctx.Builder.GetBuildPath(), ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
-		builderLogger,
-	)
+	err = ctx.Builder.MergeSketchWithBootloader(ctx.OnlyUpdateCompilationDatabase)
 	require.NoError(t, err)
 
 	bytes, err := buildPath.Join("sketch", "sketch1.ino.with_bootloader.hex").ReadFile()
@@ -127,12 +120,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	err = buildPath.Join("sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
 	require.NoError(t, err)
 
-	builderLogger := logger.New(nil, nil, false, "")
-	err = builder.MergeSketchWithBootloader(
-		ctx.OnlyUpdateCompilationDatabase,
-		ctx.Builder.GetBuildPath(), ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
-		builderLogger,
-	)
+	err = ctx.Builder.MergeSketchWithBootloader(ctx.OnlyUpdateCompilationDatabase)
 	require.NoError(t, err)
 
 	bytes, err := buildPath.Join("sketch1.ino.with_bootloader.hex").ReadFile()
@@ -153,12 +141,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	buildProperties.Remove(constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK)
 	buildProperties.Remove(constants.BUILD_PROPERTIES_BOOTLOADER_FILE)
 
-	builderLogger := logger.New(nil, nil, false, "")
-	err := builder.MergeSketchWithBootloader(
-		ctx.OnlyUpdateCompilationDatabase,
-		ctx.Builder.GetBuildPath(), ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
-		builderLogger,
-	)
+	err := ctx.Builder.MergeSketchWithBootloader(ctx.OnlyUpdateCompilationDatabase)
 	require.NoError(t, err)
 
 	exist, err := buildPath.Join("sketch.ino.with_bootloader.hex").ExistCheck()
@@ -213,12 +196,7 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 	err = buildPath.Join("sketch", "sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
 	require.NoError(t, err)
 
-	builderLogger := logger.New(nil, nil, false, "")
-	err = builder.MergeSketchWithBootloader(
-		ctx.OnlyUpdateCompilationDatabase,
-		ctx.Builder.GetBuildPath(), ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
-		builderLogger,
-	)
+	err = ctx.Builder.MergeSketchWithBootloader(ctx.OnlyUpdateCompilationDatabase)
 	require.NoError(t, err)
 
 	bytes, err := buildPath.Join("sketch", "sketch1.ino.with_bootloader.hex").ReadFile()
