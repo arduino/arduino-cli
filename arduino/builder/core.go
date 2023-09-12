@@ -22,7 +22,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -33,10 +32,7 @@ import (
 )
 
 // BuildCore fixdoc
-func (b *Builder) BuildCore(
-	actualPlatform *cores.PlatformRelease,
-	compilationDatabase *compilation.Database,
-) (paths.PathList, *paths.Path, error) {
+func (b *Builder) BuildCore(actualPlatform *cores.PlatformRelease) (paths.PathList, *paths.Path, error) {
 	if err := b.coreBuildPath.MkdirAll(); err != nil {
 		return nil, nil, errors.WithStack(err)
 	}
@@ -53,7 +49,7 @@ func (b *Builder) BuildCore(
 		}
 	}
 
-	archiveFile, objectFiles, err := b.compileCore(actualPlatform, compilationDatabase)
+	archiveFile, objectFiles, err := b.compileCore(actualPlatform)
 	if err != nil {
 		return nil, nil, errors.WithStack(err)
 	}
@@ -61,10 +57,7 @@ func (b *Builder) BuildCore(
 	return objectFiles, archiveFile, nil
 }
 
-func (b *Builder) compileCore(
-	actualPlatform *cores.PlatformRelease,
-	compilationDatabase *compilation.Database,
-) (*paths.Path, paths.PathList, error) {
+func (b *Builder) compileCore(actualPlatform *cores.PlatformRelease) (*paths.Path, paths.PathList, error) {
 	coreFolder := b.buildProperties.GetPath("build.core.path")
 	variantFolder := b.buildProperties.GetPath("build.variant.path")
 	targetCoreFolder := b.buildProperties.GetPath("runtime.platform.path")
@@ -81,7 +74,7 @@ func (b *Builder) compileCore(
 		variantObjectFiles, err = utils.CompileFilesRecursive(
 			variantFolder, b.coreBuildPath, b.buildProperties, includes,
 			b.onlyUpdateCompilationDatabase,
-			compilationDatabase,
+			b.compilationDatabase,
 			b.jobs,
 			b.logger,
 			b.Progress,
@@ -132,7 +125,7 @@ func (b *Builder) compileCore(
 	coreObjectFiles, err := utils.CompileFilesRecursive(
 		coreFolder, b.coreBuildPath, b.buildProperties, includes,
 		b.onlyUpdateCompilationDatabase,
-		compilationDatabase,
+		b.compilationDatabase,
 		b.jobs,
 		b.logger,
 		b.Progress,

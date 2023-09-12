@@ -19,7 +19,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -38,11 +37,7 @@ var (
 )
 
 // BuildLibraries fixdoc
-func (b *Builder) BuildLibraries(
-	includesFolders paths.PathList,
-	importedLibraries libraries.List,
-	compilationDatabase *compilation.Database,
-) (paths.PathList, error) {
+func (b *Builder) BuildLibraries(includesFolders paths.PathList, importedLibraries libraries.List) (paths.PathList, error) {
 	includes := f.Map(includesFolders.AsStrings(), cpp.WrapWithHyphenI)
 	libs := importedLibraries
 
@@ -50,7 +45,7 @@ func (b *Builder) BuildLibraries(
 		return nil, errors.WithStack(err)
 	}
 
-	librariesObjectFiles, err := b.compileLibraries(libs, includes, compilationDatabase)
+	librariesObjectFiles, err := b.compileLibraries(libs, includes)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -117,16 +112,13 @@ func (b *Builder) findExpectedPrecompiledLibFolder(
 	return nil
 }
 
-func (b *Builder) compileLibraries(libraries libraries.List, includes []string, compilationDatabase *compilation.Database) (paths.PathList, error) {
+func (b *Builder) compileLibraries(libraries libraries.List, includes []string) (paths.PathList, error) {
 	b.Progress.AddSubSteps(len(libraries))
 	defer b.Progress.RemoveSubSteps()
 
 	objectFiles := paths.NewPathList()
 	for _, library := range libraries {
-		libraryObjectFiles, err := b.compileLibrary(
-			library, includes,
-			compilationDatabase,
-		)
+		libraryObjectFiles, err := b.compileLibrary(library, includes)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
@@ -139,10 +131,7 @@ func (b *Builder) compileLibraries(libraries libraries.List, includes []string, 
 	return objectFiles, nil
 }
 
-func (b *Builder) compileLibrary(
-	library *libraries.Library, includes []string,
-	compilationDatabase *compilation.Database,
-) (paths.PathList, error) {
+func (b *Builder) compileLibrary(library *libraries.Library, includes []string) (paths.PathList, error) {
 	if b.logger.Verbose() {
 		b.logger.Info(tr(`Compiling library "%[1]s"`, library.Name))
 	}
@@ -205,7 +194,7 @@ func (b *Builder) compileLibrary(
 		libObjectFiles, err := utils.CompileFilesRecursive(
 			library.SourceDir, libraryBuildPath, b.buildProperties, includes,
 			b.onlyUpdateCompilationDatabase,
-			compilationDatabase,
+			b.compilationDatabase,
 			b.jobs,
 			b.logger,
 			b.Progress,
@@ -236,7 +225,7 @@ func (b *Builder) compileLibrary(
 		libObjectFiles, err := utils.CompileFiles(
 			library.SourceDir, libraryBuildPath, b.buildProperties, includes,
 			b.onlyUpdateCompilationDatabase,
-			compilationDatabase,
+			b.compilationDatabase,
 			b.jobs,
 			b.logger,
 			b.Progress,
@@ -251,7 +240,7 @@ func (b *Builder) compileLibrary(
 			utilityObjectFiles, err := utils.CompileFiles(
 				library.UtilityDir, utilityBuildPath, b.buildProperties, includes,
 				b.onlyUpdateCompilationDatabase,
-				compilationDatabase,
+				b.compilationDatabase,
 				b.jobs,
 				b.logger,
 				b.Progress,

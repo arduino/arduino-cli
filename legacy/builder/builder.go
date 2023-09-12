@@ -64,10 +64,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			sketchObjectFiles, err := ctx.Builder.BuildSketch(
-				ctx.SketchLibrariesDetector.IncludeFolders(),
-				ctx.CompilationDatabase,
-			)
+			sketchObjectFiles, err := ctx.Builder.BuildSketch(ctx.SketchLibrariesDetector.IncludeFolders())
 			if err != nil {
 				return err
 			}
@@ -94,7 +91,6 @@ func (s *Builder) Run(ctx *types.Context) error {
 			librariesObjectFiles, err := ctx.Builder.BuildLibraries(
 				ctx.SketchLibrariesDetector.IncludeFolders(),
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
-				ctx.CompilationDatabase,
 			)
 			if err != nil {
 				return err
@@ -113,7 +109,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			objectFiles, archiveFile, err := ctx.Builder.BuildCore(ctx.ActualPlatform, ctx.CompilationDatabase)
+			objectFiles, archiveFile, err := ctx.Builder.BuildCore(ctx.ActualPlatform)
 
 			ctx.CoreObjectsFiles = objectFiles
 			ctx.CoreArchiveFilePath = archiveFile
@@ -176,9 +172,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		ctx.Builder.Progress.PushProgress()
 	}
 
-	if ctx.CompilationDatabase != nil {
-		ctx.CompilationDatabase.SaveToFile()
-	}
+	ctx.Builder.SaveCompilationDatabase()
 
 	var otherErr error
 	commands = []types.Command{

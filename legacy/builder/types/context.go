@@ -17,7 +17,6 @@ package types
 
 import (
 	"github.com/arduino/arduino-cli/arduino/builder"
-	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -48,7 +47,4 @@ type Context struct {
 
 	// C++ Parsing
 	LineOffset int
-
-	// Compilation Database to build/update
-	CompilationDatabase *compilation.Database
 }

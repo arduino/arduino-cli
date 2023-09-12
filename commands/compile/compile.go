@@ -25,7 +25,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
-	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
@@ -222,10 +221,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		return r, &arduino.CompileFailedError{Message: err.Error()}
 	}
 	builderCtx.Builder = sketchBuilder
-
-	builderCtx.CompilationDatabase = compilation.NewDatabase(
-		sketchBuilder.GetBuildPath().Join("compile_commands.json"),
-	)
 
 	var libsManager *librariesmanager.LibrariesManager
 	if pme.GetProfile() != nil {

@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -59,6 +60,8 @@ type Builder struct {
 
 	// Set to true to skip build and produce only Compilation Database
 	onlyUpdateCompilationDatabase bool
+	// Compilation Database to build/update
+	compilationDatabase *compilation.Database
 
 	// Progress of all various steps
 	Progress *progress.Struct
@@ -152,6 +155,7 @@ func NewBuilder(
 		clean:                         clean,
 		sourceOverrides:               sourceOverrides,
 		onlyUpdateCompilationDatabase: onlyUpdateCompilationDatabase,
+		compilationDatabase:           compilation.NewDatabase(buildPath.Join("compile_commands.json")),
 		Progress:                      progressStats,
 		BuildOptionsManager: NewBuildOptionsManager(
 			hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
@@ -191,4 +195,11 @@ func (b *Builder) GetLibrariesBuildPath() *paths.Path {
 // ExecutableSectionsSize fixdoc
 func (b *Builder) ExecutableSectionsSize() ExecutablesFileSections {
 	return b.executableSectionsSize
+}
+
+// SaveCompilationDatabase fixdoc
+func (b *Builder) SaveCompilationDatabase() {
+	if b.compilationDatabase != nil {
+		b.compilationDatabase.SaveToFile()
+	}
 }

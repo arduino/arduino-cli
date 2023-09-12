@@ -23,7 +23,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -180,10 +179,7 @@ func writeIfDifferent(source []byte, destPath *paths.Path) error {
 }
 
 // BuildSketch fixdoc
-func (b *Builder) BuildSketch(
-	includesFolders paths.PathList,
-	compilationDatabase *compilation.Database,
-) (paths.PathList, error) {
+func (b *Builder) BuildSketch(includesFolders paths.PathList) (paths.PathList, error) {
 	includes := f.Map(includesFolders.AsStrings(), cpp.WrapWithHyphenI)
 
 	if err := b.sketchBuildPath.MkdirAll(); err != nil {
@@ -193,7 +189,7 @@ func (b *Builder) BuildSketch(
 	sketchObjectFiles, err := utils.CompileFiles(
 		b.sketchBuildPath, b.sketchBuildPath, b.buildProperties, includes,
 		b.onlyUpdateCompilationDatabase,
-		compilationDatabase,
+		b.compilationDatabase,
 		b.jobs,
 		b.builderLogger,
 		b.Progress,
@@ -208,7 +204,7 @@ func (b *Builder) BuildSketch(
 		srcObjectFiles, err := utils.CompileFilesRecursive(
 			sketchSrcPath, sketchSrcPath, b.buildProperties, includes,
 			b.onlyUpdateCompilationDatabase,
-			compilationDatabase,
+			b.compilationDatabase,
 			b.jobs,
 			b.builderLogger,
 			b.Progress,
