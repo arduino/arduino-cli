@@ -20,10 +20,8 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
-	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 )
 
@@ -51,23 +49,9 @@ type Context struct {
 	// C++ Parsing
 	LineOffset int
 
-	// Dry run, only create progress map
-	Progress progress.Struct
-	// Send progress events to this callback
-	ProgressCB rpc.TaskProgressCB
-
 	// Sizer results
 	ExecutableSectionsSize builder.ExecutablesFileSections
 
 	// Compilation Database to build/update
 	CompilationDatabase *compilation.Database
-}
-
-func (ctx *Context) PushProgress() {
-	if ctx.ProgressCB != nil {
-		ctx.ProgressCB(&rpc.TaskProgress{
-			Percent:   ctx.Progress.Progress,
-			Completed: ctx.Progress.Progress >= 100.0,
-		})
-	}
 }

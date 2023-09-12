@@ -25,12 +25,10 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
-	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/marcinbor85/gohex"
 
@@ -185,7 +183,6 @@ func writeIfDifferent(source []byte, destPath *paths.Path) error {
 func (b *Builder) BuildSketch(
 	includesFolders paths.PathList,
 	compilationDatabase *compilation.Database,
-	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, error) {
 	includes := f.Map(includesFolders.AsStrings(), cpp.WrapWithHyphenI)
 
@@ -199,7 +196,7 @@ func (b *Builder) BuildSketch(
 		compilationDatabase,
 		b.jobs,
 		b.builderLogger,
-		progress, progressCB,
+		b.Progress,
 	)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -214,7 +211,7 @@ func (b *Builder) BuildSketch(
 			compilationDatabase,
 			b.jobs,
 			b.builderLogger,
-			progress, progressCB,
+			b.Progress,
 		)
 		if err != nil {
 			return nil, errors.WithStack(err)

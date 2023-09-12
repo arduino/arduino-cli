@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
+	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -178,7 +179,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.PackageManager = pme
 	builderCtx.TargetPlatform = targetPlatform
 	builderCtx.ActualPlatform = buildPlatform
-	builderCtx.ProgressCB = progressCB
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.HardwareDirs = configuration.HardwareDirectories(configuration.Settings)
@@ -208,6 +208,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		req.GetSourceOverride(),
 		req.GetCreateCompilationDatabaseOnly(),
 		builderLogger,
+		progress.New(progressCB),
 	)
 	if err != nil {
 		if strings.Contains(err.Error(), "invalid build properties") {

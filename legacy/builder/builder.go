@@ -67,7 +67,6 @@ func (s *Builder) Run(ctx *types.Context) error {
 			sketchObjectFiles, err := ctx.Builder.BuildSketch(
 				ctx.SketchLibrariesDetector.IncludeFolders(),
 				ctx.CompilationDatabase,
-				&ctx.Progress, ctx.ProgressCB,
 			)
 			if err != nil {
 				return err
@@ -96,7 +95,6 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.SketchLibrariesDetector.IncludeFolders(),
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
 				ctx.CompilationDatabase,
-				&ctx.Progress, ctx.ProgressCB,
 			)
 			if err != nil {
 				return err
@@ -115,11 +113,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			objectFiles, archiveFile, err := ctx.Builder.BuildCore(
-				ctx.ActualPlatform,
-				ctx.CompilationDatabase,
-				&ctx.Progress, ctx.ProgressCB,
-			)
+			objectFiles, archiveFile, err := ctx.Builder.BuildCore(ctx.ActualPlatform, ctx.CompilationDatabase)
 
 			ctx.CoreObjectsFiles = objectFiles
 			ctx.CoreArchiveFilePath = archiveFile
@@ -168,8 +162,8 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 	}
 
-	ctx.Progress.AddSubSteps(len(commands) + 5)
-	defer ctx.Progress.RemoveSubSteps()
+	ctx.Builder.Progress.AddSubSteps(len(commands) + 5)
+	defer ctx.Builder.Progress.RemoveSubSteps()
 
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
@@ -178,8 +172,8 @@ func (s *Builder) Run(ctx *types.Context) error {
 			mainErr = errors.WithStack(err)
 			break
 		}
-		ctx.Progress.CompleteStep()
-		ctx.PushProgress()
+		ctx.Builder.Progress.CompleteStep()
+		ctx.Builder.Progress.PushProgress()
 	}
 
 	if ctx.CompilationDatabase != nil {
@@ -220,8 +214,8 @@ func (s *Builder) Run(ctx *types.Context) error {
 			otherErr = errors.WithStack(err)
 			break
 		}
-		ctx.Progress.CompleteStep()
-		ctx.PushProgress()
+		ctx.Builder.Progress.CompleteStep()
+		ctx.Builder.Progress.PushProgress()
 	}
 
 	if mainErr != nil {
@@ -278,8 +272,8 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 }
 
 func runCommands(ctx *types.Context, commands []types.Command) error {
-	ctx.Progress.AddSubSteps(len(commands))
-	defer ctx.Progress.RemoveSubSteps()
+	ctx.Builder.Progress.AddSubSteps(len(commands))
+	defer ctx.Builder.Progress.RemoveSubSteps()
 
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
@@ -287,8 +281,8 @@ func runCommands(ctx *types.Context, commands []types.Command) error {
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		ctx.Progress.CompleteStep()
-		ctx.PushProgress()
+		ctx.Builder.Progress.CompleteStep()
+		ctx.Builder.Progress.PushProgress()
 	}
 	return nil
 }

@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
+	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
@@ -59,6 +60,9 @@ type Builder struct {
 	// Set to true to skip build and produce only Compilation Database
 	onlyUpdateCompilationDatabase bool
 
+	// Progress of all various steps
+	Progress *progress.Struct
+
 	*BuildOptionsManager
 }
 
@@ -78,6 +82,7 @@ func NewBuilder(
 	sourceOverrides map[string]string,
 	onlyUpdateCompilationDatabase bool,
 	logger *logger.BuilderLogger,
+	progressStats *progress.Struct,
 ) (*Builder, error) {
 	buildProperties := properties.NewMap()
 	if boardBuildProperties != nil {
@@ -126,6 +131,10 @@ func NewBuilder(
 		return nil, ErrSketchCannotBeLocatedInBuildPath
 	}
 
+	if progressStats == nil {
+		progressStats = progress.New(nil)
+	}
+
 	return &Builder{
 		sketch:                        sk,
 		buildProperties:               buildProperties,
@@ -140,6 +149,7 @@ func NewBuilder(
 		clean:                         clean,
 		sourceOverrides:               sourceOverrides,
 		onlyUpdateCompilationDatabase: onlyUpdateCompilationDatabase,
+		Progress:                      progressStats,
 		BuildOptionsManager: NewBuildOptionsManager(
 			hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
 			builtInLibrariesDirs, buildPath,

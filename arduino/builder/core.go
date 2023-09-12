@@ -24,12 +24,10 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
-	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/buildcache"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 )
@@ -38,7 +36,6 @@ import (
 func (b *Builder) BuildCore(
 	actualPlatform *cores.PlatformRelease,
 	compilationDatabase *compilation.Database,
-	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, *paths.Path, error) {
 	if err := b.coreBuildPath.MkdirAll(); err != nil {
 		return nil, nil, errors.WithStack(err)
@@ -56,11 +53,7 @@ func (b *Builder) BuildCore(
 		}
 	}
 
-	archiveFile, objectFiles, err := b.compileCore(
-		actualPlatform,
-		compilationDatabase,
-		progress, progressCB,
-	)
+	archiveFile, objectFiles, err := b.compileCore(actualPlatform, compilationDatabase)
 	if err != nil {
 		return nil, nil, errors.WithStack(err)
 	}
@@ -71,7 +64,6 @@ func (b *Builder) BuildCore(
 func (b *Builder) compileCore(
 	actualPlatform *cores.PlatformRelease,
 	compilationDatabase *compilation.Database,
-	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (*paths.Path, paths.PathList, error) {
 	coreFolder := b.buildProperties.GetPath("build.core.path")
 	variantFolder := b.buildProperties.GetPath("build.variant.path")
@@ -92,7 +84,7 @@ func (b *Builder) compileCore(
 			compilationDatabase,
 			b.jobs,
 			b.logger,
-			progress, progressCB,
+			b.Progress,
 		)
 		if err != nil {
 			return nil, nil, errors.WithStack(err)
@@ -143,7 +135,7 @@ func (b *Builder) compileCore(
 		compilationDatabase,
 		b.jobs,
 		b.logger,
-		progress, progressCB,
+		b.Progress,
 	)
 	if err != nil {
 		return nil, nil, errors.WithStack(err)

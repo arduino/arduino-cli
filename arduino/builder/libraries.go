@@ -21,12 +21,10 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
-	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -44,7 +42,6 @@ func (b *Builder) BuildLibraries(
 	includesFolders paths.PathList,
 	importedLibraries libraries.List,
 	compilationDatabase *compilation.Database,
-	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, error) {
 	includes := f.Map(includesFolders.AsStrings(), cpp.WrapWithHyphenI)
 	libs := importedLibraries
@@ -53,11 +50,7 @@ func (b *Builder) BuildLibraries(
 		return nil, errors.WithStack(err)
 	}
 
-	librariesObjectFiles, err := b.compileLibraries(
-		libs, includes,
-		compilationDatabase,
-		progress, progressCB,
-	)
+	librariesObjectFiles, err := b.compileLibraries(libs, includes, compilationDatabase)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -124,34 +117,23 @@ func (b *Builder) findExpectedPrecompiledLibFolder(
 	return nil
 }
 
-func (b *Builder) compileLibraries(
-	libraries libraries.List, includes []string,
-	compilationDatabase *compilation.Database,
-	progress *progress.Struct, progressCB rpc.TaskProgressCB,
-) (paths.PathList, error) {
-	progress.AddSubSteps(len(libraries))
-	defer progress.RemoveSubSteps()
+func (b *Builder) compileLibraries(libraries libraries.List, includes []string, compilationDatabase *compilation.Database) (paths.PathList, error) {
+	b.Progress.AddSubSteps(len(libraries))
+	defer b.Progress.RemoveSubSteps()
 
 	objectFiles := paths.NewPathList()
 	for _, library := range libraries {
 		libraryObjectFiles, err := b.compileLibrary(
 			library, includes,
 			compilationDatabase,
-			progress, progressCB,
 		)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
 		objectFiles.AddAll(libraryObjectFiles)
 
-		progress.CompleteStep()
-		// PushProgress
-		if progressCB != nil {
-			progressCB(&rpc.TaskProgress{
-				Percent:   progress.Progress,
-				Completed: progress.Progress >= 100.0,
-			})
-		}
+		b.Progress.CompleteStep()
+		b.Progress.PushProgress()
 	}
 
 	return objectFiles, nil
@@ -160,7 +142,6 @@ func (b *Builder) compileLibraries(
 func (b *Builder) compileLibrary(
 	library *libraries.Library, includes []string,
 	compilationDatabase *compilation.Database,
-	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, error) {
 	if b.logger.Verbose() {
 		b.logger.Info(tr(`Compiling library "%[1]s"`, library.Name))
@@ -227,7 +208,7 @@ func (b *Builder) compileLibrary(
 			compilationDatabase,
 			b.jobs,
 			b.logger,
-			progress, progressCB,
+			b.Progress,
 		)
 		if err != nil {
 			return nil, errors.WithStack(err)
@@ -258,7 +239,7 @@ func (b *Builder) compileLibrary(
 			compilationDatabase,
 			b.jobs,
 			b.logger,
-			progress, progressCB,
+			b.Progress,
 		)
 		if err != nil {
 			return nil, errors.WithStack(err)
@@ -273,7 +254,7 @@ func (b *Builder) compileLibrary(
 				compilationDatabase,
 				b.jobs,
 				b.logger,
-				progress, progressCB,
+				b.Progress,
 			)
 			if err != nil {
 				return nil, errors.WithStack(err)
