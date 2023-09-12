@@ -155,16 +155,6 @@ func (b *Builder) GetBuildProperties() *properties.Map {
 	return b.buildProperties
 }
 
-// Jobs number of parallel processes
-func (b *Builder) Jobs() int {
-	return b.jobs
-}
-
-// CustomBuildProperties returns user provided custom build properties
-func (b *Builder) CustomBuildProperties() []string {
-	return b.customBuildProperties
-}
-
 // GetBuildPath returns the build path
 func (b *Builder) GetBuildPath() *paths.Path {
 	return b.buildPath
@@ -173,11 +163,6 @@ func (b *Builder) GetBuildPath() *paths.Path {
 // GetSketchBuildPath returns the sketch build path
 func (b *Builder) GetSketchBuildPath() *paths.Path {
 	return b.sketchBuildPath
-}
-
-// GetCoreBuildPath returns the core build path
-func (b *Builder) GetCoreBuildPath() *paths.Path {
-	return b.coreBuildPath
 }
 
 // GetLibrariesBuildPath returns the libraries build path

@@ -19,7 +19,6 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/sizer"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -142,20 +141,13 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			verboseInfoOut, err := builder.Linker(
+			return ctx.Builder.Link(
 				ctx.OnlyUpdateCompilationDatabase,
 				ctx.SketchObjectFiles,
 				ctx.LibrariesObjectFiles,
 				ctx.CoreObjectsFiles,
 				ctx.CoreArchiveFilePath,
-				ctx.Builder.GetBuildPath(),
-				ctx.Builder.GetBuildProperties(),
-				ctx.BuilderLogger,
 			)
-			if ctx.BuilderLogger.Verbose() {
-				ctx.BuilderLogger.Info(string(verboseInfoOut))
-			}
-			return err
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {

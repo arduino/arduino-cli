@@ -16,33 +16,28 @@
 package builder
 
 import (
-	"bytes"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/go-paths-helper"
-	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
 
-// Linker fixdoc
-func Linker(
+// Link fixdoc
+func (b *Builder) Link(
 	onlyUpdateCompilationDatabase bool,
 	sketchObjectFiles, librariesObjectFiles, coreObjectsFiles paths.PathList,
-	coreArchiveFilePath, buildPath *paths.Path,
-	buildProperties *properties.Map,
-	builderLogger *logger.BuilderLogger,
-) ([]byte, error) {
-	verboseInfo := &bytes.Buffer{}
+	coreArchiveFilePath *paths.Path,
+) error {
 	if onlyUpdateCompilationDatabase {
-		if builderLogger.Verbose() {
-			verboseInfo.WriteString(tr("Skip linking of final executable."))
+		if b.logger.Verbose() {
+			b.logger.Info(tr("Skip linking of final executable."))
 		}
-		return verboseInfo.Bytes(), nil
+		return nil
 	}
 
+	// TODO can we remove this multiple assignations?
 	objectFilesSketch := sketchObjectFiles
 	objectFilesLibraries := librariesObjectFiles
 	objectFilesCore := coreObjectsFiles
@@ -52,25 +47,19 @@ func Linker(
 	objectFiles.AddAll(objectFilesLibraries)
 	objectFiles.AddAll(objectFilesCore)
 
-	coreDotARelPath, err := buildPath.RelTo(coreArchiveFilePath)
+	coreDotARelPath, err := b.buildPath.RelTo(coreArchiveFilePath)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
 
-	verboseInfoOut, err := link(objectFiles, coreDotARelPath, coreArchiveFilePath, buildProperties, builderLogger)
-	verboseInfo.Write(verboseInfoOut)
-	if err != nil {
-		return verboseInfo.Bytes(), errors.WithStack(err)
+	if err := b.link(objectFiles, coreDotARelPath, coreArchiveFilePath); err != nil {
+		return errors.WithStack(err)
 	}
 
-	return verboseInfo.Bytes(), nil
+	return nil
 }
 
-func link(
-	objectFiles paths.PathList, coreDotARelPath *paths.Path, coreArchiveFilePath *paths.Path, buildProperties *properties.Map,
-	builderLogger *logger.BuilderLogger,
-) ([]byte, error) {
-	verboseBuffer := &bytes.Buffer{}
+func (b *Builder) link(objectFiles paths.PathList, coreDotARelPath *paths.Path, coreArchiveFilePath *paths.Path) error {
 	wrapWithDoubleQuotes := func(value string) string { return "\"" + value + "\"" }
 	objectFileList := strings.Join(f.Map(objectFiles.AsStrings(), wrapWithDoubleQuotes), " ")
 
@@ -83,7 +72,7 @@ func link(
 		// it may happen that a subdir/spi.o inside the archive may be overwritten by a anotherdir/spi.o
 		// because thery are both named spi.o.
 
-		properties := buildProperties.Clone()
+		properties := b.buildProperties.Clone()
 		archives := paths.NewPathList()
 		for _, object := range objectFiles {
 			if object.HasSuffix(".a") {
@@ -102,14 +91,14 @@ func link(
 
 			command, err := utils.PrepareCommandForRecipe(properties, "recipe.ar.pattern", false)
 			if err != nil {
-				return nil, errors.WithStack(err)
+				return errors.WithStack(err)
 			}
 
-			if verboseInfo, _, _, err := utils.ExecCommand(builderLogger.Verbose(), builderLogger.Stdout(), builderLogger.Stderr(), command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */); err != nil {
-				if builderLogger.Verbose() {
-					verboseBuffer.WriteString(string(verboseInfo))
+			if verboseInfo, _, _, err := utils.ExecCommand(b.logger.Verbose(), b.logger.Stdout(), b.logger.Stderr(), command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */); err != nil {
+				if b.logger.Verbose() {
+					b.logger.Info(string(verboseInfo))
 				}
-				return verboseBuffer.Bytes(), errors.WithStack(err)
+				return errors.WithStack(err)
 			}
 		}
 
@@ -117,21 +106,21 @@ func link(
 		objectFileList = "-Wl,--whole-archive " + objectFileList + " -Wl,--no-whole-archive"
 	}
 
-	properties := buildProperties.Clone()
+	properties := b.buildProperties.Clone()
 	properties.Set("compiler.c.elf.flags", properties.Get("compiler.c.elf.flags"))
-	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+builderLogger.WarningsLevel()))
+	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+b.logger.WarningsLevel()))
 	properties.Set("archive_file", coreDotARelPath.String())
 	properties.Set("archive_file_path", coreArchiveFilePath.String())
 	properties.Set("object_files", objectFileList)
 
 	command, err := utils.PrepareCommandForRecipe(properties, "recipe.c.combine.pattern", false)
 	if err != nil {
-		return verboseBuffer.Bytes(), err
+		return err
 	}
 
-	verboseInfo, _, _, err := utils.ExecCommand(builderLogger.Verbose(), builderLogger.Stdout(), builderLogger.Stderr(), command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
-	if builderLogger.Verbose() {
-		verboseBuffer.WriteString(string(verboseInfo))
+	verboseInfo, _, _, err := utils.ExecCommand(b.logger.Verbose(), b.logger.Stdout(), b.logger.Stderr(), command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+	if b.logger.Verbose() {
+		b.logger.Info(string(verboseInfo))
 	}
-	return verboseBuffer.Bytes(), err
+	return err
 }
