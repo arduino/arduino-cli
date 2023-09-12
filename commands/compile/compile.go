@@ -339,11 +339,9 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		exportBinaries = false
 	}
 	if exportBinaries {
-		err := builder.RecipeByPrefixSuffixRunner(
+		err := sketchBuilder.RunRecipe(
 			"recipe.hooks.savehex.presavehex", ".pattern", false,
 			builderCtx.OnlyUpdateCompilationDatabase,
-			sketchBuilder.GetBuildProperties(),
-			builderLogger,
 		)
 		if err != nil {
 			return r, err
@@ -383,10 +381,9 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 			}
 		}
 
-		err = builder.RecipeByPrefixSuffixRunner(
+		err = sketchBuilder.RunRecipe(
 			"recipe.hooks.savehex.postsavehex", ".pattern", false,
 			builderCtx.OnlyUpdateCompilationDatabase,
-			sketchBuilder.GetBuildProperties(), builderLogger,
 		)
 		if err != nil {
 			return r, err

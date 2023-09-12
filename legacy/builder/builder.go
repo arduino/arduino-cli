@@ -390,11 +390,9 @@ func logIfVerbose(warn bool, msg string) types.BareCommand {
 }
 
 func recipeByPrefixSuffixRunner(ctx *types.Context, prefix, suffix string, skipIfOnlyUpdatingCompilationDatabase bool) error {
-	return RecipeByPrefixSuffixRunner(
+	return ctx.Builder.RunRecipe(
 		prefix, suffix, skipIfOnlyUpdatingCompilationDatabase,
 		ctx.OnlyUpdateCompilationDatabase,
-		ctx.Builder.GetBuildProperties(),
-		ctx.BuilderLogger,
 	)
 }
 

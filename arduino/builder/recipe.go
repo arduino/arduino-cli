@@ -20,23 +20,21 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
-func RecipeByPrefixSuffixRunner(
+// RunRecipe fixdoc
+func (b *Builder) RunRecipe(
 	prefix, suffix string,
 	skipIfOnlyUpdatingCompilationDatabase, onlyUpdateCompilationDatabase bool,
-	buildProps *properties.Map,
-	builderLogger *logger.BuilderLogger,
 ) error {
 	logrus.Debugf(fmt.Sprintf("Looking for recipes like %s", prefix+"*"+suffix))
 
 	// TODO is it necessary to use Clone?
-	buildProperties := buildProps.Clone()
+	buildProperties := b.buildProperties.Clone()
 	recipes := findRecipes(buildProperties, prefix, suffix)
 
 	// TODO is it necessary to use Clone?
@@ -50,15 +48,15 @@ func RecipeByPrefixSuffixRunner(
 		}
 
 		if onlyUpdateCompilationDatabase && skipIfOnlyUpdatingCompilationDatabase {
-			if builderLogger.Verbose() {
-				builderLogger.Info(tr("Skipping: %[1]s", strings.Join(command.GetArgs(), " ")))
+			if b.logger.Verbose() {
+				b.logger.Info(tr("Skipping: %[1]s", strings.Join(command.GetArgs(), " ")))
 			}
 			return nil
 		}
 
-		verboseInfo, _, _, err := utils.ExecCommand(builderLogger.Verbose(), builderLogger.Stdout(), builderLogger.Stderr(), command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
-		if builderLogger.Verbose() {
-			builderLogger.Info(string(verboseInfo))
+		verboseInfo, _, _, err := utils.ExecCommand(b.logger.Verbose(), b.logger.Stdout(), b.logger.Stderr(), command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+		if b.logger.Verbose() {
+			b.logger.Info(string(verboseInfo))
 		}
 		if err != nil {
 			return errors.WithStack(err)
