@@ -208,6 +208,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		coreBuildCachePath,
 		int(req.GetJobs()),
 		req.GetBuildProperties(),
+		builderLogger,
 	)
 	if err != nil {
 		if strings.Contains(err.Error(), "invalid build properties") {

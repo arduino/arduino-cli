@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -45,6 +46,8 @@ type Builder struct {
 
 	// core related
 	coreBuildCachePath *paths.Path
+
+	logger *logger.BuilderLogger
 }
 
 // NewBuilder creates a sketch Builder.
@@ -56,6 +59,7 @@ func NewBuilder(
 	coreBuildCachePath *paths.Path,
 	jobs int,
 	requestBuildProperties []string,
+	logger *logger.BuilderLogger,
 ) (*Builder, error) {
 	buildProperties := properties.NewMap()
 	if boardBuildProperties != nil {
@@ -113,6 +117,7 @@ func NewBuilder(
 		jobs:                  jobs,
 		customBuildProperties: append(requestBuildProperties, "build.warn_data_percentage=75"),
 		coreBuildCachePath:    coreBuildCachePath,
+		logger:                logger,
 	}, nil
 }
 
