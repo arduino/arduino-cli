@@ -33,7 +33,7 @@ func TestSetupBuildProperties(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
 	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildProperties := ctx.BuildProperties
+	buildProperties := ctx.Builder.GetBuildProperties()
 
 	require.Equal(t, "ARDUINO", buildProperties.Get("software"))
 
@@ -81,9 +81,8 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	customBuildProp := []string{"name=fake name", "tools.avrdude.config.path=non existent path with space and a ="}
 	customProps, err := properties.LoadFromSlice(customBuildProp)
 	require.NoError(t, err)
-	ctx.BuildProperties.Merge(customProps)
 
-	buildProperties := ctx.BuildProperties
+	buildProperties := ctx.Builder.GetBuildProperties().Merge(customProps)
 	require.Equal(t, "ARDUINO", buildProperties.Get("software"))
 	require.Equal(t, "uno", buildProperties.Get("_id"))
 	require.Equal(t, "fake name", buildProperties.Get("name"))
@@ -99,7 +98,7 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "my_avr_platform:avr:custom_yun")
 	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildProperties := ctx.BuildProperties
+	buildProperties := ctx.Builder.GetBuildProperties()
 
 	require.Equal(t, "ARDUINO", buildProperties.Get("software"))
 
@@ -117,7 +116,7 @@ func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testi
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "my_avr_platform:avr:custom_yun")
 	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildProperties := ctx.BuildProperties
+	buildProperties := ctx.Builder.GetBuildProperties()
 
 	require.Equal(t, "ARDUINO", buildProperties.Get("software"))
 

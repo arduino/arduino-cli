@@ -115,7 +115,6 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 
 		ctx.PackageManager = pme
 		ctx.TargetBoard = targetBoard
-		ctx.BuildProperties = ctx.Builder.GetBuildProperties()
 		ctx.TargetPlatform = targetPlatform
 		ctx.TargetPackage = targetPackage
 		ctx.ActualPlatform = buildPlatform

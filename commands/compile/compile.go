@@ -183,8 +183,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		return nil, &arduino.InvalidArgumentError{Message: tr("Invalid build properties"), Cause: err}
 	}
 
-	buildProperties := sketchBuilder.GetBuildProperties()
-
 	requiredTools, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 	if err != nil {
 		return nil, err
@@ -198,7 +196,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.TargetPackage = targetPackage
 	builderCtx.ActualPlatform = buildPlatform
 	builderCtx.RequiredTools = requiredTools
-	builderCtx.BuildProperties = buildProperties
 	builderCtx.FQBN = fqbn
 	builderCtx.BuildPath = buildPath
 	builderCtx.ProgressCB = progressCB
@@ -277,7 +274,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	}()
 
 	defer func() {
-		buildProperties := builderCtx.BuildProperties
+		buildProperties := sketchBuilder.GetBuildProperties()
 		if buildProperties == nil {
 			return
 		}
@@ -321,7 +318,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	// if it's a regular build, go on...
 
 	if req.GetVerbose() {
-		core := buildProperties.Get("build.core")
+		core := sketchBuilder.GetBuildProperties().Get("build.core")
 		if core == "" {
 			core = "arduino"
 		}
@@ -340,7 +337,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	if !targetBoard.Properties.ContainsKey("build.board") {
 		outStream.Write([]byte(
 			tr("Warning: Board %[1]s doesn't define a %[2]s preference. Auto-set to: %[3]s",
-				targetBoard.String(), "'build.board'", buildProperties.Get("build.board")) + "\n"))
+				targetBoard.String(), "'build.board'", sketchBuilder.GetBuildProperties().Get("build.board")) + "\n"))
 	}
 
 	if err := builder.RunBuilder(builderCtx); err != nil {
@@ -359,7 +356,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		err := builder.RecipeByPrefixSuffixRunner(
 			"recipe.hooks.savehex.presavehex", ".pattern", false,
 			builderCtx.OnlyUpdateCompilationDatabase,
-			builderCtx.BuildProperties,
+			sketchBuilder.GetBuildProperties(),
 			builderLogger,
 		)
 		if err != nil {
@@ -380,7 +377,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		}
 
 		// Copy all "sketch.ino.*" artifacts to the export directory
-		baseName, ok := builderCtx.BuildProperties.GetOk("build.project_name") // == "sketch.ino"
+		baseName, ok := sketchBuilder.GetBuildProperties().GetOk("build.project_name") // == "sketch.ino"
 		if !ok {
 			return r, &arduino.MissingPlatformPropertyError{Property: "build.project_name"}
 		}
@@ -403,7 +400,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		err = builder.RecipeByPrefixSuffixRunner(
 			"recipe.hooks.savehex.postsavehex", ".pattern", false,
 			builderCtx.OnlyUpdateCompilationDatabase,
-			builderCtx.BuildProperties, builderLogger,
+			sketchBuilder.GetBuildProperties(), builderLogger,
 		)
 		if err != nil {
 			return r, err

@@ -39,7 +39,7 @@ func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
 		ctx.BuildPath,
 		ctx.BuildOptionsJson,
 		ctx.BuildOptionsJsonPrevious,
-		ctx.BuildProperties,
+		nil,
 	)
 	require.NoError(t, err)
 
@@ -71,7 +71,7 @@ func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.
 		ctx.BuildPath,
 		ctx.BuildOptionsJson,
 		ctx.BuildOptionsJsonPrevious,
-		ctx.BuildProperties,
+		nil,
 	)
 	require.NoError(t, err)
 

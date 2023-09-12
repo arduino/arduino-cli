@@ -72,7 +72,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		types.BareCommand(func(ctx *types.Context) error {
 			sketchObjectFiles, err := builder.SketchBuilder(
 				ctx.SketchBuildPath,
-				ctx.BuildProperties,
+				ctx.Builder.GetBuildProperties(),
 				ctx.SketchLibrariesDetector.IncludeFolders(),
 				ctx.OnlyUpdateCompilationDatabase,
 				ctx.CompilationDatabase,
@@ -106,7 +106,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		types.BareCommand(func(ctx *types.Context) error {
 			librariesObjectFiles, err := builder.LibrariesBuilder(
 				ctx.LibrariesBuildPath,
-				ctx.BuildProperties,
+				ctx.Builder.GetBuildProperties(),
 				ctx.SketchLibrariesDetector.IncludeFolders(),
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
 				ctx.OnlyUpdateCompilationDatabase,
@@ -134,7 +134,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		types.BareCommand(func(ctx *types.Context) error {
 			objectFiles, archiveFile, err := builder.CoreBuilder(
 				ctx.BuildPath, ctx.CoreBuildPath, ctx.Builder.CoreBuildCachePath(),
-				ctx.BuildProperties,
+				ctx.Builder.GetBuildProperties(),
 				ctx.ActualPlatform,
 				ctx.OnlyUpdateCompilationDatabase, ctx.Clean,
 				ctx.CompilationDatabase,
@@ -166,7 +166,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.CoreObjectsFiles,
 				ctx.CoreArchiveFilePath,
 				ctx.BuildPath,
-				ctx.BuildProperties,
+				ctx.Builder.GetBuildProperties(),
 				ctx.BuilderLogger,
 			)
 			if ctx.BuilderLogger.Verbose() {
@@ -192,7 +192,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		types.BareCommand(func(ctx *types.Context) error {
 			return MergeSketchWithBootloader(
 				ctx.OnlyUpdateCompilationDatabase,
-				ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
+				ctx.BuildPath, ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
 				ctx.BuilderLogger,
 			)
 		}),
@@ -238,7 +238,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				mainErr != nil,
 				ctx.BuildPath, ctx.SketchBuildPath,
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
-				ctx.BuildProperties,
+				ctx.Builder.GetBuildProperties(),
 				ctx.Builder.Sketch(),
 				ctx.SketchLibrariesDetector.IncludeFolders(),
 				ctx.LineOffset,
@@ -255,7 +255,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		types.BareCommand(func(ctx *types.Context) error {
 			executableSectionsSize, err := sizer.Size(
 				ctx.OnlyUpdateCompilationDatabase, mainErr != nil,
-				ctx.BuildProperties,
+				ctx.Builder.GetBuildProperties(),
 				ctx.BuilderLogger,
 			)
 			ctx.ExecutableSectionsSize = executableSectionsSize
@@ -284,7 +284,7 @@ func preprocessSketchCommand(ctx *types.Context) types.BareCommand {
 	return func(ctx *types.Context) error {
 		normalOutput, verboseOutput, err := PreprocessSketch(
 			ctx.Builder.Sketch(), ctx.BuildPath, ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset,
-			ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)
+			ctx.Builder.GetBuildProperties(), ctx.OnlyUpdateCompilationDatabase)
 		if ctx.BuilderLogger.Verbose() {
 			ctx.BuilderLogger.WriteStdout(verboseOutput)
 		} else {
@@ -376,12 +376,12 @@ func findIncludes(ctx *types.Context) types.BareCommand {
 	return types.BareCommand(func(ctx *types.Context) error {
 		return ctx.SketchLibrariesDetector.FindIncludes(
 			ctx.BuildPath,
-			ctx.BuildProperties.GetPath("build.core.path"),
-			ctx.BuildProperties.GetPath("build.variant.path"),
+			ctx.Builder.GetBuildProperties().GetPath("build.core.path"),
+			ctx.Builder.GetBuildProperties().GetPath("build.variant.path"),
 			ctx.SketchBuildPath,
 			ctx.Builder.Sketch(),
 			ctx.LibrariesBuildPath,
-			ctx.BuildProperties,
+			ctx.Builder.GetBuildProperties(),
 			ctx.TargetPlatform.Platform.Architecture,
 		)
 	})
@@ -405,7 +405,7 @@ func recipeByPrefixSuffixRunner(ctx *types.Context, prefix, suffix string, skipI
 	return RecipeByPrefixSuffixRunner(
 		prefix, suffix, skipIfOnlyUpdatingCompilationDatabase,
 		ctx.OnlyUpdateCompilationDatabase,
-		ctx.BuildProperties,
+		ctx.Builder.GetBuildProperties(),
 		ctx.BuilderLogger,
 	)
 }
@@ -413,11 +413,11 @@ func recipeByPrefixSuffixRunner(ctx *types.Context, prefix, suffix string, skipI
 func containerBuildOptions(ctx *types.Context) types.BareCommand {
 	return types.BareCommand(func(ctx *types.Context) error {
 		// TODO here we can pass only the properties we're reading from the
-		// ctx.BuildProperties
+		// ctx.Builder.GetBuildProperties()
 		buildOptionsJSON, buildOptionsJSONPrevious, infoMessage, err := ContainerBuildOptions(
 			ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
 			ctx.BuiltInLibrariesDirs, ctx.BuildPath, ctx.Builder.Sketch(), ctx.Builder.CustomBuildProperties(),
-			ctx.FQBN.String(), ctx.Clean, ctx.BuildProperties,
+			ctx.FQBN.String(), ctx.Clean, ctx.Builder.GetBuildProperties(),
 		)
 		if infoMessage != "" {
 			ctx.BuilderLogger.Info(infoMessage)
@@ -435,7 +435,7 @@ func containerBuildOptions(ctx *types.Context) types.BareCommand {
 
 func warnAboutArchIncompatibleLibraries(ctx *types.Context) types.BareCommand {
 	return types.BareCommand(func(ctx *types.Context) error {
-		overrides, _ := ctx.BuildProperties.GetOk("architecture.override_check")
+		overrides, _ := ctx.Builder.GetBuildProperties().GetOk("architecture.override_check")
 		WarnAboutArchIncompatibleLibraries(
 			ctx.TargetPlatform,
 			overrides,

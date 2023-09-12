@@ -29,21 +29,21 @@ import (
 
 func TestStoreBuildOptionsMap(t *testing.T) {
 	ctx := &types.Context{
-		HardwareDirs:          paths.NewPathList("hardware"),
-		BuiltInToolsDirs:      paths.NewPathList("tools"),
-		BuiltInLibrariesDirs:  paths.New("built-in libraries"),
-		OtherLibrariesDirs:    paths.NewPathList("libraries"),
-		FQBN:                  parseFQBN(t, "my:nice:fqbn"),
-		BuildProperties:       properties.NewFromHashmap(map[string]string{"compiler.optimization_flags": "-Os"}),
+		HardwareDirs:         paths.NewPathList("hardware"),
+		BuiltInToolsDirs:     paths.NewPathList("tools"),
+		BuiltInLibrariesDirs: paths.New("built-in libraries"),
+		OtherLibrariesDirs:   paths.NewPathList("libraries"),
+		FQBN:                 parseFQBN(t, "my:nice:fqbn"),
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
 
+	buildProperties := properties.NewFromHashmap(map[string]string{"compiler.optimization_flags": "-Os"})
 	buildPropertiesJSON, err := builder.CreateBuildOptionsMap(
 		ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
 		ctx.BuiltInLibrariesDirs, &sketch.Sketch{FullPath: paths.New("sketchLocation")}, []string{"custom=prop"},
-		ctx.FQBN.String(), ctx.BuildProperties.Get("compiler.optimization_flags"),
+		ctx.FQBN.String(), buildProperties.Get("compiler.optimization_flags"),
 	)
 	require.NoError(t, err)
 	ctx.BuildOptionsJson = buildPropertiesJSON

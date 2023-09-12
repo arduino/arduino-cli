@@ -73,7 +73,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 	builderLogger := logger.New(nil, nil, false, "")
 	err = builder.MergeSketchWithBootloader(
 		ctx.OnlyUpdateCompilationDatabase,
-		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
+		ctx.BuildPath, ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
 		builderLogger,
 	)
 	require.NoError(t, err)
@@ -130,7 +130,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	builderLogger := logger.New(nil, nil, false, "")
 	err = builder.MergeSketchWithBootloader(
 		ctx.OnlyUpdateCompilationDatabase,
-		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
+		ctx.BuildPath, ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
 		builderLogger,
 	)
 	require.NoError(t, err)
@@ -149,14 +149,14 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	defer cleanUpBuilderTestContext(t, ctx)
 
 	buildPath := ctx.BuildPath
-	buildProperties := ctx.BuildProperties
+	buildProperties := ctx.Builder.GetBuildProperties()
 	buildProperties.Remove(constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK)
 	buildProperties.Remove(constants.BUILD_PROPERTIES_BOOTLOADER_FILE)
 
 	builderLogger := logger.New(nil, nil, false, "")
 	err := builder.MergeSketchWithBootloader(
-		ctx.OnlyUpdateCompilationDatabase, 
-		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
+		ctx.OnlyUpdateCompilationDatabase,
+		ctx.BuildPath, ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
 		builderLogger,
 	)
 	require.NoError(t, err)
@@ -215,8 +215,8 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 
 	builderLogger := logger.New(nil, nil, false, "")
 	err = builder.MergeSketchWithBootloader(
-		ctx.OnlyUpdateCompilationDatabase, 
-		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
+		ctx.OnlyUpdateCompilationDatabase,
+		ctx.BuildPath, ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
 		builderLogger,
 	)
 	require.NoError(t, err)
