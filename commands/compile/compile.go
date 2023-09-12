@@ -208,6 +208,12 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		coreBuildCachePath,
 		int(req.GetJobs()),
 		req.GetBuildProperties(),
+		builderCtx.HardwareDirs,
+		builderCtx.BuiltInToolsDirs,
+		builderCtx.OtherLibrariesDirs,
+		builderCtx.BuiltInLibrariesDirs,
+		builderCtx.FQBN.String(),
+		builderCtx.Clean,
 		builderLogger,
 	)
 	if err != nil {

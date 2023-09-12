@@ -48,6 +48,16 @@ type Builder struct {
 	coreBuildCachePath *paths.Path
 
 	logger *logger.BuilderLogger
+
+	*BuildOptionsManager
+
+	hardwareDirs, builtInToolsDirs, otherLibrariesDirs paths.PathList
+	builtInLibrariesDirs                               *paths.Path
+	fqbn                                               string
+	clean                                              bool
+
+	compilerOptimizationFlags          string
+	runtimePlatformPath, buildCorePath *paths.Path
 }
 
 // NewBuilder creates a sketch Builder.
@@ -59,6 +69,10 @@ func NewBuilder(
 	coreBuildCachePath *paths.Path,
 	jobs int,
 	requestBuildProperties []string,
+	hardwareDirs, builtInToolsDirs, otherLibrariesDirs paths.PathList,
+	builtInLibrariesDirs *paths.Path,
+	fqbn string,
+	clean bool,
 	logger *logger.BuilderLogger,
 ) (*Builder, error) {
 	buildProperties := properties.NewMap()
@@ -89,6 +103,7 @@ func NewBuilder(
 		return nil, fmt.Errorf("invalid build properties: %w", err)
 	}
 	buildProperties.Merge(customBuildProperties)
+	customBuildPropertiesArgs := append(requestBuildProperties, "build.warn_data_percentage=75")
 
 	sketchBuildPath, err := buildPath.Join("sketch").Abs()
 	if err != nil {
@@ -115,9 +130,21 @@ func NewBuilder(
 		coreBuildPath:         coreBuildPath,
 		librariesBuildPath:    librariesBuildPath,
 		jobs:                  jobs,
-		customBuildProperties: append(requestBuildProperties, "build.warn_data_percentage=75"),
+		customBuildProperties: customBuildPropertiesArgs,
 		coreBuildCachePath:    coreBuildCachePath,
 		logger:                logger,
+		BuildOptionsManager: NewBuildOptionsManager(
+			hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
+			builtInLibrariesDirs, buildPath,
+			sk,
+			customBuildPropertiesArgs,
+			fqbn,
+			clean,
+			buildProperties.Get("compiler.optimization_flags"),
+			buildProperties.GetPath("runtime.platform.path"),
+			buildProperties.GetPath("build.core.path"), // TODO can we buildCorePath ?
+			logger,
+		),
 	}, nil
 }
 

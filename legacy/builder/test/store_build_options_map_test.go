@@ -18,15 +18,14 @@ package test
 import (
 	"testing"
 
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/sketch"
-	"github.com/arduino/arduino-cli/legacy/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
 )
 
-func TestStoreBuildOptionsMap(t *testing.T) {
+func TestCheckIfBuildOptionsChanged(t *testing.T) {
 	hardwareDirs := paths.NewPathList("hardware")
 	builtInToolsDirs := paths.NewPathList("tools")
 	builtInLibrariesDirs := paths.New("built-in libraries")
@@ -37,22 +36,24 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 	defer buildPath.RemoveAll()
 
 	buildProperties := properties.NewFromHashmap(map[string]string{"compiler.optimization_flags": "-Os"})
-	buildPropertiesJSON, err := builder.CreateBuildOptionsMap(
+	buildOptionsManager := builder.NewBuildOptionsManager(
 		hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
-		builtInLibrariesDirs, &sketch.Sketch{FullPath: paths.New("sketchLocation")}, []string{"custom=prop"},
-		fqbn.String(), buildProperties.Get("compiler.optimization_flags"),
+		builtInLibrariesDirs, buildPath, &sketch.Sketch{FullPath: paths.New("sketchLocation")}, []string{"custom=prop"},
+		fqbn.String(), false, 
+		buildProperties.Get("compiler.optimization_flags"),
+		buildProperties.GetPath("runtime.platform.path"),
+		buildProperties.GetPath("build.core.path"),
+		nil,
 	)
-	require.NoError(t, err)
-	buildOptionsJson := buildPropertiesJSON
 
-	err = builder.StoreBuildOptionsMap(buildPath, buildOptionsJson)
+	err := buildOptionsManager.WipeBuildPath()
 	require.NoError(t, err)
 
-	exist, err := buildPath.Join(constants.BUILD_OPTIONS_FILE).ExistCheck()
+	exist, err := buildPath.Join("build.options.json").ExistCheck()
 	require.NoError(t, err)
 	require.True(t, exist)
 
-	bytes, err := buildPath.Join(constants.BUILD_OPTIONS_FILE).ReadFile()
+	bytes, err := buildPath.Join("build.options.json").ReadFile()
 	require.NoError(t, err)
 
 	require.Equal(t, `{
@@ -67,3 +68,64 @@ func TestStoreBuildOptionsMap(t *testing.T) {
   "sketchLocation": "sketchLocation"
 }`, string(bytes))
 }
+
+//func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
+//	buildPath := SetupBuildPath(t)
+//	defer buildPath.RemoveAll()
+//
+//	buildOptionsJsonPrevious := "{ \"old\":\"old\" }"
+//	buildOptionsJson := "{ \"new\":\"new\" }"
+//
+//	buildPath.Join("should_be_deleted.txt").Truncate()
+//
+//	_, err := builder.WipeoutBuildPathIfBuildOptionsChanged(
+//		false,
+//		buildPath,
+//		buildOptionsJson,
+//		buildOptionsJsonPrevious,
+//		nil,
+//	)
+//	require.NoError(t, err)
+//
+//	exist, err := buildPath.ExistCheck()
+//	require.NoError(t, err)
+//	require.True(t, exist)
+//
+//	files, err := buildPath.ReadDir()
+//	require.NoError(t, err)
+//	require.Equal(t, 0, len(files))
+//
+//	exist, err = buildPath.Join("should_be_deleted.txt").ExistCheck()
+//	require.NoError(t, err)
+//	require.False(t, exist)
+//}
+//
+//func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.T) {
+//	buildPath := SetupBuildPath(t)
+//	defer buildPath.RemoveAll()
+//
+//	buildOptionsJson := "{ \"new\":\"new\" }"
+//
+//	require.NoError(t, buildPath.Join("should_not_be_deleted.txt").Truncate())
+//
+//	_, err := builder.WipeoutBuildPathIfBuildOptionsChanged(
+//		false,
+//		buildPath,
+//		buildOptionsJson,
+//		"",
+//		nil,
+//	)
+//	require.NoError(t, err)
+//
+//	exist, err := buildPath.ExistCheck()
+//	require.NoError(t, err)
+//	require.True(t, exist)
+//
+//	files, err := buildPath.ReadDir()
+//	require.NoError(t, err)
+//	require.Equal(t, 1, len(files))
+//
+//	exist, err = buildPath.Join("should_not_be_deleted.txt").ExistCheck()
+//	require.NoError(t, err)
+//	require.True(t, exist)
+//}

@@ -408,24 +408,7 @@ func recipeByPrefixSuffixRunner(ctx *types.Context, prefix, suffix string, skipI
 
 func containerBuildOptions(ctx *types.Context) types.BareCommand {
 	return types.BareCommand(func(ctx *types.Context) error {
-		// TODO here we can pass only the properties we're reading from the
-		// ctx.Builder.GetBuildProperties()
-		buildOptionsJSON, buildOptionsJSONPrevious, infoMessage, err := ContainerBuildOptions(
-			ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
-			ctx.BuiltInLibrariesDirs, ctx.Builder.GetBuildPath(), ctx.Builder.Sketch(), ctx.Builder.CustomBuildProperties(),
-			ctx.FQBN.String(), ctx.Clean, ctx.Builder.GetBuildProperties(),
-		)
-		if infoMessage != "" {
-			ctx.BuilderLogger.Info(infoMessage)
-		}
-		if err != nil {
-			return err
-		}
-
-		ctx.BuildOptionsJson = buildOptionsJSON
-		ctx.BuildOptionsJsonPrevious = buildOptionsJSONPrevious
-
-		return nil
+		return ctx.Builder.BuildOptionsManager.WipeBuildPath()
 	})
 }
 

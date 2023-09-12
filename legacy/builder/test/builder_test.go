@@ -103,7 +103,11 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 
 	builderLogger := logger.New(nil, nil, false, "")
 	ctx.BuilderLogger = builderLogger
-	ctx.Builder, err = bldr.NewBuilder(sk, nil, buildPath, false, nil, 0, nil, builderLogger)
+	ctx.Builder, err = bldr.NewBuilder(
+		sk, nil, buildPath, false, nil, 0, nil,
+		ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
+		ctx.BuiltInLibrariesDirs, fqbn, ctx.Clean, builderLogger,
+	)
 	require.NoError(t, err)
 	if fqbn != "" {
 		ctx.FQBN = parseFQBN(t, fqbn)
@@ -112,7 +116,10 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		requiredTools, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 		require.NoError(t, err)
 
-		ctx.Builder, err = bldr.NewBuilder(sk, boardBuildProperties, buildPath, false /*OptimizeForDebug*/, nil, 0, nil, builderLogger)
+		ctx.Builder, err = bldr.NewBuilder(
+			sk, boardBuildProperties, buildPath, false, nil, 0, nil,
+			ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
+			ctx.BuiltInLibrariesDirs, fqbn, ctx.Clean, builderLogger)
 		require.NoError(t, err)
 
 		ctx.PackageManager = pme

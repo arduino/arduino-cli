@@ -42,10 +42,6 @@ type Context struct {
 	FQBN                 *cores.FQBN
 	Clean                bool
 
-	// Build options are serialized here
-	BuildOptionsJson         string
-	BuildOptionsJsonPrevious string
-
 	PackageManager *packagemanager.Explorer
 	RequiredTools  []*cores.ToolRelease
 	TargetBoard    *cores.Board
