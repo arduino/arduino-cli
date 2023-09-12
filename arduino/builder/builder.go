@@ -28,6 +28,8 @@ type Builder struct {
 	sketch          *sketch.Sketch
 	buildProperties *properties.Map
 
+	buildPath *paths.Path
+
 	// Parallel processes
 	jobs int
 
@@ -83,6 +85,7 @@ func NewBuilder(
 		coreBuildCachePath:    coreBuildCachePath,
 		jobs:                  jobs,
 		customBuildProperties: append(requestBuildProperties, "build.warn_data_percentage=75"),
+		buildPath:             buildPath,
 	}, nil
 }
 
@@ -99,4 +102,9 @@ func (b *Builder) Jobs() int {
 // CustomBuildProperties returns user provided custom build properties
 func (b *Builder) CustomBuildProperties() []string {
 	return b.customBuildProperties
+}
+
+// GetBuildPath returns the build path
+func (b *Builder) GetBuildPath() *paths.Path {
+	return b.buildPath
 }

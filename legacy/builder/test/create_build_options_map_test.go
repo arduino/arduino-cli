@@ -32,7 +32,6 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 		BuiltInToolsDirs:   paths.NewPathList("tools"),
 		OtherLibrariesDirs: paths.NewPathList("libraries"),
 		FQBN:               parseFQBN(t, "my:nice:fqbn"),
-		BuildPath:          paths.New("buildPath"),
 	}
 
 	buildProperties := properties.NewFromHashmap(map[string]string{"compiler.optimization_flags": "-Os"})

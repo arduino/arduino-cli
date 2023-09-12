@@ -197,7 +197,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.ActualPlatform = buildPlatform
 	builderCtx.RequiredTools = requiredTools
 	builderCtx.FQBN = fqbn
-	builderCtx.BuildPath = buildPath
 	builderCtx.ProgressCB = progressCB
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
@@ -207,7 +206,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
 
 	builderCtx.CompilationDatabase = compilation.NewDatabase(
-		builderCtx.BuildPath.Join("compile_commands.json"),
+		sketchBuilder.GetBuildPath().Join("compile_commands.json"),
 	)
 
 	builderCtx.BuiltInLibrariesDirs = configuration.IDEBuiltinLibrariesDir(configuration.Settings)
@@ -235,7 +234,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.LibrariesBuildPath = librariesBuildPath
 	builderCtx.CoreBuildPath = coreBuildPath
 
-	if builderCtx.BuildPath.Canonical().EqualsTo(sk.FullPath.Canonical()) {
+	if sketchBuilder.GetBuildPath().Canonical().EqualsTo(sk.FullPath.Canonical()) {
 		return r, &arduino.CompileFailedError{
 			Message: tr("Sketch cannot be located in build path. Please specify a different build path"),
 		}
@@ -268,7 +267,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	)
 
 	defer func() {
-		if p := builderCtx.BuildPath; p != nil {
+		if p := sketchBuilder.GetBuildPath(); p != nil {
 			r.BuildPath = p.String()
 		}
 	}()
@@ -381,7 +380,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		if !ok {
 			return r, &arduino.MissingPlatformPropertyError{Property: "build.project_name"}
 		}
-		buildFiles, err := builderCtx.BuildPath.ReadDir()
+		buildFiles, err := sketchBuilder.GetBuildPath().ReadDir()
 		if err != nil {
 			return r, &arduino.PermissionDeniedError{Message: tr("Error reading build directory"), Cause: err}
 		}

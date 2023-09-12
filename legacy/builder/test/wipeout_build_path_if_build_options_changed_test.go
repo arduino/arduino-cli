@@ -19,26 +19,23 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/legacy/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/stretchr/testify/require"
 )
 
 func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
-	ctx := &types.Context{}
-
-	buildPath := SetupBuildPath(t, ctx)
+	buildPath := SetupBuildPath(t)
 	defer buildPath.RemoveAll()
 
-	ctx.BuildOptionsJsonPrevious = "{ \"old\":\"old\" }"
-	ctx.BuildOptionsJson = "{ \"new\":\"new\" }"
+	buildOptionsJsonPrevious := "{ \"old\":\"old\" }"
+	buildOptionsJson := "{ \"new\":\"new\" }"
 
 	buildPath.Join("should_be_deleted.txt").Truncate()
 
 	_, err := builder.WipeoutBuildPathIfBuildOptionsChanged(
-		ctx.Clean,
-		ctx.BuildPath,
-		ctx.BuildOptionsJson,
-		ctx.BuildOptionsJsonPrevious,
+		false,
+		buildPath,
+		buildOptionsJson,
+		buildOptionsJsonPrevious,
 		nil,
 	)
 	require.NoError(t, err)
@@ -57,20 +54,18 @@ func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
 }
 
 func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.T) {
-	ctx := &types.Context{}
-
-	buildPath := SetupBuildPath(t, ctx)
+	buildPath := SetupBuildPath(t)
 	defer buildPath.RemoveAll()
 
-	ctx.BuildOptionsJson = "{ \"new\":\"new\" }"
+	buildOptionsJson := "{ \"new\":\"new\" }"
 
 	require.NoError(t, buildPath.Join("should_not_be_deleted.txt").Truncate())
 
 	_, err := builder.WipeoutBuildPathIfBuildOptionsChanged(
-		ctx.Clean,
-		ctx.BuildPath,
-		ctx.BuildOptionsJson,
-		ctx.BuildOptionsJsonPrevious,
+		false,
+		buildPath,
+		buildOptionsJson,
+		"",
 		nil,
 	)
 	require.NoError(t, err)

@@ -33,7 +33,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
 	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := ctx.BuildPath
+	buildPath := ctx.Builder.GetBuildPath()
 	err := buildPath.Join("sketch").MkdirAll()
 	require.NoError(t, err)
 
@@ -73,7 +73,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 	builderLogger := logger.New(nil, nil, false, "")
 	err = builder.MergeSketchWithBootloader(
 		ctx.OnlyUpdateCompilationDatabase,
-		ctx.BuildPath, ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
+		ctx.Builder.GetBuildPath(), ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
 		builderLogger,
 	)
 	require.NoError(t, err)
@@ -90,7 +90,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
 	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := ctx.BuildPath
+	buildPath := ctx.Builder.GetBuildPath()
 	err := buildPath.Join("sketch").MkdirAll()
 	require.NoError(t, err)
 
@@ -130,7 +130,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	builderLogger := logger.New(nil, nil, false, "")
 	err = builder.MergeSketchWithBootloader(
 		ctx.OnlyUpdateCompilationDatabase,
-		ctx.BuildPath, ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
+		ctx.Builder.GetBuildPath(), ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
 		builderLogger,
 	)
 	require.NoError(t, err)
@@ -148,7 +148,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	ctx := prepareBuilderTestContext(t, nil, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
 	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := ctx.BuildPath
+	buildPath := ctx.Builder.GetBuildPath()
 	buildProperties := ctx.Builder.GetBuildProperties()
 	buildProperties.Remove(constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK)
 	buildProperties.Remove(constants.BUILD_PROPERTIES_BOOTLOADER_FILE)
@@ -156,7 +156,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	builderLogger := logger.New(nil, nil, false, "")
 	err := builder.MergeSketchWithBootloader(
 		ctx.OnlyUpdateCompilationDatabase,
-		ctx.BuildPath, ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
+		ctx.Builder.GetBuildPath(), ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
 		builderLogger,
 	)
 	require.NoError(t, err)
@@ -176,7 +176,7 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "my_avr_platform:avr:mymega:cpu=atmega2560")
 	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildPath := ctx.BuildPath
+	buildPath := ctx.Builder.GetBuildPath()
 	err := buildPath.Join("sketch").MkdirAll()
 	require.NoError(t, err)
 
@@ -216,7 +216,7 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 	builderLogger := logger.New(nil, nil, false, "")
 	err = builder.MergeSketchWithBootloader(
 		ctx.OnlyUpdateCompilationDatabase,
-		ctx.BuildPath, ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
+		ctx.Builder.GetBuildPath(), ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
 		builderLogger,
 	)
 	require.NoError(t, err)

@@ -21,34 +21,31 @@ import (
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
 )
 
 func TestStoreBuildOptionsMap(t *testing.T) {
-	ctx := &types.Context{
-		HardwareDirs:         paths.NewPathList("hardware"),
-		BuiltInToolsDirs:     paths.NewPathList("tools"),
-		BuiltInLibrariesDirs: paths.New("built-in libraries"),
-		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		FQBN:                 parseFQBN(t, "my:nice:fqbn"),
-	}
+	hardwareDirs := paths.NewPathList("hardware")
+	builtInToolsDirs := paths.NewPathList("tools")
+	builtInLibrariesDirs := paths.New("built-in libraries")
+	otherLibrariesDirs := paths.NewPathList("libraries")
+	fqbn := parseFQBN(t, "my:nice:fqbn")
 
-	buildPath := SetupBuildPath(t, ctx)
+	buildPath := SetupBuildPath(t)
 	defer buildPath.RemoveAll()
 
 	buildProperties := properties.NewFromHashmap(map[string]string{"compiler.optimization_flags": "-Os"})
 	buildPropertiesJSON, err := builder.CreateBuildOptionsMap(
-		ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
-		ctx.BuiltInLibrariesDirs, &sketch.Sketch{FullPath: paths.New("sketchLocation")}, []string{"custom=prop"},
-		ctx.FQBN.String(), buildProperties.Get("compiler.optimization_flags"),
+		hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
+		builtInLibrariesDirs, &sketch.Sketch{FullPath: paths.New("sketchLocation")}, []string{"custom=prop"},
+		fqbn.String(), buildProperties.Get("compiler.optimization_flags"),
 	)
 	require.NoError(t, err)
-	ctx.BuildOptionsJson = buildPropertiesJSON
+	buildOptionsJson := buildPropertiesJSON
 
-	err = builder.StoreBuildOptionsMap(ctx.BuildPath, ctx.BuildOptionsJson)
+	err = builder.StoreBuildOptionsMap(buildPath, buildOptionsJson)
 	require.NoError(t, err)
 
 	exist, err := buildPath.Join(constants.BUILD_OPTIONS_FILE).ExistCheck()

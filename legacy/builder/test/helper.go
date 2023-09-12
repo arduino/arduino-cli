@@ -21,7 +21,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
@@ -32,10 +31,9 @@ func Abs(t *testing.T, rel *paths.Path) *paths.Path {
 	return absPath
 }
 
-func SetupBuildPath(t *testing.T, ctx *types.Context) *paths.Path {
+func SetupBuildPath(t *testing.T) *paths.Path {
 	buildPath, err := paths.MkTempDir("", "test_build_path")
 	require.NoError(t, err)
-	ctx.BuildPath = buildPath
 	return buildPath
 }
 

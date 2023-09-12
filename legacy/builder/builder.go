@@ -38,7 +38,7 @@ const DEFAULT_DEBUG_LEVEL = 5
 type Builder struct{}
 
 func (s *Builder) Run(ctx *types.Context) error {
-	if err := ctx.BuildPath.MkdirAll(); err != nil {
+	if err := ctx.Builder.GetBuildPath().MkdirAll(); err != nil {
 		return err
 	}
 
@@ -133,7 +133,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		types.BareCommand(func(ctx *types.Context) error {
 			objectFiles, archiveFile, err := builder.CoreBuilder(
-				ctx.BuildPath, ctx.CoreBuildPath, ctx.Builder.CoreBuildCachePath(),
+				ctx.Builder.GetBuildPath(), ctx.CoreBuildPath, ctx.Builder.CoreBuildCachePath(),
 				ctx.Builder.GetBuildProperties(),
 				ctx.ActualPlatform,
 				ctx.OnlyUpdateCompilationDatabase, ctx.Clean,
@@ -165,7 +165,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.LibrariesObjectFiles,
 				ctx.CoreObjectsFiles,
 				ctx.CoreArchiveFilePath,
-				ctx.BuildPath,
+				ctx.Builder.GetBuildPath(),
 				ctx.Builder.GetBuildProperties(),
 				ctx.BuilderLogger,
 			)
@@ -192,7 +192,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		types.BareCommand(func(ctx *types.Context) error {
 			return MergeSketchWithBootloader(
 				ctx.OnlyUpdateCompilationDatabase,
-				ctx.BuildPath, ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
+				ctx.Builder.GetBuildPath(), ctx.Builder.Sketch(), ctx.Builder.GetBuildProperties(),
 				ctx.BuilderLogger,
 			)
 		}),
@@ -236,7 +236,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		types.BareCommand(func(ctx *types.Context) error {
 			normalOutput, verboseOutput, err := ExportProjectCMake(
 				mainErr != nil,
-				ctx.BuildPath, ctx.SketchBuildPath,
+				ctx.Builder.GetBuildPath(), ctx.SketchBuildPath,
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
 				ctx.Builder.GetBuildProperties(),
 				ctx.Builder.Sketch(),
@@ -283,7 +283,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 func preprocessSketchCommand(ctx *types.Context) types.BareCommand {
 	return func(ctx *types.Context) error {
 		normalOutput, verboseOutput, err := PreprocessSketch(
-			ctx.Builder.Sketch(), ctx.BuildPath, ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset,
+			ctx.Builder.Sketch(), ctx.Builder.GetBuildPath(), ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset,
 			ctx.Builder.GetBuildProperties(), ctx.OnlyUpdateCompilationDatabase)
 		if ctx.BuilderLogger.Verbose() {
 			ctx.BuilderLogger.WriteStdout(verboseOutput)
@@ -306,7 +306,7 @@ func PreprocessSketch(
 type Preprocess struct{}
 
 func (s *Preprocess) Run(ctx *types.Context) error {
-	if err := ctx.BuildPath.MkdirAll(); err != nil {
+	if err := ctx.Builder.GetBuildPath().MkdirAll(); err != nil {
 		return err
 	}
 
@@ -375,7 +375,7 @@ func RunPreprocess(ctx *types.Context) error {
 func findIncludes(ctx *types.Context) types.BareCommand {
 	return types.BareCommand(func(ctx *types.Context) error {
 		return ctx.SketchLibrariesDetector.FindIncludes(
-			ctx.BuildPath,
+			ctx.Builder.GetBuildPath(),
 			ctx.Builder.GetBuildProperties().GetPath("build.core.path"),
 			ctx.Builder.GetBuildProperties().GetPath("build.variant.path"),
 			ctx.SketchBuildPath,
@@ -416,7 +416,7 @@ func containerBuildOptions(ctx *types.Context) types.BareCommand {
 		// ctx.Builder.GetBuildProperties()
 		buildOptionsJSON, buildOptionsJSONPrevious, infoMessage, err := ContainerBuildOptions(
 			ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
-			ctx.BuiltInLibrariesDirs, ctx.BuildPath, ctx.Builder.Sketch(), ctx.Builder.CustomBuildProperties(),
+			ctx.BuiltInLibrariesDirs, ctx.Builder.GetBuildPath(), ctx.Builder.Sketch(), ctx.Builder.CustomBuildProperties(),
 			ctx.FQBN.String(), ctx.Clean, ctx.Builder.GetBuildProperties(),
 		)
 		if infoMessage != "" {

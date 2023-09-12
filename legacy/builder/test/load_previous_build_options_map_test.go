@@ -20,32 +20,27 @@ import (
 
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/stretchr/testify/require"
 )
 
 func TestLoadPreviousBuildOptionsMap(t *testing.T) {
-	ctx := &types.Context{}
-
-	buildPath := SetupBuildPath(t, ctx)
+	buildPath := SetupBuildPath(t)
 	defer buildPath.RemoveAll()
 
 	err := buildPath.Join(constants.BUILD_OPTIONS_FILE).WriteFile([]byte("test"))
 	require.NoError(t, err)
 
-	buildOptionsJsonPrevious, err := builder.LoadPreviousBuildOptionsMap(ctx.BuildPath)
+	buildOptionsJsonPrevious, err := builder.LoadPreviousBuildOptionsMap(buildPath)
 	require.NoError(t, err)
 
 	require.Equal(t, "test", buildOptionsJsonPrevious)
 }
 
 func TestLoadPreviousBuildOptionsMapMissingFile(t *testing.T) {
-	ctx := &types.Context{}
-
-	buildPath := SetupBuildPath(t, ctx)
+	buildPath := SetupBuildPath(t)
 	defer buildPath.RemoveAll()
 
-	buildOptionsJsonPrevious, err := builder.LoadPreviousBuildOptionsMap(ctx.BuildPath)
+	buildOptionsJsonPrevious, err := builder.LoadPreviousBuildOptionsMap(buildPath)
 	require.NoError(t, err)
 	require.Empty(t, buildOptionsJsonPrevious)
 }

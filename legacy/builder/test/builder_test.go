@@ -32,9 +32,8 @@ import (
 )
 
 func cleanUpBuilderTestContext(t *testing.T, ctx *types.Context) {
-	if ctx.BuildPath != nil {
-		err := ctx.BuildPath.RemoveAll()
-		require.NoError(t, err)
+	if ctx.Builder.GetBuildPath() != nil {
+		require.NoError(t, ctx.Builder.GetBuildPath().RemoveAll())
 	}
 }
 
@@ -59,13 +58,9 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		ctx.BuiltInLibrariesDirs = paths.New("downloaded_libraries")
 		ctx.OtherLibrariesDirs = paths.NewPathList("libraries")
 	}
-	if ctx.BuildPath == nil {
-		buildPath, err := paths.MkTempDir("", "test_build_path")
-		require.NoError(t, err)
-		ctx.BuildPath = buildPath
-	}
 
-	buildPath := ctx.BuildPath
+	buildPath, err := paths.MkTempDir("", "test_build_path")
+	require.NoError(t, err)
 	sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
 	require.NoError(t, err)
 	librariesBuildPath, err := buildPath.Join(constants.FOLDER_LIBRARIES).Abs()
@@ -110,7 +105,7 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		requiredTools, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 		require.NoError(t, err)
 
-		ctx.Builder, err = bldr.NewBuilder(sk, boardBuildProperties, ctx.BuildPath, false /*OptimizeForDebug*/, nil, 0, nil)
+		ctx.Builder, err = bldr.NewBuilder(sk, boardBuildProperties, buildPath, false /*OptimizeForDebug*/, nil, 0, nil)
 		require.NoError(t, err)
 
 		ctx.PackageManager = pme
@@ -122,7 +117,7 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 	}
 
 	if sk != nil {
-		require.False(t, ctx.BuildPath.Canonical().EqualsTo(sk.FullPath.Canonical()))
+		require.False(t, ctx.Builder.GetBuildPath().Canonical().EqualsTo(sk.FullPath.Canonical()))
 	}
 
 	if !stepToSkip[skipLibraries] {
