@@ -37,20 +37,20 @@ var (
 )
 
 // BuildLibraries fixdoc
-func (b *Builder) BuildLibraries(includesFolders paths.PathList, importedLibraries libraries.List) (paths.PathList, error) {
+func (b *Builder) BuildLibraries(includesFolders paths.PathList, importedLibraries libraries.List) error {
 	includes := f.Map(includesFolders.AsStrings(), cpp.WrapWithHyphenI)
 	libs := importedLibraries
 
 	if err := b.librariesBuildPath.MkdirAll(); err != nil {
-		return nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
 
 	librariesObjectFiles, err := b.compileLibraries(libs, includes)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
-
-	return librariesObjectFiles, nil
+	b.buildArtifacts.librariesObjectFiles = librariesObjectFiles
+	return nil
 }
 
 func directoryContainsFile(folder *paths.Path) bool {

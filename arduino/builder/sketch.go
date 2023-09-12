@@ -181,11 +181,11 @@ func writeIfDifferent(source []byte, destPath *paths.Path) error {
 }
 
 // BuildSketch fixdoc
-func (b *Builder) BuildSketch(includesFolders paths.PathList) (paths.PathList, error) {
+func (b *Builder) BuildSketch(includesFolders paths.PathList) error {
 	includes := f.Map(includesFolders.AsStrings(), cpp.WrapWithHyphenI)
 
 	if err := b.sketchBuildPath.MkdirAll(); err != nil {
-		return nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
 
 	sketchObjectFiles, err := utils.CompileFiles(
@@ -197,7 +197,7 @@ func (b *Builder) BuildSketch(includesFolders paths.PathList) (paths.PathList, e
 		b.Progress,
 	)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
 
 	// The "src/" subdirectory of a sketch is compiled recursively
@@ -212,12 +212,13 @@ func (b *Builder) BuildSketch(includesFolders paths.PathList) (paths.PathList, e
 			b.Progress,
 		)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return errors.WithStack(err)
 		}
 		sketchObjectFiles.AddAll(srcObjectFiles)
 	}
 
-	return sketchObjectFiles, nil
+	b.buildArtifacts.sketchObjectFiles = sketchObjectFiles
+	return nil
 }
 
 // MergeSketchWithBootloader fixdoc

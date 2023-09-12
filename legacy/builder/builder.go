@@ -63,12 +63,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			sketchObjectFiles, err := ctx.Builder.BuildSketch(ctx.SketchLibrariesDetector.IncludeFolders())
-			if err != nil {
-				return err
-			}
-			ctx.SketchObjectFiles = sketchObjectFiles
-			return nil
+			return ctx.Builder.BuildSketch(ctx.SketchLibrariesDetector.IncludeFolders())
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
@@ -87,16 +82,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			librariesObjectFiles, err := ctx.Builder.BuildLibraries(
-				ctx.SketchLibrariesDetector.IncludeFolders(),
-				ctx.SketchLibrariesDetector.ImportedLibraries(),
-			)
-			if err != nil {
-				return err
-			}
-			ctx.LibrariesObjectFiles = librariesObjectFiles
-
-			return nil
+			return ctx.Builder.BuildLibraries(ctx.SketchLibrariesDetector.IncludeFolders(), ctx.SketchLibrariesDetector.ImportedLibraries())
 		}),
 		types.BareCommand(func(ctx *types.Context) error {
 			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.libraries.postbuild", ".pattern", true)
@@ -108,12 +94,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			objectFiles, archiveFile, err := ctx.Builder.BuildCore(ctx.ActualPlatform)
-
-			ctx.CoreObjectsFiles = objectFiles
-			ctx.CoreArchiveFilePath = archiveFile
-
-			return err
+			return ctx.Builder.BuildCore(ctx.ActualPlatform)
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
@@ -126,12 +107,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			return ctx.Builder.Link(
-				ctx.SketchObjectFiles,
-				ctx.LibrariesObjectFiles,
-				ctx.CoreObjectsFiles,
-				ctx.CoreArchiveFilePath,
-			)
+			return ctx.Builder.Link()
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {

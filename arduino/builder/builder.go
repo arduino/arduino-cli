@@ -72,7 +72,22 @@ type Builder struct {
 	// C++ Parsing
 	lineOffset int
 
+	buildArtifacts *BuildArtifacts
+
 	*BuildOptionsManager
+}
+
+// BuildArtifacts contains the result of various build
+type BuildArtifacts struct {
+	// populated by BuildCore
+	coreArchiveFilePath *paths.Path
+	coreObjectsFiles    paths.PathList
+
+	// populated by BuildLibraries
+	librariesObjectFiles paths.PathList
+
+	// populated by BuildSketch
+	sketchObjectFiles paths.PathList
 }
 
 // NewBuilder creates a sketch Builder.
@@ -160,6 +175,8 @@ func NewBuilder(
 		onlyUpdateCompilationDatabase: onlyUpdateCompilationDatabase,
 		compilationDatabase:           compilation.NewDatabase(buildPath.Join("compile_commands.json")),
 		Progress:                      progressStats,
+		executableSectionsSize:        []ExecutableSectionSize{},
+		buildArtifacts:                &BuildArtifacts{},
 		BuildOptionsManager: NewBuildOptionsManager(
 			hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
 			builtInLibrariesDirs, buildPath,

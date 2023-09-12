@@ -25,7 +25,7 @@ import (
 )
 
 // Link fixdoc
-func (b *Builder) Link(sketchObjectFiles, librariesObjectFiles, coreObjectsFiles paths.PathList, coreArchiveFilePath *paths.Path) error {
+func (b *Builder) Link() error {
 	if b.onlyUpdateCompilationDatabase {
 		if b.logger.Verbose() {
 			b.logger.Info(tr("Skip linking of final executable."))
@@ -34,21 +34,21 @@ func (b *Builder) Link(sketchObjectFiles, librariesObjectFiles, coreObjectsFiles
 	}
 
 	// TODO can we remove this multiple assignations?
-	objectFilesSketch := sketchObjectFiles
-	objectFilesLibraries := librariesObjectFiles
-	objectFilesCore := coreObjectsFiles
+	objectFilesSketch := b.buildArtifacts.sketchObjectFiles
+	objectFilesLibraries := b.buildArtifacts.librariesObjectFiles
+	objectFilesCore := b.buildArtifacts.coreObjectsFiles
 
 	objectFiles := paths.NewPathList()
 	objectFiles.AddAll(objectFilesSketch)
 	objectFiles.AddAll(objectFilesLibraries)
 	objectFiles.AddAll(objectFilesCore)
 
-	coreDotARelPath, err := b.buildPath.RelTo(coreArchiveFilePath)
+	coreDotARelPath, err := b.buildPath.RelTo(b.buildArtifacts.coreArchiveFilePath)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	if err := b.link(objectFiles, coreDotARelPath, coreArchiveFilePath); err != nil {
+	if err := b.link(objectFiles, coreDotARelPath, b.buildArtifacts.coreArchiveFilePath); err != nil {
 		return errors.WithStack(err)
 	}
 

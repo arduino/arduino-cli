@@ -39,9 +39,4 @@ type Context struct {
 	PackageManager *packagemanager.Explorer
 	TargetPlatform *cores.PlatformRelease
 	ActualPlatform *cores.PlatformRelease
-
-	CoreArchiveFilePath  *paths.Path
-	CoreObjectsFiles     paths.PathList
-	LibrariesObjectFiles paths.PathList
-	SketchObjectFiles    paths.PathList
 }

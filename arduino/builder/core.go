@@ -32,9 +32,9 @@ import (
 )
 
 // BuildCore fixdoc
-func (b *Builder) BuildCore(actualPlatform *cores.PlatformRelease) (paths.PathList, *paths.Path, error) {
+func (b *Builder) BuildCore(actualPlatform *cores.PlatformRelease) error {
 	if err := b.coreBuildPath.MkdirAll(); err != nil {
-		return nil, nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
 
 	if b.coreBuildCachePath != nil {
@@ -45,16 +45,17 @@ func (b *Builder) BuildCore(actualPlatform *cores.PlatformRelease) (paths.PathLi
 			// compileCore function).
 			b.coreBuildCachePath = nil
 		} else if err := b.coreBuildCachePath.MkdirAll(); err != nil {
-			return nil, nil, errors.WithStack(err)
+			return errors.WithStack(err)
 		}
 	}
 
 	archiveFile, objectFiles, err := b.compileCore(actualPlatform)
 	if err != nil {
-		return nil, nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
-
-	return objectFiles, archiveFile, nil
+	b.buildArtifacts.coreObjectsFiles = objectFiles
+	b.buildArtifacts.coreArchiveFilePath = archiveFile
+	return nil
 }
 
 func (b *Builder) compileCore(actualPlatform *cores.PlatformRelease) (*paths.Path, paths.PathList, error) {
