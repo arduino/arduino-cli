@@ -17,6 +17,7 @@ package builder
 
 import (
 	"strings"
+	"time"
 
 	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
@@ -342,4 +343,37 @@ func (b *Builder) WarnAboutArchIncompatibleLibraries(
 					strings.Join(archs, ", ")))
 		}
 	}
+}
+
+// PrintUsedLibraries fixdoc
+// TODO here we can completly remove this part as it's duplicated in what we can
+// read in the gRPC response
+func (b *Builder) PrintUsedLibraries(importedLibraries libraries.List) {
+	if !b.logger.Verbose() || len(importedLibraries) == 0 {
+		return
+	}
+
+	for _, library := range importedLibraries {
+		legacy := ""
+		if library.IsLegacy {
+			legacy = tr("(legacy)")
+		}
+		if library.Version.String() == "" {
+			b.logger.Info(
+				tr("Using library %[1]s in folder: %[2]s %[3]s",
+					library.Name,
+					library.InstallDir,
+					legacy))
+		} else {
+			b.logger.Info(
+				tr("Using library %[1]s at version %[2]s in folder: %[3]s %[4]s",
+					library.Name,
+					library.Version,
+					library.InstallDir,
+					legacy))
+		}
+	}
+
+	// TODO Why is this here?
+	time.Sleep(100 * time.Millisecond)
 }

@@ -211,8 +211,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			infoOut, _ := PrintUsedLibrariesIfVerbose(ctx.BuilderLogger.Verbose(), ctx.SketchLibrariesDetector.ImportedLibraries())
-			ctx.BuilderLogger.Info(string(infoOut))
+			ctx.Builder.PrintUsedLibraries(ctx.SketchLibrariesDetector.ImportedLibraries())
 			return nil
 		}),
 
