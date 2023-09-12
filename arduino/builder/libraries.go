@@ -22,6 +22,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -319,4 +320,26 @@ func (b *Builder) RemoveUnusedCompiledLibraries(importedLibraries libraries.List
 	}
 
 	return nil
+}
+
+// WarnAboutArchIncompatibleLibraries fixdoc
+func (b *Builder) WarnAboutArchIncompatibleLibraries(
+	targetPlatform *cores.PlatformRelease,
+	importedLibraries libraries.List,
+) {
+	archs := []string{targetPlatform.Platform.Architecture}
+	overrides, _ := b.buildProperties.GetOk("architecture.override_check")
+	if overrides != "" {
+		archs = append(archs, strings.Split(overrides, ",")...)
+	}
+
+	for _, importedLibrary := range importedLibraries {
+		if !importedLibrary.SupportsAnyArchitectureIn(archs...) {
+			b.logger.Info(
+				tr("WARNING: library %[1]s claims to run on %[2]s architecture(s) and may be incompatible with your current board which runs on %[3]s architecture(s).",
+					importedLibrary.Name,
+					strings.Join(importedLibrary.Architectures, ", "),
+					strings.Join(archs, ", ")))
+		}
+	}
 }
