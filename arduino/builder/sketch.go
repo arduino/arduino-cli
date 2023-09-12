@@ -48,12 +48,12 @@ func (b *Builder) Sketch() *sketch.Sketch {
 // PrepareSketchBuildPath copies the sketch source files in the build path.
 // The .ino files are merged together to create a .cpp file (by the way, the
 // .cpp file still needs to be Arduino-preprocessed to compile).
-func (b *Builder) PrepareSketchBuildPath(sourceOverrides map[string]string) (int, error) {
+func (b *Builder) PrepareSketchBuildPath() (int, error) {
 	if err := b.sketchBuildPath.MkdirAll(); err != nil {
 		return 0, errors.Wrap(err, tr("unable to create a folder to save the sketch"))
 	}
 
-	offset, mergedSource, err := b.sketchMergeSources(sourceOverrides)
+	offset, mergedSource, err := b.sketchMergeSources(b.sourceOverrides)
 	if err != nil {
 		return 0, err
 	}
@@ -63,7 +63,7 @@ func (b *Builder) PrepareSketchBuildPath(sourceOverrides map[string]string) (int
 		return 0, err
 	}
 
-	if err := b.sketchCopyAdditionalFiles(b.sketchBuildPath, sourceOverrides); err != nil {
+	if err := b.sketchCopyAdditionalFiles(b.sketchBuildPath, b.sourceOverrides); err != nil {
 		return 0, err
 	}
 

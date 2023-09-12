@@ -51,6 +51,11 @@ type Builder struct {
 	logger *logger.BuilderLogger
 	clean  bool
 
+	// Source code overrides (filename -> content map).
+	// The provided source data is used instead of reading it from disk.
+	// The keys of the map are paths relative to sketch folder.
+	sourceOverrides map[string]string
+
 	*BuildOptionsManager
 }
 
@@ -67,6 +72,7 @@ func NewBuilder(
 	builtInLibrariesDirs *paths.Path,
 	fqbn *cores.FQBN,
 	clean bool,
+	sourceOverrides map[string]string,
 	logger *logger.BuilderLogger,
 ) (*Builder, error) {
 	buildProperties := properties.NewMap()
@@ -128,6 +134,7 @@ func NewBuilder(
 		coreBuildCachePath:    coreBuildCachePath,
 		logger:                logger,
 		clean:                 clean,
+		sourceOverrides:       sourceOverrides,
 		BuildOptionsManager: NewBuildOptionsManager(
 			hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
 			builtInLibrariesDirs, buildPath,

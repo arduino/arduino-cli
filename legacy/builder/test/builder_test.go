@@ -106,7 +106,7 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 	ctx.Builder, err = bldr.NewBuilder(
 		sk, nil, buildPath, false, nil, 0, nil,
 		ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
-		ctx.BuiltInLibrariesDirs, parseFQBN(t, "a:b:c"), false, builderLogger,
+		ctx.BuiltInLibrariesDirs, parseFQBN(t, "a:b:c"), false, nil, builderLogger,
 	)
 	require.NoError(t, err)
 	if fqbnString != "" {
@@ -119,7 +119,7 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		ctx.Builder, err = bldr.NewBuilder(
 			sk, boardBuildProperties, buildPath, false, nil, 0, nil,
 			ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
-			ctx.BuiltInLibrariesDirs, fqbn, false, builderLogger)
+			ctx.BuiltInLibrariesDirs, fqbn, false, nil, builderLogger)
 		require.NoError(t, err)
 
 		ctx.PackageManager = pme

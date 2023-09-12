@@ -54,7 +54,7 @@ func TestMergeSketchSources(t *testing.T) {
 
 	b, err := NewBuilder(
 		sk, nil, paths.New("testdata"), false, nil, 0, nil,
-		nil, nil, nil, nil, fqbn, false, nil)
+		nil, nil, nil, nil, fqbn, false, nil, nil)
 	require.NoError(t, err)
 
 	offset, source, err := b.sketchMergeSources(nil)
@@ -73,7 +73,7 @@ func TestMergeSketchSourcesArduinoIncluded(t *testing.T) {
 
 	// ensure not to include Arduino.h when it's already there
 	b, err := NewBuilder(sk, nil, paths.New("testdata"), false, nil, 0, nil,
-		nil, nil, nil, nil, fqbn, false, nil)
+		nil, nil, nil, nil, fqbn, false, nil, nil)
 	require.NoError(t, err)
 
 	_, source, err := b.sketchMergeSources(nil)
@@ -95,7 +95,7 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	require.NoError(t, err)
 
 	b1, err := NewBuilder(sk1, nil, paths.New("testdata"), false, nil, 0, nil,
-		nil, nil, nil, nil, fqbn, false, nil)
+		nil, nil, nil, nil, fqbn, false, nil, nil)
 	require.NoError(t, err)
 
 	// copy the sketch over, create a fake main file we don't care about it
