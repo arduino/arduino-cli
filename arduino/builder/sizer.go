@@ -13,7 +13,7 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package sizer
+package builder
 
 import (
 	"encoding/json"
@@ -21,15 +21,11 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
-	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
-
-var tr = i18n.Tr
 
 // ExecutableSectionSize represents a section of the executable output file
 type ExecutableSectionSize struct {
@@ -55,31 +51,27 @@ func (s ExecutablesFileSections) ToRPCExecutableSectionSizeArray() []*rpc.Execut
 }
 
 // Size fixdoc
-func Size(
-	onlyUpdateCompilationDatabase, sketchError bool,
-	buildProperties *properties.Map,
-	builderLogger *logger.BuilderLogger,
-) (ExecutablesFileSections, error) {
+func (b *Builder) Size(onlyUpdateCompilationDatabase, sketchError bool) (ExecutablesFileSections, error) {
 	if onlyUpdateCompilationDatabase || sketchError {
 		return nil, nil
 	}
 
-	if buildProperties.ContainsKey("recipe.advanced_size.pattern") {
-		return checkSizeAdvanced(buildProperties, builderLogger)
+	if b.buildProperties.ContainsKey("recipe.advanced_size.pattern") {
+		return b.checkSizeAdvanced()
 	}
 
-	return checkSize(buildProperties, builderLogger)
+	return b.checkSize()
 }
 
-func checkSizeAdvanced(buildProperties *properties.Map, builderLogger *logger.BuilderLogger) (ExecutablesFileSections, error) {
-	command, err := utils.PrepareCommandForRecipe(buildProperties, "recipe.advanced_size.pattern", false)
+func (b *Builder) checkSizeAdvanced() (ExecutablesFileSections, error) {
+	command, err := utils.PrepareCommandForRecipe(b.buildProperties, "recipe.advanced_size.pattern", false)
 	if err != nil {
 		return nil, errors.New(tr("Error while determining sketch size: %s", err))
 	}
 
-	verboseInfo, out, _, err := utils.ExecCommand(builderLogger.Verbose(), builderLogger.Stdout(), builderLogger.Stderr(), command, utils.Capture /* stdout */, utils.Show /* stderr */)
-	if builderLogger.Verbose() {
-		builderLogger.Info(string(verboseInfo))
+	verboseInfo, out, _, err := utils.ExecCommand(b.logger.Verbose(), b.logger.Stdout(), b.logger.Stderr(), command, utils.Capture /* stdout */, utils.Show /* stderr */)
+	if b.logger.Verbose() {
+		b.logger.Info(string(verboseInfo))
 	}
 	if err != nil {
 		return nil, errors.New(tr("Error while determining sketch size: %s", err))
@@ -107,21 +99,21 @@ func checkSizeAdvanced(buildProperties *properties.Map, builderLogger *logger.Bu
 	executableSectionsSize := resp.Sections
 	switch resp.Severity {
 	case "error":
-		builderLogger.Warn(resp.Output)
+		b.logger.Warn(resp.Output)
 		return executableSectionsSize, errors.New(resp.ErrorMessage)
 	case "warning":
-		builderLogger.Warn(resp.Output)
+		b.logger.Warn(resp.Output)
 	case "info":
-		builderLogger.Info(resp.Output)
+		b.logger.Info(resp.Output)
 	default:
 		return executableSectionsSize, fmt.Errorf("invalid '%s' severity from sketch sizer: it must be 'error', 'warning' or 'info'", resp.Severity)
 	}
 	return executableSectionsSize, nil
 }
 
-func checkSize(buildProperties *properties.Map, builderLogger *logger.BuilderLogger) (ExecutablesFileSections, error) {
-	properties := buildProperties.Clone()
-	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+builderLogger.WarningsLevel()))
+func (b *Builder) checkSize() (ExecutablesFileSections, error) {
+	properties := b.buildProperties.Clone()
+	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+b.logger.WarningsLevel()))
 
 	maxTextSizeString := properties.Get("upload.maximum_size")
 	maxDataSizeString := properties.Get("upload.maximum_data_size")
@@ -143,25 +135,25 @@ func checkSize(buildProperties *properties.Map, builderLogger *logger.BuilderLog
 		}
 	}
 
-	textSize, dataSize, _, err := execSizeRecipe(properties, builderLogger)
+	textSize, dataSize, _, err := b.execSizeRecipe(properties)
 	if err != nil {
-		builderLogger.Warn(tr("Couldn't determine program size"))
+		b.logger.Warn(tr("Couldn't determine program size"))
 		return nil, nil
 	}
 
-	builderLogger.Info(tr("Sketch uses %[1]s bytes (%[3]s%%) of program storage space. Maximum is %[2]s bytes.",
+	b.logger.Info(tr("Sketch uses %[1]s bytes (%[3]s%%) of program storage space. Maximum is %[2]s bytes.",
 		strconv.Itoa(textSize),
 		strconv.Itoa(maxTextSize),
 		strconv.Itoa(textSize*100/maxTextSize)))
 	if dataSize >= 0 {
 		if maxDataSize > 0 {
-			builderLogger.Info(tr("Global variables use %[1]s bytes (%[3]s%%) of dynamic memory, leaving %[4]s bytes for local variables. Maximum is %[2]s bytes.",
+			b.logger.Info(tr("Global variables use %[1]s bytes (%[3]s%%) of dynamic memory, leaving %[4]s bytes for local variables. Maximum is %[2]s bytes.",
 				strconv.Itoa(dataSize),
 				strconv.Itoa(maxDataSize),
 				strconv.Itoa(dataSize*100/maxDataSize),
 				strconv.Itoa(maxDataSize-dataSize)))
 		} else {
-			builderLogger.Info(tr("Global variables use %[1]s bytes of dynamic memory.", strconv.Itoa(dataSize)))
+			b.logger.Info(tr("Global variables use %[1]s bytes of dynamic memory.", strconv.Itoa(dataSize)))
 		}
 	}
 
@@ -181,12 +173,12 @@ func checkSize(buildProperties *properties.Map, builderLogger *logger.BuilderLog
 	}
 
 	if textSize > maxTextSize {
-		builderLogger.Warn(tr("Sketch too big; see %[1]s for tips on reducing it.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
+		b.logger.Warn(tr("Sketch too big; see %[1]s for tips on reducing it.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
 		return executableSectionsSize, errors.New(tr("text section exceeds available space in board"))
 	}
 
 	if maxDataSize > 0 && dataSize > maxDataSize {
-		builderLogger.Warn(tr("Not enough memory; see %[1]s for tips on reducing your footprint.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
+		b.logger.Warn(tr("Not enough memory; see %[1]s for tips on reducing your footprint.", "https://support.arduino.cc/hc/en-us/articles/360013825179"))
 		return executableSectionsSize, errors.New(tr("data section exceeds available space in board"))
 	}
 
@@ -196,23 +188,23 @@ func checkSize(buildProperties *properties.Map, builderLogger *logger.BuilderLog
 			return executableSectionsSize, err
 		}
 		if maxDataSize > 0 && dataSize > maxDataSize*warnDataPercentage/100 {
-			builderLogger.Warn(tr("Low memory available, stability problems may occur."))
+			b.logger.Warn(tr("Low memory available, stability problems may occur."))
 		}
 	}
 
 	return executableSectionsSize, nil
 }
 
-func execSizeRecipe(properties *properties.Map, builderLogger *logger.BuilderLogger) (textSize int, dataSize int, eepromSize int, resErr error) {
+func (b *Builder) execSizeRecipe(properties *properties.Map) (textSize int, dataSize int, eepromSize int, resErr error) {
 	command, err := utils.PrepareCommandForRecipe(properties, "recipe.size.pattern", false)
 	if err != nil {
 		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)
 		return
 	}
 
-	verboseInfo, out, _, err := utils.ExecCommand(builderLogger.Verbose(), builderLogger.Stdout(), builderLogger.Stderr(), command, utils.Capture /* stdout */, utils.Show /* stderr */)
-	if builderLogger.Verbose() {
-		builderLogger.Info(string(verboseInfo))
+	verboseInfo, out, _, err := utils.ExecCommand(b.logger.Verbose(), b.logger.Stdout(), b.logger.Stderr(), command, utils.Capture /* stdout */, utils.Show /* stderr */)
+	if b.logger.Verbose() {
+		b.logger.Info(string(verboseInfo))
 	}
 	if err != nil {
 		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)

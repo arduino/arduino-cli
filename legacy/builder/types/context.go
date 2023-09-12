@@ -21,7 +21,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
-	"github.com/arduino/arduino-cli/arduino/builder/sizer"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -58,7 +57,7 @@ type Context struct {
 	ProgressCB rpc.TaskProgressCB
 
 	// Sizer results
-	ExecutableSectionsSize sizer.ExecutablesFileSections
+	ExecutableSectionsSize builder.ExecutablesFileSections
 
 	// Compilation Database to build/update
 	CompilationDatabase *compilation.Database

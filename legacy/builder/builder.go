@@ -19,7 +19,6 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/builder/sizer"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/pkg/errors"
@@ -214,10 +213,8 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			executableSectionsSize, err := sizer.Size(
+			executableSectionsSize, err := ctx.Builder.Size(
 				ctx.OnlyUpdateCompilationDatabase, mainErr != nil,
-				ctx.Builder.GetBuildProperties(),
-				ctx.BuilderLogger,
 			)
 			ctx.ExecutableSectionsSize = executableSectionsSize
 			return err
