@@ -22,6 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -42,7 +43,6 @@ type BuildOptionsManager struct {
 	buildCorePath             *paths.Path
 	sketch                    *sketch.Sketch
 	customBuildProperties     []string
-	fqbn                      string
 	compilerOptimizationFlags string
 	clean                     bool
 	builderLogger             *logger.BuilderLogger
@@ -54,7 +54,7 @@ func NewBuildOptionsManager(
 	builtInLibrariesDirs, buildPath *paths.Path,
 	sketch *sketch.Sketch,
 	customBuildProperties []string,
-	fqbn string,
+	fqbn *cores.FQBN,
 	clean bool,
 	compilerOptimizationFlags string,
 	runtimePlatformPath, buildCorePath *paths.Path,
@@ -66,7 +66,7 @@ func NewBuildOptionsManager(
 	opts.Set("builtInToolsFolders", strings.Join(builtInToolsDirs.AsStrings(), ","))
 	opts.Set("otherLibrariesFolders", strings.Join(otherLibrariesDirs.AsStrings(), ","))
 	opts.SetPath("sketchLocation", sketch.FullPath)
-	opts.Set("fqbn", fqbn)
+	opts.Set("fqbn", fqbn.String())
 	opts.Set("customBuildProperties", strings.Join(customBuildProperties, ","))
 	opts.Set("compiler.optimization_flags", compilerOptimizationFlags)
 
@@ -96,7 +96,6 @@ func NewBuildOptionsManager(
 		buildCorePath:             buildCorePath,
 		sketch:                    sketch,
 		customBuildProperties:     customBuildProperties,
-		fqbn:                      fqbn,
 		compilerOptimizationFlags: compilerOptimizationFlags,
 		clean:                     clean,
 		builderLogger:             buildLogger,

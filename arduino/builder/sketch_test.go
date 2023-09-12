@@ -21,6 +21,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -48,9 +49,12 @@ func TestMergeSketchSources(t *testing.T) {
 	}
 	mergedSources := strings.ReplaceAll(string(mergedBytes), "%s", pathToGoldenSource)
 
+	fqbn, err := cores.ParseFQBN("a:b:c")
+	require.NoError(t, err)
+
 	b, err := NewBuilder(
 		sk, nil, paths.New("testdata"), false, nil, 0, nil,
-		nil, nil, nil, nil, "", false, nil)
+		nil, nil, nil, nil, fqbn, false, nil)
 	require.NoError(t, err)
 
 	offset, source, err := b.sketchMergeSources(nil)
@@ -64,9 +68,12 @@ func TestMergeSketchSourcesArduinoIncluded(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, sk)
 
+	fqbn, err := cores.ParseFQBN("a:b:c")
+	require.NoError(t, err)
+
 	// ensure not to include Arduino.h when it's already there
 	b, err := NewBuilder(sk, nil, paths.New("testdata"), false, nil, 0, nil,
-		nil, nil, nil, nil, "", false, nil)
+		nil, nil, nil, nil, fqbn, false, nil)
 	require.NoError(t, err)
 
 	_, source, err := b.sketchMergeSources(nil)
@@ -83,8 +90,12 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	sk1, err := sketch.New(paths.New("testdata", t.Name()))
 	require.Nil(t, err)
 	require.Equal(t, sk1.AdditionalFiles.Len(), 1)
+
+	fqbn, err := cores.ParseFQBN("a:b:c")
+	require.NoError(t, err)
+
 	b1, err := NewBuilder(sk1, nil, paths.New("testdata"), false, nil, 0, nil,
-		nil, nil, nil, nil, "", false, nil)
+		nil, nil, nil, nil, fqbn, false, nil)
 	require.NoError(t, err)
 
 	// copy the sketch over, create a fake main file we don't care about it

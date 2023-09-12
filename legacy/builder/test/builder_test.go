@@ -41,7 +41,7 @@ type skipContextPreparationStepName string
 
 const skipLibraries = skipContextPreparationStepName("libraries")
 
-func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *paths.Path, fqbn string, skips ...skipContextPreparationStepName) *types.Context {
+func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *paths.Path, fqbnString string, skips ...skipContextPreparationStepName) *types.Context {
 	DownloadCoresAndToolsAndLibraries(t)
 
 	stepToSkip := map[skipContextPreparationStepName]bool{}
@@ -106,12 +106,12 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 	ctx.Builder, err = bldr.NewBuilder(
 		sk, nil, buildPath, false, nil, 0, nil,
 		ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
-		ctx.BuiltInLibrariesDirs, fqbn, ctx.Clean, builderLogger,
+		ctx.BuiltInLibrariesDirs, parseFQBN(t, "a:b:c"), ctx.Clean, builderLogger,
 	)
 	require.NoError(t, err)
-	if fqbn != "" {
-		ctx.FQBN = parseFQBN(t, fqbn)
-		targetPackage, targetPlatform, targetBoard, boardBuildProperties, buildPlatform, err := pme.ResolveFQBN(ctx.FQBN)
+	if fqbnString != "" {
+		fqbn := parseFQBN(t, fqbnString)
+		targetPackage, targetPlatform, targetBoard, boardBuildProperties, buildPlatform, err := pme.ResolveFQBN(fqbn)
 		require.NoError(t, err)
 		requiredTools, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 		require.NoError(t, err)

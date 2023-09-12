@@ -182,7 +182,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.TargetPackage = targetPackage
 	builderCtx.ActualPlatform = buildPlatform
 	builderCtx.RequiredTools = requiredTools
-	builderCtx.FQBN = fqbn
 	builderCtx.ProgressCB = progressCB
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
@@ -212,7 +211,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		builderCtx.BuiltInToolsDirs,
 		builderCtx.OtherLibrariesDirs,
 		builderCtx.BuiltInLibrariesDirs,
-		builderCtx.FQBN.String(),
+		fqbn,
 		builderCtx.Clean,
 		builderLogger,
 	)

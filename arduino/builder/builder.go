@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -53,7 +54,6 @@ type Builder struct {
 
 	hardwareDirs, builtInToolsDirs, otherLibrariesDirs paths.PathList
 	builtInLibrariesDirs                               *paths.Path
-	fqbn                                               string
 	clean                                              bool
 
 	compilerOptimizationFlags          string
@@ -71,7 +71,7 @@ func NewBuilder(
 	requestBuildProperties []string,
 	hardwareDirs, builtInToolsDirs, otherLibrariesDirs paths.PathList,
 	builtInLibrariesDirs *paths.Path,
-	fqbn string,
+	fqbn *cores.FQBN,
 	clean bool,
 	logger *logger.BuilderLogger,
 ) (*Builder, error) {

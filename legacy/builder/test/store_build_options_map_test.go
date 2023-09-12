@@ -39,7 +39,7 @@ func TestCheckIfBuildOptionsChanged(t *testing.T) {
 	buildOptionsManager := builder.NewBuildOptionsManager(
 		hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
 		builtInLibrariesDirs, buildPath, &sketch.Sketch{FullPath: paths.New("sketchLocation")}, []string{"custom=prop"},
-		fqbn.String(), false, 
+		fqbn, false,
 		buildProperties.Get("compiler.optimization_flags"),
 		buildProperties.GetPath("runtime.platform.path"),
 		buildProperties.GetPath("build.core.path"),
