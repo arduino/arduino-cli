@@ -111,9 +111,9 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 	require.NoError(t, err)
 	if fqbnString != "" {
 		fqbn := parseFQBN(t, fqbnString)
-		targetPackage, targetPlatform, targetBoard, boardBuildProperties, buildPlatform, err := pme.ResolveFQBN(fqbn)
+		_, targetPlatform, _, boardBuildProperties, buildPlatform, err := pme.ResolveFQBN(fqbn)
 		require.NoError(t, err)
-		requiredTools, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
+		_, err = pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 		require.NoError(t, err)
 
 		ctx.Builder, err = bldr.NewBuilder(
@@ -123,11 +123,8 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		require.NoError(t, err)
 
 		ctx.PackageManager = pme
-		ctx.TargetBoard = targetBoard
 		ctx.TargetPlatform = targetPlatform
-		ctx.TargetPackage = targetPackage
 		ctx.ActualPlatform = buildPlatform
-		ctx.RequiredTools = requiredTools
 	}
 
 	if !stepToSkip[skipLibraries] {

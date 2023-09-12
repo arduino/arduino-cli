@@ -41,9 +41,6 @@ type Context struct {
 	OtherLibrariesDirs   paths.PathList
 
 	PackageManager *packagemanager.Explorer
-	RequiredTools  []*cores.ToolRelease
-	TargetBoard    *cores.Board
-	TargetPackage  *cores.Package
 	TargetPlatform *cores.PlatformRelease
 	ActualPlatform *cores.PlatformRelease
 

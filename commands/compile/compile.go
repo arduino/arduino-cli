@@ -99,7 +99,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	if err != nil {
 		return nil, &arduino.InvalidFQBNError{Cause: err}
 	}
-	targetPackage, targetPlatform, targetBoard, boardBuildProperties, buildPlatform, err := pme.ResolveFQBN(fqbn)
+	_, targetPlatform, targetBoard, boardBuildProperties, buildPlatform, err := pme.ResolveFQBN(fqbn)
 	if err != nil {
 		if targetPlatform == nil {
 			return nil, &arduino.PlatformNotFoundError{
@@ -170,18 +170,14 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		coreBuildCachePath = buildCachePath.Join("core")
 	}
 
-	requiredTools, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
-	if err != nil {
+	if _, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform); err != nil {
 		return nil, err
 	}
 
 	builderCtx := &types.Context{}
 	builderCtx.PackageManager = pme
-	builderCtx.TargetBoard = targetBoard
 	builderCtx.TargetPlatform = targetPlatform
-	builderCtx.TargetPackage = targetPackage
 	builderCtx.ActualPlatform = buildPlatform
-	builderCtx.RequiredTools = requiredTools
 	builderCtx.ProgressCB = progressCB
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
