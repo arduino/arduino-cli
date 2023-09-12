@@ -56,6 +56,9 @@ type Builder struct {
 	// The keys of the map are paths relative to sketch folder.
 	sourceOverrides map[string]string
 
+	// Set to true to skip build and produce only Compilation Database
+	onlyUpdateCompilationDatabase bool
+
 	*BuildOptionsManager
 }
 
@@ -73,6 +76,7 @@ func NewBuilder(
 	fqbn *cores.FQBN,
 	clean bool,
 	sourceOverrides map[string]string,
+	onlyUpdateCompilationDatabase bool,
 	logger *logger.BuilderLogger,
 ) (*Builder, error) {
 	buildProperties := properties.NewMap()
@@ -123,18 +127,19 @@ func NewBuilder(
 	}
 
 	return &Builder{
-		sketch:                sk,
-		buildProperties:       buildProperties,
-		buildPath:             buildPath,
-		sketchBuildPath:       sketchBuildPath,
-		coreBuildPath:         coreBuildPath,
-		librariesBuildPath:    librariesBuildPath,
-		jobs:                  jobs,
-		customBuildProperties: customBuildPropertiesArgs,
-		coreBuildCachePath:    coreBuildCachePath,
-		logger:                logger,
-		clean:                 clean,
-		sourceOverrides:       sourceOverrides,
+		sketch:                        sk,
+		buildProperties:               buildProperties,
+		buildPath:                     buildPath,
+		sketchBuildPath:               sketchBuildPath,
+		coreBuildPath:                 coreBuildPath,
+		librariesBuildPath:            librariesBuildPath,
+		jobs:                          jobs,
+		customBuildProperties:         customBuildPropertiesArgs,
+		coreBuildCachePath:            coreBuildCachePath,
+		logger:                        logger,
+		clean:                         clean,
+		sourceOverrides:               sourceOverrides,
+		onlyUpdateCompilationDatabase: onlyUpdateCompilationDatabase,
 		BuildOptionsManager: NewBuildOptionsManager(
 			hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
 			builtInLibrariesDirs, buildPath,

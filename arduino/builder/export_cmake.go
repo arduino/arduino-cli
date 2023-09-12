@@ -40,7 +40,6 @@ func (b *Builder) ExportProjectCMake(
 	importedLibraries libraries.List,
 	includeFolders paths.PathList,
 	lineOffset int,
-	onlyUpdateCompilationDatabase bool,
 ) error {
 	// copies the contents of the file named src to the file named
 	// by dst. The file will be created if it does not already exist. If the
@@ -243,7 +242,7 @@ func (b *Builder) ExportProjectCMake(
 		fmt.Println(err)
 	}
 
-	if err := b.PreprocessSketch(includeFolders, lineOffset, onlyUpdateCompilationDatabase); err != nil {
+	if err := b.PreprocessSketch(includeFolders, lineOffset); err != nil {
 		return err
 	}
 

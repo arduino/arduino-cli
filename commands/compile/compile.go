@@ -188,8 +188,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	builderCtx.BuiltInLibrariesDirs = configuration.IDEBuiltinLibrariesDir(configuration.Settings)
 
-	builderCtx.OnlyUpdateCompilationDatabase = req.GetCreateCompilationDatabaseOnly()
-
 	builderLogger := logger.New(outStream, errStream, req.GetVerbose(), req.GetWarnings())
 	builderCtx.BuilderLogger = builderLogger
 
@@ -208,6 +206,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		fqbn,
 		req.GetClean(),
 		req.GetSourceOverride(),
+		req.GetCreateCompilationDatabaseOnly(),
 		builderLogger,
 	)
 	if err != nil {
@@ -339,10 +338,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		exportBinaries = false
 	}
 	if exportBinaries {
-		err := sketchBuilder.RunRecipe(
-			"recipe.hooks.savehex.presavehex", ".pattern", false,
-			builderCtx.OnlyUpdateCompilationDatabase,
-		)
+		err := sketchBuilder.RunRecipe("recipe.hooks.savehex.presavehex", ".pattern", false)
 		if err != nil {
 			return r, err
 		}
@@ -381,10 +377,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 			}
 		}
 
-		err = sketchBuilder.RunRecipe(
-			"recipe.hooks.savehex.postsavehex", ".pattern", false,
-			builderCtx.OnlyUpdateCompilationDatabase,
-		)
+		err = sketchBuilder.RunRecipe("recipe.hooks.savehex.postsavehex", ".pattern", false)
 		if err != nil {
 			return r, err
 		}

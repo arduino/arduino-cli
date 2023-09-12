@@ -67,7 +67,7 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 	err = buildPath.Join("sketch", "sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
 	require.NoError(t, err)
 
-	err = ctx.Builder.MergeSketchWithBootloader(ctx.OnlyUpdateCompilationDatabase)
+	err = ctx.Builder.MergeSketchWithBootloader()
 	require.NoError(t, err)
 
 	bytes, err := buildPath.Join("sketch", "sketch1.ino.with_bootloader.hex").ReadFile()
@@ -119,7 +119,7 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	err = buildPath.Join("sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
 	require.NoError(t, err)
 
-	err = ctx.Builder.MergeSketchWithBootloader(ctx.OnlyUpdateCompilationDatabase)
+	err = ctx.Builder.MergeSketchWithBootloader()
 	require.NoError(t, err)
 
 	bytes, err := buildPath.Join("sketch1.ino.with_bootloader.hex").ReadFile()
@@ -140,7 +140,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	buildProperties.Remove("bootloader.noblink")
 	buildProperties.Remove("bootloader.file")
 
-	err := ctx.Builder.MergeSketchWithBootloader(ctx.OnlyUpdateCompilationDatabase)
+	err := ctx.Builder.MergeSketchWithBootloader()
 	require.NoError(t, err)
 
 	exist, err := buildPath.Join("sketch.ino.with_bootloader.hex").ExistCheck()
@@ -195,7 +195,7 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 	err = buildPath.Join("sketch", "sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
 	require.NoError(t, err)
 
-	err = ctx.Builder.MergeSketchWithBootloader(ctx.OnlyUpdateCompilationDatabase)
+	err = ctx.Builder.MergeSketchWithBootloader()
 	require.NoError(t, err)
 
 	bytes, err := buildPath.Join("sketch", "sketch1.ino.with_bootloader.hex").ReadFile()

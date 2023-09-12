@@ -25,12 +25,8 @@ import (
 )
 
 // Link fixdoc
-func (b *Builder) Link(
-	onlyUpdateCompilationDatabase bool,
-	sketchObjectFiles, librariesObjectFiles, coreObjectsFiles paths.PathList,
-	coreArchiveFilePath *paths.Path,
-) error {
-	if onlyUpdateCompilationDatabase {
+func (b *Builder) Link(sketchObjectFiles, librariesObjectFiles, coreObjectsFiles paths.PathList, coreArchiveFilePath *paths.Path) error {
+	if b.onlyUpdateCompilationDatabase {
 		if b.logger.Verbose() {
 			b.logger.Info(tr("Skip linking of final executable."))
 		}

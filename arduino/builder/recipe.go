@@ -29,7 +29,7 @@ import (
 // RunRecipe fixdoc
 func (b *Builder) RunRecipe(
 	prefix, suffix string,
-	skipIfOnlyUpdatingCompilationDatabase, onlyUpdateCompilationDatabase bool,
+	skipIfOnlyUpdatingCompilationDatabase bool,
 ) error {
 	logrus.Debugf(fmt.Sprintf("Looking for recipes like %s", prefix+"*"+suffix))
 
@@ -47,7 +47,7 @@ func (b *Builder) RunRecipe(
 			return errors.WithStack(err)
 		}
 
-		if onlyUpdateCompilationDatabase && skipIfOnlyUpdatingCompilationDatabase {
+		if b.onlyUpdateCompilationDatabase && skipIfOnlyUpdatingCompilationDatabase {
 			if b.logger.Verbose() {
 				b.logger.Info(tr("Skipping: %[1]s", strings.Join(command.GetArgs(), " ")))
 			}

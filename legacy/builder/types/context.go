@@ -61,8 +61,6 @@ type Context struct {
 
 	// Compilation Database to build/update
 	CompilationDatabase *compilation.Database
-	// Set to true to skip build and produce only Compilation Database
-	OnlyUpdateCompilationDatabase bool
 }
 
 func (ctx *Context) PushProgress() {

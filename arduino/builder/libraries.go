@@ -43,7 +43,6 @@ var (
 func (b *Builder) BuildLibraries(
 	includesFolders paths.PathList,
 	importedLibraries libraries.List,
-	onlyUpdateCompilationDatabase bool,
 	compilationDatabase *compilation.Database,
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, error) {
@@ -56,7 +55,6 @@ func (b *Builder) BuildLibraries(
 
 	librariesObjectFiles, err := b.compileLibraries(
 		libs, includes,
-		onlyUpdateCompilationDatabase,
 		compilationDatabase,
 		progress, progressCB,
 	)
@@ -128,7 +126,6 @@ func (b *Builder) findExpectedPrecompiledLibFolder(
 
 func (b *Builder) compileLibraries(
 	libraries libraries.List, includes []string,
-	onlyUpdateCompilationDatabase bool,
 	compilationDatabase *compilation.Database,
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, error) {
@@ -139,7 +136,6 @@ func (b *Builder) compileLibraries(
 	for _, library := range libraries {
 		libraryObjectFiles, err := b.compileLibrary(
 			library, includes,
-			onlyUpdateCompilationDatabase,
 			compilationDatabase,
 			progress, progressCB,
 		)
@@ -163,7 +159,6 @@ func (b *Builder) compileLibraries(
 
 func (b *Builder) compileLibrary(
 	library *libraries.Library, includes []string,
-	onlyUpdateCompilationDatabase bool,
 	compilationDatabase *compilation.Database,
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, error) {
@@ -228,7 +223,7 @@ func (b *Builder) compileLibrary(
 	if library.Layout == libraries.RecursiveLayout {
 		libObjectFiles, err := utils.CompileFilesRecursive(
 			library.SourceDir, libraryBuildPath, b.buildProperties, includes,
-			onlyUpdateCompilationDatabase,
+			b.onlyUpdateCompilationDatabase,
 			compilationDatabase,
 			b.jobs,
 			b.logger,
@@ -240,7 +235,7 @@ func (b *Builder) compileLibrary(
 		if library.DotALinkage {
 			archiveFile, verboseInfo, err := utils.ArchiveCompiledFiles(
 				libraryBuildPath, paths.New(library.DirName+".a"), libObjectFiles, b.buildProperties,
-				onlyUpdateCompilationDatabase, b.logger.Verbose(),
+				b.onlyUpdateCompilationDatabase, b.logger.Verbose(),
 				b.logger.Stdout(), b.logger.Stderr(),
 			)
 			if b.logger.Verbose() {
@@ -259,7 +254,7 @@ func (b *Builder) compileLibrary(
 		}
 		libObjectFiles, err := utils.CompileFiles(
 			library.SourceDir, libraryBuildPath, b.buildProperties, includes,
-			onlyUpdateCompilationDatabase,
+			b.onlyUpdateCompilationDatabase,
 			compilationDatabase,
 			b.jobs,
 			b.logger,
@@ -274,7 +269,7 @@ func (b *Builder) compileLibrary(
 			utilityBuildPath := libraryBuildPath.Join("utility")
 			utilityObjectFiles, err := utils.CompileFiles(
 				library.UtilityDir, utilityBuildPath, b.buildProperties, includes,
-				onlyUpdateCompilationDatabase,
+				b.onlyUpdateCompilationDatabase,
 				compilationDatabase,
 				b.jobs,
 				b.logger,

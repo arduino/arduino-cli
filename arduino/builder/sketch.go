@@ -184,7 +184,6 @@ func writeIfDifferent(source []byte, destPath *paths.Path) error {
 // BuildSketch fixdoc
 func (b *Builder) BuildSketch(
 	includesFolders paths.PathList,
-	onlyUpdateCompilationDatabase bool,
 	compilationDatabase *compilation.Database,
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, error) {
@@ -196,7 +195,7 @@ func (b *Builder) BuildSketch(
 
 	sketchObjectFiles, err := utils.CompileFiles(
 		b.sketchBuildPath, b.sketchBuildPath, b.buildProperties, includes,
-		onlyUpdateCompilationDatabase,
+		b.onlyUpdateCompilationDatabase,
 		compilationDatabase,
 		b.jobs,
 		b.builderLogger,
@@ -211,7 +210,7 @@ func (b *Builder) BuildSketch(
 	if sketchSrcPath.IsDir() {
 		srcObjectFiles, err := utils.CompileFilesRecursive(
 			sketchSrcPath, sketchSrcPath, b.buildProperties, includes,
-			onlyUpdateCompilationDatabase,
+			b.onlyUpdateCompilationDatabase,
 			compilationDatabase,
 			b.jobs,
 			b.builderLogger,
@@ -227,8 +226,8 @@ func (b *Builder) BuildSketch(
 }
 
 // MergeSketchWithBootloader fixdoc
-func (b *Builder) MergeSketchWithBootloader(onlyUpdateCompilationDatabase bool) error {
-	if onlyUpdateCompilationDatabase {
+func (b *Builder) MergeSketchWithBootloader() error {
+	if b.onlyUpdateCompilationDatabase {
 		return nil
 	}
 

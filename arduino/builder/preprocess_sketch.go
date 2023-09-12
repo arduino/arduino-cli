@@ -21,11 +21,11 @@ import (
 )
 
 // PreprocessSketch fixdoc
-func (b *Builder) PreprocessSketch(includes paths.PathList, lineOffset int, onlyUpdateCompilationDatabase bool) error {
+func (b *Builder) PreprocessSketch(includes paths.PathList, lineOffset int) error {
 	// In the future we might change the preprocessor
 	normalOutput, verboseOutput, err := preprocessor.PreprocessSketchWithCtags(
 		b.sketch, b.buildPath, includes, lineOffset,
-		b.buildProperties, onlyUpdateCompilationDatabase,
+		b.buildProperties, b.onlyUpdateCompilationDatabase,
 	)
 	if b.logger.Verbose() {
 		b.logger.WriteStdout(verboseOutput)

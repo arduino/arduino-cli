@@ -66,7 +66,6 @@ func (s *Builder) Run(ctx *types.Context) error {
 		types.BareCommand(func(ctx *types.Context) error {
 			sketchObjectFiles, err := ctx.Builder.BuildSketch(
 				ctx.SketchLibrariesDetector.IncludeFolders(),
-				ctx.OnlyUpdateCompilationDatabase,
 				ctx.CompilationDatabase,
 				&ctx.Progress, ctx.ProgressCB,
 			)
@@ -96,7 +95,6 @@ func (s *Builder) Run(ctx *types.Context) error {
 			librariesObjectFiles, err := ctx.Builder.BuildLibraries(
 				ctx.SketchLibrariesDetector.IncludeFolders(),
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
-				ctx.OnlyUpdateCompilationDatabase,
 				ctx.CompilationDatabase,
 				&ctx.Progress, ctx.ProgressCB,
 			)
@@ -119,7 +117,6 @@ func (s *Builder) Run(ctx *types.Context) error {
 		types.BareCommand(func(ctx *types.Context) error {
 			objectFiles, archiveFile, err := ctx.Builder.BuildCore(
 				ctx.ActualPlatform,
-				ctx.OnlyUpdateCompilationDatabase,
 				ctx.CompilationDatabase,
 				&ctx.Progress, ctx.ProgressCB,
 			)
@@ -141,7 +138,6 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		types.BareCommand(func(ctx *types.Context) error {
 			return ctx.Builder.Link(
-				ctx.OnlyUpdateCompilationDatabase,
 				ctx.SketchObjectFiles,
 				ctx.LibrariesObjectFiles,
 				ctx.CoreObjectsFiles,
@@ -164,7 +160,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			return ctx.Builder.MergeSketchWithBootloader(ctx.OnlyUpdateCompilationDatabase)
+			return ctx.Builder.MergeSketchWithBootloader()
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
@@ -208,14 +204,11 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
 				ctx.SketchLibrariesDetector.IncludeFolders(),
 				ctx.LineOffset,
-				ctx.OnlyUpdateCompilationDatabase,
 			)
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			executableSectionsSize, err := ctx.Builder.Size(
-				ctx.OnlyUpdateCompilationDatabase, mainErr != nil,
-			)
+			executableSectionsSize, err := ctx.Builder.Size(mainErr != nil)
 			ctx.ExecutableSectionsSize = executableSectionsSize
 			return err
 		}),
@@ -240,7 +233,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 func preprocessSketchCommand(ctx *types.Context) types.BareCommand {
 	return func(ctx *types.Context) error {
-		return ctx.Builder.PreprocessSketch(ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset, ctx.OnlyUpdateCompilationDatabase)
+		return ctx.Builder.PreprocessSketch(ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset)
 	}
 }
 
@@ -343,10 +336,7 @@ func logIfVerbose(warn bool, msg string) types.BareCommand {
 }
 
 func recipeByPrefixSuffixRunner(ctx *types.Context, prefix, suffix string, skipIfOnlyUpdatingCompilationDatabase bool) error {
-	return ctx.Builder.RunRecipe(
-		prefix, suffix, skipIfOnlyUpdatingCompilationDatabase,
-		ctx.OnlyUpdateCompilationDatabase,
-	)
+	return ctx.Builder.RunRecipe(prefix, suffix, skipIfOnlyUpdatingCompilationDatabase)
 }
 
 func containerBuildOptions(ctx *types.Context) types.BareCommand {

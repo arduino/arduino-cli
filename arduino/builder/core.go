@@ -37,7 +37,6 @@ import (
 // BuildCore fixdoc
 func (b *Builder) BuildCore(
 	actualPlatform *cores.PlatformRelease,
-	onlyUpdateCompilationDatabase bool,
 	compilationDatabase *compilation.Database,
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, *paths.Path, error) {
@@ -58,7 +57,6 @@ func (b *Builder) BuildCore(
 	}
 
 	archiveFile, objectFiles, err := b.compileCore(
-		onlyUpdateCompilationDatabase,
 		actualPlatform,
 		compilationDatabase,
 		progress, progressCB,
@@ -71,7 +69,6 @@ func (b *Builder) BuildCore(
 }
 
 func (b *Builder) compileCore(
-	onlyUpdateCompilationDatabase bool,
 	actualPlatform *cores.PlatformRelease,
 	compilationDatabase *compilation.Database,
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
@@ -91,7 +88,7 @@ func (b *Builder) compileCore(
 	if variantFolder != nil && variantFolder.IsDir() {
 		variantObjectFiles, err = utils.CompileFilesRecursive(
 			variantFolder, b.coreBuildPath, b.buildProperties, includes,
-			onlyUpdateCompilationDatabase,
+			b.onlyUpdateCompilationDatabase,
 			compilationDatabase,
 			b.jobs,
 			b.logger,
@@ -117,7 +114,7 @@ func (b *Builder) compileCore(
 		}
 
 		var canUseArchivedCore bool
-		if onlyUpdateCompilationDatabase || b.clean {
+		if b.onlyUpdateCompilationDatabase || b.clean {
 			canUseArchivedCore = false
 		} else if isOlder, err := utils.DirContentIsOlderThan(realCoreFolder, targetArchivedCore); err != nil || !isOlder {
 			// Recreate the archive if ANY of the core files (including platform.txt) has changed
@@ -142,7 +139,7 @@ func (b *Builder) compileCore(
 
 	coreObjectFiles, err := utils.CompileFilesRecursive(
 		coreFolder, b.coreBuildPath, b.buildProperties, includes,
-		onlyUpdateCompilationDatabase,
+		b.onlyUpdateCompilationDatabase,
 		compilationDatabase,
 		b.jobs,
 		b.logger,
@@ -154,7 +151,7 @@ func (b *Builder) compileCore(
 
 	archiveFile, verboseInfo, err := utils.ArchiveCompiledFiles(
 		b.coreBuildPath, paths.New("core.a"), coreObjectFiles, b.buildProperties,
-		onlyUpdateCompilationDatabase, b.logger.Verbose(), b.logger.Stdout(), b.logger.Stderr(),
+		b.onlyUpdateCompilationDatabase, b.logger.Verbose(), b.logger.Stdout(), b.logger.Stderr(),
 	)
 	if b.logger.Verbose() {
 		b.logger.Info(string(verboseInfo))
@@ -164,7 +161,7 @@ func (b *Builder) compileCore(
 	}
 
 	// archive core.a
-	if targetArchivedCore != nil && !onlyUpdateCompilationDatabase {
+	if targetArchivedCore != nil && !b.onlyUpdateCompilationDatabase {
 		err := archiveFile.CopyTo(targetArchivedCore)
 		if b.logger.Verbose() {
 			if err == nil {
