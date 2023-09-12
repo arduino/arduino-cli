@@ -202,9 +202,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			executableSectionsSize, err := ctx.Builder.Size(mainErr != nil)
-			ctx.ExecutableSectionsSize = executableSectionsSize
-			return err
+			return ctx.Builder.Size(mainErr != nil)
 		}),
 	}
 	for _, command := range commands {

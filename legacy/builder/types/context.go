@@ -49,9 +49,6 @@ type Context struct {
 	// C++ Parsing
 	LineOffset int
 
-	// Sizer results
-	ExecutableSectionsSize builder.ExecutablesFileSections
-
 	// Compilation Database to build/update
 	CompilationDatabase *compilation.Database
 }

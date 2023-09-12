@@ -63,6 +63,9 @@ type Builder struct {
 	// Progress of all various steps
 	Progress *progress.Struct
 
+	// Sizer results
+	executableSectionsSize ExecutablesFileSections
+
 	*BuildOptionsManager
 }
 
@@ -183,4 +186,9 @@ func (b *Builder) GetSketchBuildPath() *paths.Path {
 // GetLibrariesBuildPath returns the libraries build path
 func (b *Builder) GetLibrariesBuildPath() *paths.Path {
 	return b.librariesBuildPath
+}
+
+// ExecutableSectionsSize fixdoc
+func (b *Builder) ExecutableSectionsSize() ExecutablesFileSections {
+	return b.executableSectionsSize
 }

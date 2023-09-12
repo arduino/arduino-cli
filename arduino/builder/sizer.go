@@ -51,16 +51,24 @@ func (s ExecutablesFileSections) ToRPCExecutableSectionSizeArray() []*rpc.Execut
 }
 
 // Size fixdoc
-func (b *Builder) Size(sketchError bool) (ExecutablesFileSections, error) {
+func (b *Builder) Size(sketchError bool) error {
 	if b.onlyUpdateCompilationDatabase || sketchError {
-		return nil, nil
+		return nil
 	}
 
+	check := b.checkSize
 	if b.buildProperties.ContainsKey("recipe.advanced_size.pattern") {
-		return b.checkSizeAdvanced()
+		check = b.checkSizeAdvanced
 	}
 
-	return b.checkSize()
+	result, err := check()
+	if err != nil {
+		return err
+	}
+
+	b.executableSectionsSize = result
+
+	return nil
 }
 
 func (b *Builder) checkSizeAdvanced() (ExecutablesFileSections, error) {
