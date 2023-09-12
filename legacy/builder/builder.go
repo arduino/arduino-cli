@@ -100,15 +100,11 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			librariesObjectFiles, err := builder.LibrariesBuilder(
-				ctx.Builder.GetLibrariesBuildPath(),
-				ctx.Builder.GetBuildProperties(),
+			librariesObjectFiles, err := ctx.Builder.BuildLibraries(
 				ctx.SketchLibrariesDetector.IncludeFolders(),
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
 				ctx.OnlyUpdateCompilationDatabase,
 				ctx.CompilationDatabase,
-				ctx.Builder.Jobs(),
-				ctx.BuilderLogger,
 				&ctx.Progress, ctx.ProgressCB,
 			)
 			if err != nil {
