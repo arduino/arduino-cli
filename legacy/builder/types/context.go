@@ -53,11 +53,8 @@ type Context struct {
 	TargetPlatform *cores.PlatformRelease
 	ActualPlatform *cores.PlatformRelease
 
-	SketchBuildPath      *paths.Path
-	CoreBuildPath        *paths.Path
 	CoreArchiveFilePath  *paths.Path
 	CoreObjectsFiles     paths.PathList
-	LibrariesBuildPath   *paths.Path
 	LibrariesObjectFiles paths.PathList
 	SketchObjectFiles    paths.PathList
 

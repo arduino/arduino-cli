@@ -16,6 +16,7 @@
 package builder
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -23,12 +24,18 @@ import (
 	"github.com/arduino/go-properties-orderedmap"
 )
 
+// ErrSketchCannotBeLocatedInBuildPath fixdoc
+var ErrSketchCannotBeLocatedInBuildPath = errors.New("sketch cannot be located in build path")
+
 // Builder is a Sketch builder.
 type Builder struct {
 	sketch          *sketch.Sketch
 	buildProperties *properties.Map
 
-	buildPath *paths.Path
+	buildPath          *paths.Path
+	sketchBuildPath    *paths.Path
+	coreBuildPath      *paths.Path
+	librariesBuildPath *paths.Path
 
 	// Parallel processes
 	jobs int
@@ -79,13 +86,33 @@ func NewBuilder(
 	}
 	buildProperties.Merge(customBuildProperties)
 
+	sketchBuildPath, err := buildPath.Join("sketch").Abs()
+	if err != nil {
+		return nil, err
+	}
+	librariesBuildPath, err := buildPath.Join("libraries").Abs()
+	if err != nil {
+		return nil, err
+	}
+	coreBuildPath, err := buildPath.Join("core").Abs()
+	if err != nil {
+		return nil, err
+	}
+
+	if buildPath.Canonical().EqualsTo(sk.FullPath.Canonical()) {
+		return nil, ErrSketchCannotBeLocatedInBuildPath
+	}
+
 	return &Builder{
 		sketch:                sk,
 		buildProperties:       buildProperties,
-		coreBuildCachePath:    coreBuildCachePath,
+		buildPath:             buildPath,
+		sketchBuildPath:       sketchBuildPath,
+		coreBuildPath:         coreBuildPath,
+		librariesBuildPath:    librariesBuildPath,
 		jobs:                  jobs,
 		customBuildProperties: append(requestBuildProperties, "build.warn_data_percentage=75"),
-		buildPath:             buildPath,
+		coreBuildCachePath:    coreBuildCachePath,
 	}, nil
 }
 
@@ -107,4 +134,19 @@ func (b *Builder) CustomBuildProperties() []string {
 // GetBuildPath returns the build path
 func (b *Builder) GetBuildPath() *paths.Path {
 	return b.buildPath
+}
+
+// GetSketchBuildPath returns the sketch build path
+func (b *Builder) GetSketchBuildPath() *paths.Path {
+	return b.sketchBuildPath
+}
+
+// GetCoreBuildPath returns the core build path
+func (b *Builder) GetCoreBuildPath() *paths.Path {
+	return b.coreBuildPath
+}
+
+// GetLibrariesBuildPath returns the libraries build path
+func (b *Builder) GetLibrariesBuildPath() *paths.Path {
+	return b.librariesBuildPath
 }

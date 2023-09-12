@@ -51,7 +51,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = ctx.Builder.PrepareSketchBuildPath(ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = ctx.Builder.PrepareSketchBuildPath(ctx.SourceOverride, ctx.Builder.GetSketchBuildPath())
 			return _err
 		}),
 
@@ -71,7 +71,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		types.BareCommand(func(ctx *types.Context) error {
 			sketchObjectFiles, err := builder.SketchBuilder(
-				ctx.SketchBuildPath,
+				ctx.Builder.GetSketchBuildPath(),
 				ctx.Builder.GetBuildProperties(),
 				ctx.SketchLibrariesDetector.IncludeFolders(),
 				ctx.OnlyUpdateCompilationDatabase,
@@ -98,14 +98,14 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		types.BareCommand(func(ctx *types.Context) error {
 			return UnusedCompiledLibrariesRemover(
-				ctx.LibrariesBuildPath,
+				ctx.Builder.GetLibrariesBuildPath(),
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
 			)
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
 			librariesObjectFiles, err := builder.LibrariesBuilder(
-				ctx.LibrariesBuildPath,
+				ctx.Builder.GetLibrariesBuildPath(),
 				ctx.Builder.GetBuildProperties(),
 				ctx.SketchLibrariesDetector.IncludeFolders(),
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
@@ -133,7 +133,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 		types.BareCommand(func(ctx *types.Context) error {
 			objectFiles, archiveFile, err := builder.CoreBuilder(
-				ctx.Builder.GetBuildPath(), ctx.CoreBuildPath, ctx.Builder.CoreBuildCachePath(),
+				ctx.Builder.GetBuildPath(), ctx.Builder.GetCoreBuildPath(), ctx.Builder.CoreBuildCachePath(),
 				ctx.Builder.GetBuildProperties(),
 				ctx.ActualPlatform,
 				ctx.OnlyUpdateCompilationDatabase, ctx.Clean,
@@ -236,7 +236,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		types.BareCommand(func(ctx *types.Context) error {
 			normalOutput, verboseOutput, err := ExportProjectCMake(
 				mainErr != nil,
-				ctx.Builder.GetBuildPath(), ctx.SketchBuildPath,
+				ctx.Builder.GetBuildPath(), ctx.Builder.GetSketchBuildPath(),
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
 				ctx.Builder.GetBuildProperties(),
 				ctx.Builder.Sketch(),
@@ -319,7 +319,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = ctx.Builder.PrepareSketchBuildPath(ctx.SourceOverride, ctx.SketchBuildPath)
+			ctx.LineOffset, _err = ctx.Builder.PrepareSketchBuildPath(ctx.SourceOverride, ctx.Builder.GetSketchBuildPath())
 			return _err
 		}),
 
@@ -335,7 +335,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 	}
 
 	// Output arduino-preprocessed source
-	preprocessedSketch, err := ctx.SketchBuildPath.Join(ctx.Builder.Sketch().MainFile.Base() + ".cpp").ReadFile()
+	preprocessedSketch, err := ctx.Builder.GetSketchBuildPath().Join(ctx.Builder.Sketch().MainFile.Base() + ".cpp").ReadFile()
 	if err != nil {
 		return err
 	}
@@ -378,9 +378,9 @@ func findIncludes(ctx *types.Context) types.BareCommand {
 			ctx.Builder.GetBuildPath(),
 			ctx.Builder.GetBuildProperties().GetPath("build.core.path"),
 			ctx.Builder.GetBuildProperties().GetPath("build.variant.path"),
-			ctx.SketchBuildPath,
+			ctx.Builder.GetSketchBuildPath(),
 			ctx.Builder.Sketch(),
-			ctx.LibrariesBuildPath,
+			ctx.Builder.GetLibrariesBuildPath(),
 			ctx.Builder.GetBuildProperties(),
 			ctx.TargetPlatform.Platform.Architecture,
 		)

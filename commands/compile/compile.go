@@ -17,6 +17,7 @@ package compile
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"sort"
@@ -37,7 +38,6 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/inventory"
 	"github.com/arduino/arduino-cli/legacy/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
@@ -170,26 +170,12 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		coreBuildCachePath = buildCachePath.Join("core")
 	}
 
-	sketchBuilder, err := bldr.NewBuilder(
-		sk,
-		boardBuildProperties,
-		buildPath,
-		req.GetOptimizeForDebug(),
-		coreBuildCachePath,
-		int(req.GetJobs()),
-		req.GetBuildProperties(),
-	)
-	if err != nil {
-		return nil, &arduino.InvalidArgumentError{Message: tr("Invalid build properties"), Cause: err}
-	}
-
 	requiredTools, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 	if err != nil {
 		return nil, err
 	}
 
 	builderCtx := &types.Context{}
-	builderCtx.Builder = sketchBuilder
 	builderCtx.PackageManager = pme
 	builderCtx.TargetBoard = targetBoard
 	builderCtx.TargetPlatform = targetPlatform
@@ -205,10 +191,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
 	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
 
-	builderCtx.CompilationDatabase = compilation.NewDatabase(
-		sketchBuilder.GetBuildPath().Join("compile_commands.json"),
-	)
-
 	builderCtx.BuiltInLibrariesDirs = configuration.IDEBuiltinLibrariesDir(configuration.Settings)
 
 	builderCtx.Clean = req.GetClean()
@@ -218,27 +200,31 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderLogger := logger.New(outStream, errStream, req.GetVerbose(), req.GetWarnings())
 	builderCtx.BuilderLogger = builderLogger
 
-	sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
+	sketchBuilder, err := bldr.NewBuilder(
+		sk,
+		boardBuildProperties,
+		buildPath,
+		req.GetOptimizeForDebug(),
+		coreBuildCachePath,
+		int(req.GetJobs()),
+		req.GetBuildProperties(),
+	)
 	if err != nil {
-		return r, &arduino.CompileFailedError{Message: err.Error()}
-	}
-	librariesBuildPath, err := buildPath.Join(constants.FOLDER_LIBRARIES).Abs()
-	if err != nil {
-		return r, &arduino.CompileFailedError{Message: err.Error()}
-	}
-	coreBuildPath, err := buildPath.Join(constants.FOLDER_CORE).Abs()
-	if err != nil {
-		return r, &arduino.CompileFailedError{Message: err.Error()}
-	}
-	builderCtx.SketchBuildPath = sketchBuildPath
-	builderCtx.LibrariesBuildPath = librariesBuildPath
-	builderCtx.CoreBuildPath = coreBuildPath
-
-	if sketchBuilder.GetBuildPath().Canonical().EqualsTo(sk.FullPath.Canonical()) {
-		return r, &arduino.CompileFailedError{
-			Message: tr("Sketch cannot be located in build path. Please specify a different build path"),
+		if strings.Contains(err.Error(), "invalid build properties") {
+			return nil, &arduino.InvalidArgumentError{Message: tr("Invalid build properties"), Cause: err}
 		}
+		if errors.Is(err, bldr.ErrSketchCannotBeLocatedInBuildPath) {
+			return r, &arduino.CompileFailedError{
+				Message: tr("Sketch cannot be located in build path. Please specify a different build path"),
+			}
+		}
+		return r, &arduino.CompileFailedError{Message: err.Error()}
 	}
+	builderCtx.Builder = sketchBuilder
+
+	builderCtx.CompilationDatabase = compilation.NewDatabase(
+		sketchBuilder.GetBuildPath().Join("compile_commands.json"),
+	)
 
 	var libsManager *librariesmanager.LibrariesManager
 	if pme.GetProfile() != nil {

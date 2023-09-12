@@ -17,6 +17,7 @@ package test
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -25,7 +26,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -61,16 +61,7 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 
 	buildPath, err := paths.MkTempDir("", "test_build_path")
 	require.NoError(t, err)
-	sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
-	require.NoError(t, err)
-	librariesBuildPath, err := buildPath.Join(constants.FOLDER_LIBRARIES).Abs()
-	require.NoError(t, err)
-	coreBuildPath, err := buildPath.Join(constants.FOLDER_CORE).Abs()
-	require.NoError(t, err)
-
-	ctx.SketchBuildPath = sketchBuildPath
-	ctx.LibrariesBuildPath = librariesBuildPath
-	ctx.CoreBuildPath = coreBuildPath
+	require.NotNil(t, buildPath)
 
 	// Create a Package Manager from the given context
 	// This should happen only on legacy arduino-builder.
@@ -94,9 +85,25 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		sk = s
 	}
 
+	// This is an hack to avoid panic when the `NewBuilder` assert a condition on sketch path.
+	// Since the test will be migrated soon in an E2E manner we temporary set the sketch to be empty.
+	// so this assertion inside the Builder:
+	// buildPath().Canonical().EqualsTo(sk.FullPath.Canonical())`
+	// Doesn't fail
+	if sk == nil {
+		sk = &sketch.Sketch{
+			MainFile:         &paths.Path{},
+			FullPath:         paths.New(os.TempDir()),
+			OtherSketchFiles: []*paths.Path{},
+			AdditionalFiles:  []*paths.Path{},
+			RootFolderFiles:  []*paths.Path{},
+			Project:          &sketch.Project{},
+		}
+	}
+
 	builderLogger := logger.New(nil, nil, false, "")
 	ctx.BuilderLogger = builderLogger
-	ctx.Builder, err = bldr.NewBuilder(sk, nil, nil, false, nil, 0, nil)
+	ctx.Builder, err = bldr.NewBuilder(sk, nil, buildPath, false, nil, 0, nil)
 	require.NoError(t, err)
 	if fqbn != "" {
 		ctx.FQBN = parseFQBN(t, fqbn)
@@ -114,10 +121,6 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		ctx.TargetPackage = targetPackage
 		ctx.ActualPlatform = buildPlatform
 		ctx.RequiredTools = requiredTools
-	}
-
-	if sk != nil {
-		require.False(t, ctx.Builder.GetBuildPath().Canonical().EqualsTo(sk.FullPath.Canonical()))
 	}
 
 	if !stepToSkip[skipLibraries] {

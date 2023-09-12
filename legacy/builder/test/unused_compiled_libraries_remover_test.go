@@ -22,7 +22,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/legacy/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
@@ -36,16 +35,15 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 	require.NoError(t, temp.Join("Bridge").MkdirAll())
 	require.NoError(t, temp.Join("dummy_file").WriteFile([]byte{}))
 
-	ctx := &types.Context{}
-	ctx.LibrariesBuildPath = temp
-	ctx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
+	librariesBuildPath := temp
+	sketchLibrariesDetector := detector.NewSketchLibrariesDetector(
 		nil, nil, false, false, logger.New(nil, nil, false, ""),
 	)
-	ctx.SketchLibrariesDetector.AppendImportedLibraries(&libraries.Library{Name: "Bridge"})
+	sketchLibrariesDetector.AppendImportedLibraries(&libraries.Library{Name: "Bridge"})
 
 	err = builder.UnusedCompiledLibrariesRemover(
-		ctx.LibrariesBuildPath,
-		ctx.SketchLibrariesDetector.ImportedLibraries(),
+		librariesBuildPath,
+		sketchLibrariesDetector.ImportedLibraries(),
 	)
 	require.NoError(t, err)
 
@@ -61,16 +59,15 @@ func TestUnusedCompiledLibrariesRemover(t *testing.T) {
 }
 
 func TestUnusedCompiledLibrariesRemoverLibDoesNotExist(t *testing.T) {
-	ctx := &types.Context{}
-	ctx.LibrariesBuildPath = paths.TempDir().Join("test")
-	ctx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
+	librariesBuildPath := paths.TempDir().Join("test")
+	sketchLibrariesDetector := detector.NewSketchLibrariesDetector(
 		nil, nil, false, false, logger.New(nil, nil, false, ""),
 	)
-	ctx.SketchLibrariesDetector.AppendImportedLibraries(&libraries.Library{Name: "Bridge"})
+	sketchLibrariesDetector.AppendImportedLibraries(&libraries.Library{Name: "Bridge"})
 
 	err := builder.UnusedCompiledLibrariesRemover(
-		ctx.LibrariesBuildPath,
-		ctx.SketchLibrariesDetector.ImportedLibraries(),
+		librariesBuildPath,
+		sketchLibrariesDetector.ImportedLibraries(),
 	)
 	require.NoError(t, err)
 }
@@ -84,15 +81,14 @@ func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
 	require.NoError(t, temp.Join("Bridge").MkdirAll())
 	require.NoError(t, temp.Join("dummy_file").WriteFile([]byte{}))
 
-	ctx := &types.Context{}
-	ctx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
+	sketchLibrariesDetector := detector.NewSketchLibrariesDetector(
 		nil, nil, false, false, logger.New(nil, nil, false, ""),
 	)
-	ctx.LibrariesBuildPath = temp
+	librariesBuildPath := temp
 
 	err = builder.UnusedCompiledLibrariesRemover(
-		ctx.LibrariesBuildPath,
-		ctx.SketchLibrariesDetector.ImportedLibraries(),
+		librariesBuildPath,
+		sketchLibrariesDetector.ImportedLibraries(),
 	)
 	require.NoError(t, err)
 
