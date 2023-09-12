@@ -132,13 +132,10 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			objectFiles, archiveFile, err := builder.CoreBuilder(
-				ctx.Builder.GetBuildPath(), ctx.Builder.GetCoreBuildPath(), ctx.Builder.CoreBuildCachePath(),
-				ctx.Builder.GetBuildProperties(),
+			objectFiles, archiveFile, err := ctx.Builder.BuildCore(
 				ctx.ActualPlatform,
 				ctx.OnlyUpdateCompilationDatabase, ctx.Clean,
 				ctx.CompilationDatabase,
-				ctx.Builder.Jobs(),
 				ctx.BuilderLogger,
 				&ctx.Progress, ctx.ProgressCB,
 			)
