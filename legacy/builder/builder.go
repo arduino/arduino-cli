@@ -93,8 +93,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			return UnusedCompiledLibrariesRemover(
-				ctx.Builder.GetLibrariesBuildPath(),
+			return ctx.Builder.RemoveUnusedCompiledLibraries(
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
 			)
 		}),

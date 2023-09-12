@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
+	"golang.org/x/exp/slices"
 )
 
 // nolint
@@ -285,4 +286,37 @@ func (b *Builder) compileLibrary(
 	}
 
 	return objectFiles, nil
+}
+
+// RemoveUnusedCompiledLibraries fixdoc
+func (b *Builder) RemoveUnusedCompiledLibraries(importedLibraries libraries.List) error {
+	if b.librariesBuildPath.NotExist() {
+		return nil
+	}
+
+	toLibraryNames := func(libraries []*libraries.Library) []string {
+		libraryNames := []string{}
+		for _, library := range libraries {
+			libraryNames = append(libraryNames, library.Name)
+		}
+		return libraryNames
+	}
+
+	files, err := b.librariesBuildPath.ReadDir()
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	libraryNames := toLibraryNames(importedLibraries)
+	for _, file := range files {
+		if file.IsDir() {
+			if !slices.Contains(libraryNames, file.Base()) {
+				if err := file.RemoveAll(); err != nil {
+					return errors.WithStack(err)
+				}
+			}
+		}
+	}
+
+	return nil
 }

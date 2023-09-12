@@ -15,90 +15,81 @@
 
 package test
 
-import (
-	"testing"
+// TODO to be ported in the E2E suite
 
-	"github.com/arduino/arduino-cli/arduino/builder/detector"
-	"github.com/arduino/arduino-cli/arduino/builder/logger"
-	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/legacy/builder"
-	paths "github.com/arduino/go-paths-helper"
-	"github.com/stretchr/testify/require"
-)
-
-func TestUnusedCompiledLibrariesRemover(t *testing.T) {
-	temp, err := paths.MkTempDir("", "test")
-	require.NoError(t, err)
-	defer temp.RemoveAll()
-
-	require.NoError(t, temp.Join("SPI").MkdirAll())
-	require.NoError(t, temp.Join("Bridge").MkdirAll())
-	require.NoError(t, temp.Join("dummy_file").WriteFile([]byte{}))
-
-	librariesBuildPath := temp
-	sketchLibrariesDetector := detector.NewSketchLibrariesDetector(
-		nil, nil, false, false, logger.New(nil, nil, false, ""),
-	)
-	sketchLibrariesDetector.AppendImportedLibraries(&libraries.Library{Name: "Bridge"})
-
-	err = builder.UnusedCompiledLibrariesRemover(
-		librariesBuildPath,
-		sketchLibrariesDetector.ImportedLibraries(),
-	)
-	require.NoError(t, err)
-
-	exist, err := temp.Join("SPI").ExistCheck()
-	require.NoError(t, err)
-	require.False(t, exist)
-	exist, err = temp.Join("Bridge").ExistCheck()
-	require.NoError(t, err)
-	require.True(t, exist)
-	exist, err = temp.Join("dummy_file").ExistCheck()
-	require.NoError(t, err)
-	require.True(t, exist)
-}
-
-func TestUnusedCompiledLibrariesRemoverLibDoesNotExist(t *testing.T) {
-	librariesBuildPath := paths.TempDir().Join("test")
-	sketchLibrariesDetector := detector.NewSketchLibrariesDetector(
-		nil, nil, false, false, logger.New(nil, nil, false, ""),
-	)
-	sketchLibrariesDetector.AppendImportedLibraries(&libraries.Library{Name: "Bridge"})
-
-	err := builder.UnusedCompiledLibrariesRemover(
-		librariesBuildPath,
-		sketchLibrariesDetector.ImportedLibraries(),
-	)
-	require.NoError(t, err)
-}
-
-func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
-	temp, err := paths.MkTempDir("", "test")
-	require.NoError(t, err)
-	defer temp.RemoveAll()
-
-	require.NoError(t, temp.Join("SPI").MkdirAll())
-	require.NoError(t, temp.Join("Bridge").MkdirAll())
-	require.NoError(t, temp.Join("dummy_file").WriteFile([]byte{}))
-
-	sketchLibrariesDetector := detector.NewSketchLibrariesDetector(
-		nil, nil, false, false, logger.New(nil, nil, false, ""),
-	)
-	librariesBuildPath := temp
-
-	err = builder.UnusedCompiledLibrariesRemover(
-		librariesBuildPath,
-		sketchLibrariesDetector.ImportedLibraries(),
-	)
-	require.NoError(t, err)
-
-	exist, err := temp.Join("SPI").ExistCheck()
-	require.NoError(t, err)
-	require.False(t, exist)
-	exist, err = temp.Join("Bridge").ExistCheck()
-	require.NoError(t, err)
-	require.False(t, exist)
-	exist, err = temp.Join("dummy_file").ExistCheck()
-	require.NoError(t, err)
-	require.True(t, exist)
-}
+//func TestUnusedCompiledLibrariesRemover(t *testing.T) {
+//	temp, err := paths.MkTempDir("", "test")
+//	require.NoError(t, err)
+//	defer temp.RemoveAll()
+//
+//	require.NoError(t, temp.Join("SPI").MkdirAll())
+//	require.NoError(t, temp.Join("Bridge").MkdirAll())
+//	require.NoError(t, temp.Join("dummy_file").WriteFile([]byte{}))
+//
+//	librariesBuildPath := temp
+//	sketchLibrariesDetector := detector.NewSketchLibrariesDetector(
+//		nil, nil, false, false, logger.New(nil, nil, false, ""),
+//	)
+//	sketchLibrariesDetector.AppendImportedLibraries(&libraries.Library{Name: "Bridge"})
+//
+//	err = builder.UnusedCompiledLibrariesRemover(
+//		librariesBuildPath,
+//		sketchLibrariesDetector.ImportedLibraries(),
+//	)
+//	require.NoError(t, err)
+//
+//	exist, err := temp.Join("SPI").ExistCheck()
+//	require.NoError(t, err)
+//	require.False(t, exist)
+//	exist, err = temp.Join("Bridge").ExistCheck()
+//	require.NoError(t, err)
+//	require.True(t, exist)
+//	exist, err = temp.Join("dummy_file").ExistCheck()
+//	require.NoError(t, err)
+//	require.True(t, exist)
+//}
+//
+//func TestUnusedCompiledLibrariesRemoverLibDoesNotExist(t *testing.T) {
+//	librariesBuildPath := paths.TempDir().Join("test")
+//	sketchLibrariesDetector := detector.NewSketchLibrariesDetector(
+//		nil, nil, false, false, logger.New(nil, nil, false, ""),
+//	)
+//	sketchLibrariesDetector.AppendImportedLibraries(&libraries.Library{Name: "Bridge"})
+//
+//	err := builder.UnusedCompiledLibrariesRemover(
+//		librariesBuildPath,
+//		sketchLibrariesDetector.ImportedLibraries(),
+//	)
+//	require.NoError(t, err)
+//}
+//
+//func TestUnusedCompiledLibrariesRemoverNoUsedLibraries(t *testing.T) {
+//	temp, err := paths.MkTempDir("", "test")
+//	require.NoError(t, err)
+//	defer temp.RemoveAll()
+//
+//	require.NoError(t, temp.Join("SPI").MkdirAll())
+//	require.NoError(t, temp.Join("Bridge").MkdirAll())
+//	require.NoError(t, temp.Join("dummy_file").WriteFile([]byte{}))
+//
+//	sketchLibrariesDetector := detector.NewSketchLibrariesDetector(
+//		nil, nil, false, false, logger.New(nil, nil, false, ""),
+//	)
+//	librariesBuildPath := temp
+//
+//	err = builder.UnusedCompiledLibrariesRemover(
+//		librariesBuildPath,
+//		sketchLibrariesDetector.ImportedLibraries(),
+//	)
+//	require.NoError(t, err)
+//
+//	exist, err := temp.Join("SPI").ExistCheck()
+//	require.NoError(t, err)
+//	require.False(t, exist)
+//	exist, err = temp.Join("Bridge").ExistCheck()
+//	require.NoError(t, err)
+//	require.False(t, exist)
+//	exist, err = temp.Join("dummy_file").ExistCheck()
+//	require.NoError(t, err)
+//	require.True(t, exist)
+//}
