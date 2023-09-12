@@ -192,7 +192,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	builderCtx.BuiltInLibrariesDirs = configuration.IDEBuiltinLibrariesDir(configuration.Settings)
 
-	builderCtx.Clean = req.GetClean()
 	builderCtx.OnlyUpdateCompilationDatabase = req.GetCreateCompilationDatabaseOnly()
 	builderCtx.SourceOverride = req.GetSourceOverride()
 
@@ -212,7 +211,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		builderCtx.OtherLibrariesDirs,
 		builderCtx.BuiltInLibrariesDirs,
 		fqbn,
-		builderCtx.Clean,
+		req.GetClean(),
 		builderLogger,
 	)
 	if err != nil {

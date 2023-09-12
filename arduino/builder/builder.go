@@ -49,15 +49,9 @@ type Builder struct {
 	coreBuildCachePath *paths.Path
 
 	logger *logger.BuilderLogger
+	clean  bool
 
 	*BuildOptionsManager
-
-	hardwareDirs, builtInToolsDirs, otherLibrariesDirs paths.PathList
-	builtInLibrariesDirs                               *paths.Path
-	clean                                              bool
-
-	compilerOptimizationFlags          string
-	runtimePlatformPath, buildCorePath *paths.Path
 }
 
 // NewBuilder creates a sketch Builder.
@@ -133,6 +127,7 @@ func NewBuilder(
 		customBuildProperties: customBuildPropertiesArgs,
 		coreBuildCachePath:    coreBuildCachePath,
 		logger:                logger,
+		clean:                 clean,
 		BuildOptionsManager: NewBuildOptionsManager(
 			hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
 			builtInLibrariesDirs, buildPath,

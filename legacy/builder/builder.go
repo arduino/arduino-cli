@@ -134,7 +134,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		types.BareCommand(func(ctx *types.Context) error {
 			objectFiles, archiveFile, err := ctx.Builder.BuildCore(
 				ctx.ActualPlatform,
-				ctx.OnlyUpdateCompilationDatabase, ctx.Clean,
+				ctx.OnlyUpdateCompilationDatabase,
 				ctx.CompilationDatabase,
 				&ctx.Progress, ctx.ProgressCB,
 			)

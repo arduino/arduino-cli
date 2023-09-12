@@ -37,7 +37,7 @@ import (
 // BuildCore fixdoc
 func (b *Builder) BuildCore(
 	actualPlatform *cores.PlatformRelease,
-	onlyUpdateCompilationDatabase, clean bool,
+	onlyUpdateCompilationDatabase bool,
 	compilationDatabase *compilation.Database,
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, *paths.Path, error) {
@@ -58,7 +58,7 @@ func (b *Builder) BuildCore(
 	}
 
 	archiveFile, objectFiles, err := b.compileCore(
-		onlyUpdateCompilationDatabase, clean,
+		onlyUpdateCompilationDatabase,
 		actualPlatform,
 		compilationDatabase,
 		progress, progressCB,
@@ -71,7 +71,7 @@ func (b *Builder) BuildCore(
 }
 
 func (b *Builder) compileCore(
-	onlyUpdateCompilationDatabase, clean bool,
+	onlyUpdateCompilationDatabase bool,
 	actualPlatform *cores.PlatformRelease,
 	compilationDatabase *compilation.Database,
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
@@ -117,7 +117,7 @@ func (b *Builder) compileCore(
 		}
 
 		var canUseArchivedCore bool
-		if onlyUpdateCompilationDatabase || clean {
+		if onlyUpdateCompilationDatabase || b.clean {
 			canUseArchivedCore = false
 		} else if isOlder, err := utils.DirContentIsOlderThan(realCoreFolder, targetArchivedCore); err != nil || !isOlder {
 			// Recreate the archive if ANY of the core files (including platform.txt) has changed

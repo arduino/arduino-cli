@@ -39,7 +39,6 @@ type Context struct {
 	BuiltInToolsDirs     paths.PathList
 	BuiltInLibrariesDirs *paths.Path
 	OtherLibrariesDirs   paths.PathList
-	Clean                bool
 
 	PackageManager *packagemanager.Explorer
 	RequiredTools  []*cores.ToolRelease
