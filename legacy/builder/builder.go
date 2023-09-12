@@ -20,13 +20,9 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/builder"
-	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
 	"github.com/arduino/arduino-cli/arduino/builder/sizer"
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/go-paths-helper"
-	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -216,22 +212,13 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			normalOutput, verboseOutput, err := ExportProjectCMake(
+			return ctx.Builder.ExportProjectCMake(
 				mainErr != nil,
-				ctx.Builder.GetBuildPath(), ctx.Builder.GetSketchBuildPath(),
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
-				ctx.Builder.GetBuildProperties(),
-				ctx.Builder.Sketch(),
 				ctx.SketchLibrariesDetector.IncludeFolders(),
 				ctx.LineOffset,
 				ctx.OnlyUpdateCompilationDatabase,
 			)
-			if ctx.BuilderLogger.Verbose() {
-				ctx.BuilderLogger.WriteStdout(verboseOutput)
-			} else {
-				ctx.BuilderLogger.WriteStdout(normalOutput)
-			}
-			return err
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
@@ -264,25 +251,8 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 func preprocessSketchCommand(ctx *types.Context) types.BareCommand {
 	return func(ctx *types.Context) error {
-		normalOutput, verboseOutput, err := PreprocessSketch(
-			ctx.Builder.Sketch(), ctx.Builder.GetBuildPath(), ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset,
-			ctx.Builder.GetBuildProperties(), ctx.OnlyUpdateCompilationDatabase)
-		if ctx.BuilderLogger.Verbose() {
-			ctx.BuilderLogger.WriteStdout(verboseOutput)
-		} else {
-			ctx.BuilderLogger.WriteStdout(normalOutput)
-		}
-		return err
+		return ctx.Builder.PreprocessSketch(ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset, ctx.OnlyUpdateCompilationDatabase)
 	}
-}
-
-func PreprocessSketch(
-	sketch *sketch.Sketch, buildPath *paths.Path, includes paths.PathList, lineOffset int,
-	buildProperties *properties.Map, onlyUpdateCompilationDatabase bool,
-) ([]byte, []byte, error) {
-	// In the future we might change the preprocessor
-	preprocessorImpl := preprocessor.PreprocessSketchWithCtags
-	return preprocessorImpl(sketch, buildPath, includes, lineOffset, buildProperties, onlyUpdateCompilationDatabase)
 }
 
 type Preprocess struct{}
