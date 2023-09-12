@@ -70,14 +70,10 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			sketchObjectFiles, err := builder.SketchBuilder(
-				ctx.Builder.GetSketchBuildPath(),
-				ctx.Builder.GetBuildProperties(),
+			sketchObjectFiles, err := ctx.Builder.BuildSketch(
 				ctx.SketchLibrariesDetector.IncludeFolders(),
 				ctx.OnlyUpdateCompilationDatabase,
 				ctx.CompilationDatabase,
-				ctx.Builder.Jobs(),
-				ctx.BuilderLogger,
 				&ctx.Progress, ctx.ProgressCB,
 			)
 			if err != nil {
