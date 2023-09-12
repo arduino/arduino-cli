@@ -105,7 +105,7 @@ func (b *Builder) compileCore(
 	var targetArchivedCore *paths.Path
 	if b.coreBuildCachePath != nil {
 		realCoreFolder := coreFolder.Parent().Parent()
-		archivedCoreName := GetCachedCoreArchiveDirName(
+		archivedCoreName := getCachedCoreArchiveDirName(
 			b.buildProperties.Get("build.fqbn"),
 			b.buildProperties.Get("compiler.optimization_flags"),
 			realCoreFolder,
@@ -182,9 +182,9 @@ func (b *Builder) compileCore(
 	return archiveFile, variantObjectFiles, nil
 }
 
-// GetCachedCoreArchiveDirName returns the directory name to be used to store
+// getCachedCoreArchiveDirName returns the directory name to be used to store
 // the global cached core.a.
-func GetCachedCoreArchiveDirName(fqbn string, optimizationFlags string, coreFolder *paths.Path) string {
+func getCachedCoreArchiveDirName(fqbn string, optimizationFlags string, coreFolder *paths.Path) string {
 	fqbnToUnderscore := strings.ReplaceAll(fqbn, ":", "_")
 	fqbnToUnderscore = strings.ReplaceAll(fqbnToUnderscore, "=", "_")
 	if absCoreFolder, err := coreFolder.Abs(); err == nil {
