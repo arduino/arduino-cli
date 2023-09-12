@@ -387,7 +387,10 @@ func TestBoardOrdering(t *testing.T) {
 	pme, release := pm.NewExplorer()
 	defer release()
 
-	pl := pme.FindPlatform("arduino", "avr")
+	pl := pme.FindPlatform(&PlatformReference{
+		Package:              "arduino",
+		PlatformArchitecture: "avr",
+	})
 	require.NotNil(t, pl)
 	plReleases := pl.GetAllInstalled()
 	require.NotEmpty(t, plReleases)

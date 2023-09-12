@@ -285,7 +285,10 @@ func runProgramAction(pme *packagemanager.Explorer,
 			Property: fmt.Sprintf("%s.tool.%s", action, port.Protocol), // TODO: Can be done better, maybe inline getToolID(...)
 			Value:    uploadToolID}
 	} else if len(split) == 2 {
-		p := pme.FindPlatform(split[0], boardPlatform.Platform.Architecture)
+		p := pme.FindPlatform(&packagemanager.PlatformReference{
+			Package:              split[0],
+			PlatformArchitecture: boardPlatform.Platform.Architecture,
+		})
 		if p == nil {
 			return nil, &arduino.PlatformNotFoundError{Platform: split[0] + ":" + boardPlatform.Platform.Architecture}
 		}

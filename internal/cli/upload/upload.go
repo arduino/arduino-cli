@@ -23,7 +23,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/core"
 	sk "github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/i18n"
@@ -129,12 +129,14 @@ func runUploadCommand(command *cobra.Command, args []string) {
 				panic(tr("Platform ID is not correct"))
 			}
 
-			pme, release := commands.GetPackageManagerExplorer(&rpc.UploadRequest{Instance: inst})
-			platform := pme.FindPlatform(split[0], split[1])
-			release()
-
 			msg += "\n"
-			if platform != nil {
+			if platform, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
+				Instance:    inst,
+				SearchArgs:  platformErr.Platform,
+				AllVersions: false,
+			}); err != nil {
+				msg += err.Error()
+			} else if len(platform.GetSearchOutput()) > 0 {
 				msg += tr("Try running %s", fmt.Sprintf("`%s core install %s`", version.VersionInfo.Application, platformErr.Platform))
 			} else {
 				msg += tr("Platform %s is not found in any known index\nMaybe you need to add a 3rd party URL?", platformErr.Platform)
