@@ -21,10 +21,10 @@ import (
 )
 
 // PreprocessSketch fixdoc
-func (b *Builder) PreprocessSketch(includes paths.PathList, lineOffset int) error {
+func (b *Builder) PreprocessSketch(includes paths.PathList) error {
 	// In the future we might change the preprocessor
 	normalOutput, verboseOutput, err := preprocessor.PreprocessSketchWithCtags(
-		b.sketch, b.buildPath, includes, lineOffset,
+		b.sketch, b.buildPath, includes, b.lineOffset,
 		b.buildProperties, b.onlyUpdateCompilationDatabase,
 	)
 	if b.logger.Verbose() {

@@ -69,6 +69,9 @@ type Builder struct {
 	// Sizer results
 	executableSectionsSize ExecutablesFileSections
 
+	// C++ Parsing
+	lineOffset int
+
 	*BuildOptionsManager
 }
 

@@ -44,7 +44,4 @@ type Context struct {
 	CoreObjectsFiles     paths.PathList
 	LibrariesObjectFiles paths.PathList
 	SketchObjectFiles    paths.PathList
-
-	// C++ Parsing
-	LineOffset int
 }

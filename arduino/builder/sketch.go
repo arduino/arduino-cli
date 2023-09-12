@@ -47,26 +47,28 @@ func (b *Builder) Sketch() *sketch.Sketch {
 // PrepareSketchBuildPath copies the sketch source files in the build path.
 // The .ino files are merged together to create a .cpp file (by the way, the
 // .cpp file still needs to be Arduino-preprocessed to compile).
-func (b *Builder) PrepareSketchBuildPath() (int, error) {
+func (b *Builder) PrepareSketchBuildPath() error {
 	if err := b.sketchBuildPath.MkdirAll(); err != nil {
-		return 0, errors.Wrap(err, tr("unable to create a folder to save the sketch"))
+		return errors.Wrap(err, tr("unable to create a folder to save the sketch"))
 	}
 
 	offset, mergedSource, err := b.sketchMergeSources(b.sourceOverrides)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	destFile := b.sketchBuildPath.Join(b.sketch.MainFile.Base() + ".cpp")
 	if err := destFile.WriteFile([]byte(mergedSource)); err != nil {
-		return 0, err
+		return err
 	}
 
 	if err := b.sketchCopyAdditionalFiles(b.sketchBuildPath, b.sourceOverrides); err != nil {
-		return 0, err
+		return err
 	}
 
-	return offset, nil
+	b.lineOffset = offset
+
+	return nil
 }
 
 // sketchMergeSources merges all the .ino source files included in a sketch to produce

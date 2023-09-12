@@ -36,7 +36,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		return err
 	}
 
-	var _err, mainErr error
+	var mainErr error
 	commands := []types.Command{
 		containerBuildOptions(ctx),
 
@@ -45,8 +45,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = ctx.Builder.PrepareSketchBuildPath()
-			return _err
+			return ctx.Builder.PrepareSketchBuildPath()
 		}),
 
 		logIfVerbose(false, tr("Detecting libraries used...")),
@@ -191,7 +190,6 @@ func (s *Builder) Run(ctx *types.Context) error {
 				mainErr != nil,
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
 				ctx.SketchLibrariesDetector.IncludeFolders(),
-				ctx.LineOffset,
 			)
 		}),
 
@@ -219,7 +217,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 func preprocessSketchCommand(ctx *types.Context) types.BareCommand {
 	return func(ctx *types.Context) error {
-		return ctx.Builder.PreprocessSketch(ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset)
+		return ctx.Builder.PreprocessSketch(ctx.SketchLibrariesDetector.IncludeFolders())
 	}
 }
 
@@ -230,7 +228,6 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 		return err
 	}
 
-	var _err error
 	commands := []types.Command{
 		containerBuildOptions(ctx),
 
@@ -239,8 +236,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = ctx.Builder.PrepareSketchBuildPath()
-			return _err
+			return ctx.Builder.PrepareSketchBuildPath()
 		}),
 
 		findIncludes(ctx),

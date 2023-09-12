@@ -39,7 +39,6 @@ func (b *Builder) ExportProjectCMake(
 	sketchError bool, // Was there an error while compiling the sketch?
 	importedLibraries libraries.List,
 	includeFolders paths.PathList,
-	lineOffset int,
 ) error {
 	// copies the contents of the file named src to the file named
 	// by dst. The file will be created if it does not already exist. If the
@@ -242,7 +241,7 @@ func (b *Builder) ExportProjectCMake(
 		fmt.Println(err)
 	}
 
-	if err := b.PreprocessSketch(includeFolders, lineOffset); err != nil {
+	if err := b.PreprocessSketch(includeFolders); err != nil {
 		return err
 	}
 
