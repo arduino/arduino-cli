@@ -41,7 +41,6 @@ import (
 	"github.com/arduino/arduino-cli/legacy/builder/types"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 )
 
@@ -171,24 +170,20 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		coreBuildCachePath = buildCachePath.Join("core")
 	}
 
-	sketchBuilder := bldr.NewBuilder(
+	sketchBuilder, err := bldr.NewBuilder(
 		sk,
 		boardBuildProperties,
 		buildPath,
 		req.GetOptimizeForDebug(),
 		coreBuildCachePath,
 		int(req.GetJobs()),
+		req.GetBuildProperties(),
 	)
-
-	buildProperties := sketchBuilder.GetBuildProperties()
-
-	// Add user provided custom build properties
-	customBuildPropertiesArgs := append(req.GetBuildProperties(), "build.warn_data_percentage=75")
-	if customBuildProperties, err := properties.LoadFromSlice(req.GetBuildProperties()); err == nil {
-		buildProperties.Merge(customBuildProperties)
-	} else {
+	if err != nil {
 		return nil, &arduino.InvalidArgumentError{Message: tr("Invalid build properties"), Cause: err}
 	}
+
+	buildProperties := sketchBuilder.GetBuildProperties()
 
 	requiredTools, err := pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 	if err != nil {
@@ -204,7 +199,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.ActualPlatform = buildPlatform
 	builderCtx.RequiredTools = requiredTools
 	builderCtx.BuildProperties = buildProperties
-	builderCtx.CustomBuildProperties = customBuildPropertiesArgs
 	builderCtx.FQBN = fqbn
 	builderCtx.BuildPath = buildPath
 	builderCtx.ProgressCB = progressCB

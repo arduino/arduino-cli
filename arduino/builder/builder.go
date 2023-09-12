@@ -16,6 +16,8 @@
 package builder
 
 import (
+	"fmt"
+
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -29,6 +31,9 @@ type Builder struct {
 	// Parallel processes
 	jobs int
 
+	// Custom build properties defined by user (line by line as "key=value" pairs)
+	customBuildProperties []string
+
 	// core related
 	coreBuildCachePath *paths.Path
 }
@@ -41,7 +46,8 @@ func NewBuilder(
 	optimizeForDebug bool,
 	coreBuildCachePath *paths.Path,
 	jobs int,
-) *Builder {
+	requestBuildProperties []string,
+) (*Builder, error) {
 	buildProperties := properties.NewMap()
 	if boardBuildProperties != nil {
 		buildProperties.Merge(boardBuildProperties)
@@ -64,12 +70,20 @@ func NewBuilder(
 		}
 	}
 
-	return &Builder{
-		sketch:             sk,
-		buildProperties:    buildProperties,
-		coreBuildCachePath: coreBuildCachePath,
-		jobs:               jobs,
+	// Add user provided custom build properties
+	customBuildProperties, err := properties.LoadFromSlice(requestBuildProperties)
+	if err != nil {
+		return nil, fmt.Errorf("invalid build properties: %w", err)
 	}
+	buildProperties.Merge(customBuildProperties)
+
+	return &Builder{
+		sketch:                sk,
+		buildProperties:       buildProperties,
+		coreBuildCachePath:    coreBuildCachePath,
+		jobs:                  jobs,
+		customBuildProperties: append(requestBuildProperties, "build.warn_data_percentage=75"),
+	}, nil
 }
 
 // GetBuildProperties returns the build properties for running this build
@@ -80,4 +94,9 @@ func (b *Builder) GetBuildProperties() *properties.Map {
 // Jobs number of parallel processes
 func (b *Builder) Jobs() int {
 	return b.jobs
+}
+
+// CustomBuildProperties returns user provided custom build properties
+func (b *Builder) CustomBuildProperties() []string {
+	return b.customBuildProperties
 }

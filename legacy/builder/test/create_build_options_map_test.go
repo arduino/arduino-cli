@@ -38,7 +38,7 @@ func TestCreateBuildOptionsMap(t *testing.T) {
 
 	buildPropertiesJSON, err := builder.CreateBuildOptionsMap(
 		ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
-		ctx.BuiltInLibrariesDirs, &sketch.Sketch{FullPath: paths.New("sketchLocation")}, ctx.CustomBuildProperties,
+		ctx.BuiltInLibrariesDirs, &sketch.Sketch{FullPath: paths.New("sketchLocation")}, nil,
 		ctx.FQBN.String(), ctx.BuildProperties.Get("compiler.optimization_flags"),
 	)
 	require.NoError(t, err)

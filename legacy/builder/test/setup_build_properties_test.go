@@ -73,13 +73,13 @@ func TestSetupBuildProperties(t *testing.T) {
 
 func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	ctx := &types.Context{
-		HardwareDirs:          paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:      paths.NewPathList("downloaded_tools", "tools_builtin"),
-		CustomBuildProperties: []string{"name=fake name", "tools.avrdude.config.path=non existent path with space and a ="},
+		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
+		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
 	}
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
 	defer cleanUpBuilderTestContext(t, ctx)
-	customProps, err := properties.LoadFromSlice(ctx.CustomBuildProperties)
+	customBuildProp := []string{"name=fake name", "tools.avrdude.config.path=non existent path with space and a ="}
+	customProps, err := properties.LoadFromSlice(customBuildProp)
 	require.NoError(t, err)
 	ctx.BuildProperties.Merge(customProps)
 

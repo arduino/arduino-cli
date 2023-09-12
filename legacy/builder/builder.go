@@ -416,7 +416,7 @@ func containerBuildOptions(ctx *types.Context) types.BareCommand {
 		// ctx.BuildProperties
 		buildOptionsJSON, buildOptionsJSONPrevious, infoMessage, err := ContainerBuildOptions(
 			ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
-			ctx.BuiltInLibrariesDirs, ctx.BuildPath, ctx.Builder.Sketch(), ctx.CustomBuildProperties,
+			ctx.BuiltInLibrariesDirs, ctx.BuildPath, ctx.Builder.Sketch(), ctx.Builder.CustomBuildProperties(),
 			ctx.FQBN.String(), ctx.Clean, ctx.BuildProperties,
 		)
 		if infoMessage != "" {
