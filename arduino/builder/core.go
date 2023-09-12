@@ -24,7 +24,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
-	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -40,7 +39,6 @@ func (b *Builder) BuildCore(
 	actualPlatform *cores.PlatformRelease,
 	onlyUpdateCompilationDatabase, clean bool,
 	compilationDatabase *compilation.Database,
-	builderLogger *logger.BuilderLogger,
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, *paths.Path, error) {
 	if err := b.coreBuildPath.MkdirAll(); err != nil {
@@ -49,8 +47,8 @@ func (b *Builder) BuildCore(
 
 	if b.coreBuildCachePath != nil {
 		if _, err := b.coreBuildCachePath.RelTo(b.buildPath); err != nil {
-			builderLogger.Info(tr("Couldn't deeply cache core build: %[1]s", err))
-			builderLogger.Info(tr("Running normal build of the core..."))
+			b.logger.Info(tr("Couldn't deeply cache core build: %[1]s", err))
+			b.logger.Info(tr("Running normal build of the core..."))
 			// TODO decide if we want to override this or not. (It's only used by the
 			// compileCore function).
 			b.coreBuildCachePath = nil
@@ -63,7 +61,6 @@ func (b *Builder) BuildCore(
 		onlyUpdateCompilationDatabase, clean,
 		actualPlatform,
 		compilationDatabase,
-		builderLogger,
 		progress, progressCB,
 	)
 	if err != nil {
@@ -77,7 +74,6 @@ func (b *Builder) compileCore(
 	onlyUpdateCompilationDatabase, clean bool,
 	actualPlatform *cores.PlatformRelease,
 	compilationDatabase *compilation.Database,
-	builderLogger *logger.BuilderLogger,
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (*paths.Path, paths.PathList, error) {
 	coreFolder := b.buildProperties.GetPath("build.core.path")
@@ -98,7 +94,7 @@ func (b *Builder) compileCore(
 			onlyUpdateCompilationDatabase,
 			compilationDatabase,
 			b.jobs,
-			builderLogger,
+			b.logger,
 			progress, progressCB,
 		)
 		if err != nil {
@@ -137,8 +133,8 @@ func (b *Builder) compileCore(
 
 		if canUseArchivedCore {
 			// use archived core
-			if builderLogger.Verbose() {
-				builderLogger.Info(tr("Using precompiled core: %[1]s", targetArchivedCore))
+			if b.logger.Verbose() {
+				b.logger.Info(tr("Using precompiled core: %[1]s", targetArchivedCore))
 			}
 			return targetArchivedCore, variantObjectFiles, nil
 		}
@@ -149,7 +145,7 @@ func (b *Builder) compileCore(
 		onlyUpdateCompilationDatabase,
 		compilationDatabase,
 		b.jobs,
-		builderLogger,
+		b.logger,
 		progress, progressCB,
 	)
 	if err != nil {
@@ -158,10 +154,10 @@ func (b *Builder) compileCore(
 
 	archiveFile, verboseInfo, err := utils.ArchiveCompiledFiles(
 		b.coreBuildPath, paths.New("core.a"), coreObjectFiles, b.buildProperties,
-		onlyUpdateCompilationDatabase, builderLogger.Verbose(), builderLogger.Stdout(), builderLogger.Stderr(),
+		onlyUpdateCompilationDatabase, b.logger.Verbose(), b.logger.Stdout(), b.logger.Stderr(),
 	)
-	if builderLogger.Verbose() {
-		builderLogger.Info(string(verboseInfo))
+	if b.logger.Verbose() {
+		b.logger.Info(string(verboseInfo))
 	}
 	if err != nil {
 		return nil, nil, errors.WithStack(err)
@@ -170,15 +166,15 @@ func (b *Builder) compileCore(
 	// archive core.a
 	if targetArchivedCore != nil && !onlyUpdateCompilationDatabase {
 		err := archiveFile.CopyTo(targetArchivedCore)
-		if builderLogger.Verbose() {
+		if b.logger.Verbose() {
 			if err == nil {
-				builderLogger.Info(tr("Archiving built core (caching) in: %[1]s", targetArchivedCore))
+				b.logger.Info(tr("Archiving built core (caching) in: %[1]s", targetArchivedCore))
 			} else if os.IsNotExist(err) {
-				builderLogger.Info(tr("Unable to cache built core, please tell %[1]s maintainers to follow %[2]s",
+				b.logger.Info(tr("Unable to cache built core, please tell %[1]s maintainers to follow %[2]s",
 					actualPlatform,
 					"https://arduino.github.io/arduino-cli/latest/platform-specification/#recipes-to-build-the-corea-archive-file"))
 			} else {
-				builderLogger.Info(tr("Error archiving built core (caching) in %[1]s: %[2]s", targetArchivedCore, err))
+				b.logger.Info(tr("Error archiving built core (caching) in %[1]s: %[2]s", targetArchivedCore, err))
 			}
 		}
 	}

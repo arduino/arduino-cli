@@ -136,7 +136,6 @@ func (s *Builder) Run(ctx *types.Context) error {
 				ctx.ActualPlatform,
 				ctx.OnlyUpdateCompilationDatabase, ctx.Clean,
 				ctx.CompilationDatabase,
-				ctx.BuilderLogger,
 				&ctx.Progress, ctx.ProgressCB,
 			)
 
