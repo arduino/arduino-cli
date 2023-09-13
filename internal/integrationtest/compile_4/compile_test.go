@@ -110,6 +110,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithEnumClass", testBuilderSketchWithEnumClass},
 		{"SketchWithExternC", testBuilderSketchWithExternC},
 		{"SketchWithMultilinePrototypes", testBuilderSketchWithMultilinePrototypes},
+		{"SketchWithExternCMultiline", testBuilderSketchWithExternCMultiline},
 	}.Run(t, env, cli)
 }
 
@@ -679,6 +680,21 @@ func testBuilderSketchWithExternC(t *testing.T, env *integrationtest.Environment
 }
 
 func testBuilderSketchWithMultilinePrototypes(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchWithExternCMultiline(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	t.Run("Build", func(t *testing.T) {
 		// Build
 		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
