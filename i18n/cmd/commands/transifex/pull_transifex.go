@@ -29,6 +29,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var tr = i18n.Tr
+
 var pullTransifexCommand = &cobra.Command{
 	Use:   "pull [catalog folder]",
 	Short: "pulls the translation files from transifex",
