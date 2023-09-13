@@ -107,6 +107,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"UserHardware", testBuilderWithUserHardware},
 		{"SketchThatIncludesArduinoH", testBuilderSketchThatIncludesArduinoH},
 		{"SketchWithStaticAsserts", testBuilderSketchWithStaticAsserts},
+		{"SketchWithEnumClass", testBuilderSketchWithEnumClass},
 	}.Run(t, env, cli)
 }
 
@@ -631,6 +632,21 @@ func testBuilderSketchThatIncludesArduinoH(t *testing.T, env *integrationtest.En
 }
 
 func testBuilderSketchWithStaticAsserts(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchWithEnumClass(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	t.Run("Build", func(t *testing.T) {
 		// Build
 		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")

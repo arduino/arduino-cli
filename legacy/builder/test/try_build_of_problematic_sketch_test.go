@@ -29,26 +29,12 @@ import (
 
 // TODO add them in the compile_4
 
-func TestTryBuild035(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_enum_class", "sketch_with_enum_class.ino"))
-}
-
-func TestTryBuild036(t *testing.T) {
-	ctx := makeDefaultContext()
-	tryBuildWithContext(t, ctx, "arduino:samd:arduino_zero_native", paths.New("sketch_fastleds", "sketch_fastleds.ino"))
-}
-
 func TestTryBuild037(t *testing.T) {
 	tryBuild(t, paths.New("sketch_with_externC", "sketch_with_externC.ino"))
 }
 
 func TestTryBuild038(t *testing.T) {
 	tryBuild(t, paths.New("sketch_with_multiline_prototypes", "sketch_with_multiline_prototypes.ino"))
-}
-
-func TestTryBuild039(t *testing.T) {
-	ctx := makeDefaultContext()
-	tryBuildWithContext(t, ctx, "arduino:samd:arduino_zero_native", paths.New("sketch12", "sketch12.ino"))
 }
 
 func TestTryBuild040(t *testing.T) {
@@ -61,6 +47,16 @@ func TestTryBuild041(t *testing.T) {
 
 func TestTryBuild042(t *testing.T) {
 	tryBuild(t, paths.New("sketch_with_fake_function_pointer", "sketch_with_fake_function_pointer.ino"))
+}
+
+func TestTryBuild036(t *testing.T) {
+	ctx := makeDefaultContext()
+	tryBuildWithContext(t, ctx, "arduino:samd:arduino_zero_native", paths.New("sketch_fastleds", "sketch_fastleds.ino"))
+}
+
+func TestTryBuild039(t *testing.T) {
+	ctx := makeDefaultContext()
+	tryBuildWithContext(t, ctx, "arduino:samd:arduino_zero_native", paths.New("sketch12", "sketch12.ino"))
 }
 
 func makeDefaultContext() *types.Context {
