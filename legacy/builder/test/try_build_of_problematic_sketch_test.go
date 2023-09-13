@@ -29,10 +29,6 @@ import (
 
 // TODO add them in the compile_4
 
-func TestTryBuild037(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_externC", "sketch_with_externC.ino"))
-}
-
 func TestTryBuild038(t *testing.T) {
 	tryBuild(t, paths.New("sketch_with_multiline_prototypes", "sketch_with_multiline_prototypes.ino"))
 }
