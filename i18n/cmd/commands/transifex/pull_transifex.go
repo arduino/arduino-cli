@@ -27,6 +27,7 @@ import (
 
 	"github.com/arduino/go-paths-helper"
 	"github.com/spf13/cobra"
+	"github.com/arduino/arduino-cli/i18n"
 )
 
 var tr = i18n.Tr
