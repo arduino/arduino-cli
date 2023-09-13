@@ -1,0 +1,20 @@
+#include <Arduino.h>
+#line 0 "{{QuoteCppString .sketchMainFile}}"
+template< typename T >  T func(T t);
+#line 6 "{{QuoteCppString .sketchMainFile}}"
+void setup();
+#line 10 "{{QuoteCppString .sketchMainFile}}"
+void loop();
+#line 0 "{{QuoteCppString .sketchMainFile}}"
+#line 1 "{{QuoteCppString .sketchMainFile}}"
+template< typename T >  
+T func(T t){
+    return t * t;
+}
+
+void setup() {
+  func( 12.34f );
+}
+
+void loop() {}
+
