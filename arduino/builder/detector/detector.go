@@ -669,7 +669,7 @@ type includeCacheEntry struct {
 
 // String fixdoc
 func (entry *includeCacheEntry) String() string {
-	return fmt.Sprintf("SourceFile: %s; Include: %s; IncludePath: %s",
+	return fmt.Sprintf(tr("SourceFile: %s; Include: %s; IncludePath: %s"),
 		entry.Sourcefile, entry.Include, entry.Includepath)
 }
 

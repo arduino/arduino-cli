@@ -223,7 +223,7 @@ func getDownloadURL(languageCode, downloadID string) string {
 		case "pending":
 			fallthrough
 		case "processing":
-			fmt.Printf("Current status for language %s: %s\n", languageCode, status)
+			fmt.Printf(tr("Current status for language %s: %s\n"), languageCode, status)
 			time.Sleep(backoff)
 			backoff = backoff * 2
 			// Request the status again
@@ -234,14 +234,14 @@ func getDownloadURL(languageCode, downloadID string) string {
 			}
 			os.Exit(1)
 		}
-		fmt.Printf("Status request for language %s failed in an unforeseen way\n", languageCode)
+		fmt.Printf(tr("Status request for language %s failed in an unforeseen way\n"), languageCode)
 		os.Exit(1)
 	}
 }
 
 // download file from url and saves it in folder with the specified fileName
 func download(folder, fileName, url string) {
-	fmt.Printf("Starting download of %s\n", fileName)
+	fmt.Printf(tr("Starting download of %s\n"), fileName)
 	filePath := paths.New(folder, fileName)
 
 	res, err := http.DefaultClient.Get(url)
@@ -257,12 +257,12 @@ func download(folder, fileName, url string) {
 	}
 
 	filePath.WriteFile(data)
-	fmt.Printf("Finished download of %s\n", fileName)
+	fmt.Printf(tr("Finished download of %s\n"), fileName)
 }
 
 func pullCatalog(cmd *cobra.Command, args []string) {
 	languages := getLanguages()
-	fmt.Println("translations found:", languages)
+	fmt.Println(tr("translations found:"), languages)
 
 	folder := args[0]
 
@@ -277,5 +277,5 @@ func pullCatalog(cmd *cobra.Command, args []string) {
 		}(lang)
 	}
 	wg.Wait()
-	fmt.Println("Translation files downloaded")
+	fmt.Println(tr("Translation files downloaded"))
 }

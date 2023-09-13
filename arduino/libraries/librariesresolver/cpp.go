@@ -119,20 +119,20 @@ func (resolver *Cpp) AlternativesFor(header string) libraries.List {
 // ResolveFor finds the most suitable library for the specified combination of
 // header and architecture. If no libraries provides the requested header, nil is returned
 func (resolver *Cpp) ResolveFor(header, architecture string) *libraries.Library {
-	logrus.Infof("Resolving include %s for arch %s", header, architecture)
+	logrus.Infof(tr("Resolving include %s for arch %s"), header, architecture)
 	var found libraries.List
 	var foundPriority int
 	for _, lib := range resolver.headers[header] {
 		libPriority := ComputePriority(lib, header, architecture)
-		msg := "  discarded"
+		msg := tr("  discarded")
 		if found == nil || foundPriority < libPriority {
 			found = libraries.List{}
 			found.Add(lib)
 			foundPriority = libPriority
-			msg = "  found better lib"
+			msg = tr("  found better lib")
 		} else if foundPriority == libPriority {
 			found.Add(lib)
-			msg = "  found another lib with same priority"
+			msg = tr("  found another lib with same priority")
 		}
 		logrus.
 			WithField("lib", lib.Name).
@@ -149,12 +149,12 @@ func (resolver *Cpp) ResolveFor(header, architecture string) *libraries.Library 
 	// If more than one library qualifies use the "closestmatch" algorithm to
 	// find the best matching one (instead of choosing it randomly)
 	if best := findLibraryWithNameBestDistance(header, found); best != nil {
-		logrus.WithField("lib", best.Name).Info("  library with the best matching name")
+		logrus.WithField("lib", best.Name).Info(tr("  library with the best matching name"))
 		return best
 	}
 
 	found.SortByName()
-	logrus.WithField("lib", found[0].Name).Info("  first library in alphabetic order")
+	logrus.WithField("lib", found[0].Name).Info(tr("  first library in alphabetic order"))
 	return found[0]
 }
 
@@ -217,7 +217,7 @@ func ComputePriority(lib *libraries.Library, header, arch string) int {
 		// Bonus for libraries specified via --libraries flags, those libraries gets the highest priority
 		priority += 10000
 	default:
-		panic(fmt.Sprintf("Invalid library location: %d", lib.Location))
+		panic(fmt.Sprintf(tr("Invalid library location: %d"), lib.Location))
 	}
 	return priority
 }

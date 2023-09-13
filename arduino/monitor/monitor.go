@@ -69,15 +69,15 @@ type PortParameterDescriptor struct {
 }
 
 func (msg monitorMessage) String() string {
-	s := fmt.Sprintf("type: %s", msg.EventType)
+	s := fmt.Sprintf(tr("type: %s"), msg.EventType)
 	if msg.Message != "" {
-		s = fmt.Sprintf("%[1]s, message: %[2]s", s, msg.Message)
+		s = fmt.Sprintf(tr("%[1]s, message: %[2]s"), s, msg.Message)
 	}
 	if msg.ProtocolVersion != 0 {
-		s = fmt.Sprintf("%[1]s, protocol version: %[2]d", s, msg.ProtocolVersion)
+		s = fmt.Sprintf(tr("%[1]s, protocol version: %[2]d"), s, msg.ProtocolVersion)
 	}
 	if msg.PortDescription != nil {
-		s = fmt.Sprintf("%s, port descriptor: protocol %s, %d parameters",
+		s = fmt.Sprintf(tr("%s, port descriptor: protocol %s, %d parameters"),
 			s, msg.PortDescription.Protocol, len(msg.PortDescription.ConfigurationParameters))
 	}
 	return s
@@ -253,7 +253,7 @@ func (mon *PluggableMonitor) Describe() (*PortDescriptor, error) {
 
 // Configure sets a port configuration parameter.
 func (mon *PluggableMonitor) Configure(param, value string) error {
-	if err := mon.sendCommand(fmt.Sprintf("CONFIGURE %s %s\n", param, value)); err != nil {
+	if err := mon.sendCommand(fmt.Sprintf(tr("CONFIGURE %s %s\n"), param, value)); err != nil {
 		return err
 	}
 	_, err := mon.waitMessage(time.Second*10, "configure")
@@ -273,7 +273,7 @@ func (mon *PluggableMonitor) Open(portAddress, portProtocol string) (io.ReadWrit
 	defer tcpListener.Close()
 	tcpListenerPort := tcpListener.Addr().(*net.TCPAddr).Port
 
-	if err := mon.sendCommand(fmt.Sprintf("OPEN 127.0.0.1:%d %s\n", tcpListenerPort, portAddress)); err != nil {
+	if err := mon.sendCommand(fmt.Sprintf(tr("OPEN 127.0.0.1:%d %s\n"), tcpListenerPort, portAddress)); err != nil {
 		return nil, err
 	}
 	if _, err := mon.waitMessage(time.Second*10, "open"); err != nil {

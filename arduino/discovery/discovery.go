@@ -69,7 +69,7 @@ type discoveryMessage struct {
 }
 
 func (msg discoveryMessage) String() string {
-	s := fmt.Sprintf("type: %s", msg.EventType)
+	s := fmt.Sprintf(tr("type: %s"), msg.EventType)
 	if msg.Message != "" {
 		s = tr("%[1]s, message: %[2]s", s, msg.Message)
 	}
@@ -189,7 +189,7 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 		disc.incomingMessagesError = err
 		disc.statusMutex.Unlock()
 		close(outChan)
-		logrus.Errorf("stopped discovery %s decode loop: %v", disc.id, err)
+		logrus.Errorf(tr("stopped discovery %s decode loop: %v"), disc.id, err)
 	}
 
 	for {
@@ -206,7 +206,7 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 			closeAndReportError(err)
 			return
 		}
-		logrus.Infof("from discovery %s received message %s", disc.id, msg)
+		logrus.Infof(tr("from discovery %s received message %s"), disc.id, msg)
 		if msg.EventType == "add" {
 			if msg.Port == nil {
 				closeAndReportError(errors.New(tr("invalid 'add' message: missing port")))
@@ -253,7 +253,7 @@ func (disc *PluggableDiscovery) waitMessage(timeout time.Duration) (*discoveryMe
 }
 
 func (disc *PluggableDiscovery) sendCommand(command string) error {
-	logrus.Infof("sending command %s to discovery %s", strings.TrimSpace(command), disc)
+	logrus.Infof(tr("sending command %s to discovery %s"), strings.TrimSpace(command), disc)
 	data := []byte(command)
 	for {
 		n, err := disc.outgoingCommandsPipe.Write(data)
@@ -268,7 +268,7 @@ func (disc *PluggableDiscovery) sendCommand(command string) error {
 }
 
 func (disc *PluggableDiscovery) runProcess() error {
-	logrus.Infof("starting discovery %s process", disc.id)
+	logrus.Infof(tr("starting discovery %s process"), disc.id)
 	proc, err := executils.NewProcess(nil, disc.processArgs...)
 	if err != nil {
 		return err
@@ -295,12 +295,12 @@ func (disc *PluggableDiscovery) runProcess() error {
 	defer disc.statusMutex.Unlock()
 	disc.process = proc
 	disc.state = Alive
-	logrus.Infof("started discovery %s process", disc.id)
+	logrus.Infof(tr("started discovery %s process"), disc.id)
 	return nil
 }
 
 func (disc *PluggableDiscovery) killProcess() error {
-	logrus.Infof("killing discovery %s process", disc.id)
+	logrus.Infof(tr("killing discovery %s process"), disc.id)
 	if disc.process != nil {
 		if err := disc.process.Kill(); err != nil {
 			return err
@@ -313,7 +313,7 @@ func (disc *PluggableDiscovery) killProcess() error {
 	defer disc.statusMutex.Unlock()
 	disc.stopSync()
 	disc.state = Dead
-	logrus.Infof("killed discovery %s process", disc.id)
+	logrus.Infof(tr("killed discovery %s process"), disc.id)
 	return nil
 }
 
@@ -335,7 +335,7 @@ func (disc *PluggableDiscovery) Run() (err error) {
 		if err := disc.killProcess(); err != nil {
 			// Log failure to kill the process, ideally that should never happen
 			// but it's best to know it if it does
-			logrus.Errorf("Killing discovery %s after unsuccessful start: %s", disc.id, err)
+			logrus.Errorf(tr("Killing discovery %s after unsuccessful start: %s"), disc.id, err)
 		}
 	}()
 
@@ -415,7 +415,7 @@ func (disc *PluggableDiscovery) stopSync() {
 func (disc *PluggableDiscovery) Quit() {
 	_ = disc.sendCommand("QUIT\n")
 	if _, err := disc.waitMessage(time.Second * 5); err != nil {
-		logrus.Errorf("Quitting discovery %s: %s", disc.id, err)
+		logrus.Errorf(tr("Quitting discovery %s: %s"), disc.id, err)
 	}
 	disc.stopSync()
 	disc.killProcess()

@@ -33,7 +33,7 @@ func RecipeByPrefixSuffixRunner(
 	buildProps *properties.Map,
 	builderLogger *logger.BuilderLogger,
 ) error {
-	logrus.Debugf(fmt.Sprintf("Looking for recipes like %s", prefix+"*"+suffix))
+	logrus.Debugf(fmt.Sprintf(tr("Looking for recipes like %s"), prefix+"*"+suffix))
 
 	// TODO is it necessary to use Clone?
 	buildProperties := buildProps.Clone()
@@ -42,7 +42,7 @@ func RecipeByPrefixSuffixRunner(
 	// TODO is it necessary to use Clone?
 	properties := buildProperties.Clone()
 	for _, recipe := range recipes {
-		logrus.Debugf(fmt.Sprintf("Running recipe: %s", recipe))
+		logrus.Debugf(fmt.Sprintf(tr("Running recipe: %s"), recipe))
 
 		command, err := utils.PrepareCommandForRecipe(properties, recipe, false)
 		if err != nil {

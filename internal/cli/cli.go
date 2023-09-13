@@ -124,7 +124,7 @@ func createCliCommandTree(cmd *cobra.Command) {
 	})
 	cmd.PersistentFlags().StringVar(&configFile, "config-file", "", tr("The custom config file (if not specified the default will be used)."))
 	cmd.PersistentFlags().StringSlice("additional-urls", []string{}, tr("Comma-separated list of additional URLs for the Boards Manager."))
-	cmd.PersistentFlags().Bool("no-color", false, "Disable colored output.")
+	cmd.PersistentFlags().Bool("no-color", false, tr("Disable colored output."))
 	configuration.BindFlags(cmd, configuration.Settings)
 }
 
