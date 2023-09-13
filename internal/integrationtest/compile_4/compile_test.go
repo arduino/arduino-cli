@@ -775,7 +775,6 @@ func testBuilderSketchWithFastledsLibrary(t *testing.T, env *integrationtest.Env
 	})
 }
 
-
 type builderOutput struct {
 	CompilerOut   string `json:"compiler_out"`
 	CompilerErr   string `json:"compiler_err"`
@@ -927,4 +926,31 @@ func TestCoreCaching(t *testing.T) {
 	coreStatAfterTouch, err := cachedCoreFile.Stat()
 	require.NoError(t, err)
 	require.NotEqual(t, coreStatBefore.ModTime(), coreStatAfterTouch.ModTime())
+}
+
+func TestMergeSketchWithBootloader(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	sketchPath, err := paths.New("testdata", "SketchWithMergedSketchAndBootloader").Abs()
+	require.NoError(t, err)
+
+	// Install Arduino AVR Boards
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.6")
+	require.NoError(t, err)
+
+	buildPath, err := paths.MkTempDir("", "arduino-integration-test")
+	require.NoError(t, err)
+	defer buildPath.RemoveAll()
+
+	// Build first time
+	_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(), sketchPath.String())
+	require.NoError(t, err)
+
+	bytes, err := buildPath.Join("SketchWithMergedSketchAndBootloader.ino.with_bootloader.hex").ReadFile()
+	require.NoError(t, err)
+	mergedSketchHex := string(bytes)
+
+	require.Contains(t, mergedSketchHex, ":100000000C9434000C9446000C9446000C9446006A\n")
+	require.True(t, strings.HasSuffix(mergedSketchHex, ":00000001FF\n"))
 }
