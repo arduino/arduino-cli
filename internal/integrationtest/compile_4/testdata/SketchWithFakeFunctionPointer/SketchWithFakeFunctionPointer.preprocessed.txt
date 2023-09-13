@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#line 1 "{{QuoteCppString .sketchMainFile}}"
+#line 1 {{QuoteCppString .sketchMainFile}}
 template< uint16_t nBuffSize >
   class Foo{
     public: 
@@ -14,11 +14,11 @@ template< uint16_t nBuffSize >
 Foo<64> a;
 Foo<32> b;
 
-#line 15 "{{QuoteCppString .sketchMainFile}}"
+#line 15 {{QuoteCppString .sketchMainFile}}
 void setup();
-#line 19 "{{QuoteCppString .sketchMainFile}}"
+#line 19 {{QuoteCppString .sketchMainFile}}
 void loop();
-#line 15 "{{QuoteCppString .sketchMainFile}}"
+#line 15 {{QuoteCppString .sketchMainFile}}
 void setup(){
   a += b;
 }

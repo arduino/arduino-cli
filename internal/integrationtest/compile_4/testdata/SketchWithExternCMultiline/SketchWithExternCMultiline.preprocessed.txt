@@ -1,20 +1,20 @@
 #include <Arduino.h>
-#line 1 "{{QuoteCppString .sketchMainFile}}"
-#line 1 "{{QuoteCppString .sketchMainFile}}"
+#line 1 {{QuoteCppString .sketchMainFile}}
+#line 1 {{QuoteCppString .sketchMainFile}}
 void setup();
-#line 5 "{{QuoteCppString .sketchMainFile}}"
+#line 5 {{QuoteCppString .sketchMainFile}}
 void loop();
-#line 15 "{{QuoteCppString .sketchMainFile}}"
+#line 15 {{QuoteCppString .sketchMainFile}}
  extern "C" void test2();
-#line 20 "{{QuoteCppString .sketchMainFile}}"
+#line 20 {{QuoteCppString .sketchMainFile}}
  extern "C" void test4();
-#line 26 "{{QuoteCppString .sketchMainFile}}"
+#line 26 {{QuoteCppString .sketchMainFile}}
  extern "C" void test6();
-#line 30 "{{QuoteCppString .sketchMainFile}}"
+#line 30 {{QuoteCppString .sketchMainFile}}
 void test7();
-#line 32 "{{QuoteCppString .sketchMainFile}}"
+#line 32 {{QuoteCppString .sketchMainFile}}
  extern "C" void test10();
-#line 1 "{{QuoteCppString .sketchMainFile}}"
+#line 1 {{QuoteCppString .sketchMainFile}}
 void setup() {
    // put your setup code here, to run once:
  }

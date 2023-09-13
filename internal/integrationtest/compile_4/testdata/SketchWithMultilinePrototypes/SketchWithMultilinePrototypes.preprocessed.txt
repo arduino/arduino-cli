@@ -1,26 +1,26 @@
 #include <Arduino.h>
-#line 1 "{{QuoteCppString .sketchMainFile}}"
-#line 1 "{{QuoteCppString .sketchMainFile}}"
+#line 1 {{QuoteCppString .sketchMainFile}}
+#line 1 {{QuoteCppString .sketchMainFile}}
 void setup();
-#line 12 "{{QuoteCppString .sketchMainFile}}"
+#line 12 {{QuoteCppString .sketchMainFile}}
 void myctagstestfunc(int a, int b, int c, int d);
-#line 17 "{{QuoteCppString .sketchMainFile}}"
+#line 17 {{QuoteCppString .sketchMainFile}}
 void loop();
-#line 18 "{{QuoteCppString .sketchMainFile}}"
+#line 18 {{QuoteCppString .sketchMainFile}}
 void test();
-#line 21 "{{QuoteCppString .sketchMainFile}}"
+#line 21 {{QuoteCppString .sketchMainFile}}
 void test3();
-#line 25 "{{QuoteCppString .sketchMainFile}}"
+#line 25 {{QuoteCppString .sketchMainFile}}
 void test5(int a, int b, int c);
-#line 33 "{{QuoteCppString .sketchMainFile}}"
+#line 33 {{QuoteCppString .sketchMainFile}}
 void test7();
-#line 36 "{{QuoteCppString .sketchMainFile}}"
+#line 36 {{QuoteCppString .sketchMainFile}}
 void test8();
-#line 44 "{{QuoteCppString .sketchMainFile}}"
+#line 44 {{QuoteCppString .sketchMainFile}}
 void test9(int a, int b);
-#line 50 "{{QuoteCppString .sketchMainFile}}"
+#line 50 {{QuoteCppString .sketchMainFile}}
 void test10(int a, int b, int c );
-#line 1 "{{QuoteCppString .sketchMainFile}}"
+#line 1 {{QuoteCppString .sketchMainFile}}
 void setup() { 
 	myctagstestfunc(1,2,3,4); 
 	test();
