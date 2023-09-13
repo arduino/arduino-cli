@@ -63,6 +63,8 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 	require.NoError(t, err)
 	_, _, err = cli.Run("lib", "install", "CapacitiveSensor@0.5")
 	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "FastLED@3.1.0")
+	require.NoError(t, err)
 
 	// Install custom hardware required for tests
 	customHwDir, err := paths.New("..", "testdata", "user_hardware").Abs()
@@ -114,6 +116,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchWithMultilineTemplate", testBuilderSketchWithMultilineTemplate},
 		{"SketchWithFakeFunctionPointer", testBuilderSketchWithFakeFunctionPointer},
 		{"SketchWithMinMaxDefinitions", testBuilderSketchWithMinMaxDefinitions},
+		{"SketchWithFastledsLibrary", testBuilderSketchWithFastledsLibrary},
 	}.Run(t, env, cli)
 }
 
@@ -756,6 +759,22 @@ func testBuilderSketchWithMinMaxDefinitions(t *testing.T, env *integrationtest.E
 		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
 	})
 }
+
+func testBuilderSketchWithFastledsLibrary(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:samd:arduino_zero_native")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:samd:arduino_zero_native")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
 
 type builderOutput struct {
 	CompilerOut   string `json:"compiler_out"`
