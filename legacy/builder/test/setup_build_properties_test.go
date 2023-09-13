@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// TODO maybe create a test that actually check all the keys
 func TestSetupBuildProperties(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
@@ -71,6 +72,7 @@ func TestSetupBuildProperties(t *testing.T) {
 	require.True(t, buildProperties.ContainsKey("extra.time.dst"))
 }
 
+// TODO make this integration tests
 func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
@@ -90,6 +92,7 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	require.Equal(t, "non existent path with space and a =", buildProperties.Get("tools.avrdude.config.path"))
 }
 
+// TODO go to compile_4 that uses the custom_yum to compile and we also verify this properties
 func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),

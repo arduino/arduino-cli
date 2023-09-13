@@ -38,17 +38,8 @@ func cleanUpBuilderTestContext(t *testing.T, ctx *types.Context) {
 	}
 }
 
-type skipContextPreparationStepName string
-
-const skipLibraries = skipContextPreparationStepName("libraries")
-
-func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *paths.Path, fqbnString string, skips ...skipContextPreparationStepName) *types.Context {
+func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *paths.Path, fqbnString string) *types.Context {
 	DownloadCoresAndToolsAndLibraries(t)
-
-	stepToSkip := map[skipContextPreparationStepName]bool{}
-	for _, skip := range skips {
-		stepToSkip[skip] = true
-	}
 
 	if ctx == nil {
 		ctx = &types.Context{}
@@ -123,7 +114,6 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		_, err = pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 		require.NoError(t, err)
 
-
 		ctx.Builder, err = bldr.NewBuilder(
 			sk, boardBuildProperties, buildPath, false, nil, 0, nil,
 			ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
@@ -133,21 +123,19 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 		ctx.PackageManager = pme
 	}
 
-	if !stepToSkip[skipLibraries] {
-		lm, libsResolver, _, err := detector.LibrariesLoader(
-			false, nil,
-			ctx.BuiltInLibrariesDirs, nil, ctx.OtherLibrariesDirs,
-			actualPlatform, targetPlatform,
-		)
-		require.NoError(t, err)
+	lm, libsResolver, _, err := detector.LibrariesLoader(
+		false, nil,
+		ctx.BuiltInLibrariesDirs, nil, ctx.OtherLibrariesDirs,
+		actualPlatform, targetPlatform,
+	)
+	require.NoError(t, err)
 
-		ctx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
-			lm, libsResolver,
-			false,
-			false,
-			builderLogger,
-		)
-	}
+	ctx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
+		lm, libsResolver,
+		false,
+		false,
+		builderLogger,
+	)
 
 	return ctx
 }

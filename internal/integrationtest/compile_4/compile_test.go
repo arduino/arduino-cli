@@ -387,6 +387,7 @@ func testBuilderBridgeExample(t *testing.T, env *integrationtest.Environment, cl
 
 		// Simulate a library use in libraries build path
 		require.NoError(t, buildPath.Join("libraries", "SPI").MkdirAll())
+		require.NoError(t, buildPath.Join("libraries", "dummy_file").WriteFile([]byte{}))
 
 		// Build again...
 		_, err = tryBuild(t, env, cli, "arduino:avr:leonardo", &buildOptions{NoClean: true})
@@ -394,6 +395,7 @@ func testBuilderBridgeExample(t *testing.T, env *integrationtest.Environment, cl
 
 		require.False(t, buildPath.Join("libraries", "SPI").Exist())
 		require.True(t, buildPath.Join("libraries", "Bridge").Exist())
+		require.True(t, buildPath.Join("libraries", "dummy_file").Exist())
 	})
 
 	t.Run("Preprocess", func(t *testing.T) {

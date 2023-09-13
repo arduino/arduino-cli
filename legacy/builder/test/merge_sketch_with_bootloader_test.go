@@ -148,6 +148,7 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	require.False(t, exist)
 }
 
+// TODO convert in a compile test and we check against the real .hex
 func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:         paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),

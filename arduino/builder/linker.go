@@ -33,15 +33,10 @@ func (b *Builder) Link() error {
 		return nil
 	}
 
-	// TODO can we remove this multiple assignations?
-	objectFilesSketch := b.buildArtifacts.sketchObjectFiles
-	objectFilesLibraries := b.buildArtifacts.librariesObjectFiles
-	objectFilesCore := b.buildArtifacts.coreObjectsFiles
-
 	objectFiles := paths.NewPathList()
-	objectFiles.AddAll(objectFilesSketch)
-	objectFiles.AddAll(objectFilesLibraries)
-	objectFiles.AddAll(objectFilesCore)
+	objectFiles.AddAll(b.buildArtifacts.sketchObjectFiles)
+	objectFiles.AddAll(b.buildArtifacts.librariesObjectFiles)
+	objectFiles.AddAll(b.buildArtifacts.coreObjectsFiles)
 
 	coreDotARelPath, err := b.buildPath.RelTo(b.buildArtifacts.coreArchiveFilePath)
 	if err != nil {
