@@ -46,10 +46,13 @@ func TestLoadLibrariesAVR(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, nil, "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
 
+	_, targetPlatform, _, _, buildPlatform, err := ctx.PackageManager.ResolveFQBN(parseFQBN(t, "arduino:avr:leonardo"))
+	require.NoError(t, err)
+
 	lm, libsResolver, _, err := detector.LibrariesLoader(
 		false, nil,
 		ctx.BuiltInLibrariesDirs, nil, ctx.OtherLibrariesDirs,
-		ctx.ActualPlatform, ctx.TargetPlatform,
+		buildPlatform, targetPlatform,
 	)
 	require.NoError(t, err)
 
@@ -150,10 +153,12 @@ func TestLoadLibrariesSAM(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, nil, "arduino:sam:arduino_due_x_dbg")
 	defer cleanUpBuilderTestContext(t, ctx)
 
+	_, targetPlatform, _, _, buildPlatform, err := ctx.PackageManager.ResolveFQBN(parseFQBN(t, "arduino:sam:arduino_due_x_dbg"))
+	require.NoError(t, err)
 	lm, libsResolver, _, err := detector.LibrariesLoader(
 		false, nil,
 		ctx.BuiltInLibrariesDirs, nil, ctx.OtherLibrariesDirs,
-		ctx.ActualPlatform, ctx.TargetPlatform,
+		buildPlatform, targetPlatform,
 	)
 	require.NoError(t, err)
 
@@ -227,10 +232,12 @@ func TestLoadLibrariesAVRNoDuplicateLibrariesFolders(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, nil, "arduino:avr:leonardo")
 	defer cleanUpBuilderTestContext(t, ctx)
 
+	_, targetPlatform, _, _, buildPlatform, err := ctx.PackageManager.ResolveFQBN(parseFQBN(t, "arduino:avr:leonardo"))
+	require.NoError(t, err)
 	lm, _, _, err := detector.LibrariesLoader(
 		false, nil,
 		ctx.BuiltInLibrariesDirs, nil, ctx.OtherLibrariesDirs,
-		ctx.ActualPlatform, ctx.TargetPlatform,
+		buildPlatform, targetPlatform,
 	)
 	require.NoError(t, err)
 
@@ -250,10 +257,12 @@ func TestLoadLibrariesMyAVRPlatform(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, nil, "my_avr_platform:avr:custom_yun")
 	defer cleanUpBuilderTestContext(t, ctx)
 
+	_, targetPlatform, _, _, buildPlatform, err := ctx.PackageManager.ResolveFQBN(parseFQBN(t, "my_avr_platform:avr:custom_yun"))
+	require.NoError(t, err)
 	lm, _, _, err := detector.LibrariesLoader(
 		false, nil,
 		ctx.BuiltInLibrariesDirs, nil, ctx.OtherLibrariesDirs,
-		ctx.ActualPlatform, ctx.TargetPlatform,
+		buildPlatform, targetPlatform,
 	)
 	require.NoError(t, err)
 

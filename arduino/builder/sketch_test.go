@@ -21,7 +21,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
@@ -49,13 +48,7 @@ func TestMergeSketchSources(t *testing.T) {
 	}
 	mergedSources := strings.ReplaceAll(string(mergedBytes), "%s", pathToGoldenSource)
 
-	fqbn, err := cores.ParseFQBN("a:b:c")
-	require.NoError(t, err)
-
-	b, err := NewBuilder(
-		sk, nil, paths.New("testdata"), false, nil, 0, nil,
-		nil, nil, nil, nil, fqbn, false, nil, false, nil, nil)
-	require.NoError(t, err)
+	b := Builder{sketch: sk}
 
 	offset, source, err := b.sketchMergeSources(nil)
 	require.Nil(t, err)
@@ -68,13 +61,8 @@ func TestMergeSketchSourcesArduinoIncluded(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, sk)
 
-	fqbn, err := cores.ParseFQBN("a:b:c")
-	require.NoError(t, err)
-
 	// ensure not to include Arduino.h when it's already there
-	b, err := NewBuilder(sk, nil, paths.New("testdata"), false, nil, 0, nil,
-		nil, nil, nil, nil, fqbn, false, nil, false, nil, nil)
-	require.NoError(t, err)
+	b := Builder{sketch: sk}
 
 	_, source, err := b.sketchMergeSources(nil)
 	require.Nil(t, err)
@@ -91,16 +79,11 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	require.Nil(t, err)
 	require.Equal(t, sk1.AdditionalFiles.Len(), 1)
 
-	fqbn, err := cores.ParseFQBN("a:b:c")
-	require.NoError(t, err)
-
-	b1, err := NewBuilder(sk1, nil, paths.New("testdata"), false, nil, 0, nil,
-		nil, nil, nil, nil, fqbn, false, nil, false, nil, nil)
-	require.NoError(t, err)
+	b := Builder{sketch: sk1}
 
 	// copy the sketch over, create a fake main file we don't care about it
 	// but we need it for `SketchLoad` to succeed later
-	err = b1.sketchCopyAdditionalFiles(tmp, nil)
+	err = b.sketchCopyAdditionalFiles(tmp, nil)
 	require.Nil(t, err)
 	fakeIno := tmp.Join(fmt.Sprintf("%s.ino", tmp.Base()))
 	require.Nil(t, fakeIno.WriteFile([]byte{}))
@@ -115,7 +98,7 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	require.Nil(t, err)
 
 	// copy again
-	err = b1.sketchCopyAdditionalFiles(tmp, nil)
+	err = b.sketchCopyAdditionalFiles(tmp, nil)
 	require.Nil(t, err)
 
 	// verify file hasn't changed

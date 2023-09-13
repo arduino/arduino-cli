@@ -176,8 +176,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	builderCtx := &types.Context{}
 	builderCtx.PackageManager = pme
-	builderCtx.TargetPlatform = targetPlatform
-	builderCtx.ActualPlatform = buildPlatform
+	actualPlatform := buildPlatform
 
 	// FIXME: This will be redundant when arduino-builder will be part of the cli
 	builderCtx.HardwareDirs = configuration.HardwareDirectories(configuration.Settings)
@@ -206,6 +205,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		req.GetClean(),
 		req.GetSourceOverride(),
 		req.GetCreateCompilationDatabaseOnly(),
+		actualPlatform, targetPlatform,
 		builderLogger,
 		progress.New(progressCB),
 	)
@@ -231,7 +231,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	libsManager, libsResolver, verboseOut, err := detector.LibrariesLoader(
 		useCachedLibrariesResolution, libsManager,
 		builderCtx.BuiltInLibrariesDirs, libraryDir, builderCtx.OtherLibrariesDirs,
-		builderCtx.ActualPlatform, builderCtx.TargetPlatform,
+		actualPlatform, targetPlatform,
 	)
 	if err != nil {
 		return r, &arduino.CompileFailedError{Message: err.Error()}

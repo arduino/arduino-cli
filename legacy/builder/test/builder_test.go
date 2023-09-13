@@ -24,6 +24,7 @@ import (
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -106,32 +107,37 @@ func prepareBuilderTestContext(t *testing.T, ctx *types.Context, sketchPath *pat
 	ctx.Builder, err = bldr.NewBuilder(
 		sk, nil, buildPath, false, nil, 0, nil,
 		ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
-		ctx.BuiltInLibrariesDirs, parseFQBN(t, "a:b:c"), false, nil, false, builderLogger, nil,
+		ctx.BuiltInLibrariesDirs, parseFQBN(t, "a:b:c"), false, nil, false,
+		nil, nil, builderLogger, nil,
 	)
 	require.NoError(t, err)
+
+	var actualPlatform, targetPlatform *cores.PlatformRelease
 	if fqbnString != "" {
 		fqbn := parseFQBN(t, fqbnString)
-		_, targetPlatform, _, boardBuildProperties, buildPlatform, err := pme.ResolveFQBN(fqbn)
+		_, targetPlatfrm, _, boardBuildProperties, buildPlatform, err := pme.ResolveFQBN(fqbn)
 		require.NoError(t, err)
+		targetPlatform = targetPlatfrm
+		actualPlatform = buildPlatform
+
 		_, err = pme.FindToolsRequiredForBuild(targetPlatform, buildPlatform)
 		require.NoError(t, err)
+
 
 		ctx.Builder, err = bldr.NewBuilder(
 			sk, boardBuildProperties, buildPath, false, nil, 0, nil,
 			ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
-			ctx.BuiltInLibrariesDirs, fqbn, false, nil, false, builderLogger, nil)
+			ctx.BuiltInLibrariesDirs, fqbn, false, nil, false, targetPlatform,
+			actualPlatform, builderLogger, nil)
 		require.NoError(t, err)
-
 		ctx.PackageManager = pme
-		ctx.TargetPlatform = targetPlatform
-		ctx.ActualPlatform = buildPlatform
 	}
 
 	if !stepToSkip[skipLibraries] {
 		lm, libsResolver, _, err := detector.LibrariesLoader(
 			false, nil,
 			ctx.BuiltInLibrariesDirs, nil, ctx.OtherLibrariesDirs,
-			ctx.ActualPlatform, ctx.TargetPlatform,
+			actualPlatform, targetPlatform,
 		)
 		require.NoError(t, err)
 

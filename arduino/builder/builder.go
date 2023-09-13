@@ -72,6 +72,9 @@ type Builder struct {
 	// C++ Parsing
 	lineOffset int
 
+	targetPlatform *cores.PlatformRelease
+	actualPlatform *cores.PlatformRelease
+
 	buildArtifacts *BuildArtifacts
 
 	*BuildOptionsManager
@@ -105,6 +108,7 @@ func NewBuilder(
 	clean bool,
 	sourceOverrides map[string]string,
 	onlyUpdateCompilationDatabase bool,
+	targetPlatform, actualPlatform *cores.PlatformRelease,
 	logger *logger.BuilderLogger,
 	progressStats *progress.Struct,
 ) (*Builder, error) {
@@ -177,6 +181,8 @@ func NewBuilder(
 		Progress:                      progressStats,
 		executableSectionsSize:        []ExecutableSectionSize{},
 		buildArtifacts:                &BuildArtifacts{},
+		targetPlatform:                targetPlatform,
+		actualPlatform:                actualPlatform,
 		BuildOptionsManager: NewBuildOptionsManager(
 			hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
 			builtInLibrariesDirs, buildPath,
@@ -222,4 +228,9 @@ func (b *Builder) SaveCompilationDatabase() {
 	if b.compilationDatabase != nil {
 		b.compilationDatabase.SaveToFile()
 	}
+}
+
+// TargetPlatform fixdoc
+func (b *Builder) TargetPlatform() *cores.PlatformRelease {
+	return b.targetPlatform
 }

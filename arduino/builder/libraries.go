@@ -21,7 +21,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/go-paths-helper"
@@ -289,11 +288,8 @@ func (b *Builder) RemoveUnusedCompiledLibraries(importedLibraries libraries.List
 }
 
 // WarnAboutArchIncompatibleLibraries fixdoc
-func (b *Builder) WarnAboutArchIncompatibleLibraries(
-	targetPlatform *cores.PlatformRelease,
-	importedLibraries libraries.List,
-) {
-	archs := []string{targetPlatform.Platform.Architecture}
+func (b *Builder) WarnAboutArchIncompatibleLibraries(importedLibraries libraries.List) {
+	archs := []string{b.targetPlatform.Platform.Architecture}
 	overrides, _ := b.buildProperties.GetOk("architecture.override_check")
 	if overrides != "" {
 		archs = append(archs, strings.Split(overrides, ",")...)

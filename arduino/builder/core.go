@@ -24,7 +24,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/buildcache"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/go-paths-helper"
@@ -32,7 +31,7 @@ import (
 )
 
 // BuildCore fixdoc
-func (b *Builder) BuildCore(actualPlatform *cores.PlatformRelease) error {
+func (b *Builder) BuildCore() error {
 	if err := b.coreBuildPath.MkdirAll(); err != nil {
 		return errors.WithStack(err)
 	}
@@ -49,7 +48,7 @@ func (b *Builder) BuildCore(actualPlatform *cores.PlatformRelease) error {
 		}
 	}
 
-	archiveFile, objectFiles, err := b.compileCore(actualPlatform)
+	archiveFile, objectFiles, err := b.compileCore()
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -58,7 +57,7 @@ func (b *Builder) BuildCore(actualPlatform *cores.PlatformRelease) error {
 	return nil
 }
 
-func (b *Builder) compileCore(actualPlatform *cores.PlatformRelease) (*paths.Path, paths.PathList, error) {
+func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 	coreFolder := b.buildProperties.GetPath("build.core.path")
 	variantFolder := b.buildProperties.GetPath("build.variant.path")
 	targetCoreFolder := b.buildProperties.GetPath("runtime.platform.path")
@@ -154,7 +153,7 @@ func (b *Builder) compileCore(actualPlatform *cores.PlatformRelease) (*paths.Pat
 				b.logger.Info(tr("Archiving built core (caching) in: %[1]s", targetArchivedCore))
 			} else if os.IsNotExist(err) {
 				b.logger.Info(tr("Unable to cache built core, please tell %[1]s maintainers to follow %[2]s",
-					actualPlatform,
+					b.actualPlatform,
 					"https://arduino.github.io/arduino-cli/latest/platform-specification/#recipes-to-build-the-corea-archive-file"))
 			} else {
 				b.logger.Info(tr("Error archiving built core (caching) in %[1]s: %[2]s", targetArchivedCore, err))

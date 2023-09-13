@@ -94,7 +94,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			return ctx.Builder.BuildCore(ctx.ActualPlatform)
+			return ctx.Builder.BuildCore()
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
@@ -274,7 +274,7 @@ func findIncludes(ctx *types.Context) types.BareCommand {
 			ctx.Builder.Sketch(),
 			ctx.Builder.GetLibrariesBuildPath(),
 			ctx.Builder.GetBuildProperties(),
-			ctx.TargetPlatform.Platform.Architecture,
+			ctx.Builder.TargetPlatform().Platform.Architecture,
 		)
 	})
 }
@@ -306,7 +306,6 @@ func containerBuildOptions(ctx *types.Context) types.BareCommand {
 func warnAboutArchIncompatibleLibraries(ctx *types.Context) types.BareCommand {
 	return types.BareCommand(func(ctx *types.Context) error {
 		ctx.Builder.WarnAboutArchIncompatibleLibraries(
-			ctx.TargetPlatform,
 			ctx.SketchLibrariesDetector.ImportedLibraries(),
 		)
 		return nil

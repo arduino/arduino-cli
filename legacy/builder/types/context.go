@@ -19,7 +19,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	paths "github.com/arduino/go-paths-helper"
 )
@@ -37,6 +36,4 @@ type Context struct {
 	OtherLibrariesDirs   paths.PathList
 
 	PackageManager *packagemanager.Explorer
-	TargetPlatform *cores.PlatformRelease
-	ActualPlatform *cores.PlatformRelease
 }
