@@ -20,25 +20,26 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
-type RecipeByPrefixSuffixRunner struct {
-	Prefix                                string
-	Suffix                                string
-	SkipIfOnlyUpdatingCompilationDatabase bool
-}
+func RecipeByPrefixSuffixRunner(
+	prefix, suffix string,
+	skipIfOnlyUpdatingCompilationDatabase, onlyUpdateCompilationDatabase bool,
+	buildProps *properties.Map,
+	builderLogger *logger.BuilderLogger,
+) error {
+	logrus.Debugf(fmt.Sprintf("Looking for recipes like %s", prefix+"*"+suffix))
 
-func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
-	logrus.Debugf(fmt.Sprintf("Looking for recipes like %s", s.Prefix+"*"+s.Suffix))
+	// TODO is it necessary to use Clone?
+	buildProperties := buildProps.Clone()
+	recipes := findRecipes(buildProperties, prefix, suffix)
 
-	buildProperties := ctx.BuildProperties.Clone()
-	recipes := findRecipes(buildProperties, s.Prefix, s.Suffix)
-
+	// TODO is it necessary to use Clone?
 	properties := buildProperties.Clone()
 	for _, recipe := range recipes {
 		logrus.Debugf(fmt.Sprintf("Running recipe: %s", recipe))
@@ -48,16 +49,16 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 			return errors.WithStack(err)
 		}
 
-		if ctx.OnlyUpdateCompilationDatabase && s.SkipIfOnlyUpdatingCompilationDatabase {
-			if ctx.Verbose {
-				ctx.Info(tr("Skipping: %[1]s", strings.Join(command.GetArgs(), " ")))
+		if onlyUpdateCompilationDatabase && skipIfOnlyUpdatingCompilationDatabase {
+			if builderLogger.Verbose() {
+				builderLogger.Info(tr("Skipping: %[1]s", strings.Join(command.GetArgs(), " ")))
 			}
 			return nil
 		}
 
-		verboseInfo, _, _, err := utils.ExecCommand(ctx.Verbose, ctx.Stdout, ctx.Stderr, command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
-		if ctx.Verbose {
-			ctx.Info(string(verboseInfo))
+		verboseInfo, _, _, err := utils.ExecCommand(builderLogger.Verbose(), builderLogger.Stdout(), builderLogger.Stderr(), command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
+		if builderLogger.Verbose() {
+			builderLogger.Info(string(verboseInfo))
 		}
 		if err != nil {
 			return errors.WithStack(err)
@@ -65,7 +66,6 @@ func (s *RecipeByPrefixSuffixRunner) Run(ctx *types.Context) error {
 	}
 
 	return nil
-
 }
 
 func findRecipes(buildProperties *properties.Map, patternPrefix string, patternSuffix string) []string {

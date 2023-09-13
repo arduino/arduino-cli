@@ -21,6 +21,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/legacy/builder"
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
@@ -69,14 +70,13 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 	err = buildPath.Join("sketch", "sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
 	require.NoError(t, err)
 
-	commands := []types.Command{
-		&builder.MergeSketchWithBootloader{},
-	}
-
-	for _, command := range commands {
-		err := command.Run(ctx)
-		require.NoError(t, err)
-	}
+	builderLogger := logger.New(nil, nil, false, "")
+	err = builder.MergeSketchWithBootloader(
+		ctx.OnlyUpdateCompilationDatabase,
+		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
+		builderLogger,
+	)
+	require.NoError(t, err)
 
 	bytes, err := buildPath.Join("sketch", "sketch1.ino.with_bootloader.hex").ReadFile()
 	require.NoError(t, err)
@@ -127,14 +127,13 @@ func TestMergeSketchWithBootloaderSketchInBuildPath(t *testing.T) {
 	err = buildPath.Join("sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
 	require.NoError(t, err)
 
-	commands := []types.Command{
-		&builder.MergeSketchWithBootloader{},
-	}
-
-	for _, command := range commands {
-		err := command.Run(ctx)
-		require.NoError(t, err)
-	}
+	builderLogger := logger.New(nil, nil, false, "")
+	err = builder.MergeSketchWithBootloader(
+		ctx.OnlyUpdateCompilationDatabase,
+		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
+		builderLogger,
+	)
+	require.NoError(t, err)
 
 	bytes, err := buildPath.Join("sketch1.ino.with_bootloader.hex").ReadFile()
 	require.NoError(t, err)
@@ -154,8 +153,12 @@ func TestMergeSketchWithBootloaderWhenNoBootloaderAvailable(t *testing.T) {
 	buildProperties.Remove(constants.BUILD_PROPERTIES_BOOTLOADER_NOBLINK)
 	buildProperties.Remove(constants.BUILD_PROPERTIES_BOOTLOADER_FILE)
 
-	command := &builder.MergeSketchWithBootloader{}
-	err := command.Run(ctx)
+	builderLogger := logger.New(nil, nil, false, "")
+	err := builder.MergeSketchWithBootloader(
+		ctx.OnlyUpdateCompilationDatabase, 
+		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
+		builderLogger,
+	)
 	require.NoError(t, err)
 
 	exist, err := buildPath.Join("sketch.ino.with_bootloader.hex").ExistCheck()
@@ -210,14 +213,13 @@ func TestMergeSketchWithBootloaderPathIsParameterized(t *testing.T) {
 	err = buildPath.Join("sketch", "sketch1.ino.hex").WriteFile([]byte(fakeSketchHex))
 	require.NoError(t, err)
 
-	commands := []types.Command{
-		&builder.MergeSketchWithBootloader{},
-	}
-
-	for _, command := range commands {
-		err := command.Run(ctx)
-		require.NoError(t, err)
-	}
+	builderLogger := logger.New(nil, nil, false, "")
+	err = builder.MergeSketchWithBootloader(
+		ctx.OnlyUpdateCompilationDatabase, 
+		ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
+		builderLogger,
+	)
+	require.NoError(t, err)
 
 	bytes, err := buildPath.Join("sketch", "sketch1.ino.with_bootloader.hex").ReadFile()
 	require.NoError(t, err)

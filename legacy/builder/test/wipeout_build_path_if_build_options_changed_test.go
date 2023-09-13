@@ -34,14 +34,14 @@ func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
 
 	buildPath.Join("should_be_deleted.txt").Truncate()
 
-	commands := []types.Command{
-		&builder.WipeoutBuildPathIfBuildOptionsChanged{},
-	}
-
-	for _, command := range commands {
-		err := command.Run(ctx)
-		require.NoError(t, err)
-	}
+	_, err := builder.WipeoutBuildPathIfBuildOptionsChanged(
+		ctx.Clean,
+		ctx.BuildPath,
+		ctx.BuildOptionsJson,
+		ctx.BuildOptionsJsonPrevious,
+		ctx.BuildProperties,
+	)
+	require.NoError(t, err)
 
 	exist, err := buildPath.ExistCheck()
 	require.NoError(t, err)
@@ -66,14 +66,14 @@ func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.
 
 	require.NoError(t, buildPath.Join("should_not_be_deleted.txt").Truncate())
 
-	commands := []types.Command{
-		&builder.WipeoutBuildPathIfBuildOptionsChanged{},
-	}
-
-	for _, command := range commands {
-		err := command.Run(ctx)
-		require.NoError(t, err)
-	}
+	_, err := builder.WipeoutBuildPathIfBuildOptionsChanged(
+		ctx.Clean,
+		ctx.BuildPath,
+		ctx.BuildOptionsJson,
+		ctx.BuildOptionsJsonPrevious,
+		ctx.BuildProperties,
+	)
+	require.NoError(t, err)
 
 	exist, err := buildPath.ExistCheck()
 	require.NoError(t, err)

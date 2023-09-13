@@ -16,18 +16,14 @@
 package types
 
 import (
-	"fmt"
-	"io"
-	"os"
-	"strings"
-	"sync"
-
 	"github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
+	"github.com/arduino/arduino-cli/arduino/builder/sizer"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
@@ -37,6 +33,7 @@ import (
 type Context struct {
 	Builder                 *builder.Builder
 	SketchLibrariesDetector *detector.SketchLibrariesDetector
+	BuilderLogger           *logger.BuilderLogger
 
 	// Build options
 	HardwareDirs         paths.PathList
@@ -67,14 +64,8 @@ type Context struct {
 	LibrariesObjectFiles paths.PathList
 	SketchObjectFiles    paths.PathList
 
-	Sketch        *sketch.Sketch
-	WarningsLevel string
-
 	// C++ Parsing
 	LineOffset int
-
-	// Verbosity settings
-	Verbose bool
 
 	// Dry run, only create progress map
 	Progress progress.Struct
@@ -84,19 +75,11 @@ type Context struct {
 	// Custom build properties defined by user (line by line as "key=value" pairs)
 	CustomBuildProperties []string
 
-	// Parallel processes
-	Jobs int
-
-	// Out and Err stream to redirect all output
-	Stdout  io.Writer
-	Stderr  io.Writer
-	stdLock sync.Mutex
-
 	// Sizer results
-	ExecutableSectionsSize builder.ExecutablesFileSections
+	ExecutableSectionsSize sizer.ExecutablesFileSections
 
 	// Compilation Database to build/update
-	CompilationDatabase *builder.CompilationDatabase
+	CompilationDatabase *compilation.Database
 	// Set to true to skip build and produce only Compilation Database
 	OnlyUpdateCompilationDatabase bool
 
@@ -106,31 +89,6 @@ type Context struct {
 	SourceOverride map[string]string
 }
 
-func (ctx *Context) ExtractBuildOptions() *properties.Map {
-	opts := properties.NewMap()
-	opts.Set("hardwareFolders", strings.Join(ctx.HardwareDirs.AsStrings(), ","))
-	opts.Set("builtInToolsFolders", strings.Join(ctx.BuiltInToolsDirs.AsStrings(), ","))
-	if ctx.BuiltInLibrariesDirs != nil {
-		opts.Set("builtInLibrariesFolders", ctx.BuiltInLibrariesDirs.String())
-	}
-	opts.Set("otherLibrariesFolders", strings.Join(ctx.OtherLibrariesDirs.AsStrings(), ","))
-	opts.SetPath("sketchLocation", ctx.Sketch.FullPath)
-	var additionalFilesRelative []string
-	absPath := ctx.Sketch.FullPath.Parent()
-	for _, f := range ctx.Sketch.AdditionalFiles {
-		relPath, err := f.RelTo(absPath)
-		if err != nil {
-			continue // ignore
-		}
-		additionalFilesRelative = append(additionalFilesRelative, relPath.String())
-	}
-	opts.Set("fqbn", ctx.FQBN.String())
-	opts.Set("customBuildProperties", strings.Join(ctx.CustomBuildProperties, ","))
-	opts.Set("additionalFiles", strings.Join(additionalFilesRelative, ","))
-	opts.Set("compiler.optimization_flags", ctx.BuildProperties.Get("compiler.optimization_flags"))
-	return opts
-}
-
 func (ctx *Context) PushProgress() {
 	if ctx.ProgressCB != nil {
 		ctx.ProgressCB(&rpc.TaskProgress{
@@ -138,42 +96,4 @@ func (ctx *Context) PushProgress() {
 			Completed: ctx.Progress.Progress >= 100.0,
 		})
 	}
-}
-
-func (ctx *Context) Info(msg string) {
-	ctx.stdLock.Lock()
-	if ctx.Stdout == nil {
-		fmt.Fprintln(os.Stdout, msg)
-	} else {
-		fmt.Fprintln(ctx.Stdout, msg)
-	}
-	ctx.stdLock.Unlock()
-}
-
-func (ctx *Context) Warn(msg string) {
-	ctx.stdLock.Lock()
-	if ctx.Stderr == nil {
-		fmt.Fprintln(os.Stderr, msg)
-	} else {
-		fmt.Fprintln(ctx.Stderr, msg)
-	}
-	ctx.stdLock.Unlock()
-}
-
-func (ctx *Context) WriteStdout(data []byte) (int, error) {
-	ctx.stdLock.Lock()
-	defer ctx.stdLock.Unlock()
-	if ctx.Stdout == nil {
-		return os.Stdout.Write(data)
-	}
-	return ctx.Stdout.Write(data)
-}
-
-func (ctx *Context) WriteStderr(data []byte) (int, error) {
-	ctx.stdLock.Lock()
-	defer ctx.stdLock.Unlock()
-	if ctx.Stderr == nil {
-		return os.Stderr.Write(data)
-	}
-	return ctx.Stderr.Write(data)
 }

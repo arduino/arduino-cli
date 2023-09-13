@@ -19,10 +19,14 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
+	"github.com/arduino/arduino-cli/arduino/builder/sizer"
+	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
-	"github.com/arduino/arduino-cli/legacy/builder/phases"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/go-paths-helper"
+	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -30,7 +34,6 @@ import (
 var tr = i18n.Tr
 
 const DEFAULT_DEBUG_LEVEL = 5
-const DEFAULT_WARNINGS_LEVEL = "none"
 
 type Builder struct{}
 
@@ -41,9 +44,11 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 	var _err, mainErr error
 	commands := []types.Command{
-		&ContainerBuildOptions{},
+		containerBuildOptions(ctx),
 
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.prebuild", ".pattern", false)
+		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
 			ctx.LineOffset, _err = ctx.Builder.PrepareSketchBuildPath(ctx.SourceOverride, ctx.SketchBuildPath)
@@ -53,27 +58,26 @@ func (s *Builder) Run(ctx *types.Context) error {
 		logIfVerbose(false, tr("Detecting libraries used...")),
 		findIncludes(ctx),
 
-		&WarnAboutArchIncompatibleLibraries{},
+		warnAboutArchIncompatibleLibraries(ctx),
 
 		logIfVerbose(false, tr("Generating function prototypes...")),
-		types.BareCommand(PreprocessSketch),
+		preprocessSketchCommand(ctx),
 
 		logIfVerbose(false, tr("Compiling sketch...")),
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.sketch.prebuild", Suffix: ".pattern"},
+
 		types.BareCommand(func(ctx *types.Context) error {
-			sketchObjectFiles, err := phases.SketchBuilder(
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.sketch.prebuild", ".pattern", false)
+		}),
+
+		types.BareCommand(func(ctx *types.Context) error {
+			sketchObjectFiles, err := builder.SketchBuilder(
 				ctx.SketchBuildPath,
 				ctx.BuildProperties,
 				ctx.SketchLibrariesDetector.IncludeFolders(),
 				ctx.OnlyUpdateCompilationDatabase,
-				ctx.Verbose,
 				ctx.CompilationDatabase,
-				ctx.Jobs,
-				ctx.WarningsLevel,
-				ctx.Stdout, ctx.Stderr,
-				func(msg string) { ctx.Info(msg) },
-				func(data []byte) { ctx.WriteStdout(data) },
-				func(data []byte) { ctx.WriteStderr(data) },
+				ctx.Builder.Jobs(),
+				ctx.BuilderLogger,
 				&ctx.Progress, ctx.ProgressCB,
 			)
 			if err != nil {
@@ -82,27 +86,33 @@ func (s *Builder) Run(ctx *types.Context) error {
 			ctx.SketchObjectFiles = sketchObjectFiles
 			return nil
 		}),
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.sketch.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
+
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.sketch.postbuild", ".pattern", true)
+		}),
 
 		logIfVerbose(false, tr("Compiling libraries...")),
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.libraries.prebuild", Suffix: ".pattern"},
-		&UnusedCompiledLibrariesRemover{},
 		types.BareCommand(func(ctx *types.Context) error {
-			librariesObjectFiles, err := phases.LibrariesBuilder(
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.libraries.prebuild", ".pattern", false)
+		}),
+
+		types.BareCommand(func(ctx *types.Context) error {
+			return UnusedCompiledLibrariesRemover(
+				ctx.LibrariesBuildPath,
+				ctx.SketchLibrariesDetector.ImportedLibraries(),
+			)
+		}),
+
+		types.BareCommand(func(ctx *types.Context) error {
+			librariesObjectFiles, err := builder.LibrariesBuilder(
 				ctx.LibrariesBuildPath,
 				ctx.BuildProperties,
 				ctx.SketchLibrariesDetector.IncludeFolders(),
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
-				ctx.Verbose,
 				ctx.OnlyUpdateCompilationDatabase,
 				ctx.CompilationDatabase,
-				ctx.Jobs,
-				ctx.WarningsLevel,
-				ctx.Stdout,
-				ctx.Stderr,
-				func(msg string) { ctx.Info(msg) },
-				func(data []byte) { ctx.WriteStdout(data) },
-				func(data []byte) { ctx.WriteStderr(data) },
+				ctx.Builder.Jobs(),
+				ctx.BuilderLogger,
 				&ctx.Progress, ctx.ProgressCB,
 			)
 			if err != nil {
@@ -112,24 +122,24 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 			return nil
 		}),
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.libraries.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.libraries.postbuild", ".pattern", true)
+		}),
 
 		logIfVerbose(false, tr("Compiling core...")),
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.core.prebuild", Suffix: ".pattern"},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.core.prebuild", ".pattern", false)
+		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			objectFiles, archiveFile, err := phases.CoreBuilder(
+			objectFiles, archiveFile, err := builder.CoreBuilder(
 				ctx.BuildPath, ctx.CoreBuildPath, ctx.Builder.CoreBuildCachePath(),
 				ctx.BuildProperties,
 				ctx.ActualPlatform,
-				ctx.Verbose, ctx.OnlyUpdateCompilationDatabase, ctx.Clean,
+				ctx.OnlyUpdateCompilationDatabase, ctx.Clean,
 				ctx.CompilationDatabase,
-				ctx.Jobs,
-				ctx.WarningsLevel,
-				ctx.Stdout, ctx.Stderr,
-				func(msg string) { ctx.Info(msg) },
-				func(data []byte) { ctx.WriteStdout(data) },
-				func(data []byte) { ctx.WriteStderr(data) },
+				ctx.Builder.Jobs(),
+				ctx.BuilderLogger,
 				&ctx.Progress, ctx.ProgressCB,
 			)
 
@@ -139,40 +149,57 @@ func (s *Builder) Run(ctx *types.Context) error {
 			return err
 		}),
 
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.core.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.core.postbuild", ".pattern", true)
+		}),
 
 		logIfVerbose(false, tr("Linking everything together...")),
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.linking.prelink", Suffix: ".pattern"},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.linking.prelink", ".pattern", false)
+		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			verboseInfoOut, err := phases.Linker(
+			verboseInfoOut, err := builder.Linker(
 				ctx.OnlyUpdateCompilationDatabase,
-				ctx.Verbose,
 				ctx.SketchObjectFiles,
 				ctx.LibrariesObjectFiles,
 				ctx.CoreObjectsFiles,
 				ctx.CoreArchiveFilePath,
 				ctx.BuildPath,
 				ctx.BuildProperties,
-				ctx.Stdout,
-				ctx.Stderr,
-				ctx.WarningsLevel,
+				ctx.BuilderLogger,
 			)
-			if ctx.Verbose {
-				ctx.Info(string(verboseInfoOut))
+			if ctx.BuilderLogger.Verbose() {
+				ctx.BuilderLogger.Info(string(verboseInfoOut))
 			}
 			return err
 		}),
 
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.linking.postlink", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.linking.postlink", ".pattern", true)
+		}),
 
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.objcopy.preobjcopy", Suffix: ".pattern"},
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.objcopy.", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.objcopy.postobjcopy", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.objcopy.preobjcopy", ".pattern", false)
+		}),
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.objcopy.", ".pattern", true)
+		}),
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.objcopy.postobjcopy", ".pattern", true)
+		}),
 
-		&MergeSketchWithBootloader{},
+		types.BareCommand(func(ctx *types.Context) error {
+			return MergeSketchWithBootloader(
+				ctx.OnlyUpdateCompilationDatabase,
+				ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
+				ctx.BuilderLogger,
+			)
+		}),
 
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.postbuild", Suffix: ".pattern", SkipIfOnlyUpdatingCompilationDatabase: true},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.postbuild", ".pattern", true)
+		}),
 	}
 
 	ctx.Progress.AddSubSteps(len(commands) + 5)
@@ -200,18 +227,36 @@ func (s *Builder) Run(ctx *types.Context) error {
 			return nil
 		}),
 
-		&PrintUsedLibrariesIfVerbose{},
-
-		&ExportProjectCMake{SketchError: mainErr != nil},
+		types.BareCommand(func(ctx *types.Context) error {
+			infoOut, _ := PrintUsedLibrariesIfVerbose(ctx.BuilderLogger.Verbose(), ctx.SketchLibrariesDetector.ImportedLibraries())
+			ctx.BuilderLogger.Info(string(infoOut))
+			return nil
+		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			executableSectionsSize, err := phases.Sizer(
-				ctx.OnlyUpdateCompilationDatabase, mainErr != nil, ctx.Verbose,
+			normalOutput, verboseOutput, err := ExportProjectCMake(
+				mainErr != nil,
+				ctx.BuildPath, ctx.SketchBuildPath,
+				ctx.SketchLibrariesDetector.ImportedLibraries(),
 				ctx.BuildProperties,
-				ctx.Stdout, ctx.Stderr,
-				func(msg string) { ctx.Info(msg) },
-				func(msg string) { ctx.Warn(msg) },
-				ctx.WarningsLevel,
+				ctx.Builder.Sketch(),
+				ctx.SketchLibrariesDetector.IncludeFolders(),
+				ctx.LineOffset,
+				ctx.OnlyUpdateCompilationDatabase,
+			)
+			if ctx.BuilderLogger.Verbose() {
+				ctx.BuilderLogger.WriteStdout(verboseOutput)
+			} else {
+				ctx.BuilderLogger.WriteStdout(normalOutput)
+			}
+			return err
+		}),
+
+		types.BareCommand(func(ctx *types.Context) error {
+			executableSectionsSize, err := sizer.Size(
+				ctx.OnlyUpdateCompilationDatabase, mainErr != nil,
+				ctx.BuildProperties,
+				ctx.BuilderLogger,
 			)
 			ctx.ExecutableSectionsSize = executableSectionsSize
 			return err
@@ -235,17 +280,27 @@ func (s *Builder) Run(ctx *types.Context) error {
 	return otherErr
 }
 
-func PreprocessSketch(ctx *types.Context) error {
-	preprocessorImpl := preprocessor.PreprocessSketchWithCtags
-	normalOutput, verboseOutput, err := preprocessorImpl(
-		ctx.Sketch, ctx.BuildPath, ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset,
-		ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)
-	if ctx.Verbose {
-		ctx.WriteStdout(verboseOutput)
-	} else {
-		ctx.WriteStdout(normalOutput)
+func preprocessSketchCommand(ctx *types.Context) types.BareCommand {
+	return func(ctx *types.Context) error {
+		normalOutput, verboseOutput, err := PreprocessSketch(
+			ctx.Builder.Sketch(), ctx.BuildPath, ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset,
+			ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)
+		if ctx.BuilderLogger.Verbose() {
+			ctx.BuilderLogger.WriteStdout(verboseOutput)
+		} else {
+			ctx.BuilderLogger.WriteStdout(normalOutput)
+		}
+		return err
 	}
-	return err
+}
+
+func PreprocessSketch(
+	sketch *sketch.Sketch, buildPath *paths.Path, includes paths.PathList, lineOffset int,
+	buildProperties *properties.Map, onlyUpdateCompilationDatabase bool,
+) ([]byte, []byte, error) {
+	// In the future we might change the preprocessor
+	preprocessorImpl := preprocessor.PreprocessSketchWithCtags
+	return preprocessorImpl(sketch, buildPath, includes, lineOffset, buildProperties, onlyUpdateCompilationDatabase)
 }
 
 type Preprocess struct{}
@@ -257,9 +312,11 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 
 	var _err error
 	commands := []types.Command{
-		&ContainerBuildOptions{},
+		containerBuildOptions(ctx),
 
-		&RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.prebuild", Suffix: ".pattern"},
+		types.BareCommand(func(ctx *types.Context) error {
+			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.prebuild", ".pattern", false)
+		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
 			ctx.LineOffset, _err = ctx.Builder.PrepareSketchBuildPath(ctx.SourceOverride, ctx.SketchBuildPath)
@@ -268,9 +325,9 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 
 		findIncludes(ctx),
 
-		&WarnAboutArchIncompatibleLibraries{},
+		warnAboutArchIncompatibleLibraries(ctx),
 
-		types.BareCommand(PreprocessSketch),
+		preprocessSketchCommand(ctx),
 	}
 
 	if err := runCommands(ctx, commands); err != nil {
@@ -278,11 +335,11 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 	}
 
 	// Output arduino-preprocessed source
-	preprocessedSketch, err := ctx.SketchBuildPath.Join(ctx.Sketch.MainFile.Base() + ".cpp").ReadFile()
+	preprocessedSketch, err := ctx.SketchBuildPath.Join(ctx.Builder.Sketch().MainFile.Base() + ".cpp").ReadFile()
 	if err != nil {
 		return err
 	}
-	ctx.WriteStdout(preprocessedSketch)
+	ctx.BuilderLogger.WriteStdout(preprocessedSketch)
 	return nil
 }
 
@@ -322,7 +379,7 @@ func findIncludes(ctx *types.Context) types.BareCommand {
 			ctx.BuildProperties.GetPath("build.core.path"),
 			ctx.BuildProperties.GetPath("build.variant.path"),
 			ctx.SketchBuildPath,
-			ctx.Sketch,
+			ctx.Builder.Sketch(),
 			ctx.LibrariesBuildPath,
 			ctx.BuildProperties,
 			ctx.TargetPlatform.Platform.Architecture,
@@ -332,14 +389,59 @@ func findIncludes(ctx *types.Context) types.BareCommand {
 
 func logIfVerbose(warn bool, msg string) types.BareCommand {
 	return types.BareCommand(func(ctx *types.Context) error {
-		if !ctx.Verbose {
+		if !ctx.BuilderLogger.Verbose() {
 			return nil
 		}
 		if warn {
-			ctx.Warn(msg)
+			ctx.BuilderLogger.Warn(msg)
 		} else {
-			ctx.Info(msg)
+			ctx.BuilderLogger.Info(msg)
 		}
+		return nil
+	})
+}
+
+func recipeByPrefixSuffixRunner(ctx *types.Context, prefix, suffix string, skipIfOnlyUpdatingCompilationDatabase bool) error {
+	return RecipeByPrefixSuffixRunner(
+		prefix, suffix, skipIfOnlyUpdatingCompilationDatabase,
+		ctx.OnlyUpdateCompilationDatabase,
+		ctx.BuildProperties,
+		ctx.BuilderLogger,
+	)
+}
+
+func containerBuildOptions(ctx *types.Context) types.BareCommand {
+	return types.BareCommand(func(ctx *types.Context) error {
+		// TODO here we can pass only the properties we're reading from the
+		// ctx.BuildProperties
+		buildOptionsJSON, buildOptionsJSONPrevious, infoMessage, err := ContainerBuildOptions(
+			ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
+			ctx.BuiltInLibrariesDirs, ctx.BuildPath, ctx.Builder.Sketch(), ctx.CustomBuildProperties,
+			ctx.FQBN.String(), ctx.Clean, ctx.BuildProperties,
+		)
+		if infoMessage != "" {
+			ctx.BuilderLogger.Info(infoMessage)
+		}
+		if err != nil {
+			return err
+		}
+
+		ctx.BuildOptionsJson = buildOptionsJSON
+		ctx.BuildOptionsJsonPrevious = buildOptionsJSONPrevious
+
+		return nil
+	})
+}
+
+func warnAboutArchIncompatibleLibraries(ctx *types.Context) types.BareCommand {
+	return types.BareCommand(func(ctx *types.Context) error {
+		overrides, _ := ctx.BuildProperties.GetOk("architecture.override_check")
+		WarnAboutArchIncompatibleLibraries(
+			ctx.TargetPlatform,
+			overrides,
+			ctx.SketchLibrariesDetector.ImportedLibraries(),
+			func(s string) { ctx.BuilderLogger.Info(s) },
+		)
 		return nil
 	})
 }

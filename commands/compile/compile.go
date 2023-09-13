@@ -24,7 +24,9 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	bldr "github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -169,7 +171,14 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		coreBuildCachePath = buildCachePath.Join("core")
 	}
 
-	sketchBuilder := bldr.NewBuilder(sk, boardBuildProperties, buildPath, req.GetOptimizeForDebug(), coreBuildCachePath)
+	sketchBuilder := bldr.NewBuilder(
+		sk,
+		boardBuildProperties,
+		buildPath,
+		req.GetOptimizeForDebug(),
+		coreBuildCachePath,
+		int(req.GetJobs()),
+	)
 
 	buildProperties := sketchBuilder.GetBuildProperties()
 
@@ -197,7 +206,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.BuildProperties = buildProperties
 	builderCtx.CustomBuildProperties = customBuildPropertiesArgs
 	builderCtx.FQBN = fqbn
-	builderCtx.Sketch = sk
 	builderCtx.BuildPath = buildPath
 	builderCtx.ProgressCB = progressCB
 
@@ -207,25 +215,18 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
 	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
 
-	builderCtx.CompilationDatabase = bldr.NewCompilationDatabase(
+	builderCtx.CompilationDatabase = compilation.NewDatabase(
 		builderCtx.BuildPath.Join("compile_commands.json"),
 	)
 
-	builderCtx.Verbose = req.GetVerbose()
-	builderCtx.Jobs = int(req.GetJobs())
-
-	builderCtx.WarningsLevel = req.GetWarnings()
-	if builderCtx.WarningsLevel == "" {
-		builderCtx.WarningsLevel = builder.DEFAULT_WARNINGS_LEVEL
-	}
-
 	builderCtx.BuiltInLibrariesDirs = configuration.IDEBuiltinLibrariesDir(configuration.Settings)
 
-	builderCtx.Stdout = outStream
-	builderCtx.Stderr = errStream
 	builderCtx.Clean = req.GetClean()
 	builderCtx.OnlyUpdateCompilationDatabase = req.GetCreateCompilationDatabaseOnly()
 	builderCtx.SourceOverride = req.GetSourceOverride()
+
+	builderLogger := logger.New(outStream, errStream, req.GetVerbose(), req.GetWarnings())
+	builderCtx.BuilderLogger = builderLogger
 
 	sketchBuildPath, err := buildPath.Join(constants.FOLDER_SKETCH).Abs()
 	if err != nil {
@@ -243,7 +244,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	builderCtx.LibrariesBuildPath = librariesBuildPath
 	builderCtx.CoreBuildPath = coreBuildPath
 
-	if builderCtx.BuildPath.Canonical().EqualsTo(builderCtx.Sketch.FullPath.Canonical()) {
+	if builderCtx.BuildPath.Canonical().EqualsTo(sk.FullPath.Canonical()) {
 		return r, &arduino.CompileFailedError{
 			Message: tr("Sketch cannot be located in build path. Please specify a different build path"),
 		}
@@ -264,19 +265,15 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		return r, &arduino.CompileFailedError{Message: err.Error()}
 	}
 
-	if builderCtx.Verbose {
-		builderCtx.Warn(string(verboseOut))
+	if builderLogger.Verbose() {
+		builderLogger.Warn(string(verboseOut))
 	}
 
 	builderCtx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
 		libsManager, libsResolver,
-		builderCtx.Verbose,
 		useCachedLibrariesResolution,
 		req.GetCreateCompilationDatabaseOnly(),
-		func(msg string) { builderCtx.Info(msg) },
-		func(msg string) { builderCtx.Warn(msg) },
-		func(data []byte) { builderCtx.WriteStdout(data) },
-		func(data []byte) { builderCtx.WriteStderr(data) },
+		builderLogger,
 	)
 
 	defer func() {
@@ -365,8 +362,13 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		exportBinaries = false
 	}
 	if exportBinaries {
-		presaveHex := builder.RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.savehex.presavehex", Suffix: ".pattern"}
-		if err := presaveHex.Run(builderCtx); err != nil {
+		err := builder.RecipeByPrefixSuffixRunner(
+			"recipe.hooks.savehex.presavehex", ".pattern", false,
+			builderCtx.OnlyUpdateCompilationDatabase,
+			builderCtx.BuildProperties,
+			builderLogger,
+		)
+		if err != nil {
 			return r, err
 		}
 
@@ -404,8 +406,12 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 			}
 		}
 
-		postsaveHex := builder.RecipeByPrefixSuffixRunner{Prefix: "recipe.hooks.savehex.postsavehex", Suffix: ".pattern"}
-		if err := postsaveHex.Run(builderCtx); err != nil {
+		err = builder.RecipeByPrefixSuffixRunner(
+			"recipe.hooks.savehex.postsavehex", ".pattern", false,
+			builderCtx.OnlyUpdateCompilationDatabase,
+			builderCtx.BuildProperties, builderLogger,
+		)
+		if err != nil {
 			return r, err
 		}
 	}

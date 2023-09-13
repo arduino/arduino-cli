@@ -17,24 +17,20 @@ package builder
 
 import (
 	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 )
 
-type LoadPreviousBuildOptionsMap struct{}
-
-func (s *LoadPreviousBuildOptionsMap) Run(ctx *types.Context) error {
-	buildOptionsFile := ctx.BuildPath.Join(constants.BUILD_OPTIONS_FILE)
+func LoadPreviousBuildOptionsMap(buildPath *paths.Path) (string, error) {
+	buildOptionsFile := buildPath.Join(constants.BUILD_OPTIONS_FILE)
 
 	if buildOptionsFile.NotExist() {
-		return nil
+		return "", nil
 	}
 
-	bytes, err := buildOptionsFile.ReadFile()
+	buildOptionsJsonPrevious, err := buildOptionsFile.ReadFile()
 	if err != nil {
-		return errors.WithStack(err)
+		return "", errors.WithStack(err)
 	}
-
-	ctx.BuildOptionsJsonPrevious = string(bytes)
-	return nil
+	return string(buildOptionsJsonPrevious), nil
 }

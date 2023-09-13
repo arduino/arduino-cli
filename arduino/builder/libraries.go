@@ -13,14 +13,14 @@
 // Arduino software without disclosing the source code of your own applications.
 // To purchase a commercial license, send an email to license@arduino.cc.
 
-package phases
+package builder
 
 import (
-	"io"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/libraries"
@@ -31,21 +31,22 @@ import (
 	"github.com/pkg/errors"
 )
 
-var FLOAT_ABI_CFLAG = "float-abi"
-var FPU_CFLAG = "fpu"
+// nolint
+var (
+	FloatAbiCflag = "float-abi"
+	FpuCflag      = "fpu"
+)
 
+// LibrariesBuilder fixdoc
 func LibrariesBuilder(
 	librariesBuildPath *paths.Path,
 	buildProperties *properties.Map,
 	includesFolders paths.PathList,
 	importedLibraries libraries.List,
-	verbose, onlyUpdateCompilationDatabase bool,
-	compilationDatabase *builder.CompilationDatabase,
+	onlyUpdateCompilationDatabase bool,
+	compilationDatabase *compilation.Database,
 	jobs int,
-	warningsLevel string,
-	stdoutWriter, stderrWriter io.Writer,
-	verboseInfoFn func(msg string),
-	verboseStdoutFn, verboseStderrFn func(data []byte),
+	builderLogger *logger.BuilderLogger,
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, error) {
 	includes := f.Map(includesFolders.AsStrings(), cpp.WrapWithHyphenI)
@@ -57,13 +58,10 @@ func LibrariesBuilder(
 
 	librariesObjectFiles, err := compileLibraries(
 		libs, librariesBuildPath, buildProperties, includes,
-		verbose, onlyUpdateCompilationDatabase,
+		onlyUpdateCompilationDatabase,
 		compilationDatabase,
 		jobs,
-		warningsLevel,
-		stdoutWriter, stderrWriter,
-		verboseInfoFn,
-		verboseStdoutFn, verboseStderrFn,
+		builderLogger,
 		progress, progressCB,
 	)
 	if err != nil {
@@ -84,7 +82,7 @@ func directoryContainsFile(folder *paths.Path) bool {
 func findExpectedPrecompiledLibFolder(
 	library *libraries.Library,
 	buildProperties *properties.Map,
-	verboseInfoFn func(msg string),
+	builderLogger *logger.BuilderLogger,
 ) *paths.Path {
 	mcu := buildProperties.Get("build.mcu")
 	// Add fpu specifications if they exist
@@ -93,7 +91,7 @@ func findExpectedPrecompiledLibFolder(
 	command, _ := utils.PrepareCommandForRecipe(buildProperties, "recipe.cpp.o.pattern", true)
 	fpuSpecs := ""
 	for _, el := range command.GetArgs() {
-		if strings.Contains(el, FPU_CFLAG) {
+		if strings.Contains(el, FpuCflag) {
 			toAdd := strings.Split(el, "=")
 			if len(toAdd) > 1 {
 				fpuSpecs += strings.TrimSpace(toAdd[1]) + "-"
@@ -102,7 +100,7 @@ func findExpectedPrecompiledLibFolder(
 		}
 	}
 	for _, el := range command.GetArgs() {
-		if strings.Contains(el, FLOAT_ABI_CFLAG) {
+		if strings.Contains(el, FloatAbiCflag) {
 			toAdd := strings.Split(el, "=")
 			if len(toAdd) > 1 {
 				fpuSpecs += strings.TrimSpace(toAdd[1]) + "-"
@@ -111,37 +109,34 @@ func findExpectedPrecompiledLibFolder(
 		}
 	}
 
-	verboseInfoFn(tr("Library %[1]s has been declared precompiled:", library.Name))
+	builderLogger.Info(tr("Library %[1]s has been declared precompiled:", library.Name))
 
 	// Try directory with full fpuSpecs first, if available
 	if len(fpuSpecs) > 0 {
 		fpuSpecs = strings.TrimRight(fpuSpecs, "-")
 		fullPrecompDir := library.SourceDir.Join(mcu).Join(fpuSpecs)
 		if fullPrecompDir.Exist() && directoryContainsFile(fullPrecompDir) {
-			verboseInfoFn(tr("Using precompiled library in %[1]s", fullPrecompDir))
+			builderLogger.Info(tr("Using precompiled library in %[1]s", fullPrecompDir))
 			return fullPrecompDir
 		}
-		verboseInfoFn(tr(`Precompiled library in "%[1]s" not found`, fullPrecompDir))
+		builderLogger.Info(tr(`Precompiled library in "%[1]s" not found`, fullPrecompDir))
 	}
 
 	precompDir := library.SourceDir.Join(mcu)
 	if precompDir.Exist() && directoryContainsFile(precompDir) {
-		verboseInfoFn(tr("Using precompiled library in %[1]s", precompDir))
+		builderLogger.Info(tr("Using precompiled library in %[1]s", precompDir))
 		return precompDir
 	}
-	verboseInfoFn(tr(`Precompiled library in "%[1]s" not found`, precompDir))
+	builderLogger.Info(tr(`Precompiled library in "%[1]s" not found`, precompDir))
 	return nil
 }
 
 func compileLibraries(
 	libraries libraries.List, buildPath *paths.Path, buildProperties *properties.Map, includes []string,
-	verbose, onlyUpdateCompilationDatabase bool,
-	compilationDatabase *builder.CompilationDatabase,
+	onlyUpdateCompilationDatabase bool,
+	compilationDatabase *compilation.Database,
 	jobs int,
-	warningsLevel string,
-	stdoutWriter, stderrWriter io.Writer,
-	verboseInfoFn func(msg string),
-	verboseStdoutFn, verboseStderrFn func(data []byte),
+	builderLogger *logger.BuilderLogger,
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, error) {
 	progress.AddSubSteps(len(libraries))
@@ -151,12 +146,10 @@ func compileLibraries(
 	for _, library := range libraries {
 		libraryObjectFiles, err := compileLibrary(
 			library, buildPath, buildProperties, includes,
-			verbose, onlyUpdateCompilationDatabase,
+			onlyUpdateCompilationDatabase,
 			compilationDatabase,
 			jobs,
-			warningsLevel,
-			stdoutWriter, stderrWriter,
-			verboseInfoFn, verboseStdoutFn, verboseStderrFn,
+			builderLogger,
 			progress, progressCB,
 		)
 		if err != nil {
@@ -179,17 +172,14 @@ func compileLibraries(
 
 func compileLibrary(
 	library *libraries.Library, buildPath *paths.Path, buildProperties *properties.Map, includes []string,
-	verbose, onlyUpdateCompilationDatabase bool,
-	compilationDatabase *builder.CompilationDatabase,
+	onlyUpdateCompilationDatabase bool,
+	compilationDatabase *compilation.Database,
 	jobs int,
-	warningsLevel string,
-	stdoutWriter, stderrWriter io.Writer,
-	verboseInfoFn func(msg string),
-	verboseStdoutFn, verboseStderrFn func(data []byte),
+	builderLogger *logger.BuilderLogger,
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, error) {
-	if verbose {
-		verboseInfoFn(tr(`Compiling library "%[1]s"`, library.Name))
+	if builderLogger.Verbose() {
+		builderLogger.Info(tr(`Compiling library "%[1]s"`, library.Name))
 	}
 	libraryBuildPath := buildPath.Join(library.DirName)
 
@@ -204,11 +194,11 @@ func compileLibrary(
 		precompiledPath := findExpectedPrecompiledLibFolder(
 			library,
 			buildProperties,
-			verboseInfoFn,
+			builderLogger,
 		)
 
 		if !coreSupportPrecompiled {
-			verboseInfoFn(tr("The platform does not support '%[1]s' for precompiled libraries.", "compiler.libraries.ldflags"))
+			builderLogger.Info(tr("The platform does not support '%[1]s' for precompiled libraries.", "compiler.libraries.ldflags"))
 		} else if precompiledPath != nil {
 			// Find all libraries in precompiledPath
 			libs, err := precompiledPath.ReadDir()
@@ -253,10 +243,7 @@ func compileLibrary(
 			onlyUpdateCompilationDatabase,
 			compilationDatabase,
 			jobs,
-			verbose,
-			warningsLevel,
-			stdoutWriter, stderrWriter,
-			verboseInfoFn, verboseStdoutFn, verboseStderrFn,
+			builderLogger,
 			progress, progressCB,
 		)
 		if err != nil {
@@ -265,11 +252,11 @@ func compileLibrary(
 		if library.DotALinkage {
 			archiveFile, verboseInfo, err := utils.ArchiveCompiledFiles(
 				libraryBuildPath, paths.New(library.DirName+".a"), libObjectFiles, buildProperties,
-				onlyUpdateCompilationDatabase, verbose,
-				stdoutWriter, stderrWriter,
+				onlyUpdateCompilationDatabase, builderLogger.Verbose(),
+				builderLogger.Stdout(), builderLogger.Stderr(),
 			)
-			if verbose {
-				verboseInfoFn(string(verboseInfo))
+			if builderLogger.Verbose() {
+				builderLogger.Info(string(verboseInfo))
 			}
 			if err != nil {
 				return nil, errors.WithStack(err)
@@ -287,10 +274,7 @@ func compileLibrary(
 			onlyUpdateCompilationDatabase,
 			compilationDatabase,
 			jobs,
-			verbose,
-			warningsLevel,
-			stdoutWriter, stderrWriter,
-			verboseInfoFn, verboseStdoutFn, verboseStderrFn,
+			builderLogger,
 			progress, progressCB,
 		)
 		if err != nil {
@@ -305,10 +289,7 @@ func compileLibrary(
 				onlyUpdateCompilationDatabase,
 				compilationDatabase,
 				jobs,
-				verbose,
-				warningsLevel,
-				stdoutWriter, stderrWriter,
-				verboseInfoFn, verboseStdoutFn, verboseStderrFn,
+				builderLogger,
 				progress, progressCB,
 			)
 			if err != nil {

@@ -81,7 +81,6 @@ func makeDefaultContext() *types.Context {
 		BuiltInToolsDirs:     paths.NewPathList("downloaded_tools"),
 		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
-		Verbose:              true,
 	}
 }
 

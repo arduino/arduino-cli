@@ -17,20 +17,47 @@ package builder
 
 import (
 	"encoding/json"
+	"strings"
 
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/go-paths-helper"
+	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 )
 
-type CreateBuildOptionsMap struct{}
-
-func (s *CreateBuildOptionsMap) Run(ctx *types.Context) error {
-	buildOptions := ctx.ExtractBuildOptions()
-	bytes, err := json.MarshalIndent(buildOptions, "", "  ")
-	if err != nil {
-		return errors.WithStack(err)
+func CreateBuildOptionsMap(
+	hardwareDirs, builtInToolsDirs, otherLibrariesDirs paths.PathList,
+	builtInLibrariesDirs *paths.Path,
+	sketch *sketch.Sketch,
+	customBuildProperties []string,
+	fqbn, compilerOptimizationFlags string,
+) (string, error) {
+	opts := properties.NewMap()
+	opts.Set("hardwareFolders", strings.Join(hardwareDirs.AsStrings(), ","))
+	opts.Set("builtInToolsFolders", strings.Join(builtInToolsDirs.AsStrings(), ","))
+	if builtInLibrariesDirs != nil {
+		opts.Set("builtInLibrariesFolders", builtInLibrariesDirs.String())
 	}
-	ctx.BuildOptionsJson = string(bytes)
+	opts.Set("otherLibrariesFolders", strings.Join(otherLibrariesDirs.AsStrings(), ","))
+	opts.SetPath("sketchLocation", sketch.FullPath)
+	var additionalFilesRelative []string
+	absPath := sketch.FullPath.Parent()
+	for _, f := range sketch.AdditionalFiles {
+		relPath, err := f.RelTo(absPath)
+		if err != nil {
+			continue // ignore
+		}
+		additionalFilesRelative = append(additionalFilesRelative, relPath.String())
+	}
+	opts.Set("fqbn", fqbn)
+	opts.Set("customBuildProperties", strings.Join(customBuildProperties, ","))
+	opts.Set("additionalFiles", strings.Join(additionalFilesRelative, ","))
+	opts.Set("compiler.optimization_flags", compilerOptimizationFlags)
 
-	return nil
+	buildOptionsJSON, err := json.MarshalIndent(opts, "", "  ")
+	if err != nil {
+		return "", errors.WithStack(err)
+	}
+
+	return string(buildOptionsJSON), nil
 }

@@ -16,31 +16,31 @@
 package builder
 
 import (
+	"bytes"
 	"time"
 
-	"github.com/arduino/arduino-cli/legacy/builder/types"
+	"github.com/arduino/arduino-cli/arduino/libraries"
 )
 
-type PrintUsedLibrariesIfVerbose struct{}
-
-func (s *PrintUsedLibrariesIfVerbose) Run(ctx *types.Context) error {
-	if !ctx.Verbose || len(ctx.SketchLibrariesDetector.ImportedLibraries()) == 0 {
-		return nil
+func PrintUsedLibrariesIfVerbose(verbose bool, importedLibraries libraries.List) ([]byte, error) {
+	if !verbose || len(importedLibraries) == 0 {
+		return nil, nil
 	}
 
-	for _, library := range ctx.SketchLibrariesDetector.ImportedLibraries() {
+	infoBuf := &bytes.Buffer{}
+	for _, library := range importedLibraries {
 		legacy := ""
 		if library.IsLegacy {
 			legacy = tr("(legacy)")
 		}
 		if library.Version.String() == "" {
-			ctx.Info(
+			infoBuf.WriteString(
 				tr("Using library %[1]s in folder: %[2]s %[3]s",
 					library.Name,
 					library.InstallDir,
 					legacy))
 		} else {
-			ctx.Info(
+			infoBuf.WriteString(
 				tr("Using library %[1]s at version %[2]s in folder: %[3]s %[4]s",
 					library.Name,
 					library.Version,
@@ -50,5 +50,5 @@ func (s *PrintUsedLibrariesIfVerbose) Run(ctx *types.Context) error {
 	}
 
 	time.Sleep(100 * time.Millisecond)
-	return nil
+	return infoBuf.Bytes(), nil
 }

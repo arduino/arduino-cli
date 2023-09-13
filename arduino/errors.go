@@ -837,11 +837,8 @@ type MultiplePlatformsError struct {
 }
 
 func (e *MultiplePlatformsError) Error() string {
-	return tr("Found %d platform for reference \"%s\":\n%s",
-		len(e.Platforms),
-		e.UserPlatform,
-		strings.Join(e.Platforms, "\n"),
-	)
+	return tr("Found %d platforms matching \"%s\": %s",
+		len(e.Platforms), e.UserPlatform, strings.Join(e.Platforms, ", "))
 }
 
 // ToRPCStatus converts the error into a *status.Status

@@ -26,6 +26,7 @@ import (
 
 	"golang.org/x/exp/slices"
 
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -52,41 +53,30 @@ type SketchLibrariesDetector struct {
 	librariesManager              *librariesmanager.LibrariesManager
 	librariesResolver             *librariesresolver.Cpp
 	useCachedLibrariesResolution  bool
-	verbose                       bool
 	onlyUpdateCompilationDatabase bool
-	verboseInfoFn                 func(msg string)
-	verboseWarnFn                 func(msg string)
-	verboseStdoutFn               func(data []byte)
-	verboseStderrFn               func(data []byte)
 	importedLibraries             libraries.List
 	librariesResolutionResults    map[string]libraryResolutionResult
 	includeFolders                paths.PathList
+	logger                        *logger.BuilderLogger
 }
 
 // NewSketchLibrariesDetector todo
 func NewSketchLibrariesDetector(
 	lm *librariesmanager.LibrariesManager,
 	libsResolver *librariesresolver.Cpp,
-	verbose, useCachedLibrariesResolution bool,
+	useCachedLibrariesResolution bool,
 	onlyUpdateCompilationDatabase bool,
-	verboseInfoFn func(msg string),
-	verboseWarnFn func(msg string),
-	verboseStdoutFn func(data []byte),
-	verboseStderrFn func(data []byte),
+	logger *logger.BuilderLogger,
 ) *SketchLibrariesDetector {
 	return &SketchLibrariesDetector{
 		librariesManager:              lm,
 		librariesResolver:             libsResolver,
 		useCachedLibrariesResolution:  useCachedLibrariesResolution,
 		librariesResolutionResults:    map[string]libraryResolutionResult{},
-		verbose:                       verbose,
-		verboseInfoFn:                 verboseInfoFn,
-		verboseWarnFn:                 verboseWarnFn,
-		verboseStdoutFn:               verboseStdoutFn,
-		verboseStderrFn:               verboseStderrFn,
 		importedLibraries:             libraries.List{},
 		includeFolders:                paths.PathList{},
 		onlyUpdateCompilationDatabase: onlyUpdateCompilationDatabase,
+		logger:                        logger,
 	}
 }
 
@@ -95,10 +85,10 @@ func (l *SketchLibrariesDetector) resolveLibrary(header, platformArch string) *l
 	importedLibraries := l.importedLibraries
 	candidates := l.librariesResolver.AlternativesFor(header)
 
-	if l.verbose {
-		l.verboseInfoFn(tr("Alternatives for %[1]s: %[2]s", header, candidates))
-		l.verboseInfoFn(fmt.Sprintf("ResolveLibrary(%s)", header))
-		l.verboseInfoFn(fmt.Sprintf("  -> %s: %s", tr("candidates"), candidates))
+	if l.logger.Verbose() {
+		l.logger.Info(tr("Alternatives for %[1]s: %[2]s", header, candidates))
+		l.logger.Info(fmt.Sprintf("ResolveLibrary(%s)", header))
+		l.logger.Info(fmt.Sprintf("  -> %s: %s", tr("candidates"), candidates))
 	}
 
 	if len(candidates) == 0 {
@@ -152,7 +142,7 @@ func (l *SketchLibrariesDetector) PrintUsedAndNotUsedLibraries(sketchError bool)
 	// - as warning, when the sketch didn't compile
 	// - as info, when verbose is on
 	// - otherwise, output nothing
-	if !sketchError && !l.verbose {
+	if !sketchError && !l.logger.Verbose() {
 		return
 	}
 
@@ -169,9 +159,9 @@ func (l *SketchLibrariesDetector) PrintUsedAndNotUsedLibraries(sketchError bool)
 	}
 	res = strings.TrimSpace(res)
 	if sketchError {
-		l.verboseWarnFn(res)
+		l.logger.Warn(res)
 	} else {
-		l.verboseInfoFn(res)
+		l.logger.Info(res)
 	}
 	// todo why?? should we remove this?
 	time.Sleep(100 * time.Millisecond)
@@ -214,7 +204,7 @@ func (l *SketchLibrariesDetector) FindIncludes(
 ) error {
 	err := l.findIncludes(buildPath, buildCorePath, buildVariantPath, sketchBuildPath, sketch, librariesBuildPath, buildProperties, platformArch)
 	if err != nil && l.onlyUpdateCompilationDatabase {
-		l.verboseInfoFn(
+		l.logger.Info(
 			fmt.Sprintf(
 				"%s: %s",
 				tr("An error occurred detecting libraries"),
@@ -246,8 +236,8 @@ func (l *SketchLibrariesDetector) findIncludes(
 		if err := json.Unmarshal(d, &includeFolders); err != nil {
 			return err
 		}
-		if l.verbose {
-			l.verboseInfoFn("Using cached library discovery: " + librariesResolutionCache.String())
+		if l.logger.Verbose() {
+			l.logger.Info("Using cached library discovery: " + librariesResolutionCache.String())
 		}
 		return nil
 	}
@@ -354,14 +344,14 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 		var missingIncludeH string
 		if unchanged && cache.valid {
 			missingIncludeH = cache.Next().Include
-			if first && l.verbose {
-				l.verboseInfoFn(tr("Using cached library dependencies for file: %[1]s", sourcePath))
+			if first && l.logger.Verbose() {
+				l.logger.Info(tr("Using cached library dependencies for file: %[1]s", sourcePath))
 			}
 		} else {
 			var preprocStdout []byte
 			preprocStdout, preprocStderr, preprocErr = preprocessor.GCC(sourcePath, targetFilePath, includeFolders, buildProperties)
-			if l.verbose {
-				l.verboseStdoutFn(preprocStdout)
+			if l.logger.Verbose() {
+				l.logger.WriteStdout(preprocStdout)
 			}
 			// Unwrap error and see if it is an ExitError.
 			if preprocErr == nil {
@@ -372,8 +362,8 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 				return errors.WithStack(preprocErr)
 			} else {
 				missingIncludeH = IncludesFinderWithRegExp(string(preprocStderr))
-				if missingIncludeH == "" && l.verbose {
-					l.verboseInfoFn(tr("Error while detecting libraries included by %[1]s", sourcePath))
+				if missingIncludeH == "" && l.logger.Verbose() {
+					l.logger.Info(tr("Error while detecting libraries included by %[1]s", sourcePath))
 				}
 			}
 		}
@@ -391,8 +381,8 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 				// Filename came from cache, so run preprocessor to obtain error to show
 				var preprocStdout []byte
 				preprocStdout, preprocStderr, preprocErr = preprocessor.GCC(sourcePath, targetFilePath, includeFolders, buildProperties)
-				if l.verbose {
-					l.verboseStdoutFn(preprocStdout)
+				if l.logger.Verbose() {
+					l.logger.WriteStdout(preprocStdout)
 				}
 				if preprocErr == nil {
 					// If there is a missing #include in the cache, but running
@@ -402,7 +392,7 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 					return errors.New(tr("Internal error in cache"))
 				}
 			}
-			l.verboseStderrFn(preprocStderr)
+			l.logger.WriteStderr(preprocStderr)
 			return errors.WithStack(preprocErr)
 		}
 
@@ -414,8 +404,8 @@ func (l *SketchLibrariesDetector) findIncludesUntilDone(
 
 		if library.Precompiled && library.PrecompiledWithSources {
 			// Fully precompiled libraries should have no dependencies to avoid ABI breakage
-			if l.verbose {
-				l.verboseInfoFn(tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
+			if l.logger.Verbose() {
+				l.logger.Info(tr("Skipping dependencies detection for precompiled library %[1]s", library.Name))
 			}
 		} else {
 			for _, sourceDir := range library.SourceDirs() {

@@ -33,25 +33,24 @@ func TestStoreBuildOptionsMap(t *testing.T) {
 		BuiltInToolsDirs:      paths.NewPathList("tools"),
 		BuiltInLibrariesDirs:  paths.New("built-in libraries"),
 		OtherLibrariesDirs:    paths.NewPathList("libraries"),
-		Sketch:                &sketch.Sketch{FullPath: paths.New("sketchLocation")},
 		FQBN:                  parseFQBN(t, "my:nice:fqbn"),
 		CustomBuildProperties: []string{"custom=prop"},
-		Verbose:               true,
 		BuildProperties:       properties.NewFromHashmap(map[string]string{"compiler.optimization_flags": "-Os"}),
 	}
 
 	buildPath := SetupBuildPath(t, ctx)
 	defer buildPath.RemoveAll()
 
-	commands := []types.Command{
-		&builder.CreateBuildOptionsMap{},
-		&builder.StoreBuildOptionsMap{},
-	}
+	buildPropertiesJSON, err := builder.CreateBuildOptionsMap(
+		ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
+		ctx.BuiltInLibrariesDirs, &sketch.Sketch{FullPath: paths.New("sketchLocation")}, ctx.CustomBuildProperties,
+		ctx.FQBN.String(), ctx.BuildProperties.Get("compiler.optimization_flags"),
+	)
+	require.NoError(t, err)
+	ctx.BuildOptionsJson = buildPropertiesJSON
 
-	for _, command := range commands {
-		err := command.Run(ctx)
-		require.NoError(t, err)
-	}
+	err = builder.StoreBuildOptionsMap(ctx.BuildPath, ctx.BuildOptionsJson)
+	require.NoError(t, err)
 
 	exist, err := buildPath.Join(constants.BUILD_OPTIONS_FILE).ExistCheck()
 	require.NoError(t, err)

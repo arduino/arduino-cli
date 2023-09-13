@@ -1,3 +1,18 @@
+// This file is part of arduino-cli.
+//
+// Copyright 2023 ARDUINO SA (http://www.arduino.cc/)
+//
+// This software is released under the GNU General Public License version 3,
+// which covers the main part of arduino-cli.
+// The terms of this license can be found at:
+// https://www.gnu.org/licenses/gpl-3.0.en.html
+//
+// You can be released from the requirements of the above licenses by purchasing
+// a commercial license. Buying such a license is mandatory if you want to
+// modify or otherwise use the software for commercial activities involving the
+// Arduino software without disclosing the source code of your own applications.
+// To purchase a commercial license, send an email to license@arduino.cc.
+
 package utils
 
 import (
@@ -11,7 +26,8 @@ import (
 	"sync"
 	"unicode"
 
-	"github.com/arduino/arduino-cli/arduino/builder"
+	"github.com/arduino/arduino-cli/arduino/builder/compilation"
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/executils"
@@ -339,13 +355,9 @@ func CompileFiles(
 	buildProperties *properties.Map,
 	includes []string,
 	onlyUpdateCompilationDatabase bool,
-	compilationDatabase *builder.CompilationDatabase,
+	compilationDatabase *compilation.Database,
 	jobs int,
-	verbose bool,
-	warningsLevel string,
-	stdoutWriter, stderrWriter io.Writer,
-	verboseInfoFn func(msg string),
-	verboseStdoutFn, verboseStderrFn func(data []byte),
+	builderLogger *logger.BuilderLogger,
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, error) {
 	return compileFiles(
@@ -355,10 +367,7 @@ func CompileFiles(
 		sourceDir,
 		false,
 		buildPath, buildProperties, includes,
-		verbose,
-		warningsLevel,
-		stdoutWriter, stderrWriter,
-		verboseInfoFn, verboseStdoutFn, verboseStderrFn,
+		builderLogger,
 		progress, progressCB,
 	)
 }
@@ -369,13 +378,9 @@ func CompileFilesRecursive(
 	buildProperties *properties.Map,
 	includes []string,
 	onlyUpdateCompilationDatabase bool,
-	compilationDatabase *builder.CompilationDatabase,
+	compilationDatabase *compilation.Database,
 	jobs int,
-	verbose bool,
-	warningsLevel string,
-	stdoutWriter, stderrWriter io.Writer,
-	verboseInfoFn func(msg string),
-	verboseStdoutFn, verboseStderrFn func(data []byte),
+	builderLogger *logger.BuilderLogger,
 	progress *progress.Struct, progressCB rpc.TaskProgressCB,
 ) (paths.PathList, error) {
 	return compileFiles(
@@ -385,28 +390,21 @@ func CompileFilesRecursive(
 		sourceDir,
 		true,
 		buildPath, buildProperties, includes,
-		verbose,
-		warningsLevel,
-		stdoutWriter, stderrWriter,
-		verboseInfoFn, verboseStdoutFn, verboseStderrFn,
+		builderLogger,
 		progress, progressCB,
 	)
 }
 
 func compileFiles(
 	onlyUpdateCompilationDatabase bool,
-	compilationDatabase *builder.CompilationDatabase,
+	compilationDatabase *compilation.Database,
 	jobs int,
 	sourceDir *paths.Path,
 	recurse bool,
 	buildPath *paths.Path,
 	buildProperties *properties.Map,
 	includes []string,
-	verbose bool,
-	warningsLevel string,
-	stdoutWriter, stderrWriter io.Writer,
-	verboseInfoFn func(msg string),
-	verboseStdoutFn, verboseStderrFn func(data []byte),
+	builderLogger *logger.BuilderLogger,
 	progress *progress.Struct,
 	progressCB rpc.TaskProgressCB,
 ) (paths.PathList, error) {
@@ -438,18 +436,16 @@ func compileFiles(
 			recipe = fmt.Sprintf("recipe%s.o.pattern", globals.SourceFilesValidExtensions[source.Ext()])
 		}
 		objectFile, verboseInfo, verboseStdout, stderr, err := compileFileWithRecipe(
-			stdoutWriter, stderrWriter,
-			warningsLevel,
 			compilationDatabase,
-			verbose,
 			onlyUpdateCompilationDatabase,
 			sourceDir, source, buildPath, buildProperties, includes, recipe,
+			builderLogger,
 		)
-		if verbose {
-			verboseStdoutFn(verboseStdout)
-			verboseInfoFn(string(verboseInfo))
+		if builderLogger.Verbose() {
+			builderLogger.WriteStdout(verboseStdout)
+			builderLogger.Info(string(verboseInfo))
 		}
-		verboseStderrFn(stderr)
+		builderLogger.WriteStderr(stderr)
 		if err != nil {
 			errorsMux.Lock()
 			errorsList = append(errorsList, err)
@@ -506,21 +502,20 @@ func compileFiles(
 }
 
 func compileFileWithRecipe(
-	stdoutWriter, stderrWriter io.Writer,
-	warningsLevel string,
-	compilationDatabase *builder.CompilationDatabase,
-	verbose, onlyUpdateCompilationDatabase bool,
+	compilationDatabase *compilation.Database,
+	onlyUpdateCompilationDatabase bool,
 	sourcePath *paths.Path,
 	source *paths.Path,
 	buildPath *paths.Path,
 	buildProperties *properties.Map,
 	includes []string,
 	recipe string,
+	builderLogger *logger.BuilderLogger,
 ) (*paths.Path, []byte, []byte, []byte, error) {
 	verboseStdout, verboseInfo, errOut := &bytes.Buffer{}, &bytes.Buffer{}, &bytes.Buffer{}
 
 	properties := buildProperties.Clone()
-	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+warningsLevel))
+	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+builderLogger.WarningsLevel()))
 	properties.Set("includes", strings.Join(includes, " "))
 	properties.SetPath("source_file", source)
 	relativeSource, err := sourcePath.RelTo(source)
@@ -550,9 +545,16 @@ func compileFileWithRecipe(
 	}
 	if !objIsUpToDate && !onlyUpdateCompilationDatabase {
 		// Since this compile could be multithreaded, we first capture the command output
-		info, stdout, stderr, err := ExecCommand(verbose, stdoutWriter, stderrWriter, command, Capture, Capture)
+		info, stdout, stderr, err := ExecCommand(
+			builderLogger.Verbose(),
+			builderLogger.Stdout(),
+			builderLogger.Stderr(),
+			command,
+			Capture,
+			Capture,
+		)
 		// and transfer all at once at the end...
-		if verbose {
+		if builderLogger.Verbose() {
 			verboseInfo.Write(info)
 			verboseStdout.Write(stdout)
 		}
@@ -562,7 +564,7 @@ func compileFileWithRecipe(
 		if err != nil {
 			return nil, verboseInfo.Bytes(), verboseStdout.Bytes(), errOut.Bytes(), errors.WithStack(err)
 		}
-	} else if verbose {
+	} else if builderLogger.Verbose() {
 		if objIsUpToDate {
 			verboseInfo.WriteString(tr("Using previously compiled file: %[1]s", objectFile))
 		} else {
