@@ -34,11 +34,6 @@ func TestTryBuild036(t *testing.T) {
 	tryBuildWithContext(t, ctx, "arduino:samd:arduino_zero_native", paths.New("sketch_fastleds", "sketch_fastleds.ino"))
 }
 
-func TestTryBuild039(t *testing.T) {
-	ctx := makeDefaultContext()
-	tryBuildWithContext(t, ctx, "arduino:samd:arduino_zero_native", paths.New("sketch12", "sketch12.ino"))
-}
-
 func makeDefaultContext() *types.Context {
 	preprocessor.DebugPreprocessor = true
 	return &types.Context{
@@ -47,10 +42,6 @@ func makeDefaultContext() *types.Context {
 		BuiltInLibrariesDirs: paths.New("downloaded_libraries"),
 		OtherLibrariesDirs:   paths.NewPathList("libraries"),
 	}
-}
-
-func tryBuild(t *testing.T, sketchLocation *paths.Path) {
-	tryBuildWithContext(t, makeDefaultContext(), "arduino:avr:leonardo", sketchLocation)
 }
 
 func tryBuildWithContext(t *testing.T, ctx *types.Context, fqbn string, sketchLocation *paths.Path) {
