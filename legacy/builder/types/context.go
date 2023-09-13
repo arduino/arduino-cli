@@ -29,11 +29,10 @@ type Context struct {
 	SketchLibrariesDetector *detector.SketchLibrariesDetector
 	BuilderLogger           *logger.BuilderLogger
 
-	// Build options
+	// Used only by legacy tests
 	HardwareDirs         paths.PathList
 	BuiltInToolsDirs     paths.PathList
 	BuiltInLibrariesDirs *paths.Path
 	OtherLibrariesDirs   paths.PathList
-
-	PackageManager *packagemanager.Explorer
+	PackageManager       *packagemanager.Explorer
 }

@@ -175,16 +175,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	}
 
 	builderCtx := &types.Context{}
-	builderCtx.PackageManager = pme
 	actualPlatform := buildPlatform
-
-	// FIXME: This will be redundant when arduino-builder will be part of the cli
-	builderCtx.HardwareDirs = configuration.HardwareDirectories(configuration.Settings)
-	builderCtx.BuiltInToolsDirs = configuration.BuiltinToolsDirectories(configuration.Settings)
-	builderCtx.OtherLibrariesDirs = paths.NewPathList(req.GetLibraries()...)
-	builderCtx.OtherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
-
-	builderCtx.BuiltInLibrariesDirs = configuration.IDEBuiltinLibrariesDir(configuration.Settings)
+	builtinLibrariesDir := configuration.IDEBuiltinLibrariesDir(configuration.Settings)
+	otherLibrariesDirs := paths.NewPathList(req.GetLibraries()...)
+	otherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
 
 	builderLogger := logger.New(outStream, errStream, req.GetVerbose(), req.GetWarnings())
 	builderCtx.BuilderLogger = builderLogger
@@ -197,10 +191,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		coreBuildCachePath,
 		int(req.GetJobs()),
 		req.GetBuildProperties(),
-		builderCtx.HardwareDirs,
-		builderCtx.BuiltInToolsDirs,
-		builderCtx.OtherLibrariesDirs,
-		builderCtx.BuiltInLibrariesDirs,
+		configuration.HardwareDirectories(configuration.Settings),
+		configuration.BuiltinToolsDirectories(configuration.Settings),
+		otherLibrariesDirs,
+		builtinLibrariesDir,
 		fqbn,
 		req.GetClean(),
 		req.GetSourceOverride(),
@@ -230,7 +224,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	libraryDir := paths.NewPathList(req.Library...)
 	libsManager, libsResolver, verboseOut, err := detector.LibrariesLoader(
 		useCachedLibrariesResolution, libsManager,
-		builderCtx.BuiltInLibrariesDirs, libraryDir, builderCtx.OtherLibrariesDirs,
+		builtinLibrariesDir, libraryDir, otherLibrariesDirs,
 		actualPlatform, targetPlatform,
 	)
 	if err != nil {
