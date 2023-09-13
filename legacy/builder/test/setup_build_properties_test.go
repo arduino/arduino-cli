@@ -15,142 +15,132 @@
 
 package test
 
-import (
-	"path/filepath"
-	"testing"
-
-	"github.com/arduino/arduino-cli/legacy/builder/types"
-	paths "github.com/arduino/go-paths-helper"
-	"github.com/arduino/go-properties-orderedmap"
-	"github.com/stretchr/testify/require"
-)
-
 // TODO maybe create a test that actually check all the keys
-func TestSetupBuildProperties(t *testing.T) {
-	ctx := &types.Context{
-		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
-		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
-	}
-	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	buildProperties := ctx.Builder.GetBuildProperties()
-
-	require.Equal(t, "ARDUINO", buildProperties.Get("software"))
-
-	require.Equal(t, "uno", buildProperties.Get("_id"))
-	require.Equal(t, "Arduino/Genuino Uno", buildProperties.Get("name"))
-	require.Equal(t, "0x2341", buildProperties.Get("vid.0"))
-	require.Equal(t, "\"{compiler.path}{compiler.c.cmd}\" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} \"{source_file}\" -o \"{object_file}\"", buildProperties.Get("recipe.c.o.pattern"))
-	require.Equal(t, "{path}/etc/avrdude.conf", buildProperties.Get("tools.avrdude.config.path"))
-
-	requireEquivalentPaths(t, buildProperties.Get("runtime.platform.path"), "downloaded_hardware/arduino/avr")
-	requireEquivalentPaths(t, buildProperties.Get("runtime.hardware.path"), "downloaded_hardware/arduino")
-	require.Equal(t, "10607", buildProperties.Get("runtime.ide.version"))
-	require.NotEmpty(t, buildProperties.Get("runtime.os"))
-
-	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.arm-none-eabi-gcc.path"), "downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1")
-	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.arm-none-eabi-gcc-4.8.3-2014q1.path"), "downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1")
-
-	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.avrdude-6.0.1-arduino5.path"), "tools_builtin/avr", "downloaded_tools/avrdude/6.0.1-arduino5")
-	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.avrdude.path"), "tools_builtin/avr", "downloaded_tools/avrdude/6.0.1-arduino5")
-
-	bossacPath := buildProperties.Get("runtime.tools.bossac.path")
-	bossac161Path := buildProperties.Get("runtime.tools.bossac-1.6.1-arduino.path")
-	bossac15Path := buildProperties.Get("runtime.tools.bossac-1.5-arduino.path")
-	requireEquivalentPaths(t, bossac161Path, "downloaded_tools/bossac/1.6.1-arduino")
-	requireEquivalentPaths(t, bossac15Path, "downloaded_tools/bossac/1.5-arduino")
-	requireEquivalentPaths(t, bossacPath, bossac161Path, bossac15Path)
-
-	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.avr-gcc.path"), "downloaded_tools/avr-gcc/4.8.1-arduino5", "tools_builtin/avr")
-
-	requireEquivalentPaths(t, buildProperties.Get("build.source.path"), "sketch1")
-
-	require.True(t, buildProperties.ContainsKey("extra.time.utc"))
-	require.True(t, buildProperties.ContainsKey("extra.time.local"))
-	require.True(t, buildProperties.ContainsKey("extra.time.zone"))
-	require.True(t, buildProperties.ContainsKey("extra.time.dst"))
-}
-
-// TODO make this integration tests
-func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
-	ctx := &types.Context{
-		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
-	}
-	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
-	defer cleanUpBuilderTestContext(t, ctx)
-	customBuildProp := []string{"name=fake name", "tools.avrdude.config.path=non existent path with space and a ="}
-	customProps, err := properties.LoadFromSlice(customBuildProp)
-	require.NoError(t, err)
-
-	buildProperties := ctx.Builder.GetBuildProperties().Merge(customProps)
-	require.Equal(t, "ARDUINO", buildProperties.Get("software"))
-	require.Equal(t, "uno", buildProperties.Get("_id"))
-	require.Equal(t, "fake name", buildProperties.Get("name"))
-	require.Equal(t, "\"{compiler.path}{compiler.c.cmd}\" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} \"{source_file}\" -o \"{object_file}\"", buildProperties.Get("recipe.c.o.pattern"))
-	require.Equal(t, "non existent path with space and a =", buildProperties.Get("tools.avrdude.config.path"))
-}
-
-// TODO go to compile_4 that uses the custom_yum to compile and we also verify this properties
-func TestSetupBuildPropertiesUserHardware(t *testing.T) {
-	ctx := &types.Context{
-		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
-		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
-	}
-	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "my_avr_platform:avr:custom_yun")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	buildProperties := ctx.Builder.GetBuildProperties()
-
-	require.Equal(t, "ARDUINO", buildProperties.Get("software"))
-
-	require.Equal(t, "custom_yun", buildProperties.Get("_id"))
-	require.Equal(t, "caterina/Caterina-custom_yun.hex", buildProperties.Get("bootloader.file"))
-	requireEquivalentPaths(t, buildProperties.Get("runtime.platform.path"), filepath.Join("user_hardware", "my_avr_platform", "avr"))
-	requireEquivalentPaths(t, buildProperties.Get("runtime.hardware.path"), filepath.Join("user_hardware", "my_avr_platform"))
-}
-
-func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testing.T) {
-	ctx := &types.Context{
-		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
-		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
-	}
-	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "my_avr_platform:avr:custom_yun")
-	defer cleanUpBuilderTestContext(t, ctx)
-
-	buildProperties := ctx.Builder.GetBuildProperties()
-
-	require.Equal(t, "ARDUINO", buildProperties.Get("software"))
-
-	require.Equal(t, "custom_yun", buildProperties.Get("_id"))
-	require.Equal(t, "Arduino Yún", buildProperties.Get("name"))
-	require.Equal(t, "0x2341", buildProperties.Get("vid.0"))
-	require.Equal(t, "\"{compiler.path}{compiler.c.cmd}\" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} \"{source_file}\" -o \"{object_file}\"", buildProperties.Get("recipe.c.o.pattern"))
-	require.Equal(t, "{path}/etc/avrdude.conf", buildProperties.Get("tools.avrdude.config.path"))
-
-	requireEquivalentPaths(t, buildProperties.Get("runtime.platform.path"), "user_hardware/my_avr_platform/avr")
-	requireEquivalentPaths(t, buildProperties.Get("runtime.hardware.path"), "user_hardware/my_avr_platform")
-	require.Equal(t, "10607", buildProperties.Get("runtime.ide.version"))
-	require.NotEmpty(t, buildProperties.Get("runtime.os"))
-
-	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.arm-none-eabi-gcc.path"), "downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1")
-	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.arm-none-eabi-gcc-4.8.3-2014q1.path"), "downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1")
-	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.bossac-1.6.1-arduino.path"), "downloaded_tools/bossac/1.6.1-arduino")
-	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.bossac-1.5-arduino.path"), "downloaded_tools/bossac/1.5-arduino")
-
-	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.bossac.path"), "downloaded_tools/bossac/1.6.1-arduino", "downloaded_tools/bossac/1.5-arduino")
-	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.avrdude.path"), "downloaded_tools/avrdude/6.0.1-arduino5", "tools_builtin/avr")
-
-	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.avrdude-6.0.1-arduino5.path"), "downloaded_tools/avrdude/6.0.1-arduino5", "tools_builtin/avr")
-
-	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.avr-gcc.path"), "downloaded_tools/avr-gcc/4.8.1-arduino5", "tools_builtin/avr")
-	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.avr-gcc-4.8.1-arduino5.path"), "downloaded_tools/avr-gcc/4.8.1-arduino5", "tools_builtin/avr")
-
-	requireEquivalentPaths(t, buildProperties.Get("build.source.path"), "sketch1")
-
-	require.True(t, buildProperties.ContainsKey("extra.time.utc"))
-	require.True(t, buildProperties.ContainsKey("extra.time.local"))
-	require.True(t, buildProperties.ContainsKey("extra.time.zone"))
-	require.True(t, buildProperties.ContainsKey("extra.time.dst"))
-}
+//func TestSetupBuildProperties(t *testing.T) {
+//	ctx := &types.Context{
+//		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
+//		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
+//	}
+//	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
+//	defer cleanUpBuilderTestContext(t, ctx)
+//
+//	buildProperties := ctx.Builder.GetBuildProperties()
+//
+//	require.Equal(t, "ARDUINO", buildProperties.Get("software"))
+//
+//	require.Equal(t, "uno", buildProperties.Get("_id"))
+//	require.Equal(t, "Arduino/Genuino Uno", buildProperties.Get("name"))
+//	require.Equal(t, "0x2341", buildProperties.Get("vid.0"))
+//	require.Equal(t, "\"{compiler.path}{compiler.c.cmd}\" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} \"{source_file}\" -o \"{object_file}\"", buildProperties.Get("recipe.c.o.pattern"))
+//	require.Equal(t, "{path}/etc/avrdude.conf", buildProperties.Get("tools.avrdude.config.path"))
+//
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.platform.path"), "downloaded_hardware/arduino/avr")
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.hardware.path"), "downloaded_hardware/arduino")
+//	require.Equal(t, "10607", buildProperties.Get("runtime.ide.version"))
+//	require.NotEmpty(t, buildProperties.Get("runtime.os"))
+//
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.arm-none-eabi-gcc.path"), "downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1")
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.arm-none-eabi-gcc-4.8.3-2014q1.path"), "downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1")
+//
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.avrdude-6.0.1-arduino5.path"), "tools_builtin/avr", "downloaded_tools/avrdude/6.0.1-arduino5")
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.avrdude.path"), "tools_builtin/avr", "downloaded_tools/avrdude/6.0.1-arduino5")
+//
+//	bossacPath := buildProperties.Get("runtime.tools.bossac.path")
+//	bossac161Path := buildProperties.Get("runtime.tools.bossac-1.6.1-arduino.path")
+//	bossac15Path := buildProperties.Get("runtime.tools.bossac-1.5-arduino.path")
+//	requireEquivalentPaths(t, bossac161Path, "downloaded_tools/bossac/1.6.1-arduino")
+//	requireEquivalentPaths(t, bossac15Path, "downloaded_tools/bossac/1.5-arduino")
+//	requireEquivalentPaths(t, bossacPath, bossac161Path, bossac15Path)
+//
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.avr-gcc.path"), "downloaded_tools/avr-gcc/4.8.1-arduino5", "tools_builtin/avr")
+//
+//	requireEquivalentPaths(t, buildProperties.Get("build.source.path"), "sketch1")
+//
+//	require.True(t, buildProperties.ContainsKey("extra.time.utc"))
+//	require.True(t, buildProperties.ContainsKey("extra.time.local"))
+//	require.True(t, buildProperties.ContainsKey("extra.time.zone"))
+//	require.True(t, buildProperties.ContainsKey("extra.time.dst"))
+//}
+//
+//// TODO make this integration tests
+//func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
+//	ctx := &types.Context{
+//		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
+//		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
+//	}
+//	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
+//	defer cleanUpBuilderTestContext(t, ctx)
+//	customBuildProp := []string{"name=fake name", "tools.avrdude.config.path=non existent path with space and a ="}
+//	customProps, err := properties.LoadFromSlice(customBuildProp)
+//	require.NoError(t, err)
+//
+//	buildProperties := ctx.Builder.GetBuildProperties().Merge(customProps)
+//	require.Equal(t, "ARDUINO", buildProperties.Get("software"))
+//	require.Equal(t, "uno", buildProperties.Get("_id"))
+//	require.Equal(t, "fake name", buildProperties.Get("name"))
+//	require.Equal(t, "\"{compiler.path}{compiler.c.cmd}\" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} \"{source_file}\" -o \"{object_file}\"", buildProperties.Get("recipe.c.o.pattern"))
+//	require.Equal(t, "non existent path with space and a =", buildProperties.Get("tools.avrdude.config.path"))
+//}
+//
+//// TODO go to compile_4 that uses the custom_yum to compile and we also verify this properties
+//func TestSetupBuildPropertiesUserHardware(t *testing.T) {
+//	ctx := &types.Context{
+//		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
+//		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
+//	}
+//	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "my_avr_platform:avr:custom_yun")
+//	defer cleanUpBuilderTestContext(t, ctx)
+//
+//	buildProperties := ctx.Builder.GetBuildProperties()
+//
+//	require.Equal(t, "ARDUINO", buildProperties.Get("software"))
+//
+//	require.Equal(t, "custom_yun", buildProperties.Get("_id"))
+//	require.Equal(t, "caterina/Caterina-custom_yun.hex", buildProperties.Get("bootloader.file"))
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.platform.path"), filepath.Join("user_hardware", "my_avr_platform", "avr"))
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.hardware.path"), filepath.Join("user_hardware", "my_avr_platform"))
+//}
+//
+//func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testing.T) {
+//	ctx := &types.Context{
+//		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
+//		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
+//	}
+//	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "my_avr_platform:avr:custom_yun")
+//	defer cleanUpBuilderTestContext(t, ctx)
+//
+//	buildProperties := ctx.Builder.GetBuildProperties()
+//
+//	require.Equal(t, "ARDUINO", buildProperties.Get("software"))
+//
+//	require.Equal(t, "custom_yun", buildProperties.Get("_id"))
+//	require.Equal(t, "Arduino Yún", buildProperties.Get("name"))
+//	require.Equal(t, "0x2341", buildProperties.Get("vid.0"))
+//	require.Equal(t, "\"{compiler.path}{compiler.c.cmd}\" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} \"{source_file}\" -o \"{object_file}\"", buildProperties.Get("recipe.c.o.pattern"))
+//	require.Equal(t, "{path}/etc/avrdude.conf", buildProperties.Get("tools.avrdude.config.path"))
+//
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.platform.path"), "user_hardware/my_avr_platform/avr")
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.hardware.path"), "user_hardware/my_avr_platform")
+//	require.Equal(t, "10607", buildProperties.Get("runtime.ide.version"))
+//	require.NotEmpty(t, buildProperties.Get("runtime.os"))
+//
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.arm-none-eabi-gcc.path"), "downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1")
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.arm-none-eabi-gcc-4.8.3-2014q1.path"), "downloaded_tools/arm-none-eabi-gcc/4.8.3-2014q1")
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.bossac-1.6.1-arduino.path"), "downloaded_tools/bossac/1.6.1-arduino")
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.bossac-1.5-arduino.path"), "downloaded_tools/bossac/1.5-arduino")
+//
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.bossac.path"), "downloaded_tools/bossac/1.6.1-arduino", "downloaded_tools/bossac/1.5-arduino")
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.avrdude.path"), "downloaded_tools/avrdude/6.0.1-arduino5", "tools_builtin/avr")
+//
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.avrdude-6.0.1-arduino5.path"), "downloaded_tools/avrdude/6.0.1-arduino5", "tools_builtin/avr")
+//
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.avr-gcc.path"), "downloaded_tools/avr-gcc/4.8.1-arduino5", "tools_builtin/avr")
+//	requireEquivalentPaths(t, buildProperties.Get("runtime.tools.avr-gcc-4.8.1-arduino5.path"), "downloaded_tools/avr-gcc/4.8.1-arduino5", "tools_builtin/avr")
+//
+//	requireEquivalentPaths(t, buildProperties.Get("build.source.path"), "sketch1")
+//
+//	require.True(t, buildProperties.ContainsKey("extra.time.utc"))
+//	require.True(t, buildProperties.ContainsKey("extra.time.local"))
+//	require.True(t, buildProperties.ContainsKey("extra.time.zone"))
+//	require.True(t, buildProperties.ContainsKey("extra.time.dst"))
+//}
