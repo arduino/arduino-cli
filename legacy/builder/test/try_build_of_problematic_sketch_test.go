@@ -29,10 +29,6 @@ import (
 
 // TODO add them in the compile_4
 
-func TestTryBuild042(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_fake_function_pointer", "sketch_with_fake_function_pointer.ino"))
-}
-
 func TestTryBuild036(t *testing.T) {
 	ctx := makeDefaultContext()
 	tryBuildWithContext(t, ctx, "arduino:samd:arduino_zero_native", paths.New("sketch_fastleds", "sketch_fastleds.ino"))
