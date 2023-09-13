@@ -101,11 +101,12 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchThatChecksIfSPIHasTransactions", tryBuildAvrLeonardo},
 		{"SketchWithDependendLibraries", tryBuildAvrLeonardo},
 		{"SketchWithFunctionPointer", tryBuildAvrLeonardo},
-		{"SketchThatIncludesArduinoH", testBuilderSketchThatIncludesArduinoH},
 		{"USBHostExample", testBuilderUSBHostExample},
 		{"SketchWithConflictingLibraries", testBuilderSketchWithConflictingLibraries},
 		{"SketchLibraryProvidesAllIncludes", testBuilderSketchLibraryProvidesAllIncludes},
 		{"UserHardware", testBuilderWithUserHardware},
+		{"SketchThatIncludesArduinoH", testBuilderSketchThatIncludesArduinoH},
+		{"SketchWithStaticAsserts", testBuilderSketchWithStaticAsserts},
 	}.Run(t, env, cli)
 }
 
@@ -615,6 +616,21 @@ func tryBuildAvrLeonardo(t *testing.T, env *integrationtest.Environment, cli *in
 }
 
 func testBuilderSketchThatIncludesArduinoH(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchWithStaticAsserts(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
 	t.Run("Build", func(t *testing.T) {
 		// Build
 		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")

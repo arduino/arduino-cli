@@ -29,10 +29,6 @@ import (
 
 // TODO add them in the compile_4
 
-func TestTryBuild034(t *testing.T) {
-	tryBuild(t, paths.New("sketch_with_static_asserts", "sketch_with_static_asserts.ino"))
-}
-
 func TestTryBuild035(t *testing.T) {
 	tryBuild(t, paths.New("sketch_with_enum_class", "sketch_with_enum_class.ino"))
 }
