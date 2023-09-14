@@ -102,6 +102,7 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchNoFunctionsTwoFiles", testBuilderSketchNoFunctionsTwoFiles},
 		{"SketchWithClassAndMethodSubstring", testBuilderSketchWithClassAndMethodSubstring},
 		{"SketchThatChecksIfSPIHasTransactions", tryBuildAvrLeonardo},
+		{"SketchThatChecksIfSPIHasTransactionsAndIncludesMissingEthernet", testBuilderSketchThatChecksIfSPIHasTransactionsAndIncludesMissingEthernet},
 		{"SketchWithDependendLibraries", tryBuildAvrLeonardo},
 		{"SketchWithFunctionPointer", tryBuildAvrLeonardo},
 		{"USBHostExample", testBuilderUSBHostExample},
@@ -789,6 +790,14 @@ func testBuilderSketchClassFunction(t *testing.T, env *integrationtest.Environme
 		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
 		require.NoError(t, err)
 		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchThatChecksIfSPIHasTransactionsAndIncludesMissingEthernet(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.Error(t, err)
 	})
 }
 
