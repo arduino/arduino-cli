@@ -284,20 +284,10 @@ tasks:
       - task: go:build
 
   test:
-    desc: Run the full testsuite, `legacy` will be skipped
+    desc: Run the full testsuite
     cmds:
       - task: go:test
       - task: go:integration-test
-
-  test-legacy:
-    desc: Run tests for the `legacy` package
-    cmds:
-      - |
-        go test \
-          {{ default "-v -failfast" .GOFLAGS }} \
-          -coverprofile=coverage_legacy.txt \
-          ./legacy/... \
-          {{.TEST_LDFLAGS}}
 
   test-unit-race:
     desc: Run unit tests only with race condition detection
@@ -311,17 +301,11 @@ tasks:
           {{.TEST_LDFLAGS}}
 
   check:
-    desc: Check fmt and lint, `legacy` will be skipped
+    desc: Check fmt and lint
     cmds:
       - task: go:vet
       - task: go:lint
       - task: protoc:check
-
-  check-legacy:
-    desc: Check fmt and lint for the `legacy` package
-    cmds:
-      - test -z $(go fmt ./legacy/...)
-      - go vet ./legacy/...
 
   rpc-client:
     desc: Run the rpc client test routine (server must be already started)
@@ -376,10 +360,10 @@ tasks:
 vars:
   PROJECT_NAME: "arduino-cli"
   DIST_DIR: "dist"
-  # all modules of this project except for "legacy/..." module and integration test
+  # all modules of this project except for integration test
   DEFAULT_GO_PACKAGES:
     sh: |
-      echo $(cd {{default "./" .GO_MODULE_PATH}} && go list ./... | grep -v internal/integrationtest | grep -v legacy | tr '\n' ' ' || echo '"ERROR: Unable to discover Go packages"')
+      echo $(cd {{default "./" .GO_MODULE_PATH}} && go list ./... | grep -v internal/integrationtest | tr '\n' ' ' || echo '"ERROR: Unable to discover Go packages"')
   DEFAULT_INTEGRATIONTEST_GO_PACKAGES:
     sh: |
       echo $(cd {{default "./" .GO_MODULE_PATH}} && go list ./... | grep internal/integrationtest | tr '\n' ' ' || echo '"ERROR: Unable to discover Go packages"')
