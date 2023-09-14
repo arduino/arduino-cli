@@ -70,7 +70,7 @@ submitting a PR:
 
 To build the Arduino CLI from sources you need the following tools to be available in your local environment:
 
-- [Go][1] version 1.20 or later
+- [Go][1] version 1.21 or later
 - [Taskfile][2] to help you run the most common tasks from the command line
 
 If you want to run integration tests you will also need:
