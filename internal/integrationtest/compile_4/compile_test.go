@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
+	"go.bug.st/testifyjson/requirejson"
 	"golang.org/x/exp/slices"
 )
 
@@ -953,4 +954,62 @@ func TestMergeSketchWithBootloader(t *testing.T) {
 
 	require.Contains(t, mergedSketchHex, ":100000000C9434000C9446000C9446000C9446006A\n")
 	require.True(t, strings.HasSuffix(mergedSketchHex, ":00000001FF\n"))
+}
+
+func TestBuildOptionsFile(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	sketchPath := cli.CopySketch("sketch_simple")
+	defer sketchPath.RemoveAll()
+
+	_, _, err := cli.Run("core", "install", "arduino:avr@1.8.6")
+	require.NoError(t, err)
+
+	buildPath, err := paths.MkTempDir("", "arduino-integration-test")
+	require.NoError(t, err)
+	defer buildPath.RemoveAll()
+
+	// Build first time
+	_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(), sketchPath.String())
+	require.NoError(t, err)
+
+	exist, err := buildPath.Join("build.options.json").ExistCheck()
+	require.NoError(t, err)
+	require.True(t, exist)
+
+	buildOptionsBytes, err := buildPath.Join("build.options.json").ReadFile()
+	require.NoError(t, err)
+
+	requirejson.Query(t, buildOptionsBytes, "keys", `[
+		"additionalFiles",
+		"builtInToolsFolders",
+		"compiler.optimization_flags",
+		"customBuildProperties",
+		"fqbn",
+		"hardwareFolders",
+		"otherLibrariesFolders",
+		"sketchLocation"
+	]`)
+	requirejson.Query(t, buildOptionsBytes, ".fqbn", `"arduino:avr:uno"`)
+	requirejson.Query(t, buildOptionsBytes, ".customBuildProperties", `"build.warn_data_percentage=75"`)
+
+	// Recompiling a second time should provide the same result
+	_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(), sketchPath.String())
+	require.NoError(t, err)
+
+	buildOptionsBytes, err = buildPath.Join("build.options.json").ReadFile()
+	require.NoError(t, err)
+	requirejson.Query(t, buildOptionsBytes, ".customBuildProperties", `"build.warn_data_percentage=75"`)
+
+	// Recompiling with a new build option must produce a new `build.options.json`
+	_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(),
+		"--build-property", "custom=prop",
+		sketchPath.String(),
+	)
+	require.NoError(t, err)
+
+	buildOptionsBytes, err = buildPath.Join("build.options.json").ReadFile()
+	require.NoError(t, err)
+	requirejson.Query(t, buildOptionsBytes, ".customBuildProperties", `"custom=prop,build.warn_data_percentage=75"`)
 }
