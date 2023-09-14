@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/arduino/arduino-cli/arduino/builder/compilation"
+	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -223,14 +224,243 @@ func (b *Builder) ExecutableSectionsSize() ExecutablesFileSections {
 	return b.executableSectionsSize
 }
 
-// SaveCompilationDatabase fixdoc
-func (b *Builder) SaveCompilationDatabase() {
-	if b.compilationDatabase != nil {
-		b.compilationDatabase.SaveToFile()
-	}
-}
-
 // TargetPlatform fixdoc
 func (b *Builder) TargetPlatform() *cores.PlatformRelease {
 	return b.targetPlatform
+}
+
+// Preprocess fixdoc
+func (b *Builder) Preprocess(detector *detector.SketchLibrariesDetector) error {
+	b.Progress.AddSubSteps(6)
+	defer b.Progress.RemoveSubSteps()
+	return b.preprocess(detector)
+}
+
+func (b *Builder) preprocess(detector *detector.SketchLibrariesDetector) error {
+	if err := b.buildPath.MkdirAll(); err != nil {
+		return err
+	}
+
+	if err := b.BuildOptionsManager.WipeBuildPath(); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if err := b.RunRecipe("recipe.hooks.prebuild", ".pattern", false); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if err := b.PrepareSketchBuildPath(); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	b.logIfVerbose(false, tr("Detecting libraries used..."))
+	err := detector.FindIncludes(
+		b.GetBuildPath(),
+		b.GetBuildProperties().GetPath("build.core.path"),
+		b.GetBuildProperties().GetPath("build.variant.path"),
+		b.GetSketchBuildPath(),
+		b.Sketch(),
+		b.GetLibrariesBuildPath(),
+		b.GetBuildProperties(),
+		b.TargetPlatform().Platform.Architecture,
+	)
+	if err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	b.WarnAboutArchIncompatibleLibraries(detector.ImportedLibraries())
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	b.logIfVerbose(false, tr("Generating function prototypes..."))
+	if err := b.PreprocessSketch(detector.IncludeFolders()); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	// Output arduino-preprocessed source
+	preprocessedSketch, err := b.sketchBuildPath.Join(b.sketch.MainFile.Base() + ".cpp").ReadFile()
+	if err != nil {
+		return err
+	}
+	b.logger.WriteStdout(preprocessedSketch)
+
+	return nil
+}
+
+func (b *Builder) logIfVerbose(warn bool, msg string) {
+	if !b.logger.Verbose() {
+		return
+	}
+	if warn {
+		b.logger.Warn(msg)
+		return
+	}
+	b.logger.Info(msg)
+}
+
+// Build fixdoc
+func (b *Builder) Build(detector *detector.SketchLibrariesDetector) error {
+	b.Progress.AddSubSteps(6 /** preprocess **/ + 21 /** build **/)
+	defer b.Progress.RemoveSubSteps()
+
+	if err := b.preprocess(detector); err != nil {
+		return err
+	}
+
+	buildErr := b.build(detector)
+
+	detector.PrintUsedAndNotUsedLibraries(buildErr != nil)
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	b.PrintUsedLibraries(detector.ImportedLibraries())
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if buildErr != nil {
+		return buildErr
+	}
+	if err := b.ExportProjectCMake(detector.ImportedLibraries(), detector.IncludeFolders()); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if err := b.Size(); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	return nil
+}
+
+// Build fixdoc
+func (b *Builder) build(detector *detector.SketchLibrariesDetector) error {
+	b.logIfVerbose(false, tr("Compiling sketch..."))
+	if err := b.RunRecipe("recipe.hooks.sketch.prebuild", ".pattern", false); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if err := b.BuildSketch(detector.IncludeFolders()); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if err := b.RunRecipe("recipe.hooks.sketch.postbuild", ".pattern", true); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	b.logIfVerbose(false, tr("Compiling libraries..."))
+	if err := b.RunRecipe("recipe.hooks.libraries.prebuild", ".pattern", false); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if err := b.RemoveUnusedCompiledLibraries(detector.ImportedLibraries()); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if err := b.BuildLibraries(detector.IncludeFolders(), detector.ImportedLibraries()); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if err := b.RunRecipe("recipe.hooks.libraries.postbuild", ".pattern", true); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	b.logIfVerbose(false, tr("Compiling core..."))
+	if err := b.RunRecipe("recipe.hooks.core.prebuild", ".pattern", false); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if err := b.BuildCore(); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if err := b.RunRecipe("recipe.hooks.core.postbuild", ".pattern", true); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	b.logIfVerbose(false, tr("Linking everything together..."))
+	if err := b.RunRecipe("recipe.hooks.linking.prelink", ".pattern", false); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if err := b.Link(); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if err := b.RunRecipe("recipe.hooks.linking.postlink", ".pattern", true); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if err := b.RunRecipe("recipe.hooks.objcopy.preobjcopy", ".pattern", false); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if err := b.RunRecipe("recipe.objcopy.", ".pattern", true); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if err := b.RunRecipe("recipe.hooks.objcopy.postobjcopy", ".pattern", true); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if err := b.MergeSketchWithBootloader(); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if err := b.RunRecipe("recipe.hooks.postbuild", ".pattern", true); err != nil {
+		return err
+	}
+	b.Progress.CompleteStep()
+	b.Progress.PushProgress()
+
+	if b.compilationDatabase != nil {
+		b.compilationDatabase.SaveToFile()
+	}
+	return nil
 }

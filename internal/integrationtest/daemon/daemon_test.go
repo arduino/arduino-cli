@@ -187,7 +187,7 @@ func TestDaemonCompileOptions(t *testing.T) {
 	// https://github.com/arduino/arduino-cli/issues/2016
 	// assert that the task progress is increasing and doesn't contain multiple 100% values
 	results := analyzer.Results[""]
-	require.True(t, results[len(results)-1].Completed)
+	require.True(t, results[len(results)-1].Completed, fmt.Sprintf("latest percent value: %v", results[len(results)-1].Percent))
 	require.IsNonDecreasing(t, f.Map(results, (*commands.TaskProgress).GetPercent))
 }
 
