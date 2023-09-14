@@ -15,9 +15,7 @@ require (
 	github.com/djherbis/buffer v1.1.0
 	github.com/djherbis/nio/v3 v3.0.1
 	github.com/fatih/color v1.7.0
-	github.com/gofrs/uuid v3.2.0+incompatible
-	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8 // indirect
-	github.com/kr/text v0.2.0 // indirect
+	github.com/gofrs/uuid/v5 v5.0.0
 	github.com/leonelquinteros/gotext v1.4.0
 	github.com/mailru/easyjson v0.7.7
 	github.com/marcinbor85/gohex v0.0.0-20210308104911-55fb1c624d84
