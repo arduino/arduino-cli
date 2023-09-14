@@ -23,13 +23,13 @@ import (
 	"testing"
 	"text/template"
 	"time"
+	"slices"
 
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/testifyjson/requirejson"
-	"golang.org/x/exp/slices"
 )
 
 func TestCompileOfProblematicSketches(t *testing.T) {

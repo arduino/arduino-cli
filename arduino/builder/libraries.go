@@ -16,6 +16,7 @@
 package builder
 
 import (
+	"slices"
 	"strings"
 	"time"
 
@@ -26,7 +27,6 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
-	"golang.org/x/exp/slices"
 )
 
 // nolint

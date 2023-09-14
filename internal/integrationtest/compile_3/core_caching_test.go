@@ -18,11 +18,11 @@ package compile_test
 import (
 	"strings"
 	"testing"
+	"slices"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/exp/slices"
 )
 
 func TestCompileCoreCacheGeneration(t *testing.T) {

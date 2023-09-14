@@ -21,11 +21,11 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/arduino/go-paths-helper"
 	properties "github.com/arduino/go-properties-orderedmap"
-	"golang.org/x/exp/slices"
 
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/globals"

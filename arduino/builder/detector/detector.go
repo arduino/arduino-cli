@@ -21,10 +21,9 @@ import (
 	"fmt"
 	"os/exec"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
-
-	"golang.org/x/exp/slices"
 
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
