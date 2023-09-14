@@ -172,11 +172,8 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	}
 
 	actualPlatform := buildPlatform
-	builtinLibrariesDir := configuration.IDEBuiltinLibrariesDir(configuration.Settings)
 	otherLibrariesDirs := paths.NewPathList(req.GetLibraries()...)
 	otherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
-
-	builderLogger := logger.New(outStream, errStream, req.GetVerbose(), req.GetWarnings())
 
 	var libsManager *librariesmanager.LibrariesManager
 	if pme.GetProfile() != nil {
@@ -193,7 +190,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		configuration.HardwareDirectories(configuration.Settings),
 		configuration.BuiltinToolsDirectories(configuration.Settings),
 		otherLibrariesDirs,
-		builtinLibrariesDir,
+		configuration.IDEBuiltinLibrariesDir(configuration.Settings),
 		fqbn,
 		req.GetClean(),
 		req.GetSourceOverride(),
@@ -202,7 +199,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		req.GetSkipLibrariesDiscovery(),
 		libsManager,
 		paths.NewPathList(req.Library...),
-		builderLogger,
+		logger.New(outStream, errStream, req.GetVerbose(), req.GetWarnings()),
 		progress.New(progressCB),
 	)
 	if err != nil {
