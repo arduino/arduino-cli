@@ -38,10 +38,10 @@ var (
 	tr               = i18n.Tr
 )
 
-// PrepareSketchBuildPath copies the sketch source files in the build path.
+// prepareSketchBuildPath copies the sketch source files in the build path.
 // The .ino files are merged together to create a .cpp file (by the way, the
 // .cpp file still needs to be Arduino-preprocessed to compile).
-func (b *Builder) PrepareSketchBuildPath() error {
+func (b *Builder) prepareSketchBuildPath() error {
 	if err := b.sketchBuildPath.MkdirAll(); err != nil {
 		return errors.Wrap(err, tr("unable to create a folder to save the sketch"))
 	}

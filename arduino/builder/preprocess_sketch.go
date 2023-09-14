@@ -20,8 +20,8 @@ import (
 	"github.com/arduino/go-paths-helper"
 )
 
-// PreprocessSketch fixdoc
-func (b *Builder) PreprocessSketch(includes paths.PathList) error {
+// preprocessSketch fixdoc
+func (b *Builder) preprocessSketch(includes paths.PathList) error {
 	// In the future we might change the preprocessor
 	normalOutput, verboseOutput, err := preprocessor.PreprocessSketchWithCtags(
 		b.sketch, b.buildPath, includes, b.lineOffset,

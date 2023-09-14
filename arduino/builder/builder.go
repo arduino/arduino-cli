@@ -261,7 +261,7 @@ func (b *Builder) preprocess() error {
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	if err := b.PrepareSketchBuildPath(); err != nil {
+	if err := b.prepareSketchBuildPath(); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
@@ -284,12 +284,12 @@ func (b *Builder) preprocess() error {
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	b.WarnAboutArchIncompatibleLibraries(b.SketchLibrariesDetector.ImportedLibraries())
+	b.warnAboutArchIncompatibleLibraries(b.SketchLibrariesDetector.ImportedLibraries())
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
 	b.logIfVerbose(false, tr("Generating function prototypes..."))
-	if err := b.PreprocessSketch(b.SketchLibrariesDetector.IncludeFolders()); err != nil {
+	if err := b.preprocessSketch(b.SketchLibrariesDetector.IncludeFolders()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
@@ -331,20 +331,20 @@ func (b *Builder) Build() error {
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	b.PrintUsedLibraries(b.SketchLibrariesDetector.ImportedLibraries())
+	b.printUsedLibraries(b.SketchLibrariesDetector.ImportedLibraries())
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
 	if buildErr != nil {
 		return buildErr
 	}
-	if err := b.ExportProjectCMake(b.SketchLibrariesDetector.ImportedLibraries(), b.SketchLibrariesDetector.IncludeFolders()); err != nil {
+	if err := b.exportProjectCMake(b.SketchLibrariesDetector.ImportedLibraries(), b.SketchLibrariesDetector.IncludeFolders()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	if err := b.Size(); err != nil {
+	if err := b.size(); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
@@ -381,13 +381,13 @@ func (b *Builder) build() error {
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	if err := b.RemoveUnusedCompiledLibraries(b.SketchLibrariesDetector.ImportedLibraries()); err != nil {
+	if err := b.removeUnusedCompiledLibraries(b.SketchLibrariesDetector.ImportedLibraries()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	if err := b.BuildLibraries(b.SketchLibrariesDetector.IncludeFolders(), b.SketchLibrariesDetector.ImportedLibraries()); err != nil {
+	if err := b.buildLibraries(b.SketchLibrariesDetector.IncludeFolders(), b.SketchLibrariesDetector.ImportedLibraries()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
@@ -406,7 +406,7 @@ func (b *Builder) build() error {
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	if err := b.BuildCore(); err != nil {
+	if err := b.buildCore(); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
@@ -425,7 +425,7 @@ func (b *Builder) build() error {
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	if err := b.Link(); err != nil {
+	if err := b.link(); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()

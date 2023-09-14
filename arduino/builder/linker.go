@@ -24,8 +24,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Link fixdoc
-func (b *Builder) Link() error {
+// link fixdoc
+func (b *Builder) link() error {
 	if b.onlyUpdateCompilationDatabase {
 		if b.logger.Verbose() {
 			b.logger.Info(tr("Skip linking of final executable."))
@@ -43,14 +43,6 @@ func (b *Builder) Link() error {
 		return errors.WithStack(err)
 	}
 
-	if err := b.link(objectFiles, coreDotARelPath, b.buildArtifacts.coreArchiveFilePath); err != nil {
-		return errors.WithStack(err)
-	}
-
-	return nil
-}
-
-func (b *Builder) link(objectFiles paths.PathList, coreDotARelPath *paths.Path, coreArchiveFilePath *paths.Path) error {
 	wrapWithDoubleQuotes := func(value string) string { return "\"" + value + "\"" }
 	objectFileList := strings.Join(f.Map(objectFiles.AsStrings(), wrapWithDoubleQuotes), " ")
 
@@ -101,7 +93,7 @@ func (b *Builder) link(objectFiles paths.PathList, coreDotARelPath *paths.Path, 
 	properties.Set("compiler.c.elf.flags", properties.Get("compiler.c.elf.flags"))
 	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+b.logger.WarningsLevel()))
 	properties.Set("archive_file", coreDotARelPath.String())
-	properties.Set("archive_file_path", coreArchiveFilePath.String())
+	properties.Set("archive_file_path", b.buildArtifacts.coreArchiveFilePath.String())
 	properties.Set("object_files", objectFileList)
 
 	command, err := utils.PrepareCommandForRecipe(properties, "recipe.c.combine.pattern", false)
@@ -113,5 +105,8 @@ func (b *Builder) link(objectFiles paths.PathList, coreDotARelPath *paths.Path, 
 	if b.logger.Verbose() {
 		b.logger.Info(string(verboseInfo))
 	}
-	return err
+	if err != nil {
+		return err
+	}
+	return nil
 }
