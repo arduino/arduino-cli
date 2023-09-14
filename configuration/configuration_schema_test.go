@@ -16,7 +16,7 @@
 package configuration
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -24,7 +24,7 @@ import (
 )
 
 func TestConfigurationSchemaValidity(t *testing.T) {
-	schemaBytes, err := ioutil.ReadFile("configuration.schema.json")
+	schemaBytes, err := os.ReadFile("configuration.schema.json")
 	require.NoError(t, err)
 
 	jl := gojsonschema.NewBytesLoader(schemaBytes)
