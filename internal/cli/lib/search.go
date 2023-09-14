@@ -163,7 +163,7 @@ func (res result) String() string {
 		out.WriteString(fmt.Sprintf("  "+tr("Category: %s")+"\n", latest.Category))
 		out.WriteString(fmt.Sprintf("  "+tr("Architecture: %s")+"\n", strings.Join(latest.Architectures, ", ")))
 		out.WriteString(fmt.Sprintf("  "+tr("Types: %s")+"\n", strings.Join(latest.Types, ", ")))
-		out.WriteString(fmt.Sprintf("  "+tr("Versions: %s")+"\n", strings.Replace(fmt.Sprint(lib.GetAvailableVersions()), " ", ", ", -1)))
+		out.WriteString(fmt.Sprintf("  "+tr("Versions: %s")+"\n", strings.ReplaceAll(fmt.Sprint(lib.GetAvailableVersions()), " ", ", ")))
 		if len(latest.ProvidesIncludes) > 0 {
 			out.WriteString(fmt.Sprintf("  "+tr("Provides includes: %s")+"\n", strings.Join(latest.ProvidesIncludes, ", ")))
 		}

@@ -103,8 +103,8 @@ func PreprocessSketchWithCtags(sketch *sketch.Sketch, buildPath *paths.Path, inc
 	} else {
 		return normalOutput.Bytes(), verboseOutput.Bytes(), err
 	}
-	source = strings.Replace(source, "\r\n", "\n", -1)
-	source = strings.Replace(source, "\r", "\n", -1)
+	source = strings.ReplaceAll(source, "\r\n", "\n")
+	source = strings.ReplaceAll(source, "\r", "\n")
 	sourceRows := strings.Split(source, "\n")
 	if isFirstFunctionOutsideOfSource(firstFunctionLine, sourceRows) {
 		return normalOutput.Bytes(), verboseOutput.Bytes(), nil

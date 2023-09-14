@@ -904,7 +904,7 @@ func comparePreprocessGoldenFile(t *testing.T, sketchDir *paths.Path, preprocess
 	err = tpl.Execute(&buf, data)
 	require.NoError(t, err)
 
-	require.Equal(t, buf.String(), strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
+	require.Equal(t, buf.String(), strings.ReplaceAll(preprocessedSketch, "\r\n", "\n"))
 }
 
 func TestCoreCaching(t *testing.T) {

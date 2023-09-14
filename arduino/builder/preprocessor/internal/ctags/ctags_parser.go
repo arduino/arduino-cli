@@ -167,8 +167,8 @@ func removeTralingSemicolon(s string) string {
 }
 
 func removeSpacesAndTabs(s string) string {
-	s = strings.Replace(s, " ", "", -1)
-	s = strings.Replace(s, "\t", "", -1)
+	s = strings.ReplaceAll(s, " ", "")
+	s = strings.ReplaceAll(s, "\t", "")
 	return s
 }
 
@@ -205,7 +205,7 @@ func parseTag(row string) *Tag {
 	// and just cuts off the filename at the first double quote it
 	// sees. This means any backslashes are still escaped, and need
 	// to be unescape, and any quotes will just break the build.
-	tag.Filename = strings.Replace(parts[1], "\\\\", "\\", -1)
+	tag.Filename = strings.ReplaceAll(parts[1], "\\\\", "\\")
 
 	parts = parts[2:]
 
