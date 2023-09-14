@@ -25,7 +25,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/builder"
-	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -179,6 +178,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	builderLogger := logger.New(outStream, errStream, req.GetVerbose(), req.GetWarnings())
 
+	var libsManager *librariesmanager.LibrariesManager
+	if pme.GetProfile() != nil {
+		libsManager = lm
+	}
 	sketchBuilder, err := builder.NewBuilder(
 		sk,
 		boardBuildProperties,
@@ -195,7 +198,10 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		req.GetClean(),
 		req.GetSourceOverride(),
 		req.GetCreateCompilationDatabaseOnly(),
-		actualPlatform, targetPlatform,
+		targetPlatform, actualPlatform,
+		req.GetSkipLibrariesDiscovery(),
+		libsManager,
+		paths.NewPathList(req.Library...),
 		builderLogger,
 		progress.New(progressCB),
 	)
@@ -210,32 +216,6 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		}
 		return r, &arduino.CompileFailedError{Message: err.Error()}
 	}
-
-	var libsManager *librariesmanager.LibrariesManager
-	if pme.GetProfile() != nil {
-		libsManager = lm
-	}
-	useCachedLibrariesResolution := req.GetSkipLibrariesDiscovery()
-	libraryDir := paths.NewPathList(req.Library...)
-	libsManager, libsResolver, verboseOut, err := detector.LibrariesLoader(
-		useCachedLibrariesResolution, libsManager,
-		builtinLibrariesDir, libraryDir, otherLibrariesDirs,
-		actualPlatform, targetPlatform,
-	)
-	if err != nil {
-		return r, &arduino.CompileFailedError{Message: err.Error()}
-	}
-
-	if builderLogger.Verbose() {
-		builderLogger.Warn(string(verboseOut))
-	}
-
-	sketchLibrariesDetector := detector.NewSketchLibrariesDetector(
-		libsManager, libsResolver,
-		useCachedLibrariesResolution,
-		req.GetCreateCompilationDatabaseOnly(),
-		builderLogger,
-	)
 
 	defer func() {
 		if p := sketchBuilder.GetBuildPath(); p != nil {
@@ -265,7 +245,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	if req.GetPreprocess() {
 		// Just output preprocessed source code and exit
-		compileErr := sketchBuilder.Preprocess(sketchLibrariesDetector)
+		compileErr := sketchBuilder.Preprocess()
 		if compileErr != nil {
 			compileErr = &arduino.CompileFailedError{Message: compileErr.Error()}
 		}
@@ -274,7 +254,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	defer func() {
 		importedLibs := []*rpc.Library{}
-		for _, lib := range sketchLibrariesDetector.ImportedLibraries() {
+		for _, lib := range sketchBuilder.SketchLibrariesDetector.ImportedLibraries() {
 			rpcLib, err := lib.ToRPCLibrary()
 			if err != nil {
 				msg := tr("Error getting information for library %s", lib.Name) + ": " + err.Error() + "\n"
@@ -310,7 +290,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 				targetBoard.String(), "'build.board'", sketchBuilder.GetBuildProperties().Get("build.board")) + "\n"))
 	}
 
-	if err := sketchBuilder.Build(sketchLibrariesDetector); err != nil {
+	if err := sketchBuilder.Build(); err != nil {
 		return r, &arduino.CompileFailedError{Message: err.Error()}
 	}
 

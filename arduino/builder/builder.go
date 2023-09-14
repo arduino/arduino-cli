@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -78,6 +79,7 @@ type Builder struct {
 
 	buildArtifacts *BuildArtifacts
 
+	*detector.SketchLibrariesDetector
 	*BuildOptionsManager
 }
 
@@ -110,6 +112,9 @@ func NewBuilder(
 	sourceOverrides map[string]string,
 	onlyUpdateCompilationDatabase bool,
 	targetPlatform, actualPlatform *cores.PlatformRelease,
+	useCachedLibrariesResolution bool,
+	librariesManager *librariesmanager.LibrariesManager,
+	libraryDirs paths.PathList,
 	logger *logger.BuilderLogger,
 	progressStats *progress.Struct,
 ) (*Builder, error) {
@@ -164,6 +169,18 @@ func NewBuilder(
 		progressStats = progress.New(nil)
 	}
 
+	libsManager, libsResolver, verboseOut, err := detector.LibrariesLoader(
+		useCachedLibrariesResolution, librariesManager,
+		builtInLibrariesDirs, libraryDirs, otherLibrariesDirs,
+		actualPlatform, targetPlatform,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if logger.Verbose() {
+		logger.Warn(string(verboseOut))
+	}
+
 	return &Builder{
 		sketch:                        sk,
 		buildProperties:               buildProperties,
@@ -184,6 +201,12 @@ func NewBuilder(
 		buildArtifacts:                &BuildArtifacts{},
 		targetPlatform:                targetPlatform,
 		actualPlatform:                actualPlatform,
+		SketchLibrariesDetector: detector.NewSketchLibrariesDetector(
+			libsManager, libsResolver,
+			useCachedLibrariesResolution,
+			onlyUpdateCompilationDatabase,
+			logger,
+		),
 		BuildOptionsManager: NewBuildOptionsManager(
 			hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
 			builtInLibrariesDirs, buildPath,
@@ -230,13 +253,13 @@ func (b *Builder) TargetPlatform() *cores.PlatformRelease {
 }
 
 // Preprocess fixdoc
-func (b *Builder) Preprocess(detector *detector.SketchLibrariesDetector) error {
+func (b *Builder) Preprocess() error {
 	b.Progress.AddSubSteps(6)
 	defer b.Progress.RemoveSubSteps()
-	return b.preprocess(detector)
+	return b.preprocess()
 }
 
-func (b *Builder) preprocess(detector *detector.SketchLibrariesDetector) error {
+func (b *Builder) preprocess() error {
 	if err := b.buildPath.MkdirAll(); err != nil {
 		return err
 	}
@@ -260,7 +283,7 @@ func (b *Builder) preprocess(detector *detector.SketchLibrariesDetector) error {
 	b.Progress.PushProgress()
 
 	b.logIfVerbose(false, tr("Detecting libraries used..."))
-	err := detector.FindIncludes(
+	err := b.SketchLibrariesDetector.FindIncludes(
 		b.GetBuildPath(),
 		b.GetBuildProperties().GetPath("build.core.path"),
 		b.GetBuildProperties().GetPath("build.variant.path"),
@@ -276,12 +299,12 @@ func (b *Builder) preprocess(detector *detector.SketchLibrariesDetector) error {
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	b.WarnAboutArchIncompatibleLibraries(detector.ImportedLibraries())
+	b.WarnAboutArchIncompatibleLibraries(b.SketchLibrariesDetector.ImportedLibraries())
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
 	b.logIfVerbose(false, tr("Generating function prototypes..."))
-	if err := b.PreprocessSketch(detector.IncludeFolders()); err != nil {
+	if err := b.PreprocessSketch(b.SketchLibrariesDetector.IncludeFolders()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
@@ -309,28 +332,28 @@ func (b *Builder) logIfVerbose(warn bool, msg string) {
 }
 
 // Build fixdoc
-func (b *Builder) Build(detector *detector.SketchLibrariesDetector) error {
+func (b *Builder) Build() error {
 	b.Progress.AddSubSteps(6 /** preprocess **/ + 21 /** build **/)
 	defer b.Progress.RemoveSubSteps()
 
-	if err := b.preprocess(detector); err != nil {
+	if err := b.preprocess(); err != nil {
 		return err
 	}
 
-	buildErr := b.build(detector)
+	buildErr := b.build()
 
-	detector.PrintUsedAndNotUsedLibraries(buildErr != nil)
+	b.SketchLibrariesDetector.PrintUsedAndNotUsedLibraries(buildErr != nil)
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	b.PrintUsedLibraries(detector.ImportedLibraries())
+	b.PrintUsedLibraries(b.SketchLibrariesDetector.ImportedLibraries())
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
 	if buildErr != nil {
 		return buildErr
 	}
-	if err := b.ExportProjectCMake(detector.ImportedLibraries(), detector.IncludeFolders()); err != nil {
+	if err := b.ExportProjectCMake(b.SketchLibrariesDetector.ImportedLibraries(), b.SketchLibrariesDetector.IncludeFolders()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
@@ -346,7 +369,7 @@ func (b *Builder) Build(detector *detector.SketchLibrariesDetector) error {
 }
 
 // Build fixdoc
-func (b *Builder) build(detector *detector.SketchLibrariesDetector) error {
+func (b *Builder) build() error {
 	b.logIfVerbose(false, tr("Compiling sketch..."))
 	if err := b.RunRecipe("recipe.hooks.sketch.prebuild", ".pattern", false); err != nil {
 		return err
@@ -354,7 +377,7 @@ func (b *Builder) build(detector *detector.SketchLibrariesDetector) error {
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	if err := b.BuildSketch(detector.IncludeFolders()); err != nil {
+	if err := b.BuildSketch(b.SketchLibrariesDetector.IncludeFolders()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
@@ -373,13 +396,13 @@ func (b *Builder) build(detector *detector.SketchLibrariesDetector) error {
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	if err := b.RemoveUnusedCompiledLibraries(detector.ImportedLibraries()); err != nil {
+	if err := b.RemoveUnusedCompiledLibraries(b.SketchLibrariesDetector.ImportedLibraries()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	if err := b.BuildLibraries(detector.IncludeFolders(), detector.ImportedLibraries()); err != nil {
+	if err := b.BuildLibraries(b.SketchLibrariesDetector.IncludeFolders(), b.SketchLibrariesDetector.ImportedLibraries()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
