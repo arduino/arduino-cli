@@ -27,7 +27,7 @@ func TestOutdated(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
 
-	//Updates index for cores and libraries
+	// Updates index for cores and libraries
 	_, _, err := cli.Run("core", "update-index")
 	require.NoError(t, err)
 	_, _, err = cli.Run("lib", "update-index")

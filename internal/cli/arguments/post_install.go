@@ -26,7 +26,7 @@ import (
 // this information are consistent with each other.
 type PostInstallFlags struct {
 	runPostInstall  bool // force the execution of installation scripts
-	skipPostInstall bool //skip the execution of installation scripts
+	skipPostInstall bool // skip the execution of installation scripts
 }
 
 // AddToCommand adds flags that can be used to force running or skipping

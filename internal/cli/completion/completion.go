@@ -25,7 +25,7 @@ import (
 )
 
 var (
-	completionNoDesc bool //Disable completion description for shells that support it
+	completionNoDesc bool // Disable completion description for shells that support it
 	tr               = i18n.Tr
 )
 

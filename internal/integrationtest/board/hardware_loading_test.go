@@ -151,7 +151,7 @@ func TestHardwareLoading(t *testing.T) {
 			require.NoError(t, err)
 			jsonOut := requirejson.Parse(t, out)
 			if runtime.GOOS == "windows" {
-				//a package is a symlink, and windows does not support them
+				// a package is a symlink, and windows does not support them
 				jsonOut.LengthMustEqualTo(2)
 			} else {
 				jsonOut.LengthMustEqualTo(3)

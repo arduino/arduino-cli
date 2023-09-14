@@ -41,7 +41,7 @@ type board struct {
 func detectedBoards(t *testing.T, cli *integrationtest.ArduinoCLI) []board {
 	// This fixture provides a list of all the boards attached to the host.
 	// This fixture will parse the JSON output of `arduino-cli board list --format json`
-	//to extract all the connected boards data.
+	// to extract all the connected boards data.
 
 	// :returns a list `Board` objects.
 
