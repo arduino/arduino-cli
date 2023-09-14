@@ -232,24 +232,9 @@ func (b *Builder) GetBuildPath() *paths.Path {
 	return b.buildPath
 }
 
-// GetSketchBuildPath returns the sketch build path
-func (b *Builder) GetSketchBuildPath() *paths.Path {
-	return b.sketchBuildPath
-}
-
-// GetLibrariesBuildPath returns the libraries build path
-func (b *Builder) GetLibrariesBuildPath() *paths.Path {
-	return b.librariesBuildPath
-}
-
 // ExecutableSectionsSize fixdoc
 func (b *Builder) ExecutableSectionsSize() ExecutablesFileSections {
 	return b.executableSectionsSize
-}
-
-// TargetPlatform fixdoc
-func (b *Builder) TargetPlatform() *cores.PlatformRelease {
-	return b.targetPlatform
 }
 
 // Preprocess fixdoc
@@ -284,14 +269,14 @@ func (b *Builder) preprocess() error {
 
 	b.logIfVerbose(false, tr("Detecting libraries used..."))
 	err := b.SketchLibrariesDetector.FindIncludes(
-		b.GetBuildPath(),
-		b.GetBuildProperties().GetPath("build.core.path"),
-		b.GetBuildProperties().GetPath("build.variant.path"),
-		b.GetSketchBuildPath(),
-		b.Sketch(),
-		b.GetLibrariesBuildPath(),
-		b.GetBuildProperties(),
-		b.TargetPlatform().Platform.Architecture,
+		b.buildPath,
+		b.buildProperties.GetPath("build.core.path"),
+		b.buildProperties.GetPath("build.variant.path"),
+		b.sketchBuildPath,
+		b.sketch,
+		b.librariesBuildPath,
+		b.buildProperties,
+		b.targetPlatform.Platform.Architecture,
 	)
 	if err != nil {
 		return err
