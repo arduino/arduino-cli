@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
@@ -110,7 +109,7 @@ func TestBoardDetectionViaAPIWithNonUSBPort(t *testing.T) {
 
 func TestBoardIdentifySorting(t *testing.T) {
 	dataDir := paths.TempDir().Join("test", "data_dir")
-	os.Setenv("ARDUINO_DATA_DIR", dataDir.String())
+	t.Setenv("ARDUINO_DATA_DIR", dataDir.String())
 	dataDir.MkdirAll()
 	defer paths.TempDir().Join("test").RemoveAll()
 

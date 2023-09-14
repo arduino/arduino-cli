@@ -16,7 +16,6 @@
 package core
 
 import (
-	"os"
 	"testing"
 
 	"github.com/arduino/arduino-cli/configuration"
@@ -30,8 +29,8 @@ func TestPlatformSearch(t *testing.T) {
 
 	dataDir := paths.TempDir().Join("test", "data_dir")
 	downloadDir := paths.TempDir().Join("test", "staging")
-	os.Setenv("ARDUINO_DATA_DIR", dataDir.String())
-	os.Setenv("ARDUINO_DOWNLOADS_DIR", downloadDir.String())
+	t.Setenv("ARDUINO_DATA_DIR", dataDir.String())
+	t.Setenv("ARDUINO_DOWNLOADS_DIR", downloadDir.String())
 	dataDir.MkdirAll()
 	downloadDir.MkdirAll()
 	defer paths.TempDir().Join("test").RemoveAll()
@@ -323,8 +322,8 @@ func TestPlatformSearch(t *testing.T) {
 func TestPlatformSearchSorting(t *testing.T) {
 	dataDir := paths.TempDir().Join("test", "data_dir")
 	downloadDir := paths.TempDir().Join("test", "staging")
-	os.Setenv("ARDUINO_DATA_DIR", dataDir.String())
-	os.Setenv("ARDUINO_DOWNLOADS_DIR", downloadDir.String())
+	t.Setenv("ARDUINO_DATA_DIR", dataDir.String())
+	t.Setenv("ARDUINO_DOWNLOADS_DIR", downloadDir.String())
 	dataDir.MkdirAll()
 	downloadDir.MkdirAll()
 	defer paths.TempDir().Join("test").RemoveAll()

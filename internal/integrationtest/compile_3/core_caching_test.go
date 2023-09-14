@@ -16,9 +16,9 @@
 package compile_test
 
 import (
+	"slices"
 	"strings"
 	"testing"
-	"slices"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"

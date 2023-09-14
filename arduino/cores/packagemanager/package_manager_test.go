@@ -431,7 +431,7 @@ func TestBoardOrdering(t *testing.T) {
 }
 
 func TestFindToolsRequiredForBoard(t *testing.T) {
-	os.Setenv("ARDUINO_DATA_DIR", dataDir1.String())
+	t.Setenv("ARDUINO_DATA_DIR", dataDir1.String())
 	configuration.Settings = configuration.Init("")
 	pmb := NewBuilder(
 		dataDir1,
