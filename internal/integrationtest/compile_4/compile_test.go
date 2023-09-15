@@ -572,9 +572,6 @@ func testBuilderSketchWithConflictingLibraries(t *testing.T, env *integrationtes
 		require.NoError(t, err)
 		libs := out.BuilderResult.UsedLibraries
 
-		// SortFunc sorts the slice x in ascending order as determined by the cmp function.
-		// This sort is not guaranteed to be stable. cmp(a, b) should return a negative number when a \< b,
-		// a positive number when a > b and zero when a == b.
 		slices.SortFunc(libs, func(x, y *builderLibrary) int { return cmp.Compare(x.Name, y.Name) })
 		require.Len(t, libs, 2)
 		require.Equal(t, "Bridge", libs[0].Name)
