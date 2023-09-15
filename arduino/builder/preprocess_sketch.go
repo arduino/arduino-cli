@@ -29,8 +29,9 @@ func (b *Builder) preprocessSketch(includes paths.PathList) error {
 	)
 	if b.logger.Verbose() {
 		b.logger.WriteStdout(verboseOutput)
+	} else {
+		b.logger.WriteStdout(normalOutput)
 	}
-	b.logger.WriteStdout(normalOutput)
 
 	return err
 }
