@@ -154,14 +154,16 @@ func (m *BuildOptionsManager) wipeBuildPath() error {
 		return wipe()
 	}
 
+	// Since we might apply a side effect we clone it
+	currentOptions := m.currentOptions.Clone()
 	// If SketchLocation path is different but filename is the same, consider it equal
-	if filepath.Base(m.currentOptions.Get("sketchLocation")) == filepath.Base(prevOpts.Get("sketchLocation")) {
-		m.currentOptions.Remove("sketchLocation")
+	if filepath.Base(currentOptions.Get("sketchLocation")) == filepath.Base(prevOpts.Get("sketchLocation")) {
+		currentOptions.Remove("sketchLocation")
 		prevOpts.Remove("sketchLocation")
 	}
 
 	// If options are not changed check if core has
-	if m.currentOptions.Equals(prevOpts) {
+	if currentOptions.Equals(prevOpts) {
 		// check if any of the files contained in the core folders has changed
 		// since the json was generated - like platform.txt or similar
 		// if so, trigger a "safety" wipe
