@@ -15,11 +15,19 @@
 
 package progress
 
+import rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
+
 // Struct fixdoc
 type Struct struct {
 	Progress   float32
 	StepAmount float32
 	Parent     *Struct
+	callback   rpc.TaskProgressCB
+}
+
+// New fixdoc
+func New(callback rpc.TaskProgressCB) *Struct {
+	return &Struct{callback: callback}
 }
 
 // AddSubSteps fixdoc
@@ -45,4 +53,14 @@ func (p *Struct) RemoveSubSteps() {
 // CompleteStep fixdoc
 func (p *Struct) CompleteStep() {
 	p.Progress += p.StepAmount
+}
+
+// PushProgress fixdoc
+func (p *Struct) PushProgress() {
+	if p.callback != nil {
+		p.callback(&rpc.TaskProgress{
+			Percent:   p.Progress,
+			Completed: p.Progress >= 100.0,
+		})
+	}
 }

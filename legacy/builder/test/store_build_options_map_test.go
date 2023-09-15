@@ -18,45 +18,42 @@ package test
 import (
 	"testing"
 
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/sketch"
-	"github.com/arduino/arduino-cli/legacy/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/stretchr/testify/require"
 )
 
-func TestStoreBuildOptionsMap(t *testing.T) {
-	ctx := &types.Context{
-		HardwareDirs:          paths.NewPathList("hardware"),
-		BuiltInToolsDirs:      paths.NewPathList("tools"),
-		BuiltInLibrariesDirs:  paths.New("built-in libraries"),
-		OtherLibrariesDirs:    paths.NewPathList("libraries"),
-		FQBN:                  parseFQBN(t, "my:nice:fqbn"),
-		CustomBuildProperties: []string{"custom=prop"},
-		BuildProperties:       properties.NewFromHashmap(map[string]string{"compiler.optimization_flags": "-Os"}),
-	}
+func TestCheckIfBuildOptionsChanged(t *testing.T) {
+	hardwareDirs := paths.NewPathList("hardware")
+	builtInToolsDirs := paths.NewPathList("tools")
+	builtInLibrariesDirs := paths.New("built-in libraries")
+	otherLibrariesDirs := paths.NewPathList("libraries")
+	fqbn := parseFQBN(t, "my:nice:fqbn")
 
-	buildPath := SetupBuildPath(t, ctx)
+	buildPath := SetupBuildPath(t)
 	defer buildPath.RemoveAll()
 
-	buildPropertiesJSON, err := builder.CreateBuildOptionsMap(
-		ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
-		ctx.BuiltInLibrariesDirs, &sketch.Sketch{FullPath: paths.New("sketchLocation")}, ctx.CustomBuildProperties,
-		ctx.FQBN.String(), ctx.BuildProperties.Get("compiler.optimization_flags"),
+	buildProperties := properties.NewFromHashmap(map[string]string{"compiler.optimization_flags": "-Os"})
+	buildOptionsManager := builder.NewBuildOptionsManager(
+		hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
+		builtInLibrariesDirs, buildPath, &sketch.Sketch{FullPath: paths.New("sketchLocation")}, []string{"custom=prop"},
+		fqbn, false,
+		buildProperties.Get("compiler.optimization_flags"),
+		buildProperties.GetPath("runtime.platform.path"),
+		buildProperties.GetPath("build.core.path"),
+		nil,
 	)
-	require.NoError(t, err)
-	ctx.BuildOptionsJson = buildPropertiesJSON
 
-	err = builder.StoreBuildOptionsMap(ctx.BuildPath, ctx.BuildOptionsJson)
+	err := buildOptionsManager.WipeBuildPath()
 	require.NoError(t, err)
 
-	exist, err := buildPath.Join(constants.BUILD_OPTIONS_FILE).ExistCheck()
+	exist, err := buildPath.Join("build.options.json").ExistCheck()
 	require.NoError(t, err)
 	require.True(t, exist)
 
-	bytes, err := buildPath.Join(constants.BUILD_OPTIONS_FILE).ReadFile()
+	bytes, err := buildPath.Join("build.options.json").ReadFile()
 	require.NoError(t, err)
 
 	require.Equal(t, `{
@@ -71,3 +68,64 @@ func TestStoreBuildOptionsMap(t *testing.T) {
   "sketchLocation": "sketchLocation"
 }`, string(bytes))
 }
+
+//func TestWipeoutBuildPathIfBuildOptionsChanged(t *testing.T) {
+//	buildPath := SetupBuildPath(t)
+//	defer buildPath.RemoveAll()
+//
+//	buildOptionsJsonPrevious := "{ \"old\":\"old\" }"
+//	buildOptionsJson := "{ \"new\":\"new\" }"
+//
+//	buildPath.Join("should_be_deleted.txt").Truncate()
+//
+//	_, err := builder.WipeoutBuildPathIfBuildOptionsChanged(
+//		false,
+//		buildPath,
+//		buildOptionsJson,
+//		buildOptionsJsonPrevious,
+//		nil,
+//	)
+//	require.NoError(t, err)
+//
+//	exist, err := buildPath.ExistCheck()
+//	require.NoError(t, err)
+//	require.True(t, exist)
+//
+//	files, err := buildPath.ReadDir()
+//	require.NoError(t, err)
+//	require.Equal(t, 0, len(files))
+//
+//	exist, err = buildPath.Join("should_be_deleted.txt").ExistCheck()
+//	require.NoError(t, err)
+//	require.False(t, exist)
+//}
+//
+//func TestWipeoutBuildPathIfBuildOptionsChangedNoPreviousBuildOptions(t *testing.T) {
+//	buildPath := SetupBuildPath(t)
+//	defer buildPath.RemoveAll()
+//
+//	buildOptionsJson := "{ \"new\":\"new\" }"
+//
+//	require.NoError(t, buildPath.Join("should_not_be_deleted.txt").Truncate())
+//
+//	_, err := builder.WipeoutBuildPathIfBuildOptionsChanged(
+//		false,
+//		buildPath,
+//		buildOptionsJson,
+//		"",
+//		nil,
+//	)
+//	require.NoError(t, err)
+//
+//	exist, err := buildPath.ExistCheck()
+//	require.NoError(t, err)
+//	require.True(t, exist)
+//
+//	files, err := buildPath.ReadDir()
+//	require.NoError(t, err)
+//	require.Equal(t, 1, len(files))
+//
+//	exist, err = buildPath.Join("should_not_be_deleted.txt").ExistCheck()
+//	require.NoError(t, err)
+//	require.True(t, exist)
+//}

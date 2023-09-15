@@ -16,21 +16,81 @@
 package builder
 
 import (
+	"errors"
+	"fmt"
+
+	"github.com/arduino/arduino-cli/arduino/builder/compilation"
+	"github.com/arduino/arduino-cli/arduino/builder/logger"
+	"github.com/arduino/arduino-cli/arduino/builder/progress"
+	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 )
+
+// ErrSketchCannotBeLocatedInBuildPath fixdoc
+var ErrSketchCannotBeLocatedInBuildPath = errors.New("sketch cannot be located in build path")
 
 // Builder is a Sketch builder.
 type Builder struct {
 	sketch          *sketch.Sketch
 	buildProperties *properties.Map
 
+	buildPath          *paths.Path
+	sketchBuildPath    *paths.Path
+	coreBuildPath      *paths.Path
+	librariesBuildPath *paths.Path
+
 	// Parallel processes
 	jobs int
 
+	// Custom build properties defined by user (line by line as "key=value" pairs)
+	customBuildProperties []string
+
 	// core related
 	coreBuildCachePath *paths.Path
+
+	logger *logger.BuilderLogger
+	clean  bool
+
+	// Source code overrides (filename -> content map).
+	// The provided source data is used instead of reading it from disk.
+	// The keys of the map are paths relative to sketch folder.
+	sourceOverrides map[string]string
+
+	// Set to true to skip build and produce only Compilation Database
+	onlyUpdateCompilationDatabase bool
+	// Compilation Database to build/update
+	compilationDatabase *compilation.Database
+
+	// Progress of all various steps
+	Progress *progress.Struct
+
+	// Sizer results
+	executableSectionsSize ExecutablesFileSections
+
+	// C++ Parsing
+	lineOffset int
+
+	targetPlatform *cores.PlatformRelease
+	actualPlatform *cores.PlatformRelease
+
+	buildArtifacts *BuildArtifacts
+
+	*BuildOptionsManager
+}
+
+// BuildArtifacts contains the result of various build
+type BuildArtifacts struct {
+	// populated by BuildCore
+	coreArchiveFilePath *paths.Path
+	coreObjectsFiles    paths.PathList
+
+	// populated by BuildLibraries
+	librariesObjectFiles paths.PathList
+
+	// populated by BuildSketch
+	sketchObjectFiles paths.PathList
 }
 
 // NewBuilder creates a sketch Builder.
@@ -41,7 +101,17 @@ func NewBuilder(
 	optimizeForDebug bool,
 	coreBuildCachePath *paths.Path,
 	jobs int,
-) *Builder {
+	requestBuildProperties []string,
+	hardwareDirs, builtInToolsDirs, otherLibrariesDirs paths.PathList,
+	builtInLibrariesDirs *paths.Path,
+	fqbn *cores.FQBN,
+	clean bool,
+	sourceOverrides map[string]string,
+	onlyUpdateCompilationDatabase bool,
+	targetPlatform, actualPlatform *cores.PlatformRelease,
+	logger *logger.BuilderLogger,
+	progressStats *progress.Struct,
+) (*Builder, error) {
 	buildProperties := properties.NewMap()
 	if boardBuildProperties != nil {
 		buildProperties.Merge(boardBuildProperties)
@@ -64,12 +134,68 @@ func NewBuilder(
 		}
 	}
 
-	return &Builder{
-		sketch:             sk,
-		buildProperties:    buildProperties,
-		coreBuildCachePath: coreBuildCachePath,
-		jobs:               jobs,
+	// Add user provided custom build properties
+	customBuildProperties, err := properties.LoadFromSlice(requestBuildProperties)
+	if err != nil {
+		return nil, fmt.Errorf("invalid build properties: %w", err)
 	}
+	buildProperties.Merge(customBuildProperties)
+	customBuildPropertiesArgs := append(requestBuildProperties, "build.warn_data_percentage=75")
+
+	sketchBuildPath, err := buildPath.Join("sketch").Abs()
+	if err != nil {
+		return nil, err
+	}
+	librariesBuildPath, err := buildPath.Join("libraries").Abs()
+	if err != nil {
+		return nil, err
+	}
+	coreBuildPath, err := buildPath.Join("core").Abs()
+	if err != nil {
+		return nil, err
+	}
+
+	if buildPath.Canonical().EqualsTo(sk.FullPath.Canonical()) {
+		return nil, ErrSketchCannotBeLocatedInBuildPath
+	}
+
+	if progressStats == nil {
+		progressStats = progress.New(nil)
+	}
+
+	return &Builder{
+		sketch:                        sk,
+		buildProperties:               buildProperties,
+		buildPath:                     buildPath,
+		sketchBuildPath:               sketchBuildPath,
+		coreBuildPath:                 coreBuildPath,
+		librariesBuildPath:            librariesBuildPath,
+		jobs:                          jobs,
+		customBuildProperties:         customBuildPropertiesArgs,
+		coreBuildCachePath:            coreBuildCachePath,
+		logger:                        logger,
+		clean:                         clean,
+		sourceOverrides:               sourceOverrides,
+		onlyUpdateCompilationDatabase: onlyUpdateCompilationDatabase,
+		compilationDatabase:           compilation.NewDatabase(buildPath.Join("compile_commands.json")),
+		Progress:                      progressStats,
+		executableSectionsSize:        []ExecutableSectionSize{},
+		buildArtifacts:                &BuildArtifacts{},
+		targetPlatform:                targetPlatform,
+		actualPlatform:                actualPlatform,
+		BuildOptionsManager: NewBuildOptionsManager(
+			hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
+			builtInLibrariesDirs, buildPath,
+			sk,
+			customBuildPropertiesArgs,
+			fqbn,
+			clean,
+			buildProperties.Get("compiler.optimization_flags"),
+			buildProperties.GetPath("runtime.platform.path"),
+			buildProperties.GetPath("build.core.path"), // TODO can we buildCorePath ?
+			logger,
+		),
+	}, nil
 }
 
 // GetBuildProperties returns the build properties for running this build
@@ -77,7 +203,34 @@ func (b *Builder) GetBuildProperties() *properties.Map {
 	return b.buildProperties
 }
 
-// Jobs number of parallel processes
-func (b *Builder) Jobs() int {
-	return b.jobs
+// GetBuildPath returns the build path
+func (b *Builder) GetBuildPath() *paths.Path {
+	return b.buildPath
+}
+
+// GetSketchBuildPath returns the sketch build path
+func (b *Builder) GetSketchBuildPath() *paths.Path {
+	return b.sketchBuildPath
+}
+
+// GetLibrariesBuildPath returns the libraries build path
+func (b *Builder) GetLibrariesBuildPath() *paths.Path {
+	return b.librariesBuildPath
+}
+
+// ExecutableSectionsSize fixdoc
+func (b *Builder) ExecutableSectionsSize() ExecutablesFileSections {
+	return b.executableSectionsSize
+}
+
+// SaveCompilationDatabase fixdoc
+func (b *Builder) SaveCompilationDatabase() {
+	if b.compilationDatabase != nil {
+		b.compilationDatabase.SaveToFile()
+	}
+}
+
+// TargetPlatform fixdoc
+func (b *Builder) TargetPlatform() *cores.PlatformRelease {
+	return b.targetPlatform
 }

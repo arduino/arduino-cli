@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// TODO maybe create a test that actually check all the keys
 func TestSetupBuildProperties(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
@@ -33,7 +34,7 @@ func TestSetupBuildProperties(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
 	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildProperties := ctx.BuildProperties
+	buildProperties := ctx.Builder.GetBuildProperties()
 
 	require.Equal(t, "ARDUINO", buildProperties.Get("software"))
 
@@ -71,19 +72,19 @@ func TestSetupBuildProperties(t *testing.T) {
 	require.True(t, buildProperties.ContainsKey("extra.time.dst"))
 }
 
+// TODO make this integration tests
 func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	ctx := &types.Context{
-		HardwareDirs:          paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
-		BuiltInToolsDirs:      paths.NewPathList("downloaded_tools", "tools_builtin"),
-		CustomBuildProperties: []string{"name=fake name", "tools.avrdude.config.path=non existent path with space and a ="},
+		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware"),
+		BuiltInToolsDirs: paths.NewPathList("downloaded_tools", "tools_builtin"),
 	}
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "arduino:avr:uno")
 	defer cleanUpBuilderTestContext(t, ctx)
-	customProps, err := properties.LoadFromSlice(ctx.CustomBuildProperties)
+	customBuildProp := []string{"name=fake name", "tools.avrdude.config.path=non existent path with space and a ="}
+	customProps, err := properties.LoadFromSlice(customBuildProp)
 	require.NoError(t, err)
-	ctx.BuildProperties.Merge(customProps)
 
-	buildProperties := ctx.BuildProperties
+	buildProperties := ctx.Builder.GetBuildProperties().Merge(customProps)
 	require.Equal(t, "ARDUINO", buildProperties.Get("software"))
 	require.Equal(t, "uno", buildProperties.Get("_id"))
 	require.Equal(t, "fake name", buildProperties.Get("name"))
@@ -91,6 +92,7 @@ func TestSetupBuildPropertiesWithSomeCustomOverrides(t *testing.T) {
 	require.Equal(t, "non existent path with space and a =", buildProperties.Get("tools.avrdude.config.path"))
 }
 
+// TODO go to compile_4 that uses the custom_yum to compile and we also verify this properties
 func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 	ctx := &types.Context{
 		HardwareDirs:     paths.NewPathList(filepath.Join("..", "hardware"), "downloaded_hardware", "user_hardware"),
@@ -99,7 +101,7 @@ func TestSetupBuildPropertiesUserHardware(t *testing.T) {
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "my_avr_platform:avr:custom_yun")
 	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildProperties := ctx.BuildProperties
+	buildProperties := ctx.Builder.GetBuildProperties()
 
 	require.Equal(t, "ARDUINO", buildProperties.Get("software"))
 
@@ -117,7 +119,7 @@ func TestSetupBuildPropertiesWithMissingPropsFromParentPlatformTxtFiles(t *testi
 	ctx = prepareBuilderTestContext(t, ctx, paths.New("sketch1", "sketch1.ino"), "my_avr_platform:avr:custom_yun")
 	defer cleanUpBuilderTestContext(t, ctx)
 
-	buildProperties := ctx.BuildProperties
+	buildProperties := ctx.Builder.GetBuildProperties()
 
 	require.Equal(t, "ARDUINO", buildProperties.Get("software"))
 

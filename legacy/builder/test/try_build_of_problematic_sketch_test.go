@@ -27,11 +27,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// This is a sketch that fails to build on purpose
-//func TestTryBuild016(t *testing.T) {
-//	tryBuild(t, paths.New("sketch_that_checks_if_SPI_has_transactions_and_includes_missing_Ethernet", "sketch.ino"))
-//}
-
+// TODO add them in the compile_4
 func TestTryBuild033(t *testing.T) {
 	tryBuild(t, paths.New("sketch_that_includes_arduino_h", "sketch_that_includes_arduino_h.ino"))
 }

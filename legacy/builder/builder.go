@@ -19,14 +19,8 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/builder"
-	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
-	"github.com/arduino/arduino-cli/arduino/builder/sizer"
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/legacy/builder/types"
-	"github.com/arduino/go-paths-helper"
-	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -38,11 +32,11 @@ const DEFAULT_DEBUG_LEVEL = 5
 type Builder struct{}
 
 func (s *Builder) Run(ctx *types.Context) error {
-	if err := ctx.BuildPath.MkdirAll(); err != nil {
+	if err := ctx.Builder.GetBuildPath().MkdirAll(); err != nil {
 		return err
 	}
 
-	var _err, mainErr error
+	var mainErr error
 	commands := []types.Command{
 		containerBuildOptions(ctx),
 
@@ -51,8 +45,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = ctx.Builder.PrepareSketchBuildPath(ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
+			return ctx.Builder.PrepareSketchBuildPath()
 		}),
 
 		logIfVerbose(false, tr("Detecting libraries used...")),
@@ -70,21 +63,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			sketchObjectFiles, err := builder.SketchBuilder(
-				ctx.SketchBuildPath,
-				ctx.BuildProperties,
-				ctx.SketchLibrariesDetector.IncludeFolders(),
-				ctx.OnlyUpdateCompilationDatabase,
-				ctx.CompilationDatabase,
-				ctx.Builder.Jobs(),
-				ctx.BuilderLogger,
-				&ctx.Progress, ctx.ProgressCB,
-			)
-			if err != nil {
-				return err
-			}
-			ctx.SketchObjectFiles = sketchObjectFiles
-			return nil
+			return ctx.Builder.BuildSketch(ctx.SketchLibrariesDetector.IncludeFolders())
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
@@ -97,30 +76,13 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			return UnusedCompiledLibrariesRemover(
-				ctx.LibrariesBuildPath,
+			return ctx.Builder.RemoveUnusedCompiledLibraries(
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
 			)
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			librariesObjectFiles, err := builder.LibrariesBuilder(
-				ctx.LibrariesBuildPath,
-				ctx.BuildProperties,
-				ctx.SketchLibrariesDetector.IncludeFolders(),
-				ctx.SketchLibrariesDetector.ImportedLibraries(),
-				ctx.OnlyUpdateCompilationDatabase,
-				ctx.CompilationDatabase,
-				ctx.Builder.Jobs(),
-				ctx.BuilderLogger,
-				&ctx.Progress, ctx.ProgressCB,
-			)
-			if err != nil {
-				return err
-			}
-			ctx.LibrariesObjectFiles = librariesObjectFiles
-
-			return nil
+			return ctx.Builder.BuildLibraries(ctx.SketchLibrariesDetector.IncludeFolders(), ctx.SketchLibrariesDetector.ImportedLibraries())
 		}),
 		types.BareCommand(func(ctx *types.Context) error {
 			return recipeByPrefixSuffixRunner(ctx, "recipe.hooks.libraries.postbuild", ".pattern", true)
@@ -132,21 +94,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			objectFiles, archiveFile, err := builder.CoreBuilder(
-				ctx.BuildPath, ctx.CoreBuildPath, ctx.Builder.CoreBuildCachePath(),
-				ctx.BuildProperties,
-				ctx.ActualPlatform,
-				ctx.OnlyUpdateCompilationDatabase, ctx.Clean,
-				ctx.CompilationDatabase,
-				ctx.Builder.Jobs(),
-				ctx.BuilderLogger,
-				&ctx.Progress, ctx.ProgressCB,
-			)
-
-			ctx.CoreObjectsFiles = objectFiles
-			ctx.CoreArchiveFilePath = archiveFile
-
-			return err
+			return ctx.Builder.BuildCore()
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
@@ -159,20 +107,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			verboseInfoOut, err := builder.Linker(
-				ctx.OnlyUpdateCompilationDatabase,
-				ctx.SketchObjectFiles,
-				ctx.LibrariesObjectFiles,
-				ctx.CoreObjectsFiles,
-				ctx.CoreArchiveFilePath,
-				ctx.BuildPath,
-				ctx.BuildProperties,
-				ctx.BuilderLogger,
-			)
-			if ctx.BuilderLogger.Verbose() {
-				ctx.BuilderLogger.Info(string(verboseInfoOut))
-			}
-			return err
+			return ctx.Builder.Link()
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
@@ -190,11 +125,7 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			return MergeSketchWithBootloader(
-				ctx.OnlyUpdateCompilationDatabase,
-				ctx.BuildPath, ctx.Builder.Sketch(), ctx.BuildProperties,
-				ctx.BuilderLogger,
-			)
+			return ctx.Builder.MergeSketchWithBootloader()
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
@@ -202,8 +133,8 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 	}
 
-	ctx.Progress.AddSubSteps(len(commands) + 5)
-	defer ctx.Progress.RemoveSubSteps()
+	ctx.Builder.Progress.AddSubSteps(len(commands) + 5)
+	defer ctx.Builder.Progress.RemoveSubSteps()
 
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
@@ -212,13 +143,11 @@ func (s *Builder) Run(ctx *types.Context) error {
 			mainErr = errors.WithStack(err)
 			break
 		}
-		ctx.Progress.CompleteStep()
-		ctx.PushProgress()
+		ctx.Builder.Progress.CompleteStep()
+		ctx.Builder.Progress.PushProgress()
 	}
 
-	if ctx.CompilationDatabase != nil {
-		ctx.CompilationDatabase.SaveToFile()
-	}
+	ctx.Builder.SaveCompilationDatabase()
 
 	var otherErr error
 	commands = []types.Command{
@@ -228,38 +157,20 @@ func (s *Builder) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			infoOut, _ := PrintUsedLibrariesIfVerbose(ctx.BuilderLogger.Verbose(), ctx.SketchLibrariesDetector.ImportedLibraries())
-			ctx.BuilderLogger.Info(string(infoOut))
+			ctx.Builder.PrintUsedLibraries(ctx.SketchLibrariesDetector.ImportedLibraries())
 			return nil
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			normalOutput, verboseOutput, err := ExportProjectCMake(
+			return ctx.Builder.ExportProjectCMake(
 				mainErr != nil,
-				ctx.BuildPath, ctx.SketchBuildPath,
 				ctx.SketchLibrariesDetector.ImportedLibraries(),
-				ctx.BuildProperties,
-				ctx.Builder.Sketch(),
 				ctx.SketchLibrariesDetector.IncludeFolders(),
-				ctx.LineOffset,
-				ctx.OnlyUpdateCompilationDatabase,
 			)
-			if ctx.BuilderLogger.Verbose() {
-				ctx.BuilderLogger.WriteStdout(verboseOutput)
-			} else {
-				ctx.BuilderLogger.WriteStdout(normalOutput)
-			}
-			return err
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			executableSectionsSize, err := sizer.Size(
-				ctx.OnlyUpdateCompilationDatabase, mainErr != nil,
-				ctx.BuildProperties,
-				ctx.BuilderLogger,
-			)
-			ctx.ExecutableSectionsSize = executableSectionsSize
-			return err
+			return ctx.Builder.Size(mainErr != nil)
 		}),
 	}
 	for _, command := range commands {
@@ -269,8 +180,8 @@ func (s *Builder) Run(ctx *types.Context) error {
 			otherErr = errors.WithStack(err)
 			break
 		}
-		ctx.Progress.CompleteStep()
-		ctx.PushProgress()
+		ctx.Builder.Progress.CompleteStep()
+		ctx.Builder.Progress.PushProgress()
 	}
 
 	if mainErr != nil {
@@ -282,35 +193,17 @@ func (s *Builder) Run(ctx *types.Context) error {
 
 func preprocessSketchCommand(ctx *types.Context) types.BareCommand {
 	return func(ctx *types.Context) error {
-		normalOutput, verboseOutput, err := PreprocessSketch(
-			ctx.Builder.Sketch(), ctx.BuildPath, ctx.SketchLibrariesDetector.IncludeFolders(), ctx.LineOffset,
-			ctx.BuildProperties, ctx.OnlyUpdateCompilationDatabase)
-		if ctx.BuilderLogger.Verbose() {
-			ctx.BuilderLogger.WriteStdout(verboseOutput)
-		} else {
-			ctx.BuilderLogger.WriteStdout(normalOutput)
-		}
-		return err
+		return ctx.Builder.PreprocessSketch(ctx.SketchLibrariesDetector.IncludeFolders())
 	}
-}
-
-func PreprocessSketch(
-	sketch *sketch.Sketch, buildPath *paths.Path, includes paths.PathList, lineOffset int,
-	buildProperties *properties.Map, onlyUpdateCompilationDatabase bool,
-) ([]byte, []byte, error) {
-	// In the future we might change the preprocessor
-	preprocessorImpl := preprocessor.PreprocessSketchWithCtags
-	return preprocessorImpl(sketch, buildPath, includes, lineOffset, buildProperties, onlyUpdateCompilationDatabase)
 }
 
 type Preprocess struct{}
 
 func (s *Preprocess) Run(ctx *types.Context) error {
-	if err := ctx.BuildPath.MkdirAll(); err != nil {
+	if err := ctx.Builder.GetBuildPath().MkdirAll(); err != nil {
 		return err
 	}
 
-	var _err error
 	commands := []types.Command{
 		containerBuildOptions(ctx),
 
@@ -319,8 +212,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 		}),
 
 		types.BareCommand(func(ctx *types.Context) error {
-			ctx.LineOffset, _err = ctx.Builder.PrepareSketchBuildPath(ctx.SourceOverride, ctx.SketchBuildPath)
-			return _err
+			return ctx.Builder.PrepareSketchBuildPath()
 		}),
 
 		findIncludes(ctx),
@@ -335,7 +227,7 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 	}
 
 	// Output arduino-preprocessed source
-	preprocessedSketch, err := ctx.SketchBuildPath.Join(ctx.Builder.Sketch().MainFile.Base() + ".cpp").ReadFile()
+	preprocessedSketch, err := ctx.Builder.GetSketchBuildPath().Join(ctx.Builder.Sketch().MainFile.Base() + ".cpp").ReadFile()
 	if err != nil {
 		return err
 	}
@@ -344,8 +236,8 @@ func (s *Preprocess) Run(ctx *types.Context) error {
 }
 
 func runCommands(ctx *types.Context, commands []types.Command) error {
-	ctx.Progress.AddSubSteps(len(commands))
-	defer ctx.Progress.RemoveSubSteps()
+	ctx.Builder.Progress.AddSubSteps(len(commands))
+	defer ctx.Builder.Progress.RemoveSubSteps()
 
 	for _, command := range commands {
 		PrintRingNameIfDebug(ctx, command)
@@ -353,8 +245,8 @@ func runCommands(ctx *types.Context, commands []types.Command) error {
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		ctx.Progress.CompleteStep()
-		ctx.PushProgress()
+		ctx.Builder.Progress.CompleteStep()
+		ctx.Builder.Progress.PushProgress()
 	}
 	return nil
 }
@@ -375,14 +267,14 @@ func RunPreprocess(ctx *types.Context) error {
 func findIncludes(ctx *types.Context) types.BareCommand {
 	return types.BareCommand(func(ctx *types.Context) error {
 		return ctx.SketchLibrariesDetector.FindIncludes(
-			ctx.BuildPath,
-			ctx.BuildProperties.GetPath("build.core.path"),
-			ctx.BuildProperties.GetPath("build.variant.path"),
-			ctx.SketchBuildPath,
+			ctx.Builder.GetBuildPath(),
+			ctx.Builder.GetBuildProperties().GetPath("build.core.path"),
+			ctx.Builder.GetBuildProperties().GetPath("build.variant.path"),
+			ctx.Builder.GetSketchBuildPath(),
 			ctx.Builder.Sketch(),
-			ctx.LibrariesBuildPath,
-			ctx.BuildProperties,
-			ctx.TargetPlatform.Platform.Architecture,
+			ctx.Builder.GetLibrariesBuildPath(),
+			ctx.Builder.GetBuildProperties(),
+			ctx.Builder.TargetPlatform().Platform.Architecture,
 		)
 	})
 }
@@ -402,45 +294,19 @@ func logIfVerbose(warn bool, msg string) types.BareCommand {
 }
 
 func recipeByPrefixSuffixRunner(ctx *types.Context, prefix, suffix string, skipIfOnlyUpdatingCompilationDatabase bool) error {
-	return RecipeByPrefixSuffixRunner(
-		prefix, suffix, skipIfOnlyUpdatingCompilationDatabase,
-		ctx.OnlyUpdateCompilationDatabase,
-		ctx.BuildProperties,
-		ctx.BuilderLogger,
-	)
+	return ctx.Builder.RunRecipe(prefix, suffix, skipIfOnlyUpdatingCompilationDatabase)
 }
 
 func containerBuildOptions(ctx *types.Context) types.BareCommand {
 	return types.BareCommand(func(ctx *types.Context) error {
-		// TODO here we can pass only the properties we're reading from the
-		// ctx.BuildProperties
-		buildOptionsJSON, buildOptionsJSONPrevious, infoMessage, err := ContainerBuildOptions(
-			ctx.HardwareDirs, ctx.BuiltInToolsDirs, ctx.OtherLibrariesDirs,
-			ctx.BuiltInLibrariesDirs, ctx.BuildPath, ctx.Builder.Sketch(), ctx.CustomBuildProperties,
-			ctx.FQBN.String(), ctx.Clean, ctx.BuildProperties,
-		)
-		if infoMessage != "" {
-			ctx.BuilderLogger.Info(infoMessage)
-		}
-		if err != nil {
-			return err
-		}
-
-		ctx.BuildOptionsJson = buildOptionsJSON
-		ctx.BuildOptionsJsonPrevious = buildOptionsJSONPrevious
-
-		return nil
+		return ctx.Builder.BuildOptionsManager.WipeBuildPath()
 	})
 }
 
 func warnAboutArchIncompatibleLibraries(ctx *types.Context) types.BareCommand {
 	return types.BareCommand(func(ctx *types.Context) error {
-		overrides, _ := ctx.BuildProperties.GetOk("architecture.override_check")
-		WarnAboutArchIncompatibleLibraries(
-			ctx.TargetPlatform,
-			overrides,
+		ctx.Builder.WarnAboutArchIncompatibleLibraries(
 			ctx.SketchLibrariesDetector.ImportedLibraries(),
-			func(s string) { ctx.BuilderLogger.Info(s) },
 		)
 		return nil
 	})

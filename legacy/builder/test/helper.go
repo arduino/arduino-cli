@@ -20,22 +20,13 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
-	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
 
-func Abs(t *testing.T, rel *paths.Path) *paths.Path {
-	absPath, err := rel.Abs()
-	require.NoError(t, err)
-	return absPath
-}
-
-func SetupBuildPath(t *testing.T, ctx *types.Context) *paths.Path {
+func SetupBuildPath(t *testing.T) *paths.Path {
 	buildPath, err := paths.MkTempDir("", "test_build_path")
 	require.NoError(t, err)
-	ctx.BuildPath = buildPath
 	return buildPath
 }
 
@@ -43,16 +34,4 @@ func parseFQBN(t *testing.T, fqbnIn string) *cores.FQBN {
 	fqbn, err := cores.ParseFQBN(fqbnIn)
 	require.NoError(t, err)
 	return fqbn
-}
-
-type ByLibraryName []*libraries.Library
-
-func (s ByLibraryName) Len() int {
-	return len(s)
-}
-func (s ByLibraryName) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s ByLibraryName) Less(i, j int) bool {
-	return s[i].Name < s[j].Name
 }

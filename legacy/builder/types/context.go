@@ -17,16 +17,10 @@ package types
 
 import (
 	"github.com/arduino/arduino-cli/arduino/builder"
-	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
-	"github.com/arduino/arduino-cli/arduino/builder/progress"
-	"github.com/arduino/arduino-cli/arduino/builder/sizer"
-	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
-	properties "github.com/arduino/go-properties-orderedmap"
 )
 
 // Context structure
@@ -35,65 +29,10 @@ type Context struct {
 	SketchLibrariesDetector *detector.SketchLibrariesDetector
 	BuilderLogger           *logger.BuilderLogger
 
-	// Build options
+	// Used only by legacy tests
 	HardwareDirs         paths.PathList
 	BuiltInToolsDirs     paths.PathList
 	BuiltInLibrariesDirs *paths.Path
 	OtherLibrariesDirs   paths.PathList
-	FQBN                 *cores.FQBN
-	Clean                bool
-
-	// Build options are serialized here
-	BuildOptionsJson         string
-	BuildOptionsJsonPrevious string
-
-	PackageManager *packagemanager.Explorer
-	RequiredTools  []*cores.ToolRelease
-	TargetBoard    *cores.Board
-	TargetPackage  *cores.Package
-	TargetPlatform *cores.PlatformRelease
-	ActualPlatform *cores.PlatformRelease
-
-	BuildProperties      *properties.Map
-	BuildPath            *paths.Path
-	SketchBuildPath      *paths.Path
-	CoreBuildPath        *paths.Path
-	CoreArchiveFilePath  *paths.Path
-	CoreObjectsFiles     paths.PathList
-	LibrariesBuildPath   *paths.Path
-	LibrariesObjectFiles paths.PathList
-	SketchObjectFiles    paths.PathList
-
-	// C++ Parsing
-	LineOffset int
-
-	// Dry run, only create progress map
-	Progress progress.Struct
-	// Send progress events to this callback
-	ProgressCB rpc.TaskProgressCB
-
-	// Custom build properties defined by user (line by line as "key=value" pairs)
-	CustomBuildProperties []string
-
-	// Sizer results
-	ExecutableSectionsSize sizer.ExecutablesFileSections
-
-	// Compilation Database to build/update
-	CompilationDatabase *compilation.Database
-	// Set to true to skip build and produce only Compilation Database
-	OnlyUpdateCompilationDatabase bool
-
-	// Source code overrides (filename -> content map).
-	// The provided source data is used instead of reading it from disk.
-	// The keys of the map are paths relative to sketch folder.
-	SourceOverride map[string]string
-}
-
-func (ctx *Context) PushProgress() {
-	if ctx.ProgressCB != nil {
-		ctx.ProgressCB(&rpc.TaskProgress{
-			Percent:   ctx.Progress.Progress,
-			Completed: ctx.Progress.Progress >= 100.0,
-		})
-	}
+	PackageManager       *packagemanager.Explorer
 }

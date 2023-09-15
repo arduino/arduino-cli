@@ -1,6 +1,6 @@
 // This file is part of arduino-cli.
 //
-// Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+// Copyright 2023 ARDUINO SA (http://www.arduino.cc/)
 //
 // This software is released under the GNU General Public License version 3,
 // which covers the main part of arduino-cli.
@@ -16,21 +16,21 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
+	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
 	"github.com/arduino/go-paths-helper"
-	"github.com/pkg/errors"
 )
 
-func LoadPreviousBuildOptionsMap(buildPath *paths.Path) (string, error) {
-	buildOptionsFile := buildPath.Join(constants.BUILD_OPTIONS_FILE)
-
-	if buildOptionsFile.NotExist() {
-		return "", nil
+// PreprocessSketch fixdoc
+func (b *Builder) PreprocessSketch(includes paths.PathList) error {
+	// In the future we might change the preprocessor
+	normalOutput, verboseOutput, err := preprocessor.PreprocessSketchWithCtags(
+		b.sketch, b.buildPath, includes, b.lineOffset,
+		b.buildProperties, b.onlyUpdateCompilationDatabase,
+	)
+	if b.logger.Verbose() {
+		b.logger.WriteStdout(verboseOutput)
 	}
+	b.logger.WriteStdout(normalOutput)
 
-	buildOptionsJsonPrevious, err := buildOptionsFile.ReadFile()
-	if err != nil {
-		return "", errors.WithStack(err)
-	}
-	return string(buildOptionsJsonPrevious), nil
+	return err
 }

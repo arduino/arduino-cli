@@ -30,22 +30,16 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/arduino/sketch"
-	"github.com/arduino/arduino-cli/legacy/builder/constants"
 )
 
 var lineMatcher = regexp.MustCompile(`^#line\s\d+\s"`)
 
-func ExportProjectCMake(
+// ExportProjectCMake fixdoc
+func (b *Builder) ExportProjectCMake(
 	sketchError bool, // Was there an error while compiling the sketch?
-	buildPath, sketchBuildPath *paths.Path,
 	importedLibraries libraries.List,
-	buildProperties *properties.Map,
-	sketch *sketch.Sketch,
 	includeFolders paths.PathList,
-	lineOffset int,
-	onlyUpdateCompilationDatabase bool,
-) ([]byte, []byte, error) {
+) error {
 	// copies the contents of the file named src to the file named
 	// by dst. The file will be created if it does not already exist. If the
 	// destination file exists, all it's contents will be replaced by the contents
@@ -182,12 +176,12 @@ func ExportProjectCMake(
 	var validStaticLibExtensions = []string{".a"}
 
 	//	If sketch error or cannot export Cmake project
-	if sketchError || buildProperties.Get("compiler.export_cmake") == "" {
-		return nil, nil, nil
+	if sketchError || b.buildProperties.Get("compiler.export_cmake") == "" {
+		return nil
 	}
 
 	// Create new cmake subFolder - clean if the folder is already there
-	cmakeFolder := buildPath.Join("_cmake")
+	cmakeFolder := b.buildPath.Join("_cmake")
 	if _, err := cmakeFolder.Stat(); err == nil {
 		cmakeFolder.RemoveAll()
 	}
@@ -207,7 +201,7 @@ func ExportProjectCMake(
 	for _, library := range importedLibraries {
 		// Copy used libraries in the correct folder
 		libDir := libBaseFolder.Join(library.DirName)
-		mcu := buildProperties.Get("build.mcu")
+		mcu := b.buildProperties.Get("build.mcu")
 		copyDir(library.InstallDir.String(), libDir.String(), validExportExtensions)
 
 		// Read cmake options if available
@@ -238,28 +232,20 @@ func ExportProjectCMake(
 	}
 
 	// Copy core + variant in use + preprocessed sketch in the correct folders
-	err := copyDir(buildProperties.Get("build.core.path"), coreFolder.String(), validExportExtensions)
+	err := copyDir(b.buildProperties.Get("build.core.path"), coreFolder.String(), validExportExtensions)
 	if err != nil {
 		fmt.Println(err)
 	}
-	err = copyDir(buildProperties.Get("build.variant.path"), coreFolder.Join("variant").String(), validExportExtensions)
+	err = copyDir(b.buildProperties.Get("build.variant.path"), coreFolder.Join("variant").String(), validExportExtensions)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	normalOutput, verboseOutput, err := PreprocessSketch(
-		sketch,
-		buildPath,
-		includeFolders,
-		lineOffset,
-		buildProperties,
-		onlyUpdateCompilationDatabase,
-	)
-	if err != nil {
-		return normalOutput, verboseOutput, err
+	if err := b.PreprocessSketch(includeFolders); err != nil {
+		return err
 	}
 
-	err = copyDir(sketchBuildPath.String(), cmakeFolder.Join("sketch").String(), validExportExtensions)
+	err = copyDir(b.sketchBuildPath.String(), cmakeFolder.Join("sketch").String(), validExportExtensions)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -294,9 +280,9 @@ func ExportProjectCMake(
 	var dynamicLibsFromGccMinusL []string
 	var linkDirectories []string
 
-	extractCompileFlags(buildProperties, constants.RECIPE_C_COMBINE_PATTERN, &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
-	extractCompileFlags(buildProperties, "recipe.c.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
-	extractCompileFlags(buildProperties, "recipe.cpp.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
+	extractCompileFlags(b.buildProperties, "recipe.c.combine.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
+	extractCompileFlags(b.buildProperties, "recipe.c.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
+	extractCompileFlags(b.buildProperties, "recipe.cpp.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
 
 	// Extract folders with .h in them for adding in include list
 	headerFiles, _ := utils.FindFilesInFolder(cmakeFolder, true, validHeaderExtensions...)
@@ -307,7 +293,7 @@ func ExportProjectCMake(
 
 	// Generate the CMakeLists global file
 
-	projectName := sketch.Name
+	projectName := b.sketch.Name
 
 	cmakelist := "cmake_minimum_required(VERSION 3.5.0)\n"
 	cmakelist += "INCLUDE(FindPkgConfig)\n"
@@ -364,7 +350,7 @@ func ExportProjectCMake(
 
 	cmakeFile.WriteFile([]byte(cmakelist))
 
-	return normalOutput, verboseOutput, nil
+	return nil
 }
 
 func extractCompileFlags(buildProperties *properties.Map, recipe string, defines, dynamicLibs, linkerflags, linkDirectories *[]string) {

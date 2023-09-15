@@ -33,7 +33,6 @@ import (
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
@@ -358,7 +357,7 @@ func CompileFiles(
 	compilationDatabase *compilation.Database,
 	jobs int,
 	builderLogger *logger.BuilderLogger,
-	progress *progress.Struct, progressCB rpc.TaskProgressCB,
+	progress *progress.Struct,
 ) (paths.PathList, error) {
 	return compileFiles(
 		onlyUpdateCompilationDatabase,
@@ -368,7 +367,7 @@ func CompileFiles(
 		false,
 		buildPath, buildProperties, includes,
 		builderLogger,
-		progress, progressCB,
+		progress,
 	)
 }
 
@@ -381,7 +380,7 @@ func CompileFilesRecursive(
 	compilationDatabase *compilation.Database,
 	jobs int,
 	builderLogger *logger.BuilderLogger,
-	progress *progress.Struct, progressCB rpc.TaskProgressCB,
+	progress *progress.Struct,
 ) (paths.PathList, error) {
 	return compileFiles(
 		onlyUpdateCompilationDatabase,
@@ -391,7 +390,7 @@ func CompileFilesRecursive(
 		true,
 		buildPath, buildProperties, includes,
 		builderLogger,
-		progress, progressCB,
+		progress,
 	)
 }
 
@@ -406,7 +405,6 @@ func compileFiles(
 	includes []string,
 	builderLogger *logger.BuilderLogger,
 	progress *progress.Struct,
-	progressCB rpc.TaskProgressCB,
 ) (paths.PathList, error) {
 	validExtensions := []string{}
 	for ext := range globals.SourceFilesValidExtensions {
@@ -483,13 +481,7 @@ func compileFiles(
 		queue <- source
 
 		progress.CompleteStep()
-		// PushProgress
-		if progressCB != nil {
-			progressCB(&rpc.TaskProgress{
-				Percent:   progress.Progress,
-				Completed: progress.Progress >= 100.0,
-			})
-		}
+		progress.PushProgress()
 	}
 	close(queue)
 	wg.Wait()

@@ -18,19 +18,18 @@ package builder
 import (
 	"bytes"
 	"fmt"
+	"math"
 	"regexp"
+	"strconv"
+	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/builder/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
-	"github.com/arduino/arduino-cli/arduino/builder/logger"
-	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
-	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
-	"github.com/arduino/go-properties-orderedmap"
+	"github.com/marcinbor85/gohex"
 
 	"github.com/pkg/errors"
 )
@@ -48,26 +47,28 @@ func (b *Builder) Sketch() *sketch.Sketch {
 // PrepareSketchBuildPath copies the sketch source files in the build path.
 // The .ino files are merged together to create a .cpp file (by the way, the
 // .cpp file still needs to be Arduino-preprocessed to compile).
-func (b *Builder) PrepareSketchBuildPath(sourceOverrides map[string]string, buildPath *paths.Path) (int, error) {
-	if err := buildPath.MkdirAll(); err != nil {
-		return 0, errors.Wrap(err, tr("unable to create a folder to save the sketch"))
+func (b *Builder) PrepareSketchBuildPath() error {
+	if err := b.sketchBuildPath.MkdirAll(); err != nil {
+		return errors.Wrap(err, tr("unable to create a folder to save the sketch"))
 	}
 
-	offset, mergedSource, err := b.sketchMergeSources(sourceOverrides)
+	offset, mergedSource, err := b.sketchMergeSources(b.sourceOverrides)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
-	destFile := buildPath.Join(b.sketch.MainFile.Base() + ".cpp")
+	destFile := b.sketchBuildPath.Join(b.sketch.MainFile.Base() + ".cpp")
 	if err := destFile.WriteFile([]byte(mergedSource)); err != nil {
-		return 0, err
+		return err
 	}
 
-	if err := b.sketchCopyAdditionalFiles(buildPath, sourceOverrides); err != nil {
-		return 0, err
+	if err := b.sketchCopyAdditionalFiles(b.sketchBuildPath, b.sourceOverrides); err != nil {
+		return err
 	}
 
-	return offset, nil
+	b.lineOffset = offset
+
+	return nil
 }
 
 // sketchMergeSources merges all the .ino source files included in a sketch to produce
@@ -179,51 +180,168 @@ func writeIfDifferent(source []byte, destPath *paths.Path) error {
 	return nil
 }
 
-// SketchBuilder fixdoc
-func SketchBuilder(
-	sketchBuildPath *paths.Path,
-	buildProperties *properties.Map,
-	includesFolders paths.PathList,
-	onlyUpdateCompilationDatabase bool,
-	compilationDatabase *compilation.Database,
-	jobs int,
-	builderLogger *logger.BuilderLogger,
-	progress *progress.Struct, progressCB rpc.TaskProgressCB,
-) (paths.PathList, error) {
+// BuildSketch fixdoc
+func (b *Builder) BuildSketch(includesFolders paths.PathList) error {
 	includes := f.Map(includesFolders.AsStrings(), cpp.WrapWithHyphenI)
 
-	if err := sketchBuildPath.MkdirAll(); err != nil {
-		return nil, errors.WithStack(err)
+	if err := b.sketchBuildPath.MkdirAll(); err != nil {
+		return errors.WithStack(err)
 	}
 
 	sketchObjectFiles, err := utils.CompileFiles(
-		sketchBuildPath, sketchBuildPath, buildProperties, includes,
-		onlyUpdateCompilationDatabase,
-		compilationDatabase,
-		jobs,
-		builderLogger,
-		progress, progressCB,
+		b.sketchBuildPath, b.sketchBuildPath, b.buildProperties, includes,
+		b.onlyUpdateCompilationDatabase,
+		b.compilationDatabase,
+		b.jobs,
+		b.builderLogger,
+		b.Progress,
 	)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return errors.WithStack(err)
 	}
 
 	// The "src/" subdirectory of a sketch is compiled recursively
-	sketchSrcPath := sketchBuildPath.Join("src")
+	sketchSrcPath := b.sketchBuildPath.Join("src")
 	if sketchSrcPath.IsDir() {
 		srcObjectFiles, err := utils.CompileFilesRecursive(
-			sketchSrcPath, sketchSrcPath, buildProperties, includes,
-			onlyUpdateCompilationDatabase,
-			compilationDatabase,
-			jobs,
-			builderLogger,
-			progress, progressCB,
+			sketchSrcPath, sketchSrcPath, b.buildProperties, includes,
+			b.onlyUpdateCompilationDatabase,
+			b.compilationDatabase,
+			b.jobs,
+			b.builderLogger,
+			b.Progress,
 		)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return errors.WithStack(err)
 		}
 		sketchObjectFiles.AddAll(srcObjectFiles)
 	}
 
-	return sketchObjectFiles, nil
+	b.buildArtifacts.sketchObjectFiles = sketchObjectFiles
+	return nil
+}
+
+// MergeSketchWithBootloader fixdoc
+func (b *Builder) MergeSketchWithBootloader() error {
+	if b.onlyUpdateCompilationDatabase {
+		return nil
+	}
+
+	if !b.buildProperties.ContainsKey("bootloader.noblink") && !b.buildProperties.ContainsKey("bootloader.file") {
+		return nil
+	}
+
+	sketchFileName := b.sketch.MainFile.Base()
+	sketchInBuildPath := b.buildPath.Join(sketchFileName + ".hex")
+	sketchInSubfolder := b.buildPath.Join("sketch", sketchFileName+".hex")
+
+	var builtSketchPath *paths.Path
+	if sketchInBuildPath.Exist() {
+		builtSketchPath = sketchInBuildPath
+	} else if sketchInSubfolder.Exist() {
+		builtSketchPath = sketchInSubfolder
+	} else {
+		return nil
+	}
+
+	bootloader := ""
+	if bootloaderNoBlink, ok := b.buildProperties.GetOk("bootloader.noblink"); ok {
+		bootloader = bootloaderNoBlink
+	} else {
+		bootloader = b.buildProperties.Get("bootloader.file")
+	}
+	bootloader = b.buildProperties.ExpandPropsInString(bootloader)
+
+	bootloaderPath := b.buildProperties.GetPath("runtime.platform.path").Join("bootloaders", bootloader)
+	if bootloaderPath.NotExist() {
+		if b.logger.Verbose() {
+			b.logger.Warn(tr("Bootloader file specified but missing: %[1]s", bootloaderPath))
+		}
+		return nil
+	}
+
+	mergedSketchPath := builtSketchPath.Parent().Join(sketchFileName + ".with_bootloader.hex")
+
+	// Ignore merger errors for the first iteration
+	maximumBinSize := 16000000
+	if uploadMaxSize, ok := b.buildProperties.GetOk("upload.maximum_size"); ok {
+		maximumBinSize, _ = strconv.Atoi(uploadMaxSize)
+		maximumBinSize *= 2
+	}
+	err := merge(builtSketchPath, bootloaderPath, mergedSketchPath, maximumBinSize)
+	if err != nil && b.logger.Verbose() {
+		b.logger.Info(err.Error())
+	}
+
+	return nil
+}
+
+func merge(builtSketchPath, bootloaderPath, mergedSketchPath *paths.Path, maximumBinSize int) error {
+	if bootloaderPath.Ext() == ".bin" {
+		bootloaderPath = paths.New(strings.TrimSuffix(bootloaderPath.String(), ".bin") + ".hex")
+	}
+
+	memBoot := gohex.NewMemory()
+	if bootFile, err := bootloaderPath.Open(); err == nil {
+		defer bootFile.Close()
+		if err := memBoot.ParseIntelHex(bootFile); err != nil {
+			return errors.New(bootFile.Name() + " " + err.Error())
+		}
+	} else {
+		return err
+	}
+
+	memSketch := gohex.NewMemory()
+	if buildFile, err := builtSketchPath.Open(); err == nil {
+		defer buildFile.Close()
+		if err := memSketch.ParseIntelHex(buildFile); err != nil {
+			return errors.New(buildFile.Name() + " " + err.Error())
+		}
+	} else {
+		return err
+	}
+
+	memMerged := gohex.NewMemory()
+	initialAddress := uint32(math.MaxUint32)
+	lastAddress := uint32(0)
+
+	for _, segment := range memBoot.GetDataSegments() {
+		if err := memMerged.AddBinary(segment.Address, segment.Data); err != nil {
+			continue
+		}
+		if segment.Address < initialAddress {
+			initialAddress = segment.Address
+		}
+		if segment.Address+uint32(len(segment.Data)) > lastAddress {
+			lastAddress = segment.Address + uint32(len(segment.Data))
+		}
+	}
+	for _, segment := range memSketch.GetDataSegments() {
+		if err := memMerged.AddBinary(segment.Address, segment.Data); err != nil {
+			continue
+		}
+		if segment.Address < initialAddress {
+			initialAddress = segment.Address
+		}
+		if segment.Address+uint32(len(segment.Data)) > lastAddress {
+			lastAddress = segment.Address + uint32(len(segment.Data))
+		}
+	}
+
+	if mergeFile, err := mergedSketchPath.Create(); err == nil {
+		defer mergeFile.Close()
+		memMerged.DumpIntelHex(mergeFile, 16)
+	} else {
+		return err
+	}
+
+	// Write out a .bin if the addresses doesn't go too far away from origin
+	// (and consequently produce a very large bin)
+	size := lastAddress - initialAddress
+	if size > uint32(maximumBinSize) {
+		return nil
+	}
+	mergedSketchPathBin := paths.New(strings.TrimSuffix(mergedSketchPath.String(), ".hex") + ".bin")
+	data := memMerged.ToBinary(initialAddress, size, 0xFF)
+	return mergedSketchPathBin.WriteFile(data)
 }
