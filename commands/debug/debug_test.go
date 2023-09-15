@@ -66,7 +66,7 @@ func TestGetCommandLine(t *testing.T) {
 	defer release()
 	command, err := getCommandLine(req, pme)
 	require.Nil(t, err)
-	commandToTest := strings.Join(command[:], " ")
+	commandToTest := strings.Join(command, " ")
 	require.Equal(t, filepath.FromSlash(goldCommand), filepath.FromSlash(commandToTest))
 
 	// Other samd boards such as mkr1000 can be debugged using an external tool such as Atmel ICE connected to
@@ -88,6 +88,6 @@ func TestGetCommandLine(t *testing.T) {
 
 	command2, err := getCommandLine(req2, pme)
 	assert.Nil(t, err)
-	commandToTest2 := strings.Join(command2[:], " ")
+	commandToTest2 := strings.Join(command2, " ")
 	assert.Equal(t, filepath.FromSlash(goldCommand2), filepath.FromSlash(commandToTest2))
 }

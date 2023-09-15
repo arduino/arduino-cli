@@ -1056,7 +1056,7 @@ func TestCoreUpgradeWarningWithPackageInstalledButNotIndexed(t *testing.T) {
 		// install 3rd-party core outdated version
 		_, _, err = cli.Run("core", "install", "test:x86@1.0.0", "--additional-urls="+url)
 		require.NoError(t, err)
-		//upgrade without index fires a warning
+		// upgrade without index fires a warning
 		jsonStdout, _, _ := cli.Run("core", "upgrade", "test:x86", "--format", "json")
 		requirejson.Query(t, jsonStdout, ".warnings[]", `"missing package index for test:x86, future updates cannot be guaranteed"`)
 	})

@@ -34,11 +34,11 @@ func FromJavaToGoSyntax(s string) string {
 		if err != nil {
 			panic(err)
 		}
-		s = strings.Replace(s, submatch[0], "%["+strconv.Itoa(idx+1)+"]v", -1)
+		s = strings.ReplaceAll(s, submatch[0], "%["+strconv.Itoa(idx+1)+"]v")
 	}
 
 	// Replace "''" => "'"
-	s = strings.Replace(s, "''", "'", -1)
+	s = strings.ReplaceAll(s, "''", "'")
 
 	return s
 }

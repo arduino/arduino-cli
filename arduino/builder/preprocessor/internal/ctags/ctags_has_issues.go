@@ -18,9 +18,8 @@ package ctags
 import (
 	"bufio"
 	"os"
+	"slices"
 	"strings"
-
-	"golang.org/x/exp/slices"
 )
 
 func (p *Parser) fixCLinkageTagsDeclarations() {

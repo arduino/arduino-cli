@@ -27,8 +27,8 @@ import (
 // preprocessor. This adds double quotes around it and escapes any
 // double quotes and backslashes in the string.
 func QuoteString(str string) string {
-	str = strings.Replace(str, "\\", "\\\\", -1)
-	str = strings.Replace(str, "\"", "\\\"", -1)
+	str = strings.ReplaceAll(str, "\\", "\\\\")
+	str = strings.ReplaceAll(str, "\"", "\\\"")
 	return "\"" + str + "\""
 }
 

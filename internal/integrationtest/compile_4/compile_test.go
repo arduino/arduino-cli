@@ -17,8 +17,10 @@ package compile_test
 
 import (
 	"bytes"
+	"cmp"
 	"encoding/json"
 	"os/exec"
+	"slices"
 	"strings"
 	"testing"
 	"text/template"
@@ -29,7 +31,6 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/testifyjson/requirejson"
-	"golang.org/x/exp/slices"
 )
 
 func TestCompileOfProblematicSketches(t *testing.T) {
@@ -176,7 +177,7 @@ func testBuilderSketchWithSubfolders(t *testing.T, env *integrationtest.Environm
 	// Build
 	out, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
 	importedLibraries := out.BuilderResult.UsedLibraries
-	slices.SortFunc(importedLibraries, func(x, y *builderLibrary) bool { return x.Name < y.Name })
+	slices.SortFunc(importedLibraries, func(x, y *builderLibrary) int { return cmp.Compare(x.Name, y.Name) })
 	require.NoError(t, err)
 	require.Equal(t, 3, len(importedLibraries))
 	require.Equal(t, "testlib1", importedLibraries[0].Name)
@@ -570,7 +571,8 @@ func testBuilderSketchWithConflictingLibraries(t *testing.T, env *integrationtes
 		out, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
 		require.NoError(t, err)
 		libs := out.BuilderResult.UsedLibraries
-		slices.SortFunc(libs, func(x, y *builderLibrary) bool { return x.Name < y.Name })
+
+		slices.SortFunc(libs, func(x, y *builderLibrary) int { return cmp.Compare(x.Name, y.Name) })
 		require.Len(t, libs, 2)
 		require.Equal(t, "Bridge", libs[0].Name)
 		require.Equal(t, "IRremote", libs[1].Name)
@@ -583,7 +585,7 @@ func testBuilderSketchLibraryProvidesAllIncludes(t *testing.T, env *integrationt
 		out, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
 		require.NoError(t, err)
 		libs := out.BuilderResult.UsedLibraries
-		slices.SortFunc(libs, func(x, y *builderLibrary) bool { return x.Name < y.Name })
+		slices.SortFunc(libs, func(x, y *builderLibrary) int { return cmp.Compare(x.Name, y.Name) })
 		require.Len(t, libs, 2)
 		require.Equal(t, "ANewLibrary-master", libs[0].Name)
 		require.Equal(t, "IRremote", libs[1].Name)
@@ -899,7 +901,7 @@ func comparePreprocessGoldenFile(t *testing.T, sketchDir *paths.Path, preprocess
 	err = tpl.Execute(&buf, data)
 	require.NoError(t, err)
 
-	require.Equal(t, buf.String(), strings.Replace(preprocessedSketch, "\r\n", "\n", -1))
+	require.Equal(t, buf.String(), strings.ReplaceAll(preprocessedSketch, "\r\n", "\n"))
 }
 
 func TestCoreCaching(t *testing.T) {

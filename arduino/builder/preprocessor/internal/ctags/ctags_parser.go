@@ -25,7 +25,7 @@ import (
 const kindPrototype = "prototype"
 const kindFunction = "function"
 
-//const KIND_PROTOTYPE_MODIFIERS = "prototype_modifiers"
+// const KIND_PROTOTYPE_MODIFIERS = "prototype_modifiers"
 
 const keywordTemplate = "template"
 const keywordStatic = "static"
@@ -101,7 +101,7 @@ func addPrototype(tag *Tag) {
 			}
 			tag.Prototype = code + ";"
 		} else {
-			//tag.Code is 99% multiline, recreate it
+			// tag.Code is 99% multiline, recreate it
 			code := findTemplateMultiline(tag)
 			tag.Prototype = code + ";"
 		}
@@ -128,7 +128,7 @@ func (p *Parser) removeDefinedProtypes() {
 
 	for _, tag := range p.tags {
 		if definedPrototypes[tag.Prototype] {
-			//if ctx.DebugLevel >= 10 {
+			// if ctx.DebugLevel >= 10 {
 			//	ctx.GetLogger().Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_SKIPPING_TAG_ALREADY_DEFINED, tag.FunctionName)
 			//}
 			tag.SkipMe = true
@@ -154,7 +154,7 @@ func (p *Parser) skipTagsWhere(skipFunc skipFuncType) {
 	for _, tag := range p.tags {
 		if !tag.SkipMe {
 			skip := skipFunc(tag)
-			//if skip && p.debugLevel >= 10 {
+			// if skip && p.debugLevel >= 10 {
 			//	ctx.GetLogger().Fprintln(os.Stdout, constants.LOG_LEVEL_DEBUG, constants.MSG_SKIPPING_TAG_WITH_REASON, tag.FunctionName, runtime.FuncForPC(reflect.ValueOf(skipFunc).Pointer()).Name())
 			//}
 			tag.SkipMe = skip
@@ -167,8 +167,8 @@ func removeTralingSemicolon(s string) string {
 }
 
 func removeSpacesAndTabs(s string) string {
-	s = strings.Replace(s, " ", "", -1)
-	s = strings.Replace(s, "\t", "", -1)
+	s = strings.ReplaceAll(s, " ", "")
+	s = strings.ReplaceAll(s, "\t", "")
 	return s
 }
 
@@ -205,7 +205,7 @@ func parseTag(row string) *Tag {
 	// and just cuts off the filename at the first double quote it
 	// sees. This means any backslashes are still escaped, and need
 	// to be unescape, and any quotes will just break the build.
-	tag.Filename = strings.Replace(parts[1], "\\\\", "\\", -1)
+	tag.Filename = strings.ReplaceAll(parts[1], "\\\\", "\\")
 
 	parts = parts[2:]
 
