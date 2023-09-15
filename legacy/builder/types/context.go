@@ -19,8 +19,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/detector"
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	paths "github.com/arduino/go-paths-helper"
 )
 
 // Context structure
@@ -28,11 +26,4 @@ type Context struct {
 	Builder                 *builder.Builder
 	SketchLibrariesDetector *detector.SketchLibrariesDetector
 	BuilderLogger           *logger.BuilderLogger
-
-	// Used only by legacy tests
-	HardwareDirs         paths.PathList
-	BuiltInToolsDirs     paths.PathList
-	BuiltInLibrariesDirs *paths.Path
-	OtherLibrariesDirs   paths.PathList
-	PackageManager       *packagemanager.Explorer
 }

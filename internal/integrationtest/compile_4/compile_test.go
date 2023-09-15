@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
+	"go.bug.st/testifyjson/requirejson"
 	"golang.org/x/exp/slices"
 )
 
@@ -62,6 +63,8 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 	_, _, err = cli.Run("lib", "install", "Bridge@1.6.1")
 	require.NoError(t, err)
 	_, _, err = cli.Run("lib", "install", "CapacitiveSensor@0.5")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "FastLED@3.1.0")
 	require.NoError(t, err)
 
 	// Install custom hardware required for tests
@@ -99,12 +102,24 @@ func TestCompileOfProblematicSketches(t *testing.T) {
 		{"SketchNoFunctionsTwoFiles", testBuilderSketchNoFunctionsTwoFiles},
 		{"SketchWithClassAndMethodSubstring", testBuilderSketchWithClassAndMethodSubstring},
 		{"SketchThatChecksIfSPIHasTransactions", tryBuildAvrLeonardo},
+		{"SketchThatChecksIfSPIHasTransactionsAndIncludesMissingEthernet", testBuilderSketchThatChecksIfSPIHasTransactionsAndIncludesMissingEthernet},
 		{"SketchWithDependendLibraries", tryBuildAvrLeonardo},
 		{"SketchWithFunctionPointer", tryBuildAvrLeonardo},
 		{"USBHostExample", testBuilderUSBHostExample},
 		{"SketchWithConflictingLibraries", testBuilderSketchWithConflictingLibraries},
 		{"SketchLibraryProvidesAllIncludes", testBuilderSketchLibraryProvidesAllIncludes},
 		{"UserHardware", testBuilderWithUserHardware},
+		{"SketchThatIncludesArduinoH", testBuilderSketchThatIncludesArduinoH},
+		{"SketchWithStaticAsserts", testBuilderSketchWithStaticAsserts},
+		{"SketchWithEnumClass", testBuilderSketchWithEnumClass},
+		{"SketchWithExternC", testBuilderSketchWithExternC},
+		{"SketchWithMultilinePrototypes", testBuilderSketchWithMultilinePrototypes},
+		{"SketchWithExternCMultiline", testBuilderSketchWithExternCMultiline},
+		{"SketchWithMultilineTemplate", testBuilderSketchWithMultilineTemplate},
+		{"SketchWithFakeFunctionPointer", testBuilderSketchWithFakeFunctionPointer},
+		{"SketchWithMinMaxDefinitions", testBuilderSketchWithMinMaxDefinitions},
+		{"SketchWithFastledsLibrary", testBuilderSketchWithFastledsLibrary},
+		{"SketchClassFunction", testBuilderSketchClassFunction},
 	}.Run(t, env, cli)
 }
 
@@ -613,6 +628,179 @@ func tryBuildAvrLeonardo(t *testing.T, env *integrationtest.Environment, cli *in
 	require.NoError(t, err)
 }
 
+func testBuilderSketchThatIncludesArduinoH(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchWithStaticAsserts(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchWithEnumClass(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchWithExternC(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchWithMultilinePrototypes(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchWithExternCMultiline(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchWithMultilineTemplate(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchWithFakeFunctionPointer(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchWithMinMaxDefinitions(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:samd:arduino_zero_native")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:samd:arduino_zero_native")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchWithFastledsLibrary(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:samd:arduino_zero_native")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:samd:arduino_zero_native")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchClassFunction(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+	})
+
+	t.Run("Preprocess", func(t *testing.T) {
+		// Preprocess
+		sketchPath, preprocessedSketch, err := tryPreprocess(t, env, cli, "arduino:avr:leonardo")
+		require.NoError(t, err)
+		comparePreprocessGoldenFile(t, sketchPath, preprocessedSketch)
+	})
+}
+
+func testBuilderSketchThatChecksIfSPIHasTransactionsAndIncludesMissingEthernet(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	t.Run("Build", func(t *testing.T) {
+		// Build
+		_, err := tryBuild(t, env, cli, "arduino:avr:leonardo")
+		require.Error(t, err)
+	})
+}
+
 type builderOutput struct {
 	CompilerOut   string `json:"compiler_out"`
 	CompilerErr   string `json:"compiler_err"`
@@ -764,4 +952,89 @@ func TestCoreCaching(t *testing.T) {
 	coreStatAfterTouch, err := cachedCoreFile.Stat()
 	require.NoError(t, err)
 	require.NotEqual(t, coreStatBefore.ModTime(), coreStatAfterTouch.ModTime())
+}
+
+func TestMergeSketchWithBootloader(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	sketchPath, err := paths.New("testdata", "SketchWithMergedSketchAndBootloader").Abs()
+	require.NoError(t, err)
+
+	// Install Arduino AVR Boards
+	_, _, err = cli.Run("core", "install", "arduino:avr@1.8.6")
+	require.NoError(t, err)
+
+	buildPath, err := paths.MkTempDir("", "arduino-integration-test")
+	require.NoError(t, err)
+	defer buildPath.RemoveAll()
+
+	// Build first time
+	_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(), sketchPath.String())
+	require.NoError(t, err)
+
+	bytes, err := buildPath.Join("SketchWithMergedSketchAndBootloader.ino.with_bootloader.hex").ReadFile()
+	require.NoError(t, err)
+	mergedSketchHex := string(bytes)
+
+	require.Contains(t, mergedSketchHex, ":100000000C9434000C9446000C9446000C9446006A\n")
+	require.True(t, strings.HasSuffix(mergedSketchHex, ":00000001FF\n"))
+}
+
+func TestBuildOptionsFile(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	sketchPath := cli.CopySketch("sketch_simple")
+	defer sketchPath.RemoveAll()
+
+	_, _, err := cli.Run("core", "install", "arduino:avr@1.8.6")
+	require.NoError(t, err)
+
+	buildPath, err := paths.MkTempDir("", "arduino-integration-test")
+	require.NoError(t, err)
+	defer buildPath.RemoveAll()
+
+	// Build first time
+	_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(), sketchPath.String())
+	require.NoError(t, err)
+
+	exist, err := buildPath.Join("build.options.json").ExistCheck()
+	require.NoError(t, err)
+	require.True(t, exist)
+
+	buildOptionsBytes, err := buildPath.Join("build.options.json").ReadFile()
+	require.NoError(t, err)
+
+	requirejson.Query(t, buildOptionsBytes, "keys", `[
+		"additionalFiles",
+		"builtInToolsFolders",
+		"compiler.optimization_flags",
+		"customBuildProperties",
+		"fqbn",
+		"hardwareFolders",
+		"otherLibrariesFolders",
+		"sketchLocation"
+	]`)
+	requirejson.Query(t, buildOptionsBytes, ".fqbn", `"arduino:avr:uno"`)
+	requirejson.Query(t, buildOptionsBytes, ".customBuildProperties", `"build.warn_data_percentage=75"`)
+
+	// Recompiling a second time should provide the same result
+	_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(), sketchPath.String())
+	require.NoError(t, err)
+
+	buildOptionsBytes, err = buildPath.Join("build.options.json").ReadFile()
+	require.NoError(t, err)
+	requirejson.Query(t, buildOptionsBytes, ".customBuildProperties", `"build.warn_data_percentage=75"`)
+
+	// Recompiling with a new build option must produce a new `build.options.json`
+	_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(),
+		"--build-property", "custom=prop",
+		sketchPath.String(),
+	)
+	require.NoError(t, err)
+
+	buildOptionsBytes, err = buildPath.Join("build.options.json").ReadFile()
+	require.NoError(t, err)
+	requirejson.Query(t, buildOptionsBytes, ".customBuildProperties", `"custom=prop,build.warn_data_percentage=75"`)
 }

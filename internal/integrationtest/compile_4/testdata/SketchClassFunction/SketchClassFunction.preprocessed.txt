@@ -1,0 +1,17 @@
+#include <Arduino.h>
+#line 1 {{QuoteCppString .sketchMainFile}}
+class test {
+    void asdf() {}
+};
+#line 4 {{QuoteCppString .sketchMainFile}}
+void setup();
+#line 7 {{QuoteCppString .sketchMainFile}}
+void loop();
+#line 8 {{QuoteCppString .sketchMainFile}}
+void asdf();
+#line 4 {{QuoteCppString .sketchMainFile}}
+void setup() {
+  asdf();
+}
+void loop() {}
+void asdf() {}

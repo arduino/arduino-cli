@@ -1,0 +1,31 @@
+#include <Arduino.h>
+#line 1 {{QuoteCppString .sketchMainFile}}
+#line 1 {{QuoteCppString .sketchMainFile}}
+void test();
+#line 11 {{QuoteCppString .sketchMainFile}}
+void test2();
+#line 14 {{QuoteCppString .sketchMainFile}}
+void setup();
+#line 17 {{QuoteCppString .sketchMainFile}}
+void loop();
+#line 1 {{QuoteCppString .sketchMainFile}}
+void test() {
+  test2();
+}
+
+enum class MyEnum
+{
+  AValue = 0,
+  AnotherValue = 1
+};
+
+void test2() {
+}
+
+void setup() {
+}
+
+void loop() {
+}
+
+
