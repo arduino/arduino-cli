@@ -1,19 +1,17 @@
 # 
 # Translators:
-# CLI team <prj_cli_team@arduino.cc>, 2022
-# tokiedokie <thetokiedokie@gmail.com>, 2022
-# 小山田 純 <oyamada.junjun@outlook.jp>, 2022
+# Niraj Pradhan, 2023
 # 
 msgid ""
 msgstr ""
-"Last-Translator: 小山田 純 <oyamada.junjun@outlook.jp>, 2022\n"
-"Language-Team: Japanese (https://app.transifex.com/arduino-1/teams/108174/ja/)\n"
-"Language: ja\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Last-Translator: Niraj Pradhan, 2023\n"
+"Language-Team: Nepali (https://app.transifex.com/arduino-1/teams/108174/ne/)\n"
+"Language: ne\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: version/version.go:59
 msgid "%[1]s %[2]s Version: %[3]s Commit: %[4]s Date: %[5]s"
-msgstr ""
+msgstr "%[1]s%[2]sसंस्करण: %[3]s प्रतिबद्ध: %[4]s मिति:%[5]s"
 
 #: arduino/builder/detector/detector.go:456
 msgid "%[1]s folder is no longer supported! See %[2]s for more information"
@@ -29,44 +27,44 @@ msgstr ""
 
 #: arduino/builder/utils/utils.go:311
 msgid "%[1]s pattern is missing"
-msgstr "%[1]s パターンが見つかりません"
+msgstr ""
 
 #: arduino/discovery/discovery.go:74
 msgid "%[1]s, message: %[2]s"
-msgstr "%[1]s, メッセージ: %[2]s"
+msgstr ""
 
 #: arduino/discovery/discovery.go:83
 msgid "%[1]s, port: %[2]s"
-msgstr "%[1]s, ポート: %[2]s"
+msgstr ""
 
 #: arduino/discovery/discovery.go:80
 msgid "%[1]s, ports: %[2]s"
-msgstr "%[1]s, ポート: %[2]s"
+msgstr ""
 
 #: arduino/discovery/discovery.go:77
 msgid "%[1]s, protocol version: %[2]d"
-msgstr "%[1]s, プロトコルバージョン: %[2]d"
+msgstr ""
 
 #: arduino/resources/download.go:49
 msgid "%s already downloaded"
-msgstr "%sはすでにダウンロードされています"
+msgstr ""
 
 #: commands/upload/upload.go:689
 msgid "%s and %s cannot be used together"
-msgstr "%sと%sは同時に利用できません"
+msgstr ""
 
 #: arduino/cores/packagemanager/install_uninstall.go:353
 msgid "%s installed"
-msgstr "%sをインストールしました"
+msgstr ""
 
 #: internal/cli/lib/check_deps.go:108
 msgid "%s is already installed."
-msgstr "%sはすでにインストールされています。"
+msgstr ""
 
 #: arduino/cores/packagemanager/loader.go:65
 #: arduino/cores/packagemanager/loader.go:652
 msgid "%s is not a directory"
-msgstr "%sはディレクトリではありません"
+msgstr ""
 
 #: arduino/cores/packagemanager/install_uninstall.go:287
 msgid "%s is not managed by package manager"
@@ -97,7 +95,7 @@ msgstr ""
 
 #: legacy/builder/print_used_libraries_if_verbose.go:34
 msgid "(legacy)"
-msgstr "(レガシー)"
+msgstr ""
 
 #: internal/cli/lib/install.go:81
 msgid ""
@@ -182,7 +180,7 @@ msgstr ""
 
 #: arduino/builder/core.go:188
 msgid "Archiving built core (caching) in: %[1]s"
-msgstr "%[1]sにビルドされたコア（キャッシュ）をアーカイブ中です"
+msgstr ""
 
 #: internal/cli/sketch/sketch.go:31 internal/cli/sketch/sketch.go:32
 msgid "Arduino CLI sketch commands."
@@ -190,7 +188,7 @@ msgstr ""
 
 #: internal/cli/cli.go:70
 msgid "Arduino CLI."
-msgstr "Arduino CLI."
+msgstr ""
 
 #: internal/cli/cli.go:71
 msgid "Arduino Command Line Interface (arduino-cli)."
@@ -267,7 +265,7 @@ msgstr ""
 
 #: legacy/builder/merge_sketch_with_bootloader.go:71
 msgid "Bootloader file specified but missing: %[1]s"
-msgstr "ブートローダのファイルが指定されましたが次が不足しています：%[1]s"
+msgstr ""
 
 #: internal/cli/compile/compile.go:100
 msgid "Builds of 'core.a' are saved into this path to be cached and reused."
@@ -422,7 +420,7 @@ msgstr ""
 
 #: legacy/builder/builder.go:66
 msgid "Compiling sketch..."
-msgstr "スケッチをコンパイルしています..."
+msgstr ""
 
 #: internal/cli/config/init.go:88
 msgid ""
@@ -539,7 +537,7 @@ msgstr ""
 
 #: internal/cli/monitor/monitor.go:225
 msgid "Default"
-msgstr "初期値"
+msgstr ""
 
 #: internal/cli/board/attach.go:108
 msgid "Default FQBN set to"
@@ -1154,11 +1152,10 @@ msgid ""
 "Global variables use %[1]s bytes (%[3]s%%) of dynamic memory, leaving %[4]s "
 "bytes for local variables. Maximum is %[2]s bytes."
 msgstr ""
-"最大%[2]sバイトのRAMのうち、グローバル変数が%[1]sバイト（%[3]s%%）を使っていて、ローカル変数で%[4]sバイト使うことができます。"
 
 #: arduino/builder/sizer/sizer.go:164
 msgid "Global variables use %[1]s bytes of dynamic memory."
-msgstr "グローバル変数は%[1]sバイトのRAMを使用しています。"
+msgstr ""
 
 #: internal/cli/board/details.go:214 internal/cli/core/list.go:89
 #: internal/cli/core/search.go:100 internal/cli/monitor/monitor.go:225
@@ -1199,7 +1196,7 @@ msgstr ""
 #: internal/cli/core/list.go:89 internal/cli/lib/list.go:136
 #: internal/cli/outdated/outdated.go:85
 msgid "Installed"
-msgstr "インストール済"
+msgstr ""
 
 #: commands/lib/install.go:140
 msgid "Installed %s"
@@ -1465,7 +1462,7 @@ msgstr ""
 
 #: arduino/builder/sizer/sizer.go:199
 msgid "Low memory available, stability problems may occur."
-msgstr "スケッチが使用できるメモリが少なくなっています。動作が不安定になる可能性があります。"
+msgstr ""
 
 #: internal/cli/lib/search.go:156
 msgid "Maintainer: %s"
@@ -1482,7 +1479,7 @@ msgstr ""
 
 #: arduino/builder/detector/detector.go:460
 msgid "Missing '%[1]s' from library in %[2]s"
-msgstr "%[2]sのライブラリに「%[1]s」がありません"
+msgstr ""
 
 #: arduino/errors.go:171
 msgid "Missing FQBN (Fully Qualified Board Name)"
@@ -1522,7 +1519,7 @@ msgstr ""
 
 #: arduino/builder/detector/detector.go:154
 msgid "Multiple libraries were found for \"%[1]s\""
-msgstr "「%[1]s」に対して複数のライブラリが見つかりました"
+msgstr ""
 
 #: internal/cli/board/details.go:214 internal/cli/core/list.go:89
 #: internal/cli/core/search.go:100 internal/cli/lib/list.go:136
@@ -1594,11 +1591,11 @@ msgstr ""
 
 #: arduino/builder/sizer/sizer.go:189
 msgid "Not enough memory; see %[1]s for tips on reducing your footprint."
-msgstr "スケッチが使用するメモリが足りません。メモリを節約する方法については、以下のURLのページを参照してください。%[1]s"
+msgstr ""
 
 #: arduino/builder/detector/detector.go:157
 msgid "Not used: %[1]s"
-msgstr "未使用：%[1]s"
+msgstr ""
 
 #: internal/cli/board/details.go:185
 msgid "OS:"
@@ -1803,7 +1800,7 @@ msgstr ""
 
 #: internal/cli/board/list.go:96 internal/cli/board/list.go:132
 msgid "Port"
-msgstr "シリアルポート"
+msgstr ""
 
 #: internal/cli/monitor/monitor.go:183 internal/cli/monitor/monitor.go:192
 msgid "Port closed: %v"
@@ -2066,13 +2063,13 @@ msgstr ""
 
 #: arduino/builder/sizer/sizer.go:184
 msgid "Sketch too big; see %[1]s for tips on reducing it."
-msgstr "スケッチが大きすぎます。%[1]s には、小さくするコツが書いてあります。"
+msgstr ""
 
 #: arduino/builder/sizer/sizer.go:152
 msgid ""
 "Sketch uses %[1]s bytes (%[3]s%%) of program storage space. Maximum is %[2]s"
 " bytes."
-msgstr "最大%[2]sバイトのフラッシュメモリのうち、スケッチが%[1]sバイト（%[3]s%%）を使っています。"
+msgstr ""
 
 #: internal/cli/arguments/sketch.go:49
 msgid ""
@@ -2231,7 +2228,7 @@ msgstr ""
 
 #: internal/cli/board/list.go:96 internal/cli/board/list.go:132
 msgid "Type"
-msgstr "タイプ"
+msgstr ""
 
 #: internal/cli/lib/search.go:165
 msgid "Types: %s"
@@ -2400,7 +2397,7 @@ msgstr ""
 
 #: arduino/builder/detector/detector.go:155
 msgid "Used: %[1]s"
-msgstr "使用済：%[1]s"
+msgstr ""
 
 #: commands/compile/compile.go:342
 msgid "Using board '%[1]s' from platform in folder: %[2]s"
@@ -2416,11 +2413,11 @@ msgstr ""
 
 #: legacy/builder/print_used_libraries_if_verbose.go:44
 msgid "Using library %[1]s at version %[2]s in folder: %[3]s %[4]s"
-msgstr "次のフォルダのライブラリ%[1]sバージョン%[2]sを使用中：%[3]s %[4]s"
+msgstr ""
 
 #: legacy/builder/print_used_libraries_if_verbose.go:38
 msgid "Using library %[1]s in folder: %[2]s %[3]s"
-msgstr "次のフォルダのライブラリ%[1]sを使用中：%[2]s %[3]s"
+msgstr ""
 
 #: arduino/builder/core.go:154
 msgid "Using precompiled core: %[1]s"
@@ -2432,7 +2429,7 @@ msgstr ""
 
 #: arduino/builder/utils/utils.go:569 arduino/builder/utils/utils.go:612
 msgid "Using previously compiled file: %[1]s"
-msgstr "以前コンパイルされたファイルを使用中：%[1]s"
+msgstr ""
 
 #: internal/cli/core/download.go:34 internal/cli/core/install.go:36
 msgid "VERSION"
@@ -2477,7 +2474,6 @@ msgid ""
 "WARNING: library %[1]s claims to run on %[2]s architecture(s) and may be "
 "incompatible with your current board which runs on %[3]s architecture(s)."
 msgstr ""
-"警告：ライブラリ%[1]sはアーキテクチャ%[2]sに対応したものであり、アーキテクチャ%[3]sで動作するこのボードとは互換性がないかもしれません。"
 
 #: commands/upload/upload.go:445
 msgid "Waiting for upload port..."
