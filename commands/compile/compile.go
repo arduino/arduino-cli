@@ -24,8 +24,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino"
-	bldr "github.com/arduino/arduino-cli/arduino/builder"
-	"github.com/arduino/arduino-cli/arduino/builder/detector"
+	"github.com/arduino/arduino-cli/arduino/builder"
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/cores"
@@ -37,8 +36,6 @@ import (
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/inventory"
-	"github.com/arduino/arduino-cli/legacy/builder"
-	"github.com/arduino/arduino-cli/legacy/builder/types"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -174,16 +171,15 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		return nil, err
 	}
 
-	builderCtx := &types.Context{}
 	actualPlatform := buildPlatform
-	builtinLibrariesDir := configuration.IDEBuiltinLibrariesDir(configuration.Settings)
 	otherLibrariesDirs := paths.NewPathList(req.GetLibraries()...)
 	otherLibrariesDirs.Add(configuration.LibrariesDir(configuration.Settings))
 
-	builderLogger := logger.New(outStream, errStream, req.GetVerbose(), req.GetWarnings())
-	builderCtx.BuilderLogger = builderLogger
-
-	sketchBuilder, err := bldr.NewBuilder(
+	var libsManager *librariesmanager.LibrariesManager
+	if pme.GetProfile() != nil {
+		libsManager = lm
+	}
+	sketchBuilder, err := builder.NewBuilder(
 		sk,
 		boardBuildProperties,
 		buildPath,
@@ -194,53 +190,29 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		configuration.HardwareDirectories(configuration.Settings),
 		configuration.BuiltinToolsDirectories(configuration.Settings),
 		otherLibrariesDirs,
-		builtinLibrariesDir,
+		configuration.IDEBuiltinLibrariesDir(configuration.Settings),
 		fqbn,
 		req.GetClean(),
 		req.GetSourceOverride(),
 		req.GetCreateCompilationDatabaseOnly(),
-		actualPlatform, targetPlatform,
-		builderLogger,
+		targetPlatform, actualPlatform,
+		req.GetSkipLibrariesDiscovery(),
+		libsManager,
+		paths.NewPathList(req.Library...),
+		logger.New(outStream, errStream, req.GetVerbose(), req.GetWarnings()),
 		progress.New(progressCB),
 	)
 	if err != nil {
 		if strings.Contains(err.Error(), "invalid build properties") {
 			return nil, &arduino.InvalidArgumentError{Message: tr("Invalid build properties"), Cause: err}
 		}
-		if errors.Is(err, bldr.ErrSketchCannotBeLocatedInBuildPath) {
+		if errors.Is(err, builder.ErrSketchCannotBeLocatedInBuildPath) {
 			return r, &arduino.CompileFailedError{
 				Message: tr("Sketch cannot be located in build path. Please specify a different build path"),
 			}
 		}
 		return r, &arduino.CompileFailedError{Message: err.Error()}
 	}
-	builderCtx.Builder = sketchBuilder
-
-	var libsManager *librariesmanager.LibrariesManager
-	if pme.GetProfile() != nil {
-		libsManager = lm
-	}
-	useCachedLibrariesResolution := req.GetSkipLibrariesDiscovery()
-	libraryDir := paths.NewPathList(req.Library...)
-	libsManager, libsResolver, verboseOut, err := detector.LibrariesLoader(
-		useCachedLibrariesResolution, libsManager,
-		builtinLibrariesDir, libraryDir, otherLibrariesDirs,
-		actualPlatform, targetPlatform,
-	)
-	if err != nil {
-		return r, &arduino.CompileFailedError{Message: err.Error()}
-	}
-
-	if builderLogger.Verbose() {
-		builderLogger.Warn(string(verboseOut))
-	}
-
-	builderCtx.SketchLibrariesDetector = detector.NewSketchLibrariesDetector(
-		libsManager, libsResolver,
-		useCachedLibrariesResolution,
-		req.GetCreateCompilationDatabaseOnly(),
-		builderLogger,
-	)
 
 	defer func() {
 		if p := sketchBuilder.GetBuildPath(); p != nil {
@@ -270,7 +242,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	if req.GetPreprocess() {
 		// Just output preprocessed source code and exit
-		compileErr := builder.RunPreprocess(builderCtx)
+		compileErr := sketchBuilder.Preprocess()
 		if compileErr != nil {
 			compileErr = &arduino.CompileFailedError{Message: compileErr.Error()}
 		}
@@ -279,7 +251,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	defer func() {
 		importedLibs := []*rpc.Library{}
-		for _, lib := range builderCtx.SketchLibrariesDetector.ImportedLibraries() {
+		for _, lib := range sketchBuilder.SketchLibrariesDetector.ImportedLibraries() {
 			rpcLib, err := lib.ToRPCLibrary()
 			if err != nil {
 				msg := tr("Error getting information for library %s", lib.Name) + ": " + err.Error() + "\n"
@@ -315,7 +287,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 				targetBoard.String(), "'build.board'", sketchBuilder.GetBuildProperties().Get("build.board")) + "\n"))
 	}
 
-	if err := builder.RunBuilder(builderCtx); err != nil {
+	if err := sketchBuilder.Build(); err != nil {
 		return r, &arduino.CompileFailedError{Message: err.Error()}
 	}
 

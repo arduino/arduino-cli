@@ -154,11 +154,6 @@ jobs:
       - name: Run tests
         run: task go:test
 
-      - name: Run unit tests on the legacy package
-        # Run legacy tests on one platform only
-        if: runner.os == 'Linux'
-        run: task test-legacy
-
       - name: Upload coverage data to workflow artifact
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v3
@@ -167,7 +162,6 @@ jobs:
           name: ${{ env.COVERAGE_ARTIFACT }}
           path: |
             ./coverage_unit.txt
-            ./coverage_legacy.txt
 
   coverage-upload:
     runs-on: ubuntu-latest

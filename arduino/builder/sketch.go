@@ -25,7 +25,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
-	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/go-paths-helper"
@@ -39,15 +38,10 @@ var (
 	tr               = i18n.Tr
 )
 
-// Sketch fixdoc
-func (b *Builder) Sketch() *sketch.Sketch {
-	return b.sketch
-}
-
-// PrepareSketchBuildPath copies the sketch source files in the build path.
+// prepareSketchBuildPath copies the sketch source files in the build path.
 // The .ino files are merged together to create a .cpp file (by the way, the
 // .cpp file still needs to be Arduino-preprocessed to compile).
-func (b *Builder) PrepareSketchBuildPath() error {
+func (b *Builder) prepareSketchBuildPath() error {
 	if err := b.sketchBuildPath.MkdirAll(); err != nil {
 		return errors.Wrap(err, tr("unable to create a folder to save the sketch"))
 	}

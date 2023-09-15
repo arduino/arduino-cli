@@ -27,10 +27,7 @@ import (
 )
 
 // RunRecipe fixdoc
-func (b *Builder) RunRecipe(
-	prefix, suffix string,
-	skipIfOnlyUpdatingCompilationDatabase bool,
-) error {
+func (b *Builder) RunRecipe(prefix, suffix string, skipIfOnlyUpdatingCompilationDatabase bool) error {
 	logrus.Debugf(fmt.Sprintf("Looking for recipes like %s", prefix+"*"+suffix))
 
 	// TODO is it necessary to use Clone?

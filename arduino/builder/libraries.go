@@ -35,8 +35,8 @@ var (
 	FpuCflag      = "fpu"
 )
 
-// BuildLibraries fixdoc
-func (b *Builder) BuildLibraries(includesFolders paths.PathList, importedLibraries libraries.List) error {
+// buildLibraries fixdoc
+func (b *Builder) buildLibraries(includesFolders paths.PathList, importedLibraries libraries.List) error {
 	includes := f.Map(includesFolders.AsStrings(), cpp.WrapWithHyphenI)
 	libs := importedLibraries
 
@@ -254,8 +254,8 @@ func (b *Builder) compileLibrary(library *libraries.Library, includes []string) 
 	return objectFiles, nil
 }
 
-// RemoveUnusedCompiledLibraries fixdoc
-func (b *Builder) RemoveUnusedCompiledLibraries(importedLibraries libraries.List) error {
+// removeUnusedCompiledLibraries fixdoc
+func (b *Builder) removeUnusedCompiledLibraries(importedLibraries libraries.List) error {
 	if b.librariesBuildPath.NotExist() {
 		return nil
 	}
@@ -287,8 +287,8 @@ func (b *Builder) RemoveUnusedCompiledLibraries(importedLibraries libraries.List
 	return nil
 }
 
-// WarnAboutArchIncompatibleLibraries fixdoc
-func (b *Builder) WarnAboutArchIncompatibleLibraries(importedLibraries libraries.List) {
+// warnAboutArchIncompatibleLibraries fixdoc
+func (b *Builder) warnAboutArchIncompatibleLibraries(importedLibraries libraries.List) {
 	archs := []string{b.targetPlatform.Platform.Architecture}
 	overrides, _ := b.buildProperties.GetOk("architecture.override_check")
 	if overrides != "" {
@@ -306,10 +306,10 @@ func (b *Builder) WarnAboutArchIncompatibleLibraries(importedLibraries libraries
 	}
 }
 
-// PrintUsedLibraries fixdoc
+// printUsedLibraries fixdoc
 // TODO here we can completly remove this part as it's duplicated in what we can
 // read in the gRPC response
-func (b *Builder) PrintUsedLibraries(importedLibraries libraries.List) {
+func (b *Builder) printUsedLibraries(importedLibraries libraries.List) {
 	if !b.logger.Verbose() || len(importedLibraries) == 0 {
 		return
 	}

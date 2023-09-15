@@ -34,12 +34,8 @@ import (
 
 var lineMatcher = regexp.MustCompile(`^#line\s\d+\s"`)
 
-// ExportProjectCMake fixdoc
-func (b *Builder) ExportProjectCMake(
-	sketchError bool, // Was there an error while compiling the sketch?
-	importedLibraries libraries.List,
-	includeFolders paths.PathList,
-) error {
+// exportProjectCMake fixdoc
+func (b *Builder) exportProjectCMake(importedLibraries libraries.List, includeFolders paths.PathList) error {
 	// copies the contents of the file named src to the file named
 	// by dst. The file will be created if it does not already exist. If the
 	// destination file exists, all it's contents will be replaced by the contents
@@ -175,8 +171,8 @@ func (b *Builder) ExportProjectCMake(
 	}
 	var validStaticLibExtensions = []string{".a"}
 
-	//	If sketch error or cannot export Cmake project
-	if sketchError || b.buildProperties.Get("compiler.export_cmake") == "" {
+	//	If cannot export Cmake project
+	if b.buildProperties.Get("compiler.export_cmake") == "" {
 		return nil
 	}
 
@@ -241,7 +237,7 @@ func (b *Builder) ExportProjectCMake(
 		fmt.Println(err)
 	}
 
-	if err := b.PreprocessSketch(includeFolders); err != nil {
+	if err := b.preprocessSketch(includeFolders); err != nil {
 		return err
 	}
 

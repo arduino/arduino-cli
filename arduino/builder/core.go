@@ -30,8 +30,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// BuildCore fixdoc
-func (b *Builder) BuildCore() error {
+// buildCore fixdoc
+func (b *Builder) buildCore() error {
 	if err := b.coreBuildPath.MkdirAll(); err != nil {
 		return errors.WithStack(err)
 	}

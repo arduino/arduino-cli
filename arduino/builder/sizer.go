@@ -50,9 +50,9 @@ func (s ExecutablesFileSections) ToRPCExecutableSectionSizeArray() []*rpc.Execut
 	return res
 }
 
-// Size fixdoc
-func (b *Builder) Size(sketchError bool) error {
-	if b.onlyUpdateCompilationDatabase || sketchError {
+// size fixdoc
+func (b *Builder) size() error {
+	if b.onlyUpdateCompilationDatabase {
 		return nil
 	}
 
