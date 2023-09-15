@@ -681,7 +681,7 @@ func (pme *Explorer) FindToolsRequiredFromPlatformRelease(platform *cores.Platfo
 	requiredTools := []*cores.ToolRelease{}
 	platform.ToolDependencies.Sort()
 	for _, toolDep := range platform.ToolDependencies {
-		pme.log.WithField("tool", toolDep).Infof("Required tool")
+		pme.log.WithField("tool", toolDep).Debugf("Required tool")
 		tool := pme.FindToolDependency(toolDep)
 		if tool == nil {
 			return nil, fmt.Errorf(tr("tool release not found: %s"), toolDep)
@@ -787,7 +787,7 @@ func (pme *Explorer) FindToolsRequiredForBuild(platform, buildPlatform *cores.Pl
 	// that the returned array is sorted by version.
 	platform.ToolDependencies.Sort()
 	for _, toolDep := range platform.ToolDependencies {
-		pme.log.WithField("tool", toolDep).Infof("Required tool")
+		pme.log.WithField("tool", toolDep).Debugf("Required tool")
 		tool := pme.FindToolDependency(toolDep)
 		if tool == nil {
 			return nil, fmt.Errorf(tr("tool release not found: %s"), toolDep)
