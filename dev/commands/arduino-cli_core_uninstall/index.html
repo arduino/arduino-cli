@@ -1472,7 +1472,11 @@
 <div class="highlight"><pre><span></span><code>  arduino-cli core uninstall arduino:samd
 </code></pre></div>
 <h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>  -h, --help   help for uninstall
+<div class="highlight"><pre><span></span><code>  -h, --help                 help for uninstall
+      --run-post-install     Force run of post-install scripts (if the CLI is not running interactively).
+      --run-pre-uninstall    Force run of pre-uninstall scripts (if the CLI is not running interactively).
+      --skip-post-install    Force skip of post-install scripts (if the CLI is running interactively).
+      --skip-pre-uninstall   Force skip of pre-uninstall scripts (if the CLI is running interactively).
 </code></pre></div>
 <h3 id="options-inherited-from-parent-commands">Options inherited from parent commands<a class="headerlink" href="#options-inherited-from-parent-commands" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>      --additional-urls strings   Comma-separated list of additional URLs for the Boards Manager.

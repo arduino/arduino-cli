@@ -6087,6 +6087,12 @@ because already at latest version.</p>
 <td></td>
 <td>Set to true to skip installation if a different version of the platform is already installed.</td>
 </tr>
+<tr>
+<td>skip_pre_uninstall</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>Set to true to not run (eventual) pre uninstall scripts for trusted platforms when performing platform upgrades</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.PlatformInstallResponse"></a></p>
@@ -6251,6 +6257,12 @@ because already at latest version.</p>
 <td></td>
 <td>Architecture name of the platform (e.g., <code>avr</code>).</td>
 </tr>
+<tr>
+<td>skip_pre_uninstall</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>Set to true to not run (eventual) pre uninstall scripts for trusted platforms</td>
+</tr>
 </tbody>
 </table>
 <p><a name="cc.arduino.cli.commands.v1.PlatformUninstallResponse"></a></p>
@@ -6308,6 +6320,12 @@ because already at latest version.</p>
 <td><a href="#bool">bool</a></td>
 <td></td>
 <td>Set to true to not run (eventual) post install scripts for trusted platforms</td>
+</tr>
+<tr>
+<td>skip_pre_uninstall</td>
+<td><a href="#bool">bool</a></td>
+<td></td>
+<td>Set to true to not run (eventual) pre uninstall scripts for trusted platforms when performing platform upgrades</td>
 </tr>
 </tbody>
 </table>

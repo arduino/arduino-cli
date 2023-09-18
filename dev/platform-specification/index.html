@@ -1685,6 +1685,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#pre-uninstall-script" class="md-nav__link">
+    Pre-uninstall script
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2273,6 +2280,13 @@
         <li class="md-nav__item">
   <a href="#post-install-script" class="md-nav__link">
     Post-install script
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pre-uninstall-script" class="md-nav__link">
+    Pre-uninstall script
   </a>
   
 </li>
@@ -3445,6 +3459,21 @@ software is in use:</p>
 <li><strong>Arduino IDE 2.x</strong>: runs the script for any installed platform.</li>
 <li><strong>Arduino CLI</strong>: (since 0.12.0) runs the script for any installed platform when Arduino CLI is in "interactive" mode.
   This behavior
+  <a href="https://arduino.github.io/arduino-cli/latest/commands/arduino-cli_core_install/#options">can be configured</a></li>
+</ul>
+<h2 id="pre-uninstall-script">Pre-uninstall script<a class="headerlink" href="#pre-uninstall-script" title="Permanent link">&para;</a></h2>
+<p>Before Boards Manager starts uninstalling a platform, it checks for the presence of a script named:</p>
+<ul>
+<li><code>pre_uninstall.bat</code> - when running on Windows</li>
+<li><code>pre_uninstall.sh</code> - when running on any non-Windows operating system</li>
+</ul>
+<p>If present, the script is executed.</p>
+<p>This script may be used to configure the user's system for the removal of drivers, stopping background programs and
+execute any action that should be performed before the platform files are removed.</p>
+<p>The circumstances under which the pre-uninstall script will run are different depending on which Arduino development
+software is in use:</p>
+<ul>
+<li><strong>Arduino CLI</strong>: runs the script for any installed platform when Arduino CLI is in "interactive" mode. This behavior
   <a href="https://arduino.github.io/arduino-cli/latest/commands/arduino-cli_core_install/#options">can be configured</a></li>
 </ul>
                 
