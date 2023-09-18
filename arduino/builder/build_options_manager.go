@@ -30,8 +30,7 @@ import (
 
 // BuildOptions fixdoc
 type BuildOptions struct {
-	currentOptions          *properties.Map
-	currentBuildOptionsJSON []byte
+	currentOptions *properties.Map
 
 	hardwareDirs              paths.PathList
 	builtInToolsDirs          paths.PathList
@@ -104,7 +103,6 @@ func (b *Builder) WipeBuildPath() error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	b.buildOptions.currentBuildOptionsJSON = buildOptionsJSON
 
 	if err := b.wipeBuildPath(); err != nil {
 		return errors.WithStack(err)
