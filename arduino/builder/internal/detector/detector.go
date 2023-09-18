@@ -25,9 +25,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/arduino/arduino-cli/arduino/builder/logger"
-	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
-	"github.com/arduino/arduino-cli/arduino/builder/utils"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/logger"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/preprocessor"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/libraries"

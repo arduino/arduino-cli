@@ -25,7 +25,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
-	"github.com/arduino/arduino-cli/arduino/builder/preprocessor/internal/ctags"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/preprocessor/internal/ctags"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"

@@ -26,9 +26,9 @@ import (
 	"sync"
 	"unicode"
 
-	"github.com/arduino/arduino-cli/arduino/builder/compilation"
-	"github.com/arduino/arduino-cli/arduino/builder/logger"
-	"github.com/arduino/arduino-cli/arduino/builder/progress"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/compilation"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/logger"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/progress"
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
