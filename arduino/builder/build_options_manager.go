@@ -20,7 +20,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/utils"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -100,41 +99,41 @@ func NewBuildOptionsManager(
 }
 
 // WipeBuildPath fixdoc
-func (m *BuildOptions) WipeBuildPath(logger *logger.BuilderLogger) error {
-	buildOptionsJSON, err := json.MarshalIndent(m.currentOptions, "", "  ")
+func (b *Builder) WipeBuildPath() error {
+	buildOptionsJSON, err := json.MarshalIndent(b.buildOptions.currentOptions, "", "  ")
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	m.currentBuildOptionsJSON = buildOptionsJSON
+	b.buildOptions.currentBuildOptionsJSON = buildOptionsJSON
 
-	if err := m.wipeBuildPath(logger); err != nil {
+	if err := b.wipeBuildPath(); err != nil {
 		return errors.WithStack(err)
 	}
-	return m.buildPath.Join("build.options.json").WriteFile(buildOptionsJSON)
+	return b.buildOptions.buildPath.Join("build.options.json").WriteFile(buildOptionsJSON)
 }
 
-func (m *BuildOptions) wipeBuildPath(logger *logger.BuilderLogger) error {
+func (b *Builder) wipeBuildPath() error {
 	wipe := func() error {
 		// FIXME: this should go outside legacy and behind a `logrus` call so users can
 		// control when this should be printed.
 		// logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED + constants.MSG_REBUILD_ALL)
-		if err := m.buildPath.RemoveAll(); err != nil {
+		if err := b.buildOptions.buildPath.RemoveAll(); err != nil {
 			return errors.WithMessage(err, tr("cleaning build path"))
 		}
-		if err := m.buildPath.MkdirAll(); err != nil {
+		if err := b.buildOptions.buildPath.MkdirAll(); err != nil {
 			return errors.WithMessage(err, tr("cleaning build path"))
 		}
 		return nil
 	}
 
-	if m.clean {
+	if b.buildOptions.clean {
 		return wipe()
 	}
 
 	// Load previous build options map
 	var buildOptionsJSONPrevious []byte
 	var _err error
-	if buildOptionsFile := m.buildPath.Join("build.options.json"); buildOptionsFile.Exist() {
+	if buildOptionsFile := b.buildOptions.buildPath.Join("build.options.json"); buildOptionsFile.Exist() {
 		buildOptionsJSONPrevious, _err = buildOptionsFile.ReadFile()
 		if _err != nil {
 			return errors.WithStack(_err)
@@ -147,12 +146,12 @@ func (m *BuildOptions) wipeBuildPath(logger *logger.BuilderLogger) error {
 
 	var prevOpts *properties.Map
 	if err := json.Unmarshal(buildOptionsJSONPrevious, &prevOpts); err != nil || prevOpts == nil {
-		logger.Info(tr("%[1]s invalid, rebuilding all", "build.options.json"))
+		b.logger.Info(tr("%[1]s invalid, rebuilding all", "build.options.json"))
 		return wipe()
 	}
 
 	// Since we might apply a side effect we clone it
-	currentOptions := m.currentOptions.Clone()
+	currentOptions := b.buildOptions.currentOptions.Clone()
 	// If SketchLocation path is different but filename is the same, consider it equal
 	if filepath.Base(currentOptions.Get("sketchLocation")) == filepath.Base(prevOpts.Get("sketchLocation")) {
 		currentOptions.Remove("sketchLocation")
@@ -164,10 +163,10 @@ func (m *BuildOptions) wipeBuildPath(logger *logger.BuilderLogger) error {
 		// check if any of the files contained in the core folders has changed
 		// since the json was generated - like platform.txt or similar
 		// if so, trigger a "safety" wipe
-		targetCoreFolder := m.runtimePlatformPath
-		coreFolder := m.buildCorePath
+		targetCoreFolder := b.buildOptions.runtimePlatformPath
+		coreFolder := b.buildOptions.buildCorePath
 		realCoreFolder := coreFolder.Parent().Parent()
-		jsonPath := m.buildPath.Join("build.options.json")
+		jsonPath := b.buildOptions.buildPath.Join("build.options.json")
 		coreUnchanged, _ := utils.DirContentIsOlderThan(realCoreFolder, jsonPath, ".txt")
 		if coreUnchanged && targetCoreFolder != nil && !realCoreFolder.EqualsTo(targetCoreFolder) {
 			coreUnchanged, _ = utils.DirContentIsOlderThan(targetCoreFolder, jsonPath, ".txt")
