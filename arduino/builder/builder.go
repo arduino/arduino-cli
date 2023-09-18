@@ -79,7 +79,7 @@ type Builder struct {
 
 	buildArtifacts *BuildArtifacts
 
-	buildOptions *BuildOptionsManager
+	buildOptions *BuildOptions
 
 	*detector.SketchLibrariesDetector
 }

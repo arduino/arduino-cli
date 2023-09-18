@@ -29,8 +29,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// BuildOptionsManager fixdoc
-type BuildOptionsManager struct {
+// BuildOptions fixdoc
+type BuildOptions struct {
 	currentOptions          *properties.Map
 	currentBuildOptionsJSON []byte
 
@@ -57,7 +57,7 @@ func NewBuildOptionsManager(
 	clean bool,
 	compilerOptimizationFlags string,
 	runtimePlatformPath, buildCorePath *paths.Path,
-) *BuildOptionsManager {
+) *BuildOptions {
 	opts := properties.NewMap()
 
 	opts.Set("hardwareFolders", strings.Join(hardwareDirs.AsStrings(), ","))
@@ -83,7 +83,7 @@ func NewBuildOptionsManager(
 	}
 	opts.Set("additionalFiles", strings.Join(additionalFilesRelative, ","))
 
-	return &BuildOptionsManager{
+	return &BuildOptions{
 		currentOptions:            opts,
 		hardwareDirs:              hardwareDirs,
 		builtInToolsDirs:          builtInToolsDirs,
@@ -100,7 +100,7 @@ func NewBuildOptionsManager(
 }
 
 // WipeBuildPath fixdoc
-func (m *BuildOptionsManager) WipeBuildPath(logger *logger.BuilderLogger) error {
+func (m *BuildOptions) WipeBuildPath(logger *logger.BuilderLogger) error {
 	buildOptionsJSON, err := json.MarshalIndent(m.currentOptions, "", "  ")
 	if err != nil {
 		return errors.WithStack(err)
@@ -113,7 +113,7 @@ func (m *BuildOptionsManager) WipeBuildPath(logger *logger.BuilderLogger) error 
 	return m.buildPath.Join("build.options.json").WriteFile(buildOptionsJSON)
 }
 
-func (m *BuildOptionsManager) wipeBuildPath(logger *logger.BuilderLogger) error {
+func (m *BuildOptions) wipeBuildPath(logger *logger.BuilderLogger) error {
 	wipe := func() error {
 		// FIXME: this should go outside legacy and behind a `logrus` call so users can
 		// control when this should be printed.
