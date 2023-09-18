@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
@@ -81,7 +82,7 @@ type Builder struct {
 
 	buildOptions *buildOptions
 
-	*detector.SketchLibrariesDetector
+	libsDetector *detector.SketchLibrariesDetector
 }
 
 // BuildArtifacts contains the result of various build
@@ -202,7 +203,7 @@ func NewBuilder(
 		buildArtifacts:                &BuildArtifacts{},
 		targetPlatform:                targetPlatform,
 		actualPlatform:                actualPlatform,
-		SketchLibrariesDetector: detector.NewSketchLibrariesDetector(
+		libsDetector: detector.NewSketchLibrariesDetector(
 			libsManager, libsResolver,
 			useCachedLibrariesResolution,
 			onlyUpdateCompilationDatabase,
@@ -235,6 +236,11 @@ func (b *Builder) GetBuildPath() *paths.Path {
 // ExecutableSectionsSize fixdoc
 func (b *Builder) ExecutableSectionsSize() ExecutablesFileSections {
 	return b.executableSectionsSize
+}
+
+// ImportedLibraries fixdoc
+func (b *Builder) ImportedLibraries() libraries.List {
+	return b.libsDetector.ImportedLibraries()
 }
 
 // Preprocess fixdoc
@@ -271,7 +277,7 @@ func (b *Builder) preprocess() error {
 	b.Progress.PushProgress()
 
 	b.logIfVerbose(false, tr("Detecting libraries used..."))
-	err := b.SketchLibrariesDetector.FindIncludes(
+	err := b.libsDetector.FindIncludes(
 		b.buildPath,
 		b.buildProperties.GetPath("build.core.path"),
 		b.buildProperties.GetPath("build.variant.path"),
@@ -287,12 +293,12 @@ func (b *Builder) preprocess() error {
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	b.warnAboutArchIncompatibleLibraries(b.SketchLibrariesDetector.ImportedLibraries())
+	b.warnAboutArchIncompatibleLibraries(b.libsDetector.ImportedLibraries())
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
 	b.logIfVerbose(false, tr("Generating function prototypes..."))
-	if err := b.preprocessSketch(b.SketchLibrariesDetector.IncludeFolders()); err != nil {
+	if err := b.preprocessSketch(b.libsDetector.IncludeFolders()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
@@ -330,18 +336,18 @@ func (b *Builder) Build() error {
 
 	buildErr := b.build()
 
-	b.SketchLibrariesDetector.PrintUsedAndNotUsedLibraries(buildErr != nil)
+	b.libsDetector.PrintUsedAndNotUsedLibraries(buildErr != nil)
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	b.printUsedLibraries(b.SketchLibrariesDetector.ImportedLibraries())
+	b.printUsedLibraries(b.libsDetector.ImportedLibraries())
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
 	if buildErr != nil {
 		return buildErr
 	}
-	if err := b.exportProjectCMake(b.SketchLibrariesDetector.ImportedLibraries(), b.SketchLibrariesDetector.IncludeFolders()); err != nil {
+	if err := b.exportProjectCMake(b.libsDetector.ImportedLibraries(), b.libsDetector.IncludeFolders()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
@@ -365,7 +371,7 @@ func (b *Builder) build() error {
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	if err := b.BuildSketch(b.SketchLibrariesDetector.IncludeFolders()); err != nil {
+	if err := b.BuildSketch(b.libsDetector.IncludeFolders()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
@@ -384,13 +390,13 @@ func (b *Builder) build() error {
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	if err := b.removeUnusedCompiledLibraries(b.SketchLibrariesDetector.ImportedLibraries()); err != nil {
+	if err := b.removeUnusedCompiledLibraries(b.libsDetector.ImportedLibraries()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	if err := b.buildLibraries(b.SketchLibrariesDetector.IncludeFolders(), b.SketchLibrariesDetector.ImportedLibraries()); err != nil {
+	if err := b.buildLibraries(b.libsDetector.IncludeFolders(), b.libsDetector.ImportedLibraries()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()

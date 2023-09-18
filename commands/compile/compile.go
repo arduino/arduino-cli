@@ -251,7 +251,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	defer func() {
 		importedLibs := []*rpc.Library{}
-		for _, lib := range sketchBuilder.SketchLibrariesDetector.ImportedLibraries() {
+		for _, lib := range sketchBuilder.ImportedLibraries() {
 			rpcLib, err := lib.ToRPCLibrary()
 			if err != nil {
 				msg := tr("Error getting information for library %s", lib.Name) + ": " + err.Error() + "\n"
