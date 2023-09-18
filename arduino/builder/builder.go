@@ -249,7 +249,7 @@ func (b *Builder) preprocess() error {
 		return err
 	}
 
-	if err := b.wipeBuildPath(); err != nil {
+	if err := b.wipeBuildPathIfBuildOptionsChanged(); err != nil {
 		return err
 	}
 	if err := b.createBuildOptionsJSON(); err != nil {

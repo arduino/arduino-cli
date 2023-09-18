@@ -106,21 +106,21 @@ func (b *Builder) createBuildOptionsJSON() error {
 }
 
 func (b *Builder) wipeBuildPath() error {
-	wipe := func() error {
-		// FIXME: this should go outside legacy and behind a `logrus` call so users can
-		// control when this should be printed.
-		// logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED + constants.MSG_REBUILD_ALL)
-		if err := b.buildOptions.buildPath.RemoveAll(); err != nil {
-			return errors.WithMessage(err, tr("cleaning build path"))
-		}
-		if err := b.buildOptions.buildPath.MkdirAll(); err != nil {
-			return errors.WithMessage(err, tr("cleaning build path"))
-		}
-		return nil
+	// FIXME: this should go outside legacy and behind a `logrus` call so users can
+	// control when this should be printed.
+	// logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED + constants.MSG_REBUILD_ALL)
+	if err := b.buildOptions.buildPath.RemoveAll(); err != nil {
+		return errors.WithMessage(err, tr("cleaning build path"))
 	}
+	if err := b.buildOptions.buildPath.MkdirAll(); err != nil {
+		return errors.WithMessage(err, tr("cleaning build path"))
+	}
+	return nil
+}
 
+func (b *Builder) wipeBuildPathIfBuildOptionsChanged() error {
 	if b.buildOptions.clean {
-		return wipe()
+		return b.wipeBuildPath()
 	}
 
 	// Load previous build options map
@@ -140,7 +140,7 @@ func (b *Builder) wipeBuildPath() error {
 	var prevOpts *properties.Map
 	if err := json.Unmarshal(buildOptionsJSONPrevious, &prevOpts); err != nil || prevOpts == nil {
 		b.logger.Info(tr("%[1]s invalid, rebuilding all", "build.options.json"))
-		return wipe()
+		return b.wipeBuildPath()
 	}
 
 	// Since we might apply a side effect we clone it
@@ -169,5 +169,5 @@ func (b *Builder) wipeBuildPath() error {
 		}
 	}
 
-	return wipe()
+	return b.wipeBuildPath()
 }
