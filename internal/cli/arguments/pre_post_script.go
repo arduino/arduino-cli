@@ -21,33 +21,47 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// PostInstallFlags contains flags data used by the core install and the upgrade command
+// PrePostScriptsFlags contains flags data used by the core install and the upgrade command
 // This is useful so all flags used by commands that need
 // this information are consistent with each other.
-type PostInstallFlags struct {
-	runPostInstall  bool // force the execution of installation scripts
-	skipPostInstall bool // skip the execution of installation scripts
+type PrePostScriptsFlags struct {
+	runPostInstall   bool // force the execution of installation scripts
+	skipPostInstall  bool // skip the execution of installation scripts
+	runPreUninstall  bool // force the execution of pre uninstall scripts
+	skipPreUninstall bool // skip the execution of pre uninstall scripts
 }
 
 // AddToCommand adds flags that can be used to force running or skipping
 // of post installation scripts
-func (p *PostInstallFlags) AddToCommand(cmd *cobra.Command) {
+func (p *PrePostScriptsFlags) AddToCommand(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&p.runPostInstall, "run-post-install", false, tr("Force run of post-install scripts (if the CLI is not running interactively)."))
 	cmd.Flags().BoolVar(&p.skipPostInstall, "skip-post-install", false, tr("Force skip of post-install scripts (if the CLI is running interactively)."))
+	cmd.Flags().BoolVar(&p.runPreUninstall, "run-pre-uninstall", false, tr("Force run of pre-uninstall scripts (if the CLI is not running interactively)."))
+	cmd.Flags().BoolVar(&p.skipPreUninstall, "skip-pre-uninstall", false, tr("Force skip of pre-uninstall scripts (if the CLI is running interactively)."))
 }
 
 // GetRunPostInstall returns the run-post-install flag value
-func (p *PostInstallFlags) GetRunPostInstall() bool {
+func (p *PrePostScriptsFlags) GetRunPostInstall() bool {
 	return p.runPostInstall
 }
 
 // GetSkipPostInstall returns the skip-post-install flag value
-func (p *PostInstallFlags) GetSkipPostInstall() bool {
+func (p *PrePostScriptsFlags) GetSkipPostInstall() bool {
 	return p.skipPostInstall
 }
 
+// GetRunPreUninstall returns the run-post-install flag value
+func (p *PrePostScriptsFlags) GetRunPreUninstall() bool {
+	return p.runPreUninstall
+}
+
+// GetSkipPreUninstall returns the skip-post-install flag value
+func (p *PrePostScriptsFlags) GetSkipPreUninstall() bool {
+	return p.skipPreUninstall
+}
+
 // DetectSkipPostInstallValue returns true if a post install script must be run
-func (p *PostInstallFlags) DetectSkipPostInstallValue() bool {
+func (p *PrePostScriptsFlags) DetectSkipPostInstallValue() bool {
 	if p.GetRunPostInstall() {
 		logrus.Info("Will run post-install by user request")
 		return false
@@ -62,5 +76,24 @@ func (p *PostInstallFlags) DetectSkipPostInstallValue() bool {
 		return true
 	}
 	logrus.Info("Running from console, will run post-install by default")
+	return false
+}
+
+// DetectSkipPreUninstallValue returns true if a post install script must be run
+func (p *PrePostScriptsFlags) DetectSkipPreUninstallValue() bool {
+	if p.GetRunPreUninstall() {
+		logrus.Info("Will run pre-uninstall by user request")
+		return false
+	}
+	if p.GetSkipPreUninstall() {
+		logrus.Info("Will skip pre-uninstall by user request")
+		return true
+	}
+
+	if !configuration.IsInteractive {
+		logrus.Info("Not running from console, will skip pre-uninstall by default")
+		return true
+	}
+	logrus.Info("Running from console, will run pre-uninstall by default")
 	return false
 }

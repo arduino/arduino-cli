@@ -1559,3 +1559,21 @@ software is in use:
 - **Arduino CLI**: (since 0.12.0) runs the script for any installed platform when Arduino CLI is in "interactive" mode.
   This behavior
   [can be configured](https://arduino.github.io/arduino-cli/latest/commands/arduino-cli_core_install/#options)
+
+## Pre-uninstall script
+
+Before Boards Manager starts uninstalling a platform, it checks for the presence of a script named:
+
+- `pre_uninstall.bat` - when running on Windows
+- `pre_uninstall.sh` - when running on any non-Windows operating system
+
+If present, the script is executed.
+
+This script may be used to configure the user's system for the removal of drivers, stopping background programs and
+execute any action that should be performed before the platform files are removed.
+
+The circumstances under which the pre-uninstall script will run are different depending on which Arduino development
+software is in use:
+
+- **Arduino CLI**: runs the script for any installed platform when Arduino CLI is in "interactive" mode. This behavior
+  [can be configured](https://arduino.github.io/arduino-cli/latest/commands/arduino-cli_core_install/#options)

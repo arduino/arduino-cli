@@ -31,7 +31,7 @@ var tr = i18n.Tr
 
 // NewCommand creates a new `upgrade` command
 func NewCommand() *cobra.Command {
-	var postInstallFlags arguments.PostInstallFlags
+	var postInstallFlags arguments.PrePostScriptsFlags
 	upgradeCommand := &cobra.Command{
 		Use:     "upgrade",
 		Short:   tr("Upgrades installed cores and libraries."),
@@ -39,16 +39,16 @@ func NewCommand() *cobra.Command {
 		Example: "  " + os.Args[0] + " upgrade",
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			runUpgradeCommand(postInstallFlags.DetectSkipPostInstallValue())
+			runUpgradeCommand(postInstallFlags.DetectSkipPostInstallValue(), postInstallFlags.DetectSkipPreUninstallValue())
 		},
 	}
 	postInstallFlags.AddToCommand(upgradeCommand)
 	return upgradeCommand
 }
 
-func runUpgradeCommand(skipPostInstall bool) {
+func runUpgradeCommand(skipPostInstall bool, skipPreUninstall bool) {
 	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli upgrade`")
 	lib.Upgrade(inst, []string{})
-	core.Upgrade(inst, []string{}, skipPostInstall)
+	core.Upgrade(inst, []string{}, skipPostInstall, skipPreUninstall)
 }

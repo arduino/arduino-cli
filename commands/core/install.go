@@ -63,7 +63,7 @@ func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest, downl
 			}
 		}
 
-		if err := pme.DownloadAndInstallPlatformAndTools(platformRelease, tools, downloadCB, taskCB, req.GetSkipPostInstall()); err != nil {
+		if err := pme.DownloadAndInstallPlatformAndTools(platformRelease, tools, downloadCB, taskCB, req.GetSkipPostInstall(), req.GetSkipPreUninstall()); err != nil {
 			return err
 		}
 

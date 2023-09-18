@@ -31,7 +31,7 @@ import (
 
 func initInstallCommand() *cobra.Command {
 	var noOverwrite bool
-	var postInstallFlags arguments.PostInstallFlags
+	var scriptFlags arguments.PrePostScriptsFlags
 	installCommand := &cobra.Command{
 		Use:   fmt.Sprintf("install %s:%s[@%s]...", tr("PACKAGER"), tr("ARCH"), tr("VERSION")),
 		Short: tr("Installs one or more cores and corresponding tool dependencies."),
@@ -45,18 +45,18 @@ func initInstallCommand() *cobra.Command {
 			arguments.CheckFlagsConflicts(cmd, "run-post-install", "skip-post-install")
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			runInstallCommand(args, postInstallFlags, noOverwrite)
+			runInstallCommand(args, scriptFlags, noOverwrite)
 		},
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 			return arguments.GetInstallableCores(), cobra.ShellCompDirectiveDefault
 		},
 	}
-	postInstallFlags.AddToCommand(installCommand)
+	scriptFlags.AddToCommand(installCommand)
 	installCommand.Flags().BoolVar(&noOverwrite, "no-overwrite", false, tr("Do not overwrite already installed platforms."))
 	return installCommand
 }
 
-func runInstallCommand(args []string, postInstallFlags arguments.PostInstallFlags, noOverwrite bool) {
+func runInstallCommand(args []string, scriptFlags arguments.PrePostScriptsFlags, noOverwrite bool) {
 	inst := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli core install`")
 
@@ -67,12 +67,13 @@ func runInstallCommand(args []string, postInstallFlags arguments.PostInstallFlag
 
 	for _, platformRef := range platformsRefs {
 		platformInstallRequest := &rpc.PlatformInstallRequest{
-			Instance:        inst,
-			PlatformPackage: platformRef.PackageName,
-			Architecture:    platformRef.Architecture,
-			Version:         platformRef.Version,
-			SkipPostInstall: postInstallFlags.DetectSkipPostInstallValue(),
-			NoOverwrite:     noOverwrite,
+			Instance:         inst,
+			PlatformPackage:  platformRef.PackageName,
+			Architecture:     platformRef.Architecture,
+			Version:          platformRef.Version,
+			SkipPostInstall:  scriptFlags.DetectSkipPostInstallValue(),
+			NoOverwrite:      noOverwrite,
+			SkipPreUninstall: scriptFlags.DetectSkipPreUninstallValue(),
 		}
 		_, err := core.PlatformInstall(context.Background(), platformInstallRequest, feedback.ProgressBar(), feedback.TaskProgress())
 		if err != nil {
