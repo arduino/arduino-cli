@@ -197,8 +197,8 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		req.GetSkipLibrariesDiscovery(),
 		libsManager,
 		paths.NewPathList(req.Library...),
-		logger.New(outStream, errStream, req.GetVerbose(), req.GetWarnings()),
-		progress.New(progressCB),
+		outStream, errStream, req.GetVerbose(), req.GetWarnings(),
+		progressCB,
 	)
 	if err != nil {
 		if strings.Contains(err.Error(), "invalid build properties") {

@@ -18,6 +18,7 @@ package builder
 import (
 	"errors"
 	"fmt"
+	"io"
 
 	"github.com/arduino/arduino-cli/arduino/builder/internal/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/internal/detector"
@@ -27,6 +28,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 )
@@ -117,8 +119,8 @@ func NewBuilder(
 	useCachedLibrariesResolution bool,
 	librariesManager *librariesmanager.LibrariesManager,
 	libraryDirs paths.PathList,
-	logger *logger.BuilderLogger,
-	progressStats *progress.Struct,
+	stdout, stderr io.Writer, verbose bool, warningsLevel string,
+	progresCB rpc.TaskProgressCB,
 ) (*Builder, error) {
 	buildProperties := properties.NewMap()
 	if boardBuildProperties != nil {
@@ -167,10 +169,7 @@ func NewBuilder(
 		return nil, ErrSketchCannotBeLocatedInBuildPath
 	}
 
-	if progressStats == nil {
-		progressStats = progress.New(nil)
-	}
-
+	logger := logger.New(stdout, stderr, verbose, warningsLevel)
 	libsManager, libsResolver, verboseOut, err := detector.LibrariesLoader(
 		useCachedLibrariesResolution, librariesManager,
 		builtInLibrariesDirs, libraryDirs, otherLibrariesDirs,
@@ -198,7 +197,7 @@ func NewBuilder(
 		sourceOverrides:               sourceOverrides,
 		onlyUpdateCompilationDatabase: onlyUpdateCompilationDatabase,
 		compilationDatabase:           compilation.NewDatabase(buildPath.Join("compile_commands.json")),
-		Progress:                      progressStats,
+		Progress:                      progress.New(progresCB),
 		executableSectionsSize:        []ExecutableSectionSize{},
 		buildArtifacts:                &buildArtifacts{},
 		targetPlatform:                targetPlatform,
