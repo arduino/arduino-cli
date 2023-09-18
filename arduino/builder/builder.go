@@ -78,15 +78,15 @@ type Builder struct {
 	targetPlatform *cores.PlatformRelease
 	actualPlatform *cores.PlatformRelease
 
-	buildArtifacts *BuildArtifacts
+	buildArtifacts *buildArtifacts
 
 	buildOptions *buildOptions
 
 	libsDetector *detector.SketchLibrariesDetector
 }
 
-// BuildArtifacts contains the result of various build
-type BuildArtifacts struct {
+// buildArtifacts contains the result of various build
+type buildArtifacts struct {
 	// populated by BuildCore
 	coreArchiveFilePath *paths.Path
 	coreObjectsFiles    paths.PathList
@@ -200,7 +200,7 @@ func NewBuilder(
 		compilationDatabase:           compilation.NewDatabase(buildPath.Join("compile_commands.json")),
 		Progress:                      progressStats,
 		executableSectionsSize:        []ExecutableSectionSize{},
-		buildArtifacts:                &BuildArtifacts{},
+		buildArtifacts:                &buildArtifacts{},
 		targetPlatform:                targetPlatform,
 		actualPlatform:                actualPlatform,
 		libsDetector: detector.NewSketchLibrariesDetector(
