@@ -79,8 +79,9 @@ type Builder struct {
 
 	buildArtifacts *BuildArtifacts
 
+	buildOptions *BuildOptionsManager
+
 	*detector.SketchLibrariesDetector
-	*BuildOptionsManager
 }
 
 // BuildArtifacts contains the result of various build
@@ -207,7 +208,7 @@ func NewBuilder(
 			onlyUpdateCompilationDatabase,
 			logger,
 		),
-		BuildOptionsManager: NewBuildOptionsManager(
+		buildOptions: NewBuildOptionsManager(
 			hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
 			builtInLibrariesDirs, buildPath,
 			sk,
@@ -248,7 +249,7 @@ func (b *Builder) preprocess() error {
 		return err
 	}
 
-	if err := b.BuildOptionsManager.WipeBuildPath(b.logger); err != nil {
+	if err := b.buildOptions.WipeBuildPath(b.logger); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
