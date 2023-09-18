@@ -97,14 +97,9 @@ func NewBuildOptionsManager(
 	}
 }
 
-// WipeBuildPath fixdoc
-func (b *Builder) WipeBuildPath() error {
+func (b *Builder) createBuildOptionsJSON() error {
 	buildOptionsJSON, err := json.MarshalIndent(b.buildOptions.currentOptions, "", "  ")
 	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	if err := b.wipeBuildPath(); err != nil {
 		return errors.WithStack(err)
 	}
 	return b.buildOptions.buildPath.Join("build.options.json").WriteFile(buildOptionsJSON)

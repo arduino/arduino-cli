@@ -249,7 +249,10 @@ func (b *Builder) preprocess() error {
 		return err
 	}
 
-	if err := b.WipeBuildPath(); err != nil {
+	if err := b.wipeBuildPath(); err != nil {
+		return err
+	}
+	if err := b.createBuildOptionsJSON(); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
