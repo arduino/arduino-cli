@@ -187,7 +187,7 @@ func (b *Builder) BuildSketch(includesFolders paths.PathList) error {
 		b.onlyUpdateCompilationDatabase,
 		b.compilationDatabase,
 		b.jobs,
-		b.builderLogger,
+		b.logger,
 		b.Progress,
 	)
 	if err != nil {
@@ -202,7 +202,7 @@ func (b *Builder) BuildSketch(includesFolders paths.PathList) error {
 			b.onlyUpdateCompilationDatabase,
 			b.compilationDatabase,
 			b.jobs,
-			b.builderLogger,
+			b.logger,
 			b.Progress,
 		)
 		if err != nil {

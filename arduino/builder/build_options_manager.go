@@ -45,7 +45,6 @@ type BuildOptionsManager struct {
 	customBuildProperties     []string
 	compilerOptimizationFlags string
 	clean                     bool
-	builderLogger             *logger.BuilderLogger
 }
 
 // NewBuildOptionsManager fixdoc
@@ -58,7 +57,6 @@ func NewBuildOptionsManager(
 	clean bool,
 	compilerOptimizationFlags string,
 	runtimePlatformPath, buildCorePath *paths.Path,
-	buildLogger *logger.BuilderLogger,
 ) *BuildOptionsManager {
 	opts := properties.NewMap()
 
@@ -98,25 +96,24 @@ func NewBuildOptionsManager(
 		customBuildProperties:     customBuildProperties,
 		compilerOptimizationFlags: compilerOptimizationFlags,
 		clean:                     clean,
-		builderLogger:             buildLogger,
 	}
 }
 
 // WipeBuildPath fixdoc
-func (m *BuildOptionsManager) WipeBuildPath() error {
+func (m *BuildOptionsManager) WipeBuildPath(logger *logger.BuilderLogger) error {
 	buildOptionsJSON, err := json.MarshalIndent(m.currentOptions, "", "  ")
 	if err != nil {
 		return errors.WithStack(err)
 	}
 	m.currentBuildOptionsJSON = buildOptionsJSON
 
-	if err := m.wipeBuildPath(); err != nil {
+	if err := m.wipeBuildPath(logger); err != nil {
 		return errors.WithStack(err)
 	}
 	return m.buildPath.Join("build.options.json").WriteFile(buildOptionsJSON)
 }
 
-func (m *BuildOptionsManager) wipeBuildPath() error {
+func (m *BuildOptionsManager) wipeBuildPath(logger *logger.BuilderLogger) error {
 	wipe := func() error {
 		// FIXME: this should go outside legacy and behind a `logrus` call so users can
 		// control when this should be printed.
@@ -150,7 +147,7 @@ func (m *BuildOptionsManager) wipeBuildPath() error {
 
 	var prevOpts *properties.Map
 	if err := json.Unmarshal(buildOptionsJSONPrevious, &prevOpts); err != nil || prevOpts == nil {
-		m.builderLogger.Info(tr("%[1]s invalid, rebuilding all", "build.options.json"))
+		logger.Info(tr("%[1]s invalid, rebuilding all", "build.options.json"))
 		return wipe()
 	}
 

@@ -217,7 +217,6 @@ func NewBuilder(
 			buildProperties.Get("compiler.optimization_flags"),
 			buildProperties.GetPath("runtime.platform.path"),
 			buildProperties.GetPath("build.core.path"), // TODO can we buildCorePath ?
-			logger,
 		),
 	}, nil
 }
@@ -249,7 +248,7 @@ func (b *Builder) preprocess() error {
 		return err
 	}
 
-	if err := b.BuildOptionsManager.WipeBuildPath(); err != nil {
+	if err := b.BuildOptionsManager.WipeBuildPath(b.logger); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
