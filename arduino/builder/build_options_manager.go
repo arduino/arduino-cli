@@ -28,8 +28,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// BuildOptions fixdoc
-type BuildOptions struct {
+// buildOptions fixdoc
+type buildOptions struct {
 	currentOptions *properties.Map
 
 	hardwareDirs              paths.PathList
@@ -45,8 +45,8 @@ type BuildOptions struct {
 	clean                     bool
 }
 
-// NewBuildOptionsManager fixdoc
-func NewBuildOptionsManager(
+// newBuildOptions fixdoc
+func newBuildOptions(
 	hardwareDirs, builtInToolsDirs, otherLibrariesDirs paths.PathList,
 	builtInLibrariesDirs, buildPath *paths.Path,
 	sketch *sketch.Sketch,
@@ -55,7 +55,7 @@ func NewBuildOptionsManager(
 	clean bool,
 	compilerOptimizationFlags string,
 	runtimePlatformPath, buildCorePath *paths.Path,
-) *BuildOptions {
+) *buildOptions {
 	opts := properties.NewMap()
 
 	opts.Set("hardwareFolders", strings.Join(hardwareDirs.AsStrings(), ","))
@@ -81,7 +81,7 @@ func NewBuildOptionsManager(
 	}
 	opts.Set("additionalFiles", strings.Join(additionalFilesRelative, ","))
 
-	return &BuildOptions{
+	return &buildOptions{
 		currentOptions:            opts,
 		hardwareDirs:              hardwareDirs,
 		builtInToolsDirs:          builtInToolsDirs,

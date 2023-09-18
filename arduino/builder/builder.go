@@ -79,7 +79,7 @@ type Builder struct {
 
 	buildArtifacts *BuildArtifacts
 
-	buildOptions *BuildOptions
+	buildOptions *buildOptions
 
 	*detector.SketchLibrariesDetector
 }
@@ -208,7 +208,7 @@ func NewBuilder(
 			onlyUpdateCompilationDatabase,
 			logger,
 		),
-		buildOptions: NewBuildOptionsManager(
+		buildOptions: newBuildOptions(
 			hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
 			builtInLibrariesDirs, buildPath,
 			sk,
