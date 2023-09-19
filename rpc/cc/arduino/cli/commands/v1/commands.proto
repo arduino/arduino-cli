@@ -82,7 +82,7 @@ service ArduinoCoreService {
   rpc BoardSearch(BoardSearchRequest) returns (BoardSearchResponse);
 
   // List boards connection and disconnected events.
-  rpc BoardListWatch(stream BoardListWatchRequest)
+  rpc BoardListWatch(BoardListWatchRequest)
       returns (stream BoardListWatchResponse);
 
   // Compile an Arduino sketch.
