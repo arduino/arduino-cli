@@ -86,18 +86,10 @@ func (s *ArduinoCoreServerImpl) BoardSearch(ctx context.Context, req *rpc.BoardS
 }
 
 // BoardListWatch FIXMEDOC
-func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCoreService_BoardListWatchServer) error {
+func (s *ArduinoCoreServerImpl) BoardListWatch(req *rpc.BoardListWatchRequest, stream rpc.ArduinoCoreService_BoardListWatchServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)
-	msg, err := stream.Recv()
-	if err == io.EOF {
-		return nil
-	}
-	if err != nil {
-		return err
-	}
-
-	if msg.Instance == nil {
-		err = fmt.Errorf(tr("no instance specified"))
+	if req.Instance == nil {
+		err := fmt.Errorf(tr("no instance specified"))
 		syncSend.Send(&rpc.BoardListWatchResponse{
 			EventType: "error",
 			Error:     err.Error(),
@@ -105,32 +97,10 @@ func (s *ArduinoCoreServerImpl) BoardListWatch(stream rpc.ArduinoCoreService_Boa
 		return err
 	}
 
-	eventsChan, closeWatcher, err := board.Watch(msg)
+	eventsChan, err := board.Watch(stream.Context(), req)
 	if err != nil {
 		return convertErrorToRPCStatus(err)
 	}
-
-	go func() {
-		defer closeWatcher()
-		for {
-			msg, err := stream.Recv()
-			// Handle client closing the stream and eventual errors
-			if err == io.EOF {
-				logrus.Info("boards watcher stream closed")
-				return
-			}
-			if err != nil {
-				logrus.Infof("interrupting boards watcher: %v", err)
-				return
-			}
-
-			// Message received, does the client want to interrupt?
-			if msg != nil && msg.Interrupt {
-				logrus.Info("boards watcher interrupted by client")
-				return
-			}
-		}
-	}()
 
 	for event := range eventsChan {
 		if err := syncSend.Send(event); err != nil {

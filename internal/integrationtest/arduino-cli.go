@@ -362,16 +362,16 @@ func (inst *ArduinoCLIInstance) BoardList(timeout time.Duration) (*commands.Boar
 }
 
 // BoardListWatch calls the "BoardListWatch" gRPC method.
-func (inst *ArduinoCLIInstance) BoardListWatch() (commands.ArduinoCoreService_BoardListWatchClient, error) {
+func (inst *ArduinoCLIInstance) BoardListWatch(ctx context.Context) (commands.ArduinoCoreService_BoardListWatchClient, error) {
 	boardListWatchReq := &commands.BoardListWatchRequest{
 		Instance: inst.instance,
 	}
 	logCallf(">>> BoardListWatch(%v)\n", boardListWatchReq)
-	watcher, err := inst.cli.daemonClient.BoardListWatch(context.Background())
+	watcher, err := inst.cli.daemonClient.BoardListWatch(ctx, boardListWatchReq)
 	if err != nil {
 		return watcher, err
 	}
-	return watcher, watcher.Send(boardListWatchReq)
+	return watcher, nil
 }
 
 // PlatformInstall calls the "PlatformInstall" gRPC method.
