@@ -111,7 +111,7 @@ type ArduinoCoreServiceClient interface {
 	// Search boards in installed and not installed Platforms.
 	BoardSearch(ctx context.Context, in *BoardSearchRequest, opts ...grpc.CallOption) (*BoardSearchResponse, error)
 	// List boards connection and disconnected events.
-	BoardListWatch(ctx context.Context, opts ...grpc.CallOption) (ArduinoCoreService_BoardListWatchClient, error)
+	BoardListWatch(ctx context.Context, in *BoardListWatchRequest, opts ...grpc.CallOption) (ArduinoCoreService_BoardListWatchClient, error)
 	// Compile an Arduino sketch.
 	Compile(ctx context.Context, in *CompileRequest, opts ...grpc.CallOption) (ArduinoCoreService_CompileClient, error)
 	// Download and install a platform and its tool dependencies.
@@ -370,27 +370,28 @@ func (c *arduinoCoreServiceClient) BoardSearch(ctx context.Context, in *BoardSea
 	return out, nil
 }
 
-func (c *arduinoCoreServiceClient) BoardListWatch(ctx context.Context, opts ...grpc.CallOption) (ArduinoCoreService_BoardListWatchClient, error) {
+func (c *arduinoCoreServiceClient) BoardListWatch(ctx context.Context, in *BoardListWatchRequest, opts ...grpc.CallOption) (ArduinoCoreService_BoardListWatchClient, error) {
 	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[3], ArduinoCoreService_BoardListWatch_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
 	x := &arduinoCoreServiceBoardListWatchClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
 	return x, nil
 }
 
 type ArduinoCoreService_BoardListWatchClient interface {
-	Send(*BoardListWatchRequest) error
 	Recv() (*BoardListWatchResponse, error)
 	grpc.ClientStream
 }
 
 type arduinoCoreServiceBoardListWatchClient struct {
 	grpc.ClientStream
-}
-
-func (x *arduinoCoreServiceBoardListWatchClient) Send(m *BoardListWatchRequest) error {
-	return x.ClientStream.SendMsg(m)
 }
 
 func (x *arduinoCoreServiceBoardListWatchClient) Recv() (*BoardListWatchResponse, error) {
@@ -1020,7 +1021,7 @@ type ArduinoCoreServiceServer interface {
 	// Search boards in installed and not installed Platforms.
 	BoardSearch(context.Context, *BoardSearchRequest) (*BoardSearchResponse, error)
 	// List boards connection and disconnected events.
-	BoardListWatch(ArduinoCoreService_BoardListWatchServer) error
+	BoardListWatch(*BoardListWatchRequest, ArduinoCoreService_BoardListWatchServer) error
 	// Compile an Arduino sketch.
 	Compile(*CompileRequest, ArduinoCoreService_CompileServer) error
 	// Download and install a platform and its tool dependencies.
@@ -1123,7 +1124,7 @@ func (UnimplementedArduinoCoreServiceServer) BoardListAll(context.Context, *Boar
 func (UnimplementedArduinoCoreServiceServer) BoardSearch(context.Context, *BoardSearchRequest) (*BoardSearchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BoardSearch not implemented")
 }
-func (UnimplementedArduinoCoreServiceServer) BoardListWatch(ArduinoCoreService_BoardListWatchServer) error {
+func (UnimplementedArduinoCoreServiceServer) BoardListWatch(*BoardListWatchRequest, ArduinoCoreService_BoardListWatchServer) error {
 	return status.Errorf(codes.Unimplemented, "method BoardListWatch not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) Compile(*CompileRequest, ArduinoCoreService_CompileServer) error {
@@ -1473,12 +1474,15 @@ func _ArduinoCoreService_BoardSearch_Handler(srv interface{}, ctx context.Contex
 }
 
 func _ArduinoCoreService_BoardListWatch_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ArduinoCoreServiceServer).BoardListWatch(&arduinoCoreServiceBoardListWatchServer{stream})
+	m := new(BoardListWatchRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ArduinoCoreServiceServer).BoardListWatch(m, &arduinoCoreServiceBoardListWatchServer{stream})
 }
 
 type ArduinoCoreService_BoardListWatchServer interface {
 	Send(*BoardListWatchResponse) error
-	Recv() (*BoardListWatchRequest, error)
 	grpc.ServerStream
 }
 
@@ -1488,14 +1492,6 @@ type arduinoCoreServiceBoardListWatchServer struct {
 
 func (x *arduinoCoreServiceBoardListWatchServer) Send(m *BoardListWatchResponse) error {
 	return x.ServerStream.SendMsg(m)
-}
-
-func (x *arduinoCoreServiceBoardListWatchServer) Recv() (*BoardListWatchRequest, error) {
-	m := new(BoardListWatchRequest)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
 }
 
 func _ArduinoCoreService_Compile_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -2087,7 +2083,6 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "BoardListWatch",
 			Handler:       _ArduinoCoreService_BoardListWatch_Handler,
 			ServerStreams: true,
-			ClientStreams: true,
 		},
 		{
 			StreamName:    "Compile",
