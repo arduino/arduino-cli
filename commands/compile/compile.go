@@ -305,37 +305,35 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 			return r, err
 		}
 
-		var exportPath *paths.Path
-		if exportDir := req.GetExportDir(); exportDir != "" {
-			exportPath = paths.New(exportDir)
-		} else {
+		exportPath := paths.New(req.GetExportDir())
+		if exportPath == nil {
 			// Add FQBN (without configs part) to export path
 			fqbnSuffix := strings.ReplaceAll(fqbn.StringWithoutConfig(), ":", ".")
 			exportPath = sk.FullPath.Join("build", fqbnSuffix)
 		}
-		logrus.WithField("path", exportPath).Trace("Saving sketch to export path.")
-		if err := exportPath.MkdirAll(); err != nil {
-			return r, &arduino.PermissionDeniedError{Message: tr("Error creating output dir"), Cause: err}
-		}
 
 		// Copy all "sketch.ino.*" artifacts to the export directory
-		baseName, ok := sketchBuilder.GetBuildProperties().GetOk("build.project_name") // == "sketch.ino"
-		if !ok {
-			return r, &arduino.MissingPlatformPropertyError{Property: "build.project_name"}
-		}
-		buildFiles, err := sketchBuilder.GetBuildPath().ReadDir()
-		if err != nil {
-			return r, &arduino.PermissionDeniedError{Message: tr("Error reading build directory"), Cause: err}
-		}
-		buildFiles.FilterPrefix(baseName)
-		for _, buildFile := range buildFiles {
-			exportedFile := exportPath.Join(buildFile.Base())
-			logrus.
-				WithField("src", buildFile).
-				WithField("dest", exportedFile).
-				Trace("Copying artifact.")
-			if err = buildFile.CopyTo(exportedFile); err != nil {
-				return r, &arduino.PermissionDeniedError{Message: tr("Error copying output file %s", buildFile), Cause: err}
+		if !buildPath.EqualsTo(exportPath) {
+			logrus.WithField("path", exportPath).Trace("Saving sketch to export path.")
+			if err := exportPath.MkdirAll(); err != nil {
+				return r, &arduino.PermissionDeniedError{Message: tr("Error creating output dir"), Cause: err}
+			}
+
+			baseName, ok := sketchBuilder.GetBuildProperties().GetOk("build.project_name") // == "sketch.ino"
+			if !ok {
+				return r, &arduino.MissingPlatformPropertyError{Property: "build.project_name"}
+			}
+			buildFiles, err := sketchBuilder.GetBuildPath().ReadDir()
+			if err != nil {
+				return r, &arduino.PermissionDeniedError{Message: tr("Error reading build directory"), Cause: err}
+			}
+			buildFiles.FilterPrefix(baseName)
+			for _, buildFile := range buildFiles {
+				exportedFile := exportPath.Join(buildFile.Base())
+				logrus.WithField("src", buildFile).WithField("dest", exportedFile).Trace("Copying artifact.")
+				if err = buildFile.CopyTo(exportedFile); err != nil {
+					return r, &arduino.PermissionDeniedError{Message: tr("Error copying output file %s", buildFile), Cause: err}
+				}
 			}
 		}
 

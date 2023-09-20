@@ -73,6 +73,7 @@ func TestCompile(t *testing.T) {
 		{"WithFakeSecureBootCore", compileWithFakeSecureBootCore},
 		{"PreprocessFlagDoNotMessUpWithOutput", preprocessFlagDoNotMessUpWithOutput},
 		{"WithCustomBuildPath", buildWithCustomBuildPath},
+		{"WithCustomBuildPathAndOUtputDirFlag", buildWithCustomBuildPathAndOUtputDirFlag},
 	}.Run(t, env, cli)
 }
 
@@ -1226,4 +1227,35 @@ func buildWithCustomBuildPath(t *testing.T, env *integrationtest.Environment, cl
 		_, _, err := cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", sketchPath.String(), sketchPath.String())
 		require.Error(t, err)
 	})
+}
+
+func buildWithCustomBuildPathAndOUtputDirFlag(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	fqbn := "arduino:avr:uno"
+	sketchName := "bare_minimum"
+	sketchPath := cli.SketchbookDir().Join(sketchName)
+	defer sketchPath.RemoveAll()
+
+	// Create a test sketch
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	buildPath := cli.DataDir().Join("test_dir", "build_dir")
+	outputDirPath := buildPath
+	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--build-path", buildPath.String(), "--output-dir", outputDirPath.String())
+	require.NoError(t, err)
+
+	// Verifies that output binaries are not empty.
+	require.DirExists(t, buildPath.String())
+	files := []*paths.Path{
+		buildPath.Join(sketchName + ".ino.eep"),
+		buildPath.Join(sketchName + ".ino.elf"),
+		buildPath.Join(sketchName + ".ino.hex"),
+		buildPath.Join(sketchName + ".ino.with_bootloader.bin"),
+		buildPath.Join(sketchName + ".ino.with_bootloader.hex"),
+	}
+	for _, file := range files {
+		content, err := file.ReadFile()
+		require.NoError(t, err)
+		require.NotEmpty(t, content)
+	}
 }
