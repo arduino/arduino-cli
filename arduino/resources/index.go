@@ -17,6 +17,7 @@ package resources
 
 import (
 	"context"
+	"errors"
 	"net/url"
 	"path"
 	"strings"
@@ -33,8 +34,9 @@ import (
 
 // IndexResource is a reference to an index file URL with an optional signature.
 type IndexResource struct {
-	URL          *url.URL
-	SignatureURL *url.URL
+	URL                          *url.URL
+	SignatureURL                 *url.URL
+	EnforceSignatureVerification bool
 }
 
 // IndexFileName returns the index file name as it is saved in data dir (package_xxx_index.json).
@@ -139,6 +141,10 @@ func (res *IndexResource) Download(destDir *paths.Path, downloadCB rpc.DownloadP
 			return &arduino.PermissionDeniedError{Message: tr("Error verifying signature"), Cause: err}
 		} else if !valid {
 			return &arduino.SignatureVerificationFailedError{File: res.URL.String()}
+		}
+	} else {
+		if res.EnforceSignatureVerification {
+			return &arduino.PermissionDeniedError{Message: tr("Error verifying signature"), Cause: errors.New(tr("missing signature"))}
 		}
 	}
 
