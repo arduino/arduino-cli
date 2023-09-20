@@ -132,6 +132,8 @@ message LibraryDependencyStatus {
   string version_required = 2;
   // Version of the library dependency currently installed.
   string version_installed = 3;
+  // Version constraint of the dependency.
+  string version_constraint = 4;
 }
 
 message LibrarySearchRequest {
