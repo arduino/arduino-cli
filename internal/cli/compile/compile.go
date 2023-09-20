@@ -25,9 +25,8 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/compile"
+	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/configuration"
@@ -363,17 +362,16 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 				panic(tr("Platform ID is not correct"))
 			}
 
-			// FIXME: Here we should not access PackageManager...
-			pme, release := commands.GetPackageManagerExplorer(compileRequest)
-			platform := pme.FindPlatform(&packagemanager.PlatformReference{
-				Package:              split[0],
-				PlatformArchitecture: split[1],
-			})
-			release()
-
 			if profileArg.String() == "" {
 				res.Error += fmt.Sprintln()
-				if platform != nil {
+
+				if platform, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
+					Instance:    inst,
+					SearchArgs:  platformErr.Platform,
+					AllVersions: false,
+				}); err != nil {
+					res.Error += err.Error()
+				} else if len(platform.GetSearchOutput()) > 0 {
 					suggestion := fmt.Sprintf("`%s core install %s`", version.VersionInfo.Application, platformErr.Platform)
 					res.Error += tr("Try running %s", suggestion)
 				} else {

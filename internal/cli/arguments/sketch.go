@@ -16,9 +16,7 @@
 package arguments
 
 import (
-	"fmt"
-
-	"github.com/arduino/arduino-cli/arduino/sketch"
+	sk "github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
@@ -38,18 +36,8 @@ func InitSketchPath(path string) (sketchPath *paths.Path) {
 		logrus.Infof("Reading sketch from dir: %s", wd)
 		sketchPath = wd
 	}
-	WarnDeprecatedFiles(sketchPath)
-	return sketchPath
-}
-
-// WarnDeprecatedFiles warns the user that a type of sketch files are deprecated
-func WarnDeprecatedFiles(sketchPath *paths.Path) {
-	// .pde files are still supported but deprecated, this warning urges the user to rename them
-	if files := sketch.CheckForPdeFiles(sketchPath); len(files) > 0 {
-		msg := tr("Sketches with .pde extension are deprecated, please rename the following files to .ino:")
-		for _, f := range files {
-			msg += fmt.Sprintf("\n - %s", f)
-		}
+	if msg := sk.WarnDeprecatedFiles(sketchPath); msg != "" {
 		feedback.Warning(msg)
 	}
+	return sketchPath
 }

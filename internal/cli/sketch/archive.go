@@ -21,7 +21,6 @@ import (
 	"os"
 
 	sk "github.com/arduino/arduino-cli/commands/sketch"
-	"github.com/arduino/arduino-cli/internal/cli/arguments"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
@@ -61,7 +60,9 @@ func runArchiveCommand(args []string, includeBuildDir bool, overwrite bool) {
 		sketchPath = paths.New(args[0])
 	}
 
-	arguments.WarnDeprecatedFiles(sketchPath)
+	if msg := sk.WarnDeprecatedFiles(sketchPath); msg != "" {
+		feedback.Warning(msg)
+	}
 
 	archivePath := ""
 	if len(args) == 2 {
