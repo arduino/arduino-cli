@@ -591,6 +591,13 @@ func TestInstallLibraryWithDependencies(t *testing.T) {
 	require.NoError(t, err)
 	_, _, err = cli.Run("lib", "install", "Arduino_Builtin", "--no-overwrite")
 	require.Error(t, err)
+
+	// Install a library with an outdated dependency using --no-overwrite
+	// It should not fail because the version of the dependency matches the constraint
+	_, _, err = cli.Run("lib", "install", "Bounce2@2.53.0")
+	require.NoError(t, err)
+	_, _, err = cli.Run("lib", "install", "EncoderTool@2.2.0", "--no-overwrite")
+	require.NoError(t, err)
 }
 
 func TestInstallNoDeps(t *testing.T) {
