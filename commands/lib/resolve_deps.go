@@ -62,6 +62,16 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 		return nil, &arduino.LibraryDependenciesResolutionFailedError{}
 	}
 
+	constraints := map[string]string{}
+	// Map the dependencies' constraints of the library to install
+	for _, dep := range deps {
+		if dep.GetName() == req.GetName() {
+			for _, d := range dep.GetDependencies() {
+				constraints[d.GetName()] = d.GetConstraint().String()
+			}
+		}
+	}
+
 	res := []*rpc.LibraryDependencyStatus{}
 	for _, dep := range deps {
 		// ...and add information on currently installed versions of the libraries
@@ -69,11 +79,15 @@ func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDepe
 		if installedLib, has := installedLibs[dep.GetName()]; has {
 			installed = installedLib.Version.String()
 		}
-		res = append(res, &rpc.LibraryDependencyStatus{
+		depStatus := &rpc.LibraryDependencyStatus{
 			Name:             dep.GetName(),
 			VersionRequired:  dep.GetVersion().String(),
 			VersionInstalled: installed,
-		})
+		}
+		if constraint, has := constraints[dep.GetName()]; has {
+			depStatus.VersionConstraint = constraint
+		}
+		res = append(res, depStatus)
 	}
 	sort.Slice(res, func(i, j int) bool {
 		return res[i].Name < res[j].Name

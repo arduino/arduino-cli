@@ -28,6 +28,7 @@ import (
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
+	semver "go.bug.st/relaxed-semver"
 )
 
 // LibraryInstall resolves the library dependencies, then downloads and installs the libraries into the install location.
@@ -88,6 +89,9 @@ func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloa
 		}
 
 		if req.GetNoOverwrite() {
+			if lib.GetVersionConstraint() != "" && verifyConstraint(lib.GetVersionInstalled(), lib.GetVersionConstraint()) {
+				continue
+			}
 			if installTask.ReplacedLib != nil {
 				return fmt.Errorf(tr("Library %[1]s is already installed, but with a different version: %[2]s", libRelease, installTask.ReplacedLib))
 			}
@@ -159,4 +163,13 @@ func GitLibraryInstall(ctx context.Context, req *rpc.GitLibraryInstallRequest, t
 	}
 	taskCB(&rpc.TaskProgress{Message: tr("Library installed"), Completed: true})
 	return nil
+}
+
+func verifyConstraint(installed, constraint string) bool {
+	s, err := semver.ParseConstraint(constraint)
+	if err != nil {
+		return false
+	}
+	res := s.Match(semver.MustParse(installed))
+	return res
 }
