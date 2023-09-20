@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/commands/monitor"
+	"github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
@@ -45,13 +46,14 @@ var tr = i18n.Tr
 // NewCommand created a new `monitor` command
 func NewCommand() *cobra.Command {
 	var (
-		raw       bool
-		portArgs  arguments.Port
-		describe  bool
-		configs   []string
-		quiet     bool
-		timestamp bool
-		fqbn      arguments.Fqbn
+		raw        bool
+		portArgs   arguments.Port
+		describe   bool
+		configs    []string
+		quiet      bool
+		timestamp  bool
+		fqbn       arguments.Fqbn
+		sketchPath string
 	)
 	monitorCommand := &cobra.Command{
 		Use:   "monitor",
@@ -61,7 +63,7 @@ func NewCommand() *cobra.Command {
 			"  " + os.Args[0] + " monitor -p /dev/ttyACM0\n" +
 			"  " + os.Args[0] + " monitor -p /dev/ttyACM0 --describe",
 		Run: func(cmd *cobra.Command, args []string) {
-			runMonitorCmd(&portArgs, &fqbn, configs, describe, timestamp, quiet, raw)
+			runMonitorCmd(&portArgs, &fqbn, configs, describe, timestamp, quiet, raw, sketchPath)
 		},
 	}
 	portArgs.AddToCommand(monitorCommand)
@@ -70,12 +72,12 @@ func NewCommand() *cobra.Command {
 	monitorCommand.Flags().StringSliceVarP(&configs, "config", "c", []string{}, tr("Configure communication port settings. The format is <ID>=<value>[,<ID>=<value>]..."))
 	monitorCommand.Flags().BoolVarP(&quiet, "quiet", "q", false, tr("Run in silent mode, show only monitor input and output."))
 	monitorCommand.Flags().BoolVar(&timestamp, "timestamp", false, tr("Timestamp each incoming line."))
+	monitorCommand.Flags().StringVarP(&sketchPath, "sketch", "s", "", tr("Path to the sketch"))
 	fqbn.AddToCommand(monitorCommand)
-	monitorCommand.MarkFlagRequired("port")
 	return monitorCommand
 }
 
-func runMonitorCmd(portArgs *arguments.Port, fqbn *arguments.Fqbn, configs []string, describe, timestamp, quiet, raw bool) {
+func runMonitorCmd(portArgs *arguments.Port, fqbn *arguments.Fqbn, configs []string, describe, timestamp, quiet, raw bool, sketchPath string) {
 	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli monitor`")
 
@@ -83,8 +85,17 @@ func runMonitorCmd(portArgs *arguments.Port, fqbn *arguments.Fqbn, configs []str
 		quiet = true
 	}
 
-	// TODO: Should use sketch default_port/protocol?
-	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(instance, "", "")
+	addressDefault := ""
+	protocolDefault := ""
+	if sketchPath != "" {
+		sketch, err := sketch.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath})
+		if err != nil {
+			feedback.FatalError(err, feedback.ErrGeneric)
+		}
+		addressDefault = sketch.GetDefaultPort()
+		protocolDefault = sketch.GetDefaultProtocol()
+	}
+	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(instance, addressDefault, protocolDefault)
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
