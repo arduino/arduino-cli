@@ -16,7 +16,7 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-cli/arduino/builder/preprocessor"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/preprocessor"
 	"github.com/arduino/go-paths-helper"
 )
 

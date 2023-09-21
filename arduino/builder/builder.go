@@ -18,14 +18,17 @@ package builder
 import (
 	"errors"
 	"fmt"
+	"io"
 
-	"github.com/arduino/arduino-cli/arduino/builder/compilation"
-	"github.com/arduino/arduino-cli/arduino/builder/detector"
-	"github.com/arduino/arduino-cli/arduino/builder/logger"
-	"github.com/arduino/arduino-cli/arduino/builder/progress"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/compilation"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/detector"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/logger"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/progress"
 	"github.com/arduino/arduino-cli/arduino/cores"
+	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 )
@@ -77,14 +80,15 @@ type Builder struct {
 	targetPlatform *cores.PlatformRelease
 	actualPlatform *cores.PlatformRelease
 
-	buildArtifacts *BuildArtifacts
+	buildArtifacts *buildArtifacts
 
-	*detector.SketchLibrariesDetector
-	*BuildOptionsManager
+	buildOptions *buildOptions
+
+	libsDetector *detector.SketchLibrariesDetector
 }
 
-// BuildArtifacts contains the result of various build
-type BuildArtifacts struct {
+// buildArtifacts contains the result of various build
+type buildArtifacts struct {
 	// populated by BuildCore
 	coreArchiveFilePath *paths.Path
 	coreObjectsFiles    paths.PathList
@@ -115,8 +119,8 @@ func NewBuilder(
 	useCachedLibrariesResolution bool,
 	librariesManager *librariesmanager.LibrariesManager,
 	libraryDirs paths.PathList,
-	logger *logger.BuilderLogger,
-	progressStats *progress.Struct,
+	stdout, stderr io.Writer, verbose bool, warningsLevel string,
+	progresCB rpc.TaskProgressCB,
 ) (*Builder, error) {
 	buildProperties := properties.NewMap()
 	if boardBuildProperties != nil {
@@ -165,10 +169,7 @@ func NewBuilder(
 		return nil, ErrSketchCannotBeLocatedInBuildPath
 	}
 
-	if progressStats == nil {
-		progressStats = progress.New(nil)
-	}
-
+	logger := logger.New(stdout, stderr, verbose, warningsLevel)
 	libsManager, libsResolver, verboseOut, err := detector.LibrariesLoader(
 		useCachedLibrariesResolution, librariesManager,
 		builtInLibrariesDirs, libraryDirs, otherLibrariesDirs,
@@ -196,18 +197,18 @@ func NewBuilder(
 		sourceOverrides:               sourceOverrides,
 		onlyUpdateCompilationDatabase: onlyUpdateCompilationDatabase,
 		compilationDatabase:           compilation.NewDatabase(buildPath.Join("compile_commands.json")),
-		Progress:                      progressStats,
+		Progress:                      progress.New(progresCB),
 		executableSectionsSize:        []ExecutableSectionSize{},
-		buildArtifacts:                &BuildArtifacts{},
+		buildArtifacts:                &buildArtifacts{},
 		targetPlatform:                targetPlatform,
 		actualPlatform:                actualPlatform,
-		SketchLibrariesDetector: detector.NewSketchLibrariesDetector(
+		libsDetector: detector.NewSketchLibrariesDetector(
 			libsManager, libsResolver,
 			useCachedLibrariesResolution,
 			onlyUpdateCompilationDatabase,
 			logger,
 		),
-		BuildOptionsManager: NewBuildOptionsManager(
+		buildOptions: newBuildOptions(
 			hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
 			builtInLibrariesDirs, buildPath,
 			sk,
@@ -217,7 +218,6 @@ func NewBuilder(
 			buildProperties.Get("compiler.optimization_flags"),
 			buildProperties.GetPath("runtime.platform.path"),
 			buildProperties.GetPath("build.core.path"), // TODO can we buildCorePath ?
-			logger,
 		),
 	}, nil
 }
@@ -237,6 +237,11 @@ func (b *Builder) ExecutableSectionsSize() ExecutablesFileSections {
 	return b.executableSectionsSize
 }
 
+// ImportedLibraries fixdoc
+func (b *Builder) ImportedLibraries() libraries.List {
+	return b.libsDetector.ImportedLibraries()
+}
+
 // Preprocess fixdoc
 func (b *Builder) Preprocess() error {
 	b.Progress.AddSubSteps(6)
@@ -249,7 +254,10 @@ func (b *Builder) preprocess() error {
 		return err
 	}
 
-	if err := b.BuildOptionsManager.WipeBuildPath(); err != nil {
+	if err := b.wipeBuildPathIfBuildOptionsChanged(); err != nil {
+		return err
+	}
+	if err := b.createBuildOptionsJSON(); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
@@ -268,7 +276,7 @@ func (b *Builder) preprocess() error {
 	b.Progress.PushProgress()
 
 	b.logIfVerbose(false, tr("Detecting libraries used..."))
-	err := b.SketchLibrariesDetector.FindIncludes(
+	err := b.libsDetector.FindIncludes(
 		b.buildPath,
 		b.buildProperties.GetPath("build.core.path"),
 		b.buildProperties.GetPath("build.variant.path"),
@@ -284,12 +292,12 @@ func (b *Builder) preprocess() error {
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	b.warnAboutArchIncompatibleLibraries(b.SketchLibrariesDetector.ImportedLibraries())
+	b.warnAboutArchIncompatibleLibraries(b.libsDetector.ImportedLibraries())
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
 	b.logIfVerbose(false, tr("Generating function prototypes..."))
-	if err := b.preprocessSketch(b.SketchLibrariesDetector.IncludeFolders()); err != nil {
+	if err := b.preprocessSketch(b.libsDetector.IncludeFolders()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
@@ -327,18 +335,18 @@ func (b *Builder) Build() error {
 
 	buildErr := b.build()
 
-	b.SketchLibrariesDetector.PrintUsedAndNotUsedLibraries(buildErr != nil)
+	b.libsDetector.PrintUsedAndNotUsedLibraries(buildErr != nil)
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	b.printUsedLibraries(b.SketchLibrariesDetector.ImportedLibraries())
+	b.printUsedLibraries(b.libsDetector.ImportedLibraries())
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
 	if buildErr != nil {
 		return buildErr
 	}
-	if err := b.exportProjectCMake(b.SketchLibrariesDetector.ImportedLibraries(), b.SketchLibrariesDetector.IncludeFolders()); err != nil {
+	if err := b.exportProjectCMake(b.libsDetector.ImportedLibraries(), b.libsDetector.IncludeFolders()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
@@ -362,7 +370,7 @@ func (b *Builder) build() error {
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	if err := b.BuildSketch(b.SketchLibrariesDetector.IncludeFolders()); err != nil {
+	if err := b.BuildSketch(b.libsDetector.IncludeFolders()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
@@ -381,13 +389,13 @@ func (b *Builder) build() error {
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	if err := b.removeUnusedCompiledLibraries(b.SketchLibrariesDetector.ImportedLibraries()); err != nil {
+	if err := b.removeUnusedCompiledLibraries(b.libsDetector.ImportedLibraries()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	if err := b.buildLibraries(b.SketchLibrariesDetector.IncludeFolders(), b.SketchLibrariesDetector.ImportedLibraries()); err != nil {
+	if err := b.buildLibraries(b.libsDetector.IncludeFolders(), b.libsDetector.ImportedLibraries()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()

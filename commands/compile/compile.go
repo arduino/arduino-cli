@@ -25,8 +25,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/builder"
-	"github.com/arduino/arduino-cli/arduino/builder/logger"
-	"github.com/arduino/arduino-cli/arduino/builder/progress"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
@@ -199,8 +197,8 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		req.GetSkipLibrariesDiscovery(),
 		libsManager,
 		paths.NewPathList(req.Library...),
-		logger.New(outStream, errStream, req.GetVerbose(), req.GetWarnings()),
-		progress.New(progressCB),
+		outStream, errStream, req.GetVerbose(), req.GetWarnings(),
+		progressCB,
 	)
 	if err != nil {
 		if strings.Contains(err.Error(), "invalid build properties") {
@@ -251,7 +249,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	defer func() {
 		importedLibs := []*rpc.Library{}
-		for _, lib := range sketchBuilder.SketchLibrariesDetector.ImportedLibraries() {
+		for _, lib := range sketchBuilder.ImportedLibraries() {
 			rpcLib, err := lib.ToRPCLibrary()
 			if err != nil {
 				msg := tr("Error getting information for library %s", lib.Name) + ": " + err.Error() + "\n"

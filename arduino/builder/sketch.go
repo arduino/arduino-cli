@@ -24,7 +24,7 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
-	"github.com/arduino/arduino-cli/arduino/builder/utils"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/go-paths-helper"
@@ -187,7 +187,7 @@ func (b *Builder) BuildSketch(includesFolders paths.PathList) error {
 		b.onlyUpdateCompilationDatabase,
 		b.compilationDatabase,
 		b.jobs,
-		b.builderLogger,
+		b.logger,
 		b.Progress,
 	)
 	if err != nil {
@@ -202,7 +202,7 @@ func (b *Builder) BuildSketch(includesFolders paths.PathList) error {
 			b.onlyUpdateCompilationDatabase,
 			b.compilationDatabase,
 			b.jobs,
-			b.builderLogger,
+			b.logger,
 			b.Progress,
 		)
 		if err != nil {

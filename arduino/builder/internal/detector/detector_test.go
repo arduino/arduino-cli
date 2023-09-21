@@ -18,7 +18,7 @@ package detector_test
 import (
 	"testing"
 
-	"github.com/arduino/arduino-cli/arduino/builder/detector"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/detector"
 	"github.com/stretchr/testify/require"
 )
 

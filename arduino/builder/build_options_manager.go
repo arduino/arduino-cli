@@ -20,8 +20,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/builder/logger"
-	"github.com/arduino/arduino-cli/arduino/builder/utils"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/go-paths-helper"
@@ -29,10 +28,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-// BuildOptionsManager fixdoc
-type BuildOptionsManager struct {
-	currentOptions          *properties.Map
-	currentBuildOptionsJSON []byte
+// buildOptions fixdoc
+type buildOptions struct {
+	currentOptions *properties.Map
 
 	hardwareDirs              paths.PathList
 	builtInToolsDirs          paths.PathList
@@ -45,11 +43,10 @@ type BuildOptionsManager struct {
 	customBuildProperties     []string
 	compilerOptimizationFlags string
 	clean                     bool
-	builderLogger             *logger.BuilderLogger
 }
 
-// NewBuildOptionsManager fixdoc
-func NewBuildOptionsManager(
+// newBuildOptions fixdoc
+func newBuildOptions(
 	hardwareDirs, builtInToolsDirs, otherLibrariesDirs paths.PathList,
 	builtInLibrariesDirs, buildPath *paths.Path,
 	sketch *sketch.Sketch,
@@ -58,8 +55,7 @@ func NewBuildOptionsManager(
 	clean bool,
 	compilerOptimizationFlags string,
 	runtimePlatformPath, buildCorePath *paths.Path,
-	buildLogger *logger.BuilderLogger,
-) *BuildOptionsManager {
+) *buildOptions {
 	opts := properties.NewMap()
 
 	opts.Set("hardwareFolders", strings.Join(hardwareDirs.AsStrings(), ","))
@@ -85,7 +81,7 @@ func NewBuildOptionsManager(
 	}
 	opts.Set("additionalFiles", strings.Join(additionalFilesRelative, ","))
 
-	return &BuildOptionsManager{
+	return &buildOptions{
 		currentOptions:            opts,
 		hardwareDirs:              hardwareDirs,
 		builtInToolsDirs:          builtInToolsDirs,
@@ -98,46 +94,39 @@ func NewBuildOptionsManager(
 		customBuildProperties:     customBuildProperties,
 		compilerOptimizationFlags: compilerOptimizationFlags,
 		clean:                     clean,
-		builderLogger:             buildLogger,
 	}
 }
 
-// WipeBuildPath fixdoc
-func (m *BuildOptionsManager) WipeBuildPath() error {
-	buildOptionsJSON, err := json.MarshalIndent(m.currentOptions, "", "  ")
+func (b *Builder) createBuildOptionsJSON() error {
+	buildOptionsJSON, err := json.MarshalIndent(b.buildOptions.currentOptions, "", "  ")
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	m.currentBuildOptionsJSON = buildOptionsJSON
-
-	if err := m.wipeBuildPath(); err != nil {
-		return errors.WithStack(err)
-	}
-	return m.buildPath.Join("build.options.json").WriteFile(buildOptionsJSON)
+	return b.buildOptions.buildPath.Join("build.options.json").WriteFile(buildOptionsJSON)
 }
 
-func (m *BuildOptionsManager) wipeBuildPath() error {
-	wipe := func() error {
-		// FIXME: this should go outside legacy and behind a `logrus` call so users can
-		// control when this should be printed.
-		// logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED + constants.MSG_REBUILD_ALL)
-		if err := m.buildPath.RemoveAll(); err != nil {
-			return errors.WithMessage(err, tr("cleaning build path"))
-		}
-		if err := m.buildPath.MkdirAll(); err != nil {
-			return errors.WithMessage(err, tr("cleaning build path"))
-		}
-		return nil
+func (b *Builder) wipeBuildPath() error {
+	// FIXME: this should go outside legacy and behind a `logrus` call so users can
+	// control when this should be printed.
+	// logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED + constants.MSG_REBUILD_ALL)
+	if err := b.buildOptions.buildPath.RemoveAll(); err != nil {
+		return errors.WithMessage(err, tr("cleaning build path"))
 	}
+	if err := b.buildOptions.buildPath.MkdirAll(); err != nil {
+		return errors.WithMessage(err, tr("cleaning build path"))
+	}
+	return nil
+}
 
-	if m.clean {
-		return wipe()
+func (b *Builder) wipeBuildPathIfBuildOptionsChanged() error {
+	if b.buildOptions.clean {
+		return b.wipeBuildPath()
 	}
 
 	// Load previous build options map
 	var buildOptionsJSONPrevious []byte
 	var _err error
-	if buildOptionsFile := m.buildPath.Join("build.options.json"); buildOptionsFile.Exist() {
+	if buildOptionsFile := b.buildOptions.buildPath.Join("build.options.json"); buildOptionsFile.Exist() {
 		buildOptionsJSONPrevious, _err = buildOptionsFile.ReadFile()
 		if _err != nil {
 			return errors.WithStack(_err)
@@ -150,12 +139,12 @@ func (m *BuildOptionsManager) wipeBuildPath() error {
 
 	var prevOpts *properties.Map
 	if err := json.Unmarshal(buildOptionsJSONPrevious, &prevOpts); err != nil || prevOpts == nil {
-		m.builderLogger.Info(tr("%[1]s invalid, rebuilding all", "build.options.json"))
-		return wipe()
+		b.logger.Info(tr("%[1]s invalid, rebuilding all", "build.options.json"))
+		return b.wipeBuildPath()
 	}
 
 	// Since we might apply a side effect we clone it
-	currentOptions := m.currentOptions.Clone()
+	currentOptions := b.buildOptions.currentOptions.Clone()
 	// If SketchLocation path is different but filename is the same, consider it equal
 	if filepath.Base(currentOptions.Get("sketchLocation")) == filepath.Base(prevOpts.Get("sketchLocation")) {
 		currentOptions.Remove("sketchLocation")
@@ -167,10 +156,10 @@ func (m *BuildOptionsManager) wipeBuildPath() error {
 		// check if any of the files contained in the core folders has changed
 		// since the json was generated - like platform.txt or similar
 		// if so, trigger a "safety" wipe
-		targetCoreFolder := m.runtimePlatformPath
-		coreFolder := m.buildCorePath
+		targetCoreFolder := b.buildOptions.runtimePlatformPath
+		coreFolder := b.buildOptions.buildCorePath
 		realCoreFolder := coreFolder.Parent().Parent()
-		jsonPath := m.buildPath.Join("build.options.json")
+		jsonPath := b.buildOptions.buildPath.Join("build.options.json")
 		coreUnchanged, _ := utils.DirContentIsOlderThan(realCoreFolder, jsonPath, ".txt")
 		if coreUnchanged && targetCoreFolder != nil && !realCoreFolder.EqualsTo(targetCoreFolder) {
 			coreUnchanged, _ = utils.DirContentIsOlderThan(targetCoreFolder, jsonPath, ".txt")
@@ -180,5 +169,5 @@ func (m *BuildOptionsManager) wipeBuildPath() error {
 		}
 	}
 
-	return wipe()
+	return b.wipeBuildPath()
 }
