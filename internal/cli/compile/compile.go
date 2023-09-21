@@ -348,6 +348,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 			UpdatedUploadPort: result.NewPort(uploadRes.GetUpdatedUploadPort()),
 		},
 		ProfileOut:         profileOut,
+		Diagnostics:        compileRes.GetDiagnostics(),
 		Success:            compileError == nil,
 		showPropertiesMode: showProperties,
 		hideStats:          preprocess,
@@ -399,7 +400,8 @@ type compileResult struct {
 	Success       bool                    `json:"success"`
 	ProfileOut    string                  `json:"profile_out,omitempty"`
 	Error         string                  `json:"error,omitempty"`
-
+	// TODO: make a proper result.* structure
+	Diagnostics        []*rpc.CompileDiagnostic `json:"diagnostics"`
 	showPropertiesMode arguments.ShowPropertiesMode
 	hideStats          bool
 }
