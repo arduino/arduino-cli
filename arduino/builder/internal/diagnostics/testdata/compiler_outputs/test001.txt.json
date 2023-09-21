@@ -1,0 +1,30 @@
+[
+  {
+    "severity": "ERROR",
+    "message": "expected initializer before 'asd'\n void setup() asd {\n              ^~~",
+    "file": "/home/megabug/Arduino/Blink/Blink.ino",
+    "line": 1,
+    "col": 14
+  },
+  {
+    "severity": "ERROR",
+    "message": "'asd' was not declared in this scope\n asd\n ^~~",
+    "file": "/home/megabug/Arduino/Blink/Blink.ino",
+    "line": 6,
+    "col": 1,
+    "context": [
+      {
+        "message": "In function 'void loop()':",
+        "file": "/home/megabug/Arduino/Blink/Blink.ino"
+      }
+    ],
+    "suggestions": [
+      {
+        "message": "suggested alternative: 'rand'\n asd\n ^~~\n rand",
+        "file": "/home/megabug/Arduino/Blink/Blink.ino",
+        "line": 6,
+        "col": 1
+      }
+    ]
+  }
+]

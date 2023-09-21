@@ -1,0 +1,34 @@
+/home/megabug/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-g++ -c -g -Os -w -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error=narrowing -MMD -flto -mmcu=atmega328p -DF_CPU=16000000L -DARDUINO=10607 -DARDUINO_AVR_UNO -DARDUINO_ARCH_AVR -I/home/megabug/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino -I/home/megabug/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/standard -I/home/megabug/Arduino/libraries/Audio/src /tmp/arduino/sketches/002050EAA7EFB9A4FC451CDFBC0FA2D3/sketch/Blink.ino.cpp -o /tmp/arduino/sketches/002050EAA7EFB9A4FC451CDFBC0FA2D3/sketch/Blink.ino.cpp.o
+In file included from /home/megabug/Arduino/libraries/Audio/src/Audio.h:16:0,
+                 from /home/megabug/Arduino/Blink/Blink.ino:1:
+/home/megabug/Arduino/libraries/Audio/src/DAC.h:21:16: error: expected ')' before '*' token
+  DACClass(Dacc *_dac, uint32_t _dacId, IRQn_Type _isrId) :
+                ^
+/home/megabug/Arduino/libraries/Audio/src/DAC.h:35:2: error: 'Dacc' does not name a type
+  Dacc *dac;
+  ^~~~
+/home/megabug/Arduino/libraries/Audio/src/DAC.h:37:2: error: 'IRQn_Type' does not name a type
+  IRQn_Type isrId;
+  ^~~~~~~~~
+/home/megabug/Arduino/libraries/Audio/src/DAC.h: In member function 'void DACClass::enableInterrupts()':
+/home/megabug/Arduino/libraries/Audio/src/DAC.h:31:44: error: 'isrId' was not declared in this scope
+  void enableInterrupts()  { NVIC_EnableIRQ(isrId); };
+                                            ^~~~~
+/home/megabug/Arduino/libraries/Audio/src/DAC.h:31:29: error: 'NVIC_EnableIRQ' was not declared in this scope
+  void enableInterrupts()  { NVIC_EnableIRQ(isrId); };
+                             ^~~~~~~~~~~~~~
+/home/megabug/Arduino/libraries/Audio/src/DAC.h: In member function 'void DACClass::disableInterrupts()':
+/home/megabug/Arduino/libraries/Audio/src/DAC.h:32:45: error: 'isrId' was not declared in this scope
+  void disableInterrupts() { NVIC_DisableIRQ(isrId); };
+                                             ^~~~~
+/home/megabug/Arduino/libraries/Audio/src/DAC.h:32:29: error: 'NVIC_DisableIRQ' was not declared in this scope
+  void disableInterrupts() { NVIC_DisableIRQ(isrId); };
+                             ^~~~~~~~~~~~~~~
+/home/megabug/Arduino/Blink/Blink.ino: In function 'void setup()':
+/home/megabug/Arduino/Blink/Blink.ino:4:1: error: 'asd' was not declared in this scope
+ asd;
+ ^~~
+/home/megabug/Arduino/Blink/Blink.ino:4:1: note: suggested alternative: 'rand'
+ asd;
+ ^~~
+ rand
