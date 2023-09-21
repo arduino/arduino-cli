@@ -210,7 +210,7 @@ func NewBuilder(
 		),
 		buildOptions: newBuildOptions(
 			hardwareDirs, builtInToolsDirs, otherLibrariesDirs,
-			builtInLibrariesDirs, buildPath,
+			builtInLibrariesDirs,
 			sk,
 			customBuildPropertiesArgs,
 			fqbn,

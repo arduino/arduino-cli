@@ -36,7 +36,6 @@ type buildOptions struct {
 	builtInToolsDirs          paths.PathList
 	otherLibrariesDirs        paths.PathList
 	builtInLibrariesDirs      *paths.Path
-	buildPath                 *paths.Path
 	runtimePlatformPath       *paths.Path
 	buildCorePath             *paths.Path
 	sketch                    *sketch.Sketch
@@ -48,7 +47,7 @@ type buildOptions struct {
 // newBuildOptions fixdoc
 func newBuildOptions(
 	hardwareDirs, builtInToolsDirs, otherLibrariesDirs paths.PathList,
-	builtInLibrariesDirs, buildPath *paths.Path,
+	builtInLibrariesDirs *paths.Path,
 	sketch *sketch.Sketch,
 	customBuildProperties []string,
 	fqbn *cores.FQBN,
@@ -87,7 +86,6 @@ func newBuildOptions(
 		builtInToolsDirs:          builtInToolsDirs,
 		otherLibrariesDirs:        otherLibrariesDirs,
 		builtInLibrariesDirs:      builtInLibrariesDirs,
-		buildPath:                 buildPath,
 		runtimePlatformPath:       runtimePlatformPath,
 		buildCorePath:             buildCorePath,
 		sketch:                    sketch,
@@ -102,17 +100,17 @@ func (b *Builder) createBuildOptionsJSON() error {
 	if err != nil {
 		return err
 	}
-	return b.buildOptions.buildPath.Join("build.options.json").WriteFile(buildOptionsJSON)
+	return b.buildPath.Join("build.options.json").WriteFile(buildOptionsJSON)
 }
 
 func (b *Builder) wipeBuildPath() error {
 	// FIXME: this should go outside legacy and behind a `logrus` call so users can
 	// control when this should be printed.
 	// logger.Println(constants.LOG_LEVEL_INFO, constants.MSG_BUILD_OPTIONS_CHANGED + constants.MSG_REBUILD_ALL)
-	if err := b.buildOptions.buildPath.RemoveAll(); err != nil {
+	if err := b.buildPath.RemoveAll(); err != nil {
 		return fmt.Errorf("%s: %w", tr("cleaning build path"), err)
 	}
-	if err := b.buildOptions.buildPath.MkdirAll(); err != nil {
+	if err := b.buildPath.MkdirAll(); err != nil {
 		return fmt.Errorf("%s: %w", tr("cleaning build path"), err)
 	}
 	return nil
@@ -125,7 +123,7 @@ func (b *Builder) wipeBuildPathIfBuildOptionsChanged() error {
 
 	// Load previous build options map
 	var buildOptionsJSONPrevious []byte
-	if buildOptionsFile := b.buildOptions.buildPath.Join("build.options.json"); buildOptionsFile.Exist() {
+	if buildOptionsFile := b.buildPath.Join("build.options.json"); buildOptionsFile.Exist() {
 		var err error
 		buildOptionsJSONPrevious, err = buildOptionsFile.ReadFile()
 		if err != nil {
@@ -157,9 +155,8 @@ func (b *Builder) wipeBuildPathIfBuildOptionsChanged() error {
 		// since the json was generated - like platform.txt or similar
 		// if so, trigger a "safety" wipe
 		targetCoreFolder := b.buildOptions.runtimePlatformPath
-		coreFolder := b.buildOptions.buildCorePath
-		realCoreFolder := coreFolder.Parent().Parent()
-		jsonPath := b.buildOptions.buildPath.Join("build.options.json")
+		realCoreFolder := b.buildOptions.buildCorePath.Parent().Parent()
+		jsonPath := b.buildPath.Join("build.options.json")
 		coreUnchanged, _ := utils.DirContentIsOlderThan(realCoreFolder, jsonPath, ".txt")
 		if coreUnchanged && targetCoreFolder != nil && !realCoreFolder.EqualsTo(targetCoreFolder) {
 			coreUnchanged, _ = utils.DirContentIsOlderThan(targetCoreFolder, jsonPath, ".txt")
