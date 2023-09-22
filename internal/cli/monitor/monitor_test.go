@@ -33,5 +33,5 @@ func TestTimeStampWriter(t *testing.T) {
 	buf.Reset()
 	writer.Write([]byte("\nbar\n"))
 	// A timestamp should be inserted before the first char of the next line
-	require.Regexp(t, "^\n"+`\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\] bar` + "\n$", buf)
+	require.Regexp(t, "^\n"+`\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\] bar`+"\n$", buf)
 }
