@@ -2,6 +2,37 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
+## 0.35.0
+
+### The gRPC `cc.arduino.cli.commands.v1.BoardListWatchRequest` command request has been changed.
+
+The gRPC message `BoardListWatchRequest` has been changed from:
+
+```
+message BoardListWatchRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Set this to true to stop the discovery process
+  bool interrupt = 2;
+}
+```
+
+to
+
+```
+message BoardListWatchRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+}
+```
+
+### The gRPC `cc.arduino.cli.commands.v1.BoardListWatch` service is now server stream only.
+
+```
+  rpc BoardListWatch(BoardListWatchRequest)
+      returns (stream BoardListWatchResponse);
+```
+
 ## 0.34.0
 
 ### The gRPC `cc.arduino.cli.commands.v1.UploadRepsonse` command response has been changed.
