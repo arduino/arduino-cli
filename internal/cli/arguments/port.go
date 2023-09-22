@@ -21,7 +21,6 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/commands/board"
-	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -87,13 +86,6 @@ func (p *Port) GetPort(instance *rpc.Instance, defaultAddress, defaultProtocol s
 		}, nil
 	}
 	logrus.WithField("port", address).Tracef("Upload port")
-
-	// FIXME: We must not access PackageManager directly here but use one of the commands.* functions
-	pme, release := instances.GetPackageManagerExplorer(instance)
-	if pme == nil {
-		return nil, &arduino.InvalidInstanceError{}
-	}
-	defer release()
 
 	dm := pme.DiscoveryManager()
 	watcher, err := dm.Watch()

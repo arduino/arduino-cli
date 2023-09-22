@@ -20,7 +20,6 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/core"
-	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
@@ -50,13 +49,6 @@ func GetInstalledBoards() []string {
 // It returns a list of protocols available based on the installed boards
 func GetInstalledProtocols() []string {
 	inst := instance.CreateAndInit()
-
-	// FIXME: We must not access PackageManager directly here but use one of the commands.* functions
-	pme, release := instances.GetPackageManagerExplorer(inst)
-	if pme == nil {
-		return nil // should never happen...
-	}
-	defer release()
 
 	boards := pme.InstalledBoards()
 
@@ -93,13 +85,6 @@ func GetInstalledProgrammers() []string {
 		IncludeHiddenBoards: false,
 	}
 	list, _ := board.ListAll(context.Background(), listAllReq)
-
-	// FIXME: We must not access PackageManager directly here but use one of the commands.* functions
-	pme, release := instances.GetPackageManagerExplorer(inst)
-	if pme == nil {
-		return nil // should never happen...
-	}
-	defer release()
 
 	installedProgrammers := make(map[string]string)
 	for _, board := range list.Boards {
