@@ -24,7 +24,7 @@ import (
 	"os"
 	"sort"
 	"strings"
-        "time"
+	"time"
 
 	"github.com/arduino/arduino-cli/commands/monitor"
 	"github.com/arduino/arduino-cli/configuration"
@@ -250,13 +250,13 @@ func contains(s []string, searchterm string) bool {
 }
 
 type timeStampWriter struct {
-	writer io.Writer
+	writer            io.Writer
 	sendTimeStampNext bool
 }
 
 func newTimeStampWriter(writer io.Writer) *timeStampWriter {
 	return &timeStampWriter{
-		writer: writer,
+		writer:            writer,
 		sendTimeStampNext: true,
 	}
 }
@@ -264,19 +264,19 @@ func newTimeStampWriter(writer io.Writer) *timeStampWriter {
 func (t *timeStampWriter) Write(p []byte) (int, error) {
 	written := 0
 	for _, b := range p {
-		if (t.sendTimeStampNext) {
+		if t.sendTimeStampNext {
 			_, err := t.writer.Write([]byte(time.Now().Format("[2006-01-02 15:04:05] ")))
 			if err != nil {
 				return written, err
 			}
-			t.sendTimeStampNext = false;
+			t.sendTimeStampNext = false
 		}
 		n, err := t.writer.Write([]byte{b})
 		written += n
 		if err != nil {
 			return written, err
 		}
-		t.sendTimeStampNext = b == '\n';
+		t.sendTimeStampNext = b == '\n'
 	}
 	return written, nil
 }
