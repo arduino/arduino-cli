@@ -146,8 +146,10 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: 3.x
 
-      - name: Install golint
-        run: go install golang.org/x/lint/golint@latest
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.54
 
       - name: Check style
         env:
