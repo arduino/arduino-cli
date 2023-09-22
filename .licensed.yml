@@ -12,6 +12,39 @@ reviewed:
   go:
     - google.golang.org/protobuf/encoding/protojson
     - google.golang.org/protobuf/internal/encoding/json
+    - github.com/ProtonMail/go-crypto/bitcurves
+    - github.com/ProtonMail/go-crypto/brainpool
+    - github.com/ProtonMail/go-crypto/eax
+    - github.com/ProtonMail/go-crypto/internal/byteutil
+    - github.com/ProtonMail/go-crypto/ocb
+    - github.com/ProtonMail/go-crypto/openpgp
+    - github.com/ProtonMail/go-crypto/openpgp/aes/keywrap
+    - github.com/ProtonMail/go-crypto/openpgp/armor
+    - github.com/ProtonMail/go-crypto/openpgp/ecdh
+    - github.com/ProtonMail/go-crypto/openpgp/ecdsa
+    - github.com/ProtonMail/go-crypto/openpgp/eddsa
+    - github.com/ProtonMail/go-crypto/openpgp/elgamal
+    - github.com/ProtonMail/go-crypto/openpgp/errors
+    - github.com/ProtonMail/go-crypto/openpgp/internal/algorithm
+    - github.com/ProtonMail/go-crypto/openpgp/internal/ecc
+    - github.com/ProtonMail/go-crypto/openpgp/internal/encoding
+    - github.com/ProtonMail/go-crypto/openpgp/packet
+    - github.com/ProtonMail/go-crypto/openpgp/s2k
+    - github.com/cloudflare/circl/dh/x25519
+    - github.com/cloudflare/circl/dh/x448
+    - github.com/cloudflare/circl/ecc/goldilocks
+    - github.com/cloudflare/circl/internal/conv
+    - github.com/cloudflare/circl/internal/sha3
+    - github.com/cloudflare/circl/math
+    - github.com/cloudflare/circl/math/fp25519
+    - github.com/cloudflare/circl/math/fp448
+    - github.com/cloudflare/circl/math/mlsbset
+    - github.com/cloudflare/circl/sign
+    - github.com/cloudflare/circl/sign/ed25519
+    - github.com/cloudflare/circl/sign/ed448
+    - golang.org/x/crypto/argon2
+    - golang.org/x/crypto/blake2b
+    - golang.org/x/crypto/sha3
 
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-dependencies/GPL-3.0/.licensed.yml
 allowed:
