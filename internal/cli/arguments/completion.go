@@ -18,9 +18,9 @@ package arguments
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/core"
+	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/commands/lib"
 	"github.com/arduino/arduino-cli/commands/upload"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
@@ -52,7 +52,7 @@ func GetInstalledProtocols() []string {
 	inst := instance.CreateAndInit()
 
 	// FIXME: We must not access PackageManager directly here but use one of the commands.* functions
-	pme, release := commands.GetPackageManagerExplorer(inst)
+	pme, release := instances.GetPackageManagerExplorer(inst)
 	if pme == nil {
 		return nil // should never happen...
 	}
@@ -95,7 +95,7 @@ func GetInstalledProgrammers() []string {
 	list, _ := board.ListAll(context.Background(), listAllReq)
 
 	// FIXME: We must not access PackageManager directly here but use one of the commands.* functions
-	pme, release := commands.GetPackageManagerExplorer(inst)
+	pme, release := instances.GetPackageManagerExplorer(inst)
 	if pme == nil {
 		return nil // should never happen...
 	}

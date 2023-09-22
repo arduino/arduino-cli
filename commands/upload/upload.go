@@ -30,7 +30,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/globals"
 	"github.com/arduino/arduino-cli/arduino/serialutils"
 	"github.com/arduino/arduino-cli/arduino/sketch"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
@@ -50,7 +50,7 @@ func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsReques
 		return nil, &arduino.MissingPortProtocolError{}
 	}
 
-	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
+	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	defer release()
 
 	if pme == nil {
@@ -137,7 +137,7 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		return nil, &arduino.CantOpenSketchError{Cause: err}
 	}
 
-	pme, pmeRelease := commands.GetPackageManagerExplorer(req.GetInstance())
+	pme, pmeRelease := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

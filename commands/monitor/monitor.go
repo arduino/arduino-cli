@@ -24,7 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	pluggableMonitor "github.com/arduino/arduino-cli/arduino/monitor"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
@@ -61,7 +61,7 @@ func (p *PortProxy) Close() error {
 // Monitor opens a communication port. It returns a PortProxy to communicate with the port and a PortDescriptor
 // that describes the available configuration settings.
 func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggableMonitor.PortDescriptor, error) {
-	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
+	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, nil, &arduino.InvalidInstanceError{}
 	}

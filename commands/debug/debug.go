@@ -26,7 +26,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -45,7 +45,7 @@ var tr = i18n.Tr
 func Debug(ctx context.Context, req *rpc.GetDebugConfigRequest, inStream io.Reader, out io.Writer, interrupt <-chan os.Signal) (*rpc.DebugResponse, error) {
 
 	// Get debugging command line to run debugger
-	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
+	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

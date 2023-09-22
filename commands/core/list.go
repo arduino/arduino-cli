@@ -22,13 +22,14 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/internal/instances"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // PlatformList returns a list of installed platforms, optionally filtered by
 // those requiring an update.
 func PlatformList(req *rpc.PlatformListRequest) (*rpc.PlatformListResponse, error) {
-	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
+	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
