@@ -14,30 +14,30 @@ import (
 
 var tr = i18n.Tr
 
-// CoreInstance is an instance of the Arduino Core Services. The user can
+// coreInstance is an instance of the Arduino Core Services. The user can
 // instantiate as many as needed by providing a different configuration
 // for each one.
-type CoreInstance struct {
+type coreInstance struct {
 	pm *packagemanager.PackageManager
 	lm *librariesmanager.LibrariesManager
 }
 
 // coreInstancesContainer has methods to add an remove instances atomically.
 type coreInstancesContainer struct {
-	instances      map[int32]*CoreInstance
+	instances      map[int32]*coreInstance
 	instancesCount int32
 	instancesMux   sync.Mutex
 }
 
 // instances contains all the running Arduino Core Services instances
 var instances = &coreInstancesContainer{
-	instances:      map[int32]*CoreInstance{},
+	instances:      map[int32]*coreInstance{},
 	instancesCount: 1,
 }
 
 // GetInstance returns a CoreInstance for the given ID, or nil if ID
 // doesn't exist
-func (c *coreInstancesContainer) GetInstance(id int32) *CoreInstance {
+func (c *coreInstancesContainer) GetInstance(id int32) *coreInstance {
 	c.instancesMux.Lock()
 	defer c.instancesMux.Unlock()
 	return c.instances[id]
@@ -45,7 +45,7 @@ func (c *coreInstancesContainer) GetInstance(id int32) *CoreInstance {
 
 // AddAndAssignID saves the CoreInstance and assigns a unique ID to
 // retrieve it later
-func (c *coreInstancesContainer) AddAndAssignID(i *CoreInstance) int32 {
+func (c *coreInstancesContainer) AddAndAssignID(i *coreInstance) int32 {
 	c.instancesMux.Lock()
 	defer c.instancesMux.Unlock()
 	id := c.instancesCount
@@ -110,7 +110,7 @@ func SetLibraryManager(inst *rpc.Instance, lm *librariesmanager.LibrariesManager
 
 // Create a new *rpc.Instance ready to be initialized, supporting directories are also created.
 func Create(extraUserAgent ...string) (*rpc.Instance, error) {
-	instance := &CoreInstance{}
+	instance := &coreInstance{}
 
 	// Setup downloads directory
 	downloadsDir := configuration.DownloadsDir(configuration.Settings)
