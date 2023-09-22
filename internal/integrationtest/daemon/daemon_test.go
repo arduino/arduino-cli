@@ -17,6 +17,7 @@ package daemon_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"testing"
@@ -64,7 +65,7 @@ func TestArduinoCliDaemon(t *testing.T) {
 		go func() {
 			for {
 				msg, err := watcher.Recv()
-				if err == io.EOF {
+				if errors.Is(err, io.EOF) {
 					fmt.Println("Watcher EOF")
 					return
 				}
@@ -140,7 +141,7 @@ func TestDaemonCompileOptions(t *testing.T) {
 	require.NoError(t, err)
 	for {
 		msg, err := plInst.Recv()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 		require.NoError(t, err)
@@ -164,7 +165,7 @@ func TestDaemonCompileOptions(t *testing.T) {
 	require.NoError(t, err)
 	for {
 		msg, err := compile.Recv()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			require.FailNow(t, "Expected compilation failure", "compilation succeeded")
 			break
 		}
@@ -183,7 +184,7 @@ func TestDaemonCompileOptions(t *testing.T) {
 	analyzer := NewTaskProgressAnalyzer(t)
 	for {
 		msg, err := compile.Recv()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 		require.NoError(t, err)
@@ -216,7 +217,7 @@ func TestDaemonCompileAfterFailedLibInstall(t *testing.T) {
 	require.NoError(t, err)
 	for {
 		msg, err := compile.Recv()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			require.FailNow(t, "Expected compilation failure", "compilation succeeded")
 			break
 		}
@@ -282,7 +283,7 @@ func TestDaemonBundleLibInstall(t *testing.T) {
 		require.NoError(t, err)
 		for {
 			msg, err := instCl.Recv()
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			require.NoError(t, err)
@@ -312,7 +313,7 @@ func TestDaemonBundleLibInstall(t *testing.T) {
 		require.NoError(t, err)
 		for {
 			msg, err := instCl.Recv()
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			require.NoError(t, err)
@@ -346,7 +347,7 @@ func TestDaemonBundleLibInstall(t *testing.T) {
 		require.NoError(t, err)
 		for {
 			msg, err := uninstCl.Recv()
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			require.NoError(t, err)
@@ -385,7 +386,7 @@ func TestDaemonBundleLibInstall(t *testing.T) {
 		require.NoError(t, err)
 		for {
 			msg, err := instCl.Recv()
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				require.FailNow(t, "LibraryInstall is supposed to fail because builtin libraries directory is not set")
 			}
 			if err != nil {
@@ -422,7 +423,7 @@ func TestDaemonLibrariesRescanOnInstall(t *testing.T) {
 	require.NoError(t, err)
 	for {
 		_, err := instCl.Recv()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 		require.NoError(t, err)
@@ -455,7 +456,7 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 		require.NoError(t, err)
 		for {
 			_, err := plInst.Recv()
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			require.NoError(t, err)
@@ -555,7 +556,7 @@ func analyzeUpdateIndexClient(t *testing.T, cl commands.ArduinoCoreService_Updat
 	analyzer := NewDownloadProgressAnalyzer(t)
 	for {
 		msg, err := cl.Recv()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			return analyzer.Results, nil
 		}
 		if err != nil {
@@ -571,7 +572,7 @@ func analyzePlatformUpgradeClient(cl commands.ArduinoCoreService_PlatformUpgrade
 	var upgradeError error
 	for {
 		msg, err := cl.Recv()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 		if msg.GetPlatform() != nil {

@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -337,7 +338,7 @@ func (inst *ArduinoCLIInstance) Init(profile string, sketchPath string, respCB f
 	}
 	for {
 		msg, err := initClient.Recv()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			logCallf("<<< Init EOF\n")
 			return nil
 		}

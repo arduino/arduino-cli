@@ -194,7 +194,7 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 
 	for {
 		var msg discoveryMessage
-		if err := decoder.Decode(&msg); err == io.EOF {
+		if err := decoder.Decode(&msg); errors.Is(err, io.EOF) {
 			// This is fine, we exit gracefully
 			disc.statusMutex.Lock()
 			disc.state = Dead

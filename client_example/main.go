@@ -18,6 +18,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -353,7 +354,7 @@ func initInstance(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance) {
 	for {
 		res, err := stream.Recv()
 		// Server has finished sending
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 
@@ -389,7 +390,7 @@ func callUpdateIndex(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance
 		uiResp, err := uiRespStream.Recv()
 
 		// the server is done
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			log.Print("Update index done")
 			break
 		}
@@ -442,7 +443,7 @@ func callPlatformInstall(client rpc.ArduinoCoreServiceClient, instance *rpc.Inst
 		installResp, err := installRespStream.Recv()
 
 		// The server is done.
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			log.Printf("Install done")
 			break
 		}
@@ -496,7 +497,7 @@ func callPlatformUpgrade(client rpc.ArduinoCoreServiceClient, instance *rpc.Inst
 		upgradeResp, err := upgradeRespStream.Recv()
 
 		// The server is done.
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			log.Printf("Upgrade done")
 			break
 		}
@@ -569,7 +570,7 @@ func callCompile(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance) {
 		compResp, err := compRespStream.Recv()
 
 		// The server is done.
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			log.Print("Compilation done")
 			break
 		}
@@ -609,7 +610,7 @@ func callUpload(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance) {
 
 	for {
 		uplResp, err := uplRespStream.Recv()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			log.Printf("Upload done")
 			break
 		}
@@ -668,7 +669,7 @@ func callBoardListWatch(client rpc.ArduinoCoreServiceClient, instance *rpc.Insta
 	go func() {
 		for {
 			res, err := watchClient.Recv()
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				log.Print("closing board watch connection")
 				return
 			} else if err != nil {
@@ -708,7 +709,7 @@ func callPlatformUnInstall(client rpc.ArduinoCoreServiceClient, instance *rpc.In
 	// Loop and consume the server stream until all the operations are done.
 	for {
 		uninstallResp, err := uninstallRespStream.Recv()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			log.Print("Uninstall done")
 			break
 		}
@@ -734,7 +735,7 @@ func callUpdateLibraryIndex(client rpc.ArduinoCoreServiceClient, instance *rpc.I
 	// Loop and consume the server stream until all the operations are done.
 	for {
 		resp, err := libIdxUpdateStream.Recv()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			log.Print("Library index update done")
 			break
 		}
@@ -764,7 +765,7 @@ func callLibDownload(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance
 	// Loop and consume the server stream until all the operations are done.
 	for {
 		downloadResp, err := downloadRespStream.Recv()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			log.Print("Lib download done")
 			break
 		}
@@ -793,7 +794,7 @@ func callLibInstall(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance,
 
 	for {
 		installResp, err := installRespStream.Recv()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			log.Print("Lib install done")
 			break
 		}
@@ -826,7 +827,7 @@ func callLibInstallNoDeps(client rpc.ArduinoCoreServiceClient, instance *rpc.Ins
 
 	for {
 		installResp, err := installRespStream.Recv()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			log.Print("Lib install done")
 			break
 		}
@@ -855,7 +856,7 @@ func callLibUpgradeAll(client rpc.ArduinoCoreServiceClient, instance *rpc.Instan
 
 	for {
 		resp, err := libUpgradeAllRespStream.Recv()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			log.Printf("Lib upgrade all done")
 			break
 		}
@@ -939,7 +940,7 @@ func callLibUninstall(client rpc.ArduinoCoreServiceClient, instance *rpc.Instanc
 
 	for {
 		uninstallResp, err := libUninstallRespStream.Recv()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			log.Printf("Lib uninstall done")
 			break
 		}
