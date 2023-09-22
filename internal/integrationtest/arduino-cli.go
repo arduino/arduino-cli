@@ -34,6 +34,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 // FindRepositoryRootPath returns the repository root path
@@ -277,7 +278,7 @@ func (cli *ArduinoCLI) StartDaemon(verbose bool) string {
 	}
 	go copy(os.Stdout, stdout)
 	go copy(os.Stderr, stderr)
-	conn, err := grpc.Dial(cli.daemonAddr, grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.Dial(cli.daemonAddr, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	cli.t.NoError(err)
 	cli.daemonConn = conn
 	cli.daemonClient = commands.NewArduinoCoreServiceClient(conn)
