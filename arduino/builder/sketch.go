@@ -140,7 +140,7 @@ func (b *Builder) sketchCopyAdditionalFiles(buildPath *paths.Path, overrides map
 			sourceBytes = s
 		}
 
-		// tag each addtional file with the filename of the source it was copied from
+		// tag each additional file with the filename of the source it was copied from
 		sourceBytes = append([]byte("#line 1 "+cpp.QuoteString(file.String())+"\n"), sourceBytes...)
 
 		err = writeIfDifferent(sourceBytes, targetPath)

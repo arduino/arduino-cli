@@ -157,7 +157,7 @@ func (p *Process) Run() error {
 	return p.cmd.Run()
 }
 
-// SetEnvironment set the enviroment for the running process. Each entry is of the form "key=value".
+// SetEnvironment set the environment for the running process. Each entry is of the form "key=value".
 // System default environments will be wiped out.
 func (p *Process) SetEnvironment(values []string) {
 	p.cmd.Env = append([]string{}, values...)

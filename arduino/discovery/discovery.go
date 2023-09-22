@@ -32,7 +32,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// To work correctly a Pluggable Discovery must respect the state machine specifed on the documentation:
+// To work correctly a Pluggable Discovery must respect the state machine specified on the documentation:
 // https://arduino.github.io/arduino-cli/latest/pluggable-discovery-specification/#state-machine
 // States a PluggableDiscovery can be in
 const (
@@ -85,7 +85,7 @@ func (msg discoveryMessage) String() string {
 	return s
 }
 
-// Port containts metadata about a port to connect to a board.
+// Port contains metadata about a port to connect to a board.
 type Port struct {
 	Address       string          `json:"address"`
 	AddressLabel  string          `json:"label"`

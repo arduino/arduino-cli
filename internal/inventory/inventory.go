@@ -48,7 +48,7 @@ func Init(configPath string) error {
 	// Attempt to read config file
 	if err := Store.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			// If an error occurs during initalization of the store, just log it and recreate it from scratch.
+			// If an error occurs during initialization of the store, just log it and recreate it from scratch.
 			logrus.WithError(err).Error("Error loading inventory store")
 		}
 		if err := generateInstallationData(); err != nil {
