@@ -6,6 +6,7 @@ go 1.21
 replace github.com/mailru/easyjson => github.com/cmaglie/easyjson v0.8.1
 
 require (
+	github.com/ProtonMail/go-crypto v0.0.0-20230828082145-3c4c8a2d2371
 	github.com/arduino/go-paths-helper v1.9.0
 	github.com/arduino/go-properties-orderedmap v1.7.1
 	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b
@@ -37,7 +38,6 @@ require (
 	go.bug.st/relaxed-semver v0.10.2
 	go.bug.st/serial v1.3.2
 	go.bug.st/testifyjson v1.1.1
-	golang.org/x/crypto v0.7.0
 	golang.org/x/term v0.6.0
 	golang.org/x/text v0.8.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230526203410-71b5a4ffd15e
@@ -49,6 +49,7 @@ require (
 )
 
 require (
+	github.com/cloudflare/circl v1.3.3 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/creack/goselect v0.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -86,6 +87,7 @@ require (
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
+	golang.org/x/crypto v0.7.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
