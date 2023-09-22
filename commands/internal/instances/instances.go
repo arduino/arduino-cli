@@ -22,56 +22,18 @@ type coreInstance struct {
 	lm *librariesmanager.LibrariesManager
 }
 
-// coreInstancesContainer has methods to add an remove instances atomically.
-type coreInstancesContainer struct {
-	instances      map[int32]*coreInstance
-	instancesCount int32
-	instancesMux   sync.Mutex
-}
-
 // instances contains all the running Arduino Core Services instances
-var instances = &coreInstancesContainer{
-	instances:      map[int32]*coreInstance{},
-	instancesCount: 1,
-}
-
-// GetInstance returns a CoreInstance for the given ID, or nil if ID
-// doesn't exist
-func (c *coreInstancesContainer) GetInstance(id int32) *coreInstance {
-	c.instancesMux.Lock()
-	defer c.instancesMux.Unlock()
-	return c.instances[id]
-}
-
-// AddAndAssignID saves the CoreInstance and assigns a unique ID to
-// retrieve it later
-func (c *coreInstancesContainer) AddAndAssignID(i *coreInstance) int32 {
-	c.instancesMux.Lock()
-	defer c.instancesMux.Unlock()
-	id := c.instancesCount
-	c.instances[id] = i
-	c.instancesCount++
-	return id
-}
-
-// RemoveID removes the CoreInstance referenced by id. Returns true
-// if the operation is successful, or false if the CoreInstance does
-// not exist
-func (c *coreInstancesContainer) RemoveID(id int32) bool {
-	c.instancesMux.Lock()
-	defer c.instancesMux.Unlock()
-	if _, ok := c.instances[id]; !ok {
-		return false
-	}
-	delete(c.instances, id)
-	return true
-}
+var instances = map[int32]*coreInstance{}
+var instancesCount int32 = 1
+var instancesMux sync.Mutex
 
 // GetPackageManager returns a PackageManager. If the package manager is not found
 // (because the instance is invalid or has been destroyed), nil is returned.
 // Deprecated: use GetPackageManagerExplorer instead.
-func GetPackageManager(instance *rpc.Instance) *packagemanager.PackageManager {
-	i := instances.GetInstance(instance.GetId())
+func GetPackageManager(inst *rpc.Instance) *packagemanager.PackageManager {
+	instancesMux.Lock()
+	i := instances[inst.GetId()]
+	instancesMux.Unlock()
 	if i == nil {
 		return nil
 	}
@@ -90,8 +52,10 @@ func GetPackageManagerExplorer(req *rpc.Instance) (explorer *packagemanager.Expl
 }
 
 // GetLibraryManager returns the library manager for the given instance.
-func GetLibraryManager(req *rpc.Instance) *librariesmanager.LibrariesManager {
-	i := instances.GetInstance(req.GetId())
+func GetLibraryManager(inst *rpc.Instance) *librariesmanager.LibrariesManager {
+	instancesMux.Lock()
+	i := instances[inst.GetId()]
+	instancesMux.Unlock()
 	if i == nil {
 		return nil
 	}
@@ -100,11 +64,13 @@ func GetLibraryManager(req *rpc.Instance) *librariesmanager.LibrariesManager {
 
 // SetLibraryManager sets the library manager for the given instance.
 func SetLibraryManager(inst *rpc.Instance, lm *librariesmanager.LibrariesManager) bool {
-	coreInstance := instances.GetInstance(inst.GetId())
-	if coreInstance == nil {
+	instancesMux.Lock()
+	i := instances[inst.GetId()]
+	instancesMux.Unlock()
+	if i == nil {
 		return false
 	}
-	coreInstance.lm = lm
+	i.lm = lm
 	return true
 }
 
@@ -149,22 +115,30 @@ func Create(extraUserAgent ...string) (*rpc.Instance, error) {
 	)
 
 	// Save instance
-	instanceID := instances.AddAndAssignID(instance)
-	return &rpc.Instance{Id: instanceID}, nil
+	instancesMux.Lock()
+	id := instancesCount
+	instances[id] = instance
+	instancesCount++
+	instancesMux.Unlock()
+
+	return &rpc.Instance{Id: id}, nil
 }
 
 // IsValid returns true if the given instance is valid.
 func IsValid(inst *rpc.Instance) bool {
-	if inst == nil {
-		return false
-	}
-	return instances.GetInstance(inst.GetId()) != nil
+	instancesMux.Lock()
+	i := instances[inst.GetId()]
+	instancesMux.Unlock()
+	return i != nil
 }
 
 // Delete removes an instance.
 func Delete(inst *rpc.Instance) bool {
-	if inst == nil {
+	instancesMux.Lock()
+	defer instancesMux.Unlock()
+	if _, ok := instances[inst.GetId()]; !ok {
 		return false
 	}
-	return instances.RemoveID(inst.GetId())
+	delete(instances, inst.GetId())
+	return true
 }
