@@ -16,6 +16,7 @@
 package arguments
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -87,23 +88,23 @@ func (p *Port) GetPort(instance *rpc.Instance, defaultAddress, defaultProtocol s
 	}
 	logrus.WithField("port", address).Tracef("Upload port")
 
-	dm := pme.DiscoveryManager()
-	watcher, err := dm.Watch()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	watcher, err := board.Watch(ctx, &rpc.BoardListWatchRequest{Instance: instance})
 	if err != nil {
 		return nil, err
 	}
-	defer watcher.Close()
 
 	deadline := time.After(p.timeout.Get())
 	for {
 		select {
-		case portEvent := <-watcher.Feed():
-			if portEvent.Type != "add" {
+		case portEvent := <-watcher:
+			if portEvent.GetEventType() != "add" {
 				continue
 			}
-			port := portEvent.Port
-			if (protocol == "" || protocol == port.Protocol) && address == port.Address {
-				return port.ToRPC(), nil
+			port := portEvent.GetPort().GetPort()
+			if (protocol == "" || protocol == port.GetProtocol()) && address == port.GetAddress() {
+				return port, nil
 			}
 
 		case <-deadline:
