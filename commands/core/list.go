@@ -28,7 +28,7 @@ import (
 // PlatformList returns a list of installed platforms, optionally filtered by
 // those requiring an update.
 func PlatformList(req *rpc.PlatformListRequest) (*rpc.PlatformListResponse, error) {
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

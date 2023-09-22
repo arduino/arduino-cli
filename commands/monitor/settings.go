@@ -26,7 +26,7 @@ import (
 
 // EnumerateMonitorPortSettings returns a description of the configuration settings of a monitor port
 func EnumerateMonitorPortSettings(ctx context.Context, req *rpc.EnumerateMonitorPortSettingsRequest) (*rpc.EnumerateMonitorPortSettingsResponse, error) {
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

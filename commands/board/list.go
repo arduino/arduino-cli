@@ -203,7 +203,7 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardL
 // In case of errors partial results from discoveries that didn't fail
 // are returned.
 func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStartErrors []error, e error) {
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, nil, &arduino.InvalidInstanceError{}
 	}
@@ -258,7 +258,7 @@ func hasMatchingBoard(b *rpc.DetectedPort, fqbnFilter *cores.FQBN) bool {
 
 // Watch returns a channel that receives boards connection and disconnection events.
 func Watch(ctx context.Context, req *rpc.BoardListWatchRequest) (<-chan *rpc.BoardListWatchResponse, error) {
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

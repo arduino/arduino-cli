@@ -29,7 +29,7 @@ var tr = i18n.Tr
 
 // PlatformDownload FIXMEDOC
 func PlatformDownload(ctx context.Context, req *rpc.PlatformDownloadRequest, downloadCB rpc.DownloadProgressCB) (*rpc.PlatformDownloadResponse, error) {
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

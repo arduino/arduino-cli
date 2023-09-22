@@ -26,7 +26,7 @@ import (
 
 // ListProgrammersAvailableForUpload FIXMEDOC
 func ListProgrammersAvailableForUpload(ctx context.Context, req *rpc.ListProgrammersAvailableForUploadRequest) (*rpc.ListProgrammersAvailableForUploadResponse, error) {
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

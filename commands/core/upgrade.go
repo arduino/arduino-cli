@@ -29,7 +29,7 @@ import (
 // PlatformUpgrade FIXMEDOC
 func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformUpgradeResponse, error) {
 	upgrade := func() (*cores.PlatformRelease, error) {
-		pme, release := commands.GetPackageManagerExplorer(req)
+		pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
 		if pme == nil {
 			return nil, &arduino.InvalidInstanceError{}
 		}

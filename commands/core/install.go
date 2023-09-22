@@ -28,7 +28,7 @@ import (
 // PlatformInstall FIXMEDOC
 func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformInstallResponse, error) {
 	install := func() error {
-		pme, release := commands.GetPackageManagerExplorer(req)
+		pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
 		if pme == nil {
 			return &arduino.InvalidInstanceError{}
 		}

@@ -31,7 +31,7 @@ import (
 
 // LibrarySearch FIXMEDOC
 func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.LibrarySearchResponse, error) {
-	lm := commands.GetLibraryManager(req)
+	lm := commands.GetLibraryManager(req.GetInstance())
 	if lm == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

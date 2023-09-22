@@ -32,7 +32,7 @@ import (
 
 // LibraryInstall resolves the library dependencies, then downloads and installs the libraries into the install location.
 func LibraryInstall(ctx context.Context, req *rpc.LibraryInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
-	lm := commands.GetLibraryManager(req)
+	lm := commands.GetLibraryManager(req.GetInstance())
 	if lm == nil {
 		return &arduino.InvalidInstanceError{}
 	}
@@ -143,7 +143,7 @@ func installLibrary(lm *librariesmanager.LibrariesManager, libRelease *libraries
 
 // ZipLibraryInstall FIXMEDOC
 func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallRequest, taskCB rpc.TaskProgressCB) error {
-	lm := commands.GetLibraryManager(req)
+	lm := commands.GetLibraryManager(req.GetInstance())
 	if err := lm.InstallZipLib(ctx, paths.New(req.Path), req.Overwrite); err != nil {
 		return &arduino.FailedLibraryInstallError{Cause: err}
 	}
@@ -153,7 +153,7 @@ func ZipLibraryInstall(ctx context.Context, req *rpc.ZipLibraryInstallRequest, t
 
 // GitLibraryInstall FIXMEDOC
 func GitLibraryInstall(ctx context.Context, req *rpc.GitLibraryInstallRequest, taskCB rpc.TaskProgressCB) error {
-	lm := commands.GetLibraryManager(req)
+	lm := commands.GetLibraryManager(req.GetInstance())
 	if err := lm.InstallGitLib(req.Url, req.Overwrite); err != nil {
 		return &arduino.FailedLibraryInstallError{Cause: err}
 	}

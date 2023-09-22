@@ -50,7 +50,7 @@ func SupportedUserFields(ctx context.Context, req *rpc.SupportedUserFieldsReques
 		return nil, &arduino.MissingPortProtocolError{}
 	}
 
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
 	defer release()
 
 	if pme == nil {
@@ -137,7 +137,7 @@ func Upload(ctx context.Context, req *rpc.UploadRequest, outStream io.Writer, er
 		return nil, &arduino.CantOpenSketchError{Cause: err}
 	}
 
-	pme, pmeRelease := commands.GetPackageManagerExplorer(req)
+	pme, pmeRelease := commands.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

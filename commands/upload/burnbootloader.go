@@ -33,7 +33,7 @@ func BurnBootloader(ctx context.Context, req *rpc.BurnBootloaderRequest, outStre
 		WithField("programmer", req.GetProgrammer()).
 		Trace("BurnBootloader started", req.GetFqbn())
 
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

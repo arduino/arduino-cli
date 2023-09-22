@@ -28,7 +28,7 @@ import (
 // Details returns all details for a board including tools and HW identifiers.
 // This command basically gather al the information and translates it into the required grpc struct properties
 func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetailsResponse, error) {
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

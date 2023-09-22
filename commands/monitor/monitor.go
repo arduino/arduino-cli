@@ -61,7 +61,7 @@ func (p *PortProxy) Close() error {
 // Monitor opens a communication port. It returns a PortProxy to communicate with the port and a PortDescriptor
 // that describes the available configuration settings.
 func Monitor(ctx context.Context, req *rpc.MonitorRequest) (*PortProxy, *pluggableMonitor.PortDescriptor, error) {
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, nil, &arduino.InvalidInstanceError{}
 	}

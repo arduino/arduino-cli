@@ -35,7 +35,7 @@ import (
 
 // GetDebugConfig returns metadata to start debugging with the specified board
 func GetDebugConfig(ctx context.Context, req *rpc.GetDebugConfigRequest) (*rpc.GetDebugConfigResponse, error) {
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

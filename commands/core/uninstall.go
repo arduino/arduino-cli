@@ -37,7 +37,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 
 // platformUninstall is the implementation of platform unistaller
 func platformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, taskCB rpc.TaskProgressCB) error {
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return &arduino.InvalidInstanceError{}
 	}

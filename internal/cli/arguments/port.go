@@ -89,7 +89,7 @@ func (p *Port) GetPort(instance *rpc.Instance, defaultAddress, defaultProtocol s
 	logrus.WithField("port", address).Tracef("Upload port")
 
 	// FIXME: We must not access PackageManager directly here but use one of the commands.* functions
-	pme, release := commands.GetPackageManagerExplorer(&rpc.BoardListAllRequest{Instance: instance})
+	pme, release := commands.GetPackageManagerExplorer(instance)
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

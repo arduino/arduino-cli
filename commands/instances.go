@@ -102,8 +102,8 @@ func (c *coreInstancesContainer) RemoveID(id int32) bool {
 // GetPackageManager returns a PackageManager. If the package manager is not found
 // (because the instance is invalid or has been destroyed), nil is returned.
 // Deprecated: use GetPackageManagerExplorer instead.
-func GetPackageManager(instance rpc.InstanceCommand) *packagemanager.PackageManager {
-	i := instances.GetInstance(instance.GetInstance().GetId())
+func GetPackageManager(instance *rpc.Instance) *packagemanager.PackageManager {
+	i := instances.GetInstance(instance.GetId())
 	if i == nil {
 		return nil
 	}
@@ -113,7 +113,7 @@ func GetPackageManager(instance rpc.InstanceCommand) *packagemanager.PackageMana
 // GetPackageManagerExplorer returns a new package manager Explorer. The
 // explorer holds a read lock on the underlying PackageManager and it should
 // be released by calling the returned "release" function.
-func GetPackageManagerExplorer(req rpc.InstanceCommand) (explorer *packagemanager.Explorer, release func()) {
+func GetPackageManagerExplorer(req *rpc.Instance) (explorer *packagemanager.Explorer, release func()) {
 	pm := GetPackageManager(req)
 	if pm == nil {
 		return nil, nil
@@ -122,8 +122,8 @@ func GetPackageManagerExplorer(req rpc.InstanceCommand) (explorer *packagemanage
 }
 
 // GetLibraryManager returns the library manager for the given instance.
-func GetLibraryManager(req rpc.InstanceCommand) *librariesmanager.LibrariesManager {
-	i := instances.GetInstance(req.GetInstance().GetId())
+func GetLibraryManager(req *rpc.Instance) *librariesmanager.LibrariesManager {
+	i := instances.GetInstance(req.GetId())
 	if i == nil {
 		return nil
 	}
@@ -494,7 +494,7 @@ func Destroy(ctx context.Context, req *rpc.DestroyRequest) (*rpc.DestroyResponse
 // UpdateLibrariesIndex updates the library_index.json
 func UpdateLibrariesIndex(ctx context.Context, req *rpc.UpdateLibrariesIndexRequest, downloadCB rpc.DownloadProgressCB) error {
 	logrus.Info("Updating libraries index")
-	lm := GetLibraryManager(req)
+	lm := GetLibraryManager(req.GetInstance())
 	if lm == nil {
 		return &arduino.InvalidInstanceError{}
 	}

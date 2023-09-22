@@ -36,13 +36,13 @@ type installedLib struct {
 
 // LibraryList FIXMEDOC
 func LibraryList(ctx context.Context, req *rpc.LibraryListRequest) (*rpc.LibraryListResponse, error) {
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
 	defer release()
 
-	lm := commands.GetLibraryManager(req)
+	lm := commands.GetLibraryManager(req.GetInstance())
 	if lm == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

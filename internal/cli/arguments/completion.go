@@ -52,7 +52,7 @@ func GetInstalledProtocols() []string {
 	inst := instance.CreateAndInit()
 
 	// FIXME: We must not access PackageManager directly here but use one of the commands.* functions
-	pme, release := commands.GetPackageManagerExplorer(&rpc.BoardListAllRequest{Instance: inst})
+	pme, release := commands.GetPackageManagerExplorer(inst)
 	if pme == nil {
 		return nil // should never happen...
 	}
@@ -95,7 +95,7 @@ func GetInstalledProgrammers() []string {
 	list, _ := board.ListAll(context.Background(), listAllReq)
 
 	// FIXME: We must not access PackageManager directly here but use one of the commands.* functions
-	pme, release := commands.GetPackageManagerExplorer(listAllReq)
+	pme, release := commands.GetPackageManagerExplorer(inst)
 	if pme == nil {
 		return nil // should never happen...
 	}

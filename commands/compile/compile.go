@@ -57,13 +57,13 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 		exportBinaries = reqExportBinaries.Value
 	}
 
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}
 	defer release()
 
-	lm := commands.GetLibraryManager(req)
+	lm := commands.GetLibraryManager(req.GetInstance())
 	if lm == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

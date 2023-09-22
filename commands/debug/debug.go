@@ -45,7 +45,7 @@ var tr = i18n.Tr
 func Debug(ctx context.Context, req *rpc.GetDebugConfigRequest, inStream io.Reader, out io.Writer, interrupt <-chan os.Signal) (*rpc.DebugResponse, error) {
 
 	// Get debugging command line to run debugger
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

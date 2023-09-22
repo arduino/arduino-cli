@@ -31,7 +31,7 @@ import (
 // installed. Note that platforms that are not installed don't include boards' FQBNs.
 // If no search argument is used all boards are returned.
 func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchResponse, error) {
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := commands.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

@@ -25,7 +25,7 @@ import (
 
 // LibraryUpgradeAll upgrades all the available libraries
 func LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
-	lm := commands.GetLibraryManager(req)
+	lm := commands.GetLibraryManager(req.GetInstance())
 	if lm == nil {
 		return &arduino.InvalidInstanceError{}
 	}
@@ -43,7 +43,7 @@ func LibraryUpgradeAll(req *rpc.LibraryUpgradeAllRequest, downloadCB rpc.Downloa
 
 // LibraryUpgrade upgrades a library
 func LibraryUpgrade(ctx context.Context, req *rpc.LibraryUpgradeRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) error {
-	lm := commands.GetLibraryManager(req)
+	lm := commands.GetLibraryManager(req.GetInstance())
 	if lm == nil {
 		return &arduino.InvalidInstanceError{}
 	}
