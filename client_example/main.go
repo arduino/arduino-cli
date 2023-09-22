@@ -689,7 +689,7 @@ func callBoardListWatch(client rpc.ArduinoCoreServiceClient, instance *rpc.Insta
 	}()
 
 	// Watch for 10 seconds and then interrupts
-	timer := time.NewTicker(time.Duration(10 * time.Second))
+	timer := time.NewTicker(10 * time.Second)
 	<-timer.C
 }
 
