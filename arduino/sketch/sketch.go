@@ -158,12 +158,6 @@ func New(path *paths.Path) (*Sketch, error) {
 // supportedFiles reads all files recursively contained in Sketch and
 // filter out unneded or unsupported ones and returns them
 func (s *Sketch) supportedFiles() (*paths.PathList, error) {
-	files, err := s.FullPath.ReadDirRecursive()
-	if err != nil {
-		return nil, err
-	}
-	files.FilterOutDirs()
-	files.FilterOutHiddenFiles()
 	validExtensions := []string{}
 	for ext := range globals.MainFileValidExtensions {
 		validExtensions = append(validExtensions, ext)
@@ -171,9 +165,19 @@ func (s *Sketch) supportedFiles() (*paths.PathList, error) {
 	for ext := range globals.AdditionalFileValidExtensions {
 		validExtensions = append(validExtensions, ext)
 	}
-	files.FilterSuffix(validExtensions...)
-	return &files, nil
 
+	files, err := s.FullPath.ReadDirRecursiveFiltered(
+		nil,
+		paths.AndFilter(
+			paths.FilterOutPrefixes("."),
+			paths.FilterSuffixes(validExtensions...),
+			paths.FilterOutDirectories(),
+		),
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &files, nil
 }
 
 // GetProfile returns the requested profile or nil if the profile
