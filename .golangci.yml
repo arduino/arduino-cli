@@ -8,28 +8,36 @@ linters:
   disable-all: true
   # Enable specific linter
   enable:
+    # Nice to have
+    #- depguard
     #- errcheck
+    #- gocritic
+    #- thelper
     - errorlint
     - exportloopref
+    - forbidigo
     - gofmt
     - goimports
+    - gosec
     - gosimple
     - govet
-    - revive
-    - gosec
+    - ineffassign
     - misspell
+    - revive
     - staticcheck
+    - tenv
     - typecheck
     - unconvert
-    - ineffassign
-    - tenv
-    # Nice to have
-    #- thelper
-    #- depguard
-    #We have to dig deeper
-    #- gocritic
 
 linters-settings:
+  forbidigo:
+    forbid:
+      - p: ^(fmt\.Print(|f|ln)|print|println)$      # Optional message that gets included in error reports.
+        msg: in cli package use `feedback.*` instead
+      - p: (os\.(Stdout|Stderr|Stdin))(# )?
+        msg: in cli package use `feedback.*` instead
+    analyze-types: true
+
   revive:
     confidence: 0.8
     rules:
@@ -119,3 +127,10 @@ issues:
     - linters: [revive]
       path: internal/algorithms/channels.go
       text: "empty-block"
+
+    # Run linters only on specific path
+    - path-except: internal/cli/
+      linters:
+        - forbidigo
+    - path: internal/cli/feedback/
+      linters: [forbidigo]
