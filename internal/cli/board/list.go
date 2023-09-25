@@ -16,6 +16,7 @@
 package board
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -84,11 +85,10 @@ func runListCommand(watch bool, timeout int64, fqbn string) {
 }
 
 func watchList(inst *rpc.Instance) {
-	eventsChan, closeCB, err := board.Watch(&rpc.BoardListWatchRequest{Instance: inst})
+	eventsChan, err := board.Watch(context.Background(), &rpc.BoardListWatchRequest{Instance: inst})
 	if err != nil {
 		feedback.Fatal(tr("Error detecting boards: %v", err), feedback.ErrNetwork)
 	}
-	defer closeCB()
 
 	// This is done to avoid printing the header each time a new event is received
 	if feedback.GetFormat() == feedback.Text {

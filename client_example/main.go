@@ -657,16 +657,13 @@ func callBoardList(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance) 
 }
 
 func callBoardListWatch(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance) {
-	watchClient, err := client.BoardListWatch(context.Background())
+	req := &rpc.BoardListWatchRequest{Instance: instance}
+	watchClient, err := client.BoardListWatch(context.Background(), req)
 	if err != nil {
 		log.Fatalf("Board list watch error: %s\n", err)
 	}
 
 	// Start the watcher
-	watchClient.Send(&rpc.BoardListWatchRequest{
-		Instance: instance,
-	})
-
 	go func() {
 		for {
 			res, err := watchClient.Recv()
@@ -693,9 +690,6 @@ func callBoardListWatch(client rpc.ArduinoCoreServiceClient, instance *rpc.Insta
 	// Watch for 10 seconds and then interrupts
 	timer := time.NewTicker(time.Duration(10 * time.Second))
 	<-timer.C
-	watchClient.Send(&rpc.BoardListWatchRequest{
-		Interrupt: true,
-	})
 }
 
 func callPlatformUnInstall(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance) {

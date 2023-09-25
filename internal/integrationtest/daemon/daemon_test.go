@@ -27,6 +27,8 @@ import (
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/stretchr/testify/require"
 )
@@ -52,28 +54,34 @@ func TestArduinoCliDaemon(t *testing.T) {
 	require.NoError(t, err)
 	fmt.Printf("Got boardlist response with %d ports\n", len(boardListResp.GetPorts()))
 
+	// When the client closes the connection we expect that the streaming from the server closes.
 	testWatcher := func() {
 		// Run watcher
-		watcher, err := grpcInst.BoardListWatch()
-		require.NoError(t, err)
 		ctx, cancel := context.WithCancel(context.Background())
+		watcher, err := grpcInst.BoardListWatch(ctx)
+		require.NoError(t, err)
+		watcherCanceldCh := make(chan struct{})
 		go func() {
-			defer cancel()
 			for {
 				msg, err := watcher.Recv()
 				if err == io.EOF {
 					fmt.Println("Watcher EOF")
 					return
 				}
-				require.Empty(t, msg.Error, "Board list watcher returned an error")
+				if s, ok := status.FromError(err); ok && s.Code() == codes.Canceled {
+					fmt.Println("Watcher canceled")
+					watcherCanceldCh <- struct{}{}
+					return
+				}
 				require.NoError(t, err, "BoardListWatch grpc call returned an error")
-				fmt.Printf("WATCH> %v\n", msg)
+				require.Empty(t, msg.Error, "Board list watcher returned an error")
+				fmt.Printf("WATCH> %v %v\n", msg, err)
 			}
 		}()
 		time.Sleep(time.Second)
-		require.NoError(t, watcher.CloseSend())
+		cancel()
 		select {
-		case <-ctx.Done():
+		case <-watcherCanceldCh:
 			// all right!
 		case <-time.After(time.Second):
 			require.Fail(t, "BoardListWatch didn't close")

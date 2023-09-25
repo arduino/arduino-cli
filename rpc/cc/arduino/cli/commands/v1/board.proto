@@ -191,8 +191,6 @@ message BoardListAllResponse {
 message BoardListWatchRequest {
   // Arduino Core Service instance from the `Init` response.
   Instance instance = 1;
-  // Set this to true to stop the discovery process
-  bool interrupt = 2;
 }
 
 message BoardListWatchResponse {

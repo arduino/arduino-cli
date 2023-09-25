@@ -257,23 +257,22 @@ func hasMatchingBoard(b *rpc.DetectedPort, fqbnFilter *cores.FQBN) bool {
 }
 
 // Watch returns a channel that receives boards connection and disconnection events.
-// It also returns a callback function that must be used to stop and dispose the watch.
-func Watch(req *rpc.BoardListWatchRequest) (<-chan *rpc.BoardListWatchResponse, func(), error) {
+func Watch(ctx context.Context, req *rpc.BoardListWatchRequest) (<-chan *rpc.BoardListWatchResponse, error) {
 	pme, release := commands.GetPackageManagerExplorer(req)
 	if pme == nil {
-		return nil, nil, &arduino.InvalidInstanceError{}
+		return nil, &arduino.InvalidInstanceError{}
 	}
 	defer release()
 	dm := pme.DiscoveryManager()
 
 	watcher, err := dm.Watch()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		<-ctx.Done()
+		logrus.Trace("closed watch")
 		watcher.Close()
 	}()
 
@@ -301,5 +300,5 @@ func Watch(req *rpc.BoardListWatchRequest) (<-chan *rpc.BoardListWatchResponse, 
 		}
 	}()
 
-	return outChan, cancel, nil
+	return outChan, nil
 }
