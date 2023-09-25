@@ -166,8 +166,12 @@ func (s *Sketch) supportedFiles() (*paths.PathList, error) {
 		validExtensions = append(validExtensions, ext)
 	}
 
+	filterOutBuildPaths := func(p *paths.Path) bool {
+		return !p.Join("build.options.json").Exist()
+	}
+
 	files, err := s.FullPath.ReadDirRecursiveFiltered(
-		nil,
+		filterOutBuildPaths,
 		paths.AndFilter(
 			paths.FilterOutPrefixes("."),
 			paths.FilterSuffixes(validExtensions...),
