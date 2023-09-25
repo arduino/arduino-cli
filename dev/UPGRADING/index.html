@@ -277,6 +277,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0350" class="md-nav__link">
+    0.35.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.35.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1boardlistwatchrequest-command-request-has-been-changed" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.BoardListWatchRequest command request has been changed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1boardlistwatch-service-is-now-server-stream-only" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.BoardListWatch service is now server stream only.
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0340" class="md-nav__link">
     0.34.0
   </a>
@@ -2329,6 +2356,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0350" class="md-nav__link">
+    0.35.0
+  </a>
+  
+    <nav class="md-nav" aria-label="0.35.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1boardlistwatchrequest-command-request-has-been-changed" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.BoardListWatchRequest command request has been changed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-grpc-ccarduinoclicommandsv1boardlistwatch-service-is-now-server-stream-only" class="md-nav__link">
+    The gRPC cc.arduino.cli.commands.v1.BoardListWatch service is now server stream only.
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#0340" class="md-nav__link">
     0.34.0
   </a>
@@ -3324,6 +3378,26 @@
                 
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
+<h2 id="0350">0.35.0<a class="headerlink" href="#0350" title="Permanent link">&para;</a></h2>
+<h3 id="the-grpc-ccarduinoclicommandsv1boardlistwatchrequest-command-request-has-been-changed">The gRPC <code>cc.arduino.cli.commands.v1.BoardListWatchRequest</code> command request has been changed.<a class="headerlink" href="#the-grpc-ccarduinoclicommandsv1boardlistwatchrequest-command-request-has-been-changed" title="Permanent link">&para;</a></h3>
+<p>The gRPC message <code>BoardListWatchRequest</code> has been changed from:</p>
+<div class="highlight"><pre><span></span><code>message BoardListWatchRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+  // Set this to true to stop the discovery process
+  bool interrupt = 2;
+}
+</code></pre></div>
+<p>to</p>
+<div class="highlight"><pre><span></span><code>message BoardListWatchRequest {
+  // Arduino Core Service instance from the `Init` response.
+  Instance instance = 1;
+}
+</code></pre></div>
+<h3 id="the-grpc-ccarduinoclicommandsv1boardlistwatch-service-is-now-server-stream-only">The gRPC <code>cc.arduino.cli.commands.v1.BoardListWatch</code> service is now server stream only.<a class="headerlink" href="#the-grpc-ccarduinoclicommandsv1boardlistwatch-service-is-now-server-stream-only" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>  rpc BoardListWatch(BoardListWatchRequest)
+      returns (stream BoardListWatchResponse);
+</code></pre></div>
 <h2 id="0340">0.34.0<a class="headerlink" href="#0340" title="Permanent link">&para;</a></h2>
 <h3 id="the-grpc-ccarduinoclicommandsv1uploadrepsonse-command-response-has-been-changed">The gRPC <code>cc.arduino.cli.commands.v1.UploadRepsonse</code> command response has been changed.<a class="headerlink" href="#the-grpc-ccarduinoclicommandsv1uploadrepsonse-command-response-has-been-changed" title="Permanent link">&para;</a></h3>
 <p>Previously the <code>UploadResponse</code> was used only to stream the tool output:</p>
