@@ -24,6 +24,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/arduino/arduino-cli/commands/monitor"
 	"github.com/arduino/arduino-cli/configuration"
@@ -44,12 +45,13 @@ var tr = i18n.Tr
 // NewCommand created a new `monitor` command
 func NewCommand() *cobra.Command {
 	var (
-		raw      bool
-		portArgs arguments.Port
-		describe bool
-		configs  []string
-		quiet    bool
-		fqbn     arguments.Fqbn
+		raw       bool
+		portArgs  arguments.Port
+		describe  bool
+		configs   []string
+		quiet     bool
+		timestamp bool
+		fqbn      arguments.Fqbn
 	)
 	monitorCommand := &cobra.Command{
 		Use:   "monitor",
@@ -59,7 +61,7 @@ func NewCommand() *cobra.Command {
 			"  " + os.Args[0] + " monitor -p /dev/ttyACM0\n" +
 			"  " + os.Args[0] + " monitor -p /dev/ttyACM0 --describe",
 		Run: func(cmd *cobra.Command, args []string) {
-			runMonitorCmd(&portArgs, &fqbn, configs, describe, quiet, raw)
+			runMonitorCmd(&portArgs, &fqbn, configs, describe, timestamp, quiet, raw)
 		},
 	}
 	portArgs.AddToCommand(monitorCommand)
@@ -67,12 +69,13 @@ func NewCommand() *cobra.Command {
 	monitorCommand.Flags().BoolVar(&describe, "describe", false, tr("Show all the settings of the communication port."))
 	monitorCommand.Flags().StringSliceVarP(&configs, "config", "c", []string{}, tr("Configure communication port settings. The format is <ID>=<value>[,<ID>=<value>]..."))
 	monitorCommand.Flags().BoolVarP(&quiet, "quiet", "q", false, tr("Run in silent mode, show only monitor input and output."))
+	monitorCommand.Flags().BoolVar(&timestamp, "timestamp", false, tr("Timestamp each incoming line."))
 	fqbn.AddToCommand(monitorCommand)
 	monitorCommand.MarkFlagRequired("port")
 	return monitorCommand
 }
 
-func runMonitorCmd(portArgs *arguments.Port, fqbn *arguments.Fqbn, configs []string, describe, quiet, raw bool) {
+func runMonitorCmd(portArgs *arguments.Port, fqbn *arguments.Fqbn, configs []string, describe, timestamp, quiet, raw bool) {
 	instance := instance.CreateAndInit()
 	logrus.Info("Executing `arduino-cli monitor`")
 
@@ -160,6 +163,10 @@ func runMonitorCmd(portArgs *arguments.Port, fqbn *arguments.Fqbn, configs []str
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 
+	if timestamp {
+		ttyOut = newTimeStampWriter(ttyOut)
+	}
+
 	ctx, cancel := cleanup.InterruptableContext(context.Background())
 	if raw {
 		feedback.SetRawModeStdin()
@@ -240,4 +247,36 @@ func contains(s []string, searchterm string) bool {
 		}
 	}
 	return false
+}
+
+type timeStampWriter struct {
+	writer            io.Writer
+	sendTimeStampNext bool
+}
+
+func newTimeStampWriter(writer io.Writer) *timeStampWriter {
+	return &timeStampWriter{
+		writer:            writer,
+		sendTimeStampNext: true,
+	}
+}
+
+func (t *timeStampWriter) Write(p []byte) (int, error) {
+	written := 0
+	for _, b := range p {
+		if t.sendTimeStampNext {
+			_, err := t.writer.Write([]byte(time.Now().Format("[2006-01-02 15:04:05] ")))
+			if err != nil {
+				return written, err
+			}
+			t.sendTimeStampNext = false
+		}
+		n, err := t.writer.Write([]byte{b})
+		written += n
+		if err != nil {
+			return written, err
+		}
+		t.sendTimeStampNext = b == '\n'
+	}
+	return written, nil
 }
