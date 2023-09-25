@@ -80,7 +80,7 @@ tasks:
     dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
       - |
-        if ! which golint &>/dev/null; then
+        if ! which golangci-lint &>/dev/null; then
           echo "golangci-lint not installed or not in PATH. Please install: https://golangci-lint.run/usage/install/"
           exit 1
         fi
