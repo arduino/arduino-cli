@@ -243,10 +243,17 @@ func (b *Builder) ImportedLibraries() libraries.List {
 }
 
 // Preprocess fixdoc
-func (b *Builder) Preprocess() error {
+func (b *Builder) Preprocess() ([]byte, error) {
 	b.Progress.AddSubSteps(6)
 	defer b.Progress.RemoveSubSteps()
-	return b.preprocess()
+
+	if err := b.preprocess(); err != nil {
+		return nil, err
+	}
+
+	// Return arduino-preprocessed source
+	preprocessedSketch, err := b.sketchBuildPath.Join(b.sketch.MainFile.Base() + ".cpp").ReadFile()
+	return preprocessedSketch, err
 }
 
 func (b *Builder) preprocess() error {
@@ -302,13 +309,6 @@ func (b *Builder) preprocess() error {
 	}
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
-
-	// Output arduino-preprocessed source
-	preprocessedSketch, err := b.sketchBuildPath.Join(b.sketch.MainFile.Base() + ".cpp").ReadFile()
-	if err != nil {
-		return err
-	}
-	b.logger.WriteStdout(preprocessedSketch)
 
 	return nil
 }

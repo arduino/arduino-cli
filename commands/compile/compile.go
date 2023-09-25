@@ -240,11 +240,13 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 
 	if req.GetPreprocess() {
 		// Just output preprocessed source code and exit
-		compileErr := sketchBuilder.Preprocess()
-		if compileErr != nil {
-			compileErr = &arduino.CompileFailedError{Message: compileErr.Error()}
+		preprocessedSketch, err := sketchBuilder.Preprocess()
+		if err != nil {
+			err = &arduino.CompileFailedError{Message: err.Error()}
+			return r, err
 		}
-		return r, compileErr
+		_, err = outStream.Write(preprocessedSketch)
+		return r, err
 	}
 
 	defer func() {
