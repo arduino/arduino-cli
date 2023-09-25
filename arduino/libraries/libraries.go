@@ -106,7 +106,7 @@ func (library *Library) ToRPCLibrary() (*rpc.Library, error) {
 		return p.String()
 	}
 
-	// If the the "includes" property is empty or not included in the "library.properties" file
+	// If the "includes" property is empty or not included in the "library.properties" file
 	// we search for headers by reading the library files directly
 	headers := library.DeclaredHeaders()
 	if len(headers) == 0 {

@@ -63,7 +63,7 @@ func TestOutdatedUsingLibraryWithInvalidVersion(t *testing.T) {
 	_, _, err := cli.Run("update")
 	require.NoError(t, err)
 
-	// Install latest version of a library library
+	// Install latest version of a library
 	_, _, err = cli.Run("lib", "install", "WiFi101")
 	require.NoError(t, err)
 

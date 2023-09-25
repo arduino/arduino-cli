@@ -237,7 +237,7 @@ func TestCompileWithConflictingLibrariesInclude(t *testing.T) {
 }
 
 func TestCompileWithEsp32BundledLibraries(t *testing.T) {
-	// Some esp cores have have bundled libraries that are optimize for that architecture,
+	// Some esp cores have bundled libraries that are optimize for that architecture,
 	// it might happen that if the user has a library with the same name installed conflicts
 	// can ensue and the wrong library is used for compilation, thus it fails.
 	// This happens because for "historical" reasons these platform have their "name" key
@@ -283,7 +283,7 @@ func TestCompileWithEsp32BundledLibraries(t *testing.T) {
 }
 
 func TestCompileWithEsp8266BundledLibraries(t *testing.T) {
-	// Some esp cores have have bundled libraries that are optimize for that architecture,
+	// Some esp cores have bundled libraries that are optimize for that architecture,
 	// it might happen that if the user has a library with the same name installed conflicts
 	// can ensue and the wrong library is used for compilation, thus it fails.
 	// This happens because for "historical" reasons these platform have their "name" key
