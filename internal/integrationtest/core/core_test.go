@@ -464,7 +464,7 @@ func TestCoreListAllManuallyInstalledCore(t *testing.T) {
 	stdout, _, err := cli.Run("core", "list", "--all", "--format", "json")
 	require.NoError(t, err)
 	requirejson.NotEmpty(t, stdout)
-	len, err := strconv.Atoi(requirejson.Parse(t, stdout).Query("length").String())
+	length, err := strconv.Atoi(requirejson.Parse(t, stdout).Query("length").String())
 	require.NoError(t, err)
 
 	// Manually installs a core in sketchbooks hardware folder
@@ -479,7 +479,7 @@ func TestCoreListAllManuallyInstalledCore(t *testing.T) {
 	// Verifies manually installed core is shown
 	stdout, _, err = cli.Run("core", "list", "--all", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Len(t, stdout, len+1)
+	requirejson.Len(t, stdout, length+1)
 	requirejson.Contains(t, stdout, `[
 		{
 			"id": "arduino-beta-development:avr",
@@ -500,7 +500,7 @@ func TestCoreListUpdatableAllFlags(t *testing.T) {
 	stdout, _, err := cli.Run("core", "list", "--all", "--updatable", "--format", "json")
 	require.NoError(t, err)
 	requirejson.NotEmpty(t, stdout)
-	len, err := strconv.Atoi(requirejson.Parse(t, stdout).Query("length").String())
+	length, err := strconv.Atoi(requirejson.Parse(t, stdout).Query("length").String())
 	require.NoError(t, err)
 
 	// Manually installs a core in sketchbooks hardware folder
@@ -515,7 +515,7 @@ func TestCoreListUpdatableAllFlags(t *testing.T) {
 	// Verifies using both --updatable and --all flags --all takes precedence
 	stdout, _, err = cli.Run("core", "list", "--all", "--updatable", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Len(t, stdout, len+1)
+	requirejson.Len(t, stdout, length+1)
 	requirejson.Contains(t, stdout, `[
 		{
 			"id": "arduino-beta-development:avr",

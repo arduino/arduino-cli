@@ -48,9 +48,9 @@ func detectedBoards(t *testing.T, cli *integrationtest.ArduinoCLI) []board {
 	var boards []board
 	stdout, _, err := cli.Run("board", "list", "--format", "json")
 	require.NoError(t, err)
-	len, err := strconv.Atoi(requirejson.Parse(t, stdout).Query(".[] | .matching_boards | length").String())
+	length, err := strconv.Atoi(requirejson.Parse(t, stdout).Query(".[] | .matching_boards | length").String())
 	require.NoError(t, err)
-	for i := 0; i < len; i++ {
+	for i := 0; i < length; i++ {
 		fqbn := strings.Trim(requirejson.Parse(t, stdout).Query(".[] | .matching_boards | .["+fmt.Sprint(i)+"] | .fqbn").String(), "\"")
 		boards = append(boards, board{
 			address:      strings.Trim(requirejson.Parse(t, stdout).Query(".[] | .port | .address").String(), "\""),
@@ -69,10 +69,10 @@ func waitForBoard(t *testing.T, cli *integrationtest.ArduinoCLI) {
 	for time.Now().Unix() < timeEnd {
 		stdout, _, err := cli.Run("board", "list", "--format", "json")
 		require.NoError(t, err)
-		len, err := strconv.Atoi(requirejson.Parse(t, stdout).Query("length").String())
+		length, err := strconv.Atoi(requirejson.Parse(t, stdout).Query("length").String())
 		require.NoError(t, err)
 		numBoards := 0
-		for i := 0; i < len; i++ {
+		for i := 0; i < length; i++ {
 			numBoards, err = strconv.Atoi(requirejson.Parse(t, stdout).Query(".[] | .matching_boards | length").String())
 			require.NoError(t, err)
 			if numBoards > 0 {

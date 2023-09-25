@@ -267,7 +267,7 @@ func (cli *ArduinoCLI) StartDaemon(verbose bool) string {
 	cli.proc = cliProc
 	cli.daemonAddr = "127.0.0.1:50051"
 
-	copy := func(dst io.Writer, src io.Reader) {
+	_copy := func(dst io.Writer, src io.Reader) {
 		buff := make([]byte, 1024)
 		for {
 			n, err := src.Read(buff)
@@ -277,8 +277,8 @@ func (cli *ArduinoCLI) StartDaemon(verbose bool) string {
 			dst.Write([]byte(color.YellowString(string(buff[:n]))))
 		}
 	}
-	go copy(os.Stdout, stdout)
-	go copy(os.Stderr, stderr)
+	go _copy(os.Stdout, stdout)
+	go _copy(os.Stderr, stderr)
 	conn, err := grpc.Dial(cli.daemonAddr, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	cli.t.NoError(err)
 	cli.daemonConn = conn
