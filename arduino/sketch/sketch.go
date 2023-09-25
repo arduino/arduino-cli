@@ -54,7 +54,7 @@ func New(path *paths.Path) (*Sketch, error) {
 	} else if !exist {
 		return nil, fmt.Errorf("%s: %s", tr("no such file or directory"), path)
 	}
-	if _, validIno := globals.MainFileValidExtensions[path.Ext()]; validIno && !path.IsDir() {
+	if globals.MainFileValidExtensions[path.Ext()] && !path.IsDir() {
 		path = path.Parent()
 	}
 
@@ -121,7 +121,7 @@ func New(path *paths.Path) (*Sketch, error) {
 		f.Close()
 
 		ext := p.Ext()
-		if _, found := globals.MainFileValidExtensions[ext]; found {
+		if globals.MainFileValidExtensions[ext] {
 			if p.EqualsTo(mainFile) {
 				// The main file must not be included in the lists of other files
 				continue
@@ -132,7 +132,7 @@ func New(path *paths.Path) (*Sketch, error) {
 				sketch.OtherSketchFiles.Add(p)
 				sketch.RootFolderFiles.Add(p)
 			}
-		} else if _, found := globals.AdditionalFileValidExtensions[ext]; found {
+		} else if globals.AdditionalFileValidExtensions[ext] {
 			// If the user exported the compiles binaries to the Sketch "build" folder
 			// they would be picked up but we don't want them, so we skip them like so
 			if p.IsInsideDir(sketch.FullPath.Join("build")) {
@@ -158,12 +158,8 @@ func New(path *paths.Path) (*Sketch, error) {
 // supportedFiles reads all files recursively contained in Sketch and
 // filter out unneded or unsupported ones and returns them
 func (s *Sketch) supportedFiles() (*paths.PathList, error) {
-	validExtensions := []string{}
-	for ext := range globals.MainFileValidExtensions {
-		validExtensions = append(validExtensions, ext)
-	}
-	for ext := range globals.AdditionalFileValidExtensions {
-		validExtensions = append(validExtensions, ext)
+	filterValidExtensions := func(p *paths.Path) bool {
+		return globals.MainFileValidExtensions[p.Ext()] || globals.AdditionalFileValidExtensions[p.Ext()]
 	}
 
 	filterOutBuildPaths := func(p *paths.Path) bool {
@@ -174,7 +170,7 @@ func (s *Sketch) supportedFiles() (*paths.PathList, error) {
 		filterOutBuildPaths,
 		paths.AndFilter(
 			paths.FilterOutPrefixes("."),
-			paths.FilterSuffixes(validExtensions...),
+			filterValidExtensions,
 			paths.FilterOutDirectories(),
 		),
 	)

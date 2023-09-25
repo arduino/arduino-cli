@@ -752,7 +752,7 @@ func detectSketchNameFromBuildPath(buildPath *paths.Path) (string, error) {
 
 		// Sometimes we may have particular files like:
 		// Blink.ino.with_bootloader.bin
-		if _, ok := globals.MainFileValidExtensions[filepath.Ext(name)]; !ok {
+		if !globals.MainFileValidExtensions[filepath.Ext(name)] {
 			// just ignore those files
 			continue
 		}
