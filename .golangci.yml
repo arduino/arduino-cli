@@ -1,6 +1,6 @@
 run:
   timeout: 10m
-  go: '1.21'
+  go: "1.21"
   tests: true
 
 linters:
@@ -32,7 +32,7 @@ linters:
 linters-settings:
   forbidigo:
     forbid:
-      - p: ^(fmt\.Print(|f|ln)|print|println)$      # Optional message that gets included in error reports.
+      - p: ^(fmt\.Print(|f|ln)|print|println)$
         msg: in cli package use `feedback.*` instead
       - p: (os\.(Stdout|Stderr|Stdin))(# )?
         msg: in cli package use `feedback.*` instead
@@ -41,9 +41,9 @@ linters-settings:
   revive:
     confidence: 0.8
     rules:
-        #- name: error-return
-        #- name: unused-parameter
-        #- name: var-naming
+      #- name: error-return
+      #- name: unused-parameter
+      #- name: var-naming
       - name: blank-imports
       - name: context-as-argument
       - name: context-keys-type
