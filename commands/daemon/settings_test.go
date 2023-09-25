@@ -81,6 +81,13 @@ func TestMerge(t *testing.T) {
 	require.Equal(t, "", configuration.Settings.GetString("foo"))
 	require.Equal(t, false, configuration.Settings.GetBool("sketch.always_export_binaries"))
 
+	bulkSettings = `{"network": {}}`
+	res, err = svc.SettingsMerge(context.Background(), &rpc.SettingsMergeRequest{JsonData: bulkSettings})
+	require.NotNil(t, res)
+	require.NoError(t, err)
+
+	require.Equal(t, "", configuration.Settings.GetString("proxy"))
+
 	reset()
 }
 
