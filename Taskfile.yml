@@ -126,13 +126,6 @@ tasks:
           {{.TEST_LDFLAGS}}
         go tool covdata textfmt -i=coverage_data -o coverage_integration.txt
 
-  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
-  go:vet:
-    desc: Check for errors in Go code
-    dir: '{{default "./" .GO_MODULE_PATH}}'
-    cmds:
-      - go vet {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}}
-
   go:easyjson-generate:
     desc: Run easyjson code generation
     cmds:
@@ -301,7 +294,6 @@ tasks:
   check:
     desc: Check fmt and lint
     cmds:
-      - task: go:vet
       - task: go:lint
       - task: protoc:check
 

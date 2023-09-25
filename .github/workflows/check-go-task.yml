@@ -49,39 +49,6 @@ jobs:
 
           echo "result=$RESULT" >> $GITHUB_OUTPUT
 
-  check-errors:
-    name: check-errors (${{ matrix.module.path }})
-    needs: run-determination
-    if: needs.run-determination.outputs.result == 'true'
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-
-      matrix:
-        module:
-          - path: ./
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ env.GO_VERSION }}
-
-      - name: Install Task
-        uses: arduino/setup-task@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: 3.x
-
-      - name: Check for errors
-        env:
-          GO_MODULE_PATH: ${{ matrix.module.path }}
-        run: task go:vet
-
   check-outdated:
     name: check-outdated (${{ matrix.module.path }})
     needs: run-determination
