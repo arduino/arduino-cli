@@ -149,7 +149,7 @@ func (p *Port) Clone() *Port {
 	if p == nil {
 		return nil
 	}
-	var res Port = *p
+	res := *p
 	if p.Properties != nil {
 		res.Properties = p.Properties.Clone()
 	}

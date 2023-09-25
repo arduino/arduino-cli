@@ -43,7 +43,7 @@ const (
 	YAML
 )
 
-var formats map[string]OutputFormat = map[string]OutputFormat{
+var formats = map[string]OutputFormat{
 	"json":     JSON,
 	"jsonmini": MinifiedJSON,
 	"yaml":     YAML,
