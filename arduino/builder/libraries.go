@@ -202,14 +202,7 @@ func (b *Builder) compileLibrary(library *libraries.Library, includes []string) 
 			return nil, errors.WithStack(err)
 		}
 		if library.DotALinkage {
-			archiveFile, verboseInfo, err := utils.ArchiveCompiledFiles(
-				libraryBuildPath, paths.New(library.DirName+".a"), libObjectFiles, b.buildProperties,
-				b.onlyUpdateCompilationDatabase, b.logger.Verbose(),
-				b.logger.Stdout(), b.logger.Stderr(),
-			)
-			if b.logger.Verbose() {
-				b.logger.Info(string(verboseInfo))
-			}
+			archiveFile, err := b.archiveCompiledFiles(libraryBuildPath, paths.New(library.DirName+".a"), libObjectFiles)
 			if err != nil {
 				return nil, errors.WithStack(err)
 			}

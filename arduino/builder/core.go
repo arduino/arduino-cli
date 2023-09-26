@@ -134,13 +134,7 @@ func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 		return nil, nil, errors.WithStack(err)
 	}
 
-	archiveFile, verboseInfo, err := utils.ArchiveCompiledFiles(
-		b.coreBuildPath, paths.New("core.a"), coreObjectFiles, b.buildProperties,
-		b.onlyUpdateCompilationDatabase, b.logger.Verbose(), b.logger.Stdout(), b.logger.Stderr(),
-	)
-	if b.logger.Verbose() {
-		b.logger.Info(string(verboseInfo))
-	}
+	archiveFile, err := b.archiveCompiledFiles(b.coreBuildPath, paths.New("core.a"), coreObjectFiles)
 	if err != nil {
 		return nil, nil, errors.WithStack(err)
 	}
