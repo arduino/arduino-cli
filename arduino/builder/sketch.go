@@ -24,7 +24,6 @@ import (
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
-	"github.com/arduino/arduino-cli/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/go-paths-helper"
@@ -182,13 +181,10 @@ func (b *Builder) BuildSketch(includesFolders paths.PathList) error {
 		return errors.WithStack(err)
 	}
 
-	sketchObjectFiles, err := utils.CompileFiles(
-		b.sketchBuildPath, b.sketchBuildPath, b.buildProperties, includes,
-		b.onlyUpdateCompilationDatabase,
-		b.compilationDatabase,
-		b.jobs,
-		b.logger,
-		b.Progress,
+	sketchObjectFiles, err := b.compileFiles(
+		b.sketchBuildPath, b.sketchBuildPath,
+		false, /** recursive **/
+		includes,
 	)
 	if err != nil {
 		return errors.WithStack(err)
@@ -197,13 +193,10 @@ func (b *Builder) BuildSketch(includesFolders paths.PathList) error {
 	// The "src/" subdirectory of a sketch is compiled recursively
 	sketchSrcPath := b.sketchBuildPath.Join("src")
 	if sketchSrcPath.IsDir() {
-		srcObjectFiles, err := utils.CompileFilesRecursive(
-			sketchSrcPath, sketchSrcPath, b.buildProperties, includes,
-			b.onlyUpdateCompilationDatabase,
-			b.compilationDatabase,
-			b.jobs,
-			b.logger,
-			b.Progress,
+		srcObjectFiles, err := b.compileFiles(
+			sketchSrcPath, sketchSrcPath,
+			true, /** recursive **/
+			includes,
 		)
 		if err != nil {
 			return errors.WithStack(err)

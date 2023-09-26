@@ -71,13 +71,10 @@ func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 	var err error
 	variantObjectFiles := paths.NewPathList()
 	if variantFolder != nil && variantFolder.IsDir() {
-		variantObjectFiles, err = utils.CompileFilesRecursive(
-			variantFolder, b.coreBuildPath, b.buildProperties, includes,
-			b.onlyUpdateCompilationDatabase,
-			b.compilationDatabase,
-			b.jobs,
-			b.logger,
-			b.Progress,
+		variantObjectFiles, err = b.compileFiles(
+			variantFolder, b.coreBuildPath,
+			true, /** recursive **/
+			includes,
 		)
 		if err != nil {
 			return nil, nil, errors.WithStack(err)
@@ -122,13 +119,10 @@ func (b *Builder) compileCore() (*paths.Path, paths.PathList, error) {
 		}
 	}
 
-	coreObjectFiles, err := utils.CompileFilesRecursive(
-		coreFolder, b.coreBuildPath, b.buildProperties, includes,
-		b.onlyUpdateCompilationDatabase,
-		b.compilationDatabase,
-		b.jobs,
-		b.logger,
-		b.Progress,
+	coreObjectFiles, err := b.compileFiles(
+		coreFolder, b.coreBuildPath,
+		true, /** recursive **/
+		includes,
 	)
 	if err != nil {
 		return nil, nil, errors.WithStack(err)

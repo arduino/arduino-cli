@@ -1,0 +1,165 @@
+package builder
+
+import (
+	"fmt"
+	"runtime"
+	"strings"
+	"sync"
+
+	"github.com/arduino/arduino-cli/arduino/builder/internal/utils"
+	"github.com/arduino/arduino-cli/arduino/globals"
+	"github.com/arduino/go-paths-helper"
+	"github.com/pkg/errors"
+)
+
+func (b *Builder) compileFiles(
+	sourceDir *paths.Path,
+	buildPath *paths.Path,
+	recurse bool,
+	includes []string,
+) (paths.PathList, error) {
+	validExtensions := []string{}
+	for ext := range globals.SourceFilesValidExtensions {
+		validExtensions = append(validExtensions, ext)
+	}
+
+	sources, err := utils.FindFilesInFolder(sourceDir, recurse, validExtensions...)
+	if err != nil {
+		return nil, err
+	}
+
+	b.Progress.AddSubSteps(len(sources))
+	defer b.Progress.RemoveSubSteps()
+
+	objectFiles := paths.NewPathList()
+	var objectFilesMux sync.Mutex
+	if len(sources) == 0 {
+		return objectFiles, nil
+	}
+	var errorsList []error
+	var errorsMux sync.Mutex
+
+	queue := make(chan *paths.Path)
+	job := func(source *paths.Path) {
+		recipe := fmt.Sprintf("recipe%s.o.pattern", source.Ext())
+		if !b.buildProperties.ContainsKey(recipe) {
+			recipe = fmt.Sprintf("recipe%s.o.pattern", globals.SourceFilesValidExtensions[source.Ext()])
+		}
+		objectFile, err := b.compileFileWithRecipe(sourceDir, source, buildPath, includes, recipe)
+		if err != nil {
+			errorsMux.Lock()
+			errorsList = append(errorsList, err)
+			errorsMux.Unlock()
+		} else {
+			objectFilesMux.Lock()
+			objectFiles.Add(objectFile)
+			objectFilesMux.Unlock()
+		}
+	}
+
+	// Spawn jobs runners
+	var wg sync.WaitGroup
+	if b.jobs == 0 {
+		b.jobs = runtime.NumCPU()
+	}
+	for i := 0; i < b.jobs; i++ {
+		wg.Add(1)
+		go func() {
+			for source := range queue {
+				job(source)
+			}
+			wg.Done()
+		}()
+	}
+
+	// Feed jobs until error or done
+	for _, source := range sources {
+		errorsMux.Lock()
+		gotError := len(errorsList) > 0
+		errorsMux.Unlock()
+		if gotError {
+			break
+		}
+		queue <- source
+
+		b.Progress.CompleteStep()
+		b.Progress.PushProgress()
+	}
+	close(queue)
+	wg.Wait()
+	if len(errorsList) > 0 {
+		// output the first error
+		return nil, errors.WithStack(errorsList[0])
+	}
+	objectFiles.Sort()
+	return objectFiles, nil
+}
+
+// CompileFilesRecursive fixdoc
+func (b *Builder) compileFileWithRecipe(
+	sourcePath *paths.Path,
+	source *paths.Path,
+	buildPath *paths.Path,
+	includes []string,
+	recipe string,
+) (*paths.Path, error) {
+	properties := b.buildProperties.Clone()
+	properties.Set("compiler.warning_flags", properties.Get("compiler.warning_flags."+b.logger.WarningsLevel()))
+	properties.Set("includes", strings.Join(includes, " "))
+	properties.SetPath("source_file", source)
+	relativeSource, err := sourcePath.RelTo(source)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	depsFile := buildPath.Join(relativeSource.String() + ".d")
+	objectFile := buildPath.Join(relativeSource.String() + ".o")
+
+	properties.SetPath("object_file", objectFile)
+	err = objectFile.Parent().MkdirAll()
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	objIsUpToDate, err := utils.ObjFileIsUpToDate(source, objectFile, depsFile)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	command, err := utils.PrepareCommandForRecipe(properties, recipe, false)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	if b.compilationDatabase != nil {
+		b.compilationDatabase.Add(source, command)
+	}
+	if !objIsUpToDate && !b.onlyUpdateCompilationDatabase {
+		// Since this compile could be multithreaded, we first capture the command output
+		info, stdout, stderr, err := utils.ExecCommand(
+			b.logger.Verbose(),
+			b.logger.Stdout(),
+			b.logger.Stderr(),
+			command,
+			utils.Capture,
+			utils.Capture,
+		)
+		// and transfer all at once at the end...
+		if b.logger.Verbose() {
+			b.logger.Info(string(info))
+			b.logger.WriteStdout(stdout)
+		}
+		b.logger.WriteStderr(stderr)
+
+		// ...and then return the error
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+	} else if b.logger.Verbose() {
+		if objIsUpToDate {
+			b.logger.Info(tr("Using previously compiled file: %[1]s", objectFile))
+		} else {
+			b.logger.Info(tr("Skipping compile of: %[1]s", objectFile))
+		}
+	}
+
+	return objectFile, nil
+}

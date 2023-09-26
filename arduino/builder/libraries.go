@@ -190,13 +190,10 @@ func (b *Builder) compileLibrary(library *libraries.Library, includes []string) 
 	}
 
 	if library.Layout == libraries.RecursiveLayout {
-		libObjectFiles, err := utils.CompileFilesRecursive(
-			library.SourceDir, libraryBuildPath, b.buildProperties, includes,
-			b.onlyUpdateCompilationDatabase,
-			b.compilationDatabase,
-			b.jobs,
-			b.logger,
-			b.Progress,
+		libObjectFiles, err := b.compileFiles(
+			library.SourceDir, libraryBuildPath,
+			true, /** recursive **/
+			includes,
 		)
 		if err != nil {
 			return nil, errors.WithStack(err)
@@ -214,13 +211,10 @@ func (b *Builder) compileLibrary(library *libraries.Library, includes []string) 
 		if library.UtilityDir != nil {
 			includes = append(includes, cpp.WrapWithHyphenI(library.UtilityDir.String()))
 		}
-		libObjectFiles, err := utils.CompileFiles(
-			library.SourceDir, libraryBuildPath, b.buildProperties, includes,
-			b.onlyUpdateCompilationDatabase,
-			b.compilationDatabase,
-			b.jobs,
-			b.logger,
-			b.Progress,
+		libObjectFiles, err := b.compileFiles(
+			library.SourceDir, libraryBuildPath,
+			false, /** recursive **/
+			includes,
 		)
 		if err != nil {
 			return nil, errors.WithStack(err)
@@ -229,13 +223,10 @@ func (b *Builder) compileLibrary(library *libraries.Library, includes []string) 
 
 		if library.UtilityDir != nil {
 			utilityBuildPath := libraryBuildPath.Join("utility")
-			utilityObjectFiles, err := utils.CompileFiles(
-				library.UtilityDir, utilityBuildPath, b.buildProperties, includes,
-				b.onlyUpdateCompilationDatabase,
-				b.compilationDatabase,
-				b.jobs,
-				b.logger,
-				b.Progress,
+			utilityObjectFiles, err := b.compileFiles(
+				library.UtilityDir, utilityBuildPath,
+				false, /** recursive **/
+				includes,
 			)
 			if err != nil {
 				return nil, errors.WithStack(err)
