@@ -19,6 +19,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"os"
 	"sort"
 	"strings"
@@ -1220,6 +1221,28 @@ func buildWithCustomBuildPath(t *testing.T, env *integrationtest.Environment, cl
 		// Run build twice, to verify the build still works when the build directory is present at the start
 		_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(), sketchPath.String())
 		require.NoError(t, err)
+
+		// Run again a couple of times with a different build path, to verify that old build
+		// path is not copied back in the sketch build recursively.
+		// https://github.com/arduino/arduino-cli/issues/2266
+		secondBuildPath := sketchPath.Join("build2")
+		_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", secondBuildPath.String(), sketchPath.String())
+		require.NoError(t, err)
+		_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(), sketchPath.String())
+		require.NoError(t, err)
+		_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", secondBuildPath.String(), sketchPath.String())
+		require.NoError(t, err)
+		_, _, err = cli.Run("compile", "-b", "arduino:avr:uno", "--build-path", buildPath.String(), sketchPath.String())
+		require.NoError(t, err)
+
+		// Print build path content for debugging purposes
+		bp, _ := buildPath.ReadDirRecursive()
+		fmt.Println("Build path content:")
+		for _, file := range bp {
+			fmt.Println("> ", file.String())
+		}
+
+		require.False(t, buildPath.Join("sketch", "build2", "sketch").Exist())
 	})
 
 	t.Run("SameAsSektch", func(t *testing.T) {
