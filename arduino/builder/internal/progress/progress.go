@@ -53,10 +53,10 @@ func (p *Struct) RemoveSubSteps() {
 // CompleteStep fixdoc
 func (p *Struct) CompleteStep() {
 	p.Progress += p.StepAmount
+	p.pushProgress()
 }
 
-// PushProgress fixdoc
-func (p *Struct) PushProgress() {
+func (p *Struct) pushProgress() {
 	if p.callback != nil {
 		p.callback(&rpc.TaskProgress{
 			Percent:   p.Progress,

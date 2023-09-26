@@ -123,7 +123,6 @@ func (b *Builder) compileLibraries(libraries libraries.List, includes []string) 
 		objectFiles.AddAll(libraryObjectFiles)
 
 		b.Progress.CompleteStep()
-		b.Progress.PushProgress()
 	}
 
 	return objectFiles, nil

@@ -84,7 +84,6 @@ func (b *Builder) compileFiles(
 		queue <- source
 
 		b.Progress.CompleteStep()
-		b.Progress.PushProgress()
 	}
 	close(queue)
 	wg.Wait()

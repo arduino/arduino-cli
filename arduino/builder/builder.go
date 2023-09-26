@@ -273,19 +273,16 @@ func (b *Builder) preprocess() error {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.RunRecipe("recipe.hooks.prebuild", ".pattern", false); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.prepareSketchBuildPath(); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	b.logIfVerbose(false, tr("Detecting libraries used..."))
 	err := b.libsDetector.FindIncludes(
@@ -302,18 +299,15 @@ func (b *Builder) preprocess() error {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	b.warnAboutArchIncompatibleLibraries(b.libsDetector.ImportedLibraries())
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	b.logIfVerbose(false, tr("Generating function prototypes..."))
 	if err := b.preprocessSketch(b.libsDetector.IncludeFolders()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	return nil
 }
@@ -342,11 +336,9 @@ func (b *Builder) Build() error {
 
 	b.libsDetector.PrintUsedAndNotUsedLibraries(buildErr != nil)
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	b.printUsedLibraries(b.libsDetector.ImportedLibraries())
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if buildErr != nil {
 		return buildErr
@@ -355,13 +347,11 @@ func (b *Builder) Build() error {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.size(); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	return nil
 }
@@ -373,112 +363,94 @@ func (b *Builder) build() error {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.buildSketch(b.libsDetector.IncludeFolders()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.RunRecipe("recipe.hooks.sketch.postbuild", ".pattern", true); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	b.logIfVerbose(false, tr("Compiling libraries..."))
 	if err := b.RunRecipe("recipe.hooks.libraries.prebuild", ".pattern", false); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.removeUnusedCompiledLibraries(b.libsDetector.ImportedLibraries()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.buildLibraries(b.libsDetector.IncludeFolders(), b.libsDetector.ImportedLibraries()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.RunRecipe("recipe.hooks.libraries.postbuild", ".pattern", true); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	b.logIfVerbose(false, tr("Compiling core..."))
 	if err := b.RunRecipe("recipe.hooks.core.prebuild", ".pattern", false); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.buildCore(); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.RunRecipe("recipe.hooks.core.postbuild", ".pattern", true); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	b.logIfVerbose(false, tr("Linking everything together..."))
 	if err := b.RunRecipe("recipe.hooks.linking.prelink", ".pattern", false); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.link(); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.RunRecipe("recipe.hooks.linking.postlink", ".pattern", true); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.RunRecipe("recipe.hooks.objcopy.preobjcopy", ".pattern", false); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.RunRecipe("recipe.objcopy.", ".pattern", true); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.RunRecipe("recipe.hooks.objcopy.postobjcopy", ".pattern", true); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.mergeSketchWithBootloader(); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.RunRecipe("recipe.hooks.postbuild", ".pattern", true); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if b.compilationDatabase != nil {
 		b.compilationDatabase.SaveToFile()
