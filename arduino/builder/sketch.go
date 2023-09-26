@@ -173,8 +173,8 @@ func writeIfDifferent(source []byte, destPath *paths.Path) error {
 	return nil
 }
 
-// BuildSketch fixdoc
-func (b *Builder) BuildSketch(includesFolders paths.PathList) error {
+// buildSketch fixdoc
+func (b *Builder) buildSketch(includesFolders paths.PathList) error {
 	includes := f.Map(includesFolders.AsStrings(), cpp.WrapWithHyphenI)
 
 	if err := b.sketchBuildPath.MkdirAll(); err != nil {
@@ -208,8 +208,8 @@ func (b *Builder) BuildSketch(includesFolders paths.PathList) error {
 	return nil
 }
 
-// MergeSketchWithBootloader fixdoc
-func (b *Builder) MergeSketchWithBootloader() error {
+// mergeSketchWithBootloader fixdoc
+func (b *Builder) mergeSketchWithBootloader() error {
 	if b.onlyUpdateCompilationDatabase {
 		return nil
 	}

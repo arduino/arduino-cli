@@ -375,7 +375,7 @@ func (b *Builder) build() error {
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	if err := b.BuildSketch(b.libsDetector.IncludeFolders()); err != nil {
+	if err := b.buildSketch(b.libsDetector.IncludeFolders()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
@@ -468,7 +468,7 @@ func (b *Builder) build() error {
 	b.Progress.CompleteStep()
 	b.Progress.PushProgress()
 
-	if err := b.MergeSketchWithBootloader(); err != nil {
+	if err := b.mergeSketchWithBootloader(); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
