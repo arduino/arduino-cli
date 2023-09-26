@@ -16,33 +16,31 @@
 package globals
 
 var (
-	empty struct{}
-
 	// MainFileValidExtension is the extension that must be used for files in new sketches
 	MainFileValidExtension string = ".ino"
 
 	// MainFileValidExtensions lists valid extensions for a sketch file
-	MainFileValidExtensions = map[string]struct{}{
-		MainFileValidExtension: empty,
+	MainFileValidExtensions = map[string]bool{
+		MainFileValidExtension: true,
 		// .pde extension is deprecated and must not be used for new sketches
-		".pde": empty,
+		".pde": true,
 	}
 
 	// AdditionalFileValidExtensions lists any file extension the builder considers as valid
-	AdditionalFileValidExtensions = map[string]struct{}{
-		".h":    empty,
-		".c":    empty,
-		".hpp":  empty,
-		".hh":   empty,
-		".cpp":  empty,
-		".cxx":  empty,
-		".cc":   empty,
-		".S":    empty,
-		".adoc": empty,
-		".md":   empty,
-		".json": empty,
-		".tpp":  empty,
-		".ipp":  empty,
+	AdditionalFileValidExtensions = map[string]bool{
+		".h":    true,
+		".c":    true,
+		".hpp":  true,
+		".hh":   true,
+		".cpp":  true,
+		".cxx":  true,
+		".cc":   true,
+		".S":    true,
+		".adoc": true,
+		".md":   true,
+		".json": true,
+		".tpp":  true,
+		".ipp":  true,
 	}
 
 	// SourceFilesValidExtensions lists valid extensions for source files (no headers).
@@ -57,10 +55,10 @@ var (
 	}
 
 	// HeaderFilesValidExtensions lists valid extensions for header files
-	HeaderFilesValidExtensions = map[string]struct{}{
-		".h":   empty,
-		".hpp": empty,
-		".hh":  empty,
+	HeaderFilesValidExtensions = map[string]bool{
+		".h":   true,
+		".hpp": true,
+		".hh":  true,
 	}
 
 	// DefaultIndexURL is the default index url
