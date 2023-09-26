@@ -39,7 +39,7 @@ func TestPrintableCommand(t *testing.T) {
 		" \"specialchar-`~!@#$%^&*()-_=+[{]}\\\\|;:'\\\",<.>/?-argument\"" +
 		" \"arg   with spaces\" \"arg\twith\t\ttabs\"" +
 		" lastarg"
-	result := printableCommand(parts)
+	result := PrintableCommand(parts)
 	require.Equal(t, correct, result)
 }
 

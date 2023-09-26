@@ -27,6 +27,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/builder/internal/detector"
 	"github.com/arduino/arduino-cli/arduino/builder/internal/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/internal/progress"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
@@ -527,4 +528,18 @@ func (b *Builder) prepareCommandForRecipe(buildProperties *properties.Map, recip
 	}
 
 	return command, nil
+}
+
+func (b *Builder) execCommand(command *executils.Process) error {
+	if b.logger.Verbose() {
+		b.logger.Info(utils.PrintableCommand(command.GetArgs()))
+		command.RedirectStdoutTo(b.logger.Stdout())
+	}
+	command.RedirectStderrTo(b.logger.Stderr())
+
+	if err := command.Start(); err != nil {
+		return err
+	}
+
+	return command.Wait()
 }

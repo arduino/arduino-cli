@@ -1,7 +1,6 @@
 package builder
 
 import (
-	"github.com/arduino/arduino-cli/arduino/builder/internal/utils"
 	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
 )
@@ -52,11 +51,7 @@ func (b *Builder) archiveCompiledFiles(buildPath *paths.Path, archiveFile *paths
 			return nil, errors.WithStack(err)
 		}
 
-		verboseInfo, _, _, err := utils.ExecCommand(b.logger.Verbose(), b.logger.Stdout(), b.logger.Stderr(), command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
-		if b.logger.Verbose() {
-			b.logger.Info(string(verboseInfo))
-		}
-		if err != nil {
+		if err := b.execCommand(command); err != nil {
 			return nil, errors.WithStack(err)
 		}
 	}

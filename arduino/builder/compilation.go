@@ -1,6 +1,7 @@
 package builder
 
 import (
+	"bytes"
 	"fmt"
 	"runtime"
 	"strings"
@@ -133,21 +134,23 @@ func (b *Builder) compileFileWithRecipe(
 		b.compilationDatabase.Add(source, command)
 	}
 	if !objIsUpToDate && !b.onlyUpdateCompilationDatabase {
+		commandStdout, commandStderr := &bytes.Buffer{}, &bytes.Buffer{}
+		command.RedirectStdoutTo(commandStdout)
+		command.RedirectStderrTo(commandStderr)
+
+		if b.logger.Verbose() {
+			b.logger.Info(utils.PrintableCommand(command.GetArgs()))
+		}
 		// Since this compile could be multithreaded, we first capture the command output
-		info, stdout, stderr, err := utils.ExecCommand(
-			b.logger.Verbose(),
-			b.logger.Stdout(),
-			b.logger.Stderr(),
-			command,
-			utils.Capture,
-			utils.Capture,
-		)
+		if err := command.Start(); err != nil {
+			return nil, err
+		}
+		err := command.Wait()
 		// and transfer all at once at the end...
 		if b.logger.Verbose() {
-			b.logger.Info(string(info))
-			b.logger.WriteStdout(stdout)
+			b.logger.WriteStdout(commandStdout.Bytes())
 		}
-		b.logger.WriteStderr(stderr)
+		b.logger.WriteStderr(commandStderr.Bytes())
 
 		// ...and then return the error
 		if err != nil {

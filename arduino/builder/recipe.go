@@ -20,7 +20,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/builder/internal/utils"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -51,11 +50,7 @@ func (b *Builder) RunRecipe(prefix, suffix string, skipIfOnlyUpdatingCompilation
 			return nil
 		}
 
-		verboseInfo, _, _, err := utils.ExecCommand(b.logger.Verbose(), b.logger.Stdout(), b.logger.Stderr(), command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
-		if b.logger.Verbose() {
-			b.logger.Info(string(verboseInfo))
-		}
-		if err != nil {
+		if err := b.execCommand(command); err != nil {
 			return errors.WithStack(err)
 		}
 	}

@@ -18,7 +18,6 @@ package builder
 import (
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/builder/internal/utils"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/go-paths-helper"
 	"github.com/pkg/errors"
@@ -77,10 +76,7 @@ func (b *Builder) link() error {
 				return errors.WithStack(err)
 			}
 
-			if verboseInfo, _, _, err := utils.ExecCommand(b.logger.Verbose(), b.logger.Stdout(), b.logger.Stderr(), command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */); err != nil {
-				if b.logger.Verbose() {
-					b.logger.Info(string(verboseInfo))
-				}
+			if err := b.execCommand(command); err != nil {
 				return errors.WithStack(err)
 			}
 		}
@@ -101,12 +97,5 @@ func (b *Builder) link() error {
 		return err
 	}
 
-	verboseInfo, _, _, err := utils.ExecCommand(b.logger.Verbose(), b.logger.Stdout(), b.logger.Stderr(), command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
-	if b.logger.Verbose() {
-		b.logger.Info(string(verboseInfo))
-	}
-	if err != nil {
-		return err
-	}
-	return nil
+	return b.execCommand(command)
 }

@@ -16,13 +16,10 @@
 package utils
 
 import (
-	"bytes"
-	"io"
 	"os"
 	"strings"
 	"unicode"
 
-	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/go-paths-helper"
@@ -201,14 +198,6 @@ func FindFilesInFolder(dir *paths.Path, recurse bool, extensions ...string) (pat
 	return dir.ReadDir(fileFilter)
 }
 
-// nolint
-const (
-	Ignore        = 0 // Redirect to null
-	Show          = 1 // Show on stdout/stderr as normal
-	ShowIfVerbose = 2 // Show if verbose is set, Ignore otherwise
-	Capture       = 3 // Capture into buffer
-)
-
 func printableArgument(arg string) string {
 	if strings.ContainsAny(arg, "\"\\ \t") {
 		arg = strings.ReplaceAll(arg, "\\", "\\\\")
@@ -218,57 +207,15 @@ func printableArgument(arg string) string {
 	return arg
 }
 
-// Convert a command and argument slice back to a printable string.
+// PrintableCommand Convert a command and argument slice back to a printable string.
 // This adds basic escaping which is sufficient for debug output, but
 // probably not for shell interpretation. This essentially reverses
 // ParseCommandLine.
-func printableCommand(parts []string) string {
+func PrintableCommand(parts []string) string {
 	return strings.Join(f.Map(parts, printableArgument), " ")
 }
 
-// ExecCommand fixdoc
-func ExecCommand(
-	verbose bool,
-	stdoutWriter, stderrWriter io.Writer,
-	command *executils.Process, stdout int, stderr int,
-) ([]byte, []byte, []byte, error) {
-	verboseInfoBuf := &bytes.Buffer{}
-	if verbose {
-		verboseInfoBuf.WriteString(printableCommand(command.GetArgs()))
-	}
-
-	stdoutBuffer := &bytes.Buffer{}
-	if stdout == Capture {
-		command.RedirectStdoutTo(stdoutBuffer)
-	} else if stdout == Show || (stdout == ShowIfVerbose && verbose) {
-		if stdoutWriter != nil {
-			command.RedirectStdoutTo(stdoutWriter)
-		} else {
-			command.RedirectStdoutTo(os.Stdout)
-		}
-	}
-
-	stderrBuffer := &bytes.Buffer{}
-	if stderr == Capture {
-		command.RedirectStderrTo(stderrBuffer)
-	} else if stderr == Show || (stderr == ShowIfVerbose && verbose) {
-		if stderrWriter != nil {
-			command.RedirectStderrTo(stderrWriter)
-		} else {
-			command.RedirectStderrTo(os.Stderr)
-		}
-	}
-
-	err := command.Start()
-	if err != nil {
-		return verboseInfoBuf.Bytes(), nil, nil, errors.WithStack(err)
-	}
-
-	err = command.Wait()
-	return verboseInfoBuf.Bytes(), stdoutBuffer.Bytes(), stderrBuffer.Bytes(), errors.WithStack(err)
-}
-
-// DirContentIsOlderThan returns true if the content of the given directory is
+// DirContentIsOlderThan DirContentIsOlderThan returns true if the content of the given directory is
 // older than target file. If extensions are given, only the files with these
 // extensions are tested.
 func DirContentIsOlderThan(dir *paths.Path, target *paths.Path, extensions ...string) (bool, error) {
