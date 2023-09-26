@@ -39,7 +39,7 @@ func (b *Builder) RunRecipe(prefix, suffix string, skipIfOnlyUpdatingCompilation
 	for _, recipe := range recipes {
 		logrus.Debugf(fmt.Sprintf("Running recipe: %s", recipe))
 
-		command, err := utils.PrepareCommandForRecipe(properties, recipe, false)
+		command, err := b.prepareCommandForRecipe(properties, recipe, false)
 		if err != nil {
 			return errors.WithStack(err)
 		}

@@ -72,7 +72,7 @@ func (b *Builder) link() error {
 			properties.SetPath("archive_file_path", archive)
 			properties.SetPath("object_file", object)
 
-			command, err := utils.PrepareCommandForRecipe(properties, "recipe.ar.pattern", false)
+			command, err := b.prepareCommandForRecipe(properties, "recipe.ar.pattern", false)
 			if err != nil {
 				return errors.WithStack(err)
 			}
@@ -96,7 +96,7 @@ func (b *Builder) link() error {
 	properties.Set("archive_file_path", b.buildArtifacts.coreArchiveFilePath.String())
 	properties.Set("object_files", objectFileList)
 
-	command, err := utils.PrepareCommandForRecipe(properties, "recipe.c.combine.pattern", false)
+	command, err := b.prepareCommandForRecipe(properties, "recipe.c.combine.pattern", false)
 	if err != nil {
 		return err
 	}

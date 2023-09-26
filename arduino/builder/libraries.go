@@ -21,7 +21,6 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino/builder/cpp"
-	"github.com/arduino/arduino-cli/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/go-paths-helper"
@@ -68,7 +67,7 @@ func (b *Builder) findExpectedPrecompiledLibFolder(
 	// Add fpu specifications if they exist
 	// To do so, resolve recipe.cpp.o.pattern,
 	// search for -mfpu=xxx -mfloat-abi=yyy and add to a subfolder
-	command, _ := utils.PrepareCommandForRecipe(buildProperties, "recipe.cpp.o.pattern", true)
+	command, _ := b.prepareCommandForRecipe(buildProperties, "recipe.cpp.o.pattern", true)
 	fpuSpecs := ""
 	for _, el := range command.GetArgs() {
 		if strings.Contains(el, FpuCflag) {

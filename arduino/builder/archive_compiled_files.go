@@ -47,7 +47,7 @@ func (b *Builder) archiveCompiledFiles(buildPath *paths.Path, archiveFile *paths
 		properties.SetPath("archive_file_path", archiveFilePath)
 		properties.SetPath("object_file", objectFile)
 
-		command, err := utils.PrepareCommandForRecipe(properties, "recipe.ar.pattern", false)
+		command, err := b.prepareCommandForRecipe(properties, "recipe.ar.pattern", false)
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}

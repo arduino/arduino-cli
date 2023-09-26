@@ -125,7 +125,7 @@ func (b *Builder) compileFileWithRecipe(
 		return nil, errors.WithStack(err)
 	}
 
-	command, err := utils.PrepareCommandForRecipe(properties, recipe, false)
+	command, err := b.prepareCommandForRecipe(properties, recipe, false)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

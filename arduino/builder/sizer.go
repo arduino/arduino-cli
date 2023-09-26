@@ -72,7 +72,7 @@ func (b *Builder) size() error {
 }
 
 func (b *Builder) checkSizeAdvanced() (ExecutablesFileSections, error) {
-	command, err := utils.PrepareCommandForRecipe(b.buildProperties, "recipe.advanced_size.pattern", false)
+	command, err := b.prepareCommandForRecipe(b.buildProperties, "recipe.advanced_size.pattern", false)
 	if err != nil {
 		return nil, errors.New(tr("Error while determining sketch size: %s", err))
 	}
@@ -204,7 +204,7 @@ func (b *Builder) checkSize() (ExecutablesFileSections, error) {
 }
 
 func (b *Builder) execSizeRecipe(properties *properties.Map) (textSize int, dataSize int, eepromSize int, resErr error) {
-	command, err := utils.PrepareCommandForRecipe(properties, "recipe.size.pattern", false)
+	command, err := b.prepareCommandForRecipe(properties, "recipe.size.pattern", false)
 	if err != nil {
 		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)
 		return

@@ -19,6 +19,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/builder/internal/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/internal/detector"
@@ -28,6 +31,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/executils"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -479,4 +483,48 @@ func (b *Builder) build() error {
 		b.compilationDatabase.SaveToFile()
 	}
 	return nil
+}
+
+func (b *Builder) prepareCommandForRecipe(buildProperties *properties.Map, recipe string, removeUnsetProperties bool) (*executils.Process, error) {
+	pattern := buildProperties.Get(recipe)
+	if pattern == "" {
+		return nil, fmt.Errorf(tr("%[1]s pattern is missing"), recipe)
+	}
+
+	commandLine := buildProperties.ExpandPropsInString(pattern)
+	if removeUnsetProperties {
+		commandLine = properties.DeleteUnexpandedPropsFromString(commandLine)
+	}
+
+	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
+	if err != nil {
+		return nil, err
+	}
+
+	// if the overall commandline is too long for the platform
+	// try reducing the length by making the filenames relative
+	// and changing working directory to build.path
+	var relativePath string
+	if len(commandLine) > 30000 {
+		relativePath = buildProperties.Get("build.path")
+		for i, arg := range parts {
+			if _, err := os.Stat(arg); os.IsNotExist(err) {
+				continue
+			}
+			rel, err := filepath.Rel(relativePath, arg)
+			if err == nil && !strings.Contains(rel, "..") && len(rel) < len(arg) {
+				parts[i] = rel
+			}
+		}
+	}
+
+	command, err := executils.NewProcess(nil, parts...)
+	if err != nil {
+		return nil, err
+	}
+	if relativePath != "" {
+		command.SetDir(relativePath)
+	}
+
+	return command, nil
 }
