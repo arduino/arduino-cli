@@ -124,7 +124,7 @@ func getLatestRelease() string {
 	// Get redirected URL
 	location := res.Request.URL.String()
 
-	// The location header points to the the latest release of the CLI, it's supposed to be formatted like this:
+	// The location header points to the latest release of the CLI, it's supposed to be formatted like this:
 	// https://downloads.arduino.cc/arduino-cli/arduino-cli_0.18.3_Linux_64bit.tar.gz
 	// so we split it to get the version, if there are not enough splits something must have gone wrong.
 	split := strings.Split(location, "_")

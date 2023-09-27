@@ -277,7 +277,7 @@ func ExecCommand(
 	return verboseInfoBuf.Bytes(), stdoutBuffer.Bytes(), stderrBuffer.Bytes(), errors.WithStack(err)
 }
 
-// DirContentIsOlderThan DirContentIsOlderThan returns true if the content of the given directory is
+// DirContentIsOlderThan returns true if the content of the given directory is
 // older than target file. If extensions are given, only the files with these
 // extensions are tested.
 func DirContentIsOlderThan(dir *paths.Path, target *paths.Path, extensions ...string) (bool, error) {

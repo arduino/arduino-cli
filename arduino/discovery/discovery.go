@@ -32,7 +32,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// To work correctly a Pluggable Discovery must respect the state machine specifed on the documentation:
+// To work correctly a Pluggable Discovery must respect the state machine specified on the documentation:
 // https://arduino.github.io/arduino-cli/latest/pluggable-discovery-specification/#state-machine
 // States a PluggableDiscovery can be in
 const (
@@ -85,7 +85,7 @@ func (msg discoveryMessage) String() string {
 	return s
 }
 
-// Port containts metadata about a port to connect to a board.
+// Port contains metadata about a port to connect to a board.
 type Port struct {
 	Address       string          `json:"address"`
 	AddressLabel  string          `json:"label"`
@@ -149,7 +149,7 @@ func (p *Port) Clone() *Port {
 	if p == nil {
 		return nil
 	}
-	var res Port = *p
+	res := *p
 	if p.Properties != nil {
 		res.Properties = p.Properties.Clone()
 	}
@@ -194,7 +194,7 @@ func (disc *PluggableDiscovery) jsonDecodeLoop(in io.Reader, outChan chan<- *dis
 
 	for {
 		var msg discoveryMessage
-		if err := decoder.Decode(&msg); err == io.EOF {
+		if err := decoder.Decode(&msg); errors.Is(err, io.EOF) {
 			// This is fine, we exit gracefully
 			disc.statusMutex.Lock()
 			disc.state = Dead

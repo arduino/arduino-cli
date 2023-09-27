@@ -80,14 +80,12 @@ tasks:
     dir: '{{default "./" .GO_MODULE_PATH}}'
     cmds:
       - |
-        if ! which golint &>/dev/null; then
-          echo "golint not installed or not in PATH. Please install: https://github.com/golang/lint#installation"
+        if ! which golangci-lint &>/dev/null; then
+          echo "golangci-lint not installed or not in PATH. Please install: https://golangci-lint.run/usage/install/"
           exit 1
         fi
       - |
-        golint \
-          {{default "-min_confidence 0.8 -set_exit_status" .GO_LINT_FLAGS}} \
-          {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}}
+        golangci-lint run
 
   # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/test-go-task/Taskfile.yml
   go:test:
@@ -127,13 +125,6 @@ tasks:
           {{default .DEFAULT_INTEGRATIONTEST_GO_PACKAGES .GO_PACKAGES}} \
           {{.TEST_LDFLAGS}}
         go tool covdata textfmt -i=coverage_data -o coverage_integration.txt
-
-  # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-go-task/Taskfile.yml
-  go:vet:
-    desc: Check for errors in Go code
-    dir: '{{default "./" .GO_MODULE_PATH}}'
-    cmds:
-      - go vet {{default .DEFAULT_GO_PACKAGES .GO_PACKAGES}}
 
   go:easyjson-generate:
     desc: Run easyjson code generation
@@ -303,7 +294,6 @@ tasks:
   check:
     desc: Check fmt and lint
     cmds:
-      - task: go:vet
       - task: go:lint
       - task: protoc:check
 

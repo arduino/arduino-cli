@@ -412,7 +412,7 @@ func TestSketchArchiveOverwrite(t *testing.T) {
 	_, _, err = cli.Run("sketch", "archive", sketchPath.String())
 	require.NoError(t, err)
 
-	// It is not possibile to override an archive by default
+	// It is not possible to override an archive by default
 	_, stderr, err := cli.Run("sketch", "archive", sketchPath.String())
 	require.Error(t, err)
 	require.Contains(t, string(stderr), "Archive already exists")

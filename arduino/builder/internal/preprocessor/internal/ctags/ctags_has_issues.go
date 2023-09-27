@@ -206,78 +206,76 @@ func removeComments(text string, multilinecomment bool) (string, bool) {
 // FindCLinkageLines scans the source files searching for "extern C" context
 // It save the line numbers in a map filename -> {lines...}
 func (p *Parser) FindCLinkageLines(tags []*Tag) map[string][]int {
-
 	lines := make(map[string][]int)
 
 	for _, tag := range tags {
-
 		if lines[tag.Filename] != nil {
 			break
 		}
 
 		file, err := os.Open(tag.Filename)
-		if err == nil {
-			defer file.Close()
+		if err != nil {
+			continue
+		}
+		lines[tag.Filename] = append(lines[tag.Filename], -1)
 
-			lines[tag.Filename] = append(lines[tag.Filename], -1)
+		scanner := bufio.NewScanner(file)
 
-			scanner := bufio.NewScanner(file)
+		// we can't remove the comments otherwise the line number will be wrong
+		// there are three cases:
+		// 1 - extern "C" void foo()
+		// 2 - extern "C" {
+		//		void foo();
+		//		void bar();
+		//	}
+		// 3 - extern "C"
+		//	{
+		//		void foo();
+		//		void bar();
+		//	}
+		// case 1 and 2 can be simply recognized with string matching and indent level count
+		// case 3 needs specia attention: if the line ONLY contains `extern "C"` string, don't bail out on indent level = 0
 
-			// we can't remove the comments otherwise the line number will be wrong
-			// there are three cases:
-			// 1 - extern "C" void foo()
-			// 2 - extern "C" {
-			//		void foo();
-			//		void bar();
-			//	}
-			// 3 - extern "C"
-			//	{
-			//		void foo();
-			//		void bar();
-			//	}
-			// case 1 and 2 can be simply recognized with string matching and indent level count
-			// case 3 needs specia attention: if the line ONLY contains `extern "C"` string, don't bail out on indent level = 0
+		inScope := false
+		enteringScope := false
+		indentLevels := 0
+		line := 0
 
-			inScope := false
-			enteringScope := false
-			indentLevels := 0
-			line := 0
+		externCDecl := removeSpacesAndTabs(keywordExternC)
 
-			externCDecl := removeSpacesAndTabs(keywordExternC)
+		for scanner.Scan() {
+			line++
+			str := removeSpacesAndTabs(scanner.Text())
 
-			for scanner.Scan() {
-				line++
-				str := removeSpacesAndTabs(scanner.Text())
+			if len(str) == 0 {
+				continue
+			}
 
-				if len(str) == 0 {
-					continue
+			// check if we are on the first non empty line after externCDecl in case 3
+			if enteringScope {
+				enteringScope = false
+			}
+
+			// check if the line contains externCDecl
+			if strings.Contains(str, externCDecl) {
+				inScope = true
+				if len(str) == len(externCDecl) {
+					// case 3
+					enteringScope = true
 				}
+			}
+			if inScope {
+				lines[tag.Filename] = append(lines[tag.Filename], line)
+			}
+			indentLevels += strings.Count(str, "{") - strings.Count(str, "}")
 
-				// check if we are on the first non empty line after externCDecl in case 3
-				if enteringScope {
-					enteringScope = false
-				}
-
-				// check if the line contains externCDecl
-				if strings.Contains(str, externCDecl) {
-					inScope = true
-					if len(str) == len(externCDecl) {
-						// case 3
-						enteringScope = true
-					}
-				}
-				if inScope {
-					lines[tag.Filename] = append(lines[tag.Filename], line)
-				}
-				indentLevels += strings.Count(str, "{") - strings.Count(str, "}")
-
-				// Bail out if indentLevel is zero and we are not in case 3
-				if indentLevels == 0 && !enteringScope {
-					inScope = false
-				}
+			// Bail out if indentLevel is zero and we are not in case 3
+			if indentLevels == 0 && !enteringScope {
+				inScope = false
 			}
 		}
 
+		file.Close()
 	}
 	return lines
 }

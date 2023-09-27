@@ -17,6 +17,7 @@ package daemon_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"testing"
@@ -52,7 +53,7 @@ func TestArduinoCliDaemonCompileWithLotOfOutput(t *testing.T) {
 		msgCount := 0
 		for {
 			_, err := compile.Recv()
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			msgCount++

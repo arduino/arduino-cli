@@ -41,13 +41,13 @@ func TestCompileAndUploadRuntimeProperties(t *testing.T) {
 	_, _, err = cli.Run("core", "install", "arduino:avr")
 	require.NoError(t, err)
 
-	// Check compile runtime propeties expansion
+	// Check compile runtime properties expansion
 	bareMinimum := cli.CopySketch("bare_minimum")
 	stdout, _, err := cli.Run("compile", "--fqbn", "foo:avr:bar", "-v", bareMinimum.String())
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "PREBUILD-runtime.hardware.path="+sketchbookHardwareDir.String())
 
-	// Check upload runtime propeties expansion
+	// Check upload runtime properties expansion
 	stdout, _, err = cli.Run("upload", "--fqbn", "foo:avr:bar", bareMinimum.String())
 	require.NoError(t, err)
 	require.Contains(t, string(stdout), "UPLOAD-runtime.hardware.path="+sketchbookHardwareDir.String())

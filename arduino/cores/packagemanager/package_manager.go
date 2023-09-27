@@ -319,7 +319,7 @@ func (pme *Explorer) ResolveFQBN(fqbn *cores.FQBN) (
 	}
 
 	// Create the build properties map by overlaying the properties of the
-	// referenced platform propeties, the board platform properties and the
+	// referenced platform properties, the board platform properties and the
 	// board specific properties.
 	buildProperties := properties.NewMap()
 	buildProperties.Merge(variantPlatformRelease.Properties)

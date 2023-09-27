@@ -79,7 +79,7 @@ func (p *Port) GetPort(instance *rpc.Instance, defaultAddress, defaultProtocol s
 	if address == "" {
 		// If no address is provided we assume the user is trying to upload
 		// to a board that supports a tool that automatically detects
-		// the attached board without specifying explictly a port.
+		// the attached board without specifying explicitly a port.
 		// Tools that work this way must be specified using the property
 		// "BOARD_ID.upload.tool.default" in the platform's boards.txt.
 		return &rpc.Port{

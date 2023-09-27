@@ -62,7 +62,7 @@ func TestVersion(t *testing.T) {
 	switch version := jsonMap["VersionString"]; version {
 	case "git-snapshot":
 		require.Contains(t, version, "git-snapshot")
-	case "nigthly":
+	case "nightly":
 		require.Contains(t, version, "nightly")
 	default:
 		_, err = semver.Parse(version)

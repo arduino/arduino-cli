@@ -66,7 +66,7 @@ func TestBuilderDidNotCatchLibsFromUnusedPlatforms(t *testing.T) {
 	stdout, stderr, err := cli.Run("compile", "-b", "arduino:avr:uno", sketchPath.String())
 	require.Error(t, err)
 
-	// check that the libary resolver did not take the SAMD bundled Wire library into account
+	// check that the library resolver did not take the SAMD bundled Wire library into account
 	require.NotContains(t, string(stdout), "samd")
 	require.NotContains(t, string(stderr), "samd")
 }

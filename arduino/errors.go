@@ -830,7 +830,7 @@ func (e *SignatureVerificationFailedError) ToRPCStatus() *status.Status {
 
 // MultiplePlatformsError is returned when trying to detect
 // the Platform the user is trying to interact with and
-// and multiple results are found.
+// multiple results are found.
 type MultiplePlatformsError struct {
 	Platforms    []string
 	UserPlatform string

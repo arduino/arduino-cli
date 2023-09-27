@@ -17,7 +17,7 @@ package globals
 
 var (
 	// MainFileValidExtension is the extension that must be used for files in new sketches
-	MainFileValidExtension string = ".ino"
+	MainFileValidExtension = ".ino"
 
 	// MainFileValidExtensions lists valid extensions for a sketch file
 	MainFileValidExtensions = map[string]bool{
