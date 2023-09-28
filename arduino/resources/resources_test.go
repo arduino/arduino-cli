@@ -18,6 +18,7 @@ package resources
 import (
 	"crypto"
 	"encoding/hex"
+	"fmt"
 	"net"
 	"net/http"
 	"net/url"
@@ -147,4 +148,26 @@ func TestIndexDownloadAndSignatureWithinArchive(t *testing.T) {
 	require.Contains(t, err.Error(), "invalid signature")
 	require.False(t, invDestDir.Join("package_index.json").Exist())
 	require.False(t, invDestDir.Join("package_index.json.sig").Exist())
+}
+
+func TestIndexFileName(t *testing.T) {
+	tests := []struct {
+		url      string
+		expected string
+	}{
+		{url: "package_index.json", expected: "package_index.json"},
+		{url: "package_index.json.gz", expected: "package_index.json"},
+		{url: "package_index.tar.bz2", expected: "package_index.json"},
+		// https://github.com/arduino/arduino-cli/issues/2345
+		{url: "package_arduino.cc_index.json", expected: "package_arduino.cc_index.json"},
+		{url: "package_arduino.cc_index.json.gz", expected: "package_arduino.cc_index.json"},
+		{url: "package_arduino.cc_index.tar.bz2", expected: "package_arduino.cc_index.json"},
+		{url: "http://drazzy.com/package_drazzy.com_index.json", expected: "package_drazzy.com_index.json"},
+	}
+	for _, tc := range tests {
+		ir := IndexResource{URL: &url.URL{Path: tc.url}}
+		name, err := ir.IndexFileName()
+		require.NoError(t, err, fmt.Sprintf("error trying url: %v", tc))
+		require.Equal(t, tc.expected, name)
+	}
 }
