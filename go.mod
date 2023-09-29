@@ -38,7 +38,7 @@ require (
 	go.bug.st/relaxed-semver v0.11.0
 	go.bug.st/serial v1.6.1
 	go.bug.st/testifyjson v1.1.1
-	golang.org/x/term v0.8.0
+	golang.org/x/term v0.13.0
 	golang.org/x/text v0.9.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230526203410-71b5a4ffd15e
 	google.golang.org/grpc v1.55.0
@@ -86,7 +86,7 @@ require (
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
-	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
