@@ -15,13 +15,13 @@ require (
 	github.com/codeclysm/extract/v3 v3.1.1
 	github.com/djherbis/buffer v1.1.0
 	github.com/djherbis/nio/v3 v3.0.1
-	github.com/fatih/color v1.13.0
+	github.com/fatih/color v1.15.0
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/gofrs/uuid/v5 v5.0.0
 	github.com/leonelquinteros/gotext v1.4.0
 	github.com/mailru/easyjson v0.7.7
 	github.com/marcinbor85/gohex v0.0.0-20210308104911-55fb1c624d84
-	github.com/mattn/go-colorable v0.1.12
+	github.com/mattn/go-colorable v0.1.13
 	github.com/mattn/go-isatty v0.0.19
 	github.com/pkg/errors v0.9.1
 	github.com/pmylund/sortutil v0.0.0-20120526081524-abeda66eb583

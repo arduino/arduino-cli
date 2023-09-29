@@ -1,6 +1,6 @@
 ---
 name: github.com/mattn/go-colorable
-version: v0.1.12
+version: v0.1.13
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/mattn/go-colorable
