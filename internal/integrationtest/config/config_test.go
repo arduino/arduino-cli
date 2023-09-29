@@ -21,7 +21,7 @@ import (
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/stretchr/testify/require"
 	"go.bug.st/testifyjson/requirejson"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 func TestInit(t *testing.T) {

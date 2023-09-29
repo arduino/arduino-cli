@@ -26,7 +26,7 @@ import (
 
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 // OutputFormat is an output format

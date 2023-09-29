@@ -26,21 +26,23 @@ import (
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/go-paths-helper"
 	semver "go.bug.st/relaxed-semver"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 // Project represents the sketch project file
 type Project struct {
-	Profiles        Profiles `yaml:"profiles"`
-	DefaultProfile  string   `yaml:"default_profile"`
-	DefaultFqbn     string   `yaml:"default_fqbn"`
-	DefaultPort     string   `yaml:"default_port,omitempty"`
-	DefaultProtocol string   `yaml:"default_protocol,omitempty"`
+	ProfilesRaw     yaml.Node  `yaml:"profiles"`
+	Profiles        []*Profile `yaml:"-"`
+	DefaultProfile  string     `yaml:"default_profile"`
+	DefaultFqbn     string     `yaml:"default_fqbn"`
+	DefaultPort     string     `yaml:"default_port,omitempty"`
+	DefaultProtocol string     `yaml:"default_protocol,omitempty"`
 }
 
 // AsYaml outputs the sketch project file as YAML
 func (p *Project) AsYaml() string {
 	res := "profiles:\n"
+
 	for _, profile := range p.Profiles {
 		res += fmt.Sprintf("  %s:\n", profile.Name)
 		res += profile.AsYaml()
@@ -61,6 +63,23 @@ func (p *Project) AsYaml() string {
 	return res
 }
 
+func (p *Project) getProfiles() []*Profile {
+	profiles := []*Profile{}
+	for i, node := range p.ProfilesRaw.Content {
+		if node.Tag != "!!str" {
+			continue // Node is a map, so it is read out at key.
+		}
+
+		var profile Profile
+		profile.Name = node.Value
+		if err := p.ProfilesRaw.Content[i+1].Decode(&profile); err != nil {
+			panic(fmt.Sprintf("profiles parsing err: %v", err.Error()))
+		}
+		profiles = append(profiles, &profile)
+	}
+	return profiles
+}
+
 // Profiles are a list of Profile
 type Profiles []*Profile
 
@@ -71,18 +90,9 @@ func (p *Profiles) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		return err
 	}
 
-	var profilesData yaml.MapSlice
-	if err := unmarshal(&profilesData); err != nil {
-		return err
-	}
-
-	for _, profileData := range profilesData {
-		profileName, ok := profileData.Key.(string)
-		if !ok {
-			return fmt.Errorf("invalid profile name: %v", profileData.Key)
-		}
-		profile := unmarshaledProfiles[profileName]
-		profile.Name = profileName
+	for k, v := range unmarshaledProfiles {
+		profile := v
+		profile.Name = k
 		*p = append(*p, profile)
 	}
 
@@ -260,5 +270,7 @@ func LoadProjectFile(file *paths.Path) (*Project, error) {
 	if err := yaml.Unmarshal(data, &res); err != nil {
 		return nil, err
 	}
+	res.Profiles = res.getProfiles()
+
 	return res, nil
 }
