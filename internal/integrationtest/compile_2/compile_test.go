@@ -23,9 +23,9 @@ import (
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
 	"github.com/arduino/go-paths-helper"
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
 func TestCompilePart4(t *testing.T) {

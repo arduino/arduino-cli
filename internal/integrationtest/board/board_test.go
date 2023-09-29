@@ -22,11 +22,11 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/stretchr/testify/require"
 	semver "go.bug.st/relaxed-semver"
 	"go.bug.st/testifyjson/requirejson"
-	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
 func TestCorrectBoardListOrdering(t *testing.T) {

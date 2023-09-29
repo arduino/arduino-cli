@@ -46,6 +46,17 @@ reviewed:
     - golang.org/x/crypto/blake2b
     - golang.org/x/crypto/sha3
     - github.com/russross/blackfriday/v2
+    - github.com/go-git/gcfg
+    - github.com/go-git/gcfg/scanner
+    - github.com/go-git/gcfg/token
+    - github.com/go-git/gcfg/types
+    - golang.org/x/crypto/openpgp
+    - golang.org/x/crypto/openpgp/armor
+    - golang.org/x/crypto/openpgp/elgamal
+    - golang.org/x/crypto/openpgp/errors
+    - golang.org/x/crypto/openpgp/packet
+    - golang.org/x/crypto/openpgp/s2k
+    - golang.org/x/sys/execabs
 
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-dependencies/GPL-3.0/.licensed.yml
 allowed:
