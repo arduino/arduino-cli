@@ -1,17 +1,16 @@
 ---
-name: github.com/mitchellh/mapstructure
-version: v1.5.0
+name: github.com/pelletier/go-toml/v2/internal/tracker
+version: v2.0.8
 type: go
-summary: Package mapstructure exposes functionality to convert one arbitrary Go type
-  into another, typically to convert a map[string]interface{} into a native Go structure.
-homepage: https://pkg.go.dev/github.com/mitchellh/mapstructure
+summary: 
+homepage: https://pkg.go.dev/github.com/pelletier/go-toml/v2/internal/tracker
 license: mit
 licenses:
-- sources: LICENSE
+- sources: v2@v2.0.8/LICENSE
   text: |
     The MIT License (MIT)
 
-    Copyright (c) 2013 Mitchell Hashimoto
+    Copyright (c) 2013 - 2022 Thomas Pelletier, Eric Anderton
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -20,14 +19,16 @@ licenses:
     copies of the Software, and to permit persons to whom the Software is
     furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in
-    all copies or substantial portions of the Software.
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
 
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-    THE SOFTWARE.
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+- sources: v2@v2.0.8/README.md
+  text: The MIT License (MIT). Read [LICENSE](LICENSE).
 notices: []

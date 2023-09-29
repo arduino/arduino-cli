@@ -1,60 +1,14 @@
 ---
-name: github.com/pelletier/go-toml
-version: v1.9.3
+name: github.com/spf13/afero/internal/common
+version: v1.9.5
 type: go
-summary: Package toml is a TOML parser and manipulation library.
-homepage: https://pkg.go.dev/github.com/pelletier/go-toml
-license: mit
+summary: 
+homepage: https://pkg.go.dev/github.com/spf13/afero/internal/common
+license: apache-2.0
 licenses:
-- sources: LICENSE
-  text: |
-    The bulk of github.com/pelletier/go-toml is distributed under the MIT license
-    (see below), with the exception of localtime.go and localtime.test.go.
-    Those two files have been copied over from Google's civil library at revision
-    ed46f5086358513cf8c25f8e3f022cb838a49d66, and are distributed under the Apache
-    2.0 license (see below).
-
-
-    github.com/pelletier/go-toml:
-
-
-    The MIT License (MIT)
-
-    Copyright (c) 2013 - 2021 Thomas Pelletier, Eric Anderton
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
-
-
-    localtime.go, localtime_test.go:
-
-    Originals:
-        https://raw.githubusercontent.com/googleapis/google-cloud-go/ed46f5086358513cf8c25f8e3f022cb838a49d66/civil/civil.go
-        https://raw.githubusercontent.com/googleapis/google-cloud-go/ed46f5086358513cf8c25f8e3f022cb838a49d66/civil/civil_test.go
-    Changes:
-        * Renamed files from civil* to localtime*.
-        * Package changed from civil to toml.
-        * 'Local' prefix added to all structs.
-    License:
-        https://raw.githubusercontent.com/googleapis/google-cloud-go/ed46f5086358513cf8c25f8e3f022cb838a49d66/LICENSE
-
-
-                                     Apache License
+- sources: afero@v1.9.5/LICENSE.txt
+  text: |2
+                                    Apache License
                                Version 2.0, January 2004
                             http://www.apache.org/licenses/
 
@@ -228,33 +182,8 @@ licenses:
           defend, and hold each Contributor harmless for any liability
           incurred by, or claims asserted against, such Contributor by reason
           of your accepting any such warranty or additional liability.
-
-       END OF TERMS AND CONDITIONS
-
-       APPENDIX: How to apply the Apache License to your work.
-
-          To apply the Apache License to your work, attach the following
-          boilerplate notice, with the fields enclosed by brackets "[]"
-          replaced with your own identifying information. (Don't include
-          the brackets!)  The text should be enclosed in the appropriate
-          comment syntax for the file format. We also recommend that a
-          file or class name and description of purpose be included on the
-          same "printed page" as the copyright notice for easier
-          identification within third-party archives.
-
-       Copyright [yyyy] [name of copyright owner]
-
-       Licensed under the Apache License, Version 2.0 (the "License");
-       you may not use this file except in compliance with the License.
-       You may obtain a copy of the License at
-
-           http://www.apache.org/licenses/LICENSE-2.0
-
-       Unless required by applicable law or agreed to in writing, software
-       distributed under the License is distributed on an "AS IS" BASIS,
-       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-       See the License for the specific language governing permissions and
-       limitations under the License.
-- sources: README.md
-  text: The MIT License (MIT) + Apache 2.0. Read [LICENSE](LICENSE).
+- sources: afero@v1.9.5/README.md
+  text: |-
+    Afero is released under the Apache 2.0 license. See
+    [LICENSE.txt](https://github.com/spf13/afero/blob/master/LICENSE.txt)
 notices: []
