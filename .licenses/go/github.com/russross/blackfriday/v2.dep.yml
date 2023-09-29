@@ -1,10 +1,10 @@
 ---
 name: github.com/russross/blackfriday/v2
-version: v2.0.1
+version: v2.1.0
 type: go
 summary: Package blackfriday is a markdown processor.
 homepage: https://pkg.go.dev/github.com/russross/blackfriday/v2
-license: bsd-2-clause
+license: other
 licenses:
 - sources: LICENSE.txt
   text: |
@@ -45,7 +45,11 @@ licenses:
        [1]: https://daringfireball.net/projects/markdown/ "Markdown"
        [2]: https://golang.org/ "Go Language"
        [3]: https://github.com/vmg/sundown "Sundown"
-       [4]: https://godoc.org/gopkg.in/russross/blackfriday.v2#Parse "Parse func"
+       [4]: https://pkg.go.dev/github.com/russross/blackfriday/v2#Parse "Parse func"
        [5]: https://github.com/microcosm-cc/bluemonday "Bluemonday"
-       [6]: https://labix.org/gopkg.in "gopkg.in"
+
+       [BuildV2SVG]: https://travis-ci.org/russross/blackfriday.svg?branch=v2
+       [BuildV2URL]: https://travis-ci.org/russross/blackfriday
+       [PkgGoDevV2SVG]: https://pkg.go.dev/badge/github.com/russross/blackfriday/v2
+       [PkgGoDevV2URL]: https://pkg.go.dev/github.com/russross/blackfriday/v2
 notices: []
