@@ -51,6 +51,8 @@ var (
 
 // NewCommand created a new `upload` command
 func NewCommand() *cobra.Command {
+	var uploadFields []string
+	var parsedUploadFields map[string]string
 	uploadCommand := &cobra.Command{
 		Use:     "upload",
 		Short:   tr("Upload Arduino sketches."),
@@ -59,8 +61,20 @@ func NewCommand() *cobra.Command {
 		Args:    cobra.MaximumNArgs(1),
 		PreRun: func(cmd *cobra.Command, args []string) {
 			arguments.CheckFlagsConflicts(cmd, "input-file", "input-dir")
+			if len(uploadFields) > 0 {
+				parsedUploadFields = map[string]string{}
+				for _, field := range uploadFields {
+					split := strings.SplitN(field, "=", 2)
+					if len(split) != 2 {
+						feedback.Fatal(tr("Invalid upload field: %s", field), feedback.ErrBadArgument)
+					}
+					parsedUploadFields[split[0]] = split[1]
+				}
+			}
 		},
-		Run: runUploadCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runUploadCommand(args, parsedUploadFields)
+		},
 	}
 
 	fqbnArg.AddToCommand(uploadCommand)
@@ -73,10 +87,11 @@ func NewCommand() *cobra.Command {
 	programmer.AddToCommand(uploadCommand)
 	uploadCommand.Flags().BoolVar(&dryRun, "dry-run", false, tr("Do not perform the actual upload, just log out actions"))
 	uploadCommand.Flags().MarkHidden("dry-run")
+	uploadCommand.Flags().StringArrayVar(&uploadFields, "upload-field", uploadFields, tr("Set a value for a field required to upload.")+" (field=value)")
 	return uploadCommand
 }
 
-func runUploadCommand(command *cobra.Command, args []string) {
+func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 	logrus.Info("Executing `arduino-cli upload`")
 
 	path := ""
@@ -147,12 +162,24 @@ func runUploadCommand(command *cobra.Command, args []string) {
 
 	fields := map[string]string{}
 	if len(userFieldRes.UserFields) > 0 {
-		feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", port.Protocol))
-		if f, err := arguments.AskForUserFields(userFieldRes.UserFields); err != nil {
-			msg := fmt.Sprintf("%s: %s", tr("Error getting user input"), err)
-			feedback.Fatal(msg, feedback.ErrGeneric)
+		if len(uploadFieldsArgs) > 0 {
+			// If the user has specified some fields via cmd-line, we don't ask for them
+			for _, field := range userFieldRes.UserFields {
+				if value, ok := uploadFieldsArgs[field.Name]; ok {
+					fields[field.Name] = value
+				} else {
+					feedback.Fatal(tr("Missing required upload field: %s", field.Name), feedback.ErrBadArgument)
+				}
+			}
 		} else {
-			fields = f
+			// Otherwise prompt the user for them
+			feedback.Print(tr("Uploading to specified board using %s protocol requires the following info:", port.Protocol))
+			if f, err := arguments.AskForUserFields(userFieldRes.UserFields); err != nil {
+				msg := fmt.Sprintf("%s: %s", tr("Error getting user input"), err)
+				feedback.Fatal(msg, feedback.ErrGeneric)
+			} else {
+				fields = f
+			}
 		}
 	}
 
