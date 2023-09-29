@@ -1,12 +1,12 @@
 ---
 name: github.com/djherbis/buffer/limio
-version: v1.1.0
+version: v1.2.0
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/djherbis/buffer/limio
 license: mit
 licenses:
-- sources: buffer@v1.1.0/LICENSE.txt
+- sources: buffer@v1.2.0/LICENSE.txt
   text: |
     The MIT License (MIT)
 

@@ -1,6 +1,6 @@
 ---
 name: github.com/djherbis/buffer
-version: v1.1.0
+version: v1.2.0
 type: go
 summary: Package buffer implements a series of Buffers which can be composed to implement
   complicated buffering strategies

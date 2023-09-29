@@ -57,6 +57,11 @@ reviewed:
     - golang.org/x/crypto/openpgp/packet
     - golang.org/x/crypto/openpgp/s2k
     - golang.org/x/sys/execabs
+    - golang.org/x/text/encoding
+    - golang.org/x/text/encoding/internal
+    - golang.org/x/text/encoding/internal/identifier
+    - golang.org/x/text/encoding/unicode
+    - golang.org/x/text/internal/utf8internal
 
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-dependencies/GPL-3.0/.licensed.yml
 allowed:

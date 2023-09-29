@@ -1,6 +1,6 @@
 ---
 name: github.com/spf13/afero
-version: v1.9.5
+version: v1.10.0
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/spf13/afero

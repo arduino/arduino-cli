@@ -1,16 +1,17 @@
 ---
 name: github.com/pelletier/go-toml/v2
-version: v2.0.8
+version: v2.1.0
 type: go
 summary: Package toml is a library to read and write TOML documents.
 homepage: https://pkg.go.dev/github.com/pelletier/go-toml/v2
-license: mit
+license: other
 licenses:
 - sources: LICENSE
   text: |
     The MIT License (MIT)
 
-    Copyright (c) 2013 - 2022 Thomas Pelletier, Eric Anderton
+    go-toml v2
+    Copyright (c) 2021 - 2023 Thomas Pelletier
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal

@@ -1,13 +1,13 @@
 ---
 name: github.com/klauspost/compress/huff0
-version: v1.15.13
+version: v1.17.0
 type: go
 summary: This file contains the specialisation of Decoder.Decompress4X and Decoder.Decompress1X
   that use an asm implementation of thir main loops.
 homepage: https://pkg.go.dev/github.com/klauspost/compress/huff0
 license: bsd-3-clause
 licenses:
-- sources: compress@v1.15.13/LICENSE
+- sources: compress@v1.17.0/LICENSE
   text: |
     Copyright (c) 2012 The Go Authors. All rights reserved.
     Copyright (c) 2019 Klaus Post. All rights reserved.
