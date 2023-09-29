@@ -29,7 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/executils"
 	"github.com/arduino/arduino-cli/i18n"
-	dbg "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/sirupsen/logrus"
 )
@@ -42,7 +42,7 @@ var tr = i18n.Tr
 // grpc Out <- tool stdOut
 // grpc Out <- tool stdErr
 // It also implements tool process lifecycle management
-func Debug(ctx context.Context, req *dbg.DebugConfigRequest, inStream io.Reader, out io.Writer, interrupt <-chan os.Signal) (*dbg.DebugResponse, error) {
+func Debug(ctx context.Context, req *rpc.GetDebugConfigRequest, inStream io.Reader, out io.Writer, interrupt <-chan os.Signal) (*rpc.DebugResponse, error) {
 
 	// Get debugging command line to run debugger
 	pme, release := commands.GetPackageManagerExplorer(req)
@@ -75,7 +75,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigRequest, inStream io.Reader,
 	// Get stdIn pipe from tool
 	in, err := cmd.StdinPipe()
 	if err != nil {
-		return &dbg.DebugResponse{Error: err.Error()}, nil
+		return &rpc.DebugResponse{Error: err.Error()}, nil
 	}
 	defer in.Close()
 
@@ -85,7 +85,7 @@ func Debug(ctx context.Context, req *dbg.DebugConfigRequest, inStream io.Reader,
 
 	// Start the debug command
 	if err := cmd.Start(); err != nil {
-		return &dbg.DebugResponse{Error: err.Error()}, nil
+		return &rpc.DebugResponse{Error: err.Error()}, nil
 	}
 
 	if interrupt != nil {
@@ -111,13 +111,13 @@ func Debug(ctx context.Context, req *dbg.DebugConfigRequest, inStream io.Reader,
 
 	// Wait for process to finish
 	if err := cmd.Wait(); err != nil {
-		return &dbg.DebugResponse{Error: err.Error()}, nil
+		return &rpc.DebugResponse{Error: err.Error()}, nil
 	}
-	return &dbg.DebugResponse{}, nil
+	return &rpc.DebugResponse{}, nil
 }
 
 // getCommandLine compose a debug command represented by a core recipe
-func getCommandLine(req *dbg.DebugConfigRequest, pme *packagemanager.Explorer) ([]string, error) {
+func getCommandLine(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer) ([]string, error) {
 	debugInfo, err := getDebugProperties(req, pme)
 	if err != nil {
 		return nil, err

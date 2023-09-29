@@ -1,6 +1,6 @@
 // This file is part of arduino-cli.
 //
-// Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+// Copyright 2023 ARDUINO SA (http://www.arduino.cc/)
 //
 // This software is released under the GNU General Public License version 3,
 // which covers the main part of arduino-cli.
@@ -15,33 +15,25 @@
 
 syntax = "proto3";
 
-package cc.arduino.cli.debug.v1;
+package cc.arduino.cli.commands.v1;
 
-option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1;debug";
+option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1;commands";
 
 import "cc/arduino/cli/commands/v1/common.proto";
 import "cc/arduino/cli/commands/v1/port.proto";
 
-// DebugService abstracts a debug Session usage
-service DebugService {
-  // Start a debug session and communicate with the debugger tool.
-  rpc Debug(stream DebugRequest) returns (stream DebugResponse) {}
-
-  rpc GetDebugConfig(DebugConfigRequest) returns (GetDebugConfigResponse) {}
-}
-
 // The top-level message sent by the client for the `Debug` method.
-// Multiple `DebugReq` messages can be sent but the first message
-// must contain a `DebugConfigReq` message to initialize the debug session.
-// All subsequent messages must contain bytes to be sent to the debug session
-// and must not contain a `DebugReq` message.
+// Multiple `DebugRequest` messages can be sent but the first message
+// must contain a `GetDebugConfigRequest` message to initialize the debug
+// session. All subsequent messages must contain bytes to be sent to the debug
+// session and must not contain a `GetDebugConfigRequest` message.
 message DebugRequest {
   // Content must be either a debug session config or data to be sent.
 
   // Provides information to the debug that specifies which is the target.
-  // The first `StreamingOpenReq` message must contain a `DebugReq`
+  // The first `DebugRequest` message must contain a `GetDebugConfigRequest`
   // message.
-  DebugConfigRequest debug_request = 1;
+  GetDebugConfigRequest debug_request = 1;
 
   // The data to be sent to the target being monitored.
   bytes data = 2;
@@ -50,9 +42,9 @@ message DebugRequest {
   bool send_interrupt = 3;
 }
 
-message DebugConfigRequest {
+message GetDebugConfigRequest {
   // Arduino Core Service instance from the `Init` response.
-  cc.arduino.cli.commands.v1.Instance instance = 1;
+  Instance instance = 1;
   // Fully qualified board name of the board in use
   // (e.g., `arduino:samd:mkr1000`). If this is omitted, the FQBN attached to
   // the sketch will be used.
@@ -61,7 +53,7 @@ message DebugConfigRequest {
   // is expected to be located under this path.
   string sketch_path = 3;
   // Port of the debugger (optional).
-  cc.arduino.cli.commands.v1.Port port = 4;
+  Port port = 4;
   // Which GDB command interpreter to use.
   string interpreter = 5;
   // Directory containing the compiled executable. If `import_dir` is not

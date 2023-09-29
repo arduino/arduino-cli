@@ -24,14 +24,14 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
 	"github.com/arduino/arduino-cli/commands"
-	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
 )
 
 // GetDebugConfig returns metadata to start debugging with the specified board
-func GetDebugConfig(ctx context.Context, req *debug.DebugConfigRequest) (*debug.GetDebugConfigResponse, error) {
+func GetDebugConfig(ctx context.Context, req *rpc.GetDebugConfigRequest) (*rpc.GetDebugConfigResponse, error) {
 	pme, release := commands.GetPackageManagerExplorer(req)
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
@@ -40,7 +40,7 @@ func GetDebugConfig(ctx context.Context, req *debug.DebugConfigRequest) (*debug.
 	return getDebugProperties(req, pme)
 }
 
-func getDebugProperties(req *debug.DebugConfigRequest, pme *packagemanager.Explorer) (*debug.GetDebugConfigResponse, error) {
+func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer) (*rpc.GetDebugConfigResponse, error) {
 	// TODO: make a generic function to extract sketch from request
 	// and remove duplication in commands/compile.go
 	if req.GetSketchPath() == "" {
@@ -150,7 +150,7 @@ func getDebugProperties(req *debug.DebugConfigRequest, pme *packagemanager.Explo
 
 	server := debugProperties.Get("server")
 	toolchain := debugProperties.Get("toolchain")
-	return &debug.GetDebugConfigResponse{
+	return &rpc.GetDebugConfigResponse{
 		Executable:             debugProperties.Get("executable"),
 		Server:                 server,
 		ServerPath:             debugProperties.Get("server." + server + ".path"),
