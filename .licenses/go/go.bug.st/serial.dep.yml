@@ -1,6 +1,6 @@
 ---
 name: go.bug.st/serial
-version: v1.3.2
+version: v1.6.1
 type: go
 summary: Package serial is a cross-platform serial library for the go language.
 homepage: https://pkg.go.dev/go.bug.st/serial
@@ -9,7 +9,7 @@ licenses:
 - sources: LICENSE
   text: |2+
 
-    Copyright (c) 2014-2021, Cristian Maglie.
+    Copyright (c) 2014-2023, Cristian Maglie.
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
