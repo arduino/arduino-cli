@@ -29,7 +29,6 @@ import (
 	"time"
 
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	dbg "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
 	"github.com/arduino/arduino-cli/rpc/cc/arduino/cli/settings/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -955,11 +954,11 @@ func callLibUninstall(client rpc.ArduinoCoreServiceClient, instance *rpc.Instanc
 	}
 }
 
-func callDebugger(debugStreamingOpenClient dbg.DebugService_DebugClient, instance *rpc.Instance) {
+func callDebugger(debugStreamingOpenClient rpc.ArduinoCoreService_DebugClient, instance *rpc.Instance) {
 	currDir, _ := os.Getwd()
 	log.Printf("Send debug request")
-	err := debugStreamingOpenClient.Send(&dbg.DebugRequest{
-		DebugRequest: &dbg.DebugConfigRequest{
+	err := debugStreamingOpenClient.Send(&rpc.DebugRequest{
+		DebugRequest: &rpc.GetDebugConfigRequest{
 			Instance:   &rpc.Instance{Id: instance.GetId()},
 			Fqbn:       "arduino:samd:mkr1000",
 			SketchPath: filepath.Join(currDir, "hello"),
@@ -974,7 +973,7 @@ func callDebugger(debugStreamingOpenClient dbg.DebugService_DebugClient, instanc
 	waitForPrompt(debugStreamingOpenClient, "(gdb)")
 	// Wait for gdb to init and show the prompt
 	log.Printf("Send 'info registers' rcommand")
-	err = debugStreamingOpenClient.Send(&dbg.DebugRequest{Data: []byte("info registers\n")})
+	err = debugStreamingOpenClient.Send(&rpc.DebugRequest{Data: []byte("info registers\n")})
 	if err != nil {
 		log.Fatalf("Send error: %s\n", err)
 	}
@@ -984,7 +983,7 @@ func callDebugger(debugStreamingOpenClient dbg.DebugService_DebugClient, instanc
 
 	// Send quit command to gdb
 	log.Printf("Send 'quit' command")
-	err = debugStreamingOpenClient.Send(&dbg.DebugRequest{Data: []byte("quit\n")})
+	err = debugStreamingOpenClient.Send(&rpc.DebugRequest{Data: []byte("quit\n")})
 	if err != nil {
 		log.Fatalf("Send error: %s\n", err)
 	}
@@ -997,7 +996,7 @@ func callDebugger(debugStreamingOpenClient dbg.DebugService_DebugClient, instanc
 	}
 }
 
-func waitForPrompt(debugStreamingOpenClient dbg.DebugService_DebugClient, prompt string) {
+func waitForPrompt(debugStreamingOpenClient rpc.ArduinoCoreService_DebugClient, prompt string) {
 	var buffer bytes.Buffer
 	for {
 		compResp, err := debugStreamingOpenClient.Recv()

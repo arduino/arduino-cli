@@ -25,6 +25,7 @@ import "cc/arduino/cli/commands/v1/common.proto";
 import "cc/arduino/cli/commands/v1/board.proto";
 import "cc/arduino/cli/commands/v1/compile.proto";
 import "cc/arduino/cli/commands/v1/core.proto";
+import "cc/arduino/cli/commands/v1/debug.proto";
 import "cc/arduino/cli/commands/v1/monitor.proto";
 import "cc/arduino/cli/commands/v1/upload.proto";
 import "cc/arduino/cli/commands/v1/lib.proto";
@@ -179,6 +180,11 @@ service ArduinoCoreService {
   // Returns the parameters that can be set in the MonitorRequest calls
   rpc EnumerateMonitorPortSettings(EnumerateMonitorPortSettingsRequest)
       returns (EnumerateMonitorPortSettingsResponse);
+
+  // Start a debug session and communicate with the debugger tool.
+  rpc Debug(stream DebugRequest) returns (stream DebugResponse) {}
+
+  rpc GetDebugConfig(GetDebugConfigRequest) returns (GetDebugConfigResponse) {}
 }
 
 message CreateRequest {}

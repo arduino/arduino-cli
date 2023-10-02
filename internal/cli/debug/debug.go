@@ -28,7 +28,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	dbg "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
 	"github.com/arduino/arduino-cli/table"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/fatih/color"
@@ -82,7 +81,7 @@ func runDebugCommand(command *cobra.Command, args []string) {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 	fqbn, port := arguments.CalculateFQBNAndPort(&portArgs, &fqbnArg, instance, sk.GetDefaultFqbn(), sk.GetDefaultPort(), sk.GetDefaultProtocol())
-	debugConfigRequested := &dbg.DebugConfigRequest{
+	debugConfigRequested := &rpc.GetDebugConfigRequest{
 		Instance:    instance,
 		Fqbn:        fqbn,
 		SketchPath:  sketchPath.String(),
@@ -118,7 +117,7 @@ func runDebugCommand(command *cobra.Command, args []string) {
 }
 
 type debugInfoResult struct {
-	info *dbg.GetDebugConfigResponse
+	info *rpc.GetDebugConfigResponse
 }
 
 func (r *debugInfoResult) Data() interface{} {

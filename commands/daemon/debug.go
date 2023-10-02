@@ -20,20 +20,14 @@ import (
 	"os"
 
 	cmd "github.com/arduino/arduino-cli/commands/debug"
-	dbg "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/debug/v1"
+	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/pkg/errors"
 )
-
-// DebugService implements the `Debug` service
-type DebugService struct {
-	dbg.UnimplementedDebugServiceServer
-}
 
 // Debug returns a stream response that can be used to fetch data from the
 // target. The first message passed through the `Debug` request must
 // contain DebugRequest configuration params, not data.
-func (s *DebugService) Debug(stream dbg.DebugService_DebugServer) error {
-
+func (s *ArduinoCoreServerImpl) Debug(stream rpc.ArduinoCoreService_DebugServer) error {
 	// Grab the first message
 	msg, err := stream.Recv()
 	if err != nil {
@@ -49,7 +43,7 @@ func (s *DebugService) Debug(stream dbg.DebugService_DebugServer) error {
 	// Launch debug recipe attaching stdin and out to grpc streaming
 	signalChan := make(chan os.Signal)
 	defer close(signalChan)
-	outStream := feedStreamTo(func(data []byte) { stream.Send(&dbg.DebugResponse{Data: data}) })
+	outStream := feedStreamTo(func(data []byte) { stream.Send(&rpc.DebugResponse{Data: data}) })
 	resp, debugErr := cmd.Debug(stream.Context(), req,
 		consumeStreamFrom(func() ([]byte, error) {
 			command, err := stream.Recv()
@@ -68,6 +62,6 @@ func (s *DebugService) Debug(stream dbg.DebugService_DebugServer) error {
 }
 
 // GetDebugConfig return metadata about a debug session
-func (s *DebugService) GetDebugConfig(ctx context.Context, req *dbg.DebugConfigRequest) (*dbg.GetDebugConfigResponse, error) {
+func (s *ArduinoCoreServerImpl) GetDebugConfig(ctx context.Context, req *rpc.GetDebugConfigRequest) (*rpc.GetDebugConfigResponse, error) {
 	return cmd.GetDebugConfig(ctx, req)
 }

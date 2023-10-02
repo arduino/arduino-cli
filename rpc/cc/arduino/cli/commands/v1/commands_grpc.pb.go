@@ -73,6 +73,8 @@ const (
 	ArduinoCoreService_LibraryList_FullMethodName                       = "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryList"
 	ArduinoCoreService_Monitor_FullMethodName                           = "/cc.arduino.cli.commands.v1.ArduinoCoreService/Monitor"
 	ArduinoCoreService_EnumerateMonitorPortSettings_FullMethodName      = "/cc.arduino.cli.commands.v1.ArduinoCoreService/EnumerateMonitorPortSettings"
+	ArduinoCoreService_Debug_FullMethodName                             = "/cc.arduino.cli.commands.v1.ArduinoCoreService/Debug"
+	ArduinoCoreService_GetDebugConfig_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/GetDebugConfig"
 )
 
 // ArduinoCoreServiceClient is the client API for ArduinoCoreService service.
@@ -165,6 +167,9 @@ type ArduinoCoreServiceClient interface {
 	Monitor(ctx context.Context, opts ...grpc.CallOption) (ArduinoCoreService_MonitorClient, error)
 	// Returns the parameters that can be set in the MonitorRequest calls
 	EnumerateMonitorPortSettings(ctx context.Context, in *EnumerateMonitorPortSettingsRequest, opts ...grpc.CallOption) (*EnumerateMonitorPortSettingsResponse, error)
+	// Start a debug session and communicate with the debugger tool.
+	Debug(ctx context.Context, opts ...grpc.CallOption) (ArduinoCoreService_DebugClient, error)
+	GetDebugConfig(ctx context.Context, in *GetDebugConfigRequest, opts ...grpc.CallOption) (*GetDebugConfigResponse, error)
 }
 
 type arduinoCoreServiceClient struct {
@@ -985,6 +990,46 @@ func (c *arduinoCoreServiceClient) EnumerateMonitorPortSettings(ctx context.Cont
 	return out, nil
 }
 
+func (c *arduinoCoreServiceClient) Debug(ctx context.Context, opts ...grpc.CallOption) (ArduinoCoreService_DebugClient, error) {
+	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[20], ArduinoCoreService_Debug_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &arduinoCoreServiceDebugClient{stream}
+	return x, nil
+}
+
+type ArduinoCoreService_DebugClient interface {
+	Send(*DebugRequest) error
+	Recv() (*DebugResponse, error)
+	grpc.ClientStream
+}
+
+type arduinoCoreServiceDebugClient struct {
+	grpc.ClientStream
+}
+
+func (x *arduinoCoreServiceDebugClient) Send(m *DebugRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *arduinoCoreServiceDebugClient) Recv() (*DebugResponse, error) {
+	m := new(DebugResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *arduinoCoreServiceClient) GetDebugConfig(ctx context.Context, in *GetDebugConfigRequest, opts ...grpc.CallOption) (*GetDebugConfigResponse, error) {
+	out := new(GetDebugConfigResponse)
+	err := c.cc.Invoke(ctx, ArduinoCoreService_GetDebugConfig_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArduinoCoreServiceServer is the server API for ArduinoCoreService service.
 // All implementations must embed UnimplementedArduinoCoreServiceServer
 // for forward compatibility
@@ -1075,6 +1120,9 @@ type ArduinoCoreServiceServer interface {
 	Monitor(ArduinoCoreService_MonitorServer) error
 	// Returns the parameters that can be set in the MonitorRequest calls
 	EnumerateMonitorPortSettings(context.Context, *EnumerateMonitorPortSettingsRequest) (*EnumerateMonitorPortSettingsResponse, error)
+	// Start a debug session and communicate with the debugger tool.
+	Debug(ArduinoCoreService_DebugServer) error
+	GetDebugConfig(context.Context, *GetDebugConfigRequest) (*GetDebugConfigResponse, error)
 	mustEmbedUnimplementedArduinoCoreServiceServer()
 }
 
@@ -1198,6 +1246,12 @@ func (UnimplementedArduinoCoreServiceServer) Monitor(ArduinoCoreService_MonitorS
 }
 func (UnimplementedArduinoCoreServiceServer) EnumerateMonitorPortSettings(context.Context, *EnumerateMonitorPortSettingsRequest) (*EnumerateMonitorPortSettingsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EnumerateMonitorPortSettings not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) Debug(ArduinoCoreService_DebugServer) error {
+	return status.Errorf(codes.Unimplemented, "method Debug not implemented")
+}
+func (UnimplementedArduinoCoreServiceServer) GetDebugConfig(context.Context, *GetDebugConfigRequest) (*GetDebugConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDebugConfig not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) mustEmbedUnimplementedArduinoCoreServiceServer() {}
 
@@ -1979,6 +2033,50 @@ func _ArduinoCoreService_EnumerateMonitorPortSettings_Handler(srv interface{}, c
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArduinoCoreService_Debug_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ArduinoCoreServiceServer).Debug(&arduinoCoreServiceDebugServer{stream})
+}
+
+type ArduinoCoreService_DebugServer interface {
+	Send(*DebugResponse) error
+	Recv() (*DebugRequest, error)
+	grpc.ServerStream
+}
+
+type arduinoCoreServiceDebugServer struct {
+	grpc.ServerStream
+}
+
+func (x *arduinoCoreServiceDebugServer) Send(m *DebugResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *arduinoCoreServiceDebugServer) Recv() (*DebugRequest, error) {
+	m := new(DebugRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func _ArduinoCoreService_GetDebugConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDebugConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArduinoCoreServiceServer).GetDebugConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArduinoCoreService_GetDebugConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArduinoCoreServiceServer).GetDebugConfig(ctx, req.(*GetDebugConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArduinoCoreService_ServiceDesc is the grpc.ServiceDesc for ArduinoCoreService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -2061,6 +2159,10 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EnumerateMonitorPortSettings",
 			Handler:    _ArduinoCoreService_EnumerateMonitorPortSettings_Handler,
+		},
+		{
+			MethodName: "GetDebugConfig",
+			Handler:    _ArduinoCoreService_GetDebugConfig_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
@@ -2162,6 +2264,12 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "Monitor",
 			Handler:       _ArduinoCoreService_Monitor_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "Debug",
+			Handler:       _ArduinoCoreService_Debug_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},

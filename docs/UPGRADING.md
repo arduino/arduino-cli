@@ -4,6 +4,15 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.35.0
 
+### gRPC service `cc.arduino.cli.debug.v1` moved to `cc.arduino.cli.commands.v1`.
+
+The gRPC service `cc.arduino.cli.debug.v1` has been removed and all gRPC messages and rpc calls have been moved to
+`cc.arduino.cli.commands.v1`.
+
+The gRPC message `DebugConfigRequest` has been renamed to the proper `GetDebugConfigRequest`.
+
+All the generated API has been updated as well.
+
 ### The gRPC `cc.arduino.cli.commands.v1.BoardListWatchRequest` command request has been changed.
 
 The gRPC message `BoardListWatchRequest` has been changed from:
