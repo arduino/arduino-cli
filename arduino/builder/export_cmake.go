@@ -275,9 +275,9 @@ func (b *Builder) exportProjectCMake(importedLibraries libraries.List, includeFo
 	var dynamicLibsFromGccMinusL []string
 	var linkDirectories []string
 
-	extractCompileFlags(b.buildProperties, "recipe.c.combine.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
-	extractCompileFlags(b.buildProperties, "recipe.c.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
-	extractCompileFlags(b.buildProperties, "recipe.cpp.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
+	b.extractCompileFlags(b.buildProperties, "recipe.c.combine.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
+	b.extractCompileFlags(b.buildProperties, "recipe.c.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
+	b.extractCompileFlags(b.buildProperties, "recipe.cpp.o.pattern", &defines, &dynamicLibsFromGccMinusL, &linkerflags, &linkDirectories)
 
 	// Extract folders with .h in them for adding in include list
 	headerFiles, _ := utils.FindFilesInFolder(cmakeFolder, true, validHeaderExtensions...)
@@ -348,7 +348,7 @@ func (b *Builder) exportProjectCMake(importedLibraries libraries.List, includeFo
 	return nil
 }
 
-func extractCompileFlags(buildProperties *properties.Map, recipe string, defines, dynamicLibs, linkerflags, linkDirectories *[]string) {
+func (b *Builder) extractCompileFlags(buildProperties *properties.Map, recipe string, defines, dynamicLibs, linkerflags, linkDirectories *[]string) {
 	appendIfNotPresent := func(target []string, elements ...string) []string {
 		for _, element := range elements {
 			if !slices.Contains(target, element) {
@@ -358,7 +358,7 @@ func extractCompileFlags(buildProperties *properties.Map, recipe string, defines
 		return target
 	}
 
-	command, _ := utils.PrepareCommandForRecipe(buildProperties, recipe, true)
+	command, _ := b.prepareCommandForRecipe(buildProperties, recipe, true)
 
 	for _, arg := range command.GetArgs() {
 		if strings.HasPrefix(arg, "-D") {

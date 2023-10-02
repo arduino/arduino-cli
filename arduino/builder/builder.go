@@ -19,15 +19,20 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/builder/internal/compilation"
 	"github.com/arduino/arduino-cli/arduino/builder/internal/detector"
 	"github.com/arduino/arduino-cli/arduino/builder/internal/logger"
 	"github.com/arduino/arduino-cli/arduino/builder/internal/progress"
+	"github.com/arduino/arduino-cli/arduino/builder/internal/utils"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
 	"github.com/arduino/arduino-cli/arduino/sketch"
+	"github.com/arduino/arduino-cli/executils"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
@@ -268,19 +273,16 @@ func (b *Builder) preprocess() error {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.RunRecipe("recipe.hooks.prebuild", ".pattern", false); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.prepareSketchBuildPath(); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	b.logIfVerbose(false, tr("Detecting libraries used..."))
 	err := b.libsDetector.FindIncludes(
@@ -297,18 +299,15 @@ func (b *Builder) preprocess() error {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	b.warnAboutArchIncompatibleLibraries(b.libsDetector.ImportedLibraries())
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	b.logIfVerbose(false, tr("Generating function prototypes..."))
 	if err := b.preprocessSketch(b.libsDetector.IncludeFolders()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	return nil
 }
@@ -337,11 +336,9 @@ func (b *Builder) Build() error {
 
 	b.libsDetector.PrintUsedAndNotUsedLibraries(buildErr != nil)
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	b.printUsedLibraries(b.libsDetector.ImportedLibraries())
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if buildErr != nil {
 		return buildErr
@@ -350,13 +347,11 @@ func (b *Builder) Build() error {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.size(); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	return nil
 }
@@ -368,115 +363,155 @@ func (b *Builder) build() error {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
-	if err := b.BuildSketch(b.libsDetector.IncludeFolders()); err != nil {
+	if err := b.buildSketch(b.libsDetector.IncludeFolders()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.RunRecipe("recipe.hooks.sketch.postbuild", ".pattern", true); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	b.logIfVerbose(false, tr("Compiling libraries..."))
 	if err := b.RunRecipe("recipe.hooks.libraries.prebuild", ".pattern", false); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.removeUnusedCompiledLibraries(b.libsDetector.ImportedLibraries()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.buildLibraries(b.libsDetector.IncludeFolders(), b.libsDetector.ImportedLibraries()); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.RunRecipe("recipe.hooks.libraries.postbuild", ".pattern", true); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	b.logIfVerbose(false, tr("Compiling core..."))
 	if err := b.RunRecipe("recipe.hooks.core.prebuild", ".pattern", false); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.buildCore(); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.RunRecipe("recipe.hooks.core.postbuild", ".pattern", true); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	b.logIfVerbose(false, tr("Linking everything together..."))
 	if err := b.RunRecipe("recipe.hooks.linking.prelink", ".pattern", false); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.link(); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.RunRecipe("recipe.hooks.linking.postlink", ".pattern", true); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.RunRecipe("recipe.hooks.objcopy.preobjcopy", ".pattern", false); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.RunRecipe("recipe.objcopy.", ".pattern", true); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.RunRecipe("recipe.hooks.objcopy.postobjcopy", ".pattern", true); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
-	if err := b.MergeSketchWithBootloader(); err != nil {
+	if err := b.mergeSketchWithBootloader(); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if err := b.RunRecipe("recipe.hooks.postbuild", ".pattern", true); err != nil {
 		return err
 	}
 	b.Progress.CompleteStep()
-	b.Progress.PushProgress()
 
 	if b.compilationDatabase != nil {
 		b.compilationDatabase.SaveToFile()
 	}
 	return nil
+}
+
+func (b *Builder) prepareCommandForRecipe(buildProperties *properties.Map, recipe string, removeUnsetProperties bool) (*executils.Process, error) {
+	pattern := buildProperties.Get(recipe)
+	if pattern == "" {
+		return nil, fmt.Errorf(tr("%[1]s pattern is missing"), recipe)
+	}
+
+	commandLine := buildProperties.ExpandPropsInString(pattern)
+	if removeUnsetProperties {
+		commandLine = properties.DeleteUnexpandedPropsFromString(commandLine)
+	}
+
+	parts, err := properties.SplitQuotedString(commandLine, `"'`, false)
+	if err != nil {
+		return nil, err
+	}
+
+	// if the overall commandline is too long for the platform
+	// try reducing the length by making the filenames relative
+	// and changing working directory to build.path
+	var relativePath string
+	if len(commandLine) > 30000 {
+		relativePath = buildProperties.Get("build.path")
+		for i, arg := range parts {
+			if _, err := os.Stat(arg); os.IsNotExist(err) {
+				continue
+			}
+			rel, err := filepath.Rel(relativePath, arg)
+			if err == nil && !strings.Contains(rel, "..") && len(rel) < len(arg) {
+				parts[i] = rel
+			}
+		}
+	}
+
+	command, err := executils.NewProcess(nil, parts...)
+	if err != nil {
+		return nil, err
+	}
+	if relativePath != "" {
+		command.SetDir(relativePath)
+	}
+
+	return command, nil
+}
+
+func (b *Builder) execCommand(command *executils.Process) error {
+	if b.logger.Verbose() {
+		b.logger.Info(utils.PrintableCommand(command.GetArgs()))
+		command.RedirectStdoutTo(b.logger.Stdout())
+	}
+	command.RedirectStderrTo(b.logger.Stderr())
+
+	if err := command.Start(); err != nil {
+		return err
+	}
+
+	return command.Wait()
 }

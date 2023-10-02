@@ -20,7 +20,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/arduino/arduino-cli/arduino/builder/internal/utils"
 	properties "github.com/arduino/go-properties-orderedmap"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -39,7 +38,7 @@ func (b *Builder) RunRecipe(prefix, suffix string, skipIfOnlyUpdatingCompilation
 	for _, recipe := range recipes {
 		logrus.Debugf(fmt.Sprintf("Running recipe: %s", recipe))
 
-		command, err := utils.PrepareCommandForRecipe(properties, recipe, false)
+		command, err := b.prepareCommandForRecipe(properties, recipe, false)
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -51,11 +50,7 @@ func (b *Builder) RunRecipe(prefix, suffix string, skipIfOnlyUpdatingCompilation
 			return nil
 		}
 
-		verboseInfo, _, _, err := utils.ExecCommand(b.logger.Verbose(), b.logger.Stdout(), b.logger.Stderr(), command, utils.ShowIfVerbose /* stdout */, utils.Show /* stderr */)
-		if b.logger.Verbose() {
-			b.logger.Info(string(verboseInfo))
-		}
-		if err != nil {
+		if err := b.execCommand(command); err != nil {
 			return errors.WithStack(err)
 		}
 	}

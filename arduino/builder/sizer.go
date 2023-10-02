@@ -16,6 +16,7 @@
 package builder
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"regexp"
@@ -72,16 +73,20 @@ func (b *Builder) size() error {
 }
 
 func (b *Builder) checkSizeAdvanced() (ExecutablesFileSections, error) {
-	command, err := utils.PrepareCommandForRecipe(b.buildProperties, "recipe.advanced_size.pattern", false)
+	command, err := b.prepareCommandForRecipe(b.buildProperties, "recipe.advanced_size.pattern", false)
 	if err != nil {
 		return nil, errors.New(tr("Error while determining sketch size: %s", err))
 	}
-
-	verboseInfo, out, _, err := utils.ExecCommand(b.logger.Verbose(), b.logger.Stdout(), b.logger.Stderr(), command, utils.Capture /* stdout */, utils.Show /* stderr */)
 	if b.logger.Verbose() {
-		b.logger.Info(string(verboseInfo))
+		b.logger.Info(utils.PrintableCommand(command.GetArgs()))
 	}
-	if err != nil {
+	out := &bytes.Buffer{}
+	command.RedirectStdoutTo(out)
+	command.RedirectStderrTo(b.logger.Stderr())
+	if err := command.Start(); err != nil {
+		return nil, errors.New(tr("Error while determining sketch size: %s", err))
+	}
+	if err := command.Wait(); err != nil {
 		return nil, errors.New(tr("Error while determining sketch size: %s", err))
 	}
 
@@ -100,7 +105,7 @@ func (b *Builder) checkSizeAdvanced() (ExecutablesFileSections, error) {
 	}
 
 	var resp AdvancedSizerResponse
-	if err := json.Unmarshal(out, &resp); err != nil {
+	if err := json.Unmarshal(out.Bytes(), &resp); err != nil {
 		return nil, errors.New(tr("Error while determining sketch size: %s", err))
 	}
 
@@ -204,20 +209,27 @@ func (b *Builder) checkSize() (ExecutablesFileSections, error) {
 }
 
 func (b *Builder) execSizeRecipe(properties *properties.Map) (textSize int, dataSize int, eepromSize int, resErr error) {
-	command, err := utils.PrepareCommandForRecipe(properties, "recipe.size.pattern", false)
+	command, err := b.prepareCommandForRecipe(properties, "recipe.size.pattern", false)
 	if err != nil {
+		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)
+		return
+	}
+	if b.logger.Verbose() {
+		b.logger.Info(utils.PrintableCommand(command.GetArgs()))
+	}
+	commandStdout := &bytes.Buffer{}
+	command.RedirectStdoutTo(commandStdout)
+	command.RedirectStderrTo(b.logger.Stderr())
+	if err := command.Start(); err != nil {
+		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)
+		return
+	}
+	if err := command.Wait(); err != nil {
 		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)
 		return
 	}
 
-	verboseInfo, out, _, err := utils.ExecCommand(b.logger.Verbose(), b.logger.Stdout(), b.logger.Stderr(), command, utils.Capture /* stdout */, utils.Show /* stderr */)
-	if b.logger.Verbose() {
-		b.logger.Info(string(verboseInfo))
-	}
-	if err != nil {
-		resErr = fmt.Errorf(tr("Error while determining sketch size: %s"), err)
-		return
-	}
+	out := commandStdout.Bytes()
 
 	// force multiline match prepending "(?m)" to the actual regexp
 	// return an error if RECIPE_SIZE_REGEXP doesn't exist
