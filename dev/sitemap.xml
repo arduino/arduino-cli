@@ -336,11 +336,6 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://arduino.github.io/arduino-cli/dev/rpc/debug/</loc>
-         <lastmod>2023-10-02</lastmod>
-         <changefreq>daily</changefreq>
-    </url>
-    <url>
          <loc>https://arduino.github.io/arduino-cli/dev/rpc/settings/</loc>
          <lastmod>2023-10-02</lastmod>
          <changefreq>daily</changefreq>
