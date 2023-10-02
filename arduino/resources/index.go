@@ -42,11 +42,16 @@ type IndexResource struct {
 // IndexFileName returns the index file name as it is saved in data dir (package_xxx_index.json).
 func (res *IndexResource) IndexFileName() (string, error) {
 	filename := path.Base(res.URL.Path) // == package_index.json[.gz] || packacge_index.tar.bz2
-	if filename == "." || filename == "" {
+	if filename == "." || filename == "" || filename == "/" {
 		return "", &arduino.InvalidURLError{}
 	}
-	if i := strings.Index(filename, "."); i != -1 {
-		filename = filename[:i]
+	switch {
+	case strings.HasSuffix(filename, ".json"):
+		return filename, nil
+	case strings.HasSuffix(filename, ".gz"):
+		return strings.TrimSuffix(filename, ".gz"), nil
+	case strings.HasSuffix(filename, ".tar.bz2"):
+		return strings.TrimSuffix(filename, ".tar.bz2") + ".json", nil
 	}
 	return filename + ".json", nil
 }
