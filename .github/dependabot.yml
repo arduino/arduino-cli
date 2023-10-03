@@ -11,3 +11,9 @@ updates:
       interval: daily
     labels:
       - "topic: infrastructure"
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: monthly
+    labels:
+      - "topic: infrastructure"
