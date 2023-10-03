@@ -29,10 +29,18 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// projectRaw is a support struct used only to unmarshal the yaml
+type projectRaw struct {
+	ProfilesRaw     yaml.Node `yaml:"profiles"`
+	DefaultProfile  string    `yaml:"default_profile"`
+	DefaultFqbn     string    `yaml:"default_fqbn"`
+	DefaultPort     string    `yaml:"default_port,omitempty"`
+	DefaultProtocol string    `yaml:"default_protocol,omitempty"`
+}
+
 // Project represents the sketch project file
 type Project struct {
-	ProfilesRaw     yaml.Node  `yaml:"profiles"`
-	Profiles        []*Profile `yaml:"-"`
+	Profiles        []*Profile `yaml:"profiles"`
 	DefaultProfile  string     `yaml:"default_profile"`
 	DefaultFqbn     string     `yaml:"default_fqbn"`
 	DefaultPort     string     `yaml:"default_port,omitempty"`
@@ -63,7 +71,7 @@ func (p *Project) AsYaml() string {
 	return res
 }
 
-func (p *Project) getProfiles() []*Profile {
+func (p *projectRaw) getProfiles() []*Profile {
 	profiles := []*Profile{}
 	for i, node := range p.ProfilesRaw.Content {
 		if node.Tag != "!!str" {
@@ -80,25 +88,7 @@ func (p *Project) getProfiles() []*Profile {
 	return profiles
 }
 
-// Profiles are a list of Profile
-type Profiles []*Profile
-
 // UnmarshalYAML decodes a Profiles section from YAML source.
-func (p *Profiles) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	unmarshaledProfiles := map[string]*Profile{}
-	if err := unmarshal(&unmarshaledProfiles); err != nil {
-		return err
-	}
-
-	for k, v := range unmarshaledProfiles {
-		profile := v
-		profile.Name = k
-		*p = append(*p, profile)
-	}
-
-	return nil
-}
-
 // Profile is a sketch profile, it contains a reference to all the resources
 // needed to build and upload a sketch
 type Profile struct {
@@ -266,11 +256,16 @@ func LoadProjectFile(file *paths.Path) (*Project, error) {
 	if err != nil {
 		return nil, err
 	}
-	res := &Project{}
-	if err := yaml.Unmarshal(data, &res); err != nil {
+	raw := &projectRaw{}
+	if err := yaml.Unmarshal(data, &raw); err != nil {
 		return nil, err
 	}
-	res.Profiles = res.getProfiles()
 
-	return res, nil
+	return &Project{
+		Profiles:        raw.getProfiles(),
+		DefaultProfile:  raw.DefaultProfile,
+		DefaultFqbn:     raw.DefaultFqbn,
+		DefaultPort:     raw.DefaultPort,
+		DefaultProtocol: raw.DefaultProtocol,
+	}, nil
 }
