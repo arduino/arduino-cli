@@ -19,7 +19,9 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
+	"go.bug.st/testifyjson/requirejson"
 )
 
 func TestDebug(t *testing.T) {
@@ -37,6 +39,7 @@ func TestDebug(t *testing.T) {
 	integrationtest.CLISubtests{
 		{"Start", testDebuggerStarts},
 		{"WithPdeSketchStarts", testDebuggerWithPdeSketchStarts},
+		{"DebugInformation", testAllDebugInformation},
 	}.Run(t, env, cli)
 }
 
@@ -87,4 +90,45 @@ func testDebuggerWithPdeSketchStarts(t *testing.T, env *integrationtest.Environm
 	// Starts debugger
 	_, _, err = cli.Run("debug", "-b", fqbn, "-P", programmer, filePde.String(), "--info")
 	require.NoError(t, err)
+}
+
+func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// Create sketch for testing
+	sketchPath := cli.DataDir().Join("DebuggerStartTest")
+	defer sketchPath.RemoveAll()
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Install custom core
+	customHw, err := paths.New("testdata", "hardware").Abs()
+	require.NoError(t, err)
+	err = customHw.CopyDirTo(cli.SketchbookDir().Join("hardware"))
+	require.NoError(t, err)
+
+	// Build sketch
+	fqbn := "my:samd:my"
+	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--format", "json")
+	require.NoError(t, err)
+
+	// Starts debugger
+	jsonDebugOut, _, err := cli.Run("debug", "-b", fqbn, "-P", "atmel_ice", sketchPath.String(), "--info", "--format", "json")
+	require.NoError(t, err)
+	debugOut := requirejson.Parse(t, jsonDebugOut)
+	debugOut.MustContain(`
+	{
+		"toolchain": "gcc",
+		"toolchain_path": "gcc-path",
+		"toolchain_prefix": "gcc-prefix",
+		"server": "openocd",
+		"server_path": "openocd-path",
+		"server_configuration": {
+			"path": "openocd-path",
+			"scripts_dir": "openocd-scripts-dir",
+			"scripts": [
+				"first",
+				"second",
+				"third"
+			]
+		}
+	}`)
 }
