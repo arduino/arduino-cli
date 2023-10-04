@@ -207,5 +207,10 @@ func (r *debugInfoResult) String() string {
 		}
 	default:
 	}
+	if r.CortexDebugCustomConfig != nil {
+		t.AddRow(tr("Custom configuration for cortex-debug IDE plugin:"))
+		data, _ := json.MarshalIndent(r.CortexDebugCustomConfig, "  ", "  ")
+		return t.Render() + "  " + string(data)
+	}
 	return t.Render()
 }
