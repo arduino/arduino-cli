@@ -21,6 +21,7 @@ option go_package = "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/
 
 import "cc/arduino/cli/commands/v1/common.proto";
 import "cc/arduino/cli/commands/v1/port.proto";
+import "google/protobuf/any.proto";
 
 // The top-level message sent by the client for the `Debug` method.
 // Multiple `DebugRequest` messages can be sent but the first message
@@ -87,7 +88,20 @@ message GetDebugConfigResponse {
   // The GDB server directory
   string server_path = 6;
   // Extra configuration parameters wrt toolchain
-  map<string, string> toolchain_configuration = 7;
+  google.protobuf.Any toolchain_configuration = 7;
   // Extra configuration parameters wrt GDB server
-  map<string, string> server_configuration = 8;
+  google.protobuf.Any server_configuration = 8;
+}
+
+// Configurations specific for the 'gcc' toolchain
+message DebugGCCToolchainConfiguration {}
+
+// Configuration specific for the 'openocd` server
+message DebugOpenOCDServerConfiguration {
+  // path to openocd
+  string path = 1;
+  // path to openocd scripts
+  string scripts_dir = 2;
+  // list of scripts to execute by openocd
+  repeated string scripts = 3;
 }

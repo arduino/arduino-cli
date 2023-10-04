@@ -28,6 +28,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // GetDebugConfig returns metadata to start debugging with the specified board
@@ -150,14 +151,43 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 
 	server := debugProperties.Get("server")
 	toolchain := debugProperties.Get("toolchain")
+
+	var serverConfiguration anypb.Any
+	switch server {
+	case "openocd":
+		openocdProperties := debugProperties.SubTree("server." + server)
+		scripts := openocdProperties.ExtractSubIndexLists("scripts")
+		if s := openocdProperties.Get("script"); s != "" {
+			// backward compatibility
+			scripts = append(scripts, s)
+		}
+		openocdConf := &rpc.DebugOpenOCDServerConfiguration{
+			Path:       openocdProperties.Get("path"),
+			ScriptsDir: openocdProperties.Get("scripts_dir"),
+			Scripts:    scripts,
+		}
+		if err := serverConfiguration.MarshalFrom(openocdConf); err != nil {
+			return nil, err
+		}
+	}
+
+	var toolchainConfiguration anypb.Any
+	switch toolchain {
+	case "gcc":
+		gccConf := &rpc.DebugGCCToolchainConfiguration{}
+		if err := toolchainConfiguration.MarshalFrom(gccConf); err != nil {
+			return nil, err
+		}
+	}
+
 	return &rpc.GetDebugConfigResponse{
 		Executable:             debugProperties.Get("executable"),
 		Server:                 server,
 		ServerPath:             debugProperties.Get("server." + server + ".path"),
-		ServerConfiguration:    debugProperties.SubTree("server." + server).AsMap(),
+		ServerConfiguration:    &serverConfiguration,
 		Toolchain:              toolchain,
 		ToolchainPath:          debugProperties.Get("toolchain.path"),
 		ToolchainPrefix:        debugProperties.Get("toolchain.prefix"),
-		ToolchainConfiguration: debugProperties.SubTree("toolchain." + toolchain).AsMap(),
+		ToolchainConfiguration: &toolchainConfiguration,
 	}, nil
 }
