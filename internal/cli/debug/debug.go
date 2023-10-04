@@ -124,6 +124,7 @@ type debugInfoResult struct {
 	Server                  string `json:"server,omitempty"`
 	ServerPath              string `json:"server_path,omitempty"`
 	ServerConfig            any    `json:"server_configuration,omitempty"`
+	SvdFile                 string `json:"svd_file,omitempty"`
 	CortexDebugCustomConfig any    `json:"cortex-debug_custom_configuration,omitempty"`
 }
 
@@ -163,6 +164,7 @@ func newDebugInfoResult(info *rpc.GetDebugConfigResponse) *debugInfoResult {
 		Server:                  info.Server,
 		ServerPath:              info.ServerPath,
 		ServerConfig:            serverConfig,
+		SvdFile:                 info.SvdFile,
 		CortexDebugCustomConfig: cortexDebugCustomConfig,
 	}
 }
@@ -179,6 +181,9 @@ func (r *debugInfoResult) String() string {
 	t.AddRow(tr("Toolchain type"), table.NewCell(r.Toolchain, green))
 	t.AddRow(tr("Toolchain path"), table.NewCell(r.ToolchainPath, dimGreen))
 	t.AddRow(tr("Toolchain prefix"), table.NewCell(r.ToolchainPrefix, dimGreen))
+	if r.SvdFile != "" {
+		t.AddRow(tr("SVD file path"), table.NewCell(r.SvdFile, dimGreen))
+	}
 	switch r.Toolchain {
 	case "gcc":
 		// no options available at the moment...

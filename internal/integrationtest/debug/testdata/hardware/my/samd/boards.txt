@@ -43,3 +43,4 @@ my.debug.cortex-debug.custom.overrideRestartCommands.1=monitor gdb_sync
 my.debug.cortex-debug.custom.overrideRestartCommands.2=thb setup
 my.debug.cortex-debug.custom.overrideRestartCommands.3=c
 my.debug.cortex-debug.custom.anotherStringParamer=hellooo
+my.debug.svd_file=svd-file

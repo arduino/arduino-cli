@@ -130,6 +130,7 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 				"third"
 			]
 		},
+		"svd_file": "svd-file",
 		"cortex-debug_custom_configuration": {
 			"anotherStringParamer": "hellooo",
 			"overrideRestartCommands": [

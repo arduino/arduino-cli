@@ -191,6 +191,7 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 		Server:                 server,
 		ServerPath:             debugProperties.Get("server." + server + ".path"),
 		ServerConfiguration:    &serverConfiguration,
+		SvdFile:                debugProperties.Get("svd_file"),
 		Toolchain:              toolchain,
 		ToolchainPath:          debugProperties.Get("toolchain.path"),
 		ToolchainPrefix:        debugProperties.Get("toolchain.prefix"),

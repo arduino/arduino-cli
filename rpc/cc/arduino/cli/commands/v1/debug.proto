@@ -94,6 +94,8 @@ message GetDebugConfigResponse {
   // cortex-debug custom JSON configuration, it is provided as is from
   // the platform developers.
   string cortex_debug_custom_json = 9;
+  // the SVD file to use
+  string svd_file = 10;
 }
 
 // Configurations specific for the 'gcc' toolchain
