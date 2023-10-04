@@ -17,6 +17,7 @@ package debug
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"os/signal"
 
@@ -115,14 +116,15 @@ func runDebugCommand(command *cobra.Command, args []string) {
 }
 
 type debugInfoResult struct {
-	Executable      string `json:"executable,omitempty"`
-	Toolchain       string `json:"toolchain,omitempty"`
-	ToolchainPath   string `json:"toolchain_path,omitempty"`
-	ToolchainPrefix string `json:"toolchain_prefix,omitempty"`
-	ToolchainConfig any    `json:"toolchain_configuration,omitempty"`
-	Server          string `json:"server,omitempty"`
-	ServerPath      string `json:"server_path,omitempty"`
-	ServerConfig    any    `json:"server_configuration,omitempty"`
+	Executable              string `json:"executable,omitempty"`
+	Toolchain               string `json:"toolchain,omitempty"`
+	ToolchainPath           string `json:"toolchain_path,omitempty"`
+	ToolchainPrefix         string `json:"toolchain_prefix,omitempty"`
+	ToolchainConfig         any    `json:"toolchain_configuration,omitempty"`
+	Server                  string `json:"server,omitempty"`
+	ServerPath              string `json:"server_path,omitempty"`
+	ServerConfig            any    `json:"server_configuration,omitempty"`
+	CortexDebugCustomConfig any    `json:"cortex-debug_custom_configuration,omitempty"`
 }
 
 type openOcdServerConfigResult struct {
@@ -146,15 +148,22 @@ func newDebugInfoResult(info *rpc.GetDebugConfigResponse) *debugInfoResult {
 			Scripts:    openocdConf.Scripts,
 		}
 	}
+	var cortexDebugCustomConfig any
+	if info.CortexDebugCustomJson != "" {
+		if err := json.Unmarshal([]byte(info.CortexDebugCustomJson), &cortexDebugCustomConfig); err != nil {
+			feedback.Fatal(tr("Error during Debug: %v", err), feedback.ErrGeneric)
+		}
+	}
 	return &debugInfoResult{
-		Executable:      info.Executable,
-		Toolchain:       info.Toolchain,
-		ToolchainPath:   info.ToolchainPath,
-		ToolchainPrefix: info.ToolchainPrefix,
-		ToolchainConfig: toolchaingConfig,
-		Server:          info.Server,
-		ServerPath:      info.ServerPath,
-		ServerConfig:    serverConfig,
+		Executable:              info.Executable,
+		Toolchain:               info.Toolchain,
+		ToolchainPath:           info.ToolchainPath,
+		ToolchainPrefix:         info.ToolchainPrefix,
+		ToolchainConfig:         toolchaingConfig,
+		Server:                  info.Server,
+		ServerPath:              info.ServerPath,
+		ServerConfig:            serverConfig,
+		CortexDebugCustomConfig: cortexDebugCustomConfig,
 	}
 }
 

@@ -91,6 +91,9 @@ message GetDebugConfigResponse {
   google.protobuf.Any toolchain_configuration = 7;
   // Extra configuration parameters wrt GDB server
   google.protobuf.Any server_configuration = 8;
+  // cortex-debug custom JSON configuration, it is provided as is from
+  // the platform developers.
+  string cortex_debug_custom_json = 9;
 }
 
 // Configurations specific for the 'gcc' toolchain

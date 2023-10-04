@@ -129,6 +129,22 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 				"second",
 				"third"
 			]
+		},
+		"cortex-debug_custom_configuration": {
+			"anotherStringParamer": "hellooo",
+			"overrideRestartCommands": [
+				"monitor reset halt",
+				"monitor gdb_sync",
+				"thb setup",
+				"c"
+			],
+			"postAttachCommands": [
+				"set remote hardware-watchpoint-limit 2",
+				"monitor reset halt",
+				"monitor gdb_sync",
+				"thb setup",
+				"c"
+			]
 		}
 	}`)
 }
