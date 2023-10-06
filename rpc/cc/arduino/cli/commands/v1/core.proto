@@ -122,22 +122,5 @@ message PlatformSearchRequest {
 
 message PlatformSearchResponse {
   // Results of the search.
-  repeated Platform search_output = 1;
-}
-
-message PlatformListRequest {
-  // Arduino Core Service instance from the `Init` response.
-  Instance instance = 1;
-  // Set to true to only list platforms which have a newer version available
-  // than the one currently installed.
-  bool updatable_only = 2;
-  // Set to true to list platforms installed manually in the user' sketchbook
-  // hardware folder, installed with the PlatformManager through the CLI or
-  // IDE and that are available to install
-  bool all = 3;
-}
-
-message PlatformListResponse {
-  // The installed platforms.
-  repeated Platform installed_platforms = 1;
+  repeated PlatformSummary search_output = 1;
 }

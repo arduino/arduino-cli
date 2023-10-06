@@ -131,9 +131,6 @@ service ArduinoCoreService {
   // Search for a platform in the platforms indexes.
   rpc PlatformSearch(PlatformSearchRequest) returns (PlatformSearchResponse);
 
-  // List all installed platforms.
-  rpc PlatformList(PlatformListRequest) returns (PlatformListResponse);
-
   // Download the archive file of an Arduino library in the libraries index to
   // the staging directory.
   rpc LibraryDownload(LibraryDownloadRequest)

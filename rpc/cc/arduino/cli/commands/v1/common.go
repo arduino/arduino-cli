@@ -56,3 +56,27 @@ func (d DownloadProgressCB) End(success bool, message string) {
 
 // TaskProgressCB is a callback to receive progress messages
 type TaskProgressCB func(msg *TaskProgress)
+
+// InstanceCommand is an interface that represents a gRPC command with
+// a gRPC Instance.
+type InstanceCommand interface {
+	GetInstance() *Instance
+}
+
+// GetLatestRelease returns the latest release in this PlatformSummary,
+// or nil if not available.
+func (s *PlatformSummary) GetLatestRelease() *PlatformRelease {
+	if s.LatestVersion == "" {
+		return nil
+	}
+	return s.Releases[s.LatestVersion]
+}
+
+// GetInstalledRelease returns the latest release in this PlatformSummary,
+// or nil if not available.
+func (s *PlatformSummary) GetInstalledRelease() *PlatformRelease {
+	if s.InstalledVersion == "" {
+		return nil
+	}
+	return s.Releases[s.InstalledVersion]
+}
