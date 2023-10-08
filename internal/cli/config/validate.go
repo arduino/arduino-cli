@@ -27,6 +27,7 @@ var validMap = map[string]reflect.Kind{
 	"daemon.port":                   reflect.String,
 	"directories.data":              reflect.String,
 	"directories.downloads":         reflect.String,
+	"directories.template":          reflect.String,
 	"directories.user":              reflect.String,
 	"directories.builtin.tools":     reflect.String,
 	"directories.builtin.libraries": reflect.String,

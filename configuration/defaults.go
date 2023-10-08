@@ -38,6 +38,7 @@ func SetDefaults(settings *viper.Viper) {
 	// arduino directories
 	settings.SetDefault("directories.Data", getDefaultArduinoDataDir())
 	settings.SetDefault("directories.Downloads", filepath.Join(getDefaultArduinoDataDir(), "staging"))
+	settings.SetDefault("directories.Template", "")
 	settings.SetDefault("directories.User", getDefaultUserDir())
 
 	// Sketch compilation
