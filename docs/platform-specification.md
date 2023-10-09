@@ -1357,7 +1357,7 @@ directives:
 - `debug.server`: is a unique identifier of the required debug server, currently we support only `openocd`
 - `debug.svd_file`: is the absolute path to the SVD descriptor.
 
-OpenOCD server specific confgiurations:
+OpenOCD server specific configurations:
 
 - `debug.server.openocd.path`: is the absolute path to the OpenOCD directory
 - `debug.server.openocd.scripts_dir`: is the absolute path to the OpenOCD scripts directory
@@ -1389,7 +1389,6 @@ will result in the following JSON to be merged in the Arduino IDE generated `lau
 
 ```json
 {
-  "anotherStringParamer": "hellooo",
   "overrideRestartCommands": ["monitor reset halt", "monitor gdb_sync", "thb setup", "c"],
   "postAttachCommands": [
     "set remote hardware-watchpoint-limit 2",

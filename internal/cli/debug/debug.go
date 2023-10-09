@@ -135,7 +135,7 @@ type openOcdServerConfigResult struct {
 }
 
 func newDebugInfoResult(info *rpc.GetDebugConfigResponse) *debugInfoResult {
-	var toolchaingConfig interface{}
+	var toolchainConfig interface{}
 	var serverConfig interface{}
 	switch info.Server {
 	case "openocd":
@@ -160,7 +160,7 @@ func newDebugInfoResult(info *rpc.GetDebugConfigResponse) *debugInfoResult {
 		Toolchain:               info.Toolchain,
 		ToolchainPath:           info.ToolchainPath,
 		ToolchainPrefix:         info.ToolchainPrefix,
-		ToolchainConfig:         toolchaingConfig,
+		ToolchainConfig:         toolchainConfig,
 		Server:                  info.Server,
 		ServerPath:              info.ServerPath,
 		ServerConfig:            serverConfig,
