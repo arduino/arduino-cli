@@ -41,327 +41,326 @@ func TestPlatformSearch(t *testing.T) {
 	inst := instance.CreateAndInit()
 	require.NotNil(t, inst)
 
-	res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
-		SearchArgs:  "retrokit",
-		AllVersions: true,
-	})
-	require.Nil(t, stat)
-	require.NotNil(t, res)
+	t.Run("SearchAllVersions", func(t *testing.T) {
+		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
+			Instance:    inst,
+			SearchArgs:  "retrokit",
+			AllVersions: true,
+		})
+		require.Nil(t, stat)
+		require.NotNil(t, res)
 
-	require.Len(t, res.SearchOutput, 1)
-	require.Contains(t, res.SearchOutput, &rpc.PlatformSummary{
-		Metadata: &rpc.PlatformMetadata{
-			Id:         "Retrokits-RK002:arm",
-			Maintainer: "Retrokits (www.retrokits.com)",
-			Website:    "https://www.retrokits.com",
-			Email:      "info@retrokits.com",
-			Indexed:    true,
-		},
-		Releases: map[string]*rpc.PlatformRelease{
-			"1.0.5": {
-				Name:            "RK002",
-				Type:            []string{"Contributed"},
-				Installed:       false,
-				Version:         "1.0.5",
-				Boards:          []*rpc.Board{{Name: "RK002"}},
-				Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
-				MissingMetadata: true,
+		require.Len(t, res.SearchOutput, 1)
+		require.Contains(t, res.SearchOutput, &rpc.PlatformSummary{
+			Metadata: &rpc.PlatformMetadata{
+				Id:         "Retrokits-RK002:arm",
+				Maintainer: "Retrokits (www.retrokits.com)",
+				Website:    "https://www.retrokits.com",
+				Email:      "info@retrokits.com",
+				Indexed:    true,
 			},
-			"1.0.6": {
-				Name:            "RK002",
-				Type:            []string{"Contributed"},
-				Installed:       false,
-				Version:         "1.0.6",
-				Boards:          []*rpc.Board{{Name: "RK002"}},
-				Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
-				MissingMetadata: true,
+			Releases: map[string]*rpc.PlatformRelease{
+				"1.0.5": {
+					Name:            "RK002",
+					Type:            []string{"Contributed"},
+					Installed:       false,
+					Version:         "1.0.5",
+					Boards:          []*rpc.Board{{Name: "RK002"}},
+					Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					MissingMetadata: true,
+				},
+				"1.0.6": {
+					Name:            "RK002",
+					Type:            []string{"Contributed"},
+					Installed:       false,
+					Version:         "1.0.6",
+					Boards:          []*rpc.Board{{Name: "RK002"}},
+					Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					MissingMetadata: true,
+				},
 			},
-		},
-		InstalledVersion: "",
-		LatestVersion:    "1.0.6",
+			InstalledVersion: "",
+			LatestVersion:    "1.0.6",
+		})
 	})
 
-	res, stat = PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
-		SearchArgs:  "retrokit",
-		AllVersions: false,
-	})
-	require.Nil(t, stat)
-	require.NotNil(t, res)
-	require.Len(t, res.SearchOutput, 1)
-	require.Contains(t, res.SearchOutput, &rpc.PlatformSummary{
-		Metadata: &rpc.PlatformMetadata{
-			Id:         "Retrokits-RK002:arm",
-			Maintainer: "Retrokits (www.retrokits.com)",
-			Website:    "https://www.retrokits.com",
-			Email:      "info@retrokits.com",
-			Indexed:    true,
-		},
-		Releases: map[string]*rpc.PlatformRelease{
-			"1.0.6": {
-				Name:            "RK002",
-				Type:            []string{"Contributed"},
-				Installed:       false,
-				Version:         "1.0.6",
-				Boards:          []*rpc.Board{{Name: "RK002"}},
-				Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
-				MissingMetadata: true,
+	t.Run("SearchNoAllVersions", func(t *testing.T) {
+		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
+			Instance:    inst,
+			SearchArgs:  "retrokit",
+			AllVersions: false,
+		})
+		require.Nil(t, stat)
+		require.NotNil(t, res)
+		require.Len(t, res.SearchOutput, 1)
+		require.Contains(t, res.SearchOutput, &rpc.PlatformSummary{
+			Metadata: &rpc.PlatformMetadata{
+				Id:         "Retrokits-RK002:arm",
+				Maintainer: "Retrokits (www.retrokits.com)",
+				Website:    "https://www.retrokits.com",
+				Email:      "info@retrokits.com",
+				Indexed:    true,
 			},
-		},
-		InstalledVersion: "",
-		LatestVersion:    "1.0.6",
-	})
-
-	// Search the Package Maintainer
-	res, stat = PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
-		SearchArgs:  "Retrokits (www.retrokits.com)",
-		AllVersions: true,
-	})
-	require.Nil(t, stat)
-	require.NotNil(t, res)
-	require.Len(t, res.SearchOutput, 1)
-	require.Contains(t, res.SearchOutput, &rpc.PlatformSummary{
-		Metadata: &rpc.PlatformMetadata{
-			Id:         "Retrokits-RK002:arm",
-			Maintainer: "Retrokits (www.retrokits.com)",
-			Website:    "https://www.retrokits.com",
-			Email:      "info@retrokits.com",
-			Indexed:    true,
-		},
-		Releases: map[string]*rpc.PlatformRelease{
-			"1.0.5": {
-				Name:            "RK002",
-				Type:            []string{"Contributed"},
-				Installed:       true,
-				Version:         "1.0.5",
-				Boards:          []*rpc.Board{{Name: "RK002"}},
-				Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
-				MissingMetadata: true,
+			Releases: map[string]*rpc.PlatformRelease{
+				"1.0.6": {
+					Name:            "RK002",
+					Type:            []string{"Contributed"},
+					Installed:       false,
+					Version:         "1.0.6",
+					Boards:          []*rpc.Board{{Name: "RK002"}},
+					Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					MissingMetadata: true,
+				},
 			},
-		},
-		InstalledVersion: "",
-		LatestVersion:    "1.0.5",
-	})
-	require.Contains(t, res.SearchOutput, &rpc.Platform{
-		Metadata: &rpc.PlatformMetadata{
-			Id:         "Retrokits-RK002:arm",
-			Maintainer: "Retrokits (www.retrokits.com)",
-			Website:    "https://www.retrokits.com",
-			Email:      "info@retrokits.com",
-			Indexed:    true,
-		},
-		Release: &rpc.PlatformRelease{
-			Name:            "RK002",
-			Type:            []string{"Contributed"},
-			Installed:       true,
-			Version:         "1.0.6",
-			Boards:          []*rpc.Board{{Name: "RK002"}},
-			Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
-			MissingMetadata: true,
-		},
+			InstalledVersion: "",
+			LatestVersion:    "1.0.6",
+		})
 	})
 
-	// Search using the Package name
-	res, stat = PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
-		SearchArgs:  "Retrokits-RK002",
-		AllVersions: true,
-	})
-	require.Nil(t, stat)
-	require.NotNil(t, res)
-	require.Len(t, res.SearchOutput, 2)
-	require.Contains(t, res.SearchOutput, &rpc.Platform{
-		Metadata: &rpc.PlatformMetadata{
-			Id:         "Retrokits-RK002:arm",
-			Maintainer: "Retrokits (www.retrokits.com)",
-			Website:    "https://www.retrokits.com",
-			Email:      "info@retrokits.com",
-			Indexed:    true,
-		},
-		Release: &rpc.PlatformRelease{
-			Name:            "RK002",
-			Type:            []string{"Contributed"},
-			Installed:       true,
-			Version:         "1.0.5",
-			Boards:          []*rpc.Board{{Name: "RK002"}},
-			Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
-			MissingMetadata: true,
-		},
-	})
-	require.Contains(t, res.SearchOutput, &rpc.Platform{
-		Metadata: &rpc.PlatformMetadata{
-			Id:         "Retrokits-RK002:arm",
-			Maintainer: "Retrokits (www.retrokits.com)",
-			Website:    "https://www.retrokits.com",
-			Email:      "info@retrokits.com",
-			Indexed:    true,
-		},
-		Release: &rpc.PlatformRelease{
-			Name:            "RK002",
-			Type:            []string{"Contributed"},
-			Installed:       true,
-			Version:         "1.0.6",
-			Boards:          []*rpc.Board{{Name: "RK002"}},
-			Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
-			MissingMetadata: true,
-		},
-	})
-
-	// Search using the Platform name
-	res, stat = PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
-		SearchArgs:  "rk002",
-		AllVersions: true,
-	})
-	require.Nil(t, stat)
-	require.NotNil(t, res)
-	require.Len(t, res.SearchOutput, 2)
-	require.Contains(t, res.SearchOutput, &rpc.Platform{
-		Metadata: &rpc.PlatformMetadata{
-			Id:         "Retrokits-RK002:arm",
-			Maintainer: "Retrokits (www.retrokits.com)",
-			Website:    "https://www.retrokits.com",
-			Email:      "info@retrokits.com",
-			Indexed:    true,
-		},
-		Release: &rpc.PlatformRelease{
-			Name:            "RK002",
-			Type:            []string{"Contributed"},
-			Installed:       true,
-			Version:         "1.0.5",
-			Boards:          []*rpc.Board{{Name: "RK002"}},
-			Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
-			MissingMetadata: true,
-		},
-	})
-	require.Contains(t, res.SearchOutput, &rpc.Platform{
-		Metadata: &rpc.PlatformMetadata{
-			Id:         "Retrokits-RK002:arm",
-			Maintainer: "Retrokits (www.retrokits.com)",
-			Website:    "https://www.retrokits.com",
-			Email:      "info@retrokits.com",
-			Indexed:    true,
-		},
-		Release: &rpc.PlatformRelease{
-			Name:            "RK002",
-			Type:            []string{"Contributed"},
-			Installed:       true,
-			Version:         "1.0.6",
-			Boards:          []*rpc.Board{{Name: "RK002"}},
-			Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
-			MissingMetadata: true,
-		},
-	})
-
-	// Search using a board name
-	res, stat = PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
-		SearchArgs:  "Yún",
-		AllVersions: true,
-	})
-	require.Nil(t, stat)
-	require.NotNil(t, res)
-	require.Len(t, res.SearchOutput, 1)
-	require.Contains(t, res.SearchOutput, &rpc.Platform{
-		Metadata: &rpc.PlatformMetadata{
-			Id:         "arduino:avr",
-			Maintainer: "Arduino",
-			Website:    "https://www.arduino.cc/",
-			Email:      "packages@arduino.cc",
-			Indexed:    true,
-		},
-		Release: &rpc.PlatformRelease{
-			Name:      "Arduino AVR Boards",
-			Type:      []string{"Arduino"},
-			Installed: true,
-			Version:   "1.8.3",
-			Boards: []*rpc.Board{
-				{Name: "Arduino Yún"},
-				{Name: "Arduino Uno"},
-				{Name: "Arduino Uno WiFi"},
-				{Name: "Arduino Diecimila"},
-				{Name: "Arduino Nano"},
-				{Name: "Arduino Mega"},
-				{Name: "Arduino MegaADK"},
-				{Name: "Arduino Leonardo"},
-				{Name: "Arduino Leonardo Ethernet"},
-				{Name: "Arduino Micro"},
-				{Name: "Arduino Esplora"},
-				{Name: "Arduino Mini"},
-				{Name: "Arduino Ethernet"},
-				{Name: "Arduino Fio"},
-				{Name: "Arduino BT"},
-				{Name: "Arduino LilyPadUSB"},
-				{Name: "Arduino Lilypad"},
-				{Name: "Arduino Pro"},
-				{Name: "Arduino ATMegaNG"},
-				{Name: "Arduino Robot Control"},
-				{Name: "Arduino Robot Motor"},
-				{Name: "Arduino Gemma"},
-				{Name: "Adafruit Circuit Playground"},
-				{Name: "Arduino Yún Mini"},
-				{Name: "Arduino Industrial 101"},
-				{Name: "Linino One"},
+	t.Run("SearchThePackageMaintainer", func(t *testing.T) {
+		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
+			Instance:    inst,
+			SearchArgs:  "Retrokits (www.retrokits.com)",
+			AllVersions: true,
+		})
+		require.Nil(t, stat)
+		require.NotNil(t, res)
+		require.Len(t, res.SearchOutput, 1)
+		require.Contains(t, res.SearchOutput, &rpc.PlatformSummary{
+			Metadata: &rpc.PlatformMetadata{
+				Id:         "Retrokits-RK002:arm",
+				Maintainer: "Retrokits (www.retrokits.com)",
+				Website:    "https://www.retrokits.com",
+				Email:      "info@retrokits.com",
+				Indexed:    true,
 			},
-			Help:            &rpc.HelpResources{Online: "http://www.arduino.cc/en/Reference/HomePage"},
-			MissingMetadata: true,
-		},
+			Releases: map[string]*rpc.PlatformRelease{
+				"1.0.5": {
+					Name:            "RK002",
+					Type:            []string{"Contributed"},
+					Installed:       false,
+					Version:         "1.0.5",
+					Boards:          []*rpc.Board{{Name: "RK002"}},
+					Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					MissingMetadata: true,
+				},
+				"1.0.6": {
+					Name:            "RK002",
+					Type:            []string{"Contributed"},
+					Installed:       false,
+					Version:         "1.0.6",
+					Boards:          []*rpc.Board{{Name: "RK002"}},
+					Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					MissingMetadata: true,
+				},
+			},
+			InstalledVersion: "",
+			LatestVersion:    "1.0.6",
+		})
 	})
 
-	res, stat = PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
-		SearchArgs:  "yun",
-		AllVersions: true,
-	})
-	require.Nil(t, stat)
-	require.NotNil(t, res)
-	require.Len(t, res.SearchOutput, 1)
-	require.Contains(t, res.SearchOutput, &rpc.Platform{
-		Metadata: &rpc.PlatformMetadata{
-			Id:         "arduino:avr",
-			Indexed:    true,
-			Maintainer: "Arduino",
-			Website:    "https://www.arduino.cc/",
-			Email:      "packages@arduino.cc",
-		},
-		Release: &rpc.PlatformRelease{
-			Name:      "Arduino AVR Boards",
-			Type:      []string{"Arduino"},
-			Installed: true,
-			Version:   "1.8.3",
-			Boards: []*rpc.Board{
-				{Name: "Arduino Yún"},
-				{Name: "Arduino Uno"},
-				{Name: "Arduino Uno WiFi"},
-				{Name: "Arduino Diecimila"},
-				{Name: "Arduino Nano"},
-				{Name: "Arduino Mega"},
-				{Name: "Arduino MegaADK"},
-				{Name: "Arduino Leonardo"},
-				{Name: "Arduino Leonardo Ethernet"},
-				{Name: "Arduino Micro"},
-				{Name: "Arduino Esplora"},
-				{Name: "Arduino Mini"},
-				{Name: "Arduino Ethernet"},
-				{Name: "Arduino Fio"},
-				{Name: "Arduino BT"},
-				{Name: "Arduino LilyPadUSB"},
-				{Name: "Arduino Lilypad"},
-				{Name: "Arduino Pro"},
-				{Name: "Arduino ATMegaNG"},
-				{Name: "Arduino Robot Control"},
-				{Name: "Arduino Robot Motor"},
-				{Name: "Arduino Gemma"},
-				{Name: "Adafruit Circuit Playground"},
-				{Name: "Arduino Yún Mini"},
-				{Name: "Arduino Industrial 101"},
-				{Name: "Linino One"},
+	t.Run("SearchPackageName", func(t *testing.T) {
+		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
+			Instance:    inst,
+			SearchArgs:  "Retrokits-RK002",
+			AllVersions: true,
+		})
+		require.Nil(t, stat)
+		require.NotNil(t, res)
+		require.Len(t, res.SearchOutput, 1)
+		require.Contains(t, res.SearchOutput, &rpc.PlatformSummary{
+			Metadata: &rpc.PlatformMetadata{
+				Id:         "Retrokits-RK002:arm",
+				Maintainer: "Retrokits (www.retrokits.com)",
+				Website:    "https://www.retrokits.com",
+				Email:      "info@retrokits.com",
+				Indexed:    true,
 			},
-			Help:            &rpc.HelpResources{Online: "http://www.arduino.cc/en/Reference/HomePage"},
-			MissingMetadata: true,
-		},
+			Releases: map[string]*rpc.PlatformRelease{
+				"1.0.5": {
+					Name:            "RK002",
+					Type:            []string{"Contributed"},
+					Installed:       false,
+					Version:         "1.0.5",
+					Boards:          []*rpc.Board{{Name: "RK002"}},
+					Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					MissingMetadata: true,
+				},
+				"1.0.6": {
+					Name:            "RK002",
+					Type:            []string{"Contributed"},
+					Installed:       false,
+					Version:         "1.0.6",
+					Boards:          []*rpc.Board{{Name: "RK002"}},
+					Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					MissingMetadata: true,
+				},
+			},
+			InstalledVersion: "",
+			LatestVersion:    "1.0.6",
+		})
+	})
+
+	t.Run("SearchPlatformName", func(t *testing.T) {
+		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
+			Instance:    inst,
+			SearchArgs:  "rk002",
+			AllVersions: true,
+		})
+		require.Nil(t, stat)
+		require.NotNil(t, res)
+		require.Len(t, res.SearchOutput, 1)
+		require.Contains(t, res.SearchOutput, &rpc.PlatformSummary{
+			Metadata: &rpc.PlatformMetadata{
+				Id:         "Retrokits-RK002:arm",
+				Maintainer: "Retrokits (www.retrokits.com)",
+				Website:    "https://www.retrokits.com",
+				Email:      "info@retrokits.com",
+				Indexed:    true,
+			},
+			Releases: map[string]*rpc.PlatformRelease{
+				"1.0.5": {
+					Name:            "RK002",
+					Type:            []string{"Contributed"},
+					Installed:       false,
+					Version:         "1.0.5",
+					Boards:          []*rpc.Board{{Name: "RK002"}},
+					Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					MissingMetadata: true,
+				},
+				"1.0.6": {
+					Name:            "RK002",
+					Type:            []string{"Contributed"},
+					Installed:       false,
+					Version:         "1.0.6",
+					Boards:          []*rpc.Board{{Name: "RK002"}},
+					Help:            &rpc.HelpResources{Online: "https://www.retrokits.com/rk002/arduino"},
+					MissingMetadata: true,
+				},
+			},
+			InstalledVersion: "",
+			LatestVersion:    "1.0.6",
+		})
+	})
+
+	t.Run("SearchBoardName", func(t *testing.T) {
+		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
+			Instance:    inst,
+			SearchArgs:  "Yún",
+			AllVersions: true,
+		})
+		require.Nil(t, stat)
+		require.NotNil(t, res)
+		require.Len(t, res.SearchOutput, 1)
+		require.Contains(t, res.SearchOutput, &rpc.PlatformSummary{
+			Metadata: &rpc.PlatformMetadata{
+				Id:         "arduino:avr",
+				Maintainer: "Arduino",
+				Website:    "https://www.arduino.cc/",
+				Email:      "packages@arduino.cc",
+				Indexed:    true,
+			},
+			Releases: map[string]*rpc.PlatformRelease{
+				"1.8.3": {
+					Name:      "Arduino AVR Boards",
+					Type:      []string{"Arduino"},
+					Installed: false,
+					Version:   "1.8.3",
+					Boards: []*rpc.Board{
+						{Name: "Arduino Yún"},
+						{Name: "Arduino Uno"},
+						{Name: "Arduino Uno WiFi"},
+						{Name: "Arduino Diecimila"},
+						{Name: "Arduino Nano"},
+						{Name: "Arduino Mega"},
+						{Name: "Arduino MegaADK"},
+						{Name: "Arduino Leonardo"},
+						{Name: "Arduino Leonardo Ethernet"},
+						{Name: "Arduino Micro"},
+						{Name: "Arduino Esplora"},
+						{Name: "Arduino Mini"},
+						{Name: "Arduino Ethernet"},
+						{Name: "Arduino Fio"},
+						{Name: "Arduino BT"},
+						{Name: "Arduino LilyPadUSB"},
+						{Name: "Arduino Lilypad"},
+						{Name: "Arduino Pro"},
+						{Name: "Arduino ATMegaNG"},
+						{Name: "Arduino Robot Control"},
+						{Name: "Arduino Robot Motor"},
+						{Name: "Arduino Gemma"},
+						{Name: "Adafruit Circuit Playground"},
+						{Name: "Arduino Yún Mini"},
+						{Name: "Arduino Industrial 101"},
+						{Name: "Linino One"},
+					},
+					Help:            &rpc.HelpResources{Online: "http://www.arduino.cc/en/Reference/HomePage"},
+					MissingMetadata: true,
+				},
+			},
+			InstalledVersion: "",
+			LatestVersion:    "1.8.3",
+		})
+	})
+
+	t.Run("SearchBoardName2", func(t *testing.T) {
+		res, stat := PlatformSearch(&rpc.PlatformSearchRequest{
+			Instance:    inst,
+			SearchArgs:  "yun",
+			AllVersions: true,
+		})
+		require.Nil(t, stat)
+		require.NotNil(t, res)
+		require.Len(t, res.SearchOutput, 1)
+		require.Contains(t, res.SearchOutput, &rpc.PlatformSummary{
+			Metadata: &rpc.PlatformMetadata{
+				Id:         "arduino:avr",
+				Indexed:    true,
+				Maintainer: "Arduino",
+				Website:    "https://www.arduino.cc/",
+				Email:      "packages@arduino.cc",
+			},
+			Releases: map[string]*rpc.PlatformRelease{
+				"1.8.3": {
+					Name:      "Arduino AVR Boards",
+					Type:      []string{"Arduino"},
+					Installed: false,
+					Version:   "1.8.3",
+					Boards: []*rpc.Board{
+						{Name: "Arduino Yún"},
+						{Name: "Arduino Uno"},
+						{Name: "Arduino Uno WiFi"},
+						{Name: "Arduino Diecimila"},
+						{Name: "Arduino Nano"},
+						{Name: "Arduino Mega"},
+						{Name: "Arduino MegaADK"},
+						{Name: "Arduino Leonardo"},
+						{Name: "Arduino Leonardo Ethernet"},
+						{Name: "Arduino Micro"},
+						{Name: "Arduino Esplora"},
+						{Name: "Arduino Mini"},
+						{Name: "Arduino Ethernet"},
+						{Name: "Arduino Fio"},
+						{Name: "Arduino BT"},
+						{Name: "Arduino LilyPadUSB"},
+						{Name: "Arduino Lilypad"},
+						{Name: "Arduino Pro"},
+						{Name: "Arduino ATMegaNG"},
+						{Name: "Arduino Robot Control"},
+						{Name: "Arduino Robot Motor"},
+						{Name: "Arduino Gemma"},
+						{Name: "Adafruit Circuit Playground"},
+						{Name: "Arduino Yún Mini"},
+						{Name: "Arduino Industrial 101"},
+						{Name: "Linino One"},
+					},
+					Help:            &rpc.HelpResources{Online: "http://www.arduino.cc/en/Reference/HomePage"},
+					MissingMetadata: true,
+				},
+			},
+			InstalledVersion: "",
+			LatestVersion:    "1.8.3",
+		})
 	})
 }
 
@@ -390,11 +389,10 @@ func TestPlatformSearchSorting(t *testing.T) {
 	require.NotNil(t, res)
 
 	require.Len(t, res.SearchOutput, 3)
-	require.Equal(t, res.SearchOutput[0].Releases[res.SearchOutput[0].LatestVersion].Name, "Arduino AVR Boards")
+	require.Equal(t, res.SearchOutput[0].GetLatestRelease().Name, "Arduino AVR Boards")
 	require.Equal(t, res.SearchOutput[0].Metadata.Deprecated, false)
-	require.Equal(t, res.SearchOutput[1].Releases[res.SearchOutput[1].LatestVersion].Name, "RK002")
+	require.Equal(t, res.SearchOutput[1].GetLatestRelease().Name, "RK002")
 	require.Equal(t, res.SearchOutput[1].Metadata.Deprecated, false)
-	require.Equal(t, res.SearchOutput[2].Releases[res.SearchOutput[2].LatestVersion].Name, "Platform")
+	require.Equal(t, res.SearchOutput[2].GetLatestRelease().Name, "Platform")
 	require.Equal(t, res.SearchOutput[2].Metadata.Deprecated, true)
-
 }
