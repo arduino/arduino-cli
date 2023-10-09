@@ -110,42 +110,85 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--format", "json")
 	require.NoError(t, err)
 
-	// Starts debugger
-	jsonDebugOut, _, err := cli.Run("debug", "-b", fqbn, "-P", "atmel_ice", sketchPath.String(), "--info", "--format", "json")
-	require.NoError(t, err)
-	debugOut := requirejson.Parse(t, jsonDebugOut)
-	debugOut.MustContain(`
 	{
-		"toolchain": "gcc",
-		"toolchain_path": "gcc-path",
-		"toolchain_prefix": "gcc-prefix",
-		"server": "openocd",
-		"server_path": "openocd-path",
-		"server_configuration": {
-			"path": "openocd-path",
-			"scripts_dir": "openocd-scripts-dir",
-			"scripts": [
-				"first",
-				"second",
-				"third"
-			]
-		},
-		"svd_file": "svd-file",
-		"cortex-debug_custom_configuration": {
-			"anotherStringParamer": "hellooo",
-			"overrideRestartCommands": [
-				"monitor reset halt",
-				"monitor gdb_sync",
-				"thb setup",
-				"c"
-			],
-			"postAttachCommands": [
-				"set remote hardware-watchpoint-limit 2",
-				"monitor reset halt",
-				"monitor gdb_sync",
-				"thb setup",
-				"c"
-			]
-		}
-	}`)
+		// Starts debugger
+		jsonDebugOut, _, err := cli.Run("debug", "-b", fqbn, "-P", "atmel_ice", sketchPath.String(), "--info", "--format", "json")
+		require.NoError(t, err)
+		debugOut := requirejson.Parse(t, jsonDebugOut)
+		debugOut.MustContain(`
+		{
+			"toolchain": "gcc",
+			"toolchain_path": "gcc-path",
+			"toolchain_prefix": "gcc-prefix",
+			"server": "openocd",
+			"server_path": "openocd-path",
+			"server_configuration": {
+				"path": "openocd-path",
+				"scripts_dir": "openocd-scripts-dir",
+				"scripts": [
+					"first",
+					"second",
+					"third"
+				]
+			},
+			"svd_file": "svd-file",
+			"cortex-debug_custom_configuration": {
+				"anotherStringParamer": "hellooo",
+				"overrideRestartCommands": [
+					"monitor reset halt",
+					"monitor gdb_sync",
+					"thb setup",
+					"c"
+				],
+				"postAttachCommands": [
+					"set remote hardware-watchpoint-limit 2",
+					"monitor reset halt",
+					"monitor gdb_sync",
+					"thb setup",
+					"c"
+				]
+			}
+		}`)
+	}
+
+	// Starts debugger with another programmer
+	{
+		jsonDebugOut, _, err := cli.Run("debug", "-b", fqbn, "-P", "my_cold_ice", sketchPath.String(), "--info", "--format", "json")
+		require.NoError(t, err)
+		debugOut := requirejson.Parse(t, jsonDebugOut)
+		debugOut.MustContain(`
+		{
+			"toolchain": "gcc",
+			"toolchain_path": "gcc-path",
+			"toolchain_prefix": "gcc-prefix",
+			"server": "openocd",
+			"server_path": "openocd-path",
+			"server_configuration": {
+				"path": "openocd-path",
+				"scripts_dir": "openocd-scripts-dir",
+				"scripts": [
+					"first",
+					"second",
+					"cold_ice_script"
+				]
+			},
+			"svd_file": "svd-file",
+			"cortex-debug_custom_configuration": {
+				"anotherStringParamer": "hellooo",
+				"overrideRestartCommands": [
+					"monitor reset halt",
+					"monitor gdb_sync",
+					"thb setup",
+					"c"
+				],
+				"postAttachCommands": [
+					"set remote hardware-watchpoint-limit 2",
+					"monitor reset halt",
+					"monitor gdb_sync",
+					"thb setup",
+					"c"
+				]
+			}
+		}`)
+	}
 }
