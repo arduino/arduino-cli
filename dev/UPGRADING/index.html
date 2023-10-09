@@ -285,6 +285,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#cli-debug-info-changed-json-output" class="md-nav__link">
+    CLI debug --info changed JSON output.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grpc-ccarduinoclicommandsv1getdebugconfigresponse-message-has-been-changed" class="md-nav__link">
+    gRPC cc.arduino.cli.commands.v1.GetDebugConfigResponse message has been changed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#grpc-service-ccarduinoclidebugv1-moved-to-ccarduinoclicommandsv1" class="md-nav__link">
     gRPC service cc.arduino.cli.debug.v1 moved to cc.arduino.cli.commands.v1.
   </a>
@@ -2357,6 +2371,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#cli-debug-info-changed-json-output" class="md-nav__link">
+    CLI debug --info changed JSON output.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grpc-ccarduinoclicommandsv1getdebugconfigresponse-message-has-been-changed" class="md-nav__link">
+    gRPC cc.arduino.cli.commands.v1.GetDebugConfigResponse message has been changed.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#grpc-service-ccarduinoclidebugv1-moved-to-ccarduinoclicommandsv1" class="md-nav__link">
     gRPC service cc.arduino.cli.debug.v1 moved to cc.arduino.cli.commands.v1.
   </a>
@@ -3379,6 +3407,36 @@
                 <h1 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h1>
 <p>Here you can find a list of migration guides to handle breaking changes between releases of the CLI.</p>
 <h2 id="0350">0.35.0<a class="headerlink" href="#0350" title="Permanent link">&para;</a></h2>
+<h3 id="cli-debug-info-changed-json-output">CLI <code>debug --info</code> changed JSON output.<a class="headerlink" href="#cli-debug-info-changed-json-output" title="Permanent link">&para;</a></h3>
+<p>The string field <code>server_configuration.script</code> is now an array and has been renamed <code>scripts</code>, here an example:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;executable&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/tmp/arduino/sketches/002050EAA7EFB9A4FC451CDFBC0FA2D3/Blink.ino.elf&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;toolchain&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gcc&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;toolchain_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/user/.arduino15/packages/arduino/tools/arm-none-eabi-gcc/7-2017q4/bin/&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;toolchain_prefix&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;arm-none-eabi-&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;server&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;openocd&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;server_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/user/.arduino15/packages/arduino/tools/openocd/0.10.0-arduino7/bin/openocd&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;server_configuration&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/user/.arduino15/packages/arduino/tools/openocd/0.10.0-arduino7/bin/openocd&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;scripts_dir&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/home/user/.arduino15/packages/arduino/tools/openocd/0.10.0-arduino7/share/openocd/scripts/&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;scripts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="s2">&quot;/home/user/Workspace/arduino-cli/internal/integrationtest/debug/testdata/hardware/my/samd/variants/arduino:mkr1000/openocd_scripts/arduino_zero.cfg&quot;</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="grpc-ccarduinoclicommandsv1getdebugconfigresponse-message-has-been-changed">gRPC <code>cc.arduino.cli.commands.v1.GetDebugConfigResponse</code> message has been changed.<a class="headerlink" href="#grpc-ccarduinoclicommandsv1getdebugconfigresponse-message-has-been-changed" title="Permanent link">&para;</a></h3>
+<p>The fields <code>toolchain_configuration</code> and <code>server_configuration</code> are no more generic <code>map&lt;string, string&gt;</code> but they have
+changed type to <code>goog.protobuf.Any</code>, the concrete type is assigned at runtime based on the value of <code>toolchain</code> and
+<code>server</code> fields respectively.</p>
+<p>For the moment:</p>
+<ul>
+<li>only <code>gcc</code> is supported for <code>toolchain</code>, and the concrete type for <code>toolchain_configuration</code> is
+  <code>DebugGCCToolchainConfiguration</code>.</li>
+<li>only <code>openocd</code> is supported for <code>server</code>, and the concrete type for <code>server_configuration</code> is
+  <code>DebugOpenOCDServerConfiguration</code></li>
+</ul>
+<p>More concrete type may be added in the future as more servers/toolchains support is implemented.</p>
 <h3 id="grpc-service-ccarduinoclidebugv1-moved-to-ccarduinoclicommandsv1">gRPC service <code>cc.arduino.cli.debug.v1</code> moved to <code>cc.arduino.cli.commands.v1</code>.<a class="headerlink" href="#grpc-service-ccarduinoclidebugv1-moved-to-ccarduinoclicommandsv1" title="Permanent link">&para;</a></h3>
 <p>The gRPC service <code>cc.arduino.cli.debug.v1</code> has been removed and all gRPC messages and rpc calls have been moved to
 <code>cc.arduino.cli.commands.v1</code>.</p>

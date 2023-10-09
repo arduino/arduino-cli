@@ -1583,9 +1583,36 @@
   
 </li>
         
-          <li class="md-nav__item">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#sketch-debugging-configuration" class="md-nav__link">
     Sketch debugging configuration
+  </a>
+  
+    <nav class="md-nav" aria-label="Sketch debugging configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#debugger-configuration-directives" class="md-nav__link">
+    Debugger configuration directives
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-config-for-cortext-debug-plugin-for-arduino-ide" class="md-nav__link">
+    Custom config for Cortext-debug plugin for Arduino IDE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optimization-level-for-debugging" class="md-nav__link">
+    Optimization level for debugging
   </a>
   
 </li>
@@ -2182,9 +2209,36 @@
   
 </li>
         
-          <li class="md-nav__item">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#sketch-debugging-configuration" class="md-nav__link">
     Sketch debugging configuration
+  </a>
+  
+    <nav class="md-nav" aria-label="Sketch debugging configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#debugger-configuration-directives" class="md-nav__link">
+    Debugger configuration directives
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-config-for-cortext-debug-plugin-for-arduino-ide" class="md-nav__link">
+    Custom config for Cortext-debug plugin for Arduino IDE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optimization-level-for-debugging" class="md-nav__link">
+    Optimization level for debugging
   </a>
   
 </li>
@@ -3284,10 +3338,59 @@ leonardo.bootloader.tool=avrdude
 the <a href="#platform-terminology">core platform</a> is not used at all in defining the recipes for <code>erase</code> and <code>bootloader</code>
 actions. When using Arduino development software other than the Arduino IDE, the handling of properties from the core
 platform's platform.txt is done as usual.</p>
-<h3 id="sketch-debugging-configuration">Sketch debugging configuration<a class="headerlink" href="#sketch-debugging-configuration" title="Permanent link">&para;</a></h3>
+<h2 id="sketch-debugging-configuration">Sketch debugging configuration<a class="headerlink" href="#sketch-debugging-configuration" title="Permanent link">&para;</a></h2>
 <p>Starting from Arduino CLI 0.9.0 / Arduino IDE 2.x, sketch debugging support is available for platforms.</p>
 <p>The debug action is triggered when the user clicks the Debug button in the Arduino IDE or runs the
 <a href="../commands/arduino-cli_debug/"><code>arduino-cli debug</code></a> command.</p>
+<p>Since opening a debug session requires the orchestration of numerous tools, the CLI/IDE will take care of that duty:
+differently from the upload actions, there is no need for the platform to provide debug recipes, the only requirement is
+to provide some debug configuration directives.</p>
+<h3 id="debugger-configuration-directives">Debugger configuration directives<a class="headerlink" href="#debugger-configuration-directives" title="Permanent link">&para;</a></h3>
+<p>All the debug directives are grouped under the <code>debug.*</code> directives. Here is the complete list of the supported
+directives:</p>
+<ul>
+<li><code>debug.toolchain</code>: is a unique identifier of the required toolchain, currently we support <code>gcc</code> (and compatible) only</li>
+<li><code>debug.toolchain.path</code>: is the absolute path to the toolchain directory</li>
+<li><code>debug.toolchain.prefix</code>: is the prefix of the toolchain (for example <code>arm-none-eabi-</code>)</li>
+<li><code>debug.server</code>: is a unique identifier of the required debug server, currently we support only <code>openocd</code></li>
+<li><code>debug.svd_file</code>: is the absolute path to the SVD descriptor.</li>
+</ul>
+<p>OpenOCD server specific configurations:</p>
+<ul>
+<li><code>debug.server.openocd.path</code>: is the absolute path to the OpenOCD directory</li>
+<li><code>debug.server.openocd.scripts_dir</code>: is the absolute path to the OpenOCD scripts directory</li>
+<li><code>debug.server.openocd.scripts.N</code>: is a list of OpenOCD scripts to run (where N is a number starting from 0)</li>
+</ul>
+<h3 id="custom-config-for-cortext-debug-plugin-for-arduino-ide">Custom config for Cortext-debug plugin for Arduino IDE<a class="headerlink" href="#custom-config-for-cortext-debug-plugin-for-arduino-ide" title="Permanent link">&para;</a></h3>
+<p>The Arduino IDE uses cortex-debug plugin to start a debugging session. The IDE creates a <code>launch.json</code> file that is
+needed to start the debugging via the cortex-debug plugin. To give the platform developers more flexibility, it is
+allowed to pass any extra arbitrary setup to <code>launch.json</code> generated by the IDE. To allow this the directives under the
+group <code>debug.cortex-debug.custom.*</code> are converted into JSON and added to the generated <code>launch.json</code> as-is. Moreover, if
+a directive has a key with a numeric suffix, it is converted into a JSON array.</p>
+<p>For example the following directives:</p>
+<div class="highlight"><pre><span></span><code>debug.cortex-debug.custom.postAttachCommands.0=set remote hardware-watchpoint-limit 2
+debug.cortex-debug.custom.postAttachCommands.1=monitor reset halt
+debug.cortex-debug.custom.postAttachCommands.2=monitor gdb_sync
+debug.cortex-debug.custom.postAttachCommands.3=thb setup
+debug.cortex-debug.custom.postAttachCommands.4=c
+debug.cortex-debug.custom.overrideRestartCommands.0=monitor reset halt
+debug.cortex-debug.custom.overrideRestartCommands.1=monitor gdb_sync
+debug.cortex-debug.custom.overrideRestartCommands.2=thb setup
+debug.cortex-debug.custom.overrideRestartCommands.3=c
+</code></pre></div>
+<p>will result in the following JSON to be merged in the Arduino IDE generated <code>launch.json</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;overrideRestartCommands&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;monitor reset halt&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;monitor gdb_sync&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;thb setup&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;c&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;postAttachCommands&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;set remote hardware-watchpoint-limit 2&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;monitor reset halt&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;monitor gdb_sync&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;thb setup&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;c&quot;</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="optimization-level-for-debugging">Optimization level for debugging<a class="headerlink" href="#optimization-level-for-debugging" title="Permanent link">&para;</a></h3>
 <p>The compiler optimization level that is appropriate for normal usage will often not provide a good experience while
 debugging. For this reason, it may be helpful to use different compiler flags when compiling a sketch for use with the
 debugger. The flags for use when compiling for debugging can be defined via the <strong>compiler.optimization_flags.debug</strong>

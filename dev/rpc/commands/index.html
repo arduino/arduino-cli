@@ -1698,6 +1698,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#debuggcctoolchainconfiguration" class="md-nav__link">
+    DebugGCCToolchainConfiguration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debugopenocdserverconfiguration" class="md-nav__link">
+    DebugOpenOCDServerConfiguration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#debugrequest" class="md-nav__link">
     DebugRequest
   </a>
@@ -1721,20 +1735,6 @@
           <li class="md-nav__item">
   <a href="#getdebugconfigresponse" class="md-nav__link">
     GetDebugConfigResponse
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#getdebugconfigresponseserverconfigurationentry" class="md-nav__link">
-    GetDebugConfigResponse.ServerConfigurationEntry
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#getdebugconfigresponsetoolchainconfigurationentry" class="md-nav__link">
-    GetDebugConfigResponse.ToolchainConfigurationEntry
   </a>
   
 </li>
@@ -3083,6 +3083,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#debuggcctoolchainconfiguration" class="md-nav__link">
+    DebugGCCToolchainConfiguration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debugopenocdserverconfiguration" class="md-nav__link">
+    DebugOpenOCDServerConfiguration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#debugrequest" class="md-nav__link">
     DebugRequest
   </a>
@@ -3106,20 +3120,6 @@
           <li class="md-nav__item">
   <a href="#getdebugconfigresponse" class="md-nav__link">
     GetDebugConfigResponse
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#getdebugconfigresponseserverconfigurationentry" class="md-nav__link">
-    GetDebugConfigResponse.ServerConfigurationEntry
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#getdebugconfigresponsetoolchainconfigurationentry" class="md-nav__link">
-    GetDebugConfigResponse.ToolchainConfigurationEntry
   </a>
   
 </li>
@@ -3714,12 +3714,12 @@
 </ul>
 <ul>
 <li><a href="#cc/arduino/cli/commands/v1/debug.proto">cc/arduino/cli/commands/v1/debug.proto</a>
+    - <a href="#cc.arduino.cli.commands.v1.DebugGCCToolchainConfiguration">DebugGCCToolchainConfiguration</a>
+    - <a href="#cc.arduino.cli.commands.v1.DebugOpenOCDServerConfiguration">DebugOpenOCDServerConfiguration</a>
     - <a href="#cc.arduino.cli.commands.v1.DebugRequest">DebugRequest</a>
     - <a href="#cc.arduino.cli.commands.v1.DebugResponse">DebugResponse</a>
     - <a href="#cc.arduino.cli.commands.v1.GetDebugConfigRequest">GetDebugConfigRequest</a>
-    - <a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse">GetDebugConfigResponse</a>
-    - <a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse.ServerConfigurationEntry">GetDebugConfigResponse.ServerConfigurationEntry</a>
-    - <a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse.ToolchainConfigurationEntry">GetDebugConfigResponse.ToolchainConfigurationEntry</a></li>
+    - <a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse">GetDebugConfigResponse</a></li>
 </ul>
 <ul>
 <li><a href="#cc/arduino/cli/commands/v1/lib.proto">cc/arduino/cli/commands/v1/lib.proto</a>
@@ -6476,6 +6476,42 @@ because already at latest version.</p>
 <p align="right"><a href="#top">Top</a></p>
 
 <h2 id="ccarduinoclicommandsv1debugproto">cc/arduino/cli/commands/v1/debug.proto<a class="headerlink" href="#ccarduinoclicommandsv1debugproto" title="Permanent link">&para;</a></h2>
+<p><a name="cc.arduino.cli.commands.v1.DebugGCCToolchainConfiguration"></a></p>
+<h3 id="debuggcctoolchainconfiguration">DebugGCCToolchainConfiguration<a class="headerlink" href="#debuggcctoolchainconfiguration" title="Permanent link">&para;</a></h3>
+<p>Configurations specific for the &#39;gcc&#39; toolchain</p>
+<p><a name="cc.arduino.cli.commands.v1.DebugOpenOCDServerConfiguration"></a></p>
+<h3 id="debugopenocdserverconfiguration">DebugOpenOCDServerConfiguration<a class="headerlink" href="#debugopenocdserverconfiguration" title="Permanent link">&para;</a></h3>
+<p>Configuration specific for the &#39;openocd` server</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Label</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>path</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>path to openocd</td>
+</tr>
+<tr>
+<td>scripts_dir</td>
+<td><a href="#string">string</a></td>
+<td></td>
+<td>path to openocd scripts</td>
+</tr>
+<tr>
+<td>scripts</td>
+<td><a href="#string">string</a></td>
+<td>repeated</td>
+<td>list of scripts to execute by openocd</td>
+</tr>
+</tbody>
+</table>
 <p><a name="cc.arduino.cli.commands.v1.DebugRequest"></a></p>
 <h3 id="debugrequest">DebugRequest<a class="headerlink" href="#debugrequest" title="Permanent link">&para;</a></h3>
 <p>The top-level message sent by the client for the <code>Debug</code> method.
@@ -6646,67 +6682,27 @@ session and must not contain a <code>GetDebugConfigRequest</code> message.</p>
 </tr>
 <tr>
 <td>toolchain_configuration</td>
-<td><a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse.ToolchainConfigurationEntry">GetDebugConfigResponse.ToolchainConfigurationEntry</a></td>
-<td>repeated</td>
+<td><a href="#google.protobuf.Any">google.protobuf.Any</a></td>
+<td></td>
 <td>Extra configuration parameters wrt toolchain</td>
 </tr>
 <tr>
 <td>server_configuration</td>
-<td><a href="#cc.arduino.cli.commands.v1.GetDebugConfigResponse.ServerConfigurationEntry">GetDebugConfigResponse.ServerConfigurationEntry</a></td>
-<td>repeated</td>
+<td><a href="#google.protobuf.Any">google.protobuf.Any</a></td>
+<td></td>
 <td>Extra configuration parameters wrt GDB server</td>
 </tr>
-</tbody>
-</table>
-<p><a name="cc.arduino.cli.commands.v1.GetDebugConfigResponse.ServerConfigurationEntry"></a></p>
-<h3 id="getdebugconfigresponseserverconfigurationentry">GetDebugConfigResponse.ServerConfigurationEntry<a class="headerlink" href="#getdebugconfigresponseserverconfigurationentry" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
 <tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>key</td>
+<td>cortex_debug_custom_json</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
+<td>cortex-debug custom JSON configuration, it is provided as is from the platform developers.</td>
 </tr>
 <tr>
-<td>value</td>
+<td>svd_file</td>
 <td><a href="#string">string</a></td>
 <td></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<p><a name="cc.arduino.cli.commands.v1.GetDebugConfigResponse.ToolchainConfigurationEntry"></a></p>
-<h3 id="getdebugconfigresponsetoolchainconfigurationentry">GetDebugConfigResponse.ToolchainConfigurationEntry<a class="headerlink" href="#getdebugconfigresponsetoolchainconfigurationentry" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Type</th>
-<th>Label</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>key</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>value</td>
-<td><a href="#string">string</a></td>
-<td></td>
-<td></td>
+<td>the SVD file to use</td>
 </tr>
 </tbody>
 </table>
