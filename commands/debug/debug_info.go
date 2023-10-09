@@ -17,6 +17,8 @@ package debug
 
 import (
 	"context"
+	"encoding/json"
+	"regexp"
 	"strings"
 
 	"github.com/arduino/arduino-cli/arduino"
@@ -28,6 +30,7 @@ import (
 	"github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-properties-orderedmap"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // GetDebugConfig returns metadata to start debugging with the specified board
@@ -150,14 +153,88 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 
 	server := debugProperties.Get("server")
 	toolchain := debugProperties.Get("toolchain")
+
+	var serverConfiguration anypb.Any
+	switch server {
+	case "openocd":
+		openocdProperties := debugProperties.SubTree("server." + server)
+		scripts := openocdProperties.ExtractSubIndexLists("scripts")
+		if s := openocdProperties.Get("script"); s != "" {
+			// backward compatibility
+			scripts = append(scripts, s)
+		}
+		openocdConf := &rpc.DebugOpenOCDServerConfiguration{
+			Path:       openocdProperties.Get("path"),
+			ScriptsDir: openocdProperties.Get("scripts_dir"),
+			Scripts:    scripts,
+		}
+		if err := serverConfiguration.MarshalFrom(openocdConf); err != nil {
+			return nil, err
+		}
+	}
+
+	var toolchainConfiguration anypb.Any
+	switch toolchain {
+	case "gcc":
+		gccConf := &rpc.DebugGCCToolchainConfiguration{}
+		if err := toolchainConfiguration.MarshalFrom(gccConf); err != nil {
+			return nil, err
+		}
+	}
+
+	cortexDebugCustomJson := ""
+	if cortexDebugProps := debugProperties.SubTree("cortex-debug.custom"); cortexDebugProps.Size() > 0 {
+		cortexDebugCustomJson = convertToJsonMap(cortexDebugProps)
+	}
 	return &rpc.GetDebugConfigResponse{
 		Executable:             debugProperties.Get("executable"),
 		Server:                 server,
 		ServerPath:             debugProperties.Get("server." + server + ".path"),
-		ServerConfiguration:    debugProperties.SubTree("server." + server).AsMap(),
+		ServerConfiguration:    &serverConfiguration,
+		SvdFile:                debugProperties.Get("svd_file"),
 		Toolchain:              toolchain,
 		ToolchainPath:          debugProperties.Get("toolchain.path"),
 		ToolchainPrefix:        debugProperties.Get("toolchain.prefix"),
-		ToolchainConfiguration: debugProperties.SubTree("toolchain." + toolchain).AsMap(),
+		ToolchainConfiguration: &toolchainConfiguration,
+		CortexDebugCustomJson:  cortexDebugCustomJson,
 	}, nil
+}
+
+// Extract a JSON from a given properies.Map and converts key-indexed arrays
+// like:
+//
+//	my.indexed.array.0=first
+//	my.indexed.array.1=second
+//	my.indexed.array.2=third
+//
+// into the corresponding JSON arrays.
+func convertToJsonMap(in *properties.Map) string {
+	// XXX: Maybe this method could be a good candidate for propertis.Map?
+
+	// Find the values that should be kept as is, and the indexed arrays
+	// that should be later converted into arrays.
+	arraysKeys := map[string]bool{}
+	stringKeys := []string{}
+	trailingNumberMatcher := regexp.MustCompile(`^(.*)\.[0-9]+$`)
+	for _, k := range in.Keys() {
+		match := trailingNumberMatcher.FindAllStringSubmatch(k, -1)
+		if len(match) > 0 && len(match[0]) > 1 {
+			arraysKeys[match[0][1]] = true
+		} else {
+			stringKeys = append(stringKeys, k)
+		}
+	}
+
+	// Compose a map that can be later marshaled into JSON keeping
+	// the arrays where they are expected to be.
+	res := map[string]any{}
+	for _, k := range stringKeys {
+		res[k] = in.Get(k)
+	}
+	for k := range arraysKeys {
+		res[k] = in.ExtractSubIndexLists(k)
+	}
+
+	data, _ := json.MarshalIndent(res, "", "  ")
+	return string(data)
 }

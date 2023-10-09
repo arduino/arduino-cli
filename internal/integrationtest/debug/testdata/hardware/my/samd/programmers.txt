@@ -1,0 +1,4 @@
+
+# this programmer overrides the third script
+my_cold_ice.name=Cold ICE Tea
+my_cold_ice.debug.server.openocd.scripts.2=cold_ice_script

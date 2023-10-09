@@ -17,9 +17,9 @@ package debug
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"os/signal"
-	"sort"
 
 	"github.com/arduino/arduino-cli/commands/debug"
 	"github.com/arduino/arduino-cli/commands/sketch"
@@ -29,7 +29,6 @@ import (
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
-	"github.com/arduino/go-properties-orderedmap"
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -96,7 +95,7 @@ func runDebugCommand(command *cobra.Command, args []string) {
 		if res, err := debug.GetDebugConfig(context.Background(), debugConfigRequested); err != nil {
 			feedback.Fatal(tr("Error getting Debug info: %v", err), feedback.ErrBadArgument)
 		} else {
-			feedback.PrintResult(&debugInfoResult{res})
+			feedback.PrintResult(newDebugInfoResult(res))
 		}
 
 	} else {
@@ -117,40 +116,101 @@ func runDebugCommand(command *cobra.Command, args []string) {
 }
 
 type debugInfoResult struct {
-	info *rpc.GetDebugConfigResponse
+	Executable              string `json:"executable,omitempty"`
+	Toolchain               string `json:"toolchain,omitempty"`
+	ToolchainPath           string `json:"toolchain_path,omitempty"`
+	ToolchainPrefix         string `json:"toolchain_prefix,omitempty"`
+	ToolchainConfig         any    `json:"toolchain_configuration,omitempty"`
+	Server                  string `json:"server,omitempty"`
+	ServerPath              string `json:"server_path,omitempty"`
+	ServerConfig            any    `json:"server_configuration,omitempty"`
+	SvdFile                 string `json:"svd_file,omitempty"`
+	CortexDebugCustomConfig any    `json:"cortex-debug_custom_configuration,omitempty"`
+}
+
+type openOcdServerConfigResult struct {
+	Path       string   `json:"path,omitempty"`
+	ScriptsDir string   `json:"scripts_dir,omitempty"`
+	Scripts    []string `json:"scripts,omitempty"`
+}
+
+func newDebugInfoResult(info *rpc.GetDebugConfigResponse) *debugInfoResult {
+	var toolchainConfig interface{}
+	var serverConfig interface{}
+	switch info.Server {
+	case "openocd":
+		var openocdConf rpc.DebugOpenOCDServerConfiguration
+		if err := info.GetServerConfiguration().UnmarshalTo(&openocdConf); err != nil {
+			feedback.Fatal(tr("Error during Debug: %v", err), feedback.ErrGeneric)
+		}
+		serverConfig = &openOcdServerConfigResult{
+			Path:       openocdConf.Path,
+			ScriptsDir: openocdConf.ScriptsDir,
+			Scripts:    openocdConf.Scripts,
+		}
+	}
+	var cortexDebugCustomConfig any
+	if info.CortexDebugCustomJson != "" {
+		if err := json.Unmarshal([]byte(info.CortexDebugCustomJson), &cortexDebugCustomConfig); err != nil {
+			feedback.Fatal(tr("Error during Debug: %v", err), feedback.ErrGeneric)
+		}
+	}
+	return &debugInfoResult{
+		Executable:              info.Executable,
+		Toolchain:               info.Toolchain,
+		ToolchainPath:           info.ToolchainPath,
+		ToolchainPrefix:         info.ToolchainPrefix,
+		ToolchainConfig:         toolchainConfig,
+		Server:                  info.Server,
+		ServerPath:              info.ServerPath,
+		ServerConfig:            serverConfig,
+		SvdFile:                 info.SvdFile,
+		CortexDebugCustomConfig: cortexDebugCustomConfig,
+	}
 }
 
 func (r *debugInfoResult) Data() interface{} {
-	return r.info
+	return r
 }
 
 func (r *debugInfoResult) String() string {
 	t := table.New()
 	green := color.New(color.FgHiGreen)
 	dimGreen := color.New(color.FgGreen)
-	t.AddRow(tr("Executable to debug"), table.NewCell(r.info.GetExecutable(), green))
-	t.AddRow(tr("Toolchain type"), table.NewCell(r.info.GetToolchain(), green))
-	t.AddRow(tr("Toolchain path"), table.NewCell(r.info.GetToolchainPath(), dimGreen))
-	t.AddRow(tr("Toolchain prefix"), table.NewCell(r.info.GetToolchainPrefix(), dimGreen))
-	if len(r.info.GetToolchainConfiguration()) > 0 {
-		conf := properties.NewFromHashmap(r.info.GetToolchainConfiguration())
-		keys := conf.Keys()
-		sort.Strings(keys)
-		t.AddRow(tr("Toolchain custom configurations"))
-		for _, k := range keys {
-			t.AddRow(table.NewCell(" - "+k, dimGreen), table.NewCell(conf.Get(k), dimGreen))
-		}
+	t.AddRow(tr("Executable to debug"), table.NewCell(r.Executable, green))
+	t.AddRow(tr("Toolchain type"), table.NewCell(r.Toolchain, green))
+	t.AddRow(tr("Toolchain path"), table.NewCell(r.ToolchainPath, dimGreen))
+	t.AddRow(tr("Toolchain prefix"), table.NewCell(r.ToolchainPrefix, dimGreen))
+	if r.SvdFile != "" {
+		t.AddRow(tr("SVD file path"), table.NewCell(r.SvdFile, dimGreen))
 	}
-	t.AddRow(tr("GDB Server type"), table.NewCell(r.info.GetServer(), green))
-	t.AddRow(tr("GDB Server path"), table.NewCell(r.info.GetServerPath(), dimGreen))
-	if len(r.info.GetServerConfiguration()) > 0 {
-		conf := properties.NewFromHashmap(r.info.GetServerConfiguration())
-		keys := conf.Keys()
-		sort.Strings(keys)
-		t.AddRow(tr("Configuration options for %s", r.info.GetServer()))
-		for _, k := range keys {
-			t.AddRow(table.NewCell(" - "+k, dimGreen), table.NewCell(conf.Get(k), dimGreen))
+	switch r.Toolchain {
+	case "gcc":
+		// no options available at the moment...
+	default:
+	}
+	t.AddRow(tr("Server type"), table.NewCell(r.Server, green))
+	t.AddRow(tr("Server path"), table.NewCell(r.ServerPath, dimGreen))
+
+	switch r.Server {
+	case "openocd":
+		t.AddRow(tr("Configuration options for %s", r.Server))
+		openocdConf := r.ServerConfig.(*openOcdServerConfigResult)
+		if openocdConf.Path != "" {
+			t.AddRow(" - Path", table.NewCell(openocdConf.Path, dimGreen))
 		}
+		if openocdConf.ScriptsDir != "" {
+			t.AddRow(" - Scripts Directory", table.NewCell(openocdConf.ScriptsDir, dimGreen))
+		}
+		for _, script := range openocdConf.Scripts {
+			t.AddRow(" - Script", table.NewCell(script, dimGreen))
+		}
+	default:
+	}
+	if r.CortexDebugCustomConfig != nil {
+		t.AddRow(tr("Custom configuration for cortex-debug IDE plugin:"))
+		data, _ := json.MarshalIndent(r.CortexDebugCustomConfig, "  ", "  ")
+		return t.Render() + "  " + string(data)
 	}
 	return t.Render()
 }

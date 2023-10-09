@@ -4,6 +4,43 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## 0.35.0
 
+### CLI `debug --info` changed JSON output.
+
+The string field `server_configuration.script` is now an array and has been renamed `scripts`, here an example:
+
+```json
+{
+  "executable": "/tmp/arduino/sketches/002050EAA7EFB9A4FC451CDFBC0FA2D3/Blink.ino.elf",
+  "toolchain": "gcc",
+  "toolchain_path": "/home/user/.arduino15/packages/arduino/tools/arm-none-eabi-gcc/7-2017q4/bin/",
+  "toolchain_prefix": "arm-none-eabi-",
+  "server": "openocd",
+  "server_path": "/home/user/.arduino15/packages/arduino/tools/openocd/0.10.0-arduino7/bin/openocd",
+  "server_configuration": {
+    "path": "/home/user/.arduino15/packages/arduino/tools/openocd/0.10.0-arduino7/bin/openocd",
+    "scripts_dir": "/home/user/.arduino15/packages/arduino/tools/openocd/0.10.0-arduino7/share/openocd/scripts/",
+    "scripts": [
+      "/home/user/Workspace/arduino-cli/internal/integrationtest/debug/testdata/hardware/my/samd/variants/arduino:mkr1000/openocd_scripts/arduino_zero.cfg"
+    ]
+  }
+}
+```
+
+### gRPC `cc.arduino.cli.commands.v1.GetDebugConfigResponse` message has been changed.
+
+The fields `toolchain_configuration` and `server_configuration` are no more generic `map<string, string>` but they have
+changed type to `goog.protobuf.Any`, the concrete type is assigned at runtime based on the value of `toolchain` and
+`server` fields respectively.
+
+For the moment:
+
+- only `gcc` is supported for `toolchain`, and the concrete type for `toolchain_configuration` is
+  `DebugGCCToolchainConfiguration`.
+- only `openocd` is supported for `server`, and the concrete type for `server_configuration` is
+  `DebugOpenOCDServerConfiguration`
+
+More concrete type may be added in the future as more servers/toolchains support is implemented.
+
 ### gRPC service `cc.arduino.cli.debug.v1` moved to `cc.arduino.cli.commands.v1`.
 
 The gRPC service `cc.arduino.cli.debug.v1` has been removed and all gRPC messages and rpc calls have been moved to
