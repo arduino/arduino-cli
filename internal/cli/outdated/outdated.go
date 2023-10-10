@@ -24,6 +24,7 @@ import (
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/core"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	"github.com/arduino/arduino-cli/internal/cli/lib"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
@@ -57,15 +58,24 @@ func runOutdatedCommand(cmd *cobra.Command, args []string) {
 // Outdated prints a list of outdated platforms and libraries
 func Outdated(inst *rpc.Instance) {
 	feedback.PrintResult(
-		outdatedResult{core.GetList(inst, false, true), lib.GetList(inst, []string{}, false, true)},
+		newOutdatedResult(core.GetList(inst, false, true), lib.GetList(inst, []string{}, false, true)),
 	)
 }
 
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type outdatedResult struct {
-	Platforms     []*rpc.PlatformSummary  `json:"platforms,omitempty"`
+	Platforms     []*result.Platform      `json:"platforms,omitempty"`
 	InstalledLibs []*rpc.InstalledLibrary `json:"libraries,omitempty"`
+}
+
+func newOutdatedResult(inPlatforms []*rpc.PlatformSummary, inLibraries []*rpc.InstalledLibrary) *outdatedResult {
+	res := &outdatedResult{}
+	for _, platformSummary := range inPlatforms {
+		res.Platforms = append(res.Platforms, result.NewPlatformResult(platformSummary))
+	}
+	res.InstalledLibs = inLibraries
+	return res
 }
 
 func (ir outdatedResult) Data() interface{} {
@@ -93,11 +103,14 @@ func (ir outdatedResult) String() string {
 
 	// Based on internal/cli/core/list.go
 	for _, p := range ir.Platforms {
-		name := p.GetLatestRelease().GetName()
-		if p.GetMetadata().Deprecated {
+		name := ""
+		if latest := p.GetLatestRelease(); latest != nil {
+			name = latest.Name
+		}
+		if p.Deprecated {
 			name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), name)
 		}
-		t.AddRow(p.GetMetadata().Id, name, p.InstalledVersion, p.LatestVersion, "", "")
+		t.AddRow(p.Id, name, p.InstalledVersion, p.LatestVersion, "", "")
 	}
 
 	// Based on internal/cli/lib/list.go
