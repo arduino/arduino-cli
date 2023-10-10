@@ -16,48 +16,33 @@
 package result
 
 import (
-	"slices"
-
+	"github.com/arduino/arduino-cli/internal/orderedmap"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
-	"github.com/iancoleman/orderedmap"
 	semver "go.bug.st/relaxed-semver"
 )
 
 // NewPlatformResult creates a new result.Platform from rpc.PlatformSummary
 func NewPlatformResult(in *rpc.PlatformSummary) *Platform {
-	meta := in.Metadata
-	res := &Platform{
-		Id:                meta.Id,
-		Maintainer:        meta.Maintainer,
-		Website:           meta.Website,
-		Email:             meta.Email,
-		ManuallyInstalled: meta.ManuallyInstalled,
-		Deprecated:        meta.Deprecated,
-		Indexed:           meta.Indexed,
-
-		Releases:         orderedmap.New(),
-		InstalledVersion: in.InstalledVersion,
-		LatestVersion:    in.LatestVersion,
-	}
-
+	releases := orderedmap.New[string, *PlatformRelease]()
 	for k, v := range in.Releases {
-		res.Releases.Set(k, NewPlatformReleaseResult(v))
+		releases.Set(k, NewPlatformReleaseResult(v))
 	}
-	res.Releases.SortKeys(func(keys []string) {
-		slices.SortFunc(keys, func(x, y string) int {
-			return semver.ParseRelaxed(x).CompareTo(semver.ParseRelaxed(y))
-		})
+	releases.SortKeys(func(x, y string) int {
+		return semver.ParseRelaxed(x).CompareTo(semver.ParseRelaxed(y))
 	})
 
-	versions := []*semver.RelaxedVersion{}
-	for version := range in.Releases {
-		versions = append(versions, semver.ParseRelaxed(version))
+	return &Platform{
+		Id:                in.Metadata.Id,
+		Maintainer:        in.Metadata.Maintainer,
+		Website:           in.Metadata.Website,
+		Email:             in.Metadata.Email,
+		ManuallyInstalled: in.Metadata.ManuallyInstalled,
+		Deprecated:        in.Metadata.Deprecated,
+		Indexed:           in.Metadata.Indexed,
+		Releases:          releases,
+		InstalledVersion:  in.InstalledVersion,
+		LatestVersion:     in.LatestVersion,
 	}
-	slices.SortFunc(versions, (*semver.RelaxedVersion).CompareTo)
-	for _, version := range versions {
-		res.Releases.Set(version.String(), NewPlatformReleaseResult(in.Releases[version.String()]))
-	}
-	return res
 }
 
 // Platform maps a rpc.Platform
@@ -70,7 +55,7 @@ type Platform struct {
 	Deprecated        bool   `json:"deprecated,omitempty"`
 	Indexed           bool   `json:"indexed,omitempty"`
 
-	Releases *orderedmap.OrderedMap `json:"releases,omitempty"`
+	Releases *orderedmap.Map[string, *PlatformRelease] `json:"releases,omitempty"`
 
 	InstalledVersion string `json:"installed_version,omitempty"`
 	LatestVersion    string `json:"latest_version,omitempty"`
@@ -78,20 +63,12 @@ type Platform struct {
 
 // GetLatestRelease returns the latest relase of this platform or nil if none available.
 func (p *Platform) GetLatestRelease() *PlatformRelease {
-	res, ok := p.Releases.Get(p.LatestVersion)
-	if !ok {
-		return nil
-	}
-	return res.(*PlatformRelease)
+	return p.Releases.Get(p.LatestVersion)
 }
 
 // GetInstalledRelease returns the installed relase of this platform or nil if none available.
 func (p *Platform) GetInstalledRelease() *PlatformRelease {
-	res, ok := p.Releases.Get(p.InstalledVersion)
-	if !ok {
-		return nil
-	}
-	return res.(*PlatformRelease)
+	return p.Releases.Get(p.InstalledVersion)
 }
 
 // NewPlatformReleaseResult creates a new result.PlatformRelease from rpc.PlatformRelease

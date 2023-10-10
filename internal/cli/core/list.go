@@ -108,7 +108,7 @@ func (ir coreListResult) String() string {
 	t.SetHeader(tr("ID"), tr("Installed"), tr("Latest"), tr("Name"))
 	for _, platform := range ir.platforms {
 		name := ""
-		if installed := platform.GetLatestRelease(); installed != nil {
+		if installed := platform.GetInstalledRelease(); installed != nil {
 			name = installed.Name
 		}
 		if name == "" {
