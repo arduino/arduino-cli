@@ -21,6 +21,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
@@ -55,7 +56,7 @@ func runListCommand(args []string, all bool, updatableOnly bool) {
 // List gets and prints a list of installed platforms.
 func List(inst *rpc.Instance, all bool, updatableOnly bool) {
 	platforms := GetList(inst, all, updatableOnly)
-	feedback.PrintResult(installedResult{platforms})
+	feedback.PrintResult(newCoreListResult(platforms))
 }
 
 // GetList returns a list of installed platforms.
@@ -81,34 +82,44 @@ func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.PlatformSu
 	return result
 }
 
-// output from this command requires special formatting, let's create a dedicated
-// feedback.Result implementation
-type installedResult struct {
-	platforms []*rpc.PlatformSummary
+func newCoreListResult(in []*rpc.PlatformSummary) *coreListResult {
+	res := &coreListResult{}
+	for _, platformSummary := range in {
+		res.platforms = append(res.platforms, result.NewPlatformResult(platformSummary))
+	}
+	return res
 }
 
-func (ir installedResult) Data() interface{} {
+type coreListResult struct {
+	platforms []*result.Platform
+}
+
+// Data implements Result interface
+func (ir coreListResult) Data() interface{} {
 	return ir.platforms
 }
 
-func (ir installedResult) String() string {
+// String implements Result interface
+func (ir coreListResult) String() string {
 	if len(ir.platforms) == 0 {
 		return tr("No platforms installed.")
 	}
 	t := table.New()
 	t.SetHeader(tr("ID"), tr("Installed"), tr("Latest"), tr("Name"))
 	for _, platform := range ir.platforms {
-		installedRelease := platform.GetInstalledRelease()
-		latestRelease := platform.GetLatestRelease()
-
-		name := installedRelease.GetName()
-		if name == "" {
-			name = latestRelease.GetName()
+		name := ""
+		if installed := platform.GetLatestRelease(); installed != nil {
+			name = installed.Name
 		}
-		if platform.Metadata.Deprecated {
+		if name == "" {
+			if latest := platform.GetLatestRelease(); latest != nil {
+				name = latest.Name
+			}
+		}
+		if platform.Deprecated {
 			name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), name)
 		}
-		t.AddRow(platform.Metadata.Id, platform.InstalledVersion, platform.LatestVersion, name)
+		t.AddRow(platform.Id, platform.InstalledVersion, platform.LatestVersion, name)
 	}
 
 	return t.Render()
