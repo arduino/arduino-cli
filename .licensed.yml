@@ -62,6 +62,7 @@ reviewed:
     - golang.org/x/text/encoding/internal/identifier
     - golang.org/x/text/encoding/unicode
     - golang.org/x/text/internal/utf8internal
+    - github.com/sagikazarmark/slog-shim
 
 # Source: https://github.com/arduino/tooling-project-assets/blob/main/workflow-templates/assets/check-dependencies/GPL-3.0/.licensed.yml
 allowed:
