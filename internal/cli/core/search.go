@@ -29,6 +29,7 @@ import (
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
@@ -81,13 +82,21 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	}
 
 	coreslist := resp.GetSearchOutput()
-	feedback.PrintResult(searchResults{coreslist})
+	feedback.PrintResult(newSearchResult(coreslist))
 }
 
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type searchResults struct {
-	platforms []*rpc.PlatformSummary
+	platforms []*result.Platform
+}
+
+func newSearchResult(in []*rpc.PlatformSummary) *searchResults {
+	res := &searchResults{}
+	for _, platformSummary := range in {
+		res.platforms = append(res.platforms, result.NewPlatformResult(platformSummary))
+	}
+	return res
 }
 
 func (sr searchResults) Data() interface{} {
@@ -99,12 +108,15 @@ func (sr searchResults) String() string {
 		t := table.New()
 		t.SetHeader(tr("ID"), tr("Version"), tr("Name"))
 		for _, platform := range sr.platforms {
-			name := platform.GetLatestRelease().GetName()
-			if platform.GetMetadata().Deprecated {
+			name := ""
+			if latest := platform.GetLatestRelease(); latest != nil {
+				name = latest.Name
+			}
+			if platform.Deprecated {
 				name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), name)
 			}
-			for _, platformRelease := range platform.GetSortedReleases() {
-				t.AddRow(platform.GetMetadata().GetId(), platformRelease.GetVersion(), name)
+			for _, version := range platform.Releases.Keys() {
+				t.AddRow(platform.Id, version, name)
 			}
 		}
 		return t.Render()
