@@ -25,7 +25,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
-	f "github.com/arduino/arduino-cli/internal/algorithms"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -40,11 +39,7 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 	res := []*cores.Platform{}
 	if isUsb, _ := regexp.MatchString("[0-9a-f]{4}:[0-9a-f]{4}", req.SearchArgs); isUsb {
 		vid, pid := req.SearchArgs[:4], req.SearchArgs[5:]
-		// TODO: De-duplicate return Platforms
-		// TODO: Inline FindPlatformReleaseProvidingBoardsWithVidPid
-		res = f.Map(pme.FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid), func(x *cores.PlatformRelease) *cores.Platform {
-			return x.Platform
-		})
+		res = pme.FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid)
 	} else {
 		searchArgs := utils.SearchTermsFromQueryString(req.SearchArgs)
 		for _, targetPackage := range pme.GetPackages() {

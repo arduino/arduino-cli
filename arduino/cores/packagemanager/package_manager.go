@@ -192,8 +192,8 @@ func (pme *Explorer) GetCustomGlobalProperties() *properties.Map {
 }
 
 // FindPlatformReleaseProvidingBoardsWithVidPid FIXMEDOC
-func (pme *Explorer) FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid string) []*cores.PlatformRelease {
-	res := []*cores.PlatformRelease{}
+func (pme *Explorer) FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid string) []*cores.Platform {
+	res := []*cores.Platform{}
 	for _, targetPackage := range pme.packages {
 		for _, targetPlatform := range targetPackage.Platforms {
 			platformRelease := targetPlatform.GetLatestRelease()
@@ -202,7 +202,7 @@ func (pme *Explorer) FindPlatformReleaseProvidingBoardsWithVidPid(vid, pid strin
 			}
 			for _, boardManifest := range platformRelease.BoardsManifest {
 				if boardManifest.HasUsbID(vid, pid) {
-					res = append(res, platformRelease)
+					res = append(res, targetPlatform)
 					break
 				}
 			}
