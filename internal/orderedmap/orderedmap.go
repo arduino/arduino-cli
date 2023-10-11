@@ -3,44 +3,65 @@ package orderedmap
 import (
 	"bytes"
 	"encoding/json"
-	"reflect"
 	"slices"
 )
 
-// Map is a container of properties
-type Map[K comparable, V any] struct {
-	kv map[K]V
-	o  []K
+// Map is a map that keeps ordering insertion.
+type Map[K any, V any] interface {
+	Get(K) V
+	Set(K, V)
+	Keys() []K
+	Merge(...Map[K, V]) Map[K, V]
+	SortKeys(f func(x, y K) int)
+	SortStableKeys(f func(x, y K) int)
 }
 
-// New returns a new Map
-func New[K comparable, V any]() *Map[K, V] {
-	return &Map[K, V]{
-		kv: map[K]V{},
-		o:  []K{},
+// NewWithConversionFunc creates a map using the given conversion function
+// to convert non-comparable key type to comparable items.
+// The conversion function must be bijective.
+func NewWithConversionFunc[K any, V any, C comparable](conv func(K) C) Map[K, V] {
+	return &mapImpl[K, V, C]{
+		conv: conv,
+		kv:   map[C]V{},
+		o:    []K{},
 	}
 }
 
+// New creates a map
+func New[K comparable, V any]() *mapImpl[K, V, K] {
+	return &mapImpl[K, V, K]{
+		conv: func(in K) K { return in }, // identity
+		kv:   map[K]V{},
+		o:    []K{},
+	}
+}
+
+type mapImpl[K any, V any, C comparable] struct {
+	conv func(K) C
+	kv   map[C]V
+	o    []K
+}
+
 // Get retrieves the value corresponding to key
-func (m *Map[K, V]) Get(key K) V {
-	return m.kv[key]
+func (m *mapImpl[K, V, C]) Get(key K) V {
+	return m.kv[m.conv(key)]
 }
 
 // GetOk retrieves the value corresponding to key and returns a true/false indicator
 // to check if the key is present in the map (true if the key is present)
-func (m *Map[K, V]) GetOk(key K) (V, bool) {
-	v, ok := m.kv[key]
+func (m *mapImpl[K, V, C]) GetOk(key K) (V, bool) {
+	v, ok := m.kv[m.conv(key)]
 	return v, ok
 }
 
 // ContainsKey returns true if the map contains the specified key
-func (m *Map[K, V]) ContainsKey(key K) bool {
-	_, has := m.kv[key]
+func (m *mapImpl[K, V, C]) ContainsKey(key K) bool {
+	_, has := m.kv[m.conv(key)]
 	return has
 }
 
 // MarshalJSON marshal the map into json mantaining the order of the key
-func (m *Map[K, V]) MarshalJSON() ([]byte, error) {
+func (m *mapImpl[K, V, C]) MarshalJSON() ([]byte, error) {
 	if m.Size() == 0 {
 		return []byte("{}"), nil
 	}
@@ -52,7 +73,7 @@ func (m *Map[K, V]) MarshalJSON() ([]byte, error) {
 			return nil, err
 		}
 		buf.WriteByte(':')
-		if err := encoder.Encode(m.kv[k]); err != nil {
+		if err := encoder.Encode(m.kv[m.conv(k)]); err != nil {
 			return nil, err
 		}
 		buf.WriteByte(',')
@@ -63,24 +84,26 @@ func (m *Map[K, V]) MarshalJSON() ([]byte, error) {
 }
 
 // Set inserts or replaces an existing key-value pair in the map
-func (m *Map[K, V]) Set(key K, value V) {
-	if _, has := m.kv[key]; has {
+func (m *mapImpl[K, V, C]) Set(key K, value V) {
+	compKey := m.conv(key)
+	if _, has := m.kv[compKey]; has {
 		m.Remove(key)
 	}
-	m.kv[key] = value
+	m.kv[compKey] = value
 	m.o = append(m.o, key)
 }
 
 // Size returns the number of elements in the map
-func (m *Map[K, V]) Size() int {
+func (m *mapImpl[K, V, C]) Size() int {
 	return len(m.kv)
 }
 
 // Remove removes the key from the map
-func (m *Map[K, V]) Remove(key K) {
-	delete(m.kv, key)
+func (m *mapImpl[K, V, C]) Remove(key K) {
+	compKey := m.conv(key)
+	delete(m.kv, compKey)
 	for i, k := range m.o {
-		if k == key {
+		if m.conv(k) == compKey {
 			m.o = append(m.o[:i], m.o[i+1:]...)
 			return
 		}
@@ -89,10 +112,10 @@ func (m *Map[K, V]) Remove(key K) {
 
 // Merge merges other Maps into this one. Each key/value of the merged Maps replaces
 // the key/value present in the original Map.
-func (m *Map[K, V]) Merge(sources ...*Map[K, V]) *Map[K, V] {
+func (m *mapImpl[K, V, C]) Merge(sources ...Map[K, V]) Map[K, V] {
 	for _, source := range sources {
-		for _, key := range source.o {
-			value := source.kv[key]
+		for _, key := range source.Keys() {
+			value := source.Get(key)
 			m.Set(key, value)
 		}
 	}
@@ -100,51 +123,33 @@ func (m *Map[K, V]) Merge(sources ...*Map[K, V]) *Map[K, V] {
 }
 
 // Keys returns an array of the keys contained in the Map
-func (m *Map[K, V]) Keys() []K {
+func (m *mapImpl[K, V, C]) Keys() []K {
 	keys := make([]K, len(m.o))
 	copy(keys, m.o)
 	return keys
 }
 
-func (m *Map[K, V]) SortKeys(f func(x, y K) int) {
+func (m *mapImpl[K, V, C]) SortKeys(f func(x, y K) int) {
 	slices.SortFunc(m.o, f)
 }
 
-func (m *Map[K, V]) SortStableKeys(f func(x, y K) int) {
+func (m *mapImpl[K, V, C]) SortStableKeys(f func(x, y K) int) {
 	slices.SortStableFunc(m.o, f)
 }
 
 // Values returns an array of the values contained in the Map. Duplicated
 // values are repeated in the list accordingly.
-func (m *Map[K, V]) Values() []V {
+func (m *mapImpl[K, V, C]) Values() []V {
 	values := make([]V, len(m.o))
 	for i, key := range m.o {
-		values[i] = m.kv[key]
+		values[i] = m.kv[m.conv(key)]
 	}
 	return values
 }
 
-// AsMap returns the underlying map[string]string. This is useful if you need to
-// for ... range but without the requirement of the ordered elements.
-func (m *Map[K, V]) AsMap() map[K]V {
-	return m.kv
-}
-
 // Clone makes a copy of the Map
-func (m *Map[K, V]) Clone() *Map[K, V] {
-	clone := New[K, V]()
+func (m *mapImpl[K, V, C]) Clone() Map[K, V] {
+	clone := NewWithConversionFunc[K, V, C](m.conv)
 	clone.Merge(m)
 	return clone
-}
-
-// Equals returns true if the current Map contains the same key/value pairs of
-// the Map passed as argument, the order of insertion does not matter.
-func (m *Map[K, V]) Equals(other *Map[K, V]) bool {
-	return reflect.DeepEqual(m.kv, other.kv)
-}
-
-// EqualsWithOrder returns true if the current Map contains the same key/value pairs of
-// the Map passed as argument with the same order of insertion.
-func (m *Map[K, V]) EqualsWithOrder(other *Map[K, V]) bool {
-	return reflect.DeepEqual(m.o, other.o) && reflect.DeepEqual(m.kv, other.kv)
 }

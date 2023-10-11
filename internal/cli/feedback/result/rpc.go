@@ -23,13 +23,11 @@ import (
 
 // NewPlatformResult creates a new result.Platform from rpc.PlatformSummary
 func NewPlatformResult(in *rpc.PlatformSummary) *Platform {
-	releases := orderedmap.New[string, *PlatformRelease]()
+	releases := orderedmap.NewWithConversionFunc[*semver.Version, *PlatformRelease, string]((*semver.Version).String)
 	for k, v := range in.Releases {
-		releases.Set(k, NewPlatformReleaseResult(v))
+		releases.Set(semver.MustParse(k), NewPlatformReleaseResult(v))
 	}
-	releases.SortKeys(func(x, y string) int {
-		return semver.ParseRelaxed(x).CompareTo(semver.ParseRelaxed(y))
-	})
+	releases.SortKeys((*semver.Version).CompareTo)
 
 	return &Platform{
 		Id:                in.Metadata.Id,
@@ -40,8 +38,8 @@ func NewPlatformResult(in *rpc.PlatformSummary) *Platform {
 		Deprecated:        in.Metadata.Deprecated,
 		Indexed:           in.Metadata.Indexed,
 		Releases:          releases,
-		InstalledVersion:  in.InstalledVersion,
-		LatestVersion:     in.LatestVersion,
+		InstalledVersion:  semver.MustParse(in.InstalledVersion),
+		LatestVersion:     semver.MustParse(in.LatestVersion),
 	}
 }
 
@@ -55,10 +53,10 @@ type Platform struct {
 	Deprecated        bool   `json:"deprecated,omitempty"`
 	Indexed           bool   `json:"indexed,omitempty"`
 
-	Releases *orderedmap.Map[string, *PlatformRelease] `json:"releases,omitempty"`
+	Releases orderedmap.Map[*semver.Version, *PlatformRelease] `json:"releases,omitempty"`
 
-	InstalledVersion string `json:"installed_version,omitempty"`
-	LatestVersion    string `json:"latest_version,omitempty"`
+	InstalledVersion *semver.Version `json:"installed_version,omitempty"`
+	LatestVersion    *semver.Version `json:"latest_version,omitempty"`
 }
 
 // GetLatestRelease returns the latest relase of this platform or nil if none available.
