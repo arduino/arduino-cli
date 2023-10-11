@@ -715,20 +715,20 @@ func TestCoreSearchSortedResults(t *testing.T) {
 
 	// verify that results are already sorted correctly
 	sortedDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated == true) | .name |=ascii_downcase | .name ] | sort").String()
+		"[ .[] | select(.deprecated == true) | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name] | sort").String()
 	notSortedDeprecated := requirejson.Parse(t, stdout).Query(
-		"[.[] | select(.deprecated == true) | .name |=ascii_downcase | .name]").String()
+		"[ .[] | select(.deprecated == true) | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name]").String()
 	require.Equal(t, sortedDeprecated, notSortedDeprecated)
 
 	sortedNotDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated != true) | .name |=ascii_downcase | .name ] | sort").String()
+		"[ .[] | select(.deprecated != true) | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name] | sort").String()
 	notSortedNotDeprecated := requirejson.Parse(t, stdout).Query(
-		"[.[] | select(.deprecated != true) | .name |=ascii_downcase | .name]").String()
+		"[ .[] | select(.deprecated != true) | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name]").String()
 	require.Equal(t, sortedNotDeprecated, notSortedNotDeprecated)
 
 	// verify that deprecated platforms are the last ones
 	platform := requirejson.Parse(t, stdout).Query(
-		"[.[] | .name |=ascii_downcase | .name]").String()
+		"[ .[] | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name]").String()
 	require.Equal(t, platform, strings.TrimRight(notSortedNotDeprecated, "]")+","+strings.TrimLeft(notSortedDeprecated, "["))
 }
 
@@ -787,20 +787,20 @@ func TestCoreListSortedResults(t *testing.T) {
 
 	// verify that results are already sorted correctly
 	sortedDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated == true) | .name |=ascii_downcase | .name ] | sort").String()
+		"[ .[] | select(.deprecated == true) | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name] | sort").String()
 	notSortedDeprecated := requirejson.Parse(t, stdout).Query(
-		"[.[] | select(.deprecated == true) | .name |=ascii_downcase | .name]").String()
+		"[ .[] | select(.deprecated == true) | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name]").String()
 	require.Equal(t, sortedDeprecated, notSortedDeprecated)
 
 	sortedNotDeprecated := requirejson.Parse(t, stdout).Query(
-		"[ .[] | select(.deprecated != true) | .name |=ascii_downcase | .name ] | sort").String()
+		"[ .[] | select(.deprecated != true) | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name] | sort").String()
 	notSortedNotDeprecated := requirejson.Parse(t, stdout).Query(
-		"[.[] | select(.deprecated != true) | .name |=ascii_downcase | .name]").String()
+		"[ .[] | select(.deprecated != true) | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name]").String()
 	require.Equal(t, sortedNotDeprecated, notSortedNotDeprecated)
 
 	// verify that deprecated platforms are the last ones
 	platform := requirejson.Parse(t, stdout).Query(
-		"[.[] | .name |=ascii_downcase | .name]").String()
+		"[ .[] | {name: .releases[.latest_version].name} | .name |=ascii_downcase | .name]").String()
 	require.Equal(t, platform, strings.TrimRight(notSortedNotDeprecated, "]")+","+strings.TrimLeft(notSortedDeprecated, "["))
 }
 
