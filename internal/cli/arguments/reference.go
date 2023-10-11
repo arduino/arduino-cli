@@ -101,11 +101,6 @@ func ParseReference(arg string) (*Reference, error) {
 	})
 	foundPlatforms := []string{}
 	for _, platform := range platforms.GetSearchOutput() {
-		installedRelease := platform.GetInstalledRelease()
-		if installedRelease == nil {
-			continue
-		}
-
 		platformID := platform.GetMetadata().GetId()
 		platformUser := ret.PackageName + ":" + ret.Architecture
 		// At first we check if the platform the user is searching for matches an available one,
