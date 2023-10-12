@@ -50,18 +50,22 @@ func TestHardwareLoading(t *testing.T) {
 			jsonOut.MustContain(`[
 				{
 					"id": "arduino:avr",
-					"installed": "1.8.6",
-					"name": "Arduino AVR Boards",
-					"boards": [
-						{
-							"name": "Arduino Uno",
-							"fqbn": "arduino:avr:uno"
-						},
-						{
-							"name": "Arduino Yún",
-							"fqbn": "arduino:avr:yun"
+					"installed_version": "1.8.6",
+					"releases": {
+						"1.8.6": {
+							"name": "Arduino AVR Boards",
+							"boards": [
+								{
+									"name": "Arduino Uno",
+									"fqbn": "arduino:avr:uno"
+								},
+								{
+									"name": "Arduino Yún",
+									"fqbn": "arduino:avr:yun"
+								}
+							]
 						}
-					]
+					}
 				}
 			]`)
 		}
@@ -90,7 +94,7 @@ func TestHardwareLoading(t *testing.T) {
 					"id": "avrispmkii",
 					"name": "AVRISP mkII"
 					}
-				]			
+				]
 			}`)
 		}
 
@@ -159,33 +163,41 @@ func TestHardwareLoading(t *testing.T) {
 			jsonOut.MustContain(`[
 				{
 					"id": "arduino:avr",
-					"installed": "1.8.6",
-					"name": "Arduino AVR Boards",
-					"boards": [
-						{
-							"name": "Arduino Uno",
-							"fqbn": "arduino:avr:uno"
-						},
-						{
-							"name": "Arduino Yún",
-							"fqbn": "arduino:avr:yun"
+					"installed_version": "1.8.6",
+					"releases": {
+						"1.8.6": {
+							"name": "Arduino AVR Boards",
+							"boards": [
+								{
+									"name": "Arduino Uno",
+									"fqbn": "arduino:avr:uno"
+								},
+								{
+									"name": "Arduino Yún",
+									"fqbn": "arduino:avr:yun"
+								}
+							]
 						}
-					]
+					}
 				}
 			]`)
 			jsonOut.MustContain(`[
 				{
 					"id": "my_avr_platform:avr",
-					"installed": "9.9.9",
-					"name": "My AVR Boards",
-					"boards": [
-						{
-							"name": "Arduino Yún",
-							"fqbn": "my_avr_platform:avr:custom_yun"
+					"installed_version": "9.9.9",
+					"releases": {
+						"9.9.9": {
+							"name": "My AVR Boards",
+							"missing_metadata": true,
+							"boards": [
+								{
+									"name": "Arduino Yún",
+									"fqbn": "my_avr_platform:avr:custom_yun"
+								}
+							]
 						}
-					],
-					"manually_installed": true,
-					"missing_metadata": true
+					},
+					"manually_installed": true
 				}
 			]`)
 
@@ -196,7 +208,11 @@ func TestHardwareLoading(t *testing.T) {
 					{
 						"id": "my_symlinked_avr_platform:avr",
 						"manually_installed": true,
-						"missing_metadata": true
+						"releases": {
+							"9.9.9": {
+								"missing_metadata": true
+							}
+						}
 					}
 				]`)
 			}
@@ -226,7 +242,7 @@ func TestHardwareLoading(t *testing.T) {
 						"id": "avrispmkii",
 						"name": "AVRISP mkII"
 					}
-				]			
+				]
 			}`)
 		}
 
