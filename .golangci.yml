@@ -62,7 +62,6 @@ linters-settings:
       - name: redefines-builtin-id
       - name: superfluous-else
       - name: time-naming
-      - name: unexported-return
       - name: unreachable-code
       - name: var-declaration
       - name: defer
