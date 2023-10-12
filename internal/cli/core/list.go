@@ -72,7 +72,12 @@ func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.PlatformSu
 
 	result := []*rpc.PlatformSummary{}
 	for _, platform := range platforms.GetSearchOutput() {
-		if !all && platform.InstalledVersion == "" {
+		// If both `all` and `updatableOnly` are set, `all` takes precedence.
+		if all {
+			result = append(result, platform)
+			continue
+		}
+		if platform.InstalledVersion == "" {
 			continue
 		}
 		if updatableOnly && platform.InstalledVersion == platform.LatestVersion {
