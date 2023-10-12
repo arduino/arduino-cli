@@ -118,6 +118,9 @@ message PlatformSearchRequest {
   // Whether to show all available versions. `false` causes only the newest
   // versions of the cores to be listed in the search results.
   bool all_versions = 3;
+  // Whether to show manually installed platforms. `false` causes to skip
+  // manually installed platforms.
+  bool manually_installed = 4;
 }
 
 message PlatformSearchResponse {

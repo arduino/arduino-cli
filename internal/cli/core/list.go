@@ -62,8 +62,9 @@ func List(inst *rpc.Instance, all bool, updatableOnly bool) {
 // GetList returns a list of installed platforms.
 func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.PlatformSummary {
 	platforms, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
-		AllVersions: true,
+		Instance:          inst,
+		AllVersions:       true,
+		ManuallyInstalled: true,
 	})
 	if err != nil {
 		feedback.Fatal(tr("Error listing platforms: %v", err), feedback.ErrGeneric)

@@ -44,10 +44,12 @@ func PlatformSearch(req *rpc.PlatformSearchRequest) (*rpc.PlatformSearchResponse
 		searchArgs := utils.SearchTermsFromQueryString(req.SearchArgs)
 		for _, targetPackage := range pme.GetPackages() {
 			for _, platform := range targetPackage.Platforms {
+				if platform == nil {
+					continue
+				}
 				// Users can install platforms manually in the Sketchbook hardware folder,
-				// the core search command must operate only on platforms installed through
-				// the PlatformManager, thus we skip the manually installed ones.
-				if platform == nil || platform.ManuallyInstalled {
+				// if not explictily requested we skip them.
+				if !req.ManuallyInstalled && platform.ManuallyInstalled {
 					continue
 				}
 
