@@ -48,7 +48,17 @@ func TestCorrectHandlingOfPlatformVersionProperty(t *testing.T) {
 	// Trigger problematic call
 	out, _, err := cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
-	requirejson.Contains(t, out, `[{"id":"DxCore-dev:megaavr","installed_version":"1.4.10","name":"DxCore"}]`)
+	requirejson.Contains(t, out, `[
+		{
+			"id":"DxCore-dev:megaavr",
+			"installed_version":"1.4.10",
+			"releases": {
+				"1.4.10": {
+					"name":"DxCore"
+				}
+			}
+		}
+	]`)
 }
 
 func TestCoreSearch(t *testing.T) {
@@ -919,25 +929,25 @@ func TestCoreWithMissingCustomBoardOptionsIsLoaded(t *testing.T) {
 	require.NoError(t, err)
 	requirejson.Len(t, stdout, 1)
 	// Verifies platform is loaded except excluding board with missing options
-	requirejson.Contains(t, stdout, `[
-		{
-			"id": "arduino-beta-dev:platform_with_missing_custom_board_options"
-		}
-	]`)
-	requirejson.Query(t, stdout, ".[] | select(.id == \"arduino-beta-dev:platform_with_missing_custom_board_options\") | .boards | length", "2")
+	requirejson.Contains(t, stdout, `[{"id": "arduino-beta-dev:platform_with_missing_custom_board_options"}]`)
+	requirejson.Query(t, stdout, ".[] | select(.id == \"arduino-beta-dev:platform_with_missing_custom_board_options\") | .releases[.installed_version].boards | length", "2")
 	// Verify board with malformed options is not loaded
 	// while other board is loaded
 	requirejson.Contains(t, stdout, `[
 		{
 			"id": "arduino-beta-dev:platform_with_missing_custom_board_options",
-			"boards": [
-				{
-					"fqbn": "arduino-beta-dev:platform_with_missing_custom_board_options:nessuno"
-				},
-				{
-					"fqbn": "arduino-beta-dev:platform_with_missing_custom_board_options:altra"
+			"releases": {
+				"4.2.0": {
+					"boards": [
+						{
+							"fqbn": "arduino-beta-dev:platform_with_missing_custom_board_options:nessuno"
+						},
+						{
+							"fqbn": "arduino-beta-dev:platform_with_missing_custom_board_options:altra"
+						}
+					]
 				}
-			]
+			}
 		}
 	]`)
 }
