@@ -868,8 +868,8 @@ func TestCoreListPlatformWithoutPlatformTxt(t *testing.T) {
 	stdout, _, err = cli.Run("core", "list", "--format", "json")
 	require.NoError(t, err)
 	requirejson.Len(t, stdout, 1)
-	requirejson.Query(t, stdout, ".[] | .id", "\"some-packager:some-arch\"")
-	requirejson.Query(t, stdout, ".[] | .name", "\"some-packager-some-arch\"")
+	requirejson.Query(t, stdout, ".[] | .id", `"some-packager:some-arch"`)
+	requirejson.Query(t, stdout, ".[] | .releases[.installed_version].name", `"some-packager-some-arch"`)
 }
 
 func TestCoreDownloadMultiplePlatforms(t *testing.T) {

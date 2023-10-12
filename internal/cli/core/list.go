@@ -77,7 +77,7 @@ func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.PlatformSu
 			result = append(result, platform)
 			continue
 		}
-		if platform.InstalledVersion == "" {
+		if platform.InstalledVersion == "" && !platform.GetMetadata().ManuallyInstalled {
 			continue
 		}
 		if updatableOnly && platform.InstalledVersion == platform.LatestVersion {
