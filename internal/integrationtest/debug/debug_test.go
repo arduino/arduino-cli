@@ -215,5 +215,28 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 			}`)
 		}
 
+		{
+			// Starts debugger with mixed old and new-style openocd script definition
+			jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my2", "-P", "my_cold_ice", sketchPath.String(), "--info", "--format", "json")
+			require.NoError(t, err)
+			debugOut := requirejson.Parse(t, jsonDebugOut)
+			debugOut.MustContain(`
+			{
+				"toolchain": "gcc",
+				"toolchain_path": "gcc-path",
+				"toolchain_prefix": "gcc-prefix",
+				"server": "openocd",
+				"server_path": "openocd-path",
+				"server_configuration": {
+					"path": "openocd-path",
+					"scripts_dir": "openocd-scripts-dir",
+					"scripts": [
+						"cold_ice_script"
+					]
+				},
+				"svd_file": "svd-file"
+			}`)
+		}
+
 	}
 }
