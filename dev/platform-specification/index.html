@@ -3359,7 +3359,10 @@ directives:</p>
 <ul>
 <li><code>debug.server.openocd.path</code>: is the absolute path to the OpenOCD directory</li>
 <li><code>debug.server.openocd.scripts_dir</code>: is the absolute path to the OpenOCD scripts directory</li>
-<li><code>debug.server.openocd.scripts.N</code>: is a list of OpenOCD scripts to run (where N is a number starting from 0)</li>
+<li><code>debug.server.openocd.scripts.N</code>: is a list of OpenOCD script files to run, where N is a number (a sequence of
+  non-consecutive numbers is allowed)</li>
+<li><code>debug.server.openocd.script</code>: if there is only one OpenOCD script to run, this directive con be used instead of the
+  <code>debug.server.openocd.scripts.N</code> (this directive is ignored if <code>debug.server.openocd.scripts.N</code> is present)</li>
 </ul>
 <h3 id="custom-config-for-cortext-debug-plugin-for-arduino-ide">Custom config for Cortext-debug plugin for Arduino IDE<a class="headerlink" href="#custom-config-for-cortext-debug-plugin-for-arduino-ide" title="Permanent link">&para;</a></h3>
 <p>The Arduino IDE uses cortex-debug plugin to start a debugging session. The IDE creates a <code>launch.json</code> file that is
