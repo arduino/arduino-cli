@@ -128,7 +128,8 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 				"scripts": [
 					"first",
 					"second",
-					"third"
+					"third",
+					"fourth"
 				]
 			},
 			"svd_file": "svd-file",
@@ -169,7 +170,8 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 				"scripts": [
 					"first",
 					"second",
-					"cold_ice_script"
+					"cold_ice_script",
+					"fourth"
 				]
 			},
 			"svd_file": "svd-file",

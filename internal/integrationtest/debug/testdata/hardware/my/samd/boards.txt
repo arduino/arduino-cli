@@ -33,6 +33,7 @@ my.debug.server.openocd.script=
 my.debug.server.openocd.scripts.0=first
 my.debug.server.openocd.scripts.1=second
 my.debug.server.openocd.scripts.2=third
+my.debug.server.openocd.scripts.5=fourth
 my.debug.cortex-debug.custom.postAttachCommands.0=set remote hardware-watchpoint-limit 2
 my.debug.cortex-debug.custom.postAttachCommands.1=monitor reset halt
 my.debug.cortex-debug.custom.postAttachCommands.2=monitor gdb_sync
