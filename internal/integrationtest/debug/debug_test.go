@@ -106,13 +106,12 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 	require.NoError(t, err)
 
 	// Build sketch
-	fqbn := "my:samd:my"
-	_, _, err = cli.Run("compile", "-b", fqbn, sketchPath.String(), "--format", "json")
+	_, _, err = cli.Run("compile", "-b", "my:samd:my", sketchPath.String(), "--format", "json")
 	require.NoError(t, err)
 
 	{
 		// Starts debugger
-		jsonDebugOut, _, err := cli.Run("debug", "-b", fqbn, "-P", "atmel_ice", sketchPath.String(), "--info", "--format", "json")
+		jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my", "-P", "atmel_ice", sketchPath.String(), "--info", "--format", "json")
 		require.NoError(t, err)
 		debugOut := requirejson.Parse(t, jsonDebugOut)
 		debugOut.MustContain(`
@@ -128,7 +127,8 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 				"scripts": [
 					"first",
 					"second",
-					"third"
+					"third",
+					"fourth"
 				]
 			},
 			"svd_file": "svd-file",
@@ -153,7 +153,7 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 
 	// Starts debugger with another programmer
 	{
-		jsonDebugOut, _, err := cli.Run("debug", "-b", fqbn, "-P", "my_cold_ice", sketchPath.String(), "--info", "--format", "json")
+		jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my", "-P", "my_cold_ice", sketchPath.String(), "--info", "--format", "json")
 		require.NoError(t, err)
 		debugOut := requirejson.Parse(t, jsonDebugOut)
 		debugOut.MustContain(`
@@ -169,7 +169,8 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 				"scripts": [
 					"first",
 					"second",
-					"cold_ice_script"
+					"cold_ice_script",
+					"fourth"
 				]
 			},
 			"svd_file": "svd-file",
@@ -190,5 +191,52 @@ func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli
 				]
 			}
 		}`)
+
+		{
+			// Starts debugger with an old-style openocd script definition
+			jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my2", "-P", "atmel_ice", sketchPath.String(), "--info", "--format", "json")
+			require.NoError(t, err)
+			debugOut := requirejson.Parse(t, jsonDebugOut)
+			debugOut.MustContain(`
+			{
+				"toolchain": "gcc",
+				"toolchain_path": "gcc-path",
+				"toolchain_prefix": "gcc-prefix",
+				"server": "openocd",
+				"server_path": "openocd-path",
+				"server_configuration": {
+					"path": "openocd-path",
+					"scripts_dir": "openocd-scripts-dir",
+					"scripts": [
+						"single-script"
+					]
+				},
+				"svd_file": "svd-file"
+			}`)
+		}
+
+		{
+			// Starts debugger with mixed old and new-style openocd script definition
+			jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my2", "-P", "my_cold_ice", sketchPath.String(), "--info", "--format", "json")
+			require.NoError(t, err)
+			debugOut := requirejson.Parse(t, jsonDebugOut)
+			debugOut.MustContain(`
+			{
+				"toolchain": "gcc",
+				"toolchain_path": "gcc-path",
+				"toolchain_prefix": "gcc-prefix",
+				"server": "openocd",
+				"server_path": "openocd-path",
+				"server_configuration": {
+					"path": "openocd-path",
+					"scripts_dir": "openocd-scripts-dir",
+					"scripts": [
+						"cold_ice_script"
+					]
+				},
+				"svd_file": "svd-file"
+			}`)
+		}
+
 	}
 }

@@ -159,8 +159,8 @@ func getDebugProperties(req *rpc.GetDebugConfigRequest, pme *packagemanager.Expl
 	case "openocd":
 		openocdProperties := debugProperties.SubTree("server." + server)
 		scripts := openocdProperties.ExtractSubIndexLists("scripts")
-		if s := openocdProperties.Get("script"); s != "" {
-			// backward compatibility
+		if s := openocdProperties.Get("script"); s != "" && len(scripts) == 0 {
+			// backward compatibility: use "script" property if there are no "scipts.N"
 			scripts = append(scripts, s)
 		}
 		openocdConf := &rpc.DebugOpenOCDServerConfiguration{

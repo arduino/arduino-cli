@@ -1361,7 +1361,10 @@ OpenOCD server specific configurations:
 
 - `debug.server.openocd.path`: is the absolute path to the OpenOCD directory
 - `debug.server.openocd.scripts_dir`: is the absolute path to the OpenOCD scripts directory
-- `debug.server.openocd.scripts.N`: is a list of OpenOCD scripts to run (where N is a number starting from 0)
+- `debug.server.openocd.scripts.N`: is a list of OpenOCD script files to run, where N is a number (a sequence of
+  non-consecutive numbers is allowed)
+- `debug.server.openocd.script`: if there is only one OpenOCD script to run, this directive con be used instead of the
+  `debug.server.openocd.scripts.N` (this directive is ignored if `debug.server.openocd.scripts.N` is present)
 
 ### Custom config for Cortext-debug plugin for Arduino IDE
 
