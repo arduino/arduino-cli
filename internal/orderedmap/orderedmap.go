@@ -24,11 +24,18 @@ import (
 // Map is a map that keeps ordering insertion.
 type Map[K any, V any] interface {
 	Get(K) V
+	GetOk(key K) (V, bool)
 	Set(K, V)
+	Size() int
+	ContainsKey(key K) bool
 	Keys() []K
 	Merge(...Map[K, V]) Map[K, V]
 	SortKeys(f func(x, y K) int)
 	SortStableKeys(f func(x, y K) int)
+	Values() []V
+	Clone() Map[K, V]
+	Remove(key K)
+	MarshalJSON() ([]byte, error)
 }
 
 // NewWithConversionFunc creates a map using the given conversion function
@@ -43,7 +50,7 @@ func NewWithConversionFunc[K any, V any, C comparable](conv func(K) C) Map[K, V]
 }
 
 // New creates a map
-func New[K comparable, V any]() *mapImpl[K, V, K] {
+func New[K comparable, V any]() Map[K, V] {
 	return &mapImpl[K, V, K]{
 		conv: func(in K) K { return in }, // identity
 		kv:   map[K]V{},
