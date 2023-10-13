@@ -113,7 +113,7 @@ func TestGet(t *testing.T) {
 		require.Zero(t, m.Get(nil))
 
 		// Here we're using the conversion function to set the key, using a different
-		// pointer to retreive the value works.
+		// pointer to retrieve the value works.
 		m.Set(&A{b: []byte{60, 61, 62}}, 1)
 		require.Equal(t, 1, m.Get(&A{b: []byte{60, 61, 62}}))
 
@@ -123,7 +123,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestSet(t *testing.T) {
-	t.Run("insert 3 differnt keys", func(t *testing.T) {
+	t.Run("insert 3 different keys", func(t *testing.T) {
 		m := orderedmap.New[string, int]()
 		m.Set("a", 1)
 		m.Set("b", 2)
@@ -221,6 +221,126 @@ func TestRemove(t *testing.T) {
 		m.Remove("a")
 		require.True(t, m.Get("b"))
 		_, ok := m.GetOk("a")
+		require.False(t, ok)
+	})
+}
+
+func TestMerge(t *testing.T) {
+	t.Run("merge empty maps", func(t *testing.T) {
+		m1 := orderedmap.New[string, int]()
+		m2 := orderedmap.New[string, int]()
+
+		merged := m1.Merge(m2)
+		require.Equal(t, m1, merged)
+		require.Len(t, m1.Keys(), 0)
+	})
+
+	t.Run("merge multiple elements", func(t *testing.T) {
+		m1 := orderedmap.New[string, int]()
+		m1.Set("a", 1)
+		m1.Set("b", 2)
+		m1.Set("c", 3)
+
+		m2 := orderedmap.New[string, int]()
+		m2.Set("d", 4)
+		m2.Set("e", 5)
+
+		// assert that the Merge return is m1
+		merged := m1.Merge(m2)
+		require.Equal(t, m1, merged)
+
+		// assert we find the merged elements in the map
+		require.Equal(t, 5, m1.Size())
+		require.Equal(t, 4, m1.Get("d"))
+		require.Equal(t, 5, m1.Get("e"))
+		require.Equal(t, []string{"a", "b", "c", "d", "e"}, m1.Keys())
+
+		require.Equal(t, []string{"d", "e"}, m2.Keys())
+	})
+}
+
+func TestSortKeys(t *testing.T) {
+	t.Run("empty map", func(t *testing.T) {
+		m1 := orderedmap.New[string, int]()
+		require.Equal(t, []string{}, m1.Keys())
+		m1.SortKeys(func(x, y string) int {
+			if x < y {
+				return -1
+			}
+			return 1
+		})
+		require.Equal(t, []string{}, m1.Keys())
+	})
+	t.Run("sort ascending", func(t *testing.T) {
+		m1 := orderedmap.New[string, int]()
+		m1.Set("c", 3)
+		m1.Set("b", 2)
+		m1.Set("a", 1)
+		m1.Set("z", 4)
+
+		require.Equal(t, []string{"c", "b", "a", "z"}, m1.Keys())
+		m1.SortKeys(func(x, y string) int {
+			if x < y {
+				return -1
+			}
+			return 1
+		})
+		require.Equal(t, []string{"a", "b", "c", "z"}, m1.Keys())
+	})
+}
+
+func TestValues(t *testing.T) {
+	t.Run("empty map", func(t *testing.T) {
+		m1 := orderedmap.New[string, int]()
+		require.Empty(t, m1.Values())
+	})
+	t.Run("values respect order of insertion", func(t *testing.T) {
+		m1 := orderedmap.New[string, int]()
+		m1.Set("a", 1)
+		m1.Set("b", 2)
+		m1.Set("c", 3)
+		require.Equal(t, []int{1, 2, 3}, m1.Values())
+	})
+	t.Run("after a key sort values respect the new order", func(t *testing.T) {
+		m1 := orderedmap.New[string, int]()
+		m1.Set("c", 3)
+		m1.Set("b", 2)
+		m1.Set("a", 1)
+		m1.Set("z", 4)
+		require.Equal(t, []int{3, 2, 1, 4}, m1.Values())
+		m1.SortKeys(func(x, y string) int {
+			if x < y {
+				return -1
+			}
+			return 1
+		})
+		require.Equal(t, []int{1, 2, 3, 4}, m1.Values())
+	})
+}
+
+func TestClone(t *testing.T) {
+	t.Run("empty map", func(t *testing.T) {
+		m1 := orderedmap.New[string, int]()
+		clone := m1.Clone()
+		require.NotEqual(t, m1, clone)
+		require.Equal(t, m1.Keys(), clone.Keys())
+		require.Equal(t, m1.Values(), clone.Values())
+	})
+	t.Run("clone doesn't affect the original map", func(t *testing.T) {
+		m1 := orderedmap.New[string, int]()
+		m1.Set("a", 1)
+		m1.Set("b", 2)
+		m1.Set("c", 3)
+
+		clone := m1.Clone()
+
+		require.NotEqual(t, m1, clone)
+		require.Equal(t, m1.Keys(), clone.Keys())
+		require.Equal(t, m1.Values(), clone.Values())
+
+		clone.Set("d", 4)
+		require.Equal(t, 4, clone.Get("d"))
+		_, ok := m1.GetOk("d")
 		require.False(t, ok)
 	})
 }
