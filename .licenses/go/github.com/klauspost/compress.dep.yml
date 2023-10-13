@@ -1,6 +1,6 @@
 ---
 name: github.com/klauspost/compress
-version: v1.15.13
+version: v1.17.0
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/klauspost/compress

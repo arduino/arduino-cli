@@ -51,7 +51,7 @@ func TestCompletionZsh(t *testing.T) {
 	stdout, stderr, err := cli.Run("completion", "zsh")
 	require.NoError(t, err)
 	require.Empty(t, stderr)
-	require.Contains(t, string(stdout), "#compdef _arduino-cli arduino-cli")
+	require.Contains(t, string(stdout), "#compdef arduino-cli")
 	require.Contains(t, string(stdout), "_arduino-cli()")
 }
 
@@ -96,7 +96,7 @@ func TestCompletionZshNoDesc(t *testing.T) {
 	stdout, stderr, err := cli.Run("completion", "zsh", "--no-descriptions")
 	require.NoError(t, err)
 	require.Empty(t, stderr)
-	require.Contains(t, string(stdout), "#compdef _arduino-cli arduino-cli")
+	require.Contains(t, string(stdout), "#compdef arduino-cli")
 	require.Contains(t, string(stdout), "_arduino-cli()")
 	require.Contains(t, string(stdout), "__completeNoDesc")
 }

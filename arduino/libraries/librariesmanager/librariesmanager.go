@@ -19,13 +19,14 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"slices"
+	"strings"
 
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/libraries"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/i18n"
 	paths "github.com/arduino/go-paths-helper"
-	"github.com/pmylund/sortutil"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -60,7 +61,12 @@ func (lm LibrariesManager) Names() []string {
 		res[i] = n
 		i++
 	}
-	sortutil.CiAsc(res)
+	slices.SortFunc(res, func(a, b string) int {
+		if strings.ToLower(a) < strings.ToLower(b) {
+			return -1
+		}
+		return 1
+	})
 	return res
 }
 

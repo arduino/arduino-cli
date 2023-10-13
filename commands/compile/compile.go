@@ -135,7 +135,7 @@ func Compile(ctx context.Context, req *rpc.CompileRequest, outStream, errStream 
 	var buildPath *paths.Path
 	if buildPathArg := req.GetBuildPath(); buildPathArg != "" {
 		buildPath = paths.New(req.GetBuildPath()).Canonical()
-		if in := buildPath.IsInsideDir(sk.FullPath); in && buildPath.IsDir() {
+		if in, _ := buildPath.IsInsideDir(sk.FullPath); in && buildPath.IsDir() {
 			if sk.AdditionalFiles, err = removeBuildFromSketchFiles(sk.AdditionalFiles, buildPath); err != nil {
 				return nil, err
 			}
@@ -377,7 +377,7 @@ func removeBuildFromSketchFiles(files paths.PathList, build *paths.Path) (paths.
 	var res paths.PathList
 	ignored := false
 	for _, file := range files {
-		if !file.IsInsideDir(build) {
+		if isInside, _ := file.IsInsideDir(build); !isInside {
 			res = append(res, file)
 		} else if !ignored {
 			ignored = true

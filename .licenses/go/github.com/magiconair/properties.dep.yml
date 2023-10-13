@@ -1,6 +1,6 @@
 ---
 name: github.com/magiconair/properties
-version: v1.8.5
+version: v1.8.7
 type: go
 summary: Package properties provides functions for reading and writing ISO-8859-1
   and UTF-8 encoded .properties files and has support for recursive property expansion.

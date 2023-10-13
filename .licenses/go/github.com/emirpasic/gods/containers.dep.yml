@@ -1,13 +1,12 @@
 ---
 name: github.com/emirpasic/gods/containers
-version: v1.12.0
+version: v1.18.1
 type: go
 summary: Package containers provides core interfaces and functions for data structures.
 homepage: https://pkg.go.dev/github.com/emirpasic/gods/containers
-# The code is licensed as BSD-2-Clause except for trees/avltree/avrtree.go and trees/avltree/iterator.go
 license: bsd-2-clause
 licenses:
-- sources: gods@v1.12.0/LICENSE
+- sources: gods@v1.18.1/LICENSE
   text: |
     Copyright (c) 2015, Emir Pasic
     All rights reserved.
@@ -50,7 +49,7 @@ licenses:
     WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
     ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
     OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-- sources: gods@v1.12.0/README.md
+- sources: gods@v1.18.1/README.md
   text: This library is distributed under the BSD-style license found in the [LICENSE](https://github.com/emirpasic/gods/blob/master/LICENSE)
     file.
 notices: []

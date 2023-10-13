@@ -266,7 +266,7 @@ func (pme *Explorer) IsManagedPlatformRelease(platformRelease *cores.PlatformRel
 	if packagesDir.FollowSymLink() != nil {
 		return false
 	}
-	managed := installDir.IsInsideDir(packagesDir)
+	managed, _ := installDir.IsInsideDir(packagesDir)
 	return managed
 }
 
@@ -383,7 +383,7 @@ func (pme *Explorer) IsManagedToolRelease(toolRelease *cores.ToolRelease) bool {
 	if packagesDir.FollowSymLink() != nil {
 		return false
 	}
-	managed := installDir.IsInsideDir(packagesDir)
+	managed, _ := installDir.IsInsideDir(packagesDir)
 	return managed
 }
 

@@ -26,21 +26,31 @@ import (
 	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/go-paths-helper"
 	semver "go.bug.st/relaxed-semver"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
+
+// projectRaw is a support struct used only to unmarshal the yaml
+type projectRaw struct {
+	ProfilesRaw     yaml.Node `yaml:"profiles"`
+	DefaultProfile  string    `yaml:"default_profile"`
+	DefaultFqbn     string    `yaml:"default_fqbn"`
+	DefaultPort     string    `yaml:"default_port,omitempty"`
+	DefaultProtocol string    `yaml:"default_protocol,omitempty"`
+}
 
 // Project represents the sketch project file
 type Project struct {
-	Profiles        Profiles `yaml:"profiles"`
-	DefaultProfile  string   `yaml:"default_profile"`
-	DefaultFqbn     string   `yaml:"default_fqbn"`
-	DefaultPort     string   `yaml:"default_port,omitempty"`
-	DefaultProtocol string   `yaml:"default_protocol,omitempty"`
+	Profiles        []*Profile
+	DefaultProfile  string
+	DefaultFqbn     string
+	DefaultPort     string
+	DefaultProtocol string
 }
 
 // AsYaml outputs the sketch project file as YAML
 func (p *Project) AsYaml() string {
 	res := "profiles:\n"
+
 	for _, profile := range p.Profiles {
 		res += fmt.Sprintf("  %s:\n", profile.Name)
 		res += profile.AsYaml()
@@ -61,34 +71,24 @@ func (p *Project) AsYaml() string {
 	return res
 }
 
-// Profiles are a list of Profile
-type Profiles []*Profile
-
-// UnmarshalYAML decodes a Profiles section from YAML source.
-func (p *Profiles) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	unmarshaledProfiles := map[string]*Profile{}
-	if err := unmarshal(&unmarshaledProfiles); err != nil {
-		return err
-	}
-
-	var profilesData yaml.MapSlice
-	if err := unmarshal(&profilesData); err != nil {
-		return err
-	}
-
-	for _, profileData := range profilesData {
-		profileName, ok := profileData.Key.(string)
-		if !ok {
-			return fmt.Errorf("invalid profile name: %v", profileData.Key)
+func (p *projectRaw) getProfiles() []*Profile {
+	profiles := []*Profile{}
+	for i, node := range p.ProfilesRaw.Content {
+		if node.Tag != "!!str" {
+			continue // Node is a map, so it is read out at key.
 		}
-		profile := unmarshaledProfiles[profileName]
-		profile.Name = profileName
-		*p = append(*p, profile)
-	}
 
-	return nil
+		var profile Profile
+		profile.Name = node.Value
+		if err := p.ProfilesRaw.Content[i+1].Decode(&profile); err != nil {
+			panic(fmt.Sprintf("profiles parsing err: %v", err.Error()))
+		}
+		profiles = append(profiles, &profile)
+	}
+	return profiles
 }
 
+// UnmarshalYAML decodes a Profiles section from YAML source.
 // Profile is a sketch profile, it contains a reference to all the resources
 // needed to build and upload a sketch
 type Profile struct {
@@ -256,9 +256,16 @@ func LoadProjectFile(file *paths.Path) (*Project, error) {
 	if err != nil {
 		return nil, err
 	}
-	res := &Project{}
-	if err := yaml.Unmarshal(data, &res); err != nil {
+	raw := &projectRaw{}
+	if err := yaml.Unmarshal(data, &raw); err != nil {
 		return nil, err
 	}
-	return res, nil
+
+	return &Project{
+		Profiles:        raw.getProfiles(),
+		DefaultProfile:  raw.DefaultProfile,
+		DefaultFqbn:     raw.DefaultFqbn,
+		DefaultPort:     raw.DefaultPort,
+		DefaultProtocol: raw.DefaultProtocol,
+	}, nil
 }

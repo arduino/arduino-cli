@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/grpc/status
-version: v1.55.0
+version: v1.58.3
 type: go
 summary: Package status implements errors returned by gRPC.
 homepage: https://pkg.go.dev/google.golang.org/grpc/status
 license: apache-2.0
 licenses:
-- sources: grpc@v1.55.0/LICENSE
+- sources: grpc@v1.58.3/LICENSE
   text: |2
 
                                      Apache License

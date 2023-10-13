@@ -1,6 +1,6 @@
 ---
 name: github.com/xanzy/ssh-agent
-version: v0.2.1
+version: v0.3.3
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/xanzy/ssh-agent

@@ -1,13 +1,13 @@
 ---
 name: golang.org/x/crypto/sha3
-version: v0.7.0
+version: v0.13.0
 type: go
 summary: Package sha3 implements the SHA-3 fixed-output-length hash functions and
   the SHAKE variable-output-length hash functions defined by FIPS-202.
 homepage: https://pkg.go.dev/golang.org/x/crypto/sha3
 license: other
 licenses:
-- sources: crypto@v0.7.0/LICENSE
+- sources: crypto@v0.13.0/LICENSE
   text: |
     Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -36,7 +36,7 @@ licenses:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-- sources: crypto@v0.7.0/PATENTS
+- sources: crypto@v0.13.0/PATENTS
   text: |
     Additional IP Rights Grant (Patents)
 

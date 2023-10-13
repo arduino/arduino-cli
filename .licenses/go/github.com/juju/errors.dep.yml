@@ -1,9 +1,9 @@
 ---
 name: github.com/juju/errors
-version: v0.0.0-20181118221551-089d3ea4e4d5
+version: v1.0.0
 type: go
-summary: "[godoc-link-here] The juju/errors provides an easy way to annotate errors
-  without losing the orginal error context."
+summary: Package errors provides an easy way to annotate errors without losing the
+  original error context.
 homepage: https://pkg.go.dev/github.com/juju/errors
 license: lgpl-3.0-only
 licenses:

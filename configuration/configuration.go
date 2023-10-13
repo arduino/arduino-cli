@@ -26,7 +26,6 @@ import (
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/arduino/go-win32-utils"
 	"github.com/spf13/cobra"
-	jww "github.com/spf13/jwalterweatherman"
 	"github.com/spf13/viper"
 )
 
@@ -39,8 +38,6 @@ var tr = i18n.Tr
 // Please note the logging system hasn't been configured yet,
 // so logging shouldn't be used here.
 func Init(configFile string) *viper.Viper {
-	jww.SetStdoutThreshold(jww.LevelFatal)
-
 	// Create a new viper instance with default values for all the settings
 	settings := viper.New()
 	SetDefaults(settings)
