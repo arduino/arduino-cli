@@ -51,29 +51,20 @@ var (
 
 // NewCommand created a new `upload` command
 func NewCommand() *cobra.Command {
-	var uploadFields []string
-	var parsedUploadFields map[string]string
+	uploadFields := map[string]string{}
 	uploadCommand := &cobra.Command{
-		Use:     "upload",
-		Short:   tr("Upload Arduino sketches."),
-		Long:    tr("Upload Arduino sketches. This does NOT compile the sketch prior to upload."),
-		Example: "  " + os.Args[0] + " upload /home/user/Arduino/MySketch",
-		Args:    cobra.MaximumNArgs(1),
+		Use:   "upload",
+		Short: tr("Upload Arduino sketches."),
+		Long:  tr("Upload Arduino sketches. This does NOT compile the sketch prior to upload."),
+		Example: "" +
+			"  " + os.Args[0] + " upload /home/user/Arduino/MySketch -p /dev/ttyACM0 -b arduino:avr:uno\n" +
+			"  " + os.Args[0] + " upload -p 192.168.10.1 -b arduino:avr:uno --upload-field password=abc",
+		Args: cobra.MaximumNArgs(1),
 		PreRun: func(cmd *cobra.Command, args []string) {
 			arguments.CheckFlagsConflicts(cmd, "input-file", "input-dir")
-			if len(uploadFields) > 0 {
-				parsedUploadFields = map[string]string{}
-				for _, field := range uploadFields {
-					split := strings.SplitN(field, "=", 2)
-					if len(split) != 2 {
-						feedback.Fatal(tr("Invalid upload field: %s", field), feedback.ErrBadArgument)
-					}
-					parsedUploadFields[split[0]] = split[1]
-				}
-			}
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			runUploadCommand(args, parsedUploadFields)
+			runUploadCommand(args, uploadFields)
 		},
 	}
 
@@ -87,7 +78,7 @@ func NewCommand() *cobra.Command {
 	programmer.AddToCommand(uploadCommand)
 	uploadCommand.Flags().BoolVar(&dryRun, "dry-run", false, tr("Do not perform the actual upload, just log out actions"))
 	uploadCommand.Flags().MarkHidden("dry-run")
-	uploadCommand.Flags().StringArrayVar(&uploadFields, "upload-field", uploadFields, tr("Set a value for a field required to upload.")+" (field=value)")
+	arguments.AddKeyValuePFlag(uploadCommand, &uploadFields, "upload-field", "F", nil, tr("Set a value for a field required to upload."))
 	return uploadCommand
 }
 
