@@ -40,11 +40,11 @@ type projectRaw struct {
 
 // Project represents the sketch project file
 type Project struct {
-	Profiles        []*Profile `yaml:"profiles"`
-	DefaultProfile  string     `yaml:"default_profile"`
-	DefaultFqbn     string     `yaml:"default_fqbn"`
-	DefaultPort     string     `yaml:"default_port,omitempty"`
-	DefaultProtocol string     `yaml:"default_protocol,omitempty"`
+	Profiles        []*Profile
+	DefaultProfile  string
+	DefaultFqbn     string
+	DefaultPort     string
+	DefaultProtocol string
 }
 
 // AsYaml outputs the sketch project file as YAML
