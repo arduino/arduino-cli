@@ -11,3 +11,10 @@ updates:
       interval: daily
     labels:
       - "topic: infrastructure"
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 10
+    labels:
+      - "topic: infrastructure"
