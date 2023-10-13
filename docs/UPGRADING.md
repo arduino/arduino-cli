@@ -4,6 +4,166 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ## v0.35.0
 
+### CLI `core list` and `core search` changed JSON output.
+
+Below is an example of the response containing an object with all possible keys set.
+
+```json
+[
+  {
+    "id": "arduino:avr",
+    "maintainer": "Arduino",
+    "website": "http://www.arduino.cc/",
+    "email": "packages@arduino.cc",
+    "indexed": true,
+    "manually_installed": true,
+    "deprecated": true,
+    "releases": {
+      "1.6.2": {
+        "name": "Arduino AVR Boards",
+        "version": "1.6.2",
+        "type": [
+          "Arduino"
+        ],
+        "installed": true,
+        "boards": [
+          {
+            "name": "Arduino Robot Motor"
+          }
+        ],
+        "help": {
+          "online": "http://www.arduino.cc/en/Reference/HomePage"
+        },
+        "missing_metadata": true,
+        "deprecated": true
+      },
+      "1.8.3": { ... }
+    },
+    "installed_version": "1.6.2",
+    "latest_version": "1.8.3"
+  }
+]
+```
+
+### gRPC `cc.arduino.cli.commands.v1.PlatformSearchResponse` message has been changed.
+
+The old behavior was a bit misleading to the client because, to list all the available versions for each platform, we
+used to use the `latest` as it was describing the current platform version. We introduced a new message:
+`PlatformSummary`, with the intent to make the response more straightforward and less error-prone.
+
+```protobuf
+message PlatformSearchResponse {
+  // Results of the search.
+  repeated PlatformSummary search_output = 1;
+}
+
+// PlatformSummary is a structure containing all the information about
+// a platform and all its available releases.
+message PlatformSummary {
+  // Generic information about a platform
+  PlatformMetadata metadata = 1;
+  // Maps version to the corresponding PlatformRelease
+  map<string, PlatformRelease> releases = 2;
+  // The installed version of the platform, or empty string if none installed
+  string installed_version = 3;
+  // The latest available version of the platform, or empty if none available
+  string latest_version = 4;
+}
+```
+
+The new response contains an array of `PlatformSummary`. `PlatformSummary` contains all the information about a platform
+and all its available releases. Releases contain all the PlatformReleases of a specific platform, and the key is the
+semver string of a specific version. We've added the `installed_version` and `latest_version` to make more convenient
+the access of such values in the map. A few notes about the behavior of the `releases` map:
+
+- It can be empty if no releases are found
+- It can contain a single-release
+- It can contain multiple releases
+- If in the request we provide the `manually_installed=true`, the key of such release is an empty string.
+
+### Removed gRPC API: `cc.arduino.cli.commands.v1.PlatformList`, `PlatformListRequest`, and `PlatformListResponse`.
+
+The following gRPC API have been removed:
+
+- `cc.arduino.cli.commands.v1.PlatformList`: you can use the already available gRPC method `PlatformSearch` to perform
+  the same task. Setting the `all_versions=true` and `manually_installed=true` in the `PlatformSearchRequest` returns
+  all the data needed to produce the same result of the old api.
+- `cc.arduino.cli.commands.v1.PlatformListRequest`.
+- `cc.arduino.cli.commands.v1.PlatformListResponse`.
+
+### gRPC `cc.arduino.cli.commands.v1.Platform` message has been changed.
+
+The old `Platform` and other information such as name, website, and email... contained details about the currently
+installed version and the latest available. We noticed an ambiguous use of the `latest` field, especially when such a
+message came in the `PlatformSearchResponse` response. In that use case, the latest field contained the specific version
+of a particular platform: this is a hack because the value doesn't always reflect the meaning of that property. Another
+inconsistent case occurs when a platform maintainer changes the name of a particular release. We always pick the value
+from the latest release, but this might not be what we want to do all the time. We concluded that the design of that
+message isn't something to be considered future-proof proof, so we decided to modify it as follows:
+
+```protobuf
+// Platform is a structure containing all the information about a single
+// platform release.
+message Platform {
+  // Generic information about a platform
+  PlatformMetadata metadata = 1;
+  // Information about a specific release of a platform
+  PlatformRelease release = 2;
+}
+
+// PlatformMetadata contains generic information about a platform (not
+// correlated to a specific release).
+message PlatformMetadata {
+  // Platform ID (e.g., `arduino:avr`).
+  string id = 1;
+  // Maintainer of the platform's package.
+  string maintainer = 2;
+  // A URL provided by the author of the platform's package, intended to point
+  // to their website.
+  string website = 3;
+  // Email of the maintainer of the platform's package.
+  string email = 4;
+  // If true this Platform has been installed manually in the user' sketchbook
+  // hardware folder
+  bool manually_installed = 5;
+  // True if the latest release of this Platform has been deprecated
+  bool deprecated = 6;
+  // If true the platform is indexed
+  bool indexed = 7;
+}
+
+// PlatformRelease contains information about a specific release of a platform.
+message PlatformRelease {
+  // Name used to identify the platform to humans (e.g., "Arduino AVR Boards").
+  string name = 1;
+  // Version of the platform release
+  string version = 5;
+  // Type of the platform.
+  repeated string type = 6;
+  // True if the platform is installed
+  bool installed = 7;
+  // List of boards provided by the platform. If the platform is installed,
+  // this is the boards listed in the platform's boards.txt. If the platform is
+  // not installed, this is an arbitrary list of board names provided by the
+  // platform author for display and may not match boards.txt.
+  repeated Board boards = 8;
+  // A URL provided by the author of the platform's package, intended to point
+  // to their online help service.
+  HelpResources help = 9;
+  // This field is true when the platform is installed with the Arduino IDE 1.8.
+  // If the platform is also not indexed it may fail to work correctly in some
+  // circumstances, and it may need to be re-installed.
+  bool missing_metadata = 10;
+  // True this release is deprecated
+  bool deprecated = 11;
+}
+```
+
+To address all the inconsistencies/inaccuracies we introduced two messages:
+
+- `PlatformMetadata` contains generic information about a platform (not correlated to a specific release).
+- `PlatformRelease` contains information about a specific release of a platform.
+
 ### CLI `debug --info` changed JSON output.
 
 The string field `server_configuration.script` is now an array and has been renamed `scripts`, here an example:

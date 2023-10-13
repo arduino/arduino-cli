@@ -495,8 +495,10 @@ type Platform struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Generic information about a platform
 	Metadata *PlatformMetadata `protobuf:"bytes,1,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	Release  *PlatformRelease  `protobuf:"bytes,2,opt,name=release,proto3" json:"release,omitempty"`
+	// Information about a specific release of a platform
+	Release *PlatformRelease `protobuf:"bytes,2,opt,name=release,proto3" json:"release,omitempty"`
 }
 
 func (x *Platform) Reset() {
@@ -552,6 +554,7 @@ type PlatformSummary struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Generic information about a platform
 	Metadata *PlatformMetadata `protobuf:"bytes,1,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	// Maps version to the corresponding PlatformRelease
 	Releases map[string]*PlatformRelease `protobuf:"bytes,2,rep,name=releases,proto3" json:"releases,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
@@ -629,14 +632,14 @@ type PlatformMetadata struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Platform ID (e.g., `arduino:avr`).
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // package + architecture
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Maintainer of the platform's package.
-	Maintainer string `protobuf:"bytes,2,opt,name=maintainer,proto3" json:"maintainer,omitempty"` // from parent-package
+	Maintainer string `protobuf:"bytes,2,opt,name=maintainer,proto3" json:"maintainer,omitempty"`
 	// A URL provided by the author of the platform's package, intended to point
 	// to their website.
-	Website string `protobuf:"bytes,3,opt,name=website,proto3" json:"website,omitempty"` // from parent-package
+	Website string `protobuf:"bytes,3,opt,name=website,proto3" json:"website,omitempty"`
 	// Email of the maintainer of the platform's package.
-	Email string `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"` // from parent-package
+	Email string `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
 	// If true this Platform has been installed manually in the user' sketchbook
 	// hardware folder
 	ManuallyInstalled bool `protobuf:"varint,5,opt,name=manually_installed,json=manuallyInstalled,proto3" json:"manually_installed,omitempty"`

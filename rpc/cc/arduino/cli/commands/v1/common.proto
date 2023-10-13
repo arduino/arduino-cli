@@ -74,13 +74,16 @@ message Programmer {
 // Platform is a structure containing all the information about a single
 // platform release.
 message Platform {
+  // Generic information about a platform
   PlatformMetadata metadata = 1;
+  // Information about a specific release of a platform
   PlatformRelease release = 2;
 }
 
 // PlatformSummary is a structure containing all the information about
 // a platform and all its available releases.
 message PlatformSummary {
+  // Generic information about a platform
   PlatformMetadata metadata = 1;
   // Maps version to the corresponding PlatformRelease
   map<string, PlatformRelease> releases = 2;
@@ -94,14 +97,14 @@ message PlatformSummary {
 // correlated to a specific release).
 message PlatformMetadata {
   // Platform ID (e.g., `arduino:avr`).
-  string id = 1; // package + architecture
+  string id = 1;
   // Maintainer of the platform's package.
-  string maintainer = 2; // from parent-package
+  string maintainer = 2;
   // A URL provided by the author of the platform's package, intended to point
   // to their website.
-  string website = 3; // from parent-package
+  string website = 3;
   // Email of the maintainer of the platform's package.
-  string email = 4; // from parent-package
+  string email = 4;
   // If true this Platform has been installed manually in the user' sketchbook
   // hardware folder
   bool manually_installed = 5;
