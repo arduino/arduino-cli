@@ -18,6 +18,7 @@ package orderedmap
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"slices"
 )
 
@@ -38,10 +39,15 @@ type Map[K any, V any] interface {
 	MarshalJSON() ([]byte, error)
 }
 
+type scalars interface {
+	~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 |
+		~uint16 | ~uint32 | ~uint64 | ~uintptr | ~float32 | ~float64 | ~string
+}
+
 // NewWithConversionFunc creates a map using the given conversion function
 // to convert non-comparable key type to comparable items.
 // The conversion function must be bijective.
-func NewWithConversionFunc[K any, V any, C comparable](conv func(K) C) Map[K, V] {
+func NewWithConversionFunc[K any, V any, C scalars](conv func(K) C) Map[K, V] {
 	return &mapImpl[K, V, C]{
 		conv: conv,
 		kv:   map[C]V{},
@@ -50,7 +56,7 @@ func NewWithConversionFunc[K any, V any, C comparable](conv func(K) C) Map[K, V]
 }
 
 // New creates a map
-func New[K comparable, V any]() Map[K, V] {
+func New[K scalars, V any]() Map[K, V] {
 	return &mapImpl[K, V, K]{
 		conv: func(in K) K { return in }, // identity
 		kv:   map[K]V{},
@@ -58,7 +64,7 @@ func New[K comparable, V any]() Map[K, V] {
 	}
 }
 
-type mapImpl[K any, V any, C comparable] struct {
+type mapImpl[K any, V any, C scalars] struct {
 	conv func(K) C
 	kv   map[C]V
 	o    []K
@@ -91,7 +97,8 @@ func (m *mapImpl[K, V, C]) MarshalJSON() ([]byte, error) {
 	buf.WriteByte('{')
 	encoder := json.NewEncoder(&buf)
 	for _, k := range m.o {
-		if err := encoder.Encode(k); err != nil {
+		// Here we convert non string keys in string.
+		if err := encoder.Encode(fmt.Sprintf("%v", m.conv(k))); err != nil {
 			return nil, err
 		}
 		buf.WriteByte(':')

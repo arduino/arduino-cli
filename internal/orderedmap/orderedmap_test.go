@@ -67,36 +67,6 @@ func TestGet(t *testing.T) {
 		require.True(t, ok)
 	})
 
-	t.Run("the key is a pointer", func(t *testing.T) {
-		m := orderedmap.New[*string, int]()
-
-		notExistingKey := toPtr("not-existing-key")
-		require.Equal(t, 0, m.Get(notExistingKey))
-		v, ok := m.GetOk(notExistingKey)
-		require.Zero(t, v)
-		require.False(t, ok)
-
-		existingKey := toPtr("existing-key")
-		m.Set(existingKey, 1)
-		require.Equal(t, 1, m.Get(existingKey))
-		v, ok = m.GetOk(existingKey)
-		require.Equal(t, 1, v)
-		require.True(t, ok)
-
-		// Using a different pointer with the same value returns no result
-		require.Equal(t, 0, m.Get(toPtr("existing-key")))
-		v, ok = m.GetOk(toPtr("existing-key"))
-		require.Zero(t, v)
-		require.False(t, ok)
-
-		// test empty key
-		m.Set(nil, 2)
-		require.Equal(t, 2, m.Get(nil))
-		v, ok = m.GetOk(nil)
-		require.Equal(t, 2, v)
-		require.True(t, ok)
-	})
-
 	t.Run("custom comparable key", func(t *testing.T) {
 		type A struct {
 			b []byte
@@ -342,6 +312,47 @@ func TestClone(t *testing.T) {
 		require.Equal(t, 4, clone.Get("d"))
 		_, ok := m1.GetOk("d")
 		require.False(t, ok)
+	})
+}
+
+func TestMarshallJSON(t *testing.T) {
+	t.Run("empty map", func(t *testing.T) {
+		m := orderedmap.New[string, int]()
+		mapJSON, err := m.MarshalJSON()
+		require.NoError(t, err)
+		require.JSONEq(t, `{}`, string(mapJSON))
+	})
+	t.Run("respect the order of insertion", func(t *testing.T) {
+		m := orderedmap.New[string, int]()
+		m.Set("a", 1)
+		m.Set("b", 2)
+		m.Set("c", 3)
+		mapJSON, err := m.MarshalJSON()
+		require.NoError(t, err)
+		require.JSONEq(t, `{"a":1,"b":2,"c":3}`, string(mapJSON))
+	})
+	t.Run("can serialize int keys", func(t *testing.T) {
+		m := orderedmap.New[int, bool]()
+		m.Set(1, true)
+		m.Set(2, true)
+		m.Set(3, true)
+		mapJSON, err := m.MarshalJSON()
+		require.NoError(t, err)
+		require.JSONEq(t, `{"1":true,"2":true,"3":true}`, string(mapJSON))
+	})
+	t.Run("can serialize pointer keys", func(t *testing.T) {
+		m := orderedmap.NewWithConversionFunc[*int, bool, int](func(i *int) int {
+			if i == nil {
+				return 0
+			}
+			return *i
+		})
+		m.Set(toPtr(1), true)
+		m.Set(toPtr(2), true)
+		m.Set(toPtr(3), true)
+		mapJSON, err := m.MarshalJSON()
+		require.NoError(t, err)
+		require.JSONEq(t, `{"1":true,"2":true,"3":true}`, string(mapJSON))
 	})
 }
 
