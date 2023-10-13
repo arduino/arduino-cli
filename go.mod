@@ -24,7 +24,6 @@ require (
 	github.com/mattn/go-colorable v0.1.13
 	github.com/mattn/go-isatty v0.0.19
 	github.com/pkg/errors v0.9.1
-	github.com/pmylund/sortutil v0.0.0-20120526081524-abeda66eb583
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/rogpeppe/go-internal v1.11.0
 	github.com/schollz/closestmatch v2.1.0+incompatible
