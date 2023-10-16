@@ -59,22 +59,32 @@ func List(inst *rpc.Instance, all bool, updatableOnly bool) {
 }
 
 // GetList returns a list of installed platforms.
-func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.Platform {
-	platforms, err := core.PlatformList(&rpc.PlatformListRequest{
-		Instance:      inst,
-		UpdatableOnly: updatableOnly,
-		All:           all,
+func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.PlatformSummary {
+	platforms, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
+		Instance:    inst,
+		AllVersions: true,
 	})
 	if err != nil {
 		feedback.Fatal(tr("Error listing platforms: %v", err), feedback.ErrGeneric)
 	}
-	return platforms.InstalledPlatforms
+
+	result := []*rpc.PlatformSummary{}
+	for _, platform := range platforms.GetSearchOutput() {
+		if !all && platform.InstalledVersion == "" {
+			continue
+		}
+		if updatableOnly && platform.InstalledVersion == platform.LatestVersion {
+			continue
+		}
+		result = append(result, platform)
+	}
+	return result
 }
 
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type installedResult struct {
-	platforms []*rpc.Platform
+	platforms []*rpc.PlatformSummary
 }
 
 func (ir installedResult) Data() interface{} {
@@ -87,12 +97,18 @@ func (ir installedResult) String() string {
 	}
 	t := table.New()
 	t.SetHeader(tr("ID"), tr("Installed"), tr("Latest"), tr("Name"))
-	for _, p := range ir.platforms {
-		name := p.Name
-		if p.Deprecated {
+	for _, platform := range ir.platforms {
+		installedRelease := platform.GetInstalledRelease()
+		latestRelease := platform.GetLatestRelease()
+
+		name := installedRelease.GetName()
+		if name == "" {
+			name = latestRelease.GetName()
+		}
+		if platform.Metadata.Deprecated {
 			name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), name)
 		}
-		t.AddRow(p.Id, p.Installed, p.Latest, name)
+		t.AddRow(platform.Metadata.Id, platform.InstalledVersion, platform.LatestVersion, name)
 	}
 
 	return t.Render()
