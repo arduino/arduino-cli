@@ -85,7 +85,7 @@ func (r searchResults) String() string {
 		if item.IsHidden {
 			hidden = tr("(hidden)")
 		}
-		t.AddRow(item.GetName(), item.GetFqbn(), item.Platform.Id, hidden)
+		t.AddRow(item.GetName(), item.GetFqbn(), item.Platform.Metadata.Id, hidden)
 	}
 	return t.Render()
 }

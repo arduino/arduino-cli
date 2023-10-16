@@ -87,7 +87,7 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type searchResults struct {
-	platforms []*rpc.Platform
+	platforms []*rpc.PlatformSummary
 }
 
 func (sr searchResults) Data() interface{} {
@@ -98,12 +98,14 @@ func (sr searchResults) String() string {
 	if len(sr.platforms) > 0 {
 		t := table.New()
 		t.SetHeader(tr("ID"), tr("Version"), tr("Name"))
-		for _, item := range sr.platforms {
-			name := item.GetName()
-			if item.Deprecated {
+		for _, platform := range sr.platforms {
+			name := platform.GetLatestRelease().GetName()
+			if platform.GetMetadata().Deprecated {
 				name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), name)
 			}
-			t.AddRow(item.GetId(), item.GetLatest(), name)
+			for _, platformRelease := range platform.GetSortedReleases() {
+				t.AddRow(platform.GetMetadata().GetId(), platformRelease.GetVersion(), name)
+			}
 		}
 		return t.Render()
 	}

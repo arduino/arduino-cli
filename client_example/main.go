@@ -420,7 +420,7 @@ func callPlatformSearch(client rpc.ArduinoCoreServiceClient, instance *rpc.Insta
 	for _, plat := range platforms {
 		// We only print ID and version of the platforms found but you can look
 		// at the definition for the rpc.Platform struct for more fields.
-		log.Printf("Search result: %+v - %+v", plat.GetId(), plat.GetLatest())
+		log.Printf("Search result: %+v - %+v", plat.GetMetadata().GetId(), plat.GetLatestVersion())
 	}
 }
 
@@ -546,7 +546,7 @@ func callBoardSearch(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance
 	}
 
 	for _, board := range res.Boards {
-		log.Printf("Board Name: %s, Board Platform: %s\n", board.Name, board.Platform.Id)
+		log.Printf("Board Name: %s, Board Platform: %s\n", board.Name, board.Platform.Metadata.Id)
 	}
 }
 

@@ -15,6 +15,12 @@
 
 package commands
 
+import (
+	"sort"
+
+	semver "go.bug.st/relaxed-semver"
+)
+
 // DownloadProgressCB is a callback to get updates on download progress
 type DownloadProgressCB func(curr *DownloadProgress)
 
@@ -79,4 +85,16 @@ func (s *PlatformSummary) GetInstalledRelease() *PlatformRelease {
 		return nil
 	}
 	return s.Releases[s.InstalledVersion]
+}
+
+// GetSortedReleases returns the releases in order of version.
+func (s *PlatformSummary) GetSortedReleases() []*PlatformRelease {
+	res := []*PlatformRelease{}
+	for _, release := range s.GetReleases() {
+		res = append(res, release)
+	}
+	sort.SliceStable(res, func(i, j int) bool {
+		return semver.ParseRelaxed(res[i].Version).LessThan(semver.ParseRelaxed(res[j].Version))
+	})
+	return res
 }

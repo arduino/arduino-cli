@@ -157,7 +157,9 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardL
 
 		// We need the Platform maintaner for sorting so we set it here
 		platform := &rpc.Platform{
-			Maintainer: board.PlatformRelease.Platform.Package.Maintainer,
+			Metadata: &rpc.PlatformMetadata{
+				Maintainer: board.PlatformRelease.Platform.Package.Maintainer,
+			},
 		}
 		boards = append(boards, &rpc.BoardListItem{
 			Name:     board.Name(),
@@ -185,7 +187,7 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardL
 
 	// Put Arduino boards before others in case there are non Arduino boards with identical VID:PID combination
 	sort.SliceStable(boards, func(i, j int) bool {
-		if boards[i].Platform.Maintainer == "Arduino" && boards[j].Platform.Maintainer != "Arduino" {
+		if boards[i].Platform.Metadata.Maintainer == "Arduino" && boards[j].Platform.Metadata.Maintainer != "Arduino" {
 			return true
 		}
 		return false

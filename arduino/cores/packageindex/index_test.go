@@ -91,11 +91,10 @@ func TestIndexFromPlatformRelease(t *testing.T) {
 				Name:     "serial-monitor",
 			},
 		},
+		Name:     "Arduino AVR Boards",
+		Category: "Arduino",
 		Platform: &cores.Platform{
-			Name:         "Arduino AVR Boards",
 			Architecture: "avr",
-			Category:     "Arduino",
-
 			Package: &cores.Package{
 				Name:       "arduino",
 				Maintainer: "Arduino",

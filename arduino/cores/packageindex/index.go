@@ -222,11 +222,11 @@ func IndexFromPlatformRelease(pr *cores.PlatformRelease) Index {
 				URL:        pr.Platform.Package.URL,
 				Email:      pr.Platform.Package.Email,
 				Platforms: []*indexPlatformRelease{{
-					Name:                  pr.Platform.Name,
+					Name:                  pr.Name,
 					Architecture:          pr.Platform.Architecture,
 					Version:               pr.Version,
-					Deprecated:            pr.Platform.Deprecated,
-					Category:              pr.Platform.Category,
+					Deprecated:            pr.Deprecated,
+					Category:              pr.Category,
 					URL:                   pr.Resource.URL,
 					ArchiveFileName:       pr.Resource.ArchiveFileName,
 					Checksum:              pr.Resource.Checksum,
@@ -263,18 +263,13 @@ func (inPackage indexPackage) extractPackageIn(outPackages cores.Packages, trust
 
 func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *cores.Package, trusted bool, isInstallJSON bool) error {
 	outPlatform := outPackage.GetOrCreatePlatform(inPlatformRelease.Architecture)
-	// FIXME: shall we use the Name and Category of the latest release? or maybe move Name and Category in PlatformRelease?
-	outPlatform.Name = inPlatformRelease.Name
-	outPlatform.Category = inPlatformRelease.Category
 	// If the variable `isInstallJSON` is false it means that the index we're reading is coming from the additional-urls.
 	// Therefore, the `outPlatform.Indexed` will be set at `true`.
 	outPlatform.Indexed = outPlatform.Indexed || !isInstallJSON
 
-	// If the Platform is installed before deprecation installed.json file does not include "deprecated" field.
-	// The installed.json is read during loading phase of an installed Platform, if the deprecated field is not found
-	// the package_index.json field would be overwritten and the deprecation info would be lost.
-	// This check prevents that behaviour.
-	if !outPlatform.Deprecated {
+	// If the latest platform release is deprecated, then deprecate the whole platform.
+	if outPlatform.Latest == nil || outPlatform.Latest.LessThan(inPlatformRelease.Version) {
+		outPlatform.Latest = inPlatformRelease.Version
 		outPlatform.Deprecated = inPlatformRelease.Deprecated
 	}
 
@@ -283,6 +278,8 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 		return fmt.Errorf(tr("invalid platform archive size: %s"), err)
 	}
 	outPlatformRelease := outPlatform.GetOrCreateRelease(inPlatformRelease.Version)
+	outPlatformRelease.Name = inPlatformRelease.Name
+	outPlatformRelease.Category = inPlatformRelease.Category
 	outPlatformRelease.IsTrusted = trusted
 	outPlatformRelease.Resource = &resources.DownloadResource{
 		ArchiveFileName: inPlatformRelease.ArchiveFileName,
@@ -296,6 +293,7 @@ func (inPlatformRelease indexPlatformRelease) extractPlatformIn(outPackage *core
 	outPlatformRelease.ToolDependencies = inPlatformRelease.extractToolDependencies()
 	outPlatformRelease.DiscoveryDependencies = inPlatformRelease.extractDiscoveryDependencies()
 	outPlatformRelease.MonitorDependencies = inPlatformRelease.extractMonitorDependencies()
+	outPlatformRelease.Deprecated = inPlatformRelease.Deprecated
 	return nil
 }
 

@@ -323,14 +323,14 @@ func (pm *Builder) loadPlatformRelease(platform *cores.PlatformRelease, path *pa
 		platform.Properties.Set("pluggable_monitor.required.serial", "builtin:serial-monitor")
 	}
 
-	if platform.Platform.Name == "" {
+	if platform.Name == "" {
 		if name, ok := platform.Properties.GetOk("name"); ok {
-			platform.Platform.Name = name
+			platform.Name = name
 		} else {
 			// If the platform.txt file doesn't exist for this platform and it's not in any
 			// package index there is no way of retrieving its name, so we build one using
 			// the available information, that is the packager name and the architecture.
-			platform.Platform.Name = fmt.Sprintf("%s-%s", platform.Platform.Package.Name, platform.Platform.Architecture)
+			platform.Name = fmt.Sprintf("%s-%s", platform.Platform.Package.Name, platform.Platform.Architecture)
 		}
 	}
 

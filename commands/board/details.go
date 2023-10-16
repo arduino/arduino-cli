@@ -39,7 +39,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 		return nil, &arduino.InvalidFQBNError{Cause: err}
 	}
 
-	boardPackage, boardPlatform, board, boardProperties, boardRefPlatform, err := pme.ResolveFQBN(fqbn)
+	boardPackage, boardPlatformRelease, board, boardProperties, boardRefPlatform, err := pme.ResolveFQBN(fqbn)
 	if err != nil {
 		return nil, &arduino.UnknownFQBNError{Cause: err}
 	}
@@ -65,11 +65,11 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 	}
 
 	details.DebuggingSupported = boardProperties.ContainsKey("debug.executable") ||
-		boardPlatform.Properties.ContainsKey("debug.executable") ||
+		boardPlatformRelease.Properties.ContainsKey("debug.executable") ||
 		(boardRefPlatform != nil && boardRefPlatform.Properties.ContainsKey("debug.executable")) ||
 		// HOTFIX: Remove me when the `arduino:samd` core is updated
-		boardPlatform.String() == "arduino:samd@1.8.9" ||
-		boardPlatform.String() == "arduino:samd@1.8.8"
+		boardPlatformRelease.String() == "arduino:samd@1.8.9" ||
+		boardPlatformRelease.String() == "arduino:samd@1.8.8"
 
 	details.Package = &rpc.Package{
 		Name:       boardPackage.Name,
@@ -81,16 +81,16 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 	}
 
 	details.Platform = &rpc.BoardPlatform{
-		Architecture: boardPlatform.Platform.Architecture,
-		Category:     boardPlatform.Platform.Category,
-		Name:         boardPlatform.Platform.Name,
+		Architecture: boardPlatformRelease.Platform.Architecture,
+		Category:     boardPlatformRelease.Category,
+		Name:         boardPlatformRelease.Name,
 	}
 
-	if boardPlatform.Resource != nil {
-		details.Platform.Url = boardPlatform.Resource.URL
-		details.Platform.ArchiveFilename = boardPlatform.Resource.ArchiveFileName
-		details.Platform.Checksum = boardPlatform.Resource.Checksum
-		details.Platform.Size = boardPlatform.Resource.Size
+	if boardPlatformRelease.Resource != nil {
+		details.Platform.Url = boardPlatformRelease.Resource.URL
+		details.Platform.ArchiveFilename = boardPlatformRelease.Resource.ArchiveFileName
+		details.Platform.Checksum = boardPlatformRelease.Resource.Checksum
+		details.Platform.Size = boardPlatformRelease.Resource.Size
 	}
 
 	details.ConfigOptions = []*rpc.ConfigOption{}
@@ -118,7 +118,7 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 	}
 
 	details.ToolsDependencies = []*rpc.ToolsDependencies{}
-	for _, tool := range boardPlatform.ToolDependencies {
+	for _, tool := range boardPlatformRelease.ToolDependencies {
 		toolRelease := pme.FindToolDependency(tool)
 		var systems []*rpc.Systems
 		if toolRelease != nil {
@@ -141,9 +141,9 @@ func Details(ctx context.Context, req *rpc.BoardDetailsRequest) (*rpc.BoardDetai
 	}
 
 	details.Programmers = []*rpc.Programmer{}
-	for id, p := range boardPlatform.Programmers {
+	for id, p := range boardPlatformRelease.Programmers {
 		details.Programmers = append(details.Programmers, &rpc.Programmer{
-			Platform: boardPlatform.Platform.Name,
+			Platform: boardPlatformRelease.Name,
 			Id:       id,
 			Name:     p.Name,
 		})

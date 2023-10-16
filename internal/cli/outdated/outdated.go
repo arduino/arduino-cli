@@ -64,7 +64,7 @@ func Outdated(inst *rpc.Instance) {
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type outdatedResult struct {
-	Platforms     []*rpc.Platform         `json:"platforms,omitempty"`
+	Platforms     []*rpc.PlatformSummary  `json:"platforms,omitempty"`
 	InstalledLibs []*rpc.InstalledLibrary `json:"libraries,omitempty"`
 }
 
@@ -93,11 +93,11 @@ func (ir outdatedResult) String() string {
 
 	// Based on internal/cli/core/list.go
 	for _, p := range ir.Platforms {
-		name := p.Name
-		if p.Deprecated {
+		name := p.GetLatestRelease().GetName()
+		if p.GetMetadata().Deprecated {
 			name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), name)
 		}
-		t.AddRow(p.Id, name, p.Installed, p.Latest, "", "")
+		t.AddRow(p.GetMetadata().Id, name, p.InstalledVersion, p.LatestVersion, "", "")
 	}
 
 	// Based on internal/cli/lib/list.go
