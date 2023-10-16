@@ -1,6 +1,6 @@
 ---
 name: github.com/mitchellh/mapstructure
-version: v1.4.1
+version: v1.5.0
 type: go
 summary: Package mapstructure exposes functionality to convert one arbitrary Go type
   into another, typically to convert a map[string]interface{} into a native Go structure.

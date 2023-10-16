@@ -29,9 +29,9 @@ import (
 	"github.com/arduino/arduino-cli/arduino/utils"
 	paths "github.com/arduino/go-paths-helper"
 	"github.com/codeclysm/extract/v3"
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 	semver "go.bug.st/relaxed-semver"
-	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
 // LibraryInstallPlan contains the main information required to perform a library

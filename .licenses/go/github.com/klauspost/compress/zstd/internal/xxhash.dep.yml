@@ -1,12 +1,12 @@
 ---
 name: github.com/klauspost/compress/zstd/internal/xxhash
-version: v1.15.13
+version: v1.17.0
 type: go
 summary: 
 homepage: https://pkg.go.dev/github.com/klauspost/compress/zstd/internal/xxhash
 license: other
 licenses:
-- sources: compress@v1.15.13/LICENSE
+- sources: compress@v1.17.0/LICENSE
   text: |
     Copyright (c) 2012 The Go Authors. All rights reserved.
     Copyright (c) 2019 Klaus Post. All rights reserved.

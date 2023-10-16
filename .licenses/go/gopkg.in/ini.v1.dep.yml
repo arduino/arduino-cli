@@ -1,6 +1,6 @@
 ---
 name: gopkg.in/ini.v1
-version: v1.62.0
+version: v1.67.0
 type: go
 summary: Package ini provides INI file read and write functionality in Go.
 homepage: https://pkg.go.dev/gopkg.in/ini.v1

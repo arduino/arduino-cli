@@ -1,12 +1,12 @@
 ---
 name: google.golang.org/genproto/googleapis/rpc/status
-version: v0.0.0-20230526203410-71b5a4ffd15e
+version: v0.0.0-20231012201019-e917dd12ba7a
 type: go
 summary: 
 homepage: https://pkg.go.dev/google.golang.org/genproto/googleapis/rpc/status
 license: apache-2.0
 licenses:
-- sources: rpc@v0.0.0-20230526203410-71b5a4ffd15e/LICENSE
+- sources: rpc@v0.0.0-20231012201019-e917dd12ba7a/LICENSE
   text: |2
 
                                      Apache License

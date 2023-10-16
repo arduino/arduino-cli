@@ -19,7 +19,9 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
+	"go.bug.st/testifyjson/requirejson"
 )
 
 func TestDebug(t *testing.T) {
@@ -37,6 +39,7 @@ func TestDebug(t *testing.T) {
 	integrationtest.CLISubtests{
 		{"Start", testDebuggerStarts},
 		{"WithPdeSketchStarts", testDebuggerWithPdeSketchStarts},
+		{"DebugInformation", testAllDebugInformation},
 	}.Run(t, env, cli)
 }
 
@@ -87,4 +90,153 @@ func testDebuggerWithPdeSketchStarts(t *testing.T, env *integrationtest.Environm
 	// Starts debugger
 	_, _, err = cli.Run("debug", "-b", fqbn, "-P", programmer, filePde.String(), "--info")
 	require.NoError(t, err)
+}
+
+func testAllDebugInformation(t *testing.T, env *integrationtest.Environment, cli *integrationtest.ArduinoCLI) {
+	// Create sketch for testing
+	sketchPath := cli.DataDir().Join("DebuggerStartTest")
+	defer sketchPath.RemoveAll()
+	_, _, err := cli.Run("sketch", "new", sketchPath.String())
+	require.NoError(t, err)
+
+	// Install custom core
+	customHw, err := paths.New("testdata", "hardware").Abs()
+	require.NoError(t, err)
+	err = customHw.CopyDirTo(cli.SketchbookDir().Join("hardware"))
+	require.NoError(t, err)
+
+	// Build sketch
+	_, _, err = cli.Run("compile", "-b", "my:samd:my", sketchPath.String(), "--format", "json")
+	require.NoError(t, err)
+
+	{
+		// Starts debugger
+		jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my", "-P", "atmel_ice", sketchPath.String(), "--info", "--format", "json")
+		require.NoError(t, err)
+		debugOut := requirejson.Parse(t, jsonDebugOut)
+		debugOut.MustContain(`
+		{
+			"toolchain": "gcc",
+			"toolchain_path": "gcc-path",
+			"toolchain_prefix": "gcc-prefix",
+			"server": "openocd",
+			"server_path": "openocd-path",
+			"server_configuration": {
+				"path": "openocd-path",
+				"scripts_dir": "openocd-scripts-dir",
+				"scripts": [
+					"first",
+					"second",
+					"third",
+					"fourth"
+				]
+			},
+			"svd_file": "svd-file",
+			"cortex-debug_custom_configuration": {
+				"anotherStringParamer": "hellooo",
+				"overrideRestartCommands": [
+					"monitor reset halt",
+					"monitor gdb_sync",
+					"thb setup",
+					"c"
+				],
+				"postAttachCommands": [
+					"set remote hardware-watchpoint-limit 2",
+					"monitor reset halt",
+					"monitor gdb_sync",
+					"thb setup",
+					"c"
+				]
+			}
+		}`)
+	}
+
+	// Starts debugger with another programmer
+	{
+		jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my", "-P", "my_cold_ice", sketchPath.String(), "--info", "--format", "json")
+		require.NoError(t, err)
+		debugOut := requirejson.Parse(t, jsonDebugOut)
+		debugOut.MustContain(`
+		{
+			"toolchain": "gcc",
+			"toolchain_path": "gcc-path",
+			"toolchain_prefix": "gcc-prefix",
+			"server": "openocd",
+			"server_path": "openocd-path",
+			"server_configuration": {
+				"path": "openocd-path",
+				"scripts_dir": "openocd-scripts-dir",
+				"scripts": [
+					"first",
+					"second",
+					"cold_ice_script",
+					"fourth"
+				]
+			},
+			"svd_file": "svd-file",
+			"cortex-debug_custom_configuration": {
+				"anotherStringParamer": "hellooo",
+				"overrideRestartCommands": [
+					"monitor reset halt",
+					"monitor gdb_sync",
+					"thb setup",
+					"c"
+				],
+				"postAttachCommands": [
+					"set remote hardware-watchpoint-limit 2",
+					"monitor reset halt",
+					"monitor gdb_sync",
+					"thb setup",
+					"c"
+				]
+			}
+		}`)
+
+		{
+			// Starts debugger with an old-style openocd script definition
+			jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my2", "-P", "atmel_ice", sketchPath.String(), "--info", "--format", "json")
+			require.NoError(t, err)
+			debugOut := requirejson.Parse(t, jsonDebugOut)
+			debugOut.MustContain(`
+			{
+				"toolchain": "gcc",
+				"toolchain_path": "gcc-path",
+				"toolchain_prefix": "gcc-prefix",
+				"server": "openocd",
+				"server_path": "openocd-path",
+				"server_configuration": {
+					"path": "openocd-path",
+					"scripts_dir": "openocd-scripts-dir",
+					"scripts": [
+						"single-script"
+					]
+				},
+				"svd_file": "svd-file"
+			}`)
+		}
+
+		{
+			// Starts debugger with mixed old and new-style openocd script definition
+			jsonDebugOut, _, err := cli.Run("debug", "-b", "my:samd:my2", "-P", "my_cold_ice", sketchPath.String(), "--info", "--format", "json")
+			require.NoError(t, err)
+			debugOut := requirejson.Parse(t, jsonDebugOut)
+			debugOut.MustContain(`
+			{
+				"toolchain": "gcc",
+				"toolchain_path": "gcc-path",
+				"toolchain_prefix": "gcc-prefix",
+				"server": "openocd",
+				"server_path": "openocd-path",
+				"server_configuration": {
+					"path": "openocd-path",
+					"scripts_dir": "openocd-scripts-dir",
+					"scripts": [
+						"cold_ice_script"
+					]
+				},
+				"svd_file": "svd-file"
+			}`)
+		}
+
+	}
 }

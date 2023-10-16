@@ -158,13 +158,18 @@ func getCommandLine(req *rpc.GetDebugConfigRequest, pme *packagemanager.Explorer
 	// Extract path to GDB Server
 	switch debugInfo.GetServer() {
 	case "openocd":
+		var openocdConf rpc.DebugOpenOCDServerConfiguration
+		if err := debugInfo.ServerConfiguration.UnmarshalTo(&openocdConf); err != nil {
+			return nil, err
+		}
+
 		serverCmd := fmt.Sprintf(`target extended-remote | "%s"`, debugInfo.ServerPath)
 
-		if cfg := debugInfo.ServerConfiguration["scripts_dir"]; cfg != "" {
+		if cfg := openocdConf.GetScriptsDir(); cfg != "" {
 			serverCmd += fmt.Sprintf(` -s "%s"`, cfg)
 		}
 
-		if script := debugInfo.ServerConfiguration["script"]; script != "" {
+		for _, script := range openocdConf.GetScripts() {
 			serverCmd += fmt.Sprintf(` --file "%s"`, script)
 		}
 
