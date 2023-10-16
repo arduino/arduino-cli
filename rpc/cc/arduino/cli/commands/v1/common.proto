@@ -132,9 +132,12 @@ message PlatformRelease {
   // A URL provided by the author of the platform's package, intended to point
   // to their online help service.
   HelpResources help = 9;
-  // This field is true when the platform is installed with the Arduino IDE 1.8.
-  // If the platform is also not indexed it may fail to work correctly in some
-  // circumstances, and it may need to be re-installed.
+  // This field is true if the platform is missing installation metadata (this
+  // happens if the platform has been installed with the legacy Arduino IDE
+  // <=1.8.x). If the platform miss metadata and it's not indexed through a
+  // package index, it may fail to work correctly in some circumstances, and it
+  // may need to be reinstalled. This should be evaluated only when the
+  // PlatformRelease is `Installed` otherwise is an undefined behaviour.
   bool missing_metadata = 10;
   // True this release is deprecated
   bool deprecated = 11;

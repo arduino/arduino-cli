@@ -752,9 +752,12 @@ type PlatformRelease struct {
 	// A URL provided by the author of the platform's package, intended to point
 	// to their online help service.
 	Help *HelpResources `protobuf:"bytes,9,opt,name=help,proto3" json:"help,omitempty"`
-	// This field is true when the platform is installed with the Arduino IDE 1.8.
-	// If the platform is also not indexed it may fail to work correctly in some
-	// circumstances, and it may need to be re-installed.
+	// This field is true if the platform is missing installation metadata (this
+	// happens if the platform has been installed with the legacy Arduino IDE
+	// <=1.8.x). If the platform miss metadata and it's not indexed through a
+	// package index, it may fail to work correctly in some circumstances, and it
+	// may need to be reinstalled. This should be evaluated only when the
+	// PlatformRelease is `Installed` otherwise is an undefined behaviour.
 	MissingMetadata bool `protobuf:"varint,10,opt,name=missing_metadata,json=missingMetadata,proto3" json:"missing_metadata,omitempty"`
 	// True this release is deprecated
 	Deprecated bool `protobuf:"varint,11,opt,name=deprecated,proto3" json:"deprecated,omitempty"`

@@ -70,13 +70,13 @@ func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.PlatformSu
 		feedback.Fatal(tr("Error listing platforms: %v", err), feedback.ErrGeneric)
 	}
 
+	// If both `all` and `updatableOnly` are set, `all` takes precedence.
+	if all {
+		return platforms.GetSearchOutput()
+	}
+
 	result := []*rpc.PlatformSummary{}
 	for _, platform := range platforms.GetSearchOutput() {
-		// If both `all` and `updatableOnly` are set, `all` takes precedence.
-		if all {
-			result = append(result, platform)
-			continue
-		}
 		if platform.InstalledVersion == "" && !platform.GetMetadata().ManuallyInstalled {
 			continue
 		}

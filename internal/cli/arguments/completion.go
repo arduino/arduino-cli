@@ -84,8 +84,9 @@ func GetUninstallableCores() []string {
 	inst := instance.CreateAndInit()
 
 	platforms, _ := core.PlatformSearch(&rpc.PlatformSearchRequest{
-		Instance:    inst,
-		AllVersions: false,
+		Instance:          inst,
+		AllVersions:       false,
+		ManuallyInstalled: true,
 	})
 
 	var res []string

@@ -63,13 +63,15 @@ func PlatformReleaseToRPC(platformRelease *cores.PlatformRelease) *rpc.PlatformR
 		}
 	}
 
+	// This field make sense only if the platformRelease is installed otherwise is an "undefined behaviour"
+	missingMetadata := platformRelease.IsInstalled() && !platformRelease.HasMetadata()
 	return &rpc.PlatformRelease{
 		Name:            platformRelease.Name,
 		Help:            &rpc.HelpResources{Online: platformRelease.Platform.Package.Help.Online},
 		Boards:          boards,
 		Version:         platformRelease.Version.String(),
 		Installed:       platformRelease.IsInstalled(),
-		MissingMetadata: !platformRelease.HasMetadata(),
+		MissingMetadata: missingMetadata,
 		Type:            []string{platformRelease.Category},
 		Deprecated:      platformRelease.Deprecated,
 	}

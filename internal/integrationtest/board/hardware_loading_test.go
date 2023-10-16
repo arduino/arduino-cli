@@ -188,7 +188,6 @@ func TestHardwareLoading(t *testing.T) {
 					"releases": {
 						"9.9.9": {
 							"name": "My AVR Boards",
-							"missing_metadata": true,
 							"boards": [
 								{
 									"name": "Arduino Yún",
@@ -210,7 +209,6 @@ func TestHardwareLoading(t *testing.T) {
 						"manually_installed": true,
 						"releases": {
 							"9.9.9": {
-								"missing_metadata": true
 							}
 						}
 					}

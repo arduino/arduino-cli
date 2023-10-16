@@ -199,6 +199,8 @@ func TestCoreSearchNoArgs(t *testing.T) {
 	stdout, _, err = cli.Run("core", "search", "--format", "json", "--additional-urls="+url.String())
 	require.NoError(t, err)
 	requirejson.Contains(t, stdout, `[{"id": "test:x86", "releases": { "3.0.0": {"name":"test_core"}}}]`)
+	// A platform could contain multiple releases, we get the length of how many releases are present for each platform
+	// and we sum them to see if the expected numers matches.
 	requirejson.Query(t, stdout, `[.[].releases | length] | add`, fmt.Sprint(numPlatforms))
 }
 
