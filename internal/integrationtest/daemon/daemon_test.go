@@ -104,7 +104,7 @@ func TestDaemonAutoUpdateIndexOnFirstInit(t *testing.T) {
 		fmt.Printf("INIT> %v\n", ir.GetMessage())
 	}))
 
-	_, err := grpcInst.PlatformList(context.Background())
+	_, err := grpcInst.PlatformSearch(context.Background(), "", true)
 	require.NoError(t, err)
 
 	require.FileExists(t, cli.DataDir().Join("package_index.json").String())
@@ -477,8 +477,8 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 			platform, upgradeError := analyzePlatformUpgradeClient(plUpgrade)
 			require.NoError(t, upgradeError)
 			require.NotNil(t, platform)
-			require.True(t, platform.Indexed)          // the esp866 is present in the additional-urls
-			require.False(t, platform.MissingMetadata) // install.json is present
+			require.True(t, platform.Metadata.Indexed)         // the esp866 is present in the additional-urls
+			require.False(t, platform.Release.MissingMetadata) // install.json is present
 		})
 		t.Run("and install.json is missing", func(t *testing.T) {
 			env, cli := createEnvForDaemon(t)
@@ -497,9 +497,8 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 			platform, upgradeError := analyzePlatformUpgradeClient(plUpgrade)
 			require.NoError(t, upgradeError)
 			require.NotNil(t, platform)
-			require.True(t, platform.Indexed)          // the esp866 is not present in the additional-urls
-			require.False(t, platform.MissingMetadata) // install.json is present because the old version got upgraded
-
+			require.True(t, platform.Metadata.Indexed)         // the esp866 is not present in the additional-urls
+			require.False(t, platform.Release.MissingMetadata) // install.json is present because the old version got upgraded
 		})
 	})
 
@@ -521,8 +520,8 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 			platform, upgradeError := analyzePlatformUpgradeClient(plUpgrade)
 			require.ErrorIs(t, upgradeError, (&arduino.PlatformAlreadyAtTheLatestVersionError{Platform: "esp8266:esp8266"}).ToRPCStatus().Err())
 			require.NotNil(t, platform)
-			require.False(t, platform.Indexed)         // the esp866 is not present in the additional-urls
-			require.False(t, platform.MissingMetadata) // install.json is present
+			require.False(t, platform.Metadata.Indexed)        // the esp866 is not present in the additional-urls
+			require.False(t, platform.Release.MissingMetadata) // install.json is present
 		})
 		t.Run("missing both additional URLs and install.json", func(t *testing.T) {
 			env, cli := createEnvForDaemon(t)
@@ -546,8 +545,8 @@ func TestDaemonCoreUpgradePlatform(t *testing.T) {
 			platform, upgradeError := analyzePlatformUpgradeClient(plUpgrade)
 			require.ErrorIs(t, upgradeError, (&arduino.PlatformAlreadyAtTheLatestVersionError{Platform: "esp8266:esp8266"}).ToRPCStatus().Err())
 			require.NotNil(t, platform)
-			require.False(t, platform.Indexed)        // the esp866 is not present in the additional-urls
-			require.True(t, platform.MissingMetadata) // install.json is present
+			require.False(t, platform.Metadata.Indexed)       // the esp866 is not present in the additional-urls
+			require.True(t, platform.Release.MissingMetadata) // install.json is present
 		})
 	})
 }
