@@ -145,11 +145,6 @@ func main() {
 	log.Println("calling PlatformInstall(arduino:samd@1.6.19)")
 	callPlatformInstall(client, instance)
 
-	// Now list the installed platforms to double check previous installation
-	// went right.
-	log.Println("calling PlatformList()")
-	callPlatformList(client, instance)
-
 	// Upgrade the installed platform to the latest version.
 	log.Println("calling PlatformUpgrade(arduino:samd)")
 	callPlatformUpgrade(client, instance)
@@ -461,21 +456,6 @@ func callPlatformInstall(client rpc.ArduinoCoreServiceClient, instance *rpc.Inst
 		if installResp.GetTaskProgress() != nil {
 			log.Printf("TASK: %s", installResp.GetTaskProgress())
 		}
-	}
-}
-
-func callPlatformList(client rpc.ArduinoCoreServiceClient, instance *rpc.Instance) {
-	listResp, err := client.PlatformList(context.Background(),
-		&rpc.PlatformListRequest{Instance: instance})
-
-	if err != nil {
-		log.Fatalf("List error: %s", err)
-	}
-
-	for _, plat := range listResp.GetInstalledPlatforms() {
-		// We only print ID and version of the installed platforms but you can look
-		// at the definition for the rpc.Platform struct for more fields.
-		log.Printf("Installed platform: %s - %s", plat.GetId(), plat.GetInstalled())
 	}
 }
 
