@@ -48,6 +48,7 @@ func TestCompileShowProperties(t *testing.T) {
 	require.NoError(t, err, "Output must be a clean property list")
 	require.Empty(t, stderr)
 	require.True(t, props.ContainsKey("archive_file_path"))
+	require.True(t, props.ContainsKey("sketch_path"))
 	require.NotContains(t, props.Get("archive_file_path"), "{build.path}")
 
 	// Test --show-properties --format JSON output is clean
