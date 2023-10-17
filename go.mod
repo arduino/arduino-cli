@@ -22,7 +22,7 @@ require (
 	github.com/mailru/easyjson v0.7.7
 	github.com/marcinbor85/gohex v0.0.0-20210308104911-55fb1c624d84
 	github.com/mattn/go-colorable v0.1.13
-	github.com/mattn/go-isatty v0.0.19
+	github.com/mattn/go-isatty v0.0.20
 	github.com/pkg/errors v0.9.1
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/rogpeppe/go-internal v1.11.0
