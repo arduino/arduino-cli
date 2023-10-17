@@ -131,7 +131,9 @@ func NewBuilder(
 	if boardBuildProperties != nil {
 		buildProperties.Merge(boardBuildProperties)
 	}
-
+	if sk != nil {
+		buildProperties.SetPath("sketch_path", sk.FullPath)
+	}
 	if buildPath != nil {
 		buildProperties.SetPath("build.path", buildPath)
 	}
