@@ -94,3 +94,27 @@ func TestSearchLibraryFields(t *testing.T) {
 	require.Len(t, res, 19)
 	require.Equal(t, "FlashStorage", res[0])
 }
+
+func TestSearchLibraryWithQualifiers(t *testing.T) {
+	lm := librariesmanager.NewLibraryManager(fullIndexPath, nil)
+	lm.LoadIndex()
+
+	query := func(q string) []string {
+		libs := []string{}
+		for _, lib := range searchLibrary(&rpc.LibrarySearchRequest{SearchArgs: q}, lm).Libraries {
+			libs = append(libs, lib.Name)
+		}
+		return libs
+	}
+
+	res := query("name:FlashStorage")
+	require.Len(t, res, 7)
+
+	res = query("name=FlashStorage")
+	require.Len(t, res, 1)
+	require.Equal(t, "FlashStorage", res[0])
+
+	res = query("name=\"Painless Mesh\"")
+	require.Len(t, res, 1)
+	require.Equal(t, "Painless Mesh", res[0])
+}
