@@ -38,9 +38,9 @@ func LibrarySearch(ctx context.Context, req *rpc.LibrarySearchRequest) (*rpc.Lib
 	return searchLibrary(req, lm), nil
 }
 
-// MatcherTokensFromQueryString parses the query string into tokens of interest
+// matcherTokensFromQueryString parses the query string into tokens of interest
 // for the qualifier-value pattern matching.
-func MatcherTokensFromQueryString(query string) []string {
+func matcherTokensFromQueryString(query string) []string {
 	escaped := false
 	quoted := false
 	tokens := []string{}
@@ -75,9 +75,9 @@ func MatcherTokensFromQueryString(query string) []string {
 	return tokens
 }
 
-// DefaulLibraryMatchExtractor returns a string describing the library that
+// defaulLibraryMatchExtractor returns a string describing the library that
 // is used for the simple search.
-func DefaultLibraryMatchExtractor(lib *librariesindex.Library) string {
+func defaultLibraryMatchExtractor(lib *librariesindex.Library) string {
 	res := lib.Name + " " +
 		lib.Latest.Paragraph + " " +
 		lib.Latest.Sentence + " " +
@@ -88,16 +88,16 @@ func DefaultLibraryMatchExtractor(lib *librariesindex.Library) string {
 	return res
 }
 
-// MatcherFromQueryString returns a closure that takes a library as a
+// matcherFromQueryString returns a closure that takes a library as a
 // parameter and returns true if the library matches the query.
-func MatcherFromQueryString(query string) func(*librariesindex.Library) bool {
+func matcherFromQueryString(query string) func(*librariesindex.Library) bool {
 	// A qv-query is one using <qualifier>[:=]<value> syntax.
 	qvQuery := strings.Contains(query, ":") || strings.Contains(query, "=")
 
 	if !qvQuery {
 		queryTerms := utils.SearchTermsFromQueryString(query)
 		return func(lib *librariesindex.Library) bool {
-			return utils.Match(DefaultLibraryMatchExtractor(lib), queryTerms)
+			return utils.Match(defaultLibraryMatchExtractor(lib), queryTerms)
 		}
 	}
 
@@ -131,7 +131,7 @@ func MatcherFromQueryString(query string) func(*librariesindex.Library) bool {
 		{"website", func(lib *librariesindex.Library) string { return lib.Latest.Website }},
 	}
 
-	queryTerms := MatcherTokensFromQueryString(query)
+	queryTerms := matcherTokensFromQueryString(query)
 
 	return func(lib *librariesindex.Library) bool {
 		matched := true
@@ -155,7 +155,7 @@ func MatcherFromQueryString(query string) func(*librariesindex.Library) bool {
 			}
 
 			if !knownQualifier {
-				matched = (matched && utils.Match(DefaultLibraryMatchExtractor(lib), []string{term}))
+				matched = (matched && utils.Match(defaultLibraryMatchExtractor(lib), []string{term}))
 			}
 		}
 		return matched
@@ -169,7 +169,7 @@ func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.Libraries
 		query = req.GetQuery()
 	}
 
-	matcher := MatcherFromQueryString(query)
+	matcher := matcherFromQueryString(query)
 
 	for _, lib := range lm.Index.Libraries {
 		if matcher(lib) {
