@@ -22,6 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/commands/board"
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -41,11 +42,11 @@ type Port struct {
 func (p *Port) AddToCommand(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&p.address, "port", "p", "", tr("Upload port address, e.g.: COM3 or /dev/ttyACM2"))
 	cmd.RegisterFlagCompletionFunc("port", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return GetConnectedBoards(), cobra.ShellCompDirectiveDefault
+		return f.Map(GetAvailablePorts(), (*rpc.Port).GetAddress), cobra.ShellCompDirectiveDefault
 	})
 	cmd.Flags().StringVarP(&p.protocol, "protocol", "l", "", tr("Upload port protocol, e.g: serial"))
 	cmd.RegisterFlagCompletionFunc("protocol", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return GetInstalledProtocols(), cobra.ShellCompDirectiveDefault
+		return f.Map(GetAvailablePorts(), (*rpc.Port).GetProtocol), cobra.ShellCompDirectiveDefault
 	})
 	p.timeout.AddToCommand(cmd)
 }

@@ -216,16 +216,10 @@ func TestCoreCompletion(t *testing.T) {
 	require.Contains(t, string(stdout), "arduino:avr:uno")
 	stdout, _, _ = cli.Run("__complete", "monitor", "-b", "")
 	require.Contains(t, string(stdout), "arduino:avr:uno")
-	stdout, _, _ = cli.Run("__complete", "burn-bootloader", "-l", "")
-	require.Contains(t, string(stdout), "network")
-	stdout, _, _ = cli.Run("__complete", "compile", "-l", "")
-	require.Contains(t, string(stdout), "network")
-	stdout, _, _ = cli.Run("__complete", "debug", "-l", "")
-	require.Contains(t, string(stdout), "network")
-	stdout, _, _ = cli.Run("__complete", "upload", "-l", "")
-	require.Contains(t, string(stdout), "network")
-	stdout, _, _ = cli.Run("__complete", "monitor", "-l", "")
-	require.Contains(t, string(stdout), "network")
+
+	// -l/--protocol and -p/--port cannot be tested because there are
+	// no board connected.
+
 	stdout, _, _ = cli.Run("__complete", "burn-bootloader", "-P", "")
 	require.Contains(t, string(stdout), "atmel_ice")
 	stdout, _, _ = cli.Run("__complete", "compile", "-P", "")
