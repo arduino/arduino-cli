@@ -27,7 +27,7 @@ import (
 	"time"
 
 	"github.com/arduino/arduino-cli/commands/monitor"
-	"github.com/arduino/arduino-cli/commands/sketch"
+	sk "github.com/arduino/arduino-cli/commands/sketch"
 	"github.com/arduino/arduino-cli/configuration"
 	"github.com/arduino/arduino-cli/i18n"
 	"github.com/arduino/arduino-cli/internal/cli/arguments"
@@ -46,14 +46,14 @@ var tr = i18n.Tr
 // NewCommand created a new `monitor` command
 func NewCommand() *cobra.Command {
 	var (
-		raw        bool
 		portArgs   arguments.Port
+		fqbnArg    arguments.Fqbn
+		profileArg arguments.Profile
+		raw        bool
 		describe   bool
 		configs    []string
 		quiet      bool
 		timestamp  bool
-		fqbn       arguments.Fqbn
-		sketchPath string
 	)
 	monitorCommand := &cobra.Command{
 		Use:   "monitor",
@@ -63,47 +63,91 @@ func NewCommand() *cobra.Command {
 			"  " + os.Args[0] + " monitor -p /dev/ttyACM0\n" +
 			"  " + os.Args[0] + " monitor -p /dev/ttyACM0 --describe",
 		Run: func(cmd *cobra.Command, args []string) {
-			runMonitorCmd(&portArgs, &fqbn, configs, describe, timestamp, quiet, raw, sketchPath)
+			sketchPath := ""
+			if len(args) > 0 {
+				sketchPath = args[0]
+			}
+			var portProvidedFromFlag bool
+			if p := cmd.Flags().Lookup("port"); p != nil && p.Changed {
+				portProvidedFromFlag = true
+			}
+			runMonitorCmd(&portArgs, &fqbnArg, &profileArg, sketchPath, configs, describe, timestamp, quiet, raw, portProvidedFromFlag)
 		},
 	}
 	portArgs.AddToCommand(monitorCommand)
+	profileArg.AddToCommand(monitorCommand)
 	monitorCommand.Flags().BoolVar(&raw, "raw", false, tr("Set terminal in raw mode (unbuffered)."))
 	monitorCommand.Flags().BoolVar(&describe, "describe", false, tr("Show all the settings of the communication port."))
 	monitorCommand.Flags().StringSliceVarP(&configs, "config", "c", []string{}, tr("Configure communication port settings. The format is <ID>=<value>[,<ID>=<value>]..."))
 	monitorCommand.Flags().BoolVarP(&quiet, "quiet", "q", false, tr("Run in silent mode, show only monitor input and output."))
 	monitorCommand.Flags().BoolVar(&timestamp, "timestamp", false, tr("Timestamp each incoming line."))
-	monitorCommand.Flags().StringVarP(&sketchPath, "sketch", "s", "", tr("Path to the sketch"))
-	fqbn.AddToCommand(monitorCommand)
+	fqbnArg.AddToCommand(monitorCommand)
 	return monitorCommand
 }
 
-func runMonitorCmd(portArgs *arguments.Port, fqbn *arguments.Fqbn, configs []string, describe, timestamp, quiet, raw bool, sketchPath string) {
-	instance := instance.CreateAndInit()
+func runMonitorCmd(
+	portArgs *arguments.Port, fqbnArg *arguments.Fqbn, profileArg *arguments.Profile, sketchPathArg string,
+	configs []string, describe, timestamp, quiet, raw bool, portProvidedFromFlag bool,
+) {
 	logrus.Info("Executing `arduino-cli monitor`")
 
 	if !configuration.HasConsole {
 		quiet = true
 	}
 
-	addressDefault := ""
-	protocolDefault := ""
-	if sketchPath != "" {
-		sketch, err := sketch.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath})
+	var (
+		inst                         *rpc.Instance
+		fqbn                         string
+		defaultPort, defaultProtocol string
+	)
+
+	if !portProvidedFromFlag {
+		sketchPath := arguments.InitSketchPath(sketchPathArg)
+		sketch, err := sk.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 		if err != nil {
-			feedback.FatalError(err, feedback.ErrGeneric)
+			feedback.Fatal(
+				tr("Error getting default port from `sketch.yaml`. Check if you're in the correct sketch folder or provide the --port flag: %s", err),
+				feedback.ErrGeneric,
+			)
 		}
-		addressDefault = sketch.GetDefaultPort()
-		protocolDefault = sketch.GetDefaultProtocol()
+		defaultPort = sketch.GetDefaultPort()
+		defaultProtocol = sketch.GetDefaultProtocol()
+
+		var profile *rpc.Profile
+		if profileArg.Get() == "" {
+			inst, profile = instance.CreateAndInitWithProfile(sketch.GetDefaultProfile().GetName(), sketchPath)
+		} else {
+			inst, profile = instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
+		}
+
+		// Priority on how to retrieve the fqbn
+		// 1. from flag
+		// 2. from profile
+		// 3. from default_fqbn specified in the sketch.yaml
+		// 4. try to detect from the port
+		switch {
+		case fqbnArg.String() != "":
+			fqbn = fqbnArg.String()
+		case profile.GetFqbn() != "":
+			fqbn = profile.GetFqbn()
+		case sketch.GetDefaultFqbn() != "":
+			fqbn = sketch.GetDefaultFqbn()
+		default:
+			fqbn, _ = portArgs.DetectFQBN(inst)
+		}
+	} else {
+		inst = instance.CreateAndInit()
+		fqbn = fqbnArg.String()
 	}
-	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(instance, addressDefault, protocolDefault)
+	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(inst, defaultPort, defaultProtocol)
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
 	}
 
 	enumerateResp, err := monitor.EnumerateMonitorPortSettings(context.Background(), &rpc.EnumerateMonitorPortSettingsRequest{
-		Instance:     instance,
+		Instance:     inst,
 		PortProtocol: portProtocol,
-		Fqbn:         fqbn.String(),
+		Fqbn:         fqbn,
 	})
 	if err != nil {
 		feedback.Fatal(tr("Error getting port settings details: %s", err), feedback.ErrGeneric)
@@ -155,9 +199,9 @@ func runMonitorCmd(portArgs *arguments.Port, fqbn *arguments.Fqbn, configs []str
 		}
 	}
 	portProxy, _, err := monitor.Monitor(context.Background(), &rpc.MonitorRequest{
-		Instance:          instance,
+		Instance:          inst,
 		Port:              &rpc.Port{Address: portAddress, Protocol: portProtocol},
-		Fqbn:              fqbn.String(),
+		Fqbn:              fqbn,
 		PortConfiguration: configuration,
 	})
 	if err != nil {
