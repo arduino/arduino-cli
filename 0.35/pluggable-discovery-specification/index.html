@@ -1,0 +1,1972 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Arduino Command Line Interface">
+      
+      
+      
+      
+        <link rel="canonical" href="https://arduino.github.io/arduino-cli/0.35/pluggable-discovery-specification/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-7.3.6">
+    
+    
+      
+        <title>Pluggable discovery specification - Arduino CLI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.a57b2b03.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#009485">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="teal" data-md-color-accent="orange">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#pluggable-discovery-api-via-stdinstdout" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Arduino CLI" class="md-header__button md-logo" aria-label="Arduino CLI" data-md-component="logo">
+      
+  <img src="../img/icon_mac_light.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Arduino CLI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Pluggable discovery specification
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/arduino/arduino-cli" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    arduino/arduino-cli
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Arduino CLI" class="md-nav__button md-logo" aria-label="Arduino CLI" data-md-component="logo">
+      
+  <img src="../img/icon_mac_light.png" alt="logo">
+
+    </a>
+    Arduino CLI
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/arduino/arduino-cli" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    arduino/arduino-cli
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        Installation
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../UPGRADING/" class="md-nav__link">
+        Upgrading
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        Getting started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../command-line-completion/" class="md-nav__link">
+        Command line completion
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CONTRIBUTING/" class="md-nav__link">
+        How to contribute
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FAQ/" class="md-nav__link">
+        FAQ
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8">
+          Command reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Command reference" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          Command reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli/" class="md-nav__link">
+        arduino-cli
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board/" class="md-nav__link">
+        board
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board_attach/" class="md-nav__link">
+        board attach
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board_details/" class="md-nav__link">
+        board details
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board_list/" class="md-nav__link">
+        board list
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board_listall/" class="md-nav__link">
+        board listall
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_board_search/" class="md-nav__link">
+        board search
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_burn-bootloader/" class="md-nav__link">
+        burn-bootloader
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_cache/" class="md-nav__link">
+        cache
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_cache_clean/" class="md-nav__link">
+        cache clean
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_compile/" class="md-nav__link">
+        compile
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_completion/" class="md-nav__link">
+        completion
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config/" class="md-nav__link">
+        config
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_dump/" class="md-nav__link">
+        config dump
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_init/" class="md-nav__link">
+        config init
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_add/" class="md-nav__link">
+        config add
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_delete/" class="md-nav__link">
+        config delete
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_remove/" class="md-nav__link">
+        config remove
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_config_set/" class="md-nav__link">
+        config set
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core/" class="md-nav__link">
+        core
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_download/" class="md-nav__link">
+        core download
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_install/" class="md-nav__link">
+        core install
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_list/" class="md-nav__link">
+        core list
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_search/" class="md-nav__link">
+        core search
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_uninstall/" class="md-nav__link">
+        core uninstall
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_update-index/" class="md-nav__link">
+        core update-index
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_core_upgrade/" class="md-nav__link">
+        core upgrade
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_daemon/" class="md-nav__link">
+        daemon
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_debug/" class="md-nav__link">
+        debug
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib/" class="md-nav__link">
+        lib
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_deps/" class="md-nav__link">
+        lib deps
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_download/" class="md-nav__link">
+        lib download
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_examples/" class="md-nav__link">
+        lib examples
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_install/" class="md-nav__link">
+        lib install
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_list/" class="md-nav__link">
+        lib list
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_search/" class="md-nav__link">
+        lib search
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_uninstall/" class="md-nav__link">
+        lib uninstall
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_update-index/" class="md-nav__link">
+        lib update-index
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_lib_upgrade/" class="md-nav__link">
+        lib upgrade
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_monitor/" class="md-nav__link">
+        monitor
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_outdated/" class="md-nav__link">
+        outdated
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_sketch/" class="md-nav__link">
+        sketch
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_sketch_archive/" class="md-nav__link">
+        sketch archive
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_sketch_new/" class="md-nav__link">
+        sketch new
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_update/" class="md-nav__link">
+        update
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_upgrade/" class="md-nav__link">
+        upgrade
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_upload/" class="md-nav__link">
+        upload
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/arduino-cli_version/" class="md-nav__link">
+        version
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9">
+          gRPC reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="gRPC reference" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          gRPC reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rpc/commands/" class="md-nav__link">
+        commands
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rpc/settings/" class="md-nav__link">
+        settings
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        Configuration
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../integration-options/" class="md-nav__link">
+        Integration options
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sketch-build-process/" class="md-nav__link">
+        Sketch build process
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sketch-specification/" class="md-nav__link">
+        Sketch specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sketch-project-file/" class="md-nav__link">
+        Sketch project file
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../library-specification/" class="md-nav__link">
+        Library specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../platform-specification/" class="md-nav__link">
+        Platform specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Pluggable discovery specification
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Pluggable discovery specification
+      </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pluggable-discovery-api-via-stdinstdout" class="md-nav__link">
+    Pluggable discovery API via stdin/stdout
+  </a>
+  
+    <nav class="md-nav" aria-label="Pluggable discovery API via stdin/stdout">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hello-command" class="md-nav__link">
+    HELLO command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#start-command" class="md-nav__link">
+    START command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stop-command" class="md-nav__link">
+    STOP command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quit-command" class="md-nav__link">
+    QUIT command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list-command" class="md-nav__link">
+    LIST command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#start_sync-command" class="md-nav__link">
+    START_SYNC command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-commands" class="md-nav__link">
+    Invalid commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#state-machine" class="md-nav__link">
+    State machine
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#board-identification" class="md-nav__link">
+    Board identification
+  </a>
+  
+    <nav class="md-nav" aria-label="Board identification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#identification-of-board-options" class="md-nav__link">
+    Identification of board options
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pluggable-monitor-specification/" class="md-nav__link">
+        Pluggable monitor specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../package_index_json-specification/" class="md-nav__link">
+        Package index specification
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_20" type="checkbox" id="__nav_20" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_20">
+          Guides
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Guides" data-md-level="1">
+        <label class="md-nav__title" for="__nav_20">
+          <span class="md-nav__icon md-icon"></span>
+          Guides
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/secure-boot/" class="md-nav__link">
+        Secure boot
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pluggable-discovery-api-via-stdinstdout" class="md-nav__link">
+    Pluggable discovery API via stdin/stdout
+  </a>
+  
+    <nav class="md-nav" aria-label="Pluggable discovery API via stdin/stdout">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hello-command" class="md-nav__link">
+    HELLO command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#start-command" class="md-nav__link">
+    START command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stop-command" class="md-nav__link">
+    STOP command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quit-command" class="md-nav__link">
+    QUIT command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list-command" class="md-nav__link">
+    LIST command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#start_sync-command" class="md-nav__link">
+    START_SYNC command
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-commands" class="md-nav__link">
+    Invalid commands
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#state-machine" class="md-nav__link">
+    State machine
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#board-identification" class="md-nav__link">
+    Board identification
+  </a>
+  
+    <nav class="md-nav" aria-label="Board identification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#identification-of-board-options" class="md-nav__link">
+    Identification of board options
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/arduino/arduino-cli/blob/master/docs/pluggable-discovery-specification.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  <h1>Pluggable discovery specification</h1>
+                
+                <p>Discovery tools are a special kind of tool used to find supported boards, a platform developer can create their own
+following the specification below. These tools must be in the form of executables that can be launched as a subprocess
+using a <code>platform.txt</code> command line recipe. They communicate to the parent process via stdin/stdout, accepting commands
+as plain text strings from stdin and sending answers back in JSON format on stdout. Each tool will implement the
+commands to list and enumerate ports for a specific protocol as specified in this document.</p>
+<h3 id="pluggable-discovery-api-via-stdinstdout">Pluggable discovery API via stdin/stdout<a class="headerlink" href="#pluggable-discovery-api-via-stdinstdout" title="Permanent link">&para;</a></h3>
+<p>All the commands listed in this specification must be implemented in the discovery.</p>
+<p>After startup, the tool will just stay idle waiting for commands. The available commands are: <code>HELLO</code>, <code>START</code>, <code>STOP</code>,
+<code>QUIT</code>, <code>LIST</code> and <code>START_SYNC</code>.</p>
+<p>After each command the client always expects a response from the discovery. The discovery must not introduce any delay
+and must respond to all commands as fast as possible.</p>
+<h4 id="hello-command">HELLO command<a class="headerlink" href="#hello-command" title="Permanent link">&para;</a></h4>
+<p><code>HELLO</code> <strong>must be the first command sent</strong> to the discovery to tell the name of the client/IDE and the version of the
+pluggable discovery protocol that the client/IDE supports. The syntax of the command is:</p>
+<p><code>HELLO &lt;PROTOCOL_VERSION&gt; "&lt;USER_AGENT&gt;"</code></p>
+<ul>
+<li><code>&lt;PROTOCOL_VERSION&gt;</code> is the maximum protocol version supported by the client/IDE (currently <code>1</code>)</li>
+<li><code>&lt;USER_AGENT&gt;</code> is the name and version of the client. It must not contain double-quotes (<code>"</code>).</li>
+</ul>
+<p>some examples:</p>
+<ul>
+<li><code>HELLO 1 "Arduino IDE 1.8.13"</code></li>
+</ul>
+<ul>
+<li><code>HELLO 1 "arduino-cli 1.2.3"</code></li>
+</ul>
+<p>the response to the command is:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;eventType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hello&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;protocolVersion&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;OK&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The <code>protocolVersion</code> field represents the protocol version that will be used in the rest of the communication. There
+are three possible cases:</p>
+<ul>
+<li>if the client/IDE supports the same or a more recent version of the protocol than the discovery, then the client/IDE
+  should go into a compatibility mode and use the protocol level supported by the discovery.</li>
+<li>if the discovery supports a more recent version of the protocol than the client/IDE: the discovery should downgrade
+  itself into compatibility mode and report a <code>protocolVersion</code> that is less than or equal to the one supported by the
+  client/IDE.</li>
+<li>if the discovery cannot go into compatibility mode, it must report the protocol version supported (even if greater
+  than the version supported by the client/IDE) and the client/IDE may decide to terminate the discovery or produce an
+  error/warning.</li>
+</ul>
+<h4 id="start-command">START command<a class="headerlink" href="#start-command" title="Permanent link">&para;</a></h4>
+<p>The <code>START</code> command initializes and starts the discovery internal subroutines. This command must be called before
+<code>LIST</code>. The response to the start command is:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;eventType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;start&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;OK&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>If the discovery could not start, for any reason, it must report the error with:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;eventType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;start&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Permission error&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The <code>error</code> field must be set to <code>true</code> and the <code>message</code> field should contain a description of the error.</p>
+<h4 id="stop-command">STOP command<a class="headerlink" href="#stop-command" title="Permanent link">&para;</a></h4>
+<p>The <code>STOP</code> command stops the discovery internal subroutines and possibly frees the internally used resources. This
+command should be called if the client wants to pause the discovery for a while. The response to the command is:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;eventType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;stop&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;OK&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>If an error occurs:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;eventType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;stop&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Resource busy&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The <code>error</code> field must be set to <code>true</code> and the <code>message</code> field should contain a description of the error.</p>
+<h4 id="quit-command">QUIT command<a class="headerlink" href="#quit-command" title="Permanent link">&para;</a></h4>
+<p>The <code>QUIT</code> command terminates the discovery. The response to <code>QUIT</code> is:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;eventType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;quit&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;OK&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>after this output the discovery exits. This command is supposed to always succeed.</p>
+<h4 id="list-command">LIST command<a class="headerlink" href="#list-command" title="Permanent link">&para;</a></h4>
+<p>The <code>LIST</code> command executes an enumeration of the ports and returns a list of the available ports at the moment of the
+call. The format of the response is the following:</p>
+<div class="highlight"><pre><span></span><code>{
+  &quot;eventType&quot;: &quot;list&quot;,
+  &quot;ports&quot;: [
+    {
+      &quot;address&quot;:       &lt;-- THE ADDRESS OF THE PORT
+      &quot;label&quot;:         &lt;-- HOW THE PORT IS DISPLAYED ON THE GUI
+      &quot;protocol&quot;:      &lt;-- THE PROTOCOL USED BY THE BOARD
+      &quot;protocolLabel&quot;: &lt;-- HOW THE PROTOCOL IS DISPLAYED ON THE GUI
+      &quot;hardwareId&quot;:    &lt;-- A STRING THAT UNIQUELY IDENTIFIES A BOARD INSTANCE
+      &quot;properties&quot;: {
+                       &lt;-- A LIST OF PROPERTIES OF THE PORT
+      }
+    },
+    {
+      ...              &lt;-- OTHER PORTS...
+    }
+  ]
+}
+</code></pre></div>
+<p>The <code>ports</code> field contains a list of the available ports.</p>
+<p>Each port has:</p>
+<ul>
+<li>an <code>address</code> (for example <code>/dev/ttyACM0</code> for serial ports or <code>192.168.10.100</code> for network ports)</li>
+<li>a <code>label</code> that is the human readable form of the <code>address</code> (it may be for example <code>ttyACM0</code> or
+  <code>SSH on 192.168.10.100</code>)</li>
+<li><code>protocol</code> is the protocol identifier (such as <code>serial</code> or <code>dfu</code> or <code>ssh</code>)</li>
+<li><code>protocolLabel</code> is the <code>protocol</code> in human readable form (for example <code>Serial port</code> or <code>DFU USB</code> or <code>Network (ssh)</code>)</li>
+<li>
+<p><code>hardwareId</code> (optional) a string that uniquely identifies a specific board instance (even among other boards of the
+  same model). Different ports with the same <code>hardwareId</code> must belong to the same board instance. The identifier should
+  be sufficiently long to uniquely identify the board instance and reduce the probability of collisions. Good examples
+  of <code>hardwareId</code> values are: Ethernet MAC Address, USB Serial Number, CPU-ID number, etc.</p>
+<p>This value <strong>should not</strong> be used to identify the board <strong>model</strong> (see the
+<a href="#board-identification">board identification</a> section for more information about identification of the board model).</p>
+</li>
+</ul>
+<ul>
+<li><code>properties</code> is a list of key/value pairs that represent information relative to the specific port.</li>
+</ul>
+<p>To make the above more clear let's show an example output from the <code>serial-discovery</code> builtin in the Arduino CLI:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;eventType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;list&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;ports&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;address&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/dev/ttyACM0&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;label&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ttyACM0&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;protocol&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;serial&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;protocolLabel&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Serial Port (USB)&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;hardwareId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;EBEABFD6514D32364E202020FF10181E&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;pid&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0x804e&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;vid&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0x2341&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;serialNumber&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;EBEABFD6514D32364E202020FF10181E&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ttyACM0&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>In this case the serial port metadata comes from a USB serial converter. Inside the <code>properties</code> we have all the
+properties of the port, and some of them may be useful for product identification (in this case only USB VID/PID is
+useful to identify the board model).</p>
+<p>The <code>hardwareId</code> field is populated with the USB <code>serialNumber</code> since this value is useful to identify the board
+instance.</p>
+<p>The <code>LIST</code> command performs a one-shot polling of the ports. The discovery should answer as soon as reasonably possible,
+without any additional delay.</p>
+<p>Some discoveries may require some time to discover a new port (for example network protocols like MDNS, Bluetooth, etc.
+require some seconds to receive the broadcasts from all available clients) in that case it is fine to answer with an
+empty or incomplete list.</p>
+<p>If an error occurs and the discovery can't complete the enumeration, it must report the error with:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;eventType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;list&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Resource busy&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The <code>error</code> field must be set to <code>true</code> and the <code>message</code> field should contain a description of the error.</p>
+<h4 id="start_sync-command">START_SYNC command<a class="headerlink" href="#start_sync-command" title="Permanent link">&para;</a></h4>
+<p>The <code>START_SYNC</code> command puts the tool in "events" mode: the discovery will send <code>add</code> and <code>remove</code> events each time a
+new port is detected or removed respectively. If the discovery goes into "events" mode successfully the response to this
+command is:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;eventType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;start_sync&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;OK&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>After this message the discovery will send <code>add</code> and <code>remove</code> events asynchronously (more on that later). If an error
+occurs and the discovery can't go in "events" mode the error must be reported as:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;eventType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;start_sync&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Resource busy&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The <code>error</code> field must be set to <code>true</code> and the <code>message</code> field should contain a description of the error.</p>
+<p>Once in "event" mode, the discovery is allowed to send <code>add</code> and <code>remove</code> messages asynchronously in realtime, this
+means that the client must be able to handle these incoming messages at any moment.</p>
+<p>The <code>add</code> event looks like the following:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;eventType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;add&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;port&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;address&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/dev/ttyACM0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;label&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ttyACM0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;hardwareId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;EBEABFD6514D32364E202020FF10181E&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;pid&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0x804e&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;vid&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0x2341&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;serialNumber&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;EBEABFD6514D32364E202020FF10181E&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ttyACM0&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;protocol&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;serial&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;protocolLabel&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Serial Port (USB)&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>It basically provides the same information as the <code>list</code> event but for a single port. After calling <code>START_SYNC</code> an
+initial burst of add events must be generated in sequence to report all the ports available at the moment of the start.</p>
+<p>The <code>remove</code> event looks like the following:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;eventType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;remove&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;port&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;address&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/dev/ttyACM0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;protocol&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;serial&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The content is straightforward, in this case only the <code>address</code> and <code>protocol</code> fields are reported.</p>
+<p>If the information about a port needs to be updated the discovery may send a new <code>add</code> message for the same port address
+and protocol without sending a <code>remove</code> first: this means that all the previous information about the port must be
+discarded and replaced with the new one.</p>
+<h4 id="invalid-commands">Invalid commands<a class="headerlink" href="#invalid-commands" title="Permanent link">&para;</a></h4>
+<p>If the client sends an invalid or malformed command, the discovery should answer with:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;eventType&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;command_error&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Unknown command XXXX&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="state-machine">State machine<a class="headerlink" href="#state-machine" title="Permanent link">&para;</a></h3>
+<p>A well behaved pluggable discovery tool must reflect the following state machine.</p>
+<p><img alt="Pluggable discovery state machine" src="../img/pluggable-discovery-state-machine.png" /></p>
+<p>The arrows represent the commands outlined in the above sections, calling a command successfully assumes the state
+changes.</p>
+<p>A pluggable discovery state is Alive when the process has been started but no command has been executed. Dead means the
+process has been stopped and no further commands can be received.</p>
+<h3 id="board-identification">Board identification<a class="headerlink" href="#board-identification" title="Permanent link">&para;</a></h3>
+<p>The <code>properties</code> associated to a port can be used to identify the board attached to that port. The algorithm is simple:</p>
+<ul>
+<li>each board listed in the platform file <a href="../platform-specification/#boardstxt"><code>boards.txt</code></a> may declare a set of
+  <code>upload_port.*</code> properties</li>
+<li>if each <code>upload_port.*</code> property has a match in the <code>properties</code> set coming from the discovery then the board is a
+  "candidate" board attached to that port.</li>
+</ul>
+<p>Some port <code>properties</code> may not be precise enough to uniquely identify a board, in that case more boards may match the
+same set of <code>properties</code>, that's why we called it "candidate".</p>
+<p>Let's see an example to clarify things a bit, let's suppose that we have the following <code>properties</code> coming from the
+serial discovery:</p>
+<div class="highlight"><pre><span></span><code>  &quot;port&quot;: {
+    &quot;address&quot;: &quot;/dev/ttyACM0&quot;,
+    &quot;properties&quot;: {
+      &quot;pid&quot;: &quot;0x804e&quot;,
+      &quot;vid&quot;: &quot;0x2341&quot;,
+      &quot;serialNumber&quot;: &quot;EBEABFD6514D32364E202020FF10181E&quot;,
+      &quot;name&quot;: &quot;ttyACM0&quot;
+    },
+    ...
+</code></pre></div>
+<p>in this case we can use <code>vid</code> and <code>pid</code> to identify the board. The <code>serialNumber</code>, instead, is unique for that specific
+instance of the board so it can't be used to identify the board model. Let's suppose we have the following <code>boards.txt</code>:</p>
+<div class="highlight"><pre><span></span><code># Arduino Zero (Programming Port)
+# ---------------------------------------
+arduino_zero_edbg.name=Arduino Zero (Programming Port)
+arduino_zero_edbg.upload_port.vid=0x03eb
+arduino_zero_edbg.upload_port.pid=0x2157
+[...CUT...]
+# Arduino Zero (Native USB Port)
+# --------------------------------------
+arduino_zero_native.name=Arduino Zero (Native USB Port)
+arduino_zero_native.upload_port.0.vid=0x2341
+arduino_zero_native.upload_port.0.pid=0x804d
+arduino_zero_native.upload_port.1.vid=0x2341
+arduino_zero_native.upload_port.1.pid=0x004d
+arduino_zero_native.upload_port.2.vid=0x2341
+arduino_zero_native.upload_port.2.pid=0x824d
+arduino_zero_native.upload_port.3.vid=0x2341
+arduino_zero_native.upload_port.3.pid=0x024d
+[...CUT...]
+# Arduino MKR1000
+# -----------------------
+mkr1000.name=Arduino MKR1000
+mkr1000.upload_port.0.vid=0x2341       &lt;------- MATCHING IDs
+mkr1000.upload_port.0.pid=0x804e       &lt;------- MATCHING IDs
+mkr1000.upload_port.1.vid=0x2341
+mkr1000.upload_port.1.pid=0x004e
+mkr1000.upload_port.2.vid=0x2341
+mkr1000.upload_port.2.pid=0x824e
+mkr1000.upload_port.3.vid=0x2341
+mkr1000.upload_port.3.pid=0x024e
+[...CUT...]
+</code></pre></div>
+<p>As we can see the only board that has the two properties matching is the <code>mkr1000</code>, in this case the CLI knows that the
+board is surely an MKR1000.</p>
+<p>Note that <code>vid</code> and <code>pid</code> properties are just free text key/value pairs: the discovery may return basically anything,
+the board just needs to have the same properties defined in <code>boards.txt</code> as <code>upload_port.*</code> to be identified.</p>
+<p>We can also specify multiple identification properties for the same board using the <code>.N</code> suffix, for example:</p>
+<div class="highlight"><pre><span></span><code>myboard.name=My Wonderful Arduino Compatible Board
+myboard.upload_port.pears=20
+myboard.upload_port.apples=30
+</code></pre></div>
+<p>will match on <code>pears=20, apples=30</code> but:</p>
+<div class="highlight"><pre><span></span><code>myboard.name=My Wonderful Arduino Compatible Board
+myboard.upload_port.0.pears=20
+myboard.upload_port.0.apples=30
+myboard.upload_port.1.pears=30
+myboard.upload_port.1.apples=40
+</code></pre></div>
+<p>will match on both <code>pears=20, apples=30</code> and <code>pears=30, apples=40</code> but not <code>pears=20, apples=40</code>, in that sense each
+"set" of identification properties is independent from each other and cannot be mixed for port matching.</p>
+<h4 id="identification-of-board-options">Identification of board options<a class="headerlink" href="#identification-of-board-options" title="Permanent link">&para;</a></h4>
+<p><a href="../platform-specification/#custom-board-options">Custom board options</a> can also be identified.</p>
+<p>Identification property values are associated with a custom board option by the board definition in
+<a href="../platform-specification/#boardstxt"><code>boards.txt</code></a>. Two formats are available.</p>
+<p>If only a single set of identification properties are associated with the option:</p>
+<div class="highlight"><pre><span></span><code>BOARD_ID.menu.MENU_ID.OPTION_ID.upload_port.PORT_PROPERTY_KEY=PORT_PROPERTY_VALUE
+</code></pre></div>
+<p>If one or more sets of identification properties are associated with the option, an index number is used for each set:</p>
+<div class="highlight"><pre><span></span><code>BOARD_ID.menu.MENU_ID.OPTION_ID.upload_port.SET_INDEX.PORT_PROPERTY_KEY=PORT_PROPERTY_VALUE
+</code></pre></div>
+<p>If multiple identification properties are associated within a set, all must match for the option to be identified.</p>
+<p>Let's see an example to clarify it, in the following <code>boards.txt</code>:</p>
+<div class="highlight"><pre><span></span><code>myboard.upload_port.pid=0x0010
+myboard.upload_port.vid=0x2341
+myboard.menu.cpu.atmega1280=ATmega1280
+myboard.menu.cpu.atmega1280.upload_port.c=atmega1280          &lt;--- identification property for cpu=atmega1280
+myboard.menu.cpu.atmega1280.build_cpu=atmega1280
+myboard.menu.cpu.atmega2560=ATmega2560
+myboard.menu.cpu.atmega2560.upload_port.c=atmega2560          &lt;--- identification property for cpu=atmega2560
+myboard.menu.cpu.atmega2560.build_cpu=atmega2560
+myboard.menu.mem.1k=1KB
+myboard.menu.mem.1k.upload_port.mem=1                         &lt;--- identification property for mem=1k
+myboard.menu.mem.1k.build_mem=1024
+myboard.menu.mem.2k=2KB
+myboard.menu.mem.2k.upload_port.1.mem=2                       &lt;------ identification property for mem=2k (case 1)
+myboard.menu.mem.2k.upload_port.2.ab=ef                       &lt;---\
+myboard.menu.mem.2k.upload_port.2.cd=gh                       &lt;---+-- identification property for mem=2k (case 2)
+myboard.menu.mem.2k.build_mem=2048
+</code></pre></div>
+<p>we have a board called <code>myboard</code> with two custom menu options <code>cpu</code> and <code>mem</code>.</p>
+<p>A port with the following identification properties:</p>
+<div class="highlight"><pre><span></span><code>vid=0x0010
+pid=0x2341
+c=atmega2560
+</code></pre></div>
+<p>will be identified as FQBN <code>mypackage:avr:myboard:cpu=atmega2560</code> because of the property <code>c=atmega2560</code>.</p>
+<p>A port with the following identification properties:</p>
+<div class="highlight"><pre><span></span><code>vid=0x0010
+pid=0x2341
+c=atmega2560
+mem=2
+</code></pre></div>
+<p>will be identified as FQBN <code>mypackage:avr:myboard:cpu=atmega2560,mem=2k</code>.</p>
+<p>A port with the following identification properties:</p>
+<div class="highlight"><pre><span></span><code>vid=0x0010
+pid=0x2341
+c=atmega2560
+ab=ef
+cd=gh
+</code></pre></div>
+<p>will be identified as FQBN <code>mypackage:avr:myboard:cpu=atmega2560,mem=2k</code> too (they will match the second identification
+properties set for <code>mem=2k</code>).</p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../platform-specification/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Platform specification" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Platform specification
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../pluggable-monitor-specification/" class="md-footer__link md-footer__link--next" aria-label="Next: Pluggable monitor specification" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Pluggable monitor specification
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright 2020 ARDUINO SA (http://www.arduino.cc/)
+          </div>
+        
+        
+          Made with
+          <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+            Material for MkDocs
+          </a>
+        
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.fcfe8b6d.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.b1047164.min.js"></script>
+      
+    
+  </body>
+</html>
