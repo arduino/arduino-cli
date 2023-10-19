@@ -13,7 +13,7 @@ env:
 on:
   push:
     tags:
-      - "[0-9]+.[0-9]+.[0-9]+*"
+      - "v[0-9]+.[0-9]+.[0-9]+*"
 
 jobs:
   create-release-artifacts:
@@ -45,7 +45,7 @@ jobs:
         if: matrix.os == 'Windows_32bit'
         uses: arduino/create-changelog@v1
         with:
-          tag-regex: '^[0-9]+\.[0-9]+\.[0-9]+.*$'
+          tag-regex: '^v[0-9]+\.[0-9]+\.[0-9]+.*$'
           filter-regex: '^\[(skip|changelog)[ ,-](skip|changelog)\].*'
           case-insensitive-regex: true
           changelog-file-path: "${{ env.DIST_DIR }}/CHANGELOG.md"

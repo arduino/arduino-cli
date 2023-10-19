@@ -2,7 +2,7 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
-## 0.35.0
+## v0.35.0
 
 ### CLI `debug --info` changed JSON output.
 

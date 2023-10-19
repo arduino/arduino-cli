@@ -363,7 +363,7 @@ vars:
   TIMESTAMP_SHORT:
     sh: echo "{{now | date "20060102"}}"
   TAG:
-    sh: echo "$(git tag --points-at=HEAD 2> /dev/null | head -n1)"
+    sh: echo "$(git tag --points-at=HEAD 2> /dev/null | head -n1 | sed 's/^v//')"
   VERSION: "{{if .NIGHTLY}}nightly-{{.TIMESTAMP_SHORT}}{{else if .TAG}}{{.TAG}}{{else}}{{.PACKAGE_NAME_PREFIX}}git-snapshot{{end}}"
   CONFIGURATION_PACKAGE: "github.com/arduino/arduino-cli/version"
   LDFLAGS: >-
