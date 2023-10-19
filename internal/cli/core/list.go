@@ -56,7 +56,7 @@ func runListCommand(args []string, all bool, updatableOnly bool) {
 // List gets and prints a list of installed platforms.
 func List(inst *rpc.Instance, all bool, updatableOnly bool) {
 	platforms := GetList(inst, all, updatableOnly)
-	feedback.PrintResult(newCoreListResult(platforms))
+	feedback.PrintResult(newCoreListResult(platforms, updatableOnly))
 }
 
 // GetList returns a list of installed platforms.
@@ -88,8 +88,8 @@ func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.PlatformSu
 	return result
 }
 
-func newCoreListResult(in []*rpc.PlatformSummary) *coreListResult {
-	res := &coreListResult{}
+func newCoreListResult(in []*rpc.PlatformSummary, updatableOnly bool) *coreListResult {
+	res := &coreListResult{updatableOnly: updatableOnly}
 	for _, platformSummary := range in {
 		res.platforms = append(res.platforms, result.NewPlatformSummary(platformSummary))
 	}
@@ -97,7 +97,8 @@ func newCoreListResult(in []*rpc.PlatformSummary) *coreListResult {
 }
 
 type coreListResult struct {
-	platforms []*result.PlatformSummary
+	platforms     []*result.PlatformSummary
+	updatableOnly bool
 }
 
 // Data implements Result interface
@@ -108,6 +109,9 @@ func (ir coreListResult) Data() interface{} {
 // String implements Result interface
 func (ir coreListResult) String() string {
 	if len(ir.platforms) == 0 {
+		if ir.updatableOnly {
+			return tr("All platforms are up to date.")
+		}
 		return tr("No platforms installed.")
 	}
 	t := table.New()
