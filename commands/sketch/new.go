@@ -65,6 +65,11 @@ func NewSketch(ctx context.Context, req *rpc.NewSketchRequest) (*rpc.NewSketchRe
 		if err := templateDirPath.CopyDirTo(sketchDirPath); err != nil {
 			return nil, &arduino.CantCreateSketchError{Cause: err}
 		}
+
+		oldMainFilePath := sketchDirPath.Join(templateDirPath.Base() + globals.MainFileValidExtension)
+		if err := oldMainFilePath.Rename(sketchMainFilePath); err != nil {
+			return nil, &arduino.CantCreateSketchError{Cause: err}
+		}
 	} else {
 		if err := sketchDirPath.MkdirAll(); err != nil {
 			return nil, &arduino.CantCreateSketchError{Cause: err}
