@@ -201,6 +201,33 @@ func (cli *ArduinoCLI) convertEnvForExecutils(env map[string]string) []string {
 	return envVars
 }
 
+// InstallMockedSerialDiscovery will replace the already installed serial-discovery
+// with a mocked one.
+func (cli *ArduinoCLI) InstallMockedSerialDiscovery(t *testing.T) {
+	// Build mocked serial-discovery
+	mockDir := FindRepositoryRootPath(t).Join("internal", "integrationtest", "mock_serial_discovery")
+	gobuild, err := executils.NewProcess(nil, "go", "build")
+	require.NoError(t, err)
+	gobuild.SetDirFromPath(mockDir)
+	require.NoError(t, gobuild.Run(), "Building mocked serial-discovery")
+
+	// Install it replacing the current serial discovery
+	mockBin := mockDir.Join("mock_serial_discovery")
+	dataDir := cli.DataDir()
+	require.NotNil(t, dataDir, "data dir missing")
+	serialDiscoveries, err := dataDir.Join("packages", "builtin", "tools", "serial-discovery").ReadDirRecursiveFiltered(
+		nil, paths.AndFilter(
+			paths.FilterNames("serial-discovery"),
+			paths.FilterOutDirectories(),
+		),
+	)
+	require.NoError(t, err, "scanning data dir for serial-discoveries")
+	require.NotEmpty(t, serialDiscoveries, "no serial-discoveries found in data dir")
+	for _, serialDiscovery := range serialDiscoveries {
+		require.NoError(t, mockBin.CopyTo(serialDiscovery), "installing mocked serial discovery to %s", serialDiscovery)
+	}
+}
+
 // RunWithCustomEnv executes the given arduino-cli command with the given custom env and returns the output.
 func (cli *ArduinoCLI) RunWithCustomEnv(env map[string]string, args ...string) ([]byte, []byte, error) {
 	if cli.cliConfigPath != nil {

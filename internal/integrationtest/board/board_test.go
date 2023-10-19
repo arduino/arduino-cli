@@ -91,6 +91,44 @@ func TestBoardList(t *testing.T) {
 		MustBeEmpty()
 }
 
+func TestBoardListMock(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	_, _, err := cli.Run("core", "update-index")
+	require.NoError(t, err)
+
+	cli.InstallMockedSerialDiscovery(t)
+
+	stdout, _, err := cli.Run("board", "list", "--format", "json")
+	require.NoError(t, err)
+
+	// check is a valid json and contains a list of ports
+	requirejson.Contains(t, stdout, `[
+		{
+		  "matching_boards": [
+			{
+			  "name": "Arduino Yún",
+			  "fqbn": "arduino:avr:yun"
+			}
+		  ],
+		  "port": {
+			"address": "/dev/ttyCIAO",
+			"label": "Mocked Serial port",
+			"protocol": "serial",
+			"protocol_label": "Serial",
+			"properties": {
+			  "pid": "0x0041",
+			  "serial": "123456",
+			  "vid": "0x2341"
+			},
+			"hardware_id": "123456"
+		  }
+		}
+	  ]
+	`)
+}
+
 func TestBoardListWithFqbnFilter(t *testing.T) {
 	if os.Getenv("CI") != "" {
 		t.Skip("VMs have no serial ports")
