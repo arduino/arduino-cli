@@ -80,7 +80,7 @@ func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.PlatformSu
 		if platform.InstalledVersion == "" && !platform.GetMetadata().ManuallyInstalled {
 			continue
 		}
-		if updatableOnly && platform.InstalledVersion == platform.LatestVersion {
+		if updatableOnly && platform.InstalledVersion == platform.LatestCompatibleVersion {
 			continue
 		}
 		result = append(result, platform)
@@ -117,19 +117,22 @@ func (ir coreListResult) String() string {
 	t := table.New()
 	t.SetHeader(tr("ID"), tr("Installed"), tr("Latest"), tr("Name"))
 	for _, platform := range ir.platforms {
-		name := ""
+		var name string
 		if installed := platform.GetInstalledRelease(); installed != nil {
 			name = installed.Name
 		}
 		if name == "" {
-			if latest := platform.GetLatestRelease(); latest != nil {
+			if latestCompatible := platform.GetLatestCompatibleRelease(); latestCompatible != nil {
+				name = latestCompatible.Name
+			} else if latest := platform.GetLatestRelease(); latest != nil && name == "" {
 				name = latest.Name
 			}
 		}
 		if platform.Deprecated {
 			name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), name)
 		}
-		t.AddRow(platform.Id, platform.InstalledVersion, platform.LatestVersion, name)
+
+		t.AddRow(platform.Id, platform.InstalledVersion, platform.LatestCompatibleVersion, name)
 	}
 
 	return t.Render()
