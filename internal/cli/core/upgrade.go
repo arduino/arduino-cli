@@ -73,13 +73,13 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUni
 			if platform.InstalledVersion == "" {
 				continue
 			}
-			if platform.InstalledVersion == platform.LatestVersion {
+			if platform.InstalledVersion == platform.LatestCompatibleVersion {
 				// if it's not updatable, skip it
 				continue
 			}
 			targets = append(targets, &rpc.Platform{
 				Metadata: platform.GetMetadata(),
-				Release:  platform.GetLatestRelease(),
+				Release:  platform.GetLatestCompatibleRelease(),
 			})
 		}
 
