@@ -37,16 +37,17 @@ func NewPlatformSummary(in *rpc.PlatformSummary) *PlatformSummary {
 	releases.SortKeys((*semver.Version).CompareTo)
 
 	return &PlatformSummary{
-		Id:                in.GetMetadata().GetId(),
-		Maintainer:        in.GetMetadata().GetMaintainer(),
-		Website:           in.GetMetadata().GetWebsite(),
-		Email:             in.GetMetadata().GetEmail(),
-		ManuallyInstalled: in.GetMetadata().GetManuallyInstalled(),
-		Deprecated:        in.GetMetadata().GetDeprecated(),
-		Indexed:           in.GetMetadata().GetIndexed(),
-		Releases:          releases,
-		InstalledVersion:  semver.MustParse(in.GetInstalledVersion()),
-		LatestVersion:     semver.MustParse(in.GetLatestVersion()),
+		Id:                      in.GetMetadata().GetId(),
+		Maintainer:              in.GetMetadata().GetMaintainer(),
+		Website:                 in.GetMetadata().GetWebsite(),
+		Email:                   in.GetMetadata().GetEmail(),
+		ManuallyInstalled:       in.GetMetadata().GetManuallyInstalled(),
+		Deprecated:              in.GetMetadata().GetDeprecated(),
+		Indexed:                 in.GetMetadata().GetIndexed(),
+		Releases:                releases,
+		InstalledVersion:        semver.MustParse(in.GetInstalledVersion()),
+		LatestVersion:           semver.MustParse(in.GetLatestVersion()),
+		LatestCompatibleVersion: semver.MustParse(in.LatestCompatibleVersion),
 	}
 }
 
@@ -62,13 +63,19 @@ type PlatformSummary struct {
 
 	Releases orderedmap.Map[*semver.Version, *PlatformRelease] `json:"releases,omitempty"`
 
-	InstalledVersion *semver.Version `json:"installed_version,omitempty"`
-	LatestVersion    *semver.Version `json:"latest_version,omitempty"`
+	InstalledVersion        *semver.Version `json:"installed_version,omitempty"`
+	LatestVersion           *semver.Version `json:"latest_version,omitempty"`
+	LatestCompatibleVersion *semver.Version `json:"latest_compatible_version,omitempty"`
 }
 
 // GetLatestRelease returns the latest relase of this platform or nil if none available.
 func (p *PlatformSummary) GetLatestRelease() *PlatformRelease {
 	return p.Releases.Get(p.LatestVersion)
+}
+
+// GetLatestCompatibleRelease returns the latest relase of this platform or nil if none available.
+func (p *PlatformSummary) GetLatestCompatibleRelease() *PlatformRelease {
+	return p.Releases.Get(p.LatestCompatibleVersion)
 }
 
 // GetInstalledRelease returns the installed relase of this platform or nil if none available.
@@ -103,6 +110,7 @@ func NewPlatformRelease(in *rpc.PlatformRelease) *PlatformRelease {
 		Help:            help,
 		MissingMetadata: in.MissingMetadata,
 		Deprecated:      in.Deprecated,
+		Incompatible:    in.Incompatible,
 	}
 	return res
 }
@@ -117,6 +125,7 @@ type PlatformRelease struct {
 	Help            *HelpResource `json:"help,omitempty"`
 	MissingMetadata bool          `json:"missing_metadata,omitempty"`
 	Deprecated      bool          `json:"deprecated,omitempty"`
+	Incompatible    bool          `json:"incompatible,omitempty"`
 }
 
 // Board maps a rpc.Board

@@ -37,18 +37,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	allVersions bool
-)
-
 func initSearchCommand() *cobra.Command {
+	var allVersions bool
 	searchCommand := &cobra.Command{
 		Use:     fmt.Sprintf("search <%s...>", tr("keywords")),
 		Short:   tr("Search for a core in Boards Manager."),
 		Long:    tr("Search for a core in Boards Manager using the specified keywords."),
 		Example: "  " + os.Args[0] + " core search MKRZero -a -v",
 		Args:    cobra.ArbitraryArgs,
-		Run:     runSearchCommand,
+		Run: func(cmd *cobra.Command, args []string) {
+			runSearchCommand(cmd, args, allVersions)
+		},
 	}
 	searchCommand.Flags().BoolVarP(&allVersions, "all", "a", false, tr("Show all available core versions."))
 
@@ -58,7 +57,7 @@ func initSearchCommand() *cobra.Command {
 // indexUpdateInterval specifies the time threshold over which indexes are updated
 const indexUpdateInterval = "24h"
 
-func runSearchCommand(cmd *cobra.Command, args []string) {
+func runSearchCommand(cmd *cobra.Command, args []string, allVersions bool) {
 	inst := instance.CreateAndInit()
 
 	if indexesNeedUpdating(indexUpdateInterval) {
@@ -82,19 +81,23 @@ func runSearchCommand(cmd *cobra.Command, args []string) {
 	}
 
 	coreslist := resp.GetSearchOutput()
-	feedback.PrintResult(newSearchResult(coreslist))
+	feedback.PrintResult(newSearchResult(coreslist, allVersions))
 }
 
 // output from this command requires special formatting, let's create a dedicated
 // feedback.Result implementation
 type searchResults struct {
-	platforms []*result.PlatformSummary
+	platforms   []*result.PlatformSummary
+	allVersions bool
 }
 
-func newSearchResult(in []*rpc.PlatformSummary) *searchResults {
-	res := &searchResults{}
-	for _, platformSummary := range in {
-		res.platforms = append(res.platforms, result.NewPlatformSummary(platformSummary))
+func newSearchResult(in []*rpc.PlatformSummary, allVersions bool) *searchResults {
+	res := &searchResults{
+		platforms:   make([]*result.PlatformSummary, len(in)),
+		allVersions: allVersions,
+	}
+	for i, platformSummary := range in {
+		res.platforms[i] = result.NewPlatformSummary(platformSummary)
 	}
 	return res
 }
@@ -108,15 +111,24 @@ func (sr searchResults) String() string {
 		t := table.New()
 		t.SetHeader(tr("ID"), tr("Version"), tr("Name"))
 		for _, platform := range sr.platforms {
-			name := ""
-			if latest := platform.GetLatestRelease(); latest != nil {
-				name = latest.Name
+			// When allVersions is not requested we only show the latest compatible version
+			if !sr.allVersions {
+				if latestCompatible := platform.GetLatestCompatibleRelease(); latestCompatible != nil {
+					name := latestCompatible.Name
+					if latestCompatible.Deprecated {
+						name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), latestCompatible.Name)
+					}
+					t.AddRow(platform.Id, latestCompatible.Version, name)
+				}
+				continue
 			}
-			if platform.Deprecated {
-				name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), name)
-			}
-			for _, version := range platform.Releases.Keys() {
-				t.AddRow(platform.Id, version, name)
+
+			for _, release := range platform.Releases.Values() {
+				name := release.Name
+				if platform.Deprecated {
+					name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), release.Name)
+				}
+				t.AddRow(platform.Id, release.Version, name)
 			}
 		}
 		return t.Render()
