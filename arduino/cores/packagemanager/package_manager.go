@@ -121,6 +121,42 @@ func (pmb *Builder) Build() *PackageManager {
 	}
 }
 
+func (pmb *Builder) calculateIncompatibleVersions() {
+	// calculates Incompatible PlatformRelease
+	for _, op := range pmb.packages {
+		for _, p := range op.Platforms {
+			for _, pr := range p.Releases {
+				platformHasIncompatibleTools := func() bool {
+					for _, td := range pr.ToolDependencies {
+						if td == nil {
+							return true
+						}
+
+						_, ok := pmb.packages[td.ToolPackager]
+						if !ok {
+							return true
+						}
+						tool := pmb.packages[td.ToolPackager].Tools[td.ToolName]
+						if tool == nil {
+							return true
+						}
+						tr := tool.Releases[td.ToolVersion.NormalizedString()]
+						if tr == nil {
+							return true
+						}
+
+						if tr.GetCompatibleFlavour() == nil {
+							return true
+						}
+					}
+					return false
+				}
+				pr.Incompatible = platformHasIncompatibleTools()
+			}
+		}
+	}
+}
+
 // NewBuilder creates a Builder with the same configuration
 // of this PackageManager. A "commit" function callback is returned: calling
 // this function will make the builder write the new configuration into this
@@ -128,6 +164,7 @@ func (pmb *Builder) Build() *PackageManager {
 func (pm *PackageManager) NewBuilder() (builder *Builder, commit func()) {
 	pmb := NewBuilder(pm.IndexDir, pm.PackagesDir, pm.DownloadDir, pm.tempDir, pm.userAgent)
 	return pmb, func() {
+		pmb.calculateIncompatibleVersions()
 		pmb.BuildIntoExistingPackageManager(pm)
 	}
 }
