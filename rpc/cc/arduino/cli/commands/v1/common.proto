@@ -91,6 +91,9 @@ message PlatformSummary {
   string installed_version = 3;
   // The latest available version of the platform, or empty if none available
   string latest_version = 4;
+  // The latest available version of the platform containing all compatible
+  // dependencies, or empty if none available
+  string latest_compatible_version = 5;
 }
 
 // PlatformMetadata contains generic information about a platform (not
@@ -141,6 +144,8 @@ message PlatformRelease {
   bool missing_metadata = 7;
   // True this release is deprecated
   bool deprecated = 8;
+  // True if the platform contains an incompatible dependency.
+  bool incompatible = 9;
 }
 
 message InstalledPlatformReference {
