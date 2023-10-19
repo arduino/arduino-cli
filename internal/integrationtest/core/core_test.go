@@ -191,8 +191,8 @@ func TestCoreSearchNoArgs(t *testing.T) {
 	for _, v := range strings.Split(strings.TrimSpace(string(stdout)), "\n") {
 		lines = append(lines, strings.Fields(strings.TrimSpace(v)))
 	}
-	// Check the presence of test:x86@3.0.0
-	require.Contains(t, lines, []string{"test:x86", "3.0.0", "test_core"})
+	// Check the absence of test:x86@3.0.0 because it contains incompatible deps
+	require.NotContains(t, lines, []string{"test:x86", "3.0.0", "test_core"})
 	numPlatforms = len(lines) - 1
 
 	// same thing in JSON format, also check the number of platforms found is the same
@@ -695,7 +695,7 @@ func TestCoreSearchSortedResults(t *testing.T) {
 	require.NoError(t, err)
 
 	out := strings.Split(strings.TrimSpace(string(stdout)), "\n")
-	var lines, deprecated, notDeprecated [][]string
+	var lines, deprecated, notDeprecated, incompatibles [][]string
 	for i, v := range out {
 		if i > 0 {
 			v = strings.Join(strings.Fields(v), " ")
@@ -705,6 +705,10 @@ func TestCoreSearchSortedResults(t *testing.T) {
 	for _, v := range lines {
 		if strings.HasPrefix(v[2], "[DEPRECATED]") {
 			deprecated = append(deprecated, v)
+			continue
+		}
+		if _, err := semver.Parse(v[1]); err != nil {
+			incompatibles = append(incompatibles, v)
 		} else {
 			notDeprecated = append(notDeprecated, v)
 		}
@@ -717,9 +721,13 @@ func TestCoreSearchSortedResults(t *testing.T) {
 	require.True(t, sort.SliceIsSorted(notDeprecated, func(i, j int) bool {
 		return strings.ToLower(notDeprecated[i][2]) < strings.ToLower(notDeprecated[j][2])
 	}))
+	require.True(t, sort.SliceIsSorted(incompatibles, func(i, j int) bool {
+		return strings.ToLower(incompatibles[i][2]) < strings.ToLower(incompatibles[j][2])
+	}))
 
+	result := append(notDeprecated, incompatibles...)
 	// verify that deprecated platforms are the last ones
-	require.Equal(t, lines, append(notDeprecated, deprecated...))
+	require.Equal(t, lines, append(result, deprecated...))
 
 	// test same behaviour with json output
 	stdout, _, err = cli.Run("core", "search", "--additional-urls="+url.String(), "--format=json")
@@ -1110,4 +1118,92 @@ func TestCoreListWhenNoPlatformAreInstalled(t *testing.T) {
 	stdout, _, err = cli.Run("core", "list")
 	require.NoError(t, err)
 	require.Equal(t, "No platforms installed.\n", string(stdout))
+}
+
+func TestCoreHavingIncompatibleDepTools(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	url := env.HTTPServeFile(8000, paths.New("..", "testdata", "test_index.json")).String()
+	additionalURLs := "--additional-urls=" + url
+
+	_, _, err := cli.Run("core", "update-index", additionalURLs)
+	require.NoError(t, err)
+
+	// check that list shows only compatible versions
+	stdout, _, err := cli.Run("core", "list", "--all", "--format", "json", additionalURLs)
+	require.NoError(t, err)
+	t.Log(string(stdout))
+	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest`, `"1.0.2"`)
+	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest_compatible`, `"1.0.1"`)
+
+	// install latest compatible version
+	_, _, err = cli.Run("core", "install", "foo_vendor:avr", additionalURLs)
+	require.NoError(t, err)
+	stdout, _, err = cli.Run("core", "list", "--all", "--format", "json", additionalURLs)
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest_compatible`, `"1.0.1"`)
+
+	// install incompatible version
+	_, stderr, err := cli.Run("core", "install", "foo_vendor:avr@1.0.2", additionalURLs)
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "no versions available for the current OS")
+
+	// install compatible version
+	_, _, err = cli.Run("core", "install", "foo_vendor:avr@1.0.0", additionalURLs)
+	require.NoError(t, err)
+	stdout, _, err = cli.Run("core", "list", "--format", "json", additionalURLs)
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .installed`, `"1.0.0"`)
+
+	// Lists all updatable cores
+	stdout, _, err = cli.Run("core", "list", "--updatable", "--format", "json", additionalURLs)
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest_compatible`, `"1.0.1"`)
+
+	// upgrade to latest compatible (1.0.0 -> 1.0.1)
+	_, _, err = cli.Run("core", "upgrade", "foo_vendor:avr", "--format", "json", additionalURLs)
+	require.NoError(t, err)
+	stdout, _, err = cli.Run("core", "list", "--format", "json", additionalURLs)
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .installed`, `"1.0.1"`)
+
+	// upgrade to latest incompatible not possible (1.0.1 -> 1.0.2)
+	_, _, err = cli.Run("core", "upgrade", "foo_vendor:avr", "--format", "json", additionalURLs)
+	require.NoError(t, err)
+	stdout, _, err = cli.Run("core", "list", "--format", "json", additionalURLs)
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .installed`, `"1.0.1"`)
+
+	// When no compatible version are found return error
+	_, stderr, err = cli.Run("core", "install", "incompatible_vendor:avr", additionalURLs)
+	require.Error(t, err)
+	require.Contains(t, string(stderr), "has no available releases for your OS")
+
+	// Core search --all shows incompatible field when a version is incompatible
+	stdout, _, err = cli.Run("core", "search", "--all", "--format", "json", additionalURLs)
+	require.NoError(t, err)
+	requirejson.Query(t, stdout,
+		`[.[] | select(.id == "foo_vendor:avr") | {latest: .latest, incompatible: .incompatible}] | sort_by(.latest)`,
+		`[
+			{"incompatible":null,"latest":"1.0.0"},
+			{"incompatible":null,"latest":"1.0.1"},
+			{"incompatible":true,"latest":"1.0.2"}
+		]`,
+	)
+
+	// Core search shows latest compatible version
+	stdout, _, err = cli.Run("core", "search", "--format", "json", additionalURLs)
+	require.NoError(t, err)
+	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest`, `"1.0.1"`)
+	requirejson.Query(t, stdout, `.[] | select(.id == "incompatible_vendor:avr") | .incompatible`, `true`)
+
+	// In text mode, core search doesn't show any version if no compatible one are present
+	stdout, _, err = cli.Run("core", "search", additionalURLs)
+	require.NoError(t, err)
+	var lines [][]string
+	for _, v := range strings.Split(strings.TrimSpace(string(stdout)), "\n") {
+		lines = append(lines, strings.Fields(strings.TrimSpace(v)))
+	}
+	require.Contains(t, lines, []string{"incompatible_vendor:avr", "Incompatible", "Boards"})
 }
