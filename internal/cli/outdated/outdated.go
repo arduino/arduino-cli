@@ -109,13 +109,13 @@ func (ir outdatedResult) String() string {
 	// Based on internal/cli/core/list.go
 	for _, p := range ir.Platforms {
 		name := ""
-		if latest := p.GetLatestRelease(); latest != nil {
-			name = latest.Name
+		if latestCompatible := p.GetLatestCompatibleRelease(); latestCompatible != nil {
+			name = latestCompatible.Name
 		}
 		if p.Deprecated {
 			name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), name)
 		}
-		t.AddRow(p.Id, name, p.InstalledVersion, p.LatestVersion, "", "")
+		t.AddRow(p.Id, name, p.InstalledVersion, p.LatestCompatibleVersion, "", "")
 	}
 
 	// Based on internal/cli/lib/list.go
