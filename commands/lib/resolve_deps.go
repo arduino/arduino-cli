@@ -22,13 +22,13 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/internal/instances"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // LibraryResolveDependencies FIXMEDOC
 func LibraryResolveDependencies(ctx context.Context, req *rpc.LibraryResolveDependenciesRequest) (*rpc.LibraryResolveDependenciesResponse, error) {
-	lm := commands.GetLibraryManager(req)
+	lm := instances.GetLibraryManager(req.GetInstance())
 	if lm == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

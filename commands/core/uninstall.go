@@ -21,6 +21,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/internal/instances"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
@@ -37,7 +38,7 @@ func PlatformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, t
 
 // platformUninstall is the implementation of platform unistaller
 func platformUninstall(ctx context.Context, req *rpc.PlatformUninstallRequest, taskCB rpc.TaskProgressCB) error {
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return &arduino.InvalidInstanceError{}
 	}

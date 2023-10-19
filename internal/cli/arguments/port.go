@@ -16,12 +16,13 @@
 package arguments
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/arduino/arduino-cli/arduino"
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
+	f "github.com/arduino/arduino-cli/internal/algorithms"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/sirupsen/logrus"
@@ -41,11 +42,11 @@ type Port struct {
 func (p *Port) AddToCommand(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&p.address, "port", "p", "", tr("Upload port address, e.g.: COM3 or /dev/ttyACM2"))
 	cmd.RegisterFlagCompletionFunc("port", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return GetConnectedBoards(), cobra.ShellCompDirectiveDefault
+		return f.Map(GetAvailablePorts(), (*rpc.Port).GetAddress), cobra.ShellCompDirectiveDefault
 	})
 	cmd.Flags().StringVarP(&p.protocol, "protocol", "l", "", tr("Upload port protocol, e.g: serial"))
 	cmd.RegisterFlagCompletionFunc("protocol", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return GetInstalledProtocols(), cobra.ShellCompDirectiveDefault
+		return f.Map(GetAvailablePorts(), (*rpc.Port).GetProtocol), cobra.ShellCompDirectiveDefault
 	})
 	p.timeout.AddToCommand(cmd)
 }
@@ -88,30 +89,23 @@ func (p *Port) GetPort(instance *rpc.Instance, defaultAddress, defaultProtocol s
 	}
 	logrus.WithField("port", address).Tracef("Upload port")
 
-	// FIXME: We must not access PackageManager directly here but use one of the commands.* functions
-	pme, release := commands.GetPackageManagerExplorer(&rpc.BoardListAllRequest{Instance: instance})
-	if pme == nil {
-		return nil, &arduino.InvalidInstanceError{}
-	}
-	defer release()
-
-	dm := pme.DiscoveryManager()
-	watcher, err := dm.Watch()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	watcher, err := board.Watch(ctx, &rpc.BoardListWatchRequest{Instance: instance})
 	if err != nil {
 		return nil, err
 	}
-	defer watcher.Close()
 
 	deadline := time.After(p.timeout.Get())
 	for {
 		select {
-		case portEvent := <-watcher.Feed():
-			if portEvent.Type != "add" {
+		case portEvent := <-watcher:
+			if portEvent.GetEventType() != "add" {
 				continue
 			}
-			port := portEvent.Port
-			if (protocol == "" || protocol == port.Protocol) && address == port.Address {
-				return port.ToRPC(), nil
+			port := portEvent.GetPort().GetPort()
+			if (protocol == "" || protocol == port.GetProtocol()) && address == port.GetAddress() {
+				return port, nil
 			}
 
 		case <-deadline:

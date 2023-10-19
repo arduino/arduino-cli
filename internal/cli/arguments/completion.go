@@ -18,7 +18,6 @@ package arguments
 import (
 	"context"
 
-	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/board"
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/commands/lib"
@@ -46,41 +45,6 @@ func GetInstalledBoards() []string {
 	return res
 }
 
-// GetInstalledProtocols is an helper function useful to autocomplete.
-// It returns a list of protocols available based on the installed boards
-func GetInstalledProtocols() []string {
-	inst := instance.CreateAndInit()
-
-	// FIXME: We must not access PackageManager directly here but use one of the commands.* functions
-	pme, release := commands.GetPackageManagerExplorer(&rpc.BoardListAllRequest{Instance: inst})
-	if pme == nil {
-		return nil // should never happen...
-	}
-	defer release()
-
-	boards := pme.InstalledBoards()
-
-	installedProtocols := make(map[string]struct{})
-	for _, board := range boards {
-		for _, protocol := range board.Properties.SubTree("upload.tool").FirstLevelKeys() {
-			if protocol == "default" {
-				// default is used as fallback when trying to upload to a board
-				// using a protocol not defined for it, it's useless showing it
-				// in autocompletion
-				continue
-			}
-			installedProtocols[protocol] = struct{}{}
-		}
-	}
-	res := make([]string, len(installedProtocols))
-	i := 0
-	for k := range installedProtocols {
-		res[i] = k
-		i++
-	}
-	return res
-}
-
 // GetInstalledProgrammers is an helper function useful to autocomplete.
 // It returns a list of programmers available based on the installed boards
 func GetInstalledProgrammers() []string {
@@ -93,13 +57,6 @@ func GetInstalledProgrammers() []string {
 		IncludeHiddenBoards: false,
 	}
 	list, _ := board.ListAll(context.Background(), listAllReq)
-
-	// FIXME: We must not access PackageManager directly here but use one of the commands.* functions
-	pme, release := commands.GetPackageManagerExplorer(listAllReq)
-	if pme == nil {
-		return nil // should never happen...
-	}
-	defer release()
 
 	installedProgrammers := make(map[string]string)
 	for _, board := range list.Boards {
@@ -203,19 +160,19 @@ func GetInstallableLibs() []string {
 	return res
 }
 
-// GetConnectedBoards is an helper function useful to autocomplete.
-// It returns a list of boards which are currently connected
-// Obviously it does not suggests network ports because of the timeout
-func GetConnectedBoards() []string {
+// GetAvailablePorts is an helper function useful to autocomplete.
+// It returns a list of upload port of the boards which are currently connected.
+// It will not suggests network ports because the timeout is not set.
+func GetAvailablePorts() []*rpc.Port {
 	inst := instance.CreateAndInit()
 
 	list, _, _ := board.List(&rpc.BoardListRequest{
 		Instance: inst,
 	})
-	var res []string
+	var res []*rpc.Port
 	// transform the data structure for the completion
 	for _, i := range list {
-		res = append(res, i.Port.Address)
+		res = append(res, i.Port)
 	}
 	return res
 }

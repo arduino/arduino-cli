@@ -20,14 +20,14 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/libraries"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/internal/instances"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-paths-helper"
 )
 
 // LibraryUninstall FIXMEDOC
 func LibraryUninstall(ctx context.Context, req *rpc.LibraryUninstallRequest, taskCB rpc.TaskProgressCB) error {
-	lm := commands.GetLibraryManager(req)
+	lm := instances.GetLibraryManager(req.GetInstance())
 	ref, err := createLibIndexReference(lm, req)
 	if err != nil {
 		return &arduino.InvalidLibraryError{Cause: err}

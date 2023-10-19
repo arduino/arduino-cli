@@ -31,7 +31,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/arduino/discovery"
 	"github.com/arduino/arduino-cli/arduino/httpclient"
-	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/internal/instances"
 	"github.com/arduino/arduino-cli/internal/inventory"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/go-properties-orderedmap"
@@ -203,7 +203,7 @@ func identify(pme *packagemanager.Explorer, port *discovery.Port) ([]*rpc.BoardL
 // In case of errors partial results from discoveries that didn't fail
 // are returned.
 func List(req *rpc.BoardListRequest) (r []*rpc.DetectedPort, discoveryStartErrors []error, e error) {
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, nil, &arduino.InvalidInstanceError{}
 	}
@@ -258,7 +258,7 @@ func hasMatchingBoard(b *rpc.DetectedPort, fqbnFilter *cores.FQBN) bool {
 
 // Watch returns a channel that receives boards connection and disconnection events.
 func Watch(ctx context.Context, req *rpc.BoardListWatchRequest) (<-chan *rpc.BoardListWatchResponse, error) {
-	pme, release := commands.GetPackageManagerExplorer(req)
+	pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 	if pme == nil {
 		return nil, &arduino.InvalidInstanceError{}
 	}

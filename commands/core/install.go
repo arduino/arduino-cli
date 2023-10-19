@@ -22,13 +22,14 @@ import (
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores/packagemanager"
 	"github.com/arduino/arduino-cli/commands"
+	"github.com/arduino/arduino-cli/commands/internal/instances"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
 
 // PlatformInstall FIXMEDOC
 func PlatformInstall(ctx context.Context, req *rpc.PlatformInstallRequest, downloadCB rpc.DownloadProgressCB, taskCB rpc.TaskProgressCB) (*rpc.PlatformInstallResponse, error) {
 	install := func() error {
-		pme, release := commands.GetPackageManagerExplorer(req)
+		pme, release := instances.GetPackageManagerExplorer(req.GetInstance())
 		if pme == nil {
 			return &arduino.InvalidInstanceError{}
 		}
