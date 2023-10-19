@@ -2,7 +2,7 @@
 
 Here you can find a list of migration guides to handle breaking changes between releases of the CLI.
 
-## v0.35.0
+## 0.36.0
 
 ### CLI `core list` and `core search` changed JSON output.
 
@@ -166,6 +166,8 @@ To address all the inconsistencies/inaccuracies we introduced two messages:
 
 - `PlatformMetadata` contains generic information about a platform (not correlated to a specific release).
 - `PlatformRelease` contains information about a specific release of a platform.
+
+## 0.35.0
 
 ### CLI `debug --info` changed JSON output.
 
