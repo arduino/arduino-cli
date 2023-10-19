@@ -112,8 +112,11 @@ func GetInstallableCores() []string {
 	})
 	var res []string
 	// transform the data structure for the completion
-	for _, i := range platforms.SearchOutput {
-		res = append(res, i.GetMetadata().GetId()+"\t"+i.GetReleases()[i.GetLatestVersion()].GetName())
+	for _, i := range platforms.GetSearchOutput() {
+		if i.GetLatestCompatibleVersion() == "" {
+			continue
+		}
+		res = append(res, i.GetMetadata().GetId()+"\t"+i.GetLatestCompatibleRelease().GetName())
 	}
 	return res
 }
