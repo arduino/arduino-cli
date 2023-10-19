@@ -1651,7 +1651,7 @@ msgstr "Manca il programmatore"
 
 #: internal/cli/upload/upload.go:162
 msgid "Missing required upload field: %s"
-msgstr ""
+msgstr "Manca un campo obbligatorio del caricamento: %s"
 
 #: arduino/builder/sizer.go:243
 msgid "Missing size regexp"
@@ -2144,7 +2144,7 @@ msgstr "Tipo di server"
 
 #: internal/cli/upload/upload.go:81
 msgid "Set a value for a field required to upload."
-msgstr ""
+msgstr "Imposta un valore per un campo richiesto dal caricamento."
 
 #: internal/cli/monitor/monitor.go:68
 msgid "Set terminal in raw mode (unbuffered)."
