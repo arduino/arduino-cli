@@ -38,7 +38,6 @@ func SetDefaults(settings *viper.Viper) {
 	// arduino directories
 	settings.SetDefault("directories.Data", getDefaultArduinoDataDir())
 	settings.SetDefault("directories.Downloads", filepath.Join(getDefaultArduinoDataDir(), "staging"))
-	settings.SetDefault("directories.Template", "")
 	settings.SetDefault("directories.User", getDefaultUserDir())
 
 	// Sketch compilation
@@ -70,4 +69,6 @@ func SetDefaults(settings *viper.Viper) {
 	settings.BindEnv("directories.Downloads", "ARDUINO_DOWNLOADS_DIR")
 	settings.BindEnv("directories.Data", "ARDUINO_DATA_DIR")
 	settings.BindEnv("sketch.always_export_binaries", "ARDUINO_SKETCH_ALWAYS_EXPORT_BINARIES")
+
+	settings.SetDefault("sketch.template", "")
 }
