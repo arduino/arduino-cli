@@ -1,6 +1,23 @@
 {
   "libraries": [
     {
+      "name": "Array",
+      "version": "1.2.1",
+      "author": "Peter Polidoro \u003cpeterpolidoro@gmail.com\u003e",
+      "maintainer": "Peter Polidoro \u003cpeterpolidoro@gmail.com\u003e",
+      "sentence": "An array container similar to the C++ std::array",
+      "paragraph": "Like this project? Please star it on GitHub!",
+      "website": "https://github.com/janelia-arduino/Array.git",
+      "category": "Data Storage",
+      "architectures": ["*"],
+      "types": ["Contributed"],
+      "repository": "https://github.com/janelia-arduino/Array.git",
+      "url": "https://downloads.arduino.cc/libraries/github.com/janelia-arduino/Array-1.2.1.zip",
+      "archiveFileName": "Array-1.2.1.zip",
+      "size": 7859,
+      "checksum": "SHA-256:dc69e0b4d1390c08253120a80e6e07e5cc6185ec24cbe3cb96dec2d8173e6495"
+    },
+    {
       "name": "esp8266-framework",
       "version": "1.1.5",
       "author": "Suraj I.",
@@ -42,6 +59,25 @@
       "archiveFileName": "Painless_Mesh-1.5.0.zip",
       "size": 293531,
       "checksum": "SHA-256:9d965064fc704e8ba19c0452cc50e619145f7869b9b135dbf7e521f6ec0a4b33"
+    },
+    {
+      "name": "Pushdata_ESP8266_SSL",
+      "version": "0.0.6",
+      "author": "Ragnar Lonn",
+      "maintainer": "Ragnar Lonn \u003chello@pushdata.io\u003e",
+      "license": "MIT",
+      "sentence": "Free, ultra-simple time series data storage for your IoT sensors",
+      "paragraph": "Pushdata.io client library that makes it very simple to store your time series data online",
+      "website": "https://pushdata.io",
+      "category": "Communication",
+      "architectures": ["*"],
+      "types": ["Contributed"],
+      "repository": "https://github.com/pushdata-io/Arduino_ESP8266_SSL.git",
+      "providesIncludes": ["Pushdata_ESP8266_SSL.h"],
+      "url": "https://downloads.arduino.cc/libraries/github.com/pushdata-io/Pushdata_ESP8266_SSL-0.0.6.zip",
+      "archiveFileName": "Pushdata_ESP8266_SSL-0.0.6.zip",
+      "size": 12160,
+      "checksum": "SHA-256:5d592eb7900782f681b86f5fd77c5d9f25c78555e3b5f0880c52197031206df0"
     },
     {
       "name": "RF24Mesh",

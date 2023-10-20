@@ -152,4 +152,39 @@ func TestSearchLibraryWithQualifiers(t *testing.T) {
 	res = query("mesh esp paragraph:wifi")
 	require.Len(t, res, 1)
 	require.Equal(t, "esp8266-framework", res[0])
+
+	// Unknown qualifier should revert to original matching
+	res = query("std::array")
+	require.Len(t, res, 1)
+	require.Equal(t, "Array", res[0])
+
+	res = query("data storage")
+	require.Len(t, res, 1)
+	require.Equal(t, "Pushdata_ESP8266_SSL", res[0])
+
+	res = query("category:\"data storage\"")
+	require.Len(t, res, 1)
+	require.Equal(t, "Array", res[0])
+
+	res = query("maintainer:@")
+	require.Len(t, res, 4)
+
+	res = query("sentence:\"A library for NRF24L01(+) devices mesh.\"")
+	require.Len(t, res, 1)
+	require.Equal(t, "RF24Mesh", res[0])
+
+	res = query("types=contributed")
+	require.Len(t, res, 6)
+
+	res = query("version:1.0")
+	require.Len(t, res, 2)
+
+	res = query("version=1.2.1")
+	require.Len(t, res, 1)
+	require.Equal(t, "Array", res[0])
+
+	// Non-SSL URLs
+	res = query("website:http://")
+	require.Len(t, res, 1)
+	require.Equal(t, "RF24Mesh", res[0])
 }
