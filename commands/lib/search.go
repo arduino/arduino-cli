@@ -127,24 +127,24 @@ func matcherFromQueryString(query string) func(*librariesindex.Library) bool {
 		matched := true
 		for _, term := range queryTerms {
 
-			// Flag indicating whether the search term matched a known qualifier
-			knownQualifier := false
+			if sepIdx := strings.IndexAny(term, "=:"); sepIdx != -1 {
+				potentialKey := term[:sepIdx]
+				separator := term[sepIdx]
 
-			for key, extractor := range qualifiers {
-				if strings.HasPrefix(term, key+":") {
-					target := strings.TrimPrefix(term, key+":")
-					matched = (matched && utils.Match(extractor(lib), []string{target}))
-					knownQualifier = true
-					break
-				} else if strings.HasPrefix(term, key+"=") {
-					target := strings.TrimPrefix(term, key+"=")
-					matched = (matched && strings.ToLower(extractor(lib)) == target)
-					knownQualifier = true
-					break
+				extractor, ok := qualifiers[potentialKey]
+				if ok {
+					target := term[sepIdx+1:]
+					if separator == ':' {
+						matched = (matched && utils.Match(extractor(lib), []string{target}))
+					} else { // "="
+						matched = (matched && strings.ToLower(extractor(lib)) == target)
+					}
+				} else {
+					// Unknown qualifier names revert to basic search terms.
+					matched = (matched && utils.Match(defaultLibraryMatchExtractor(lib), []string{term}))
 				}
-			}
-
-			if !knownQualifier {
+			} else {
+				// Terms that do not use qv-syntax are handled as usual.
 				matched = (matched && utils.Match(defaultLibraryMatchExtractor(lib), []string{term}))
 			}
 		}
