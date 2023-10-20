@@ -70,8 +70,9 @@ jobs:
 
       - name: Collect tests
         id: collection
+        # jq flags must be "-cRn" see: https://stackoverflow.com/a/68859958/1655275
         run: |
-          echo "tests-data=$(go list ./internal/integrationtest/... | grep integrationtest/ | tr "/" " " | cut -d " " -f 6 | jq -cR '[inputs]')" >> $GITHUB_OUTPUT
+          echo "tests-data=$(go list ./internal/integrationtest/... | grep integrationtest/ | tr "/" " " | cut -d " " -f 6 | jq -cRn '[inputs]')" >> $GITHUB_OUTPUT
 
   test-integration:
     needs: tests-collector
