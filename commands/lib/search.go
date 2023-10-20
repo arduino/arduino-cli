@@ -88,23 +88,6 @@ func defaultLibraryMatchExtractor(lib *librariesindex.Library) string {
 	return res
 }
 
-// matcherFromQueryString returns a closure that takes a library as a
-// parameter and returns true if the library matches the query.
-func matcherFromQueryString(query string) func(*librariesindex.Library) bool {
-	// A qv-query is one using <qualifier>[:=]<value> syntax.
-	qvQuery := strings.Contains(query, ":") || strings.Contains(query, "=")
-
-	if !qvQuery {
-		queryTerms := utils.SearchTermsFromQueryString(query)
-		return func(lib *librariesindex.Library) bool {
-			return utils.Match(defaultLibraryMatchExtractor(lib), queryTerms)
-		}
-	}
-
-	joinedStrings := func(strs []string) string {
-		return strings.Join(strs, " ")
-	}
-
 var qualifiers map[string]func(lib *librariesindex.Library) string = map[string]func(lib *librariesindex.Library) string{
 	"name":          func(lib *librariesindex.Library) string { return lib.Name },
 	"architectures": func(lib *librariesindex.Library) string { return strings.Join(lib.Latest.Architectures, " ") },
@@ -125,6 +108,19 @@ var qualifiers map[string]func(lib *librariesindex.Library) string = map[string]
 	"website":    func(lib *librariesindex.Library) string { return lib.Latest.Website },
 }
 
+// matcherFromQueryString returns a closure that takes a library as a
+// parameter and returns true if the library matches the query.
+func matcherFromQueryString(query string) func(*librariesindex.Library) bool {
+	// A qv-query is one using <qualifier>[:=]<value> syntax.
+	qvQuery := strings.Contains(query, ":") || strings.Contains(query, "=")
+
+	if !qvQuery {
+		queryTerms := utils.SearchTermsFromQueryString(query)
+		return func(lib *librariesindex.Library) bool {
+			return utils.Match(defaultLibraryMatchExtractor(lib), queryTerms)
+		}
+	}
+
 	queryTerms := matcherTokensFromQueryString(query)
 
 	return func(lib *librariesindex.Library) bool {
@@ -134,15 +130,15 @@ var qualifiers map[string]func(lib *librariesindex.Library) string = map[string]
 			// Flag indicating whether the search term matched a known qualifier
 			knownQualifier := false
 
-			for _, q := range qualifiers {
-				if strings.HasPrefix(term, q.key+":") {
-					target := strings.TrimPrefix(term, q.key+":")
-					matched = (matched && utils.Match(q.extractor(lib), []string{target}))
+			for key, extractor := range qualifiers {
+				if strings.HasPrefix(term, key+":") {
+					target := strings.TrimPrefix(term, key+":")
+					matched = (matched && utils.Match(extractor(lib), []string{target}))
 					knownQualifier = true
 					break
-				} else if strings.HasPrefix(term, q.key+"=") {
-					target := strings.TrimPrefix(term, q.key+"=")
-					matched = (matched && strings.ToLower(q.extractor(lib)) == target)
+				} else if strings.HasPrefix(term, key+"=") {
+					target := strings.TrimPrefix(term, key+"=")
+					matched = (matched && strings.ToLower(extractor(lib)) == target)
 					knownQualifier = true
 					break
 				}
