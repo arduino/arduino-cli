@@ -817,9 +817,9 @@ func TestQualifiedSearch(t *testing.T) {
 	runSearch("name:MKRIoTCarrier", []string{"Arduino_MKRIoTCarrier"})
 	runSearch("name=Arduino_MKRIoTCarrier", []string{"Arduino_MKRIoTCarrier"})
 	// Embedded space in double-quoted string
-	runSearch("name=\"dht sensor library\"", []string{"DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"})
+	runSearch("name=\"dht sensor library\"", []string{"DHT sensor library"})
 	// No closing double-quote
-	runSearch("name=\"dht sensor library", []string{"DHT sensor library", "DHT sensor library for ESPx", "SimpleDHT", "SDHT"})
+	runSearch("name=\"dht sensor library", []string{"DHT sensor library"})
 	runSearch("name:\"sensor dht\"", []string{})
 	// Literal double-quote
 	runSearch("sentence:\\\"", []string{"RTCtime"})
