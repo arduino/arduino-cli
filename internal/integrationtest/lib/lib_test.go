@@ -792,22 +792,8 @@ func TestQualifiedSearch(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()
 
-	stdout, _, err := cli.Run("lib", "search", "--names", "WiFi101")
-	require.NoError(t, err)
-	lines := strings.Split(strings.TrimSpace(string(stdout)), "\n")
-	var libs []string
-	for i, v := range lines {
-		lines[i] = strings.TrimSpace(v)
-		if strings.Contains(v, "Name:") {
-			libs = append(libs, strings.Trim(strings.SplitN(v, " ", 2)[1], "\""))
-		}
-	}
-
-	expected := []string{"WiFi101", "WiFi101OTA", "Firebase Arduino based on WiFi101", "WiFi101_Generic"}
-	require.Subset(t, libs, expected)
-
 	runSearch := func(args string, expectedLibs []string) {
-		stdout, _, err = cli.Run("lib", "search", "--names", "--format", "json", args)
+		stdout, _, err := cli.Run("lib", "search", "--names", "--format", "json", args)
 		require.NoError(t, err)
 		libraries := requirejson.Parse(t, stdout).Query("[ .libraries | .[] | .name ]").String()
 		for _, l := range expectedLibs {
