@@ -21,8 +21,15 @@ import (
 	"testing"
 
 	"github.com/arduino/arduino-cli/internal/integrationtest"
+	"github.com/arduino/go-paths-helper"
 	"github.com/stretchr/testify/require"
 )
+
+// returns a reader that tells the mocked monitor to exit
+func quitMonitor() io.Reader {
+	// tells mocked monitor to exit
+	return bytes.NewBufferString("QUIT\n")
+}
 
 func TestMonitorConfigFlags(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
@@ -38,14 +45,8 @@ func TestMonitorConfigFlags(t *testing.T) {
 	cli.InstallMockedSerialDiscovery(t)
 	cli.InstallMockedSerialMonitor(t)
 
-	// Test monitor command
-	quit := func() io.Reader {
-		// tells mocked monitor to exit
-		return bytes.NewBufferString("QUIT\n")
-	}
-
 	t.Run("NoArgs", func(t *testing.T) {
-		stdout, _, err := cli.RunWithCustomInput(quit(), "monitor", "-p", "/dev/ttyARG", "--raw")
+		stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARG", "--raw")
 		require.NoError(t, err)
 		require.Contains(t, string(stdout), "Opened port: /dev/ttyARG")
 		require.Contains(t, string(stdout), "Configuration baudrate = 9600")
@@ -54,7 +55,7 @@ func TestMonitorConfigFlags(t *testing.T) {
 	})
 
 	t.Run("BaudConfig", func(t *testing.T) {
-		stdout, _, err := cli.RunWithCustomInput(quit(), "monitor", "-p", "/dev/ttyARG", "-c", "baudrate=115200", "--raw")
+		stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARG", "-c", "baudrate=115200", "--raw")
 		require.NoError(t, err)
 		require.Contains(t, string(stdout), "Opened port: /dev/ttyARG")
 		require.Contains(t, string(stdout), "Configuration baudrate = 115200")
@@ -64,7 +65,7 @@ func TestMonitorConfigFlags(t *testing.T) {
 	})
 
 	t.Run("BaudAndParitfyConfig", func(t *testing.T) {
-		stdout, _, err := cli.RunWithCustomInput(quit(), "monitor", "-p", "/dev/ttyARG",
+		stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARG",
 			"-c", "baudrate=115200", "-c", "parity=even", "--raw")
 		require.NoError(t, err)
 		require.Contains(t, string(stdout), "Opened port: /dev/ttyARG")
@@ -75,16 +76,181 @@ func TestMonitorConfigFlags(t *testing.T) {
 	})
 
 	t.Run("InvalidConfigKey", func(t *testing.T) {
-		_, stderr, err := cli.RunWithCustomInput(quit(), "monitor", "-p", "/dev/ttyARG",
+		_, stderr, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARG",
 			"-c", "baud=115200", "-c", "parity=even", "--raw")
 		require.Error(t, err)
 		require.Contains(t, string(stderr), "invalid port configuration: baud=115200")
 	})
 
 	t.Run("InvalidConfigValue", func(t *testing.T) {
-		_, stderr, err := cli.RunWithCustomInput(quit(), "monitor", "-p", "/dev/ttyARG",
+		_, stderr, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARG",
 			"-c", "parity=9600", "--raw")
 		require.Error(t, err)
 		require.Contains(t, string(stderr), "invalid port configuration value for parity: 9600")
+	})
+}
+
+func TestMonitorCommandFlagsAndDefaultPortFQBNSelection(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	// Install AVR platform
+	_, _, err := cli.Run("core", "install", "arduino:avr@1.8.6")
+	require.NoError(t, err)
+
+	// Patch the Yun board to require special RTS/DTR serial configuration
+	f, err := cli.DataDir().Join("packages", "arduino", "hardware", "avr", "1.8.6", "boards.txt").Append()
+	require.NoError(t, err)
+	_, err = f.WriteString(`
+uno.serial.disableRTS=true
+uno.serial.disableDTR=false
+yun.serial.disableRTS=true
+yun.serial.disableDTR=true
+`)
+	require.NoError(t, err)
+	require.NoError(t, f.Close())
+
+	// Install mocked discovery and monitor for testing
+	cli.InstallMockedSerialDiscovery(t)
+	cli.InstallMockedSerialMonitor(t)
+
+	// Create test sketches
+	getSketchPath := func(sketch string) string {
+		p, err := paths.New("testdata", sketch).Abs()
+		require.NoError(t, err)
+		require.True(t, p.IsDir())
+		return p.String()
+	}
+	sketch := getSketchPath("SketchWithNoProfiles")
+	sketchWithPort := getSketchPath("SketchWithDefaultPort")
+	sketchWithFQBN := getSketchPath("SketchWithDefaultFQBN")
+	sketchWithPortAndFQBN := getSketchPath("SketchWithDefaultPortAndFQBN")
+
+	t.Run("NoFlags", func(t *testing.T) {
+		t.Run("NoDefaultPortNoDefaultFQBN", func(t *testing.T) {
+			_, stderr, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "--raw", sketch)
+			require.Error(t, err)
+			require.Contains(t, string(stderr), "No monitor available for the port protocol default")
+		})
+
+		t.Run("WithDefaultPort", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "--raw", sketchWithPort)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyDEF")
+			require.Contains(t, string(stdout), "Configuration rts = on")
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+		})
+
+		t.Run("WithDefaultFQBN", func(t *testing.T) {
+			_, stderr, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "--raw", sketchWithFQBN)
+			require.Error(t, err)
+			require.Contains(t, string(stderr), "No monitor available for the port protocol default")
+		})
+
+		t.Run("WithDefaultPortAndQBN", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "--raw", sketchWithPortAndFQBN)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyDEF")
+			require.Contains(t, string(stdout), "Configuration rts = off")
+			require.Contains(t, string(stdout), "Configuration dtr = off")
+		})
+	})
+
+	t.Run("WithPortFlag", func(t *testing.T) {
+		t.Run("NoDefaultPortNoDefaultFQBN", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARGS", "--raw", sketch)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyARGS")
+			require.Contains(t, string(stdout), "Configuration rts = on")
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+		})
+
+		t.Run("WithDefaultPort", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARGS", "--raw", sketchWithPort)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyARGS")
+			require.Contains(t, string(stdout), "Configuration rts = on")
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+		})
+
+		t.Run("WithDefaultFQBN", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARGS", "--raw", sketchWithFQBN)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyARGS")
+			require.Contains(t, string(stdout), "Configuration rts = off")
+			require.Contains(t, string(stdout), "Configuration dtr = off")
+		})
+
+		t.Run("WithDefaultPortAndQBN", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARGS", "--raw", sketchWithPortAndFQBN)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyARGS")
+			require.Contains(t, string(stdout), "Configuration rts = off")
+			require.Contains(t, string(stdout), "Configuration dtr = off")
+		})
+	})
+
+	t.Run("WithFQBNFlag", func(t *testing.T) {
+		t.Run("NoDefaultPortNoDefaultFQBN", func(t *testing.T) {
+			_, stderr, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-b", "arduino:avr:uno", "--raw", sketch)
+			require.Error(t, err)
+			require.Contains(t, string(stderr), "No monitor available for the port protocol default")
+		})
+
+		t.Run("WithDefaultPort", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-b", "arduino:avr:uno", "--raw", sketchWithPort)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyDEF")
+			require.Contains(t, string(stdout), "Configuration rts = off")
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+		})
+
+		t.Run("WithDefaultFQBN", func(t *testing.T) {
+			_, stderr, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-b", "arduino:avr:uno", "--raw", sketchWithFQBN)
+			require.Error(t, err)
+			require.Contains(t, string(stderr), "No monitor available for the port protocol default")
+		})
+
+		t.Run("WithDefaultPortAndQBN", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-b", "arduino:avr:uno", "--raw", sketchWithPortAndFQBN)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyDEF")
+			require.Contains(t, string(stdout), "Configuration rts = off")
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+		})
+	})
+
+	t.Run("WithPortAndFQBNFlags", func(t *testing.T) {
+		t.Run("NoDefaultPortNoDefaultFQBN", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARGS", "-b", "arduino:avr:uno", "--raw", sketch)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyARGS")
+			require.Contains(t, string(stdout), "Configuration rts = off")
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+		})
+
+		t.Run("WithDefaultPort", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARGS", "-b", "arduino:avr:uno", "--raw", sketchWithPort)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyARGS")
+			require.Contains(t, string(stdout), "Configuration rts = off")
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+		})
+
+		t.Run("WithDefaultFQBN", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARGS", "-b", "arduino:avr:uno", "--raw", sketchWithFQBN)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyARGS")
+			require.Contains(t, string(stdout), "Configuration rts = off")
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+		})
+
+		t.Run("WithDefaultPortAndQBN", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARGS", "-b", "arduino:avr:uno", "--raw", sketchWithPortAndFQBN)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyARGS")
+			require.Contains(t, string(stdout), "Configuration rts = off")
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+		})
 	})
 }

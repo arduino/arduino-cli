@@ -1,0 +1,2 @@
+default_port: /dev/ttyDEF
+default_fqbn: arduino:avr:yun
