@@ -84,7 +84,6 @@ initDownloadTool() {
 checkLatestVersion() {
   # Use the GitHub releases webpage to find the latest version for this project
   # so we don't get rate-limited.
-  #CHECKLATESTVERSION_REGEX="v?[0-9][A-Za-z0-9\.-]*"
   CHECKLATESTVERSION_REGEX="v\?[0-9][A-Za-z0-9\.-]*"
   CHECKLATESTVERSION_LATEST_URL="https://github.com/${PROJECT_OWNER}/${PROJECT_NAME}/releases/latest"
   if [ "$DOWNLOAD_TOOL" = "curl" ]; then
