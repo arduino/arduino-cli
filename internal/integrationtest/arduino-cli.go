@@ -207,7 +207,7 @@ func (cli *ArduinoCLI) InstallMockedSerialDiscovery(t *testing.T) {
 	fmt.Println(color.BlueString("<<< Install mocked serial-discovery"))
 
 	// Build mocked serial-discovery
-	mockDir := FindRepositoryRootPath(t).Join("internal", "integrationtest", "mock_serial_discovery")
+	mockDir := FindRepositoryRootPath(t).Join("internal", "mock_serial_discovery")
 	gobuild, err := executils.NewProcess(nil, "go", "build")
 	require.NoError(t, err)
 	gobuild.SetDirFromPath(mockDir)
@@ -238,7 +238,7 @@ func (cli *ArduinoCLI) InstallMockedSerialMonitor(t *testing.T) {
 	fmt.Println(color.BlueString("<<< Install mocked serial-monitor"))
 
 	// Build mocked serial-monitor
-	mockDir := FindRepositoryRootPath(t).Join("internal", "integrationtest", "mock_serial_monitor")
+	mockDir := FindRepositoryRootPath(t).Join("internal", "mock_serial_monitor")
 	gobuild, err := executils.NewProcess(nil, "go", "build")
 	require.NoError(t, err)
 	gobuild.SetDirFromPath(mockDir)
