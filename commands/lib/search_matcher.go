@@ -135,5 +135,3 @@ func MatcherFromQueryString(query string) func(*librariesindex.Library) bool {
 		return matched
 	}
 }
-
-
