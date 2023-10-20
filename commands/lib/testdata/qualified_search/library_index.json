@@ -1,0 +1,83 @@
+{
+  "libraries": [
+    {
+      "name": "esp8266-framework",
+      "version": "1.1.5",
+      "author": "Suraj I.",
+      "maintainer": "Suraj I. \u003csurajinamdar151@gmail.com\u003e",
+      "sentence": "esp8266 framework stack for easy configurable applications",
+      "paragraph": "esp8266 framework includes all services like gpio, wifi, http, mqtt, ntp, ota, napt, espnow, mesh, server etc. which are ready to use in all applications",
+      "website": "https://github.com/Suraj151/esp8266-framework",
+      "category": "Communication",
+      "architectures": ["esp8266"],
+      "types": ["Contributed"],
+      "repository": "https://github.com/Suraj151/esp8266-framework.git",
+      "url": "https://downloads.arduino.cc/libraries/github.com/Suraj151/esp8266_framework-1.1.5.zip",
+      "archiveFileName": "esp8266_framework-1.1.5.zip",
+      "size": 1918535,
+      "checksum": "SHA-256:81731d4ccc80846c317a2d4e2086d32caa695ed97d3e4765a59c5651b4be30b5"
+    },
+    {
+      "name": "Painless Mesh",
+      "version": "1.5.0",
+      "author": "Coopdis,Scotty Franzyshen,Edwin van Leeuwen,Germán Martín,Maximilian Schwarz,Doanh Doanh",
+      "maintainer": "Edwin van Leeuwen",
+      "sentence": "A painless way to setup a mesh with ESP8266 and ESP32 devices",
+      "paragraph": "A painless way to setup a mesh with ESP8266 and ESP32 devices",
+      "website": "https://gitlab.com/painlessMesh/painlessMesh",
+      "category": "Communication",
+      "architectures": ["esp8266", "esp32"],
+      "types": ["Contributed"],
+      "repository": "https://gitlab.com/painlessMesh/painlessMesh.git",
+      "providesIncludes": ["painlessMesh.h"],
+      "dependencies": [
+        {
+          "name": "ArduinoJson"
+        },
+        {
+          "name": "TaskScheduler"
+        }
+      ],
+      "url": "https://downloads.arduino.cc/libraries/gitlab.com/painlessMesh/Painless_Mesh-1.5.0.zip",
+      "archiveFileName": "Painless_Mesh-1.5.0.zip",
+      "size": 293531,
+      "checksum": "SHA-256:9d965064fc704e8ba19c0452cc50e619145f7869b9b135dbf7e521f6ec0a4b33"
+    },
+    {
+      "name": "RF24Mesh",
+      "version": "1.0.0",
+      "author": "TMRh20",
+      "maintainer": "TMRh20",
+      "sentence": "A library for NRF24L01(+) devices mesh.",
+      "paragraph": "Provides a simple and seamless 'mesh' layer for sensor networks, allowing automatic and dynamic configuration that can be customized to suit many scenarios. It is currently designed to interface directly with with the RF24Network Development library, an OSI Network Layer using nRF24L01(+) radios driven by the newly optimized RF24 library fork.",
+      "website": "http://tmrh20.github.io/RF24Mesh/",
+      "category": "Communication",
+      "architectures": ["avr"],
+      "types": ["Contributed"],
+      "repository": "https://github.com/TMRh20/RF24Mesh.git",
+      "url": "https://downloads.arduino.cc/libraries/github.com/TMRh20/RF24Mesh-1.0.0.zip",
+      "archiveFileName": "RF24Mesh-1.0.0.zip",
+      "size": 31419,
+      "checksum": "SHA-256:1b122a6412bc06a33a7fbcef34e2210d0990c25839fd7bc547604103f28194b5"
+    },
+    {
+      "name": "DLLN3X ZigBee Mesh Module Library",
+      "version": "1.0.1",
+      "author": "Duke Liu \u003cmentalflow@ourdocs.cn\u003e",
+      "maintainer": "Duke Liu \u003cmentalflow@ourdocs.cn\u003e",
+      "license": "MIT",
+      "sentence": "This library allows you to use DLLN3X ZigBee mesh module very easily.",
+      "paragraph": "This library currently allows basic send and receive operations using the DLLN3X module, with more features to come.",
+      "website": "https://github.com/mentalfl0w/DLLN3X_zigbee_mesh_module_library",
+      "category": "Communication",
+      "architectures": ["*"],
+      "types": ["Contributed"],
+      "repository": "https://github.com/mentalfl0w/DLLN3X_zigbee_mesh_module_library.git",
+      "providesIncludes": ["DLLN3X.h"],
+      "url": "https://downloads.arduino.cc/libraries/github.com/mentalfl0w/DLLN3X_ZigBee_Mesh_Module_Library-1.0.1.zip",
+      "archiveFileName": "DLLN3X_ZigBee_Mesh_Module_Library-1.0.1.zip",
+      "size": 6122,
+      "checksum": "SHA-256:a28833bbd575ef8deab744a1f0e1175dad9e5329bf5c620fc2fe53e1de1d32ba"
+    }
+  ]
+}
