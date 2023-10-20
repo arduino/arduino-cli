@@ -807,7 +807,7 @@ func TestQualifiedSearch(t *testing.T) {
 	require.Subset(t, libs, expected)
 
 	runSearch := func(args string, expectedLibs []string) {
-		stdout, _, err = cli.Run("lib", "search", "--names", "--json", args)
+		stdout, _, err = cli.Run("lib", "search", "--names", "--format", "json", args)
 		require.NoError(t, err)
 		libraries := requirejson.Parse(t, stdout).Query("[ .libraries | .[] | .name ]").String()
 		for _, l := range expectedLibs {
