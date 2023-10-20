@@ -265,6 +265,27 @@ func (cli *ArduinoCLI) InstallMockedSerialMonitor(t *testing.T) {
 
 // RunWithCustomEnv executes the given arduino-cli command with the given custom env and returns the output.
 func (cli *ArduinoCLI) RunWithCustomEnv(env map[string]string, args ...string) ([]byte, []byte, error) {
+	var stdoutBuf, stderrBuf bytes.Buffer
+	err := cli.run(&stdoutBuf, &stderrBuf, nil, env, args...)
+
+	errBuf := stderrBuf.Bytes()
+	cli.t.NotContains(string(errBuf), "panic: runtime error:", "arduino-cli panicked")
+
+	return stdoutBuf.Bytes(), errBuf, err
+}
+
+// RunWithCustomInput executes the given arduino-cli command pushing the given input stream and returns the output.
+func (cli *ArduinoCLI) RunWithCustomInput(in io.Reader, args ...string) ([]byte, []byte, error) {
+	var stdoutBuf, stderrBuf bytes.Buffer
+	err := cli.run(&stdoutBuf, &stderrBuf, in, cli.cliEnvVars, args...)
+
+	errBuf := stderrBuf.Bytes()
+	cli.t.NotContains(string(errBuf), "panic: runtime error:", "arduino-cli panicked")
+
+	return stdoutBuf.Bytes(), errBuf, err
+}
+
+func (cli *ArduinoCLI) run(stdoutBuff, stderrBuff io.Writer, stdinBuff io.Reader, env map[string]string, args ...string) error {
 	if cli.cliConfigPath != nil {
 		args = append([]string{"--config-file", cli.cliConfigPath.String()}, args...)
 	}
@@ -275,35 +296,44 @@ func (cli *ArduinoCLI) RunWithCustomEnv(env map[string]string, args ...string) (
 	cli.t.NoError(err)
 	stderr, err := cliProc.StderrPipe()
 	cli.t.NoError(err)
-	_, err = cliProc.StdinPipe()
+	stdin, err := cliProc.StdinPipe()
 	cli.t.NoError(err)
 	cliProc.SetDir(cli.WorkingDir().String())
 
 	cli.t.NoError(cliProc.Start())
 
-	var stdoutBuf, stderrBuf bytes.Buffer
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
 		defer wg.Done()
-		if _, err := io.Copy(&stdoutBuf, io.TeeReader(stdout, os.Stdout)); err != nil {
+		if stdoutBuff == nil {
+			stdoutBuff = io.Discard
+		}
+		if _, err := io.Copy(stdoutBuff, io.TeeReader(stdout, os.Stdout)); err != nil {
 			fmt.Println(color.HiBlackString("<<< stdout copy error:"), err)
 		}
 	}()
 	go func() {
 		defer wg.Done()
-		if _, err := io.Copy(&stderrBuf, io.TeeReader(stderr, os.Stderr)); err != nil {
+		if stderrBuff == nil {
+			stderrBuff = io.Discard
+		}
+		if _, err := io.Copy(stderrBuff, io.TeeReader(stderr, os.Stderr)); err != nil {
 			fmt.Println(color.HiBlackString("<<< stderr copy error:"), err)
 		}
 	}()
+	if stdinBuff != nil {
+		go func() {
+			if _, err := io.Copy(stdin, stdinBuff); err != nil {
+				fmt.Println(color.HiBlackString("<<< stdin copy error:"), err)
+			}
+		}()
+	}
 	wg.Wait()
 	cliErr := cliProc.Wait()
 	fmt.Println(color.HiBlackString("<<< Run completed (err = %v)", cliErr))
 
-	errBuf := stderrBuf.Bytes()
-	cli.t.NotContains(string(errBuf), "panic: runtime error:", "arduino-cli panicked")
-
-	return stdoutBuf.Bytes(), errBuf, cliErr
+	return cliErr
 }
 
 // StartDaemon starts the Arduino CLI daemon. It returns the address of the daemon.
