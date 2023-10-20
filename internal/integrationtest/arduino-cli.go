@@ -228,6 +228,33 @@ func (cli *ArduinoCLI) InstallMockedSerialDiscovery(t *testing.T) {
 	}
 }
 
+// InstallMockedSerialMonitor will replace the already installed serial-monitor
+// with a mocked one.
+func (cli *ArduinoCLI) InstallMockedSerialMonitor(t *testing.T) {
+	// Build mocked serial-monitor
+	mockDir := FindRepositoryRootPath(t).Join("internal", "integrationtest", "mock_serial_monitor")
+	gobuild, err := executils.NewProcess(nil, "go", "build")
+	require.NoError(t, err)
+	gobuild.SetDirFromPath(mockDir)
+	require.NoError(t, gobuild.Run(), "Building mocked serial-monitor")
+
+	// Install it replacing the current serial monitor
+	mockBin := mockDir.Join("mock_serial_monitor")
+	dataDir := cli.DataDir()
+	require.NotNil(t, dataDir, "data dir missing")
+	serialMonitors, err := dataDir.Join("packages", "builtin", "tools", "serial-monitor").ReadDirRecursiveFiltered(
+		nil, paths.AndFilter(
+			paths.FilterNames("serial-monitor"),
+			paths.FilterOutDirectories(),
+		),
+	)
+	require.NoError(t, err, "scanning data dir for serial-monitor")
+	require.NotEmpty(t, serialMonitors, "no serial-monitor found in data dir")
+	for _, serialMonitor := range serialMonitors {
+		require.NoError(t, mockBin.CopyTo(serialMonitor), "installing mocked serial monitor to %s", serialMonitor)
+	}
+}
+
 // RunWithCustomEnv executes the given arduino-cli command with the given custom env and returns the output.
 func (cli *ArduinoCLI) RunWithCustomEnv(env map[string]string, args ...string) ([]byte, []byte, error) {
 	if cli.cliConfigPath != nil {

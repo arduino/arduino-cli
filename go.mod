@@ -12,6 +12,7 @@ require (
 	github.com/arduino/go-timeutils v0.0.0-20171220113728-d1dd9e313b1b
 	github.com/arduino/go-win32-utils v1.0.0
 	github.com/arduino/pluggable-discovery-protocol-handler/v2 v2.1.1
+	github.com/arduino/pluggable-monitor-protocol-handler v0.9.2
 	github.com/cmaglie/pb v1.0.27
 	github.com/codeclysm/extract/v3 v3.1.1
 	github.com/djherbis/buffer v1.2.0
@@ -60,6 +61,8 @@ require (
 	github.com/go-git/go-billy/v5 v5.5.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/h2non/filetype v1.1.3 // indirect
+	github.com/hashicorp/errwrap v1.0.0 // indirect
+	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
