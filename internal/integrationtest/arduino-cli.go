@@ -204,12 +204,15 @@ func (cli *ArduinoCLI) convertEnvForExecutils(env map[string]string) []string {
 // InstallMockedSerialDiscovery will replace the already installed serial-discovery
 // with a mocked one.
 func (cli *ArduinoCLI) InstallMockedSerialDiscovery(t *testing.T) {
+	fmt.Println(color.BlueString("<<< Install mocked serial-discovery"))
+
 	// Build mocked serial-discovery
 	mockDir := FindRepositoryRootPath(t).Join("internal", "integrationtest", "mock_serial_discovery")
 	gobuild, err := executils.NewProcess(nil, "go", "build")
 	require.NoError(t, err)
 	gobuild.SetDirFromPath(mockDir)
 	require.NoError(t, gobuild.Run(), "Building mocked serial-discovery")
+	fmt.Println(color.HiBlackString("    Build of mocked serial-discovery succeeded."))
 
 	// Install it replacing the current serial discovery
 	mockBin := mockDir.Join("mock_serial_discovery")
@@ -225,18 +228,22 @@ func (cli *ArduinoCLI) InstallMockedSerialDiscovery(t *testing.T) {
 	require.NotEmpty(t, serialDiscoveries, "no serial-discoveries found in data dir")
 	for _, serialDiscovery := range serialDiscoveries {
 		require.NoError(t, mockBin.CopyTo(serialDiscovery), "installing mocked serial discovery to %s", serialDiscovery)
+		fmt.Println(color.HiBlackString("    Discovery installed in " + serialDiscovery.String()))
 	}
 }
 
 // InstallMockedSerialMonitor will replace the already installed serial-monitor
 // with a mocked one.
 func (cli *ArduinoCLI) InstallMockedSerialMonitor(t *testing.T) {
+	fmt.Println(color.BlueString("<<< Install mocked serial-monitor"))
+
 	// Build mocked serial-monitor
 	mockDir := FindRepositoryRootPath(t).Join("internal", "integrationtest", "mock_serial_monitor")
 	gobuild, err := executils.NewProcess(nil, "go", "build")
 	require.NoError(t, err)
 	gobuild.SetDirFromPath(mockDir)
 	require.NoError(t, gobuild.Run(), "Building mocked serial-monitor")
+	fmt.Println(color.HiBlackString("    Build of mocked serial-monitor succeeded."))
 
 	// Install it replacing the current serial monitor
 	mockBin := mockDir.Join("mock_serial_monitor")
@@ -252,6 +259,7 @@ func (cli *ArduinoCLI) InstallMockedSerialMonitor(t *testing.T) {
 	require.NotEmpty(t, serialMonitors, "no serial-monitor found in data dir")
 	for _, serialMonitor := range serialMonitors {
 		require.NoError(t, mockBin.CopyTo(serialMonitor), "installing mocked serial monitor to %s", serialMonitor)
+		fmt.Println(color.HiBlackString("    Monitor installed in " + serialMonitor.String()))
 	}
 }
 
