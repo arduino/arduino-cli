@@ -97,6 +97,23 @@
       "checksum": "SHA-256:1b122a6412bc06a33a7fbcef34e2210d0990c25839fd7bc547604103f28194b5"
     },
     {
+      "name": "RTCtime",
+      "version": "1.0.5",
+      "author": "smz \u003ctinker@smz.it\u003e",
+      "maintainer": "smz (https://github.com/smz)",
+      "sentence": "A \"Standard C Runtime\" compatible library for interfacing the DS1307 and DS3231 Real Time Clock modules.",
+      "paragraph": "This library is for getting/setting time from hardware RTC modules. It uses an API compatible with the AVR implementation of the Standard C runtime time library as available in the Arduino IDE since version 1.6.10 (AVR C Runtime Library 2.0.0)",
+      "website": "https://github.com/smz/Arduino-RTCtime",
+      "category": "Timing",
+      "architectures": ["*"],
+      "types": ["Contributed"],
+      "repository": "https://github.com/smz/Arduino-RTCtime.git",
+      "url": "https://downloads.arduino.cc/libraries/github.com/smz/RTCtime-1.0.5.zip",
+      "archiveFileName": "RTCtime-1.0.5.zip",
+      "size": 18870,
+      "checksum": "SHA-256:89493bb6d1f834426e82330fdf55a249ff43eb61707831d75deed8644a7ebce8"
+    },
+    {
       "name": "DLLN3X ZigBee Mesh Module Library",
       "version": "1.0.1",
       "author": "Duke Liu \u003cmentalflow@ourdocs.cn\u003e",

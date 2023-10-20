@@ -174,10 +174,10 @@ func TestSearchLibraryWithQualifiers(t *testing.T) {
 	require.Equal(t, "RF24Mesh", res[0])
 
 	res = query("types=contributed")
-	require.Len(t, res, 6)
+	require.Len(t, res, 7)
 
 	res = query("version:1.0")
-	require.Len(t, res, 2)
+	require.Len(t, res, 3)
 
 	res = query("version=1.2.1")
 	require.Len(t, res, 1)
@@ -187,4 +187,9 @@ func TestSearchLibraryWithQualifiers(t *testing.T) {
 	res = query("website:http://")
 	require.Len(t, res, 1)
 	require.Equal(t, "RF24Mesh", res[0])
+
+	// Literal double-quote
+	res = query("sentence:\\\"")
+	require.Len(t, res, 1)
+	require.Equal(t, "RTCtime", res[0])
 }
