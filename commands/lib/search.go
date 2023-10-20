@@ -105,31 +105,25 @@ func matcherFromQueryString(query string) func(*librariesindex.Library) bool {
 		return strings.Join(strs, " ")
 	}
 
-	qualifiers := []struct {
-		key       string
-		extractor func(*librariesindex.Library) string
-	}{
-		// The library name comes from the Library object.
-		{"name", func(lib *librariesindex.Library) string { return lib.Name }},
-
-		// All other values come from the latest Release.
-		{"architectures", func(lib *librariesindex.Library) string { return joinedStrings(lib.Latest.Architectures) }},
-		{"author", func(lib *librariesindex.Library) string { return lib.Latest.Author }},
-		{"category", func(lib *librariesindex.Library) string { return lib.Latest.Category }},
-		{"dependencies", func(lib *librariesindex.Library) string {
-			names := []string{}
-			for _, dep := range lib.Latest.Dependencies {
-				names = append(names, dep.GetName())
-			}
-			return joinedStrings(names)
-		}},
-		{"maintainer", func(lib *librariesindex.Library) string { return lib.Latest.Maintainer }},
-		{"paragraph", func(lib *librariesindex.Library) string { return lib.Latest.Paragraph }},
-		{"sentence", func(lib *librariesindex.Library) string { return lib.Latest.Sentence }},
-		{"types", func(lib *librariesindex.Library) string { return joinedStrings(lib.Latest.Types) }},
-		{"version", func(lib *librariesindex.Library) string { return lib.Latest.Version.String() }},
-		{"website", func(lib *librariesindex.Library) string { return lib.Latest.Website }},
-	}
+var qualifiers map[string]func(lib *librariesindex.Library) string = map[string]func(lib *librariesindex.Library) string{
+	"name":          func(lib *librariesindex.Library) string { return lib.Name },
+	"architectures": func(lib *librariesindex.Library) string { return strings.Join(lib.Latest.Architectures, " ") },
+	"author":        func(lib *librariesindex.Library) string { return lib.Latest.Author },
+	"category":      func(lib *librariesindex.Library) string { return lib.Latest.Category },
+	"dependencies": func(lib *librariesindex.Library) string {
+		names := make([]string, len(lib.Latest.Dependencies))
+		for i, dep := range lib.Latest.Dependencies {
+			names[i] = dep.GetName()
+		}
+		return strings.Join(names, " ")
+	},
+	"maintainer": func(lib *librariesindex.Library) string { return lib.Latest.Maintainer },
+	"paragraph":  func(lib *librariesindex.Library) string { return lib.Latest.Paragraph },
+	"sentence":   func(lib *librariesindex.Library) string { return lib.Latest.Sentence },
+	"types":      func(lib *librariesindex.Library) string { return strings.Join(lib.Latest.Types, " ") },
+	"version":    func(lib *librariesindex.Library) string { return lib.Latest.Version.String() },
+	"website":    func(lib *librariesindex.Library) string { return lib.Latest.Website },
+}
 
 	queryTerms := matcherTokensFromQueryString(query)
 
