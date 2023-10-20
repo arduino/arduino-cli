@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -212,15 +213,20 @@ func (cli *ArduinoCLI) InstallMockedSerialDiscovery(t *testing.T) {
 	require.NoError(t, err)
 	gobuild.SetDirFromPath(mockDir)
 	require.NoError(t, gobuild.Run(), "Building mocked serial-discovery")
+	ext := ""
+	if runtime.GOOS == "windows" {
+		ext = ".exe"
+	}
+	mockBin := mockDir.Join("mock_serial_discovery" + ext)
+	require.True(t, mockBin.Exist())
 	fmt.Println(color.HiBlackString("    Build of mocked serial-discovery succeeded."))
 
 	// Install it replacing the current serial discovery
-	mockBin := mockDir.Join("mock_serial_discovery")
 	dataDir := cli.DataDir()
 	require.NotNil(t, dataDir, "data dir missing")
 	serialDiscoveries, err := dataDir.Join("packages", "builtin", "tools", "serial-discovery").ReadDirRecursiveFiltered(
 		nil, paths.AndFilter(
-			paths.FilterNames("serial-discovery"),
+			paths.FilterNames("serial-discovery"+ext),
 			paths.FilterOutDirectories(),
 		),
 	)
@@ -243,15 +249,20 @@ func (cli *ArduinoCLI) InstallMockedSerialMonitor(t *testing.T) {
 	require.NoError(t, err)
 	gobuild.SetDirFromPath(mockDir)
 	require.NoError(t, gobuild.Run(), "Building mocked serial-monitor")
+	ext := ""
+	if runtime.GOOS == "windows" {
+		ext = ".exe"
+	}
+	mockBin := mockDir.Join("mock_serial_monitor" + ext)
+	require.True(t, mockBin.Exist())
 	fmt.Println(color.HiBlackString("    Build of mocked serial-monitor succeeded."))
 
 	// Install it replacing the current serial monitor
-	mockBin := mockDir.Join("mock_serial_monitor")
 	dataDir := cli.DataDir()
 	require.NotNil(t, dataDir, "data dir missing")
 	serialMonitors, err := dataDir.Join("packages", "builtin", "tools", "serial-monitor").ReadDirRecursiveFiltered(
 		nil, paths.AndFilter(
-			paths.FilterNames("serial-monitor"),
+			paths.FilterNames("serial-monitor"+ext),
 			paths.FilterOutDirectories(),
 		),
 	)
