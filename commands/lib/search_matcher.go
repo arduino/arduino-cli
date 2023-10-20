@@ -110,27 +110,23 @@ func MatcherFromQueryString(query string) func(*librariesindex.Library) bool {
 	return func(lib *librariesindex.Library) bool {
 		matched := true
 		for _, term := range queryTerms {
-
-			if sepIdx := strings.IndexAny(term, "=:"); sepIdx != -1 {
-				potentialKey := term[:sepIdx]
-				separator := term[sepIdx]
-
-				extractor, ok := qualifiers[potentialKey]
-				if ok {
-					target := term[sepIdx+1:]
-					if separator == ':' {
+			if sepIdx := strings.IndexAny(term, ":="); sepIdx != -1 {
+				qualifier, separator, target := term[:sepIdx], term[sepIdx], term[sepIdx+1:]
+				if extractor, ok := qualifiers[qualifier]; ok {
+					switch separator {
+					case ':':
 						matched = (matched && utils.Match(extractor(lib), []string{target}))
-					} else { // "="
+						continue
+					case '=':
 						matched = (matched && strings.ToLower(extractor(lib)) == target)
+						continue
 					}
-				} else {
-					// Unknown qualifier names revert to basic search terms.
-					matched = (matched && utils.Match(defaultLibraryMatchExtractor(lib), []string{term}))
 				}
-			} else {
-				// Terms that do not use qv-syntax are handled as usual.
-				matched = (matched && utils.Match(defaultLibraryMatchExtractor(lib), []string{term}))
 			}
+			// We perform the usual match in the following cases:
+			// 1. Unknown qualifier names revert to basic search terms.
+			// 2. Terms that do not use qv-syntax.
+			matched = (matched && utils.Match(defaultLibraryMatchExtractor(lib), []string{term}))
 		}
 		return matched
 	}
