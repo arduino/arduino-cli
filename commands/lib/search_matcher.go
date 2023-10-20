@@ -92,7 +92,7 @@ var qualifiers map[string]func(lib *librariesindex.Library) string = map[string]
 	"website":    func(lib *librariesindex.Library) string { return lib.Latest.Website },
 }
 
-// matcherFromQueryString returns a closure that takes a library as a
+// MatcherFromQueryString returns a closure that takes a library as a
 // parameter and returns true if the library matches the query.
 func MatcherFromQueryString(query string) func(*librariesindex.Library) bool {
 	// A qv-query is one using <qualifier>[:=]<value> syntax.
