@@ -35,9 +35,6 @@ func InteractiveStreams() (io.Reader, io.Writer, error) {
 	if format != Text {
 		return nil, nil, errors.New(tr("interactive terminal not supported for the '%s' output format", format))
 	}
-	if !isTerminal() {
-		return nil, nil, errors.New(tr("not running in a terminal"))
-	}
 	return os.Stdin, stdOut, nil
 }
 
@@ -45,11 +42,19 @@ var oldStateStdin *term.State
 
 // SetRawModeStdin sets the stdin stream in RAW mode (no buffering, echo disabled,
 // no terminal escape codes nor signals interpreted)
-func SetRawModeStdin() {
+func SetRawModeStdin() error {
 	if oldStateStdin != nil {
 		panic("terminal already in RAW mode")
 	}
-	oldStateStdin, _ = term.MakeRaw(int(os.Stdin.Fd()))
+	if !IsTerminal() {
+		return errors.New(tr("not running in a terminal"))
+	}
+	old, err := term.MakeRaw(int(os.Stdin.Fd()))
+	if err != nil {
+		return err
+	}
+	oldStateStdin = old
+	return nil
 }
 
 // RestoreModeStdin restore the terminal settings to the normal non-RAW state. This
@@ -63,7 +68,8 @@ func RestoreModeStdin() {
 	oldStateStdin = nil
 }
 
-func isTerminal() bool {
+// IsTerminal returns true if there is an interactive terminal
+func IsTerminal() bool {
 	return term.IsTerminal(int(os.Stdin.Fd()))
 }
 
@@ -72,7 +78,7 @@ func InputUserField(prompt string, secret bool) (string, error) {
 	if format != Text {
 		return "", errors.New(tr("user input not supported for the '%s' output format", format))
 	}
-	if !isTerminal() {
+	if !IsTerminal() {
 		return "", errors.New(tr("user input not supported in non interactive mode"))
 	}
 

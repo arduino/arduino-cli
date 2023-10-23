@@ -169,10 +169,12 @@ func runMonitorCmd(portArgs *arguments.Port, fqbn *arguments.Fqbn, configs []str
 
 	ctx, cancel := cleanup.InterruptableContext(context.Background())
 	if raw {
-		feedback.SetRawModeStdin()
-		defer func() {
-			feedback.RestoreModeStdin()
-		}()
+		if feedback.IsTerminal() {
+			if err := feedback.SetRawModeStdin(); err != nil {
+				feedback.Warning(tr("Error setting raw mode: %s", err.Error()))
+			}
+			defer feedback.RestoreModeStdin()
+		}
 
 		// In RAW mode CTRL-C is not converted into an Interrupt by
 		// the terminal, we must intercept ASCII 3 (CTRL-C) on our own...
