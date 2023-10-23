@@ -1182,11 +1182,11 @@ func TestCoreHavingIncompatibleDepTools(t *testing.T) {
 	stdout, _, err = cli.Run("core", "search", "--all", "--format", "json", additionalURLs)
 	require.NoError(t, err)
 	requirejson.Query(t, stdout,
-		`[.[] | select(.id == "foo_vendor:avr") | .releases | map(.) | .[] | {version: .version, incompatible: .incompatible}] | sort_by(.version)`,
+		`[.[] | select(.id == "foo_vendor:avr") | .releases | map(.) | .[] | {version: .version, compatible: .compatible}] | sort_by(.version)`,
 		`[
-			{"incompatible":null,"version":"1.0.0"},
-			{"incompatible":null,"version":"1.0.1"},
-			{"incompatible":true,"version":"1.0.2"}
+			{"compatible":true,"version":"1.0.0"},
+			{"compatible":true,"version":"1.0.1"},
+			{"compatible":false,"version":"1.0.2"}
 		]`,
 	)
 
@@ -1194,7 +1194,7 @@ func TestCoreHavingIncompatibleDepTools(t *testing.T) {
 	stdout, _, err = cli.Run("core", "search", "--format", "json", additionalURLs)
 	require.NoError(t, err)
 	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest_version`, `"1.0.2"`)
-	requirejson.Query(t, stdout, `.[] | select(.id == "incompatible_vendor:avr") | .releases[.latest_version].incompatible`, `true`)
+	requirejson.Query(t, stdout, `.[] | select(.id == "incompatible_vendor:avr") | .releases[.latest_version].compatible`, `false`)
 
 	// In text mode, core search doesn't show any version if no compatible one are present
 	stdout, _, err = cli.Run("core", "search", additionalURLs)

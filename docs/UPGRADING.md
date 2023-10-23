@@ -6,9 +6,9 @@ Here you can find a list of migration guides to handle breaking changes between 
 
 ### The gRPC `cc.arduino.cli.commands.v1.PlatformRelease` has been changed.
 
-We've added a new field called `incompatible`. This field indicates if the current platform release is installable or
-not. It may happen that a platform doesn't have a dependency available for an OS, in such cases, if we try to install
-the platform it will fail. The new field can be used to know upfront if a specific release is installable.
+We've added a new field called `compatible`. This field indicates if the current platform release is installable or not.
+It may happen that a platform doesn't have a dependency available for an OS, in such cases, if we try to install the
+platform it will fail. The new field can be used to know upfront if a specific release is installable.
 
 ### The gRPC `cc.arduino.cli.commands.v1.PlatformSummary` has been changed.
 

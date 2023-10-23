@@ -75,7 +75,7 @@ type PlatformRelease struct {
 	PluggableDiscoveryAware bool                          `json:"-"` // true if the Platform supports pluggable discovery (no compatibility layer required)
 	Monitors                map[string]*MonitorDependency `json:"-"`
 	MonitorsDevRecipes      map[string]string             `json:"-"`
-	Incompatible            bool                          `json:"-"` // true if at least one ToolDependencies is not available for the current OS/ARCH.
+	Compatible              bool                          `json:"-"` // true if at all ToolDependencies are available for the current OS/ARCH.
 }
 
 // BoardManifest contains information about a board. These metadata are usually
@@ -238,7 +238,7 @@ func (platform *Platform) GetLatestCompatibleRelease() *PlatformRelease {
 	}
 	maximum := &PlatformRelease{Version: &semver.Version{}}
 	for _, release := range platform.Releases {
-		if release.Incompatible {
+		if !release.IsCompatible() {
 			continue
 		}
 		if release.Version.GreaterThan(maximum.Version) {
@@ -278,7 +278,7 @@ func (platform *Platform) GetAllReleasesVersions() []*semver.Version {
 func (platform *Platform) GetAllCompatibleReleasesVersions() []*semver.Version {
 	versions := []*semver.Version{}
 	for _, release := range platform.Releases {
-		if release.Incompatible {
+		if !release.IsCompatible() {
 			continue
 		}
 		versions = append(versions, release.Version)
@@ -477,8 +477,8 @@ func (release *PlatformRelease) HasMetadata() bool {
 	return installedJSONPath.Exist()
 }
 
-// IsIncompatible returns true if the PlatformRelease contains tool
-// dependencies that are not available in the current OS/ARCH.
-func (release *PlatformRelease) IsIncompatible() bool {
-	return release.Incompatible
+// IsCompatible returns true if all the tools dependencies of a PlatformRelease
+// are available in the current OS/ARCH.
+func (release *PlatformRelease) IsCompatible() bool {
+	return release.Compatible
 }

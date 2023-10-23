@@ -144,8 +144,9 @@ message PlatformRelease {
   bool missing_metadata = 7;
   // True this release is deprecated
   bool deprecated = 8;
-  // True if the platform contains an incompatible dependency.
-  bool incompatible = 9;
+  // True if the platform dependencies are available for the current OS. This
+  // also means that the platform is installable.
+  bool compatible = 9;
 }
 
 message InstalledPlatformReference {

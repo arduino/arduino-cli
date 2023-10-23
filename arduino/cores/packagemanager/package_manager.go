@@ -121,37 +121,37 @@ func (pmb *Builder) Build() *PackageManager {
 	}
 }
 
-func (pmb *Builder) calculateIncompatibleVersions() {
-	// calculates Incompatible PlatformRelease
+// calculate Compatible PlatformRelease
+func (pmb *Builder) calculateCompatibleReleases() {
 	for _, op := range pmb.packages {
 		for _, p := range op.Platforms {
 			for _, pr := range p.Releases {
-				platformHasIncompatibleTools := func() bool {
+				platformHasAllCompatibleTools := func() bool {
 					for _, td := range pr.ToolDependencies {
 						if td == nil {
-							return true
+							return false
 						}
 
 						_, ok := pmb.packages[td.ToolPackager]
 						if !ok {
-							return true
+							return false
 						}
 						tool := pmb.packages[td.ToolPackager].Tools[td.ToolName]
 						if tool == nil {
-							return true
+							return false
 						}
 						tr := tool.Releases[td.ToolVersion.NormalizedString()]
 						if tr == nil {
-							return true
+							return false
 						}
 
 						if tr.GetCompatibleFlavour() == nil {
-							return true
+							return false
 						}
 					}
-					return false
+					return true
 				}
-				pr.Incompatible = platformHasIncompatibleTools()
+				pr.Compatible = platformHasAllCompatibleTools()
 			}
 		}
 	}
@@ -164,7 +164,7 @@ func (pmb *Builder) calculateIncompatibleVersions() {
 func (pm *PackageManager) NewBuilder() (builder *Builder, commit func()) {
 	pmb := NewBuilder(pm.IndexDir, pm.PackagesDir, pm.DownloadDir, pm.tempDir, pm.userAgent)
 	return pmb, func() {
-		pmb.calculateIncompatibleVersions()
+		pmb.calculateCompatibleReleases()
 		pmb.BuildIntoExistingPackageManager(pm)
 	}
 }

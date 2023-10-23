@@ -110,7 +110,7 @@ func NewPlatformRelease(in *rpc.PlatformRelease) *PlatformRelease {
 		Help:            help,
 		MissingMetadata: in.MissingMetadata,
 		Deprecated:      in.Deprecated,
-		Incompatible:    in.Incompatible,
+		Compatible:      in.Compatible,
 	}
 	return res
 }
@@ -125,7 +125,7 @@ type PlatformRelease struct {
 	Help            *HelpResource `json:"help,omitempty"`
 	MissingMetadata bool          `json:"missing_metadata,omitempty"`
 	Deprecated      bool          `json:"deprecated,omitempty"`
-	Incompatible    bool          `json:"incompatible,omitempty"`
+	Compatible      bool          `json:"compatible"`
 }
 
 // Board maps a rpc.Board
