@@ -83,15 +83,19 @@ func GetInstalledProgrammers() []string {
 func GetUninstallableCores() []string {
 	inst := instance.CreateAndInit()
 
-	platforms, _ := core.PlatformList(&rpc.PlatformListRequest{
-		Instance:      inst,
-		UpdatableOnly: false,
-		All:           false,
+	platforms, _ := core.PlatformSearch(&rpc.PlatformSearchRequest{
+		Instance:          inst,
+		AllVersions:       false,
+		ManuallyInstalled: true,
 	})
+
 	var res []string
 	// transform the data structure for the completion
-	for _, i := range platforms.InstalledPlatforms {
-		res = append(res, i.Id+"\t"+i.Name)
+	for _, i := range platforms.GetSearchOutput() {
+		if i.InstalledVersion == "" {
+			continue
+		}
+		res = append(res, i.GetMetadata().GetId()+"\t"+i.GetInstalledRelease().GetName())
 	}
 	return res
 }
@@ -109,7 +113,7 @@ func GetInstallableCores() []string {
 	var res []string
 	// transform the data structure for the completion
 	for _, i := range platforms.SearchOutput {
-		res = append(res, i.Id+"\t"+i.Name)
+		res = append(res, i.GetMetadata().GetId()+"\t"+i.GetReleases()[i.GetLatestVersion()].GetName())
 	}
 	return res
 }

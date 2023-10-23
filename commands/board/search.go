@@ -22,6 +22,7 @@ import (
 
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/utils"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
@@ -37,7 +38,7 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 	}
 	defer release()
 
-	res := &rpc.BoardSearchResponse{Boards: []*rpc.BoardListItem{}}
+	foundBoards := []*rpc.BoardListItem{}
 	for _, targetPackage := range pme.GetPackages() {
 		for _, platform := range targetPackage.Platforms {
 			latestPlatformRelease := platform.GetLatestRelease()
@@ -45,24 +46,6 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 
 			if latestPlatformRelease == nil && installedPlatformRelease == nil {
 				continue
-			}
-
-			rpcPlatform := &rpc.Platform{
-				Id:                platform.String(),
-				Name:              platform.Name,
-				Maintainer:        platform.Package.Maintainer,
-				Website:           platform.Package.WebsiteURL,
-				Email:             platform.Package.Email,
-				ManuallyInstalled: platform.ManuallyInstalled,
-				Indexed:           platform.Indexed,
-			}
-
-			if latestPlatformRelease != nil {
-				rpcPlatform.Latest = latestPlatformRelease.Version.String()
-			}
-			if installedPlatformRelease != nil {
-				rpcPlatform.Installed = installedPlatformRelease.Version.String()
-				rpcPlatform.MissingMetadata = !installedPlatformRelease.HasMetadata()
 			}
 
 			// Platforms that are not installed don't have a list of boards
@@ -81,11 +64,14 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 						continue
 					}
 
-					res.Boards = append(res.Boards, &rpc.BoardListItem{
+					foundBoards = append(foundBoards, &rpc.BoardListItem{
 						Name:     board.Name(),
 						Fqbn:     board.FQBN(),
 						IsHidden: board.IsHidden(),
-						Platform: rpcPlatform,
+						Platform: &rpc.Platform{
+							Metadata: commands.PlatformToRPCPlatformMetadata(platform),
+							Release:  commands.PlatformReleaseToRPC(installedPlatformRelease),
+						},
 					})
 				}
 			} else if latestPlatformRelease != nil {
@@ -95,20 +81,24 @@ func Search(ctx context.Context, req *rpc.BoardSearchRequest) (*rpc.BoardSearchR
 						continue
 					}
 
-					res.Boards = append(res.Boards, &rpc.BoardListItem{
-						Name:     strings.Trim(board.Name, " \n"),
-						Platform: rpcPlatform,
+					foundBoards = append(foundBoards, &rpc.BoardListItem{
+						Name: strings.Trim(board.Name, " \n"),
+						Platform: &rpc.Platform{
+							Metadata: commands.PlatformToRPCPlatformMetadata(platform),
+							Release:  commands.PlatformReleaseToRPC(latestPlatformRelease),
+						},
 					})
 				}
 			}
 		}
 	}
 
-	sort.Slice(res.Boards, func(i, j int) bool {
-		if res.Boards[i].Name != res.Boards[j].Name {
-			return res.Boards[i].Name < res.Boards[j].Name
+	sort.Slice(foundBoards, func(i, j int) bool {
+		if foundBoards[i].Name != foundBoards[j].Name {
+			return foundBoards[i].Name < foundBoards[j].Name
 		}
-		return res.Boards[i].Platform.Id < res.Boards[j].Platform.Id
+		return foundBoards[i].Platform.Metadata.Id < foundBoards[j].Platform.Metadata.Id
 	})
-	return res, nil
+
+	return &rpc.BoardSearchResponse{Boards: foundBoards}, nil
 }

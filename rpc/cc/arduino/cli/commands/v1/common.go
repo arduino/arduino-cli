@@ -15,6 +15,12 @@
 
 package commands
 
+import (
+	"sort"
+
+	semver "go.bug.st/relaxed-semver"
+)
+
 // DownloadProgressCB is a callback to get updates on download progress
 type DownloadProgressCB func(curr *DownloadProgress)
 
@@ -56,3 +62,39 @@ func (d DownloadProgressCB) End(success bool, message string) {
 
 // TaskProgressCB is a callback to receive progress messages
 type TaskProgressCB func(msg *TaskProgress)
+
+// InstanceCommand is an interface that represents a gRPC command with
+// a gRPC Instance.
+type InstanceCommand interface {
+	GetInstance() *Instance
+}
+
+// GetLatestRelease returns the latest release in this PlatformSummary,
+// or nil if not available.
+func (s *PlatformSummary) GetLatestRelease() *PlatformRelease {
+	if s.LatestVersion == "" {
+		return nil
+	}
+	return s.Releases[s.LatestVersion]
+}
+
+// GetInstalledRelease returns the latest release in this PlatformSummary,
+// or nil if not available.
+func (s *PlatformSummary) GetInstalledRelease() *PlatformRelease {
+	if s.InstalledVersion == "" {
+		return nil
+	}
+	return s.Releases[s.InstalledVersion]
+}
+
+// GetSortedReleases returns the releases in order of version.
+func (s *PlatformSummary) GetSortedReleases() []*PlatformRelease {
+	res := []*PlatformRelease{}
+	for _, release := range s.GetReleases() {
+		res = append(res, release)
+	}
+	sort.SliceStable(res, func(i, j int) bool {
+		return semver.ParseRelaxed(res[i].Version).LessThan(semver.ParseRelaxed(res[j].Version))
+	})
+	return res
+}

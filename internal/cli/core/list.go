@@ -21,6 +21,7 @@ import (
 
 	"github.com/arduino/arduino-cli/commands/core"
 	"github.com/arduino/arduino-cli/internal/cli/feedback"
+	"github.com/arduino/arduino-cli/internal/cli/feedback/result"
 	"github.com/arduino/arduino-cli/internal/cli/instance"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	"github.com/arduino/arduino-cli/table"
@@ -55,44 +56,76 @@ func runListCommand(args []string, all bool, updatableOnly bool) {
 // List gets and prints a list of installed platforms.
 func List(inst *rpc.Instance, all bool, updatableOnly bool) {
 	platforms := GetList(inst, all, updatableOnly)
-	feedback.PrintResult(installedResult{platforms})
+	feedback.PrintResult(newCoreListResult(platforms))
 }
 
 // GetList returns a list of installed platforms.
-func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.Platform {
-	platforms, err := core.PlatformList(&rpc.PlatformListRequest{
-		Instance:      inst,
-		UpdatableOnly: updatableOnly,
-		All:           all,
+func GetList(inst *rpc.Instance, all bool, updatableOnly bool) []*rpc.PlatformSummary {
+	platforms, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
+		Instance:          inst,
+		AllVersions:       true,
+		ManuallyInstalled: true,
 	})
 	if err != nil {
 		feedback.Fatal(tr("Error listing platforms: %v", err), feedback.ErrGeneric)
 	}
-	return platforms.InstalledPlatforms
+
+	// If both `all` and `updatableOnly` are set, `all` takes precedence.
+	if all {
+		return platforms.GetSearchOutput()
+	}
+
+	result := []*rpc.PlatformSummary{}
+	for _, platform := range platforms.GetSearchOutput() {
+		if platform.InstalledVersion == "" && !platform.GetMetadata().ManuallyInstalled {
+			continue
+		}
+		if updatableOnly && platform.InstalledVersion == platform.LatestVersion {
+			continue
+		}
+		result = append(result, platform)
+	}
+	return result
 }
 
-// output from this command requires special formatting, let's create a dedicated
-// feedback.Result implementation
-type installedResult struct {
-	platforms []*rpc.Platform
+func newCoreListResult(in []*rpc.PlatformSummary) *coreListResult {
+	res := &coreListResult{}
+	for _, platformSummary := range in {
+		res.platforms = append(res.platforms, result.NewPlatformResult(platformSummary))
+	}
+	return res
 }
 
-func (ir installedResult) Data() interface{} {
+type coreListResult struct {
+	platforms []*result.Platform
+}
+
+// Data implements Result interface
+func (ir coreListResult) Data() interface{} {
 	return ir.platforms
 }
 
-func (ir installedResult) String() string {
+// String implements Result interface
+func (ir coreListResult) String() string {
 	if len(ir.platforms) == 0 {
 		return tr("No platforms installed.")
 	}
 	t := table.New()
 	t.SetHeader(tr("ID"), tr("Installed"), tr("Latest"), tr("Name"))
-	for _, p := range ir.platforms {
-		name := p.Name
-		if p.Deprecated {
+	for _, platform := range ir.platforms {
+		name := ""
+		if installed := platform.GetInstalledRelease(); installed != nil {
+			name = installed.Name
+		}
+		if name == "" {
+			if latest := platform.GetLatestRelease(); latest != nil {
+				name = latest.Name
+			}
+		}
+		if platform.Deprecated {
 			name = fmt.Sprintf("[%s] %s", tr("DEPRECATED"), name)
 		}
-		t.AddRow(p.Id, p.Installed, p.Latest, name)
+		t.AddRow(platform.Id, platform.InstalledVersion, platform.LatestVersion, name)
 	}
 
 	return t.Render()

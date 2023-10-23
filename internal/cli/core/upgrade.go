@@ -60,21 +60,36 @@ func runUpgradeCommand(args []string, skipPostInstall bool, skipPreUninstall boo
 func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUninstall bool) {
 	// if no platform was passed, upgrade allthethings
 	if len(args) == 0 {
-		targets, err := core.PlatformList(&rpc.PlatformListRequest{
-			Instance:      inst,
-			UpdatableOnly: true,
+		platforms, err := core.PlatformSearch(&rpc.PlatformSearchRequest{
+			Instance:    inst,
+			AllVersions: false,
 		})
 		if err != nil {
 			feedback.Fatal(tr("Error retrieving core list: %v", err), feedback.ErrGeneric)
 		}
 
-		if len(targets.InstalledPlatforms) == 0 {
+		targets := []*rpc.Platform{}
+		for _, platform := range platforms.GetSearchOutput() {
+			if platform.InstalledVersion == "" {
+				continue
+			}
+			if platform.InstalledVersion == platform.LatestVersion {
+				// if it's not updatable, skip it
+				continue
+			}
+			targets = append(targets, &rpc.Platform{
+				Metadata: platform.GetMetadata(),
+				Release:  platform.GetLatestRelease(),
+			})
+		}
+
+		if len(targets) == 0 {
 			feedback.Print(tr("All the cores are already at the latest version"))
 			return
 		}
 
-		for _, t := range targets.InstalledPlatforms {
-			args = append(args, t.Id)
+		for _, t := range targets {
+			args = append(args, t.GetMetadata().Id)
 		}
 	}
 
@@ -82,8 +97,8 @@ func Upgrade(inst *rpc.Instance, args []string, skipPostInstall bool, skipPreUni
 		if response == nil || response.Platform == nil {
 			return
 		}
-		if !response.Platform.Indexed {
-			feedback.Warning(tr("missing package index for %s, future updates cannot be guaranteed", response.Platform.Id))
+		if !response.Platform.GetMetadata().Indexed {
+			feedback.Warning(tr("missing package index for %s, future updates cannot be guaranteed", response.Platform.GetMetadata().Id))
 		}
 	}
 

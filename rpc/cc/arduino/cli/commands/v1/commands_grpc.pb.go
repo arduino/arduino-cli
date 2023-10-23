@@ -60,7 +60,6 @@ const (
 	ArduinoCoreService_ListProgrammersAvailableForUpload_FullMethodName = "/cc.arduino.cli.commands.v1.ArduinoCoreService/ListProgrammersAvailableForUpload"
 	ArduinoCoreService_BurnBootloader_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/BurnBootloader"
 	ArduinoCoreService_PlatformSearch_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/PlatformSearch"
-	ArduinoCoreService_PlatformList_FullMethodName                      = "/cc.arduino.cli.commands.v1.ArduinoCoreService/PlatformList"
 	ArduinoCoreService_LibraryDownload_FullMethodName                   = "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryDownload"
 	ArduinoCoreService_LibraryInstall_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryInstall"
 	ArduinoCoreService_LibraryUpgrade_FullMethodName                    = "/cc.arduino.cli.commands.v1.ArduinoCoreService/LibraryUpgrade"
@@ -139,8 +138,6 @@ type ArduinoCoreServiceClient interface {
 	BurnBootloader(ctx context.Context, in *BurnBootloaderRequest, opts ...grpc.CallOption) (ArduinoCoreService_BurnBootloaderClient, error)
 	// Search for a platform in the platforms indexes.
 	PlatformSearch(ctx context.Context, in *PlatformSearchRequest, opts ...grpc.CallOption) (*PlatformSearchResponse, error)
-	// List all installed platforms.
-	PlatformList(ctx context.Context, in *PlatformListRequest, opts ...grpc.CallOption) (*PlatformListResponse, error)
 	// Download the archive file of an Arduino library in the libraries index to
 	// the staging directory.
 	LibraryDownload(ctx context.Context, in *LibraryDownloadRequest, opts ...grpc.CallOption) (ArduinoCoreService_LibraryDownloadClient, error)
@@ -690,15 +687,6 @@ func (c *arduinoCoreServiceClient) PlatformSearch(ctx context.Context, in *Platf
 	return out, nil
 }
 
-func (c *arduinoCoreServiceClient) PlatformList(ctx context.Context, in *PlatformListRequest, opts ...grpc.CallOption) (*PlatformListResponse, error) {
-	out := new(PlatformListResponse)
-	err := c.cc.Invoke(ctx, ArduinoCoreService_PlatformList_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *arduinoCoreServiceClient) LibraryDownload(ctx context.Context, in *LibraryDownloadRequest, opts ...grpc.CallOption) (ArduinoCoreService_LibraryDownloadClient, error) {
 	stream, err := c.cc.NewStream(ctx, &ArduinoCoreService_ServiceDesc.Streams[12], ArduinoCoreService_LibraryDownload_FullMethodName, opts...)
 	if err != nil {
@@ -1092,8 +1080,6 @@ type ArduinoCoreServiceServer interface {
 	BurnBootloader(*BurnBootloaderRequest, ArduinoCoreService_BurnBootloaderServer) error
 	// Search for a platform in the platforms indexes.
 	PlatformSearch(context.Context, *PlatformSearchRequest) (*PlatformSearchResponse, error)
-	// List all installed platforms.
-	PlatformList(context.Context, *PlatformListRequest) (*PlatformListResponse, error)
 	// Download the archive file of an Arduino library in the libraries index to
 	// the staging directory.
 	LibraryDownload(*LibraryDownloadRequest, ArduinoCoreService_LibraryDownloadServer) error
@@ -1207,9 +1193,6 @@ func (UnimplementedArduinoCoreServiceServer) BurnBootloader(*BurnBootloaderReque
 }
 func (UnimplementedArduinoCoreServiceServer) PlatformSearch(context.Context, *PlatformSearchRequest) (*PlatformSearchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PlatformSearch not implemented")
-}
-func (UnimplementedArduinoCoreServiceServer) PlatformList(context.Context, *PlatformListRequest) (*PlatformListResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PlatformList not implemented")
 }
 func (UnimplementedArduinoCoreServiceServer) LibraryDownload(*LibraryDownloadRequest, ArduinoCoreService_LibraryDownloadServer) error {
 	return status.Errorf(codes.Unimplemented, "method LibraryDownload not implemented")
@@ -1770,24 +1753,6 @@ func _ArduinoCoreService_PlatformSearch_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ArduinoCoreService_PlatformList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PlatformListRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ArduinoCoreServiceServer).PlatformList(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ArduinoCoreService_PlatformList_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ArduinoCoreServiceServer).PlatformList(ctx, req.(*PlatformListRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _ArduinoCoreService_LibraryDownload_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(LibraryDownloadRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -2139,10 +2104,6 @@ var ArduinoCoreService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PlatformSearch",
 			Handler:    _ArduinoCoreService_PlatformSearch_Handler,
-		},
-		{
-			MethodName: "PlatformList",
-			Handler:    _ArduinoCoreService_PlatformList_Handler,
 		},
 		{
 			MethodName: "LibraryResolveDependencies",

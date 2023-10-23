@@ -66,6 +66,7 @@ func ParseReference(arg string) (*Reference, error) {
 	if arg == "" {
 		return nil, fmt.Errorf(tr("invalid empty core argument"))
 	}
+
 	toks := strings.SplitN(arg, "@", 2)
 	if toks[0] == "" {
 		return nil, fmt.Errorf(tr("invalid empty core reference '%s'"), arg)
@@ -85,23 +86,22 @@ func ParseReference(arg string) (*Reference, error) {
 	if toks[0] == "" {
 		return nil, fmt.Errorf(tr("invalid empty core name '%s'"), arg)
 	}
-	ret.PackageName = toks[0]
 	if toks[1] == "" {
 		return nil, fmt.Errorf(tr("invalid empty core architecture '%s'"), arg)
 	}
+	ret.PackageName = toks[0]
 	ret.Architecture = toks[1]
 
 	// Now that we have the required informations in `ret` we can
 	// try to use core.PlatformList to optimize what the user typed
 	// (by replacing the PackageName and Architecture in ret with the content of core.GetPlatform())
-	platforms, _ := core.PlatformList(&rpc.PlatformListRequest{
-		Instance:      instance.CreateAndInit(),
-		UpdatableOnly: false,
-		All:           true, // this is true because we want also the installable platforms
+	platforms, _ := core.PlatformSearch(&rpc.PlatformSearchRequest{
+		Instance:    instance.CreateAndInit(),
+		AllVersions: false,
 	})
 	foundPlatforms := []string{}
-	for _, platform := range platforms.InstalledPlatforms {
-		platformID := platform.GetId()
+	for _, platform := range platforms.GetSearchOutput() {
+		platformID := platform.GetMetadata().GetId()
 		platformUser := ret.PackageName + ":" + ret.Architecture
 		// At first we check if the platform the user is searching for matches an available one,
 		// this way we do not need to adapt the casing and we can return it directly
@@ -110,7 +110,6 @@ func ParseReference(arg string) (*Reference, error) {
 		}
 		if strings.EqualFold(platformUser, platformID) {
 			logrus.Infof("Found possible match for reference %s -> %s", platformUser, platformID)
-			toks = strings.Split(platformID, ":")
 			foundPlatforms = append(foundPlatforms, platformID)
 		}
 	}
@@ -122,6 +121,7 @@ func ParseReference(arg string) (*Reference, error) {
 	if len(foundPlatforms) > 1 {
 		return nil, &arduino.MultiplePlatformsError{Platforms: foundPlatforms, UserPlatform: arg}
 	}
+	toks = strings.Split(foundPlatforms[0], ":")
 	ret.PackageName = toks[0]
 	ret.Architecture = toks[1]
 	return ret, nil

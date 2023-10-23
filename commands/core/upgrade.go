@@ -49,10 +49,12 @@ func PlatformUpgrade(ctx context.Context, req *rpc.PlatformUpgradeRequest, downl
 	}
 
 	var rpcPlatform *rpc.Platform
-
 	platformRelease, err := upgrade()
 	if platformRelease != nil {
-		rpcPlatform = commands.PlatformReleaseToRPC(platformRelease)
+		rpcPlatform = &rpc.Platform{
+			Metadata: commands.PlatformToRPCPlatformMetadata(platformRelease.Platform),
+			Release:  commands.PlatformReleaseToRPC(platformRelease),
+		}
 	}
 	if err != nil {
 		return &rpc.PlatformUpgradeResponse{Platform: rpcPlatform}, err

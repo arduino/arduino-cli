@@ -23,6 +23,7 @@ import (
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/cores"
 	"github.com/arduino/arduino-cli/arduino/utils"
+	"github.com/arduino/arduino-cli/commands"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 )
@@ -46,29 +47,14 @@ func ListAll(ctx context.Context, req *rpc.BoardListAllRequest) (*rpc.BoardListA
 				continue
 			}
 
-			installedVersion := installedPlatformRelease.Version.String()
-
-			latestVersion := ""
-			if latestPlatformRelease := platform.GetLatestRelease(); latestPlatformRelease != nil {
-				latestVersion = latestPlatformRelease.Version.String()
-			}
-
 			rpcPlatform := &rpc.Platform{
-				Id:                platform.String(),
-				Installed:         installedVersion,
-				Latest:            latestVersion,
-				Name:              platform.Name,
-				Maintainer:        platform.Package.Maintainer,
-				Website:           platform.Package.WebsiteURL,
-				Email:             platform.Package.Email,
-				ManuallyInstalled: platform.ManuallyInstalled,
-				Indexed:           platform.Indexed,
-				MissingMetadata:   !installedPlatformRelease.HasMetadata(),
+				Metadata: commands.PlatformToRPCPlatformMetadata(platform),
+				Release:  commands.PlatformReleaseToRPC(installedPlatformRelease),
 			}
 
 			toTest := []string{
 				platform.String(),
-				platform.Name,
+				installedPlatformRelease.Name,
 				platform.Architecture,
 				targetPackage.Name,
 				targetPackage.Maintainer,

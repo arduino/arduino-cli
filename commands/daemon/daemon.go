@@ -258,12 +258,6 @@ func (s *ArduinoCoreServerImpl) PlatformSearch(ctx context.Context, req *rpc.Pla
 	return resp, convertErrorToRPCStatus(err)
 }
 
-// PlatformList FIXMEDOC
-func (s *ArduinoCoreServerImpl) PlatformList(ctx context.Context, req *rpc.PlatformListRequest) (*rpc.PlatformListResponse, error) {
-	platforms, err := core.PlatformList(req)
-	return platforms, convertErrorToRPCStatus(err)
-}
-
 // Upload FIXMEDOC
 func (s *ArduinoCoreServerImpl) Upload(req *rpc.UploadRequest, stream rpc.ArduinoCoreService_UploadServer) error {
 	syncSend := NewSynchronizedSend(stream.Send)

@@ -45,7 +45,7 @@ func (pmb *Builder) LoadHardwareForProfile(p *sketch.Profile, installMissing boo
 			logrus.WithField("platform", platformRef).WithError(err).Debugf("Error loading platform for profile")
 		} else {
 			platformReleases = append(platformReleases, platformRelease)
-			indexURLs[platformRelease.Platform.Name] = platformRef.PlatformIndexURL
+			indexURLs[platformRelease.Name] = platformRef.PlatformIndexURL
 			logrus.WithField("platform", platformRef).Debugf("Loaded platform for profile")
 		}
 	}

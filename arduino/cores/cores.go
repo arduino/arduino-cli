@@ -37,14 +37,13 @@ import (
 
 // Platform represents a platform package.
 type Platform struct {
-	Architecture      string // The name of the architecture of this package.
-	Name              string
-	Category          string
+	Architecture      string                                       // The name of the architecture of this package.
 	Releases          map[semver.NormalizedString]*PlatformRelease // The Releases of this platform, labeled by version.
 	Package           *Package                                     `json:"-"`
 	ManuallyInstalled bool                                         // true if the Platform has been installed without the CLI
-	Deprecated        bool                                         // true if the Platform has been deprecated
+	Deprecated        bool                                         // true if the latest PlatformRelease of this Platform has been deprecated
 	Indexed           bool                                         // true if the Platform has been indexed from additional-urls
+	Latest            *semver.Version                              `json:"-"`
 }
 
 // PlatformReleaseHelp represents the help URL for this Platform release
@@ -54,12 +53,15 @@ type PlatformReleaseHelp struct {
 
 // PlatformRelease represents a release of a plaform package.
 type PlatformRelease struct {
+	Name                    string
+	Category                string
 	Resource                *resources.DownloadResource
 	Version                 *semver.Version
 	BoardsManifest          []*BoardManifest
 	ToolDependencies        ToolDependencies
 	DiscoveryDependencies   DiscoveryDependencies
 	MonitorDependencies     MonitorDependencies
+	Deprecated              bool
 	Help                    PlatformReleaseHelp           `json:"-"`
 	Platform                *Platform                     `json:"-"`
 	Properties              *properties.Map               `json:"-"`
@@ -407,7 +409,7 @@ func (release *PlatformRelease) MarshalJSON() ([]byte, error) {
 		ID:        release.Platform.String(),
 		Installed: release.Version.String(),
 		Latest:    latestStr,
-		Name:      release.Platform.Name,
+		Name:      release.Name,
 	})
 }
 
