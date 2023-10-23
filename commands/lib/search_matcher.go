@@ -84,8 +84,10 @@ var qualifiers map[string]func(lib *librariesindex.Library) string = map[string]
 		}
 		return strings.Join(names, " ")
 	},
+	"license":    func(lib *librariesindex.Library) string { return lib.Latest.License },
 	"maintainer": func(lib *librariesindex.Library) string { return lib.Latest.Maintainer },
 	"paragraph":  func(lib *librariesindex.Library) string { return lib.Latest.Paragraph },
+	"provides":   func(lib *librariesindex.Library) string { return strings.Join(lib.Latest.ProvidesIncludes, " ") },
 	"sentence":   func(lib *librariesindex.Library) string { return lib.Latest.Sentence },
 	"types":      func(lib *librariesindex.Library) string { return strings.Join(lib.Latest.Types, " ") },
 	"version":    func(lib *librariesindex.Library) string { return lib.Latest.Version.String() },

@@ -192,4 +192,15 @@ func TestSearchLibraryWithQualifiers(t *testing.T) {
 	res = query("sentence:\\\"")
 	require.Len(t, res, 1)
 	require.Equal(t, "RTCtime", res[0])
+
+	res = query("license=MIT")
+	require.Len(t, res, 2)
+
+	// Empty string
+	res = query("license=\"\"")
+	require.Len(t, res, 5)
+
+	res = query("provides:painlessmesh.h")
+	require.Len(t, res, 1)
+	require.Equal(t, "Painless Mesh", res[0])
 }
