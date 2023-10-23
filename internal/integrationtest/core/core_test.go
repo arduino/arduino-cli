@@ -178,11 +178,11 @@ func TestCoreSearchNoArgs(t *testing.T) {
 	require.Contains(t, lines, []string{"test:x86", "2.0.0", "test_core"})
 	numPlatforms := len(lines) - 1
 
-	// same thing in JSON format, also check the number of platforms found is the same
+	// Same thing in JSON format, also check the number of platforms found is the same
 	stdout, _, err = cli.Run("core", "search", "--format", "json")
 	require.NoError(t, err)
 	requirejson.Contains(t, stdout, `[{"id": "test:x86", "releases": { "2.0.0": {"name":"test_core"}}}]`)
-	requirejson.Query(t, stdout, "length", fmt.Sprint(numPlatforms))
+	requirejson.Query(t, stdout, `[.[] | select(.latest_compatible_version != "")] | length`, fmt.Sprint(numPlatforms))
 
 	// list all with additional urls, check the test core is there
 	stdout, _, err = cli.Run("core", "search", "--additional-urls="+url.String())
@@ -199,9 +199,7 @@ func TestCoreSearchNoArgs(t *testing.T) {
 	stdout, _, err = cli.Run("core", "search", "--format", "json", "--additional-urls="+url.String())
 	require.NoError(t, err)
 	requirejson.Contains(t, stdout, `[{"id": "test:x86", "releases": { "3.0.0": {"name":"test_core"}}}]`)
-	// A platform could contain multiple releases, we get the length of how many releases are present for each platform
-	// and we sum them to see if the expected numers matches.
-	requirejson.Query(t, stdout, `[.[].releases | length] | add`, fmt.Sprint(numPlatforms))
+	requirejson.Query(t, stdout, `[.[] | select(.latest_compatible_version != "")] | length`, fmt.Sprint(numPlatforms))
 }
 
 func TestCoreUpdateIndexUrlNotFound(t *testing.T) {
@@ -695,7 +693,7 @@ func TestCoreSearchSortedResults(t *testing.T) {
 	require.NoError(t, err)
 
 	out := strings.Split(strings.TrimSpace(string(stdout)), "\n")
-	var lines, deprecated, notDeprecated, incompatibles [][]string
+	var lines, deprecated, notDeprecated [][]string
 	for i, v := range out {
 		if i > 0 {
 			v = strings.Join(strings.Fields(v), " ")
@@ -707,11 +705,7 @@ func TestCoreSearchSortedResults(t *testing.T) {
 			deprecated = append(deprecated, v)
 			continue
 		}
-		if _, err := semver.Parse(v[1]); err != nil {
-			incompatibles = append(incompatibles, v)
-		} else {
-			notDeprecated = append(notDeprecated, v)
-		}
+		notDeprecated = append(notDeprecated, v)
 	}
 
 	// verify that results are already sorted correctly
@@ -721,13 +715,9 @@ func TestCoreSearchSortedResults(t *testing.T) {
 	require.True(t, sort.SliceIsSorted(notDeprecated, func(i, j int) bool {
 		return strings.ToLower(notDeprecated[i][2]) < strings.ToLower(notDeprecated[j][2])
 	}))
-	require.True(t, sort.SliceIsSorted(incompatibles, func(i, j int) bool {
-		return strings.ToLower(incompatibles[i][2]) < strings.ToLower(incompatibles[j][2])
-	}))
 
-	result := append(notDeprecated, incompatibles...)
 	// verify that deprecated platforms are the last ones
-	require.Equal(t, lines, append(result, deprecated...))
+	require.Equal(t, lines, append(notDeprecated, deprecated...))
 
 	// test same behaviour with json output
 	stdout, _, err = cli.Run("core", "search", "--additional-urls="+url.String(), "--format=json")
@@ -1134,15 +1124,15 @@ func TestCoreHavingIncompatibleDepTools(t *testing.T) {
 	stdout, _, err := cli.Run("core", "list", "--all", "--format", "json", additionalURLs)
 	require.NoError(t, err)
 	t.Log(string(stdout))
-	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest`, `"1.0.2"`)
-	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest_compatible`, `"1.0.1"`)
+	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest_version`, `"1.0.2"`)
+	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest_compatible_version`, `"1.0.1"`)
 
 	// install latest compatible version
 	_, _, err = cli.Run("core", "install", "foo_vendor:avr", additionalURLs)
 	require.NoError(t, err)
 	stdout, _, err = cli.Run("core", "list", "--all", "--format", "json", additionalURLs)
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest_compatible`, `"1.0.1"`)
+	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest_compatible_version`, `"1.0.1"`)
 
 	// install incompatible version
 	_, stderr, err := cli.Run("core", "install", "foo_vendor:avr@1.0.2", additionalURLs)
@@ -1154,26 +1144,34 @@ func TestCoreHavingIncompatibleDepTools(t *testing.T) {
 	require.NoError(t, err)
 	stdout, _, err = cli.Run("core", "list", "--format", "json", additionalURLs)
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .installed`, `"1.0.0"`)
+	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .installed_version`, `"1.0.0"`)
 
 	// Lists all updatable cores
 	stdout, _, err = cli.Run("core", "list", "--updatable", "--format", "json", additionalURLs)
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest_compatible`, `"1.0.1"`)
+	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest_compatible_version`, `"1.0.1"`)
+
+	// Show outdated cores, must show latest compatible
+	stdout, _, err = cli.Run("outdated", "--format", "json", additionalURLs)
+	require.NoError(t, err)
+	requirejson.Query(t, stdout,
+		`.platforms | .[] | select(.id == "foo_vendor:avr") | {latest_compatible: .latest_compatible_version, latest: .latest_version}`,
+		`{"latest_compatible": "1.0.1", "latest": "1.0.2"}`,
+	)
 
 	// upgrade to latest compatible (1.0.0 -> 1.0.1)
 	_, _, err = cli.Run("core", "upgrade", "foo_vendor:avr", "--format", "json", additionalURLs)
 	require.NoError(t, err)
 	stdout, _, err = cli.Run("core", "list", "--format", "json", additionalURLs)
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .installed`, `"1.0.1"`)
+	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .installed_version`, `"1.0.1"`)
 
 	// upgrade to latest incompatible not possible (1.0.1 -> 1.0.2)
 	_, _, err = cli.Run("core", "upgrade", "foo_vendor:avr", "--format", "json", additionalURLs)
 	require.NoError(t, err)
 	stdout, _, err = cli.Run("core", "list", "--format", "json", additionalURLs)
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .installed`, `"1.0.1"`)
+	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .installed_version`, `"1.0.1"`)
 
 	// When no compatible version are found return error
 	_, stderr, err = cli.Run("core", "install", "incompatible_vendor:avr", additionalURLs)
@@ -1184,19 +1182,19 @@ func TestCoreHavingIncompatibleDepTools(t *testing.T) {
 	stdout, _, err = cli.Run("core", "search", "--all", "--format", "json", additionalURLs)
 	require.NoError(t, err)
 	requirejson.Query(t, stdout,
-		`[.[] | select(.id == "foo_vendor:avr") | {latest: .latest, incompatible: .incompatible}] | sort_by(.latest)`,
+		`[.[] | select(.id == "foo_vendor:avr") | .releases | map(.) | .[] | {version: .version, incompatible: .incompatible}] | sort_by(.version)`,
 		`[
-			{"incompatible":null,"latest":"1.0.0"},
-			{"incompatible":null,"latest":"1.0.1"},
-			{"incompatible":true,"latest":"1.0.2"}
+			{"incompatible":null,"version":"1.0.0"},
+			{"incompatible":null,"version":"1.0.1"},
+			{"incompatible":true,"version":"1.0.2"}
 		]`,
 	)
 
-	// Core search shows latest compatible version
+	// Core search shows latest compatible version even if incompatible
 	stdout, _, err = cli.Run("core", "search", "--format", "json", additionalURLs)
 	require.NoError(t, err)
-	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest`, `"1.0.1"`)
-	requirejson.Query(t, stdout, `.[] | select(.id == "incompatible_vendor:avr") | .incompatible`, `true`)
+	requirejson.Query(t, stdout, `.[] | select(.id == "foo_vendor:avr") | .latest_version`, `"1.0.2"`)
+	requirejson.Query(t, stdout, `.[] | select(.id == "incompatible_vendor:avr") | .releases[.latest_version].incompatible`, `true`)
 
 	// In text mode, core search doesn't show any version if no compatible one are present
 	stdout, _, err = cli.Run("core", "search", additionalURLs)
@@ -1205,5 +1203,5 @@ func TestCoreHavingIncompatibleDepTools(t *testing.T) {
 	for _, v := range strings.Split(strings.TrimSpace(string(stdout)), "\n") {
 		lines = append(lines, strings.Fields(strings.TrimSpace(v)))
 	}
-	require.Contains(t, lines, []string{"incompatible_vendor:avr", "Incompatible", "Boards"})
+	require.NotContains(t, lines, []string{"incompatible_vendor:avr"})
 }
