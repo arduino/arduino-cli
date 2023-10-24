@@ -788,6 +788,29 @@ func TestSearch(t *testing.T) {
 	runSearch("json", []string{"ArduinoJson", "Arduino_JSON"})
 }
 
+func TestQualifiedSearch(t *testing.T) {
+	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
+	defer env.CleanUp()
+
+	runSearch := func(args string, expectedLibs []string) {
+		stdout, _, err := cli.Run("lib", "search", "--names", "--format", "json", args)
+		require.NoError(t, err)
+		libraries := requirejson.Parse(t, stdout).Query("[ .libraries | .[] | .name ]").String()
+		for _, l := range expectedLibs {
+			require.Contains(t, libraries, l)
+		}
+	}
+	runSearch("name:MKRIoTCarrier", []string{"Arduino_MKRIoTCarrier"})
+	runSearch("name=Arduino_MKRIoTCarrier", []string{"Arduino_MKRIoTCarrier"})
+	// Embedded space in double-quoted string
+	runSearch("name=\"dht sensor library\"", []string{"DHT sensor library"})
+	// No closing double-quote
+	runSearch("name=\"dht sensor library", []string{"DHT sensor library"})
+	runSearch("name:\"sensor dht\"", []string{})
+	// Literal double-quote
+	runSearch("sentence:\\\"", []string{"RTCtime"})
+}
+
 func TestSearchParagraph(t *testing.T) {
 	env, cli := integrationtest.CreateArduinoCLIWithEnvironment(t)
 	defer env.CleanUp()

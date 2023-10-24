@@ -37,11 +37,60 @@ func initSearchCommand() *cobra.Command {
 	var namesOnly bool
 	var omitReleasesDetails bool
 	searchCommand := &cobra.Command{
-		Use:     fmt.Sprintf("search [%s]", tr("LIBRARY_NAME")),
-		Short:   tr("Searches for one or more libraries data."),
-		Long:    tr("Search for one or more libraries data (case insensitive search)."),
-		Example: "  " + os.Args[0] + " lib search audio",
-		Args:    cobra.ArbitraryArgs,
+		Use:   fmt.Sprintf("search [%s ...]", tr("SEARCH_TERM")),
+		Short: tr("Searches for one or more libraries matching a query."),
+		Long: tr(`Search for libraries matching zero or more search terms.
+
+All searches are performed in a case-insensitive fashion. Queries containing
+multiple search terms will return only libraries that match all of the terms.
+
+Search terms that do not match the QV syntax described below are basic search
+terms, and will match libraries that include the term anywhere in any of the
+following fields:
+ - Author
+ - Name
+ - Paragraph
+ - Provides
+ - Sentence
+
+A special syntax, called qualifier-value (QV), indicates that a search term
+should be compared against only one field of each library index entry. This
+syntax uses the name of an index field (case-insensitive), an equals sign (=)
+or a colon (:), and a value, e.g. 'name=ArduinoJson' or 'provides:tinyusb.h'.
+
+QV search terms that use a colon separator will match all libraries with the
+value anywhere in the named field, and QV search terms that use an equals
+separator will match only libraries with exactly the provided value in the
+named field.
+
+QV search terms can include embedded spaces using double-quote (") characters
+around the value or the entire term, e.g. 'category="Data Processing"' and
+'"category=Data Processing"' are equivalent. A QV term can include a literal
+double-quote character by preceding it with a backslash (\) character.
+
+NOTE: QV search terms using double-quote or backslash characters that are
+passed as command-line arguments may require quoting or escaping to prevent
+the shell from interpreting those characters.
+
+In addition to the fields listed above, QV terms can use these qualifiers:
+ - Architectures
+ - Category
+ - Dependencies
+ - License
+ - Maintainer
+ - Types
+ - Version
+ - Website
+		`),
+		Example: "  " + os.Args[0] + " lib search audio                               # " + tr("basic search for \"audio\"") + "\n" +
+			"  " + os.Args[0] + " lib search name:buzzer                         # " + tr("libraries with \"buzzer\" in the Name field") + "\n" +
+			"  " + os.Args[0] + " lib search name=pcf8523                        # " + tr("libraries with a Name exactly matching \"pcf8523\"") + "\n" +
+			"  " + os.Args[0] + " lib search \"author:\\\"Daniel Garcia\\\"\"          # " + tr("libraries authored by Daniel Garcia") + "\n" +
+			"  " + os.Args[0] + " lib search author=Adafruit name:gfx            # " + tr("libraries authored only by Adafruit with \"gfx\" in their Name") + "\n" +
+			"  " + os.Args[0] + " lib search esp32 display maintainer=espressif  # " + tr("basic search for \"esp32\" and \"display\" limited to official Maintainer") + "\n" +
+			"  " + os.Args[0] + " lib search dependencies:IRremote               # " + tr("libraries that depend on at least \"IRremote\"") + "\n" +
+			"  " + os.Args[0] + " lib search dependencies=IRremote               # " + tr("libraries that depend only on \"IRremote\"") + "\n",
+		Args: cobra.ArbitraryArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			runSearchCommand(args, namesOnly, omitReleasesDetails)
 		},

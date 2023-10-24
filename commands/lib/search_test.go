@@ -28,6 +28,7 @@ import (
 
 var customIndexPath = paths.New("testdata", "test1")
 var fullIndexPath = paths.New("testdata", "full")
+var qualifiedSearchIndexPath = paths.New("testdata", "qualified_search")
 
 func TestSearchLibrary(t *testing.T) {
 	lm := librariesmanager.NewLibraryManager(customIndexPath, nil)
@@ -93,4 +94,113 @@ func TestSearchLibraryFields(t *testing.T) {
 	res = query("flashstorage")
 	require.Len(t, res, 19)
 	require.Equal(t, "FlashStorage", res[0])
+}
+
+func TestSearchLibraryWithQualifiers(t *testing.T) {
+	lm := librariesmanager.NewLibraryManager(qualifiedSearchIndexPath, nil)
+	lm.LoadIndex()
+
+	query := func(q string) []string {
+		libs := []string{}
+		for _, lib := range searchLibrary(&rpc.LibrarySearchRequest{SearchArgs: q}, lm).Libraries {
+			libs = append(libs, lib.Name)
+		}
+		return libs
+	}
+
+	res := query("mesh")
+	require.Len(t, res, 4)
+
+	res = query("name:Mesh")
+	require.Len(t, res, 3)
+
+	res = query("name=Mesh")
+	require.Len(t, res, 0)
+
+	// Space not in double-quoted string
+	res = query("name=Painless Mesh")
+	require.Len(t, res, 0)
+
+	// Embedded space in double-quoted string
+	res = query("name=\"Painless Mesh\"")
+	require.Len(t, res, 1)
+	require.Equal(t, "Painless Mesh", res[0])
+
+	// No closing double-quote - still tokenizes with embedded space
+	res = query("name:\"Painless Mesh")
+	require.Len(t, res, 1)
+
+	// Malformed double-quoted string with escaped first double-quote
+	res = query("name:\\\"Painless Mesh\"")
+	require.Len(t, res, 0)
+
+	res = query("name:mesh author:TMRh20")
+	require.Len(t, res, 1)
+	require.Equal(t, "RF24Mesh", res[0])
+
+	res = query("mesh dependencies:ArduinoJson")
+	require.Len(t, res, 1)
+	require.Equal(t, "Painless Mesh", res[0])
+
+	res = query("architectures:esp author=\"Suraj I.\"")
+	require.Len(t, res, 1)
+	require.Equal(t, "esp8266-framework", res[0])
+
+	res = query("mesh esp")
+	require.Len(t, res, 2)
+
+	res = query("mesh esp paragraph:wifi")
+	require.Len(t, res, 1)
+	require.Equal(t, "esp8266-framework", res[0])
+
+	// Unknown qualifier should revert to original matching
+	res = query("std::array")
+	require.Len(t, res, 1)
+	require.Equal(t, "Array", res[0])
+
+	res = query("data storage")
+	require.Len(t, res, 1)
+	require.Equal(t, "Pushdata_ESP8266_SSL", res[0])
+
+	res = query("category:\"data storage\"")
+	require.Len(t, res, 1)
+	require.Equal(t, "Array", res[0])
+
+	res = query("maintainer:@")
+	require.Len(t, res, 4)
+
+	res = query("sentence:\"A library for NRF24L01(+) devices mesh.\"")
+	require.Len(t, res, 1)
+	require.Equal(t, "RF24Mesh", res[0])
+
+	res = query("types=contributed")
+	require.Len(t, res, 7)
+
+	res = query("version:1.0")
+	require.Len(t, res, 3)
+
+	res = query("version=1.2.1")
+	require.Len(t, res, 1)
+	require.Equal(t, "Array", res[0])
+
+	// Non-SSL URLs
+	res = query("website:http://")
+	require.Len(t, res, 1)
+	require.Equal(t, "RF24Mesh", res[0])
+
+	// Literal double-quote
+	res = query("sentence:\\\"")
+	require.Len(t, res, 1)
+	require.Equal(t, "RTCtime", res[0])
+
+	res = query("license=MIT")
+	require.Len(t, res, 2)
+
+	// Empty string
+	res = query("license=\"\"")
+	require.Len(t, res, 5)
+
+	res = query("provides:painlessmesh.h")
+	require.Len(t, res, 1)
+	require.Equal(t, "Painless Mesh", res[0])
 }

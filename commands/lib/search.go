@@ -23,7 +23,6 @@ import (
 	"github.com/arduino/arduino-cli/arduino"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesindex"
 	"github.com/arduino/arduino-cli/arduino/libraries/librariesmanager"
-	"github.com/arduino/arduino-cli/arduino/utils"
 	"github.com/arduino/arduino-cli/commands/internal/instances"
 	rpc "github.com/arduino/arduino-cli/rpc/cc/arduino/cli/commands/v1"
 	semver "go.bug.st/relaxed-semver"
@@ -44,18 +43,11 @@ func searchLibrary(req *rpc.LibrarySearchRequest, lm *librariesmanager.Libraries
 	if query == "" {
 		query = req.GetQuery()
 	}
-	queryTerms := utils.SearchTermsFromQueryString(query)
+
+	matcher := MatcherFromQueryString(query)
 
 	for _, lib := range lm.Index.Libraries {
-		toTest := lib.Name + " " +
-			lib.Latest.Paragraph + " " +
-			lib.Latest.Sentence + " " +
-			lib.Latest.Author + " "
-		for _, include := range lib.Latest.ProvidesIncludes {
-			toTest += include + " "
-		}
-
-		if utils.Match(toTest, queryTerms) {
+		if matcher(lib) {
 			res = append(res, indexLibraryToRPCSearchLibrary(lib, req.GetOmitReleasesDetails()))
 		}
 	}
