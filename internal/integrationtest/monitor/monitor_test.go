@@ -154,6 +154,13 @@ yun.serial.disableDTR=true
 			require.Contains(t, string(stdout), "Configuration rts = off")
 			require.Contains(t, string(stdout), "Configuration dtr = off")
 		})
+
+		t.Run("FQBNFromSpecificProfile", func(t *testing.T) {
+			// The only way to assert we're picking up the fqbn specified from the profile is to provide a wrong value
+			_, stderr, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "--raw", "--profile", "profile1", sketchWithPortAndFQBN)
+			require.Error(t, err)
+			require.Contains(t, string(stderr), "not an FQBN: broken_fqbn")
+		})
 	})
 
 	t.Run("WithPortFlag", func(t *testing.T) {
@@ -188,6 +195,13 @@ yun.serial.disableDTR=true
 			require.Contains(t, string(stdout), "Configuration rts = off")
 			require.Contains(t, string(stdout), "Configuration dtr = off")
 		})
+
+		t.Run("FQBNFromSpecificProfile", func(t *testing.T) {
+			// The only way to assert we're picking up the fqbn specified from the profile is to provide a wrong value
+			_, stderr, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARGS", "--raw", "--profile", "profile1", sketchWithPortAndFQBN)
+			require.Error(t, err)
+			require.Contains(t, string(stderr), "not an FQBN: broken_fqbn")
+		})
 	})
 
 	t.Run("WithFQBNFlag", func(t *testing.T) {
@@ -213,6 +227,14 @@ yun.serial.disableDTR=true
 
 		t.Run("WithDefaultPortAndQBN", func(t *testing.T) {
 			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-b", "arduino:avr:uno", "--raw", sketchWithPortAndFQBN)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyDEF")
+			require.Contains(t, string(stdout), "Configuration rts = off")
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+		})
+
+		t.Run("IgnoreProfile", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-b", "arduino:avr:uno", "--raw", "--profile", "profile1", sketchWithPortAndFQBN)
 			require.NoError(t, err)
 			require.Contains(t, string(stdout), "Opened port: /dev/ttyDEF")
 			require.Contains(t, string(stdout), "Configuration rts = off")
@@ -247,6 +269,14 @@ yun.serial.disableDTR=true
 
 		t.Run("WithDefaultPortAndQBN", func(t *testing.T) {
 			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARGS", "-b", "arduino:avr:uno", "--raw", sketchWithPortAndFQBN)
+			require.NoError(t, err)
+			require.Contains(t, string(stdout), "Opened port: /dev/ttyARGS")
+			require.Contains(t, string(stdout), "Configuration rts = off")
+			require.Contains(t, string(stdout), "Configuration dtr = on")
+		})
+
+		t.Run("IgnoreProfile", func(t *testing.T) {
+			stdout, _, err := cli.RunWithCustomInput(quitMonitor(), "monitor", "-p", "/dev/ttyARGS", "-b", "arduino:avr:uno", "--raw", "--profile", "profile1", sketchWithPortAndFQBN)
 			require.NoError(t, err)
 			require.Contains(t, string(stdout), "Opened port: /dev/ttyARGS")
 			require.Contains(t, string(stdout), "Configuration rts = off")

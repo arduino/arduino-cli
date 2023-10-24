@@ -98,6 +98,11 @@ func runMonitorCmd(
 		defaultPort, defaultProtocol string
 	)
 
+	// Flags takes maximum precedence over sketch.yaml
+	// If {--port --fqbn --profile} are set we ignore the profile.
+	// If both {--port --profile} are set we read the fqbn in the following order: profile -> default_fqbn -> discovery
+	// If only --port is set we read the fqbn in the following order: default_fqbn -> discovery
+	// If only --fqbn is set we read the port in the following order: default_port
 	sketchPath := arguments.InitSketchPath(sketchPathArg)
 	sketch, err := sk.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if err != nil && !portArgs.IsPortFlagSet() {
@@ -108,6 +113,8 @@ func runMonitorCmd(
 	}
 	if sketch != nil {
 		defaultPort, defaultProtocol = sketch.GetDefaultPort(), sketch.GetDefaultProtocol()
+	}
+	if fqbnArg.String() == "" {
 		if profileArg.Get() == "" {
 			inst, profile = instance.CreateAndInitWithProfile(sketch.GetDefaultProfile().GetName(), sketchPath)
 		} else {
