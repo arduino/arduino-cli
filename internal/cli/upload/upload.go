@@ -89,7 +89,7 @@ func runUploadCommand(args []string, uploadFieldsArgs map[string]string) {
 	if len(args) > 0 {
 		path = args[0]
 	}
-	sketchPath := arguments.InitSketchPath(path)
+	sketchPath := arguments.InitSketchPath(path, true)
 
 	if msg := sk.WarnDeprecatedFiles(sketchPath); importDir == "" && importFile == "" && msg != "" {
 		feedback.Warning(msg)

@@ -155,3 +155,8 @@ func (p *Port) DetectFQBN(inst *rpc.Instance) (string, *rpc.Port) {
 	}
 	return "", nil
 }
+
+// IsPortFlagSet returns true if the port address is provided
+func (p *Port) IsPortFlagSet() bool {
+	return p.address != ""
+}

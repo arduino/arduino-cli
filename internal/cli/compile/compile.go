@@ -157,7 +157,7 @@ func runCompileCommand(cmd *cobra.Command, args []string) {
 		path = args[0]
 	}
 
-	sketchPath := arguments.InitSketchPath(path)
+	sketchPath := arguments.InitSketchPath(path, true)
 
 	sk, err := sketch.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if err != nil {
