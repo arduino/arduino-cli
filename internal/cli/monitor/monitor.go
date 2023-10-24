@@ -103,7 +103,7 @@ func runMonitorCmd(
 	// If both {--port --profile} are set we read the fqbn in the following order: profile -> default_fqbn -> discovery
 	// If only --port is set we read the fqbn in the following order: default_fqbn -> discovery
 	// If only --fqbn is set we read the port in the following order: default_port
-	sketchPath := arguments.InitSketchPath(sketchPathArg)
+	sketchPath := arguments.InitSketchPath(sketchPathArg, false)
 	sketch, err := sk.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 	if err != nil && !portArgs.IsPortFlagSet() {
 		feedback.Fatal(
