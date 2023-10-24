@@ -93,48 +93,46 @@ func runMonitorCmd(
 
 	var (
 		inst                         *rpc.Instance
+		profile                      *rpc.Profile
 		fqbn                         string
 		defaultPort, defaultProtocol string
 	)
 
-	if !portArgs.IsPortFlagSet() {
-		sketchPath := arguments.InitSketchPath(sketchPathArg)
-		sketch, err := sk.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
-		if err != nil {
-			feedback.Fatal(
-				tr("Error getting default port from `sketch.yaml`. Check if you're in the correct sketch folder or provide the --port flag: %s", err),
-				feedback.ErrGeneric,
-			)
-		}
-		defaultPort = sketch.GetDefaultPort()
-		defaultProtocol = sketch.GetDefaultProtocol()
-
-		var profile *rpc.Profile
+	sketchPath := arguments.InitSketchPath(sketchPathArg)
+	sketch, err := sk.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
+	if err != nil && !portArgs.IsPortFlagSet() {
+		feedback.Fatal(
+			tr("Error getting default port from `sketch.yaml`. Check if you're in the correct sketch folder or provide the --port flag: %s", err),
+			feedback.ErrGeneric,
+		)
+	}
+	if sketch != nil {
+		defaultPort, defaultProtocol = sketch.GetDefaultPort(), sketch.GetDefaultProtocol()
 		if profileArg.Get() == "" {
 			inst, profile = instance.CreateAndInitWithProfile(sketch.GetDefaultProfile().GetName(), sketchPath)
 		} else {
 			inst, profile = instance.CreateAndInitWithProfile(profileArg.Get(), sketchPath)
 		}
-
-		// Priority on how to retrieve the fqbn
-		// 1. from flag
-		// 2. from profile
-		// 3. from default_fqbn specified in the sketch.yaml
-		// 4. try to detect from the port
-		switch {
-		case fqbnArg.String() != "":
-			fqbn = fqbnArg.String()
-		case profile.GetFqbn() != "":
-			fqbn = profile.GetFqbn()
-		case sketch.GetDefaultFqbn() != "":
-			fqbn = sketch.GetDefaultFqbn()
-		default:
-			fqbn, _ = portArgs.DetectFQBN(inst)
-		}
-	} else {
-		inst = instance.CreateAndInit()
-		fqbn = fqbnArg.String()
 	}
+	if inst == nil {
+		inst = instance.CreateAndInit()
+	}
+	// Priority on how to retrieve the fqbn
+	// 1. from flag
+	// 2. from profile
+	// 3. from default_fqbn specified in the sketch.yaml
+	// 4. try to detect from the port
+	switch {
+	case fqbnArg.String() != "":
+		fqbn = fqbnArg.String()
+	case profile.GetFqbn() != "":
+		fqbn = profile.GetFqbn()
+	case sketch.GetDefaultFqbn() != "":
+		fqbn = sketch.GetDefaultFqbn()
+	default:
+		fqbn, _ = portArgs.DetectFQBN(inst)
+	}
+
 	portAddress, portProtocol, err := portArgs.GetPortAddressAndProtocol(inst, defaultPort, defaultProtocol)
 	if err != nil {
 		feedback.FatalError(err, feedback.ErrGeneric)
