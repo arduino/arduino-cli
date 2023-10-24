@@ -67,11 +67,7 @@ func NewCommand() *cobra.Command {
 			if len(args) > 0 {
 				sketchPath = args[0]
 			}
-			var portProvidedFromFlag bool
-			if p := cmd.Flags().Lookup("port"); p != nil && p.Changed {
-				portProvidedFromFlag = true
-			}
-			runMonitorCmd(&portArgs, &fqbnArg, &profileArg, sketchPath, configs, describe, timestamp, quiet, raw, portProvidedFromFlag)
+			runMonitorCmd(&portArgs, &fqbnArg, &profileArg, sketchPath, configs, describe, timestamp, quiet, raw)
 		},
 	}
 	portArgs.AddToCommand(monitorCommand)
@@ -87,7 +83,7 @@ func NewCommand() *cobra.Command {
 
 func runMonitorCmd(
 	portArgs *arguments.Port, fqbnArg *arguments.Fqbn, profileArg *arguments.Profile, sketchPathArg string,
-	configs []string, describe, timestamp, quiet, raw bool, portProvidedFromFlag bool,
+	configs []string, describe, timestamp, quiet, raw bool,
 ) {
 	logrus.Info("Executing `arduino-cli monitor`")
 
@@ -101,7 +97,7 @@ func runMonitorCmd(
 		defaultPort, defaultProtocol string
 	)
 
-	if !portProvidedFromFlag {
+	if !portArgs.IsPortFlagSet() {
 		sketchPath := arguments.InitSketchPath(sketchPathArg)
 		sketch, err := sk.LoadSketch(context.Background(), &rpc.LoadSketchRequest{SketchPath: sketchPath.String()})
 		if err != nil {
