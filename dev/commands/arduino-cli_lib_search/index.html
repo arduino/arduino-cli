@@ -1449,13 +1449,54 @@
                   <h1>lib search</h1>
                 
                 <h2 id="arduino-cli-lib-search">arduino-cli lib search<a class="headerlink" href="#arduino-cli-lib-search" title="Permanent link">&para;</a></h2>
-<p>Searches for one or more libraries data.</p>
+<p>Searches for one or more libraries matching a query.</p>
 <h3 id="synopsis">Synopsis<a class="headerlink" href="#synopsis" title="Permanent link">&para;</a></h3>
-<p>Search for one or more libraries data (case insensitive search).</p>
-<div class="highlight"><pre><span></span><code>arduino-cli lib search [LIBRARY_NAME] [flags]
+<p>Search for libraries matching zero or more search terms.</p>
+<p>All searches are performed in a case-insensitive fashion. Queries containing
+multiple search terms will return only libraries that match all of the terms.</p>
+<p>Search terms that do not match the QV syntax described below are basic search
+terms, and will match libraries that include the term anywhere in any of the
+following fields:
+ - Author
+ - Name
+ - Paragraph
+ - Provides
+ - Sentence</p>
+<p>A special syntax, called qualifier-value (QV), indicates that a search term
+should be compared against only one field of each library index entry. This
+syntax uses the name of an index field (case-insensitive), an equals sign (=)
+or a colon (:), and a value, e.g. 'name=ArduinoJson' or 'provides:tinyusb.h'.</p>
+<p>QV search terms that use a colon separator will match all libraries with the
+value anywhere in the named field, and QV search terms that use an equals
+separator will match only libraries with exactly the provided value in the
+named field.</p>
+<p>QV search terms can include embedded spaces using double-quote (") characters
+around the value or the entire term, e.g. 'category="Data Processing"' and
+'"category=Data Processing"' are equivalent. A QV term can include a literal
+double-quote character by preceding it with a backslash () character.</p>
+<p>NOTE: QV search terms using double-quote or backslash characters that are
+passed as command-line arguments may require quoting or escaping to prevent
+the shell from interpreting those characters.</p>
+<p>In addition to the fields listed above, QV terms can use these qualifiers:
+ - Architectures
+ - Category
+ - Dependencies
+ - License
+ - Maintainer
+ - Types
+ - Version
+ - Website</p>
+<div class="highlight"><pre><span></span><code>arduino-cli lib search [SEARCH_TERM ...] [flags]
 </code></pre></div>
 <h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>  arduino-cli lib search audio
+<div class="highlight"><pre><span></span><code>  arduino-cli lib search audio                               # basic search for &quot;audio&quot;
+  arduino-cli lib search name:buzzer                         # libraries with &quot;buzzer&quot; in the Name field
+  arduino-cli lib search name=pcf8523                        # libraries with a Name exactly matching &quot;pcf8523&quot;
+  arduino-cli lib search &quot;author:\&quot;Daniel Garcia\&quot;&quot;          # libraries authored by Daniel Garcia
+  arduino-cli lib search author=Adafruit name:gfx            # libraries authored only by Adafruit with &quot;gfx&quot; in their Name
+  arduino-cli lib search esp32 display maintainer=espressif  # basic search for &quot;esp32&quot; and &quot;display&quot; limited to official Maintainer
+  arduino-cli lib search dependencies:IRremote               # libraries that depend on at least &quot;IRremote&quot;
+  arduino-cli lib search dependencies=IRremote               # libraries that depend only on &quot;IRremote&quot;
 </code></pre></div>
 <h3 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>  -h, --help                    help for search
